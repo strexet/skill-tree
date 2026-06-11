@@ -4,7 +4,9 @@
 
 - Find the applicable `FUTURE.md`.
 - Confirm it contains `Pending Queue`, `Prioritized Next Changes`, and `Backlog`.
-- Read relevant repository rules before editing.
+- MUST read repository `AGENTS.md`, `RULES.md`, or equivalent rules before editing.
+- MUST read repository/document map if one exists.
+- MUST read current `FEATURES.md`, active `FUTURE.md`, and task-relevant architecture/domain docs.
 
 ## Read Pending
 
@@ -15,6 +17,7 @@
 
 - Search affected code, assets, scenes, prefabs, settings, tests, and docs.
 - Check related items in all three queues.
+- Verify referenced paths and symbols still exist.
 - Determine implementation status: implemented, stale, duplicate, contradictory, blocked, or valid.
 
 ## Expand
@@ -40,4 +43,6 @@
 - Required owner decision blocks implementation.
 - A request conflicts with current architecture or platform constraints and no safe resolution exists.
 - Evidence is insufficient to identify affected ownership.
-- The user asked to implement rather than process; route to `implement-next-future-task` only for prioritized tasks.
+- Required repository rules or task-relevant documents are missing or contradictory.
+- The user asked to implement rather than process; route to `skill-tree-implement-next-future-task` only for prioritized tasks.
+- Never process from `FUTURE.md` alone.

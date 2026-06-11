@@ -12,4 +12,4 @@ Use for agents without a verified native profile:
 node bin/install.js --only generic --target /path/to/agent/skills --copy
 ```
 
-Manual install is also valid: copy selected `skills/<skill-name>/` folders into the agent's documented skill location.
+Manual install is also valid: copy selected `skills/skill-tree-<skill-name>/` folders into the agent's documented skill location.

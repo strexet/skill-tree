@@ -36,8 +36,9 @@ Soft providers are listed but not selected by automatic detection. Select them w
 ## Selecting Skills
 
 ```bash
-node bin/install.js --skills unity-repo-documentation
-node bin/install.js --skills process-future-pending implement-next-future-task
+node bin/install.js --skills skill-tree-unity-repo-documentation
+node bin/install.js --skills skill-tree-process-future-pending skill-tree-implement-next-future-task
+node bin/install.js --skills skill-tree-unity-repo-documentation-audit
 ```
 
 Without `--skills`, all canonical skills are selected.
@@ -83,6 +84,10 @@ node bin/install.js --uninstall --only claude-code --with-init --target /path/to
 ```
 
 Uninstall removes only selected skill folders and marker-fenced bridge blocks owned by this installer. It does not delete unrelated instruction files or unrelated skills.
+
+## Migration From Unprefixed Skill Names
+
+The installer does not provide active alias skill folders for legacy unprefixed names. Remove old installed folders, then reinstall the prefixed skills. See `docs/MIGRATION.md` for project and global cleanup examples.
 
 ## Verify
 

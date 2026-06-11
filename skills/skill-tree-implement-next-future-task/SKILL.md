@@ -1,5 +1,5 @@
 ---
-name: implement-next-future-task
+name: skill-tree-implement-next-future-task
 description: Implement exactly one task from the Prioritized Next Changes section of FUTURE.md. Use for "Implement next", "Implement next feature", "Implement next: <task name>", or "Implement next feature: <task name>". Never select from Pending Queue or Backlog, and stop for blocking unresolved questions or when a named prioritized task is absent.
 license: MIT
 ---
@@ -42,14 +42,21 @@ python3 scripts/select_prioritized_task.py /path/to/Documents/FUTURE.md --name "
 Before editing:
 
 1. Read the complete selected task.
-2. Read all required repository documentation.
-3. Read `Questions and required clarifications`.
-4. Identify unresolved blocking questions.
-5. Ask the owner those questions.
-6. Stop implementation until answers exist.
-7. Update the task with answers before implementation.
+2. MUST read repository `AGENTS.md`, `Documents/RULES.md`, or equivalent repository rules.
+3. MUST read repository/document map if one exists.
+4. MUST inspect all documents referenced by the task.
+5. MUST read current-state docs such as `FEATURES.md` and task-relevant architecture/domain docs.
+6. MUST inspect current code and tests for affected paths and symbols.
+7. MUST check for recent changes that invalidate task assumptions or make the work already complete.
+8. MUST check existing `FUTURE.md` tasks for duplicate or overlapping work.
+9. Read `Questions and required clarifications`.
+10. Identify unresolved blocking questions.
+11. Ask the owner those questions.
+12. Stop implementation until answers exist.
+13. Update the task with answers or stale assumptions before implementation.
 
 Do not guess to keep moving.
+MUST NOT implement from `FUTURE.md` alone.
 
 ## Scope
 
@@ -60,8 +67,9 @@ Do not guess to keep moving.
 - Avoid opportunistic refactors.
 - Add or update tests appropriate to the task.
 - Update current-state documentation when behavior ships.
+- Keep `FEATURES.md` current-state only. Move new plans, deferred work, or known bugs awaiting fixes to `FUTURE.md`.
 - Remove the completed task from `FUTURE.md` instead of keeping completed entries indefinitely.
-- Report checks actually run.
+- Report required context inspected and checks actually run.
 
 ## Completion
 

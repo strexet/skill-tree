@@ -1,0 +1,7 @@
+interface:
+  display_name: "Unity Documentation Audit"
+  short_description: "Audit existing Unity docs against code"
+  default_prompt: "Audit existing Unity repository documentation against the current codebase and repair drift."
+
+policy:
+  allow_implicit_invocation: true

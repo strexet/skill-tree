@@ -23,13 +23,13 @@ class ReferenceSyncTests(unittest.TestCase):
 
     def test_full_copy_is_byte_identical(self):
         source = (ROOT / "REPO_INIT_INSTRUCTIONS.md").read_bytes()
-        copy = (ROOT / "skills/unity-repo-documentation/references/REPO_INIT_INSTRUCTIONS.md").read_bytes()
+        copy = (ROOT / "skills/skill-tree-unity-repo-documentation/references/REPO_INIT_INSTRUCTIONS.md").read_bytes()
         self.assertEqual(copy, source)
 
     def test_generated_references_have_notice(self):
         for rel in [
-            "skills/process-future-pending/references/FUTURE_TASK_STANDARD.md",
-            "skills/implement-next-future-task/references/FUTURE_EXECUTION_RULES.md",
+            "skills/skill-tree-process-future-pending/references/FUTURE_TASK_STANDARD.md",
+            "skills/skill-tree-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md",
         ]:
             text = (ROOT / rel).read_text(encoding="utf-8")
             self.assertTrue(text.startswith("<!--\nGENERATED FILE"))

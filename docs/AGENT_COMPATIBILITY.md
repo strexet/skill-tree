@@ -16,6 +16,7 @@ Primary sources checked:
 ## Compatibility Notes
 
 - Basic `SKILL.md` folders are the canonical portable format.
+- Repository-owned skill names intentionally use the `skill-tree-` prefix for cross-source discovery clarity.
 - Optional fields such as `allowed-tools`, hooks, or product-specific metadata are not interpreted uniformly.
 - `agents/openai.yaml` is optional Codex metadata and is not required for portable behavior.
 - Some Tier 1 providers rely on the open `skills` CLI path convention instead of verified native skill-discovery semantics.

@@ -4,7 +4,7 @@ Last verified: 2026-06-10.
 
 ## Canonical Ownership
 
-Canonical behavior lives under `skills/<skill-name>/`. Agent adapters describe installation behavior and optional bridges, but do not redefine skill content.
+Canonical behavior lives under `skills/skill-tree-<skill-name>/`. Agent adapters describe installation behavior and optional bridges, but do not redefine skill content.
 
 ## Provider Matrix
 
@@ -66,6 +66,8 @@ Existing files are backed up before modification. Uninstall removes only the mar
 ## Uninstall Boundaries
 
 Uninstall removes selected canonical skill directories or symlinks and optional bridge blocks. It does not delete shared instruction files or unrelated skills.
+
+Legacy unprefixed skill folders are not aliases. They must be removed explicitly during migration, then prefixed skills installed.
 
 ## Test Strategy
 

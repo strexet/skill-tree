@@ -4,14 +4,16 @@ Vendor-neutral Agent Skills for Unity repository documentation and `FUTURE.md` t
 
 ## Skills
 
-- `unity-repo-documentation`: analyze an existing Unity repository and create or repair AI-oriented documentation.
-- `process-future-pending`: research `FUTURE.md` Pending Queue entries and promote only implementation-ready work.
-- `implement-next-future-task`: implement exactly one task from `Prioritized Next Changes`.
+- `skill-tree-unity-repo-documentation`: analyze an existing Unity repository and create or repair AI-oriented documentation.
+- `skill-tree-process-future-pending`: research `FUTURE.md` Pending Queue entries and promote only implementation-ready work.
+- `skill-tree-implement-next-future-task`: implement exactly one task from `Prioritized Next Changes`.
+- `skill-tree-unity-repo-documentation-audit`: audit existing repository documentation against current code and repair drift.
 
 ## Trigger Examples
 
 ```text
 Initialize AI-oriented documentation for this Unity project.
+Audit and repair existing Unity repository documentation.
 Process pending.
 Implement next.
 Implement next: Add save migration validation.
@@ -22,7 +24,7 @@ Implement next: Add save migration validation.
 Canonical source:
 
 ```text
-skills/<skill-name>/
+skills/skill-tree-<skill-name>/
 ```
 
 Project installation and global installation paths are determined by the selected agent profile in `config/providers.json`. Optional vendor metadata is non-canonical and may be ignored by other agents.
@@ -47,10 +49,14 @@ node bin/install.js --only codex --project --target /path/to/repo --symlink
 Direct upstream passthrough for current `skills` CLI profiles:
 
 ```bash
-node bin/install.js --agent qwen-code --skills process-future-pending --source /path/to/this/repo
+node bin/install.js --agent qwen-code --skills skill-tree-process-future-pending --source /path/to/this/repo
 ```
 
 Do not use a remote one-liner until a real repository URL is intentionally selected.
+
+## Migration
+
+All repository-owned skills use the `skill-tree-` prefix. Legacy installed folders are not active aliases and should be removed before reinstalling. See `docs/MIGRATION.md`.
 
 ## Supported Tiers
 

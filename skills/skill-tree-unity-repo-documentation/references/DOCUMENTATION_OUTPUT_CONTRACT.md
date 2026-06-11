@@ -40,8 +40,8 @@ Create optional specialized documents only when repository evidence justifies th
 
 - `PROJECT.md`: product purpose, scope, users, non-goals.
 - `TECHNICAL.md`: stack, architecture, data flow, constraints.
-- `FEATURES.md`: implemented, partial, configured, disabled, or deprecated feature behavior only.
-- `FUTURE.md`: Pending Queue, Prioritized Next Changes, Backlog.
+- `FEATURES.md`: implemented, partial, configured, disabled, or deprecated feature behavior only. No future-work, roadmap, next-step, pending, or implementation-plan sections.
+- `FUTURE.md`: Pending Queue, Prioritized Next Changes, Backlog, planned improvements, known bugs awaiting fixes, documentation improvements, proposed features, refactoring plans, and deferred investigations.
 - `RULES.md`: AI-agent workflow and repository editing rules.
 - `REPOSITORY_MAP.md`: physical layout and ownership.
 - `BUILD_AND_RELEASE.md`: local builds, CI, signing, release flow.
@@ -57,8 +57,13 @@ Live documents use stable names without timestamps or snapshot markers. Snapshot
 
 - Implemented behavior belongs in current-state docs.
 - Planned behavior belongs in `FUTURE.md`.
+- Current limitations may be documented in `FEATURES.md`; plans to resolve them belong in `FUTURE.md`.
 - Assumptions and open questions must be marked.
 - Repository evidence outranks existing docs for current behavior.
+
+## Issue Discovery
+
+Documentation work must inspect key implementation paths, tests, error handling, state transitions, persistence, mutation logic, and existing `FUTURE.md` entries. Add meaningful discovered issues to the active `FUTURE.md` backlog with evidence, affected paths/symbols, impact, suggested direction, acceptance criteria, and focused tests. Distinguish confirmed bugs, strongly suspected issues, documentation inconsistencies, and improvement opportunities.
 
 ## `FUTURE.md` Queues
 
@@ -74,4 +79,4 @@ Live documents use stable names without timestamps or snapshot markers. Snapshot
 
 ## Final Handoff
 
-Report created and updated files, optional documents and why, major verified findings, drift found, open questions, checks run, checks not run, risks, and a suggested commit message.
+Report created and updated files, optional documents and why, major verified findings, drift corrected, issues added to backlog, potential issues excluded for insufficient evidence, open questions, checks run, checks not run, risks, and a suggested commit message.

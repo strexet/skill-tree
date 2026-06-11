@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VALIDATOR = ROOT / "skills/process-future-pending/scripts/validate_future_document.py"
+VALIDATOR = ROOT / "skills/skill-tree-process-future-pending/scripts/validate_future_document.py"
 FIXTURES = ROOT / "tests/fixtures/future"
 
 

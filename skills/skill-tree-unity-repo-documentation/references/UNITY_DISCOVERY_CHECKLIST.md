@@ -52,3 +52,5 @@ Use this checklist while building the evidence inventory. Mark areas not present
 - Generated/transient directories: `Library/`, `Temp/`, `Obj/`, `Logs/`, `Build/`, `Builds/`, `UserSettings/`
 - Secrets and credentials: document locations/names only, never values
 - Existing docs drift: compare against current code and serialized state
+- `FEATURES.md`/`FUTURE.md` split: current behavior only in `FEATURES.md`, planned work and known bugs awaiting fixes in `FUTURE.md`
+- Issue discovery: inspect key code paths, tests, error handling, state transitions, persistence, mutation logic, and existing backlog before final handoff

@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SELECTOR = ROOT / "skills/implement-next-future-task/scripts/select_prioritized_task.py"
+SELECTOR = ROOT / "skills/skill-tree-implement-next-future-task/scripts/select_prioritized_task.py"
 FIXTURES = ROOT / "tests/fixtures/future"
 
 

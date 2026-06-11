@@ -829,6 +829,33 @@ When docs and code disagree:
 5. Record unresolved conflict as an open question or `FUTURE.md` task.
 6. Do not “fix” code merely to make it match old documentation during a documentation task.
 
+## 6.17 Code issue discovery during documentation
+
+Documentation review must not silently ignore meaningful code or architecture problems discovered during inspection.
+
+Before finalizing documents, inspect:
+
+- key implementation paths;
+- tests;
+- error handling;
+- state transitions;
+- persistence and mutation logic;
+- existing `FUTURE.md` entries.
+
+Add noteworthy findings to the active `FUTURE.md` backlog when evidence supports them. Valid findings include confirmed bugs, strongly suspected bugs, broken or risky logic, documentation/code drift, architectural issues, missing validation, missing tests, error-handling gaps, security or data-safety concerns, maintainability problems, performance risks, and dead or misleading code.
+
+Each added backlog entry should include:
+
+- finding type: confirmed bug, strongly suspected issue, documentation inconsistency, or improvement opportunity;
+- evidence;
+- affected paths and symbols;
+- user or technical impact;
+- suggested investigation or implementation direction;
+- acceptance criteria;
+- focused tests where relevant.
+
+Merge with existing backlog entries when the same issue is already documented. Do not duplicate tasks. Do not present speculation as a confirmed bug. Do not add trivial style observations unless they materially affect maintainability or correctness. Do not automatically fix unrelated code bugs unless implementation work is explicitly requested.
+
 ## 7. Phase 3 — Create the Documentation Set
 
 Create documents in this order so later files can reference established facts:
@@ -1121,6 +1148,8 @@ Do not reproduce every directory.
 This file contains current implemented or partial behavior only.
 
 Planned-only work belongs in `FUTURE.md`.
+Future sections, roadmaps, pending implementation plans, proposed features, and deferred work do not belong in `FEATURES.md`.
+Current limitations may be documented only as present behavior; plans to resolve them belong in `FUTURE.md`.
 
 Use this template for each material feature:
 
@@ -1172,6 +1201,7 @@ Deprecated
 ```
 
 Do not use `Planned` in `FEATURES.md`.
+Do not include a `Future Work`, `Roadmap`, `Next Steps`, `Pending`, or equivalent planning section in `FEATURES.md`.
 
 ### 13.2 Feature granularity
 
@@ -1207,7 +1237,7 @@ Each section must name concrete owners. When behavior depends on scene wiring or
 
 ## 14. Document Specification — `Documents/FUTURE.md`
 
-`FUTURE.md` is the single source of truth for not-yet-implemented work.
+`FUTURE.md` is the single source of truth for not-yet-implemented work, planned improvements, backlog items, known bugs awaiting fixes, documentation improvements, proposed features, refactoring plans, and deferred investigations.
 
 It must contain three distinct queues:
 
@@ -1329,24 +1359,30 @@ Treat these commands as equivalent.
 
 When instructed to process pending tasks, the agent must:
 
-1. Read the complete `Pending Queue`.
-2. Read the source-of-truth documents relevant to each pending item.
-3. Inspect current implementation, serialized assets, settings, tests, and history as needed.
-4. Check whether each request is already implemented, obsolete, duplicated, contradictory, or blocked.
-5. Merge overlapping pending entries when they describe the same coherent change.
-6. Expand each valid request into a maximally detailed task using the full prioritized-task template.
-7. Add a mandatory `Questions and required clarifications` section to every promoted task.
-8. Include questions about possible implementation approaches and additional task context, not only obvious missing acceptance criteria.
-9. Answer questions from repository evidence when possible.
-10. Mark answers as verified, inferred, recommended, or unresolved.
-11. Move only implementation-ready entries into `Prioritized Next Changes`.
-12. Leave blocked or insufficiently understood entries in `Pending Queue` with an explanation of what is missing.
-13. Place promoted tasks according to explicit priority placement or the repository’s documented prioritization rules.
-14. Remove the original pending entry only after its information has been preserved in the promoted task.
+1. MUST read repository `AGENTS.md`, `RULES.md`, or equivalent rules.
+2. MUST read the repository/document map if one exists.
+3. MUST read current `FEATURES.md`, active `FUTURE.md`, and source-of-truth documents relevant to each pending item.
+4. Read the complete `Pending Queue`.
+5. MUST inspect current implementation, serialized assets, settings, tests, and history as needed.
+6. MUST verify referenced paths and symbols still exist.
+7. Check whether each request is already implemented, obsolete, duplicated, contradictory, or blocked.
+8. Check existing `FUTURE.md` tasks for overlap.
+9. Merge overlapping pending entries when they describe the same coherent change.
+10. Expand each valid request into a maximally detailed task using the full prioritized-task template and current code/test paths.
+11. Add a mandatory `Questions and required clarifications` section to every promoted task.
+12. Include questions about possible implementation approaches and additional task context, not only obvious missing acceptance criteria.
+13. Answer questions from repository evidence when possible.
+14. Mark answers as verified, inferred, recommended, or unresolved.
+15. Move only implementation-ready entries into `Prioritized Next Changes`.
+16. Leave blocked or insufficiently understood entries in `Pending Queue` with an explanation of what is missing.
+17. Place promoted tasks according to explicit priority placement or the repository’s documented prioritization rules.
+18. Remove the original pending entry only after its information has been preserved in the promoted task.
+19. Report which repository rules, documents, code paths, and tests were inspected.
 
 Processing pending work is a documentation and research operation. It does not implement the task unless the user explicitly combines the commands.
 
 A promoted task must not be a lightly expanded version of the pending bullet. It must be detailed enough to serve as the implementation contract.
+Agents MUST NOT process pending work from `FUTURE.md` alone. Stop or mark the item blocked when required repository context is missing or contradictory.
 
 #### 14.4.2 Mandatory implementation questions
 
@@ -1404,6 +1440,10 @@ When processing pending tasks, resolve what can be resolved from evidence. Prese
 
 Before implementing a task from `Prioritized Next Changes`, the agent must read its complete `Questions and required clarifications` section.
 
+Before editing, the agent MUST read repository `AGENTS.md`, `RULES.md`, or equivalent rules; MUST read the repository/document map if one exists; MUST inspect all documents referenced by the task; MUST read current-state docs such as `FEATURES.md` and task-relevant architecture/domain docs; MUST inspect current code and tests for affected paths and symbols; MUST check for recent changes that invalidate task assumptions or make the task already complete; and MUST check active `FUTURE.md` tasks for duplicate or overlapping work.
+
+The agent MUST NOT implement from `FUTURE.md` alone.
+
 If any unresolved question can materially affect:
 
 - public or user-visible behavior;
@@ -1448,7 +1488,7 @@ the agent must:
 3. Select the first task in that section.
 4. Ignore `Pending Queue` and `Backlog` for task selection.
 5. Stop and report that no prioritized task is available when the section is empty.
-6. Perform the clarification gate before editing.
+6. Perform mandatory repository orientation and the clarification gate before editing.
 7. Implement only the selected task.
 
 With a task name:
@@ -1512,6 +1552,7 @@ Include rules such as:
 13. Do not change Unity/package/platform foundations silently.
 14. Remove the shipped entry instead of marking it completed forever.
 15. Never use `Backlog` as hidden implementation context for an `Implement next` command.
+16. Report which repository rules, documents, code paths, and tests were inspected.
 
 ### 14.6 Prioritized-task completeness standard
 
@@ -1877,6 +1918,7 @@ agent workflow -> RULES.md
 ```
 
 Update all affected documents in the same change set. Keep edits minimal and factual.
+Completing implemented work must remove or update the matching `FUTURE.md` entry. Historical planning details must not be copied into `FEATURES.md`.
 
 ### 15.10 When to propose instead of implement
 

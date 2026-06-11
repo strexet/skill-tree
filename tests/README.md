@@ -11,7 +11,7 @@ node --test tests/test_installer.js tests/test_provider_matrix.js
 
 Prompt: `Initialize AI-oriented documentation for this existing Unity project.`
 
-Expected activation: `unity-repo-documentation`.
+Expected activation: `skill-tree-unity-repo-documentation`.
 
 Expected files read: `references/REPO_INIT_INSTRUCTIONS.md`, `references/DOCUMENTATION_OUTPUT_CONTRACT.md`, `references/UNITY_DISCOVERY_CHECKLIST.md`, repository code/settings/assets/docs.
 
@@ -26,11 +26,23 @@ Negative prompts:
 - `Update one sentence in README.`
 - `Implement next.`
 
+## Documentation Audit Skill
+
+Prompt: `Audit and repair existing Unity repository documentation.`
+
+Expected activation: `skill-tree-unity-repo-documentation-audit`.
+
+Fixtures: `tests/fixtures/documentation-audit/`.
+
+Forbidden behavior: product code refactors, docs-only comparison without code inspection, duplicate backlog issue creation, future-work sections in `FEATURES.md`.
+
+Scoring checks: baseline docs verified, stale claims repaired, missing docs recreated from evidence, meaningful discovered issues added or merged in `FUTURE.md`, audit summary reports inspected context.
+
 ## Pending Processing Skill
 
 Prompt: `Process pending tasks in FUTURE.md.`
 
-Expected activation: `process-future-pending`.
+Expected activation: `skill-tree-process-future-pending`.
 
 Forbidden behavior: product code changes, Backlog selection, unresearched promotion, missing questions.
 
@@ -40,7 +52,7 @@ Scoring checks: every pending item researched, promoted tasks are complete, bloc
 
 Prompt: `Implement next.`
 
-Expected activation: `implement-next-future-task`.
+Expected activation: `skill-tree-implement-next-future-task`.
 
 Forbidden behavior: Backlog fallback, Pending implementation, skipping blocked first task, fuzzy matching missing names, implementing multiple tasks.
 

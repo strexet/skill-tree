@@ -60,10 +60,10 @@ def extract_section(text: str, start_heading: str, end_heading: str) -> str:
 def expected_outputs(root: Path) -> dict[Path, str]:
     source = read_text(root / "REPO_INIT_INSTRUCTIONS.md")
     return {
-        root / "skills/unity-repo-documentation/references/REPO_INIT_INSTRUCTIONS.md": source,
-        root / "skills/process-future-pending/references/FUTURE_TASK_STANDARD.md": NOTICE
+        root / "skills/skill-tree-unity-repo-documentation/references/REPO_INIT_INSTRUCTIONS.md": source,
+        root / "skills/skill-tree-process-future-pending/references/FUTURE_TASK_STANDARD.md": NOTICE
         + extract_section(source, FUTURE_START, FUTURE_END),
-        root / "skills/implement-next-future-task/references/FUTURE_EXECUTION_RULES.md": NOTICE
+        root / "skills/skill-tree-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md": NOTICE
         + extract_section(source, EXECUTION_START, EXECUTION_END),
     }
 

@@ -29,11 +29,12 @@ ROOT_FILES = [
     "config/providers.json",
     "docs/AGENT_COMPATIBILITY.md",
     "docs/INSTALLATION_ARCHITECTURE.md",
+    "docs/MIGRATION.md",
     "docs/SECURITY.md",
     "src/init-rules/unity-repository-skills.md",
 ]
 SKILLS = {
-    "unity-repo-documentation": {
+    "skill-tree-unity-repo-documentation": {
         "references": [
             "REPO_INIT_INSTRUCTIONS.md",
             "DOCUMENTATION_OUTPUT_CONTRACT.md",
@@ -45,13 +46,17 @@ SKILLS = {
             "create_documentation_snapshot.py",
         ],
     },
-    "process-future-pending": {
+    "skill-tree-process-future-pending": {
         "references": ["FUTURE_TASK_STANDARD.md", "PENDING_PROCESSING_CHECKLIST.md"],
         "scripts": ["validate_future_document.py"],
     },
-    "implement-next-future-task": {
+    "skill-tree-implement-next-future-task": {
         "references": ["FUTURE_EXECUTION_RULES.md", "IMPLEMENTATION_HANDOFF_CHECKLIST.md"],
         "scripts": ["select_prioritized_task.py"],
+    },
+    "skill-tree-unity-repo-documentation-audit": {
+        "references": [],
+        "scripts": [],
     },
 }
 ADAPTERS = ["codex", "claude-code", "gemini-cli", "github-copilot", "cursor", "windsurf", "cline", "generic"]
@@ -117,6 +122,8 @@ def check_structure(repo: Path) -> list[str]:
 def check_skills(repo: Path) -> list[str]:
     errors: list[str] = []
     for name, required in SKILLS.items():
+        if not name.startswith("skill-tree-"):
+            errors.append(f"{name}: missing skill-tree- prefix")
         skill_dir = repo / "skills" / name
         if not skill_dir.is_dir():
             errors.append(f"missing skill folder: {name}")
@@ -146,6 +153,9 @@ def check_skills(repo: Path) -> list[str]:
             errors.append(f"{name}: absolute machine path in SKILL.md")
         if "../" in text:
             errors.append(f"{name}: possible sibling/root dependency in SKILL.md")
+    for skill_dir in sorted((repo / "skills").iterdir()):
+        if skill_dir.is_dir() and (skill_dir / "SKILL.md").is_file() and not skill_dir.name.startswith("skill-tree-"):
+            errors.append(f"{skill_dir.name}: canonical skill missing skill-tree- prefix")
     return errors
 
 
@@ -213,21 +223,36 @@ def check_python_scripts(repo: Path) -> list[str]:
 
 def check_behavior(repo: Path) -> list[str]:
     errors: list[str] = []
-    process = read(repo / "skills/process-future-pending/SKILL.md")
-    implement = read(repo / "skills/implement-next-future-task/SKILL.md")
-    doc = read(repo / "skills/unity-repo-documentation/SKILL.md")
+    process = read(repo / "skills/skill-tree-process-future-pending/SKILL.md")
+    implement = read(repo / "skills/skill-tree-implement-next-future-task/SKILL.md")
+    doc = read(repo / "skills/skill-tree-unity-repo-documentation/SKILL.md")
+    audit = read(repo / "skills/skill-tree-unity-repo-documentation-audit/SKILL.md")
     if "Do not implement" not in process:
         errors.append("process skill does not explicitly forbid implementation")
+    if "MUST NOT process pending work from `FUTURE.md` alone" not in process:
+        errors.append("process skill does not forbid FUTURE-only processing")
     if "Questions and required clarifications" not in process:
         errors.append("process skill does not require questions")
     if "Never select from Pending Queue or Backlog" not in implement:
         errors.append("implement skill does not forbid Backlog/Pending selection")
+    if "MUST NOT implement from `FUTURE.md` alone" not in implement:
+        errors.append("implement skill does not forbid FUTURE-only implementation")
     if "Stop if absent" not in implement:
         errors.append("implement skill does not stop on missing named task")
     if "blocking unresolved questions" not in implement:
         errors.append("implement skill does not stop on blocking questions")
     if "references/REPO_INIT_INSTRUCTIONS.md" not in doc:
         errors.append("documentation skill does not read source reference")
+    if "FEATURES.md` limited to current implemented or partial behavior" not in doc:
+        errors.append("documentation skill does not enforce FEATURES/FUTURE split")
+    if "meaningful discovered issues" not in doc:
+        errors.append("documentation skill does not add discovered issues to FUTURE")
+    if "MUST NOT audit docs by comparing documents only" not in audit:
+        errors.append("documentation audit skill does not require code-aware audit")
+    if "Recreate missing required docs from current repository evidence" not in audit:
+        errors.append("documentation audit skill does not recreate missing docs from evidence")
+    if "Add meaningful findings to active `FUTURE.md` backlog" not in audit:
+        errors.append("documentation audit skill does not add issues to FUTURE")
     return errors
 
 
@@ -236,9 +261,10 @@ def check_docs(repo: Path, strict: bool) -> list[str]:
     placeholder_exempt = {
         "REPO_INIT_INSTRUCTIONS.md",
         "SKILL_REPOSITORY_CREATION_INSTRUCTIONS.md",
-        "skills/unity-repo-documentation/references/REPO_INIT_INSTRUCTIONS.md",
-        "skills/process-future-pending/references/FUTURE_TASK_STANDARD.md",
-        "skills/implement-next-future-task/references/FUTURE_EXECUTION_RULES.md",
+        "skills/skill-tree-unity-repo-documentation/references/REPO_INIT_INSTRUCTIONS.md",
+        "skills/skill-tree-process-future-pending/references/FUTURE_TASK_STANDARD.md",
+        "skills/skill-tree-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md",
+        "docs/MIGRATION.md",
     }
     for path in sorted(repo.rglob("*.md")):
         rel = path.relative_to(repo).as_posix()

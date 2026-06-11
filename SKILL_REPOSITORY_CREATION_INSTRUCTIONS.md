@@ -18,11 +18,12 @@ SKILL_REPOSITORY_CREATION_INSTRUCTIONS.md
 .git/
 ```
 
-The completed repository must provide three focused skills:
+The completed repository must provide four focused skills:
 
-1. `unity-repo-documentation`
-2. `process-future-pending`
-3. `implement-next-future-task`
+1. `skill-tree-unity-repo-documentation`
+2. `skill-tree-process-future-pending`
+3. `skill-tree-implement-next-future-task`
+4. `skill-tree-unity-repo-documentation-audit`
 
 The canonical skills must follow the open Agent Skills specification and remain portable across AI coding agents that support `SKILL.md`.
 
@@ -170,32 +171,39 @@ Store this information in `INSTALL.md` and `docs/AGENT_COMPATIBILITY.md`.
 
 ## 3. Non-Negotiable Design Decisions
 
-### 3.1 Three focused skills
+### 3.1 Four focused skills
 
-Create three separate skills rather than one large skill.
+Create four separate skills rather than one large skill.
 
 The responsibilities must not overlap unnecessarily:
 
 ```text
-unity-repo-documentation
+skill-tree-unity-repo-documentation
   Deeply analyzes an existing Unity repository and creates or repairs
   its AI-oriented repository documentation.
 
-process-future-pending
+skill-tree-process-future-pending
   Processes only the Pending Queue in FUTURE.md and promotes sufficiently
   researched entries into maximally detailed Prioritized Next Changes.
 
-implement-next-future-task
+skill-tree-implement-next-future-task
   Selects and implements exactly one task from Prioritized Next Changes,
   following the name-selection and clarification-gate rules.
+
+skill-tree-unity-repo-documentation-audit
+  Audits existing repository documentation against current code, tests,
+  configuration, repository structure, and workflow rules. It repairs
+  documentation drift and adds meaningful discovered issues to FUTURE.md.
 ```
+
+Every repository-owned skill directory and `SKILL.md` frontmatter name must start with `skill-tree-`.
 
 ### 3.2 Vendor-neutral canonical skills
 
 Canonical content lives only under:
 
 ```text
-skills/<skill-name>/
+skills/skill-tree-<skill-name>/
 ```
 
 Every canonical skill must use the common Agent Skills structure:
@@ -248,7 +256,7 @@ The root `REPO_INIT_INSTRUCTIONS.md` is the canonical source.
 The documentation skill must contain a synchronized copy at:
 
 ```text
-skills/unity-repo-documentation/references/REPO_INIT_INSTRUCTIONS.md
+skills/skill-tree-unity-repo-documentation/references/REPO_INIT_INSTRUCTIONS.md
 ```
 
 The copy must be byte-for-byte identical to the root file unless a generated provenance header is explicitly adopted. Prefer byte-for-byte identity.
@@ -256,8 +264,8 @@ The copy must be byte-for-byte identical to the root file unless a generated pro
 The two FUTURE-related skills must use generated focused references:
 
 ```text
-skills/process-future-pending/references/FUTURE_TASK_STANDARD.md
-skills/implement-next-future-task/references/FUTURE_EXECUTION_RULES.md
+skills/skill-tree-process-future-pending/references/FUTURE_TASK_STANDARD.md
+skills/skill-tree-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md
 ```
 
 Do not manually maintain divergent copies.
@@ -449,7 +457,7 @@ Create this structure:
 │   └── init-rules/
 │       └── unity-repository-skills.md
 ├── skills/
-│   ├── unity-repo-documentation/
+│   ├── skill-tree-unity-repo-documentation/
 │   │   ├── SKILL.md
 │   │   ├── agents/
 │   │   │   └── openai.yaml
@@ -461,7 +469,7 @@ Create this structure:
 │   │       ├── inspect_unity_repository.py
 │   │       ├── validate_unity_documentation.py
 │   │       └── create_documentation_snapshot.py
-│   ├── process-future-pending/
+│   ├── skill-tree-process-future-pending/
 │   │   ├── SKILL.md
 │   │   ├── agents/
 │   │   │   └── openai.yaml
@@ -470,15 +478,19 @@ Create this structure:
 │   │   │   └── PENDING_PROCESSING_CHECKLIST.md
 │   │   └── scripts/
 │   │       └── validate_future_document.py
-│   └── implement-next-future-task/
+│   ├── skill-tree-implement-next-future-task/
+│   │   ├── SKILL.md
+│   │   ├── agents/
+│   │   │   └── openai.yaml
+│   │   ├── references/
+│   │   │   ├── FUTURE_EXECUTION_RULES.md
+│   │   │   └── IMPLEMENTATION_HANDOFF_CHECKLIST.md
+│   │   └── scripts/
+│   │       └── select_prioritized_task.py
+│   └── skill-tree-unity-repo-documentation-audit/
 │       ├── SKILL.md
-│       ├── agents/
-│       │   └── openai.yaml
-│       ├── references/
-│       │   ├── FUTURE_EXECUTION_RULES.md
-│       │   └── IMPLEMENTATION_HANDOFF_CHECKLIST.md
-│       └── scripts/
-│           └── select_prioritized_task.py
+│       └── agents/
+│           └── openai.yaml
 ├── scripts/
 │   ├── sync_skill_references.py
 │   └── validate_skill_repository.py
@@ -564,7 +576,7 @@ Perform the work in this order:
 5. Analyze the source instruction.
 6. Create repository conventions and cross-agent documentation.
 7. Implement reference synchronization.
-8. Create the three canonical skills.
+8. Create the four canonical skills.
 9. Implement deterministic skill-local scripts.
 10. Create the provider matrix.
 11. Implement the unified installer and thin launchers.
@@ -767,7 +779,7 @@ README must distinguish:
 
 ```text
 Canonical source:
-  skills/<skill-name>/
+  skills/skill-tree-<skill-name>/
 
 Project installation:
   Determined by the selected agent profile.
@@ -879,11 +891,11 @@ The script must:
 1. Locate the repository root reliably from its own path.
 2. Read root `REPO_INIT_INSTRUCTIONS.md`.
 3. Copy it byte-for-byte to:
-   `skills/unity-repo-documentation/references/REPO_INIT_INSTRUCTIONS.md`.
+   `skills/skill-tree-unity-repo-documentation/references/REPO_INIT_INSTRUCTIONS.md`.
 4. Extract the full `FUTURE.md` specification section into:
-   `skills/process-future-pending/references/FUTURE_TASK_STANDARD.md`.
+   `skills/skill-tree-process-future-pending/references/FUTURE_TASK_STANDARD.md`.
 5. Extract the implementation-selection and clarification sections into:
-   `skills/implement-next-future-task/references/FUTURE_EXECUTION_RULES.md`.
+   `skills/skill-tree-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md`.
 6. Add a concise generated-file notice to extracted references.
 7. Fail if required source headings are missing or ambiguous.
 8. Support a check-only mode that makes no changes.
@@ -950,12 +962,12 @@ Do not prepend this notice to the byte-for-byte documentation-skill copy.
 
 It must print the affected paths.
 
-## 10. Skill 1 — `unity-repo-documentation`
+## 10. Skill 1 — `skill-tree-unity-repo-documentation`
 
 Create:
 
 ```text
-skills/unity-repo-documentation/
+skills/skill-tree-unity-repo-documentation/
 ```
 
 ## 10.1 Purpose
@@ -972,7 +984,7 @@ At minimum:
 
 ```yaml
 ---
-name: unity-repo-documentation
+name: skill-tree-unity-repo-documentation
 description: Deeply analyze an existing Unity repository and create, initialize, audit, or repair its AI-oriented repository documentation. Use for requests to document an unfamiliar Unity project, create PROJECT.md, TECHNICAL.md, FEATURES.md, FUTURE.md, RULES.md, AGENTS.md, or establish repository documentation. Do not use for ordinary feature implementation, isolated copy edits, or Unity/package upgrades.
 ---
 ```
@@ -993,10 +1005,15 @@ The skill must instruct the agent to:
 6. Inspect code, assemblies, scenes, prefabs, assets, packages, settings, build tooling, platform integrations, tests, and existing docs.
 7. Create the required live document set.
 8. Keep planned and implemented behavior separate.
-9. avoid modifying Unity behavior during documentation initialization;
-10. run local documentation validation;
-11. review the final diff;
-12. report evidence gaps, checks run, and risks.
+9. Keep `FEATURES.md` limited to current implemented or partial behavior.
+10. Put planned work, known bugs awaiting fixes, deferred investigations, and proposed improvements in `FUTURE.md`.
+11. Inspect key implementation paths, tests, error handling, state transitions, persistence, mutation logic, and existing `FUTURE.md` entries before finalizing documentation.
+12. Add meaningful discovered issues to `FUTURE.md` with evidence, affected paths/symbols, impact, suggested direction, acceptance criteria, and focused tests.
+13. Distinguish confirmed bugs, strongly suspected issues, documentation inconsistencies, and improvement opportunities.
+14. Avoid modifying Unity behavior during documentation initialization.
+15. Run local documentation validation.
+16. Review the final diff.
+17. Report evidence gaps, drift corrected, issues added to backlog, potential issues excluded for insufficient evidence, checks run, and risks.
 
 It must instruct the agent to use the skill-local script by path relative to the skill directory, not by assuming the source repository layout.
 
@@ -1183,12 +1200,59 @@ Required behavior:
 
 Do not create snapshots automatically as part of documentation initialization.
 
-## 11. Skill 2 — `process-future-pending`
+## 10A. Skill 4 — `skill-tree-unity-repo-documentation-audit`
 
 Create:
 
 ```text
-skills/process-future-pending/
+skills/skill-tree-unity-repo-documentation-audit/
+```
+
+### 10A.1 Purpose
+
+This skill audits existing repository documentation against current code, tests, configuration, repository structure, build metadata, agent workflows, and skill definitions.
+
+It performs the same depth of code and architecture inspection as `skill-tree-unity-repo-documentation`, but its primary purpose is ongoing documentation maintenance after baseline docs already exist.
+
+It must not automatically implement unrelated product code changes.
+
+### 10A.2 Required behavior
+
+The skill must:
+
+1. MUST read repository `AGENTS.md`, `RULES.md`, or equivalent rules before auditing.
+2. MUST read the repository/document map if one exists.
+3. Inventory all documentation and classify each document role.
+4. Verify the baseline document set expected by `skill-tree-unity-repo-documentation`.
+5. Recreate missing required documents from current repository evidence.
+6. Validate documented claims against current code, tests, repository structure, build configuration, and agent workflows.
+7. Fix stale paths, renamed symbols, outdated behavior descriptions, contradictions, duplicate guidance, incorrect implementation status, and obsolete future sections in current-state documents.
+8. Enforce that `FEATURES.md` describes current implemented or partial behavior only.
+9. Enforce that `FUTURE.md` contains planned work, backlog, known bugs awaiting fixes, documentation improvements, proposed skills, refactoring plans, and deferred investigations.
+10. Mark historical documents clearly when they remain useful.
+11. While inspecting code, identify meaningful bugs, risky logic, missing tests, documentation/code drift, maintainability issues, and security/data-safety risks.
+12. Add meaningful findings to `FUTURE.md` using the same task-quality requirements as the documentation skill.
+13. Merge with existing backlog entries and avoid duplicate tasks.
+14. Distinguish confirmed bugs, strongly suspected issues, documentation inconsistencies, and improvement opportunities.
+15. Produce an audit summary covering documents inspected, missing documents created, documents merged or role-corrected, drift corrected, paths/symbols updated, contradictions resolved, backlog items added, and unverified claims.
+
+### 10A.3 `SKILL.md` frontmatter
+
+Use:
+
+```yaml
+---
+name: skill-tree-unity-repo-documentation-audit
+description: Audit existing Unity repository documentation against the current codebase, tests, configuration, repository structure, and skill/workflow rules. Use after documentation already exists, after major changes or repository restructures, before releases, or when documentation drift is suspected. Fix stale documentation in place, enforce FEATURES.md and FUTURE.md responsibilities, recreate missing baseline documents from current evidence, and add meaningful discovered issues to FUTURE.md without changing unrelated product code.
+---
+```
+
+## 11. Skill 2 — `skill-tree-process-future-pending`
+
+Create:
+
+```text
+skills/skill-tree-process-future-pending/
 ```
 
 ## 11.1 Purpose
@@ -1208,7 +1272,7 @@ Use:
 
 ```yaml
 ---
-name: process-future-pending
+name: skill-tree-process-future-pending
 description: Process the Pending Queue in a repository FUTURE.md. Use when asked to "Process pending" or "Process pending tasks": research each pending request, validate it against the repository, add implementation questions, and promote only implementation-ready work into Prioritized Next Changes. Do not implement the tasks and do not promote Backlog work unless explicitly requested.
 ---
 ```
@@ -1220,24 +1284,31 @@ Adjust only if required by the current official format.
 The skill must:
 
 1. Locate the applicable `FUTURE.md`.
-2. Read repository `AGENTS.md` and relevant rules.
-3. Read local `references/FUTURE_TASK_STANDARD.md`.
-4. Read the complete Pending Queue.
-5. Inspect affected implementation and documents.
-6. Check whether each item is implemented, stale, duplicate, contradictory, or blocked.
-7. Merge overlapping requests when justified.
-8. Expand valid items to the complete prioritized-task standard.
-9. Add task-specific implementation questions.
-10. Resolve questions from evidence where possible.
-11. mark blocking unresolved questions explicitly;
-12. move only sufficiently researched tasks;
-13. preserve priority placement;
-14. leave insufficiently understood items pending;
-15. run FUTURE validation;
-16. report promoted, retained, merged, and removed items.
+2. MUST read repository `AGENTS.md`, `RULES.md`, or equivalent rules.
+3. MUST read repository/document map if one exists.
+4. MUST read current `FEATURES.md`, active `FUTURE.md`, and task-relevant architecture/domain docs.
+5. Read local `references/FUTURE_TASK_STANDARD.md`.
+6. Read the complete Pending Queue.
+7. MUST inspect affected implementation, tests, settings, serialized assets, and documents.
+8. MUST verify whether each item is implemented, stale, duplicate, contradictory, or blocked.
+9. MUST verify referenced paths and symbols still exist.
+10. Check existing `FUTURE.md` tasks for overlap.
+11. Merge overlapping requests when justified.
+12. Expand valid items to the complete prioritized-task standard with current code/test paths.
+13. Add task-specific implementation questions.
+14. Resolve questions from evidence where possible.
+15. Mark blocking unresolved questions explicitly.
+16. Move only sufficiently researched tasks.
+17. Preserve priority placement.
+18. Leave insufficiently understood items pending.
+19. Run FUTURE validation.
+20. Report required context inspected plus promoted, retained, merged, and removed items.
 
 It must explicitly state:
 
+- MUST NOT process pending work from `FUTURE.md` alone;
+- stop or mark the item blocked when required repository context is missing or contradictory;
+- do not silently guess architecture, ownership, tests, or conventions;
 - processing is research and documentation work;
 - no feature implementation occurs;
 - Backlog is not processed unless the user explicitly includes it;
@@ -1322,12 +1393,12 @@ Therefore either:
 
 Do not require the skill to call a root repository script after installation.
 
-## 12. Skill 3 — `implement-next-future-task`
+## 12. Skill 3 — `skill-tree-implement-next-future-task`
 
 Create:
 
 ```text
-skills/implement-next-future-task/
+skills/skill-tree-implement-next-future-task/
 ```
 
 ## 12.1 Purpose
@@ -1342,7 +1413,7 @@ Use:
 
 ```yaml
 ---
-name: implement-next-future-task
+name: skill-tree-implement-next-future-task
 description: Implement exactly one task from the Prioritized Next Changes section of FUTURE.md. Use for "Implement next", "Implement next feature", "Implement next: <task name>", or "Implement next feature: <task name>". Never select from Pending Queue or Backlog, and stop for blocking unresolved questions or when a named prioritized task is absent.
 ---
 ```
@@ -1387,14 +1458,21 @@ The skill must:
 Before editing:
 
 1. Read the complete task.
-2. Read all required repository documentation.
-3. Read `Questions and required clarifications`.
-4. Identify unresolved blocking questions.
-5. Ask the owner those questions.
-6. Stop implementation until answers exist.
-7. Update the task with answers before implementation.
+2. MUST read repository `AGENTS.md`, `RULES.md`, or equivalent repository rules.
+3. MUST read repository/document map if one exists.
+4. MUST inspect all documents referenced by the task.
+5. MUST read current-state docs such as `FEATURES.md` and task-relevant architecture/domain docs.
+6. MUST inspect current code and tests for affected paths and symbols.
+7. MUST check for recent changes that invalidate task assumptions or make the work already complete.
+8. MUST check existing `FUTURE.md` tasks for duplicate or overlapping work.
+9. Read `Questions and required clarifications`.
+10. Identify unresolved blocking questions.
+11. Ask the owner those questions.
+12. Stop implementation until answers exist.
+13. Update the task with answers or stale assumptions before implementation.
 
 Do not guess to avoid the stop.
+MUST NOT implement from `FUTURE.md` alone.
 
 ## 12.5 Scope behavior
 
@@ -1407,9 +1485,10 @@ The skill must:
 - avoid opportunistic refactors;
 - add or update tests;
 - update current-state documentation;
+- keep `FEATURES.md` current-state only and move plans, deferred work, or known bugs awaiting fixes to `FUTURE.md`;
 - remove the completed task from `FUTURE.md`;
 - not mark it completed indefinitely;
-- report checks actually run.
+- report required context inspected and checks actually run.
 
 ## 12.6 `agents/openai.yaml`
 
@@ -1487,7 +1566,7 @@ Do not implement fuzzy matching.
 Create the canonical implementation at:
 
 ```text
-skills/process-future-pending/scripts/validate_future_document.py
+skills/skill-tree-process-future-pending/scripts/validate_future_document.py
 ```
 
 Copy or generate the same implementation for any skill that requires standalone use, or design the implementation skill to use its own selector for relevant checks.
@@ -1818,7 +1897,7 @@ node bin/install.js --list
 node bin/install.js --dry-run --all
 node bin/install.js --only claude-code --global
 node bin/install.js --only codex --only cursor --project --target /path/to/repo
-node bin/install.js --agent qwen-code --skills process-future-pending
+node bin/install.js --agent qwen-code --skills skill-tree-process-future-pending
 node bin/install.js --all --with-init
 node bin/install.js --uninstall --only windsurf
 ```
@@ -2561,7 +2640,7 @@ The repository is complete only when:
 
 ### Structure
 
-- [ ] All three canonical skill folders exist.
+- [ ] All four canonical skill folders exist.
 - [ ] Every skill has `SKILL.md`.
 - [ ] Every skill is self-contained.
 - [ ] Optional vendor metadata is non-canonical.
@@ -2703,7 +2782,7 @@ Use this only after reading the complete instruction:
 6. Read and map all of REPO_INIT_INSTRUCTIONS.md.
 7. Create vendor-neutral root documentation and compatibility docs.
 8. Implement deterministic reference synchronization.
-9. Create the three focused, self-contained canonical skills.
+9. Create the four focused, self-contained canonical skills.
 10. Create the declarative provider matrix.
 11. Implement the unified Node installer and thin platform wrappers.
 12. Add optional, reversible repository instruction bridges.
