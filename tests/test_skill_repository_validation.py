@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = ROOT / "scripts/validate_skill_repository.py"
 UNITY_INSPECT = ROOT / "skills/skill-tree-unity-repo-documentation/scripts/inspect_unity_repository.py"
 UNITY_DOCS = ROOT / "skills/skill-tree-unity-repo-documentation/scripts/validate_unity_documentation.py"
-SNAPSHOT = ROOT / "skills/skill-tree-unity-repo-documentation/scripts/create_documentation_snapshot.py"
+SNAPSHOT = ROOT / "skills/skill-tree-create-documents-snapshot/scripts/create_documentation_snapshot.py"
 AUDIT_SKILL = ROOT / "skills/skill-tree-unity-repo-documentation-audit/SKILL.md"
 
 
@@ -36,12 +36,28 @@ class SkillRepositoryValidationTests(unittest.TestCase):
         skills_dir = ROOT / "skills"
         names = sorted(path.name for path in skills_dir.iterdir() if (path / "SKILL.md").is_file())
         self.assertIn("skill-tree-unity-repo-documentation-audit", names)
+        self.assertIn("skill-tree-create-documents-snapshot", names)
         self.assertTrue(names)
         for name in names:
             with self.subTest(skill=name):
                 self.assertTrue(name.startswith("skill-tree-"))
                 text = (skills_dir / name / "SKILL.md").read_text(encoding="utf-8")
                 self.assertIn(f"name: {name}", text)
+
+    def test_skill_tree_display_names_match_required_strings(self):
+        expected = {
+            "skill-tree-unity-repo-documentation": "Skill-Tree: Initialize Documents",
+            "skill-tree-unity-repo-documentation-audit": "Skill-Tree: Audit Documents",
+            "skill-tree-process-future-pending": "Skill-Tree: Process Pending Tasks",
+            "skill-tree-implement-next-future-task": "Skill-Tree: Implement Next Task",
+            "skill-tree-create-documents-snapshot": "Skill-Tree: Create Snapshot",
+        }
+        for skill, display_name in expected.items():
+            with self.subTest(skill=skill):
+                skill_md = (ROOT / "skills" / skill / "SKILL.md").read_text(encoding="utf-8")
+                openai_yaml = (ROOT / "skills" / skill / "agents" / "openai.yaml").read_text(encoding="utf-8")
+                self.assertIn(f"# {display_name}", skill_md)
+                self.assertIn(f'display_name: "{display_name}"', openai_yaml)
 
     def test_documentation_audit_skill_requires_code_aware_future_updates(self):
         text = AUDIT_SKILL.read_text(encoding="utf-8")
@@ -61,6 +77,15 @@ class SkillRepositoryValidationTests(unittest.TestCase):
                 self.assertIn("- Task title\n  - Description", text)
                 self.assertIn("Unity/game behavior", text)
                 self.assertIn("Data/model behavior", text)
+
+    def test_snapshot_skill_owns_document_snapshot_creation(self):
+        skill = (ROOT / "skills/skill-tree-create-documents-snapshot/SKILL.md").read_text(encoding="utf-8")
+        contract = (ROOT / "skills/skill-tree-unity-repo-documentation/references/DOCUMENTATION_OUTPUT_CONTRACT.md").read_text(encoding="utf-8")
+        validator = (ROOT / "skills/skill-tree-unity-repo-documentation/scripts/validate_unity_documentation.py").read_text(encoding="utf-8")
+        self.assertIn("Skill-Tree: Create Snapshot", skill)
+        self.assertIn("Do not create or update `Documents/DOCUMENTS_SNAPSHOT.md`", skill)
+        self.assertIn("skill-tree-create-documents-snapshot", contract)
+        self.assertNotIn('"DOCUMENTS_SNAPSHOT.md"', validator)
 
     def test_unity_inventory_and_docs_validation(self):
         with tempfile.TemporaryDirectory() as tmp:

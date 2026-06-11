@@ -33,6 +33,7 @@ test("--list succeeds without writes", () => {
   assert.match(result.stdout, /claude-code/);
   assert.match(result.stdout, /skill-tree-unity-repo-documentation/);
   assert.match(result.stdout, /skill-tree-unity-repo-documentation-audit/);
+  assert.match(result.stdout, /skill-tree-create-documents-snapshot/);
 });
 
 test("dry-run all succeeds without installing", () => {

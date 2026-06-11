@@ -1,0 +1,7 @@
+interface:
+  display_name: "Skill-Tree: Create Snapshot"
+  short_description: "Create explicit docs snapshots"
+  default_prompt: "Create an explicit-request-only Markdown documentation snapshot archive."
+
+policy:
+  allow_implicit_invocation: true

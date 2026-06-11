@@ -21,11 +21,11 @@ The result must allow a future AI agent to understand, with minimal rediscovery:
 - how to build, test, validate, and release the project;
 - which changes require documentation updates;
 - what work is active, pending refinement, or deferred;
-- how to create dated documentation snapshots without polluting live source documents.
+- how to avoid polluting live source documents with snapshot copies.
 
 The task is not complete after producing plausible prose. Every material statement must be derived from repository evidence, explicitly marked as an assumption, or recorded as an open question.
 
-Do not copy domain-specific content from another project. Reuse only the documentation principles, responsibility boundaries, validation discipline, and snapshot workflow.
+Do not copy domain-specific content from another project. Reuse only the documentation principles, responsibility boundaries, and validation discipline.
 
 ## 2. Required Deliverables
 
@@ -45,7 +45,6 @@ Documents/
   BUILD_AND_RELEASE.md
   TESTING.md
   DEPENDENCIES.md
-  DOCUMENTS_SNAPSHOT.md
 ```
 
 Create additional documents only when the repository provides enough evidence and the subject is materially important:
@@ -194,7 +193,6 @@ Documents/REPOSITORY_MAP.md       physical repository layout and code ownership 
 Documents/BUILD_AND_RELEASE.md     local builds, CI, signing, platform release flow
 Documents/TESTING.md              test topology, commands, environments, validation matrix
 Documents/DEPENDENCIES.md         packages, SDKs, plugins, sources, update constraints
-Documents/DOCUMENTS_SNAPSHOT.md   explicit documentation snapshot procedure
 ```
 
 Optional documents own only their specialized subject.
@@ -870,9 +868,8 @@ Create documents in this order so later files can reference established facts:
 8. Optional specialized documents
 9. `Documents/FUTURE.md`
 10. `Documents/RULES.md`
-11. `Documents/DOCUMENTS_SNAPSHOT.md`
-12. root `AGENTS.md`
-13. root `README.md`
+11. root `AGENTS.md`
+12. root `README.md`
 
 Do not write `README.md` first. It should summarize the already validated documentation, not become the source from which the rest is guessed.
 
@@ -2177,157 +2174,11 @@ Create when recurring, validated setup/build/runtime failures have known fixes.
 
 Each entry should include symptoms, affected environment, root cause, verified fix, and references. Avoid folklore.
 
-## 20. Documentation Snapshot Procedure
+## 20. Documentation Snapshot Boundary
 
-Create `Documents/DOCUMENTS_SNAPSHOT.md` with a Unity-project-specific snapshot workflow.
+Do not create `Documents/DOCUMENTS_SNAPSHOT.md` during documentation initialization or maintenance.
 
-### 20.1 Trigger
-
-Run the snapshot flow only when the user explicitly asks for a documentation, Markdown, or `.md` snapshot archive.
-
-Do not generate or refresh snapshots during normal code or documentation edits.
-
-### 20.2 Source scope
-
-Default source set:
-
-- root `README.md`;
-- root `AGENTS.md`;
-- tracked repository-owned Markdown under `Documents/`;
-- other tracked project-owned Markdown only when it contains material repository-specific information.
-
-Use:
-
-```bash
-git ls-files '*.md'
-```
-
-Exclude by default:
-
-- package/vendor documentation;
-- Unity package cache;
-- generated API docs;
-- build output;
-- imported SDK changelogs unless explicitly requested;
-- dependency licenses unless explicitly requested;
-- transient reports.
-
-Explicit user scope overrides the default.
-
-### 20.3 Relevance check
-
-Inspect each candidate enough to confirm that it contains project-specific information.
-
-Relevant categories include:
-
-- project purpose;
-- Unity architecture;
-- implemented features;
-- build/release;
-- testing;
-- packages and SDKs;
-- platform integrations;
-- persistence/networking;
-- AI-agent rules;
-- implementation plans;
-- snapshot workflow.
-
-Do not claim a file is relevant without checking it.
-
-### 20.4 Timestamp
-
-Generate the current local timestamp at snapshot creation:
-
-```text
-YYYY-MM-DD-HH-MM
-```
-
-Do not reuse example timestamps.
-
-### 20.5 Archive name
-
-Default:
-
-```text
-<repository-name>-documents-snapshot-YYYY-MM-DD-HH-MM.zip
-```
-
-For a single source document:
-
-```text
-<repository-name>-document-snapshot-<source-stem>-YYYY-MM-DD-HH-MM.zip
-```
-
-Place the archive at repository root unless the user requests another location.
-
-### 20.6 Snapshot member names
-
-Keep archive members at zip root.
-
-Convert:
-
-```text
-Documents/FUTURE.md
-```
-
-to:
-
-```text
-FUTURE.snapshot-YYYY-MM-DD-HH-MM.md
-```
-
-Do not preserve source folders inside the archive.
-
-If two source files have the same basename, flatten their relative paths deterministically:
-
-```text
-Packages__com.company.tool__README.snapshot-YYYY-MM-DD-HH-MM.md
-```
-
-Never overwrite a collision.
-
-### 20.7 Snapshot notice
-
-Prepend every copied Markdown file with:
-
-```markdown
-<!--
-SNAPSHOT DOCUMENT
-Snapshot date: YYYY-MM-DD
-Snapshot time: HH-MM
-Original source path: path/from/repository/root.md
-Archive file name: NAME.snapshot-YYYY-MM-DD-HH-MM.md
-Relevance check: Included after confirming that the source contains repository-specific Unity project, architecture, feature, build, test, dependency, platform, implementation-plan, or AI-agent workflow information.
-Snapshot warning: This is a dated copy for AI-agent context. The live repository document, Unity project state, packages, serialized assets, and implementation may drift after this snapshot. Check the live source path and current repository before changing behavior.
--->
-```
-
-Keep one blank line before the original content.
-
-### 20.8 Snapshot safety
-
-- Do not edit live source documents.
-- Stage copies outside the repository.
-- Do not open Unity or cause asset reserialization.
-- Do not include secrets, local reports, or ignored files.
-- Do not commit the archive unless requested.
-- Keep live document names free of snapshot suffixes.
-
-### 20.9 Verification
-
-Verify:
-
-- archive exists;
-- requested scope is correct;
-- entries are at zip root;
-- every member has the timestamped snapshot name;
-- every member begins with `SNAPSHOT DOCUMENT`;
-- no source document changed due to snapshot generation;
-- no secrets or transient files were included;
-- collisions were handled;
-- single-file requests contain exactly one Markdown member.
-
-Report included count, scope, exclusions, archive path, and source-file status.
+Snapshot archive creation is owned by the separate `skill-tree-create-documents-snapshot` skill. Documentation initialization and audit skills should only enforce that live Markdown filenames remain stable and free of snapshot markers.
 
 ## 21. Deep Review Before Finalizing the Documentation
 
@@ -2492,8 +2343,6 @@ The task is complete only when all applicable checks pass.
 - [ ] `Documents/BUILD_AND_RELEASE.md`
 - [ ] `Documents/TESTING.md`
 - [ ] `Documents/DEPENDENCIES.md`
-- [ ] `Documents/DOCUMENTS_SNAPSHOT.md`
-
 ### Quality
 
 - [ ] All documents are in English.
@@ -2525,8 +2374,7 @@ Use this condensed sequence only after understanding the detailed requirements a
 8. Create only justified specialized documents.
 9. Validate and structure FUTURE into Pending, Prioritized, and Backlog.
 10. Create RULES and the short root AGENTS handoff.
-11. Create DOCUMENTS_SNAPSHOT with explicit-request-only behavior.
-12. Write README last.
-13. Review facts, links, duplication, Unity safety, and secret handling.
-14. Report exact files, evidence gaps, checks run, and remaining risks.
+11. Write README last.
+12. Review facts, links, duplication, Unity safety, and secret handling.
+13. Report exact files, evidence gaps, checks run, and remaining risks.
 ```

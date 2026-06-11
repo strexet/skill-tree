@@ -1,5 +1,5 @@
 interface:
-  display_name: "Implement Next FUTURE Task"
+  display_name: "Skill-Tree: Implement Next Task"
   short_description: "Implement one prioritized FUTURE.md task"
   default_prompt: "Implement the next eligible task from Prioritized Next Changes."
 

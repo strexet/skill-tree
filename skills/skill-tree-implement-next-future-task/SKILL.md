@@ -4,7 +4,7 @@ description: Implement exactly one task from the Prioritized Next Changes sectio
 license: MIT
 ---
 
-# Implement Next FUTURE Task
+# Skill-Tree: Implement Next Task
 
 Use this skill to implement exactly one eligible task from `Prioritized Next Changes`.
 

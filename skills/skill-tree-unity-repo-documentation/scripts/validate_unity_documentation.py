@@ -20,7 +20,6 @@ REQUIRED_DOCS = [
     "BUILD_AND_RELEASE.md",
     "TESTING.md",
     "DEPENDENCIES.md",
-    "DOCUMENTS_SNAPSHOT.md",
 ]
 QUEUE_HEADINGS = ["## Pending Queue", "## Prioritized Next Changes", "## Backlog"]
 REQUIRED_TASK_SECTIONS = [

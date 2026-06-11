@@ -1,5 +1,5 @@
 interface:
-  display_name: "Unity Repository Documentation"
+  display_name: "Skill-Tree: Initialize Documents"
   short_description: "Analyze and document an existing Unity repository"
   default_prompt: "Analyze this existing Unity repository and create or repair its AI-oriented documentation."
 

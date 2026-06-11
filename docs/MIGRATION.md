@@ -10,6 +10,7 @@ Current canonical skills:
 - `skill-tree-process-future-pending`
 - `skill-tree-implement-next-future-task`
 - `skill-tree-unity-repo-documentation-audit`
+- `skill-tree-create-documents-snapshot`
 
 Legacy installed folders should be removed, then the prefixed skills should be installed.
 

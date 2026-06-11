@@ -4,7 +4,7 @@ description: Process the Pending Queue in a repository FUTURE.md. Use when asked
 license: MIT
 ---
 
-# Process FUTURE Pending Tasks
+# Skill-Tree: Process Pending Tasks
 
 Use this skill only for `Process pending` and `Process pending tasks`.
 

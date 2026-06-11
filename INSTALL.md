@@ -39,6 +39,7 @@ Soft providers are listed but not selected by automatic detection. Select them w
 node bin/install.js --skills skill-tree-unity-repo-documentation
 node bin/install.js --skills skill-tree-process-future-pending skill-tree-implement-next-future-task
 node bin/install.js --skills skill-tree-unity-repo-documentation-audit
+node bin/install.js --skills skill-tree-create-documents-snapshot
 ```
 
 Without `--skills`, all canonical skills are selected.

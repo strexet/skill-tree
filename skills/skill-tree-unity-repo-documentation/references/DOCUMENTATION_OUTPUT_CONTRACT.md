@@ -18,7 +18,6 @@ This contract summarizes the deliverables owned by `REPO_INIT_INSTRUCTIONS.md`. 
 - `BUILD_AND_RELEASE.md`
 - `TESTING.md`
 - `DEPENDENCIES.md`
-- `DOCUMENTS_SNAPSHOT.md`
 
 ## Optional Documents
 
@@ -47,7 +46,7 @@ Create optional specialized documents only when repository evidence justifies th
 - `BUILD_AND_RELEASE.md`: local builds, CI, signing, release flow.
 - `TESTING.md`: test topology and validation matrix.
 - `DEPENDENCIES.md`: packages, SDKs, sources, update constraints.
-- `DOCUMENTS_SNAPSHOT.md`: explicit-request-only snapshot workflow.
+Snapshot archive creation is handled by `skill-tree-create-documents-snapshot`, not by generated live documentation.
 
 ## Live Filename Rules
 

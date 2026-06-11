@@ -4,7 +4,7 @@ description: Deeply analyze an existing Unity repository and create, initialize,
 license: MIT
 ---
 
-# Unity Repository Documentation
+# Skill-Tree: Initialize Documents
 
 Use this skill for documentation initialization, audit, or repair in an existing Unity project, Unity package, or Unity monorepo.
 
@@ -35,7 +35,6 @@ Run skill-local helpers by path relative to this skill directory:
 ```bash
 python3 scripts/inspect_unity_repository.py /path/to/unity-repo --format markdown
 python3 scripts/validate_unity_documentation.py /path/to/unity-repo
-python3 scripts/create_documentation_snapshot.py /path/to/unity-repo --dry-run
 ```
 
 ## Activation Examples

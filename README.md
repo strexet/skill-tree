@@ -4,16 +4,18 @@ Vendor-neutral Agent Skills for Unity repository documentation and `FUTURE.md` t
 
 ## Skills
 
-- `skill-tree-unity-repo-documentation`: analyze an existing Unity repository and create or repair AI-oriented documentation.
-- `skill-tree-process-future-pending`: research `FUTURE.md` Pending Queue entries and promote only implementation-ready work.
-- `skill-tree-implement-next-future-task`: implement exactly one task from `Prioritized Next Changes`.
-- `skill-tree-unity-repo-documentation-audit`: audit existing repository documentation against current code and repair drift.
+- `skill-tree-unity-repo-documentation` — Skill-Tree: Initialize Documents: analyze an existing Unity repository and create or repair AI-oriented documentation.
+- `skill-tree-unity-repo-documentation-audit` — Skill-Tree: Audit Documents: audit existing repository documentation against current code and repair drift.
+- `skill-tree-process-future-pending` — Skill-Tree: Process Pending Tasks: research `FUTURE.md` Pending Queue entries and promote only implementation-ready work.
+- `skill-tree-implement-next-future-task` — Skill-Tree: Implement Next Task: implement exactly one task from `Prioritized Next Changes`.
+- `skill-tree-create-documents-snapshot` — Skill-Tree: Create Snapshot: create explicit-request-only Markdown documentation snapshot archives.
 
 ## Trigger Examples
 
 ```text
 Initialize AI-oriented documentation for this Unity project.
 Audit and repair existing Unity repository documentation.
+Create a documentation snapshot archive.
 Process pending.
 Implement next.
 Implement next: Add save migration validation.

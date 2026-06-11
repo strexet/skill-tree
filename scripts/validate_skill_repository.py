@@ -43,8 +43,11 @@ SKILLS = {
         "scripts": [
             "inspect_unity_repository.py",
             "validate_unity_documentation.py",
-            "create_documentation_snapshot.py",
         ],
+    },
+    "skill-tree-create-documents-snapshot": {
+        "references": ["SNAPSHOT_RULES.md"],
+        "scripts": ["create_documentation_snapshot.py"],
     },
     "skill-tree-process-future-pending": {
         "references": ["FUTURE_TASK_STANDARD.md", "PENDING_PROCESSING_CHECKLIST.md"],
@@ -58,6 +61,13 @@ SKILLS = {
         "references": [],
         "scripts": [],
     },
+}
+DISPLAY_NAMES = {
+    "skill-tree-unity-repo-documentation": "Skill-Tree: Initialize Documents",
+    "skill-tree-unity-repo-documentation-audit": "Skill-Tree: Audit Documents",
+    "skill-tree-process-future-pending": "Skill-Tree: Process Pending Tasks",
+    "skill-tree-implement-next-future-task": "Skill-Tree: Implement Next Task",
+    "skill-tree-create-documents-snapshot": "Skill-Tree: Create Snapshot",
 }
 ADAPTERS = ["codex", "claude-code", "gemini-cli", "github-copilot", "cursor", "windsurf", "cline", "generic"]
 
@@ -153,6 +163,15 @@ def check_skills(repo: Path) -> list[str]:
             errors.append(f"{name}: absolute machine path in SKILL.md")
         if "../" in text:
             errors.append(f"{name}: possible sibling/root dependency in SKILL.md")
+        expected_display = DISPLAY_NAMES.get(name)
+        openai_yaml = skill_dir / "agents" / "openai.yaml"
+        if expected_display:
+            if f"# {expected_display}" not in text:
+                errors.append(f"{name}: H1 display name mismatch")
+            if not openai_yaml.is_file():
+                errors.append(f"{name}: missing agents/openai.yaml")
+            elif f'display_name: "{expected_display}"' not in read(openai_yaml):
+                errors.append(f"{name}: openai display name mismatch")
     for skill_dir in sorted((repo / "skills").iterdir()):
         if skill_dir.is_dir() and (skill_dir / "SKILL.md").is_file() and not skill_dir.name.startswith("skill-tree-"):
             errors.append(f"{skill_dir.name}: canonical skill missing skill-tree- prefix")
@@ -227,6 +246,7 @@ def check_behavior(repo: Path) -> list[str]:
     implement = read(repo / "skills/skill-tree-implement-next-future-task/SKILL.md")
     doc = read(repo / "skills/skill-tree-unity-repo-documentation/SKILL.md")
     audit = read(repo / "skills/skill-tree-unity-repo-documentation-audit/SKILL.md")
+    snapshot = read(repo / "skills/skill-tree-create-documents-snapshot/SKILL.md")
     if "Do not implement" not in process:
         errors.append("process skill does not explicitly forbid implementation")
     if "MUST NOT process pending work from `FUTURE.md` alone" not in process:
@@ -257,6 +277,10 @@ def check_behavior(repo: Path) -> list[str]:
         errors.append("documentation skill does not forbid Pending for discovered findings")
     if "Do not add documentation/audit findings to Pending Queue" not in audit:
         errors.append("documentation audit skill does not forbid Pending for discovered findings")
+    if "Do not create or update `Documents/DOCUMENTS_SNAPSHOT.md`" not in snapshot:
+        errors.append("snapshot skill does not own snapshot docs boundary")
+    if "create_documentation_snapshot.py" not in snapshot:
+        errors.append("snapshot skill does not reference snapshot helper")
     return errors
 
 
