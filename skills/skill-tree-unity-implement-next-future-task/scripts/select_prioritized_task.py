@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+# GENERATED FILE
+# Source: common/scripts/select_prioritized_task.py
+# Generator: scripts/sync_skill_references.py
+# Do not edit manually. Update the source file and rerun the generator.
+
 """Select one task from FUTURE.md Prioritized Next Changes."""
 
 from __future__ import annotations

@@ -295,7 +295,13 @@ Shared general workflow references live under:
 common/references/
 ```
 
-The synchronization script must copy shared references into every installed skill folder that needs them so each installed skill remains self-contained. Unity skills should read copied common references first, then Unity-specific references.
+Shared generated helper implementations live under:
+
+```text
+common/scripts/
+```
+
+The synchronization script must copy shared references and shared helper implementations into every installed skill folder that needs them so each installed skill remains self-contained. Unity skills should read copied common references first, then Unity-specific references.
 
 The documentation skill must contain a synchronized copy at:
 
@@ -317,8 +323,10 @@ The Unity FUTURE-related skills must include both copied common references and U
 ```text
 skills/skill-tree-unity-process-future-pending/references/COMMON_FUTURE_WORKFLOW.md
 skills/skill-tree-unity-process-future-pending/references/FUTURE_TASK_STANDARD.md
+skills/skill-tree-unity-process-future-pending/references/PENDING_TASK_FORMAT.md
 skills/skill-tree-unity-implement-next-future-task/references/COMMON_FUTURE_WORKFLOW.md
 skills/skill-tree-unity-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md
+skills/skill-tree-unity-implement-next-future-task/references/PENDING_TASK_FORMAT.md
 ```
 
 Do not manually maintain divergent copies.
@@ -510,12 +518,15 @@ Create this structure:
 │   └── init-rules/
 │       └── skill-tree-skills.md
 ├── common/
-│   └── references/
-│       ├── DOCUMENTATION_OUTPUT_CONTRACT.md
-│       ├── FUTURE_WORKFLOW.md
-│       ├── PENDING_TASK_FORMAT.md
-│       ├── REPOSITORY_DISCOVERY_CHECKLIST.md
-│       └── SNAPSHOT_RULES.md
+│   ├── references/
+│   │   ├── DOCUMENTATION_OUTPUT_CONTRACT.md
+│   │   ├── FUTURE_WORKFLOW.md
+│   │   ├── PENDING_TASK_FORMAT.md
+│   │   ├── REPOSITORY_DISCOVERY_CHECKLIST.md
+│   │   └── SNAPSHOT_RULES.md
+│   └── scripts/
+│       ├── select_prioritized_task.py
+│       └── validate_future_document.py
 ├── skills/
 │   ├── skill-tree-repo-documentation/
 │   ├── skill-tree-repo-documentation-audit/
@@ -741,7 +752,7 @@ It must tell agents:
 
 - this repository maintains reusable cross-agent Agent Skills;
 - `REPO_INIT_INSTRUCTIONS.md` is canonical for Unity documentation behavior;
-- generated references must be updated through `scripts/sync_skill_references.py`;
+- generated references and generated helper-script copies must be updated through `scripts/sync_skill_references.py`;
 - `config/providers.json` is canonical for installer provider definitions;
 - every skill change requires validation and tests;
 - skill folders must remain self-contained;
@@ -773,7 +784,7 @@ It must:
 - identify `skills/` as canonical;
 - clarify that `.claude/skills/` is an installation destination, not a second source;
 - point to `adapters/claude-code/README.md`;
-- prohibit editing generated references manually.
+- prohibit editing generated files manually.
 
 Do not duplicate all repository rules.
 
@@ -934,11 +945,12 @@ The script must:
    and `skills/skill-tree-unity-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md`.
 6. Extract the Unity pending template into:
    `skills/skill-tree-unity-repo-documentation-audit/references/PENDING_TASK_FORMAT.md`.
-7. Add a concise generated-file notice to generated references.
-8. Fail if required source headings are missing or ambiguous.
-9. Support a check-only mode that makes no changes.
-10. Use deterministic output.
-11. Preserve UTF-8 and LF line endings.
+7. Generate shared helper scripts from `common/scripts/` into every skill-local script copy that needs standalone use.
+8. Add a concise generated-file notice to generated references and generated helper-script copies.
+9. Fail if required source headings are missing or ambiguous.
+10. Support a check-only mode that makes no changes.
+11. Use deterministic output.
+12. Preserve UTF-8 and LF line endings.
 
 Recommended interface:
 
@@ -1640,7 +1652,18 @@ Include:
 
 ## 12.8 `scripts/select_prioritized_task.py`
 
-Create a deterministic selector/parser.
+Create the canonical selector/parser at:
+
+```text
+common/scripts/select_prioritized_task.py
+```
+
+Generate it into each implementing skill that requires standalone use:
+
+```text
+skills/skill-tree-implement-next-future-task/scripts/select_prioritized_task.py
+skills/skill-tree-unity-implement-next-future-task/scripts/select_prioritized_task.py
+```
 
 Required interface:
 
@@ -1682,10 +1705,15 @@ Do not implement fuzzy matching.
 Create the canonical implementation at:
 
 ```text
-skills/skill-tree-process-future-pending/scripts/validate_future_document.py
+common/scripts/validate_future_document.py
 ```
 
-Copy or generate the same implementation for any skill that requires standalone use, or design the implementation skill to use its own selector for relevant checks.
+Generate the same implementation into any skill that requires standalone use, including:
+
+```text
+skills/skill-tree-process-future-pending/scripts/validate_future_document.py
+skills/skill-tree-unity-process-future-pending/scripts/validate_future_document.py
+```
 
 Checks must include:
 
@@ -2187,7 +2215,7 @@ Use a minimal safe parser. Do not add a YAML dependency solely for validation un
 ### 15.3 Source synchronization
 
 - full source copy is identical;
-- generated references are current;
+- generated references and generated helper-script copies are current;
 - generated notices exist;
 - generator check mode passes.
 
@@ -2614,7 +2642,7 @@ When `REPO_INIT_INSTRUCTIONS.md` changes:
 8. Review generated diffs.
 9. Commit source and synchronized changes together.
 
-Never manually patch generated references to hide drift.
+Never manually patch generated files to hide drift.
 
 The repository validator must fail when synchronization is stale.
 
@@ -2905,7 +2933,7 @@ Use this only after reading the complete instruction:
 13. Add skill-local references and safe scripts.
 14. Add repository validators.
 15. Add fixtures, unit tests, compatibility tests, and eval scenarios.
-16. Synchronize generated references.
+16. Synchronize generated files.
 17. Run strict validation and all Python and Node tests.
 18. Review standalone installed-form skills and every Tier 1 command.
 19. Review the Git diff.

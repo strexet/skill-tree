@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-# GENERATED FILE
-# Source: common/scripts/validate_future_document.py
-# Generator: scripts/sync_skill_references.py
-# Do not edit manually. Update the source file and rerun the generator.
-
 """Validate FUTURE.md queue structure and prioritized task contracts."""
 
 from __future__ import annotations

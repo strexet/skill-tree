@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Synchronize generated skill references from canonical source documents."""
+"""Synchronize generated skill files from canonical source documents."""
 
 from __future__ import annotations
 
@@ -18,6 +18,19 @@ Do not edit manually. Update the source document and rerun the generator.
 -->
 
 """
+
+
+def generated_python(source: str, text: str) -> str:
+    notice = f"""# GENERATED FILE
+# Source: {source}
+# Generator: scripts/sync_skill_references.py
+# Do not edit manually. Update the source file and rerun the generator.
+
+"""
+    if text.startswith("#!"):
+        shebang, rest = text.split("\n", 1)
+        return f"{shebang}\n{notice}{rest}"
+    return notice + text
 
 
 FUTURE_START = "## 14. Document Specification — `Documents/FUTURE.md`"
@@ -70,6 +83,10 @@ def expected_outputs(root: Path) -> dict[Path, str]:
     common_contract = read_text(common_dir / "DOCUMENTATION_OUTPUT_CONTRACT.md")
     common_discovery = read_text(common_dir / "REPOSITORY_DISCOVERY_CHECKLIST.md")
     common_snapshot = read_text(common_dir / "SNAPSHOT_RULES.md")
+    common_scripts = root / "common/scripts"
+    future_validator = read_text(common_scripts / "validate_future_document.py")
+    task_selector = read_text(common_scripts / "select_prioritized_task.py")
+    unity_pending = extract_section(source, PENDING_TEMPLATE_START, PENDING_TEMPLATE_END)
     return {
         root / "skills/skill-tree-unity-repo-documentation/references/REPO_INIT_INSTRUCTIONS.md": source,
         root / "skills/skill-tree-unity-repo-documentation/references/COMMON_DOCUMENTATION_OUTPUT_CONTRACT.md": generated_notice("common/references/DOCUMENTATION_OUTPUT_CONTRACT.md")
@@ -104,16 +121,24 @@ def expected_outputs(root: Path) -> dict[Path, str]:
         + common_future,
         root / "skills/skill-tree-unity-implement-next-future-task/references/COMMON_FUTURE_WORKFLOW.md": generated_notice("common/references/FUTURE_WORKFLOW.md")
         + common_future,
+        root / "skills/skill-tree-unity-process-future-pending/references/PENDING_TASK_FORMAT.md": generated_notice("REPO_INIT_INSTRUCTIONS.md")
+        + unity_pending,
+        root / "skills/skill-tree-unity-implement-next-future-task/references/PENDING_TASK_FORMAT.md": generated_notice("REPO_INIT_INSTRUCTIONS.md")
+        + unity_pending,
         root / "skills/skill-tree-unity-process-future-pending/references/FUTURE_TASK_STANDARD.md": generated_notice("REPO_INIT_INSTRUCTIONS.md")
         + extract_section(source, FUTURE_START, FUTURE_END),
         root / "skills/skill-tree-unity-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md": generated_notice("REPO_INIT_INSTRUCTIONS.md")
         + extract_section(source, EXECUTION_START, EXECUTION_END),
         root / "skills/skill-tree-unity-repo-documentation-audit/references/PENDING_TASK_FORMAT.md": generated_notice("REPO_INIT_INSTRUCTIONS.md")
-        + extract_section(source, PENDING_TEMPLATE_START, PENDING_TEMPLATE_END),
+        + unity_pending,
         root / "skills/skill-tree-create-documents-snapshot/references/SNAPSHOT_RULES.md": generated_notice("common/references/SNAPSHOT_RULES.md")
         + common_snapshot,
         root / "skills/skill-tree-unity-create-documents-snapshot/references/SNAPSHOT_RULES.md": generated_notice("common/references/SNAPSHOT_RULES.md")
         + common_snapshot,
+        root / "skills/skill-tree-process-future-pending/scripts/validate_future_document.py": generated_python("common/scripts/validate_future_document.py", future_validator),
+        root / "skills/skill-tree-unity-process-future-pending/scripts/validate_future_document.py": generated_python("common/scripts/validate_future_document.py", future_validator),
+        root / "skills/skill-tree-implement-next-future-task/scripts/select_prioritized_task.py": generated_python("common/scripts/select_prioritized_task.py", task_selector),
+        root / "skills/skill-tree-unity-implement-next-future-task/scripts/select_prioritized_task.py": generated_python("common/scripts/select_prioritized_task.py", task_selector),
     }
 
 
@@ -145,7 +170,7 @@ def write(outputs: dict[Path, str]) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--check", action="store_true", help="fail if generated references are stale")
+    parser.add_argument("--check", action="store_true", help="fail if generated files are stale")
     args = parser.parse_args(argv)
 
     try:

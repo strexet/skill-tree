@@ -44,7 +44,7 @@ python3 scripts/select_prioritized_task.py /path/to/Documents/FUTURE.md --name "
 
 ## Clarification Gate
 
-Read `references/COMMON_FUTURE_WORKFLOW.md` and `references/FUTURE_EXECUTION_RULES.md` before selecting or implementing work.
+Read `references/COMMON_FUTURE_WORKFLOW.md`, `references/FUTURE_EXECUTION_RULES.md`, and `references/PENDING_TASK_FORMAT.md` before selecting or implementing work.
 
 Before editing:
 

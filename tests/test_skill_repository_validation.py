@@ -2,6 +2,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -127,6 +128,28 @@ class SkillRepositoryValidationTests(unittest.TestCase):
             result = subprocess.run([sys.executable, str(SNAPSHOT), str(root), "--dry-run"], text=True, capture_output=True)
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("archive:", result.stdout)
+
+    def test_snapshot_archive_names_and_notice_timestamp(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            docs = root / "Documents"
+            docs.mkdir()
+            (root / "README.md").write_text("Project architecture docs\n", encoding="utf-8")
+            (docs / "FUTURE.md").write_text("Future project architecture\n", encoding="utf-8")
+            (docs / "README.md").write_text("Documents README with architecture\n", encoding="utf-8")
+            output = root / "snapshot.zip"
+
+            result = subprocess.run([sys.executable, str(SNAPSHOT), str(root), "--output", str(output)], text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+
+            with zipfile.ZipFile(output, "r") as archive:
+                names = archive.namelist()
+                self.assertTrue(any(name.startswith("FUTURE.snapshot-") for name in names), names)
+                self.assertFalse(any(name.startswith("Documents__FUTURE.snapshot-") for name in names), names)
+                self.assertTrue(any(name.startswith("Documents__README.snapshot-") for name in names), names)
+                content = archive.read(next(name for name in names if name.startswith("FUTURE.snapshot-"))).decode("utf-8")
+            self.assertRegex(content, r"(?m)^Snapshot date: \d{4}-\d{2}-\d{2}$")
+            self.assertRegex(content, r"(?m)^Snapshot time: \d{2}-\d{2}$")
 
 
 if __name__ == "__main__":

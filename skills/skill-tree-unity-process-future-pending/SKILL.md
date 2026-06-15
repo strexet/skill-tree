@@ -20,7 +20,7 @@ Processing pending work is research and documentation work. Do not implement fea
 
 1. Locate the applicable `FUTURE.md`.
 2. MUST read repository `AGENTS.md`, `Documents/RULES.md`, and equivalent repository rules.
-3. Read `references/COMMON_FUTURE_WORKFLOW.md`, `references/FUTURE_TASK_STANDARD.md`, and `references/PENDING_PROCESSING_CHECKLIST.md`.
+3. Read `references/COMMON_FUTURE_WORKFLOW.md`, `references/FUTURE_TASK_STANDARD.md`, `references/PENDING_TASK_FORMAT.md`, and `references/PENDING_PROCESSING_CHECKLIST.md`.
 4. MUST read repository/document map if one exists.
 5. MUST read current `FEATURES.md`, active `FUTURE.md`, and task-relevant architecture/domain docs.
 6. Read the complete Pending Queue.

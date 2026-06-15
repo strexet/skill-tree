@@ -6,7 +6,7 @@ Last verified: 2026-06-10.
 
 Canonical behavior lives under `skills/skill-tree-<skill-name>/`. Agent adapters describe installation behavior and optional bridges, but do not redefine skill content.
 
-Shared parent behavior lives under `common/references/` and is copied into installed skill folders by `scripts/sync_skill_references.py`. Installed skills remain self-contained; they do not depend on sibling skill folders or the source repository after copy.
+Shared parent behavior lives under `common/references/` and shared generated helper implementations live under `common/scripts/`. Both are copied into installed skill folders by `scripts/sync_skill_references.py`. Installed skills remain self-contained; they do not depend on sibling skill folders or the source repository after copy.
 
 ## Provider Matrix
 

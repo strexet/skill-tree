@@ -4,6 +4,7 @@
 
 - Read `SKILL_REPOSITORY_CREATION_INSTRUCTIONS.md` before changing repository structure, installer behavior, provider metadata, tests, or skill contracts.
 - Read `common/references/` before changing general documentation, snapshot, or `FUTURE.md` workflow behavior.
+- Read `common/scripts/` before changing shared generated helper behavior.
 - Read `REPO_INIT_INSTRUCTIONS.md` before changing Unity documentation workflow behavior.
 - Read `docs/INSTALLATION_ARCHITECTURE.md` before changing the installer or provider matrix.
 - Read `docs/AGENT_COMPATIBILITY.md` before changing agent support claims.
@@ -23,8 +24,9 @@
 ## Source-of-Truth Rules
 
 - `common/references/` is canonical for general documentation, snapshot, and `FUTURE.md` workflow behavior.
+- `common/scripts/` is canonical for shared generated helper scripts.
 - `REPO_INIT_INSTRUCTIONS.md` is canonical for Unity repository analysis and Unity-specific documentation workflow behavior.
-- `scripts/sync_skill_references.py` owns generated references. Do not edit generated references manually.
+- `scripts/sync_skill_references.py` owns generated references and generated helper-script copies. Do not edit generated files manually.
 - `config/providers.json` is canonical for provider ids, paths, detection metadata, upstream profiles, and adapter bridges.
 - `LICENSE` is the existing repository license. The SPDX identifier is `MIT`.
 - `docs/AGENT_COMPATIBILITY.md` is canonical for support tier limits and official reference dates.

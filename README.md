@@ -42,11 +42,11 @@ Canonical source:
 skills/skill-tree-<skill-name>/
 ```
 
-Shared parent references live in `common/references/`. Installed skills remain self-contained because `scripts/sync_skill_references.py` copies generated common references into each skill folder that needs them.
+Shared parent references live in `common/references/`. Shared helper scripts live in `common/scripts/`. Installed skills remain self-contained because `scripts/sync_skill_references.py` copies generated common references and generated helper-script copies into each skill folder that needs them.
 
 Unity documentation behavior remains canonical in `REPO_INIT_INSTRUCTIONS.md`. General workflow behavior lives in `common/references/`.
 
-Refresh generated references with:
+Refresh generated files with:
 
 ```bash
 python3 scripts/sync_skill_references.py
@@ -114,7 +114,7 @@ git diff --check
 ## Repository Layout
 
 ```text
-common/      shared parent references copied into self-contained skills
+common/      shared parent references and scripts copied into self-contained skills
 skills/      canonical Agent Skills
 config/      provider matrix
 bin/         unified installer
@@ -127,11 +127,12 @@ docs/        compatibility, installation, and security notes
 ## Updating Skills
 
 1. Update `common/references/` for general workflow behavior.
-2. Update `REPO_INIT_INSTRUCTIONS.md` only when Unity-specific workflow changes.
-3. Run `python3 scripts/sync_skill_references.py`.
-4. Update concise references, validators, fixtures, and docs when behavior changes.
-5. Run validation and tests when owner policy allows.
-6. Review generated diffs before staging.
+2. Update `common/scripts/` for shared helper behavior.
+3. Update `REPO_INIT_INSTRUCTIONS.md` only when Unity-specific workflow changes.
+4. Run `python3 scripts/sync_skill_references.py`.
+5. Update concise references, validators, fixtures, and docs when behavior changes.
+6. Run validation and tests when owner policy allows.
+7. Review generated diffs before staging.
 
 ## Limitations
 

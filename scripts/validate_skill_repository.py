@@ -60,7 +60,7 @@ SKILLS = {
         "scripts": ["validate_future_document.py"],
     },
     "skill-tree-unity-process-future-pending": {
-        "references": ["COMMON_FUTURE_WORKFLOW.md", "FUTURE_TASK_STANDARD.md", "PENDING_PROCESSING_CHECKLIST.md"],
+        "references": ["COMMON_FUTURE_WORKFLOW.md", "FUTURE_TASK_STANDARD.md", "PENDING_PROCESSING_CHECKLIST.md", "PENDING_TASK_FORMAT.md"],
         "scripts": ["validate_future_document.py"],
     },
     "skill-tree-implement-next-future-task": {
@@ -68,7 +68,7 @@ SKILLS = {
         "scripts": ["select_prioritized_task.py"],
     },
     "skill-tree-unity-implement-next-future-task": {
-        "references": ["COMMON_FUTURE_WORKFLOW.md", "FUTURE_EXECUTION_RULES.md", "IMPLEMENTATION_HANDOFF_CHECKLIST.md"],
+        "references": ["COMMON_FUTURE_WORKFLOW.md", "FUTURE_EXECUTION_RULES.md", "IMPLEMENTATION_HANDOFF_CHECKLIST.md", "PENDING_TASK_FORMAT.md"],
         "scripts": ["select_prioritized_task.py"],
     },
     "skill-tree-repo-documentation": {

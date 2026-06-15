@@ -48,9 +48,9 @@ def relevant(path: Path, root: Path) -> bool:
     return any(keyword in text for keyword in keywords)
 
 
-def member_name(path: Path, root: Path, stamp: str, used: set[str]) -> str:
+def member_name(path: Path, root: Path, stamp: str, duplicate_basenames: set[str], used: set[str]) -> str:
     rel = path.relative_to(root).as_posix()
-    stem = path.stem if path.name == rel else rel.replace("/", "__").removesuffix(".md")
+    stem = rel.replace("/", "__").removesuffix(".md") if path.name in duplicate_basenames else path.stem
     name = f"{stem}.snapshot-{stamp}.md"
     counter = 2
     while name in used:
@@ -61,7 +61,7 @@ def member_name(path: Path, root: Path, stamp: str, used: set[str]) -> str:
 
 
 def snapshot_notice(source: str, name: str, stamp: str) -> str:
-    date, time = stamp.rsplit("-", 1)[0], stamp.rsplit("-", 1)[1]
+    date, time = stamp[:10], stamp[11:]
     return f"""<!--
 SNAPSHOT DOCUMENT
 Snapshot date: {date}
@@ -79,19 +79,23 @@ def create(root: Path, output: Path | None, dry_run: bool) -> tuple[Path, list[s
     if not root.exists() or not root.is_dir():
         raise ValueError(f"invalid target path: {root}")
     now = dt.datetime.now().strftime("%Y-%m-%d-%H-%M")
-    candidates = [path for path in tracked_markdown(root) if not any(part in EXCLUDE_PARTS for part in path.parts)]
+    candidates = sorted(path for path in tracked_markdown(root) if not any(part in EXCLUDE_PARTS for part in path.parts))
     included = [path for path in candidates if path.exists() and relevant(path, root)]
     archive = output or (root / f"{repo_name(root)}-documents-snapshot-{now}.zip")
     report = [path.relative_to(root).as_posix() for path in included]
     if dry_run:
         return archive, report
     used: set[str] = set()
+    basename_counts: dict[str, int] = {}
+    for path in included:
+        basename_counts[path.name] = basename_counts.get(path.name, 0) + 1
+    duplicate_basenames = {name for name, count in basename_counts.items() if count > 1}
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
         staged: list[Path] = []
         for path in included:
             rel = path.relative_to(root).as_posix()
-            name = member_name(path, root, now, used)
+            name = member_name(path, root, now, duplicate_basenames, used)
             target = tmp_path / name
             target.write_text(snapshot_notice(rel, name, now) + path.read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
             staged.append(target)
