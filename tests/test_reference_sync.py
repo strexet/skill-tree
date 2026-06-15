@@ -30,6 +30,7 @@ class ReferenceSyncTests(unittest.TestCase):
         for rel in [
             "skills/skill-tree-process-future-pending/references/FUTURE_TASK_STANDARD.md",
             "skills/skill-tree-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md",
+            "skills/skill-tree-unity-repo-documentation-audit/references/PENDING_TASK_FORMAT.md",
         ]:
             text = (ROOT / rel).read_text(encoding="utf-8")
             self.assertTrue(text.startswith("<!--\nGENERATED FILE"))

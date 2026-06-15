@@ -388,6 +388,8 @@ It may remain in `Prioritized Next Changes` to preserve priority, but `Implement
 
 Use this format when an AI agent adds an item to `Pending Queue`. Keep the entry concise, preserve source context, and use nested Markdown lists only. Include only relevant sections.
 
+When initializing or repairing repository documentation, copy this template into the target repository's `Documents/FUTURE.md` under `## Pending Task Format`.
+
 ```text
 - Task title
   - Description

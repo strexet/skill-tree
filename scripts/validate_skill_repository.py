@@ -58,7 +58,7 @@ SKILLS = {
         "scripts": ["select_prioritized_task.py"],
     },
     "skill-tree-unity-repo-documentation-audit": {
-        "references": [],
+        "references": ["PENDING_TASK_FORMAT.md"],
         "scripts": [],
     },
 }
@@ -273,6 +273,10 @@ def check_behavior(repo: Path) -> list[str]:
         errors.append("documentation audit skill does not recreate missing docs from evidence")
     if "Add meaningful findings to active `FUTURE.md` Backlog" not in audit:
         errors.append("documentation audit skill does not add issues to FUTURE")
+    if "Ensure `FUTURE.md` contains `## Pending Task Format` before `## Pending Queue`" not in audit:
+        errors.append("documentation audit skill does not repair missing pending task format")
+    if "references/PENDING_TASK_FORMAT.md" not in audit:
+        errors.append("documentation audit skill does not read pending task format reference")
     if "Do not add documentation/audit findings to Pending Queue" not in doc:
         errors.append("documentation skill does not forbid Pending for discovered findings")
     if "Do not add documentation/audit findings to Pending Queue" not in audit:

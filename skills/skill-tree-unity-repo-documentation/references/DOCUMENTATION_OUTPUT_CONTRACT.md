@@ -69,10 +69,13 @@ Documentation work must inspect key implementation paths, tests, error handling,
 `FUTURE.md` must contain:
 
 ```text
+## Pending Task Format
 ## Pending Queue
 ## Prioritized Next Changes
 ## Backlog
 ```
+
+`Pending Task Format` must include the repo-local nested Markdown template for adding new Pending Queue items, including source verification, Unity/game behavior, data/model behavior, acceptance criteria, tests, and documentation updates.
 
 `Implement next` uses only `Prioritized Next Changes`. `Process pending` researches Pending Queue entries and promotes only implementation-ready tasks.
 

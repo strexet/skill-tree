@@ -21,6 +21,8 @@ FUTURE_START = "## 14. Document Specification — `Documents/FUTURE.md`"
 FUTURE_END = "## 15. Document Specification — `Documents/RULES.md`"
 EXECUTION_START = "### 14.4 Command semantics"
 EXECUTION_END = "## 15. Document Specification — `Documents/RULES.md`"
+PENDING_TEMPLATE_START = "### 14.8 Pending item template"
+PENDING_TEMPLATE_END = "### 14.9 Task lifecycle"
 
 
 def repo_root() -> Path:
@@ -65,6 +67,8 @@ def expected_outputs(root: Path) -> dict[Path, str]:
         + extract_section(source, FUTURE_START, FUTURE_END),
         root / "skills/skill-tree-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md": NOTICE
         + extract_section(source, EXECUTION_START, EXECUTION_END),
+        root / "skills/skill-tree-unity-repo-documentation-audit/references/PENDING_TASK_FORMAT.md": NOTICE
+        + extract_section(source, PENDING_TEMPLATE_START, PENDING_TEMPLATE_END),
     }
 
 

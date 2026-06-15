@@ -1086,6 +1086,7 @@ Include:
 - document ownership map;
 - live filename rules;
 - required `FUTURE.md` queues;
+- required repo-local Pending Queue entry format guidance;
 - current-state versus planned-state rule;
 - cross-document validation;
 - final handoff requirements.
@@ -1226,12 +1227,15 @@ The skill must:
 7. Fix stale paths, renamed symbols, outdated behavior descriptions, contradictions, duplicate guidance, incorrect implementation status, and obsolete future sections in current-state documents.
 8. Enforce that `FEATURES.md` describes current implemented or partial behavior only.
 9. Enforce that `FUTURE.md` contains planned work, backlog, known bugs awaiting fixes, documentation improvements, proposed skills, refactoring plans, and deferred investigations.
-10. Mark historical documents clearly when they remain useful.
-11. While inspecting code, identify meaningful bugs, risky logic, missing tests, documentation/code drift, maintainability issues, and security/data-safety risks.
-12. Add meaningful findings to the active `FUTURE.md` Backlog, not Pending Queue, using the same task-quality requirements as the documentation skill.
-13. Merge with existing backlog entries and avoid duplicate tasks.
-14. Distinguish confirmed bugs, strongly suspected issues, documentation inconsistencies, and improvement opportunities.
-15. Produce an audit summary covering documents inspected, missing documents created, documents merged or role-corrected, drift corrected, paths/symbols updated, contradictions resolved, backlog items added, and unverified claims.
+10. Enforce that `FUTURE.md` contains repo-local `## Pending Task Format` guidance before `## Pending Queue`; add or repair the nested Markdown template when absent or incomplete.
+11. Mark historical documents clearly when they remain useful.
+12. While inspecting code, identify meaningful bugs, risky logic, missing tests, documentation/code drift, maintainability issues, and security/data-safety risks.
+13. Add meaningful findings to the active `FUTURE.md` Backlog, not Pending Queue, using the same task-quality requirements as the documentation skill.
+14. Merge with existing backlog entries and avoid duplicate tasks.
+15. Distinguish confirmed bugs, strongly suspected issues, documentation inconsistencies, and improvement opportunities.
+16. Produce an audit summary covering documents inspected, missing documents created, documents merged or role-corrected, drift corrected, paths/symbols updated, contradictions resolved, Pending Task Format repair, backlog items added, and unverified claims.
+
+The audit skill must include a generated `references/PENDING_TASK_FORMAT.md` extracted from `REPO_INIT_INSTRUCTIONS.md` section 14.8 and use it when repairing missing repo-local Pending Queue guidance.
 
 ### 10A.3 `SKILL.md` frontmatter
 

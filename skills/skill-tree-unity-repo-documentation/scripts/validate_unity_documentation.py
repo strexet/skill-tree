@@ -22,6 +22,15 @@ REQUIRED_DOCS = [
     "DEPENDENCIES.md",
 ]
 QUEUE_HEADINGS = ["## Pending Queue", "## Prioritized Next Changes", "## Backlog"]
+PENDING_FORMAT_HEADING = "## Pending Task Format"
+PENDING_FORMAT_MARKERS = [
+    "- Task title",
+    "Source verification requirements",
+    "Unity/game behavior",
+    "Data/model behavior",
+    "Acceptance criteria",
+    "Documentation updates",
+]
 REQUIRED_TASK_SECTIONS = [
     "Goal",
     "Current behavior",
@@ -51,9 +60,25 @@ def validate_future(path: Path, strict: bool) -> list[str]:
     if not path.exists():
         return [f"missing FUTURE.md: {path}"]
     text = read(path)
+    lines = text.splitlines()
+    heading_positions: dict[str, int] = {}
+    for index, line in enumerate(lines):
+        if re.match(r"^##\s+", line):
+            heading_positions[line.strip()] = index
+    if PENDING_FORMAT_HEADING not in heading_positions:
+        errors.append(f"FUTURE.md missing `{PENDING_FORMAT_HEADING}`")
+    else:
+        pending_queue_line = heading_positions.get("## Pending Queue")
+        if pending_queue_line is not None and heading_positions[PENDING_FORMAT_HEADING] > pending_queue_line:
+            errors.append("FUTURE.md pending task format must appear before `## Pending Queue`")
+        format_end = pending_queue_line if pending_queue_line is not None else len(lines)
+        format_text = "\n".join(lines[heading_positions[PENDING_FORMAT_HEADING] : format_end])
+        for marker in PENDING_FORMAT_MARKERS:
+            if marker not in format_text:
+                errors.append(f"FUTURE.md pending task format missing `{marker}`")
     last = -1
     for heading in QUEUE_HEADINGS:
-        index = text.find(heading)
+        index = heading_positions.get(heading, -1)
         if index == -1:
             errors.append(f"FUTURE.md missing `{heading}`")
         elif index < last:

@@ -65,6 +65,8 @@ class SkillRepositoryValidationTests(unittest.TestCase):
         self.assertIn("Recreate missing required docs from current repository evidence", text)
         self.assertIn("Add meaningful findings to active `FUTURE.md` Backlog", text)
         self.assertIn("Do not add documentation/audit findings to Pending Queue", text)
+        self.assertIn("Ensure `FUTURE.md` contains `## Pending Task Format` before `## Pending Queue`", text)
+        self.assertIn("references/PENDING_TASK_FORMAT.md", text)
         self.assertIn("`FEATURES.md`: current implemented", text)
 
     def test_future_contract_routes_documentation_findings_to_backlog(self):
@@ -77,6 +79,8 @@ class SkillRepositoryValidationTests(unittest.TestCase):
                 self.assertIn("- Task title\n  - Description", text)
                 self.assertIn("Unity/game behavior", text)
                 self.assertIn("Data/model behavior", text)
+                self.assertIn("copy this template into the target repository's `Documents/FUTURE.md`", text)
+                self.assertIn("## Pending Task Format", text)
 
     def test_snapshot_skill_owns_document_snapshot_creation(self):
         skill = (ROOT / "skills/skill-tree-create-documents-snapshot/SKILL.md").read_text(encoding="utf-8")

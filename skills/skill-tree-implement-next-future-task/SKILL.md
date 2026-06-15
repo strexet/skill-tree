@@ -1,6 +1,11 @@
 ---
 name: skill-tree-implement-next-future-task
-description: Implement exactly one task from the Prioritized Next Changes section of FUTURE.md. Use for "Implement next", "Implement next feature", "Implement next: <task name>", or "Implement next feature: <task name>". Never select from Pending Queue or Backlog, and stop for blocking unresolved questions or when a named prioritized task is absent.
+description: >
+  Implement exactly one task from the Prioritized Next Changes section of
+  FUTURE.md. Use for "Implement next", "Implement next feature",
+  "Implement next: <task name>", or "Implement next feature: <task name>".
+  Never select from Pending Queue or Backlog, and stop for blocking unresolved
+  questions or when a named prioritized task is absent.
 license: MIT
 ---
 
@@ -50,7 +55,7 @@ Before editing:
 7. MUST check for recent changes that invalidate task assumptions or make the work already complete.
 8. MUST check existing `FUTURE.md` tasks for duplicate or overlapping work.
 9. Read `Questions and required clarifications`.
-10. Identify unresolved blocking questions.
+10. Identify blocking unresolved questions.
 11. Ask the owner those questions.
 12. Stop implementation until answers exist.
 13. Update the task with answers or stale assumptions before implementation.

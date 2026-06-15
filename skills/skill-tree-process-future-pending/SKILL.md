@@ -1,6 +1,11 @@
 ---
 name: skill-tree-process-future-pending
-description: Process the Pending Queue in a repository FUTURE.md. Use when asked to "Process pending" or "Process pending tasks": research each pending request, validate it against the repository, add implementation questions, and promote only implementation-ready work into Prioritized Next Changes. Do not implement the tasks and do not promote Backlog work unless explicitly requested.
+description: >
+  Process the Pending Queue in a repository FUTURE.md. Use when asked to
+  "Process pending" or "Process pending tasks": research each pending request,
+  validate it against the repository, add implementation questions, and promote
+  only implementation-ready work into Prioritized Next Changes. Do not implement
+  the tasks and do not promote Backlog work unless explicitly requested.
 license: MIT
 ---
 

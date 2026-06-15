@@ -19,7 +19,8 @@ Before editing, MUST inspect:
 3. Repository/document map if one exists.
 4. Existing `PROJECT.md`, `TECHNICAL.md`, `FEATURES.md`, `FUTURE.md`, `RULES.md`, `AGENTS.md`, `REPOSITORY_MAP.md`, and other live docs.
 5. Key code, tests, build configuration, package manifests, settings, and agent workflow files relevant to documented claims.
-6. Current `skill-tree-unity-repo-documentation` specification when baseline document expectations are unclear.
+6. Local `references/PENDING_TASK_FORMAT.md` before repairing missing Pending Queue format guidance.
+7. Current `skill-tree-unity-repo-documentation` specification when other baseline document expectations are unclear.
 
 MUST NOT audit docs by comparing documents only. Verify substantial claims against code and tests.
 
@@ -34,13 +35,14 @@ MUST NOT audit docs by comparing documents only. Verify substantial claims again
    - `AGENTS.md` / `RULES.md`: repository workflow rules and source-of-truth hierarchy.
    - Architecture docs: current architecture only.
    - Historical docs: clearly marked as historical.
-5. Fix stale paths, renamed symbols, outdated behavior, contradictions, duplicate guidance, obsolete future sections in current-state docs, and unsupported claims.
-6. While inspecting code, identify meaningful issues: confirmed bugs, likely bugs, risky logic, documentation/code drift, missing validation, missing tests, error-handling gaps, security/data-safety concerns, maintainability problems, performance risks, and dead or misleading code.
-7. Add meaningful findings to active `FUTURE.md` Backlog using repository task structure. Do not add documentation/audit findings to Pending Queue. Merge with existing tasks when same issue exists. Do not duplicate tasks.
-8. Distinguish finding type: confirmed bug, strongly suspected issue, documentation inconsistency, or improvement opportunity. Include evidence, affected paths/symbols, impact, suggested direction, acceptance criteria, and focused tests where relevant.
-9. Do not change product code unless user explicitly requested implementation or a documentation-specific defect cannot be repaired otherwise.
-10. Run documentation validators when owner policy allows validation.
-11. Review final diff for secrets, personal data, absolute local paths, stale references, unsupported compatibility claims, malformed Markdown/frontmatter, placeholders, and accidental generated-file edits.
+5. Ensure `FUTURE.md` contains `## Pending Task Format` before `## Pending Queue`. If absent or incomplete, add or repair the repo-local nested Markdown template from `references/PENDING_TASK_FORMAT.md` so agents know how to add new Pending Queue items.
+6. Fix stale paths, renamed symbols, outdated behavior, contradictions, duplicate guidance, obsolete future sections in current-state docs, and unsupported claims.
+7. While inspecting code, identify meaningful issues: confirmed bugs, likely bugs, risky logic, documentation/code drift, missing validation, missing tests, error-handling gaps, security/data-safety concerns, maintainability problems, performance risks, and dead or misleading code.
+8. Add meaningful findings to active `FUTURE.md` Backlog using repository task structure. Do not add documentation/audit findings to Pending Queue. Merge with existing tasks when same issue exists. Do not duplicate tasks.
+9. Distinguish finding type: confirmed bug, strongly suspected issue, documentation inconsistency, or improvement opportunity. Include evidence, affected paths/symbols, impact, suggested direction, acceptance criteria, and focused tests where relevant.
+10. Do not change product code unless user explicitly requested implementation or a documentation-specific defect cannot be repaired otherwise.
+11. Run documentation validators when owner policy allows validation.
+12. Review final diff for secrets, personal data, absolute local paths, stale references, unsupported compatibility claims, malformed Markdown/frontmatter, placeholders, and accidental generated-file edits.
 
 ## FEATURES.md / FUTURE.md Rule
 
@@ -58,6 +60,7 @@ Final response MUST report:
 - Drift corrected.
 - Paths/symbols updated.
 - Contradictions resolved.
+- Pending Task Format added or confirmed in `FUTURE.md`.
 - Backlog items added or merged.
 - Confirmation that documentation/audit findings were not added to Pending Queue.
 - Potential issues not added because evidence was insufficient.

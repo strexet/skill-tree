@@ -123,6 +123,8 @@ Build/release behavior belongs in `BUILD_AND_RELEASE.md`.
 Remove an item from this file when it ships.
 ```
 
+The generated `FUTURE.md` must also include a repo-local `## Pending Task Format` section before `## Pending Queue`. This section must tell agents to use the pending item template from section 14.8 when a user asks them to add a new pending task, and it must include the full nested Markdown template so agents working only inside the initialized repository can follow the format without access to this skill.
+
 ### 14.4 Command semantics
 
 The generated `FUTURE.md` and `RULES.md` must define the following command behavior.
@@ -505,6 +507,8 @@ It may remain in `Prioritized Next Changes` to preserve priority, but `Implement
 ### 14.8 Pending item template
 
 Use this format when an AI agent adds an item to `Pending Queue`. Keep the entry concise, preserve source context, and use nested Markdown lists only. Include only relevant sections.
+
+When initializing or repairing repository documentation, copy this template into the target repository's `Documents/FUTURE.md` under `## Pending Task Format`.
 
 ```text
 - Task title
