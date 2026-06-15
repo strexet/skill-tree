@@ -36,10 +36,14 @@ Soft providers are listed but not selected by automatic detection. Select them w
 ## Selecting Skills
 
 ```bash
-node bin/install.js --skills skill-tree-unity-repo-documentation
+node bin/install.js --skills skill-tree-repo-documentation
+node bin/install.js --skills skill-tree-repo-documentation-audit
 node bin/install.js --skills skill-tree-process-future-pending skill-tree-implement-next-future-task
-node bin/install.js --skills skill-tree-unity-repo-documentation-audit
 node bin/install.js --skills skill-tree-create-documents-snapshot
+node bin/install.js --skills skill-tree-unity-repo-documentation
+node bin/install.js --skills skill-tree-unity-repo-documentation-audit
+node bin/install.js --skills skill-tree-unity-process-future-pending skill-tree-unity-implement-next-future-task
+node bin/install.js --skills skill-tree-unity-create-documents-snapshot
 ```
 
 Without `--skills`, all canonical skills are selected.
@@ -75,7 +79,7 @@ Copy mode stages replacement and refuses overwrite unless `--force` is passed. S
 node bin/install.js --only claude-code --with-init --target /path/to/repo
 ```
 
-Bridges are short instruction blocks generated from `src/init-rules/unity-repository-skills.md`. They use explicit begin/end markers, preserve existing content, and create backups before modifying existing files.
+Bridges are short instruction blocks generated from `src/init-rules/skill-tree-skills.md`. They use explicit begin/end markers, preserve existing content, and create backups before modifying existing files.
 
 ## Uninstall
 
@@ -124,7 +128,7 @@ This installer has no first-party telemetry. Network access may occur indirectly
 
 - Provider skill paths from `config/providers.json`.
 - Optional bridge destinations declared by selected providers.
-- No Unity project files, builds, tests, package resolution, or editor state.
+- No target project source files, builds, tests, dependency resolution, or editor state unless optional bridge files are explicitly requested with `--with-init`.
 
 ## Troubleshooting
 

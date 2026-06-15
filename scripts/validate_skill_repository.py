@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the Unity repository skills source tree."""
+"""Validate the Skill Tree repository skills source tree."""
 
 from __future__ import annotations
 
@@ -31,12 +31,14 @@ ROOT_FILES = [
     "docs/INSTALLATION_ARCHITECTURE.md",
     "docs/MIGRATION.md",
     "docs/SECURITY.md",
-    "src/init-rules/unity-repository-skills.md",
+    "src/init-rules/skill-tree-skills.md",
 ]
 SKILLS = {
     "skill-tree-unity-repo-documentation": {
         "references": [
             "REPO_INIT_INSTRUCTIONS.md",
+            "COMMON_DOCUMENTATION_OUTPUT_CONTRACT.md",
+            "COMMON_REPOSITORY_DISCOVERY_CHECKLIST.md",
             "DOCUMENTATION_OUTPUT_CONTRACT.md",
             "UNITY_DISCOVERY_CHECKLIST.md",
         ],
@@ -49,25 +51,58 @@ SKILLS = {
         "references": ["SNAPSHOT_RULES.md"],
         "scripts": ["create_documentation_snapshot.py"],
     },
+    "skill-tree-unity-create-documents-snapshot": {
+        "references": ["SNAPSHOT_RULES.md", "UNITY_SNAPSHOT_SUPPLEMENT.md"],
+        "scripts": ["create_documentation_snapshot.py"],
+    },
     "skill-tree-process-future-pending": {
-        "references": ["FUTURE_TASK_STANDARD.md", "PENDING_PROCESSING_CHECKLIST.md"],
+        "references": ["FUTURE_TASK_STANDARD.md", "PENDING_PROCESSING_CHECKLIST.md", "PENDING_TASK_FORMAT.md"],
+        "scripts": ["validate_future_document.py"],
+    },
+    "skill-tree-unity-process-future-pending": {
+        "references": ["COMMON_FUTURE_WORKFLOW.md", "FUTURE_TASK_STANDARD.md", "PENDING_PROCESSING_CHECKLIST.md"],
         "scripts": ["validate_future_document.py"],
     },
     "skill-tree-implement-next-future-task": {
-        "references": ["FUTURE_EXECUTION_RULES.md", "IMPLEMENTATION_HANDOFF_CHECKLIST.md"],
+        "references": ["FUTURE_EXECUTION_RULES.md", "IMPLEMENTATION_HANDOFF_CHECKLIST.md", "PENDING_TASK_FORMAT.md"],
         "scripts": ["select_prioritized_task.py"],
     },
+    "skill-tree-unity-implement-next-future-task": {
+        "references": ["COMMON_FUTURE_WORKFLOW.md", "FUTURE_EXECUTION_RULES.md", "IMPLEMENTATION_HANDOFF_CHECKLIST.md"],
+        "scripts": ["select_prioritized_task.py"],
+    },
+    "skill-tree-repo-documentation": {
+        "references": [
+            "DOCUMENTATION_OUTPUT_CONTRACT.md",
+            "REPOSITORY_DISCOVERY_CHECKLIST.md",
+            "PENDING_TASK_FORMAT.md",
+        ],
+        "scripts": ["validate_repository_documentation.py"],
+    },
+    "skill-tree-repo-documentation-audit": {
+        "references": [
+            "DOCUMENTATION_OUTPUT_CONTRACT.md",
+            "REPOSITORY_DISCOVERY_CHECKLIST.md",
+            "PENDING_TASK_FORMAT.md",
+        ],
+        "scripts": [],
+    },
     "skill-tree-unity-repo-documentation-audit": {
-        "references": ["PENDING_TASK_FORMAT.md"],
+        "references": ["COMMON_DOCUMENTATION_OUTPUT_CONTRACT.md", "COMMON_REPOSITORY_DISCOVERY_CHECKLIST.md", "PENDING_TASK_FORMAT.md"],
         "scripts": [],
     },
 }
 DISPLAY_NAMES = {
-    "skill-tree-unity-repo-documentation": "Skill-Tree: Initialize Documents",
-    "skill-tree-unity-repo-documentation-audit": "Skill-Tree: Audit Documents",
+    "skill-tree-repo-documentation": "Skill-Tree: Initialize Documents",
+    "skill-tree-repo-documentation-audit": "Skill-Tree: Audit Documents",
     "skill-tree-process-future-pending": "Skill-Tree: Process Pending Tasks",
     "skill-tree-implement-next-future-task": "Skill-Tree: Implement Next Task",
     "skill-tree-create-documents-snapshot": "Skill-Tree: Create Snapshot",
+    "skill-tree-unity-repo-documentation": "Skill-Tree-Unity: Initialize Documents",
+    "skill-tree-unity-repo-documentation-audit": "Skill-Tree-Unity: Audit Documents",
+    "skill-tree-unity-process-future-pending": "Skill-Tree-Unity: Process Pending Tasks",
+    "skill-tree-unity-implement-next-future-task": "Skill-Tree-Unity: Implement Next Task",
+    "skill-tree-unity-create-documents-snapshot": "Skill-Tree-Unity: Create Snapshot",
 }
 ADAPTERS = ["codex", "claude-code", "gemini-cli", "github-copilot", "cursor", "windsurf", "cline", "generic"]
 
@@ -244,8 +279,10 @@ def check_behavior(repo: Path) -> list[str]:
     errors: list[str] = []
     process = read(repo / "skills/skill-tree-process-future-pending/SKILL.md")
     implement = read(repo / "skills/skill-tree-implement-next-future-task/SKILL.md")
-    doc = read(repo / "skills/skill-tree-unity-repo-documentation/SKILL.md")
-    audit = read(repo / "skills/skill-tree-unity-repo-documentation-audit/SKILL.md")
+    unity_doc = read(repo / "skills/skill-tree-unity-repo-documentation/SKILL.md")
+    general_doc = read(repo / "skills/skill-tree-repo-documentation/SKILL.md")
+    unity_audit = read(repo / "skills/skill-tree-unity-repo-documentation-audit/SKILL.md")
+    general_audit = read(repo / "skills/skill-tree-repo-documentation-audit/SKILL.md")
     snapshot = read(repo / "skills/skill-tree-create-documents-snapshot/SKILL.md")
     if "Do not implement" not in process:
         errors.append("process skill does not explicitly forbid implementation")
@@ -261,26 +298,28 @@ def check_behavior(repo: Path) -> list[str]:
         errors.append("implement skill does not stop on missing named task")
     if "blocking unresolved questions" not in implement:
         errors.append("implement skill does not stop on blocking questions")
-    if "references/REPO_INIT_INSTRUCTIONS.md" not in doc:
-        errors.append("documentation skill does not read source reference")
-    if "FEATURES.md` limited to current implemented or partial behavior" not in doc:
-        errors.append("documentation skill does not enforce FEATURES/FUTURE split")
-    if "meaningful discovered issues" not in doc:
-        errors.append("documentation skill does not add discovered issues to FUTURE")
-    if "MUST NOT audit docs by comparing documents only" not in audit:
-        errors.append("documentation audit skill does not require code-aware audit")
-    if "Recreate missing required docs from current repository evidence" not in audit:
-        errors.append("documentation audit skill does not recreate missing docs from evidence")
-    if "Add meaningful findings to active `FUTURE.md` Backlog" not in audit:
-        errors.append("documentation audit skill does not add issues to FUTURE")
-    if "Ensure `FUTURE.md` contains `## Pending Task Format` before `## Pending Queue`" not in audit:
-        errors.append("documentation audit skill does not repair missing pending task format")
-    if "references/PENDING_TASK_FORMAT.md" not in audit:
-        errors.append("documentation audit skill does not read pending task format reference")
-    if "Do not add documentation/audit findings to Pending Queue" not in doc:
-        errors.append("documentation skill does not forbid Pending for discovered findings")
-    if "Do not add documentation/audit findings to Pending Queue" not in audit:
-        errors.append("documentation audit skill does not forbid Pending for discovered findings")
+    if "references/REPO_INIT_INSTRUCTIONS.md" not in unity_doc:
+        errors.append("unity documentation skill does not read source reference")
+    for label, text in [("general documentation", general_doc), ("unity documentation", unity_doc)]:
+        if "FEATURES.md` limited to current implemented or partial behavior" not in text:
+            errors.append(f"{label} skill does not enforce FEATURES/FUTURE split")
+        if "meaningful discovered issues" not in text:
+            errors.append(f"{label} skill does not add discovered issues to FUTURE")
+        if "not Pending Queue" not in text and "Do not add documentation/audit findings to Pending Queue" not in text:
+            errors.append(f"{label} skill does not forbid Pending for discovered findings")
+    for label, text in [("general audit", general_audit), ("unity audit", unity_audit)]:
+        if "MUST NOT audit docs by comparing documents only" not in text:
+            errors.append(f"{label} skill does not require code-aware audit")
+        if "Recreate missing required docs from current repository evidence" not in text:
+            errors.append(f"{label} skill does not recreate missing docs from evidence")
+        if "Add meaningful findings to active `FUTURE.md` Backlog" not in text:
+            errors.append(f"{label} skill does not add issues to FUTURE")
+        if "Ensure `FUTURE.md` contains `## Pending Task Format` before `## Pending Queue`" not in text:
+            errors.append(f"{label} skill does not repair missing pending task format")
+        if "references/PENDING_TASK_FORMAT.md" not in text:
+            errors.append(f"{label} skill does not read pending task format reference")
+        if "Do not add documentation/audit findings to Pending Queue" not in text:
+            errors.append(f"{label} audit skill does not forbid Pending for discovered findings")
     if "Do not create or update `Documents/DOCUMENTS_SNAPSHOT.md`" not in snapshot:
         errors.append("snapshot skill does not own snapshot docs boundary")
     if "create_documentation_snapshot.py" not in snapshot:
@@ -296,6 +335,8 @@ def check_docs(repo: Path, strict: bool) -> list[str]:
         "skills/skill-tree-unity-repo-documentation/references/REPO_INIT_INSTRUCTIONS.md",
         "skills/skill-tree-process-future-pending/references/FUTURE_TASK_STANDARD.md",
         "skills/skill-tree-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md",
+        "skills/skill-tree-unity-process-future-pending/references/FUTURE_TASK_STANDARD.md",
+        "skills/skill-tree-unity-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md",
         "docs/MIGRATION.md",
     }
     for path in sorted(repo.rglob("*.md")):

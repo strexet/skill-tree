@@ -1,12 +1,12 @@
 {
-  "name": "unity-repository-skills",
+  "name": "skill-tree-skills",
   "version": "0.1.0",
-  "description": "Vendor-neutral Agent Skills for documenting Unity repositories and executing FUTURE.md workflows.",
+  "description": "Vendor-neutral Agent Skills for repository documentation, FUTURE.md workflows, and Unity-specific variants.",
   "license": "MIT",
   "private": true,
   "type": "commonjs",
   "bin": {
-    "unity-repository-skills-install": "bin/install.js"
+    "skill-tree-skills-install": "bin/install.js"
   },
   "engines": {
     "node": ">=18"

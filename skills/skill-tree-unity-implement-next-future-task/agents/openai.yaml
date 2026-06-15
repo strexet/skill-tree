@@ -1,0 +1,7 @@
+interface:
+  display_name: "Skill-Tree-Unity: Implement Next Task"
+  short_description: "Implement one prioritized Unity task"
+  default_prompt: "Implement the next eligible Unity task from Prioritized Next Changes."
+
+policy:
+  allow_implicit_invocation: true

@@ -10,6 +10,7 @@ UNITY_INSPECT = ROOT / "skills/skill-tree-unity-repo-documentation/scripts/inspe
 UNITY_DOCS = ROOT / "skills/skill-tree-unity-repo-documentation/scripts/validate_unity_documentation.py"
 SNAPSHOT = ROOT / "skills/skill-tree-create-documents-snapshot/scripts/create_documentation_snapshot.py"
 AUDIT_SKILL = ROOT / "skills/skill-tree-unity-repo-documentation-audit/SKILL.md"
+GENERAL_AUDIT_SKILL = ROOT / "skills/skill-tree-repo-documentation-audit/SKILL.md"
 
 
 class SkillRepositoryValidationTests(unittest.TestCase):
@@ -23,6 +24,7 @@ class SkillRepositoryValidationTests(unittest.TestCase):
             VALIDATOR,
             ROOT / "skills/skill-tree-process-future-pending/scripts/validate_future_document.py",
             ROOT / "skills/skill-tree-implement-next-future-task/scripts/select_prioritized_task.py",
+            ROOT / "skills/skill-tree-repo-documentation/scripts/validate_repository_documentation.py",
             UNITY_INSPECT,
             UNITY_DOCS,
             SNAPSHOT,
@@ -35,8 +37,11 @@ class SkillRepositoryValidationTests(unittest.TestCase):
     def test_all_canonical_skills_use_skill_tree_prefix(self):
         skills_dir = ROOT / "skills"
         names = sorted(path.name for path in skills_dir.iterdir() if (path / "SKILL.md").is_file())
+        self.assertIn("skill-tree-repo-documentation", names)
+        self.assertIn("skill-tree-repo-documentation-audit", names)
         self.assertIn("skill-tree-unity-repo-documentation-audit", names)
         self.assertIn("skill-tree-create-documents-snapshot", names)
+        self.assertIn("skill-tree-unity-create-documents-snapshot", names)
         self.assertTrue(names)
         for name in names:
             with self.subTest(skill=name):
@@ -46,11 +51,16 @@ class SkillRepositoryValidationTests(unittest.TestCase):
 
     def test_skill_tree_display_names_match_required_strings(self):
         expected = {
-            "skill-tree-unity-repo-documentation": "Skill-Tree: Initialize Documents",
-            "skill-tree-unity-repo-documentation-audit": "Skill-Tree: Audit Documents",
+            "skill-tree-repo-documentation": "Skill-Tree: Initialize Documents",
+            "skill-tree-repo-documentation-audit": "Skill-Tree: Audit Documents",
             "skill-tree-process-future-pending": "Skill-Tree: Process Pending Tasks",
             "skill-tree-implement-next-future-task": "Skill-Tree: Implement Next Task",
             "skill-tree-create-documents-snapshot": "Skill-Tree: Create Snapshot",
+            "skill-tree-unity-repo-documentation": "Skill-Tree-Unity: Initialize Documents",
+            "skill-tree-unity-repo-documentation-audit": "Skill-Tree-Unity: Audit Documents",
+            "skill-tree-unity-process-future-pending": "Skill-Tree-Unity: Process Pending Tasks",
+            "skill-tree-unity-implement-next-future-task": "Skill-Tree-Unity: Implement Next Task",
+            "skill-tree-unity-create-documents-snapshot": "Skill-Tree-Unity: Create Snapshot",
         }
         for skill, display_name in expected.items():
             with self.subTest(skill=skill):
@@ -60,18 +70,19 @@ class SkillRepositoryValidationTests(unittest.TestCase):
                 self.assertIn(f'display_name: "{display_name}"', openai_yaml)
 
     def test_documentation_audit_skill_requires_code_aware_future_updates(self):
-        text = AUDIT_SKILL.read_text(encoding="utf-8")
-        self.assertIn("MUST NOT audit docs by comparing documents only", text)
-        self.assertIn("Recreate missing required docs from current repository evidence", text)
-        self.assertIn("Add meaningful findings to active `FUTURE.md` Backlog", text)
-        self.assertIn("Do not add documentation/audit findings to Pending Queue", text)
-        self.assertIn("Ensure `FUTURE.md` contains `## Pending Task Format` before `## Pending Queue`", text)
-        self.assertIn("references/PENDING_TASK_FORMAT.md", text)
-        self.assertIn("`FEATURES.md`: current implemented", text)
+        for skill in (AUDIT_SKILL, GENERAL_AUDIT_SKILL):
+            text = skill.read_text(encoding="utf-8")
+            self.assertIn("MUST NOT audit docs by comparing documents only", text)
+            self.assertIn("Recreate missing required docs from current repository evidence", text)
+            self.assertIn("Add meaningful findings to active `FUTURE.md` Backlog", text)
+            self.assertIn("Do not add documentation/audit findings to Pending Queue", text)
+            self.assertIn("Ensure `FUTURE.md` contains `## Pending Task Format` before `## Pending Queue`", text)
+            self.assertIn("references/PENDING_TASK_FORMAT.md", text)
+            self.assertIn("`FEATURES.md`: current implemented", text)
 
     def test_future_contract_routes_documentation_findings_to_backlog(self):
         source = (ROOT / "REPO_INIT_INSTRUCTIONS.md").read_text(encoding="utf-8")
-        generated = (ROOT / "skills/skill-tree-process-future-pending/references/FUTURE_TASK_STANDARD.md").read_text(encoding="utf-8")
+        generated = (ROOT / "skills/skill-tree-unity-process-future-pending/references/FUTURE_TASK_STANDARD.md").read_text(encoding="utf-8")
         for text in (source, generated):
             with self.subTest(source=text[:20]):
                 self.assertIn("Do not put issues discovered during Unity documentation initialization or documentation audit in `Pending Queue`", text)
@@ -81,6 +92,9 @@ class SkillRepositoryValidationTests(unittest.TestCase):
                 self.assertIn("Data/model behavior", text)
                 self.assertIn("copy this template into the target repository's `Documents/FUTURE.md`", text)
                 self.assertIn("## Pending Task Format", text)
+        general = (ROOT / "skills/skill-tree-process-future-pending/references/FUTURE_TASK_STANDARD.md").read_text(encoding="utf-8")
+        self.assertIn("Documentation or audit findings discovered during repository documentation work belong in `Backlog`", general)
+        self.assertIn("Runtime/product behavior", (ROOT / "skills/skill-tree-process-future-pending/references/PENDING_TASK_FORMAT.md").read_text(encoding="utf-8"))
 
     def test_snapshot_skill_owns_document_snapshot_creation(self):
         skill = (ROOT / "skills/skill-tree-create-documents-snapshot/SKILL.md").read_text(encoding="utf-8")
@@ -88,7 +102,7 @@ class SkillRepositoryValidationTests(unittest.TestCase):
         validator = (ROOT / "skills/skill-tree-unity-repo-documentation/scripts/validate_unity_documentation.py").read_text(encoding="utf-8")
         self.assertIn("Skill-Tree: Create Snapshot", skill)
         self.assertIn("Do not create or update `Documents/DOCUMENTS_SNAPSHOT.md`", skill)
-        self.assertIn("skill-tree-create-documents-snapshot", contract)
+        self.assertIn("skill-tree-unity-create-documents-snapshot", contract)
         self.assertNotIn('"DOCUMENTS_SNAPSHOT.md"', validator)
 
     def test_unity_inventory_and_docs_validation(self):

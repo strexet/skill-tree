@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Synchronize generated skill references from REPO_INIT_INSTRUCTIONS.md."""
+"""Synchronize generated skill references from canonical source documents."""
 
 from __future__ import annotations
 
@@ -8,14 +8,17 @@ import difflib
 import sys
 from pathlib import Path
 
-NOTICE = """<!--
+
+def generated_notice(source: str) -> str:
+    return f"""<!--
 GENERATED FILE
-Source: REPO_INIT_INSTRUCTIONS.md
+Source: {source}
 Generator: scripts/sync_skill_references.py
 Do not edit manually. Update the source document and rerun the generator.
 -->
 
 """
+
 
 FUTURE_START = "## 14. Document Specification — `Documents/FUTURE.md`"
 FUTURE_END = "## 15. Document Specification — `Documents/RULES.md`"
@@ -61,14 +64,56 @@ def extract_section(text: str, start_heading: str, end_heading: str) -> str:
 
 def expected_outputs(root: Path) -> dict[Path, str]:
     source = read_text(root / "REPO_INIT_INSTRUCTIONS.md")
+    common_dir = root / "common/references"
+    common_future = read_text(common_dir / "FUTURE_WORKFLOW.md")
+    common_pending = read_text(common_dir / "PENDING_TASK_FORMAT.md")
+    common_contract = read_text(common_dir / "DOCUMENTATION_OUTPUT_CONTRACT.md")
+    common_discovery = read_text(common_dir / "REPOSITORY_DISCOVERY_CHECKLIST.md")
+    common_snapshot = read_text(common_dir / "SNAPSHOT_RULES.md")
     return {
         root / "skills/skill-tree-unity-repo-documentation/references/REPO_INIT_INSTRUCTIONS.md": source,
-        root / "skills/skill-tree-process-future-pending/references/FUTURE_TASK_STANDARD.md": NOTICE
+        root / "skills/skill-tree-unity-repo-documentation/references/COMMON_DOCUMENTATION_OUTPUT_CONTRACT.md": generated_notice("common/references/DOCUMENTATION_OUTPUT_CONTRACT.md")
+        + common_contract,
+        root / "skills/skill-tree-unity-repo-documentation/references/COMMON_REPOSITORY_DISCOVERY_CHECKLIST.md": generated_notice("common/references/REPOSITORY_DISCOVERY_CHECKLIST.md")
+        + common_discovery,
+        root / "skills/skill-tree-repo-documentation/references/DOCUMENTATION_OUTPUT_CONTRACT.md": generated_notice("common/references/DOCUMENTATION_OUTPUT_CONTRACT.md")
+        + common_contract,
+        root / "skills/skill-tree-repo-documentation/references/REPOSITORY_DISCOVERY_CHECKLIST.md": generated_notice("common/references/REPOSITORY_DISCOVERY_CHECKLIST.md")
+        + common_discovery,
+        root / "skills/skill-tree-repo-documentation/references/PENDING_TASK_FORMAT.md": generated_notice("common/references/PENDING_TASK_FORMAT.md")
+        + common_pending,
+        root / "skills/skill-tree-repo-documentation-audit/references/DOCUMENTATION_OUTPUT_CONTRACT.md": generated_notice("common/references/DOCUMENTATION_OUTPUT_CONTRACT.md")
+        + common_contract,
+        root / "skills/skill-tree-repo-documentation-audit/references/REPOSITORY_DISCOVERY_CHECKLIST.md": generated_notice("common/references/REPOSITORY_DISCOVERY_CHECKLIST.md")
+        + common_discovery,
+        root / "skills/skill-tree-repo-documentation-audit/references/PENDING_TASK_FORMAT.md": generated_notice("common/references/PENDING_TASK_FORMAT.md")
+        + common_pending,
+        root / "skills/skill-tree-unity-repo-documentation-audit/references/COMMON_DOCUMENTATION_OUTPUT_CONTRACT.md": generated_notice("common/references/DOCUMENTATION_OUTPUT_CONTRACT.md")
+        + common_contract,
+        root / "skills/skill-tree-unity-repo-documentation-audit/references/COMMON_REPOSITORY_DISCOVERY_CHECKLIST.md": generated_notice("common/references/REPOSITORY_DISCOVERY_CHECKLIST.md")
+        + common_discovery,
+        root / "skills/skill-tree-process-future-pending/references/FUTURE_TASK_STANDARD.md": generated_notice("common/references/FUTURE_WORKFLOW.md")
+        + common_future,
+        root / "skills/skill-tree-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md": generated_notice("common/references/FUTURE_WORKFLOW.md")
+        + common_future,
+        root / "skills/skill-tree-process-future-pending/references/PENDING_TASK_FORMAT.md": generated_notice("common/references/PENDING_TASK_FORMAT.md")
+        + common_pending,
+        root / "skills/skill-tree-implement-next-future-task/references/PENDING_TASK_FORMAT.md": generated_notice("common/references/PENDING_TASK_FORMAT.md")
+        + common_pending,
+        root / "skills/skill-tree-unity-process-future-pending/references/COMMON_FUTURE_WORKFLOW.md": generated_notice("common/references/FUTURE_WORKFLOW.md")
+        + common_future,
+        root / "skills/skill-tree-unity-implement-next-future-task/references/COMMON_FUTURE_WORKFLOW.md": generated_notice("common/references/FUTURE_WORKFLOW.md")
+        + common_future,
+        root / "skills/skill-tree-unity-process-future-pending/references/FUTURE_TASK_STANDARD.md": generated_notice("REPO_INIT_INSTRUCTIONS.md")
         + extract_section(source, FUTURE_START, FUTURE_END),
-        root / "skills/skill-tree-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md": NOTICE
+        root / "skills/skill-tree-unity-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md": generated_notice("REPO_INIT_INSTRUCTIONS.md")
         + extract_section(source, EXECUTION_START, EXECUTION_END),
-        root / "skills/skill-tree-unity-repo-documentation-audit/references/PENDING_TASK_FORMAT.md": NOTICE
+        root / "skills/skill-tree-unity-repo-documentation-audit/references/PENDING_TASK_FORMAT.md": generated_notice("REPO_INIT_INSTRUCTIONS.md")
         + extract_section(source, PENDING_TEMPLATE_START, PENDING_TEMPLATE_END),
+        root / "skills/skill-tree-create-documents-snapshot/references/SNAPSHOT_RULES.md": generated_notice("common/references/SNAPSHOT_RULES.md")
+        + common_snapshot,
+        root / "skills/skill-tree-unity-create-documents-snapshot/references/SNAPSHOT_RULES.md": generated_notice("common/references/SNAPSHOT_RULES.md")
+        + common_snapshot,
     }
 
 

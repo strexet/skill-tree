@@ -9,7 +9,7 @@ const root = path.resolve(__dirname, "..");
 const cli = path.join(root, "bin", "install.js");
 
 function tmpdir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), "unity-skills-test-"));
+  return fs.mkdtempSync(path.join(os.tmpdir(), "skill-tree-test-"));
 }
 
 function run(args, options = {}) {
@@ -31,9 +31,12 @@ test("--list succeeds without writes", () => {
   const result = run(["--list"]);
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /claude-code/);
+  assert.match(result.stdout, /skill-tree-repo-documentation/);
+  assert.match(result.stdout, /skill-tree-repo-documentation-audit/);
   assert.match(result.stdout, /skill-tree-unity-repo-documentation/);
   assert.match(result.stdout, /skill-tree-unity-repo-documentation-audit/);
   assert.match(result.stdout, /skill-tree-create-documents-snapshot/);
+  assert.match(result.stdout, /skill-tree-unity-create-documents-snapshot/);
 });
 
 test("dry-run all succeeds without installing", () => {
@@ -90,7 +93,7 @@ test("bridge insertion is idempotent and creates backup on second write", () => 
   result = run(["--only", "codex", "--project", "--target", target, "--copy", "--force", "--with-init", "--skills", "skill-tree-process-future-pending"]);
   assert.equal(result.status, 0, result.stderr);
   const text = fs.readFileSync(path.join(target, "AGENTS.md"), "utf8");
-  assert.equal((text.match(/BEGIN unity-repository-skills/g) || []).length, 1);
+  assert.equal((text.match(/BEGIN skill-tree-skills/g) || []).length, 1);
   assert.ok(text.includes("Keep me."));
   assert.ok(fs.existsSync(path.join(target, "AGENTS.md.bak")));
 });
@@ -104,7 +107,7 @@ test("bridge uninstall preserves surrounding content", () => {
   assert.equal(result.status, 0, result.stderr);
   const text = fs.readFileSync(path.join(target, "AGENTS.md"), "utf8");
   assert.ok(text.includes("# Existing"));
-  assert.equal(text.includes("BEGIN unity-repository-skills"), false);
+  assert.equal(text.includes("BEGIN skill-tree-skills"), false);
 });
 
 test("verify mode detects installed skill", () => {

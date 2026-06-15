@@ -44,7 +44,7 @@ def relevant(path: Path, root: Path) -> bool:
     if rel in {"README.md", "AGENTS.md"} or rel.startswith("Documents/"):
         return True
     text = path.read_text(encoding="utf-8", errors="replace")[:20000].lower()
-    keywords = ["unity", "architecture", "feature", "future", "build", "test", "dependency", "agent"]
+    keywords = ["architecture", "feature", "future", "build", "test", "dependency", "agent", "project"]
     return any(keyword in text for keyword in keywords)
 
 
@@ -68,8 +68,8 @@ Snapshot date: {date}
 Snapshot time: {time}
 Original source path: {source}
 Archive file name: {name}
-Relevance check: Included after confirming that the source contains repository-specific Unity project, architecture, feature, build, test, dependency, platform, implementation-plan, or AI-agent workflow information.
-Snapshot warning: This is a dated copy for AI-agent context. The live repository document, Unity project state, packages, serialized assets, and implementation may drift after this snapshot. Check the live source path and current repository before changing behavior.
+Relevance check: Included after confirming that the source contains repository-specific project, architecture, feature, build, test, dependency, platform, implementation-plan, or AI-agent workflow information.
+Snapshot warning: This is a dated copy for AI-agent context. The live repository document, project state, dependencies, generated files, and implementation may drift after this snapshot. Check the live source path and current repository before changing behavior.
 -->
 
 """

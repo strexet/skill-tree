@@ -46,7 +46,7 @@ Create optional specialized documents only when repository evidence justifies th
 - `BUILD_AND_RELEASE.md`: local builds, CI, signing, release flow.
 - `TESTING.md`: test topology and validation matrix.
 - `DEPENDENCIES.md`: packages, SDKs, sources, update constraints.
-Snapshot archive creation is handled by `skill-tree-create-documents-snapshot`, not by generated live documentation.
+Snapshot archive creation is handled by `skill-tree-unity-create-documents-snapshot`, not by generated live documentation.
 
 ## Live Filename Rules
 

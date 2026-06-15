@@ -2182,7 +2182,7 @@ Each entry should include symptoms, affected environment, root cause, verified f
 
 Do not create `Documents/DOCUMENTS_SNAPSHOT.md` during documentation initialization or maintenance.
 
-Snapshot archive creation is owned by the separate `skill-tree-create-documents-snapshot` skill. Documentation initialization and audit skills should only enforce that live Markdown filenames remain stable and free of snapshot markers.
+Snapshot archive creation is owned by the separate `skill-tree-unity-create-documents-snapshot` skill. Documentation initialization and audit skills should only enforce that live Markdown filenames remain stable and free of snapshot markers.
 
 ## 21. Deep Review Before Finalizing the Documentation
 

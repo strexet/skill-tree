@@ -4,7 +4,7 @@ description: Audit existing Unity repository documentation against the current c
 license: MIT
 ---
 
-# Skill-Tree: Audit Documents
+# Skill-Tree-Unity: Audit Documents
 
 Use this skill for ongoing audit and maintenance of existing Unity repository documentation. For first-time documentation initialization, use `skill-tree-unity-repo-documentation`.
 
@@ -19,8 +19,8 @@ Before editing, MUST inspect:
 3. Repository/document map if one exists.
 4. Existing `PROJECT.md`, `TECHNICAL.md`, `FEATURES.md`, `FUTURE.md`, `RULES.md`, `AGENTS.md`, `REPOSITORY_MAP.md`, and other live docs.
 5. Key code, tests, build configuration, package manifests, settings, and agent workflow files relevant to documented claims.
-6. Local `references/PENDING_TASK_FORMAT.md` before repairing missing Pending Queue format guidance.
-7. Current `skill-tree-unity-repo-documentation` specification when other baseline document expectations are unclear.
+6. Local `references/COMMON_DOCUMENTATION_OUTPUT_CONTRACT.md`, `references/COMMON_REPOSITORY_DISCOVERY_CHECKLIST.md`, and `references/PENDING_TASK_FORMAT.md`.
+7. Current `skill-tree-unity-repo-documentation` specification when other Unity-specific baseline document expectations are unclear.
 
 MUST NOT audit docs by comparing documents only. Verify substantial claims against code and tests.
 

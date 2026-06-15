@@ -1,5 +1,5 @@
 interface:
-  display_name: "Skill-Tree: Audit Documents"
+  display_name: "Skill-Tree-Unity: Audit Documents"
   short_description: "Audit existing Unity docs against code"
   default_prompt: "Audit existing Unity repository documentation against the current codebase and repair drift."
 

@@ -80,7 +80,7 @@
       "projectPath": ".agents/skills",
       "globalPath": "~/.cursor/skills",
       "initBridge": "cursor",
-      "bridgePath": ".cursor/rules/unity-repository-skills.mdc",
+      "bridgePath": ".cursor/rules/skill-tree-skills.mdc",
       "officialDocs": ["https://cursor.com/docs"],
       "notes": "Rule bridge is optional and non-canonical."
     },
@@ -98,7 +98,7 @@
       "projectPath": ".windsurf/skills",
       "globalPath": "~/.codeium/windsurf/skills",
       "initBridge": "windsurf",
-      "bridgePath": ".windsurf/rules/unity-repository-skills.md",
+      "bridgePath": ".windsurf/rules/skill-tree-skills.md",
       "officialDocs": ["https://docs.devin.ai/desktop/cascade/memories"],
       "notes": "Directory probe supplements command/app probes and does not make this provider soft."
     },
@@ -112,7 +112,7 @@
       "projectPath": ".agents/skills",
       "globalPath": "~/.agents/skills",
       "initBridge": "cline",
-      "bridgePath": ".clinerules/unity-repository-skills.md",
+      "bridgePath": ".clinerules/skill-tree-skills.md",
       "officialDocs": ["https://docs.cline.bot"],
       "notes": "Extension detection is the reliable signal."
     },
@@ -154,7 +154,7 @@
       "projectPath": ".roo/skills",
       "globalPath": "~/.roo/skills",
       "initBridge": "roo",
-      "bridgePath": ".roo/rules/unity-repository-skills.md",
+      "bridgePath": ".roo/rules/skill-tree-skills.md",
       "officialDocs": ["https://docs.roocode.com/features/skills/"],
       "notes": "Extension-specific discovery may vary."
     },
@@ -168,7 +168,7 @@
       "projectPath": ".kilocode/skills",
       "globalPath": "~/.kilocode/skills",
       "initBridge": "kilo",
-      "bridgePath": ".kilocode/rules/unity-repository-skills.md",
+      "bridgePath": ".kilocode/rules/skill-tree-skills.md",
       "officialDocs": ["https://kilocode.ai"],
       "notes": "Profile path follows current upstream skills CLI table."
     },
@@ -182,7 +182,7 @@
       "projectPath": ".continue/skills",
       "globalPath": "~/.continue/skills",
       "initBridge": "continue",
-      "bridgePath": ".continue/rules/unity-repository-skills.md",
+      "bridgePath": ".continue/rules/skill-tree-skills.md",
       "officialDocs": ["https://docs.continue.dev/customize/deep-dives/rules"],
       "notes": "Rules are not full skill implementations."
     },
@@ -196,7 +196,7 @@
       "projectPath": ".junie/skills",
       "globalPath": "~/.junie/skills",
       "initBridge": "junie",
-      "bridgePath": ".junie/rules/unity-repository-skills.md",
+      "bridgePath": ".junie/rules/skill-tree-skills.md",
       "officialDocs": ["https://www.jetbrains.com/junie/"],
       "notes": "Soft until a stable local plugin signal is verified."
     },
@@ -210,7 +210,7 @@
       "projectPath": ".kiro/skills",
       "globalPath": "~/.kiro/skills",
       "initBridge": "kiro",
-      "bridgePath": ".kiro/steering/unity-repository-skills.md",
+      "bridgePath": ".kiro/steering/skill-tree-skills.md",
       "officialDocs": ["https://kiro.dev/docs"],
       "notes": "Custom agents may need resources configured."
     },
@@ -393,7 +393,7 @@
       "projectPath": ".devin/skills",
       "globalPath": "~/.config/devin/skills",
       "initBridge": "devin",
-      "bridgePath": ".devin/rules/unity-repository-skills.md",
+      "bridgePath": ".devin/rules/skill-tree-skills.md",
       "officialDocs": ["https://docs.devin.ai"],
       "notes": "Tier 2 upstream passthrough."
     },

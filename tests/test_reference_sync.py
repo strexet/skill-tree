@@ -28,9 +28,21 @@ class ReferenceSyncTests(unittest.TestCase):
 
     def test_generated_references_have_notice(self):
         for rel in [
+            "skills/skill-tree-repo-documentation/references/DOCUMENTATION_OUTPUT_CONTRACT.md",
+            "skills/skill-tree-repo-documentation/references/REPOSITORY_DISCOVERY_CHECKLIST.md",
+            "skills/skill-tree-repo-documentation/references/PENDING_TASK_FORMAT.md",
+            "skills/skill-tree-repo-documentation-audit/references/PENDING_TASK_FORMAT.md",
             "skills/skill-tree-process-future-pending/references/FUTURE_TASK_STANDARD.md",
             "skills/skill-tree-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md",
+            "skills/skill-tree-unity-process-future-pending/references/COMMON_FUTURE_WORKFLOW.md",
+            "skills/skill-tree-unity-process-future-pending/references/FUTURE_TASK_STANDARD.md",
+            "skills/skill-tree-unity-implement-next-future-task/references/COMMON_FUTURE_WORKFLOW.md",
+            "skills/skill-tree-unity-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md",
+            "skills/skill-tree-unity-repo-documentation-audit/references/COMMON_DOCUMENTATION_OUTPUT_CONTRACT.md",
+            "skills/skill-tree-unity-repo-documentation-audit/references/COMMON_REPOSITORY_DISCOVERY_CHECKLIST.md",
             "skills/skill-tree-unity-repo-documentation-audit/references/PENDING_TASK_FORMAT.md",
+            "skills/skill-tree-create-documents-snapshot/references/SNAPSHOT_RULES.md",
+            "skills/skill-tree-unity-create-documents-snapshot/references/SNAPSHOT_RULES.md",
         ]:
             text = (ROOT / rel).read_text(encoding="utf-8")
             self.assertTrue(text.startswith("<!--\nGENERATED FILE"))

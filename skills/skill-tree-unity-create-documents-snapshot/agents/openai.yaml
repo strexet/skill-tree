@@ -1,0 +1,7 @@
+interface:
+  display_name: "Skill-Tree-Unity: Create Snapshot"
+  short_description: "Create explicit Unity docs snapshots"
+  default_prompt: "Create an explicit-request-only Unity Markdown documentation snapshot archive."
+
+policy:
+  allow_implicit_invocation: true

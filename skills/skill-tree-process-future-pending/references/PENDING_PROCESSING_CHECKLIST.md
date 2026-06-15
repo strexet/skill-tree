@@ -17,7 +17,7 @@
 
 ## Research
 
-- Search affected code, assets, scenes, prefabs, settings, tests, and docs.
+- Search affected code, configuration, data files, tests, and docs.
 - Check related items in all three queues.
 - Verify referenced paths and symbols still exist.
 - Determine implementation status: implemented, stale, duplicate, contradictory, blocked, or valid.
@@ -26,7 +26,7 @@
 
 - Identify ownership and likely paths.
 - Add current behavior, desired behavior, touch list, discovery allowance, out of scope, implementation constraints, validation, acceptance, docs updates, and risks.
-- Add task-specific questions covering UX, architecture, files, state, persistence, serialization, platform behavior, compatibility, migration, recovery, diagnostics, testing, rollout, and non-goals.
+- Add task-specific questions covering UX/product behavior, architecture, files, state, persistence, external integrations, platform behavior, compatibility, migration, recovery, diagnostics, testing, rollout, and non-goals.
 
 ## Resolve Questions
 

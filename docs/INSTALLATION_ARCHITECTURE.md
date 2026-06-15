@@ -6,6 +6,8 @@ Last verified: 2026-06-10.
 
 Canonical behavior lives under `skills/skill-tree-<skill-name>/`. Agent adapters describe installation behavior and optional bridges, but do not redefine skill content.
 
+Shared parent behavior lives under `common/references/` and is copied into installed skill folders by `scripts/sync_skill_references.py`. Installed skills remain self-contained; they do not depend on sibling skill folders or the source repository after copy.
+
 ## Provider Matrix
 
 `config/providers.json` is the single source of truth for:
@@ -53,12 +55,12 @@ Local source is preferred when running from a clone. A Git source is used only w
 
 ## Bridges
 
-Bridge content comes from `src/init-rules/unity-repository-skills.md`. The installer inserts it between stable markers:
+Bridge content comes from `src/init-rules/skill-tree-skills.md`. The installer inserts it between stable markers:
 
 ```text
-<!-- BEGIN unity-repository-skills -->
+<!-- BEGIN skill-tree-skills -->
 ...
-<!-- END unity-repository-skills -->
+<!-- END skill-tree-skills -->
 ```
 
 Existing files are backed up before modification. Uninstall removes only the marked block.

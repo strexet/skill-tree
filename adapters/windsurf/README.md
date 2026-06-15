@@ -4,7 +4,7 @@
 - Upstream profile: `windsurf`
 - Project path: `.windsurf/skills`
 - Global path: `~/.codeium/windsurf/skills`
-- Optional bridge: `.windsurf/rules/unity-repository-skills.md`
+- Optional bridge: `.windsurf/rules/skill-tree-skills.md`
 - Official docs: <https://docs.devin.ai/desktop/cascade/memories>
 - Last verified: 2026-06-10
 

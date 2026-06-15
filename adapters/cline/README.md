@@ -4,7 +4,7 @@
 - Upstream profile: `cline`
 - Project path: `.agents/skills`
 - Global path: `~/.agents/skills`
-- Optional bridge: `.clinerules/unity-repository-skills.md`
+- Optional bridge: `.clinerules/skill-tree-skills.md`
 - Official reference: current open `skills` CLI compatibility docs and Cline docs
 - Last verified: 2026-06-10
 

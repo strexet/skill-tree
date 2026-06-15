@@ -18,13 +18,23 @@ SKILL_REPOSITORY_CREATION_INSTRUCTIONS.md
 .git/
 ```
 
-The completed repository must provide five focused skills:
+The completed repository must provide ten focused skills: five general skills and five Unity-specific skills.
+
+General skills:
+
+1. `skill-tree-repo-documentation`
+2. `skill-tree-repo-documentation-audit`
+3. `skill-tree-process-future-pending`
+4. `skill-tree-implement-next-future-task`
+5. `skill-tree-create-documents-snapshot`
+
+Unity-specific skills:
 
 1. `skill-tree-unity-repo-documentation`
-2. `skill-tree-process-future-pending`
-3. `skill-tree-implement-next-future-task`
-4. `skill-tree-unity-repo-documentation-audit`
-5. `skill-tree-create-documents-snapshot`
+2. `skill-tree-unity-repo-documentation-audit`
+3. `skill-tree-unity-process-future-pending`
+4. `skill-tree-unity-implement-next-future-task`
+5. `skill-tree-unity-create-documents-snapshot`
 
 The canonical skills must follow the open Agent Skills specification and remain portable across AI coding agents that support `SKILL.md`.
 
@@ -172,16 +182,20 @@ Store this information in `INSTALL.md` and `docs/AGENT_COMPATIBILITY.md`.
 
 ## 3. Non-Negotiable Design Decisions
 
-### 3.1 Five focused skills
+### 3.1 Ten focused skills
 
-Create five separate skills rather than one large skill.
+Create ten separate skills rather than one large skill. The five general skills own portable repository workflows. The five Unity-specific skills extend those workflows with Unity evidence, safety, and terminology.
 
 The responsibilities must not overlap unnecessarily:
 
 ```text
-skill-tree-unity-repo-documentation
-  Deeply analyzes an existing Unity repository and creates or repairs
+skill-tree-repo-documentation
+  Deeply analyzes an existing software repository and creates or repairs
   its AI-oriented repository documentation.
+
+skill-tree-repo-documentation-audit
+  Audits existing repository documentation against current code, tests,
+  configuration, repository structure, and workflow rules.
 
 skill-tree-process-future-pending
   Processes only the Pending Queue in FUTURE.md and promotes sufficiently
@@ -191,17 +205,34 @@ skill-tree-implement-next-future-task
   Selects and implements exactly one task from Prioritized Next Changes,
   following the name-selection and clarification-gate rules.
 
+skill-tree-create-documents-snapshot
+  Creates explicit-request-only Markdown documentation snapshot archives
+  without modifying live source documents.
+
+skill-tree-unity-repo-documentation
+  Deeply analyzes an existing Unity repository and creates or repairs
+  its AI-oriented repository documentation.
+
 skill-tree-unity-repo-documentation-audit
   Audits existing repository documentation against current code, tests,
   configuration, repository structure, and workflow rules. It repairs
   documentation drift and adds meaningful discovered issues to FUTURE.md.
 
-skill-tree-create-documents-snapshot
-  Creates explicit-request-only Markdown documentation snapshot archives
-  without modifying live source documents.
+skill-tree-unity-process-future-pending
+  Applies pending processing to Unity repository work using Unity-specific
+  evidence such as assemblies, assets, settings, scenes, prefabs, and tests.
+
+skill-tree-unity-implement-next-future-task
+  Implements exactly one prioritized Unity repository task after Unity-specific
+  orientation and clarification checks.
+
+skill-tree-unity-create-documents-snapshot
+  Creates explicit-request-only Unity Markdown documentation snapshot archives
+  without modifying live source documents or Unity project state.
 ```
 
 Every repository-owned skill directory and `SKILL.md` frontmatter name must start with `skill-tree-`.
+Unity-specific skill directory and frontmatter names must start with `skill-tree-unity-`, and visible display names must start with `Skill-Tree-Unity:`.
 
 ### 3.2 Vendor-neutral canonical skills
 
@@ -258,6 +289,14 @@ Repository-level scripts may maintain and validate the source tree, but each ski
 
 The root `REPO_INIT_INSTRUCTIONS.md` is the canonical source.
 
+Shared general workflow references live under:
+
+```text
+common/references/
+```
+
+The synchronization script must copy shared references into every installed skill folder that needs them so each installed skill remains self-contained. Unity skills should read copied common references first, then Unity-specific references.
+
 The documentation skill must contain a synchronized copy at:
 
 ```text
@@ -266,11 +305,20 @@ skills/skill-tree-unity-repo-documentation/references/REPO_INIT_INSTRUCTIONS.md
 
 The copy must be byte-for-byte identical to the root file unless a generated provenance header is explicitly adopted. Prefer byte-for-byte identity.
 
-The two FUTURE-related skills must use generated focused references:
+The general FUTURE-related skills must use generated focused references from `common/references/FUTURE_WORKFLOW.md`:
 
 ```text
 skills/skill-tree-process-future-pending/references/FUTURE_TASK_STANDARD.md
 skills/skill-tree-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md
+```
+
+The Unity FUTURE-related skills must include both copied common references and Unity-specific generated references:
+
+```text
+skills/skill-tree-unity-process-future-pending/references/COMMON_FUTURE_WORKFLOW.md
+skills/skill-tree-unity-process-future-pending/references/FUTURE_TASK_STANDARD.md
+skills/skill-tree-unity-implement-next-future-task/references/COMMON_FUTURE_WORKFLOW.md
+skills/skill-tree-unity-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md
 ```
 
 Do not manually maintain divergent copies.
@@ -460,49 +508,25 @@ Create this structure:
 │       └── README.md
 ├── src/
 │   └── init-rules/
-│       └── unity-repository-skills.md
+│       └── skill-tree-skills.md
+├── common/
+│   └── references/
+│       ├── DOCUMENTATION_OUTPUT_CONTRACT.md
+│       ├── FUTURE_WORKFLOW.md
+│       ├── PENDING_TASK_FORMAT.md
+│       ├── REPOSITORY_DISCOVERY_CHECKLIST.md
+│       └── SNAPSHOT_RULES.md
 ├── skills/
-│   ├── skill-tree-unity-repo-documentation/
-│   │   ├── SKILL.md
-│   │   ├── agents/
-│   │   │   └── openai.yaml
-│   │   ├── references/
-│   │   │   ├── REPO_INIT_INSTRUCTIONS.md
-│   │   │   ├── DOCUMENTATION_OUTPUT_CONTRACT.md
-│   │   │   └── UNITY_DISCOVERY_CHECKLIST.md
-│   │   └── scripts/
-│   │       ├── inspect_unity_repository.py
-│   │       └── validate_unity_documentation.py
-│   ├── skill-tree-create-documents-snapshot/
-│   │   ├── SKILL.md
-│   │   ├── agents/
-│   │   │   └── openai.yaml
-│   │   ├── references/
-│   │   │   └── SNAPSHOT_RULES.md
-│   │   └── scripts/
-│   │       └── create_documentation_snapshot.py
+│   ├── skill-tree-repo-documentation/
+│   ├── skill-tree-repo-documentation-audit/
 │   ├── skill-tree-process-future-pending/
-│   │   ├── SKILL.md
-│   │   ├── agents/
-│   │   │   └── openai.yaml
-│   │   ├── references/
-│   │   │   ├── FUTURE_TASK_STANDARD.md
-│   │   │   └── PENDING_PROCESSING_CHECKLIST.md
-│   │   └── scripts/
-│   │       └── validate_future_document.py
 │   ├── skill-tree-implement-next-future-task/
-│   │   ├── SKILL.md
-│   │   ├── agents/
-│   │   │   └── openai.yaml
-│   │   ├── references/
-│   │   │   ├── FUTURE_EXECUTION_RULES.md
-│   │   │   └── IMPLEMENTATION_HANDOFF_CHECKLIST.md
-│   │   └── scripts/
-│   │       └── select_prioritized_task.py
-│   └── skill-tree-unity-repo-documentation-audit/
-│       ├── SKILL.md
-│       └── agents/
-│           └── openai.yaml
+│   ├── skill-tree-create-documents-snapshot/
+│   ├── skill-tree-unity-repo-documentation/
+│   ├── skill-tree-unity-repo-documentation-audit/
+│   ├── skill-tree-unity-process-future-pending/
+│   ├── skill-tree-unity-implement-next-future-task/
+│   └── skill-tree-unity-create-documents-snapshot/
 ├── scripts/
 │   ├── sync_skill_references.py
 │   └── validate_skill_repository.py
@@ -588,7 +612,7 @@ Perform the work in this order:
 5. Analyze the source instruction.
 6. Create repository conventions and cross-agent documentation.
 7. Implement reference synchronization.
-8. Create the five canonical skills.
+8. Create the ten canonical skills.
 9. Implement deterministic skill-local scripts.
 10. Create the provider matrix.
 11. Implement the unified installer and thin launchers.
@@ -901,18 +925,20 @@ Use Python standard library only.
 The script must:
 
 1. Locate the repository root reliably from its own path.
-2. Read root `REPO_INIT_INSTRUCTIONS.md`.
-3. Copy it byte-for-byte to:
+2. Read root `REPO_INIT_INSTRUCTIONS.md` and `common/references/`.
+3. Copy `REPO_INIT_INSTRUCTIONS.md` byte-for-byte to:
    `skills/skill-tree-unity-repo-documentation/references/REPO_INIT_INSTRUCTIONS.md`.
-4. Extract the full `FUTURE.md` specification section into:
-   `skills/skill-tree-process-future-pending/references/FUTURE_TASK_STANDARD.md`.
-5. Extract the implementation-selection and clarification sections into:
-   `skills/skill-tree-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md`.
-6. Add a concise generated-file notice to extracted references.
-7. Fail if required source headings are missing or ambiguous.
-8. Support a check-only mode that makes no changes.
-9. Use deterministic output.
-10. Preserve UTF-8 and LF line endings.
+4. Copy common documentation, discovery, pending-format, future-workflow, and snapshot references into every general and Unity skill folder that needs them.
+5. Extract Unity-specific `FUTURE.md` and execution sections into:
+   `skills/skill-tree-unity-process-future-pending/references/FUTURE_TASK_STANDARD.md`
+   and `skills/skill-tree-unity-implement-next-future-task/references/FUTURE_EXECUTION_RULES.md`.
+6. Extract the Unity pending template into:
+   `skills/skill-tree-unity-repo-documentation-audit/references/PENDING_TASK_FORMAT.md`.
+7. Add a concise generated-file notice to generated references.
+8. Fail if required source headings are missing or ambiguous.
+9. Support a check-only mode that makes no changes.
+10. Use deterministic output.
+11. Preserve UTF-8 and LF line endings.
 
 Recommended interface:
 
@@ -1064,7 +1090,7 @@ Recommended intent:
 
 ```yaml
 interface:
-  display_name: "Skill-Tree: Initialize Documents"
+  display_name: "Skill-Tree-Unity: Initialize Documents"
   short_description: "Analyze and document an existing Unity repository"
   default_prompt: "Analyze this existing Unity repository and create or repair its AI-oriented documentation."
 
@@ -1194,7 +1220,7 @@ Validation must not claim semantic correctness. It validates structure and detec
 
 ## 10.9 Snapshot boundary
 
-Documentation initialization must not create `Documents/DOCUMENTS_SNAPSHOT.md` and must not own snapshot archive creation. Snapshot archive creation belongs to `skill-tree-create-documents-snapshot`.
+Documentation initialization must not create `Documents/DOCUMENTS_SNAPSHOT.md` and must not own snapshot archive creation. Unity snapshot archive creation belongs to `skill-tree-unity-create-documents-snapshot`.
 
 The documentation skill may still reject snapshot-named live files.
 
@@ -1254,7 +1280,7 @@ Recommended intent:
 
 ```yaml
 interface:
-  display_name: "Skill-Tree: Audit Documents"
+  display_name: "Skill-Tree-Unity: Audit Documents"
   short_description: "Audit existing Unity docs against code"
   default_prompt: "Audit existing Unity repository documentation against the current codebase and repair drift."
 
@@ -1262,12 +1288,12 @@ policy:
   allow_implicit_invocation: true
 ```
 
-## 10B. Skill 5 — `skill-tree-create-documents-snapshot`
+## 10B. Unity Skill — `skill-tree-unity-create-documents-snapshot`
 
 Create:
 
 ```text
-skills/skill-tree-create-documents-snapshot/
+skills/skill-tree-unity-create-documents-snapshot/
 ```
 
 ### 10B.1 Purpose
@@ -1299,7 +1325,7 @@ Use:
 
 ```yaml
 ---
-name: skill-tree-create-documents-snapshot
+name: skill-tree-unity-create-documents-snapshot
 description: Create explicit-request-only Markdown documentation snapshot archives for Unity repositories without modifying live source documents. Use when asked to create a documentation snapshot, documents snapshot, Markdown snapshot, .md snapshot archive, or AI-context docs archive. Do not use during normal documentation initialization, documentation audit, feature implementation, Process pending, or Implement next.
 ---
 ```
@@ -1310,7 +1336,7 @@ Recommended intent:
 
 ```yaml
 interface:
-  display_name: "Skill-Tree: Create Snapshot"
+  display_name: "Skill-Tree-Unity: Create Snapshot"
   short_description: "Create explicit docs snapshots"
   default_prompt: "Create an explicit-request-only Markdown documentation snapshot archive."
 
@@ -1915,9 +1941,9 @@ AGENTS.md
 CLAUDE.md
 GEMINI.md
 .github/copilot-instructions.md
-.cursor/rules/unity-repository-skills.mdc
-.windsurf/rules/unity-repository-skills.md
-.clinerules/unity-repository-skills.md
+.cursor/rules/skill-tree-skills.mdc
+.windsurf/rules/skill-tree-skills.md
+.clinerules/skill-tree-skills.md
 .opencode/AGENTS.md
 ```
 
@@ -1928,7 +1954,7 @@ Use the selected provider’s adapter definition.
 Bridge content must be generated from:
 
 ```text
-src/init-rules/unity-repository-skills.md
+src/init-rules/skill-tree-skills.md
 ```
 
 The bridge must only explain:
@@ -2730,7 +2756,7 @@ The repository is complete only when:
 
 ### Structure
 
-- [ ] All five canonical skill folders exist.
+- [ ] All ten canonical skill folders exist.
 - [ ] Every skill has `SKILL.md`.
 - [ ] Every skill is self-contained.
 - [ ] Optional vendor metadata is non-canonical.
@@ -2872,7 +2898,7 @@ Use this only after reading the complete instruction:
 6. Read and map all of REPO_INIT_INSTRUCTIONS.md.
 7. Create vendor-neutral root documentation and compatibility docs.
 8. Implement deterministic reference synchronization.
-9. Create the five focused, self-contained canonical skills.
+9. Create the ten focused, self-contained canonical skills.
 10. Create the declarative provider matrix.
 11. Implement the unified Node installer and thin platform wrappers.
 12. Add optional, reversible repository instruction bridges.

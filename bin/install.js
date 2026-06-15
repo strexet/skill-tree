@@ -9,9 +9,9 @@ const { spawnSync } = require("node:child_process");
 const REPO_ROOT = path.resolve(__dirname, "..");
 const PROVIDERS_FILE = path.join(REPO_ROOT, "config", "providers.json");
 const SKILLS_DIR = path.join(REPO_ROOT, "skills");
-const BRIDGE_FILE = path.join(REPO_ROOT, "src", "init-rules", "unity-repository-skills.md");
-const MARKER_BEGIN = "<!-- BEGIN unity-repository-skills -->";
-const MARKER_END = "<!-- END unity-repository-skills -->";
+const BRIDGE_FILE = path.join(REPO_ROOT, "src", "init-rules", "skill-tree-skills.md");
+const MARKER_BEGIN = "<!-- BEGIN skill-tree-skills -->";
+const MARKER_END = "<!-- END skill-tree-skills -->";
 
 function usage() {
   return `Usage: node bin/install.js [options]

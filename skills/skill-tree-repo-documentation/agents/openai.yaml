@@ -1,0 +1,7 @@
+interface:
+  display_name: "Skill-Tree: Initialize Documents"
+  short_description: "Analyze and document an existing repository"
+  default_prompt: "Analyze this existing repository and create or repair its AI-oriented documentation."
+
+policy:
+  allow_implicit_invocation: true

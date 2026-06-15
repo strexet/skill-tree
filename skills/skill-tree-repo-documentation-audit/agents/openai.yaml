@@ -1,0 +1,7 @@
+interface:
+  display_name: "Skill-Tree: Audit Documents"
+  short_description: "Audit existing repository docs against code"
+  default_prompt: "Audit existing repository documentation against the current codebase and repair drift."
+
+policy:
+  allow_implicit_invocation: true

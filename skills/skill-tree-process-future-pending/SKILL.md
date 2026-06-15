@@ -19,11 +19,11 @@ Processing pending work is research and documentation work. Do not implement fea
 
 1. Locate the applicable `FUTURE.md`.
 2. MUST read repository `AGENTS.md`, `Documents/RULES.md`, and equivalent repository rules.
-3. Read `references/FUTURE_TASK_STANDARD.md` and `references/PENDING_PROCESSING_CHECKLIST.md`.
+3. Read `references/FUTURE_TASK_STANDARD.md`, `references/PENDING_TASK_FORMAT.md`, and `references/PENDING_PROCESSING_CHECKLIST.md`.
 4. MUST read repository/document map if one exists.
 5. MUST read current `FEATURES.md`, active `FUTURE.md`, and task-relevant architecture/domain docs.
 6. Read the complete Pending Queue.
-7. MUST inspect affected implementation, serialized assets, settings, tests, and docs before changing tasks.
+7. MUST inspect affected implementation, configuration, data files, tests, and docs before changing tasks.
 8. MUST verify whether each item is already implemented, stale, duplicate, contradictory, blocked, or valid.
 9. MUST verify referenced paths and symbols still exist.
 10. Check existing `FUTURE.md` tasks for overlap and merge only when requests describe the same coherent change.

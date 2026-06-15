@@ -4,7 +4,7 @@ description: Deeply analyze an existing Unity repository and create, initialize,
 license: MIT
 ---
 
-# Skill-Tree: Initialize Documents
+# Skill-Tree-Unity: Initialize Documents
 
 Use this skill for documentation initialization, audit, or repair in an existing Unity project, Unity package, or Unity monorepo.
 
@@ -14,21 +14,22 @@ Do not use it to implement product features, upgrade Unity, upgrade packages, pr
 
 1. Confirm repository root and worktree state.
 2. Find every Unity root by checking for `Assets/`, `Packages/`, and `ProjectSettings/`.
-3. Read `references/REPO_INIT_INSTRUCTIONS.md` completely.
-4. Read `references/DOCUMENTATION_OUTPUT_CONTRACT.md` and `references/UNITY_DISCOVERY_CHECKLIST.md`.
-5. Build an evidence inventory before writing narrative documentation.
-6. Inspect code, assemblies, scenes, prefabs, ScriptableObjects, packages, settings, build tooling, platform integrations, tests, and existing docs.
-7. Review key implementation paths, tests, error handling, state transitions, persistence, mutation logic, and existing `FUTURE.md` entries before finalizing documentation.
-8. Create or repair the required live documents.
-9. Keep implemented, configured, partial, disabled, deprecated, planned, assumption, and open-question states distinct.
-10. Keep `FEATURES.md` limited to current implemented or partial behavior. Put future work, plans, backlog, known bugs awaiting fixes, and deferred investigations in `FUTURE.md`.
-11. Add meaningful discovered issues to the active `FUTURE.md` Backlog using the repository task structure. Do not add documentation/audit findings to Pending Queue. Merge with existing entries when same issue exists.
-12. Label findings as confirmed bug, strongly suspected issue, documentation inconsistency, or improvement opportunity. Include evidence, affected paths/symbols, impact, suggested direction, acceptance criteria, and focused tests where relevant.
-13. Do not present speculation as a confirmed bug. Do not add trivial style observations unless they materially affect maintainability or correctness.
-14. Do not modify Unity behavior, serialized assets, package versions, build settings, generated files, or product code as part of documentation initialization.
-15. Run `scripts/validate_unity_documentation.py` against the target repository when validation is allowed.
-16. Review the final diff for unsupported claims, secrets, broken links, snapshot-named live files, accidental Unity asset changes, stale placeholders, and planned work in `FEATURES.md`.
-17. Report created/updated docs, drift corrected, issues added to Backlog, potential issues excluded for insufficient evidence, evidence gaps, checks run, checks not run, and remaining risks.
+3. Read `references/COMMON_DOCUMENTATION_OUTPUT_CONTRACT.md` and `references/COMMON_REPOSITORY_DISCOVERY_CHECKLIST.md`.
+4. Read `references/REPO_INIT_INSTRUCTIONS.md` completely.
+5. Read `references/DOCUMENTATION_OUTPUT_CONTRACT.md` and `references/UNITY_DISCOVERY_CHECKLIST.md`.
+6. Build an evidence inventory before writing narrative documentation.
+7. Inspect code, assemblies, scenes, prefabs, ScriptableObjects, packages, settings, build tooling, platform integrations, tests, and existing docs.
+8. Review key implementation paths, tests, error handling, state transitions, persistence, mutation logic, and existing `FUTURE.md` entries before finalizing documentation.
+9. Create or repair the required live documents.
+10. Keep implemented, configured, partial, disabled, deprecated, planned, assumption, and open-question states distinct.
+11. Keep `FEATURES.md` limited to current implemented or partial behavior. Put future work, plans, backlog, known bugs awaiting fixes, and deferred investigations in `FUTURE.md`.
+12. Add meaningful discovered issues to the active `FUTURE.md` Backlog using the repository task structure. Do not add documentation/audit findings to Pending Queue. Merge with existing entries when same issue exists.
+13. Label findings as confirmed bug, strongly suspected issue, documentation inconsistency, or improvement opportunity. Include evidence, affected paths/symbols, impact, suggested direction, acceptance criteria, and focused tests where relevant.
+14. Do not present speculation as a confirmed bug. Do not add trivial style observations unless they materially affect maintainability or correctness.
+15. Do not modify Unity behavior, serialized assets, package versions, build settings, generated files, or product code as part of documentation initialization.
+16. Run `scripts/validate_unity_documentation.py` against the target repository when validation is allowed.
+17. Review the final diff for unsupported claims, secrets, broken links, snapshot-named live files, accidental Unity asset changes, stale placeholders, and planned work in `FEATURES.md`.
+18. Report created/updated docs, drift corrected, issues added to Backlog, potential issues excluded for insufficient evidence, evidence gaps, checks run, checks not run, and remaining risks.
 
 Run skill-local helpers by path relative to this skill directory:
 

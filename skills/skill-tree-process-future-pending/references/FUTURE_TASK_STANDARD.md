@@ -1,394 +1,84 @@
 <!--
 GENERATED FILE
-Source: REPO_INIT_INSTRUCTIONS.md
+Source: common/references/FUTURE_WORKFLOW.md
 Generator: scripts/sync_skill_references.py
 Do not edit manually. Update the source document and rerun the generator.
 -->
 
-## 14. Document Specification — `Documents/FUTURE.md`
+# Future Workflow Standard
 
-`FUTURE.md` is the single source of truth for not-yet-implemented work, planned improvements, backlog items, known bugs awaiting fixes, documentation improvements, proposed features, refactoring plans, and deferred investigations.
+This shared standard is the general parent contract for `FUTURE.md` task intake, pending processing, and implement-next execution.
 
-It must contain three distinct queues:
+## Required Sections
+
+`FUTURE.md` must contain:
 
 ```text
+## Pending Task Format
 ## Pending Queue
 ## Prioritized Next Changes
 ## Backlog
 ```
 
-### 14.1 Queue semantics
+`Pending Task Format` must contain the nested Markdown template from `PENDING_TASK_FORMAT.md`.
 
-**Pending Queue**
+## Queue Semantics
 
-Use for raw owner/user requests, rough task notes, or explicitly captured intake that is not yet implementation-ready.
+`Pending Queue` is raw intake. Pending entries are not implementation-ready and must be researched before implementation.
 
-Do not put issues discovered during Unity documentation initialization or documentation audit in `Pending Queue`. Documentation/audit findings must go to `Backlog` unless the owner explicitly asks to treat the item as pending intake.
+`Prioritized Next Changes` is the only implementation queue. Items higher in this section have higher priority.
 
-A pending item may lack:
+`Backlog` is deferred work. Implementation commands must never select work directly from `Backlog`.
 
-- confirmed reproduction;
-- affected paths;
-- technical approach;
-- dependencies;
-- acceptance criteria;
-- implementation constraints;
-- explicit non-goals;
-- required contextual decisions;
-- priority placement.
+Documentation or audit findings discovered during repository documentation work belong in `Backlog`, not `Pending Queue`, unless the owner explicitly asks to capture them as pending intake.
 
-Pending items must never be implemented directly. They must first be researched, validated, expanded, and moved into `Prioritized Next Changes`.
+## Process Pending
 
-**Prioritized Next Changes**
+When processing pending work:
 
-Use for validated, maximally detailed, self-contained work that is ready for implementation.
-
-Order entries from top to bottom by priority.
-
-A task in this section must contain enough verified context and implementation guidance that the implementing agent can normally complete it without:
-
-- rediscovering the original request;
-- reading unrelated areas of the repository;
-- modifying components not named or justified by the task;
-- inventing product decisions;
-- inventing architecture or ownership;
-- searching the `Backlog` for missing context;
-- performing opportunistic cleanup;
-- broadening scope merely because neighboring code could also be improved.
-
-The expected standard is deliberately high: a prioritized task should describe the intended change so completely that nearly all code, assets, settings, tests, and documentation outside its stated `Touch`, dependencies, and justified discovery scope can remain untouched.
-
-This does not prohibit inspecting dependencies or adjacent code needed to implement the task safely. It prohibits changing unrelated behavior or treating a concise task description as permission for broad repository work.
-
-Every task in `Prioritized Next Changes` must contain an explicit `Questions and required clarifications` section. The section may state that no unresolved questions remain, but it must not be omitted.
-
-**Backlog**
-
-Use for valid but deliberately deferred work.
-
-Use `Backlog` for issues discovered while creating or auditing documentation, including confirmed bugs, strongly suspected bugs, documentation/code drift, maintainability problems, missing validation, missing tests, performance risks, security/data-safety concerns, and improvement opportunities.
-
-Backlog items may be less implementation-ready than prioritized tasks, but they should still preserve the original intent and useful evidence.
-
-A task must be explicitly promoted from `Backlog` into `Prioritized Next Changes` and expanded to the full prioritized-task standard before implementation.
-
-Implementation commands must never select work directly from `Backlog`.
-
-### 14.2 Task intake and validation
-
-Gather future work from:
-
-- explicit user or owner requests;
-- existing issue/task documents;
-- repository TODOs and FIXMEs;
-- reproducible defects;
-- incomplete code paths;
-- disabled features with clear intent;
-- failing or skipped tests;
-- current documentation open questions that require implementation;
-- release notes identifying known limitations.
-
-Do not create tasks solely because an agent imagines a “better architecture.”
-
-Before adding or promoting a task:
-
-1. Check whether it is already implemented.
-2. Search the affected code, assets, scenes, prefabs, settings, tests, and current documentation.
-3. Identify the actual owners and affected paths.
-4. Check for related tasks in all three queues to avoid duplication.
-5. Verify whether the requested behavior conflicts with current architectural or platform constraints.
-6. Identify product, UX, technical, platform, migration, compatibility, and validation questions.
-7. Remove, merge, or rewrite stale tasks.
-8. Preserve unresolved decisions as explicit questions rather than silently choosing an implementation.
-
-### 14.3 Required file header
-
-```text
-# Future Work
-
-Last validated: YYYY-MM-DD.
-
-This is the single implementation queue. Items higher in
-`Prioritized Next Changes` are higher priority.
-
-`Process pending tasks` and `Process pending` refine Pending Queue entries
-and move implementation-ready tasks into `Prioritized Next Changes`.
-
-`Implement next feature` and `Implement next` operate only on
-`Prioritized Next Changes`. They never select tasks from `Backlog`.
-
-Implemented behavior belongs in `FEATURES.md`.
-Foundational decisions belong in `TECHNICAL.md`.
-Build/release behavior belongs in `BUILD_AND_RELEASE.md`.
-Remove an item from this file when it ships.
-```
-
-The generated `FUTURE.md` must also include a repo-local `## Pending Task Format` section before `## Pending Queue`. This section must tell agents to use the pending item template from section 14.8 when a user asks them to add a new pending task, and it must include the full nested Markdown template so agents working only inside the initialized repository can follow the format without access to this skill.
-
-### 14.4 Command semantics
-
-The generated `FUTURE.md` and `RULES.md` must define the following command behavior.
-
-#### 14.4.1 `Process pending tasks` and `Process pending`
-
-Treat these commands as equivalent.
-
-When instructed to process pending tasks, the agent must:
-
-1. MUST read repository `AGENTS.md`, `RULES.md`, or equivalent rules.
-2. MUST read the repository/document map if one exists.
-3. MUST read current `FEATURES.md`, active `FUTURE.md`, and source-of-truth documents relevant to each pending item.
+1. Read repository `AGENTS.md`, `RULES.md`, or equivalent rules.
+2. Read repository/document map if one exists.
+3. Read current `FEATURES.md`, active `FUTURE.md`, and task-relevant architecture/domain docs.
 4. Read the complete `Pending Queue`.
-5. MUST inspect current implementation, serialized assets, settings, tests, and history as needed.
-6. MUST verify referenced paths and symbols still exist.
+5. Inspect current implementation, configuration, data files, tests, history, and docs as needed.
+6. Verify referenced paths and symbols still exist.
 7. Check whether each request is already implemented, obsolete, duplicated, contradictory, or blocked.
 8. Check existing `FUTURE.md` tasks for overlap.
-9. Merge overlapping pending entries when they describe the same coherent change.
-10. Expand each valid request into a maximally detailed task using the full prioritized-task template and current code/test paths.
-11. Add a mandatory `Questions and required clarifications` section to every promoted task.
-12. Include questions about possible implementation approaches and additional task context, not only obvious missing acceptance criteria.
-13. Answer questions from repository evidence when possible.
-14. Mark answers as verified, inferred, recommended, or unresolved.
-15. Move only implementation-ready entries into `Prioritized Next Changes`.
-16. Leave blocked or insufficiently understood entries in `Pending Queue` with an explanation of what is missing.
-17. Place promoted tasks according to explicit priority placement or the repository’s documented prioritization rules.
-18. Remove the original pending entry only after its information has been preserved in the promoted task.
-19. Report which repository rules, documents, code paths, and tests were inspected.
+9. Merge overlapping pending entries only when no intent is lost.
+10. Expand valid requests into detailed prioritized tasks using current evidence.
+11. Add `Questions and required clarifications:` to every promoted task.
+12. Resolve questions from repository evidence where possible.
+13. Mark answers as verified, inferred, recommended, or unresolved.
+14. Move only implementation-ready entries into `Prioritized Next Changes`.
+15. Leave blocked or insufficiently understood entries in `Pending Queue` with missing information.
+16. Remove original pending entries only after preserving their information.
+17. Report rules, documents, code paths, data/config files, and tests inspected.
 
-Processing pending work is a documentation and research operation. It does not implement the task unless the user explicitly combines the commands.
+Processing pending work is research and documentation work. It does not implement tasks unless the user explicitly combines the commands.
 
-A promoted task must not be a lightly expanded version of the pending bullet. It must be detailed enough to serve as the implementation contract.
-Agents MUST NOT process pending work from `FUTURE.md` alone. Stop or mark the item blocked when required repository context is missing or contradictory.
+MUST NOT process pending work from `FUTURE.md` alone. Stop or mark the item blocked when required repository context is missing or contradictory.
 
-#### 14.4.2 Mandatory implementation questions
+## Implement Next
 
-Every task promoted to `Prioritized Next Changes` must include implementation-oriented questions covering all material ambiguity.
+Without a task name, select the first task in `Prioritized Next Changes`.
 
-Potential question areas include:
+With a task name, search only `Prioritized Next Changes` headings. Use exact normalized matching unless repository rules define aliases. Stop when no match or multiple normalized matches exist.
 
-- intended user-visible behavior;
-- exact trigger and entry point;
-- supported and unsupported flows;
-- UI/UX placement and states;
-- architecture and ownership;
-- reuse versus introduction of new abstractions;
-- scene, prefab, ScriptableObject, and serialization impact;
-- data ownership, persistence, and migration;
-- networking or backend contract changes;
-- platform differences;
-- package or SDK constraints;
-- backward compatibility;
-- failure and recovery behavior;
-- diagnostics and telemetry;
-- testing strategy;
-- rollout or feature-flag behavior;
-- out-of-scope neighboring behavior;
-- documentation ownership.
+Never fall back to:
 
-Do not add generic filler questions. Questions must be specific to the task and grounded in repository findings.
+- the first prioritized task when a named task is absent;
+- a similarly named backlog task;
+- a pending entry;
+- repository TODOs;
+- inferred work.
 
-Use question states such as:
+Before editing, read repository rules, task-relevant docs, current-state docs, code, tests, data/config files, and the selected task's complete `Questions and required clarifications` section.
 
-```text
-- [Resolved — repository evidence] Question?
-  Answer:
-  Evidence:
+MUST NOT implement from `FUTURE.md` alone.
 
-- [Resolved — owner decision] Question?
-  Answer:
+Blocking unresolved questions stop implementation until the owner answers them.
 
-- [Recommended default — confirmation optional] Question?
-  Recommendation:
-  Rationale:
-
-- [Unresolved — blocks implementation] Question?
-  Why it matters:
-  Required answer from:
-
-- [Unresolved — non-blocking] Question?
-  Safe default:
-  Consequence:
-```
-
-When processing pending tasks, resolve what can be resolved from evidence. Preserve genuine ambiguity.
-
-#### 14.4.3 Clarification gate before implementation
-
-Before implementing a task from `Prioritized Next Changes`, the agent must read its complete `Questions and required clarifications` section.
-
-Before editing, the agent MUST read repository `AGENTS.md`, `RULES.md`, or equivalent rules; MUST read the repository/document map if one exists; MUST inspect all documents referenced by the task; MUST read current-state docs such as `FEATURES.md` and task-relevant architecture/domain docs; MUST inspect current code and tests for affected paths and symbols; MUST check for recent changes that invalidate task assumptions or make the task already complete; and MUST check active `FUTURE.md` tasks for duplicate or overlapping work.
-
-The agent MUST NOT implement from `FUTURE.md` alone.
-
-If any unresolved question can materially affect:
-
-- public or user-visible behavior;
-- architecture;
-- affected files or systems;
-- serialized or persistent data;
-- backend or native contracts;
-- compatibility;
-- security or privacy;
-- migration;
-- destructive behavior;
-- acceptance criteria;
-
-the agent must ask the user or designated owner for clarification and stop implementation of that task until the necessary answer is provided.
-
-The agent must not guess merely to keep implementation moving.
-
-Non-blocking questions may use an explicitly documented safe default only when the task already states that default and its consequences.
-
-After receiving answers:
-
-1. update the task’s question entries;
-2. incorporate the decisions into implementation notes and acceptance criteria;
-3. keep relevant rationale and evidence;
-4. then begin implementation.
-
-#### 14.4.4 `Implement next feature` and `Implement next`
-
-Treat these commands as equivalent.
-
-Without a task name:
-
-```text
-Implement next feature
-Implement next
-```
-
-the agent must:
-
-1. Open `FUTURE.md`.
-2. Read `Prioritized Next Changes`.
-3. Select the first task in that section.
-4. Ignore `Pending Queue` and `Backlog` for task selection.
-5. Stop and report that no prioritized task is available when the section is empty.
-6. Perform mandatory repository orientation and the clarification gate before editing.
-7. Implement only the selected task.
-
-With a task name:
-
-```text
-Implement next feature: Task Name
-Implement next: Task Name
-```
-
-the agent must:
-
-1. Search only `Prioritized Next Changes`.
-2. Match the requested task name against headings in that section.
-3. Use an exact case-insensitive normalized heading match unless repository rules define aliases.
-4. Implement the matching task only.
-5. Stop without implementation when no matching prioritized task exists.
-6. Report clearly that the named task was not found in `Prioritized Next Changes`.
-7. Do not fall back to:
-   - the first prioritized task;
-   - a similarly named backlog task;
-   - a pending entry;
-   - repository TODOs;
-   - an inferred task.
-8. Perform the clarification gate before editing.
-
-If more than one prioritized task has the same normalized name, stop and report the ambiguity. Do not choose one arbitrarily.
-
-#### 14.4.5 Selection boundaries
-
-`Implement next` commands interact only with `Prioritized Next Changes`.
-
-They must never:
-
-- promote a backlog item automatically;
-- implement a pending item;
-- search the backlog for a requested name;
-- interpret backlog ordering as implementation priority;
-- process pending tasks implicitly;
-- combine multiple prioritized tasks;
-- replace a missing named task with a similar task;
-- implement unrelated cleanup discovered during repository inspection.
-
-A user must explicitly request backlog promotion or pending processing before such work becomes eligible for `Implement next`.
-
-### 14.5 Implementor rules
-
-Include rules such as:
-
-1. Read the owning source-of-truth documents.
-2. Select work only according to the command semantics above.
-3. Process pending intake before starting a matching task that has not yet been promoted.
-4. Implement one prioritized entry at a time.
-5. Read the entire selected task, including questions, dependencies, non-goals, risks, and documentation updates.
-6. Ask blocking unresolved questions before implementation.
-7. Do not bundle unrelated cleanup.
-8. Respect `Touch` limits unless new evidence requires a documented expansion.
-9. When scope must expand, explain why and update the task before changing the additional area.
-10. Add or update tests.
-11. Update current-state documentation when behavior ships.
-12. Do not guess third-party SDK behavior.
-13. Do not change Unity/package/platform foundations silently.
-14. Remove the shipped entry instead of marking it completed forever.
-15. Never use `Backlog` as hidden implementation context for an `Implement next` command.
-16. Report which repository rules, documents, code paths, and tests were inspected.
-
-### 14.6 Prioritized-task completeness standard
-
-Every task in `Prioritized Next Changes` must be a practical implementation contract.
-
-It should normally contain enough detail to establish:
-
-- why the change exists;
-- verified current behavior;
-- desired behavior;
-- exact scope;
-- affected modules and likely paths;
-- known entry points;
-- relevant scenes, prefabs, assets, settings, and assemblies;
-- data and state changes;
-- dependencies;
-- explicit non-goals;
-- implementation constraints;
-- possible implementation approaches;
-- chosen or recommended approach;
-- unresolved implementation questions;
-- Unity serialization implications;
-- platform-specific implications;
-- compatibility and migration requirements;
-- error handling and recovery;
-- diagnostics;
-- test plan;
-- manual validation;
-- acceptance criteria;
-- documentation updates;
-- risks.
-
-The task may instruct the implementer to inspect a small, defined area before editing when exact symbols are likely to drift. It must not use broad phrases such as:
-
-```text
-Update whatever is necessary.
-Refactor related code.
-Fix all affected systems.
-Clean up nearby logic.
-Handle edge cases.
-Add tests as needed.
-```
-
-Replace such phrases with explicit boundaries and expected outcomes.
-
-A prioritized task should make unrelated modifications unnecessary. When a required change cannot be identified during task refinement, state the narrow discovery rule that allows the implementer to locate it.
-
-Example:
-
-```text
-Discovery allowance:
-- Follow references from `PlayerBootstrap.InitializeAsync()` only far enough to identify
-  the current save-service registration.
-- Add newly discovered files to `Touch` before editing them.
-- Do not inspect or refactor unrelated services registered by the same composition root.
-```
-
-### 14.7 Self-contained prioritized-task template
-
-Use:
+## Prioritized Task Template
 
 ```text
 ### Task Title
@@ -433,9 +123,6 @@ Implementation notes:
 Data, persistence, and migration:
 - ...
 
-Unity/serialization considerations:
-- ...
-
 Platform considerations:
 - ...
 
@@ -446,15 +133,15 @@ Diagnostics and observability:
 - ...
 
 Questions and required clarifications:
-- [Resolved — repository evidence] ...
+- [Resolved - repository evidence] ...
   Answer:
   Evidence:
 
-- [Recommended default — confirmation optional] ...
+- [Recommended default - confirmation optional] ...
   Recommendation:
   Rationale:
 
-- [Unresolved — blocks implementation] ...
+- [Unresolved - blocks implementation] ...
   Why it matters:
   Required answer from:
 
@@ -471,116 +158,4 @@ Risks:
 - ...
 ```
 
-Every prioritized task must include at least:
-
-- `Goal`;
-- `Current behavior`;
-- `Desired behavior`;
-- `Touch`;
-- `Discovery allowance`;
-- `Out of scope`;
-- `Implementation constraints`;
-- `Questions and required clarifications`;
-- `Validation`;
-- `Acceptance`;
-- `Documentation updates`;
-- `Risks`.
-
-Use `None identified` with a brief rationale when a required section genuinely has no content. Do not omit the section.
-
-The questions section must always be present, even when all questions are resolved:
-
-```text
-Questions and required clarifications:
-- No unresolved questions. Repository evidence and existing project rules establish
-  the implementation decisions listed above.
-```
-
-A task with a blocking unresolved question must use:
-
-```text
-Status: Blocked pending answers
-```
-
-It may remain in `Prioritized Next Changes` to preserve priority, but `Implement next` must stop at the clarification gate rather than skipping it automatically. The agent may only skip a blocked first task when the user explicitly requests another named task.
-
-### 14.8 Pending item template
-
-Use this format when an AI agent adds an item to `Pending Queue`. Keep the entry concise, preserve source context, and use nested Markdown lists only. Include only relevant sections.
-
-When initializing or repairing repository documentation, copy this template into the target repository's `Documents/FUTURE.md` under `## Pending Task Format`.
-
-```text
-- Task title
-  - Description
-    - State what should change, why, where it applies, and what problem it solves.
-  - Current context
-    - Summarize known current behavior, relevant Unity systems, assemblies, scenes, prefabs, ScriptableObjects, settings, tests, docs, or tooling.
-  - Source verification requirements
-    - MUST inspect current project code, assets, settings, and tests before promotion when assumptions may be stale.
-    - MUST verify official Unity, package, platform, SDK, backend, store, or other external behavior before relying on it.
-    - MUST update the task if source inspection contradicts the current assumptions.
-  - Requirements
-    - List concrete, testable requirements.
-  - Unity/game behavior
-    - Describe runtime, Editor, build, platform, scene/prefab, input, UI, gameplay, content, or tool behavior when relevant.
-  - Data/model behavior
-    - Describe state, persistence, serialization, save migration, Addressables/Resources, networking, cache, backend, analytics, or mutation behavior when relevant.
-  - Edge cases
-    - Include missing data, stale data, disabled states, duplicate entries, partial failure, cancellation, concurrency, offline behavior, platform differences, or old save/config compatibility when relevant.
-  - Expected behavior
-    - Describe the final observable outcome.
-  - Suggested implementation
-    - Name likely files, symbols, assets, tests, helpers, docs, and reuse points without over-constraining the developer.
-  - Acceptance criteria
-    - List concrete checks that can be verified manually, by tests, or by code review.
-  - Tests
-    - List focused test scenarios or validation steps when logic, state, serialization, platform behavior, tooling, or important UI behavior changes.
-  - Documentation updates
-    - Name docs that likely need updates, especially `FEATURES.md`, `FUTURE.md`, `TECHNICAL.md`, `REPOSITORY_MAP.md`, `TESTING.md`, or specialized integration docs.
-```
-
-Pending entries do not need the full questions section. The mandatory questions section is created during `Process pending tasks` or `Process pending`.
-
-Do not use vague titles such as `Fix UI`, `Improve things`, `Update page`, or `Bug`. Use short action-oriented titles. Do not add empty sections. Do not put future work in `FEATURES.md` while drafting pending items.
-
-### 14.9 Task lifecycle
-
-```text
-Raw request
--> Pending Queue
--> `Process pending` research and validation
--> maximally detailed task with implementation questions
--> Prioritized Next Changes
--> clarification gate
--> implementation
--> tests and validation
--> current-state docs updated
--> task removed from FUTURE.md
-```
-
-Backlog lifecycle:
-
-```text
-Deferred idea or validated future work
--> Backlog
--> explicit promotion request
--> full task expansion and questions
--> Prioritized Next Changes
--> clarification gate
--> implementation
-```
-
-`Implement next` does not perform promotion.
-
-Do not use `FUTURE.md` as a changelog.
-
-### 14.10 Optional validated-removal section
-
-During a one-time backlog cleanup, an agent may temporarily include:
-
-```text
-## Validated Implemented and Removed from Backlog
-```
-
-Use it to explain why stale tasks were removed. Delete or move this historical record to release notes after the cleanup if it no longer helps implementation.
+Every prioritized task must include at least `Goal`, `Current behavior`, `Desired behavior`, `Touch`, `Discovery allowance`, `Out of scope`, `Implementation constraints`, `Questions and required clarifications`, `Validation`, `Acceptance`, `Documentation updates`, and `Risks`.

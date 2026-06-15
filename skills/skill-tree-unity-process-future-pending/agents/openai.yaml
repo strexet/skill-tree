@@ -1,0 +1,7 @@
+interface:
+  display_name: "Skill-Tree-Unity: Process Pending Tasks"
+  short_description: "Research and promote pending Unity tasks"
+  default_prompt: "Process pending Unity tasks in FUTURE.md without implementing them."
+
+policy:
+  allow_implicit_invocation: true

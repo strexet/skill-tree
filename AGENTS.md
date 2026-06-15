@@ -3,6 +3,7 @@
 ## Required Reading
 
 - Read `SKILL_REPOSITORY_CREATION_INSTRUCTIONS.md` before changing repository structure, installer behavior, provider metadata, tests, or skill contracts.
+- Read `common/references/` before changing general documentation, snapshot, or `FUTURE.md` workflow behavior.
 - Read `REPO_INIT_INSTRUCTIONS.md` before changing Unity documentation workflow behavior.
 - Read `docs/INSTALLATION_ARCHITECTURE.md` before changing the installer or provider matrix.
 - Read `docs/AGENT_COMPATIBILITY.md` before changing agent support claims.
@@ -14,14 +15,15 @@
 - Skill installer: `bin/install.js`; shell wrappers: `install.sh`, `install.ps1`.
 - Provider matrix: `config/providers.json`.
 - Agent adapters and bridge notes: `adapters/`.
-- Shared bridge text: `src/init-rules/unity-repository-skills.md`.
+- Shared bridge text: `src/init-rules/skill-tree-skills.md`.
 - Repository validators and generators: `scripts/`.
 - Python and Node tests: `tests/`.
 - Compatibility/security/installation docs: `docs/`.
 
 ## Source-of-Truth Rules
 
-- `REPO_INIT_INSTRUCTIONS.md` is canonical for Unity repository analysis, documentation initialization, `FUTURE.md` queue semantics, `Process pending`, and `Implement next`.
+- `common/references/` is canonical for general documentation, snapshot, and `FUTURE.md` workflow behavior.
+- `REPO_INIT_INSTRUCTIONS.md` is canonical for Unity repository analysis and Unity-specific documentation workflow behavior.
 - `scripts/sync_skill_references.py` owns generated references. Do not edit generated references manually.
 - `config/providers.json` is canonical for provider ids, paths, detection metadata, upstream profiles, and adapter bridges.
 - `LICENSE` is the existing repository license. The SPDX identifier is `MIT`.
