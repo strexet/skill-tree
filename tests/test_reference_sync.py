@@ -28,6 +28,8 @@ class ReferenceSyncTests(unittest.TestCase):
 
     def test_generated_references_have_notice(self):
         for rel in [
+            "skills/skill-tree-add-pending-task/references/PENDING_TASK_INTAKE.md",
+            "skills/skill-tree-add-pending-task/references/PENDING_TASK_FORMAT.md",
             "skills/skill-tree-repo-documentation/references/DOCUMENTATION_OUTPUT_CONTRACT.md",
             "skills/skill-tree-repo-documentation/references/REPOSITORY_DISCOVERY_CHECKLIST.md",
             "skills/skill-tree-repo-documentation/references/PENDING_TASK_FORMAT.md",

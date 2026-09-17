@@ -32,6 +32,12 @@ This shared standard is the general parent contract for `FUTURE.md` task intake,
 
 Documentation or audit findings discovered during repository documentation work belong in `Backlog`, not `Pending Queue`, unless the owner explicitly asks to capture them as pending intake.
 
+## Add Pending Task
+
+`Add pending: <idea>` captures one understood user request as a concise nested-list entry in Pending Queue. Use light current-state documentation context and clarify missing intent before writing. Record priority and source wording; default to Highest and first in the queue. Honor explicit lower priority or relative placement, asking only when placement is ambiguous. Preserve existing task order and all other queues.
+
+This is intake, not implementation or promotion. Leave technical discovery, detailed questions and implementation-ready planning to `Process pending`. The general `skill-tree-add-pending-task` also serves Unity repositories; it does not require a separate Unity variant. A skill providing intake includes the self-contained `PENDING_TASK_INTAKE.md` contract.
+
 ## Process Pending
 
 When processing pending work:
@@ -49,7 +55,7 @@ When processing pending work:
 11. Add `Questions and required clarifications:` to every promoted task.
 12. Resolve questions from repository evidence where possible.
 13. Mark answers as verified, inferred, recommended, or unresolved.
-14. Move only implementation-ready entries into `Prioritized Next Changes`.
+14. Move only implementation-ready entries into `Prioritized Next Changes`, preserving explicit priority intent from intake; pending order does not override readiness or owner-selected placement.
 15. Leave blocked or insufficiently understood entries in `Pending Queue` with missing information.
 16. Remove original pending entries only after preserving their information.
 17. Report rules, documents, code paths, data/config files, and tests inspected.

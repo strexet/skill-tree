@@ -80,6 +80,7 @@ def expected_outputs(root: Path) -> dict[Path, str]:
     common_dir = root / "common/references"
     common_future = read_text(common_dir / "FUTURE_WORKFLOW.md")
     common_pending = read_text(common_dir / "PENDING_TASK_FORMAT.md")
+    common_intake = read_text(common_dir / "PENDING_TASK_INTAKE.md")
     common_contract = read_text(common_dir / "DOCUMENTATION_OUTPUT_CONTRACT.md")
     common_discovery = read_text(common_dir / "REPOSITORY_DISCOVERY_CHECKLIST.md")
     common_snapshot = read_text(common_dir / "SNAPSHOT_RULES.md")
@@ -88,6 +89,10 @@ def expected_outputs(root: Path) -> dict[Path, str]:
     task_selector = read_text(common_scripts / "select_prioritized_task.py")
     unity_pending = extract_section(source, PENDING_TEMPLATE_START, PENDING_TEMPLATE_END)
     return {
+        root / "skills/skill-tree-add-pending-task/references/PENDING_TASK_INTAKE.md": generated_notice("common/references/PENDING_TASK_INTAKE.md")
+        + common_intake,
+        root / "skills/skill-tree-add-pending-task/references/PENDING_TASK_FORMAT.md": generated_notice("common/references/PENDING_TASK_FORMAT.md")
+        + common_pending,
         root / "skills/skill-tree-unity-repo-documentation/references/REPO_INIT_INSTRUCTIONS.md": source,
         root / "skills/skill-tree-unity-repo-documentation/references/COMMON_DOCUMENTATION_OUTPUT_CONTRACT.md": generated_notice("common/references/DOCUMENTATION_OUTPUT_CONTRACT.md")
         + common_contract,

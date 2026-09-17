@@ -52,6 +52,7 @@ class SkillRepositoryValidationTests(unittest.TestCase):
 
     def test_skill_tree_display_names_match_required_strings(self):
         expected = {
+            "skill-tree-add-pending-task": "Skill-Tree: Add Pending Task",
             "skill-tree-repo-documentation": "Skill-Tree: Initialize Documents",
             "skill-tree-repo-documentation-audit": "Skill-Tree: Audit Documents",
             "skill-tree-process-future-pending": "Skill-Tree: Process Pending Tasks",

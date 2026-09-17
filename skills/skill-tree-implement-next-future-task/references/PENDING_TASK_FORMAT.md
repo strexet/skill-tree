@@ -13,6 +13,8 @@ When initializing or repairing repository documentation, copy this template into
 
 ```text
 - Task title
+  - Priority
+    - State the user's priority and intended queue position; default to Highest and first in Pending Queue when neither is specified.
   - Description
     - State what should change, why, where it applies, and what problem it solves.
   - Current context
@@ -39,8 +41,12 @@ When initializing or repairing repository documentation, copy this template into
     - List focused test scenarios or validation steps when logic, state, serialization, platform behavior, tooling, or important UI behavior changes.
   - Documentation updates
     - Name docs that likely need updates, especially `FEATURES.md`, `FUTURE.md`, `TECHNICAL.md`, `REPOSITORY_MAP.md`, `TESTING.md`, or specialized integration docs.
+  - Source
+    - Preserve the original user request and material clarification answers.
 ```
 
 Pending entries do not need the full questions section. The mandatory questions section is created during `Process pending tasks` or `Process pending`.
+
+For lightweight user-request intake, include only a clear title, Priority, Description, Expected behavior, Source and useful context. Technical details may remain deferred; do not force every template section. Clarify missing subject/change/outcome before insertion. Explicit low priority places the new entry last by default; explicit relative placement overrides default ordering. Preserve existing entries' relative order. See `PENDING_TASK_INTAKE.md` in skills that provide intake for the complete understanding/placement contract.
 
 Do not use vague titles such as `Fix UI`, `Improve things`, `Update page`, or `Bug`. Use short action-oriented titles. Do not add empty sections. Do not put future work in `FEATURES.md` while drafting pending items.

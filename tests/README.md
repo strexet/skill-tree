@@ -49,6 +49,26 @@ Forbidden behavior: live document edits, ignored/transient file inclusion, secre
 
 Scoring checks: archive members are at zip root, snapshot notices are prepended, live source files are unchanged, included docs are repository-relevant, exclusions are reported.
 
+## Pending Task Intake
+
+Expected activation: `skill-tree-add-pending-task`, also for Unity repositories. The automated installer case verifies that this skill can be copied alone with both local references; it does not prove interpretation quality.
+
+Evaluate these prompts against an isolated repository with current-state docs and a populated Pending Queue:
+
+| Prompt/context | Expected outcome |
+|---|---|
+| `Add pending: add replay on the loss screen so I can start another game there` | One concise entry, Highest/default, first; original wording retained |
+| `Add pending: not urgent, let me disable dice shake` with docs distinguishing animation/vibration | Ask which effect if context cannot resolve it; no write until answered; then Low/last |
+| `Add pending: add a Later button to the consent screen` | “Later” is product text, not low-priority wording; default Highest/first |
+| `Add pending: make that thing nicer` with multiple possible subjects | Focused subject/outcome question; document unchanged |
+| `Add pending: add replay, after task X` | Insert after the unique X; explain placement override; preserve existing order |
+| Explicit numeric priority without a documented scale, missing/duplicate anchor or conflicting urgency | Ask about placement before writing |
+| Obvious equivalent task already exists | Identify it and ask whether to update or create a distinct task; no silent duplicate/merge |
+| Clear replay goal, unknown component/API/layout | Capture goal with deferred technical detail; do not require implementation-ready research |
+| `Process pending`, `Implement next`, or brainstorming without a capture request | Do not route to intake |
+
+Scoring: only Pending Queue changes; title/priority/description/expected behavior/source present; inferred context labeled; no unsupported behavior or architecture; other queues and existing task order preserved. Run behavior evaluation only when authorized and do not modify a live project's queue for evaluation.
+
 ## Pending Processing Skills
 
 Prompt: `Process pending tasks in FUTURE.md.`

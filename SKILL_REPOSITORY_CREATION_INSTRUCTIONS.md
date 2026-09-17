@@ -1,6 +1,6 @@
 # Skill Repository Creation Instructions
 
-Last updated: 2026-06-10
+Last updated: 2026-09-17 (portable pending-task intake added by owner request)
 Primary audience: AI coding agents creating the repository
 Repository type: vendor-neutral, cross-agent Agent Skills source repository
 Required source document: `REPO_INIT_INSTRUCTIONS.md`
@@ -18,7 +18,7 @@ SKILL_REPOSITORY_CREATION_INSTRUCTIONS.md
 .git/
 ```
 
-The completed repository must provide ten focused skills: five general skills and five Unity-specific skills.
+The repository provides eleven focused skills: six general skills and five Unity-specific skills. The owner-requested portable intake skill also serves Unity repositories without duplicating its flow.
 
 General skills:
 
@@ -27,6 +27,7 @@ General skills:
 3. `skill-tree-process-future-pending`
 4. `skill-tree-implement-next-future-task`
 5. `skill-tree-create-documents-snapshot`
+6. `skill-tree-add-pending-task`
 
 Unity-specific skills:
 
@@ -182,9 +183,9 @@ Store this information in `INSTALL.md` and `docs/AGENT_COMPATIBILITY.md`.
 
 ## 3. Non-Negotiable Design Decisions
 
-### 3.1 Ten focused skills
+### 3.1 Focused skills
 
-Create ten separate skills rather than one large skill. The five general skills own portable repository workflows. The five Unity-specific skills extend those workflows with Unity evidence, safety, and terminology.
+Create eleven separate skills rather than one large skill. Six general skills own portable repository workflows. Five Unity-specific skills extend workflows that need Unity evidence, safety, and terminology. Lightweight task intake uses the general skill for both types.
 
 The responsibilities must not overlap unnecessarily:
 
@@ -200,6 +201,13 @@ skill-tree-repo-documentation-audit
 skill-tree-process-future-pending
   Processes only the Pending Queue in FUTURE.md and promotes sufficiently
   researched entries into maximally detailed Prioritized Next Changes.
+
+skill-tree-add-pending-task
+  Uses light repository documentation context to clarify informal user intent
+  and add one concise nested-list Pending Queue entry with source wording,
+  priority and placement. Default Highest/first; honor explicit lower priority
+  or relative placement and ask about ambiguity before writing. It does not
+  implement or perform the deeper research owned by Process pending.
 
 skill-tree-implement-next-future-task
   Selects and implements exactly one task from Prioritized Next Changes,
@@ -522,6 +530,7 @@ Create this structure:
 │   │   ├── DOCUMENTATION_OUTPUT_CONTRACT.md
 │   │   ├── FUTURE_WORKFLOW.md
 │   │   ├── PENDING_TASK_FORMAT.md
+│   │   ├── PENDING_TASK_INTAKE.md
 │   │   ├── REPOSITORY_DISCOVERY_CHECKLIST.md
 │   │   └── SNAPSHOT_RULES.md
 │   └── scripts/
@@ -530,6 +539,7 @@ Create this structure:
 ├── skills/
 │   ├── skill-tree-repo-documentation/
 │   ├── skill-tree-repo-documentation-audit/
+│   ├── skill-tree-add-pending-task/
 │   ├── skill-tree-process-future-pending/
 │   ├── skill-tree-implement-next-future-task/
 │   ├── skill-tree-create-documents-snapshot/
@@ -623,7 +633,7 @@ Perform the work in this order:
 5. Analyze the source instruction.
 6. Create repository conventions and cross-agent documentation.
 7. Implement reference synchronization.
-8. Create the ten canonical skills.
+8. Create the eleven canonical skills.
 9. Implement deterministic skill-local scripts.
 10. Create the provider matrix.
 11. Implement the unified installer and thin launchers.
@@ -2784,7 +2794,7 @@ The repository is complete only when:
 
 ### Structure
 
-- [ ] All ten canonical skill folders exist.
+- [ ] All eleven canonical skill folders exist, including portable pending intake.
 - [ ] Every skill has `SKILL.md`.
 - [ ] Every skill is self-contained.
 - [ ] Optional vendor metadata is non-canonical.
@@ -2926,7 +2936,7 @@ Use this only after reading the complete instruction:
 6. Read and map all of REPO_INIT_INSTRUCTIONS.md.
 7. Create vendor-neutral root documentation and compatibility docs.
 8. Implement deterministic reference synchronization.
-9. Create the ten focused, self-contained canonical skills.
+9. Create the eleven focused, self-contained canonical skills.
 10. Create the declarative provider matrix.
 11. Implement the unified Node installer and thin platform wrappers.
 12. Add optional, reversible repository instruction bridges.

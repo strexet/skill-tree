@@ -1,0 +1,7 @@
+interface:
+  display_name: "Skill-Tree: Add Pending Task"
+  short_description: "Clarify an idea and capture a concise pending task"
+  default_prompt: "Use $skill-tree-add-pending-task to clarify my informal request and add a concise task with priority to FUTURE.md Pending Queue."
+
+policy:
+  allow_implicit_invocation: true

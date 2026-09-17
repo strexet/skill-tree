@@ -36,6 +36,7 @@ test("--list succeeds without writes", () => {
   assert.match(result.stdout, /skill-tree-unity-repo-documentation/);
   assert.match(result.stdout, /skill-tree-unity-repo-documentation-audit/);
   assert.match(result.stdout, /skill-tree-create-documents-snapshot/);
+  assert.match(result.stdout, /skill-tree-add-pending-task/);
   assert.match(result.stdout, /skill-tree-unity-create-documents-snapshot/);
 });
 
@@ -56,6 +57,24 @@ test("project-scope copy install preserves unrelated skill", () => {
   assert.equal(result.status, 0, result.stderr);
   assert.ok(fs.existsSync(path.join(target, ".agents", "skills", "skill-tree-process-future-pending", "SKILL.md")));
   assert.ok(fs.existsSync(path.join(unrelated, "SKILL.md")));
+});
+
+test("portable pending intake installs alone with self-contained references", () => {
+  const target = tmpdir();
+  const name = "skill-tree-add-pending-task";
+  try {
+    const result = run(["--only", "codex", "--project", "--target", target, "--copy", "--skills", name]);
+    assert.equal(result.status, 0, result.stderr);
+    const installed = path.join(target, ".agents", "skills", name);
+    for (const file of ["SKILL.md", "references/PENDING_TASK_INTAKE.md", "references/PENDING_TASK_FORMAT.md", "agents/openai.yaml"]) {
+      assert.deepEqual(fs.readFileSync(path.join(installed, file)), fs.readFileSync(path.join(root, "skills", name, file)));
+    }
+    assert.deepEqual(fs.readdirSync(path.join(target, ".agents", "skills")), [name]);
+    const verified = run(["--verify", "--only", "codex", "--project", "--target", target, "--skills", name]);
+    assert.equal(verified.status, 0, verified.stderr);
+  } finally {
+    fs.rmSync(target, { recursive: true, force: true });
+  }
 });
 
 test("global-scope copy install uses HOME-derived path", () => {

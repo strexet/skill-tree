@@ -8,6 +8,7 @@ General skills:
 
 - `skill-tree-repo-documentation` — Skill-Tree: Initialize Documents: analyze an existing repository and create or repair AI-oriented documentation.
 - `skill-tree-repo-documentation-audit` — Skill-Tree: Audit Documents: audit existing repository documentation against current code and repair drift.
+- `skill-tree-add-pending-task` — Skill-Tree: Add Pending Task: clarify an informal request and capture a concise task with priority in Pending Queue; also works in Unity repositories.
 - `skill-tree-process-future-pending` — Skill-Tree: Process Pending Tasks: research `FUTURE.md` Pending Queue entries and promote only implementation-ready work.
 - `skill-tree-implement-next-future-task` — Skill-Tree: Implement Next Task: implement exactly one task from `Prioritized Next Changes`.
 - `skill-tree-create-documents-snapshot` — Skill-Tree: Create Snapshot: create explicit-request-only Markdown documentation snapshot archives.
@@ -26,6 +27,8 @@ Unity-specific skills:
 Initialize AI-oriented documentation for this repository.
 Audit and repair existing repository documentation.
 Create a documentation snapshot archive.
+Add pending: not urgent, let me turn off the dice shake in settings.
+Add this feature idea to the pending queue: add replay on the loss screen.
 Process pending.
 Implement next.
 Implement next: Add save migration validation.
@@ -33,6 +36,30 @@ Implement next: Add save migration validation.
 Initialize AI-oriented documentation for this Unity project.
 Audit and repair existing Unity repository documentation.
 ```
+
+## Recommended task flow
+
+Use `Add pending: <informal request>` to capture one idea, then `Process pending` to research and promote ready work, then `Implement next` to implement exactly one prioritized task. Intake is deliberately shallow: read relevant docs, clarify missing intent, preserve source wording, and leave architecture/code/test discovery for processing.
+
+Intake defaults to Highest priority and first in Pending Queue. Explicit low/later priority defaults to last; other stated priorities follow local conventions. A requested relative position wins over default ordering. The skill asks about conflicting priority, unclear placement or missing subject/outcome before writing. It preserves existing task order and never promotes a task during intake.
+
+### Intake output
+
+Entries use the repository's nested Markdown format. Minimum fields are title, Priority, Description, Expected behavior and Source; include Current context and other sections only when useful. Do not create a full prioritized specification or mark the entry Ready.
+
+```markdown
+- Add replay from the loss screen
+  - Priority
+    - Highest — default; first in Pending Queue.
+  - Description
+    - Let the player start another game directly from the loss screen.
+  - Expected behavior
+    - A replay action on the loss screen starts another game.
+  - Source
+    - User request: “add replay on the loss screen so I can start another game there”.
+```
+
+See [intake decisions and examples](common/references/PENDING_TASK_INTAKE.md) and [the shared pending template](common/references/PENDING_TASK_FORMAT.md). Unknown implementation details may be deferred; unclear intent must be answered before adding the entry.
 
 ## Source Model
 
@@ -68,13 +95,13 @@ node bin/install.js --only codex --project --target /path/to/repo --symlink
 Install only general workflow skills:
 
 ```bash
-node bin/install.js --only codex --project --target /path/to/repo --copy --skills skill-tree-repo-documentation skill-tree-process-future-pending skill-tree-implement-next-future-task
+node bin/install.js --only codex --project --target /path/to/repo --copy --skills skill-tree-repo-documentation skill-tree-add-pending-task skill-tree-process-future-pending skill-tree-implement-next-future-task
 ```
 
-Install only Unity workflow skills:
+Install the Unity workflow plus portable task intake:
 
 ```bash
-node bin/install.js --only codex --project --target /path/to/unity-repo --copy --skills skill-tree-unity-repo-documentation skill-tree-unity-process-future-pending skill-tree-unity-implement-next-future-task
+node bin/install.js --only codex --project --target /path/to/unity-repo --copy --skills skill-tree-unity-repo-documentation skill-tree-add-pending-task skill-tree-unity-process-future-pending skill-tree-unity-implement-next-future-task
 ```
 
 Direct upstream passthrough for current `skills` CLI profiles:

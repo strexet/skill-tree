@@ -12,6 +12,7 @@ General skills:
 
 - `skill-tree-repo-documentation`
 - `skill-tree-repo-documentation-audit`
+- `skill-tree-add-pending-task` (portable intake for general and Unity repositories)
 - `skill-tree-process-future-pending`
 - `skill-tree-implement-next-future-task`
 - `skill-tree-create-documents-snapshot`
@@ -23,6 +24,8 @@ Unity-specific skills:
 - `skill-tree-unity-process-future-pending`
 - `skill-tree-unity-implement-next-future-task`
 - `skill-tree-unity-create-documents-snapshot`
+
+Task intake is additive: install `skill-tree-add-pending-task` without replacing existing processing or implementation skills. There is no separate Unity intake alias. Existing copied installations need the new skill explicitly installed; adding source files does not update them automatically.
 
 Legacy installed folders should be removed, then canonical skills should be installed.
 

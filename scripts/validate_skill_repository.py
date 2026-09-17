@@ -34,6 +34,10 @@ ROOT_FILES = [
     "src/init-rules/skill-tree-skills.md",
 ]
 SKILLS = {
+    "skill-tree-add-pending-task": {
+        "references": ["PENDING_TASK_INTAKE.md", "PENDING_TASK_FORMAT.md"],
+        "scripts": [],
+    },
     "skill-tree-unity-repo-documentation": {
         "references": [
             "REPO_INIT_INSTRUCTIONS.md",
@@ -93,6 +97,7 @@ SKILLS = {
     },
 }
 DISPLAY_NAMES = {
+    "skill-tree-add-pending-task": "Skill-Tree: Add Pending Task",
     "skill-tree-repo-documentation": "Skill-Tree: Initialize Documents",
     "skill-tree-repo-documentation-audit": "Skill-Tree: Audit Documents",
     "skill-tree-process-future-pending": "Skill-Tree: Process Pending Tasks",
