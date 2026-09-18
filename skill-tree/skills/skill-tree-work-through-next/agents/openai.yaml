@@ -1,0 +1,7 @@
+interface:
+  display_name: "Skill-Tree: Work Through Next"
+  short_description: "Work Through Next"
+  default_prompt: "Apply Work Through Next to the selected repository under applicable rules."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,7 +1,0 @@
-interface:
-  display_name: "Skill-Tree-Unity: Initialize Documents"
-  short_description: "Analyze and document an existing Unity repository"
-  default_prompt: "Analyze this existing Unity repository and create or repair its AI-oriented documentation."
-
-policy:
-  allow_implicit_invocation: true

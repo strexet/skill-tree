@@ -1,0 +1,7 @@
+interface:
+  display_name: "Skill-Tree: Implement All"
+  short_description: "Implement All"
+  default_prompt: "Apply Implement All to the selected repository under applicable rules."
+
+policy:
+  allow_implicit_invocation: true

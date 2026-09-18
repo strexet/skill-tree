@@ -1,0 +1,7 @@
+interface:
+  display_name: "Skill-Tree-Unity: Create Snapshot"
+  short_description: "Create Snapshot"
+  default_prompt: "Apply Create Snapshot to the selected repository under applicable rules."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Skill-Tree: Add Pending Task"
+  short_description: "Add Pending Task"
+  default_prompt: "Apply Add Pending Task to the selected repository under applicable rules."
+
+policy:
+  allow_implicit_invocation: true

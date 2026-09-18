@@ -1,7 +1,0 @@
-interface:
-  display_name: "Skill-Tree: Process Pending Tasks"
-  short_description: "Research and promote pending repository tasks"
-  default_prompt: "Process pending tasks in FUTURE.md without implementing them."
-
-policy:
-  allow_implicit_invocation: true

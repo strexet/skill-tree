@@ -1,8 +1,3 @@
-@AGENTS.md
+# Claude Code Repository Entry Point
 
-## Claude Code Maintainer Notes
-
-- `skills/` is the canonical source tree.
-- `.claude/skills/` is an installation destination, not a second source.
-- Read `adapters/claude-code/README.md` before changing Claude-specific guidance.
-- Do not edit generated files manually. Update `common/references/`, `common/scripts/`, or `REPO_INIT_INSTRUCTIONS.md`, then run `scripts/sync_skill_references.py`.
+Read [repository instructions](AGENTS.md) and the referenced Skill Tree contracts before source changes.

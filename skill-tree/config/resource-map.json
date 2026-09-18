@@ -1,0 +1,192 @@
+{
+  "skill-tree-add-pending-task": {
+    "references": {
+      "document-rules.md": "common/references/document-rules.md",
+      "pending-task-format.md": "common/references/pending-task-format.md",
+      "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
+    },
+    "scripts": {
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
+  },
+  "skill-tree-create-documents-snapshot": {
+    "references": {
+      "document-rules.md": "common/references/document-rules.md",
+      "snapshot-rules.md": "common/references/snapshot-rules.md"
+    },
+    "scripts": {
+      "create-documentation-snapshot.py": "common/scripts/create-documentation-snapshot.py"
+    }
+  },
+  "skill-tree-implement-all": {
+    "references": {
+      "document-rules.md": "common/references/document-rules.md",
+      "future-workflow.md": "common/references/future-workflow.md",
+      "history-retention.md": "common/references/history-retention.md",
+      "orchestration.md": "common/references/orchestration.md",
+      "pending-task-format.md": "common/references/pending-task-format.md",
+      "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "unity-safety.md": "common/references/unity-safety.md",
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
+    },
+    "scripts": {
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
+  },
+  "skill-tree-implement-next-future-task": {
+    "references": {
+      "document-rules.md": "common/references/document-rules.md",
+      "future-workflow.md": "common/references/future-workflow.md",
+      "history-retention.md": "common/references/history-retention.md",
+      "pending-task-format.md": "common/references/pending-task-format.md",
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
+    },
+    "scripts": {
+      "select-prioritized-task.py": "common/scripts/select-prioritized-task.py",
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
+  },
+  "skill-tree-process-future-pending": {
+    "references": {
+      "document-rules.md": "common/references/document-rules.md",
+      "future-workflow.md": "common/references/future-workflow.md",
+      "history-retention.md": "common/references/history-retention.md",
+      "pending-task-format.md": "common/references/pending-task-format.md",
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
+    },
+    "scripts": {
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "validate-future-document.py": "common/scripts/validate-future-document.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
+  },
+  "skill-tree-repo-documentation": {
+    "references": {
+      "document-rules.md": "common/references/document-rules.md",
+      "documentation-output-contract.md": "common/references/documentation-output-contract.md",
+      "history-retention.md": "common/references/history-retention.md",
+      "pending-task-format.md": "common/references/pending-task-format.md",
+      "repository-discovery-checklist.md": "common/references/repository-discovery-checklist.md",
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
+    },
+    "scripts": {
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "validate-future-document.py": "common/scripts/validate-future-document.py",
+      "validate-repository-documentation.py": "common/scripts/validate-repository-documentation.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
+  },
+  "skill-tree-repo-documentation-audit": {
+    "references": {
+      "document-rules.md": "common/references/document-rules.md",
+      "documentation-output-contract.md": "common/references/documentation-output-contract.md",
+      "history-retention.md": "common/references/history-retention.md",
+      "pending-task-format.md": "common/references/pending-task-format.md",
+      "repository-discovery-checklist.md": "common/references/repository-discovery-checklist.md",
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
+    },
+    "scripts": {
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "validate-future-document.py": "common/scripts/validate-future-document.py",
+      "validate-repository-documentation.py": "common/scripts/validate-repository-documentation.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
+  },
+  "skill-tree-unity-create-documents-snapshot": {
+    "references": {
+      "document-rules.md": "common/references/document-rules.md",
+      "snapshot-rules.md": "common/references/snapshot-rules.md",
+      "unity-safety.md": "common/references/unity-safety.md"
+    },
+    "scripts": {
+      "create-documentation-snapshot.py": "common/scripts/create-documentation-snapshot.py"
+    }
+  },
+  "skill-tree-unity-implement-next-future-task": {
+    "references": {
+      "document-rules.md": "common/references/document-rules.md",
+      "future-workflow.md": "common/references/future-workflow.md",
+      "history-retention.md": "common/references/history-retention.md",
+      "pending-task-format.md": "common/references/pending-task-format.md",
+      "unity-safety.md": "common/references/unity-safety.md",
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
+    },
+    "scripts": {
+      "select-prioritized-task.py": "common/scripts/select-prioritized-task.py",
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
+  },
+  "skill-tree-unity-process-future-pending": {
+    "references": {
+      "document-rules.md": "common/references/document-rules.md",
+      "future-workflow.md": "common/references/future-workflow.md",
+      "history-retention.md": "common/references/history-retention.md",
+      "pending-task-format.md": "common/references/pending-task-format.md",
+      "unity-safety.md": "common/references/unity-safety.md",
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
+    },
+    "scripts": {
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "validate-future-document.py": "common/scripts/validate-future-document.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
+  },
+  "skill-tree-unity-repo-documentation": {
+    "references": {
+      "document-rules.md": "common/references/document-rules.md",
+      "documentation-output-contract.md": "common/references/documentation-output-contract.md",
+      "history-retention.md": "common/references/history-retention.md",
+      "pending-task-format.md": "common/references/pending-task-format.md",
+      "repo-init-instructions.md": "documents/repo-init-instructions.md",
+      "repository-discovery-checklist.md": "common/references/repository-discovery-checklist.md",
+      "unity-safety.md": "common/references/unity-safety.md",
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
+    },
+    "scripts": {
+      "inspect-unity-repository.py": "common/scripts/inspect-unity-repository.py",
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "validate-future-document.py": "common/scripts/validate-future-document.py",
+      "validate-repository-documentation.py": "common/scripts/validate-repository-documentation.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
+  },
+  "skill-tree-unity-repo-documentation-audit": {
+    "references": {
+      "document-rules.md": "common/references/document-rules.md",
+      "documentation-output-contract.md": "common/references/documentation-output-contract.md",
+      "history-retention.md": "common/references/history-retention.md",
+      "pending-task-format.md": "common/references/pending-task-format.md",
+      "repo-init-instructions.md": "documents/repo-init-instructions.md",
+      "repository-discovery-checklist.md": "common/references/repository-discovery-checklist.md",
+      "unity-safety.md": "common/references/unity-safety.md",
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
+    },
+    "scripts": {
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "validate-future-document.py": "common/scripts/validate-future-document.py",
+      "validate-repository-documentation.py": "common/scripts/validate-repository-documentation.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
+  },
+  "skill-tree-work-through-next": {
+    "references": {
+      "document-rules.md": "common/references/document-rules.md",
+      "future-workflow.md": "common/references/future-workflow.md",
+      "history-retention.md": "common/references/history-retention.md",
+      "orchestration.md": "common/references/orchestration.md",
+      "pending-task-format.md": "common/references/pending-task-format.md",
+      "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "unity-safety.md": "common/references/unity-safety.md",
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
+    },
+    "scripts": {
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
+  }
+}
