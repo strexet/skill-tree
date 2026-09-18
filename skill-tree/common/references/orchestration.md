@@ -10,6 +10,12 @@ Implement through the implementation contract. Capture understood findings with 
 
 Start mode all to freeze the initial Prioritized identities. Execute the same dependency cycle for remaining snapshot roots by current priority. Include required discovered work; exclude new nonblocking tasks. Completion records deduplicate dependencies shared by initial roots. Absent tasks without evidence stop execution.
 
+## Processing Handoff
+
+An explicitly launched/resumed controller automatically selects the recommended eligible next unit after targeted processing through advance/next. Report the scoped prioritized units and the chosen ID/reason; no routine next-action question interrupts the authorized root/snapshot cycle. Required closure/snapshot boundaries, deferred findings and original validation limits remain binding. Missing material decisions require questions; blocked or exhausted execution stops.
+
+Standalone Process Pending prints the global prioritized list and a developer-choice handoff with one recommended action last. A stored active checkpoint alone never activates the automatic path. Flow completion reports deferred choices and starts no additional root/snapshot. Follow the processing-result contract in future-workflow.md.
+
 ## Boundaries
 
 No implicit Backlog promotion, scheduler, publishing, real services or commit permission. Repository rules and exact validation profiles remain binding. Original deadlines and consumed limits survive interruption. Stop on cycles, unresolved decisions, mandatory validation failures or a complete cycle without task/dependency progress. Checkpoint partial work, stop reason and next action. Never renew a run budget through new IDs.

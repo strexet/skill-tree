@@ -1,0 +1,68 @@
+{
+  "checks": [
+    {
+      "name": "source synchronization and strict validation",
+      "result": "pass"
+    },
+    {
+      "count": 50,
+      "name": "Python behavioral suite",
+      "result": "pass"
+    },
+    {
+      "count": 24,
+      "name": "Node provider/installer suite",
+      "result": "pass"
+    },
+    {
+      "name": "installer list and full-provider dry run",
+      "result": "pass"
+    }
+  ],
+  "coverage_gaps": [
+    "Live agent next-action question behavior is specified by skill contracts; no implementation/task-processing run is performed during policy setup.",
+    "Auxiliary quick_validate requires unavailable PyYAML; strict source frontmatter checks pass.",
+    "Unity execution and scheduler qualification remain outside policy setup."
+  ],
+  "findings": [
+    {
+      "id": "F-standalone-processing-choice",
+      "observation": "Standalone processing reports prioritized work and waits for developer next-action selection with one recommendation last.",
+      "status": "resolved"
+    },
+    {
+      "id": "F-scoped-controller-continuation",
+      "observation": "Explicit controllers choose eligible scoped units automatically; active checkpoint state alone grants no continuation.",
+      "status": "resolved"
+    }
+  ],
+  "id": "A-49144943-4862-4829-9e25-5f07b591353b",
+  "recorded_at": "2026-09-18T06:05:03.412093+00:00",
+  "scope": "Standalone processing choice and bounded controller handoff policy",
+  "source_fingerprints": {
+    "AGENTS.md": "84611e452c9060649fd6d50f5141eb60cbe21c962c99e3ca7d5f21cb87cba496",
+    "README.md": "56ff053367ba90e50414ec96fe1cda57f0d6b209d52149390f3043e1124af753",
+    "skill-tree/common/references/future-workflow.md": "aee98163111c955a957fbfec1030a407a2dac06d90acd30f97992a2a174f17ea",
+    "skill-tree/common/references/orchestration.md": "ce179ab2c239f772522642af14608420dd4b382b6d4529eb834378e559b5a19b",
+    "skill-tree/config/resource-map.json": "a76135911fdfced2c8ae984dccc7b6b4e608ff3b4751c8e2cc10a9dfca8c5eaa",
+    "skill-tree/scripts/sync-skill-references.py": "1730e0add2b5e563442860e17006a9af5e9ea7714c44fbe93df33bed08594e51",
+    "skill-tree/skills/skill-tree-implement-all/SKILL.md": "6f1e0934303573e27f34b65336138c54db6bed20e69cceb5ef6e8aada03dc341",
+    "skill-tree/skills/skill-tree-process-future-pending/SKILL.md": "93a21056079a562cad8d732b226cd96069789e1123497b8457e413ed7a52d769",
+    "skill-tree/skills/skill-tree-unity-process-future-pending/SKILL.md": "7c104cfe7069863465aaca6a72629a1ba1206ccf46fdd300eb755dbaee67b66b",
+    "skill-tree/skills/skill-tree-work-through-next/SKILL.md": "1b3f2eff653aa948a302363a6f4e30d422966f6ab34eff26d9c8bcd1edae9bd3",
+    "skill-tree/src/init-rules/skill-tree-skills.md": "570ea92ee9f9a2dad43a37245cc7cc8cb7483809b2fba7a6d96d503e415b8d2c"
+  },
+  "sources": [
+    "AGENTS.md",
+    "README.md",
+    "skill-tree/common/references/future-workflow.md",
+    "skill-tree/common/references/orchestration.md",
+    "skill-tree/src/init-rules/skill-tree-skills.md",
+    "skill-tree/skills/skill-tree-process-future-pending/SKILL.md",
+    "skill-tree/skills/skill-tree-unity-process-future-pending/SKILL.md",
+    "skill-tree/skills/skill-tree-work-through-next/SKILL.md",
+    "skill-tree/skills/skill-tree-implement-all/SKILL.md",
+    "skill-tree/config/resource-map.json",
+    "skill-tree/scripts/sync-skill-references.py"
+  ]
+}

@@ -8,11 +8,18 @@
       "scope": "skill-tree-source-qualification"
     },
     {
-      "fresh": true,
+      "fresh": false,
       "id": "A-ddb19c32-cfaf-41a4-8403-2f408cc0f913",
       "path": "skill-tree/history/audits/audit-a-ddb19c32-cfaf-41a4-8403-2f408cc0f913.json",
       "recorded_at": "2026-09-18T05:01:34.259431+00:00",
       "scope": "skill-tree-source-qualification"
+    },
+    {
+      "fresh": true,
+      "id": "A-49144943-4862-4829-9e25-5f07b591353b",
+      "path": "skill-tree/history/audits/audit-a-49144943-4862-4829-9e25-5f07b591353b.json",
+      "recorded_at": "2026-09-18T06:05:03.412093+00:00",
+      "scope": "Standalone processing choice and bounded controller handoff policy"
     }
   ],
   "canonical_resources": {
@@ -410,10 +417,10 @@
   },
   "latest_audit": {
     "fresh": true,
-    "id": "A-ddb19c32-cfaf-41a4-8403-2f408cc0f913",
-    "path": "skill-tree/history/audits/audit-a-ddb19c32-cfaf-41a4-8403-2f408cc0f913.json",
-    "recorded_at": "2026-09-18T05:01:34.259431+00:00",
-    "scope": "skill-tree-source-qualification"
+    "id": "A-49144943-4862-4829-9e25-5f07b591353b",
+    "path": "skill-tree/history/audits/audit-a-49144943-4862-4829-9e25-5f07b591353b.json",
+    "recorded_at": "2026-09-18T06:05:03.412093+00:00",
+    "scope": "Standalone processing choice and bounded controller handoff policy"
   },
   "policy_references": [
     "AGENTS.md"
@@ -429,9 +436,9 @@
     "skill-tree/bin/install.js": "0bc007b08c0c866e823dad730dcdb5dcaa2dec688eebe12e75ef27bab2e60d92",
     "skill-tree/common/references/document-rules.md": "728617677f017dfb618fd50ff455a6ea7b650f9df7448f372463292a0cb6333a",
     "skill-tree/common/references/documentation-output-contract.md": "4e9bff86bb77783874edf9751d94e59042c4de5884873a81686cbf3c73143eac",
-    "skill-tree/common/references/future-workflow.md": "002f4ada2107baaa88e2d150787ddbcab1116a54d147116a54d40968b50e1f22",
+    "skill-tree/common/references/future-workflow.md": "aee98163111c955a957fbfec1030a407a2dac06d90acd30f97992a2a174f17ea",
     "skill-tree/common/references/history-retention.md": "d31e15b5b39b65024210bc5930e43bc7a910fef4c215a56393e256f852c2458b",
-    "skill-tree/common/references/orchestration.md": "1a4e356580c4830dd25c7a51727ffec04ab83d7fbf49e8e0404d84651eac34d7",
+    "skill-tree/common/references/orchestration.md": "ce179ab2c239f772522642af14608420dd4b382b6d4529eb834378e559b5a19b",
     "skill-tree/common/references/pending-task-format.md": "6c0a90ea992f2c19a26e4f95fc4e45b7ff89d25c0cc8e2c49c11cfa8bad2d8ba",
     "skill-tree/common/references/pending-task-intake.md": "6316cdb6e9b22826b6af956fb9e3b46f9f42056a3345dfde1644c5098da4c296",
     "skill-tree/common/references/repository-discovery-checklist.md": "a112230c076fea515c437e3e7407c575ee6690d772eaa28e68f80c720c7a621c",
@@ -457,7 +464,7 @@
     "skill-tree/scripts/run-tests.py": "00c61ad36efcc208865692e5822f38dd4bbbc036d058bc7e55bc81c3851b711e",
     "skill-tree/scripts/sync-skill-references.py": "1730e0add2b5e563442860e17006a9af5e9ea7714c44fbe93df33bed08594e51",
     "skill-tree/scripts/validate-skill-repository.py": "9288e4550348a2878d7fe3dad2e8ae4805abe1e9a1dd92361e1cb36ac5c316b0",
-    "skill-tree/src/init-rules/skill-tree-skills.md": "054344bd7c1746aac33b6d47304b1ff7d22c99fb20907be06a79f3300bcad37c"
+    "skill-tree/src/init-rules/skill-tree-skills.md": "570ea92ee9f9a2dad43a37245cc7cc8cb7483809b2fba7a6d96d503e415b8d2c"
   },
   "state": null,
   "validation_commands": [

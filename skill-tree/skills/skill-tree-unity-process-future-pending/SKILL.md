@@ -6,7 +6,7 @@ license: MIT
 
 # Skill-Tree-Unity: Process Pending Tasks
 
-Read applicable rules, current documentation, relevant implementation/configuration/tests and [workflow](references/future-workflow.md). Use scripts/workflow-state.py pending to resolve the complete selection before research. Read [metadata](references/workflow-metadata.md) for process payloads. Split oversized work, preserve Pending parent IDs, clarify required decisions and retain blocked intake. Apply researched dispositions through process with the inspected source hash. Return created/reused/retained/resolved IDs. No implementation is implied.
+Read applicable rules, current documentation, relevant implementation/configuration/tests and [workflow](references/future-workflow.md). Use scripts/workflow-state.py pending to resolve the complete selection before research. Read [metadata](references/workflow-metadata.md) for process payloads. Split oversized work, preserve Pending parent IDs, clarify required decisions and retain blocked intake. Apply researched dispositions through process with the inspected source hash. Return created/reused/retained/resolved IDs and the refreshed prioritized list with brief outcomes/blockers. Follow the workflow processing-result contract: standalone invocation presents next choices, places one recommended action last and waits for the developer; explicit Work Through Next/Implement All invocation returns to the bounded controller for automatic eligible selection. An active checkpoint alone implies no continuation.
 
 Read [Unity safety](references/unity-safety.md). Inspect relevant serialized state, pinned versions and lifecycle. Separate static, Editor, Play Mode/UI, player and device evidence; authorization remains scoped.
 
