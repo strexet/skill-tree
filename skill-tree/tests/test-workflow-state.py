@@ -180,4 +180,10 @@ class WorkflowStateTests(unittest.TestCase):
         task=self.main()
         with self.assertRaises(wf.WorkflowError):wf.complete(self.store,{'task_id':task['id'],'outcome':'Behavior delivered.','acceptance':[{'criterion':'Preserve isolated state.','result':'not-run','required':False,'evidence':['test-report.json']}],'source_fingerprints':wf.fingerprints(self.store,['source.cs'])})
 
+    def test_repeated_retained_processing_receipts_do_not_count_as_progress(self):
+        main=self.main();wf.start(self.store,'next');pending=self.pending('Required decision',relation='blocker',root_task_id=main['id'],related_task_id=main['id'])
+        payload={'selectors':[pending['id']],'dispositions':{pending['id']:{'status':'retained','reason':'Required configuration evidence remains unavailable.'}},'tasks':[]}
+        wf.process(self.store,payload);wf.record_cycle(self.store);wf.process(self.store,payload)
+        self.assertEqual(wf.record_cycle(self.store)['phase'],'blocked')
+
 if __name__=='__main__':unittest.main()

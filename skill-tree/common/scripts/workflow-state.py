@@ -511,7 +511,9 @@ def record_cycle(store):
     with store.lock():
         text=store.text();state=store.load(text);run=state['active_run']
         if not run:raise WorkflowError('No active run')
-        signature=digest(dump({'tasks':state['tasks'],'outcomes':[o['task_id'] for o in store.outcomes()],'pending_results':run['processing_results']}).encode())
+        semantic_fields=['id','queue','priority','status','parent_pending_ids','root_task_id','related_task_id','relation','depends_on']
+        task_state=[{key:task[key] for key in semantic_fields} for task in state['tasks']]
+        signature=digest(dump({'tasks':task_state,'outcomes':[o['task_id'] for o in store.outcomes()]}).encode())
         if run.get('cycle_signature')==signature:
             run['phase']='blocked';run['stop_reason']='Completed cycle without task/dependency progress';run['next_action']='Resolve recorded blocker before resumption'
         run['cycle_signature']=signature;store.save(text,state);return run
