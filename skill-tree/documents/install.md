@@ -1,5 +1,7 @@
 # Installation
 
+Local installation requires Node.js 18 or later. Deterministic workflow helpers require Python 3.9 or later and the standard library.
+
 ```sh
 node skill-tree/bin/install.js --list
 node skill-tree/bin/install.js --dry-run --all
