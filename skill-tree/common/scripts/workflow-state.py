@@ -297,6 +297,12 @@ def validate_run(run):
     for key in ['root_task_id','current_task_id']:
         if run[key] is not None and not valid_id(run[key],'T'): raise WorkflowError('Corrupt checkpoint task pointer')
     if not isinstance(run['limits'],dict) or not isinstance(run['processing_results'],list): raise WorkflowError('Corrupt checkpoint limits/results')
+    budget=run['limits'].get('selected_task_budget')
+    if budget is not None:
+        if not isinstance(budget,dict) or set(budget)!={'limit_seconds','used_seconds','rationale'}:raise WorkflowError('Selected-task budget requires limit_seconds, used_seconds and rationale')
+        if type(budget['limit_seconds']) not in {int,float} or budget['limit_seconds']<=0:raise WorkflowError('Selected-task budget limit must be positive')
+        if type(budget['used_seconds']) not in {int,float} or budget['used_seconds']<0:raise WorkflowError('Selected-task budget usage must be non-negative')
+        if not isinstance(budget['rationale'],str) or not budget['rationale'].strip():raise WorkflowError('Selected-task budget requires a concrete rationale')
     if not isinstance(run['phase'],str) or (run['stop_reason'] is not None and not isinstance(run['stop_reason'],str)):raise WorkflowError('Corrupt checkpoint phase/reason')
     for key in ['partial_work','history_refs']:
         if key in run and (not isinstance(run[key],list) or any(not isinstance(v,str) for v in run[key])):raise WorkflowError('Corrupt checkpoint references')
@@ -392,18 +398,12 @@ def start(store,mode,selector=None,limits=None):
         snapshot=[chosen['id']] if mode=='next' else [t['id'] for t in sorted([t for t in tasks if t['queue']=='Prioritized Next Changes'],key=lambda t:-t['priority'])]
         if mode=='all' and selector:raise WorkflowError('Implement All uses the initial prioritized snapshot')
         run={'id':identity('WR'),'mode':mode,'snapshot':snapshot,'root_task_id':chosen['id'],'current_task_id':chosen['id'],'phase':'implement','required_ids':[chosen['id']],'deferred_ids':[],'pending_ids':[],'processing_results':[],'completed_ids':[],'limits':limits or {},'partial_work':[],'stop_reason':None,'next_action':'Implement selected task','started_at':now()}
-        state['active_run']=run;store.save(text,state);return run
+        validate_run(run);state['active_run']=run;store.save(text,state);return run
 
 def enforce_limits(run):
     if run.get('stop_reason'):raise WorkflowError('Run stopped: '+str(run['stop_reason'])+'; resolve the recorded condition before explicit checkpoint resumption')
-    limits=run['limits']
-    deadline=limits.get('deadline')
-    if deadline:
-        try: expired=datetime.now(timezone.utc)>=datetime.fromisoformat(deadline.replace('Z','+00:00'))
-        except (ValueError,TypeError) as exc: raise WorkflowError('Invalid validation deadline') from exc
-        if expired:raise WorkflowError('Original validation deadline exhausted; owner-authorized continuation required')
-    for kind in ['retry','repair','reload']:
-        if limits.get(kind+'_used',0)>limits.get(kind+'_limit',float('inf')):raise WorkflowError('Validation '+kind+' limit exhausted')
+    budget=run['limits'].get('selected_task_budget')
+    if budget is not None and budget['used_seconds']>=budget['limit_seconds']:raise WorkflowError('Selected-task budget exhausted')
 
 def next_task(store):
     state=store.load();run=state['active_run']
@@ -446,7 +446,7 @@ def advance(store):
         store.save(text,state);return result
 
 def checkpoint(store,payload):
-    allowed={'phase','partial_work','stop_reason','next_action','validation_consumed','history_refs'}
+    allowed={'phase','partial_work','stop_reason','next_action','validation_consumed','task_budget_used_seconds','history_refs'}
     if set(payload)-allowed:raise WorkflowError('Checkpoint contains unsupported fields')
     with store.lock():
         text=store.text();state=store.load(text);run=state['active_run']
@@ -454,9 +454,15 @@ def checkpoint(store,payload):
         consumed=payload.get('validation_consumed',{})
         if not isinstance(consumed,dict):raise WorkflowError('Invalid consumed validation counters')
         for k,v in consumed.items():
-            if k not in {'retry_used','repair_used','reload_used'} or type(v) is not int or v<run['limits'].get(k,0):raise WorkflowError('Validation counters cannot decrease or renew limits')
+            if k not in {'retry_used','repair_used','reload_used'} or type(v) is not int or v<run['limits'].get(k,0):raise WorkflowError('Validation counters cannot decrease')
             run['limits'][k]=v
-        run.update({k:v for k,v in payload.items() if k!='validation_consumed'});validate_run(run);store.save(text,state);return run
+        if 'task_budget_used_seconds' in payload:
+            budget=run['limits'].get('selected_task_budget')
+            used=payload['task_budget_used_seconds']
+            if budget is None:raise WorkflowError('No selected-task budget exists')
+            if type(used) not in {int,float} or used<budget['used_seconds']:raise WorkflowError('Selected-task budget usage cannot decrease')
+            budget['used_seconds']=used
+        run.update({k:v for k,v in payload.items() if k not in {'validation_consumed','task_budget_used_seconds'}});validate_run(run);store.save(text,state);return run
 
 def complete(store,payload):
     with store.lock():

@@ -88,10 +88,18 @@ class WorkflowStateTests(unittest.TestCase):
         self.pending('Unrelated work');self.assertEqual(self.store.load()['active_run']['limits']['retry_used'],1)
         with self.assertRaises(wf.WorkflowError):wf.checkpoint(self.store,{'validation_consumed':{'retry_used':0}})
         with self.assertRaises(wf.WorkflowError):wf.start(self.store,'next')
-    def test_expired_limits_cannot_be_renewed(self):
-        self.main();wf.start(self.store,'next',limits={'deadline':'2000-01-01T00:00:00+00:00'})
-        with self.assertRaisesRegex(wf.WorkflowError,'deadline exhausted'):wf.next_task(self.store)
+    def test_recorded_deadline_is_evidence_not_authorization_gate(self):
+        main=self.main();wf.start(self.store,'next',limits={'deadline':'2000-01-01T00:00:00+00:00'})
+        self.assertEqual(wf.next_task(self.store)['task_id'],main['id'])
         with self.assertRaises(wf.WorkflowError):wf.checkpoint(self.store,{'limits':{}})
+    def test_justified_selected_task_budget_is_enforced(self):
+        self.main();wf.start(self.store,'next',limits={'selected_task_budget':{'limit_seconds':100,'used_seconds':0,'rationale':'Bound paid device-lab occupancy.'}})
+        wf.checkpoint(self.store,{'task_budget_used_seconds':100})
+        with self.assertRaisesRegex(wf.WorkflowError,'Selected-task budget exhausted'):wf.next_task(self.store)
+        with self.assertRaisesRegex(wf.WorkflowError,'cannot decrease'):wf.checkpoint(self.store,{'task_budget_used_seconds':99})
+    def test_selected_task_budget_requires_rationale(self):
+        self.main()
+        with self.assertRaisesRegex(wf.WorkflowError,'concrete rationale'):wf.start(self.store,'next',limits={'selected_task_budget':{'limit_seconds':100,'used_seconds':0,'rationale':''}})
     def test_no_progress_cycle_stops_without_breaking_resume(self):
         self.main();wf.start(self.store,'next');wf.record_cycle(self.store);wf.advance(self.store)
         self.assertEqual(wf.record_cycle(self.store)['phase'],'blocked')
