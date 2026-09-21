@@ -6,4 +6,4 @@ Establish the subject, target component, requested change and observable outcome
 
 Keep intake brief. Deep implementation research, detailed alternatives and complete acceptance planning belong to Process Pending. Preserve constraints and exact technical examples; translate request prose into English. Check existing Pending/Prioritized/Backlog entries for duplicates. Explicit update/reuse requests permit scoped changes; ambiguous duplicates require clarification.
 
-Return the Pending identity, title, priority, relationship and deferred details. Intake neither promotes tasks nor grants execution/commit permission.
+Return the Pending identity, title, priority, relationship and deferred details. Intake neither promotes tasks nor grants execution/commit permission. Transient lock waits, transport probes, alternate controls and targeted repairs stay in the active checkpoint. Pending intake requires durable work remaining independently actionable after the current operation.
