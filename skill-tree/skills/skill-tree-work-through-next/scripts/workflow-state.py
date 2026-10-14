@@ -169,6 +169,20 @@ def select(tasks, selector=None):
     if task['status']!='Ready': raise WorkflowError('Selected task has blocking unresolved questions: '+task['id'])
     return task
 
+def validate_dependencies(tasks, completed_ids=()):
+    """Validate the open dependency graph without changing task state."""
+    open_tasks={t['id']:t for t in tasks if t['queue']=='Prioritized Next Changes'}
+    completed=set(completed_ids);visiting=set();visited=set()
+    def visit(task_id):
+        if task_id in completed:return
+        if task_id not in open_tasks:raise WorkflowError('Missing required dependency: '+task_id)
+        if task_id in visiting:raise WorkflowError('Dependency cycle: '+task_id)
+        if task_id in visited:return
+        visiting.add(task_id)
+        for dependency in open_tasks[task_id]['depends_on']:visit(dependency)
+        visiting.remove(task_id);visited.add(task_id)
+    for task_id in open_tasks:visit(task_id)
+
 def render(title,meta,body):
     if not title.strip() or '\n' in title: raise WorkflowError('Task title requires one nonempty line')
     header='\n'.join(k+': '+(json.dumps(meta[k],ensure_ascii=False) if not isinstance(meta[k],str) else meta[k]) for k in FIELDS)
@@ -348,8 +362,30 @@ def process(store,payload):
         for result in dispositions.values():
             if result.get('status') not in {'promoted','retained','resolved'} or not result.get('reason'): raise WorkflowError('Processing disposition requires status and reason')
         for result in dispositions.values():assert_prose(result['reason'])
+        specs=payload.get('tasks',[])
+        if not isinstance(specs,list) or any(not isinstance(spec,dict) for spec in specs):raise WorkflowError('Processing tasks require a list of objects')
+        # Allocate every identity before resolving forward references; no writes occur until validation succeeds.
+        assigned=[spec.get('reuse_id') or identity('T') for spec in specs];keys={}
+        for spec,task_id in zip(specs,assigned):
+            key=spec.get('key')
+            if key is not None:
+                if not isinstance(key,str) or not re.fullmatch(r'[a-z][a-z0-9-]*',key):raise WorkflowError('Task key requires lowercase kebab-case')
+                if key in keys:raise WorkflowError('Duplicate task key: '+key)
+                keys[key]=task_id
+        def dependencies(spec):
+            values=spec.get('depends_on',[])
+            if not isinstance(values,list):raise WorkflowError('Task dependencies require a list')
+            result=[]
+            for value in values:
+                if isinstance(value,str) and value.startswith('@'):
+                    if value[1:] not in keys:raise WorkflowError('Unknown task key: '+value)
+                    value=keys[value[1:]]
+                if not valid_id(value,'T'):raise WorkflowError('Dependency requires a T- ID or @task-key')
+                if value in result:raise WorkflowError('Duplicate dependency: '+value)
+                result.append(value)
+            return result
         pr=identity('PR');produced=[];reused=[]; consumed=set();run=state['active_run']
-        for spec in payload.get('tasks',[]):
+        for spec,task_id in zip(specs,assigned):
             parents=spec.get('parent_pending_ids',[])
             if not parents or not set(parents).issubset(selected_ids): raise WorkflowError('Produced task requires selected Pending provenance')
             sources=[t for t in selected if t['id'] in parents]
@@ -358,14 +394,14 @@ def process(store,payload):
             root,parent,relation=next(iter(contexts));consumed.update(parents)
             if any(dispositions[p]['status']!='promoted' for p in parents): raise WorkflowError('Produced task conflicts with Pending disposition')
             if spec.get('reuse_id'):
-                reused_task=resolve(tasks,[spec['reuse_id']],'Prioritized Next Changes')[0]
+                reused_task=resolve(parse(text),[spec['reuse_id']],'Prioritized Next Changes')[0]
                 if (reused_task['root_task_id'],reused_task['related_task_id'],reused_task['relation'])!=(root or reused_task['id'],parent,relation): raise WorkflowError('Reused task relationship conflicts')
                 merged=list(dict.fromkeys(reused_task['parent_pending_ids']+parents))
-                text=rewrite_meta(text,reused_task['id'],{'parent_pending_ids':merged,'processing_run_id':pr});reused.append(reused_task['id']); continue
+                deps=list(dict.fromkeys(reused_task['depends_on']+dependencies(spec)))
+                text=rewrite_meta(text,reused_task['id'],{'parent_pending_ids':merged,'processing_run_id':pr,'depends_on':deps});reused.append(reused_task['id']); continue
             assert_prose(spec['title']+'\n'+spec['body'])
-            task_id=identity('T')
             priority=spec.get('priority',max(t['priority'] for t in sources))
-            meta={'id':task_id,'priority':priority,'status':'Ready','parent_pending_ids':parents,'processing_run_id':pr,'root_task_id':root or task_id,'related_task_id':parent,'relation':relation,'depends_on':spec.get('depends_on',[])}
+            meta={'id':task_id,'priority':priority,'status':'Ready','parent_pending_ids':parents,'processing_run_id':pr,'root_task_id':root or task_id,'related_task_id':parent,'relation':relation,'depends_on':dependencies(spec)}
             validate_metadata(meta,'Prioritized Next Changes')
             if any(t['id'] not in parents and normalized(t['title'])==normalized(spec['title']) for t in parse(text)): raise WorkflowError('Duplicate produced title requires explicit reuse')
             text=insert(text,'Prioritized Next Changes',render(spec['title'],meta,spec['body']));produced.append(task_id)
@@ -387,7 +423,9 @@ def process(store,payload):
                 key='required_ids' if child['relation'] in {'blocker','subtask'} else 'deferred_ids'
                 if tid not in run[key]:run[key].append(tid)
         text=remove(text,{p for p in selected_ids if dispositions[p]['status']!='retained'})
-        receipt={'id':pr,'selected_ids':[t['id'] for t in selected],'created_ids':produced,'reused_ids':reused,'dispositions':dispositions}
+        completed={o['task_id'] for o in store.outcomes() if o.get('disposition')=='completed'}
+        validate_dependencies(parse(text),completed)
+        receipt={'id':pr,'selected_ids':[t['id'] for t in selected],'created_ids':produced,'reused_ids':reused,'task_keys':keys,'dispositions':dispositions}
         if run: run['processing_results'].append(receipt);run['phase']='dependencies';run['next_action']='Select required task'
         store.save(text,state)
         return receipt
@@ -565,12 +603,19 @@ def history(store,task_id=None,component=None):
         result.append(view)
     return result
 
+def installed_catalog(root):
+    """Discover repository-local Skill Tree packages without an upstream checkout."""
+    entrypoints=set()
+    for pattern in ['.*/skills/skill-tree-*/SKILL.md','.*/agent/skills/skill-tree-*/SKILL.md','skills/skill-tree-*/SKILL.md']:
+        entrypoints.update(root.glob(pattern))
+    return [{'name':p.parent.name,'entrypoint':p.relative_to(root).as_posix(),'resources':[r.relative_to(root).as_posix() for r in sorted(p.parent.rglob('*')) if r.is_file() and '__pycache__' not in r.parts]} for p in sorted(entrypoints) if p.is_file()]
+
 def manifest(store):
     path=store.base/'skill-tree.json';existing=json.loads(path.read_text()) if path.exists() else {}
     role='source' if (store.base/'skills').is_dir() else 'target';files=[]
     for p in sorted((store.base/'documents').glob('*')):
         if p.is_file():files.append({'path':p.relative_to(store.root).as_posix(),'role':'generated-index-and-active-state' if p.name=='future.json' else 'canonical','owner':'skill-tree'})
-    catalog=[]
+    catalog=installed_catalog(store.root) if role=='target' else []
     if role=='source':
         canonical=[*sorted((store.base/'common').rglob('*')),*sorted((store.base/'scripts').glob('*.py')),store.base/'bin/install.js',store.base/'config/providers.json',store.base/'config/resource-map.json',store.base/'src/init-rules/skill-tree-skills.md']
         for p in canonical:

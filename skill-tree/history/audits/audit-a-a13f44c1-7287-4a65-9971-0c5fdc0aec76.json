@@ -1,0 +1,78 @@
+{
+  "checks": [
+    {
+      "check": "python_behavioral_tests",
+      "count": 79,
+      "result": "pass"
+    },
+    {
+      "check": "node_installation_provider_tests",
+      "count": 24,
+      "result": "pass"
+    },
+    {
+      "check": "generated_resource_sync",
+      "result": "pass"
+    },
+    {
+      "check": "strict_source_package_validation",
+      "result": "pass"
+    },
+    {
+      "check": "installer_list_and_dry_run",
+      "result": "pass"
+    },
+    {
+      "check": "source_diff_whitespace",
+      "result": "pass"
+    }
+  ],
+  "coverage_gaps": [
+    "The ancillary quick validator cannot run because the available Python runtime lacks PyYAML; strict source validation checks package frontmatter and resource integrity.",
+    "Live provider installation, Unity execution and external service behavior remain outside source helper qualification."
+  ],
+  "findings": [],
+  "id": "A-a13f44c1-7287-4a65-9971-0c5fdc0aec76",
+  "recorded_at": "2026-10-14T05:55:09.306946+00:00",
+  "scope": "workflow-helper-features",
+  "source_fingerprints": {
+    "README.md": "bf3ad579f3c4827a959f9f27b63e43297ebb063fb4bc6671df08fedf5be21064",
+    "skill-tree/common/references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
+    "skill-tree/common/references/snapshot-rules.md": "fd5069941a5cea4bab8bc89f3750fef60f365728b7eee3c3493400687883f226",
+    "skill-tree/common/references/workflow-metadata.md": "4a00d9614eac9863f82b4a66a145aff2feef30822375f1c14ce0d7fe2925743c",
+    "skill-tree/common/scripts/create-documentation-snapshot.py": "aeabe609b8d2c1a45b5d5e28f7afaaf51fbd42041515822717c530fb42d22adb",
+    "skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+    "skill-tree/common/scripts/validate-repository-documentation.py": "d477dbb1c311bb24d1bf1a5815e5b245b001fd72780b02b8e5d701b5aad8db41",
+    "skill-tree/common/scripts/workflow-state.py": "922f0b477f4f7917d6c56c5a988b8a353fcee06c6359471930bc4e30d90821c0",
+    "skill-tree/documents/implementation-plan.md": "59f6d45ed59a7c5886968d0cd49471904d2d6ef9b48d5107618f99cb7e167a2b",
+    "skill-tree/documents/skill-repository-creation-instructions.md": "a433a28f26c6d19ba267aa7acf717f7c792730c3f3c86b9f0e86f3d798dea150",
+    "skill-tree/scripts/validate-skill-repository.py": "c2b1dcbf66bbff5f49dd8ed88269b5878fcc78c1e59191ea1f760f37c37233f1",
+    "skill-tree/skills/skill-tree-create-documents-snapshot/SKILL.md": "143b28e256550319090c003a15fa3a5e72d1007a30aae565a4e611a4358cdaaf",
+    "skill-tree/skills/skill-tree-repo-documentation-audit/SKILL.md": "3284e832070eed2ce31972968660cf2e96bebb758e9d0e35d02b7b4d11ac9560",
+    "skill-tree/skills/skill-tree-unity-create-documents-snapshot/SKILL.md": "f24338bb2204d268a003083e204accf2f411d62fb25849d9445d0f4fa435943a",
+    "skill-tree/tests/test-documentation-audit-fixtures.py": "56b4e0fa79029ef3b3ad96a0653c616900581c3ab8a049f536f847415fcc27f8",
+    "skill-tree/tests/test-manifest-validation.py": "be75ef268000565c2e76003693257a84083b722fbb9c3a6cb350cdbed42a938f",
+    "skill-tree/tests/test-scoped-snapshots.py": "ba1c2cf2ea6df98f256cd53068ba64e1d071de9f085aaf2d0cc502f1e7d6fb99",
+    "skill-tree/tests/test-workflow-state.py": "12909cc0bda9134963bb9ca022a16d77298085f50e75a5681db0d359e8ba8962"
+  },
+  "sources": [
+    "README.md",
+    "skill-tree/common/references/document-rules.md",
+    "skill-tree/common/references/snapshot-rules.md",
+    "skill-tree/common/references/workflow-metadata.md",
+    "skill-tree/common/scripts/create-documentation-snapshot.py",
+    "skill-tree/common/scripts/validate-document-rules.py",
+    "skill-tree/common/scripts/validate-repository-documentation.py",
+    "skill-tree/common/scripts/workflow-state.py",
+    "skill-tree/documents/implementation-plan.md",
+    "skill-tree/documents/skill-repository-creation-instructions.md",
+    "skill-tree/scripts/validate-skill-repository.py",
+    "skill-tree/tests/test-documentation-audit-fixtures.py",
+    "skill-tree/tests/test-manifest-validation.py",
+    "skill-tree/tests/test-scoped-snapshots.py",
+    "skill-tree/tests/test-workflow-state.py",
+    "skill-tree/skills/skill-tree-create-documents-snapshot/SKILL.md",
+    "skill-tree/skills/skill-tree-unity-create-documents-snapshot/SKILL.md",
+    "skill-tree/skills/skill-tree-repo-documentation-audit/SKILL.md"
+  ]
+}

@@ -19,3 +19,7 @@ Target documentation and task state reside in `skill-tree/documents/`. Structure
 ## Processing Handoff
 
 Standalone Process Pending reports the refreshed prioritized list and asks for the next action, with one recommended action last. Work Through Next and Implement All automatically select the next eligible scoped unit after processing while preserving material questions, validation limits and deferred work. An active checkpoint alone supplies no implementation instruction.
+
+## Helper capabilities
+
+Process Pending resolves payload-local dependency keys into stable T- IDs before atomic persistence. Target manifests index installed local skills; repository validation detects stale hashes/indexes, invalid paths, dependency cycles and corrupt checkpoints without changing state. Prose lint reports located errors and review warnings. Snapshot helpers support `--include` file/directory scope, `--member-style dotted`, `--output-dir root`, explicit output and timestamp options. Shared contracts describe payloads and validation boundaries.

@@ -46,8 +46,12 @@ Run generated resource checks, strict validators, Python/Node tests, installer l
 
 Status: implementation complete. Thirteen standalone skills, lowercase source layout, current document contracts, stable task identities, numeric priorities, targeted processing, resumable dependency orchestration, navigation manifests and compact bounded evidence are implemented.
 
-Qualification: 50 Python behavioral checks and 24 Node installation/provider checks pass. Standalone orchestrators complete temporary fixture runs without sibling packages. Synchronization, strict repository validation, installer list/dry-run and diff checks pass. Unity execution, live provider reinstallation and scheduling remain outside the approved source scope.
+Qualification: 79 Python behavioral checks and 24 Node installation/provider checks pass. Standalone orchestrators complete temporary fixture runs without sibling packages. Synchronization, strict repository validation, installer list/dry-run and diff checks pass. Unity execution, live provider reinstallation and scheduling remain outside the approved source scope.
 
 Validation gap: the ancillary bundled quick validator cannot run because available Python runtimes lack PyYAML. Strict repository validation checks current frontmatter, naming, resource integrity and document rules.
 
 Implementation commit references: `91f0bd1`, `86f7af9`, `061222e`. The navigation manifest points to the current qualification audit and evidence. A task-owned qualification metadata diff requires the final authorized local documentation commit; a clean worktree requires no remaining source work. Publication and live-project setup require separate scope.
+
+## Workflow helper capabilities
+
+Process Pending supports payload-local task keys and forward dependency references, validates the complete required graph before saving, and returns the stable identity map. Target manifests catalog installed local packages. Repository validation checks persisted metadata schemas, canonical paths/hashes, index agreement, required dependency closure and active checkpoint consistency without replacing state. Prose diagnostics include source locations and warning/error categories. Snapshot helpers accept explicit file/directory scope, dotted member naming and root output while preserving default artifact conventions and live documents.

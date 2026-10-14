@@ -50,6 +50,49 @@ class WorkflowStateTests(unittest.TestCase):
         b=self.pending('Merge B');c=self.pending('Merge C')
         receipt=wf.process(self.store,{'selectors':[b['id'],c['id']],'dispositions':{p['id']:{'status':'promoted','reason':'One coherent outcome.'} for p in [b,c]},'tasks':[{'title':'Merged outcome','body':self.body(),'parent_pending_ids':[b['id'],c['id']]}]})
         self.assertEqual(set(wf.resolve(wf.parse(self.store.text()),[receipt['created_ids'][0]])[0]['parent_pending_ids']),{b['id'],c['id']})
+    def process_specs(self,pending,specs):
+        return wf.process(self.store,{'selectors':[pending['id']],'dispositions':{pending['id']:{'status':'promoted','reason':'Research confirms bounded implementation units.'}},'tasks':specs})
+    def spec(self,pending,title,key,dependencies=()):
+        return {'title':title,'key':key,'body':self.body(),'parent_pending_ids':[pending['id']],'depends_on':list(dependencies)}
+    def test_split_forward_dependency_resolves_keys_atomically_and_orders_execution(self):
+        p=self.pending('Storage scope')
+        receipt=self.process_specs(p,[self.spec(p,'Migration','migration',['@storage']),self.spec(p,'Storage schema','storage')])
+        tasks=wf.parse(self.store.text());migration=wf.resolve(tasks,[receipt['task_keys']['migration']])[0];schema=wf.resolve(tasks,[receipt['task_keys']['storage']])[0]
+        self.assertEqual(migration['depends_on'],[schema['id']]);self.assertEqual(migration['parent_pending_ids'],[p['id']])
+        wf.start(self.store,'next',migration['id']);self.assertEqual(wf.next_task(self.store)['task_id'],schema['id'])
+    def test_invalid_split_dependency_graph_preserves_queue_index_manifest_and_checkpoint(self):
+        self.main();wf.start(self.store,'next');p=self.pending('Split scope')
+        before={path:path.read_bytes() for path in self.store.base.rglob('*') if path.is_file()}
+        invalid=[
+            [self.spec(p,'Unit A','a',['@missing'])],
+            [self.spec(p,'Unit A','same'),self.spec(p,'Unit B','same')],
+            [self.spec(p,'Unit A','a',['@b']),self.spec(p,'Unit B','b',['@a'])],
+            [self.spec(p,'Unit A','a',['@a'])],
+            [self.spec(p,'Unit A','a',[wf.identity('T')])],
+            [self.spec(p,'Unit A','a',[p['id']])],
+        ]
+        for specs in invalid:
+            with self.subTest(specs=specs):
+                with self.assertRaises(wf.WorkflowError):self.process_specs(p,specs)
+                self.assertEqual(before,{path:path.read_bytes() for path in self.store.base.rglob('*') if path.is_file()})
+    def test_reused_contract_can_depend_on_new_sibling_and_receipt_resolves_both(self):
+        parent=self.main();p=self.pending('Related scope')
+        receipt=self.process_specs(p,[{'key':'existing','reuse_id':parent['id'],'parent_pending_ids':[p['id']],'depends_on':['@fixture']},self.spec(p,'Fixture','fixture')])
+        task=wf.resolve(wf.parse(self.store.text()),[parent['id']])[0]
+        self.assertEqual(task['depends_on'],[receipt['task_keys']['fixture']]);self.assertEqual(receipt['task_keys']['existing'],parent['id'])
+    def test_reuse_cycle_with_existing_task_is_rejected_before_save(self):
+        a=self.main('Unit A');b=self.main('Unit B');p=self.pending('Dependency extension')
+        text=wf.rewrite_meta(self.store.text(),a['id'],{'depends_on':[b['id']]});self.store.future.write_text(text)
+        before=self.store.future.read_bytes()
+        with self.assertRaisesRegex(wf.WorkflowError,'cycle'):
+            self.process_specs(p,[{'reuse_id':b['id'],'parent_pending_ids':[p['id']],'depends_on':[a['id']]}])
+        self.assertEqual(before,self.store.future.read_bytes())
+    def test_completed_dependency_accepts_ledger_but_cancelled_dependency_does_not(self):
+        done=self.main('Completed fixture');self.complete(done);p=self.pending('Consumer')
+        receipt=self.process_specs(p,[self.spec(p,'Consumer task','consumer',[done['id']])]);self.assertTrue(receipt['created_ids'])
+        cancelled=self.main('Cancelled fixture');wf.complete(self.store,{'task_id':cancelled['id'],'disposition':'cancelled','outcome':'The fixture scope is withdrawn.'});p=self.pending('Second consumer')
+        with self.assertRaisesRegex(wf.WorkflowError,'Missing required dependency'):self.process_specs(p,[self.spec(p,'Second task','second',[cancelled['id']])])
+
     def test_explicit_reuse_extends_provenance_without_duplicate_task(self):
         main=self.main();p=self.pending('Compatible clarification')
         result=wf.process(self.store,{'selectors':[p['id']],'dispositions':{p['id']:{'status':'promoted','reason':'Same scope.'}},'tasks':[{'reuse_id':main['id'],'parent_pending_ids':[p['id']]}]})

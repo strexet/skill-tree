@@ -15,11 +15,18 @@
       "scope": "skill-tree-source-qualification"
     },
     {
-      "fresh": true,
+      "fresh": false,
       "id": "A-49144943-4862-4829-9e25-5f07b591353b",
       "path": "skill-tree/history/audits/audit-a-49144943-4862-4829-9e25-5f07b591353b.json",
       "recorded_at": "2026-09-18T06:05:03.412093+00:00",
       "scope": "Standalone processing choice and bounded controller handoff policy"
+    },
+    {
+      "fresh": true,
+      "id": "A-a13f44c1-7287-4a65-9971-0c5fdc0aec76",
+      "path": "skill-tree/history/audits/audit-a-a13f44c1-7287-4a65-9971-0c5fdc0aec76.json",
+      "recorded_at": "2026-10-14T05:55:09.306946+00:00",
+      "scope": "workflow-helper-features"
     }
   ],
   "canonical_resources": {
@@ -417,10 +424,10 @@
   },
   "latest_audit": {
     "fresh": true,
-    "id": "A-49144943-4862-4829-9e25-5f07b591353b",
-    "path": "skill-tree/history/audits/audit-a-49144943-4862-4829-9e25-5f07b591353b.json",
-    "recorded_at": "2026-09-18T06:05:03.412093+00:00",
-    "scope": "Standalone processing choice and bounded controller handoff policy"
+    "id": "A-a13f44c1-7287-4a65-9971-0c5fdc0aec76",
+    "path": "skill-tree/history/audits/audit-a-a13f44c1-7287-4a65-9971-0c5fdc0aec76.json",
+    "recorded_at": "2026-10-14T05:55:09.306946+00:00",
+    "scope": "workflow-helper-features"
   },
   "policy_references": [
     "AGENTS.md"
@@ -434,36 +441,36 @@
   "role": "source",
   "source_digests": {
     "skill-tree/bin/install.js": "0bc007b08c0c866e823dad730dcdb5dcaa2dec688eebe12e75ef27bab2e60d92",
-    "skill-tree/common/references/document-rules.md": "728617677f017dfb618fd50ff455a6ea7b650f9df7448f372463292a0cb6333a",
+    "skill-tree/common/references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "skill-tree/common/references/documentation-output-contract.md": "4e9bff86bb77783874edf9751d94e59042c4de5884873a81686cbf3c73143eac",
-    "skill-tree/common/references/future-workflow.md": "aee98163111c955a957fbfec1030a407a2dac06d90acd30f97992a2a174f17ea",
+    "skill-tree/common/references/future-workflow.md": "6bcb0563fabccf5d1ad73e2be61aeef82211a5a3acc4552e253ce71cb0f6d58c",
     "skill-tree/common/references/history-retention.md": "d31e15b5b39b65024210bc5930e43bc7a910fef4c215a56393e256f852c2458b",
-    "skill-tree/common/references/orchestration.md": "ce179ab2c239f772522642af14608420dd4b382b6d4529eb834378e559b5a19b",
+    "skill-tree/common/references/orchestration.md": "813bf5b144831654f9b0a906c94c3c8191007c171e7333660f9a6ca86e48105a",
     "skill-tree/common/references/pending-task-format.md": "6c0a90ea992f2c19a26e4f95fc4e45b7ff89d25c0cc8e2c49c11cfa8bad2d8ba",
-    "skill-tree/common/references/pending-task-intake.md": "6316cdb6e9b22826b6af956fb9e3b46f9f42056a3345dfde1644c5098da4c296",
+    "skill-tree/common/references/pending-task-intake.md": "d3a108aa459637d70f348937c8e93d18ee226a261eb0ac7cdfe9630865a87b88",
     "skill-tree/common/references/repository-discovery-checklist.md": "a112230c076fea515c437e3e7407c575ee6690d772eaa28e68f80c720c7a621c",
-    "skill-tree/common/references/snapshot-rules.md": "754e152d0540813e1a18c75b0cbd5c938dee9799afe138366d232dc6a4370c47",
-    "skill-tree/common/references/unity-safety.md": "676c4c4ccd5c7ed2c7c2ba1c7cdb52ae6d728eb3da32ea3a603417d82136ee2d",
-    "skill-tree/common/references/workflow-metadata.md": "1c13c9f98a6a60893f3a25f62d08d1f8051aa71ca79c4be091d9ad858920f5ef",
-    "skill-tree/common/scripts/create-documentation-snapshot.py": "2bca468dc5c8c4da9b50f4a64321ccba93689bcf1d665b22a64b3dd4011a1da8",
+    "skill-tree/common/references/snapshot-rules.md": "fd5069941a5cea4bab8bc89f3750fef60f365728b7eee3c3493400687883f226",
+    "skill-tree/common/references/unity-safety.md": "b580f4d62c2297c343682df0a3fb9cd535b33569e86dd428c4465303c5af72b9",
+    "skill-tree/common/references/workflow-metadata.md": "4a00d9614eac9863f82b4a66a145aff2feef30822375f1c14ce0d7fe2925743c",
+    "skill-tree/common/scripts/create-documentation-snapshot.py": "aeabe609b8d2c1a45b5d5e28f7afaaf51fbd42041515822717c530fb42d22adb",
     "skill-tree/common/scripts/inspect-unity-repository.py": "794230aca0f338a9d5a6ce7dd62df2016c9d13fb9622174429f9188225fb78e9",
     "skill-tree/common/scripts/select-prioritized-task.py": "93f12ac5a333fb072bf8d9d849d08e3b422af856d582d492902647efe35c896f",
-    "skill-tree/common/scripts/validate-document-rules.py": "ac6e91bb15413acfa4cd4545d5cb4d3345667adfb0bf78c8c77e4f6c298de96d",
+    "skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     "skill-tree/common/scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
-    "skill-tree/common/scripts/validate-repository-documentation.py": "b2ec19da70c3682af19aefdf0a6248a7b34b5907d97a04d77674a83a7b5173cd",
-    "skill-tree/common/scripts/workflow-state.py": "e2fbd6cd8fa9176476d7c0043aff9842ad3700e73cf1de4e685f7e34f336504b",
+    "skill-tree/common/scripts/validate-repository-documentation.py": "d477dbb1c311bb24d1bf1a5815e5b245b001fd72780b02b8e5d701b5aad8db41",
+    "skill-tree/common/scripts/workflow-state.py": "922f0b477f4f7917d6c56c5a988b8a353fcee06c6359471930bc4e30d90821c0",
     "skill-tree/config/providers.json": "80255fe3fb67e32d71cc7791aee1e51c1d34a508d4c77b6ca852521907ede97a",
     "skill-tree/config/resource-map.json": "a76135911fdfced2c8ae984dccc7b6b4e608ff3b4751c8e2cc10a9dfca8c5eaa",
     "skill-tree/documents/agent-compatibility.md": "b4899ab5b15c55a53847ed1b0536c5fa90a55b3b73f721cabc3f36de6694ea22",
-    "skill-tree/documents/implementation-plan.md": "fe18f8cff6c8a72b1176d5a27b687b392a83b8ab3711e4ef4cbb8af4ebc725a1",
+    "skill-tree/documents/implementation-plan.md": "59f6d45ed59a7c5886968d0cd49471904d2d6ef9b48d5107618f99cb7e167a2b",
     "skill-tree/documents/install.md": "de39726d7f734307b11e025cf3eed896ad035ff9e47b60dbc47b263f52834b90",
     "skill-tree/documents/installation-architecture.md": "0cb16d1238944805e4b30963e29828ca041af376d07d1819a3108c3ce1ab7a15",
     "skill-tree/documents/repo-init-instructions.md": "303b5a91dbab80e78d74ac19a20405204440f3940ac3514ab29e1e3cab9349f0",
     "skill-tree/documents/security.md": "871f265b80b401e787d3091a84a885cca1fcf34b4d354a9efeaee4ab1c84bfd6",
-    "skill-tree/documents/skill-repository-creation-instructions.md": "774549ee1bb0bf562ded6dac45aea79a5970dcd66a3387ce6228459219a797e3",
+    "skill-tree/documents/skill-repository-creation-instructions.md": "a433a28f26c6d19ba267aa7acf717f7c792730c3f3c86b9f0e86f3d798dea150",
     "skill-tree/scripts/run-tests.py": "00c61ad36efcc208865692e5822f38dd4bbbc036d058bc7e55bc81c3851b711e",
     "skill-tree/scripts/sync-skill-references.py": "1730e0add2b5e563442860e17006a9af5e9ea7714c44fbe93df33bed08594e51",
-    "skill-tree/scripts/validate-skill-repository.py": "9288e4550348a2878d7fe3dad2e8ae4805abe1e9a1dd92361e1cb36ac5c316b0",
+    "skill-tree/scripts/validate-skill-repository.py": "c2b1dcbf66bbff5f49dd8ed88269b5878fcc78c1e59191ea1f760f37c37233f1",
     "skill-tree/src/init-rules/skill-tree-skills.md": "570ea92ee9f9a2dad43a37245cc7cc8cb7483809b2fba7a6d96d503e415b8d2c"
   },
   "state": null,

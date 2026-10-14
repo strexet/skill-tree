@@ -10,7 +10,7 @@ Each package contains `SKILL.md` with YAML name/description/license fields, opti
 
 ## Document contract
 
-Generated prose uses English, current declarative descriptions and explicit entities instead of pronouns. Technical identifiers and externally required syntax retain exact spelling. Owned files/directories use lowercase kebab-case. Required discovery filenames and standard manifests are exceptions. Current documentation owns current behavior; future.md owns planned work; compact history owns recorded outcomes. No migration handlers, format converters or legacy aliases are supported.
+Generated prose uses English, current declarative descriptions and explicit entities instead of ambiguous pronouns. Quoted technical labels and grammatical clauses retain exact meaning; prose warnings require contextual review. Technical identifiers and externally required syntax retain exact spelling. Owned files/directories use lowercase kebab-case. Required discovery filenames and standard manifests are exceptions. Current documentation owns current behavior; future.md owns planned work; compact history owns recorded outcomes. No migration handlers, format converters or legacy aliases are supported.
 
 ## Source changes
 

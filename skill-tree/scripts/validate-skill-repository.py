@@ -53,14 +53,12 @@ def validate(strict=False):
         rulepath=core/'common/scripts/validate-document-rules.py';spec=importlib.util.spec_from_file_location('document_rules',rulepath);rules=importlib.util.module_from_spec(spec);spec.loader.exec_module(rules)
         for path in [*core.rglob('*.md'),repo/'README.md',repo/'AGENTS.md',repo/'CLAUDE.md',repo/'GEMINI.md']:
             if 'fixtures' not in path.parts and 'artifacts' not in path.parts:
-                errors.extend(str(path.relative_to(repo))+': '+e for e in rules.check(path))
+                errors.extend(rules.check(path,warnings_as_errors=True))
     manifest=core/'skill-tree.json'
     if manifest.exists():
-        data=json.loads(manifest.read_text())
-        if {s['name'] for s in data.get('catalog',[])}!=actual:errors.append('Manifest skill catalog stale')
-        for item in data.get('files',[]):
-            rel=item['path'];target=repo/rel
-            if Path(rel).is_absolute() or '..' in Path(rel).parts or not target.exists():errors.append('Invalid manifest path: '+rel)
+        validator=core/'common/scripts/validate-repository-documentation.py'
+        spec=importlib.util.spec_from_file_location('repository_documentation',validator);module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        errors.extend(module.validate_manifest(repo)['errors'])
     return {'ok':not errors,'errors':errors}
 
 def main(argv=None):
