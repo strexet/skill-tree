@@ -680,6 +680,11 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/lib/installation.js",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/templates/invariants.json",
       "role": "canonical"
     },
@@ -769,7 +774,7 @@
   "role": "source",
   "source_digests": {
     ".skill-tree/bin/compose.js": "92bb585ca4d16748061aab5483650efdc3607751946d5df3b30dfdeab38d5a54",
-    ".skill-tree/bin/install.js": "2945c9aa8897f16e1f82d0315d2d86e51587c049180b9c2a1103a7bb6d61f960",
+    ".skill-tree/bin/install.js": "4a9d2a893313c7ffc83c58b32fc863004d60c3a8dff410b03e1610d88fb12b4a",
     ".skill-tree/common/references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     ".skill-tree/common/references/documentation-output-contract.md": "306022e9c5d87bdc068e9270a211ee992d999efeb975783c59c5bf9f06f72a42",
     ".skill-tree/common/references/future-workflow.md": "6bcb0563fabccf5d1ad73e2be61aeef82211a5a3acc4552e253ce71cb0f6d58c",
@@ -789,14 +794,14 @@
     ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     ".skill-tree/common/scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
     ".skill-tree/common/scripts/validate-repository-documentation.py": "1065967019c4e71fd81ae49edc4f8a6a39f8e1d9a6bf984ca4a42527cc15b326",
-    ".skill-tree/common/scripts/workflow-state.py": "58d6a637e72b31d01b800b30ffaad4b3226e035129d03c001b8b4c84087e9e27",
+    ".skill-tree/common/scripts/workflow-state.py": "55eb17791f015e22413c53455bb0874a39dd64b8492bb3a131007551c989dba4",
     ".skill-tree/config/capabilities.json": "84b9f008ab33bdc188fa19dbb906b384a52cb5bc720b9b13c8767fc759b026d4",
     ".skill-tree/config/flavors.json": "4dac636990132918271f68cccb7e5daf5a8428c7f79e21957ce01f3ef35a3d09",
     ".skill-tree/config/providers.json": "80255fe3fb67e32d71cc7791aee1e51c1d34a508d4c77b6ca852521907ede97a",
     ".skill-tree/config/repository.json": "cdc6218cb1003e00d1e3d703de079a476d283ab6a27132a581078c8228c1eef7",
     ".skill-tree/config/resource-map.json": "db55c5897e58749bf0b54febf364ecce21f202305fa7f1cfb998da3e9f873d60",
     ".skill-tree/documents/agent-compatibility.md": "f3a154273909067262ee90fa7a944f7149468c38102eeb3e4ea852435f1b8e29",
-    ".skill-tree/documents/future.md": "d64b3ef799d39e1f813fc93d5844e8cf9f69d2dfad516aedb8743ab7d2778487",
+    ".skill-tree/documents/future.md": "178797c4180a4cb33156be34388d28284256dc8ecdf13d483a66136e2188bd12",
     ".skill-tree/documents/implementation-plan.md": "7f85a4ec6bf302c26be6e832e43da349f35064b5b7b9b110281c940ba250225e",
     ".skill-tree/documents/install.md": "69762781fdd64fe84fdc8ac528c17d589ed83e269884e92f9726c25fd51b2f29",
     ".skill-tree/documents/installation-architecture.md": "cbf2088a256139a2b95c8e4193910d7f2000fcadfff64a4271d47357959fdf8e",
@@ -808,12 +813,13 @@
     ".skill-tree/domains/unity/sections.json": "30c1399b1649fed8be6c45dc5e8ec88d55770cd08f0cdc340973d47ae9c3fd9c",
     ".skill-tree/domains/web/sections.json": "fe03c8a26d9977e21fd6c81ea2d5f484d9702a0f97c02749c2780f8f58cdbcd1",
     ".skill-tree/lib/composer.js": "bb8f73942e677a158caa79405ed799fbc191b84a65c10e56cd93718bdb52efb8",
+    ".skill-tree/lib/installation.js": "6c9811b15db6693a7fe6e8ab4c0c7d04de52e9cf881e2b9e1ccb33ca83323976",
     ".skill-tree/scripts/run-tests.py": "00c61ad36efcc208865692e5822f38dd4bbbc036d058bc7e55bc81c3851b711e",
     ".skill-tree/scripts/sync-skill-references.py": "7362077b0b1d031c88af9a1ddb7cfe8ddc2bc3472e64cb470100ac24038404b9",
     ".skill-tree/scripts/validate-skill-repository.py": "79a5f44291b66cdfe8637a63609781e540168d2a43d2a98f870a1d2bebd44286",
     ".skill-tree/src/init-rules/skill-tree-skills.md": "74cb9a275ce1bcd845c31eae44101e79e5adcd02875d84f1a4c8feb1744716fd",
     ".skill-tree/templates/invariants.json": "4545894b07fab5f222d15eddd17c220408a4be8a5e5f25da3a4a34ef06bb87b5",
-    ".skill-tree/templates/operations.json": "87262b9a1dfd25c0300a6365d3f0aa4304ce34438227d82081e291b716bded8d"
+    ".skill-tree/templates/operations.json": "61a12eb54d60fa6d68b7a4c9c96cae1b669dac4b6f9d57a8cfc55aa9429f9fe5"
   },
   "state": ".skill-tree/documents/future.json",
   "validation_commands": [

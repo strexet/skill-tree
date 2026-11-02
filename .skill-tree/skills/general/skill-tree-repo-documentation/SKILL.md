@@ -12,6 +12,6 @@ Read repository-owner rules before action. Exact prioritized selection, required
 
 Read applicable repository rules and [output contract](references/documentation-output-contract.md). Inspect source using [discovery](references/repository-discovery-checklist.md). Create the required current document set; preserve unowned instructions. Read [metadata](references/workflow-metadata.md); initialize future.md explicitly, then refresh index and manifest. Capture confirmed documentation findings in Backlog with stable IDs and evidence. Review document rules and validators; report verified facts, unknowns and actual checks.
 
-Generated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency.
+Generated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency. After queue setup, run scripts/workflow-state.py capture-foundation against the covered root; report the captured or reused Pending ID before implementation selection.
 
 Use repository-discovered tools and concrete profile recipes. Platform-neutral checks establish only the recorded assertions; product/runtime claims require matching evidence.

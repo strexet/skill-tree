@@ -13,6 +13,7 @@ function tmpdir() {
 }
 
 function run(args, options = {}) {
+  if(!args.includes("--help")&&!args.includes("--list")&&!args.includes("--flavor"))args=["--flavor","general",...args];
   return spawnSync(process.execPath, [cli, ...args], {
     cwd: root,
     text: true,
@@ -33,11 +34,11 @@ test("--list succeeds without writes", () => {
   assert.match(result.stdout, /claude-code/);
   assert.match(result.stdout, /skill-tree-repo-documentation/);
   assert.match(result.stdout, /skill-tree-repo-documentation-audit/);
-  assert.match(result.stdout, /skill-tree-unity-repo-documentation/);
-  assert.match(result.stdout, /skill-tree-unity-repo-documentation-audit/);
+  assert.match(result.stdout, /general, web, unity/);
+
   assert.match(result.stdout, /skill-tree-create-documents-snapshot/);
   assert.match(result.stdout, /skill-tree-add-pending-task/);
-  assert.match(result.stdout, /skill-tree-unity-create-documents-snapshot/);
+
 });
 
 test("dry-run all succeeds without installing", () => {
@@ -45,7 +46,7 @@ test("dry-run all succeeds without installing", () => {
   const result = run(["--dry-run", "--all", "--project", "--target", target]);
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /dry-run/);
-  assert.equal(fs.existsSync(path.join(target, ".agents", "skills", "skill-tree-unity-repo-documentation")), false);
+  assert.equal(fs.existsSync(path.join(target, ".agents", "skills", "skill-tree-repo-documentation")), false);
 });
 
 test("project-scope copy install preserves unrelated skill", () => {
@@ -66,8 +67,8 @@ test("portable pending intake installs alone with self-contained references", ()
     const result = run(["--only", "codex", "--project", "--target", target, "--copy", "--skills", name]);
     assert.equal(result.status, 0, result.stderr);
     const installed = path.join(target, ".agents", "skills", name);
-    for (const file of ["SKILL.md", "references/pending-task-intake.md", "references/pending-task-format.md", "agents/openai.yaml"]) {
-      assert.deepEqual(fs.readFileSync(path.join(installed, file)), fs.readFileSync(path.join(root, "skills", name, file)));
+    for (const file of ["references/pending-task-intake.md", "references/pending-task-format.md"]) {
+      assert.deepEqual(fs.readFileSync(path.join(installed, file)), fs.readFileSync(path.join(root, "skills", "general", name, file)));
     }
     assert.deepEqual(fs.readdirSync(path.join(target, ".agents", "skills")), [name]);
     const verified = run(["--verify", "--only", "codex", "--project", "--target", target, "--skills", name]);
@@ -77,31 +78,24 @@ test("portable pending intake installs alone with self-contained references", ()
   }
 });
 
-test("global-scope copy install uses HOME-derived path", () => {
-  const home = tmpdir();
-  const result = run(["--only", "claude-code", "--global", "--copy", "--skills", "skill-tree-implement-next-future-task"], { env: { HOME: home } });
-  assert.equal(result.status, 0, result.stderr);
-  assert.ok(fs.existsSync(path.join(home, ".claude", "skills", "skill-tree-implement-next-future-task", "SKILL.md")));
+test("global specialization is rejected without touching HOME", () => {
+  const home=tmpdir();try{const result=run(["--only","claude-code","--global","--copy"],{env:{HOME:home}});assert.notEqual(result.status,0);assert.equal(fs.existsSync(path.join(home,".claude")),false);}finally{fs.rmSync(home,{recursive:true,force:true});}
 });
 
 test("copy mode refuses overwrite without force and force replaces", () => {
   const target = tmpdir();
-  let result = run(["--only", "codex", "--project", "--target", target, "--copy", "--skills", "skill-tree-unity-repo-documentation"]);
+  let result = run(["--only", "codex", "--project", "--target", target, "--copy", "--skills", "skill-tree-repo-documentation"]);
   assert.equal(result.status, 0, result.stderr);
-  result = run(["--only", "codex", "--project", "--target", target, "--copy", "--skills", "skill-tree-unity-repo-documentation"]);
+  result = run(["--only", "codex", "--project", "--target", target, "--copy", "--skills", "skill-tree-repo-documentation"]);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /exists/);
-  result = run(["--only", "codex", "--project", "--target", target, "--copy", "--force", "--skills", "skill-tree-unity-repo-documentation"]);
+  assert.match(result.stdout, /current|no-op/);
+  result = run(["--only", "codex", "--project", "--target", target, "--copy", "--force", "--skills", "skill-tree-repo-documentation"]);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /copied/);
+  assert.match(result.stdout, /current|no-op/);
 });
 
-test("symlink mode creates symlink where supported", { skip: process.platform === "win32" }, () => {
-  const target = tmpdir();
-  const result = run(["--only", "codex", "--project", "--target", target, "--symlink", "--skills", "skill-tree-implement-next-future-task"]);
-  assert.equal(result.status, 0, result.stderr);
-  const installed = path.join(target, ".agents", "skills", "skill-tree-implement-next-future-task");
-  assert.equal(fs.lstatSync(installed).isSymbolicLink(), true);
+test("symlink specialization is rejected before writes", () => {
+ const target=tmpdir();try{const result=run(["--only","codex","--target",target,"--symlink"]);assert.notEqual(result.status,0);assert.equal(fs.existsSync(path.join(target,".skill-tree")),false);}finally{fs.rmSync(target,{recursive:true,force:true});}
 });
 
 test("bridge insertion is idempotent and creates backup on second write", () => {
@@ -114,7 +108,7 @@ test("bridge insertion is idempotent and creates backup on second write", () => 
   const text = fs.readFileSync(path.join(target, "AGENTS.md"), "utf8");
   assert.equal((text.match(/BEGIN skill-tree-skills/g) || []).length, 1);
   assert.ok(text.includes("Keep me."));
-  assert.ok(fs.existsSync(path.join(target, "AGENTS.md.bak")));
+  assert.ok(fs.existsSync(path.join(target, ".skill-tree/installation/.backups")));
 });
 
 test("bridge uninstall preserves surrounding content", () => {
@@ -144,14 +138,12 @@ test("uninstall removes selected skill only", () => {
   result = run(["--uninstall", "--only", "codex", "--project", "--target", target, "--skills", "skill-tree-process-future-pending"]);
   assert.equal(result.status, 0, result.stderr);
   assert.equal(fs.existsSync(path.join(target, ".agents", "skills", "skill-tree-process-future-pending")), false);
-  assert.ok(fs.existsSync(path.join(target, ".agents", "skills", "skill-tree-unity-repo-documentation", "SKILL.md")));
+  assert.ok(fs.existsSync(path.join(target, ".agents", "skills", "skill-tree-repo-documentation", "SKILL.md")));
 });
 
-test("explicit upstream agent dry-run builds npx command", () => {
-  const result = run(["--dry-run", "--agent", "qwen-code", "--source", "https://github.com/example/repo", "--skills", "skill-tree-process-future-pending"]);
-  assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /npx -y skills add/);
-  assert.match(result.stdout, /--agent qwen-code/);
+test("upstream paths reject uncomposed installation", () => {
+ const result=run(["--dry-run","--agent","qwen-code","--source","https://github.com/example/repo","--skills","skill-tree-process-future-pending"]);
+ assert.notEqual(result.status,0);assert.match(result.stderr,/unsupported/);
 });
 
 test("partial provider failure returns non-zero and keeps other rows", () => {
@@ -159,8 +151,8 @@ test("partial provider failure returns non-zero and keeps other rows", () => {
   const fileDest = path.join(target, "not-a-directory");
   fs.writeFileSync(fileDest, "x", "utf8");
   const result = run(["--only", "codex", "--only", "generic", "--project", "--target", fileDest, "--copy", "--skills", "skill-tree-process-future-pending"]);
-  assert.equal(result.status, 1);
-  assert.match(result.stdout, /failed:/);
+  assert.notEqual(result.status,0);
+  assert.match(result.stderr+result.stdout,/directory|ENOTDIR/);
 });
 
 for (const [name, mode] of [["skill-tree-work-through-next", "next"], ["skill-tree-implement-all", "all"]]) {

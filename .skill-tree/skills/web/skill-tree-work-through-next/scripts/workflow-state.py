@@ -350,6 +350,21 @@ def intake(store,payload):
         store.save(text,state)
         return meta
 
+def capture_foundation(store):
+    profile=store.base/'installation/profile.json'
+    if not profile.is_file():return {'status':'no-profile'}
+    value=json.loads(profile.read_text());gap=next((g for g in value.get('gaps',[]) if g.get('key')=='test-foundation'),None)
+    if not gap:return {'status':'no-gap'}
+    if not store.future.is_file():return {'status':'deferred-until-documentation-setup','gap':gap}
+    title='Configure foundational tests for the covered project'
+    existing=next((t for t in parse(store.text()) if normalized(t['title'])==normalized(title)),None)
+    if existing:return {'status':'reused','task_id':existing['id'],'queue':existing['queue']}
+    completed=next((o for o in reversed(store.outcomes()) if o.get('title')==title),None)
+    if completed:return {'status':'review-existing-outcome','task_id':completed['task_id'],'gap':gap}
+    tasks=parse(store.text())
+    result=intake(store,{'title':title,'description':gap['reason'],'expected_behavior':gap['recommendation'],'priority':max((t['priority'] for t in tasks),default=100)+1,'priority_reason':'Missing foundational validation requires researched setup before dependent acceptance.'})
+    return {'status':'captured','pending_id':result['id'],'priority':result['priority']}
+
 def process(store,payload):
     """Apply researched dispositions; receipt scope is explicitly selected first."""
     with store.lock():
@@ -664,7 +679,7 @@ def prune(store,apply=False):
     return removals
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=['refresh','manifest','index','read','select','pending','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle']);parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=['refresh','manifest','index','read','select','pending','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation']);parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash')
     args=parser.parse_args(argv)
     try:
         store=Store(args.root);payload=json.loads(args.input.read_text()) if args.input else {}
@@ -681,6 +696,7 @@ def main(argv=None):
         elif cmd=='select':result=select(parse(store.text()),args.id)
         elif cmd=='pending':result=resolve(parse(store.text()),args.names or ([args.id] if args.id else []),'Pending Queue')
         elif cmd=='intake':result=intake(store,payload)
+        elif cmd=='capture-foundation':result=capture_foundation(store)
         elif cmd=='process':result=process(store,payload)
         elif cmd=='start':result=start(store,args.mode,args.id,payload.get('limits'))
         elif cmd=='next':result=next_task(store)

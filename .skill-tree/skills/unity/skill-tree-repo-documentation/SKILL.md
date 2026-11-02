@@ -12,6 +12,6 @@ Read repository-owner rules before action. Exact prioritized selection, required
 
 Read applicable repository rules and [output contract](references/documentation-output-contract.md). Inspect source using [discovery](references/repository-discovery-checklist.md). Create the required current document set; preserve unowned instructions. Read [metadata](references/workflow-metadata.md); initialize future.md explicitly, then refresh index and manifest. Capture confirmed documentation findings in Backlog with stable IDs and evidence. Review document rules and validators; report verified facts, unknowns and actual checks.
 
-Generated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency.
+Generated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency. After queue setup, run scripts/workflow-state.py capture-foundation against the covered root; report the captured or reused Pending ID before implementation selection.
 
 Prefer deterministic logic and UTF EditMode assertions. Focused PlayMode fixtures cover lifecycle, frames, physics and coroutines. Preserve serialized identity and pinned packages. Verify exact Editor ownership, save/service isolation, authorization, deadlines and cleanup before execution. Player builds, device runs and external services require matching scope. Read [Unity safety](references/unity-safety.md).

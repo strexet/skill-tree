@@ -21,7 +21,7 @@ Options:
   --only <provider-id>          Select provider id from .skill-tree/config/providers.json (repeatable)
   --agent <upstream-profile>    Explicit upstream skills CLI profile passthrough (repeatable)
   --skills <names...>           Select one or more skills
-  --global                      Install to provider global path
+  --flavor general|web|unity    Select the project workflow flavor\n  --global                      Unsupported for project specialization
   --project                     Install to project path (default)
   --target <path>               Project root or explicit generic destination
   --source <path-or-git>        Local source or Git source for upstream CLI
@@ -53,6 +53,7 @@ function listSkills(sourceRoot = REPO_ROOT) {
 
 function parseArgs(argv) {
   const args = {
+    flavor: null,
     all: false,
     only: [],
     agent: [],
@@ -80,7 +81,8 @@ function parseArgs(argv) {
       i += 1;
       return argv[i];
     };
-    if (token === "--all") args.all = true;
+    if (token === "--flavor") args.flavor = next();
+    else if (token === "--all") args.all = true;
     else if (token === "--only") args.only.push(next());
     else if (token === "--agent") args.agent.push(next());
     else if (token === "--skills" || token === "--skill") {
@@ -239,264 +241,50 @@ function installBase(provider, args) {
   return path.join(targetRoot, provider.projectPath);
 }
 
-function ensureSafeDestination(dest) {
-  const resolved = path.resolve(dest);
-  if (resolved === path.parse(resolved).root) {
-    throw new Error(`refusing filesystem root destination: ${resolved}`);
-  }
-}
-
-function copyDir(src, dest, force) {
-  if (fs.existsSync(dest)) {
-    if (!force) return { ok: false, skipped: true, message: "exists" };
-    fs.rmSync(dest, { recursive: true, force: true });
-  }
-  fs.mkdirSync(path.dirname(dest), { recursive: true });
-  fs.cpSync(src, dest, { recursive: true, verbatimSymlinks: true });
-  return { ok: true, message: "copied" };
-}
-
-function symlinkDir(src, dest, force) {
-  if (fs.existsSync(dest)) {
-    if (!force) return { ok: false, skipped: true, message: "exists" };
-    fs.rmSync(dest, { recursive: true, force: true });
-  }
-  fs.mkdirSync(path.dirname(dest), { recursive: true });
-  fs.symlinkSync(src, dest, "dir");
-  return { ok: true, message: "symlinked" };
-}
-
-function removeDir(dest) {
-  if (!fs.existsSync(dest)) return { ok: true, message: "missing" };
-  const stat = fs.lstatSync(dest);
-  if (stat.isDirectory() || stat.isSymbolicLink()) {
-    fs.rmSync(dest, { recursive: true, force: true });
-    return { ok: true, message: "removed" };
-  }
-  return { ok: false, message: "not a directory or symlink" };
-}
-
-function bridgeText() {
-  return `${MARKER_BEGIN}\n${fs.readFileSync(BRIDGE_FILE, "utf8").trim()}\n${MARKER_END}\n`;
-}
-
-function writeBridge(provider, args) {
-  if (!provider.bridgePath) return { ok: true, message: "no bridge" };
-  const rootDir = args.target ? path.resolve(args.target) : process.cwd();
-  const dest = path.join(rootDir, provider.bridgePath);
-  ensureSafeDestination(dest);
-  const block = bridgeText();
-  let current = "";
-  if (fs.existsSync(dest)) current = fs.readFileSync(dest, "utf8");
-  const markerRe = new RegExp(`${escapeRegExp(MARKER_BEGIN)}[\\s\\S]*?${escapeRegExp(MARKER_END)}\\n?`);
-  let next;
-  if (markerRe.test(current)) {
-    next = current.replace(markerRe, block);
-  } else {
-    next = current ? `${current.replace(/\s*$/, "\n\n")}${block}` : block;
-  }
-  if (current === next) return { ok: true, message: "bridge current", path: dest };
-  fs.mkdirSync(path.dirname(dest), { recursive: true });
-  if (fs.existsSync(dest)) {
-    fs.copyFileSync(dest, `${dest}.bak`);
-  }
-  fs.writeFileSync(dest, next, "utf8");
-  return { ok: true, message: "bridge written", path: dest };
-}
-
-function removeBridge(provider, args) {
-  if (!provider.bridgePath) return { ok: true, message: "no bridge" };
-  const rootDir = args.target ? path.resolve(args.target) : process.cwd();
-  const dest = path.join(rootDir, provider.bridgePath);
-  if (!fs.existsSync(dest)) return { ok: true, message: "bridge missing", path: dest };
-  const current = fs.readFileSync(dest, "utf8");
-  const markerRe = new RegExp(`\\n?${escapeRegExp(MARKER_BEGIN)}[\\s\\S]*?${escapeRegExp(MARKER_END)}\\n?`);
-  if (!markerRe.test(current)) return { ok: true, message: "bridge absent", path: dest };
-  fs.copyFileSync(dest, `${dest}.bak`);
-  const next = current.replace(markerRe, "\n").replace(/\n{3,}/g, "\n\n").trimEnd() + "\n";
-  fs.writeFileSync(dest, next, "utf8");
-  return { ok: true, message: "bridge removed", path: dest };
-}
-
-function escapeRegExp(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function verifyInstall(provider, args, skills) {
-  const base = installBase(provider, args);
-  const errors = [];
-  for (const skill of skills) {
-    const dest = path.join(base, skill);
-    const skillFile = path.join(dest, "SKILL.md");
-    if (!fs.existsSync(skillFile)) {
-      errors.push(`${skill}: missing SKILL.md`);
-      continue;
-    }
-    const text = fs.readFileSync(skillFile, "utf8");
-    for (const rel of text.match(/(references|scripts)\/[A-Za-z0-9_.\-/]+/g) || []) {
-      const clean = rel.replace(/[).,;]+$/, "");
-      if (!fs.existsSync(path.join(dest, clean))) errors.push(`${skill}: missing ${clean}`);
-    }
-  }
-  if (args.withInit && provider.bridgePath) {
-    const bridge = path.join(args.target ? path.resolve(args.target) : process.cwd(), provider.bridgePath);
-    if (!fs.existsSync(bridge) || !fs.readFileSync(bridge, "utf8").includes(MARKER_BEGIN)) {
-      errors.push(`${provider.id}: bridge marker missing`);
-    }
-  }
-  return { ok: errors.length === 0, errors };
-}
-
-function upstreamCommand(args, provider, skills) {
-  const source = args.source || REPO_ROOT;
-  const command = ["npx", "-y", "skills", args.uninstall ? "remove" : "add"];
-  if (args.uninstall) {
-    command.push(...skills, "--agent", provider.skillsProfile, "--yes");
-    if (args.global) command.push("--global");
-  } else {
-    command.push(source, "--agent", provider.skillsProfile, "--yes");
-    for (const skill of skills) command.push("--skill", skill);
-    if (args.global) command.push("--global");
-    if (args.copy) command.push("--copy");
-  }
-  return command;
-}
-
-function runUpstream(command) {
-  const result = spawnSync(command[0], command.slice(1), { stdio: "inherit", shell: process.platform === "win32" });
-  return { ok: result.status === 0, status: result.status };
-}
-
-function installLocalProvider(provider, args, skills, source) {
-  const base = installBase(provider, args);
-  ensureSafeDestination(base);
-  const rows = [];
-  for (const skill of skills) {
-    const src = path.join(source, "skills", "general", skill);
-    const dest = path.join(base, skill);
-    if (args.dryRun || args.verify) {
-      rows.push({ provider: provider.id, skill, action: args.verify ? "verify" : "dry-run", path: dest, ok: true });
-      continue;
-    }
-    const result = args.uninstall
-      ? removeDir(dest)
-      : args.symlink
-        ? symlinkDir(src, dest, args.force)
-        : copyDir(src, dest, args.force);
-    rows.push({ provider: provider.id, skill, action: result.message, path: dest, ok: result.ok || result.skipped });
-  }
-  if (args.withInit && !args.dryRun && !args.verify) {
-    const bridge = args.uninstall ? removeBridge(provider, args) : writeBridge(provider, args);
-    rows.push({ provider: provider.id, skill: "(bridge)", action: bridge.message, path: bridge.path || "", ok: bridge.ok });
-  } else if (args.withInit) {
-    rows.push({ provider: provider.id, skill: "(bridge)", action: args.verify ? "verify" : "dry-run", path: provider.bridgePath || "", ok: true });
-  }
-  if (args.verify) {
-    const verified = verifyInstall(provider, args, skills);
-    if (!verified.ok) {
-      rows.push({ provider: provider.id, skill: "(verify)", action: verified.errors.join("; "), path: base, ok: false });
-    }
-  }
-  return rows;
-}
-
 function printList(matrix) {
-  console.log("Providers:");
-  for (const provider of matrix.providers) {
-    console.log(`${provider.id}\t${provider.label}\ttier=${provider.tier}\tsoft=${provider.soft}\tprofile=${provider.skillsProfile}`);
-  }
-  console.log("\nSkills:");
+  console.log("Flavors: general, web, unity\nProviders:");
+  for (const provider of matrix.providers) console.log(`${provider.id}\t${provider.label}\ttier=${provider.tier}\tsoft=${provider.soft}`);
+  console.log("\nLogical operations:");
   for (const skill of listSkills()) console.log(skill);
 }
 
-function printRows(rows) {
-  console.log("provider\tskill\taction\tok\tpath");
-  for (const row of rows) {
-    console.log(`${row.provider}\t${row.skill}\t${row.action}\t${row.ok ? "yes" : "no"}\t${row.path || ""}`);
-  }
-}
-
-function main(argv = process.argv.slice(2)) {
-  let args;
+async function main(argv = process.argv.slice(2)) {
   try {
-    args = parseArgs(argv);
-  } catch (error) {
-    console.error(`error: ${error.message}`);
-    console.error(usage());
-    return 2;
-  }
-  if (args.help) {
-    console.log(usage());
-    return 0;
-  }
-  const matrix = loadProviders();
-  if (args.list) {
-    printList(matrix);
-    return 0;
-  }
-  try {
-    const source = sourceRoot(args);
-    const providers = selectedProviders(args, matrix);
-    const passthrough = args.agent.map((profile) => ({
-      id: `agent:${profile}`,
-      label: `Upstream ${profile}`,
-      tier: 2,
-      skillsProfile: profile,
-      soft: false,
-      projectPath: "",
-      globalPath: "",
-      detect: [],
-      bridgePath: "",
-    }));
-    const allProviders = [...providers, ...passthrough];
-    if (allProviders.length === 0) throw new Error("no providers selected; use --only, --all, or --agent");
-    const skills = selectedSkills(args, source || REPO_ROOT);
-    if (skills.length === 0) throw new Error("no skills selected");
-    const rows = [];
-    for (const provider of allProviders) {
-      try {
-        const useUpstream = provider.id.startsWith("agent:") || !source;
-        if (useUpstream) {
-          const command = upstreamCommand(args, provider, skills);
-          if (args.dryRun || args.verify) {
-            rows.push({ provider: provider.id, skill: skills.join(","), action: command.join(" "), path: "", ok: true });
-          } else {
-            const result = runUpstream(command);
-            rows.push({ provider: provider.id, skill: skills.join(","), action: "upstream", path: "", ok: result.ok });
-          }
-        } else {
-          rows.push(...installLocalProvider(provider, args, skills, source));
-        }
-      } catch (error) {
-        rows.push({ provider: provider.id, skill: skills.join(","), action: `failed: ${error.message}`, path: "", ok: false });
-      }
+    const args=parseArgs(argv);
+    if(args.help){console.log(usage());return 0;}
+    const matrix=loadProviders();
+    if(args.list){printList(matrix);return 0;}
+    if(args.global||args.symlink||args.agent.length||!isLocalSource(args.source)) throw Error("Project specialization supports local project-scoped copy installation; global, symlink and uncomposed upstream paths are unsupported. Use --target <project> --flavor general|web|unity --copy.");
+    if(!args.target)throw Error("Select the covered project explicitly with --target <repository>");
+    const target=fs.realpathSync(path.resolve(args.target));
+    args.target=target;
+    if(!fs.statSync(target).isDirectory())throw Error("Target must be a project directory");
+    const source=sourceRoot(args),manager=require(path.join(source,'lib/installation.js'));
+    const prior=manager.receipt(target);
+    let flavor=args.flavor||prior?.flavor;
+    if(!flavor&&process.stdin.isTTY&&!args.nonInteractive){
+      const rl=require('node:readline/promises').createInterface({input:process.stdin,output:process.stdout});
+      try {flavor=(await rl.question('Choose flavor (general, web, unity): ')).trim();}finally{rl.close();}
     }
-    printRows(rows);
-    return rows.every((row) => row.ok) ? 0 : 1;
-  } catch (error) {
-    console.error(`error: ${error.message}`);
-    return 2;
-  }
+    if(!['general','web','unity'].includes(flavor))throw Error("Fresh noninteractive installation requires --flavor general|web|unity; --yes never selects a flavor");
+    const providers=selectedProviders(args,matrix);
+    if(!providers.length)throw Error("No providers selected; use --only or --all");
+    const skills=selectedSkills(args,source),rows=[];
+    for(const provider of providers){
+      try{
+        const base=installBase(provider,args),selections=skills.map(name=>({name,provider:provider.id,rel:path.relative(target,path.join(base,name)).split(path.sep).join('/')}));
+        for(const item of selections)require(path.join(source,'lib/composer.js')).safe(target,item.rel);
+        let result;
+        if(args.verify){const profile=manager.verify(target,source);if(profile.flavor!==flavor)throw Error('Flavor differs from receipt');for(const item of selections)if(!profile.destinations[item.rel])throw Error('Selected package is not receipt-owned: '+item.rel);result={action:'verified',profile,delta:[]};}
+        else if(args.uninstall)result=manager.uninstall(target,selections,{dryRun:args.dryRun,withInit:args.withInit});
+        else result=manager.install(target,source,flavor,selections,{dryRun:args.dryRun,bridges:args.withInit&&provider.bridgePath?[provider.bridgePath]:[]});
+        rows.push({provider:provider.id,ok:true,action:result.action,flavor,changed:result.delta,facts:result.profile.facts,gaps:result.profile.gaps});
+      }catch(error){rows.push({provider:provider.id,ok:false,error:error.message});}
+    }
+    console.log(JSON.stringify(rows,null,2));
+    if(rows.some(r=>r.ok)&&!args.verify&&!args.uninstall){console.log('Documentation setup remains separate: invoke skill-tree-repo-documentation. After queue creation, capture the persisted foundation finding through scripts/workflow-state.py capture-foundation <project>. No product execution performed.');}
+    return rows.every(r=>r.ok)?0:1;
+  }catch(error){console.error('error: '+error.message);return 2;}
 }
-
-if (require.main === module) {
-  process.exitCode = main();
-}
-
-module.exports = {
-  MARKER_BEGIN,
-  MARKER_END,
-  parseArgs,
-  loadProviders,
-  listSkills,
-  detectProbe,
-  detectProvider,
-  selectedProviders,
-  selectedSkills,
-  installLocalProvider,
-  verifyInstall,
-  bridgeText,
-  writeBridge,
-  removeBridge,
-  main,
-};
+if(require.main===module)main().then(code=>{process.exitCode=code;}).catch(error=>{console.error(error.message);process.exitCode=2;});
+module.exports={parseArgs,loadProviders,listSkills,detectProbe,detectProvider,selectedProviders,selectedSkills,sourceRoot,installBase,main};

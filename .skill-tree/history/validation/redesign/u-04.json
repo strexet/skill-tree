@@ -1,0 +1,9 @@
+{
+  "unit": "U-04",
+  "qualification": "source-contract-and-temporary-fixture",
+  "checks": [
+    "38 Node installation/composition/provider controls: pass",
+    "79 Python and strict source validation: pass",
+    "owned replacement, recovery, local refresh, rollback and foundation intake: pass"
+  ]
+}

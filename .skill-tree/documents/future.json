@@ -3,14 +3,16 @@
     "completed_ids": [
       "T-257487e7-a192-4b6a-a2bf-634106432f67",
       "T-69b96cac-72c3-4a69-9969-9775ea457877",
-      "T-25e8ef8b-6545-4c82-ab91-f1e8bd28605f"
+      "T-25e8ef8b-6545-4c82-ab91-f1e8bd28605f",
+      "T-9bada49a-808a-48c5-a5da-ed44b71f00df"
     ],
     "completion_refs": {
       "T-257487e7-a192-4b6a-a2bf-634106432f67": "O-7df16a21-0424-48ba-bbcb-268635a7dbb5",
       "T-25e8ef8b-6545-4c82-ab91-f1e8bd28605f": "O-5955b4b5-a0e2-4d0c-b096-691bc234b08a",
-      "T-69b96cac-72c3-4a69-9969-9775ea457877": "O-75f15cf2-5927-4754-a46b-da7a4b57de59"
+      "T-69b96cac-72c3-4a69-9969-9775ea457877": "O-75f15cf2-5927-4754-a46b-da7a4b57de59",
+      "T-9bada49a-808a-48c5-a5da-ed44b71f00df": "O-c9ed0397-bf83-4f74-b5b8-44dcfa808d05"
     },
-    "current_task_id": "T-9bada49a-808a-48c5-a5da-ed44b71f00df",
+    "current_task_id": "T-98e59352-ec61-46da-bb16-73754fb836fc",
     "deferred_ids": [],
     "id": "WR-87ba65c7-3806-44ad-8b5d-92bfd1a5f3d6",
     "limits": {},
@@ -25,7 +27,8 @@
       "T-257487e7-a192-4b6a-a2bf-634106432f67",
       "T-69b96cac-72c3-4a69-9969-9775ea457877",
       "T-25e8ef8b-6545-4c82-ab91-f1e8bd28605f",
-      "T-9bada49a-808a-48c5-a5da-ed44b71f00df"
+      "T-9bada49a-808a-48c5-a5da-ed44b71f00df",
+      "T-98e59352-ec61-46da-bb16-73754fb836fc"
     ],
     "root_task_id": "T-bae05f34-57a2-4bbe-9a3f-07f835d4e3c1",
     "snapshot": [
@@ -35,32 +38,14 @@
     "stop_reason": null
   },
   "format": "skill-tree-future",
-  "source_hash": "d64b3ef799d39e1f813fc93d5844e8cf9f69d2dfad516aedb8743ab7d2778487",
+  "source_hash": "178797c4180a4cb33156be34388d28284256dc8ecdf13d483a66136e2188bd12",
   "tasks": [
-    {
-      "depends_on": [
-        "T-25e8ef8b-6545-4c82-ab91-f1e8bd28605f"
-      ],
-      "id": "T-9bada49a-808a-48c5-a5da-ed44b71f00df",
-      "line": 11,
-      "parent_pending_ids": [
-        "P-d5ffb35c-ee83-4ba6-9f6b-89f647b869b8"
-      ],
-      "priority": 105,
-      "processing_run_id": "PR-7e6c556f-e261-441b-bd21-caf2f656050d",
-      "queue": "Prioritized Next Changes",
-      "related_task_id": null,
-      "relation": "main",
-      "root_task_id": "T-9bada49a-808a-48c5-a5da-ed44b71f00df",
-      "status": "Ready",
-      "title": "U-04 Install and maintain owned project packages"
-    },
     {
       "depends_on": [
         "T-9bada49a-808a-48c5-a5da-ed44b71f00df"
       ],
       "id": "T-98e59352-ec61-46da-bb16-73754fb836fc",
-      "line": 61,
+      "line": 11,
       "parent_pending_ids": [
         "P-d5ffb35c-ee83-4ba6-9f6b-89f647b869b8"
       ],
@@ -78,7 +63,7 @@
         "T-98e59352-ec61-46da-bb16-73754fb836fc"
       ],
       "id": "T-0277c075-52e4-41a3-8f7b-ab79bd7bf019",
-      "line": 111,
+      "line": 61,
       "parent_pending_ids": [
         "P-d5ffb35c-ee83-4ba6-9f6b-89f647b869b8"
       ],
@@ -96,7 +81,7 @@
         "T-98e59352-ec61-46da-bb16-73754fb836fc"
       ],
       "id": "T-2a154c49-75e0-4b67-b564-ea65b0291f8b",
-      "line": 161,
+      "line": 111,
       "parent_pending_ids": [
         "P-d5ffb35c-ee83-4ba6-9f6b-89f647b869b8"
       ],
@@ -115,7 +100,7 @@
         "T-2a154c49-75e0-4b67-b564-ea65b0291f8b"
       ],
       "id": "T-bae05f34-57a2-4bbe-9a3f-07f835d4e3c1",
-      "line": 211,
+      "line": 161,
       "parent_pending_ids": [
         "P-d5ffb35c-ee83-4ba6-9f6b-89f647b869b8"
       ],

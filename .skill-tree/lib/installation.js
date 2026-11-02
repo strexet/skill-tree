@@ -1,0 +1,149 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path');
+const c=require('./composer.js');
+const BEGIN='<!-- BEGIN skill-tree-skills -->',END='<!-- END skill-tree-skills -->';
+const INSTALL='.skill-tree/installation',PROFILE=INSTALL+'/profile.json';
+function filesAt(root,rel){
+ const full=c.safe(root,rel);if(!fs.existsSync(full))return null;
+ if(fs.lstatSync(full).isFile())return {'':c.hash(fs.readFileSync(full))};
+ const out={};function walk(dir,prefix){for(const e of fs.readdirSync(dir,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){if(e.name==='__pycache__')continue;const child=path.join(dir,e.name),key=prefix+e.name;if(e.isSymbolicLink())throw Error('Symlink in owned package: '+rel+'/'+key);if(e.isDirectory())walk(child,key+'/');else if(e.isFile())out[key]=c.hash(fs.readFileSync(child));else throw Error('Unsupported owned entry: '+key);}}walk(full,'');return out;
+}
+const treeHash=(root,rel)=>{const files=filesAt(root,rel);return files===null?null:c.hash(c.json(files));};
+function receipt(root,required=false){
+ const p=c.readJson(root,PROFILE,null);
+ if(!p){if(required)throw Error('Missing ownership receipt; install with an explicit --flavor');return null;}
+ if(p.format!=='skill-tree-profile'||p.schema!==1||p.project_root!==fs.realpathSync(root)||!p.destinations||!p.bundle_digests)throw Error('Unsupported or foreign ownership receipt; use the manual update checklist');
+ return p;
+}
+function verifyOwned(root,p,includeBundle=true){
+ for(const [rel,record] of Object.entries(p.destinations)){
+  if(!/^skill-tree-[a-z0-9-]+$/.test(record.name)||path.basename(rel)!==record.name)throw Error('Invalid owned destination');
+  if(c.json(filesAt(root,rel))!==c.json(record.files))throw Error('Unowned or locally modified package conflicts: '+rel);
+ }
+ if(includeBundle)for(const [rel,hash] of Object.entries(p.bundle_digests))if(c.hash(c.read(root,rel)||'')!==hash)throw Error('Modified maintenance bundle: '+rel);
+ for(const [rel,record] of Object.entries(p.bridges||{})){const current=c.read(root,rel)||'',block=bridgeBlock(current);if(!block||c.hash(block)!==record.hash)throw Error('Modified or missing owned bridge: '+rel);}
+}
+function bridgeBlock(text){
+ const a=text.indexOf(BEGIN),b=text.indexOf(END);if(a<0&&b<0)return null;
+ if(a<0||b<a||text.indexOf(BEGIN,a+BEGIN.length)>=0||text.indexOf(END,b+END.length)>=0)throw Error('Ambiguous bridge markers');
+ return text.slice(a,b+END.length);
+}
+function hasActiveOperation(root){const state=c.readJson(root,'.skill-tree/documents/future.json',{}),run=state.active_run;return Boolean(run&&!run.stop_reason&&!['blocked','awaiting-validation','refresh-profile','validation-blocked'].includes(run.phase));}
+function materialize(root,rel,files){const dest=c.safe(root,rel);fs.mkdirSync(dest,{recursive:true});for(const [name,content] of Object.entries(files)){const file=c.safe(root,path.posix.join(rel,name));fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,content);}}
+function recover(root){
+ const journal=c.readJson(root,INSTALL+'/.journal.json',null);if(!journal)return;
+ if(journal.schema!==1||!Array.isArray(journal.entries))throw Error('Unsupported installation journal');
+ for(const e of journal.entries){const actual=treeHash(root,e.dest),backup=treeHash(root,e.backup),stage=e.staged?treeHash(root,e.staged):null;
+  if(actual!==e.old&&actual!==e.next&&!(actual===null&&backup===e.old))throw Error('Interrupted installation conflicts: '+e.dest);
+  if(e.next!==null&&actual!==e.next&&stage!==e.next)throw Error('Missing or modified staged generation: '+e.dest);
+ }
+ for(const e of journal.entries){
+  if(treeHash(root,e.dest)===e.next)continue;
+  const dest=c.safe(root,e.dest),backup=c.safe(root,e.backup);
+  if(fs.existsSync(dest)){fs.mkdirSync(path.dirname(backup),{recursive:true});if(fs.existsSync(backup))throw Error('Recovery backup conflict: '+e.dest);fs.renameSync(dest,backup);}
+  if(e.staged){fs.mkdirSync(path.dirname(dest),{recursive:true});fs.renameSync(c.safe(root,e.staged),dest);}
+ }
+ fs.writeFileSync(c.safe(root,INSTALL+'/.last-transaction.json'),c.json(journal));
+ fs.unlinkSync(c.safe(root,INSTALL+'/.journal.json'));
+ fs.rmSync(c.safe(root,INSTALL+'/.staging'),{recursive:true,force:true});
+ // Backups retain one completed generation for explicit reviewed rollback.
+}
+function transaction(root,changes){
+ const stage=INSTALL+'/.staging',backups=INSTALL+'/.backups';
+ if(fs.existsSync(c.safe(root,stage)))fs.rmSync(c.safe(root,stage),{recursive:true});
+ const entries=[];let n=0;
+ for(const [dest,change] of Object.entries(changes)){
+  const old=treeHash(root,dest),backup=backups+'/'+n,staged=change===null?null:stage+'/'+n;
+  if(change!==null){if(typeof change==='string'){const p=c.safe(root,staged);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,change);}else materialize(root,staged,change);}
+  const next=staged?treeHash(root,staged):null;
+  if(old!==next)entries.push({dest,old,next,backup,staged});n++;
+ }
+ if(!entries.length){fs.rmSync(c.safe(root,stage),{recursive:true,force:true});return;}
+ if(fs.existsSync(c.safe(root,backups)))fs.rmSync(c.safe(root,backups),{recursive:true});
+ fs.writeFileSync(c.safe(root,INSTALL+'/.journal.json'),c.json({schema:1,entries}));recover(root);
+}
+function locked(root,action){
+ const dir=c.safe(root,INSTALL);fs.mkdirSync(dir,{recursive:true});const lock=c.safe(root,INSTALL+'/.install-lock');let fd;
+ try{fd=fs.openSync(lock,'wx',0o600);}catch{throw Error('Installation lock exists; inspect PID/host before explicit removal');}
+ try{fs.writeFileSync(fd,c.json({pid:process.pid,host:require('node:os').hostname()}));recover(root);return action();}finally{fs.closeSync(fd);fs.unlinkSync(lock);}
+}
+function bundle(source,flavor){
+ const files={};for(const rel of Object.keys(c.sourceInputs(source))){
+  if(rel.startsWith('domains/')&&!rel.startsWith('domains/'+flavor+'/'))continue;
+  if(rel==='config/repository.json')continue;
+  files['source/'+rel]=c.read(source,rel);
+ }
+ files['manager.js']="#!/usr/bin/env node\n'use strict';\nconst path=require('node:path');\nconst manager=require('./source/lib/installation.js');\nprocess.exitCode=manager.localMain(path.resolve(__dirname,'../..'),path.join(__dirname,'source'),process.argv.slice(2));\n";
+ return files;
+}
+function plan(root,source,flavor,selections,options={}){
+ const old=receipt(root);if(old)verifyOwned(root,old);
+ if(!old&&fs.existsSync(c.safe(root,INSTALL))&&fs.readdirSync(c.safe(root,INSTALL)).some(name=>name!=='.install-lock'))throw Error('Unowned maintenance directory conflict');
+ if(hasActiveOperation(root))throw Error('Active controller must checkpoint at a stopped cleanup/handoff point before installation or refresh');
+ if(old)for(const rel of Object.keys(old.destinations))selections.push({rel,provider:old.destinations[rel].provider,name:old.destinations[rel].name});
+ const unique=Object.values(Object.fromEntries(selections.map(s=>[s.rel,s]))),names=[...new Set(unique.map(s=>s.name))];
+ const profile=c.resolveProfile(source,root,flavor),built=c.compose(source,profile,names),changes={},destinations={...(old?.destinations||{})};
+ for(const item of unique){
+  const current=filesAt(root,item.rel),owned=old?.destinations[item.rel];
+  if(current&&!owned)throw Error('Unowned destination conflict, including --force: '+item.rel);
+  const files=built.packages[item.name];if(!files)throw Error('Missing composed operation: '+item.name);
+  changes[item.rel]=files;destinations[item.rel]={provider:item.provider,name:item.name,flavor,files:built.output_digests[item.name],identity:c.hash(c.json(built.output_digests[item.name]))};
+ }
+ const bridges={...(old?.bridges||{})};
+ for(const rel of new Set([...(options.bridges||[]),...Object.keys(old?.bridges||{})])){
+  const current=c.read(root,rel)||'',existing=bridgeBlock(current);
+  if(existing&&!old?.bridges[rel])throw Error('Unowned bridge conflict: '+rel);
+  const block=BEGIN+'\n'+c.read(source,'src/init-rules/skill-tree-skills.md').trim()+'\nFlavor: '+flavor+'. Profile: `.skill-tree/installation/profile.json`.\n'+END;
+  changes[rel]=existing?current.replace(existing,block):current+(current.endsWith('\n')?'\n':'\n\n')+block+'\n';
+  bridges[rel]={hash:c.hash(block)};
+ }
+ const maintenance=bundle(source,flavor),bundle_digests={};
+ for(const [rel,content] of Object.entries(maintenance)){const dest=INSTALL+'/'+rel;if(fs.existsSync(c.safe(root,dest))&&!old?.bundle_digests[dest])throw Error('Unowned maintenance file conflict: '+dest);changes[dest]=content;bundle_digests[dest]=c.hash(content);}
+ for(const rel of Object.keys(old?.bundle_digests||{}))if(!bundle_digests[rel])changes[rel]=null;
+ const next={...profile,source_digests:built.source_digests,destinations,bridges,bundle_digests,identity:built.identity};
+ changes[PROFILE]=c.json(next);
+ const delta=Object.entries(changes).filter(([rel,change])=>{
+  const expected=change===null?null:typeof change==='string'?c.hash(c.json({'':c.hash(change)})):c.hash(c.json(Object.fromEntries(Object.entries(change).map(([rel,text])=>[rel,c.hash(text)]))));
+  return treeHash(root,rel)!==expected;
+ }).map(([rel])=>rel);
+ return {profile:next,changes,delta,old};
+}
+function verify(root,source){const p=receipt(root,true);verifyOwned(root,p);const now=c.resolveProfile(source,root,p.flavor);if(c.json(now.inputs)!==c.json(p.inputs)||c.json(now.inventory)!==c.json(p.inventory))throw Error('Profile refresh-required: node .skill-tree/installation/manager.js --refresh-profile');return p;}
+function install(root,source,flavor,selections,options={}){
+ if(options.dryRun){const result=plan(root,source,flavor,selections,options);return {profile:result.profile,delta:result.delta,action:'dry-run'};}
+ return locked(root,()=>{const result=plan(root,source,flavor,selections,options);transaction(root,result.changes);verify(root,source);return {profile:result.profile,delta:result.delta,action:result.delta.length?'installed':'verified no-op current'};});
+}
+function uninstall(root,selections,options={}){
+ function action(){const p=receipt(root,true);verifyOwned(root,p);if(hasActiveOperation(root))throw Error('Active controller must stop before uninstall');const next=JSON.parse(c.json(p)),changes={};
+  for(const item of selections){if(!p.destinations[item.rel])throw Error('Unowned uninstall destination: '+item.rel);changes[item.rel]=null;delete next.destinations[item.rel];}
+  if(options.withInit&&Object.keys(next.destinations).length===0)for(const rel of Object.keys(p.bridges||{})){const current=c.read(root,rel),block=bridgeBlock(current);changes[rel]=current.replace(block,'');delete next.bridges[rel];}
+  changes[PROFILE]=c.json(next);if(!options.dryRun)transaction(root,changes);return {action:options.dryRun?'dry-run uninstall':'removed',profile:next,delta:Object.keys(changes)};
+ }
+ return options.dryRun?action():locked(root,action);
+}
+function refresh(root,source,dryRun=false){const p=receipt(root,true);return install(root,source,p.flavor,Object.entries(p.destinations).map(([rel,d])=>({rel,provider:d.provider,name:d.name})),{dryRun,bridges:Object.keys(p.bridges||{})});}
+function rollback(root){return locked(root,()=>{
+ const p=receipt(root,true);verifyOwned(root,p);if(hasActiveOperation(root))throw Error('Stop the active controller before rollback');
+ const last=c.readJson(root,INSTALL+'/.last-transaction.json',null);if(!last)throw Error('No retained generation for rollback');
+ const changes={};
+ for(const e of last.entries){
+  if(treeHash(root,e.dest)!==e.next)throw Error('Rollback conflicts with current content: '+e.dest);
+  if(e.old===null){changes[e.dest]=null;continue;}
+  if(treeHash(root,e.backup)!==e.old)throw Error('Rollback backup is unavailable: '+e.dest);
+  const full=c.safe(root,e.backup);
+  if(fs.lstatSync(full).isFile())changes[e.dest]=fs.readFileSync(full,'utf8');
+  else changes[e.dest]=Object.fromEntries(Object.keys(filesAt(root,e.backup)).map(rel=>[rel,fs.readFileSync(c.safe(root,e.backup+'/'+rel),'utf8')]));
+ }
+ transaction(root,changes);return {action:'generation rolled back; project dependencies unchanged; verify freshness before admission'};
+});}
+function localMain(root,source,args){
+ try{
+  if(args.some(a=>!['--refresh-profile','--dry-run','--verify','--recover','--rollback'].includes(a)))throw Error('Usage: manager.js --refresh-profile [--dry-run] | --verify | --recover');
+  if(args.includes('--rollback')){console.log(c.json(rollback(root)));return 0;}
+  if(args.includes('--recover')){locked(root,()=>{});console.log('Installation recovery complete');return 0;}
+  if(args.includes('--verify')){verify(root,source);console.log('Owned installation verified');return 0;}
+  if(!args.includes('--refresh-profile'))throw Error('Use --refresh-profile or --verify');
+  const result=refresh(root,source,args.includes('--dry-run'));console.log(c.json({action:result.action,changed:result.delta,facts:result.profile.facts,gaps:result.profile.gaps}));return 0;
+ }catch(error){console.error(error.message);return 2;}
+}
+module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,recover,transaction,locked,plan,install,verify,uninstall,refresh,rollback,localMain};

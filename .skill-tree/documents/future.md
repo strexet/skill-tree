@@ -8,56 +8,6 @@ Fixed metadata records task identity and dependency scope.
 
 ## Prioritized Next Changes
 
-### U-04 Install and maintain owned project packages
-
-```yaml
-id: T-9bada49a-808a-48c5-a5da-ed44b71f00df
-priority: 105
-status: Ready
-parent_pending_ids: ["P-d5ffb35c-ee83-4ba6-9f6b-89f647b869b8"]
-processing_run_id: PR-7e6c556f-e261-441b-bd21-caf2f656050d
-root_task_id: T-9bada49a-808a-48c5-a5da-ed44b71f00df
-related_task_id: null
-relation: main
-depends_on: ["T-25e8ef8b-6545-4c82-ab91-f1e8bd28605f"]
-```
-
-Goal:
-- Receipts, static profile refresh, ownership conflicts and recovery work without source access.
-
-Current behavior:
-- The baseline uses thirteen source skills and the existing workflow schema.
-
-Desired behavior:
-- Receipts, static profile refresh, ownership conflicts and recovery work without source access.
-
-Touch:
-- Source contracts, helpers, installer, fixtures and current documentation as required by the selected unit.
-
-Discovery allowance:
-- The selected unit follows the approved redesign scope.
-
-Out of scope:
-- Live target installation, publication, Unity execution and existing target migration.
-
-Implementation constraints:
-- The selected unit follows the approved redesign scope.
-
-Questions and required clarifications:
-- [Resolved - owner request] The approved plan authorizes implementation and intermediate local commits.
-
-Validation:
-- Run relevant static and temporary-fixture checks with operation deadlines.
-
-Acceptance:
-- Receipts, static profile refresh, ownership conflicts and recovery work without source access.
-
-Documentation updates:
-- Update current contracts and implementation status.
-
-Risks:
-- Preserve exact task identities, ownership and unrelated content.
-
 ### U-05 Persist task progress and validation groups
 
 ```yaml
