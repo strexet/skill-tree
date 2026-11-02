@@ -450,7 +450,13 @@ def process(store,payload):
         receipt={'id':pr,'selected_ids':[t['id'] for t in selected],'created_ids':produced,'reused_ids':reused,'task_keys':keys,'dispositions':dispositions}
         if run:
             run['processing_results'].append(receipt);run['phase']='dependencies';run['next_action']='Select required task'
-            run['admitted_task_ids']=sorted(set(run['admitted_task_ids'])|dependency_scope(parse(text),run));run['admitted_groups']=admitted_groups(parse(text),run)
+            allowed=set(run['admitted_task_ids']);introduced=set();updated=parse(text)
+            for tid in produced+reused:
+                child=resolve(updated,[tid])[0]
+                if child['relation'] in {'blocker','subtask'} and child['related_task_id'] in allowed:
+                    introduced.update(dependency_scope(updated,{'snapshot':[tid]}))
+            if dependency_scope(updated,run)-allowed-introduced:raise WorkflowError('Processing cannot admit a dependency outside the captured required scope')
+            run['admitted_task_ids']=sorted(allowed|introduced);run['required_ids']=list(dict.fromkeys(run['required_ids']+sorted(introduced)));run['admitted_groups']=admitted_groups(updated,run)
         store.save(text,state)
         return receipt
 
@@ -463,7 +469,7 @@ def start(store,mode,selector=None,limits=None):
         snapshot=[chosen['id']] if mode=='next' else [t['id'] for t in sorted([t for t in tasks if t['queue']=='Prioritized Next Changes'],key=lambda t:-t['priority'])]
         if mode=='all' and selector:raise WorkflowError('Implement All uses the initial prioritized snapshot')
         run={'id':identity('WR'),'mode':mode,'snapshot':snapshot,'root_task_id':chosen['id'],'current_task_id':chosen['id'],'phase':'implement','required_ids':[chosen['id']],'deferred_ids':[],'pending_ids':[],'processing_results':[],'completed_ids':[],'limits':limits or {},'partial_work':[],'stop_reason':None,'next_action':'Implement selected task','started_at':now()}
-        run['admission']=admission;run['admitted_task_ids']=sorted(dependency_scope(tasks,run));run['admitted_groups']=admitted_groups(tasks,run)
+        run['admission']=admission;run['admitted_task_ids']=sorted(dependency_scope(tasks,run));run['required_ids']=list(run['admitted_task_ids']);run['admitted_groups']=admitted_groups(tasks,run)
         validate_run(run);state['active_run']=run;store.save(text,state);return run
 
 def enforce_limits(run):
@@ -474,7 +480,7 @@ def enforce_limits(run):
 def next_task(store):
     state=store.load();run=state['active_run']
     if not run:raise WorkflowError('No active run')
-    enforce_limits(run);tasks=parse(store.text());by_id={t['id']:t for t in tasks};done={o['task_id'] for o in store.outcomes() if o['disposition']=='completed'}
+    enforce_limits(run);assert_admission(store,state);tasks=parse(store.text());by_id={t['id']:t for t in tasks};done={o['task_id'] for o in store.outcomes() if o['disposition']=='completed'}
     validate_dependencies(tasks,done)
     visiting=set();visited=set()
     def walk(tid):
@@ -509,8 +515,11 @@ def next_task(store):
     if stage=='blocked':raise WorkflowError('Selected task progress is blocked; resolve the recorded stop')
     if stage=='awaiting-validation':
         # Immediate checks and verified consumers force validation before another implementation.
-        checks=check_specs(task);results=state['task_progress'][task['id']]['checks']
-        early=any(check['timing']!='group-end' and results.get(check['id'],{}).get('result',{}).get('result')!='pass' for check in checks)
+        checks=check_specs(task)
+        def due(check):
+            try:validate_task_checks(store,task['id'],state,check['id']);return False
+            except WorkflowError:return True
+        early=any(check['timing']!='group-end' and due(check) for check in checks)
         consumers=any(task['id'] in candidate['depends_on'] for candidate in tasks if candidate['id'] in scope_ids(tasks,run))
         group=task.get('validation_group_id')
         if group and not early and not consumers:
@@ -548,6 +557,7 @@ def checkpoint(store,payload):
 def complete(store,payload):
     with store.lock():
         store.guard(payload.get('expected_source_hash'));text=store.text();tasks=parse(text);state=store.load(text);task=resolve(tasks,[payload['task_id']],'Prioritized Next Changes')[0]
+        assert_scope(store,state,tasks,task['id'])
         outcomes=store.outcomes();done={o['task_id'] for o in outcomes if o['disposition']=='completed'}
         if task['id'] in {o['task_id'] for o in outcomes}:raise WorkflowError('Task already has terminal outcome')
         disposition=payload.get('disposition','completed')
@@ -823,10 +833,36 @@ def group_fingerprint(store,task,state):
     if any(value is None for value in definitions.values()):raise WorkflowError('Group prerequisite lacks a preserved validation contract')
     return digest(dump(definitions).encode())
 
+PRODUCT_LANES={'browser','server','unity-editmode','unity-playmode','visual','player','device','native'}
+
+def execution_session(store,recipe,environment,entry,provided=None,require_current=False):
+    sessions=entry.setdefault('execution_sessions',{})
+    session=provided or sessions.get(environment)
+    if recipe['lane'] not in PRODUCT_LANES:return None
+    fields=['project_root','authorization','profile_id','deadline_utc','cleanup_seconds','tool_identity','session_identity','fixture_identity','build_identity','identity_evidence']
+    if not isinstance(session,dict) or any(not session.get(key) for key in fields):raise WorkflowError('Product checks require an owned execution session with authorization, identity evidence, deadline and cleanup reserve')
+    if Path(session['project_root']).resolve()!=store.root:raise WorkflowError('Execution session checkout differs from the covered root')
+    if type(session['cleanup_seconds']) not in {int,float} or session['cleanup_seconds']<=0:raise WorkflowError('Execution cleanup reserve must be positive')
+    try:deadline=datetime.fromisoformat(session['deadline_utc'].replace('Z','+00:00'))
+    except (ValueError,TypeError) as exc:raise WorkflowError('Execution deadline requires an aware timestamp') from exc
+    if deadline.tzinfo is None or require_current and (deadline-datetime.now(timezone.utc)).total_seconds()<=session['cleanup_seconds']:raise WorkflowError('Execution deadline lacks a cleanup reserve')
+    if recipe['lane'].startswith('unity-'):
+        if session.get('editor_version')!=recipe.get('editor_version') or not session.get('save_service_isolation'):raise WorkflowError('Unity session requires the pinned Editor and verified save/service isolation')
+    if not isinstance(session['identity_evidence'],list):raise WorkflowError('Execution identity requires repository-relative evidence')
+    for ref in session['identity_evidence']:evidence_pointer(store,ref,required=True)
+    sessions[environment]=deepcopy(session)
+    return session
+
 def check_snapshot(store,task,check,state):
     sources=fingerprints(store,check['sources'])
     if any(value is None for value in sources.values()):raise WorkflowError('Required check source/test input is unavailable')
     recipe,environment=recipe_for(store,check)
+    if recipe['lane'] in {'unit','unity-editmode'} and check['timing']!='immediate':raise WorkflowError('Focused behavioral checks remain immediate')
+    entry=state['task_progress'].get(task['id'],{});session=execution_session(store,recipe,environment,entry)
+    if session:
+        identity={key:session[key] for key in ['tool_identity','fixture_identity','build_identity','save_service_isolation','editor_version'] if key in session}
+        identity['evidence']=[evidence_pointer(store,ref,required=True) for ref in session['identity_evidence']]
+        environment=digest(dump({'recipe_environment':environment,'execution':identity}).encode())
     executable={key:check[key] for key in ['recipe_id','sources','parameters','assertion']}
     key=digest(dump({'check':executable,'recipe':recipe,'sources':sources,'environment':environment,'group':group_fingerprint(store,task,state)}).encode())
     return {'key':key,'definition':task_signature(task),'sources':sources,'environment_identity':environment,'recipe':recipe}
@@ -838,6 +874,20 @@ def get_check(store,state,payload):
     if len(matches)!=1:raise WorkflowError('Absent check identity')
     return task,matches[0]
 
+def assert_admission(store,state,tid=None):
+    profile_path=store.base/'installation/profile.json'
+    if not profile_path.is_file():return
+    profile=json.loads(profile_path.read_text());run=state['active_run']
+    admitted=run.get('admission') if run else state['task_progress'].get(tid,{}).get('admission')
+    if not admitted or admitted.get('identity')!=profile.get('identity'):raise WorkflowError('Profile admission changed; explicitly re-admit the current profile before continuation')
+
+def assert_scope(store,state,tasks,tid):
+    run=state['active_run']
+    if run:
+        enforce_limits(run)
+        if tid not in scope_ids(tasks,run):raise WorkflowError('Task is outside the admitted controller scope')
+    assert_admission(store,state,tid)
+
 def begin_task(store,payload):
     # Standalone admission occurs once at the implementation boundary; controller leaves reuse the admitted profile.
     state=store.load();admission=state['active_run'].get('admission') if state['active_run'] else admit_profile(store)
@@ -846,11 +896,10 @@ def begin_task(store,payload):
         if task['status']!='Ready':raise WorkflowError('Selected task has blocking questions')
         done={o['task_id'] for o in store.outcomes() if o['disposition']=='completed'}
         if any(dep not in done for dep in task['depends_on']):raise WorkflowError('Verified dependencies remain incomplete')
-        if state['active_run']:
-            enforce_limits(state['active_run'])
-            if task['id'] not in scope_ids(parse(text),state['active_run']):raise WorkflowError('Task outside controller scope')
+        if state['active_run']:assert_scope(store,state,parse(text),task['id'])
         entry=state['task_progress'].setdefault(task['id'],{'stage':'implementing','checks':{},'admission':admission,'partial_work':[]})
         if entry['stage']=='blocked':raise WorkflowError('Task progress is blocked; explicitly resolve the recorded stop')
+        entry['admission']=admission
         result={'task_id':task['id'],'phase':'validate' if entry['stage']=='awaiting-validation' else 'implement','checks':check_specs(task)}
         store.save(text,state);return result
 
@@ -859,6 +908,7 @@ def mark_implemented(store,payload):
         text=store.text();state=store.load(text);task=resolve(parse(text),[payload['task_id']],'Prioritized Next Changes')[0]
         entry=state['task_progress'].get(task['id'])
         if not entry or entry['stage']=='blocked':raise WorkflowError('Begin or resume implementation before marking the unit implemented')
+        assert_scope(store,state,parse(text),task['id'])
         entry['stage']='awaiting-validation';entry['definition']=task_signature(task);entry['partial_work']=payload.get('changed_files',[])
         store.save(text,state);return {'task_id':task['id'],'phase':'validate','checks':check_specs(task)}
 
@@ -866,13 +916,19 @@ def prepare_check(store,payload):
     with store.lock():
         text=store.text();state=store.load(text);task,check=get_check(store,state,payload);entry=state['task_progress'].get(task['id'])
         if not entry or entry['stage']=='blocked':raise WorkflowError('Begin implementation before check preparation')
+        assert_scope(store,state,parse(text),task['id'])
+        slot=entry['checks'].get(check['id'],{});previous=slot.get('attempt')
+        if previous and not any(record.get('attempt_id')==previous['attempt_id'] for record in [slot.get('result',{}),slot.get('red',{}),*slot.get('receipts',{}).values()]):raise WorkflowError('Recover and close the original pending check attempt before preparing another control')
         if state['active_run']:
             enforce_limits(state['active_run']);state['active_run']['admitted_groups']=admitted_groups(parse(text),state['active_run'])
+        recipe,environment=recipe_for(store,check);execution_session(store,recipe,environment,entry,payload.get('execution'),require_current=True)
         snapshot=check_snapshot(store,task,check,state)
         launch=payload.get('launch')
         if launch:
             required=['assertion','cheaper_evidence_insufficient','authorization','deadline_utc','cleanup_seconds','project_root','execution_profile']
             if not isinstance(launch,dict) or any(not launch.get(key) for key in required):raise WorkflowError('Launch requires concrete assertion, rationale, authorization, exact checkout, deadline and cleanup profile')
+            if type(launch['cleanup_seconds']) not in {int,float} or launch['cleanup_seconds']<=0:raise WorkflowError('Launch cleanup reserve must be positive')
+            if launch['cheaper_evidence_insufficient'].strip().casefold() in {'run everything to be safe','to be safe','routine checklist'}:raise WorkflowError('Launch requires an assertion-specific rationale')
             if Path(launch['project_root']).resolve()!=store.root:raise WorkflowError('Launch checkout differs from the covered root')
             try:deadline=datetime.fromisoformat(launch['deadline_utc'].replace('Z','+00:00'))
             except (ValueError,TypeError) as exc:raise WorkflowError('Launch deadline requires an aware civil timestamp') from exc
@@ -884,6 +940,10 @@ def prepare_check(store,payload):
 def record_check(store,payload):
     with store.lock():
         text=store.text();state=store.load(text);task,check=get_check(store,state,payload);entry=state['task_progress'].get(task['id'],{});slot=entry.get('checks',{}).get(check['id'],{});attempt=slot.get('attempt')
+        delivered=slot.get('receipts',{}).get(payload.get('attempt_id'))
+        if delivered:
+            if delivered.get('payload_hash')!=digest(dump(payload).encode()):raise WorkflowError('Conflicting replay of the original check receipt')
+            return deepcopy(delivered)
         if not attempt or attempt['attempt_id']!=payload.get('attempt_id'):raise WorkflowError('Recover the original prepared check attempt; never invent a receipt')
         current=check_snapshot(store,task,check,state)
         if current['key']!=attempt['key'] or current['definition']!=attempt['definition']:raise WorkflowError('Prepared check is stale; source/test/check-set changed')
@@ -909,10 +969,13 @@ def record_check(store,payload):
                 assertions=payload.get('assertions',[])
                 if not assertions or not any(a.get('assertion')==check['assertion'] for a in assertions) or any(a.get('result')!='pass' for a in assertions):raise WorkflowError('Static/visual checks require actual matching assertions')
                 if result=='red':raise WorkflowError('Static/visual observations cannot establish behavioral Red')
-        record={key:deepcopy(payload[key]) for key in ['result','classification','actual_lane','counts','assertions','failure_category','cleanup'] if key in payload}
+        timings=payload.get('timing',{})
+        if not isinstance(timings,dict) or any(key not in {'active_controller_seconds','tool_wall_seconds','prerequisite_wait_seconds'} or type(value) not in {int,float} or value<0 for key,value in timings.items()):raise WorkflowError('Operation timings require separate nonnegative controller, tool and prerequisite observations')
+        record={key:deepcopy(payload[key]) for key in ['result','classification','actual_lane','counts','assertions','failure_category','cleanup','timing'] if key in payload}
         record.update({key:attempt[key] for key in ['key','definition','sources','environment_identity','attempt_id']});record.update({'evidence':evidence,'recorded_at':now()})
         if result=='red':slot['red']=record
-        else:slot['result']=record
+        slot['result']=record
+        record['payload_hash']=digest(dump(payload).encode());slot.setdefault('receipts',{})[attempt['attempt_id']]=record
         if result=='fail' and classification=='executed-control':
             signature=payload.get('failure_signature')
             if not isinstance(signature,str) or not signature.strip():raise WorkflowError('Executed failure requires a stable failure signature')
@@ -929,18 +992,20 @@ def record_check(store,payload):
             if state['active_run']:state['active_run'].update({'phase':'blocked','stop_reason':entry['stop_reason'],'next_action':payload.get('next_action','Report the rejection and missing scope')})
         store.save(text,state);return record
 
-def validate_task_checks(store,tid,state=None):
+def validate_task_checks(store,tid,state=None,check_id=None):
     state=state or store.load();task=resolve(parse(store.text()),[tid],'Prioritized Next Changes')[0];entry=state['task_progress'].get(tid)
     if not entry or entry['stage'] not in {'implementing','awaiting-validation'}:raise WorkflowError('Task implementation/check progress is missing or blocked')
+    assert_admission(store,state,tid)
     records=[]
     for check in check_specs(task):
+        if check_id is not None and check['id']!=check_id:continue
         record=entry['checks'].get(check['id'],{}).get('result')
         if not record or record['result']!='pass':raise WorkflowError('Required check pending, failed or unavailable: '+check['id'])
         current=check_snapshot(store,task,check,state)
         if record['key']!=current['key'] or record['definition']!=current['definition']:raise WorkflowError('Required check evidence is stale: '+check['id'])
         for ref in record['evidence']:
             if not ref.get('available') or file_hash(store.root/ref['path'])!=ref['sha256']:raise WorkflowError('Required result evidence is unavailable or changed: '+check['id'])
-        records.append({'check':check,'result':record})
+        records.append({'check':check,'result':record,**({'red':entry['checks'][check['id']]['red']} if 'red' in entry['checks'][check['id']] else {})})
     return records
 
 def resume_task(store,payload):
@@ -958,7 +1023,11 @@ def reuse_check(store,payload):
     with store.lock():
         text=store.text();state=store.load(text);source,source_check=get_check(store,state,{'task_id':payload['from_task_id'],'check_id':payload['from_check_id']});target,target_check=get_check(store,state,payload)
         if not state['active_run'] or not source.get('validation_group_id') or source.get('validation_group_id')!=target.get('validation_group_id'):raise WorkflowError('Shared evidence requires an admitted compatible group')
-        records=validate_task_checks(store,source['id'],state);record=next(item['result'] for item in records if item['check']['id']==source_check['id'])
+        assert_scope(store,state,parse(text),target['id'])
+        records=validate_task_checks(store,source['id'],state,source_check['id']);record=next(item['result'] for item in records if item['check']['id']==source_check['id'])
+        target_entry=state['task_progress'].get(target['id'],{});recipe,environment=recipe_for(store,target_check)
+        source_session=state['task_progress'][source['id']].get('execution_sessions',{}).get(environment)
+        if source_session:target_entry.setdefault('execution_sessions',{}).setdefault(environment,deepcopy(source_session))
         snapshot=check_snapshot(store,target,target_check,state)
         if snapshot['key']!=record['key']:raise WorkflowError('Shared checks differ in recipe, parameters, assertion, sources or environment')
         entry=state['task_progress'].get(target['id'])

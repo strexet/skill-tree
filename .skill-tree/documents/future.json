@@ -1,8 +1,102 @@
 {
-  "active_run": null,
+  "active_run": {
+    "admission": {
+      "flavor": "general",
+      "identity": "repository-local"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-0d1fa805-6441-424e-9f49-64f63b732c9e",
+      "T-25f102b6-589a-459d-a8e7-eb0b2f082f2f",
+      "T-c91cc58b-b81f-4e27-9e9f-710090d7c9c3",
+      "T-d6dfa7ea-3bbe-4293-9d49-a3470c8d9f54"
+    ],
+    "completed_ids": [
+      "T-0d1fa805-6441-424e-9f49-64f63b732c9e"
+    ],
+    "completion_refs": {
+      "T-0d1fa805-6441-424e-9f49-64f63b732c9e": "O-e41f8da0-7077-40ae-878f-b0fbf6d5778b"
+    },
+    "current_task_id": "T-25f102b6-589a-459d-a8e7-eb0b2f082f2f",
+    "deferred_ids": [],
+    "id": "WR-64465f14-2fe9-4696-b451-a31de1ec7fcd",
+    "limits": {},
+    "mode": "next",
+    "next_action": "implement",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "implement",
+    "processing_results": [],
+    "required_ids": [
+      "T-d6dfa7ea-3bbe-4293-9d49-a3470c8d9f54",
+      "T-0d1fa805-6441-424e-9f49-64f63b732c9e",
+      "T-25f102b6-589a-459d-a8e7-eb0b2f082f2f"
+    ],
+    "root_task_id": "T-d6dfa7ea-3bbe-4293-9d49-a3470c8d9f54",
+    "snapshot": [
+      "T-d6dfa7ea-3bbe-4293-9d49-a3470c8d9f54"
+    ],
+    "started_at": "2026-11-02T07:33:58.032165+00:00",
+    "stop_reason": null
+  },
   "format": "skill-tree-future",
   "schema": 2,
-  "source_hash": "05a1f55b7a7202ce1a56bb01919c016110a355ca8de0fe746183d6e62853e634",
+  "source_hash": "b0126d3307bc1d9fd92cd6eaa5f096a7e81a0c12ada3738c3f64117c54f31c6d",
   "task_progress": {},
-  "tasks": []
+  "tasks": [
+    {
+      "depends_on": [
+        "T-0d1fa805-6441-424e-9f49-64f63b732c9e"
+      ],
+      "id": "T-25f102b6-589a-459d-a8e7-eb0b2f082f2f",
+      "line": 11,
+      "parent_pending_ids": [
+        "P-c526b036-fd1d-4a9a-b5b5-6e53fcf778b8"
+      ],
+      "priority": 113,
+      "processing_run_id": "PR-9c772e36-381c-4f7d-9f70-1a1744eb5ad2",
+      "queue": "Prioritized Next Changes",
+      "related_task_id": null,
+      "relation": "main",
+      "root_task_id": "T-25f102b6-589a-459d-a8e7-eb0b2f082f2f",
+      "status": "Ready",
+      "title": "Repair profile activation and installation recovery boundaries"
+    },
+    {
+      "depends_on": [
+        "T-25f102b6-589a-459d-a8e7-eb0b2f082f2f"
+      ],
+      "id": "T-c91cc58b-b81f-4e27-9e9f-710090d7c9c3",
+      "line": 56,
+      "parent_pending_ids": [
+        "P-c526b036-fd1d-4a9a-b5b5-6e53fcf778b8"
+      ],
+      "priority": 112,
+      "processing_run_id": "PR-9c772e36-381c-4f7d-9f70-1a1744eb5ad2",
+      "queue": "Prioritized Next Changes",
+      "related_task_id": null,
+      "relation": "main",
+      "root_task_id": "T-c91cc58b-b81f-4e27-9e9f-710090d7c9c3",
+      "status": "Ready",
+      "title": "Complete static specialization and package verification"
+    },
+    {
+      "depends_on": [
+        "T-c91cc58b-b81f-4e27-9e9f-710090d7c9c3"
+      ],
+      "id": "T-d6dfa7ea-3bbe-4293-9d49-a3470c8d9f54",
+      "line": 102,
+      "parent_pending_ids": [
+        "P-c526b036-fd1d-4a9a-b5b5-6e53fcf778b8"
+      ],
+      "priority": 111,
+      "processing_run_id": "PR-9c772e36-381c-4f7d-9f70-1a1744eb5ad2",
+      "queue": "Prioritized Next Changes",
+      "related_task_id": null,
+      "relation": "main",
+      "root_task_id": "T-d6dfa7ea-3bbe-4293-9d49-a3470c8d9f54",
+      "status": "Ready",
+      "title": "Qualify workflow redesign conformance repairs"
+    }
+  ]
 }

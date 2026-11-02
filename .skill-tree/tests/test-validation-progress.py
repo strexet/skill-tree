@@ -90,6 +90,7 @@ class ValidationProgressTests(unittest.TestCase):
         payload['failure_category']='expected-behavior';wf.record_check(self.store,payload)
         self.assertIn('red',self.store.load()['task_progress'][tid]['checks']['behavior'])
         with self.assertRaises(wf.WorkflowError):wf.validate_task_checks(self.store,tid)
+        next_attempt=wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'});payload['attempt_id']=next_attempt['attempt_id']
         payload.update({'result':'pass','counts':{'expected':1,'discovered':0,'passed':0,'failed':0,'skipped':0}})
         with self.assertRaises(wf.WorkflowError):wf.record_check(self.store,payload)
         payload['counts']={'expected':1,'discovered':1,'passed':1,'failed':0,'skipped':0};wf.record_check(self.store,payload);wf.validate_task_checks(self.store,tid)

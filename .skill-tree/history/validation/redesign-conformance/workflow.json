@@ -1,0 +1,17 @@
+{
+  "scope": "source and temporary-fixture controls",
+  "task_id": "T-0d1fa805-6441-424e-9f49-64f63b732c9e",
+  "checks": [
+    {
+      "log": "skill-tree-audit-test-py.log",
+      "sha256": "3d7d80e7d17289b0fa4255ce173de7406ce04de92a0ac0d9648c3e55889df199",
+      "summary": "(test_workflow_state.WorkflowStateTests.test_split_forward_dependency_resolves_keys_atomically_and_orders_execution) ... ok\ntest_targeted_processing_never_consumes_unselected_work (test_workflow_state.WorkflowStateTests.test_targeted_processing_never_consumes_unselected_work) ... ok\ntest_unresolved_finding_protects_old_audit_until_scoped_resolution (test_workflow_state.WorkflowStateTests.test_unresolved_finding_protects_old_audit_until_scoped_resolution) ... ok\ntest_writer_lock_rejects_second_controller (test_workflow_state.WorkflowStateTests.test_writer_lock_rejects_second_controller) ... ok\n\n----------------------------------------------------------------------\nRan 107 tests in 5.110s\n\nOK\n"
+    },
+    {
+      "log": "skill-tree-audit-test-node.log",
+      "sha256": "deda1ee6af3fc05358dbfea623f13bfd765722df8b39fe524f9216dca1f8aed0",
+      "summary": "oviders excluded from --all selection\nok 42 - soft providers excluded from --all selection\n  ---\n  duration_ms: 0.370709\n  ...\n# Subtest: known Tier 2 passthrough examples present or supported by --agent\nok 43 - known Tier 2 passthrough examples present or supported by --agent\n  ---\n  duration_ms: 0.122667\n  ...\n# Subtest: fixture duplicate provider id is detectable\nok 44 - fixture duplicate provider id is detectable\n  ---\n  duration_ms: 0.675167\n  ...\n# Subtest: fixture invalid soft probe is detectable\nok 45 - fixture invalid soft probe is detectable\n  ---\n  duration_ms: 0.21075\n  ...\n1..45\n# tests 45\n# suites 0\n# pass 45\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 6122.36675\n"
+    }
+  ],
+  "product_execution": false
+}

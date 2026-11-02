@@ -27,6 +27,13 @@
       "path": ".skill-tree/history/audits/audit-a-a13f44c1-7287-4a65-9971-0c5fdc0aec76.json",
       "recorded_at": "2026-10-14T05:55:09.306946+00:00",
       "scope": "workflow-helper-features"
+    },
+    {
+      "fresh": false,
+      "id": "A-b4515e85-52af-4c34-9f18-eeaeaa534b7d",
+      "path": ".skill-tree/history/audits/audit-a-b4515e85-52af-4c34-9f18-eeaeaa534b7d.json",
+      "recorded_at": "2026-11-02T07:19:52.968000+00:00",
+      "scope": "workflow-redesign-0-2-0"
     }
   ],
   "canonical_resources": {
@@ -840,10 +847,10 @@
   },
   "latest_audit": {
     "fresh": false,
-    "id": "A-a13f44c1-7287-4a65-9971-0c5fdc0aec76",
-    "path": ".skill-tree/history/audits/audit-a-a13f44c1-7287-4a65-9971-0c5fdc0aec76.json",
-    "recorded_at": "2026-10-14T05:55:09.306946+00:00",
-    "scope": "workflow-helper-features"
+    "id": "A-b4515e85-52af-4c34-9f18-eeaeaa534b7d",
+    "path": ".skill-tree/history/audits/audit-a-b4515e85-52af-4c34-9f18-eeaeaa534b7d.json",
+    "recorded_at": "2026-11-02T07:19:52.968000+00:00",
+    "scope": "workflow-redesign-0-2-0"
   },
   "policy_references": [
     "AGENTS.md"
@@ -871,21 +878,21 @@
     ".skill-tree/common/references/snapshot-rules.md": "18142120546fcd532e496fbd14aefbe449fa63da40cbcca577db249b91dcd30e",
     ".skill-tree/common/references/unity-safety.md": "ff6e0063e3a26f60d8655a08beb33ef19ffa2f27fce9c5efd573480b1b81e6ac",
     ".skill-tree/common/references/validation-policy.md": "e1827c8118d46b5b24bb60085303b6510fdf403279a7dfb3630a8d64f679a89c",
-    ".skill-tree/common/references/workflow-metadata.md": "d2af326b8a4416237a6fc964cea8102fc5558fa5339578748f6e5e422b103dca",
+    ".skill-tree/common/references/workflow-metadata.md": "c24f5bc17c07a814a7530cf5101a0882183b864d497c0b8fb770d0ad2fdea69e",
     ".skill-tree/common/scripts/create-documentation-snapshot.py": "c47fed16988ab9fecc6dc18f0fbc7d61df5a94de80eef2ef066f208a002e5741",
     ".skill-tree/common/scripts/inspect-unity-repository.py": "794230aca0f338a9d5a6ce7dd62df2016c9d13fb9622174429f9188225fb78e9",
     ".skill-tree/common/scripts/select-prioritized-task.py": "93f12ac5a333fb072bf8d9d849d08e3b422af856d582d492902647efe35c896f",
     ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     ".skill-tree/common/scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
     ".skill-tree/common/scripts/validate-repository-documentation.py": "d529f103760f9d37971ed5e2003b937915d7ff2c74243916f7c1d2344a9abdd0",
-    ".skill-tree/common/scripts/workflow-state.py": "9ad5c0b4e8f7773174fc60fbfd2869e8c177821b8dfed0218bb3def35a8e6ff0",
+    ".skill-tree/common/scripts/workflow-state.py": "5e26643ef4fc3c43cdf871019aed5c30b534cee2bff78a1e9d9913c28ea277fc",
     ".skill-tree/config/capabilities.json": "84b9f008ab33bdc188fa19dbb906b384a52cb5bc720b9b13c8767fc759b026d4",
     ".skill-tree/config/flavors.json": "b5f8b98748819d4829028e34c4c91e3437d136ab96ba13989eade76cf5898643",
     ".skill-tree/config/providers.json": "80255fe3fb67e32d71cc7791aee1e51c1d34a508d4c77b6ca852521907ede97a",
     ".skill-tree/config/repository.json": "cdc6218cb1003e00d1e3d703de079a476d283ab6a27132a581078c8228c1eef7",
     ".skill-tree/config/resource-map.json": "bc7f451af9eae6845327445e5b6f1b26fe382ea1fcb3a2a25701eb517e65d889",
     ".skill-tree/documents/agent-compatibility.md": "21e2c40b92081803060ba0e2af521d93c853f6ee54643578ed0335b89b0c2dfe",
-    ".skill-tree/documents/future.md": "05a1f55b7a7202ce1a56bb01919c016110a355ca8de0fe746183d6e62853e634",
+    ".skill-tree/documents/future.md": "b0126d3307bc1d9fd92cd6eaa5f096a7e81a0c12ada3738c3f64117c54f31c6d",
     ".skill-tree/documents/implementation-plan.md": "52b7af510e621cb98392e57f07a5964cd1590e7c7c28ddcf4ab8b9cddd5076cf",
     ".skill-tree/documents/install.md": "3f5e2cb5b842929f5f9d73327b384367ef1f5d40b7cff2c9175afa68e9b81d8e",
     ".skill-tree/documents/installation-architecture.md": "fd548f5be2a74fbfdb416a748e62869771d80f04acb47b246d4488effe083eea",
