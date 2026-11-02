@@ -928,7 +928,14 @@ def binding_context(store,recipe,allow_blocked=False):
         text=binding_path(root,'ProjectSettings/ProjectVersion.txt').read_text();version=re.search(r'm_EditorVersion:\s*(\S+)',text)
         locked=json.loads(binding_path(root,'Packages/packages-lock.json').read_text(encoding='utf-8-sig'))['dependencies']
         if not version or version[1]!=pins['editor_version'] or locked.get('com.unity.test-framework',{}).get('version')!=pins['utf_version']:raise WorkflowError('Binding Editor or UTF pin mismatch')
-        if root==execution and locked.get('com.unity.pipeline',{}).get('version')!=pins['pipeline_version']:raise WorkflowError('Binding Pipeline pin mismatch')
+        if root==execution:
+            pipeline=locked.get('com.unity.pipeline',{});pipeline_version=pipeline.get('version')
+            if pipeline.get('source')=='embedded':
+                if pipeline_version!='file:com.unity.pipeline':raise WorkflowError('Binding embedded Pipeline location mismatch')
+                embedded=json.loads(binding_path(execution,'Packages/com.unity.pipeline/package.json').read_text(encoding='utf-8-sig'))
+                if embedded.get('name')!='com.unity.pipeline':raise WorkflowError('Binding embedded Pipeline identity mismatch')
+                pipeline_version=embedded.get('version')
+            if pipeline_version!=pins['pipeline_version']:raise WorkflowError('Binding Pipeline pin mismatch')
     if binding['blockers'] and not allow_blocked:raise WorkflowError('Validation-blocked: '+str(len(binding['blockers']))+' unqualified isolated source differences; review '+binding['review_path'])
     return {'id':binding_id,**{key:binding[key] for key in ['queue_root','execution_root','workspace_root','queue_digest','execution_digest','workspace_digest','pins','review_digest','blockers']}}
 

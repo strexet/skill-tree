@@ -31,7 +31,15 @@ function resolveBindings(queue,document){
   const pins=spec.pins;if(!pins||!['editor_version','cli_version','pipeline_version','utf_version'].every(k=>typeof pins[k]==='string'&&pins[k]))throw Error('Binding requires explicit toolchain pins');
   for(const root of [queue,execution]){const editor=fs.readFileSync(checked(root,'ProjectSettings/ProjectVersion.txt'),'utf8').match(/m_EditorVersion:\s*(\S+)/)?.[1];const locked=jsonAt(root,'Packages/packages-lock.json').dependencies||{};if(editor!==pins.editor_version||locked['com.unity.test-framework']?.version!==pins.utf_version)throw Error('Binding Editor or UTF pin mismatch');}
   const locked=jsonAt(execution,'Packages/packages-lock.json').dependencies||{};
-  if(locked['com.unity.pipeline']?.version!==pins.pipeline_version)throw Error('Binding Pipeline pin mismatch');
+  const pipeline=locked['com.unity.pipeline'];
+  let pipelineVersion=pipeline?.version;
+  if(pipeline?.source==='embedded'){
+   if(pipeline.version!=='file:com.unity.pipeline')throw Error('Binding embedded Pipeline location mismatch');
+   const embedded=jsonAt(execution,'Packages/com.unity.pipeline/package.json');
+   if(embedded.name!=='com.unity.pipeline')throw Error('Binding embedded Pipeline identity mismatch');
+   pipelineVersion=embedded.version;
+  }
+  if(pipelineVersion!==pins.pipeline_version)throw Error('Binding Pipeline pin mismatch');
   result[id]={...spec,queue_root:queue,workspace_root:workspace,execution_root:execution,locator_digest:hash(fs.readFileSync(checked(queue,spec.locator))),review_digest:hash(fs.readFileSync(checked(queue,spec.review_path))),queue_digest:q.digest,execution_digest:e.digest,workspace_digest:w.digest,blockers:blockers.sort(),qualification:'reviewed static identity only; product execution unqualified'};
  }
  return result;

@@ -32,3 +32,16 @@ test('binding refuses mismatched pins and non-product relabeling while retaining
  f.spec.pins.editor_version='6000.0.83f1';f.document.recipes.isolated.lane='static';f.write(f.queue,'.skill-tree/validation-recipes.json',f.document);assert.throws(()=>c.resolveProfile(source,f.queue,'unity'),/Unity execution binding/);
  f.document.recipes.isolated.lane='unity-playmode';f.review.differences[0].classification='unqualified';f.write(f.queue,f.spec.review_path,f.review);f.write(f.queue,'.skill-tree/validation-recipes.json',f.document);assert.deepEqual(c.resolveProfile(source,f.queue,'unity').execution_bindings.pilot.blockers,['Assets/fixture.cs']);
 });
+
+test('embedded Pipeline uses reviewed package identity and version, never the file locator as a version',t=>{
+ const f=fixture(t,'6000.3.27f2');
+ f.write(f.execution,'Packages/com.unity.pipeline/package.json',{name:'com.unity.pipeline',version:'0.9.1-exp.1'});
+ f.write(f.execution,'Packages/packages-lock.json',{dependencies:{'com.unity.test-framework':{version:'1.6.0'},'com.unity.pipeline':{version:'file:com.unity.pipeline',source:'embedded'}}});
+ const q=b.snapshot(f.queue,f.spec.source_paths),e=b.snapshot(f.execution,f.spec.source_paths);
+ f.review.queue_digest=q.digest;f.review.execution_digest=e.digest;
+ f.review.differences=[...new Set([...Object.keys(q.files),...Object.keys(e.files)])].filter(n=>q.files[n]!==e.files[n]).map(n=>({path:n,queue:q.files[n]||null,execution:e.files[n]||null,classification:'fixture',reason:'Reviewed test fixture.'}));
+ f.write(f.queue,f.spec.review_path,f.review);f.spec.pins.pipeline_version='0.9.1-exp.1';
+ assert.doesNotThrow(()=>b.resolveBindings(f.queue,f.document));
+ f.spec.pins.pipeline_version='0.7.0-exp.1';assert.throws(()=>b.resolveBindings(f.queue,f.document),/Pipeline pin mismatch/);
+ f.spec.pins.pipeline_version='file:com.unity.pipeline';assert.throws(()=>b.resolveBindings(f.queue,f.document),/Pipeline pin mismatch/);
+});

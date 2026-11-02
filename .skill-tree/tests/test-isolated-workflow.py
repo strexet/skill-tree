@@ -46,6 +46,16 @@ class IsolatedWorkflowTests(unittest.TestCase):
                 path=root/relative;before=path.read_bytes();path.write_bytes(before+b' ')
                 with self.assertRaises(wf.WorkflowError):wf.recipe_for(self.store,self.check)
                 path.write_bytes(before)
+    def test_embedded_pipeline_matches_the_package_version_and_rejects_locator_pins(self):
+        self.write(self.execution,'Packages/com.unity.pipeline/package.json',{'name':'com.unity.pipeline','version':'0.9.1-exp.1'})
+        self.write(self.execution,'Packages/packages-lock.json',{'dependencies':{'com.unity.test-framework':{'version':'1.6.0'},'com.unity.pipeline':{'version':'file:com.unity.pipeline','source':'embedded'}}})
+        binding=self.profile['execution_bindings']['pilot'];binding['execution_digest']=wf.binding_snapshot(self.execution,self.binding['source_paths']);binding['pins']['pipeline_version']='0.9.1-exp.1'
+        self.write(self.root,'.skill-tree/installation/profile.json',self.profile)
+        self.assertEqual(wf.binding_context(self.store,self.recipe)['pins']['pipeline_version'],'0.9.1-exp.1')
+        for version in ['0.7.0-exp.1','file:com.unity.pipeline']:
+            binding['pins']['pipeline_version']=version;self.write(self.root,'.skill-tree/installation/profile.json',self.profile)
+            with self.subTest(version=version),self.assertRaisesRegex(wf.WorkflowError,'Pipeline pin mismatch'):wf.binding_context(self.store,self.recipe)
+
     def test_product_session_requires_matching_binding_toolchain_source_and_isolation(self):
         recipe,env=wf.recipe_for(self.store,self.check);self.write(self.root,'identity.json',{'checkout':str(self.execution)})
         session={'project_root':str(self.execution),'queue_root':str(self.root),'binding_id':'pilot','source_identity':recipe['execution_context']['execution_digest'],'authorization':'owner exact scoped request','profile_id':'reviewed-profile','deadline_utc':(datetime.now(timezone.utc)+timedelta(minutes=5)).isoformat(),'cleanup_seconds':5,'tool_identity':{'cli_version':'1.0.0-beta.10','pipeline_version':'0.7.0-exp.1'},'session_identity':'owned-process','fixture_identity':'isolated-fixture','build_identity':'compiled-source','identity_evidence':['identity.json'],'editor_version':'6000.3.27f2','save_service_isolation':'verified'}
