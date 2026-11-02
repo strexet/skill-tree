@@ -8,7 +8,26 @@
     },
     "web": {
       "sections": "domains/web/sections.json",
-      "resources": {}
+      "resources": {
+        "references/web-development.md": "domains/web/development.md"
+      },
+      "conditional_resources": [
+        {
+          "when": {
+            "field": [
+              "facts",
+              "packages",
+              "@playwright/test",
+              "version"
+            ],
+            "matches": "^1\\.\\d+\\.\\d+$"
+          },
+          "resources": {
+            "references/playwright-testing.md": "domains/web/playwright-testing.md"
+          },
+          "instruction": "Use the [Playwright fixture](references/playwright-testing.md) with the admitted declared recipes."
+        }
+      ]
     },
     "unity": {
       "sections": "domains/unity/sections.json",

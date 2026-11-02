@@ -51,3 +51,13 @@ test('Unity capability composition gates panel, input and performance fixtures b
  assert.ok(modern['references/panel-simulator.md']);assert.ok(modern['references/input-testing.md']);assert.ok(modern['references/performance-testing.md']);assert.ok(!modern['references/ugui-testing.md']);
  const unsupported=profile('6000.0.83f1',{'com.unity.ui.test-framework':'6.3.0'},true);assert.ok(!unsupported['references/panel-simulator.md']);
 });
+test('Web browser component runners retain browser effects and exact pinned conditional resources',t=>{
+ const root=fixture(t);write(root,'package.json',{engines:{node:'22.12.0'},devDependencies:{'@playwright/test':'1.56.1'},scripts:{'test:component':'playwright test --project=components','test:api':'node --test tests/api','dev':'vite --host 127.0.0.1'}});
+ const p=c.resolveProfile(source,root,'web');assert.equal(p.recipes['script-test-component'].lane,'browser');assert.equal(p.recipes['script-test-api'].lane,'integration');assert.ok(p.recipes['script-dev']);
+ const pkg=c.compose(source,p).packages['skill-tree-work-through-next'];assert.ok(pkg['references/playwright-testing.md']);assert.ok(!pkg['references/unity-development.md']);
+ write(root,'package.json',{scripts:{test:'python -m pytest'}});const generic=c.compose(source,c.resolveProfile(source,root,'web')).packages['skill-tree-work-through-next'];assert.ok(!generic['references/playwright-testing.md']);assert.ok(generic['references/web-development.md']);
+});
+test('non-JavaScript Web roots use declared static recipes without importing executable configuration',t=>{
+ const root=fixture(t);write(root,'pyproject.toml','[project]\nname = "api"\n');write(root,'.skill-tree/validation-recipes.json',{schema:1,recipes:{'api-tests':{lane:'integration',argv:['python','-m','pytest','tests/api'],input_paths:['pyproject.toml']}}});
+ const p=c.resolveProfile(source,root,'web');assert.deepEqual(p.recipes['api-tests'].argv,['python','-m','pytest','tests/api']);assert.ok(!p.gaps.some(g=>g.key==='test-foundation'));
+});

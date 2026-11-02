@@ -1,0 +1,9 @@
+{
+  "unit": "U-07",
+  "qualification": "source-contract-and-temporary-fixture",
+  "checks": [
+    "8 composer controls including Web behavioral Red/Green: pass",
+    "Strict source validation: pass",
+    "Browser-backed component classification, non-JavaScript recipes and conditional Playwright resources: pass; no browser/server executed"
+  ]
+}

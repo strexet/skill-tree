@@ -14,4 +14,4 @@ Read applicable rules, current documentation, relevant implementation/configurat
 
 Generated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency.
 
-Use focused behavior, component and API fixtures promptly. Browser checks cover actual routing, hydration, storage, service-worker lifecycle, layout, keyboard focus and accessibility when relevant. Verify exact server/build identity and browser policy; mock or screenshot evidence alone never establishes integration. Deployment and physical-device evidence remain separate.
+Use focused behavior, component and API fixtures promptly. Browser checks cover actual routing, hydration, storage, service-worker lifecycle, layout, keyboard focus and accessibility when relevant. Verify exact server/build identity and browser policy; mock or screenshot evidence alone never establishes integration. Deployment and physical-device evidence remain separate. Read [Web development](references/web-development.md) for server identity, failure states and browser/hosted evidence.

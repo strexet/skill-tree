@@ -383,6 +383,7 @@
         ".skill-tree/skills/web/skill-tree-add-pending-task/references/pending-task-intake.md",
         ".skill-tree/skills/web/skill-tree-add-pending-task/references/project-profile.md",
         ".skill-tree/skills/web/skill-tree-add-pending-task/references/validation-policy.md",
+        ".skill-tree/skills/web/skill-tree-add-pending-task/references/web-development.md",
         ".skill-tree/skills/web/skill-tree-add-pending-task/references/workflow-metadata.md",
         ".skill-tree/skills/web/skill-tree-add-pending-task/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-add-pending-task/scripts/workflow-state.py"
@@ -399,6 +400,7 @@
         ".skill-tree/skills/web/skill-tree-create-documents-snapshot/references/project-profile.md",
         ".skill-tree/skills/web/skill-tree-create-documents-snapshot/references/snapshot-rules.md",
         ".skill-tree/skills/web/skill-tree-create-documents-snapshot/references/validation-policy.md",
+        ".skill-tree/skills/web/skill-tree-create-documents-snapshot/references/web-development.md",
         ".skill-tree/skills/web/skill-tree-create-documents-snapshot/scripts/create-documentation-snapshot.py"
       ]
     },
@@ -417,6 +419,7 @@
         ".skill-tree/skills/web/skill-tree-implement-all/references/pending-task-intake.md",
         ".skill-tree/skills/web/skill-tree-implement-all/references/project-profile.md",
         ".skill-tree/skills/web/skill-tree-implement-all/references/validation-policy.md",
+        ".skill-tree/skills/web/skill-tree-implement-all/references/web-development.md",
         ".skill-tree/skills/web/skill-tree-implement-all/references/workflow-metadata.md",
         ".skill-tree/skills/web/skill-tree-implement-all/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-implement-all/scripts/workflow-state.py"
@@ -435,6 +438,7 @@
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/references/pending-task-format.md",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/references/project-profile.md",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/references/validation-policy.md",
+        ".skill-tree/skills/web/skill-tree-implement-next-future-task/references/web-development.md",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/references/workflow-metadata.md",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/scripts/select-prioritized-task.py",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/scripts/validate-document-rules.py",
@@ -454,6 +458,7 @@
         ".skill-tree/skills/web/skill-tree-process-future-pending/references/pending-task-format.md",
         ".skill-tree/skills/web/skill-tree-process-future-pending/references/project-profile.md",
         ".skill-tree/skills/web/skill-tree-process-future-pending/references/validation-policy.md",
+        ".skill-tree/skills/web/skill-tree-process-future-pending/references/web-development.md",
         ".skill-tree/skills/web/skill-tree-process-future-pending/references/workflow-metadata.md",
         ".skill-tree/skills/web/skill-tree-process-future-pending/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-process-future-pending/scripts/validate-future-document.py",
@@ -474,6 +479,7 @@
         ".skill-tree/skills/web/skill-tree-repo-documentation/references/project-profile.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation/references/repository-discovery-checklist.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation/references/validation-policy.md",
+        ".skill-tree/skills/web/skill-tree-repo-documentation/references/web-development.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation/references/workflow-metadata.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-repo-documentation/scripts/validate-future-document.py",
@@ -495,6 +501,7 @@
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/references/project-profile.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/references/repository-discovery-checklist.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/references/validation-policy.md",
+        ".skill-tree/skills/web/skill-tree-repo-documentation-audit/references/web-development.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/references/workflow-metadata.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/scripts/validate-future-document.py",
@@ -517,6 +524,7 @@
         ".skill-tree/skills/web/skill-tree-work-through-next/references/pending-task-intake.md",
         ".skill-tree/skills/web/skill-tree-work-through-next/references/project-profile.md",
         ".skill-tree/skills/web/skill-tree-work-through-next/references/validation-policy.md",
+        ".skill-tree/skills/web/skill-tree-work-through-next/references/web-development.md",
         ".skill-tree/skills/web/skill-tree-work-through-next/references/workflow-metadata.md",
         ".skill-tree/skills/web/skill-tree-work-through-next/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-work-through-next/scripts/workflow-state.py"
@@ -751,6 +759,16 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/domains/web/development.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/domains/web/playwright-testing.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/domains/web/sections.json",
       "role": "canonical"
     },
@@ -842,12 +860,12 @@
     ".skill-tree/common/scripts/validate-repository-documentation.py": "d529f103760f9d37971ed5e2003b937915d7ff2c74243916f7c1d2344a9abdd0",
     ".skill-tree/common/scripts/workflow-state.py": "9ad5c0b4e8f7773174fc60fbfd2869e8c177821b8dfed0218bb3def35a8e6ff0",
     ".skill-tree/config/capabilities.json": "84b9f008ab33bdc188fa19dbb906b384a52cb5bc720b9b13c8767fc759b026d4",
-    ".skill-tree/config/flavors.json": "18e6027986b1281e01f9af309eccfd52bb1f38702e888621d85623dde4800817",
+    ".skill-tree/config/flavors.json": "b5f8b98748819d4829028e34c4c91e3437d136ab96ba13989eade76cf5898643",
     ".skill-tree/config/providers.json": "80255fe3fb67e32d71cc7791aee1e51c1d34a508d4c77b6ca852521907ede97a",
     ".skill-tree/config/repository.json": "cdc6218cb1003e00d1e3d703de079a476d283ab6a27132a581078c8228c1eef7",
     ".skill-tree/config/resource-map.json": "db55c5897e58749bf0b54febf364ecce21f202305fa7f1cfb998da3e9f873d60",
     ".skill-tree/documents/agent-compatibility.md": "f3a154273909067262ee90fa7a944f7149468c38102eeb3e4ea852435f1b8e29",
-    ".skill-tree/documents/future.md": "fb7c0eeedeae1719f5e1fcf8198d0c290c3fdbb870fb4874abd3d10c9084eff8",
+    ".skill-tree/documents/future.md": "ba3c72733c8bf51ef38c72b80d5e2195b6ced365c9085028d6c9d27af88db37c",
     ".skill-tree/documents/implementation-plan.md": "7f85a4ec6bf302c26be6e832e43da349f35064b5b7b9b110281c940ba250225e",
     ".skill-tree/documents/install.md": "69762781fdd64fe84fdc8ac528c17d589ed83e269884e92f9726c25fd51b2f29",
     ".skill-tree/documents/installation-architecture.md": "cbf2088a256139a2b95c8e4193910d7f2000fcadfff64a4271d47357959fdf8e",
@@ -863,8 +881,10 @@
     ".skill-tree/domains/unity/sections.json": "e95700a599c6048e3ee9b32b1428c452707297e7425f48349bd8cacd58e9bdc6",
     ".skill-tree/domains/unity/ugui-testing.md": "873c236f793ff3c9ece8f0d0346c5c48513e8220406fce216751571c58b79073",
     ".skill-tree/domains/unity/uitk-testing.md": "c817eb7700e4082ed46557088535ac10e39c928c866ee3b99b343e626b9e449e",
-    ".skill-tree/domains/web/sections.json": "fe03c8a26d9977e21fd6c81ea2d5f484d9702a0f97c02749c2780f8f58cdbcd1",
-    ".skill-tree/lib/composer.js": "b436bc2401a1afe6273eca595bb6853d055ed9608de263d8d84330c20791cb8f",
+    ".skill-tree/domains/web/development.md": "a8e55f4d58ad64056707801a3c31aa56eb884755fd12ef08c341680d73645bc9",
+    ".skill-tree/domains/web/playwright-testing.md": "661393b4329bbe03f68f1570919fe8bf02dcebb5bf77555f3c5c46e05d4739a7",
+    ".skill-tree/domains/web/sections.json": "705a5dca39a2a0baa64f0043d6d188ade153c7dff553fcf55bfd25256b2bb2c7",
+    ".skill-tree/lib/composer.js": "476ed2a55c0f064a335f8385dea10eae3487882959e4644275e13e8cc3c08750",
     ".skill-tree/lib/installation.js": "6c9811b15db6693a7fe6e8ab4c0c7d04de52e9cf881e2b9e1ccb33ca83323976",
     ".skill-tree/scripts/run-tests.py": "00c61ad36efcc208865692e5822f38dd4bbbc036d058bc7e55bc81c3851b711e",
     ".skill-tree/scripts/sync-skill-references.py": "7362077b0b1d031c88af9a1ddb7cfe8ddc2bc3472e64cb470100ac24038404b9",

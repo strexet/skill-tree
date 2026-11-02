@@ -57,9 +57,9 @@ function resolveProfile(source,root,flavor) {
   facts.packages[name]={state:exact?'known':'ambiguous',version:exact,declaration:declared};
  }
  for(const [name,command] of Object.entries(pkg.scripts||{}).sort()){
-  if(!/^(test(?::[\w-]+)?|lint|typecheck|check|build)$/.test(name))continue;
+  if(!/^(test(?::[\w-]+)?|lint|typecheck|check|build|dev|start|preview)$/.test(name))continue;
   if(/echo\s+["']?Error: no test specified/.test(command))continue;
-  const lane=/browser|e2e/.test(name)?'browser':name==='build'?'build':/lint|typecheck|check/.test(name)?'static':'unit';
+  const lane=/playwright|cypress|--browser\b/.test(command)||/browser|e2e/.test(name)?'browser':/test:(api|integration)/.test(name)?'integration':/^(dev|start|preview)$/.test(name)?'server':name==='build'?'build':/lint|typecheck|check/.test(name)?'static':'unit';
   recipes['script-'+name.replace(/:/g,'-')]={lane,argv:[manager,'run',name],declared_command:command,input_paths:['package.json',...locks,...discovered.filter(p=>/config|policy/.test(p))],qualification:'static-recipe; runner unqualified'};
  }
  if(flavor==='unity'){
@@ -82,7 +82,7 @@ function resolveProfile(source,root,flavor) {
   if(utf)for(const lane of ['EditMode','PlayMode'])recipes['unity-'+lane.toLowerCase()]={lane:'unity-'+lane.toLowerCase(),argv:['Unity','-batchmode','-projectPath','{project_root}','-runTests','-testPlatform',lane,'-testFilter','{test_filter}','-testResults','{result_path}','-logFile','{log_path}'],editor_version:version,utf_version:utf.version,input_paths:['ProjectSettings/ProjectVersion.txt','Packages/manifest.json','Packages/packages-lock.json',...discovered],qualification:'static-recipe; authorized matching Editor and isolated fixture required'};
   if(!utf)gaps.push({key:'test-foundation',reason:'The project lacks the foundational Unity Test Framework.',recommendation:'Research the pinned Editor, configure compatible UTF and a meaningful EditMode smoke test, document focused commands and refresh the profile.'});
   else if(!facts.test_assemblies.length)gaps.push({key:'test-foundation',reason:'UTF exists without a discovered test assembly.',recommendation:'Configure the existing UTF framework and one meaningful EditMode test assembly; preserve package pins.'});
- } else if(!Object.values(recipes).some(r=>r.lane==='unit'))gaps.push({key:'test-foundation',reason:'No usable foundational test command is declared.',recommendation:'Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile.'});
+ } else if(!Object.values(recipes).some(r=>['unit','integration','browser'].includes(r.lane)))gaps.push({key:'test-foundation',reason:'No usable foundational test command is declared.',recommendation:'Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile.'});
  const explicit=readJson(root,'.skill-tree/validation-recipes.json',null);
  if(explicit){if(explicit.schema!==1||!explicit.recipes)throw Error('Unsupported static validation recipe format');for(const [id,recipe] of Object.entries(explicit.recipes)){
   if(!/^[a-z][a-z0-9-]*$/.test(id)||!Array.isArray(recipe.argv)||!recipe.argv.length||recipe.argv.some(v=>typeof v!=='string')||!recipe.lane)throw Error('Invalid static recipe: '+id);
@@ -90,7 +90,7 @@ function resolveProfile(source,root,flavor) {
   recipes[id]={...recipe,input_paths:['.skill-tree/validation-recipes.json',...(recipe.input_paths||[])],qualification:'owner-declared static recipe; runner unqualified'};
   for(const rel of recipe.input_paths||[]){const value=read(root,rel);inputs[rel]=value===null?null:hash(value);}
  }
- if(Object.values(recipes).some(r=>['unit','unity-editmode'].includes(r.lane)))gaps.splice(0,gaps.length,...gaps.filter(g=>g.key!=='test-foundation'));}
+ if(Object.values(recipes).some(r=>['unit','integration','browser','unity-editmode'].includes(r.lane)))gaps.splice(0,gaps.length,...gaps.filter(g=>g.key!=='test-foundation'));}
  const environment_id=hash(json({flavor,inputs,facts,recipes}));
  return {format:'skill-tree-profile',schema:1,composer_version:registry.composer_version,flavor,project_root:root,inputs,inventory:discovered,facts,recipes,gaps,environment_id,qualification:'static compatibility only; product execution unqualified'};
 }
