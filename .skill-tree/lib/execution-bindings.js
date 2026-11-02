@@ -15,6 +15,10 @@ function snapshot(root,paths,excluded=[]){
  const entries=Object.entries(files).sort(([a],[b])=>Buffer.compare(Buffer.from(a),Buffer.from(b)));
  return {files:Object.fromEntries(entries),digest:hash(entries.map(([name,digest])=>name+'\0'+digest+'\n').join(''))};
 }
+function supportSnapshot(root,paths){
+ if(!Array.isArray(paths))throw Error('Binding support paths require a list');
+ return paths.length?snapshot(root,paths):{files:{},digest:hash('')};
+}
 function resolveBindings(queue,document){
  const result={};
  for(const [id,spec] of Object.entries(document.execution_bindings||{})){
@@ -22,8 +26,10 @@ function resolveBindings(queue,document){
   if(!spec.locator?.startsWith('.skill-tree/local/'))throw Error('Binding locator requires local machine configuration');
   const locator=jsonAt(queue,spec.locator);if(locator.schema!==1||rootPath(locator.queue_root)!==queue)throw Error('Foreign binding queue identity');
   const workspace=rootPath(locator.workspace_root),execution=rootPath(checked(workspace,spec.execution_subdir));disjoint(queue,workspace);disjoint(queue,execution);
-  const q=snapshot(queue,spec.source_paths,spec.exclude_paths),e=snapshot(execution,spec.source_paths,spec.exclude_paths),w=snapshot(workspace,spec.workspace_paths),review=jsonAt(queue,spec.review_path);
+  const q=snapshot(queue,spec.source_paths,spec.exclude_paths),e=snapshot(execution,spec.source_paths,spec.exclude_paths),w=supportSnapshot(workspace,spec.workspace_paths===undefined?[]:spec.workspace_paths),support=supportSnapshot(queue,spec.queue_paths===undefined?[]:spec.queue_paths),review=jsonAt(queue,spec.review_path);
   if(review.schema!==1||review.queue_digest!==q.digest||review.execution_digest!==e.digest||review.workspace_digest!==w.digest)throw Error('Binding source review is stale');
+  if(!Object.keys(w.files).length&&!Object.keys(support.files).length)throw Error('Binding requires reviewed runner/profile paths');
+  if(spec.queue_paths?.length&&review.queue_support_digest!==support.digest)throw Error('Binding queue support review is stale');
   const differences={};for(const name of new Set([...Object.keys(q.files),...Object.keys(e.files)])){if(q.files[name]!==e.files[name])differences[name]={queue:q.files[name]||null,execution:e.files[name]||null};}
   if(!Array.isArray(review.differences)||review.differences.length!==Object.keys(differences).length)throw Error('Binding review must classify every source difference');
   const seen=new Set(),blockers=[];
@@ -40,7 +46,7 @@ function resolveBindings(queue,document){
    pipelineVersion=embedded.version;
   }
   if(pipelineVersion!==pins.pipeline_version)throw Error('Binding Pipeline pin mismatch');
-  result[id]={...spec,queue_root:queue,workspace_root:workspace,execution_root:execution,locator_digest:hash(fs.readFileSync(checked(queue,spec.locator))),review_digest:hash(fs.readFileSync(checked(queue,spec.review_path))),queue_digest:q.digest,execution_digest:e.digest,workspace_digest:w.digest,blockers:blockers.sort(),qualification:'reviewed static identity only; product execution unqualified'};
+  result[id]={...spec,workspace_paths:spec.workspace_paths===undefined?[]:spec.workspace_paths,...(spec.queue_paths?.length?{queue_support_digest:support.digest}:{}),queue_root:queue,workspace_root:workspace,execution_root:execution,locator_digest:hash(fs.readFileSync(checked(queue,spec.locator))),review_digest:hash(fs.readFileSync(checked(queue,spec.review_path))),queue_digest:q.digest,execution_digest:e.digest,workspace_digest:w.digest,blockers:blockers.sort(),qualification:'reviewed static identity only; product execution unqualified'};
  }
  return result;
 }

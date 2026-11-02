@@ -45,3 +45,18 @@ test('embedded Pipeline uses reviewed package identity and version, never the fi
  f.spec.pins.pipeline_version='0.7.0-exp.1';assert.throws(()=>b.resolveBindings(f.queue,f.document),/Pipeline pin mismatch/);
  f.spec.pins.pipeline_version='file:com.unity.pipeline';assert.throws(()=>b.resolveBindings(f.queue,f.document),/Pipeline pin mismatch/);
 });
+
+test('canonical project owns runner source without a separate workspace tooling tree',t=>{
+ const f=fixture(t,'6000.3.27f2');f.write(f.queue,'Tools/Automation/run.py','raise RuntimeError("Never execute during composition")');
+ f.spec.queue_paths=['Tools/Automation'];f.spec.workspace_paths=[];
+ f.review.workspace_digest=b.snapshot(f.workspace,['scripts/runner.py']).digest;
+ f.review.workspace_digest=require('node:crypto').createHash('sha256').update('').digest('hex');
+ f.review.queue_support_digest=b.snapshot(f.queue,f.spec.queue_paths).digest;f.write(f.queue,f.spec.review_path,f.review);
+ f.document.recipes.isolated.argv=['python3','{queue_root}/Tools/Automation/run.py','--project','{project_root}'];f.write(f.queue,'.skill-tree/validation-recipes.json',f.document);
+ const p=c.resolveProfile(source,f.queue,'unity');assert.equal(p.execution_bindings.pilot.queue_support_digest,f.review.queue_support_digest);assert.deepEqual(p.execution_bindings.pilot.workspace_paths,[]);
+ f.write(f.queue,'Tools/Automation/run.py','changed');assert.throws(()=>c.resolveProfile(source,f.queue,'unity'),/queue support review is stale/);
+});
+test('empty or invalid automation scopes cannot silently drop runner fingerprints',t=>{
+ const f=fixture(t);f.spec.queue_paths=[];f.spec.workspace_paths=[];f.review.workspace_digest=require('node:crypto').createHash('sha256').update('').digest('hex');f.write(f.queue,f.spec.review_path,f.review);
+ assert.throws(()=>b.resolveBindings(f.queue,f.document),/reviewed runner/);f.spec.queue_paths='Tools';assert.throws(()=>b.resolveBindings(f.queue,f.document),/require a list/);
+});

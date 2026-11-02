@@ -39,6 +39,13 @@ class IsolatedWorkflowTests(unittest.TestCase):
         self.assertEqual(recipe['execution_context']['execution_digest'],wf.binding_snapshot(self.execution,self.binding['source_paths']))
         self.check['parameters']['execution_checkout']=str(self.root)
         with self.assertRaisesRegex(wf.WorkflowError,'Check checkout'):wf.recipe_for(self.store,self.check)
+    def test_project_owned_runner_is_hashed_without_workspace_tooling(self):
+        self.write(self.root,'Tools/Automation/run.py','canonical runner')
+        binding=self.profile['execution_bindings']['pilot'];binding['queue_paths']=['Tools/Automation'];binding['workspace_paths']=[];binding['workspace_digest']=wf.digest(b'');binding['queue_support_digest']=wf.binding_snapshot(self.root,binding['queue_paths']);self.write(self.root,'.skill-tree/installation/profile.json',self.profile)
+        self.assertEqual(wf.binding_context(self.store,self.recipe)['queue_support_digest'],binding['queue_support_digest'])
+        self.write(self.root,'Tools/Automation/run.py','changed canonical runner')
+        with self.assertRaisesRegex(wf.WorkflowError,'queue support identity changed'):wf.binding_context(self.store,self.recipe)
+
     def test_changed_sources_locator_runner_and_review_are_rejected(self):
         cases=[(self.execution,'Assets/fixture.cs'),(self.root,'Assets/main.cs'),(self.workspace,'scripts/runner.py'),(self.root,self.binding['review_path']),(self.root,self.binding['locator'])]
         for root,relative in cases:

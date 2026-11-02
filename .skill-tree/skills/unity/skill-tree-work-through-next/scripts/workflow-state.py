@@ -886,8 +886,8 @@ def binding_path(root,relative):
         if current.is_symlink():raise WorkflowError('Binding symlink is unsupported: '+relative)
     return current
 
-def binding_snapshot(root,paths,excluded=None):
-    if not isinstance(paths,list) or not paths:raise WorkflowError('Binding requires source paths')
+def binding_snapshot(root,paths,excluded=None,allow_empty=False):
+    if not isinstance(paths,list) or (not paths and not allow_empty):raise WorkflowError('Binding requires source paths')
     excluded=excluded or []
     if not isinstance(excluded,list):raise WorkflowError('Binding exclusions require relative paths')
     for relative in excluded:binding_path(root,relative)
@@ -921,7 +921,11 @@ def binding_context(store,recipe,allow_blocked=False):
     if queue==execution or queue in execution.parents or execution in queue.parents or queue==workspace or queue in workspace.parents or workspace in queue.parents:raise WorkflowError('Binding queue and execution roots overlap')
     if file_hash(binding_path(queue,binding['review_path']))!=binding['review_digest']:raise WorkflowError('Binding source review changed')
     for root,paths,key in [(queue,binding['source_paths'],'queue_digest'),(execution,binding['source_paths'],'execution_digest'),(workspace,binding['workspace_paths'],'workspace_digest')]:
-        if binding_snapshot(root,paths,binding.get('exclude_paths',[]) if root!=workspace else [])!=binding[key]:raise WorkflowError('Binding source identity changed: '+key)
+        if binding_snapshot(root,paths,binding.get('exclude_paths',[]) if root!=workspace else [],allow_empty=root==workspace)!=binding[key]:raise WorkflowError('Binding source identity changed: '+key)
+    queue_paths=binding.get('queue_paths',[])
+    if not isinstance(queue_paths,list):raise WorkflowError('Binding support paths require a list')
+    if not queue_paths and not binding.get('workspace_paths'):raise WorkflowError('Binding requires reviewed runner/profile paths')
+    if queue_paths and binding_snapshot(queue,queue_paths)!=binding.get('queue_support_digest'):raise WorkflowError('Binding queue support identity changed')
     pins=binding['pins']
     if recipe.get('editor_version')!=pins['editor_version']:raise WorkflowError('Recipe Editor pin differs from the reviewed binding')
     for root in [queue,execution]:
@@ -937,7 +941,7 @@ def binding_context(store,recipe,allow_blocked=False):
                 pipeline_version=embedded.get('version')
             if pipeline_version!=pins['pipeline_version']:raise WorkflowError('Binding Pipeline pin mismatch')
     if binding['blockers'] and not allow_blocked:raise WorkflowError('Validation-blocked: '+str(len(binding['blockers']))+' unqualified isolated source differences; review '+binding['review_path'])
-    return {'id':binding_id,**{key:binding[key] for key in ['queue_root','execution_root','workspace_root','queue_digest','execution_digest','workspace_digest','pins','review_digest','blockers']}}
+    return {'id':binding_id,**({'queue_support_digest':binding['queue_support_digest']} if 'queue_support_digest' in binding else {}),**{key:binding[key] for key in ['queue_root','execution_root','workspace_root','queue_digest','execution_digest','workspace_digest','pins','review_digest','blockers']}}
 
 def recipe_for(store,check):
     profile_path=store.base/'installation/profile.json'
