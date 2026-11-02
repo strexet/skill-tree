@@ -126,6 +126,28 @@ class MaintenanceScopeTests(unittest.TestCase):
         for key in ['id','root_task_id','current_task_id','phase','stop_reason','next_action','partial_work','admission','limits']:self.assertEqual(after[key],self.before[key],key)
         self.assertIn(self.child,after['completed_ids']);self.assertNotIn('maintenance',after)
         with self.assertRaisesRegex(wf.WorkflowError,'Run stopped'):wf.next_task(self.store)
+    def test_maintenance_revalidates_completed_dependency_without_touching_parked_run(self):
+        def complete_unit(tid):
+            wf.begin_task(self.store,{'task_id':tid});wf.mark_implemented(self.store,{'task_id':tid})
+            attempt=wf.prepare_check(self.store,{'task_id':tid,'check_id':'static'})
+            wf.record_check(self.store,{'task_id':tid,'check_id':'static','attempt_id':attempt['attempt_id'],'result':'pass','classification':'executed-control','actual_lane':'static','environment_identity':attempt['environment_identity'],'assertions':[{'assertion':'The value remains preserved.','result':'pass'}],'evidence':['report.json'],'cleanup':'No product process was launched.'})
+            wf.complete(self.store,{'task_id':tid,'outcome':'The value remains preserved.','acceptance':[{'criterion':'Preserve the value.','result':'pass','evidence':['report.json']}],'source_fingerprints':wf.fingerprints(self.store,['source.py'])})
+        self.focus();complete_unit(self.child);wf.finish(self.store)
+        next_id=self.task('Next infrastructure',self.root_id)
+        with self.store.lock():
+            text=wf.rewrite_meta(self.store.text(),next_id,{'depends_on':[self.child]});self.store.save(text,self.store.load())
+        wf.focus_maintenance(self.store,{'task_id':next_id,'instruction':'Verify only the current static infrastructure contract.'})
+        (self.root/'source.py').write_text('value=2')
+        complete_unit(next_id)
+        self.assertEqual(wf.advance(self.store)['task_id'],self.child)
+        attempt=wf.prepare_check(self.store,{'task_id':self.child,'check_id':'static'})
+        wf.record_check(self.store,{'task_id':self.child,'check_id':'static','attempt_id':attempt['attempt_id'],'result':'pass','classification':'executed-control','actual_lane':'static','environment_identity':attempt['environment_identity'],'assertions':[{'assertion':'The value remains preserved.','result':'pass'}],'evidence':['report.json'],'cleanup':'Static inspection only.'})
+        wf.accept_revalidation(self.store,{'task_id':self.child})
+        run=self.store.load()['active_run'];self.assertIn(self.child,run['maintenance']['revalidated_checks']);self.assertNotIn('revalidated_checks',run)
+        wf.finish(self.store)
+        run=self.store.load()['active_run']
+        for key in ['id','root_task_id','current_task_id','phase','stop_reason','next_action','partial_work','admission','limits']:self.assertEqual(run[key],self.before[key],key)
+
     def test_focus_cannot_select_another_task_or_expand_into_product_checks(self):
         self.focus()
         with self.assertRaises(wf.WorkflowError):wf.begin_task(self.store,{'task_id':self.root_id})

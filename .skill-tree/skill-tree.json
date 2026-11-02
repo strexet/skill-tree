@@ -902,7 +902,7 @@
     ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     ".skill-tree/common/scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
     ".skill-tree/common/scripts/validate-repository-documentation.py": "8844b912c043e7213a1a57476579672e78a4b717152044d0a4114a4523cf8f5d",
-    ".skill-tree/common/scripts/workflow-state.py": "08faaf8958a5be6864ae78f144f52469963bf2c8e1b73f902e0dedab06d64a12",
+    ".skill-tree/common/scripts/workflow-state.py": "2a67e87a00426357ca9c172095725a96480395903603bd923d2ecc1ec0ceca92",
     ".skill-tree/config/capabilities.json": "fc9572cc6a65f689fd7a750560a897593fd7b90df50eadea3954e242556626c5",
     ".skill-tree/config/flavors.json": "67c9e7e39886ddc8eedd7e9956e85c61c97c278f2bdbd81970a430f0dab348c2",
     ".skill-tree/config/providers.json": "80255fe3fb67e32d71cc7791aee1e51c1d34a508d4c77b6ca852521907ede97a",

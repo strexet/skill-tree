@@ -1059,8 +1059,8 @@ def accept_revalidation(store,payload):
         if not task.get('completed_contract') or not state['task_progress'].get(task['id'],{}).get('revalidation'):raise WorkflowError('No completed-contract revalidation is prepared')
         assert_scope(store,state,parse(text),task['id'])
         results=validate_task_checks(store,task['id'],state)
-        state['active_run'].setdefault('revalidated_checks',{})[task['id']]=results
-        state['task_progress'].pop(task['id']);state['active_run']['next_action']='Select remaining due checks or finish the preserved run'
+        execution_run(state['active_run']).setdefault('revalidated_checks',{})[task['id']]=results
+        state['task_progress'].pop(task['id']);execution_run(state['active_run'])['next_action']='Select remaining due checks or finish the preserved run'
         store.save(text,state);return {'task_id':task['id'],'phase':'revalidated','checks':[entry['check']['id'] for entry in results]}
 
 def get_check(store,state,payload):
@@ -1085,7 +1085,7 @@ def assert_scope(store,state,tasks,tid):
         run=execution_run(run);enforce_limits(run)
         if tid not in scope_ids(tasks,run) and not (state['task_progress'].get(tid,{}).get('revalidation') and tid in run['admitted_task_ids'] and tid in run['required_ids']):raise WorkflowError('Task is outside the admitted controller scope')
         if run.get('execution_restriction')=='static-unit-only':
-            task=resolve(tasks,[tid],'Prioritized Next Changes')[0]
+            task=validation_task(store,tid) if state['task_progress'].get(tid,{}).get('revalidation') else resolve(tasks,[tid],'Prioritized Next Changes')[0]
             if any(recipe_for(store,check)[0]['lane'] not in {'static','unit'} for check in check_specs(task)):raise WorkflowError('Maintenance focus refuses product checks')
     assert_admission(store,state,tid)
 
