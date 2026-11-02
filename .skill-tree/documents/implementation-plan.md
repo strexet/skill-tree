@@ -1,57 +1,37 @@
-# Approved Skill Tree Implementation Plan
+# Approved Skill Tree Implementation
 
-## Authorization and boundaries
+## Scope and ownership
 
-The developer approved implementation and scoped local commits. Source repository: `/Users/petr/Projects/_skills/_my/skill-tree`. No push, publication, skill reinstallation, live Yahtzee setup, Unity execution or scheduling. Preserve unrelated work.
+Source release version: 0.2.0. The owner request authorizes the workflow redesign and intermediate scoped local commits in the Skill Tree source repository. Source/temporary-fixture qualification is the release gate. Publication, push, live provider reinstallation, existing-target migration, Unity/product execution, devices and scheduling remain separate owner actions.
 
-## Layout and document rules
+Canonical contracts/helpers reside in `.skill-tree/common/`; authored entry-point sections reside in `.skill-tree/templates/`; domain resources reside in `.skill-tree/domains/`. Flavor/capability/provider/resource registries reside in `.skill-tree/config/`. The deterministic composer owns generated representative packages under `.skill-tree/skills/general/`, `.skill-tree/skills/web/` and `.skill-tree/skills/unity/`. Each flavor contains the same eight logical operations with stable names.
 
-Move source skills, common resources, scripts, installer, provider configuration, adapters and tests beneath `.skill-tree/`. Place substantive documentation under `.skill-tree/documents/`. Use lowercase kebab-case filenames and directories. Preserve required external filenames: `SKILL.md`, root/provider discovery documents, package manifests and `LICENSE`. Update every path, generator, validator, installer and test runner. Remove migration machinery, legacy aliases and format converters; existing projects require explicit setup after reinstallation.
+## Installation
 
-All skill instructions, references, templates, examples and generated prose use English, declarative current-state descriptions and explicit entities instead of pronouns. Structured historical evidence remains permitted. Entry points remain concise and supporting resources load progressively. Installed skills remain self-contained.
+One explicit project root receives general, web or unity through project-scoped copy installation. Static discovery reads bounded inputs/inventories without application execution or configuration imports. The profile/receipt owns concrete facts, recipes, gaps, source/output hashes and destinations. Exact ownership/content checks protect replacement, uninstall, bridges and the maintenance bundle. `--force` supplies no ownership adoption or local-edit deletion.
 
-## Metadata and priorities
+Installation uses staging, backups, an exclusive lock and a recoverable replacement journal. Multi-provider output reports individual results. The local manager refreshes, verifies, recovers and rolls back one retained generation without source-checkout or network access. Active execution reaches a stopped cleanup/handoff boundary before activation. Unknown required compatibility stops; missing foundational tests remain an installable, deduplicated highest-open-plus-one setup finding. Documentation initialization and normal Pending intake remain separate from installation.
 
-`skill-tree.json` indexes repository-relative documentation, queues, skill catalog, file ownership, generator relationships, validators, source digests and latest audit pointers. Policy references never grant authorization. No automatic full documentation initialization during intake.
+Global, symlink and uncomposed upstream specialization are unsupported before writes. Automatic migration, format conversion, legacy aliases, background refresh, package upgrades and cross-project routing are excluded. The [manual target checklist](manual-target-update.md) preserves the existing repository's identities, checkpoint and historical receipts.
 
-`documents/future.md` owns editable task definitions. Task headers contain id, priority, status, parent_pending_ids, processing_run_id, root_task_id, related_task_id, relation and depends_on. Stable UUID identities use P-/T-/B- prefixes. Promotion creates a T- identity and retains Pending provenance. Relations: main, blocker, subtask, followup. Higher integer priority wins; ties follow document order. Explicit developer priority overrides defaults. Intake=100; low=25; required dependency=highest open priority+1; nonblocking finding=root priority-1. No fixed maximum.
+## Task and validation state
 
-`documents/future.json` contains a generated task index and authoritative active-run checkpoint: run/root/current IDs, phase, required/deferred tasks, initial snapshot, processing results, acceptance evidence, partial work, stop reason and next action. Refresh preserves active state, operation evidence and optional task-specific budgets. Source-hash checks, exclusive locks, atomic writes and temporary transaction recovery protect metadata. Corrupt/unsupported state causes an actionable error rather than silent reset.
+Queue/index schema 2 separates task definitions in `documents/future.md`, implementation/check progress in `future.json.task_progress`, controller scope/admission in `active_run` and compact terminal outcomes in history. UUID task/provenance IDs, integer priorities and the single verified `depends_on` graph retain exact selection and dependency semantics. Small tasks require Goal, Touch, Validation and Acceptance; structured checks own criterion mapping, relevant source/tests, recipe IDs, parameters, assertion and timing.
 
-## History
+Begin admits the profile once per invocation/resume. Nested Red/Green checks reuse admission. Implemented tasks await required checks without reimplementation. Prepared attempts bind source/test/recipe/environment/group identities; actual result records require matching artifacts, lane, classification and cleanup. Nonzero expected runner discovery and no required skips protect test evidence. Expected behavioral Red remains separate from final acceptance.
 
-`history/task-outcomes.jsonl` retains compact terminal records: identities/provenance, disposition, delivered outcome/reason, acceptance checks, limitations/followups, source fingerprints, optional commits, evidence availability and timestamp. Record completion before queue removal. Queue absence never proves completion.
+Controllers freeze task/group membership inside the root or initial snapshot plus required descendants. Scoped intake/process receipts admit new required work; direct queue edits never silently expand scope. Group batching never postpones focused feedback, verified dependency checks or safety/security obligations. Completion verifies all current required results before recoverable terminal receipt and queue/progress removal. Two unchanged executed failures stop the task; prerequisite waits and transport uncertainty preserve the same checkpoint without consuming the executed-failure counter.
 
-`history/audits/audit-<id>.json` retains scope, source fingerprints, stable findings, corrections, task links, performed checks and coverage gaps. `history/runs/run-<id>.json` retains initial roots, outcomes, unresolved dependencies, execution observations, optional task-budget consumption and next action. Keep latest 10 audits and 10 finished runs; protect records referenced by unresolved findings, active runs or explicit pins. Keep compact task outcomes without count-based expiry. Large evidence resides in ignored artifacts. Mark expired evidence unavailable. Source changes make audit coverage stale. Historical passes never establish current validation or authorization. Exclude transcripts, reasoning, routine tool events, repeated snapshots, secrets and unmeasured token claims.
+## Domain behavior
 
-## Leaf contracts and orchestration
+General guidance uses repository-discovered recipes and task-specific test seams without platform assumptions. Common practice favors small slices, meaningful test oracles, behavior-preserving refactoring and conditional property/negative controls without coverage quotas or automatic extra tools.
 
-Add Pending: clarify material ambiguity; brief understood English intake; duplicate checks; stable ID and dependency context; return Pending ID.
+Unity guidance uses pinned UTF EditMode for suitable domain/configuration assertions, focused PlayMode for lifecycle/frame/physics assertions, verified save/service isolation and one owned Editor per exact checkout. Serialized identity and package pins remain preserved. Capability predicates emit applicable uGUI, UI Toolkit, Unity 6.3 panel simulation, Input System 1.11 and Performance Testing 3.0 resources. Player/native/device claims require matching separate evidence and authorization.
 
-Process Pending: optional IDs/exact normalized names, otherwise whole Pending queue. Resolve complete selection before mutation; reject absent/ambiguous targets without fallback. Deep repository research; split/merge support; preserve parent IDs; structured created/reused/retained/resolved results.
+Web guidance distinguishes unit, component, API, actual-browser and hosted evidence; browser-backed component suites retain browser effects. Concrete recipes support non-JavaScript roots. Server/build identity, controlled data/storage, keyboard/focus/accessibility, failure/race states, persistence and affected browser policy govern justified browser checks. Local/emulated results never establish hosted or physical-device behavior.
 
-Implement Next: highest-priority Prioritized task, ties by order; optional explicit ID/name. Never Pending/Backlog fallback; blocked selection stops. Structured completed/dependency/clarification/validation-blocked outcomes, changed files, findings, review and validation evidence, authorized commits.
+## Qualification and checkpoint
 
-Work through next: checkpoint one main; implement; intake findings; process exact required Pending IDs; recursively execute required dependency closure; resume/validate parent; process nonblocking findings and defer implementation. Finish only when main and required descendants complete.
+Implementation units U-01 through U-08 have completed source qualification. The release passes 96 Python and 45 Node behavioral checks, synchronization, strict validation, installer listing, shell entry-point listing, temporary-target all-provider dry-run and diff checks. The required root and descendants close through the preserved controller. The release report resides in `history/validation/redesign/release-qualification.json`; unit evidence resides beside the report. Root acceptance and required descendants close through the same controller without creating another run.
 
-Implement All: freeze initial Prioritized identities; execute Work through next cycle in priority order; include required discovered dependencies; exclude new nonblocking work; deduplicate completed dependencies. Stop on cycles, unresolved decisions, unsafe isolation, failed mandatory validation without a repair path, repeated unchanged failures or a full cycle without task/dependency progress. Preserve standing authorization, operation evidence and optional task-specific budgets. Both orchestrators install independently with applicable generated contracts/helpers.
-
-## Verification and delivery
-
-Behavioral tests: naming and discovery exceptions; document rules; IDs/priorities and targeted split/merge; checkpoint preservation and interruption; concurrent/corrupt state; dependency recursion/parent resumption/deferred findings/snapshot boundaries; completion before removal; audit freshness/retention pins/evidence expiry; standalone install/provider discovery; absence of legacy conversion machinery.
-
-Run generated resource checks, strict validators, Python/Node tests, installer list/dry-run and git diff --check. Scoped commits: layout/document rules; metadata/history/leaf contracts; orchestration/integration.
-
-## Current checkpoint
-
-Status: implementation complete. Thirteen standalone skills, lowercase source layout, current document contracts, stable task identities, numeric priorities, targeted processing, resumable dependency orchestration, navigation manifests and compact bounded evidence are implemented.
-
-Qualification: 79 Python behavioral checks and 24 Node installation/provider checks pass. Standalone orchestrators complete temporary fixture runs without sibling packages. Synchronization, strict repository validation, installer list/dry-run and diff checks pass. Unity execution, live provider reinstallation and scheduling remain outside the approved source scope.
-
-Validation gap: the ancillary bundled quick validator cannot run because available Python runtimes lack PyYAML. Strict repository validation checks current frontmatter, naming, resource integrity and document rules.
-
-Implementation commit references: `91f0bd1`, `86f7af9`, `061222e`. The navigation manifest points to the current qualification audit and evidence. A task-owned qualification metadata diff requires the final authorized local documentation commit; a clean worktree requires no remaining source work. Publication and live-project setup require separate scope.
-
-## Workflow helper capabilities
-
-Process Pending supports payload-local task keys and forward dependency references, validates the complete required graph before saving, and returns the stable identity map. Target manifests catalog installed local packages. Repository validation checks persisted metadata schemas, canonical paths/hashes, index agreement, required dependency closure and active checkpoint consistency without replacing state. Prose diagnostics include source locations and warning/error categories. Snapshot helpers accept explicit file/directory scope, dotted member naming and root output while preserving default artifact conventions and live documents.
+Required checks are synchronization, strict source/metadata/prose validation, Python and Node behavioral fixtures, installer list, temporary-target all-provider dry-run, shell entry-point listing and diff checks. No test result claims actual agent/model adherence, native provider runtime, Unity/browser execution, hosted deployment or device qualification.

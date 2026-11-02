@@ -1,0 +1,9 @@
+{
+  "operation": "source-layout-relocation",
+  "date": "2026-11-02",
+  "source_prefix": "skill-tree/",
+  "destination_prefix": ".skill-tree/",
+  "original_receipts": "Preserved unchanged; original paths and verdicts remain historical evidence.",
+  "qualification": "Relocation supplies no fresh test, product-runtime or authorization evidence.",
+  "source_role": "The current manifest uses explicit config/repository.json source-role metadata."
+}

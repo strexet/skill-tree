@@ -4,14 +4,9 @@
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
-const { spawnSync } = require("node:child_process");
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const PROVIDERS_FILE = path.join(REPO_ROOT, "config", "providers.json");
-const SKILLS_DIR = path.join(REPO_ROOT, "skills");
-const BRIDGE_FILE = path.join(REPO_ROOT, "src", "init-rules", "skill-tree-skills.md");
-const MARKER_BEGIN = "<!-- BEGIN skill-tree-skills -->";
-const MARKER_END = "<!-- END skill-tree-skills -->";
 
 function usage() {
   return `Usage: node .skill-tree/bin/install.js [options]
@@ -24,13 +19,13 @@ Options:
   --flavor general|web|unity    Select the project workflow flavor\n  --global                      Unsupported for project specialization
   --project                     Install to project path (default)
   --target <path>               Project root or explicit generic destination
-  --source <path-or-git>        Local source or Git source for upstream CLI
+  --source <path>               Explicit local Skill Tree source repository
   --copy                        Copy skill folders
-  --symlink                     Symlink skill folders
+  --symlink                     Unsupported for project specialization
   --with-init                   Add marker-fenced instruction bridge
   --dry-run                     Print plan without writes or network
   --list                        List providers and skills
-  --force                       Replace existing installer-owned skill dirs and bridge blocks
+  --force                       Retain ownership checks; never discard local modifications
   --uninstall                   Remove selected skills and optional bridge blocks
   --verify                      Verify installed files without writing
   --non-interactive             Do not prompt
@@ -228,7 +223,11 @@ function sourceRoot(args) {
   if (!args.source) return REPO_ROOT;
   if (!isLocalSource(args.source)) return null;
   const resolved = path.resolve(args.source);
-  return fs.existsSync(path.join(resolved, ".skill-tree", "skills")) ? path.join(resolved, ".skill-tree") : resolved;
+  for(const candidate of [path.join(resolved,".skill-tree"),resolved]){
+    const marker=path.join(candidate,"config/repository.json");
+    if(fs.existsSync(marker)&&JSON.parse(fs.readFileSync(marker,"utf8")).role==='source')return candidate;
+  }
+  throw Error('Local source requires explicit source-role metadata');
 }
 
 function installBase(provider, args) {

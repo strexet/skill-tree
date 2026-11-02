@@ -4,19 +4,18 @@ Flavor: unity. Static compatibility only; execution remains unqualified.
 
 ```json
 {
-  "environment_id": "7cd035b2a84a761bfaf6a69898f48fc1a1aaa3215b0d88a7a6c65814f23bbdb3",
   "facts": {
     "editor": "6000.0.83f1",
     "node": null,
     "package_manager": "npm",
     "packages": {
       "com.unity.test-framework": {
-        "declaration": "1.4.6",
+        "declaration_digest": "4f7e39ff822ea1097acede5f7b8773ffb24822c1192124129cd676cd5a9eda4b",
         "state": "known",
         "version": "1.4.6"
       },
       "com.unity.ugui": {
-        "declaration": "2.0.0",
+        "declaration_digest": "f22abd6773ab232869321ad4b1e47ac0c908febf4f3a2bd10c8066140f741261",
         "state": "known",
         "version": "2.0.0"
       }
@@ -29,6 +28,7 @@ Flavor: unity. Static compatibility only; execution remains unqualified.
     ]
   },
   "gaps": [],
+  "instruction_profile_id": "b372689a8f917dbf40c2517380c9bb9962af730caac830aad5877e64f2f104d2",
   "recipes": {
     "unity-editmode": {
       "argv": [

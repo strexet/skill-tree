@@ -26,6 +26,7 @@
   },
   "skill-tree-implement-all": {
     "references": {
+      "development-practices.md": "common/references/development-practices.md",
       "document-rules.md": "common/references/document-rules.md",
       "future-workflow.md": "common/references/future-workflow.md",
       "history-retention.md": "common/references/history-retention.md",
@@ -43,6 +44,7 @@
   },
   "skill-tree-implement-next-future-task": {
     "references": {
+      "development-practices.md": "common/references/development-practices.md",
       "document-rules.md": "common/references/document-rules.md",
       "future-workflow.md": "common/references/future-workflow.md",
       "history-retention.md": "common/references/history-retention.md",
@@ -111,6 +113,7 @@
   },
   "skill-tree-work-through-next": {
     "references": {
+      "development-practices.md": "common/references/development-practices.md",
       "document-rules.md": "common/references/document-rules.md",
       "future-workflow.md": "common/references/future-workflow.md",
       "history-retention.md": "common/references/history-retention.md",

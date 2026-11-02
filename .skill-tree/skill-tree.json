@@ -74,6 +74,7 @@
       "resources": [
         ".skill-tree/skills/general/skill-tree-implement-all/SKILL.md",
         ".skill-tree/skills/general/skill-tree-implement-all/agents/openai.yaml",
+        ".skill-tree/skills/general/skill-tree-implement-all/references/development-practices.md",
         ".skill-tree/skills/general/skill-tree-implement-all/references/document-rules.md",
         ".skill-tree/skills/general/skill-tree-implement-all/references/future-workflow.md",
         ".skill-tree/skills/general/skill-tree-implement-all/references/history-retention.md",
@@ -94,6 +95,7 @@
       "resources": [
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/SKILL.md",
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/agents/openai.yaml",
+        ".skill-tree/skills/general/skill-tree-implement-next-future-task/references/development-practices.md",
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/references/document-rules.md",
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/references/future-workflow.md",
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/references/history-retention.md",
@@ -174,6 +176,7 @@
       "resources": [
         ".skill-tree/skills/general/skill-tree-work-through-next/SKILL.md",
         ".skill-tree/skills/general/skill-tree-work-through-next/agents/openai.yaml",
+        ".skill-tree/skills/general/skill-tree-work-through-next/references/development-practices.md",
         ".skill-tree/skills/general/skill-tree-work-through-next/references/document-rules.md",
         ".skill-tree/skills/general/skill-tree-work-through-next/references/future-workflow.md",
         ".skill-tree/skills/general/skill-tree-work-through-next/references/history-retention.md",
@@ -233,6 +236,7 @@
       "resources": [
         ".skill-tree/skills/unity/skill-tree-implement-all/SKILL.md",
         ".skill-tree/skills/unity/skill-tree-implement-all/agents/openai.yaml",
+        ".skill-tree/skills/unity/skill-tree-implement-all/references/development-practices.md",
         ".skill-tree/skills/unity/skill-tree-implement-all/references/document-rules.md",
         ".skill-tree/skills/unity/skill-tree-implement-all/references/future-workflow.md",
         ".skill-tree/skills/unity/skill-tree-implement-all/references/history-retention.md",
@@ -257,6 +261,7 @@
       "resources": [
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/SKILL.md",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/agents/openai.yaml",
+        ".skill-tree/skills/unity/skill-tree-implement-next-future-task/references/development-practices.md",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/references/document-rules.md",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/references/future-workflow.md",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/references/history-retention.md",
@@ -353,6 +358,7 @@
       "resources": [
         ".skill-tree/skills/unity/skill-tree-work-through-next/SKILL.md",
         ".skill-tree/skills/unity/skill-tree-work-through-next/agents/openai.yaml",
+        ".skill-tree/skills/unity/skill-tree-work-through-next/references/development-practices.md",
         ".skill-tree/skills/unity/skill-tree-work-through-next/references/document-rules.md",
         ".skill-tree/skills/unity/skill-tree-work-through-next/references/future-workflow.md",
         ".skill-tree/skills/unity/skill-tree-work-through-next/references/history-retention.md",
@@ -410,6 +416,7 @@
       "resources": [
         ".skill-tree/skills/web/skill-tree-implement-all/SKILL.md",
         ".skill-tree/skills/web/skill-tree-implement-all/agents/openai.yaml",
+        ".skill-tree/skills/web/skill-tree-implement-all/references/development-practices.md",
         ".skill-tree/skills/web/skill-tree-implement-all/references/document-rules.md",
         ".skill-tree/skills/web/skill-tree-implement-all/references/future-workflow.md",
         ".skill-tree/skills/web/skill-tree-implement-all/references/history-retention.md",
@@ -431,6 +438,7 @@
       "resources": [
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/SKILL.md",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/agents/openai.yaml",
+        ".skill-tree/skills/web/skill-tree-implement-next-future-task/references/development-practices.md",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/references/document-rules.md",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/references/future-workflow.md",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/references/history-retention.md",
@@ -515,6 +523,7 @@
       "resources": [
         ".skill-tree/skills/web/skill-tree-work-through-next/SKILL.md",
         ".skill-tree/skills/web/skill-tree-work-through-next/agents/openai.yaml",
+        ".skill-tree/skills/web/skill-tree-work-through-next/references/development-practices.md",
         ".skill-tree/skills/web/skill-tree-work-through-next/references/document-rules.md",
         ".skill-tree/skills/web/skill-tree-work-through-next/references/future-workflow.md",
         ".skill-tree/skills/web/skill-tree-work-through-next/references/history-retention.md",
@@ -564,6 +573,11 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/documents/manual-target-update.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/documents/repo-init-instructions.md",
       "role": "canonical"
     },
@@ -580,6 +594,11 @@
     {
       "owner": "skill-tree",
       "path": ".skill-tree/documents/workflow-redesign-rnd-plan.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/development-practices.md",
       "role": "canonical"
     },
     {
@@ -838,9 +857,10 @@
   "role": "source",
   "source_digests": {
     ".skill-tree/bin/compose.js": "92bb585ca4d16748061aab5483650efdc3607751946d5df3b30dfdeab38d5a54",
-    ".skill-tree/bin/install.js": "4a9d2a893313c7ffc83c58b32fc863004d60c3a8dff410b03e1610d88fb12b4a",
+    ".skill-tree/bin/install.js": "ef22035aba0b99aa6419758de7e1dad3e82cff4b619613a30ed79dc9b239cd3a",
+    ".skill-tree/common/references/development-practices.md": "e49e939299c92d945d2aaa0d88cadde03639ae951670f8e46e62289cd5734664",
     ".skill-tree/common/references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
-    ".skill-tree/common/references/documentation-output-contract.md": "306022e9c5d87bdc068e9270a211ee992d999efeb975783c59c5bf9f06f72a42",
+    ".skill-tree/common/references/documentation-output-contract.md": "34d40d7d8a53b08c5078421cb999b1b3d606506c8b6c9cb5d78273cce73e1008",
     ".skill-tree/common/references/future-workflow.md": "6998f580e8003760859acf89d61d330f80b36f2b8102a250685b28993804a4ce",
     ".skill-tree/common/references/history-retention.md": "e34302d1665162c5c94bd1adea7cbdf32a36325bb4a6db1eafab24fc236c3585",
     ".skill-tree/common/references/installation-profile.md": "ad033a82b9c5cfa7bbfa869d77dcf971010747a9a097898a89fcffed612ee7cc",
@@ -863,16 +883,17 @@
     ".skill-tree/config/flavors.json": "b5f8b98748819d4829028e34c4c91e3437d136ab96ba13989eade76cf5898643",
     ".skill-tree/config/providers.json": "80255fe3fb67e32d71cc7791aee1e51c1d34a508d4c77b6ca852521907ede97a",
     ".skill-tree/config/repository.json": "cdc6218cb1003e00d1e3d703de079a476d283ab6a27132a581078c8228c1eef7",
-    ".skill-tree/config/resource-map.json": "db55c5897e58749bf0b54febf364ecce21f202305fa7f1cfb998da3e9f873d60",
-    ".skill-tree/documents/agent-compatibility.md": "f3a154273909067262ee90fa7a944f7149468c38102eeb3e4ea852435f1b8e29",
-    ".skill-tree/documents/future.md": "ba3c72733c8bf51ef38c72b80d5e2195b6ced365c9085028d6c9d27af88db37c",
-    ".skill-tree/documents/implementation-plan.md": "7f85a4ec6bf302c26be6e832e43da349f35064b5b7b9b110281c940ba250225e",
-    ".skill-tree/documents/install.md": "69762781fdd64fe84fdc8ac528c17d589ed83e269884e92f9726c25fd51b2f29",
-    ".skill-tree/documents/installation-architecture.md": "cbf2088a256139a2b95c8e4193910d7f2000fcadfff64a4271d47357959fdf8e",
+    ".skill-tree/config/resource-map.json": "bc7f451af9eae6845327445e5b6f1b26fe382ea1fcb3a2a25701eb517e65d889",
+    ".skill-tree/documents/agent-compatibility.md": "21e2c40b92081803060ba0e2af521d93c853f6ee54643578ed0335b89b0c2dfe",
+    ".skill-tree/documents/future.md": "05a1f55b7a7202ce1a56bb01919c016110a355ca8de0fe746183d6e62853e634",
+    ".skill-tree/documents/implementation-plan.md": "52b7af510e621cb98392e57f07a5964cd1590e7c7c28ddcf4ab8b9cddd5076cf",
+    ".skill-tree/documents/install.md": "3f5e2cb5b842929f5f9d73327b384367ef1f5d40b7cff2c9175afa68e9b81d8e",
+    ".skill-tree/documents/installation-architecture.md": "fd548f5be2a74fbfdb416a748e62869771d80f04acb47b246d4488effe083eea",
+    ".skill-tree/documents/manual-target-update.md": "6a9ddb25dff58397de4a5b0a19fd013083ef8a81b3b00f5ecb7370d47382cfa4",
     ".skill-tree/documents/repo-init-instructions.md": "06f7eedd332bd13daba08f131a5c34b0fdffd8cb835c4ecc0d062010071251fa",
-    ".skill-tree/documents/security.md": "871f265b80b401e787d3091a84a885cca1fcf34b4d354a9efeaee4ab1c84bfd6",
-    ".skill-tree/documents/skill-repository-creation-instructions.md": "9abd94c18ca26fb6217973d35c814929f69a43b1bbac55de5f06a1aff05fa239",
-    ".skill-tree/documents/workflow-redesign-rnd-plan.md": "0c57aff8a3f8cead55ceb41336f09235794a4fd0992a7d7bb4dac858ef712b9f",
+    ".skill-tree/documents/security.md": "4d767dfdb5f52a6d1dd3fc06a0012dcadd748373d17dc1f5c4a89d440afbec2d",
+    ".skill-tree/documents/skill-repository-creation-instructions.md": "daded8f88d38029360cacc7c92dcc77a738c4b1c7f60ff42232af35f6d39f13f",
+    ".skill-tree/documents/workflow-redesign-rnd-plan.md": "abc1b0870fb062f4a0a2c4799e1de000181601b679e02ad49c1bcb77d9ec21fb",
     ".skill-tree/domains/general/sections.json": "936bf430802a7ff38ac83413b25162a079bdb81734388420336291b00d2136f6",
     ".skill-tree/domains/unity/development.md": "f65dc5e0e69df84d3204fe70339a7dfa53fcd0d57a2b97f8e57d34a399e5f640",
     ".skill-tree/domains/unity/input-testing.md": "0dec57b1321db917d8e3b06036e4824df94757be0ab49ee959ec84c2688e2347",
@@ -884,14 +905,14 @@
     ".skill-tree/domains/web/development.md": "a8e55f4d58ad64056707801a3c31aa56eb884755fd12ef08c341680d73645bc9",
     ".skill-tree/domains/web/playwright-testing.md": "661393b4329bbe03f68f1570919fe8bf02dcebb5bf77555f3c5c46e05d4739a7",
     ".skill-tree/domains/web/sections.json": "705a5dca39a2a0baa64f0043d6d188ade153c7dff553fcf55bfd25256b2bb2c7",
-    ".skill-tree/lib/composer.js": "476ed2a55c0f064a335f8385dea10eae3487882959e4644275e13e8cc3c08750",
-    ".skill-tree/lib/installation.js": "6c9811b15db6693a7fe6e8ab4c0c7d04de52e9cf881e2b9e1ccb33ca83323976",
+    ".skill-tree/lib/composer.js": "257a06e0bd5ab185e6a00032dae3ba3ff86d0716d579726c619e2942f664da1c",
+    ".skill-tree/lib/installation.js": "ec6c4aaaf34796f942dd2a532f32b8156bb74fb439ecdf87557c667e525b876a",
     ".skill-tree/scripts/run-tests.py": "00c61ad36efcc208865692e5822f38dd4bbbc036d058bc7e55bc81c3851b711e",
     ".skill-tree/scripts/sync-skill-references.py": "7362077b0b1d031c88af9a1ddb7cfe8ddc2bc3472e64cb470100ac24038404b9",
     ".skill-tree/scripts/validate-skill-repository.py": "79a5f44291b66cdfe8637a63609781e540168d2a43d2a98f870a1d2bebd44286",
     ".skill-tree/src/init-rules/skill-tree-skills.md": "74cb9a275ce1bcd845c31eae44101e79e5adcd02875d84f1a4c8feb1744716fd",
     ".skill-tree/templates/invariants.json": "4545894b07fab5f222d15eddd17c220408a4be8a5e5f25da3a4a34ef06bb87b5",
-    ".skill-tree/templates/operations.json": "61a12eb54d60fa6d68b7a4c9c96cae1b669dac4b6f9d57a8cfc55aa9429f9fe5"
+    ".skill-tree/templates/operations.json": "4c47abcf67c353eed7754589f103f5b423e9d24147b8b395935167a406538562"
   },
   "state": ".skill-tree/documents/future.json",
   "validation_commands": [

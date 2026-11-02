@@ -35,3 +35,6 @@ test('an active executing controller blocks replacement and malformed maintenanc
  const root=setup(t);fs.mkdirSync(path.join(root,'.skill-tree/installation'),{recursive:true});fs.writeFileSync(path.join(root,'.skill-tree/installation/manager.js'),'private');assert.notEqual(run(root,['--force']).status,0);assert.equal(fs.readFileSync(path.join(root,'.skill-tree/installation/manager.js'),'utf8'),'private');
  fs.rmSync(path.join(root,'.skill-tree'),{recursive:true,force:true});assert.equal(run(root).status,0);fs.mkdirSync(path.join(root,'.skill-tree/documents'));fs.writeFileSync(path.join(root,'.skill-tree/documents/future.json'),JSON.stringify({active_run:{phase:'implement',stop_reason:null}}));assert.notEqual(run(root,['--force']).status,0);
 });
+test('untracked maintenance source is a conflict and cannot be adopted by refresh',t=>{
+ const root=setup(t);assert.equal(run(root).status,0);const extra=path.join(root,'.skill-tree/installation/source/lib/unowned.js');fs.writeFileSync(extra,'private');assert.notEqual(run(root,['--verify']).status,0);const r=spawnSync(process.execPath,[path.join(root,'.skill-tree/installation/manager.js'),'--refresh-profile'],{encoding:'utf8',timeout:15000});assert.notEqual(r.status,0);assert.equal(fs.readFileSync(extra,'utf8'),'private');
+});

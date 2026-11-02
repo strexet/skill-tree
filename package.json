@@ -1,7 +1,7 @@
 {
   "name": "skill-tree-skills",
-  "version": "0.1.0",
-  "description": "Vendor-neutral Agent Skills for repository documentation, future.md workflows, and Unity-specific variants.",
+  "version": "0.2.0",
+  "description": "Project-scoped general, web and Unity Skill Tree flavors with owned installation and resumable validation.",
   "license": "MIT",
   "private": true,
   "type": "commonjs",

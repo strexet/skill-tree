@@ -20,7 +20,12 @@ function verifyOwned(root,p,includeBundle=true){
   if(!/^skill-tree-[a-z0-9-]+$/.test(record.name)||path.basename(rel)!==record.name)throw Error('Invalid owned destination');
   if(c.json(filesAt(root,rel))!==c.json(record.files))throw Error('Unowned or locally modified package conflicts: '+rel);
  }
- if(includeBundle)for(const [rel,hash] of Object.entries(p.bundle_digests))if(c.hash(c.read(root,rel)||'')!==hash)throw Error('Modified maintenance bundle: '+rel);
+ if(includeBundle){
+  for(const [rel,hash] of Object.entries(p.bundle_digests))if(c.hash(c.read(root,rel)||'')!==hash)throw Error('Modified maintenance bundle: '+rel);
+  const actual=filesAt(root,INSTALL+'/source');
+  const expected=Object.fromEntries(Object.entries(p.bundle_digests).filter(([rel])=>rel.startsWith(INSTALL+'/source/')).map(([rel,hash])=>[rel.slice((INSTALL+'/source/').length),hash]));
+  if(c.json(actual)!==c.json(expected))throw Error('Unowned or missing maintenance source inventory');
+ }
  for(const [rel,record] of Object.entries(p.bridges||{})){const current=c.read(root,rel)||'',block=bridgeBlock(current);if(!block||c.hash(block)!==record.hash)throw Error('Modified or missing owned bridge: '+rel);}
 }
 function bridgeBlock(text){

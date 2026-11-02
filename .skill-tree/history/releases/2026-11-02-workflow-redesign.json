@@ -1,0 +1,34 @@
+{
+  "date": "2026-11-02",
+  "version": "0.2.0",
+  "composer_version": "1.0.0",
+  "queue_schema": 2,
+  "scope": "local source release",
+  "units": [
+    "U-01",
+    "U-02",
+    "U-03",
+    "U-04",
+    "U-05",
+    "U-06",
+    "U-07",
+    "U-08"
+  ],
+  "prior_implementation_commits": [
+    "d12877c",
+    "68806a1",
+    "fd6def4",
+    "0aadae2",
+    "65677f9",
+    "728a354",
+    "76b09a3"
+  ],
+  "qualification_report": ".skill-tree/history/validation/redesign/release-qualification.json",
+  "manual_target_update": ".skill-tree/documents/manual-target-update.md",
+  "publication": "No push, tag, registry publication or live installation.",
+  "remaining_scope": [
+    "Explicit owner-selected existing-target update and flavor installation.",
+    "Target-specific Unity/browser/provider/device qualification under applicable scope.",
+    "Optional actual agent-behavior evaluations remain separately scoped."
+  ]
+}

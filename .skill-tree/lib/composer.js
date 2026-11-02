@@ -12,6 +12,7 @@ const json=value=>JSON.stringify(stable(value),null,2)+'\n';
 function safe(root,rel) {
  if(typeof rel!=='string'||path.isAbsolute(rel)||rel.split(/[\\/]/).includes('..'))throw Error('Expected repository-relative path: '+rel);
  const full=path.resolve(root,rel),base=fs.realpathSync(root);
+ let ancestor=path.resolve(root);for(const part of rel.split(/[\\/]/).filter(Boolean)){ancestor=path.join(ancestor,part);if(fs.existsSync(ancestor)&&fs.lstatSync(ancestor).isSymbolicLink())throw Error('Symlink input is unsupported: '+rel);}
  let current=full;
  while(!fs.existsSync(current)&&current!==path.dirname(current))current=path.dirname(current);
  if(fs.existsSync(current)){const real=fs.realpathSync(current);if(real!==base&&!real.startsWith(base+path.sep))throw Error('Path escapes root: '+rel);}
@@ -54,13 +55,13 @@ function resolveProfile(source,root,flavor) {
  const dependencies={...pkg.dependencies,...pkg.devDependencies};facts.packages={};
  for(const [name,declared] of Object.entries(dependencies).sort()) {
   const exact=lock?.packages?.['node_modules/'+name]?.version||(/^\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(declared)?declared:null);
-  facts.packages[name]={state:exact?'known':'ambiguous',version:exact,declaration:declared};
+  facts.packages[name]={state:exact?'known':'ambiguous',version:exact,declaration_digest:hash(declared)};
  }
  for(const [name,command] of Object.entries(pkg.scripts||{}).sort()){
   if(!/^(test(?::[\w-]+)?|lint|typecheck|check|build|dev|start|preview)$/.test(name))continue;
   if(/echo\s+["']?Error: no test specified/.test(command))continue;
   const lane=/playwright|cypress|--browser\b/.test(command)||/browser|e2e/.test(name)?'browser':/test:(api|integration)/.test(name)?'integration':/^(dev|start|preview)$/.test(name)?'server':name==='build'?'build':/lint|typecheck|check/.test(name)?'static':'unit';
-  recipes['script-'+name.replace(/:/g,'-')]={lane,argv:[manager,'run',name],declared_command:command,input_paths:['package.json',...locks,...discovered.filter(p=>/config|policy/.test(p))],qualification:'static-recipe; runner unqualified'};
+  recipes['script-'+name.replace(/:/g,'-')]={lane,argv:[manager,'run',name],command_digest:hash(command),input_paths:['package.json',...locks,...discovered.filter(p=>/config|policy/.test(p))],qualification:'static-recipe; runner unqualified'};
  }
  if(flavor==='unity'){
   const version=read(root,'ProjectSettings/ProjectVersion.txt')?.match(/m_EditorVersion:\s*(\S+)/)?.[1];
@@ -72,7 +73,7 @@ function resolveProfile(source,root,flavor) {
   for(const [name,declared] of Object.entries(manifest).sort()){
    const version=locked[name]?.version||(/^\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(declared)?declared:null);
    if(locked[name]&&/^\d+\.\d+\.\d+$/.test(declared)&&declared!==version)throw Error('Conflicting Unity package version: '+name);
-   facts.packages[name]={state:version?'known':'ambiguous',version,declaration:declared};
+   facts.packages[name]={state:version?'known':'ambiguous',version,declaration_digest:hash(declared)};
   }
   const utf=facts.packages['com.unity.test-framework'];
   if(utf&&(!utf.version||!rules.unity.utf_patterns.some(p=>new RegExp(p).test(utf.version))))throw Error('Unsupported or ambiguous UTF version; update the bundled compatibility rules');
@@ -136,11 +137,17 @@ function compose(source,profile,selected=null) {
   const domainFiles={};for(const [dest,src] of Object.entries(recipe.resources))domainFiles[dest]=read(source,src);
   files=mergeResources(files,domainFiles,recipe.replacements||{});
   for(const item of active){const extra={};for(const [dest,src] of Object.entries(item.resources))extra[dest]=read(source,src);files=mergeResources(files,extra,item.replacements||{});}
-  files['references/project-profile.md']='# Concrete Project Profile\n\nFlavor: '+profile.flavor+'. Static compatibility only; execution remains unqualified.\n\n```json\n'+json({environment_id:profile.environment_id,facts:profile.facts,recipes:profile.recipes,gaps:profile.gaps})+'```\n';
+  files['references/project-profile.md']='# Concrete Project Profile\n\nFlavor: '+profile.flavor+'. Static compatibility only; execution remains unqualified.\n\n```json\n'+json({instruction_profile_id:hash(json({flavor:profile.flavor,facts:profile.facts,recipes:profile.recipes,gaps:profile.gaps})),facts:profile.facts,recipes:profile.recipes,gaps:profile.gaps})+'```\n';
   files['SKILL.md']='---\nname: '+name+'\ndescription: '+JSON.stringify('['+profile.flavor+'] '+op.description)+'\nlicense: MIT\n---\n\n# '+op.title+'\n\nFlavor: '+profile.flavor+'. Read the [concrete project profile](references/project-profile.md).\n\n'+sections.map(s=>s.text).join('\n\n')+'\n';
   files['agents/openai.yaml']='interface:\n  display_name: '+JSON.stringify(op.title+' ('+profile.flavor+')')+'\n  short_description: '+JSON.stringify(profile.flavor+' Skill Tree workflow')+'\n';
   for(const [rel,content] of Object.entries(files)){if(typeof content!=='string')throw Error('Missing composition resource: '+rel);safe(source,rel);}
-  for(const match of files['SKILL.md'].matchAll(/\]\(([^)]+)\)/g))if(!/^https?:/.test(match[1])&&!files[match[1]])throw Error('Missing composed link: '+match[1]);
+  for(const [rel,content] of Object.entries(files).filter(([rel])=>rel.endsWith('.md'))){
+   for(const match of content.matchAll(/\]\(([^)]+)\)/g)){
+    const target=match[1].split('#')[0];if(!target||/^https?:/.test(target))continue;
+    const resolved=path.posix.normalize(path.posix.join(path.posix.dirname(rel),target));
+    if(!files[resolved])throw Error('Missing composed link: '+rel+' -> '+target);
+   }
+  }
   packages[name]=stable(files);
  }
  const source_digests=sourceInputs(source),output_digests={};

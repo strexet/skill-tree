@@ -1,84 +1,8 @@
 {
-  "active_run": {
-    "admission": {
-      "flavor": "general",
-      "identity": "repository-local"
-    },
-    "admitted_groups": {},
-    "admitted_task_ids": [
-      "T-98e59352-ec61-46da-bb16-73754fb836fc",
-      "T-0277c075-52e4-41a3-8f7b-ab79bd7bf019",
-      "T-2a154c49-75e0-4b67-b564-ea65b0291f8b",
-      "T-bae05f34-57a2-4bbe-9a3f-07f835d4e3c1"
-    ],
-    "completed_ids": [
-      "T-257487e7-a192-4b6a-a2bf-634106432f67",
-      "T-69b96cac-72c3-4a69-9969-9775ea457877",
-      "T-25e8ef8b-6545-4c82-ab91-f1e8bd28605f",
-      "T-9bada49a-808a-48c5-a5da-ed44b71f00df",
-      "T-98e59352-ec61-46da-bb16-73754fb836fc",
-      "T-0277c075-52e4-41a3-8f7b-ab79bd7bf019",
-      "T-2a154c49-75e0-4b67-b564-ea65b0291f8b"
-    ],
-    "completion_refs": {
-      "T-0277c075-52e4-41a3-8f7b-ab79bd7bf019": "O-70ad684b-5a86-4d09-a05b-f34f49b414f3",
-      "T-257487e7-a192-4b6a-a2bf-634106432f67": "O-7df16a21-0424-48ba-bbcb-268635a7dbb5",
-      "T-25e8ef8b-6545-4c82-ab91-f1e8bd28605f": "O-5955b4b5-a0e2-4d0c-b096-691bc234b08a",
-      "T-2a154c49-75e0-4b67-b564-ea65b0291f8b": "O-d68dff95-7272-4a7d-9ecf-5f656389b4be",
-      "T-69b96cac-72c3-4a69-9969-9775ea457877": "O-75f15cf2-5927-4754-a46b-da7a4b57de59",
-      "T-98e59352-ec61-46da-bb16-73754fb836fc": "O-b70c1721-abe7-4717-9b8b-c9e5d605434a",
-      "T-9bada49a-808a-48c5-a5da-ed44b71f00df": "O-c9ed0397-bf83-4f74-b5b8-44dcfa808d05"
-    },
-    "current_task_id": "T-bae05f34-57a2-4bbe-9a3f-07f835d4e3c1",
-    "deferred_ids": [],
-    "id": "WR-87ba65c7-3806-44ad-8b5d-92bfd1a5f3d6",
-    "limits": {},
-    "mode": "next",
-    "next_action": "implement",
-    "partial_work": [],
-    "pending_ids": [],
-    "phase": "implement",
-    "processing_results": [],
-    "required_ids": [
-      "T-bae05f34-57a2-4bbe-9a3f-07f835d4e3c1",
-      "T-257487e7-a192-4b6a-a2bf-634106432f67",
-      "T-69b96cac-72c3-4a69-9969-9775ea457877",
-      "T-25e8ef8b-6545-4c82-ab91-f1e8bd28605f",
-      "T-9bada49a-808a-48c5-a5da-ed44b71f00df",
-      "T-98e59352-ec61-46da-bb16-73754fb836fc",
-      "T-0277c075-52e4-41a3-8f7b-ab79bd7bf019",
-      "T-2a154c49-75e0-4b67-b564-ea65b0291f8b"
-    ],
-    "root_task_id": "T-bae05f34-57a2-4bbe-9a3f-07f835d4e3c1",
-    "snapshot": [
-      "T-bae05f34-57a2-4bbe-9a3f-07f835d4e3c1"
-    ],
-    "started_at": "2026-11-02T06:36:28.543587+00:00",
-    "stop_reason": null
-  },
+  "active_run": null,
   "format": "skill-tree-future",
   "schema": 2,
-  "source_hash": "ba3c72733c8bf51ef38c72b80d5e2195b6ced365c9085028d6c9d27af88db37c",
+  "source_hash": "05a1f55b7a7202ce1a56bb01919c016110a355ca8de0fe746183d6e62853e634",
   "task_progress": {},
-  "tasks": [
-    {
-      "depends_on": [
-        "T-0277c075-52e4-41a3-8f7b-ab79bd7bf019",
-        "T-2a154c49-75e0-4b67-b564-ea65b0291f8b"
-      ],
-      "id": "T-bae05f34-57a2-4bbe-9a3f-07f835d4e3c1",
-      "line": 11,
-      "parent_pending_ids": [
-        "P-d5ffb35c-ee83-4ba6-9f6b-89f647b869b8"
-      ],
-      "priority": 101,
-      "processing_run_id": "PR-7e6c556f-e261-441b-bd21-caf2f656050d",
-      "queue": "Prioritized Next Changes",
-      "related_task_id": null,
-      "relation": "main",
-      "root_task_id": "T-bae05f34-57a2-4bbe-9a3f-07f835d4e3c1",
-      "status": "Ready",
-      "title": "U-08 Qualify the redesigned source workflow"
-    }
-  ]
+  "tasks": []
 }

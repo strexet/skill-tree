@@ -2,7 +2,7 @@
 
 ## Ownership
 
-The source repository contains thirteen portable skills under `.skill-tree/skills/`. Five Unity variants add Unity repository evidence and safety requirements. Shared canonical references/scripts reside under `.skill-tree/common/`. `resource-map.json` defines generated standalone resources; `providers.json` defines provider IDs, detection, installation destinations and optional bridge paths.
+The source repository contains eight logical operations composed into representative general, web and unity packages under `.skill-tree/skills/<flavor>/`. Authored templates and domain slots own entry-point instructions; generated packages receive no independent edits. Shared canonical references/scripts reside under `.skill-tree/common/`. `resource-map.json` defines generated standalone resources; `providers.json` defines provider IDs, detection, installation destinations and optional bridge paths.
 
 ## Skill packages
 

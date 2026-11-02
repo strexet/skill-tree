@@ -1,25 +1,22 @@
 # Skill Tree
 
-Skill Tree provides portable repository documentation, task intake, research, implementation and resumable orchestration skills. Thirteen skills include five Unity-specific variants.
+Skill Tree provides eight portable operations for repository documentation, intake, research, implementation and resumable orchestration. One project-scoped installation selects general, web or unity. Common contracts and concrete project capabilities compose into standalone packages with stable `skill-tree-*` names.
 
-[Installation](.skill-tree/documents/install.md) · [Workflow](.skill-tree/common/references/future-workflow.md) · [Metadata](.skill-tree/common/references/workflow-metadata.md) · [Source manifest](.skill-tree/skill-tree.json)
+[Installation](.skill-tree/documents/install.md) · [Validation](.skill-tree/common/references/validation-policy.md) · [Workflow](.skill-tree/common/references/future-workflow.md) · [Metadata](.skill-tree/common/references/workflow-metadata.md) · [Source manifest](.skill-tree/skill-tree.json)
 
 ```sh
 node .skill-tree/bin/install.js --list
-node .skill-tree/bin/install.js --dry-run --all
+node .skill-tree/bin/install.js --target <project-root> --only codex --flavor general --copy --dry-run
+npm run sync:check
 npm run validate
 npm run test:py
 npm run test:node
 ```
 
-Install individual skills by copy or symlink using the local installer. Optional provider bridges preserve unowned instruction content. Installed skills carry required resources; source repository access is unnecessary during execution.
+Project-scoped copy installation includes owned receipts and a self-contained local profile manager. Static discovery never starts an Editor, server, browser or test suite. Missing test infrastructure remains a deduplicated setup finding. Installation and documentation initialization are separate operations; unknown or modified packages conflict even with `--force`.
 
-Target documentation and task state reside in `.skill-tree/documents/`. Structured task outcomes and bounded audit/run records reside in `.skill-tree/history/`. Developer authorization governs validation, commits and external operations.
+Target documentation, schema-2 task progress and controller checkpoints reside in `.skill-tree/documents/`. Structured outcomes and bounded audit/run evidence reside in `.skill-tree/history/`. Focused Red/Green feedback remains immediate; compatible additional boundary checks can share a scoped group. Completion requires current passed check receipts.
 
-## Processing Handoff
+Standalone Process Pending reports the prioritized list and waits for developer selection, with one recommendation last. Explicit Work Through Next and Implement All controllers continue through eligible required work inside the recorded scope. A checkpoint, profile or installed flavor supplies no independent execution, continuation, commit or publication permission.
 
-Standalone Process Pending reports the refreshed prioritized list and asks for the next action, with one recommended action last. Work Through Next and Implement All automatically select the next eligible scoped unit after processing while preserving material questions, validation limits and deferred work. An active checkpoint alone supplies no implementation instruction.
-
-## Helper capabilities
-
-Process Pending resolves payload-local dependency keys into stable T- IDs before atomic persistence. Target manifests index installed local skills; repository validation detects stale hashes/indexes, invalid paths, dependency cycles and corrupt checkpoints without changing state. Prose lint reports located errors and review warnings. Snapshot helpers support `--include` file/directory scope, `--member-style dotted`, `--output-dir root`, explicit output and timestamp options. Shared contracts describe payloads and validation boundaries.
+Source fixtures qualify deterministic helper/composer/installer behavior. Unity, browser, hosted/provider, device and actual agent-behavior qualification remain separate evidence boundaries. [Manual target update](.skill-tree/documents/manual-target-update.md) preserves the existing repository's identities and history without an automatic converter.

@@ -4,7 +4,6 @@ Flavor: web. Static compatibility only; execution remains unqualified.
 
 ```json
 {
-  "environment_id": "511b4f0bc37ab5bc115e4281bbd1aabfbcc1429af3da98bc9cedeedc9001d4e0",
   "facts": {
     "node": null,
     "package_manager": "npm",
@@ -13,6 +12,7 @@ Flavor: web. Static compatibility only; execution remains unqualified.
     "ui": []
   },
   "gaps": [],
+  "instruction_profile_id": "8fd14a1c410dd9f1df9f2695208808ffc973c1a1fa7ddec61ee57c422f44b265",
   "recipes": {
     "script-test": {
       "argv": [
@@ -20,7 +20,7 @@ Flavor: web. Static compatibility only; execution remains unqualified.
         "run",
         "test"
       ],
-      "declared_command": "node --test",
+      "command_digest": "f90321a3f3beab5b298ce4c7878f7c4db1e376ad5b15295a0dc01c36f1722446",
       "input_paths": [
         "package.json"
       ],

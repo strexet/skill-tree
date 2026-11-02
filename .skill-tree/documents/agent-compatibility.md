@@ -1,5 +1,5 @@
 # Agent Compatibility
 
-.skill-tree/config/providers.json defines supported provider profiles, support tiers, detection metadata, installation destinations, optional bridges and official reference links. Provider destination spelling follows provider discovery requirements. The matrix is configuration, not proof of runtime behavior for every provider release.
+`.skill-tree/config/providers.json` owns provider IDs, detection, destinations, optional bridges and official discovery references. Provider-required directories retain exact spelling. The source release changes no provider support claim; matrix entries describe discovery configuration rather than native runtime qualification for every release.
 
-Tier-one entries receive mocked local installation and bridge coverage. Tier-two profiles use explicit upstream passthrough. Generic fallback uses an explicit destination without claiming native discovery. Runtime compatibility depends on the installed provider. Source reorganization preserves provider configuration and support boundaries.
+Local project-scoped copy installation supports matrix destinations. Soft providers require explicit selection. Generic installation uses the explicit target root without a native-discovery claim. Global, symlink and upstream passthrough specialization are unsupported; the installer never silently forwards uncomposed source templates. Temporary installation/bridge fixtures establish local filesystem behavior only. Actual provider/model behavior remains separately unqualified.

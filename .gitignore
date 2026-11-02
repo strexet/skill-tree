@@ -21,3 +21,5 @@ tmp/
 .skill-tree/installation/.journal.json
 .skill-tree/installation/.staging/
 .skill-tree/installation/.backups/
+
+.skill-tree/installation/.last-transaction.json

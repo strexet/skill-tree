@@ -61,3 +61,15 @@ test('non-JavaScript Web roots use declared static recipes without importing exe
  const root=fixture(t);write(root,'pyproject.toml','[project]\nname = "api"\n');write(root,'.skill-tree/validation-recipes.json',{schema:1,recipes:{'api-tests':{lane:'integration',argv:['python','-m','pytest','tests/api'],input_paths:['pyproject.toml']}}});
  const p=c.resolveProfile(source,root,'web');assert.deepEqual(p.recipes['api-tests'].argv,['python','-m','pytest','tests/api']);assert.ok(!p.gaps.some(g=>g.key==='test-foundation'));
 });
+test('irrelevant input formatting can refresh environment identity without changing package bytes',t=>{
+ const root=fixture(t);write(root,'package.json','{"scripts":{"test":"node --test"}}');const a=c.resolveProfile(source,root,'general'),first=c.compose(source,a);
+ write(root,'package.json','{\n  "scripts": { "test": "node --test" }\n}\n');const b=c.resolveProfile(source,root,'general'),second=c.compose(source,b);
+ assert.notEqual(a.environment_id,b.environment_id);assert.deepEqual(first.output_digests,second.output_digests);
+});
+test('every flavor audit retains common metadata and prose validation without source dependencies',t=>{
+ const root=fixture(t);write(root,'ProjectSettings/ProjectVersion.txt','m_EditorVersion: 6000.0.83f1');write(root,'Packages/manifest.json',{dependencies:{}});
+ for(const flavor of ['general','web','unity']){
+  const files=c.compose(source,c.resolveProfile(source,root,flavor)).packages['skill-tree-repo-documentation-audit'];
+  assert.match(files['SKILL.md'],/validate-repository-documentation\.py/);assert.match(files['SKILL.md'],/validate-document-rules\.py/);assert.ok(files['scripts/validate-repository-documentation.py']);
+ }
+});

@@ -210,3 +210,6 @@ test("explicit local source accepts the reorganized repository root", () => {
     assert.ok(fs.existsSync(path.join(target, ".agents", "skills", "skill-tree-add-pending-task", "SKILL.md")));
   } finally { fs.rmSync(target, { recursive: true, force: true }); }
 });
+test('root shell launcher exposes the composed logical catalog and PowerShell points to the owned entrypoint',()=>{
+ const result=spawnSync('sh',[path.join(root,'../install.sh'),'--list'],{encoding:'utf8',timeout:10000});assert.equal(result.status,0,result.stderr);assert.match(result.stdout,/Flavors: general, web, unity/);assert.match(result.stdout,/skill-tree-work-through-next/);assert.match(fs.readFileSync(path.join(root,'../install.ps1'),'utf8'),/\.skill-tree\/bin\/install\.js/);
+});

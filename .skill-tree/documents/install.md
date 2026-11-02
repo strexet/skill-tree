@@ -1,11 +1,30 @@
 # Installation
 
-Local installation requires Node.js 18 or later. Deterministic workflow helpers require Python 3.9 or later and the standard library.
+Local installation requires Node.js 18 or later. Workflow helpers require Python 3.9 or later and the standard library. One explicitly selected project root receives one flavor and project-scoped copy packages.
 
 ```sh
 node .skill-tree/bin/install.js --list
-node .skill-tree/bin/install.js --dry-run --all
-node .skill-tree/bin/install.js --only codex --project --copy --skills skill-tree-work-through-next
+node .skill-tree/bin/install.js --target <project-root> --only codex --flavor unity --copy --dry-run
+node .skill-tree/bin/install.js --target <project-root> --only codex --flavor unity --copy
+node .skill-tree/bin/install.js --target <project-root> --only codex --verify
 ```
 
-The local installer supports provider selection, copy/symlink, project/global destinations, explicit upstream sources, optional bridges, verification and scoped uninstall. Provider paths and support tiers reside in .skill-tree/config/providers.json. Dry-run performs no installation. Reinstallation and target documentation setup are explicit operations. No automatic metadata conversion is supported.
+Fresh noninteractive installation requires `--flavor general|web|unity`; interactive installation asks once. `--yes` never chooses a flavor. Repeat installation retains the receipt flavor; explicit switches regenerate all owned packages in the scope. `--skills` selects logical operations. `--all` selects non-soft provider-matrix entries; soft providers require explicit selection. Generic provider target denotes the covered root and explicit discovery destination. Global, symlink and uncomposed upstream specialization fail before writes.
+
+Dry-run reports facts, gaps, exact changed destinations and ownership conflicts without writes. Matching installations are verified no-ops. `--force` cannot adopt unowned content or discard local modifications. A stopped cleanup/handoff checkpoint precedes replacement during a controller. Optional `--with-init` inserts a receipt-owned bridge while preserving surrounding instructions. Scoped `--uninstall` removes only matching owned packages; `--with-init` removes the bridge when no packages remain.
+
+The installation receipt and concrete profile reside at `.skill-tree/installation/profile.json`. The local manager resolves the target from the bundle location, independent of caller working directory and source checkout.
+
+```sh
+node .skill-tree/installation/manager.js --verify
+node .skill-tree/installation/manager.js --refresh-profile --dry-run
+node .skill-tree/installation/manager.js --refresh-profile
+node .skill-tree/installation/manager.js --recover
+node .skill-tree/installation/manager.js --rollback
+```
+
+Refresh is static, offline and explicit. Relevant input/inventory changes require refresh; unsupported compatibility requires a scoped bundle/source update. Queue/checkpoint identities and acceptance obligations survive refresh. Rollback restores one retained package/receipt generation; project dependencies remain unchanged and freshness still requires verification. Failed/interrupted replacement retains recoverable staging/journal evidence. Lock removal requires verified owner PID/host; stale locks are never removed automatically.
+
+Documentation setup remains separate: invoke `skill-tree-repo-documentation`. After queue creation, invoke the installed helper `scripts/workflow-state.py capture-foundation <project-root>` and report the captured/reused Pending ID. Missing foundational tests produce one highest-open-plus-one setup task through normal intake, research and selection. Installation never runs workflow helpers, installs project dependencies or executes product code.
+
+Non-JavaScript projects and unsupported executable configuration use `.skill-tree/validation-recipes.json`: schema 1 contains `recipes` keyed by stable recipe ID, each with a lane, argument-vector command and relevant repository-relative `input_paths`. Use existing pinned tools and environment-variable references instead of inline credentials. Explicit recipes supplement declared package scripts without overriding recipe IDs. Required unknown versions or incompatible formats stop with a concrete error; missing tests alone do not prevent installation.

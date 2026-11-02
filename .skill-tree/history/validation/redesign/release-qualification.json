@@ -1,0 +1,125 @@
+{
+  "version": "0.2.0",
+  "qualification": "source and temporary filesystem fixtures",
+  "product_execution": false,
+  "commands": [
+    {
+      "command": [
+        "npm",
+        "run",
+        "sync:check"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.492,
+      "deadline_seconds": 120,
+      "cleanup_reserve_seconds": 10,
+      "output_sha256": "33f50fe80aa5c26e3ec70e8ce4737b776d1cc0c57608a7c98f26dd9733103c98",
+      "local_log": ".skill-tree/artifacts/redesign-qualification/check-0.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "validate"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 1.002,
+      "deadline_seconds": 120,
+      "cleanup_reserve_seconds": 10,
+      "output_sha256": "658d9a80f74c99ccf099187c500f850fd26979ef94825d862dfd3dcd23e6f48c",
+      "local_log": ".skill-tree/artifacts/redesign-qualification/check-1.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:py"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 5.367,
+      "deadline_seconds": 120,
+      "cleanup_reserve_seconds": 10,
+      "output_sha256": "ec0b31915d9c507c25ebbd43a43c09881849df966e28448b5fde0417a97f175e",
+      "local_log": ".skill-tree/artifacts/redesign-qualification/check-2.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:node"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 5.852,
+      "deadline_seconds": 120,
+      "cleanup_reserve_seconds": 10,
+      "output_sha256": "92aadd7bf6c345c13368979f0fb65254dc5a0e03995770c1e05cdf42a5c69024",
+      "local_log": ".skill-tree/artifacts/redesign-qualification/check-3.log"
+    },
+    {
+      "command": [
+        "node",
+        ".skill-tree/bin/install.js",
+        "--list"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.059,
+      "deadline_seconds": 120,
+      "cleanup_reserve_seconds": 10,
+      "output_sha256": "cf223ec9bd3235a2449fe93133b7cd8a9b5a51ef44213f8fdc1c85cca713a861",
+      "local_log": ".skill-tree/artifacts/redesign-qualification/check-4.log"
+    },
+    {
+      "command": [
+        "sh",
+        "install.sh",
+        "--list"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.066,
+      "deadline_seconds": 120,
+      "cleanup_reserve_seconds": 10,
+      "output_sha256": "cf223ec9bd3235a2449fe93133b7cd8a9b5a51ef44213f8fdc1c85cca713a861",
+      "local_log": ".skill-tree/artifacts/redesign-qualification/check-5.log"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.042,
+      "deadline_seconds": 120,
+      "cleanup_reserve_seconds": 10,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_log": ".skill-tree/artifacts/redesign-qualification/check-6.log"
+    },
+    {
+      "command": [
+        "node",
+        ".skill-tree/bin/install.js",
+        "--dry-run",
+        "--all",
+        "--target",
+        "<temporary-project-root>",
+        "--flavor",
+        "general",
+        "--copy"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.531,
+      "deadline_seconds": 120,
+      "cleanup_reserve_seconds": 10,
+      "output_sha256": "db5a41f017c21e92dfa0710b890215942e1329fb66ffcc38b79b67c15e03fc8d",
+      "local_log": ".skill-tree/artifacts/redesign-qualification/check-7.log"
+    }
+  ],
+  "python_tests": 96,
+  "node_tests": 45,
+  "all_passed": true,
+  "limits": [
+    "No live provider installation, Unity Editor, browser/server, Player, device or hosted qualification.",
+    "No actual model-behavior evaluation.",
+    "Historical receipts retain original paths and verdicts; source qualification is current evidence."
+  ]
+}
