@@ -21,7 +21,7 @@ def validate_manifest(root):
     if not isinstance(data,dict):return {'ok':False,'errors':['Manifest requires an object'],'warnings':[]}
     if data.get('format')!='skill-tree-manifest':errors.append('Unsupported manifest format')
     if data.get('role') not in {'source','target'}:errors.append('Unsupported manifest role')
-    actual_role='source' if (root/'.skill-tree/skills').is_dir() else 'target'
+    actual_role='source' if (root/'.skill-tree/config/repository.json').is_file() and json.loads((root/'.skill-tree/config/repository.json').read_text()).get('role')=='source' else 'target'
     if data.get('role')!=actual_role:errors.append('Manifest role disagrees with repository layout')
     for field in ['queue','state','latest_audit']:
         if field not in data:errors.append('Missing manifest field: '+field)
@@ -82,7 +82,7 @@ def validate_manifest(root):
         for skill in data['catalog']:
             if isinstance(skill,dict) and skill.get('entrypoint') in expected_resources and skill.get('resources')!=expected_resources[skill['entrypoint']]:errors.append('Installed skill resources are stale: '+skill['entrypoint'])
     else:
-        actual={p.relative_to(root).as_posix() for p in (root/'.skill-tree/skills').glob('*/SKILL.md')}
+        actual={p.relative_to(root).as_posix() for p in (root/'.skill-tree/skills').glob('*/*/SKILL.md')}
         if entries!=actual:errors.append('Source skill catalog is stale; refresh the manifest')
     for audit in data['audit_scopes']:
         if not isinstance(audit,dict):errors.append('Invalid audit navigation entry')

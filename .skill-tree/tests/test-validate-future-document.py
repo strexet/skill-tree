@@ -2,7 +2,7 @@ from pathlib import Path
 import subprocess
 import sys
 import unittest
-ROOT=Path(__file__).resolve().parents[1];CLI=ROOT/'skills/skill-tree-process-future-pending/scripts/validate-future-document.py';FIXTURES=ROOT/'tests/fixtures/future'
+ROOT=Path(__file__).resolve().parents[1];CLI=ROOT/'skills/general/skill-tree-process-future-pending/scripts/validate-future-document.py';FIXTURES=ROOT/'tests/fixtures/future'
 class FutureValidationTests(unittest.TestCase):
     def test_current_contracts(self):
         for fixture in ['valid.md','blocking-question.md','empty-prioritized.md']:

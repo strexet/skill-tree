@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "composer_version": "1.0.0",
+  "flavors": {
+    "general": {
+      "sections": "domains/general/sections.json",
+      "resources": {}
+    },
+    "web": {
+      "sections": "domains/web/sections.json",
+      "resources": {}
+    },
+    "unity": {
+      "sections": "domains/unity/sections.json",
+      "resources": {
+        "references/unity-safety.md": "common/references/unity-safety.md",
+        "scripts/inspect-unity-repository.py": "common/scripts/inspect-unity-repository.py"
+      }
+    }
+  }
+}

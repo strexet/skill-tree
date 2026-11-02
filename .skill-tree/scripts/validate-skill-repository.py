@@ -24,10 +24,11 @@ def validate(strict=False):
         if path.suffix=='.py':
             try:ast.parse(path.read_text())
             except SyntaxError as exc:errors.append(str(exc))
-    actual={p.parent.name for p in (core/'skills').glob('*/SKILL.md')}
+    actual={p.parent.name for p in (core/'skills').glob('*/*/SKILL.md')}
     if actual!=set(mapping):errors.append('Skill catalog and resource map disagree')
-    for name,resources in mapping.items():
-        package=core/'skills'/name;text=(package/'SKILL.md').read_text()
+    for flavor in ['general','web','unity']:
+      for name,resources in mapping.items():
+        package=core/'skills'/flavor/name;text=(package/'SKILL.md').read_text()
         if not re.fullmatch(r'skill-tree-[a-z0-9]+(?:-[a-z0-9]+)*',name) or len(name)>64:errors.append('Invalid skill name: '+name)
         match=re.match(r'---\n(.*?)\n---\n',text,re.S)
         if not match or 'name: '+name+'\n' not in match[1]+'\n':errors.append('Invalid frontmatter: '+name)

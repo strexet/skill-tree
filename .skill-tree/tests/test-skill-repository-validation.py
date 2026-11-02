@@ -6,8 +6,8 @@ import tempfile
 import unittest
 import zipfile
 ROOT=Path(__file__).resolve().parents[1]
-UNITY_INSPECT=ROOT/'skills/skill-tree-unity-repo-documentation/scripts/inspect-unity-repository.py'
-SNAPSHOT=ROOT/'skills/skill-tree-create-documents-snapshot/scripts/create-documentation-snapshot.py'
+UNITY_INSPECT=ROOT/'skills/unity/skill-tree-repo-documentation/scripts/inspect-unity-repository.py'
+SNAPSHOT=ROOT/'skills/general/skill-tree-create-documents-snapshot/scripts/create-documentation-snapshot.py'
 
 class RepositoryValidationTests(unittest.TestCase):
     def test_strict_source_validation(self):

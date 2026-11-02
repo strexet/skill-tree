@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "unity": {
+    "editor_patterns": [
+      "^6000\\.[03]\\.\\d+[abfp]\\d+$"
+    ],
+    "utf_patterns": [
+      "^1\\.4\\.\\d+$"
+    ],
+    "sources": [
+      "https://docs.unity3d.com/Packages/com.unity.test-framework@1.4/manual/reference-command-line.html",
+      "https://docs.unity.com/en-us/engine/6000.3/manual/uitoolkits/ui-system-compare"
+    ]
+  },
+  "web": {
+    "lock_versions": [
+      2,
+      3
+    ],
+    "sources": [
+      "https://docs.npmjs.com/cli/v11/configuring-npm/package-lock-json/"
+    ]
+  },
+  "inventory": {
+    "roots": [
+      "Assets",
+      "Packages",
+      "ProjectSettings",
+      "tests",
+      "test",
+      "src",
+      ".skill-tree/documents"
+    ],
+    "extensions": [
+      ".asmdef",
+      ".uxml",
+      ".uss"
+    ],
+    "names": [
+      "playwright.config.ts",
+      "playwright.config.js",
+      "vitest.config.ts",
+      "vitest.config.js",
+      "jest.config.js",
+      "jest.config.ts",
+      "vite.config.ts",
+      "next.config.js",
+      "next.config.ts",
+      "validation-profile.json",
+      "validation-recipes.json",
+      "browser-policy.json"
+    ]
+  }
+}

@@ -60,6 +60,7 @@ class ManifestValidationTests(unittest.TestCase):
         state=json.loads(self.store.state.read_text());state['active_run']={'id':'invalid'};self.store.state.write_text(wf.dump(state));self.assert_error('Corrupt active checkpoint');self.assertEqual(json.loads(self.store.state.read_text())['active_run'],{'id':'invalid'})
     def test_source_manifest_has_no_target_queue_requirement(self):
         (self.store.base/'skills').mkdir();self.store.state.unlink();self.store.future.unlink()
+        (self.store.base/'config').mkdir(exist_ok=True);(self.store.base/'config/repository.json').write_text('{"role":"source","schema":1}')
         (self.store.base/'skill-tree.json').write_text(wf.dump(wf.manifest(self.store)));self.assertTrue(validator.validate_manifest(self.root)['ok'])
 
 if __name__=='__main__':unittest.main()

@@ -8,56 +8,6 @@ Fixed metadata records task identity and dependency scope.
 
 ## Prioritized Next Changes
 
-### U-03 Compose project-specialized packages
-
-```yaml
-id: T-25e8ef8b-6545-4c82-ab91-f1e8bd28605f
-priority: 106
-status: Ready
-parent_pending_ids: ["P-d5ffb35c-ee83-4ba6-9f6b-89f647b869b8"]
-processing_run_id: PR-7e6c556f-e261-441b-bd21-caf2f656050d
-root_task_id: T-25e8ef8b-6545-4c82-ab91-f1e8bd28605f
-related_task_id: null
-relation: main
-depends_on: ["T-69b96cac-72c3-4a69-9969-9775ea457877"]
-```
-
-Goal:
-- Deterministic standalone packages implement eight operations for general, web and unity profiles.
-
-Current behavior:
-- The baseline uses thirteen source skills and the existing workflow schema.
-
-Desired behavior:
-- Deterministic standalone packages implement eight operations for general, web and unity profiles.
-
-Touch:
-- Source contracts, helpers, installer, fixtures and current documentation as required by the selected unit.
-
-Discovery allowance:
-- The selected unit follows the approved redesign scope.
-
-Out of scope:
-- Live target installation, publication, Unity execution and existing target migration.
-
-Implementation constraints:
-- The selected unit follows the approved redesign scope.
-
-Questions and required clarifications:
-- [Resolved - owner request] The approved plan authorizes implementation and intermediate local commits.
-
-Validation:
-- Run relevant static and temporary-fixture checks with operation deadlines.
-
-Acceptance:
-- Deterministic standalone packages implement eight operations for general, web and unity profiles.
-
-Documentation updates:
-- Update current contracts and implementation status.
-
-Risks:
-- Preserve exact task identities, ownership and unrelated content.
-
 ### U-04 Install and maintain owned project packages
 
 ```yaml

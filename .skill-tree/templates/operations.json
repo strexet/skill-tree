@@ -1,0 +1,82 @@
+{
+  "skill-tree-add-pending-task": {
+    "title": "Skill-Tree: Add Pending Task",
+    "description": "Capture an informal request as brief understood Pending work with an ID and numeric priority. Use for Add pending; clarify material missing intent before insertion.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read applicable repository rules, the manifest and relevant current documentation. Read [intake](references/pending-task-intake.md), [format](references/pending-task-format.md) and [metadata](references/workflow-metadata.md). Confirm subject/change/outcome and duplicates before insertion. Ask contextual questions when required intent is missing. Use scripts/workflow-state.py intake with the inspected source hash. Return Pending ID, title, priority and deferred details. Intake never promotes or implements work.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency."
+      }
+    ]
+  },
+  "skill-tree-create-documents-snapshot": {
+    "title": "Skill-Tree: Create Snapshot",
+    "description": "Create an explicitly requested Markdown documentation snapshot archive without editing live documents.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read repository rules and [snapshot scope](references/snapshot-rules.md). Inspect candidate relevance, then run scripts/create-documentation-snapshot.py <repository> --dry-run with requested --include, --member-style and --output/--output-dir options. Create the requested archive only after scope is understood. Preserve live sources, exclude private/generated/vendor content and verify member names/notices. Return archive path and scope; commit only under explicit authorization.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency."
+      }
+    ]
+  },
+  "skill-tree-implement-all": {
+    "title": "Skill-Tree: Implement All",
+    "description": "Implement an initial prioritized snapshot and required dependencies with resumable checkpoints; defer new nonblocking work.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read applicable rules, [orchestration](references/orchestration.md) and [metadata](references/workflow-metadata.md). Query the index/checkpoint first. Start mode all only when no active run exists; otherwise resume. Use scripts/workflow-state.py advance before handoffs. After scoped processing, automatically choose the recommended eligible unit inside the recorded root/snapshot boundary; routine next-action questions apply only to standalone processing. Material questions and execution stops remain binding. Follow bundled [intake](references/pending-task-intake.md) and [processing/implementation](references/future-workflow.md) contracts. Query compact history only when relevant. Return completed/deferred/blocked IDs, checks and next action. No scheduler or blanket execution permission is implied.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency."
+      }
+    ]
+  },
+  "skill-tree-implement-next-future-task": {
+    "title": "Skill-Tree: Implement Next Task",
+    "description": "Implement the highest-priority Prioritized task or an exact task ID/name; capture findings and record acceptance evidence before completion.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read repository rules, [workflow](references/future-workflow.md), [metadata](references/workflow-metadata.md), selected task questions, current documentation and task-relevant source/tests. Use scripts/workflow-state.py select: highest priority wins, ties follow document order; exact IDs/names never fall back. A blocked selection stops. Implement minimal scoped changes and capture findings through intake with root/direct-parent context. Perform authorized validation and review, update current documentation, then complete with individual acceptance/source evidence. Required unrun checks prevent completion. Record authorized commits only after commit creation. Return completed/needs-dependencies/needs-clarification/validation-blocked outcome and captured IDs. Never implement from the queue alone.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency."
+      }
+    ]
+  },
+  "skill-tree-process-future-pending": {
+    "title": "Skill-Tree: Process Pending Tasks",
+    "description": "Research Pending tasks selected by IDs or exact names and produce Ready prioritized tasks with provenance. No selection processes the Pending Queue.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read applicable rules, current documentation, relevant implementation/configuration/tests and [workflow](references/future-workflow.md). Use scripts/workflow-state.py pending to resolve the complete selection before research. Read [metadata](references/workflow-metadata.md) for process payloads. Split oversized work, preserve Pending parent IDs, clarify required decisions and retain blocked intake. Apply researched dispositions through process with the inspected source hash. Return created/reused/retained/resolved IDs and the refreshed prioritized list with brief outcomes/blockers. Follow the workflow processing-result contract: standalone invocation presents next choices, places one recommended action last and waits for the developer; explicit Work Through Next/Implement All invocation returns to the bounded controller for automatic eligible selection. An active checkpoint alone implies no continuation.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency."
+      }
+    ]
+  },
+  "skill-tree-repo-documentation": {
+    "title": "Skill-Tree: Initialize Documents",
+    "description": "Initialize or repair current repository documentation, the Skill Tree navigation manifest and task index from source evidence.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read applicable repository rules and [output contract](references/documentation-output-contract.md). Inspect source using [discovery](references/repository-discovery-checklist.md). Create the required current document set; preserve unowned instructions. Read [metadata](references/workflow-metadata.md); initialize future.md explicitly, then refresh index and manifest. Capture confirmed documentation findings in Backlog with stable IDs and evidence. Review document rules and validators; report verified facts, unknowns and actual checks.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency."
+      }
+    ]
+  },
+  "skill-tree-repo-documentation-audit": {
+    "title": "Skill-Tree: Audit Documents",
+    "description": "Audit current repository documentation against implementation and persist bounded findings, coverage and source fingerprints.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read rules, manifest, current documents and [output contract](references/documentation-output-contract.md). Inspect relevant source/configuration/tests using [discovery](references/repository-discovery-checklist.md); document-to-document comparison alone is insufficient. Repair drift and missing required documents from current evidence. Capture confirmed issues in Backlog with IDs and evidence. Read [metadata](references/workflow-metadata.md) and [retention](references/history-retention.md); persist an audit with stable finding IDs, source coverage and unrun checks. Refresh manifest; run the repository metadata consistency validator and scoped prose diagnostics; report corrections, unresolved findings and actual validation. No product implementation is implied.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency."
+      }
+    ]
+  },
+  "skill-tree-work-through-next": {
+    "title": "Skill-Tree: Work Through Next",
+    "description": "Complete one prioritized main task and required blockers/subtasks through a resumable implementation and processing cycle.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read applicable rules, [orchestration](references/orchestration.md) and [metadata](references/workflow-metadata.md). Query the index/checkpoint first. Start mode next only when no active run exists; otherwise resume. Use scripts/workflow-state.py advance before handoffs. After scoped processing, automatically choose the recommended eligible unit inside the recorded root/snapshot boundary; routine next-action questions apply only to standalone processing. Material questions and execution stops remain binding. Follow bundled [intake](references/pending-task-intake.md) and [processing/implementation](references/future-workflow.md) contracts. Query compact history only when relevant. Return completed/deferred/blocked IDs, checks and next action. No scheduler or blanket execution permission is implied.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency."
+      }
+    ]
+  }
+}

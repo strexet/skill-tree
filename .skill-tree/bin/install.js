@@ -44,7 +44,7 @@ function loadProviders(file = PROVIDERS_FILE) {
 }
 
 function listSkills(sourceRoot = REPO_ROOT) {
-  const dir = path.join(sourceRoot, "skills");
+  const dir = path.join(sourceRoot, "skills", "general");
   if (!fs.existsSync(dir)) return [];
   return fs.readdirSync(dir)
     .filter((name) => fs.existsSync(path.join(dir, name, "SKILL.md")))
@@ -372,7 +372,7 @@ function installLocalProvider(provider, args, skills, source) {
   ensureSafeDestination(base);
   const rows = [];
   for (const skill of skills) {
-    const src = path.join(source, "skills", skill);
+    const src = path.join(source, "skills", "general", skill);
     const dest = path.join(base, skill);
     if (args.dryRun || args.verify) {
       rows.push({ provider: provider.id, skill, action: args.verify ? "verify" : "dry-run", path: dest, ok: true });

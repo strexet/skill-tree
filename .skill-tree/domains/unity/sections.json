@@ -1,0 +1,6 @@
+[
+  {
+    "id": "domain",
+    "text": "Prefer deterministic logic and UTF EditMode assertions. Focused PlayMode fixtures cover lifecycle, frames, physics and coroutines. Preserve serialized identity and pinned packages. Verify exact Editor ownership, save/service isolation, authorization, deadlines and cleanup before execution. Player builds, device runs and external services require matching scope. Read [Unity safety](references/unity-safety.md)."
+  }
+]

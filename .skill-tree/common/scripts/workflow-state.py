@@ -610,15 +610,15 @@ def installed_catalog(root):
 
 def manifest(store):
     path=store.base/'skill-tree.json';existing=json.loads(path.read_text()) if path.exists() else {}
-    role='source' if (store.base/'skills').is_dir() else 'target';files=[]
+    role='source' if (store.base/'config/repository.json').is_file() and json.loads((store.base/'config/repository.json').read_text()).get('role')=='source' else 'target';files=[]
     for p in sorted((store.base/'documents').glob('*')):
         if p.is_file():files.append({'path':p.relative_to(store.root).as_posix(),'role':'generated-index-and-active-state' if p.name=='future.json' else 'canonical','owner':'skill-tree'})
     catalog=installed_catalog(store.root) if role=='target' else []
     if role=='source':
-        canonical=[*sorted((store.base/'common').rglob('*')),*sorted((store.base/'scripts').glob('*.py')),store.base/'bin/install.js',store.base/'config/providers.json',store.base/'config/resource-map.json',store.base/'src/init-rules/skill-tree-skills.md']
+        canonical=[p for directory in ['common','scripts','lib','templates','domains','config','bin','src'] for p in sorted((store.base/directory).rglob('*'))]
         for p in canonical:
             if p.is_file() and '__pycache__' not in p.parts:files.append({'path':p.relative_to(store.root).as_posix(),'role':'canonical','owner':'skill-tree'})
-        for p in sorted((store.base/'skills').glob('*/SKILL.md')):
+        for p in sorted((store.base/'skills').glob('*/*/SKILL.md')):
             catalog.append({'name':p.parent.name,'entrypoint':p.relative_to(store.root).as_posix(),'resources':[r.relative_to(store.root).as_posix() for r in sorted(p.parent.rglob('*')) if r.is_file() and '__pycache__' not in r.parts]})
     audits=[]
     for p in (store.base/'history/audits').glob('*.json'):

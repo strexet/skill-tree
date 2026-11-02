@@ -1,0 +1,9 @@
+{
+  "unit": "U-03",
+  "qualification": "source-contract-and-temporary-fixture",
+  "checks": [
+    "5 composer fixtures including behavioral Red/Green: pass",
+    "79 Python checks and strict source validation: pass",
+    "installer integration is the next required unit U-04"
+  ]
+}

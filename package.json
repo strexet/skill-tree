@@ -16,6 +16,6 @@
     "sync:check": "python3 .skill-tree/scripts/sync-skill-references.py --check",
     "validate": "python3 .skill-tree/scripts/validate-skill-repository.py --strict",
     "test:py": "python3 .skill-tree/scripts/run-tests.py",
-    "test:node": "node --test .skill-tree/tests/test-installer.js .skill-tree/tests/test-provider-matrix.js"
+    "test:node": "node --test .skill-tree/tests/test-*.js"
   }
 }

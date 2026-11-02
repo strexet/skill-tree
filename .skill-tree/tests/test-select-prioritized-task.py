@@ -3,7 +3,7 @@ from pathlib import Path
 import subprocess
 import sys
 import unittest
-ROOT=Path(__file__).resolve().parents[1];CLI=ROOT/'skills/skill-tree-implement-next-future-task/scripts/select-prioritized-task.py';FIXTURES=ROOT/'tests/fixtures/future'
+ROOT=Path(__file__).resolve().parents[1];CLI=ROOT/'skills/general/skill-tree-implement-next-future-task/scripts/select-prioritized-task.py';FIXTURES=ROOT/'tests/fixtures/future'
 class SelectionTests(unittest.TestCase):
     def run_cli(self,fixture,*args):return subprocess.run([sys.executable,str(CLI),str(FIXTURES/fixture),'--format','json',*args],capture_output=True,text=True)
     def test_priority_and_document_order(self):

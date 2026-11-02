@@ -1,7 +1,0 @@
-interface:
-  display_name: "Skill-Tree: Audit Documents"
-  short_description: "Audit Documents"
-  default_prompt: "Apply Audit Documents to the selected repository under applicable rules."
-
-policy:
-  allow_implicit_invocation: true
