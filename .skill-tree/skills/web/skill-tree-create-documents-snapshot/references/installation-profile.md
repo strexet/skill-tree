@@ -19,3 +19,46 @@ Activation validates workflow schema 2 and refuses unresolved prepared operation
 Shared provider destinations retain an explicit provider reference set. Scoped uninstall releases the selected provider and retains packages/bridges referenced by another provider. Verification re-resolves static facts and recomposes expected standalone bytes from the verified local bundle; matching edited hashes alone cannot establish the installed flavor/policy. Package declarations retain separate declared-version provenance; version-specific resources require resolved lock evidence. Required UTF compatibility without resolution returns one installation-time error. Task check preparation substitutes concrete argument-vector parameters without shell evaluation.
 
 Activation rechecks relevant project inputs after staging. Failed verification restores a matching owned generation while retaining current project inputs and workflow progress. Conflicting external edits preserve generation backups and stop automatic restoration. Opaque input digests use raw bytes rather than decoded text.
+
+## Isolated Unity execution bindings
+
+An explicit `.skill-tree/validation-recipes.json` can declare `execution_bindings`. Each binding owns a repository-relative local locator, execution subdirectory, queue/execution source paths, workspace runner/profile paths, source-review path and exact Editor/CLI/Pipeline/UTF pins. The ignored `.skill-tree/local/` locator records the exact machine-local queue and workspace roots. Portable declarations contain no absolute paths. The generated machine-bound installation receipt records resolved roots and current content digests.
+
+Static composition reads source bytes only. Complete source snapshots include fixture-only and extra files; the review classifies every difference as fixture, encoding or unqualified with exact queue/execution hashes and a reason. Unqualified differences remain product-execution blockers. A source, runner, locator, review or pin change requires reviewed profile refresh. Missing paths, symlinks, overlapping roots, foreign queue identities and non-Unity recipe relabeling fail before activation or product operations.
+
+Bound recipes retain Unity lanes. `{project_root}` resolves to the reviewed execution checkout; `{queue_root}` retains the single task authority; `{binding_workspace}` resolves the reviewed runner workspace. Check parameters cannot override reserved roots. Product sessions additionally match the queue, binding, source digest, CLI/Pipeline pins, Editor, ownership evidence, deadline, cleanup and save/service isolation. Static identity verification grants no Editor launch, admission into a stopped game controller or runtime acceptance.
+
+A binding declaration uses the following shape. Snapshot exclusions are explicit reviewed repository-relative paths; a required check source cannot appear in the exclusions. `.git`, `__pycache__` and `.DS_Store` entries remain outside source snapshots.
+
+```json
+{
+  "schema": 1,
+  "execution_bindings": {
+    "isolated": {
+      "locator": ".skill-tree/local/isolated.json",
+      "execution_subdir": "scratch/pilot",
+      "source_paths": ["Assets", "Packages", "ProjectSettings"],
+      "exclude_paths": [],
+      "workspace_paths": ["scripts/runner.py", "docs/validation-profile.md"],
+      "review_path": ".skill-tree/validation/isolated-review.json",
+      "pins": {
+        "editor_version": "6000.3.27f2",
+        "cli_version": "1.0.0-beta.10",
+        "pipeline_version": "0.7.0-exp.1",
+        "utf_version": "1.6.0"
+      }
+    }
+  },
+  "recipes": {
+    "isolated-check": {
+      "lane": "unity-playmode",
+      "editor_version": "6000.3.27f2",
+      "execution_binding": "isolated",
+      "argv": ["python3", "{binding_workspace}/scripts/runner.py", "--project", "{project_root}"],
+      "input_paths": []
+    }
+  }
+}
+```
+
+The example pins describe data syntax, not a qualified toolchain combination. The review records schema 1, queue/execution/workspace snapshot digests and a complete `differences` list with `path`, exact nullable `queue`/`execution` SHA-256 values, `classification` and `reason`. The locator records schema 1 plus exact absolute machine-local `queue_root` and `workspace_root`. The generated receipt never replaces an owner authorization or actual toolchain check.

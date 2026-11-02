@@ -2,6 +2,7 @@
 const fs=require('node:fs');
 const path=require('node:path');
 const crypto=require('node:crypto');
+const bindings=require('./execution-bindings.js');
 const hash=value=>crypto.createHash('sha256').update(value).digest('hex');
 function stable(value) {
  if(Array.isArray(value)) return value.map(stable);
@@ -87,9 +88,12 @@ function resolveProfile(source,root,flavor) {
   else if(!facts.test_assemblies.length)gaps.push({key:'test-foundation',reason:'UTF exists without a discovered test assembly.',recommendation:'Configure the existing UTF framework and one meaningful EditMode test assembly; preserve package pins.'});
  } else if(!Object.values(recipes).some(r=>['unit','integration','browser'].includes(r.lane)))gaps.push({key:'test-foundation',reason:'No usable foundational test command is declared.',recommendation:'Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile.'});
  const explicit=readJson(root,'.skill-tree/validation-recipes.json',null);
+ const execution_bindings=explicit?bindings.resolveBindings(root,explicit):{};
+ for(const binding of Object.values(execution_bindings))for(const rel of [binding.locator,binding.review_path])inputs[rel]=inputDigest(root,rel);
  if(explicit){if(explicit.schema!==1||!explicit.recipes)throw Error('Unsupported static validation recipe format');for(const [id,recipe] of Object.entries(explicit.recipes)){
   if(!/^[a-z][a-z0-9-]*$/.test(id)||!Array.isArray(recipe.argv)||!recipe.argv.length||recipe.argv.some(v=>typeof v!=='string')||!rules.lanes.includes(recipe.lane))throw Error('Invalid or unsupported static recipe lane: '+id);
   if(recipes[id])throw Error('Recipe collision: '+id);
+  if(recipe.execution_binding&&(!execution_bindings[recipe.execution_binding]||!['unity-editmode','unity-playmode'].includes(recipe.lane)||recipe.editor_version!==execution_bindings[recipe.execution_binding].pins.editor_version))throw Error('Recipe requires a matching reviewed Unity execution binding: '+id);
   recipes[id]={...recipe,input_paths:['.skill-tree/validation-recipes.json',...(recipe.input_paths||[])],qualification:'owner-declared static recipe; runner unqualified'};
   for(const rel of recipe.input_paths||[]){inputs[rel]=inputDigest(root,rel);}
  }
@@ -102,8 +106,8 @@ function resolveProfile(source,root,flavor) {
   facts.capabilities[id]={state,package:rule.package,version:pkg?.version||null};
   if(['ambiguous','unsupported'].includes(state))gaps.push({key:'unavailable-specialization',capability:id,reason:'The bundled version-specific fixture contract is unavailable; declared commands require owned qualification.'});
  }
- const environment_id=hash(json({flavor,inputs,facts,recipes}));
- return {format:'skill-tree-profile',schema:1,composer_version:registry.composer_version,flavor,project_root:root,inputs,inventory:discovered,facts,recipes,gaps,environment_id,qualification:'static compatibility only; product execution unqualified'};
+ const environment_id=hash(json({flavor,inputs,facts,recipes,execution_bindings}));
+ return {format:'skill-tree-profile',schema:1,composer_version:registry.composer_version,flavor,project_root:root,inputs,inventory:discovered,facts,recipes,gaps,environment_id,execution_bindings,qualification:'static compatibility only; product execution unqualified'};
 }
 function mergeSections(common,additions,replaceable=[]) {
  const result=common.map(s=>({...s}));

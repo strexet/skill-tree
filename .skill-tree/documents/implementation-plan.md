@@ -12,7 +12,7 @@ One explicit project root receives general, web or unity through project-scoped 
 
 Installation uses staging, backups, an exclusive lock and a recoverable replacement journal. Multi-provider output reports individual results. The local manager refreshes, verifies, recovers and rolls back one retained generation without source-checkout or network access. Active execution reaches a stopped cleanup/handoff boundary before activation. Unknown required compatibility stops; missing foundational tests remain an installable, deduplicated highest-open-plus-one setup finding. Documentation initialization and normal Pending intake remain separate from installation.
 
-Global, symlink and uncomposed upstream specialization are unsupported before writes. Automatic migration, format conversion, legacy aliases, background refresh, package upgrades and cross-project routing are excluded. The [manual target checklist](manual-target-update.md) preserves the existing repository's identities, checkpoint and historical receipts.
+Global, symlink and uncomposed upstream specialization are unsupported before writes. Automatic migration, format conversion, legacy aliases, background refresh, package upgrades and cross-project task routing are excluded. Explicit reviewed isolated Unity execution bindings preserve one queue authority while separating source, fixture and workspace identity. Machine-local locators remain outside portable declarations; unqualified source differences block product checks. The [manual target checklist](manual-target-update.md) preserves the existing repository's identities, checkpoint and historical receipts.
 
 ## Task and validation state
 

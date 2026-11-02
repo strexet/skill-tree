@@ -330,6 +330,10 @@ def validate_run(run):
     if not isinstance(run['phase'],str) or (run['stop_reason'] is not None and not isinstance(run['stop_reason'],str)):raise WorkflowError('Corrupt checkpoint phase/reason')
     for key in ['partial_work','history_refs']:
         if key in run and (not isinstance(run[key],list) or any(not isinstance(v,str) for v in run[key])):raise WorkflowError('Corrupt checkpoint references')
+    focus=run.get('maintenance')
+    if focus is not None:
+        if not isinstance(focus,dict) or not valid_id(focus.get('id'),'MF') or not run.get('stop_reason') or focus.get('execution_restriction')!='static-unit-only' or not focus.get('instruction') or not isinstance(focus.get('admission'),dict):raise WorkflowError('Corrupt maintenance scope')
+        if any(not isinstance(focus.get(key),list) or not set(focus[key]).issubset(run['admitted_task_ids']) for key in ['snapshot','required_ids','admitted_task_ids']):raise WorkflowError('Maintenance scope expands the preserved controller')
 
 def intake(store,payload):
     with store.lock():
@@ -356,7 +360,10 @@ def intake(store,payload):
         text=insert(text,'Pending Queue',render(payload['title'],meta,body))
         run=state['active_run']
         if run:
-            run['pending_ids'].append(meta['id']);run['phase']='capture-findings'
+            run['pending_ids'].append(meta['id'])
+            if not run.get('stop_reason'):run['phase']='capture-findings'
+            focus=run.get('maintenance')
+            if focus and parent in focus['admitted_task_ids']:focus['pending_ids'].append(meta['id'])
         store.save(text,state)
         return meta
 
@@ -451,7 +458,8 @@ def process(store,payload):
         validate_dependencies(parse(text),completed)
         receipt={'id':pr,'selected_ids':[t['id'] for t in selected],'created_ids':produced,'reused_ids':reused,'task_keys':keys,'dispositions':dispositions}
         if run:
-            run['processing_results'].append(receipt);run['phase']='dependencies';run['next_action']='Select required task'
+            run['processing_results'].append(receipt)
+            if not run.get('stop_reason'):run['phase']='dependencies';run['next_action']='Select required task'
             allowed=set(run['admitted_task_ids']);introduced=set();updated=parse(text)
             for tid in produced+reused:
                 child=resolve(updated,[tid])[0]
@@ -459,6 +467,13 @@ def process(store,payload):
                     introduced.update(dependency_scope(updated,{'snapshot':[tid]}))
             if dependency_scope(updated,run)-allowed-introduced:raise WorkflowError('Processing cannot admit a dependency outside the captured required scope')
             run['admitted_task_ids']=sorted(allowed|introduced);run['required_ids']=list(dict.fromkeys(run['required_ids']+sorted(introduced)));run['admitted_groups']=admitted_groups(updated,run)
+            focus=run.get('maintenance')
+            if focus:
+                focused=dependency_scope(updated,focus)
+                if not focused.issubset(set(focus['admitted_task_ids'])|introduced):raise WorkflowError('Processing cannot expand the maintenance scope outside captured required work')
+                for task in updated:
+                    if task['id'] in focused and any(recipe_for(store,check)[0]['lane'] not in {'static','unit'} for check in check_specs(task)):raise WorkflowError('Maintenance descendants require non-product validation')
+                focus['admitted_task_ids']=sorted(focused);focus['required_ids']=sorted(focused)
         store.save(text,state)
         return receipt
 
@@ -479,10 +494,33 @@ def enforce_limits(run):
     budget=run['limits'].get('selected_task_budget')
     if budget is not None and budget['used_seconds']>=budget['limit_seconds']:raise WorkflowError('Selected-task budget exhausted')
 
+def execution_run(run):
+    return run.get('maintenance',run)
+
+def focus_maintenance(store,payload):
+    """Bound explicitly requested non-product work while preserving a stopped controller."""
+    admission=admit_profile(store)
+    if not payload.get('instruction'):raise WorkflowError('Maintenance focus requires the explicit owner instruction')
+    with store.lock():
+        text=store.text();state=store.load(text);run=state['active_run'];tasks=parse(text)
+        if not run or not run.get('stop_reason'):raise WorkflowError('Maintenance focus requires a preserved stopped controller')
+        if run.get('maintenance'):raise WorkflowError('Resume the existing maintenance focus')
+        selected=resolve(tasks,[payload['task_id']],'Prioritized Next Changes')[0]
+        scope=dependency_scope(tasks,{'snapshot':[selected['id']]})
+        if not scope.issubset(scope_ids(tasks,run)):raise WorkflowError('Maintenance focus is outside the admitted required scope')
+        for task in tasks:
+            if task['id'] in scope:
+                if task['status']!='Ready' or any(recipe_for(store,check)[0]['lane'] not in {'static','unit'} for check in check_specs(task)):raise WorkflowError('Maintenance focus permits only researched static/unit infrastructure checks')
+        run['maintenance']={'id':identity('MF'),'root_task_id':selected['id'],'snapshot':[selected['id']],'required_ids':sorted(scope),'admitted_task_ids':sorted(scope),'admitted_groups':{},'current_task_id':selected['id'],'completed_ids':[],'deferred_ids':[],'pending_ids':[],'phase':'implement','limits':{},'stop_reason':None,'admission':admission,'instruction':payload['instruction'],'next_action':'Implement the bounded infrastructure task','execution_restriction':'static-unit-only'}
+        store.save(text,state);return run['maintenance']
+
 def next_task(store):
     state=store.load();run=state['active_run']
     if not run:raise WorkflowError('No active run')
-    enforce_limits(run);assert_admission(store,state);tasks=parse(store.text());by_id={t['id']:t for t in tasks};done={o['task_id'] for o in store.outcomes() if o['disposition']=='completed'}
+    enforce_limits(execution_run(run));assert_admission(store,state)
+    if run.get('maintenance'):
+        state=deepcopy(state);run=deepcopy(run['maintenance']);state['active_run']=run
+    tasks=parse(store.text());by_id={t['id']:t for t in tasks};done={o['task_id'] for o in store.outcomes() if o['disposition']=='completed'}
     validate_dependencies(tasks,done)
     visiting=set();visited=set()
     def walk(tid):
@@ -536,6 +574,7 @@ def next_task(store):
 def advance(store):
     with store.lock():
         result=next_task(store);text=store.text();state=store.load(text);run=state['active_run']
+        run=execution_run(run)
         run['admitted_groups']=admitted_groups(parse(text),run)
         run['phase']=result['phase'];run['current_task_id']=result.get('task_id');run['root_task_id']=result.get('root_task_id',run['root_task_id']);run['next_action']=result['phase']
         if result.get('task_id') and result['task_id'] not in run['required_ids']:run['required_ids'].append(result['task_id'])
@@ -573,7 +612,7 @@ def complete(store,payload):
         for limitation in payload.get('limitations',[]):assert_prose(limitation)
         if disposition=='completed':
             run=state['active_run']
-            if run:enforce_limits(run)
+            if run:enforce_limits(execution_run(run))
             if task['status']!='Ready':raise WorkflowError('Blocked task cannot complete')
             if any(dep not in done for dep in task['depends_on']):raise WorkflowError('Required dependencies remain incomplete')
             if any(t['queue']=='Pending Queue' and t['related_task_id']==task['id'] and t['relation'] in {'blocker','subtask'} for t in tasks):raise WorkflowError('Required Pending work remains unprocessed')
@@ -597,7 +636,9 @@ def complete(store,payload):
         ledger=''.join(json.dumps(o,ensure_ascii=False,sort_keys=True)+'\n' for o in outcomes+[record])
         if state['active_run']:
             run=state['active_run'];run.setdefault('completion_refs',{})[task['id']]=record['id'];run['completed_ids'].append(task['id']) if disposition=='completed' else None
-            run['current_task_id']=None;run['phase']='resume-parent';run['next_action']='Select required task or finish root'
+            target=execution_run(run)
+            if target is not run and disposition=='completed':target['completed_ids'].append(task['id'])
+            target['current_task_id']=None;target['phase']='resume-parent';target['next_action']='Select required task or finish root'
         state['task_progress'].pop(task['id'],None)
         text=remove(text,{task['id']});store.save(text,state,{'.skill-tree/history/task-outcomes.jsonl':ledger});return record
 
@@ -605,6 +646,17 @@ def finish(store):
     with store.lock():
         text=store.text();state=store.load(text);run=state['active_run']
         if not run:raise WorkflowError('No active run')
+        if run.get('maintenance'):
+            focus=run['maintenance'];enforce_limits(focus)
+            assert_admission(store,state)
+            done={o['task_id'] for o in store.outcomes() if o['disposition']=='completed'}
+            if not set(focus['required_ids']).issubset(done):raise WorkflowError('Maintenance scope remains incomplete')
+            context=deepcopy(state);context['active_run']=deepcopy(focus)
+            if stale_completed_checks(store,context):raise WorkflowError('Maintenance acceptance evidence is stale')
+            summary=deepcopy(focus);summary.update({'finished_at':now(),'phase':'completed','next_action':None})
+            del run['maintenance']
+            ref='.skill-tree/history/runs/scope-'+summary['id'].lower()+'.json';run.setdefault('history_refs',[]).append(ref)
+            store.save(text,state,{ref:dump(summary)});return summary
         enforce_limits(run)
         done={o['task_id'] for o in store.outcomes() if o['disposition']=='completed'}
         required=set(run['snapshot']+run['required_ids'])
@@ -623,6 +675,7 @@ def record_cycle(store):
     with store.lock():
         text=store.text();state=store.load(text);run=state['active_run']
         if not run:raise WorkflowError('No active run')
+        run=execution_run(run)
         semantic_fields=['id','queue','priority','status','parent_pending_ids','root_task_id','related_task_id','relation','depends_on']
         task_state=[{key:task[key] for key in semantic_fields} for task in state['tasks']]
         signature=digest(dump({'tasks':task_state,'outcomes':[o['task_id'] for o in store.outcomes()],'revalidated':{tid:[entry['result']['key'] for entry in checks] for tid,checks in run.get('revalidated_checks',{}).items()},'progress':{tid:{'stage':entry['stage'],'diagnostics':{cid:slot.get('result',{}).get('diagnostic_key') for cid,slot in entry['checks'].items() if slot.get('result',{}).get('diagnostic_key')},'checks':{cid:slot.get('result',{}).get('key') if slot.get('result',{}).get('result')=='pass' else None for cid,slot in entry['checks'].items() if slot.get('result',{}).get('result')=='pass'}} for tid,entry in state['task_progress'].items()}}).encode())
@@ -799,8 +852,8 @@ def resume_admission(store):
     with store.lock():
         text=store.text();state=store.load(text);run=state['active_run']
         if not run:raise WorkflowError('No active run')
-        run['admission']=admitted
-        if run.pop('profile_refresh_required',False) and run['stop_reason']=='Installation profile changed; re-admit before continuation':run['stop_reason']=None
+        target=execution_run(run);target['admission']=admitted
+        if target is run and run.pop('profile_refresh_required',False) and run['stop_reason']=='Installation profile changed; re-admit before continuation':run['stop_reason']=None
         store.save(text,state);return admitted
 
 def dependency_scope(tasks,run):
@@ -825,6 +878,60 @@ def admitted_groups(tasks,run):
 def task_signature(task):
     return digest(dump({'checks':check_specs(task),'criteria':acceptance_criteria(task),'group':task.get('validation_group_id'),'boundary':task.get('boundary_validation','not-required')}).encode())
 
+def binding_path(root,relative):
+    if not isinstance(relative,str) or not relative or Path(relative).is_absolute() or '\\' in relative or any(part in {'','.','..'} for part in relative.split('/')):raise WorkflowError('Binding paths require canonical repository-relative paths')
+    current=Path(root)
+    for part in relative.split('/'):
+        current=current/part
+        if current.is_symlink():raise WorkflowError('Binding symlink is unsupported: '+relative)
+    return current
+
+def binding_snapshot(root,paths,excluded=None):
+    if not isinstance(paths,list) or not paths:raise WorkflowError('Binding requires source paths')
+    excluded=excluded or []
+    if not isinstance(excluded,list):raise WorkflowError('Binding exclusions require relative paths')
+    for relative in excluded:binding_path(root,relative)
+    files={}
+    def visit(relative):
+        if any(relative==prefix or relative.startswith(prefix+'/') for prefix in excluded):return
+        path=binding_path(root,relative)
+        if path.is_dir():
+            for child in sorted(path.iterdir()):
+                if child.name not in {'.git','__pycache__','.DS_Store'}:visit(relative+'/'+child.name)
+        elif path.is_file():files[relative]=file_hash(path)
+        else:raise WorkflowError('Missing or unsupported binding source: '+relative)
+    for relative in paths:visit(relative)
+    return digest(''.join(name+'\0'+files[name]+'\n' for name in sorted(files)).encode())
+
+def binding_context(store,recipe,allow_blocked=False):
+    binding_id=recipe.get('execution_binding')
+    if not binding_id:return None
+    profile=json.loads((store.base/'installation/profile.json').read_text())
+    binding=profile.get('execution_bindings',{}).get(binding_id)
+    if not binding or recipe.get('lane') not in {'unity-editmode','unity-playmode'}:raise WorkflowError('A reviewed Unity execution binding is required')
+    if not binding.get('locator','').startswith('.skill-tree/local/'):raise WorkflowError('Binding locator requires local machine configuration')
+    locator_path=binding_path(store.root,binding['locator'])
+    if file_hash(locator_path)!=binding['locator_digest']:raise WorkflowError('Binding locator changed; review and refresh the owned profile')
+    locator=json.loads(locator_path.read_text(encoding='utf-8-sig'))
+    for key in ['queue_root','workspace_root','execution_root']:
+        path=Path(binding[key])
+        if not path.is_absolute() or not path.is_dir() or path.resolve()!=path:raise WorkflowError('Binding root requires an exact real directory')
+    queue=Path(binding['queue_root']);workspace=Path(binding['workspace_root']);execution=Path(binding['execution_root'])
+    if locator.get('schema')!=1 or locator.get('queue_root')!=str(store.root) or locator.get('workspace_root')!=str(workspace) or queue!=store.root or binding_path(workspace,binding['execution_subdir'])!=execution:raise WorkflowError('Foreign binding queue or execution identity')
+    if queue==execution or queue in execution.parents or execution in queue.parents or queue==workspace or queue in workspace.parents or workspace in queue.parents:raise WorkflowError('Binding queue and execution roots overlap')
+    if file_hash(binding_path(queue,binding['review_path']))!=binding['review_digest']:raise WorkflowError('Binding source review changed')
+    for root,paths,key in [(queue,binding['source_paths'],'queue_digest'),(execution,binding['source_paths'],'execution_digest'),(workspace,binding['workspace_paths'],'workspace_digest')]:
+        if binding_snapshot(root,paths,binding.get('exclude_paths',[]) if root!=workspace else [])!=binding[key]:raise WorkflowError('Binding source identity changed: '+key)
+    pins=binding['pins']
+    if recipe.get('editor_version')!=pins['editor_version']:raise WorkflowError('Recipe Editor pin differs from the reviewed binding')
+    for root in [queue,execution]:
+        text=binding_path(root,'ProjectSettings/ProjectVersion.txt').read_text();version=re.search(r'm_EditorVersion:\s*(\S+)',text)
+        locked=json.loads(binding_path(root,'Packages/packages-lock.json').read_text(encoding='utf-8-sig'))['dependencies']
+        if not version or version[1]!=pins['editor_version'] or locked.get('com.unity.test-framework',{}).get('version')!=pins['utf_version']:raise WorkflowError('Binding Editor or UTF pin mismatch')
+        if root==execution and locked.get('com.unity.pipeline',{}).get('version')!=pins['pipeline_version']:raise WorkflowError('Binding Pipeline pin mismatch')
+    if binding['blockers'] and not allow_blocked:raise WorkflowError('Validation-blocked: '+str(len(binding['blockers']))+' unqualified isolated source differences; review '+binding['review_path'])
+    return {'id':binding_id,**{key:binding[key] for key in ['queue_root','execution_root','workspace_root','queue_digest','execution_digest','workspace_digest','pins','review_digest','blockers']}}
+
 def recipe_for(store,check):
     profile_path=store.base/'installation/profile.json'
     profile=json.loads(profile_path.read_text()) if profile_path.exists() else {}
@@ -837,8 +944,16 @@ def recipe_for(store,check):
     inputs={}
     for rel in recipe.get('input_paths',[]):inputs.update(fingerprints(store,[rel]))
     if profile and any(profile.get('inputs',{}).get(rel)!=value for rel,value in inputs.items()):raise WorkflowError('Profile refresh-required: node .skill-tree/installation/manager.js --refresh-profile')
-    recipe=deepcopy(recipe)
-    arguments=[];parameters={**check['parameters'],'project_root':str(store.root)}
+    recipe=deepcopy(recipe);recipe.pop('execution_context',None)
+    binding=binding_context(store,recipe)
+    parameters={**check['parameters'],'project_root':str(store.root),'queue_root':str(store.root)}
+    if binding:
+        if parameters.get('execution_checkout',binding['execution_root'])!=binding['execution_root']:raise WorkflowError('Check checkout differs from the reviewed execution binding')
+        declared=profile['execution_bindings'][recipe['execution_binding']]
+        for relative in check.get('sources',[]):
+            if any(relative==prefix or relative.startswith(prefix+'/') for prefix in declared.get('exclude_paths',[])):raise WorkflowError('A required check source is excluded from the binding')
+        recipe['execution_context']=binding;parameters.update({'project_root':binding['execution_root'],'binding_workspace':binding['workspace_root']})
+    arguments=[]
     for argument in recipe.get('argv',[]):
         def parameter(match):
             key=match[1]
@@ -867,7 +982,13 @@ def execution_session(store,recipe,environment,entry,provided=None,require_curre
     if recipe['lane'] not in PRODUCT_LANES:return None
     fields=['project_root','authorization','profile_id','deadline_utc','cleanup_seconds','tool_identity','session_identity','fixture_identity','build_identity','identity_evidence']
     if not isinstance(session,dict) or any(not session.get(key) for key in fields):raise WorkflowError('Product checks require an owned execution session with authorization, identity evidence, deadline and cleanup reserve')
-    if Path(session['project_root']).resolve()!=store.root:raise WorkflowError('Execution session checkout differs from the covered root')
+    binding=binding_context(store,recipe)
+    expected_root=Path(binding['execution_root']) if binding else store.root
+    if Path(session['project_root']).resolve()!=expected_root:raise WorkflowError('Execution session checkout differs from the covered root')
+    if binding:
+        if session.get('queue_root')!=str(store.root) or session.get('binding_id')!=binding['id'] or session.get('source_identity')!=binding['execution_digest']:raise WorkflowError('Execution session lacks the reviewed queue, binding or source identity')
+        tools=session.get('tool_identity')
+        if not isinstance(tools,dict) or any(tools.get(key)!=binding['pins'][key] for key in ['cli_version','pipeline_version']):raise WorkflowError('Execution session toolchain differs from the binding pins')
     if type(session['cleanup_seconds']) not in {int,float} or session['cleanup_seconds']<=0:raise WorkflowError('Execution cleanup reserve must be positive')
     try:deadline=datetime.fromisoformat(session['deadline_utc'].replace('Z','+00:00'))
     except (ValueError,TypeError) as exc:raise WorkflowError('Execution deadline requires an aware timestamp') from exc
@@ -948,19 +1069,22 @@ def assert_admission(store,state,tid=None):
     profile_path=store.base/'installation/profile.json'
     if not profile_path.is_file():return
     profile=json.loads(profile_path.read_text());run=state['active_run']
-    admitted=run.get('admission') if run else state['task_progress'].get(tid,{}).get('admission')
+    admitted=execution_run(run).get('admission') if run else state['task_progress'].get(tid,{}).get('admission')
     if not admitted or admitted.get('identity')!=profile.get('identity'):raise WorkflowError('Profile admission changed; explicitly re-admit the current profile before continuation')
 
 def assert_scope(store,state,tasks,tid):
     run=state['active_run']
     if run:
-        enforce_limits(run)
+        run=execution_run(run);enforce_limits(run)
         if tid not in scope_ids(tasks,run) and not (state['task_progress'].get(tid,{}).get('revalidation') and tid in run['admitted_task_ids'] and tid in run['required_ids']):raise WorkflowError('Task is outside the admitted controller scope')
+        if run.get('execution_restriction')=='static-unit-only':
+            task=resolve(tasks,[tid],'Prioritized Next Changes')[0]
+            if any(recipe_for(store,check)[0]['lane'] not in {'static','unit'} for check in check_specs(task)):raise WorkflowError('Maintenance focus refuses product checks')
     assert_admission(store,state,tid)
 
 def begin_task(store,payload):
     # Standalone admission occurs once at the implementation boundary; controller leaves reuse the admitted profile.
-    state=store.load();admission=state['active_run'].get('admission') if state['active_run'] else admit_profile(store)
+    state=store.load();admission=execution_run(state['active_run']).get('admission') if state['active_run'] else admit_profile(store)
     with store.lock():
         text=store.text();state=store.load(text);task=resolve(parse(text),[payload['task_id']],'Prioritized Next Changes')[0]
         if task['status']!='Ready':raise WorkflowError('Selected task has blocking questions')
@@ -991,7 +1115,7 @@ def prepare_check(store,payload):
         slot=entry['checks'].get(check['id'],{});previous=slot.get('attempt')
         if previous and not any(record.get('attempt_id')==previous['attempt_id'] for record in [slot.get('result',{}),slot.get('red',{}),*slot.get('receipts',{}).values()]):raise WorkflowError('Recover and close the original pending check attempt before preparing another control')
         if state['active_run']:
-            enforce_limits(state['active_run']);state['active_run']['admitted_groups']=admitted_groups(parse(text),state['active_run'])
+            target=execution_run(state['active_run']);enforce_limits(target);target['admitted_groups']=admitted_groups(parse(text),target)
         recipe,environment=recipe_for(store,check);execution_session(store,recipe,environment,entry,payload.get('execution'),require_current=True)
         snapshot=check_snapshot(store,task,check,state)
         launch=payload.get('launch')
@@ -1000,7 +1124,8 @@ def prepare_check(store,payload):
             if not isinstance(launch,dict) or any(not launch.get(key) for key in required):raise WorkflowError('Launch requires concrete assertion, rationale, authorization, exact checkout, deadline and cleanup profile')
             if type(launch['cleanup_seconds']) not in {int,float} or launch['cleanup_seconds']<=0:raise WorkflowError('Launch cleanup reserve must be positive')
             if launch['cheaper_evidence_insufficient'].strip().casefold() in {'run everything to be safe','to be safe','routine checklist'}:raise WorkflowError('Launch requires an assertion-specific rationale')
-            if Path(launch['project_root']).resolve()!=store.root:raise WorkflowError('Launch checkout differs from the covered root')
+            expected_root=Path(recipe['execution_context']['execution_root']) if recipe.get('execution_binding') else store.root
+            if Path(launch['project_root']).resolve()!=expected_root:raise WorkflowError('Launch checkout differs from the covered root')
             try:deadline=datetime.fromisoformat(launch['deadline_utc'].replace('Z','+00:00'))
             except (ValueError,TypeError) as exc:raise WorkflowError('Launch deadline requires an aware civil timestamp') from exc
             if deadline.tzinfo is None or (deadline-datetime.now(timezone.utc)).total_seconds()<=launch['cleanup_seconds']:raise WorkflowError('Launch deadline lacks a cleanup reserve')
@@ -1056,11 +1181,11 @@ def record_check(store,payload):
             record['failure_signature']=signature;record['diagnostic_key']=observed
             if count>=2:
                 entry['resume_stage']=entry['stage'];entry['stage']='blocked';entry['stop_reason']='Two unchanged executed failures'
-                if state['active_run']:state['active_run'].update({'phase':'blocked','stop_task_id':task['id'],'stop_reason':entry['stop_reason'],'next_action':'Resolve the recorded failure before explicit resumption'})
+                if state['active_run']:execution_run(state['active_run']).update({'phase':'blocked','stop_task_id':task['id'],'stop_reason':entry['stop_reason'],'next_action':'Resolve the recorded failure before explicit resumption'})
         elif result in {'pass','red'}:entry.pop('unchanged_failure',None)
         if classification=='host-policy-rejection':
             entry['resume_stage']=entry['stage'];entry['stage']='blocked';entry['stop_reason']='Host policy rejected the operation: '+payload.get('reason','missing execution scope')
-            if state['active_run']:state['active_run'].update({'phase':'blocked','stop_task_id':task['id'],'stop_reason':entry['stop_reason'],'next_action':payload.get('next_action','Report the rejection and missing scope')})
+            if state['active_run']:execution_run(state['active_run']).update({'phase':'blocked','stop_task_id':task['id'],'stop_reason':entry['stop_reason'],'next_action':payload.get('next_action','Report the rejection and missing scope')})
         store.save(text,state);return record
 
 def validate_task_checks(store,tid,state=None,check_id=None):
@@ -1085,7 +1210,7 @@ def resume_task(store,payload):
     with store.lock():
         text=store.text();state=store.load(text);entry=state['task_progress'].get(payload['task_id'])
         if not entry or entry['stage']!='blocked':raise WorkflowError('No blocked task progress to resume')
-        run=state['active_run']
+        run=execution_run(state['active_run']) if state['active_run'] else None
         if run and payload['task_id'] not in scope_ids(parse(text),run):raise WorkflowError('Blocked task is outside the active controller scope')
         entry['stage']=entry.get('resume_stage','awaiting-validation');entry.setdefault('resolutions',[]).append(payload['resolution']);entry['admission']=admitted
         if state['active_run']:
@@ -1111,7 +1236,7 @@ def reuse_check(store,payload):
         entry['checks'].setdefault(target_check['id'],{})['result']=reused;store.save(text,state);return reused
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=['refresh','manifest','index','read','select','pending','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reuse-check','admit','resume-task','accept-revalidation']);parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=['refresh','manifest','index','read','select','pending','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance']);parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash')
     args=parser.parse_args(argv)
     try:
         store=Store(args.root);payload=json.loads(args.input.read_text()) if args.input else {}
@@ -1135,6 +1260,7 @@ def main(argv=None):
         elif cmd=='record-check':result=record_check(store,payload)
         elif cmd=='reuse-check':result=reuse_check(store,payload)
         elif cmd=='admit':result=resume_admission(store)
+        elif cmd=='focus-maintenance':result=focus_maintenance(store,payload)
         elif cmd=='resume-task':result=resume_task(store,payload)
         elif cmd=='accept-revalidation':result=accept_revalidation(store,payload)
         elif cmd=='process':result=process(store,payload)
