@@ -34,6 +34,13 @@
       "path": ".skill-tree/history/audits/audit-a-b4515e85-52af-4c34-9f18-eeaeaa534b7d.json",
       "recorded_at": "2026-11-02T07:19:52.968000+00:00",
       "scope": "workflow-redesign-0-2-0"
+    },
+    {
+      "fresh": false,
+      "id": "A-031fa918-b34a-4e49-bfbb-670ab472c653",
+      "path": ".skill-tree/history/audits/audit-a-031fa918-b34a-4e49-bfbb-670ab472c653.json",
+      "recorded_at": "2026-11-02T08:07:37.902803+00:00",
+      "scope": "workflow-redesign-conformance-repairs"
     }
   ],
   "canonical_resources": {
@@ -852,10 +859,10 @@
   },
   "latest_audit": {
     "fresh": false,
-    "id": "A-b4515e85-52af-4c34-9f18-eeaeaa534b7d",
-    "path": ".skill-tree/history/audits/audit-a-b4515e85-52af-4c34-9f18-eeaeaa534b7d.json",
-    "recorded_at": "2026-11-02T07:19:52.968000+00:00",
-    "scope": "workflow-redesign-0-2-0"
+    "id": "A-031fa918-b34a-4e49-bfbb-670ab472c653",
+    "path": ".skill-tree/history/audits/audit-a-031fa918-b34a-4e49-bfbb-670ab472c653.json",
+    "recorded_at": "2026-11-02T08:07:37.902803+00:00",
+    "scope": "workflow-redesign-conformance-repairs"
   },
   "policy_references": [
     "AGENTS.md"
@@ -891,7 +898,7 @@
     ".skill-tree/common/scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
     ".skill-tree/common/scripts/validate-repository-documentation.py": "8844b912c043e7213a1a57476579672e78a4b717152044d0a4114a4523cf8f5d",
     ".skill-tree/common/scripts/workflow-state.py": "912f83f1b00ce51612560fcd5b3170b284bd52dad10dca6028c1c7f376f04249",
-    ".skill-tree/config/capabilities.json": "8f76e5dbea27db11324acd97b55b96083a62fa8a9fc750c1215c06e4d38438ee",
+    ".skill-tree/config/capabilities.json": "fc9572cc6a65f689fd7a750560a897593fd7b90df50eadea3954e242556626c5",
     ".skill-tree/config/flavors.json": "67c9e7e39886ddc8eedd7e9956e85c61c97c278f2bdbd81970a430f0dab348c2",
     ".skill-tree/config/providers.json": "80255fe3fb67e32d71cc7791aee1e51c1d34a508d4c77b6ca852521907ede97a",
     ".skill-tree/config/repository.json": "cdc6218cb1003e00d1e3d703de079a476d283ab6a27132a581078c8228c1eef7",
@@ -918,7 +925,7 @@
     ".skill-tree/domains/web/development.md": "a8e55f4d58ad64056707801a3c31aa56eb884755fd12ef08c341680d73645bc9",
     ".skill-tree/domains/web/playwright-testing.md": "661393b4329bbe03f68f1570919fe8bf02dcebb5bf77555f3c5c46e05d4739a7",
     ".skill-tree/domains/web/sections.json": "705a5dca39a2a0baa64f0043d6d188ade153c7dff553fcf55bfd25256b2bb2c7",
-    ".skill-tree/lib/composer.js": "5a881c053c89ce259d761b80fa9d02235012ab29e2ef59985b0f5827e4ca5806",
+    ".skill-tree/lib/composer.js": "b586513bdb41e8e59af4b93212c722bf5173340226cb5da389cf8cd5eff3cf98",
     ".skill-tree/lib/installation.js": "8ba136f78ebb23d25c5df58f13a0b1d23d3c4db6ee17461072625a7c4dc92396",
     ".skill-tree/scripts/run-tests.py": "00c61ad36efcc208865692e5822f38dd4bbbc036d058bc7e55bc81c3851b711e",
     ".skill-tree/scripts/sync-skill-references.py": "7362077b0b1d031c88af9a1ddb7cfe8ddc2bc3472e64cb470100ac24038404b9",

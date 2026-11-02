@@ -1,0 +1,36 @@
+{
+  "admission": {
+    "flavor": "general",
+    "identity": "repository-local"
+  },
+  "admitted_groups": {},
+  "admitted_task_ids": [
+    "T-cdc08133-0c9f-4eee-a01e-60f34f683abe"
+  ],
+  "completed_ids": [
+    "T-cdc08133-0c9f-4eee-a01e-60f34f683abe"
+  ],
+  "completion_refs": {
+    "T-cdc08133-0c9f-4eee-a01e-60f34f683abe": "O-76c0adf4-23c9-4430-87b5-f70eb8b7a0a7"
+  },
+  "current_task_id": null,
+  "deferred_ids": [],
+  "finished_at": "2026-11-02T08:35:23.151288+00:00",
+  "id": "WR-5774d103-0aa4-423c-87fb-f5532b84041f",
+  "limits": {},
+  "mode": "next",
+  "next_action": null,
+  "partial_work": [],
+  "pending_ids": [],
+  "phase": "completed",
+  "processing_results": [],
+  "required_ids": [
+    "T-cdc08133-0c9f-4eee-a01e-60f34f683abe"
+  ],
+  "root_task_id": "T-cdc08133-0c9f-4eee-a01e-60f34f683abe",
+  "snapshot": [
+    "T-cdc08133-0c9f-4eee-a01e-60f34f683abe"
+  ],
+  "started_at": "2026-11-02T08:32:31.519355+00:00",
+  "stop_reason": null
+}

@@ -89,3 +89,19 @@ test('Unity required UTF flags require resolution evidence and track reload sett
 test('input fingerprints hash raw bytes even for an opaque dependency lock',t=>{
  const root=fixture(t),file=path.join(root,'bun.lockb');fs.writeFileSync(file,Buffer.from([0x80]));const first=c.resolveProfile(source,root,'general');fs.writeFileSync(file,Buffer.from([0x81]));const next=c.resolveProfile(source,root,'general');assert.notEqual(first.inputs['bun.lockb'],next.inputs['bun.lockb']);
 });
+test('resolved UTF 1.6.0 supports the pinned Unity 6000.0 target without accepting unresolved or future versions',t=>{
+ const root=fixture(t);write(root,'ProjectSettings/ProjectVersion.txt','m_EditorVersion: 6000.0.83f1');
+ write(root,'Packages/manifest.json',{dependencies:{'com.unity.test-framework':'1.6.0'}});
+ write(root,'Packages/packages-lock.json',{dependencies:{'com.unity.test-framework':{version:'1.6.0',source:'builtin'}}});
+ const p=c.resolveProfile(source,root,'unity');assert.equal(p.recipes['unity-editmode'].utf_version,'1.6.0');assert.equal(p.facts.packages['com.unity.test-framework'].resolution_source,'Packages/packages-lock.json');
+ for(const lane of ['EditMode','PlayMode'])assert.deepEqual(p.recipes['unity-'+lane.toLowerCase()].argv,['Unity','-batchmode','-projectPath','{project_root}','-runTests','-testPlatform',lane,'-testFilter','{test_filter}','-testResults','{result_path}','-logFile','{log_path}']);
+ assert.ok(c.compose(source,p).packages['skill-tree-work-through-next']);
+ write(root,'Packages/packages-lock.json',{dependencies:{'com.unity.test-framework':{version:'1.6.1',source:'builtin'}}});assert.throws(()=>c.resolveProfile(source,root,'unity'),/Unsupported.*UTF/);
+ fs.unlinkSync(path.join(root,'Packages/packages-lock.json'));assert.throws(()=>c.resolveProfile(source,root,'unity'),/Unsupported.*UTF/);
+});
+test('Unity BOM-prefixed JSON remains static input with unchanged raw-byte fingerprints',t=>{
+ const root=fixture(t);write(root,'ProjectSettings/ProjectVersion.txt','m_EditorVersion: 6000.0.83f1');write(root,'Packages/manifest.json','\uFEFF'+JSON.stringify({dependencies:{'com.unity.test-framework':'1.6.0'}}));write(root,'Packages/packages-lock.json',{dependencies:{'com.unity.test-framework':{version:'1.6.0',source:'builtin'}}});
+ const rel='Assets/Tests/Fixture.asmdef';write(root,rel,'\uFEFF'+JSON.stringify({name:'Fixture',optionalUnityReferences:['TestAssemblies']}));const before=fs.readFileSync(path.join(root,rel));
+ const p=c.resolveProfile(source,root,'unity');assert.ok(p.facts.test_assemblies.includes(rel));assert.equal(p.inputs[rel],c.hash(before));assert.deepEqual(fs.readFileSync(path.join(root,rel)),before);
+ write(root,rel,'\uFEFF{broken');assert.throws(()=>c.resolveProfile(source,root,'unity'),SyntaxError);
+});

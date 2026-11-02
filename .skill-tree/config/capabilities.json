@@ -5,12 +5,15 @@
       "^6000\\.[03]\\.\\d+[abfp]\\d+$"
     ],
     "utf_patterns": [
-      "^1\\.4\\.\\d+$"
+      "^1\\.4\\.\\d+$",
+      "^1\\.6\\.0$"
     ],
     "sources": [
       "https://docs.unity3d.com/Packages/com.unity.test-framework@1.4/manual/reference-command-line.html",
       "https://docs.unity.com/en-us/engine/6000.3/manual/uitoolkits/ui-system-compare",
-      "https://docs.unity.com/en-us/engine/6000.0/manual/packages-list/dependencies-lp/upm-conflicts-auto"
+      "https://docs.unity.com/en-us/engine/6000.0/manual/packages-list/dependencies-lp/upm-conflicts-auto",
+      "https://docs.unity3d.com/Packages/com.unity.test-framework@1.6/manual/index.html",
+      "https://docs.unity3d.com/6000.2/Documentation/Manual/test-framework/reference-command-line.html"
     ]
   },
   "web": {

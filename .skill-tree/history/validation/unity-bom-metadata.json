@@ -1,0 +1,47 @@
+{
+  "scope": "static JSON reader and temporary source fixtures",
+  "preserves_raw_project_bytes": true,
+  "checks": [
+    {
+      "command": [
+        "npm",
+        "run",
+        "sync:check"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.538,
+      "output_tail": "\n> skill-tree-skills@0.2.0 sync:check\n> python3 .skill-tree/scripts/sync-skill-references.py --check\n\nskill references current\n"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "validate"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 1.07,
+      "output_tail": "\n> skill-tree-skills@0.2.0 validate\n> python3 .skill-tree/scripts/validate-skill-repository.py --strict\n\nskill repository valid\n"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:py"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 5.928,
+      "output_tail": "finding_protects_old_audit_until_scoped_resolution (test_workflow_state.WorkflowStateTests.test_unresolved_finding_protects_old_audit_until_scoped_resolution) ... ok\ntest_writer_lock_rejects_second_controller (test_workflow_state.WorkflowStateTests.test_writer_lock_rejects_second_controller) ... ok\n\n----------------------------------------------------------------------\nRan 114 tests in 5.647s\n\nOK\n"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:node"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 13.48,
+      "output_tail": ".074708\n  ...\n# Subtest: fixture duplicate provider id is detectable\nok 61 - fixture duplicate provider id is detectable\n  ---\n  duration_ms: 0.760125\n  ...\n# Subtest: fixture invalid soft probe is detectable\nok 62 - fixture invalid soft probe is detectable\n  ---\n  duration_ms: 0.321\n  ...\n1..62\n# tests 62\n# suites 0\n# pass 62\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 13264.726083\n"
+    }
+  ],
+  "product_execution": false
+}

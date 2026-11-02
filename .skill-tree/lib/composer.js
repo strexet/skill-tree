@@ -21,7 +21,7 @@ function safe(root,rel) {
 }
 function read(root,rel) { const p=safe(root,rel);return fs.existsSync(p)?fs.readFileSync(p,'utf8'):null; }
 const inputDigest=(root,rel)=>{const file=safe(root,rel);return fs.existsSync(file)?hash(fs.readFileSync(file)):null;};
-const readJson=(root,rel,fallback={})=>{const data=read(root,rel);return data===null?fallback:JSON.parse(data);};
+const readJson=(root,rel,fallback={})=>{const data=read(root,rel);return data===null?fallback:JSON.parse(data.replace(/^\uFEFF/,''));};
 function inventory(root,rules) {
  const out=[];
  function walk(rel) {

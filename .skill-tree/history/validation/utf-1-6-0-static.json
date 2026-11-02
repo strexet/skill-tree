@@ -1,0 +1,52 @@
+{
+  "scope": "static compatibility and temporary source fixtures",
+  "package_version": "1.6.0",
+  "unity_minimum_from_pinned_package": "6000.0",
+  "sources": [
+    "https://docs.unity3d.com/Packages/com.unity.test-framework@1.6/manual/index.html",
+    "https://docs.unity3d.com/6000.2/Documentation/Manual/test-framework/reference-command-line.html"
+  ],
+  "checks": [
+    {
+      "command": [
+        "npm",
+        "run",
+        "sync:check"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.588,
+      "output_tail": "\n> skill-tree-skills@0.2.0 sync:check\n> python3 .skill-tree/scripts/sync-skill-references.py --check\n\nskill references current\n"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "validate"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 1.326,
+      "output_tail": "\n> skill-tree-skills@0.2.0 validate\n> python3 .skill-tree/scripts/validate-skill-repository.py --strict\n\nskill repository valid\n"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:py"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 7.246,
+      "output_tail": " (test_workflow_state.WorkflowStateTests.test_unresolved_finding_protects_old_audit_until_scoped_resolution) ... ok\ntest_writer_lock_rejects_second_controller (test_workflow_state.WorkflowStateTests.test_writer_lock_rejects_second_controller) ... ok\n\n----------------------------------------------------------------------\nRan 114 tests in 6.893s\n\nOK\n"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:node"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 12.17,
+      "output_tail": "d is detectable\nok 60 - fixture duplicate provider id is detectable\n  ---\n  duration_ms: 0.613875\n  ...\n# Subtest: fixture invalid soft probe is detectable\nok 61 - fixture invalid soft probe is detectable\n  ---\n  duration_ms: 0.262458\n  ...\n1..61\n# tests 61\n# suites 0\n# pass 61\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 11953.961917\n"
+    }
+  ],
+  "product_execution": false
+}
