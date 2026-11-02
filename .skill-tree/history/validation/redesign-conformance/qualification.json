@@ -1,0 +1,22 @@
+{
+  "scope": "source and temporary-fixture controls",
+  "task_id": "T-d6dfa7ea-3bbe-4293-9d49-a3470c8d9f54",
+  "checks": [
+    {
+      "log": "check-2.log",
+      "sha256": "b9242fb84d967e13ac4bba2bff150b204fc6ef4110c8add11d359359389f8db2",
+      "summary": "(test_workflow_state.WorkflowStateTests.test_split_forward_dependency_resolves_keys_atomically_and_orders_execution) ... ok\ntest_targeted_processing_never_consumes_unselected_work (test_workflow_state.WorkflowStateTests.test_targeted_processing_never_consumes_unselected_work) ... ok\ntest_unresolved_finding_protects_old_audit_until_scoped_resolution (test_workflow_state.WorkflowStateTests.test_unresolved_finding_protects_old_audit_until_scoped_resolution) ... ok\ntest_writer_lock_rejects_second_controller (test_workflow_state.WorkflowStateTests.test_writer_lock_rejects_second_controller) ... ok\n\n----------------------------------------------------------------------\nRan 114 tests in 5.783s\n\nOK\n"
+    },
+    {
+      "log": "check-3.log",
+      "sha256": "f451aa45dbbd0ee77a0840d7826bff77798748684ff72aee21b45e15ccf7fe62",
+      "summary": "t providers excluded from --all selection\nok 57 - soft providers excluded from --all selection\n  ---\n  duration_ms: 0.193833\n  ...\n# Subtest: known Tier 2 passthrough examples present or supported by --agent\nok 58 - known Tier 2 passthrough examples present or supported by --agent\n  ---\n  duration_ms: 0.077\n  ...\n# Subtest: fixture duplicate provider id is detectable\nok 59 - fixture duplicate provider id is detectable\n  ---\n  duration_ms: 0.729125\n  ...\n# Subtest: fixture invalid soft probe is detectable\nok 60 - fixture invalid soft probe is detectable\n  ---\n  duration_ms: 0.25025\n  ...\n1..60\n# tests 60\n# suites 0\n# pass 60\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 11872.408\n"
+    },
+    {
+      "log": "final-report.json",
+      "sha256": "634a89f3eb310594acd8b75f8cf42238a37ce401d9db2f552e71a98f637dd330",
+      "summary": "ill-tree/artifacts/redesign-conformance/check-7.log\"\n    }\n  ],\n  \"python_tests\": 114,\n  \"node_tests\": 60,\n  \"all_passed\": true,\n  \"limits\": [\n    \"No live provider installation, Unity Editor, browser/server, Player, device or hosted qualification.\",\n    \"No actual model-behavior evaluation.\",\n    \"Historical receipts retain original paths and verdicts; source qualification is current evidence.\"\n  ],\n  \"matrix_sha256\": \"a97b9c8cd39ce29ef7f81264563575917e3fb1dd4a92fd197053e6f9ff841873\",\n  \"post_plan_validation\": {\n    \"command\": [\n      \"npm\",\n      \"run\",\n      \"validate\"\n    ],\n    \"exit_code\": 0,\n    \"output_sha256\": \"658d9a80f74c99ccf099187c500f850fd26979ef94825d862dfd3dcd23e6f48c\"\n  }\n}\n"
+    }
+  ],
+  "product_execution": false
+}

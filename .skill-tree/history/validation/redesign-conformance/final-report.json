@@ -1,0 +1,136 @@
+{
+  "version": "0.2.0",
+  "qualification": "0.2.0 conformance repairs; source and temporary filesystem fixtures",
+  "conformance_matrix": ".skill-tree/documents/workflow-redesign-conformance.md",
+  "product_execution": false,
+  "commands": [
+    {
+      "command": [
+        "npm",
+        "run",
+        "sync:check"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.484,
+      "deadline_seconds": 120,
+      "cleanup_reserve_seconds": 10,
+      "output_sha256": "33f50fe80aa5c26e3ec70e8ce4737b776d1cc0c57608a7c98f26dd9733103c98",
+      "local_log": ".skill-tree/artifacts/redesign-conformance/check-0.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "validate"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 1.065,
+      "deadline_seconds": 120,
+      "cleanup_reserve_seconds": 10,
+      "output_sha256": "658d9a80f74c99ccf099187c500f850fd26979ef94825d862dfd3dcd23e6f48c",
+      "local_log": ".skill-tree/artifacts/redesign-conformance/check-1.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:py"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 6.077,
+      "deadline_seconds": 120,
+      "cleanup_reserve_seconds": 10,
+      "output_sha256": "b9242fb84d967e13ac4bba2bff150b204fc6ef4110c8add11d359359389f8db2",
+      "local_log": ".skill-tree/artifacts/redesign-conformance/check-2.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:node"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 12.084,
+      "deadline_seconds": 120,
+      "cleanup_reserve_seconds": 10,
+      "output_sha256": "f451aa45dbbd0ee77a0840d7826bff77798748684ff72aee21b45e15ccf7fe62",
+      "local_log": ".skill-tree/artifacts/redesign-conformance/check-3.log"
+    },
+    {
+      "command": [
+        "node",
+        ".skill-tree/bin/install.js",
+        "--list"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.054,
+      "deadline_seconds": 120,
+      "cleanup_reserve_seconds": 10,
+      "output_sha256": "cf223ec9bd3235a2449fe93133b7cd8a9b5a51ef44213f8fdc1c85cca713a861",
+      "local_log": ".skill-tree/artifacts/redesign-conformance/check-4.log"
+    },
+    {
+      "command": [
+        "sh",
+        "install.sh",
+        "--list"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.063,
+      "deadline_seconds": 120,
+      "cleanup_reserve_seconds": 10,
+      "output_sha256": "cf223ec9bd3235a2449fe93133b7cd8a9b5a51ef44213f8fdc1c85cca713a861",
+      "local_log": ".skill-tree/artifacts/redesign-conformance/check-5.log"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.097,
+      "deadline_seconds": 120,
+      "cleanup_reserve_seconds": 10,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_log": ".skill-tree/artifacts/redesign-conformance/check-6.log"
+    },
+    {
+      "command": [
+        "node",
+        ".skill-tree/bin/install.js",
+        "--dry-run",
+        "--all",
+        "--target",
+        "<temporary-project-root>",
+        "--flavor",
+        "general",
+        "--copy"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.559,
+      "deadline_seconds": 120,
+      "cleanup_reserve_seconds": 10,
+      "output_sha256": "61b4895baf84d2f8515227930b759f9916f806d58a965d56273be24af9d5f5b6",
+      "local_log": ".skill-tree/artifacts/redesign-conformance/check-7.log"
+    }
+  ],
+  "python_tests": 114,
+  "node_tests": 60,
+  "all_passed": true,
+  "limits": [
+    "No live provider installation, Unity Editor, browser/server, Player, device or hosted qualification.",
+    "No actual model-behavior evaluation.",
+    "Historical receipts retain original paths and verdicts; source qualification is current evidence."
+  ],
+  "matrix_sha256": "a97b9c8cd39ce29ef7f81264563575917e3fb1dd4a92fd197053e6f9ff841873",
+  "post_plan_validation": {
+    "command": [
+      "npm",
+      "run",
+      "validate"
+    ],
+    "exit_code": 0,
+    "output_sha256": "658d9a80f74c99ccf099187c500f850fd26979ef94825d862dfd3dcd23e6f48c"
+  }
+}

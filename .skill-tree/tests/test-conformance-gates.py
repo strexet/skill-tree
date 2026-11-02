@@ -96,4 +96,26 @@ class ConformanceGateTests(unittest.TestCase):
         self.edit_plan(tid,lambda plan:plan['checks'][0]['parameters'].update({'case':'two words; literal argument'}))
         attempt=wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'});self.assertEqual(attempt['recipe']['argv'],['fixture','--root',str(self.root.resolve()),'--case','two words; literal argument'])
 
+    def finish_task(self,tid):
+        self.progress(tid);self.passed(tid)
+        return wf.complete(self.store,{'task_id':tid,'outcome':'The value remains observable.','acceptance':[{'criterion':'Preserve the value.','result':'pass','evidence':['report.json']}],'source_fingerprints':wf.fingerprints(self.store,['source.py'])})
+    def test_finish_refuses_stale_completed_checks_and_revalidation_never_reimplements_or_duplicates_history(self):
+        tid=self.task();wf.start(self.store,'next');self.finish_task(tid);ledger=(self.store.base/'history/task-outcomes.jsonl').read_bytes();(self.root/'source.py').write_text('value = 2\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'stale|unavailable'):wf.finish(self.store)
+        self.assertEqual(wf.next_task(self.store)['phase'],'validate');self.passed(tid);wf.accept_revalidation(self.store,{'task_id':tid});wf.finish(self.store)
+        self.assertEqual((self.store.base/'history/task-outcomes.jsonl').read_bytes(),ledger);self.assertIsNone(self.store.load()['active_run'])
+    def test_resuming_an_unrelated_blocked_task_cannot_clear_an_active_execution_stop(self):
+        outside=self.task('Outside');self.progress(outside);inside=self.task('Inside');wf.start(self.store,'next',inside);state=self.store.load();state['task_progress'][outside].update({'stage':'blocked','resume_stage':'awaiting-validation','stop_reason':'unrelated failure'});state['active_run']['stop_reason']='Owner decision remains unresolved'
+        with self.store.lock():self.store.save(self.store.text(),state)
+        with self.assertRaisesRegex(wf.WorkflowError,'scope'):wf.resume_task(self.store,{'task_id':outside,'resolution':'The unrelated fixture is repaired.'})
+        self.assertEqual(self.store.load()['active_run']['stop_reason'],'Owner decision remains unresolved')
+
+    def test_finish_never_discards_a_pending_revalidation_attempt(self):
+        tid=self.task();wf.start(self.store,'next');self.finish_task(tid);wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'})
+        with self.assertRaisesRegex(wf.WorkflowError,'stale|pending|unavailable'):wf.finish(self.store)
+        self.assertEqual(wf.next_task(self.store)['task_id'],tid);self.assertIsNotNone(self.store.load()['active_run'])
+    def test_completed_check_history_reports_missing_artifacts_without_rewriting_the_ledger(self):
+        tid=self.task();self.finish_task(tid);before=(self.store.base/'history/task-outcomes.jsonl').read_bytes();(self.root/'report.json').unlink();view=wf.history(self.store,tid)[0]
+        self.assertFalse(view['check_results'][0]['result']['evidence'][0]['available']);self.assertEqual((self.store.base/'history/task-outcomes.jsonl').read_bytes(),before)
+
 if __name__=='__main__':unittest.main()

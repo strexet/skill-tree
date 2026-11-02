@@ -86,3 +86,6 @@ test('Unity required UTF flags require resolution evidence and track reload sett
  assert.throws(()=>c.resolveProfile(source,root,'unity'),/resolved UTF|lock/);
  write(root,'Packages/packages-lock.json',{dependencies:{'com.unity.test-framework':{version:'1.4.6'}}});const first=c.resolveProfile(source,root,'unity');write(root,'ProjectSettings/EditorSettings.asset','m_EnterPlayModeOptionsEnabled: 1\nm_EnterPlayModeOptions: 3\n');const next=c.resolveProfile(source,root,'unity');assert.notEqual(first.environment_id,next.environment_id);assert.equal(next.facts.reload.enabled,'1');assert.ok(next.recipes['unity-editmode'].input_paths.includes('ProjectSettings/EditorSettings.asset'));
 });
+test('input fingerprints hash raw bytes even for an opaque dependency lock',t=>{
+ const root=fixture(t),file=path.join(root,'bun.lockb');fs.writeFileSync(file,Buffer.from([0x80]));const first=c.resolveProfile(source,root,'general');fs.writeFileSync(file,Buffer.from([0x81]));const next=c.resolveProfile(source,root,'general');assert.notEqual(first.inputs['bun.lockb'],next.inputs['bun.lockb']);
+});

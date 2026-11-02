@@ -1,0 +1,162 @@
+{
+  "checks": [
+    {
+      "command": [
+        "npm",
+        "run",
+        "sync:check"
+      ],
+      "result": "pass"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "validate"
+      ],
+      "result": "pass"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:py"
+      ],
+      "result": "pass"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:node"
+      ],
+      "result": "pass"
+    },
+    {
+      "command": [
+        "node",
+        ".skill-tree/bin/install.js",
+        "--list"
+      ],
+      "result": "pass"
+    },
+    {
+      "command": [
+        "sh",
+        "install.sh",
+        "--list"
+      ],
+      "result": "pass"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "result": "pass"
+    },
+    {
+      "command": [
+        "node",
+        ".skill-tree/bin/install.js",
+        "--dry-run",
+        "--all",
+        "--target",
+        "<temporary-project-root>",
+        "--flavor",
+        "general",
+        "--copy"
+      ],
+      "result": "pass"
+    }
+  ],
+  "coverage_gaps": [
+    "No live provider installation, Unity Editor, browser/server, Player, device or hosted qualification.",
+    "No actual model-behavior evaluation.",
+    "Historical receipts retain original paths and verdicts; source qualification is current evidence."
+  ],
+  "findings": [
+    {
+      "id": "R-01",
+      "observation": "The conformance matrix records the reproduced gap, scoped repair and regression evidence.",
+      "status": "resolved"
+    },
+    {
+      "id": "R-02",
+      "observation": "The conformance matrix records the reproduced gap, scoped repair and regression evidence.",
+      "status": "resolved"
+    },
+    {
+      "id": "R-03",
+      "observation": "The conformance matrix records the reproduced gap, scoped repair and regression evidence.",
+      "status": "resolved"
+    },
+    {
+      "id": "R-04",
+      "observation": "The conformance matrix records the reproduced gap, scoped repair and regression evidence.",
+      "status": "resolved"
+    },
+    {
+      "id": "R-05",
+      "observation": "The conformance matrix records the reproduced gap, scoped repair and regression evidence.",
+      "status": "resolved"
+    },
+    {
+      "id": "R-06",
+      "observation": "The conformance matrix records the reproduced gap, scoped repair and regression evidence.",
+      "status": "resolved"
+    },
+    {
+      "id": "R-07",
+      "observation": "The conformance matrix records the reproduced gap, scoped repair and regression evidence.",
+      "status": "resolved"
+    },
+    {
+      "id": "R-08",
+      "observation": "The conformance matrix records the reproduced gap, scoped repair and regression evidence.",
+      "status": "resolved"
+    },
+    {
+      "id": "R-09",
+      "observation": "The conformance matrix records the reproduced gap, scoped repair and regression evidence.",
+      "status": "resolved"
+    },
+    {
+      "id": "R-10",
+      "observation": "The conformance matrix records the reproduced gap, scoped repair and regression evidence.",
+      "status": "resolved"
+    },
+    {
+      "id": "R-11",
+      "observation": "The conformance matrix records the reproduced gap, scoped repair and regression evidence.",
+      "status": "resolved"
+    },
+    {
+      "id": "R-12",
+      "observation": "The conformance matrix records the reproduced gap, scoped repair and regression evidence.",
+      "status": "resolved"
+    }
+  ],
+  "id": "A-031fa918-b34a-4e49-bfbb-670ab472c653",
+  "recorded_at": "2026-11-02T08:07:37.902803+00:00",
+  "scope": "workflow-redesign-conformance-repairs",
+  "source_fingerprints": {
+    ".skill-tree/common/scripts/validate-repository-documentation.py": "8844b912c043e7213a1a57476579672e78a4b717152044d0a4114a4523cf8f5d",
+    ".skill-tree/common/scripts/workflow-state.py": "912f83f1b00ce51612560fcd5b3170b284bd52dad10dca6028c1c7f376f04249",
+    ".skill-tree/config/capabilities.json": "8f76e5dbea27db11324acd97b55b96083a62fa8a9fc750c1215c06e4d38438ee",
+    ".skill-tree/config/flavors.json": "67c9e7e39886ddc8eedd7e9956e85c61c97c278f2bdbd81970a430f0dab348c2",
+    ".skill-tree/documents/workflow-redesign-conformance.md": "a97b9c8cd39ce29ef7f81264563575917e3fb1dd4a92fd197053e6f9ff841873",
+    ".skill-tree/lib/composer.js": "5a881c053c89ce259d761b80fa9d02235012ab29e2ef59985b0f5827e4ca5806",
+    ".skill-tree/lib/installation.js": "8ba136f78ebb23d25c5df58f13a0b1d23d3c4db6ee17461072625a7c4dc92396"
+  },
+  "sources": [
+    ".skill-tree/common/scripts/workflow-state.py",
+    ".skill-tree/common/scripts/validate-repository-documentation.py",
+    ".skill-tree/lib/composer.js",
+    ".skill-tree/lib/installation.js",
+    ".skill-tree/config/capabilities.json",
+    ".skill-tree/config/flavors.json",
+    ".skill-tree/documents/workflow-redesign-conformance.md"
+  ]
+}

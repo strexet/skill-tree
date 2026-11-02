@@ -27,7 +27,13 @@
           },
           "instruction": "Use the [Playwright fixture](references/playwright-testing.md) with the admitted declared recipes."
         }
-      ]
+      ],
+      "capabilities": {
+        "playwright-test": {
+          "package": "@playwright/test",
+          "version_pattern": "^1\\.\\d+\\.\\d+$"
+        }
+      }
     },
     "unity": {
       "sections": "domains/unity/sections.json",

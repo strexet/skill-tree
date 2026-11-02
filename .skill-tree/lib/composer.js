@@ -20,6 +20,7 @@ function safe(root,rel) {
  return full;
 }
 function read(root,rel) { const p=safe(root,rel);return fs.existsSync(p)?fs.readFileSync(p,'utf8'):null; }
+const inputDigest=(root,rel)=>{const file=safe(root,rel);return fs.existsSync(file)?hash(fs.readFileSync(file)):null;};
 const readJson=(root,rel,fallback={})=>{const data=read(root,rel);return data===null?fallback:JSON.parse(data);};
 function inventory(root,rules) {
  const out=[];
@@ -43,7 +44,7 @@ function resolveProfile(source,root,flavor) {
  if(!registry.flavors[flavor])throw Error('Unknown flavor: '+flavor);
  const fixed=['package.json','package-lock.json','npm-shrinkwrap.json','yarn.lock','pnpm-lock.yaml','bun.lock','bun.lockb','.nvmrc','.node-version','pyproject.toml','pytest.ini','Cargo.toml','ProjectSettings/ProjectVersion.txt','ProjectSettings/EditorSettings.asset','ProjectSettings/ProjectSettings.asset','Packages/manifest.json','Packages/packages-lock.json','.skill-tree/validation-recipes.json'];
  const discovered=inventory(root,rules.inventory),inputs={};
- for(const rel of [...new Set([...fixed,...discovered])].sort()){const value=read(root,rel);inputs[rel]=value===null?null:hash(value);}
+ for(const rel of [...new Set([...fixed,...discovered])].sort()){inputs[rel]=inputDigest(root,rel);}
  const facts={test_assemblies:[],ui:[]},recipes={},gaps=[];
  const pkg=readJson(root,'package.json'),locks=['package-lock.json','npm-shrinkwrap.json','yarn.lock','pnpm-lock.yaml','bun.lock','bun.lockb'].filter(rel=>inputs[rel]!==null);
  if(locks.length>1)throw Error('Conflicting dependency locks: '+locks.join(', '));
@@ -90,11 +91,17 @@ function resolveProfile(source,root,flavor) {
   if(!/^[a-z][a-z0-9-]*$/.test(id)||!Array.isArray(recipe.argv)||!recipe.argv.length||recipe.argv.some(v=>typeof v!=='string')||!rules.lanes.includes(recipe.lane))throw Error('Invalid or unsupported static recipe lane: '+id);
   if(recipes[id])throw Error('Recipe collision: '+id);
   recipes[id]={...recipe,input_paths:['.skill-tree/validation-recipes.json',...(recipe.input_paths||[])],qualification:'owner-declared static recipe; runner unqualified'};
-  for(const rel of recipe.input_paths||[]){const value=read(root,rel);inputs[rel]=value===null?null:hash(value);}
+  for(const rel of recipe.input_paths||[]){inputs[rel]=inputDigest(root,rel);}
  }
  if(Object.values(recipes).some(r=>['unit','integration','browser','unity-editmode'].includes(r.lane)))gaps.splice(0,gaps.length,...gaps.filter(g=>g.key!=='test-foundation'));}
  const unresolved=Object.entries(facts.packages).filter(([,value])=>value.state==='ambiguous').map(([name])=>name);
  if(unresolved.length)gaps.push({key:'unresolved-package-versions',packages:unresolved,reason:'Dependency declarations lack resolved version evidence; version-specific resources are unavailable until supported lock evidence is supplied.'});
+ facts.capabilities={};
+ for(const [id,rule] of Object.entries(registry.flavors[flavor].capabilities||{})){
+  const pkg=facts.packages[rule.package],state=!pkg?'absent':pkg.state!=='known'?'ambiguous':new RegExp(rule.version_pattern).test(pkg.version)?'known':'unsupported';
+  facts.capabilities[id]={state,package:rule.package,version:pkg?.version||null};
+  if(['ambiguous','unsupported'].includes(state))gaps.push({key:'unavailable-specialization',capability:id,reason:'The bundled version-specific fixture contract is unavailable; declared commands require owned qualification.'});
+ }
  const environment_id=hash(json({flavor,inputs,facts,recipes}));
  return {format:'skill-tree-profile',schema:1,composer_version:registry.composer_version,flavor,project_root:root,inputs,inventory:discovered,facts,recipes,gaps,environment_id,qualification:'static compatibility only; product execution unqualified'};
 }

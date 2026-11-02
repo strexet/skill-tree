@@ -100,7 +100,7 @@ def validate_manifest(root):
             if state.get('tasks')!=wf.index(text):errors.append('Queue index differs from task definitions')
             completed={o['task_id'] for o in store.outcomes() if o.get('disposition')=='completed'}
             wf.validate_dependencies(tasks,completed)
-            wf.validate_progress(state,tasks)
+            wf.validate_progress(state,tasks,completed)
             run=state['active_run']
             if run is not None:
                 wf.validate_run(run)

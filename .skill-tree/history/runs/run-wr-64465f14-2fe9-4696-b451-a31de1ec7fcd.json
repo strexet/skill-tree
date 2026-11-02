@@ -1,0 +1,196 @@
+{
+  "admission": {
+    "flavor": "general",
+    "identity": "repository-local"
+  },
+  "admitted_groups": {},
+  "admitted_task_ids": [
+    "T-0d1fa805-6441-424e-9f49-64f63b732c9e",
+    "T-25f102b6-589a-459d-a8e7-eb0b2f082f2f",
+    "T-c91cc58b-b81f-4e27-9e9f-710090d7c9c3",
+    "T-d6dfa7ea-3bbe-4293-9d49-a3470c8d9f54"
+  ],
+  "completed_ids": [
+    "T-0d1fa805-6441-424e-9f49-64f63b732c9e",
+    "T-25f102b6-589a-459d-a8e7-eb0b2f082f2f",
+    "T-c91cc58b-b81f-4e27-9e9f-710090d7c9c3",
+    "T-d6dfa7ea-3bbe-4293-9d49-a3470c8d9f54"
+  ],
+  "completion_refs": {
+    "T-0d1fa805-6441-424e-9f49-64f63b732c9e": "O-e41f8da0-7077-40ae-878f-b0fbf6d5778b",
+    "T-25f102b6-589a-459d-a8e7-eb0b2f082f2f": "O-b615db10-5bd1-4983-a002-7d23501938dc",
+    "T-c91cc58b-b81f-4e27-9e9f-710090d7c9c3": "O-a172112b-cec9-48d2-98a6-7290b7250435",
+    "T-d6dfa7ea-3bbe-4293-9d49-a3470c8d9f54": "O-7d72e00b-bfd1-46f2-bba4-af4b7cdad63b"
+  },
+  "current_task_id": null,
+  "deferred_ids": [],
+  "finished_at": "2026-11-02T08:07:37.753635+00:00",
+  "id": "WR-64465f14-2fe9-4696-b451-a31de1ec7fcd",
+  "limits": {},
+  "mode": "next",
+  "next_action": null,
+  "partial_work": [],
+  "pending_ids": [],
+  "phase": "completed",
+  "processing_results": [],
+  "required_ids": [
+    "T-d6dfa7ea-3bbe-4293-9d49-a3470c8d9f54",
+    "T-0d1fa805-6441-424e-9f49-64f63b732c9e",
+    "T-25f102b6-589a-459d-a8e7-eb0b2f082f2f",
+    "T-c91cc58b-b81f-4e27-9e9f-710090d7c9c3"
+  ],
+  "revalidated_checks": {
+    "T-0d1fa805-6441-424e-9f49-64f63b732c9e": [
+      {
+        "check": {
+          "assertion": "Stale results, repeated receipt delivery and processing cannot bypass required validation or admitted scope.",
+          "criteria": [
+            "Stale results, repeated receipt delivery and processing cannot bypass required validation or admitted scope."
+          ],
+          "id": "source-qualification",
+          "parameters": {},
+          "recipe_id": "static-inspection",
+          "sources": [
+            ".skill-tree/common/scripts/workflow-state.py",
+            ".skill-tree/tests/test-validation-progress.py"
+          ],
+          "timing": "immediate"
+        },
+        "result": {
+          "actual_lane": "static",
+          "assertions": [
+            {
+              "assertion": "Stale results, repeated receipt delivery and processing cannot bypass required validation or admitted scope.",
+              "result": "pass"
+            }
+          ],
+          "attempt_id": "C-f89d8d02-f79b-4e7a-964b-40974902d65d",
+          "classification": "executed-control",
+          "cleanup": "The final current source fixture qualification passed and temporary targets were cleaned; no product process was launched.",
+          "definition": "004d831054680af525a564ef7ce6507df677ebf0614c6b7f8150c454094b88f3",
+          "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/redesign-conformance/final-report.json",
+              "sha256": "634a89f3eb310594acd8b75f8cf42238a37ce401d9db2f552e71a98f637dd330"
+            }
+          ],
+          "execution_sessions": {},
+          "key": "c639fd35b1682025054e51896a4d6c372b22da76b8005358585a44de4fcb8efa",
+          "payload_hash": "ea1719c7513179441b598e1b35447492e898480150ddb6cb7aaf75b629401057",
+          "recorded_at": "2026-11-02T08:07:37.155551+00:00",
+          "result": "pass",
+          "sources": {
+            ".skill-tree/common/scripts/workflow-state.py": "912f83f1b00ce51612560fcd5b3170b284bd52dad10dca6028c1c7f376f04249",
+            ".skill-tree/tests/test-validation-progress.py": "fb18c7e3ff4321f901f9ba615fc5f5cc74e0b836987f2e6194c289c784239c3c"
+          }
+        }
+      }
+    ],
+    "T-25f102b6-589a-459d-a8e7-eb0b2f082f2f": [
+      {
+        "check": {
+          "assertion": "Profile replacement preserves stopped workflow state and rejects concurrent edits or incompatible state.",
+          "criteria": [
+            "Profile replacement preserves stopped workflow state and rejects concurrent edits or incompatible state."
+          ],
+          "id": "source-qualification",
+          "parameters": {},
+          "recipe_id": "static-inspection",
+          "sources": [
+            ".skill-tree/lib/installation.js",
+            ".skill-tree/tests/test-installation-integrity.js"
+          ],
+          "timing": "immediate"
+        },
+        "result": {
+          "actual_lane": "static",
+          "assertions": [
+            {
+              "assertion": "Profile replacement preserves stopped workflow state and rejects concurrent edits or incompatible state.",
+              "result": "pass"
+            }
+          ],
+          "attempt_id": "C-88c4f567-6f1e-4be0-9a9f-b9d05c2dea49",
+          "classification": "executed-control",
+          "cleanup": "The final current source fixture qualification passed and temporary targets were cleaned; no product process was launched.",
+          "definition": "9b66cb3d7d409c12868e3de8f79cf949432226e62837a2cf5c9d8ea37f8487b3",
+          "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/redesign-conformance/final-report.json",
+              "sha256": "634a89f3eb310594acd8b75f8cf42238a37ce401d9db2f552e71a98f637dd330"
+            }
+          ],
+          "execution_sessions": {},
+          "key": "7124aedc395e3f78561b2e4027a44a3d3397e5e82e3956b2eb44d6a90e24fa55",
+          "payload_hash": "c5d4b2051579d42d07347a2da7f9e85d7d0c7a8d50f6948da1348d25cd3fea62",
+          "recorded_at": "2026-11-02T08:07:37.369305+00:00",
+          "result": "pass",
+          "sources": {
+            ".skill-tree/lib/installation.js": "8ba136f78ebb23d25c5df58f13a0b1d23d3c4db6ee17461072625a7c4dc92396",
+            ".skill-tree/tests/test-installation-integrity.js": "9faab609d1df151817d0e528e255df635e1ca6708897658b5e0cbe17f381dffb"
+          }
+        }
+      }
+    ],
+    "T-c91cc58b-b81f-4e27-9e9f-710090d7c9c3": [
+      {
+        "check": {
+          "assertion": "Resolved capabilities, concrete commands and verified package identities reject ambiguous or unsupported required configurations.",
+          "criteria": [
+            "Resolved capabilities, concrete commands and verified package identities reject ambiguous or unsupported required configurations."
+          ],
+          "id": "source-qualification",
+          "parameters": {},
+          "recipe_id": "static-inspection",
+          "sources": [
+            ".skill-tree/lib/composer.js",
+            ".skill-tree/config/capabilities.json",
+            ".skill-tree/tests/test-composer.js"
+          ],
+          "timing": "immediate"
+        },
+        "result": {
+          "actual_lane": "static",
+          "assertions": [
+            {
+              "assertion": "Resolved capabilities, concrete commands and verified package identities reject ambiguous or unsupported required configurations.",
+              "result": "pass"
+            }
+          ],
+          "attempt_id": "C-8119ec9b-4437-4368-88f2-5960a9ebc389",
+          "classification": "executed-control",
+          "cleanup": "The final current source fixture qualification passed and temporary targets were cleaned; no product process was launched.",
+          "definition": "edb85e2b7c9a272b027502c20a32a9a699393c451f8c696a998634861b035e29",
+          "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/redesign-conformance/final-report.json",
+              "sha256": "634a89f3eb310594acd8b75f8cf42238a37ce401d9db2f552e71a98f637dd330"
+            }
+          ],
+          "execution_sessions": {},
+          "key": "5e30e19f4346f574a121911d1c39977dadc03f3308276d4bdf098060003d4594",
+          "payload_hash": "4f85f4e1797cd5dcb30018024ac8ecea38cbb1a987d76229d063a4e7ba1650c0",
+          "recorded_at": "2026-11-02T08:07:37.582838+00:00",
+          "result": "pass",
+          "sources": {
+            ".skill-tree/config/capabilities.json": "8f76e5dbea27db11324acd97b55b96083a62fa8a9fc750c1215c06e4d38438ee",
+            ".skill-tree/lib/composer.js": "5a881c053c89ce259d761b80fa9d02235012ab29e2ef59985b0f5827e4ca5806",
+            ".skill-tree/tests/test-composer.js": "7cb2ef993fb59e4f79bc8366c5fb85a536a711fd49ab431b7e11aca69e13ca90"
+          }
+        }
+      }
+    ]
+  },
+  "root_task_id": "T-d6dfa7ea-3bbe-4293-9d49-a3470c8d9f54",
+  "snapshot": [
+    "T-d6dfa7ea-3bbe-4293-9d49-a3470c8d9f54"
+  ],
+  "started_at": "2026-11-02T07:33:58.032165+00:00",
+  "stop_reason": null
+}

@@ -77,7 +77,7 @@ function recover(root){
  fs.rmSync(c.safe(root,INSTALL+'/.staging'),{recursive:true,force:true});
  // Backups retain one completed generation for explicit reviewed rollback.
 }
-function transaction(root,changes,expected={}){
+function transaction(root,changes,expected={},beforeActivate=null){
  const stage=INSTALL+'/.staging',backups=INSTALL+'/.backups';
  if(fs.existsSync(c.safe(root,stage)))fs.rmSync(c.safe(root,stage),{recursive:true});
  for(const [dest,hash] of Object.entries(expected))if(treeHash(root,dest)!==hash)throw Error('Destination changed after ownership validation: '+dest);
@@ -89,6 +89,7 @@ function transaction(root,changes,expected={}){
   if(old!==next)entries.push({dest,old,next,backup,staged});n++;
  }
  for(const [dest,hash] of Object.entries(expected))if(treeHash(root,dest)!==hash)throw Error('Destination changed during staging: '+dest);
+ if(beforeActivate){try{beforeActivate();}catch(error){fs.rmSync(c.safe(root,stage),{recursive:true,force:true});throw error;}}
  if(!entries.length){fs.rmSync(c.safe(root,stage),{recursive:true,force:true});return;}
  if(fs.existsSync(c.safe(root,backups)))fs.rmSync(c.safe(root,backups),{recursive:true});
  fs.writeFileSync(c.safe(root,INSTALL+'/.journal.json'),c.json({schema:1,entries}));recover(root);
@@ -167,7 +168,15 @@ function verify(root,source){
 }
 function install(root,source,flavor,selections,options={}){
  if(options.dryRun){const result=plan(root,source,flavor,selections,options);return {profile:result.profile,delta:result.delta,action:'dry-run'};}
- return locked(root,()=>{const result=plan(root,source,flavor,selections,options);transaction(root,result.changes,result.expected);verify(root,source);return {profile:result.profile,delta:result.delta,action:result.delta.length?'installed':'verified no-op current'};});
+ return locked(root,()=>{
+  const result=plan(root,source,flavor,selections,options);
+  transaction(root,result.changes,result.expected,()=>{const current=c.resolveProfile(source,root,flavor);if(current.environment_id!==result.profile.environment_id)throw Error('Project inputs changed during profile staging; refresh from current inputs');});
+  try{verify(root,source);}catch(error){
+   if(result.delta.length){try{restoreGeneration(root);}catch(recovery){throw Error('Profile verification failed; preserved generation backups require conflict review: '+error.message+'; '+recovery.message);}}
+   throw error;
+  }
+  return {profile:result.profile,delta:result.delta,action:result.delta.length?'installed':'verified no-op current'};
+ });
 }
 function uninstall(root,selections,options={}){
  function action(){const p=receipt(root,true);verifyOwned(root,p);if(hasActiveOperation(root))throw Error('Active controller must stop before uninstall');const next=JSON.parse(c.json(p)),changes={},expected={};
@@ -189,7 +198,7 @@ function uninstall(root,selections,options={}){
  return options.dryRun?action():locked(root,action);
 }
 function refresh(root,source,dryRun=false){const p=receipt(root,true);return install(root,source,p.flavor,Object.entries(p.destinations).map(([rel,d])=>({rel,provider:d.provider,name:d.name})),{dryRun,bridges:Object.keys(p.bridges||{})});}
-function rollback(root){return locked(root,()=>{
+function restoreGeneration(root){
  const p=receipt(root,true);verifyOwned(root,p);if(hasActiveOperation(root))throw Error('Stop the active controller before rollback');
  const last=c.readJson(root,INSTALL+'/.last-transaction.json',null);if(!last)throw Error('No retained generation for rollback');
  const changes={},expected={};
@@ -205,7 +214,8 @@ function rollback(root){return locked(root,()=>{
  }
  const stopped=stoppedWorkflow(root);if(stopped){changes[WORKFLOW]=stopped;expected[WORKFLOW]=treeHash(root,WORKFLOW);}
  transaction(root,changes,expected);return {action:'generation rolled back; project dependencies unchanged; verify freshness before admission'};
-});}
+}
+function rollback(root){return locked(root,()=>restoreGeneration(root));}
 function localMain(root,source,args){
  try{
   if(args.some(a=>!['--refresh-profile','--dry-run','--verify','--recover','--rollback'].includes(a)))throw Error('Usage: manager.js --refresh-profile [--dry-run] | --verify | --recover');

@@ -72,3 +72,19 @@ test('shared bridges survive uninstall until the final recorded provider release
  const root=setup(t);assert.equal(run(root,['--with-init']).status,0);assert.equal(run(root,['--only','amp','--with-init']).status,0);assert.equal(run(root,['--uninstall','--with-init']).status,0);assert.match(fs.readFileSync(path.join(root,'AGENTS.md'),'utf8'),/BEGIN skill-tree-skills/);
  const result=spawnSync(process.execPath,[cli,'--target',root,'--only','amp','--uninstall','--with-init'],{encoding:'utf8',timeout:15000});assert.equal(result.status,0,result.stdout+result.stderr);assert.ok(!fs.readFileSync(path.join(root,'AGENTS.md'),'utf8').includes('BEGIN skill-tree-skills'));
 });
+test('input drift during staging preserves the previous owned generation',t=>{
+ const root=setup(t),manager=require('../lib/installation.js');assert.equal(run(root).status,0);const profile=path.join(root,'.skill-tree/installation/profile.json'),before=fs.readFileSync(profile,'utf8');fs.writeFileSync(path.join(root,'package.json'),JSON.stringify({scripts:{test:'node --test'}}));const write=fs.writeFileSync;let changed=false;
+ fs.writeFileSync=(file,...args)=>{if(!changed&&String(file).includes('/.staging/')){changed=true;write(path.join(root,'package.json'),JSON.stringify({scripts:{test:'node --test changed-fixture'}}));}return write(file,...args);};
+ try{assert.throws(()=>manager.refresh(fs.realpathSync(root),path.resolve(__dirname,'..')),/input|refresh|environment/);}finally{fs.writeFileSync=write;}
+ assert.equal(fs.readFileSync(profile,'utf8'),before);
+});
+test('post-activation input drift rolls back the owned generation without reverting project inputs',t=>{
+ const root=setup(t),manager=require('../lib/installation.js');assert.equal(run(root).status,0);const profile=path.join(root,'.skill-tree/installation/profile.json'),before=fs.readFileSync(profile,'utf8');fs.writeFileSync(path.join(root,'package.json'),JSON.stringify({scripts:{test:'node --test'}}));const rename=fs.renameSync;let changed=false;
+ fs.renameSync=(from,to)=>{const result=rename(from,to);if(!changed&&String(to)===path.join(fs.realpathSync(root),'.skill-tree/installation/profile.json')){changed=true;fs.writeFileSync(path.join(root,'package.json'),JSON.stringify({scripts:{test:'node --test changed-fixture'}}));}return result;};
+ try{assert.throws(()=>manager.refresh(fs.realpathSync(root),path.resolve(__dirname,'..')),/input|refresh|profile/i);}finally{fs.renameSync=rename;}
+ assert.equal(fs.readFileSync(profile,'utf8'),before);assert.match(fs.readFileSync(path.join(root,'package.json'),'utf8'),/changed-fixture/);
+});
+test('local refresh catches a Web runner major change and omits unsupported fixture instructions',t=>{
+ const root=setup(t);function versions(version){fs.writeFileSync(path.join(root,'package.json'),JSON.stringify({devDependencies:{'@playwright/test':version},scripts:{test:'playwright test'}}));fs.writeFileSync(path.join(root,'package-lock.json'),JSON.stringify({lockfileVersion:3,packages:{'node_modules/@playwright/test':{version}}}));}
+ versions('1.56.1');assert.equal(run(root,['--flavor','web']).status,0);const resource=path.join(root,'.agents/skills/skill-tree-work-through-next/references/playwright-testing.md');assert.ok(fs.existsSync(resource));versions('2.0.0');const manager=path.join(root,'.skill-tree/installation/manager.js'),result=spawnSync(process.execPath,[manager,'--refresh-profile'],{encoding:'utf8',timeout:15000});assert.equal(result.status,0,result.stdout+result.stderr);assert.ok(!fs.existsSync(resource));const profile=JSON.parse(fs.readFileSync(path.join(root,'.skill-tree/installation/profile.json')));assert.equal(profile.facts.capabilities['playwright-test'].state,'unsupported');assert.ok(profile.gaps.some(g=>g.key==='unavailable-specialization'));assert.equal(profile.facts.packages['@playwright/test'].version,'2.0.0');
+});

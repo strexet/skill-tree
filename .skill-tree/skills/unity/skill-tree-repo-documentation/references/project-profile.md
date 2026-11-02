@@ -5,6 +5,7 @@ Flavor: unity. Static compatibility only; execution remains unqualified.
 ```json
 {
   "facts": {
+    "capabilities": {},
     "editor": "6000.0.83f1",
     "node": null,
     "package_manager": "npm",
@@ -37,7 +38,7 @@ Flavor: unity. Static compatibility only; execution remains unqualified.
     ]
   },
   "gaps": [],
-  "instruction_profile_id": "f1edcb550928c54b9848272fe9e56dadc5d53915d2272a370c50866aa12fe094",
+  "instruction_profile_id": "2cff0437d6b6950b91418dd07d87fc53a561b3b8277930f60b09986aa6c45cbd",
   "recipes": {
     "unity-editmode": {
       "argv": [

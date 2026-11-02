@@ -66,4 +66,8 @@ class ManifestValidationTests(unittest.TestCase):
         (self.store.base/'config').mkdir(exist_ok=True);(self.store.base/'config/repository.json').write_text('{"role":"source","schema":1}')
         (self.store.base/'skill-tree.json').write_text(wf.dump(wf.manifest(self.store)));self.assertTrue(validator.validate_manifest(self.root)['ok'])
 
+    def test_generic_root_destination_is_in_the_target_catalog(self):
+        package=self.root/'skill-tree-fixture';package.mkdir();(package/'SKILL.md').write_text('Fixture skill.\n');self.refresh()
+        entries=wf.manifest(self.store)['catalog'];self.assertTrue(any(item['entrypoint']=='skill-tree-fixture/SKILL.md' for item in entries));self.assertTrue(validator.validate_manifest(self.root)['ok'])
+
 if __name__=='__main__':unittest.main()

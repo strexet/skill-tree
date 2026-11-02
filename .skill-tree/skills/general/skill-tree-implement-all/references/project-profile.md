@@ -5,6 +5,7 @@ Flavor: general. Static compatibility only; execution remains unqualified.
 ```json
 {
   "facts": {
+    "capabilities": {},
     "node": null,
     "package_manager": "npm",
     "packages": {},
@@ -12,7 +13,7 @@ Flavor: general. Static compatibility only; execution remains unqualified.
     "ui": []
   },
   "gaps": [],
-  "instruction_profile_id": "737406315da10b0777df501d09c557949cb510cb261f2f36a299a3af939d8bf0",
+  "instruction_profile_id": "e6c677af5de0e378fab4112ef5a4e6665b1dff37a31d08730464db52df91c5b2",
   "recipes": {
     "script-test": {
       "argv": [
