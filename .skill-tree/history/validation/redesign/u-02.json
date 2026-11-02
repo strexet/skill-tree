@@ -1,0 +1,7 @@
+{
+  "unit": "U-02",
+  "qualification": "source-contract-and-temporary-fixture",
+  "checks": [
+    "sync, strict validation, 79 Python and 24 Node checks: pass"
+  ]
+}

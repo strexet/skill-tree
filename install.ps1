@@ -8,5 +8,5 @@ if (-not $node) {
   exit 1
 }
 
-& node (Join-Path $scriptDir "skill-tree/bin/install.js") @args
+& node (Join-Path $scriptDir ".skill-tree/bin/install.js") @args
 exit $LASTEXITCODE

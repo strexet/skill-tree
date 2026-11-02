@@ -1,0 +1,539 @@
+{
+  "audit_scopes": [
+    {
+      "fresh": false,
+      "id": "A-ebef81a1-8c46-4560-b542-80c7db57c79a",
+      "path": ".skill-tree/history/audits/audit-a-ebef81a1-8c46-4560-b542-80c7db57c79a.json",
+      "recorded_at": "2026-09-18T04:59:44.146459+00:00",
+      "scope": "skill-tree-source-qualification"
+    },
+    {
+      "fresh": false,
+      "id": "A-ddb19c32-cfaf-41a4-8403-2f408cc0f913",
+      "path": ".skill-tree/history/audits/audit-a-ddb19c32-cfaf-41a4-8403-2f408cc0f913.json",
+      "recorded_at": "2026-09-18T05:01:34.259431+00:00",
+      "scope": "skill-tree-source-qualification"
+    },
+    {
+      "fresh": false,
+      "id": "A-49144943-4862-4829-9e25-5f07b591353b",
+      "path": ".skill-tree/history/audits/audit-a-49144943-4862-4829-9e25-5f07b591353b.json",
+      "recorded_at": "2026-09-18T06:05:03.412093+00:00",
+      "scope": "Standalone processing choice and bounded controller handoff policy"
+    },
+    {
+      "fresh": false,
+      "id": "A-a13f44c1-7287-4a65-9971-0c5fdc0aec76",
+      "path": ".skill-tree/history/audits/audit-a-a13f44c1-7287-4a65-9971-0c5fdc0aec76.json",
+      "recorded_at": "2026-10-14T05:55:09.306946+00:00",
+      "scope": "workflow-helper-features"
+    }
+  ],
+  "canonical_resources": {
+    "generator": ".skill-tree/scripts/sync-skill-references.py",
+    "provider_matrix": ".skill-tree/config/providers.json",
+    "references": ".skill-tree/common/references",
+    "resource_map": ".skill-tree/config/resource-map.json",
+    "scripts": ".skill-tree/common/scripts"
+  },
+  "catalog": [
+    {
+      "entrypoint": ".skill-tree/skills/skill-tree-add-pending-task/SKILL.md",
+      "name": "skill-tree-add-pending-task",
+      "resources": [
+        ".skill-tree/skills/skill-tree-add-pending-task/SKILL.md",
+        ".skill-tree/skills/skill-tree-add-pending-task/agents/openai.yaml",
+        ".skill-tree/skills/skill-tree-add-pending-task/references/document-rules.md",
+        ".skill-tree/skills/skill-tree-add-pending-task/references/installation-profile.md",
+        ".skill-tree/skills/skill-tree-add-pending-task/references/pending-task-format.md",
+        ".skill-tree/skills/skill-tree-add-pending-task/references/pending-task-intake.md",
+        ".skill-tree/skills/skill-tree-add-pending-task/references/validation-policy.md",
+        ".skill-tree/skills/skill-tree-add-pending-task/references/workflow-metadata.md",
+        ".skill-tree/skills/skill-tree-add-pending-task/scripts/validate-document-rules.py",
+        ".skill-tree/skills/skill-tree-add-pending-task/scripts/workflow-state.py"
+      ]
+    },
+    {
+      "entrypoint": ".skill-tree/skills/skill-tree-create-documents-snapshot/SKILL.md",
+      "name": "skill-tree-create-documents-snapshot",
+      "resources": [
+        ".skill-tree/skills/skill-tree-create-documents-snapshot/SKILL.md",
+        ".skill-tree/skills/skill-tree-create-documents-snapshot/agents/openai.yaml",
+        ".skill-tree/skills/skill-tree-create-documents-snapshot/references/document-rules.md",
+        ".skill-tree/skills/skill-tree-create-documents-snapshot/references/installation-profile.md",
+        ".skill-tree/skills/skill-tree-create-documents-snapshot/references/snapshot-rules.md",
+        ".skill-tree/skills/skill-tree-create-documents-snapshot/references/validation-policy.md",
+        ".skill-tree/skills/skill-tree-create-documents-snapshot/scripts/create-documentation-snapshot.py"
+      ]
+    },
+    {
+      "entrypoint": ".skill-tree/skills/skill-tree-implement-all/SKILL.md",
+      "name": "skill-tree-implement-all",
+      "resources": [
+        ".skill-tree/skills/skill-tree-implement-all/SKILL.md",
+        ".skill-tree/skills/skill-tree-implement-all/agents/openai.yaml",
+        ".skill-tree/skills/skill-tree-implement-all/references/document-rules.md",
+        ".skill-tree/skills/skill-tree-implement-all/references/future-workflow.md",
+        ".skill-tree/skills/skill-tree-implement-all/references/history-retention.md",
+        ".skill-tree/skills/skill-tree-implement-all/references/installation-profile.md",
+        ".skill-tree/skills/skill-tree-implement-all/references/orchestration.md",
+        ".skill-tree/skills/skill-tree-implement-all/references/pending-task-format.md",
+        ".skill-tree/skills/skill-tree-implement-all/references/pending-task-intake.md",
+        ".skill-tree/skills/skill-tree-implement-all/references/unity-safety.md",
+        ".skill-tree/skills/skill-tree-implement-all/references/validation-policy.md",
+        ".skill-tree/skills/skill-tree-implement-all/references/workflow-metadata.md",
+        ".skill-tree/skills/skill-tree-implement-all/scripts/validate-document-rules.py",
+        ".skill-tree/skills/skill-tree-implement-all/scripts/workflow-state.py"
+      ]
+    },
+    {
+      "entrypoint": ".skill-tree/skills/skill-tree-implement-next-future-task/SKILL.md",
+      "name": "skill-tree-implement-next-future-task",
+      "resources": [
+        ".skill-tree/skills/skill-tree-implement-next-future-task/SKILL.md",
+        ".skill-tree/skills/skill-tree-implement-next-future-task/agents/openai.yaml",
+        ".skill-tree/skills/skill-tree-implement-next-future-task/references/document-rules.md",
+        ".skill-tree/skills/skill-tree-implement-next-future-task/references/future-workflow.md",
+        ".skill-tree/skills/skill-tree-implement-next-future-task/references/history-retention.md",
+        ".skill-tree/skills/skill-tree-implement-next-future-task/references/installation-profile.md",
+        ".skill-tree/skills/skill-tree-implement-next-future-task/references/pending-task-format.md",
+        ".skill-tree/skills/skill-tree-implement-next-future-task/references/validation-policy.md",
+        ".skill-tree/skills/skill-tree-implement-next-future-task/references/workflow-metadata.md",
+        ".skill-tree/skills/skill-tree-implement-next-future-task/scripts/select-prioritized-task.py",
+        ".skill-tree/skills/skill-tree-implement-next-future-task/scripts/validate-document-rules.py",
+        ".skill-tree/skills/skill-tree-implement-next-future-task/scripts/workflow-state.py"
+      ]
+    },
+    {
+      "entrypoint": ".skill-tree/skills/skill-tree-process-future-pending/SKILL.md",
+      "name": "skill-tree-process-future-pending",
+      "resources": [
+        ".skill-tree/skills/skill-tree-process-future-pending/SKILL.md",
+        ".skill-tree/skills/skill-tree-process-future-pending/agents/openai.yaml",
+        ".skill-tree/skills/skill-tree-process-future-pending/references/document-rules.md",
+        ".skill-tree/skills/skill-tree-process-future-pending/references/future-workflow.md",
+        ".skill-tree/skills/skill-tree-process-future-pending/references/history-retention.md",
+        ".skill-tree/skills/skill-tree-process-future-pending/references/installation-profile.md",
+        ".skill-tree/skills/skill-tree-process-future-pending/references/pending-task-format.md",
+        ".skill-tree/skills/skill-tree-process-future-pending/references/validation-policy.md",
+        ".skill-tree/skills/skill-tree-process-future-pending/references/workflow-metadata.md",
+        ".skill-tree/skills/skill-tree-process-future-pending/scripts/validate-document-rules.py",
+        ".skill-tree/skills/skill-tree-process-future-pending/scripts/validate-future-document.py",
+        ".skill-tree/skills/skill-tree-process-future-pending/scripts/workflow-state.py"
+      ]
+    },
+    {
+      "entrypoint": ".skill-tree/skills/skill-tree-repo-documentation/SKILL.md",
+      "name": "skill-tree-repo-documentation",
+      "resources": [
+        ".skill-tree/skills/skill-tree-repo-documentation/SKILL.md",
+        ".skill-tree/skills/skill-tree-repo-documentation/agents/openai.yaml",
+        ".skill-tree/skills/skill-tree-repo-documentation/references/document-rules.md",
+        ".skill-tree/skills/skill-tree-repo-documentation/references/documentation-output-contract.md",
+        ".skill-tree/skills/skill-tree-repo-documentation/references/history-retention.md",
+        ".skill-tree/skills/skill-tree-repo-documentation/references/installation-profile.md",
+        ".skill-tree/skills/skill-tree-repo-documentation/references/pending-task-format.md",
+        ".skill-tree/skills/skill-tree-repo-documentation/references/repository-discovery-checklist.md",
+        ".skill-tree/skills/skill-tree-repo-documentation/references/validation-policy.md",
+        ".skill-tree/skills/skill-tree-repo-documentation/references/workflow-metadata.md",
+        ".skill-tree/skills/skill-tree-repo-documentation/scripts/validate-document-rules.py",
+        ".skill-tree/skills/skill-tree-repo-documentation/scripts/validate-future-document.py",
+        ".skill-tree/skills/skill-tree-repo-documentation/scripts/validate-repository-documentation.py",
+        ".skill-tree/skills/skill-tree-repo-documentation/scripts/workflow-state.py"
+      ]
+    },
+    {
+      "entrypoint": ".skill-tree/skills/skill-tree-repo-documentation-audit/SKILL.md",
+      "name": "skill-tree-repo-documentation-audit",
+      "resources": [
+        ".skill-tree/skills/skill-tree-repo-documentation-audit/SKILL.md",
+        ".skill-tree/skills/skill-tree-repo-documentation-audit/agents/openai.yaml",
+        ".skill-tree/skills/skill-tree-repo-documentation-audit/references/document-rules.md",
+        ".skill-tree/skills/skill-tree-repo-documentation-audit/references/documentation-output-contract.md",
+        ".skill-tree/skills/skill-tree-repo-documentation-audit/references/history-retention.md",
+        ".skill-tree/skills/skill-tree-repo-documentation-audit/references/installation-profile.md",
+        ".skill-tree/skills/skill-tree-repo-documentation-audit/references/pending-task-format.md",
+        ".skill-tree/skills/skill-tree-repo-documentation-audit/references/repository-discovery-checklist.md",
+        ".skill-tree/skills/skill-tree-repo-documentation-audit/references/validation-policy.md",
+        ".skill-tree/skills/skill-tree-repo-documentation-audit/references/workflow-metadata.md",
+        ".skill-tree/skills/skill-tree-repo-documentation-audit/scripts/validate-document-rules.py",
+        ".skill-tree/skills/skill-tree-repo-documentation-audit/scripts/validate-future-document.py",
+        ".skill-tree/skills/skill-tree-repo-documentation-audit/scripts/validate-repository-documentation.py",
+        ".skill-tree/skills/skill-tree-repo-documentation-audit/scripts/workflow-state.py"
+      ]
+    },
+    {
+      "entrypoint": ".skill-tree/skills/skill-tree-unity-create-documents-snapshot/SKILL.md",
+      "name": "skill-tree-unity-create-documents-snapshot",
+      "resources": [
+        ".skill-tree/skills/skill-tree-unity-create-documents-snapshot/SKILL.md",
+        ".skill-tree/skills/skill-tree-unity-create-documents-snapshot/agents/openai.yaml",
+        ".skill-tree/skills/skill-tree-unity-create-documents-snapshot/references/document-rules.md",
+        ".skill-tree/skills/skill-tree-unity-create-documents-snapshot/references/installation-profile.md",
+        ".skill-tree/skills/skill-tree-unity-create-documents-snapshot/references/snapshot-rules.md",
+        ".skill-tree/skills/skill-tree-unity-create-documents-snapshot/references/unity-safety.md",
+        ".skill-tree/skills/skill-tree-unity-create-documents-snapshot/references/validation-policy.md",
+        ".skill-tree/skills/skill-tree-unity-create-documents-snapshot/scripts/create-documentation-snapshot.py"
+      ]
+    },
+    {
+      "entrypoint": ".skill-tree/skills/skill-tree-unity-implement-next-future-task/SKILL.md",
+      "name": "skill-tree-unity-implement-next-future-task",
+      "resources": [
+        ".skill-tree/skills/skill-tree-unity-implement-next-future-task/SKILL.md",
+        ".skill-tree/skills/skill-tree-unity-implement-next-future-task/agents/openai.yaml",
+        ".skill-tree/skills/skill-tree-unity-implement-next-future-task/references/document-rules.md",
+        ".skill-tree/skills/skill-tree-unity-implement-next-future-task/references/future-workflow.md",
+        ".skill-tree/skills/skill-tree-unity-implement-next-future-task/references/history-retention.md",
+        ".skill-tree/skills/skill-tree-unity-implement-next-future-task/references/installation-profile.md",
+        ".skill-tree/skills/skill-tree-unity-implement-next-future-task/references/pending-task-format.md",
+        ".skill-tree/skills/skill-tree-unity-implement-next-future-task/references/unity-safety.md",
+        ".skill-tree/skills/skill-tree-unity-implement-next-future-task/references/validation-policy.md",
+        ".skill-tree/skills/skill-tree-unity-implement-next-future-task/references/workflow-metadata.md",
+        ".skill-tree/skills/skill-tree-unity-implement-next-future-task/scripts/select-prioritized-task.py",
+        ".skill-tree/skills/skill-tree-unity-implement-next-future-task/scripts/validate-document-rules.py",
+        ".skill-tree/skills/skill-tree-unity-implement-next-future-task/scripts/workflow-state.py"
+      ]
+    },
+    {
+      "entrypoint": ".skill-tree/skills/skill-tree-unity-process-future-pending/SKILL.md",
+      "name": "skill-tree-unity-process-future-pending",
+      "resources": [
+        ".skill-tree/skills/skill-tree-unity-process-future-pending/SKILL.md",
+        ".skill-tree/skills/skill-tree-unity-process-future-pending/agents/openai.yaml",
+        ".skill-tree/skills/skill-tree-unity-process-future-pending/references/document-rules.md",
+        ".skill-tree/skills/skill-tree-unity-process-future-pending/references/future-workflow.md",
+        ".skill-tree/skills/skill-tree-unity-process-future-pending/references/history-retention.md",
+        ".skill-tree/skills/skill-tree-unity-process-future-pending/references/installation-profile.md",
+        ".skill-tree/skills/skill-tree-unity-process-future-pending/references/pending-task-format.md",
+        ".skill-tree/skills/skill-tree-unity-process-future-pending/references/unity-safety.md",
+        ".skill-tree/skills/skill-tree-unity-process-future-pending/references/validation-policy.md",
+        ".skill-tree/skills/skill-tree-unity-process-future-pending/references/workflow-metadata.md",
+        ".skill-tree/skills/skill-tree-unity-process-future-pending/scripts/validate-document-rules.py",
+        ".skill-tree/skills/skill-tree-unity-process-future-pending/scripts/validate-future-document.py",
+        ".skill-tree/skills/skill-tree-unity-process-future-pending/scripts/workflow-state.py"
+      ]
+    },
+    {
+      "entrypoint": ".skill-tree/skills/skill-tree-unity-repo-documentation/SKILL.md",
+      "name": "skill-tree-unity-repo-documentation",
+      "resources": [
+        ".skill-tree/skills/skill-tree-unity-repo-documentation/SKILL.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation/agents/openai.yaml",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation/references/document-rules.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation/references/documentation-output-contract.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation/references/history-retention.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation/references/installation-profile.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation/references/pending-task-format.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation/references/repo-init-instructions.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation/references/repository-discovery-checklist.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation/references/unity-safety.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation/references/validation-policy.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation/references/workflow-metadata.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation/scripts/inspect-unity-repository.py",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation/scripts/validate-document-rules.py",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation/scripts/validate-future-document.py",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation/scripts/validate-repository-documentation.py",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation/scripts/workflow-state.py"
+      ]
+    },
+    {
+      "entrypoint": ".skill-tree/skills/skill-tree-unity-repo-documentation-audit/SKILL.md",
+      "name": "skill-tree-unity-repo-documentation-audit",
+      "resources": [
+        ".skill-tree/skills/skill-tree-unity-repo-documentation-audit/SKILL.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation-audit/agents/openai.yaml",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation-audit/references/document-rules.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation-audit/references/documentation-output-contract.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation-audit/references/history-retention.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation-audit/references/installation-profile.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation-audit/references/pending-task-format.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation-audit/references/repo-init-instructions.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation-audit/references/repository-discovery-checklist.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation-audit/references/unity-safety.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation-audit/references/validation-policy.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation-audit/references/workflow-metadata.md",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation-audit/scripts/validate-document-rules.py",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation-audit/scripts/validate-future-document.py",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation-audit/scripts/validate-repository-documentation.py",
+        ".skill-tree/skills/skill-tree-unity-repo-documentation-audit/scripts/workflow-state.py"
+      ]
+    },
+    {
+      "entrypoint": ".skill-tree/skills/skill-tree-work-through-next/SKILL.md",
+      "name": "skill-tree-work-through-next",
+      "resources": [
+        ".skill-tree/skills/skill-tree-work-through-next/SKILL.md",
+        ".skill-tree/skills/skill-tree-work-through-next/agents/openai.yaml",
+        ".skill-tree/skills/skill-tree-work-through-next/references/document-rules.md",
+        ".skill-tree/skills/skill-tree-work-through-next/references/future-workflow.md",
+        ".skill-tree/skills/skill-tree-work-through-next/references/history-retention.md",
+        ".skill-tree/skills/skill-tree-work-through-next/references/installation-profile.md",
+        ".skill-tree/skills/skill-tree-work-through-next/references/orchestration.md",
+        ".skill-tree/skills/skill-tree-work-through-next/references/pending-task-format.md",
+        ".skill-tree/skills/skill-tree-work-through-next/references/pending-task-intake.md",
+        ".skill-tree/skills/skill-tree-work-through-next/references/unity-safety.md",
+        ".skill-tree/skills/skill-tree-work-through-next/references/validation-policy.md",
+        ".skill-tree/skills/skill-tree-work-through-next/references/workflow-metadata.md",
+        ".skill-tree/skills/skill-tree-work-through-next/scripts/validate-document-rules.py",
+        ".skill-tree/skills/skill-tree-work-through-next/scripts/workflow-state.py"
+      ]
+    }
+  ],
+  "files": [
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/documents/agent-compatibility.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/documents/future.json",
+      "role": "generated-index-and-active-state"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/documents/future.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/documents/implementation-plan.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/documents/install.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/documents/installation-architecture.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/documents/repo-init-instructions.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/documents/security.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/documents/skill-repository-creation-instructions.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/documents/workflow-redesign-rnd-plan.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/document-rules.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/documentation-output-contract.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/future-workflow.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/history-retention.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/installation-profile.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/orchestration.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/pending-task-format.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/pending-task-intake.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/repository-discovery-checklist.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/snapshot-rules.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/unity-safety.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/validation-policy.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/workflow-metadata.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/scripts/create-documentation-snapshot.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/scripts/inspect-unity-repository.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/scripts/select-prioritized-task.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/scripts/validate-document-rules.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/scripts/validate-future-document.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/scripts/validate-repository-documentation.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/scripts/workflow-state.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/scripts/run-tests.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/scripts/sync-skill-references.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/scripts/validate-skill-repository.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/bin/install.js",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/config/providers.json",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/config/resource-map.json",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/src/init-rules/skill-tree-skills.md",
+      "role": "canonical"
+    }
+  ],
+  "format": "skill-tree-manifest",
+  "history": {
+    "audits": ".skill-tree/history/audits",
+    "runs": ".skill-tree/history/runs",
+    "task_outcomes": ".skill-tree/history/task-outcomes.jsonl"
+  },
+  "latest_audit": {
+    "fresh": false,
+    "id": "A-a13f44c1-7287-4a65-9971-0c5fdc0aec76",
+    "path": ".skill-tree/history/audits/audit-a-a13f44c1-7287-4a65-9971-0c5fdc0aec76.json",
+    "recorded_at": "2026-10-14T05:55:09.306946+00:00",
+    "scope": "workflow-helper-features"
+  },
+  "policy_references": [
+    "AGENTS.md"
+  ],
+  "queue": ".skill-tree/documents/future.md",
+  "retention": {
+    "audits": 10,
+    "pins": [],
+    "runs": 10
+  },
+  "role": "source",
+  "source_digests": {
+    ".skill-tree/bin/install.js": "dd27ac99b7a9fdfb23abacd9acc1846fa5b332672c93016799dec70dc16db6d7",
+    ".skill-tree/common/references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
+    ".skill-tree/common/references/documentation-output-contract.md": "e8543d7b98c12cd95dfbb4683d280bfcc595f6b42dba8d3efe3a8d68a2325cfb",
+    ".skill-tree/common/references/future-workflow.md": "6bcb0563fabccf5d1ad73e2be61aeef82211a5a3acc4552e253ce71cb0f6d58c",
+    ".skill-tree/common/references/history-retention.md": "e34302d1665162c5c94bd1adea7cbdf32a36325bb4a6db1eafab24fc236c3585",
+    ".skill-tree/common/references/installation-profile.md": "ad033a82b9c5cfa7bbfa869d77dcf971010747a9a097898a89fcffed612ee7cc",
+    ".skill-tree/common/references/orchestration.md": "813bf5b144831654f9b0a906c94c3c8191007c171e7333660f9a6ca86e48105a",
+    ".skill-tree/common/references/pending-task-format.md": "6c0a90ea992f2c19a26e4f95fc4e45b7ff89d25c0cc8e2c49c11cfa8bad2d8ba",
+    ".skill-tree/common/references/pending-task-intake.md": "d3a108aa459637d70f348937c8e93d18ee226a261eb0ac7cdfe9630865a87b88",
+    ".skill-tree/common/references/repository-discovery-checklist.md": "a112230c076fea515c437e3e7407c575ee6690d772eaa28e68f80c720c7a621c",
+    ".skill-tree/common/references/snapshot-rules.md": "18142120546fcd532e496fbd14aefbe449fa63da40cbcca577db249b91dcd30e",
+    ".skill-tree/common/references/unity-safety.md": "b580f4d62c2297c343682df0a3fb9cd535b33569e86dd428c4465303c5af72b9",
+    ".skill-tree/common/references/validation-policy.md": "e1827c8118d46b5b24bb60085303b6510fdf403279a7dfb3630a8d64f679a89c",
+    ".skill-tree/common/references/workflow-metadata.md": "cc5dc2dcde05364cae969002acc718f35a6cfe3c94018685551e213133ab2980",
+    ".skill-tree/common/scripts/create-documentation-snapshot.py": "c47fed16988ab9fecc6dc18f0fbc7d61df5a94de80eef2ef066f208a002e5741",
+    ".skill-tree/common/scripts/inspect-unity-repository.py": "794230aca0f338a9d5a6ce7dd62df2016c9d13fb9622174429f9188225fb78e9",
+    ".skill-tree/common/scripts/select-prioritized-task.py": "93f12ac5a333fb072bf8d9d849d08e3b422af856d582d492902647efe35c896f",
+    ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+    ".skill-tree/common/scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
+    ".skill-tree/common/scripts/validate-repository-documentation.py": "f74076e1e0887c1b2ccda35274825e15fe3d6d0c592c6a369d79c8d09696d047",
+    ".skill-tree/common/scripts/workflow-state.py": "0d442b3e52c61e3ddfed70ecfdcda1d76a43bc51a38b622f1b6b1d571c61f630",
+    ".skill-tree/config/providers.json": "80255fe3fb67e32d71cc7791aee1e51c1d34a508d4c77b6ca852521907ede97a",
+    ".skill-tree/config/resource-map.json": "e30597eaddd31ce7239762809b3c994a59d894daea63725e58ada1e90ece90c4",
+    ".skill-tree/documents/agent-compatibility.md": "f3a154273909067262ee90fa7a944f7149468c38102eeb3e4ea852435f1b8e29",
+    ".skill-tree/documents/future.md": "ecfb17822c7033b025f45a4d70e3b1503cf56d0d924cccce8781c46609b4152e",
+    ".skill-tree/documents/implementation-plan.md": "7f85a4ec6bf302c26be6e832e43da349f35064b5b7b9b110281c940ba250225e",
+    ".skill-tree/documents/install.md": "69762781fdd64fe84fdc8ac528c17d589ed83e269884e92f9726c25fd51b2f29",
+    ".skill-tree/documents/installation-architecture.md": "cbf2088a256139a2b95c8e4193910d7f2000fcadfff64a4271d47357959fdf8e",
+    ".skill-tree/documents/repo-init-instructions.md": "06f7eedd332bd13daba08f131a5c34b0fdffd8cb835c4ecc0d062010071251fa",
+    ".skill-tree/documents/security.md": "871f265b80b401e787d3091a84a885cca1fcf34b4d354a9efeaee4ab1c84bfd6",
+    ".skill-tree/documents/skill-repository-creation-instructions.md": "9abd94c18ca26fb6217973d35c814929f69a43b1bbac55de5f06a1aff05fa239",
+    ".skill-tree/documents/workflow-redesign-rnd-plan.md": "0c57aff8a3f8cead55ceb41336f09235794a4fd0992a7d7bb4dac858ef712b9f",
+    ".skill-tree/scripts/run-tests.py": "00c61ad36efcc208865692e5822f38dd4bbbc036d058bc7e55bc81c3851b711e",
+    ".skill-tree/scripts/sync-skill-references.py": "8d040e3321914b517d1bc02b2d3e56c160f06ab012611aca60f7e318255f3034",
+    ".skill-tree/scripts/validate-skill-repository.py": "c2b1dcbf66bbff5f49dd8ed88269b5878fcc78c1e59191ea1f760f37c37233f1",
+    ".skill-tree/src/init-rules/skill-tree-skills.md": "74cb9a275ce1bcd845c31eae44101e79e5adcd02875d84f1a4c8feb1744716fd"
+  },
+  "state": ".skill-tree/documents/future.json",
+  "validation_commands": [
+    "npm run sync:check",
+    "npm run validate",
+    "npm run test:py",
+    "npm run test:node",
+    "git diff --check"
+  ]
+}

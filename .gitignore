@@ -14,6 +14,10 @@ build/
 .tmp/
 tmp/
 
-skill-tree/artifacts/
-skill-tree/.writer-lock
-skill-tree/.transaction.json
+.skill-tree/artifacts/
+.skill-tree/.writer-lock
+.skill-tree/.transaction.json
+.skill-tree/installation/.install-lock
+.skill-tree/installation/.journal.json
+.skill-tree/installation/.staging/
+.skill-tree/installation/.backups/

@@ -6,16 +6,16 @@
   "private": true,
   "type": "commonjs",
   "bin": {
-    "skill-tree-skills-install": "skill-tree/bin/install.js"
+    "skill-tree-skills-install": ".skill-tree/bin/install.js"
   },
   "engines": {
     "node": ">=18"
   },
   "scripts": {
-    "sync": "python3 skill-tree/scripts/sync-skill-references.py",
-    "sync:check": "python3 skill-tree/scripts/sync-skill-references.py --check",
-    "validate": "python3 skill-tree/scripts/validate-skill-repository.py --strict",
-    "test:py": "python3 skill-tree/scripts/run-tests.py",
-    "test:node": "node --test skill-tree/tests/test-installer.js skill-tree/tests/test-provider-matrix.js"
+    "sync": "python3 .skill-tree/scripts/sync-skill-references.py",
+    "sync:check": "python3 .skill-tree/scripts/sync-skill-references.py --check",
+    "validate": "python3 .skill-tree/scripts/validate-skill-repository.py --strict",
+    "test:py": "python3 .skill-tree/scripts/run-tests.py",
+    "test:node": "node --test .skill-tree/tests/test-installer.js .skill-tree/tests/test-provider-matrix.js"
   }
 }
