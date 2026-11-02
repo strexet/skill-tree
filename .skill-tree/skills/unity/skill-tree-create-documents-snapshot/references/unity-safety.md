@@ -1,6 +1,6 @@
 # Unity Evidence and Safety
 
-Detect Unity roots from Assets/Packages/ProjectSettings. Inspect the pinned Editor version, package manifests/locks, assemblies, scenes/prefabs, serialized configuration, startup/lifecycle, persistence, backend/native SDKs, platform settings, builds and tests when relevant. Exclude Library/Temp/Obj/Logs/Builds/UserSettings and dependency caches from documentation evidence.
+Use the admitted project root, pinned Editor/packages and assembly/UI inventory from the concrete profile. Inspect task-relevant scenes/prefabs, serialized configuration, startup/lifecycle, persistence, backend/native SDKs, platform settings and checks. Profile refresh resolves stable compatibility; focused test loops never repeat generic version discovery. Exclude Library/Temp/Obj/Logs/Builds/UserSettings and dependency caches from documentation evidence.
 
 Preserve serialized assets, GUIDs, package pins and unrelated work. Prefer Unity tooling for scene/asset changes. Never build generated solutions or run dotnet build without explicit authorization. Static inspection never establishes compilation, Play Mode, UI, player or device behavior.
 

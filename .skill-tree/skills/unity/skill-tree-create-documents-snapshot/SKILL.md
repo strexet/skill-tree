@@ -14,4 +14,6 @@ Read repository rules and [snapshot scope](references/snapshot-rules.md). Inspec
 
 Generated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency.
 
-Prefer deterministic logic and UTF EditMode assertions. Focused PlayMode fixtures cover lifecycle, frames, physics and coroutines. Preserve serialized identity and pinned packages. Verify exact Editor ownership, save/service isolation, authorization, deadlines and cleanup before execution. Player builds, device runs and external services require matching scope. Read [Unity safety](references/unity-safety.md).
+Prefer deterministic logic and UTF EditMode assertions. Focused PlayMode fixtures cover lifecycle, frames, physics and coroutines. Preserve serialized identity and pinned packages. Verify exact Editor ownership, save/service isolation, authorization, deadlines and cleanup before execution. Player builds, device runs and external services require matching scope. Read [Unity safety](references/unity-safety.md). Read [Unity development](references/unity-development.md) for test seams, lane selection and lifecycle cleanup.
+
+Use the [uGUI checks](references/ugui-testing.md) for the admitted Canvas surfaces.

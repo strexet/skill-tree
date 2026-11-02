@@ -43,3 +43,11 @@ test('adding test assemblies changes the inventory without executing project cod
  const a=c.resolveProfile(source,root,'unity');write(root,'Assets/Tests/EditMode/Tests.asmdef',{name:'Tests',optionalUnityReferences:['TestAssemblies']});const b=c.resolveProfile(source,root,'unity');
  assert.notEqual(a.environment_id,b.environment_id);assert.ok(b.facts.test_assemblies.length);assert.ok(b.recipes['unity-editmode']);
 });
+test('Unity capability composition gates panel, input and performance fixtures before emission',t=>{
+ const root=fixture(t);
+ function profile(editor,packages,toolkit=false){write(root,'ProjectSettings/ProjectVersion.txt','m_EditorVersion: '+editor);write(root,'Packages/manifest.json',{dependencies:{'com.unity.test-framework':'1.4.6',...packages}});if(toolkit)write(root,'Assets/UI/view.uxml','<UXML/>');return c.compose(source,c.resolveProfile(source,root,'unity')).packages['skill-tree-work-through-next'];}
+ const old=profile('6000.0.83f1',{'com.unity.ugui':'2.0.0'});assert.ok(old['references/ugui-testing.md']);assert.ok(!old['references/panel-simulator.md']);assert.ok(!old['references/input-testing.md']);
+ const modern=profile('6000.3.1f1',{'com.unity.ui.test-framework':'6.3.0','com.unity.inputsystem':'1.11.2','com.unity.test-framework.performance':'3.0.3'},true);
+ assert.ok(modern['references/panel-simulator.md']);assert.ok(modern['references/input-testing.md']);assert.ok(modern['references/performance-testing.md']);assert.ok(!modern['references/ugui-testing.md']);
+ const unsupported=profile('6000.0.83f1',{'com.unity.ui.test-framework':'6.3.0'},true);assert.ok(!unsupported['references/panel-simulator.md']);
+});

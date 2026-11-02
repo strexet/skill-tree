@@ -114,24 +114,37 @@ function sourceInputs(source) {
   walk(dir);
  }return result;
 }
+function matches(profile,predicate){
+ if(predicate.all)return predicate.all.every(p=>matches(profile,p));
+ if(predicate.any)return predicate.any.some(p=>matches(profile,p));
+ if(!Array.isArray(predicate.field))throw Error('Capability predicate requires a field path');
+ const value=predicate.field.reduce((current,key)=>current?.[key],profile);
+ if('contains' in predicate)return Array.isArray(value)&&value.includes(predicate.contains);
+ if('matches' in predicate)return typeof value==='string'&&new RegExp(predicate.matches).test(value);
+ if('equals' in predicate)return value===predicate.equals;
+ throw Error('Unsupported capability predicate');
+}
 function compose(source,profile,selected=null) {
  const registry=readJson(source,'config/flavors.json'),recipe=registry.flavors[profile.flavor];if(!recipe)throw Error('Unknown flavor');
  const operations=readJson(source,'templates/operations.json'),mapping=readJson(source,'config/resource-map.json'),mandatory=readJson(source,'templates/invariants.json'),domain=readJson(source,recipe.sections),packages={};
  const names=selected||Object.keys(operations).sort();
  for(const name of names){const op=operations[name];if(!op)throw Error('Unknown operation: '+name);
-  const sections=mergeSections(mergeSections(mandatory,op.sections),domain,recipe.replaceable_slots||[]);
+  let sections=mergeSections(mergeSections(mandatory,op.sections),domain,recipe.replaceable_slots||[]);
+  const active=(recipe.conditional_resources||[]).filter(item=>matches(profile,item.when));
+  sections=mergeSections(sections,active.map((item,index)=>({id:'capability-'+index,text:item.instruction})));
   let files={};for(const [group,resources] of Object.entries(mapping[name]))for(const [dest,src] of Object.entries(resources))files[group+'/'+dest]=read(source,src);
   const domainFiles={};for(const [dest,src] of Object.entries(recipe.resources))domainFiles[dest]=read(source,src);
   files=mergeResources(files,domainFiles,recipe.replacements||{});
+  for(const item of active){const extra={};for(const [dest,src] of Object.entries(item.resources))extra[dest]=read(source,src);files=mergeResources(files,extra,item.replacements||{});}
   files['references/project-profile.md']='# Concrete Project Profile\n\nFlavor: '+profile.flavor+'. Static compatibility only; execution remains unqualified.\n\n```json\n'+json({environment_id:profile.environment_id,facts:profile.facts,recipes:profile.recipes,gaps:profile.gaps})+'```\n';
   files['SKILL.md']='---\nname: '+name+'\ndescription: '+JSON.stringify('['+profile.flavor+'] '+op.description)+'\nlicense: MIT\n---\n\n# '+op.title+'\n\nFlavor: '+profile.flavor+'. Read the [concrete project profile](references/project-profile.md).\n\n'+sections.map(s=>s.text).join('\n\n')+'\n';
   files['agents/openai.yaml']='interface:\n  display_name: '+JSON.stringify(op.title+' ('+profile.flavor+')')+'\n  short_description: '+JSON.stringify(profile.flavor+' Skill Tree workflow')+'\n';
   for(const [rel,content] of Object.entries(files)){if(typeof content!=='string')throw Error('Missing composition resource: '+rel);safe(source,rel);}
-  for(const match of files['SKILL.md'].matchAll(/\]\(([^)]+)\)/g))if(!files[match[1]])throw Error('Missing composed link: '+match[1]);
+  for(const match of files['SKILL.md'].matchAll(/\]\(([^)]+)\)/g))if(!/^https?:/.test(match[1])&&!files[match[1]])throw Error('Missing composed link: '+match[1]);
   packages[name]=stable(files);
  }
  const source_digests=sourceInputs(source),output_digests={};
  for(const [name,files] of Object.entries(packages))output_digests[name]=Object.fromEntries(Object.entries(files).map(([rel,content])=>[rel,hash(content)]));
  return {packages,source_digests,output_digests,identity:hash(json({flavor:profile.flavor,environment_id:profile.environment_id,source_digests,output_digests}))};
 }
-module.exports={hash,json,safe,read,readJson,inventory,resolveProfile,mergeSections,mergeResources,sourceInputs,compose};
+module.exports={hash,json,safe,read,readJson,inventory,resolveProfile,mergeSections,mergeResources,sourceInputs,matches,compose};

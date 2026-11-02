@@ -16,16 +16,18 @@
       "T-69b96cac-72c3-4a69-9969-9775ea457877",
       "T-25e8ef8b-6545-4c82-ab91-f1e8bd28605f",
       "T-9bada49a-808a-48c5-a5da-ed44b71f00df",
-      "T-98e59352-ec61-46da-bb16-73754fb836fc"
+      "T-98e59352-ec61-46da-bb16-73754fb836fc",
+      "T-0277c075-52e4-41a3-8f7b-ab79bd7bf019"
     ],
     "completion_refs": {
+      "T-0277c075-52e4-41a3-8f7b-ab79bd7bf019": "O-70ad684b-5a86-4d09-a05b-f34f49b414f3",
       "T-257487e7-a192-4b6a-a2bf-634106432f67": "O-7df16a21-0424-48ba-bbcb-268635a7dbb5",
       "T-25e8ef8b-6545-4c82-ab91-f1e8bd28605f": "O-5955b4b5-a0e2-4d0c-b096-691bc234b08a",
       "T-69b96cac-72c3-4a69-9969-9775ea457877": "O-75f15cf2-5927-4754-a46b-da7a4b57de59",
       "T-98e59352-ec61-46da-bb16-73754fb836fc": "O-b70c1721-abe7-4717-9b8b-c9e5d605434a",
       "T-9bada49a-808a-48c5-a5da-ed44b71f00df": "O-c9ed0397-bf83-4f74-b5b8-44dcfa808d05"
     },
-    "current_task_id": "T-0277c075-52e4-41a3-8f7b-ab79bd7bf019",
+    "current_task_id": "T-2a154c49-75e0-4b67-b564-ea65b0291f8b",
     "deferred_ids": [],
     "id": "WR-87ba65c7-3806-44ad-8b5d-92bfd1a5f3d6",
     "limits": {},
@@ -42,7 +44,8 @@
       "T-25e8ef8b-6545-4c82-ab91-f1e8bd28605f",
       "T-9bada49a-808a-48c5-a5da-ed44b71f00df",
       "T-98e59352-ec61-46da-bb16-73754fb836fc",
-      "T-0277c075-52e4-41a3-8f7b-ab79bd7bf019"
+      "T-0277c075-52e4-41a3-8f7b-ab79bd7bf019",
+      "T-2a154c49-75e0-4b67-b564-ea65b0291f8b"
     ],
     "root_task_id": "T-bae05f34-57a2-4bbe-9a3f-07f835d4e3c1",
     "snapshot": [
@@ -53,33 +56,15 @@
   },
   "format": "skill-tree-future",
   "schema": 2,
-  "source_hash": "840dfb2c986d9213602caf7709b750858576d42b38d05adb9f179fb078410a4b",
+  "source_hash": "fb7c0eeedeae1719f5e1fcf8198d0c290c3fdbb870fb4874abd3d10c9084eff8",
   "task_progress": {},
   "tasks": [
     {
       "depends_on": [
         "T-98e59352-ec61-46da-bb16-73754fb836fc"
       ],
-      "id": "T-0277c075-52e4-41a3-8f7b-ab79bd7bf019",
-      "line": 11,
-      "parent_pending_ids": [
-        "P-d5ffb35c-ee83-4ba6-9f6b-89f647b869b8"
-      ],
-      "priority": 103,
-      "processing_run_id": "PR-7e6c556f-e261-441b-bd21-caf2f656050d",
-      "queue": "Prioritized Next Changes",
-      "related_task_id": null,
-      "relation": "main",
-      "root_task_id": "T-0277c075-52e4-41a3-8f7b-ab79bd7bf019",
-      "status": "Ready",
-      "title": "U-06 Qualify Unity domain contracts"
-    },
-    {
-      "depends_on": [
-        "T-98e59352-ec61-46da-bb16-73754fb836fc"
-      ],
       "id": "T-2a154c49-75e0-4b67-b564-ea65b0291f8b",
-      "line": 80,
+      "line": 11,
       "parent_pending_ids": [
         "P-d5ffb35c-ee83-4ba6-9f6b-89f647b869b8"
       ],
@@ -98,7 +83,7 @@
         "T-2a154c49-75e0-4b67-b564-ea65b0291f8b"
       ],
       "id": "T-bae05f34-57a2-4bbe-9a3f-07f835d4e3c1",
-      "line": 149,
+      "line": 80,
       "parent_pending_ids": [
         "P-d5ffb35c-ee83-4ba6-9f6b-89f647b869b8"
       ],
