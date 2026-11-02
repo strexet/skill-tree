@@ -41,7 +41,7 @@ function resolveProfile(source,root,flavor) {
  root=fs.realpathSync(root);
  const registry=readJson(source,'config/flavors.json'),rules=readJson(source,'config/capabilities.json');
  if(!registry.flavors[flavor])throw Error('Unknown flavor: '+flavor);
- const fixed=['package.json','package-lock.json','npm-shrinkwrap.json','yarn.lock','pnpm-lock.yaml','bun.lock','bun.lockb','.nvmrc','.node-version','pyproject.toml','pytest.ini','Cargo.toml','ProjectSettings/ProjectVersion.txt','Packages/manifest.json','Packages/packages-lock.json','.skill-tree/validation-recipes.json'];
+ const fixed=['package.json','package-lock.json','npm-shrinkwrap.json','yarn.lock','pnpm-lock.yaml','bun.lock','bun.lockb','.nvmrc','.node-version','pyproject.toml','pytest.ini','Cargo.toml','ProjectSettings/ProjectVersion.txt','ProjectSettings/EditorSettings.asset','ProjectSettings/ProjectSettings.asset','Packages/manifest.json','Packages/packages-lock.json','.skill-tree/validation-recipes.json'];
  const discovered=inventory(root,rules.inventory),inputs={};
  for(const rel of [...new Set([...fixed,...discovered])].sort()){const value=read(root,rel);inputs[rel]=value===null?null:hash(value);}
  const facts={test_assemblies:[],ui:[]},recipes={},gaps=[];
@@ -54,8 +54,9 @@ function resolveProfile(source,root,flavor) {
  if(lock&&!rules.web.lock_versions.includes(lock.lockfileVersion))throw Error('Unsupported dependency lock format');
  const dependencies={...pkg.dependencies,...pkg.devDependencies};facts.packages={};
  for(const [name,declared] of Object.entries(dependencies).sort()) {
-  const exact=lock?.packages?.['node_modules/'+name]?.version||(/^\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(declared)?declared:null);
-  facts.packages[name]={state:exact?'known':'ambiguous',version:exact,declaration_digest:hash(declared)};
+  const exact=lock?.packages?.['node_modules/'+name]?.version||null;
+  if(exact&&/^\d+\.\d+\.\d+$/.test(declared)&&exact!==declared)throw Error('Conflicting declared and locked package versions: '+name);
+  facts.packages[name]={state:exact?'known':'ambiguous',version:exact,declared_version:/^\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(declared)?declared:null,resolution_source:exact?locks[0]:null,declaration_digest:hash(declared)};
  }
  for(const [name,command] of Object.entries(pkg.scripts||{}).sort()){
   if(!/^(test(?::[\w-]+)?|lint|typecheck|check|build|dev|start|preview)$/.test(name))continue;
@@ -68,30 +69,32 @@ function resolveProfile(source,root,flavor) {
   if(!version)throw Error('Unity root requires ProjectSettings/ProjectVersion.txt');
   if(!rules.unity.editor_patterns.some(p=>new RegExp(p).test(version)))throw Error('Unsupported Unity version: '+version);
   facts.editor=version;
+  const editorSettings=read(root,'ProjectSettings/EditorSettings.asset');facts.reload={state:editorSettings===null?'absent':'known',enabled:editorSettings?.match(/m_EnterPlayModeOptionsEnabled:\s*(\d+)/)?.[1]||null,options:editorSettings?.match(/m_EnterPlayModeOptions:\s*(\d+)/)?.[1]||null};
   const manifest=readJson(root,'Packages/manifest.json').dependencies||{},locked=readJson(root,'Packages/packages-lock.json').dependencies||{};
   facts.packages={};
   for(const [name,declared] of Object.entries(manifest).sort()){
-   const version=locked[name]?.version||(/^\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(declared)?declared:null);
-   if(locked[name]&&/^\d+\.\d+\.\d+$/.test(declared)&&declared!==version)throw Error('Conflicting Unity package version: '+name);
-   facts.packages[name]={state:version?'known':'ambiguous',version,declaration_digest:hash(declared)};
+   const version=locked[name]?.version||null;
+   facts.packages[name]={state:version?'known':'ambiguous',version,declared_version:/^\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(declared)?declared:null,resolution_source:version?'Packages/packages-lock.json':null,declaration_digest:hash(declared)};
   }
   const utf=facts.packages['com.unity.test-framework'];
-  if(utf&&(!utf.version||!rules.unity.utf_patterns.some(p=>new RegExp(p).test(utf.version))))throw Error('Unsupported or ambiguous UTF version; update the bundled compatibility rules');
+  if(utf&&(!utf.version||!rules.unity.utf_patterns.some(p=>new RegExp(p).test(utf.version))))throw Error('Unsupported or ambiguous resolved UTF version; provide the project package lock or update the bundled compatibility rules');
   for(const rel of discovered.filter(p=>p.endsWith('.asmdef'))){const asm=readJson(root,rel);if(asm.optionalUnityReferences?.includes('TestAssemblies')||asm.references?.some(r=>/TestRunner/.test(r)))facts.test_assemblies.push(rel);}
   if(facts.packages['com.unity.ugui'])facts.ui.push('ugui');
   if(discovered.some(p=>/\.(uxml|uss)$/.test(p)))facts.ui.push('uitk');
-  if(utf)for(const lane of ['EditMode','PlayMode'])recipes['unity-'+lane.toLowerCase()]={lane:'unity-'+lane.toLowerCase(),argv:['Unity','-batchmode','-projectPath','{project_root}','-runTests','-testPlatform',lane,'-testFilter','{test_filter}','-testResults','{result_path}','-logFile','{log_path}'],editor_version:version,utf_version:utf.version,input_paths:['ProjectSettings/ProjectVersion.txt','Packages/manifest.json','Packages/packages-lock.json',...discovered],qualification:'static-recipe; authorized matching Editor and isolated fixture required'};
+  if(utf)for(const lane of ['EditMode','PlayMode'])recipes['unity-'+lane.toLowerCase()]={lane:'unity-'+lane.toLowerCase(),argv:['Unity','-batchmode','-projectPath','{project_root}','-runTests','-testPlatform',lane,'-testFilter','{test_filter}','-testResults','{result_path}','-logFile','{log_path}'],editor_version:version,utf_version:utf.version,input_paths:['ProjectSettings/ProjectVersion.txt','ProjectSettings/EditorSettings.asset','ProjectSettings/ProjectSettings.asset','Packages/manifest.json','Packages/packages-lock.json',...discovered],qualification:'static-recipe; authorized matching Editor and isolated fixture required'};
   if(!utf)gaps.push({key:'test-foundation',reason:'The project lacks the foundational Unity Test Framework.',recommendation:'Research the pinned Editor, configure compatible UTF and a meaningful EditMode smoke test, document focused commands and refresh the profile.'});
   else if(!facts.test_assemblies.length)gaps.push({key:'test-foundation',reason:'UTF exists without a discovered test assembly.',recommendation:'Configure the existing UTF framework and one meaningful EditMode test assembly; preserve package pins.'});
  } else if(!Object.values(recipes).some(r=>['unit','integration','browser'].includes(r.lane)))gaps.push({key:'test-foundation',reason:'No usable foundational test command is declared.',recommendation:'Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile.'});
  const explicit=readJson(root,'.skill-tree/validation-recipes.json',null);
  if(explicit){if(explicit.schema!==1||!explicit.recipes)throw Error('Unsupported static validation recipe format');for(const [id,recipe] of Object.entries(explicit.recipes)){
-  if(!/^[a-z][a-z0-9-]*$/.test(id)||!Array.isArray(recipe.argv)||!recipe.argv.length||recipe.argv.some(v=>typeof v!=='string')||!recipe.lane)throw Error('Invalid static recipe: '+id);
+  if(!/^[a-z][a-z0-9-]*$/.test(id)||!Array.isArray(recipe.argv)||!recipe.argv.length||recipe.argv.some(v=>typeof v!=='string')||!rules.lanes.includes(recipe.lane))throw Error('Invalid or unsupported static recipe lane: '+id);
   if(recipes[id])throw Error('Recipe collision: '+id);
   recipes[id]={...recipe,input_paths:['.skill-tree/validation-recipes.json',...(recipe.input_paths||[])],qualification:'owner-declared static recipe; runner unqualified'};
   for(const rel of recipe.input_paths||[]){const value=read(root,rel);inputs[rel]=value===null?null:hash(value);}
  }
  if(Object.values(recipes).some(r=>['unit','integration','browser','unity-editmode'].includes(r.lane)))gaps.splice(0,gaps.length,...gaps.filter(g=>g.key!=='test-foundation'));}
+ const unresolved=Object.entries(facts.packages).filter(([,value])=>value.state==='ambiguous').map(([name])=>name);
+ if(unresolved.length)gaps.push({key:'unresolved-package-versions',packages:unresolved,reason:'Dependency declarations lack resolved version evidence; version-specific resources are unavailable until supported lock evidence is supplied.'});
  const environment_id=hash(json({flavor,inputs,facts,recipes}));
  return {format:'skill-tree-profile',schema:1,composer_version:registry.composer_version,flavor,project_root:root,inputs,inventory:discovered,facts,recipes,gaps,environment_id,qualification:'static compatibility only; product execution unqualified'};
 }

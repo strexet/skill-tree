@@ -89,4 +89,11 @@ class ConformanceGateTests(unittest.TestCase):
         with self.assertRaisesRegex(wf.WorkflowError,'Installation lock'):wf.intake(self.store,{'title':'New task','description':'Inspect the scope.','expected_behavior':'Preserve the profile transaction.'})
         self.assertEqual(self.store.future.read_bytes(),before)
 
+    def test_profile_recipe_parameters_resolve_to_concrete_argument_vectors(self):
+        tid=self.task();self.store.future.write_text(self.store.text().replace('static-inspection','focused-fixture'))
+        (self.store.base/'config/repository.json').write_text(json.dumps({'role':'source','schema':1,'recipes':{'focused-fixture':{'lane':'unit','argv':['fixture','--root','{project_root}','--case','{case}'],'input_paths':[]}}}));self.progress(tid)
+        with self.assertRaisesRegex(wf.WorkflowError,'parameters'):wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'})
+        self.edit_plan(tid,lambda plan:plan['checks'][0]['parameters'].update({'case':'two words; literal argument'}))
+        attempt=wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'});self.assertEqual(attempt['recipe']['argv'],['fixture','--root',str(self.root.resolve()),'--case','two words; literal argument'])
+
 if __name__=='__main__':unittest.main()

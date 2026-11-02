@@ -9,7 +9,8 @@
     ],
     "sources": [
       "https://docs.unity3d.com/Packages/com.unity.test-framework@1.4/manual/reference-command-line.html",
-      "https://docs.unity.com/en-us/engine/6000.3/manual/uitoolkits/ui-system-compare"
+      "https://docs.unity.com/en-us/engine/6000.3/manual/uitoolkits/ui-system-compare",
+      "https://docs.unity.com/en-us/engine/6000.0/manual/packages-list/dependencies-lp/upm-conflicts-auto"
     ]
   },
   "web": {
@@ -29,7 +30,10 @@
       "tests",
       "test",
       "src",
-      ".skill-tree/documents"
+      ".skill-tree/documents",
+      "e2e",
+      "config",
+      ".config"
     ],
     "extensions": [
       ".asmdef",
@@ -50,5 +54,20 @@
       "validation-recipes.json",
       "browser-policy.json"
     ]
-  }
+  },
+  "lanes": [
+    "static",
+    "unit",
+    "integration",
+    "browser",
+    "unity-editmode",
+    "unity-playmode",
+    "visual",
+    "harness",
+    "build",
+    "server",
+    "player",
+    "device",
+    "native"
+  ]
 }

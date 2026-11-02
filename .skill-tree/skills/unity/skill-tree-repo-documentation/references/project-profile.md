@@ -11,14 +11,23 @@ Flavor: unity. Static compatibility only; execution remains unqualified.
     "packages": {
       "com.unity.test-framework": {
         "declaration_digest": "4f7e39ff822ea1097acede5f7b8773ffb24822c1192124129cd676cd5a9eda4b",
+        "declared_version": "1.4.6",
+        "resolution_source": "Packages/packages-lock.json",
         "state": "known",
         "version": "1.4.6"
       },
       "com.unity.ugui": {
         "declaration_digest": "f22abd6773ab232869321ad4b1e47ac0c908febf4f3a2bd10c8066140f741261",
+        "declared_version": "2.0.0",
+        "resolution_source": "Packages/packages-lock.json",
         "state": "known",
         "version": "2.0.0"
       }
+    },
+    "reload": {
+      "enabled": null,
+      "options": null,
+      "state": "absent"
     },
     "test_assemblies": [
       "Assets/Tests/EditMode/Tests.asmdef"
@@ -28,7 +37,7 @@ Flavor: unity. Static compatibility only; execution remains unqualified.
     ]
   },
   "gaps": [],
-  "instruction_profile_id": "b372689a8f917dbf40c2517380c9bb9962af730caac830aad5877e64f2f104d2",
+  "instruction_profile_id": "f1edcb550928c54b9848272fe9e56dadc5d53915d2272a370c50866aa12fe094",
   "recipes": {
     "unity-editmode": {
       "argv": [
@@ -49,6 +58,8 @@ Flavor: unity. Static compatibility only; execution remains unqualified.
       "editor_version": "6000.0.83f1",
       "input_paths": [
         "ProjectSettings/ProjectVersion.txt",
+        "ProjectSettings/EditorSettings.asset",
+        "ProjectSettings/ProjectSettings.asset",
         "Packages/manifest.json",
         "Packages/packages-lock.json",
         "Assets/Tests/EditMode/Tests.asmdef"
@@ -76,6 +87,8 @@ Flavor: unity. Static compatibility only; execution remains unqualified.
       "editor_version": "6000.0.83f1",
       "input_paths": [
         "ProjectSettings/ProjectVersion.txt",
+        "ProjectSettings/EditorSettings.asset",
+        "ProjectSettings/ProjectSettings.asset",
         "Packages/manifest.json",
         "Packages/packages-lock.json",
         "Assets/Tests/EditMode/Tests.asmdef"

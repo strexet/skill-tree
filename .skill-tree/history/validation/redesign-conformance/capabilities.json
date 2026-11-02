@@ -1,0 +1,22 @@
+{
+  "scope": "source and temporary-fixture controls",
+  "task_id": "T-c91cc58b-b81f-4e27-9e9f-710090d7c9c3",
+  "checks": [
+    {
+      "log": "skill-tree-composer-after.log",
+      "sha256": "06047da83920e7cbb8a83f3ea77af295775861503d50527d24fbddbb4e624d34",
+      "summary": "tains common metadata and prose validation without source dependencies\nok 10 - every flavor audit retains common metadata and prose validation without source dependencies\n  ---\n  duration_ms: 54.37775\n  ...\n# Subtest: declared versions never masquerade as resolved capabilities\nok 11 - declared versions never masquerade as resolved capabilities\n  ---\n  duration_ms: 20.9275\n  ...\n# Subtest: explicit recipe formats reject unknown lanes and unresolved command parameters\nok 12 - explicit recipe formats reject unknown lanes and unresolved command parameters\n  ---\n  duration_ms: 2.90425\n  ...\n1..12\n# tests 12\n# suites 0\n# pass 12\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 487.667834\n"
+    },
+    {
+      "log": "skill-tree-audit-integrity.log",
+      "sha256": "1bb33b04be65bfeedfdaa03e6fef4ef6d7f49199d487512fc1725dec36a387f9",
+      "summary": "uring scoped uninstall\nok 16 - shared provider destinations retain every recorded owner during scoped uninstall\n  ---\n  duration_ms: 792.95975\n  ...\n# Subtest: verification rejects a forged flavor and rehashed unrelated package content\nok 17 - verification rejects a forged flavor and rehashed unrelated package content\n  ---\n  duration_ms: 300.715208\n  ...\n# Subtest: shared bridges survive uninstall until the final recorded provider releases the package\nok 18 - shared bridges survive uninstall until the final recorded provider releases the package\n  ---\n  duration_ms: 818.068541\n  ...\n1..18\n# tests 18\n# suites 0\n# pass 18\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 10916.897167\n"
+    },
+    {
+      "log": "skill-tree-audit-test-py.log",
+      "sha256": "4f0e8745dd9d73c98040cb0aad96a559b2e8b93f8c566d730ff9a92cd0779b83",
+      "summary": "(test_workflow_state.WorkflowStateTests.test_split_forward_dependency_resolves_keys_atomically_and_orders_execution) ... ok\ntest_targeted_processing_never_consumes_unselected_work (test_workflow_state.WorkflowStateTests.test_targeted_processing_never_consumes_unselected_work) ... ok\ntest_unresolved_finding_protects_old_audit_until_scoped_resolution (test_workflow_state.WorkflowStateTests.test_unresolved_finding_protects_old_audit_until_scoped_resolution) ... ok\ntest_writer_lock_rejects_second_controller (test_workflow_state.WorkflowStateTests.test_writer_lock_rejects_second_controller) ... ok\n\n----------------------------------------------------------------------\nRan 109 tests in 4.805s\n\nOK\n"
+    }
+  ],
+  "product_execution": false
+}

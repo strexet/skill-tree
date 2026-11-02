@@ -274,10 +274,10 @@ async function main(argv = process.argv.slice(2)) {
         const base=installBase(provider,args),selections=skills.map(name=>({name,provider:provider.id,rel:path.relative(target,path.join(base,name)).split(path.sep).join('/')}));
         for(const item of selections)require(path.join(source,'lib/composer.js')).safe(target,item.rel);
         let result;
-        if(args.verify){const profile=manager.verify(target,source);if(profile.flavor!==flavor)throw Error('Flavor differs from receipt');for(const item of selections)if(!profile.destinations[item.rel])throw Error('Selected package is not receipt-owned: '+item.rel);result={action:'verified',profile,delta:[]};}
+        if(args.verify){const profile=manager.verify(target,source);if(profile.flavor!==flavor)throw Error('Flavor differs from receipt');for(const item of selections)if(!profile.destinations[item.rel]||!(profile.destinations[item.rel].providers||[profile.destinations[item.rel].provider]).includes(provider.id))throw Error('Selected package is not receipt-owned: '+item.rel);result={action:'verified',profile,delta:[]};}
         else if(args.uninstall)result=manager.uninstall(target,selections,{dryRun:args.dryRun,withInit:args.withInit});
-        else result=manager.install(target,source,flavor,selections,{dryRun:args.dryRun,bridges:args.withInit&&provider.bridgePath?[provider.bridgePath]:[]});
-        rows.push({provider:provider.id,ok:true,action:result.action,flavor,changed:result.delta,facts:result.profile.facts,gaps:result.profile.gaps});
+        else result=manager.install(target,source,flavor,selections,{dryRun:args.dryRun,provider:provider.id,bridges:args.withInit&&provider.bridgePath?[provider.bridgePath]:[]});
+        rows.push({provider:provider.id,ok:true,action:result.action,flavor,changed:result.delta,profile_identity:result.profile.identity,environment_identity:result.profile.environment_id,input_fingerprints:result.profile.inputs,packages:Object.entries(result.profile.destinations).map(([destination,record])=>({destination,name:record.name,flavor:record.flavor,identity:record.identity,providers:record.providers||[record.provider]})),policy:'Immediate focused feedback; scoped additional boundary checks; no implicit product execution.',facts:result.profile.facts,gaps:result.profile.gaps});
       }catch(error){rows.push({provider:provider.id,ok:false,error:error.message});}
     }
     console.log(JSON.stringify(rows,null,2));

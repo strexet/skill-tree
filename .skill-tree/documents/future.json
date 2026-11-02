@@ -13,13 +13,15 @@
     ],
     "completed_ids": [
       "T-0d1fa805-6441-424e-9f49-64f63b732c9e",
-      "T-25f102b6-589a-459d-a8e7-eb0b2f082f2f"
+      "T-25f102b6-589a-459d-a8e7-eb0b2f082f2f",
+      "T-c91cc58b-b81f-4e27-9e9f-710090d7c9c3"
     ],
     "completion_refs": {
       "T-0d1fa805-6441-424e-9f49-64f63b732c9e": "O-e41f8da0-7077-40ae-878f-b0fbf6d5778b",
-      "T-25f102b6-589a-459d-a8e7-eb0b2f082f2f": "O-b615db10-5bd1-4983-a002-7d23501938dc"
+      "T-25f102b6-589a-459d-a8e7-eb0b2f082f2f": "O-b615db10-5bd1-4983-a002-7d23501938dc",
+      "T-c91cc58b-b81f-4e27-9e9f-710090d7c9c3": "O-a172112b-cec9-48d2-98a6-7290b7250435"
     },
-    "current_task_id": "T-c91cc58b-b81f-4e27-9e9f-710090d7c9c3",
+    "current_task_id": "T-d6dfa7ea-3bbe-4293-9d49-a3470c8d9f54",
     "deferred_ids": [],
     "id": "WR-64465f14-2fe9-4696-b451-a31de1ec7fcd",
     "limits": {},
@@ -44,33 +46,15 @@
   },
   "format": "skill-tree-future",
   "schema": 2,
-  "source_hash": "6aab74e167ae0a781ab994b518651c25e5f80988490e576b3d2657102a39629e",
+  "source_hash": "463a7b5b7cd9b61ab5ff178078c28073dd7e1e8fce332f3fbc23558198f84477",
   "task_progress": {},
   "tasks": [
-    {
-      "depends_on": [
-        "T-25f102b6-589a-459d-a8e7-eb0b2f082f2f"
-      ],
-      "id": "T-c91cc58b-b81f-4e27-9e9f-710090d7c9c3",
-      "line": 11,
-      "parent_pending_ids": [
-        "P-c526b036-fd1d-4a9a-b5b5-6e53fcf778b8"
-      ],
-      "priority": 112,
-      "processing_run_id": "PR-9c772e36-381c-4f7d-9f70-1a1744eb5ad2",
-      "queue": "Prioritized Next Changes",
-      "related_task_id": null,
-      "relation": "main",
-      "root_task_id": "T-c91cc58b-b81f-4e27-9e9f-710090d7c9c3",
-      "status": "Ready",
-      "title": "Complete static specialization and package verification"
-    },
     {
       "depends_on": [
         "T-c91cc58b-b81f-4e27-9e9f-710090d7c9c3"
       ],
       "id": "T-d6dfa7ea-3bbe-4293-9d49-a3470c8d9f54",
-      "line": 57,
+      "line": 11,
       "parent_pending_ids": [
         "P-c526b036-fd1d-4a9a-b5b5-6e53fcf778b8"
       ],

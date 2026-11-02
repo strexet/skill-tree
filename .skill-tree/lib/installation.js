@@ -8,6 +8,11 @@ function filesAt(root,rel){
  if(fs.lstatSync(full).isFile())return {'':c.hash(fs.readFileSync(full))};
  const out={};function walk(dir,prefix){for(const e of fs.readdirSync(dir,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){if(e.name==='__pycache__')continue;const child=path.join(dir,e.name),key=prefix+e.name;if(e.isSymbolicLink())throw Error('Symlink in owned package: '+rel+'/'+key);if(e.isDirectory())walk(child,key+'/');else if(e.isFile())out[key]=c.hash(fs.readFileSync(child));else throw Error('Unsupported owned entry: '+key);}}walk(full,'');return out;
 }
+const owners=record=>record.providers||[record.provider];
+function compositionIdentity(profile){
+ const outputs=Object.fromEntries(Object.values(profile.destinations).map(record=>[record.name,record.files]));
+ return c.hash(c.json({flavor:profile.flavor,environment_id:profile.environment_id,source_digests:profile.source_digests,output_digests:outputs}));
+}
 const treeHash=(root,rel)=>{const files=filesAt(root,rel);return files===null?null:c.hash(c.json(files));};
 function receipt(root,required=false){
  const p=c.readJson(root,PROFILE,null);
@@ -16,6 +21,7 @@ function receipt(root,required=false){
  return p;
 }
 function verifyOwned(root,p,includeBundle=true){
+ if(p.identity!==compositionIdentity(p))throw Error('Composition receipt identity mismatch');
  for(const [rel,record] of Object.entries(p.destinations)){
   if(!/^skill-tree-[a-z0-9-]+$/.test(record.name)||path.basename(rel)!==record.name)throw Error('Invalid owned destination');
   if(c.json(filesAt(root,rel))!==c.json(record.files))throw Error('Unowned or locally modified package conflicts: '+rel);
@@ -107,13 +113,14 @@ function plan(root,source,flavor,selections,options={}){
  if(!old&&fs.existsSync(c.safe(root,INSTALL))&&fs.readdirSync(c.safe(root,INSTALL)).some(name=>name!=='.install-lock'))throw Error('Unowned maintenance directory conflict');
  if(hasActiveOperation(root))throw Error('Active controller must checkpoint at a stopped cleanup/handoff point before installation or refresh');
  if(old)for(const rel of Object.keys(old.destinations))selections.push({rel,provider:old.destinations[rel].provider,name:old.destinations[rel].name});
- const unique=Object.values(Object.fromEntries(selections.map(s=>[s.rel,s]))),names=[...new Set(unique.map(s=>s.name))];
+ const merged={};for(const item of selections){if(!merged[item.rel])merged[item.rel]={...item,providers:[]};merged[item.rel].providers=[...new Set([...merged[item.rel].providers,...(item.providers||[item.provider])])].sort();}
+ const unique=Object.values(merged),names=[...new Set(unique.map(s=>s.name))];
  const profile=c.resolveProfile(source,root,flavor),built=c.compose(source,profile,names),changes={},destinations={...(old?.destinations||{})};
  for(const item of unique){
   const current=filesAt(root,item.rel),owned=old?.destinations[item.rel];
   if(current&&!owned)throw Error('Unowned destination conflict, including --force: '+item.rel);
   const files=built.packages[item.name];if(!files)throw Error('Missing composed operation: '+item.name);
-  changes[item.rel]=files;destinations[item.rel]={provider:item.provider,name:item.name,flavor,files:built.output_digests[item.name],identity:c.hash(c.json(built.output_digests[item.name]))};
+  changes[item.rel]=files;destinations[item.rel]={provider:owned?.provider||item.provider,providers:[...new Set([...(owned?owners(owned):[]),...item.providers])].sort(),name:item.name,flavor,files:built.output_digests[item.name],identity:c.hash(c.json(built.output_digests[item.name]))};
  }
  const bridges={...(old?.bridges||{})},bridgeBefore={};
  for(const rel of new Set([...(options.bridges||[]),...Object.keys(old?.bridges||{})])){
@@ -121,7 +128,7 @@ function plan(root,source,flavor,selections,options={}){
   if(existing&&!old?.bridges[rel])throw Error('Unowned bridge conflict: '+rel);
   const block=BEGIN+'\n'+c.read(source,'src/init-rules/skill-tree-skills.md').trim()+'\nFlavor: '+flavor+'. Profile: `.skill-tree/installation/profile.json`.\n'+END;
   changes[rel]=existing?current.replace(existing,block):current+(current.endsWith('\n')?'\n':'\n\n')+block+'\n';
-  bridges[rel]={hash:c.hash(block)};
+  bridges[rel]={hash:c.hash(block),providers:[...new Set([...(old?.bridges[rel]?.providers||[]),...(options.bridges?.includes(rel)&&options.provider?[options.provider]:[])])].sort()};
  }
  const maintenance=bundle(source,flavor),bundle_digests={};
  for(const [rel,content] of Object.entries(maintenance)){const dest=INSTALL+'/'+rel;if(fs.existsSync(c.safe(root,dest))&&!old?.bundle_digests[dest])throw Error('Unowned maintenance file conflict: '+dest);changes[dest]=content;bundle_digests[dest]=c.hash(content);}
@@ -144,15 +151,39 @@ function plan(root,source,flavor,selections,options={}){
  }).map(([rel])=>rel);
  return {profile:next,changes,delta,old,expected};
 }
-function verify(root,source){const p=receipt(root,true);verifyOwned(root,p);const now=c.resolveProfile(source,root,p.flavor);if(c.json(now.inputs)!==c.json(p.inputs)||c.json(now.inventory)!==c.json(p.inventory))throw Error('Profile refresh-required: node .skill-tree/installation/manager.js --refresh-profile');return p;}
+function verify(root,source){
+ const p=receipt(root,true);verifyOwned(root,p);const bundleSource=c.safe(root,INSTALL+'/source');
+ const now=c.resolveProfile(bundleSource,root,p.flavor);
+ for(const field of ['inputs','inventory','facts','recipes','gaps','environment_id'])if(c.json(now[field])!==c.json(p[field]))throw Error('Profile refresh-required or resolved profile mismatch: node .skill-tree/installation/manager.js --refresh-profile');
+ if(p.identity!==compositionIdentity(p))throw Error('Composition receipt identity mismatch');
+ const generated=c.compose(bundleSource,now,[...new Set(Object.values(p.destinations).map(record=>record.name))]);
+ const providers=c.readJson(bundleSource,'config/providers.json').providers;
+ for(const [rel,record] of Object.entries(p.destinations)){
+  if(record.flavor!==p.flavor||record.identity!==c.hash(c.json(record.files))||c.json(generated.output_digests[record.name])!==c.json(record.files))throw Error('Package identity/flavor does not match deterministic composition: '+rel);
+  if(owners(record).some(id=>{const provider=providers.find(p=>p.id===id);return !provider||rel!==path.posix.join(provider.id==='generic'?'':provider.projectPath,record.name);}))throw Error('Provider ownership disagrees with the scoped destination: '+rel);
+ }
+ for(const [rel,digest] of Object.entries(p.bundle_digests))if(rel.startsWith(INSTALL+'/source/')&&p.source_digests[rel.slice((INSTALL+'/source/').length)]!==digest)throw Error('Bundle and source recipe identities disagree');
+ return p;
+}
 function install(root,source,flavor,selections,options={}){
  if(options.dryRun){const result=plan(root,source,flavor,selections,options);return {profile:result.profile,delta:result.delta,action:'dry-run'};}
  return locked(root,()=>{const result=plan(root,source,flavor,selections,options);transaction(root,result.changes,result.expected);verify(root,source);return {profile:result.profile,delta:result.delta,action:result.delta.length?'installed':'verified no-op current'};});
 }
 function uninstall(root,selections,options={}){
  function action(){const p=receipt(root,true);verifyOwned(root,p);if(hasActiveOperation(root))throw Error('Active controller must stop before uninstall');const next=JSON.parse(c.json(p)),changes={},expected={};
-  for(const item of selections){if(!p.destinations[item.rel])throw Error('Unowned uninstall destination: '+item.rel);changes[item.rel]=null;expected[item.rel]=c.hash(c.json(p.destinations[item.rel].files));delete next.destinations[item.rel];}
-  if(options.withInit&&Object.keys(next.destinations).length===0)for(const rel of Object.keys(p.bridges||{})){const current=c.read(root,rel),block=bridgeBlock(current);changes[rel]=current.replace(block,'');expected[rel]=treeHash(root,rel);delete next.bridges[rel];}
+  for(const item of selections){const record=p.destinations[item.rel];if(!record||!owners(record).includes(item.provider))throw Error('Unowned uninstall destination for the selected provider: '+item.rel);
+   const remaining=owners(next.destinations[item.rel]).filter(provider=>provider!==item.provider);
+   if(remaining.length){next.destinations[item.rel].providers=remaining;next.destinations[item.rel].provider=remaining[0];}
+   else{changes[item.rel]=null;expected[item.rel]=c.hash(c.json(record.files));delete next.destinations[item.rel];}
+  }
+  if(options.withInit){const active=new Set(Object.values(next.destinations).flatMap(owners));
+   for(const [rel,record] of Object.entries(p.bridges||{})){
+    const remaining=(record.providers||[]).filter(provider=>active.has(provider));
+    if(remaining.length){next.bridges[rel].providers=remaining;continue;}
+    const current=c.read(root,rel),block=bridgeBlock(current);changes[rel]=current.replace(block,'');expected[rel]=treeHash(root,rel);delete next.bridges[rel];
+   }
+  }
+  next.identity=compositionIdentity(next);const stopped=stoppedWorkflow(root);if(stopped){changes[WORKFLOW]=stopped;expected[WORKFLOW]=treeHash(root,WORKFLOW);}
   changes[PROFILE]=c.json(next);expected[PROFILE]=treeHash(root,PROFILE);if(!options.dryRun)transaction(root,changes,expected);return {action:options.dryRun?'dry-run uninstall':'removed',profile:next,delta:Object.keys(changes)};
  }
  return options.dryRun?action():locked(root,action);

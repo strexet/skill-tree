@@ -61,3 +61,14 @@ test('a real controller re-admits after local refresh without resetting task pro
  function command(name,payload=null){const args=[helper,name,root];if(payload){const p=path.join(root,'input.json');fs.writeFileSync(p,JSON.stringify(payload));args.push('--input',p);}const result=spawnSync('python3',args,{encoding:'utf8',timeout:15000});assert.equal(result.status,0,result.stdout+result.stderr);return JSON.parse(result.stdout);}
  const selected=command('select');command('start');command('begin',{task_id:selected.id});command('implemented',{task_id:selected.id});assert.equal(command('advance').phase,'validate');fs.writeFileSync(path.join(root,'package.json'),JSON.stringify({scripts:{test:'node --test'}}));assert.equal(run(root).status,0);assert.ok(command('index').active_run.stop_reason);command('admit');const current=command('index');assert.equal(current.active_run.stop_reason,null);assert.equal(current.task_progress[selected.id].stage,'awaiting-validation');
 });
+test('shared provider destinations retain every recorded owner during scoped uninstall',t=>{
+ const root=setup(t);assert.equal(run(root).status,0);assert.equal(run(root,['--only','gemini-cli']).status,0);assert.equal(run(root,['--uninstall']).status,0);const file=path.join(root,'.agents/skills/skill-tree-work-through-next/SKILL.md');assert.ok(fs.existsSync(file));const result=spawnSync(process.execPath,[cli,'--target',root,'--only','gemini-cli','--verify'],{encoding:'utf8',timeout:15000});assert.equal(result.status,0,result.stdout+result.stderr);
+});
+test('verification rejects a forged flavor and rehashed unrelated package content',t=>{
+ const root=setup(t);assert.equal(run(root).status,0);const profilePath=path.join(root,'.skill-tree/installation/profile.json'),c=require('../lib/composer.js'),p=JSON.parse(fs.readFileSync(profilePath));const rel='.agents/skills/skill-tree-add-pending-task',file=path.join(root,rel,'SKILL.md');fs.writeFileSync(file,'unrelated but rehashed');p.destinations[rel].files['SKILL.md']=c.hash('unrelated but rehashed');p.destinations[rel].identity=c.hash(c.json(p.destinations[rel].files));fs.writeFileSync(profilePath,JSON.stringify(p));assert.notEqual(run(root,['--verify']).status,0);
+});
+
+test('shared bridges survive uninstall until the final recorded provider releases the package',t=>{
+ const root=setup(t);assert.equal(run(root,['--with-init']).status,0);assert.equal(run(root,['--only','amp','--with-init']).status,0);assert.equal(run(root,['--uninstall','--with-init']).status,0);assert.match(fs.readFileSync(path.join(root,'AGENTS.md'),'utf8'),/BEGIN skill-tree-skills/);
+ const result=spawnSync(process.execPath,[cli,'--target',root,'--only','amp','--uninstall','--with-init'],{encoding:'utf8',timeout:15000});assert.equal(result.status,0,result.stdout+result.stderr);assert.ok(!fs.readFileSync(path.join(root,'AGENTS.md'),'utf8').includes('BEGIN skill-tree-skills'));
+});

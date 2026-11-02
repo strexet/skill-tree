@@ -824,6 +824,15 @@ def recipe_for(store,check):
     inputs={}
     for rel in recipe.get('input_paths',[]):inputs.update(fingerprints(store,[rel]))
     if profile and any(profile.get('inputs',{}).get(rel)!=value for rel,value in inputs.items()):raise WorkflowError('Profile refresh-required: node .skill-tree/installation/manager.js --refresh-profile')
+    recipe=deepcopy(recipe)
+    arguments=[];parameters={**check['parameters'],'project_root':str(store.root)}
+    for argument in recipe.get('argv',[]):
+        def parameter(match):
+            key=match[1]
+            if key not in parameters or not isinstance(parameters[key],str) or not parameters[key]:raise WorkflowError('Recipe parameters are unresolved: '+key)
+            return parameters[key]
+        arguments.append(re.sub(r'\{([a-z][a-z0-9_]*)\}',parameter,argument))
+    if 'argv' in recipe:recipe['argv']=arguments
     environment=digest(dump({'recipe':recipe,'inputs':inputs}).encode())
     return recipe,environment
 
