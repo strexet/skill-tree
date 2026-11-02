@@ -83,4 +83,10 @@ class ConformanceGateTests(unittest.TestCase):
         wf.validate_task_checks(self.store,tid)
         with self.assertRaisesRegex(wf.WorkflowError,'deadline'):wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'})
 
+    def test_workflow_mutation_waits_for_the_installation_lock(self):
+        install=self.store.base/'installation';install.mkdir();(install/'.install-lock').write_text('synthetic-owner')
+        before=self.store.future.read_bytes()
+        with self.assertRaisesRegex(wf.WorkflowError,'Installation lock'):wf.intake(self.store,{'title':'New task','description':'Inspect the scope.','expected_behavior':'Preserve the profile transaction.'})
+        self.assertEqual(self.store.future.read_bytes(),before)
+
 if __name__=='__main__':unittest.main()

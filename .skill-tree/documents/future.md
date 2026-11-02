@@ -8,51 +8,6 @@ Fixed metadata records task identity and dependency scope.
 
 ## Prioritized Next Changes
 
-### Repair profile activation and installation recovery boundaries
-
-```yaml
-id: T-25f102b6-589a-459d-a8e7-eb0b2f082f2f
-priority: 113
-status: Ready
-parent_pending_ids: ["P-c526b036-fd1d-4a9a-b5b5-6e53fcf778b8"]
-processing_run_id: PR-9c772e36-381c-4f7d-9f70-1a1744eb5ad2
-root_task_id: T-25f102b6-589a-459d-a8e7-eb0b2f082f2f
-related_task_id: null
-relation: main
-depends_on: ["T-0d1fa805-6441-424e-9f49-64f63b732c9e"]
-```
-
-Goal:
-- Profile replacement preserves stopped workflow state and rejects concurrent edits or incompatible state.
-
-Touch:
-- .skill-tree/lib/installation.js, .skill-tree/tests/test-installation-integrity.js
-
-Validation:
-```json
-{
-  "checks": [
-    {
-      "id": "source-qualification",
-      "recipe_id": "static-inspection",
-      "criteria": [
-        "Profile replacement preserves stopped workflow state and rejects concurrent edits or incompatible state."
-      ],
-      "sources": [
-        ".skill-tree/lib/installation.js",
-        ".skill-tree/tests/test-installation-integrity.js"
-      ],
-      "parameters": {},
-      "assertion": "Profile replacement preserves stopped workflow state and rejects concurrent edits or incompatible state.",
-      "timing": "immediate"
-    }
-  ]
-}
-```
-
-Acceptance:
-- Profile replacement preserves stopped workflow state and rejects concurrent edits or incompatible state.
-
 ### Complete static specialization and package verification
 
 ```yaml

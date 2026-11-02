@@ -233,11 +233,13 @@ class Store:
     @contextmanager
     def lock(self):
         self.base.mkdir(exist_ok=True)
+        if (self.base/'installation/.install-lock').exists():raise WorkflowError('Installation lock exists; implementation waits for the owned profile transaction')
         path=self.base/'.writer-lock'
         try: fd=os.open(path,os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600)
         except FileExistsError as exc: raise WorkflowError('Writer lock exists; verify owner PID/host before explicit lock removal') from exc
         try:
             os.write(fd,dump({'pid':os.getpid(),'host':socket.gethostname()}).encode());os.close(fd)
+            if (self.base/'installation/.install-lock').exists():raise WorkflowError('Installation lock exists; preserve the profile handoff')
             self.recover()
             mutable=[self.future,self.state,self.base/'skill-tree.json',self.base/'history/task-outcomes.jsonl',*list((self.base/'history').rglob('*.json'))]
             self._write_hashes={p.relative_to(self.root).as_posix():file_hash(p) for p in mutable}
@@ -784,7 +786,9 @@ def resume_admission(store):
     with store.lock():
         text=store.text();state=store.load(text);run=state['active_run']
         if not run:raise WorkflowError('No active run')
-        run['admission']=admitted;store.save(text,state);return admitted
+        run['admission']=admitted
+        if run.pop('profile_refresh_required',False) and run['stop_reason']=='Installation profile changed; re-admit before continuation':run['stop_reason']=None
+        store.save(text,state);return admitted
 
 def dependency_scope(tasks,run):
     by_id={t['id']:t for t in tasks};result=set()

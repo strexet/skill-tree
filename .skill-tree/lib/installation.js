@@ -33,7 +33,25 @@ function bridgeBlock(text){
  if(a<0||b<a||text.indexOf(BEGIN,a+BEGIN.length)>=0||text.indexOf(END,b+END.length)>=0)throw Error('Ambiguous bridge markers');
  return text.slice(a,b+END.length);
 }
-function hasActiveOperation(root){const state=c.readJson(root,'.skill-tree/documents/future.json',{}),run=state.active_run;return Boolean(run&&!run.stop_reason&&!['blocked','awaiting-validation','refresh-profile','validation-blocked'].includes(run.phase));}
+const WORKFLOW='.skill-tree/documents/future.json';
+function workflowState(root){
+ const state=c.readJson(root,WORKFLOW,null);if(state===null)return null;
+ if(state.format!=='skill-tree-future'||state.schema!==2||!Array.isArray(state.tasks)||!state.task_progress||typeof state.task_progress!=='object'||Array.isArray(state.task_progress)||!(state.active_run===null||state.active_run&&typeof state.active_run==='object'))throw Error('Unsupported workflow schema; use the manual update checklist');
+ return state;
+}
+function hasActiveOperation(root){
+ const state=workflowState(root);if(!state)return false;
+ for(const progress of Object.values(state.task_progress))for(const slot of Object.values(progress.checks||{})){
+  const attempt=slot.attempt;if(attempt&&!Object.values(slot.receipts||{}).some(r=>r.attempt_id===attempt.attempt_id)&&slot.result?.attempt_id!==attempt.attempt_id&&slot.red?.attempt_id!==attempt.attempt_id)return true;
+ }
+ const run=state.active_run;return Boolean(run&&!run.stop_reason&&!['blocked','validate','awaiting-validation','refresh-profile','validation-blocked'].includes(run.phase));
+}
+function stoppedWorkflow(root){
+ const state=workflowState(root);if(!state?.active_run)return null;
+ const run=state.active_run;run.profile_refresh_required=true;
+ if(!run.stop_reason)run.stop_reason='Installation profile changed; re-admit before continuation';
+ return c.json(state);
+}
 function materialize(root,rel,files){const dest=c.safe(root,rel);fs.mkdirSync(dest,{recursive:true});for(const [name,content] of Object.entries(files)){const file=c.safe(root,path.posix.join(rel,name));fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,content);}}
 function recover(root){
  const journal=c.readJson(root,INSTALL+'/.journal.json',null);if(!journal)return;
@@ -53,16 +71,18 @@ function recover(root){
  fs.rmSync(c.safe(root,INSTALL+'/.staging'),{recursive:true,force:true});
  // Backups retain one completed generation for explicit reviewed rollback.
 }
-function transaction(root,changes){
+function transaction(root,changes,expected={}){
  const stage=INSTALL+'/.staging',backups=INSTALL+'/.backups';
  if(fs.existsSync(c.safe(root,stage)))fs.rmSync(c.safe(root,stage),{recursive:true});
+ for(const [dest,hash] of Object.entries(expected))if(treeHash(root,dest)!==hash)throw Error('Destination changed after ownership validation: '+dest);
  const entries=[];let n=0;
  for(const [dest,change] of Object.entries(changes)){
-  const old=treeHash(root,dest),backup=backups+'/'+n,staged=change===null?null:stage+'/'+n;
+  const old=Object.hasOwn(expected,dest)?expected[dest]:treeHash(root,dest),backup=backups+'/'+n,staged=change===null?null:stage+'/'+n;
   if(change!==null){if(typeof change==='string'){const p=c.safe(root,staged);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,change);}else materialize(root,staged,change);}
   const next=staged?treeHash(root,staged):null;
   if(old!==next)entries.push({dest,old,next,backup,staged});n++;
  }
+ for(const [dest,hash] of Object.entries(expected))if(treeHash(root,dest)!==hash)throw Error('Destination changed during staging: '+dest);
  if(!entries.length){fs.rmSync(c.safe(root,stage),{recursive:true,force:true});return;}
  if(fs.existsSync(c.safe(root,backups)))fs.rmSync(c.safe(root,backups),{recursive:true});
  fs.writeFileSync(c.safe(root,INSTALL+'/.journal.json'),c.json({schema:1,entries}));recover(root);
@@ -70,7 +90,7 @@ function transaction(root,changes){
 function locked(root,action){
  const dir=c.safe(root,INSTALL);fs.mkdirSync(dir,{recursive:true});const lock=c.safe(root,INSTALL+'/.install-lock');let fd;
  try{fd=fs.openSync(lock,'wx',0o600);}catch{throw Error('Installation lock exists; inspect PID/host before explicit removal');}
- try{fs.writeFileSync(fd,c.json({pid:process.pid,host:require('node:os').hostname()}));recover(root);return action();}finally{fs.closeSync(fd);fs.unlinkSync(lock);}
+ try{fs.writeFileSync(fd,c.json({pid:process.pid,host:require('node:os').hostname()}));if(fs.existsSync(c.safe(root,'.skill-tree/.writer-lock')))throw Error('Workflow writer lock exists; reach a cleanup/handoff boundary before installation');recover(root);return action();}finally{fs.closeSync(fd);fs.unlinkSync(lock);}
 }
 function bundle(source,flavor){
  const files={};for(const rel of Object.keys(c.sourceInputs(source))){
@@ -82,7 +102,8 @@ function bundle(source,flavor){
  return files;
 }
 function plan(root,source,flavor,selections,options={}){
- const old=receipt(root);if(old)verifyOwned(root,old);
+ const profileBefore=treeHash(root,PROFILE);const old=receipt(root);if(old)verifyOwned(root,old);
+ const workflowBefore=treeHash(root,WORKFLOW);
  if(!old&&fs.existsSync(c.safe(root,INSTALL))&&fs.readdirSync(c.safe(root,INSTALL)).some(name=>name!=='.install-lock'))throw Error('Unowned maintenance directory conflict');
  if(hasActiveOperation(root))throw Error('Active controller must checkpoint at a stopped cleanup/handoff point before installation or refresh');
  if(old)for(const rel of Object.keys(old.destinations))selections.push({rel,provider:old.destinations[rel].provider,name:old.destinations[rel].name});
@@ -94,9 +115,9 @@ function plan(root,source,flavor,selections,options={}){
   const files=built.packages[item.name];if(!files)throw Error('Missing composed operation: '+item.name);
   changes[item.rel]=files;destinations[item.rel]={provider:item.provider,name:item.name,flavor,files:built.output_digests[item.name],identity:c.hash(c.json(built.output_digests[item.name]))};
  }
- const bridges={...(old?.bridges||{})};
+ const bridges={...(old?.bridges||{})},bridgeBefore={};
  for(const rel of new Set([...(options.bridges||[]),...Object.keys(old?.bridges||{})])){
-  const current=c.read(root,rel)||'',existing=bridgeBlock(current);
+  const current=c.read(root,rel)||'',existing=bridgeBlock(current);bridgeBefore[rel]=treeHash(root,rel);
   if(existing&&!old?.bridges[rel])throw Error('Unowned bridge conflict: '+rel);
   const block=BEGIN+'\n'+c.read(source,'src/init-rules/skill-tree-skills.md').trim()+'\nFlavor: '+flavor+'. Profile: `.skill-tree/installation/profile.json`.\n'+END;
   changes[rel]=existing?current.replace(existing,block):current+(current.endsWith('\n')?'\n':'\n\n')+block+'\n';
@@ -107,22 +128,32 @@ function plan(root,source,flavor,selections,options={}){
  for(const rel of Object.keys(old?.bundle_digests||{}))if(!bundle_digests[rel])changes[rel]=null;
  const next={...profile,source_digests:built.source_digests,destinations,bridges,bundle_digests,identity:built.identity};
  changes[PROFILE]=c.json(next);
+ if(old?.identity!==next.identity){const stopped=stoppedWorkflow(root);if(stopped)changes[WORKFLOW]=stopped;}
+ const expected={};
+ for(const rel of Object.keys(changes)){
+  if(old?.destinations[rel])expected[rel]=c.hash(c.json(old.destinations[rel].files));
+  else if(old?.bundle_digests[rel])expected[rel]=c.hash(c.json({'':old.bundle_digests[rel]}));
+  else if(rel===PROFILE)expected[rel]=profileBefore;
+  else if(rel===WORKFLOW)expected[rel]=workflowBefore;
+  else if(Object.hasOwn(bridgeBefore,rel))expected[rel]=bridgeBefore[rel];
+  else expected[rel]=null;
+ }
  const delta=Object.entries(changes).filter(([rel,change])=>{
   const expected=change===null?null:typeof change==='string'?c.hash(c.json({'':c.hash(change)})):c.hash(c.json(Object.fromEntries(Object.entries(change).map(([rel,text])=>[rel,c.hash(text)]))));
   return treeHash(root,rel)!==expected;
  }).map(([rel])=>rel);
- return {profile:next,changes,delta,old};
+ return {profile:next,changes,delta,old,expected};
 }
 function verify(root,source){const p=receipt(root,true);verifyOwned(root,p);const now=c.resolveProfile(source,root,p.flavor);if(c.json(now.inputs)!==c.json(p.inputs)||c.json(now.inventory)!==c.json(p.inventory))throw Error('Profile refresh-required: node .skill-tree/installation/manager.js --refresh-profile');return p;}
 function install(root,source,flavor,selections,options={}){
  if(options.dryRun){const result=plan(root,source,flavor,selections,options);return {profile:result.profile,delta:result.delta,action:'dry-run'};}
- return locked(root,()=>{const result=plan(root,source,flavor,selections,options);transaction(root,result.changes);verify(root,source);return {profile:result.profile,delta:result.delta,action:result.delta.length?'installed':'verified no-op current'};});
+ return locked(root,()=>{const result=plan(root,source,flavor,selections,options);transaction(root,result.changes,result.expected);verify(root,source);return {profile:result.profile,delta:result.delta,action:result.delta.length?'installed':'verified no-op current'};});
 }
 function uninstall(root,selections,options={}){
- function action(){const p=receipt(root,true);verifyOwned(root,p);if(hasActiveOperation(root))throw Error('Active controller must stop before uninstall');const next=JSON.parse(c.json(p)),changes={};
-  for(const item of selections){if(!p.destinations[item.rel])throw Error('Unowned uninstall destination: '+item.rel);changes[item.rel]=null;delete next.destinations[item.rel];}
-  if(options.withInit&&Object.keys(next.destinations).length===0)for(const rel of Object.keys(p.bridges||{})){const current=c.read(root,rel),block=bridgeBlock(current);changes[rel]=current.replace(block,'');delete next.bridges[rel];}
-  changes[PROFILE]=c.json(next);if(!options.dryRun)transaction(root,changes);return {action:options.dryRun?'dry-run uninstall':'removed',profile:next,delta:Object.keys(changes)};
+ function action(){const p=receipt(root,true);verifyOwned(root,p);if(hasActiveOperation(root))throw Error('Active controller must stop before uninstall');const next=JSON.parse(c.json(p)),changes={},expected={};
+  for(const item of selections){if(!p.destinations[item.rel])throw Error('Unowned uninstall destination: '+item.rel);changes[item.rel]=null;expected[item.rel]=c.hash(c.json(p.destinations[item.rel].files));delete next.destinations[item.rel];}
+  if(options.withInit&&Object.keys(next.destinations).length===0)for(const rel of Object.keys(p.bridges||{})){const current=c.read(root,rel),block=bridgeBlock(current);changes[rel]=current.replace(block,'');expected[rel]=treeHash(root,rel);delete next.bridges[rel];}
+  changes[PROFILE]=c.json(next);expected[PROFILE]=treeHash(root,PROFILE);if(!options.dryRun)transaction(root,changes,expected);return {action:options.dryRun?'dry-run uninstall':'removed',profile:next,delta:Object.keys(changes)};
  }
  return options.dryRun?action():locked(root,action);
 }
@@ -130,16 +161,19 @@ function refresh(root,source,dryRun=false){const p=receipt(root,true);return ins
 function rollback(root){return locked(root,()=>{
  const p=receipt(root,true);verifyOwned(root,p);if(hasActiveOperation(root))throw Error('Stop the active controller before rollback');
  const last=c.readJson(root,INSTALL+'/.last-transaction.json',null);if(!last)throw Error('No retained generation for rollback');
- const changes={};
+ const changes={},expected={};
  for(const e of last.entries){
+  if(e.dest===WORKFLOW)continue;
   if(treeHash(root,e.dest)!==e.next)throw Error('Rollback conflicts with current content: '+e.dest);
+  expected[e.dest]=e.next;
   if(e.old===null){changes[e.dest]=null;continue;}
   if(treeHash(root,e.backup)!==e.old)throw Error('Rollback backup is unavailable: '+e.dest);
   const full=c.safe(root,e.backup);
   if(fs.lstatSync(full).isFile())changes[e.dest]=fs.readFileSync(full,'utf8');
   else changes[e.dest]=Object.fromEntries(Object.keys(filesAt(root,e.backup)).map(rel=>[rel,fs.readFileSync(c.safe(root,e.backup+'/'+rel),'utf8')]));
  }
- transaction(root,changes);return {action:'generation rolled back; project dependencies unchanged; verify freshness before admission'};
+ const stopped=stoppedWorkflow(root);if(stopped){changes[WORKFLOW]=stopped;expected[WORKFLOW]=treeHash(root,WORKFLOW);}
+ transaction(root,changes,expected);return {action:'generation rolled back; project dependencies unchanged; verify freshness before admission'};
 });}
 function localMain(root,source,args){
  try{
