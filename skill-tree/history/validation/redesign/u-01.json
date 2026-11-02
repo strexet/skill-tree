@@ -1,0 +1,8 @@
+{
+  "unit": "U-01",
+  "qualification": "source-contract-and-temporary-fixture",
+  "checks": [
+    "npm run validate: pass",
+    "baseline 79 Python and 24 Node checks: pass"
+  ]
+}

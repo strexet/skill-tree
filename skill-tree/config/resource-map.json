@@ -2,8 +2,10 @@
   "skill-tree-add-pending-task": {
     "references": {
       "document-rules.md": "common/references/document-rules.md",
+      "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
@@ -14,7 +16,9 @@
   "skill-tree-create-documents-snapshot": {
     "references": {
       "document-rules.md": "common/references/document-rules.md",
-      "snapshot-rules.md": "common/references/snapshot-rules.md"
+      "installation-profile.md": "common/references/installation-profile.md",
+      "snapshot-rules.md": "common/references/snapshot-rules.md",
+      "validation-policy.md": "common/references/validation-policy.md"
     },
     "scripts": {
       "create-documentation-snapshot.py": "common/scripts/create-documentation-snapshot.py"
@@ -25,10 +29,12 @@
       "document-rules.md": "common/references/document-rules.md",
       "future-workflow.md": "common/references/future-workflow.md",
       "history-retention.md": "common/references/history-retention.md",
+      "installation-profile.md": "common/references/installation-profile.md",
       "orchestration.md": "common/references/orchestration.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "pending-task-intake.md": "common/references/pending-task-intake.md",
       "unity-safety.md": "common/references/unity-safety.md",
+      "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
@@ -41,7 +47,9 @@
       "document-rules.md": "common/references/document-rules.md",
       "future-workflow.md": "common/references/future-workflow.md",
       "history-retention.md": "common/references/history-retention.md",
+      "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
+      "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
@@ -55,7 +63,9 @@
       "document-rules.md": "common/references/document-rules.md",
       "future-workflow.md": "common/references/future-workflow.md",
       "history-retention.md": "common/references/history-retention.md",
+      "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
+      "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
@@ -69,8 +79,10 @@
       "document-rules.md": "common/references/document-rules.md",
       "documentation-output-contract.md": "common/references/documentation-output-contract.md",
       "history-retention.md": "common/references/history-retention.md",
+      "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "repository-discovery-checklist.md": "common/references/repository-discovery-checklist.md",
+      "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
@@ -85,8 +97,10 @@
       "document-rules.md": "common/references/document-rules.md",
       "documentation-output-contract.md": "common/references/documentation-output-contract.md",
       "history-retention.md": "common/references/history-retention.md",
+      "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "repository-discovery-checklist.md": "common/references/repository-discovery-checklist.md",
+      "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
@@ -99,8 +113,10 @@
   "skill-tree-unity-create-documents-snapshot": {
     "references": {
       "document-rules.md": "common/references/document-rules.md",
+      "installation-profile.md": "common/references/installation-profile.md",
       "snapshot-rules.md": "common/references/snapshot-rules.md",
-      "unity-safety.md": "common/references/unity-safety.md"
+      "unity-safety.md": "common/references/unity-safety.md",
+      "validation-policy.md": "common/references/validation-policy.md"
     },
     "scripts": {
       "create-documentation-snapshot.py": "common/scripts/create-documentation-snapshot.py"
@@ -111,8 +127,10 @@
       "document-rules.md": "common/references/document-rules.md",
       "future-workflow.md": "common/references/future-workflow.md",
       "history-retention.md": "common/references/history-retention.md",
+      "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "unity-safety.md": "common/references/unity-safety.md",
+      "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
@@ -126,8 +144,10 @@
       "document-rules.md": "common/references/document-rules.md",
       "future-workflow.md": "common/references/future-workflow.md",
       "history-retention.md": "common/references/history-retention.md",
+      "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "unity-safety.md": "common/references/unity-safety.md",
+      "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
@@ -141,10 +161,12 @@
       "document-rules.md": "common/references/document-rules.md",
       "documentation-output-contract.md": "common/references/documentation-output-contract.md",
       "history-retention.md": "common/references/history-retention.md",
+      "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "repo-init-instructions.md": "documents/repo-init-instructions.md",
       "repository-discovery-checklist.md": "common/references/repository-discovery-checklist.md",
       "unity-safety.md": "common/references/unity-safety.md",
+      "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
@@ -160,10 +182,12 @@
       "document-rules.md": "common/references/document-rules.md",
       "documentation-output-contract.md": "common/references/documentation-output-contract.md",
       "history-retention.md": "common/references/history-retention.md",
+      "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "repo-init-instructions.md": "documents/repo-init-instructions.md",
       "repository-discovery-checklist.md": "common/references/repository-discovery-checklist.md",
       "unity-safety.md": "common/references/unity-safety.md",
+      "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
@@ -178,10 +202,12 @@
       "document-rules.md": "common/references/document-rules.md",
       "future-workflow.md": "common/references/future-workflow.md",
       "history-retention.md": "common/references/history-retention.md",
+      "installation-profile.md": "common/references/installation-profile.md",
       "orchestration.md": "common/references/orchestration.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "pending-task-intake.md": "common/references/pending-task-intake.md",
       "unity-safety.md": "common/references/unity-safety.md",
+      "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {

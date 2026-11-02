@@ -2,9 +2,9 @@
 
 ## Status and scope
 
-Date: 2026-11-02. Status: research and proposed design; implementation remains outside the current request.
+Date: 2026-11-02. Status: approved implementation in progress; intermediate local commits are authorized.
 
-The current deliverable contains repository findings, design decisions, implementation units and acceptance criteria. The current deliverable changes no skill, helper, installer, provider configuration, queue, checkpoint or installed package. The existing `implementation-plan.md` describes the current implementation; the proposed design does not change the existing implementation contract.
+The approved source implementation follows units U-01 through U-08. The implementation checkpoint preserves unit identities and required dependencies. Target migration, live installation and publication remain separate owner actions.
 
 The requested outcomes are:
 
