@@ -32,23 +32,8 @@ Perform authorized validation and review; record individual acceptance results, 
 
 ## Prioritized body
 
-Each prioritized body contains standalone sections with nested observable requirements:
+Small tasks contain Goal, Touch, Validation and Acceptance. Larger tasks include Current behavior, Desired behavior, Discovery allowance, Out of scope, Implementation constraints, Questions and required clarifications, Documentation updates and Risks when substantive. Blocking questions use `[Unresolved - blocks implementation]` and status Blocked pending answers; Ready tasks contain no blocking questions.
 
-```text
-Goal:
-Current behavior:
-Desired behavior:
-Touch:
-Discovery allowance:
-Out of scope:
-Implementation constraints:
-Questions and required clarifications:
-- [Resolved - repository evidence] Confirmed decision with source.
-- [Unresolved - blocks implementation] Missing decision and required context.
-Validation:
-Acceptance:
-Documentation updates:
-Risks:
-```
+Validation owns the structured check plan from [validation policy](validation-policy.md). Each check records a stable ID, profile recipe ID, criterion mapping, relevant source/test paths, parameters, assertion and immediate/boundary timing. Acceptance contains unique observable bullet criteria. No mandatory empty sections or section-count boilerplate exists.
 
-Optional dependencies, data/persistence, platform, diagnostics, failure handling and implementation approaches belong only when task-relevant. Avoid boilerplate and empty sections. Blocked status requires a blocking question; Ready requires no blocking questions. Readiness never grants validation or commit permission.
+Implementation begins through `begin`; awaiting-validation progress resumes checks without implementation. Execute focused Red/Green promptly; `implemented` schedules outstanding boundary evidence. Use `prepare-check` before execution and recover the original attempt when transport is uncertain. Record actual results through `record-check`, then complete only with current passing check receipts. Read-only inspection and intake remain available when profile admission blocks execution. Standalone Implement Next never implements another group member or creates a controller implicitly.

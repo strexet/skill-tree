@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 CORE=Path(__file__).resolve().parents[1]
 def load(name):
@@ -17,6 +18,7 @@ class ManifestValidationTests(unittest.TestCase):
         (self.root/'README.md').write_text('Project entrypoint.\n');(self.root/'AGENTS.md').write_text('Agent entrypoint.\n')
         self.store.future.write_text('# Future Work\n\n## Pending Task Format\n\n## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n')
         self.refresh()
+        admission=patch.object(wf,'admit_profile',return_value={'identity':'synthetic-manifest-fixture'});admission.start();self.addCleanup(admission.stop)
     def refresh(self):
         with self.store.lock():self.store.save(self.store.text(),self.store.load())
     def mutate_manifest(self,change):
@@ -51,7 +53,8 @@ class ManifestValidationTests(unittest.TestCase):
         self.mutate_manifest(lambda data:data['catalog'][0]['resources'].append('README.md'));self.assert_error('escapes package')
     def test_missing_dependency_and_cycle_are_detected_without_starting_run(self):
         p=wf.intake(self.store,{'title':'Main','description':'Implement scoped behavior.','expected_behavior':'The project preserves state.'})
-        body='\n\n'.join(section+':\n- Scoped repository requirement.' for section in wf.SECTIONS)
+        check={'id':'behavior','recipe_id':'static-inspection','criteria':['Scoped repository requirement.'],'sources':['README.md'],'parameters':{},'assertion':'Scoped repository requirement.','timing':'immediate'}
+        body='Goal:\n- Scoped repository requirement.\n\nTouch:\n- README.md\n\nValidation:\n```json\n'+json.dumps({'checks':[check]})+'\n```\n\nAcceptance:\n- Scoped repository requirement.\n'
         receipt=wf.process(self.store,{'selectors':[p['id']],'dispositions':{p['id']:{'status':'promoted','reason':'Bounded task.'}},'tasks':[{'key':'a','title':'Unit A','body':body,'parent_pending_ids':[p['id']]},{'key':'b','title':'Unit B','body':body,'parent_pending_ids':[p['id']]}]})
         ids=receipt['task_keys'];text=wf.rewrite_meta(self.store.text(),ids['a'],{'depends_on':[wf.identity('T')]});self.store.future.write_text(text);self.refresh();self.assert_error('Missing required dependency')
         text=wf.rewrite_meta(self.store.text(),ids['a'],{'depends_on':[ids['b']]});text=wf.rewrite_meta(text,ids['b'],{'depends_on':[ids['a']]});self.store.future.write_text(text);self.refresh();self.assert_error('Dependency cycle')

@@ -13,12 +13,14 @@ class WorkflowStateTests(unittest.TestCase):
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup);self.root=Path(self.temp.name)
         docs=self.root/'.skill-tree/documents';docs.mkdir(parents=True);self.store=wf.Store(self.root)
         self.store.future.write_text('# Future Work\n\n## Pending Task Format\n\nFixed headers precede task bodies.\n\n## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n\n')
+        config=self.store.base/'config';config.mkdir(exist_ok=True);(config/'repository.json').write_text(json.dumps({'schema':1,'role':'source'}))
         (self.root/'source.cs').write_text('Repository source evidence.\n')
         (self.root/'test-report.json').write_text('{"fixture":"behavioral-simulation"}')
     def pending(self,title='Main feature',**kwargs):
         return wf.intake(self.store,{'title':title,'description':'Implement the scoped behavior.','expected_behavior':'The selected behavior preserves isolated state.',**kwargs})
     def body(self):
-        return '\n\n'.join(s+':\n- '+('Preserve isolated state.' if s=='Acceptance' else 'Repository evidence defines the scoped requirement.') for s in wf.SECTIONS)
+        check={'id':'behavior','recipe_id':'static-inspection','criteria':['Preserve isolated state.'],'sources':['source.cs'],'parameters':{},'assertion':'Preserve isolated state.','timing':'immediate'}
+        return 'Goal:\n- Preserve isolated state.\n\nTouch:\n- source.cs\n\nValidation:\n```json\n'+json.dumps({'checks':[check]})+'\n```\n\nAcceptance:\n- Preserve isolated state.\n'
     def promote(self,pending,title=None,**kwargs):
         spec={'title':title or pending['title'],'body':self.body(),'parent_pending_ids':[pending['id']],**kwargs}
         receipt=wf.process(self.store,{'selectors':[pending['id']],'dispositions':{pending['id']:{'status':'promoted','reason':'Research confirms scoped readiness.'}},'tasks':[spec]})
@@ -26,6 +28,10 @@ class WorkflowStateTests(unittest.TestCase):
     def main(self,title='Main feature',priority=100):
         p=self.pending(title,priority=priority);p['title']=title;return self.promote(p)
     def complete(self,task):
+        wf.begin_task(self.store,{'task_id':task['id']})
+        attempt=wf.prepare_check(self.store,{'task_id':task['id'],'check_id':'behavior'})
+        wf.record_check(self.store,{'task_id':task['id'],'check_id':'behavior','attempt_id':attempt['attempt_id'],'result':'pass','classification':'executed-control','actual_lane':'static','environment_identity':attempt['environment_identity'],'assertions':[{'assertion':'Preserve isolated state.','result':'pass'}],'cleanup':'No product process was launched.','evidence':['test-report.json']})
+        wf.mark_implemented(self.store,{'task_id':task['id']})
         return wf.complete(self.store,{'task_id':task['id'],'outcome':'The scoped behavior preserves isolated state.','acceptance':[{'criterion':'Preserve isolated state.','result':'pass','evidence':['test-report.json']}],'source_fingerprints':wf.fingerprints(self.store,['source.cs'])})
     def test_intake_priority_ids_and_minimal_index(self):
         a=self.pending('Normal');b=self.pending('Low',low_priority=True)

@@ -184,6 +184,10 @@ for (const [name, mode] of [["skill-tree-work-through-next", "next"], ["skill-tr
       assert.equal(command("advance").task_id, selected.id);
       const crypto = require("node:crypto");
       const hash = crypto.createHash("sha256").update(fs.readFileSync(path.join(target, "source.cs"))).digest("hex");
+      command("begin", [], {task_id:selected.id});
+      const attempt=command("prepare-check", [], {task_id:selected.id,check_id:"behavior"});
+      command("record-check", [], {task_id:selected.id,check_id:"behavior",attempt_id:attempt.attempt_id,result:"pass",classification:"executed-control",actual_lane:"static",environment_identity:attempt.environment_identity,assertions:[{assertion:"Preserve isolated state.",result:"pass"}],cleanup:"No product process was launched.",evidence:["test-report.json"]});
+      command("implemented", [], {task_id:selected.id});
       command("complete", [], {
         task_id: selected.id,
         outcome: "The fixture preserves isolated state.",

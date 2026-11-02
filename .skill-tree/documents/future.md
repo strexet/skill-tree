@@ -8,56 +8,6 @@ Fixed metadata records task identity and dependency scope.
 
 ## Prioritized Next Changes
 
-### U-05 Persist task progress and validation groups
-
-```yaml
-id: T-98e59352-ec61-46da-bb16-73754fb836fc
-priority: 104
-status: Ready
-parent_pending_ids: ["P-d5ffb35c-ee83-4ba6-9f6b-89f647b869b8"]
-processing_run_id: PR-7e6c556f-e261-441b-bd21-caf2f656050d
-root_task_id: T-98e59352-ec61-46da-bb16-73754fb836fc
-related_task_id: null
-relation: main
-depends_on: ["T-9bada49a-808a-48c5-a5da-ed44b71f00df"]
-```
-
-Goal:
-- Profile admission, immediate checks, bounded groups and stale evidence prevent premature completion.
-
-Current behavior:
-- The baseline uses thirteen source skills and the existing workflow schema.
-
-Desired behavior:
-- Profile admission, immediate checks, bounded groups and stale evidence prevent premature completion.
-
-Touch:
-- Source contracts, helpers, installer, fixtures and current documentation as required by the selected unit.
-
-Discovery allowance:
-- The selected unit follows the approved redesign scope.
-
-Out of scope:
-- Live target installation, publication, Unity execution and existing target migration.
-
-Implementation constraints:
-- The selected unit follows the approved redesign scope.
-
-Questions and required clarifications:
-- [Resolved - owner request] The approved plan authorizes implementation and intermediate local commits.
-
-Validation:
-- Run relevant static and temporary-fixture checks with operation deadlines.
-
-Acceptance:
-- Profile admission, immediate checks, bounded groups and stale evidence prevent premature completion.
-
-Documentation updates:
-- Update current contracts and implementation status.
-
-Risks:
-- Preserve exact task identities, ownership and unrelated content.
-
 ### U-06 Qualify Unity domain contracts
 
 ```yaml
@@ -97,7 +47,26 @@ Questions and required clarifications:
 - [Resolved - owner request] The approved plan authorizes implementation and intermediate local commits.
 
 Validation:
-- Run relevant static and temporary-fixture checks with operation deadlines.
+```json
+{
+  "checks": [
+    {
+      "id": "source-qualification",
+      "recipe_id": "static-inspection",
+      "criteria": [
+        "Concrete pinned Unity recipes preserve EditMode-first feedback, lifecycle isolation and platform evidence limits."
+      ],
+      "sources": [
+        ".skill-tree/common/references/validation-policy.md",
+        ".skill-tree/common/references/installation-profile.md"
+      ],
+      "parameters": {},
+      "assertion": "Concrete pinned Unity recipes preserve EditMode-first feedback, lifecycle isolation and platform evidence limits.",
+      "timing": "immediate"
+    }
+  ]
+}
+```
 
 Acceptance:
 - Concrete pinned Unity recipes preserve EditMode-first feedback, lifecycle isolation and platform evidence limits.
@@ -147,7 +116,26 @@ Questions and required clarifications:
 - [Resolved - owner request] The approved plan authorizes implementation and intermediate local commits.
 
 Validation:
-- Run relevant static and temporary-fixture checks with operation deadlines.
+```json
+{
+  "checks": [
+    {
+      "id": "source-qualification",
+      "recipe_id": "static-inspection",
+      "criteria": [
+        "Concrete Web recipes distinguish unit, API, browser, accessibility and deployment assertions."
+      ],
+      "sources": [
+        ".skill-tree/common/references/validation-policy.md",
+        ".skill-tree/common/references/installation-profile.md"
+      ],
+      "parameters": {},
+      "assertion": "Concrete Web recipes distinguish unit, API, browser, accessibility and deployment assertions.",
+      "timing": "immediate"
+    }
+  ]
+}
+```
 
 Acceptance:
 - Concrete Web recipes distinguish unit, API, browser, accessibility and deployment assertions.
@@ -197,7 +185,26 @@ Questions and required clarifications:
 - [Resolved - owner request] The approved plan authorizes implementation and intermediate local commits.
 
 Validation:
-- Run relevant static and temporary-fixture checks with operation deadlines.
+```json
+{
+  "checks": [
+    {
+      "id": "source-qualification",
+      "recipe_id": "static-inspection",
+      "criteria": [
+        "Controllers, installation and documentation pass source fixtures without product execution."
+      ],
+      "sources": [
+        ".skill-tree/common/references/validation-policy.md",
+        ".skill-tree/common/references/installation-profile.md"
+      ],
+      "parameters": {},
+      "assertion": "Controllers, installation and documentation pass source fixtures without product execution.",
+      "timing": "immediate"
+    }
+  ]
+}
+```
 
 Acceptance:
 - Controllers, installation and documentation pass source fixtures without product execution.

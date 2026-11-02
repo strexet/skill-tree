@@ -47,7 +47,9 @@ Questions and required clarifications:
 - [Unresolved - blocks implementation] Required developer decision.
 
 Validation:
-- Repository evidence defines the scoped requirement.
+```json
+{"checks": [{"id": "behavior", "recipe_id": "static-inspection", "criteria": ["Preserve isolated state."], "sources": ["source.cs"], "parameters": {}, "assertion": "Preserve isolated state.", "timing": "immediate"}]}
+```
 
 Acceptance:
 - Preserve isolated state.

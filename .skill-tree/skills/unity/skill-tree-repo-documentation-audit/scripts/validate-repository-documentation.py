@@ -95,11 +95,12 @@ def validate_manifest(root):
         try:
             store=wf.Store(root);text=store.text();tasks=wf.parse(text)
             state=json.loads(store.state.read_text())
-            if not isinstance(state,dict) or state.get('format')!=wf.FORMAT or 'active_run' not in state:raise wf.WorkflowError('Unsupported checkpoint schema')
+            if not isinstance(state,dict) or state.get('format')!=wf.FORMAT or state.get('schema')!=2 or 'active_run' not in state:raise wf.WorkflowError('Unsupported checkpoint schema')
             if state.get('source_hash')!=wf.digest(text.encode()):errors.append('Queue index source hash is stale')
             if state.get('tasks')!=wf.index(text):errors.append('Queue index differs from task definitions')
             completed={o['task_id'] for o in store.outcomes() if o.get('disposition')=='completed'}
             wf.validate_dependencies(tasks,completed)
+            wf.validate_progress(state,tasks)
             run=state['active_run']
             if run is not None:
                 wf.validate_run(run)

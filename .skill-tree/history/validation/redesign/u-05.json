@@ -1,0 +1,8 @@
+{
+  "unit": "U-05",
+  "qualification": "source-contract-and-temporary-fixture",
+  "checks": [
+    "96 Python and 38 Node checks: pass",
+    "17 progress fixtures cover scoped groups, stale evidence, Red validity, failure classification, admission and completion gates"
+  ]
+}
