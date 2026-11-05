@@ -381,21 +381,43 @@ def intake(store,payload):
         matches=[t for t in tasks if normalized(t['title'])==normalized(payload['title'])]
         if matches: raise WorkflowError('Possible duplicate task; clarify update/reuse before intake: '+matches[0]['id'])
         relation=payload.get('relation','main');priority=payload.get('priority')
+        classification=payload.get('classification')
+        if classification is not None:
+            if not isinstance(classification,dict) or not isinstance(classification.get('kind'),str) or classification['kind'] not in {'defect','other'} or not isinstance(classification.get('reason'),str) or not classification['reason'].strip():
+                raise WorkflowError('Intake classification requires defect/other kind and a semantic reason')
+        defect=classification is not None and classification['kind']=='defect'
+        placement=payload.get('relative_priority')
+        if placement is not None:
+            if priority is not None:raise WorkflowError('Conflicting numeric and relative priorities require owner clarification')
+            if not isinstance(placement,dict) or not isinstance(placement.get('direction'),str) or placement['direction'] not in {'above','below'}:
+                raise WorkflowError('Relative priority requires above/below direction and an exact open task ID')
+            anchors=[task for task in tasks if task['id']==placement.get('task_id')]
+            if len(anchors)!=1:raise WorkflowError('Relative priority requires an exact open task ID')
+            priority=anchors[0]['priority']+(1 if placement['direction']=='above' else -1)
         parent=payload.get('related_task_id');root=payload.get('root_task_id')
+        related_priority=None
         if relation!='main':
             related=resolve(tasks,[parent],'Prioritized Next Changes')[0]
             expected_root=related['root_task_id'] or related['id']
             if root!=expected_root: raise WorkflowError('Finding root does not match direct parent')
             root_task=resolve(tasks,[root],'Prioritized Next Changes')[0]
-            if priority is None: priority=max((t['priority'] for t in tasks),default=100)+1 if relation in {'blocker','subtask'} else root_task['priority']-1
+            related_priority=max((t['priority'] for t in tasks),default=100)+1 if relation in {'blocker','subtask'} else root_task['priority']-1
+        automatic_defect=priority is None and defect and not payload.get('low_priority')
+        if priority is None and defect:
+            priority=25 if payload.get('low_priority') else max((t['priority'] for t in tasks),default=100)+1
+        if priority is None and related_priority is not None:priority=related_priority
         if priority is None: priority=25 if payload.get('low_priority') else 100
         meta={'id':identity('P'),'priority':priority,'status':'Pending','parent_pending_ids':[],'processing_run_id':None,'root_task_id':root,'related_task_id':parent,'relation':relation,'depends_on':[]}
         validate_metadata(meta,'Pending Queue')
         for field in ['description','expected_behavior']:
             if not isinstance(payload.get(field),str) or not payload[field].strip(): raise WorkflowError('Intake requires understood '+field)
         body='Description:\n- '+payload['description']+'\n\nExpected behavior:\n- '+payload['expected_behavior']
+        if classification is not None:
+            body+='\n\nRequest classification:\n- '+classification['kind']+': '+classification['reason']
         for field,label in [('context','Current context'),('source','Source'),('priority_reason','Priority rationale')]:
             if payload.get(field): body+='\n\n'+label+':\n- '+payload[field]
+        if automatic_defect and not payload.get('priority_reason'):
+            body+='\n\nPriority rationale:\n- Defect intake receives the highest open Pending, Prioritized or Backlog priority plus one; an empty queue uses the default-100 baseline.'
         assert_prose(payload['title']+'\n'+body)
         text=insert(text,'Pending Queue',render(payload['title'],meta,body))
         run=state['active_run']

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-pending-intake-boundary.py"
+  ],
+  "returncode": 0,
+  "counts": {
+    "expected": 3,
+    "discovered": 3,
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0
+  },
+  "stdout": "",
+  "stderr": "...\n----------------------------------------------------------------------\nRan 3 tests in 0.205s\n\nOK\n",
+  "strategy": "focused qualification"
+}

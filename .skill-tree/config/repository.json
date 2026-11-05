@@ -1,1 +1,40 @@
-{"role":"source","schema":1}
+{
+  "role": "source",
+  "schema": 1,
+  "recipes": {
+    "pending-boundary-unit": {
+      "lane": "unit",
+      "argv": [
+        "python3",
+        ".skill-tree/tests/test-pending-intake-boundary.py"
+      ],
+      "input_paths": []
+    },
+    "pending-boundary-installation": {
+      "lane": "unit",
+      "argv": [
+        "node",
+        "--test",
+        ".skill-tree/tests/test-pending-boundary-installation.js"
+      ],
+      "input_paths": []
+    },
+    "pending-priority-unit": {
+      "lane": "unit",
+      "argv": [
+        "python3",
+        ".skill-tree/tests/test-pending-priority.py"
+      ],
+      "input_paths": []
+    },
+    "pending-priority-installation": {
+      "lane": "unit",
+      "argv": [
+        "node",
+        "--test",
+        ".skill-tree/tests/test-pending-priority-installation.js"
+      ],
+      "input_paths": []
+    }
+  }
+}

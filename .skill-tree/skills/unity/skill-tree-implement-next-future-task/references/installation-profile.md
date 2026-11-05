@@ -1,6 +1,6 @@
 # Installation Profile
 
-The selected project root receives exactly one flavor: general, web or unity. Eight stable `skill-tree-*` operation names carry common invariants plus selected domain sections. The registry declares section slots and exact resource replacements; owner authorization, selection, checkpoint integrity, truthful evidence and publication boundaries are non-replaceable.
+The selected project root receives exactly one flavor: general, web or unity. Nine stable `skill-tree-*` operation names carry common invariants plus selected domain sections. The registry declares section slots and exact resource replacements; owner authorization, selection, checkpoint integrity, truthful evidence and publication boundaries are non-replaceable.
 
 Composition is deterministic and static. The capability resolver reads configuration as data, records known/absent/ambiguous/unsupported facts and emits concrete applicable recipes. Installation never evaluates project configuration, executes application code, upgrades dependencies or initializes documentation. Missing optional infrastructure does not prevent installation. Unknown essential compatibility produces a clear error.
 

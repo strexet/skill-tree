@@ -1,0 +1,206 @@
+{
+  "schema": 1,
+  "owner_scope": "Reconcile local changes in every worktree, including the existing PR/review-cycle implementation.",
+  "base_branch": "develop",
+  "base_commit": "91eacd9d27342484d9e38b6dc253f36bf5077eb3",
+  "implementation_branch": "codex/pending-intake",
+  "canonical_queue": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "integration": [
+    {
+      "path": ".skill-tree/common/references/pr-review-cycle.md",
+      "status": "included unchanged",
+      "original_sha256": "b23b9c746922a4be7e7ba2423d2d495483ea36fdb5677fd6ff822bc0fbfda5b2",
+      "current_sha256": "b23b9c746922a4be7e7ba2423d2d495483ea36fdb5677fd6ff822bc0fbfda5b2"
+    },
+    {
+      "path": ".skill-tree/common/references/run-workspaces.md",
+      "status": "included unchanged",
+      "original_sha256": "3f31048647a64422397850c9a451a65f56fbc1a6a8c3976ada85c223662f99a0",
+      "current_sha256": "3f31048647a64422397850c9a451a65f56fbc1a6a8c3976ada85c223662f99a0"
+    },
+    {
+      "path": ".skill-tree/common/scripts/pr-review-state.py",
+      "status": "included unchanged",
+      "original_sha256": "1cbe0550c6d1fe8ba300fd41297be3806e256fc73c334dae2d0bda78a0b8923d",
+      "current_sha256": "1cbe0550c6d1fe8ba300fd41297be3806e256fc73c334dae2d0bda78a0b8923d"
+    },
+    {
+      "path": ".skill-tree/common/scripts/run-workspaces.py",
+      "status": "included unchanged",
+      "original_sha256": "af4e8301a5d24e94353f5e805a53718681c46bbc77349039df508b3e38112077",
+      "current_sha256": "af4e8301a5d24e94353f5e805a53718681c46bbc77349039df508b3e38112077"
+    },
+    {
+      "path": ".skill-tree/history/validation/pr-review-cycle/event-ledger-reconciliation.json",
+      "status": "included unchanged",
+      "original_sha256": "36aa230b95cb8456bdfe9e12f14e830bdde0245902f026fd9578f6092941330c",
+      "current_sha256": "36aa230b95cb8456bdfe9e12f14e830bdde0245902f026fd9578f6092941330c"
+    },
+    {
+      "path": ".skill-tree/history/validation/pr-review-cycle/source-final-qualification.json",
+      "status": "included unchanged",
+      "original_sha256": "7adca48c933fdb9bfe2589eb9e6d66e7b4b0d2c4182bfe9ae7f26cba2bd50deb",
+      "current_sha256": "7adca48c933fdb9bfe2589eb9e6d66e7b4b0d2c4182bfe9ae7f26cba2bd50deb"
+    },
+    {
+      "path": ".skill-tree/history/validation/pr-review-cycle/source-qualification.json",
+      "status": "included unchanged",
+      "original_sha256": "5ffb53648d7d5007a1623710350e0747df69a0db2f4e3b7fe1360892ea16689c",
+      "current_sha256": "5ffb53648d7d5007a1623710350e0747df69a0db2f4e3b7fe1360892ea16689c"
+    },
+    {
+      "path": ".skill-tree/history/validation/pr-review-cycle/source-requalification.json",
+      "status": "included unchanged",
+      "original_sha256": "19ff11eb78450a61accf78424b473811c53e9685aadf2b5672200a016f4f6bda",
+      "current_sha256": "19ff11eb78450a61accf78424b473811c53e9685aadf2b5672200a016f4f6bda"
+    },
+    {
+      "path": ".skill-tree/run-evidence/wr-1e1301a8-5850-4291-abb7-a3f03c3470b6/events.json",
+      "status": "included unchanged",
+      "original_sha256": "d1efd07e7c7dac1af20ba48a8b7cd3a72caf0d11e139b3b44b7b45cb0a21acff",
+      "current_sha256": "d1efd07e7c7dac1af20ba48a8b7cd3a72caf0d11e139b3b44b7b45cb0a21acff"
+    },
+    {
+      "path": ".skill-tree/tests/test-completed-dependency-admission.py",
+      "status": "included unchanged",
+      "original_sha256": "2108ded67e1f27354b78e55d349a32a5012990fd2d9d2b0deced6891341c18ec",
+      "current_sha256": "2108ded67e1f27354b78e55d349a32a5012990fd2d9d2b0deced6891341c18ec"
+    },
+    {
+      "path": ".skill-tree/tests/test-pr-review-cycle.py",
+      "status": "included unchanged",
+      "original_sha256": "9e3477588ac856341c370de3ac388a9044c0eec80cc5f3b9db668419b514f5a6",
+      "current_sha256": "9e3477588ac856341c370de3ac388a9044c0eec80cc5f3b9db668419b514f5a6"
+    },
+    {
+      "path": ".skill-tree/tests/test-pr-workspace-installation.js",
+      "status": "reconciled with schema-3 fixes and current intake work",
+      "original_sha256": "68009641e129aec342796b1b90bf573bd16fec96563578b774991665c783025b",
+      "current_sha256": "461c3fb9cd99fb49660680e3fcecdf46e6e9f367f9db2d268ff12598d9a466ed"
+    },
+    {
+      "path": ".skill-tree/tests/test-run-workspaces.py",
+      "status": "reconciled with schema-3 fixes and current intake work",
+      "original_sha256": "7209800ef963c5e19c3bc296c0897a957cd6ca97057cd5a3269d799a89682980",
+      "current_sha256": "b117053816d23fcefefa60497d0fe0b008e60c64ab0ea4f1881e1eb85209ba9e"
+    },
+    {
+      "path": ".skill-tree/tests/test-selected-snapshot.py",
+      "status": "included unchanged",
+      "original_sha256": "61df18f9e5bcafb9c986180d46bbb90b842c28163c34a6f339dc62ebc0527913",
+      "current_sha256": "61df18f9e5bcafb9c986180d46bbb90b842c28163c34a6f339dc62ebc0527913"
+    },
+    {
+      "path": ".skill-tree/common/references/installation-profile.md",
+      "status": "reconciled with schema-3 fixes and current intake work",
+      "original_sha256": "fe30975220c2587a4a15c21091126ad0333d8cba6b84e75c8259d577aa29c106",
+      "current_sha256": "71b43cd88f65f72b3ba9c4662cba8bda377497c9f64b084b9d163bc61e26debe"
+    },
+    {
+      "path": ".skill-tree/common/references/orchestration.md",
+      "status": "included unchanged",
+      "original_sha256": "79313308e0b2f1833ab131ffd2b2c5fed4f18163b26b682f9234b17f285f8ca5",
+      "current_sha256": "79313308e0b2f1833ab131ffd2b2c5fed4f18163b26b682f9234b17f285f8ca5"
+    },
+    {
+      "path": ".skill-tree/common/references/validation-policy.md",
+      "status": "included unchanged",
+      "original_sha256": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+      "current_sha256": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7"
+    },
+    {
+      "path": ".skill-tree/common/references/workflow-metadata.md",
+      "status": "reconciled with schema-3 fixes and current intake work",
+      "original_sha256": "0a90f558c84ba3ff7b0227c2ae6fedfe510fb5bfd835c780b58b9ae3d79c1b3e",
+      "current_sha256": "6c3252f4564cecc532eec5cec4ad30c9373bea8f85e3c698b19308dd83ae7b9d"
+    },
+    {
+      "path": ".skill-tree/common/scripts/validate-repository-documentation.py",
+      "status": "included unchanged",
+      "original_sha256": "a9833b258675765a24de4205f5b87a6e34a90913408e97957582e007c78ba911",
+      "current_sha256": "a9833b258675765a24de4205f5b87a6e34a90913408e97957582e007c78ba911"
+    },
+    {
+      "path": ".skill-tree/common/scripts/workflow-state.py",
+      "status": "reconciled with schema-3 fixes and current intake work",
+      "original_sha256": "3eaad467929d956b5828a42c2e0f9b7b452abf04f3525520e8cddc40b730ffb6",
+      "current_sha256": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47"
+    },
+    {
+      "path": ".skill-tree/config/resource-map.json",
+      "status": "reconciled with schema-3 fixes and current intake work",
+      "original_sha256": "faf33e768cd6ffebb59328fbc076287b199ee5289a56db22ec8a4e48e7fb2c7f",
+      "current_sha256": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e"
+    },
+    {
+      "path": ".skill-tree/documents/implementation-plan.md",
+      "status": "reconciled with schema-3 fixes and current intake work",
+      "original_sha256": "d0b894dd0e3d24238b8af8da7e3994e7af09404cf8951f3ad88999b4a856e13b",
+      "current_sha256": "7a67ad20545035cc13b17eb24524d6080e49c426b3276e2ee65d7e2c2521aa53"
+    },
+    {
+      "path": ".skill-tree/documents/manual-target-update.md",
+      "status": "reconciled with schema-3 fixes and current intake work",
+      "original_sha256": "8b0566e46cc98172f7d09153d0babe3a03efb5f9e75d75ca50913bbe645a5b32",
+      "current_sha256": "8cc8c710cf8d7a0f55659dcbae478d28529f0354bac1a974c317a3534868ccd8"
+    },
+    {
+      "path": ".skill-tree/documents/skill-repository-creation-instructions.md",
+      "status": "included unchanged",
+      "original_sha256": "c1e4c41cde43079187f9cd32e70fb6d5a1c4b5ce089eada3d7a919d4225a5836",
+      "current_sha256": "c1e4c41cde43079187f9cd32e70fb6d5a1c4b5ce089eada3d7a919d4225a5836"
+    },
+    {
+      "path": ".skill-tree/lib/composer.js",
+      "status": "included unchanged",
+      "original_sha256": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec",
+      "current_sha256": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec"
+    },
+    {
+      "path": ".skill-tree/lib/installation.js",
+      "status": "included unchanged",
+      "original_sha256": "cd380f155c2ad21f49f51ca190d73955d3934d820afc35f8764ea0ed85a5d3b5",
+      "current_sha256": "cd380f155c2ad21f49f51ca190d73955d3934d820afc35f8764ea0ed85a5d3b5"
+    },
+    {
+      "path": ".skill-tree/templates/operations.json",
+      "status": "reconciled with schema-3 fixes and current intake work",
+      "original_sha256": "f0e3f0b8668e862f8ef8024cf1257500dacdf11a158dc08cce9aa9fe9c26ff3a",
+      "current_sha256": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91"
+    },
+    {
+      "path": ".skill-tree/tests/readme.md",
+      "status": "included unchanged",
+      "original_sha256": "ba007473756205f2cf17b54067da10a48c102bc0b392b2fd2652479dc488af6a",
+      "current_sha256": "ba007473756205f2cf17b54067da10a48c102bc0b392b2fd2652479dc488af6a"
+    },
+    {
+      "path": ".skill-tree/tests/test-composer.js",
+      "status": "included unchanged",
+      "original_sha256": "bf1f752cf44244b6d45dfee3ab5c4850c27f428214de2e16b746ef02350b0c71",
+      "current_sha256": "bf1f752cf44244b6d45dfee3ab5c4850c27f428214de2e16b746ef02350b0c71"
+    },
+    {
+      "path": ".skill-tree/tests/test-manifest-validation.py",
+      "status": "included unchanged",
+      "original_sha256": "803ad1b0acf6fc01d1dd5cdffed22c37aa6c247c3d277e293d8ec3fe3cf9b413",
+      "current_sha256": "803ad1b0acf6fc01d1dd5cdffed22c37aa6c247c3d277e293d8ec3fe3cf9b413"
+    },
+    {
+      "path": "README.md",
+      "status": "reconciled with schema-3 fixes and current intake work",
+      "original_sha256": "14e6c2c96874db9a7a1ead0c4711fa9f5ba095a424c33d82162f54570ec886bb",
+      "current_sha256": "4f761b6651c75969e0220e8f4646c74b9c5a6b6ddd98573cb4607a7ea78ce7e9"
+    }
+  ],
+  "state_policy": [
+    "The canonical checkout remains the only queue/checkpoint/outcome writer.",
+    "Original PR/review-cycle source and immutable reports remain preserved in the original worktree and in the external backup.",
+    "Generated packages are recomposed from reconciled canonical sources; queue/index files are never copied between branches.",
+    "No source push, live PR operation, force update or history rewrite occurs."
+  ],
+  "qualification": [
+    "Existing PR/review-cycle fixtures join the current source suites.",
+    "Historical qualification reports retain original bytes and do not establish current-source acceptance."
+  ]
+}

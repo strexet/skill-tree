@@ -170,6 +170,15 @@ class RunWorkspaceTests(unittest.TestCase):
         event={'schema':1,'id':wf.identity('E'),'queue_id':registry['queue_id'],'run_id':run['id'],'changes':[{'task_id':task['id'],'before':{'queue':task['queue'],'body':'Conflicting prior definition'},'after':None}],'outcomes':[],'checkpoint_before':run,'checkpoint_after':run}
         with self.assertRaisesRegex(wf.WorkflowError,'canonical task'):wf.replay_events(store,{'schema':1,'queue_id':registry['queue_id'],'run_id':run['id'],'events':[event]})
         self.assertEqual(store.text(),text)
+    def test_git_preflight_uses_the_current_remote_target_and_preserves_dirty_source(self):
+        spec=importlib.util.spec_from_file_location('workspace_pr',CORE/'common/scripts/pr-review-state.py');pr=importlib.util.module_from_spec(spec);spec.loader.exec_module(pr)
+        run=self.start(self.task());path=self.location(run)
+        with self.assertRaisesRegex(pr.ReviewError,'No changes'):pr.preflight(path,{})
+        (path/'source.py').write_text('value = 2\n')
+        with self.assertRaisesRegex(pr.ReviewError,'Dirty worktree'):pr.preflight(path,{})
+        self.call(path,'add','source.py');self.call(path,'commit','-m','Fixture scoped fix')
+        context=pr.preflight(path,{'target_branch':'release/example'})
+        self.assertEqual(context['source_branch'],run['workspace']['branch']);self.assertEqual(context['target_branch'],'release/example');self.assertEqual(context['changed_files'],['source.py'])
     def finish_run(self,run):
         store=wf.Store(self.location(run));tid=run['root_task_id'];wf.begin_task(store,{'task_id':tid})
         (store.source_root/'report.json').write_text('{"assertion":"scoped fixture passed"}')

@@ -1,0 +1,78 @@
+{
+  "checks": [
+    {
+      "command": "npm run sync:check",
+      "result": "pass"
+    },
+    {
+      "command": "npm run validate",
+      "result": "pass"
+    },
+    {
+      "command": "npm run test:py",
+      "failures": 0,
+      "result": "pass",
+      "tests": 179
+    },
+    {
+      "command": "npm run test:node",
+      "failures": 0,
+      "result": "pass",
+      "skipped": 0,
+      "tests": 74
+    },
+    {
+      "command": "node .skill-tree/bin/install.js --list",
+      "result": "pass"
+    },
+    {
+      "command": "node .skill-tree/bin/install.js --dry-run --all --target <temporary-project-root> --flavor general",
+      "result": "pass"
+    },
+    {
+      "command": "sh install.sh --list",
+      "result": "pass"
+    },
+    {
+      "command": "git diff --check",
+      "result": "pass"
+    },
+    {
+      "command": "skill-creator quick_validate.py for general/web/unity PR packages with isolated pinned PyYAML 6.0.2",
+      "result": "pass"
+    }
+  ],
+  "coverage": [
+    "Direct-owner merge defaults, explicit branches, natural forms, negatives, quotes and conflicts.",
+    "Persistent actionable findings, verified fixes, repeat review and changed head/base/target.",
+    "Required CI/approval gates, provider access loss, merge conflict and conditional expected-head argument.",
+    "Existing PR/comment reuse, lost-response recovery, pagination and merged-result observation.",
+    "Distinct run bases/workspaces, atomic task/resource/publication claims and canonical queue routing.",
+    "Dirty/missing worktrees, identity conflicts, reserved-run recovery and explicit schema-2 checkpoint adoption.",
+    "Environment prerequisites without secret reads, isolated mutable directories and runtime resource policy.",
+    "Semantic event export/replay, conflicting updates, portable execution locators and immutable terminal outcomes.",
+    "Installed general/web/unity standalone helpers, profile refresh and exact-worktree controller re-admission.",
+    "Cross-run completed dependency source integration before consumer implementation."
+  ],
+  "limitations": [
+    "Live GitHub/Git-provider qualification remains unexecuted.",
+    "Unity Editor, browser runtime, hosted services, devices and paid services remain unexecuted.",
+    "Connector capability and repository policy discovery remain agent responsibilities; unknown required policies block readiness.",
+    "Provider helpers support GitHub CLI/API primitives; another provider requires equivalent authorized capabilities.",
+    "No Skill Tree source commit, source push, PR creation or live merge occurs in the current scope."
+  ],
+  "qualification": "source, temporary local Git, controlled provider and installed standalone fixtures",
+  "schema": 1,
+  "scope": "PR review cycle and isolated concurrent controller runs",
+  "source_fingerprints": {
+    ".skill-tree/common": "c01d67fbfbb06e3bfe6a43ecbeb08c344baa3ae32fe8f9a917bf69e3744e549f",
+    ".skill-tree/config": "1af80b8513c0797ee77f4549fa9ab4d2e21912d092a584558cee68d4aaa71e3b",
+    ".skill-tree/lib": "fe48617387798b93d98f0c8d11db3b747b10719f3e50670fee38406d5c2ad772",
+    ".skill-tree/templates": "16299c7b125cd81e08ffdb9a65759116acbe63a1ec6ff994d05b45900a20f63c",
+    ".skill-tree/tests": "1caf38dffda1d6e803a2ef56e3ab53d2dd6e4ad3642ca7e7e582bb6e581858f8"
+  },
+  "test_log_digests": {
+    "node": "19ef4d58058e8b475bd4d57c176596d8d219c5ddc5511f6a43954b5b6f2d2e3c",
+    "python": "47ca8a6e29f72eabe2d6d5274767bf82d590eafbad4a0f83fcfb7ac9f1065e30"
+  }
+}

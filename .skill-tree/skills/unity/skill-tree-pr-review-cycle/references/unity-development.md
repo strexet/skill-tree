@@ -1,0 +1,15 @@
+# Unity Development
+
+Use the concrete profile's pinned Editor, UTF, assembly inventory, UI resources and named recipes. Static compatibility is distinct from runner qualification. Preserve package pins, serialized fields, GUIDs and existing architecture. Missing foundational tests require the deduplicated setup intake; a missing optional specialist package supplies no automatic top-priority task or upgrade permission.
+
+Prefer deterministic rules/state transitions with explicit clock, randomness, persistence and service inputs. Keep a minimal behavior-preserving test seam inside the selected change. A broader necessary seam becomes one required researched descendant with exact coupling, blocked assertion and preservation checks; optional architecture work stays deferred. Keep lifecycle adapters small without imposing a DI framework or ScriptableObject rewrite.
+
+UTF EditMode is the executable default for suitable domain/configuration/Editor assertions. UTF PlayMode in Editor covers Awake/OnEnable/Start ordering, frame/coroutine behavior, physics, scenes and runtime bindings through a focused isolated fixture. Player/native/AOT and physical-device assertions require matching build/device scope. A frame-related defect alone never justifies normal-level traversal. EditMode still executes inside an authorized Unity Editor.
+
+Run the profile recipe with an explicit test filter and result/log paths in an authorized matching Editor lifecycle. Parse NUnit XML and logs, require nonzero expected discovery and preserve failures/skips. A successful launch or CLI transport is not a passing test suite. Use deterministic NUnit assertions for domain behavior and bounded UnityTest frame/condition assertions for lifecycle. Never silently omit asynchronous fixtures through incompatible synchronous options.
+
+Reuse one owned Editor/controller per exact checkout; record PID, process start and project identity after a fresh unrelated-Editor preflight. Verify save/service isolation, deadlines and cleanup before runtime checks. Reuse suitable isolated scenes/prefabs, restore static state, event subscriptions, temporary objects and time settings. No save reset, backend call, generated-solution build or package upgrade is implicit.
+
+Warm-Editor iteration preserves lifecycle acceptance. Disabled domain reload requires proven static/event cleanup and separate configuration scope; startup semantics retain a cold-start regression. Focused test assemblies can reduce measured compilation cost, but moving runtime/Editor code requires assembly-dependency and serialization review. No assembly-per-class rule exists.
+
+Performance fixes identify the changed hot path, representative workload and actual allocation/timing/resource assertions. Record first-failure evidence and investigate flakiness instead of retrying until Green. Editor timing never qualifies mobile release performance; development-Player and release-Player results remain distinct. Mutation experiments use authorized isolated UTF/harness execution with guaranteed restoration, never an unrequested generated-solution build.

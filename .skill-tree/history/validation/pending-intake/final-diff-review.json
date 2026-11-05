@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "scope": [
+    "Existing PR/review-cycle implementation and retained qualification evidence",
+    "Pending invocation boundaries and semantic priority policy",
+    "Canonical completed queue and append-only run history"
+  ],
+  "reviewed_sources": [
+    ".skill-tree/common/scripts/workflow-state.py",
+    ".skill-tree/common/scripts/pr-review-state.py",
+    ".skill-tree/common/scripts/validate-repository-documentation.py",
+    ".skill-tree/common/references/pending-task-intake.md",
+    ".skill-tree/config/repository.json",
+    ".skill-tree/config/resource-map.json",
+    ".skill-tree/templates/operations.json",
+    ".skill-tree/tests"
+  ],
+  "findings": [],
+  "corrections": [
+    "Remove the pre-existing trailing whitespace in the preserved PR workspace test."
+  ],
+  "acceptance_evidence_current": true,
+  "qualification": {
+    "python_tests": 223,
+    "node_tests": 83,
+    "source_checks": "passed"
+  },
+  "merge_policy": "Preserve every original branch commit and canonical history record; reconcile the integration tree against the reviewed source snapshot; no push."
+}

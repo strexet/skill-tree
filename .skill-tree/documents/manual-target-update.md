@@ -1,6 +1,6 @@
 # Manual Target Update
 
-The existing target repository requires an explicit owner-selected update after source qualification. No automatic migration, legacy path alias or format converter exists.
+The existing target repository requires an explicit owner-selected update after source qualification. Explicit run-registry setup/adoption supports schema-2 checkpoints and writes schema 3 while preserving task progress and complete run records. No automatic migration, legacy path alias or general format converter exists.
 
 1. Inspect status, owned Skill Tree files/packages, repository rules, queue, checkpoint and history. Stop the controller and preserve a reviewable backup.
 2. Move the owned directory to `.skill-tree/` and update root pointers, commands and narrow ignore entries while preserving unrelated content.
