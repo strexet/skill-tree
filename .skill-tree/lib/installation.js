@@ -39,23 +39,39 @@ function bridgeBlock(text){
  if(a<0||b<a||text.indexOf(BEGIN,a+BEGIN.length)>=0||text.indexOf(END,b+END.length)>=0)throw Error('Ambiguous bridge markers');
  return text.slice(a,b+END.length);
 }
+function queueRoot(root){
+ const result=require('node:child_process').spawnSync('git',['-C',root,'rev-parse','--git-common-dir'],{encoding:'utf8',timeout:5000});
+ if(result.status!==0)return root;
+ const common=path.resolve(root,result.stdout.trim()),locator=path.join(common,'skill-tree-runtime.json');
+ if(!fs.existsSync(locator))return root;
+ const data=JSON.parse(fs.readFileSync(locator,'utf8'));
+ if(data.schema!==1||!data.canonical_root||!fs.existsSync(data.canonical_root))throw Error('Canonical queue locator requires explicit recovery');
+ return data.canonical_root;
+}
 const WORKFLOW='.skill-tree/documents/future.json';
 function workflowState(root){
- const state=c.readJson(root,WORKFLOW,null);if(state===null)return null;
- if(state.format!=='skill-tree-future'||state.schema!==2||!Array.isArray(state.tasks)||!state.task_progress||typeof state.task_progress!=='object'||Array.isArray(state.task_progress)||!(state.active_run===null||state.active_run&&typeof state.active_run==='object'))throw Error('Unsupported workflow schema; use the manual update checklist');
+ const state=c.readJson(queueRoot(root),WORKFLOW,null);if(state===null)return null;
+ if(state.format!=='skill-tree-future'||![2,3].includes(state.schema)||!Array.isArray(state.tasks)||!state.task_progress||typeof state.task_progress!=='object'||Array.isArray(state.task_progress)||!(state.active_run===null||state.active_run&&typeof state.active_run==='object'))throw Error('Unsupported workflow schema; use the manual update checklist');
+ if(state.schema===3&&(!state.run_registry||state.run_registry.schema!==1||!state.run_registry.runs))throw Error('Unsupported multi-run registry; explicit recovery required');
  return state;
+}
+function unfinishedRun(run){
+ if(!run)return false;const delivery=run.delivery||{};
+ return !(delivery.implementation==='completed'&&(['local-result','merged'].includes(delivery.status)||delivery.status==='pr-ready'&&!delivery.authorization?.merge));
 }
 function hasActiveOperation(root){
  const state=workflowState(root);if(!state)return false;
  for(const progress of Object.values(state.task_progress))for(const slot of Object.values(progress.checks||{})){
   const attempt=slot.attempt;if(attempt&&!Object.values(slot.receipts||{}).some(r=>r.attempt_id===attempt.attempt_id)&&slot.result?.attempt_id!==attempt.attempt_id&&slot.red?.attempt_id!==attempt.attempt_id)return true;
  }
- const run=state.active_run;return Boolean(run&&!run.stop_reason&&!['blocked','validate','awaiting-validation','refresh-profile','validation-blocked'].includes(run.phase));
+ const runs=state.run_registry?Object.values(state.run_registry.runs):[state.active_run];return runs.filter(unfinishedRun).some(run=>Boolean(run&&!run.stop_reason&&!['blocked','validate','awaiting-validation','refresh-profile','validation-blocked'].includes(run.phase)));
 }
 function stoppedWorkflow(root){
- const state=workflowState(root);if(!state?.active_run)return null;
- const run=state.active_run;run.profile_refresh_required=true;
- if(!run.stop_reason)run.stop_reason='Installation profile changed; re-admit before continuation';
+ const state=workflowState(root);if(!state||queueRoot(root)!==root)return null;
+ const runs=state.run_registry?Object.values(state.run_registry.runs):[state.active_run];
+ const unfinished=runs.filter(unfinishedRun);if(!unfinished.length)return null;
+ for(const run of unfinished){run.profile_refresh_required=true;
+ if(!run.stop_reason)run.stop_reason='Installation profile changed; re-admit before continuation';}
  return c.json(state);
 }
 function materialize(root,rel,files){const dest=c.safe(root,rel);fs.mkdirSync(dest,{recursive:true});for(const [name,content] of Object.entries(files)){const file=c.safe(root,path.posix.join(rel,name));fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,content);}}
@@ -95,9 +111,11 @@ function transaction(root,changes,expected={},beforeActivate=null){
  fs.writeFileSync(c.safe(root,INSTALL+'/.journal.json'),c.json({schema:1,entries}));recover(root);
 }
 function locked(root,action){
+ const owner=queueRoot(root),barrier=owner!==root?path.join(owner,INSTALL+'/.install-lock'):null;let barrierFd;
+ if(barrier){fs.mkdirSync(path.dirname(barrier),{recursive:true});try{barrierFd=fs.openSync(barrier,'wx',0o600);fs.writeFileSync(barrierFd,c.json({pid:process.pid,host:require('node:os').hostname()}));}catch{throw Error('Canonical installation lock exists');}}
  const dir=c.safe(root,INSTALL);fs.mkdirSync(dir,{recursive:true});const lock=c.safe(root,INSTALL+'/.install-lock');let fd;
- try{fd=fs.openSync(lock,'wx',0o600);}catch{throw Error('Installation lock exists; inspect PID/host before explicit removal');}
- try{fs.writeFileSync(fd,c.json({pid:process.pid,host:require('node:os').hostname()}));if(fs.existsSync(c.safe(root,'.skill-tree/.writer-lock')))throw Error('Workflow writer lock exists; reach a cleanup/handoff boundary before installation');recover(root);return action();}finally{fs.closeSync(fd);fs.unlinkSync(lock);}
+ try{fd=fs.openSync(lock,'wx',0o600);}catch{if(barrier){fs.closeSync(barrierFd);fs.unlinkSync(barrier);}throw Error('Installation lock exists; inspect PID/host before explicit removal');}
+ try{fs.writeFileSync(fd,c.json({pid:process.pid,host:require('node:os').hostname()}));if(fs.existsSync(c.safe(owner,'.skill-tree/.writer-lock')))throw Error('Workflow writer lock exists; reach a cleanup/handoff boundary before installation');recover(root);return action();}finally{fs.closeSync(fd);fs.unlinkSync(lock);if(barrier){fs.closeSync(barrierFd);fs.unlinkSync(barrier);}}
 }
 function bundle(source,flavor){
  const files={};for(const rel of Object.keys(c.sourceInputs(source))){
@@ -155,7 +173,7 @@ function plan(root,source,flavor,selections,options={}){
 function verify(root,source){
  const p=receipt(root,true);verifyOwned(root,p);const bundleSource=c.safe(root,INSTALL+'/source');
  const now=c.resolveProfile(bundleSource,root,p.flavor);
- for(const field of ['inputs','inventory','facts','recipes','gaps','environment_id','execution_bindings'])if(c.json(now[field])!==c.json(p[field]))throw Error('Profile refresh-required or resolved profile mismatch: node .skill-tree/installation/manager.js --refresh-profile');
+ for(const field of ['inputs','inventory','facts','recipes','gaps','environment_id','execution_bindings','worktree_environment'])if(c.json(now[field])!==c.json(p[field]))throw Error('Profile refresh-required or resolved profile mismatch: node .skill-tree/installation/manager.js --refresh-profile');
  if(p.identity!==compositionIdentity(p))throw Error('Composition receipt identity mismatch');
  const generated=c.compose(bundleSource,now,[...new Set(Object.values(p.destinations).map(record=>record.name))]);
  const providers=c.readJson(bundleSource,'config/providers.json').providers;

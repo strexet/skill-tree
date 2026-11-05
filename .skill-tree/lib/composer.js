@@ -43,7 +43,7 @@ function resolveProfile(source,root,flavor) {
  root=fs.realpathSync(root);
  const registry=readJson(source,'config/flavors.json'),rules=readJson(source,'config/capabilities.json');
  if(!registry.flavors[flavor])throw Error('Unknown flavor: '+flavor);
- const fixed=['package.json','package-lock.json','npm-shrinkwrap.json','yarn.lock','pnpm-lock.yaml','bun.lock','bun.lockb','.nvmrc','.node-version','pyproject.toml','pytest.ini','Cargo.toml','ProjectSettings/ProjectVersion.txt','ProjectSettings/EditorSettings.asset','ProjectSettings/ProjectSettings.asset','Packages/manifest.json','Packages/packages-lock.json','.skill-tree/validation-recipes.json'];
+ const fixed=['package.json','package-lock.json','npm-shrinkwrap.json','yarn.lock','pnpm-lock.yaml','bun.lock','bun.lockb','.nvmrc','.node-version','pyproject.toml','pytest.ini','Cargo.toml','ProjectSettings/ProjectVersion.txt','ProjectSettings/EditorSettings.asset','ProjectSettings/ProjectSettings.asset','Packages/manifest.json','Packages/packages-lock.json','.skill-tree/validation-recipes.json','.skill-tree/worktree-profile.json'];
  const discovered=inventory(root,rules.inventory),inputs={};
  for(const rel of [...new Set([...fixed,...discovered])].sort()){inputs[rel]=inputDigest(root,rel);}
  const facts={test_assemblies:[],ui:[]},recipes={},gaps=[];
@@ -106,8 +106,12 @@ function resolveProfile(source,root,flavor) {
   facts.capabilities[id]={state,package:rule.package,version:pkg?.version||null};
   if(['ambiguous','unsupported'].includes(state))gaps.push({key:'unavailable-specialization',capability:id,reason:'The bundled version-specific fixture contract is unavailable; declared commands require owned qualification.'});
  }
- const environment_id=hash(json({flavor,inputs,facts,recipes,execution_bindings}));
- return {format:'skill-tree-profile',schema:1,composer_version:registry.composer_version,flavor,project_root:root,inputs,inventory:discovered,facts,recipes,gaps,environment_id,execution_bindings,qualification:'static compatibility only; product execution unqualified'};
+ const worktree_environment=readJson(root,'.skill-tree/worktree-profile.json',{schema:1,required_files:[],isolated_directories:[],exclusive_resources:[]});
+ if(worktree_environment.schema!==1)throw Error('Unsupported worktree environment declaration');
+ for(const key of ['required_files','isolated_directories'])for(const rel of worktree_environment[key]||[])safe(root,rel);
+ if((worktree_environment.exclusive_resources||[]).some(key=>typeof key!=='string'||!key))throw Error('Explicit runtime resource identities required');
+ const environment_id=hash(json({flavor,inputs,facts,recipes,execution_bindings,worktree_environment}));
+ return {format:'skill-tree-profile',schema:1,composer_version:registry.composer_version,flavor,project_root:root,inputs,inventory:discovered,facts,recipes,gaps,environment_id,execution_bindings,worktree_environment,qualification:'static compatibility only; product execution unqualified'};
 }
 function mergeSections(common,additions,replaceable=[]) {
  const result=common.map(s=>({...s}));
@@ -151,7 +155,7 @@ function compose(source,profile,selected=null) {
   const domainFiles={};for(const [dest,src] of Object.entries(recipe.resources))domainFiles[dest]=read(source,src);
   files=mergeResources(files,domainFiles,recipe.replacements||{});
   for(const item of active){const extra={};for(const [dest,src] of Object.entries(item.resources))extra[dest]=read(source,src);files=mergeResources(files,extra,item.replacements||{});}
-  files['references/project-profile.md']='# Concrete Project Profile\n\nFlavor: '+profile.flavor+'. Static compatibility only; execution remains unqualified.\n\n```json\n'+json({instruction_profile_id:hash(json({flavor:profile.flavor,facts:profile.facts,recipes:profile.recipes,gaps:profile.gaps})),facts:profile.facts,recipes:profile.recipes,gaps:profile.gaps})+'```\n';
+  files['references/project-profile.md']='# Concrete Project Profile\n\nFlavor: '+profile.flavor+'. Static compatibility only; execution remains unqualified.\n\n```json\n'+json({instruction_profile_id:hash(json({flavor:profile.flavor,facts:profile.facts,recipes:profile.recipes,gaps:profile.gaps})),facts:profile.facts,recipes:profile.recipes,gaps:profile.gaps,worktree_environment:profile.worktree_environment})+'```\n';
   files['SKILL.md']='---\nname: '+name+'\ndescription: '+JSON.stringify('['+profile.flavor+'] '+op.description)+'\nlicense: MIT\n---\n\n# '+op.title+'\n\nFlavor: '+profile.flavor+'. Read the [concrete project profile](references/project-profile.md).\n\n'+sections.map(s=>s.text).join('\n\n')+'\n';
   files['agents/openai.yaml']='interface:\n  display_name: '+JSON.stringify(op.title+' ('+profile.flavor+')')+'\n  short_description: '+JSON.stringify(profile.flavor+' Skill Tree workflow')+'\n';
   for(const [rel,content] of Object.entries(files)){if(typeof content!=='string')throw Error('Missing composition resource: '+rel);safe(source,rel);}

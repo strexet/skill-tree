@@ -5,10 +5,12 @@
       "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
     }
@@ -34,10 +36,12 @@
       "orchestration.md": "common/references/orchestration.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
     }
@@ -50,10 +54,12 @@
       "history-retention.md": "common/references/history-retention.md",
       "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
+      "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "run-workspaces.py": "common/scripts/run-workspaces.py",
       "select-prioritized-task.py": "common/scripts/select-prioritized-task.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
@@ -66,10 +72,12 @@
       "history-retention.md": "common/references/history-retention.md",
       "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
+      "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "validate-future-document.py": "common/scripts/validate-future-document.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
@@ -83,10 +91,12 @@
       "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "repository-discovery-checklist.md": "common/references/repository-discovery-checklist.md",
+      "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "validate-future-document.py": "common/scripts/validate-future-document.py",
       "validate-repository-documentation.py": "common/scripts/validate-repository-documentation.py",
@@ -101,10 +111,12 @@
       "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "repository-discovery-checklist.md": "common/references/repository-discovery-checklist.md",
+      "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "validate-future-document.py": "common/scripts/validate-future-document.py",
       "validate-repository-documentation.py": "common/scripts/validate-repository-documentation.py",
@@ -121,10 +133,12 @@
       "orchestration.md": "common/references/orchestration.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
     }

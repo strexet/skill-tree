@@ -2,7 +2,7 @@
 
 ## Work through next
 
-Read rules and manifest; resolve one highest-priority main or explicit prioritized ID/name. Start mode next, recording applicable task-specific execution policy and observed counters. Resume an active checkpoint instead of restarting. Run cycle after each completed iteration to enforce progress. Use advance before each handoff; read only the selected task body and applicable selected-flavor leaf contract.
+Read rules and manifest; resolve one highest-priority main or explicit prioritized ID/name. Start mode next, recording applicable task-specific execution policy and observed counters. Resume an explicitly selected checkpoint instead of restarting. Read [run workspaces](run-workspaces.md) before a new Git controller; explicit workspace setup establishes the canonical queue and schema-3 registry. Each admitted run retains one isolated workspace and atomic task claims. Run cycle after each completed iteration to enforce progress. Use advance before each handoff; read only the selected task body and applicable selected-flavor leaf contract.
 
 Implement through the implementation contract. Capture understood findings with root/direct-parent context; retain Pending IDs. Process exact required Pending IDs before parent resumption. Recursively execute required dependencies by priority. Resume the parent only after dependency outcomes establish completion. Persist acceptance evidence before queue removal. Process captured nonblocking findings once at the end; retain insufficiently understood work and defer implementation. Finish only after the main and required descendants complete.
 

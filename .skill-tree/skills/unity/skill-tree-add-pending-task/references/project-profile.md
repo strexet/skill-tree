@@ -98,6 +98,12 @@ Flavor: unity. Static compatibility only; execution remains unqualified.
       "qualification": "static-recipe; authorized matching Editor and isolated fixture required",
       "utf_version": "1.4.6"
     }
+  },
+  "worktree_environment": {
+    "exclusive_resources": [],
+    "isolated_directories": [],
+    "required_files": [],
+    "schema": 1
   }
 }
 ```

@@ -15,7 +15,7 @@ npm run test:node
 
 Project-scoped copy installation includes owned receipts and a self-contained local profile manager. Static discovery never starts an Editor, server, browser or test suite. Missing test infrastructure remains a deduplicated setup finding. Installation and documentation initialization are separate operations; unknown or modified packages conflict even with `--force`.
 
-Target documentation, schema-2 task progress and controller checkpoints reside in `.skill-tree/documents/`. Structured outcomes and bounded audit/run evidence reside in `.skill-tree/history/`. Focused Red/Green feedback remains immediate; compatible additional boundary checks can share a scoped group. Completion requires current passed check receipts.
+Target documentation and task progress reside in `.skill-tree/documents/`. Schema 2 retains standalone single-run checkpoints; explicit workspace setup creates a schema-3 registry for isolated controllers sharing one canonical queue. Structured outcomes and bounded audit/run evidence reside in `.skill-tree/history/`. Focused Red/Green feedback remains immediate; compatible additional boundary checks can share a scoped group. Completion requires current passed check receipts.
 
 Standalone Process Pending reports the prioritized list and waits for developer selection, with one recommendation last. Explicit Work Through Next and Implement All controllers continue through eligible required work inside the recorded scope. A checkpoint, profile or installed flavor supplies no independent execution, continuation, commit or publication permission.
 

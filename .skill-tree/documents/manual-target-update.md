@@ -5,7 +5,7 @@ The existing target repository requires an explicit owner-selected update after 
 1. Inspect status, owned Skill Tree files/packages, repository rules, queue, checkpoint and history. Stop the controller and preserve a reviewable backup.
 2. Move the owned directory to `.skill-tree/` and update root pointers, commands and narrow ignore entries while preserving unrelated content.
 3. Review exact superseded packages and marker blocks. Packages without receipts require manual ownership review; `--force` never adopts legacy content. Install the selected project-scoped flavor and verify the receipt and output inventories.
-4. Adapt the queue/index/checkpoint manually to schema 2 and the structured check contract. Preserve task/run IDs, required/deferred scope, outstanding acceptance, stop reasons and next action. Reconcile unsupported state explicitly; never reset progress merely to pass validation.
+4. Preserve the supported checkpoint schema and structured check contract. Schema 2 retains the standalone single-run interface; schema 3 retains the canonical queue registry, complete run records, claims and event history. Explicit workspace setup owns adoption into a registered controller. Preserve task/run IDs, required/deferred scope, outstanding acceptance, stop reasons and next action. Reconcile unsupported state explicitly; never reset progress or downgrade a registry merely to pass validation.
 5. Preserve original history receipts/evidence bytes. Record relocated-reference mapping and honest stale/unavailable evidence in an update note; rebuild derived navigation/index data.
 6. Run metadata/package/source checks, review the diff and report the preserved next action. Product execution and controller continuation require applicable owner scope.
 
