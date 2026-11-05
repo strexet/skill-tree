@@ -44,6 +44,8 @@ def validate_manifest(root):
         seen.add(path)
         if item['role']=='canonical':canonical.add(path)
     if set(data['source_digests'])!=canonical:errors.append('Manifest source digests do not cover canonical files')
+    owned_documents={p.relative_to(root).as_posix() for p in (root/'.skill-tree/documents').rglob('*') if p.is_file() and not p.is_symlink() and '__pycache__' not in p.parts and p.name!='.DS_Store'}
+    if not owned_documents.issubset(seen):errors.append('Owned documentation coverage is stale; refresh the manifest')
     for path,expected in data['source_digests'].items():
         target=portable(path,'source_digests')
         if not isinstance(expected,str) or not re.fullmatch(r'[a-f0-9]{64}',expected):errors.append('Invalid source digest: '+path)
@@ -125,7 +127,8 @@ def validate(root,strict=False):
     result=validate_manifest(root);errors+=result['errors'];warnings+=result['warnings']
     if strict:
         rules=load('validate-document-rules')
-        for path in sorted(docs.glob('*.md')):errors+=rules.check(path,warnings_as_errors=True)
+        for path in sorted(docs.rglob('*.md')):
+            if not path.is_symlink():errors+=rules.check(path,warnings_as_errors=True)
     return {'ok':not errors,'errors':errors,'warnings':warnings}
 
 def main(argv=None):

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-pending-priority.py"
+  ],
+  "returncode": 0,
+  "counts": {
+    "expected": 13,
+    "discovered": 13,
+    "passed": 13,
+    "failed": 0,
+    "skipped": 0
+  },
+  "stdout": "",
+  "stderr": ".............\n----------------------------------------------------------------------\nRan 13 tests in 0.482s\n\nOK\n",
+  "strategy": "focused qualification"
+}

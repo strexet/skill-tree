@@ -4,6 +4,8 @@
 
 Pending Queue contains understood intake awaiting research. Prioritized Next Changes contains researched executable tasks. Backlog contains deferred issues and investigations. The agent never selects implementation work from Pending Queue or Backlog.
 
+Add Pending preserves imperatives and conditional branches in the future task description without executing the described operations. A separate explicit owner instruction to capture, process and implement supplies the subsequent workflow scope. The [intake contract](pending-task-intake.md) owns the distinction; descriptive verbs and helper source text never independently activate a controller.
+
 ## Process Pending
 
 Resolve optional Pending IDs or exact normalized names before mutation; no input selects the Pending Queue. Absent/ambiguous selections stop without fallback. Read repository rules, document map, relevant current documentation, implementation, configuration, assets/data, tests and source history when needed. Never process from future.md alone.

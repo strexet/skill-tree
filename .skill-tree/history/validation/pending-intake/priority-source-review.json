@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "review_kind": "semantic classification contract, deterministic helper and source qualification",
+  "findings": [
+    {
+      "scope": "semantic inputs",
+      "result": "pass",
+      "observation": "The agent classifies original request meaning before translation, handles English/Russian defect terms and issuee, and excludes negations and new issue/bug-classifier features. The helper validates a defect/other decision with a reason and retains provenance in the Pending body."
+    },
+    {
+      "scope": "priority and explicit overrides",
+      "result": "pass",
+      "observation": "The helper uses all parsed open queues, includes blocked tasks, ignores terminal history, uses default 100 only for an empty maximum, and honors explicit numeric/relative/low defect priority."
+    },
+    {
+      "scope": "compatibility and state",
+      "result": "pass",
+      "observation": "Existing programmatic payloads retain previous defaults; classified ordinary requests retain relationship rules. Invalid decisions/relative conflicts fail before writes. Installed packages execute independently across all flavors."
+    },
+    {
+      "scope": "test-oracle correction",
+      "result": "pass",
+      "observation": "Early synthetic prioritized fixtures lacked required provenance and structured task sections. Corrected fixtures establish a controlled baseline with 10 behavioral failures and zero fixture errors, followed by 13 passing tests."
+    }
+  ],
+  "qualification_report": ".skill-tree/history/validation/pending-intake/priority-qualification-final.json",
+  "limitations": [
+    "Semantic interpretation remains an agent responsibility; deterministic fixtures do not establish actual agent/model adherence.",
+    "No live Git provider publication, product, Figma or paid-model operation ran."
+  ]
+}

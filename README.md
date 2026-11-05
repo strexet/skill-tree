@@ -1,6 +1,6 @@
 # Skill Tree
 
-Skill Tree provides eight portable operations for repository documentation, intake, research, implementation and resumable orchestration. One project-scoped installation selects general, web or unity. Common contracts and concrete project capabilities compose into standalone packages with stable `skill-tree-*` names.
+Skill Tree provides nine portable operations for repository documentation, intake, research, implementation and resumable orchestration. One project-scoped installation selects general, web or unity. Common contracts and concrete project capabilities compose into standalone packages with stable `skill-tree-*` names.
 
 [Installation](.skill-tree/documents/install.md) · [Validation](.skill-tree/common/references/validation-policy.md) · [Workflow](.skill-tree/common/references/future-workflow.md) · [Metadata](.skill-tree/common/references/workflow-metadata.md) · [Source manifest](.skill-tree/skill-tree.json) · [Conformance audit](.skill-tree/documents/workflow-redesign-conformance.md)
 
@@ -20,3 +20,5 @@ Target documentation and task progress reside in `.skill-tree/documents/`. Schem
 Standalone Process Pending reports the prioritized list and waits for developer selection, with one recommendation last. Explicit Work Through Next and Implement All controllers continue through eligible required work inside the recorded scope. A checkpoint, profile or installed flavor supplies no independent execution, continuation, commit or publication permission.
 
 Source fixtures qualify deterministic helper/composer/installer behavior. Unity, browser, hosted/provider, device and actual agent-behavior qualification remain separate evidence boundaries. [Manual target update](.skill-tree/documents/manual-target-update.md) preserves the existing repository's identities and history without an automatic converter.
+
+The [PR review cycle](.skill-tree/common/references/pr-review-cycle.md) supports a current source branch, a default develop target and merge disabled unless explicitly authorized. [Run workspaces](.skill-tree/common/references/run-workspaces.md) bind concurrent controller runs to isolated branches/worktrees and one canonical task queue. Explicit setup/adoption preserves supported checkpoints; semantic run-event envelopes carry scoped queue and completion changes without overwriting concurrent updates.

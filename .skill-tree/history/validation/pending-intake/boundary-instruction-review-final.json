@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "review_kind": "source and scenario review",
+  "sources": [
+    ".skill-tree/common/references/pending-task-intake.md",
+    ".skill-tree/templates/operations.json",
+    ".skill-tree/common/references/future-workflow.md"
+  ],
+  "cases": [
+    {
+      "request": "Add Pending: find the corresponding Figma node; stop/report when absent; implement and fix the current version when found.",
+      "expected": "Capture node lookup and both conditional branches without executing the described operations.",
+      "observation": "The canonical intake contract names every branch, the entry point routes to the contract, and helper characterization preserves description/expected behavior with Pending-only state."
+    },
+    {
+      "request": "Create Pending, then process and implement the task.",
+      "expected": "Capture first, then the caller invokes the explicitly requested workflow under current selection/authorization policies.",
+      "observation": "The contract distinguishes the separate owner instruction from embedded task verbs; the helper remains a metadata-only operation."
+    },
+    {
+      "request": "Add Pending with missing material subject, change or outcome.",
+      "expected": "Ask the necessary understanding question before insertion.",
+      "observation": "The entry point and intake contract retain material clarification and duplicate checks without asking whether clear intake-only work should start implementation."
+    }
+  ],
+  "limitations": [
+    "Source review and deterministic fixtures do not establish actual agent/model adherence.",
+    "No live Figma, provider, product or paid-model operation ran."
+  ],
+  "revalidation": "The current final canonical intake contract, Add Pending entry point and subsequent-workflow boundary were re-read after semantic priority integration. Conditional task actions remain future requirements; the new classification/priority policy supplies no execution authorization."
+}

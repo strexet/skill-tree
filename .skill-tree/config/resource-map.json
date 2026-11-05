@@ -36,11 +36,13 @@
       "orchestration.md": "common/references/orchestration.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "pr-review-cycle.md": "common/references/pr-review-cycle.md",
       "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "pr-review-state.py": "common/scripts/pr-review-state.py",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
@@ -54,6 +56,7 @@
       "history-retention.md": "common/references/history-retention.md",
       "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
+      "pending-task-intake.md": "common/references/pending-task-intake.md",
       "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
@@ -72,6 +75,7 @@
       "history-retention.md": "common/references/history-retention.md",
       "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
+      "pending-task-intake.md": "common/references/pending-task-intake.md",
       "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
@@ -90,6 +94,7 @@
       "history-retention.md": "common/references/history-retention.md",
       "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
+      "pending-task-intake.md": "common/references/pending-task-intake.md",
       "repository-discovery-checklist.md": "common/references/repository-discovery-checklist.md",
       "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
@@ -110,6 +115,7 @@
       "history-retention.md": "common/references/history-retention.md",
       "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
+      "pending-task-intake.md": "common/references/pending-task-intake.md",
       "repository-discovery-checklist.md": "common/references/repository-discovery-checklist.md",
       "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
@@ -133,11 +139,30 @@
       "orchestration.md": "common/references/orchestration.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "pr-review-cycle.md": "common/references/pr-review-cycle.md",
       "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "pr-review-state.py": "common/scripts/pr-review-state.py",
+      "run-workspaces.py": "common/scripts/run-workspaces.py",
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
+  },
+  "skill-tree-pr-review-cycle": {
+    "references": {
+      "document-rules.md": "common/references/document-rules.md",
+      "installation-profile.md": "common/references/installation-profile.md",
+      "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "pr-review-cycle.md": "common/references/pr-review-cycle.md",
+      "run-workspaces.md": "common/references/run-workspaces.md",
+      "validation-policy.md": "common/references/validation-policy.md",
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
+    },
+    "scripts": {
+      "pr-review-state.py": "common/scripts/pr-review-state.py",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "workflow-state.py": "common/scripts/workflow-state.py"

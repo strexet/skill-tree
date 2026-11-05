@@ -1,0 +1,83 @@
+{
+  "checks": [
+    {
+      "command": "npm run sync:check",
+      "result": "pass"
+    },
+    {
+      "command": "npm run validate",
+      "result": "pass"
+    },
+    {
+      "command": "npm run test:py",
+      "failures": 0,
+      "result": "pass",
+      "tests": 181
+    },
+    {
+      "command": "npm run test:node",
+      "failures": 0,
+      "result": "pass",
+      "skipped": 0,
+      "tests": 74
+    },
+    {
+      "command": "node .skill-tree/bin/install.js --list",
+      "result": "pass"
+    },
+    {
+      "command": "node .skill-tree/bin/install.js --dry-run --all --target <temporary-project-root> --flavor general",
+      "result": "pass"
+    },
+    {
+      "command": "sh install.sh --list",
+      "result": "pass"
+    },
+    {
+      "command": "git diff --check",
+      "result": "pass"
+    },
+    {
+      "command": "skill-creator quick_validate.py for general/web/unity PR packages with isolated pinned PyYAML 6.0.2",
+      "result": "pass"
+    }
+  ],
+  "coverage": [
+    "Direct-owner merge defaults, explicit branches, natural forms, negatives, quotes and conflicts.",
+    "Persistent actionable findings, verified fixes, repeat review and changed head/base/target.",
+    "Required CI/approval gates, provider access loss, merge conflict and conditional expected-head argument.",
+    "Existing PR/comment reuse, lost-response recovery, pagination and merged-result observation.",
+    "Distinct run bases/workspaces, atomic task/resource/publication claims and canonical queue routing.",
+    "Dirty/missing worktrees, identity conflicts, reserved-run recovery and explicit schema-2 checkpoint adoption.",
+    "Environment prerequisites without secret reads, isolated mutable directories and runtime resource policy.",
+    "Semantic event export/replay, conflicting updates, portable execution locators and immutable terminal outcomes.",
+    "Installed general/web/unity standalone helpers, profile refresh and exact-worktree controller re-admission.",
+    "Cross-run completed dependency source integration before consumer implementation.",
+    "Pending check attempts export as owned progress deltas and replay without losing original attempt identities.",
+    "Completed run registries permit profile refresh without resetting terminal checkpoints.",
+    "PR readiness and merged status require concrete provider PR identity; remote endpoints use opaque digests.",
+    "Adopted transport settings remain opaque in portable event envelopes; canonical replay preserves applied-event identity."
+  ],
+  "limitations": [
+    "Live GitHub/Git-provider qualification remains unexecuted.",
+    "Unity Editor, browser runtime, hosted services, devices and paid services remain unexecuted.",
+    "Connector capability and repository policy discovery remain agent responsibilities; unknown required policies block readiness.",
+    "Provider helpers support GitHub CLI/API primitives; another provider requires equivalent authorized capabilities.",
+    "No Skill Tree source commit, source push, PR creation or live merge occurs in the current scope."
+  ],
+  "prior_report": ".skill-tree/history/validation/pr-review-cycle/source-requalification.json",
+  "qualification": "Accepted final source and installed standalone fixture qualification",
+  "schema": 1,
+  "scope": "PR review cycle and isolated concurrent controller runs",
+  "source_fingerprints": {
+    ".skill-tree/common": "019f7473e9a2c574fffc1db2ad3e219453758988127906ace44fb9c8f7532a00",
+    ".skill-tree/config": "1af80b8513c0797ee77f4549fa9ab4d2e21912d092a584558cee68d4aaa71e3b",
+    ".skill-tree/lib": "daf82cb41edfa215c01f472fe25489e728100aba63945bdbab254e50307a7657",
+    ".skill-tree/templates": "16299c7b125cd81e08ffdb9a65759116acbe63a1ec6ff994d05b45900a20f63c",
+    ".skill-tree/tests": "9c8eb775e39d03b263fde8089cfdc6f7fa82155507ef6108fd091914842f8d36"
+  },
+  "test_log_digests": {
+    "node": "2ca5e62fedbed5444fddc3d2eca308636f2f32ef3f6071589fe205b37aa97da5",
+    "python": "203aac64b7a1c26b0b1dfb11c50a2d88713acf8dade0e80ff29b41859ff13c2b"
+  }
+}

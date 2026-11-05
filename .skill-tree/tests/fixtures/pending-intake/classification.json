@@ -1,0 +1,12 @@
+[
+  {"request":"Fix the bug: saving loses the last edit.","kind":"defect"},
+  {"request":"There is an issuee: the runner crashes on an empty queue.","kind":"defect"},
+  {"request":"Critical problem: every login fails.","kind":"defect"},
+  {"request":"Исправь баг: кнопка сохранения не работает.","kind":"defect"},
+  {"request":"Ошибка: очередь теряет задачу при повторном запуске.","kind":"defect"},
+  {"request":"Дефект: после перезапуска пропадает результат.","kind":"defect"},
+  {"request":"Add a new export format.","kind":"other"},
+  {"request":"There is no bug; add an issue management screen.","kind":"other"},
+  {"request":"Добавь классификатор багов с поддержкой слова issuee.","kind":"other"},
+  {"request":"Add a critical-problem label to the issue tracker.","kind":"other"}
+]
