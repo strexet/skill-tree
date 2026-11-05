@@ -665,7 +665,280 @@
     "schema": 1
   },
   "schema": 3,
-  "source_hash": "05a1f55b7a7202ce1a56bb01919c016110a355ca8de0fe746183d6e62853e634",
+  "source_hash": "512b46098a7b280b0783362b2f68c378d10621733cb9587a01f121b9c8d65024",
   "task_progress": {},
-  "tasks": []
+  "tasks": [
+    {
+      "depends_on": [],
+      "id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "line": 11,
+      "parent_pending_ids": [
+        "P-e5de6bf4-99d6-481e-b158-7d302efde259"
+      ],
+      "priority": 131,
+      "processing_run_id": "PR-595a7e56-0da2-4b81-afc6-f5cff249c1e2",
+      "queue": "Prioritized Next Changes",
+      "related_task_id": null,
+      "relation": "main",
+      "root_task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "status": "Ready",
+      "title": "Define the shared iterative task clarification protocol"
+    },
+    {
+      "depends_on": [],
+      "id": "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "line": 85,
+      "parent_pending_ids": [
+        "P-97789c00-ffd4-450f-a0ca-8cd5fd68f8de"
+      ],
+      "priority": 130,
+      "processing_run_id": "PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45",
+      "queue": "Prioritized Next Changes",
+      "related_task_id": null,
+      "relation": "main",
+      "root_task_id": "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "status": "Ready",
+      "title": "Define the external skill plugin contract"
+    },
+    {
+      "depends_on": [
+        "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa"
+      ],
+      "id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "line": 164,
+      "parent_pending_ids": [
+        "P-e5de6bf4-99d6-481e-b158-7d302efde259"
+      ],
+      "priority": 128,
+      "processing_run_id": "PR-595a7e56-0da2-4b81-afc6-f5cff249c1e2",
+      "queue": "Prioritized Next Changes",
+      "related_task_id": null,
+      "relation": "main",
+      "root_task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "status": "Ready",
+      "title": "Implement explicit task clarification rounds and guarded revisions"
+    },
+    {
+      "depends_on": [],
+      "id": "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "line": 292,
+      "parent_pending_ids": [
+        "P-3f7df14a-88b7-48c8-ac14-eaef552d08aa"
+      ],
+      "priority": 125,
+      "processing_run_id": "PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45",
+      "queue": "Prioritized Next Changes",
+      "related_task_id": null,
+      "relation": "main",
+      "root_task_id": "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "status": "Ready",
+      "title": "Build a dated evidence map of the external skill market"
+    },
+    {
+      "depends_on": [],
+      "id": "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "line": 360,
+      "parent_pending_ids": [
+        "P-8f13728d-b0df-4097-afa3-677e7dc939b5"
+      ],
+      "priority": 124,
+      "processing_run_id": "PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45",
+      "queue": "Prioritized Next Changes",
+      "related_task_id": null,
+      "relation": "main",
+      "root_task_id": "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "status": "Ready",
+      "title": "Discuss and agree workflow extension decisions with the owner"
+    },
+    {
+      "depends_on": [
+        "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc"
+      ],
+      "id": "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "line": 437,
+      "parent_pending_ids": [
+        "P-14584d76-6e8b-418a-b04b-8de586f10f0a"
+      ],
+      "priority": 123,
+      "processing_run_id": "PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45",
+      "queue": "Prioritized Next Changes",
+      "related_task_id": null,
+      "relation": "main",
+      "root_task_id": "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "status": "Ready",
+      "title": "Specify plugin selection and consent behavior for installation"
+    },
+    {
+      "depends_on": [
+        "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+        "T-2da07d09-0b1a-4407-b375-defd23720387"
+      ],
+      "id": "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "line": 510,
+      "parent_pending_ids": [
+        "P-97789c00-ffd4-450f-a0ca-8cd5fd68f8de"
+      ],
+      "priority": 120,
+      "processing_run_id": "PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45",
+      "queue": "Prioritized Next Changes",
+      "related_task_id": null,
+      "relation": "main",
+      "root_task_id": "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "status": "Ready",
+      "title": "Implement pinned external plugin package lifecycle"
+    },
+    {
+      "depends_on": [
+        "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5"
+      ],
+      "id": "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "line": 589,
+      "parent_pending_ids": [
+        "P-97789c00-ffd4-450f-a0ca-8cd5fd68f8de"
+      ],
+      "priority": 119,
+      "processing_run_id": "PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45",
+      "queue": "Prioritized Next Changes",
+      "related_task_id": null,
+      "relation": "main",
+      "root_task_id": "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "status": "Ready",
+      "title": "Compose selected plugin hooks into standalone operations"
+    },
+    {
+      "depends_on": [
+        "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+      ],
+      "id": "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "line": 664,
+      "parent_pending_ids": [
+        "P-97789c00-ffd4-450f-a0ca-8cd5fd68f8de"
+      ],
+      "priority": 118,
+      "processing_run_id": "PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45",
+      "queue": "Prioritized Next Changes",
+      "related_task_id": null,
+      "relation": "main",
+      "root_task_id": "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "status": "Ready",
+      "title": "Implement resumable plugin invocation and result receipts"
+    },
+    {
+      "depends_on": [
+        "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5"
+      ],
+      "id": "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "line": 762,
+      "parent_pending_ids": [
+        "P-50c04dfb-3cb6-4531-ae04-bd24bb232671"
+      ],
+      "priority": 117,
+      "processing_run_id": "PR-5420f7ac-ede8-4a34-bac5-a7d84f405fff",
+      "queue": "Prioritized Next Changes",
+      "related_task_id": null,
+      "relation": "main",
+      "root_task_id": "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "status": "Ready",
+      "title": "Expose the installed plugin registry and exact-ID removal"
+    },
+    {
+      "depends_on": [
+        "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+      ],
+      "id": "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "line": 840,
+      "parent_pending_ids": [
+        "P-468bf390-905d-43c5-a161-604eb1a41244"
+      ],
+      "priority": 116,
+      "processing_run_id": "PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45",
+      "queue": "Prioritized Next Changes",
+      "related_task_id": null,
+      "relation": "main",
+      "root_task_id": "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "status": "Ready",
+      "title": "Integrate the pinned development-mode review pilot"
+    },
+    {
+      "depends_on": [
+        "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+        "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+      ],
+      "id": "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "line": 918,
+      "parent_pending_ids": [
+        "P-c9ec2d76-0e74-46cd-afd4-ce3f46a7a60b",
+        "P-e5de6bf4-99d6-481e-b158-7d302efde259"
+      ],
+      "priority": 115,
+      "processing_run_id": "PR-595a7e56-0da2-4b81-afc6-f5cff249c1e2",
+      "queue": "Prioritized Next Changes",
+      "related_task_id": null,
+      "relation": "main",
+      "root_task_id": "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "status": "Ready",
+      "title": "Integrate post-processing interviews and task rework"
+    },
+    {
+      "depends_on": [
+        "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+        "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+      ],
+      "id": "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "line": 994,
+      "parent_pending_ids": [
+        "P-3f7df14a-88b7-48c8-ac14-eaef552d08aa"
+      ],
+      "priority": 114,
+      "processing_run_id": "PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45",
+      "queue": "Prioritized Next Changes",
+      "related_task_id": null,
+      "relation": "main",
+      "root_task_id": "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "status": "Ready",
+      "title": "Qualify shortlisted plugins against workflow baselines"
+    },
+    {
+      "depends_on": [
+        "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+        "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5"
+      ],
+      "id": "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "line": 1064,
+      "parent_pending_ids": [
+        "P-336855cb-5271-40b9-a142-95ed6102889b"
+      ],
+      "priority": 112,
+      "processing_run_id": "PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45",
+      "queue": "Prioritized Next Changes",
+      "related_task_id": null,
+      "relation": "main",
+      "root_task_id": "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "status": "Ready",
+      "title": "Implement the workflow-grouped catalog and evidence-backed bundles"
+    },
+    {
+      "depends_on": [
+        "T-2da07d09-0b1a-4407-b375-defd23720387",
+        "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+        "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+        "T-10528edd-4542-4c26-b8b3-738ffc00d791"
+      ],
+      "id": "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "line": 1136,
+      "parent_pending_ids": [
+        "P-14584d76-6e8b-418a-b04b-8de586f10f0a"
+      ],
+      "priority": 110,
+      "processing_run_id": "PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45",
+      "queue": "Prioritized Next Changes",
+      "related_task_id": null,
+      "relation": "main",
+      "root_task_id": "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "status": "Ready",
+      "title": "Implement confirmed recommended and alternative plugin installation"
+    }
+  ]
 }

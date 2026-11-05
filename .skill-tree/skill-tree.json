@@ -752,6 +752,16 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/documents/plugin-system-research.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/documents/plugin-workflow-decisions.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/documents/project.md",
       "role": "canonical"
     },
@@ -1131,11 +1141,13 @@
     ".skill-tree/documents/build-and-release.md": "074d815d75579dc6e11dfd76f8f844d3c672bc6e990bbd3b6a6c6c3b79db1af0",
     ".skill-tree/documents/dependencies.md": "e524d1d314d8c443e000260860e71fca6db4bd6938e86cb7443379a6fb2db4f3",
     ".skill-tree/documents/features.md": "25e2fa6c9ce949587ff16be6dad4be73d0ee61f6d6c19c1a283bc6e0b07525ae",
-    ".skill-tree/documents/future.md": "05a1f55b7a7202ce1a56bb01919c016110a355ca8de0fe746183d6e62853e634",
+    ".skill-tree/documents/future.md": "512b46098a7b280b0783362b2f68c378d10621733cb9587a01f121b9c8d65024",
     ".skill-tree/documents/implementation-plan.md": "0aafa416d440cea5400dcad4c9ddb7b2d80bc1482193a1a7b74c92628fcd7ad9",
     ".skill-tree/documents/install.md": "59eddcbcbba0363cdb5f2d37eb628f6c3a439bededc4d6226c87128ad6447969",
     ".skill-tree/documents/installation-architecture.md": "fd548f5be2a74fbfdb416a748e62869771d80f04acb47b246d4488effe083eea",
     ".skill-tree/documents/manual-target-update.md": "f83c49a885b75d27d250d53d5f00936bc1c9e3d45998518cb0045ef8734e3482",
+    ".skill-tree/documents/plugin-system-research.md": "252ea8eac8c950fa1a6c8a2ea0a774f81dd9b69850fc7fecc99eff52373e7bb7",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "ada306d29205daf0cda4ac42196917c5d230b763c1dcac5dc2e764a8e1438522",
     ".skill-tree/documents/project.md": "d7c68cfa97eb457a6adb4e5d8d950d831797e377e1d34baaed1f1a1eaa0b575d",
     ".skill-tree/documents/repo-init-instructions.md": "06f7eedd332bd13daba08f131a5c34b0fdffd8cb835c4ecc0d062010071251fa",
     ".skill-tree/documents/repository-map.md": "c984f360a96991a1c982971efd8b34d7c5a72d445c2838d4d276c4cd1fe7e6e8",
