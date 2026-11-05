@@ -1090,7 +1090,7 @@
     ".skill-tree/lib/installation.js": "53bee41f7348c7d3a1f6c472d0111a4fb139c90d3c72ef6c1ff50285d80459a9",
     ".skill-tree/scripts/run-tests.py": "00c61ad36efcc208865692e5822f38dd4bbbc036d058bc7e55bc81c3851b711e",
     ".skill-tree/scripts/sync-skill-references.py": "7362077b0b1d031c88af9a1ddb7cfe8ddc2bc3472e64cb470100ac24038404b9",
-    ".skill-tree/scripts/validate-skill-repository.py": "a2635c28c49eec0ebfbd48f4457a002a38ef8da7c7feb6d4aa2420ecf1fe1999",
+    ".skill-tree/scripts/validate-skill-repository.py": "c7a99c949181f6b9ebac40d738c1327cec2a114bc4a4cb6ba4bd0d6984afbc7c",
     ".skill-tree/src/init-rules/skill-tree-skills.md": "74cb9a275ce1bcd845c31eae44101e79e5adcd02875d84f1a4c8feb1744716fd",
     ".skill-tree/templates/invariants.json": "4545894b07fab5f222d15eddd17c220408a4be8a5e5f25da3a4a34ef06bb87b5",
     ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91"

@@ -19,6 +19,8 @@ def validate(strict=False):
     if json.loads((repo/'package.json').read_text()).get('license')!='MIT':errors.append('Package license must remain MIT')
     if json.loads((repo/'package.json').read_text()).get('version')!=json.loads((core/'config/flavors.json').read_text()).get('release_version'):errors.append('Package version and flavor registry release_version disagree')
     for path in core.rglob('*'):
+        # Installed execution snapshots and transaction backups have separate receipt verification.
+        if path.is_relative_to(core/'installation'):continue
         if any(part in {'__pycache__','artifacts','.git'} for part in path.parts):continue
         if path.name in {'.writer-lock','.transaction.json'}:continue
         if path.name not in EXCEPTIONS and not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*(?:\.[a-z0-9]+)*',path.name):errors.append('Invalid owned name: '+str(path.relative_to(core)))
@@ -54,6 +56,7 @@ def validate(strict=False):
     if strict:
         rulepath=core/'common/scripts/validate-document-rules.py';spec=importlib.util.spec_from_file_location('document_rules',rulepath);rules=importlib.util.module_from_spec(spec);spec.loader.exec_module(rules)
         for path in [*core.rglob('*.md'),repo/'README.md',repo/'AGENTS.md',repo/'CLAUDE.md',repo/'GEMINI.md']:
+            if path.is_relative_to(core/'installation'):continue
             if 'fixtures' not in path.parts and 'artifacts' not in path.parts:
                 errors.extend(rules.check(path,warnings_as_errors=True))
     manifest=core/'skill-tree.json'

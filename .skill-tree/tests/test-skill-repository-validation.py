@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -10,6 +11,26 @@ UNITY_INSPECT=ROOT/'skills/unity/skill-tree-repo-documentation/scripts/inspect-u
 SNAPSHOT=ROOT/'skills/general/skill-tree-create-documents-snapshot/scripts/create-documentation-snapshot.py'
 
 class RepositoryValidationTests(unittest.TestCase):
+    def test_source_validation_excludes_self_installation_and_retains_source_checks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo=Path(tmp)
+            shutil.copytree(ROOT,repo/'.skill-tree',ignore=shutil.ignore_patterns('installation','artifacts','__pycache__'))
+            for name in ['AGENTS.md','CLAUDE.md','GEMINI.md','README.md','LICENSE','package.json','install.sh','install.ps1']:
+                shutil.copy2(ROOT.parent/name,repo/name)
+            installation=repo/'.skill-tree/installation'
+            backup=installation/'.backups/0'
+            backup.mkdir(parents=True)
+            (installation/'.last-transaction.json').write_text('{}\n')
+            (backup/'retained.py').write_text('not valid Python!\n')
+            (backup/'retained.md').write_text('You must retain this historical backup.\n')
+            command=[sys.executable,str(repo/'.skill-tree/scripts/validate-skill-repository.py'),'--strict','--format','json']
+            result=subprocess.run(command,capture_output=True,text=True)
+            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+            (repo/'.skill-tree/common/invalid_owned.py').write_text('not valid Python!\n')
+            result=subprocess.run(command,capture_output=True,text=True)
+            self.assertNotEqual(result.returncode,0)
+            self.assertIn('Invalid owned name: common/invalid_owned.py',result.stdout)
+            self.assertIn('invalid syntax',result.stdout)
     def test_strict_source_validation(self):
         result=subprocess.run([sys.executable,str(ROOT/'scripts/validate-skill-repository.py'),'--strict','--format','json'],capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)

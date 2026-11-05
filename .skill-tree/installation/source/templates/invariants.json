@@ -1,0 +1,7 @@
+[
+  {
+    "id": "invariants",
+    "locked": true,
+    "text": "Read repository-owner rules before action. Exact prioritized selection, required dependency scope, checkpoint integrity, truthful evidence, owner authorization and commit/publication boundaries remain mandatory. A profile, installed flavor or stored checkpoint grants no execution or continuation permission. Read [validation policy](references/validation-policy.md) and [installation profile](references/installation-profile.md)."
+  }
+]
