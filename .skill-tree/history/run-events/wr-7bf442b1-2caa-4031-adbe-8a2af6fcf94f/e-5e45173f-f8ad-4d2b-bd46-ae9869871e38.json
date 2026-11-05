@@ -1,0 +1,276 @@
+{
+  "changes": [],
+  "checkpoint_after": {
+    "admission": {
+      "flavor": "general",
+      "identity": "repository-local"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "completed_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "completion_refs": {
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44": "O-f11794c1-5081-482f-86cf-1811b8040a3e",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece": "O-7ce78968-d027-4996-bb23-33c70bb07371"
+    },
+    "current_task_id": "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {},
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+    "limits": {},
+    "mode": "all",
+    "next_action": "validate",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "validate",
+    "processing_results": [],
+    "required_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "root_task_id": "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece",
+    "snapshot": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "started_at": "2026-11-05T06:56:56.648398+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "develop",
+      "base_commit": "91eacd9d27342484d9e38b6dc253f36bf5077eb3",
+      "branch": "codex/pending-intake",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly instructs merging the latest main changes into local develop and then working from develop without further confirmation; push remains excluded.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f"
+    },
+    "workspace_state": "ready"
+  },
+  "checkpoint_before": {
+    "admission": {
+      "flavor": "general",
+      "identity": "repository-local"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "completed_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "completion_refs": {
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44": "O-f11794c1-5081-482f-86cf-1811b8040a3e",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece": "O-7ce78968-d027-4996-bb23-33c70bb07371"
+    },
+    "current_task_id": "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {},
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+    "limits": {},
+    "mode": "all",
+    "next_action": "validate",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "validate",
+    "processing_results": [],
+    "required_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "root_task_id": "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece",
+    "snapshot": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "started_at": "2026-11-05T06:56:56.648398+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "develop",
+      "base_commit": "91eacd9d27342484d9e38b6dc253f36bf5077eb3",
+      "branch": "codex/pending-intake",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly instructs merging the latest main changes into local develop and then working from develop without further confirmation; push remains excluded.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f"
+    },
+    "workspace_state": "ready"
+  },
+  "id": "E-5e45173f-f8ad-4d2b-bd46-ae9869871e38",
+  "outcomes": [],
+  "progress_changes": [
+    {
+      "after": {
+        "admission": {
+          "flavor": "general",
+          "identity": "repository-local"
+        },
+        "checks": {
+          "boundary-state-fixtures": {
+            "attempt": {
+              "attempt_id": "C-739ee1ed-a59b-4e77-83d4-71518281f172",
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "7f1ec019b243c5bab3b1be478ec79bb2e35c6400fdf281711196daa4fbbb6070",
+              "key": "835ce6e4230b3a99f643d8ec2ac7da99efcfecaa2ad6cb23da7fc93c5b947269",
+              "launch": null,
+              "prepared_at": "2026-11-05T07:24:31.936862+00:00",
+              "recipe": {
+                "argv": [
+                  "python3",
+                  ".skill-tree/tests/test-pending-intake-boundary.py"
+                ],
+                "input_paths": [],
+                "lane": "unit"
+              },
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+                ".skill-tree/tests/test-pending-intake-boundary.py": "025445702e4d971d87589f2a5051bcc117c1d7a5359da3bf7957d8ddc4ddf5b9"
+              }
+            },
+            "receipts": {
+              "C-739ee1ed-a59b-4e77-83d4-71518281f172": {
+                "actual_lane": "unit",
+                "attempt_id": "C-739ee1ed-a59b-4e77-83d4-71518281f172",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+                "counts": {
+                  "discovered": 3,
+                  "expected": 3,
+                  "failed": 0,
+                  "passed": 3,
+                  "skipped": 0
+                },
+                "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+                "environment_identity": "7f1ec019b243c5bab3b1be478ec79bb2e35c6400fdf281711196daa4fbbb6070",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/boundary-state-fixtures-c-739ee1ed-a59b-4e77-83d4-71518281f172.json",
+                    "sha256": "b61eb9f92b7f94c887dbde108920e9307880cdff7ac121403c8cfce9c552dae0"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "835ce6e4230b3a99f643d8ec2ac7da99efcfecaa2ad6cb23da7fc93c5b947269",
+                "payload_hash": "ac5f4dfe0b7ef2e48d0763a53fb8897aa64a0497f69c3fb8c6b96e9088755a24",
+                "recorded_at": "2026-11-05T07:24:32.292322+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                  ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                  ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+                  ".skill-tree/tests/test-pending-intake-boundary.py": "025445702e4d971d87589f2a5051bcc117c1d7a5359da3bf7957d8ddc4ddf5b9"
+                },
+                "timing": {
+                  "tool_wall_seconds": 0.2633012495934963
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-739ee1ed-a59b-4e77-83d4-71518281f172",
+              "classification": "executed-control",
+              "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+              "counts": {
+                "discovered": 3,
+                "expected": 3,
+                "failed": 0,
+                "passed": 3,
+                "skipped": 0
+              },
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "7f1ec019b243c5bab3b1be478ec79bb2e35c6400fdf281711196daa4fbbb6070",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/pending-intake/boundary-state-fixtures-c-739ee1ed-a59b-4e77-83d4-71518281f172.json",
+                  "sha256": "b61eb9f92b7f94c887dbde108920e9307880cdff7ac121403c8cfce9c552dae0"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "835ce6e4230b3a99f643d8ec2ac7da99efcfecaa2ad6cb23da7fc93c5b947269",
+              "payload_hash": "ac5f4dfe0b7ef2e48d0763a53fb8897aa64a0497f69c3fb8c6b96e9088755a24",
+              "recorded_at": "2026-11-05T07:24:32.292322+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+                ".skill-tree/tests/test-pending-intake-boundary.py": "025445702e4d971d87589f2a5051bcc117c1d7a5359da3bf7957d8ddc4ddf5b9"
+              },
+              "timing": {
+                "tool_wall_seconds": 0.2633012495934963
+              }
+            }
+          }
+        },
+        "execution_sessions": {},
+        "revalidation": true,
+        "run_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+        "stage": "awaiting-validation"
+      },
+      "before": {
+        "admission": {
+          "flavor": "general",
+          "identity": "repository-local"
+        },
+        "checks": {
+          "boundary-state-fixtures": {
+            "attempt": {
+              "attempt_id": "C-739ee1ed-a59b-4e77-83d4-71518281f172",
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "7f1ec019b243c5bab3b1be478ec79bb2e35c6400fdf281711196daa4fbbb6070",
+              "key": "835ce6e4230b3a99f643d8ec2ac7da99efcfecaa2ad6cb23da7fc93c5b947269",
+              "launch": null,
+              "prepared_at": "2026-11-05T07:24:31.936862+00:00",
+              "recipe": {
+                "argv": [
+                  "python3",
+                  ".skill-tree/tests/test-pending-intake-boundary.py"
+                ],
+                "input_paths": [],
+                "lane": "unit"
+              },
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+                ".skill-tree/tests/test-pending-intake-boundary.py": "025445702e4d971d87589f2a5051bcc117c1d7a5359da3bf7957d8ddc4ddf5b9"
+              }
+            }
+          }
+        },
+        "execution_sessions": {},
+        "revalidation": true,
+        "run_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+        "stage": "awaiting-validation"
+      },
+      "task_id": "T-ca90d648-6296-47dc-84af-8dca9afb0c44"
+    }
+  ],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "run_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+  "schema": 1,
+  "sequence": 35
+}
