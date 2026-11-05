@@ -5,6 +5,7 @@ const os = require('node:os');
 const path = require('node:path');
 const source = path.resolve(__dirname, '..');
 const c = require('../lib/composer.js');
+const expectedOperations = ['skill-tree-add-pending-task','skill-tree-clarify-tasks','skill-tree-create-documents-snapshot','skill-tree-implement-all','skill-tree-implement-next-future-task','skill-tree-pr-review-cycle','skill-tree-process-future-pending','skill-tree-repo-documentation','skill-tree-repo-documentation-audit','skill-tree-work-through-next'];
 function fixture(t) { const root=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-compose-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));return root; }
 function write(root,rel,data) { const p=path.join(root,rel);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,typeof data==='string'?data:JSON.stringify(data)); }
 test('source recipe identities survive composition and retain freshness and collision checks',t=>{
@@ -22,12 +23,12 @@ test('target role cannot inject source recipes',t=>{
  const root=fixture(t);write(root,'.skill-tree/config/repository.json',{schema:1,role:'target',recipes:{unowned:{lane:'unit',argv:['unowned'],input_paths:[]}}});
  assert.equal(c.resolveProfile(source,root,'general').recipes.unowned,undefined);
 });
-test('composition is deterministic, standalone and has nine logical names for every flavor',t=>{
+test('composition is deterministic, standalone and has the complete authored operation set for every flavor',t=>{
  for(const flavor of ['general','web','unity']) {
   const root=fixture(t);
   if(flavor==='unity'){write(root,'ProjectSettings/ProjectVersion.txt','m_EditorVersion: 6000.0.83f1');write(root,'Packages/manifest.json',{dependencies:{'com.unity.test-framework':'1.4.6'}});write(root,'Packages/packages-lock.json',{dependencies:{'com.unity.test-framework':{version:'1.4.6'}}});}
   const profile=c.resolveProfile(source,root,flavor),a=c.compose(source,profile),b=c.compose(source,profile);
-  assert.deepEqual(a,b);assert.equal(Object.keys(a.packages).length,9);
+  assert.deepEqual(a,b);assert.deepEqual(Object.keys(a.packages).sort(),expectedOperations);
   for(const [name,files] of Object.entries(a.packages)) {
    assert.ok(!name.includes('unity-'));assert.equal((files['SKILL.md'].match(/^name:/gm)||[]).length,1);
    assert.match(files['SKILL.md'],new RegExp('Flavor: '+flavor));
@@ -46,7 +47,7 @@ test('static capability inputs detect additions, unsupported versions and confli
  assert.throws(()=>c.resolveProfile(source,root,'unity'),/unsupported/i);
 });
 test('missing foundation is a persisted capability gap while installation remains composable',t=>{
- const root=fixture(t),p=c.resolveProfile(source,root,'web');assert.equal(p.gaps[0].key,'test-foundation');assert.equal(Object.keys(c.compose(source,p).packages).length,9);
+ const root=fixture(t),p=c.resolveProfile(source,root,'web');assert.equal(p.gaps[0].key,'test-foundation');assert.deepEqual(Object.keys(c.compose(source,p).packages).sort(),expectedOperations);
 });
 test('resource collisions reject undeclared replacements and slot overrides preserve mandatory invariants',()=>{
  assert.throws(()=>c.mergeResources({'a':'one'},{'a':'two'}),/conflict/i);

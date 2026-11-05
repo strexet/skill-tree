@@ -4,7 +4,7 @@
 
 The shared protocol derives from the pinned [grilling instructions](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/grilling/SKILL.md). Explicit task/group clarification and the post-processing interview adapter share one round, answer, revision and confirmation protocol. Explicit clarification requires no generic plugin engine, native Skill tool, implementation run or new worktree.
 
-The contract specifies the controller interface. The controller implementation task supplies executable commands and installed entry points; the contract alone establishes no executable capability. The current source-backed manual session remains distinguishable from a controller invocation.
+The `skill-tree-clarify-tasks` operation supplies the executable controller interface through the bundled `workflow-state.py` helper. The helper records source-backed interview state and guarded revisions. Source-backed manual discussion, controller invocation and native external-skill invocation remain distinct evidence classes.
 
 ## Selection and state ownership
 

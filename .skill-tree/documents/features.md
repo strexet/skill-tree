@@ -1,11 +1,12 @@
 # Current Features
 
-All three flavors expose the same nine operation names.
+All three flavors expose the same ten operation names.
 
 | Operation | Current responsibility |
 | --- | --- |
 | `skill-tree-add-pending-task` | Capture understood intent with identity, semantic classification and numeric priority. |
 | `skill-tree-process-future-pending` | Research selected Pending work and record scoped dispositions and dependencies. |
+| `skill-tree-clarify-tasks` | Refine an exact task/group through researched question rounds, guarded revisions and current owner confirmation. |
 | `skill-tree-implement-next-future-task` | Implement an exact or highest-priority eligible Prioritized task with acceptance evidence. |
 | `skill-tree-work-through-next` | Orchestrate one root and required dependencies through a retained checkpoint. |
 | `skill-tree-implement-all` | Orchestrate the initial Prioritized snapshot or an explicit selected group. |

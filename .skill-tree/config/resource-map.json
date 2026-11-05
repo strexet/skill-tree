@@ -167,5 +167,25 @@
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
     }
+  },
+  "skill-tree-clarify-tasks": {
+    "references": {
+      "development-practices.md": "common/references/development-practices.md",
+      "document-rules.md": "common/references/document-rules.md",
+      "future-workflow.md": "common/references/future-workflow.md",
+      "history-retention.md": "common/references/history-retention.md",
+      "installation-profile.md": "common/references/installation-profile.md",
+      "pending-task-format.md": "common/references/pending-task-format.md",
+      "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "run-workspaces.md": "common/references/run-workspaces.md",
+      "validation-policy.md": "common/references/validation-policy.md",
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
+    },
+    "scripts": {
+      "run-workspaces.py": "common/scripts/run-workspaces.py",
+      "select-prioritized-task.py": "common/scripts/select-prioritized-task.py",
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
   }
 }

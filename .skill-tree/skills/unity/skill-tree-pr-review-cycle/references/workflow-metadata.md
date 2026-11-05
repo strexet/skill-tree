@@ -66,9 +66,9 @@ Product lanes require an owned execution session even when no new process launch
 
 ## Task clarification contract
 
-The clarification controller task implements the following metadata-only interface; command availability requires the matching implementation and installed snapshot. Canonical mutable records reside in `.skill-tree/clarifications/cl-<uuid>.json` with schema 1, stable `CL-<uuid>` identity and integer revision. Records contain exact selected task IDs, source and semantic baselines, facts, rounds/questions/answers, revision evidence, confirmation, state and next action. The queue/index remain task authorities; implementation progress, run checkpoints and terminal ledgers remain separate.
+The `skill-tree-clarify-tasks` operation exposes the following metadata-only interface through the bundled helper. Canonical mutable records reside in `.skill-tree/clarifications/cl-<uuid>.json` with schema 1, stable `CL-<uuid>` identity and integer revision. Records contain exact selected task IDs, source and semantic baselines, facts, rounds/questions/answers, revision evidence, confirmation, state and next action. The queue/index remain task authorities; implementation progress, run checkpoints and terminal ledgers remain separate.
 
-Planned commands: `clarify-start`, `clarify-read`, `clarify-round`, `clarify-answer`, `clarify-revise`, `clarify-confirm`, `clarify-resume` and `clarify-cancel`. Commands use the existing root and structured `--input` convention; read accepts `--id CL-<uuid>`. Start supplies exact unique `task_ids` and `expected_source_hash`; existing-session mutators additionally supply `session_id`, `expected_session_hash` and `expected_session_revision`. Source/session hashes are complete-content guards, not semantic identities.
+Clarification commands: `clarify-start`, `clarify-read`, `clarify-round`, `clarify-answer`, `clarify-revise`, `clarify-confirm`, `clarify-resume` and `clarify-cancel`. Commands use the existing root and structured `--input` convention; read accepts `--id CL-<uuid>`. Start supplies exact unique `task_ids` and `expected_source_hash`; existing-session mutators additionally supply `session_id`, `expected_session_hash` and `expected_session_revision`. Source/session hashes are complete-content guards, not semantic identities.
 
 Round payloads supply stable question IDs, prerequisite IDs, task/semantic-field bindings, recommendations and source facts. Answer payloads bind actual submitted answer evidence to the exact session, round and question revision. Revision payloads identify exact selected tasks, replacement content and permitted dependency changes; fixed provenance/relationship fields and optional validation metadata remain preserved. Confirmation payloads bind actual owner evidence to the current exact scope and semantic fingerprints after clarity recheck. Resume reconciles drift without new selection; cancellation records the reason without asserting satisfied required interviews.
 
@@ -77,3 +77,83 @@ Session-only commands write only the session through the canonical writer lock. 
 ## Workspace helper interface
 
 `workspace-setup` explicitly enables the compatible run registry and optionally adopts an existing checkpoint. `runs` lists retained runs. `recover-locator` and `recover-workspace` preserve identities while resolving explicitly inspected machine-state gaps. `environment` inspects declared prerequisites without reading secrets or launching runtimes. `resource` owns exclusive runtime claims. `export-run` and `replay-events` transfer scoped semantic changes without replacing canonical queue files. The run workspace contract defines payloads and conflict behavior.
+
+
+## Clarification payloads
+
+`clarify-start` accepts the exact `task_ids`, inspected `expected_source_hash` and optional `mode: explicit|required-interview`. The returned session includes `id`, integer `revision` and computed `session_hash`. `clarify-read --id CL-<uuid>` returns the current record without mutation. Every existing-session mutation supplies the following guard fields; placeholders represent exact inspected values.
+
+```json
+{
+  "session_id": "CL-<uuid>",
+  "expected_source_hash": "<complete-queue-sha256>",
+  "expected_session_hash": "<complete-session-sha256>",
+  "expected_session_revision": 1
+}
+```
+
+`clarify-round` merges stable question definitions and source facts. Question IDs use lowercase kebab-case. `bindings` maps selected task IDs to semantic fields: `title`, `goal`, `scope`, `exclusions`, `dependencies`, `acceptance`, `validation`, `required_plugin_policy` or `content`. An unchanged question retains the question revision; an edited definition advances the revision and reopens affected answers. The round returns a `CR-` identity, complete independent `question_ids` frontier and matching question revisions. Dependent questions stay registered for a later round.
+
+```json
+{
+  "questions": [
+    {
+      "id": "storage-choice",
+      "text": "Which storage boundary applies?",
+      "recommendation": "Keep the selected project-local boundary.",
+      "prerequisites": [],
+      "bindings": {"T-<uuid>": ["scope", "dependencies"]}
+    },
+    {
+      "id": "migration-choice",
+      "text": "Which migration behavior follows the storage decision?",
+      "recommendation": "Preserve existing records within the selected boundary.",
+      "prerequisites": ["storage-choice"],
+      "bindings": {"T-<uuid>": ["acceptance", "validation"]}
+    }
+  ],
+  "facts": [
+    {
+      "id": "storage-source",
+      "observation": "The inspected source defines project-local storage.",
+      "sources": [{"path": "src/storage.py", "sha256": "<inspected-file-sha256>"}],
+      "limitations": ["Runtime behavior remains unqualified."]
+    }
+  ]
+}
+```
+
+Source paths resolve against the caller execution checkout, independently of canonical queue routing. Stored source-origin identity and file hashes retain the inspected checkout boundary. Changed or unavailable facts block clarity/confirmation until fresh research replaces the facts. Fact `limitations` can be an empty list when supported.
+
+`clarify-answer` requires the displayed round/question identity, exact question revision, actual submitted answer and source evidence. Evidence kind is `owner-message` or `submitted-answer`; a nonempty `reference` identifies the actual owner submission. Recommendations, defaults and elapsed waits never qualify. An exact duplicate answer returns without another session write; conflicting replay rejects mutation.
+
+```json
+{
+  "round_id": "CR-<uuid>",
+  "question_id": "storage-choice",
+  "question_revision": 1,
+  "answer": "Keep storage within the selected project.",
+  "evidence": {"kind": "owner-message", "reference": "Owner message identifying the submitted storage decision."}
+}
+```
+
+`clarify-revise` accepts `tasks`, a nonempty list of objects with exact selected `task_id` and optional replacement `title`, `body` or `depends_on`. Replacement `body` contains the task sections without the task heading/metadata header. Omitted fields remain preserved. Replacement dependencies are exact `T-` IDs. Fixed provenance/relationship fields and optional validation headers remain unchanged. Open prepared implementation attempts require safe recovery before revision. Invalid acceptance/check mapping, missing dependencies, cycles and unowned tasks reject the complete transaction.
+
+A `clarify-round` payload with an empty decision frontier records the clarity rubric below. Every rubric value requires source-backed assessment; `evidence` contains concrete recheck observations. A false assessment preserves the research prerequisite. A true complete rubric with no unresolved mandatory questions permits current shared-understanding confirmation.
+
+```json
+{
+  "clarity": {
+    "goals": true,
+    "scope": true,
+    "exclusions": true,
+    "dependencies": true,
+    "acceptance": true,
+    "validation": true,
+    "decisions": true,
+    "evidence": ["The selected task, accepted decisions and inspected sources define feasible observable acceptance."]
+  }
+}
+```
+
+`clarify-confirm` supplies `task_ids` in the returned frozen order, the exact returned `semantic_fingerprints` mapping and actual owner `evidence` with the same evidence shape as an answer. The owner confirms the displayed current task summary after recheck; a prepared confirmation request supplies no approval. `clarify-resume` reconciles current source drift without selecting new tasks or resuming implementation. `clarify-cancel` requires a nonempty `reason`; a required-interview cancellation retains the unsatisfied admission hold. Repeated unchanged rounds persist a blocked state and concrete next action.

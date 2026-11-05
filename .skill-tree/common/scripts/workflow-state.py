@@ -225,8 +225,8 @@ def rewrite_meta(text,task_id,changes):
     return ''.join(lines)
 
 class Store:
-    def __init__(self,root,run_id=None,allow_unselected=False,route_queue=True):
-        self.source_root=Path(root).resolve();self.run_id=run_id;self.selected_run_id=None;self.allow_unselected=allow_unselected
+    def __init__(self,root,run_id=None,allow_unselected=False,route_queue=True,neutral=False):
+        self.source_root=Path(root).resolve();self.run_id=run_id;self.selected_run_id=None;self.allow_unselected=allow_unselected;self.neutral=neutral
         self.root=workspaces.canonical(root) if route_queue else self.source_root;self.base=self.root/'.skill-tree';self.future=self.base/'documents/future.md';self.state=self.base/'documents/future.json'
         if not self.root.is_dir(): raise WorkflowError('Target repository does not exist')
         if self.base.is_symlink(): raise WorkflowError('Owned metadata directory cannot be a symlink')
@@ -246,7 +246,7 @@ class Store:
             os.write(fd,dump({'pid':os.getpid(),'host':socket.gethostname()}).encode());os.close(fd)
             if (self.base/'installation/.install-lock').exists():raise WorkflowError('Installation lock exists; preserve the profile handoff')
             self.recover()
-            mutable=[self.future,self.state,self.base/'skill-tree.json',self.base/'history/task-outcomes.jsonl',*list((self.base/'history').rglob('*.json'))]
+            mutable=[self.future,self.state,self.base/'skill-tree.json',self.base/'history/task-outcomes.jsonl',*list((self.base/'history').rglob('*.json')),*list((self.base/'clarifications').glob('*.json'))]
             self._write_hashes={p.relative_to(self.root).as_posix():file_hash(p) for p in mutable}
             yield
         finally:
@@ -300,7 +300,9 @@ class Store:
                 validate_run(run)
             value['active_run']=run
             if 'run_registry' in old:value['run_registry']=old['run_registry']
-            value=workspaces.project(self,value)
+            if self.neutral:
+                if 'run_registry' in value:workspaces.validate_registry(value['run_registry'])
+            else:value=workspaces.project(self,value)
             for retained in value.get('run_registry',{}).get('runs',{}).values():validate_run(retained)
             value['task_progress']=old.get('task_progress')
             validate_progress(value,parse(text),{record['task_id'] for record in self.outcomes() if record['disposition']=='completed'})
@@ -563,6 +565,7 @@ def start(store,mode,selector=None,limits=None,workspace=None):
             snapshot=[chosen['id']] if mode=='next' else [t['id'] for t in sorted([t for t in tasks if t['queue']=='Prioritized Next Changes'],key=lambda t:-t['priority'])]
         if mode=='all' and selector:raise WorkflowError('Implement All uses the initial prioritized snapshot')
         run={'id':identity('WR'),'mode':mode,'snapshot':snapshot,'root_task_id':chosen['id'],'current_task_id':chosen['id'],'phase':'implement','required_ids':[chosen['id']],'deferred_ids':[],'pending_ids':[],'processing_results':[],'completed_ids':[],'limits':limits or {},'partial_work':[],'stop_reason':None,'next_action':'Implement selected task','started_at':now()}
+        for tid in dependency_scope(tasks,run):clarification_admission(store,tid)
         run['admission']=admission;run['admitted_task_ids']=sorted(dependency_scope(tasks,run));run['required_ids']=list(run['admitted_task_ids']);run['admitted_groups']=admitted_groups(tasks,run)
         if registry:
             done={o['task_id'] for o in store.outcomes() if o['disposition']=='completed'}
@@ -648,6 +651,7 @@ def next_task(store):
     if task.get('completed_contract'):
         return {'phase':'validate','task_id':task['id'],'root_task_id':root,'completed_contract':True,'title':task['title'],'body':task['body'],'checks':check_specs(task)}
     if task['status']!='Ready':raise WorkflowError('Selected required task has blocking unresolved questions: '+task['id'])
+    clarification_admission(store,task['id'])
     run['admitted_groups']=admitted_groups(tasks,run)
     stage=state['task_progress'].get(task['id'],{}).get('stage')
     if stage=='blocked':raise WorkflowError('Selected task progress is blocked; resolve the recorded stop')
@@ -663,6 +667,7 @@ def next_task(store):
         if group and not early and not consumers:
             eligible=[candidate for candidate in tasks if candidate['id'] in scope_ids(tasks,run) and candidate.get('validation_group_id')==group and candidate['queue']=='Prioritized Next Changes' and candidate['status']=='Ready' and state['task_progress'].get(candidate['id'],{}).get('stage') not in {'awaiting-validation','blocked'} and all(dep in done for dep in candidate['depends_on'])]
             if eligible:task=max(eligible,key=lambda candidate:candidate['priority']);stage=state['task_progress'].get(task['id'],{}).get('stage')
+    clarification_admission(store,task['id'])
     return {'phase':'validate' if stage=='awaiting-validation' else 'implement','root_task_id':root,'task_id':task['id'],'title':task['title'],'priority':task['priority'],'body':task['body'],'checks':check_specs(task)}
 
 def advance(store):
@@ -700,6 +705,7 @@ def checkpoint(store,payload):
 def complete(store,payload):
     with store.lock():
         store.guard(payload.get('expected_source_hash'));text=store.text();tasks=parse(text);state=store.load(text);task=resolve(tasks,[payload['task_id']],'Prioritized Next Changes')[0]
+        clarification_admission(store,task['id'])
         assert_scope(store,state,tasks,task['id'])
         outcomes=store.outcomes();done={o['task_id'] for o in outcomes if o['disposition']=='completed'}
         if task['id'] in {o['task_id'] for o in outcomes}:raise WorkflowError('Task already has terminal outcome')
@@ -1234,11 +1240,13 @@ def assert_scope(store,state,tasks,tid):
     assert_admission(store,state,tid)
 
 def begin_task(store,payload):
+    clarification_admission(store,payload['task_id'])
     # Standalone admission occurs once at the implementation boundary; controller leaves reuse the admitted profile.
     state=store.load();admission=execution_run(state['active_run']).get('admission') if state['active_run'] else admit_profile(store)
     with store.lock():
         text=store.text();state=store.load(text);task=resolve(parse(text),[payload['task_id']],'Prioritized Next Changes')[0]
         if task['status']!='Ready':raise WorkflowError('Selected task has blocking questions')
+        clarification_admission(store,task['id'])
         if state['active_run']:assert_scope(store,state,parse(text),task['id'])
         done={o['task_id'] for o in store.outcomes() if o['disposition']=='completed'}
         if any(dep not in done for dep in task['depends_on']):raise WorkflowError('Verified dependencies remain incomplete')
@@ -1445,14 +1453,323 @@ def replay_events(store,payload):
         return {'applied_events':len(applied)}
 
 
+
+# Clarification state is independent of implementation run selection and admission.
+CLARIFICATION_STATES={'researching','awaiting-answers','revising','awaiting-confirmation','complete','blocked','cancelled'}
+CLARIFICATION_FIELDS={'title','goal','scope','exclusions','dependencies','acceptance','validation','required_plugin_policy','content'}
+CLARIFICATION_COMMANDS={'clarify-start','clarify-read','clarify-round','clarify-answer','clarify-revise','clarify-confirm','clarify-resume','clarify-cancel'}
+
+def clarification_path(store,session_id):
+    if not valid_id(session_id,'CL'):raise WorkflowError('Clarification requires an exact CL- identity')
+    return store.owned('.skill-tree/clarifications/'+session_id.lower()+'.json')
+
+def clarification_read(store,session_id):
+    path=clarification_path(store,session_id)
+    if not path.is_file():raise WorkflowError('Unknown clarification session')
+    raw=path.read_bytes();record=json.loads(raw)
+    if record.get('schema')!=1 or record.get('id')!=session_id or record.get('state') not in CLARIFICATION_STATES or type(record.get('revision')) is not int or record['revision']<1:
+        raise WorkflowError('Unsupported clarification session')
+    ids=record.get('task_ids')
+    if not isinstance(ids,list) or not ids or any(not valid_id(tid,'T') for tid in ids) or len(set(ids))!=len(ids):raise WorkflowError('Corrupt clarification scope')
+    return {**record,'session_hash':digest(raw)}
+
+def clarification_tasks(store,task_ids,text=None):
+    if not isinstance(task_ids,list) or not task_ids or any(not valid_id(tid,'T') for tid in task_ids) or len(set(task_ids))!=len(task_ids):raise WorkflowError('Clarification requires exact unique prioritized T- identities')
+    tasks=parse(store.text() if text is None else text);selected=set(task_ids)
+    result=[t for t in tasks if t['queue']=='Prioritized Next Changes' and t['id'] in selected]
+    if {t['id'] for t in result}!=selected:raise WorkflowError('Clarification task is absent, terminal or outside the prioritized queue')
+    if any(o['task_id'] in selected for o in store.outcomes()):raise WorkflowError('Terminal task definitions cannot be clarified or revised')
+    return sorted(result,key=lambda t:-t['priority'])
+
+def clarification_text_semantics(value):
+    # Only supported presentation equivalence is normalized; literals stay case-sensitive.
+    chunks=re.split(r'(```[^\n]*\n.*?\n```|`[^`\n]*`)',value,flags=re.S);result=[]
+    for chunk in chunks:
+        if chunk.startswith('```'):
+            match=re.fullmatch(r'```json\n(.*?)\n```',chunk,re.S)
+            if match:
+                try:chunk='```json\n'+dump(json.loads(match[1])).strip()+'\n```'
+                except json.JSONDecodeError:pass
+            result.append(chunk)
+        elif chunk.startswith('`'):result.append(chunk)
+        else:
+            chunk=re.sub(r'(\*\*|__)(\S(?:.*?\S)?)\1',r'\2',chunk)
+            result.append('\n'.join(re.sub(r'[ \t]+',' ',line.strip()) for line in chunk.splitlines() if line.strip()))
+    return ''.join(result).strip()
+
+def clarification_semantics(task):
+    body=re.sub(r'^###[^\n]+\n\s*```yaml\n.*?\n```\s*','',task['body'],count=1,flags=re.S)
+    sections={};heading='content';fenced=False
+    for line in body.splitlines(keepends=True):
+        if line.startswith('```'):fenced=not fenced
+        match=None if fenced else re.fullmatch(r'([A-Z][A-Za-z /-]+):\s*\n?',line)
+        if match:heading=match[1];sections.setdefault(heading,[])
+        else:sections.setdefault(heading,[]).append(line)
+    mapping={'Goal':'goal','Scope':'scope','Touch':'scope','Out of scope':'exclusions','Exclusions':'exclusions','Acceptance':'acceptance','Validation':'validation','Required plugin policy':'required_plugin_policy'}
+    fields={key:[] for key in CLARIFICATION_FIELDS-{'title','dependencies'}}
+    for name,lines in sections.items():fields[mapping.get(name,'content')].append((name,clarification_text_semantics(''.join(lines))))
+    fields={key:value for key,value in fields.items()}
+    fields['validation'].append(('metadata',{key:task.get(key) for key in OPTIONAL_FIELDS}))
+    fields['content'].append(('identity',clarification_identity(task)))
+    fields.update(title=task['title'],dependencies=task['depends_on'])
+    return {key:digest(dump(value).encode()) for key,value in fields.items()}
+
+def clarification_identity(task):
+    return {key:task[key] for key in ['id','parent_pending_ids','processing_run_id','root_task_id','related_task_id','relation']}
+
+def clarification_baselines(tasks):
+    return {task['id']:{'content_hash':digest(task['body'].encode()),'identity':clarification_identity(task),'fields':clarification_semantics(task)} for task in tasks}
+
+def clarification_fingerprints(baselines):
+    return {tid:digest(dump(baseline['fields']).encode()) for tid,baseline in baselines.items()}
+
+def clarification_invalidate(record,baselines):
+    changed={tid:{field for field,value in baseline['fields'].items() if value!=record['baselines'][tid]['fields'].get(field)} for tid,baseline in baselines.items()}
+    invalid=set()
+    for key,answer in record['answers'].items():
+        question=record['questions'][key]
+        if any(changed.get(tid,set())&set(fields) for tid,fields in question['bindings'].items()):invalid.add(key)
+    while True:
+        expanded=invalid|{key for key,q in record['questions'].items() if set(q['prerequisites'])&invalid}
+        if expanded==invalid:break
+        invalid=expanded
+    for key in invalid:
+        if key in record['answers']:record['answers'][key]['valid']=False
+    semantic_change=any(changed.values())
+    if semantic_change:
+        if record.get('confirmation'):record.setdefault('confirmation_history',[]).append(record['confirmation'])
+        record['confirmation']=None;record['clarity']=None;record['state']='researching';record['next_action']='Recheck changed task semantics and affected decisions'
+    record['baselines']=baselines;record['semantic_fingerprints']=clarification_fingerprints(baselines)
+    return changed
+
+def clarification_admission(store,task_id):
+    done={o['task_id']:o for o in store.outcomes() if o['disposition']=='completed'}
+    if task_id in done:return
+    tasks={t['id']:t for t in parse(store.text())}
+    required=[];satisfied=[]
+    for path in sorted((store.base/'clarifications').glob('*.json')):
+        record=clarification_read(store,'CL-'+path.stem[3:])
+        if task_id not in record['task_ids']:continue
+        if record['mode']=='explicit' and record['state']=='cancelled':continue
+        fresh=not clarification_stale_facts(store,record)
+        for tid in record['task_ids']:
+            if tid in tasks:
+                fresh=fresh and clarification_fingerprints(clarification_baselines([tasks[tid]]))[tid]==record['semantic_fingerprints'].get(tid)
+            else:
+                # Successful guarded completion removes the definition; immutable history retains acceptance.
+                fresh=fresh and tid in done and done[tid]['recorded_at']>=(record.get('confirmation') or {}).get('recorded_at','')
+        if record['state']=='complete' and fresh:
+            if record['mode']=='required-interview':satisfied.append(record)
+            continue
+        if record['mode']=='required-interview':required.append(record)
+        elif record['state']!='cancelled':raise WorkflowError('Selected task has an open or stale clarification hold: '+record['id'])
+    if required and not all(any(set(old['task_ids']).issubset(set(done['task_ids'])) and done['created_at']>=old['created_at'] for done in satisfied) for old in required):
+        raise WorkflowError('Selected task has an unsatisfied required interview hold: '+required[0]['id'])
+
+def clarification_evidence(value):
+    if not isinstance(value,dict) or set(value)!={'kind','reference'} or value['kind'] not in {'owner-message','submitted-answer'} or not isinstance(value['reference'],str) or not value['reference'].strip():
+        raise WorkflowError('Actual owner answer evidence requires owner-message or submitted-answer and a nonempty reference')
+    return value
+
+def clarification_stale_facts(store,record):
+    stale=[];origin=digest(str(store.source_root.resolve()).encode())
+    for key,fact in record['facts'].items():
+        if fact.get('source_origin')!=origin or any(file_hash(binding_path(store.source_root,source['path']))!=source['sha256'] for source in fact['sources']):stale.append(key)
+    return stale
+
+def clarification_write(store,record,writes=None):
+    record.pop('session_hash',None)
+    record['updated_at']=now()
+    relative=clarification_path(store,record['id']).relative_to(store.root).as_posix()
+    store.commit({**(writes or {}),relative:dump(record)})
+    return clarification_read(store,record['id'])
+
+def clarification_guard(store,payload):
+    if not isinstance(payload.get('expected_source_hash'),str) or not payload['expected_source_hash']:raise WorkflowError('Clarification requires expected_source_hash from inspected complete queue bytes')
+    store.guard(payload['expected_source_hash'])
+    record=clarification_read(store,payload.get('session_id'))
+    if payload.get('expected_session_hash')!=record['session_hash'] or type(payload.get('expected_session_revision')) is not int or payload['expected_session_revision']!=record['revision']:
+        raise WorkflowError('Clarification session changed since inspection; reread the session')
+    return record
+
+def clarification_start(store,payload):
+    with store.lock():
+        if not payload.get('expected_source_hash'):raise WorkflowError('Clarification requires expected_source_hash')
+        store.guard(payload['expected_source_hash']);tasks=clarification_tasks(store,payload.get('task_ids'))
+        mode=payload.get('mode','explicit')
+        if mode not in {'explicit','required-interview'}:raise WorkflowError('Unknown clarification mode')
+        for path in (store.base/'clarifications').glob('*.json'):
+            old=clarification_read(store,'CL-'+path.stem[3:])
+            if old['state'] not in {'complete','cancelled'} and set(old['task_ids'])&{t['id'] for t in tasks}:raise WorkflowError('Selected task already has an open clarification session: '+old['id'])
+        baselines=clarification_baselines(tasks)
+        record={'schema':1,'id':identity('CL'),'revision':1,'mode':mode,'task_ids':[t['id'] for t in tasks],'state':'researching','source_hash':file_hash(store.future),'baselines':baselines,'semantic_fingerprints':clarification_fingerprints(baselines),'facts':{},'questions':{},'rounds':[],'answers':{},'task_revisions':[],'confirmation':None,'clarity':None,'no_progress_rounds':0,'next_action':'Research source facts and prepare the independent decision frontier','created_at':now()}
+        store.guard(payload['expected_source_hash'])
+        return clarification_write(store,record)
+
+def clarification_questions(record,specs):
+    if not isinstance(specs,list):raise WorkflowError('Questions require a list')
+    seen=set()
+    for spec in specs:
+        if not isinstance(spec,dict):raise WorkflowError('Question requires a structured definition')
+        key=spec.get('id');bindings=spec.get('bindings');prerequisites=spec.get('prerequisites',[])
+        if not isinstance(key,str) or not re.fullmatch(r'[a-z][a-z0-9-]*',key) or key in seen:raise WorkflowError('Questions require unique stable lowercase IDs')
+        seen.add(key)
+        if any(not isinstance(spec.get(field),str) or not spec[field].strip() for field in ['text','recommendation']):raise WorkflowError('Every question requires text and a recommendation')
+        if not isinstance(bindings,dict) or not bindings or not set(bindings).issubset(record['task_ids']):raise WorkflowError('Questions bind exact selected tasks')
+        for fields in bindings.values():
+            if not isinstance(fields,list) or not fields or len(set(fields))!=len(fields) or not set(fields).issubset(CLARIFICATION_FIELDS):raise WorkflowError('Question bindings require explicit semantic fields')
+        if not isinstance(prerequisites,list) or any(not isinstance(v,str) for v in prerequisites) or len(set(prerequisites))!=len(prerequisites) or key in prerequisites:raise WorkflowError('Invalid question prerequisites')
+        question={field:deepcopy(spec[field]) for field in ['id','text','recommendation','bindings']};question.update(prerequisites=prerequisites,required=spec.get('required',True))
+        if type(question['required']) is not bool:raise WorkflowError('Question required flag requires a boolean')
+        old=record['questions'].get(key);definition={k:v for k,v in (old or {}).items() if k!='revision'}
+        question['revision']=(old['revision']+(question!=definition)) if old else 1
+        if 'revision' in spec and spec['revision']!=question['revision']:raise WorkflowError('Question revision does not match the current definition')
+        if old and question['revision']!=old['revision']:
+            if key in record['answers']:record['answers'][key]['valid']=False
+            record['confirmation']=None;record['clarity']=None
+        record['questions'][key]=question
+    visiting=set();visited=set()
+    def visit(key):
+        if key not in record['questions']:raise WorkflowError('Unknown question prerequisite: '+key)
+        if key in visiting:raise WorkflowError('Question prerequisite cycle')
+        if key in visited:return
+        visiting.add(key)
+        for prerequisite in record['questions'][key]['prerequisites']:visit(prerequisite)
+        visiting.remove(key);visited.add(key)
+    for key in record['questions']:visit(key)
+    # A changed prerequisite invalidates downstream settled answers, too.
+    for _ in record['questions']:
+        for key,q in record['questions'].items():
+            if key in record['answers'] and any(not record['answers'].get(p,{}).get('valid') for p in q['prerequisites']):record['answers'][key]['valid']=False
+
+def clarification_round(store,record,payload):
+    clarification_questions(record,payload.get('questions',[]))
+    facts=payload.get('facts',[])
+    if not isinstance(facts,list):raise WorkflowError('Source facts require a list')
+    for fact in facts:
+        if not isinstance(fact,dict) or not isinstance(fact.get('id'),str) or not re.fullmatch(r'[a-z][a-z0-9-]*',fact['id']) or not fact.get('observation') or not isinstance(fact.get('limitations'),list) or not fact.get('sources'):raise WorkflowError('Source facts require stable identity, observation, inspected sources and limitations')
+        for source in fact['sources']:
+            path=binding_path(store.source_root,source['path'])
+            if not source.get('sha256') or file_hash(path)!=source['sha256']:raise WorkflowError('Source fact does not match inspected source bytes')
+        record['facts'][fact['id']]={**deepcopy(fact),'source_origin':digest(str(store.source_root.resolve()).encode())}
+    settled={key for key,answer in record['answers'].items() if answer['valid']}
+    unresolved=[key for key,q in record['questions'].items() if q['required'] and key not in settled]
+    frontier=[key for key,q in record['questions'].items() if key not in settled and set(q['prerequisites']).issubset(settled)]
+    clarity=payload.get('clarity')
+    if clarity is not None:
+        fields={'goals','scope','exclusions','dependencies','acceptance','validation','decisions'}
+        if not isinstance(clarity,dict) or set(clarity)!=fields|{'evidence'} or any(type(clarity[k]) is not bool for k in fields) or not isinstance(clarity['evidence'],list) or not clarity['evidence'] or any(not isinstance(e,str) or not e.strip() for e in clarity['evidence']):raise WorkflowError('Clarity recheck requires all rubric booleans and concrete evidence')
+        record['clarity']={'assessment':clarity,'semantic_fingerprints':record['semantic_fingerprints']}
+    progress=digest(dump({key:record[key] for key in ['facts','questions','answers','semantic_fingerprints','clarity']}).encode())
+    record['no_progress_rounds']=record['no_progress_rounds']+1 if record.get('progress_signature')==progress else 0
+    record['progress_signature']=progress
+    round_record={'id':identity('CR'),'question_ids':frontier,'question_revisions':{key:record['questions'][key]['revision'] for key in frontier},'source_hash':file_hash(store.future),'semantic_fingerprints':record['semantic_fingerprints']}
+    record['rounds'].append(round_record)
+    checked=record.get('clarity')
+    record['stale_facts']=clarification_stale_facts(store,record)
+    if record['stale_facts']:record.update(state='blocked',clarity=None,confirmation=None,next_action='Research changed or unavailable source facts in the original execution checkout: '+', '.join(record['stale_facts']))
+    elif record['no_progress_rounds']>=2:record.update(state='blocked',next_action='Resolve the unchanged decision or source-research prerequisite before another round')
+    elif frontier:record.update(state='awaiting-answers',next_action='Present every independent question with its recommendation and wait for actual owner answers')
+    elif unresolved:record.update(state='blocked',next_action='Resolve unsettled question prerequisites')
+    elif checked and checked['semantic_fingerprints']==record['semantic_fingerprints'] and all(value is True for key,value in checked['assessment'].items() if key!='evidence'):
+        record.update(state='awaiting-confirmation',next_action='Present the current selected task summary and request explicit shared-understanding confirmation')
+    else:record.update(state='researching',next_action='Research remaining facts and record a complete clarity recheck')
+
+def clarification_revise(store,record,payload):
+    specs=payload.get('tasks')
+    if not isinstance(specs,list) or not specs:raise WorkflowError('Task revision requires nonempty replacement specifications')
+    text=store.text();old_text=text;before_tasks=parse(text);seen=set()
+    # Validate existing checkpoint without projecting or persisting a selected implementation run.
+    state=Store(store.root,allow_unselected=True,neutral=True).load(text);persisted=json.loads(store.state.read_text()) if store.state.exists() else state
+    for spec in specs:
+        if not isinstance(spec,dict) or set(spec)-{'task_id','title','body','depends_on'}:raise WorkflowError('Task revision permits only selected task content, title and dependencies')
+        tid=spec.get('task_id')
+        if tid not in record['task_ids'] or tid in seen:raise WorkflowError('Task revision requires exact unique selected tasks')
+        seen.add(tid);task=clarification_tasks(store,[tid],text)[0]
+        for slot in persisted.get('task_progress',{}).get(tid,{}).get('checks',{}).values():
+            attempt=slot.get('attempt')
+            if attempt and not any(item.get('attempt_id')==attempt['attempt_id'] for item in [slot.get('result',{}),slot.get('red',{}),*slot.get('receipts',{}).values()]):raise WorkflowError('Recover the prepared implementation check before task revision')
+        meta={key:deepcopy(task[key]) for key in FIELDS+OPTIONAL_FIELDS if key in task}
+        if 'depends_on' in spec:meta['depends_on']=spec['depends_on']
+        match=re.match(r'^###[^\n]+\n\s*```yaml\n.*?\n```\s*',task['body'],re.S)
+        body=spec.get('body',task['body'][match.end():]);title=spec.get('title',task['title'])
+        if not isinstance(body,str):raise WorkflowError('Replacement task body requires text')
+        fenced=False
+        for line in body.splitlines():
+            if line.startswith('```'):fenced=not fenced
+            elif not fenced and re.match(r'^#{1,3}\s',line):raise WorkflowError('Replacement task body cannot contain document, queue or task headings')
+        assert_prose(title+'\n'+body);validate_metadata(meta,task['queue']);entry=render(title,meta,body)
+        lines=text.splitlines(keepends=True);lines[task['start']:task['end']]=[entry];text=''.join(lines)
+    tasks=parse(text)
+    if [(t['id'],t['queue']) for t in before_tasks]!=[(t['id'],t['queue']) for t in tasks] or any(old['body']!=new['body'] for old,new in zip(before_tasks,tasks) if old['id'] not in seen):raise WorkflowError('Task revision changes unselected tasks or queue membership')
+    validate_dependencies(tasks,{o['task_id'] for o in store.outcomes() if o['disposition']=='completed'})
+    baselines=clarification_baselines(clarification_tasks(store,record['task_ids'],text));changed=clarification_invalidate(record,baselines)
+    record['task_revisions'].append({'id':identity('TR'),'task_ids':[tid for tid in record['task_ids'] if tid in seen],'source_before':digest(old_text.encode()),'source_after':digest(text.encode()),'changed_fields':{key:sorted(value) for key,value in changed.items()},'recorded_at':now()})
+    persisted['source_hash']=digest(text.encode());persisted['tasks']=index(text)
+    manifest_value=manifest(store);state_rel='.skill-tree/documents/future.json'
+    if not any(f['path']==state_rel for f in manifest_value['files']):manifest_value['files'].append({'path':state_rel,'role':'generated-index-and-active-state','owner':'skill-tree'})
+    manifest_value['state']=state_rel;manifest_value['source_digests']['.skill-tree/documents/future.md']=digest(text.encode())
+    record['source_hash']=digest(text.encode())
+    return {'.skill-tree/documents/future.md':text,state_rel:dump(persisted),'.skill-tree/skill-tree.json':dump(manifest_value)}
+
+def clarification_mutate(store,command,payload):
+    with store.lock():
+        record=clarification_guard(store,payload);tasks=clarification_tasks(store,record['task_ids']);baselines=clarification_baselines(tasks)
+        if any(baselines[tid]['identity']!=record['baselines'][tid]['identity'] for tid in record['task_ids']):raise WorkflowError('Selected task provenance or relationship identity changed; preserve the clarification and resolve the conflict')
+        if record['state']=='cancelled':raise WorkflowError('Cancelled clarification remains terminal; start a new explicit session')
+        if command=='clarify-resume':
+            clarification_invalidate(record,baselines)
+            if record['state']=='blocked':record.update(state='researching',next_action='Resolve the recorded prerequisite and recheck the same selected tasks')
+            record['stale_facts']=clarification_stale_facts(store,record)
+            if record['stale_facts']:record.update(state='blocked',clarity=None,confirmation=None,next_action='Research changed or unavailable source facts in the original execution checkout: '+', '.join(record['stale_facts']))
+        elif any(baselines[tid]['content_hash']!=record['baselines'][tid]['content_hash'] for tid in record['task_ids']):raise WorkflowError('Selected task source changed; resume clarification to reconcile drift')
+        writes=None
+        if command=='clarify-round':
+            if record['state']=='complete':raise WorkflowError('Completed clarification requires semantic drift before another round')
+            clarification_round(store,record,payload)
+        elif command=='clarify-answer':
+            key=payload.get('question_id');question=record['questions'].get(key);round_record=next((r for r in record['rounds'] if r['id']==payload.get('round_id')),None)
+            if not question or not round_record or key not in round_record['question_ids'] or payload.get('question_revision')!=question['revision'] or round_record['question_revisions'][key]!=question['revision']:raise WorkflowError('Answer does not match the session round and question revision')
+            if not isinstance(payload.get('answer'),str) or not payload['answer'].strip():raise WorkflowError('Actual submitted owner answer is required')
+            evidence=clarification_evidence(payload.get('evidence'))
+            answer={'round_id':round_record['id'],'question_revision':question['revision'],'answer':payload['answer'],'evidence':evidence,'valid':True}
+            old=record['answers'].get(key)
+            if old and old['valid'] and old['round_id']==round_record['id']:
+                if old!=answer:raise WorkflowError('Conflicting replay of the original owner answer')
+                return record
+            if any(round_record['semantic_fingerprints'].get(tid)!=record['semantic_fingerprints'][tid] for tid in question['bindings']):raise WorkflowError('Question task context changed; prepare a current round before another owner answer')
+            if round_record!=record['rounds'][-1] or any(not record['answers'].get(p,{}).get('valid') for p in question['prerequisites']):raise WorkflowError('Answer round is stale or its prerequisites remain unsettled')
+            record['answers'][key]=answer;record.update(state='revising',clarity=None,confirmation=None,next_action='Apply accepted decisions to the selected tasks and recheck the decision frontier')
+        elif command=='clarify-revise':writes=clarification_revise(store,record,payload)
+        elif command=='clarify-confirm':
+            if clarification_stale_facts(store,record):raise WorkflowError('Source facts changed after research; resume and recheck before confirmation')
+            if record['state']!='awaiting-confirmation' or payload.get('task_ids')!=record['task_ids'] or payload.get('semantic_fingerprints')!=record['semantic_fingerprints']:raise WorkflowError('Confirmation must match the current exact scope and semantic task fingerprints after clarity recheck')
+            evidence=clarification_evidence(payload.get('evidence'))
+            record['confirmation']={'task_ids':record['task_ids'],'semantic_fingerprints':record['semantic_fingerprints'],'evidence':evidence,'recorded_at':now()}
+            record.update(state='complete',next_action='Report clarification acceptance; wait for a separate implementation instruction')
+        elif command=='clarify-cancel':
+            if not isinstance(payload.get('reason'),str) or not payload['reason'].strip():raise WorkflowError('Cancellation requires an explicit reason')
+            record.update(state='cancelled',cancellation={'reason':payload['reason'],'recorded_at':now()},next_action='Report cancelled discussion and any unsatisfied required interview obligation')
+        record['revision']+=1
+        if command!='clarify-revise':record['source_hash']=file_hash(store.future)
+        store.guard(payload['expected_source_hash'])
+        return clarification_write(store,record,writes)
+
+
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=['refresh','manifest','index','read','select','pending','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events']);parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|{'refresh','manifest','index','read','select','pending','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     args=parser.parse_args(argv)
     try:
         store=Store(args.root,args.run_id,allow_unselected=args.command in {'index','runs','manifest','start','workspace-setup','recover-locator'},route_queue=args.command!='recover-locator');payload=json.loads(args.input.read_text()) if args.input else {}
         if args.expected_source_hash:payload['expected_source_hash']=args.expected_source_hash
         cmd=args.command
-        if cmd=='manifest':
+        if cmd in CLARIFICATION_COMMANDS:
+            # Canonical routing only: no checkpoint load or implicit implementation-run selection.
+            store=Store(args.root,allow_unselected=True,neutral=True)
+            if cmd=='clarify-start':result=clarification_start(store,payload)
+            elif cmd=='clarify-read':result=clarification_read(store,args.id or payload.get('session_id'))
+            else:result=clarification_mutate(store,cmd,payload)
+        elif cmd=='manifest':
             store=Store(args.root,args.run_id,allow_unselected=True,route_queue=False)
             if args.apply:
                 with store.lock():result=manifest(store);store.commit({'.skill-tree/skill-tree.json':dump(result)})
@@ -1461,7 +1778,8 @@ def main(argv=None):
             with store.lock():text=store.text();result=store.load(text);store.save(text,result)
         elif cmd=='index':result=store.load()
         elif cmd=='read':result=resolve(parse(store.text()),[args.id])[0]
-        elif cmd=='select':result=select(parse(store.text()),args.id)
+        elif cmd=='select':
+            result=select(parse(store.text()),args.id);clarification_admission(store,result['id'])
         elif cmd=='pending':result=resolve(parse(store.text()),args.names or ([args.id] if args.id else []),'Pending Queue')
         elif cmd=='intake':result=intake(store,payload)
         elif cmd=='capture-foundation':result=capture_foundation(store)
