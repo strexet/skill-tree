@@ -1,0 +1,35 @@
+{
+  "assertion": "The external plugin contract defines pinned identity, dependency closure, host invocation, activation lifetime, input/result envelopes and existing-operation hook names. The contract preserves standalone resources, core authorization and acceptance boundaries, offline composition and guarded resume semantics. Workflow-changing choices and unresolved host limitations are explicitly routed to the owner workflow decision task. Project defaults, explicit temporary run overrides and frozen effective configuration are defined separately from installed-package state; confirmed installation enables only the exact displayed hooks and readiness effects.",
+  "attempt_id": "C-4ec89216-00ba-4454-aa6a-5d5551e4a2ee",
+  "commands": [
+    {
+      "command": "Strict document rules",
+      "exit_code": 0
+    },
+    {
+      "command": "npm run validate",
+      "exit_code": 0
+    }
+  ],
+  "limitations": [
+    "Contract design only; lifecycle, composition, invocation and comparative qualification remain separate implementation tasks."
+  ],
+  "observations": [
+    "Pinned resources, license/dependency closure and native requirements have explicit owned identity.",
+    "All existing-operation phases preserve complete core operations and locked selection/check/authorization invariants.",
+    "Project installation confirmation binds exact enabled settings; acquisition, skill execution and frozen effective run configuration remain separate.",
+    "Codex-first source-backed bounded adapter is distinct from native execution and universal support; unsupported tools return prerequisites.",
+    "Question/findings/failure envelopes, idempotent attempts, stale-result guards and ordinary authorized rework are specified.",
+    "New stages and remaining material policy decisions route to actual owner discussion; recommendation efficacy remains unqualified until comparison."
+  ],
+  "result": "pass",
+  "reviewer": "Root source inspection and independent read-only review_plugin_planning_commit",
+  "source_fingerprints": {
+    ".skill-tree/common/scripts/pr-review-state.py": "a26cc95e66145a4917669466c3880f3d8252199a13c63b3e9e9f9fc30dc443d5",
+    ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+    ".skill-tree/documents/plugin-system-contract.md": "92448722e083369b2fd6a1b771c25bc6d137c2b1569eef07dcf40b1e08018053",
+    ".skill-tree/documents/plugin-system-research.md": "252ea8eac8c950fa1a6c8a2ea0a774f81dd9b69850fc7fecc99eff52373e7bb7",
+    ".skill-tree/templates/invariants.json": "4545894b07fab5f222d15eddd17c220408a4be8a5e5f25da3a4a34ef06bb87b5"
+  },
+  "task_id": "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc"
+}

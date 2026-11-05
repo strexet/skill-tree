@@ -50,7 +50,7 @@
       "scope": "skill-tree-next-version-quality-0-3-0"
     },
     {
-      "fresh": true,
+      "fresh": false,
       "id": "A-9e7ffc3d-cd29-4665-99ae-97e5b3572440",
       "path": ".skill-tree/history/audits/audit-a-9e7ffc3d-cd29-4665-99ae-97e5b3572440.json",
       "recorded_at": "2026-11-05T09:21:26.895470+00:00",
@@ -752,6 +752,11 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/documents/plugin-system-contract.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/documents/plugin-system-research.md",
       "role": "canonical"
     },
@@ -793,6 +798,11 @@
     {
       "owner": "skill-tree",
       "path": ".skill-tree/documents/skill-repository-creation-instructions.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/documents/task-clarification-contract.md",
       "role": "canonical"
     },
     {
@@ -1088,7 +1098,7 @@
     "task_outcomes": ".skill-tree/history/task-outcomes.jsonl"
   },
   "latest_audit": {
-    "fresh": true,
+    "fresh": false,
     "id": "A-9e7ffc3d-cd29-4665-99ae-97e5b3572440",
     "path": ".skill-tree/history/audits/audit-a-9e7ffc3d-cd29-4665-99ae-97e5b3572440.json",
     "recorded_at": "2026-11-05T09:21:26.895470+00:00",
@@ -1110,7 +1120,7 @@
     ".skill-tree/common/references/development-practices.md": "e49e939299c92d945d2aaa0d88cadde03639ae951670f8e46e62289cd5734664",
     ".skill-tree/common/references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     ".skill-tree/common/references/documentation-output-contract.md": "34d40d7d8a53b08c5078421cb999b1b3d606506c8b6c9cb5d78273cce73e1008",
-    ".skill-tree/common/references/future-workflow.md": "b2fe86a999bde83038850b7a69640260eaee4246773ec8eb4815ee60eaf7a98a",
+    ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
     ".skill-tree/common/references/history-retention.md": "e34302d1665162c5c94bd1adea7cbdf32a36325bb4a6db1eafab24fc236c3585",
     ".skill-tree/common/references/installation-profile.md": "05d15601e98233e5367a9b1ad67832983a94e8b8e68bcd4f4c81e5f94bc792c5",
     ".skill-tree/common/references/orchestration.md": "79313308e0b2f1833ab131ffd2b2c5fed4f18163b26b682f9234b17f285f8ca5",
@@ -1122,7 +1132,7 @@
     ".skill-tree/common/references/snapshot-rules.md": "18142120546fcd532e496fbd14aefbe449fa63da40cbcca577db249b91dcd30e",
     ".skill-tree/common/references/unity-safety.md": "ff6e0063e3a26f60d8655a08beb33ef19ffa2f27fce9c5efd573480b1b81e6ac",
     ".skill-tree/common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
-    ".skill-tree/common/references/workflow-metadata.md": "6c3252f4564cecc532eec5cec4ad30c9373bea8f85e3c698b19308dd83ae7b9d",
+    ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
     ".skill-tree/common/scripts/create-documentation-snapshot.py": "612aea11e766621747490ddeb13dd24e980cdd30c499d0756635b1c3cce1df93",
     ".skill-tree/common/scripts/inspect-unity-repository.py": "794230aca0f338a9d5a6ce7dd62df2016c9d13fb9622174429f9188225fb78e9",
     ".skill-tree/common/scripts/pr-review-state.py": "a26cc95e66145a4917669466c3880f3d8252199a13c63b3e9e9f9fc30dc443d5",
@@ -1146,6 +1156,7 @@
     ".skill-tree/documents/install.md": "59eddcbcbba0363cdb5f2d37eb628f6c3a439bededc4d6226c87128ad6447969",
     ".skill-tree/documents/installation-architecture.md": "fd548f5be2a74fbfdb416a748e62869771d80f04acb47b246d4488effe083eea",
     ".skill-tree/documents/manual-target-update.md": "f83c49a885b75d27d250d53d5f00936bc1c9e3d45998518cb0045ef8734e3482",
+    ".skill-tree/documents/plugin-system-contract.md": "92448722e083369b2fd6a1b771c25bc6d137c2b1569eef07dcf40b1e08018053",
     ".skill-tree/documents/plugin-system-research.md": "252ea8eac8c950fa1a6c8a2ea0a774f81dd9b69850fc7fecc99eff52373e7bb7",
     ".skill-tree/documents/plugin-workflow-decisions.md": "ada306d29205daf0cda4ac42196917c5d230b763c1dcac5dc2e764a8e1438522",
     ".skill-tree/documents/project.md": "d7c68cfa97eb457a6adb4e5d8d950d831797e377e1d34baaed1f1a1eaa0b575d",
@@ -1155,6 +1166,7 @@
     ".skill-tree/documents/security.md": "4d767dfdb5f52a6d1dd3fc06a0012dcadd748373d17dc1f5c4a89d440afbec2d",
     ".skill-tree/documents/skill-quality-audit.md": "484c6eef09767e5aa3862161b3e671145fb14179a080af17c51ff56cdd57aa0f",
     ".skill-tree/documents/skill-repository-creation-instructions.md": "c1e4c41cde43079187f9cd32e70fb6d5a1c4b5ce089eada3d7a919d4225a5836",
+    ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406",
     ".skill-tree/documents/technical.md": "b2ffc458051ab045b10414c951db184292c4ea3de9ca3cc000ca1cead47d82b0",
     ".skill-tree/documents/testing.md": "de169454b70a54d39629fe7399ea03842f36aae439cdb9c4433022d9e2b7dcd8",
     ".skill-tree/documents/workflow-redesign-conformance.md": "a97b9c8cd39ce29ef7f81264563575917e3fb1dd4a92fd197053e6f9ff841873",

@@ -1,0 +1,40 @@
+{
+  "assertion": "The shared protocol defines exact task/group scope, dependency-ordered question rounds, source facts, actual owner answers, guarded revisions and interruption/resume. Completion requires concrete goals, scope, dependencies, acceptance and feasible validation, no unresolved mandatory decisions and actual owner confirmation bound to the current task revision. The shared loop derives from the inspected upstream grilling protocol and supports explicit clarification without a generic plugin engine; the planned post-processing adapter reuses the same loop. The contract separates complete-content write guards from semantic confirmation identity; formatting-only edits preserve confirmation, semantic edits reopen affected answers and final confirmation, and unrelated answers remain valid.",
+  "attempt_id": "C-badf7b90-00f2-41c4-a6bf-eccda3135e81",
+  "check_id": "clarification-contract",
+  "commands": [
+    {
+      "command": "Document rules for contract and common references with warnings-as-errors",
+      "exit_code": 0
+    },
+    {
+      "command": "npm run sync:check",
+      "exit_code": 0
+    },
+    {
+      "command": "npm run validate",
+      "exit_code": 0
+    }
+  ],
+  "limitations": [
+    "Contract design and source/static validation only; executable clarification behavior is delivered by the separate controller task."
+  ],
+  "observations": [
+    "Exact unique frozen T-task scope, canonical session ownership and explicit parked-run neutrality are specified.",
+    "Dependent full-frontier rounds distinguish researched source facts from actual owner answers and never infer submission from silence.",
+    "Source hash, session hash and revision protect transactions; identity/provenance/optional metadata, graph validation and interrupted recovery have explicit outcomes.",
+    "Separate semantic identity covers complete task content; formatting preserves confirmation, affected semantics reopen answers and final confirmation, unrelated answers survive.",
+    "Seven positive, negative, stale and interrupted examples cover the clarity rubric and actual current owner confirmation boundary.",
+    "The shared loop derives from pinned upstream protocol without an engine bootstrap; manual, helper and native execution evidence remain distinct."
+  ],
+  "result": "pass",
+  "reviewer": "Root source inspection plus independent read-only review_plugin_planning_commit",
+  "source_fingerprints": {
+    ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+    ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+    ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+    ".skill-tree/documents/plugin-system-research.md": "252ea8eac8c950fa1a6c8a2ea0a774f81dd9b69850fc7fecc99eff52373e7bb7",
+    ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406"
+  },
+  "task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa"
+}

@@ -24,6 +24,14 @@ Process Pending invoked by an explicitly launched or explicitly resumed Work Thr
 
 An active checkpoint alone supplies no instruction to resume implementation after a standalone Process Pending request. Explicit controller invocation determines automatic-continuation context. Material clarification questions, unsafe isolation, mandatory validation failures without a repair path, an exhausted optional task-specific budget, repeated unchanged failures and no-progress/dependency-cycle stops remain binding in every mode. Completed flows report outcomes and deferred next choices; completed flows never automatically start another root or snapshot.
 
+## Explicit task clarification contract
+
+An owner-invoked task/group interview uses exact selected Prioritized identities, researched source facts and dependent question rounds. The agent presents the current independent frontier with numbered questions and recommendations, waits for actual submitted answers, revises affected tasks and rechecks clarity. Silence and displayed defaults supply no answers. Explicit clarification requires no plugin engine or implementation run.
+
+The [metadata contract](workflow-metadata.md#task-clarification-contract) owns the planned controller interface and session guards. Separate canonical session files preserve scope and round state without implicitly selecting a parked implementation run. Task revisions preserve identities, provenance, optional validation headers and unrelated progress through guarded owned transactions.
+
+Full queue/session bytes guard writes; separate semantic task identity guards confirmation. Semantic changes reopen affected answers and final confirmation while retaining unrelated answers. Formatting-only changes preserve confirmation. Completion requires an empty decision frontier, concrete task/acceptance/validation definitions and actual owner confirmation of the current summary. Completion never starts implementation. Required interview holds and source drift remain explicit across interruption, resume and cancellation.
+
 ## Implement Next
 
 Select the highest integer priority in Prioritized Next Changes; document order breaks ties. Explicit task ID/name selects only an exact prioritized match. Absent/ambiguous or blocked selections stop; no fallback. Read applicable rules, selected task questions, relevant docs, source/config/assets and tests before implementation. Never implement from future.md alone.
