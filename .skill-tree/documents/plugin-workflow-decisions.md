@@ -4,7 +4,7 @@
 
 The completed initial task clarification cycle covers fifteen selected tasks, including the owner-requested installed-plugin registry and removal interface. Q1-Q11 have actual owner approval. Approval evidence and selected identities reside in `.skill-tree/history/research/plugin-grill-session.json`. The initial final confirmation binds the exact task and summary fingerprints recorded in the clarification session, separately from individual decision approval.
 
-The subsequent workflow design discussion has actual owner approval for W1. W2 remains open. The [W1 decision record](../history/research/plugin-auto-manual-decision.json) preserves the actual owner submission reference, approved policy and implementation boundary. W1 extends the planned final-acceptance policy with legitimate delegated Auto acceptance; the existing manual-only controller remains the implemented baseline until the required followup passes acceptance.
+The subsequent workflow design discussion has actual owner approval for W1 and W2. The [W2 decision record](../history/research/plugin-hook-decisions.json) includes the approved post-processing task-wording application and the requested two-commit document review sequence. The [W1 decision record](../history/research/plugin-auto-manual-decision.json) preserves the actual owner submission reference, approved policy and implementation boundary. W1 extends the planned final-acceptance policy with legitimate delegated Auto acceptance; the existing manual-only controller remains the implemented baseline until the required followup passes acceptance.
 
 ## Approved decisions
 
@@ -38,25 +38,9 @@ The existing validation signature omits full task semantics. The clarification c
 
 ## Workflow decisions and remaining proposal
 
-Task `T-a5a738da-c182-4206-bb61-75ffa21946fb` owns the design discussion. W1 approves explicit internal phases and default Auto decision governance inside the current operations. W2 owns the remaining exact plugin-anchor proposal and has no approval effect. The original fifteen root identities and historical terminal outcomes remain unchanged.
+Task `T-a5a738da-c182-4206-bb61-75ffa21946fb` owns the design discussion. W1 approves explicit internal phases and default Auto decision governance inside the current operations. W2 approves the exact initial integration anchors and the task-wording review application in the [implementation plan](implementation-plan.md). The original fifteen root identities and historical terminal outcomes remain unchanged.
 
-```mermaid
-flowchart LR
-    A[Pending intake] --> B[Processing research]
-    B --> C[Visible stable-ID T-task]
-    C --> D{Enabled interview}
-    D -->|Yes| E[Hold: mode-specific answers, revisions, recheck and acceptance]
-    E --> F[Ready]
-    D -->|No| F
-    F --> G[Research, plan and plan review]
-    G --> H[Implementation, checks and documentation]
-    H --> I[Core review, finding resolution, fixes and re-review]
-    I --> J[Configured after-review pass]
-    J -->|Findings and authorized fixes| I
-    J -->|Current required results complete| K[PR ready]
-```
-
-The diagram combines approved W1 phases and pilot defaults with the remaining W2 anchor proposal. The diagram supplies no W2 approval. PR creation, publication and merge retain applicable owner authorization. A local implementation result requires no implicit PR action.
+The [implementation plan](implementation-plan.md#approved-integration-anchors) owns the approved anchor map and execution sequence. PR creation, publication and merge retain applicable owner authorization. The current manual-only controller and absent production plugin infrastructure remain explicit implementation boundaries.
 
 ### Approved decision W1: internal phases and decision modes
 
@@ -72,7 +56,7 @@ The automatic review/fix cycle separates the reviewer, resolver and executor rol
 
 ### Required W1 implementation handoff
 
-Pending `P-09b5b828-dcdc-4d06-bee1-19e1787e34f4`, priority 128, captures the required Auto/Manual foundation as a blocker of interview consumer `T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69`. Processing researches decomposition, shared consumer dependencies and qualification after the workflow-design gate. The design task contains no workflow implementation. The completed manual clarification controller and original contracts retain immutable terminal evidence.
+Pending `P-09b5b828-dcdc-4d06-bee1-19e1787e34f4`, priority 128, captures the required Auto/Manual foundation as a blocker of interview consumer `T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69`. Processing researches decomposition, shared consumer dependencies and qualification through the approved workflow-design handoff. The design task contains no workflow implementation. The completed manual clarification controller and original contracts retain immutable terminal evidence.
 
 | Unfinished consumer | Required specification alignment before implementation |
 | --- | --- |
@@ -82,23 +66,16 @@ Pending `P-09b5b828-dcdc-4d06-bee1-19e1787e34f4`, priority 128, captures the req
 | Interview pilot `T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69` | Auto uses actual bounded delegated answers and final acceptance; Manual uses actual owner answers and confirmation. Acceptance criteria and check mappings change together. |
 | Comparison `T-a583acd5-fc6b-4d37-97ec-02df969fea9e` | Both comparison arms freeze the same current W1 core baseline and mode. W1 grants no trial authorization or increased limits. |
 
-Qualification covers both modes, out-of-authority requests, false answer origin, semantic drift, explicit switching and resume, no-progress escalation and actual agent scenarios. Installation consent, package ownership and existing publication boundaries retain applicable authorization. W2 remains an owner decision in the current discussion; the proposed Auto implementation supplies no answer to W2.
+Qualification covers both modes, out-of-authority requests, false answer origin, semantic drift, explicit switching and resume, no-progress escalation and actual agent scenarios. Installation consent, package ownership and existing publication boundaries retain applicable authorization. W2 has actual owner approval; delegated-agent behavior remains an unimplemented requirement rather than the source of the approval.
 
-### Open decision W2: permitted initial anchor map
+### Approved decision W2: integration anchors and task wording
 
-All anchors follow mandatory selection, admission, ownership and authorization guards. Each supported operation/phase pair has one deterministic sequential anchor. The general phase vocabulary does not imply support for every operation/phase pair.
+The [approved anchor map](implementation-plan.md#approved-integration-anchors) defines deterministic before/during/after boundaries inside existing operations. Complete core work and current checks remain mandatory. Leaf/controller bindings avoid duplicate invocation; after-review occurs before PR readiness and any authorized merge.
 
-| Existing operation | Before | During | After |
-| --- | --- | --- | --- |
-| Process Pending | After exact Pending selection and guards, before source research. | After source research, before final task formulation. | After atomic creation of visible stable-ID T-tasks with implementation holds, before the processing handoff and interview launch; an enabled interview retains the holds until actual mode-specific answers, revisions, recheck and acceptance. Core-only task creation has no plugin interview hold. |
-| Implement Next | After exact task/dependency admission, before selected-task research. | After selected-task research and local planning, before source edits. | After required checks and documentation, before terminal task completion. Verification-oriented plugins may inspect evidence; plugin output never substitutes for required checks. |
-| Initialize Documents / Audit Documents | After exact repository/document scope and guards, before source research. | After source research, before document formulation or audit consolidation. | After document updates and required validation, before operation acceptance. An after-hook edit invalidates affected checks. |
-| PR Review Cycle | After pinning the complete diff/base/head and authority, before core review analysis. | After the first complete core diff inspection, before finding consolidation and the ordinary fix/re-review cycle. | After the complete core review/fix cycle, before PR readiness and any authorized merge. Ponytail uses the after-review anchor by default. |
+The [post-processing sequence](implementation-plan.md#post-processing-task-quality) includes configured `writing-for-agents` wording review, grilling, revisions, affected wording recheck and current mode-specific final acceptance. Task creation and configured holds are atomic. Editorial edits preserve identity, provenance, required constraints and dependencies; semantic changes reopen affected questions and final acceptance. Optional plugin configuration creates the obligation; core-only projects receive no plugin hold.
 
-`During` contributes an additional declared pass; the plugin cannot replace, interrupt arbitrarily or truncate core work. Changes to the reviewed head/base, relevant source, task semantics or effective configuration invalidate affected results. New authorized fixes repeat the required core review and configured passes for the current identity. Deterministic ordering resolves multiple bindings at the same anchor.
-
-Implement All and Work Through Next reuse the leaf-operation bindings and create no duplicate controller invocation. Add Pending, Create Snapshot, standalone Clarify Tasks and controller-level bindings remain unsupported in the initial map. The post-processing interview uses the shared clarification session rather than invoking the plugin again on every internal question round. Validation is an existing implementation obligation, not a newly invented standalone operation. Additional readiness gates outside the two approved pilot policies require a separate explicit policy decision.
+The catalog records task-editorial and skill/document applications separately. Placement approval supplies no application-specific improvement evidence or automatic installation. Source/resource closure, host support, lifecycle and actual invocation remain qualification requirements.
 
 ### Separate comparative qualification decision
 
-The market study contains a finite proposal of eight fixtures, 36 worker trials, eight blind judges, eight factual helpers and two activation calibrations: at most 54 spawned contexts, 96 explicit host-turn requests and 60 task-specific minutes. Task `T-a583acd5-fc6b-4d37-97ec-02df969fea9e` owns actual agreement before comparison execution and records the current W1 baseline before freezing trials. W1 approval and any later W2 approval supply no comparison execution authority, favorable recommendation evidence, external acquisition or native/runtime scope.
+The market study contains a finite proposal of eight fixtures, 36 worker trials, eight blind judges, eight factual helpers and two activation calibrations: at most 54 spawned contexts, 96 explicit host-turn requests and 60 task-specific minutes. Task `T-a583acd5-fc6b-4d37-97ec-02df969fea9e` owns actual agreement before comparison execution and records the current W1 baseline before freezing trials. W1/W2 approval supplies no comparison execution authority, favorable recommendation evidence, external acquisition or native/runtime scope.

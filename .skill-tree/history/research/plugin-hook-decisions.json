@@ -1,0 +1,28 @@
+{
+  "approved_scope": [
+    "Deterministic internal before/during/after anchors for Process Pending, Implement Next, document operations and PR Review Cycle.",
+    "Complete core operations, current required checks, leaf/controller deduplication and after-review before readiness/merge.",
+    "Post-processing writing-for-agents task wording review before grilling, affected recheck after revisions and current mode-specific final acceptance before Ready.",
+    "Preserved task identity, constraints, dependencies and current semantic/formatting freshness rules.",
+    "Task-editorial and skill/document applications remain distinct catalog/evidence locations."
+  ],
+  "comparison_status": "proposal_requires_separate_actual_agreement",
+  "decision_id": "W2",
+  "implementation_status": "not_implemented",
+  "owner_submission": {
+    "kind": "owner-message",
+    "reference": "Actual current owner message approving W2 recommendations and requesting plan finalization, first commit, full document review/fixes and a second commit.",
+    "text": "W2 - согласен с твоими рекомендациями.\nВнеси все правки в план-докумен и закосить финальную версию.\n\nПосле комита проведи полное ревью всего документа: найди недочеты и проблемы и поправь их.\n\nПосле этого еще один комит."
+  },
+  "plan": ".skill-tree/documents/implementation-plan.md",
+  "record_kind": "owner-workflow-decision",
+  "recorded_at": "2026-11-05T18:43:15.744429+00:00",
+  "requested_sequence": [
+    "commit_approved_plan",
+    "review_complete_document_and_fix",
+    "commit_review_fixes"
+  ],
+  "schema": 1,
+  "status": "approved",
+  "w1_reference": ".skill-tree/history/research/plugin-auto-manual-decision.json"
+}
