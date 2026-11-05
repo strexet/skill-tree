@@ -2,7 +2,7 @@
 
 ## Ownership
 
-The source repository contains eight logical operations composed into representative general, web and unity packages under `.skill-tree/skills/<flavor>/`. Authored templates and domain slots own entry-point instructions; generated packages receive no independent edits. Shared canonical references/scripts reside under `.skill-tree/common/`. `resource-map.json` defines generated standalone resources; `providers.json` defines provider IDs, detection, installation destinations and optional bridge paths.
+The source repository contains nine logical operations composed into representative general, web and unity packages under `.skill-tree/skills/<flavor>/`. Authored templates and domain slots own entry-point instructions; generated packages receive no independent edits. Shared canonical references/scripts reside under `.skill-tree/common/`. `resource-map.json` defines generated standalone resources; `providers.json` defines provider IDs, detection, installation destinations and optional bridge paths.
 
 ## Skill packages
 
@@ -10,7 +10,7 @@ Each package contains `SKILL.md` with YAML name/description/license fields, opti
 
 ## Document contract
 
-Generated prose uses English, current declarative descriptions and explicit entities instead of ambiguous pronouns. Quoted technical labels and grammatical clauses retain exact meaning; prose warnings require contextual review. Technical identifiers and externally required syntax retain exact spelling. Owned files/directories use lowercase kebab-case. Required discovery filenames and standard manifests are exceptions. Current documentation owns current behavior; future.md owns planned work; compact history owns recorded outcomes. No migration handlers, format converters or legacy aliases are supported.
+Generated prose uses English, current declarative descriptions and explicit entities instead of ambiguous pronouns. Quoted technical labels and grammatical clauses retain exact meaning; prose warnings require contextual review. Technical identifiers and externally required syntax retain exact spelling. Owned files/directories use lowercase kebab-case. Required discovery filenames and standard manifests are exceptions. Current documentation owns current behavior; future.md owns planned work; compact history owns recorded outcomes. Explicit run-registry adoption preserves supported schema-2 checkpoints. Unsupported format converters and legacy aliases remain excluded.
 
 ## Source changes
 

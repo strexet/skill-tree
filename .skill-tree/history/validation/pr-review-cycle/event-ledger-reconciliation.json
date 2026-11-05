@@ -1,0 +1,9 @@
+{
+  "event_ids": [
+    "E-d9a8afe9-43aa-47d5-b69d-aba326d66fd2"
+  ],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "resolution": "The intermediate helper recorded durable events before the applied-event marker fix. The owner run contains the exact four terminal outcomes and current validated checkpoint. Explicit marker reconciliation preserves every event byte, task identity, source branch and worktree.",
+  "run_id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6",
+  "schema": 1
+}

@@ -7,12 +7,12 @@ const source = path.resolve(__dirname, '..');
 const c = require('../lib/composer.js');
 function fixture(t) { const root=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-compose-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));return root; }
 function write(root,rel,data) { const p=path.join(root,rel);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,typeof data==='string'?data:JSON.stringify(data)); }
-test('composition is deterministic, standalone and has eight logical names for every flavor',t=>{
+test('composition is deterministic, standalone and has nine logical names for every flavor',t=>{
  for(const flavor of ['general','web','unity']) {
   const root=fixture(t);
   if(flavor==='unity'){write(root,'ProjectSettings/ProjectVersion.txt','m_EditorVersion: 6000.0.83f1');write(root,'Packages/manifest.json',{dependencies:{'com.unity.test-framework':'1.4.6'}});write(root,'Packages/packages-lock.json',{dependencies:{'com.unity.test-framework':{version:'1.4.6'}}});}
   const profile=c.resolveProfile(source,root,flavor),a=c.compose(source,profile),b=c.compose(source,profile);
-  assert.deepEqual(a,b);assert.equal(Object.keys(a.packages).length,8);
+  assert.deepEqual(a,b);assert.equal(Object.keys(a.packages).length,9);
   for(const [name,files] of Object.entries(a.packages)) {
    assert.ok(!name.includes('unity-'));assert.equal((files['SKILL.md'].match(/^name:/gm)||[]).length,1);
    assert.match(files['SKILL.md'],new RegExp('Flavor: '+flavor));
@@ -31,7 +31,7 @@ test('static capability inputs detect additions, unsupported versions and confli
  assert.throws(()=>c.resolveProfile(source,root,'unity'),/unsupported/i);
 });
 test('missing foundation is a persisted capability gap while installation remains composable',t=>{
- const root=fixture(t),p=c.resolveProfile(source,root,'web');assert.equal(p.gaps[0].key,'test-foundation');assert.equal(Object.keys(c.compose(source,p).packages).length,8);
+ const root=fixture(t),p=c.resolveProfile(source,root,'web');assert.equal(p.gaps[0].key,'test-foundation');assert.equal(Object.keys(c.compose(source,p).packages).length,9);
 });
 test('resource collisions reject undeclared replacements and slot overrides preserve mandatory invariants',()=>{
  assert.throws(()=>c.mergeResources({'a':'one'},{'a':'two'}),/conflict/i);

@@ -61,6 +61,19 @@ class ManifestValidationTests(unittest.TestCase):
         self.assertIsNone(json.loads(self.store.state.read_text())['active_run'])
     def test_active_checkpoint_schema_and_missing_root_are_detected_without_reset(self):
         state=json.loads(self.store.state.read_text());state['active_run']={'id':'invalid'};self.store.state.write_text(wf.dump(state));self.assert_error('Corrupt active checkpoint');self.assertEqual(json.loads(self.store.state.read_text())['active_run'],{'id':'invalid'})
+    def test_nested_document_is_indexed_and_changed_bytes_are_detected(self):
+        nested=self.store.base/'documents/automation/runtime.md';nested.parent.mkdir();nested.write_text('# Runtime Contract\n\nThe fixture preserves source.\n')
+        self.refresh();manifest=json.loads((self.store.base/'skill-tree.json').read_text());rel=nested.relative_to(self.store.root).as_posix()
+        self.assertIn(rel,{f['path'] for f in manifest['files']});self.assertEqual(manifest['source_digests'][rel],wf.file_hash(nested))
+        nested.write_text('# Runtime Contract\n\nThe fixture preserves resources.\n');self.assert_error('Stale manifest source digest')
+    def test_nested_prose_defect_fails_strict_validation(self):
+        nested=self.store.base/'documents/automation/runtime.md';nested.parent.mkdir();nested.write_text('# Runtime Contract\n\nWe preserve state.\n');self.refresh()
+        result=validator.validate(self.root,True);self.assertFalse(result['ok']);self.assertTrue(any('runtime.md' in str(error) for error in result['errors']),result)
+    def test_missing_nested_navigation_and_digest_are_detected_together(self):
+        nested=self.store.base/'documents/automation/runtime.md';nested.parent.mkdir();nested.write_text('# Runtime Contract\n\nThe fixture preserves source.\n');self.refresh();rel=nested.relative_to(self.store.root).as_posix()
+        def omit(data):
+            data['files']=[f for f in data['files'] if f['path']!=rel];data['source_digests'].pop(rel,None)
+        self.mutate_manifest(omit);self.assert_error('Owned documentation coverage is stale')
     def test_source_manifest_has_no_target_queue_requirement(self):
         (self.store.base/'skills').mkdir();self.store.state.unlink();self.store.future.unlink()
         (self.store.base/'config').mkdir(exist_ok=True);(self.store.base/'config/repository.json').write_text('{"role":"source","schema":1}')

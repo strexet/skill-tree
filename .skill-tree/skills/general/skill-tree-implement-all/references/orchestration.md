@@ -2,13 +2,15 @@
 
 ## Work through next
 
-Read rules and manifest; resolve one highest-priority main or explicit prioritized ID/name. Start mode next, recording applicable task-specific execution policy and observed counters. Resume an active checkpoint instead of restarting. Run cycle after each completed iteration to enforce progress. Use advance before each handoff; read only the selected task body and applicable selected-flavor leaf contract.
+Read rules and manifest; resolve one highest-priority main or explicit prioritized ID/name. Read [run workspaces](run-workspaces.md) before source edits. Start mode next with a dedicated branch/worktree, recording applicable task-specific execution policy and observed counters. Resume the explicitly selected checkpoint without restarting; a new invocation can create a separate claimed run. Run cycle after each completed iteration to enforce progress. Use advance before each handoff; read only the selected task body and applicable selected-flavor leaf contract.
 
 Implement through the implementation contract. Capture understood findings with root/direct-parent context; retain Pending IDs. Process exact required Pending IDs before parent resumption. Recursively execute required dependencies by priority. Resume the parent only after dependency outcomes establish completion. Persist acceptance evidence before queue removal. Process captured nonblocking findings once at the end; retain insufficiently understood work and defer implementation. Finish only after the main and required descendants complete.
 
 ## Implement All
 
-Start mode all to freeze the initial Prioritized identities. Execute the same dependency cycle for remaining snapshot roots by current priority. Include required discovered work; exclude new nonblocking tasks. Completion records deduplicate dependencies shared by initial roots. Absent tasks without evidence stop execution.
+Start mode all to freeze the initial Prioritized identities. An explicit owner-selected group supplies exact prioritized T- IDs through the start payload's `snapshot_ids`; omission selects the full initial Prioritized queue. Resolve the requested group before starting, report the selected roots and required dependencies, and preserve the recorded snapshot on resume. A selected group follows numeric priority and document tie order. Pending/Backlog items require normal research and promotion before selection. The selected root group differs from `validation_group_id`, which batches validation inside admitted scope.
+
+Execute the same dependency cycle for remaining snapshot roots by current priority. Include required discovered work; exclude unrelated roots and new nonblocking tasks. Completion records deduplicate dependencies shared by initial roots. Absent tasks without evidence stop execution.
 
 ## Processing Handoff
 
@@ -29,3 +31,7 @@ Use bundled processing/implementation/intake references when installed leaf skil
 Start pins the current profile and freezes required task/group scope. Resume re-admits through `admit`; leaf calls reuse the pin. Scoped processing can admit required descendants with the existing receipt; direct queue edits never silently expand controller scope. Ready dependencies retain verified completion semantics.
 
 Advance returns implement or validate. Awaiting-validation units keep the specification and never re-enter implementation. Compatible eligible members of the same declared group can proceed only inside admitted scope; immediate checks and verified consumers force earlier validation. Unrelated initial roots never bypass an unresolved selected root. Finish requires completed required tasks and current acceptance; no pending or failed check can disappear into a terminal outcome.
+
+## Publication handoff
+
+Finish preserves implementation acceptance independently of delivery. Offer local result, PR review/fix, or PR review/fix with an explicit merge target. No offer starts publication. A recorded full-path owner instruction continues through the bundled [PR review cycle](pr-review-cycle.md) without repeated authorization questions. PR readiness, merge confirmation and publication blockers remain separate persisted outcomes.

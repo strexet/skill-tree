@@ -4,7 +4,7 @@
 
 Source release version: 0.2.0. The owner request authorizes the workflow redesign and intermediate scoped local commits in the Skill Tree source repository. Source/temporary-fixture qualification is the release gate. Publication, push, live provider reinstallation, existing-target migration, Unity/product execution, devices and scheduling remain separate owner actions.
 
-Canonical contracts/helpers reside in `.skill-tree/common/`; authored entry-point sections reside in `.skill-tree/templates/`; domain resources reside in `.skill-tree/domains/`. Flavor/capability/provider/resource registries reside in `.skill-tree/config/`. The deterministic composer owns generated representative packages under `.skill-tree/skills/general/`, `.skill-tree/skills/web/` and `.skill-tree/skills/unity/`. Each flavor contains the same eight logical operations with stable names.
+Canonical contracts/helpers reside in `.skill-tree/common/`; authored entry-point sections reside in `.skill-tree/templates/`; domain resources reside in `.skill-tree/domains/`. Flavor/capability/provider/resource registries reside in `.skill-tree/config/`. The deterministic composer owns generated representative packages under `.skill-tree/skills/general/`, `.skill-tree/skills/web/` and `.skill-tree/skills/unity/`. Each flavor contains the same nine logical operations with stable names.
 
 ## Installation
 
@@ -16,7 +16,7 @@ Global, symlink and uncomposed upstream specialization are unsupported before wr
 
 ## Task and validation state
 
-Queue/index schema 2 separates task definitions in `documents/future.md`, implementation/check progress in `future.json.task_progress`, controller scope/admission in `active_run` and compact terminal outcomes in history. UUID task/provenance IDs, integer priorities and the single verified `depends_on` graph retain exact selection and dependency semantics. Small tasks require Goal, Touch, Validation and Acceptance; structured checks own criterion mapping, relevant source/tests, recipe IDs, parameters, assertion and timing.
+Queue/index schemas 2 and 3 separate task definitions in `documents/future.md`, implementation/check progress in `future.json.task_progress`, controller scope/admission in the single-run checkpoint or multi-run registry and compact terminal outcomes in history. UUID task/provenance IDs, integer priorities and the single verified `depends_on` graph retain exact selection and dependency semantics. Small tasks require Goal, Touch, Validation and Acceptance; structured checks own criterion mapping, relevant source/tests, recipe IDs, parameters, assertion and timing.
 
 Begin admits the profile once per invocation/resume. Nested Red/Green checks reuse admission. Implemented tasks await required checks without reimplementation. Prepared attempts bind source/test/recipe/environment/group identities; actual result records require matching artifacts, lane, classification and cleanup. Nonzero expected runner discovery and no required skips protect test evidence. Expected behavioral Red remains separate from final acceptance.
 
@@ -37,3 +37,9 @@ Implementation units U-01 through U-08 have completed source qualification. The 
 Required checks are synchronization, strict source/metadata/prose validation, Python and Node behavioral fixtures, installer list, temporary-target all-provider dry-run, shell entry-point listing and diff checks. No test result claims actual agent/model adherence, native provider runtime, Unity/browser execution, hosted deployment or device qualification.
 
 The controller revalidates stale required completed checks before finish without rewriting terminal outcomes. Provider reference sets protect shared discovery destinations. Static dependency facts distinguish declared and resolved versions; deterministic recomposition verifies the installed policy. Profile activation protects concurrent edits and input drift, preserves stopped workflow state and restores matching owned generations after verification failure.
+
+## PR cycle and concurrent controller scope
+
+The current owner scope covers the ninth shared operation, PR review/fix contracts, isolated branch/worktree lifecycle, compatible multi-run registry adoption, canonical queue claims/events, profile and installer integration, and controlled standalone qualification for general, web and unity. The selected run uses a local develop base and one codex branch/worktree. Source qualification requires local temporary Git repositories and provider fixtures. Actual Skill Tree PR creation, push, publication and merge remain outside the scope.
+
+Implement All accepts an explicit selected group through `snapshot_ids` in the start JSON. The selected snapshot preserves priority/document order, admits required dependencies and excludes unrelated roots; omission retains full initial Prioritized selection. Invalid group admission leaves state, claims and workspaces unchanged. Resume preserves the frozen scope. Controlled source and installed general/web/unity fixtures qualify selected-group behavior.
