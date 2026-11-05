@@ -44,6 +44,7 @@ function resolveProfile(source,root,flavor) {
  const registry=readJson(source,'config/flavors.json'),rules=readJson(source,'config/capabilities.json');
  if(!registry.flavors[flavor])throw Error('Unknown flavor: '+flavor);
  const fixed=['package.json','package-lock.json','npm-shrinkwrap.json','yarn.lock','pnpm-lock.yaml','bun.lock','bun.lockb','.nvmrc','.node-version','pyproject.toml','pytest.ini','Cargo.toml','ProjectSettings/ProjectVersion.txt','ProjectSettings/EditorSettings.asset','ProjectSettings/ProjectSettings.asset','Packages/manifest.json','Packages/packages-lock.json','.skill-tree/validation-recipes.json','.skill-tree/worktree-profile.json'];
+ fixed.push('.skill-tree/config/repository.json');
  const discovered=inventory(root,rules.inventory),inputs={};
  for(const rel of [...new Set([...fixed,...discovered])].sort()){inputs[rel]=inputDigest(root,rel);}
  const facts={test_assemblies:[],ui:[]},recipes={},gaps=[];
@@ -88,16 +89,20 @@ function resolveProfile(source,root,flavor) {
   else if(!facts.test_assemblies.length)gaps.push({key:'test-foundation',reason:'UTF exists without a discovered test assembly.',recommendation:'Configure the existing UTF framework and one meaningful EditMode test assembly; preserve package pins.'});
  } else if(!Object.values(recipes).some(r=>['unit','integration','browser'].includes(r.lane)))gaps.push({key:'test-foundation',reason:'No usable foundational test command is declared.',recommendation:'Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile.'});
  const explicit=readJson(root,'.skill-tree/validation-recipes.json',null);
+ const sourceRegistry=readJson(root,'.skill-tree/config/repository.json',null);
+ const sourceRecipes=sourceRegistry?.role==='source'?{schema:sourceRegistry.schema,recipes:sourceRegistry.recipes||{}}:null;
  const execution_bindings=explicit?bindings.resolveBindings(root,explicit):{};
  for(const binding of Object.values(execution_bindings))for(const rel of [binding.locator,binding.review_path])inputs[rel]=inputDigest(root,rel);
- if(explicit){if(explicit.schema!==1||!explicit.recipes)throw Error('Unsupported static validation recipe format');for(const [id,recipe] of Object.entries(explicit.recipes)){
+ for(const [declarationPath,declaration] of [['.skill-tree/config/repository.json',sourceRecipes],['.skill-tree/validation-recipes.json',explicit]]){
+ if(declaration){if(declaration.schema!==1||!declaration.recipes)throw Error('Unsupported static validation recipe format');for(const [id,recipe] of Object.entries(declaration.recipes)){
   if(!/^[a-z][a-z0-9-]*$/.test(id)||!Array.isArray(recipe.argv)||!recipe.argv.length||recipe.argv.some(v=>typeof v!=='string')||!rules.lanes.includes(recipe.lane))throw Error('Invalid or unsupported static recipe lane: '+id);
   if(recipes[id])throw Error('Recipe collision: '+id);
   if(recipe.execution_binding&&(!execution_bindings[recipe.execution_binding]||!['unity-editmode','unity-playmode'].includes(recipe.lane)||recipe.editor_version!==execution_bindings[recipe.execution_binding].pins.editor_version))throw Error('Recipe requires a matching reviewed Unity execution binding: '+id);
-  recipes[id]={...recipe,input_paths:['.skill-tree/validation-recipes.json',...(recipe.input_paths||[])],qualification:'owner-declared static recipe; runner unqualified'};
+  recipes[id]={...recipe,input_paths:[declarationPath,...(recipe.input_paths||[])],qualification:'owner-declared static recipe; runner unqualified'};
   for(const rel of recipe.input_paths||[]){inputs[rel]=inputDigest(root,rel);}
  }
  if(Object.values(recipes).some(r=>['unit','integration','browser','unity-editmode'].includes(r.lane)))gaps.splice(0,gaps.length,...gaps.filter(g=>g.key!=='test-foundation'));}
+ }
  const unresolved=Object.entries(facts.packages).filter(([,value])=>value.state==='ambiguous').map(([name])=>name);
  if(unresolved.length)gaps.push({key:'unresolved-package-versions',packages:unresolved,reason:'Dependency declarations lack resolved version evidence; version-specific resources are unavailable until supported lock evidence is supplied.'});
  facts.capabilities={};

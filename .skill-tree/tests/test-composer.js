@@ -7,6 +7,21 @@ const source = path.resolve(__dirname, '..');
 const c = require('../lib/composer.js');
 function fixture(t) { const root=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-compose-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));return root; }
 function write(root,rel,data) { const p=path.join(root,rel);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,typeof data==='string'?data:JSON.stringify(data)); }
+test('source recipe identities survive composition and retain freshness and collision checks',t=>{
+ const root=fixture(t),rel='.skill-tree/config/repository.json';
+ write(root,rel,{schema:1,role:'source',recipes:{'focused-check':{lane:'unit',argv:['python3','focused.py'],input_paths:[]}}});
+ const first=c.resolveProfile(source,root,'general');
+ assert.deepEqual(first.recipes['focused-check']?.argv,['python3','focused.py']);
+ assert.ok(first.recipes['focused-check'].input_paths.includes(rel));
+ write(root,rel,{schema:1,role:'source',recipes:{'focused-check':{lane:'unit',argv:['python3','changed.py'],input_paths:[]}}});
+ assert.notEqual(first.environment_id,c.resolveProfile(source,root,'general').environment_id);
+ write(root,'.skill-tree/validation-recipes.json',{schema:1,recipes:{'focused-check':{lane:'unit',argv:['other'],input_paths:[]}}});
+ assert.throws(()=>c.resolveProfile(source,root,'general'),/collision/i);
+});
+test('target role cannot inject source recipes',t=>{
+ const root=fixture(t);write(root,'.skill-tree/config/repository.json',{schema:1,role:'target',recipes:{unowned:{lane:'unit',argv:['unowned'],input_paths:[]}}});
+ assert.equal(c.resolveProfile(source,root,'general').recipes.unowned,undefined);
+});
 test('composition is deterministic, standalone and has nine logical names for every flavor',t=>{
  for(const flavor of ['general','web','unity']) {
   const root=fixture(t);

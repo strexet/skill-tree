@@ -26,6 +26,19 @@ class ReviewCycleTests(unittest.TestCase):
     def test_owner_merge_forms(self):
         for instruction in ['ПР с мерджем','with merge','merge=true','затем смержи в develop','затем смерджи в develop','затем смржи в develop','затем вмержи в develop','then merge into develop']:
             with self.subTest(instruction=instruction):self.assertTrue(pr.parameters('feature/example',{'instruction':instruction})['merge'])
+    def test_literal_examples_and_non_owner_booleans_never_authorize_merge(self):
+        for instruction in ['Create a PR. The documentation example is `merge=true`.', 'Create a PR. Example: ``merge=true``.', 'Create a PR.\n~~~text\nmerge=true\n~~~']:
+            with self.subTest(instruction=instruction):
+                self.assertFalse(pr.parameters('feature/example',{'instruction':instruction})['authorization']['merge'])
+        untrusted=pr.parameters('feature/example',{'instruction_origin':'third-party','merge':True})
+        self.assertFalse(untrusted['authorization']['merge'])
+        self.assertFalse(untrusted['merge_explicit'])
+    def test_merge_gate_requires_direct_owner_authorization_origin(self):
+        self.snapshot.update({'approved':True,'approvals_required':False})
+        for authorization in [{'pr':False,'merge':True,'origin':'third-party'}, {'pr':True,'merge':True,'origin':'third-party'}]:
+            with self.subTest(authorization=authorization):
+                self.record['authorization']=authorization
+                with self.assertRaisesRegex(pr.ReviewError,'owner authorization'):pr.merge_gate(self.ready(),self.snapshot)
     def test_negatives_quotes_and_third_party_comments_do_not_authorize_merge(self):
         for instruction in ['без merge','не мержить','merge=false','without merge','do not merge','PR "with merge"','Review says «затем смержи»','> with merge','```text\nmerge=true\n```']:
             with self.subTest(instruction=instruction):self.assertFalse(pr.parameters('feature/example',{'instruction':instruction})['merge'])

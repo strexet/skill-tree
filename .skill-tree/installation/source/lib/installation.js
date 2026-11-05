@@ -14,10 +14,10 @@ function compositionIdentity(profile){
  return c.hash(c.json({flavor:profile.flavor,environment_id:profile.environment_id,source_digests:profile.source_digests,output_digests:outputs}));
 }
 const treeHash=(root,rel)=>{const files=filesAt(root,rel);return files===null?null:c.hash(c.json(files));};
-function receipt(root,required=false){
+function receipt(root,required=false,allowForeign=false){
  const p=c.readJson(root,PROFILE,null);
  if(!p){if(required)throw Error('Missing ownership receipt; install with an explicit --flavor');return null;}
- if(p.format!=='skill-tree-profile'||p.schema!==1||p.project_root!==fs.realpathSync(root)||!p.destinations||!p.bundle_digests)throw Error('Unsupported or foreign ownership receipt; use the manual update checklist');
+ if(p.format!=='skill-tree-profile'||p.schema!==1||typeof p.project_root!=='string'||!allowForeign&&p.project_root!==fs.realpathSync(root)||!p.destinations||!p.bundle_digests)throw Error('Unsupported or foreign ownership receipt; use the manual update checklist');
  return p;
 }
 function verifyOwned(root,p,includeBundle=true){
@@ -170,8 +170,8 @@ function plan(root,source,flavor,selections,options={}){
  }).map(([rel])=>rel);
  return {profile:next,changes,delta,old,expected};
 }
-function verify(root,source){
- const p=receipt(root,true);verifyOwned(root,p);const bundleSource=c.safe(root,INSTALL+'/source');
+function verify(root,source,allowForeign=false){
+ const p=receipt(root,true,allowForeign);verifyOwned(root,p);const bundleSource=c.safe(root,INSTALL+'/source');
  const now=c.resolveProfile(bundleSource,root,p.flavor);
  for(const field of ['source_version','inputs','inventory','facts','recipes','gaps','environment_id','execution_bindings','worktree_environment'])if(c.json(now[field])!==c.json(p[field]))throw Error('Profile refresh-required or resolved profile mismatch: node .skill-tree/installation/manager.js --refresh-profile');
  if(p.identity!==compositionIdentity(p))throw Error('Composition receipt identity mismatch');
@@ -234,9 +234,23 @@ function restoreGeneration(root){
  transaction(root,changes,expected);return {action:'generation rolled back; project dependencies unchanged; verify freshness before admission'};
 }
 function rollback(root){return locked(root,()=>restoreGeneration(root));}
+function rebind(root,source){
+ if(fs.existsSync(c.safe(root,INSTALL+'/.journal.json'))||fs.existsSync(c.safe(root,INSTALL+'/.staging')))throw Error('Recover the original installation transaction before explicit rebind');
+ verify(root,source,true);
+ return locked(root,()=>{
+  const p=verify(root,source,true),project_root=fs.realpathSync(root);
+  if(p.project_root===project_root)return {action:'verified no-op current'};
+  if(hasActiveOperation(root))throw Error('Active controller must reach a stopped handoff before rebind');
+  transaction(root,{[PROFILE]:c.json({...p,project_root})},{[PROFILE]:treeHash(root,PROFILE)},()=>verify(root,source,true));
+  verify(root,source);return {action:'verified installation rebound; recover the queue locator explicitly when required'};
+ });
+}
 function localMain(root,source,args){
  try{
-  if(args.some(a=>!['--refresh-profile','--dry-run','--verify','--recover','--rollback'].includes(a)))throw Error('Usage: manager.js --refresh-profile [--dry-run] | --verify | --recover');
+  if(args.some(a=>!['--refresh-profile','--dry-run','--verify','--recover','--rollback','--rebind'].includes(a)))throw Error('Usage: manager.js --refresh-profile [--dry-run] | --verify | --recover | --rollback | --rebind');
+  const operations=args.filter(a=>a!=='--dry-run');
+  if(operations.length!==1||args.filter(a=>a==='--dry-run').length>1||args.includes('--dry-run')&&operations[0]!=='--refresh-profile')throw Error('Select exactly one manager operation; --dry-run applies only to --refresh-profile');
+  if(args.includes('--rebind')){console.log(c.json(rebind(root,source)));return 0;}
   if(args.includes('--rollback')){console.log(c.json(rollback(root)));return 0;}
   if(args.includes('--recover')){locked(root,()=>{});console.log('Installation recovery complete');return 0;}
   if(args.includes('--verify')){verify(root,source);console.log('Owned installation verified');return 0;}
@@ -244,4 +258,4 @@ function localMain(root,source,args){
   const result=refresh(root,source,args.includes('--dry-run'));console.log(c.json({action:result.action,changed:result.delta,facts:result.profile.facts,gaps:result.profile.gaps}));return 0;
  }catch(error){console.error(error.message);return 2;}
 }
-module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,recover,transaction,locked,plan,install,verify,uninstall,refresh,rollback,localMain};
+module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,recover,transaction,locked,plan,install,verify,uninstall,refresh,rollback,rebind,localMain};

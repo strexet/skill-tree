@@ -254,8 +254,9 @@ def recover_locator(store, payload):
         if payload.get('queue_id') != registry['queue_id']:
             raise RunError('Recovery requires the exact queue ID')
         mapping = payload.get('worktrees', {})
-        if set(mapping) != set(registry['runs']):
-            raise RunError('Recovery requires every retained run locator')
+        required={rid for rid,run in registry['runs'].items() if not delivery_finished(run)}
+        if not isinstance(mapping,dict) or not required.issubset(mapping) or set(mapping)-set(registry['runs']):
+            raise RunError('Recovery requires every unfinished retained run locator and rejects unknown run IDs')
         for rid, value in mapping.items():
             path = Path(value).resolve(); run = registry['runs'][rid]
             if common_dir(path) != common_dir(store.root) or git(path, 'symbolic-ref', '--short', 'HEAD') != run['workspace']['branch']:

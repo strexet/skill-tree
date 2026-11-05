@@ -41,6 +41,20 @@
       "path": ".skill-tree/history/audits/audit-a-031fa918-b34a-4e49-bfbb-670ab472c653.json",
       "recorded_at": "2026-11-02T08:07:37.902803+00:00",
       "scope": "workflow-redesign-conformance-repairs"
+    },
+    {
+      "fresh": false,
+      "id": "A-a5c8d5b6-612f-41ef-9234-952997f7b711",
+      "path": ".skill-tree/history/audits/audit-a-a5c8d5b6-612f-41ef-9234-952997f7b711.json",
+      "recorded_at": "2026-11-05T08:30:03.592755+00:00",
+      "scope": "skill-tree-next-version-quality-0-3-0"
+    },
+    {
+      "fresh": true,
+      "id": "A-9e7ffc3d-cd29-4665-99ae-97e5b3572440",
+      "path": ".skill-tree/history/audits/audit-a-9e7ffc3d-cd29-4665-99ae-97e5b3572440.json",
+      "recorded_at": "2026-11-05T09:21:26.895470+00:00",
+      "scope": "skill-tree-next-version-quality-0-3-0"
     }
   ],
   "canonical_resources": {
@@ -693,6 +707,21 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/documents/build-and-release.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/documents/dependencies.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/documents/features.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/documents/future.json",
       "role": "generated-index-and-active-state"
     },
@@ -723,7 +752,22 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/documents/project.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/documents/repo-init-instructions.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/documents/repository-map.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/documents/rules.md",
       "role": "canonical"
     },
     {
@@ -733,7 +777,22 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/documents/skill-quality-audit.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/documents/skill-repository-creation-instructions.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/documents/technical.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/documents/testing.md",
       "role": "canonical"
     },
     {
@@ -869,6 +928,11 @@
     {
       "owner": "skill-tree",
       "path": ".skill-tree/common/scripts/workflow-state.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/scripts/agent-conformance.py",
       "role": "canonical"
     },
     {
@@ -1014,11 +1078,11 @@
     "task_outcomes": ".skill-tree/history/task-outcomes.jsonl"
   },
   "latest_audit": {
-    "fresh": false,
-    "id": "A-031fa918-b34a-4e49-bfbb-670ab472c653",
-    "path": ".skill-tree/history/audits/audit-a-031fa918-b34a-4e49-bfbb-670ab472c653.json",
-    "recorded_at": "2026-11-02T08:07:37.902803+00:00",
-    "scope": "workflow-redesign-conformance-repairs"
+    "fresh": true,
+    "id": "A-9e7ffc3d-cd29-4665-99ae-97e5b3572440",
+    "path": ".skill-tree/history/audits/audit-a-9e7ffc3d-cd29-4665-99ae-97e5b3572440.json",
+    "recorded_at": "2026-11-05T09:21:26.895470+00:00",
+    "scope": "skill-tree-next-version-quality-0-3-0"
   },
   "policy_references": [
     "AGENTS.md"
@@ -1038,21 +1102,21 @@
     ".skill-tree/common/references/documentation-output-contract.md": "34d40d7d8a53b08c5078421cb999b1b3d606506c8b6c9cb5d78273cce73e1008",
     ".skill-tree/common/references/future-workflow.md": "b2fe86a999bde83038850b7a69640260eaee4246773ec8eb4815ee60eaf7a98a",
     ".skill-tree/common/references/history-retention.md": "e34302d1665162c5c94bd1adea7cbdf32a36325bb4a6db1eafab24fc236c3585",
-    ".skill-tree/common/references/installation-profile.md": "71b43cd88f65f72b3ba9c4662cba8bda377497c9f64b084b9d163bc61e26debe",
+    ".skill-tree/common/references/installation-profile.md": "05d15601e98233e5367a9b1ad67832983a94e8b8e68bcd4f4c81e5f94bc792c5",
     ".skill-tree/common/references/orchestration.md": "79313308e0b2f1833ab131ffd2b2c5fed4f18163b26b682f9234b17f285f8ca5",
     ".skill-tree/common/references/pending-task-format.md": "6c0a90ea992f2c19a26e4f95fc4e45b7ff89d25c0cc8e2c49c11cfa8bad2d8ba",
     ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
-    ".skill-tree/common/references/pr-review-cycle.md": "b23b9c746922a4be7e7ba2423d2d495483ea36fdb5677fd6ff822bc0fbfda5b2",
+    ".skill-tree/common/references/pr-review-cycle.md": "640f5913dbe660723492089b155bbed8d9e36193dd58d52a29729631a938f08a",
     ".skill-tree/common/references/repository-discovery-checklist.md": "a112230c076fea515c437e3e7407c575ee6690d772eaa28e68f80c720c7a621c",
-    ".skill-tree/common/references/run-workspaces.md": "3f31048647a64422397850c9a451a65f56fbc1a6a8c3976ada85c223662f99a0",
+    ".skill-tree/common/references/run-workspaces.md": "d9a97bc8ee56ef0aa6f254075df08e2946fdc61c578328a52f6991dbd723468c",
     ".skill-tree/common/references/snapshot-rules.md": "18142120546fcd532e496fbd14aefbe449fa63da40cbcca577db249b91dcd30e",
     ".skill-tree/common/references/unity-safety.md": "ff6e0063e3a26f60d8655a08beb33ef19ffa2f27fce9c5efd573480b1b81e6ac",
     ".skill-tree/common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
     ".skill-tree/common/references/workflow-metadata.md": "6c3252f4564cecc532eec5cec4ad30c9373bea8f85e3c698b19308dd83ae7b9d",
-    ".skill-tree/common/scripts/create-documentation-snapshot.py": "c47fed16988ab9fecc6dc18f0fbc7d61df5a94de80eef2ef066f208a002e5741",
+    ".skill-tree/common/scripts/create-documentation-snapshot.py": "612aea11e766621747490ddeb13dd24e980cdd30c499d0756635b1c3cce1df93",
     ".skill-tree/common/scripts/inspect-unity-repository.py": "794230aca0f338a9d5a6ce7dd62df2016c9d13fb9622174429f9188225fb78e9",
-    ".skill-tree/common/scripts/pr-review-state.py": "1cbe0550c6d1fe8ba300fd41297be3806e256fc73c334dae2d0bda78a0b8923d",
-    ".skill-tree/common/scripts/run-workspaces.py": "af4e8301a5d24e94353f5e805a53718681c46bbc77349039df508b3e38112077",
+    ".skill-tree/common/scripts/pr-review-state.py": "a26cc95e66145a4917669466c3880f3d8252199a13c63b3e9e9f9fc30dc443d5",
+    ".skill-tree/common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
     ".skill-tree/common/scripts/select-prioritized-task.py": "93f12ac5a333fb072bf8d9d849d08e3b422af856d582d492902647efe35c896f",
     ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     ".skill-tree/common/scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
@@ -1061,17 +1125,26 @@
     ".skill-tree/config/capabilities.json": "fc9572cc6a65f689fd7a750560a897593fd7b90df50eadea3954e242556626c5",
     ".skill-tree/config/flavors.json": "cc2e8ec2e54af53232ab2813a219d3d00a5d7e8b75d2d85ca20f4c0db28231a8",
     ".skill-tree/config/providers.json": "80255fe3fb67e32d71cc7791aee1e51c1d34a508d4c77b6ca852521907ede97a",
-    ".skill-tree/config/repository.json": "1a8c766c9b93d31ff0573b1bc79dfb54e6489e627065be208b0a40c115ce41a7",
+    ".skill-tree/config/repository.json": "3c26162b83118090e970b09b23a926ac7daf4487bf7a4a0ac78244fd54c8182a",
     ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
-    ".skill-tree/documents/agent-compatibility.md": "21e2c40b92081803060ba0e2af521d93c853f6ee54643578ed0335b89b0c2dfe",
+    ".skill-tree/documents/agent-compatibility.md": "f3fb38f0362489ecbc61f129a3346b47a1719e940a722165901f06fd0e5ea37e",
+    ".skill-tree/documents/build-and-release.md": "074d815d75579dc6e11dfd76f8f844d3c672bc6e990bbd3b6a6c6c3b79db1af0",
+    ".skill-tree/documents/dependencies.md": "e524d1d314d8c443e000260860e71fca6db4bd6938e86cb7443379a6fb2db4f3",
+    ".skill-tree/documents/features.md": "25e2fa6c9ce949587ff16be6dad4be73d0ee61f6d6c19c1a283bc6e0b07525ae",
     ".skill-tree/documents/future.md": "05a1f55b7a7202ce1a56bb01919c016110a355ca8de0fe746183d6e62853e634",
-    ".skill-tree/documents/implementation-plan.md": "c8cde378759200799e1b94a7534c0c1fcd077bbf085e833bb4f2d021fa999237",
-    ".skill-tree/documents/install.md": "839a4c8af6ec3e24b64d59e7bafec3ff1abdc8f323d436f57cd2cb466038e2b3",
+    ".skill-tree/documents/implementation-plan.md": "0aafa416d440cea5400dcad4c9ddb7b2d80bc1482193a1a7b74c92628fcd7ad9",
+    ".skill-tree/documents/install.md": "59eddcbcbba0363cdb5f2d37eb628f6c3a439bededc4d6226c87128ad6447969",
     ".skill-tree/documents/installation-architecture.md": "fd548f5be2a74fbfdb416a748e62869771d80f04acb47b246d4488effe083eea",
-    ".skill-tree/documents/manual-target-update.md": "bde9fef269768e996560216a4e9d6cd31cc0b8b1d85c07886459e302943eff56",
+    ".skill-tree/documents/manual-target-update.md": "f83c49a885b75d27d250d53d5f00936bc1c9e3d45998518cb0045ef8734e3482",
+    ".skill-tree/documents/project.md": "d7c68cfa97eb457a6adb4e5d8d950d831797e377e1d34baaed1f1a1eaa0b575d",
     ".skill-tree/documents/repo-init-instructions.md": "06f7eedd332bd13daba08f131a5c34b0fdffd8cb835c4ecc0d062010071251fa",
+    ".skill-tree/documents/repository-map.md": "c984f360a96991a1c982971efd8b34d7c5a72d445c2838d4d276c4cd1fe7e6e8",
+    ".skill-tree/documents/rules.md": "95187a9653e27bdba89d9de3bbc7055eceda1a79d3589465d0c5d6814762970c",
     ".skill-tree/documents/security.md": "4d767dfdb5f52a6d1dd3fc06a0012dcadd748373d17dc1f5c4a89d440afbec2d",
+    ".skill-tree/documents/skill-quality-audit.md": "484c6eef09767e5aa3862161b3e671145fb14179a080af17c51ff56cdd57aa0f",
     ".skill-tree/documents/skill-repository-creation-instructions.md": "c1e4c41cde43079187f9cd32e70fb6d5a1c4b5ce089eada3d7a919d4225a5836",
+    ".skill-tree/documents/technical.md": "b2ffc458051ab045b10414c951db184292c4ea3de9ca3cc000ca1cead47d82b0",
+    ".skill-tree/documents/testing.md": "de169454b70a54d39629fe7399ea03842f36aae439cdb9c4433022d9e2b7dcd8",
     ".skill-tree/documents/workflow-redesign-conformance.md": "a97b9c8cd39ce29ef7f81264563575917e3fb1dd4a92fd197053e6f9ff841873",
     ".skill-tree/documents/workflow-redesign-rnd-plan.md": "abc1b0870fb062f4a0a2c4799e1de000181601b679e02ad49c1bcb77d9ec21fb",
     ".skill-tree/domains/general/sections.json": "936bf430802a7ff38ac83413b25162a079bdb81734388420336291b00d2136f6",
@@ -1085,9 +1158,10 @@
     ".skill-tree/domains/web/development.md": "a8e55f4d58ad64056707801a3c31aa56eb884755fd12ef08c341680d73645bc9",
     ".skill-tree/domains/web/playwright-testing.md": "661393b4329bbe03f68f1570919fe8bf02dcebb5bf77555f3c5c46e05d4739a7",
     ".skill-tree/domains/web/sections.json": "705a5dca39a2a0baa64f0043d6d188ade153c7dff553fcf55bfd25256b2bb2c7",
-    ".skill-tree/lib/composer.js": "e1f3429e17810f91cfa53ba8769368ddc39f67b2fa39f8731b93097030fd0eaa",
+    ".skill-tree/lib/composer.js": "60d8ab877bccd80835529692a5d2df7ad42dafa966ab695c938ade3ac073b8e8",
     ".skill-tree/lib/execution-bindings.js": "4087f0855eac260dc7ec4008be24015b3645ac7f53e11b3f7f7eccab5434a852",
-    ".skill-tree/lib/installation.js": "53bee41f7348c7d3a1f6c472d0111a4fb139c90d3c72ef6c1ff50285d80459a9",
+    ".skill-tree/lib/installation.js": "abc2bca0d228e774f9978a63ea3fe7c2cf7464d7d4e1d695441fc09f8a2146e0",
+    ".skill-tree/scripts/agent-conformance.py": "dd7f691f223ab886c84b151e22de295a513907ee0a728b40357c7ad382f7837d",
     ".skill-tree/scripts/run-tests.py": "00c61ad36efcc208865692e5822f38dd4bbbc036d058bc7e55bc81c3851b711e",
     ".skill-tree/scripts/sync-skill-references.py": "7362077b0b1d031c88af9a1ddb7cfe8ddc2bc3472e64cb470100ac24038404b9",
     ".skill-tree/scripts/validate-skill-repository.py": "c7a99c949181f6b9ebac40d738c1327cec2a114bc4a4cb6ba4bd0d6984afbc7c",

@@ -21,7 +21,8 @@ def digest(value):
 
 def instructions(text):
     # Only the current owner's direct instruction enters the authorization parser.
-    text=re.sub(r'(?ms)^\s*```.*?^\s*```[^\n]*', '', text)
+    text=re.sub(r'(?ms)^\s*(`{3,}|~{3,})[^\n]*\n.*?^\s*\1[^\n]*', '', text)
+    text=re.sub(r'(`+).*?\1', '', text, flags=re.S)
     text=re.sub(r'(?m)^\s*>.*$', '', text)
     return re.sub(r'"[^"\n]*"|«[^»]*»|“[^”]*”|\x27[^\x27\n]*\x27', '', text)
 
@@ -42,7 +43,8 @@ def parameters(current_branch, payload):
     positive+=[m.span() for m in re.finditer(pos,affirmative,re.I)]
     if 'merge' in payload:
         if type(payload['merge']) is not bool:raise ReviewError('merge requires a boolean')
-        (positive if payload['merge'] else negative).append((0,0))
+        if payload.get('instruction_origin','owner')=='owner':
+            (positive if payload['merge'] else negative).append((0,0))
     if positive and negative:raise ReviewError('Conflicting explicit merge instructions require clarification')
     choices={'source_branch':[], 'target_branch':[]}
     for key in choices:
@@ -153,7 +155,8 @@ def ready(record,snapshot):
 def merge_gate(record,snapshot):
     record=ready(record,snapshot)
     if record['status']=='merged':return record
-    if not record['authorization'].get('merge'):raise ReviewError('Merge lacks explicit owner authorization')
+    authorization=record['authorization']
+    if not authorization.get('merge') or not authorization.get('pr') or authorization.get('origin')!='owner':raise ReviewError('Merge lacks explicit owner authorization')
     if snapshot.get('approvals_known') is not True:raise ReviewError('Required approval policy is unknown')
     if snapshot.get('approvals_required') and not snapshot.get('approved'):raise ReviewError('External approval requirements remain unsatisfied')
     if snapshot.get('mergeable')!='MERGEABLE':raise ReviewError('Merge conflict or unknown mergeability')

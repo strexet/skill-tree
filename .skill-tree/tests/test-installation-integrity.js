@@ -2,6 +2,17 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const cli=path.resolve(__dirname,'../bin/install.js');
 function setup(t){const root=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-owned-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));return root;}
 function run(root,extra=[],entry=cli){return spawnSync(process.execPath,[entry,'--target',root,'--only','codex','--flavor','general',...extra],{encoding:'utf8',timeout:15000});}
+test('invalid manager combinations reject before writes while explicit rollback remains available',t=>{
+ const manager=require('../lib/installation.js'),root=setup(t);assert.equal(run(root).status,0);
+ const entry=path.join(root,'.skill-tree/installation/manager.js'),before=manager.treeHash(root,'.skill-tree');
+ for(const args of [['--rollback','--dry-run'],['--recover','--rollback'],['--verify','--refresh-profile'],['--rollback','--rollback'],['--dry-run']]){
+  const result=spawnSync(process.execPath,[entry,...args],{encoding:'utf8',timeout:15000});
+  assert.notEqual(result.status,0,JSON.stringify(args));assert.equal(manager.treeHash(root,'.skill-tree'),before);
+  assert.ok(fs.existsSync(path.join(root,'.agents/skills/skill-tree-add-pending-task/SKILL.md')));
+ }
+ const rolled=spawnSync(process.execPath,[entry,'--rollback'],{encoding:'utf8',timeout:15000});assert.equal(rolled.status,0,rolled.stderr);
+ assert.ok(!fs.existsSync(path.join(root,'.skill-tree/installation/profile.json')));
+});
 test('installed release version matches the bundled source and forged receipt versions fail verification',t=>{
  const root=setup(t);assert.equal(run(root).status,0);
  const version=JSON.parse(fs.readFileSync(path.resolve(__dirname,'../../package.json'))).version;

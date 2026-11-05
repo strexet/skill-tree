@@ -21,9 +21,16 @@ node .skill-tree/installation/manager.js --refresh-profile --dry-run
 node .skill-tree/installation/manager.js --refresh-profile
 node .skill-tree/installation/manager.js --recover
 node .skill-tree/installation/manager.js --rollback
+node .skill-tree/installation/manager.js --rebind
 ```
 
 Refresh is static, offline and explicit. Relevant input/inventory changes require refresh; unsupported compatibility requires a scoped bundle/source update. Queue/checkpoint identities and acceptance obligations survive refresh. Rollback restores one retained package/receipt generation; project dependencies remain unchanged and freshness still requires verification. Failed/interrupted replacement retains recoverable staging/journal evidence. Lock removal requires verified owner PID/host; stale locks are never removed automatically.
+
+The local manager accepts exactly one operation. `--dry-run` applies only to `--refresh-profile`; unsupported combinations reject before writes. A relocated owned installation uses explicit `--rebind` after review. Rebinding verifies existing package/bundle bytes, composition and current inputs before changing the receipt root. Unknown ownership, local edits and pending installation transactions remain blockers. Rebinding never launches a workflow helper.
+
+For a clean clone with a retained schema-3 queue, explicit `workflow-state.py recover-locator <project> --input <recovery.json>` restores the machine-local locator. The request contains the exact `queue_id` and a `worktrees` object covering every unfinished run. Completed delivery mappings can be omitted; historical checkpoints and terminal outcomes remain unchanged. A linked controller worktree retains the canonical queue owner.
+
+Source-role recipes in `.skill-tree/config/repository.json` feed installed composition with stable recipe IDs and declaration fingerprints. Target recipes reside in `.skill-tree/validation-recipes.json`. Duplicate IDs across package scripts or declarations reject composition.
 
 Documentation setup remains separate: invoke `skill-tree-repo-documentation`. After queue creation, invoke the installed helper `scripts/workflow-state.py capture-foundation <project-root>` and report the captured/reused Pending ID. Missing foundational tests produce one highest-open-plus-one setup task through normal intake, research and selection. Installation never runs workflow helpers, installs project dependencies or executes product code.
 
