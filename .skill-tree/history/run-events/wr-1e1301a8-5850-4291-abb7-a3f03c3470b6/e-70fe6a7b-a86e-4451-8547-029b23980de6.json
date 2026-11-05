@@ -1,0 +1,260 @@
+{
+  "changes": [
+    {
+      "after": null,
+      "before": {
+        "body": "### PR review and publication lifecycle\n\n```yaml\nid: T-4a02d1ab-b613-4483-8e62-724c93321ea0\npriority: 102\nstatus: Ready\nparent_pending_ids: [\"P-f871ad8a-30ea-4c23-8aa7-89a652034c84\"]\nprocessing_run_id: PR-9740384f-85e2-46cc-a5e3-7b545a50b2c5\nroot_task_id: T-836634a2-30a7-48df-aa7c-59a05d76837e\nrelated_task_id: T-836634a2-30a7-48df-aa7c-59a05d76837e\nrelation: subtask\ndepends_on: []\n```\n\nGoal:\n- PR review authorization, freshness and resumable publication satisfy fixture acceptance.\n\nTouch:\n- PR skill, publication helper and provider fixtures.\n\nValidation:\n```json\n{\"checks\": [{\"id\": \"source-qualification\", \"recipe_id\": \"static-inspection\", \"criteria\": [\"PR review authorization, freshness and resumable publication satisfy fixture acceptance.\"], \"sources\": [\".skill-tree/common\", \".skill-tree/templates\", \".skill-tree/config\", \".skill-tree/lib\", \".skill-tree/tests\"], \"parameters\": {}, \"assertion\": \"PR review authorization, freshness and resumable publication satisfy fixture acceptance.\", \"timing\": \"immediate\"}]}\n```\n\nAcceptance:\n- PR review authorization, freshness and resumable publication satisfy fixture acceptance.\n\n",
+        "queue": "Prioritized Next Changes"
+      },
+      "task_id": "T-4a02d1ab-b613-4483-8e62-724c93321ea0"
+    }
+  ],
+  "checkpoint_after": {
+    "admission": {
+      "flavor": "general",
+      "identity": "repository-local"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0",
+      "T-6ae99cb6-1824-409b-8404-53811dd50ffb",
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "completed_ids": [
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0"
+    ],
+    "completion_refs": {
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3": "O-a22e5fef-fb3a-4a19-8972-3564233dc18a",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0": "O-20655670-d0a1-4954-9e1d-ed0439a3b702"
+    },
+    "current_task_id": null,
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {},
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6",
+    "limits": {},
+    "mode": "next",
+    "next_action": "Select required task or finish root",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "resume-parent",
+    "processing_results": [],
+    "required_ids": [
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0",
+      "T-6ae99cb6-1824-409b-8404-53811dd50ffb",
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "root_task_id": "T-836634a2-30a7-48df-aa7c-59a05d76837e",
+    "snapshot": [
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "started_at": "2026-11-03T14:28:32.297879+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "develop",
+      "base_commit": "57b33ef0ac8826e29e74124329a23d3e9acd7597",
+      "branch": "codex/pr-review-cycle",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests local develop from main and a dedicated codex branch/worktree; source publication remains excluded.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6"
+    }
+  },
+  "checkpoint_before": {
+    "admission": {
+      "flavor": "general",
+      "identity": "repository-local"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0",
+      "T-6ae99cb6-1824-409b-8404-53811dd50ffb",
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "completed_ids": [
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3"
+    ],
+    "completion_refs": {
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3": "O-a22e5fef-fb3a-4a19-8972-3564233dc18a"
+    },
+    "current_task_id": "T-4a02d1ab-b613-4483-8e62-724c93321ea0",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {},
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6",
+    "limits": {},
+    "mode": "next",
+    "next_action": "implement",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "implement",
+    "processing_results": [],
+    "required_ids": [
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0",
+      "T-6ae99cb6-1824-409b-8404-53811dd50ffb",
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "root_task_id": "T-836634a2-30a7-48df-aa7c-59a05d76837e",
+    "snapshot": [
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "started_at": "2026-11-03T14:28:32.297879+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "develop",
+      "base_commit": "57b33ef0ac8826e29e74124329a23d3e9acd7597",
+      "branch": "codex/pr-review-cycle",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests local develop from main and a dedicated codex branch/worktree; source publication remains excluded.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6"
+    }
+  },
+  "id": "E-70fe6a7b-a86e-4451-8547-029b23980de6",
+  "outcomes": [
+    {
+      "acceptance": [
+        {
+          "criterion": "PR review authorization, freshness and resumable publication satisfy fixture acceptance.",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/pr-review-cycle/source-qualification.json",
+              "sha256": "5ffb53648d7d5007a1623710350e0747df69a0db2f4e3b7fe1360892ea16689c"
+            }
+          ],
+          "result": "pass"
+        }
+      ],
+      "boundary_validation": "not-required",
+      "check_results": [
+        {
+          "check": {
+            "assertion": "PR review authorization, freshness and resumable publication satisfy fixture acceptance.",
+            "criteria": [
+              "PR review authorization, freshness and resumable publication satisfy fixture acceptance."
+            ],
+            "id": "source-qualification",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/common",
+              ".skill-tree/templates",
+              ".skill-tree/config",
+              ".skill-tree/lib",
+              ".skill-tree/tests"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "PR review authorization, freshness and resumable publication satisfy fixture acceptance.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-400b1df2-e633-4614-ad59-b7ba8cc2b338",
+            "classification": "executed-control",
+            "cleanup": "Temporary Git repositories and installed fixture targets are removed; no product or live-provider process starts.",
+            "definition": "41d5f8abea909de2f80a2a5d41af99b6d18a4639bea414918ce6b0055a933e66",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/pr-review-cycle/source-qualification.json",
+                "sha256": "5ffb53648d7d5007a1623710350e0747df69a0db2f4e3b7fe1360892ea16689c"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "16f92cf65aa936ed86f33016ddc74d03c7c521712201eaee16c890a673ed6e4a",
+            "payload_hash": "07b145aba3cda5ff9e5aca10f3528f10ed3bb4d929d989752d93ec7a37ca5ab7",
+            "recorded_at": "2026-11-03T15:09:13.273536+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common": "c01d67fbfbb06e3bfe6a43ecbeb08c344baa3ae32fe8f9a917bf69e3744e549f",
+              ".skill-tree/config": "1af80b8513c0797ee77f4549fa9ab4d2e21912d092a584558cee68d4aaa71e3b",
+              ".skill-tree/lib": "fe48617387798b93d98f0c8d11db3b747b10719f3e50670fee38406d5c2ad772",
+              ".skill-tree/templates": "16299c7b125cd81e08ffdb9a65759116acbe63a1ec6ff994d05b45900a20f63c",
+              ".skill-tree/tests": "1caf38dffda1d6e803a2ef56e3ab53d2dd6e4ad3642ca7e7e582bb6e581858f8"
+            }
+          }
+        }
+      ],
+      "commits": [],
+      "depends_on": [],
+      "disposition": "completed",
+      "evidence": [
+        {
+          "available": true,
+          "path": ".skill-tree/history/validation/pr-review-cycle/source-qualification.json",
+          "sha256": "5ffb53648d7d5007a1623710350e0747df69a0db2f4e3b7fe1360892ea16689c"
+        }
+      ],
+      "followup_ids": [],
+      "id": "O-20655670-d0a1-4954-9e1d-ed0439a3b702",
+      "limitations": [
+        "Live-provider and product-runtime qualification remains outside the current source-fixture scope."
+      ],
+      "outcome": "PR review authorization, freshness and resumable publication satisfy fixture acceptance.",
+      "parent_pending_ids": [
+        "P-f871ad8a-30ea-4c23-8aa7-89a652034c84"
+      ],
+      "recorded_at": "2026-11-03T15:09:13.499998+00:00",
+      "related_task_id": "T-836634a2-30a7-48df-aa7c-59a05d76837e",
+      "root_task_id": "T-836634a2-30a7-48df-aa7c-59a05d76837e",
+      "run_id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6",
+      "source_fingerprints": {
+        ".skill-tree/common": "c01d67fbfbb06e3bfe6a43ecbeb08c344baa3ae32fe8f9a917bf69e3744e549f",
+        ".skill-tree/config": "1af80b8513c0797ee77f4549fa9ab4d2e21912d092a584558cee68d4aaa71e3b",
+        ".skill-tree/lib": "fe48617387798b93d98f0c8d11db3b747b10719f3e50670fee38406d5c2ad772",
+        ".skill-tree/templates": "16299c7b125cd81e08ffdb9a65759116acbe63a1ec6ff994d05b45900a20f63c",
+        ".skill-tree/tests": "1caf38dffda1d6e803a2ef56e3ab53d2dd6e4ad3642ca7e7e582bb6e581858f8"
+      },
+      "task_id": "T-4a02d1ab-b613-4483-8e62-724c93321ea0",
+      "title": "PR review and publication lifecycle",
+      "validation_group_id": null,
+      "validation_plan": [
+        {
+          "assertion": "PR review authorization, freshness and resumable publication satisfy fixture acceptance.",
+          "criteria": [
+            "PR review authorization, freshness and resumable publication satisfy fixture acceptance."
+          ],
+          "id": "source-qualification",
+          "parameters": {},
+          "recipe_id": "static-inspection",
+          "sources": [
+            ".skill-tree/common",
+            ".skill-tree/templates",
+            ".skill-tree/config",
+            ".skill-tree/lib",
+            ".skill-tree/tests"
+          ],
+          "timing": "immediate"
+        }
+      ],
+      "validation_signature": "41d5f8abea909de2f80a2a5d41af99b6d18a4639bea414918ce6b0055a933e66"
+    }
+  ],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "run_id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6",
+  "schema": 1,
+  "sequence": 4
+}

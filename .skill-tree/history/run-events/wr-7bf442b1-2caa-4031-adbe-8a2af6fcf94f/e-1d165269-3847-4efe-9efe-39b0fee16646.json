@@ -1,0 +1,904 @@
+{
+  "changes": [
+    {
+      "after": null,
+      "before": {
+        "body": "### Preserve imperative and conditional requests as future work during Add Pending intake\n\n```yaml\nid: T-ca90d648-6296-47dc-84af-8dca9afb0c44\npriority: 100\nstatus: Ready\nparent_pending_ids: [\"P-91c7311d-b9a1-47c7-b0ba-4312d4ca08be\"]\nprocessing_run_id: PR-14d40f02-ed5f-4bba-8249-1b960919674e\nroot_task_id: T-ca90d648-6296-47dc-84af-8dca9afb0c44\nrelated_task_id: null\nrelation: main\ndepends_on: []\n```\n\nGoal:\n- Make the Add Pending instruction boundary explicit while preserving imperative and conditional future requirements.\n\nTouch:\n- `.skill-tree/common/references/pending-task-intake.md`, `.skill-tree/common/references/future-workflow.md` and `.skill-tree/templates/operations.json`.\n- `.skill-tree/tests/test-pending-intake-boundary.py`, `.skill-tree/tests/test-pending-boundary-installation.js` and relevant existing workflow/composition fixtures.\n- `.skill-tree/config/repository.json` for local unit recipes when the task-specific recipes are absent; generated general, web and unity packages through the canonical generator.\n\nCurrent behavior:\n- The intake contract and entry point already prohibit promotion and implementation, but the contract lacks explicit treatment of imperatives, embedded conditions and separate post-intake execution instructions.\n- The intake helper stores understood description/expected-behavior text and creates Pending metadata. Existing workflow tests exercise state isolation, but dedicated conditional-request scenarios are absent.\n\nDesired behavior:\n- The invocation context determines intake-only scope. Verbs such as find, implement and fix inside the described future task do not expand the current workflow.\n- Use a local Figma scenario containing node lookup, a missing-node stop/report branch and a found-node design-implementation/current-version-fix branch. Preserve every action and condition in the captured request.\n- A direct separate instruction such as \"Create Pending, then process and implement the task\" permits the subsequent explicitly requested workflow after capture, subject to existing selection and authorization policies.\n- Necessary intake reads, duplicate checks and questions about missing material subject/change/outcome remain permitted. Clear intake-only requests do not trigger a question about starting the described implementation.\n\nImplementation constraints:\n- No live Figma lookup, design implementation, network publication or external agent/model execution belongs to the regression fixture.\n- Characterization fixtures exercise actual helper serialization and state effects. Source/scenario review establishes instruction coverage; deterministic fixtures do not establish model adherence.\n- Declare `pending-boundary-unit` as a local unit recipe running `python3 .skill-tree/tests/test-pending-intake-boundary.py` and `pending-boundary-installation` as a local unit recipe running `node --test .skill-tree/tests/test-pending-boundary-installation.js`; reuse the existing test infrastructure.\n- Change the helper only for a demonstrated serialization/state defect. Preserve schema-2 and schema-3 state, stable Pending IDs and completed-run evidence.\n\nValidation:\n- Characterize existing serialization before changes; use focused behavioral Red/Green for any executable repair and explicit contract/scenario review for instruction semantics.\n- Required source qualification includes synchronization, strict validation, Python and Node suites, installer list, an all-provider general-flavor dry-run in a temporary root and diff checks.\n```json\n{\n  \"checks\": [\n    {\n      \"id\": \"boundary-state-fixtures\",\n      \"recipe_id\": \"pending-boundary-unit\",\n      \"criteria\": [\n        \"Add Pending treats imperatives inside the future task description as requirements rather than immediate execution authorization.\",\n        \"The Figma scenario retains node lookup, the missing-node stop/report condition and the found-node implementation/fix condition without starting the described operations.\"\n      ],\n      \"sources\": [\n        \".skill-tree/common/references/pending-task-intake.md\",\n        \".skill-tree/templates/operations.json\",\n        \".skill-tree/common/scripts/workflow-state.py\",\n        \".skill-tree/tests/test-pending-intake-boundary.py\"\n      ],\n      \"parameters\": {},\n      \"assertion\": \"Imperative and conditional text survives actual intake, which creates only Pending work and leaves implementation progress and run history unchanged.\",\n      \"timing\": \"immediate\"\n    },\n    {\n      \"id\": \"boundary-instruction-review\",\n      \"recipe_id\": \"static-inspection\",\n      \"criteria\": [\n        \"Add Pending treats imperatives inside the future task description as requirements rather than immediate execution authorization.\",\n        \"The Figma scenario retains node lookup, the missing-node stop/report condition and the found-node implementation/fix condition without starting the described operations.\",\n        \"A separate explicit owner instruction to process and implement after capture supplies the subsequent workflow scope; ordinary intake questions concern only missing material intent.\"\n      ],\n      \"sources\": [\n        \".skill-tree/common/references/pending-task-intake.md\",\n        \".skill-tree/templates/operations.json\"\n      ],\n      \"parameters\": {},\n      \"assertion\": \"The entry point and canonical intake contract distinguish embedded future requirements from separate owner execution instructions, including both Figma branches.\",\n      \"timing\": \"immediate\"\n    },\n    {\n      \"id\": \"boundary-standalone-flavors\",\n      \"recipe_id\": \"pending-boundary-installation\",\n      \"criteria\": [\n        \"General, web and unity packages expose the same intake boundary and standalone fixtures preserve queue provenance, unrelated tasks and retained run history.\"\n      ],\n      \"sources\": [\n        \".skill-tree/config/resource-map.json\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/tests/test-pending-boundary-installation.js\",\n        \".skill-tree/common/scripts/workflow-state.py\"\n      ],\n      \"parameters\": {},\n      \"assertion\": \"Installed standalone intake packages preserve conditional request text and state boundaries across general, web and unity.\",\n      \"timing\": \"immediate\"\n    },\n    {\n      \"id\": \"boundary-source-qualification\",\n      \"recipe_id\": \"static-inspection\",\n      \"criteria\": [\n        \"General, web and unity packages expose the same intake boundary and standalone fixtures preserve queue provenance, unrelated tasks and retained run history.\"\n      ],\n      \"sources\": [\n        \".skill-tree/common/references/pending-task-intake.md\",\n        \".skill-tree/templates/operations.json\",\n        \".skill-tree/config/repository.json\",\n        \".skill-tree/scripts/sync-skill-references.py\"\n      ],\n      \"parameters\": {},\n      \"assertion\": \"Required source checks pass and regenerated resources contain the reviewed common intake boundary.\",\n      \"timing\": \"immediate\"\n    }\n  ]\n}\n```\n\nAcceptance:\n- Add Pending treats imperatives inside the future task description as requirements rather than immediate execution authorization.\n- The Figma scenario retains node lookup, the missing-node stop/report condition and the found-node implementation/fix condition without starting the described operations.\n- A separate explicit owner instruction to process and implement after capture supplies the subsequent workflow scope; ordinary intake questions concern only missing material intent.\n- General, web and unity packages expose the same intake boundary and standalone fixtures preserve queue provenance, unrelated tasks and retained run history.\n\n",
+        "queue": "Prioritized Next Changes"
+      },
+      "task_id": "T-ca90d648-6296-47dc-84af-8dca9afb0c44"
+    }
+  ],
+  "checkpoint_after": {
+    "admission": {
+      "flavor": "general",
+      "identity": "repository-local"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "completed_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44"
+    ],
+    "completion_refs": {
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44": "O-f11794c1-5081-482f-86cf-1811b8040a3e"
+    },
+    "current_task_id": null,
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {},
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+    "limits": {},
+    "mode": "all",
+    "next_action": "Select required task or finish root",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "resume-parent",
+    "processing_results": [],
+    "required_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "root_task_id": "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+    "snapshot": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "started_at": "2026-11-05T06:56:56.648398+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "develop",
+      "base_commit": "91eacd9d27342484d9e38b6dc253f36bf5077eb3",
+      "branch": "codex/pending-intake",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly instructs merging the latest main changes into local develop and then working from develop without further confirmation; push remains excluded.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f"
+    },
+    "workspace_state": "ready"
+  },
+  "checkpoint_before": {
+    "admission": {
+      "flavor": "general",
+      "identity": "repository-local"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "completed_ids": [],
+    "current_task_id": "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {},
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+    "limits": {},
+    "mode": "all",
+    "next_action": "implement",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "implement",
+    "processing_results": [],
+    "required_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "root_task_id": "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+    "snapshot": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "started_at": "2026-11-05T06:56:56.648398+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "develop",
+      "base_commit": "91eacd9d27342484d9e38b6dc253f36bf5077eb3",
+      "branch": "codex/pending-intake",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly instructs merging the latest main changes into local develop and then working from develop without further confirmation; push remains excluded.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f"
+    },
+    "workspace_state": "ready"
+  },
+  "id": "E-1d165269-3847-4efe-9efe-39b0fee16646",
+  "outcomes": [
+    {
+      "acceptance": [
+        {
+          "criterion": "Add Pending treats imperatives inside the future task description as requirements rather than immediate execution authorization.",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/pending-intake/boundary-instruction-review.json",
+              "sha256": "68f3973a326b8845da9056c7aa17227f5574fedbfb7135f333fd7e98ec06cd5c"
+            },
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/pending-intake/boundary-state-fixtures-c-a876c38b-8415-4b7c-b41b-5fac799eff2e.json",
+              "sha256": "941951df1f5238371595dbb9f3cb30cf58782fe80f098a50c7ad8d5608d2d082"
+            }
+          ],
+          "result": "pass"
+        },
+        {
+          "criterion": "The Figma scenario retains node lookup, the missing-node stop/report condition and the found-node implementation/fix condition without starting the described operations.",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/pending-intake/boundary-instruction-review.json",
+              "sha256": "68f3973a326b8845da9056c7aa17227f5574fedbfb7135f333fd7e98ec06cd5c"
+            },
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/pending-intake/boundary-state-fixtures-c-a876c38b-8415-4b7c-b41b-5fac799eff2e.json",
+              "sha256": "941951df1f5238371595dbb9f3cb30cf58782fe80f098a50c7ad8d5608d2d082"
+            }
+          ],
+          "result": "pass"
+        },
+        {
+          "criterion": "A separate explicit owner instruction to process and implement after capture supplies the subsequent workflow scope; ordinary intake questions concern only missing material intent.",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/pending-intake/boundary-instruction-review.json",
+              "sha256": "68f3973a326b8845da9056c7aa17227f5574fedbfb7135f333fd7e98ec06cd5c"
+            }
+          ],
+          "result": "pass"
+        },
+        {
+          "criterion": "General, web and unity packages expose the same intake boundary and standalone fixtures preserve queue provenance, unrelated tasks and retained run history.",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/pending-intake/boundary-qualification.json",
+              "sha256": "81e51d3f3b4deb695912f24647fdc35df911aa019e519e372dcffe15ab39df94"
+            },
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/pending-intake/boundary-standalone-flavors-c-36c58de1-fca5-431f-b82b-5d3dc2a29452.json",
+              "sha256": "a3c1f6e27152555ac8ce0b80ec4e818ec9338c37171e9f62210774866eba1331"
+            }
+          ],
+          "result": "pass"
+        }
+      ],
+      "boundary_validation": "not-required",
+      "check_results": [
+        {
+          "check": {
+            "assertion": "Imperative and conditional text survives actual intake, which creates only Pending work and leaves implementation progress and run history unchanged.",
+            "criteria": [
+              "Add Pending treats imperatives inside the future task description as requirements rather than immediate execution authorization.",
+              "The Figma scenario retains node lookup, the missing-node stop/report condition and the found-node implementation/fix condition without starting the described operations."
+            ],
+            "id": "boundary-state-fixtures",
+            "parameters": {},
+            "recipe_id": "pending-boundary-unit",
+            "sources": [
+              ".skill-tree/common/references/pending-task-intake.md",
+              ".skill-tree/templates/operations.json",
+              ".skill-tree/common/scripts/workflow-state.py",
+              ".skill-tree/tests/test-pending-intake-boundary.py"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "unit",
+            "attempt_id": "C-a876c38b-8415-4b7c-b41b-5fac799eff2e",
+            "classification": "executed-control",
+            "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+            "counts": {
+              "discovered": 3,
+              "expected": 3,
+              "failed": 0,
+              "passed": 3,
+              "skipped": 0
+            },
+            "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+            "environment_identity": "7f1ec019b243c5bab3b1be478ec79bb2e35c6400fdf281711196daa4fbbb6070",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/pending-intake/boundary-state-fixtures-c-a876c38b-8415-4b7c-b41b-5fac799eff2e.json",
+                "sha256": "941951df1f5238371595dbb9f3cb30cf58782fe80f098a50c7ad8d5608d2d082"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "e9317e7446ac59814d1c2fb446f56aef0a6982ae65300fce67925764556abd41",
+            "payload_hash": "ff62a3155d969769d8774c1a9957aa53b445adee1a56835286ee3a26608805a0",
+            "recorded_at": "2026-11-05T07:06:06.661376+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common/references/pending-task-intake.md": "71e0a7e7beb8286470f06b42cc6093bf37b1ff0a1953a4cb2b5dbe2aa38e0d23",
+              ".skill-tree/common/scripts/workflow-state.py": "3eaad467929d956b5828a42c2e0f9b7b452abf04f3525520e8cddc40b730ffb6",
+              ".skill-tree/templates/operations.json": "4e9c9dc09887471a33bef633f40b930d7c0aabdd109cf3bfeeaa438532573073",
+              ".skill-tree/tests/test-pending-intake-boundary.py": "025445702e4d971d87589f2a5051bcc117c1d7a5359da3bf7957d8ddc4ddf5b9"
+            },
+            "timing": {
+              "tool_wall_seconds": 0.27325283270329237
+            }
+          }
+        },
+        {
+          "check": {
+            "assertion": "The entry point and canonical intake contract distinguish embedded future requirements from separate owner execution instructions, including both Figma branches.",
+            "criteria": [
+              "Add Pending treats imperatives inside the future task description as requirements rather than immediate execution authorization.",
+              "The Figma scenario retains node lookup, the missing-node stop/report condition and the found-node implementation/fix condition without starting the described operations.",
+              "A separate explicit owner instruction to process and implement after capture supplies the subsequent workflow scope; ordinary intake questions concern only missing material intent."
+            ],
+            "id": "boundary-instruction-review",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/common/references/pending-task-intake.md",
+              ".skill-tree/templates/operations.json"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "The entry point and canonical intake contract distinguish embedded future requirements from separate owner execution instructions, including both Figma branches.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-d4b2cfa7-c496-4fc5-bb09-e7d3022af93b",
+            "classification": "executed-control",
+            "cleanup": "Source review and local fixture qualification leave no product or provider process.",
+            "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/pending-intake/boundary-instruction-review.json",
+                "sha256": "68f3973a326b8845da9056c7aa17227f5574fedbfb7135f333fd7e98ec06cd5c"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "bd9bd1ed218f03c527de6d18171777fa0369c6e5de18a7b286ab9b02cf68e534",
+            "payload_hash": "4baa81ff56192f4b0979f270db8331d0cf1ab4a6952a0d954e3f83007142ae3d",
+            "recorded_at": "2026-11-05T07:06:59.521382+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common/references/pending-task-intake.md": "71e0a7e7beb8286470f06b42cc6093bf37b1ff0a1953a4cb2b5dbe2aa38e0d23",
+              ".skill-tree/templates/operations.json": "4e9c9dc09887471a33bef633f40b930d7c0aabdd109cf3bfeeaa438532573073"
+            }
+          }
+        },
+        {
+          "check": {
+            "assertion": "Installed standalone intake packages preserve conditional request text and state boundaries across general, web and unity.",
+            "criteria": [
+              "General, web and unity packages expose the same intake boundary and standalone fixtures preserve queue provenance, unrelated tasks and retained run history."
+            ],
+            "id": "boundary-standalone-flavors",
+            "parameters": {},
+            "recipe_id": "pending-boundary-installation",
+            "sources": [
+              ".skill-tree/config/resource-map.json",
+              ".skill-tree/lib/composer.js",
+              ".skill-tree/tests/test-pending-boundary-installation.js",
+              ".skill-tree/common/scripts/workflow-state.py"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "unit",
+            "attempt_id": "C-36c58de1-fca5-431f-b82b-5d3dc2a29452",
+            "classification": "executed-control",
+            "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+            "counts": {
+              "discovered": 3,
+              "expected": 3,
+              "failed": 0,
+              "passed": 3,
+              "skipped": 0
+            },
+            "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+            "environment_identity": "ae49f98eb313ab728e08ac359b82b0382743400adace1e32e8f611201ba841a2",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/pending-intake/boundary-standalone-flavors-c-36c58de1-fca5-431f-b82b-5d3dc2a29452.json",
+                "sha256": "a3c1f6e27152555ac8ce0b80ec4e818ec9338c37171e9f62210774866eba1331"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "e0488ee5c9563ead50a5a2779e523b3af07adf0d827cba599aeaafa1e6bce974",
+            "payload_hash": "0c78bf26565f7e53827b9af34591189299da2c9d1f4670c908e537d65de5223b",
+            "recorded_at": "2026-11-05T07:06:08.812700+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common/scripts/workflow-state.py": "3eaad467929d956b5828a42c2e0f9b7b452abf04f3525520e8cddc40b730ffb6",
+              ".skill-tree/config/resource-map.json": "3e4ac91e10baa3d2ea981ed1e0b2587adf76237841520e5d86fa2ba6bb908b72",
+              ".skill-tree/lib/composer.js": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec",
+              ".skill-tree/tests/test-pending-boundary-installation.js": "d8c1d5036fac258bcff96a27a5d9957f536b74ae5ba0ab67ddc7d1450a8a7d5c"
+            },
+            "timing": {
+              "tool_wall_seconds": 1.7101471247151494
+            }
+          }
+        },
+        {
+          "check": {
+            "assertion": "Required source checks pass and regenerated resources contain the reviewed common intake boundary.",
+            "criteria": [
+              "General, web and unity packages expose the same intake boundary and standalone fixtures preserve queue provenance, unrelated tasks and retained run history."
+            ],
+            "id": "boundary-source-qualification",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/common/references/pending-task-intake.md",
+              ".skill-tree/templates/operations.json",
+              ".skill-tree/config/repository.json",
+              ".skill-tree/scripts/sync-skill-references.py"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "Required source checks pass and regenerated resources contain the reviewed common intake boundary.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-a0db17bf-7659-4965-9018-83b45697e378",
+            "classification": "executed-control",
+            "cleanup": "Source review and local fixture qualification leave no product or provider process.",
+            "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/pending-intake/boundary-qualification.json",
+                "sha256": "81e51d3f3b4deb695912f24647fdc35df911aa019e519e372dcffe15ab39df94"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "d74d3f058614dc6d3953983dfd54d8e463f24e2814089c016dd5df429cee0f77",
+            "payload_hash": "bf223fc51b313173174d175dfd970d0501b61df216fceda96bd7093566f46830",
+            "recorded_at": "2026-11-05T07:08:50.143099+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common/references/pending-task-intake.md": "71e0a7e7beb8286470f06b42cc6093bf37b1ff0a1953a4cb2b5dbe2aa38e0d23",
+              ".skill-tree/config/repository.json": "2e7f3780159e878676df3ee00059d2e5d4ab6b9268f2e2c5f806b443f0cc5a98",
+              ".skill-tree/scripts/sync-skill-references.py": "7362077b0b1d031c88af9a1ddb7cfe8ddc2bc3472e64cb470100ac24038404b9",
+              ".skill-tree/templates/operations.json": "4e9c9dc09887471a33bef633f40b930d7c0aabdd109cf3bfeeaa438532573073"
+            }
+          }
+        }
+      ],
+      "commits": [],
+      "depends_on": [],
+      "disposition": "completed",
+      "evidence": [
+        {
+          "available": true,
+          "path": ".skill-tree/history/validation/pending-intake/boundary-instruction-review.json",
+          "sha256": "68f3973a326b8845da9056c7aa17227f5574fedbfb7135f333fd7e98ec06cd5c"
+        },
+        {
+          "available": true,
+          "path": ".skill-tree/history/validation/pending-intake/boundary-qualification.json",
+          "sha256": "81e51d3f3b4deb695912f24647fdc35df911aa019e519e372dcffe15ab39df94"
+        },
+        {
+          "available": true,
+          "path": ".skill-tree/history/validation/pending-intake/boundary-standalone-flavors-c-36c58de1-fca5-431f-b82b-5d3dc2a29452.json",
+          "sha256": "a3c1f6e27152555ac8ce0b80ec4e818ec9338c37171e9f62210774866eba1331"
+        },
+        {
+          "available": true,
+          "path": ".skill-tree/history/validation/pending-intake/boundary-state-fixtures-c-a876c38b-8415-4b7c-b41b-5fac799eff2e.json",
+          "sha256": "941951df1f5238371595dbb9f3cb30cf58782fe80f098a50c7ad8d5608d2d082"
+        }
+      ],
+      "followup_ids": [],
+      "id": "O-f11794c1-5081-482f-86cf-1811b8040a3e",
+      "limitations": [
+        "Deterministic helper fixtures and source review do not establish actual model adherence.",
+        "No live Figma, provider publication or product execution ran."
+      ],
+      "outcome": "Shared Add Pending guidance distinguishes future imperative/conditional requirements from separate execution instructions; local and standalone fixtures preserve Pending-only state.",
+      "parent_pending_ids": [
+        "P-91c7311d-b9a1-47c7-b0ba-4312d4ca08be"
+      ],
+      "recorded_at": "2026-11-05T07:08:50.863022+00:00",
+      "related_task_id": null,
+      "root_task_id": "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "run_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+      "source_fingerprints": {
+        ".skill-tree/common/references/pending-task-intake.md": "71e0a7e7beb8286470f06b42cc6093bf37b1ff0a1953a4cb2b5dbe2aa38e0d23",
+        ".skill-tree/common/scripts/workflow-state.py": "3eaad467929d956b5828a42c2e0f9b7b452abf04f3525520e8cddc40b730ffb6",
+        ".skill-tree/config/repository.json": "2e7f3780159e878676df3ee00059d2e5d4ab6b9268f2e2c5f806b443f0cc5a98",
+        ".skill-tree/config/resource-map.json": "3e4ac91e10baa3d2ea981ed1e0b2587adf76237841520e5d86fa2ba6bb908b72",
+        ".skill-tree/lib/composer.js": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec",
+        ".skill-tree/scripts/sync-skill-references.py": "7362077b0b1d031c88af9a1ddb7cfe8ddc2bc3472e64cb470100ac24038404b9",
+        ".skill-tree/templates/operations.json": "4e9c9dc09887471a33bef633f40b930d7c0aabdd109cf3bfeeaa438532573073",
+        ".skill-tree/tests/test-pending-boundary-installation.js": "d8c1d5036fac258bcff96a27a5d9957f536b74ae5ba0ab67ddc7d1450a8a7d5c",
+        ".skill-tree/tests/test-pending-intake-boundary.py": "025445702e4d971d87589f2a5051bcc117c1d7a5359da3bf7957d8ddc4ddf5b9"
+      },
+      "task_id": "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "title": "Preserve imperative and conditional requests as future work during Add Pending intake",
+      "validation_group_id": null,
+      "validation_plan": [
+        {
+          "assertion": "Imperative and conditional text survives actual intake, which creates only Pending work and leaves implementation progress and run history unchanged.",
+          "criteria": [
+            "Add Pending treats imperatives inside the future task description as requirements rather than immediate execution authorization.",
+            "The Figma scenario retains node lookup, the missing-node stop/report condition and the found-node implementation/fix condition without starting the described operations."
+          ],
+          "id": "boundary-state-fixtures",
+          "parameters": {},
+          "recipe_id": "pending-boundary-unit",
+          "sources": [
+            ".skill-tree/common/references/pending-task-intake.md",
+            ".skill-tree/templates/operations.json",
+            ".skill-tree/common/scripts/workflow-state.py",
+            ".skill-tree/tests/test-pending-intake-boundary.py"
+          ],
+          "timing": "immediate"
+        },
+        {
+          "assertion": "The entry point and canonical intake contract distinguish embedded future requirements from separate owner execution instructions, including both Figma branches.",
+          "criteria": [
+            "Add Pending treats imperatives inside the future task description as requirements rather than immediate execution authorization.",
+            "The Figma scenario retains node lookup, the missing-node stop/report condition and the found-node implementation/fix condition without starting the described operations.",
+            "A separate explicit owner instruction to process and implement after capture supplies the subsequent workflow scope; ordinary intake questions concern only missing material intent."
+          ],
+          "id": "boundary-instruction-review",
+          "parameters": {},
+          "recipe_id": "static-inspection",
+          "sources": [
+            ".skill-tree/common/references/pending-task-intake.md",
+            ".skill-tree/templates/operations.json"
+          ],
+          "timing": "immediate"
+        },
+        {
+          "assertion": "Installed standalone intake packages preserve conditional request text and state boundaries across general, web and unity.",
+          "criteria": [
+            "General, web and unity packages expose the same intake boundary and standalone fixtures preserve queue provenance, unrelated tasks and retained run history."
+          ],
+          "id": "boundary-standalone-flavors",
+          "parameters": {},
+          "recipe_id": "pending-boundary-installation",
+          "sources": [
+            ".skill-tree/config/resource-map.json",
+            ".skill-tree/lib/composer.js",
+            ".skill-tree/tests/test-pending-boundary-installation.js",
+            ".skill-tree/common/scripts/workflow-state.py"
+          ],
+          "timing": "immediate"
+        },
+        {
+          "assertion": "Required source checks pass and regenerated resources contain the reviewed common intake boundary.",
+          "criteria": [
+            "General, web and unity packages expose the same intake boundary and standalone fixtures preserve queue provenance, unrelated tasks and retained run history."
+          ],
+          "id": "boundary-source-qualification",
+          "parameters": {},
+          "recipe_id": "static-inspection",
+          "sources": [
+            ".skill-tree/common/references/pending-task-intake.md",
+            ".skill-tree/templates/operations.json",
+            ".skill-tree/config/repository.json",
+            ".skill-tree/scripts/sync-skill-references.py"
+          ],
+          "timing": "immediate"
+        }
+      ],
+      "validation_signature": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4"
+    }
+  ],
+  "progress_changes": [
+    {
+      "after": null,
+      "before": {
+        "admission": {
+          "flavor": "general",
+          "identity": "repository-local"
+        },
+        "checks": {
+          "boundary-instruction-review": {
+            "attempt": {
+              "attempt_id": "C-d4b2cfa7-c496-4fc5-bb09-e7d3022af93b",
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "key": "bd9bd1ed218f03c527de6d18171777fa0369c6e5de18a7b286ab9b02cf68e534",
+              "launch": null,
+              "prepared_at": "2026-11-05T07:06:59.435455+00:00",
+              "recipe": {
+                "assertion_contract": "explicit source and artifact assertions",
+                "input_paths": [],
+                "lane": "static"
+              },
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "71e0a7e7beb8286470f06b42cc6093bf37b1ff0a1953a4cb2b5dbe2aa38e0d23",
+                ".skill-tree/templates/operations.json": "4e9c9dc09887471a33bef633f40b930d7c0aabdd109cf3bfeeaa438532573073"
+              }
+            },
+            "receipts": {
+              "C-d4b2cfa7-c496-4fc5-bb09-e7d3022af93b": {
+                "actual_lane": "static",
+                "assertions": [
+                  {
+                    "assertion": "The entry point and canonical intake contract distinguish embedded future requirements from separate owner execution instructions, including both Figma branches.",
+                    "result": "pass"
+                  }
+                ],
+                "attempt_id": "C-d4b2cfa7-c496-4fc5-bb09-e7d3022af93b",
+                "classification": "executed-control",
+                "cleanup": "Source review and local fixture qualification leave no product or provider process.",
+                "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+                "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/boundary-instruction-review.json",
+                    "sha256": "68f3973a326b8845da9056c7aa17227f5574fedbfb7135f333fd7e98ec06cd5c"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "bd9bd1ed218f03c527de6d18171777fa0369c6e5de18a7b286ab9b02cf68e534",
+                "payload_hash": "4baa81ff56192f4b0979f270db8331d0cf1ab4a6952a0d954e3f83007142ae3d",
+                "recorded_at": "2026-11-05T07:06:59.521382+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/pending-task-intake.md": "71e0a7e7beb8286470f06b42cc6093bf37b1ff0a1953a4cb2b5dbe2aa38e0d23",
+                  ".skill-tree/templates/operations.json": "4e9c9dc09887471a33bef633f40b930d7c0aabdd109cf3bfeeaa438532573073"
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "static",
+              "assertions": [
+                {
+                  "assertion": "The entry point and canonical intake contract distinguish embedded future requirements from separate owner execution instructions, including both Figma branches.",
+                  "result": "pass"
+                }
+              ],
+              "attempt_id": "C-d4b2cfa7-c496-4fc5-bb09-e7d3022af93b",
+              "classification": "executed-control",
+              "cleanup": "Source review and local fixture qualification leave no product or provider process.",
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/pending-intake/boundary-instruction-review.json",
+                  "sha256": "68f3973a326b8845da9056c7aa17227f5574fedbfb7135f333fd7e98ec06cd5c"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "bd9bd1ed218f03c527de6d18171777fa0369c6e5de18a7b286ab9b02cf68e534",
+              "payload_hash": "4baa81ff56192f4b0979f270db8331d0cf1ab4a6952a0d954e3f83007142ae3d",
+              "recorded_at": "2026-11-05T07:06:59.521382+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "71e0a7e7beb8286470f06b42cc6093bf37b1ff0a1953a4cb2b5dbe2aa38e0d23",
+                ".skill-tree/templates/operations.json": "4e9c9dc09887471a33bef633f40b930d7c0aabdd109cf3bfeeaa438532573073"
+              }
+            }
+          },
+          "boundary-source-qualification": {
+            "attempt": {
+              "attempt_id": "C-a0db17bf-7659-4965-9018-83b45697e378",
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "key": "d74d3f058614dc6d3953983dfd54d8e463f24e2814089c016dd5df429cee0f77",
+              "launch": null,
+              "prepared_at": "2026-11-05T07:08:50.047094+00:00",
+              "recipe": {
+                "assertion_contract": "explicit source and artifact assertions",
+                "input_paths": [],
+                "lane": "static"
+              },
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "71e0a7e7beb8286470f06b42cc6093bf37b1ff0a1953a4cb2b5dbe2aa38e0d23",
+                ".skill-tree/config/repository.json": "2e7f3780159e878676df3ee00059d2e5d4ab6b9268f2e2c5f806b443f0cc5a98",
+                ".skill-tree/scripts/sync-skill-references.py": "7362077b0b1d031c88af9a1ddb7cfe8ddc2bc3472e64cb470100ac24038404b9",
+                ".skill-tree/templates/operations.json": "4e9c9dc09887471a33bef633f40b930d7c0aabdd109cf3bfeeaa438532573073"
+              }
+            },
+            "receipts": {
+              "C-a0db17bf-7659-4965-9018-83b45697e378": {
+                "actual_lane": "static",
+                "assertions": [
+                  {
+                    "assertion": "Required source checks pass and regenerated resources contain the reviewed common intake boundary.",
+                    "result": "pass"
+                  }
+                ],
+                "attempt_id": "C-a0db17bf-7659-4965-9018-83b45697e378",
+                "classification": "executed-control",
+                "cleanup": "Source review and local fixture qualification leave no product or provider process.",
+                "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+                "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/boundary-qualification.json",
+                    "sha256": "81e51d3f3b4deb695912f24647fdc35df911aa019e519e372dcffe15ab39df94"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "d74d3f058614dc6d3953983dfd54d8e463f24e2814089c016dd5df429cee0f77",
+                "payload_hash": "bf223fc51b313173174d175dfd970d0501b61df216fceda96bd7093566f46830",
+                "recorded_at": "2026-11-05T07:08:50.143099+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/pending-task-intake.md": "71e0a7e7beb8286470f06b42cc6093bf37b1ff0a1953a4cb2b5dbe2aa38e0d23",
+                  ".skill-tree/config/repository.json": "2e7f3780159e878676df3ee00059d2e5d4ab6b9268f2e2c5f806b443f0cc5a98",
+                  ".skill-tree/scripts/sync-skill-references.py": "7362077b0b1d031c88af9a1ddb7cfe8ddc2bc3472e64cb470100ac24038404b9",
+                  ".skill-tree/templates/operations.json": "4e9c9dc09887471a33bef633f40b930d7c0aabdd109cf3bfeeaa438532573073"
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "static",
+              "assertions": [
+                {
+                  "assertion": "Required source checks pass and regenerated resources contain the reviewed common intake boundary.",
+                  "result": "pass"
+                }
+              ],
+              "attempt_id": "C-a0db17bf-7659-4965-9018-83b45697e378",
+              "classification": "executed-control",
+              "cleanup": "Source review and local fixture qualification leave no product or provider process.",
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/pending-intake/boundary-qualification.json",
+                  "sha256": "81e51d3f3b4deb695912f24647fdc35df911aa019e519e372dcffe15ab39df94"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "d74d3f058614dc6d3953983dfd54d8e463f24e2814089c016dd5df429cee0f77",
+              "payload_hash": "bf223fc51b313173174d175dfd970d0501b61df216fceda96bd7093566f46830",
+              "recorded_at": "2026-11-05T07:08:50.143099+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "71e0a7e7beb8286470f06b42cc6093bf37b1ff0a1953a4cb2b5dbe2aa38e0d23",
+                ".skill-tree/config/repository.json": "2e7f3780159e878676df3ee00059d2e5d4ab6b9268f2e2c5f806b443f0cc5a98",
+                ".skill-tree/scripts/sync-skill-references.py": "7362077b0b1d031c88af9a1ddb7cfe8ddc2bc3472e64cb470100ac24038404b9",
+                ".skill-tree/templates/operations.json": "4e9c9dc09887471a33bef633f40b930d7c0aabdd109cf3bfeeaa438532573073"
+              }
+            }
+          },
+          "boundary-standalone-flavors": {
+            "attempt": {
+              "attempt_id": "C-36c58de1-fca5-431f-b82b-5d3dc2a29452",
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "ae49f98eb313ab728e08ac359b82b0382743400adace1e32e8f611201ba841a2",
+              "key": "e0488ee5c9563ead50a5a2779e523b3af07adf0d827cba599aeaafa1e6bce974",
+              "launch": null,
+              "prepared_at": "2026-11-05T07:06:07.036470+00:00",
+              "recipe": {
+                "argv": [
+                  "node",
+                  "--test",
+                  ".skill-tree/tests/test-pending-boundary-installation.js"
+                ],
+                "input_paths": [],
+                "lane": "unit"
+              },
+              "sources": {
+                ".skill-tree/common/scripts/workflow-state.py": "3eaad467929d956b5828a42c2e0f9b7b452abf04f3525520e8cddc40b730ffb6",
+                ".skill-tree/config/resource-map.json": "3e4ac91e10baa3d2ea981ed1e0b2587adf76237841520e5d86fa2ba6bb908b72",
+                ".skill-tree/lib/composer.js": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec",
+                ".skill-tree/tests/test-pending-boundary-installation.js": "d8c1d5036fac258bcff96a27a5d9957f536b74ae5ba0ab67ddc7d1450a8a7d5c"
+              }
+            },
+            "receipts": {
+              "C-36c58de1-fca5-431f-b82b-5d3dc2a29452": {
+                "actual_lane": "unit",
+                "attempt_id": "C-36c58de1-fca5-431f-b82b-5d3dc2a29452",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+                "counts": {
+                  "discovered": 3,
+                  "expected": 3,
+                  "failed": 0,
+                  "passed": 3,
+                  "skipped": 0
+                },
+                "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+                "environment_identity": "ae49f98eb313ab728e08ac359b82b0382743400adace1e32e8f611201ba841a2",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/boundary-standalone-flavors-c-36c58de1-fca5-431f-b82b-5d3dc2a29452.json",
+                    "sha256": "a3c1f6e27152555ac8ce0b80ec4e818ec9338c37171e9f62210774866eba1331"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "e0488ee5c9563ead50a5a2779e523b3af07adf0d827cba599aeaafa1e6bce974",
+                "payload_hash": "0c78bf26565f7e53827b9af34591189299da2c9d1f4670c908e537d65de5223b",
+                "recorded_at": "2026-11-05T07:06:08.812700+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/scripts/workflow-state.py": "3eaad467929d956b5828a42c2e0f9b7b452abf04f3525520e8cddc40b730ffb6",
+                  ".skill-tree/config/resource-map.json": "3e4ac91e10baa3d2ea981ed1e0b2587adf76237841520e5d86fa2ba6bb908b72",
+                  ".skill-tree/lib/composer.js": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec",
+                  ".skill-tree/tests/test-pending-boundary-installation.js": "d8c1d5036fac258bcff96a27a5d9957f536b74ae5ba0ab67ddc7d1450a8a7d5c"
+                },
+                "timing": {
+                  "tool_wall_seconds": 1.7101471247151494
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-36c58de1-fca5-431f-b82b-5d3dc2a29452",
+              "classification": "executed-control",
+              "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+              "counts": {
+                "discovered": 3,
+                "expected": 3,
+                "failed": 0,
+                "passed": 3,
+                "skipped": 0
+              },
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "ae49f98eb313ab728e08ac359b82b0382743400adace1e32e8f611201ba841a2",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/pending-intake/boundary-standalone-flavors-c-36c58de1-fca5-431f-b82b-5d3dc2a29452.json",
+                  "sha256": "a3c1f6e27152555ac8ce0b80ec4e818ec9338c37171e9f62210774866eba1331"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "e0488ee5c9563ead50a5a2779e523b3af07adf0d827cba599aeaafa1e6bce974",
+              "payload_hash": "0c78bf26565f7e53827b9af34591189299da2c9d1f4670c908e537d65de5223b",
+              "recorded_at": "2026-11-05T07:06:08.812700+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/scripts/workflow-state.py": "3eaad467929d956b5828a42c2e0f9b7b452abf04f3525520e8cddc40b730ffb6",
+                ".skill-tree/config/resource-map.json": "3e4ac91e10baa3d2ea981ed1e0b2587adf76237841520e5d86fa2ba6bb908b72",
+                ".skill-tree/lib/composer.js": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec",
+                ".skill-tree/tests/test-pending-boundary-installation.js": "d8c1d5036fac258bcff96a27a5d9957f536b74ae5ba0ab67ddc7d1450a8a7d5c"
+              },
+              "timing": {
+                "tool_wall_seconds": 1.7101471247151494
+              }
+            }
+          },
+          "boundary-state-fixtures": {
+            "attempt": {
+              "attempt_id": "C-a876c38b-8415-4b7c-b41b-5fac799eff2e",
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "7f1ec019b243c5bab3b1be478ec79bb2e35c6400fdf281711196daa4fbbb6070",
+              "key": "e9317e7446ac59814d1c2fb446f56aef0a6982ae65300fce67925764556abd41",
+              "launch": null,
+              "prepared_at": "2026-11-05T07:06:06.288899+00:00",
+              "recipe": {
+                "argv": [
+                  "python3",
+                  ".skill-tree/tests/test-pending-intake-boundary.py"
+                ],
+                "input_paths": [],
+                "lane": "unit"
+              },
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "71e0a7e7beb8286470f06b42cc6093bf37b1ff0a1953a4cb2b5dbe2aa38e0d23",
+                ".skill-tree/common/scripts/workflow-state.py": "3eaad467929d956b5828a42c2e0f9b7b452abf04f3525520e8cddc40b730ffb6",
+                ".skill-tree/templates/operations.json": "4e9c9dc09887471a33bef633f40b930d7c0aabdd109cf3bfeeaa438532573073",
+                ".skill-tree/tests/test-pending-intake-boundary.py": "025445702e4d971d87589f2a5051bcc117c1d7a5359da3bf7957d8ddc4ddf5b9"
+              }
+            },
+            "receipts": {
+              "C-a876c38b-8415-4b7c-b41b-5fac799eff2e": {
+                "actual_lane": "unit",
+                "attempt_id": "C-a876c38b-8415-4b7c-b41b-5fac799eff2e",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+                "counts": {
+                  "discovered": 3,
+                  "expected": 3,
+                  "failed": 0,
+                  "passed": 3,
+                  "skipped": 0
+                },
+                "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+                "environment_identity": "7f1ec019b243c5bab3b1be478ec79bb2e35c6400fdf281711196daa4fbbb6070",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/boundary-state-fixtures-c-a876c38b-8415-4b7c-b41b-5fac799eff2e.json",
+                    "sha256": "941951df1f5238371595dbb9f3cb30cf58782fe80f098a50c7ad8d5608d2d082"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "e9317e7446ac59814d1c2fb446f56aef0a6982ae65300fce67925764556abd41",
+                "payload_hash": "ff62a3155d969769d8774c1a9957aa53b445adee1a56835286ee3a26608805a0",
+                "recorded_at": "2026-11-05T07:06:06.661376+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/pending-task-intake.md": "71e0a7e7beb8286470f06b42cc6093bf37b1ff0a1953a4cb2b5dbe2aa38e0d23",
+                  ".skill-tree/common/scripts/workflow-state.py": "3eaad467929d956b5828a42c2e0f9b7b452abf04f3525520e8cddc40b730ffb6",
+                  ".skill-tree/templates/operations.json": "4e9c9dc09887471a33bef633f40b930d7c0aabdd109cf3bfeeaa438532573073",
+                  ".skill-tree/tests/test-pending-intake-boundary.py": "025445702e4d971d87589f2a5051bcc117c1d7a5359da3bf7957d8ddc4ddf5b9"
+                },
+                "timing": {
+                  "tool_wall_seconds": 0.27325283270329237
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-a876c38b-8415-4b7c-b41b-5fac799eff2e",
+              "classification": "executed-control",
+              "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+              "counts": {
+                "discovered": 3,
+                "expected": 3,
+                "failed": 0,
+                "passed": 3,
+                "skipped": 0
+              },
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "7f1ec019b243c5bab3b1be478ec79bb2e35c6400fdf281711196daa4fbbb6070",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/pending-intake/boundary-state-fixtures-c-a876c38b-8415-4b7c-b41b-5fac799eff2e.json",
+                  "sha256": "941951df1f5238371595dbb9f3cb30cf58782fe80f098a50c7ad8d5608d2d082"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "e9317e7446ac59814d1c2fb446f56aef0a6982ae65300fce67925764556abd41",
+              "payload_hash": "ff62a3155d969769d8774c1a9957aa53b445adee1a56835286ee3a26608805a0",
+              "recorded_at": "2026-11-05T07:06:06.661376+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "71e0a7e7beb8286470f06b42cc6093bf37b1ff0a1953a4cb2b5dbe2aa38e0d23",
+                ".skill-tree/common/scripts/workflow-state.py": "3eaad467929d956b5828a42c2e0f9b7b452abf04f3525520e8cddc40b730ffb6",
+                ".skill-tree/templates/operations.json": "4e9c9dc09887471a33bef633f40b930d7c0aabdd109cf3bfeeaa438532573073",
+                ".skill-tree/tests/test-pending-intake-boundary.py": "025445702e4d971d87589f2a5051bcc117c1d7a5359da3bf7957d8ddc4ddf5b9"
+              },
+              "timing": {
+                "tool_wall_seconds": 0.27325283270329237
+              }
+            }
+          }
+        },
+        "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+        "execution_sessions": {},
+        "partial_work": [],
+        "run_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+        "stage": "awaiting-validation"
+      },
+      "task_id": "T-ca90d648-6296-47dc-84af-8dca9afb0c44"
+    }
+  ],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "run_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+  "schema": 1,
+  "sequence": 14
+}

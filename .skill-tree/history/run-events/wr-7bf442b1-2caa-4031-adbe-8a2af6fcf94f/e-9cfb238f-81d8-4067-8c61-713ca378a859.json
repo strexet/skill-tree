@@ -1,0 +1,731 @@
+{
+  "changes": [],
+  "checkpoint_after": {
+    "admission": {
+      "flavor": "general",
+      "identity": "repository-local"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "completed_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "completion_refs": {
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44": "O-f11794c1-5081-482f-86cf-1811b8040a3e",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece": "O-7ce78968-d027-4996-bb23-33c70bb07371"
+    },
+    "current_task_id": "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {},
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+    "limits": {},
+    "mode": "all",
+    "next_action": "validate",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "validate",
+    "processing_results": [],
+    "required_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "root_task_id": "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece",
+    "snapshot": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "started_at": "2026-11-05T06:56:56.648398+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "develop",
+      "base_commit": "91eacd9d27342484d9e38b6dc253f36bf5077eb3",
+      "branch": "codex/pending-intake",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly instructs merging the latest main changes into local develop and then working from develop without further confirmation; push remains excluded.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f"
+    },
+    "workspace_state": "ready"
+  },
+  "checkpoint_before": {
+    "admission": {
+      "flavor": "general",
+      "identity": "repository-local"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "completed_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "completion_refs": {
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44": "O-f11794c1-5081-482f-86cf-1811b8040a3e",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece": "O-7ce78968-d027-4996-bb23-33c70bb07371"
+    },
+    "current_task_id": "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {},
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+    "limits": {},
+    "mode": "all",
+    "next_action": "validate",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "validate",
+    "processing_results": [],
+    "required_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "root_task_id": "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece",
+    "snapshot": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "started_at": "2026-11-05T06:56:56.648398+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "develop",
+      "base_commit": "91eacd9d27342484d9e38b6dc253f36bf5077eb3",
+      "branch": "codex/pending-intake",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly instructs merging the latest main changes into local develop and then working from develop without further confirmation; push remains excluded.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f"
+    },
+    "workspace_state": "ready"
+  },
+  "id": "E-9cfb238f-81d8-4067-8c61-713ca378a859",
+  "outcomes": [],
+  "progress_changes": [
+    {
+      "after": {
+        "admission": {
+          "flavor": "general",
+          "identity": "repository-local"
+        },
+        "checks": {
+          "boundary-instruction-review": {
+            "attempt": {
+              "attempt_id": "C-6c0b3a12-0f5a-419a-b656-4942b4910f07",
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "key": "3064dd4146d34a8e8019f0bc1523dc32fba90d159d93b28856a076e03cb57c14",
+              "launch": null,
+              "prepared_at": "2026-11-05T07:24:34.782069+00:00",
+              "recipe": {
+                "assertion_contract": "explicit source and artifact assertions",
+                "input_paths": [],
+                "lane": "static"
+              },
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91"
+              }
+            },
+            "receipts": {
+              "C-6c0b3a12-0f5a-419a-b656-4942b4910f07": {
+                "actual_lane": "static",
+                "assertions": [
+                  {
+                    "assertion": "The entry point and canonical intake contract distinguish embedded future requirements from separate owner execution instructions, including both Figma branches.",
+                    "result": "pass"
+                  }
+                ],
+                "attempt_id": "C-6c0b3a12-0f5a-419a-b656-4942b4910f07",
+                "classification": "executed-control",
+                "cleanup": "Source review and local fixture qualification leave no product or provider process.",
+                "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+                "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/boundary-instruction-review-final.json",
+                    "sha256": "3b288b913c4b49a02ccee11feba6cf70c34c4c2d1874728b1d25bebc7527d556"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "3064dd4146d34a8e8019f0bc1523dc32fba90d159d93b28856a076e03cb57c14",
+                "payload_hash": "ae057457833565a6338493bf4413e36691f5e32d9d79df1d31ca213f614a6623",
+                "recorded_at": "2026-11-05T07:24:34.849112+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                  ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91"
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "static",
+              "assertions": [
+                {
+                  "assertion": "The entry point and canonical intake contract distinguish embedded future requirements from separate owner execution instructions, including both Figma branches.",
+                  "result": "pass"
+                }
+              ],
+              "attempt_id": "C-6c0b3a12-0f5a-419a-b656-4942b4910f07",
+              "classification": "executed-control",
+              "cleanup": "Source review and local fixture qualification leave no product or provider process.",
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/pending-intake/boundary-instruction-review-final.json",
+                  "sha256": "3b288b913c4b49a02ccee11feba6cf70c34c4c2d1874728b1d25bebc7527d556"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "3064dd4146d34a8e8019f0bc1523dc32fba90d159d93b28856a076e03cb57c14",
+              "payload_hash": "ae057457833565a6338493bf4413e36691f5e32d9d79df1d31ca213f614a6623",
+              "recorded_at": "2026-11-05T07:24:34.849112+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91"
+              }
+            }
+          },
+          "boundary-source-qualification": {
+            "attempt": {
+              "attempt_id": "C-5e00896e-18ed-4258-b176-462fbda0d743",
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "key": "932fb12ada6a99946ed0bb855d9020bd4c6843727552773cf990009e3f7309af",
+              "launch": null,
+              "prepared_at": "2026-11-05T07:24:35.195520+00:00",
+              "recipe": {
+                "assertion_contract": "explicit source and artifact assertions",
+                "input_paths": [],
+                "lane": "static"
+              },
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                ".skill-tree/config/repository.json": "1a8c766c9b93d31ff0573b1bc79dfb54e6489e627065be208b0a40c115ce41a7",
+                ".skill-tree/scripts/sync-skill-references.py": "7362077b0b1d031c88af9a1ddb7cfe8ddc2bc3472e64cb470100ac24038404b9",
+                ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91"
+              }
+            }
+          },
+          "boundary-standalone-flavors": {
+            "attempt": {
+              "attempt_id": "C-356eb55d-25cf-48f3-96f2-262e8a8e6016",
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "ae49f98eb313ab728e08ac359b82b0382743400adace1e32e8f611201ba841a2",
+              "key": "be977e32e0c30eba8b1c435f0dccdfbd957f94cfc2676438ae995ccc88e77761",
+              "launch": null,
+              "prepared_at": "2026-11-05T07:24:32.651150+00:00",
+              "recipe": {
+                "argv": [
+                  "node",
+                  "--test",
+                  ".skill-tree/tests/test-pending-boundary-installation.js"
+                ],
+                "input_paths": [],
+                "lane": "unit"
+              },
+              "sources": {
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                ".skill-tree/lib/composer.js": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec",
+                ".skill-tree/tests/test-pending-boundary-installation.js": "d8c1d5036fac258bcff96a27a5d9957f536b74ae5ba0ab67ddc7d1450a8a7d5c"
+              }
+            },
+            "receipts": {
+              "C-356eb55d-25cf-48f3-96f2-262e8a8e6016": {
+                "actual_lane": "unit",
+                "attempt_id": "C-356eb55d-25cf-48f3-96f2-262e8a8e6016",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+                "counts": {
+                  "discovered": 3,
+                  "expected": 3,
+                  "failed": 0,
+                  "passed": 3,
+                  "skipped": 0
+                },
+                "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+                "environment_identity": "ae49f98eb313ab728e08ac359b82b0382743400adace1e32e8f611201ba841a2",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/boundary-standalone-flavors-c-356eb55d-25cf-48f3-96f2-262e8a8e6016.json",
+                    "sha256": "a80ffb11271f066d475ab8cb8e291fcd3f2602f87102c213d73f07e491ca329c"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "be977e32e0c30eba8b1c435f0dccdfbd957f94cfc2676438ae995ccc88e77761",
+                "payload_hash": "d34de320a241757ded0c44a1faf883309454582ec80449d26d50fb740e352ca2",
+                "recorded_at": "2026-11-05T07:24:34.392330+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                  ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                  ".skill-tree/lib/composer.js": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec",
+                  ".skill-tree/tests/test-pending-boundary-installation.js": "d8c1d5036fac258bcff96a27a5d9957f536b74ae5ba0ab67ddc7d1450a8a7d5c"
+                },
+                "timing": {
+                  "tool_wall_seconds": 1.6758603332564235
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-356eb55d-25cf-48f3-96f2-262e8a8e6016",
+              "classification": "executed-control",
+              "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+              "counts": {
+                "discovered": 3,
+                "expected": 3,
+                "failed": 0,
+                "passed": 3,
+                "skipped": 0
+              },
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "ae49f98eb313ab728e08ac359b82b0382743400adace1e32e8f611201ba841a2",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/pending-intake/boundary-standalone-flavors-c-356eb55d-25cf-48f3-96f2-262e8a8e6016.json",
+                  "sha256": "a80ffb11271f066d475ab8cb8e291fcd3f2602f87102c213d73f07e491ca329c"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "be977e32e0c30eba8b1c435f0dccdfbd957f94cfc2676438ae995ccc88e77761",
+              "payload_hash": "d34de320a241757ded0c44a1faf883309454582ec80449d26d50fb740e352ca2",
+              "recorded_at": "2026-11-05T07:24:34.392330+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                ".skill-tree/lib/composer.js": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec",
+                ".skill-tree/tests/test-pending-boundary-installation.js": "d8c1d5036fac258bcff96a27a5d9957f536b74ae5ba0ab67ddc7d1450a8a7d5c"
+              },
+              "timing": {
+                "tool_wall_seconds": 1.6758603332564235
+              }
+            }
+          },
+          "boundary-state-fixtures": {
+            "attempt": {
+              "attempt_id": "C-739ee1ed-a59b-4e77-83d4-71518281f172",
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "7f1ec019b243c5bab3b1be478ec79bb2e35c6400fdf281711196daa4fbbb6070",
+              "key": "835ce6e4230b3a99f643d8ec2ac7da99efcfecaa2ad6cb23da7fc93c5b947269",
+              "launch": null,
+              "prepared_at": "2026-11-05T07:24:31.936862+00:00",
+              "recipe": {
+                "argv": [
+                  "python3",
+                  ".skill-tree/tests/test-pending-intake-boundary.py"
+                ],
+                "input_paths": [],
+                "lane": "unit"
+              },
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+                ".skill-tree/tests/test-pending-intake-boundary.py": "025445702e4d971d87589f2a5051bcc117c1d7a5359da3bf7957d8ddc4ddf5b9"
+              }
+            },
+            "receipts": {
+              "C-739ee1ed-a59b-4e77-83d4-71518281f172": {
+                "actual_lane": "unit",
+                "attempt_id": "C-739ee1ed-a59b-4e77-83d4-71518281f172",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+                "counts": {
+                  "discovered": 3,
+                  "expected": 3,
+                  "failed": 0,
+                  "passed": 3,
+                  "skipped": 0
+                },
+                "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+                "environment_identity": "7f1ec019b243c5bab3b1be478ec79bb2e35c6400fdf281711196daa4fbbb6070",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/boundary-state-fixtures-c-739ee1ed-a59b-4e77-83d4-71518281f172.json",
+                    "sha256": "b61eb9f92b7f94c887dbde108920e9307880cdff7ac121403c8cfce9c552dae0"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "835ce6e4230b3a99f643d8ec2ac7da99efcfecaa2ad6cb23da7fc93c5b947269",
+                "payload_hash": "ac5f4dfe0b7ef2e48d0763a53fb8897aa64a0497f69c3fb8c6b96e9088755a24",
+                "recorded_at": "2026-11-05T07:24:32.292322+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                  ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                  ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+                  ".skill-tree/tests/test-pending-intake-boundary.py": "025445702e4d971d87589f2a5051bcc117c1d7a5359da3bf7957d8ddc4ddf5b9"
+                },
+                "timing": {
+                  "tool_wall_seconds": 0.2633012495934963
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-739ee1ed-a59b-4e77-83d4-71518281f172",
+              "classification": "executed-control",
+              "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+              "counts": {
+                "discovered": 3,
+                "expected": 3,
+                "failed": 0,
+                "passed": 3,
+                "skipped": 0
+              },
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "7f1ec019b243c5bab3b1be478ec79bb2e35c6400fdf281711196daa4fbbb6070",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/pending-intake/boundary-state-fixtures-c-739ee1ed-a59b-4e77-83d4-71518281f172.json",
+                  "sha256": "b61eb9f92b7f94c887dbde108920e9307880cdff7ac121403c8cfce9c552dae0"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "835ce6e4230b3a99f643d8ec2ac7da99efcfecaa2ad6cb23da7fc93c5b947269",
+              "payload_hash": "ac5f4dfe0b7ef2e48d0763a53fb8897aa64a0497f69c3fb8c6b96e9088755a24",
+              "recorded_at": "2026-11-05T07:24:32.292322+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+                ".skill-tree/tests/test-pending-intake-boundary.py": "025445702e4d971d87589f2a5051bcc117c1d7a5359da3bf7957d8ddc4ddf5b9"
+              },
+              "timing": {
+                "tool_wall_seconds": 0.2633012495934963
+              }
+            }
+          }
+        },
+        "execution_sessions": {},
+        "revalidation": true,
+        "run_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+        "stage": "awaiting-validation"
+      },
+      "before": {
+        "admission": {
+          "flavor": "general",
+          "identity": "repository-local"
+        },
+        "checks": {
+          "boundary-instruction-review": {
+            "attempt": {
+              "attempt_id": "C-6c0b3a12-0f5a-419a-b656-4942b4910f07",
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "key": "3064dd4146d34a8e8019f0bc1523dc32fba90d159d93b28856a076e03cb57c14",
+              "launch": null,
+              "prepared_at": "2026-11-05T07:24:34.782069+00:00",
+              "recipe": {
+                "assertion_contract": "explicit source and artifact assertions",
+                "input_paths": [],
+                "lane": "static"
+              },
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91"
+              }
+            },
+            "receipts": {
+              "C-6c0b3a12-0f5a-419a-b656-4942b4910f07": {
+                "actual_lane": "static",
+                "assertions": [
+                  {
+                    "assertion": "The entry point and canonical intake contract distinguish embedded future requirements from separate owner execution instructions, including both Figma branches.",
+                    "result": "pass"
+                  }
+                ],
+                "attempt_id": "C-6c0b3a12-0f5a-419a-b656-4942b4910f07",
+                "classification": "executed-control",
+                "cleanup": "Source review and local fixture qualification leave no product or provider process.",
+                "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+                "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/boundary-instruction-review-final.json",
+                    "sha256": "3b288b913c4b49a02ccee11feba6cf70c34c4c2d1874728b1d25bebc7527d556"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "3064dd4146d34a8e8019f0bc1523dc32fba90d159d93b28856a076e03cb57c14",
+                "payload_hash": "ae057457833565a6338493bf4413e36691f5e32d9d79df1d31ca213f614a6623",
+                "recorded_at": "2026-11-05T07:24:34.849112+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                  ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91"
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "static",
+              "assertions": [
+                {
+                  "assertion": "The entry point and canonical intake contract distinguish embedded future requirements from separate owner execution instructions, including both Figma branches.",
+                  "result": "pass"
+                }
+              ],
+              "attempt_id": "C-6c0b3a12-0f5a-419a-b656-4942b4910f07",
+              "classification": "executed-control",
+              "cleanup": "Source review and local fixture qualification leave no product or provider process.",
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/pending-intake/boundary-instruction-review-final.json",
+                  "sha256": "3b288b913c4b49a02ccee11feba6cf70c34c4c2d1874728b1d25bebc7527d556"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "3064dd4146d34a8e8019f0bc1523dc32fba90d159d93b28856a076e03cb57c14",
+              "payload_hash": "ae057457833565a6338493bf4413e36691f5e32d9d79df1d31ca213f614a6623",
+              "recorded_at": "2026-11-05T07:24:34.849112+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91"
+              }
+            }
+          },
+          "boundary-standalone-flavors": {
+            "attempt": {
+              "attempt_id": "C-356eb55d-25cf-48f3-96f2-262e8a8e6016",
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "ae49f98eb313ab728e08ac359b82b0382743400adace1e32e8f611201ba841a2",
+              "key": "be977e32e0c30eba8b1c435f0dccdfbd957f94cfc2676438ae995ccc88e77761",
+              "launch": null,
+              "prepared_at": "2026-11-05T07:24:32.651150+00:00",
+              "recipe": {
+                "argv": [
+                  "node",
+                  "--test",
+                  ".skill-tree/tests/test-pending-boundary-installation.js"
+                ],
+                "input_paths": [],
+                "lane": "unit"
+              },
+              "sources": {
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                ".skill-tree/lib/composer.js": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec",
+                ".skill-tree/tests/test-pending-boundary-installation.js": "d8c1d5036fac258bcff96a27a5d9957f536b74ae5ba0ab67ddc7d1450a8a7d5c"
+              }
+            },
+            "receipts": {
+              "C-356eb55d-25cf-48f3-96f2-262e8a8e6016": {
+                "actual_lane": "unit",
+                "attempt_id": "C-356eb55d-25cf-48f3-96f2-262e8a8e6016",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+                "counts": {
+                  "discovered": 3,
+                  "expected": 3,
+                  "failed": 0,
+                  "passed": 3,
+                  "skipped": 0
+                },
+                "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+                "environment_identity": "ae49f98eb313ab728e08ac359b82b0382743400adace1e32e8f611201ba841a2",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/boundary-standalone-flavors-c-356eb55d-25cf-48f3-96f2-262e8a8e6016.json",
+                    "sha256": "a80ffb11271f066d475ab8cb8e291fcd3f2602f87102c213d73f07e491ca329c"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "be977e32e0c30eba8b1c435f0dccdfbd957f94cfc2676438ae995ccc88e77761",
+                "payload_hash": "d34de320a241757ded0c44a1faf883309454582ec80449d26d50fb740e352ca2",
+                "recorded_at": "2026-11-05T07:24:34.392330+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                  ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                  ".skill-tree/lib/composer.js": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec",
+                  ".skill-tree/tests/test-pending-boundary-installation.js": "d8c1d5036fac258bcff96a27a5d9957f536b74ae5ba0ab67ddc7d1450a8a7d5c"
+                },
+                "timing": {
+                  "tool_wall_seconds": 1.6758603332564235
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-356eb55d-25cf-48f3-96f2-262e8a8e6016",
+              "classification": "executed-control",
+              "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+              "counts": {
+                "discovered": 3,
+                "expected": 3,
+                "failed": 0,
+                "passed": 3,
+                "skipped": 0
+              },
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "ae49f98eb313ab728e08ac359b82b0382743400adace1e32e8f611201ba841a2",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/pending-intake/boundary-standalone-flavors-c-356eb55d-25cf-48f3-96f2-262e8a8e6016.json",
+                  "sha256": "a80ffb11271f066d475ab8cb8e291fcd3f2602f87102c213d73f07e491ca329c"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "be977e32e0c30eba8b1c435f0dccdfbd957f94cfc2676438ae995ccc88e77761",
+              "payload_hash": "d34de320a241757ded0c44a1faf883309454582ec80449d26d50fb740e352ca2",
+              "recorded_at": "2026-11-05T07:24:34.392330+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                ".skill-tree/lib/composer.js": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec",
+                ".skill-tree/tests/test-pending-boundary-installation.js": "d8c1d5036fac258bcff96a27a5d9957f536b74ae5ba0ab67ddc7d1450a8a7d5c"
+              },
+              "timing": {
+                "tool_wall_seconds": 1.6758603332564235
+              }
+            }
+          },
+          "boundary-state-fixtures": {
+            "attempt": {
+              "attempt_id": "C-739ee1ed-a59b-4e77-83d4-71518281f172",
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "7f1ec019b243c5bab3b1be478ec79bb2e35c6400fdf281711196daa4fbbb6070",
+              "key": "835ce6e4230b3a99f643d8ec2ac7da99efcfecaa2ad6cb23da7fc93c5b947269",
+              "launch": null,
+              "prepared_at": "2026-11-05T07:24:31.936862+00:00",
+              "recipe": {
+                "argv": [
+                  "python3",
+                  ".skill-tree/tests/test-pending-intake-boundary.py"
+                ],
+                "input_paths": [],
+                "lane": "unit"
+              },
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+                ".skill-tree/tests/test-pending-intake-boundary.py": "025445702e4d971d87589f2a5051bcc117c1d7a5359da3bf7957d8ddc4ddf5b9"
+              }
+            },
+            "receipts": {
+              "C-739ee1ed-a59b-4e77-83d4-71518281f172": {
+                "actual_lane": "unit",
+                "attempt_id": "C-739ee1ed-a59b-4e77-83d4-71518281f172",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+                "counts": {
+                  "discovered": 3,
+                  "expected": 3,
+                  "failed": 0,
+                  "passed": 3,
+                  "skipped": 0
+                },
+                "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+                "environment_identity": "7f1ec019b243c5bab3b1be478ec79bb2e35c6400fdf281711196daa4fbbb6070",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/boundary-state-fixtures-c-739ee1ed-a59b-4e77-83d4-71518281f172.json",
+                    "sha256": "b61eb9f92b7f94c887dbde108920e9307880cdff7ac121403c8cfce9c552dae0"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "835ce6e4230b3a99f643d8ec2ac7da99efcfecaa2ad6cb23da7fc93c5b947269",
+                "payload_hash": "ac5f4dfe0b7ef2e48d0763a53fb8897aa64a0497f69c3fb8c6b96e9088755a24",
+                "recorded_at": "2026-11-05T07:24:32.292322+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                  ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                  ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+                  ".skill-tree/tests/test-pending-intake-boundary.py": "025445702e4d971d87589f2a5051bcc117c1d7a5359da3bf7957d8ddc4ddf5b9"
+                },
+                "timing": {
+                  "tool_wall_seconds": 0.2633012495934963
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-739ee1ed-a59b-4e77-83d4-71518281f172",
+              "classification": "executed-control",
+              "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+              "counts": {
+                "discovered": 3,
+                "expected": 3,
+                "failed": 0,
+                "passed": 3,
+                "skipped": 0
+              },
+              "definition": "21a8deba07cab7b4cc3aaeaf7bde9543f6cb0f290bd7a43d817d0a6af95e0db4",
+              "environment_identity": "7f1ec019b243c5bab3b1be478ec79bb2e35c6400fdf281711196daa4fbbb6070",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/pending-intake/boundary-state-fixtures-c-739ee1ed-a59b-4e77-83d4-71518281f172.json",
+                  "sha256": "b61eb9f92b7f94c887dbde108920e9307880cdff7ac121403c8cfce9c552dae0"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "835ce6e4230b3a99f643d8ec2ac7da99efcfecaa2ad6cb23da7fc93c5b947269",
+              "payload_hash": "ac5f4dfe0b7ef2e48d0763a53fb8897aa64a0497f69c3fb8c6b96e9088755a24",
+              "recorded_at": "2026-11-05T07:24:32.292322+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+                ".skill-tree/tests/test-pending-intake-boundary.py": "025445702e4d971d87589f2a5051bcc117c1d7a5359da3bf7957d8ddc4ddf5b9"
+              },
+              "timing": {
+                "tool_wall_seconds": 0.2633012495934963
+              }
+            }
+          }
+        },
+        "execution_sessions": {},
+        "revalidation": true,
+        "run_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+        "stage": "awaiting-validation"
+      },
+      "task_id": "T-ca90d648-6296-47dc-84af-8dca9afb0c44"
+    }
+  ],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "run_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+  "schema": 1,
+  "sequence": 40
+}

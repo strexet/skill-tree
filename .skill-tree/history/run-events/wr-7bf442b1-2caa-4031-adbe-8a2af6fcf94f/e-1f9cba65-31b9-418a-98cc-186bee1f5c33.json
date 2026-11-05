@@ -1,0 +1,816 @@
+{
+  "changes": [],
+  "checkpoint_after": {
+    "admission": {
+      "flavor": "general",
+      "identity": "repository-local"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "completed_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44"
+    ],
+    "completion_refs": {
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44": "O-f11794c1-5081-482f-86cf-1811b8040a3e"
+    },
+    "current_task_id": "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {},
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+    "limits": {},
+    "mode": "all",
+    "next_action": "implement",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "implement",
+    "processing_results": [],
+    "required_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "root_task_id": "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece",
+    "snapshot": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "started_at": "2026-11-05T06:56:56.648398+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "develop",
+      "base_commit": "91eacd9d27342484d9e38b6dc253f36bf5077eb3",
+      "branch": "codex/pending-intake",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly instructs merging the latest main changes into local develop and then working from develop without further confirmation; push remains excluded.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f"
+    },
+    "workspace_state": "ready"
+  },
+  "checkpoint_before": {
+    "admission": {
+      "flavor": "general",
+      "identity": "repository-local"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "completed_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44"
+    ],
+    "completion_refs": {
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44": "O-f11794c1-5081-482f-86cf-1811b8040a3e"
+    },
+    "current_task_id": "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {},
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+    "limits": {},
+    "mode": "all",
+    "next_action": "implement",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "implement",
+    "processing_results": [],
+    "required_ids": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "root_task_id": "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece",
+    "snapshot": [
+      "T-ca90d648-6296-47dc-84af-8dca9afb0c44",
+      "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    ],
+    "started_at": "2026-11-05T06:56:56.648398+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "develop",
+      "base_commit": "91eacd9d27342484d9e38b6dc253f36bf5077eb3",
+      "branch": "codex/pending-intake",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly instructs merging the latest main changes into local develop and then working from develop without further confirmation; push remains excluded.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f"
+    },
+    "workspace_state": "ready"
+  },
+  "id": "E-1f9cba65-31b9-418a-98cc-186bee1f5c33",
+  "outcomes": [],
+  "progress_changes": [
+    {
+      "after": {
+        "admission": {
+          "flavor": "general",
+          "identity": "repository-local"
+        },
+        "checks": {
+          "defect-priority-fixtures": {
+            "attempt": {
+              "attempt_id": "C-3665fb0c-d8eb-4e3c-81ac-4e4414b8d0cd",
+              "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+              "environment_identity": "359fffe1919ef71c49f908262267efaca279e1b494c45f7b878e662fd4c21ab2",
+              "key": "568e8f3a1ce7bc7af938e2c8011f97595681d6bc18932e990c70161aa9aed21a",
+              "launch": null,
+              "prepared_at": "2026-11-05T07:18:42.301559+00:00",
+              "recipe": {
+                "argv": [
+                  "python3",
+                  ".skill-tree/tests/test-pending-priority.py"
+                ],
+                "input_paths": [],
+                "lane": "unit"
+              },
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                ".skill-tree/common/references/workflow-metadata.md": "6c3252f4564cecc532eec5cec4ad30c9373bea8f85e3c698b19308dd83ae7b9d",
+                ".skill-tree/common/scripts/workflow-state.py": "3eaad467929d956b5828a42c2e0f9b7b452abf04f3525520e8cddc40b730ffb6",
+                ".skill-tree/tests/test-pending-priority.py": "d45687966512a3caa3e57a3540ccad82af0b1eed86eb3f810924df23e200ca62"
+              }
+            },
+            "receipts": {
+              "C-3665fb0c-d8eb-4e3c-81ac-4e4414b8d0cd": {
+                "actual_lane": "unit",
+                "attempt_id": "C-3665fb0c-d8eb-4e3c-81ac-4e4414b8d0cd",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+                "counts": {
+                  "discovered": 13,
+                  "expected": 13,
+                  "failed": 10,
+                  "passed": 3,
+                  "skipped": 0
+                },
+                "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+                "environment_identity": "359fffe1919ef71c49f908262267efaca279e1b494c45f7b878e662fd4c21ab2",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/defect-priority-fixtures-c-3665fb0c-d8eb-4e3c-81ac-4e4414b8d0cd.json",
+                    "sha256": "d05b78d8e362b6192b5132110a03ebc35fc124fc11b4f81b408f332fdb763fa8"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_category": "expected-behavior",
+                "key": "568e8f3a1ce7bc7af938e2c8011f97595681d6bc18932e990c70161aa9aed21a",
+                "payload_hash": "4a3743173be6eb510bbf19e33abd0666a4079d54c70133ae0b64c1af11a68a0a",
+                "recorded_at": "2026-11-05T07:18:42.951639+00:00",
+                "result": "red",
+                "sources": {
+                  ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                  ".skill-tree/common/references/workflow-metadata.md": "6c3252f4564cecc532eec5cec4ad30c9373bea8f85e3c698b19308dd83ae7b9d",
+                  ".skill-tree/common/scripts/workflow-state.py": "3eaad467929d956b5828a42c2e0f9b7b452abf04f3525520e8cddc40b730ffb6",
+                  ".skill-tree/tests/test-pending-priority.py": "d45687966512a3caa3e57a3540ccad82af0b1eed86eb3f810924df23e200ca62"
+                },
+                "timing": {
+                  "tool_wall_seconds": 0.5632081250660121
+                }
+              },
+              "C-9b42ddfa-6179-49a8-876b-76904913aba4": {
+                "actual_lane": "unit",
+                "attempt_id": "C-9b42ddfa-6179-49a8-876b-76904913aba4",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+                "counts": {
+                  "discovered": 13,
+                  "expected": 13,
+                  "failed": 2,
+                  "passed": 11,
+                  "skipped": 0
+                },
+                "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+                "diagnostic_key": "b84fbda7c88f06882c69e688677980b624d5812a9decf5352b5abaf59eb62697",
+                "environment_identity": "359fffe1919ef71c49f908262267efaca279e1b494c45f7b878e662fd4c21ab2",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/defect-priority-fixtures-c-9b42ddfa-6179-49a8-876b-76904913aba4.json",
+                    "sha256": "b17a10d5761218935499034a8ad0ff151acdec80548cd35a1aec8487f8e9c677"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_signature": "defect-priority-fixtures:nonzero-fixture-result",
+                "key": "a97397233539df0ec78bfaabacac029049295f8f6dfc3627da532300bc7e1d98",
+                "payload_hash": "b17a0a84feee8024807c3bbf34857daaaa7c1d8a0f2e70d95f6d03e6e6f0f84f",
+                "recorded_at": "2026-11-05T07:17:11.875712+00:00",
+                "result": "fail",
+                "sources": {
+                  ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                  ".skill-tree/common/references/workflow-metadata.md": "6c3252f4564cecc532eec5cec4ad30c9373bea8f85e3c698b19308dd83ae7b9d",
+                  ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                  ".skill-tree/tests/test-pending-priority.py": "216c118839c205a7b817f00e390d9f8c8a2fd003efe39d3f2726686d3112769f"
+                },
+                "timing": {
+                  "tool_wall_seconds": 0.5744160837493837
+                }
+              },
+              "C-a0cf2e20-ae11-4e43-a92b-f6ff0cb4b70d": {
+                "actual_lane": "unit",
+                "attempt_id": "C-a0cf2e20-ae11-4e43-a92b-f6ff0cb4b70d",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+                "counts": {
+                  "discovered": 13,
+                  "expected": 13,
+                  "failed": 2,
+                  "passed": 11,
+                  "skipped": 0
+                },
+                "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+                "diagnostic_key": "a85f479997c827afd5c5702b45e2b013e91bfd25ffa60a190960cc3cee69aad5",
+                "environment_identity": "359fffe1919ef71c49f908262267efaca279e1b494c45f7b878e662fd4c21ab2",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/defect-priority-fixtures-c-a0cf2e20-ae11-4e43-a92b-f6ff0cb4b70d.json",
+                    "sha256": "9d66f6cf73ea8deb93f1882ecd793a5d2c10475a856a5c53b952aa431ea59d11"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_signature": "defect-priority-fixtures:nonzero-fixture-result",
+                "key": "169de9cc50bbbbcf332d3789a9aef283606ec25232f6057e50298f7fdd4c4e43",
+                "payload_hash": "87efd6c90b0abedea0b22a86d466a4b2897930f2eb74dca6926d6c972ff550a7",
+                "recorded_at": "2026-11-05T07:14:28.964607+00:00",
+                "result": "fail",
+                "sources": {
+                  ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                  ".skill-tree/common/references/workflow-metadata.md": "6c3252f4564cecc532eec5cec4ad30c9373bea8f85e3c698b19308dd83ae7b9d",
+                  ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                  ".skill-tree/tests/test-pending-priority.py": "15e099e5dd4236803c2914a1d4ba40cf214cd69e9a51855b252bd4c13fc91a55"
+                },
+                "timing": {
+                  "tool_wall_seconds": 0.5187478750012815
+                }
+              },
+              "C-d5d862ca-e0dc-4eca-a3e1-2465dd6a3e40": {
+                "actual_lane": "unit",
+                "attempt_id": "C-d5d862ca-e0dc-4eca-a3e1-2465dd6a3e40",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+                "counts": {
+                  "discovered": 13,
+                  "expected": 13,
+                  "failed": 10,
+                  "passed": 3,
+                  "skipped": 0
+                },
+                "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+                "environment_identity": "359fffe1919ef71c49f908262267efaca279e1b494c45f7b878e662fd4c21ab2",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/defect-priority-fixtures-c-d5d862ca-e0dc-4eca-a3e1-2465dd6a3e40.json",
+                    "sha256": "2a09fb61b46576464601b233e0edba245a8753c4abe96e926dc51129e889f8ad"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_category": "expected-behavior",
+                "key": "dab22f913afa0dbd30989236b35ecc9bf6eb93a58d0567fcb24384558e04dc70",
+                "payload_hash": "e94b3c9057a3ca69fb6c257420f52b6ce2ee82afb5203a10baf2da9df57e366c",
+                "recorded_at": "2026-11-05T07:12:16.420668+00:00",
+                "result": "red",
+                "sources": {
+                  ".skill-tree/common/references/pending-task-intake.md": "71e0a7e7beb8286470f06b42cc6093bf37b1ff0a1953a4cb2b5dbe2aa38e0d23",
+                  ".skill-tree/common/references/workflow-metadata.md": "0a90f558c84ba3ff7b0227c2ae6fedfe510fb5bfd835c780b58b9ae3d79c1b3e",
+                  ".skill-tree/common/scripts/workflow-state.py": "3eaad467929d956b5828a42c2e0f9b7b452abf04f3525520e8cddc40b730ffb6",
+                  ".skill-tree/tests/test-pending-priority.py": "c60966f4920ac291d6bac62dcb8cef891eb87a97d7d3f2ddb25844cd28abbf48"
+                },
+                "timing": {
+                  "tool_wall_seconds": 0.5346882082521915
+                }
+              }
+            },
+            "red": {
+              "actual_lane": "unit",
+              "attempt_id": "C-3665fb0c-d8eb-4e3c-81ac-4e4414b8d0cd",
+              "classification": "executed-control",
+              "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+              "counts": {
+                "discovered": 13,
+                "expected": 13,
+                "failed": 10,
+                "passed": 3,
+                "skipped": 0
+              },
+              "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+              "environment_identity": "359fffe1919ef71c49f908262267efaca279e1b494c45f7b878e662fd4c21ab2",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/pending-intake/defect-priority-fixtures-c-3665fb0c-d8eb-4e3c-81ac-4e4414b8d0cd.json",
+                  "sha256": "d05b78d8e362b6192b5132110a03ebc35fc124fc11b4f81b408f332fdb763fa8"
+                }
+              ],
+              "execution_sessions": {},
+              "failure_category": "expected-behavior",
+              "key": "568e8f3a1ce7bc7af938e2c8011f97595681d6bc18932e990c70161aa9aed21a",
+              "payload_hash": "4a3743173be6eb510bbf19e33abd0666a4079d54c70133ae0b64c1af11a68a0a",
+              "recorded_at": "2026-11-05T07:18:42.951639+00:00",
+              "result": "red",
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                ".skill-tree/common/references/workflow-metadata.md": "6c3252f4564cecc532eec5cec4ad30c9373bea8f85e3c698b19308dd83ae7b9d",
+                ".skill-tree/common/scripts/workflow-state.py": "3eaad467929d956b5828a42c2e0f9b7b452abf04f3525520e8cddc40b730ffb6",
+                ".skill-tree/tests/test-pending-priority.py": "d45687966512a3caa3e57a3540ccad82af0b1eed86eb3f810924df23e200ca62"
+              },
+              "timing": {
+                "tool_wall_seconds": 0.5632081250660121
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-3665fb0c-d8eb-4e3c-81ac-4e4414b8d0cd",
+              "classification": "executed-control",
+              "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+              "counts": {
+                "discovered": 13,
+                "expected": 13,
+                "failed": 10,
+                "passed": 3,
+                "skipped": 0
+              },
+              "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+              "environment_identity": "359fffe1919ef71c49f908262267efaca279e1b494c45f7b878e662fd4c21ab2",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/pending-intake/defect-priority-fixtures-c-3665fb0c-d8eb-4e3c-81ac-4e4414b8d0cd.json",
+                  "sha256": "d05b78d8e362b6192b5132110a03ebc35fc124fc11b4f81b408f332fdb763fa8"
+                }
+              ],
+              "execution_sessions": {},
+              "failure_category": "expected-behavior",
+              "key": "568e8f3a1ce7bc7af938e2c8011f97595681d6bc18932e990c70161aa9aed21a",
+              "payload_hash": "4a3743173be6eb510bbf19e33abd0666a4079d54c70133ae0b64c1af11a68a0a",
+              "recorded_at": "2026-11-05T07:18:42.951639+00:00",
+              "result": "red",
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                ".skill-tree/common/references/workflow-metadata.md": "6c3252f4564cecc532eec5cec4ad30c9373bea8f85e3c698b19308dd83ae7b9d",
+                ".skill-tree/common/scripts/workflow-state.py": "3eaad467929d956b5828a42c2e0f9b7b452abf04f3525520e8cddc40b730ffb6",
+                ".skill-tree/tests/test-pending-priority.py": "d45687966512a3caa3e57a3540ccad82af0b1eed86eb3f810924df23e200ca62"
+              },
+              "timing": {
+                "tool_wall_seconds": 0.5632081250660121
+              }
+            }
+          },
+          "defect-priority-standalone-flavors": {
+            "attempt": {
+              "attempt_id": "C-653f4993-1b10-4743-b819-3a99c822776f",
+              "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+              "environment_identity": "8c42acc673522757835f25e69647e1a95b455e42b631f448a115d67a254caa3a",
+              "key": "6244b6140c65f1e70fa0680dc2d97def232021481f0cc2044dd185cf1ee1dbf2",
+              "launch": null,
+              "prepared_at": "2026-11-05T07:14:29.311659+00:00",
+              "recipe": {
+                "argv": [
+                  "node",
+                  "--test",
+                  ".skill-tree/tests/test-pending-priority-installation.js"
+                ],
+                "input_paths": [],
+                "lane": "unit"
+              },
+              "sources": {
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                ".skill-tree/lib/composer.js": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec",
+                ".skill-tree/tests/test-pending-priority-installation.js": "7729a917d4ddeaff250cf15c5563fc609286e50a944c79c27bd66a2f2871a5d7"
+              }
+            },
+            "receipts": {
+              "C-653f4993-1b10-4743-b819-3a99c822776f": {
+                "actual_lane": "unit",
+                "attempt_id": "C-653f4993-1b10-4743-b819-3a99c822776f",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+                "counts": {
+                  "discovered": 3,
+                  "expected": 3,
+                  "failed": 0,
+                  "passed": 3,
+                  "skipped": 0
+                },
+                "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+                "environment_identity": "8c42acc673522757835f25e69647e1a95b455e42b631f448a115d67a254caa3a",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/defect-priority-standalone-flavors-c-653f4993-1b10-4743-b819-3a99c822776f.json",
+                    "sha256": "6c31378607dc04f5aafee0bdb6f925d963dc7bad036d8f502474c5b9712c6603"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "6244b6140c65f1e70fa0680dc2d97def232021481f0cc2044dd185cf1ee1dbf2",
+                "payload_hash": "7afaa773fc6120194d3dbe076bbd5b49f697aadf198d4b3ceb7c86e141ce7fe0",
+                "recorded_at": "2026-11-05T07:14:33.137418+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                  ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                  ".skill-tree/lib/composer.js": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec",
+                  ".skill-tree/tests/test-pending-priority-installation.js": "7729a917d4ddeaff250cf15c5563fc609286e50a944c79c27bd66a2f2871a5d7"
+                },
+                "timing": {
+                  "tool_wall_seconds": 3.7456910419277847
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-653f4993-1b10-4743-b819-3a99c822776f",
+              "classification": "executed-control",
+              "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+              "counts": {
+                "discovered": 3,
+                "expected": 3,
+                "failed": 0,
+                "passed": 3,
+                "skipped": 0
+              },
+              "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+              "environment_identity": "8c42acc673522757835f25e69647e1a95b455e42b631f448a115d67a254caa3a",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/pending-intake/defect-priority-standalone-flavors-c-653f4993-1b10-4743-b819-3a99c822776f.json",
+                  "sha256": "6c31378607dc04f5aafee0bdb6f925d963dc7bad036d8f502474c5b9712c6603"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "6244b6140c65f1e70fa0680dc2d97def232021481f0cc2044dd185cf1ee1dbf2",
+              "payload_hash": "7afaa773fc6120194d3dbe076bbd5b49f697aadf198d4b3ceb7c86e141ce7fe0",
+              "recorded_at": "2026-11-05T07:14:33.137418+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                ".skill-tree/lib/composer.js": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec",
+                ".skill-tree/tests/test-pending-priority-installation.js": "7729a917d4ddeaff250cf15c5563fc609286e50a944c79c27bd66a2f2871a5d7"
+              },
+              "timing": {
+                "tool_wall_seconds": 3.7456910419277847
+              }
+            }
+          }
+        },
+        "execution_sessions": {},
+        "partial_work": [],
+        "run_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+        "stage": "implementing"
+      },
+      "before": {
+        "admission": {
+          "flavor": "general",
+          "identity": "repository-local"
+        },
+        "checks": {
+          "defect-priority-fixtures": {
+            "attempt": {
+              "attempt_id": "C-3665fb0c-d8eb-4e3c-81ac-4e4414b8d0cd",
+              "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+              "environment_identity": "359fffe1919ef71c49f908262267efaca279e1b494c45f7b878e662fd4c21ab2",
+              "key": "568e8f3a1ce7bc7af938e2c8011f97595681d6bc18932e990c70161aa9aed21a",
+              "launch": null,
+              "prepared_at": "2026-11-05T07:18:42.301559+00:00",
+              "recipe": {
+                "argv": [
+                  "python3",
+                  ".skill-tree/tests/test-pending-priority.py"
+                ],
+                "input_paths": [],
+                "lane": "unit"
+              },
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                ".skill-tree/common/references/workflow-metadata.md": "6c3252f4564cecc532eec5cec4ad30c9373bea8f85e3c698b19308dd83ae7b9d",
+                ".skill-tree/common/scripts/workflow-state.py": "3eaad467929d956b5828a42c2e0f9b7b452abf04f3525520e8cddc40b730ffb6",
+                ".skill-tree/tests/test-pending-priority.py": "d45687966512a3caa3e57a3540ccad82af0b1eed86eb3f810924df23e200ca62"
+              }
+            },
+            "receipts": {
+              "C-9b42ddfa-6179-49a8-876b-76904913aba4": {
+                "actual_lane": "unit",
+                "attempt_id": "C-9b42ddfa-6179-49a8-876b-76904913aba4",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+                "counts": {
+                  "discovered": 13,
+                  "expected": 13,
+                  "failed": 2,
+                  "passed": 11,
+                  "skipped": 0
+                },
+                "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+                "diagnostic_key": "b84fbda7c88f06882c69e688677980b624d5812a9decf5352b5abaf59eb62697",
+                "environment_identity": "359fffe1919ef71c49f908262267efaca279e1b494c45f7b878e662fd4c21ab2",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/defect-priority-fixtures-c-9b42ddfa-6179-49a8-876b-76904913aba4.json",
+                    "sha256": "b17a10d5761218935499034a8ad0ff151acdec80548cd35a1aec8487f8e9c677"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_signature": "defect-priority-fixtures:nonzero-fixture-result",
+                "key": "a97397233539df0ec78bfaabacac029049295f8f6dfc3627da532300bc7e1d98",
+                "payload_hash": "b17a0a84feee8024807c3bbf34857daaaa7c1d8a0f2e70d95f6d03e6e6f0f84f",
+                "recorded_at": "2026-11-05T07:17:11.875712+00:00",
+                "result": "fail",
+                "sources": {
+                  ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                  ".skill-tree/common/references/workflow-metadata.md": "6c3252f4564cecc532eec5cec4ad30c9373bea8f85e3c698b19308dd83ae7b9d",
+                  ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                  ".skill-tree/tests/test-pending-priority.py": "216c118839c205a7b817f00e390d9f8c8a2fd003efe39d3f2726686d3112769f"
+                },
+                "timing": {
+                  "tool_wall_seconds": 0.5744160837493837
+                }
+              },
+              "C-a0cf2e20-ae11-4e43-a92b-f6ff0cb4b70d": {
+                "actual_lane": "unit",
+                "attempt_id": "C-a0cf2e20-ae11-4e43-a92b-f6ff0cb4b70d",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+                "counts": {
+                  "discovered": 13,
+                  "expected": 13,
+                  "failed": 2,
+                  "passed": 11,
+                  "skipped": 0
+                },
+                "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+                "diagnostic_key": "a85f479997c827afd5c5702b45e2b013e91bfd25ffa60a190960cc3cee69aad5",
+                "environment_identity": "359fffe1919ef71c49f908262267efaca279e1b494c45f7b878e662fd4c21ab2",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/defect-priority-fixtures-c-a0cf2e20-ae11-4e43-a92b-f6ff0cb4b70d.json",
+                    "sha256": "9d66f6cf73ea8deb93f1882ecd793a5d2c10475a856a5c53b952aa431ea59d11"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_signature": "defect-priority-fixtures:nonzero-fixture-result",
+                "key": "169de9cc50bbbbcf332d3789a9aef283606ec25232f6057e50298f7fdd4c4e43",
+                "payload_hash": "87efd6c90b0abedea0b22a86d466a4b2897930f2eb74dca6926d6c972ff550a7",
+                "recorded_at": "2026-11-05T07:14:28.964607+00:00",
+                "result": "fail",
+                "sources": {
+                  ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                  ".skill-tree/common/references/workflow-metadata.md": "6c3252f4564cecc532eec5cec4ad30c9373bea8f85e3c698b19308dd83ae7b9d",
+                  ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                  ".skill-tree/tests/test-pending-priority.py": "15e099e5dd4236803c2914a1d4ba40cf214cd69e9a51855b252bd4c13fc91a55"
+                },
+                "timing": {
+                  "tool_wall_seconds": 0.5187478750012815
+                }
+              },
+              "C-d5d862ca-e0dc-4eca-a3e1-2465dd6a3e40": {
+                "actual_lane": "unit",
+                "attempt_id": "C-d5d862ca-e0dc-4eca-a3e1-2465dd6a3e40",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+                "counts": {
+                  "discovered": 13,
+                  "expected": 13,
+                  "failed": 10,
+                  "passed": 3,
+                  "skipped": 0
+                },
+                "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+                "environment_identity": "359fffe1919ef71c49f908262267efaca279e1b494c45f7b878e662fd4c21ab2",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/defect-priority-fixtures-c-d5d862ca-e0dc-4eca-a3e1-2465dd6a3e40.json",
+                    "sha256": "2a09fb61b46576464601b233e0edba245a8753c4abe96e926dc51129e889f8ad"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_category": "expected-behavior",
+                "key": "dab22f913afa0dbd30989236b35ecc9bf6eb93a58d0567fcb24384558e04dc70",
+                "payload_hash": "e94b3c9057a3ca69fb6c257420f52b6ce2ee82afb5203a10baf2da9df57e366c",
+                "recorded_at": "2026-11-05T07:12:16.420668+00:00",
+                "result": "red",
+                "sources": {
+                  ".skill-tree/common/references/pending-task-intake.md": "71e0a7e7beb8286470f06b42cc6093bf37b1ff0a1953a4cb2b5dbe2aa38e0d23",
+                  ".skill-tree/common/references/workflow-metadata.md": "0a90f558c84ba3ff7b0227c2ae6fedfe510fb5bfd835c780b58b9ae3d79c1b3e",
+                  ".skill-tree/common/scripts/workflow-state.py": "3eaad467929d956b5828a42c2e0f9b7b452abf04f3525520e8cddc40b730ffb6",
+                  ".skill-tree/tests/test-pending-priority.py": "c60966f4920ac291d6bac62dcb8cef891eb87a97d7d3f2ddb25844cd28abbf48"
+                },
+                "timing": {
+                  "tool_wall_seconds": 0.5346882082521915
+                }
+              }
+            },
+            "red": {
+              "actual_lane": "unit",
+              "attempt_id": "C-d5d862ca-e0dc-4eca-a3e1-2465dd6a3e40",
+              "classification": "executed-control",
+              "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+              "counts": {
+                "discovered": 13,
+                "expected": 13,
+                "failed": 10,
+                "passed": 3,
+                "skipped": 0
+              },
+              "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+              "environment_identity": "359fffe1919ef71c49f908262267efaca279e1b494c45f7b878e662fd4c21ab2",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/pending-intake/defect-priority-fixtures-c-d5d862ca-e0dc-4eca-a3e1-2465dd6a3e40.json",
+                  "sha256": "2a09fb61b46576464601b233e0edba245a8753c4abe96e926dc51129e889f8ad"
+                }
+              ],
+              "execution_sessions": {},
+              "failure_category": "expected-behavior",
+              "key": "dab22f913afa0dbd30989236b35ecc9bf6eb93a58d0567fcb24384558e04dc70",
+              "payload_hash": "e94b3c9057a3ca69fb6c257420f52b6ce2ee82afb5203a10baf2da9df57e366c",
+              "recorded_at": "2026-11-05T07:12:16.420668+00:00",
+              "result": "red",
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "71e0a7e7beb8286470f06b42cc6093bf37b1ff0a1953a4cb2b5dbe2aa38e0d23",
+                ".skill-tree/common/references/workflow-metadata.md": "0a90f558c84ba3ff7b0227c2ae6fedfe510fb5bfd835c780b58b9ae3d79c1b3e",
+                ".skill-tree/common/scripts/workflow-state.py": "3eaad467929d956b5828a42c2e0f9b7b452abf04f3525520e8cddc40b730ffb6",
+                ".skill-tree/tests/test-pending-priority.py": "c60966f4920ac291d6bac62dcb8cef891eb87a97d7d3f2ddb25844cd28abbf48"
+              },
+              "timing": {
+                "tool_wall_seconds": 0.5346882082521915
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-9b42ddfa-6179-49a8-876b-76904913aba4",
+              "classification": "executed-control",
+              "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+              "counts": {
+                "discovered": 13,
+                "expected": 13,
+                "failed": 2,
+                "passed": 11,
+                "skipped": 0
+              },
+              "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+              "diagnostic_key": "b84fbda7c88f06882c69e688677980b624d5812a9decf5352b5abaf59eb62697",
+              "environment_identity": "359fffe1919ef71c49f908262267efaca279e1b494c45f7b878e662fd4c21ab2",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/pending-intake/defect-priority-fixtures-c-9b42ddfa-6179-49a8-876b-76904913aba4.json",
+                  "sha256": "b17a10d5761218935499034a8ad0ff151acdec80548cd35a1aec8487f8e9c677"
+                }
+              ],
+              "execution_sessions": {},
+              "failure_signature": "defect-priority-fixtures:nonzero-fixture-result",
+              "key": "a97397233539df0ec78bfaabacac029049295f8f6dfc3627da532300bc7e1d98",
+              "payload_hash": "b17a0a84feee8024807c3bbf34857daaaa7c1d8a0f2e70d95f6d03e6e6f0f84f",
+              "recorded_at": "2026-11-05T07:17:11.875712+00:00",
+              "result": "fail",
+              "sources": {
+                ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+                ".skill-tree/common/references/workflow-metadata.md": "6c3252f4564cecc532eec5cec4ad30c9373bea8f85e3c698b19308dd83ae7b9d",
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/tests/test-pending-priority.py": "216c118839c205a7b817f00e390d9f8c8a2fd003efe39d3f2726686d3112769f"
+              },
+              "timing": {
+                "tool_wall_seconds": 0.5744160837493837
+              }
+            }
+          },
+          "defect-priority-standalone-flavors": {
+            "attempt": {
+              "attempt_id": "C-653f4993-1b10-4743-b819-3a99c822776f",
+              "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+              "environment_identity": "8c42acc673522757835f25e69647e1a95b455e42b631f448a115d67a254caa3a",
+              "key": "6244b6140c65f1e70fa0680dc2d97def232021481f0cc2044dd185cf1ee1dbf2",
+              "launch": null,
+              "prepared_at": "2026-11-05T07:14:29.311659+00:00",
+              "recipe": {
+                "argv": [
+                  "node",
+                  "--test",
+                  ".skill-tree/tests/test-pending-priority-installation.js"
+                ],
+                "input_paths": [],
+                "lane": "unit"
+              },
+              "sources": {
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                ".skill-tree/lib/composer.js": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec",
+                ".skill-tree/tests/test-pending-priority-installation.js": "7729a917d4ddeaff250cf15c5563fc609286e50a944c79c27bd66a2f2871a5d7"
+              }
+            },
+            "receipts": {
+              "C-653f4993-1b10-4743-b819-3a99c822776f": {
+                "actual_lane": "unit",
+                "attempt_id": "C-653f4993-1b10-4743-b819-3a99c822776f",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+                "counts": {
+                  "discovered": 3,
+                  "expected": 3,
+                  "failed": 0,
+                  "passed": 3,
+                  "skipped": 0
+                },
+                "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+                "environment_identity": "8c42acc673522757835f25e69647e1a95b455e42b631f448a115d67a254caa3a",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pending-intake/defect-priority-standalone-flavors-c-653f4993-1b10-4743-b819-3a99c822776f.json",
+                    "sha256": "6c31378607dc04f5aafee0bdb6f925d963dc7bad036d8f502474c5b9712c6603"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "6244b6140c65f1e70fa0680dc2d97def232021481f0cc2044dd185cf1ee1dbf2",
+                "payload_hash": "7afaa773fc6120194d3dbe076bbd5b49f697aadf198d4b3ceb7c86e141ce7fe0",
+                "recorded_at": "2026-11-05T07:14:33.137418+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                  ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                  ".skill-tree/lib/composer.js": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec",
+                  ".skill-tree/tests/test-pending-priority-installation.js": "7729a917d4ddeaff250cf15c5563fc609286e50a944c79c27bd66a2f2871a5d7"
+                },
+                "timing": {
+                  "tool_wall_seconds": 3.7456910419277847
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-653f4993-1b10-4743-b819-3a99c822776f",
+              "classification": "executed-control",
+              "cleanup": "Temporary fixture repositories and installs are removed; no live provider or product operation starts.",
+              "counts": {
+                "discovered": 3,
+                "expected": 3,
+                "failed": 0,
+                "passed": 3,
+                "skipped": 0
+              },
+              "definition": "60297d01f529f2cb49490498011881c67e346a6896dd7939c7be18a1a39b5391",
+              "environment_identity": "8c42acc673522757835f25e69647e1a95b455e42b631f448a115d67a254caa3a",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/pending-intake/defect-priority-standalone-flavors-c-653f4993-1b10-4743-b819-3a99c822776f.json",
+                  "sha256": "6c31378607dc04f5aafee0bdb6f925d963dc7bad036d8f502474c5b9712c6603"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "6244b6140c65f1e70fa0680dc2d97def232021481f0cc2044dd185cf1ee1dbf2",
+              "payload_hash": "7afaa773fc6120194d3dbe076bbd5b49f697aadf198d4b3ceb7c86e141ce7fe0",
+              "recorded_at": "2026-11-05T07:14:33.137418+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                ".skill-tree/lib/composer.js": "736ea68276158e8ba07729dec9d8fe0f56c76f0439a403ea3073611ebb8112ec",
+                ".skill-tree/tests/test-pending-priority-installation.js": "7729a917d4ddeaff250cf15c5563fc609286e50a944c79c27bd66a2f2871a5d7"
+              },
+              "timing": {
+                "tool_wall_seconds": 3.7456910419277847
+              }
+            }
+          }
+        },
+        "execution_sessions": {},
+        "partial_work": [],
+        "run_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+        "stage": "implementing",
+        "unchanged_failure": {
+          "count": 1,
+          "signature": "b84fbda7c88f06882c69e688677980b624d5812a9decf5352b5abaf59eb62697"
+        }
+      },
+      "task_id": "T-eb87ec2b-e56b-4ef3-86bf-edb38c7caece"
+    }
+  ],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "run_id": "WR-7bf442b1-2caa-4031-adbe-8a2af6fcf94f",
+  "schema": 1,
+  "sequence": 26
+}

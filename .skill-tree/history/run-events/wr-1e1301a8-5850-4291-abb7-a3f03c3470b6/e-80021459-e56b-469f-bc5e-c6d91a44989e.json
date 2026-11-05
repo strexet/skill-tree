@@ -1,0 +1,264 @@
+{
+  "changes": [
+    {
+      "after": null,
+      "before": {
+        "body": "### Concurrent run and worktree lifecycle\n\n```yaml\nid: T-6ae99cb6-1824-409b-8404-53811dd50ffb\npriority: 101\nstatus: Ready\nparent_pending_ids: [\"P-8aa21560-fe36-4de4-9973-652a73da077f\"]\nprocessing_run_id: PR-bce4470e-90d6-4528-af86-566a4355e72c\nroot_task_id: T-836634a2-30a7-48df-aa7c-59a05d76837e\nrelated_task_id: T-836634a2-30a7-48df-aa7c-59a05d76837e\nrelation: subtask\ndepends_on: []\n```\n\nGoal:\n- Controller runs preserve isolated workspaces, atomic ownership and canonical queue history.\n\nTouch:\n- Workflow helper, run registry and installation lifecycle.\n\nValidation:\n```json\n{\"checks\": [{\"id\": \"source-qualification\", \"recipe_id\": \"static-inspection\", \"criteria\": [\"Controller runs preserve isolated workspaces, atomic ownership and canonical queue history.\"], \"sources\": [\".skill-tree/common\", \".skill-tree/templates\", \".skill-tree/config\", \".skill-tree/lib\", \".skill-tree/tests\"], \"parameters\": {}, \"assertion\": \"Controller runs preserve isolated workspaces, atomic ownership and canonical queue history.\", \"timing\": \"immediate\"}]}\n```\n\nAcceptance:\n- Controller runs preserve isolated workspaces, atomic ownership and canonical queue history.\n\n",
+        "queue": "Prioritized Next Changes"
+      },
+      "task_id": "T-6ae99cb6-1824-409b-8404-53811dd50ffb"
+    }
+  ],
+  "checkpoint_after": {
+    "admission": {
+      "flavor": "general",
+      "identity": "repository-local"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0",
+      "T-6ae99cb6-1824-409b-8404-53811dd50ffb",
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "completed_ids": [
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0",
+      "T-6ae99cb6-1824-409b-8404-53811dd50ffb"
+    ],
+    "completion_refs": {
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3": "O-a22e5fef-fb3a-4a19-8972-3564233dc18a",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0": "O-20655670-d0a1-4954-9e1d-ed0439a3b702",
+      "T-6ae99cb6-1824-409b-8404-53811dd50ffb": "O-0c5657e1-f79b-4930-9a5e-fa21a674d35f"
+    },
+    "current_task_id": null,
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {},
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6",
+    "limits": {},
+    "mode": "next",
+    "next_action": "Select required task or finish root",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "resume-parent",
+    "processing_results": [],
+    "required_ids": [
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0",
+      "T-6ae99cb6-1824-409b-8404-53811dd50ffb",
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "root_task_id": "T-836634a2-30a7-48df-aa7c-59a05d76837e",
+    "snapshot": [
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "started_at": "2026-11-03T14:28:32.297879+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "develop",
+      "base_commit": "57b33ef0ac8826e29e74124329a23d3e9acd7597",
+      "branch": "codex/pr-review-cycle",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests local develop from main and a dedicated codex branch/worktree; source publication remains excluded.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6"
+    }
+  },
+  "checkpoint_before": {
+    "admission": {
+      "flavor": "general",
+      "identity": "repository-local"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0",
+      "T-6ae99cb6-1824-409b-8404-53811dd50ffb",
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "completed_ids": [
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0"
+    ],
+    "completion_refs": {
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3": "O-a22e5fef-fb3a-4a19-8972-3564233dc18a",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0": "O-20655670-d0a1-4954-9e1d-ed0439a3b702"
+    },
+    "current_task_id": "T-6ae99cb6-1824-409b-8404-53811dd50ffb",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {},
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6",
+    "limits": {},
+    "mode": "next",
+    "next_action": "implement",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "implement",
+    "processing_results": [],
+    "required_ids": [
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0",
+      "T-6ae99cb6-1824-409b-8404-53811dd50ffb",
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "root_task_id": "T-836634a2-30a7-48df-aa7c-59a05d76837e",
+    "snapshot": [
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "started_at": "2026-11-03T14:28:32.297879+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "develop",
+      "base_commit": "57b33ef0ac8826e29e74124329a23d3e9acd7597",
+      "branch": "codex/pr-review-cycle",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests local develop from main and a dedicated codex branch/worktree; source publication remains excluded.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6"
+    }
+  },
+  "id": "E-80021459-e56b-469f-bc5e-c6d91a44989e",
+  "outcomes": [
+    {
+      "acceptance": [
+        {
+          "criterion": "Controller runs preserve isolated workspaces, atomic ownership and canonical queue history.",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/pr-review-cycle/source-qualification.json",
+              "sha256": "5ffb53648d7d5007a1623710350e0747df69a0db2f4e3b7fe1360892ea16689c"
+            }
+          ],
+          "result": "pass"
+        }
+      ],
+      "boundary_validation": "not-required",
+      "check_results": [
+        {
+          "check": {
+            "assertion": "Controller runs preserve isolated workspaces, atomic ownership and canonical queue history.",
+            "criteria": [
+              "Controller runs preserve isolated workspaces, atomic ownership and canonical queue history."
+            ],
+            "id": "source-qualification",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/common",
+              ".skill-tree/templates",
+              ".skill-tree/config",
+              ".skill-tree/lib",
+              ".skill-tree/tests"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "Controller runs preserve isolated workspaces, atomic ownership and canonical queue history.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-fc680fc2-da12-4899-a4a2-b16f9d380e80",
+            "classification": "executed-control",
+            "cleanup": "Temporary Git repositories and installed fixture targets are removed; no product or live-provider process starts.",
+            "definition": "2fd088aef322d789d10fe0565525cdf23418ccae1e154cb3825f7da93b37775b",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/pr-review-cycle/source-qualification.json",
+                "sha256": "5ffb53648d7d5007a1623710350e0747df69a0db2f4e3b7fe1360892ea16689c"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "b5988058e9fa66797622c99fd6d777d53895bd4e3ad383e1083c239e9848408e",
+            "payload_hash": "1624bbef7cd07b2bf4fd8916c01d98740c5d0438dc257438c83c9237c7f589b0",
+            "recorded_at": "2026-11-03T15:09:14.407690+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common": "c01d67fbfbb06e3bfe6a43ecbeb08c344baa3ae32fe8f9a917bf69e3744e549f",
+              ".skill-tree/config": "1af80b8513c0797ee77f4549fa9ab4d2e21912d092a584558cee68d4aaa71e3b",
+              ".skill-tree/lib": "fe48617387798b93d98f0c8d11db3b747b10719f3e50670fee38406d5c2ad772",
+              ".skill-tree/templates": "16299c7b125cd81e08ffdb9a65759116acbe63a1ec6ff994d05b45900a20f63c",
+              ".skill-tree/tests": "1caf38dffda1d6e803a2ef56e3ab53d2dd6e4ad3642ca7e7e582bb6e581858f8"
+            }
+          }
+        }
+      ],
+      "commits": [],
+      "depends_on": [],
+      "disposition": "completed",
+      "evidence": [
+        {
+          "available": true,
+          "path": ".skill-tree/history/validation/pr-review-cycle/source-qualification.json",
+          "sha256": "5ffb53648d7d5007a1623710350e0747df69a0db2f4e3b7fe1360892ea16689c"
+        }
+      ],
+      "followup_ids": [],
+      "id": "O-0c5657e1-f79b-4930-9a5e-fa21a674d35f",
+      "limitations": [
+        "Live-provider and product-runtime qualification remains outside the current source-fixture scope."
+      ],
+      "outcome": "Controller runs preserve isolated workspaces, atomic ownership and canonical queue history.",
+      "parent_pending_ids": [
+        "P-8aa21560-fe36-4de4-9973-652a73da077f"
+      ],
+      "recorded_at": "2026-11-03T15:09:14.645370+00:00",
+      "related_task_id": "T-836634a2-30a7-48df-aa7c-59a05d76837e",
+      "root_task_id": "T-836634a2-30a7-48df-aa7c-59a05d76837e",
+      "run_id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6",
+      "source_fingerprints": {
+        ".skill-tree/common": "c01d67fbfbb06e3bfe6a43ecbeb08c344baa3ae32fe8f9a917bf69e3744e549f",
+        ".skill-tree/config": "1af80b8513c0797ee77f4549fa9ab4d2e21912d092a584558cee68d4aaa71e3b",
+        ".skill-tree/lib": "fe48617387798b93d98f0c8d11db3b747b10719f3e50670fee38406d5c2ad772",
+        ".skill-tree/templates": "16299c7b125cd81e08ffdb9a65759116acbe63a1ec6ff994d05b45900a20f63c",
+        ".skill-tree/tests": "1caf38dffda1d6e803a2ef56e3ab53d2dd6e4ad3642ca7e7e582bb6e581858f8"
+      },
+      "task_id": "T-6ae99cb6-1824-409b-8404-53811dd50ffb",
+      "title": "Concurrent run and worktree lifecycle",
+      "validation_group_id": null,
+      "validation_plan": [
+        {
+          "assertion": "Controller runs preserve isolated workspaces, atomic ownership and canonical queue history.",
+          "criteria": [
+            "Controller runs preserve isolated workspaces, atomic ownership and canonical queue history."
+          ],
+          "id": "source-qualification",
+          "parameters": {},
+          "recipe_id": "static-inspection",
+          "sources": [
+            ".skill-tree/common",
+            ".skill-tree/templates",
+            ".skill-tree/config",
+            ".skill-tree/lib",
+            ".skill-tree/tests"
+          ],
+          "timing": "immediate"
+        }
+      ],
+      "validation_signature": "2fd088aef322d789d10fe0565525cdf23418ccae1e154cb3825f7da93b37775b"
+    }
+  ],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "run_id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6",
+  "schema": 1,
+  "sequence": 6
+}

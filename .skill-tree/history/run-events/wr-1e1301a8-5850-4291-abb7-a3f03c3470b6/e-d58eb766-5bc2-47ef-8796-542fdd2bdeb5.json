@@ -1,0 +1,610 @@
+{
+  "changes": [],
+  "checkpoint_after": {
+    "admission": {
+      "flavor": "general",
+      "identity": "repository-local"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0",
+      "T-6ae99cb6-1824-409b-8404-53811dd50ffb",
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "completed_ids": [
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0",
+      "T-6ae99cb6-1824-409b-8404-53811dd50ffb",
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "completion_refs": {
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3": "O-a22e5fef-fb3a-4a19-8972-3564233dc18a",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0": "O-20655670-d0a1-4954-9e1d-ed0439a3b702",
+      "T-6ae99cb6-1824-409b-8404-53811dd50ffb": "O-0c5657e1-f79b-4930-9a5e-fa21a674d35f",
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e": "O-d8f9d2a5-7aec-45a3-bf07-7ece8f466189"
+    },
+    "current_task_id": "T-6ae99cb6-1824-409b-8404-53811dd50ffb",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {},
+      "implementation": "completed",
+      "order_completed": true,
+      "publication": "not-requested",
+      "status": "local-result"
+    },
+    "finished_at": "2026-11-03T15:09:15.957823+00:00",
+    "id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6",
+    "limits": {},
+    "mode": "next",
+    "next_action": "validate",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "validate",
+    "processing_results": [],
+    "required_ids": [
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0",
+      "T-6ae99cb6-1824-409b-8404-53811dd50ffb",
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "revalidated_checks": {
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3": [
+        {
+          "check": {
+            "assertion": "All supported installed flavors include the complete contracts and tested standalone helpers.",
+            "criteria": [
+              "All supported installed flavors include the complete contracts and tested standalone helpers."
+            ],
+            "id": "source-qualification",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/common",
+              ".skill-tree/templates",
+              ".skill-tree/config",
+              ".skill-tree/lib",
+              ".skill-tree/tests"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "All supported installed flavors include the complete contracts and tested standalone helpers.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-c571f195-daac-4a22-86c7-31a8d7acfd72",
+            "classification": "executed-control",
+            "cleanup": "Temporary fixtures are removed; no product, paid service or live-provider operation starts.",
+            "definition": "984af30d658d3c9cb603dda891cd0ba2c0992f2c1be5c145068bfa534d63ab77",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/pr-review-cycle/source-requalification.json",
+                "sha256": "19ff11eb78450a61accf78424b473811c53e9685aadf2b5672200a016f4f6bda"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "a8b25928ace1fdfa89f220d42f964e901b4649383eaf0dd861bb915697b896bc",
+            "payload_hash": "be7ffbbe7422654115eab17893dc14ec1659844734247ad4ab9bd18baa70d8ee",
+            "recorded_at": "2026-11-03T15:17:46.070821+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common": "20933035a24b9b8a6d2f551d772d45747e0ffba8a718dadb76d5160018040ebb",
+              ".skill-tree/config": "1af80b8513c0797ee77f4549fa9ab4d2e21912d092a584558cee68d4aaa71e3b",
+              ".skill-tree/lib": "daf82cb41edfa215c01f472fe25489e728100aba63945bdbab254e50307a7657",
+              ".skill-tree/templates": "16299c7b125cd81e08ffdb9a65759116acbe63a1ec6ff994d05b45900a20f63c",
+              ".skill-tree/tests": "f15b744caa71354b2d15e2e56a4f546e427aa5a7ab57fa7730497c5e5793b7a6"
+            }
+          }
+        }
+      ],
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0": [
+        {
+          "check": {
+            "assertion": "PR review authorization, freshness and resumable publication satisfy fixture acceptance.",
+            "criteria": [
+              "PR review authorization, freshness and resumable publication satisfy fixture acceptance."
+            ],
+            "id": "source-qualification",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/common",
+              ".skill-tree/templates",
+              ".skill-tree/config",
+              ".skill-tree/lib",
+              ".skill-tree/tests"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "PR review authorization, freshness and resumable publication satisfy fixture acceptance.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-16ca9234-4ec1-40ab-9ad7-fd4fa2764079",
+            "classification": "executed-control",
+            "cleanup": "Temporary fixtures are removed; no product, paid service or live-provider operation starts.",
+            "definition": "41d5f8abea909de2f80a2a5d41af99b6d18a4639bea414918ce6b0055a933e66",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/pr-review-cycle/source-requalification.json",
+                "sha256": "19ff11eb78450a61accf78424b473811c53e9685aadf2b5672200a016f4f6bda"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "e81109ca213b6b89f945b7af0b32f1e6f9c7253eb55b7b653acc8f2e12e6070b",
+            "payload_hash": "03baea94a8b9aaacd543753b31a2501d5a6301f7ff6c6c6ce9fa99fd7a9d812d",
+            "recorded_at": "2026-11-03T15:17:47.001507+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common": "20933035a24b9b8a6d2f551d772d45747e0ffba8a718dadb76d5160018040ebb",
+              ".skill-tree/config": "1af80b8513c0797ee77f4549fa9ab4d2e21912d092a584558cee68d4aaa71e3b",
+              ".skill-tree/lib": "daf82cb41edfa215c01f472fe25489e728100aba63945bdbab254e50307a7657",
+              ".skill-tree/templates": "16299c7b125cd81e08ffdb9a65759116acbe63a1ec6ff994d05b45900a20f63c",
+              ".skill-tree/tests": "f15b744caa71354b2d15e2e56a4f546e427aa5a7ab57fa7730497c5e5793b7a6"
+            }
+          }
+        }
+      ],
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e": [
+        {
+          "check": {
+            "assertion": "The PR cycle and isolated concurrent controllers satisfy the requested contracts with installed standalone fixture evidence.",
+            "criteria": [
+              "The PR cycle and isolated concurrent controllers satisfy the requested contracts with installed standalone fixture evidence."
+            ],
+            "id": "source-qualification",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/common",
+              ".skill-tree/templates",
+              ".skill-tree/config",
+              ".skill-tree/lib",
+              ".skill-tree/tests"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "The PR cycle and isolated concurrent controllers satisfy the requested contracts with installed standalone fixture evidence.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-f7f60b94-25c6-41aa-8378-2e1a4654e921",
+            "classification": "executed-control",
+            "cleanup": "Temporary fixtures are removed; no product, paid service or live-provider operation starts.",
+            "definition": "762ef3bf76c9186556f63a43384db57b6add9be060bc8b9bb7dd22e67f8e8d7b",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/pr-review-cycle/source-requalification.json",
+                "sha256": "19ff11eb78450a61accf78424b473811c53e9685aadf2b5672200a016f4f6bda"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "06c3211b3be69f60582ccc1e49fea044d54fd89f8dfdbe85e6101b36180ed1c7",
+            "payload_hash": "6df1cb2e0f34133bc197cd13f2354cb6b02cd0db905fdc97f01b6a2067ba40e7",
+            "recorded_at": "2026-11-03T15:17:44.986019+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common": "20933035a24b9b8a6d2f551d772d45747e0ffba8a718dadb76d5160018040ebb",
+              ".skill-tree/config": "1af80b8513c0797ee77f4549fa9ab4d2e21912d092a584558cee68d4aaa71e3b",
+              ".skill-tree/lib": "daf82cb41edfa215c01f472fe25489e728100aba63945bdbab254e50307a7657",
+              ".skill-tree/templates": "16299c7b125cd81e08ffdb9a65759116acbe63a1ec6ff994d05b45900a20f63c",
+              ".skill-tree/tests": "f15b744caa71354b2d15e2e56a4f546e427aa5a7ab57fa7730497c5e5793b7a6"
+            }
+          }
+        }
+      ]
+    },
+    "root_task_id": "T-836634a2-30a7-48df-aa7c-59a05d76837e",
+    "snapshot": [
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "started_at": "2026-11-03T14:28:32.297879+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "develop",
+      "base_commit": "57b33ef0ac8826e29e74124329a23d3e9acd7597",
+      "branch": "codex/pr-review-cycle",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests local develop from main and a dedicated codex branch/worktree; source publication remains excluded.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6"
+    }
+  },
+  "checkpoint_before": {
+    "admission": {
+      "flavor": "general",
+      "identity": "repository-local"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0",
+      "T-6ae99cb6-1824-409b-8404-53811dd50ffb",
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "completed_ids": [
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0",
+      "T-6ae99cb6-1824-409b-8404-53811dd50ffb",
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "completion_refs": {
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3": "O-a22e5fef-fb3a-4a19-8972-3564233dc18a",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0": "O-20655670-d0a1-4954-9e1d-ed0439a3b702",
+      "T-6ae99cb6-1824-409b-8404-53811dd50ffb": "O-0c5657e1-f79b-4930-9a5e-fa21a674d35f",
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e": "O-d8f9d2a5-7aec-45a3-bf07-7ece8f466189"
+    },
+    "current_task_id": "T-6ae99cb6-1824-409b-8404-53811dd50ffb",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {},
+      "implementation": "completed",
+      "order_completed": true,
+      "publication": "not-requested",
+      "status": "local-result"
+    },
+    "finished_at": "2026-11-03T15:09:15.957823+00:00",
+    "id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6",
+    "limits": {},
+    "mode": "next",
+    "next_action": "validate",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "validate",
+    "processing_results": [],
+    "required_ids": [
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3",
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0",
+      "T-6ae99cb6-1824-409b-8404-53811dd50ffb",
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "revalidated_checks": {
+      "T-27543372-99ab-4afd-921a-9ca9cbcc05e3": [
+        {
+          "check": {
+            "assertion": "All supported installed flavors include the complete contracts and tested standalone helpers.",
+            "criteria": [
+              "All supported installed flavors include the complete contracts and tested standalone helpers."
+            ],
+            "id": "source-qualification",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/common",
+              ".skill-tree/templates",
+              ".skill-tree/config",
+              ".skill-tree/lib",
+              ".skill-tree/tests"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "All supported installed flavors include the complete contracts and tested standalone helpers.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-c571f195-daac-4a22-86c7-31a8d7acfd72",
+            "classification": "executed-control",
+            "cleanup": "Temporary fixtures are removed; no product, paid service or live-provider operation starts.",
+            "definition": "984af30d658d3c9cb603dda891cd0ba2c0992f2c1be5c145068bfa534d63ab77",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/pr-review-cycle/source-requalification.json",
+                "sha256": "19ff11eb78450a61accf78424b473811c53e9685aadf2b5672200a016f4f6bda"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "a8b25928ace1fdfa89f220d42f964e901b4649383eaf0dd861bb915697b896bc",
+            "payload_hash": "be7ffbbe7422654115eab17893dc14ec1659844734247ad4ab9bd18baa70d8ee",
+            "recorded_at": "2026-11-03T15:17:46.070821+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common": "20933035a24b9b8a6d2f551d772d45747e0ffba8a718dadb76d5160018040ebb",
+              ".skill-tree/config": "1af80b8513c0797ee77f4549fa9ab4d2e21912d092a584558cee68d4aaa71e3b",
+              ".skill-tree/lib": "daf82cb41edfa215c01f472fe25489e728100aba63945bdbab254e50307a7657",
+              ".skill-tree/templates": "16299c7b125cd81e08ffdb9a65759116acbe63a1ec6ff994d05b45900a20f63c",
+              ".skill-tree/tests": "f15b744caa71354b2d15e2e56a4f546e427aa5a7ab57fa7730497c5e5793b7a6"
+            }
+          }
+        }
+      ],
+      "T-4a02d1ab-b613-4483-8e62-724c93321ea0": [
+        {
+          "check": {
+            "assertion": "PR review authorization, freshness and resumable publication satisfy fixture acceptance.",
+            "criteria": [
+              "PR review authorization, freshness and resumable publication satisfy fixture acceptance."
+            ],
+            "id": "source-qualification",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/common",
+              ".skill-tree/templates",
+              ".skill-tree/config",
+              ".skill-tree/lib",
+              ".skill-tree/tests"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "PR review authorization, freshness and resumable publication satisfy fixture acceptance.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-16ca9234-4ec1-40ab-9ad7-fd4fa2764079",
+            "classification": "executed-control",
+            "cleanup": "Temporary fixtures are removed; no product, paid service or live-provider operation starts.",
+            "definition": "41d5f8abea909de2f80a2a5d41af99b6d18a4639bea414918ce6b0055a933e66",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/pr-review-cycle/source-requalification.json",
+                "sha256": "19ff11eb78450a61accf78424b473811c53e9685aadf2b5672200a016f4f6bda"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "e81109ca213b6b89f945b7af0b32f1e6f9c7253eb55b7b653acc8f2e12e6070b",
+            "payload_hash": "03baea94a8b9aaacd543753b31a2501d5a6301f7ff6c6c6ce9fa99fd7a9d812d",
+            "recorded_at": "2026-11-03T15:17:47.001507+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common": "20933035a24b9b8a6d2f551d772d45747e0ffba8a718dadb76d5160018040ebb",
+              ".skill-tree/config": "1af80b8513c0797ee77f4549fa9ab4d2e21912d092a584558cee68d4aaa71e3b",
+              ".skill-tree/lib": "daf82cb41edfa215c01f472fe25489e728100aba63945bdbab254e50307a7657",
+              ".skill-tree/templates": "16299c7b125cd81e08ffdb9a65759116acbe63a1ec6ff994d05b45900a20f63c",
+              ".skill-tree/tests": "f15b744caa71354b2d15e2e56a4f546e427aa5a7ab57fa7730497c5e5793b7a6"
+            }
+          }
+        }
+      ],
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e": [
+        {
+          "check": {
+            "assertion": "The PR cycle and isolated concurrent controllers satisfy the requested contracts with installed standalone fixture evidence.",
+            "criteria": [
+              "The PR cycle and isolated concurrent controllers satisfy the requested contracts with installed standalone fixture evidence."
+            ],
+            "id": "source-qualification",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/common",
+              ".skill-tree/templates",
+              ".skill-tree/config",
+              ".skill-tree/lib",
+              ".skill-tree/tests"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "The PR cycle and isolated concurrent controllers satisfy the requested contracts with installed standalone fixture evidence.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-f7f60b94-25c6-41aa-8378-2e1a4654e921",
+            "classification": "executed-control",
+            "cleanup": "Temporary fixtures are removed; no product, paid service or live-provider operation starts.",
+            "definition": "762ef3bf76c9186556f63a43384db57b6add9be060bc8b9bb7dd22e67f8e8d7b",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/pr-review-cycle/source-requalification.json",
+                "sha256": "19ff11eb78450a61accf78424b473811c53e9685aadf2b5672200a016f4f6bda"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "06c3211b3be69f60582ccc1e49fea044d54fd89f8dfdbe85e6101b36180ed1c7",
+            "payload_hash": "6df1cb2e0f34133bc197cd13f2354cb6b02cd0db905fdc97f01b6a2067ba40e7",
+            "recorded_at": "2026-11-03T15:17:44.986019+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common": "20933035a24b9b8a6d2f551d772d45747e0ffba8a718dadb76d5160018040ebb",
+              ".skill-tree/config": "1af80b8513c0797ee77f4549fa9ab4d2e21912d092a584558cee68d4aaa71e3b",
+              ".skill-tree/lib": "daf82cb41edfa215c01f472fe25489e728100aba63945bdbab254e50307a7657",
+              ".skill-tree/templates": "16299c7b125cd81e08ffdb9a65759116acbe63a1ec6ff994d05b45900a20f63c",
+              ".skill-tree/tests": "f15b744caa71354b2d15e2e56a4f546e427aa5a7ab57fa7730497c5e5793b7a6"
+            }
+          }
+        }
+      ]
+    },
+    "root_task_id": "T-836634a2-30a7-48df-aa7c-59a05d76837e",
+    "snapshot": [
+      "T-836634a2-30a7-48df-aa7c-59a05d76837e"
+    ],
+    "started_at": "2026-11-03T14:28:32.297879+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "develop",
+      "base_commit": "57b33ef0ac8826e29e74124329a23d3e9acd7597",
+      "branch": "codex/pr-review-cycle",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests local develop from main and a dedicated codex branch/worktree; source publication remains excluded.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6"
+    }
+  },
+  "id": "E-d58eb766-5bc2-47ef-8796-542fdd2bdeb5",
+  "outcomes": [],
+  "progress_changes": [
+    {
+      "after": {
+        "admission": {
+          "flavor": "general",
+          "identity": "repository-local"
+        },
+        "checks": {
+          "source-qualification": {
+            "attempt": {
+              "attempt_id": "C-3004d0e7-60fe-4b9d-90a0-2941f5794df4",
+              "definition": "2fd088aef322d789d10fe0565525cdf23418ccae1e154cb3825f7da93b37775b",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "key": "948c37b2bb92ba2c9f58b6190e13e9a8714d1fe4c3cb75ae78b188324a416d2b",
+              "launch": null,
+              "prepared_at": "2026-11-03T15:17:47.832984+00:00",
+              "recipe": {
+                "assertion_contract": "explicit source and artifact assertions",
+                "input_paths": [],
+                "lane": "static"
+              },
+              "sources": {
+                ".skill-tree/common": "20933035a24b9b8a6d2f551d772d45747e0ffba8a718dadb76d5160018040ebb",
+                ".skill-tree/config": "1af80b8513c0797ee77f4549fa9ab4d2e21912d092a584558cee68d4aaa71e3b",
+                ".skill-tree/lib": "daf82cb41edfa215c01f472fe25489e728100aba63945bdbab254e50307a7657",
+                ".skill-tree/templates": "16299c7b125cd81e08ffdb9a65759116acbe63a1ec6ff994d05b45900a20f63c",
+                ".skill-tree/tests": "f15b744caa71354b2d15e2e56a4f546e427aa5a7ab57fa7730497c5e5793b7a6"
+              }
+            },
+            "receipts": {
+              "C-3004d0e7-60fe-4b9d-90a0-2941f5794df4": {
+                "actual_lane": "static",
+                "assertions": [
+                  {
+                    "assertion": "Controller runs preserve isolated workspaces, atomic ownership and canonical queue history.",
+                    "result": "pass"
+                  }
+                ],
+                "attempt_id": "C-3004d0e7-60fe-4b9d-90a0-2941f5794df4",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixtures are removed; no product, paid service or live-provider operation starts.",
+                "definition": "2fd088aef322d789d10fe0565525cdf23418ccae1e154cb3825f7da93b37775b",
+                "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/pr-review-cycle/source-requalification.json",
+                    "sha256": "19ff11eb78450a61accf78424b473811c53e9685aadf2b5672200a016f4f6bda"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "948c37b2bb92ba2c9f58b6190e13e9a8714d1fe4c3cb75ae78b188324a416d2b",
+                "payload_hash": "aa0d026c57cda568a888bf910afd1f372d2e0d6131836957b5a65a4f719495df",
+                "recorded_at": "2026-11-03T15:17:47.901019+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common": "20933035a24b9b8a6d2f551d772d45747e0ffba8a718dadb76d5160018040ebb",
+                  ".skill-tree/config": "1af80b8513c0797ee77f4549fa9ab4d2e21912d092a584558cee68d4aaa71e3b",
+                  ".skill-tree/lib": "daf82cb41edfa215c01f472fe25489e728100aba63945bdbab254e50307a7657",
+                  ".skill-tree/templates": "16299c7b125cd81e08ffdb9a65759116acbe63a1ec6ff994d05b45900a20f63c",
+                  ".skill-tree/tests": "f15b744caa71354b2d15e2e56a4f546e427aa5a7ab57fa7730497c5e5793b7a6"
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "static",
+              "assertions": [
+                {
+                  "assertion": "Controller runs preserve isolated workspaces, atomic ownership and canonical queue history.",
+                  "result": "pass"
+                }
+              ],
+              "attempt_id": "C-3004d0e7-60fe-4b9d-90a0-2941f5794df4",
+              "classification": "executed-control",
+              "cleanup": "Temporary fixtures are removed; no product, paid service or live-provider operation starts.",
+              "definition": "2fd088aef322d789d10fe0565525cdf23418ccae1e154cb3825f7da93b37775b",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/pr-review-cycle/source-requalification.json",
+                  "sha256": "19ff11eb78450a61accf78424b473811c53e9685aadf2b5672200a016f4f6bda"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "948c37b2bb92ba2c9f58b6190e13e9a8714d1fe4c3cb75ae78b188324a416d2b",
+              "payload_hash": "aa0d026c57cda568a888bf910afd1f372d2e0d6131836957b5a65a4f719495df",
+              "recorded_at": "2026-11-03T15:17:47.901019+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common": "20933035a24b9b8a6d2f551d772d45747e0ffba8a718dadb76d5160018040ebb",
+                ".skill-tree/config": "1af80b8513c0797ee77f4549fa9ab4d2e21912d092a584558cee68d4aaa71e3b",
+                ".skill-tree/lib": "daf82cb41edfa215c01f472fe25489e728100aba63945bdbab254e50307a7657",
+                ".skill-tree/templates": "16299c7b125cd81e08ffdb9a65759116acbe63a1ec6ff994d05b45900a20f63c",
+                ".skill-tree/tests": "f15b744caa71354b2d15e2e56a4f546e427aa5a7ab57fa7730497c5e5793b7a6"
+              }
+            }
+          }
+        },
+        "execution_sessions": {},
+        "revalidation": true,
+        "run_id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6",
+        "stage": "awaiting-validation"
+      },
+      "before": {
+        "admission": {
+          "flavor": "general",
+          "identity": "repository-local"
+        },
+        "checks": {
+          "source-qualification": {
+            "attempt": {
+              "attempt_id": "C-3004d0e7-60fe-4b9d-90a0-2941f5794df4",
+              "definition": "2fd088aef322d789d10fe0565525cdf23418ccae1e154cb3825f7da93b37775b",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "key": "948c37b2bb92ba2c9f58b6190e13e9a8714d1fe4c3cb75ae78b188324a416d2b",
+              "launch": null,
+              "prepared_at": "2026-11-03T15:17:47.832984+00:00",
+              "recipe": {
+                "assertion_contract": "explicit source and artifact assertions",
+                "input_paths": [],
+                "lane": "static"
+              },
+              "sources": {
+                ".skill-tree/common": "20933035a24b9b8a6d2f551d772d45747e0ffba8a718dadb76d5160018040ebb",
+                ".skill-tree/config": "1af80b8513c0797ee77f4549fa9ab4d2e21912d092a584558cee68d4aaa71e3b",
+                ".skill-tree/lib": "daf82cb41edfa215c01f472fe25489e728100aba63945bdbab254e50307a7657",
+                ".skill-tree/templates": "16299c7b125cd81e08ffdb9a65759116acbe63a1ec6ff994d05b45900a20f63c",
+                ".skill-tree/tests": "f15b744caa71354b2d15e2e56a4f546e427aa5a7ab57fa7730497c5e5793b7a6"
+              }
+            }
+          }
+        },
+        "execution_sessions": {},
+        "revalidation": true,
+        "run_id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6",
+        "stage": "awaiting-validation"
+      },
+      "task_id": "T-6ae99cb6-1824-409b-8404-53811dd50ffb"
+    }
+  ],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "run_id": "WR-1e1301a8-5850-4291-abb7-a3f03c3470b6",
+  "schema": 1,
+  "sequence": 24
+}
