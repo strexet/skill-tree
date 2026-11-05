@@ -1,0 +1,57 @@
+{
+  "task_id": "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+  "check_id": "market-source-review",
+  "attempt_id": "C-7f0722f7-84bf-4d4e-a317-8b726813d7e5",
+  "assertion": "The market map covers distribution ecosystems and relevant planning, processing, implementation, review, validation, documentation and domain candidates with dated primary sources. Candidate records distinguish adoption signals from demonstrated outcomes and identify revision, maintenance, license, dependencies and host/flavor compatibility. The research defines a justified comparison shortlist and bounded evaluation plan, including both supplied pilots and unsupported or unqualified cases.",
+  "result": "pass",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/documents/plugin-market-research.md": "cdedbf889a7136f8390089b0d70448c59de91e6622e6a23c9c222da744852621",
+    ".skill-tree/documents/plugin-system-research.md": "6a8062f4bb9c39abc9f0e1ef513d6af2e2f50a2b0f8616b30007c8e6bd718205",
+    ".skill-tree/history/research/plugin-market-map.json": "031c37aa5827f4b3193589ea45bcc8d34dd985522425555c8c0245f2683c00f0"
+  },
+  "coverage": {
+    "candidate_entry_texts": 38,
+    "candidate_repository_families": 11,
+    "repository_revision_and_maintenance_snapshots": 19,
+    "supporting_inspected_source_records": 25,
+    "primary_adoption_pages": 8,
+    "reported_outcome_or_methodology_records": 7,
+    "target_workflow_trial_count": 0,
+    "candidate_runtime_execution_count": 0,
+    "recommended_candidate_count": 0,
+    "inspection_limits": "Counts identify fetched/inspected entry interfaces and recorded evidence, not exhaustive package security audits, reference closure or successful invocation."
+  },
+  "observations": [
+    "38 distinct inspected immutable candidate entry records cover planning, processing, implementation, review, validation, documentation, web and Unity source use.",
+    "Per-entry license, dependency, maintenance, host/flavor, adoption and outcome evidence retains explicit gaps; reported family benchmarks do not qualify the selected adapter.",
+    "Independent read-only reviewer found no material gap and confirmed unchanged core provider support.",
+    "The proposal contains36worker trials plus8blind judges,8factual helpers and2calibrations:54contexts; max96explicit host-turn requests and60task-specific minutes, including orchestration.",
+    "Matched source-derived core clarification baseline and controller-owned factual delegation disclose unsupported conditional/asynchronous paths.",
+    "Target comparisons, candidate runtime execution and recommendations remain zero."
+  ],
+  "reviewer": "Root source/structure inspection and independent review_plugin_market_map final pass",
+  "commands": [
+    {
+      "command": "Market map structural assertions and cohort arithmetic",
+      "exit_code": 0
+    },
+    {
+      "command": "Scoped strict document rules",
+      "exit_code": 0
+    },
+    {
+      "command": "npm run validate",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "limitations": [
+    "Source research establishes no target-workflow efficacy, native host invocation, complete security/resource-closure audit or browser/Unity runtime qualification.",
+    "The finite comparison proposal remains pending actual owner agreement in task114; no trial ran.",
+    "Mutable adoption counts are dated interest/install signals rather than unique users or measured improvement."
+  ]
+}

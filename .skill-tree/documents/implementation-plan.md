@@ -4,6 +4,8 @@
 
 Source release version: 0.3.0. The owner request authorizes the workflow redesign and intermediate scoped local commits in the Skill Tree source repository. Source/temporary-fixture qualification is the release gate. Publication, push, live provider reinstallation, existing-target migration, Unity/product execution, devices and scheduling remain separate owner actions.
 
+The active plugin-system expansion follows the owner-confirmed fifteen-task [specification](../history/research/plugin-clarification-summary.md) through run `WR-0304315b-587e-489c-ac51-861258b13eb0`. The owner-selected local base and merge target are `codex/next-version`; the isolated implementation branch is `codex/plugin-system`. The canonical task index owns current progress, claims and required/deferred work. Scoped local commits retain reviewed implementation units, while remote publication remains a separate owner action. Stored scope and history supply no independent continuation instruction.
+
 Canonical contracts/helpers reside in `.skill-tree/common/`; authored entry-point sections reside in `.skill-tree/templates/`; domain resources reside in `.skill-tree/domains/`. Flavor/capability/provider/resource registries reside in `.skill-tree/config/`. The deterministic composer owns generated representative packages under `.skill-tree/skills/general/`, `.skill-tree/skills/web/` and `.skill-tree/skills/unity/`. Each flavor contains the same ten logical operations with stable names.
 
 ## Installation

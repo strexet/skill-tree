@@ -826,6 +826,11 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/documents/plugin-market-research.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/documents/plugin-system-contract.md",
       "role": "canonical"
     },
@@ -1221,17 +1226,18 @@
     ".skill-tree/config/providers.json": "80255fe3fb67e32d71cc7791aee1e51c1d34a508d4c77b6ca852521907ede97a",
     ".skill-tree/config/repository.json": "3c26162b83118090e970b09b23a926ac7daf4487bf7a4a0ac78244fd54c8182a",
     ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
-    ".skill-tree/documents/agent-compatibility.md": "f3fb38f0362489ecbc61f129a3346b47a1719e940a722165901f06fd0e5ea37e",
+    ".skill-tree/documents/agent-compatibility.md": "5f2359a60b70d0a12403161735f64145ba7d44263d3becf8c59910a422904c91",
     ".skill-tree/documents/build-and-release.md": "074d815d75579dc6e11dfd76f8f844d3c672bc6e990bbd3b6a6c6c3b79db1af0",
     ".skill-tree/documents/dependencies.md": "e524d1d314d8c443e000260860e71fca6db4bd6938e86cb7443379a6fb2db4f3",
     ".skill-tree/documents/features.md": "e37eb011ca22e81bb12bb6002e9292115bf6da9d36065516804bc9f13c2885f7",
     ".skill-tree/documents/future.md": "512b46098a7b280b0783362b2f68c378d10621733cb9587a01f121b9c8d65024",
-    ".skill-tree/documents/implementation-plan.md": "22578c7ea04ed5aa5aa0c4ea72f0d5d4a6e45ced61be32abf70714cfc202d39e",
+    ".skill-tree/documents/implementation-plan.md": "8974066af81d3e0f0c737be3431c13f2bbe2df6ba985309d9497c22370bb041b",
     ".skill-tree/documents/install.md": "59eddcbcbba0363cdb5f2d37eb628f6c3a439bededc4d6226c87128ad6447969",
     ".skill-tree/documents/installation-architecture.md": "fd548f5be2a74fbfdb416a748e62869771d80f04acb47b246d4488effe083eea",
     ".skill-tree/documents/manual-target-update.md": "f83c49a885b75d27d250d53d5f00936bc1c9e3d45998518cb0045ef8734e3482",
+    ".skill-tree/documents/plugin-market-research.md": "cdedbf889a7136f8390089b0d70448c59de91e6622e6a23c9c222da744852621",
     ".skill-tree/documents/plugin-system-contract.md": "92448722e083369b2fd6a1b771c25bc6d137c2b1569eef07dcf40b1e08018053",
-    ".skill-tree/documents/plugin-system-research.md": "252ea8eac8c950fa1a6c8a2ea0a774f81dd9b69850fc7fecc99eff52373e7bb7",
+    ".skill-tree/documents/plugin-system-research.md": "6a8062f4bb9c39abc9f0e1ef513d6af2e2f50a2b0f8616b30007c8e6bd718205",
     ".skill-tree/documents/plugin-workflow-decisions.md": "ada306d29205daf0cda4ac42196917c5d230b763c1dcac5dc2e764a8e1438522",
     ".skill-tree/documents/project.md": "419e0ced059c4f8130006e2f2b5c745fdb05944facc576671f19356b198ba934",
     ".skill-tree/documents/repo-init-instructions.md": "06f7eedd332bd13daba08f131a5c34b0fdffd8cb835c4ecc0d062010071251fa",
