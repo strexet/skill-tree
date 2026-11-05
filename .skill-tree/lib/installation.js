@@ -173,7 +173,7 @@ function plan(root,source,flavor,selections,options={}){
 function verify(root,source){
  const p=receipt(root,true);verifyOwned(root,p);const bundleSource=c.safe(root,INSTALL+'/source');
  const now=c.resolveProfile(bundleSource,root,p.flavor);
- for(const field of ['inputs','inventory','facts','recipes','gaps','environment_id','execution_bindings','worktree_environment'])if(c.json(now[field])!==c.json(p[field]))throw Error('Profile refresh-required or resolved profile mismatch: node .skill-tree/installation/manager.js --refresh-profile');
+ for(const field of ['source_version','inputs','inventory','facts','recipes','gaps','environment_id','execution_bindings','worktree_environment'])if(c.json(now[field])!==c.json(p[field]))throw Error('Profile refresh-required or resolved profile mismatch: node .skill-tree/installation/manager.js --refresh-profile');
  if(p.identity!==compositionIdentity(p))throw Error('Composition receipt identity mismatch');
  const generated=c.compose(bundleSource,now,[...new Set(Object.values(p.destinations).map(record=>record.name))]);
  const providers=c.readJson(bundleSource,'config/providers.json').providers;

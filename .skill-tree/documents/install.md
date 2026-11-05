@@ -13,7 +13,7 @@ Fresh noninteractive installation requires `--flavor general|web|unity`; interac
 
 Dry-run reports facts, gaps, exact changed destinations and ownership conflicts without writes. Matching installations are verified no-ops. `--force` cannot adopt unowned content or discard local modifications. A stopped cleanup/handoff checkpoint precedes replacement during a controller. Optional `--with-init` inserts a receipt-owned bridge while preserving surrounding instructions. Scoped `--uninstall` removes only matching owned packages; `--with-init` removes the bridge when no packages remain.
 
-The installation receipt and concrete profile reside at `.skill-tree/installation/profile.json`. The local manager resolves the target from the bundle location, independent of caller working directory and source checkout.
+The installation receipt and concrete profile reside at `.skill-tree/installation/profile.json`. The `source_version` field identifies the source release; `config/flavors.json` owns the bundled release version and matches root `package.json`. Composed project profiles expose the same version. The local manager resolves the target from the bundle location, independent of caller working directory and source checkout.
 
 ```sh
 node .skill-tree/installation/manager.js --verify

@@ -2,7 +2,7 @@
 
 ## Scope and ownership
 
-Source release version: 0.2.0. The owner request authorizes the workflow redesign and intermediate scoped local commits in the Skill Tree source repository. Source/temporary-fixture qualification is the release gate. Publication, push, live provider reinstallation, existing-target migration, Unity/product execution, devices and scheduling remain separate owner actions.
+Source release version: 0.3.0. The owner request authorizes the workflow redesign and intermediate scoped local commits in the Skill Tree source repository. Source/temporary-fixture qualification is the release gate. Publication, push, live provider reinstallation, existing-target migration, Unity/product execution, devices and scheduling remain separate owner actions.
 
 Canonical contracts/helpers reside in `.skill-tree/common/`; authored entry-point sections reside in `.skill-tree/templates/`; domain resources reside in `.skill-tree/domains/`. Flavor/capability/provider/resource registries reside in `.skill-tree/config/`. The deterministic composer owns generated representative packages under `.skill-tree/skills/general/`, `.skill-tree/skills/web/` and `.skill-tree/skills/unity/`. Each flavor contains the same nine logical operations with stable names.
 

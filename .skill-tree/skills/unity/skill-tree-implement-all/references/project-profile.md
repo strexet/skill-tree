@@ -99,6 +99,7 @@ Flavor: unity. Static compatibility only; execution remains unqualified.
       "utf_version": "1.4.6"
     }
   },
+  "source_version": "0.3.0",
   "worktree_environment": {
     "exclusive_resources": [],
     "isolated_directories": [],

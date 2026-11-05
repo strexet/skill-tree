@@ -29,6 +29,7 @@ Flavor: general. Static compatibility only; execution remains unqualified.
       "qualification": "static-recipe; runner unqualified"
     }
   },
+  "source_version": "0.3.0",
   "worktree_environment": {
     "exclusive_resources": [],
     "isolated_directories": [],

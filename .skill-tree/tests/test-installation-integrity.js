@@ -2,6 +2,17 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const cli=path.resolve(__dirname,'../bin/install.js');
 function setup(t){const root=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-owned-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));return root;}
 function run(root,extra=[],entry=cli){return spawnSync(process.execPath,[entry,'--target',root,'--only','codex','--flavor','general',...extra],{encoding:'utf8',timeout:15000});}
+test('installed release version matches the bundled source and forged receipt versions fail verification',t=>{
+ const root=setup(t);assert.equal(run(root).status,0);
+ const version=JSON.parse(fs.readFileSync(path.resolve(__dirname,'../../package.json'))).version;
+ const receipt=path.join(root,'.skill-tree/installation/profile.json'),profile=JSON.parse(fs.readFileSync(receipt));
+ assert.equal(profile.source_version,version);
+ assert.equal(JSON.parse(fs.readFileSync(path.join(root,'.skill-tree/installation/source/config/flavors.json'))).release_version,version);
+ const concrete=fs.readFileSync(path.join(root,'.agents/skills/skill-tree-add-pending-task/references/project-profile.md'),'utf8');
+ assert.equal(JSON.parse(concrete.match(/```json\n([\s\S]*?)\n```/)[1]).source_version,version);
+ profile.source_version='0.0.0';fs.writeFileSync(receipt,JSON.stringify(profile));
+ assert.notEqual(run(root,['--verify']).status,0);
+});
 test('force never adopts an unowned package',t=>{const root=setup(t),dest=path.join(root,'.agents/skills/skill-tree-add-pending-task');fs.mkdirSync(dest,{recursive:true});fs.writeFileSync(path.join(dest,'private.txt'),'preserve');const r=run(root,['--force','--skills','skill-tree-add-pending-task']);assert.notEqual(r.status,0);assert.equal(fs.readFileSync(path.join(dest,'private.txt'),'utf8'),'preserve');});
 test('verify rejects a false-positive entrypoint and locally modified packages survive force/uninstall',t=>{const root=setup(t);assert.equal(run(root).status,0);const file=path.join(root,'.agents/skills/skill-tree-add-pending-task/SKILL.md');fs.writeFileSync(file,'unrelated');for(const op of ['--verify','--force','--uninstall'])assert.notEqual(run(root,[op]).status,0);assert.equal(fs.readFileSync(file,'utf8'),'unrelated');});
 test('maintenance refresh works without source access and detects newly added tools',t=>{const root=setup(t);assert.equal(run(root).status,0);const manager=path.join(root,'.skill-tree/installation/manager.js');fs.writeFileSync(path.join(root,'package.json'),JSON.stringify({scripts:{test:'node --test'}}));assert.notEqual(run(root,['--verify']).status,0);const r=spawnSync(process.execPath,[manager,'--refresh-profile'],{cwd:os.tmpdir(),encoding:'utf8',timeout:15000});assert.equal(r.status,0,r.stdout+r.stderr);assert.equal(run(root,['--verify']).status,0);const profile=JSON.parse(fs.readFileSync(path.join(root,'.skill-tree/installation/profile.json')));assert.ok(profile.recipes['script-test']);assert.equal(profile.gaps.length,0);});

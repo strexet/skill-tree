@@ -17,6 +17,7 @@ def validate(strict=False):
     for rel in ['AGENTS.md','README.md','LICENSE','package.json','install.sh','install.ps1']:
         if not (repo/rel).is_file():errors.append('Missing root entrypoint: '+rel)
     if json.loads((repo/'package.json').read_text()).get('license')!='MIT':errors.append('Package license must remain MIT')
+    if json.loads((repo/'package.json').read_text()).get('version')!=json.loads((core/'config/flavors.json').read_text()).get('release_version'):errors.append('Package version and flavor registry release_version disagree')
     for path in core.rglob('*'):
         if any(part in {'__pycache__','artifacts','.git'} for part in path.parts):continue
         if path.name in {'.writer-lock','.transaction.json'}:continue

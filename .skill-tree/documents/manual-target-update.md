@@ -9,4 +9,4 @@ The existing target repository requires an explicit owner-selected update after 
 5. Preserve original history receipts/evidence bytes. Record relocated-reference mapping and honest stale/unavailable evidence in an update note; rebuild derived navigation/index data.
 6. Run metadata/package/source checks, review the diff and report the preserved next action. Product execution and controller continuation require applicable owner scope.
 
-The current source release performs no existing-target update, live provider installation or product execution.
+Existing-target updates and provider installation require explicit owner scope. Static package installation does not authorize product execution.
