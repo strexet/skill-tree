@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "record_kind": "design-approval-propagation-review",
+  "decision_id": "W1",
+  "result": "pass",
+  "reviewer": "Root guarded-state assertions and independent flow_design_proposal_review",
+  "source_fingerprints": {
+    ".skill-tree/documents/plugin-workflow-decisions.md": "2d9e41cc3fc7bc655d1351ff53f3d9243f4ec5eb87935ddfbd5383b695fa60f5",
+    ".skill-tree/history/research/plugin-auto-manual-decision.json": "77adbf24970ab1a5ea81270c948c1b2416dcf890d776540cad0dce2fb63e1772"
+  },
+  "observations": [
+    "Actual owner approval matches the complete displayed W1 recommendation, including delegated final specification acceptance.",
+    "The source decision distinguishes approved policy from the currently implemented manual-only controller.",
+    "Task124 remains design-only; the live clarification accepts W1 and retains W2 as the only unanswered frontier, with no final confirmation.",
+    "Required Pending P-09b5b828-dcdc-4d06-bee1-19e1787e34f4 is a blocker of frozen interview115 and appears in the existing run Pending list. The initial fifteen roots and four completed outcomes remain unchanged.",
+    "Exact specification alignment for composition119, invocation118, review116, interview115 and comparison114 is recorded before implementation.",
+    "No W2 answer, comparison execution, implicit installation consent or expanded publication authority is recorded."
+  ],
+  "continuation_requirement": "After the W2 design handoff, process the exact required W1 Pending and align shared dependencies, consumer specifications, acceptance and check mappings before affected implementation.",
+  "limitations": [
+    "No Auto/Manual implementation, actor qualification or Task124 completion is claimed."
+  ]
+}
