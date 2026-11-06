@@ -1,0 +1,5 @@
+{
+  "control": "Python -I -B still reads matching timestamp bytecode caches",
+  "observed": "different cached code",
+  "owned_source_bytes_preserved": true
+}

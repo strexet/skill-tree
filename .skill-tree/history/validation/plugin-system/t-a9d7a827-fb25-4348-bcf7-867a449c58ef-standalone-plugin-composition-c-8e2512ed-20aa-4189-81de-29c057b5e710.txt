@@ -1,0 +1,435 @@
+TAP version 13
+# Subtest: composition exposes real callable composition and boundary APIs
+ok 1 - composition exposes real callable composition and boundary APIs
+  ---
+  duration_ms: 0.812167
+  ...
+# Subtest: general core-only composition covers registered operations with W1 and no optional plugin hold
+not ok 2 - general core-only composition covers registered operations with W1 and no optional plugin hold
+  ---
+  duration_ms: 243.172541
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:69:47'
+  failureType: 'testCodeFailure'
+  error: 'Each composed operation declares its own ordered plugin manifest.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    manifest (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:26:33)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:71:73)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: web core-only composition covers registered operations with W1 and no optional plugin hold
+not ok 3 - web core-only composition covers registered operations with W1 and no optional plugin hold
+  ---
+  duration_ms: 231.477708
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:69:47'
+  failureType: 'testCodeFailure'
+  error: 'Each composed operation declares its own ordered plugin manifest.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    manifest (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:26:33)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:71:73)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: unity core-only composition covers registered operations with W1 and no optional plugin hold
+not ok 4 - unity core-only composition covers registered operations with W1 and no optional plugin hold
+  ---
+  duration_ms: 255.669083
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:69:47'
+  failureType: 'testCodeFailure'
+  error: 'Each composed operation declares its own ordered plugin manifest.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    manifest (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:26:33)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:71:73)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: general composes A-to-B-to-A occurrences in exact order with independent parameters
+not ok 5 - general composes A-to-B-to-A occurrences in exact order with independent parameters
+  ---
+  duration_ms: 533.8135
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:74:47'
+  failureType: 'testCodeFailure'
+  error: 'Each composed operation declares its own ordered plugin manifest.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    manifest (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:26:33)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:75:342)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: web composes A-to-B-to-A occurrences in exact order with independent parameters
+not ok 6 - web composes A-to-B-to-A occurrences in exact order with independent parameters
+  ---
+  duration_ms: 508.83725
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:74:47'
+  failureType: 'testCodeFailure'
+  error: 'Each composed operation declares its own ordered plugin manifest.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    manifest (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:26:33)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:75:342)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: unity composes A-to-B-to-A occurrences in exact order with independent parameters
+not ok 7 - unity composes A-to-B-to-A occurrences in exact order with independent parameters
+  ---
+  duration_ms: 537.83975
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:74:47'
+  failureType: 'testCodeFailure'
+  error: 'Each composed operation declares its own ordered plugin manifest.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    manifest (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:26:33)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:75:342)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: selected operation closure excludes unrelated plugins and preserves locked core instructions
+not ok 8 - selected operation closure excludes unrelated plugins and preserves locked core instructions
+  ---
+  duration_ms: 528.957208
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:79:1'
+  failureType: 'testCodeFailure'
+  error: 'Each composed operation declares its own ordered plugin manifest.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    manifest (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:26:33)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:80:158)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: upstream BOM and binary bytes survive composition and original-byte hashing
+not ok 9 - upstream BOM and binary bytes survive composition and original-byte hashing
+  ---
+  duration_ms: 511.056834
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:82:1'
+  failureType: 'testCodeFailure'
+  error: 'Each composed operation declares its own ordered plugin manifest.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    manifest (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:26:33)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:83:98)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: owned catalog registers all operation phases and approved named aliases with callable guards
+not ok 10 - owned catalog registers all operation phases and approved named aliases with callable guards
+  ---
+  duration_ms: 0.340791
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:85:1'
+  failureType: 'testCodeFailure'
+  error: 'Standalone plugin composition is not implemented'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    Object.unavailable (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-composition.js:3:30)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:86:22)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: a later registered operation composes through the same extension without a fixed manager count
+not ok 11 - a later registered operation composes through the same extension without a fixed manager count
+  ---
+  duration_ms: 563.405583
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:89:1'
+  failureType: 'testCodeFailure'
+  error: 'Each composed operation declares its own ordered plugin manifest.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    manifest (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:26:33)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:91:201)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: an unknown configured label remains unresolved and never supplies a successful executable boundary
+not ok 12 - an unknown configured label remains unresolved and never supplies a successful executable boundary
+  ---
+  duration_ms: 508.296958
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:93:1'
+  failureType: 'testCodeFailure'
+  error: 'Each composed operation declares its own ordered plugin manifest.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    manifest (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:26:33)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:94:152)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: missing native tools remain explicit unavailable prerequisites for noncatalog cross-host sources
+not ok 13 - missing native tools remain explicit unavailable prerequisites for noncatalog cross-host sources
+  ---
+  duration_ms: 507.785541
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:96:1'
+  failureType: 'testCodeFailure'
+  error: 'Standalone plugin composition is not implemented'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    Object.unavailable (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-composition.js:3:30)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:97:217)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: composition installation list and dry-run never execute an upstream helper or mutate plugin configuration
+ok 14 - composition installation list and dry-run never execute an upstream helper or mutate plugin configuration
+  ---
+  duration_ms: 2290.705792
+  ...
+# Subtest: general copied installed operation prepares without source installation or sibling packages
+not ok 15 - general copied installed operation prepares without source installation or sibling packages
+  ---
+  duration_ms: 686.850334
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:102:47'
+  failureType: 'testCodeFailure'
+  error: "ENOENT: no such file or directory, open '/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-plugin-composition-dx8wi5/only-package/plugins/editor/upstream/SKILL.md'"
+  code: 'ENOENT'
+  stack: |-
+    Object.openSync (node:fs:561:18)
+    Object.readFileSync (node:fs:445:35)
+    read (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:12:32)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:104:19)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: web copied installed operation prepares without source installation or sibling packages
+not ok 16 - web copied installed operation prepares without source installation or sibling packages
+  ---
+  duration_ms: 697.426875
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:102:47'
+  failureType: 'testCodeFailure'
+  error: "ENOENT: no such file or directory, open '/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-plugin-composition-anUboA/only-package/plugins/editor/upstream/SKILL.md'"
+  code: 'ENOENT'
+  stack: |-
+    Object.openSync (node:fs:561:18)
+    Object.readFileSync (node:fs:445:35)
+    read (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:12:32)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:104:19)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: unity copied installed operation prepares without source installation or sibling packages
+not ok 17 - unity copied installed operation prepares without source installation or sibling packages
+  ---
+  duration_ms: 754.051416
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:102:47'
+  failureType: 'testCodeFailure'
+  error: "ENOENT: no such file or directory, open '/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-plugin-composition-BDWJj9/only-package/plugins/editor/upstream/SKILL.md'"
+  code: 'ENOENT'
+  stack: |-
+    Object.openSync (node:fs:561:18)
+    Object.readFileSync (node:fs:445:35)
+    read (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:12:32)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:104:19)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: Processing before and during bind actual selected Pending identities and preserve unresolved intake bytes
+not ok 18 - Processing before and during bind actual selected Pending identities and preserve unresolved intake bytes
+  ---
+  duration_ms: 614.910125
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:106:1'
+  failureType: 'testCodeFailure'
+  error: 'Standalone plugin composition is not implemented'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    Object.unavailable (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-composition.js:3:30)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:107:295)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: Processing guard rejects fabricated absent or premature task context without changing the queue
+not ok 19 - Processing guard rejects fabricated absent or premature task context without changing the queue
+  ---
+  duration_ms: 728.829
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:109:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /Pending|pending|context|selected/i. Input:
+    
+    'Error: Standalone plugin composition is not implemented'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: 'Standalone plugin composition is not implemented'
+  stack: |-
+    Object.unavailable (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-composition.js:3:30)
+    /Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:110:421
+    getActual (node:assert:498:5)
+    Function.throws (node:assert:644:24)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:110:404)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:110:404)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: implementation During requires the matching actual draft-plan frame before acceptance
+not ok 20 - implementation During requires the matching actual draft-plan frame before acceptance
+  ---
+  duration_ms: 673.679208
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:112:1'
+  failureType: 'testCodeFailure'
+  error: 'Standalone plugin composition is not implemented'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    Object.unavailable (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-composition.js:3:30)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:113:486)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: implementation During rejects research-only and already accepted plans without stale readiness
+not ok 21 - implementation During rejects research-only and already accepted plans without stale readiness
+  ---
+  duration_ms: 624.27275
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:115:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /draft|plan|phase|accept/i. Input:
+    
+    'Error: Standalone plugin composition is not implemented'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: 'Standalone plugin composition is not implemented'
+  stack: |-
+    Object.unavailable (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-composition.js:3:30)
+    /Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:116:364
+    getActual (node:assert:498:5)
+    Function.throws (node:assert:644:24)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:116:347)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:116:347)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: a materially changed draft loses old acceptance before the next During preparation
+not ok 22 - a materially changed draft loses old acceptance before the next During preparation
+  ---
+  duration_ms: 673.839917
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:118:1'
+  failureType: 'testCodeFailure'
+  error: 'Standalone plugin composition is not implemented'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    Object.unavailable (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-composition.js:3:30)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:119:453)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: sequence edits change profile and composition identity without mutating the frozen previous manifest
+not ok 23 - sequence edits change profile and composition identity without mutating the frozen previous manifest
+  ---
+  duration_ms: 678.495625
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:121:1'
+  failureType: 'testCodeFailure'
+  error: 'Each composed operation declares its own ordered plugin manifest.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    manifest (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:26:33)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:122:653)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: modified owned resources and escaping registry paths cannot enter a composed package
+not ok 24 - modified owned resources and escaping registry paths cannot enter a composed package
+  ---
+  duration_ms: 500.569708
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:124:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:125:201)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: copied operation detects changed local plugin bytes before preparing any occurrence
+not ok 25 - copied operation detects changed local plugin bytes before preparing any occurrence
+  ---
+  duration_ms: 493.420667
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:128:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /changed|digest|resource|inventory|modified/i. Input:
+    
+    'Error: Standalone plugin composition is not implemented'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: 'Standalone plugin composition is not implemented'
+  stack: |-
+    Object.unavailable (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-composition.js:3:30)
+    /Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:129:271
+    getActual (node:assert:498:5)
+    Function.throws (node:assert:644:24)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:129:254)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:129:254)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+1..25
+# tests 25
+# suites 0
+# pass 2
+# fail 23
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 14437.039208

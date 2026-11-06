@@ -18,4 +18,6 @@ Generated prose follows [document rules](references/document-rules.md). No unrel
 
 The decision frame binds the exact admitted task and current source context. Draft plan and any during contribution precede current plan review/acceptance and source edits. Actual required check receipts and full review remain mandatory before terminal task completion.
 
+Read the [plugin binding and invocation boundaries](references/plugin-invocation.md). The local ordered manifest describes configured occurrences and bundled source resources. Read the local manifest before routing. Invoke scripts/plugin-hooks.js with an explicit request only for configured matching occurrences at an actual before, during, after or registered named boundary. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Preparation preserves core selection, current plan acceptance and authorization guards; preparation establishes no actual plugin invocation. Missing capabilities and unqualified execution remain explicit prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent.
+
 Use repository-discovered tools and concrete profile recipes. Platform-neutral checks establish only the recorded assertions; product/runtime claims require matching evidence.

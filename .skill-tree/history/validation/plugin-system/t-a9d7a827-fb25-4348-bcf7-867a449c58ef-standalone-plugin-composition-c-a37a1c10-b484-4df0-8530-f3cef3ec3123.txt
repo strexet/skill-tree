@@ -1,0 +1,150 @@
+TAP version 13
+# Subtest: composition exposes real callable composition and boundary APIs
+ok 1 - composition exposes real callable composition and boundary APIs
+  ---
+  duration_ms: 0.6815
+  ...
+# Subtest: general core-only composition covers registered operations with W1 and no optional plugin hold
+ok 2 - general core-only composition covers registered operations with W1 and no optional plugin hold
+  ---
+  duration_ms: 352.012958
+  ...
+# Subtest: web core-only composition covers registered operations with W1 and no optional plugin hold
+ok 3 - web core-only composition covers registered operations with W1 and no optional plugin hold
+  ---
+  duration_ms: 319.35625
+  ...
+# Subtest: unity core-only composition covers registered operations with W1 and no optional plugin hold
+ok 4 - unity core-only composition covers registered operations with W1 and no optional plugin hold
+  ---
+  duration_ms: 331.289667
+  ...
+# Subtest: general composes A-to-B-to-A occurrences in exact order with independent parameters
+ok 5 - general composes A-to-B-to-A occurrences in exact order with independent parameters
+  ---
+  duration_ms: 590.006
+  ...
+# Subtest: web composes A-to-B-to-A occurrences in exact order with independent parameters
+ok 6 - web composes A-to-B-to-A occurrences in exact order with independent parameters
+  ---
+  duration_ms: 600.091958
+  ...
+# Subtest: unity composes A-to-B-to-A occurrences in exact order with independent parameters
+ok 7 - unity composes A-to-B-to-A occurrences in exact order with independent parameters
+  ---
+  duration_ms: 621.709209
+  ...
+# Subtest: selected operation closure excludes unrelated plugins and preserves locked core instructions
+ok 8 - selected operation closure excludes unrelated plugins and preserves locked core instructions
+  ---
+  duration_ms: 581.36325
+  ...
+# Subtest: upstream BOM and binary bytes survive composition and original-byte hashing
+ok 9 - upstream BOM and binary bytes survive composition and original-byte hashing
+  ---
+  duration_ms: 536.743167
+  ...
+# Subtest: owned catalog registers all operation phases and approved named aliases with callable guards
+ok 10 - owned catalog registers all operation phases and approved named aliases with callable guards
+  ---
+  duration_ms: 33.894917
+  ...
+# Subtest: a later registered operation composes through the same extension without a fixed manager count
+ok 11 - a later registered operation composes through the same extension without a fixed manager count
+  ---
+  duration_ms: 718.491959
+  ...
+# Subtest: an unknown configured label remains unresolved and never supplies a successful executable boundary
+ok 12 - an unknown configured label remains unresolved and never supplies a successful executable boundary
+  ---
+  duration_ms: 557.126292
+  ...
+# Subtest: missing native tools remain explicit unavailable prerequisites for noncatalog cross-host sources
+ok 13 - missing native tools remain explicit unavailable prerequisites for noncatalog cross-host sources
+  ---
+  duration_ms: 545.458541
+  ...
+# Subtest: composition installation list and dry-run never execute an upstream helper or mutate plugin configuration
+ok 14 - composition installation list and dry-run never execute an upstream helper or mutate plugin configuration
+  ---
+  duration_ms: 3632.024709
+  ...
+# Subtest: general copied installed operation prepares without source installation or sibling packages
+ok 15 - general copied installed operation prepares without source installation or sibling packages
+  ---
+  duration_ms: 890.675875
+  ...
+# Subtest: web copied installed operation prepares without source installation or sibling packages
+ok 16 - web copied installed operation prepares without source installation or sibling packages
+  ---
+  duration_ms: 873.431375
+  ...
+# Subtest: unity copied installed operation prepares without source installation or sibling packages
+ok 17 - unity copied installed operation prepares without source installation or sibling packages
+  ---
+  duration_ms: 915.351625
+  ...
+# Subtest: Processing before and during bind actual selected Pending identities and preserve unresolved intake bytes
+ok 18 - Processing before and during bind actual selected Pending identities and preserve unresolved intake bytes
+  ---
+  duration_ms: 1653.266084
+  ...
+# Subtest: Processing guard rejects fabricated absent or premature task context without changing the queue
+ok 19 - Processing guard rejects fabricated absent or premature task context without changing the queue
+  ---
+  duration_ms: 1034.693083
+  ...
+# Subtest: implementation During requires the matching actual draft-plan frame before acceptance
+ok 20 - implementation During requires the matching actual draft-plan frame before acceptance
+  ---
+  duration_ms: 1070.370916
+  ...
+# Subtest: implementation During rejects research-only and already accepted plans without stale readiness
+ok 21 - implementation During rejects research-only and already accepted plans without stale readiness
+  ---
+  duration_ms: 1670.450959
+  ...
+# Subtest: a materially changed draft loses old acceptance before the next During preparation
+ok 22 - a materially changed draft loses old acceptance before the next During preparation
+  ---
+  duration_ms: 829.71375
+  ...
+# Subtest: sequence edits change profile and composition identity without mutating the frozen previous manifest
+ok 23 - sequence edits change profile and composition identity without mutating the frozen previous manifest
+  ---
+  duration_ms: 751.803917
+  ...
+# Subtest: modified owned resources and escaping registry paths cannot enter a composed package
+ok 24 - modified owned resources and escaping registry paths cannot enter a composed package
+  ---
+  duration_ms: 1034.973083
+  ...
+# Subtest: copied operation detects changed local plugin bytes before preparing any occurrence
+ok 25 - copied operation detects changed local plugin bytes before preparing any occurrence
+  ---
+  duration_ms: 560.083916
+  ...
+# Subtest: condition-excluded Processing occurrence is a task-free no-op without Pending or DO guards
+ok 26 - condition-excluded Processing occurrence is a task-free no-op without Pending or DO guards
+  ---
+  duration_ms: 1100.385041
+  ...
+# Subtest: copied workflow guard bytes are verified before a tampered helper can forge selected scope
+ok 27 - copied workflow guard bytes are verified before a tampered helper can forge selected scope
+  ---
+  duration_ms: 553.672083
+  ...
+# Subtest: timestamp-valid bytecode cannot replace verified workflow source or execute a cached guard
+ok 28 - timestamp-valid bytecode cannot replace verified workflow source or execute a cached guard
+  ---
+  duration_ms: 947.511708
+  ...
+1..28
+# tests 28
+# suites 0
+# pass 28
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 23393.268041

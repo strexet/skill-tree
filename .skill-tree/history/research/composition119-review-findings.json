@@ -1,0 +1,38 @@
+{
+  "findings": [
+    {
+      "id": "conditional-empty-selection",
+      "observation": "An enabled occurrence with a false condition reached Pending/plan guards despite an empty selected set.",
+      "required_repair": "Skip boundary guard for an empty selected/unresolved set; evaluate false conditions before incompatible-context obligations.",
+      "status": "repaired-required-checks-and-full-review-passed"
+    },
+    {
+      "id": "owned-dispatcher-drift",
+      "observation": "The copied operation executed a modified workflow scope helper because the local manifest verified only plugin resources and the main dispatcher version. A controlled forged helper produced a marker.",
+      "required_repair": "Bind and verify actual composed owned helper/reference bytes before helper loading/execution; retain separate plugin resource verification.",
+      "status": "repaired-required-checks-and-full-review-passed"
+    },
+    {
+      "id": "unrelated-parameter-defaults",
+      "observation": "The operation manifest included arbitrary parameter defaults from unrelated packages.",
+      "required_repair": "Emit defaults only for the selected package closure and assert absence using a unique unrelated marker.",
+      "status": "repaired-required-checks-and-full-review-passed"
+    },
+    {
+      "id": "timestamp-bytecode-cache",
+      "observation": "A valid source hash still allowed Python -I -B to execute a matching timestamp cache with different code in a controlled fixture.",
+      "required_repair": "Use a fresh nonexistent cache prefix before owned helper imports and disable cache writes; preserve existing cache bytes.",
+      "status": "repaired-required-checks-and-full-review-passed"
+    }
+  ],
+  "limits": [
+    "Early review is not the mandatory post-check full diff review.",
+    "Controlled helper tampering is an isolated unit fixture, not a hostile native plugin or product-host qualification."
+  ],
+  "review_phase": "early-implementation-audit",
+  "reviewers": [
+    "/root",
+    "/root/composition119_early_audit"
+  ],
+  "task_id": "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+}

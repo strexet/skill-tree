@@ -11,6 +11,11 @@
         "id": "decision-scope",
         "locked": true,
         "text": "The decision frame uses the original request/project context before a Pending ID exists. Capture remains intake only; a plan or delegated answer never promotes or implements the embedded future work. Missing original owner intent remains an owner question."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md). The local ordered manifest describes configured occurrences and bundled source resources. Read the local manifest before routing. Invoke scripts/plugin-hooks.js with an explicit request only for configured matching occurrences at an actual before, during, after or registered named boundary. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Preparation preserves core selection, current plan acceptance and authorization guards; preparation establishes no actual plugin invocation. Missing capabilities and unqualified execution remain explicit prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
       }
     ]
   },
@@ -26,6 +31,11 @@
         "id": "decision-scope",
         "locked": true,
         "text": "The decision frame uses bounded document/snapshot context and the requested archive scope. Operation execution creates only the authorized snapshot; the frame creates no Future task or implementation run."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md). The local ordered manifest describes configured occurrences and bundled source resources. Read the local manifest before routing. Invoke scripts/plugin-hooks.js with an explicit request only for configured matching occurrences at an actual before, during, after or registered named boundary. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Preparation preserves core selection, current plan acceptance and authorization guards; preparation establishes no actual plugin invocation. Missing capabilities and unqualified execution remain explicit prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
       }
     ]
   },
@@ -41,6 +51,11 @@
         "id": "decision-scope",
         "locked": true,
         "text": "The controller retains the frozen root/snapshot and existing mode. Leaf operation frames own task plan/check/review decisions; the controller consumes matching leaf evidence without inventing another task-selection or implementation grant."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md). The local ordered manifest describes configured occurrences and bundled source resources. Read the local manifest before routing. Invoke scripts/plugin-hooks.js with an explicit request only for configured matching occurrences at an actual before, during, after or registered named boundary. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Preparation preserves core selection, current plan acceptance and authorization guards; preparation establishes no actual plugin invocation. Missing capabilities and unqualified execution remain explicit prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
       }
     ]
   },
@@ -56,6 +71,11 @@
         "id": "decision-scope",
         "locked": true,
         "text": "The decision frame binds the exact admitted task and current source context. Draft plan and any during contribution precede current plan review/acceptance and source edits. Actual required check receipts and full review remain mandatory before terminal task completion."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md). The local ordered manifest describes configured occurrences and bundled source resources. Read the local manifest before routing. Invoke scripts/plugin-hooks.js with an explicit request only for configured matching occurrences at an actual before, during, after or registered named boundary. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Preparation preserves core selection, current plan acceptance and authorization guards; preparation establishes no actual plugin invocation. Missing capabilities and unqualified execution remain explicit prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
       }
     ]
   },
@@ -71,6 +91,11 @@
         "id": "decision-scope",
         "locked": true,
         "text": "Before promotion, the decision frame uses the real selected Pending IDs. Source-backed in-scope decisions can use Auto; unresolved owner intent remains Pending. The standalone next-action selection still requires an actual developer instruction, while an explicitly launched controller retains the frozen automatic-selection scope."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md). The local ordered manifest describes configured occurrences and bundled source resources. Read the local manifest before routing. Invoke scripts/plugin-hooks.js with an explicit request only for configured matching occurrences at an actual before, during, after or registered named boundary. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Preparation preserves core selection, current plan acceptance and authorization guards; preparation establishes no actual plugin invocation. Missing capabilities and unqualified execution remain explicit prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
       }
     ]
   },
@@ -86,6 +111,11 @@
         "id": "decision-scope",
         "locked": true,
         "text": "The decision frame uses the actual project/document scope before Future setup. Metadata bootstrap occurs only through the separately authorized documentation operation; the frame creates no queue or implementation run."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md). The local ordered manifest describes configured occurrences and bundled source resources. Read the local manifest before routing. Invoke scripts/plugin-hooks.js with an explicit request only for configured matching occurrences at an actual before, during, after or registered named boundary. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Preparation preserves core selection, current plan acceptance and authorization guards; preparation establishes no actual plugin invocation. Missing capabilities and unqualified execution remain explicit prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
       }
     ]
   },
@@ -101,6 +131,11 @@
         "id": "decision-scope",
         "locked": true,
         "text": "The decision frame uses bounded document/source inspection scope. Plan and review concern the authorized audit and repairs; governance supplies no product implementation permission."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md). The local ordered manifest describes configured occurrences and bundled source resources. Read the local manifest before routing. Invoke scripts/plugin-hooks.js with an explicit request only for configured matching occurrences at an actual before, during, after or registered named boundary. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Preparation preserves core selection, current plan acceptance and authorization guards; preparation establishes no actual plugin invocation. Missing capabilities and unqualified execution remain explicit prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
       }
     ]
   },
@@ -116,6 +151,11 @@
         "id": "decision-scope",
         "locked": true,
         "text": "The controller retains one selected root, required dependencies and existing mode. Leaf frames own current task phases; new nonblocking findings remain deferred and actor decisions never expand the root."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md). The local ordered manifest describes configured occurrences and bundled source resources. Read the local manifest before routing. Invoke scripts/plugin-hooks.js with an explicit request only for configured matching occurrences at an actual before, during, after or registered named boundary. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Preparation preserves core selection, current plan acceptance and authorization guards; preparation establishes no actual plugin invocation. Missing capabilities and unqualified execution remain explicit prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
       }
     ]
   },
@@ -131,6 +171,11 @@
         "id": "decision-scope",
         "locked": true,
         "text": "The decision frame binds the complete current repository/base/head/target review identity. Reviewer findings receive evidence-backed resolution, authorized fixes, current checks and re-review. Decisions never replace required external approval, checks, PR creation or merge authorization."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md). The local ordered manifest describes configured occurrences and bundled source resources. Read the local manifest before routing. Invoke scripts/plugin-hooks.js with an explicit request only for configured matching occurrences at an actual before, during, after or registered named boundary. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Preparation preserves core selection, current plan acceptance and authorization guards; preparation establishes no actual plugin invocation. Missing capabilities and unqualified execution remain explicit prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
       }
     ]
   },
@@ -146,6 +191,11 @@
         "id": "decision-scope",
         "locked": true,
         "text": "Resolve the frozen decision mode before starting new discussion. New qualified Auto operation routing passes decision_mode auto, a bounded actual owner grant and the real executor/context to clarify-start; explicit Manual and legacy sessions remain Manual. Create exact parent-bound DG decisions and attach the existing decision ID to the core actor broker. Current specification acceptance remains separate from an individual answer. Reconcile original actors before switching or cancellation."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md). The local ordered manifest describes configured occurrences and bundled source resources. Read the local manifest before routing. Invoke scripts/plugin-hooks.js with an explicit request only for configured matching occurrences at an actual before, during, after or registered named boundary. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Preparation preserves core selection, current plan acceptance and authorization guards; preparation establishes no actual plugin invocation. Missing capabilities and unqualified execution remain explicit prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
       }
     ]
   }

@@ -203,9 +203,10 @@ function selectBindings(compiled,event,context){
  for(const row of compiled.bindings){
   if(!row.enabled||row.operation!==selectedEvent.operation)continue;
   if(row.anchor!==selectedEvent.anchor&&!(row.location.status==='resolved'&&location.status==='resolved'&&row.location.boundary_id===location.boundary_id))continue;
+  if(!conditionMatches(row.condition,current))continue;
   if(row.location.status!=='resolved'){unresolved.push({id:row.id,reason:row.location.reason});continue;}
   if(!row.location.context_kinds.includes(current.kind)||row.context_kinds&&!row.context_kinds.includes(current.kind)){unresolved.push({id:row.id,reason:'The registered boundary or plugin requires a compatible typed context'});continue;}
-  if(conditionMatches(row.condition,current))selected.push(clone(row));
+  selected.push(clone(row));
  }
  selectedEvents.set(selectedEvent,{catalog:compiled.catalog,operation:selectedEvent.operation,anchor:selectedEvent.anchor,boundary_id:selectedEvent.boundary_id});
  return freezeData({bindings:selected,unresolved,context:current,event:selectedEvent,configuration_digest:compiled.configuration_digest});

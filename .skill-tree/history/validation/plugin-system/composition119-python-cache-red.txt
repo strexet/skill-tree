@@ -1,0 +1,31 @@
+TAP version 13
+# Subtest: timestamp-valid bytecode cannot replace verified workflow source or execute a cached guard
+not ok 1 - timestamp-valid bytecode cannot replace verified workflow source or execute a cached guard
+  ---
+  duration_ms: 822.881542
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:148:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    A timestamp-valid cache replaced the verified owned workflow source.
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:161:9)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 898.508083
