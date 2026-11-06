@@ -1,0 +1,97 @@
+{
+  "accepted_transition": {
+    "after": {
+      "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "content_fingerprint": "08d433f49a28d5e7ef800bce9888b362617b9e414c25955c6fd6d05795e78238",
+      "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "id": "review-hook:5e2d787634d4b04bbf2d70b0a3c9c532bf578e0e6377414d50e7d18f02906e1f",
+      "kind": "review",
+      "publication_id": "dddddddddddddddddddddddddddddddd",
+      "semantic_fingerprint": "feb2f72b5e6c7439e3eabd30e377ede2cec17f4ff86638b76399b885bde2109d",
+      "target_branch": "develop"
+    },
+    "before": {
+      "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "content_fingerprint": "08d433f49a28d5e7ef800bce9888b362617b9e414c25955c6fd6d05795e78238",
+      "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "id": "review-hook:5e2d787634d4b04bbf2d70b0a3c9c532bf578e0e6377414d50e7d18f02906e1f",
+      "kind": "review",
+      "publication_id": "dddddddddddddddddddddddddddddddd",
+      "semantic_fingerprint": "feb2f72b5e6c7439e3eabd30e377ede2cec17f4ff86638b76399b885bde2109d",
+      "target_branch": "develop"
+    },
+    "receipt": {
+      "after": "6f40fd9021dc3e6a327cb88dd4971f8dc9c544829719cf82ddb8b8a7a71971a2",
+      "before": "6f40fd9021dc3e6a327cb88dd4971f8dc9c544829719cf82ddb8b8a7a71971a2",
+      "decision_receipt": {
+        "acceptance_digest": "1fee58204ae520c09ef886c303666a025441e3348eab89e434b069777ef2e3b9",
+        "decision_id": "DG-4f4954df-5575-54e4-afbd-3c1edd0b8b56"
+      },
+      "kind": "core-resolution",
+      "reference": ".skill-tree/decisions/dg-4f4954df-5575-54e4-afbd-3c1edd0b8b56.json"
+    }
+  },
+  "actual_dg_answer": "accept",
+  "actual_dg_authority_matches_chain": true,
+  "actual_dg_executor_matches_chain": true,
+  "actual_dg_mode_matches_chain": true,
+  "actual_dg_reference": {
+    "acceptance_digest": "1fee58204ae520c09ef886c303666a025441e3348eab89e434b069777ef2e3b9",
+    "decision_id": "DG-4f4954df-5575-54e4-afbd-3c1edd0b8b56"
+  },
+  "actual_exit_code": 0,
+  "attempt_id": "HI-806a135d-5e82-4712-a1b1-89905d3e759b",
+  "bypass_observed": true,
+  "canonical_metadata_written": false,
+  "chain_id": "HC-b81da6dc-b68c-50a9-9ae7-c1042ab76e8f",
+  "chain_state_after_generic_resolution": "complete",
+  "fixture_removed": true,
+  "format": "skill-tree-bounded-negative-observation",
+  "native_actors_started": 0,
+  "observation": "generic-resolution-allows-unresolved-review-finding-to-reach-ready",
+  "original_result": {
+    "findings": [
+      {
+        "cause": "The fixture returns the old constant.",
+        "consequence": "The required fixture value is wrong.",
+        "id": "UNRESOLVED-PILOT-ONE",
+        "line": 2,
+        "path": "source.py",
+        "severity": "P1"
+      }
+    ],
+    "status": "findings"
+  },
+  "performed_fix": false,
+  "performed_plugin_findings_incorporation": false,
+  "provider_calls": 0,
+  "publication_before_ready": {
+    "findings": {},
+    "hook_chains": [
+      "HC-b81da6dc-b68c-50a9-9ae7-c1042ab76e8f"
+    ],
+    "review_plugin_contributions": {},
+    "status": "pr-review-in-progress"
+  },
+  "qualification": "One isolated deterministic local reproduction with scripted fixture actors and actual DG/helper transitions; no native host actor, provider request, actual human consent or comparative efficacy.",
+  "raw_output": {
+    "path": ".skill-tree/artifacts/plugin-implementation/ponytail116-generic-resolution-reproduction.txt",
+    "sha256": "959e2b68647f91e32187b86f2ab72ec9c23d94ada32d1aaa4dd7ff3c46f4fcca"
+  },
+  "readiness": {
+    "core_unresolved": 0,
+    "findings": {},
+    "review_plugin_contributions": {},
+    "status": "pr-ready"
+  },
+  "schema": 1,
+  "script": {
+    "path": ".skill-tree/artifacts/plugin-implementation/ponytail116-generic-resolution-reproduction.py",
+    "sha256": "9da29e5927e844bed43e20afe2b35da82007d7eb7116d23bae22f72549085c9f"
+  },
+  "source_digest": "526cb014454af1fe99b122a0d3358e9d923c9a97d880bae1523b58e0df5e4155",
+  "source_freeze": ".skill-tree/history/validation/plugin-system/ponytail116-source-freeze1.json",
+  "source_freeze_sha256": "cfa5334be78d1d8d146e927a840126aacabf69258978b11c64739683d11a92c5",
+  "source_mismatches_after": [],
+  "source_paths_checked": 248
+}

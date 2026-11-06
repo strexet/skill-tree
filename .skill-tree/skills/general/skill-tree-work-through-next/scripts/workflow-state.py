@@ -1842,6 +1842,13 @@ def _hook_node(package_root,request):
     except ValueError as error:raise WorkflowError('Owned hook preparation returned invalid JSON') from error
 
 
+def _hook_review_frontier(store,ctx,frontier):
+    if not frontier.get('publication_id'):return
+    helper=owned_module('skill_tree_review_frontier',Path(__file__).with_name('pr-review-state.py'))
+    current=helper.review_phase_guard(store,ctx,frontier['phase'])
+    if any(current.get(key)!=frontier.get(key) for key in ['publication_id','publication_hash','phase','core_review_key','core_review_digest']):raise WorkflowError('The actual publication review frontier changed during invocation preparation')
+
+
 def _hook_resolution_context(ctx,chain,attempt,purpose):
     result=deepcopy(ctx)
     if result.get('session_id'):result['clarification_session_id']=result.pop('session_id')
@@ -1854,6 +1861,11 @@ def _hook_transition(store,chain,attempt,receipt,after):
     if not isinstance(receipt,dict):raise WorkflowError('Hook incorporation requires actual ordinary core transition evidence')
     before=chain['context']
     if receipt.get('before')!=helper.digest(before) or receipt.get('after')!=helper.digest(after):raise WorkflowError('Core hook receipt differs from the exact before/after operation context')
+    if before.get('kind')=='review' and before.get('publication_id') and attempt.get('result',{}).get('status')=='findings' and (receipt.get('kind')!='core-incorporation' or receipt.get('publication_id')!=before['publication_id']):raise WorkflowError('Publication-bound review findings require actual ordinary publication contribution incorporation evidence')
+    if receipt.get('kind')=='core-incorporation' and before.get('kind')=='review' and receipt.get('publication_id'):
+        review=owned_module('skill_tree_review_incorporation',Path(__file__).with_name('pr-review-state.py'))
+        try:return review.verify_review_contribution(store,chain,attempt,receipt,after)
+        except ValueError as error:raise WorkflowError(str(error)) from error
     if receipt.get('kind')=='core-incorporation' and receipt.get('orchestration_id'):
         oid=receipt['orchestration_id']
         if oid!=before.get('orchestration_id') or oid!=after.get('orchestration_id'):raise WorkflowError('Core plan incorporation belongs to another original orchestration')
@@ -1952,6 +1964,7 @@ def _hook_action(store,command,payload,*,private_delivery_provider=None,private_
     if not isinstance(ctx,dict):raise WorkflowError('A typed current hook context is required')
     orchestration_id=payload.get('orchestration_id') or (locator or {}).get('orchestration_id') or ctx.get('orchestration_id')
     if orchestration_id:ctx['orchestration_id']=orchestration_id
+    if frame is None and ctx.get('kind')=='review' and payload.get('publication_id'):ctx['publication_id']=payload['publication_id']
     ctx=actual_hook_context(effective,ctx)
     run_locator=None
     if ctx.get('run_id'):
@@ -1995,11 +2008,12 @@ def _hook_action(store,command,payload,*,private_delivery_provider=None,private_
     if business:
         helper.guards(frame,normalized)
         helper.proof_check(frame,proof,context_value=ctx if cmd=='accept' else None);helper.require_business_admission(frame,proof)
+        _hook_review_frontier(effective,ctx,proof.get('guard') or {})
     if cmd=='invoke':
         original=frame['attempts'].get(payload.get('attempt_id'))
         if not original or payload.get('input_digest')!=original['input_digest']:raise WorkflowError('Hook dispatch does not match the original attempt input')
         if original['id']!=frame['prepared_attempt_id'] or original['status']!='prepared':raise WorkflowError('Only the original prepared attempt can begin invocation')
-        helper.attempt_sources(original,proof)
+        helper.attempt_sources(original,proof);helper.review_frontier(original,proof)
         private_request={**request,'package_root':str(package_root),'runtime_action':'delivery-data','chain_id':frame['id'],'attempt_id':original['id'],'binding_id':original['binding_id'],'public_input':original['input'],'input_digest':original['input_digest'],'mode':frame['mode'],'authority':frame['authority']}
         if 'private_secrets' in payload:private_request['private_secrets']=payload['private_secrets']
         if private_delivery_provider is None:delivery=_hook_node(package_root,private_request)
@@ -2010,6 +2024,9 @@ def _hook_action(store,command,payload,*,private_delivery_provider=None,private_
         private_input=delivery['payload']
         for key,expected in {'chain_id':frame['id'],'attempt_id':original['id'],'binding_id':original['binding_id'],'context':ctx,'event':proof['event'],'input_digest':original['input_digest'],'mode':frame['mode'],'authority':frame['authority']}.items():
             if private_input.get(key)!=expected:raise WorkflowError('The trusted private delivery differs from the original current invocation')
+        if private_input.get('invocation_policy')!=original['input'].get('invocation_policy'):raise WorkflowError('Private delivery differs from the sealed immutable invocation policy')
+        for key in ['allowed_tools','allowed_actions']:
+            if private_input.get(key)!=original['input'].get('execution_policy',{}).get(key):raise WorkflowError('Private delivery tools or actions differ from the original sealed execution policy')
         proof['delivery']={key:delivery[key] for key in ['input_digest','delivery_digest','resolved_parameter_digest']}
         if 'dispatch_identity' in delivery:proof['delivery']['dispatch_identity']=delivery['dispatch_identity']
     chain_id=frame['id'] if frame else 'HC-'+str(uuid.uuid5(uuid.NAMESPACE_URL,'skill-tree-invocation:'+normalized.get('request_id','')))
@@ -2027,6 +2044,7 @@ def _hook_action(store,command,payload,*,private_delivery_provider=None,private_
         elif normalized.get('expected_source_hash') is not None:raise WorkflowError('Hook queue context changed; reread before mutation')
         if actual_hook_context(effective,ctx)!=ctx:raise WorkflowError('The actual selected hook scope changed during preparation')
         frontier=proof.get('guard') or {}
+        _hook_review_frontier(effective,ctx,frontier)
         if frontier.get('orchestration_id'):
             core=owned_module('skill_tree_hook_orchestration_guard',Path(__file__).with_name('decision-orchestration.py')).read(effective,frontier['orchestration_id'])
             if core['orchestration_hash']!=frontier.get('orchestration_hash') or core['phase']!='plan-review' or not core['plan'] or core['plan']['digest']!=frontier.get('plan_digest') or core['plan_acceptance'] is not None:raise WorkflowError('The current draft-plan frontier changed during hook preparation')

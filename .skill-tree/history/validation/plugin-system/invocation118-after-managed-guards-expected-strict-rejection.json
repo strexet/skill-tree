@@ -1,0 +1,9 @@
+{
+  "qualification": "Expected strict current-source rejection of the immutable historical native report. This is not a passing native regrade.",
+  "actual_exit_code": 1,
+  "actual_error": "ValueError: An invocation source fingerprint is missing, stale or nonportable",
+  "actual_cli_behavior": "The validator raises ValueError on stale source fingerprints; no JSON success result is emitted.",
+  "analysis_sha256": "3eeebb11f8c6f2cb983efc21287859867f64617190300daabf7b7f04d4d18e00",
+  "committed_head": "57bbf013d08c2014aff87f379d2cd708063b81a6",
+  "harness_note": "An initial wrapper incorrectly expected structured JSON for a rejected validation. The retained raw invocation establishes the exact source-mismatch rejection; no validator or immutable report/capture/grade was modified."
+}

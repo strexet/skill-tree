@@ -1,0 +1,20 @@
+{
+  "kind": "validation-footprint-refinement",
+  "task_id": "T-18db6175-499f-4679-bf8d-f815c7b42411",
+  "added_sources": [
+    ".skill-tree/lib/plugin-runtime.js",
+    ".skill-tree/lib/plugin-composition.js",
+    ".skill-tree/common/scripts/plugin-hooks.js",
+    ".skill-tree/common/scripts/plugin-invocation.py",
+    ".skill-tree/common/scripts/workflow-state.py",
+    ".skill-tree/common/references/plugin-invocation.md",
+    ".skill-tree/config/resource-map.json",
+    ".skill-tree/tests/test-plugin-workflow.py",
+    ".skill-tree/tests/test-plugin-invocation-installation.js",
+    ".skill-tree/tests/fixtures/ponytail"
+  ],
+  "original_content_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+  "current_content_fingerprint": "f95f0f9f67330ae7ecd33441d79079cba3acdba9921ee62e0373d6652694eab3",
+  "retained_agreed_semantic_identity": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+  "reason": "Required concrete runtime/engine/phase-guard and raw-fixture inputs implement the already agreed optional report-only pilot contract; no additional behavior, dependency, root, criterion, recipe, assertion or publication authority. Current corrected plan receives actual significant resolver/critic acceptance before implementation."
+}

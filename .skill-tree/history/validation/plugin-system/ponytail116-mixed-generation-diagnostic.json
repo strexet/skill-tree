@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "classification": "Mixed-generation development diagnostic; not current source qualification.",
+  "result": "failed-diagnostic",
+  "actual_exit_code": 1,
+  "counts": {
+    "discovered": 33,
+    "failed": 1,
+    "errors": 2
+  },
+  "elapsed_seconds": 277.908,
+  "log": ".skill-tree/history/validation/plugin-system/ponytail116-mixed-generation-diagnostic.txt",
+  "sha256": "6edd1708aa50eb31b6bbbe9252db6d897cf3841786b8e8f8f464720a781ba2ca",
+  "limits": [
+    "Source implementation changed during the diagnostic; no passing receipt or source-identity claim follows.",
+    "The raw failure observations identify missing initial snapshot_key and stale references after a new review head; repaired behavior requires a fresh stable-source check."
+  ]
+}

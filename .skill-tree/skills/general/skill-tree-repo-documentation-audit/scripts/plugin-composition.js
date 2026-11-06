@@ -137,6 +137,12 @@ if context['kind']=='controller':
  run=runs.get(context['run_id'])
  if not run or set(context.get('task_ids',[]))-set(run.get('admitted_task_ids',run.get('snapshot',[]))+run.get('required_ids',[])):raise ValueError('The controller context exceeds the actual recorded run scope')
 proof={'kind':'actual-owned-scope'}
+if operation=='skill-tree-pr-review-cycle' and 'publication_id' in context:
+ review=w.owned_module('owned_plugin_review',Path(sys.argv[1]).with_name('pr-review-state.py'))
+ publication=review._review_path(s,context['publication_id']);original=capture(publication)
+ frontier=review.review_phase_guard(s,context,phase)
+ if original is None or frontier.get('publication_hash')!=hashlib.sha256(original).hexdigest():raise ValueError('The actual publication changed during review phase preparation')
+ proof.update(frontier)
 if operation=='skill-tree-implement-next-future-task' and phase=='during':
  identity=p.get('orchestration_id')
  if not identity:raise ValueError('Implementation During requires the current actual draft-plan orchestration frame')
@@ -150,7 +156,7 @@ for path,previous in watched.items():
 print(json.dumps(proof))`;
 function guardBoundary(packageRoot,request,operation,phase){
  if(typeof request.project_root!=='string'||!fs.existsSync(request.project_root)||!fs.statSync(request.project_root).isDirectory())fail('composition-context','An explicit existing execution project root is required');
- const context=bindings.validateContext(request.context),needsWorkflow=['pending','task','task-group','controller'].includes(context.kind)||operation===processOperation||operation===implementOperation;
+ const context=bindings.validateContext(request.context),needsWorkflow=['pending','task','task-group','controller'].includes(context.kind)||operation===processOperation||operation===implementOperation||operation==='skill-tree-pr-review-cycle'&&own(context,'publication_id');
  if(!needsWorkflow)return {kind:'task-free',context_kind:context.kind};
  const helper=registry.safe(packageRoot,'scripts/workflow-state.py');
  if(!fs.existsSync(helper))fail('composition-context','The local owned workflow helper closure is missing');
@@ -168,6 +174,7 @@ function prepareMetadata(packageRoot,payload,readiness){
  const base={bindings:selected.bindings,unresolved:selected.unresolved,prerequisites,event:selected.event,context:selected.context,configuration_digest:compiled.configuration_digest,boundary_id:location.boundary_id||null,invocation:'not-executed'};
  if(location.status!=='resolved'){prerequisites.push({code:'unresolved-anchor',reason:location.reason});return {...base,status:'prerequisite'};}
  if(!configured||!selected.bindings.length&&!selected.unresolved.length)return {...base,status:'noop'};
+ if(!readiness&&manifest.operation==='skill-tree-pr-review-cycle'&&selected.bindings.some(row=>own(manifest.packages[row.plugin_id].adaptation||{},'invocation_policy'))&&!own(selected.context,'publication_id'))fail('composition-context','The policy-bound review invocation requires the actual owned publication identity');
  const proof=readiness?null:catalog.boundaries[location.boundary_id].handler({...request,package_root:packageRoot});
  for(const item of selected.unresolved)prerequisites.push({code:'incompatible-binding',binding_id:item.id,reason:item.reason});
  const associated=associatedInstallation(packageRoot,request.project_root,verified),liveRegistry=registry.safe(request.project_root,registry.REGISTRY);

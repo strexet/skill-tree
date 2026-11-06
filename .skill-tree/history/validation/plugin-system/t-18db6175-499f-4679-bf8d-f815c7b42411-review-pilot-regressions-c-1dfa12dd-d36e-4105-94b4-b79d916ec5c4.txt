@@ -1,0 +1,17 @@
+..............................F.....
+======================================================================
+FAIL: test_plugin_cannot_satisfy_external_approval_or_owner_merge_authority (__main__.PluginReviewPilotTests.test_plugin_cannot_satisfy_external_approval_or_owner_merge_authority)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 763, in test_plugin_cannot_satisfy_external_approval_or_owner_merge_authority
+    self.assertEqual(self.cli('ready')['status'],'pr-ready')
+                     ^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 107, in cli
+    self.assertEqual(result.returncode,0 if ok else 2,result.stdout+result.stderr)
+AssertionError: 2 != 0 : {"ok": false, "error": "A configured enabled review occurrence is missing a unique explicitly attached current completed pass: ponytail-review-once"}
+
+
+----------------------------------------------------------------------
+Ran 36 tests in 334.423s
+
+FAILED (failures=1)

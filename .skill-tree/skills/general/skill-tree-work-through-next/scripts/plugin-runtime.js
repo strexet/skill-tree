@@ -59,6 +59,20 @@ function frozenPlan(packageRoot,payload,readiness){
 }
 function occurrencePlan(packageRoot,payload){return frozenPlan(packageRoot,businessRequest(payload),false);}
 function readinessPlan(packageRoot,payload){return frozenPlan(packageRoot,payload,true);}
+function requirementPlan(packageRoot,payload){
+ const request=clone(payload),{manifest}=composition.verifiedManifest(packageRoot),{configuration,compiled,catalog}=compiledConfiguration(manifest,request.run_overrides||{},request.execution_policy);
+ if(request.event?.operation!==manifest.operation)fail('runtime-operation','The requirement event differs from the composed operation');
+ return {configuration,proof:proofFor(packageRoot,manifest,request,configuration,compiled,catalog,true)};
+}
+function invocationPolicy(record){
+ const policy=record.adaptation?.invocation_policy;
+ if(policy===undefined)return undefined;
+ if(!object(policy)||policy.schema!==1||policy.context_lifetime!=='single-attempt'||policy.kind!=='report-only'||policy.require_context_end!==true||policy.fresh_context_per_attempt!==true)fail('runtime-policy','A supported isolated report-only invocation policy is required');
+ for(const key of ['allowed_tools','allowed_actions'])if(!Array.isArray(policy[key])||policy[key].some(value=>typeof value!=='string'||!value)||new Set(policy[key]).size!==policy[key].length)fail('runtime-policy','The immutable invocation policy requires distinct bounded tools and actions');
+ if(own(policy,'instructions')&&typeof policy.instructions!=='string')fail('runtime-policy','The immutable invocation policy instructions require text');
+ if(policy.allowed_actions.some(value=>value!=='return-proposals'))fail('runtime-policy','A review invocation cannot authorize writes or publication');
+ return clone(policy);
+}
 function resolvePrivate(value,resolver,secrets){
  if(object(value)&&Object.keys(value).length===1&&own(value,'$secret')){
   const name=value.$secret;if(typeof name!=='string'||!name||typeof resolver!=='function')fail('runtime-secret','A permitted invocation-context secret provider is required');
@@ -83,10 +97,12 @@ function deliveryData(packageRoot,payload,resolveSecret){
  const owned=composition.verifiedManifest(packageRoot),rebuilt=compiledConfiguration(owned.manifest,request.configuration.run_overrides||{},request.configuration.execution_policy);
  const deliverySelection=bindings.selectBindings(rebuilt.compiled,{...request.event,attempt_id:request.attempt_id},request.context),deliveryRow=deliverySelection.bindings.find(item=>item.id===row.id);
  if(!deliveryRow)fail('runtime-binding','The actual invocation occurrence is no longer selected');
- const record=request.configuration.packages[row.plugin_id],secrets=[];
+ const record=request.configuration.packages[row.plugin_id],secrets=[],invocation=invocationPolicy(record);
+ if(!same(invocation??null,input.invocation_policy??null))fail('runtime-policy','Private delivery differs from the sealed immutable invocation policy');
  const grant=clone(request.authority);if(!object(grant)||!same(grant,input.authority)||grant.context_id!==input.context?.id||!Array.isArray(grant.constraints)||!grant.constraints.length)fail('runtime-authority','The exact sealed bounded core authority must accompany private delivery');
  const policy=executionPolicy(request.configuration.execution_policy);
  if(!same(policy,input.execution_policy))fail('runtime-authority','Private delivery must retain the sealed allowed tools and actions');
+ if(invocation&&(['allowed_tools','allowed_actions'].some(key=>policy[key].some(value=>!invocation[key].includes(value)))))fail('runtime-policy','The effective tools or actions exceed the immutable report-only policy');
  if(!same(input.context,proof.context)||!same(input.event,proof.event)||input.chain_id!==request.chain_id||input.attempt_id!==request.attempt_id||input.binding_id!==row.id||input.configuration_digest!==request.configuration.configuration_digest)fail('runtime-input','Private delivery must retain the exact sealed occurrence and accepted context');
  if(request.execution_policy!==undefined&&!same(policy,executionPolicy(request.execution_policy)))fail('runtime-authority','Private delivery cannot replace the frozen allowed tools or actions');
  const values=resolvePrivate(row.effective.values,resolveSecret,secrets),options={run:{values,instructions:row.effective.instructions}};
@@ -95,6 +111,7 @@ function deliveryData(packageRoot,payload,resolveSecret){
  const dispatch=bindings.dispatchIdentity(deliveryRow,deliverySelection.event,deliverySelection.context,{configuration_digest:request.configuration.configuration_digest,parameters:resolved.values,extra_instructions:resolved.instructions});
  const data={dispatch_identity:dispatch,mechanism:'source-backed-context',provider:'codex',mode:input.mode,authority:grant,authority_digest:input.authority_digest,allowed_tools:policy.allowed_tools,allowed_actions:policy.allowed_actions,chain_id:request.chain_id,attempt_id:request.attempt_id,binding_id:row.id,event:clone(proof.event),plugin:{plugin_id:row.plugin_id,revision:record.revision,content_digest:record.content_digest,entry:record.entry,resource_digests:clone(record.files)},context:clone(proof.context),scope_source_snapshot:clone(input.scope_source_snapshot||{}),parameters:resolved.values,extra_instructions:resolved.instructions,input_digest:request.input_digest};
  if([data.chain_id,data.attempt_id].some(value=>typeof value!=='string'||!value))fail('runtime-input','The actual chain and original attempt identities are required');
+ if(invocation)data.invocation_policy=invocation;
  return {payload:data,dispatch_identity:dispatch,input_digest:request.input_digest,delivery_digest:digest(data),resolved_parameter_digest:resolved.digest,configuration_parameter_digest:row.effective.digest,contains_secrets:secrets.length>0};
 }
-module.exports={freezePlan,occurrencePlan,readinessPlan,deliveryData,canonical,digest};
+module.exports={freezePlan,occurrencePlan,readinessPlan,requirementPlan,deliveryData,canonical,digest};

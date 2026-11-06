@@ -1,0 +1,513 @@
+{
+  "classification": "Static compatibility analysis retaining historical actual observations at their original source; not a new actor run.",
+  "current_head": "f5e3734795b0f77bbd672ec8cdd8844730494438",
+  "current_workflow": {
+    "path": ".skill-tree/common/scripts/workflow-state.py",
+    "sha256": "76589e1dca50664128650f706ab413003039a1725b74f24ba2dcb9d9a622d029"
+  },
+  "format": "skill-tree-core127-static-source-compatibility",
+  "historical_observations": {
+    "native_capture_event_count": 24,
+    "qualification_limits": [
+      "Controlled adversarial critic establishes transport/arbitration, not spontaneous critique quality or comparative efficacy.",
+      "Scripted fixture-owner submissions establish no real-human approval.",
+      "Historical profile hashes, source hashes and captured role events remain original; no fresh current-source role invocation is claimed."
+    ],
+    "scenario_count": 3,
+    "scenarios": [
+      {
+        "captured_owned_profile_sha256": [
+          "406e0f1a0a0ff368290b5a8217c8626a1437ee7e3b48b2da8860aff6d0d31a4f"
+        ],
+        "context_kind": "request",
+        "labels": [
+          "final"
+        ],
+        "observation_count": 1,
+        "phases": [
+          "research"
+        ],
+        "scenario_id": "core-auto-significant",
+        "task_pending_run_session_fields": [],
+        "transitions": [
+          "start",
+          "question",
+          "prepare-actor",
+          "record-actor",
+          "accept-decision"
+        ]
+      },
+      {
+        "captured_owned_profile_sha256": [
+          "a884c10950c5f6b41d729c8a31cdceed0241317692ff7ec5ef8d7de87442abb2"
+        ],
+        "context_kind": "request",
+        "labels": [
+          "manual-wait",
+          "final"
+        ],
+        "observation_count": 2,
+        "phases": [
+          "research"
+        ],
+        "scenario_id": "core-manual",
+        "task_pending_run_session_fields": [],
+        "transitions": [
+          "start",
+          "question",
+          "prepare-actor",
+          "record-actor",
+          "accept-decision"
+        ]
+      },
+      {
+        "captured_owned_profile_sha256": [
+          "5c1d96535fa7520bd873cb57705c1326fba1833f236a57a53c0e082b63fe1f05"
+        ],
+        "context_kind": "request",
+        "labels": [
+          "original-pending",
+          "reconciled",
+          "switched",
+          "resumed",
+          "final"
+        ],
+        "observation_count": 5,
+        "phases": [
+          "research"
+        ],
+        "scenario_id": "core-switch-resume",
+        "task_pending_run_session_fields": [],
+        "transitions": [
+          "start",
+          "question",
+          "prepare-actor",
+          "reconcile-actor",
+          "switch-mode",
+          "resume",
+          "record-actor",
+          "accept-decision"
+        ]
+      }
+    ],
+    "state_observation_count": 8
+  },
+  "historical_provenance": {
+    "commit": "1fcbf1e1023810bd16ecc7b9d58c3713b5a67b1e",
+    "matches_immutable_capture": true,
+    "prior_artifact": ".skill-tree/artifacts/plugin-implementation/core127-after118-compatibility-analysis.json",
+    "prior_artifact_sha256": "811bff80b8aa7b94d28e62362ecd308ab45406a89e6b3db5d8f834bd60a224fc",
+    "prior_raw_source_matches_git_blob": true,
+    "workflow_git_blob": "c2ba084916970cf9e9222218658c5c51ac465e50",
+    "workflow_sha256": "791531838c16c1b362ade3b086e66dfb804da20c06b8828b0e71f251a08b0c5e"
+  },
+  "immutable_historical_artifacts": {
+    ".skill-tree/history/validation/plugin-system/core127-native/capture.json": "65475548db6a70be601c337dd89ae6c7bddf545e0017eac053865ff8dc7e70b8",
+    ".skill-tree/history/validation/plugin-system/core127-native/grade.json": "19051bb3ebbde34778178ab8143791a90518cd78bcc54e2b2453ae03de16c95c",
+    ".skill-tree/history/validation/plugin-system/core127-native/qualification.json": "bb9feadfef705d7d50ca60b3463b4dc3247eebd1f2ad5fc790791867f75586a9",
+    ".skill-tree/history/validation/plugin-system/core127-native/report.json": "56f43d1e35d3d5381b0866f026c4517ce90017153faf703c5604b12656c5be99"
+  },
+  "operations_not_performed": [
+    "No tests or native/provider calls.",
+    "No queue/controller/profile/installed/source edits.",
+    "No historical capture/report/grade/qualification modification.",
+    "No scheduling, publication, push or commit."
+  ],
+  "schema": 1,
+  "selected_adapter_closure": {
+    "cli": {
+      "command_sets": {
+        "CLARIFICATION_COMMANDS": {
+          "current_ast_sha256": "6b53794b12d2c488f485bbafb55d6310f0f2293b8de4a9687edbf991685498ea",
+          "historical_ast_sha256": "6b53794b12d2c488f485bbafb55d6310f0f2293b8de4a9687edbf991685498ea",
+          "identical": true
+        },
+        "DECISION_COMMANDS": {
+          "current_ast_sha256": "5240e89793566b934437e55dfdcba8c1ac31cdd95249180114f0b31b02921c1b",
+          "historical_ast_sha256": "5240e89793566b934437e55dfdcba8c1ac31cdd95249180114f0b31b02921c1b",
+          "identical": true
+        },
+        "ORCHESTRATION_COMMANDS": {
+          "current_ast_sha256": "1a86fec0481210594f637acb61fb0e85b076d1397748fb74c49397da8ab977d5",
+          "historical_ast_sha256": "1a86fec0481210594f637acb61fb0e85b076d1397748fb74c49397da8ab977d5",
+          "identical": true
+        }
+      },
+      "new_hook_route": "Disjoint hook- command names; selected core route bodies remain exact. Non-hook output retains the original dump() branch.",
+      "selected_bodies": {
+        "cmd in DECISION_COMMANDS": {
+          "current_body_ast_sha256": "a6312b18cc459ed9c6d53d6fa5d0cc83da98a9dd4b50d3f676ff52b240fbe23f",
+          "historical_body_ast_sha256": "a6312b18cc459ed9c6d53d6fa5d0cc83da98a9dd4b50d3f676ff52b240fbe23f",
+          "identical": true
+        },
+        "cmd in ORCHESTRATION_COMMANDS": {
+          "current_body_ast_sha256": "ad745de17b7b9263730b565397e3dbfa9594b4165d23c5ce534c9514638bc445",
+          "historical_body_ast_sha256": "ad745de17b7b9263730b565397e3dbfa9594b4165d23c5ce534c9514638bc445",
+          "identical": true
+        }
+      }
+    },
+    "decision_action": "AST-identical to the historically captured source; its unchanged decision_helper call now uses the reviewed owned loader.",
+    "decision_context_guard": "AST-identical. All captured contexts are request contexts without session/task/Pending/controller identities; only DG context validation runs, not task/CL/controller or hook admission paths.",
+    "decision_helper": {
+      "current_ast_sha256": "50dcb35f533debda5040372926b93b591e314f3dba585316f3b72e9e6aa9ed83",
+      "delta": "Importlib cache-based module execution becomes validated owned source execution; DG bytes remain exactly historical.",
+      "historical_ast_sha256": "e5f799d55d51e901339decbb8468de0082393aa53b579cb4e967a6eb407c487d",
+      "relative_module": "decision-governance.py"
+    },
+    "module_initializers": "New hook functions, command sets and mutable-source tuples are definitions/data only. run-workspaces remains the same relative module; owned_module performs read/hash/compile checks and restores interpreter cache settings. No new Node/provider call is added to module initialization.",
+    "orchestration_action": {
+      "changed_success_path": "The same relative byte-identical DO module is executed through owned inventory validation and source-only loading.",
+      "current_loader_statement_count": 1,
+      "current_remaining_ast_sha256": "82dabcbf7228fc557dae54973fca3f15dd653a62d76576f13a8d5a510d4014d7",
+      "historical_loader_statement_count": 3,
+      "historical_remaining_ast_sha256": "82dabcbf7228fc557dae54973fca3f15dd653a62d76576f13a8d5a510d4014d7",
+      "remaining_body_identical": true
+    },
+    "owned_module": {
+      "current_ast_matches_633e716": true,
+      "current_ast_sha256": "0167b7a9cebc88069087d40587abb0845da1bad81b90129beba7b273548813bb",
+      "introduced_by_reviewed118": true,
+      "middle_source_sha256": "57383709635e780c6d207834fba5396583f1ecfe86ac2456380fabf755b6a68b",
+      "requirements": "Valid current composed inventory and owned activation. Failure behavior for tamper/bytecode drift is intentionally stricter; no equivalence claim for invalid installations."
+    },
+    "run_workspaces": "Byte-identical to reviewed633e716. Historical1f difference is validate_registry plus register_hook_reference/validate_hook_references; canonical/runtime/runtime_file/common_dir/git ASTs remain historical. Request-only neutral Store construction does not call run registry validation or hook registration."
+  },
+  "source_modules": {
+    "common/references/decision-governance.md": {
+      "byte_identical": true,
+      "current_sha256": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+      "historical_git_blob": "b94bd55556a14533cd772422dd1230c925318372",
+      "historical_git_commit": "1fcbf1e1023810bd16ecc7b9d58c3713b5a67b1e",
+      "historical_sha256": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3"
+    },
+    "common/references/validation-policy.md": {
+      "byte_identical": true,
+      "current_sha256": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+      "historical_git_blob": "8c53b66360bf81ec559487189a573a481da01ca0",
+      "historical_git_commit": "1fcbf1e1023810bd16ecc7b9d58c3713b5a67b1e",
+      "historical_sha256": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7"
+    },
+    "common/scripts/decision-governance.py": {
+      "added_ast_functions": [],
+      "byte_identical": true,
+      "changed_shared_ast_functions": [],
+      "current_sha256": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+      "historical_git_blob": "4092dd37edab8bebc70dc9d51bb22a7f45d29755",
+      "historical_git_commit": "1fcbf1e1023810bd16ecc7b9d58c3713b5a67b1e",
+      "historical_sha256": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286"
+    },
+    "common/scripts/decision-orchestration.py": {
+      "added_ast_functions": [],
+      "byte_identical": true,
+      "changed_shared_ast_functions": [],
+      "current_sha256": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+      "historical_git_blob": "0de8a0a1fa5d4f26a9bf48034e4ed82f686a9838",
+      "historical_git_commit": "1fcbf1e1023810bd16ecc7b9d58c3713b5a67b1e",
+      "historical_sha256": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145"
+    },
+    "common/scripts/run-workspaces.py": {
+      "added_ast_functions": [
+        "register_hook_reference",
+        "validate_hook_references"
+      ],
+      "byte_identical": false,
+      "changed_shared_ast_functions": [
+        "validate_registry"
+      ],
+      "current_sha256": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+      "historical_git_blob": "5389d2752baadacb315e2e446e65e7aae4648a00",
+      "historical_git_commit": "1fcbf1e1023810bd16ecc7b9d58c3713b5a67b1e",
+      "historical_sha256": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac"
+    },
+    "common/scripts/validate-document-rules.py": {
+      "added_ast_functions": [],
+      "byte_identical": true,
+      "changed_shared_ast_functions": [],
+      "current_sha256": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+      "historical_git_blob": "ec6c4c90833f0999bcfd90260234ec3820b1299d",
+      "historical_git_commit": "1fcbf1e1023810bd16ecc7b9d58c3713b5a67b1e",
+      "historical_sha256": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7"
+    },
+    "common/scripts/workflow-state.py": {
+      "added_ast_functions": [
+        "Store.expect_unchanged",
+        "_hook_action",
+        "_hook_admission",
+        "_hook_admission_inputs",
+        "_hook_admission_key",
+        "_hook_admission_selection",
+        "_hook_admitted_context",
+        "_hook_admitted_pending_context",
+        "_hook_context_links",
+        "_hook_controller",
+        "_hook_inventory_guard",
+        "_hook_locator",
+        "_hook_locator_path",
+        "_hook_mutable_source",
+        "_hook_node",
+        "_hook_pending_admission",
+        "_hook_policy_guard",
+        "_hook_register",
+        "_hook_resolution_context",
+        "_hook_safe",
+        "_hook_scope_matches",
+        "_hook_scope_source_guard",
+        "_hook_scope_source_hash",
+        "_hook_scope_sources",
+        "_hook_source_store",
+        "_hook_supersession",
+        "_hook_transition",
+        "_hook_watch",
+        "_hook_watch_guard",
+        "_start_selection",
+        "actual_hook_context",
+        "hook_action",
+        "hook_admission",
+        "hook_helper",
+        "hook_pending_admission",
+        "owned_module",
+        "prepare_hook_admission"
+      ],
+      "byte_identical": false,
+      "changed_shared_ast_functions": [
+        "Store.commit",
+        "Store.lock",
+        "advance",
+        "assert_prose",
+        "clarification_admission",
+        "clarification_revise",
+        "complete",
+        "decision_helper",
+        "finish",
+        "main",
+        "orchestration_action",
+        "process",
+        "start"
+      ],
+      "current_sha256": "76589e1dca50664128650f706ab413003039a1725b74f24ba2dcb9d9a622d029",
+      "historical_git_blob": "c2ba084916970cf9e9222218658c5c51ac465e50",
+      "historical_git_commit": "1fcbf1e1023810bd16ecc7b9d58c3713b5a67b1e",
+      "historical_sha256": "791531838c16c1b362ade3b086e66dfb804da20c06b8828b0e71f251a08b0c5e"
+    }
+  },
+  "status": "CONDITIONAL-awaiting-final-current-checks-owned-activation-and-controller-selection",
+  "store_delta_proof": {
+    "Store.commit": {
+      "conditional_inertness": "The list is empty after the actual Store.lock initialization and no historical reached request-only branch registers a hook admission. The new loop is therefore vacuous, not merely AST-equivalent. No Node/private provider/policy callback or HC work runs through this loop. DG/DO writes target decision files rather than navigation manifest; transaction write construction, CAS, journal/recovery and hashes remain exact historical AST after removing these guarded additions.",
+      "current_ast_sha256": "bf048ed1092412383eff06f1f774e01baa50e88b8f01c7bcf0606e4698796f90",
+      "historical_ast_sha256": "7fb97b6bcdbbec53b1b3923b27f89958893b9099a775bef903de3a28b6667bc5",
+      "normalized_current_ast_sha256": "7fb97b6bcdbbec53b1b3923b27f89958893b9099a775bef903de3a28b6667bc5",
+      "normalized_equals_historical": true,
+      "reviewed_deltas": [
+        "Read _hook_active_admissions and compute navigation-only follow-up flag.",
+        "Iterate active admissions to call pure _hook_admission checks.",
+        "Mark business committed only when admissions is nonempty."
+      ]
+    },
+    "Store.lock": {
+      "conditional_inertness": "Historical request-only DG/DO transitions call no hook_admission/preflight/register path. The actual lock initializes an empty admission list for every metadata transition; role helpers never append to that list. Extra HC CAS inventory does not create an HC or a Future queue.",
+      "current_ast_sha256": "f4da8bf5775487f21bb8c5c71aab7ee3aeea35b74db04d7518719d73c658a8b6",
+      "historical_ast_sha256": "9f37925501c7720c636f608a5cae819b889fb20dcad60da92f30d74844fddf1c",
+      "normalized_current_ast_sha256": "9f37925501c7720c636f608a5cae819b889fb20dcad60da92f30d74844fddf1c",
+      "normalized_equals_historical": true,
+      "reviewed_deltas": [
+        "Invocation metadata is added to the CAS read inventory.",
+        "Each actual Store.lock entry initializes _writer_active=True, _hook_active_admissions=[], _hook_business_committed=False.",
+        "Lock exit resets writer flag, preflight cache and active admission list."
+      ]
+    },
+    "new_expect_unchanged": "Additional callable method is not invoked by historical DG/DO paths; original decision CAS remains in the unchanged transaction body.",
+    "unchanged_store_methods": [
+      "Store.__init__",
+      "Store.owned",
+      "Store.recover",
+      "Store.replace",
+      "Store.guard",
+      "Store.load"
+    ]
+  },
+  "verdict": {
+    "fresh_actor_trigger": "Any newly discovered change in reachable role routing, sealed envelope, predecessor, mode/authority or acceptance behavior, or an explicit current-native acceptance requirement, requires an actual bounded controlled role run rather than this static argument.",
+    "fresh_current_native_role_qualification": false,
+    "reason": "DG/DO role routing, envelopes, predecessor material, mode/authority and acceptance logic are byte-identical. Reached WF adapter tails and context guards are exact; changed loader/Store success paths are explicitly bounded and conditionally inert for the captured request-only flows. No historical capture or raw source fingerprint is relabeled as current.",
+    "required_conditions": [
+      "Pass current required core127 unit, copied standalone, parent-adapter and oracle checks against the final source footprint.",
+      "Pass current managed-guard/invocation/owned-loader checks on the exact final composed source; earlier historical or intermediate Greens are not substituted.",
+      "Activate the reviewed owned snapshot with canonical queue/history preservation and explicit re-admission.",
+      "Select the completed core127 dependency through the existing controller revalidation contract before recording acceptance.",
+      "Keep the native validator strict: historical WF fingerprint mismatch must not be rewritten or accepted as a current-source native capture."
+    ],
+    "static_compatibility_supported": true
+  },
+  "workflow_ast": {
+    "all_added_functions": [
+      "Store.expect_unchanged",
+      "_hook_action",
+      "_hook_admission",
+      "_hook_admission_inputs",
+      "_hook_admission_key",
+      "_hook_admission_selection",
+      "_hook_admitted_context",
+      "_hook_admitted_pending_context",
+      "_hook_context_links",
+      "_hook_controller",
+      "_hook_inventory_guard",
+      "_hook_locator",
+      "_hook_locator_path",
+      "_hook_mutable_source",
+      "_hook_node",
+      "_hook_pending_admission",
+      "_hook_policy_guard",
+      "_hook_register",
+      "_hook_resolution_context",
+      "_hook_safe",
+      "_hook_scope_matches",
+      "_hook_scope_source_guard",
+      "_hook_scope_source_hash",
+      "_hook_scope_sources",
+      "_hook_source_store",
+      "_hook_supersession",
+      "_hook_transition",
+      "_hook_watch",
+      "_hook_watch_guard",
+      "_start_selection",
+      "actual_hook_context",
+      "hook_action",
+      "hook_admission",
+      "hook_helper",
+      "hook_pending_admission",
+      "owned_module",
+      "prepare_hook_admission"
+    ],
+    "all_changed_shared_functions": [
+      "Store.commit",
+      "Store.lock",
+      "advance",
+      "assert_prose",
+      "clarification_admission",
+      "clarification_revise",
+      "complete",
+      "decision_helper",
+      "finish",
+      "main",
+      "orchestration_action",
+      "process",
+      "start"
+    ],
+    "current_exact_in_prior_set": 21,
+    "prior_22_function_set_rechecked": {
+      "Store.__init__": {
+        "current_ast_sha256": "ee7b380e33094b42d3b05b175966ecf827a402208d00988285c19a836b55c8ec",
+        "historical_ast_sha256": "ee7b380e33094b42d3b05b175966ecf827a402208d00988285c19a836b55c8ec",
+        "identical": true
+      },
+      "Store.commit": {
+        "current_ast_sha256": "bf048ed1092412383eff06f1f774e01baa50e88b8f01c7bcf0606e4698796f90",
+        "historical_ast_sha256": "7fb97b6bcdbbec53b1b3923b27f89958893b9099a775bef903de3a28b6667bc5",
+        "identical": false
+      },
+      "Store.guard": {
+        "current_ast_sha256": "f8977c7d46bac3b5ca1349304e45197a2eb66b05727c1c6ce2d7a33f5c0c1c71",
+        "historical_ast_sha256": "f8977c7d46bac3b5ca1349304e45197a2eb66b05727c1c6ce2d7a33f5c0c1c71",
+        "identical": true
+      },
+      "Store.load": {
+        "current_ast_sha256": "83470c2be086353d8e60e8be333d11993586364274f13d315408d5407f0b7cca",
+        "historical_ast_sha256": "83470c2be086353d8e60e8be333d11993586364274f13d315408d5407f0b7cca",
+        "identical": true
+      },
+      "Store.owned": {
+        "current_ast_sha256": "b9da6caf8c2efe4737bbc00c088ce20c982d3269f53c0a156f9277abb6b924f8",
+        "historical_ast_sha256": "b9da6caf8c2efe4737bbc00c088ce20c982d3269f53c0a156f9277abb6b924f8",
+        "identical": true
+      },
+      "Store.recover": {
+        "current_ast_sha256": "48e9cbc080c7ab6677533a80b4dbb08bae36c695e5d54ac6d3ba705b0f4e13cd",
+        "historical_ast_sha256": "48e9cbc080c7ab6677533a80b4dbb08bae36c695e5d54ac6d3ba705b0f4e13cd",
+        "identical": true
+      },
+      "Store.replace": {
+        "current_ast_sha256": "d3722f276bd0134e1d3c077b390d35dac86879d7c6e56fb8757891a40dc59e7a",
+        "historical_ast_sha256": "d3722f276bd0134e1d3c077b390d35dac86879d7c6e56fb8757891a40dc59e7a",
+        "identical": true
+      },
+      "clarification_answer_evidence": {
+        "current_ast_sha256": "171685cfe72fff30c51e07b27ced64630fb74fa2bf72ba4b2d34be0edb31b1e5",
+        "historical_ast_sha256": "171685cfe72fff30c51e07b27ced64630fb74fa2bf72ba4b2d34be0edb31b1e5",
+        "identical": true
+      },
+      "clarification_decision_context": {
+        "current_ast_sha256": "ee0ca3bee1aac62e58cc5c6db874d30d71b219751a2cebf3d3401ad1904e1c7a",
+        "historical_ast_sha256": "ee0ca3bee1aac62e58cc5c6db874d30d71b219751a2cebf3d3401ad1904e1c7a",
+        "identical": true
+      },
+      "clarification_decision_policy": {
+        "current_ast_sha256": "8937c3b2a9ac3980d92cef2473e3eed794b323e60d19736f36ee353d167db842",
+        "historical_ast_sha256": "8937c3b2a9ac3980d92cef2473e3eed794b323e60d19736f36ee353d167db842",
+        "identical": true
+      },
+      "clarification_evidence": {
+        "current_ast_sha256": "d85cf9fcf03d4de496936a7398dc44003dde0a881a1d864632a23130641c6adf",
+        "historical_ast_sha256": "d85cf9fcf03d4de496936a7398dc44003dde0a881a1d864632a23130641c6adf",
+        "identical": true
+      },
+      "clarification_mutate": {
+        "current_ast_sha256": "c3d71b3d927455f219a099fa998ef9a740f021c874305a7ef429aceb7af53356",
+        "historical_ast_sha256": "c3d71b3d927455f219a099fa998ef9a740f021c874305a7ef429aceb7af53356",
+        "identical": true
+      },
+      "clarification_read": {
+        "current_ast_sha256": "fb78490224da396a3785da9ee11a2b25120b2c719a55d91fb1f1ed4351b5e708",
+        "historical_ast_sha256": "fb78490224da396a3785da9ee11a2b25120b2c719a55d91fb1f1ed4351b5e708",
+        "identical": true
+      },
+      "decision_action": {
+        "current_ast_sha256": "7732aef60ec38d1f2a553f052320da1402000957d470d77203ae0a99e05a25ec",
+        "historical_ast_sha256": "7732aef60ec38d1f2a553f052320da1402000957d470d77203ae0a99e05a25ec",
+        "identical": true
+      },
+      "decision_context_guard": {
+        "current_ast_sha256": "79e9fe2e4d19543df677a2f2d1f6aba6a39b9de28474d58cfcb1d1236232aeb3",
+        "historical_ast_sha256": "79e9fe2e4d19543df677a2f2d1f6aba6a39b9de28474d58cfcb1d1236232aeb3",
+        "identical": true
+      },
+      "digest": {
+        "current_ast_sha256": "c26444e3b9e5b3416d9e8a05e620f1bc78ea784ece561d00bb60721757cb82b3",
+        "historical_ast_sha256": "c26444e3b9e5b3416d9e8a05e620f1bc78ea784ece561d00bb60721757cb82b3",
+        "identical": true
+      },
+      "dump": {
+        "current_ast_sha256": "c232f3eb0bc33fce3d248234bb784c39b9d343f3e0a5b366d721bca81e970b45",
+        "historical_ast_sha256": "c232f3eb0bc33fce3d248234bb784c39b9d343f3e0a5b366d721bca81e970b45",
+        "identical": true
+      },
+      "file_hash": {
+        "current_ast_sha256": "54365fa1671a9bb47a76efcc108fc5bfff86e05a22bb4ba7983fdb9d76c7cd5d",
+        "historical_ast_sha256": "54365fa1671a9bb47a76efcc108fc5bfff86e05a22bb4ba7983fdb9d76c7cd5d",
+        "identical": true
+      },
+      "now": {
+        "current_ast_sha256": "0821e5547e33e30630380f395c75e3500724b22f7503542276fd6b766cc36e0f",
+        "historical_ast_sha256": "0821e5547e33e30630380f395c75e3500724b22f7503542276fd6b766cc36e0f",
+        "identical": true
+      },
+      "orchestration_execution_snapshot": {
+        "current_ast_sha256": "24fe42da31a5261376caefb9e20a1d450dc457732e2dbaa8c5697288231d0e3b",
+        "historical_ast_sha256": "24fe42da31a5261376caefb9e20a1d450dc457732e2dbaa8c5697288231d0e3b",
+        "identical": true
+      },
+      "valid_id": {
+        "current_ast_sha256": "3240d1adfa103b581dc4b57ae787155eefaacf6070d9d0eb5a2f841cb83ccccd",
+        "historical_ast_sha256": "3240d1adfa103b581dc4b57ae787155eefaacf6070d9d0eb5a2f841cb83ccccd",
+        "identical": true
+      },
+      "validate_run": {
+        "current_ast_sha256": "f9813684b42969b8cbe91bc14d7a57c7827f2b1cad6e4d1cae107972fa791b5f",
+        "historical_ast_sha256": "f9813684b42969b8cbe91bc14d7a57c7827f2b1cad6e4d1cae107972fa791b5f",
+        "identical": true
+      }
+    },
+    "prior_exact_count": 22
+  }
+}

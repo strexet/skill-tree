@@ -1,0 +1,49 @@
+{
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-orchestration-adapters.py"
+  ],
+  "attempt_id": "C-11cc5ef5-4504-4924-87f2-3070e903cc3a",
+  "check_id": "decision-parent-adapters",
+  "counts": {
+    "discovered": 6,
+    "expected": 6,
+    "failed": 0,
+    "passed": 6,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-43931d2c-5bb5-4eca-8ba8-069c503b2cda-decision-parent-adapters-c-11cc5ef5-4504-4924-87f2-3070e903cc3a.txt",
+  "result": "pass",
+  "reviewed_failure_reason": null,
+  "source_fingerprints": {
+    ".skill-tree/bin/install.js": "f322a379cd0f5846645d0e77cb6ac1bf36f4b479fa3ee9cbc5333e1714d6aa5f",
+    ".skill-tree/common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+    ".skill-tree/common/references/development-practices.md": "47402db618635e221d3e3944cb0f2dc88238e278a6e2c49f49491ce98e24fc14",
+    ".skill-tree/common/references/orchestration.md": "79313308e0b2f1833ab131ffd2b2c5fed4f18163b26b682f9234b17f285f8ca5",
+    ".skill-tree/common/references/workflow-metadata.md": "47b832b8378cd837b7f8f9d86e5ad1de6d27630bc913dbe8b887d0c7fed32810",
+    ".skill-tree/common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    ".skill-tree/common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+    ".skill-tree/common/scripts/pr-review-state.py": "547be66447fb14280a021661af1b7207b34ab07eb2e6c8bd5af7ec37a2779d16",
+    ".skill-tree/common/scripts/run-workspaces.py": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+    ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+    ".skill-tree/common/scripts/workflow-state.py": "76589e1dca50664128650f706ab413003039a1725b74f24ba2dcb9d9a622d029",
+    ".skill-tree/config/resource-map.json": "95a4922b2331416863100c9b054e84709bafd4126c1542a15fac49781da13248",
+    ".skill-tree/documents/implementation-plan.md": "d53373bb753c92ba770aca2af1d9dd4bea586888de5aa5320b454a2e056e84e1",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "2bc848663455a1c9fcf682c5fa50dfe4a0e1f19de8421223265cb80845dbbcad",
+    ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+    ".skill-tree/lib/installation.js": "efb88bc5a28246aab36c7d1cb709f5ec4fb37dc736867c3533503e74c26fa431",
+    ".skill-tree/scripts/agent-conformance.py": "0f7a79a83e69aad8c8f3a5c4d063b94616f1c6d786f0e13cc3027dee3401f49e",
+    ".skill-tree/templates/invariants.json": "5a147a9ee4297250a6604f6a447fa10b57b9b94f3942044a9135790ce9c64b48",
+    ".skill-tree/templates/operations.json": "30f8c0d2dd6d067496485cdcc3050697ebed3a4462bf259f4fc7d5a6279422e6",
+    ".skill-tree/tests/test-decision-conformance.py": "61f6a39d65dd54978b5a260268a653d87f8efc1fc6662571731fccd7c8a95cdf",
+    ".skill-tree/tests/test-decision-governance-installation.js": "eec5260b4fbb28a04d86361e81c35813eaf3d75f18c4f1524a1cf7269157ac83",
+    ".skill-tree/tests/test-decision-orchestration.py": "fc2ba0b10bc3511e2d7dbbc890abe5664a7c7d11c9dcf3c07fc8d6623afba1ea",
+    ".skill-tree/tests/test-orchestration-adapters.py": "2e1daa5f407445459068ec0af110c6be4995cd525b7ce02e32e69d20f3aeb26f"
+  },
+  "task_id": "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda",
+  "tool_wall_seconds": 4.244056332856417
+}

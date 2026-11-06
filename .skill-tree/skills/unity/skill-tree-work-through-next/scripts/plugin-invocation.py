@@ -134,7 +134,7 @@ def raw(store,chain_id):
     try:
         contents=path.read_bytes();value=json.loads(contents)
     except (OSError,ValueError) as error:raise InvocationError('Unreadable invocation chain') from error
-    require(isinstance(value,dict) and value.get('schema')==1 and value.get('id')==chain_id and value.get('chain_hash')==digest({key:item for key,item in value.items() if key!='chain_hash'}),'Unsupported or modified invocation chain')
+    require(isinstance(value,dict) and type(value.get('schema')) is int and value['schema']==1 and value.get('id')==chain_id and value.get('chain_hash')==digest({key:item for key,item in value.items() if key!='chain_hash'}),'Unsupported or modified invocation chain')
     require(type(value.get('revision')) is int and value['revision']>0 and value.get('state') in {'active','blocked','complete','superseded'},'Invalid invocation revision or state')
     require({'context','initial_context','authority','mode','executor','event','configuration','execution_snapshot','stages','attempts','cursor','prepared_attempt_id','history'}<=set(value),'Invocation metadata lacks required state fields')
     require(isinstance(value['history'],list),'Invocation history must be retained')
@@ -315,6 +315,33 @@ def producer(value,kind,who,mechanism=False):
     return clone(value)
 
 
+def invocation_policy(package):
+    value=package.get('adaptation',{}).get('invocation_policy')
+    if value is None:return None
+    require(isinstance(value,dict) and type(value.get('schema')) is int and value['schema']==1 and value.get('context_lifetime')=='single-attempt' and value.get('kind')=='report-only' and value.get('fresh_context_per_attempt') is True and value.get('require_context_end') is True,'A supported immutable isolated invocation policy is required')
+    for key in ['allowed_tools','allowed_actions']:require(isinstance(value.get(key),list) and all(text(item) for item in value[key]) and len(value[key])==len(set(value[key])),'Immutable invocation policy requires bounded tools and actions')
+    require('instructions' not in value or isinstance(value['instructions'],str),'Immutable invocation policy instructions must be text')
+    require(all(item=='return-proposals' for item in value['allowed_actions']),'Report-only invocations cannot authorize writes or publication')
+    return clone(value)
+
+
+def review_frontier(attempt,proof):
+    original=attempt['input'].get('review_frontier')
+    if original is None:return
+    current=proof.get('guard') or {}
+    require(all(current.get(key)==value for key,value in original.items()),'The actual core review frontier changed; reconcile the original review attempt')
+
+
+def context_end(attempt,value):
+    policy=attempt['input'].get('invocation_policy')
+    if policy is None:return None
+    require(isinstance(value,dict),'Matching host-observed context-end evidence is required')
+    ended=producer(value,'host-context-ended',attempt['actor'])
+    require(ended['provider']==attempt['creation_evidence']['provider'] and ended.get('state')=='ended','The original host must observe the invocation context end')
+    require(ended.get('attempt_id')==attempt['id'] and all(ended.get(key)==attempt.get(key) for key in ['input_digest','delivery_digest']),'Context end belongs to another invocation input or delivery')
+    return ended
+
+
 def prepare(chain,payload,proof):
     proof_check(chain,proof);require(not chain['authority'].get('revoked'),'The bounded invocation authority has been revoked');require(not current_attempt(chain),'Reconcile or accept the original occurrence before preparing another attempt')
     require_business_admission(chain,proof)
@@ -326,12 +353,21 @@ def prepare(chain,payload,proof):
     if chain['cursor']==len(rows):chain['state']='complete';return {'skipped_to_completion':True}
     row=rows[chain['cursor']];who=actor(payload.get('actor'));require(who['id']!=chain['executor']['id'] and who['context_id']!=chain['executor']['context_id'],'Source-backed invocation requires an isolated actor context')
     require(not any(item['index']!=chain['cursor'] and (item['actor']['id']==who['id'] or item['actor']['context_id']==who['context_id']) for item in chain['attempts'].values()),'A separate binding occurrence requires an isolated invocation lifetime')
+    policy=invocation_policy(chain['configuration']['packages'][row['plugin_id']])
+    if policy:
+        if chain['context']['kind']=='review':require(text(chain['context'].get('publication_id')),'An actual publication is required for the isolated review policy')
+        require(not any(item['actor']['id']==who['id'] or item['actor']['context_id']==who['context_id'] for item in chain['attempts'].values()),'The immutable policy requires a fresh isolated actor for every attempt')
+        execution=chain['configuration'].get('execution_policy',{})
+        require(all(all(value in policy[key] for value in execution.get(key,[])) for key in ['allowed_tools','allowed_actions']),'Execution tools or actions exceed immutable report-only policy')
     created=producer(payload.get('creation_evidence'),'host-agent-created',who)
     boundary=chain['event'].get('boundary_id',chain['event']['operation']+':'+chain['event']['anchor']);lineage=clone(chain['initial_lineage']);require(len(lineage)<64 and all(isinstance(item,dict) and text(item.get('binding_id')) and text(item.get('boundary_id')) for item in lineage),'Active invocation lineage is invalid')
     require(not any(item['binding_id']==row['id'] and item['boundary_id']==boundary for item in lineage),'Recursive re-entry of the same active occurrence is forbidden');lineage.append({'binding_id':row['id'],'boundary_id':boundary})
     original='HI-'+str(uuid.uuid4());package={'plugin_id':row['plugin_id'],**clone(chain['configuration']['packages'][row['plugin_id']])}
     sealed={'chain_id':chain['id'],'attempt_id':original,'binding_id':row['id'],'index':chain['cursor'],'event':clone(chain['event']),'context':clone(chain['context']),'configuration_digest':chain['configuration']['configuration_digest'],'mode':chain['mode'],'epoch':chain['epoch'],'execution_snapshot_digest':digest(chain['execution_snapshot']),'authority_digest':digest(chain['authority']),'authority':clone(chain['authority']),'scope_source_snapshot':scope_snapshot(proof.get('scope_source_snapshot',{})),'package_identity':package,'parameters':clone(row['effective']['values']),'extra_instructions':row['effective']['instructions'],'parameter_digest':row['effective']['digest'],'lineage':lineage}
     if 'execution_policy' in chain['configuration']:sealed['execution_policy']=clone(chain['configuration']['execution_policy'])
+    if policy:sealed['invocation_policy']=policy
+    frontier=proof.get('guard') or {}
+    if frontier.get('publication_id'):sealed['review_frontier']={key:clone(frontier.get(key)) for key in ['publication_id','phase','core_review_key','core_review_digest']}
     attempt={'id':original,'index':chain['cursor'],'binding_id':row['id'],'status':'prepared','actor':who,'creation_evidence':created,'invoke_evidence':None,'result_evidence':None,'input':sealed,'input_digest':digest(sealed),'delivery_digest':None,'resolved_parameter_digest':None,'result':None}
     chain['attempts'][original]=attempt;stage=chain['stages'][chain['cursor']];stage['attempt_ids'].append(original);stage['status']='prepared';chain['prepared_attempt_id']=original;chain['state']='active';return {'attempt_id':original}
 
@@ -353,7 +389,7 @@ def mutate(store,command,payload,*,proof=None,verify_transition=None,guard=None)
             proof_check(chain,proof,context_value=accepted);require_business_admission(chain,proof)
         if command=='prepare':detail=prepare(chain,payload,proof)
         elif command=='invoke':
-            proof_check(chain,proof);attempt=exact_attempt(chain,payload);attempt_sources(attempt,proof);require(attempt['id']==chain['prepared_attempt_id'] and attempt['status']=='prepared','Only the original prepared attempt can begin invocation');delivery=proof.get('delivery')
+            proof_check(chain,proof);attempt=exact_attempt(chain,payload);attempt_sources(attempt,proof);review_frontier(attempt,proof);require(attempt['id']==chain['prepared_attempt_id'] and attempt['status']=='prepared','Only the original prepared attempt can begin invocation');delivery=proof.get('delivery')
             require(isinstance(delivery,dict) and delivery.get('input_digest')==attempt['input_digest'],'A trusted resolved delivery digest is required')
             for key in ['delivery_digest','resolved_parameter_digest']:
                 require(isinstance(payload.get(key),str) and SHA.fullmatch(payload[key]) and payload[key]==delivery.get(key),'The actual private delivery identity differs');attempt[key]=payload[key]
@@ -364,20 +400,27 @@ def mutate(store,command,payload,*,proof=None,verify_transition=None,guard=None)
                 attempt['dispatch_identity']=dispatched
             attempt['invoke_evidence']=producer(payload.get('evidence'),'host-invoked',attempt['actor'],True);require(attempt['invoke_evidence']['provider']==attempt['creation_evidence']['provider'],'The dispatch provider differs from the original created actor');attempt['status']='invoking';chain['stages'][attempt['index']]['status']='invoking';detail={'attempt_id':attempt['id']}
         elif command=='record':
-            attempt=exact_attempt(chain,payload);attempt_sources(attempt,proof);result=clone(payload.get('result'));require(isinstance(result,dict) and result.get('status') in OUTCOMES,'An actual supported invocation result is required')
+            attempt=exact_attempt(chain,payload);attempt_sources(attempt,proof);review_frontier(attempt,proof);result=clone(payload.get('result'));require(isinstance(result,dict) and result.get('status') in OUTCOMES,'An actual supported invocation result is required')
             evidence=producer(payload.get('evidence'),'host-result',attempt['actor'],True);require(evidence['provider']==attempt['creation_evidence']['provider'],'The returned provider differs from the original actor')
             require(payload.get('delivery_digest')==attempt['delivery_digest'] and attempt['delivery_digest'] is not None,'The result belongs to another private delivery')
             if 'resolved_parameter_digest' in payload:require(payload['resolved_parameter_digest']==attempt['resolved_parameter_digest'],'The returned resolved parameter digest differs')
             for key in ['input_digest','delivery_digest','resolved_parameter_digest']:
                 if key in result:require(result[key]==attempt[key],'Returned output acknowledges another invocation input')
             require(not any(result.get(key) for key in ['real_human','human_approved','native_skill_called','native_tool_called']) and result.get('mechanism','source-backed-context')=='source-backed-context','Source-backed results cannot invent human approval or native Skill execution')
+            if attempt['input'].get('invocation_policy') is not None:
+                if attempt['input']['invocation_policy'].get('kind')=='report-only' and attempt['input']['context'].get('kind')=='review' and attempt['input']['context'].get('publication_id') and result['status'] in {'passed','findings','questions'}:
+                    require(all(not result.get(key) or result['status']==key for key in ['findings','questions']),'A report-only review result outcome must match every nonempty reserved findings or questions payload')
+                ended=context_end(attempt,payload.get('context_end_evidence'));require(attempt.get('context_end_evidence',ended)==ended,'Conflicting original host context-end observation');require(not any(result.get(key) for key in ['parent_mode','activate_session','session_active']),'A report-only result cannot extend its session into the parent');attempt['context_end_evidence']=ended
             if attempt['result'] is not None:
                 require(result==attempt['result'] and evidence==attempt['result_evidence'],'Conflicting duplicate invocation result');return clone(chain)
             proof_check(chain,proof);require(attempt['id']==chain['prepared_attempt_id'] and attempt['status'] in {'invoking','unknown'},'Only the original invoked attempt can return a result')
             attempt['result']=result;attempt['result_evidence']=evidence;status=result['status'];attempt['status']='returned' if status in {'passed','findings','questions'} else status;chain['stages'][attempt['index']]['status']='awaiting-acceptance' if attempt['status']=='returned' else 'blocked';chain['state']='active' if attempt['status']=='returned' else 'blocked';detail={'attempt_id':attempt['id'],'result_status':status}
         elif command=='accept':
-            before=clone(chain['context']);after=context(payload.get('context',before));proof_check(chain,proof,context_value=after);attempt=exact_attempt(chain,payload);attempt_sources(attempt,proof);require(attempt['id']==chain['prepared_attempt_id'] and attempt['status']=='returned','An unresolved failed, unavailable or cancelled result cannot satisfy the occurrence')
+            before=clone(chain['context']);after=context(payload.get('context',before));proof_check(chain,proof,context_value=after);attempt=exact_attempt(chain,payload);attempt_sources(attempt,proof);review_frontier(attempt,proof);require(attempt['id']==chain['prepared_attempt_id'] and attempt['status']=='returned','An unresolved failed, unavailable or cancelled result cannot satisfy the occurrence')
             require(attempt['input']['context']==before,'The original returned result belongs to a stale accepted context; explicit retry or verified incorporation is required')
+            if attempt['input'].get('invocation_policy') is not None:
+                ended=context_end(attempt,payload.get('context_end_evidence',attempt.get('context_end_evidence')))
+                require(ended==attempt.get('context_end_evidence'),'Context-end evidence differs from the original recorded host observation')
             receipt=payload.get('receipt')
             if attempt['result']['status']=='passed' and after==before and receipt is None:receipt={'kind':'no-change','reference':attempt['result_evidence']['reference'],'before':digest(before),'after':digest(after)}
             else:
@@ -386,7 +429,10 @@ def mutate(store,command,payload,*,proof=None,verify_transition=None,guard=None)
             stage=chain['stages'][attempt['index']];stage.update(status='complete',accepted_context=clone(after),accepted_transition={'before':before,'after':clone(after),'receipt':clone(receipt)});chain['context']=after;chain['prepared_attempt_id']=None;chain['cursor']+=1;chain['state']='complete' if chain['cursor']==len(chain['stages']) else 'active';detail={'attempt_id':attempt['id'],'transition':clone(receipt)}
         elif command=='reconcile':
             attempt=exact_attempt(chain,payload,False);status=payload.get('status');evidence=payload.get('evidence');require(status in {'unknown','failed','unavailable','cancelled'} and isinstance(evidence,dict) and evidence.get('kind')=='host-reconciliation' and text(evidence.get('reference')),'Original attempt reconciliation requires actual host evidence')
-            require(attempt['id']==chain['prepared_attempt_id'] and attempt['status'] in PENDING,'Only an unresolved original attempt can be reconciled');attempt['status']=status;attempt['reconciliation']=clone(evidence);chain['stages'][attempt['index']]['status']='blocked';chain['state']='blocked';detail={'attempt_id':attempt['id'],'status':status}
+            require(attempt['id']==chain['prepared_attempt_id'] and attempt['status'] in PENDING,'Only an unresolved original attempt can be reconciled')
+            if attempt['input'].get('invocation_policy') is not None and status!='unknown':
+                ended=context_end(attempt,payload.get('context_end_evidence'));require(attempt.get('context_end_evidence',ended)==ended,'Conflicting original host context-end observation');attempt['context_end_evidence']=ended
+            attempt['status']=status;attempt['reconciliation']=clone(evidence);chain['stages'][attempt['index']]['status']='blocked';chain['state']='blocked';detail={'attempt_id':attempt['id'],'status':status}
         elif command=='resume':
             require(text(payload.get('reason')),'Explicit invocation resumption requires the actual resolved condition');require(not any(item['status'] in PENDING for item in chain['attempts'].values()),'Reconcile every unresolved original attempt before resumption');new=context(payload.get('context',chain['context']))
             for key in ['kind','id','task_ids','pending_ids','run_id','session_id']:

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "result": "pass",
+  "exit_code": 0,
+  "discovered": 2,
+  "expected": 2,
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-plugin-review.py",
+    "PluginReviewPilotTests.test_policy_bound_review_rejects_contradictory_success_payloads_at_record",
+    "PluginReviewPilotTests.test_policy_bound_review_preserves_empty_reserved_arrays_and_arbitrary_annotations"
+  ],
+  "selected_tests": [
+    "test_policy_bound_review_rejects_contradictory_success_payloads_at_record",
+    "test_policy_bound_review_preserves_empty_reserved_arrays_and_arbitrary_annotations"
+  ],
+  "wall_seconds": 32.90336258430034,
+  "source_fingerprints": {
+    ".skill-tree/common/references/plugin-invocation.md": "afd0aefd29290d8cd18bfe1ab0c40e3d4a2fc6fd856072f920085f421d489732",
+    ".skill-tree/common/references/pr-review-cycle.md": "987532f697e54f6502f31286e57054316255d0a000d3d93686c6701bdc14f0ef",
+    ".skill-tree/common/scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",
+    ".skill-tree/common/scripts/plugin-invocation.py": "11b97675583753ccc391492de556e71d74bb39ab0b43cce64412469d6ef85e77",
+    ".skill-tree/common/scripts/pr-review-state.py": "6bfb09e0273a6322c86c5f5915e8dc0503fa22416881c499c281c1dec570a3d1",
+    ".skill-tree/common/scripts/workflow-state.py": "34e5c105ad7cf594720f4c60655a27bfdfdccc93e71ce9d00610447178bb1883",
+    ".skill-tree/config/plugins/ponytail.json": "30ae89c79d4895184ef681b6a369cd2d0ae872fa4599df18f31eb7580e1aacbb",
+    ".skill-tree/config/resource-map.json": "95a4922b2331416863100c9b054e84709bafd4126c1542a15fac49781da13248",
+    ".skill-tree/documents/implementation-plan.md": "b6a1222b64d638bc1ab9a03f13abf454f195c95198f6aac7dd2e29637a0582e3",
+    ".skill-tree/documents/plugin-system-contract.md": "a50a26f11f3a839570d46588673be02ea86fe37a083bb14d8278bb8645f72634",
+    ".skill-tree/documents/plugin-system-research.md": "7e408525e7958f8c05dc8ed971edff9e75ddbb629f2117aee0d0498a6fc5790a",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "2341dd16a380768332194285cf8356e0326951860c38d96dbd1c10b7d19d37ce",
+    ".skill-tree/lib/plugin-composition.js": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a",
+    ".skill-tree/lib/plugin-runtime.js": "82830c2aff9ae2380f5cf2440a461f3a2d6d61c4141561db3ce1ae2346fac78d",
+    ".skill-tree/tests/fixtures/ponytail": "445fee6585cab8a9d9aa03ffe09cb6f18c2ca095c4c7b2a8834f10c6aa761bdf",
+    ".skill-tree/tests/test-plugin-invocation-installation.js": "fa16b6af4ae637415100fa2e0c3dcfeb9a7f392e168f61980ecd3c8fc84e1495",
+    ".skill-tree/tests/test-plugin-review.py": "ae5892d9fc09be097d360ee4fe7e145593278e7fa6ec76d77cc8c723908c7eaa",
+    ".skill-tree/tests/test-plugin-workflow.py": "a7ae1a514938920070a4c6a936d43fcac5d772168c3d9d40005dfe91ccaff44b"
+  },
+  "changed_sources": [],
+  "log": ".skill-tree/history/validation/plugin-system/ponytail116-normalized-report-green1.txt",
+  "qualification": "Two current synthetic normalized-result controls (including four negative variants) only; full42/repository/source review and actual candidate-host qualification remain separate."
+}
