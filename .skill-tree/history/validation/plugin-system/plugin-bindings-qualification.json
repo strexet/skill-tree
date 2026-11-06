@@ -1,0 +1,71 @@
+{
+  "focused_controls": {
+    "green": {
+      "attempt_id": "C-c78ecff1-2ecd-464e-83ab-6599351fd01f",
+      "discovered": 30,
+      "failed": 0,
+      "passed": 30,
+      "skipped": 0
+    },
+    "red": {
+      "attempt_id": "C-f4206676-46ee-40bf-b055-50f718912a6f",
+      "discovered": 20,
+      "failed": 19,
+      "passed": 1,
+      "skipped": 0
+    }
+  },
+  "independent_review": {
+    "agent": "/root/current_plugin_contract_review",
+    "remaining_findings": [],
+    "result": "passed"
+  },
+  "limits": [
+    "The definition helper invokes no plugin or host handler and establishes no native/candidate execution.",
+    "Installed general/web/unity hook integration belongs to composition119; actual ordered accepted-context dispatch belongs to invocation118.",
+    "Host implementation versions/source fingerprints bind function behavior; JavaScript closure internals cannot be inferred from serialized metadata.",
+    "The original runnable Red remains immutable; later legitimate oracle correction uses two items to exercise a real frozen reorder and retains the diagnostic in local artifacts."
+  ],
+  "other_checks": [
+    "sync:check",
+    "strict repository validation",
+    "strict source and canonical documentation validation",
+    "strict edited reference prose",
+    "installer list",
+    "offline all-provider general temporary-target dry-run",
+    "git diff --check"
+  ],
+  "qualified_assertions": [
+    "Dynamic owned-operation and callable named-boundary definitions with exact or declared alias resolution.",
+    "Ordered independent occurrences and effective parameters, exact move/remove, immutable configuration and declarative conditions.",
+    "Typed task-free/Pending/task/group/review context forms; actual existence and workflow admission remain runtime guards.",
+    "Delivery versus input identities, exact replay conflict, actual named-boundary alias events and active occurrence lineage.",
+    "Copied binding/parameter module resource closure without workflow metadata or source checkout.",
+    "Existing lifecycle regressions in the full suite retain registry-based profile freshness, explicit stopped canonical handoff and retained queue/claim preservation."
+  ],
+  "recorded_at": "2026-11-06T04:22:38.992432+00:00",
+  "repository_tests": {
+    "evidence": [
+      ".skill-tree/history/validation/plugin-system/bindings-all-node.txt",
+      ".skill-tree/history/validation/plugin-system/bindings-all-python.txt"
+    ],
+    "failed": 0,
+    "node": 201,
+    "python": 262,
+    "skipped": 0
+  },
+  "sources": {
+    ".skill-tree/common/references/plugin-invocation.md": "1c783c45c4da4dc0f30e4db76c50b0e211bc1dea5b67f552a15ab5dcf468ea71",
+    ".skill-tree/common/scripts/workflow-state.py": "f531546773a653809e09af093a1dddfacca763517b13cebf9b00673ab959737f",
+    ".skill-tree/lib/composer.js": "ebb4042086e61e32cd7c255df79befcdff06ae0b0bfaf2941d5d8facc1268e01",
+    ".skill-tree/lib/plugin-bindings.js": "9ea7de58262993188ffa0b1abaf35e4819f9b635b1695561d21c793127299059",
+    ".skill-tree/lib/plugin-lifecycle.js": "05f1604a464385532cdda5d1b729c6286aac625c2bb279495b44b30155fc4e9e",
+    ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    ".skill-tree/lib/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+    ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+    ".skill-tree/tests/test-plugin-bindings.js": "1d5f1760709e61b5fa2d988978c4b8b3b5fae867a6786fa3b1c0f490be0fdeef",
+    ".skill-tree/tests/test-plugin-installation.js": "bbfb824146efbde96737078b69b02b7fdca60ced5fe8df48a88329163ca74f0f"
+  },
+  "status": "passed",
+  "task_id": "T-787453a8-2643-48c1-8715-9626d67d5e0e"
+}
