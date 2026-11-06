@@ -4,7 +4,7 @@
 
 The completed initial task clarification cycle covers fifteen selected tasks, including the owner-requested installed-plugin registry and removal interface. Q1-Q11 have actual owner approval. Approval evidence and selected identities reside in `.skill-tree/history/research/plugin-grill-session.json`. The initial final confirmation binds the exact task and summary fingerprints recorded in the clarification session, separately from individual decision approval.
 
-The subsequent workflow design discussion has actual owner approval for W1 and W2. [W3](../history/research/plugin-management-decisions.json) selects core-only default installation and adds open source/parameter/binding management; W3 supersedes the initial fixed-operation exclusions and any proposed default plugin bundle. The [W2 decision record](../history/research/plugin-hook-decisions.json) includes the approved post-processing task-wording application and the requested two-commit document review sequence. The [W1 decision record](../history/research/plugin-auto-manual-decision.json) preserves the actual owner submission reference, approved policy and implementation boundary. W1 extends the planned final-acceptance policy with legitimate delegated Auto acceptance; the existing manual-only controller remains the implemented baseline until the required followup passes acceptance.
+The subsequent workflow design discussion has actual owner approval for W1 and W2. [W3](../history/research/plugin-management-decisions.json) selects core-only default installation and adds open source/parameter/binding management; W3 supersedes the initial fixed-operation exclusions and any proposed default plugin bundle. The [W2 decision record](../history/research/plugin-hook-decisions.json) includes the approved post-processing task-wording application and the requested two-commit document review sequence. The [W1 decision record](../history/research/plugin-auto-manual-decision.json) preserves the actual owner submission reference, approved policy and implementation boundary. W1 extends the planned final-acceptance policy with legitimate delegated Auto acceptance; the recorded manual-only controller remains the historical baseline; core mode/actor activation requires the matching followup qualification.
 
 ## Approved decisions
 
@@ -32,7 +32,7 @@ The management task supplies a documented exact-ID removal command with affected
 
 The market study owns the current ecosystem map, justified shortlist and bounded comparison plan. Comparative qualification owns observed outcomes and recommendation eligibility. The workflow design task owns concrete proposals for additional stages or operation splits; new structural changes require actual owner agreement. Research deliverables do not presume favorable plugin outcomes or universal host compatibility.
 
-Source research establishes the absence of a generic prompt execution engine and the need for bounded activation, dependency closure and verified adapters. The native Skill tool is unavailable in the current session. The implemented shared clarification controller supports guarded source-backed sessions; the installed standalone Clarify Tasks operation exposes the controller. External plugin invocation remains a separate implementation and qualification deliverable.
+Source research establishes the absence of a generic prompt execution engine and the need for bounded activation, dependency closure and verified adapters. The recorded native Skill tool remains unavailable in the inspected host. The shared clarification controller supports guarded source-backed sessions and delegated state references; core phase/actor contracts distinguish actual host qualification from synthetic state controls. External plugin invocation remains a separate implementation and qualification deliverable.
 
 The existing validation signature omits full task semantics. The clarification contract separates complete-content write guards from semantic confirmation identity. Manual task revisions preserve immutable terminal outcomes, Pending provenance and parked implementation progress; no implementation run begins through clarification.
 
@@ -40,7 +40,7 @@ The existing validation signature omits full task semantics. The clarification c
 
 Task `T-a5a738da-c182-4206-bb61-75ffa21946fb` owns the design discussion. W1 approves explicit internal phases and default Auto decision governance inside the current operations. W2 approves the exact initial integration anchors and the task-wording review application in the [implementation plan](implementation-plan.md). The original fifteen root identities and historical terminal outcomes remain unchanged.
 
-The [implementation plan](implementation-plan.md#approved-integration-anchors) owns the approved anchor map and execution sequence. PR creation, publication and merge retain applicable owner authorization. The current manual-only controller and absent production plugin infrastructure remain explicit implementation boundaries.
+The [implementation plan](implementation-plan.md#approved-integration-anchors) owns the approved anchor map and execution sequence. PR creation, publication and merge retain applicable owner authorization. Canonical Future and component qualification records distinguish the historical manual baseline, core governance activation and remaining external-plugin runtime obligations.
 
 ### Approved decision W1: internal phases and decision modes
 
@@ -66,7 +66,7 @@ Processed Pending `P-09b5b828-dcdc-4d06-bee1-19e1787e34f4` supplies provenance f
 | Interview pilot `T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69` | Auto uses actual bounded delegated answers and final acceptance; Manual uses actual owner answers and confirmation. Acceptance criteria and check mappings change together. |
 | Comparison `T-a583acd5-fc6b-4d37-97ec-02df969fea9e` | Both comparison arms freeze the same current W1 core baseline and mode. W1 grants no trial authorization or increased limits. |
 
-Qualification covers both modes, out-of-authority requests, false answer origin, semantic drift, explicit switching and resume, no-progress escalation and actual agent scenarios. Installation consent, package ownership and existing publication boundaries retain applicable authorization. W2 has actual owner approval; delegated-agent behavior remains an unimplemented requirement rather than the source of the approval.
+Qualification covers both modes, out-of-authority requests, false answer origin, semantic drift, explicit switching and resume, no-progress escalation and actual agent scenarios. Installation consent, package ownership and existing publication boundaries retain applicable authorization. W2 has actual owner approval; delegated-agent behavior requires matching actual-host qualification rather than supplying the source of the approval.
 
 ### Approved decision W2: integration anchors and task wording
 

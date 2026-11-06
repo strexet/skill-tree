@@ -1,0 +1,16 @@
+{
+  "added_check": "decision-observation-oracle",
+  "preserved": [
+    "Original three required checks and all six acceptance criteria.",
+    "Actual actor check remains mandatory and cannot be satisfied by synthetic traces.",
+    "No pending attempt or frozen root/dependency scope changes."
+  ],
+  "reason": "The actual-host report verifier has meaningful negative controls for transcript-shaped claims, separate trusted capture, source/actor/input/result identity, Manual scripted-owner boundaries and stale-mode delivery. Synthetic verifier controls remain separate from the mandatory actual-host observation check.",
+  "record_kind": "actual-observation-oracle-validation-plan",
+  "sources": [
+    ".skill-tree/tests/test-decision-conformance.py",
+    ".skill-tree/common/references/workflow-metadata.md",
+    ".skill-tree/common/references/orchestration.md"
+  ],
+  "task_id": "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda"
+}

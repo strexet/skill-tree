@@ -1,0 +1,5 @@
+{
+  "passed": true,
+  "scenarios": 3,
+  "scope": "Bounded source-bound actor observations; the separately supplied root capture is the trust boundary, not cryptographic native-origin proof. Scripted owner inputs are not real-human acceptance."
+}

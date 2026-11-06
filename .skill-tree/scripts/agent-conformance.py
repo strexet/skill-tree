@@ -294,8 +294,149 @@ def validate_clarification_report(report):
         if not report.get('limitations'):raise ValueError('Scripted-owner, native invocation and model identity limitations are required')
     return {'passed':True,'scenarios':2,'scope':'Bounded actual-agent clarification observations with scripted fixture-owner inputs; no real-human or native external-skill qualification.'}
 
+CORE_DECISION_CASES={'core-auto-significant','core-manual','core-switch-resume'}
+CORE_DECISION_SOURCES={'common/scripts/workflow-state.py','common/scripts/decision-governance.py','common/scripts/decision-orchestration.py'}
+
+def _validate_core_decision_report(report,trusted_capture=None):
+    """Validate caller-captured observations; a report never establishes its own origin."""
+    import tempfile
+    def require(condition,message):
+        if not condition:raise ValueError(message)
+    def text(value):return isinstance(value,str) and bool(value.strip())
+    def sha(value):return isinstance(value,str) and re.fullmatch('[a-f0-9]{64}',value) is not None
+    def load(name,relative):
+        spec=importlib.util.spec_from_file_location(name,CORE/relative)
+        value=importlib.util.module_from_spec(spec);spec.loader.exec_module(value);return value
+    require(isinstance(report,dict) and report.get('schema')==1 and report.get('kind')=='core-decision-agent-conformance','A core decision observation report is required')
+    require(isinstance(trusted_capture,dict) and trusted_capture is not report and trusted_capture.get('schema')==1 and trusted_capture.get('kind')=='core-decision-native-capture','A separately supplied trusted native capture is required; report labels are insufficient')
+    sources=report.get('source_snapshot');require(isinstance(sources,dict) and CORE_DECISION_SOURCES<=set(sources),'Current core source fingerprints are required')
+    require(sources==trusted_capture.get('source_snapshot'),'Report and external capture source fingerprints differ')
+    for relative,fingerprint in sources.items():
+        require(isinstance(relative,str) and not Path(relative).is_absolute() and '\\' not in relative and '..' not in Path(relative).parts and sha(fingerprint),'Core source paths require portable SHA256 fingerprints')
+        file=CORE/relative;require(file.is_file() and digest(file)==fingerprint,'Core source fingerprints differ from the current execution source')
+    limitations=report.get('limitations');require(isinstance(limitations,list) and limitations and all(text(v) for v in limitations),'Capture trust, scripted-owner and unexposed native metadata limitations are required')
+    words=' '.join(limitations).casefold()
+    require(all(word in words for word in ['capture','scripted','human','model','token','cost']),'Capture trust, scripted-owner and unexposed model/token/cost limitations must be explicit')
+    rows=report.get('scenarios');events=trusted_capture.get('events')
+    require(isinstance(rows,list) and len(rows)==3 and all(isinstance(v,dict) for v in rows) and {v.get('scenario_id') for v in rows}==CORE_DECISION_CASES,'Three unique core decision scenarios are required')
+    require(isinstance(events,list) and events and all(isinstance(v,dict) and text(v.get('id')) and v.get('scenario_id') in CORE_DECISION_CASES and type(v.get('sequence')) is int and v['sequence']>0 for v in events),'External capture requires identified ordered native events')
+    indexed={event['id']:event for event in events};require(len(indexed)==len(events),'External capture event identities must be unique')
+    governance=load('conformance_core_decisions','common/scripts/decision-governance.py')
+    orchestration=load('conformance_core_orchestration','common/scripts/decision-orchestration.py')
+
+    def native(event):
+        require(text(event.get('provider')) and sha(event.get('native_request_sha256')),'Actual native provider and full request fingerprint are required')
+        actor=event.get('actor');require(isinstance(actor,dict) and set(actor)=={'id','context_id'} and all(text(v) for v in actor.values()),'An actual native actor and context identity are required')
+        require(all(key in event for key in ['tool_call_id','model','tokens','cost']),'Unexposed native metadata must be explicit null values or actual observations')
+        if event['kind']=='actor-created':require(event.get('tool')=='collaboration.spawn_agent','A delegated role requires an actual native actor creation capture')
+        else:
+            inventory=event.get('inventory_entry',{})
+            require(event['kind']=='executor-observed' and event.get('tool')=='collaboration.list_agents' and inventory.get('agent_name')==actor['id'] and inventory.get('agent_status')=='running','An existing executor requires an observed running native inventory entry')
+        return actor
+
+    class SnapshotStore:
+        def __init__(self,root):self.root=root
+        def owned(self,relative):return self.root/relative
+
+    for row in rows:
+        scenario=row['scenario_id'];ids=row.get('event_ids')
+        require(isinstance(ids,list) and ids and all(isinstance(v,str) and v in indexed for v in ids) and len(ids)==len(set(ids)),'Report event references must resolve uniquely against the separate capture')
+        observed=[indexed[value] for value in ids]
+        require(all(event['scenario_id']==scenario for event in observed) and set(ids)=={event['id'] for event in events if event['scenario_id']==scenario},'Every scenario event must be captured, referenced and bound to the exact scenario')
+        sequence=[event['sequence'] for event in observed];require(sequence==sorted(set(sequence)),'Captured scenario order must be strictly increasing')
+        require(all(event['kind'] in {'actor-created','executor-observed','actor-returned','observation','scripted-owner-input','stale-result-rejected'} for event in observed),'Unknown native capture event kind')
+        by_id={event['id']:event for event in observed}
+        creations=[event for event in observed if event['kind'] in {'actor-created','executor-observed'}]
+        for event in creations:native(event)
+        returns=[event for event in observed if event['kind']=='actor-returned']
+        for event in returns:
+            creation=by_id.get(event.get('creation_event_id'),{})
+            require(creation.get('kind')=='actor-created' and creation['sequence']<event['sequence'] and sha(event.get('input_digest')) and isinstance(event.get('result'),dict) and event['result'].get('input_digest')==event['input_digest'],'A returned JSON result requires an earlier actual creation and the exact sealed input digest')
+        observations=[event for event in observed if event['kind']=='observation']
+        final=[event for event in observations if event.get('label')=='final'];require(len(final)==1 and observations[-1] is final[0],'One final current artifact observation is required')
+        final=final[0];frame=final.get('orchestration',{});decision=final.get('decision',{})
+        require(isinstance(frame,dict) and isinstance(decision,dict),'Actual final DG and orchestration bytes are required')
+        executor=[event for event in creations if event.get('actor')==frame.get('executor')]
+        require(len(executor)==1 and executor[0]['sequence']<final['sequence'],'The actual observed executor must match the orchestration and decision ledgers')
+        require(executor[0]['kind']=='executor-observed' or executor[0].get('role') in {'executor','worker'},'A decision role cannot double as executor evidence')
+        with tempfile.TemporaryDirectory(prefix='skill-tree-observed-decision-') as temporary:
+            store=SnapshotStore(Path(temporary));directory=store.root/'.skill-tree/decisions';directory.mkdir(parents=True)
+            def verify_observation(event,accepted=False):
+                current_frame=event.get('orchestration');current_decision=event.get('decision')
+                require(isinstance(current_frame,dict) and isinstance(current_decision,dict) and current_frame.get('id')==frame.get('id') and current_decision.get('id')==decision.get('id'),'Captured observations must retain the original exact orchestration and decision identities')
+                require(current_frame.get('executor')==frame.get('executor') and governance._identity(current_frame.get('context',{}))==governance._identity(frame.get('context',{})),'Captured executor and typed scope must remain exact')
+                frozen=current_frame.get('execution_snapshot');require(isinstance(frozen,dict) and all(frozen.get(key)==value for key,value in sources.items()),'Every current source fingerprint must match the frozen orchestration input')
+                for record,key in [(current_frame,'orchestration_hash'),(current_decision,'decision_hash')]:
+                    identity=record.get('id');pattern=orchestration.DO if key=='orchestration_hash' else governance.DG
+                    require(isinstance(identity,str) and pattern.fullmatch(identity) and record.get(key)==governance._hash({k:v for k,v in record.items() if k!=key}),'Captured artifact identity or checksum differs')
+                    (directory/(record['id'].lower()+'.json')).write_text(json.dumps(record))
+                try:
+                    loaded=orchestration.read(store,current_frame['id']);attached=orchestration.ledger(store,loaded)
+                    require(attached==current_decision and current_decision['context']==orchestration.decision_context(loaded,loaded['question_purpose']),'Current question scope differs from the orchestration input')
+                    require(event.get('action')==orchestration.next_action(store,loaded['id'])['action'],'Captured next action differs from the actual observed artifact frontier')
+                    if accepted:
+                        receipt=governance.acceptance_reference(store,{'decision_id':current_decision['id'],'acceptance_digest':current_decision.get('acceptance',{}).get('digest')},{'context':current_decision['context'],'mode':loaded['mode'],'mode_epoch':current_decision['mode_epoch'],'authority_digest':governance._hash(loaded['authority']),'kind':current_decision['question']['kind']})
+                        require(loaded.get('acceptance')==receipt and event.get('action')=='accepted','The final orchestration must contain the current exact accepted DG receipt')
+                except (KeyError,TypeError,governance.DecisionError,orchestration.OrchestrationError) as error:raise ValueError('Captured current decision artifacts are invalid: '+str(error)) from error
+            for event in observations:verify_observation(event,event is final)
+
+        requests=frame.get('actor_requests');require(isinstance(requests,dict),'Actual sealed actor requests are required')
+        attempts=decision.get('attempts',{})
+        for attempt_id,attempt in attempts.items():
+            request=requests.get(attempt_id);require(isinstance(request,dict) and request.get('attempt_id')==attempt_id and isinstance(request.get('input'),dict),'Each original actor attempt requires its sealed orchestration request')
+            envelope=request['input'];input_digest=request.get('input_digest')
+            require(sha(input_digest) and input_digest==governance._hash(envelope) and envelope.get('orchestration_id')==frame['id'] and envelope.get('actor')==attempt['actor'] and envelope.get('decision_id')==decision['id'] and envelope.get('role')==attempt['role'] and envelope.get('mode')==attempt['mode'] and envelope.get('mode_epoch')==attempt['mode_epoch'] and envelope.get('authority_digest')==attempt['authority_digest']==governance._hash(envelope.get('authority')) and governance._hash(envelope.get('question'))==attempt['question_digest'] and governance._identity(envelope.get('context',{}))==governance._identity(decision['context']) and envelope.get('context',{}).get('semantic_fingerprint')==attempt['semantic_fingerprint'] and envelope.get('context',{}).get('content_fingerprint')==attempt['content_fingerprint'],'Sealed actor input differs from the original exact DG scope, question, mode or authority')
+            predecessors={'critic':{'resolver'},'arbiter':{'resolver','critic'}}.get(attempt['role'],set())
+            prior={value['role']:value for value in attempts.values() if value['role'] in predecessors and value['status'] in {'answered','agree','disagree'} and all(value[key]==attempt[key] for key in ['mode','mode_epoch','frontier_epoch','authority_digest','semantic_fingerprint','question_digest'])}
+            basis={role:governance._receipt(value) for role,value in prior.items()}
+            require(envelope.get('role_receipts')==basis,'An actual critic or arbiter input must contain the exact predecessor result and evidence receipts')
+            material={role:{key:value[key] for key in ['actor','status','result','evidence']} for role,value in prior.items()}
+            require(envelope.get('prior_role_results')==material,'Sealed predecessor material must contain the exact actual answers, public rationales, actors, statuses and evidence; receipt hashes alone are insufficient')
+            frozen=envelope.get('execution_snapshot');require(isinstance(frozen,dict) and all(frozen.get(k)==v for k,v in sources.items()),'Actual actor inputs must bind the observed current core sources')
+            if attempt['role']=='owner':
+                require(request.get('creation_evidence') is None and envelope.get('creation_evidence') is None,'A scripted owner input cannot claim native agent creation')
+                owners=[event for event in observed if event['kind']=='scripted-owner-input' and event.get('actor')==attempt['actor'] and event.get('result')==attempt.get('result') and event.get('evidence')==attempt.get('evidence')]
+                require(len(owners)==1 and owners[0].get('real_human') is False and owners[0]['sequence']<final['sequence'],'The accepted owner result requires exact externally captured scripted input with no real-human claim')
+            else:
+                creation=request.get('creation_evidence',{});native_event=by_id.get(creation.get('reference'),{})
+                require(native_event.get('kind')=='actor-created' and native_event.get('role')==attempt['role'] and native_event.get('actor')==attempt['actor'] and creation==envelope.get('creation_evidence') and creation.get('kind')=='host-agent-created' and creation.get('provider')==native_event.get('provider') and creation.get('tool')==native_event.get('tool') and creation.get('actor_id')==attempt['actor']['id'] and creation.get('actor_context_id')==attempt['actor']['context_id'],'A delegated DG role must match an actual externally captured creation')
+                matches=[event for event in returns if event['creation_event_id']==native_event['id'] and event['input_digest']==input_digest]
+                require(len(matches)==1,'Each original delegated input requires one exact actual returned JSON observation')
+                returned=matches[0];require(returned['sequence']<final['sequence'],'A decision cannot precede its actual actor result')
+                if attempt['status'] in {'answered','agree','disagree'}:
+                    evidence=attempt.get('evidence',{})
+                    require(returned['result']==attempt.get('result') and evidence.get('kind')=='delegated-agent' and evidence.get('reference')==returned['id'] and evidence.get('creation_reference')==native_event['id'] and evidence.get('provider')==native_event['provider'] and text(evidence.get('tool')),'Actual returned JSON and original creation must match the recorded DG answer evidence')
+
+        def label(name):
+            found=[event for event in observations if event.get('label')==name];require(len(found)==1,'The actual '+name+' artifact observation is required');return found[0]
+        if scenario=='core-auto-significant':
+            require(frame['mode']=='auto' and decision['question'].get('significance')=='significant','The Auto scenario requires an actual significant delegated decision')
+            roles=governance._roles(decision)
+            require(set(roles)=={'resolver','critic','arbiter'} and roles['critic']['status']=='disagree' and decision['acceptance']['attempt_id']==roles['arbiter']['id'],'Actual substantive critic disagreement must be resolved by the independent current arbiter')
+        elif scenario=='core-manual':
+            wait=label('manual-wait');workers=[event for event in creations if event.get('role')=='worker' and event.get('actor')==frame['executor']]
+            require(len(workers)==1 and frame['mode']=='manual' and wait.get('action') in {'ask-owner','wait-owner'} and wait['orchestration'].get('acceptance') is None and wait['decision'].get('acceptance') is None,'Manual requires an actual independent worker waiting without acceptance')
+            owner=[event for event in observed if event['kind']=='scripted-owner-input'];require(len(owner)==1,'Manual requires one actual scripted fixture-owner input')
+            worker_returns=[event for event in returns if event['creation_event_id']==workers[0]['id']]
+            waiting=[event for event in worker_returns if event['result'].get('status')=='waiting'];complete=[event for event in worker_returns if event['result'].get('status')=='complete']
+            require(len(waiting)==len(complete)==1 and waiting[0]['sequence']<=wait['sequence']<owner[0]['sequence']<complete[0]['sequence']<=final['sequence'],'Actual worker wait, scripted owner and completion must occur in that order')
+        else:
+            pending=label('original-pending');reconciled=label('reconciled');switched=label('switched');resumed=label('resumed')
+            original=[attempt for attempt in pending['decision']['attempts'].values() if attempt['status']=='pending'];require(len(original)==1,'The switch scenario requires one original unresolved actor')
+            original=original[0];old=original['id'];after=reconciled['decision']['attempts'].get(old,{})
+            require(after.get('status')=='cancelled' and after.get('reconciliation',{}).get('kind')=='actor-reconciliation' and text(after['reconciliation'].get('reference')),'Only explicit original-attempt reconciliation can release the pending actor')
+            rejected=[event for event in observed if event['kind']=='stale-result-rejected'];require(len(rejected)==1,'An actual rejected delivery of the held original result is required');rejected=rejected[0]
+            require(pending['sequence']<reconciled['sequence']<switched['sequence']<resumed['sequence']<rejected['sequence']<final['sequence'] and switched['orchestration']['mode']!=pending['orchestration']['mode'] and switched['decision']['mode_epoch']>pending['decision']['mode_epoch'],'Reconciliation, explicit changed mode, resume and stale delivery must preserve their actual order')
+            require(rejected.get('attempt_id')==old and rejected.get('input_digest')==requests[old]['input_digest'] and text(rejected.get('error')) and rejected.get('decision')==resumed['decision'],'Rejected stale delivery must retain the exact current DG bytes')
+            require(any(item['event']=='switch-mode' for item in frame['history']) and any(item['event']=='resume' for item in frame['history']) and decision['attempts'][old]['status']=='cancelled' and decision['acceptance']['attempt_id']!=old and decision['acceptance']['mode_epoch']>original['mode_epoch'],'Only a new current accepted result may follow the explicit switch and resume')
+    return {'passed':True,'scenarios':3,'scope':'Bounded source-bound actor observations; the separately supplied root capture is the trust boundary, not cryptographic native-origin proof. Scripted owner inputs are not real-human acceptance.'}
+
+def validate_core_decision_report(report,trusted_capture=None):
+    try:return _validate_core_decision_report(report,trusted_capture)
+    except (KeyError,TypeError,IndexError,AttributeError) as error:raise ValueError('Malformed core decision report or external capture') from error
+
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=['prepare','grade','validate','clarification-prepare','clarification-observe','clarification-interrupt','clarification-grade','clarification-validate']);parser.add_argument('--scenario');parser.add_argument('--root',type=Path);parser.add_argument('--input',type=Path);parser.add_argument('--reply',type=Path);parser.add_argument('--observations',type=Path);parser.add_argument('--phase');args=parser.parse_args()
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=['prepare','grade','validate','clarification-prepare','clarification-observe','clarification-interrupt','clarification-grade','clarification-validate','core-decision-validate']);parser.add_argument('--scenario');parser.add_argument('--root',type=Path);parser.add_argument('--input',type=Path);parser.add_argument('--reply',type=Path);parser.add_argument('--observations',type=Path);parser.add_argument('--capture',type=Path);parser.add_argument('--phase');args=parser.parse_args()
     if args.command=='prepare':result=prepare(args.scenario,args.root.resolve())
     elif args.command=='grade':result=grade(json.loads(args.input.read_text()),args.root.resolve(),args.reply.read_text())
     elif args.command=='validate':result=validate_report(json.loads(args.input.read_text()))
@@ -303,6 +444,7 @@ def main():
     elif args.command=='clarification-observe':result=observe_clarification(json.loads(args.input.read_text()),args.root.resolve(),args.phase,args.reply.read_text())
     elif args.command=='clarification-interrupt':result=interrupt_clarification(json.loads(args.input.read_text()),args.root.resolve())
     elif args.command=='clarification-grade':result=grade_clarification(json.loads(args.input.read_text()),args.root.resolve(),json.loads(args.observations.read_text()))
+    elif args.command=='core-decision-validate':result=validate_core_decision_report(json.loads(args.input.read_text()),json.loads(args.capture.read_text()) if args.capture else None)
     else:result=validate_clarification_report(json.loads(args.input.read_text()))
     print(json.dumps(result,ensure_ascii=False,indent=2))
 

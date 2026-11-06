@@ -1,0 +1,21 @@
+{
+  "added_sources": [
+    ".skill-tree/common/scripts/decision-governance.py",
+    ".skill-tree/common/scripts/workflow-state.py",
+    ".skill-tree/common/scripts/pr-review-state.py",
+    ".skill-tree/common/scripts/run-workspaces.py",
+    ".skill-tree/common/scripts/validate-document-rules.py",
+    ".skill-tree/common/references/development-practices.md",
+    ".skill-tree/lib/composer.js",
+    ".skill-tree/lib/installation.js",
+    ".skill-tree/bin/install.js"
+  ],
+  "preserved": [
+    "All three initial check IDs, criteria and parameters.",
+    "Original root/dependencies/provenance and frozen twenty-one-unit scope.",
+    "No pending check attempt exists."
+  ],
+  "reason": "The core phase helper consumes the existing DG ledger and guarded Store; standalone fixtures use the real installer/composer. The common default-loop rule requires alignment with approved W1 qualified core actor roles.",
+  "record_kind": "implementation-validation-source-refinement",
+  "task_id": "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda"
+}

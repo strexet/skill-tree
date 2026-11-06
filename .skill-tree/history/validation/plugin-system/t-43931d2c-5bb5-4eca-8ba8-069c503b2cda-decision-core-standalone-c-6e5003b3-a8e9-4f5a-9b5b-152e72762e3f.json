@@ -1,0 +1,46 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-decision-governance-installation.js"
+  ],
+  "attempt_id": "C-6e5003b3-a8e9-4f5a-9b5b-152e72762e3f",
+  "check_id": "decision-core-standalone",
+  "counts": {
+    "discovered": 3,
+    "expected": 3,
+    "failed": 3,
+    "passed": 0,
+    "skipped": 0
+  },
+  "exit_code": 1,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-43931d2c-5bb5-4eca-8ba8-069c503b2cda-decision-core-standalone-c-6e5003b3-a8e9-4f5a-9b5b-152e72762e3f.txt",
+  "result": "red",
+  "reviewed_failure_reason": "Three copied flavor fixtures discover the full registered core but assert that the owned operation package lacks required decision-orchestration.py before any Python import; the new standalone core resource closure is not implemented.",
+  "source_fingerprints": {
+    ".skill-tree/bin/install.js": "6a3028764bcec61b7a95edabc8e2434dcdba2c718fc3fc99f0dcacb43701fdaf",
+    ".skill-tree/common/references/decision-governance.md": "f2ad537ffe4c0191f45d8288460e85bf721882dac8d97f5a019689d250ba75ba",
+    ".skill-tree/common/references/development-practices.md": "e49e939299c92d945d2aaa0d88cadde03639ae951670f8e46e62289cd5734664",
+    ".skill-tree/common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    ".skill-tree/common/scripts/decision-orchestration.py": "0c825e263c39456d13cf4f93af8756ca5e5a42eb00a9c20bc22ee0fb5ac2f5ec",
+    ".skill-tree/common/scripts/pr-review-state.py": "3149a85987ef01913b163132fe19c59754f1b4939c336812fefe5a1fd0ae0834",
+    ".skill-tree/common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+    ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+    ".skill-tree/common/scripts/workflow-state.py": "1d414b52841c47faf2c893fedf4ff3e89c39d146afbcd4d433e4aa20f78a84e2",
+    ".skill-tree/config/resource-map.json": "77317fe7b4e05e3ebb8ff8455053fcdee1b29399ef7894884284d5a7c45d16f3",
+    ".skill-tree/documents/implementation-plan.md": "d53373bb753c92ba770aca2af1d9dd4bea586888de5aa5320b454a2e056e84e1",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "ef81629dd2e76ed70a05896e57b38ca55571439af333da08ecebcf9d80bbe2ca",
+    ".skill-tree/lib/composer.js": "ebb4042086e61e32cd7c255df79befcdff06ae0b0bfaf2941d5d8facc1268e01",
+    ".skill-tree/lib/installation.js": "aff2c16139da198abc00a04e89a0bfe1a22bc826e38a722e146632b14164ef82",
+    ".skill-tree/scripts/agent-conformance.py": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
+    ".skill-tree/templates/invariants.json": "4545894b07fab5f222d15eddd17c220408a4be8a5e5f25da3a4a34ef06bb87b5",
+    ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+    ".skill-tree/tests/test-decision-governance-installation.js": "eec5260b4fbb28a04d86361e81c35813eaf3d75f18c4f1524a1cf7269157ac83",
+    ".skill-tree/tests/test-decision-orchestration.py": "2a836715f4c0c9132d19d9286d7a5f526eef4ddd61eb709b1af5b8a18c58e169"
+  },
+  "task_id": "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda",
+  "tool_wall_seconds": 1.2362906248308718
+}

@@ -101,6 +101,7 @@
       "resources": [
         ".skill-tree/skills/general/skill-tree-add-pending-task/SKILL.md",
         ".skill-tree/skills/general/skill-tree-add-pending-task/agents/openai.yaml",
+        ".skill-tree/skills/general/skill-tree-add-pending-task/references/decision-governance.md",
         ".skill-tree/skills/general/skill-tree-add-pending-task/references/document-rules.md",
         ".skill-tree/skills/general/skill-tree-add-pending-task/references/installation-profile.md",
         ".skill-tree/skills/general/skill-tree-add-pending-task/references/pending-task-format.md",
@@ -110,6 +111,7 @@
         ".skill-tree/skills/general/skill-tree-add-pending-task/references/validation-policy.md",
         ".skill-tree/skills/general/skill-tree-add-pending-task/references/workflow-metadata.md",
         ".skill-tree/skills/general/skill-tree-add-pending-task/scripts/decision-governance.py",
+        ".skill-tree/skills/general/skill-tree-add-pending-task/scripts/decision-orchestration.py",
         ".skill-tree/skills/general/skill-tree-add-pending-task/scripts/run-workspaces.py",
         ".skill-tree/skills/general/skill-tree-add-pending-task/scripts/validate-document-rules.py",
         ".skill-tree/skills/general/skill-tree-add-pending-task/scripts/workflow-state.py"
@@ -121,6 +123,7 @@
       "resources": [
         ".skill-tree/skills/general/skill-tree-clarify-tasks/SKILL.md",
         ".skill-tree/skills/general/skill-tree-clarify-tasks/agents/openai.yaml",
+        ".skill-tree/skills/general/skill-tree-clarify-tasks/references/decision-governance.md",
         ".skill-tree/skills/general/skill-tree-clarify-tasks/references/development-practices.md",
         ".skill-tree/skills/general/skill-tree-clarify-tasks/references/document-rules.md",
         ".skill-tree/skills/general/skill-tree-clarify-tasks/references/future-workflow.md",
@@ -133,6 +136,7 @@
         ".skill-tree/skills/general/skill-tree-clarify-tasks/references/validation-policy.md",
         ".skill-tree/skills/general/skill-tree-clarify-tasks/references/workflow-metadata.md",
         ".skill-tree/skills/general/skill-tree-clarify-tasks/scripts/decision-governance.py",
+        ".skill-tree/skills/general/skill-tree-clarify-tasks/scripts/decision-orchestration.py",
         ".skill-tree/skills/general/skill-tree-clarify-tasks/scripts/run-workspaces.py",
         ".skill-tree/skills/general/skill-tree-clarify-tasks/scripts/select-prioritized-task.py",
         ".skill-tree/skills/general/skill-tree-clarify-tasks/scripts/validate-document-rules.py",
@@ -145,12 +149,18 @@
       "resources": [
         ".skill-tree/skills/general/skill-tree-create-documents-snapshot/SKILL.md",
         ".skill-tree/skills/general/skill-tree-create-documents-snapshot/agents/openai.yaml",
+        ".skill-tree/skills/general/skill-tree-create-documents-snapshot/references/decision-governance.md",
         ".skill-tree/skills/general/skill-tree-create-documents-snapshot/references/document-rules.md",
         ".skill-tree/skills/general/skill-tree-create-documents-snapshot/references/installation-profile.md",
         ".skill-tree/skills/general/skill-tree-create-documents-snapshot/references/project-profile.md",
         ".skill-tree/skills/general/skill-tree-create-documents-snapshot/references/snapshot-rules.md",
         ".skill-tree/skills/general/skill-tree-create-documents-snapshot/references/validation-policy.md",
-        ".skill-tree/skills/general/skill-tree-create-documents-snapshot/scripts/create-documentation-snapshot.py"
+        ".skill-tree/skills/general/skill-tree-create-documents-snapshot/scripts/create-documentation-snapshot.py",
+        ".skill-tree/skills/general/skill-tree-create-documents-snapshot/scripts/decision-governance.py",
+        ".skill-tree/skills/general/skill-tree-create-documents-snapshot/scripts/decision-orchestration.py",
+        ".skill-tree/skills/general/skill-tree-create-documents-snapshot/scripts/run-workspaces.py",
+        ".skill-tree/skills/general/skill-tree-create-documents-snapshot/scripts/validate-document-rules.py",
+        ".skill-tree/skills/general/skill-tree-create-documents-snapshot/scripts/workflow-state.py"
       ]
     },
     {
@@ -159,6 +169,7 @@
       "resources": [
         ".skill-tree/skills/general/skill-tree-implement-all/SKILL.md",
         ".skill-tree/skills/general/skill-tree-implement-all/agents/openai.yaml",
+        ".skill-tree/skills/general/skill-tree-implement-all/references/decision-governance.md",
         ".skill-tree/skills/general/skill-tree-implement-all/references/development-practices.md",
         ".skill-tree/skills/general/skill-tree-implement-all/references/document-rules.md",
         ".skill-tree/skills/general/skill-tree-implement-all/references/future-workflow.md",
@@ -173,6 +184,7 @@
         ".skill-tree/skills/general/skill-tree-implement-all/references/validation-policy.md",
         ".skill-tree/skills/general/skill-tree-implement-all/references/workflow-metadata.md",
         ".skill-tree/skills/general/skill-tree-implement-all/scripts/decision-governance.py",
+        ".skill-tree/skills/general/skill-tree-implement-all/scripts/decision-orchestration.py",
         ".skill-tree/skills/general/skill-tree-implement-all/scripts/pr-review-state.py",
         ".skill-tree/skills/general/skill-tree-implement-all/scripts/run-workspaces.py",
         ".skill-tree/skills/general/skill-tree-implement-all/scripts/validate-document-rules.py",
@@ -185,6 +197,7 @@
       "resources": [
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/SKILL.md",
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/agents/openai.yaml",
+        ".skill-tree/skills/general/skill-tree-implement-next-future-task/references/decision-governance.md",
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/references/development-practices.md",
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/references/document-rules.md",
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/references/future-workflow.md",
@@ -197,6 +210,7 @@
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/references/validation-policy.md",
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/references/workflow-metadata.md",
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/scripts/decision-governance.py",
+        ".skill-tree/skills/general/skill-tree-implement-next-future-task/scripts/decision-orchestration.py",
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/scripts/run-workspaces.py",
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/scripts/select-prioritized-task.py",
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/scripts/validate-document-rules.py",
@@ -209,6 +223,7 @@
       "resources": [
         ".skill-tree/skills/general/skill-tree-pr-review-cycle/SKILL.md",
         ".skill-tree/skills/general/skill-tree-pr-review-cycle/agents/openai.yaml",
+        ".skill-tree/skills/general/skill-tree-pr-review-cycle/references/decision-governance.md",
         ".skill-tree/skills/general/skill-tree-pr-review-cycle/references/document-rules.md",
         ".skill-tree/skills/general/skill-tree-pr-review-cycle/references/installation-profile.md",
         ".skill-tree/skills/general/skill-tree-pr-review-cycle/references/pending-task-intake.md",
@@ -218,6 +233,7 @@
         ".skill-tree/skills/general/skill-tree-pr-review-cycle/references/validation-policy.md",
         ".skill-tree/skills/general/skill-tree-pr-review-cycle/references/workflow-metadata.md",
         ".skill-tree/skills/general/skill-tree-pr-review-cycle/scripts/decision-governance.py",
+        ".skill-tree/skills/general/skill-tree-pr-review-cycle/scripts/decision-orchestration.py",
         ".skill-tree/skills/general/skill-tree-pr-review-cycle/scripts/pr-review-state.py",
         ".skill-tree/skills/general/skill-tree-pr-review-cycle/scripts/run-workspaces.py",
         ".skill-tree/skills/general/skill-tree-pr-review-cycle/scripts/validate-document-rules.py",
@@ -230,6 +246,7 @@
       "resources": [
         ".skill-tree/skills/general/skill-tree-process-future-pending/SKILL.md",
         ".skill-tree/skills/general/skill-tree-process-future-pending/agents/openai.yaml",
+        ".skill-tree/skills/general/skill-tree-process-future-pending/references/decision-governance.md",
         ".skill-tree/skills/general/skill-tree-process-future-pending/references/document-rules.md",
         ".skill-tree/skills/general/skill-tree-process-future-pending/references/future-workflow.md",
         ".skill-tree/skills/general/skill-tree-process-future-pending/references/history-retention.md",
@@ -241,6 +258,7 @@
         ".skill-tree/skills/general/skill-tree-process-future-pending/references/validation-policy.md",
         ".skill-tree/skills/general/skill-tree-process-future-pending/references/workflow-metadata.md",
         ".skill-tree/skills/general/skill-tree-process-future-pending/scripts/decision-governance.py",
+        ".skill-tree/skills/general/skill-tree-process-future-pending/scripts/decision-orchestration.py",
         ".skill-tree/skills/general/skill-tree-process-future-pending/scripts/run-workspaces.py",
         ".skill-tree/skills/general/skill-tree-process-future-pending/scripts/validate-document-rules.py",
         ".skill-tree/skills/general/skill-tree-process-future-pending/scripts/validate-future-document.py",
@@ -253,6 +271,7 @@
       "resources": [
         ".skill-tree/skills/general/skill-tree-repo-documentation/SKILL.md",
         ".skill-tree/skills/general/skill-tree-repo-documentation/agents/openai.yaml",
+        ".skill-tree/skills/general/skill-tree-repo-documentation/references/decision-governance.md",
         ".skill-tree/skills/general/skill-tree-repo-documentation/references/document-rules.md",
         ".skill-tree/skills/general/skill-tree-repo-documentation/references/documentation-output-contract.md",
         ".skill-tree/skills/general/skill-tree-repo-documentation/references/history-retention.md",
@@ -265,6 +284,7 @@
         ".skill-tree/skills/general/skill-tree-repo-documentation/references/validation-policy.md",
         ".skill-tree/skills/general/skill-tree-repo-documentation/references/workflow-metadata.md",
         ".skill-tree/skills/general/skill-tree-repo-documentation/scripts/decision-governance.py",
+        ".skill-tree/skills/general/skill-tree-repo-documentation/scripts/decision-orchestration.py",
         ".skill-tree/skills/general/skill-tree-repo-documentation/scripts/run-workspaces.py",
         ".skill-tree/skills/general/skill-tree-repo-documentation/scripts/validate-document-rules.py",
         ".skill-tree/skills/general/skill-tree-repo-documentation/scripts/validate-future-document.py",
@@ -278,6 +298,7 @@
       "resources": [
         ".skill-tree/skills/general/skill-tree-repo-documentation-audit/SKILL.md",
         ".skill-tree/skills/general/skill-tree-repo-documentation-audit/agents/openai.yaml",
+        ".skill-tree/skills/general/skill-tree-repo-documentation-audit/references/decision-governance.md",
         ".skill-tree/skills/general/skill-tree-repo-documentation-audit/references/document-rules.md",
         ".skill-tree/skills/general/skill-tree-repo-documentation-audit/references/documentation-output-contract.md",
         ".skill-tree/skills/general/skill-tree-repo-documentation-audit/references/history-retention.md",
@@ -290,6 +311,7 @@
         ".skill-tree/skills/general/skill-tree-repo-documentation-audit/references/validation-policy.md",
         ".skill-tree/skills/general/skill-tree-repo-documentation-audit/references/workflow-metadata.md",
         ".skill-tree/skills/general/skill-tree-repo-documentation-audit/scripts/decision-governance.py",
+        ".skill-tree/skills/general/skill-tree-repo-documentation-audit/scripts/decision-orchestration.py",
         ".skill-tree/skills/general/skill-tree-repo-documentation-audit/scripts/run-workspaces.py",
         ".skill-tree/skills/general/skill-tree-repo-documentation-audit/scripts/validate-document-rules.py",
         ".skill-tree/skills/general/skill-tree-repo-documentation-audit/scripts/validate-future-document.py",
@@ -303,6 +325,7 @@
       "resources": [
         ".skill-tree/skills/general/skill-tree-work-through-next/SKILL.md",
         ".skill-tree/skills/general/skill-tree-work-through-next/agents/openai.yaml",
+        ".skill-tree/skills/general/skill-tree-work-through-next/references/decision-governance.md",
         ".skill-tree/skills/general/skill-tree-work-through-next/references/development-practices.md",
         ".skill-tree/skills/general/skill-tree-work-through-next/references/document-rules.md",
         ".skill-tree/skills/general/skill-tree-work-through-next/references/future-workflow.md",
@@ -317,6 +340,7 @@
         ".skill-tree/skills/general/skill-tree-work-through-next/references/validation-policy.md",
         ".skill-tree/skills/general/skill-tree-work-through-next/references/workflow-metadata.md",
         ".skill-tree/skills/general/skill-tree-work-through-next/scripts/decision-governance.py",
+        ".skill-tree/skills/general/skill-tree-work-through-next/scripts/decision-orchestration.py",
         ".skill-tree/skills/general/skill-tree-work-through-next/scripts/pr-review-state.py",
         ".skill-tree/skills/general/skill-tree-work-through-next/scripts/run-workspaces.py",
         ".skill-tree/skills/general/skill-tree-work-through-next/scripts/validate-document-rules.py",
@@ -329,6 +353,7 @@
       "resources": [
         ".skill-tree/skills/unity/skill-tree-add-pending-task/SKILL.md",
         ".skill-tree/skills/unity/skill-tree-add-pending-task/agents/openai.yaml",
+        ".skill-tree/skills/unity/skill-tree-add-pending-task/references/decision-governance.md",
         ".skill-tree/skills/unity/skill-tree-add-pending-task/references/document-rules.md",
         ".skill-tree/skills/unity/skill-tree-add-pending-task/references/installation-profile.md",
         ".skill-tree/skills/unity/skill-tree-add-pending-task/references/pending-task-format.md",
@@ -341,6 +366,7 @@
         ".skill-tree/skills/unity/skill-tree-add-pending-task/references/validation-policy.md",
         ".skill-tree/skills/unity/skill-tree-add-pending-task/references/workflow-metadata.md",
         ".skill-tree/skills/unity/skill-tree-add-pending-task/scripts/decision-governance.py",
+        ".skill-tree/skills/unity/skill-tree-add-pending-task/scripts/decision-orchestration.py",
         ".skill-tree/skills/unity/skill-tree-add-pending-task/scripts/inspect-unity-repository.py",
         ".skill-tree/skills/unity/skill-tree-add-pending-task/scripts/run-workspaces.py",
         ".skill-tree/skills/unity/skill-tree-add-pending-task/scripts/validate-document-rules.py",
@@ -353,6 +379,7 @@
       "resources": [
         ".skill-tree/skills/unity/skill-tree-clarify-tasks/SKILL.md",
         ".skill-tree/skills/unity/skill-tree-clarify-tasks/agents/openai.yaml",
+        ".skill-tree/skills/unity/skill-tree-clarify-tasks/references/decision-governance.md",
         ".skill-tree/skills/unity/skill-tree-clarify-tasks/references/development-practices.md",
         ".skill-tree/skills/unity/skill-tree-clarify-tasks/references/document-rules.md",
         ".skill-tree/skills/unity/skill-tree-clarify-tasks/references/future-workflow.md",
@@ -368,6 +395,7 @@
         ".skill-tree/skills/unity/skill-tree-clarify-tasks/references/validation-policy.md",
         ".skill-tree/skills/unity/skill-tree-clarify-tasks/references/workflow-metadata.md",
         ".skill-tree/skills/unity/skill-tree-clarify-tasks/scripts/decision-governance.py",
+        ".skill-tree/skills/unity/skill-tree-clarify-tasks/scripts/decision-orchestration.py",
         ".skill-tree/skills/unity/skill-tree-clarify-tasks/scripts/inspect-unity-repository.py",
         ".skill-tree/skills/unity/skill-tree-clarify-tasks/scripts/run-workspaces.py",
         ".skill-tree/skills/unity/skill-tree-clarify-tasks/scripts/select-prioritized-task.py",
@@ -381,6 +409,7 @@
       "resources": [
         ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/SKILL.md",
         ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/agents/openai.yaml",
+        ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/references/decision-governance.md",
         ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/references/document-rules.md",
         ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/references/installation-profile.md",
         ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/references/project-profile.md",
@@ -390,7 +419,12 @@
         ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/references/unity-safety.md",
         ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/references/validation-policy.md",
         ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/scripts/create-documentation-snapshot.py",
-        ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/scripts/inspect-unity-repository.py"
+        ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/scripts/decision-governance.py",
+        ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/scripts/decision-orchestration.py",
+        ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/scripts/inspect-unity-repository.py",
+        ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/scripts/run-workspaces.py",
+        ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/scripts/validate-document-rules.py",
+        ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/scripts/workflow-state.py"
       ]
     },
     {
@@ -399,6 +433,7 @@
       "resources": [
         ".skill-tree/skills/unity/skill-tree-implement-all/SKILL.md",
         ".skill-tree/skills/unity/skill-tree-implement-all/agents/openai.yaml",
+        ".skill-tree/skills/unity/skill-tree-implement-all/references/decision-governance.md",
         ".skill-tree/skills/unity/skill-tree-implement-all/references/development-practices.md",
         ".skill-tree/skills/unity/skill-tree-implement-all/references/document-rules.md",
         ".skill-tree/skills/unity/skill-tree-implement-all/references/future-workflow.md",
@@ -416,6 +451,7 @@
         ".skill-tree/skills/unity/skill-tree-implement-all/references/validation-policy.md",
         ".skill-tree/skills/unity/skill-tree-implement-all/references/workflow-metadata.md",
         ".skill-tree/skills/unity/skill-tree-implement-all/scripts/decision-governance.py",
+        ".skill-tree/skills/unity/skill-tree-implement-all/scripts/decision-orchestration.py",
         ".skill-tree/skills/unity/skill-tree-implement-all/scripts/inspect-unity-repository.py",
         ".skill-tree/skills/unity/skill-tree-implement-all/scripts/pr-review-state.py",
         ".skill-tree/skills/unity/skill-tree-implement-all/scripts/run-workspaces.py",
@@ -429,6 +465,7 @@
       "resources": [
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/SKILL.md",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/agents/openai.yaml",
+        ".skill-tree/skills/unity/skill-tree-implement-next-future-task/references/decision-governance.md",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/references/development-practices.md",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/references/document-rules.md",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/references/future-workflow.md",
@@ -444,6 +481,7 @@
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/references/validation-policy.md",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/references/workflow-metadata.md",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/scripts/decision-governance.py",
+        ".skill-tree/skills/unity/skill-tree-implement-next-future-task/scripts/decision-orchestration.py",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/scripts/inspect-unity-repository.py",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/scripts/run-workspaces.py",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/scripts/select-prioritized-task.py",
@@ -457,6 +495,7 @@
       "resources": [
         ".skill-tree/skills/unity/skill-tree-pr-review-cycle/SKILL.md",
         ".skill-tree/skills/unity/skill-tree-pr-review-cycle/agents/openai.yaml",
+        ".skill-tree/skills/unity/skill-tree-pr-review-cycle/references/decision-governance.md",
         ".skill-tree/skills/unity/skill-tree-pr-review-cycle/references/document-rules.md",
         ".skill-tree/skills/unity/skill-tree-pr-review-cycle/references/installation-profile.md",
         ".skill-tree/skills/unity/skill-tree-pr-review-cycle/references/pending-task-intake.md",
@@ -469,6 +508,7 @@
         ".skill-tree/skills/unity/skill-tree-pr-review-cycle/references/validation-policy.md",
         ".skill-tree/skills/unity/skill-tree-pr-review-cycle/references/workflow-metadata.md",
         ".skill-tree/skills/unity/skill-tree-pr-review-cycle/scripts/decision-governance.py",
+        ".skill-tree/skills/unity/skill-tree-pr-review-cycle/scripts/decision-orchestration.py",
         ".skill-tree/skills/unity/skill-tree-pr-review-cycle/scripts/inspect-unity-repository.py",
         ".skill-tree/skills/unity/skill-tree-pr-review-cycle/scripts/pr-review-state.py",
         ".skill-tree/skills/unity/skill-tree-pr-review-cycle/scripts/run-workspaces.py",
@@ -482,6 +522,7 @@
       "resources": [
         ".skill-tree/skills/unity/skill-tree-process-future-pending/SKILL.md",
         ".skill-tree/skills/unity/skill-tree-process-future-pending/agents/openai.yaml",
+        ".skill-tree/skills/unity/skill-tree-process-future-pending/references/decision-governance.md",
         ".skill-tree/skills/unity/skill-tree-process-future-pending/references/document-rules.md",
         ".skill-tree/skills/unity/skill-tree-process-future-pending/references/future-workflow.md",
         ".skill-tree/skills/unity/skill-tree-process-future-pending/references/history-retention.md",
@@ -496,6 +537,7 @@
         ".skill-tree/skills/unity/skill-tree-process-future-pending/references/validation-policy.md",
         ".skill-tree/skills/unity/skill-tree-process-future-pending/references/workflow-metadata.md",
         ".skill-tree/skills/unity/skill-tree-process-future-pending/scripts/decision-governance.py",
+        ".skill-tree/skills/unity/skill-tree-process-future-pending/scripts/decision-orchestration.py",
         ".skill-tree/skills/unity/skill-tree-process-future-pending/scripts/inspect-unity-repository.py",
         ".skill-tree/skills/unity/skill-tree-process-future-pending/scripts/run-workspaces.py",
         ".skill-tree/skills/unity/skill-tree-process-future-pending/scripts/validate-document-rules.py",
@@ -509,6 +551,7 @@
       "resources": [
         ".skill-tree/skills/unity/skill-tree-repo-documentation/SKILL.md",
         ".skill-tree/skills/unity/skill-tree-repo-documentation/agents/openai.yaml",
+        ".skill-tree/skills/unity/skill-tree-repo-documentation/references/decision-governance.md",
         ".skill-tree/skills/unity/skill-tree-repo-documentation/references/document-rules.md",
         ".skill-tree/skills/unity/skill-tree-repo-documentation/references/documentation-output-contract.md",
         ".skill-tree/skills/unity/skill-tree-repo-documentation/references/history-retention.md",
@@ -524,6 +567,7 @@
         ".skill-tree/skills/unity/skill-tree-repo-documentation/references/validation-policy.md",
         ".skill-tree/skills/unity/skill-tree-repo-documentation/references/workflow-metadata.md",
         ".skill-tree/skills/unity/skill-tree-repo-documentation/scripts/decision-governance.py",
+        ".skill-tree/skills/unity/skill-tree-repo-documentation/scripts/decision-orchestration.py",
         ".skill-tree/skills/unity/skill-tree-repo-documentation/scripts/inspect-unity-repository.py",
         ".skill-tree/skills/unity/skill-tree-repo-documentation/scripts/run-workspaces.py",
         ".skill-tree/skills/unity/skill-tree-repo-documentation/scripts/validate-document-rules.py",
@@ -538,6 +582,7 @@
       "resources": [
         ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/SKILL.md",
         ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/agents/openai.yaml",
+        ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/references/decision-governance.md",
         ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/references/document-rules.md",
         ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/references/documentation-output-contract.md",
         ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/references/history-retention.md",
@@ -553,6 +598,7 @@
         ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/references/validation-policy.md",
         ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/references/workflow-metadata.md",
         ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/scripts/decision-governance.py",
+        ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/scripts/decision-orchestration.py",
         ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/scripts/inspect-unity-repository.py",
         ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/scripts/run-workspaces.py",
         ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/scripts/validate-document-rules.py",
@@ -567,6 +613,7 @@
       "resources": [
         ".skill-tree/skills/unity/skill-tree-work-through-next/SKILL.md",
         ".skill-tree/skills/unity/skill-tree-work-through-next/agents/openai.yaml",
+        ".skill-tree/skills/unity/skill-tree-work-through-next/references/decision-governance.md",
         ".skill-tree/skills/unity/skill-tree-work-through-next/references/development-practices.md",
         ".skill-tree/skills/unity/skill-tree-work-through-next/references/document-rules.md",
         ".skill-tree/skills/unity/skill-tree-work-through-next/references/future-workflow.md",
@@ -584,6 +631,7 @@
         ".skill-tree/skills/unity/skill-tree-work-through-next/references/validation-policy.md",
         ".skill-tree/skills/unity/skill-tree-work-through-next/references/workflow-metadata.md",
         ".skill-tree/skills/unity/skill-tree-work-through-next/scripts/decision-governance.py",
+        ".skill-tree/skills/unity/skill-tree-work-through-next/scripts/decision-orchestration.py",
         ".skill-tree/skills/unity/skill-tree-work-through-next/scripts/inspect-unity-repository.py",
         ".skill-tree/skills/unity/skill-tree-work-through-next/scripts/pr-review-state.py",
         ".skill-tree/skills/unity/skill-tree-work-through-next/scripts/run-workspaces.py",
@@ -597,6 +645,7 @@
       "resources": [
         ".skill-tree/skills/web/skill-tree-add-pending-task/SKILL.md",
         ".skill-tree/skills/web/skill-tree-add-pending-task/agents/openai.yaml",
+        ".skill-tree/skills/web/skill-tree-add-pending-task/references/decision-governance.md",
         ".skill-tree/skills/web/skill-tree-add-pending-task/references/document-rules.md",
         ".skill-tree/skills/web/skill-tree-add-pending-task/references/installation-profile.md",
         ".skill-tree/skills/web/skill-tree-add-pending-task/references/pending-task-format.md",
@@ -607,6 +656,7 @@
         ".skill-tree/skills/web/skill-tree-add-pending-task/references/web-development.md",
         ".skill-tree/skills/web/skill-tree-add-pending-task/references/workflow-metadata.md",
         ".skill-tree/skills/web/skill-tree-add-pending-task/scripts/decision-governance.py",
+        ".skill-tree/skills/web/skill-tree-add-pending-task/scripts/decision-orchestration.py",
         ".skill-tree/skills/web/skill-tree-add-pending-task/scripts/run-workspaces.py",
         ".skill-tree/skills/web/skill-tree-add-pending-task/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-add-pending-task/scripts/workflow-state.py"
@@ -618,6 +668,7 @@
       "resources": [
         ".skill-tree/skills/web/skill-tree-clarify-tasks/SKILL.md",
         ".skill-tree/skills/web/skill-tree-clarify-tasks/agents/openai.yaml",
+        ".skill-tree/skills/web/skill-tree-clarify-tasks/references/decision-governance.md",
         ".skill-tree/skills/web/skill-tree-clarify-tasks/references/development-practices.md",
         ".skill-tree/skills/web/skill-tree-clarify-tasks/references/document-rules.md",
         ".skill-tree/skills/web/skill-tree-clarify-tasks/references/future-workflow.md",
@@ -631,6 +682,7 @@
         ".skill-tree/skills/web/skill-tree-clarify-tasks/references/web-development.md",
         ".skill-tree/skills/web/skill-tree-clarify-tasks/references/workflow-metadata.md",
         ".skill-tree/skills/web/skill-tree-clarify-tasks/scripts/decision-governance.py",
+        ".skill-tree/skills/web/skill-tree-clarify-tasks/scripts/decision-orchestration.py",
         ".skill-tree/skills/web/skill-tree-clarify-tasks/scripts/run-workspaces.py",
         ".skill-tree/skills/web/skill-tree-clarify-tasks/scripts/select-prioritized-task.py",
         ".skill-tree/skills/web/skill-tree-clarify-tasks/scripts/validate-document-rules.py",
@@ -643,13 +695,19 @@
       "resources": [
         ".skill-tree/skills/web/skill-tree-create-documents-snapshot/SKILL.md",
         ".skill-tree/skills/web/skill-tree-create-documents-snapshot/agents/openai.yaml",
+        ".skill-tree/skills/web/skill-tree-create-documents-snapshot/references/decision-governance.md",
         ".skill-tree/skills/web/skill-tree-create-documents-snapshot/references/document-rules.md",
         ".skill-tree/skills/web/skill-tree-create-documents-snapshot/references/installation-profile.md",
         ".skill-tree/skills/web/skill-tree-create-documents-snapshot/references/project-profile.md",
         ".skill-tree/skills/web/skill-tree-create-documents-snapshot/references/snapshot-rules.md",
         ".skill-tree/skills/web/skill-tree-create-documents-snapshot/references/validation-policy.md",
         ".skill-tree/skills/web/skill-tree-create-documents-snapshot/references/web-development.md",
-        ".skill-tree/skills/web/skill-tree-create-documents-snapshot/scripts/create-documentation-snapshot.py"
+        ".skill-tree/skills/web/skill-tree-create-documents-snapshot/scripts/create-documentation-snapshot.py",
+        ".skill-tree/skills/web/skill-tree-create-documents-snapshot/scripts/decision-governance.py",
+        ".skill-tree/skills/web/skill-tree-create-documents-snapshot/scripts/decision-orchestration.py",
+        ".skill-tree/skills/web/skill-tree-create-documents-snapshot/scripts/run-workspaces.py",
+        ".skill-tree/skills/web/skill-tree-create-documents-snapshot/scripts/validate-document-rules.py",
+        ".skill-tree/skills/web/skill-tree-create-documents-snapshot/scripts/workflow-state.py"
       ]
     },
     {
@@ -658,6 +716,7 @@
       "resources": [
         ".skill-tree/skills/web/skill-tree-implement-all/SKILL.md",
         ".skill-tree/skills/web/skill-tree-implement-all/agents/openai.yaml",
+        ".skill-tree/skills/web/skill-tree-implement-all/references/decision-governance.md",
         ".skill-tree/skills/web/skill-tree-implement-all/references/development-practices.md",
         ".skill-tree/skills/web/skill-tree-implement-all/references/document-rules.md",
         ".skill-tree/skills/web/skill-tree-implement-all/references/future-workflow.md",
@@ -673,6 +732,7 @@
         ".skill-tree/skills/web/skill-tree-implement-all/references/web-development.md",
         ".skill-tree/skills/web/skill-tree-implement-all/references/workflow-metadata.md",
         ".skill-tree/skills/web/skill-tree-implement-all/scripts/decision-governance.py",
+        ".skill-tree/skills/web/skill-tree-implement-all/scripts/decision-orchestration.py",
         ".skill-tree/skills/web/skill-tree-implement-all/scripts/pr-review-state.py",
         ".skill-tree/skills/web/skill-tree-implement-all/scripts/run-workspaces.py",
         ".skill-tree/skills/web/skill-tree-implement-all/scripts/validate-document-rules.py",
@@ -685,6 +745,7 @@
       "resources": [
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/SKILL.md",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/agents/openai.yaml",
+        ".skill-tree/skills/web/skill-tree-implement-next-future-task/references/decision-governance.md",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/references/development-practices.md",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/references/document-rules.md",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/references/future-workflow.md",
@@ -698,6 +759,7 @@
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/references/web-development.md",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/references/workflow-metadata.md",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/scripts/decision-governance.py",
+        ".skill-tree/skills/web/skill-tree-implement-next-future-task/scripts/decision-orchestration.py",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/scripts/run-workspaces.py",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/scripts/select-prioritized-task.py",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/scripts/validate-document-rules.py",
@@ -710,6 +772,7 @@
       "resources": [
         ".skill-tree/skills/web/skill-tree-pr-review-cycle/SKILL.md",
         ".skill-tree/skills/web/skill-tree-pr-review-cycle/agents/openai.yaml",
+        ".skill-tree/skills/web/skill-tree-pr-review-cycle/references/decision-governance.md",
         ".skill-tree/skills/web/skill-tree-pr-review-cycle/references/document-rules.md",
         ".skill-tree/skills/web/skill-tree-pr-review-cycle/references/installation-profile.md",
         ".skill-tree/skills/web/skill-tree-pr-review-cycle/references/pending-task-intake.md",
@@ -720,6 +783,7 @@
         ".skill-tree/skills/web/skill-tree-pr-review-cycle/references/web-development.md",
         ".skill-tree/skills/web/skill-tree-pr-review-cycle/references/workflow-metadata.md",
         ".skill-tree/skills/web/skill-tree-pr-review-cycle/scripts/decision-governance.py",
+        ".skill-tree/skills/web/skill-tree-pr-review-cycle/scripts/decision-orchestration.py",
         ".skill-tree/skills/web/skill-tree-pr-review-cycle/scripts/pr-review-state.py",
         ".skill-tree/skills/web/skill-tree-pr-review-cycle/scripts/run-workspaces.py",
         ".skill-tree/skills/web/skill-tree-pr-review-cycle/scripts/validate-document-rules.py",
@@ -732,6 +796,7 @@
       "resources": [
         ".skill-tree/skills/web/skill-tree-process-future-pending/SKILL.md",
         ".skill-tree/skills/web/skill-tree-process-future-pending/agents/openai.yaml",
+        ".skill-tree/skills/web/skill-tree-process-future-pending/references/decision-governance.md",
         ".skill-tree/skills/web/skill-tree-process-future-pending/references/document-rules.md",
         ".skill-tree/skills/web/skill-tree-process-future-pending/references/future-workflow.md",
         ".skill-tree/skills/web/skill-tree-process-future-pending/references/history-retention.md",
@@ -744,6 +809,7 @@
         ".skill-tree/skills/web/skill-tree-process-future-pending/references/web-development.md",
         ".skill-tree/skills/web/skill-tree-process-future-pending/references/workflow-metadata.md",
         ".skill-tree/skills/web/skill-tree-process-future-pending/scripts/decision-governance.py",
+        ".skill-tree/skills/web/skill-tree-process-future-pending/scripts/decision-orchestration.py",
         ".skill-tree/skills/web/skill-tree-process-future-pending/scripts/run-workspaces.py",
         ".skill-tree/skills/web/skill-tree-process-future-pending/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-process-future-pending/scripts/validate-future-document.py",
@@ -756,6 +822,7 @@
       "resources": [
         ".skill-tree/skills/web/skill-tree-repo-documentation/SKILL.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation/agents/openai.yaml",
+        ".skill-tree/skills/web/skill-tree-repo-documentation/references/decision-governance.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation/references/document-rules.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation/references/documentation-output-contract.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation/references/history-retention.md",
@@ -769,6 +836,7 @@
         ".skill-tree/skills/web/skill-tree-repo-documentation/references/web-development.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation/references/workflow-metadata.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation/scripts/decision-governance.py",
+        ".skill-tree/skills/web/skill-tree-repo-documentation/scripts/decision-orchestration.py",
         ".skill-tree/skills/web/skill-tree-repo-documentation/scripts/run-workspaces.py",
         ".skill-tree/skills/web/skill-tree-repo-documentation/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-repo-documentation/scripts/validate-future-document.py",
@@ -782,6 +850,7 @@
       "resources": [
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/SKILL.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/agents/openai.yaml",
+        ".skill-tree/skills/web/skill-tree-repo-documentation-audit/references/decision-governance.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/references/document-rules.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/references/documentation-output-contract.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/references/history-retention.md",
@@ -795,6 +864,7 @@
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/references/web-development.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/references/workflow-metadata.md",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/scripts/decision-governance.py",
+        ".skill-tree/skills/web/skill-tree-repo-documentation-audit/scripts/decision-orchestration.py",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/scripts/run-workspaces.py",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/scripts/validate-future-document.py",
@@ -808,6 +878,7 @@
       "resources": [
         ".skill-tree/skills/web/skill-tree-work-through-next/SKILL.md",
         ".skill-tree/skills/web/skill-tree-work-through-next/agents/openai.yaml",
+        ".skill-tree/skills/web/skill-tree-work-through-next/references/decision-governance.md",
         ".skill-tree/skills/web/skill-tree-work-through-next/references/development-practices.md",
         ".skill-tree/skills/web/skill-tree-work-through-next/references/document-rules.md",
         ".skill-tree/skills/web/skill-tree-work-through-next/references/future-workflow.md",
@@ -823,6 +894,7 @@
         ".skill-tree/skills/web/skill-tree-work-through-next/references/web-development.md",
         ".skill-tree/skills/web/skill-tree-work-through-next/references/workflow-metadata.md",
         ".skill-tree/skills/web/skill-tree-work-through-next/scripts/decision-governance.py",
+        ".skill-tree/skills/web/skill-tree-work-through-next/scripts/decision-orchestration.py",
         ".skill-tree/skills/web/skill-tree-work-through-next/scripts/pr-review-state.py",
         ".skill-tree/skills/web/skill-tree-work-through-next/scripts/run-workspaces.py",
         ".skill-tree/skills/web/skill-tree-work-through-next/scripts/validate-document-rules.py",
@@ -973,6 +1045,11 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/common/references/decision-governance.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/common/references/development-practices.md",
       "role": "canonical"
     },
@@ -1064,6 +1141,11 @@
     {
       "owner": "skill-tree",
       "path": ".skill-tree/common/scripts/decision-governance.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/scripts/decision-orchestration.py",
       "role": "canonical"
     },
     {
@@ -1315,7 +1397,8 @@
   "source_digests": {
     ".skill-tree/bin/compose.js": "a328aaece4d36bc739f20907f3d1cc20a82e3d7e4d5d7c3a8872630cf923c78a",
     ".skill-tree/bin/install.js": "6a3028764bcec61b7a95edabc8e2434dcdba2c718fc3fc99f0dcacb43701fdaf",
-    ".skill-tree/common/references/development-practices.md": "e49e939299c92d945d2aaa0d88cadde03639ae951670f8e46e62289cd5734664",
+    ".skill-tree/common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+    ".skill-tree/common/references/development-practices.md": "47402db618635e221d3e3944cb0f2dc88238e278a6e2c49f49491ce98e24fc14",
     ".skill-tree/common/references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     ".skill-tree/common/references/documentation-output-contract.md": "34d40d7d8a53b08c5078421cb999b1b3d606506c8b6c9cb5d78273cce73e1008",
     ".skill-tree/common/references/future-workflow.md": "d8c04b71daddb6df3b6e0198e87cd2497d2e7b9db50cfa9ec8222dae78344e24",
@@ -1331,9 +1414,10 @@
     ".skill-tree/common/references/snapshot-rules.md": "18142120546fcd532e496fbd14aefbe449fa63da40cbcca577db249b91dcd30e",
     ".skill-tree/common/references/unity-safety.md": "ff6e0063e3a26f60d8655a08beb33ef19ffa2f27fce9c5efd573480b1b81e6ac",
     ".skill-tree/common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
-    ".skill-tree/common/references/workflow-metadata.md": "c1a031314c6122fbbdbdbc73849bbe4cae6f93298d2f1ef172f6970470f2d249",
+    ".skill-tree/common/references/workflow-metadata.md": "03a3ba8d0899c63385408e8a0e2560f67c5ac1cbf3ee3bc361245b0240d4eeac",
     ".skill-tree/common/scripts/create-documentation-snapshot.py": "612aea11e766621747490ddeb13dd24e980cdd30c499d0756635b1c3cce1df93",
     ".skill-tree/common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    ".skill-tree/common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
     ".skill-tree/common/scripts/inspect-unity-repository.py": "794230aca0f338a9d5a6ce7dd62df2016c9d13fb9622174429f9188225fb78e9",
     ".skill-tree/common/scripts/pr-review-state.py": "3149a85987ef01913b163132fe19c59754f1b4939c336812fefe5a1fd0ae0834",
     ".skill-tree/common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
@@ -1341,12 +1425,12 @@
     ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     ".skill-tree/common/scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
     ".skill-tree/common/scripts/validate-repository-documentation.py": "a9833b258675765a24de4205f5b87a6e34a90913408e97957582e007c78ba911",
-    ".skill-tree/common/scripts/workflow-state.py": "b7524592a7e6a8126bb0ad846cc500884f725828e8133ccf2c80fcf2dc0e5e3b",
+    ".skill-tree/common/scripts/workflow-state.py": "791531838c16c1b362ade3b086e66dfb804da20c06b8828b0e71f251a08b0c5e",
     ".skill-tree/config/capabilities.json": "fc9572cc6a65f689fd7a750560a897593fd7b90df50eadea3954e242556626c5",
     ".skill-tree/config/flavors.json": "cc2e8ec2e54af53232ab2813a219d3d00a5d7e8b75d2d85ca20f4c0db28231a8",
     ".skill-tree/config/providers.json": "80255fe3fb67e32d71cc7791aee1e51c1d34a508d4c77b6ca852521907ede97a",
     ".skill-tree/config/repository.json": "3c26162b83118090e970b09b23a926ac7daf4487bf7a4a0ac78244fd54c8182a",
-    ".skill-tree/config/resource-map.json": "77317fe7b4e05e3ebb8ff8455053fcdee1b29399ef7894884284d5a7c45d16f3",
+    ".skill-tree/config/resource-map.json": "829639608fb34169b13b3b82bfb7c2935036698963113bed9cb8559815391423",
     ".skill-tree/documents/agent-compatibility.md": "5f2359a60b70d0a12403161735f64145ba7d44263d3becf8c59910a422904c91",
     ".skill-tree/documents/build-and-release.md": "074d815d75579dc6e11dfd76f8f844d3c672bc6e990bbd3b6a6c6c3b79db1af0",
     ".skill-tree/documents/dependencies.md": "e524d1d314d8c443e000260860e71fca6db4bd6938e86cb7443379a6fb2db4f3",
@@ -1361,7 +1445,7 @@
     ".skill-tree/documents/plugin-market-research.md": "cdedbf889a7136f8390089b0d70448c59de91e6622e6a23c9c222da744852621",
     ".skill-tree/documents/plugin-system-contract.md": "eeddb14292e115f489aa855f01f60ab922448317a3e9956d649148b177944680",
     ".skill-tree/documents/plugin-system-research.md": "df72f246f13a3a4186a0035f9dec75b3dcc9dcc511de1ecf66a7bc0c62462a31",
-    ".skill-tree/documents/plugin-workflow-decisions.md": "ef81629dd2e76ed70a05896e57b38ca55571439af333da08ecebcf9d80bbe2ca",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "2bc848663455a1c9fcf682c5fa50dfe4a0e1f19de8421223265cb80845dbbcad",
     ".skill-tree/documents/project.md": "419e0ced059c4f8130006e2f2b5c745fdb05944facc576671f19356b198ba934",
     ".skill-tree/documents/repo-init-instructions.md": "06f7eedd332bd13daba08f131a5c34b0fdffd8cb835c4ecc0d062010071251fa",
     ".skill-tree/documents/repository-map.md": "c984f360a96991a1c982971efd8b34d7c5a72d445c2838d4d276c4cd1fe7e6e8",
@@ -1395,13 +1479,13 @@
     ".skill-tree/lib/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
     ".skill-tree/lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
     ".skill-tree/lib/plugins.js": "d9d140a9a1c7df3682f95ace505a6d06bbac5823787329acd70834732de1d4d0",
-    ".skill-tree/scripts/agent-conformance.py": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
+    ".skill-tree/scripts/agent-conformance.py": "6ac909c9430facff5f7d2276ce0ce6e5fa389c13db44d562f0b7825c895957ea",
     ".skill-tree/scripts/run-tests.py": "00c61ad36efcc208865692e5822f38dd4bbbc036d058bc7e55bc81c3851b711e",
     ".skill-tree/scripts/sync-skill-references.py": "7362077b0b1d031c88af9a1ddb7cfe8ddc2bc3472e64cb470100ac24038404b9",
     ".skill-tree/scripts/validate-skill-repository.py": "c7a99c949181f6b9ebac40d738c1327cec2a114bc4a4cb6ba4bd0d6984afbc7c",
     ".skill-tree/src/init-rules/skill-tree-skills.md": "74cb9a275ce1bcd845c31eae44101e79e5adcd02875d84f1a4c8feb1744716fd",
-    ".skill-tree/templates/invariants.json": "4545894b07fab5f222d15eddd17c220408a4be8a5e5f25da3a4a34ef06bb87b5",
-    ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266"
+    ".skill-tree/templates/invariants.json": "5a147a9ee4297250a6604f6a447fa10b57b9b94f3942044a9135790ce9c64b48",
+    ".skill-tree/templates/operations.json": "9d8f9e0caf848c0b5908dadaebf24b334ab47e5035373235cf91847a89a28d16"
   },
   "state": ".skill-tree/documents/future.json",
   "validation_commands": [

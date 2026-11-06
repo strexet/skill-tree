@@ -1461,6 +1461,76 @@ def replay_events(store,payload):
 CLARIFICATION_STATES={'researching','awaiting-answers','revising','awaiting-confirmation','complete','blocked','cancelled'}
 CLARIFICATION_FIELDS={'title','goal','scope','exclusions','dependencies','acceptance','validation','required_plugin_policy','content'}
 DECISION_COMMANDS={'decision-start','decision-read','decision-prepare','decision-record','decision-reconcile','decision-switch','decision-accept','decision-resume'}
+ORCHESTRATION_COMMANDS={'orchestration-'+command for command in ['start','read','next','question','prepare-actor','record-actor','reconcile-actor','switch-mode','accept-decision','research','plan','accept-plan','implement','checks','review','resolve','fix','resume','observe-failure']}
+
+def orchestration_execution_snapshot(store):
+    scripts=Path(__file__).parent;references=scripts.parent/'references'
+    paths={'common/scripts/'+name:scripts/name for name in ['workflow-state.py','decision-governance.py','decision-orchestration.py','run-workspaces.py','validate-document-rules.py']}
+    paths.update({'common/references/'+name:references/name for name in ['decision-governance.md','validation-policy.md']})
+    paths['owned-profile']=store.source_root/'.skill-tree/installation/profile.json'
+    if any(path.is_symlink() for path in paths.values()):raise WorkflowError('Execution snapshot cannot adopt symlinked core inputs')
+    return {key:file_hash(path) for key,path in paths.items()}
+
+def orchestration_action(store,command,payload):
+    spec=importlib.util.spec_from_file_location('skill_tree_decision_orchestration',Path(__file__).with_name('decision-orchestration.py'))
+    helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper)
+    try:
+        if command=='orchestration-read':return helper.read(store,payload.get('orchestration_id'))
+        frame=None if command=='orchestration-start' else helper.read(store,payload.get('orchestration_id'))
+        current_snapshot=orchestration_execution_snapshot(store)
+        if frame is None or command=='orchestration-resume':
+            if 'execution_snapshot' in payload and payload['execution_snapshot']!=current_snapshot:raise WorkflowError('Orchestration execution snapshot differs from the actual current bundle/profile')
+            payload={**payload,'execution_snapshot':current_snapshot}
+        elif command!='orchestration-reconcile-actor' and frame.get('execution_snapshot')!=current_snapshot:raise WorkflowError('Core bundle/profile changed; reconcile original actors and explicitly resume the same orchestration')
+        payload={key:value for key,value in payload.items() if key!='parent_policy_reconciliation'}
+        context=payload.get('context') if frame is None else payload.get('context',frame['context']) if command=='orchestration-resume' else frame['context']
+        if frame is not None and command=='orchestration-resume' and frame['context'].get('session_id'):
+            parent=clarification_read(store,frame['context']['session_id'])
+            current=clarification_decision_context(parent,frame['context'].get('purpose'),frame['context'].get('question_id') if frame['context'].get('purpose')=='answer' else None)
+            if context!=current:raise WorkflowError('Resume requires the exact current parent clarification context')
+            old_epoch=frame['context'].get('parent_mode_epoch',0);new_epoch=parent.get('decision_mode_epoch',0)
+            if new_epoch!=old_epoch:
+                stable=lambda value:{key:item for key,item in value.items() if key not in {'parent_mode_epoch','semantic_fingerprint','content_fingerprint'}}
+                if stable(frame['context'])!=stable(current):raise WorkflowError('Parent-policy resume cannot substitute another session, task, question or purpose')
+                previous={'decision_mode':frame['mode'],'decision_authority':frame['authority'],'decision_executor':frame['executor']}
+                switches=[entry for entry in parent.get('decision_mode_history',[]) if entry.get('previous_epoch',-1)>=old_epoch]
+                if new_epoch<=old_epoch or not switches or switches[0].get('previous_epoch')!=old_epoch or switches[0].get('previous_policy')!=previous or [entry.get('previous_epoch') for entry in switches]!=list(range(old_epoch,new_epoch)):raise WorkflowError('Parent policy reconciliation requires the actual contiguous original switch history')
+                authority=parent.get('decision_authority');executor=parent.get('decision_executor')
+                if authority is None or executor is None:raise WorkflowError('The current parent cleared the bounded grant or executor; restore explicit policy before resuming the frame')
+                payload={**payload,'parent_policy_reconciliation':{'mode':clarification_decision_mode(parent),'authority':authority,'executor':executor,'switches':deepcopy(switches)}}
+        cleanup=command=='orchestration-reconcile-actor'
+        def scope_guard():
+            decision_context_guard(store,context,allow_stale=cleanup)
+            if cleanup:return
+            if context.get('session_id'):
+                parent=clarification_read(store,context['session_id'])
+                if parent['state']=='cancelled':raise WorkflowError('Cancelled clarification permits only original actor cleanup')
+                adopted=payload.get('parent_policy_reconciliation') if command=='orchestration-resume' else None
+                mode=adopted['mode'] if adopted else payload.get('mode','auto') if frame is None else frame['mode']
+                authority=adopted['authority'] if adopted else payload.get('authority') if frame is None else frame['authority']
+                executor=adopted['executor'] if adopted else payload.get('executor') if frame is None else frame['executor']
+                if mode!=clarification_decision_mode(parent) or authority!=parent.get('decision_authority') or mode=='auto' and executor!=parent.get('decision_executor'):raise WorkflowError('Orchestration mode, authority or executor differs from the current clarification')
+                if command=='orchestration-switch-mode' and payload.get('mode')!=mode:raise WorkflowError('Change the parent clarification mode through the guarded session')
+        if command=='orchestration-next':
+            scope_guard();return helper.next_action(store,payload['orchestration_id'])
+        if command=='orchestration-switch-mode':clarification_evidence(payload.get('evidence'))
+        class BoundStore:
+            def __getattr__(self,key):return getattr(store,key)
+            def guard(self):
+                if store.future.exists():
+                    if not payload.get('expected_source_hash'):raise WorkflowError('Orchestration mutation requires the inspected existing queue hash')
+                    store.guard(payload['expected_source_hash'])
+                elif payload.get('expected_source_hash') is not None:raise WorkflowError('Orchestration queue context changed; reread before mutation')
+                if not cleanup and orchestration_execution_snapshot(store)!=current_snapshot:raise WorkflowError('Core execution inputs changed during the metadata operation')
+                scope_guard()
+            @contextmanager
+            def lock(self):
+                with store.lock():self.guard();yield
+            def commit(self,writes):
+                self.guard();return store.commit(writes)
+        bound=BoundStore()
+        return helper.start(bound,payload) if frame is None else helper.mutate(bound,command,payload)
+    except helper.OrchestrationError as error:raise WorkflowError(str(error)) from error
 
 def decision_action(store,command,payload):
     helper=decision_helper()
@@ -1561,12 +1631,12 @@ def clarification_decision_question(record,purpose,question_id=None):
 def clarification_decision_policy(record,payload):
     mode=payload.get('decision_mode','manual')
     if mode not in {'auto','manual'}:raise WorkflowError('Unknown clarification decision mode')
-    authority=payload.get('decision_authority')
+    authority=payload.get('decision_authority',record.get('decision_authority') if mode=='manual' else None)
     if mode=='auto' and not authority:raise WorkflowError('Auto clarification requires an explicit bounded owner grant')
     if authority is not None:
         try:authority=decision_helper().validate_authority(authority,clarification_decision_context(record,'confirmation'),mode)
         except ValueError as error:raise WorkflowError(str(error)) from error
-    executor=payload.get('decision_executor')
+    executor=payload.get('decision_executor',record.get('decision_executor') if mode=='manual' else None)
     if mode=='auto' and (not isinstance(executor,dict) or set(executor)!={'id','context_id'} or any(not isinstance(v,str) or not v.strip() for v in executor.values())):raise WorkflowError('Auto clarification requires the actual executor identity and context')
     return {'decision_mode':mode,'decision_authority':authority,'decision_executor':executor}
 
@@ -1937,13 +2007,17 @@ def clarification_mutate(store,command,payload):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|{'refresh','manifest','index','read','select','pending','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|{'refresh','manifest','index','read','select','pending','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     args=parser.parse_args(argv)
     try:
         store=Store(args.root,args.run_id,allow_unselected=args.command in {'index','runs','manifest','start','workspace-setup','recover-locator'},route_queue=args.command!='recover-locator');payload=json.loads(args.input.read_text()) if args.input else {}
         if args.expected_source_hash:payload['expected_source_hash']=args.expected_source_hash
         cmd=args.command
-        if cmd in DECISION_COMMANDS:
+        if cmd in ORCHESTRATION_COMMANDS:
+            store=Store(args.root,allow_unselected=True,neutral=True)
+            if args.id:payload['orchestration_id']=args.id
+            result=orchestration_action(store,cmd,payload)
+        elif cmd in DECISION_COMMANDS:
             store=Store(args.root,allow_unselected=True,neutral=True)
             if args.id:payload['decision_id']=args.id
             result=decision_action(store,cmd,payload)
