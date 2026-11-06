@@ -72,7 +72,7 @@ function verifyOwnedResources(packageRoot,inventory){
  if(registry.json(actual)!==registry.json(inventory))fail('composition-resource','The actual owned dispatcher resource closure changed');
 }
 function verifiedManifest(packageRoot){
- const manifest=readJson(packageRoot,MANIFEST);
+ const manifestBytes=fs.readFileSync(registry.safe(packageRoot,MANIFEST)),manifest=JSON.parse(manifestBytes.toString('utf8').replace(/^\uFEFF/,''));
  if(!object(manifest)||manifest.format!=='skill-tree-plugin-bindings'||manifest.schema!==1||manifest.identity!==registry.seal(manifest).identity||!object(manifest.operations)||!own(manifest.operations,manifest.operation)||!object(manifest.packages))fail('composition-manifest','The local plugin manifest is invalid or changed');
  verifyOwnedResources(packageRoot,manifest.owned_resources);
  const actual=fs.existsSync(registry.safe(packageRoot,'plugins'))?fs.readdirSync(registry.safe(packageRoot,'plugins')).sort():[];
@@ -88,7 +88,31 @@ function verifiedManifest(packageRoot){
  }
  const catalog=createCatalog(manifest.operations),compiled=bindings.compileBindings(manifest.definitions,{packages:manifest.packages,catalog,parameterDefaults:manifest.parameter_defaults});
  if(registry.json(portableCatalog(catalog))!==registry.json(manifest.catalog)||compiled.configuration_digest!==manifest.configuration_digest||registry.json(compiled.bindings)!==registry.json(manifest.bindings))fail('composition-manifest','The local binding configuration or owned boundary catalog changed');
- return {manifest,catalog,compiled};
+ return {manifest,catalog,compiled,manifest_digest:hash(manifestBytes)};
+}
+function projectRelative(value,root){const relative=path.relative(root,value);return relative&&!path.isAbsolute(relative)&&relative!=='..'&&!relative.startsWith('..'+path.sep)?relative.split(path.sep).join('/'):null;}
+function associatedInstallation(packageRoot,projectRoot,verified){
+ const project=fs.realpathSync(projectRoot),actualPackage=fs.realpathSync(packageRoot),candidates=new Set();
+ // Retain the invoked path before realpath removes a conflicting owned symlink.
+ for(const [base,value]of [[path.resolve(projectRoot),path.resolve(packageRoot)],[project,actualPackage]]){const relative=projectRelative(value,base);if(relative)candidates.add(relative);}
+ let ancestor=path.resolve(packageRoot);
+ while(true){try{if(fs.realpathSync(ancestor)===project){const relative=projectRelative(path.resolve(packageRoot),ancestor);if(relative)candidates.add(relative);}}catch{}const parent=path.dirname(ancestor);if(parent===ancestor)break;ancestor=parent;}
+ if(!candidates.size)return false;
+ const profilePath=registry.safe(project,'.skill-tree/installation/profile.json');if(!fs.existsSync(profilePath))return false;
+ let profile;try{profile=JSON.parse(fs.readFileSync(profilePath,'utf8').replace(/^\uFEFF/,''));}catch{fail('composition-ownership','The relevant owned profile is unreadable; explicit ownership recovery remains required');}
+ if(!object(profile)||!object(profile.destinations))fail('composition-ownership','The relevant ownership profile has no verifiable destination claims');
+ const claims=[...candidates].filter(relative=>own(profile.destinations,relative));if(!claims.length)return false;
+ if(profile.format!=='skill-tree-profile'||profile.schema!==1||profile.project_root!==project||typeof profile.flavor!=='string'||typeof profile.environment_id!=='string'||!object(profile.source_digests))fail('composition-ownership','The relevant ownership profile is unsupported or belongs to another project');
+ const records=Object.values(profile.destinations);for(const record of records)if(!object(record)||typeof record.name!=='string'||!object(record.files))fail('composition-ownership','The ownership receipt composition inventory is invalid');
+ const outputs=Object.fromEntries(records.map(record=>[record.name,record.files]));
+ if(profile.identity!==hash(registry.json({flavor:profile.flavor,environment_id:profile.environment_id,source_digests:profile.source_digests,output_digests:outputs})))fail('composition-ownership','The relevant ownership receipt composition identity changed');
+ const {manifest,manifest_digest}=verified,inventory={...manifest.owned_resources,[MANIFEST]:manifest_digest};
+ for(const record of Object.values(manifest.packages))Object.assign(inventory,record.files);
+ for(const relative of claims){
+  const record=profile.destinations[relative];let destination;try{destination=registry.safe(project,relative);}catch(error){fail('composition-ownership','The exact operation ownership claim is unsafe: '+error.message);}
+  if(fs.realpathSync(destination)!==actualPackage||record.name!==manifest.operation||path.posix.basename(relative)!==record.name||!/^skill-tree-[a-z0-9-]+$/.test(record.name)||record.flavor!==profile.flavor||record.identity!==hash(registry.json(record.files))||registry.json(record.files)!==registry.json(inventory))fail('composition-ownership','The exact operation ownership receipt or complete resource inventory changed');
+ }
+ return true;
 }
 const guardProgram=String.raw`import hashlib,importlib.util,json,sys
 from pathlib import Path
@@ -136,20 +160,27 @@ function guardBoundary(packageRoot,request,operation,phase){
  if(run.error||run.status!==0)fail('composition-context','The actual selected operation context guard failed: '+(run.stderr||run.stdout||run.error?.message||'The owned helper is unavailable').trim().split('\n').at(-1));
  return JSON.parse(run.stdout);
 }
-function prepareBoundary(packageRoot,payload){
- const request=clone(payload),{manifest,catalog,compiled}=verifiedManifest(packageRoot);
+function prepareMetadata(packageRoot,payload,readiness){
+ const request=clone(payload),verified=verifiedManifest(packageRoot),{manifest,catalog,compiled}=verified;
  if(request.event?.operation!==manifest.operation)fail('composition-operation','The event must identify the actual composed operation');
  const selected=bindings.selectBindings(compiled,request.event,request.context),location=bindings.resolveLocation(request.event,catalog),prerequisites=[];
  const configured=compiled.bindings.some(row=>row.enabled&&row.operation===request.event.operation&&(row.anchor===request.event.anchor||row.location.status==='resolved'&&location.status==='resolved'&&row.location.boundary_id===location.boundary_id));
  const base={bindings:selected.bindings,unresolved:selected.unresolved,prerequisites,event:selected.event,context:selected.context,configuration_digest:compiled.configuration_digest,boundary_id:location.boundary_id||null,invocation:'not-executed'};
  if(location.status!=='resolved'){prerequisites.push({code:'unresolved-anchor',reason:location.reason});return {...base,status:'prerequisite'};}
  if(!configured||!selected.bindings.length&&!selected.unresolved.length)return {...base,status:'noop'};
- const proof=catalog.boundaries[location.boundary_id].handler({...request,package_root:packageRoot});
+ const proof=readiness?null:catalog.boundaries[location.boundary_id].handler({...request,package_root:packageRoot});
  for(const item of selected.unresolved)prerequisites.push({code:'incompatible-binding',binding_id:item.id,reason:item.reason});
- if(fs.existsSync(registry.safe(request.project_root,registry.REGISTRY))){const current=registry.verifyInstalled(request.project_root);if(current.identity!==manifest.registry_identity)prerequisites.push({code:'configuration-stale',reason:'The live plugin generation differs from the frozen operation; explicit refresh and parked-run reconciliation remain required.'});}
+ const associated=associatedInstallation(packageRoot,request.project_root,verified),liveRegistry=registry.safe(request.project_root,registry.REGISTRY);
+ if(fs.existsSync(liveRegistry)){const current=registry.verifyInstalled(request.project_root);if(current.identity!==manifest.registry_identity)prerequisites.push({code:'configuration-stale',reason:'The live plugin generation differs from the frozen operation; explicit refresh and parked-run reconciliation remain required.'});}
+ else if(associated&&manifest.registry_present)prerequisites.push({code:'registry-required',reason:'The associated managed operation requires the frozen live plugin registry; explicit registry recovery remains required.'});
  const available=request.capabilities||[];
  if(!Array.isArray(available)||available.some(value=>typeof value!=='string'))fail('composition-capability','Capabilities require explicit named host facts');
  for(const row of selected.bindings){const record=manifest.packages[row.plugin_id],missing=(record.execution?.required||[]).filter(value=>!available.includes(value));if(missing.length)prerequisites.push({code:'missing-capability',binding_id:row.id,plugin_id:row.plugin_id,missing});prerequisites.push({code:'invocation-unqualified',binding_id:row.id,plugin_id:row.plugin_id,reason:'The boundary is prepared only; persisted actual host invocation and result qualification remain required.'});}
  return {...base,guard:proof,status:prerequisites.length?'prerequisite':'noop'};
 }
-module.exports={createCatalog,resolveInputs,composeOperation,prepareBoundary,verifiedManifest};
+function prepareBoundary(packageRoot,payload){
+ if(own(payload,'proof_kind')||own(payload,'readiness_kind'))fail('composition-proof','Completed readiness cannot supply business boundary preparation');
+ return prepareMetadata(packageRoot,payload,false);
+}
+function prepareReadinessBoundary(packageRoot,payload){return {...prepareMetadata(packageRoot,payload,true),proof_kind:'completed-readiness'};}
+module.exports={createCatalog,resolveInputs,composeOperation,prepareBoundary,prepareReadinessBoundary,verifiedManifest};

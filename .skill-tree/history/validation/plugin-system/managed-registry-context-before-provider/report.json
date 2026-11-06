@@ -1,0 +1,26 @@
+{
+  "qualification": "Deterministic original-HI and real guarded CL revision fixture controls only; no actual native/provider or comparative-efficacy claim.",
+  "change": "Only contribution acceptance permits the current verified after-context; prepare/invoke/record bind the original chain context before private resolution and under the writer.",
+  "observed_red": {
+    "method_count": 1,
+    "context_drift_failure_entries": 1,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 17.15
+  },
+  "current_targeted_controls": {
+    "real_cl_context_drift": "passed with zero provider/sink calls and retained original HC/HI",
+    "ordered_cl_incorporation": "passed on identical fixed source in one separate retry; first combined run retained a Python scope-guard ETIMEDOUT without timeout/source relaxation",
+    "ordered_retry_seconds": 13.87
+  },
+  "final_source": {
+    "workflow_state_sha256": "76589e1dca50664128650f706ab413003039a1725b74f24ba2dcb9d9a622d029",
+    "test_sha256": "a7ae1a514938920070a4c6a936d43fcac5d772168c3d9d40005dfe91ccaff44b"
+  },
+  "artifacts": {
+    "managed-registry-preprovider-cl-context-red.txt": "852605d06459ccb9282f9a3acec55de69dd19e92fb635868a48ce85ab4fd0964",
+    "managed-registry-preprovider-cl-context-green.txt": "ba384354700f2855e9d9ebedb768f522cc899399586fea0e3c3e798bd3772ffd",
+    "managed-registry-preprovider-cl-context-ordered-retry.txt": "7e1df5eb962289ff2db4361a543eaceb9cb22b36ce3123bd787efdbd3d896ee3"
+  },
+  "limits": "Original combined timeout is retained as runtime-unavailable diagnostic evidence, not silently converted to a passing run. Formal final2 full focused checks are separate immutable receipts."
+}

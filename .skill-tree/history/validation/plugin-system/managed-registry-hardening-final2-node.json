@@ -1,0 +1,17 @@
+{
+  "name": "node",
+  "argv": [
+    "npm",
+    "run",
+    "test:node"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "tool_wall_seconds": 72.50482783280313,
+  "source_freeze": ".skill-tree/history/validation/plugin-system/managed-registry-hardening-source-freeze2.json",
+  "qualification": "Current frozen source/repository validation only; no actual candidate trial or universal native/product qualification.",
+  "tests": 281,
+  "pass": 281,
+  "fail": 0,
+  "skipped": 0
+}

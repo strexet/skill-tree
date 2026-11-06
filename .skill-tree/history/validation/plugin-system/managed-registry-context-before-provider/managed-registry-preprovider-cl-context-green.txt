@@ -1,0 +1,40 @@
+.F
+======================================================================
+FAIL: test_default_node_a_b_a_isolates_other_capability_holds_and_preserves_guarded_b_contribution (__main__.PluginWorkflowBridgeTests.test_default_node_a_b_a_isolates_other_capability_holds_and_preserves_guarded_b_contribution)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1719, in test_default_node_a_b_a_isolates_other_capability_holds_and_preserves_guarded_b_contribution
+    try:frame=self.returned(frame,status='findings')
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 959, in returned
+    frame=self.prepare_bridge(frame);attempt=frame['attempts'][frame['prepared_attempt_id']];actor=attempt['actor']
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 945, in prepare_bridge
+    return self.change(frame,'prepare',actor=actor,creation_evidence={'kind':'host-agent-created',
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 939, in change
+    return wf.hook_action(self.store,'hook-'+command,{'chain_id':frame['id'],
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/workflow-state.py", line 1922, in hook_action
+    try:return _hook_action(store,command,payload,private_delivery_provider=private_delivery_provider,private_delivery_sink=private_delivery_sink)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/workflow-state.py", line 1968, in _hook_action
+    prepared=_hook_node(package_root,request);proof=prepared['proof'] if frame is None else prepared
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/workflow-state.py", line 1840, in _hook_node
+    if run.returncode:raise WorkflowError('Owned hook preparation failed: '+(run.stderr.strip().splitlines()[-1] if run.stderr.strip() else 'The owned Node bridge is unavailable'))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+hook_fixture_workflow.WorkflowError: Owned hook preparation failed: The actual selected operation context guard failed: spawnSync python3 ETIMEDOUT
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1720, in test_default_node_a_b_a_isolates_other_capability_holds_and_preserves_guarded_b_contribution
+    except ValueError as error:self.fail('Other-occurrence editor holds blocked the default Node B delivery: '+str(error))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Other-occurrence editor holds blocked the default Node B delivery: Owned hook preparation failed: The actual selected operation context guard failed: spawnSync python3 ETIMEDOUT
+
+----------------------------------------------------------------------
+Ran 2 tests in 32.619s
+
+FAILED (failures=1)

@@ -1,0 +1,21 @@
+F
+======================================================================
+FAIL: test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation (__main__.PluginWorkflowBridgeTests.test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation) (kind='context-drift')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1342, in test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation
+    self.assertEqual(calls,[]);self.assertEqual(self.invocation_bytes(frame),before)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['provider'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'provider'
+
+- ['provider']
++ []
+
+----------------------------------------------------------------------
+Ran 1 test in 17.150s
+
+FAILED (failures=1)

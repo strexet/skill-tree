@@ -155,3 +155,80 @@ test('copied PR entry verifies owned inventory before loading workspace helpers'
  const run=spawnSync('python3',['-I','-B',helper,'--help'],{cwd:runtime,encoding:'utf8',timeout:30000});
  assert.equal(fs.existsSync(marker),false);assert.equal(run.status,2,run.stdout+run.stderr);assert.equal(JSON.parse(run.stdout).ok,false);noFuture(runtime);
 });
+
+for(const flavor of ['general','web','unity'])test(flavor+' managed registry loss holds the copied bridge while an independent source-free copy stays usable',async t=>{
+ const base=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-managed-registry-'));t.after(()=>fs.rmSync(base,{recursive:true,force:true}));
+ const source=path.join(base,'source'),project=path.join(base,'project'),upstream=path.join(base,'upstream'),standalone=path.join(base,'only-operation'),runtime=path.join(base,'independent-runtime'),name='skill-tree-add-pending-task';
+ fs.mkdirSync(source);fs.mkdirSync(project);fs.mkdirSync(upstream);fs.mkdirSync(runtime);
+ for(const relative of Object.keys(composer.sourceInputs(core)))write(source,relative,fs.readFileSync(path.join(core,relative)));
+ write(project,'package.json',{scripts:{test:'node --test'}});write(upstream,'SKILL.md','# Controlled plugin\nRead [marker](marker.json) and return a bounded proposal.\n');write(upstream,'marker.json',{marker:'controlled-source-closure'});
+ if(flavor==='unity'){write(project,'ProjectSettings/ProjectVersion.txt','m_EditorVersion: 6000.3.27f2');write(project,'Packages/manifest.json',{dependencies:{'com.unity.test-framework':'1.6.0'}});write(project,'Packages/packages-lock.json',{dependencies:{'com.unity.test-framework':{version:'1.6.0'}}});}
+ installation.install(project,source,flavor,[{name,provider:'codex',rel:'.agents/skills/'+name}]);
+ const lifecycle=require('../lib/plugin-lifecycle.js'),registry=require('../lib/plugin-registry.js'),proposal=await lifecycle.prepareProposal(project,{request_id:'managed-copy-install',operation:'install',sources:[{id:'controlled',path:upstream}],bindings:[{id:'controlled-before',plugin_id:'controlled',operation:name,anchor:'before',enabled:true,parameters:{marker:'controlled-input'}}]});
+ lifecycle.applyProposal(project,proposal,{proposal_digest:proposal.digest});installation.refresh(project,source);
+ const packageRoot=path.join(project,'.agents/skills',name),script=path.join(packageRoot,'scripts/plugin-hooks.js'),event={id:'managed-copy-event',operation:name,anchor:'before'},context={kind:'request',id:'managed-copy-request',semantic_fingerprint:'a'.repeat(64),content_fingerprint:'b'.repeat(64)},request={runtime_action:'freeze-chain',project_root:project,event,context,capabilities:['codex-source-backed-context']};
+ function prepare(script,packet){const input=path.join(base,'request.json');fs.writeFileSync(input,JSON.stringify(packet));const run=spawnSync(process.execPath,[script,'--input',input],{cwd:base,encoding:'utf8',timeout:30000});assert.equal(run.status,0,run.stdout+run.stderr);return JSON.parse(run.stdout);}
+ const original=prepare(script,request);assert.deepEqual(original.proof.prerequisites,[]);
+ fs.unlinkSync(path.join(project,registry.REGISTRY));
+ for(const packet of [request,{...request,runtime_action:'occurrence-plan',configuration:original.configuration}]){
+  const result=prepare(script,packet),proof=result.proof||result;assert.ok(proof.prerequisites.length,'Registry absence at the actual owned destination must remain a prerequisite.');assert.match(JSON.stringify(proof.prerequisites),/registry|profile|ownership|association|configuration/i);
+ }
+ const program=String.raw`import importlib.util,json,pathlib,sys
+p=pathlib.Path(sys.argv[1]);spec=importlib.util.spec_from_file_location('managed_copied_workflow',p);w=importlib.util.module_from_spec(spec);exec(compile(p.read_bytes(),str(p),'exec'),w.__dict__)
+root=pathlib.Path(sys.argv[2]);s=w.Store(root,allow_unselected=True,neutral=True,route_queue=False);package=p.parent.parent
+context={'kind':'request','id':'managed-bridge-request'}
+grant={'id':'managed-bridge-grant','revision':1,'context_id':context['id'],'allowed_kinds':['technical'],'constraints':['Controlled fixture only; no native actor or external actions.'],'evidence':{'kind':'owner-message','reference':'Scripted isolated test configuration, not actual human approval.'}}
+c=w.hook_action(s,'hook-start',{'request_id':'managed-bridge-chain','package_root':str(package),'event':{'id':'managed-bridge-event','operation':'skill-tree-add-pending-task','anchor':'before'},'context':context,'mode':'manual','authority':grant,'executor':{'id':'controlled-parent','context_id':'controlled-parent-context'},'capabilities':['codex-source-backed-context']})
+next_action=w.hook_action(s,'hook-next',{'chain_id':c['id']});held=False
+try:
+ w.hook_action(s,'hook-prepare',{'chain_id':c['id'],'expected_chain_hash':c['chain_hash'],'expected_chain_revision':c['revision'],'actor':{'id':'synthetic-held-actor','context_id':'synthetic-held-context'},'creation_evidence':{'kind':'host-agent-created','provider':'controlled-unit-host','tool':'controlled-fixture','reference':'Synthetic metadata input; no actual actor was created.','actor_id':'synthetic-held-actor','actor_context_id':'synthetic-held-context'}})
+except w.WorkflowError:held=True
+after=w.hook_action(s,'hook-read',{'chain_id':c['id']})
+print(json.dumps({'action':next_action['action'],'held':held,'attempts':len(after['attempts']),'cursor':after['cursor'],'future_created':s.future.exists()}))`;
+ const bridge=JSON.parse(python(['-c',program,path.join(packageRoot,'scripts/workflow-state.py'),project],project));assert.deepEqual(bridge,{action:'prerequisite',held:true,attempts:0,cursor:0,future_created:false});
+ for(const forbidden of ['installation.js','composer.js'])assert.equal(fs.existsSync(path.join(packageRoot,'scripts',forbidden)),false,'The operation must not gain an installer dependency.');
+ fs.cpSync(packageRoot,standalone,{recursive:true});fs.rmSync(project,{recursive:true});fs.rmSync(source,{recursive:true});fs.rmSync(upstream,{recursive:true});
+ const copiedScript=path.join(standalone,'scripts/plugin-hooks.js'),independent={...request,project_root:runtime},copied=prepare(copiedScript,independent);assert.deepEqual(copied.proof.prerequisites,[]);assert.equal(copied.proof.bindings.length,1);
+ assert.deepEqual(prepare(copiedScript,{...independent,runtime_action:'occurrence-plan',configuration:copied.configuration}).prerequisites,[]);noFuture(runtime);
+});
+
+for(const flavor of ['general','web','unity'])test(flavor+' executable copied CLI and workflow retain an owned symlink entry claim',async t=>{
+ const base=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-owned-entry-'));t.after(()=>fs.rmSync(base,{recursive:true,force:true}));
+ const project=path.join(base,'project'),upstream=path.join(base,'upstream'),relocated=path.join(base,'relocated-operation'),name='skill-tree-add-pending-task';fs.mkdirSync(project);fs.mkdirSync(upstream);
+ write(project,'package.json',{scripts:{test:'node --test'}});write(upstream,'SKILL.md','# Controlled owned entry\nReturn a bounded proposal.\n');
+ if(flavor==='unity'){write(project,'ProjectSettings/ProjectVersion.txt','m_EditorVersion: 6000.3.27f2');write(project,'Packages/manifest.json',{dependencies:{'com.unity.test-framework':'1.6.0'}});write(project,'Packages/packages-lock.json',{dependencies:{'com.unity.test-framework':{version:'1.6.0'}}});}
+ installation.install(project,core,flavor,[{name,provider:'codex',rel:'.agents/skills/'+name}]);
+ const lifecycle=require('../lib/plugin-lifecycle.js'),registry=require('../lib/plugin-registry.js'),proposal=await lifecycle.prepareProposal(project,{request_id:'owned-entry-install',operation:'install',sources:[{id:'controlled',path:upstream}],bindings:[{id:'owned-entry',plugin_id:'controlled',operation:name,anchor:'before',enabled:true}]});lifecycle.applyProposal(project,proposal,{proposal_digest:proposal.digest});installation.refresh(project,core);
+ const packageRoot=path.join(project,'.agents/skills',name),script=path.join(packageRoot,'scripts/plugin-hooks.js'),request={runtime_action:'freeze-chain',project_root:project,event:{id:'owned-entry-event',operation:name,anchor:'before'},context:{kind:'request',id:'owned-entry-context'},capabilities:['codex-source-backed-context']};
+ const run=packet=>spawnSync(process.execPath,[script,'--input','-'],{input:JSON.stringify(packet),encoding:'utf8',timeout:30000}),initial=run(request);assert.equal(initial.status,0,initial.stdout+initial.stderr);const frozen=JSON.parse(initial.stdout);assert.deepEqual(frozen.proof.prerequisites,[]);
+ const profile=fs.readFileSync(path.join(project,'.skill-tree/installation/profile.json'));fs.renameSync(packageRoot,relocated);fs.symlinkSync(relocated,packageRoot,'dir');fs.unlinkSync(path.join(project,registry.REGISTRY));
+ const assertHeldCLI=()=>{for(const packet of [request,{...request,runtime_action:'occurrence-plan',configuration:frozen.configuration}]){const prepared=run(packet);if(prepared.status===0){const value=JSON.parse(prepared.stdout),proof=value.proof||value;assert.ok(proof.prerequisites.length||proof.unresolved.length,'Executable owned symlink entry silently supplied an executable proof');assert.match(JSON.stringify([proof.prerequisites,proof.unresolved]),/registry|profile|ownership|association|configuration|receipt|symlink/i);}else assert.match(prepared.stderr,/registry|profile|ownership|association|configuration|receipt|symlink/i);}};assertHeldCLI();
+ const program=String.raw`import importlib.util,json,pathlib,sys
+p=pathlib.Path(sys.argv[1]);spec=importlib.util.spec_from_file_location('owned_entry_workflow',p);w=importlib.util.module_from_spec(spec);exec(compile(p.read_bytes(),str(p),'exec'),w.__dict__)
+root=pathlib.Path(sys.argv[2]);package=pathlib.Path(sys.argv[3]);s=w.Store(root,allow_unselected=True,neutral=True,route_queue=False)
+context={'kind':'request','id':'owned-entry-bridge-context'}
+grant={'id':'owned-entry-grant','revision':1,'context_id':context['id'],'allowed_kinds':['technical'],'constraints':['Controlled metadata only; no actual actor or external action.'],'evidence':{'kind':'owner-message','reference':'Scripted isolated fixture grant, not actual human approval.'}}
+held=False;attempts=0
+try:
+ c=w.hook_action(s,'hook-start',{'request_id':sys.argv[4],'package_root':str(package),'event':{'id':'owned-entry-bridge-event','operation':'skill-tree-add-pending-task','anchor':'before'},'context':context,'mode':'manual','authority':grant,'executor':{'id':'controlled-parent','context_id':'controlled-parent-context'},'capabilities':['codex-source-backed-context']})
+ current=w.hook_action(s,'hook-next',{'chain_id':c['id']});held=current['action']=='prerequisite';attempts=len(w.hook_action(s,'hook-read',{'chain_id':c['id']})['attempts'])
+except w.WorkflowError as error:
+ if not any(word in str(error).lower() for word in ['registry','profile','ownership','association','configuration','receipt','symlink']):raise
+ held=True
+print(json.dumps({'held':held,'attempts':attempts,'future_created':s.future.exists()}))`;
+ const bridge=JSON.parse(python(['-c',program,path.join(packageRoot,'scripts/workflow-state.py'),project,packageRoot,'owned-entry-chain-readable'],project));assert.deepEqual(bridge,{held:true,attempts:0,future_created:false});
+ write(project,'.skill-tree/installation/profile.json','{unreadable relevant ownership profile');assertHeldCLI();
+ const opaqueBridge=JSON.parse(python(['-c',program,path.join(packageRoot,'scripts/workflow-state.py'),project,packageRoot,'owned-entry-chain-opaque'],project));assert.deepEqual(opaqueBridge,{held:true,attempts:0,future_created:false});
+ fs.writeFileSync(path.join(project,'.skill-tree/installation/profile.json'),profile);
+ assert.equal(fs.lstatSync(packageRoot).isSymbolicLink(),true);assert.deepEqual(fs.readFileSync(path.join(project,'.skill-tree/installation/profile.json')),profile);assert.equal(fs.existsSync(path.join(project,'.skill-tree/documents/future.md')),false);assert.equal(fs.existsSync(path.join(project,'.skill-tree/documents/future.json')),false);
+});
+
+for(const flavor of ['general','web','unity'])test(flavor+' copied CLI provides distinct read-only completed readiness without source siblings',async t=>{
+ const base=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-readiness-entry-'));t.after(()=>fs.rmSync(base,{recursive:true,force:true}));const project=path.join(base,'project'),upstream=path.join(base,'upstream'),standalone=path.join(base,'standalone'),runtime=path.join(base,'runtime'),name='skill-tree-add-pending-task';fs.mkdirSync(project);fs.mkdirSync(upstream);fs.mkdirSync(runtime);write(project,'package.json',{scripts:{test:'node --test'}});write(upstream,'SKILL.md','# Controlled retained readiness\nReturn a bounded proposal.\n');
+ if(flavor==='unity'){write(project,'ProjectSettings/ProjectVersion.txt','m_EditorVersion: 6000.3.27f2');write(project,'Packages/manifest.json',{dependencies:{'com.unity.test-framework':'1.6.0'}});write(project,'Packages/packages-lock.json',{dependencies:{'com.unity.test-framework':{version:'1.6.0'}}});}
+ installation.install(project,core,flavor,[{name,provider:'codex',rel:'.agents/skills/'+name}]);const lifecycle=require('../lib/plugin-lifecycle.js'),registry=require('../lib/plugin-registry.js'),proposal=await lifecycle.prepareProposal(project,{request_id:'readiness-entry-install',operation:'install',sources:[{id:'controlled',path:upstream}],bindings:[{id:'retained-entry',plugin_id:'controlled',operation:name,anchor:'before',enabled:true}]});lifecycle.applyProposal(project,proposal,{proposal_digest:proposal.digest});installation.refresh(project,core);
+ const packageRoot=path.join(project,'.agents/skills',name),request={project_root:project,event:{id:'retained-readiness-event',operation:name,anchor:'before'},context:{kind:'request',id:'retained-readiness-context'},capabilities:['codex-source-backed-context']};
+ const run=(root,packet)=>{const value=spawnSync(process.execPath,[path.join(root,'scripts/plugin-hooks.js'),'--input','-'],{input:JSON.stringify(packet),encoding:'utf8',timeout:30000});assert.equal(value.status,0,value.stdout+value.stderr);return JSON.parse(value.stdout);},configuration=run(packageRoot,{...request,runtime_action:'freeze-chain'}).configuration,input={...request,configuration,runtime_action:'readiness-plan'};
+ const profile=fs.readFileSync(path.join(project,'.skill-tree/installation/profile.json')),ready=run(packageRoot,input);assert.equal(ready.proof_kind,'completed-readiness');assert.equal(ready.guard,null);assert.deepEqual(ready.prerequisites,[]);fs.unlinkSync(path.join(project,registry.REGISTRY));assert.ok(run(packageRoot,input).prerequisites.length,'Completed readiness must preserve missing managed authority.');assert.deepEqual(fs.readFileSync(path.join(project,'.skill-tree/installation/profile.json')),profile);
+ fs.cpSync(packageRoot,standalone,{recursive:true});fs.rmSync(project,{recursive:true});fs.rmSync(upstream,{recursive:true});const independent=run(standalone,{...input,project_root:runtime});assert.equal(independent.proof_kind,'completed-readiness');assert.deepEqual(independent.prerequisites,[]);assert.equal(independent.bindings.length,1);noFuture(runtime);
+});

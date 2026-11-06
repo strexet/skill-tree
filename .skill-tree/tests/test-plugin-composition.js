@@ -15,10 +15,10 @@ const event=(operation=processing,anchor='after')=>({id:'controlled-boundary-eve
 function temporary(t){const base=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-plugin-composition-'));t.after(()=>fs.rmSync(base,{recursive:true,force:true}));return base;}
 function project(root,flavor){fs.mkdirSync(root,{recursive:true});write(root,'package.json',{scripts:{test:'node --test'}});if(flavor==='unity'){write(root,'ProjectSettings/ProjectVersion.txt','m_EditorVersion: 6000.3.27f2');write(root,'Packages/manifest.json',{dependencies:{'com.unity.test-framework':'1.6.0'}});write(root,'Packages/packages-lock.json',{dependencies:{'com.unity.test-framework':{version:'1.6.0'}}});}}
 function sourceCopy(destination){fs.mkdirSync(destination);for(const relative of Object.keys(composer.sourceInputs(core)))write(destination,relative,read(core,relative));return destination;}
-async function fixture(t,{flavor='general',rows=[],ids=['editor','interview'],capabilities=[],adapter=undefined,adapters={},source=core,base=temporary(t)}={}){
+async function fixture(t,{flavor='general',rows=[],ids=['editor','interview'],capabilities=[],capabilitiesByPlugin={},adapter=undefined,adapters={},source=core,base=temporary(t)}={}){
  const root=path.join(base,'project');project(root,flavor);installation.install(root,source,flavor,[{name:processing,provider:'codex',rel:'.agents/skills/'+processing}]);
  const originals={},sources=[];
- for(const id of ids){const upstream=path.join(base,'upstream-'+id),marker=path.join(base,'upstream-helper-executed-'+id);fs.mkdirSync(upstream);const skill=Buffer.from('\ufeff---\nname: external-'+id+'\n---\nExternal '+id+' instructions. Read [data](assets/data.bin) and [helper](scripts/sentinel.py).\n');const binary=Buffer.from([0,255,128,13,10,0,42]);write(upstream,'SKILL.md',skill);write(upstream,'assets/data.bin',binary);write(upstream,'scripts/sentinel.py','from pathlib import Path\nPath('+JSON.stringify(marker)+').write_text("unexpected execution")\nraise RuntimeError("upstream helper must remain inert")\n');write(upstream,'unrelated-private.txt','Excluded from the declared closure.');originals[id]={skill,binary,marker,upstream};const selectedAdapter=Object.hasOwn(adapters,id)?adapters[id]:adapter;sources.push({id,path:upstream,capabilities,...(selectedAdapter===undefined?{}:{adapter:selectedAdapter}),metadata:{authoring_host:'claude',custom:'source provenance survives'}});}
+ for(const id of ids){const upstream=path.join(base,'upstream-'+id),marker=path.join(base,'upstream-helper-executed-'+id);fs.mkdirSync(upstream);const skill=Buffer.from('\ufeff---\nname: external-'+id+'\n---\nExternal '+id+' instructions. Read [data](assets/data.bin) and [helper](scripts/sentinel.py).\n');const binary=Buffer.from([0,255,128,13,10,0,42]);write(upstream,'SKILL.md',skill);write(upstream,'assets/data.bin',binary);write(upstream,'scripts/sentinel.py','from pathlib import Path\nPath('+JSON.stringify(marker)+').write_text("unexpected execution")\nraise RuntimeError("upstream helper must remain inert")\n');write(upstream,'unrelated-private.txt','Excluded from the declared closure.');originals[id]={skill,binary,marker,upstream};const selectedAdapter=Object.hasOwn(adapters,id)?adapters[id]:adapter;sources.push({id,path:upstream,capabilities:Object.hasOwn(capabilitiesByPlugin,id)?capabilitiesByPlugin[id]:capabilities,...(selectedAdapter===undefined?{}:{adapter:selectedAdapter}),metadata:{authoring_host:'claude',custom:'source provenance survives'}});}
  if(sources.length){const proposal=await lifecycle.prepareProposal(root,{request_id:'controlled-plugin-install',operation:'install',sources,bindings:rows});lifecycle.applyProposal(root,proposal,{proposal_digest:proposal.digest});installation.refresh(root,source);}
  return {base,root,flavor,source,originals};
 }
@@ -161,4 +161,114 @@ print(json.dumps({'cache_file':str(cache),'source_sha256':hashlib.sha256(origina
  assert.equal(fs.existsSync(marker),false,'A timestamp-valid cache replaced the verified owned workflow source.');assert.equal(result.status,'prerequisite');assert.equal(result.guard.kind,'actual-owned-scope');
  assert.throws(()=>api().prepareBoundary(packageRoot,{project_root:f.root,event:event(processing,'before'),context:{kind:'pending',id:'forged-pending-scope',pending_ids:['P-11111111-1111-4111-8111-111111111111']},capabilities:[]}),/actual|selected|Pending|pending|scope/i);
  assert.equal(fs.existsSync(marker),false);assert.deepEqual(fs.readFileSync(control.cache_file),originalCache,'Existing bytecode belongs to the fixture and must remain untouched.');assert.deepEqual(fs.readFileSync(helper),originalSource);assert.deepEqual(read(packageRoot,manifestPath),originalManifest);assert.deepEqual(metadataBytes(f.root),before);
+});
+
+// Managed positive controls use the actual receipt-owned destination, never mount().
+async function managedOperation(t,options={}){
+ const f=await fixture(t,{rows:[row('managed','editor',{operation:intake,anchor:'before'})],ids:['editor'],...options});
+ installation.install(f.root,f.source,f.flavor,[{name:intake,provider:'codex',rel:'.agents/skills/'+intake}]);
+ return {...f,packageRoot:path.join(f.root,'.agents/skills',intake)};
+}
+function runtimeRequest(f,extra={}){return request(f,intake,'before',{context:{kind:'request',id:'managed-request',semantic_fingerprint:'a'.repeat(64),content_fingerprint:'b'.repeat(64),accepted_marker:'initial'},capabilities:['codex-source-backed-context'],...extra});}
+function preparationPaths(f,frozen,input=runtimeRequest(f)){
+ const runtime=require('../lib/plugin-runtime.js');return [()=>runtime.freezePlan(f.packageRoot,input).proof,()=>runtime.occurrencePlan(f.packageRoot,{...input,configuration:frozen.configuration})];
+}
+function assertHeldPreparation(prepare,label){
+ try{const proof=prepare();assert.ok(proof.prerequisites.length||proof.unresolved.length,label+' silently supplied an executable proof');assert.match(JSON.stringify([proof.prerequisites,proof.unresolved]),/registry|profile|ownership|association|configuration|receipt/i,label);}
+ catch(error){if(error.code==='ERR_ASSERTION')throw error;assert.match(error.message,/registry|profile|ownership|association|configuration|receipt|unreadable|unowned/i,label);}
+}
+function profileIdentity(profile){const output_digests=Object.fromEntries(Object.values(profile.destinations).map(record=>[record.name,record.files]));return composer.hash(composer.json({flavor:profile.flavor,environment_id:profile.environment_id,source_digests:profile.source_digests,output_digests}));}
+
+test('the exact receipt-owned operation retains absent managed registry authority in both preparation APIs',async t=>{
+ const f=await managedOperation(t),runtime=require('../lib/plugin-runtime.js'),input=runtimeRequest(f),frozen=runtime.freezePlan(f.packageRoot,input);assert.deepEqual(frozen.proof.prerequisites,[]);
+ const profile=read(f.root,'.skill-tree/installation/profile.json'),moduleManifest=read(f.packageRoot,manifestPath),before=read(f.root,registry.REGISTRY);fs.unlinkSync(path.join(f.root,registry.REGISTRY));
+ for(const prepare of preparationPaths(f,frozen,input))assertHeldPreparation(prepare,'Missing associated registry');
+ assert.deepEqual(read(f.root,'.skill-tree/installation/profile.json'),profile);assert.deepEqual(read(f.packageRoot,manifestPath),moduleManifest);noForbiddenWorkflow(f.root);
+ write(f.root,registry.REGISTRY,before);for(const prepare of preparationPaths(f,frozen,input))assert.deepEqual(prepare().prerequisites,[],'Exact restoration should recover the original inspected configuration.');
+ const removal=await lifecycle.prepareProposal(f.root,{request_id:'managed-normal-uninstall',operation:'uninstall',plugin_ids:['editor']});lifecycle.applyProposal(f.root,removal,{proposal_digest:removal.digest});
+ for(const prepare of preparationPaths(f,frozen,input))assertHeldPreparation(prepare,'Normal managed uninstall');
+});
+
+test('unreadable and modified present managed registries remain explicit holds',async t=>{
+ const f=await managedOperation(t),runtime=require('../lib/plugin-runtime.js'),frozen=runtime.freezePlan(f.packageRoot,runtimeRequest(f)),original=read(f.root,registry.REGISTRY);
+ for(const bytes of ['{unreadable registry',original.toString().replace('"generation": 1','"generation": 987')]){
+  write(f.root,registry.REGISTRY,bytes);const saved=read(f.root,registry.REGISTRY);for(const prepare of preparationPaths(f,frozen))assertHeldPreparation(prepare,'Unreadable or changed registry');assert.deepEqual(read(f.root,registry.REGISTRY),saved);
+ }
+ noForbiddenWorkflow(f.root);
+});
+
+for(const fault of ['foreign-project','receipt-identity','destination-identity','resealed-file-claim','resealed-resource-claim','operation-claim','unsupported-schema','unreadable-profile'])test('a relevant '+fault+' profile claim cannot turn managed registry loss into standalone success',async t=>{
+ const f=await managedOperation(t),runtime=require('../lib/plugin-runtime.js'),frozen=runtime.freezePlan(f.packageRoot,runtimeRequest(f)),profile=JSON.parse(read(f.root,'.skill-tree/installation/profile.json')),relative='.agents/skills/'+intake;fs.unlinkSync(path.join(f.root,registry.REGISTRY));
+ if(fault==='foreign-project'){const other=path.join(f.base,'foreign-project');fs.mkdirSync(other);profile.project_root=other;}
+ if(fault==='receipt-identity')profile.identity='0'.repeat(64);
+ if(fault==='destination-identity')profile.destinations[relative].identity='0'.repeat(64);
+ if(fault==='resealed-file-claim'){profile.destinations[relative].files[manifestPath]='0'.repeat(64);profile.destinations[relative].identity=composer.hash(composer.json(profile.destinations[relative].files));profile.identity=profileIdentity(profile);}
+ if(fault==='resealed-resource-claim'){profile.destinations[relative].files['SKILL.md']='0'.repeat(64);profile.destinations[relative].identity=composer.hash(composer.json(profile.destinations[relative].files));profile.identity=profileIdentity(profile);}
+ if(fault==='operation-claim'){profile.destinations[relative].name=processing;profile.identity=profileIdentity(profile);}
+ if(fault==='unsupported-schema')profile.schema=987;
+ write(f.root,'.skill-tree/installation/profile.json',fault==='unreadable-profile'?'{unreadable ownership profile':composer.json(profile));const saved=read(f.root,'.skill-tree/installation/profile.json');
+ for(const prepare of preparationPaths(f,frozen))assertHeldPreparation(prepare,'Relevant '+fault+' ownership');assert.deepEqual(read(f.root,'.skill-tree/installation/profile.json'),saved);noForbiddenWorkflow(f.root);
+});
+
+test('independent copies beside an unrelated valid profile acquire no missing-registry hold',async t=>{
+ const f=await managedOperation(t),runtime=require('../lib/plugin-runtime.js');fs.unlinkSync(path.join(f.root,registry.REGISTRY));
+ for(const independent of [path.join(f.base,'outside-operation'),path.join(f.root,'independent-operation')]){
+  fs.cpSync(f.packageRoot,independent,{recursive:true});const frozen=runtime.freezePlan(independent,runtimeRequest(f));assert.deepEqual(frozen.proof.prerequisites,[]);assert.deepEqual(runtime.occurrencePlan(independent,{...runtimeRequest(f),configuration:frozen.configuration}).prerequisites,[]);
+ }
+ noForbiddenWorkflow(f.root);
+});
+
+test('an owned destination replaced by a symlink retains the conflicting managed claim',async t=>{
+ const f=await managedOperation(t),runtime=require('../lib/plugin-runtime.js'),frozen=runtime.freezePlan(f.packageRoot,runtimeRequest(f)),relocated=path.join(f.base,'relocated-owned-operation'),profile=read(f.root,'.skill-tree/installation/profile.json');
+ fs.renameSync(f.packageRoot,relocated);fs.symlinkSync(relocated,f.packageRoot,'dir');fs.unlinkSync(path.join(f.root,registry.REGISTRY));
+ for(const prepare of preparationPaths(f,frozen))assertHeldPreparation(prepare,'Symlinked owned destination');
+ assert.equal(fs.lstatSync(f.packageRoot).isSymbolicLink(),true);assert.deepEqual(read(f.root,'.skill-tree/installation/profile.json'),profile);assert.equal(fs.existsSync(path.join(relocated,'SKILL.md')),true);noForbiddenWorkflow(f.root);
+});
+
+test('empty disabled and false-condition hook sets create no missing-registry or ownership hold',async t=>{
+ for(const rows of [[],[row('disabled','editor',{operation:intake,anchor:'before',enabled:false})],[row('excluded','editor',{operation:intake,anchor:'before',condition:false})]]){
+  const f=await managedOperation(t,{rows}),runtime=require('../lib/plugin-runtime.js');fs.unlinkSync(path.join(f.root,registry.REGISTRY));write(f.root,'.skill-tree/installation/profile.json','{unreadable unrelated metadata');
+  const frozen=runtime.freezePlan(f.packageRoot,runtimeRequest(f));assert.deepEqual(frozen.proof.bindings,[]);assert.deepEqual(frozen.proof.prerequisites,[]);assert.deepEqual(runtime.occurrencePlan(f.packageRoot,{...runtimeRequest(f),configuration:frozen.configuration}).prerequisites,[]);noForbiddenWorkflow(f.root);
+ }
+});
+
+// The Python bridge controls exercise real HC/HI and guarded B incorporation.
+// These opaque host packets isolate default Node delivery and forwarding scope.
+function privatePacket(f,frozen,id,context,capabilities){
+ const current=frozen.configuration.bindings.find(row=>row.id===id),attempt='HI-'+(id==='editor-first'?'1':id==='interview-middle'?'2':'3').repeat(8)+'-1111-4111-8111-111111111111',chain='HC-11111111-1111-4111-8111-111111111111';
+ const authority={id:'controlled-node-grant',revision:1,context_id:context.id,allowed_kinds:['technical'],constraints:['Controlled Node delivery only; no actor or native execution.'],evidence:{kind:'owner-message',reference:'Scripted isolated fixture configuration.'}};
+ const public_input={chain_id:chain,attempt_id:attempt,binding_id:id,event:frozen.proof.event,context,configuration_digest:frozen.configuration.configuration_digest,mode:'manual',authority,authority_digest:'9'.repeat(64),execution_policy:frozen.configuration.execution_policy,parameters:current.effective.values,extra_instructions:current.effective.instructions,scope_source_snapshot:{}};
+ return {...runtimeRequest(f),event:frozen.proof.event,context,capabilities,configuration:frozen.configuration,chain_id:chain,attempt_id:attempt,binding_id:id,authority,public_input,input_digest:'7'.repeat(64)};
+}
+test('default Node delivery isolates other-occurrence holds and forwards accepted B context to the final A',async t=>{
+ const rows=[row('editor-first','editor',{operation:intake,anchor:'before',parameters:{pass:'initial'}}),row('interview-middle','interview',{operation:intake,anchor:'before',parameters:{pass:'middle',token:{$secret:'controlled-b-reference'}}}),row('editor-final','editor',{operation:intake,anchor:'before',parameters:{pass:'final',token:{$secret:'controlled-a-reference'}}})];
+ const f=await managedOperation(t,{rows,ids:['editor','interview'],capabilitiesByPlugin:{editor:['editor-only-capability']}}),runtime=require('../lib/plugin-runtime.js'),available=['codex-source-backed-context','editor-only-capability'],limited=['codex-source-backed-context'],context=runtimeRequest(f).context,frozen=runtime.freezePlan(f.packageRoot,runtimeRequest(f,{capabilities:available}));assert.deepEqual(frozen.proof.prerequisites,[]);
+ const first=runtime.deliveryData(f.packageRoot,privatePacket(f,frozen,'editor-first',context,available));assert.equal(first.payload.parameters.pass,'initial');const firstBytes=JSON.stringify(first);
+ const visible=runtime.occurrencePlan(f.packageRoot,{...runtimeRequest(f,{capabilities:limited}),configuration:frozen.configuration});assert.ok(visible.prerequisites.some(item=>item.binding_id==='editor-first'));assert.ok(visible.prerequisites.some(item=>item.binding_id==='editor-final'));
+ let resolutions=0;const resolve=()=>{resolutions++;return 'Controlled private fixture value';};
+ const middle=runtime.deliveryData(f.packageRoot,privatePacket(f,frozen,'interview-middle',context,limited),resolve);assert.equal(middle.payload.parameters.pass,'middle');assert.equal(resolutions,1,'Only the current permitted private delivery resolves parameters.');
+ const accepted={...context,accepted_marker:'accepted-after-b',semantic_fingerprint:'c'.repeat(64),content_fingerprint:'d'.repeat(64)};resolutions=0;
+ assert.throws(()=>runtime.deliveryData(f.packageRoot,privatePacket(f,frozen,'editor-final',accepted,limited),resolve),/prerequisite|capability|unavailable/i);assert.equal(resolutions,0);
+ const last=runtime.deliveryData(f.packageRoot,privatePacket(f,frozen,'editor-final',accepted,available),resolve);assert.equal(last.payload.context.accepted_marker,'accepted-after-b');assert.equal(last.payload.parameters.pass,'final');assert.notEqual(first.payload.attempt_id,last.payload.attempt_id);assert.equal(JSON.stringify(first),firstBytes,'Later context must preserve the original first occurrence packet.');
+ fs.unlinkSync(path.join(f.root,registry.REGISTRY));resolutions=0;assert.throws(()=>runtime.deliveryData(f.packageRoot,privatePacket(f,frozen,'interview-middle',context,available),resolve),/prerequisite|registry|configuration/i);assert.equal(resolutions,0);noForbiddenWorkflow(f.root);
+});
+
+test('completed readiness checks retained During metadata without admitting a new business occurrence',async t=>{
+ const runtime=require('../lib/plugin-runtime.js');assert.equal(typeof runtime.readinessPlan,'function','The owned runtime requires a distinct completed-readiness endpoint.');
+ const f=await fixture(t,{rows:[row('completed-during','editor',{operation:implementation,anchor:'during',parameters:{token:{$secret:'readiness-must-not-resolve'}}})],ids:['editor']}),state=workflow(f,{phase:'accepted'}),{files}=build(f,implementation),packageRoot=mount(f,files),context=state.context;
+ const beforeRequest={project_root:f.root,event:event(implementation,'before'),context,capabilities:['codex-source-backed-context']},configuration=runtime.freezePlan(packageRoot,beforeRequest).configuration,input={...beforeRequest,event:event(implementation,'during'),orchestration_id:state.frame.id,configuration};
+ assert.throws(()=>runtime.freezePlan(packageRoot,input),/draft|accept|plan|phase/i);assert.throws(()=>runtime.occurrencePlan(packageRoot,input),/draft|accept|plan|phase/i);
+ const previous=metadataBytes(f.root),ready=runtime.readinessPlan(packageRoot,input);assert.equal(ready.proof_kind,'completed-readiness');assert.equal(ready.guard,null);assert.deepEqual(ready.prerequisites,[]);assert.deepEqual(ready.bindings.map(item=>item.id),['completed-during']);assert.deepEqual(ready.context,context);assert.equal(ready.configuration_digest,configuration.configuration_digest);
+ write(f.root,'source.txt','Ordinary implementation changed the project after the retained hook completed.\n');assert.deepEqual(runtime.readinessPlan(packageRoot,input).prerequisites,[],'Completed readiness must not replay an old HI project-source snapshot.');
+ for(const name of ['freezePlan','occurrencePlan'])assert.throws(()=>runtime[name](packageRoot,{...input,...ready}),/readiness|business|proof/i,'A completed-readiness result cannot substitute for business preparation.');
+ let resolved=0;assert.throws(()=>runtime.deliveryData(packageRoot,{...input,...ready,public_input:{binding_id:'completed-during'},input_digest:'a'.repeat(64)},()=>{resolved++;return 'forbidden';}),/readiness|business|proof/i);assert.equal(resolved,0);
+ const changed=JSON.parse(JSON.stringify(configuration));changed.definitions[0].parameters={changed:true};assert.throws(()=>runtime.readinessPlan(packageRoot,{...input,configuration:changed}),/configuration|frozen|definition/i);assert.deepEqual(metadataBytes(f.root),previous);
+});
+
+test('completed readiness retains managed registry holds and independent no-op portability',async t=>{
+ const runtime=require('../lib/plugin-runtime.js');assert.equal(typeof runtime.readinessPlan,'function','Completed readiness requires a real owned endpoint.');
+ const f=await managedOperation(t),input=runtimeRequest(f),frozen=runtime.freezePlan(f.packageRoot,input),request={...input,configuration:frozen.configuration},original=read(f.root,registry.REGISTRY),previous=metadataBytes(f.root);assert.deepEqual(runtime.readinessPlan(f.packageRoot,request).prerequisites,[]);
+ fs.unlinkSync(path.join(f.root,registry.REGISTRY));assertHeldPreparation(()=>runtime.readinessPlan(f.packageRoot,request),'Completed associated registry');
+ const standalone=path.join(f.base,'readiness-standalone');fs.cpSync(f.packageRoot,standalone,{recursive:true});assert.deepEqual(runtime.readinessPlan(standalone,request).prerequisites,[]);write(f.root,registry.REGISTRY,original);assert.deepEqual(runtime.readinessPlan(f.packageRoot,request).prerequisites,[]);assert.deepEqual(metadataBytes(f.root),previous);noForbiddenWorkflow(f.root);
+ for(const rows of [[],[row('disabled-readiness','editor',{operation:intake,anchor:'before',enabled:false})],[row('excluded-readiness','editor',{operation:intake,anchor:'before',condition:false})]]){const empty=await managedOperation(t,{rows}),base=runtimeRequest(empty),configuration=runtime.freezePlan(empty.packageRoot,base).configuration;fs.unlinkSync(path.join(empty.root,registry.REGISTRY));write(empty.root,'.skill-tree/installation/profile.json','{opaque irrelevant no-op profile');const ready=runtime.readinessPlan(empty.packageRoot,{...base,configuration});assert.equal(ready.proof_kind,'completed-readiness');assert.deepEqual(ready.bindings,[]);assert.deepEqual(ready.prerequisites,[]);noForbiddenWorkflow(empty.root);}
 });

@@ -200,9 +200,8 @@ def attach_hook_chain(store,record,snapshot,chain_id):
     return result
 
 def hook_admission(store,record,snapshot):
-    if not record.get('hook_chains'):return
     wf=owned_module('review_hook_workflow',Path(__file__).with_name('workflow-state.py'))
-    try:wf.hook_admission(store,scope=hook_context(snapshot),chain_ids=record['hook_chains'])
+    try:wf.hook_admission(store,scope=hook_context(snapshot),chain_ids=record.get('hook_chains',[]))
     except (ValueError,OSError) as error:raise ReviewError('Current review hook obligations remain unresolved: '+str(error)) from error
 
 def ready(record,snapshot,*,store=None):
@@ -210,9 +209,8 @@ def ready(record,snapshot,*,store=None):
     record=reconcile(record,snapshot)
     if record['status']=='merged':return record
     if record['status']=='blocked':raise ReviewError(record['blocked_reason'])
-    if record.get('hook_chains'):
-        if store is None:raise ReviewError('Current hook readiness requires the live owned store')
-        hook_admission(store,record,snapshot)
+    if record.get('hook_chains') and store is None:raise ReviewError('Current hook readiness requires the live owned store')
+    if store is not None:hook_admission(store,record,snapshot)
     if not record.get('pr') or not record['pr'].get('id') or not record['pr'].get('url'):raise ReviewError('PR readiness requires the existing provider PR identity and URL')
     review=record.get('review')
     if not review or review['key']!=review_key(snapshot) or review['unresolved']:
@@ -348,6 +346,11 @@ def main(argv=None):
             wf=owned_module('pr_workflow',Path(__file__).with_name('workflow-state.py'))
             store=wf.Store(canonical,allow_unselected=True)
             with ws.publication_lock(root,snapshot.get('remote','origin'),snapshot.get('target_branch',key)):
+                if args.command in {'ready','merge-gate'}:
+                    prior=canonical/('.skill-tree/history/publications/pub-'+key+'.json')
+                    inspected=json.loads(prior.read_text()) if prior.exists() else None
+                    if inspected:
+                        wf.prepare_hook_admission(store,scope=hook_context(snapshot),chain_ids=inspected.get('hook_chains',[]))
                 with store.lock():
                     relative='.skill-tree/history/publications/pub-'+key+'.json';path=canonical/relative
                     record=json.loads(path.read_text()) if path.exists() else None

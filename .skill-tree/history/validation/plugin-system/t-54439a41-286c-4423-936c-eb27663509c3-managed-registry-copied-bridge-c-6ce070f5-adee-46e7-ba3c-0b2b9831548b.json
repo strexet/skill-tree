@@ -1,0 +1,44 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-plugin-invocation-installation.js"
+  ],
+  "attempt_id": "C-6ce070f5-adee-46e7-ba3c-0b2b9831548b",
+  "check_id": "managed-registry-copied-bridge",
+  "counts": {
+    "discovered": 17,
+    "expected": 17,
+    "failed": 0,
+    "passed": 17,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-54439a41-286c-4423-936c-eb27663509c3-managed-registry-copied-bridge-c-6ce070f5-adee-46e7-ba3c-0b2b9831548b.txt",
+  "result": "pass",
+  "reviewed_failure_reason": null,
+  "source_fingerprints": {
+    ".skill-tree/common/references/plugin-invocation.md": "205fbce39d22792274f2fa01d60f9dc0fbb306410a25b26f65adfa7d8236c00e",
+    ".skill-tree/common/references/workflow-metadata.md": "47b832b8378cd837b7f8f9d86e5ad1de6d27630bc913dbe8b887d0c7fed32810",
+    ".skill-tree/common/scripts/plugin-hooks.js": "fd5d304848f526b827318f181d572caae76db089961e1e01a7f54d03d50023d2",
+    ".skill-tree/common/scripts/plugin-invocation.py": "9b7e42042d72579247cd4f09bc45388b652ec7d0d0bc95354c0002849811f124",
+    ".skill-tree/common/scripts/pr-review-state.py": "547be66447fb14280a021661af1b7207b34ab07eb2e6c8bd5af7ec37a2779d16",
+    ".skill-tree/common/scripts/run-workspaces.py": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+    ".skill-tree/common/scripts/workflow-state.py": "c6a5cb40a2577ae6ed0bd4d888a630b36a09f6f85843b723ab6e4e99be24c5c9",
+    ".skill-tree/config/resource-map.json": "95a4922b2331416863100c9b054e84709bafd4126c1542a15fac49781da13248",
+    ".skill-tree/history/research/plugin-managed-registry-absence-observation.json": "05b7bfc7869b32ea561d9af13ee8886ef2be87a60c645c7e5ebd2f5c71738ecf",
+    ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+    ".skill-tree/lib/installation.js": "efb88bc5a28246aab36c7d1cb709f5ec4fb37dc736867c3533503e74c26fa431",
+    ".skill-tree/lib/plugin-composition.js": "7e61980fa8c3ce5d5f1d0807f8cc38a1f264a201db57f208d8300e31cd3db00e",
+    ".skill-tree/lib/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+    ".skill-tree/lib/plugin-runtime.js": "0c2cc89e184b509ccf2d99de6f0cd6cca47b958967899a8440e5be02fad68c6f",
+    ".skill-tree/tests/test-plugin-composition.js": "0ac136430c64c82c8d0fe3a55c8cf75526f7a29ca6f21fe9902ec317f2a569d8",
+    ".skill-tree/tests/test-plugin-invocation-installation.js": "fa16b6af4ae637415100fa2e0c3dcfeb9a7f392e168f61980ecd3c8fc84e1495",
+    ".skill-tree/tests/test-plugin-workflow.py": "e04b7fcecf2ab49bec451a0747a7b2c4e1c216eb8c38b993cb342a401092cc1a"
+  },
+  "task_id": "T-54439a41-286c-4423-936c-eb27663509c3",
+  "tool_wall_seconds": 44.6568441670388
+}

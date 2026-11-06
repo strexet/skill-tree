@@ -279,8 +279,10 @@ class Store:
             self.recover()
             mutable=[self.future,self.state,self.base/'skill-tree.json',self.base/'history/task-outcomes.jsonl',*list((self.base/'history').rglob('*.json')),*list((self.base/'clarifications').glob('*.json')),*list((self.base/'decisions').glob('*.json')),*list((self.base/'invocations').glob('*.json'))]
             self._write_hashes={p.relative_to(self.root).as_posix():file_hash(p) for p in mutable}
+            self._writer_active=True;self._hook_active_admissions=[];self._hook_business_committed=False
             yield
         finally:
+            self._writer_active=False;self._hook_preflights={};self._hook_active_admissions=[];self._hook_business_committed=False
             path.unlink(missing_ok=True)
     def replace(self,path,content):
         path.parent.mkdir(parents=True,exist_ok=True)
@@ -304,12 +306,17 @@ class Store:
             self.replace(self.owned(write['path']),write['content'])
         journal.unlink()
     def commit(self,writes):
+        admissions=list(getattr(self,'_hook_active_admissions',[]))
+        navigation_followup=set(writes)=={'.skill-tree/skill-tree.json'} and getattr(self,'_hook_business_committed',False)
+        for admission in admissions:
+            _hook_admission(self,admission['scope'],admission['chain_ids'],register=False,navigation_followup=navigation_followup)
         record={'format':'skill-tree-transaction','writes':[]}
         for rel,content in writes.items():
             path=self.owned(rel);actual=file_hash(path);expected=getattr(self,'_write_hashes',{}).get(rel,actual)
             if actual!=expected:raise WorkflowError('Metadata changed during the operation; preserve developer changes: '+rel)
             record['writes'].append({'path':rel,'expected_hash':expected,'content':content})
         self.replace(self.base/'.transaction.json',dump(record));self.recover()
+        if admissions and not navigation_followup:self._hook_business_committed=True
         if hasattr(self,'_write_hashes'):
             for write in record['writes']:self._write_hashes[write['path']]=digest(write['content'].encode())
     def expect_unchanged(self,relative,expected_hash):
@@ -487,6 +494,9 @@ def capture_foundation(store):
 
 def process(store,payload):
     """Apply researched dispositions; receipt scope is explicitly selected first."""
+    proposed=payload.get('dispositions',{})
+    due=[tid for tid,row in proposed.items() if isinstance(row,dict) and row.get('status') in {'promoted','resolved'}] if isinstance(proposed,dict) else []
+    if due:prepare_hook_admission(store,scope={'kind':'pending','pending_ids':due})
     with store.lock():
         store.guard(payload.get('expected_source_hash'));text=store.text();tasks=parse(text);state=store.load(text)
         selected=resolve(tasks,payload.get('selectors',[]),'Pending Queue'); selected_ids={t['id'] for t in selected}
@@ -582,29 +592,35 @@ def process(store,payload):
         store.save(text,state)
         return receipt
 
+def _start_selection(store,mode,selector,workspace,text=None):
+    tasks=parse(store.text() if text is None else text);options=workspace or {}
+    scoped='snapshot_ids' in options
+    if scoped:
+        ids=options['snapshot_ids']
+        if mode!='all' or selector or not isinstance(ids,list) or not ids or any(not valid_id(tid,'T') for tid in ids) or len(set(ids))!=len(ids):
+            raise WorkflowError('Exact Implement All snapshot requires a nonempty unique list of prioritized T- IDs')
+        selected=set(ids)
+        roots=sorted([t for t in tasks if t['queue']=='Prioritized Next Changes' and t['id'] in selected],key=lambda t:-t['priority'])
+        missing=selected-{t['id'] for t in roots}
+        if missing:raise WorkflowError('Snapshot IDs must identify exact prioritized tasks: '+', '.join(sorted(missing)))
+        for task in roots:select(tasks,task['id'])
+        chosen=roots[0];snapshot=[t['id'] for t in roots]
+    else:
+        chosen=select(tasks,selector)
+        snapshot=[chosen['id']] if mode=='next' else [t['id'] for t in sorted([t for t in tasks if t['queue']=='Prioritized Next Changes'],key=lambda t:-t['priority'])]
+    if mode=='all' and selector:raise WorkflowError('Implement All uses the initial prioritized snapshot')
+    return tasks,chosen,snapshot
+
 def start(store,mode,selector=None,limits=None,workspace=None):
     admission=admit_profile(store)
+    pre_tasks,pre_chosen,pre_snapshot=_start_selection(store,mode,selector,workspace)
+    for tid in dependency_scope(pre_tasks,{'snapshot':pre_snapshot}):prepare_hook_admission(store,scope=tid)
     with store.lock():
         text=store.text();state=store.load(text)
         registry=state.get('run_registry')
         if not registry and state['active_run'] is not None: raise WorkflowError('Active run exists; resume the recorded run')
         if not registry and workspaces.common_dir(store.root):raise WorkflowError('Git controllers require workspace-setup before start')
-        tasks=parse(text);options=workspace or {}
-        scoped='snapshot_ids' in options
-        if scoped:
-            ids=options['snapshot_ids']
-            if mode!='all' or selector or not isinstance(ids,list) or not ids or any(not valid_id(tid,'T') for tid in ids) or len(set(ids))!=len(ids):
-                raise WorkflowError('Exact Implement All snapshot requires a nonempty unique list of prioritized T- IDs')
-            selected=set(ids)
-            roots=sorted([t for t in tasks if t['queue']=='Prioritized Next Changes' and t['id'] in selected],key=lambda t:-t['priority'])
-            missing=selected-{t['id'] for t in roots}
-            if missing:raise WorkflowError('Snapshot IDs must identify exact prioritized tasks: '+', '.join(sorted(missing)))
-            for task in roots:select(tasks,task['id'])
-            chosen=roots[0];snapshot=[t['id'] for t in roots]
-        else:
-            chosen=select(tasks,selector)
-            snapshot=[chosen['id']] if mode=='next' else [t['id'] for t in sorted([t for t in tasks if t['queue']=='Prioritized Next Changes'],key=lambda t:-t['priority'])]
-        if mode=='all' and selector:raise WorkflowError('Implement All uses the initial prioritized snapshot')
+        tasks,chosen,snapshot=_start_selection(store,mode,selector,workspace,text)
         run={'id':identity('WR'),'mode':mode,'snapshot':snapshot,'root_task_id':chosen['id'],'current_task_id':chosen['id'],'phase':'implement','required_ids':[chosen['id']],'deferred_ids':[],'pending_ids':[],'processing_results':[],'completed_ids':[],'limits':limits or {},'partial_work':[],'stop_reason':None,'next_action':'Implement selected task','started_at':now()}
         for tid in dependency_scope(tasks,run):clarification_admission(store,tid)
         run['admission']=admission;run['admitted_task_ids']=sorted(dependency_scope(tasks,run));run['required_ids']=list(run['admitted_task_ids']);run['admitted_groups']=admitted_groups(tasks,run)
@@ -712,6 +728,8 @@ def next_task(store):
     return {'phase':'validate' if stage=='awaiting-validation' else 'implement','root_task_id':root,'task_id':task['id'],'title':task['title'],'priority':task['priority'],'body':task['body'],'checks':check_specs(task)}
 
 def advance(store):
+    # Read-only selection prepares the exact initial and group-switched hook scopes.
+    next_task(store)
     with store.lock():
         result=next_task(store);text=store.text();state=store.load(text);run=state['active_run']
         run=execution_run(run)
@@ -744,6 +762,7 @@ def checkpoint(store,payload):
         run.update({k:v for k,v in payload.items() if k not in {'validation_consumed','task_budget_used_seconds'}});validate_run(run);store.save(text,state);return run
 
 def complete(store,payload):
+    if payload.get('disposition','completed')=='completed':prepare_hook_admission(store,scope=payload.get('task_id'))
     with store.lock():
         store.guard(payload.get('expected_source_hash'));text=store.text();tasks=parse(text);state=store.load(text);task=resolve(tasks,[payload['task_id']],'Prioritized Next Changes')[0]
         disposition=payload.get('disposition','completed')
@@ -791,6 +810,10 @@ def complete(store,payload):
         text=remove(text,{task['id']});store.save(text,state,{'.skill-tree/history/task-outcomes.jsonl':ledger});return record
 
 def finish(store):
+    inspected=store.load().get('active_run')
+    if inspected:
+        references=execution_run(inspected).get('hook_chains',[])
+        prepare_hook_admission(store,chain_ids=references)
     with store.lock():
         text=store.text();state=store.load(text);run=state['active_run']
         if not run:raise WorkflowError('No active run')
@@ -801,7 +824,7 @@ def finish(store):
             if not set(focus['required_ids']).issubset(done):raise WorkflowError('Maintenance scope remains incomplete')
             context=deepcopy(state);context['active_run']=deepcopy(focus)
             if stale_completed_checks(store,context):raise WorkflowError('Maintenance acceptance evidence is stale')
-            if focus.get('hook_chains'):hook_admission(store,chain_ids=focus['hook_chains'])
+            hook_admission(store,chain_ids=focus.get('hook_chains',[]))
             summary=deepcopy(focus);summary.update({'finished_at':now(),'phase':'completed','next_action':None})
             del run['maintenance']
             ref='.skill-tree/history/runs/scope-'+summary['id'].lower()+'.json';run.setdefault('history_refs',[]).append(ref)
@@ -816,7 +839,7 @@ def finish(store):
         assert_admission(store,state)
         stale=stale_completed_checks(store,state)
         if stale:raise WorkflowError('Required completed check evidence is stale or unavailable: '+stale[0]['task_id']+'/'+stale[0]['check_id']+'; advance selects the preserved contract for revalidation')
-        if run.get('hook_chains'):hook_admission(store,chain_ids=run['hook_chains'])
+        hook_admission(store,chain_ids=run.get('hook_chains',[]))
         run.setdefault('delivery',{'publication':'not-requested','authorization':{}}).update({'implementation':'completed','status':'implementation-completed'})
         if not run['delivery'].get('authorization',{}).get('pr'):run['delivery']['status']='local-result'
         run['delivery']['order_completed']=run['delivery']['status']=='local-result'
@@ -1533,6 +1556,18 @@ def _hook_controller(store,run_id):
     state=_hook_source_store(store,store.source_root).load()
     runs=dict(state.get('run_registry',{}).get('runs',{}))
     if state.get('active_run'):runs[state['active_run']['id']]=state['active_run']
+    if run_id not in runs and getattr(store,'_hook_readiness',False) and valid_id(run_id,'WR'):
+        archived=_hook_safe(store.root,'.skill-tree/history/runs/run-'+run_id.lower()+'.json')
+        if archived.is_file():
+            receipt=json.loads(archived.read_text());validate_run(receipt)
+            if receipt.get('id')==run_id and receipt.get('phase')=='completed' and isinstance(receipt.get('finished_at'),str):
+                required=set(receipt['snapshot']+receipt['required_ids']);outcomes=store.outcomes()
+                successful={row['task_id'] for row in outcomes if row.get('disposition')=='completed'}
+                owned={row['task_id']:row for row in outcomes if row.get('run_id')==run_id}
+                actual_completed={tid for tid,row in owned.items() if row.get('disposition')=='completed'}
+                references=receipt.get('completion_refs',{})
+                if not required.issubset(successful) or set(receipt['completed_ids'])!=actual_completed or not isinstance(references,dict) or references!={tid:row['id'] for tid,row in owned.items()}:raise WorkflowError('The completed controller archive differs from successful original and current-run task outcomes')
+                runs[run_id]=receipt
     if run_id not in runs:raise WorkflowError('The hook controller is not an actual recorded run')
     return runs[run_id]
 
@@ -1687,6 +1722,34 @@ def _hook_locator(store,chain_id):
     return value
 
 
+def _hook_inventory_guard(manifest_path):
+    """Recheck exact owned file closure using only pinned local metadata."""
+    root=manifest_path.parent.parent;manifest=json.loads(manifest_path.read_text())
+    if not isinstance(manifest,dict):raise WorkflowError('The frozen hook manifest is invalid')
+    inventory=manifest.get('owned_resources');packages=manifest.get('packages')
+    if not isinstance(inventory,dict) or not isinstance(packages,dict):raise WorkflowError('The frozen hook resource inventory is unavailable')
+    def walk(directory,prefix='',dispatcher=False):
+        actual={}
+        for path in sorted(directory.iterdir()):
+            relative=prefix+path.name
+            if dispatcher and (path.name=='__pycache__' or not prefix and path.name=='plugins' or relative=='references/plugin-bindings.json'):continue
+            if path.is_symlink():raise WorkflowError('The hook resource inventory contains a symlink')
+            if path.is_dir():actual.update(walk(path,relative+'/',dispatcher))
+            elif path.is_file():actual[relative]=file_hash(path)
+            else:raise WorkflowError('The hook resource inventory contains an unsupported entry')
+        return actual
+    if walk(root,dispatcher=True)!=inventory:raise WorkflowError('The exact owned hook dispatcher resource closure changed')
+    plugin_root=root/'plugins'
+    if plugin_root.is_symlink() or plugin_root.exists() and not plugin_root.is_dir():raise WorkflowError('The hook plugin inventory is not an owned directory')
+    names=sorted(path.name for path in plugin_root.iterdir()) if plugin_root.exists() else []
+    if names!=sorted(packages):raise WorkflowError('The exact owned hook plugin package inventory changed')
+    for identity,record in packages.items():
+        if not isinstance(record,dict) or not isinstance(record.get('files'),dict):raise WorkflowError('The hook plugin resource inventory is invalid')
+        directory=plugin_root/identity
+        if directory.is_symlink() or not directory.is_dir():raise WorkflowError('The hook plugin resource inventory changed')
+        if walk(directory,'plugins/'+identity+'/')!=record['files']:raise WorkflowError('The exact owned hook plugin resource closure changed')
+
+
 def _hook_watch(package_root,execution_root):
     package_root=Path(package_root).resolve();manifest_path=_hook_safe(package_root,'references/plugin-bindings.json')
     manifest=json.loads(manifest_path.read_text());watch={str(manifest_path):file_hash(manifest_path)}
@@ -1703,13 +1766,18 @@ def _hook_watch(package_root,execution_root):
             watch[str(path)]=expected
     for relative in ['.skill-tree/installation/profile.json','.skill-tree/installation/plugins.json']:
         path=_hook_safe(execution_root,relative);watch[str(path)]=file_hash(path)
+    _hook_watch_guard(watch,package_root)
     return watch
 
 
-def _hook_watch_guard(watch):
+def _hook_watch_guard(watch,package_root):
     for value,expected in watch.items():
         path=Path(value)
         if not path.is_absolute() or any(parent.is_symlink() for parent in [path,*path.parents]) or file_hash(path)!=expected:raise WorkflowError('Hook package, profile or configuration changed; explicitly reconcile the frozen invocation')
+    manifest=_hook_safe(package_root,'references/plugin-bindings.json')
+    expected=watch.get(str(manifest))
+    if not isinstance(expected,str) or re.fullmatch('[a-f0-9]{64}',expected) is None:raise WorkflowError('The exact owned operation manifest is missing from the original hook watch')
+    _hook_inventory_guard(manifest)
 
 
 HOOK_MUTABLE_SOURCE_PATHS=(
@@ -1763,7 +1831,11 @@ def _hook_policy_guard(store,ctx,mode,authority,executor):
 
 
 def _hook_node(package_root,request):
-    script=_hook_safe(package_root,'scripts/plugin-hooks.js')
+    package_root=Path(package_root).absolute();verified=_hook_safe(package_root,'scripts/plugin-hooks.js')
+    # Keep the lexical installed destination visible to the owned bootstrap.
+    # The actual script closure is verified independently before execution.
+    script=package_root/'scripts/plugin-hooks.js'
+    if script.resolve()!=verified:raise WorkflowError('The lexical hook entry differs from the verified operation script')
     run=subprocess.run(['node',str(script),'--input','-'],input=json.dumps(request,ensure_ascii=True),capture_output=True,text=True,timeout=30)
     if run.returncode:raise WorkflowError('Owned hook preparation failed: '+(run.stderr.strip().splitlines()[-1] if run.stderr.strip() else 'The owned Node bridge is unavailable'))
     try:return json.loads(run.stdout)
@@ -1870,10 +1942,12 @@ def _hook_action(store,command,payload,*,private_delivery_provider=None,private_
                     if payload.get('expected_source_hash') is not None and store.future.exists():store.guard(payload['expected_source_hash'])
                     yield
         return helper.mutate(CleanupStore(),'reconcile',payload)
+    business=cmd in {'prepare','invoke','record','accept'}
+    if locator is not None and business:_hook_watch_guard(locator['watch'],locator['package_root'])
     execution_root=Path(locator['execution_root']) if locator else store.source_root
     effective=Store(execution_root,allow_unselected=True,neutral=True)
     if effective.root!=store.root:raise WorkflowError('Hook execution belongs to another canonical queue')
-    package_root=Path(payload.get('package_root') or (locator or {}).get('package_root') or Path(__file__).parent.parent).resolve()
+    package_root=Path(payload.get('package_root') or (locator or {}).get('package_root') or Path(__file__).parent.parent).absolute()
     ctx=deepcopy(payload.get('context',frame['context'] if frame else None))
     if not isinstance(ctx,dict):raise WorkflowError('A typed current hook context is required')
     orchestration_id=payload.get('orchestration_id') or (locator or {}).get('orchestration_id') or ctx.get('orchestration_id')
@@ -1885,7 +1959,7 @@ def _hook_action(store,command,payload,*,private_delivery_provider=None,private_
         if selected.source_root!=execution_root:raise WorkflowError('Hook execution must use the actual linked controller worktree')
         run_locator=workspaces.runtime_file(effective.root)
     ev=payload.get('event') if frame is None else frame['event'];configuration=frame['configuration'] if frame else None
-    request={'runtime_action':'freeze-chain' if frame is None else 'occurrence-plan','project_root':str(execution_root),'event':ev,'context':ctx,'capabilities':deepcopy(payload.get('capabilities',(locator or {}).get('capabilities',[]))),'adapter':deepcopy(payload.get('adapter',(locator or {}).get('adapter',{'provider':'codex','mechanism':'source-backed-context'})))}
+    request={'runtime_action':'freeze-chain' if frame is None else 'readiness-plan' if cmd=='next' and frame['state']=='complete' else 'occurrence-plan','project_root':str(execution_root),'event':ev,'context':ctx,'capabilities':deepcopy(payload.get('capabilities',(locator or {}).get('capabilities',[]))),'adapter':deepcopy(payload.get('adapter',(locator or {}).get('adapter',{'provider':'codex','mechanism':'source-backed-context'})))}
     if orchestration_id:request['orchestration_id']=orchestration_id
     if frame is None:
         request['run_overrides']=deepcopy(payload.get('run_overrides',{}))
@@ -1894,7 +1968,13 @@ def _hook_action(store,command,payload,*,private_delivery_provider=None,private_
     prepared=_hook_node(package_root,request);proof=prepared['proof'] if frame is None else prepared
     if frame is None:
         configuration=prepared['configuration']
-        if not configuration['bindings'] and not payload.get('supersedes_chain_id'):return {'status':'noop','state':'complete','bindings':[]}
+        request_id=payload.get('request_id');existing=False
+        if isinstance(request_id,str) and request_id.strip():
+            original_id='HC-'+str(uuid.uuid5(uuid.NAMESPACE_URL,'skill-tree-invocation:'+request_id))
+            existing=helper.location(store,original_id).exists()
+        candidate={'configuration':configuration,'state':'active','cursor':0,'prepared_attempt_id':None,'attempts':{}}
+        if not proof.get('bindings') and not proof.get('unresolved') and not helper.applicable_prerequisites(candidate,proof) and not payload.get('supersedes_chain_id') and not existing:
+            return {'status':'noop','state':'complete','bindings':[]}
     original_source=frame['attempts'].get(payload.get('attempt_id') or frame.get('prepared_attempt_id')) if frame is not None and cmd in {'invoke','record','accept','next'} else None
     scoped_sources=_hook_scope_sources(effective,ctx,original_source)
     proof['scope_source_snapshot']=scoped_sources
@@ -1907,9 +1987,19 @@ def _hook_action(store,command,payload,*,private_delivery_provider=None,private_
         parent=clarification_read(effective,ctx['session_id']);normalized.setdefault('mode',clarification_decision_mode(parent))
         if parent.get('decision_authority') is not None:normalized.setdefault('authority',parent['decision_authority'])
         if parent.get('decision_executor') is not None:normalized.setdefault('executor',parent['decision_executor'])
+    watch=_hook_watch(package_root,execution_root)
+    if run_locator is not None:watch[str(run_locator.resolve())]=file_hash(run_locator)
+    if locator is not None and business:
+        if watch!=locator['watch']:raise WorkflowError('The frozen hook resource watch changed; explicitly reconcile and resume before adopting a new baseline')
+        watch=deepcopy(locator['watch'])
+    if business:
+        helper.guards(frame,normalized)
+        helper.proof_check(frame,proof,context_value=ctx if cmd=='accept' else None);helper.require_business_admission(frame,proof)
     if cmd=='invoke':
         original=frame['attempts'].get(payload.get('attempt_id'))
         if not original or payload.get('input_digest')!=original['input_digest']:raise WorkflowError('Hook dispatch does not match the original attempt input')
+        if original['id']!=frame['prepared_attempt_id'] or original['status']!='prepared':raise WorkflowError('Only the original prepared attempt can begin invocation')
+        helper.attempt_sources(original,proof)
         private_request={**request,'package_root':str(package_root),'runtime_action':'delivery-data','chain_id':frame['id'],'attempt_id':original['id'],'binding_id':original['binding_id'],'public_input':original['input'],'input_digest':original['input_digest'],'mode':frame['mode'],'authority':frame['authority']}
         if 'private_secrets' in payload:private_request['private_secrets']=payload['private_secrets']
         if private_delivery_provider is None:delivery=_hook_node(package_root,private_request)
@@ -1922,15 +2012,15 @@ def _hook_action(store,command,payload,*,private_delivery_provider=None,private_
             if private_input.get(key)!=expected:raise WorkflowError('The trusted private delivery differs from the original current invocation')
         proof['delivery']={key:delivery[key] for key in ['input_digest','delivery_digest','resolved_parameter_digest']}
         if 'dispatch_identity' in delivery:proof['delivery']['dispatch_identity']=delivery['dispatch_identity']
-    watch=_hook_watch(package_root,execution_root)
-    if run_locator is not None:watch[str(run_locator.resolve())]=file_hash(run_locator)
     chain_id=frame['id'] if frame else 'HC-'+str(uuid.uuid5(uuid.NAMESPACE_URL,'skill-tree-invocation:'+normalized.get('request_id','')))
     private_path=_hook_locator_path(effective,chain_id);private_expected=locator['_locator_hash'] if locator else file_hash(private_path)
     private={'schema':1,'chain_id':chain_id,'canonical_root':str(effective.root),'package_root':str(package_root),'execution_root':str(execution_root),'watch':watch,'capabilities':request['capabilities'],'adapter':request['adapter'],'orchestration_id':orchestration_id}
     mode=normalized.get('mode',frame['mode'] if frame else 'auto');grant=normalized.get('authority',frame['authority'] if frame else None);executor=normalized.get('executor',frame['executor'] if frame else None)
     def guard(current,operation,values):
-        _hook_watch_guard(watch)
-        if cmd in {'prepare','invoke','record','accept'}:_hook_scope_source_guard(effective,scoped_sources)
+        _hook_watch_guard(watch,package_root)
+        if business:
+            _hook_watch_guard(locator['watch'],locator['package_root']);_hook_scope_source_guard(effective,scoped_sources)
+            helper.proof_check(current,proof,context_value=ctx if cmd=='accept' else None);helper.require_business_admission(current,proof)
         if effective.future.exists():
             if not normalized.get('expected_source_hash'):raise WorkflowError('Hook mutation requires the inspected existing queue source hash')
             effective.guard(normalized['expected_source_hash'])
@@ -1954,7 +2044,7 @@ def _hook_action(store,command,payload,*,private_delivery_provider=None,private_
     bound=BoundStore()
     if cmd=='next':
         try:
-            _hook_watch_guard(locator['watch']);_hook_policy_guard(effective,ctx,mode,grant,executor)
+            _hook_watch_guard(locator['watch'],locator['package_root']);_hook_policy_guard(effective,ctx,mode,grant,executor)
         except WorkflowError as error:return {'chain_id':frame['id'],'state':frame['state'],'cursor':frame['cursor'],'action':'prerequisite','prerequisites':[{'code':'current-hook-inputs','reason':str(error)}]}
         return helper.next_action(bound,frame['id'],proof=proof)
     if frame is None:return helper.start(bound,normalized,proof=proof,verify_supersession=lambda old,new,receipt:_hook_supersession(effective,old,new,receipt),guard=guard)
@@ -1988,36 +2078,106 @@ def _hook_scope_matches(chain,scope):
     return scope.get('id')==chain['context']['id']
 
 
-def hook_admission(store,scope=None,chain_ids=None):
-    try:return _hook_admission(store,scope,chain_ids)
-    except WorkflowError:raise
-    except ValueError as error:raise WorkflowError(str(error)) from error
+def _hook_admission_key(scope,chain_ids):
+    return hook_helper().digest({'scope':scope,'selection':'scope' if chain_ids is None else 'references'})
 
 
-def _hook_admission(store,scope=None,chain_ids=None):
+def _hook_admission_selection(store,scope,chain_ids):
     helper=hook_helper();directory=store.base/'invocations'
     if chain_ids is None:
-        if not directory.exists():return
+        if not directory.exists():return []
         if not directory.is_dir():raise WorkflowError('Owned hook metadata requires recovery')
-        chain_ids=[]
+        selected=[]
         for path in sorted(directory.glob('*.json')):
             value='HC-'+path.stem[3:]
             if not valid_id(value,'HC'):raise WorkflowError('Unrecognized hook metadata requires recovery')
             frame=helper.read(store,value)
-            if _hook_scope_matches(frame,scope):chain_ids.append(value)
-    for original in chain_ids:
-        current=original;seen=set()
+            if _hook_scope_matches(frame,scope):selected.append(value)
+    else:
+        if not isinstance(chain_ids,list) or len(chain_ids)!=len(set(chain_ids)) or any(not valid_id(item,'HC') for item in chain_ids):raise WorkflowError('Hook admission requires distinct exact chain references')
+        selected=list(chain_ids)
+    result=[]
+    for original in selected:
+        current=original;seen=set();lineage=[]
         while True:
             if current in seen:raise WorkflowError('Hook replacement lineage contains a cycle')
             seen.add(current);frame=helper.read(store,current)
+            lineage.append({'id':current,'chain_hash':frame['chain_hash'],'revision':frame['revision']})
             if frame['state']!='superseded':break
             current=frame['superseded_by']
-        if frame['state']!='complete':raise WorkflowError('An existing required hook chain remains unfinished: '+current)
-        location=_hook_locator(store,current);execution=_hook_source_store(store,location['execution_root']);_hook_watch_guard(location['watch'])
-        actual=deepcopy(scope) if isinstance(scope,dict) and scope.get('kind')=='review' else _hook_admitted_context(execution,frame['context'])
-        if actual!=frame['context']:raise WorkflowError('The completed hook result is stale for the actual current scope')
-        _hook_policy_guard(execution,actual,frame['mode'],frame['authority'],frame['executor'])
-        if frame['stages'] and frame['stages'][-1].get('accepted_context')!=actual:raise WorkflowError('The final hook stage does not bind the current accepted context')
+        if scope is not None and not _hook_scope_matches(frame,scope):raise WorkflowError('A referenced hook belongs to another selected scope')
+        result.append({'original':original,'chain_id':current,'lineage':lineage})
+    return result
+
+
+def _hook_admission_inputs(store,item,scope):
+    helper=hook_helper();frame=helper.read(store,item['chain_id'])
+    if frame['state']!='complete':raise WorkflowError('An existing required hook chain remains unfinished: '+frame['id'])
+    location=_hook_locator(store,frame['id']);execution=_hook_source_store(store,location['execution_root']);execution._hook_readiness=True;_hook_watch_guard(location['watch'],location['package_root'])
+    actual=deepcopy(scope) if isinstance(scope,dict) and scope.get('kind')=='review' else _hook_admitted_context(execution,frame['context'])
+    if actual!=frame['context']:raise WorkflowError('The completed hook result is stale for the actual current scope')
+    _hook_policy_guard(execution,actual,frame['mode'],frame['authority'],frame['executor'])
+    if frame['stages'] and frame['stages'][-1].get('accepted_context')!=actual:raise WorkflowError('The final hook stage does not bind the current accepted context')
+    identity={'chain_hash':frame['chain_hash'],'revision':frame['revision'],'locator_hash':location['_locator_hash'],
+        'context':actual,'watch':location['watch'],'execution_root':location['execution_root']}
+    return frame,location,identity
+
+
+def prepare_hook_admission(store,scope=None,chain_ids=None):
+    """Prepare trusted current readiness outside the writer; retain no second ledger."""
+    helper=hook_helper();selection=_hook_admission_selection(store,scope,chain_ids);entries={}
+    if selection and (getattr(store,'_writer_active',False) or (store.base/'.writer-lock').exists()):raise WorkflowError('Hook readiness preflight must run outside the metadata writer scope')
+    for item in selection:
+        frame,location,identity=_hook_admission_inputs(store,item,scope)
+        if frame['configuration']['bindings']:
+            request={'runtime_action':'readiness-plan','project_root':location['execution_root'],'configuration':frame['configuration'],
+                'event':frame['event'],'context':identity['context'],'capabilities':location.get('capabilities',[]),
+                'adapter':location.get('adapter',{'provider':'codex','mechanism':'source-backed-context'})}
+            proof=_hook_node(Path(location['package_root']),request)
+        else:
+            proof={'proof_kind':'completed-readiness','configuration_digest':frame['configuration']['configuration_digest'],
+                'event':frame['event'],'context':identity['context'],'execution_snapshot':frame['execution_snapshot'],
+                'bindings':[],'prerequisites':[],'unresolved':[]}
+        if proof.get('proof_kind')!='completed-readiness':raise WorkflowError('The owned completed-readiness proof is unavailable')
+        helper.proof_check(frame,proof,allow_readiness=True);helper.require_business_admission(frame,proof)
+        entries[frame['id']]={'identity':deepcopy(identity),'proof':deepcopy(proof)}
+    key=_hook_admission_key(scope,chain_ids);cache=getattr(store,'_hook_preflights',{})
+    cache[key]={'selection':deepcopy(selection),'entries':entries};store._hook_preflights=cache
+    return {'chain_ids':[item['chain_id'] for item in selection]}
+
+
+def hook_admission(store,scope=None,chain_ids=None):
+    try:
+        if not getattr(store,'_writer_active',False):prepare_hook_admission(store,scope,chain_ids)
+        return _hook_admission(store,scope,chain_ids)
+    except WorkflowError:raise
+    except ValueError as error:raise WorkflowError(str(error)) from error
+
+
+def _hook_admission(store,scope=None,chain_ids=None,*,register=True,navigation_followup=False):
+    helper=hook_helper();selection=_hook_admission_selection(store,scope,chain_ids)
+    key=_hook_admission_key(scope,chain_ids);cached=getattr(store,'_hook_preflights',{}).get(key)
+    if cached is None:
+        if selection:raise WorkflowError('Current hook readiness preflight is missing for the selected chain identity')
+        # Empty scope needs no Node tool. Retain the observed absence so a newly
+        # matching obligation cannot appear before the same writer commits.
+        cached={'selection':[],'entries':{}}
+        cache=getattr(store,'_hook_preflights',{});cache[key]=cached;store._hook_preflights=cache
+    if cached['selection']!=selection:raise WorkflowError('The selected hook chain identity changed after current readiness preflight')
+    for item in selection:
+        if navigation_followup:
+            # The exact navigation-only follow-up cannot re-authorize business or
+            # reconstruct a scope consumed by the preceding guarded atomic save.
+            frame=helper.read(store,item['chain_id']);location=_hook_locator(store,frame['id']);_hook_watch_guard(location['watch'],location['package_root'])
+            identity={'chain_hash':frame['chain_hash'],'revision':frame['revision'],'locator_hash':location['_locator_hash'],
+                'context':frame['context'],'watch':location['watch'],'execution_root':location['execution_root']}
+        else:frame,location,identity=_hook_admission_inputs(store,item,scope)
+        entry=cached['entries'].get(frame['id'])
+        if entry is None or entry['identity']!=identity:raise WorkflowError('Current hook readiness identity changed after preflight')
+        helper.proof_check(frame,entry['proof'],allow_readiness=True);helper.require_business_admission(frame,entry['proof'])
+    if register and getattr(store,'_writer_active',False):
+        reference={'scope':deepcopy(scope),'chain_ids':deepcopy(chain_ids)}
+        if reference not in store._hook_active_admissions:store._hook_active_admissions.append(reference)
 
 
 # Clarification state is independent of implementation run selection and admission.
@@ -2321,9 +2481,9 @@ def clarification_invalidate(record,baselines):
     return changed
 
 def clarification_admission(store,task_id,hook_gate=True):
+    if hook_gate:hook_admission(store,scope=task_id)
     done={o['task_id']:o for o in store.outcomes() if o['disposition']=='completed'}
     if task_id in done:return
-    if hook_gate:hook_admission(store,scope=task_id)
     tasks={t['id']:t for t in parse(store.text())}
     required=[];satisfied=[]
     for path in sorted((store.base/'clarifications').glob('*.json')):

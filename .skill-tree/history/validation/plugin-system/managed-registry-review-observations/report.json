@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "qualification": "Deterministic controlled fixtures and source-review observations, not actual native/provider or comparative-efficacy qualification. Current final frozen checks remain separately required.",
+  "correction": "The mixed adjacent-review Red log contains three invalid carrier/dependency race families caused by lexical/canonical macOS path comparison. These entries do not establish behavioral Red. The qualification-correction file identifies exact invalid subcases; corrected three-case current Green asserts that actual injection occurred. No historical source reconstruction is claimed.",
+  "valid_observed_red_categories": [
+    "stale declared source before cached provider",
+    "already-invoking original replay before cached provider",
+    "relocated package before frozen-watch rejection",
+    "post-preflight extra dispatcher/plugin resource or symlink",
+    "disabled or condition-excluded cold WF starts",
+    "authorized no-selected successor active-state hold"
+  ],
+  "artifacts": {
+    "managed-registry-adjacent-review-red.txt": "78f2f8c597f0b87401805dbca17727f86e7cd49dbcc4dd5d7521395bc1585ae8",
+    "managed-registry-inventory-noop-relocation-red.txt": "a3c808cf03486d8e25fa517d7a99ec40ba644c65ff36c0383764b7041121cd93",
+    "managed-registry-carrier-fixture-qualification-correction.json": "632b64fc37e94f8b506f23cdf07d98cd9834e192a8dc27455a257607b5b8d30e",
+    "managed-registry-carrier-canonical-fixture-green.txt": "8c5cc2a91890e16f3321990e07d87254208c28e85d2e4f50894a880fbf25909d",
+    "managed-registry-explicit-noop-successor-red.txt": "f996b44b7f5cbfc95c12311da5dfcffbf5d4e790cb2915aecfe282af436ae156",
+    "managed-registry-preprovider-source-review-observation.json": "938fc7628a4f97a6918861a0df6040f78e9c610e933add02004b5eb555ad528e",
+    "managed-registry-preprovider-original-review-observation.json": "d63399554a6cb9dc8c4c0d41b578932b0ffa74db9323f34a0a234bfab7ac88a1",
+    "managed-registry-noop-admission-review-observation.json": "30c3a3b32a9269f1033b98a8f4b91cfd53b9391306f4d1dc1539353398101531"
+  }
+}

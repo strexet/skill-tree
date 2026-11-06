@@ -1,10 +1,13 @@
 """Guarded invocation fixtures are synthetic; actual host observations use a separate lane."""
 import copy
+from contextlib import contextmanager
 import hashlib
 import importlib.util
+import io
 import json
 from pathlib import Path
 import subprocess
+import shutil
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -504,6 +507,22 @@ class PluginInvocationTests(unittest.TestCase):
         self.assertEqual(engine().next_action(self.store,new['id'],proof=self.proof(successor))['action'],'complete')
         self.assertEqual(new['context'],old['context']);self.no_future()
 
+    def test_explicit_no_selected_successor_retains_adoption_and_records_skips_without_hi(self):
+        for variant in ['disabled','condition-excluded']:
+            with self.subTest(variant=variant):
+                request=self.request();request['request_id']+='-'+variant;old=self.start(request)
+                configuration=copy.deepcopy(request['configuration']);configuration['bindings'][0].update({'enabled':False} if variant=='disabled' else {'condition':False})
+                configuration['configuration_digest']=sha('explicit-no-selected-'+variant)
+                successor,receipt=self.adoption(old,request,configuration);successor['request_id']+='-'+variant
+                proof=self.proof(successor,rows=[])
+                new=engine().start(self.store,successor,proof=proof,verify_supersession=lambda *args:copy.deepcopy(receipt))
+                self.assertEqual(new['state'],'complete');self.assertEqual(new['cursor'],1);self.assertEqual(new['attempts'],{})
+                self.assertEqual(new['stages'][0]['status'],'skipped');self.assertEqual(new['supersession_receipt'],receipt)
+                self.assertEqual(engine().read(self.store,old['id'])['state'],'superseded')
+                self.assertEqual(engine().next_action(self.store,new['id'],proof=proof)['action'],'complete')
+                before=self.files();replayed=engine().start(self.store,successor,proof=proof,verify_supersession=lambda *args:self.fail('Exact replay cannot request another adoption.'))
+                self.assertEqual(replayed,new);self.assertEqual(self.files(),before);self.no_future()
+
     def test_config_adoption_requires_current_predecessor_and_verified_exact_receipt(self):
         request=self.request([self.row('first-a'),self.row('last-a')]);old=self.start(request)
         successor,receipt=self.adoption(old,request);before=self.files()
@@ -673,6 +692,157 @@ class PluginInvocationTests(unittest.TestCase):
         self.assertEqual(engine().pending_scan(self.store),[])
         self.assertEqual(engine().next_action(self.store,frame['id'],proof=self.proof(request))['action'],'prepare')
 
+
+    def held_proof(self,request,kind,binding_id=None,context=None):
+        value=self.proof(request,context=context)
+        if kind=='unresolved':value['unresolved']=[{'id':binding_id or request['configuration']['bindings'][0]['id'],'reason':'Controlled unresolved current location.'}]
+        else:
+            item={'code':'controlled-prerequisite','reason':'Controlled current admission hold.'}
+            if kind!='global':item['binding_id']=binding_id or request['configuration']['bindings'][0]['id']
+            value['prerequisites']=[item]
+        return value
+
+    def test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically(self):
+        for kind in ['global','current','unresolved']:
+            for command in ['prepare','invoke','record','accept']:
+                with self.subTest(kind=kind,command=command):
+                    request=self.request();request['request_id']+='-'+kind+'-'+command;frame=self.start(request)
+                    if command!='prepare':frame=self.prepared(frame,request)
+                    if command in {'record','accept'}:frame=self.invoked(frame,request)
+                    if command=='accept':frame=self.recorded(frame,request)
+                    held=self.held_proof(request,kind);before=self.files()
+                    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+                        if command=='prepare':self.prepared(frame,request,proof=held)
+                        elif command=='invoke':self.invoked(frame,request,proof=held)
+                        elif command=='record':self.recorded(frame,request,proof=held)
+                        else:self.accepted(frame,request,proof=held)
+                    self.assertEqual(self.files(),before)
+
+    def test_current_unresolved_selector_row_is_not_silently_skipped_or_counted_complete(self):
+        for remaining in ['next-selected','all-unresolved']:
+            with self.subTest(remaining=remaining):
+                rows=[self.row('current-unresolved'),self.row('later-selected','interview')]
+                request=self.request(rows);request['request_id']+='-selector-'+remaining
+                proof=self.proof(request,rows=[rows[1]] if remaining=='next-selected' else [])
+                proof['unresolved']=[{'id':rows[0]['id'],'reason':'The actual selector found the current location/context incompatible.'}]
+                if remaining=='all-unresolved':proof['unresolved'].append({'id':rows[1]['id'],'reason':'The actual selector found the later location/context incompatible.'})
+                frame=self.start(request,proof);before=self.files()
+                self.assertEqual(engine().next_action(self.store,frame['id'],proof=proof)['action'],'prerequisite')
+                with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+                    self.prepared(frame,request,proof=proof)
+                self.assertEqual(self.files(),before);self.assertEqual(engine().read(self.store,frame['id'])['cursor'],0)
+
+    def test_completed_readiness_proof_cannot_authorize_ordinary_business_transitions(self):
+        for command in ['start','prepare','invoke','record','accept','resume']:
+            with self.subTest(command=command):
+                request=self.request();request['request_id']+='-readiness-kind-'+command
+                if command=='start':
+                    proof=self.proof(request);proof['proof_kind']='completed-readiness';before=self.files()
+                    with self.assertRaisesRegex(ValueError,'readiness|business|proof'):self.start(request,proof)
+                    self.assertEqual(self.files(),before);continue
+                frame=self.start(request)
+                if command not in {'prepare','resume'}:frame=self.prepared(frame,request)
+                if command in {'record','accept'}:frame=self.invoked(frame,request)
+                if command=='accept':frame=self.recorded(frame,request)
+                proof=self.proof(request);proof['proof_kind']='completed-readiness';before=self.files()
+                with self.assertRaisesRegex(ValueError,'readiness|business|proof'):
+                    if command=='prepare':self.prepared(frame,request,proof=proof)
+                    elif command=='invoke':self.invoked(frame,request,proof=proof)
+                    elif command=='record':self.recorded(frame,request,proof=proof)
+                    elif command=='resume':self.change(frame,'resume',proof=proof,reason='A readiness proof cannot authorize recovery business inputs.')
+                    else:self.accepted(frame,request,proof=proof)
+                self.assertEqual(self.files(),before)
+
+    def test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch(self):
+        for kind in ['global','current']:
+            for command in ['invoke','record','accept']:
+                with self.subTest(kind=kind,command=command):
+                    request=self.request();request['request_id']+='-writer-'+kind+'-'+command;frame=self.prepared(self.start(request),request)
+                    if command in {'record','accept'}:frame=self.invoked(frame,request)
+                    if command=='accept':frame=self.recorded(frame,request)
+                    original=copy.deepcopy(self.attempt(frame));proof=self.proof(request);calls=[]
+                    payload={'chain_id':frame['id'],'expected_chain_hash':frame['chain_hash'],'expected_chain_revision':frame['revision'],
+                        'attempt_id':original['id'],'input_digest':original['input_digest']}
+                    if command=='invoke':
+                        headers={'input_digest':original['input_digest'],'delivery_digest':sha('delivery-'+original['input_digest']),
+                            'resolved_parameter_digest':original['input']['parameter_digest']}
+                        proof['delivery']=headers;payload.update(headers,evidence={'kind':'host-invoked','provider':'controlled-unit-host','tool':'controlled-dispatch',
+                            'reference':'Synthetic original invocation after writer-entry admission change.','actor_id':original['actor']['id'],
+                            'actor_context_id':original['actor']['context_id'],'mechanism':'source-backed-context'})
+                    elif command=='record':
+                        payload.update(delivery_digest=original['delivery_digest'],resolved_parameter_digest=original['resolved_parameter_digest'],
+                            result={'status':'passed'},evidence={'kind':'host-result','provider':'controlled-unit-host','tool':'controlled-result',
+                            'reference':'Synthetic original result after writer-entry admission change.','actor_id':original['actor']['id'],
+                            'actor_context_id':original['actor']['context_id'],'mechanism':'source-backed-context'})
+                    else:payload['context']=request['context']
+                    def writer_guard(current,operation,values):
+                        self.assertTrue((self.store.base/'.writer-lock').exists(),'The controlled hold must appear after metadata writer entry.')
+                        calls.append(operation);item={'code':'controlled-writer-hold','reason':'Applicable prerequisite appeared at writer entry.'}
+                        if kind=='current':item['binding_id']=original['binding_id']
+                        proof['prerequisites'].append(item)
+                    before=self.files()
+                    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+                        engine().mutate(self.store,command,payload,proof=proof,guard=writer_guard)
+                    self.assertEqual(calls,[command]);self.assertEqual(self.files(),before)
+                    self.assertEqual(engine().read(self.store,frame['id']),frame)
+
+    def test_held_start_stays_inspectable_and_completed_next_requires_current_global_admission(self):
+        request=self.request();held=self.held_proof(request,'global');frame=self.start(request,held)
+        self.assertEqual(frame['attempts'],{});self.assertEqual(frame['cursor'],0)
+        self.assertEqual(engine().read(self.store,frame['id']),frame)
+        self.assertEqual(engine().next_action(self.store,frame['id'],proof=held)['action'],'prerequisite')
+        request=self.request();request['request_id']+='-complete';request,complete=self.returned(request)
+        complete=self.accepted(complete,request);before=self.files()
+        self.assertEqual(engine().next_action(self.store,complete['id'],proof=self.held_proof(request,'global'))['action'],'prerequisite')
+        self.assertEqual(self.files(),before);self.assertEqual(engine().read(self.store,complete['id'])['state'],'complete')
+        self.assertEqual(engine().next_action(self.store,complete['id'],proof=self.proof(request))['action'],'complete')
+
+    def test_other_occurrence_requirements_preserve_current_contribution_and_accepted_prefix(self):
+        request=self.request([self.row('editor-first'),self.row('interview-middle','interview'),self.row('editor-final')])
+        request,frame=self.returned(request,suffix='first');frame=self.accepted(frame,request);prefix=copy.deepcopy(frame['attempts'])
+        other=self.proof(request);other['prerequisites']=[{'code':'missing-capability','binding_id':identity,'reason':'Controlled editor-only capability loss.'} for identity in ['editor-first','editor-final']]
+        other['unresolved']=[{'id':'editor-final','reason':'Controlled future-only location hold.'}]
+        try:request,frame=self.returned(request,status='findings',suffix='middle',frame=frame,proof=other)
+        except ValueError as error:self.fail('Another occurrence prerequisite incorrectly blocked current B: '+str(error))
+        before=copy.deepcopy(frame['context']);after=self.context('incorporated-b');receipt=self.core_receipt(before,after)
+        accepted_proof=copy.deepcopy(other);accepted_proof['context']=after
+        frame=self.accepted(frame,request,context=after,receipt=receipt,verifier=lambda *args:receipt,proof=accepted_proof)
+        self.assertEqual(frame['cursor'],2);self.assertEqual(frame['context'],after)
+        self.assertTrue(all(frame['attempts'][key]==value for key,value in prefix.items()))
+        self.assertEqual(engine().next_action(self.store,frame['id'],proof=accepted_proof)['action'],'prerequisite')
+        old=self.files()
+        with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+            self.prepared(frame,request,suffix='final',proof=accepted_proof)
+        self.assertEqual(self.files(),old)
+        ready=self.proof(request,context=after);frame=self.prepared(frame,request,suffix='final',proof=ready)
+        frame=self.invoked(frame,request,proof=ready);frame=self.recorded(frame,request,proof=ready)
+        frame=self.accepted(frame,request,context=after,proof=ready)
+        self.assertEqual(frame['state'],'complete');self.assertTrue(all(frame['attempts'][key]==value for key,value in prefix.items()))
+
+    def test_current_holds_preserve_read_original_reconciliation_and_explicit_recovery(self):
+        request=self.request();frame=self.start(request);frame=self.prepared(frame,request);frame=self.invoked(frame,request)
+        original=copy.deepcopy(self.attempt(frame));held=self.held_proof(request,'global')
+        self.assertEqual(engine().read(self.store,frame['id']),frame)
+        frame=self.change(frame,'reconcile',proof=held,attempt_id=original['id'],status='cancelled',
+            evidence={'kind':'host-reconciliation','reference':'Synthetic original cancellation remains available while prerequisites are held.'})
+        self.assertEqual(frame['attempts'][original['id']]['input'],original['input']);self.assertEqual(engine().pending_scan(self.store),[])
+        frame=self.change(frame,'resume',proof=held,retry=True,reason='Explicit retry after reconciling the original attempt; business admission remains held.')
+        self.assertEqual(frame['cursor'],0);self.assertIsNone(frame['prepared_attempt_id'])
+        self.assertEqual(engine().next_action(self.store,frame['id'],proof=held)['action'],'prerequisite')
+        frame=self.prepared(frame,request,suffix='restored');self.assertNotEqual(frame['prepared_attempt_id'],original['id'])
+        self.assertEqual(frame['attempts'][original['id']]['input'],original['input']);self.no_future()
+
+    def test_unknown_or_malformed_requirement_scope_cannot_masquerade_as_another_occurrence(self):
+        for scope in ['not-in-frozen-order',None,17]:
+            for kind in ['prerequisite','unresolved']:
+                with self.subTest(scope=scope,kind=kind):
+                    request=self.request();request['request_id']+='-unknown-'+str(scope)+'-'+kind;frame=self.start(request);proof=self.proof(request)
+                    proof['prerequisites' if kind=='prerequisite' else 'unresolved']=[{'binding_id' if kind=='prerequisite' else 'id':scope,'code':'controlled-scope','reason':'A malformed scope is not another admitted occurrence.'}]
+                    before=self.files()
+                    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|scope|held'):
+                        self.prepared(frame,request,proof=proof)
+                    self.assertEqual(self.files(),before)
+
 clarification_fixture=load('hook_bridge_cl_fixture',CORE/'tests/test-task-clarification.py')
 clarification_fixture.wf=wf
 
@@ -683,18 +853,51 @@ class PluginWorkflowBridgeTests(unittest.TestCase):
     source_hash=clarification_fixture.TaskClarificationTests.source_hash
     finish_task=clarification_fixture.TaskClarificationTests.finish_task
 
-    def install(self,operation='skill-tree-process-future-pending',anchor='after'):
+    def install(self,operation='skill-tree-process-future-pending',anchor='after',binding_options=None,resource_collision=False):
         self.operation=operation;self.anchor=anchor
         (self.root/'package.json').write_text(json.dumps({'scripts':{'test':'node --test'}}))
         program="""const fs=require('node:fs'),path=require('node:path');
 const core=process.argv[1],root=process.argv[2],install=require(path.join(core,'lib/installation.js')),lifecycle=require(path.join(core,'lib/plugin-lifecycle.js'));
-const operation=process.argv[3],anchor=process.argv[4],upstream=path.join(root,'controlled-upstream');fs.mkdirSync(upstream);
-fs.writeFileSync(path.join(upstream,'SKILL.md'),'---\\nname: controlled-bridge\\n---\\nReturn controlled task proposals without executing helpers.\\n');
+const operation=process.argv[3],anchor=process.argv[4],options=JSON.parse(process.argv[5]||'{}'),upstream=path.join(root,'controlled-upstream');fs.mkdirSync(upstream);
+fs.writeFileSync(path.join(upstream,'SKILL.md'),'---\\nname: controlled-bridge\\n---\\nReturn controlled task proposals without executing helpers.\\n'+(process.argv[6]==='true'?'Read [the upstream JSON](references/plugin-bindings.json).\\n':''));if(process.argv[6]==='true'){fs.mkdirSync(path.join(upstream,'references'));fs.writeFileSync(path.join(upstream,'references/plugin-bindings.json'),JSON.stringify({kind:'ordinary-upstream-data'}));}
 install.install(root,core,'general',[{name:operation,provider:'codex',rel:'.agents/skills/'+operation}]);
-(async()=>{const proposal=await lifecycle.prepareProposal(root,{request_id:'bridge-install',operation:'install',sources:[{id:'controlled',path:upstream}],bindings:['proposal-b','final-a'].map(id=>({id,plugin_id:'controlled',operation,anchor,enabled:true,parameters:{marker:id},instructions:'Controlled '+id}))});lifecycle.applyProposal(root,proposal,{proposal_digest:proposal.digest});install.refresh(root,core);process.stdout.write(JSON.stringify({package_root:path.join(root,'.agents/skills',operation)}));})().catch(error=>{process.stderr.write(error.stack);process.exitCode=1;});"""
-        result=subprocess.run(['node','-e',program,str(CORE),str(self.root),operation,anchor],capture_output=True,text=True)
+(async()=>{const proposal=await lifecycle.prepareProposal(root,{request_id:'bridge-install',operation:'install',sources:[{id:'controlled',path:upstream}],bindings:['proposal-b','final-a'].map(id=>({id,plugin_id:'controlled',operation,anchor,enabled:true,parameters:{marker:id},instructions:'Controlled '+id,...options}))});lifecycle.applyProposal(root,proposal,{proposal_digest:proposal.digest});install.refresh(root,core);process.stdout.write(JSON.stringify({package_root:path.join(root,'.agents/skills',operation)}));})().catch(error=>{process.stderr.write(error.stack);process.exitCode=1;});"""
+        result=subprocess.run(['node','-e',program,str(CORE),str(self.root),operation,anchor,json.dumps(binding_options or {}),json.dumps(resource_collision)],capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
         self.package_root=Path(json.loads(result.stdout)['package_root'])
+
+
+    def install_ordered_capability_fixture(self,incompatible='none'):
+        self.operation='skill-tree-process-future-pending';self.anchor='after'
+        self.capabilities=['codex-source-backed-context','editor-only-capability']
+        (self.root/'package.json').write_text(json.dumps({'scripts':{'test':'node --test'}}))
+        program=r"""const fs=require('node:fs'),path=require('node:path');
+const core=process.argv[1],root=process.argv[2],install=require(path.join(core,'lib/installation.js')),lifecycle=require(path.join(core,'lib/plugin-lifecycle.js'));
+const operation='skill-tree-process-future-pending';install.install(root,core,'general',[{name:operation,provider:'codex',rel:'.agents/skills/'+operation}]);
+const sources=['editor','interview'].map(id=>{const source=path.join(root,'controlled-'+id);fs.mkdirSync(source);fs.writeFileSync(path.join(source,'SKILL.md'),'---\nname: controlled-'+id+'\n---\nReturn scoped controlled proposals without invoking tools.\n');return {id,path:source,capabilities:id==='editor'?['editor-only-capability']:[],...(process.argv[3]==='all'||process.argv[3]==='editor'&&id==='editor'?{adapter:{context_kinds:['document']}}:{})};});
+(async()=>{const rows=[['editor-first','editor'],['interview-middle','interview'],['editor-final','editor']].map(([id,plugin_id])=>({id,plugin_id,operation,anchor:'after',enabled:true,parameters:{marker:id},instructions:'Controlled occurrence '+id}));const proposal=await lifecycle.prepareProposal(root,{request_id:'ordered-capability-install',operation:'install',sources,bindings:rows});lifecycle.applyProposal(root,proposal,{proposal_digest:proposal.digest});install.refresh(root,core);process.stdout.write(JSON.stringify({package_root:path.join(root,'.agents/skills',operation)}));})().catch(error=>{process.stderr.write(error.stack);process.exitCode=1;});"""
+        result=subprocess.run(['node','-e',program,str(CORE),str(self.root),incompatible],capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+        self.package_root=Path(json.loads(result.stdout)['package_root'])
+
+    def invocation_bytes(self,frame):
+        return {relative:(self.store.root/relative).read_bytes() if (self.store.root/relative).is_file() else None for relative in [
+            '.skill-tree/invocations/'+frame['id'].lower()+'.json',
+            '.skill-tree/local/hook-locations/'+frame['id'].lower()+'.json']}
+
+    def injected_prerequisite(self,original,kind,binding_id):
+        def prepared(package_root,request):
+            self.assertFalse((self.store.base/'.writer-lock').exists(),'Owned Node preparation cannot run under the writer lock.')
+            value=original(package_root,request)
+            if request.get('runtime_action') in {'occurrence-plan','readiness-plan'}:
+                value=copy.deepcopy(value)
+                if kind=='unresolved':value['unresolved'].append({'id':binding_id,'reason':'Controlled current binding location hold.'})
+                else:
+                    item={'code':'controlled-admission','reason':'Controlled prerequisite-only change.'}
+                    if kind=='current':item['binding_id']=binding_id
+                    value['prerequisites'].append(item)
+            return value
+        return prepared
 
     def cl_start(self):
         return wf.clarification_start(self.store,{'task_ids':[self.a],'expected_source_hash':self.source_hash(),
@@ -718,35 +921,43 @@ install.install(root,core,'general',[{name:operation,provider:'codex',rel:'.agen
         return self.cl_change(session,'clarify-revise',tasks=[{'task_id':self.a,
             'body':self.body('Preserve the incorporated controlled marker.')}])
 
-    def frame(self,session=None):
-        ctx={'kind':'task','id':'bridge-task:'+self.a,'task_ids':[self.a],'body':''}
+    def frame(self,session=None,request_id='bridge-chain',task_id=None,run_id=None):
+        selected=task_id or self.a
+        ctx={'kind':'task','id':'bridge-task:'+selected,'task_ids':[selected],'body':''}
+        if run_id:ctx['run_id']=run_id
         if session:ctx['session_id']=session['id']
         ctx=wf.actual_hook_context(self.store,ctx)
         grant={'id':'bridge-grant','revision':1,'context_id':ctx['id'],'allowed_kinds':['technical'],
             'constraints':['Isolated source-backed bridge fixture; no actual host execution or publication.'],
             'evidence':{'kind':'owner-message','reference':'Scripted fixture grant only.'}}
         return wf.hook_action(self.store,'hook-start',{'package_root':str(self.package_root),
-            'request_id':'bridge-chain','event':{'id':'bridge-event','operation':'skill-tree-process-future-pending','anchor':'after'},
+            'request_id':request_id,'event':{'id':'bridge-event','operation':'skill-tree-process-future-pending','anchor':'after'},
             'context':ctx,'mode':'manual','authority':grant,'executor':{'id':'bridge-executor','context_id':'bridge-executor-context'},
-            'capabilities':['codex-source-backed-context'],'expected_source_hash':self.source_hash()})
+            'capabilities':getattr(self,'capabilities',['codex-source-backed-context']),'expected_source_hash':self.source_hash()})
 
     def change(self,frame,command,**extra):
         return wf.hook_action(self.store,'hook-'+command,{'chain_id':frame['id'],
             'expected_chain_hash':frame['chain_hash'],'expected_chain_revision':frame['revision'],
-            'expected_source_hash':self.source_hash(),**extra})
+            'expected_source_hash':self.source_hash(),'capabilities':getattr(self,'capabilities',['codex-source-backed-context']),**extra})
 
-    def returned(self,frame,status='passed',stop_after_invoke=False):
+    def prepare_bridge(self,frame):
         index=frame['cursor'];actor={'id':'bridge-actor-'+str(index),'context_id':'bridge-context-'+str(index)}
-        frame=self.change(frame,'prepare',actor=actor,creation_evidence={'kind':'host-agent-created',
+        return self.change(frame,'prepare',actor=actor,creation_evidence={'kind':'host-agent-created',
             'provider':'controlled-unit-host','tool':'controlled-create','reference':'Synthetic bridge actor creation.',
             'actor_id':actor['id'],'actor_context_id':actor['context_id']})
+
+    def delivery_bridge(self,frame):
         attempt=frame['attempts'][frame['prepared_attempt_id']]
-        private=wf._hook_node(self.package_root,{'runtime_action':'delivery-data','project_root':str(self.root),
-            'event':frame['event'],'context':frame['context'],'capabilities':['codex-source-backed-context'],
+        return wf._hook_node(self.package_root,{'runtime_action':'delivery-data','project_root':str(self.root),
+            'event':frame['event'],'context':frame['context'],'capabilities':getattr(self,'capabilities',['codex-source-backed-context']),
             'adapter':{'provider':'codex','mechanism':'source-backed-context'},'configuration':frame['configuration'],
             'chain_id':frame['id'],'attempt_id':attempt['id'],'binding_id':attempt['binding_id'],
             'public_input':attempt['input'],'input_digest':attempt['input_digest'],'authority':frame['authority'],
             'orchestration_id':frame['context'].get('orchestration_id')})
+
+    def returned(self,frame,status='passed',stop_after_invoke=False):
+        frame=self.prepare_bridge(frame);attempt=frame['attempts'][frame['prepared_attempt_id']];actor=attempt['actor']
+        private=self.delivery_bridge(frame)
         values={key:private[key] for key in ['input_digest','delivery_digest','resolved_parameter_digest']}
         evidence={'kind':'host-invoked','provider':'controlled-unit-host','tool':'controlled-dispatch',
             'reference':'Synthetic bridge dispatch, not actual native invocation.','actor_id':actor['id'],
@@ -924,6 +1135,20 @@ install.install(root,core,'general',[{name:operation,provider:'codex',rel:'.agen
         self.assertIsNone(core['plan_acceptance']);self.assertIsNone(core['checks']);self.assertIsNone(core['review'])
         frame=self.accept(self.returned(frame));self.assertEqual(frame['state'],'complete')
         self.assertEqual(frame['stages'][-1]['accepted_context']['orchestration_plan_digest'],sha('draft-three'))
+        plan_change('question',purpose='plan',question={'id':'accept-draft','kind':'specification-acceptance','text':'Accept the current controlled draft?',
+            'options':[{'id':'accept','text':'Accept the controlled plan.'},{'id':'revise','text':'Revise the controlled plan.'}],
+            'recommendation':'accept','significance':'routine'})
+        action=wf.orchestration_action(self.store,'orchestration-next',{'orchestration_id':core['id']})
+        owner={'id':'scripted-plan-owner','context_id':'scripted-plan-owner-context'}
+        plan_change('prepare-actor',actor=owner,input_digest=action['input_digest'],expected_decision_hash=action['decision_hash'])
+        decision=wf.decision_helper().read(self.store,core['question_decision_id']);attempt=decision['attempts'][decision['prepared_attempt_id']]
+        action=wf.orchestration_action(self.store,'orchestration-next',{'orchestration_id':core['id']})
+        plan_change('record-actor',attempt_id=attempt['id'],expected_decision_hash=decision['decision_hash'],input_digest=action['input_digest'],
+            result={'status':'answered','answer':'accept','rationale':'Synthetic owner accepts the exact controlled plan.'},
+            evidence={'kind':'submitted-answer','reference':'Scripted fixture owner plan input; no real-human claim.',**{'actor_id':owner['id'],'actor_context_id':owner['context_id']}})
+        plan_change('accept-decision');plan_change('accept-plan',decision_receipt=core['acceptance']);self.assertEqual(core['phase'],'implement')
+        before=self.invocation_bytes(frame);wf.hook_admission(self.store,scope=self.a)
+        self.assertEqual(self.invocation_bytes(frame),before)
 
     def test_consumed_pending_readiness_uses_exact_successful_linked_processing_receipt_only(self):
         run=wf.start(self.store,'next',self.a)
@@ -1084,6 +1309,443 @@ install.install(root,core,'general',[{name:operation,provider:'codex',rel:'.agen
         frame=self.change(frame,'resume',retry=True,reason='Recheck the same occurrence against current authored source.')
         frame=self.accept(self.returned(frame));self.assertEqual(frame['state'],'complete')
         self.assertEqual(frame['attempts'][original['id']]['input']['scope_source_snapshot'],snapshot)
+
+
+    def test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation(self):
+        self.install();actual_node=wf._hook_node
+        for kind in ['global','current','unresolved','source-drift','already-invoking','relocated-package','context-drift']:
+            with self.subTest(kind=kind):
+                frame=self.prepare_bridge(self.frame(request_id='cached-private-'+kind));attempt=copy.deepcopy(frame['attempts'][frame['prepared_attempt_id']])
+                delivery=self.delivery_bridge(frame);headers={key:delivery[key] for key in ['input_digest','delivery_digest','resolved_parameter_digest']}
+                evidence={'kind':'host-invoked','provider':'controlled-unit-host','tool':'controlled-dispatch','reference':'Synthetic cached exact original delivery.',
+                    'actor_id':attempt['actor']['id'],'actor_context_id':attempt['actor']['context_id'],'mechanism':'source-backed-context'}
+                calls=[]
+                def provider(request):calls.append('provider');self.assertFalse((self.store.base/'.writer-lock').exists());return copy.deepcopy(delivery)
+                def sink(value):calls.append('sink');self.assertFalse((self.store.base/'.writer-lock').exists())
+                relocated=self.root/'relocated-operation'
+                if kind=='relocated-package':shutil.copytree(self.package_root,relocated)
+                def invoke(current):return wf.hook_action(self.store,'hook-invoke',{'chain_id':current['id'],'expected_chain_hash':current['chain_hash'],
+                    'expected_chain_revision':current['revision'],'expected_source_hash':self.source_hash(),'attempt_id':attempt['id'],
+                    **headers,'evidence':evidence,**({'package_root':str(relocated)} if kind=='relocated-package' else {})},private_delivery_provider=provider,private_delivery_sink=sink)
+                if kind=='already-invoking':frame=invoke(frame);calls.clear()
+                source=self.root/'source.py';original_source=source.read_bytes()
+                if kind=='source-drift':source.write_text('VALUE = 9\n')
+                if kind=='context-drift':
+                    revised=self.revise(self.cl_start());revised_body=wf.resolve(wf.parse(self.store.text()),[self.a])[0]['body']
+                    self.assertTrue(revised['task_revisions']);self.assertNotEqual(wf.actual_hook_context(self.store,frame['context']),frame['context'])
+                before=self.invocation_bytes(frame)
+                try:
+                    prepared=actual_node if kind in {'source-drift','already-invoking','relocated-package','context-drift'} else self.injected_prerequisite(actual_node,kind,attempt['binding_id'])
+                    with patch.object(wf,'_hook_node',prepared):
+                        with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held|source.*changed|source bytes|original prepared|watch|baseline|context|current invocation'):
+                            invoke(frame)
+                    self.assertEqual(calls,[]);self.assertEqual(self.invocation_bytes(frame),before)
+                finally:source.write_bytes(original_source)
+                if kind=='context-drift':
+                    self.assertEqual(wf.resolve(wf.parse(self.store.text()),[self.a])[0]['body'],revised_body)
+                    self.assertEqual(engine().read(self.store,frame['id'])['attempts'][attempt['id']]['input'],attempt['input']);continue
+                if kind=='already-invoking':continue
+                if kind=='relocated-package':shutil.rmtree(relocated);continue
+                current=invoke(frame)
+                self.assertEqual(calls,['provider','sink']);self.assertEqual(current['prepared_attempt_id'],attempt['id'])
+                self.assertEqual(current['attempts'][attempt['id']]['input'],attempt['input'])
+                self.assertEqual(current['attempts'][attempt['id']]['status'],'invoking')
+
+    def test_completed_hook_admission_rechecks_prerequisite_only_hold_without_rewriting_history(self):
+        self.install();frame=self.accept(self.returned(self.frame()));frame=self.accept(self.returned(frame))
+        self.assertEqual(frame['state'],'complete');before=self.invocation_bytes(frame);actual_node=wf._hook_node
+        wf.hook_admission(self.store,scope=self.a,chain_ids=[frame['id']])
+        with patch.object(wf,'_hook_node',self.injected_prerequisite(actual_node,'global','unused-completed-binding')):
+            with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+                wf.hook_admission(self.store,scope=self.a,chain_ids=[frame['id']])
+        self.assertEqual(self.invocation_bytes(frame),before)
+        self.assertEqual(engine().read(self.store,frame['id']),frame)
+        wf.hook_admission(self.store,scope=self.a,chain_ids=[frame['id']])
+        self.assertEqual(self.invocation_bytes(frame),before);self.assertEqual(engine().read(self.store,frame['id'])['state'],'complete')
+
+    def test_actual_node_unresolved_current_location_never_skips_to_later_or_complete(self):
+        for incompatible in ['editor','all']:
+            with self.subTest(incompatible=incompatible):
+                # Each actual installed fixture has its own project and queue ownership.
+                with tempfile.TemporaryDirectory() as temporary:
+                    original_root,original_store,original_a,original_b=self.root,self.store,self.a,self.b
+                    self.root=Path(temporary);self.store=wf.Store(self.root);self.store.future.parent.mkdir(parents=True)
+                    self.store.future.write_text('# Future Work\n\n## Pending Task Format\n\n## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n')
+                    (self.store.base/'config').mkdir();(self.store.base/'config/repository.json').write_text(json.dumps({'schema':1,'role':'source'}))
+                    (self.root/'source.py').write_text('VALUE = 1\n');self.a=self.task('Selected unresolved task',100);self.b=self.task('Other unresolved task',1)
+                    try:
+                        self.install_ordered_capability_fixture(incompatible);frame=self.frame(request_id='actual-unresolved-'+incompatible)
+                        proof=wf._hook_node(self.package_root,{'runtime_action':'occurrence-plan','project_root':str(self.root),'event':frame['event'],
+                            'context':frame['context'],'configuration':frame['configuration'],'capabilities':self.capabilities,
+                            'adapter':{'provider':'codex','mechanism':'source-backed-context'}})
+                        self.assertEqual([row['id'] for row in proof['bindings']],['interview-middle'] if incompatible=='editor' else [])
+                        self.assertIn('editor-first',[row['id'] for row in proof['unresolved']]);before=self.invocation_bytes(frame)
+                        with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+                            self.prepare_bridge(frame)
+                        self.assertEqual(self.invocation_bytes(frame),before);self.assertEqual(engine().read(self.store,frame['id'])['cursor'],0)
+                    finally:self.root,self.store,self.a,self.b=original_root,original_store,original_a,original_b
+
+    def test_upstream_manifest_named_json_remains_an_ordinary_pinned_resource(self):
+        self.install(resource_collision=True)
+        resource=self.package_root/'plugins/controlled/upstream/references/plugin-bindings.json'
+        self.assertEqual(json.loads(resource.read_text()),{'kind':'ordinary-upstream-data'})
+        try:
+            frame=self.accept(self.returned(self.frame()));frame=self.accept(self.returned(frame))
+            wf.hook_admission(self.store,scope=self.a)
+        except ValueError as error:self.fail('An upstream references/plugin-bindings.json must remain ordinary pinned data: '+str(error))
+        self.assertEqual(frame['state'],'complete');self.assertEqual(json.loads(resource.read_text()),{'kind':'ordinary-upstream-data'})
+
+    def test_pure_writer_readiness_rechecks_exact_resource_inventory_without_node(self):
+        self.install();frame=self.accept(self.returned(self.frame()));frame=self.accept(self.returned(frame))
+        retained=self.invocation_bytes(frame);actual_node=wf._hook_node
+        def outside_writer(package_root,request):
+            self.assertFalse((self.store.base/'.writer-lock').exists(),'Inventory closure is rechecked without Node under the writer lock.')
+            return actual_node(package_root,request)
+        with patch.object(wf,'_hook_node',outside_writer):
+            for kind,relative in [('dispatcher-extra','scripts/extra.js'),('plugin-extra','plugins/controlled/upstream/extra.md'),
+                ('dispatcher-link','scripts/unowned-link'),('missing','scripts/plugin-runtime.js'),('cache','scripts/__pycache__/controlled.pyc')]:
+                with self.subTest(kind=kind):
+                    wf.prepare_hook_admission(self.store,scope=self.a);path=self.package_root/relative;original=path.read_bytes() if path.is_file() else None
+                    if kind=='missing':path.unlink()
+                    elif kind=='dispatcher-link':path.symlink_to(self.root/'source.py')
+                    else:path.parent.mkdir(parents=True,exist_ok=True);path.write_text('Controlled post-preflight inventory change.')
+                    try:
+                        with self.store.lock():
+                            if kind=='cache':wf.hook_admission(self.store,scope=self.a)
+                            else:
+                                with self.assertRaisesRegex(ValueError,'inventory|closure|resource|symlink|changed|watch'):
+                                    wf.hook_admission(self.store,scope=self.a)
+                        self.assertEqual(self.invocation_bytes(frame),retained)
+                    finally:
+                        path.unlink(missing_ok=True)
+                        if original is not None:path.write_bytes(original)
+
+    def test_copied_wf_disabled_and_condition_excluded_starts_are_task_free_noops_without_masking_existing_hi(self):
+        original_root,original_store=self.root,self.store
+        for variant,options in [('disabled',{'enabled':False}),('excluded',{'condition':False}),
+            ('pending-replay',{'condition':{'equals':{'path':'/enabled','value':True}}})]:
+            with self.subTest(variant=variant),tempfile.TemporaryDirectory() as temporary:
+                base=Path(temporary);self.root=base/'managed';self.root.mkdir();self.store=wf.Store(self.root)
+                try:
+                    self.install('skill-tree-add-pending-task','before',binding_options=options)
+                    bundle=base/'standalone';shutil.copytree(self.package_root,bundle)
+                    copied=load('noop_copied_wf_'+variant,bundle/'scripts/workflow-state.py');execution=base/'execution';execution.mkdir()
+                    store=copied.Store(execution,allow_unselected=True,neutral=True)
+                    ctx={'kind':'request','id':'copied-noop-request','enabled':True}
+                    grant={'id':'copied-noop-grant','revision':1,'context_id':ctx['id'],'allowed_kinds':['technical'],
+                        'constraints':['Synthetic copied task-free metadata only.'],'evidence':{'kind':'owner-message','reference':'Scripted standalone fixture.'}}
+                    payload={'package_root':str(bundle),'request_id':'copied-noop-'+variant,'event':{'id':'copied-noop-event',
+                        'operation':self.operation,'anchor':self.anchor},'context':ctx,'mode':'manual','authority':grant,
+                        'executor':{'id':'copied-executor','context_id':'copied-executor-context'},'capabilities':['codex-source-backed-context']}
+                    frame=copied.hook_action(store,'hook-start',payload)
+                    if variant=='pending-replay':
+                        actor={'id':'copied-original-actor','context_id':'copied-original-context'}
+                        frame=copied.hook_action(store,'hook-prepare',{'chain_id':frame['id'],'expected_chain_hash':frame['chain_hash'],
+                            'expected_chain_revision':frame['revision'],'actor':actor,'creation_evidence':{'kind':'host-agent-created',
+                            'provider':'controlled-unit-host','tool':'controlled-create','reference':'Synthetic isolated actor; no provider called.',
+                            'actor_id':actor['id'],'actor_context_id':actor['context_id']}})
+                        record=store.base/'invocations'/(frame['id'].lower()+'.json');before=record.read_bytes()
+                        with self.assertRaisesRegex(ValueError,'identity|reused|different|original|context'):
+                            copied.hook_action(store,'hook-start',{**payload,'context':{**ctx,'enabled':False}})
+                        self.assertEqual(record.read_bytes(),before)
+                    else:
+                        self.assertEqual(frame.get('status'),'noop');self.assertEqual(frame['state'],'complete')
+                        self.assertFalse((store.base/'invocations').exists());self.assertFalse((store.base/'local/hook-locations').exists())
+                        with patch.object(copied,'_hook_node',side_effect=AssertionError('No-op admission cannot require Node.')):
+                            copied.hook_admission(store,scope=ctx)
+                    self.assertFalse(store.future.exists());self.assertFalse(store.state.exists())
+                finally:self.root,self.store=original_root,original_store
+
+    def test_core_callers_prepare_exact_scoped_readiness_before_writer_entry(self):
+        self.install();frame=self.accept(self.returned(self.frame()));frame=self.accept(self.returned(frame))
+        unrelated=self.frame(request_id='unrelated-held-chain',task_id=self.b)
+        actual_node=wf._hook_node;queries=[]
+        def outside_writer(package_root,request):
+            self.assertFalse((self.store.base/'.writer-lock').exists(),'Core readiness must prepare owned metadata outside the writer scope.')
+            if request.get('runtime_action')=='readiness-plan':queries.append(request['context']['id'])
+            return actual_node(package_root,request)
+        with patch.object(wf,'_hook_node',outside_writer):
+            previous=len(queries);run=wf.start(self.store,'next',self.a);self.assertGreater(len(queries),previous)
+            linked=self.accept(self.returned(self.frame(request_id='linked-controller-chain',run_id=run['id'])))
+            linked=self.accept(self.returned(linked));self.assertEqual(linked['state'],'complete')
+            previous=len(queries);self.assertEqual(wf.advance(self.store)['task_id'],self.a);self.assertGreater(len(queries),previous)
+            previous=len(queries);wf.begin_task(self.store,{'task_id':self.a});self.assertGreater(len(queries),previous)
+            pending=wf.intake(self.store,{'title':'No optional Pending hook','description':'Resolve the isolated bounded request.',
+                'expected_behavior':'No unrelated hook is consulted.','priority':1})
+            previous=len(queries);wf.process(self.store,{'selectors':[pending['id']],'dispositions':{pending['id']:{'status':'resolved',
+                'reason':'The bounded source request requires no further work.'}},'tasks':[]});self.assertEqual(len(queries),previous)
+            previous=len(queries);self.finish_task(self.a);self.assertGreater(len(queries),previous)
+            previous=len(queries);wf.finish(self.store);self.assertGreater(len(queries),previous)
+        self.assertIsNone(self.store.load()['active_run'])
+        with self.assertRaisesRegex(ValueError,'actual recorded run'):wf._hook_controller(self.store,run['id'])
+        archive=self.store.base/'history/runs'/('run-'+run['id'].lower()+'.json');original_archive=archive.read_bytes()
+        retained=self.invocation_bytes(linked)
+        for field,value in [('id','WR-11111111-1111-4111-8111-111111111111'),('phase','implement'),('snapshot','invalid'),('completed_ids',[]),('completion_refs',{}),('finished_at',None)]:
+            with self.subTest(archive_field=field):
+                changed=json.loads(original_archive);changed[field]=value;archive.write_text(json.dumps(changed))
+                with self.assertRaisesRegex(ValueError,'recorded run|completed|successful|corrupt|checkpoint|identity'):
+                    wf.hook_admission(self.store,scope=self.a,chain_ids=[linked['id']])
+                self.assertEqual(self.invocation_bytes(linked),retained);archive.write_bytes(original_archive)
+        wf.hook_admission(self.store,scope=self.a,chain_ids=[linked['id']])
+        self.assertEqual(engine().read(self.store,unrelated['id'])['cursor'],0)
+        self.assertEqual(engine().read(self.store,frame['id'])['state'],'complete')
+
+    def test_finish_rejects_carrier_reference_disappearance_before_writer_entry(self):
+        self.install();run=wf.start(self.store,'next',self.a)
+        frame=self.accept(self.returned(self.frame(request_id='finish-carrier-chain',run_id=run['id'])))
+        frame=self.accept(self.returned(frame));self.finish_task(self.a)
+        original_state=self.store.state.read_bytes();retained=self.invocation_bytes(frame);actual_lock=wf.Store.lock;changed=[]
+        @contextmanager
+        def reference_race(store):
+            if store.root==self.store.root and not changed:
+                value=json.loads(store.state.read_text());self.assertEqual(value['active_run']['hook_chains'],[frame['id']])
+                value['active_run']['hook_chains']=[];store.state.write_text(json.dumps(value));changed.append(store.state.read_bytes())
+            with actual_lock(store):yield
+        try:
+            with patch.object(wf.Store,'lock',reference_race):
+                with self.assertRaisesRegex(ValueError,'reference|selection|preflight|changed|carrier|admission'):
+                    wf.finish(self.store)
+            self.assertTrue(changed);self.assertEqual(self.store.state.read_bytes(),changed[0]);self.assertEqual(self.invocation_bytes(frame),retained)
+            self.assertFalse((self.store.base/'history/runs'/('run-'+run['id'].lower()+'.json')).exists())
+        finally:self.store.state.write_bytes(original_state)
+        self.assertEqual(wf.finish(self.store)['id'],run['id'])
+
+    def test_start_rechecks_completed_dependency_preflight_inside_the_writer(self):
+        self.install();old=self.accept(self.returned(self.frame(request_id='old-completed-dependency-hook',task_id=self.b)))
+        old=self.accept(self.returned(old));self.finish_task(self.b)
+        pending=wf.intake(self.store,{'title':'Require the actual completed dependency','description':'Reuse the already completed task.',
+            'expected_behavior':'The dependency hook remains current at controller admission.','priority':1})
+        wf.process(self.store,{'selectors':[pending['id']],'dispositions':{pending['id']:{'status':'promoted',
+            'reason':'Source research identifies the existing dependency.'}},'tasks':[{'reuse_id':self.a,'title':'Selected task',
+            'body':self.body(),'parent_pending_ids':[pending['id']],'depends_on':[self.b]}]})
+        path=self.store.base/'invocations'/(old['id'].lower()+'.json');original=path.read_bytes();state=self.store.state.read_bytes()
+        actual_lock=wf.Store.lock;changed=[]
+        @contextmanager
+        def dependency_race(store):
+            if store.root==self.store.root and not changed:
+                value=json.loads(path.read_text());value['controlled_concurrent_note']='The completed dependency proof changed before the writer.'
+                value['chain_hash']=engine().digest({key:item for key,item in value.items() if key!='chain_hash'})
+                path.write_text(json.dumps(value));changed.append(path.read_bytes())
+            with actual_lock(store):yield
+        try:
+            with patch.object(wf.Store,'lock',dependency_race):
+                with self.assertRaisesRegex(ValueError,'reference|selection|preflight|changed|identity|admission'):
+                    wf.start(self.store,'next',self.a)
+            self.assertTrue(changed);self.assertEqual(self.store.state.read_bytes(),state);self.assertEqual(path.read_bytes(),changed[0])
+        finally:path.write_bytes(original)
+        self.assertEqual(wf.start(self.store,'next',self.a)['root_task_id'],self.a)
+
+    def test_finished_readiness_preserves_actual_reused_completed_dependency_without_new_completion(self):
+        self.install();old=self.finish_task(self.b);self.assertIsNone(old['run_id'])
+        pending=wf.intake(self.store,{'title':'Reuse a completed dependency','description':'Use the already accepted dependency.',
+            'expected_behavior':'The selected new root retains the actual completed dependency.','priority':1})
+        wf.process(self.store,{'selectors':[pending['id']],'dispositions':{pending['id']:{'status':'promoted',
+            'reason':'Source research identifies the existing completed dependency.'}},'tasks':[{'reuse_id':self.a,'title':'Selected task',
+            'body':self.body(),'parent_pending_ids':[pending['id']],'depends_on':[self.b]}]})
+        run=wf.start(self.store,'next',self.a);self.assertIn(self.b,run['required_ids']);self.assertNotIn(self.b,run['completed_ids'])
+        frame=self.accept(self.returned(self.frame(request_id='reused-dependency-controller-chain',run_id=run['id'])))
+        frame=self.accept(self.returned(frame));self.finish_task(self.a);finished=wf.finish(self.store)
+        self.assertEqual(finished['completed_ids'],[self.a]);self.assertNotIn(self.b,finished.get('completion_refs',{}))
+        self.assertEqual(next(row for row in self.store.outcomes() if row['task_id']==self.b)['id'],old['id'])
+        before=self.invocation_bytes(frame)
+        try:wf.hook_admission(self.store,scope=self.a,chain_ids=[frame['id']])
+        except ValueError as error:self.fail('A real finished run reusing an accepted completed dependency must retain readiness: '+str(error))
+        self.assertEqual(self.invocation_bytes(frame),before);self.assertIsNone(self.store.load()['active_run'])
+
+    def test_standalone_pending_process_rechecks_readiness_before_consuming_the_original_scope(self):
+        self.install(anchor='before');pending=wf.intake(self.store,{'title':'Selected standalone Pending','description':'Resolve the exact bounded request.',
+            'expected_behavior':'The source request is resolved after required hooks.','priority':1})
+        ctx=wf.actual_hook_context(self.store,{'kind':'pending','id':'standalone-pending-hook','pending_ids':[pending['id']],'body':''})
+        grant={'id':'standalone-pending-grant','revision':1,'context_id':ctx['id'],'allowed_kinds':['technical'],
+            'constraints':['Synthetic standalone processing only.'],'evidence':{'kind':'owner-message','reference':'Scripted isolated Pending fixture.'}}
+        frame=wf.hook_action(self.store,'hook-start',{'package_root':str(self.package_root),'request_id':'standalone-pending-chain',
+            'event':{'id':'standalone-pending-event','operation':self.operation,'anchor':self.anchor},'context':ctx,'mode':'manual',
+            'authority':grant,'executor':{'id':'pending-executor','context_id':'pending-executor-context'},'capabilities':['codex-source-backed-context'],
+            'expected_source_hash':self.source_hash()})
+        frame=self.accept(self.returned(frame));frame=self.accept(self.returned(frame));before=self.invocation_bytes(frame)
+        actual_node=wf._hook_node;queries=[]
+        def outside_writer(package_root,request):
+            self.assertFalse((self.store.base/'.writer-lock').exists())
+            if request.get('runtime_action')=='readiness-plan':queries.append(request['context']['id'])
+            return actual_node(package_root,request)
+        with patch.object(wf,'_hook_node',outside_writer):
+            receipt=wf.process(self.store,{'selectors':[pending['id']],'dispositions':{pending['id']:{'status':'resolved',
+                'reason':'Source research resolves the exact standalone request.'}},'tasks':[]})
+        self.assertTrue(queries);self.assertEqual(receipt['selected_ids'],[pending['id']]);self.assertEqual(self.invocation_bytes(frame),before)
+        self.assertNotIn(pending['id'],[task['id'] for task in wf.parse(self.store.text())]);self.assertIsNone(self.store.load()['active_run'])
+
+    def test_readiness_preflight_rejects_changed_matching_identity_and_new_matching_chain_inside_writer(self):
+        self.install();frame=self.accept(self.returned(self.frame()));frame=self.accept(self.returned(frame))
+        self.assertTrue(callable(getattr(wf,'prepare_hook_admission',None)),'A trusted scope-bound readiness preflight is required.')
+        actual_node=wf._hook_node;chain_path=self.store.base/'invocations'/ (frame['id'].lower()+'.json')
+        locator_path=self.store.base/'local/hook-locations'/(frame['id'].lower()+'.json')
+        def outside_writer(package_root,request):
+            self.assertFalse((self.store.base/'.writer-lock').exists(),'A writer-side admission recheck cannot start Node.')
+            return actual_node(package_root,request)
+        with patch.object(wf,'_hook_node',outside_writer):
+            for kind,path in [('chain',chain_path),('locator',locator_path),('deleted-chain',chain_path)]:
+                with self.subTest(kind=kind):
+                    wf.prepare_hook_admission(self.store,scope=self.a);original=path.read_bytes();value=json.loads(original)
+                    if kind=='chain':
+                        value['controlled_concurrent_note']='Another metadata writer changed the complete chain.'
+                        value['chain_hash']=engine().digest({key:item for key,item in value.items() if key!='chain_hash'})
+                    elif kind=='locator':value['capabilities'].append('controlled-concurrent-capability')
+                    if kind=='deleted-chain':path.unlink()
+                    else:path.write_text(json.dumps(value))
+                    before=self.invocation_bytes(frame)
+                    try:
+                        with self.store.lock():
+                            with self.assertRaisesRegex(ValueError,'preflight|changed|current|identity|prerequisite|admission'):
+                                wf.hook_admission(self.store,scope=self.a)
+                        self.assertEqual(self.invocation_bytes(frame),before)
+                    finally:path.write_bytes(original)
+                    wf.hook_admission(self.store,scope=self.a)
+            wf.prepare_hook_admission(self.store,scope=self.a)
+            added=self.frame(request_id='matching-chain-added-after-preflight');before=self.invocation_bytes(added)
+            with self.store.lock():
+                with self.assertRaisesRegex(ValueError,'preflight|unfinished|current|prerequisite|admission'):
+                    wf.hook_admission(self.store,scope=self.a)
+            self.assertEqual(self.invocation_bytes(added),before);self.assertEqual(engine().read(self.store,frame['id'])['state'],'complete')
+            added_chain=self.store.base/'invocations'/(added['id'].lower()+'.json')
+            added_locator=self.store.base/'local/hook-locations'/(added['id'].lower()+'.json')
+            added_bytes,added_location=added_chain.read_bytes(),added_locator.read_bytes()
+            added_chain.unlink();added_locator.unlink();retained=chain_path.read_bytes()
+            manifest=self.store.base/'skill-tree.json';navigation=manifest.read_bytes()
+            for selection in ['existing-complete','empty']:
+                with self.subTest(commit_selection=selection):
+                    if selection=='empty':chain_path.unlink()
+                    try:
+                        wf.prepare_hook_admission(self.store,scope=self.a)
+                        with self.store.lock():
+                            wf.hook_admission(self.store,scope=self.a)
+                            added_chain.write_bytes(added_bytes);added_locator.write_bytes(added_location)
+                            with self.assertRaisesRegex(ValueError,'preflight|changed|current|identity|prerequisite|admission'):
+                                self.store.commit({'.skill-tree/skill-tree.json':'{"unexpected_navigation_write":true}\n'})
+                        self.assertEqual(manifest.read_bytes(),navigation)
+                    finally:
+                        added_chain.unlink(missing_ok=True);added_locator.unlink(missing_ok=True);chain_path.write_bytes(retained)
+
+    def test_pr_ready_and_merge_gate_prepare_referenced_review_chains_outside_writer(self):
+        self.install('skill-tree-pr-review-cycle','after')
+        pr=load('managed_readiness_pr_fixture',CORE/'common/scripts/pr-review-state.py')
+        subprocess.run(['git','init','-q',str(self.root)],check=True,capture_output=True)
+        snapshot={'repo_id':'controlled-repository','remote':'origin','source_branch':'feature/controlled','target_branch':'develop',
+            'head':'a'*40,'base_oid':'b'*40,'changed_files':['source.py'],'pr':{'id':'PR-controlled','url':'https://example.invalid/pr/1','number':1},
+            'state':'OPEN','threads':[],'reviews':[],'comments':[],'checks':[],'checks_known':True,'approvals_known':True,
+            'approvals_required':False,'approved':True,'mergeable':'MERGEABLE'}
+        ctx=pr.hook_context(snapshot);grant={'id':'review-fixture-grant','revision':1,'context_id':ctx['id'],'allowed_kinds':['technical'],
+            'constraints':['Synthetic metadata review only; no publication or merge execution.'],
+            'evidence':{'kind':'owner-message','reference':'Scripted isolated metadata fixture permission.'}}
+        frame=wf.hook_action(self.store,'hook-start',{'package_root':str(self.package_root),'request_id':'controlled-review-chain',
+            'event':{'id':'controlled-review-event','operation':self.operation,'anchor':self.anchor},'context':ctx,'mode':'manual',
+            'authority':grant,'executor':{'id':'review-executor','context_id':'review-executor-context'},
+            'capabilities':['codex-source-backed-context'],'expected_source_hash':self.source_hash()})
+        frame=self.accept(self.returned(frame));frame=self.accept(self.returned(frame))
+        record=pr.new_record(snapshot,pr.parameters(snapshot['source_branch'],{'merge':True}))
+        record=pr.reviewed(record,snapshot,{'head':snapshot['head'],'base_oid':snapshot['base_oid'],'target_branch':snapshot['target_branch'],
+            'files':['source.py'],'context_inspected':True,'discussions_inspected':True,'checks_inspected':True,'findings':[],'evidence':['controlled-review.json']})
+        record=pr.attach_hook_chain(self.store,record,snapshot,frame['id']);publication='d'*32
+        path=self.store.base/'history/publications'/('pub-'+publication+'.json');path.parent.mkdir(parents=True);path.write_text(json.dumps(record))
+        source=self.root/'controlled-pr-input.json';source.write_text(json.dumps({'snapshot':snapshot}))
+        actual_node=wf._hook_node;queries=[];actual_owned=pr.owned_module
+        def shared_workflow(name,path):return wf if path.name=='workflow-state.py' else actual_owned(name,path)
+        def outside_writer(package_root,request):
+            self.assertFalse((self.store.base/'.writer-lock').exists(),'PR metadata readiness cannot start Node under the writer lock.')
+            if request.get('runtime_action')=='readiness-plan':queries.append(request['context']['id'])
+            return actual_node(package_root,request)
+        with patch.object(pr,'owned_module',shared_workflow),patch.object(wf,'_hook_node',outside_writer):
+            for command in ['ready','merge-gate']:
+                with self.subTest(command=command),patch('sys.stdout',new_callable=io.StringIO) as output:
+                    previous=len(queries);code=pr.main([command,str(self.root),'--publication-id',publication,'--input',str(source)])
+                    self.assertEqual(code,0,output.getvalue());self.assertGreater(len(queries),previous)
+            actual_lock=wf.Store.lock
+            for command in ['ready','merge-gate']:
+                with self.subTest(disappeared_carrier=command):
+                    original=path.read_bytes();changed=[]
+                    @contextmanager
+                    def reference_race(store):
+                        if store.root==self.store.root and not changed:
+                            value=json.loads(path.read_text());self.assertEqual(value['hook_chains'],[frame['id']])
+                            value['hook_chains']=[];path.write_text(json.dumps(value));changed.append(path.read_bytes())
+                        with actual_lock(store):yield
+                    try:
+                        with patch.object(wf.Store,'lock',reference_race),patch('sys.stdout',new_callable=io.StringIO) as output:
+                            code=pr.main([command,str(self.root),'--publication-id',publication,'--input',str(source)])
+                        self.assertTrue(changed);self.assertEqual(code,2,output.getvalue());self.assertEqual(path.read_bytes(),changed[0])
+                    finally:path.write_bytes(original)
+        self.assertEqual(engine().read(self.store,frame['id'])['state'],'complete')
+
+    def test_business_transition_cannot_silently_replace_the_original_watch_baseline(self):
+        self.install();frame=self.frame();before=self.invocation_bytes(frame);registry=self.store.base/'installation/plugins.json';original=registry.read_bytes()
+        frozen=json.loads(before['.skill-tree/local/hook-locations/'+frame['id'].lower()+'.json'])['watch']
+        # Equivalent registry JSON preserves its semantic identity but changes the frozen raw watch.
+        registry.write_text(json.dumps(json.loads(original),ensure_ascii=True,separators=(',',':')))
+        self.assertNotEqual(registry.read_bytes(),original)
+        with self.assertRaisesRegex(ValueError,'watch|configuration|registry|changed|reconcile|prerequisite|drift'):
+            self.prepare_bridge(frame)
+        self.assertEqual(self.invocation_bytes(frame),before)
+        self.assertEqual(engine().read(self.store,frame['id'])['configuration'],frame['configuration'])
+        registry.write_bytes(original);current=self.prepare_bridge(frame)
+        self.assertEqual(json.loads(self.invocation_bytes(current)['.skill-tree/local/hook-locations/'+frame['id'].lower()+'.json'])['watch'],frozen)
+
+    def test_writer_time_source_recheck_rejects_a_post_preflight_registry_change_without_node_under_lock(self):
+        self.install();frame=self.frame();before=self.invocation_bytes(frame);registry=self.store.base/'installation/plugins.json';original=registry.read_bytes()
+        actual_lock=wf.Store.lock;changed=[];actual_node=wf._hook_node
+        @contextmanager
+        def raced_lock(store):
+            with actual_lock(store):
+                if store.root==self.store.root and not changed:
+                    changed.append(True);registry.write_text(json.dumps(json.loads(original),ensure_ascii=True,separators=(',',':')))
+                yield
+        def outside_lock(package_root,request):
+            self.assertFalse((self.store.base/'.writer-lock').exists(),'The writer guard must recheck bytes without Node subprocesses.')
+            return actual_node(package_root,request)
+        with patch.object(wf.Store,'lock',raced_lock),patch.object(wf,'_hook_node',outside_lock):
+            with self.assertRaisesRegex(ValueError,'changed|watch|configuration|registry|reconcile'):
+                self.prepare_bridge(frame)
+        self.assertTrue(changed);self.assertEqual(self.invocation_bytes(frame),before)
+        registry.write_bytes(original);self.assertTrue(self.prepare_bridge(frame)['prepared_attempt_id'])
+
+    def test_default_node_a_b_a_isolates_other_capability_holds_and_preserves_guarded_b_contribution(self):
+        self.install_ordered_capability_fixture();session=self.cl_start();frame=self.accept(self.returned(self.frame(session)))
+        self.assertEqual(frame['cursor'],1);prefix=copy.deepcopy(frame['attempts']);prefix_stage=copy.deepcopy(frame['stages'][0])
+        first_locator=json.loads(self.invocation_bytes(frame)['.skill-tree/local/hook-locations/'+frame['id'].lower()+'.json'])
+        self.capabilities=['codex-source-backed-context']
+        plan=wf._hook_node(self.package_root,{'runtime_action':'occurrence-plan','project_root':str(self.root),'event':frame['event'],
+            'context':frame['context'],'configuration':frame['configuration'],'capabilities':self.capabilities,
+            'adapter':{'provider':'codex','mechanism':'source-backed-context'}})
+        editor_holds={item.get('binding_id') for item in plan['prerequisites'] if item.get('code')=='missing-capability'}
+        self.assertEqual(editor_holds,{'editor-first','editor-final'})
+        try:frame=self.returned(frame,status='findings')
+        except ValueError as error:self.fail('Other-occurrence editor holds blocked the default Node B delivery: '+str(error))
+        original_b=copy.deepcopy(frame['attempts'][frame['prepared_attempt_id']]);before_context=copy.deepcopy(frame['context'])
+        session=self.revise(session);after=wf.actual_hook_context(self.store,before_context)
+        receipt={'kind':'core-incorporation','session_id':session['id'],'task_revision_id':session['task_revisions'][-1]['id'],
+            'before':engine().digest(before_context),'after':engine().digest(after)}
+        actual_node=wf._hook_node
+        for kind in ['global','current','unresolved']:
+            with self.subTest(hold=kind):
+                unchanged=self.invocation_bytes(frame)
+                with patch.object(wf,'_hook_node',self.injected_prerequisite(actual_node,kind,original_b['binding_id'])):
+                    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+                        self.accept(frame,context=after,receipt=receipt)
+                self.assertEqual(self.invocation_bytes(frame),unchanged)
+        frame=self.accept(frame,context=after,receipt=receipt)
+        self.assertEqual(frame['cursor'],2);self.assertEqual(frame['context'],after);self.assertEqual(frame['stages'][0],prefix_stage)
+        self.assertTrue(all(frame['attempts'][key]==value for key,value in prefix.items()))
+        self.assertEqual(frame['attempts'][original_b['id']]['input'],original_b['input'])
+        self.assertEqual(json.loads(self.invocation_bytes(frame)['.skill-tree/local/hook-locations/'+frame['id'].lower()+'.json'])['watch'],first_locator['watch'])
+        self.assertEqual(wf.hook_action(self.store,'hook-next',{'chain_id':frame['id'],'capabilities':self.capabilities})['action'],'prerequisite')
+        held=self.invocation_bytes(frame)
+        with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|capability|held'):
+            self.prepare_bridge(frame)
+        self.assertEqual(self.invocation_bytes(frame),held)
+        self.capabilities=['codex-source-backed-context','editor-only-capability']
+        frame=self.returned(frame);final=frame['attempts'][frame['prepared_attempt_id']]
+        self.assertEqual(final['binding_id'],'editor-final');self.assertEqual(final['input']['context'],after)
+        self.assertIn('incorporated controlled marker',final['input']['context']['body'])
+        frame=self.accept(frame);self.assertEqual(frame['state'],'complete');self.assertEqual(frame['stages'][0],prefix_stage)
+        self.assertNotEqual(wf.clarification_read(self.store,session['id'])['state'],'complete')
 
 
 if __name__ == '__main__':

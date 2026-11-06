@@ -37,25 +37,28 @@ function compiledConfiguration(manifest,runOverrides={},policyValue){
  const policy=executionPolicy(policyValue);
  return {catalog,compiled,configuration:{configuration_digest:digest({binding_configuration_digest:compiled.configuration_digest,execution_policy:policy}),binding_configuration_digest:compiled.configuration_digest,execution_policy:policy,bindings:clone(compiled.bindings),definitions:clone(manifest.definitions),packages:clone(manifest.packages),parameter_defaults:clone(manifest.parameter_defaults),run_overrides:clone(runOverrides),manifest_identity:manifest.identity,operation:manifest.operation}};
 }
-function proofFor(packageRoot,manifest,request,configuration,compiled,catalog){
- const selection=bindings.selectBindings(compiled,request.event,request.context),boundary=composition.prepareBoundary(packageRoot,request);
+function businessRequest(payload){if(own(payload,'proof_kind')||own(payload,'readiness_kind'))fail('runtime-proof','Completed readiness cannot substitute for business preparation');return clone(payload);}
+function proofFor(packageRoot,manifest,request,configuration,compiled,catalog,readiness=false){
+ const selection=bindings.selectBindings(compiled,request.event,request.context),boundary=readiness?composition.prepareReadinessBoundary(packageRoot,request):composition.prepareBoundary(packageRoot,request);
  const prerequisites=boundary.prerequisites.filter(item=>item.code!=='invocation-unqualified'||!supportedAdapter(request));
  if(selection.bindings.length&&!supportedAdapter(request))prerequisites.push({code:'unsupported-adapter',reason:'The current host must explicitly support the source-backed Codex context adapter.'});
- return {configuration_digest:configuration.configuration_digest,context:clone(selection.context),event:clone(selection.event),bindings:clone(selection.bindings),unresolved:clone(selection.unresolved),prerequisites:clone(prerequisites),execution_snapshot:snapshot(packageRoot,manifest,request.project_root),guard:boundary.guard||null,adapter:{provider:'codex',mechanism:'source-backed-context',native_skill_tool:false}};
+ return {...(readiness?{proof_kind:'completed-readiness'}:{}),configuration_digest:configuration.configuration_digest,context:clone(selection.context),event:clone(selection.event),bindings:clone(selection.bindings),unresolved:clone(selection.unresolved),prerequisites:clone(prerequisites),execution_snapshot:snapshot(packageRoot,manifest,request.project_root),guard:boundary.guard||null,adapter:{provider:'codex',mechanism:'source-backed-context',native_skill_tool:false}};
 }
 function freezePlan(packageRoot,payload){
- const request=clone(payload),{manifest}=composition.verifiedManifest(packageRoot),{configuration,compiled,catalog}=compiledConfiguration(manifest,request.run_overrides||{},request.execution_policy);
+ const request=businessRequest(payload),{manifest}=composition.verifiedManifest(packageRoot),{configuration,compiled,catalog}=compiledConfiguration(manifest,request.run_overrides||{},request.execution_policy);
  if(request.event?.operation!==manifest.operation)fail('runtime-operation','The hook event differs from the composed operation');
  return {configuration,proof:proofFor(packageRoot,manifest,request,configuration,compiled,catalog)};
 }
-function occurrencePlan(packageRoot,payload){
+function frozenPlan(packageRoot,payload,readiness){
  const request=clone(payload),{manifest}=composition.verifiedManifest(packageRoot),frozen=request.configuration;
  if(!object(frozen)||frozen.operation!==manifest.operation||request.event?.operation!==manifest.operation)fail('runtime-configuration','The frozen operation configuration is required');
- if(frozen.manifest_identity!==manifest.identity)return {configuration_digest:frozen.configuration_digest,context:clone(request.context),event:clone(request.event),bindings:[],unresolved:[],prerequisites:[{code:'configuration-stale',reason:'The owned operation changed; explicitly reconcile the frozen chain before continuation.'}],execution_snapshot:snapshot(packageRoot,manifest,request.project_root)};
+ if(frozen.manifest_identity!==manifest.identity)return {...(readiness?{proof_kind:'completed-readiness',guard:null,adapter:{provider:'codex',mechanism:'source-backed-context',native_skill_tool:false}}:{}),configuration_digest:frozen.configuration_digest,context:clone(request.context),event:clone(request.event),bindings:[],unresolved:[],prerequisites:[{code:'configuration-stale',reason:'The owned operation changed; explicitly reconcile the frozen chain before continuation.'}],execution_snapshot:snapshot(packageRoot,manifest,request.project_root)};
  const current=compiledConfiguration(manifest,frozen.run_overrides||{},frozen.execution_policy);
  if(!same(current.configuration,frozen))fail('runtime-configuration','The recorded frozen configuration differs from the owned definitions and explicit overrides');
- return proofFor(packageRoot,manifest,request,current.configuration,current.compiled,current.catalog);
+ return proofFor(packageRoot,manifest,request,current.configuration,current.compiled,current.catalog,readiness);
 }
+function occurrencePlan(packageRoot,payload){return frozenPlan(packageRoot,businessRequest(payload),false);}
+function readinessPlan(packageRoot,payload){return frozenPlan(packageRoot,payload,true);}
 function resolvePrivate(value,resolver,secrets){
  if(object(value)&&Object.keys(value).length===1&&own(value,'$secret')){
   const name=value.$secret;if(typeof name!=='string'||!name||typeof resolver!=='function')fail('runtime-secret','A permitted invocation-context secret provider is required');
@@ -67,10 +70,15 @@ function resolvePrivate(value,resolver,secrets){
  if(object(value))return Object.fromEntries(Object.keys(value).map(key=>[key,resolvePrivate(value[key],resolver,secrets)]));return value;
 }
 function deliveryData(packageRoot,payload,resolveSecret){
- const request=clone(payload),proof=occurrencePlan(packageRoot,request),input=request.public_input;
- if(proof.prerequisites.length||proof.unresolved.length)fail('runtime-prerequisite','The current hook preparation has unresolved prerequisites');
+ const request=businessRequest(payload),proof=occurrencePlan(packageRoot,request),input=request.public_input;
  if(!object(input)||typeof request.input_digest!=='string'||!/^[a-f0-9]{64}$/.test(request.input_digest))fail('runtime-input','The original public attempt and exact input digest are required');
- const row=proof.bindings.find(item=>item.id===request.binding_id||item.id===input.binding_id);
+ if(request.binding_id!==undefined&&request.binding_id!==input.binding_id)fail('runtime-input','Private delivery must retain the exact original binding identity');
+ const frozenIds=new Set(request.configuration.bindings.map(item=>item.id));
+ if(!frozenIds.has(input.binding_id))fail('runtime-binding','The original binding is absent from the frozen configuration');
+ // Raw requirements remain visible; only global and this original occurrence gate delivery.
+ const applicable=(item,key)=>!object(item)||!own(item,key)||typeof item[key]!=='string'||!frozenIds.has(item[key])||item[key]===input.binding_id;
+ if(proof.prerequisites.some(item=>applicable(item,'binding_id'))||proof.unresolved.some(item=>applicable(item,'id')))fail('runtime-prerequisite','The current hook preparation has applicable unresolved prerequisites');
+ const row=proof.bindings.find(item=>item.id===input.binding_id);
  if(!row)fail('runtime-binding','The original binding is not eligible in the current accepted context');
  const owned=composition.verifiedManifest(packageRoot),rebuilt=compiledConfiguration(owned.manifest,request.configuration.run_overrides||{},request.configuration.execution_policy);
  const deliverySelection=bindings.selectBindings(rebuilt.compiled,{...request.event,attempt_id:request.attempt_id},request.context),deliveryRow=deliverySelection.bindings.find(item=>item.id===row.id);
@@ -89,4 +97,4 @@ function deliveryData(packageRoot,payload,resolveSecret){
  if([data.chain_id,data.attempt_id].some(value=>typeof value!=='string'||!value))fail('runtime-input','The actual chain and original attempt identities are required');
  return {payload:data,dispatch_identity:dispatch,input_digest:request.input_digest,delivery_digest:digest(data),resolved_parameter_digest:resolved.digest,configuration_parameter_digest:row.effective.digest,contains_secrets:secrets.length>0};
 }
-module.exports={freezePlan,occurrencePlan,deliveryData,canonical,digest};
+module.exports={freezePlan,occurrencePlan,readinessPlan,deliveryData,canonical,digest};

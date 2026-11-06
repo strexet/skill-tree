@@ -1,0 +1,63 @@
+FFFFFF
+======================================================================
+FAIL: test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation (__main__.PluginWorkflowBridgeTests.test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation) (kind='relocated-package')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1323, in test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation
+    self.assertEqual(calls,[]);self.assertEqual(self.invocation_bytes(frame),before)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['provider'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'provider'
+
+- ['provider']
++ []
+
+======================================================================
+FAIL: test_pure_writer_readiness_rechecks_exact_resource_inventory_without_node (__main__.PluginWorkflowBridgeTests.test_pure_writer_readiness_rechecks_exact_resource_inventory_without_node) (kind='dispatcher-extra')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1384, in test_pure_writer_readiness_rechecks_exact_resource_inventory_without_node
+    with self.assertRaisesRegex(ValueError,'inventory|closure|resource|symlink|changed|watch'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_pure_writer_readiness_rechecks_exact_resource_inventory_without_node (__main__.PluginWorkflowBridgeTests.test_pure_writer_readiness_rechecks_exact_resource_inventory_without_node) (kind='plugin-extra')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1384, in test_pure_writer_readiness_rechecks_exact_resource_inventory_without_node
+    with self.assertRaisesRegex(ValueError,'inventory|closure|resource|symlink|changed|watch'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_pure_writer_readiness_rechecks_exact_resource_inventory_without_node (__main__.PluginWorkflowBridgeTests.test_pure_writer_readiness_rechecks_exact_resource_inventory_without_node) (kind='dispatcher-link')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1384, in test_pure_writer_readiness_rechecks_exact_resource_inventory_without_node
+    with self.assertRaisesRegex(ValueError,'inventory|closure|resource|symlink|changed|watch'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_copied_wf_disabled_and_condition_excluded_starts_are_task_free_noops_without_masking_existing_hi (__main__.PluginWorkflowBridgeTests.test_copied_wf_disabled_and_condition_excluded_starts_are_task_free_noops_without_masking_existing_hi) (variant='disabled')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1420, in test_copied_wf_disabled_and_condition_excluded_starts_are_task_free_noops_without_masking_existing_hi
+    self.assertEqual(frame.get('status'),'noop');self.assertEqual(frame['state'],'complete')
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: None != 'noop'
+
+======================================================================
+FAIL: test_copied_wf_disabled_and_condition_excluded_starts_are_task_free_noops_without_masking_existing_hi (__main__.PluginWorkflowBridgeTests.test_copied_wf_disabled_and_condition_excluded_starts_are_task_free_noops_without_masking_existing_hi) (variant='excluded')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1420, in test_copied_wf_disabled_and_condition_excluded_starts_are_task_free_noops_without_masking_existing_hi
+    self.assertEqual(frame.get('status'),'noop');self.assertEqual(frame['state'],'complete')
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: None != 'noop'
+
+----------------------------------------------------------------------
+Ran 3 tests in 26.493s
+
+FAILED (failures=6)

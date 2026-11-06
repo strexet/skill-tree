@@ -173,8 +173,9 @@ def write(store,chain,command,detail=None):
     store.commit(encoded_write(store,chain,command,detail));return clone(chain)
 
 
-def proof_check(chain,proof,*,context_value=None,allow_snapshot=False):
+def proof_check(chain,proof,*,context_value=None,allow_snapshot=False,allow_readiness=False):
     require(isinstance(proof,dict),'A trusted owned preparation proof is required')
+    require(proof.get('proof_kind')!='completed-readiness' or allow_readiness,'A completed-readiness proof cannot authorize ordinary business execution')
     require(proof.get('configuration_digest')==chain['configuration']['configuration_digest'],'The frozen effective configuration changed')
     require(proof.get('event')==chain['event'],'The current operation event changed')
     current=context(proof.get('context'));require(current==(context_value if context_value is not None else chain['context']),'The current accepted context changed')
@@ -184,6 +185,41 @@ def proof_check(chain,proof,*,context_value=None,allow_snapshot=False):
     for row in rows:
         require(isinstance(row,dict) and text(row.get('id')) and row.get('id') in configured and row['id'] not in seen and row==configured[row['id']],'A selected occurrence differs from frozen definitions');seen.add(row['id'])
     return current
+
+
+def applicable_prerequisites(chain,proof):
+    """Retain diagnostics while admitting only global and current-occurrence work."""
+    require(isinstance(proof,dict),'A current owned prerequisite proof is required')
+    configured={row['id'] for row in chain['configuration']['bindings']}
+    original=current_attempt(chain);binding=original['binding_id'] if original else None
+    if original is None and chain['state']!='complete':
+        selected={row['id'] for row in proof.get('bindings',[]) if isinstance(row,dict) and isinstance(row.get('id'),str)}
+        unresolved={row['id'] for row in proof.get('unresolved',[]) if isinstance(row,dict) and isinstance(row.get('id'),str) and row['id'] in configured}
+        # The actual selector omits incompatible rows from bindings. A current
+        # unresolved row is a held frontier, never a condition-excluded skip.
+        binding=next((row['id'] for row in chain['configuration']['bindings'][chain['cursor']:] if row['enabled'] and row['id'] in selected|unresolved),None)
+    applicable=[]
+    for field,scope in [('prerequisites','binding_id'),('unresolved','id')]:
+        items=proof.get(field,[]);require(isinstance(items,list),'The owned prerequisite proof is incomplete')
+        for item in items:
+            if not isinstance(item,dict):
+                applicable.append({'code':'malformed-owned-prerequisite','reason':'An owned prerequisite lacks a verifiable occurrence scope.'});continue
+            value=item.get(scope)
+            # Missing scope is global. Unknown or malformed scope cannot masquerade
+            # as a different admitted occurrence, including after completion.
+            if scope not in item or not isinstance(value,str) or value not in configured or value==binding:
+                applicable.append(clone(item))
+    return applicable
+
+
+def require_business_admission(chain,proof):
+    require(not applicable_prerequisites(chain,proof),'The current owned invocation has applicable unresolved prerequisites; business admission is held')
+
+
+def record_not_selected(chain,stage):
+    stage.update(status='skipped',accepted_context=clone(chain['context']),accepted_transition={'before':clone(chain['context']),
+        'after':clone(chain['context']),'receipt':{'kind':'not-selected','reference':'owned-condition-selection',
+        'before':digest(chain['context']),'after':digest(chain['context'])}})
 
 
 def start(store,payload,*,proof,verify_supersession=None,guard=None):
@@ -210,6 +246,9 @@ def start(store,payload,*,proof,verify_supersession=None,guard=None):
             require(verify_supersession is not None,'Configuration adoption requires actual core authorization')
             receipt=verify_supersession(clone(old),clone(payload),clone(payload.get('supersession_receipt')))
             require(isinstance(receipt,dict) and receipt.get('kind')=='configuration-adoption' and text(receipt.get('reference')) and receipt.get('before_configuration_digest')==old['configuration']['configuration_digest'] and receipt.get('after_configuration_digest')==chain['configuration']['configuration_digest'],'The core configuration adoption receipt differs')
+            if not proof['bindings'] and not proof.get('unresolved') and not applicable_prerequisites(chain,proof):
+                for stage in chain['stages']:record_not_selected(chain,stage)
+                chain['cursor']=len(chain['stages']);chain['state']='complete'
             old.update(state='superseded',superseded_by=chain['id'],supersession_receipt=clone(receipt));chain['supersession_receipt']=clone(receipt)
             writes=encoded_write(store,old,'superseded',{'replacement_chain_id':chain['id'],'receipt':receipt});writes.update(encoded_write(store,chain,'start',{'supersedes_chain_id':old['id'],'receipt':receipt}));store.commit(writes);return clone(chain)
         return write(store,chain,'start')
@@ -237,14 +276,21 @@ def next_action(store,chain_id,*,proof=None):
     if chain['authority'].get('revoked',False):return {**base,'action':'prerequisite','prerequisites':[{'code':'authority-revoked','reason':'Explicitly restore actual owner authority after original attempt reconciliation.'}]}
     if chain['state']=='complete':
         if proof is not None:
-            try:proof_check(chain,proof)
+            try:
+                proof_check(chain,proof,allow_readiness=True)
+                held=applicable_prerequisites(chain,proof)
+                if held:return {**base,'action':'prerequisite','prerequisites':held}
             except InvocationError as error:return {**base,'action':'prerequisite','prerequisites':[{'code':'completed-chain-drift','reason':str(error)}]}
         return {**base,'action':'complete'}
     if chain['state']=='superseded':return {**base,'action':'superseded','replacement_chain_id':chain['superseded_by']}
     original=current_attempt(chain)
     if original:
         if proof is not None:
-            try:attempt_sources(original,proof)
+            try:
+                proof_check(chain,proof)
+                held=applicable_prerequisites(chain,proof)
+                if held:return {**base,'action':'prerequisite','attempt_id':original['id'],'prerequisites':held}
+                attempt_sources(original,proof)
             except InvocationError as error:return {**base,'action':'prerequisite','attempt_id':original['id'],'prerequisites':[{'code':'scope-source-drift','reason':str(error)}]}
         if original['status'] in {'invoking','unknown'}:return {**base,'action':'wait-original','attempt_id':original['id']}
         if original['status']=='prepared':return {**base,'action':'invoke','attempt_id':original['id'],'input':clone(original['input']),'input_digest':original['input_digest']}
@@ -253,7 +299,8 @@ def next_action(store,chain_id,*,proof=None):
     if proof is None:return {**base,'action':'prerequisite','prerequisites':[{'code':'preparation-proof-required'}]}
     try:proof_check(chain,proof)
     except InvocationError as error:return {**base,'action':'prerequisite','prerequisites':[{'code':'stale-preparation','reason':str(error)}]}
-    if proof.get('prerequisites') or proof.get('unresolved'):return {**base,'action':'prerequisite','prerequisites':clone(proof.get('prerequisites',[])+proof.get('unresolved',[]))}
+    held=applicable_prerequisites(chain,proof)
+    if held:return {**base,'action':'prerequisite','prerequisites':held}
     return {**base,'action':'prepare','binding_id':chain['configuration']['bindings'][chain['cursor']]['id']}
 
 
@@ -270,12 +317,12 @@ def producer(value,kind,who,mechanism=False):
 
 def prepare(chain,payload,proof):
     proof_check(chain,proof);require(not chain['authority'].get('revoked'),'The bounded invocation authority has been revoked');require(not current_attempt(chain),'Reconcile or accept the original occurrence before preparing another attempt')
-    require(not proof.get('unresolved') and not proof.get('prerequisites'),'The owned boundary still has unresolved prerequisites')
+    require_business_admission(chain,proof)
     selected={row['id'] for row in proof['bindings']};rows=chain['configuration']['bindings']
     while chain['cursor']<len(rows):
         stage=chain['stages'][chain['cursor']];row=rows[chain['cursor']]
         if row['enabled'] and row['id'] in selected:break
-        stage.update(status='skipped',accepted_context=clone(chain['context']),accepted_transition={'before':clone(chain['context']),'after':clone(chain['context']),'receipt':{'kind':'not-selected','reference':'owned-condition-selection','before':digest(chain['context']),'after':digest(chain['context'])}});chain['cursor']+=1
+        record_not_selected(chain,stage);chain['cursor']+=1
     if chain['cursor']==len(rows):chain['state']='complete';return {'skipped_to_completion':True}
     row=rows[chain['cursor']];who=actor(payload.get('actor'));require(who['id']!=chain['executor']['id'] and who['context_id']!=chain['executor']['context_id'],'Source-backed invocation requires an isolated actor context')
     require(not any(item['index']!=chain['cursor'] and (item['actor']['id']==who['id'] or item['actor']['context_id']==who['context_id']) for item in chain['attempts'].values()),'A separate binding occurrence requires an isolated invocation lifetime')
@@ -301,6 +348,9 @@ def mutate(store,command,payload,*,proof=None,verify_transition=None,guard=None)
         if guard is not None:guard(clone(chain),command,clone(payload))
         if command not in {'reconcile','resume'}:require(not chain['authority'].get('revoked',False),'A revoked owner grant permits only original reconciliation and explicit reauthorization')
         detail={}
+        if command in {'prepare','invoke','record','accept'}:
+            accepted=context(payload.get('context',chain['context'])) if command=='accept' else None
+            proof_check(chain,proof,context_value=accepted);require_business_admission(chain,proof)
         if command=='prepare':detail=prepare(chain,payload,proof)
         elif command=='invoke':
             proof_check(chain,proof);attempt=exact_attempt(chain,payload);attempt_sources(attempt,proof);require(attempt['id']==chain['prepared_attempt_id'] and attempt['status']=='prepared','Only the original prepared attempt can begin invocation');delivery=proof.get('delivery')

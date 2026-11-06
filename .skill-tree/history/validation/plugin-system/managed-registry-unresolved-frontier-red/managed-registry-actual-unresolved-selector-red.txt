@@ -1,0 +1,21 @@
+FF
+======================================================================
+FAIL: test_actual_node_unresolved_current_location_never_skips_to_later_or_complete (__main__.PluginWorkflowBridgeTests.test_actual_node_unresolved_current_location_never_skips_to_later_or_complete) (incompatible='editor')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1345, in test_actual_node_unresolved_current_location_never_skips_to_later_or_complete
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_actual_node_unresolved_current_location_never_skips_to_later_or_complete (__main__.PluginWorkflowBridgeTests.test_actual_node_unresolved_current_location_never_skips_to_later_or_complete) (incompatible='all')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1345, in test_actual_node_unresolved_current_location_never_skips_to_later_or_complete
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 4.519s
+
+FAILED (failures=2)

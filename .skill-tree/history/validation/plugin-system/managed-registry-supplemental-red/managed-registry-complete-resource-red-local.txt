@@ -1,0 +1,28 @@
+TAP version 13
+# Subtest: a relevant resealed-resource-claim profile claim cannot turn managed registry loss into standalone success
+not ok 1 - a relevant resealed-resource-claim profile claim cannot turn managed registry loss into standalone success
+  ---
+  duration_ms: 1127.484
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:200:190'
+  failureType: 'testCodeFailure'
+  error: 'Relevant resealed-resource-claim ownership silently supplied an executable proof'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: 0
+  operator: '=='
+  stack: |-
+    assertHeldPreparation (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:177:35)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:210:50)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1245.30425

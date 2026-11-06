@@ -17,9 +17,11 @@ function verifyBootstrap(root){
 }
 if(require.main===module){try{
  if(process.argv.length!==4||process.argv[2]!=='--input')throw Error('Usage: node scripts/plugin-hooks.js --input <request.json>');
- const root=path.resolve(__dirname,'..');verifyBootstrap(root);
+ const root=path.resolve(path.dirname(process.argv[1]),'..'),actualRoot=path.resolve(__dirname,'..');
+ if(fs.realpathSync(root)!==fs.realpathSync(actualRoot))throw Error('The invoked owned package root differs from the actual helper closure');
+ verifyBootstrap(root);
  const request=JSON.parse(fs.readFileSync(process.argv[3]==='-'?0:process.argv[3],'utf8'));let value;
- const actions={'freeze-chain':'freezePlan','occurrence-plan':'occurrencePlan','delivery-data':'deliveryData'};
+ const actions={'freeze-chain':'freezePlan','occurrence-plan':'occurrencePlan','readiness-plan':'readinessPlan','delivery-data':'deliveryData'};
  if(Object.hasOwn(actions,request.runtime_action)){const runtime=require('./plugin-runtime.js');let resolver;if(request.private_secrets){const values=request.private_secrets;resolver=name=>Object.hasOwn(values,name)?values[name]:undefined;}value=runtime[actions[request.runtime_action]](root,request,resolver);}
  else{if(request.runtime_action)throw Error('Unknown owned runtime action');value=require('./plugin-composition.js').prepareBoundary(root,request);}
  process.stdout.write(JSON.stringify(value,null,2)+'\n');
