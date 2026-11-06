@@ -2,7 +2,7 @@
 
 ## Approved scope and implementation boundary
 
-[W3 owner approval](../history/research/plugin-management-decisions.json) defines a core-only default, optional plugin setup during installation and later management through `skill-tree-plugins`. The curated catalog supplies discovery and evidence annotations rather than an admission allowlist. The current source contains ten operations and no executable external-plugin management engine. The planned management operation is the eleventh core operation after implementation and qualification.
+[W3 owner approval](../history/research/plugin-management-decisions.json) defines a core-only default, optional plugin setup during installation and later management through `skill-tree-plugins`. The curated catalog supplies discovery and evidence annotations rather than an admission allowlist. The current source contains ten operations, pure source/parameter helpers and an owned lifecycle backend. The public plugin-management operation and generic invocation dispatcher remain separate implementation work. The planned management operation is the eleventh core operation after implementation and qualification.
 
 ## Initial and repeat installation
 
@@ -66,6 +66,18 @@ The pure helpers in `.skill-tree/lib/plugin-sources.js` and `.skill-tree/lib/plu
 `resolveParameters({upstream, project, binding, run, schema})` accepts optional layers containing `values` and `instructions`. JSON objects merge recursively; arrays, scalar values and null replace earlier values. Omission preserves an earlier value. The highest explicitly provided instruction string wins, including an empty string. Exact secret-reference objects replace atomically and remain unresolved. Resolution preserves input objects and returns effective values/text, JSON Pointer origins, a deterministic digest, schema status and secret-reference names. Plugin keys such as `mode` and `authority` remain data inside `values` and never become core envelope fields.
 
 The optional schema subset supports boolean schemas, scalar `type`, `properties`, `required`, `additionalProperties`, `items`, `enum`, `const`, numeric bounds and string/array length bounds. Unsupported constraints fail explicitly with `parameter-schema-unsupported`; supported validation failures use `parameter-schema`. A missing schema reports `absent`; successful supported validation reports `validated`. Non-JSON values, cycles, sparse arrays and accessors reject as `parameter-json`. Configuration never resolves secrets, executes getters or fetches schema references.
+
+## Owned lifecycle backend
+
+`.skill-tree/lib/plugin-registry.js` owns read-only registry/schema/inventory validation. The registry records a monotonically advancing configuration generation, installed packages, ordered binding occurrences and mutation receipts. `.skill-tree/installation/plugin-packages/<id>/upstream/` preserves the original resource closure; a separate overlay retains adapter metadata. Installed package dependency IDs remain distinct from source-relative resource dependencies.
+
+`.skill-tree/lib/plugin-acquisition.js` implements explicit bounded raw HTTP/HTTPS reads and bare Git object acquisition. Raw resources retain actual bytes; repository resources bind the resolved immutable commit. Relative resource closure, aggregate byte/file/storage limits and one deadline remain enforced. Repository acquisition performs no checkout, hook or source-helper execution and removes temporary Git storage. Transport errors omit credential-bearing locators. Controlled local HTTP/Git fixtures qualify the recorded host paths rather than every provider or native invocation mechanism.
+
+`.skill-tree/lib/plugin-lifecycle.js` exposes asynchronous `prepareProposal` and `prepareRollback`, synchronous `applyProposal`, and explicit `recoverPlugins`. Preparation completes acquisition outside activation locks. A serialized proposal contains inspected base64 resource bytes, source/configuration digests, the expected core and registry identities, exact occurrences and one request ID. Activation requires the matching proposal digest, current ownership and a stopped canonical handoff. Read-only inventory and ordinary dry-run perform no acquisition or installed-state mutation.
+
+Exact request replay returns the original outcome; conflicting reuse of a request ID rejects. Verified no-op outcomes retain durable request evidence without advancing configuration generation or replacing meaningful rollback backups. Update, configuration, enable/disable and exact package uninstall preserve independent occurrence identities. Package removal clears every live occurrence of the selected package while retaining original sources, unrelated/shared packages and historical requirements.
+
+Core and plugin activation use separate journal/staging/backup channels under the existing canonical installation/writer locks. Staging rechecks every relevant owned resource and rejects path collisions before activation. Interrupted package/registry/binding activation recovers together. Rollback restores binary resources into a new registry generation and retains current request history. Current profile verification and cached normal/maintenance admission reject changed plugin state or pending recovery until owned recovery, profile refresh and explicit re-admission complete. The backend supplies no workflow continuation or skill-execution permission.
 
 ## Mutation and removal integrity
 

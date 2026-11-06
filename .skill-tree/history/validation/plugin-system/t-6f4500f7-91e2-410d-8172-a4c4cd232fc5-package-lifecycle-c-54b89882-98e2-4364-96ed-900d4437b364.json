@@ -1,0 +1,41 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-plugin-installation.js"
+  ],
+  "attempt_id": "C-54b89882-98e2-4364-96ed-900d4437b364",
+  "check_id": "package-lifecycle",
+  "counts": {
+    "discovered": 16,
+    "expected": 16,
+    "failed": 16,
+    "passed": 0,
+    "skipped": 0
+  },
+  "exit_code": 1,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-6f4500f7-91e2-410d-8172-a4c4cd232fc5-package-lifecycle-c-54b89882-98e2-4364-96ed-900d4437b364.txt",
+  "result": "red",
+  "reviewed_failure_reason": "Runnable lifecycle skeleton lacks owned package and binding transactions, exact consent/replay guards, rollback/recovery, freshness and actual remote acquisition; corrected requirements-derived behavior checks fail before Green implementation.",
+  "source_fingerprints": {
+    ".skill-tree/bin/install.js": "6a3028764bcec61b7a95edabc8e2434dcdba2c718fc3fc99f0dcacb43701fdaf",
+    ".skill-tree/common/references/installation-profile.md": "05d15601e98233e5367a9b1ad67832983a94e8b8e68bcd4f4c81e5f94bc792c5",
+    ".skill-tree/common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+    ".skill-tree/documents/plugin-installation-contract.md": "159c86c891e4f26186628c83825d928c0c91b0e033162a7d4d6594f956464520",
+    ".skill-tree/documents/plugin-management-contract.md": "0938f5e3355a490c67c724307c38954118c7b3315f184d3cb408cb2895f4d998",
+    ".skill-tree/documents/plugin-system-contract.md": "a954d148df40e7a22814fb1f8515d654140cff02f7fe14e1a65f6cad33732efc",
+    ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84",
+    ".skill-tree/lib/composer.js": "60d8ab877bccd80835529692a5d2df7ad42dafa966ab695c938ade3ac073b8e8",
+    ".skill-tree/lib/installation.js": "abc2bca0d228e774f9978a63ea3fe7c2cf7464d7d4e1d695441fc09f8a2146e0",
+    ".skill-tree/lib/plugin-acquisition.js": "04d159e898fffe91d682bdfb957212a28fc5cd59508ff1bd3b3375d1e85bfb2c",
+    ".skill-tree/lib/plugin-lifecycle.js": "5a164b36a3fcd8fa9b5b545a0e49dc7fab5f7fb1154db2759c007c40719bc119",
+    ".skill-tree/lib/plugin-registry.js": "d75eb132c24f1dd795df4d024b9d55af8d2920812a4d194a943915eea7ddb37d",
+    ".skill-tree/lib/plugins.js": "d9d140a9a1c7df3682f95ace505a6d06bbac5823787329acd70834732de1d4d0",
+    ".skill-tree/tests/test-plugin-installation.js": "d22373abecf9598a37a39f4a6fae8c0c2134749e2fed66b1e0c707b1bacdb0eb"
+  },
+  "task_id": "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+  "tool_wall_seconds": 2.0937677081674337
+}

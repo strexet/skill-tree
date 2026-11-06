@@ -6,6 +6,8 @@ An external skill plugin is a pinned instruction/resource package integrated thr
 
 The plugin system preserves exact task selection, dependency closure, source/check evidence, standalone installation and owner authorization. A plugin cannot replace locked invariants, mark core checks passed, change owner decisions, authorize publication or satisfy independent approval. Core-only projects receive the approved core W1 phases and decision governance after implementation, with no optional-plugin readiness obligation. Plugins cannot create an unrelated global stage or silently replace core behavior.
 
+The current source exposes the [source/parameter foundation and owned lifecycle backend](plugin-management-contract.md#owned-lifecycle-backend). Controlled fixture qualification covers acquisition and package/registry transactions. Generic hook composition, actual host dispatch, public management and installer integration retain separate task acceptance; backend installation alone establishes no successful skill invocation.
+
 ## Identity and resource closure
 
 Each descriptor has a stable lowercase plugin ID, display name, source URL/path, exact immutable revision or content snapshot, entry path, content digests, attribution/license evidence, resources/dependencies and explicit adapter/capability status. Curated IDs and noncatalog repository/skill/raw-document/local sources share the same pipeline. Source-host labels such as Claude do not restrict import. Original content/metadata and owned wrappers or adaptation overlays remain separate. Mutable branches, discovery counts and catalog labels never identify installed executable content.

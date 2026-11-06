@@ -11,9 +11,9 @@ function stable(value) {
 }
 const json=value=>JSON.stringify(stable(value),null,2)+'\n';
 function safe(root,rel) {
- if(typeof rel!=='string'||path.isAbsolute(rel)||rel.split(/[\\/]/).includes('..'))throw Error('Expected repository-relative path: '+rel);
+ if(typeof rel!=='string'||path.isAbsolute(rel)||path.win32.isAbsolute(rel)||rel.split(/[\\/]/).includes('..'))throw Error('Expected repository-relative path: '+rel);
  const full=path.resolve(root,rel),base=fs.realpathSync(root);
- let ancestor=path.resolve(root);for(const part of rel.split(/[\\/]/).filter(Boolean)){ancestor=path.join(ancestor,part);if(fs.existsSync(ancestor)&&fs.lstatSync(ancestor).isSymbolicLink())throw Error('Symlink input is unsupported: '+rel);}
+ let ancestor=path.resolve(root);for(const part of rel.split(/[\\/]/).filter(Boolean)){ancestor=path.join(ancestor,part);try{if(fs.lstatSync(ancestor).isSymbolicLink())throw Error('Symlink input is unsupported: '+rel);}catch(error){if(error.code!=='ENOENT')throw error;}}
  let current=full;
  while(!fs.existsSync(current)&&current!==path.dirname(current))current=path.dirname(current);
  if(fs.existsSync(current)){const real=fs.realpathSync(current);if(real!==base&&!real.startsWith(base+path.sep))throw Error('Path escapes root: '+rel);}
@@ -44,7 +44,7 @@ function resolveProfile(source,root,flavor) {
  const registry=readJson(source,'config/flavors.json'),rules=readJson(source,'config/capabilities.json');
  if(!registry.flavors[flavor])throw Error('Unknown flavor: '+flavor);
  const fixed=['package.json','package-lock.json','npm-shrinkwrap.json','yarn.lock','pnpm-lock.yaml','bun.lock','bun.lockb','.nvmrc','.node-version','pyproject.toml','pytest.ini','Cargo.toml','ProjectSettings/ProjectVersion.txt','ProjectSettings/EditorSettings.asset','ProjectSettings/ProjectSettings.asset','Packages/manifest.json','Packages/packages-lock.json','.skill-tree/validation-recipes.json','.skill-tree/worktree-profile.json'];
- fixed.push('.skill-tree/config/repository.json');
+ fixed.push('.skill-tree/config/repository.json','.skill-tree/installation/plugins.json');
  const discovered=inventory(root,rules.inventory),inputs={};
  for(const rel of [...new Set([...fixed,...discovered])].sort()){inputs[rel]=inputDigest(root,rel);}
  const facts={test_assemblies:[],ui:[]},recipes={},gaps=[];

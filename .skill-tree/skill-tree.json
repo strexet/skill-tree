@@ -1106,7 +1106,22 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/lib/plugin-acquisition.js",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/lib/plugin-lifecycle.js",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/lib/plugin-parameters.js",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/lib/plugin-registry.js",
       "role": "canonical"
     },
     {
@@ -1263,7 +1278,7 @@
     ".skill-tree/common/references/documentation-output-contract.md": "34d40d7d8a53b08c5078421cb999b1b3d606506c8b6c9cb5d78273cce73e1008",
     ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
     ".skill-tree/common/references/history-retention.md": "e34302d1665162c5c94bd1adea7cbdf32a36325bb4a6db1eafab24fc236c3585",
-    ".skill-tree/common/references/installation-profile.md": "05d15601e98233e5367a9b1ad67832983a94e8b8e68bcd4f4c81e5f94bc792c5",
+    ".skill-tree/common/references/installation-profile.md": "05801326c3aa3e325a1ccf170a7fbbc678d7e2ae804bb6a8fef6c3a05d2fbee8",
     ".skill-tree/common/references/orchestration.md": "79313308e0b2f1833ab131ffd2b2c5fed4f18163b26b682f9234b17f285f8ca5",
     ".skill-tree/common/references/pending-task-format.md": "6c0a90ea992f2c19a26e4f95fc4e45b7ff89d25c0cc8e2c49c11cfa8bad2d8ba",
     ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
@@ -1282,7 +1297,7 @@
     ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     ".skill-tree/common/scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
     ".skill-tree/common/scripts/validate-repository-documentation.py": "a9833b258675765a24de4205f5b87a6e34a90913408e97957582e007c78ba911",
-    ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+    ".skill-tree/common/scripts/workflow-state.py": "f531546773a653809e09af093a1dddfacca763517b13cebf9b00673ab959737f",
     ".skill-tree/config/capabilities.json": "fc9572cc6a65f689fd7a750560a897593fd7b90df50eadea3954e242556626c5",
     ".skill-tree/config/flavors.json": "cc2e8ec2e54af53232ab2813a219d3d00a5d7e8b75d2d85ca20f4c0db28231a8",
     ".skill-tree/config/providers.json": "80255fe3fb67e32d71cc7791aee1e51c1d34a508d4c77b6ca852521907ede97a",
@@ -1298,10 +1313,10 @@
     ".skill-tree/documents/installation-architecture.md": "fd548f5be2a74fbfdb416a748e62869771d80f04acb47b246d4488effe083eea",
     ".skill-tree/documents/manual-target-update.md": "f83c49a885b75d27d250d53d5f00936bc1c9e3d45998518cb0045ef8734e3482",
     ".skill-tree/documents/plugin-installation-contract.md": "159c86c891e4f26186628c83825d928c0c91b0e033162a7d4d6594f956464520",
-    ".skill-tree/documents/plugin-management-contract.md": "0938f5e3355a490c67c724307c38954118c7b3315f184d3cb408cb2895f4d998",
+    ".skill-tree/documents/plugin-management-contract.md": "d5d68870bb0f44c356fdbd5423f3995dea33931eded820ffa335ac715cc24616",
     ".skill-tree/documents/plugin-market-research.md": "cdedbf889a7136f8390089b0d70448c59de91e6622e6a23c9c222da744852621",
-    ".skill-tree/documents/plugin-system-contract.md": "a954d148df40e7a22814fb1f8515d654140cff02f7fe14e1a65f6cad33732efc",
-    ".skill-tree/documents/plugin-system-research.md": "4c042f33b94830141a99263d632322993d445a411d8e08d4f9d0692f01a926c7",
+    ".skill-tree/documents/plugin-system-contract.md": "eeddb14292e115f489aa855f01f60ab922448317a3e9956d649148b177944680",
+    ".skill-tree/documents/plugin-system-research.md": "df72f246f13a3a4186a0035f9dec75b3dcc9dcc511de1ecf66a7bc0c62462a31",
     ".skill-tree/documents/plugin-workflow-decisions.md": "ef81629dd2e76ed70a05896e57b38ca55571439af333da08ecebcf9d80bbe2ca",
     ".skill-tree/documents/project.md": "419e0ced059c4f8130006e2f2b5c745fdb05944facc576671f19356b198ba934",
     ".skill-tree/documents/repo-init-instructions.md": "06f7eedd332bd13daba08f131a5c34b0fdffd8cb835c4ecc0d062010071251fa",
@@ -1326,10 +1341,13 @@
     ".skill-tree/domains/web/development.md": "a8e55f4d58ad64056707801a3c31aa56eb884755fd12ef08c341680d73645bc9",
     ".skill-tree/domains/web/playwright-testing.md": "661393b4329bbe03f68f1570919fe8bf02dcebb5bf77555f3c5c46e05d4739a7",
     ".skill-tree/domains/web/sections.json": "705a5dca39a2a0baa64f0043d6d188ade153c7dff553fcf55bfd25256b2bb2c7",
-    ".skill-tree/lib/composer.js": "60d8ab877bccd80835529692a5d2df7ad42dafa966ab695c938ade3ac073b8e8",
+    ".skill-tree/lib/composer.js": "ebb4042086e61e32cd7c255df79befcdff06ae0b0bfaf2941d5d8facc1268e01",
     ".skill-tree/lib/execution-bindings.js": "4087f0855eac260dc7ec4008be24015b3645ac7f53e11b3f7f7eccab5434a852",
-    ".skill-tree/lib/installation.js": "abc2bca0d228e774f9978a63ea3fe7c2cf7464d7d4e1d695441fc09f8a2146e0",
+    ".skill-tree/lib/installation.js": "aff2c16139da198abc00a04e89a0bfe1a22bc826e38a722e146632b14164ef82",
+    ".skill-tree/lib/plugin-acquisition.js": "7bac01aa2440363225b4b9606362feeee1f162ed7adbad6a92ebda21fee6adbc",
+    ".skill-tree/lib/plugin-lifecycle.js": "05f1604a464385532cdda5d1b729c6286aac625c2bb279495b44b30155fc4e9e",
     ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    ".skill-tree/lib/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
     ".skill-tree/lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
     ".skill-tree/lib/plugins.js": "d9d140a9a1c7df3682f95ace505a6d06bbac5823787329acd70834732de1d4d0",
     ".skill-tree/scripts/agent-conformance.py": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",

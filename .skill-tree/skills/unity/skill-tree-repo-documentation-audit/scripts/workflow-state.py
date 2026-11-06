@@ -1223,6 +1223,9 @@ def assert_admission(store,state,tid=None):
     profile=json.loads(profile_path.read_text());run=state['active_run']
     admitted=execution_run(run).get('admission') if run else state['task_progress'].get(tid,{}).get('admission')
     if not admitted or admitted.get('identity')!=profile.get('identity'):raise WorkflowError('Profile admission changed; explicitly re-admit the current profile before continuation')
+    plugin_registry='.skill-tree/installation/plugins.json';registry_path=store.source_root/plugin_registry
+    if (store.source_root/'.skill-tree/installation/.plugin-journal.json').exists():raise WorkflowError('Plugin installation recovery is required before continuation')
+    if registry_path.is_symlink() or file_hash(registry_path)!=profile.get('inputs',{}).get(plugin_registry):raise WorkflowError('Plugin generation changed; refresh the owned profile and explicitly re-admit before continuation')
 
 def assert_scope(store,state,tasks,tid):
     run=state['active_run']
