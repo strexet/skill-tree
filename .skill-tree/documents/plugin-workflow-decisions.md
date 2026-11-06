@@ -4,7 +4,7 @@
 
 The completed initial task clarification cycle covers fifteen selected tasks, including the owner-requested installed-plugin registry and removal interface. Q1-Q11 have actual owner approval. Approval evidence and selected identities reside in `.skill-tree/history/research/plugin-grill-session.json`. The initial final confirmation binds the exact task and summary fingerprints recorded in the clarification session, separately from individual decision approval.
 
-The subsequent workflow design discussion has actual owner approval for W1 and W2. The [W2 decision record](../history/research/plugin-hook-decisions.json) includes the approved post-processing task-wording application and the requested two-commit document review sequence. The [W1 decision record](../history/research/plugin-auto-manual-decision.json) preserves the actual owner submission reference, approved policy and implementation boundary. W1 extends the planned final-acceptance policy with legitimate delegated Auto acceptance; the existing manual-only controller remains the implemented baseline until the required followup passes acceptance.
+The subsequent workflow design discussion has actual owner approval for W1 and W2. [W3](../history/research/plugin-management-decisions.json) selects core-only default installation and adds open source/parameter/binding management; W3 supersedes the initial fixed-operation exclusions and any proposed default plugin bundle. The [W2 decision record](../history/research/plugin-hook-decisions.json) includes the approved post-processing task-wording application and the requested two-commit document review sequence. The [W1 decision record](../history/research/plugin-auto-manual-decision.json) preserves the actual owner submission reference, approved policy and implementation boundary. W1 extends the planned final-acceptance policy with legitimate delegated Auto acceptance; the existing manual-only controller remains the implemented baseline until the required followup passes acceptance.
 
 ## Approved decisions
 
@@ -79,3 +79,11 @@ The catalog records task-editorial and skill/document applications separately. P
 ### Separate comparative qualification decision
 
 The market study contains a finite proposal of eight fixtures, 36 worker trials, eight blind judges, eight factual helpers and two activation calibrations: at most 54 spawned contexts, 96 explicit host-turn requests and 60 task-specific minutes. Task `T-a583acd5-fc6b-4d37-97ec-02df969fea9e` owns actual agreement before comparison execution and records the current W1 baseline before freezing trials. W1/W2 approval supplies no comparison execution authority, favorable recommendation evidence, external acquisition or native/runtime scope.
+
+## Approved decision W3: optional open plugin management
+
+Core installation defaults to zero new external plugins and includes the planned `skill-tree-plugins` operation. Optional setup during installation and later management use the same preview/confirmation flow. Repeat core installation preserves existing plugins; discovery/recommendation labels never select or acquire a package automatically.
+
+The [management contract](plugin-management-contract.md) owns installed/known views, noncatalog URL/repository/raw/local imports, Claude/other source-host acceptance, registered all-operation/named anchors, additional instruction/JSON parameters and exact unbind/uninstall/forget actions. Catalog membership and producer labels supply no import allowlist. Native/source-backed capability status remains separate from imported/installed state.
+
+W3 retains actual configuration consent, core authorization/ownership and frozen-run requirements. Source/resource closure remains explicit; unavailable native tools never become a successful invocation. Recommendation labels still require matching outcome evidence, but unqualified custom/manual selection remains available with visible status. The current source has ten operations; eleven is the qualified target after the core manager implementation.
