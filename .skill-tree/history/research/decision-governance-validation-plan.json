@@ -1,0 +1,16 @@
+{
+  "added_check_id": "decision-adapter-regressions",
+  "added_sources": [
+    ".skill-tree/common/scripts/decision-governance.py",
+    ".skill-tree/config/resource-map.json",
+    ".skill-tree/tests/test-decision-adapters.py"
+  ],
+  "preserved": [
+    "Exact task/root/provenance/dependencies and every acceptance criterion.",
+    "Frozen fifteen roots, twenty-one admitted units and existing completed outcomes.",
+    "No check attempt or accepted result for the selected state unit existed before the refinement."
+  ],
+  "reason": "A shared task-free decision helper uses existing guarded Store transactions; workflow/PR adapters retain a separate focused regression entry point. Both test-first checks preserve all original acceptance criteria.",
+  "record_kind": "implementation-validation-plan-refinement",
+  "task_id": "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99"
+}

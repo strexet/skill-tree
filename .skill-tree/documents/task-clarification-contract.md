@@ -6,6 +6,18 @@ The shared protocol derives from the pinned [grilling instructions](https://gith
 
 The `skill-tree-clarify-tasks` operation supplies the executable controller interface through the bundled `workflow-state.py` helper. The helper records source-backed interview state and guarded revisions. Source-backed manual discussion, controller invocation and native external-skill invocation remain distinct evidence classes.
 
+## Decision mode and bounded authority
+
+The interview `mode: explicit|required-interview` remains separate from `decision_mode: manual|auto`. The compatible state interface defaults to Manual; legacy sessions without decision fields retain Manual interpretation without rewritten history. Automatic actor routing and default-Auto operation activation require separate core orchestration qualification and an owned snapshot refresh. A decision record supplies no actor execution.
+
+Explicit Auto state freezes a bounded owner grant and the actual executor identity/context. Auto answers and final specification acceptance consume accepted `DG-` decision references through the shared decision helper. The reference binds the current session, question, purpose, selected tasks, semantic identity, parent mode epoch and authority. Delegated origin remains delegated origin. An answer decision cannot satisfy final specification acceptance. Manual retains actual owner answers and confirmation.
+
+An explicit `clarify-switch-mode` requires actual owner evidence and reconciliation or cancellation of original pending actors. The switch preserves prior policy, origin and confirmation history, advances the parent epoch and reopens current acceptance. Late replies from an earlier epoch remain stale. Changing project defaults supplies no switch. Current implementation admission revalidates live decision references; a stored complete state cannot conceal revoked acceptance.
+
+Session cancellation requires the same original-attempt cleanup. Cancelled sessions reject later answer preparation, recording and acceptance. Guarded reconciliation can close an existing original attempt after the former task or queue disappears; cleanup supplies no answer, successful execution or new queue.
+
+The grant covers product, technical or specification choices within the exact selected scope. Delegated acceptance supplies no installation consent, publication authority, check result or external required approval. State fixtures use explicitly synthetic inputs and establish no actual-human or actual-host qualification. The orchestration qualification owns observed independent actor use.
+
 ## Selection and state ownership
 
 The owner selects exact unique Prioritized `T-` identities. Selection preserves numeric priority and document order, freezes the selected identities and never adds dependencies or later queue additions silently. Ready and clarification-blocked tasks can participate. Missing, duplicate, terminal or non-prioritized identities reject selection atomically. An ID-shaped title cannot substitute for a missing identity.
@@ -20,7 +32,7 @@ An open explicit session holds implementation admission for the selected tasks. 
 
 The agent maps dependent decisions and researches source-answerable facts. Each round presents the complete currently independent frontier: numbered questions whose prerequisites already have actual settled answers, with a recommendation for every question. A dependent question remains in a later round. A running fact investigation leaves only the dependent branch waiting.
 
-Questions have stable IDs, prerequisite IDs and affected task/semantic-field bindings. Source facts include inspected source identity and limitations. Owner decisions require actual owner messages or structured submitted answers, with source evidence. A displayed default, preselection, silence, elapsed time or agent recommendation supplies no owner answer.
+Questions have stable IDs, prerequisite IDs and affected task/semantic-field bindings. Source facts include inspected source identity and limitations. Manual decisions require actual owner messages or structured submitted answers, with source evidence. Auto decisions require current bounded delegated acceptance references. A displayed default, preselection, silence, elapsed time or agent recommendation supplies no answer.
 
 Answers bind the session, round, question identity and question revision. Exact duplicate delivery recovers the original result; conflicting replay or an answer for another identity rejects mutation. The agent applies accepted decisions to the selected task specifications, then rechecks the decision frontier and clarity rubric. Research, interviews and waits occur outside the writer lock.
 
@@ -40,7 +52,7 @@ The session states are `researching`, `awaiting-answers`, `revising`, `awaiting-
 
 Clarity requires concrete goals, scope and exclusions, dependencies, observable acceptance and feasible validation. Required product decisions have actual answers; remaining research belongs to explicit scoped deliverables with dependent work gated accordingly. Contradictory definitions, hidden dependency cycles, unsupported facts and unanswered mandatory branches prevent confirmation eligibility.
 
-An empty frontier and a complete clarity recheck lead to `awaiting-confirmation`. The owner receives a current task summary and explicitly confirms shared understanding of the current selected task semantics. Confirmation binds the exact scope and semantic fingerprints. A stale or missing confirmation cannot complete the session. Repeated rounds with no new facts, answers or semantic progress retain a visible blocked state and a concrete next action rather than inventing clarity.
+An empty frontier and a complete clarity recheck lead to `awaiting-confirmation`. Manual requires actual owner confirmation of the current displayed task summary. Auto requires a separate current specification-acceptance decision under the frozen grant. Confirmation binds the exact scope, semantic fingerprints and current mode/authority. A stale or missing confirmation cannot complete the session. Repeated rounds with no new facts, answers or semantic progress retain a visible blocked state and a concrete next action rather than inventing clarity.
 
 Completion records clarification acceptance only. The session never starts implementation, commits, publication or another workflow controller. Explicit implementation instructions remain separate.
 

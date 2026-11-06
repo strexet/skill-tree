@@ -1,0 +1,102 @@
+{
+  "applicability": "Only implementation profile admission changed. All manual clarification functions, neutral Store class, instruction/resource definitions, tests and actual-observation grader retain identical source behavior.",
+  "attempt_id": "C-40e2c71e-7575-4d35-8c9a-7ebd9b28fbab",
+  "changed_top_level_python_nodes": [
+    "assert_admission"
+  ],
+  "check_id": "clarification-agent-observation",
+  "check_sources": [
+    {
+      "byte_identical": false,
+      "current_sha256": "f531546773a653809e09af093a1dddfacca763517b13cebf9b00673ab959737f",
+      "observed_commit_sha256": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+      "path": ".skill-tree/common/scripts/workflow-state.py"
+    },
+    {
+      "byte_identical": true,
+      "current_sha256": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+      "observed_commit_sha256": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+      "path": ".skill-tree/common/references/workflow-metadata.md"
+    },
+    {
+      "byte_identical": true,
+      "current_sha256": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+      "observed_commit_sha256": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+      "path": ".skill-tree/common/references/future-workflow.md"
+    },
+    {
+      "byte_identical": true,
+      "current_sha256": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+      "observed_commit_sha256": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+      "path": ".skill-tree/templates/operations.json"
+    },
+    {
+      "byte_identical": true,
+      "current_sha256": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+      "observed_commit_sha256": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+      "path": ".skill-tree/config/resource-map.json"
+    },
+    {
+      "byte_identical": true,
+      "current_sha256": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5",
+      "observed_commit_sha256": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5",
+      "path": ".skill-tree/tests/test-task-clarification.py"
+    },
+    {
+      "byte_identical": true,
+      "current_sha256": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+      "observed_commit_sha256": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+      "path": ".skill-tree/tests/test-clarification-installation.js"
+    },
+    {
+      "byte_identical": true,
+      "current_sha256": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
+      "observed_commit_sha256": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
+      "path": ".skill-tree/scripts/agent-conformance.py"
+    },
+    {
+      "byte_identical": true,
+      "current_sha256": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+      "observed_commit_sha256": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+      "path": ".skill-tree/documents/task-clarification-contract.md"
+    }
+  ],
+  "current_source_commit": "4c0467afa6e99b2eba1253be2ad68b8921edf317",
+  "historical_observations": {
+    "actor_ids": 3,
+    "observed_turns": 10,
+    "path": ".skill-tree/history/validation/plugin-system/clarification-agent-observations.json",
+    "sha256": "f243f525ca6e2f5c6633be1ac2f380688ab373514b7d4dd0ecae809e52c3e037",
+    "validator_scenarios": 2
+  },
+  "limitations": [
+    "Historical actual host traces retain original snapshot/source identities; this analysis does not relabel the traces as new current-host executions.",
+    "The actual report validator and fresh state/standalone checks supplement this source applicability proof."
+  ],
+  "observations": [
+    "Both traces preserve actual agent IDs, original installed snapshot identities, source-backed general qualification and scripted fixture-owner limits.",
+    "Each actual trace retains displayed current summary before submitted fixture consent before completion, current task bytes, bound answers and exact semantics/provenance.",
+    "The neutral clarification start/read/mutate/revise path and unchanged Store do not reach changed assert_admission; no new host qualification is inferred.",
+    "Fresh prepared checks pass24 state regressions and3 standalone general/web/unity fixtures.",
+    "W1 new mode/actor paths retain separate future qualification requirements."
+  ],
+  "observed_source_commit": "b288c9a",
+  "result": "pass",
+  "review_findings": [],
+  "reviewers": [
+    "Root source/AST delta and actual-report validation",
+    "Independent /root/current_plugin_contract_review source applicability and captured artifact/interaction review"
+  ],
+  "source_fingerprints": {
+    ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+    ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+    ".skill-tree/common/scripts/workflow-state.py": "f531546773a653809e09af093a1dddfacca763517b13cebf9b00673ab959737f",
+    ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+    ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+    ".skill-tree/scripts/agent-conformance.py": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
+    ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+    ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+    ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+  },
+  "task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+}

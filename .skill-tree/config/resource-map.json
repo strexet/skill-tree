@@ -10,6 +10,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "decision-governance.py": "common/scripts/decision-governance.py",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
@@ -42,6 +43,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "decision-governance.py": "common/scripts/decision-governance.py",
       "pr-review-state.py": "common/scripts/pr-review-state.py",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
@@ -62,6 +64,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "decision-governance.py": "common/scripts/decision-governance.py",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "select-prioritized-task.py": "common/scripts/select-prioritized-task.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
@@ -81,6 +84,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "decision-governance.py": "common/scripts/decision-governance.py",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "validate-future-document.py": "common/scripts/validate-future-document.py",
@@ -101,6 +105,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "decision-governance.py": "common/scripts/decision-governance.py",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "validate-future-document.py": "common/scripts/validate-future-document.py",
@@ -122,6 +127,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "decision-governance.py": "common/scripts/decision-governance.py",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "validate-future-document.py": "common/scripts/validate-future-document.py",
@@ -145,6 +151,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "decision-governance.py": "common/scripts/decision-governance.py",
       "pr-review-state.py": "common/scripts/pr-review-state.py",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
@@ -162,6 +169,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "decision-governance.py": "common/scripts/decision-governance.py",
       "pr-review-state.py": "common/scripts/pr-review-state.py",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
@@ -182,6 +190,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "decision-governance.py": "common/scripts/decision-governance.py",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "select-prioritized-task.py": "common/scripts/select-prioritized-task.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",

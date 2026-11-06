@@ -246,7 +246,7 @@ class Store:
             os.write(fd,dump({'pid':os.getpid(),'host':socket.gethostname()}).encode());os.close(fd)
             if (self.base/'installation/.install-lock').exists():raise WorkflowError('Installation lock exists; preserve the profile handoff')
             self.recover()
-            mutable=[self.future,self.state,self.base/'skill-tree.json',self.base/'history/task-outcomes.jsonl',*list((self.base/'history').rglob('*.json')),*list((self.base/'clarifications').glob('*.json'))]
+            mutable=[self.future,self.state,self.base/'skill-tree.json',self.base/'history/task-outcomes.jsonl',*list((self.base/'history').rglob('*.json')),*list((self.base/'clarifications').glob('*.json')),*list((self.base/'decisions').glob('*.json'))]
             self._write_hashes={p.relative_to(self.root).as_posix():file_hash(p) for p in mutable}
             yield
         finally:
@@ -1460,7 +1460,151 @@ def replay_events(store,payload):
 # Clarification state is independent of implementation run selection and admission.
 CLARIFICATION_STATES={'researching','awaiting-answers','revising','awaiting-confirmation','complete','blocked','cancelled'}
 CLARIFICATION_FIELDS={'title','goal','scope','exclusions','dependencies','acceptance','validation','required_plugin_policy','content'}
-CLARIFICATION_COMMANDS={'clarify-start','clarify-read','clarify-round','clarify-answer','clarify-revise','clarify-confirm','clarify-resume','clarify-cancel'}
+DECISION_COMMANDS={'decision-start','decision-read','decision-prepare','decision-record','decision-reconcile','decision-switch','decision-accept','decision-resume'}
+
+def decision_action(store,command,payload):
+    helper=decision_helper()
+    if command=='decision-read':return helper.read(store,payload.get('decision_id'))
+    if command not in DECISION_COMMANDS:raise WorkflowError('Unknown decision operation')
+    if command=='decision-start':context=payload.get('context',{})
+    else:context=payload.get('context') if command=='decision-resume' else helper.read(store,payload.get('decision_id'))['context']
+    class BoundStore:
+        def __getattr__(self,key):return getattr(store,key)
+        def guard(self):
+            if store.future.exists():
+                if not payload.get('expected_source_hash'):raise WorkflowError('Decision mutation requires the inspected existing queue source hash')
+                store.guard(payload['expected_source_hash'])
+            elif payload.get('expected_source_hash') is not None:raise WorkflowError('Decision queue context changed; reread the project')
+        @contextmanager
+        def lock(self):
+            with store.lock():
+                self.guard();decision_context_guard(store,context,allow_stale=command=='decision-reconcile')
+                if context.get('session_id') and command!='decision-reconcile':
+                    session=clarification_read(store,context['session_id'])
+                    if session['state']=='cancelled':raise WorkflowError('Cancelled clarification permits only original-attempt reconciliation')
+                    current=None if command=='decision-start' else helper.read(store,payload['decision_id'])
+                    mode=payload.get('mode') if current is None else current['mode']
+                    if mode!=clarification_decision_mode(session):raise WorkflowError('Decision mode differs from the current clarification mode')
+                    if command=='decision-switch' and (payload.get('mode',mode)!=mode or payload.get('authority',session.get('decision_authority'))!=session.get('decision_authority')):raise WorkflowError('Switch the clarification mode and authority through the guarded parent session')
+                    authority=payload.get('authority') if current is None else current['authority']
+                    if authority!=session.get('decision_authority'):raise WorkflowError('Decision authority differs from the current clarification grant')
+                    executor=payload.get('executor') if current is None else payload.get('executor',current['executor'])
+                    if mode=='auto' and executor!=session.get('decision_executor'):raise WorkflowError('Decision executor differs from the actual clarification executor')
+                    question=clarification_decision_question(session,context['purpose'],context.get('question_id'))
+                    candidate=payload.get('question') if command in {'decision-start','decision-resume'} and 'question' in payload else current['question']
+                    if not isinstance(candidate,dict):raise WorkflowError('Decision question requires a structured current definition')
+                    if any(candidate.get(key)!=value for key,value in question.items()):raise WorkflowError('Decision question differs from the current clarification question or acceptance purpose')
+                yield
+        def commit(self,writes):
+            self.guard();decision_context_guard(store,context,allow_stale=command=='decision-reconcile');return store.commit(writes)
+    try:
+        bound=BoundStore()
+        return helper.start(bound,payload) if command=='decision-start' else helper.mutate(bound,command,payload)
+    except helper.DecisionError as error:raise WorkflowError(str(error)) from error
+
+def decision_helper():
+    spec=importlib.util.spec_from_file_location('skill_tree_decision_governance',Path(__file__).with_name('decision-governance.py'))
+    helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper);return helper
+
+def decision_context_guard(store,context,allow_stale=False):
+    try:decision_helper().validate_context(context)
+    except ValueError as error:raise WorkflowError(str(error)) from error
+    # Cleanup closes an existing guarded original attempt and supplies no
+    # answer/acceptance. Completion or removal of its former scope cannot strand
+    # that attempt; ordinary decision mutations still require live scope below.
+    if allow_stale:return
+    kind=context.get('kind')
+    if kind in {'task','task-group','pending'}:
+        selectors=context.get('pending_ids',[]) if kind=='pending' else context.get('task_ids',[])
+        if not selectors:raise WorkflowError('Task and Pending decisions require actual selected identities')
+        selected=resolve(parse(store.text()),selectors,'Pending Queue' if kind=='pending' else 'Prioritized Next Changes')
+        if kind!='pending' and set(context.get('pending_ids',[]))-{pending for task in selected for pending in task['parent_pending_ids']}:raise WorkflowError('Decision Pending provenance differs from the selected tasks')
+    if kind=='controller':
+        if not store.future.is_file() or not store.state.is_file():raise WorkflowError('A controller decision requires an existing recorded run')
+        state=Store(store.root,allow_unselected=True,route_queue=False,neutral=True).load()
+        runs=dict(state.get('run_registry',{}).get('runs',{}))
+        if state.get('active_run'):runs[state['active_run']['id']]=state['active_run']
+        run=runs.get(context.get('run_id'))
+        if not run:raise WorkflowError('Controller decision identity is not a recorded run')
+        if set(context.get('task_ids',[]))-set(run.get('admitted_task_ids',run.get('snapshot',[]))+run.get('required_ids',[])):raise WorkflowError('Decision scope exceeds the recorded controller scope')
+    if context.get('session_id'):
+        session=clarification_read(store,context['session_id'])
+        current=clarification_decision_context(session,context.get('purpose'),context.get('question_id') if context.get('purpose')=='answer' else None)
+        if context!=current:raise WorkflowError('Decision context differs from the current clarification question, semantics or mode epoch')
+
+def clarification_decision_mode(record):
+    mode=record.get('decision_mode','manual')
+    if mode not in {'auto','manual'}:raise WorkflowError('Unknown clarification decision mode')
+    return mode
+
+def clarification_decision_context(record,purpose,question_id=None):
+    if purpose not in {'answer','confirmation'}:raise WorkflowError('Unknown clarification decision purpose')
+    identity={'kind':'task' if len(record['task_ids'])==1 else 'task-group','id':'task-scope:'+','.join(record['task_ids']),'task_ids':record['task_ids'],'session_id':record['id'],'purpose':purpose,'parent_mode_epoch':record.get('decision_mode_epoch',0)}
+    if purpose=='answer':
+        question=record['questions'].get(question_id)
+        if not question:raise WorkflowError('Decision requires a current clarification question')
+        identity.update(question_id=question_id,question_revision=question['revision'])
+        semantics={tid:{field:record['baselines'][tid]['fields'][field] for field in fields} for tid,fields in question['bindings'].items()}
+    else:
+        identity.update(question_id='final-confirmation',question_revision=1)
+        semantics=record['semantic_fingerprints']
+    semantic=digest(dump({'identity':identity,'mode':clarification_decision_mode(record),'semantics':semantics}).encode())
+    content=digest(dump({'identity':identity,'content':{tid:b['content_hash'] for tid,b in record['baselines'].items()}}).encode())
+    return {**identity,'semantic_fingerprint':semantic,'content_fingerprint':content}
+
+def clarification_decision_question(record,purpose,question_id=None):
+    if purpose=='confirmation':return {'id':'final-confirmation','kind':'specification-acceptance','text':'Accept the current selected task specification.'}
+    question=record['questions'].get(question_id)
+    if purpose!='answer' or not question:raise WorkflowError('Unknown clarification decision question')
+    return {'id':question_id,'kind':question.get('decision_kind','technical'),'text':question['text']}
+
+def clarification_decision_policy(record,payload):
+    mode=payload.get('decision_mode','manual')
+    if mode not in {'auto','manual'}:raise WorkflowError('Unknown clarification decision mode')
+    authority=payload.get('decision_authority')
+    if mode=='auto' and not authority:raise WorkflowError('Auto clarification requires an explicit bounded owner grant')
+    if authority is not None:
+        try:authority=decision_helper().validate_authority(authority,clarification_decision_context(record,'confirmation'),mode)
+        except ValueError as error:raise WorkflowError(str(error)) from error
+    executor=payload.get('decision_executor')
+    if mode=='auto' and (not isinstance(executor,dict) or set(executor)!={'id','context_id'} or any(not isinstance(v,str) or not v.strip() for v in executor.values())):raise WorkflowError('Auto clarification requires the actual executor identity and context')
+    return {'decision_mode':mode,'decision_authority':authority,'decision_executor':executor}
+
+def clarification_answer_evidence(store,record,payload,purpose,question_id=None):
+    reference=payload.get('decision_receipt')
+    mode=clarification_decision_mode(record)
+    if reference is None:
+        if mode!='manual':raise WorkflowError('Auto clarification requires a current delegated decision receipt')
+        return clarification_evidence(payload.get('evidence')),None
+    if not isinstance(reference,dict):raise WorkflowError('Decision receipt requires a decision ID and acceptance digest')
+    reference={key:reference.get(key) for key in ['decision_id','acceptance_digest']}
+    helper=decision_helper();context=clarification_decision_context(record,purpose,question_id)
+    if not record.get('decision_authority'):raise WorkflowError('A decision receipt requires the frozen clarification authority')
+    expected={'context':context,'mode':mode,'kind':clarification_decision_question(record,purpose,question_id)['kind']}
+    # The helper owns the grant digest representation; compare the actual frozen
+    # authority as well as the validated helper acceptance identity.
+    try:
+        decision=helper.read(store,reference.get('decision_id'))
+        if decision.get('authority')!=record['decision_authority']:raise WorkflowError('Decision receipt uses another authority grant')
+        question=clarification_decision_question(record,purpose,question_id)
+        if any(decision.get('question',{}).get(key)!=value for key,value in question.items()):raise WorkflowError('Decision receipt answers another clarification question')
+        expected['authority_digest']=decision['authority_digest']
+        accepted=helper.acceptance_reference(store,reference,expected)
+        if not isinstance(accepted,dict) or not isinstance(accepted.get('origin'),dict):raise WorkflowError('Decision acceptance lacks actual producer evidence')
+    except (ValueError,AttributeError,KeyError) as error:raise WorkflowError('Invalid current clarification decision receipt: '+str(error)) from error
+    if purpose=='answer':
+        option=next((item for item in decision['question']['options'] if item['id']==accepted.get('answer')),None)
+        if not option or payload.get('answer') not in {option['id'],option['text']}:raise WorkflowError('Clarification answer differs from the actual accepted decision')
+    return accepted['origin'],{'decision_id':reference['decision_id'],'acceptance_digest':reference['acceptance_digest'],'mode':mode,'parent_mode_epoch':record.get('decision_mode_epoch',0),'acceptance':accepted}
+
+def clarification_pending_decisions(store,record):
+    helper=decision_helper();pending=[]
+    for path in (store.base/'decisions').glob('dg-*.json'):
+        decision=helper.read(store,'DG-'+path.stem[3:])
+        if decision.get('context',{}).get('session_id')==record['id'] and decision.get('active_attempt_id'):pending.append(decision['id'])
+    return pending
+
+CLARIFICATION_COMMANDS={'clarify-start','clarify-read','clarify-round','clarify-answer','clarify-revise','clarify-confirm','clarify-resume','clarify-cancel','clarify-switch-mode'}
 
 def clarification_path(store,session_id):
     if not valid_id(session_id,'CL'):raise WorkflowError('Clarification requires an exact CL- identity')
@@ -1561,13 +1705,26 @@ def clarification_admission(store,task_id):
             else:
                 # Successful guarded completion removes the definition; immutable history retains acceptance.
                 fresh=fresh and tid in done and done[tid]['recorded_at']>=(record.get('confirmation') or {}).get('recorded_at','')
-        if record['state']=='complete' and fresh:
+        if record['state']=='complete' and fresh and clarification_acceptance_current(store,record):
             if record['mode']=='required-interview':satisfied.append(record)
             continue
         if record['mode']=='required-interview':required.append(record)
         elif record['state']!='cancelled':raise WorkflowError('Selected task has an open or stale clarification hold: '+record['id'])
     if required and not all(any(set(old['task_ids']).issubset(set(done['task_ids'])) and done['created_at']>=old['created_at'] for done in satisfied) for old in required):
         raise WorkflowError('Selected task has an unsatisfied required interview hold: '+required[0]['id'])
+
+def clarification_acceptance_current(store,record):
+    confirmation=record.get('confirmation')
+    if not confirmation:return False
+    if 'decision_mode' in record and (confirmation.get('decision_mode')!=clarification_decision_mode(record) or confirmation.get('decision_mode_epoch')!=record.get('decision_mode_epoch',0)):return False
+    try:
+        clarification_answer_evidence(store,record,{'evidence':confirmation.get('evidence'),'decision_receipt':confirmation.get('decision_receipt')},'confirmation')
+        for key,answer in record['answers'].items():
+            reference=answer.get('decision_receipt')
+            if answer.get('valid') and reference and reference.get('parent_mode_epoch')==record.get('decision_mode_epoch',0):
+                clarification_answer_evidence(store,record,{'answer':answer['answer'],'decision_receipt':reference},'answer',key)
+    except (ValueError,KeyError,TypeError):return False
+    return True
 
 def clarification_evidence(value):
     if not isinstance(value,dict) or set(value)!={'kind','reference'} or value['kind'] not in {'owner-message','submitted-answer'} or not isinstance(value['reference'],str) or not value['reference'].strip():
@@ -1606,6 +1763,7 @@ def clarification_start(store,payload):
             if old['state'] not in {'complete','cancelled'} and set(old['task_ids'])&{t['id'] for t in tasks}:raise WorkflowError('Selected task already has an open clarification session: '+old['id'])
         baselines=clarification_baselines(tasks)
         record={'schema':1,'id':identity('CL'),'revision':1,'mode':mode,'task_ids':[t['id'] for t in tasks],'state':'researching','source_hash':file_hash(store.future),'baselines':baselines,'semantic_fingerprints':clarification_fingerprints(baselines),'facts':{},'questions':{},'rounds':[],'answers':{},'task_revisions':[],'confirmation':None,'clarity':None,'no_progress_rounds':0,'next_action':'Research source facts and prepare the independent decision frontier','created_at':now()}
+        record.update(clarification_decision_policy(record,payload));record['decision_mode_epoch']=0;record['decision_mode_history']=[]
         store.guard(payload['expected_source_hash'])
         return clarification_write(store,record)
 
@@ -1623,6 +1781,9 @@ def clarification_questions(record,specs):
             if not isinstance(fields,list) or not fields or len(set(fields))!=len(fields) or not set(fields).issubset(CLARIFICATION_FIELDS):raise WorkflowError('Question bindings require explicit semantic fields')
         if not isinstance(prerequisites,list) or any(not isinstance(v,str) for v in prerequisites) or len(set(prerequisites))!=len(prerequisites) or key in prerequisites:raise WorkflowError('Invalid question prerequisites')
         question={field:deepcopy(spec[field]) for field in ['id','text','recommendation','bindings']};question.update(prerequisites=prerequisites,required=spec.get('required',True))
+        if 'decision_kind' in spec:
+            if spec['decision_kind'] not in {'product','technical'}:raise WorkflowError('Clarification question requires a bounded product or technical decision kind')
+            question['decision_kind']=spec['decision_kind']
         if type(question['required']) is not bool:raise WorkflowError('Question required flag requires a boolean')
         old=record['questions'].get(key);definition={k:v for k,v in (old or {}).items() if k!='revision'}
         question['revision']=(old['revision']+(question!=definition)) if old else 1
@@ -1667,15 +1828,16 @@ def clarification_round(store,record,payload):
     record['no_progress_rounds']=record['no_progress_rounds']+1 if record.get('progress_signature')==progress else 0
     record['progress_signature']=progress
     round_record={'id':identity('CR'),'question_ids':frontier,'question_revisions':{key:record['questions'][key]['revision'] for key in frontier},'source_hash':file_hash(store.future),'semantic_fingerprints':record['semantic_fingerprints']}
+    if 'decision_mode' in record:round_record['decision_mode_epoch']=record.get('decision_mode_epoch',0)
     record['rounds'].append(round_record)
     checked=record.get('clarity')
     record['stale_facts']=clarification_stale_facts(store,record)
     if record['stale_facts']:record.update(state='blocked',clarity=None,confirmation=None,next_action='Research changed or unavailable source facts in the original execution checkout: '+', '.join(record['stale_facts']))
     elif record['no_progress_rounds']>=2:record.update(state='blocked',next_action='Resolve the unchanged decision or source-research prerequisite before another round')
-    elif frontier:record.update(state='awaiting-answers',next_action='Present every independent question with its recommendation and wait for actual owner answers')
+    elif frontier:record.update(state='awaiting-answers',next_action='Prepare bounded independent delegated decisions for the current question frontier' if clarification_decision_mode(record)=='auto' else 'Present every independent question with its recommendation and wait for actual owner answers')
     elif unresolved:record.update(state='blocked',next_action='Resolve unsettled question prerequisites')
     elif checked and checked['semantic_fingerprints']==record['semantic_fingerprints'] and all(value is True for key,value in checked['assessment'].items() if key!='evidence'):
-        record.update(state='awaiting-confirmation',next_action='Present the current selected task summary and request explicit shared-understanding confirmation')
+        record.update(state='awaiting-confirmation',next_action='Obtain current delegated specification acceptance under the frozen authority' if clarification_decision_mode(record)=='auto' else 'Present the current selected task summary and request explicit shared-understanding confirmation')
     else:record.update(state='researching',next_action='Research remaining facts and record a complete clarity recheck')
 
 def clarification_revise(store,record,payload):
@@ -1733,25 +1895,40 @@ def clarification_mutate(store,command,payload):
         elif command=='clarify-answer':
             key=payload.get('question_id');question=record['questions'].get(key);round_record=next((r for r in record['rounds'] if r['id']==payload.get('round_id')),None)
             if not question or not round_record or key not in round_record['question_ids'] or payload.get('question_revision')!=question['revision'] or round_record['question_revisions'][key]!=question['revision']:raise WorkflowError('Answer does not match the session round and question revision')
+            if round_record.get('decision_mode_epoch',0)!=record.get('decision_mode_epoch',0):raise WorkflowError('Answer belongs to a previous decision mode epoch')
             if not isinstance(payload.get('answer'),str) or not payload['answer'].strip():raise WorkflowError('Actual submitted owner answer is required')
-            evidence=clarification_evidence(payload.get('evidence'))
+            evidence,decision_receipt=clarification_answer_evidence(store,record,payload,'answer',key)
             answer={'round_id':round_record['id'],'question_revision':question['revision'],'answer':payload['answer'],'evidence':evidence,'valid':True}
+            if decision_receipt is not None:answer['decision_receipt']=decision_receipt
             old=record['answers'].get(key)
             if old and old['valid'] and old['round_id']==round_record['id']:
                 if old!=answer:raise WorkflowError('Conflicting replay of the original owner answer')
                 return record
             if any(round_record['semantic_fingerprints'].get(tid)!=record['semantic_fingerprints'][tid] for tid in question['bindings']):raise WorkflowError('Question task context changed; prepare a current round before another owner answer')
             if round_record!=record['rounds'][-1] or any(not record['answers'].get(p,{}).get('valid') for p in question['prerequisites']):raise WorkflowError('Answer round is stale or its prerequisites remain unsettled')
+            if old:record.setdefault('answer_history',[]).append({'question_id':key,**deepcopy(old)})
             record['answers'][key]=answer;record.update(state='revising',clarity=None,confirmation=None,next_action='Apply accepted decisions to the selected tasks and recheck the decision frontier')
         elif command=='clarify-revise':writes=clarification_revise(store,record,payload)
         elif command=='clarify-confirm':
             if clarification_stale_facts(store,record):raise WorkflowError('Source facts changed after research; resume and recheck before confirmation')
             if record['state']!='awaiting-confirmation' or payload.get('task_ids')!=record['task_ids'] or payload.get('semantic_fingerprints')!=record['semantic_fingerprints']:raise WorkflowError('Confirmation must match the current exact scope and semantic task fingerprints after clarity recheck')
-            evidence=clarification_evidence(payload.get('evidence'))
+            evidence,decision_receipt=clarification_answer_evidence(store,record,payload,'confirmation')
             record['confirmation']={'task_ids':record['task_ids'],'semantic_fingerprints':record['semantic_fingerprints'],'evidence':evidence,'recorded_at':now()}
+            if 'decision_mode' in record:record['confirmation'].update(decision_mode=clarification_decision_mode(record),decision_mode_epoch=record.get('decision_mode_epoch',0))
+            if decision_receipt is not None:record['confirmation']['decision_receipt']=decision_receipt
             record.update(state='complete',next_action='Report clarification acceptance; wait for a separate implementation instruction')
+        elif command=='clarify-switch-mode':
+            evidence=clarification_evidence(payload.get('evidence'))
+            policy=clarification_decision_policy(record,payload)
+            previous={key:record.get(key,'manual' if key=='decision_mode' else None) for key in policy}
+            if policy==previous:return record
+            if clarification_pending_decisions(store,record):raise WorkflowError('Reconcile or cancel the original pending delegated decision before switching mode')
+            record.setdefault('decision_mode_history',[]).append({'previous_policy':previous,'previous_epoch':record.get('decision_mode_epoch',0),'previous_confirmation':deepcopy(record.get('confirmation')),'evidence':evidence,'recorded_at':now()})
+            record.update(policy);record['decision_mode_epoch']=record.get('decision_mode_epoch',0)+1
+            record.update(state='researching',confirmation=None,clarity=None,next_action='Recheck current clarity and obtain acceptance under the explicitly selected mode and authority')
         elif command=='clarify-cancel':
             if not isinstance(payload.get('reason'),str) or not payload['reason'].strip():raise WorkflowError('Cancellation requires an explicit reason')
+            if clarification_pending_decisions(store,record):raise WorkflowError('Reconcile or cancel original pending delegated decisions before cancelling clarification')
             record.update(state='cancelled',cancellation={'reason':payload['reason'],'recorded_at':now()},next_action='Report cancelled discussion and any unsatisfied required interview obligation')
         record['revision']+=1
         if command!='clarify-revise':record['source_hash']=file_hash(store.future)
@@ -1760,13 +1937,17 @@ def clarification_mutate(store,command,payload):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|{'refresh','manifest','index','read','select','pending','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|{'refresh','manifest','index','read','select','pending','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     args=parser.parse_args(argv)
     try:
         store=Store(args.root,args.run_id,allow_unselected=args.command in {'index','runs','manifest','start','workspace-setup','recover-locator'},route_queue=args.command!='recover-locator');payload=json.loads(args.input.read_text()) if args.input else {}
         if args.expected_source_hash:payload['expected_source_hash']=args.expected_source_hash
         cmd=args.command
-        if cmd in CLARIFICATION_COMMANDS:
+        if cmd in DECISION_COMMANDS:
+            store=Store(args.root,allow_unselected=True,neutral=True)
+            if args.id:payload['decision_id']=args.id
+            result=decision_action(store,cmd,payload)
+        elif cmd in CLARIFICATION_COMMANDS:
             # Canonical routing only: no checkpoint load or implicit implementation-run selection.
             store=Store(args.root,allow_unselected=True,neutral=True)
             if cmd=='clarify-start':result=clarification_start(store,payload)

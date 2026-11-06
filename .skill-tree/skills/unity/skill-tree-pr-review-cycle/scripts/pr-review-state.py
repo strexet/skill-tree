@@ -90,6 +90,24 @@ def identity(snapshot):
 def review_key(snapshot):
     return digest({key:snapshot.get(key) for key in ['head','base_oid','target_branch','changed_files','threads','reviews','comments','checks','checks_known','required_checks_missing','approvals_known','approvals_required','approved']})
 
+def decision_context(snapshot,purpose='finding-resolution'):
+    if not isinstance(purpose,str) or not re.fullmatch(r'[a-z][a-z0-9-]*',purpose):raise ReviewError('Review decision requires an exact bounded purpose')
+    scope={key:snapshot.get(key) for key in ['repo_id','remote','remote_id','source_branch','target_branch','head','base_oid']}
+    semantic=digest({'scope':scope,'review_key':review_key(snapshot),'purpose':purpose})
+    return {'kind':'review','id':'review:'+digest(scope),'head':snapshot.get('head'),'base_oid':snapshot.get('base_oid'),'target_branch':snapshot.get('target_branch'),'purpose':purpose,'semantic_fingerprint':semantic,'content_fingerprint':digest(snapshot)}
+
+def decision_acceptance(store,record,snapshot,reference,expected):
+    if record.get('identity')!=identity(snapshot):raise ReviewError('Decision requires the current review repository, head, base and target')
+    if expected.get('kind') not in {'technical','product','specification-acceptance'}:raise ReviewError('Delegated review decisions cannot replace publication authority, checks or external approval')
+    purpose=expected.get('context',{}).get('purpose','finding-resolution')
+    spec=importlib.util.spec_from_file_location('review_decision_governance',Path(__file__).with_name('decision-governance.py'))
+    helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper)
+    try:accepted=helper.acceptance_reference(store,reference,{**expected,'context':decision_context(snapshot,purpose)})
+    except ValueError as error:raise ReviewError(str(error)) from error
+    result=deepcopy(record);receipts=result.setdefault('decision_receipts',[])
+    if accepted not in receipts:receipts.append(deepcopy(accepted))
+    return result
+
 def reconcile(record,snapshot):
     record=deepcopy(record)
     for key in ['repo_id','remote','remote_id','source_branch']:

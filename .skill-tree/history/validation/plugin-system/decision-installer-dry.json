@@ -1,0 +1,5 @@
+{
+  "exit_code": 0,
+  "scope": "Offline all-provider general temporary-target installation dry-run; no source acquisition or host invocation.",
+  "output_sha256": "cded3be3b826c026ecde7135f349ec45f222bafc5e5420187aa1e8d64d322d5e"
+}

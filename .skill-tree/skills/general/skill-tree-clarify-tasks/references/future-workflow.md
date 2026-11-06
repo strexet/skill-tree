@@ -26,11 +26,13 @@ An active checkpoint alone supplies no instruction to resume implementation afte
 
 ## Explicit task clarification contract
 
-An owner-invoked task/group interview uses exact selected Prioritized identities, researched source facts and dependent question rounds. The agent presents the current independent frontier with numbered questions and recommendations, waits for actual submitted answers, revises affected tasks and rechecks clarity. Silence and displayed defaults supply no answers. Explicit clarification requires no plugin engine or implementation run.
+An owner-invoked task/group interview uses exact selected Prioritized identities, researched source facts and dependent question rounds. The agent presents the current independent frontier with numbered questions and recommendations, obtains actual current-mode answers, revises affected tasks and rechecks clarity. Manual waits for actual owner submissions. Explicit Auto state consumes bounded delegated decision references with actual origin retained. Silence and displayed defaults supply no answers. Explicit clarification requires no plugin engine or implementation run.
 
 The [metadata contract](workflow-metadata.md#task-clarification-contract) owns the planned controller interface and session guards. Separate canonical session files preserve scope and round state without implicitly selecting a parked implementation run. Task revisions preserve identities, provenance, optional validation headers and unrelated progress through guarded owned transactions.
 
-Full queue/session bytes guard writes; separate semantic task identity guards confirmation. Semantic changes reopen affected answers and final confirmation while retaining unrelated answers. Formatting-only changes preserve confirmation. Completion requires an empty decision frontier, concrete task/acceptance/validation definitions and actual owner confirmation of the current summary. Completion never starts implementation. Required interview holds and source drift remain explicit across interruption, resume and cancellation.
+Full queue/session bytes guard writes; separate semantic task identity guards confirmation. Semantic changes reopen affected answers and final confirmation while retaining unrelated answers. Formatting-only changes preserve confirmation. Completion requires an empty decision frontier, concrete task/acceptance/validation definitions and current mode-specific acceptance: actual owner confirmation in Manual or a separate current bounded specification decision in Auto. Explicit switching preserves history, reconciles original pending actors and requires new current-mode acceptance. Completion never starts implementation. Required interview holds and source drift remain explicit across interruption, resume and cancellation.
+
+The compatible state interface retains Manual defaults and legacy owner history. Default-Auto operation routing requires qualified core orchestration and an owned installed snapshot; state-schema availability alone never activates actors. Installation consent, publication authority, required checks and external approvals remain separate obligations.
 
 ## Implement Next
 
