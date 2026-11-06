@@ -25,6 +25,9 @@ Options:
   --with-init                   Add marker-fenced instruction bridge
   --dry-run                     Print plan without writes or network
   --list                        List providers and skills
+  --list-plugins                Inspect installed plugins without setup or dispatch
+  --json                        Emit the plugin inventory as JSON
+  --group-by plugin|point       Group the human plugin inventory (default: plugin)
   --force                       Retain ownership checks; never discard local modifications
   --uninstall                   Remove selected skills and optional bridge blocks
   --verify                      Verify installed files without writing
@@ -62,6 +65,9 @@ function parseArgs(argv) {
     withInit: false,
     dryRun: false,
     list: false,
+    listPlugins: false,
+    json: false,
+    groupBy: null,
     force: false,
     uninstall: false,
     verify: false,
@@ -95,6 +101,19 @@ function parseArgs(argv) {
     else if (token === "--with-init") args.withInit = true;
     else if (token === "--dry-run") args.dryRun = true;
     else if (token === "--list") args.list = true;
+    else if (token === "--list-plugins") {
+      if (args.listPlugins) throw new Error("--list-plugins cannot repeat");
+      args.listPlugins = true;
+    }
+    else if (token === "--json") {
+      if (args.json) throw new Error("--json cannot repeat");
+      args.json = true;
+    }
+    else if (token === "--group-by") {
+      if (args.groupBy !== null) throw new Error("--group-by cannot repeat");
+      args.groupBy = next();
+      if (!["plugin", "point"].includes(args.groupBy)) throw new Error("--group-by requires plugin or point");
+    }
     else if (token === "--force") args.force = true;
     else if (token === "--uninstall") args.uninstall = true;
     else if (token === "--verify") args.verify = true;
@@ -106,6 +125,10 @@ function parseArgs(argv) {
   if (args.global && args.project) throw new Error("--global and --project are mutually exclusive");
   if (args.copy && args.symlink) throw new Error("--copy and --symlink are mutually exclusive");
   if (args.uninstall && args.verify) throw new Error("--uninstall and --verify are mutually exclusive");
+  if (!args.listPlugins && (args.json || args.groupBy !== null)) throw new Error("--json and --group-by require --list-plugins");
+  if (args.listPlugins && (args.list || args.flavor || args.all || args.only.length || args.agent.length || args.skills.length || args.global || args.source || args.copy || args.symlink || args.withInit || args.dryRun || args.force || args.uninstall || args.verify)) {
+    throw new Error("--list-plugins is a read-only operation and cannot be mixed with installation or provider options");
+  }
   return args;
 }
 
@@ -251,6 +274,15 @@ async function main(argv = process.argv.slice(2)) {
   try {
     const args=parseArgs(argv);
     if(args.help){console.log(usage());return 0;}
+    if(args.listPlugins){
+      if(!args.target)throw Error("Select the inspected project explicitly with --target <repository>");
+      const target=fs.realpathSync(path.resolve(args.target));
+      if(!fs.statSync(target).isDirectory())throw Error("Target must be a project directory");
+      const listArgs=["--list-plugins"];
+      if(args.json)listArgs.push("--json");
+      if(args.groupBy!==null)listArgs.push("--group-by",args.groupBy);
+      return await require(path.join(REPO_ROOT,"lib/plugins.js")).listMain(target,listArgs,{source:REPO_ROOT});
+    }
     const matrix=loadProviders();
     if(args.list){printList(matrix);return 0;}
     if(args.global||args.symlink||args.agent.length||!isLocalSource(args.source)) throw Error("Project specialization supports local project-scoped copy installation; global, symlink and uncomposed upstream paths are unsupported. Use --target <project> --flavor general|web|unity --copy.");

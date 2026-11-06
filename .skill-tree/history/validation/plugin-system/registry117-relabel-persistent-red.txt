@@ -1,0 +1,27 @@
+TAP version 13
+# Subtest: removal applies only matching target digest and still-current registry consent
+not ok 1 - removal applies only matching target digest and still-current registry consent
+  ---
+  duration_ms: 878.474291
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-management.js:50:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception: A matching digest cannot authorize a falsely labelled management operation'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    rejectsRelabel (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-management.js:50:739)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-management.js:50:1070)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 962.02675

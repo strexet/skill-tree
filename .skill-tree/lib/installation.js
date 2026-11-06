@@ -78,11 +78,11 @@ function hookCanonicalDocument(raw){
  }
  const result=value(0);space();if(at!==raw.length)throw Error('Malformed invocation JSON suffix');return result;
 }
-function pendingHookOperation(root){
+function readHookRecords(root){
  const owner=queueRoot(root),directory=c.safe(owner,'.skill-tree/invocations');
- if(!fs.existsSync(directory))return false;
+ if(!fs.existsSync(directory))return [];
  if(!fs.lstatSync(directory).isDirectory())throw Error('Malformed invocation metadata directory; explicit recovery required');
- let pending=false;
+ const records=[];
  for(const name of fs.readdirSync(directory).sort()){
   if(!/^hc-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}\.json$/.test(name))throw Error('Unknown invocation metadata; explicit recovery required');
   const file=c.safe(owner,'.skill-tree/invocations/'+name);let record;
@@ -91,14 +91,16 @@ function pendingHookOperation(root){
   if(c.hash(hookCanonicalDocument(raw))!==record.chain_hash)throw Error('Invocation metadata checksum changed; explicit recovery required');
   for(const attempt of Object.values(record.attempts)){
    if(!attempt||!['prepared','invoking','unknown','returned','failed','unavailable','cancelled'].includes(attempt.status))throw Error('Malformed original invocation attempt; explicit recovery required');
-   if(['prepared','invoking','unknown'].includes(attempt.status))pending=true;
   }
   if(record.state==='superseded'){
    const id=record.superseded_by;if(typeof id!=='string'||!/^HC-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(id)||!fs.existsSync(c.safe(owner,'.skill-tree/invocations/'+id.toLowerCase()+'.json')))throw Error('Missing invocation replacement; explicit recovery required');
   }
+  records.push(record);
  }
- return pending;
+ return records;
 }
+function pendingHookOperation(root){return readHookRecords(root).some(record=>Object.values(record.attempts).some(attempt=>['prepared','invoking','unknown'].includes(attempt.status)));}
+
 function hasActiveOperation(root){
  if(pendingHookOperation(root))return true;
  const state=workflowState(root);if(!state)return false;
@@ -311,6 +313,7 @@ function rebind(root,source){
 }
 function localMain(root,source,args){
  try{
+  if(args.includes('--list-plugins'))return require('./plugins.js').listMain(root,args,{source});
   if(args.some(a=>!['--refresh-profile','--dry-run','--verify','--recover','--rollback','--rebind'].includes(a)))throw Error('Usage: manager.js --refresh-profile [--dry-run] | --verify | --recover | --rollback | --rebind');
   const operations=args.filter(a=>a!=='--dry-run');
   if(operations.length!==1||args.filter(a=>a==='--dry-run').length>1||args.includes('--dry-run')&&operations[0]!=='--refresh-profile')throw Error('Select exactly one manager operation; --dry-run applies only to --refresh-profile');
@@ -322,4 +325,4 @@ function localMain(root,source,args){
   const result=refresh(root,source,args.includes('--dry-run'));console.log(c.json({action:result.action,changed:result.delta,facts:result.profile.facts,gaps:result.profile.gaps}));return 0;
  }catch(error){console.error(error.message);return 2;}
 }
-module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,pendingHookOperation,stoppedWorkflow,plan,install,verify,uninstall,refresh,rollback,rebind,localMain};
+module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,readHookRecords,pendingHookOperation,stoppedWorkflow,plan,install,verify,uninstall,refresh,rollback,rebind,localMain};

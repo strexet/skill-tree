@@ -1,0 +1,40 @@
+TAP version 13
+# Subtest: frozen target associations and corrupt HC records remain explicit without claiming readiness
+not ok 1 - frozen target associations and corrupt HC records remain explicit without claiming readiness
+  ---
+  duration_ms: 1232.813541
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-management.js:54:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Foreign or unassociated executions cannot be reported as affected on the current target
+    + actual - expected
+    
+      [
+    +   'HC-03a309ef-6e93-50e4-8bb8-65e3be541cc7',
+    +   'HC-b1461ae7-b5cf-5523-b381-b1ba6ada876b',
+        'HC-dd20e334-dd64-533e-a0de-8e7ea9b6d7cd'
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'HC-dd20e334-dd64-533e-a0de-8e7ea9b6d7cd'
+  actual:
+    0: 'HC-03a309ef-6e93-50e4-8bb8-65e3be541cc7'
+    1: 'HC-b1461ae7-b5cf-5523-b381-b1ba6ada876b'
+    2: 'HC-dd20e334-dd64-533e-a0de-8e7ea9b6d7cd'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-management.js:54:868)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1316.469708

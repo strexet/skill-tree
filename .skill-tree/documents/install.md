@@ -40,6 +40,23 @@ Resolved package capabilities use supported npm lockfile 2/3 or Unity package-lo
 
 Provider references protect shared discovery destinations such as `.agents/skills`. Removing one provider retains a package or bridge still referenced by another provider. Verification includes deterministic recomposition from the owned bundle, resolved facts, package identities and complete inventories. Installer output reports profile/environment identities, input fingerprints, package identities/provider references and validation policy.
 
+## Installed plugin inventory
+
+The source installer and installed manager expose offline installed-plugin views without flavor/provider selection, Future initialization, source acquisition or plugin dispatch. Human output groups the current occurrences by plugin or integration point; JSON includes the full installed and point projections.
+
+```sh
+node .skill-tree/bin/install.js --list-plugins --target . --json
+node .skill-tree/bin/install.js --list-plugins --target . --group-by point
+node .skill-tree/installation/manager.js --list-plugins --json
+node .skill-tree/installation/manager.js --list-plugins --group-by plugin
+```
+
+The inventory retains source/revision/content identities, owned destinations, dependencies, recorded adapter/capability state and every ordered occurrence. Global and per-point positions use one-based numbering. Repeated package references retain separate IDs, conditions, enabled states, reference-level parameters and extra instructions. Enabled configuration supplies no successful invocation evidence.
+
+Readable resource drift remains visible with diagnostics. Opaque or foreign ownership remains unavailable without recovery or adoption. Exit codes are zero for a healthy view, one for readable drift and two for unavailable state or invalid arguments. The list route rejects installation-option mixtures; JSON and grouping options require the list route.
+
+Frozen HC requirements remain separate from current defaults. The view records chain state and verified, foreign or uncertain installation association without claiming readiness. Removal preserves frozen state and can expose missing requirements. Typed exact-ID preview/application APIs reside in the [management backend](plugin-management-contract.md#installed-inventory-and-exact-id-management); the dedicated management skill remains a later operation.
+
 ## External plugin installation design
 
 The current installer manages core Skill Tree operations and exposes no external-plugin setup flags. The approved [plugin installation interaction contract](plugin-installation-contract.md) defines the core-only default, optional initial/later setup, exact proposal consent, ordered repeated bindings and separate stage recovery for the corresponding implementation tasks. The design contract supplies no current acquisition or invocation capability.
