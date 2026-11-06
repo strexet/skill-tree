@@ -9,9 +9,41 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import uuid
 
-_spec=importlib.util.spec_from_file_location('pr_workspaces',Path(__file__).with_name('run-workspaces.py'))
-ws=importlib.util.module_from_spec(_spec);_spec.loader.exec_module(ws)
+def owned_module(name,path):
+    path=Path(path)
+    if path.is_symlink() or path.parent.is_symlink():raise ValueError('Owned Python helpers cannot use symlinks')
+    source=path.read_bytes();package_root=path.parent.parent;manifest_path=package_root/'references/plugin-bindings.json'
+    if manifest_path.exists() or (package_root/'SKILL.md').exists():
+        if not manifest_path.is_file() or manifest_path.is_symlink() or manifest_path.parent.is_symlink():raise ValueError('The owned package inventory is unavailable')
+        manifest=json.loads(manifest_path.read_text())
+        if not isinstance(manifest,dict):raise ValueError('The owned package inventory is invalid')
+        inventory=manifest.get('owned_resources')
+        if not isinstance(inventory,dict) or not inventory or path.relative_to(package_root).as_posix() not in inventory:raise ValueError('The owned package inventory does not contain the requested helper')
+        for relative,expected in inventory.items():
+            if not isinstance(relative,str) or not relative or relative.startswith(('/','\\')) or '\\' in relative or '\0' in relative or re.match(r'^[A-Za-z]:',relative) or any(part in {'','.','..'} for part in relative.split('/')) or not isinstance(expected,str) or re.fullmatch('[a-f0-9]{64}',expected) is None:raise ValueError('The owned package inventory has invalid resource metadata')
+            resource=package_root
+            for part in relative.split('/'):
+                resource=resource/part
+                if resource.is_symlink():raise ValueError('Owned package resources cannot use symlinks')
+            if not resource.is_file():raise ValueError('Owned package resource bytes differ: '+relative)
+            current=source if resource==path else resource.read_bytes()
+            if hashlib.sha256(current).hexdigest()!=expected:raise ValueError('Owned package resource bytes differ: '+relative)
+    spec=importlib.util.spec_from_file_location(name,path);module=importlib.util.module_from_spec(spec)
+    previous=(sys.pycache_prefix,sys.dont_write_bytecode)
+    prefix=path.parent/('.owned-source-'+uuid.uuid4().hex)
+    if prefix.exists():raise ValueError('A fresh source-only helper prefix is required')
+    try:
+        sys.pycache_prefix=str(prefix);sys.dont_write_bytecode=True
+        exec(compile(source,str(path),'exec'),module.__dict__)
+    finally:sys.pycache_prefix,sys.dont_write_bytecode=previous
+    return module
+
+try:ws=owned_module('pr_workspaces',Path(__file__).with_name('run-workspaces.py'))
+except (ValueError,OSError) as error:
+    if __name__!='__main__':raise
+    print(json.dumps({'ok':False,'error':str(error)},ensure_ascii=True,sort_keys=True));raise SystemExit(2)
 
 class ReviewError(ValueError):
     pass
@@ -100,8 +132,7 @@ def decision_acceptance(store,record,snapshot,reference,expected):
     if record.get('identity')!=identity(snapshot):raise ReviewError('Decision requires the current review repository, head, base and target')
     if expected.get('kind') not in {'technical','product','specification-acceptance'}:raise ReviewError('Delegated review decisions cannot replace publication authority, checks or external approval')
     purpose=expected.get('context',{}).get('purpose','finding-resolution')
-    spec=importlib.util.spec_from_file_location('review_decision_governance',Path(__file__).with_name('decision-governance.py'))
-    helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper)
+    helper=owned_module('review_decision_governance',Path(__file__).with_name('decision-governance.py'))
     try:accepted=helper.acceptance_reference(store,reference,{**expected,'context':decision_context(snapshot,purpose)})
     except ValueError as error:raise ReviewError(str(error)) from error
     result=deepcopy(record);receipts=result.setdefault('decision_receipts',[])
@@ -153,10 +184,35 @@ def reviewed(record,snapshot,payload):
     record['rounds']=record.get('rounds',[])+[deepcopy(record['review'])]
     return record
 
-def ready(record,snapshot):
+def hook_context(snapshot):
+    scope={key:snapshot.get(key) for key in ['repo_id','remote','remote_id','source_branch','target_branch']}
+    return {'kind':'review','id':'review-hook:'+digest(scope),'head':snapshot.get('head'),'base_oid':snapshot.get('base_oid'),'target_branch':snapshot.get('target_branch'),'semantic_fingerprint':digest({'scope':scope,'review_key':review_key(snapshot)}),'content_fingerprint':digest(snapshot)}
+
+def attach_hook_chain(store,record,snapshot,chain_id):
+    ws.validate_hook_references(record)
+    if record.get('identity')!=identity(snapshot):raise ReviewError('Hook attachment requires the exact current review snapshot')
+    engine=owned_module('review_plugin_invocation',Path(__file__).with_name('plugin-invocation.py'))
+    try:chain=engine.read(store,chain_id)
+    except ValueError as error:raise ReviewError(str(error)) from error
+    if chain['context']!=hook_context(snapshot):raise ReviewError('Hook chain belongs to another review scope or current head/base')
+    result=deepcopy(record);refs=result.setdefault('hook_chains',[])
+    if chain_id not in refs:refs.append(chain_id)
+    return result
+
+def hook_admission(store,record,snapshot):
+    if not record.get('hook_chains'):return
+    wf=owned_module('review_hook_workflow',Path(__file__).with_name('workflow-state.py'))
+    try:wf.hook_admission(store,scope=hook_context(snapshot),chain_ids=record['hook_chains'])
+    except (ValueError,OSError) as error:raise ReviewError('Current review hook obligations remain unresolved: '+str(error)) from error
+
+def ready(record,snapshot,*,store=None):
+    ws.validate_hook_references(record)
     record=reconcile(record,snapshot)
     if record['status']=='merged':return record
     if record['status']=='blocked':raise ReviewError(record['blocked_reason'])
+    if record.get('hook_chains'):
+        if store is None:raise ReviewError('Current hook readiness requires the live owned store')
+        hook_admission(store,record,snapshot)
     if not record.get('pr') or not record['pr'].get('id') or not record['pr'].get('url'):raise ReviewError('PR readiness requires the existing provider PR identity and URL')
     review=record.get('review')
     if not review or review['key']!=review_key(snapshot) or review['unresolved']:
@@ -170,8 +226,8 @@ def ready(record,snapshot):
     record['ci']='not-configured' if not checks else 'required-checks-passed'
     record['status']='pr-ready';return record
 
-def merge_gate(record,snapshot):
-    record=ready(record,snapshot)
+def merge_gate(record,snapshot,*,store=None):
+    record=ready(record,snapshot,store=store)
     if record['status']=='merged':return record
     authorization=record['authorization']
     if not authorization.get('merge') or not authorization.get('pr') or authorization.get('origin')!='owner':raise ReviewError('Merge lacks explicit owner authorization')
@@ -277,7 +333,7 @@ def local_fast_forward(root,target,remote):
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command',choices=['parameters','preflight','init','observe','review','ready','merge-gate','operation','block'])
+    parser.add_argument('command',choices=['parameters','preflight','init','observe','review','ready','merge-gate','operation','block','hook-attach'])
     parser.add_argument('root',type=Path);parser.add_argument('--input',type=Path,required=True);parser.add_argument('--publication-id')
     args=parser.parse_args(argv)
     try:
@@ -289,7 +345,7 @@ def main(argv=None):
             canonical=ws.canonical(root);snapshot=payload.get('snapshot',{})
             key=args.publication_id or digest({k:snapshot[k] for k in ['repo_id','remote','source_branch','target_branch']})[:32]
             if not re.fullmatch(r'[a-f0-9]{32}',key):raise ReviewError('Invalid publication ID')
-            spec=importlib.util.spec_from_file_location('pr_workflow',Path(__file__).with_name('workflow-state.py'));wf=importlib.util.module_from_spec(spec);spec.loader.exec_module(wf)
+            wf=owned_module('pr_workflow',Path(__file__).with_name('workflow-state.py'))
             store=wf.Store(canonical,allow_unselected=True)
             with ws.publication_lock(root,snapshot.get('remote','origin'),snapshot.get('target_branch',key)):
                 with store.lock():
@@ -306,8 +362,9 @@ def main(argv=None):
                         if not record:raise ReviewError('Initialize or select the existing publication record')
                         if args.command=='observe':result=reconcile(record,snapshot)
                         elif args.command=='review':result=reviewed(record,snapshot,payload['review'])
-                        elif args.command=='ready':result=ready(record,snapshot)
-                        elif args.command=='merge-gate':result=merge_gate(record,snapshot)
+                        elif args.command=='hook-attach':result=attach_hook_chain(store,record,snapshot,payload['chain_id'])
+                        elif args.command=='ready':result=ready(record,snapshot,store=store)
+                        elif args.command=='merge-gate':result=merge_gate(record,snapshot,store=store)
                         elif args.command=='block':
                             if not payload.get('reason'):raise ReviewError('Publication block requires the actual prerequisite or failure')
                             result=deepcopy(record);result['status']='blocked';result['blocked_reason']=payload['reason']

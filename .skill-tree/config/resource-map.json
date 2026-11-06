@@ -6,23 +6,57 @@
       "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "plugin-invocation.md": "common/references/plugin-invocation.md",
       "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
-      "workflow-metadata.md": "common/references/workflow-metadata.md",
-      "plugin-invocation.md": "common/references/plugin-invocation.md"
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
-      "run-workspaces.py": "common/scripts/run-workspaces.py",
-      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
-      "workflow-state.py": "common/scripts/workflow-state.py",
-      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
-      "plugin-composition.js": "lib/plugin-composition.js",
       "plugin-bindings.js": "lib/plugin-bindings.js",
+      "plugin-composition.js": "lib/plugin-composition.js",
+      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
+      "plugin-invocation.py": "common/scripts/plugin-invocation.py",
       "plugin-parameters.js": "lib/plugin-parameters.js",
       "plugin-registry.js": "lib/plugin-registry.js",
-      "plugin-sources.js": "lib/plugin-sources.js"
+      "plugin-runtime.js": "lib/plugin-runtime.js",
+      "plugin-sources.js": "lib/plugin-sources.js",
+      "run-workspaces.py": "common/scripts/run-workspaces.py",
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
+  },
+  "skill-tree-clarify-tasks": {
+    "references": {
+      "decision-governance.md": "common/references/decision-governance.md",
+      "development-practices.md": "common/references/development-practices.md",
+      "document-rules.md": "common/references/document-rules.md",
+      "future-workflow.md": "common/references/future-workflow.md",
+      "history-retention.md": "common/references/history-retention.md",
+      "installation-profile.md": "common/references/installation-profile.md",
+      "pending-task-format.md": "common/references/pending-task-format.md",
+      "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "plugin-invocation.md": "common/references/plugin-invocation.md",
+      "run-workspaces.md": "common/references/run-workspaces.md",
+      "validation-policy.md": "common/references/validation-policy.md",
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
+    },
+    "scripts": {
+      "decision-governance.py": "common/scripts/decision-governance.py",
+      "decision-orchestration.py": "common/scripts/decision-orchestration.py",
+      "plugin-bindings.js": "lib/plugin-bindings.js",
+      "plugin-composition.js": "lib/plugin-composition.js",
+      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
+      "plugin-invocation.py": "common/scripts/plugin-invocation.py",
+      "plugin-parameters.js": "lib/plugin-parameters.js",
+      "plugin-registry.js": "lib/plugin-registry.js",
+      "plugin-runtime.js": "lib/plugin-runtime.js",
+      "plugin-sources.js": "lib/plugin-sources.js",
+      "run-workspaces.py": "common/scripts/run-workspaces.py",
+      "select-prioritized-task.py": "common/scripts/select-prioritized-task.py",
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
   "skill-tree-create-documents-snapshot": {
@@ -30,23 +64,25 @@
       "decision-governance.md": "common/references/decision-governance.md",
       "document-rules.md": "common/references/document-rules.md",
       "installation-profile.md": "common/references/installation-profile.md",
+      "plugin-invocation.md": "common/references/plugin-invocation.md",
       "snapshot-rules.md": "common/references/snapshot-rules.md",
-      "validation-policy.md": "common/references/validation-policy.md",
-      "plugin-invocation.md": "common/references/plugin-invocation.md"
+      "validation-policy.md": "common/references/validation-policy.md"
     },
     "scripts": {
       "create-documentation-snapshot.py": "common/scripts/create-documentation-snapshot.py",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
-      "run-workspaces.py": "common/scripts/run-workspaces.py",
-      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
-      "workflow-state.py": "common/scripts/workflow-state.py",
-      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
-      "plugin-composition.js": "lib/plugin-composition.js",
       "plugin-bindings.js": "lib/plugin-bindings.js",
+      "plugin-composition.js": "lib/plugin-composition.js",
+      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
+      "plugin-invocation.py": "common/scripts/plugin-invocation.py",
       "plugin-parameters.js": "lib/plugin-parameters.js",
       "plugin-registry.js": "lib/plugin-registry.js",
-      "plugin-sources.js": "lib/plugin-sources.js"
+      "plugin-runtime.js": "lib/plugin-runtime.js",
+      "plugin-sources.js": "lib/plugin-sources.js",
+      "run-workspaces.py": "common/scripts/run-workspaces.py",
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
   "skill-tree-implement-all": {
@@ -60,25 +96,27 @@
       "orchestration.md": "common/references/orchestration.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "plugin-invocation.md": "common/references/plugin-invocation.md",
       "pr-review-cycle.md": "common/references/pr-review-cycle.md",
       "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
-      "workflow-metadata.md": "common/references/workflow-metadata.md",
-      "plugin-invocation.md": "common/references/plugin-invocation.md"
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
+      "plugin-bindings.js": "lib/plugin-bindings.js",
+      "plugin-composition.js": "lib/plugin-composition.js",
+      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
+      "plugin-invocation.py": "common/scripts/plugin-invocation.py",
+      "plugin-parameters.js": "lib/plugin-parameters.js",
+      "plugin-registry.js": "lib/plugin-registry.js",
+      "plugin-runtime.js": "lib/plugin-runtime.js",
+      "plugin-sources.js": "lib/plugin-sources.js",
       "pr-review-state.py": "common/scripts/pr-review-state.py",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
-      "workflow-state.py": "common/scripts/workflow-state.py",
-      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
-      "plugin-composition.js": "lib/plugin-composition.js",
-      "plugin-bindings.js": "lib/plugin-bindings.js",
-      "plugin-parameters.js": "lib/plugin-parameters.js",
-      "plugin-registry.js": "lib/plugin-registry.js",
-      "plugin-sources.js": "lib/plugin-sources.js"
+      "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
   "skill-tree-implement-next-future-task": {
@@ -91,24 +129,55 @@
       "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "plugin-invocation.md": "common/references/plugin-invocation.md",
       "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
-      "workflow-metadata.md": "common/references/workflow-metadata.md",
-      "plugin-invocation.md": "common/references/plugin-invocation.md"
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
+      "plugin-bindings.js": "lib/plugin-bindings.js",
+      "plugin-composition.js": "lib/plugin-composition.js",
+      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
+      "plugin-invocation.py": "common/scripts/plugin-invocation.py",
+      "plugin-parameters.js": "lib/plugin-parameters.js",
+      "plugin-registry.js": "lib/plugin-registry.js",
+      "plugin-runtime.js": "lib/plugin-runtime.js",
+      "plugin-sources.js": "lib/plugin-sources.js",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "select-prioritized-task.py": "common/scripts/select-prioritized-task.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
-      "workflow-state.py": "common/scripts/workflow-state.py",
-      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
-      "plugin-composition.js": "lib/plugin-composition.js",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
+  },
+  "skill-tree-pr-review-cycle": {
+    "references": {
+      "decision-governance.md": "common/references/decision-governance.md",
+      "document-rules.md": "common/references/document-rules.md",
+      "installation-profile.md": "common/references/installation-profile.md",
+      "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "plugin-invocation.md": "common/references/plugin-invocation.md",
+      "pr-review-cycle.md": "common/references/pr-review-cycle.md",
+      "run-workspaces.md": "common/references/run-workspaces.md",
+      "validation-policy.md": "common/references/validation-policy.md",
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
+    },
+    "scripts": {
+      "decision-governance.py": "common/scripts/decision-governance.py",
+      "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "plugin-bindings.js": "lib/plugin-bindings.js",
+      "plugin-composition.js": "lib/plugin-composition.js",
+      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
+      "plugin-invocation.py": "common/scripts/plugin-invocation.py",
       "plugin-parameters.js": "lib/plugin-parameters.js",
       "plugin-registry.js": "lib/plugin-registry.js",
-      "plugin-sources.js": "lib/plugin-sources.js"
+      "plugin-runtime.js": "lib/plugin-runtime.js",
+      "plugin-sources.js": "lib/plugin-sources.js",
+      "pr-review-state.py": "common/scripts/pr-review-state.py",
+      "run-workspaces.py": "common/scripts/run-workspaces.py",
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
   "skill-tree-process-future-pending": {
@@ -120,24 +189,26 @@
       "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "plugin-invocation.md": "common/references/plugin-invocation.md",
       "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
-      "workflow-metadata.md": "common/references/workflow-metadata.md",
-      "plugin-invocation.md": "common/references/plugin-invocation.md"
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
+      "plugin-bindings.js": "lib/plugin-bindings.js",
+      "plugin-composition.js": "lib/plugin-composition.js",
+      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
+      "plugin-invocation.py": "common/scripts/plugin-invocation.py",
+      "plugin-parameters.js": "lib/plugin-parameters.js",
+      "plugin-registry.js": "lib/plugin-registry.js",
+      "plugin-runtime.js": "lib/plugin-runtime.js",
+      "plugin-sources.js": "lib/plugin-sources.js",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "validate-future-document.py": "common/scripts/validate-future-document.py",
-      "workflow-state.py": "common/scripts/workflow-state.py",
-      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
-      "plugin-composition.js": "lib/plugin-composition.js",
-      "plugin-bindings.js": "lib/plugin-bindings.js",
-      "plugin-parameters.js": "lib/plugin-parameters.js",
-      "plugin-registry.js": "lib/plugin-registry.js",
-      "plugin-sources.js": "lib/plugin-sources.js"
+      "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
   "skill-tree-repo-documentation": {
@@ -149,26 +220,28 @@
       "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "plugin-invocation.md": "common/references/plugin-invocation.md",
       "repository-discovery-checklist.md": "common/references/repository-discovery-checklist.md",
       "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
-      "workflow-metadata.md": "common/references/workflow-metadata.md",
-      "plugin-invocation.md": "common/references/plugin-invocation.md"
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
+      "plugin-bindings.js": "lib/plugin-bindings.js",
+      "plugin-composition.js": "lib/plugin-composition.js",
+      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
+      "plugin-invocation.py": "common/scripts/plugin-invocation.py",
+      "plugin-parameters.js": "lib/plugin-parameters.js",
+      "plugin-registry.js": "lib/plugin-registry.js",
+      "plugin-runtime.js": "lib/plugin-runtime.js",
+      "plugin-sources.js": "lib/plugin-sources.js",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "validate-future-document.py": "common/scripts/validate-future-document.py",
       "validate-repository-documentation.py": "common/scripts/validate-repository-documentation.py",
-      "workflow-state.py": "common/scripts/workflow-state.py",
-      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
-      "plugin-composition.js": "lib/plugin-composition.js",
-      "plugin-bindings.js": "lib/plugin-bindings.js",
-      "plugin-parameters.js": "lib/plugin-parameters.js",
-      "plugin-registry.js": "lib/plugin-registry.js",
-      "plugin-sources.js": "lib/plugin-sources.js"
+      "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
   "skill-tree-repo-documentation-audit": {
@@ -180,26 +253,28 @@
       "installation-profile.md": "common/references/installation-profile.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "plugin-invocation.md": "common/references/plugin-invocation.md",
       "repository-discovery-checklist.md": "common/references/repository-discovery-checklist.md",
       "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
-      "workflow-metadata.md": "common/references/workflow-metadata.md",
-      "plugin-invocation.md": "common/references/plugin-invocation.md"
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
+      "plugin-bindings.js": "lib/plugin-bindings.js",
+      "plugin-composition.js": "lib/plugin-composition.js",
+      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
+      "plugin-invocation.py": "common/scripts/plugin-invocation.py",
+      "plugin-parameters.js": "lib/plugin-parameters.js",
+      "plugin-registry.js": "lib/plugin-registry.js",
+      "plugin-runtime.js": "lib/plugin-runtime.js",
+      "plugin-sources.js": "lib/plugin-sources.js",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "validate-future-document.py": "common/scripts/validate-future-document.py",
       "validate-repository-documentation.py": "common/scripts/validate-repository-documentation.py",
-      "workflow-state.py": "common/scripts/workflow-state.py",
-      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
-      "plugin-composition.js": "lib/plugin-composition.js",
-      "plugin-bindings.js": "lib/plugin-bindings.js",
-      "plugin-parameters.js": "lib/plugin-parameters.js",
-      "plugin-registry.js": "lib/plugin-registry.js",
-      "plugin-sources.js": "lib/plugin-sources.js"
+      "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
   "skill-tree-work-through-next": {
@@ -213,82 +288,27 @@
       "orchestration.md": "common/references/orchestration.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "pending-task-intake.md": "common/references/pending-task-intake.md",
+      "plugin-invocation.md": "common/references/plugin-invocation.md",
       "pr-review-cycle.md": "common/references/pr-review-cycle.md",
       "run-workspaces.md": "common/references/run-workspaces.md",
       "validation-policy.md": "common/references/validation-policy.md",
-      "workflow-metadata.md": "common/references/workflow-metadata.md",
-      "plugin-invocation.md": "common/references/plugin-invocation.md"
+      "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
+      "plugin-bindings.js": "lib/plugin-bindings.js",
+      "plugin-composition.js": "lib/plugin-composition.js",
+      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
+      "plugin-invocation.py": "common/scripts/plugin-invocation.py",
+      "plugin-parameters.js": "lib/plugin-parameters.js",
+      "plugin-registry.js": "lib/plugin-registry.js",
+      "plugin-runtime.js": "lib/plugin-runtime.js",
+      "plugin-sources.js": "lib/plugin-sources.js",
       "pr-review-state.py": "common/scripts/pr-review-state.py",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
-      "workflow-state.py": "common/scripts/workflow-state.py",
-      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
-      "plugin-composition.js": "lib/plugin-composition.js",
-      "plugin-bindings.js": "lib/plugin-bindings.js",
-      "plugin-parameters.js": "lib/plugin-parameters.js",
-      "plugin-registry.js": "lib/plugin-registry.js",
-      "plugin-sources.js": "lib/plugin-sources.js"
-    }
-  },
-  "skill-tree-pr-review-cycle": {
-    "references": {
-      "decision-governance.md": "common/references/decision-governance.md",
-      "document-rules.md": "common/references/document-rules.md",
-      "installation-profile.md": "common/references/installation-profile.md",
-      "pending-task-intake.md": "common/references/pending-task-intake.md",
-      "pr-review-cycle.md": "common/references/pr-review-cycle.md",
-      "run-workspaces.md": "common/references/run-workspaces.md",
-      "validation-policy.md": "common/references/validation-policy.md",
-      "workflow-metadata.md": "common/references/workflow-metadata.md",
-      "plugin-invocation.md": "common/references/plugin-invocation.md"
-    },
-    "scripts": {
-      "decision-governance.py": "common/scripts/decision-governance.py",
-      "decision-orchestration.py": "common/scripts/decision-orchestration.py",
-      "pr-review-state.py": "common/scripts/pr-review-state.py",
-      "run-workspaces.py": "common/scripts/run-workspaces.py",
-      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
-      "workflow-state.py": "common/scripts/workflow-state.py",
-      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
-      "plugin-composition.js": "lib/plugin-composition.js",
-      "plugin-bindings.js": "lib/plugin-bindings.js",
-      "plugin-parameters.js": "lib/plugin-parameters.js",
-      "plugin-registry.js": "lib/plugin-registry.js",
-      "plugin-sources.js": "lib/plugin-sources.js"
-    }
-  },
-  "skill-tree-clarify-tasks": {
-    "references": {
-      "decision-governance.md": "common/references/decision-governance.md",
-      "development-practices.md": "common/references/development-practices.md",
-      "document-rules.md": "common/references/document-rules.md",
-      "future-workflow.md": "common/references/future-workflow.md",
-      "history-retention.md": "common/references/history-retention.md",
-      "installation-profile.md": "common/references/installation-profile.md",
-      "pending-task-format.md": "common/references/pending-task-format.md",
-      "pending-task-intake.md": "common/references/pending-task-intake.md",
-      "run-workspaces.md": "common/references/run-workspaces.md",
-      "validation-policy.md": "common/references/validation-policy.md",
-      "workflow-metadata.md": "common/references/workflow-metadata.md",
-      "plugin-invocation.md": "common/references/plugin-invocation.md"
-    },
-    "scripts": {
-      "decision-governance.py": "common/scripts/decision-governance.py",
-      "decision-orchestration.py": "common/scripts/decision-orchestration.py",
-      "run-workspaces.py": "common/scripts/run-workspaces.py",
-      "select-prioritized-task.py": "common/scripts/select-prioritized-task.py",
-      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
-      "workflow-state.py": "common/scripts/workflow-state.py",
-      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
-      "plugin-composition.js": "lib/plugin-composition.js",
-      "plugin-bindings.js": "lib/plugin-bindings.js",
-      "plugin-parameters.js": "lib/plugin-parameters.js",
-      "plugin-registry.js": "lib/plugin-registry.js",
-      "plugin-sources.js": "lib/plugin-sources.js"
+      "workflow-state.py": "common/scripts/workflow-state.py"
     }
   }
 }

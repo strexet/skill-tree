@@ -95,12 +95,27 @@ def setup(store, payload):
         atomic(runtime_file(store.root), locator)
         return registry
 
+def validate_hook_references(run):
+    values=run.get('hook_chains',[])
+    if not isinstance(values,list) or any(not isinstance(value,str) or not re.fullmatch(r'HC-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}',value) for value in values) or len(values)!=len(set(values)):raise RunError('Controller hook references require exact distinct chain identities')
+    return values
+
+def register_hook_reference(run,chain_id,task_ids=()):
+    validate_hook_references(run)
+    if not isinstance(chain_id,str) or not re.fullmatch(r'HC-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}',chain_id):raise RunError('An exact hook chain identity is required')
+    scope=set(run.get('admitted_task_ids',run.get('snapshot',[])))|set(run.get('required_ids',[]))
+    if set(task_ids)-scope:raise RunError('Hook registration exceeds the recorded controller task scope')
+    result=deepcopy(run);refs=result.setdefault('hook_chains',[])
+    if chain_id not in refs:refs.append(chain_id)
+    return result
+
 def validate_registry(registry):
     if not isinstance(registry, dict) or registry.get('schema') != 1 or not re.fullmatch(r'Q-[a-f0-9-]{36}', registry.get('queue_id', '')):
         raise RunError('Unsupported run registry; explicit recovery required')
     if any(not isinstance(registry.get(k), dict) for k in ['runs', 'claims', 'resources']):
         raise RunError('Corrupt run registry collections')
     for rid, run in registry['runs'].items():
+        validate_hook_references(run)
         if run.get('id') != rid:
             raise RunError('Run registry identity conflict')
     for tid, rid in registry['claims'].items():

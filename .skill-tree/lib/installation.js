@@ -60,7 +60,47 @@ function unfinishedRun(run){
  if(!run)return false;const delivery=run.delivery||{};
  return !(delivery.implementation==='completed'&&(['local-result','merged'].includes(delivery.status)||delivery.status==='pr-ready'&&!delivery.authorization?.merge));
 }
+function hookCanonicalDocument(raw){
+ // Preserve owned Python JSON numeric/string tokens; JS numeric rendering differs.
+ let at=0;const space=()=>{while(/\s/.test(raw[at]||'')&&at<raw.length)at++;};
+ function stringToken(){const begin=at++;let escaped=false;for(;at<raw.length;at++){const char=raw[at];if(!escaped&&char==='"'){at++;return raw.slice(begin,at);}if(!escaped&&char==='\\')escaped=true;else escaped=false;}throw Error('Malformed invocation JSON string');}
+ function compare(left,right){const a=Array.from(left),b=Array.from(right);for(let i=0;i<Math.min(a.length,b.length);i++){const delta=a[i].codePointAt(0)-b[i].codePointAt(0);if(delta)return delta;}return a.length-b.length;}
+ function value(depth){
+  space();const char=raw[at];
+  if(char==='"')return stringToken();
+  if(char==='{'){
+   at++;space();const entries=[];if(raw[at]==='}'){at++;return '{}';}
+   while(true){space();if(raw[at]!=='"')throw Error('Malformed invocation JSON key');const key=stringToken(),name=JSON.parse(key);space();if(raw[at++]!==':')throw Error('Malformed invocation JSON object');const item=value(depth+1);if(depth!==0||name!=='chain_hash')entries.push({name,key,item});space();const separator=raw[at++];if(separator==='}')break;if(separator!==',')throw Error('Malformed invocation JSON object');}
+   entries.sort((a,b)=>compare(a.name,b.name));return '{'+entries.map(item=>item.key+':'+item.item).join(',')+'}';
+  }
+  if(char==='['){at++;space();const items=[];if(raw[at]===']'){at++;return '[]';}while(true){items.push(value(depth+1));space();const separator=raw[at++];if(separator===']')break;if(separator!==',')throw Error('Malformed invocation JSON array');}return '['+items.join(',')+']';}
+  const begin=at;while(at<raw.length&&!/[\s,}\]]/.test(raw[at]))at++;if(begin===at)throw Error('Malformed invocation JSON token');return raw.slice(begin,at);
+ }
+ const result=value(0);space();if(at!==raw.length)throw Error('Malformed invocation JSON suffix');return result;
+}
+function pendingHookOperation(root){
+ const owner=queueRoot(root),directory=c.safe(owner,'.skill-tree/invocations');
+ if(!fs.existsSync(directory))return false;
+ if(!fs.lstatSync(directory).isDirectory())throw Error('Malformed invocation metadata directory; explicit recovery required');
+ let pending=false;
+ for(const name of fs.readdirSync(directory).sort()){
+  if(!/^hc-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}\.json$/.test(name))throw Error('Unknown invocation metadata; explicit recovery required');
+  const file=c.safe(owner,'.skill-tree/invocations/'+name);let record;
+  let raw;try{raw=fs.readFileSync(file,'utf8');record=JSON.parse(raw);}catch{throw Error('Malformed invocation metadata; explicit recovery required');}
+  if(record.schema!==1||record.id?.toLowerCase()+'.json'!==name||typeof record.chain_hash!=='string'||!/^([a-f0-9]{64})$/.test(record.chain_hash)||!record.attempts||Array.isArray(record.attempts)||!Array.isArray(record.stages)||!Number.isSafeInteger(record.revision)||record.revision<1)throw Error('Unsupported invocation metadata; explicit recovery required');
+  if(c.hash(hookCanonicalDocument(raw))!==record.chain_hash)throw Error('Invocation metadata checksum changed; explicit recovery required');
+  for(const attempt of Object.values(record.attempts)){
+   if(!attempt||!['prepared','invoking','unknown','returned','failed','unavailable','cancelled'].includes(attempt.status))throw Error('Malformed original invocation attempt; explicit recovery required');
+   if(['prepared','invoking','unknown'].includes(attempt.status))pending=true;
+  }
+  if(record.state==='superseded'){
+   const id=record.superseded_by;if(typeof id!=='string'||!/^HC-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(id)||!fs.existsSync(c.safe(owner,'.skill-tree/invocations/'+id.toLowerCase()+'.json')))throw Error('Missing invocation replacement; explicit recovery required');
+  }
+ }
+ return pending;
+}
 function hasActiveOperation(root){
+ if(pendingHookOperation(root))return true;
  const state=workflowState(root);if(!state)return false;
  for(const progress of Object.values(state.task_progress))for(const slot of Object.values(progress.checks||{})){
   const attempt=slot.attempt;if(attempt&&!Object.values(slot.receipts||{}).some(r=>r.attempt_id===attempt.attempt_id)&&slot.result?.attempt_id!==attempt.attempt_id&&slot.red?.attempt_id!==attempt.attempt_id)return true;
@@ -282,4 +322,4 @@ function localMain(root,source,args){
   const result=refresh(root,source,args.includes('--dry-run'));console.log(c.json({action:result.action,changed:result.delta,facts:result.profile.facts,gaps:result.profile.gaps}));return 0;
  }catch(error){console.error(error.message);return 2;}
 }
-module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,stoppedWorkflow,plan,install,verify,uninstall,refresh,rollback,rebind,localMain};
+module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,pendingHookOperation,stoppedWorkflow,plan,install,verify,uninstall,refresh,rollback,rebind,localMain};

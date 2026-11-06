@@ -11,13 +11,17 @@ function safe(root,relative){
 function verifyBootstrap(root){
  const manifest=JSON.parse(fs.readFileSync(safe(root,'references/plugin-bindings.json'),'utf8')),{identity,...content}=manifest;
  if(manifest.format!=='skill-tree-plugin-bindings'||manifest.schema!==1||identity!==hash(json(content))||!manifest.owned_resources||Array.isArray(manifest.owned_resources))throw Error('Invalid owned helper inventory manifest');
- const required=['plugin-hooks.js','plugin-composition.js','plugin-bindings.js','plugin-parameters.js','plugin-registry.js','plugin-sources.js','workflow-state.py','decision-governance.py','decision-orchestration.py','run-workspaces.py','validate-document-rules.py'];
+ const required=['plugin-hooks.js','plugin-runtime.js','plugin-invocation.py','plugin-composition.js','plugin-bindings.js','plugin-parameters.js','plugin-registry.js','plugin-sources.js','workflow-state.py','decision-governance.py','decision-orchestration.py','run-workspaces.py','validate-document-rules.py'];
  for(const name of required)if(!Object.hasOwn(manifest.owned_resources,'scripts/'+name))throw Error('The owned helper closure is incomplete');
  for(const [relative,sum]of Object.entries(manifest.owned_resources))if(typeof sum!=='string'||!/^[a-f0-9]{64}$/.test(sum)||hash(fs.readFileSync(safe(root,relative)))!==sum)throw Error('Owned helper resource digest changed: '+relative);
 }
 if(require.main===module){try{
  if(process.argv.length!==4||process.argv[2]!=='--input')throw Error('Usage: node scripts/plugin-hooks.js --input <request.json>');
  const root=path.resolve(__dirname,'..');verifyBootstrap(root);
- const api=require('./plugin-composition.js'),value=api.prepareBoundary(root,JSON.parse(fs.readFileSync(process.argv[3],'utf8')));process.stdout.write(JSON.stringify(value,null,2)+'\n');
+ const request=JSON.parse(fs.readFileSync(process.argv[3]==='-'?0:process.argv[3],'utf8'));let value;
+ const actions={'freeze-chain':'freezePlan','occurrence-plan':'occurrencePlan','delivery-data':'deliveryData'};
+ if(Object.hasOwn(actions,request.runtime_action)){const runtime=require('./plugin-runtime.js');let resolver;if(request.private_secrets){const values=request.private_secrets;resolver=name=>Object.hasOwn(values,name)?values[name]:undefined;}value=runtime[actions[request.runtime_action]](root,request,resolver);}
+ else{if(request.runtime_action)throw Error('Unknown owned runtime action');value=require('./plugin-composition.js').prepareBoundary(root,request);}
+ process.stdout.write(JSON.stringify(value,null,2)+'\n');
 }catch(error){process.stderr.write(error.message+'\n');process.exitCode=1;}}
 module.exports={verifyBootstrap};

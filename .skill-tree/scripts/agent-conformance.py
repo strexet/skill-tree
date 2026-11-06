@@ -435,8 +435,267 @@ def validate_core_decision_report(report,trusted_capture=None):
     try:return _validate_core_decision_report(report,trusted_capture)
     except (KeyError,TypeError,IndexError,AttributeError) as error:raise ValueError('Malformed core decision report or external capture') from error
 
+PLUGIN_INVOCATION_SOURCES={
+    'common/scripts/plugin-invocation.py','common/scripts/workflow-state.py',
+    'common/scripts/run-workspaces.py','common/scripts/decision-governance.py',
+    'common/scripts/decision-orchestration.py','common/scripts/validate-document-rules.py',
+    'common/scripts/plugin-hooks.js','lib/plugin-composition.js','lib/plugin-runtime.js',
+    'lib/plugin-bindings.js','lib/plugin-parameters.js','lib/plugin-registry.js','lib/plugin-sources.js',
+}
+
+# Workflow output has its own task/CL/DO/CAS guards; authored research remains source.
+PLUGIN_MUTABLE_WORKFLOW_PATHS={
+    '.skill-tree/documents/future.md','.skill-tree/documents/future.json',
+    '.skill-tree/skill-tree.json','.skill-tree/invocations','.skill-tree/clarifications',
+    '.skill-tree/decisions','.skill-tree/local','.skill-tree/history/checkpoints',
+    '.skill-tree/history/runs','.skill-tree/history/run-events','.skill-tree/history/task-outcomes.jsonl',
+    '.skill-tree/run-evidence','.skill-tree/artifacts','.skill-tree/.writer-lock',
+    '.skill-tree/.transaction.json',
+}
+
+def _validate_plugin_invocation_report(report,trusted_capture=None):
+    """Check independently captured source-backed invocations, not self-authenticating labels."""
+    import base64
+    import math
+    import tempfile
+    def require(condition,message):
+        if not condition:raise ValueError(message)
+    def text(value):return isinstance(value,str) and bool(value.strip())
+    def sha(value):return isinstance(value,str) and re.fullmatch('[a-f0-9]{64}',value) is not None
+    def relative(value):return text(value) and not Path(value).is_absolute() and not re.match('^[A-Za-z]:',value) and '\\' not in value and '\0' not in value and all(part not in {'','..','.'} for part in value.split('/'))
+    def load(name,path):
+        path=CORE/path;spec=importlib.util.spec_from_file_location(name,path);value=importlib.util.module_from_spec(spec)
+        exec(compile(path.read_bytes(),str(path),'exec'),value.__dict__);return value
+    require(isinstance(report,dict) and report.get('schema')==1 and report.get('kind')=='plugin-invocation-agent-conformance','A plugin invocation observation report is required')
+    require(isinstance(trusted_capture,dict) and trusted_capture is not report and trusted_capture.get('schema')==1 and trusted_capture.get('kind')=='plugin-invocation-native-capture','A separately supplied trusted native capture is required; labels and transcripts cannot supply origin')
+    sources=report.get('source_snapshot');require(isinstance(sources,dict) and PLUGIN_INVOCATION_SOURCES<=set(sources) and sources==trusted_capture.get('source_snapshot'),'The report and external capture must bind the complete current invocation source set')
+    for path,fingerprint in sources.items():require(relative(path) and sha(fingerprint) and (CORE/path).is_file() and digest(CORE/path)==fingerprint,'An invocation source fingerprint is missing, stale or nonportable')
+    limitations=report.get('limitations');require(isinstance(limitations,list) and limitations and all(text(value) for value in limitations),'Explicit source-backed, capture, owner and accounting limitations are required')
+    words=' '.join(limitations).casefold();require(all(word in words for word in ['capture','scripted','human','source-backed','native','model','token','cost']),'The capture trust boundary, scripted owner and unexposed metadata limitations must remain explicit')
+    engine=load('observed_plugin_invocation','common/scripts/plugin-invocation.py');wf=load('observed_plugin_workflow','common/scripts/workflow-state.py')
+    scenario=report.get('scenario');events=trusted_capture.get('events')
+    require(isinstance(scenario,dict) and scenario.get('id')=='source-backed-a-b-a' and isinstance(events,list) and events,'The bounded A1-to-B-to-A2 scenario and external events are required')
+    ids=scenario.get('event_ids');require(isinstance(ids,list) and len(ids)==len(set(ids)) and len(ids)==len(events),'Every captured event requires one exact report reference')
+    require(all(isinstance(event,dict) and text(event.get('id')) and type(event.get('sequence')) is int for event in events),'Native observations require exact identities and sequence numbers')
+    indexed={event['id']:event for event in events};require(len(indexed)==len(events) and set(ids)==set(indexed),'Captured native event identities must be unique and complete')
+    observed=[indexed[value] for value in ids];require([event['sequence'] for event in observed]==list(range(1,len(observed)+1)),'The externally observed event order must be complete and strictly increasing')
+    allowed={'actor-created','actor-dispatched','actor-returned','chain-observed','scripted-owner-input','core-incorporation','core-confirmation'}
+    require(all(event.get('kind') in allowed for event in observed),'Unknown invocation capture event kind')
+    def native(event,tool):
+        require(text(event.get('provider')) and event.get('tool')==tool and sha(event.get('native_request_sha256')),'Native creation or dispatch requires the actually observed provider/tool/request fingerprint')
+        actor=event.get('actor');require(isinstance(actor,dict) and set(actor)=={'id','context_id'} and all(text(value) for value in actor.values()),'An actual actor and context identity are required')
+        require(all(key in event for key in ['tool_call_id','model','tokens','cost']),'Unexposed model, native call IDs, tokens and cost must be explicit')
+        for key in ['tool_call_id','model']:require(event[key] is None or text(event[key]),'Unexposed or observed native identity metadata must remain explicit')
+        for key in ['tokens','cost']:require(event[key] is None or type(event[key]) in {int,float} and math.isfinite(event[key]) and event[key]>=0,'Native accounting cannot be invented, negative or boolean')
+        return actor
+    creations=[event for event in observed if event['kind']=='actor-created'];dispatches=[event for event in observed if event['kind']=='actor-dispatched'];returns=[event for event in observed if event['kind']=='actor-returned']
+    require(len(creations)==len(dispatches)==len(returns)==3,'Exactly three distinct actual source-backed invocations are required')
+    for event in creations:native(event,'collaboration.spawn_agent')
+    for event in dispatches:
+        native(event,'collaboration.followup_task');require(event.get('mechanism')=='source-backed-context' and event.get('native_skill_called') is False,'The observation must not invent a native Skill call')
+    require(len({event['actor']['id'] for event in creations})==len({event['actor']['context_id'] for event in creations})==3,'Repeated package occurrences require isolated actual invocation contexts')
+    qualification=trusted_capture.get('qualification');require(isinstance(qualification,dict),'The finite actual observation budget is required')
+    require(qualification.get('limits')=={'contexts':6,'requests':12,'wall_seconds':1800,'cleanup_seconds':60},'Actual invocation limits cannot increase or lose cleanup reserve')
+    previous=qualification.get('previous_attempts',[]);require(isinstance(previous,list) and len(previous)<=1,'Only one concrete repaired-source qualification rerun is within the approved reserve')
+    contexts=3;requests=6;all_contexts=[event['actor']['context_id'] for event in creations];all_actors=[event['actor']['id'] for event in creations]
+    for prior in previous:
+        require(isinstance(prior,dict) and prior.get('result')=='fail' and text(prior.get('failure_signature')),'An earlier probe requires a retained concrete failure')
+        old=prior.get('capture');require(isinstance(old,dict) and isinstance(old.get('events'),list),'A repaired-source rerun must preserve earlier observations')
+        if old.get('source_snapshot')==sources:
+            repair=prior.get('repair');require(isinstance(repair,dict) and relative(repair.get('path')) and text(repair.get('reason')) and sha(repair.get('before_sha256')) and sha(repair.get('after_sha256')) and repair['before_sha256']!=repair['after_sha256'],'Unchanged core source requires an explicit concrete installed-resource repair')
+            old_resource=old.get('resources',{}).get(repair['path'],{});new_resource=trusted_capture.get('resources',{}).get(repair['path'],{})
+            require(old_resource.get('sha256')==repair['before_sha256'] and new_resource.get('sha256')==repair['after_sha256'],'The retained repaired resource digests differ')
+        prior_creations=[event for event in old['events'] if event.get('kind')=='actor-created'];prior_dispatches=[event for event in old['events'] if event.get('kind')=='actor-dispatched']
+        for event in prior_creations:native(event,'collaboration.spawn_agent')
+        for event in prior_dispatches:native(event,'collaboration.followup_task')
+        contexts+=len(prior_creations);requests+=len(prior_creations)+len(prior_dispatches);all_contexts.extend(event['actor']['context_id'] for event in prior_creations);all_actors.extend(event['actor']['id'] for event in prior_creations)
+    require(len(set(all_contexts))==len(set(all_actors))==contexts,'A repaired-source rerun retains the original distinct native creation/context identities')
+    consumed=qualification.get('consumed');require(isinstance(consumed,dict) and consumed.get('contexts')==contexts<=6 and consumed.get('requests')==requests<=12 and type(consumed.get('wall_seconds')) in {int,float} and 0<=consumed['wall_seconds']<=1800,'Observed qualification use must include retained failures and stay within the finite plan')
+    raw=trusted_capture.get('resources');require(isinstance(raw,dict) and raw,'Actual installed resource bytes are required for independent nonce checks')
+    resources={}
+    for path,record in raw.items():
+        require(relative(path) and isinstance(record,dict) and record.get('encoding')=='base64' and isinstance(record.get('data'),str) and sha(record.get('sha256')),'Installed resources require portable identities and exact encoded bytes')
+        try:content=base64.b64decode(record['data'],validate=True)
+        except (ValueError,TypeError) as error:raise ValueError('Malformed captured resource bytes') from error
+        require(hashlib.sha256(content).hexdigest()==record['sha256'],'Captured installed resource bytes changed');resources[path]=content
+    protected=trusted_capture.get('protected_inventory_before');protected_after=trusted_capture.get('protected_inventory_after')
+    require(isinstance(protected,dict) and protected and all(relative(path) and sha(value) for path,value in protected.items()) and protected_after==protected,'The final protected fixture and installed operation/plugin inventory must equal the captured initial bytes')
+    def protected_sum(path,value):return any((key==path or key.endswith('/'+path)) and fingerprint==value for key,fingerprint in protected.items())
+    require(any(Path(path).name=='source.py' for path in protected),'The controlled source fixture must remain in the protected inventory')
+    for path,record in raw.items():require(protected_sum(path,record['sha256']),'The initial and final protected inventory must bind every captured installed plugin resource')
+    manifest_record=trusted_capture.get('operation_manifest')
+    require(isinstance(manifest_record,dict) and manifest_record.get('encoding')=='base64' and isinstance(manifest_record.get('data'),str) and sha(manifest_record.get('sha256')),'The actual owned operation manifest bytes are required')
+    try:
+        manifest_bytes=base64.b64decode(manifest_record['data'],validate=True);manifest=json.loads(manifest_bytes)
+    except (ValueError,TypeError,UnicodeDecodeError) as error:raise ValueError('Malformed captured operation manifest bytes') from error
+    require(hashlib.sha256(manifest_bytes).hexdigest()==manifest_record['sha256'] and protected_sum('references/plugin-bindings.json',manifest_record['sha256']),'The actual manifest bytes differ from the protected installed operation')
+    require(isinstance(manifest,dict) and manifest.get('format')=='skill-tree-plugin-bindings' and manifest.get('schema')==1 and isinstance(manifest.get('owned_resources'),dict) and manifest['owned_resources'],'The captured owned operation manifest is unsupported')
+    for path,value in manifest['owned_resources'].items():require(relative(path) and sha(value) and protected_sum(path,value),'The actual manifest resources differ from the protected installed operation')
+    for path in PLUGIN_INVOCATION_SOURCES:require(manifest['owned_resources'].get('scripts/'+Path(path).name)==sources[path],'The actual installed operation helpers differ from the qualified current invocation source')
+    observations=[event for event in observed if event['kind']=='chain-observed']
+    def label(name):
+        found=[event for event in observations if event.get('label')==name];require(len(found)==1,'A unique '+name+' chain observation is required');return found[0]
+    start=label('start');b_returned=label('b-returned');complete=label('chain-complete');final=label('final');require(observations[-1] is final and start['sequence']<b_returned['sequence']<complete['sequence']<final['sequence'],'Original, returned, complete and final chain observations retain actual order')
+    chain=final.get('chain');require(isinstance(chain,dict),'The actual final HC record is required');configuration=chain.get('configuration',{});rows=configuration.get('bindings');packages=configuration.get('packages')
+    require(isinstance(rows,list) and len(rows)==3 and all(isinstance(row,dict) for row in rows) and isinstance(packages,dict),'The actual frozen ordered three-occurrence configuration is required')
+    row_ids=[row.get('id') for row in rows];require(all(text(value) for value in row_ids) and len(set(row_ids))==3 and rows[0].get('plugin_id')==rows[2].get('plugin_id')!=rows[1].get('plugin_id'),'A-to-B-to-A requires distinct occurrence IDs without collapsing repeated packages')
+    require(all(row.get('enabled') is True for row in rows),'The observed three-occurrence qualification chain requires three enabled occurrences')
+    policy=configuration.get('execution_policy');require(isinstance(policy,dict) and set(policy)=={'allowed_tools','allowed_actions'},'The actual core execution policy must be frozen separately from plugin parameters')
+    for key in ['allowed_tools','allowed_actions']:require(isinstance(policy[key],list) and policy[key] and all(text(value) for value in policy[key]) and len(set(policy[key]))==len(policy[key]),'The bounded execution policy requires explicit distinct tool/action names')
+    require(sha(configuration.get('binding_configuration_digest')),'The binding configuration digest must remain distinct from the core policy digest')
+    policy_program="""const fs=require('node:fs'),crypto=require('node:crypto'),value=JSON.parse(fs.readFileSync(0,'utf8'));
+function canonical(v){if(Array.isArray(v))return '['+v.map(canonical).join(',')+']';if(v&&typeof v==='object')return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+canonical(v[k])).join(',')+'}';return JSON.stringify(v);}
+process.stdout.write(crypto.createHash('sha256').update(canonical(value)).digest('hex'));"""
+    policy_run=subprocess.run(['node','-e',policy_program],input=json.dumps({'binding_configuration_digest':configuration['binding_configuration_digest'],'execution_policy':policy},ensure_ascii=True),capture_output=True,text=True,timeout=10)
+    require(policy_run.returncode==0 and policy_run.stdout==configuration.get('configuration_digest'),'The frozen core policy differs from the owned Node configuration identity')
+    compile_program="""const fs=require('node:fs'),crypto=require('node:crypto'),c=require(process.argv[1]),b=require(process.argv[2]),r=require(process.argv[3]),p=JSON.parse(fs.readFileSync(0,'utf8')),m=p.manifest;
+function canonical(v){if(Array.isArray(v))return '['+v.map(canonical).join(',')+']';if(v&&typeof v==='object')return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+canonical(v[k])).join(',')+'}';return JSON.stringify(v);}
+const hash=v=>crypto.createHash('sha256').update(canonical(v)).digest('hex');
+if(m.identity!==r.seal(m).identity)throw Error('The captured owned manifest seal differs');
+const catalog=c.createCatalog(m.operations),compiled=b.compileBindings(m.definitions,{packages:m.packages,catalog,parameterDefaults:m.parameter_defaults,runOverrides:p.configuration.run_overrides||{}});
+const expected={configuration_digest:hash({binding_configuration_digest:compiled.configuration_digest,execution_policy:p.configuration.execution_policy}),binding_configuration_digest:compiled.configuration_digest,execution_policy:p.configuration.execution_policy,bindings:compiled.bindings,definitions:m.definitions,packages:m.packages,parameter_defaults:m.parameter_defaults,run_overrides:p.configuration.run_overrides||{},manifest_identity:m.identity,operation:m.operation};
+if(canonical(expected)!==canonical(p.configuration))throw Error('The frozen configuration differs from the actual owned definitions and explicit overrides');
+const base=b.compileBindings(m.definitions,{packages:m.packages,catalog,parameterDefaults:m.parameter_defaults,runOverrides:{}});
+if(canonical(base.bindings)!==canonical(m.bindings)||base.configuration_digest!==m.configuration_digest)throw Error('The captured manifest compiled projection differs');
+process.stdout.write('valid');"""
+    compiled=subprocess.run(['node','-e',compile_program,str(CORE/'lib/plugin-composition.js'),str(CORE/'lib/plugin-bindings.js'),str(CORE/'lib/plugin-registry.js')],input=json.dumps({'manifest':manifest,'configuration':configuration},ensure_ascii=True,allow_nan=False),capture_output=True,text=True,timeout=10)
+    require(compiled.returncode==0 and compiled.stdout=='valid','The captured frozen configuration cannot be independently reproduced from the actual owned operation manifest')
+
+    require(chain.get('state')=='complete' and chain.get('cursor')==3 and chain.get('prepared_attempt_id') is None,'A required unresolved or original attempt cannot complete the chain')
+    require(len(chain.get('attempts',{}))==3 and len(chain.get('stages',[]))==3,'One original actual attempt per qualified occurrence is required')
+    invocations={};union=set()
+    for plugin,package in packages.items():
+        require(text(plugin) and isinstance(package,dict) and text(package.get('revision')) and sha(package.get('content_digest')) and relative(package.get('entry')),'The frozen installed package identity is incomplete')
+        inventory=package.get('resources',package.get('files'));require(isinstance(inventory,dict) and inventory and package['entry'] in inventory,'The installed entry requires the exact resource closure')
+        for path,fingerprint in inventory.items():require(path in resources and fingerprint==hashlib.sha256(resources[path]).hexdigest(),'The installed resource closure differs from the frozen actual package');union.add(path)
+    require(set(resources)==union,'The capture cannot substitute unrelated or omitted resources for the declared package closure')
+    class SnapshotStore:
+        def __init__(self,root):self.root=root;self.base=root/'.skill-tree'
+        def owned(self,relative):return self.root/relative
+    with tempfile.TemporaryDirectory(prefix='skill-tree-plugin-observation-') as temporary:
+        store=SnapshotStore(Path(temporary));directory=store.base/'invocations';directory.mkdir(parents=True)
+        previous_frame=None
+        for event in observations:
+            current=event.get('chain');require(isinstance(current,dict) and current.get('id')==chain['id'],'Captured chain identity cannot change')
+            require(all(current.get(key)==chain.get(key) for key in ['configuration','event','initial_context','mode','authority','executor','execution_snapshot','request_id','start_digest','initial_lineage']),'A captured operation, scope, authority or frozen configuration changed')
+            frozen=current.get('execution_snapshot');require(isinstance(frozen,dict) and all(frozen.get(path)==value for path,value in sources.items()),'Actual invocation artifacts must bind current execution source hashes')
+            require(frozen.get('operation-manifest')==manifest_record['sha256'],'The invocation execution snapshot differs from the actual installed operation manifest bytes')
+            require(current.get('chain_hash')==engine.digest({key:value for key,value in current.items() if key!='chain_hash'}),'Captured HC checksum differs')
+            path=directory/(current['id'].lower()+'.json');path.write_text(json.dumps(current,ensure_ascii=True))
+            try:
+                require(engine.read(store,current['id'])==current,'Captured HC data differs from the supported ledger')
+                if event is final:require(engine.next_action(store,current['id'])['action']=='complete','Final current engine state remains unresolved')
+            except (engine.InvocationError,KeyError,TypeError) as error:raise ValueError('Captured invocation state is invalid: '+str(error)) from error
+            if previous_frame:
+                require(current['cursor']>=previous_frame['cursor'] and current['history'][:len(previous_frame['history'])]==previous_frame['history'],'Later stage edits cannot rewrite earlier chain progress/history')
+                for original,attempt in previous_frame['attempts'].items():
+                    if any(stage.get('status')=='complete' and original in stage.get('attempt_ids',[]) for stage in previous_frame['stages']):require(current['attempts'].get(original)==attempt,'Completed-prefix input or result history changed')
+            previous_frame=current
+    def node_identity(payload,row,configuration_digest):
+        program="""const fs=require('node:fs'),crypto=require('node:crypto'),p=require(process.argv[1]),packet=JSON.parse(fs.readFileSync(0,'utf8')),value=packet.delivery;
+function canonical(v){if(Array.isArray(v))return '['+v.map(canonical).join(',')+']';if(v&&typeof v==='object')return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+canonical(v[k])).join(',')+'}';return JSON.stringify(v);}
+const result=p.resolveParameters({run:{values:value.parameters,instructions:value.extra_instructions}});
+function stable(v){if(Array.isArray(v))return v.map(stable);if(v&&typeof v==='object')return Object.fromEntries(Object.keys(v).sort().map(k=>[k,stable(v[k])]));return v;}
+const hash=v=>crypto.createHash('sha256').update(JSON.stringify(stable(v))).digest('hex'),row=packet.row;
+const identity={binding_id:row.id,boundary_id:row.location?.boundary_id||row.operation+':'+row.anchor,operation:value.event.operation,anchor:value.event.anchor,event_id:value.event.id,attempt_id:value.attempt_id};
+const inputs={configuration_digest:packet.configuration_digest,parameters:value.parameters,extra_instructions:value.extra_instructions};
+const dispatch_identity={...identity,binding_anchor:row.anchor,delivery_key:hash(identity),input_digest:hash({context:value.context,inputs,binding:row})};
+process.stdout.write(JSON.stringify({delivery_digest:crypto.createHash('sha256').update(canonical(value)).digest('hex'),resolved_parameter_digest:result.digest,dispatch_identity}));"""
+        run=subprocess.run(['node','-e',program,str(CORE/'lib/plugin-parameters.js')],input=json.dumps({'delivery':payload,'row':row,'configuration_digest':configuration_digest},ensure_ascii=True,allow_nan=False),capture_output=True,text=True,timeout=10)
+        require(run.returncode==0,'The owned JS identity oracle failed');return json.loads(run.stdout)
+    for index,row in enumerate(rows):
+        stage=chain['stages'][index];require(stage.get('index')==index and stage.get('binding_id')==row['id'] and stage.get('status')=='complete' and len(stage.get('attempt_ids',[]))==1,'Every occurrence must retain its distinct completed original attempt')
+        original=stage['attempt_ids'][0];attempt=chain['attempts'].get(original,{});require(attempt.get('id')==original and attempt.get('index')==index and attempt.get('binding_id')==row['id'] and attempt.get('status')=='returned','A failed, unknown or substituted original invocation cannot satisfy an occurrence')
+        inp=attempt.get('input');who=attempt.get('actor');require(isinstance(inp,dict) and attempt.get('input_digest')==engine.digest(inp),'The original public sealed input changed')
+        require(inp.get('chain_id')==chain['id'] and inp.get('attempt_id')==original and inp.get('index')==index and inp.get('binding_id')==row['id'] and inp.get('event')==chain['event'] and inp.get('configuration_digest')==configuration['configuration_digest'] and inp.get('mode')==chain['mode'] and inp.get('epoch')==chain.get('epoch') and inp.get('execution_snapshot_digest')==engine.digest(chain['execution_snapshot']) and inp.get('authority_digest')==engine.digest(chain['authority']),'The original invocation input changed core operation, mode, authority or occurrence identity')
+        require(inp.get('authority')==chain['authority'] and inp.get('execution_policy')==policy,'The original public input must seal the complete actual grant and allowed execution policy')
+        scope_sources=inp.get('scope_source_snapshot');require(isinstance(scope_sources,dict) and scope_sources and all(relative(path) and sha(value) and protected.get(path)==value for path,value in scope_sources.items()),'The original bounded task source snapshot differs from the independently captured protected project bytes')
+        package=packages[row['plugin_id']];require(inp.get('package_identity')=={'plugin_id':row['plugin_id'],**package},'The actual loaded package identity differs from the pinned occurrence')
+        effective=row.get('effective');require(isinstance(effective,dict) and not effective.get('secretReferences') and inp.get('parameters')==effective.get('values') and inp.get('extra_instructions')==effective.get('instructions') and inp.get('parameter_digest')==effective.get('digest'),'The public reference-level values or extra instructions were dropped or replaced')
+        current_lineage=[*chain.get('initial_lineage',[]),{'binding_id':row['id'],'boundary_id':chain['event'].get('boundary_id',chain['event']['operation']+':'+chain['event']['anchor'])}];require(inp.get('lineage')==current_lineage,'Active lineage cannot deduplicate a separate occurrence or omit the current occurrence')
+        created=[event for event in creations if event.get('binding_id')==row['id'] and event.get('actor')==who];dispatched=[event for event in dispatches if event.get('binding_id')==row['id'] and event.get('attempt_id')==original];returned=[event for event in returns if event.get('binding_id')==row['id'] and event.get('attempt_id')==original]
+        require(len(created)==len(dispatched)==len(returned)==1,'Every occurrence requires one actual creation, exact dispatch and returned result')
+        created,dispatched,returned=created[0],dispatched[0],returned[0];require(created['sequence']<dispatched['sequence']<returned['sequence']<complete['sequence'],'Invocation evidence must precede chain completion')
+        require(dispatched.get('creation_event_id')==created['id'] and returned.get('creation_event_id')==created['id'] and returned.get('dispatch_event_id')==dispatched['id'] and dispatched.get('actor')==returned.get('actor')==who and who['id']!=chain['executor']['id'] and who['context_id']!=chain['executor']['context_id'],'Actual producer identities cannot be substituted or reused as executor')
+        require(dispatched.get('input')==inp and dispatched.get('input_digest')==attempt['input_digest']==returned.get('input_digest'),'The actually delivered public envelope differs from the original sealed input')
+        delivery=dispatched.get('delivery');require(isinstance(delivery,dict),'Actual resolved nonsecret delivery bytes are required')
+        require(delivery.get('mechanism')=='source-backed-context' and delivery.get('provider')=='codex' and all(delivery.get(key)==inp.get(key) for key in ['chain_id','attempt_id','binding_id','event','context']) and delivery.get('input_digest')==attempt['input_digest'],'The source-backed host payload changed the actual operation or scope')
+        require(delivery.get('mode')==chain['mode'] and delivery.get('authority')==chain['authority'] and delivery.get('authority_digest')==inp['authority_digest'] and delivery.get('allowed_tools')==policy['allowed_tools'] and delivery.get('allowed_actions')==policy['allowed_actions'],'The actual actor did not receive the frozen mode, complete grant and bounded tool/action policy')
+        require(delivery.get('scope_source_snapshot')==scope_sources,'The actual actor did not receive the original sealed bounded project source snapshot')
+        expected_plugin={'plugin_id':row['plugin_id'],'revision':package['revision'],'content_digest':package['content_digest'],'entry':package['entry'],'resource_digests':package.get('resources',package.get('files'))};require(delivery.get('plugin')==expected_plugin,'The delivered installed entry or resource inventory differs')
+        require(delivery.get('parameters')==effective['values'] and delivery.get('extra_instructions')==effective['instructions'],'The nonsecret actual JSON values or extra instruction text were not forwarded')
+        js=node_identity(delivery,row,configuration['configuration_digest']);require(js['delivery_digest']==dispatched.get('delivery_digest')==attempt.get('delivery_digest')==returned.get('delivery_digest') and js['resolved_parameter_digest']==dispatched.get('resolved_parameter_digest')==attempt.get('resolved_parameter_digest')==inp['parameter_digest'],'The actual JS delivery/parameter digest differs; Python JSON formatting supplies no substitute')
+        require(delivery.get('dispatch_identity')==attempt.get('dispatch_identity')==js['dispatch_identity'],'Actual binding/event/HI dispatch identity or opaque binding digests differ')
+        require(js['dispatch_identity']['operation']==row['operation'] and ('boundary_id' not in chain['event'] or chain['event']['boundary_id']==js['dispatch_identity']['boundary_id']),'The actual dispatch descriptor cannot redirect the frozen owned boundary')
+        if 'dispatch_identity' in dispatched:require(dispatched['dispatch_identity']==js['dispatch_identity'],'The captured dispatch descriptor differs from the actual delivery')
+        result=returned.get('result');require(isinstance(result,dict) and result==attempt.get('result') and result.get('input_digest')==attempt['input_digest'] and result.get('delivery_digest')==attempt['delivery_digest'],'The observed raw returned JSON must match the original ledger outcome')
+        require(result.get('status')==('findings' if index==1 else 'passed') and not result.get('real_human') and result.get('mechanism','source-backed-context')=='source-backed-context','The actual returned outcome cannot invent success, native execution or human approval')
+        for key,kind,origin in [('creation_evidence','host-agent-created',created),('invoke_evidence','host-invoked',dispatched),('result_evidence','host-result',returned)]:
+            evidence=attempt.get(key);require(isinstance(evidence,dict) and evidence.get('kind')==kind and evidence.get('reference')==origin['id'] and evidence.get('actor_id')==who['id'] and evidence.get('actor_context_id')==who['context_id'] and text(evidence.get('provider')) and text(evidence.get('tool')),'Original ledger evidence must match the actual external producer event')
+            require(evidence.get('tool')==(created['tool'] if key=='creation_evidence' else dispatched['tool']),'The producer evidence tool differs from the actual native call')
+            require(evidence.get('provider')==created['provider']==dispatched['provider'],'The recorded invocation provider differs from the actual original host creation and dispatch')
+            if key!='creation_evidence':require(evidence.get('mechanism')=='source-backed-context','Actual invocation evidence cannot claim an unsupported native mechanism')
+        marker_path=(Path(package['entry']).parent/'marker.json').as_posix();require(marker_path in resources,'The controlled installed marker resource is missing')
+        try:resource_marker=json.loads(resources[marker_path])['resource_marker']
+        except (ValueError,KeyError,TypeError) as error:raise ValueError('Malformed controlled marker resource') from error
+        markers=result.get('evidence');require(isinstance(markers,dict) and markers.get('resource_marker')==resource_marker and markers.get('parameter_marker')==delivery['parameters'].get('marker') and markers.get('extra_instruction_marker')==delivery['extra_instructions'],'Actual parameter/resource/instruction nonces differ from independently expected values')
+        transition=stage.get('accepted_transition');require(isinstance(transition,dict) and transition.get('before')==inp['context'] and transition.get('after')==stage.get('accepted_context') and isinstance(transition.get('receipt'),dict) and transition['receipt'].get('before')==engine.digest(transition['before']) and transition['receipt'].get('after')==engine.digest(transition['after']),'Accepted stage context transitions must retain original before/after evidence')
+        if index!=1:require(transition['receipt'].get('kind')=='no-change' and transition['before']==transition['after'] and transition['receipt'].get('reference')==returned['id'],'A passed editor cannot silently apply another core context transition')
+        invocations[index]={'created':created,'dispatched':dispatched,'returned':returned,'attempt':attempt,'stage':stage,'markers':markers}
+    require(invocations[0]['returned']['sequence']<invocations[1]['created']['sequence'] and invocations[1]['returned']['sequence']<invocations[2]['created']['sequence'],'Ordered occurrences execute sequentially rather than in parallel or sorted by package identity')
+    incorporation=[event for event in observed if event['kind']=='core-incorporation'];confirmation=[event for event in observed if event['kind']=='core-confirmation'];require(len(incorporation)==len(confirmation)==1,'Actual ordinary core incorporation and final confirmation artifacts are required')
+    incorporation,confirmation=incorporation[0],confirmation[0]
+    require(invocations[1]['returned']['sequence']<b_returned['sequence']<incorporation['sequence']<invocations[2]['dispatched']['sequence']<complete['sequence']<confirmation['sequence']<final['sequence'],'B incorporation precedes A2, while final task confirmation follows the completed chain')
+    for event in [incorporation,confirmation]:
+        owner=indexed.get(event.get('owner_event_id'),{});require(owner.get('kind')=='scripted-owner-input' and owner.get('real_human') is False and owner['sequence']<event['sequence'] and owner.get('purpose')==('incorporation' if event is incorporation else 'confirmation'),'Core test inputs must be explicitly scripted owner submissions in the actual order')
+    require(incorporation.get('attempt_id')==invocations[1]['attempt']['id'] and incorporation.get('binding_id')==rows[1]['id'],'Core incorporation belongs to another returned occurrence')
+    before_future=incorporation.get('future_before');after_future=incorporation.get('future_after');require(text(before_future) and text(after_future) and before_future!=after_future and confirmation.get('future')==after_future,'The actual incorporated task bytes must change and remain current through final acceptance')
+    before_tasks=wf.parse(before_future);after_tasks=wf.parse(after_future);task_ids=chain['initial_context'].get('task_ids');require(chain['initial_context'].get('kind')=='task' and isinstance(task_ids,list) and len(task_ids)==1,'The actual qualification uses one visible stable T-task')
+    tid=task_ids[0];before_task=wf.resolve(before_tasks,[tid],'Prioritized Next Changes')[0];after_task=wf.resolve(after_tasks,[tid],'Prioritized Next Changes')[0]
+    for index,invocation in invocations.items():
+        selected_task=after_task if index==2 else before_task;declared={path for check in wf.check_specs(selected_task) for path in check['sources']};declared.update(invocation['attempt']['input']['context'].get('source_paths',[]))
+        declared={path for path in declared if not any(path==prefix or path.startswith(prefix+'/') for prefix in PLUGIN_MUTABLE_WORKFLOW_PATHS)}
+        require(set(invocation['attempt']['input']['scope_source_snapshot'])==declared,'The original bounded source snapshot omits or substitutes actual task check sources or explicit context paths')
+    require([(task['id'],task['queue']) for task in before_tasks]==[(task['id'],task['queue']) for task in after_tasks] and wf.clarification_identity(before_task)==wf.clarification_identity(after_task),'Incorporation cannot replace task identity, provenance or queue membership')
+    require(all(old['body']==new['body'] for old,new in zip(before_tasks,after_tasks) if old['id']!=tid),'Core incorporation changed an unrelated task')
+    def actual_context(ctx,task,future):
+        require(isinstance(ctx,dict) and ctx.get('kind')=='task' and ctx.get('task_ids')==[tid] and ctx.get('id')==chain['initial_context']['id'] and ctx.get('content_fingerprint')==hashlib.sha256(task['body'].encode()).hexdigest() and ctx.get('semantic_fingerprint')==wf.clarification_fingerprints(wf.clarification_baselines([task]))[tid],'Actual task context fingerprints differ from captured guarded task bytes')
+        if 'source_hash' in ctx:require(ctx['source_hash']==hashlib.sha256(future.encode()).hexdigest(),'The delivered source hash differs from actual queue bytes')
+        for key in ['body','task_body']:
+            if key in ctx:require(ctx[key]==task['body'],'The delivered task body differs from the accepted current task')
+        if 'task_body' in ctx.get('data',{}):require(ctx['data']['task_body']==task['body'],'The delivered task body differs from the accepted current task')
+    initial=chain['initial_context'];current=chain['context'];actual_context(initial,before_task,before_future);actual_context(current,after_task,after_future)
+    require(invocations[0]['attempt']['input']['context']==invocations[1]['attempt']['input']['context']==initial and invocations[2]['attempt']['input']['context']==current and initial!=current,'A1 history and A2 current accepted context must remain separate')
+    require(invocations[0]['stage']['accepted_context']==initial and invocations[1]['stage']['accepted_context']==invocations[2]['stage']['accepted_context']==current,'Only the guarded B incorporation advances the accepted task context')
+    require(incorporation.get('before_context')==initial and incorporation.get('after_context')==current and incorporation.get('receipt')==invocations[1]['stage']['accepted_transition']['receipt'],'Actual core revision receipt differs from the accepted B transition')
+    before_session=incorporation.get('session_before');after_session=incorporation.get('session_after');final_session=confirmation.get('session');require(all(isinstance(value,dict) for value in [before_session,after_session,final_session]),'Actual clarification revision and final session artifacts are required')
+    require(before_session.get('id')==after_session.get('id')==final_session.get('id') and all(value.get('task_ids')==[tid] and value.get('decision_mode','manual')=='manual' for value in [before_session,after_session,final_session]),'The controlled Manual owner/session scope cannot change')
+    require(after_session.get('state')!='complete' and final_session.get('state')=='complete','Incorporation is distinct from final confirmation and cannot deadlock the last editor')
+    receipt=incorporation['receipt'];revision=[value for value in after_session.get('task_revisions',[]) if value.get('id')==receipt.get('task_revision_id')];require(len(revision)==1 and receipt.get('session_id')==after_session['id'] and receipt.get('kind')=='core-incorporation','The accepted B change requires the actual ordinary clarification task revision')
+    require(receipt.get('source_before')==revision[0].get('source_before')==hashlib.sha256(before_future.encode()).hexdigest() and receipt.get('source_after')==revision[0].get('source_after')==hashlib.sha256(after_future.encode()).hexdigest() and tid in revision[0].get('task_ids',[]) and 'goal' in revision[0].get('changed_fields',{}).get(tid,[]),'Core revision evidence does not bind actual before/after task bytes')
+    owner=indexed[incorporation['owner_event_id']];require(any(answer.get('valid') and answer.get('answer')==owner.get('answer') and answer.get('evidence')==owner.get('evidence') for answer in before_session.get('answers',{}).values()),'B incorporation lacks the actual scripted submitted answer')
+    final_owner=indexed[confirmation['owner_event_id']];confirm=final_session.get('confirmation');require(isinstance(confirm,dict) and confirm.get('evidence')==final_owner.get('evidence') and confirm.get('task_ids')==[tid] and confirm.get('semantic_fingerprints')==final_session.get('semantic_fingerprints'),'Final fixture confirmation must bind the current exact task and explicit scripted input')
+    require(final_session.get('baselines')==wf.clarification_baselines([after_task]) and final_session.get('semantic_fingerprints')==wf.clarification_fingerprints(wf.clarification_baselines([after_task])),'Final core acceptance belongs to stale task semantics')
+    for record in [before_session,after_session,final_session]:
+        raw_record={key:value for key,value in record.items() if key!='session_hash'};require(record.get('session_hash')==hashlib.sha256(wf.dump(raw_record).encode()).hexdigest(),'Captured clarification artifact checksum differs')
+    with tempfile.TemporaryDirectory(prefix='skill-tree-plugin-confirmation-') as temporary:
+        store=wf.Store(Path(temporary),allow_unselected=True,neutral=True);store.future.parent.mkdir(parents=True);store.future.write_text(after_future);target=wf.clarification_path(store,final_session['id']);target.parent.mkdir(parents=True);target.write_text(wf.dump({key:value for key,value in final_session.items() if key!='session_hash'}))
+        try:require(wf.clarification_acceptance_current(store,wf.clarification_read(store,final_session['id'])),'Final core acceptance is no longer current')
+        except (wf.WorkflowError,KeyError,TypeError) as error:raise ValueError('Final captured core acceptance is invalid: '+str(error)) from error
+    def marker(task):
+        values=re.findall(r'Context marker: ([a-zA-Z0-9-]+)\.',task['body']);require(len(values)==1,'The controlled task marker must be independently identifiable');return values[0]
+    old_marker,new_marker=marker(before_task),marker(after_task);require(old_marker!=new_marker,'B must incorporate an actual bounded task change')
+    proposal=invocations[1]['attempt']['result'].get('proposal');require(isinstance(proposal,dict) and proposal.get('task_id')==tid and proposal.get('context_marker')==new_marker,'The actual B proposal must match the incorporated task addition')
+    require(invocations[0]['markers'].get('context_marker')==invocations[1]['markers'].get('context_marker')==old_marker and invocations[2]['markers'].get('context_marker')==new_marker,'The final repeated occurrence did not observe B\'s incorporated current task marker')
+    return {'passed':True,'occurrences':3,'actual_contexts':3,'scope':'Bounded source-backed Codex invocation observations with separately trusted native capture; scripted fixture-owner inputs are not real-human approval, native Skill invocation or comparative plugin efficacy.'}
+
+def validate_plugin_invocation_report(report,trusted_capture=None):
+    try:return _validate_plugin_invocation_report(report,trusted_capture)
+    except (KeyError,TypeError,IndexError,AttributeError,OverflowError,UnicodeError,OSError) as error:raise ValueError('Malformed plugin invocation report or external native capture') from error
+
+
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=['prepare','grade','validate','clarification-prepare','clarification-observe','clarification-interrupt','clarification-grade','clarification-validate','core-decision-validate']);parser.add_argument('--scenario');parser.add_argument('--root',type=Path);parser.add_argument('--input',type=Path);parser.add_argument('--reply',type=Path);parser.add_argument('--observations',type=Path);parser.add_argument('--capture',type=Path);parser.add_argument('--phase');args=parser.parse_args()
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=['prepare','grade','validate','clarification-prepare','clarification-observe','clarification-interrupt','clarification-grade','clarification-validate','core-decision-validate','plugin-invocation-validate']);parser.add_argument('--scenario');parser.add_argument('--root',type=Path);parser.add_argument('--input',type=Path);parser.add_argument('--reply',type=Path);parser.add_argument('--observations',type=Path);parser.add_argument('--capture',type=Path);parser.add_argument('--phase');args=parser.parse_args()
     if args.command=='prepare':result=prepare(args.scenario,args.root.resolve())
     elif args.command=='grade':result=grade(json.loads(args.input.read_text()),args.root.resolve(),args.reply.read_text())
     elif args.command=='validate':result=validate_report(json.loads(args.input.read_text()))
@@ -445,6 +704,7 @@ def main():
     elif args.command=='clarification-interrupt':result=interrupt_clarification(json.loads(args.input.read_text()),args.root.resolve())
     elif args.command=='clarification-grade':result=grade_clarification(json.loads(args.input.read_text()),args.root.resolve(),json.loads(args.observations.read_text()))
     elif args.command=='core-decision-validate':result=validate_core_decision_report(json.loads(args.input.read_text()),json.loads(args.capture.read_text()) if args.capture else None)
+    elif args.command=='plugin-invocation-validate':result=validate_plugin_invocation_report(json.loads(args.input.read_text()),json.loads(args.capture.read_text()) if args.capture else None)
     else:result=validate_clarification_report(json.loads(args.input.read_text()))
     print(json.dumps(result,ensure_ascii=False,indent=2))
 

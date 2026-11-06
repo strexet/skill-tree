@@ -26,8 +26,39 @@ RELATIONS = {'main', 'blocker', 'subtask', 'followup'}
 TERMINAL = {'completed', 'cancelled', 'superseded', 'merged'}
 FORMAT = 'skill-tree-future'
 
-_workspace_spec=importlib.util.spec_from_file_location('skill_tree_run_workspaces',Path(__file__).with_name('run-workspaces.py'))
-workspaces=importlib.util.module_from_spec(_workspace_spec);_workspace_spec.loader.exec_module(workspaces)
+def owned_module(name,path):
+    path=Path(path)
+    if path.is_symlink() or path.parent.is_symlink():raise ValueError('Owned Python helpers cannot use symlinks')
+    source=path.read_bytes();package_root=path.parent.parent;manifest_path=package_root/'references/plugin-bindings.json'
+    if manifest_path.exists() or (package_root/'SKILL.md').exists():
+        if not manifest_path.is_file() or manifest_path.is_symlink() or manifest_path.parent.is_symlink():raise ValueError('The owned package inventory is unavailable')
+        manifest=json.loads(manifest_path.read_text())
+        if not isinstance(manifest,dict):raise ValueError('The owned package inventory is invalid')
+        inventory=manifest.get('owned_resources')
+        if not isinstance(inventory,dict) or not inventory or path.relative_to(package_root).as_posix() not in inventory:raise ValueError('The owned package inventory does not contain the requested helper')
+        for relative,expected in inventory.items():
+            if not isinstance(relative,str) or not relative or relative.startswith(('/','\\')) or '\\' in relative or '\0' in relative or re.match(r'^[A-Za-z]:',relative) or any(part in {'','.','..'} for part in relative.split('/')) or not isinstance(expected,str) or re.fullmatch('[a-f0-9]{64}',expected) is None:raise ValueError('The owned package inventory has invalid resource metadata')
+            resource=package_root
+            for part in relative.split('/'):
+                resource=resource/part
+                if resource.is_symlink():raise ValueError('Owned package resources cannot use symlinks')
+            if not resource.is_file():raise ValueError('Owned package resource bytes differ: '+relative)
+            current=source if resource==path else resource.read_bytes()
+            if hashlib.sha256(current).hexdigest()!=expected:raise ValueError('Owned package resource bytes differ: '+relative)
+    spec=importlib.util.spec_from_file_location(name,path);module=importlib.util.module_from_spec(spec)
+    previous=(sys.pycache_prefix,sys.dont_write_bytecode)
+    prefix=path.parent/('.owned-source-'+uuid.uuid4().hex)
+    if prefix.exists():raise ValueError('A fresh source-only helper prefix is required')
+    try:
+        sys.pycache_prefix=str(prefix);sys.dont_write_bytecode=True
+        exec(compile(source,str(path),'exec'),module.__dict__)
+    finally:sys.pycache_prefix,sys.dont_write_bytecode=previous
+    return module
+
+try:workspaces=owned_module('skill_tree_run_workspaces',Path(__file__).with_name('run-workspaces.py'))
+except (ValueError,OSError) as error:
+    if __name__!='__main__':raise
+    print(json.dumps({'ok':False,'error':str(error)},ensure_ascii=True,sort_keys=True));raise SystemExit(2)
 
 class WorkflowError(ValueError):
     pass
@@ -60,7 +91,7 @@ def dump(value):
 
 def assert_prose(text):
     path=Path(__file__).with_name('validate-document-rules.py')
-    spec=importlib.util.spec_from_file_location('skill_tree_document_rules',path);rules=importlib.util.module_from_spec(spec);spec.loader.exec_module(rules)
+    rules=owned_module('skill_tree_document_rules',path)
     if not isinstance(text,str):raise WorkflowError('Generated prose requires a string')
     errors=rules.check_text(text)
     if errors:raise WorkflowError('Generated prose violates document rules: '+', '.join(errors))
@@ -246,7 +277,7 @@ class Store:
             os.write(fd,dump({'pid':os.getpid(),'host':socket.gethostname()}).encode());os.close(fd)
             if (self.base/'installation/.install-lock').exists():raise WorkflowError('Installation lock exists; preserve the profile handoff')
             self.recover()
-            mutable=[self.future,self.state,self.base/'skill-tree.json',self.base/'history/task-outcomes.jsonl',*list((self.base/'history').rglob('*.json')),*list((self.base/'clarifications').glob('*.json')),*list((self.base/'decisions').glob('*.json'))]
+            mutable=[self.future,self.state,self.base/'skill-tree.json',self.base/'history/task-outcomes.jsonl',*list((self.base/'history').rglob('*.json')),*list((self.base/'clarifications').glob('*.json')),*list((self.base/'decisions').glob('*.json')),*list((self.base/'invocations').glob('*.json'))]
             self._write_hashes={p.relative_to(self.root).as_posix():file_hash(p) for p in mutable}
             yield
         finally:
@@ -281,6 +312,14 @@ class Store:
         self.replace(self.base/'.transaction.json',dump(record));self.recover()
         if hasattr(self,'_write_hashes'):
             for write in record['writes']:self._write_hashes[write['path']]=digest(write['content'].encode())
+    def expect_unchanged(self,relative,expected_hash):
+        if not hasattr(self,'_write_hashes'):raise WorkflowError('Metadata expectations require the owned writer lock')
+        path=self.owned(relative)
+        if expected_hash is not None and (not isinstance(expected_hash,str) or not re.fullmatch('[a-f0-9]{64}',expected_hash)):raise WorkflowError('Metadata expectation requires an exact digest or absent state')
+        if relative in self._write_hashes and self._write_hashes[relative]!=expected_hash:raise WorkflowError('Metadata expectation conflicts with the writer snapshot')
+        if file_hash(path)!=expected_hash:raise WorkflowError('Metadata changed before expectation registration')
+        self._write_hashes[relative]=expected_hash
+
     def text(self):
         self.owned('.skill-tree/documents/future.md')
         if not self.future.is_file(): raise WorkflowError('Missing .skill-tree/documents/future.md; run explicit documentation setup')
@@ -456,6 +495,8 @@ def process(store,payload):
         for result in dispositions.values():
             if result.get('status') not in {'promoted','retained','resolved'} or not result.get('reason'): raise WorkflowError('Processing disposition requires status and reason')
         for result in dispositions.values():assert_prose(result['reason'])
+        due=[tid for tid,result in dispositions.items() if result.get('status') in {'promoted','resolved'}]
+        if due:hook_admission(store,scope={'kind':'pending','pending_ids':due})
         specs=payload.get('tasks',[])
         if not isinstance(specs,list) or any(not isinstance(spec,dict) for spec in specs):raise WorkflowError('Processing tasks require a list of objects')
         # Allocate every identity before resolving forward references; no writes occur until validation succeeds.
@@ -520,7 +561,7 @@ def process(store,payload):
         text=remove(text,{p for p in selected_ids if dispositions[p]['status']!='retained'})
         completed={o['task_id'] for o in store.outcomes() if o.get('disposition')=='completed'}
         validate_dependencies(parse(text),completed)
-        receipt={'id':pr,'selected_ids':[t['id'] for t in selected],'created_ids':produced,'reused_ids':reused,'task_keys':keys,'dispositions':dispositions}
+        receipt={'id':pr,'pending_contexts':{task['id']:{'semantic_fingerprint':digest(clarification_text_semantics(task['body']).encode()),'content_fingerprint':digest(task['body'].encode())} for task in selected},'selected_ids':[t['id'] for t in selected],'created_ids':produced,'reused_ids':reused,'task_keys':keys,'dispositions':dispositions}
         if run:
             run['processing_results'].append(receipt)
             if not run.get('stop_reason'):run['phase']='dependencies';run['next_action']='Select required task'
@@ -705,7 +746,9 @@ def checkpoint(store,payload):
 def complete(store,payload):
     with store.lock():
         store.guard(payload.get('expected_source_hash'));text=store.text();tasks=parse(text);state=store.load(text);task=resolve(tasks,[payload['task_id']],'Prioritized Next Changes')[0]
-        clarification_admission(store,task['id'])
+        disposition=payload.get('disposition','completed')
+        if disposition!='completed':hook_pending_admission(store,scope=task['id'])
+        clarification_admission(store,task['id'],hook_gate=disposition=='completed')
         assert_scope(store,state,tasks,task['id'])
         outcomes=store.outcomes();done={o['task_id'] for o in outcomes if o['disposition']=='completed'}
         if task['id'] in {o['task_id'] for o in outcomes}:raise WorkflowError('Task already has terminal outcome')
@@ -736,7 +779,8 @@ def complete(store,payload):
             for accepted in payload['acceptance']:
                 required_refs={ref['path'] for item in validation_records if accepted['criterion'] in item['check']['criteria'] for ref in item['result']['evidence']}
                 if not required_refs.issubset({ref['path'] for ref in accepted['evidence']}):raise WorkflowError('Acceptance evidence does not match the required check receipts')
-        record={'run_id':state['active_run']['id'] if state['active_run'] else None,'validation_group_id':task.get('validation_group_id'),'boundary_validation':task.get('boundary_validation','not-required'),'validation_plan':check_specs(task),'validation_signature':task_signature(task),'check_results':validation_records,'depends_on':task['depends_on'],'id':identity('O'),'task_id':task['id'],'title':task['title'],'root_task_id':task['root_task_id'],'related_task_id':task['related_task_id'],'parent_pending_ids':task['parent_pending_ids'],'disposition':disposition,'outcome':payload['outcome'],'acceptance':payload.get('acceptance',[]),'limitations':payload.get('limitations',[]),'followup_ids':payload.get('followup_ids',[]),'source_fingerprints':payload.get('source_fingerprints',{}),'commits':payload.get('commits',[]),'evidence':[evidence_pointer(store,e) for e in payload.get('evidence',[])],'recorded_at':now()}
+        task_context={'semantic_fingerprint':clarification_fingerprints(clarification_baselines([task]))[task['id']],'content_fingerprint':digest(task['body'].encode())}
+        record={'task_context':task_context,'run_id':state['active_run']['id'] if state['active_run'] else None,'validation_group_id':task.get('validation_group_id'),'boundary_validation':task.get('boundary_validation','not-required'),'validation_plan':check_specs(task),'validation_signature':task_signature(task),'check_results':validation_records,'depends_on':task['depends_on'],'id':identity('O'),'task_id':task['id'],'title':task['title'],'root_task_id':task['root_task_id'],'related_task_id':task['related_task_id'],'parent_pending_ids':task['parent_pending_ids'],'disposition':disposition,'outcome':payload['outcome'],'acceptance':payload.get('acceptance',[]),'limitations':payload.get('limitations',[]),'followup_ids':payload.get('followup_ids',[]),'source_fingerprints':payload.get('source_fingerprints',{}),'commits':payload.get('commits',[]),'evidence':[evidence_pointer(store,e) for e in payload.get('evidence',[])],'recorded_at':now()}
         ledger=''.join(json.dumps(o,ensure_ascii=False,sort_keys=True)+'\n' for o in outcomes+[record])
         if state['active_run']:
             run=state['active_run'];run.setdefault('completion_refs',{})[task['id']]=record['id'];run['completed_ids'].append(task['id']) if disposition=='completed' else None
@@ -757,6 +801,7 @@ def finish(store):
             if not set(focus['required_ids']).issubset(done):raise WorkflowError('Maintenance scope remains incomplete')
             context=deepcopy(state);context['active_run']=deepcopy(focus)
             if stale_completed_checks(store,context):raise WorkflowError('Maintenance acceptance evidence is stale')
+            if focus.get('hook_chains'):hook_admission(store,chain_ids=focus['hook_chains'])
             summary=deepcopy(focus);summary.update({'finished_at':now(),'phase':'completed','next_action':None})
             del run['maintenance']
             ref='.skill-tree/history/runs/scope-'+summary['id'].lower()+'.json';run.setdefault('history_refs',[]).append(ref)
@@ -771,6 +816,7 @@ def finish(store):
         assert_admission(store,state)
         stale=stale_completed_checks(store,state)
         if stale:raise WorkflowError('Required completed check evidence is stale or unavailable: '+stale[0]['task_id']+'/'+stale[0]['check_id']+'; advance selects the preserved contract for revalidation')
+        if run.get('hook_chains'):hook_admission(store,chain_ids=run['hook_chains'])
         run.setdefault('delivery',{'publication':'not-requested','authorization':{}}).update({'implementation':'completed','status':'implementation-completed'})
         if not run['delivery'].get('authorization',{}).get('pr'):run['delivery']['status']='local-result'
         run['delivery']['order_completed']=run['delivery']['status']=='local-result'
@@ -1457,6 +1503,523 @@ def replay_events(store,payload):
 
 
 
+# Hook metadata remains independent of controller selection and Future bootstrap.
+HOOK_COMMANDS={'hook-'+name for name in ['start','read','next','prepare','invoke','record','accept','reconcile','resume','pending']}
+
+
+def hook_helper():
+    return owned_module('skill_tree_plugin_invocation',Path(__file__).with_name('plugin-invocation.py'))
+
+
+def _hook_safe(root,relative):
+    helper=hook_helper()
+    if not helper.relative(relative):raise WorkflowError('Hook resource paths must remain bounded and repository-relative')
+    base=Path(root).resolve();value=base
+    for part in relative.split('/'):
+        value=value/part
+        if value.is_symlink():raise WorkflowError('Hook resource symlinks are unsupported')
+    return value
+
+
+def _hook_source_store(store,source_root):
+    # Canonical routing was established before writer-lock entry; scoped reads stay pure.
+    result=object.__new__(Store);result.__dict__.update(store.__dict__)
+    result.source_root=Path(source_root).resolve();result.neutral=True;result.allow_unselected=True;result.run_id=None;result.selected_run_id=None
+    return result
+
+
+def _hook_controller(store,run_id):
+    if not store.future.is_file() or not store.state.is_file():raise WorkflowError('A controller hook requires an existing recorded run')
+    state=_hook_source_store(store,store.source_root).load()
+    runs=dict(state.get('run_registry',{}).get('runs',{}))
+    if state.get('active_run'):runs[state['active_run']['id']]=state['active_run']
+    if run_id not in runs:raise WorkflowError('The hook controller is not an actual recorded run')
+    return runs[run_id]
+
+
+def actual_hook_context(store,value):
+    """Bind only selected scope bytes, preserving unrelated queue independence."""
+    if not isinstance(value,dict):raise WorkflowError('A typed hook context is required')
+    result=deepcopy(value);kind=result.get('kind')
+    if kind in {'task','task-group','pending'}:
+        key='pending_ids' if kind=='pending' else 'task_ids';ids=result.get(key)
+        if not isinstance(ids,list) or not ids:raise WorkflowError('Hook scope requires actual selected identities')
+        selected=resolve(parse(store.text()),ids,'Pending Queue' if kind=='pending' else 'Prioritized Next Changes')
+        if kind=='pending':
+            fingerprints={item['id']:{'semantic_fingerprint':digest(clarification_text_semantics(item['body']).encode()),'content_fingerprint':digest(item['body'].encode())} for item in selected}
+        else:
+            baselines=clarification_baselines(selected);semantics=clarification_fingerprints(baselines)
+            fingerprints={tid:{'semantic_fingerprint':semantics[tid],'content_fingerprint':baseline['content_hash']} for tid,baseline in baselines.items()}
+            if set(result.get('pending_ids',[]))-{item for task in selected for item in task['parent_pending_ids']}:raise WorkflowError('Hook Pending provenance differs from actual selected tasks')
+        if len(selected)==1:
+            result.update(fingerprints[selected[0]['id']])
+            if 'body' in result:result['body']=selected[0]['body']
+        else:
+            result['semantic_fingerprint']=digest(dump({tid:part['semantic_fingerprint'] for tid,part in fingerprints.items()}).encode())
+            result['content_fingerprint']=digest(dump({tid:part['content_fingerprint'] for tid,part in fingerprints.items()}).encode())
+            if 'body' in result:result['body']={task['id']:task['body'] for task in selected}
+        if kind=='task-group' or 'task_fingerprints' in result:result['task_fingerprints']=fingerprints
+    elif kind in {'document','snapshot'}:
+        paths=result.get('paths');
+        if not isinstance(paths,list) or not paths:raise WorkflowError('Document hook context requires bounded paths')
+        files={};semantic={};bodies={}
+        for relative in paths:
+            path=_hook_safe(store.source_root,relative);raw=path.read_bytes() if path.is_file() else None;files[relative]=digest(raw) if raw is not None else None
+            if raw is None:semantic[relative]=None
+            else:
+                try:
+                    content=raw.decode('utf-8');semantic[relative]=digest(clarification_text_semantics(content).encode());bodies[relative]=content
+                except UnicodeError:semantic[relative]=files[relative]
+        result['semantic_fingerprint']=digest(dump(semantic).encode());result['content_fingerprint']=digest(dump(files).encode())
+        if 'body' in result:result['body']=bodies
+    elif kind=='controller':
+        run=_hook_controller(store,result.get('run_id'));admitted=set(run.get('admitted_task_ids',run.get('snapshot',[]))+run.get('required_ids',[]))
+        if set(result.get('task_ids',[]))-admitted:raise WorkflowError('Hook scope exceeds the actual controller admission')
+        scope={key:run.get(key) for key in ['id','mode','snapshot','root_task_id','admitted_task_ids','required_ids']}
+        result['semantic_fingerprint']=digest(dump(scope).encode());result['content_fingerprint']=result['semantic_fingerprint']
+    elif kind=='review':
+        # The PR bridge supplies the current independently inspected provider snapshot.
+        # A typed ledger never replaces ordinary PR head/base/check/authorization gates.
+        pass
+    elif kind in {'request','project','management'}:
+        data={key:item for key,item in result.items() if key not in {'semantic_fingerprint','content_fingerprint'}}
+        if kind in {'project','management'}:
+            data['owned_profile']=file_hash(store.source_root/'.skill-tree/installation/profile.json')
+            if kind=='management':data['registry']=file_hash(store.source_root/'.skill-tree/installation/plugins.json')
+        result['semantic_fingerprint']=hook_helper().digest(data);result['content_fingerprint']=result['semantic_fingerprint']
+    else:raise WorkflowError('Unknown hook context kind')
+    return _hook_context_links(store,result)
+
+
+def _hook_context_links(store,result):
+    kind=result['kind']
+    if result.get('orchestration_id'):
+        core=owned_module('skill_tree_hook_plan_context',Path(__file__).with_name('decision-orchestration.py')).read(store,result['orchestration_id'])
+        if any(result.get(key)!=core['context'].get(key) for key in ['kind','id','task_ids','pending_ids']):raise WorkflowError('The hook plan belongs to another actual selected operation scope')
+        result['orchestration_plan_digest']=core['plan']['digest'] if core.get('plan') else None
+        result['orchestration_plan_fingerprint']=hook_helper().digest(core['plan']) if core.get('plan') else None
+    if result.get('session_id'):
+        parent=clarification_read(store,result['session_id'])
+        if parent['state']=='cancelled':raise WorkflowError('Cancelled clarification permits only original hook cleanup')
+        if set(result.get('task_ids',[]))-set(parent['task_ids']):raise WorkflowError('Hook task scope differs from the linked clarification')
+        result['parent_mode_epoch']=parent.get('decision_mode_epoch',0)
+        if result.get('question_id') and result.get('purpose')!='confirmation':
+            question=parent['questions'].get(result['question_id'])
+            if not question:raise WorkflowError('The linked hook question is not current')
+            result['question_revision']=question['revision']
+    if result.get('run_id') and kind!='controller':
+        run=_hook_controller(store,result['run_id'])
+        if set(result.get('task_ids',[]))-set(run.get('admitted_task_ids',run.get('snapshot',[]))+run.get('required_ids',[])):raise WorkflowError('Hook tasks exceed the linked controller scope')
+    try:return hook_helper().context(result)
+    except ValueError as error:raise WorkflowError(str(error)) from error
+
+
+def _hook_admitted_context(store,value):
+    # Completed outcomes retain the exact consumed task bytes for readiness only.
+    # Runtime preparation still requires live selected tasks in actual_hook_context.
+    if value.get('kind')=='pending':return _hook_admitted_pending_context(store,value)
+    if value.get('kind') not in {'task','task-group'}:return actual_hook_context(store,value)
+    ids=value['task_ids'];open_tasks={task['id']:task for task in parse(store.text()) if task['queue']=='Prioritized Next Changes'}
+    if all(tid in open_tasks for tid in ids):return actual_hook_context(store,value)
+    completed={item['task_id']:item for item in store.outcomes() if item.get('disposition')=='completed'}
+    selected=[open_tasks[tid] for tid in ids if tid in open_tasks];baselines=clarification_baselines(selected);semantics=clarification_fingerprints(baselines)
+    fingerprints={tid:{'semantic_fingerprint':semantics[tid],'content_fingerprint':part['content_hash']} for tid,part in baselines.items()}
+    provenance={item for task in selected for item in task['parent_pending_ids']}
+    for tid in ids:
+        if tid in fingerprints:continue
+        outcome=completed.get(tid);part=(outcome or {}).get('task_context')
+        if not isinstance(part,dict) or set(part)!={'semantic_fingerprint','content_fingerprint'} or any(not isinstance(item,str) or re.fullmatch('[a-f0-9]{64}',item) is None for item in part.values()):raise WorkflowError('The removed hook task lacks an exact successful completed context: '+tid)
+        fingerprints[tid]=deepcopy(part);provenance.update(outcome['parent_pending_ids'])
+    if set(value.get('pending_ids',[]))-provenance:raise WorkflowError('Completed hook Pending provenance differs from the preserved task outcomes')
+    result=deepcopy(value)
+    if len(ids)==1:result.update(fingerprints[ids[0]])
+    else:
+        for key in ['semantic_fingerprint','content_fingerprint']:result[key]=digest(dump({tid:part[key] for tid,part in fingerprints.items()}).encode())
+    if result['kind']=='task-group' or 'task_fingerprints' in result:result['task_fingerprints']=fingerprints
+    if 'body' in result:
+        bodies={tid:open_tasks[tid]['body'] if tid in open_tasks else result['body'].get(tid) if isinstance(result['body'],dict) else result['body'] for tid in ids}
+        if any(not isinstance(body,str) or digest(body.encode())!=fingerprints[tid]['content_fingerprint'] for tid,body in bodies.items()):raise WorkflowError('Completed hook body differs from the exact preserved task outcome')
+        result['body']=bodies[ids[0]] if len(ids)==1 else bodies
+    return _hook_context_links(store,result)
+
+
+def _hook_admitted_pending_context(store,value):
+    ids=value['pending_ids'];open_tasks={task['id']:task for task in parse(store.text()) if task['queue']=='Pending Queue'}
+    if all(pid in open_tasks for pid in ids):return actual_hook_context(store,value)
+    if not value.get('run_id'):raise WorkflowError('Consumed Pending hook readiness requires the original linked controller receipt')
+    run=_hook_controller(store,value['run_id']);receipts=run.get('processing_results',[]);fingerprints={}
+    for pid in ids:
+        if pid in open_tasks:
+            body=open_tasks[pid]['body'];fingerprints[pid]={'semantic_fingerprint':digest(clarification_text_semantics(body).encode()),'content_fingerprint':digest(body.encode())};continue
+        receipt=next((item for item in reversed(receipts) if pid in item.get('selected_ids',[]) and item.get('dispositions',{}).get(pid,{}).get('status') in {'promoted','resolved'}),None)
+        part=(receipt or {}).get('pending_contexts',{}).get(pid)
+        if not isinstance(part,dict) or set(part)!={'semantic_fingerprint','content_fingerprint'} or any(not isinstance(item,str) or re.fullmatch('[a-f0-9]{64}',item) is None for item in part.values()):raise WorkflowError('The consumed Pending hook lacks an exact successful processing receipt: '+pid)
+        fingerprints[pid]=deepcopy(part)
+    result=deepcopy(value)
+    if len(ids)==1:result.update(fingerprints[ids[0]])
+    else:
+        for key in ['semantic_fingerprint','content_fingerprint']:result[key]=digest(dump({pid:part[key] for pid,part in fingerprints.items()}).encode())
+    if 'task_fingerprints' in result:result['task_fingerprints']=fingerprints
+    if 'body' in result:
+        bodies={pid:open_tasks[pid]['body'] if pid in open_tasks else result['body'].get(pid) if isinstance(result['body'],dict) else result['body'] for pid in ids}
+        if any(not isinstance(body,str) or digest(body.encode())!=fingerprints[pid]['content_fingerprint'] for pid,body in bodies.items()):raise WorkflowError('Consumed Pending hook body differs from the exact processing receipt')
+        result['body']=bodies[ids[0]] if len(ids)==1 else bodies
+    return _hook_context_links(store,result)
+
+
+def _hook_locator_path(store,chain_id):
+    if not valid_id(chain_id,'HC'):raise WorkflowError('Hook lookup requires an exact HC identity')
+    path=_hook_safe(store.root,'.skill-tree/local/hook-locations/'+chain_id.lower()+'.json')
+    if path.is_symlink() or path.parent.is_symlink():raise WorkflowError('Private hook locators cannot use symlinks')
+    return path
+
+
+def _hook_locator(store,chain_id):
+    path=_hook_locator_path(store,chain_id)
+    if not path.is_file():raise WorkflowError('The private hook execution locator is unavailable; explicitly recover the owned location')
+    raw=path.read_bytes();value=json.loads(raw)
+    if not isinstance(value,dict) or value.get('schema')!=1 or value.get('chain_id')!=chain_id or not isinstance(value.get('watch'),dict):raise WorkflowError('Unsupported private hook locator')
+    if any(not isinstance(path,str) or not Path(path).is_absolute() or (expected is not None and (not isinstance(expected,str) or re.fullmatch('[a-f0-9]{64}',expected) is None)) for path,expected in value['watch'].items()):raise WorkflowError('Unsupported private hook resource watchers')
+    for key in ['package_root','execution_root']:
+        if not isinstance(value.get(key),str) or not Path(value[key]).is_absolute():raise WorkflowError('Private hook locations require actual absolute roots')
+    if value.get('canonical_root')!=str(store.root):raise WorkflowError('Hook execution locator belongs to another canonical repository')
+    value['_locator_hash']=digest(raw)
+    return value
+
+
+def _hook_watch(package_root,execution_root):
+    package_root=Path(package_root).resolve();manifest_path=_hook_safe(package_root,'references/plugin-bindings.json')
+    manifest=json.loads(manifest_path.read_text());watch={str(manifest_path):file_hash(manifest_path)}
+    inventory=manifest.get('owned_resources')
+    if not isinstance(inventory,dict):raise WorkflowError('The actual owned hook inventory is unavailable')
+    for relative,expected in inventory.items():
+        path=_hook_safe(package_root,relative)
+        if file_hash(path)!=expected:raise WorkflowError('Owned hook bytes changed during preparation')
+        watch[str(path)]=expected
+    for package in manifest.get('packages',{}).values():
+        for relative,expected in package.get('files',{}).items():
+            path=_hook_safe(package_root,relative)
+            if file_hash(path)!=expected:raise WorkflowError('Pinned plugin bytes changed during preparation')
+            watch[str(path)]=expected
+    for relative in ['.skill-tree/installation/profile.json','.skill-tree/installation/plugins.json']:
+        path=_hook_safe(execution_root,relative);watch[str(path)]=file_hash(path)
+    return watch
+
+
+def _hook_watch_guard(watch):
+    for value,expected in watch.items():
+        path=Path(value)
+        if not path.is_absolute() or any(parent.is_symlink() for parent in [path,*path.parents]) or file_hash(path)!=expected:raise WorkflowError('Hook package, profile or configuration changed; explicitly reconcile the frozen invocation')
+
+
+HOOK_MUTABLE_SOURCE_PATHS=(
+    '.skill-tree/documents/future.md','.skill-tree/documents/future.json','.skill-tree/skill-tree.json',
+    '.skill-tree/invocations','.skill-tree/clarifications','.skill-tree/decisions','.skill-tree/local',
+    '.skill-tree/history/checkpoints','.skill-tree/history/runs','.skill-tree/history/run-events',
+    '.skill-tree/history/task-outcomes.jsonl','.skill-tree/run-evidence','.skill-tree/artifacts',
+    '.skill-tree/.writer-lock','.skill-tree/.transaction.json',
+)
+
+
+def _hook_mutable_source(relative):
+    return any(relative==prefix or relative.startswith(prefix+'/') for prefix in HOOK_MUTABLE_SOURCE_PATHS)
+
+
+def _hook_scope_source_hash(store,relative):
+    path=_hook_safe(store.source_root,relative)
+    return binding_snapshot(store.source_root,[relative],excluded=list(HOOK_MUTABLE_SOURCE_PATHS)) if path.is_dir() else file_hash(path)
+
+
+def _hook_scope_sources(store,ctx,original=None):
+    if original is not None:
+        paths=list(original['input'].get('scope_source_snapshot',{}))
+    else:
+        paths=deepcopy(ctx.get('source_paths',[]))
+        if not isinstance(paths,list):raise WorkflowError('Explicit scoped source files require a bounded path list')
+        if ctx['kind'] in {'task','task-group'}:
+            selected=resolve(parse(store.text()),ctx['task_ids'],'Prioritized Next Changes')
+            paths.extend(relative for task in selected for check in check_specs(task) for relative in check['sources'])
+    result={}
+    for relative in paths:
+        _hook_safe(store.source_root,relative)
+        if not _hook_mutable_source(relative):result[relative]=_hook_scope_source_hash(store,relative)
+    return result
+
+
+def _hook_scope_source_guard(store,expected):
+    if any(_hook_scope_source_hash(store,relative)!=value for relative,value in expected.items()):raise WorkflowError('The selected invocation source bytes changed during preparation; reconcile or explicitly retry')
+
+
+def _hook_policy_guard(store,ctx,mode,authority,executor):
+    if isinstance(authority,dict) and authority.get('revoked',False):raise WorkflowError('The actual hook owner authority is revoked')
+    if ctx.get('orchestration_id'):
+        core=owned_module('skill_tree_hook_plan_policy',Path(__file__).with_name('decision-orchestration.py')).read(store,ctx['orchestration_id'])
+        if mode!=core['mode'] or authority!=core['authority'] or executor!=core['executor']:raise WorkflowError('Hook mode, authority or executor differs from the actual linked plan orchestration')
+    if not ctx.get('session_id'):return
+    parent=clarification_read(store,ctx['session_id'])
+    if parent['state']=='cancelled' or mode!=clarification_decision_mode(parent):raise WorkflowError('Hook decision mode differs from the current linked clarification')
+    if parent.get('decision_authority') is not None and authority!=parent['decision_authority']:raise WorkflowError('Hook authority differs from the actual linked clarification grant')
+    if mode=='auto' and executor!=parent.get('decision_executor'):raise WorkflowError('Hook executor differs from the actual linked Auto clarification')
+
+
+def _hook_node(package_root,request):
+    script=_hook_safe(package_root,'scripts/plugin-hooks.js')
+    run=subprocess.run(['node',str(script),'--input','-'],input=json.dumps(request,ensure_ascii=True),capture_output=True,text=True,timeout=30)
+    if run.returncode:raise WorkflowError('Owned hook preparation failed: '+(run.stderr.strip().splitlines()[-1] if run.stderr.strip() else 'The owned Node bridge is unavailable'))
+    try:return json.loads(run.stdout)
+    except ValueError as error:raise WorkflowError('Owned hook preparation returned invalid JSON') from error
+
+
+def _hook_resolution_context(ctx,chain,attempt,purpose):
+    result=deepcopy(ctx)
+    if result.get('session_id'):result['clarification_session_id']=result.pop('session_id')
+    result.update(purpose=purpose,hook_chain_id=chain['id'],hook_attempt_id=attempt['id'],hook_result_digest=hook_helper().digest(attempt['result']))
+    return result
+
+
+def _hook_transition(store,chain,attempt,receipt,after):
+    helper=hook_helper()
+    if not isinstance(receipt,dict):raise WorkflowError('Hook incorporation requires actual ordinary core transition evidence')
+    before=chain['context']
+    if receipt.get('before')!=helper.digest(before) or receipt.get('after')!=helper.digest(after):raise WorkflowError('Core hook receipt differs from the exact before/after operation context')
+    if receipt.get('kind')=='core-incorporation' and receipt.get('orchestration_id'):
+        oid=receipt['orchestration_id']
+        if oid!=before.get('orchestration_id') or oid!=after.get('orchestration_id'):raise WorkflowError('Core plan incorporation belongs to another original orchestration')
+        core=owned_module('skill_tree_hook_plan_incorporation',Path(__file__).with_name('decision-orchestration.py')).read(store,oid)
+        _hook_policy_guard(store,after,chain['mode'],chain['authority'],chain['executor'])
+        if any(after.get(key)!=core['context'].get(key) or before.get(key)!=after.get(key) for key in ['kind','id','task_ids','pending_ids','semantic_fingerprint','content_fingerprint']):raise WorkflowError('Core plan incorporation cannot substitute the original actual task scope')
+        sequence=receipt.get('plan_sequence');entry=next((item for item in core['history'] if item.get('sequence')==sequence and item.get('event')=='plan'),None)
+        previous=(entry or {}).get('detail',{}).get('previous_plan')
+        if not isinstance(previous,dict) or previous.get('digest')!=before.get('orchestration_plan_digest') or helper.digest(previous)!=before.get('orchestration_plan_fingerprint'):raise WorkflowError('Core plan incorporation lacks the exact original previous plan event')
+        if any(item.get('event')=='plan' and item.get('sequence',0)>sequence for item in core['history']):raise WorkflowError('A later core plan event superseded the incorporation receipt')
+        if core['phase']!='plan-review' or not core.get('plan') or core.get('plan_acceptance') is not None or core.get('checks') is not None or core.get('review') is not None:raise WorkflowError('Core plan incorporation requires the actual unaccepted revised draft frontier')
+        if helper.digest(previous)==helper.digest(core['plan']):raise WorkflowError('A no-op plan revision cannot resolve hook findings or questions; use a current accepted core resolution')
+        if core['plan']['digest']!=after.get('orchestration_plan_digest') or helper.digest(core['plan'])!=after.get('orchestration_plan_fingerprint') or actual_hook_context(store,after)!=after:raise WorkflowError('Core plan incorporation does not bind the exact current revised plan')
+        return {**deepcopy(receipt),'reference':'.skill-tree/decisions/'+oid.lower()+'.json','plan_before':deepcopy(previous),'plan_after':deepcopy(core['plan']),'final_confirmation':False}
+    if any(before.get(key)!=after.get(key) for key in ['orchestration_id','orchestration_plan_digest','orchestration_plan_fingerprint']):raise WorkflowError('A changed plan requires the exact ordinary core plan incorporation receipt')
+    if receipt.get('kind')=='core-incorporation':
+        session=clarification_read(store,receipt.get('session_id'));revision=next((item for item in session.get('task_revisions',[]) if item.get('id')==receipt.get('task_revision_id')),None)
+        if not revision:raise WorkflowError('The actual guarded clarification revision is unavailable')
+        ids=before.get('task_ids',[])
+        if not ids or set(revision['task_ids'])-set(ids):raise WorkflowError('Core incorporation changes another hook task scope')
+        if before.get('session_id') and before['session_id']!=session['id']:raise WorkflowError('Core incorporation belongs to another clarification session')
+        fingerprints=revision.get('task_fingerprints',{})
+        for tid in ids:
+            if tid not in fingerprints:raise WorkflowError('Core task revision lacks exact selected-task fingerprints')
+        changed=[tid for tid in revision['task_ids'] if tid in ids and fingerprints[tid]['before']!=fingerprints[tid]['after']]
+        if not changed or not any(revision.get('changed_fields',{}).get(tid) or tid in revision.get('content_changed_task_ids',[]) for tid in changed):raise WorkflowError('A no-op task revision cannot resolve hook findings or questions; use a current accepted core resolution')
+        old=fingerprints[ids[0]]['before'] if len(ids)==1 else {'semantic_fingerprint':digest(dump({tid:fingerprints[tid]['before']['semantic_fingerprint'] for tid in ids}).encode()),'content_fingerprint':digest(dump({tid:fingerprints[tid]['before']['content_fingerprint'] for tid in ids}).encode())}
+        new=fingerprints[ids[0]]['after'] if len(ids)==1 else {'semantic_fingerprint':digest(dump({tid:fingerprints[tid]['after']['semantic_fingerprint'] for tid in ids}).encode()),'content_fingerprint':digest(dump({tid:fingerprints[tid]['after']['content_fingerprint'] for tid in ids}).encode())}
+        if any(before.get(key)!=old[key] or after.get(key)!=new[key] for key in ['semantic_fingerprint','content_fingerprint']):raise WorkflowError('The actual core revision does not bind the original task and current incorporated bytes')
+        if actual_hook_context(store,after)!=after:raise WorkflowError('The incorporated hook task context is no longer current')
+        for key in ['source_before','source_after']:
+            if key in receipt and receipt[key]!=revision[key]:raise WorkflowError('The supplied core revision source receipt differs')
+        return {**deepcopy(receipt),'reference':'.skill-tree/clarifications/'+session['id'].lower()+'.json','source_before':revision['source_before'],'source_after':revision['source_after'],'final_confirmation':False}
+    if receipt.get('kind')=='core-resolution':
+        decisions=decision_helper();expected=_hook_resolution_context(after,chain,attempt,'hook-result-resolution');reference=receipt.get('decision_receipt')
+        accepted=decisions.acceptance_reference(store,reference,{'context':expected,'mode':chain['mode'],'kind':'technical','authority_digest':decisions._hash(chain['authority'])})
+        if accepted['answer'] not in {'accept','resolve','dismiss'}:raise WorkflowError('The current core decision did not resolve the hook contribution')
+        return {**deepcopy(receipt),'reference':'.skill-tree/decisions/'+reference['decision_id'].lower()+'.json','decision_receipt':reference}
+    raise WorkflowError('An unsupported core receipt cannot satisfy a hook result')
+
+
+def _hook_supersession(store,old,new,receipt):
+    if not isinstance(receipt,dict):raise WorkflowError('Hook configuration adoption requires an actual current core decision')
+    decisions=decision_helper();ctx=deepcopy(new['context'])
+    if ctx.get('session_id'):ctx['clarification_session_id']=ctx.pop('session_id')
+    ctx.update(purpose='hook-configuration-adoption',hook_chain_id=old['id'],before_configuration_digest=old['configuration']['configuration_digest'],after_configuration_digest=new['configuration']['configuration_digest'])
+    reference=receipt.get('decision_receipt');accepted=decisions.acceptance_reference(store,reference,{'context':ctx,'mode':new.get('mode','auto'),'kind':'technical','authority_digest':decisions._hash(new['authority'])})
+    if accepted['answer']!='adopt':raise WorkflowError('The current core decision did not adopt the replacement configuration')
+    return {'kind':'configuration-adoption','reference':'.skill-tree/decisions/'+reference['decision_id'].lower()+'.json','decision_receipt':reference,'before_configuration_digest':old['configuration']['configuration_digest'],'after_configuration_digest':new['configuration']['configuration_digest']}
+
+
+def _hook_register(store,writes,ctx,chain_id):
+    if not ctx.get('run_id'):return
+    registration=_hook_source_store(store,store.source_root);registration.run_id=ctx['run_id'];registration.selected_run_id=ctx['run_id'];state=registration.load()
+    run=state.get('run_registry',{}).get('runs',{}).get(ctx['run_id']) or state.get('active_run')
+    if not run or run['id']!=ctx['run_id']:raise WorkflowError('The hook controller registration is not current')
+    state['active_run']=workspaces.register_hook_reference(run,chain_id,ctx.get('task_ids',[]));persisted=workspaces.persist(registration,state)
+    registration.record_run_event(registration.text(),persisted,writes);writes['.skill-tree/documents/future.json']=dump(persisted)
+
+
+def hook_action(store,command,payload,*,private_delivery_provider=None,private_delivery_sink=None):
+    if not isinstance(payload,dict):raise WorkflowError('Hook operations require a structured payload')
+    if any(key in payload for key in ['private_delivery_provider','private_delivery_sink']):raise WorkflowError('Private delivery callbacks are trusted in-process callables, never JSON input')
+    if any(value is not None and not callable(value) for value in [private_delivery_provider,private_delivery_sink]):raise WorkflowError('Private delivery callbacks require actual in-process callables')
+    if command!='hook-invoke' and any(value is not None for value in [private_delivery_provider,private_delivery_sink]):raise WorkflowError('Private delivery callbacks apply only to the original invocation dispatch')
+    try:return _hook_action(store,command,payload,private_delivery_provider=private_delivery_provider,private_delivery_sink=private_delivery_sink)
+    except WorkflowError:raise
+    except ValueError as error:raise WorkflowError(str(error)) from error
+
+
+def _hook_action(store,command,payload,*,private_delivery_provider=None,private_delivery_sink=None):
+    helper=hook_helper();cmd=command.removeprefix('hook-')
+    if command not in HOOK_COMMANDS:raise WorkflowError('Unknown hook operation')
+    if cmd=='read':return helper.read(store,payload.get('chain_id'))
+    if cmd=='pending':return helper.pending_scan(store)
+    frame=None if cmd=='start' else helper.read(store,payload.get('chain_id'))
+    cleanup=cmd=='reconcile';locator=None
+    if frame is not None and not cleanup:
+        locator=_hook_locator(store,frame['id'])
+    if cleanup:
+        class CleanupStore:
+            def __getattr__(self,key):return getattr(store,key)
+            @contextmanager
+            def lock(self):
+                with store.lock():
+                    if payload.get('expected_source_hash') is not None and store.future.exists():store.guard(payload['expected_source_hash'])
+                    yield
+        return helper.mutate(CleanupStore(),'reconcile',payload)
+    execution_root=Path(locator['execution_root']) if locator else store.source_root
+    effective=Store(execution_root,allow_unselected=True,neutral=True)
+    if effective.root!=store.root:raise WorkflowError('Hook execution belongs to another canonical queue')
+    package_root=Path(payload.get('package_root') or (locator or {}).get('package_root') or Path(__file__).parent.parent).resolve()
+    ctx=deepcopy(payload.get('context',frame['context'] if frame else None))
+    if not isinstance(ctx,dict):raise WorkflowError('A typed current hook context is required')
+    orchestration_id=payload.get('orchestration_id') or (locator or {}).get('orchestration_id') or ctx.get('orchestration_id')
+    if orchestration_id:ctx['orchestration_id']=orchestration_id
+    ctx=actual_hook_context(effective,ctx)
+    run_locator=None
+    if ctx.get('run_id'):
+        selected=Store(execution_root,ctx['run_id']);selected.load()
+        if selected.source_root!=execution_root:raise WorkflowError('Hook execution must use the actual linked controller worktree')
+        run_locator=workspaces.runtime_file(effective.root)
+    ev=payload.get('event') if frame is None else frame['event'];configuration=frame['configuration'] if frame else None
+    request={'runtime_action':'freeze-chain' if frame is None else 'occurrence-plan','project_root':str(execution_root),'event':ev,'context':ctx,'capabilities':deepcopy(payload.get('capabilities',(locator or {}).get('capabilities',[]))),'adapter':deepcopy(payload.get('adapter',(locator or {}).get('adapter',{'provider':'codex','mechanism':'source-backed-context'})))}
+    if orchestration_id:request['orchestration_id']=orchestration_id
+    if frame is None:
+        request['run_overrides']=deepcopy(payload.get('run_overrides',{}))
+        if 'execution_policy' in payload:request['execution_policy']=deepcopy(payload['execution_policy'])
+    else:request['configuration']=configuration
+    prepared=_hook_node(package_root,request);proof=prepared['proof'] if frame is None else prepared
+    if frame is None:
+        configuration=prepared['configuration']
+        if not configuration['bindings'] and not payload.get('supersedes_chain_id'):return {'status':'noop','state':'complete','bindings':[]}
+    original_source=frame['attempts'].get(payload.get('attempt_id') or frame.get('prepared_attempt_id')) if frame is not None and cmd in {'invoke','record','accept','next'} else None
+    scoped_sources=_hook_scope_sources(effective,ctx,original_source)
+    proof['scope_source_snapshot']=scoped_sources
+    normalized={key:deepcopy(value) for key,value in payload.items() if key not in {'proof','private_secrets','package_root'}};normalized['context']=ctx
+    if frame is None:normalized.update(configuration=configuration,event=proof['event'])
+    if ctx.get('orchestration_id') and frame is None:
+        core=owned_module('skill_tree_hook_plan_defaults',Path(__file__).with_name('decision-orchestration.py')).read(effective,ctx['orchestration_id'])
+        for key in ['mode','authority','executor']:normalized.setdefault(key,core[key])
+    if ctx.get('session_id') and frame is None:
+        parent=clarification_read(effective,ctx['session_id']);normalized.setdefault('mode',clarification_decision_mode(parent))
+        if parent.get('decision_authority') is not None:normalized.setdefault('authority',parent['decision_authority'])
+        if parent.get('decision_executor') is not None:normalized.setdefault('executor',parent['decision_executor'])
+    if cmd=='invoke':
+        original=frame['attempts'].get(payload.get('attempt_id'))
+        if not original or payload.get('input_digest')!=original['input_digest']:raise WorkflowError('Hook dispatch does not match the original attempt input')
+        private_request={**request,'package_root':str(package_root),'runtime_action':'delivery-data','chain_id':frame['id'],'attempt_id':original['id'],'binding_id':original['binding_id'],'public_input':original['input'],'input_digest':original['input_digest'],'mode':frame['mode'],'authority':frame['authority']}
+        if 'private_secrets' in payload:private_request['private_secrets']=payload['private_secrets']
+        if private_delivery_provider is None:delivery=_hook_node(package_root,private_request)
+        else:
+            try:delivery=private_delivery_provider(deepcopy(private_request))
+            except Exception as error:raise WorkflowError('The trusted private delivery provider is unavailable') from error
+        if not isinstance(delivery,dict) or not isinstance(delivery.get('payload'),dict):raise WorkflowError('The trusted private provider must return the exact owned Node delivery envelope')
+        private_input=delivery['payload']
+        for key,expected in {'chain_id':frame['id'],'attempt_id':original['id'],'binding_id':original['binding_id'],'context':ctx,'event':proof['event'],'input_digest':original['input_digest'],'mode':frame['mode'],'authority':frame['authority']}.items():
+            if private_input.get(key)!=expected:raise WorkflowError('The trusted private delivery differs from the original current invocation')
+        proof['delivery']={key:delivery[key] for key in ['input_digest','delivery_digest','resolved_parameter_digest']}
+        if 'dispatch_identity' in delivery:proof['delivery']['dispatch_identity']=delivery['dispatch_identity']
+    watch=_hook_watch(package_root,execution_root)
+    if run_locator is not None:watch[str(run_locator.resolve())]=file_hash(run_locator)
+    chain_id=frame['id'] if frame else 'HC-'+str(uuid.uuid5(uuid.NAMESPACE_URL,'skill-tree-invocation:'+normalized.get('request_id','')))
+    private_path=_hook_locator_path(effective,chain_id);private_expected=locator['_locator_hash'] if locator else file_hash(private_path)
+    private={'schema':1,'chain_id':chain_id,'canonical_root':str(effective.root),'package_root':str(package_root),'execution_root':str(execution_root),'watch':watch,'capabilities':request['capabilities'],'adapter':request['adapter'],'orchestration_id':orchestration_id}
+    mode=normalized.get('mode',frame['mode'] if frame else 'auto');grant=normalized.get('authority',frame['authority'] if frame else None);executor=normalized.get('executor',frame['executor'] if frame else None)
+    def guard(current,operation,values):
+        _hook_watch_guard(watch)
+        if cmd in {'prepare','invoke','record','accept'}:_hook_scope_source_guard(effective,scoped_sources)
+        if effective.future.exists():
+            if not normalized.get('expected_source_hash'):raise WorkflowError('Hook mutation requires the inspected existing queue source hash')
+            effective.guard(normalized['expected_source_hash'])
+        elif normalized.get('expected_source_hash') is not None:raise WorkflowError('Hook queue context changed; reread before mutation')
+        if actual_hook_context(effective,ctx)!=ctx:raise WorkflowError('The actual selected hook scope changed during preparation')
+        frontier=proof.get('guard') or {}
+        if frontier.get('orchestration_id'):
+            core=owned_module('skill_tree_hook_orchestration_guard',Path(__file__).with_name('decision-orchestration.py')).read(effective,frontier['orchestration_id'])
+            if core['orchestration_hash']!=frontier.get('orchestration_hash') or core['phase']!='plan-review' or not core['plan'] or core['plan']['digest']!=frontier.get('plan_digest') or core['plan_acceptance'] is not None:raise WorkflowError('The current draft-plan frontier changed during hook preparation')
+        _hook_policy_guard(effective,ctx,mode,grant,executor)
+    class BoundStore:
+        def __getattr__(self,key):return getattr(effective,key)
+        @contextmanager
+        def lock(self):
+            with effective.lock():guard(frame or {},cmd,normalized);yield
+        def commit(self,writes):
+            guard(frame or {},cmd,normalized);merged=dict(writes)
+            relative_path=private_path.relative_to(effective.root).as_posix();effective.expect_unchanged(relative_path,private_expected);merged[relative_path]=json.dumps(private,sort_keys=True,ensure_ascii=True,indent=2)+'\n'
+            if frame is None:_hook_register(effective,merged,ctx,chain_id)
+            effective.commit(merged)
+    bound=BoundStore()
+    if cmd=='next':
+        try:
+            _hook_watch_guard(locator['watch']);_hook_policy_guard(effective,ctx,mode,grant,executor)
+        except WorkflowError as error:return {'chain_id':frame['id'],'state':frame['state'],'cursor':frame['cursor'],'action':'prerequisite','prerequisites':[{'code':'current-hook-inputs','reason':str(error)}]}
+        return helper.next_action(bound,frame['id'],proof=proof)
+    if frame is None:return helper.start(bound,normalized,proof=proof,verify_supersession=lambda old,new,receipt:_hook_supersession(effective,old,new,receipt),guard=guard)
+    result=helper.mutate(bound,cmd,normalized,proof=proof,verify_transition=lambda chain,attempt,receipt,after:_hook_transition(effective,chain,attempt,receipt,after),guard=guard)
+    if cmd=='invoke' and private_delivery_sink is not None:
+        try:private_delivery_sink(deepcopy(delivery['payload']))
+        except Exception as error:raise WorkflowError('The private delivery sink failed; reconcile the original invocation before retrying') from error
+    return result
+
+
+def hook_pending_admission(store,scope=None):
+    try:return _hook_pending_admission(store,scope)
+    except WorkflowError:raise
+    except ValueError as error:raise WorkflowError(str(error)) from error
+
+
+def _hook_pending_admission(store,scope=None):
+    helper=hook_helper()
+    for pending in helper.pending_scan(store):
+        frame=helper.read(store,pending['chain_id'])
+        if _hook_scope_matches(frame,scope):raise WorkflowError('Reconcile the original pending hook attempt before cancelling the selected task: '+pending['attempt_id'])
+
+
+def _hook_scope_matches(chain,scope):
+    if scope is None:return True
+    if isinstance(scope,str):return scope in chain['context'].get('task_ids',[]) or scope in chain['context'].get('pending_ids',[])
+    if not isinstance(scope,dict):raise WorkflowError('Hook admission requires an exact scope')
+    if scope.get('kind') and scope['kind']!=chain['context']['kind']:return False
+    for key in ['task_ids','pending_ids']:
+        if key in scope:return bool(set(scope[key])&set(chain['context'].get(key,[])))
+    return scope.get('id')==chain['context']['id']
+
+
+def hook_admission(store,scope=None,chain_ids=None):
+    try:return _hook_admission(store,scope,chain_ids)
+    except WorkflowError:raise
+    except ValueError as error:raise WorkflowError(str(error)) from error
+
+
+def _hook_admission(store,scope=None,chain_ids=None):
+    helper=hook_helper();directory=store.base/'invocations'
+    if chain_ids is None:
+        if not directory.exists():return
+        if not directory.is_dir():raise WorkflowError('Owned hook metadata requires recovery')
+        chain_ids=[]
+        for path in sorted(directory.glob('*.json')):
+            value='HC-'+path.stem[3:]
+            if not valid_id(value,'HC'):raise WorkflowError('Unrecognized hook metadata requires recovery')
+            frame=helper.read(store,value)
+            if _hook_scope_matches(frame,scope):chain_ids.append(value)
+    for original in chain_ids:
+        current=original;seen=set()
+        while True:
+            if current in seen:raise WorkflowError('Hook replacement lineage contains a cycle')
+            seen.add(current);frame=helper.read(store,current)
+            if frame['state']!='superseded':break
+            current=frame['superseded_by']
+        if frame['state']!='complete':raise WorkflowError('An existing required hook chain remains unfinished: '+current)
+        location=_hook_locator(store,current);execution=_hook_source_store(store,location['execution_root']);_hook_watch_guard(location['watch'])
+        actual=deepcopy(scope) if isinstance(scope,dict) and scope.get('kind')=='review' else _hook_admitted_context(execution,frame['context'])
+        if actual!=frame['context']:raise WorkflowError('The completed hook result is stale for the actual current scope')
+        _hook_policy_guard(execution,actual,frame['mode'],frame['authority'],frame['executor'])
+        if frame['stages'] and frame['stages'][-1].get('accepted_context')!=actual:raise WorkflowError('The final hook stage does not bind the current accepted context')
+
+
 # Clarification state is independent of implementation run selection and admission.
 CLARIFICATION_STATES={'researching','awaiting-answers','revising','awaiting-confirmation','complete','blocked','cancelled'}
 CLARIFICATION_FIELDS={'title','goal','scope','exclusions','dependencies','acceptance','validation','required_plugin_policy','content'}
@@ -1472,8 +2035,7 @@ def orchestration_execution_snapshot(store):
     return {key:file_hash(path) for key,path in paths.items()}
 
 def orchestration_action(store,command,payload):
-    spec=importlib.util.spec_from_file_location('skill_tree_decision_orchestration',Path(__file__).with_name('decision-orchestration.py'))
-    helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper)
+    helper=owned_module('skill_tree_decision_orchestration',Path(__file__).with_name('decision-orchestration.py'))
     try:
         if command=='orchestration-read':return helper.read(store,payload.get('orchestration_id'))
         frame=None if command=='orchestration-start' else helper.read(store,payload.get('orchestration_id'))
@@ -1573,8 +2135,7 @@ def decision_action(store,command,payload):
     except helper.DecisionError as error:raise WorkflowError(str(error)) from error
 
 def decision_helper():
-    spec=importlib.util.spec_from_file_location('skill_tree_decision_governance',Path(__file__).with_name('decision-governance.py'))
-    helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper);return helper
+    return owned_module('skill_tree_decision_governance',Path(__file__).with_name('decision-governance.py'))
 
 def decision_context_guard(store,context,allow_stale=False):
     try:decision_helper().validate_context(context)
@@ -1759,9 +2320,10 @@ def clarification_invalidate(record,baselines):
     record['baselines']=baselines;record['semantic_fingerprints']=clarification_fingerprints(baselines)
     return changed
 
-def clarification_admission(store,task_id):
+def clarification_admission(store,task_id,hook_gate=True):
     done={o['task_id']:o for o in store.outcomes() if o['disposition']=='completed'}
     if task_id in done:return
+    if hook_gate:hook_admission(store,scope=task_id)
     tasks={t['id']:t for t in parse(store.text())}
     required=[];satisfied=[]
     for path in sorted((store.base/'clarifications').glob('*.json')):
@@ -1938,8 +2500,10 @@ def clarification_revise(store,record,payload):
     tasks=parse(text)
     if [(t['id'],t['queue']) for t in before_tasks]!=[(t['id'],t['queue']) for t in tasks] or any(old['body']!=new['body'] for old,new in zip(before_tasks,tasks) if old['id'] not in seen):raise WorkflowError('Task revision changes unselected tasks or queue membership')
     validate_dependencies(tasks,{o['task_id'] for o in store.outcomes() if o['disposition']=='completed'})
-    baselines=clarification_baselines(clarification_tasks(store,record['task_ids'],text));changed=clarification_invalidate(record,baselines)
-    record['task_revisions'].append({'id':identity('TR'),'task_ids':[tid for tid in record['task_ids'] if tid in seen],'source_before':digest(old_text.encode()),'source_after':digest(text.encode()),'changed_fields':{key:sorted(value) for key,value in changed.items()},'recorded_at':now()})
+    before_baselines=clarification_baselines([task for task in before_tasks if task['id'] in record['task_ids']]);before_semantics=clarification_fingerprints(before_baselines)
+    baselines=clarification_baselines(clarification_tasks(store,record['task_ids'],text));after_semantics=clarification_fingerprints(baselines);changed=clarification_invalidate(record,baselines)
+    revision_fingerprints={tid:{'before':{'semantic_fingerprint':before_semantics[tid],'content_fingerprint':before_baselines[tid]['content_hash']},'after':{'semantic_fingerprint':after_semantics[tid],'content_fingerprint':baselines[tid]['content_hash']}} for tid in record['task_ids']}
+    record['task_revisions'].append({'id':identity('TR'),'task_ids':[tid for tid in record['task_ids'] if tid in seen],'task_fingerprints':revision_fingerprints,'content_changed_task_ids':[tid for tid in record['task_ids'] if before_baselines[tid]['content_hash']!=baselines[tid]['content_hash']],'source_before':digest(old_text.encode()),'source_after':digest(text.encode()),'changed_fields':{key:sorted(value) for key,value in changed.items()},'recorded_at':now()})
     persisted['source_hash']=digest(text.encode());persisted['tasks']=index(text)
     manifest_value=manifest(store);state_rel='.skill-tree/documents/future.json'
     if not any(f['path']==state_rel for f in manifest_value['files']):manifest_value['files'].append({'path':state_rel,'role':'generated-index-and-active-state','owner':'skill-tree'})
@@ -2007,13 +2571,17 @@ def clarification_mutate(store,command,payload):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|{'refresh','manifest','index','read','select','pending','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|{'refresh','manifest','index','read','select','pending','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     args=parser.parse_args(argv)
     try:
         store=Store(args.root,args.run_id,allow_unselected=args.command in {'index','runs','manifest','start','workspace-setup','recover-locator'},route_queue=args.command!='recover-locator');payload=json.loads(args.input.read_text()) if args.input else {}
         if args.expected_source_hash:payload['expected_source_hash']=args.expected_source_hash
         cmd=args.command
-        if cmd in ORCHESTRATION_COMMANDS:
+        if cmd in HOOK_COMMANDS:
+            store=Store(args.root,allow_unselected=True,neutral=True)
+            if args.id:payload['chain_id']=args.id
+            result=hook_action(store,cmd,payload)
+        elif cmd in ORCHESTRATION_COMMANDS:
             store=Store(args.root,allow_unselected=True,neutral=True)
             if args.id:payload['orchestration_id']=args.id
             result=orchestration_action(store,cmd,payload)
@@ -2069,7 +2637,7 @@ def main(argv=None):
         elif cmd=='history':result=history(store,args.id,args.component)
         elif cmd=='cycle':result=record_cycle(store)
         else:result={'removed' if args.apply else 'candidates':prune(store,args.apply)}
-        print(dump(result),end='');return 0
+        print(json.dumps(result,ensure_ascii=True,indent=2,sort_keys=True)+'\n' if cmd in HOOK_COMMANDS else dump(result),end='');return 0
     except (WorkflowError,workspaces.RunError,OSError,json.JSONDecodeError,KeyError,TypeError,subprocess.TimeoutExpired) as exc:
         print(dump({'ok':False,'error':str(exc)}),end='');return 2
 if __name__=='__main__':

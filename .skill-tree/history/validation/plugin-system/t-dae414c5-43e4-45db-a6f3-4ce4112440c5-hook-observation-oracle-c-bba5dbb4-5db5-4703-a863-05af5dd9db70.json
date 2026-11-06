@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-plugin-conformance.py"
+  ],
+  "attempt_id": "C-bba5dbb4-5db5-4703-a863-05af5dd9db70",
+  "check_id": "hook-observation-oracle",
+  "counts": {
+    "discovered": 12,
+    "expected": 12,
+    "failed": 12,
+    "passed": 0,
+    "skipped": 0
+  },
+  "exit_code": 1,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-dae414c5-43e4-45db-a6f3-4ce4112440c5-hook-observation-oracle-c-bba5dbb4-5db5-4703-a863-05af5dd9db70.txt",
+  "result": "red",
+  "reviewed_failure_reason": "Twelve discovered oracle controls reach the explicitly missing invocation observation validator; independent controlled CL trace preparation succeeds and native actor calls are not fixture substitutes.",
+  "source_fingerprints": {
+    ".skill-tree/scripts/agent-conformance.py": "6ac909c9430facff5f7d2276ce0ce6e5fa389c13db44d562f0b7825c895957ea",
+    ".skill-tree/tests/test-plugin-conformance.py": "bb4f0d0359d3246f6aab25efc68cecb4b0ec3316d68becc57a12ff735f8d7b31"
+  },
+  "task_id": "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+  "tool_wall_seconds": 0.06504712486639619
+}

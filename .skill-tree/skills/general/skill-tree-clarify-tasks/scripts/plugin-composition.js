@@ -61,7 +61,7 @@ function composeOperation(source,profile,operation,ownedFiles){
  const manifest=registry.seal({format:'skill-tree-plugin-bindings',schema:1,operation,owned_resources:ownedResources,operations:current.operations,registry_present:current.registry_present,registry_identity:current.registry_identity,configuration_digest:compiled.configuration_digest,definitions,bindings:clone(compiled.bindings),packages,parameter_defaults:parameterDefaults,catalog:portableCatalog(catalog)});
  files[MANIFEST]=registry.json(manifest);return {files,manifest};
 }
-const requiredHelpers=['plugin-hooks.js','plugin-composition.js','plugin-bindings.js','plugin-parameters.js','plugin-registry.js','plugin-sources.js','workflow-state.py','decision-governance.py','decision-orchestration.py','run-workspaces.py','validate-document-rules.py'];
+const requiredHelpers=['plugin-hooks.js','plugin-runtime.js','plugin-invocation.py','plugin-composition.js','plugin-bindings.js','plugin-parameters.js','plugin-registry.js','plugin-sources.js','workflow-state.py','decision-governance.py','decision-orchestration.py','run-workspaces.py','validate-document-rules.py'];
 function verifyOwnedResources(packageRoot,inventory){
  if(!object(inventory)||requiredHelpers.some(name=>!own(inventory,'scripts/'+name)))fail('composition-resource','The actual owned dispatcher helper closure is missing');
  for(const [relative,sum]of Object.entries(inventory)){
@@ -152,4 +152,4 @@ function prepareBoundary(packageRoot,payload){
  for(const row of selected.bindings){const record=manifest.packages[row.plugin_id],missing=(record.execution?.required||[]).filter(value=>!available.includes(value));if(missing.length)prerequisites.push({code:'missing-capability',binding_id:row.id,plugin_id:row.plugin_id,missing});prerequisites.push({code:'invocation-unqualified',binding_id:row.id,plugin_id:row.plugin_id,reason:'The boundary is prepared only; persisted actual host invocation and result qualification remain required.'});}
  return {...base,guard:proof,status:prerequisites.length?'prerequisite':'noop'};
 }
-module.exports={createCatalog,resolveInputs,composeOperation,prepareBoundary};
+module.exports={createCatalog,resolveInputs,composeOperation,prepareBoundary,verifiedManifest};
