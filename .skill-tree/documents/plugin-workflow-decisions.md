@@ -56,7 +56,7 @@ The automatic review/fix cycle separates the reviewer, resolver and executor rol
 
 ### Required W1 implementation handoff
 
-Pending `P-09b5b828-dcdc-4d06-bee1-19e1787e34f4`, priority 128, captures the required Auto/Manual foundation as a blocker of interview consumer `T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69`. Processing researches decomposition, shared consumer dependencies and qualification through the approved workflow-design handoff. The design task contains no workflow implementation. The completed manual clarification controller and original contracts retain immutable terminal evidence.
+Processed Pending `P-09b5b828-dcdc-4d06-bee1-19e1787e34f4` supplies provenance for required foundation tasks `T-29ef78b9-d808-4f85-b6c8-3d768edf3a99` (Auto/Manual state and authority) and `T-43931d2c-5bb5-4eca-8ba8-069c503b2cda` (core decision actors, internal phases and qualification). The [processing record](../history/research/plugin-plan-future-transfer.json) preserves the handoff; canonical Future owns exact consumer dependencies and current progress. The design task contains no workflow implementation. The completed manual clarification controller and original contracts retain immutable terminal evidence.
 
 | Unfinished consumer | Required specification alignment before implementation |
 | --- | --- |

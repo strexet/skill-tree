@@ -1,0 +1,26 @@
+{
+  "assertion": "The external plugin contract defines pinned identity, dependency closure, host invocation, activation lifetime, input/result envelopes and existing-operation hook names. The contract preserves standalone resources, core authorization and acceptance boundaries, offline composition and guarded resume semantics. Workflow-changing choices and unresolved host limitations are explicitly routed to the owner workflow decision task. Project defaults, explicit temporary run overrides and frozen effective configuration are defined separately from installed-package state; confirmed installation enables only the exact displayed hooks and readiness effects.",
+  "attempt_id": "C-a89171f5-df6d-4b81-917e-0f3119077f5c",
+  "independent_reviewer": "/root/current_plugin_contract_review",
+  "limits": [
+    "No candidate efficacy or successful/native host execution is established by static review."
+  ],
+  "review": [
+    "Pinned source/resource identities, bounded invocation/lifetime and typed input/result receipts are explicit.",
+    "Core authorization, standalone/offline composition, recoverable ownership and frozen run configuration remain required.",
+    "Exact consent covers ordered repeated bindings; package identity never collapses another occurrence.",
+    "Stale W1 Pending prose is corrected to processed provenance and exact state/orchestration task IDs."
+  ],
+  "scope": "Current completed external plugin contract, source inspection only",
+  "sources": {
+    ".skill-tree/common/scripts/pr-review-state.py": "a26cc95e66145a4917669466c3880f3d8252199a13c63b3e9e9f9fc30dc443d5",
+    ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+    ".skill-tree/documents/implementation-plan.md": "8c6aba1b915f6d80e4c49b7ced344d1909e10a78838ca46de346ddc0f828ad37",
+    ".skill-tree/documents/plugin-management-contract.md": "f43a728e75b2faae51640c5cadf9d9b484d1d010c33368784d5ed859e3b156a1",
+    ".skill-tree/documents/plugin-system-contract.md": "a954d148df40e7a22814fb1f8515d654140cff02f7fe14e1a65f6cad33732efc",
+    ".skill-tree/documents/plugin-system-research.md": "6a8062f4bb9c39abc9f0e1ef513d6af2e2f50a2b0f8616b30007c8e6bd718205",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "ef81629dd2e76ed70a05896e57b38ca55571439af333da08ecebcf9d80bbe2ca",
+    ".skill-tree/templates/invariants.json": "4545894b07fab5f222d15eddd17c220408a4be8a5e5f25da3a4a34ef06bb87b5"
+  },
+  "status": "passed"
+}

@@ -856,6 +856,11 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/documents/plugin-installation-contract.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/documents/plugin-management-contract.md",
       "role": "canonical"
     },
@@ -1274,14 +1279,15 @@
     ".skill-tree/documents/features.md": "e37eb011ca22e81bb12bb6002e9292115bf6da9d36065516804bc9f13c2885f7",
     ".skill-tree/documents/future.md": "512b46098a7b280b0783362b2f68c378d10621733cb9587a01f121b9c8d65024",
     ".skill-tree/documents/implementation-plan.md": "8c6aba1b915f6d80e4c49b7ced344d1909e10a78838ca46de346ddc0f828ad37",
-    ".skill-tree/documents/install.md": "59eddcbcbba0363cdb5f2d37eb628f6c3a439bededc4d6226c87128ad6447969",
+    ".skill-tree/documents/install.md": "2b1667f1c126a75b9835aa1ba7a5dc03a61c51ab40e293279dde94a8903f32e2",
     ".skill-tree/documents/installation-architecture.md": "fd548f5be2a74fbfdb416a748e62869771d80f04acb47b246d4488effe083eea",
     ".skill-tree/documents/manual-target-update.md": "f83c49a885b75d27d250d53d5f00936bc1c9e3d45998518cb0045ef8734e3482",
+    ".skill-tree/documents/plugin-installation-contract.md": "159c86c891e4f26186628c83825d928c0c91b0e033162a7d4d6594f956464520",
     ".skill-tree/documents/plugin-management-contract.md": "f43a728e75b2faae51640c5cadf9d9b484d1d010c33368784d5ed859e3b156a1",
     ".skill-tree/documents/plugin-market-research.md": "cdedbf889a7136f8390089b0d70448c59de91e6622e6a23c9c222da744852621",
     ".skill-tree/documents/plugin-system-contract.md": "a954d148df40e7a22814fb1f8515d654140cff02f7fe14e1a65f6cad33732efc",
-    ".skill-tree/documents/plugin-system-research.md": "6a8062f4bb9c39abc9f0e1ef513d6af2e2f50a2b0f8616b30007c8e6bd718205",
-    ".skill-tree/documents/plugin-workflow-decisions.md": "7cf06fd4258b49f886d82bce148b44e60be5e8eaad8d2fa385db5f52516b0b9c",
+    ".skill-tree/documents/plugin-system-research.md": "4c042f33b94830141a99263d632322993d445a411d8e08d4f9d0692f01a926c7",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "ef81629dd2e76ed70a05896e57b38ca55571439af333da08ecebcf9d80bbe2ca",
     ".skill-tree/documents/project.md": "419e0ced059c4f8130006e2f2b5c745fdb05944facc576671f19356b198ba934",
     ".skill-tree/documents/repo-init-instructions.md": "06f7eedd332bd13daba08f131a5c34b0fdffd8cb835c4ecc0d062010071251fa",
     ".skill-tree/documents/repository-map.md": "c984f360a96991a1c982971efd8b34d7c5a72d445c2838d4d276c4cd1fe7e6e8",
