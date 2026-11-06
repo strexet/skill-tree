@@ -1,0 +1,674 @@
+
+> skill-tree-skills@0.3.0 test:node
+> node --test .skill-tree/tests/test-*.js
+
+TAP version 13
+# Subtest: general clarification package runs independently of source and sibling packages
+ok 1 - general clarification package runs independently of source and sibling packages
+  ---
+  duration_ms: 1126.634375
+  ...
+# Subtest: web clarification package runs independently of source and sibling packages
+ok 2 - web clarification package runs independently of source and sibling packages
+  ---
+  duration_ms: 983.934084
+  ...
+# Subtest: unity clarification package runs independently of source and sibling packages
+ok 3 - unity clarification package runs independently of source and sibling packages
+  ---
+  duration_ms: 935.004667
+  ...
+# Subtest: source recipe identities survive composition and retain freshness and collision checks
+ok 4 - source recipe identities survive composition and retain freshness and collision checks
+  ---
+  duration_ms: 16.936958
+  ...
+# Subtest: target role cannot inject source recipes
+ok 5 - target role cannot inject source recipes
+  ---
+  duration_ms: 6.575875
+  ...
+# Subtest: composition is deterministic, standalone and has the complete authored operation set for every flavor
+ok 6 - composition is deterministic, standalone and has the complete authored operation set for every flavor
+  ---
+  duration_ms: 730.837333
+  ...
+# Subtest: static capability inputs detect additions, unsupported versions and conflicting locks
+ok 7 - static capability inputs detect additions, unsupported versions and conflicting locks
+  ---
+  duration_ms: 23.897125
+  ...
+# Subtest: missing foundation is a persisted capability gap while installation remains composable
+ok 8 - missing foundation is a persisted capability gap while installation remains composable
+  ---
+  duration_ms: 68.499959
+  ...
+# Subtest: resource collisions reject undeclared replacements and slot overrides preserve mandatory invariants
+ok 9 - resource collisions reject undeclared replacements and slot overrides preserve mandatory invariants
+  ---
+  duration_ms: 0.216667
+  ...
+# Subtest: adding test assemblies changes the inventory without executing project code
+ok 10 - adding test assemblies changes the inventory without executing project code
+  ---
+  duration_ms: 19.706417
+  ...
+# Subtest: Unity capability composition gates panel, input and performance fixtures before emission
+ok 11 - Unity capability composition gates panel, input and performance fixtures before emission
+  ---
+  duration_ms: 179.059583
+  ...
+# Subtest: Web browser component runners retain browser effects and exact pinned conditional resources
+ok 12 - Web browser component runners retain browser effects and exact pinned conditional resources
+  ---
+  duration_ms: 90.032333
+  ...
+# Subtest: non-JavaScript Web roots use declared static recipes without importing executable configuration
+ok 13 - non-JavaScript Web roots use declared static recipes without importing executable configuration
+  ---
+  duration_ms: 4.516542
+  ...
+# Subtest: irrelevant input formatting can refresh environment identity without changing package bytes
+ok 14 - irrelevant input formatting can refresh environment identity without changing package bytes
+  ---
+  duration_ms: 114.275834
+  ...
+# Subtest: every flavor audit retains common metadata and prose validation without source dependencies
+ok 15 - every flavor audit retains common metadata and prose validation without source dependencies
+  ---
+  duration_ms: 222.322084
+  ...
+# Subtest: declared versions never masquerade as resolved capabilities
+ok 16 - declared versions never masquerade as resolved capabilities
+  ---
+  duration_ms: 104.835542
+  ...
+# Subtest: explicit recipe formats reject unknown lanes and unresolved command parameters
+ok 17 - explicit recipe formats reject unknown lanes and unresolved command parameters
+  ---
+  duration_ms: 6.641709
+  ...
+# Subtest: Unity required UTF flags require resolution evidence and track reload settings
+ok 18 - Unity required UTF flags require resolution evidence and track reload settings
+  ---
+  duration_ms: 30.560375
+  ...
+# Subtest: input fingerprints hash raw bytes even for an opaque dependency lock
+ok 19 - input fingerprints hash raw bytes even for an opaque dependency lock
+  ---
+  duration_ms: 19.5235
+  ...
+# Subtest: resolved UTF 1.6.0 supports the pinned Unity 6000.0 target without accepting unresolved or future versions
+ok 20 - resolved UTF 1.6.0 supports the pinned Unity 6000.0 target without accepting unresolved or future versions
+  ---
+  duration_ms: 87.201542
+  ...
+# Subtest: Unity BOM-prefixed JSON remains static input with unchanged raw-byte fingerprints
+ok 21 - Unity BOM-prefixed JSON remains static input with unchanged raw-byte fingerprints
+  ---
+  duration_ms: 20.096833
+  ...
+# Subtest: binding composes exact roots, complete source identity and pinned 6.3 without executing a runner
+ok 22 - binding composes exact roots, complete source identity and pinned 6.3 without executing a runner
+  ---
+  duration_ms: 117.821958
+  ...
+# Subtest: binding refuses changed queue, isolated fixture or workspace runner before profile activation
+ok 23 - binding refuses changed queue, isolated fixture or workspace runner before profile activation
+  ---
+  duration_ms: 59.318833
+  ...
+# Subtest: binding refuses arbitrary roots, symlinks, overlap and missing source classification
+ok 24 - binding refuses arbitrary roots, symlinks, overlap and missing source classification
+  ---
+  duration_ms: 42.346791
+  ...
+# Subtest: binding refuses mismatched pins and non-product relabeling while retaining honest source blockers
+ok 25 - binding refuses mismatched pins and non-product relabeling while retaining honest source blockers
+  ---
+  duration_ms: 35.859458
+  ...
+# Subtest: embedded Pipeline uses reviewed package identity and version, never the file locator as a version
+ok 26 - embedded Pipeline uses reviewed package identity and version, never the file locator as a version
+  ---
+  duration_ms: 22.472834
+  ...
+# Subtest: canonical project owns runner source without a separate workspace tooling tree
+ok 27 - canonical project owns runner source without a separate workspace tooling tree
+  ---
+  duration_ms: 31.251167
+  ...
+# Subtest: empty or invalid automation scopes cannot silently drop runner fingerprints
+ok 28 - empty or invalid automation scopes cannot silently drop runner fingerprints
+  ---
+  duration_ms: 16.571667
+  ...
+# Subtest: invalid manager combinations reject before writes while explicit rollback remains available
+ok 29 - invalid manager combinations reject before writes while explicit rollback remains available
+  ---
+  duration_ms: 1873.848625
+  ...
+# Subtest: installed release version matches the bundled source and forged receipt versions fail verification
+ok 30 - installed release version matches the bundled source and forged receipt versions fail verification
+  ---
+  duration_ms: 733.512
+  ...
+# Subtest: force never adopts an unowned package
+ok 31 - force never adopts an unowned package
+  ---
+  duration_ms: 192.98725
+  ...
+# Subtest: verify rejects a false-positive entrypoint and locally modified packages survive force/uninstall
+ok 32 - verify rejects a false-positive entrypoint and locally modified packages survive force/uninstall
+  ---
+  duration_ms: 888.249209
+  ...
+# Subtest: maintenance refresh works without source access and detects newly added tools
+ok 33 - maintenance refresh works without source access and detects newly added tools
+  ---
+  duration_ms: 1378.520458
+  ...
+# Subtest: noninteractive missing flavor, global, symlink and upstream specialization fail without writes
+ok 34 - noninteractive missing flavor, global, symlink and upstream specialization fail without writes
+  ---
+  duration_ms: 218.990834
+  ...
+# Subtest: owned no-op is verified; dry-run reports conflicts without writes
+ok 35 - owned no-op is verified; dry-run reports conflicts without writes
+  ---
+  duration_ms: 942.73825
+  ...
+# Subtest: interrupted replacement rolls forward from the journal and preserves unrelated content
+ok 36 - interrupted replacement rolls forward from the journal and preserves unrelated content
+  ---
+  duration_ms: 923.668417
+  ...
+# Subtest: flavor switch updates all owned packages; stopped pending validation survives refresh and rollback
+ok 37 - flavor switch updates all owned packages; stopped pending validation survives refresh and rollback
+  ---
+  duration_ms: 1228.248416
+  ...
+# Subtest: missing foundation is deferred without a queue and captured exactly once after setup
+ok 38 - missing foundation is deferred without a queue and captured exactly once after setup
+  ---
+  duration_ms: 614.029917
+  ...
+# Subtest: an active executing controller blocks replacement and malformed maintenance ownership is preserved
+ok 39 - an active executing controller blocks replacement and malformed maintenance ownership is preserved
+  ---
+  duration_ms: 526.667666
+  ...
+# Subtest: untracked maintenance source is a conflict and cannot be adopted by refresh
+ok 40 - untracked maintenance source is a conflict and cannot be adopted by refresh
+  ---
+  duration_ms: 549.677458
+  ...
+# Subtest: refresh refuses incompatible workflow state without replacing packages or receipts
+ok 41 - refresh refuses incompatible workflow state without replacing packages or receipts
+  ---
+  duration_ms: 440.513083
+  ...
+# Subtest: refresh refuses an unresolved standalone execution attempt and the workflow writer lock
+ok 42 - refresh refuses an unresolved standalone execution attempt and the workflow writer lock
+  ---
+  duration_ms: 550.377958
+  ...
+# Subtest: standalone profile refresh stops a waiting controller and preserves progress across rollback
+ok 43 - standalone profile refresh stops a waiting controller and preserves progress across rollback
+  ---
+  duration_ms: 1024.484292
+  ...
+# Subtest: a concurrent edit during staging is preserved and activation refuses the changed destination
+ok 44 - a concurrent edit during staging is preserved and activation refuses the changed destination
+  ---
+  duration_ms: 536.132834
+  ...
+# Subtest: a real controller re-admits after local refresh without resetting task progress
+ok 45 - a real controller re-admits after local refresh without resetting task progress
+  ---
+  duration_ms: 1727.946292
+  ...
+# Subtest: shared provider destinations retain every recorded owner during scoped uninstall
+ok 46 - shared provider destinations retain every recorded owner during scoped uninstall
+  ---
+  duration_ms: 1142.786417
+  ...
+# Subtest: verification rejects a forged flavor and rehashed unrelated package content
+ok 47 - verification rejects a forged flavor and rehashed unrelated package content
+  ---
+  duration_ms: 377.226084
+  ...
+# Subtest: shared bridges survive uninstall until the final recorded provider releases the package
+ok 48 - shared bridges survive uninstall until the final recorded provider releases the package
+  ---
+  duration_ms: 1221.046708
+  ...
+# Subtest: input drift during staging preserves the previous owned generation
+ok 49 - input drift during staging preserves the previous owned generation
+  ---
+  duration_ms: 513.963292
+  ...
+# Subtest: post-activation input drift rolls back the owned generation without reverting project inputs
+ok 50 - post-activation input drift rolls back the owned generation without reverting project inputs
+  ---
+  duration_ms: 760.553375
+  ...
+# Subtest: local refresh catches a Web runner major change and omits unsupported fixture instructions
+ok 51 - local refresh catches a Web runner major change and omits unsupported fixture instructions
+  ---
+  duration_ms: 748.432542
+  ...
+# Subtest: --help succeeds
+ok 52 - --help succeeds
+  ---
+  duration_ms: 103.13425
+  ...
+# Subtest: --list succeeds without writes
+ok 53 - --list succeeds without writes
+  ---
+  duration_ms: 86.961625
+  ...
+# Subtest: dry-run all succeeds without installing
+ok 54 - dry-run all succeeds without installing
+  ---
+  duration_ms: 2666.600667
+  ...
+# Subtest: project-scope copy install preserves unrelated skill
+ok 55 - project-scope copy install preserves unrelated skill
+  ---
+  duration_ms: 382.746917
+  ...
+# Subtest: portable pending intake installs alone with self-contained references
+ok 56 - portable pending intake installs alone with self-contained references
+  ---
+  duration_ms: 418.922208
+  ...
+# Subtest: global specialization is rejected without touching HOME
+ok 57 - global specialization is rejected without touching HOME
+  ---
+  duration_ms: 61.882667
+  ...
+# Subtest: copy mode refuses overwrite without force and force replaces
+ok 58 - copy mode refuses overwrite without force and force replaces
+  ---
+  duration_ms: 833.57925
+  ...
+# Subtest: symlink specialization is rejected before writes
+ok 59 - symlink specialization is rejected before writes
+  ---
+  duration_ms: 56.06575
+  ...
+# Subtest: bridge insertion is idempotent and creates backup on second write
+ok 60 - bridge insertion is idempotent and creates backup on second write
+  ---
+  duration_ms: 588.044
+  ...
+# Subtest: bridge uninstall preserves surrounding content
+ok 61 - bridge uninstall preserves surrounding content
+  ---
+  duration_ms: 406.266958
+  ...
+# Subtest: verify mode detects installed skill
+ok 62 - verify mode detects installed skill
+  ---
+  duration_ms: 373.159833
+  ...
+# Subtest: uninstall removes selected skill only
+ok 63 - uninstall removes selected skill only
+  ---
+  duration_ms: 558.679625
+  ...
+# Subtest: upstream paths reject uncomposed installation
+ok 64 - upstream paths reject uncomposed installation
+  ---
+  duration_ms: 52.177334
+  ...
+# Subtest: partial provider failure returns non-zero and keeps other rows
+ok 65 - partial provider failure returns non-zero and keeps other rows
+  ---
+  duration_ms: 52.926333
+  ...
+# Subtest: skill-tree-work-through-next installs alone and completes a temporary fixture run
+ok 66 - skill-tree-work-through-next installs alone and completes a temporary fixture run
+  ---
+  duration_ms: 1514.933125
+  ...
+# Subtest: skill-tree-implement-all installs alone and completes a temporary fixture run
+ok 67 - skill-tree-implement-all installs alone and completes a temporary fixture run
+  ---
+  duration_ms: 1418.038167
+  ...
+# Subtest: explicit local source accepts the reorganized repository root
+ok 68 - explicit local source accepts the reorganized repository root
+  ---
+  duration_ms: 243.739708
+  ...
+# Subtest: root shell launcher exposes the composed logical catalog and PowerShell points to the owned entrypoint
+ok 69 - root shell launcher exposes the composed logical catalog and PowerShell points to the owned entrypoint
+  ---
+  duration_ms: 62.603708
+  ...
+# Subtest: general standalone intake captures conditional requirements without dispatch
+ok 70 - general standalone intake captures conditional requirements without dispatch
+  ---
+  duration_ms: 1208.8055
+  ...
+# Subtest: web standalone intake captures conditional requirements without dispatch
+ok 71 - web standalone intake captures conditional requirements without dispatch
+  ---
+  duration_ms: 1005.278209
+  ...
+# Subtest: unity standalone intake captures conditional requirements without dispatch
+ok 72 - unity standalone intake captures conditional requirements without dispatch
+  ---
+  duration_ms: 918.689208
+  ...
+# Subtest: general standalone defect priority honors semantic decisions and owner overrides
+ok 73 - general standalone defect priority honors semantic decisions and owner overrides
+  ---
+  duration_ms: 2284.154792
+  ...
+# Subtest: web standalone defect priority honors semantic decisions and owner overrides
+ok 74 - web standalone defect priority honors semantic decisions and owner overrides
+  ---
+  duration_ms: 1725.39725
+  ...
+# Subtest: unity standalone defect priority honors semantic decisions and owner overrides
+ok 75 - unity standalone defect priority honors semantic decisions and owner overrides
+  ---
+  duration_ms: 1474.759583
+  ...
+# Subtest: source and parameter facade exposes the usable foundation without installation dependencies
+ok 76 - source and parameter facade exposes the usable foundation without installation dependencies
+  ---
+  duration_ms: 0.631375
+  ...
+# Subtest: local normalization separates the machine locator from portable discovery metadata
+ok 77 - local normalization separates the machine locator from portable discovery metadata
+  ---
+  duration_ms: 1.921792
+  ...
+# Subtest: known source IDs preserve custom Claude provenance without an admission allowlist
+ok 78 - known source IDs preserve custom Claude provenance without an admission allowlist
+  ---
+  duration_ms: 0.738833
+  ...
+# Subtest: repository skill links preserve the selected ref and repository-relative entry
+ok 79 - repository skill links preserve the selected ref and repository-relative entry
+  ---
+  duration_ms: 0.257042
+  ...
+# Subtest: credential-bearing raw locators remain outside portable definitions
+ok 80 - credential-bearing raw locators remain outside portable definitions
+  ---
+  duration_ms: 0.123834
+  ...
+# Subtest: local snapshots preserve BOM, binary assets and original frontmatter bytes
+ok 81 - local snapshots preserve BOM, binary assets and original frontmatter bytes
+  ---
+  duration_ms: 6.063625
+  ...
+# Subtest: declared sibling resources and nested relative links form a closed source snapshot
+ok 82 - declared sibling resources and nested relative links form a closed source snapshot
+  ---
+  duration_ms: 3.815458
+  ...
+# Subtest: nonstandard instruction content retains upstream bytes and a separate adaptation overlay
+ok 83 - nonstandard instruction content retains upstream bytes and a separate adaptation overlay
+  ---
+  duration_ms: 1.780417
+  ...
+# Subtest: missing required source resources reject snapshots
+ok 84 - missing required source resources reject snapshots
+  ---
+  duration_ms: 1.60275
+  ...
+# Subtest: resource paths cannot escape the admitted source root
+ok 85 - resource paths cannot escape the admitted source root
+  ---
+  duration_ms: 1.182625
+  ...
+# Subtest: symlink resources reject acquisition without reading the target
+ok 86 - symlink resources reject acquisition without reading the target
+  ---
+  duration_ms: 1.263459
+  ...
+# Subtest: expected content fingerprints reject acquisition drift
+ok 87 - expected content fingerprints reject acquisition drift
+  ---
+  duration_ms: 0.870041
+  ...
+# Subtest: injected repository acquisition records immutable actual revision and actual resource bytes
+ok 88 - injected repository acquisition records immutable actual revision and actual resource bytes
+  ---
+  duration_ms: 0.470958
+  ...
+# Subtest: mutable repository labels cannot masquerade as resolved immutable revisions
+ok 89 - mutable repository labels cannot masquerade as resolved immutable revisions
+  ---
+  duration_ms: 0.863833
+  ...
+# Subtest: raw acquisition uses the actual acquired content snapshot and needs a real acquirer
+ok 90 - raw acquisition uses the actual acquired content snapshot and needs a real acquirer
+  ---
+  duration_ms: 0.467167
+  ...
+# Subtest: missing native capability permits complete inert resources without fake invocation
+ok 91 - missing native capability permits complete inert resources without fake invocation
+  ---
+  duration_ms: 3.40975
+  ...
+# Subtest: source inspection never executes a bundled helper or copies unrelated adjacent files
+ok 92 - source inspection never executes a bundled helper or copies unrelated adjacent files
+  ---
+  duration_ms: 4.027458
+  ...
+# Subtest: parameters apply upstream project binding run precedence with object merge and array/scalar/null replacement
+ok 93 - parameters apply upstream project binding run precedence with object merge and array/scalar/null replacement
+  ---
+  duration_ms: 0.772
+  ...
+# Subtest: extra instruction text uses the highest explicit value including an empty string
+ok 94 - extra instruction text uses the highest explicit value including an empty string
+  ---
+  duration_ms: 0.076125
+  ...
+# Subtest: parameter origins and deterministic digest describe actual effective values
+ok 95 - parameter origins and deterministic digest describe actual effective values
+  ---
+  duration_ms: 0.215792
+  ...
+# Subtest: secret references stay references and no resolver reads secret values
+ok 96 - secret references stay references and no resolver reads secret values
+  ---
+  duration_ms: 0.13325
+  ...
+# Subtest: arbitrary plugin parameter names remain isolated from core authority and prototype state
+ok 97 - arbitrary plugin parameter names remain isolated from core authority and prototype state
+  ---
+  duration_ms: 0.099834
+  ...
+# Subtest: supported optional schemas validate concrete resolved values
+ok 98 - supported optional schemas validate concrete resolved values
+  ---
+  duration_ms: 0.292292
+  ...
+# Subtest: unsupported schema constraints and non-JSON values remain explicit failures
+ok 99 - unsupported schema constraints and non-JSON values remain explicit failures
+  ---
+  duration_ms: 0.171667
+  ...
+# Subtest: resolution leaves configuration inputs unchanged and snapshot validation rejects byte tampering
+ok 100 - resolution leaves configuration inputs unchanged and snapshot validation rejects byte tampering
+  ---
+  duration_ms: 1.401666
+  ...
+# Subtest: source ID collisions reject unrelated source reuse while matching known definitions remain reusable
+ok 101 - source ID collisions reject unrelated source reuse while matching known definitions remain reusable
+  ---
+  duration_ms: 0.665542
+  ...
+# Subtest: an acquired resource map cannot smuggle escaping paths into an otherwise valid snapshot
+ok 102 - an acquired resource map cannot smuggle escaping paths into an otherwise valid snapshot
+  ---
+  duration_ms: 0.182708
+  ...
+# Subtest: secret references atomically replace objects in both directions with matching origins
+ok 103 - secret references atomically replace objects in both directions with matching origins
+  ---
+  duration_ms: 0.141209
+  ...
+# Subtest: empty and null replacements preserve explicit origin and do not mutate layer inputs
+ok 104 - empty and null replacements preserve explicit origin and do not mutate layer inputs
+  ---
+  duration_ms: 0.105125
+  ...
+# Subtest: parameter accessors never execute and nested unsupported schema constraints are explicit
+ok 105 - parameter accessors never execute and nested unsupported schema constraints are explicit
+  ---
+  duration_ms: 0.160417
+  ...
+# Subtest: snapshot verification rejects mutable repository revisions and inconsistent descriptor identity
+ok 106 - snapshot verification rejects mutable repository revisions and inconsistent descriptor identity
+  ---
+  duration_ms: 0.255708
+  ...
+# Subtest: portable resource paths reject Windows absolute paths on every host
+ok 107 - portable resource paths reject Windows absolute paths on every host
+  ---
+  duration_ms: 0.142167
+  ...
+# Subtest: acquired paths normalize once and reject aliases while staged paths stay canonical
+ok 108 - acquired paths normalize once and reject aliases while staged paths stay canonical
+  ---
+  duration_ms: 0.248625
+  ...
+# Subtest: a normalized local root replaced by a symlink rejects before outside source acquisition
+ok 109 - a normalized local root replaced by a symlink rejects before outside source acquisition
+  ---
+  duration_ms: 3.839917
+  ...
+# Subtest: GitHub and GitLab folder links normalize to repository entry points with explicit overrides
+ok 110 - GitHub and GitLab folder links normalize to repository entry points with explicit overrides
+  ---
+  duration_ms: 0.296958
+  ...
+# Subtest: ssh and git URL strings remain repository acquisitions without credential exposure
+ok 111 - ssh and git URL strings remain repository acquisitions without credential exposure
+  ---
+  duration_ms: 0.106541
+  ...
+# Subtest: hosted ref and entry segments decode safely and encoded path escapes remain rejected
+ok 112 - hosted ref and entry segments decode safely and encoded path escapes remain rejected
+  ---
+  duration_ms: 0.137667
+  ...
+# Subtest: remote declared directory resources accept trailing separators without changing closure guards
+ok 113 - remote declared directory resources accept trailing separators without changing closure guards
+  ---
+  duration_ms: 0.350667
+  ...
+# Subtest: installed general PR/controller packages execute without source or sibling packages
+ok 114 - installed general PR/controller packages execute without source or sibling packages
+  ---
+  duration_ms: 2034.655166
+  ...
+# Subtest: installed web PR/controller packages execute without source or sibling packages
+ok 115 - installed web PR/controller packages execute without source or sibling packages
+  ---
+  duration_ms: 1562.346167
+  ...
+# Subtest: installed unity PR/controller packages execute without source or sibling packages
+ok 116 - installed unity PR/controller packages execute without source or sibling packages
+  ---
+  duration_ms: 1357.779959
+  ...
+# Subtest: worktree environment declarations refresh the concrete profile without reading secrets
+ok 117 - worktree environment declarations refresh the concrete profile without reading secrets
+  ---
+  duration_ms: 454.64775
+  ...
+# Subtest: provider ids are unique and Tier 1 complete
+ok 118 - provider ids are unique and Tier 1 complete
+  ---
+  duration_ms: 0.521334
+  ...
+# Subtest: provider profiles and paths are present
+ok 119 - provider profiles and paths are present
+  ---
+  duration_ms: 0.228416
+  ...
+# Subtest: directory-only probes are soft
+ok 120 - directory-only probes are soft
+  ---
+  duration_ms: 0.44275
+  ...
+# Subtest: soft providers excluded from --all selection
+ok 121 - soft providers excluded from --all selection
+  ---
+  duration_ms: 0.4495
+  ...
+# Subtest: known Tier 2 passthrough examples present or supported by --agent
+ok 122 - known Tier 2 passthrough examples present or supported by --agent
+  ---
+  duration_ms: 0.484375
+  ...
+# Subtest: fixture duplicate provider id is detectable
+ok 123 - fixture duplicate provider id is detectable
+  ---
+  duration_ms: 2.491667
+  ...
+# Subtest: fixture invalid soft probe is detectable
+ok 124 - fixture invalid soft probe is detectable
+  ---
+  duration_ms: 0.600625
+  ...
+# Subtest: explicit rebind verifies relocated ownership and remains idempotent
+ok 125 - explicit rebind verifies relocated ownership and remains idempotent
+  ---
+  duration_ms: 2530.009209
+  ...
+# Subtest: rebind never adopts edited packages, unknown bundle files or pending transactions
+ok 126 - rebind never adopts edited packages, unknown bundle files or pending transactions
+  ---
+  duration_ms: 1585.767833
+  ...
+# Subtest: clean clones recover terminal registry locators while retaining every historical checkpoint
+ok 127 - clean clones recover terminal registry locators while retaining every historical checkpoint
+  ---
+  duration_ms: 1902.236791
+  ...
+# Subtest: linked worktree rebind preserves canonical queue authority and workflow bytes
+ok 128 - linked worktree rebind preserves canonical queue authority and workflow bytes
+  ---
+  duration_ms: 1746.192709
+  ...
+# Subtest: installed general Implement All freezes only the requested group through its standalone CLI
+ok 129 - installed general Implement All freezes only the requested group through its standalone CLI
+  ---
+  duration_ms: 3718.046708
+  ...
+# Subtest: installed web Implement All freezes only the requested group through its standalone CLI
+ok 130 - installed web Implement All freezes only the requested group through its standalone CLI
+  ---
+  duration_ms: 2731.11525
+  ...
+# Subtest: installed unity Implement All freezes only the requested group through its standalone CLI
+ok 131 - installed unity Implement All freezes only the requested group through its standalone CLI
+  ---
+  duration_ms: 2543.5075
+  ...
+# Subtest: installed controller starts and resumes the same worktree with a canonical queue and profile admission
+ok 132 - installed controller starts and resumes the same worktree with a canonical queue and profile admission
+  ---
+  duration_ms: 4361.268209
+  ...
+1..132
+# tests 132
+# suites 0
+# pass 132
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 19210.0805

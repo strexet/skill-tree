@@ -1106,6 +1106,21 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/lib/plugin-parameters.js",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/lib/plugin-sources.js",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/lib/plugins.js",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/templates/invariants.json",
       "role": "canonical"
     },
@@ -1283,7 +1298,7 @@
     ".skill-tree/documents/installation-architecture.md": "fd548f5be2a74fbfdb416a748e62869771d80f04acb47b246d4488effe083eea",
     ".skill-tree/documents/manual-target-update.md": "f83c49a885b75d27d250d53d5f00936bc1c9e3d45998518cb0045ef8734e3482",
     ".skill-tree/documents/plugin-installation-contract.md": "159c86c891e4f26186628c83825d928c0c91b0e033162a7d4d6594f956464520",
-    ".skill-tree/documents/plugin-management-contract.md": "f43a728e75b2faae51640c5cadf9d9b484d1d010c33368784d5ed859e3b156a1",
+    ".skill-tree/documents/plugin-management-contract.md": "0938f5e3355a490c67c724307c38954118c7b3315f184d3cb408cb2895f4d998",
     ".skill-tree/documents/plugin-market-research.md": "cdedbf889a7136f8390089b0d70448c59de91e6622e6a23c9c222da744852621",
     ".skill-tree/documents/plugin-system-contract.md": "a954d148df40e7a22814fb1f8515d654140cff02f7fe14e1a65f6cad33732efc",
     ".skill-tree/documents/plugin-system-research.md": "4c042f33b94830141a99263d632322993d445a411d8e08d4f9d0692f01a926c7",
@@ -1314,6 +1329,9 @@
     ".skill-tree/lib/composer.js": "60d8ab877bccd80835529692a5d2df7ad42dafa966ab695c938ade3ac073b8e8",
     ".skill-tree/lib/execution-bindings.js": "4087f0855eac260dc7ec4008be24015b3645ac7f53e11b3f7f7eccab5434a852",
     ".skill-tree/lib/installation.js": "abc2bca0d228e774f9978a63ea3fe7c2cf7464d7d4e1d695441fc09f8a2146e0",
+    ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    ".skill-tree/lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+    ".skill-tree/lib/plugins.js": "d9d140a9a1c7df3682f95ace505a6d06bbac5823787329acd70834732de1d4d0",
     ".skill-tree/scripts/agent-conformance.py": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
     ".skill-tree/scripts/run-tests.py": "00c61ad36efcc208865692e5822f38dd4bbbc036d058bc7e55bc81c3851b711e",
     ".skill-tree/scripts/sync-skill-references.py": "7362077b0b1d031c88af9a1ddb7cfe8ddc2bc3472e64cb470100ac24038404b9",

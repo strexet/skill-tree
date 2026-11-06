@@ -1,0 +1,30 @@
+{
+  "assertion": "The external plugin contract defines pinned identity, dependency closure, host invocation, activation lifetime, input/result envelopes and existing-operation hook names. The contract preserves standalone resources, core authorization and acceptance boundaries, offline composition and guarded resume semantics. Workflow-changing choices and unresolved host limitations are explicitly routed to the owner workflow decision task. Project defaults, explicit temporary run overrides and frozen effective configuration are defined separately from installed-package state; confirmed installation enables only the exact displayed hooks and readiness effects.",
+  "changed_sources": [
+    ".skill-tree/documents/plugin-system-research.md"
+  ],
+  "delta_review": [
+    "Research now links the reviewed installation interaction contract, requires consent before plugin writes after verified core, retains no execution during install.",
+    "Ponytail placement now explicitly depends on opt-in and core-only creates no binding.",
+    "Post-processing acceptance now states approved W1 current-mode/current-authority policy rather than stale owner-only semantics.",
+    "All original shared-script/invariant and external-contract source digests match the prior independent contract review."
+  ],
+  "limits": [
+    "Static current-source review only; no candidate execution or recommendation benefit."
+  ],
+  "prior_unchanged_scope_evidence": [
+    {
+      "available": true,
+      "path": ".skill-tree/history/validation/plugin-system/contract-review-c-a89171f5-df6d-4b81-917e-0f3119077f5c.json",
+      "sha256": "0db28fd9bc1171e472f73dd29d4715bd33055f315df290bcab0d2f22b8d1bd7c"
+    }
+  ],
+  "sources": {
+    ".skill-tree/common/scripts/pr-review-state.py": "a26cc95e66145a4917669466c3880f3d8252199a13c63b3e9e9f9fc30dc443d5",
+    ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+    ".skill-tree/documents/plugin-system-contract.md": "a954d148df40e7a22814fb1f8515d654140cff02f7fe14e1a65f6cad33732efc",
+    ".skill-tree/documents/plugin-system-research.md": "4c042f33b94830141a99263d632322993d445a411d8e08d4f9d0692f01a926c7",
+    ".skill-tree/templates/invariants.json": "4545894b07fab5f222d15eddd17c220408a4be8a5e5f25da3a4a34ef06bb87b5"
+  },
+  "status": "passed"
+}
