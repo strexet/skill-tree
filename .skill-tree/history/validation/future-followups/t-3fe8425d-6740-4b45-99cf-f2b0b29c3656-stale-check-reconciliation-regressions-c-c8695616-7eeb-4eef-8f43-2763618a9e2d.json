@@ -1,0 +1,38 @@
+{
+  "actual_lane": "unit",
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-workflow-state.py"
+  ],
+  "attempt_id": "C-c8695616-7eeb-4eef-8f43-2763618a9e2d",
+  "check_id": "stale-check-reconciliation-regressions",
+  "classification": "executed-control",
+  "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+  "counts": {
+    "discovered": 46,
+    "expected": 46,
+    "failed": 0,
+    "passed": 46,
+    "skipped": 0
+  },
+  "environment_identity": "b84b549c923b045af0429dc2e77a60d1a7e18f46be84bfffe29be678b61621a9",
+  "evidence": [
+    ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-c8695616-7eeb-4eef-8f43-2763618a9e2d.json",
+    ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-c8695616-7eeb-4eef-8f43-2763618a9e2d.txt"
+  ],
+  "exit_code": 0,
+  "failure_anchor": null,
+  "result": "pass",
+  "sources": {
+    ".skill-tree/common/references/validation-policy.md": "4b0370124139f3203f944e84f9c3768d5d1f9a693ee26bb70260425a3add42b6",
+    ".skill-tree/common/references/workflow-metadata.md": "7ae4e5254fe3b2c70dcbccf75dd48bf95f200bfc7cab702c058d7869177cfea8",
+    ".skill-tree/common/scripts/workflow-state.py": "2088d51a08cd3551801dffa1fc11c54491aa1c5b7f19a629e1bddedae48af06e",
+    ".skill-tree/history/validation/plugin-system/processing115-interrupted-focused-attempt.json": "5673a5d9b8275792038d6ddf2281cefb405308936448ad6891c0ee3b7823dbf3",
+    ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+    ".skill-tree/tests/test-workflow-state.py": "81d384f1268ec27d680f1407424cfa98c9d4d3e9b085fb66435100ff86702187"
+  },
+  "task_id": "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+  "timing": {
+    "tool_wall_seconds": 14.878285333048552
+  }
+}

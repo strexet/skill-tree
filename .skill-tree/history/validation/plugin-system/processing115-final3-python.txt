@@ -1,0 +1,82 @@
+
+> skill-tree-skills@0.3.0 test:py
+> python3 .skill-tree/scripts/run-tests.py
+
+test_missing_duplicate_or_failed_scenarios_never_qualify (test_agent_conformance.AgentConformanceTests.test_missing_duplicate_or_failed_scenarios_never_qualify) ... ok
+test_observed_source_mutation_fails_an_unrelated_request (test_agent_conformance.AgentConformanceTests.test_observed_source_mutation_fails_an_unrelated_request) ... ok
+test_prepare_rejects_shared_repository_identity_before_writes (test_agent_conformance.AgentConformanceTests.test_prepare_rejects_shared_repository_identity_before_writes) ... ok
+test_report_admission_keeps_bounded_agent_and_helper_evidence_separate (test_agent_conformance.AgentConformanceTests.test_report_admission_keeps_bounded_agent_and_helper_evidence_separate) ... ok
+test_unexposed_model_identity_requires_an_explicit_limit (test_agent_conformance.AgentConformanceTests.test_unexposed_model_identity_requires_an_explicit_limit) ... ok
+test_artifact_grader_rejects_missing_observations_and_wrong_scope (test_agent_conformance.ClarificationConformanceTests.test_artifact_grader_rejects_missing_observations_and_wrong_scope) ... ok
+test_combined_consent_rejects_stale_summary_answer_only_and_unreviewed_roles (test_agent_conformance.ClarificationConformanceTests.test_combined_consent_rejects_stale_summary_answer_only_and_unreviewed_roles) ... ok
+test_report_requires_captured_turns_and_independent_semantic_review (test_agent_conformance.ClarificationConformanceTests.test_report_requires_captured_turns_and_independent_semantic_review) ... ok
+test_resume_requires_another_actor_and_preserves_parked_state (test_agent_conformance.ClarificationConformanceTests.test_resume_requires_another_actor_and_preserves_parked_state) ... ok
+test_reviewed_current_summary_accepts_one_actual_answer_and_confirmation (test_agent_conformance.ClarificationConformanceTests.test_reviewed_current_summary_accepts_one_actual_answer_and_confirmation) ... ok
+test_source_mutation_and_missing_owner_confirmation_fail (test_agent_conformance.ClarificationConformanceTests.test_source_mutation_and_missing_owner_confirmation_fail) ... ok
+test_missing_registry_is_rejected_without_checkpoint_reset (test_checkpoint_registry.CheckpointRegistryTests.test_missing_registry_is_rejected_without_checkpoint_reset) ... ok
+test_registry_claim_conflict_is_reported_without_rewriting_history (test_checkpoint_registry.CheckpointRegistryTests.test_registry_claim_conflict_is_reported_without_rewriting_history) ... ok
+test_validation_and_read_only_index_preserve_completed_runs_events_and_pending (test_checkpoint_registry.CheckpointRegistryTests.test_validation_and_read_only_index_preserve_completed_runs_events_and_pending) ... ok
+test_advance_establishes_selected_revalidation_without_a_prepared_attempt (test_completed_dependency_admission.CompletedDependencyAdmissionTests.test_advance_establishes_selected_revalidation_without_a_prepared_attempt) ... ok
+test_changed_recipe_invalidates_accepted_dependency (test_completed_dependency_admission.CompletedDependencyAdmissionTests.test_changed_recipe_invalidates_accepted_dependency) ... Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 1906, in _execute_child
+    part = os.read(errpipe_read, 50000)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/scripts/run-tests.py", line 13, in <module>
+    if __name__=='__main__':raise SystemExit(main())
+                                             ^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/scripts/run-tests.py", line 12, in main
+    return int(not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful())
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/unittest/runner.py", line 217, in run
+    test(result)
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/unittest/suite.py", line 84, in __call__
+    return self.run(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/unittest/suite.py", line 122, in run
+    test(result)
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/unittest/suite.py", line 84, in __call__
+    return self.run(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/unittest/suite.py", line 122, in run
+    test(result)
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/unittest/case.py", line 678, in __call__
+    return self.run(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/unittest/case.py", line 623, in run
+    self._callTestMethod(testMethod)
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/unittest/case.py", line 579, in _callTestMethod
+    if method() is not None:
+       ^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-completed-dependency-admission.py", line 127, in test_changed_recipe_invalidates_accepted_dependency
+    child, parent, store = self.dependency()
+                           ^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-completed-dependency-admission.py", line 25, in dependency
+    self.finish_run(first)
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-run-workspaces.py", line 185, in finish_run
+    attempt=wf.prepare_check(store,{'task_id':tid,'check_id':'behavior'})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/workflow-state.py", line 1389, in prepare_check
+    assert_scope(store,state,parse(text),task['id'])
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/workflow-state.py", line 1344, in assert_scope
+    workspaces.ensure_workspace(store,run)
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/run-workspaces.py", line 195, in ensure_workspace
+    unfinished(path)
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/run-workspaces.py", line 206, in unfinished
+    location = Path(git(root, 'rev-parse', '--git-path', item))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/run-workspaces.py", line 25, in git
+    result = subprocess.run(['git', '-C', str(root), *map(str, args)], capture_output=True, text=True, timeout=45)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 1912, in _execute_child
+    os.close(errpipe_read)
+KeyboardInterrupt

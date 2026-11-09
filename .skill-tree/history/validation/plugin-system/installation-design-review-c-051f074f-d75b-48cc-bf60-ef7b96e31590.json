@@ -1,0 +1,27 @@
+{
+  "actual_lane": "static",
+  "attempt_id": "C-051f074f-d75b-48cc-bf60-ef7b96e31590",
+  "check_id": "installation-design-review",
+  "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+  "evidence": [
+    ".skill-tree/history/validation/plugin-system/installation-design-review-c-45c471b5-7feb-4b0c-86fd-761d1f73aa0d.json",
+    ".skill-tree/documents/plugin-installation-contract.md"
+  ],
+  "result": "pass",
+  "review": [
+    "The current source now includes the eleventh core operation. The current standalone manager exposes exact preview, consent and typed occurrence actions. The initial optional installer integration is a separate pending unit.",
+    "The approved core-only default, explicit setup and stage isolation remain in the installation contract. Missing curated recommendations do not alter direct input or current installed state. Current strict standalone fixtures establish package behavior only."
+  ],
+  "schema": 1,
+  "source_fingerprints": {
+    ".skill-tree/bin/install.js": "f322a379cd0f5846645d0e77cb6ac1bf36f4b479fa3ee9cbc5333e1714d6aa5f",
+    ".skill-tree/common/references/installation-profile.md": "5719d29e503c669cd091a70564aa4c93abf1a582811308c8fdea9b9345eace7e",
+    ".skill-tree/documents/implementation-plan.md": "73692c86132c37dc8be19457f9bf33dc6ff87027cfad50de85a361bca6f09606",
+    ".skill-tree/documents/plugin-installation-contract.md": "18620f033fb0ba02db8f12244e23cbd95b06c3a127a798a965b54ab979811bde",
+    ".skill-tree/documents/plugin-management-contract.md": "2b5c9aeb18dd30b06a809fd14e5222abf579a002187870167d61f6f7dda5b11a",
+    ".skill-tree/documents/plugin-system-contract.md": "b25424efd0dc920376a8d32b9dd7ea27d6b644d966e167f690c8999dc2fa36f5",
+    ".skill-tree/documents/plugin-system-research.md": "ad99e0d4bffd5bb60607eb525dbf8026d4986a1bf151f11b0a2fa62e111927d8",
+    ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84"
+  },
+  "task_id": "T-2da07d09-0b1a-4407-b375-defd23720387"
+}

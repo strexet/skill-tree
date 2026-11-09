@@ -1,0 +1,498 @@
+{
+  "acceptance": null,
+  "accepted_obligations": [
+    "0149eae94a929d0b2f26ba81e66e5d0c249466dee4bb925d996cc0cc4d4f19f6"
+  ],
+  "actor_requests": {
+    "DA-2ffd92e0-8b42-4049-aa6a-f49aa5e2f655": {
+      "attempt_id": "DA-2ffd92e0-8b42-4049-aa6a-f49aa5e2f655",
+      "creation_evidence": {
+        "actor_context_id": "/root/reconcile_plan",
+        "actor_id": "/root/reconcile_plan",
+        "kind": "host-agent-created",
+        "provider": "Codex collaboration",
+        "reference": "Actual collaboration.spawn_agent returned /root/reconcile_plan.",
+        "tool": "collaboration.spawn_agent"
+      },
+      "input": {
+        "actor": {
+          "context_id": "/root/reconcile_plan",
+          "id": "/root/reconcile_plan"
+        },
+        "authority": {
+          "allowed_kinds": [
+            "technical",
+            "product",
+            "specification-acceptance"
+          ],
+          "constraints": [
+            "Only the two explicitly selected task scopes and the local codex/next-version delivery. No new runtime, network, plugin, remote or publication authority."
+          ],
+          "context_id": "task:T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+          "evidence": {
+            "kind": "owner-message",
+            "reference": "Owner explicitly invoked Implement All for the two deferred Future tasks and approved Auto delegated technical decisions."
+          },
+          "id": "future-followups-static",
+          "revision": 1
+        },
+        "authority_digest": "b370e921ec03879035c8a66fdbb9405d7a2d327343ead0ff2c56774fc38fa0e8",
+        "context": {
+          "content_fingerprint": "e0845b18aba1b86abf5d87b4c6103a93138619f36764bc86bc892b6812bf66b0",
+          "decision_purpose": "plan",
+          "execution_snapshot_digest": "167b5da44f21e03492352bd309a02f8ff156d340919c42c8ba15ef2b70443996",
+          "id": "task:T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+          "kind": "task",
+          "orchestration_id": "DO-2622c3b9-f00c-58ad-9eda-41c2b70e665a",
+          "plan_digest": "37c3e9fa9bea14d20534de3639ebc1bb2297c37dd42f3c7a981d73d641d07bb3",
+          "required_checks_digest": "da2bba0929bdb7e970819c9d5612cc8edf93628292b2586efda340123eea5d43",
+          "semantic_fingerprint": "e0845b18aba1b86abf5d87b4c6103a93138619f36764bc86bc892b6812bf66b0",
+          "task_ids": [
+            "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+          ]
+        },
+        "creation_evidence": {
+          "actor_context_id": "/root/reconcile_plan",
+          "actor_id": "/root/reconcile_plan",
+          "kind": "host-agent-created",
+          "provider": "Codex collaboration",
+          "reference": "Actual collaboration.spawn_agent returned /root/reconcile_plan.",
+          "tool": "collaboration.spawn_agent"
+        },
+        "decision_hash": "e6dc0ef76170e82d76b22b9cf20478476cb883c257584de8205e5e32727cab50",
+        "decision_id": "DG-b490323b-dfc8-54c1-805e-2ae6408bafd8",
+        "execution_snapshot": {
+          "common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+          "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+          "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+          "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+          "common/scripts/run-workspaces.py": "306a8dad9d834250febd3fff4b109f0fb8b00711232705e483787bc1cdab5f20",
+          "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+          "common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+          "owned-profile": "a227f78838400d005bba9cb62086c154b8ee47301317beeb3cc1fcc6c9300e88"
+        },
+        "mode": "auto",
+        "mode_epoch": 1,
+        "orchestration_id": "DO-2622c3b9-f00c-58ad-9eda-41c2b70e665a",
+        "orchestration_revision": 4,
+        "prior_role_results": {},
+        "question": {
+          "id": "static-plan-37c3e9fa",
+          "kind": "specification-acceptance",
+          "options": [
+            {
+              "id": "accept",
+              "text": "Accept current plan."
+            },
+            {
+              "id": "revise",
+              "text": "Revise current plan."
+            }
+          ],
+          "plan_text": "# Static inspection recipe discovery\n\nUse the exact existing Python static-inspection fallback shape. Add the definition to the owned capabilities configuration, and compose the built-in fallback only after explicit declaration selection when no explicit recipe owns the ID. Keep the recipe assertion-only with no argv. Preserve the existing Python fallback and result/receipt behavior.\n\nThe capabilities marker belongs to the source bundle, so current verification can recompose an older owned bundle with its original recipe inventory. A normal refresh to the current source adds discovery. Explicit source/project static-inspection declarations take precedence and preserve their recipe/argument behavior. Newly installed standalone profile references and validation documentation identify the fallback without suggesting an executable runner.\n\nUse a disposable owned project and test-first discovery, exact Python recipe resolution, explicit precedence and older profile verification/upgrade. Run the required static assertion and installed focused Node test, review current diff, then regenerate through the owned generator. Leave plugin and queue decisions outside scope. Complete this task at the first controller priority and revalidate the immutable contract if the second task changes shared covered source.\n",
+          "recommendation": "accept",
+          "significance": "significant",
+          "text": "Accept the current source-backed implementation plan or identify a material required revision."
+        },
+        "role": "resolver",
+        "role_receipts": {},
+        "schema": 1
+      },
+      "input_digest": "8fbb1d684d8a43d00e5937bdcdd82faf9f5b793d4bc915deb60d114a19d22601"
+    },
+    "DA-d5a90ba5-d0ec-4952-a147-a29760a23180": {
+      "attempt_id": "DA-d5a90ba5-d0ec-4952-a147-a29760a23180",
+      "creation_evidence": {
+        "actor_context_id": "/root/delivery_review",
+        "actor_id": "/root/delivery_review",
+        "kind": "host-agent-created",
+        "provider": "Codex collaboration",
+        "reference": "Actual collaboration.spawn_agent returned /root/delivery_review.",
+        "tool": "collaboration.spawn_agent"
+      },
+      "input": {
+        "actor": {
+          "context_id": "/root/delivery_review",
+          "id": "/root/delivery_review"
+        },
+        "authority": {
+          "allowed_kinds": [
+            "technical",
+            "product",
+            "specification-acceptance"
+          ],
+          "constraints": [
+            "Only the two explicitly selected task scopes and the local codex/next-version delivery. No new runtime, network, plugin, remote or publication authority."
+          ],
+          "context_id": "task:T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+          "evidence": {
+            "kind": "owner-message",
+            "reference": "Owner explicitly invoked Implement All for the two deferred Future tasks and approved Auto delegated technical decisions."
+          },
+          "id": "future-followups-static",
+          "revision": 1
+        },
+        "authority_digest": "b370e921ec03879035c8a66fdbb9405d7a2d327343ead0ff2c56774fc38fa0e8",
+        "context": {
+          "content_fingerprint": "e0845b18aba1b86abf5d87b4c6103a93138619f36764bc86bc892b6812bf66b0",
+          "decision_purpose": "plan",
+          "execution_snapshot_digest": "167b5da44f21e03492352bd309a02f8ff156d340919c42c8ba15ef2b70443996",
+          "id": "task:T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+          "kind": "task",
+          "orchestration_id": "DO-2622c3b9-f00c-58ad-9eda-41c2b70e665a",
+          "plan_digest": "37c3e9fa9bea14d20534de3639ebc1bb2297c37dd42f3c7a981d73d641d07bb3",
+          "required_checks_digest": "da2bba0929bdb7e970819c9d5612cc8edf93628292b2586efda340123eea5d43",
+          "semantic_fingerprint": "e0845b18aba1b86abf5d87b4c6103a93138619f36764bc86bc892b6812bf66b0",
+          "task_ids": [
+            "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+          ]
+        },
+        "creation_evidence": {
+          "actor_context_id": "/root/delivery_review",
+          "actor_id": "/root/delivery_review",
+          "kind": "host-agent-created",
+          "provider": "Codex collaboration",
+          "reference": "Actual collaboration.spawn_agent returned /root/delivery_review.",
+          "tool": "collaboration.spawn_agent"
+        },
+        "decision_hash": "81ab20657edd4bd2edd36eaf696d249d3e70d4923ae07b285fa47fd7e07dbf51",
+        "decision_id": "DG-b490323b-dfc8-54c1-805e-2ae6408bafd8",
+        "execution_snapshot": {
+          "common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+          "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+          "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+          "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+          "common/scripts/run-workspaces.py": "306a8dad9d834250febd3fff4b109f0fb8b00711232705e483787bc1cdab5f20",
+          "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+          "common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+          "owned-profile": "a227f78838400d005bba9cb62086c154b8ee47301317beeb3cc1fcc6c9300e88"
+        },
+        "mode": "auto",
+        "mode_epoch": 1,
+        "orchestration_id": "DO-2622c3b9-f00c-58ad-9eda-41c2b70e665a",
+        "orchestration_revision": 6,
+        "prior_role_results": {
+          "resolver": {
+            "actor": {
+              "context_id": "/root/reconcile_plan",
+              "id": "/root/reconcile_plan"
+            },
+            "evidence": {
+              "actor_context_id": "/root/reconcile_plan",
+              "actor_id": "/root/reconcile_plan",
+              "creation_reference": "Actual collaboration.spawn_agent returned /root/reconcile_plan.",
+              "kind": "delegated-agent",
+              "provider": "Codex collaboration",
+              "reference": "/root/reconcile_plan returned the actual sealed-input answer in collaboration.",
+              "tool": "collaboration.followup_task"
+            },
+            "result": {
+              "answer": "accept",
+              "input_digest": "8fbb1d684d8a43d00e5937bdcdd82faf9f5b793d4bc915deb60d114a19d22601",
+              "rationale": "Adding the assertion-only definition after explicit recipe selection preserves existing declarations and matches the Python fallback without changing check identities. Verification recomposes from the owned bundle, so legacy profiles remain verifiable and reinstalling from current source adds discovery. The focused controls cover the relevant behavior.",
+              "status": "answered"
+            },
+            "status": "answered"
+          }
+        },
+        "question": {
+          "id": "static-plan-37c3e9fa",
+          "kind": "specification-acceptance",
+          "options": [
+            {
+              "id": "accept",
+              "text": "Accept current plan."
+            },
+            {
+              "id": "revise",
+              "text": "Revise current plan."
+            }
+          ],
+          "plan_text": "# Static inspection recipe discovery\n\nUse the exact existing Python static-inspection fallback shape. Add the definition to the owned capabilities configuration, and compose the built-in fallback only after explicit declaration selection when no explicit recipe owns the ID. Keep the recipe assertion-only with no argv. Preserve the existing Python fallback and result/receipt behavior.\n\nThe capabilities marker belongs to the source bundle, so current verification can recompose an older owned bundle with its original recipe inventory. A normal refresh to the current source adds discovery. Explicit source/project static-inspection declarations take precedence and preserve their recipe/argument behavior. Newly installed standalone profile references and validation documentation identify the fallback without suggesting an executable runner.\n\nUse a disposable owned project and test-first discovery, exact Python recipe resolution, explicit precedence and older profile verification/upgrade. Run the required static assertion and installed focused Node test, review current diff, then regenerate through the owned generator. Leave plugin and queue decisions outside scope. Complete this task at the first controller priority and revalidate the immutable contract if the second task changes shared covered source.\n",
+          "recommendation": "accept",
+          "significance": "significant",
+          "text": "Accept the current source-backed implementation plan or identify a material required revision."
+        },
+        "role": "critic",
+        "role_receipts": {
+          "resolver": "db9102839445b68745d7b71d84d9e403960e6cb47de65d57bb36285e0de082f0"
+        },
+        "schema": 1
+      },
+      "input_digest": "67b26d5003207d48d69fa532b2caf41e98772e1e8cd596226f1c234ff15c7c99"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the two explicitly selected task scopes and the local codex/next-version delivery. No new runtime, network, plugin, remote or publication authority."
+    ],
+    "context_id": "task:T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Owner explicitly invoked Implement All for the two deferred Future tasks and approved Auto delegated technical decisions."
+    },
+    "id": "future-followups-static",
+    "revision": 1
+  },
+  "capabilities": {
+    "independent_actors": true
+  },
+  "checks": {
+    "identity": {
+      "base_oid": "23c34b77ae55363bfb4dc9fc2c2fa9f6abb2492b",
+      "head": "23c34b77ae55363bfb4dc9fc2c2fa9f6abb2492b",
+      "source_digest": "2b2ecc70d3c00a66923cfc3982d6f0b7fa2f9342edd6a8dd7c0a8367578e92d0"
+    },
+    "passed": true,
+    "required_checks_digest": "da2bba0929bdb7e970819c9d5612cc8edf93628292b2586efda340123eea5d43",
+    "results": [
+      {
+        "id": "installed-static-recipe-discovery",
+        "reference": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-5b9ac7d5-64cf-42c9-baf0-d2879b11fd90.json",
+        "status": "passed"
+      },
+      {
+        "id": "static-recipe-discovery-contract",
+        "reference": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-static-recipe-discovery-contract-c-6ec3040e-a094-4381-b5d0-a7680f69fb73.json",
+        "status": "passed"
+      }
+    ]
+  },
+  "context": {
+    "content_fingerprint": "e0845b18aba1b86abf5d87b4c6103a93138619f36764bc86bc892b6812bf66b0",
+    "id": "task:T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+    "kind": "task",
+    "semantic_fingerprint": "e0845b18aba1b86abf5d87b4c6103a93138619f36764bc86bc892b6812bf66b0",
+    "task_ids": [
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ]
+  },
+  "execution_snapshot": {
+    "common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+    "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+    "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+    "common/scripts/run-workspaces.py": "306a8dad9d834250febd3fff4b109f0fb8b00711232705e483787bc1cdab5f20",
+    "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+    "common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+    "owned-profile": "a227f78838400d005bba9cb62086c154b8ee47301317beeb3cc1fcc6c9300e88"
+  },
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "failure_observations": [],
+  "history": [
+    {
+      "detail": {},
+      "event": "start",
+      "phase": "research",
+      "previous_frame_hash": null,
+      "sequence": 1
+    },
+    {
+      "detail": {},
+      "event": "research",
+      "phase": "plan",
+      "previous_frame_hash": "3a2af4fc22da34c489e926cc35bdb4623e963e3708e56f4b32d153d78c43c7c8",
+      "sequence": 2
+    },
+    {
+      "detail": {
+        "previous_acceptance": null,
+        "previous_plan": null
+      },
+      "event": "plan",
+      "phase": "plan-review",
+      "previous_frame_hash": "260ebac74b54291ab3b7a052abf8c78fd414bb3cc7b57987a5c561718d6d940c",
+      "sequence": 3
+    },
+    {
+      "detail": {
+        "decision_id": "DG-b490323b-dfc8-54c1-805e-2ae6408bafd8",
+        "purpose": "plan"
+      },
+      "event": "question",
+      "phase": "plan-review",
+      "previous_frame_hash": "8040a43b5bab50fc796f192b492cd48c07fee98fc867a4c59c8e5f55124c5a34",
+      "sequence": 4
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-2ffd92e0-8b42-4049-aa6a-f49aa5e2f655",
+        "input_digest": "8fbb1d684d8a43d00e5937bdcdd82faf9f5b793d4bc915deb60d114a19d22601"
+      },
+      "event": "prepare-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "d481d2548d46aabbb3a6976ea27452c100b19f2ddef8d71842e895e3a5077067",
+      "sequence": 5
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-2ffd92e0-8b42-4049-aa6a-f49aa5e2f655",
+        "status": "answered"
+      },
+      "event": "record-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "8235638d2e325b01e31c6fbd4a446d68bd73daca4d549f46828d104b2a01368b",
+      "sequence": 6
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-d5a90ba5-d0ec-4952-a147-a29760a23180",
+        "input_digest": "67b26d5003207d48d69fa532b2caf41e98772e1e8cd596226f1c234ff15c7c99"
+      },
+      "event": "prepare-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "acc0454c804b86b40672302160b4200ebc45926345b1694ef3bd71214fd58d07",
+      "sequence": 7
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-d5a90ba5-d0ec-4952-a147-a29760a23180",
+        "status": "agree"
+      },
+      "event": "record-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "b4d69912a917ab4b8e06ced43c551b9cb2fb1ed3ae3c9817da0e7175413c770d",
+      "sequence": 8
+    },
+    {
+      "detail": {
+        "acceptance_digest": "c60bd590ced6d7305794f4ab97f4200eff973c7db87be392e646a7e6bcbf7822",
+        "decision_id": "DG-b490323b-dfc8-54c1-805e-2ae6408bafd8"
+      },
+      "event": "accept-decision",
+      "phase": "plan-review",
+      "previous_frame_hash": "a40a358d476715962849a5e314e28445d68d1cf9f401fb452d16db51b106fb29",
+      "sequence": 9
+    },
+    {
+      "detail": {},
+      "event": "accept-plan",
+      "phase": "implement",
+      "previous_frame_hash": "8bdb21c94a4a07b886cb93858bd2e330f8d327a5603a6f511b51c23fbea806a5",
+      "sequence": 10
+    },
+    {
+      "detail": {},
+      "event": "implement",
+      "phase": "checks",
+      "previous_frame_hash": "e3b3bfdb441ff1578369ab3d9b526bff0dc197a4714498087a26304b3f7aa9c8",
+      "sequence": 11
+    },
+    {
+      "detail": {},
+      "event": "checks",
+      "phase": "review",
+      "previous_frame_hash": "c6a27a0813c90c8437dedd720a1ead82cd93f6d5e41889ea64c2e217ba886836",
+      "sequence": 12
+    },
+    {
+      "detail": {
+        "previous_resolutions": {},
+        "previous_review": null
+      },
+      "event": "review",
+      "phase": "ready",
+      "previous_frame_hash": "e51eb2922f16fcede7ca662d276cf32b87c080ae0c6aefec2734ec9e3e92892c",
+      "sequence": 13
+    }
+  ],
+  "id": "DO-2622c3b9-f00c-58ad-9eda-41c2b70e665a",
+  "identity": {
+    "base_oid": "23c34b77ae55363bfb4dc9fc2c2fa9f6abb2492b",
+    "head": "23c34b77ae55363bfb4dc9fc2c2fa9f6abb2492b",
+    "source_digest": "2b2ecc70d3c00a66923cfc3982d6f0b7fa2f9342edd6a8dd7c0a8367578e92d0"
+  },
+  "mode": "auto",
+  "orchestration_hash": "a8b407510dbfec1d374b7eb626b40d1427b7ba2d2f6db63492190e932d992e43",
+  "owner_question": null,
+  "phase": "ready",
+  "phase_after_checks": "review",
+  "plan": {
+    "digest": "37c3e9fa9bea14d20534de3639ebc1bb2297c37dd42f3c7a981d73d641d07bb3",
+    "reference": ".skill-tree/artifacts/future-followups/static-plan.md",
+    "required_checks": [
+      "static-recipe-discovery-contract",
+      "installed-static-recipe-discovery"
+    ]
+  },
+  "plan_acceptance": {
+    "actor": {
+      "context_id": "/root/reconcile_plan",
+      "id": "/root/reconcile_plan"
+    },
+    "answer": "accept",
+    "attempt_id": "DA-2ffd92e0-8b42-4049-aa6a-f49aa5e2f655",
+    "authority_digest": "b370e921ec03879035c8a66fdbb9405d7a2d327343ead0ff2c56774fc38fa0e8",
+    "context_identity": {
+      "decision_purpose": "plan",
+      "execution_snapshot_digest": "167b5da44f21e03492352bd309a02f8ff156d340919c42c8ba15ef2b70443996",
+      "id": "task:T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+      "kind": "task",
+      "orchestration_id": "DO-2622c3b9-f00c-58ad-9eda-41c2b70e665a",
+      "plan_digest": "37c3e9fa9bea14d20534de3639ebc1bb2297c37dd42f3c7a981d73d641d07bb3",
+      "required_checks_digest": "da2bba0929bdb7e970819c9d5612cc8edf93628292b2586efda340123eea5d43",
+      "task_ids": [
+        "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+      ]
+    },
+    "decision_id": "DG-b490323b-dfc8-54c1-805e-2ae6408bafd8",
+    "digest": "c60bd590ced6d7305794f4ab97f4200eff973c7db87be392e646a7e6bcbf7822",
+    "kind": "specification-acceptance",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/reconcile_plan",
+      "actor_id": "/root/reconcile_plan",
+      "creation_reference": "Actual collaboration.spawn_agent returned /root/reconcile_plan.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "/root/reconcile_plan returned the actual sealed-input answer in collaboration.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "7b508800d6474fc21cba3d8f159034fa2258f32870ff5043b0733d3dcb7c6593",
+    "question_id": "static-plan-37c3e9fa",
+    "rationale": "Adding the assertion-only definition after explicit recipe selection preserves existing declarations and matches the Python fallback without changing check identities. Verification recomposes from the owned bundle, so legacy profiles remain verifiable and reinstalling from current source adds discovery. The focused controls cover the relevant behavior.",
+    "role_receipts": {
+      "critic": "2eeb4889e4817c1de86a7af73ac949648bc7b7fabdbc40e2f73bbc2d5829de97",
+      "resolver": "db9102839445b68745d7b71d84d9e403960e6cb47de65d57bb36285e0de082f0"
+    },
+    "semantic_fingerprint": "e0845b18aba1b86abf5d87b4c6103a93138619f36764bc86bc892b6812bf66b0"
+  },
+  "prepared_actor": null,
+  "prerequisites": [],
+  "question_context": null,
+  "question_decision_id": null,
+  "question_purpose": "plan",
+  "question_sequence": 1,
+  "request_id": "future-followups-WR-141caef1-f423-4aa0-9b4a-17582eec8a9a-static",
+  "research_reference": "Installed operation, exact Future contract, maintained source and independent source audit.",
+  "resolutions": {},
+  "resolved_obligations": [],
+  "review": {
+    "digest": "32419ad3a2a15832aaa602e6817b2dcfdec7e1b9c44e16c072da21129462e056",
+    "findings": [],
+    "id": "static-independent-final",
+    "identity": {
+      "base_oid": "23c34b77ae55363bfb4dc9fc2c2fa9f6abb2492b",
+      "head": "23c34b77ae55363bfb4dc9fc2c2fa9f6abb2492b",
+      "source_digest": "2b2ecc70d3c00a66923cfc3982d6f0b7fa2f9342edd6a8dd7c0a8367578e92d0"
+    },
+    "reference": ".skill-tree/history/validation/future-followups/static-independent-review.json"
+  },
+  "revision": 13,
+  "schema": 1,
+  "stagnation": {
+    "count": 0,
+    "key": null
+  },
+  "stagnation_limit": 3,
+  "start_digest": "48faf7f8c85cb727dcee366ce4e668a7c7c32bd84ef1992514a6b9e8123a401f"
+}

@@ -1,0 +1,500 @@
+{
+  "checks": [
+    {
+      "evidence": ".skill-tree/artifacts/version-audit/python-tests.log",
+      "name": "python-behavioral-suite",
+      "result": "pass",
+      "tests": 224
+    },
+    {
+      "evidence": ".skill-tree/artifacts/version-audit/node-tests.log",
+      "failed": 0,
+      "name": "node-behavioral-suite",
+      "result": "pass",
+      "skipped": 0,
+      "tests": 84
+    },
+    {
+      "name": "source-sync-and-strict-validation",
+      "result": "pass"
+    },
+    {
+      "name": "installed-strict-documentation-validation",
+      "result": "pass"
+    },
+    {
+      "name": "document-rules-with-warnings-as-errors",
+      "result": "pass"
+    },
+    {
+      "name": "owned-installation-verification",
+      "result": "pass"
+    },
+    {
+      "name": "provider-list-shell-entrypoint-and-all-provider-temporary-target-dry-run",
+      "result": "pass"
+    },
+    {
+      "name": "task-owned-diff-whitespace",
+      "result": "pass"
+    },
+    {
+      "name": "retained-run-and-progress-preservation",
+      "result": "pass"
+    },
+    {
+      "evidence": ".skill-tree/artifacts/version-audit/probes.json",
+      "name": "five-local-defect-probes",
+      "result": "reproduced"
+    }
+  ],
+  "commits_created": [],
+  "coverage_gaps": [
+    "Actual model-run skill routing and workflow adherence remain unqualified.",
+    "Native discovery across every configured provider and current provider support remain unqualified.",
+    "Live PR publication, comments, push, merge and required provider policies remain unqualified.",
+    "Unity Editor, actual browser product, hosted and physical-device execution remain unqualified.",
+    "Source review samples critical paths and existing tests; the audit establishes no exhaustive security assurance.",
+    "Package word counts establish no measured context, latency or token-cost result."
+  ],
+  "documentation_baseline": {
+    "errors": [
+      "Missing .skill-tree/documents/project.md",
+      "Missing .skill-tree/documents/technical.md",
+      "Missing .skill-tree/documents/features.md",
+      "Missing .skill-tree/documents/rules.md",
+      "Missing .skill-tree/documents/repository-map.md",
+      "Missing .skill-tree/documents/build-and-release.md",
+      "Missing .skill-tree/documents/testing.md",
+      "Missing .skill-tree/documents/dependencies.md"
+    ],
+    "ok": false,
+    "warnings": [
+      "Latest recorded audit is stale; historical verdicts remain unchanged"
+    ]
+  },
+  "documentation_final": {
+    "errors": [],
+    "ok": true,
+    "warnings": [
+      "Latest recorded audit is stale; historical verdicts remain unchanged"
+    ]
+  },
+  "findings": [
+    {
+      "acceptance_direction": "Inline and fenced examples, quoted text and every non-owner payload remain unable to authorize merge. A prior publication record cannot acquire merge authorization from non-owner reinitialization. Explicit affirmative owner scope remains supported and explicit conflicts require clarification.",
+      "backlog_id": "B-c826e629-47c1-4981-990b-7c5be25223af",
+      "id": "merge-authorization",
+      "impact": "The helper can accept merge authorization without an affirmative direct-owner merge instruction.",
+      "observation": "Inline code containing merge=true grants merge authorization; a non-owner boolean payload also sets the merge authorization bit.",
+      "priority": 120,
+      "severity": "P1",
+      "sources": [
+        ".skill-tree/common/scripts/pr-review-state.py",
+        ".skill-tree/common/references/pr-review-cycle.md",
+        ".skill-tree/tests/test-pr-review-cycle.py"
+      ],
+      "status": "open",
+      "title": "Reject merge authorization from examples and non-owner payloads"
+    },
+    {
+      "acceptance_direction": "Unsupported or conflicting operation combinations reject before writes. Every accepted dry-run combination preserves the complete installation, profile, workflow and transaction state. An ordinary explicitly requested rollback retains owned-generation behavior.",
+      "backlog_id": "B-de097121-810f-440d-b3b9-39db9bcccd92",
+      "id": "rollback-dry-run",
+      "impact": "An accepted dry-run request mutates the installation instead of producing a read-only plan or rejecting unsupported flags.",
+      "observation": "The local manager accepts --rollback --dry-run and removes nine installed skills and the profile in a disposable project.",
+      "priority": 119,
+      "severity": "P1",
+      "sources": [
+        ".skill-tree/lib/installation.js",
+        ".skill-tree/documents/install.md",
+        ".skill-tree/tests/test-installation-integrity.js"
+      ],
+      "status": "open",
+      "title": "Preserve installation state for dry-run rollback and conflicting manager flags"
+    },
+    {
+      "acceptance_direction": "An explicit reviewed bootstrap or rebind path supports a clean clone and a controller worktree, preserves canonical queue identity and terminal history, and rejects unknown ownership or modified packages. Portable declarations remain distinct from machine-local locators. A matching same-root installation remains a verified no-op.",
+      "backlog_id": "B-3fdcc7a7-a8bd-471c-9309-d2369f5a2314",
+      "id": "self-install-bootstrap",
+      "impact": "Repository self-hosting works in the installation checkout but the normal installer and workflow commands cannot bootstrap a fresh checkout.",
+      "observation": "A clean clone rejects the tracked machine-bound receipt and cannot read the retained schema-3 queue without the original Git-local locator.",
+      "priority": 110,
+      "severity": "P1",
+      "sources": [
+        ".skill-tree/lib/installation.js",
+        ".skill-tree/common/scripts/run-workspaces.py",
+        ".skill-tree/common/references/installation-profile.md",
+        ".skill-tree/documents/manual-target-update.md"
+      ],
+      "status": "open",
+      "title": "Provide explicit safe bootstrap for self-installed clones and worktrees"
+    },
+    {
+      "acceptance_direction": "One documented recipe authority feeds profile composition and installed resolution. Existing source recipe IDs resolve to the intended commands with freshness checks, and completed contracts retain required verification. Unknown recipe IDs remain blocked.",
+      "backlog_id": "B-4ac59ebe-f3cd-4c47-bf66-c7b52337fa43",
+      "id": "source-recipe-discovery",
+      "impact": "Source task validation and immutable completed-contract revalidation lose the existing recipe IDs after installation.",
+      "observation": "Four recipes in the source registry disappear behind the installed profile recipe map and fail installed workflow resolution.",
+      "priority": 109,
+      "severity": "P2",
+      "sources": [
+        ".skill-tree/config/repository.json",
+        ".skill-tree/lib/composer.js",
+        ".skill-tree/common/scripts/workflow-state.py",
+        ".skill-tree/tests/test-completed-dependency-admission.py"
+      ],
+      "status": "open",
+      "title": "Preserve source validation recipe identities during self-installation"
+    },
+    {
+      "acceptance_direction": "Default and explicit snapshot scopes exclude generated representative packages and installed maintenance copies while preserving canonical authored documentation. Source and target fixtures cover ownership boundaries, material context, exclusions and live-file preservation.",
+      "backlog_id": "B-6f324468-ce01-44f4-831f-09165eb083af",
+      "id": "snapshot-generated-output",
+      "impact": "Generated copies dominate the selected context and contradict the snapshot exclusion contract.",
+      "observation": "Default snapshot selection includes 333 generated representative-package documents and 17 installed maintenance-bundle documents.",
+      "priority": 105,
+      "severity": "P2",
+      "sources": [
+        ".skill-tree/common/scripts/create-documentation-snapshot.py",
+        ".skill-tree/common/references/snapshot-rules.md",
+        ".skill-tree/config/repository.json",
+        ".skill-tree/tests/test-skill-repository-validation.py"
+      ],
+      "status": "open",
+      "title": "Exclude generated packages and maintenance bundles from documentation snapshots"
+    },
+    {
+      "acceptance_direction": "A bounded approved evaluation records positive and negative skill triggers, informal English and Russian requests, intake-only intent, standalone processing waits, explicit controller continuation, resumed checkpoints and authorization examples. Results distinguish model adherence from helper fixtures and retain exact model/provider/context identities. External execution and cost require separate explicit scope.",
+      "backlog_id": "B-bb532f95-5acd-4f90-a842-21e9b47ddee2",
+      "id": "agent-conformance",
+      "impact": "Passing fixture counts cannot establish correct skill selection, clarification and continuation in an actual agent session.",
+      "observation": "The current suites qualify deterministic helpers and simulated snapshots without actual model-run workflow adherence.",
+      "priority": 90,
+      "severity": "qualification-gap",
+      "sources": [
+        ".skill-tree/tests/readme.md",
+        ".skill-tree/templates/operations.json",
+        ".skill-tree/common/references/future-workflow.md",
+        ".skill-tree/documents/agent-compatibility.md"
+      ],
+      "status": "open",
+      "title": "Qualify skill routing and workflow adherence with bounded agent scenarios"
+    },
+    {
+      "corrections": [
+        "project.md",
+        "technical.md",
+        "features.md",
+        "rules.md",
+        "repository-map.md",
+        "build-and-release.md",
+        "testing.md",
+        "dependencies.md"
+      ],
+      "id": "required-document-set",
+      "observation": "The eight required current documents are present and pass the installed strict documentation validator.",
+      "status": "resolved"
+    }
+  ],
+  "id": "A-a5c8d5b6-612f-41ef-9234-952997f7b711",
+  "implementation_changes": [],
+  "official_references": [
+    "https://agentskills.io/specification",
+    "https://learn.chatgpt.com/docs/build-skills"
+  ],
+  "recorded_at": "2026-11-05T08:30:03.592755+00:00",
+  "reproductions": {
+    "clean_clone": {
+      "reinstall_dry_run": {
+        "returncode": 2,
+        "stderr": "error: Unsupported or foreign ownership receipt; use the manual update checklist",
+        "stdout": ""
+      },
+      "verify": {
+        "returncode": 2,
+        "stderr": "Unsupported or foreign ownership receipt; use the manual update checklist",
+        "stdout": ""
+      },
+      "workflow_index": {
+        "returncode": 2,
+        "stderr": "",
+        "stdout": "{\n  \"error\": \"Run registry locator mismatch; explicit recover-locator required\",\n  \"ok\": false\n}"
+      }
+    },
+    "merge_authorization": {
+      "inline_example": {
+        "authorization": {
+          "instruction_digest": "486a89e6c94a3d8eadb9fd3513f224c04cf6a2ab1bfb066f40a2db266174c380",
+          "merge": true,
+          "origin": "owner",
+          "pr": true
+        },
+        "merge": true,
+        "merge_explicit": true,
+        "source_branch": "codex/example",
+        "target_branch": "develop"
+      },
+      "inline_example_gate": "pr-ready",
+      "no_owner_instruction": {
+        "authorization": {
+          "instruction_digest": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126",
+          "merge": false,
+          "origin": "owner",
+          "pr": true
+        },
+        "merge": false,
+        "merge_explicit": false,
+        "source_branch": "codex/example",
+        "target_branch": "develop"
+      },
+      "non_owner_boolean": {
+        "authorization": {
+          "instruction_digest": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126",
+          "merge": true,
+          "origin": "third-party",
+          "pr": false
+        },
+        "merge": true,
+        "merge_explicit": true,
+        "source_branch": "codex/example",
+        "target_branch": "develop"
+      }
+    },
+    "no_remote_mutations": true,
+    "package_metrics": [
+      {
+        "bytes": 198987,
+        "entry_words": 271,
+        "files": 13,
+        "markdown_words": 5999,
+        "skill": "skill-tree-add-pending-task"
+      },
+      {
+        "bytes": 29863,
+        "entry_words": 154,
+        "files": 8,
+        "markdown_words": 2306,
+        "skill": "skill-tree-create-documents-snapshot"
+      },
+      {
+        "bytes": 251173,
+        "entry_words": 315,
+        "files": 19,
+        "markdown_words": 9497,
+        "skill": "skill-tree-implement-all"
+      },
+      {
+        "bytes": 210920,
+        "entry_words": 201,
+        "files": 17,
+        "markdown_words": 7271,
+        "skill": "skill-tree-implement-next-future-task"
+      },
+      {
+        "bytes": 231691,
+        "entry_words": 225,
+        "files": 14,
+        "markdown_words": 7092,
+        "skill": "skill-tree-pr-review-cycle"
+      },
+      {
+        "bytes": 208976,
+        "entry_words": 216,
+        "files": 16,
+        "markdown_words": 7053,
+        "skill": "skill-tree-process-future-pending"
+      },
+      {
+        "bytes": 214881,
+        "entry_words": 182,
+        "files": 18,
+        "markdown_words": 6407,
+        "skill": "skill-tree-repo-documentation"
+      },
+      {
+        "bytes": 214967,
+        "entry_words": 178,
+        "files": 18,
+        "markdown_words": 6403,
+        "skill": "skill-tree-repo-documentation-audit"
+      },
+      {
+        "bytes": 250928,
+        "entry_words": 276,
+        "files": 19,
+        "markdown_words": 9458,
+        "skill": "skill-tree-work-through-next"
+      }
+    ],
+    "rollback_dry_run": {
+      "after_skills": 0,
+      "before_skills": 9,
+      "receipt_exists_after": false,
+      "result": {
+        "returncode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"action\": \"generation rolled back; project dependencies unchanged; verify freshness before admission\"\n}"
+      }
+    },
+    "snapshot_scope": {
+      "examples": [
+        ".skill-tree/installation/source/common/references/development-practices.md",
+        ".skill-tree/installation/source/common/references/document-rules.md"
+      ],
+      "generated_representatives": 333,
+      "installation_bundle": 17,
+      "total": 400
+    },
+    "source_recipes": {
+      "declared": [
+        "pending-boundary-installation",
+        "pending-boundary-unit",
+        "pending-priority-installation",
+        "pending-priority-unit"
+      ],
+      "installed": [
+        "script-test-node",
+        "script-test-py"
+      ],
+      "resolution": {
+        "pending-boundary-installation": {
+          "error": "Validation-blocked: recipe unavailable: pending-boundary-installation; review the required plan after profile refresh",
+          "resolved": false
+        },
+        "pending-boundary-unit": {
+          "error": "Validation-blocked: recipe unavailable: pending-boundary-unit; review the required plan after profile refresh",
+          "resolved": false
+        },
+        "pending-priority-installation": {
+          "error": "Validation-blocked: recipe unavailable: pending-priority-installation; review the required plan after profile refresh",
+          "resolved": false
+        },
+        "pending-priority-unit": {
+          "error": "Validation-blocked: recipe unavailable: pending-priority-unit; review the required plan after profile refresh",
+          "resolved": false
+        }
+      }
+    }
+  },
+  "reviewed_commit": "6b81d6dd2dc3ba009226f54ec7655059c49d5cd4",
+  "scope": "skill-tree-next-version-quality-0-3-0",
+  "source_fingerprints": {
+    ".agents/skills/skill-tree-add-pending-task/SKILL.md": "b316b4bfbcbdb3ffd9a49f9179c5d75d8294c3cf562e05fa7c193f1c5c5d3efc",
+    ".agents/skills/skill-tree-create-documents-snapshot/SKILL.md": "11677eec04cc3d842e0ea1a58fb4959f84fea080d274f442e70bce92ed5b1fba",
+    ".agents/skills/skill-tree-implement-all/SKILL.md": "4ae5ced48c45fc6f67f6d72b25530254f38038db91f9c8547ca22b56089b46c1",
+    ".agents/skills/skill-tree-implement-next-future-task/SKILL.md": "5a44cd59709ff256ad36cfa2ccc87b190d334233f3d66d28532f5842e7945311",
+    ".agents/skills/skill-tree-pr-review-cycle/SKILL.md": "8f0f42fef06d6de69c7c521ab9ed19930e1a46c0fb6e19913a2f9c4ac3ca19fe",
+    ".agents/skills/skill-tree-process-future-pending/SKILL.md": "7754c6d60e0015056c68146be70f7b20ec1e71c2f7a9e15b368bc01af48992e5",
+    ".agents/skills/skill-tree-repo-documentation-audit/SKILL.md": "627ec224fd0ee0af35f14fe943ed6427cd3c4f077be9c31c57d63fcc539d0855",
+    ".agents/skills/skill-tree-repo-documentation/SKILL.md": "bfff40f085457c85400131e114c76a8ce0c4d9f790c3da10c4a4c04e4cf77b77",
+    ".agents/skills/skill-tree-work-through-next/SKILL.md": "e212392cb59ba050ab867a20d2e6c1d919133899282bc34cd70273a36c6f1649",
+    ".skill-tree/common/references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
+    ".skill-tree/common/references/documentation-output-contract.md": "34d40d7d8a53b08c5078421cb999b1b3d606506c8b6c9cb5d78273cce73e1008",
+    ".skill-tree/common/references/future-workflow.md": "b2fe86a999bde83038850b7a69640260eaee4246773ec8eb4815ee60eaf7a98a",
+    ".skill-tree/common/references/history-retention.md": "e34302d1665162c5c94bd1adea7cbdf32a36325bb4a6db1eafab24fc236c3585",
+    ".skill-tree/common/references/installation-profile.md": "71b43cd88f65f72b3ba9c4662cba8bda377497c9f64b084b9d163bc61e26debe",
+    ".skill-tree/common/references/orchestration.md": "79313308e0b2f1833ab131ffd2b2c5fed4f18163b26b682f9234b17f285f8ca5",
+    ".skill-tree/common/references/pr-review-cycle.md": "b23b9c746922a4be7e7ba2423d2d495483ea36fdb5677fd6ff822bc0fbfda5b2",
+    ".skill-tree/common/references/snapshot-rules.md": "18142120546fcd532e496fbd14aefbe449fa63da40cbcca577db249b91dcd30e",
+    ".skill-tree/common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+    ".skill-tree/common/references/workflow-metadata.md": "6c3252f4564cecc532eec5cec4ad30c9373bea8f85e3c698b19308dd83ae7b9d",
+    ".skill-tree/common/scripts/create-documentation-snapshot.py": "c47fed16988ab9fecc6dc18f0fbc7d61df5a94de80eef2ef066f208a002e5741",
+    ".skill-tree/common/scripts/pr-review-state.py": "1cbe0550c6d1fe8ba300fd41297be3806e256fc73c334dae2d0bda78a0b8923d",
+    ".skill-tree/common/scripts/run-workspaces.py": "af4e8301a5d24e94353f5e805a53718681c46bbc77349039df508b3e38112077",
+    ".skill-tree/common/scripts/select-prioritized-task.py": "93f12ac5a333fb072bf8d9d849d08e3b422af856d582d492902647efe35c896f",
+    ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+    ".skill-tree/common/scripts/validate-repository-documentation.py": "a9833b258675765a24de4205f5b87a6e34a90913408e97957582e007c78ba911",
+    ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+    ".skill-tree/config/capabilities.json": "fc9572cc6a65f689fd7a750560a897593fd7b90df50eadea3954e242556626c5",
+    ".skill-tree/config/flavors.json": "cc2e8ec2e54af53232ab2813a219d3d00a5d7e8b75d2d85ca20f4c0db28231a8",
+    ".skill-tree/config/providers.json": "80255fe3fb67e32d71cc7791aee1e51c1d34a508d4c77b6ca852521907ede97a",
+    ".skill-tree/config/repository.json": "1a8c766c9b93d31ff0573b1bc79dfb54e6489e627065be208b0a40c115ce41a7",
+    ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+    ".skill-tree/documents/agent-compatibility.md": "21e2c40b92081803060ba0e2af521d93c853f6ee54643578ed0335b89b0c2dfe",
+    ".skill-tree/documents/build-and-release.md": "074d815d75579dc6e11dfd76f8f844d3c672bc6e990bbd3b6a6c6c3b79db1af0",
+    ".skill-tree/documents/dependencies.md": "e524d1d314d8c443e000260860e71fca6db4bd6938e86cb7443379a6fb2db4f3",
+    ".skill-tree/documents/features.md": "44a4e3037dd0b812782acd6dc96b24acf469ef93a7a070f77106baa0968a9bbe",
+    ".skill-tree/documents/project.md": "9d1a5784159d73c6629a71b885b1c7e7ce91bc605de663e44b91f32d764ff6b4",
+    ".skill-tree/documents/repository-map.md": "c984f360a96991a1c982971efd8b34d7c5a72d445c2838d4d276c4cd1fe7e6e8",
+    ".skill-tree/documents/rules.md": "95187a9653e27bdba89d9de3bbc7055eceda1a79d3589465d0c5d6814762970c",
+    ".skill-tree/documents/skill-quality-audit.md": "2d650f831fa26ebf9c1364189fe55f7bcd31b1591a16909ca4011aebb8024f36",
+    ".skill-tree/documents/technical.md": "05080c5e616c6d5780975d724e3b6cc73829e76b3cdae5d4de00b0f56e88c6f5",
+    ".skill-tree/documents/testing.md": "9e7b0dd74ba0d812de64888c86eef7e1ebce1e9b657f8742ac6820f3ecef8334",
+    ".skill-tree/domains/general/sections.json": "936bf430802a7ff38ac83413b25162a079bdb81734388420336291b00d2136f6",
+    ".skill-tree/domains/unity/sections.json": "e95700a599c6048e3ee9b32b1428c452707297e7425f48349bd8cacd58e9bdc6",
+    ".skill-tree/domains/web/sections.json": "705a5dca39a2a0baa64f0043d6d188ade153c7dff553fcf55bfd25256b2bb2c7",
+    ".skill-tree/lib/composer.js": "e1f3429e17810f91cfa53ba8769368ddc39f67b2fa39f8731b93097030fd0eaa",
+    ".skill-tree/lib/installation.js": "53bee41f7348c7d3a1f6c472d0111a4fb139c90d3c72ef6c1ff50285d80459a9",
+    ".skill-tree/scripts/validate-skill-repository.py": "c7a99c949181f6b9ebac40d738c1327cec2a114bc4a4cb6ba4bd0d6984afbc7c",
+    ".skill-tree/templates/invariants.json": "4545894b07fab5f222d15eddd17c220408a4be8a5e5f25da3a4a34ef06bb87b5",
+    ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+    ".skill-tree/tests/readme.md": "ba007473756205f2cf17b54067da10a48c102bc0b392b2fd2652479dc488af6a",
+    ".skill-tree/tests/test-documentation-audit-fixtures.py": "56b4e0fa79029ef3b3ad96a0653c616900581c3ab8a049f536f847415fcc27f8",
+    ".skill-tree/tests/test-pr-review-cycle.py": "9e3477588ac856341c370de3ac388a9044c0eec80cc5f3b9db668419b514f5a6",
+    ".skill-tree/tests/test-skill-repository-validation.py": "48125da8a11d2863d655b9fb2430052638ceb8b386fcf58ebcd58806c17d165d",
+    ".skill-tree/tests/test-workflow-state.py": "78f8d5b453628f7d0a8deb1eb3eb0a7849ef32c8e6c7afd6c0cf83c7df72f76c",
+    "AGENTS.md": "10f397b0dcd15c4e9cdaf8470afdc7ffaaf1bdb974e26544fb4282ebabf41272",
+    "README.md": "4f761b6651c75969e0220e8f4646c74b9c5a6b6ddd98573cb4607a7ea78ce7e9",
+    "package.json": "54963447efc1404dda2e0b05f6bacc5654a6370c8cb305b506ed36a7ad79440d"
+  },
+  "sources": [
+    "AGENTS.md",
+    "README.md",
+    "package.json",
+    ".skill-tree/templates/operations.json",
+    ".skill-tree/templates/invariants.json",
+    ".skill-tree/lib/composer.js",
+    ".skill-tree/lib/installation.js",
+    ".skill-tree/common/scripts/workflow-state.py",
+    ".skill-tree/common/scripts/run-workspaces.py",
+    ".skill-tree/common/scripts/pr-review-state.py",
+    ".skill-tree/common/scripts/create-documentation-snapshot.py",
+    ".skill-tree/common/scripts/validate-document-rules.py",
+    ".skill-tree/common/scripts/validate-repository-documentation.py",
+    ".skill-tree/common/scripts/select-prioritized-task.py",
+    ".skill-tree/common/references/future-workflow.md",
+    ".skill-tree/common/references/workflow-metadata.md",
+    ".skill-tree/common/references/orchestration.md",
+    ".skill-tree/common/references/validation-policy.md",
+    ".skill-tree/common/references/installation-profile.md",
+    ".skill-tree/common/references/pr-review-cycle.md",
+    ".skill-tree/common/references/snapshot-rules.md",
+    ".skill-tree/common/references/documentation-output-contract.md",
+    ".skill-tree/common/references/history-retention.md",
+    ".skill-tree/common/references/document-rules.md",
+    ".skill-tree/config/repository.json",
+    ".skill-tree/config/providers.json",
+    ".skill-tree/config/capabilities.json",
+    ".skill-tree/config/flavors.json",
+    ".skill-tree/config/resource-map.json",
+    ".skill-tree/domains/general/sections.json",
+    ".skill-tree/domains/web/sections.json",
+    ".skill-tree/domains/unity/sections.json",
+    ".skill-tree/scripts/validate-skill-repository.py",
+    ".skill-tree/tests/test-pr-review-cycle.py",
+    ".skill-tree/tests/test-workflow-state.py",
+    ".skill-tree/tests/test-documentation-audit-fixtures.py",
+    ".skill-tree/tests/test-skill-repository-validation.py",
+    ".skill-tree/tests/readme.md",
+    ".skill-tree/documents/agent-compatibility.md",
+    ".skill-tree/documents/skill-quality-audit.md",
+    ".agents/skills/skill-tree-add-pending-task/SKILL.md",
+    ".agents/skills/skill-tree-create-documents-snapshot/SKILL.md",
+    ".agents/skills/skill-tree-implement-all/SKILL.md",
+    ".agents/skills/skill-tree-implement-next-future-task/SKILL.md",
+    ".agents/skills/skill-tree-pr-review-cycle/SKILL.md",
+    ".agents/skills/skill-tree-process-future-pending/SKILL.md",
+    ".agents/skills/skill-tree-repo-documentation/SKILL.md",
+    ".agents/skills/skill-tree-repo-documentation-audit/SKILL.md",
+    ".agents/skills/skill-tree-work-through-next/SKILL.md",
+    ".skill-tree/documents/project.md",
+    ".skill-tree/documents/technical.md",
+    ".skill-tree/documents/features.md",
+    ".skill-tree/documents/rules.md",
+    ".skill-tree/documents/repository-map.md",
+    ".skill-tree/documents/build-and-release.md",
+    ".skill-tree/documents/testing.md",
+    ".skill-tree/documents/dependencies.md"
+  ]
+}

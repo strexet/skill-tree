@@ -1,0 +1,1071 @@
+{
+  "approval_events": [
+    {
+      "applies_to_round": 1,
+      "approved_question_ids": [
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4"
+      ],
+      "scope": "Only the recommendations actually presented in round 1; later recommendations remain undecided.",
+      "source": "Current owner message in this chat",
+      "text": "Все рекомендации мне нравятся, утверждаем"
+    },
+    {
+      "applies_to_round": 2,
+      "approved_question_ids": [
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9",
+        "Q10"
+      ],
+      "scope": "Approval covers all six round 2 recommendations; the separate async Q5/Q6 answers corroborate the corresponding decisions.",
+      "source": "Explicit owner message in the current chat",
+      "text": "Все шесть рекомендаций утверждаем. Вноси правки в задачи и продолжай цикл grill, пока не останется неясностей."
+    },
+    {
+      "applies_to_round": 3,
+      "approved_question_ids": [
+        "Q11"
+      ],
+      "scope": "Install confirmation acquires and enables the exact displayed configuration; execution occurs later in authorized workflows.",
+      "source": "Actual structured owner answer in the current chat",
+      "text": "Да — установить и включить показанную конфигурацию"
+    },
+    {
+      "future_sha256": "512b46098a7b280b0783362b2f68c378d10621733cb9587a01f121b9c8d65024",
+      "kind": "final-shared-understanding-confirmation",
+      "question_item_id": "[\"request_user_input_async\",\"call_1d967386f0dd4d83ac3cda1eb50c2f9c\",0]",
+      "selected_task_ids": [
+        "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+        "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+        "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+        "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+        "T-2da07d09-0b1a-4407-b375-defd23720387",
+        "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+        "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+        "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+        "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+        "T-18db6175-499f-4679-bf8d-f815c7b42411",
+        "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+        "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+        "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+        "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+      ],
+      "source": "Actual structured owner answer in the current chat",
+      "summary_sha256": "d2014669cbd3827d4763279354abe7397de31a89bc4e6cd8a4f557dd96b20c65",
+      "text": "Да — подтверждаю итоговую спецификацию"
+    }
+  ],
+  "authorization": "The owner explicitly requests capture, targeted processing and then a live iterative grill/answer/revise/re-grill cycle for the current task group.",
+  "clarity_criteria": [
+    "Every selected task has a concrete goal, scope, exclusions, dependencies, observable acceptance and feasible validation.",
+    "Mandatory product decisions and relevant source facts are resolved or represented by explicit scoped research prerequisites.",
+    "No contradictory definitions, hidden dependency cycles, assumed owner answers or silent selection expansion remains.",
+    "Task revisions and answer evidence match the current selected task baseline.",
+    "The owner confirms shared understanding of the final current task summary before implementation."
+  ],
+  "clarity_review": {
+    "criterion_check_mapping": "All fifteen task acceptance sets match planned check criteria and assertions.",
+    "dependency_graph": "Valid after removing an implicit lifecycle prerequisite on the downstream management interface.",
+    "independent_reviews": [
+      "grill_round_three_gaps: no remaining material owner ambiguity",
+      "grill_task_consistency: no additional contradictions or cycles; identified lifecycle/interface criterion corrected"
+    ],
+    "material_owner_questions_remaining": [],
+    "scope_note": "Research outcomes and adapter execution remain future deliverables rather than assumed facts."
+  },
+  "completion": {
+    "approved_decision_ids": [
+      "Q1",
+      "Q2",
+      "Q3",
+      "Q4",
+      "Q5",
+      "Q6",
+      "Q7",
+      "Q8",
+      "Q9",
+      "Q10",
+      "Q11"
+    ],
+    "completed_on": "2026-11-05",
+    "implementation_started": false,
+    "next_action": "Await an explicit developer implementation selection.",
+    "result": "clear-and-owner-confirmed",
+    "round_count": 3,
+    "task_count": 15
+  },
+  "confirmation_request": {
+    "answer": "Да — подтверждаю итоговую спецификацию",
+    "answer_evidence": {
+      "question_item_id": "[\"request_user_input_async\",\"call_1d967386f0dd4d83ac3cda1eb50c2f9c\",0]",
+      "source": "Actual structured owner answer in the current chat"
+    },
+    "future_sha256": "512b46098a7b280b0783362b2f68c378d10621733cb9587a01f121b9c8d65024",
+    "question": "Confirm the shared understanding of the current fifteen-task specification, including Q1-Q11 and installed-plugin registry/removal. Confirmation closes clarification only and does not start implementation.",
+    "recommended_answer": "Confirm the current task specification.",
+    "selected_task_ids": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "status": "confirmed",
+    "summary_path": ".skill-tree/history/research/plugin-clarification-summary.md",
+    "summary_sha256": "d2014669cbd3827d4763279354abe7397de31a89bc4e6cd8a4f557dd96b20c65"
+  },
+  "created_task_ids": [
+    "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+    "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+    "T-10528edd-4542-4c26-b8b3-738ffc00d791"
+  ],
+  "current_round": 3,
+  "current_task_baseline": {
+    "future_sha256": "512b46098a7b280b0783362b2f68c378d10621733cb9587a01f121b9c8d65024",
+    "task_revision_sha256": {
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791": "6a7fbb37cf09b1522424078bfafab660aa2963eb8570cb0e6856677d1fc9a71d",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411": "a767cee753b91157798f4bde82f80530485cd2ddcacbe5d8b5a08bae0cdfe17d",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa": "393798ad057416190191a76b0943ac7397f5ec8bf8c849216e5580311ff310b3",
+      "T-2da07d09-0b1a-4407-b375-defd23720387": "92b333d845c5b94eb2e27b188fcee030f01f138e59eabc752490a902b26761d0",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69": "f1e5dddbea4ba9f82235324dc4359156b8bca72476849a57a3b2da67381b99a8",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": "82c680f787aaa2031f2d1b9f182c92dc4cf1c52a48260a928a9018e176318b88",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f": "68435148a136b79ba4e394173ad63da2ebb0f1ff3157e718aa87326c37fcc246",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5": "d7ecdd3f63b8f2bc22b164f520cddefe3bf942845384268e9f7bf3d1086742bd",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e": "2eab51d5699e567d54c24a0903e92563d66ae5baad51d5ea5e9f454447de3bf4",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb": "20e46d11f3564ed7cba37df820800587c5933e131aa10951ddbbe259be29383a",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef": "80090472abcf7726504fd291db8920daea343cebc590fbe910d2a42b6a230d41",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5": "2e6b0fb810f6f7b8db0840ae59b688275ee543e09281ff25a20ef9e411ea7ab0",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d": "c991e506ad79981e79c0d99c9781c427fd59ee19ed17b9e752ef017be12859ad",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516": "377d0bdb04c22164295262f6847181aee3da255af8da6c2fb0db760c8137bbe2",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5": "cfdb9fab0e6ae672a4d500b0dda3825825d5a3e9171697ce3b3718960a508061"
+    }
+  },
+  "execution_mode": "The native Skill tool is unavailable. The assistant directly applies the inspected interview protocol in the chat; no reusable controller implementation or external plugin invocation is claimed.",
+  "frontier_question_ids": [],
+  "intake_id": "P-e5de6bf4-99d6-481e-b158-7d302efde259",
+  "later_decision_branches": [
+    {
+      "reason": "Q1-Q11 settle the initial pilots. Any additional stage or split needs a concrete future proposal and actual owner decision before dependent implementation.",
+      "state": "owned-research-deliverable",
+      "task_id": "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "topic": "concrete-workflow-extension-proposals"
+    },
+    {
+      "reason": "Codex-first verification is approved; source facts and adapter qualification remain implementation evidence rather than owner preference questions.",
+      "state": "owned-research-and-validation-deliverable",
+      "task_id": "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "topic": "host-invocation-capabilities"
+    },
+    {
+      "reason": "The market study proposes the justified shortlist and comparison plan before bounded qualification; favorable recommendations are not assumed.",
+      "state": "owned-research-deliverable",
+      "task_id": "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "topic": "comparison-metrics-thresholds-and-bounded-execution-plan"
+    }
+  ],
+  "owner_confirmation": {
+    "answer": "Да — подтверждаю итоговую спецификацию",
+    "confirmed_on": "2026-11-05",
+    "future_sha256": "512b46098a7b280b0783362b2f68c378d10621733cb9587a01f121b9c8d65024",
+    "question_item_id": "[\"request_user_input_async\",\"call_1d967386f0dd4d83ac3cda1eb50c2f9c\",0]",
+    "scope": "Shared understanding of the current fifteen-task specification, including Q1-Q11 and the installed-plugin registry/removal requirement. Clarification completion grants no implementation or commit authorization.",
+    "selected_task_ids": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "source": "Actual structured owner answer in the current chat",
+    "status": "confirmed",
+    "summary_path": ".skill-tree/history/research/plugin-clarification-summary.md",
+    "summary_sha256": "d2014669cbd3827d4763279354abe7397de31a89bc4e6cd8a4f557dd96b20c65",
+    "task_revision_sha256": {
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791": "6a7fbb37cf09b1522424078bfafab660aa2963eb8570cb0e6856677d1fc9a71d",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411": "a767cee753b91157798f4bde82f80530485cd2ddcacbe5d8b5a08bae0cdfe17d",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa": "393798ad057416190191a76b0943ac7397f5ec8bf8c849216e5580311ff310b3",
+      "T-2da07d09-0b1a-4407-b375-defd23720387": "92b333d845c5b94eb2e27b188fcee030f01f138e59eabc752490a902b26761d0",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69": "f1e5dddbea4ba9f82235324dc4359156b8bca72476849a57a3b2da67381b99a8",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": "82c680f787aaa2031f2d1b9f182c92dc4cf1c52a48260a928a9018e176318b88",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f": "68435148a136b79ba4e394173ad63da2ebb0f1ff3157e718aa87326c37fcc246",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5": "d7ecdd3f63b8f2bc22b164f520cddefe3bf942845384268e9f7bf3d1086742bd",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e": "2eab51d5699e567d54c24a0903e92563d66ae5baad51d5ea5e9f454447de3bf4",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb": "20e46d11f3564ed7cba37df820800587c5933e131aa10951ddbbe259be29383a",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef": "80090472abcf7726504fd291db8920daea343cebc590fbe910d2a42b6a230d41",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5": "2e6b0fb810f6f7b8db0840ae59b688275ee543e09281ff25a20ef9e411ea7ab0",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d": "c991e506ad79981e79c0d99c9781c427fd59ee19ed17b9e752ef017be12859ad",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516": "377d0bdb04c22164295262f6847181aee3da255af8da6c2fb0db760c8137bbe2",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5": "cfdb9fab0e6ae672a4d500b0dda3825825d5a3e9171697ce3b3718960a508061"
+    }
+  },
+  "processing_id": "PR-595a7e56-0da2-4b81-afc6-f5cff249c1e2",
+  "protocol_source": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/grilling/SKILL.md",
+  "record_kind": "manual-agent-guided-clarification",
+  "reused_task_ids": [
+    "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69"
+  ],
+  "review_corrections": [
+    {
+      "after_sha256": "d7ecdd3f63b8f2bc22b164f520cddefe3bf942845384268e9f7bf3d1086742bd",
+      "reason": "Keep lifecycle acceptance independent of the downstream management interface to avoid an implicit dependency cycle.",
+      "task_id": "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5"
+    }
+  ],
+  "rounds": [
+    {
+      "owner_answers_received": true,
+      "questions": [
+        {
+          "answer": "Additional bounded review pass; changes follow the normal authorized fix/re-review flow.",
+          "answer_evidence": {
+            "applies_to_round": 1,
+            "approved_question_ids": [
+              "Q1",
+              "Q2",
+              "Q3",
+              "Q4"
+            ],
+            "scope": "Only the recommendations actually presented in round 1; later recommendations remain undecided.",
+            "source": "Current owner message in this chat",
+            "text": "Все рекомендации мне нравятся, утверждаем"
+          },
+          "depends_on": [],
+          "id": "Q1",
+          "options": [
+            "Additional review pass",
+            "Mode of the primary reviewer",
+            "Review and implementation assistant"
+          ],
+          "question": "Ponytail serves as an additional review pass focused on unnecessary complexity and minimal complete changes, returning findings to the normal fix/re-review cycle, with before/during/after placement configurable. Is the proposed role correct?",
+          "recommendation_accepted": true,
+          "recommended_answer": "Additional bounded review pass; changes follow the normal authorized fix/re-review flow.",
+          "state": "approved",
+          "topic": "review-plugin-role"
+        },
+        {
+          "answer": "Required for tasks with the interview enabled; no mandatory global interview for core-only projects.",
+          "answer_evidence": {
+            "applies_to_round": 1,
+            "approved_question_ids": [
+              "Q1",
+              "Q2",
+              "Q3",
+              "Q4"
+            ],
+            "scope": "Only the recommendations actually presented in round 1; later recommendations remain undecided.",
+            "source": "Current owner message in this chat",
+            "text": "Все рекомендации мне нравятся, утверждаем"
+          },
+          "depends_on": [],
+          "id": "Q2",
+          "options": [
+            "Required when enabled",
+            "Owner-invoked advisory assessment only"
+          ],
+          "question": "An enabled post-processing interview must finish actual questions, answers and task revisions before the task becomes implementable. Is the proposed obligation correct?",
+          "recommendation_accepted": true,
+          "recommended_answer": "Required for tasks with the interview enabled; no mandatory global interview for core-only projects.",
+          "state": "approved",
+          "topic": "enabled-interview-obligation"
+        },
+        {
+          "answer": "Verify Codex first and keep other host invocation support explicitly qualified or unavailable.",
+          "answer_evidence": {
+            "applies_to_round": 1,
+            "approved_question_ids": [
+              "Q1",
+              "Q2",
+              "Q3",
+              "Q4"
+            ],
+            "scope": "Only the recommendations actually presented in round 1; later recommendations remain undecided.",
+            "source": "Current owner message in this chat",
+            "text": "Все рекомендации мне нравятся, утверждаем"
+          },
+          "depends_on": [],
+          "id": "Q3",
+          "options": [
+            "Codex first",
+            "Codex and Claude Code",
+            "Every current provider"
+          ],
+          "question": "The first verified plugin invocation host is Codex, with a portable contract and additional hosts qualified separately. Is the proposed initial coverage correct?",
+          "recommendation_accepted": true,
+          "recommended_answer": "Verify Codex first and keep other host invocation support explicitly qualified or unavailable.",
+          "state": "approved",
+          "topic": "initial-verified-hosts"
+        },
+        {
+          "answer": "Prioritize demonstrated quality improvement; report time/cost and limitations without treating adoption as outcome evidence.",
+          "answer_evidence": {
+            "applies_to_round": 1,
+            "approved_question_ids": [
+              "Q1",
+              "Q2",
+              "Q3",
+              "Q4"
+            ],
+            "scope": "Only the recommendations actually presented in round 1; later recommendations remain undecided.",
+            "source": "Current owner message in this chat",
+            "text": "Все рекомендации мне нравятся, утверждаем"
+          },
+          "depends_on": [],
+          "id": "Q4",
+          "options": [
+            "Quality first",
+            "Balanced quality and cost",
+            "Time or cost first"
+          ],
+          "question": "Measured task/review quality is the primary recommendation objective, with time and cost treated as additional constraints. Is the proposed objective correct?",
+          "recommendation_accepted": true,
+          "recommended_answer": "Prioritize demonstrated quality improvement; report time/cost and limitations without treating adoption as outcome evidence.",
+          "state": "approved",
+          "topic": "recommendation-objective"
+        }
+      ],
+      "round": 1,
+      "status": "answered-and-task-revisions-recorded",
+      "task_revisions": [
+        {
+          "after_sha256": "7025e0df36a85b4a3b07faad704dcac039c7eaca92c7e94ad6e17ab351bdc6e2",
+          "before_sha256": "2ab4ffdf9646c47bc5a0d74cdadc9c7c49aae6138d7342951be675049c2767bf",
+          "decision_ids": [
+            "Q2",
+            "Q3"
+          ],
+          "task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa"
+        },
+        {
+          "after_sha256": "18a07f054e76db4a1edb9dcb1e340d0a3d4f0989e7af4d4d9d192a6290d6aaa9",
+          "before_sha256": "e3ba589edebc1c39dc85bcd41543e8926449649e32962e3a2eb9a8e903a287b4",
+          "decision_ids": [
+            "Q1",
+            "Q2",
+            "Q3"
+          ],
+          "task_id": "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc"
+        },
+        {
+          "after_sha256": "e722da67f651e3b09e7354388220177c664e48814a22fa93cbee9b9225871d14",
+          "before_sha256": "733e8c6d54438b41cd21a90792c894081eed444885b27f64f6001591a2e3ccda",
+          "decision_ids": [
+            "Q2",
+            "Q3"
+          ],
+          "task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+        },
+        {
+          "after_sha256": "4ce5671c5902d7d8c3d86b3f38b5b1df613b06b168c2b325e2037962068cdb4d",
+          "before_sha256": "c95d99458fbac142fe3ab3129d9d5e6420ed62f1ba351c6fb54dcb159732a1b0",
+          "decision_ids": [
+            "Q3",
+            "Q4"
+          ],
+          "task_id": "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d"
+        },
+        {
+          "after_sha256": "25805ce999fe5051d4375bd2ff975c1fbe8c80895248147becc61696930b6364",
+          "before_sha256": "3b9acc738b7cb98526fcbcef799e2b44a3f02a9a2197391d5e9114e117a79b8d",
+          "decision_ids": [
+            "Q1",
+            "Q2",
+            "Q3",
+            "Q4"
+          ],
+          "task_id": "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+        },
+        {
+          "after_sha256": "c545ff2bd208d5d5aba7731d0060b05850111b3fdae910739042fd2d4f080e80",
+          "before_sha256": "a95a552173fe2232a0404e32b11769942816555c04d78636ac97bea7005eedca",
+          "decision_ids": [
+            "Q3"
+          ],
+          "task_id": "T-2da07d09-0b1a-4407-b375-defd23720387"
+        },
+        {
+          "after_sha256": "55ca788aa5b71ec3d312ffa33fe72648a4eacf4960f387f6a20bda5bb0dda872",
+          "before_sha256": "d86b78d1bd2a840f9fc60fa419ffd2550243479dd59fe75a4131608eab7f9e5e",
+          "decision_ids": [
+            "Q3"
+          ],
+          "task_id": "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5"
+        },
+        {
+          "after_sha256": "470840e2f46d17a1a2ea78829552afadb5351e8415d7e2e473d176b62e7548ff",
+          "before_sha256": "cda7530f1732b84caaf9ffe7b2b415d804e8197ce9340b074cab24a8c277be7d",
+          "decision_ids": [
+            "Q1",
+            "Q3"
+          ],
+          "task_id": "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+        },
+        {
+          "after_sha256": "aa7678e865b118236a354d9d76e826060f932dca3ccef1662bf3e5343bbe434d",
+          "before_sha256": "a9ba09f92d57c90b39aa354b51cdc464c8bb09d9265c217d3e16a60e9ce8b6de",
+          "decision_ids": [
+            "Q1",
+            "Q2",
+            "Q3"
+          ],
+          "task_id": "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+        },
+        {
+          "after_sha256": "94d323d1c610173a169e4d6a06f31aa75f12d52b2677f7b403da4fb45be58c75",
+          "before_sha256": "d9ed68994a680bc6c97ea1797d81936441607f333ad72def69746f700ebbbcaf",
+          "decision_ids": [
+            "Q1",
+            "Q3"
+          ],
+          "task_id": "T-18db6175-499f-4679-bf8d-f815c7b42411"
+        },
+        {
+          "after_sha256": "2e3355b501a5c31e2aa46e3e0815627c610a89329ab96bcf6ec28115555e921e",
+          "before_sha256": "2b43811136c0fc7c1d7fcf92f207e761441a5221c17a1fd8773092ef208aadcf",
+          "decision_ids": [
+            "Q2",
+            "Q3"
+          ],
+          "task_id": "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69"
+        },
+        {
+          "after_sha256": "4776ef5ea1c4f391b23443280b095634ac1a56e07668a1e92937593488f8d647",
+          "before_sha256": "5061aa8fa96c649b79e45cce404f3a386af41424311c20859042f9a2676b74ec",
+          "decision_ids": [
+            "Q3",
+            "Q4"
+          ],
+          "task_id": "T-a583acd5-fc6b-4d37-97ec-02df969fea9e"
+        },
+        {
+          "after_sha256": "c887849219182e517486a82d7b346f1d446c4f7cace898b0e11881dcf0600fcc",
+          "before_sha256": "48929d2d873ba71df61165387d23b330a130b1bd2a5757e0e995df6076a2ed65",
+          "decision_ids": [
+            "Q3",
+            "Q4"
+          ],
+          "task_id": "T-ea3d73b4-c312-4de9-9897-c97f380e4516"
+        },
+        {
+          "after_sha256": "ef419844299c36c963c65892bc1755c304170e30d619d657cd577a6515316401",
+          "before_sha256": "8f2910effda89cfdf7bb5092cf911d7e4062c8303b226b44e6c25b968af502f5",
+          "decision_ids": [
+            "Q3",
+            "Q4"
+          ],
+          "task_id": "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+        }
+      ]
+    },
+    {
+      "owner_answers_received": true,
+      "questions": [
+        {
+          "answer": "Default to a bounded pass after ordinary full review, before PR readiness; preserve the other configured placements.",
+          "answer_evidence": {
+            "applies_to_round": 2,
+            "approved_question_ids": [
+              "Q5",
+              "Q6",
+              "Q7",
+              "Q8",
+              "Q9",
+              "Q10"
+            ],
+            "scope": "Approval covers all six round 2 recommendations; the separate async Q5/Q6 answers corroborate the corresponding decisions.",
+            "source": "Explicit owner message in the current chat",
+            "text": "Все шесть рекомендаций утверждаем. Вноси правки в задачи и продолжай цикл grill, пока не останется неясностей."
+          },
+          "depends_on": [
+            "Q1"
+          ],
+          "id": "Q5",
+          "options": [
+            "After ordinary review",
+            "Before ordinary review",
+            "No default; always select explicitly"
+          ],
+          "question": "The default Ponytail pass runs after the ordinary full review and before PR readiness, while before/during/after remain configurable. Is the proposed default correct?",
+          "recommendation_accepted": true,
+          "recommended_answer": "Default to a bounded pass after ordinary full review, before PR readiness; preserve the other configured placements.",
+          "state": "approved",
+          "topic": "default-review-placement"
+        },
+        {
+          "answer": "Create the stable T-task immediately in a non-implementable clarification state; retain the same ID throughout the interview and publish Ready after completion.",
+          "answer_evidence": {
+            "applies_to_round": 2,
+            "approved_question_ids": [
+              "Q5",
+              "Q6",
+              "Q7",
+              "Q8",
+              "Q9",
+              "Q10"
+            ],
+            "scope": "Approval covers all six round 2 recommendations; the separate async Q5/Q6 answers corroborate the corresponding decisions.",
+            "source": "Explicit owner message in the current chat",
+            "text": "Все шесть рекомендаций утверждаем. Вноси правки в задачи и продолжай цикл grill, пока не останется неясностей."
+          },
+          "depends_on": [
+            "Q2"
+          ],
+          "id": "Q6",
+          "options": [
+            "Visible held T-task",
+            "Keep an unpublished draft until the interview completes"
+          ],
+          "question": "Processing creates a visible researched T-task with a stable ID and a clarification hold; Ready is published only after the enabled interview, revisions and owner confirmation. Is the proposed task lifecycle correct?",
+          "recommendation_accepted": true,
+          "recommended_answer": "Create the stable T-task immediately in a non-implementable clarification state; retain the same ID throughout the interview and publish Ready after completion.",
+          "state": "approved",
+          "topic": "interview-readiness-timing"
+        },
+        {
+          "answer": "Require completion while the review pass remains enabled; an explicit configuration change never counts as a successful execution.",
+          "answer_evidence": {
+            "applies_to_round": 2,
+            "approved_question_ids": [
+              "Q5",
+              "Q6",
+              "Q7",
+              "Q8",
+              "Q9",
+              "Q10"
+            ],
+            "scope": "Approval covers all six round 2 recommendations; the separate async Q5/Q6 answers corroborate the corresponding decisions.",
+            "source": "Explicit owner message in the current chat",
+            "text": "Все шесть рекомендаций утверждаем. Вноси правки в задачи и продолжай цикл grill, пока не останется неясностей."
+          },
+          "depends_on": [
+            "Q1",
+            "Q3"
+          ],
+          "id": "Q7",
+          "options": [
+            "Required when enabled",
+            "Incomplete pass does not block PR readiness"
+          ],
+          "question": "An enabled Ponytail review pass is required to finish before PR readiness; unavailable dependencies or failed execution retain a visible block instead of silently skipping the pass. Is the proposed completion policy correct?",
+          "recommendation_accepted": true,
+          "recommended_answer": "Require completion while the review pass remains enabled; an explicit configuration change never counts as a successful execution.",
+          "state": "approved",
+          "topic": "configured-review-completion"
+        },
+        {
+          "answer": "Reassess changed goals, scope, exclusions, dependencies, acceptance, validation or required plugin policy; preserve unrelated answers and avoid repeating formatting-only review.",
+          "answer_evidence": {
+            "applies_to_round": 2,
+            "approved_question_ids": [
+              "Q5",
+              "Q6",
+              "Q7",
+              "Q8",
+              "Q9",
+              "Q10"
+            ],
+            "scope": "Approval covers all six round 2 recommendations; the separate async Q5/Q6 answers corroborate the corresponding decisions.",
+            "source": "Explicit owner message in the current chat",
+            "text": "Все шесть рекомендаций утверждаем. Вноси правки в задачи и продолжай цикл grill, пока не останется неясностей."
+          },
+          "depends_on": [
+            "Q2"
+          ],
+          "id": "Q8",
+          "options": [
+            "Reassess affected semantics only",
+            "Always repeat the complete interview"
+          ],
+          "question": "Semantic changes reopen affected answers and final confirmation, while unrelated answers remain valid and formatting-only changes need no new interview. Is the proposed revision policy correct?",
+          "recommendation_accepted": true,
+          "recommended_answer": "Reassess changed goals, scope, exclusions, dependencies, acceptance, validation or required plugin policy; preserve unrelated answers and avoid repeating formatting-only review.",
+          "state": "approved",
+          "topic": "semantic-confirmation-invalidation"
+        },
+        {
+          "answer": "Use project defaults with explicit temporary per-run overrides and a recorded effective configuration; disabling a required interview does not establish completed answers or execution.",
+          "answer_evidence": {
+            "applies_to_round": 2,
+            "approved_question_ids": [
+              "Q5",
+              "Q6",
+              "Q7",
+              "Q8",
+              "Q9",
+              "Q10"
+            ],
+            "scope": "Approval covers all six round 2 recommendations; the separate async Q5/Q6 answers corroborate the corresponding decisions.",
+            "source": "Explicit owner message in the current chat",
+            "text": "Все шесть рекомендаций утверждаем. Вноси правки в задачи и продолжай цикл grill, пока не останется неясностей."
+          },
+          "depends_on": [
+            "Q1",
+            "Q2",
+            "Q3"
+          ],
+          "id": "Q9",
+          "options": [
+            "Project defaults and temporary overrides",
+            "Project settings only",
+            "Run settings only"
+          ],
+          "question": "Project defaults support explicit per-run overrides; the effective settings are recorded and frozen for that run/resume, and persistent changes require an explicit configuration edit. Is the proposed configuration model correct?",
+          "recommendation_accepted": true,
+          "recommended_answer": "Use project defaults with explicit temporary per-run overrides and a recorded effective configuration; disabling a required interview does not establish completed answers or execution.",
+          "state": "approved",
+          "topic": "configuration-lifetime-and-overrides"
+        },
+        {
+          "answer": "Require the project comparison before inclusion in recommended bundles; external research supports the shortlist and unqualified candidates remain clearly identified.",
+          "answer_evidence": {
+            "applies_to_round": 2,
+            "approved_question_ids": [
+              "Q5",
+              "Q6",
+              "Q7",
+              "Q8",
+              "Q9",
+              "Q10"
+            ],
+            "scope": "Approval covers all six round 2 recommendations; the separate async Q5/Q6 answers corroborate the corresponding decisions.",
+            "source": "Explicit owner message in the current chat",
+            "text": "Все шесть рекомендаций утверждаем. Вноси правки в задачи и продолжай цикл grill, пока не останется неясностей."
+          },
+          "depends_on": [
+            "Q4"
+          ],
+          "id": "Q10",
+          "options": [
+            "Project comparison required for recommendations",
+            "Reliable external evaluations are sufficient"
+          ],
+          "question": "Recommended bundles contain candidates that pass a bounded comparison in the target workflow; untested or compatibility-only candidates remain manually selectable with explicit evidence status. Is the proposed eligibility rule correct?",
+          "recommendation_accepted": true,
+          "recommended_answer": "Require the project comparison before inclusion in recommended bundles; external research supports the shortlist and unqualified candidates remain clearly identified.",
+          "state": "approved",
+          "topic": "recommendation-evidence-eligibility"
+        }
+      ],
+      "round": 2,
+      "source_baseline": {
+        "future_sha256": "7e4581fbba4f311db0648fa729e6cce2840d2e7f4be5e1cd490708e63ebe4681",
+        "task_revision_sha256": {
+          "T-18db6175-499f-4679-bf8d-f815c7b42411": "94d323d1c610173a169e4d6a06f31aa75f12d52b2677f7b403da4fb45be58c75",
+          "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa": "7025e0df36a85b4a3b07faad704dcac039c7eaca92c7e94ad6e17ab351bdc6e2",
+          "T-2da07d09-0b1a-4407-b375-defd23720387": "c545ff2bd208d5d5aba7731d0060b05850111b3fdae910739042fd2d4f080e80",
+          "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69": "2e3355b501a5c31e2aa46e3e0815627c610a89329ab96bcf6ec28115555e921e",
+          "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": "18a07f054e76db4a1edb9dcb1e340d0a3d4f0989e7af4d4d9d192a6290d6aaa9",
+          "T-6ec57615-3512-4f91-98e8-efb12cde7d7f": "ef419844299c36c963c65892bc1755c304170e30d619d657cd577a6515316401",
+          "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5": "55ca788aa5b71ec3d312ffa33fe72648a4eacf4960f387f6a20bda5bb0dda872",
+          "T-a583acd5-fc6b-4d37-97ec-02df969fea9e": "4776ef5ea1c4f391b23443280b095634ac1a56e07668a1e92937593488f8d647",
+          "T-a5a738da-c182-4206-bb61-75ffa21946fb": "25805ce999fe5051d4375bd2ff975c1fbe8c80895248147becc61696930b6364",
+          "T-a9d7a827-fb25-4348-bcf7-867a449c58ef": "470840e2f46d17a1a2ea78829552afadb5351e8415d7e2e473d176b62e7548ff",
+          "T-dae414c5-43e4-45db-a6f3-4ce4112440c5": "aa7678e865b118236a354d9d76e826060f932dca3ccef1662bf3e5343bbe434d",
+          "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d": "4ce5671c5902d7d8c3d86b3f38b5b1df613b06b168c2b325e2037962068cdb4d",
+          "T-ea3d73b4-c312-4de9-9897-c97f380e4516": "c887849219182e517486a82d7b346f1d446c4f7cace898b0e11881dcf0600fcc",
+          "T-f63559f1-4663-41b7-b085-f55ba7b47fe5": "e722da67f651e3b09e7354388220177c664e48814a22fa93cbee9b9225871d14"
+        }
+      },
+      "status": "answered-and-task-revisions-recorded",
+      "task_revisions": [
+        {
+          "after_sha256": "393798ad057416190191a76b0943ac7397f5ec8bf8c849216e5580311ff310b3",
+          "before_sha256": "7025e0df36a85b4a3b07faad704dcac039c7eaca92c7e94ad6e17ab351bdc6e2",
+          "decision_ids": [
+            "Q6",
+            "Q8"
+          ],
+          "task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa"
+        },
+        {
+          "after_sha256": "82c680f787aaa2031f2d1b9f182c92dc4cf1c52a48260a928a9018e176318b88",
+          "before_sha256": "18a07f054e76db4a1edb9dcb1e340d0a3d4f0989e7af4d4d9d192a6290d6aaa9",
+          "decision_ids": [
+            "Q5",
+            "Q6",
+            "Q7",
+            "Q9",
+            "Q11"
+          ],
+          "task_id": "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc"
+        },
+        {
+          "after_sha256": "cfdb9fab0e6ae672a4d500b0dda3825825d5a3e9171697ce3b3718960a508061",
+          "before_sha256": "e722da67f651e3b09e7354388220177c664e48814a22fa93cbee9b9225871d14",
+          "decision_ids": [
+            "Q6",
+            "Q8"
+          ],
+          "task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+        },
+        {
+          "after_sha256": "c991e506ad79981e79c0d99c9781c427fd59ee19ed17b9e752ef017be12859ad",
+          "before_sha256": "4ce5671c5902d7d8c3d86b3f38b5b1df613b06b168c2b325e2037962068cdb4d",
+          "decision_ids": [
+            "Q10"
+          ],
+          "task_id": "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d"
+        },
+        {
+          "after_sha256": "20e46d11f3564ed7cba37df820800587c5933e131aa10951ddbbe259be29383a",
+          "before_sha256": "25805ce999fe5051d4375bd2ff975c1fbe8c80895248147becc61696930b6364",
+          "decision_ids": [
+            "Q5",
+            "Q6",
+            "Q7"
+          ],
+          "task_id": "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+        },
+        {
+          "after_sha256": "92b333d845c5b94eb2e27b188fcee030f01f138e59eabc752490a902b26761d0",
+          "before_sha256": "c545ff2bd208d5d5aba7731d0060b05850111b3fdae910739042fd2d4f080e80",
+          "decision_ids": [
+            "Q9",
+            "Q10",
+            "Q11"
+          ],
+          "task_id": "T-2da07d09-0b1a-4407-b375-defd23720387"
+        },
+        {
+          "after_sha256": "346ff3d9af851e78735c9a5d1a83df9c69b8b54311d92ea4d8f833a38659282b",
+          "before_sha256": "55ca788aa5b71ec3d312ffa33fe72648a4eacf4960f387f6a20bda5bb0dda872",
+          "decision_ids": [
+            "Q9",
+            "Q11"
+          ],
+          "task_id": "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5"
+        },
+        {
+          "after_sha256": "80090472abcf7726504fd291db8920daea343cebc590fbe910d2a42b6a230d41",
+          "before_sha256": "470840e2f46d17a1a2ea78829552afadb5351e8415d7e2e473d176b62e7548ff",
+          "decision_ids": [
+            "Q5",
+            "Q9"
+          ],
+          "task_id": "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+        },
+        {
+          "after_sha256": "2e6b0fb810f6f7b8db0840ae59b688275ee543e09281ff25a20ef9e411ea7ab0",
+          "before_sha256": "aa7678e865b118236a354d9d76e826060f932dca3ccef1662bf3e5343bbe434d",
+          "decision_ids": [
+            "Q5",
+            "Q6",
+            "Q7",
+            "Q9"
+          ],
+          "task_id": "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+        },
+        {
+          "after_sha256": "6a7fbb37cf09b1522424078bfafab660aa2963eb8570cb0e6856677d1fc9a71d",
+          "before_sha256": "bff25b4e196f07697f63c81dbf3615c812c205dfe9d81fe6402bf8d35f6d94ea",
+          "decision_ids": [
+            "Q9",
+            "Q11"
+          ],
+          "task_id": "T-10528edd-4542-4c26-b8b3-738ffc00d791"
+        },
+        {
+          "after_sha256": "a767cee753b91157798f4bde82f80530485cd2ddcacbe5d8b5a08bae0cdfe17d",
+          "before_sha256": "94d323d1c610173a169e4d6a06f31aa75f12d52b2677f7b403da4fb45be58c75",
+          "decision_ids": [
+            "Q5",
+            "Q7",
+            "Q9"
+          ],
+          "task_id": "T-18db6175-499f-4679-bf8d-f815c7b42411"
+        },
+        {
+          "after_sha256": "f1e5dddbea4ba9f82235324dc4359156b8bca72476849a57a3b2da67381b99a8",
+          "before_sha256": "2e3355b501a5c31e2aa46e3e0815627c610a89329ab96bcf6ec28115555e921e",
+          "decision_ids": [
+            "Q6",
+            "Q8",
+            "Q9"
+          ],
+          "task_id": "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69"
+        },
+        {
+          "after_sha256": "2eab51d5699e567d54c24a0903e92563d66ae5baad51d5ea5e9f454447de3bf4",
+          "before_sha256": "4776ef5ea1c4f391b23443280b095634ac1a56e07668a1e92937593488f8d647",
+          "decision_ids": [
+            "Q10"
+          ],
+          "task_id": "T-a583acd5-fc6b-4d37-97ec-02df969fea9e"
+        },
+        {
+          "after_sha256": "377d0bdb04c22164295262f6847181aee3da255af8da6c2fb0db760c8137bbe2",
+          "before_sha256": "c887849219182e517486a82d7b346f1d446c4f7cace898b0e11881dcf0600fcc",
+          "decision_ids": [
+            "Q10"
+          ],
+          "task_id": "T-ea3d73b4-c312-4de9-9897-c97f380e4516"
+        },
+        {
+          "after_sha256": "68435148a136b79ba4e394173ad63da2ebb0f1ff3157e718aa87326c37fcc246",
+          "before_sha256": "a819cbcf4c85d510aaa522afdaf471fc4af6189a8703160a99fa72ee6f049c5d",
+          "decision_ids": [
+            "Q9",
+            "Q10",
+            "Q11"
+          ],
+          "task_id": "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+        }
+      ]
+    },
+    {
+      "owner_answers_received": true,
+      "questions": [
+        {
+          "answer": "Confirmation installs and enables the exact displayed configuration; plugin execution occurs later in the corresponding authorized workflow.",
+          "answer_evidence": {
+            "applies_to_round": 3,
+            "approved_question_ids": [
+              "Q11"
+            ],
+            "scope": "Install confirmation acquires and enables the exact displayed configuration; execution occurs later in authorized workflows.",
+            "source": "Actual structured owner answer in the current chat",
+            "text": "Да — установить и включить показанную конфигурацию"
+          },
+          "depends_on": [
+            "Q2",
+            "Q7",
+            "Q9"
+          ],
+          "id": "Q11",
+          "question": "Does confirmation install and enable the displayed plugin configuration, including versions, hook locations and readiness effects?",
+          "recommendation_accepted": true,
+          "recommended_answer": "Confirmation installs and enables the exact displayed configuration; plugin execution occurs later in the corresponding authorized workflow.",
+          "state": "approved",
+          "topic": "installation-versus-hook-enablement"
+        }
+      ],
+      "round": 3,
+      "source_baseline": {
+        "future_sha256": "7e4581fbba4f311db0648fa729e6cce2840d2e7f4be5e1cd490708e63ebe4681",
+        "task_revision_sha256": {
+          "T-18db6175-499f-4679-bf8d-f815c7b42411": "94d323d1c610173a169e4d6a06f31aa75f12d52b2677f7b403da4fb45be58c75",
+          "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa": "7025e0df36a85b4a3b07faad704dcac039c7eaca92c7e94ad6e17ab351bdc6e2",
+          "T-2da07d09-0b1a-4407-b375-defd23720387": "c545ff2bd208d5d5aba7731d0060b05850111b3fdae910739042fd2d4f080e80",
+          "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69": "2e3355b501a5c31e2aa46e3e0815627c610a89329ab96bcf6ec28115555e921e",
+          "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": "18a07f054e76db4a1edb9dcb1e340d0a3d4f0989e7af4d4d9d192a6290d6aaa9",
+          "T-6ec57615-3512-4f91-98e8-efb12cde7d7f": "ef419844299c36c963c65892bc1755c304170e30d619d657cd577a6515316401",
+          "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5": "55ca788aa5b71ec3d312ffa33fe72648a4eacf4960f387f6a20bda5bb0dda872",
+          "T-a583acd5-fc6b-4d37-97ec-02df969fea9e": "4776ef5ea1c4f391b23443280b095634ac1a56e07668a1e92937593488f8d647",
+          "T-a5a738da-c182-4206-bb61-75ffa21946fb": "25805ce999fe5051d4375bd2ff975c1fbe8c80895248147becc61696930b6364",
+          "T-a9d7a827-fb25-4348-bcf7-867a449c58ef": "470840e2f46d17a1a2ea78829552afadb5351e8415d7e2e473d176b62e7548ff",
+          "T-dae414c5-43e4-45db-a6f3-4ce4112440c5": "aa7678e865b118236a354d9d76e826060f932dca3ccef1662bf3e5343bbe434d",
+          "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d": "4ce5671c5902d7d8c3d86b3f38b5b1df613b06b168c2b325e2037962068cdb4d",
+          "T-ea3d73b4-c312-4de9-9897-c97f380e4516": "c887849219182e517486a82d7b346f1d446c4f7cace898b0e11881dcf0600fcc",
+          "T-f63559f1-4663-41b7-b085-f55ba7b47fe5": "e722da67f651e3b09e7354388220177c664e48814a22fa93cbee9b9225871d14"
+        }
+      },
+      "status": "answered-and-task-revisions-recorded",
+      "task_revisions": [
+        {
+          "after_sha256": "82c680f787aaa2031f2d1b9f182c92dc4cf1c52a48260a928a9018e176318b88",
+          "before_sha256": "18a07f054e76db4a1edb9dcb1e340d0a3d4f0989e7af4d4d9d192a6290d6aaa9",
+          "decision_ids": [
+            "Q5",
+            "Q6",
+            "Q7",
+            "Q9",
+            "Q11"
+          ],
+          "task_id": "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc"
+        },
+        {
+          "after_sha256": "92b333d845c5b94eb2e27b188fcee030f01f138e59eabc752490a902b26761d0",
+          "before_sha256": "c545ff2bd208d5d5aba7731d0060b05850111b3fdae910739042fd2d4f080e80",
+          "decision_ids": [
+            "Q9",
+            "Q10",
+            "Q11"
+          ],
+          "task_id": "T-2da07d09-0b1a-4407-b375-defd23720387"
+        },
+        {
+          "after_sha256": "346ff3d9af851e78735c9a5d1a83df9c69b8b54311d92ea4d8f833a38659282b",
+          "before_sha256": "55ca788aa5b71ec3d312ffa33fe72648a4eacf4960f387f6a20bda5bb0dda872",
+          "decision_ids": [
+            "Q9",
+            "Q11"
+          ],
+          "task_id": "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5"
+        },
+        {
+          "after_sha256": "6a7fbb37cf09b1522424078bfafab660aa2963eb8570cb0e6856677d1fc9a71d",
+          "before_sha256": "bff25b4e196f07697f63c81dbf3615c812c205dfe9d81fe6402bf8d35f6d94ea",
+          "decision_ids": [
+            "Q9",
+            "Q11"
+          ],
+          "task_id": "T-10528edd-4542-4c26-b8b3-738ffc00d791"
+        },
+        {
+          "after_sha256": "68435148a136b79ba4e394173ad63da2ebb0f1ff3157e718aa87326c37fcc246",
+          "before_sha256": "a819cbcf4c85d510aaa522afdaf471fc4af6189a8703160a99fa72ee6f049c5d",
+          "decision_ids": [
+            "Q9",
+            "Q10",
+            "Q11"
+          ],
+          "task_id": "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+        }
+      ]
+    }
+  ],
+  "schema": 1,
+  "scope_extensions": [
+    {
+      "created_task_id": "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "pending_id": "P-50c04dfb-3cb6-4531-ae04-bd24bb232671",
+      "processing_id": "PR-5420f7ac-ede8-4a34-bac5-a7d84f405fff",
+      "reason": "The owner adds installed-plugin visibility and simple removal to the selected plugin-system scope.",
+      "source": "Explicit owner message during the active clarification cycle",
+      "text": "И касательно добавляемых плагинов: нужно иметь какой-то реестр \"что установлено и в какие места\" + возможно легко удалить соответствующие плагины."
+    }
+  ],
+  "scope_limits": [
+    "The cycle does not create an implementation run or start product implementation.",
+    "Current Ready labels alone do not establish clarity or owner agreement.",
+    "No unanswered question or default recommendation is accepted by silence."
+  ],
+  "selected_task_ids": [
+    "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+    "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+    "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+    "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+    "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+    "T-2da07d09-0b1a-4407-b375-defd23720387",
+    "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+    "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+    "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+    "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+    "T-18db6175-499f-4679-bf8d-f815c7b42411",
+    "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+    "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+    "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+    "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+  ],
+  "session_id": "plugin-task-clarification-2026-11-05",
+  "settled_constraints": [
+    "The owner requests install/skip/choose-alternatives with complete grouped catalog selection and actual confirmation.",
+    "A skipped plugin selection preserves a functional core installation.",
+    "New mandatory workflow stages or operation splits require actual owner agreement.",
+    "Skill installation remains distinct from invocation and grants no implementation, commit or publication scope.",
+    "Facts are researched from sources; recommendations are proposals until the owner answers.",
+    "Ponytail is an additional bounded review pass focused on unnecessary complexity and minimal complete changes; findings follow the ordinary authorized fix/re-review flow, and before/during/after placement remains configurable.",
+    "An enabled post-processing interview is required before implementation; actual answers, revisions and rechecks are necessary. Core-only projects receive no mandatory global interview.",
+    "Codex is the first verified plugin invocation host. The contract remains portable; invocation on other hosts is explicitly unqualified or unavailable until verified. Existing core installation support remains unchanged.",
+    "Recommendations prioritize demonstrated task/review quality improvement, with explicit time/cost reporting and limitations; adoption alone supplies no outcome evidence.",
+    "Ponytail defaults to an additional bounded pass after the ordinary full review and before PR readiness; before/during/after placement remains configurable.",
+    "Processing with an enabled interview creates a visible stable-ID T-task in a non-implementable clarification state; the same task becomes Ready only after actual answers, revisions, rechecks and owner confirmation.",
+    "An enabled Ponytail pass must complete before PR readiness. Missing capability, failure or unavailability retains a visible block; explicit disabling never counts as successful execution.",
+    "Semantic changes reopen affected answers and final confirmation while preserving unrelated answers; formatting-only changes preserve confirmation. Semantic identity covers goal, scope, exclusions, dependencies, acceptance, validation and required plugin policy.",
+    "Project defaults permit explicit temporary per-run overrides. The effective configuration is recorded and frozen across resume; persistent edits are explicit and never silently satisfy or replace parked-run obligations.",
+    "Recommended bundles require bounded comparison evidence in the target workflow. Untested or compatibility-only candidates remain manually selectable with explicit evidence status; no eligible candidate produces an explicit empty recommendation set.",
+    "The installation proposal displays exact versions, hook locations, enabled state and readiness effects. Actual confirmation installs and enables exactly the displayed configuration; skill execution occurs later in authorized workflows."
+  ],
+  "source_baseline": {
+    "commit": "853c9130f7750aaf00368c47a59d598254ac0800",
+    "future_sha256": "3b68253699cdbc824db25bc24ccf41491e873e93b04f43115c10b3801ca0fc52",
+    "task_revision_sha256": {
+      "T-18db6175-499f-4679-bf8d-f815c7b42411": "d9ed68994a680bc6c97ea1797d81936441607f333ad72def69746f700ebbbcaf",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa": "2ab4ffdf9646c47bc5a0d74cdadc9c7c49aae6138d7342951be675049c2767bf",
+      "T-2da07d09-0b1a-4407-b375-defd23720387": "a95a552173fe2232a0404e32b11769942816555c04d78636ac97bea7005eedca",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69": "2b43811136c0fc7c1d7fcf92f207e761441a5221c17a1fd8773092ef208aadcf",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": "e3ba589edebc1c39dc85bcd41543e8926449649e32962e3a2eb9a8e903a287b4",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f": "8f2910effda89cfdf7bb5092cf911d7e4062c8303b226b44e6c25b968af502f5",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5": "d86b78d1bd2a840f9fc60fa419ffd2550243479dd59fe75a4131608eab7f9e5e",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e": "5061aa8fa96c649b79e45cce404f3a386af41424311c20859042f9a2676b74ec",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb": "3b9acc738b7cb98526fcbcef799e2b44a3f02a9a2197391d5e9114e117a79b8d",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef": "cda7530f1732b84caaf9ffe7b2b415d804e8197ce9340b074cab24a8c277be7d",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5": "a9ba09f92d57c90b39aa354b51cdc464c8bb09d9265c217d3e16a60e9ce8b6de",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d": "c95d99458fbac142fe3ab3129d9d5e6420ed62f1ba351c6fb54dcb159732a1b0",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516": "48929d2d873ba71df61165387d23b330a130b1bd2a5757e0e995df6076a2ed65",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5": "733e8c6d54438b41cd21a90792c894081eed444885b27f64f6001591a2e3ccda"
+    }
+  },
+  "source_facts": [
+    {
+      "observation": "Processing reuse merges provenance and dependencies but does not revise task titles or bodies.",
+      "source": ".skill-tree/common/scripts/workflow-state.py:488"
+    },
+    {
+      "observation": "Refresh loads and saves under a lock without guarding a preceding external task edit.",
+      "source": ".skill-tree/common/scripts/workflow-state.py:1460"
+    },
+    {
+      "observation": "Exact resolution, blocking status/marker agreement and guarded owned transactions already exist.",
+      "source": ".skill-tree/common/scripts/workflow-state.py"
+    },
+    {
+      "observation": "The existing check signature covers checks, acceptance, group and boundary but omits goal, exclusions and dependencies; full-task owner confirmation requires a separate semantic identity.",
+      "source": ".skill-tree/common/scripts/workflow-state.py:987"
+    },
+    {
+      "observation": "Review activation must remain bounded; isolation is an implementation requirement of the approved role rather than another owner approval.",
+      "source": ".skill-tree/documents/plugin-system-research.md"
+    },
+    {
+      "observation": "Mandatory missing or stale check evidence already blocks completion; an explicit configuration change cannot be reported as a successful plugin execution.",
+      "source": ".skill-tree/common/references/validation-policy.md"
+    },
+    {
+      "observation": "The core installer has owned destination receipts, guarded uninstall and stopped-operation checks but no external-plugin inventory/binding management. The added management task reuses the planned lifecycle.",
+      "source": ".skill-tree/lib/installation.js:199"
+    },
+    {
+      "observation": "Independent task-consistency review identified stale readiness alternatives, a nonexistent adapter bootstrap reference and combined fixture/actual-agent acceptance; the task revisions remove the contradictions and separate evidence mappings.",
+      "source": "Read-only agent review during clarification round 3"
+    }
+  ],
+  "status": "complete",
+  "validation": {
+    "commands": [
+      {
+        "command": "python3 .agents/skills/skill-tree-process-future-pending/scripts/validate-future-document.py .skill-tree/documents/future.md --strict",
+        "result": "pass"
+      },
+      {
+        "command": "python3 .agents/skills/skill-tree-repo-documentation-audit/scripts/validate-document-rules.py .skill-tree/documents/future.md .skill-tree/documents/plugin-workflow-decisions.md .skill-tree/documents/plugin-system-research.md --warnings-as-errors",
+        "result": "pass"
+      },
+      {
+        "command": "python3 .agents/skills/skill-tree-repo-documentation-audit/scripts/validate-repository-documentation.py . --strict",
+        "result": "pass"
+      },
+      {
+        "command": "git diff --check",
+        "result": "pass"
+      }
+    ],
+    "qualification": "Task/document metadata validation only; no plugin implementation or runtime qualification."
+  },
+  "wrapper_source": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/grill-me/SKILL.md"
+}

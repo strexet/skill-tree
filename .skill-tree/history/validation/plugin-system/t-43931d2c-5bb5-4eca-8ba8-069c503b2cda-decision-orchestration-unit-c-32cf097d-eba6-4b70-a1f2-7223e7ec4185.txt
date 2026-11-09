@@ -1,0 +1,269 @@
+FF.FFFFFFFFFFFFFFFFFFF
+======================================================================
+FAIL: test_absent_host_capability_is_visible_without_manual_fallback (__main__.OrchestrationTests.test_absent_host_capability_is_visible_without_manual_fallback)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 83, in test_absent_host_capability_is_visible_without_manual_fallback
+    frame=self.change(self.start(capabilities={'independent_actors':False}),'question',question=self.question(),purpose='decision');self.assertEqual(self.action(frame)['action'],'prerequisite');self.assertEqual(frame['mode'],'auto');self.assertIsNone(frame['acceptance'])
+                                                                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unimplemented' != 'prerequisite'
+- unimplemented
++ prerequisite
+
+
+======================================================================
+FAIL: test_actual_role_frontier_requires_critic_and_arbiter_for_disagreement (__main__.OrchestrationTests.test_actual_role_frontier_requires_critic_and_arbiter_for_disagreement)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 74, in test_actual_role_frontier_requires_critic_and_arbiter_for_disagreement
+    frame=self.change(self.start(),'question',question=self.question(significance='significant'),purpose='decision');self.assertEqual(self.action(frame)['role'],'resolver');frame=self.answer(self.prepare(frame));self.assertEqual(self.action(frame)['role'],'critic');frame=self.answer(self.prepare(frame),status='disagree');self.assertEqual(self.action(frame)['role'],'arbiter');frame=self.answer(self.prepare(frame),answer='revise');frame=self.change(frame,'accept-decision');self.assertEqual(frame['acceptance']['answer'],'revise');self.assertEqual(frame['acceptance']['origin']['kind'],'delegated-agent')
+                                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: None != 'resolver'
+
+======================================================================
+FAIL: test_changed_plan_invalidates_prior_acceptance_and_downstream_evidence (__main__.OrchestrationTests.test_changed_plan_invalidates_prior_acceptance_and_downstream_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 106, in test_changed_plan_invalidates_prior_acceptance_and_downstream_evidence
+    frame=self.plan_ready();old=copy.deepcopy(frame['plan_acceptance']);frame=self.change(frame,'plan',plan_digest=sha('plan-two'),required_checks=['unit'],reference='Synthetic changed plan.');self.assertEqual(frame['phase'],'plan-review');self.assertIsNone(frame['plan_acceptance'])
+          ^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 51, in plan_ready
+    frame=self.start();frame=self.change(frame,'research',reference='Synthetic researched fixture.');frame=self.change(frame,'plan',plan_digest=sha('plan-one'),required_checks=['unit'],reference='Synthetic plan-one.');frame=self.decision(frame,'plan',self.question(kind='specification-acceptance'));frame=self.change(frame,'accept-plan',decision_receipt=frame['acceptance']);self.assertEqual(frame['phase'],'implement');return frame
+                                                                                                                                                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 49, in decision
+    frame=self.change(frame,'question',question=question or self.question(),purpose=purpose,finding_id=finding_id);frame=self.prepare(frame);frame=self.answer(frame);return self.change(frame,'accept-decision')
+                                                                                                                         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 41, in prepare
+    action=self.action(frame);self.assertIn(action['action'],{'delegate','ask-owner'});role=role or action['role'];actor=actor or self.actor(role)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unimplemented' not found in {'delegate', 'ask-owner'}
+
+======================================================================
+FAIL: test_changed_review_identity_invalidates_earlier_finding_receipt (__main__.OrchestrationTests.test_changed_review_identity_invalidates_earlier_finding_receipt)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 129, in test_changed_review_identity_invalidates_earlier_finding_receipt
+    frame=self.reviewed([self.finding()]);frame=self.decision(frame,'finding-resolution',self.question(),finding_id=self.finding()['id']);old=copy.deepcopy(frame['acceptance']);frame=self.change(frame,'review',identity=self.identity(),review_id='review-two',findings=[self.finding()],reference='Synthetic new review.');self.assertEqual(frame['phase'],'resolution');before=self.snapshot()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 54, in reviewed
+    frame=self.plan_ready();frame=self.change(frame,'implement',identity=self.identity(),reference='Synthetic implementation.');frame=self.change(frame,'checks',identity=self.identity(),results=[{'id':'unit','status':'passed','reference':'Synthetic test evidence.'}]);frame=self.change(frame,'review',identity=self.identity(),review_id='review-one',findings=findings,reference='Synthetic full review.');return frame
+          ^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 51, in plan_ready
+    frame=self.start();frame=self.change(frame,'research',reference='Synthetic researched fixture.');frame=self.change(frame,'plan',plan_digest=sha('plan-one'),required_checks=['unit'],reference='Synthetic plan-one.');frame=self.decision(frame,'plan',self.question(kind='specification-acceptance'));frame=self.change(frame,'accept-plan',decision_receipt=frame['acceptance']);self.assertEqual(frame['phase'],'implement');return frame
+                                                                                                                                                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 49, in decision
+    frame=self.change(frame,'question',question=question or self.question(),purpose=purpose,finding_id=finding_id);frame=self.prepare(frame);frame=self.answer(frame);return self.change(frame,'accept-decision')
+                                                                                                                         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 41, in prepare
+    action=self.action(frame);self.assertIn(action['action'],{'delegate','ask-owner'});role=role or action['role'];actor=actor or self.actor(role)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unimplemented' not found in {'delegate', 'ask-owner'}
+
+======================================================================
+FAIL: test_checks_bind_current_identity_and_all_required_checks (__main__.OrchestrationTests.test_checks_bind_current_identity_and_all_required_checks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 116, in test_checks_bind_current_identity_and_all_required_checks
+    frame=self.plan_ready();frame=self.change(frame,'implement',identity=self.identity(),reference='Synthetic implementation.');before=self.snapshot()
+          ^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 51, in plan_ready
+    frame=self.start();frame=self.change(frame,'research',reference='Synthetic researched fixture.');frame=self.change(frame,'plan',plan_digest=sha('plan-one'),required_checks=['unit'],reference='Synthetic plan-one.');frame=self.decision(frame,'plan',self.question(kind='specification-acceptance'));frame=self.change(frame,'accept-plan',decision_receipt=frame['acceptance']);self.assertEqual(frame['phase'],'implement');return frame
+                                                                                                                                                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 49, in decision
+    frame=self.change(frame,'question',question=question or self.question(),purpose=purpose,finding_id=finding_id);frame=self.prepare(frame);frame=self.answer(frame);return self.change(frame,'accept-decision')
+                                                                                                                         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 41, in prepare
+    action=self.action(frame);self.assertIn(action['action'],{'delegate','ask-owner'});role=role or action['role'];actor=actor or self.actor(role)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unimplemented' not found in {'delegate', 'ask-owner'}
+
+======================================================================
+FAIL: test_creation_identity_and_sealed_input_are_current (__main__.OrchestrationTests.test_creation_identity_and_sealed_input_are_current) (extra={'input_digest': '0000000000000000000000000000000000000000000000000000000000000000'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 88, in test_creation_identity_and_sealed_input_are_current
+    with self.subTest(extra=extra),self.assertRaises(flow.OrchestrationError):self.change(frame,'prepare-actor',actor=actor,input_digest=extra.get('input_digest',action['input_digest']),expected_decision_hash=action['decision_hash'],creation_evidence=extra.get('creation_evidence',self.creation(actor)))
+AssertionError: OrchestrationError not raised
+
+======================================================================
+FAIL: test_creation_identity_and_sealed_input_are_current (__main__.OrchestrationTests.test_creation_identity_and_sealed_input_are_current) (extra={'creation_evidence': {'kind': 'host-agent-created', 'provider': 'unit-host', 'tool': 'unit-spawn', 'reference': 'synthetic-created:resolver-1', 'actor_id': 'resolver-1', 'actor_context_id': 'counterfeit'}})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 88, in test_creation_identity_and_sealed_input_are_current
+    with self.subTest(extra=extra),self.assertRaises(flow.OrchestrationError):self.change(frame,'prepare-actor',actor=actor,input_digest=extra.get('input_digest',action['input_digest']),expected_decision_hash=action['decision_hash'],creation_evidence=extra.get('creation_evidence',self.creation(actor)))
+AssertionError: OrchestrationError not raised
+
+======================================================================
+FAIL: test_exact_actor_result_replay_is_idempotent_and_conflict_rejects (__main__.OrchestrationTests.test_exact_actor_result_replay_is_idempotent_and_conflict_rejects)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 152, in test_exact_actor_result_replay_is_idempotent_and_conflict_rejects
+    frame=self.change(self.start(),'question',question=self.question(),purpose='decision');frame=self.answer(self.prepare(frame));before=self.snapshot();self.assertEqual(self.answer(frame),frame);self.assertEqual(self.snapshot(),before)
+                                                                                                             ^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 41, in prepare
+    action=self.action(frame);self.assertIn(action['action'],{'delegate','ask-owner'});role=role or action['role'];actor=actor or self.actor(role)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unimplemented' not found in {'delegate', 'ask-owner'}
+
+======================================================================
+FAIL: test_false_executor_independence_rejects_before_any_actor_write (__main__.OrchestrationTests.test_false_executor_independence_rejects_before_any_actor_write) (actor={'id': 'executor', 'context_id': 'another'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 79, in test_false_executor_independence_rejects_before_any_actor_write
+    with self.subTest(actor=actor),self.assertRaises(flow.OrchestrationError):self.change(frame,'prepare-actor',actor=actor,input_digest=action['input_digest'],expected_decision_hash=action['decision_hash'],creation_evidence=self.creation(actor))
+AssertionError: OrchestrationError not raised
+
+======================================================================
+FAIL: test_false_executor_independence_rejects_before_any_actor_write (__main__.OrchestrationTests.test_false_executor_independence_rejects_before_any_actor_write) (actor={'id': 'renamed', 'context_id': 'executor-context'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 79, in test_false_executor_independence_rejects_before_any_actor_write
+    with self.subTest(actor=actor),self.assertRaises(flow.OrchestrationError):self.change(frame,'prepare-actor',actor=actor,input_digest=action['input_digest'],expected_decision_hash=action['decision_hash'],creation_evidence=self.creation(actor))
+AssertionError: OrchestrationError not raised
+
+======================================================================
+FAIL: test_finding_fix_requires_resolution_checks_and_clean_current_rereview (__main__.OrchestrationTests.test_finding_fix_requires_resolution_checks_and_clean_current_rereview)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 123, in test_finding_fix_requires_resolution_checks_and_clean_current_rereview
+    finding=self.finding();frame=self.reviewed([finding]);self.assertEqual(frame['phase'],'resolution')
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 54, in reviewed
+    frame=self.plan_ready();frame=self.change(frame,'implement',identity=self.identity(),reference='Synthetic implementation.');frame=self.change(frame,'checks',identity=self.identity(),results=[{'id':'unit','status':'passed','reference':'Synthetic test evidence.'}]);frame=self.change(frame,'review',identity=self.identity(),review_id='review-one',findings=findings,reference='Synthetic full review.');return frame
+          ^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 51, in plan_ready
+    frame=self.start();frame=self.change(frame,'research',reference='Synthetic researched fixture.');frame=self.change(frame,'plan',plan_digest=sha('plan-one'),required_checks=['unit'],reference='Synthetic plan-one.');frame=self.decision(frame,'plan',self.question(kind='specification-acceptance'));frame=self.change(frame,'accept-plan',decision_receipt=frame['acceptance']);self.assertEqual(frame['phase'],'implement');return frame
+                                                                                                                                                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 49, in decision
+    frame=self.change(frame,'question',question=question or self.question(),purpose=purpose,finding_id=finding_id);frame=self.prepare(frame);frame=self.answer(frame);return self.change(frame,'accept-decision')
+                                                                                                                         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 41, in prepare
+    action=self.action(frame);self.assertIn(action['action'],{'delegate','ask-owner'});role=role or action['role'];actor=actor or self.actor(role)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unimplemented' not found in {'delegate', 'ask-owner'}
+
+======================================================================
+FAIL: test_full_clean_path_reaches_ready_without_inventing_a_fix (__main__.OrchestrationTests.test_full_clean_path_reaches_ready_without_inventing_a_fix)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 103, in test_full_clean_path_reaches_ready_without_inventing_a_fix
+    frame=self.reviewed([]);self.assertEqual(frame['phase'],'ready');self.assertFalse(any(item['event']=='fix' for item in frame['history']))
+          ^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 54, in reviewed
+    frame=self.plan_ready();frame=self.change(frame,'implement',identity=self.identity(),reference='Synthetic implementation.');frame=self.change(frame,'checks',identity=self.identity(),results=[{'id':'unit','status':'passed','reference':'Synthetic test evidence.'}]);frame=self.change(frame,'review',identity=self.identity(),review_id='review-one',findings=findings,reference='Synthetic full review.');return frame
+          ^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 51, in plan_ready
+    frame=self.start();frame=self.change(frame,'research',reference='Synthetic researched fixture.');frame=self.change(frame,'plan',plan_digest=sha('plan-one'),required_checks=['unit'],reference='Synthetic plan-one.');frame=self.decision(frame,'plan',self.question(kind='specification-acceptance'));frame=self.change(frame,'accept-plan',decision_receipt=frame['acceptance']);self.assertEqual(frame['phase'],'implement');return frame
+                                                                                                                                                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 49, in decision
+    frame=self.change(frame,'question',question=question or self.question(),purpose=purpose,finding_id=finding_id);frame=self.prepare(frame);frame=self.answer(frame);return self.change(frame,'accept-decision')
+                                                                                                                         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 41, in prepare
+    action=self.action(frame);self.assertIn(action['action'],{'delegate','ask-owner'});role=role or action['role'];actor=actor or self.actor(role)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unimplemented' not found in {'delegate', 'ask-owner'}
+
+======================================================================
+FAIL: test_guards_locks_and_existing_queue_bytes_are_preserved (__main__.OrchestrationTests.test_guards_locks_and_existing_queue_bytes_are_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 140, in test_guards_locks_and_existing_queue_bytes_are_preserved
+    with self.assertRaises(flow.OrchestrationError):self.change({**frame,'orchestration_hash':'0'*64},'research',reference='Stale frame.')
+AssertionError: OrchestrationError not raised
+
+======================================================================
+FAIL: test_manual_waits_for_owner_answer_and_retains_origin (__main__.OrchestrationTests.test_manual_waits_for_owner_answer_and_retains_origin)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 95, in test_manual_waits_for_owner_answer_and_retains_origin
+    frame=self.change(self.start(mode='manual'),'question',question=self.question(),purpose='decision');self.assertEqual(self.action(frame)['action'],'ask-owner');self.assertIsNone(frame['acceptance']);frame=self.prepare(frame);self.assertEqual(self.action(frame)['action'],'wait-owner');frame=self.answer(frame);frame=self.change(frame,'accept-decision');self.assertEqual(frame['acceptance']['origin']['kind'],'submitted-answer');self.assertEqual(frame['mode'],'manual')
+                                                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unimplemented' != 'ask-owner'
+- unimplemented
++ ask-owner
+
+
+======================================================================
+FAIL: test_mode_switch_reconciles_original_pending_actor (__main__.OrchestrationTests.test_mode_switch_reconciles_original_pending_actor)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 98, in test_mode_switch_reconciles_original_pending_actor
+    frame=self.change(self.start(),'question',question=self.question(),purpose='decision');frame=self.prepare(frame);before=self.snapshot()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 41, in prepare
+    action=self.action(frame);self.assertIn(action['action'],{'delegate','ask-owner'});role=role or action['role'];actor=actor or self.actor(role)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unimplemented' not found in {'delegate', 'ask-owner'}
+
+======================================================================
+FAIL: test_new_frame_defaults_auto_and_never_bootstraps_queue (__main__.OrchestrationTests.test_new_frame_defaults_auto_and_never_bootstraps_queue)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 62, in test_new_frame_defaults_auto_and_never_bootstraps_queue
+    frame=self.start();self.assertEqual(frame['mode'],'auto');self.assertEqual(frame['phase'],'research');self.assertFalse((self.root/'.skill-tree/documents').exists());self.assertEqual(flow.read(self.store,frame['id']),frame)
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unimplemented' != 'research'
+- unimplemented
++ research
+
+
+======================================================================
+FAIL: test_out_of_grant_question_stays_unresolved_without_publication_authority (__main__.OrchestrationTests.test_out_of_grant_question_stays_unresolved_without_publication_authority)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 148, in test_out_of_grant_question_stays_unresolved_without_publication_authority
+    frame=self.start(authority=self.authority(allowed_kinds=['product']));frame=self.change(frame,'question',question=self.question(),purpose='decision');self.assertEqual(self.action(frame)['action'],'prerequisite');self.assertIsNone(frame['acceptance'])
+                                                                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unimplemented' != 'prerequisite'
+- unimplemented
++ prerequisite
+
+
+======================================================================
+FAIL: test_product_answer_cannot_accept_current_plan (__main__.OrchestrationTests.test_product_answer_cannot_accept_current_plan)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 111, in test_product_answer_cannot_accept_current_plan
+    frame=self.start();frame=self.change(frame,'research',reference='Synthetic research.');frame=self.change(frame,'plan',plan_digest=sha('plan-one'),required_checks=['unit'],reference='Synthetic plan.');frame=self.decision(frame,'decision',self.question(kind='product'));before=self.snapshot()
+                                                                                                                                                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 49, in decision
+    frame=self.change(frame,'question',question=question or self.question(),purpose=purpose,finding_id=finding_id);frame=self.prepare(frame);frame=self.answer(frame);return self.change(frame,'accept-decision')
+                                                                                                                         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 41, in prepare
+    action=self.action(frame);self.assertIn(action['action'],{'delegate','ask-owner'});role=role or action['role'];actor=actor or self.actor(role)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unimplemented' not found in {'delegate', 'ask-owner'}
+
+======================================================================
+FAIL: test_start_nonce_replay_and_read_are_nonmutating (__main__.OrchestrationTests.test_start_nonce_replay_and_read_are_nonmutating)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 66, in test_start_nonce_replay_and_read_are_nonmutating
+    with self.assertRaises(flow.OrchestrationError):self.start(mode='manual')
+AssertionError: OrchestrationError not raised
+
+======================================================================
+FAIL: test_unavailable_actor_retains_prerequisite_and_original_attempt (__main__.OrchestrationTests.test_unavailable_actor_retains_prerequisite_and_original_attempt)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 92, in test_unavailable_actor_retains_prerequisite_and_original_attempt
+    frame=self.change(self.start(),'question',question=self.question(),purpose='decision');frame=self.answer(self.prepare(frame),status='unavailable');self.assertEqual(self.action(frame)['action'],'prerequisite');self.assertEqual(frame['mode'],'auto');self.assertIsNone(frame['acceptance']);decision=dg.read(self.store,frame['question_decision_id']);self.assertEqual(len(decision['attempts']),1)
+                                                                                                             ^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 41, in prepare
+    action=self.action(frame);self.assertIn(action['action'],{'delegate','ask-owner'});role=role or action['role'];actor=actor or self.actor(role)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unimplemented' not found in {'delegate', 'ask-owner'}
+
+======================================================================
+FAIL: test_unchanged_failures_persist_one_owner_question_without_agent_progress (__main__.OrchestrationTests.test_unchanged_failures_persist_one_owner_question_without_agent_progress)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-orchestration.py", line 136, in test_unchanged_failures_persist_one_owner_question_without_agent_progress
+    self.assertIsNotNone(frame['owner_question']);question=copy.deepcopy(frame['owner_question']);self.assertEqual(self.action(frame)['action'],'owner-question');frame=self.change(frame,'observe-failure',code='same-prerequisite',reference='Another unchanged observation.',actor_count=99);self.assertEqual(frame['owner_question'],question);self.assertEqual(frame['mode'],'auto')
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly None
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.254s
+
+FAILED (failures=21)

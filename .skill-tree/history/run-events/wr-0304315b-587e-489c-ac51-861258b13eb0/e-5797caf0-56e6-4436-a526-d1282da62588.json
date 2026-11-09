@@ -1,0 +1,1295 @@
+{
+  "changes": [],
+  "checkpoint_after": {
+    "admission": {
+      "environment_id": "a6243a3d03b4aff3f1439e883170c77b0c14e05633eb29c25cb15ade403a6760",
+      "flavor": "general",
+      "identity": "10877850bb1ec6f2f17ef8b8e340d582ef64fe0cb0f883feb13c988446242915"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda",
+      "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+      "T-93c83c5a-9074-42dc-b68c-a11ff8b51254",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "completed_ids": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5"
+    ],
+    "completion_refs": {
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa": "O-ac001b97-eb35-4d59-b454-0c99270a12df",
+      "T-2da07d09-0b1a-4407-b375-defd23720387": "O-4176fc0c-5ff8-48bd-a6cc-326772d4342e",
+      "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9": "O-02ce6b06-7f01-491d-82af-5eac803aa26b",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": "O-6ad524b7-13eb-4fca-82b8-4e53e092ad2c",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5": "O-7d79a3ea-91c6-451b-ad8a-a5a356442399",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb": "O-bd95d91a-b289-4f0b-a449-0628cbec0fb3",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d": "O-f6a04cbc-50b5-487e-bbb4-c6d9587df89e",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5": "O-a734f372-7d4d-4069-9960-939f4bcb0617"
+    },
+    "current_task_id": "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+    "cycle_signature": "9a4118f12bb37e8b2d3989c3bf492caeae3c4973b1423f06e5a146d0e1bb9869",
+    "deferred_ids": [
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Commit the approved changes, then Implement All from and back into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+    "limits": {},
+    "mode": "all",
+    "next_action": "implement",
+    "partial_work": [
+      "W3 actual owner direction is recorded: core-only default, optional initial/later management, open sources, extensible anchors and parameter forwarding.",
+      "Three required descendants are processed and seven existing unstarted specifications are updated with matching acceptance/check mappings. The initial fifteen roots and five terminal outcomes remain preserved.",
+      "Independent review resolves six design/metadata gaps. The current source remains ten operations; the eleven-operation manager/import/binding features are planned, not implemented."
+    ],
+    "pending_ids": [
+      "P-9bf5b8af-1e50-4f53-9ab9-56ef46997428",
+      "P-09b5b828-dcdc-4d06-bee1-19e1787e34f4",
+      "P-a3796e30-9b57-4c28-89b2-39db50a9bd93",
+      "P-539a810d-cdb5-4901-bbfe-a2344698b78f",
+      "P-edc462d9-992f-4c74-ab0a-b4e573109e7d",
+      "P-15cb6414-b258-4d28-baf1-a6ce41fd21dc",
+      "P-a4d8c4d3-d7c0-45ec-ab61-e57e3d962977"
+    ],
+    "phase": "implement",
+    "processing_results": [
+      {
+        "created_ids": [
+          "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+          "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+          "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad"
+        ],
+        "dispositions": {
+          "P-539a810d-cdb5-4901-bbfe-a2344698b78f": {
+            "reason": "Source research and actual W3 direction define a required acyclic descendant with observable acceptance and existing validation recipes.",
+            "status": "promoted"
+          },
+          "P-a3796e30-9b57-4c28-89b2-39db50a9bd93": {
+            "reason": "Source research and actual W3 direction define a required acyclic descendant with observable acceptance and existing validation recipes.",
+            "status": "promoted"
+          },
+          "P-edc462d9-992f-4c74-ab0a-b4e573109e7d": {
+            "reason": "Source research and actual W3 direction define a required acyclic descendant with observable acceptance and existing validation recipes.",
+            "status": "promoted"
+          }
+        },
+        "id": "PR-9ffb62ea-745b-4d44-a772-dad8d1c35f5b",
+        "reused_ids": [],
+        "selected_ids": [
+          "P-539a810d-cdb5-4901-bbfe-a2344698b78f",
+          "P-edc462d9-992f-4c74-ab0a-b4e573109e7d",
+          "P-a3796e30-9b57-4c28-89b2-39db50a9bd93"
+        ],
+        "task_keys": {
+          "extensible-bindings": "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+          "open-sources": "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+          "plugins-manager": "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad"
+        }
+      },
+      {
+        "created_ids": [
+          "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99",
+          "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda",
+          "T-93c83c5a-9074-42dc-b68c-a11ff8b51254"
+        ],
+        "dispositions": {
+          "P-09b5b828-dcdc-4d06-bee1-19e1787e34f4": {
+            "reason": "Source research decomposes W1 into state/authority and fully qualified core orchestration, upstream of external composition/runtime.",
+            "status": "promoted"
+          },
+          "P-15cb6414-b258-4d28-baf1-a6ce41fd21dc": {
+            "reason": "The complete plan extends existing main task definitions and preserves original IDs/provenance instead of creating duplicate implementation roots.",
+            "status": "promoted"
+          },
+          "P-a4d8c4d3-d7c0-45ec-ab61-e57e3d962977": {
+            "reason": "Source inspection reproduces a missing local-only delivery completion gate; a required infrastructure descendant implements the gate without performing final integration early.",
+            "status": "promoted"
+          }
+        },
+        "id": "PR-c05ed091-79f1-48a1-94e1-0021ebd64dde",
+        "reused_ids": [
+          "T-2da07d09-0b1a-4407-b375-defd23720387",
+          "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+          "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+          "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+          "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+          "T-18db6175-499f-4679-bf8d-f815c7b42411",
+          "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+          "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+          "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+          "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+        ],
+        "selected_ids": [
+          "P-15cb6414-b258-4d28-baf1-a6ce41fd21dc",
+          "P-09b5b828-dcdc-4d06-bee1-19e1787e34f4",
+          "P-a4d8c4d3-d7c0-45ec-ab61-e57e3d962977"
+        ],
+        "task_keys": {
+          "decision-orchestration": "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda",
+          "decision-state": "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99",
+          "local-delivery-gate": "T-93c83c5a-9074-42dc-b68c-a11ff8b51254"
+        }
+      }
+    ],
+    "required_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+      "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+      "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad",
+      "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99",
+      "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda",
+      "T-93c83c5a-9074-42dc-b68c-a11ff8b51254"
+    ],
+    "revalidated_checks": {
+      "T-2da07d09-0b1a-4407-b375-defd23720387": [
+        {
+          "check": {
+            "assertion": "Initial installation defaults to core only with the management operation; optional initial/later plugin setup shows exact sources/revisions, bindings, effective parameters, adapter status and readiness effects before plugin writes, and confirmation activates exactly the displayed proposal. Known-entry browsing and direct noncatalog source input share the same selection flow; continuing without new plugins preserves a functional core and already installed packages/bindings. The interaction contract defines actual consent, noninteractive/repeat behavior, separate core/plugin transaction outcomes, optional-stage failure recovery and offline/no-write listing or dry-run semantics. Recommendation evidence is an annotation rather than a source allowlist or default selection; an empty eligible set still supports custom source selection and the core-only default. The interaction contract exposes identical generic occurrence/order controls during optional installation and later skill-tree-plugins use: add repeated same-plugin bindings at one anchor, move/configure/remove an exact occurrence, and preview/confirm the complete ordered chain with no plugin-specific restriction.",
+            "criteria": [
+              "Initial installation defaults to core only with the management operation; optional initial/later plugin setup shows exact sources/revisions, bindings, effective parameters, adapter status and readiness effects before plugin writes, and confirmation activates exactly the displayed proposal.",
+              "Known-entry browsing and direct noncatalog source input share the same selection flow; continuing without new plugins preserves a functional core and already installed packages/bindings.",
+              "The interaction contract defines actual consent, noninteractive/repeat behavior, separate core/plugin transaction outcomes, optional-stage failure recovery and offline/no-write listing or dry-run semantics.",
+              "Recommendation evidence is an annotation rather than a source allowlist or default selection; an empty eligible set still supports custom source selection and the core-only default.",
+              "The interaction contract exposes identical generic occurrence/order controls during optional installation and later skill-tree-plugins use: add repeated same-plugin bindings at one anchor, move/configure/remove an exact occurrence, and preview/confirm the complete ordered chain with no plugin-specific restriction."
+            ],
+            "id": "installation-design-review",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/documents/plugin-system-research.md",
+              ".skill-tree/documents/plugin-installation-contract.md",
+              ".skill-tree/bin/install.js",
+              ".skill-tree/common/references/installation-profile.md",
+              ".skill-tree/documents/plugin-management-contract.md",
+              ".skill-tree/history/research/plugin-management-decisions.json",
+              ".skill-tree/documents/plugin-system-contract.md",
+              ".skill-tree/documents/implementation-plan.md"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "Initial installation defaults to core only with the management operation; optional initial/later plugin setup shows exact sources/revisions, bindings, effective parameters, adapter status and readiness effects before plugin writes, and confirmation activates exactly the displayed proposal. Known-entry browsing and direct noncatalog source input share the same selection flow; continuing without new plugins preserves a functional core and already installed packages/bindings. The interaction contract defines actual consent, noninteractive/repeat behavior, separate core/plugin transaction outcomes, optional-stage failure recovery and offline/no-write listing or dry-run semantics. Recommendation evidence is an annotation rather than a source allowlist or default selection; an empty eligible set still supports custom source selection and the core-only default. The interaction contract exposes identical generic occurrence/order controls during optional installation and later skill-tree-plugins use: add repeated same-plugin bindings at one anchor, move/configure/remove an exact occurrence, and preview/confirm the complete ordered chain with no plugin-specific restriction.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-d9625ef2-71a4-4141-a692-55dca017b48d",
+            "classification": "executed-control",
+            "cleanup": "Static delta review complete with no runtime process.",
+            "definition": "11e2f5b4f45f845ccc5be4cc929a341887124bb74a3fd8f8525052666460008a",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/plugin-system/installation-design-c-d9625ef2-71a4-4141-a692-55dca017b48d.json",
+                "sha256": "af3c8a897e37d4db8c95de9a8757483e678824d6d37a4c35037fd21dedb90624"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "ff244354f6c4bbc5012aaa2f54dc1f1b388254060ee018c2b30314101e006a11",
+            "payload_hash": "e49377ec61c059b2a268074813d17345b91306c63054d2694703457423645a14",
+            "recorded_at": "2026-11-06T03:11:46.229090+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/bin/install.js": "6a3028764bcec61b7a95edabc8e2434dcdba2c718fc3fc99f0dcacb43701fdaf",
+              ".skill-tree/common/references/installation-profile.md": "05d15601e98233e5367a9b1ad67832983a94e8b8e68bcd4f4c81e5f94bc792c5",
+              ".skill-tree/documents/implementation-plan.md": "8c6aba1b915f6d80e4c49b7ced344d1909e10a78838ca46de346ddc0f828ad37",
+              ".skill-tree/documents/plugin-installation-contract.md": "159c86c891e4f26186628c83825d928c0c91b0e033162a7d4d6594f956464520",
+              ".skill-tree/documents/plugin-management-contract.md": "0938f5e3355a490c67c724307c38954118c7b3315f184d3cb408cb2895f4d998",
+              ".skill-tree/documents/plugin-system-contract.md": "a954d148df40e7a22814fb1f8515d654140cff02f7fe14e1a65f6cad33732efc",
+              ".skill-tree/documents/plugin-system-research.md": "4c042f33b94830141a99263d632322993d445a411d8e08d4f9d0692f01a926c7",
+              ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84"
+            }
+          }
+        }
+      ],
+      "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9": [
+        {
+          "check": {
+            "assertion": "Catalog IDs, repository/path/ref URLs, raw instruction URLs and local files/folders normalize into stable known definitions and immutable content/resource snapshots without a source-host or catalog allowlist. Claude-shaped and nonstandard instruction fixtures preserve original bytes/metadata and separate owned wrappers/adaptation overlays; known registration and inert installation remain distinct from runnable support and missing native capabilities. Additional instruction text and arbitrary JSON resolve upstream, project, binding and explicit run precedence with optional schema validation, visible origins and no overwrite of core authority/identity fields. Owned snapshot paths are portable and repository-relative; machine-local acquisition locators and resolved secret values stay outside portable descriptors, ordinary views and receipts. Missing source resources, source drift, path escapes and conflicting identities reject activation; offline listing and acquisition execute no source helper or native dependency installer.",
+            "criteria": [
+              "Catalog IDs, repository/path/ref URLs, raw instruction URLs and local files/folders normalize into stable known definitions and immutable content/resource snapshots without a source-host or catalog allowlist.",
+              "Claude-shaped and nonstandard instruction fixtures preserve original bytes/metadata and separate owned wrappers/adaptation overlays; known registration and inert installation remain distinct from runnable support and missing native capabilities.",
+              "Additional instruction text and arbitrary JSON resolve upstream, project, binding and explicit run precedence with optional schema validation, visible origins and no overwrite of core authority/identity fields.",
+              "Owned snapshot paths are portable and repository-relative; machine-local acquisition locators and resolved secret values stay outside portable descriptors, ordinary views and receipts.",
+              "Missing source resources, source drift, path escapes and conflicting identities reject activation; offline listing and acquisition execute no source helper or native dependency installer."
+            ],
+            "id": "open-source-parameters",
+            "parameters": {
+              "test_path": ".skill-tree/tests/test-plugin-sources.js"
+            },
+            "recipe_id": "quality-node",
+            "sources": [
+              ".skill-tree/lib/plugin-sources.js",
+              ".skill-tree/lib/plugin-parameters.js",
+              ".skill-tree/lib/plugins.js",
+              ".skill-tree/tests/test-plugin-sources.js",
+              ".skill-tree/documents/plugin-management-contract.md",
+              ".skill-tree/documents/plugin-system-contract.md"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "unit",
+            "attempt_id": "C-338480ed-e3eb-489b-986d-187423c13d4d",
+            "classification": "executed-control",
+            "cleanup": "Focused unit runner exited; temporary fixture cleanup is performed by test finalizers.",
+            "counts": {
+              "discovered": 38,
+              "expected": 38,
+              "failed": 0,
+              "passed": 38,
+              "skipped": 0
+            },
+            "definition": "b7058ddd8fe909fc6a37e0e5ed2badbd5c5b8ab0117798273ede2bb8f3f0bcf4",
+            "environment_identity": "c8f3e444ff788eb8a2bfc98cac02f47ebbc58456efbe86adc9fdad5a99237810",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/plugin-system/t-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9-open-source-parameters-c-338480ed-e3eb-489b-986d-187423c13d4d.json",
+                "sha256": "40e82717dd3b7a22d2bc60fd721a35eb10be7769bccbae1c294d8f426c842251"
+              },
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/plugin-system/t-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9-open-source-parameters-c-338480ed-e3eb-489b-986d-187423c13d4d.txt",
+                "sha256": "67675b8a0bfa9770346c662fff1ebd92c83378f7017eda63a8735db97363eb09"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "16e749ca8a4618c5f3f69a24ed0c90f029707c905ccee1200c2951d210633eed",
+            "payload_hash": "3c67028d8cc258df7128547b92d1626d58eef4c33faba2e4df0fef2436ff9d96",
+            "recorded_at": "2026-11-06T04:01:15.702791+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/documents/plugin-management-contract.md": "d5d68870bb0f44c356fdbd5423f3995dea33931eded820ffa335ac715cc24616",
+              ".skill-tree/documents/plugin-system-contract.md": "eeddb14292e115f489aa855f01f60ab922448317a3e9956d649148b177944680",
+              ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+              ".skill-tree/lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+              ".skill-tree/lib/plugins.js": "d9d140a9a1c7df3682f95ace505a6d06bbac5823787329acd70834732de1d4d0",
+              ".skill-tree/tests/test-plugin-sources.js": "2dccdcbe210f1b8d24794f865eea0ffea830ad8ebe987dc1b7d09f0909b02b0e"
+            },
+            "timing": {
+              "tool_wall_seconds": 0.15327208396047354
+            }
+          }
+        }
+      ],
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": [
+        {
+          "check": {
+            "assertion": "The external plugin contract defines pinned identity, dependency closure, host invocation, activation lifetime, input/result envelopes and existing-operation hook names. The contract preserves standalone resources, core authorization and acceptance boundaries, offline composition and guarded resume semantics. Workflow-changing choices and unresolved host limitations are explicitly routed to the owner workflow decision task. Project defaults, explicit temporary run overrides and frozen effective configuration are defined separately from installed-package state; confirmed installation enables only the exact displayed hooks and readiness effects.",
+            "criteria": [
+              "The external plugin contract defines pinned identity, dependency closure, host invocation, activation lifetime, input/result envelopes and existing-operation hook names.",
+              "The contract preserves standalone resources, core authorization and acceptance boundaries, offline composition and guarded resume semantics.",
+              "Workflow-changing choices and unresolved host limitations are explicitly routed to the owner workflow decision task.",
+              "Project defaults, explicit temporary run overrides and frozen effective configuration are defined separately from installed-package state; confirmed installation enables only the exact displayed hooks and readiness effects."
+            ],
+            "id": "contract-review",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/documents/plugin-system-research.md",
+              ".skill-tree/documents/plugin-system-contract.md",
+              ".skill-tree/templates/invariants.json",
+              ".skill-tree/common/scripts/workflow-state.py",
+              ".skill-tree/common/scripts/pr-review-state.py"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "The external plugin contract defines pinned identity, dependency closure, host invocation, activation lifetime, input/result envelopes and existing-operation hook names. The contract preserves standalone resources, core authorization and acceptance boundaries, offline composition and guarded resume semantics. Workflow-changing choices and unresolved host limitations are explicitly routed to the owner workflow decision task. Project defaults, explicit temporary run overrides and frozen effective configuration are defined separately from installed-package state; confirmed installation enables only the exact displayed hooks and readiness effects.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-d539f6f5-7866-4398-822f-66a05f0c8d0c",
+            "classification": "executed-control",
+            "cleanup": "Delta source inspection complete with no runtime processes.",
+            "definition": "aef081fb8634f6b58160c2a7ca2bbaf2f863c7d7cd0874802e8cd8d7e071e01c",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/plugin-system/contract-review-c-d539f6f5-7866-4398-822f-66a05f0c8d0c.json",
+                "sha256": "9f08a6c3f238c1e60ec7b07e9b6219ebccf467e5616ea5be84393abe1c186aea"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "48c5a8cd91d14c9d92781e2ed2c4aca2392cb0f4c0d08eea2fafe6694f54b6b9",
+            "payload_hash": "6cde7bf089bc7edf0151eb77469aebff72b4761e006475134dd877d4d9d71daa",
+            "recorded_at": "2026-11-06T02:50:59.525936+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common/scripts/pr-review-state.py": "a26cc95e66145a4917669466c3880f3d8252199a13c63b3e9e9f9fc30dc443d5",
+              ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+              ".skill-tree/documents/plugin-system-contract.md": "a954d148df40e7a22814fb1f8515d654140cff02f7fe14e1a65f6cad33732efc",
+              ".skill-tree/documents/plugin-system-research.md": "4c042f33b94830141a99263d632322993d445a411d8e08d4f9d0692f01a926c7",
+              ".skill-tree/templates/invariants.json": "4545894b07fab5f222d15eddd17c220408a4be8a5e5f25da3a4a34ef06bb87b5"
+            }
+          }
+        }
+      ]
+    },
+    "root_task_id": "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+    "snapshot": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "started_at": "2026-11-05T11:44:41.702298+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "branch": "codex/plugin-system",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests continuing from the current codex/next-version branch instead of develop and merging all results into codex/next-version.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-0304315b-587e-489c-ac51-861258b13eb0"
+    },
+    "workspace_state": "ready"
+  },
+  "checkpoint_before": {
+    "admission": {
+      "environment_id": "a6243a3d03b4aff3f1439e883170c77b0c14e05633eb29c25cb15ade403a6760",
+      "flavor": "general",
+      "identity": "10877850bb1ec6f2f17ef8b8e340d582ef64fe0cb0f883feb13c988446242915"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda",
+      "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+      "T-93c83c5a-9074-42dc-b68c-a11ff8b51254",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "completed_ids": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5"
+    ],
+    "completion_refs": {
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa": "O-ac001b97-eb35-4d59-b454-0c99270a12df",
+      "T-2da07d09-0b1a-4407-b375-defd23720387": "O-4176fc0c-5ff8-48bd-a6cc-326772d4342e",
+      "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9": "O-02ce6b06-7f01-491d-82af-5eac803aa26b",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": "O-6ad524b7-13eb-4fca-82b8-4e53e092ad2c",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5": "O-7d79a3ea-91c6-451b-ad8a-a5a356442399",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb": "O-bd95d91a-b289-4f0b-a449-0628cbec0fb3",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d": "O-f6a04cbc-50b5-487e-bbb4-c6d9587df89e",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5": "O-a734f372-7d4d-4069-9960-939f4bcb0617"
+    },
+    "current_task_id": "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+    "cycle_signature": "9a4118f12bb37e8b2d3989c3bf492caeae3c4973b1423f06e5a146d0e1bb9869",
+    "deferred_ids": [
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Commit the approved changes, then Implement All from and back into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+    "limits": {},
+    "mode": "all",
+    "next_action": "implement",
+    "partial_work": [
+      "W3 actual owner direction is recorded: core-only default, optional initial/later management, open sources, extensible anchors and parameter forwarding.",
+      "Three required descendants are processed and seven existing unstarted specifications are updated with matching acceptance/check mappings. The initial fifteen roots and five terminal outcomes remain preserved.",
+      "Independent review resolves six design/metadata gaps. The current source remains ten operations; the eleven-operation manager/import/binding features are planned, not implemented."
+    ],
+    "pending_ids": [
+      "P-9bf5b8af-1e50-4f53-9ab9-56ef46997428",
+      "P-09b5b828-dcdc-4d06-bee1-19e1787e34f4",
+      "P-a3796e30-9b57-4c28-89b2-39db50a9bd93",
+      "P-539a810d-cdb5-4901-bbfe-a2344698b78f",
+      "P-edc462d9-992f-4c74-ab0a-b4e573109e7d",
+      "P-15cb6414-b258-4d28-baf1-a6ce41fd21dc",
+      "P-a4d8c4d3-d7c0-45ec-ab61-e57e3d962977"
+    ],
+    "phase": "implement",
+    "processing_results": [
+      {
+        "created_ids": [
+          "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+          "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+          "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad"
+        ],
+        "dispositions": {
+          "P-539a810d-cdb5-4901-bbfe-a2344698b78f": {
+            "reason": "Source research and actual W3 direction define a required acyclic descendant with observable acceptance and existing validation recipes.",
+            "status": "promoted"
+          },
+          "P-a3796e30-9b57-4c28-89b2-39db50a9bd93": {
+            "reason": "Source research and actual W3 direction define a required acyclic descendant with observable acceptance and existing validation recipes.",
+            "status": "promoted"
+          },
+          "P-edc462d9-992f-4c74-ab0a-b4e573109e7d": {
+            "reason": "Source research and actual W3 direction define a required acyclic descendant with observable acceptance and existing validation recipes.",
+            "status": "promoted"
+          }
+        },
+        "id": "PR-9ffb62ea-745b-4d44-a772-dad8d1c35f5b",
+        "reused_ids": [],
+        "selected_ids": [
+          "P-539a810d-cdb5-4901-bbfe-a2344698b78f",
+          "P-edc462d9-992f-4c74-ab0a-b4e573109e7d",
+          "P-a3796e30-9b57-4c28-89b2-39db50a9bd93"
+        ],
+        "task_keys": {
+          "extensible-bindings": "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+          "open-sources": "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+          "plugins-manager": "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad"
+        }
+      },
+      {
+        "created_ids": [
+          "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99",
+          "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda",
+          "T-93c83c5a-9074-42dc-b68c-a11ff8b51254"
+        ],
+        "dispositions": {
+          "P-09b5b828-dcdc-4d06-bee1-19e1787e34f4": {
+            "reason": "Source research decomposes W1 into state/authority and fully qualified core orchestration, upstream of external composition/runtime.",
+            "status": "promoted"
+          },
+          "P-15cb6414-b258-4d28-baf1-a6ce41fd21dc": {
+            "reason": "The complete plan extends existing main task definitions and preserves original IDs/provenance instead of creating duplicate implementation roots.",
+            "status": "promoted"
+          },
+          "P-a4d8c4d3-d7c0-45ec-ab61-e57e3d962977": {
+            "reason": "Source inspection reproduces a missing local-only delivery completion gate; a required infrastructure descendant implements the gate without performing final integration early.",
+            "status": "promoted"
+          }
+        },
+        "id": "PR-c05ed091-79f1-48a1-94e1-0021ebd64dde",
+        "reused_ids": [
+          "T-2da07d09-0b1a-4407-b375-defd23720387",
+          "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+          "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+          "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+          "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+          "T-18db6175-499f-4679-bf8d-f815c7b42411",
+          "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+          "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+          "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+          "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+        ],
+        "selected_ids": [
+          "P-15cb6414-b258-4d28-baf1-a6ce41fd21dc",
+          "P-09b5b828-dcdc-4d06-bee1-19e1787e34f4",
+          "P-a4d8c4d3-d7c0-45ec-ab61-e57e3d962977"
+        ],
+        "task_keys": {
+          "decision-orchestration": "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda",
+          "decision-state": "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99",
+          "local-delivery-gate": "T-93c83c5a-9074-42dc-b68c-a11ff8b51254"
+        }
+      }
+    ],
+    "required_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+      "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+      "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad",
+      "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99",
+      "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda",
+      "T-93c83c5a-9074-42dc-b68c-a11ff8b51254"
+    ],
+    "revalidated_checks": {
+      "T-2da07d09-0b1a-4407-b375-defd23720387": [
+        {
+          "check": {
+            "assertion": "Initial installation defaults to core only with the management operation; optional initial/later plugin setup shows exact sources/revisions, bindings, effective parameters, adapter status and readiness effects before plugin writes, and confirmation activates exactly the displayed proposal. Known-entry browsing and direct noncatalog source input share the same selection flow; continuing without new plugins preserves a functional core and already installed packages/bindings. The interaction contract defines actual consent, noninteractive/repeat behavior, separate core/plugin transaction outcomes, optional-stage failure recovery and offline/no-write listing or dry-run semantics. Recommendation evidence is an annotation rather than a source allowlist or default selection; an empty eligible set still supports custom source selection and the core-only default. The interaction contract exposes identical generic occurrence/order controls during optional installation and later skill-tree-plugins use: add repeated same-plugin bindings at one anchor, move/configure/remove an exact occurrence, and preview/confirm the complete ordered chain with no plugin-specific restriction.",
+            "criteria": [
+              "Initial installation defaults to core only with the management operation; optional initial/later plugin setup shows exact sources/revisions, bindings, effective parameters, adapter status and readiness effects before plugin writes, and confirmation activates exactly the displayed proposal.",
+              "Known-entry browsing and direct noncatalog source input share the same selection flow; continuing without new plugins preserves a functional core and already installed packages/bindings.",
+              "The interaction contract defines actual consent, noninteractive/repeat behavior, separate core/plugin transaction outcomes, optional-stage failure recovery and offline/no-write listing or dry-run semantics.",
+              "Recommendation evidence is an annotation rather than a source allowlist or default selection; an empty eligible set still supports custom source selection and the core-only default.",
+              "The interaction contract exposes identical generic occurrence/order controls during optional installation and later skill-tree-plugins use: add repeated same-plugin bindings at one anchor, move/configure/remove an exact occurrence, and preview/confirm the complete ordered chain with no plugin-specific restriction."
+            ],
+            "id": "installation-design-review",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/documents/plugin-system-research.md",
+              ".skill-tree/documents/plugin-installation-contract.md",
+              ".skill-tree/bin/install.js",
+              ".skill-tree/common/references/installation-profile.md",
+              ".skill-tree/documents/plugin-management-contract.md",
+              ".skill-tree/history/research/plugin-management-decisions.json",
+              ".skill-tree/documents/plugin-system-contract.md",
+              ".skill-tree/documents/implementation-plan.md"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "Initial installation defaults to core only with the management operation; optional initial/later plugin setup shows exact sources/revisions, bindings, effective parameters, adapter status and readiness effects before plugin writes, and confirmation activates exactly the displayed proposal. Known-entry browsing and direct noncatalog source input share the same selection flow; continuing without new plugins preserves a functional core and already installed packages/bindings. The interaction contract defines actual consent, noninteractive/repeat behavior, separate core/plugin transaction outcomes, optional-stage failure recovery and offline/no-write listing or dry-run semantics. Recommendation evidence is an annotation rather than a source allowlist or default selection; an empty eligible set still supports custom source selection and the core-only default. The interaction contract exposes identical generic occurrence/order controls during optional installation and later skill-tree-plugins use: add repeated same-plugin bindings at one anchor, move/configure/remove an exact occurrence, and preview/confirm the complete ordered chain with no plugin-specific restriction.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-d9625ef2-71a4-4141-a692-55dca017b48d",
+            "classification": "executed-control",
+            "cleanup": "Static delta review complete with no runtime process.",
+            "definition": "11e2f5b4f45f845ccc5be4cc929a341887124bb74a3fd8f8525052666460008a",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/plugin-system/installation-design-c-d9625ef2-71a4-4141-a692-55dca017b48d.json",
+                "sha256": "af3c8a897e37d4db8c95de9a8757483e678824d6d37a4c35037fd21dedb90624"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "ff244354f6c4bbc5012aaa2f54dc1f1b388254060ee018c2b30314101e006a11",
+            "payload_hash": "e49377ec61c059b2a268074813d17345b91306c63054d2694703457423645a14",
+            "recorded_at": "2026-11-06T03:11:46.229090+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/bin/install.js": "6a3028764bcec61b7a95edabc8e2434dcdba2c718fc3fc99f0dcacb43701fdaf",
+              ".skill-tree/common/references/installation-profile.md": "05d15601e98233e5367a9b1ad67832983a94e8b8e68bcd4f4c81e5f94bc792c5",
+              ".skill-tree/documents/implementation-plan.md": "8c6aba1b915f6d80e4c49b7ced344d1909e10a78838ca46de346ddc0f828ad37",
+              ".skill-tree/documents/plugin-installation-contract.md": "159c86c891e4f26186628c83825d928c0c91b0e033162a7d4d6594f956464520",
+              ".skill-tree/documents/plugin-management-contract.md": "0938f5e3355a490c67c724307c38954118c7b3315f184d3cb408cb2895f4d998",
+              ".skill-tree/documents/plugin-system-contract.md": "a954d148df40e7a22814fb1f8515d654140cff02f7fe14e1a65f6cad33732efc",
+              ".skill-tree/documents/plugin-system-research.md": "4c042f33b94830141a99263d632322993d445a411d8e08d4f9d0692f01a926c7",
+              ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84"
+            }
+          }
+        }
+      ],
+      "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9": [
+        {
+          "check": {
+            "assertion": "Catalog IDs, repository/path/ref URLs, raw instruction URLs and local files/folders normalize into stable known definitions and immutable content/resource snapshots without a source-host or catalog allowlist. Claude-shaped and nonstandard instruction fixtures preserve original bytes/metadata and separate owned wrappers/adaptation overlays; known registration and inert installation remain distinct from runnable support and missing native capabilities. Additional instruction text and arbitrary JSON resolve upstream, project, binding and explicit run precedence with optional schema validation, visible origins and no overwrite of core authority/identity fields. Owned snapshot paths are portable and repository-relative; machine-local acquisition locators and resolved secret values stay outside portable descriptors, ordinary views and receipts. Missing source resources, source drift, path escapes and conflicting identities reject activation; offline listing and acquisition execute no source helper or native dependency installer.",
+            "criteria": [
+              "Catalog IDs, repository/path/ref URLs, raw instruction URLs and local files/folders normalize into stable known definitions and immutable content/resource snapshots without a source-host or catalog allowlist.",
+              "Claude-shaped and nonstandard instruction fixtures preserve original bytes/metadata and separate owned wrappers/adaptation overlays; known registration and inert installation remain distinct from runnable support and missing native capabilities.",
+              "Additional instruction text and arbitrary JSON resolve upstream, project, binding and explicit run precedence with optional schema validation, visible origins and no overwrite of core authority/identity fields.",
+              "Owned snapshot paths are portable and repository-relative; machine-local acquisition locators and resolved secret values stay outside portable descriptors, ordinary views and receipts.",
+              "Missing source resources, source drift, path escapes and conflicting identities reject activation; offline listing and acquisition execute no source helper or native dependency installer."
+            ],
+            "id": "open-source-parameters",
+            "parameters": {
+              "test_path": ".skill-tree/tests/test-plugin-sources.js"
+            },
+            "recipe_id": "quality-node",
+            "sources": [
+              ".skill-tree/lib/plugin-sources.js",
+              ".skill-tree/lib/plugin-parameters.js",
+              ".skill-tree/lib/plugins.js",
+              ".skill-tree/tests/test-plugin-sources.js",
+              ".skill-tree/documents/plugin-management-contract.md",
+              ".skill-tree/documents/plugin-system-contract.md"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "unit",
+            "attempt_id": "C-338480ed-e3eb-489b-986d-187423c13d4d",
+            "classification": "executed-control",
+            "cleanup": "Focused unit runner exited; temporary fixture cleanup is performed by test finalizers.",
+            "counts": {
+              "discovered": 38,
+              "expected": 38,
+              "failed": 0,
+              "passed": 38,
+              "skipped": 0
+            },
+            "definition": "b7058ddd8fe909fc6a37e0e5ed2badbd5c5b8ab0117798273ede2bb8f3f0bcf4",
+            "environment_identity": "c8f3e444ff788eb8a2bfc98cac02f47ebbc58456efbe86adc9fdad5a99237810",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/plugin-system/t-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9-open-source-parameters-c-338480ed-e3eb-489b-986d-187423c13d4d.json",
+                "sha256": "40e82717dd3b7a22d2bc60fd721a35eb10be7769bccbae1c294d8f426c842251"
+              },
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/plugin-system/t-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9-open-source-parameters-c-338480ed-e3eb-489b-986d-187423c13d4d.txt",
+                "sha256": "67675b8a0bfa9770346c662fff1ebd92c83378f7017eda63a8735db97363eb09"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "16e749ca8a4618c5f3f69a24ed0c90f029707c905ccee1200c2951d210633eed",
+            "payload_hash": "3c67028d8cc258df7128547b92d1626d58eef4c33faba2e4df0fef2436ff9d96",
+            "recorded_at": "2026-11-06T04:01:15.702791+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/documents/plugin-management-contract.md": "d5d68870bb0f44c356fdbd5423f3995dea33931eded820ffa335ac715cc24616",
+              ".skill-tree/documents/plugin-system-contract.md": "eeddb14292e115f489aa855f01f60ab922448317a3e9956d649148b177944680",
+              ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+              ".skill-tree/lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+              ".skill-tree/lib/plugins.js": "d9d140a9a1c7df3682f95ace505a6d06bbac5823787329acd70834732de1d4d0",
+              ".skill-tree/tests/test-plugin-sources.js": "2dccdcbe210f1b8d24794f865eea0ffea830ad8ebe987dc1b7d09f0909b02b0e"
+            },
+            "timing": {
+              "tool_wall_seconds": 0.15327208396047354
+            }
+          }
+        }
+      ],
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": [
+        {
+          "check": {
+            "assertion": "The external plugin contract defines pinned identity, dependency closure, host invocation, activation lifetime, input/result envelopes and existing-operation hook names. The contract preserves standalone resources, core authorization and acceptance boundaries, offline composition and guarded resume semantics. Workflow-changing choices and unresolved host limitations are explicitly routed to the owner workflow decision task. Project defaults, explicit temporary run overrides and frozen effective configuration are defined separately from installed-package state; confirmed installation enables only the exact displayed hooks and readiness effects.",
+            "criteria": [
+              "The external plugin contract defines pinned identity, dependency closure, host invocation, activation lifetime, input/result envelopes and existing-operation hook names.",
+              "The contract preserves standalone resources, core authorization and acceptance boundaries, offline composition and guarded resume semantics.",
+              "Workflow-changing choices and unresolved host limitations are explicitly routed to the owner workflow decision task.",
+              "Project defaults, explicit temporary run overrides and frozen effective configuration are defined separately from installed-package state; confirmed installation enables only the exact displayed hooks and readiness effects."
+            ],
+            "id": "contract-review",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/documents/plugin-system-research.md",
+              ".skill-tree/documents/plugin-system-contract.md",
+              ".skill-tree/templates/invariants.json",
+              ".skill-tree/common/scripts/workflow-state.py",
+              ".skill-tree/common/scripts/pr-review-state.py"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "The external plugin contract defines pinned identity, dependency closure, host invocation, activation lifetime, input/result envelopes and existing-operation hook names. The contract preserves standalone resources, core authorization and acceptance boundaries, offline composition and guarded resume semantics. Workflow-changing choices and unresolved host limitations are explicitly routed to the owner workflow decision task. Project defaults, explicit temporary run overrides and frozen effective configuration are defined separately from installed-package state; confirmed installation enables only the exact displayed hooks and readiness effects.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-d539f6f5-7866-4398-822f-66a05f0c8d0c",
+            "classification": "executed-control",
+            "cleanup": "Delta source inspection complete with no runtime processes.",
+            "definition": "aef081fb8634f6b58160c2a7ca2bbaf2f863c7d7cd0874802e8cd8d7e071e01c",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/plugin-system/contract-review-c-d539f6f5-7866-4398-822f-66a05f0c8d0c.json",
+                "sha256": "9f08a6c3f238c1e60ec7b07e9b6219ebccf467e5616ea5be84393abe1c186aea"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "48c5a8cd91d14c9d92781e2ed2c4aca2392cb0f4c0d08eea2fafe6694f54b6b9",
+            "payload_hash": "6cde7bf089bc7edf0151eb77469aebff72b4761e006475134dd877d4d9d71daa",
+            "recorded_at": "2026-11-06T02:50:59.525936+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common/scripts/pr-review-state.py": "a26cc95e66145a4917669466c3880f3d8252199a13c63b3e9e9f9fc30dc443d5",
+              ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+              ".skill-tree/documents/plugin-system-contract.md": "a954d148df40e7a22814fb1f8515d654140cff02f7fe14e1a65f6cad33732efc",
+              ".skill-tree/documents/plugin-system-research.md": "4c042f33b94830141a99263d632322993d445a411d8e08d4f9d0692f01a926c7",
+              ".skill-tree/templates/invariants.json": "4545894b07fab5f222d15eddd17c220408a4be8a5e5f25da3a4a34ef06bb87b5"
+            }
+          }
+        }
+      ]
+    },
+    "root_task_id": "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+    "snapshot": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "started_at": "2026-11-05T11:44:41.702298+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "branch": "codex/plugin-system",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests continuing from the current codex/next-version branch instead of develop and merging all results into codex/next-version.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-0304315b-587e-489c-ac51-861258b13eb0"
+    },
+    "workspace_state": "ready"
+  },
+  "id": "E-5797caf0-56e6-4436-a526-d1282da62588",
+  "outcomes": [],
+  "progress_changes": [
+    {
+      "after": {
+        "admission": {
+          "environment_id": "a6243a3d03b4aff3f1439e883170c77b0c14e05633eb29c25cb15ade403a6760",
+          "flavor": "general",
+          "identity": "10877850bb1ec6f2f17ef8b8e340d582ef64fe0cb0f883feb13c988446242915"
+        },
+        "checks": {
+          "extensible-bindings": {
+            "attempt": {
+              "attempt_id": "C-c78ecff1-2ecd-464e-83ab-6599351fd01f",
+              "definition": "6fc2fe83bfd74446623299f66e3bef874ca0d632dbf821c66ee1149c4389bb2e",
+              "environment_identity": "b8c37235b7a43b9872ddf2f21e4db1f471455841ea31de29cfe368ecae0f80a4",
+              "key": "c2d8faa2fb2f2dec6bb58d3149fdf2052ba07b6dd7a55636aba448381be39d39",
+              "launch": null,
+              "prepared_at": "2026-11-06T04:19:34.527940+00:00",
+              "recipe": {
+                "argv": [
+                  "node",
+                  "--test",
+                  ".skill-tree/tests/test-plugin-bindings.js"
+                ],
+                "input_paths": [
+                  ".skill-tree/config/repository.json"
+                ],
+                "lane": "unit",
+                "qualification": "owner-declared static recipe; runner unqualified"
+              },
+              "sources": {
+                ".skill-tree/common/references/plugin-invocation.md": "1c783c45c4da4dc0f30e4db76c50b0e211bc1dea5b67f552a15ab5dcf468ea71",
+                ".skill-tree/documents/implementation-plan.md": "8c6aba1b915f6d80e4c49b7ced344d1909e10a78838ca46de346ddc0f828ad37",
+                ".skill-tree/documents/plugin-management-contract.md": "d5d68870bb0f44c356fdbd5423f3995dea33931eded820ffa335ac715cc24616",
+                ".skill-tree/documents/plugin-system-contract.md": "eeddb14292e115f489aa855f01f60ab922448317a3e9956d649148b177944680",
+                ".skill-tree/lib/composer.js": "ebb4042086e61e32cd7c255df79befcdff06ae0b0bfaf2941d5d8facc1268e01",
+                ".skill-tree/lib/plugin-bindings.js": "9ea7de58262993188ffa0b1abaf35e4819f9b635b1695561d21c793127299059",
+                ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+                ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                ".skill-tree/tests/test-plugin-bindings.js": "1d5f1760709e61b5fa2d988978c4b8b3b5fae867a6786fa3b1c0f490be0fdeef"
+              }
+            },
+            "receipts": {
+              "C-c78ecff1-2ecd-464e-83ab-6599351fd01f": {
+                "actual_lane": "unit",
+                "attempt_id": "C-c78ecff1-2ecd-464e-83ab-6599351fd01f",
+                "classification": "executed-control",
+                "cleanup": "Focused unit runner exited; temporary fixture cleanup is performed by test finalizers.",
+                "counts": {
+                  "discovered": 30,
+                  "expected": 30,
+                  "failed": 0,
+                  "passed": 30,
+                  "skipped": 0
+                },
+                "definition": "6fc2fe83bfd74446623299f66e3bef874ca0d632dbf821c66ee1149c4389bb2e",
+                "environment_identity": "b8c37235b7a43b9872ddf2f21e4db1f471455841ea31de29cfe368ecae0f80a4",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/t-787453a8-2643-48c1-8715-9626d67d5e0e-extensible-bindings-c-c78ecff1-2ecd-464e-83ab-6599351fd01f.json",
+                    "sha256": "0bdc81e55997f07be0a99c55ddd0246fa887aff1d91562eac97150c5c0df4f9c"
+                  },
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/t-787453a8-2643-48c1-8715-9626d67d5e0e-extensible-bindings-c-c78ecff1-2ecd-464e-83ab-6599351fd01f.txt",
+                    "sha256": "f0bf3ebaaccf37f2b5f8212c60ee49a96da2c7d990b51880cf802fcea000096d"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "c2d8faa2fb2f2dec6bb58d3149fdf2052ba07b6dd7a55636aba448381be39d39",
+                "payload_hash": "f530c75b9db828fbad73e074699dd6edddeceae814ae1feb9afb368ae39cb8a1",
+                "recorded_at": "2026-11-06T04:19:35.048469+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/plugin-invocation.md": "1c783c45c4da4dc0f30e4db76c50b0e211bc1dea5b67f552a15ab5dcf468ea71",
+                  ".skill-tree/documents/implementation-plan.md": "8c6aba1b915f6d80e4c49b7ced344d1909e10a78838ca46de346ddc0f828ad37",
+                  ".skill-tree/documents/plugin-management-contract.md": "d5d68870bb0f44c356fdbd5423f3995dea33931eded820ffa335ac715cc24616",
+                  ".skill-tree/documents/plugin-system-contract.md": "eeddb14292e115f489aa855f01f60ab922448317a3e9956d649148b177944680",
+                  ".skill-tree/lib/composer.js": "ebb4042086e61e32cd7c255df79befcdff06ae0b0bfaf2941d5d8facc1268e01",
+                  ".skill-tree/lib/plugin-bindings.js": "9ea7de58262993188ffa0b1abaf35e4819f9b635b1695561d21c793127299059",
+                  ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+                  ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                  ".skill-tree/tests/test-plugin-bindings.js": "1d5f1760709e61b5fa2d988978c4b8b3b5fae867a6786fa3b1c0f490be0fdeef"
+                },
+                "timing": {
+                  "tool_wall_seconds": 0.3123958329670131
+                }
+              },
+              "C-f4206676-46ee-40bf-b055-50f718912a6f": {
+                "actual_lane": "unit",
+                "attempt_id": "C-f4206676-46ee-40bf-b055-50f718912a6f",
+                "classification": "executed-control",
+                "cleanup": "Focused unit runner exited; temporary fixture cleanup is performed by test finalizers.",
+                "counts": {
+                  "discovered": 20,
+                  "expected": 20,
+                  "failed": 19,
+                  "passed": 1,
+                  "skipped": 0
+                },
+                "definition": "6fc2fe83bfd74446623299f66e3bef874ca0d632dbf821c66ee1149c4389bb2e",
+                "environment_identity": "b8c37235b7a43b9872ddf2f21e4db1f471455841ea31de29cfe368ecae0f80a4",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/t-787453a8-2643-48c1-8715-9626d67d5e0e-extensible-bindings-c-f4206676-46ee-40bf-b055-50f718912a6f.json",
+                    "sha256": "2a4855922f6fc33f201cefc9fc5654c5db2e6629982c181105f248afda8397df"
+                  },
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/t-787453a8-2643-48c1-8715-9626d67d5e0e-extensible-bindings-c-f4206676-46ee-40bf-b055-50f718912a6f.txt",
+                    "sha256": "bf7742ee03b6e7035ef64915ad8aa5f74861c6316e94c9d38409979462c0d82f"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_category": "expected-behavior",
+                "key": "66a7dda7e20b4aef5b98f4e3412f74cf88d86ed082b14c1a31d51030108a05c0",
+                "payload_hash": "a18fc78ecf2409ea6cc44225db68c2e8fc06f5546b73c57a84698327aab21843",
+                "recorded_at": "2026-11-06T04:08:15.452250+00:00",
+                "result": "red",
+                "sources": {
+                  ".skill-tree/common/references/plugin-invocation.md": "3222aba32d1be175561730d3ed9ec5ea306533918439fbeba4a299f7eebc88ba",
+                  ".skill-tree/documents/implementation-plan.md": "8c6aba1b915f6d80e4c49b7ced344d1909e10a78838ca46de346ddc0f828ad37",
+                  ".skill-tree/documents/plugin-management-contract.md": "d5d68870bb0f44c356fdbd5423f3995dea33931eded820ffa335ac715cc24616",
+                  ".skill-tree/documents/plugin-system-contract.md": "eeddb14292e115f489aa855f01f60ab922448317a3e9956d649148b177944680",
+                  ".skill-tree/lib/composer.js": "ebb4042086e61e32cd7c255df79befcdff06ae0b0bfaf2941d5d8facc1268e01",
+                  ".skill-tree/lib/plugin-bindings.js": "0a23c81df144269b9a73cc554af0ed19e78c3c3bfc55c208395e395569b8d2b0",
+                  ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+                  ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                  ".skill-tree/tests/test-plugin-bindings.js": "e46115d18a202c0d7d6f9cddd9dee3f229bf8fe3e495e1fb236e805bb35ac2df"
+                },
+                "timing": {
+                  "tool_wall_seconds": 0.18449766607955098
+                }
+              }
+            },
+            "red": {
+              "actual_lane": "unit",
+              "attempt_id": "C-f4206676-46ee-40bf-b055-50f718912a6f",
+              "classification": "executed-control",
+              "cleanup": "Focused unit runner exited; temporary fixture cleanup is performed by test finalizers.",
+              "counts": {
+                "discovered": 20,
+                "expected": 20,
+                "failed": 19,
+                "passed": 1,
+                "skipped": 0
+              },
+              "definition": "6fc2fe83bfd74446623299f66e3bef874ca0d632dbf821c66ee1149c4389bb2e",
+              "environment_identity": "b8c37235b7a43b9872ddf2f21e4db1f471455841ea31de29cfe368ecae0f80a4",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/t-787453a8-2643-48c1-8715-9626d67d5e0e-extensible-bindings-c-f4206676-46ee-40bf-b055-50f718912a6f.json",
+                  "sha256": "2a4855922f6fc33f201cefc9fc5654c5db2e6629982c181105f248afda8397df"
+                },
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/t-787453a8-2643-48c1-8715-9626d67d5e0e-extensible-bindings-c-f4206676-46ee-40bf-b055-50f718912a6f.txt",
+                  "sha256": "bf7742ee03b6e7035ef64915ad8aa5f74861c6316e94c9d38409979462c0d82f"
+                }
+              ],
+              "execution_sessions": {},
+              "failure_category": "expected-behavior",
+              "key": "66a7dda7e20b4aef5b98f4e3412f74cf88d86ed082b14c1a31d51030108a05c0",
+              "payload_hash": "a18fc78ecf2409ea6cc44225db68c2e8fc06f5546b73c57a84698327aab21843",
+              "recorded_at": "2026-11-06T04:08:15.452250+00:00",
+              "result": "red",
+              "sources": {
+                ".skill-tree/common/references/plugin-invocation.md": "3222aba32d1be175561730d3ed9ec5ea306533918439fbeba4a299f7eebc88ba",
+                ".skill-tree/documents/implementation-plan.md": "8c6aba1b915f6d80e4c49b7ced344d1909e10a78838ca46de346ddc0f828ad37",
+                ".skill-tree/documents/plugin-management-contract.md": "d5d68870bb0f44c356fdbd5423f3995dea33931eded820ffa335ac715cc24616",
+                ".skill-tree/documents/plugin-system-contract.md": "eeddb14292e115f489aa855f01f60ab922448317a3e9956d649148b177944680",
+                ".skill-tree/lib/composer.js": "ebb4042086e61e32cd7c255df79befcdff06ae0b0bfaf2941d5d8facc1268e01",
+                ".skill-tree/lib/plugin-bindings.js": "0a23c81df144269b9a73cc554af0ed19e78c3c3bfc55c208395e395569b8d2b0",
+                ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+                ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                ".skill-tree/tests/test-plugin-bindings.js": "e46115d18a202c0d7d6f9cddd9dee3f229bf8fe3e495e1fb236e805bb35ac2df"
+              },
+              "timing": {
+                "tool_wall_seconds": 0.18449766607955098
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-c78ecff1-2ecd-464e-83ab-6599351fd01f",
+              "classification": "executed-control",
+              "cleanup": "Focused unit runner exited; temporary fixture cleanup is performed by test finalizers.",
+              "counts": {
+                "discovered": 30,
+                "expected": 30,
+                "failed": 0,
+                "passed": 30,
+                "skipped": 0
+              },
+              "definition": "6fc2fe83bfd74446623299f66e3bef874ca0d632dbf821c66ee1149c4389bb2e",
+              "environment_identity": "b8c37235b7a43b9872ddf2f21e4db1f471455841ea31de29cfe368ecae0f80a4",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/t-787453a8-2643-48c1-8715-9626d67d5e0e-extensible-bindings-c-c78ecff1-2ecd-464e-83ab-6599351fd01f.json",
+                  "sha256": "0bdc81e55997f07be0a99c55ddd0246fa887aff1d91562eac97150c5c0df4f9c"
+                },
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/t-787453a8-2643-48c1-8715-9626d67d5e0e-extensible-bindings-c-c78ecff1-2ecd-464e-83ab-6599351fd01f.txt",
+                  "sha256": "f0bf3ebaaccf37f2b5f8212c60ee49a96da2c7d990b51880cf802fcea000096d"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "c2d8faa2fb2f2dec6bb58d3149fdf2052ba07b6dd7a55636aba448381be39d39",
+              "payload_hash": "f530c75b9db828fbad73e074699dd6edddeceae814ae1feb9afb368ae39cb8a1",
+              "recorded_at": "2026-11-06T04:19:35.048469+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/references/plugin-invocation.md": "1c783c45c4da4dc0f30e4db76c50b0e211bc1dea5b67f552a15ab5dcf468ea71",
+                ".skill-tree/documents/implementation-plan.md": "8c6aba1b915f6d80e4c49b7ced344d1909e10a78838ca46de346ddc0f828ad37",
+                ".skill-tree/documents/plugin-management-contract.md": "d5d68870bb0f44c356fdbd5423f3995dea33931eded820ffa335ac715cc24616",
+                ".skill-tree/documents/plugin-system-contract.md": "eeddb14292e115f489aa855f01f60ab922448317a3e9956d649148b177944680",
+                ".skill-tree/lib/composer.js": "ebb4042086e61e32cd7c255df79befcdff06ae0b0bfaf2941d5d8facc1268e01",
+                ".skill-tree/lib/plugin-bindings.js": "9ea7de58262993188ffa0b1abaf35e4819f9b635b1695561d21c793127299059",
+                ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+                ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                ".skill-tree/tests/test-plugin-bindings.js": "1d5f1760709e61b5fa2d988978c4b8b3b5fae867a6786fa3b1c0f490be0fdeef"
+              },
+              "timing": {
+                "tool_wall_seconds": 0.3123958329670131
+              }
+            }
+          }
+        },
+        "definition": "6fc2fe83bfd74446623299f66e3bef874ca0d632dbf821c66ee1149c4389bb2e",
+        "execution_sessions": {},
+        "partial_work": [
+          ".skill-tree/lib/plugin-bindings.js",
+          ".skill-tree/common/references/plugin-invocation.md",
+          ".skill-tree/tests/test-plugin-bindings.js"
+        ],
+        "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+        "stage": "awaiting-validation"
+      },
+      "before": {
+        "admission": {
+          "environment_id": "a6243a3d03b4aff3f1439e883170c77b0c14e05633eb29c25cb15ade403a6760",
+          "flavor": "general",
+          "identity": "10877850bb1ec6f2f17ef8b8e340d582ef64fe0cb0f883feb13c988446242915"
+        },
+        "checks": {
+          "extensible-bindings": {
+            "attempt": {
+              "attempt_id": "C-c78ecff1-2ecd-464e-83ab-6599351fd01f",
+              "definition": "6fc2fe83bfd74446623299f66e3bef874ca0d632dbf821c66ee1149c4389bb2e",
+              "environment_identity": "b8c37235b7a43b9872ddf2f21e4db1f471455841ea31de29cfe368ecae0f80a4",
+              "key": "c2d8faa2fb2f2dec6bb58d3149fdf2052ba07b6dd7a55636aba448381be39d39",
+              "launch": null,
+              "prepared_at": "2026-11-06T04:19:34.527940+00:00",
+              "recipe": {
+                "argv": [
+                  "node",
+                  "--test",
+                  ".skill-tree/tests/test-plugin-bindings.js"
+                ],
+                "input_paths": [
+                  ".skill-tree/config/repository.json"
+                ],
+                "lane": "unit",
+                "qualification": "owner-declared static recipe; runner unqualified"
+              },
+              "sources": {
+                ".skill-tree/common/references/plugin-invocation.md": "1c783c45c4da4dc0f30e4db76c50b0e211bc1dea5b67f552a15ab5dcf468ea71",
+                ".skill-tree/documents/implementation-plan.md": "8c6aba1b915f6d80e4c49b7ced344d1909e10a78838ca46de346ddc0f828ad37",
+                ".skill-tree/documents/plugin-management-contract.md": "d5d68870bb0f44c356fdbd5423f3995dea33931eded820ffa335ac715cc24616",
+                ".skill-tree/documents/plugin-system-contract.md": "eeddb14292e115f489aa855f01f60ab922448317a3e9956d649148b177944680",
+                ".skill-tree/lib/composer.js": "ebb4042086e61e32cd7c255df79befcdff06ae0b0bfaf2941d5d8facc1268e01",
+                ".skill-tree/lib/plugin-bindings.js": "9ea7de58262993188ffa0b1abaf35e4819f9b635b1695561d21c793127299059",
+                ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+                ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                ".skill-tree/tests/test-plugin-bindings.js": "1d5f1760709e61b5fa2d988978c4b8b3b5fae867a6786fa3b1c0f490be0fdeef"
+              }
+            },
+            "receipts": {
+              "C-f4206676-46ee-40bf-b055-50f718912a6f": {
+                "actual_lane": "unit",
+                "attempt_id": "C-f4206676-46ee-40bf-b055-50f718912a6f",
+                "classification": "executed-control",
+                "cleanup": "Focused unit runner exited; temporary fixture cleanup is performed by test finalizers.",
+                "counts": {
+                  "discovered": 20,
+                  "expected": 20,
+                  "failed": 19,
+                  "passed": 1,
+                  "skipped": 0
+                },
+                "definition": "6fc2fe83bfd74446623299f66e3bef874ca0d632dbf821c66ee1149c4389bb2e",
+                "environment_identity": "b8c37235b7a43b9872ddf2f21e4db1f471455841ea31de29cfe368ecae0f80a4",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/t-787453a8-2643-48c1-8715-9626d67d5e0e-extensible-bindings-c-f4206676-46ee-40bf-b055-50f718912a6f.json",
+                    "sha256": "2a4855922f6fc33f201cefc9fc5654c5db2e6629982c181105f248afda8397df"
+                  },
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/t-787453a8-2643-48c1-8715-9626d67d5e0e-extensible-bindings-c-f4206676-46ee-40bf-b055-50f718912a6f.txt",
+                    "sha256": "bf7742ee03b6e7035ef64915ad8aa5f74861c6316e94c9d38409979462c0d82f"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_category": "expected-behavior",
+                "key": "66a7dda7e20b4aef5b98f4e3412f74cf88d86ed082b14c1a31d51030108a05c0",
+                "payload_hash": "a18fc78ecf2409ea6cc44225db68c2e8fc06f5546b73c57a84698327aab21843",
+                "recorded_at": "2026-11-06T04:08:15.452250+00:00",
+                "result": "red",
+                "sources": {
+                  ".skill-tree/common/references/plugin-invocation.md": "3222aba32d1be175561730d3ed9ec5ea306533918439fbeba4a299f7eebc88ba",
+                  ".skill-tree/documents/implementation-plan.md": "8c6aba1b915f6d80e4c49b7ced344d1909e10a78838ca46de346ddc0f828ad37",
+                  ".skill-tree/documents/plugin-management-contract.md": "d5d68870bb0f44c356fdbd5423f3995dea33931eded820ffa335ac715cc24616",
+                  ".skill-tree/documents/plugin-system-contract.md": "eeddb14292e115f489aa855f01f60ab922448317a3e9956d649148b177944680",
+                  ".skill-tree/lib/composer.js": "ebb4042086e61e32cd7c255df79befcdff06ae0b0bfaf2941d5d8facc1268e01",
+                  ".skill-tree/lib/plugin-bindings.js": "0a23c81df144269b9a73cc554af0ed19e78c3c3bfc55c208395e395569b8d2b0",
+                  ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+                  ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                  ".skill-tree/tests/test-plugin-bindings.js": "e46115d18a202c0d7d6f9cddd9dee3f229bf8fe3e495e1fb236e805bb35ac2df"
+                },
+                "timing": {
+                  "tool_wall_seconds": 0.18449766607955098
+                }
+              }
+            },
+            "red": {
+              "actual_lane": "unit",
+              "attempt_id": "C-f4206676-46ee-40bf-b055-50f718912a6f",
+              "classification": "executed-control",
+              "cleanup": "Focused unit runner exited; temporary fixture cleanup is performed by test finalizers.",
+              "counts": {
+                "discovered": 20,
+                "expected": 20,
+                "failed": 19,
+                "passed": 1,
+                "skipped": 0
+              },
+              "definition": "6fc2fe83bfd74446623299f66e3bef874ca0d632dbf821c66ee1149c4389bb2e",
+              "environment_identity": "b8c37235b7a43b9872ddf2f21e4db1f471455841ea31de29cfe368ecae0f80a4",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/t-787453a8-2643-48c1-8715-9626d67d5e0e-extensible-bindings-c-f4206676-46ee-40bf-b055-50f718912a6f.json",
+                  "sha256": "2a4855922f6fc33f201cefc9fc5654c5db2e6629982c181105f248afda8397df"
+                },
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/t-787453a8-2643-48c1-8715-9626d67d5e0e-extensible-bindings-c-f4206676-46ee-40bf-b055-50f718912a6f.txt",
+                  "sha256": "bf7742ee03b6e7035ef64915ad8aa5f74861c6316e94c9d38409979462c0d82f"
+                }
+              ],
+              "execution_sessions": {},
+              "failure_category": "expected-behavior",
+              "key": "66a7dda7e20b4aef5b98f4e3412f74cf88d86ed082b14c1a31d51030108a05c0",
+              "payload_hash": "a18fc78ecf2409ea6cc44225db68c2e8fc06f5546b73c57a84698327aab21843",
+              "recorded_at": "2026-11-06T04:08:15.452250+00:00",
+              "result": "red",
+              "sources": {
+                ".skill-tree/common/references/plugin-invocation.md": "3222aba32d1be175561730d3ed9ec5ea306533918439fbeba4a299f7eebc88ba",
+                ".skill-tree/documents/implementation-plan.md": "8c6aba1b915f6d80e4c49b7ced344d1909e10a78838ca46de346ddc0f828ad37",
+                ".skill-tree/documents/plugin-management-contract.md": "d5d68870bb0f44c356fdbd5423f3995dea33931eded820ffa335ac715cc24616",
+                ".skill-tree/documents/plugin-system-contract.md": "eeddb14292e115f489aa855f01f60ab922448317a3e9956d649148b177944680",
+                ".skill-tree/lib/composer.js": "ebb4042086e61e32cd7c255df79befcdff06ae0b0bfaf2941d5d8facc1268e01",
+                ".skill-tree/lib/plugin-bindings.js": "0a23c81df144269b9a73cc554af0ed19e78c3c3bfc55c208395e395569b8d2b0",
+                ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+                ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                ".skill-tree/tests/test-plugin-bindings.js": "e46115d18a202c0d7d6f9cddd9dee3f229bf8fe3e495e1fb236e805bb35ac2df"
+              },
+              "timing": {
+                "tool_wall_seconds": 0.18449766607955098
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-f4206676-46ee-40bf-b055-50f718912a6f",
+              "classification": "executed-control",
+              "cleanup": "Focused unit runner exited; temporary fixture cleanup is performed by test finalizers.",
+              "counts": {
+                "discovered": 20,
+                "expected": 20,
+                "failed": 19,
+                "passed": 1,
+                "skipped": 0
+              },
+              "definition": "6fc2fe83bfd74446623299f66e3bef874ca0d632dbf821c66ee1149c4389bb2e",
+              "environment_identity": "b8c37235b7a43b9872ddf2f21e4db1f471455841ea31de29cfe368ecae0f80a4",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/t-787453a8-2643-48c1-8715-9626d67d5e0e-extensible-bindings-c-f4206676-46ee-40bf-b055-50f718912a6f.json",
+                  "sha256": "2a4855922f6fc33f201cefc9fc5654c5db2e6629982c181105f248afda8397df"
+                },
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/t-787453a8-2643-48c1-8715-9626d67d5e0e-extensible-bindings-c-f4206676-46ee-40bf-b055-50f718912a6f.txt",
+                  "sha256": "bf7742ee03b6e7035ef64915ad8aa5f74861c6316e94c9d38409979462c0d82f"
+                }
+              ],
+              "execution_sessions": {},
+              "failure_category": "expected-behavior",
+              "key": "66a7dda7e20b4aef5b98f4e3412f74cf88d86ed082b14c1a31d51030108a05c0",
+              "payload_hash": "a18fc78ecf2409ea6cc44225db68c2e8fc06f5546b73c57a84698327aab21843",
+              "recorded_at": "2026-11-06T04:08:15.452250+00:00",
+              "result": "red",
+              "sources": {
+                ".skill-tree/common/references/plugin-invocation.md": "3222aba32d1be175561730d3ed9ec5ea306533918439fbeba4a299f7eebc88ba",
+                ".skill-tree/documents/implementation-plan.md": "8c6aba1b915f6d80e4c49b7ced344d1909e10a78838ca46de346ddc0f828ad37",
+                ".skill-tree/documents/plugin-management-contract.md": "d5d68870bb0f44c356fdbd5423f3995dea33931eded820ffa335ac715cc24616",
+                ".skill-tree/documents/plugin-system-contract.md": "eeddb14292e115f489aa855f01f60ab922448317a3e9956d649148b177944680",
+                ".skill-tree/lib/composer.js": "ebb4042086e61e32cd7c255df79befcdff06ae0b0bfaf2941d5d8facc1268e01",
+                ".skill-tree/lib/plugin-bindings.js": "0a23c81df144269b9a73cc554af0ed19e78c3c3bfc55c208395e395569b8d2b0",
+                ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+                ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                ".skill-tree/tests/test-plugin-bindings.js": "e46115d18a202c0d7d6f9cddd9dee3f229bf8fe3e495e1fb236e805bb35ac2df"
+              },
+              "timing": {
+                "tool_wall_seconds": 0.18449766607955098
+              }
+            }
+          }
+        },
+        "definition": "6fc2fe83bfd74446623299f66e3bef874ca0d632dbf821c66ee1149c4389bb2e",
+        "execution_sessions": {},
+        "partial_work": [
+          ".skill-tree/lib/plugin-bindings.js",
+          ".skill-tree/common/references/plugin-invocation.md",
+          ".skill-tree/tests/test-plugin-bindings.js"
+        ],
+        "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+        "stage": "awaiting-validation"
+      },
+      "task_id": "T-787453a8-2643-48c1-8715-9626d67d5e0e"
+    }
+  ],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+  "schema": 1,
+  "sequence": 146
+}

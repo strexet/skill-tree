@@ -1,0 +1,13 @@
+{
+  "name": "installer-list",
+  "argv": [
+    "node",
+    ".skill-tree/bin/install.js",
+    "--list"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "tool_wall_seconds": 0.07125112507492304,
+  "source_freeze": ".skill-tree/history/validation/plugin-system/managed-registry-hardening-source-freeze.json",
+  "qualification": "Current frozen source/repository validation only; no actual candidate trial or universal native/product qualification."
+}

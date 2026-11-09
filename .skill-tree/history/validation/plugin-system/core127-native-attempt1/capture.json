@@ -1,0 +1,1050 @@
+{
+  "events": [
+    {
+      "actor": {
+        "context_id": "/root",
+        "id": "/root"
+      },
+      "cost": null,
+      "id": "core-auto-significant-event-1",
+      "inventory_entry": {
+        "agent_name": "/root",
+        "agent_status": "running"
+      },
+      "kind": "executor-observed",
+      "model": null,
+      "native_request_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "provider": "Codex collaboration",
+      "scenario_id": "core-auto-significant",
+      "sequence": 1,
+      "tokens": null,
+      "tool": "collaboration.list_agents",
+      "tool_call_id": null
+    },
+    {
+      "actor": {
+        "context_id": "/root/core127_auto_resolver",
+        "id": "/root/core127_auto_resolver"
+      },
+      "cost": null,
+      "id": "core-auto-significant-event-2",
+      "kind": "actor-created",
+      "model": null,
+      "native_request_sha256": "a89526b26a30e46dc37929648ac6792d2e586cb06c51115fe0c54324b608bb74",
+      "provider": "Codex collaboration",
+      "role": "resolver",
+      "scenario_id": "core-auto-significant",
+      "sequence": 2,
+      "tokens": null,
+      "tool": "collaboration.spawn_agent",
+      "tool_call_id": null
+    },
+    {
+      "creation_event_id": "core-auto-significant-event-2",
+      "id": "core-auto-significant-event-3",
+      "input_digest": "0e743aec535f81b1ea7e3e713ecdba3b3b1d36aef5659afd4a1f8e08878a3129",
+      "kind": "actor-returned",
+      "result": {
+        "answer": "json",
+        "input_digest": "0e743aec535f81b1ea7e3e713ecdba3b3b1d36aef5659afd4a1f8e08878a3129",
+        "rationale": "Both representations satisfy the fixture. A named value field makes the value explicit and permits future fields; the frozen facts establish no byte limit or shell requirement that outweighs those benefits.",
+        "status": "answered"
+      },
+      "scenario_id": "core-auto-significant",
+      "sequence": 3
+    },
+    {
+      "actor": {
+        "context_id": "/root/core127_auto_critic",
+        "id": "/root/core127_auto_critic"
+      },
+      "cost": null,
+      "id": "core-auto-significant-event-4",
+      "kind": "actor-created",
+      "model": null,
+      "native_request_sha256": "aebb5f0007b4af82b8a89cd03f3bb9cdb7f76bd3a58da1f41a83e97e66e05928",
+      "provider": "Codex collaboration",
+      "role": "critic",
+      "scenario_id": "core-auto-significant",
+      "sequence": 4,
+      "tokens": null,
+      "tool": "collaboration.spawn_agent",
+      "tool_call_id": null
+    },
+    {
+      "creation_event_id": "core-auto-significant-event-4",
+      "id": "core-auto-significant-event-5",
+      "input_digest": "e00d1cf97b7a2c478c979bb59f36c67fbe062981eca055a6c34c6b592fd1186a",
+      "kind": "actor-returned",
+      "result": {
+        "answer": "text",
+        "input_digest": "e00d1cf97b7a2c478c979bb59f36c67fbe062981eca055a6c34c6b592fd1186a",
+        "rationale": "Both representations are valid. Plain text minimizes bytes and simplifies shell integration, providing concrete benefits for the fixture; JSON's support for future named fields does not establish a present need for that structure.",
+        "status": "disagree"
+      },
+      "scenario_id": "core-auto-significant",
+      "sequence": 5
+    },
+    {
+      "actor": {
+        "context_id": "/root/core127_auto_arbiter",
+        "id": "/root/core127_auto_arbiter"
+      },
+      "cost": null,
+      "id": "core-auto-significant-event-6",
+      "kind": "actor-created",
+      "model": null,
+      "native_request_sha256": "7360ec19a7588bcf43d1ed4748b9ff52b3cb4e8c38dfeb0c77f517e60ee5da32",
+      "provider": "Codex collaboration",
+      "role": "arbiter",
+      "scenario_id": "core-auto-significant",
+      "sequence": 6,
+      "tokens": null,
+      "tool": "collaboration.spawn_agent",
+      "tool_call_id": null
+    },
+    {
+      "creation_event_id": "core-auto-significant-event-6",
+      "id": "core-auto-significant-event-7",
+      "input_digest": "14bd1e5dbc1e296ae34cc229339adb2162362562c18944419766594b87a8830e",
+      "kind": "actor-returned",
+      "result": {
+        "answer": "json",
+        "input_digest": "14bd1e5dbc1e296ae34cc229339adb2162362562c18944419766594b87a8830e",
+        "rationale": "JSON's named value field supports future extension; plain text offers only the stated byte and shell-integration advantages. The sealed input contains resolver and critic receipt hashes, not their reasoning, so this choice relies on the supplied facts and establishes no comparative efficacy conclusion.",
+        "status": "answered"
+      },
+      "scenario_id": "core-auto-significant",
+      "sequence": 7
+    },
+    {
+      "action": "accepted",
+      "decision": {
+        "acceptance": {
+          "actor": {
+            "context_id": "/root/core127_auto_arbiter",
+            "id": "/root/core127_auto_arbiter"
+          },
+          "answer": "json",
+          "attempt_id": "DA-c0737476-a99e-47f2-9399-6fb636c8273a",
+          "authority_digest": "ee32fb235ed5cf1bbda63ebeb45967cb42fe8320df9a2bfd759b40bba4d9070e",
+          "context_identity": {
+            "controlled_adversarial_critic": true,
+            "decision_purpose": "decision",
+            "execution_snapshot_digest": "623654994fe311444923b837e037f465d1509629436eb720254b0cdd1422b575",
+            "facts": [
+              "Both JSON object and plain text are valid fixture representations.",
+              "JSON permits future named fields; plain text minimizes bytes and shell integration.",
+              "The significant Auto fixture deliberately asks the critic to exercise a substantive counterposition; arbitration transport is qualified, not spontaneous critique quality."
+            ],
+            "id": "core-auto-significant",
+            "kind": "request",
+            "orchestration_id": "DO-0b9c94ba-78b3-5904-a5f0-74a670e629da"
+          },
+          "decision_id": "DG-61d83bfd-7fad-5823-a3f8-39e2fdcf629b",
+          "digest": "6bff329d7b382f9ed6fefee91fd4e6213d67e36600462529c4399a2affe0ec77",
+          "kind": "technical",
+          "mode": "auto",
+          "mode_epoch": 1,
+          "origin": {
+            "actor_context_id": "/root/core127_auto_arbiter",
+            "actor_id": "/root/core127_auto_arbiter",
+            "creation_reference": "core-auto-significant-event-6",
+            "kind": "delegated-agent",
+            "provider": "Codex collaboration",
+            "reference": "core-auto-significant-event-7",
+            "tool": "collaboration.followup_task"
+          },
+          "question_digest": "f8205b2329ce5bb734110112531364ce002b77b48ab0f28ba39af20787a19c4b",
+          "question_id": "representation",
+          "rationale": "JSON's named value field supports future extension; plain text offers only the stated byte and shell-integration advantages. The sealed input contains resolver and critic receipt hashes, not their reasoning, so this choice relies on the supplied facts and establishes no comparative efficacy conclusion.",
+          "role_receipts": {
+            "arbiter": "d52015b2ec921d3e3a327866443910ba957b0fbb694d024891c0e083d3949ceb",
+            "critic": "97d442bd6816ad845101c219aa6b1c26b78b1310df3698d8ce9be3299e9bdaae",
+            "resolver": "86ceb684f88ae99786a507b6a153b357eeccc2288816d79ea93e75b060096cec"
+          },
+          "semantic_fingerprint": "0f332ded5769108e3441323298a8c240a8f3c1d1aa3e7c2e8930f40daeeaf95c"
+        },
+        "active_attempt_id": null,
+        "attempts": {
+          "DA-2221798e-ad7c-4cdc-9d5b-9ff060558d40": {
+            "actor": {
+              "context_id": "/root/core127_auto_resolver",
+              "id": "/root/core127_auto_resolver"
+            },
+            "authority_digest": "ee32fb235ed5cf1bbda63ebeb45967cb42fe8320df9a2bfd759b40bba4d9070e",
+            "basis_digest": null,
+            "content_fingerprint": "ab32eebd95dbd1014c41e1a90020ff0a4b4a2e29cc3957f1f9a97828889b7f26",
+            "evidence": {
+              "actor_context_id": "/root/core127_auto_resolver",
+              "actor_id": "/root/core127_auto_resolver",
+              "creation_reference": "core-auto-significant-event-2",
+              "kind": "delegated-agent",
+              "provider": "Codex collaboration",
+              "reference": "core-auto-significant-event-3",
+              "tool": "collaboration.followup_task"
+            },
+            "frontier_epoch": 1,
+            "id": "DA-2221798e-ad7c-4cdc-9d5b-9ff060558d40",
+            "mode": "auto",
+            "mode_epoch": 1,
+            "question_digest": "f8205b2329ce5bb734110112531364ce002b77b48ab0f28ba39af20787a19c4b",
+            "result": {
+              "answer": "json",
+              "input_digest": "0e743aec535f81b1ea7e3e713ecdba3b3b1d36aef5659afd4a1f8e08878a3129",
+              "rationale": "Both representations satisfy the fixture. A named value field makes the value explicit and permits future fields; the frozen facts establish no byte limit or shell requirement that outweighs those benefits.",
+              "status": "answered"
+            },
+            "role": "resolver",
+            "semantic_fingerprint": "0f332ded5769108e3441323298a8c240a8f3c1d1aa3e7c2e8930f40daeeaf95c",
+            "status": "answered"
+          },
+          "DA-58d8553e-9f1a-4aae-9b2f-794e316fb342": {
+            "actor": {
+              "context_id": "/root/core127_auto_critic",
+              "id": "/root/core127_auto_critic"
+            },
+            "authority_digest": "ee32fb235ed5cf1bbda63ebeb45967cb42fe8320df9a2bfd759b40bba4d9070e",
+            "basis_digest": "0c57fa1c08c9cf003da38cb7fc17268285cb1e30688cb15a4b1a73d2c387b1eb",
+            "content_fingerprint": "ab32eebd95dbd1014c41e1a90020ff0a4b4a2e29cc3957f1f9a97828889b7f26",
+            "evidence": {
+              "actor_context_id": "/root/core127_auto_critic",
+              "actor_id": "/root/core127_auto_critic",
+              "creation_reference": "core-auto-significant-event-4",
+              "kind": "delegated-agent",
+              "provider": "Codex collaboration",
+              "reference": "core-auto-significant-event-5",
+              "tool": "collaboration.followup_task"
+            },
+            "frontier_epoch": 1,
+            "id": "DA-58d8553e-9f1a-4aae-9b2f-794e316fb342",
+            "mode": "auto",
+            "mode_epoch": 1,
+            "question_digest": "f8205b2329ce5bb734110112531364ce002b77b48ab0f28ba39af20787a19c4b",
+            "result": {
+              "answer": "text",
+              "input_digest": "e00d1cf97b7a2c478c979bb59f36c67fbe062981eca055a6c34c6b592fd1186a",
+              "rationale": "Both representations are valid. Plain text minimizes bytes and simplifies shell integration, providing concrete benefits for the fixture; JSON's support for future named fields does not establish a present need for that structure.",
+              "status": "disagree"
+            },
+            "role": "critic",
+            "semantic_fingerprint": "0f332ded5769108e3441323298a8c240a8f3c1d1aa3e7c2e8930f40daeeaf95c",
+            "status": "disagree"
+          },
+          "DA-c0737476-a99e-47f2-9399-6fb636c8273a": {
+            "actor": {
+              "context_id": "/root/core127_auto_arbiter",
+              "id": "/root/core127_auto_arbiter"
+            },
+            "authority_digest": "ee32fb235ed5cf1bbda63ebeb45967cb42fe8320df9a2bfd759b40bba4d9070e",
+            "basis_digest": "78ba38d8bba15367bd4de44349000360d3c8f2fb8ba38bb369ce2a9c8179596f",
+            "content_fingerprint": "ab32eebd95dbd1014c41e1a90020ff0a4b4a2e29cc3957f1f9a97828889b7f26",
+            "evidence": {
+              "actor_context_id": "/root/core127_auto_arbiter",
+              "actor_id": "/root/core127_auto_arbiter",
+              "creation_reference": "core-auto-significant-event-6",
+              "kind": "delegated-agent",
+              "provider": "Codex collaboration",
+              "reference": "core-auto-significant-event-7",
+              "tool": "collaboration.followup_task"
+            },
+            "frontier_epoch": 1,
+            "id": "DA-c0737476-a99e-47f2-9399-6fb636c8273a",
+            "mode": "auto",
+            "mode_epoch": 1,
+            "question_digest": "f8205b2329ce5bb734110112531364ce002b77b48ab0f28ba39af20787a19c4b",
+            "result": {
+              "answer": "json",
+              "input_digest": "14bd1e5dbc1e296ae34cc229339adb2162362562c18944419766594b87a8830e",
+              "rationale": "JSON's named value field supports future extension; plain text offers only the stated byte and shell-integration advantages. The sealed input contains resolver and critic receipt hashes, not their reasoning, so this choice relies on the supplied facts and establishes no comparative efficacy conclusion.",
+              "status": "answered"
+            },
+            "role": "arbiter",
+            "semantic_fingerprint": "0f332ded5769108e3441323298a8c240a8f3c1d1aa3e7c2e8930f40daeeaf95c",
+            "status": "answered"
+          }
+        },
+        "authority": {
+          "allowed_kinds": [
+            "technical",
+            "product",
+            "specification-acceptance"
+          ],
+          "constraints": [
+            "Temporary metadata-only qualification; no real product, network, publication, installation consent or external approval."
+          ],
+          "context_id": "core-auto-significant",
+          "evidence": {
+            "kind": "owner-message",
+            "reference": "Current Implement All authorizes required core127 qualification; fixture business facts and later owner inputs are controlled test data."
+          },
+          "id": "core127-fixture-grant",
+          "revision": 1
+        },
+        "authority_digest": "ee32fb235ed5cf1bbda63ebeb45967cb42fe8320df9a2bfd759b40bba4d9070e",
+        "context": {
+          "content_fingerprint": "ab32eebd95dbd1014c41e1a90020ff0a4b4a2e29cc3957f1f9a97828889b7f26",
+          "controlled_adversarial_critic": true,
+          "decision_purpose": "decision",
+          "execution_snapshot_digest": "623654994fe311444923b837e037f465d1509629436eb720254b0cdd1422b575",
+          "facts": [
+            "Both JSON object and plain text are valid fixture representations.",
+            "JSON permits future named fields; plain text minimizes bytes and shell integration.",
+            "The significant Auto fixture deliberately asks the critic to exercise a substantive counterposition; arbitration transport is qualified, not spontaneous critique quality."
+          ],
+          "id": "core-auto-significant",
+          "kind": "request",
+          "orchestration_id": "DO-0b9c94ba-78b3-5904-a5f0-74a670e629da",
+          "semantic_fingerprint": "0f332ded5769108e3441323298a8c240a8f3c1d1aa3e7c2e8930f40daeeaf95c"
+        },
+        "decision_hash": "873ca2506be0e0de895972557799ea612701c2de5ce3f8e77fe403a330799ec1",
+        "executor": {
+          "context_id": "/root",
+          "id": "/root"
+        },
+        "frontier_epoch": 1,
+        "history": [
+          {
+            "context_fingerprint": "ab32eebd95dbd1014c41e1a90020ff0a4b4a2e29cc3957f1f9a97828889b7f26",
+            "detail": {},
+            "event": "started",
+            "mode_epoch": 1,
+            "previous_record_hash": null,
+            "sequence": 1
+          },
+          {
+            "context_fingerprint": "ab32eebd95dbd1014c41e1a90020ff0a4b4a2e29cc3957f1f9a97828889b7f26",
+            "detail": {
+              "attempt_id": "DA-2221798e-ad7c-4cdc-9d5b-9ff060558d40",
+              "role": "resolver"
+            },
+            "event": "prepare",
+            "mode_epoch": 1,
+            "previous_record_hash": "81ef376edd77908905aa975c61721d413670c68c7994bb287144997041d868e9",
+            "sequence": 2
+          },
+          {
+            "context_fingerprint": "ab32eebd95dbd1014c41e1a90020ff0a4b4a2e29cc3957f1f9a97828889b7f26",
+            "detail": {
+              "attempt_id": "DA-2221798e-ad7c-4cdc-9d5b-9ff060558d40",
+              "status": "answered"
+            },
+            "event": "record",
+            "mode_epoch": 1,
+            "previous_record_hash": "b8f7560851ef4707b310e2df3cfd7a7c7df82bb5fbbfb8e385767a43c58fb67c",
+            "sequence": 3
+          },
+          {
+            "context_fingerprint": "ab32eebd95dbd1014c41e1a90020ff0a4b4a2e29cc3957f1f9a97828889b7f26",
+            "detail": {
+              "attempt_id": "DA-58d8553e-9f1a-4aae-9b2f-794e316fb342",
+              "role": "critic"
+            },
+            "event": "prepare",
+            "mode_epoch": 1,
+            "previous_record_hash": "48758a0ab374ebf27aa1057b9b4b2088eb198fa781f30872196000ee5e18f9e9",
+            "sequence": 4
+          },
+          {
+            "context_fingerprint": "ab32eebd95dbd1014c41e1a90020ff0a4b4a2e29cc3957f1f9a97828889b7f26",
+            "detail": {
+              "attempt_id": "DA-58d8553e-9f1a-4aae-9b2f-794e316fb342",
+              "status": "disagree"
+            },
+            "event": "record",
+            "mode_epoch": 1,
+            "previous_record_hash": "123bb0877c206f2fa3caec8d9cccf34fc38e93df8b89880c3b296107c1456a84",
+            "sequence": 5
+          },
+          {
+            "context_fingerprint": "ab32eebd95dbd1014c41e1a90020ff0a4b4a2e29cc3957f1f9a97828889b7f26",
+            "detail": {
+              "attempt_id": "DA-c0737476-a99e-47f2-9399-6fb636c8273a",
+              "role": "arbiter"
+            },
+            "event": "prepare",
+            "mode_epoch": 1,
+            "previous_record_hash": "74038d318521d150cf3ab26c8be320596d71df32b8206a855ec30830c1220c44",
+            "sequence": 6
+          },
+          {
+            "context_fingerprint": "ab32eebd95dbd1014c41e1a90020ff0a4b4a2e29cc3957f1f9a97828889b7f26",
+            "detail": {
+              "attempt_id": "DA-c0737476-a99e-47f2-9399-6fb636c8273a",
+              "status": "answered"
+            },
+            "event": "record",
+            "mode_epoch": 1,
+            "previous_record_hash": "cecbd8983c0a504384a2418f9cf8e8601dbbadce634e6b0e6e60cde7bf4ec27c",
+            "sequence": 7
+          },
+          {
+            "context_fingerprint": "ab32eebd95dbd1014c41e1a90020ff0a4b4a2e29cc3957f1f9a97828889b7f26",
+            "detail": {
+              "acceptance_digest": "6bff329d7b382f9ed6fefee91fd4e6213d67e36600462529c4399a2affe0ec77"
+            },
+            "event": "accept",
+            "mode_epoch": 1,
+            "previous_record_hash": "883de551500fc883f34ea329cb2cf7f398f969ef10091db15711a9aa88d90e29",
+            "sequence": 8
+          }
+        ],
+        "id": "DG-61d83bfd-7fad-5823-a3f8-39e2fdcf629b",
+        "mode": "auto",
+        "mode_epoch": 1,
+        "prepared_attempt_id": "DA-c0737476-a99e-47f2-9399-6fb636c8273a",
+        "question": {
+          "id": "representation",
+          "kind": "technical",
+          "options": [
+            {
+              "id": "json",
+              "text": "A JSON object with a named value field."
+            },
+            {
+              "id": "text",
+              "text": "A minimal plain-text integer."
+            }
+          ],
+          "recommendation": "json",
+          "significance": "significant",
+          "text": "Which representation fits the controlled fixture?"
+        },
+        "request_id": "DO-0b9c94ba-78b3-5904-a5f0-74a670e629da:question:1",
+        "revision": 8,
+        "schema": 1,
+        "start_digest": "7ab2f137a04e73f5448111ebb3ea5bb1ec1e73b32e8a3824402e2d8af12e3af7",
+        "state": "accepted"
+      },
+      "id": "core-auto-significant-event-8",
+      "kind": "observation",
+      "label": "final",
+      "orchestration": {
+        "acceptance": {
+          "actor": {
+            "context_id": "/root/core127_auto_arbiter",
+            "id": "/root/core127_auto_arbiter"
+          },
+          "answer": "json",
+          "attempt_id": "DA-c0737476-a99e-47f2-9399-6fb636c8273a",
+          "authority_digest": "ee32fb235ed5cf1bbda63ebeb45967cb42fe8320df9a2bfd759b40bba4d9070e",
+          "context_identity": {
+            "controlled_adversarial_critic": true,
+            "decision_purpose": "decision",
+            "execution_snapshot_digest": "623654994fe311444923b837e037f465d1509629436eb720254b0cdd1422b575",
+            "facts": [
+              "Both JSON object and plain text are valid fixture representations.",
+              "JSON permits future named fields; plain text minimizes bytes and shell integration.",
+              "The significant Auto fixture deliberately asks the critic to exercise a substantive counterposition; arbitration transport is qualified, not spontaneous critique quality."
+            ],
+            "id": "core-auto-significant",
+            "kind": "request",
+            "orchestration_id": "DO-0b9c94ba-78b3-5904-a5f0-74a670e629da"
+          },
+          "decision_id": "DG-61d83bfd-7fad-5823-a3f8-39e2fdcf629b",
+          "digest": "6bff329d7b382f9ed6fefee91fd4e6213d67e36600462529c4399a2affe0ec77",
+          "kind": "technical",
+          "mode": "auto",
+          "mode_epoch": 1,
+          "origin": {
+            "actor_context_id": "/root/core127_auto_arbiter",
+            "actor_id": "/root/core127_auto_arbiter",
+            "creation_reference": "core-auto-significant-event-6",
+            "kind": "delegated-agent",
+            "provider": "Codex collaboration",
+            "reference": "core-auto-significant-event-7",
+            "tool": "collaboration.followup_task"
+          },
+          "question_digest": "f8205b2329ce5bb734110112531364ce002b77b48ab0f28ba39af20787a19c4b",
+          "question_id": "representation",
+          "rationale": "JSON's named value field supports future extension; plain text offers only the stated byte and shell-integration advantages. The sealed input contains resolver and critic receipt hashes, not their reasoning, so this choice relies on the supplied facts and establishes no comparative efficacy conclusion.",
+          "role_receipts": {
+            "arbiter": "d52015b2ec921d3e3a327866443910ba957b0fbb694d024891c0e083d3949ceb",
+            "critic": "97d442bd6816ad845101c219aa6b1c26b78b1310df3698d8ce9be3299e9bdaae",
+            "resolver": "86ceb684f88ae99786a507b6a153b357eeccc2288816d79ea93e75b060096cec"
+          },
+          "semantic_fingerprint": "0f332ded5769108e3441323298a8c240a8f3c1d1aa3e7c2e8930f40daeeaf95c"
+        },
+        "accepted_obligations": [
+          "d7fd253e65b6d8a5afbcbf98b80aa7b811f08912f05fa3a9287ce8871b61dee1"
+        ],
+        "actor_requests": {
+          "DA-2221798e-ad7c-4cdc-9d5b-9ff060558d40": {
+            "attempt_id": "DA-2221798e-ad7c-4cdc-9d5b-9ff060558d40",
+            "creation_evidence": {
+              "actor_context_id": "/root/core127_auto_resolver",
+              "actor_id": "/root/core127_auto_resolver",
+              "kind": "host-agent-created",
+              "provider": "Codex collaboration",
+              "reference": "core-auto-significant-event-2",
+              "tool": "collaboration.spawn_agent"
+            },
+            "input": {
+              "actor": {
+                "context_id": "/root/core127_auto_resolver",
+                "id": "/root/core127_auto_resolver"
+              },
+              "authority": {
+                "allowed_kinds": [
+                  "technical",
+                  "product",
+                  "specification-acceptance"
+                ],
+                "constraints": [
+                  "Temporary metadata-only qualification; no real product, network, publication, installation consent or external approval."
+                ],
+                "context_id": "core-auto-significant",
+                "evidence": {
+                  "kind": "owner-message",
+                  "reference": "Current Implement All authorizes required core127 qualification; fixture business facts and later owner inputs are controlled test data."
+                },
+                "id": "core127-fixture-grant",
+                "revision": 1
+              },
+              "authority_digest": "ee32fb235ed5cf1bbda63ebeb45967cb42fe8320df9a2bfd759b40bba4d9070e",
+              "context": {
+                "content_fingerprint": "ab32eebd95dbd1014c41e1a90020ff0a4b4a2e29cc3957f1f9a97828889b7f26",
+                "controlled_adversarial_critic": true,
+                "decision_purpose": "decision",
+                "execution_snapshot_digest": "623654994fe311444923b837e037f465d1509629436eb720254b0cdd1422b575",
+                "facts": [
+                  "Both JSON object and plain text are valid fixture representations.",
+                  "JSON permits future named fields; plain text minimizes bytes and shell integration.",
+                  "The significant Auto fixture deliberately asks the critic to exercise a substantive counterposition; arbitration transport is qualified, not spontaneous critique quality."
+                ],
+                "id": "core-auto-significant",
+                "kind": "request",
+                "orchestration_id": "DO-0b9c94ba-78b3-5904-a5f0-74a670e629da",
+                "semantic_fingerprint": "0f332ded5769108e3441323298a8c240a8f3c1d1aa3e7c2e8930f40daeeaf95c"
+              },
+              "creation_evidence": {
+                "actor_context_id": "/root/core127_auto_resolver",
+                "actor_id": "/root/core127_auto_resolver",
+                "kind": "host-agent-created",
+                "provider": "Codex collaboration",
+                "reference": "core-auto-significant-event-2",
+                "tool": "collaboration.spawn_agent"
+              },
+              "decision_hash": "81ef376edd77908905aa975c61721d413670c68c7994bb287144997041d868e9",
+              "decision_id": "DG-61d83bfd-7fad-5823-a3f8-39e2fdcf629b",
+              "execution_snapshot": {
+                "common/references/decision-governance.md": "aad9b5b8c5e95b08c01ae59d120e9a200ade03ac725216cb20a47e6c57bff415",
+                "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+                "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+                "common/scripts/decision-orchestration.py": "3acb6b5c9fb0a0f4ebb8b432f996fad2b306e899001ffaa17f0b22cb219a8f20",
+                "common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+                "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+                "common/scripts/workflow-state.py": "3ecaa964defe0eb9858f4b269566f4c1d5a71cf22a009c7602683673d0c5d268",
+                "owned-profile": "0e93f9445017650c0ad5f608fc9c9d1222e9cbdad948b947baa49c4c5305fb93"
+              },
+              "mode": "auto",
+              "mode_epoch": 1,
+              "orchestration_id": "DO-0b9c94ba-78b3-5904-a5f0-74a670e629da",
+              "orchestration_revision": 2,
+              "question": {
+                "id": "representation",
+                "kind": "technical",
+                "options": [
+                  {
+                    "id": "json",
+                    "text": "A JSON object with a named value field."
+                  },
+                  {
+                    "id": "text",
+                    "text": "A minimal plain-text integer."
+                  }
+                ],
+                "recommendation": "json",
+                "significance": "significant",
+                "text": "Which representation fits the controlled fixture?"
+              },
+              "role": "resolver",
+              "role_receipts": {},
+              "schema": 1
+            },
+            "input_digest": "0e743aec535f81b1ea7e3e713ecdba3b3b1d36aef5659afd4a1f8e08878a3129"
+          },
+          "DA-58d8553e-9f1a-4aae-9b2f-794e316fb342": {
+            "attempt_id": "DA-58d8553e-9f1a-4aae-9b2f-794e316fb342",
+            "creation_evidence": {
+              "actor_context_id": "/root/core127_auto_critic",
+              "actor_id": "/root/core127_auto_critic",
+              "kind": "host-agent-created",
+              "provider": "Codex collaboration",
+              "reference": "core-auto-significant-event-4",
+              "tool": "collaboration.spawn_agent"
+            },
+            "input": {
+              "actor": {
+                "context_id": "/root/core127_auto_critic",
+                "id": "/root/core127_auto_critic"
+              },
+              "authority": {
+                "allowed_kinds": [
+                  "technical",
+                  "product",
+                  "specification-acceptance"
+                ],
+                "constraints": [
+                  "Temporary metadata-only qualification; no real product, network, publication, installation consent or external approval."
+                ],
+                "context_id": "core-auto-significant",
+                "evidence": {
+                  "kind": "owner-message",
+                  "reference": "Current Implement All authorizes required core127 qualification; fixture business facts and later owner inputs are controlled test data."
+                },
+                "id": "core127-fixture-grant",
+                "revision": 1
+              },
+              "authority_digest": "ee32fb235ed5cf1bbda63ebeb45967cb42fe8320df9a2bfd759b40bba4d9070e",
+              "context": {
+                "content_fingerprint": "ab32eebd95dbd1014c41e1a90020ff0a4b4a2e29cc3957f1f9a97828889b7f26",
+                "controlled_adversarial_critic": true,
+                "decision_purpose": "decision",
+                "execution_snapshot_digest": "623654994fe311444923b837e037f465d1509629436eb720254b0cdd1422b575",
+                "facts": [
+                  "Both JSON object and plain text are valid fixture representations.",
+                  "JSON permits future named fields; plain text minimizes bytes and shell integration.",
+                  "The significant Auto fixture deliberately asks the critic to exercise a substantive counterposition; arbitration transport is qualified, not spontaneous critique quality."
+                ],
+                "id": "core-auto-significant",
+                "kind": "request",
+                "orchestration_id": "DO-0b9c94ba-78b3-5904-a5f0-74a670e629da",
+                "semantic_fingerprint": "0f332ded5769108e3441323298a8c240a8f3c1d1aa3e7c2e8930f40daeeaf95c"
+              },
+              "creation_evidence": {
+                "actor_context_id": "/root/core127_auto_critic",
+                "actor_id": "/root/core127_auto_critic",
+                "kind": "host-agent-created",
+                "provider": "Codex collaboration",
+                "reference": "core-auto-significant-event-4",
+                "tool": "collaboration.spawn_agent"
+              },
+              "decision_hash": "48758a0ab374ebf27aa1057b9b4b2088eb198fa781f30872196000ee5e18f9e9",
+              "decision_id": "DG-61d83bfd-7fad-5823-a3f8-39e2fdcf629b",
+              "execution_snapshot": {
+                "common/references/decision-governance.md": "aad9b5b8c5e95b08c01ae59d120e9a200ade03ac725216cb20a47e6c57bff415",
+                "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+                "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+                "common/scripts/decision-orchestration.py": "3acb6b5c9fb0a0f4ebb8b432f996fad2b306e899001ffaa17f0b22cb219a8f20",
+                "common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+                "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+                "common/scripts/workflow-state.py": "3ecaa964defe0eb9858f4b269566f4c1d5a71cf22a009c7602683673d0c5d268",
+                "owned-profile": "0e93f9445017650c0ad5f608fc9c9d1222e9cbdad948b947baa49c4c5305fb93"
+              },
+              "mode": "auto",
+              "mode_epoch": 1,
+              "orchestration_id": "DO-0b9c94ba-78b3-5904-a5f0-74a670e629da",
+              "orchestration_revision": 4,
+              "question": {
+                "id": "representation",
+                "kind": "technical",
+                "options": [
+                  {
+                    "id": "json",
+                    "text": "A JSON object with a named value field."
+                  },
+                  {
+                    "id": "text",
+                    "text": "A minimal plain-text integer."
+                  }
+                ],
+                "recommendation": "json",
+                "significance": "significant",
+                "text": "Which representation fits the controlled fixture?"
+              },
+              "role": "critic",
+              "role_receipts": {
+                "resolver": "86ceb684f88ae99786a507b6a153b357eeccc2288816d79ea93e75b060096cec"
+              },
+              "schema": 1
+            },
+            "input_digest": "e00d1cf97b7a2c478c979bb59f36c67fbe062981eca055a6c34c6b592fd1186a"
+          },
+          "DA-c0737476-a99e-47f2-9399-6fb636c8273a": {
+            "attempt_id": "DA-c0737476-a99e-47f2-9399-6fb636c8273a",
+            "creation_evidence": {
+              "actor_context_id": "/root/core127_auto_arbiter",
+              "actor_id": "/root/core127_auto_arbiter",
+              "kind": "host-agent-created",
+              "provider": "Codex collaboration",
+              "reference": "core-auto-significant-event-6",
+              "tool": "collaboration.spawn_agent"
+            },
+            "input": {
+              "actor": {
+                "context_id": "/root/core127_auto_arbiter",
+                "id": "/root/core127_auto_arbiter"
+              },
+              "authority": {
+                "allowed_kinds": [
+                  "technical",
+                  "product",
+                  "specification-acceptance"
+                ],
+                "constraints": [
+                  "Temporary metadata-only qualification; no real product, network, publication, installation consent or external approval."
+                ],
+                "context_id": "core-auto-significant",
+                "evidence": {
+                  "kind": "owner-message",
+                  "reference": "Current Implement All authorizes required core127 qualification; fixture business facts and later owner inputs are controlled test data."
+                },
+                "id": "core127-fixture-grant",
+                "revision": 1
+              },
+              "authority_digest": "ee32fb235ed5cf1bbda63ebeb45967cb42fe8320df9a2bfd759b40bba4d9070e",
+              "context": {
+                "content_fingerprint": "ab32eebd95dbd1014c41e1a90020ff0a4b4a2e29cc3957f1f9a97828889b7f26",
+                "controlled_adversarial_critic": true,
+                "decision_purpose": "decision",
+                "execution_snapshot_digest": "623654994fe311444923b837e037f465d1509629436eb720254b0cdd1422b575",
+                "facts": [
+                  "Both JSON object and plain text are valid fixture representations.",
+                  "JSON permits future named fields; plain text minimizes bytes and shell integration.",
+                  "The significant Auto fixture deliberately asks the critic to exercise a substantive counterposition; arbitration transport is qualified, not spontaneous critique quality."
+                ],
+                "id": "core-auto-significant",
+                "kind": "request",
+                "orchestration_id": "DO-0b9c94ba-78b3-5904-a5f0-74a670e629da",
+                "semantic_fingerprint": "0f332ded5769108e3441323298a8c240a8f3c1d1aa3e7c2e8930f40daeeaf95c"
+              },
+              "creation_evidence": {
+                "actor_context_id": "/root/core127_auto_arbiter",
+                "actor_id": "/root/core127_auto_arbiter",
+                "kind": "host-agent-created",
+                "provider": "Codex collaboration",
+                "reference": "core-auto-significant-event-6",
+                "tool": "collaboration.spawn_agent"
+              },
+              "decision_hash": "74038d318521d150cf3ab26c8be320596d71df32b8206a855ec30830c1220c44",
+              "decision_id": "DG-61d83bfd-7fad-5823-a3f8-39e2fdcf629b",
+              "execution_snapshot": {
+                "common/references/decision-governance.md": "aad9b5b8c5e95b08c01ae59d120e9a200ade03ac725216cb20a47e6c57bff415",
+                "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+                "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+                "common/scripts/decision-orchestration.py": "3acb6b5c9fb0a0f4ebb8b432f996fad2b306e899001ffaa17f0b22cb219a8f20",
+                "common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+                "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+                "common/scripts/workflow-state.py": "3ecaa964defe0eb9858f4b269566f4c1d5a71cf22a009c7602683673d0c5d268",
+                "owned-profile": "0e93f9445017650c0ad5f608fc9c9d1222e9cbdad948b947baa49c4c5305fb93"
+              },
+              "mode": "auto",
+              "mode_epoch": 1,
+              "orchestration_id": "DO-0b9c94ba-78b3-5904-a5f0-74a670e629da",
+              "orchestration_revision": 6,
+              "question": {
+                "id": "representation",
+                "kind": "technical",
+                "options": [
+                  {
+                    "id": "json",
+                    "text": "A JSON object with a named value field."
+                  },
+                  {
+                    "id": "text",
+                    "text": "A minimal plain-text integer."
+                  }
+                ],
+                "recommendation": "json",
+                "significance": "significant",
+                "text": "Which representation fits the controlled fixture?"
+              },
+              "role": "arbiter",
+              "role_receipts": {
+                "critic": "97d442bd6816ad845101c219aa6b1c26b78b1310df3698d8ce9be3299e9bdaae",
+                "resolver": "86ceb684f88ae99786a507b6a153b357eeccc2288816d79ea93e75b060096cec"
+              },
+              "schema": 1
+            },
+            "input_digest": "14bd1e5dbc1e296ae34cc229339adb2162362562c18944419766594b87a8830e"
+          }
+        },
+        "authority": {
+          "allowed_kinds": [
+            "technical",
+            "product",
+            "specification-acceptance"
+          ],
+          "constraints": [
+            "Temporary metadata-only qualification; no real product, network, publication, installation consent or external approval."
+          ],
+          "context_id": "core-auto-significant",
+          "evidence": {
+            "kind": "owner-message",
+            "reference": "Current Implement All authorizes required core127 qualification; fixture business facts and later owner inputs are controlled test data."
+          },
+          "id": "core127-fixture-grant",
+          "revision": 1
+        },
+        "capabilities": {
+          "independent_actors": true
+        },
+        "checks": null,
+        "context": {
+          "content_fingerprint": "ab32eebd95dbd1014c41e1a90020ff0a4b4a2e29cc3957f1f9a97828889b7f26",
+          "controlled_adversarial_critic": true,
+          "facts": [
+            "Both JSON object and plain text are valid fixture representations.",
+            "JSON permits future named fields; plain text minimizes bytes and shell integration.",
+            "The significant Auto fixture deliberately asks the critic to exercise a substantive counterposition; arbitration transport is qualified, not spontaneous critique quality."
+          ],
+          "id": "core-auto-significant",
+          "kind": "request",
+          "semantic_fingerprint": "0f332ded5769108e3441323298a8c240a8f3c1d1aa3e7c2e8930f40daeeaf95c"
+        },
+        "execution_snapshot": {
+          "common/references/decision-governance.md": "aad9b5b8c5e95b08c01ae59d120e9a200ade03ac725216cb20a47e6c57bff415",
+          "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+          "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+          "common/scripts/decision-orchestration.py": "3acb6b5c9fb0a0f4ebb8b432f996fad2b306e899001ffaa17f0b22cb219a8f20",
+          "common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+          "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+          "common/scripts/workflow-state.py": "3ecaa964defe0eb9858f4b269566f4c1d5a71cf22a009c7602683673d0c5d268",
+          "owned-profile": "0e93f9445017650c0ad5f608fc9c9d1222e9cbdad948b947baa49c4c5305fb93"
+        },
+        "executor": {
+          "context_id": "/root",
+          "id": "/root"
+        },
+        "failure_observations": [],
+        "history": [
+          {
+            "detail": {},
+            "event": "start",
+            "phase": "research",
+            "previous_frame_hash": null,
+            "sequence": 1
+          },
+          {
+            "detail": {
+              "decision_id": "DG-61d83bfd-7fad-5823-a3f8-39e2fdcf629b",
+              "purpose": "decision"
+            },
+            "event": "question",
+            "phase": "research",
+            "previous_frame_hash": "1ffba1f6aa5f622d644802f56a1de18fed9d1ab456551d7e92b6d28b01ce891c",
+            "sequence": 2
+          },
+          {
+            "detail": {
+              "attempt_id": "DA-2221798e-ad7c-4cdc-9d5b-9ff060558d40",
+              "input_digest": "0e743aec535f81b1ea7e3e713ecdba3b3b1d36aef5659afd4a1f8e08878a3129"
+            },
+            "event": "prepare-actor",
+            "phase": "research",
+            "previous_frame_hash": "a8578ff9df2c7a7ce3be53a4d09dbf6a93d11050e7aa36c77219ceedf0540aab",
+            "sequence": 3
+          },
+          {
+            "detail": {
+              "attempt_id": "DA-2221798e-ad7c-4cdc-9d5b-9ff060558d40",
+              "status": "answered"
+            },
+            "event": "record-actor",
+            "phase": "research",
+            "previous_frame_hash": "9c97056d05c439537bc5aa376cbbb4200b01c1ce0043a35a8c89efb94cd6a0b7",
+            "sequence": 4
+          },
+          {
+            "detail": {
+              "attempt_id": "DA-58d8553e-9f1a-4aae-9b2f-794e316fb342",
+              "input_digest": "e00d1cf97b7a2c478c979bb59f36c67fbe062981eca055a6c34c6b592fd1186a"
+            },
+            "event": "prepare-actor",
+            "phase": "research",
+            "previous_frame_hash": "4be55765ed7d9972dfc329c19be4cd4789a9eb144141393bc9928ba7709d1300",
+            "sequence": 5
+          },
+          {
+            "detail": {
+              "attempt_id": "DA-58d8553e-9f1a-4aae-9b2f-794e316fb342",
+              "status": "disagree"
+            },
+            "event": "record-actor",
+            "phase": "research",
+            "previous_frame_hash": "4e9c44f36dca65024b98c1e09555c384eadfd2d820e216b227b97027f25b2025",
+            "sequence": 6
+          },
+          {
+            "detail": {
+              "attempt_id": "DA-c0737476-a99e-47f2-9399-6fb636c8273a",
+              "input_digest": "14bd1e5dbc1e296ae34cc229339adb2162362562c18944419766594b87a8830e"
+            },
+            "event": "prepare-actor",
+            "phase": "research",
+            "previous_frame_hash": "8dd926ddc37e6c810ac78955202ceaad3e2d13f9777f2ddf235ea8063b83d27e",
+            "sequence": 7
+          },
+          {
+            "detail": {
+              "attempt_id": "DA-c0737476-a99e-47f2-9399-6fb636c8273a",
+              "status": "answered"
+            },
+            "event": "record-actor",
+            "phase": "research",
+            "previous_frame_hash": "f9a9a7d68bea723a7b10425d043efad30cbcfa3283e17bf7291c33a6f319c9c1",
+            "sequence": 8
+          },
+          {
+            "detail": {
+              "acceptance_digest": "6bff329d7b382f9ed6fefee91fd4e6213d67e36600462529c4399a2affe0ec77",
+              "decision_id": "DG-61d83bfd-7fad-5823-a3f8-39e2fdcf629b"
+            },
+            "event": "accept-decision",
+            "phase": "research",
+            "previous_frame_hash": "5cb659728447e6d795b38cd6823a49d3963da41e7864213e9cead9a3dcff89b5",
+            "sequence": 9
+          }
+        ],
+        "id": "DO-0b9c94ba-78b3-5904-a5f0-74a670e629da",
+        "identity": null,
+        "mode": "auto",
+        "orchestration_hash": "36177939851b83bb41c32b9809184f7f2b73f687975e7174abc990902797a561",
+        "owner_question": null,
+        "phase": "research",
+        "phase_after_checks": "review",
+        "plan": null,
+        "plan_acceptance": null,
+        "prepared_actor": {
+          "attempt_id": "DA-c0737476-a99e-47f2-9399-6fb636c8273a",
+          "creation_evidence": {
+            "actor_context_id": "/root/core127_auto_arbiter",
+            "actor_id": "/root/core127_auto_arbiter",
+            "kind": "host-agent-created",
+            "provider": "Codex collaboration",
+            "reference": "core-auto-significant-event-6",
+            "tool": "collaboration.spawn_agent"
+          },
+          "input": {
+            "actor": {
+              "context_id": "/root/core127_auto_arbiter",
+              "id": "/root/core127_auto_arbiter"
+            },
+            "authority": {
+              "allowed_kinds": [
+                "technical",
+                "product",
+                "specification-acceptance"
+              ],
+              "constraints": [
+                "Temporary metadata-only qualification; no real product, network, publication, installation consent or external approval."
+              ],
+              "context_id": "core-auto-significant",
+              "evidence": {
+                "kind": "owner-message",
+                "reference": "Current Implement All authorizes required core127 qualification; fixture business facts and later owner inputs are controlled test data."
+              },
+              "id": "core127-fixture-grant",
+              "revision": 1
+            },
+            "authority_digest": "ee32fb235ed5cf1bbda63ebeb45967cb42fe8320df9a2bfd759b40bba4d9070e",
+            "context": {
+              "content_fingerprint": "ab32eebd95dbd1014c41e1a90020ff0a4b4a2e29cc3957f1f9a97828889b7f26",
+              "controlled_adversarial_critic": true,
+              "decision_purpose": "decision",
+              "execution_snapshot_digest": "623654994fe311444923b837e037f465d1509629436eb720254b0cdd1422b575",
+              "facts": [
+                "Both JSON object and plain text are valid fixture representations.",
+                "JSON permits future named fields; plain text minimizes bytes and shell integration.",
+                "The significant Auto fixture deliberately asks the critic to exercise a substantive counterposition; arbitration transport is qualified, not spontaneous critique quality."
+              ],
+              "id": "core-auto-significant",
+              "kind": "request",
+              "orchestration_id": "DO-0b9c94ba-78b3-5904-a5f0-74a670e629da",
+              "semantic_fingerprint": "0f332ded5769108e3441323298a8c240a8f3c1d1aa3e7c2e8930f40daeeaf95c"
+            },
+            "creation_evidence": {
+              "actor_context_id": "/root/core127_auto_arbiter",
+              "actor_id": "/root/core127_auto_arbiter",
+              "kind": "host-agent-created",
+              "provider": "Codex collaboration",
+              "reference": "core-auto-significant-event-6",
+              "tool": "collaboration.spawn_agent"
+            },
+            "decision_hash": "74038d318521d150cf3ab26c8be320596d71df32b8206a855ec30830c1220c44",
+            "decision_id": "DG-61d83bfd-7fad-5823-a3f8-39e2fdcf629b",
+            "execution_snapshot": {
+              "common/references/decision-governance.md": "aad9b5b8c5e95b08c01ae59d120e9a200ade03ac725216cb20a47e6c57bff415",
+              "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+              "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+              "common/scripts/decision-orchestration.py": "3acb6b5c9fb0a0f4ebb8b432f996fad2b306e899001ffaa17f0b22cb219a8f20",
+              "common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+              "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+              "common/scripts/workflow-state.py": "3ecaa964defe0eb9858f4b269566f4c1d5a71cf22a009c7602683673d0c5d268",
+              "owned-profile": "0e93f9445017650c0ad5f608fc9c9d1222e9cbdad948b947baa49c4c5305fb93"
+            },
+            "mode": "auto",
+            "mode_epoch": 1,
+            "orchestration_id": "DO-0b9c94ba-78b3-5904-a5f0-74a670e629da",
+            "orchestration_revision": 6,
+            "question": {
+              "id": "representation",
+              "kind": "technical",
+              "options": [
+                {
+                  "id": "json",
+                  "text": "A JSON object with a named value field."
+                },
+                {
+                  "id": "text",
+                  "text": "A minimal plain-text integer."
+                }
+              ],
+              "recommendation": "json",
+              "significance": "significant",
+              "text": "Which representation fits the controlled fixture?"
+            },
+            "role": "arbiter",
+            "role_receipts": {
+              "critic": "97d442bd6816ad845101c219aa6b1c26b78b1310df3698d8ce9be3299e9bdaae",
+              "resolver": "86ceb684f88ae99786a507b6a153b357eeccc2288816d79ea93e75b060096cec"
+            },
+            "schema": 1
+          },
+          "input_digest": "14bd1e5dbc1e296ae34cc229339adb2162362562c18944419766594b87a8830e"
+        },
+        "prerequisites": [],
+        "question_context": {
+          "content_fingerprint": "ab32eebd95dbd1014c41e1a90020ff0a4b4a2e29cc3957f1f9a97828889b7f26",
+          "controlled_adversarial_critic": true,
+          "decision_purpose": "decision",
+          "execution_snapshot_digest": "623654994fe311444923b837e037f465d1509629436eb720254b0cdd1422b575",
+          "facts": [
+            "Both JSON object and plain text are valid fixture representations.",
+            "JSON permits future named fields; plain text minimizes bytes and shell integration.",
+            "The significant Auto fixture deliberately asks the critic to exercise a substantive counterposition; arbitration transport is qualified, not spontaneous critique quality."
+          ],
+          "id": "core-auto-significant",
+          "kind": "request",
+          "orchestration_id": "DO-0b9c94ba-78b3-5904-a5f0-74a670e629da",
+          "semantic_fingerprint": "0f332ded5769108e3441323298a8c240a8f3c1d1aa3e7c2e8930f40daeeaf95c"
+        },
+        "question_decision_id": "DG-61d83bfd-7fad-5823-a3f8-39e2fdcf629b",
+        "question_purpose": "decision",
+        "question_sequence": 1,
+        "request_id": "core-auto-significant",
+        "resolutions": {},
+        "resolved_obligations": [],
+        "review": null,
+        "revision": 9,
+        "schema": 1,
+        "stagnation": {
+          "count": 0,
+          "key": null
+        },
+        "stagnation_limit": 3,
+        "start_digest": "5f080c43cd8c08238597748f5bb0b0be8e728fea0fb2f004729aecf100ad79e7"
+      },
+      "scenario_id": "core-auto-significant",
+      "sequence": 8
+    }
+  ],
+  "kind": "core-decision-native-capture",
+  "schema": 1,
+  "source_snapshot": {
+    "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    "common/scripts/decision-orchestration.py": "3acb6b5c9fb0a0f4ebb8b432f996fad2b306e899001ffaa17f0b22cb219a8f20",
+    "common/scripts/workflow-state.py": "3ecaa964defe0eb9858f4b269566f4c1d5a71cf22a009c7602683673d0c5d268"
+  }
+}

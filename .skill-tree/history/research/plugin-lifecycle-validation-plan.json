@@ -1,0 +1,33 @@
+{
+  "constraints": [
+    "Core and plugin transaction journals/backups remain separate under the same canonical locks.",
+    "Network acquisition finishes outside the synchronous activation lock; remote results have actual immutable identities.",
+    "Binary rollback creates a new registry generation without deleting current request/history evidence.",
+    "Composition consumes the pure registry module, avoiding a composer-lifecycle import cycle.",
+    "Source resource dependencies and installed-package dependency IDs remain separate."
+  ],
+  "format": "skill-tree-implementation-research",
+  "planned_modules": [
+    ".skill-tree/lib/plugin-registry.js",
+    ".skill-tree/lib/plugin-acquisition.js",
+    ".skill-tree/lib/plugin-lifecycle.js"
+  ],
+  "preserved": [
+    "Task IDs, relationships, priorities, dependencies and every acceptance criterion.",
+    "Current checkpoint/progress/claims and immutable terminal outcomes."
+  ],
+  "reason": "Source research separates authored validation inputs from generated runtime registry state and defines bounded lifecycle module seams.",
+  "recorded_at": "2026-11-06T03:12:13.513810+00:00",
+  "runtime_registry_input": "Removed from source check fingerprints only; runtime registry behavior remains mandatory in the mapped isolated-fixture tests.",
+  "schema": 1,
+  "source_refs": [
+    ".skill-tree/lib/installation.js",
+    ".skill-tree/lib/composer.js",
+    ".skill-tree/lib/plugin-sources.js",
+    ".skill-tree/lib/plugin-parameters.js"
+  ],
+  "task_ids": [
+    "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+    "T-10528edd-4542-4c26-b8b3-738ffc00d791"
+  ]
+}

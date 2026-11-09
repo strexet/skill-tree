@@ -1,0 +1,19 @@
+{
+  "actual_error": "Core source fingerprints differ from the current execution source",
+  "actual_exit_code": 1,
+  "format": "skill-tree-expected-strict-source-rejection",
+  "fresh_native_roles": false,
+  "immutable_historical_artifacts": {
+    ".skill-tree/history/validation/plugin-system/core127-native/capture.json": "65475548db6a70be601c337dd89ae6c7bddf545e0017eac053865ff8dc7e70b8",
+    ".skill-tree/history/validation/plugin-system/core127-native/grade.json": "19051bb3ebbde34778178ab8143791a90518cd78bcc54e2b2453ae03de16c95c",
+    ".skill-tree/history/validation/plugin-system/core127-native/qualification.json": "bb9feadfef705d7d50ca60b3463b4dc3247eebd1f2ad5fc790791867f75586a9",
+    ".skill-tree/history/validation/plugin-system/core127-native/report.json": "56f43d1e35d3d5381b0866f026c4517ce90017153faf703c5604b12656c5be99"
+  },
+  "metadata_written": false,
+  "qualification": "Actual current read-only strict validator rejection of immutable historical source evidence; not a passing current native grade or formal workflow check.",
+  "raw_output": ".skill-tree/artifacts/plugin-implementation/core127-after-ponytail116-expected-strict-rejection.txt",
+  "raw_output_sha256": "8549647c3a38488710f1fcdc90081e6a3cee1b1f61633e655c4c6dbf4b2ce2df",
+  "schema": 1,
+  "source_commit": "6725b379f6a8af018a203bed2c7c6a7448cd575f",
+  "validator_sha256": "0f7a79a83e69aad8c8f3a5c4d063b94616f1c6d786f0e13cc3027dee3401f49e"
+}

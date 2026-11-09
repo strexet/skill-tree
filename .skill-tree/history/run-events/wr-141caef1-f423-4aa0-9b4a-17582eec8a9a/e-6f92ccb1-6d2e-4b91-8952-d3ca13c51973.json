@@ -1,0 +1,376 @@
+{
+  "changes": [],
+  "checkpoint_after": {
+    "admission": {
+      "environment_id": "4d1be2a553210a1f2e81b45d5e3c7d0c0eceefadad15a7fcc0a4c195c4b690f9",
+      "flavor": "general",
+      "identity": "1fd25c38a896a61eefb001e4fd271e699e4f332f59e893228120700751c4b865"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ],
+    "completed_ids": [
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656"
+    ],
+    "completion_refs": {
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656": "O-7a007cdb-e2ba-45c5-b505-71b5157ba627",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e": "O-28f9fdea-3574-4241-a352-150610cdbd00"
+    },
+    "current_task_id": null,
+    "cycle_signature": "d3acf2b6ff39dad78ebe6e3c30c30b2b305ed96ccadc48390435b67c719c7def",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Implement both deferred Future tasks using skill-tree-implement-all and merge into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+    "limits": {},
+    "mode": "all",
+    "next_action": "deferred-processing",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "deferred-processing",
+    "processing_results": [],
+    "required_ids": [
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ],
+    "revalidated_checks": {
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e": [
+        {
+          "check": {
+            "assertion": "Owned profile discovery and the bundled validation documentation identify static-inspection as an assertion-only built-in fallback when no explicit recipe overrides the ID.",
+            "criteria": [
+              "Owned profile discovery and the bundled validation documentation identify static-inspection as an assertion-only built-in fallback when no explicit recipe overrides the ID."
+            ],
+            "id": "static-recipe-discovery-contract",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/lib/composer.js",
+              ".skill-tree/common/references/installation-profile.md",
+              ".skill-tree/common/references/validation-policy.md",
+              ".skill-tree/documents/install.md",
+              ".skill-tree/common/scripts/workflow-state.py"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "Owned profile discovery and the bundled validation documentation identify static-inspection as an assertion-only built-in fallback when no explicit recipe overrides the ID.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-d85f610b-fb49-4f4a-9572-b7a00ac1e3ad",
+            "classification": "executed-control",
+            "cleanup": "Read-only source and installed fixture evidence inspected.",
+            "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-static-recipe-discovery-contract-c-d85f610b-fb49-4f4a-9572-b7a00ac1e3ad.json",
+                "sha256": "2fb82838949ac9bae9c223711ceb5503faa6ad2ccb15318755a80ffb1c3ed5d3"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "1e115e489dc543e83a4a3d6efeacb3ebc6d080f53400af383bab7c70409ed8c6",
+            "payload_hash": "7b26f0b65c2e531b015d924d3b0ce6a6e11f5d1d688d4ed0a2f9c274359a6166",
+            "recorded_at": "2026-11-09T10:51:01.328241+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common/references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
+              ".skill-tree/common/references/validation-policy.md": "4b0370124139f3203f944e84f9c3768d5d1f9a693ee26bb70260425a3add42b6",
+              ".skill-tree/common/scripts/workflow-state.py": "7c4204c84fdc3518c11bf2e1466a41257a826ec9746a824fc10d3f367c23b4d2",
+              ".skill-tree/documents/install.md": "6174ac3a81a3072b45db28246d73886089ab13238f1e59708260b0fc1d4fba4a",
+              ".skill-tree/lib/composer.js": "9605ce43a0e99aff77dbf1e223dd7afcf326917753db7963de5bf1d61bdcd04b"
+            }
+          }
+        },
+        {
+          "check": {
+            "assertion": "An installed standalone fixture discovers the built-in fallback without an executable command and resolves the existing static assertion contract. An explicit recipe retains existing precedence.",
+            "criteria": [
+              "An installed standalone fixture discovers the built-in fallback without an executable command and resolves the existing static assertion contract. An explicit recipe retains existing precedence."
+            ],
+            "id": "installed-static-recipe-discovery",
+            "parameters": {
+              "test_path": ".skill-tree/tests/test-installation-integrity.js"
+            },
+            "recipe_id": "quality-node",
+            "sources": [
+              ".skill-tree/lib/composer.js",
+              ".skill-tree/tests/test-installation-integrity.js",
+              ".skill-tree/lib/installation.js",
+              ".skill-tree/common/scripts/workflow-state.py"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "unit",
+            "attempt_id": "C-1531c640-ad9d-4ce1-a151-4c0223dade7c",
+            "classification": "executed-control",
+            "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+            "counts": {
+              "discovered": 25,
+              "expected": 25,
+              "failed": 0,
+              "passed": 25,
+              "skipped": 0
+            },
+            "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+            "environment_identity": "fc8ee3019b8cb5546b19deb9d1d3afd37b78e6c0af3c82554015647de7ba59fd",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-1531c640-ad9d-4ce1-a151-4c0223dade7c.json",
+                "sha256": "2b63e5878f6534f45ad3ce8cc15465a40a36efae09a735a76e125b336c11f646"
+              },
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-1531c640-ad9d-4ce1-a151-4c0223dade7c.txt",
+                "sha256": "7a540ddcc9ab3e6545727508bf570b7c391f148fdbd27a9fc7179b6eb44fa81b"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "ace9b0caf71594231ea886b5215aa697f5b4d41cff983e1519d1d5c94fd7d784",
+            "payload_hash": "6d753a4c2650b615699665c840bf1e025cfd9308d76e2af18b7dad742b2013dd",
+            "recorded_at": "2026-11-09T10:51:00.019135+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common/scripts/workflow-state.py": "7c4204c84fdc3518c11bf2e1466a41257a826ec9746a824fc10d3f367c23b4d2",
+              ".skill-tree/lib/composer.js": "9605ce43a0e99aff77dbf1e223dd7afcf326917753db7963de5bf1d61bdcd04b",
+              ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+              ".skill-tree/tests/test-installation-integrity.js": "e35c56daaa49c70da68c82af216291a98494f83e2f4f927ab56302b603a4586c"
+            },
+            "timing": {
+              "tool_wall_seconds": 69.51605033315718
+            }
+          }
+        }
+      ]
+    },
+    "root_task_id": "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+    "snapshot": [
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656"
+    ],
+    "started_at": "2026-11-09T10:29:15.272535+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "23c34b77ae55363bfb4dc9fc2c2fa9f6abb2492b",
+      "branch": "codex/future-followups",
+      "local_base": true,
+      "local_base_authorization": "Owner explicitly requested Implement All for the two deferred Future tasks using the local codex/next-version base and local merge back.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a"
+    },
+    "workspace_state": "ready"
+  },
+  "checkpoint_before": {
+    "admission": {
+      "environment_id": "4d1be2a553210a1f2e81b45d5e3c7d0c0eceefadad15a7fcc0a4c195c4b690f9",
+      "flavor": "general",
+      "identity": "1fd25c38a896a61eefb001e4fd271e699e4f332f59e893228120700751c4b865"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ],
+    "completed_ids": [
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656"
+    ],
+    "completion_refs": {
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656": "O-7a007cdb-e2ba-45c5-b505-71b5157ba627",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e": "O-28f9fdea-3574-4241-a352-150610cdbd00"
+    },
+    "current_task_id": "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+    "cycle_signature": "d3acf2b6ff39dad78ebe6e3c30c30b2b305ed96ccadc48390435b67c719c7def",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Implement both deferred Future tasks using skill-tree-implement-all and merge into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+    "limits": {},
+    "mode": "all",
+    "next_action": "Select remaining due checks or finish the preserved run",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "validate",
+    "processing_results": [],
+    "required_ids": [
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ],
+    "revalidated_checks": {
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e": [
+        {
+          "check": {
+            "assertion": "Owned profile discovery and the bundled validation documentation identify static-inspection as an assertion-only built-in fallback when no explicit recipe overrides the ID.",
+            "criteria": [
+              "Owned profile discovery and the bundled validation documentation identify static-inspection as an assertion-only built-in fallback when no explicit recipe overrides the ID."
+            ],
+            "id": "static-recipe-discovery-contract",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/lib/composer.js",
+              ".skill-tree/common/references/installation-profile.md",
+              ".skill-tree/common/references/validation-policy.md",
+              ".skill-tree/documents/install.md",
+              ".skill-tree/common/scripts/workflow-state.py"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "Owned profile discovery and the bundled validation documentation identify static-inspection as an assertion-only built-in fallback when no explicit recipe overrides the ID.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-d85f610b-fb49-4f4a-9572-b7a00ac1e3ad",
+            "classification": "executed-control",
+            "cleanup": "Read-only source and installed fixture evidence inspected.",
+            "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-static-recipe-discovery-contract-c-d85f610b-fb49-4f4a-9572-b7a00ac1e3ad.json",
+                "sha256": "2fb82838949ac9bae9c223711ceb5503faa6ad2ccb15318755a80ffb1c3ed5d3"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "1e115e489dc543e83a4a3d6efeacb3ebc6d080f53400af383bab7c70409ed8c6",
+            "payload_hash": "7b26f0b65c2e531b015d924d3b0ce6a6e11f5d1d688d4ed0a2f9c274359a6166",
+            "recorded_at": "2026-11-09T10:51:01.328241+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common/references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
+              ".skill-tree/common/references/validation-policy.md": "4b0370124139f3203f944e84f9c3768d5d1f9a693ee26bb70260425a3add42b6",
+              ".skill-tree/common/scripts/workflow-state.py": "7c4204c84fdc3518c11bf2e1466a41257a826ec9746a824fc10d3f367c23b4d2",
+              ".skill-tree/documents/install.md": "6174ac3a81a3072b45db28246d73886089ab13238f1e59708260b0fc1d4fba4a",
+              ".skill-tree/lib/composer.js": "9605ce43a0e99aff77dbf1e223dd7afcf326917753db7963de5bf1d61bdcd04b"
+            }
+          }
+        },
+        {
+          "check": {
+            "assertion": "An installed standalone fixture discovers the built-in fallback without an executable command and resolves the existing static assertion contract. An explicit recipe retains existing precedence.",
+            "criteria": [
+              "An installed standalone fixture discovers the built-in fallback without an executable command and resolves the existing static assertion contract. An explicit recipe retains existing precedence."
+            ],
+            "id": "installed-static-recipe-discovery",
+            "parameters": {
+              "test_path": ".skill-tree/tests/test-installation-integrity.js"
+            },
+            "recipe_id": "quality-node",
+            "sources": [
+              ".skill-tree/lib/composer.js",
+              ".skill-tree/tests/test-installation-integrity.js",
+              ".skill-tree/lib/installation.js",
+              ".skill-tree/common/scripts/workflow-state.py"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "unit",
+            "attempt_id": "C-1531c640-ad9d-4ce1-a151-4c0223dade7c",
+            "classification": "executed-control",
+            "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+            "counts": {
+              "discovered": 25,
+              "expected": 25,
+              "failed": 0,
+              "passed": 25,
+              "skipped": 0
+            },
+            "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+            "environment_identity": "fc8ee3019b8cb5546b19deb9d1d3afd37b78e6c0af3c82554015647de7ba59fd",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-1531c640-ad9d-4ce1-a151-4c0223dade7c.json",
+                "sha256": "2b63e5878f6534f45ad3ce8cc15465a40a36efae09a735a76e125b336c11f646"
+              },
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-1531c640-ad9d-4ce1-a151-4c0223dade7c.txt",
+                "sha256": "7a540ddcc9ab3e6545727508bf570b7c391f148fdbd27a9fc7179b6eb44fa81b"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "ace9b0caf71594231ea886b5215aa697f5b4d41cff983e1519d1d5c94fd7d784",
+            "payload_hash": "6d753a4c2650b615699665c840bf1e025cfd9308d76e2af18b7dad742b2013dd",
+            "recorded_at": "2026-11-09T10:51:00.019135+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common/scripts/workflow-state.py": "7c4204c84fdc3518c11bf2e1466a41257a826ec9746a824fc10d3f367c23b4d2",
+              ".skill-tree/lib/composer.js": "9605ce43a0e99aff77dbf1e223dd7afcf326917753db7963de5bf1d61bdcd04b",
+              ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+              ".skill-tree/tests/test-installation-integrity.js": "e35c56daaa49c70da68c82af216291a98494f83e2f4f927ab56302b603a4586c"
+            },
+            "timing": {
+              "tool_wall_seconds": 69.51605033315718
+            }
+          }
+        }
+      ]
+    },
+    "root_task_id": "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+    "snapshot": [
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656"
+    ],
+    "started_at": "2026-11-09T10:29:15.272535+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "23c34b77ae55363bfb4dc9fc2c2fa9f6abb2492b",
+      "branch": "codex/future-followups",
+      "local_base": true,
+      "local_base_authorization": "Owner explicitly requested Implement All for the two deferred Future tasks using the local codex/next-version base and local merge back.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a"
+    },
+    "workspace_state": "ready"
+  },
+  "id": "E-6f92ccb1-6d2e-4b91-8952-d3ca13c51973",
+  "outcomes": [],
+  "progress_changes": [],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "run_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+  "schema": 1,
+  "sequence": 43
+}

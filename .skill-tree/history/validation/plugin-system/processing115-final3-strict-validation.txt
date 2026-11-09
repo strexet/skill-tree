@@ -1,0 +1,9 @@
+
+> skill-tree-skills@0.3.0 validate
+> python3 .skill-tree/scripts/validate-skill-repository.py --strict
+
+Stale manifest source digest: .skill-tree/common/references/future-workflow.md
+Stale manifest source digest: .skill-tree/common/references/workflow-metadata.md
+Stale manifest source digest: .skill-tree/common/scripts/plugin-processing.py
+Stale manifest source digest: .skill-tree/common/scripts/workflow-state.py
+Stale manifest source digest: .skill-tree/scripts/validate-skill-repository.py

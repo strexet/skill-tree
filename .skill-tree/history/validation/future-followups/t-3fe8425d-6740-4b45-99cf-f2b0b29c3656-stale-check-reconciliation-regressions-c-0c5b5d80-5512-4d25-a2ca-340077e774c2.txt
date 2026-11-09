@@ -1,0 +1,71 @@
+.............................EEFE........FE...
+======================================================================
+ERROR: test_reconcile_can_observe_a_removed_check_without_fabricating_a_current_key (__main__.WorkflowStateTests.test_reconcile_can_observe_a_removed_check_without_fabricating_a_current_key)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/tests/test-workflow-state.py", line 482, in test_reconcile_can_observe_a_removed_check_without_fabricating_a_current_key
+    self._bind_test_runner(request,runner)
+  File "/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/tests/test-workflow-state.py", line 272, in _bind_test_runner
+    inspection = wf.reconcile_check(self.store,request)
+                 ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'workflow_runtime' has no attribute 'reconcile_check'
+
+======================================================================
+ERROR: test_reconcile_only_closes_selected_scope_and_preserves_a_parked_run_and_red (__main__.WorkflowStateTests.test_reconcile_only_closes_selected_scope_and_preserves_a_parked_run_and_red)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/tests/test-workflow-state.py", line 530, in test_reconcile_only_closes_selected_scope_and_preserves_a_parked_run_and_red
+    self._bind_test_runner(request,runner)
+  File "/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/tests/test-workflow-state.py", line 272, in _bind_test_runner
+    inspection = wf.reconcile_check(self.store,request)
+                 ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'workflow_runtime' has no attribute 'reconcile_check'
+
+======================================================================
+ERROR: test_reconcile_rejects_fresh_moved_and_mismatched_cleanup_without_mutation (__main__.WorkflowStateTests.test_reconcile_rejects_fresh_moved_and_mismatched_cleanup_without_mutation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/tests/test-workflow-state.py", line 416, in test_reconcile_rejects_fresh_moved_and_mismatched_cleanup_without_mutation
+    binding = self._bind_test_runner(request,process)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/tests/test-workflow-state.py", line 272, in _bind_test_runner
+    inspection = wf.reconcile_check(self.store,request)
+                 ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'workflow_runtime' has no attribute 'reconcile_check'
+
+======================================================================
+ERROR: test_stale_unbound_attempt_rejects_retroactive_binding_and_cleanup (__main__.WorkflowStateTests.test_stale_unbound_attempt_rejects_retroactive_binding_and_cleanup)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/tests/test-workflow-state.py", line 460, in test_stale_unbound_attempt_rejects_retroactive_binding_and_cleanup
+    inspected = wf.reconcile_check(self.store,request)
+                ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'workflow_runtime' has no attribute 'reconcile_check'
+
+======================================================================
+FAIL: test_reconcile_preserves_old_pass_and_allows_fresh_check_after_verified_exit (__main__.WorkflowStateTests.test_reconcile_preserves_old_pass_and_allows_fresh_check_after_verified_exit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/tests/test-workflow-state.py", line 346, in test_reconcile_preserves_old_pass_and_allows_fresh_check_after_verified_exit
+    with self.assertRaises(wf.WorkflowError):
+AssertionError: WorkflowError not raised
+
+======================================================================
+FAIL: test_stale_check_inspection_uses_the_cli_without_writes (__main__.WorkflowStateTests.test_stale_check_inspection_uses_the_cli_without_writes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/tests/test-workflow-state.py", line 326, in test_stale_check_inspection_uses_the_cli_without_writes
+    self.assertEqual(probe.returncode,0,probe.stdout+probe.stderr)
+AssertionError: 2 != 0 : usage: workflow-state.py [-h] [--id ID] [--names [NAMES ...]] [--input INPUT]
+                         [--mode {next,all}] [--component COMPONENT] [--apply]
+                         [--expected-source-hash EXPECTED_SOURCE_HASH]
+                         [--run-id RUN_ID]
+                         {accept-revalidation,admit,advance,audit,begin,capture-foundation,checkpoint,clarify-answer,clarify-cancel,clarify-confirm,clarify-processing-adopt,clarify-processing-contribute,clarify-processing-recheck,clarify-read,clarify-resume,clarify-revise,clarify-round,clarify-start,clarify-switch-mode,complete,cycle,decision-accept,decision-prepare,decision-read,decision-reconcile,decision-record,decision-resume,decision-start,decision-switch,environment,export-run,finish,focus-maintenance,history,hook-accept,hook-invoke,hook-next,hook-pending,hook-prepare,hook-read,hook-reconcile,hook-record,hook-resume,hook-start,implemented,index,intake,local-delivery-admit-retained,local-delivery-admit-target,local-delivery-complete,local-delivery-merge,local-delivery-prepare,local-delivery-reconcile,local-delivery-status,local-delivery-validate,manifest,next,orchestration-accept-decision,orchestration-accept-plan,orchestration-checks,orchestration-fix,orchestration-implement,orchestration-next,orchestration-observe-failure,orchestration-plan,orchestration-prepare-actor,orchestration-question,orchestration-read,orchestration-reconcile-actor,orchestration-record-actor,orchestration-research,orchestration-resolve,orchestration-resume,orchestration-review,orchestration-start,orchestration-switch-mode,pending,prepare-check,process,prune,read,record-check,recover-locator,recover-workspace,refresh,replay-events,resource,resume-task,reuse-check,runs,select,start,workspace-setup}
+                         root
+workflow-state.py: error: argument command: invalid choice: 'reconcile-check' (choose from 'accept-revalidation', 'admit', 'advance', 'audit', 'begin', 'capture-foundation', 'checkpoint', 'clarify-answer', 'clarify-cancel', 'clarify-confirm', 'clarify-processing-adopt', 'clarify-processing-contribute', 'clarify-processing-recheck', 'clarify-read', 'clarify-resume', 'clarify-revise', 'clarify-round', 'clarify-start', 'clarify-switch-mode', 'complete', 'cycle', 'decision-accept', 'decision-prepare', 'decision-read', 'decision-reconcile', 'decision-record', 'decision-resume', 'decision-start', 'decision-switch', 'environment', 'export-run', 'finish', 'focus-maintenance', 'history', 'hook-accept', 'hook-invoke', 'hook-next', 'hook-pending', 'hook-prepare', 'hook-read', 'hook-reconcile', 'hook-record', 'hook-resume', 'hook-start', 'implemented', 'index', 'intake', 'local-delivery-admit-retained', 'local-delivery-admit-target', 'local-delivery-complete', 'local-delivery-merge', 'local-delivery-prepare', 'local-delivery-reconcile', 'local-delivery-status', 'local-delivery-validate', 'manifest', 'next', 'orchestration-accept-decision', 'orchestration-accept-plan', 'orchestration-checks', 'orchestration-fix', 'orchestration-implement', 'orchestration-next', 'orchestration-observe-failure', 'orchestration-plan', 'orchestration-prepare-actor', 'orchestration-question', 'orchestration-read', 'orchestration-reconcile-actor', 'orchestration-record-actor', 'orchestration-research', 'orchestration-resolve', 'orchestration-resume', 'orchestration-review', 'orchestration-start', 'orchestration-switch-mode', 'pending', 'prepare-check', 'process', 'prune', 'read', 'record-check', 'recover-locator', 'recover-workspace', 'refresh', 'replay-events', 'resource', 'resume-task', 'reuse-check', 'runs', 'select', 'start', 'workspace-setup')
+
+
+----------------------------------------------------------------------
+Ran 46 tests in 14.094s
+
+FAILED (failures=2, errors=4)

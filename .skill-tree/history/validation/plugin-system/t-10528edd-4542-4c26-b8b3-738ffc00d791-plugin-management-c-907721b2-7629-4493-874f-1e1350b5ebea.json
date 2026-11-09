@@ -1,0 +1,45 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-plugin-management.js"
+  ],
+  "attempt_id": "C-907721b2-7629-4493-874f-1e1350b5ebea",
+  "check_id": "plugin-management",
+  "counts": {
+    "discovered": 16,
+    "expected": 16,
+    "failed": 0,
+    "passed": 16,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-10528edd-4542-4c26-b8b3-738ffc00d791-plugin-management-c-907721b2-7629-4493-874f-1e1350b5ebea.txt",
+  "result": "pass",
+  "reviewed_failure_reason": null,
+  "source_fingerprints": {
+    ".skill-tree/bin/install.js": "f322a379cd0f5846645d0e77cb6ac1bf36f4b479fa3ee9cbc5333e1714d6aa5f",
+    ".skill-tree/documents/implementation-plan.md": "73692c86132c37dc8be19457f9bf33dc6ff87027cfad50de85a361bca6f09606",
+    ".skill-tree/documents/install.md": "854642d0f9d5d75b466c454050da34e12e07526a4ec8c59a4e833acfcb7dbe9c",
+    ".skill-tree/documents/plugin-installation-contract.md": "18620f033fb0ba02db8f12244e23cbd95b06c3a127a798a965b54ab979811bde",
+    ".skill-tree/documents/plugin-management-contract.md": "2b5c9aeb18dd30b06a809fd14e5222abf579a002187870167d61f6f7dda5b11a",
+    ".skill-tree/documents/plugin-system-contract.md": "b25424efd0dc920376a8d32b9dd7ea27d6b644d966e167f690c8999dc2fa36f5",
+    ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84",
+    ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+    ".skill-tree/lib/installation.js": "2aefd416b8c2fcfa7f58cd75f78092e2c3c65f8a54b52437c7b29250b1dfcbf8",
+    ".skill-tree/lib/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
+    ".skill-tree/lib/plugin-composition.js": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d",
+    ".skill-tree/lib/plugin-lifecycle.js": "a58cfcfaf96b5d6ecc8af144a5556446a62a0bb88f0837b0df706bb130e74717",
+    ".skill-tree/lib/plugin-management.js": "1b530f7e5f3c2dab029c1d36e0b8a57b2a082815e154d01b9e7236b96d5fcd6e",
+    ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    ".skill-tree/lib/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+    ".skill-tree/lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+    ".skill-tree/lib/plugins.js": "ac1953986cb59aca438f29202816f7c5bcdbc0f156651b0ef88819dd00ea2acc",
+    ".skill-tree/tests/test-plugin-management.js": "db4448500efd2c6224b881beb9859cfe24d5a7c520ed3b8c017b1dedfb3d0d28"
+  },
+  "task_id": "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+  "tool_wall_seconds": 33.35962525010109
+}

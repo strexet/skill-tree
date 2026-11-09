@@ -1,0 +1,204 @@
+{
+  "decision": "W3",
+  "ordering": "Installer design precedes source/parameter foundation; lifecycle precedes binding composition; manager follows lifecycle/registry/bindings without depending on recommendation experiments.",
+  "prioritized_handoff": [
+    {
+      "depends_on": [
+        "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+        "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+        "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+        "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+      ],
+      "id": "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad",
+      "priority": 131,
+      "status": "Ready",
+      "title": "Implement the core Skill Tree Plugins management operation"
+    },
+    {
+      "depends_on": [
+        "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+        "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5"
+      ],
+      "id": "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+      "priority": 130,
+      "status": "Ready",
+      "title": "Implement extensible all-operation and named plugin bindings"
+    },
+    {
+      "depends_on": [
+        "T-2da07d09-0b1a-4407-b375-defd23720387",
+        "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc"
+      ],
+      "id": "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+      "priority": 129,
+      "status": "Ready",
+      "title": "Implement open skill source import and parameter resolution"
+    },
+    {
+      "depends_on": [
+        "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc"
+      ],
+      "id": "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "priority": 123,
+      "status": "Ready",
+      "title": "Specify plugin selection and consent behavior for installation"
+    },
+    {
+      "depends_on": [
+        "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+        "T-2da07d09-0b1a-4407-b375-defd23720387",
+        "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9"
+      ],
+      "id": "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "priority": 120,
+      "status": "Ready",
+      "title": "Implement pinned external plugin package lifecycle"
+    },
+    {
+      "depends_on": [
+        "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+        "T-787453a8-2643-48c1-8715-9626d67d5e0e"
+      ],
+      "id": "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "priority": 119,
+      "status": "Ready",
+      "title": "Compose selected plugin hooks into standalone operations"
+    },
+    {
+      "depends_on": [
+        "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+      ],
+      "id": "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "priority": 118,
+      "status": "Ready",
+      "title": "Implement resumable plugin invocation and result receipts"
+    },
+    {
+      "depends_on": [
+        "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5"
+      ],
+      "id": "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "priority": 117,
+      "status": "Ready",
+      "title": "Expose the installed plugin registry and exact-ID removal"
+    },
+    {
+      "depends_on": [
+        "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+      ],
+      "id": "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "priority": 116,
+      "status": "Ready",
+      "title": "Integrate the pinned development-mode review pilot"
+    },
+    {
+      "depends_on": [
+        "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+        "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+      ],
+      "id": "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "priority": 115,
+      "status": "Ready",
+      "title": "Integrate post-processing interviews and task rework"
+    },
+    {
+      "depends_on": [
+        "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+        "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+      ],
+      "id": "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "priority": 114,
+      "status": "Ready",
+      "title": "Qualify shortlisted plugins against workflow baselines"
+    },
+    {
+      "depends_on": [
+        "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+        "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5"
+      ],
+      "id": "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "priority": 112,
+      "status": "Ready",
+      "title": "Implement the workflow-grouped catalog and evidence-backed bundles"
+    },
+    {
+      "depends_on": [
+        "T-2da07d09-0b1a-4407-b375-defd23720387",
+        "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+        "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+        "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+        "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad"
+      ],
+      "id": "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "priority": 110,
+      "status": "Ready",
+      "title": "Implement confirmed recommended and alternative plugin installation"
+    }
+  ],
+  "receipt": {
+    "created_ids": [
+      "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+      "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+      "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad"
+    ],
+    "dispositions": {
+      "P-539a810d-cdb5-4901-bbfe-a2344698b78f": {
+        "reason": "Source research and actual W3 direction define a required acyclic descendant with observable acceptance and existing validation recipes.",
+        "status": "promoted"
+      },
+      "P-a3796e30-9b57-4c28-89b2-39db50a9bd93": {
+        "reason": "Source research and actual W3 direction define a required acyclic descendant with observable acceptance and existing validation recipes.",
+        "status": "promoted"
+      },
+      "P-edc462d9-992f-4c74-ab0a-b4e573109e7d": {
+        "reason": "Source research and actual W3 direction define a required acyclic descendant with observable acceptance and existing validation recipes.",
+        "status": "promoted"
+      }
+    },
+    "id": "PR-9ffb62ea-745b-4d44-a772-dad8d1c35f5b",
+    "reused_ids": [],
+    "selected_ids": [
+      "P-539a810d-cdb5-4901-bbfe-a2344698b78f",
+      "P-edc462d9-992f-4c74-ab0a-b4e573109e7d",
+      "P-a3796e30-9b57-4c28-89b2-39db50a9bd93"
+    ],
+    "task_keys": {
+      "extensible-bindings": "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+      "open-sources": "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+      "plugins-manager": "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad"
+    }
+  },
+  "record_kind": "scoped-required-processing",
+  "research": [
+    "Current installer ownership/rollback and composer/resource-map sources",
+    "Existing registry/lifecycle/invocation/catalog check plans and exact dependency graph",
+    "Approved W1/W2 source/current manual baseline and W3 owner direction",
+    "Agent Skills primary specification and official Anthropic skill packaging"
+  ],
+  "schema": 1,
+  "scope": "The initial fifteen roots remain unchanged; three required descendants are admitted through the scoped processing receipt. No feature implementation or universal host execution is claimed.",
+  "selected_pending_ids": [
+    "P-539a810d-cdb5-4901-bbfe-a2344698b78f",
+    "P-edc462d9-992f-4c74-ab0a-b4e573109e7d",
+    "P-a3796e30-9b57-4c28-89b2-39db50a9bd93"
+  ],
+  "updated_existing_ids": [
+    "T-2da07d09-0b1a-4407-b375-defd23720387",
+    "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+    "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+    "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+    "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+    "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+    "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+  ],
+  "validation": {
+    "acceptance_check_mapping": "pass",
+    "admitted_scope": 18,
+    "completed_roots_unchanged": 5,
+    "dependency_graph": "pass",
+    "frozen_roots": 15,
+    "new_features_implemented": false
+  }
+}

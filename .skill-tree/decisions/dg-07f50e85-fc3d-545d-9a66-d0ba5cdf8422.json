@@ -1,0 +1,323 @@
+{
+  "acceptance": {
+    "actor": {
+      "context_id": "/root/invocation118_plan_resolver",
+      "id": "/root/invocation118_plan_resolver"
+    },
+    "answer": "accept",
+    "attempt_id": "DA-8c755c9e-328a-4be7-b7aa-dff822d17ec3",
+    "authority_digest": "386e89783ad8d71fca68376613f39c580f267b8f2e21088fb88a3e3ca052ec1c",
+    "context_identity": {
+      "decision_purpose": "plan",
+      "execution_snapshot_digest": "d4c331a3e65b029b9719b4e87e22219b0cbbeb45f8d9f8307295fa5f31cdcfd9",
+      "id": "task:T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "kind": "task",
+      "orchestration_id": "DO-1c975780-f773-56bd-a6ad-4556feb2037b",
+      "plan_digest": "161a71ec19ab4830605e63494d29c3aab01b9740f989e1a1b9e4c219e64a95dc",
+      "required_checks_digest": "8427c0a28c4de42473e55307d5b742f300bbb061e6886ab399f65744643c9cc4",
+      "task_ids": [
+        "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+      ]
+    },
+    "decision_id": "DG-07f50e85-fc3d-545d-9a66-d0ba5cdf8422",
+    "digest": "56a231f7f8108f71e393a26ed40fcf6f9dc0ddab3ccd81f3fe2162eed2372528",
+    "kind": "specification-acceptance",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/invocation118_plan_resolver",
+      "actor_id": "/root/invocation118_plan_resolver",
+      "creation_reference": "Actual root native creation /root/invocation118_plan_resolver; fork_turns none, initially idle.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/invocation118_plan_resolver returned matching sealed JSON in collaboration.final answer.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "27dc78e3bbaafb6cc73d560c29cb409eee3de18ba6915b8e92e477f0ccef1c7e",
+    "question_id": "invocation118-plan",
+    "rationale": "The plan covers task118's guarded occurrence identity, frozen configuration, sequential current-context delivery, replay/recovery and standalone installation requirements. JS retains parameter identity authority; secret delivery stays ephemeral. Existing clarification revision permits B's task-content incorporation before final confirmation, while final readiness retains current core acceptance and checks. The finite source-backed Codex observation uses independent host evidence and semantic controls without claiming native Skill execution, real-human approval or comparative qualification.",
+    "role_receipts": {
+      "critic": "a9d816808a03a74a8d7a1ba3872cb18a449337bb854158dce1cffab0d3394830",
+      "resolver": "3d7f4a29b1e4ecb25f2cfc3a69d947f7812b52d1214174f02c39af531889f422"
+    },
+    "semantic_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96"
+  },
+  "active_attempt_id": null,
+  "attempts": {
+    "DA-8c755c9e-328a-4be7-b7aa-dff822d17ec3": {
+      "actor": {
+        "context_id": "/root/invocation118_plan_resolver",
+        "id": "/root/invocation118_plan_resolver"
+      },
+      "authority_digest": "386e89783ad8d71fca68376613f39c580f267b8f2e21088fb88a3e3ca052ec1c",
+      "basis_digest": null,
+      "content_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+      "evidence": {
+        "actor_context_id": "/root/invocation118_plan_resolver",
+        "actor_id": "/root/invocation118_plan_resolver",
+        "creation_reference": "Actual root native creation /root/invocation118_plan_resolver; fork_turns none, initially idle.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/invocation118_plan_resolver returned matching sealed JSON in collaboration.final answer.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-8c755c9e-328a-4be7-b7aa-dff822d17ec3",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "27dc78e3bbaafb6cc73d560c29cb409eee3de18ba6915b8e92e477f0ccef1c7e",
+      "result": {
+        "answer": "accept",
+        "input_digest": "535f0e3601ed89dc01670e1c16265f07d6468f705d791978f497f0587a259ae4",
+        "rationale": "The plan covers task118's guarded occurrence identity, frozen configuration, sequential current-context delivery, replay/recovery and standalone installation requirements. JS retains parameter identity authority; secret delivery stays ephemeral. Existing clarification revision permits B's task-content incorporation before final confirmation, while final readiness retains current core acceptance and checks. The finite source-backed Codex observation uses independent host evidence and semantic controls without claiming native Skill execution, real-human approval or comparative qualification.",
+        "status": "answered"
+      },
+      "role": "resolver",
+      "semantic_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+      "status": "answered"
+    },
+    "DA-af9950aa-532d-4f5c-9b8d-1db0406b203c": {
+      "actor": {
+        "context_id": "/root/invocation118_plan_critic",
+        "id": "/root/invocation118_plan_critic"
+      },
+      "authority_digest": "386e89783ad8d71fca68376613f39c580f267b8f2e21088fb88a3e3ca052ec1c",
+      "basis_digest": "9a91d89d8a724ffafff3d1527f1b25202abb5336d4f0c7823405c08faf9a005f",
+      "content_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+      "evidence": {
+        "actor_context_id": "/root/invocation118_plan_critic",
+        "actor_id": "/root/invocation118_plan_critic",
+        "creation_reference": "Actual root native creation /root/invocation118_plan_critic; fork_turns none, initially idle.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/invocation118_plan_critic returned matching sealed JSON in collaboration.final answer.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-af9950aa-532d-4f5c-9b8d-1db0406b203c",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "27dc78e3bbaafb6cc73d560c29cb409eee3de18ba6915b8e92e477f0ccef1c7e",
+      "result": {
+        "answer": "accept",
+        "input_digest": "b179ea20083a3ea6ed156068ece1fdc3fb29669d21b20c9a81bb7b28221ac3db",
+        "rationale": "The plan matches canonical task118 and the resolver's acceptance. Current clarify-revise permits guarded task incorporation before final clarification confirmation, so B can update the context consumed by A2 without a confirmation deadlock; final readiness still requires current acceptance and checks. The plan preserves JS parameter identity, keeps resolved secrets ephemeral, places Node preparation and host calls outside writer locks, and explicitly checks task-free pending/uncertain invocations before the installer's no-Future return. Independent capture and semantic oracle controls support the narrowly labelled source-backed qualification. The six-context, twelve-request, 1800-second ceiling includes cleanup and excludes comparative trials, fabricated owner approval and publication authority.",
+        "status": "agree"
+      },
+      "role": "critic",
+      "semantic_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+      "status": "agree"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the approved task and dependency scope, including the finite controlled source-backed adapter qualification. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+    ],
+    "context_id": "task:T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+    },
+    "id": "approved-invocation118",
+    "revision": 1
+  },
+  "authority_digest": "386e89783ad8d71fca68376613f39c580f267b8f2e21088fb88a3e3ca052ec1c",
+  "context": {
+    "content_fingerprint": "70e46d34fab96448db4ee53866e8b1523aa3e0365eabaea97cf6a4e86567f9db",
+    "decision_purpose": "plan",
+    "execution_snapshot_digest": "d4c331a3e65b029b9719b4e87e22219b0cbbeb45f8d9f8307295fa5f31cdcfd9",
+    "id": "task:T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+    "kind": "task",
+    "orchestration_id": "DO-1c975780-f773-56bd-a6ad-4556feb2037b",
+    "plan_digest": "161a71ec19ab4830605e63494d29c3aab01b9740f989e1a1b9e4c219e64a95dc",
+    "required_checks_digest": "8427c0a28c4de42473e55307d5b742f300bbb061e6886ab399f65744643c9cc4",
+    "semantic_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+    "task_ids": [
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+    ]
+  },
+  "decision_hash": "4e5a831a36af35c576e2d21c89d810ceba313b9acf819cc8b78162cd2a27bcf0",
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "frontier_epoch": 1,
+  "history": [
+    {
+      "context_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+      "detail": {},
+      "event": "started",
+      "mode_epoch": 1,
+      "previous_record_hash": null,
+      "sequence": 1
+    },
+    {
+      "context_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+      "detail": {
+        "attempt_id": "DA-8c755c9e-328a-4be7-b7aa-dff822d17ec3",
+        "role": "resolver"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "698eaafbaa165a984213389dcd16aebe4986e41bca06bbdc818469ff01eb1bae",
+      "sequence": 2
+    },
+    {
+      "context_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+      "detail": {
+        "attempt_id": "DA-8c755c9e-328a-4be7-b7aa-dff822d17ec3",
+        "status": "answered"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "5d43e03bf09c6e653a7c95b612c11b6a9a0febf3d250e812e1cbb7fa56fbab30",
+      "sequence": 3
+    },
+    {
+      "context_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+      "detail": {
+        "attempt_id": "DA-af9950aa-532d-4f5c-9b8d-1db0406b203c",
+        "role": "critic"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "d3b713c00a5e99765d6b1f486a754593121bcc5c804f53f570d9700a881ff3f8",
+      "sequence": 4
+    },
+    {
+      "context_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+      "detail": {
+        "attempt_id": "DA-af9950aa-532d-4f5c-9b8d-1db0406b203c",
+        "status": "agree"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "f582b185250a6b2538950e47f9c2138ccfab5d5b0df66c9ac8dd3af73b5cfde7",
+      "sequence": 5
+    },
+    {
+      "context_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+      "detail": {
+        "acceptance_digest": "56a231f7f8108f71e393a26ed40fcf6f9dc0ddab3ccd81f3fe2162eed2372528"
+      },
+      "event": "accept",
+      "mode_epoch": 1,
+      "previous_record_hash": "575a772b029b125f5460b6ef92ffa180a2476434f2686a36f029f8cae146282c",
+      "sequence": 6
+    },
+    {
+      "context_fingerprint": "fca96414b17579a4b7cef4a9bfa7c2d4f0d47fa77403474ac12d2f6674d68939",
+      "detail": {
+        "previous_context": {
+          "content_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+          "decision_purpose": "plan",
+          "execution_snapshot_digest": "d4c331a3e65b029b9719b4e87e22219b0cbbeb45f8d9f8307295fa5f31cdcfd9",
+          "id": "task:T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+          "kind": "task",
+          "orchestration_id": "DO-1c975780-f773-56bd-a6ad-4556feb2037b",
+          "plan_digest": "161a71ec19ab4830605e63494d29c3aab01b9740f989e1a1b9e4c219e64a95dc",
+          "required_checks_digest": "8427c0a28c4de42473e55307d5b742f300bbb061e6886ab399f65744643c9cc4",
+          "semantic_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+          "task_ids": [
+            "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+          ]
+        },
+        "previous_question": {
+          "id": "invocation118-plan",
+          "kind": "specification-acceptance",
+          "options": [
+            {
+              "id": "accept",
+              "text": "Accept the current plan."
+            },
+            {
+              "id": "revise",
+              "text": "Revise the plan with concrete reasons."
+            }
+          ],
+          "plan_text": "# Resumable Plugin Invocation Plan\n\n## Authorized result\n\nTask T-dae414c5-43e4-45db-a6f3-4ce4112440c5 adds guarded resumable plugin execution receipts to the qualified composition boundary. Actual host tools execute outside metadata locks. The initial supported mechanism is an honestly labelled source-backed Codex instruction/resource context. A native Skill tool remains unclaimed. Catalog recommendation experiments, specialist pilot policy and public management retain separate tasks.\n\n## State and integration\n\n1. A standalone `plugin-invocation.py` engine uses the existing Store protocol and one HC record under `.skill-tree/invocations/`. Neutral task-free commands create no Future, controller or fabricated task. Records bind revisions, hashes, operation/event, typed scope, ordered definitions, exact package/resource identities, mode/authority, explicit overrides, cursor, original attempts and historical context transitions.\n2. `hook-start`, `hook-next`, `hook-prepare`, `hook-invoke`, `hook-record`, `hook-accept`, `hook-reconcile` and `hook-resume` separate selection, original attempt creation, actual host start, returned transport result, accepted incorporation and final readiness. Questions, findings, unavailable actors and uncertain attempts retain unresolved obligations. Duplicate delivery reconciles the original result; conflicting replay, stale input and active recursive re-entry reject mutation.\n3. Ordered definitions remain frozen; selection and each envelope use the latest accepted context at the cursor. Earlier completed-prefix receipts keep the original stage input. B incorporation uses ordinary guarded core revision evidence before A2; incorporation does not require final CL confirmation or Ready status. Final readiness remains blocked until the full chain and applicable current core acceptance/checks qualify.\n4. The owned JS resolver remains authoritative for effective values, condition selection and parameter/delivery identity. Python never substitutes a differently formatted JSON digest for the JS parameter digest. Configuration references, ephemeral resolved delivery values and whole-envelope identity remain separate. Secret values reach only the permitted invocation context and never ordinary ledgers, previews, history, exports or persisted sealed files. Nonsecret marker fixtures qualify native forwarding; a fake provider qualifies secret separation without claiming a real service integration.\n5. Owned Node preparation and actual host calls occur before/outside the writer lock. Preparation captures trusted inventory/scope proofs; the writer then rechecks relevant inputs and compare-and-swap guards through reads. Ordinary CL/DO/processing helpers apply proposed changes separately. Acceptance verifies the exact recorded before/after transition; an interrupted incorporation remains blocked and reconciles actual core history.\n6. Workflow and PR adapters expose the engine and enforce live registered chain obligations without replacing authorization, required checks or independent approval. Source-only owned Python loading protects new entry paths against matching bytecode-cache substitution. Store snapshots include invocation files; controller metadata retains frozen references without a schema migration. Installer and lifecycle barriers inspect pending/uncertain invocation records before the no-Future early return. Malformed records and uncertain originals retain prerequisites.\n7. Resource maps and bootstrap inventories contain the new standalone helper closure. Composition resolves only the explicitly supported adapter planning prerequisite; missing capabilities, unresolved anchors, changed ownership/configuration and stale scope remain prerequisites. Pilot115 owns atomic post-processing/editor/interview policy and final specification acceptance; pilot116 owns Ponytail attachment and current PR policy.\n\n## Requirements-led qualification\n\nPython state and bridge controls cover exact JSON and extra instructions, nested/Unicode/exponent values, reserved-looking data, secret separation, task-free/Pending/task/review scope, replay/conflicts, stale source/profile/review identities, explicit frozen overrides, failure/question/rework/unknown recovery, recursion and same-package occurrence independence. A-to-B-to-A controls verify current accepted context, retained prefix evidence and interrupted incorporation. Pending task-free invocations prevent installation/replacement and participate in ordinary CAS recovery.\n\nCopied general/web/unity fixtures remove source and siblings, retain dynamic operation registration, verify resources and source-only runtime loading, and preserve no-plugin behavior without optional tools or queue creation. A required oracle suite independently rejects semantic capture corruptions while retaining valid checksums.\n\n## Bounded actual host observation\n\nThree real isolated actors load controlled installed plugin resources and sealed inputs in A1, B and A2 order. Distinct upstream, JSON-parameter and extra-instruction nonces establish actual forwarding. B returns a proposed T-task addition. The parent incorporates the proposal through ordinary guarded clarification revision using explicitly scripted Manual fixture-owner input. A2 reads the incorporated addition. Final fixture confirmation follows the chain; scripted fixture inputs never supply real-human business approval.\n\nThe parent separately captures actual creation/dispatch/result events, actor/context identities, exact resource/input/output bindings and ordinary core revision evidence. The oracle compares expected nonce values and actual before/after task bytes rather than actor-supplied success flags. Missing native events, collapsed occurrences, reordered incorporation, changed markers/context, unresolved originals and invented human/native provenance reject qualification. Unexposed exact model, native call IDs, tokens and cost remain null.\n\nLimits are six new qualification contexts, twelve explicit spawn/follow-up requests and 1,800 total wall seconds including cleanup. The final sixty seconds remain cleanup reserve. Nominal execution uses three contexts and six requests. Reserve permits one corrected-source rerun after a retained concrete failure; favorable resampling and unrelated comparative candidate trials remain excluded.\n\n## Completion\n\nFocused Red precedes implementation. Required task checks include state, copied installation, actual-host observation and the independent oracle. Repository sync, strict validation, Python/Node suites, installer list/dry-run and diff checks precede independent full-diff review. Findings follow current core resolution/fix/re-review. Authorized scoped commits precede terminal acceptance; owned stopped-handoff activation preserves canonical state and explicit re-admission. Local merge into codex/next-version remains the controller tail after every admitted unit qualifies. No PR, push, release, tag or license change is authorized by the invocation plan.\n",
+          "recommendation": "accept",
+          "significance": "significant",
+          "text": "Accept the exact approved-scope invocation plan, or request a bounded revision."
+        }
+      },
+      "event": "resume",
+      "mode_epoch": 1,
+      "previous_record_hash": "c68ce80918cbb64f7cb155b8f3b5c0aea8b94b48c9352af5e05e37ec8b6ef96d",
+      "sequence": 7
+    },
+    {
+      "context_fingerprint": "70e46d34fab96448db4ee53866e8b1523aa3e0365eabaea97cf6a4e86567f9db",
+      "detail": {
+        "previous_context": {
+          "content_fingerprint": "fca96414b17579a4b7cef4a9bfa7c2d4f0d47fa77403474ac12d2f6674d68939",
+          "decision_purpose": "plan",
+          "execution_snapshot_digest": "d4c331a3e65b029b9719b4e87e22219b0cbbeb45f8d9f8307295fa5f31cdcfd9",
+          "id": "task:T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+          "kind": "task",
+          "orchestration_id": "DO-1c975780-f773-56bd-a6ad-4556feb2037b",
+          "plan_digest": "161a71ec19ab4830605e63494d29c3aab01b9740f989e1a1b9e4c219e64a95dc",
+          "required_checks_digest": "8427c0a28c4de42473e55307d5b742f300bbb061e6886ab399f65744643c9cc4",
+          "semantic_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+          "task_ids": [
+            "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+          ]
+        },
+        "previous_question": {
+          "id": "invocation118-plan",
+          "kind": "specification-acceptance",
+          "options": [
+            {
+              "id": "accept",
+              "text": "Accept the current plan."
+            },
+            {
+              "id": "revise",
+              "text": "Revise the plan with concrete reasons."
+            }
+          ],
+          "plan_text": "# Resumable Plugin Invocation Plan\n\n## Authorized result\n\nTask T-dae414c5-43e4-45db-a6f3-4ce4112440c5 adds guarded resumable plugin execution receipts to the qualified composition boundary. Actual host tools execute outside metadata locks. The initial supported mechanism is an honestly labelled source-backed Codex instruction/resource context. A native Skill tool remains unclaimed. Catalog recommendation experiments, specialist pilot policy and public management retain separate tasks.\n\n## State and integration\n\n1. A standalone `plugin-invocation.py` engine uses the existing Store protocol and one HC record under `.skill-tree/invocations/`. Neutral task-free commands create no Future, controller or fabricated task. Records bind revisions, hashes, operation/event, typed scope, ordered definitions, exact package/resource identities, mode/authority, explicit overrides, cursor, original attempts and historical context transitions.\n2. `hook-start`, `hook-next`, `hook-prepare`, `hook-invoke`, `hook-record`, `hook-accept`, `hook-reconcile` and `hook-resume` separate selection, original attempt creation, actual host start, returned transport result, accepted incorporation and final readiness. Questions, findings, unavailable actors and uncertain attempts retain unresolved obligations. Duplicate delivery reconciles the original result; conflicting replay, stale input and active recursive re-entry reject mutation.\n3. Ordered definitions remain frozen; selection and each envelope use the latest accepted context at the cursor. Earlier completed-prefix receipts keep the original stage input. B incorporation uses ordinary guarded core revision evidence before A2; incorporation does not require final CL confirmation or Ready status. Final readiness remains blocked until the full chain and applicable current core acceptance/checks qualify.\n4. The owned JS resolver remains authoritative for effective values, condition selection and parameter/delivery identity. Python never substitutes a differently formatted JSON digest for the JS parameter digest. Configuration references, ephemeral resolved delivery values and whole-envelope identity remain separate. Secret values reach only the permitted invocation context and never ordinary ledgers, previews, history, exports or persisted sealed files. Nonsecret marker fixtures qualify native forwarding; a fake provider qualifies secret separation without claiming a real service integration.\n5. Owned Node preparation and actual host calls occur before/outside the writer lock. Preparation captures trusted inventory/scope proofs; the writer then rechecks relevant inputs and compare-and-swap guards through reads. Ordinary CL/DO/processing helpers apply proposed changes separately. Acceptance verifies the exact recorded before/after transition; an interrupted incorporation remains blocked and reconciles actual core history.\n6. Workflow and PR adapters expose the engine and enforce live registered chain obligations without replacing authorization, required checks or independent approval. Source-only owned Python loading protects new entry paths against matching bytecode-cache substitution. Store snapshots include invocation files; controller metadata retains frozen references without a schema migration. Installer and lifecycle barriers inspect pending/uncertain invocation records before the no-Future early return. Malformed records and uncertain originals retain prerequisites.\n7. Resource maps and bootstrap inventories contain the new standalone helper closure. Composition resolves only the explicitly supported adapter planning prerequisite; missing capabilities, unresolved anchors, changed ownership/configuration and stale scope remain prerequisites. Pilot115 owns atomic post-processing/editor/interview policy and final specification acceptance; pilot116 owns Ponytail attachment and current PR policy.\n\n## Requirements-led qualification\n\nPython state and bridge controls cover exact JSON and extra instructions, nested/Unicode/exponent values, reserved-looking data, secret separation, task-free/Pending/task/review scope, replay/conflicts, stale source/profile/review identities, explicit frozen overrides, failure/question/rework/unknown recovery, recursion and same-package occurrence independence. A-to-B-to-A controls verify current accepted context, retained prefix evidence and interrupted incorporation. Pending task-free invocations prevent installation/replacement and participate in ordinary CAS recovery.\n\nCopied general/web/unity fixtures remove source and siblings, retain dynamic operation registration, verify resources and source-only runtime loading, and preserve no-plugin behavior without optional tools or queue creation. A required oracle suite independently rejects semantic capture corruptions while retaining valid checksums.\n\n## Bounded actual host observation\n\nThree real isolated actors load controlled installed plugin resources and sealed inputs in A1, B and A2 order. Distinct upstream, JSON-parameter and extra-instruction nonces establish actual forwarding. B returns a proposed T-task addition. The parent incorporates the proposal through ordinary guarded clarification revision using explicitly scripted Manual fixture-owner input. A2 reads the incorporated addition. Final fixture confirmation follows the chain; scripted fixture inputs never supply real-human business approval.\n\nThe parent separately captures actual creation/dispatch/result events, actor/context identities, exact resource/input/output bindings and ordinary core revision evidence. The oracle compares expected nonce values and actual before/after task bytes rather than actor-supplied success flags. Missing native events, collapsed occurrences, reordered incorporation, changed markers/context, unresolved originals and invented human/native provenance reject qualification. Unexposed exact model, native call IDs, tokens and cost remain null.\n\nLimits are six new qualification contexts, twelve explicit spawn/follow-up requests and 1,800 total wall seconds including cleanup. The final sixty seconds remain cleanup reserve. Nominal execution uses three contexts and six requests. Reserve permits one corrected-source rerun after a retained concrete failure; favorable resampling and unrelated comparative candidate trials remain excluded.\n\n## Completion\n\nFocused Red precedes implementation. Required task checks include state, copied installation, actual-host observation and the independent oracle. Repository sync, strict validation, Python/Node suites, installer list/dry-run and diff checks precede independent full-diff review. Findings follow current core resolution/fix/re-review. Authorized scoped commits precede terminal acceptance; owned stopped-handoff activation preserves canonical state and explicit re-admission. Local merge into codex/next-version remains the controller tail after every admitted unit qualifies. No PR, push, release, tag or license change is authorized by the invocation plan.\n",
+          "recommendation": "accept",
+          "significance": "significant",
+          "text": "Accept the exact approved-scope invocation plan, or request a bounded revision."
+        }
+      },
+      "event": "resume",
+      "mode_epoch": 1,
+      "previous_record_hash": "893369619d3a8e50bc7aa4ea0d2f99b0f5eccd886101aa129c9acf3ae55598e6",
+      "sequence": 8
+    }
+  ],
+  "id": "DG-07f50e85-fc3d-545d-9a66-d0ba5cdf8422",
+  "mode": "auto",
+  "mode_epoch": 1,
+  "prepared_attempt_id": "DA-af9950aa-532d-4f5c-9b8d-1db0406b203c",
+  "question": {
+    "id": "invocation118-plan",
+    "kind": "specification-acceptance",
+    "options": [
+      {
+        "id": "accept",
+        "text": "Accept the current plan."
+      },
+      {
+        "id": "revise",
+        "text": "Revise the plan with concrete reasons."
+      }
+    ],
+    "plan_text": "# Resumable Plugin Invocation Plan\n\n## Authorized result\n\nTask T-dae414c5-43e4-45db-a6f3-4ce4112440c5 adds guarded resumable plugin execution receipts to the qualified composition boundary. Actual host tools execute outside metadata locks. The initial supported mechanism is an honestly labelled source-backed Codex instruction/resource context. A native Skill tool remains unclaimed. Catalog recommendation experiments, specialist pilot policy and public management retain separate tasks.\n\n## State and integration\n\n1. A standalone `plugin-invocation.py` engine uses the existing Store protocol and one HC record under `.skill-tree/invocations/`. Neutral task-free commands create no Future, controller or fabricated task. Records bind revisions, hashes, operation/event, typed scope, ordered definitions, exact package/resource identities, mode/authority, explicit overrides, cursor, original attempts and historical context transitions.\n2. `hook-start`, `hook-next`, `hook-prepare`, `hook-invoke`, `hook-record`, `hook-accept`, `hook-reconcile` and `hook-resume` separate selection, original attempt creation, actual host start, returned transport result, accepted incorporation and final readiness. Questions, findings, unavailable actors and uncertain attempts retain unresolved obligations. Duplicate delivery reconciles the original result; conflicting replay, stale input and active recursive re-entry reject mutation.\n3. Ordered definitions remain frozen; selection and each envelope use the latest accepted context at the cursor. Earlier completed-prefix receipts keep the original stage input. B incorporation uses ordinary guarded core revision evidence before A2; incorporation does not require final CL confirmation or Ready status. Final readiness remains blocked until the full chain and applicable current core acceptance/checks qualify.\n4. The owned JS resolver remains authoritative for effective values, condition selection and parameter/delivery identity. Python never substitutes a differently formatted JSON digest for the JS parameter digest. Configuration references, ephemeral resolved delivery values and whole-envelope identity remain separate. Secret values reach only the permitted invocation context and never ordinary ledgers, previews, history, exports or persisted sealed files. Nonsecret marker fixtures qualify native forwarding; a fake provider qualifies secret separation without claiming a real service integration.\n5. Owned Node preparation and actual host calls occur before/outside the writer lock. Preparation captures trusted inventory/scope proofs; the writer then rechecks relevant inputs and compare-and-swap guards through reads. Ordinary CL/DO/processing helpers apply proposed changes separately. Acceptance verifies the exact recorded before/after transition; an interrupted incorporation remains blocked and reconciles actual core history.\n6. Workflow and PR adapters expose the engine and enforce live registered chain obligations without replacing authorization, required checks or independent approval. Source-only owned Python loading protects new entry paths against matching bytecode-cache substitution. Store snapshots include invocation files; controller metadata retains frozen references without a schema migration. Installer and lifecycle barriers inspect pending/uncertain invocation records before the no-Future early return. Malformed records and uncertain originals retain prerequisites.\n7. Resource maps and bootstrap inventories contain the new standalone helper closure. Composition resolves only the explicitly supported adapter planning prerequisite; missing capabilities, unresolved anchors, changed ownership/configuration and stale scope remain prerequisites. Pilot115 owns atomic post-processing/editor/interview policy and final specification acceptance; pilot116 owns Ponytail attachment and current PR policy.\n\n## Requirements-led qualification\n\nPython state and bridge controls cover exact JSON and extra instructions, nested/Unicode/exponent values, reserved-looking data, secret separation, task-free/Pending/task/review scope, replay/conflicts, stale source/profile/review identities, explicit frozen overrides, failure/question/rework/unknown recovery, recursion and same-package occurrence independence. A-to-B-to-A controls verify current accepted context, retained prefix evidence and interrupted incorporation. Pending task-free invocations prevent installation/replacement and participate in ordinary CAS recovery.\n\nCopied general/web/unity fixtures remove source and siblings, retain dynamic operation registration, verify resources and source-only runtime loading, and preserve no-plugin behavior without optional tools or queue creation. A required oracle suite independently rejects semantic capture corruptions while retaining valid checksums.\n\n## Bounded actual host observation\n\nThree real isolated actors load controlled installed plugin resources and sealed inputs in A1, B and A2 order. Distinct upstream, JSON-parameter and extra-instruction nonces establish actual forwarding. B returns a proposed T-task addition. The parent incorporates the proposal through ordinary guarded clarification revision using explicitly scripted Manual fixture-owner input. A2 reads the incorporated addition. Final fixture confirmation follows the chain; scripted fixture inputs never supply real-human business approval.\n\nThe parent separately captures actual creation/dispatch/result events, actor/context identities, exact resource/input/output bindings and ordinary core revision evidence. The oracle compares expected nonce values and actual before/after task bytes rather than actor-supplied success flags. Missing native events, collapsed occurrences, reordered incorporation, changed markers/context, unresolved originals and invented human/native provenance reject qualification. Unexposed exact model, native call IDs, tokens and cost remain null.\n\nLimits are six new qualification contexts, twelve explicit spawn/follow-up requests and 1,800 total wall seconds including cleanup. The final sixty seconds remain cleanup reserve. Nominal execution uses three contexts and six requests. Reserve permits one corrected-source rerun after a retained concrete failure; favorable resampling and unrelated comparative candidate trials remain excluded.\n\n## Completion\n\nFocused Red precedes implementation. Required task checks include state, copied installation, actual-host observation and the independent oracle. Repository sync, strict validation, Python/Node suites, installer list/dry-run and diff checks precede independent full-diff review. Findings follow current core resolution/fix/re-review. Authorized scoped commits precede terminal acceptance; owned stopped-handoff activation preserves canonical state and explicit re-admission. Local merge into codex/next-version remains the controller tail after every admitted unit qualifies. No PR, push, release, tag or license change is authorized by the invocation plan.\n",
+    "recommendation": "accept",
+    "significance": "significant",
+    "text": "Accept the exact approved-scope invocation plan, or request a bounded revision."
+  },
+  "request_id": "DO-1c975780-f773-56bd-a6ad-4556feb2037b:question:1",
+  "revision": 8,
+  "schema": 1,
+  "start_digest": "9a7c8ac2c9c2fa71b82e2f714893edb1bd64778a829518e5d763eef85c2864a9",
+  "state": "accepted"
+}

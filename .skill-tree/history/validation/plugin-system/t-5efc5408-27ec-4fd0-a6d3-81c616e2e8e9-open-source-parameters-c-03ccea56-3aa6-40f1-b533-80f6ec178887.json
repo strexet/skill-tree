@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-plugin-sources.js"
+  ],
+  "attempt_id": "C-03ccea56-3aa6-40f1-b533-80f6ec178887",
+  "check_id": "open-source-parameters",
+  "counts": {
+    "discovered": 38,
+    "expected": 38,
+    "failed": 0,
+    "passed": 38,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9-open-source-parameters-c-03ccea56-3aa6-40f1-b533-80f6ec178887.txt",
+  "result": "pass",
+  "reviewed_failure_reason": null,
+  "source_fingerprints": {
+    ".skill-tree/documents/plugin-management-contract.md": "dd9ee48ee9a3f64af0aebd475192637ff2e44e80fea9a5344a47c4d810451627",
+    ".skill-tree/documents/plugin-system-contract.md": "b25424efd0dc920376a8d32b9dd7ea27d6b644d966e167f690c8999dc2fa36f5",
+    ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    ".skill-tree/lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+    ".skill-tree/lib/plugins.js": "ac1953986cb59aca438f29202816f7c5bcdbc0f156651b0ef88819dd00ea2acc",
+    ".skill-tree/tests/test-plugin-sources.js": "2dccdcbe210f1b8d24794f865eea0ffea830ad8ebe987dc1b7d09f0909b02b0e"
+  },
+  "task_id": "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+  "tool_wall_seconds": 0.20481979195028543
+}

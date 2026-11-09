@@ -1,0 +1,32 @@
+{
+  "format": "skill-tree-validation-qualification-correction",
+  "schema": 1,
+  "affected_artifacts": [
+    "managed-registry-adjacent-review-red.txt",
+    "managed-registry-adjacent-review-green.txt"
+  ],
+  "invalid_behavioral_red_tests": [
+    "test_finish_rejects_carrier_reference_disappearance_before_writer_entry",
+    "test_start_rechecks_completed_dependency_preflight_inside_the_writer",
+    "test_pr_ready_and_merge_gate_prepare_referenced_review_chains_outside_writer (carrier disappearance subcases only)"
+  ],
+  "reason": "The original race fixture compared canonical Store.root with lexical tempfile root; macOS /var to /private/var normalization prevented the intended mutation. Assertion failures without injected mutation are not behavioral Red evidence. Independent source findings remain source evidence only.",
+  "retained_valid_red_subcases": [
+    "cached provider: declared source drift",
+    "cached provider: already-invoking original replay",
+    "cached provider: relocated package frozen-watch mismatch",
+    "exact resource closure additions and symlink",
+    "disabled and condition-excluded copied WF cold starts",
+    "explicit condition-excluded and disabled successor active state"
+  ],
+  "correction": "Race callbacks compare Store.root to self.store.root and assert the injection occurred. No old-source reconstruction or retroactive Red label is used.",
+  "corrected_current_regression_result": {
+    "artifact": "managed-registry-carrier-canonical-fixture-green.txt",
+    "discovered": 3,
+    "passed": 3,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 23.639
+  }
+}

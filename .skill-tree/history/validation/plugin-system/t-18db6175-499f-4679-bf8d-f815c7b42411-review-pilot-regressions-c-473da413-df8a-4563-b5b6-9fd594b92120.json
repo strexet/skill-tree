@@ -1,0 +1,44 @@
+{
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-plugin-review.py"
+  ],
+  "attempt_id": "C-473da413-df8a-4563-b5b6-9fd594b92120",
+  "check_id": "review-pilot-regressions",
+  "counts": {
+    "discovered": 1,
+    "expected": 1,
+    "failed": 1,
+    "passed": 0,
+    "skipped": 0
+  },
+  "exit_code": 1,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-18db6175-499f-4679-bf8d-f815c7b42411-review-pilot-regressions-c-473da413-df8a-4563-b5b6-9fd594b92120.txt",
+  "result": "red",
+  "reviewed_failure_reason": "The actual owned PR CLI permits readiness after complete core review despite an installed enabled Ponytail occurrence with no started or attached chain.",
+  "source_fingerprints": {
+    ".skill-tree/common/references/plugin-invocation.md": "205fbce39d22792274f2fa01d60f9dc0fbb306410a25b26f65adfa7d8236c00e",
+    ".skill-tree/common/references/pr-review-cycle.md": "640f5913dbe660723492089b155bbed8d9e36193dd58d52a29729631a938f08a",
+    ".skill-tree/common/scripts/plugin-hooks.js": "fd5d304848f526b827318f181d572caae76db089961e1e01a7f54d03d50023d2",
+    ".skill-tree/common/scripts/plugin-invocation.py": "9b7e42042d72579247cd4f09bc45388b652ec7d0d0bc95354c0002849811f124",
+    ".skill-tree/common/scripts/pr-review-state.py": "547be66447fb14280a021661af1b7207b34ab07eb2e6c8bd5af7ec37a2779d16",
+    ".skill-tree/common/scripts/workflow-state.py": "76589e1dca50664128650f706ab413003039a1725b74f24ba2dcb9d9a622d029",
+    ".skill-tree/config/plugins/ponytail.json": "7524fe90fb2f2c7d60d8752bb21865ee4f12b7b0b0ccb8b004c04b5b94e47b7c",
+    ".skill-tree/config/resource-map.json": "95a4922b2331416863100c9b054e84709bafd4126c1542a15fac49781da13248",
+    ".skill-tree/documents/implementation-plan.md": "d53373bb753c92ba770aca2af1d9dd4bea586888de5aa5320b454a2e056e84e1",
+    ".skill-tree/documents/plugin-system-contract.md": "ad81db5c53c25df9326b6f9c679ac33e8ae15e32e51ec19d95b352ef1d68a2fc",
+    ".skill-tree/documents/plugin-system-research.md": "df72f246f13a3a4186a0035f9dec75b3dcc9dcc511de1ecf66a7bc0c62462a31",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "2bc848663455a1c9fcf682c5fa50dfe4a0e1f19de8421223265cb80845dbbcad",
+    ".skill-tree/lib/plugin-composition.js": "7e61980fa8c3ce5d5f1d0807f8cc38a1f264a201db57f208d8300e31cd3db00e",
+    ".skill-tree/lib/plugin-runtime.js": "0c2cc89e184b509ccf2d99de6f0cd6cca47b958967899a8440e5be02fad68c6f",
+    ".skill-tree/tests/fixtures/ponytail": "445fee6585cab8a9d9aa03ffe09cb6f18c2ca095c4c7b2a8834f10c6aa761bdf",
+    ".skill-tree/tests/test-plugin-invocation-installation.js": "fa16b6af4ae637415100fa2e0c3dcfeb9a7f392e168f61980ecd3c8fc84e1495",
+    ".skill-tree/tests/test-plugin-review.py": "b38525ccb31756422b50dd6d867468a0e038d4ee5c14c8c48b3c660403d6115e",
+    ".skill-tree/tests/test-plugin-workflow.py": "a7ae1a514938920070a4c6a936d43fcac5d772168c3d9d40005dfe91ccaff44b"
+  },
+  "task_id": "T-18db6175-499f-4679-bf8d-f815c7b42411",
+  "tool_wall_seconds": 1.4769541253335774
+}

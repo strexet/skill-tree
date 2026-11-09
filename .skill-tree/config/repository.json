@@ -2,6 +2,16 @@
   "role": "source",
   "schema": 1,
   "recipes": {
+    "quality-python": {
+      "lane": "unit",
+      "argv": ["python3", "{test_path}"],
+      "input_paths": []
+    },
+    "quality-node": {
+      "lane": "unit",
+      "argv": ["node", "--test", "{test_path}"],
+      "input_paths": []
+    },
     "pending-boundary-unit": {
       "lane": "unit",
       "argv": [

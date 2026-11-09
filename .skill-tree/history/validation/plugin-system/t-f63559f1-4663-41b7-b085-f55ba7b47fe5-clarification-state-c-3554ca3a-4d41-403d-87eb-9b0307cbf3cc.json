@@ -1,0 +1,56 @@
+{
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-task-clarification.py"
+  ],
+  "attempt_id": "C-3554ca3a-4d41-403d-87eb-9b0307cbf3cc",
+  "baseline": {
+    "last_accepted": {
+      "discovered": 24,
+      "expected": 24,
+      "failed": 0,
+      "passed": 24,
+      "skipped": 0
+    },
+    "original": {
+      "discovered": 24,
+      "expected": 24,
+      "failed": 0,
+      "passed": 24,
+      "skipped": 0
+    }
+  },
+  "check_id": "clarification-state",
+  "count_error": null,
+  "counts": {
+    "discovered": 24,
+    "expected": 24,
+    "failed": 0,
+    "passed": 24,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limitations": [
+    "Focused unit fixture evidence. No new actual actor or product qualification."
+  ],
+  "log_sha256": "f31524885de85c5157ad1b07a9d0a3e6464ddcd9e52199af57d37114d5203cff",
+  "output": ".skill-tree/history/validation/plugin-system/t-f63559f1-4663-41b7-b085-f55ba7b47fe5-clarification-state-c-3554ca3a-4d41-403d-87eb-9b0307cbf3cc.txt",
+  "owned_profile_identity": "56e828eacced91072ba944c318a5291a21b88be7f83b90a2248f53fdae95806a",
+  "process_group_clean": true,
+  "result": "pass",
+  "source_commit": "82eaf49b6cb35e65dfa30413228bddcb10190562",
+  "sources": {
+    ".skill-tree/common/references/future-workflow.md": "13edfc2edf90e86351f3f047f3b3a4bbf696de54f3bac5010fb6fb19dbbdc603",
+    ".skill-tree/common/references/workflow-metadata.md": "1fff0a891987404ac7bc43d536b0798c08ee6c16a6e3367cbfc9a0f3c54b7fa3",
+    ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+    ".skill-tree/config/resource-map.json": "bd4b539b8aad5d6b55aba3609073f28b7e879fa7e8c3edf60dbbf28f9e56ad26",
+    ".skill-tree/documents/task-clarification-contract.md": "ceab4175e4e293fb9bba5b54c713ee769702c2b18e912ad784a1a7e99cf5e3dc",
+    ".skill-tree/scripts/agent-conformance.py": "e14b387f60d200fea4484c4a40d359c5a8d1339e26abf2addb82d5c8ab5a1e16",
+    ".skill-tree/templates/operations.json": "af81ff4d4b003ef8e8dac292995b3227d5fb45d80666dd80b83b4111d1ded050",
+    ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+    ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+  },
+  "task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+  "timed_out": false,
+  "tool_wall_seconds": 31.497
+}

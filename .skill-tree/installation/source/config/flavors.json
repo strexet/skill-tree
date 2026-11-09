@@ -1,0 +1,139 @@
+{
+  "schema": 1,
+  "composer_version": "1.0.0",
+  "release_version": "0.3.0",
+  "flavors": {
+    "general": {
+      "sections": "domains/general/sections.json",
+      "resources": {}
+    },
+    "web": {
+      "sections": "domains/web/sections.json",
+      "resources": {
+        "references/web-development.md": "domains/web/development.md"
+      },
+      "conditional_resources": [
+        {
+          "when": {
+            "field": [
+              "facts",
+              "packages",
+              "@playwright/test",
+              "version"
+            ],
+            "matches": "^1\\.\\d+\\.\\d+$"
+          },
+          "resources": {
+            "references/playwright-testing.md": "domains/web/playwright-testing.md"
+          },
+          "instruction": "Use the [Playwright fixture](references/playwright-testing.md) with the admitted declared recipes."
+        }
+      ],
+      "capabilities": {
+        "playwright-test": {
+          "package": "@playwright/test",
+          "version_pattern": "^1\\.\\d+\\.\\d+$"
+        }
+      }
+    },
+    "unity": {
+      "sections": "domains/unity/sections.json",
+      "resources": {
+        "references/unity-safety.md": "common/references/unity-safety.md",
+        "scripts/inspect-unity-repository.py": "common/scripts/inspect-unity-repository.py",
+        "references/unity-development.md": "domains/unity/development.md"
+      },
+      "conditional_resources": [
+        {
+          "when": {
+            "field": [
+              "facts",
+              "ui"
+            ],
+            "contains": "ugui"
+          },
+          "resources": {
+            "references/ugui-testing.md": "domains/unity/ugui-testing.md"
+          },
+          "instruction": "Use the [uGUI checks](references/ugui-testing.md) for the admitted Canvas surfaces."
+        },
+        {
+          "when": {
+            "field": [
+              "facts",
+              "ui"
+            ],
+            "contains": "uitk"
+          },
+          "resources": {
+            "references/uitk-testing.md": "domains/unity/uitk-testing.md"
+          },
+          "instruction": "Use the [UI Toolkit checks](references/uitk-testing.md) for the admitted panel surfaces."
+        },
+        {
+          "when": {
+            "all": [
+              {
+                "field": [
+                  "facts",
+                  "editor"
+                ],
+                "matches": "^6000\\.3\\."
+              },
+              {
+                "field": [
+                  "facts",
+                  "ui"
+                ],
+                "contains": "uitk"
+              },
+              {
+                "field": [
+                  "facts",
+                  "packages",
+                  "com.unity.ui.test-framework",
+                  "version"
+                ],
+                "matches": "^6\\.3\\.\\d+$"
+              }
+            ]
+          },
+          "resources": {
+            "references/panel-simulator.md": "domains/unity/panel-simulator.md"
+          },
+          "instruction": "Use the [PanelSimulator fixture](references/panel-simulator.md) for the admitted Unity 6.3 panel tests."
+        },
+        {
+          "when": {
+            "field": [
+              "facts",
+              "packages",
+              "com.unity.inputsystem",
+              "version"
+            ],
+            "matches": "^1\\.11\\.\\d+$"
+          },
+          "resources": {
+            "references/input-testing.md": "domains/unity/input-testing.md"
+          },
+          "instruction": "Use the [Input System fixture](references/input-testing.md) for admitted simulated input assertions."
+        },
+        {
+          "when": {
+            "field": [
+              "facts",
+              "packages",
+              "com.unity.test-framework.performance",
+              "version"
+            ],
+            "matches": "^3\\.0\\.\\d+$"
+          },
+          "resources": {
+            "references/performance-testing.md": "domains/unity/performance-testing.md"
+          },
+          "instruction": "Use the [performance fixture](references/performance-testing.md) for admitted allocation/timing measurements."
+        }
+      ]
+    }
+  }
+}

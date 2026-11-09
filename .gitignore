@@ -23,3 +23,8 @@ tmp/
 .skill-tree/installation/.backups/
 
 .skill-tree/installation/.last-transaction.json
+.skill-tree/installation/.rebind-*/
+.skill-tree/installation/.plugin-journal.json
+.skill-tree/installation/.plugin-staging/
+.skill-tree/installation/.plugin-backups/
+.skill-tree/installation/.last-plugin-transaction.json

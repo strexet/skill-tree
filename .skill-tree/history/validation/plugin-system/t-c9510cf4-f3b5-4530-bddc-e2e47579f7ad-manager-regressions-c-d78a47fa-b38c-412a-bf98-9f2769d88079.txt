@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: missing curated data keeps fresh and saved project-known management offline
+ok 1 - missing curated data keeps fresh and saved project-known management offline
+  ---
+  duration_ms: 1021.213333
+  ...
+# Subtest: shared manager previews exact A-B-A and preserves order across cancellation, move and replay
+ok 2 - shared manager previews exact A-B-A and preserves order across cancellation, move and replay
+  ---
+  duration_ms: 2359.774041
+  ...
+# Subtest: exact unbind, package uninstall and forget preserve independent owned records
+ok 3 - exact unbind, package uninstall and forget preserve independent owned records
+  ---
+  duration_ms: 3012.657459
+  ...
+# Subtest: confirmed provider scope is checked inside lifecycle and original replay survives a later provider change
+ok 4 - confirmed provider scope is checked inside lifecycle and original replay survives a later provider change
+  ---
+  duration_ms: 1770.362583
+  ...
+# Subtest: rehashed outer preview and configure-action relabelling cannot replace the inner seal
+ok 5 - rehashed outer preview and configure-action relabelling cannot replace the inner seal
+  ---
+  duration_ms: 1632.625459
+  ...
+# Subtest: known-only activation neither recovers unrelated journals nor mutates installed state
+ok 6 - known-only activation neither recovers unrelated journals nor mutates installed state
+  ---
+  duration_ms: 614.282042
+  ...
+# Subtest: pure point reorder exposes matched frozen requirements while preserving unrelated slots and records
+ok 7 - pure point reorder exposes matched frozen requirements while preserving unrelated slots and records
+  ---
+  duration_ms: 1582.263583
+  ...
+# Subtest: bind, edit, activation and update use one exact proposal shape with no dispatch
+ok 8 - bind, edit, activation and update use one exact proposal shape with no dispatch
+  ---
+  duration_ms: 4721.1615
+  ...
+# Subtest: manager lifecycle preserves pending journals for new requests and exact recorded replay
+ok 9 - manager lifecycle preserves pending journals for new requests and exact recorded replay
+  ---
+  duration_ms: 1922.37025
+  ...
+# Subtest: blocked preparation shows the requested change without exposing an actionable proposal
+ok 10 - blocked preparation shows the requested change without exposing an actionable proposal
+  ---
+  duration_ms: 1455.856166
+  ...
+# Subtest: new stopped frozen impact invalidates consent and inner lifecycle cannot bypass the manager guard
+ok 11 - new stopped frozen impact invalidates consent and inner lifecycle cannot bypass the manager guard
+  ---
+  duration_ms: 1948.745
+  ...
+# Subtest: staged activation rechecks frozen impact before mutating the registry
+ok 12 - staged activation rechecks frozen impact before mutating the registry
+  ---
+  duration_ms: 1501.269
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 23637.80525

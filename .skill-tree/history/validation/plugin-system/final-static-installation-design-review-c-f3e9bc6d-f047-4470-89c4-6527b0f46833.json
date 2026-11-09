@@ -1,0 +1,42 @@
+{
+  "actual_lane": "static",
+  "attempt_id": "C-f3e9bc6d-f047-4470-89c4-6527b0f46833",
+  "check_id": "installation-design-review",
+  "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+  "evidence_sha256": {
+    ".skill-tree/bin/install.js": "c7b6581b5aa5e3a9c150d3cd9bdf312a5324ea40ebd1605a4d4184318b606636",
+    ".skill-tree/common/references/installation-profile.md": "5719d29e503c669cd091a70564aa4c93abf1a582811308c8fdea9b9345eace7e",
+    ".skill-tree/documents/install.md": "d14bbeb9a886af9c0ad56637f05c05ba3bae83a29fdd21db6760a2e514c6f243",
+    ".skill-tree/documents/plugin-installation-contract.md": "c5cf887a2960a980955757e8ee01d4e4c11adad52795c7e3f3960c9b5f894eaf",
+    ".skill-tree/documents/plugin-management-contract.md": "2b5c9aeb18dd30b06a809fd14e5222abf579a002187870167d61f6f7dda5b11a",
+    ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84",
+    ".skill-tree/history/research/plugin-sequence-task-amendment.json": "611ec02103eda9e7668fc952a51c326bed1ce3ac6e6697a3cc9c85855919b532",
+    ".skill-tree/lib/plugin-management.js": "9eac76130885864fb06ddc2a3311805e761f22857d21bc8cfcb9ee508a4c2660"
+  },
+  "limitations": [
+    "This receipt reviews the current design and source. The separately captured controller installer receipt owns executable fixture evidence. No external plugin invocation or authorization to acquire/install a real candidate is claimed."
+  ],
+  "mismatches": [],
+  "result": "pass",
+  "review": [
+    "The current CLI implements verified core-only defaults, the terminal optional setup menu after all selected providers verify, the core manager, and matching-digest application of a resolved supplied proposal. Browsing or defaults never supply configuration consent.",
+    "The same manager inventory, prepare/apply, and generic occurrence controls cover known and noncatalog sources, effective parameters and readiness evidence, complete A\u2013B\u2013A ordering and exact occurrence mutation. Current eligibility is empty and custom selection remains visible.",
+    "The current interaction and profile contracts separate core and plugin outcomes, explicit recovery, profile refresh and re-admission. The CLI verifies provider scope and exact flavor, preserves interrupted plugin journals for explicit recovery, and provides an offline read-only dry path without acquisition, dispatch or queue initialization.",
+    "The exact current installer fixture suite includes core-only/repeat, opt-in, provider mismatch, cancellation, exact proposal parity, interrupted recovery, read-only checks and independent repeated occurrence data. Setup and installed manager share the typed backend rather than treating catalog membership as a restriction.",
+    "The formerly stale planned-manager and installer wording now describes the implemented shared confirmed setup. Current read-only source and evidence were checked after the prose correction."
+  ],
+  "schema": 1,
+  "source_commit": "5c4e28c3ee34f1f9e385c82cde21f0886b202919",
+  "source_fingerprints": {
+    ".skill-tree/bin/install.js": "c7b6581b5aa5e3a9c150d3cd9bdf312a5324ea40ebd1605a4d4184318b606636",
+    ".skill-tree/common/references/installation-profile.md": "5719d29e503c669cd091a70564aa4c93abf1a582811308c8fdea9b9345eace7e",
+    ".skill-tree/documents/implementation-plan.md": "73692c86132c37dc8be19457f9bf33dc6ff87027cfad50de85a361bca6f09606",
+    ".skill-tree/documents/plugin-installation-contract.md": "c5cf887a2960a980955757e8ee01d4e4c11adad52795c7e3f3960c9b5f894eaf",
+    ".skill-tree/documents/plugin-management-contract.md": "2b5c9aeb18dd30b06a809fd14e5222abf579a002187870167d61f6f7dda5b11a",
+    ".skill-tree/documents/plugin-system-contract.md": "35af053252eb88060cfa32f71fb3b1c7b3bbe7afb5d60cc0a937c41b686a8038",
+    ".skill-tree/documents/plugin-system-research.md": "4c4bd02dd56b92fc82030d4440dace33cdab9aa390dac8efccb4af5d249356a1",
+    ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84"
+  },
+  "task_id": "T-2da07d09-0b1a-4407-b375-defd23720387",
+  "unit_captures_same_contract": {}
+}

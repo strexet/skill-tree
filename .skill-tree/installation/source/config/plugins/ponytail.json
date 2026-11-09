@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "id": "ponytail",
+  "source": {
+    "kind": "repository",
+    "url": "https://github.com/DietrichGebert/ponytail",
+    "ref": "96608e078b2d5ea607c5c3b8b5a54d1c1fba6846",
+    "entry": "skills/ponytail/SKILL.md"
+  },
+  "resources": [
+    "LICENSE"
+  ],
+  "dependencies": [],
+  "capabilities": [],
+  "metadata": {
+    "title": "Pinned Ponytail development-mode review pilot",
+    "source_application": "Original skills/ponytail/SKILL.md, not ponytail-review",
+    "license": "MIT",
+    "license_resource": "LICENSE",
+    "source_verification": {
+      "expected_git_blob": "d64edd32265ba21cbf5270158f04e97d96925f27",
+      "expected_entry_bytes": 3496,
+      "expected_digests": {
+        "skills/ponytail/SKILL.md": "9badd22a32e19cb884e46dfa8d3aae82bb81dfa5484105b8b4f0262df823a509",
+        "LICENSE": "fb1bc6909ac3ef82d5c22106e32ef682b0cff66788fa915fb9b53b15c9d2f3ab"
+      },
+      "expected_content_digest": "14147d26122fb21e825ff59f20d3eedd79ebdbf05c17eaae93daf67826ec5615",
+      "evidence": ".skill-tree/tests/fixtures/ponytail/source-manifest.json"
+    },
+    "pilot_policy": {
+      "operation": "skill-tree-pr-review-cycle",
+      "suggested_anchor": "after",
+      "configurable_anchors": [
+        "before",
+        "during",
+        "after"
+      ],
+      "suggested_enabled_state_only_after_explicit_selection": true,
+      "core_only_creates_binding": false,
+      "requires_explicit_install_enable_confirmation": true,
+      "readiness_effect": "An enabled matching occurrence must complete for current review identity; failure, missing execution, unavailable capability or stale evidence blocks readiness. Explicit disabling requires recorded configuration reconciliation and supplies no success."
+    }
+  },
+  "adapter": {
+    "context_kinds": [
+      "review"
+    ],
+    "parameter_defaults": {
+      "upstream": {
+        "values": {
+          "level": "full"
+        }
+      }
+    },
+    "invocation_policy": {
+      "schema": 1,
+      "kind": "report-only",
+      "context_lifetime": "single-attempt",
+      "fresh_context_per_attempt": true,
+      "require_context_end": true,
+      "allowed_tools": [
+        "read-pinned-resources",
+        "read-scoped-context"
+      ],
+      "allowed_actions": [
+        "return-proposals"
+      ],
+      "instructions": "Apply the exact original Ponytail resource inside the original isolated actor and current review identity. Use the explicitly supplied level parameter; the default level is full. Return concrete findings or a no-findings result. Preserve correctness, security, required behavior and project conventions. Project, task, installation, provider and publication writes remain outside the allowed policy. Full core review, actual checks, W1 resolution and authorized rework remain core responsibilities. The upstream session mode ends with the original actor context. The owned invocation policy remains separate from replaceable parameters and extra instruction text."
+    }
+  },
+  "expectedDigests": {
+    "skills/ponytail/SKILL.md": "9badd22a32e19cb884e46dfa8d3aae82bb81dfa5484105b8b4f0262df823a509",
+    "LICENSE": "fb1bc6909ac3ef82d5c22106e32ef682b0cff66788fa915fb9b53b15c9d2f3ab"
+  }
+}

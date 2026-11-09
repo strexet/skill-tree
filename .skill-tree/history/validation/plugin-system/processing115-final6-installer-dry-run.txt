@@ -1,0 +1,3138 @@
+[
+  {
+    "provider": "claude-code",
+    "ok": true,
+    "action": "dry-run",
+    "flavor": "general",
+    "changed": [
+      ".claude/skills/skill-tree-add-pending-task",
+      ".claude/skills/skill-tree-clarify-tasks",
+      ".claude/skills/skill-tree-create-documents-snapshot",
+      ".claude/skills/skill-tree-implement-all",
+      ".claude/skills/skill-tree-implement-next-future-task",
+      ".claude/skills/skill-tree-pr-review-cycle",
+      ".claude/skills/skill-tree-process-future-pending",
+      ".claude/skills/skill-tree-repo-documentation",
+      ".claude/skills/skill-tree-repo-documentation-audit",
+      ".claude/skills/skill-tree-work-through-next",
+      ".skill-tree/installation/source/common/references/decision-governance.md",
+      ".skill-tree/installation/source/common/references/development-practices.md",
+      ".skill-tree/installation/source/common/references/document-rules.md",
+      ".skill-tree/installation/source/common/references/documentation-output-contract.md",
+      ".skill-tree/installation/source/common/references/future-workflow.md",
+      ".skill-tree/installation/source/common/references/history-retention.md",
+      ".skill-tree/installation/source/common/references/installation-profile.md",
+      ".skill-tree/installation/source/common/references/orchestration.md",
+      ".skill-tree/installation/source/common/references/pending-task-format.md",
+      ".skill-tree/installation/source/common/references/pending-task-intake.md",
+      ".skill-tree/installation/source/common/references/plugin-invocation.md",
+      ".skill-tree/installation/source/common/references/pr-review-cycle.md",
+      ".skill-tree/installation/source/common/references/repository-discovery-checklist.md",
+      ".skill-tree/installation/source/common/references/run-workspaces.md",
+      ".skill-tree/installation/source/common/references/snapshot-rules.md",
+      ".skill-tree/installation/source/common/references/unity-safety.md",
+      ".skill-tree/installation/source/common/references/validation-policy.md",
+      ".skill-tree/installation/source/common/references/workflow-metadata.md",
+      ".skill-tree/installation/source/common/scripts/create-documentation-snapshot.py",
+      ".skill-tree/installation/source/common/scripts/decision-governance.py",
+      ".skill-tree/installation/source/common/scripts/decision-orchestration.py",
+      ".skill-tree/installation/source/common/scripts/inspect-unity-repository.py",
+      ".skill-tree/installation/source/common/scripts/plugin-hooks.js",
+      ".skill-tree/installation/source/common/scripts/plugin-invocation.py",
+      ".skill-tree/installation/source/common/scripts/plugin-processing.py",
+      ".skill-tree/installation/source/common/scripts/pr-review-state.py",
+      ".skill-tree/installation/source/common/scripts/run-workspaces.py",
+      ".skill-tree/installation/source/common/scripts/select-prioritized-task.py",
+      ".skill-tree/installation/source/common/scripts/validate-document-rules.py",
+      ".skill-tree/installation/source/common/scripts/validate-future-document.py",
+      ".skill-tree/installation/source/common/scripts/validate-repository-documentation.py",
+      ".skill-tree/installation/source/common/scripts/workflow-state.py",
+      ".skill-tree/installation/source/domains/general/sections.json",
+      ".skill-tree/installation/source/templates/invariants.json",
+      ".skill-tree/installation/source/templates/operations.json",
+      ".skill-tree/installation/source/config/capabilities.json",
+      ".skill-tree/installation/source/config/flavors.json",
+      ".skill-tree/installation/source/config/plugins/ponytail.json",
+      ".skill-tree/installation/source/config/plugins/task-editorial.json",
+      ".skill-tree/installation/source/config/plugins/task-interview.json",
+      ".skill-tree/installation/source/config/providers.json",
+      ".skill-tree/installation/source/config/resource-map.json",
+      ".skill-tree/installation/source/lib/composer.js",
+      ".skill-tree/installation/source/lib/execution-bindings.js",
+      ".skill-tree/installation/source/lib/installation.js",
+      ".skill-tree/installation/source/lib/plugin-acquisition.js",
+      ".skill-tree/installation/source/lib/plugin-bindings.js",
+      ".skill-tree/installation/source/lib/plugin-composition.js",
+      ".skill-tree/installation/source/lib/plugin-lifecycle.js",
+      ".skill-tree/installation/source/lib/plugin-management.js",
+      ".skill-tree/installation/source/lib/plugin-parameters.js",
+      ".skill-tree/installation/source/lib/plugin-registry.js",
+      ".skill-tree/installation/source/lib/plugin-runtime.js",
+      ".skill-tree/installation/source/lib/plugin-sources.js",
+      ".skill-tree/installation/source/lib/plugins.js",
+      ".skill-tree/installation/source/src/init-rules/skill-tree-skills.md",
+      ".skill-tree/installation/manager.js",
+      ".skill-tree/installation/profile.json"
+    ],
+    "profile_identity": "49f566f3a4c913c943729d2cac193758bf31d09a8105599c03c20fc4c5a5fe65",
+    "environment_identity": "4e461fd827d8e0b8d03a68ced1752df088e1a22eedd8c17d5a0e33e09a78ce29",
+    "input_fingerprints": {
+      ".node-version": null,
+      ".nvmrc": null,
+      ".skill-tree/config/repository.json": null,
+      ".skill-tree/installation/plugins.json": null,
+      ".skill-tree/validation-recipes.json": null,
+      ".skill-tree/worktree-profile.json": null,
+      "Cargo.toml": null,
+      "Packages/manifest.json": null,
+      "Packages/packages-lock.json": null,
+      "ProjectSettings/EditorSettings.asset": null,
+      "ProjectSettings/ProjectSettings.asset": null,
+      "ProjectSettings/ProjectVersion.txt": null,
+      "bun.lock": null,
+      "bun.lockb": null,
+      "npm-shrinkwrap.json": null,
+      "package-lock.json": null,
+      "package.json": null,
+      "pnpm-lock.yaml": null,
+      "pyproject.toml": null,
+      "pytest.ini": null,
+      "yarn.lock": null
+    },
+    "packages": [
+      {
+        "destination": ".claude/skills/skill-tree-add-pending-task",
+        "name": "skill-tree-add-pending-task",
+        "flavor": "general",
+        "identity": "8f6529a700d99194cd0d55960ba2df4046cf240ce8c8de32dcfcc7602ad852eb",
+        "providers": [
+          "claude-code"
+        ]
+      },
+      {
+        "destination": ".claude/skills/skill-tree-clarify-tasks",
+        "name": "skill-tree-clarify-tasks",
+        "flavor": "general",
+        "identity": "fdf6f2fd09584a5a861f54b759de7c67ca423badc478ebdaada039fa1077e941",
+        "providers": [
+          "claude-code"
+        ]
+      },
+      {
+        "destination": ".claude/skills/skill-tree-create-documents-snapshot",
+        "name": "skill-tree-create-documents-snapshot",
+        "flavor": "general",
+        "identity": "9fcc0b00fb742e391337491212040de94c81980f1a25925808cb39520a0cf8a5",
+        "providers": [
+          "claude-code"
+        ]
+      },
+      {
+        "destination": ".claude/skills/skill-tree-implement-all",
+        "name": "skill-tree-implement-all",
+        "flavor": "general",
+        "identity": "47f71883b277e05a40bfb22a9780e14f195b1ac7d184b29797515d07a3d5b536",
+        "providers": [
+          "claude-code"
+        ]
+      },
+      {
+        "destination": ".claude/skills/skill-tree-implement-next-future-task",
+        "name": "skill-tree-implement-next-future-task",
+        "flavor": "general",
+        "identity": "2b98e243acc4df6fb7e4d7c17d6315d7b9a20443e599297f5dc90553d0a627f8",
+        "providers": [
+          "claude-code"
+        ]
+      },
+      {
+        "destination": ".claude/skills/skill-tree-pr-review-cycle",
+        "name": "skill-tree-pr-review-cycle",
+        "flavor": "general",
+        "identity": "738ae13a31486799f00a0708c7127647f940bff4ebf3630fe50b755a2a6e9d2c",
+        "providers": [
+          "claude-code"
+        ]
+      },
+      {
+        "destination": ".claude/skills/skill-tree-process-future-pending",
+        "name": "skill-tree-process-future-pending",
+        "flavor": "general",
+        "identity": "c0abaa54ecf14fc8684446fdf300645ec3ef983cae8abc515732f0149bf9065e",
+        "providers": [
+          "claude-code"
+        ]
+      },
+      {
+        "destination": ".claude/skills/skill-tree-repo-documentation",
+        "name": "skill-tree-repo-documentation",
+        "flavor": "general",
+        "identity": "9dcd3aecda4fc553f0c5235ada76487d2235bc6d17bd7781524497097521b673",
+        "providers": [
+          "claude-code"
+        ]
+      },
+      {
+        "destination": ".claude/skills/skill-tree-repo-documentation-audit",
+        "name": "skill-tree-repo-documentation-audit",
+        "flavor": "general",
+        "identity": "cf43a8e5f71d00e37d93caa1112cf0b69c501b920c6dbebdd344e6fd1c470342",
+        "providers": [
+          "claude-code"
+        ]
+      },
+      {
+        "destination": ".claude/skills/skill-tree-work-through-next",
+        "name": "skill-tree-work-through-next",
+        "flavor": "general",
+        "identity": "240bda9dc55bd728ce8378afe4bcfbf138e4954c983b72820b7d7a3fcaa756b0",
+        "providers": [
+          "claude-code"
+        ]
+      }
+    ],
+    "policy": "Immediate focused feedback; scoped additional boundary checks; no implicit product execution.",
+    "facts": {
+      "test_assemblies": [],
+      "ui": [],
+      "package_manager": "npm",
+      "node": null,
+      "packages": {},
+      "capabilities": {}
+    },
+    "gaps": [
+      {
+        "key": "test-foundation",
+        "reason": "No usable foundational test command is declared.",
+        "recommendation": "Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile."
+      }
+    ]
+  },
+  {
+    "provider": "codex",
+    "ok": true,
+    "action": "dry-run",
+    "flavor": "general",
+    "changed": [
+      ".agents/skills/skill-tree-add-pending-task",
+      ".agents/skills/skill-tree-clarify-tasks",
+      ".agents/skills/skill-tree-create-documents-snapshot",
+      ".agents/skills/skill-tree-implement-all",
+      ".agents/skills/skill-tree-implement-next-future-task",
+      ".agents/skills/skill-tree-pr-review-cycle",
+      ".agents/skills/skill-tree-process-future-pending",
+      ".agents/skills/skill-tree-repo-documentation",
+      ".agents/skills/skill-tree-repo-documentation-audit",
+      ".agents/skills/skill-tree-work-through-next",
+      ".skill-tree/installation/source/common/references/decision-governance.md",
+      ".skill-tree/installation/source/common/references/development-practices.md",
+      ".skill-tree/installation/source/common/references/document-rules.md",
+      ".skill-tree/installation/source/common/references/documentation-output-contract.md",
+      ".skill-tree/installation/source/common/references/future-workflow.md",
+      ".skill-tree/installation/source/common/references/history-retention.md",
+      ".skill-tree/installation/source/common/references/installation-profile.md",
+      ".skill-tree/installation/source/common/references/orchestration.md",
+      ".skill-tree/installation/source/common/references/pending-task-format.md",
+      ".skill-tree/installation/source/common/references/pending-task-intake.md",
+      ".skill-tree/installation/source/common/references/plugin-invocation.md",
+      ".skill-tree/installation/source/common/references/pr-review-cycle.md",
+      ".skill-tree/installation/source/common/references/repository-discovery-checklist.md",
+      ".skill-tree/installation/source/common/references/run-workspaces.md",
+      ".skill-tree/installation/source/common/references/snapshot-rules.md",
+      ".skill-tree/installation/source/common/references/unity-safety.md",
+      ".skill-tree/installation/source/common/references/validation-policy.md",
+      ".skill-tree/installation/source/common/references/workflow-metadata.md",
+      ".skill-tree/installation/source/common/scripts/create-documentation-snapshot.py",
+      ".skill-tree/installation/source/common/scripts/decision-governance.py",
+      ".skill-tree/installation/source/common/scripts/decision-orchestration.py",
+      ".skill-tree/installation/source/common/scripts/inspect-unity-repository.py",
+      ".skill-tree/installation/source/common/scripts/plugin-hooks.js",
+      ".skill-tree/installation/source/common/scripts/plugin-invocation.py",
+      ".skill-tree/installation/source/common/scripts/plugin-processing.py",
+      ".skill-tree/installation/source/common/scripts/pr-review-state.py",
+      ".skill-tree/installation/source/common/scripts/run-workspaces.py",
+      ".skill-tree/installation/source/common/scripts/select-prioritized-task.py",
+      ".skill-tree/installation/source/common/scripts/validate-document-rules.py",
+      ".skill-tree/installation/source/common/scripts/validate-future-document.py",
+      ".skill-tree/installation/source/common/scripts/validate-repository-documentation.py",
+      ".skill-tree/installation/source/common/scripts/workflow-state.py",
+      ".skill-tree/installation/source/domains/general/sections.json",
+      ".skill-tree/installation/source/templates/invariants.json",
+      ".skill-tree/installation/source/templates/operations.json",
+      ".skill-tree/installation/source/config/capabilities.json",
+      ".skill-tree/installation/source/config/flavors.json",
+      ".skill-tree/installation/source/config/plugins/ponytail.json",
+      ".skill-tree/installation/source/config/plugins/task-editorial.json",
+      ".skill-tree/installation/source/config/plugins/task-interview.json",
+      ".skill-tree/installation/source/config/providers.json",
+      ".skill-tree/installation/source/config/resource-map.json",
+      ".skill-tree/installation/source/lib/composer.js",
+      ".skill-tree/installation/source/lib/execution-bindings.js",
+      ".skill-tree/installation/source/lib/installation.js",
+      ".skill-tree/installation/source/lib/plugin-acquisition.js",
+      ".skill-tree/installation/source/lib/plugin-bindings.js",
+      ".skill-tree/installation/source/lib/plugin-composition.js",
+      ".skill-tree/installation/source/lib/plugin-lifecycle.js",
+      ".skill-tree/installation/source/lib/plugin-management.js",
+      ".skill-tree/installation/source/lib/plugin-parameters.js",
+      ".skill-tree/installation/source/lib/plugin-registry.js",
+      ".skill-tree/installation/source/lib/plugin-runtime.js",
+      ".skill-tree/installation/source/lib/plugin-sources.js",
+      ".skill-tree/installation/source/lib/plugins.js",
+      ".skill-tree/installation/source/src/init-rules/skill-tree-skills.md",
+      ".skill-tree/installation/manager.js",
+      ".skill-tree/installation/profile.json"
+    ],
+    "profile_identity": "49f566f3a4c913c943729d2cac193758bf31d09a8105599c03c20fc4c5a5fe65",
+    "environment_identity": "4e461fd827d8e0b8d03a68ced1752df088e1a22eedd8c17d5a0e33e09a78ce29",
+    "input_fingerprints": {
+      ".node-version": null,
+      ".nvmrc": null,
+      ".skill-tree/config/repository.json": null,
+      ".skill-tree/installation/plugins.json": null,
+      ".skill-tree/validation-recipes.json": null,
+      ".skill-tree/worktree-profile.json": null,
+      "Cargo.toml": null,
+      "Packages/manifest.json": null,
+      "Packages/packages-lock.json": null,
+      "ProjectSettings/EditorSettings.asset": null,
+      "ProjectSettings/ProjectSettings.asset": null,
+      "ProjectSettings/ProjectVersion.txt": null,
+      "bun.lock": null,
+      "bun.lockb": null,
+      "npm-shrinkwrap.json": null,
+      "package-lock.json": null,
+      "package.json": null,
+      "pnpm-lock.yaml": null,
+      "pyproject.toml": null,
+      "pytest.ini": null,
+      "yarn.lock": null
+    },
+    "packages": [
+      {
+        "destination": ".agents/skills/skill-tree-add-pending-task",
+        "name": "skill-tree-add-pending-task",
+        "flavor": "general",
+        "identity": "8f6529a700d99194cd0d55960ba2df4046cf240ce8c8de32dcfcc7602ad852eb",
+        "providers": [
+          "codex"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-clarify-tasks",
+        "name": "skill-tree-clarify-tasks",
+        "flavor": "general",
+        "identity": "fdf6f2fd09584a5a861f54b759de7c67ca423badc478ebdaada039fa1077e941",
+        "providers": [
+          "codex"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-create-documents-snapshot",
+        "name": "skill-tree-create-documents-snapshot",
+        "flavor": "general",
+        "identity": "9fcc0b00fb742e391337491212040de94c81980f1a25925808cb39520a0cf8a5",
+        "providers": [
+          "codex"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-implement-all",
+        "name": "skill-tree-implement-all",
+        "flavor": "general",
+        "identity": "47f71883b277e05a40bfb22a9780e14f195b1ac7d184b29797515d07a3d5b536",
+        "providers": [
+          "codex"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-implement-next-future-task",
+        "name": "skill-tree-implement-next-future-task",
+        "flavor": "general",
+        "identity": "2b98e243acc4df6fb7e4d7c17d6315d7b9a20443e599297f5dc90553d0a627f8",
+        "providers": [
+          "codex"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-pr-review-cycle",
+        "name": "skill-tree-pr-review-cycle",
+        "flavor": "general",
+        "identity": "738ae13a31486799f00a0708c7127647f940bff4ebf3630fe50b755a2a6e9d2c",
+        "providers": [
+          "codex"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-process-future-pending",
+        "name": "skill-tree-process-future-pending",
+        "flavor": "general",
+        "identity": "c0abaa54ecf14fc8684446fdf300645ec3ef983cae8abc515732f0149bf9065e",
+        "providers": [
+          "codex"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-repo-documentation",
+        "name": "skill-tree-repo-documentation",
+        "flavor": "general",
+        "identity": "9dcd3aecda4fc553f0c5235ada76487d2235bc6d17bd7781524497097521b673",
+        "providers": [
+          "codex"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-repo-documentation-audit",
+        "name": "skill-tree-repo-documentation-audit",
+        "flavor": "general",
+        "identity": "cf43a8e5f71d00e37d93caa1112cf0b69c501b920c6dbebdd344e6fd1c470342",
+        "providers": [
+          "codex"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-work-through-next",
+        "name": "skill-tree-work-through-next",
+        "flavor": "general",
+        "identity": "240bda9dc55bd728ce8378afe4bcfbf138e4954c983b72820b7d7a3fcaa756b0",
+        "providers": [
+          "codex"
+        ]
+      }
+    ],
+    "policy": "Immediate focused feedback; scoped additional boundary checks; no implicit product execution.",
+    "facts": {
+      "test_assemblies": [],
+      "ui": [],
+      "package_manager": "npm",
+      "node": null,
+      "packages": {},
+      "capabilities": {}
+    },
+    "gaps": [
+      {
+        "key": "test-foundation",
+        "reason": "No usable foundational test command is declared.",
+        "recommendation": "Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile."
+      }
+    ]
+  },
+  {
+    "provider": "gemini-cli",
+    "ok": true,
+    "action": "dry-run",
+    "flavor": "general",
+    "changed": [
+      ".agents/skills/skill-tree-add-pending-task",
+      ".agents/skills/skill-tree-clarify-tasks",
+      ".agents/skills/skill-tree-create-documents-snapshot",
+      ".agents/skills/skill-tree-implement-all",
+      ".agents/skills/skill-tree-implement-next-future-task",
+      ".agents/skills/skill-tree-pr-review-cycle",
+      ".agents/skills/skill-tree-process-future-pending",
+      ".agents/skills/skill-tree-repo-documentation",
+      ".agents/skills/skill-tree-repo-documentation-audit",
+      ".agents/skills/skill-tree-work-through-next",
+      ".skill-tree/installation/source/common/references/decision-governance.md",
+      ".skill-tree/installation/source/common/references/development-practices.md",
+      ".skill-tree/installation/source/common/references/document-rules.md",
+      ".skill-tree/installation/source/common/references/documentation-output-contract.md",
+      ".skill-tree/installation/source/common/references/future-workflow.md",
+      ".skill-tree/installation/source/common/references/history-retention.md",
+      ".skill-tree/installation/source/common/references/installation-profile.md",
+      ".skill-tree/installation/source/common/references/orchestration.md",
+      ".skill-tree/installation/source/common/references/pending-task-format.md",
+      ".skill-tree/installation/source/common/references/pending-task-intake.md",
+      ".skill-tree/installation/source/common/references/plugin-invocation.md",
+      ".skill-tree/installation/source/common/references/pr-review-cycle.md",
+      ".skill-tree/installation/source/common/references/repository-discovery-checklist.md",
+      ".skill-tree/installation/source/common/references/run-workspaces.md",
+      ".skill-tree/installation/source/common/references/snapshot-rules.md",
+      ".skill-tree/installation/source/common/references/unity-safety.md",
+      ".skill-tree/installation/source/common/references/validation-policy.md",
+      ".skill-tree/installation/source/common/references/workflow-metadata.md",
+      ".skill-tree/installation/source/common/scripts/create-documentation-snapshot.py",
+      ".skill-tree/installation/source/common/scripts/decision-governance.py",
+      ".skill-tree/installation/source/common/scripts/decision-orchestration.py",
+      ".skill-tree/installation/source/common/scripts/inspect-unity-repository.py",
+      ".skill-tree/installation/source/common/scripts/plugin-hooks.js",
+      ".skill-tree/installation/source/common/scripts/plugin-invocation.py",
+      ".skill-tree/installation/source/common/scripts/plugin-processing.py",
+      ".skill-tree/installation/source/common/scripts/pr-review-state.py",
+      ".skill-tree/installation/source/common/scripts/run-workspaces.py",
+      ".skill-tree/installation/source/common/scripts/select-prioritized-task.py",
+      ".skill-tree/installation/source/common/scripts/validate-document-rules.py",
+      ".skill-tree/installation/source/common/scripts/validate-future-document.py",
+      ".skill-tree/installation/source/common/scripts/validate-repository-documentation.py",
+      ".skill-tree/installation/source/common/scripts/workflow-state.py",
+      ".skill-tree/installation/source/domains/general/sections.json",
+      ".skill-tree/installation/source/templates/invariants.json",
+      ".skill-tree/installation/source/templates/operations.json",
+      ".skill-tree/installation/source/config/capabilities.json",
+      ".skill-tree/installation/source/config/flavors.json",
+      ".skill-tree/installation/source/config/plugins/ponytail.json",
+      ".skill-tree/installation/source/config/plugins/task-editorial.json",
+      ".skill-tree/installation/source/config/plugins/task-interview.json",
+      ".skill-tree/installation/source/config/providers.json",
+      ".skill-tree/installation/source/config/resource-map.json",
+      ".skill-tree/installation/source/lib/composer.js",
+      ".skill-tree/installation/source/lib/execution-bindings.js",
+      ".skill-tree/installation/source/lib/installation.js",
+      ".skill-tree/installation/source/lib/plugin-acquisition.js",
+      ".skill-tree/installation/source/lib/plugin-bindings.js",
+      ".skill-tree/installation/source/lib/plugin-composition.js",
+      ".skill-tree/installation/source/lib/plugin-lifecycle.js",
+      ".skill-tree/installation/source/lib/plugin-management.js",
+      ".skill-tree/installation/source/lib/plugin-parameters.js",
+      ".skill-tree/installation/source/lib/plugin-registry.js",
+      ".skill-tree/installation/source/lib/plugin-runtime.js",
+      ".skill-tree/installation/source/lib/plugin-sources.js",
+      ".skill-tree/installation/source/lib/plugins.js",
+      ".skill-tree/installation/source/src/init-rules/skill-tree-skills.md",
+      ".skill-tree/installation/manager.js",
+      ".skill-tree/installation/profile.json"
+    ],
+    "profile_identity": "49f566f3a4c913c943729d2cac193758bf31d09a8105599c03c20fc4c5a5fe65",
+    "environment_identity": "4e461fd827d8e0b8d03a68ced1752df088e1a22eedd8c17d5a0e33e09a78ce29",
+    "input_fingerprints": {
+      ".node-version": null,
+      ".nvmrc": null,
+      ".skill-tree/config/repository.json": null,
+      ".skill-tree/installation/plugins.json": null,
+      ".skill-tree/validation-recipes.json": null,
+      ".skill-tree/worktree-profile.json": null,
+      "Cargo.toml": null,
+      "Packages/manifest.json": null,
+      "Packages/packages-lock.json": null,
+      "ProjectSettings/EditorSettings.asset": null,
+      "ProjectSettings/ProjectSettings.asset": null,
+      "ProjectSettings/ProjectVersion.txt": null,
+      "bun.lock": null,
+      "bun.lockb": null,
+      "npm-shrinkwrap.json": null,
+      "package-lock.json": null,
+      "package.json": null,
+      "pnpm-lock.yaml": null,
+      "pyproject.toml": null,
+      "pytest.ini": null,
+      "yarn.lock": null
+    },
+    "packages": [
+      {
+        "destination": ".agents/skills/skill-tree-add-pending-task",
+        "name": "skill-tree-add-pending-task",
+        "flavor": "general",
+        "identity": "8f6529a700d99194cd0d55960ba2df4046cf240ce8c8de32dcfcc7602ad852eb",
+        "providers": [
+          "gemini-cli"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-clarify-tasks",
+        "name": "skill-tree-clarify-tasks",
+        "flavor": "general",
+        "identity": "fdf6f2fd09584a5a861f54b759de7c67ca423badc478ebdaada039fa1077e941",
+        "providers": [
+          "gemini-cli"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-create-documents-snapshot",
+        "name": "skill-tree-create-documents-snapshot",
+        "flavor": "general",
+        "identity": "9fcc0b00fb742e391337491212040de94c81980f1a25925808cb39520a0cf8a5",
+        "providers": [
+          "gemini-cli"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-implement-all",
+        "name": "skill-tree-implement-all",
+        "flavor": "general",
+        "identity": "47f71883b277e05a40bfb22a9780e14f195b1ac7d184b29797515d07a3d5b536",
+        "providers": [
+          "gemini-cli"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-implement-next-future-task",
+        "name": "skill-tree-implement-next-future-task",
+        "flavor": "general",
+        "identity": "2b98e243acc4df6fb7e4d7c17d6315d7b9a20443e599297f5dc90553d0a627f8",
+        "providers": [
+          "gemini-cli"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-pr-review-cycle",
+        "name": "skill-tree-pr-review-cycle",
+        "flavor": "general",
+        "identity": "738ae13a31486799f00a0708c7127647f940bff4ebf3630fe50b755a2a6e9d2c",
+        "providers": [
+          "gemini-cli"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-process-future-pending",
+        "name": "skill-tree-process-future-pending",
+        "flavor": "general",
+        "identity": "c0abaa54ecf14fc8684446fdf300645ec3ef983cae8abc515732f0149bf9065e",
+        "providers": [
+          "gemini-cli"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-repo-documentation",
+        "name": "skill-tree-repo-documentation",
+        "flavor": "general",
+        "identity": "9dcd3aecda4fc553f0c5235ada76487d2235bc6d17bd7781524497097521b673",
+        "providers": [
+          "gemini-cli"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-repo-documentation-audit",
+        "name": "skill-tree-repo-documentation-audit",
+        "flavor": "general",
+        "identity": "cf43a8e5f71d00e37d93caa1112cf0b69c501b920c6dbebdd344e6fd1c470342",
+        "providers": [
+          "gemini-cli"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-work-through-next",
+        "name": "skill-tree-work-through-next",
+        "flavor": "general",
+        "identity": "240bda9dc55bd728ce8378afe4bcfbf138e4954c983b72820b7d7a3fcaa756b0",
+        "providers": [
+          "gemini-cli"
+        ]
+      }
+    ],
+    "policy": "Immediate focused feedback; scoped additional boundary checks; no implicit product execution.",
+    "facts": {
+      "test_assemblies": [],
+      "ui": [],
+      "package_manager": "npm",
+      "node": null,
+      "packages": {},
+      "capabilities": {}
+    },
+    "gaps": [
+      {
+        "key": "test-foundation",
+        "reason": "No usable foundational test command is declared.",
+        "recommendation": "Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile."
+      }
+    ]
+  },
+  {
+    "provider": "cursor",
+    "ok": true,
+    "action": "dry-run",
+    "flavor": "general",
+    "changed": [
+      ".agents/skills/skill-tree-add-pending-task",
+      ".agents/skills/skill-tree-clarify-tasks",
+      ".agents/skills/skill-tree-create-documents-snapshot",
+      ".agents/skills/skill-tree-implement-all",
+      ".agents/skills/skill-tree-implement-next-future-task",
+      ".agents/skills/skill-tree-pr-review-cycle",
+      ".agents/skills/skill-tree-process-future-pending",
+      ".agents/skills/skill-tree-repo-documentation",
+      ".agents/skills/skill-tree-repo-documentation-audit",
+      ".agents/skills/skill-tree-work-through-next",
+      ".skill-tree/installation/source/common/references/decision-governance.md",
+      ".skill-tree/installation/source/common/references/development-practices.md",
+      ".skill-tree/installation/source/common/references/document-rules.md",
+      ".skill-tree/installation/source/common/references/documentation-output-contract.md",
+      ".skill-tree/installation/source/common/references/future-workflow.md",
+      ".skill-tree/installation/source/common/references/history-retention.md",
+      ".skill-tree/installation/source/common/references/installation-profile.md",
+      ".skill-tree/installation/source/common/references/orchestration.md",
+      ".skill-tree/installation/source/common/references/pending-task-format.md",
+      ".skill-tree/installation/source/common/references/pending-task-intake.md",
+      ".skill-tree/installation/source/common/references/plugin-invocation.md",
+      ".skill-tree/installation/source/common/references/pr-review-cycle.md",
+      ".skill-tree/installation/source/common/references/repository-discovery-checklist.md",
+      ".skill-tree/installation/source/common/references/run-workspaces.md",
+      ".skill-tree/installation/source/common/references/snapshot-rules.md",
+      ".skill-tree/installation/source/common/references/unity-safety.md",
+      ".skill-tree/installation/source/common/references/validation-policy.md",
+      ".skill-tree/installation/source/common/references/workflow-metadata.md",
+      ".skill-tree/installation/source/common/scripts/create-documentation-snapshot.py",
+      ".skill-tree/installation/source/common/scripts/decision-governance.py",
+      ".skill-tree/installation/source/common/scripts/decision-orchestration.py",
+      ".skill-tree/installation/source/common/scripts/inspect-unity-repository.py",
+      ".skill-tree/installation/source/common/scripts/plugin-hooks.js",
+      ".skill-tree/installation/source/common/scripts/plugin-invocation.py",
+      ".skill-tree/installation/source/common/scripts/plugin-processing.py",
+      ".skill-tree/installation/source/common/scripts/pr-review-state.py",
+      ".skill-tree/installation/source/common/scripts/run-workspaces.py",
+      ".skill-tree/installation/source/common/scripts/select-prioritized-task.py",
+      ".skill-tree/installation/source/common/scripts/validate-document-rules.py",
+      ".skill-tree/installation/source/common/scripts/validate-future-document.py",
+      ".skill-tree/installation/source/common/scripts/validate-repository-documentation.py",
+      ".skill-tree/installation/source/common/scripts/workflow-state.py",
+      ".skill-tree/installation/source/domains/general/sections.json",
+      ".skill-tree/installation/source/templates/invariants.json",
+      ".skill-tree/installation/source/templates/operations.json",
+      ".skill-tree/installation/source/config/capabilities.json",
+      ".skill-tree/installation/source/config/flavors.json",
+      ".skill-tree/installation/source/config/plugins/ponytail.json",
+      ".skill-tree/installation/source/config/plugins/task-editorial.json",
+      ".skill-tree/installation/source/config/plugins/task-interview.json",
+      ".skill-tree/installation/source/config/providers.json",
+      ".skill-tree/installation/source/config/resource-map.json",
+      ".skill-tree/installation/source/lib/composer.js",
+      ".skill-tree/installation/source/lib/execution-bindings.js",
+      ".skill-tree/installation/source/lib/installation.js",
+      ".skill-tree/installation/source/lib/plugin-acquisition.js",
+      ".skill-tree/installation/source/lib/plugin-bindings.js",
+      ".skill-tree/installation/source/lib/plugin-composition.js",
+      ".skill-tree/installation/source/lib/plugin-lifecycle.js",
+      ".skill-tree/installation/source/lib/plugin-management.js",
+      ".skill-tree/installation/source/lib/plugin-parameters.js",
+      ".skill-tree/installation/source/lib/plugin-registry.js",
+      ".skill-tree/installation/source/lib/plugin-runtime.js",
+      ".skill-tree/installation/source/lib/plugin-sources.js",
+      ".skill-tree/installation/source/lib/plugins.js",
+      ".skill-tree/installation/source/src/init-rules/skill-tree-skills.md",
+      ".skill-tree/installation/manager.js",
+      ".skill-tree/installation/profile.json"
+    ],
+    "profile_identity": "49f566f3a4c913c943729d2cac193758bf31d09a8105599c03c20fc4c5a5fe65",
+    "environment_identity": "4e461fd827d8e0b8d03a68ced1752df088e1a22eedd8c17d5a0e33e09a78ce29",
+    "input_fingerprints": {
+      ".node-version": null,
+      ".nvmrc": null,
+      ".skill-tree/config/repository.json": null,
+      ".skill-tree/installation/plugins.json": null,
+      ".skill-tree/validation-recipes.json": null,
+      ".skill-tree/worktree-profile.json": null,
+      "Cargo.toml": null,
+      "Packages/manifest.json": null,
+      "Packages/packages-lock.json": null,
+      "ProjectSettings/EditorSettings.asset": null,
+      "ProjectSettings/ProjectSettings.asset": null,
+      "ProjectSettings/ProjectVersion.txt": null,
+      "bun.lock": null,
+      "bun.lockb": null,
+      "npm-shrinkwrap.json": null,
+      "package-lock.json": null,
+      "package.json": null,
+      "pnpm-lock.yaml": null,
+      "pyproject.toml": null,
+      "pytest.ini": null,
+      "yarn.lock": null
+    },
+    "packages": [
+      {
+        "destination": ".agents/skills/skill-tree-add-pending-task",
+        "name": "skill-tree-add-pending-task",
+        "flavor": "general",
+        "identity": "8f6529a700d99194cd0d55960ba2df4046cf240ce8c8de32dcfcc7602ad852eb",
+        "providers": [
+          "cursor"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-clarify-tasks",
+        "name": "skill-tree-clarify-tasks",
+        "flavor": "general",
+        "identity": "fdf6f2fd09584a5a861f54b759de7c67ca423badc478ebdaada039fa1077e941",
+        "providers": [
+          "cursor"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-create-documents-snapshot",
+        "name": "skill-tree-create-documents-snapshot",
+        "flavor": "general",
+        "identity": "9fcc0b00fb742e391337491212040de94c81980f1a25925808cb39520a0cf8a5",
+        "providers": [
+          "cursor"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-implement-all",
+        "name": "skill-tree-implement-all",
+        "flavor": "general",
+        "identity": "47f71883b277e05a40bfb22a9780e14f195b1ac7d184b29797515d07a3d5b536",
+        "providers": [
+          "cursor"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-implement-next-future-task",
+        "name": "skill-tree-implement-next-future-task",
+        "flavor": "general",
+        "identity": "2b98e243acc4df6fb7e4d7c17d6315d7b9a20443e599297f5dc90553d0a627f8",
+        "providers": [
+          "cursor"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-pr-review-cycle",
+        "name": "skill-tree-pr-review-cycle",
+        "flavor": "general",
+        "identity": "738ae13a31486799f00a0708c7127647f940bff4ebf3630fe50b755a2a6e9d2c",
+        "providers": [
+          "cursor"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-process-future-pending",
+        "name": "skill-tree-process-future-pending",
+        "flavor": "general",
+        "identity": "c0abaa54ecf14fc8684446fdf300645ec3ef983cae8abc515732f0149bf9065e",
+        "providers": [
+          "cursor"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-repo-documentation",
+        "name": "skill-tree-repo-documentation",
+        "flavor": "general",
+        "identity": "9dcd3aecda4fc553f0c5235ada76487d2235bc6d17bd7781524497097521b673",
+        "providers": [
+          "cursor"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-repo-documentation-audit",
+        "name": "skill-tree-repo-documentation-audit",
+        "flavor": "general",
+        "identity": "cf43a8e5f71d00e37d93caa1112cf0b69c501b920c6dbebdd344e6fd1c470342",
+        "providers": [
+          "cursor"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-work-through-next",
+        "name": "skill-tree-work-through-next",
+        "flavor": "general",
+        "identity": "240bda9dc55bd728ce8378afe4bcfbf138e4954c983b72820b7d7a3fcaa756b0",
+        "providers": [
+          "cursor"
+        ]
+      }
+    ],
+    "policy": "Immediate focused feedback; scoped additional boundary checks; no implicit product execution.",
+    "facts": {
+      "test_assemblies": [],
+      "ui": [],
+      "package_manager": "npm",
+      "node": null,
+      "packages": {},
+      "capabilities": {}
+    },
+    "gaps": [
+      {
+        "key": "test-foundation",
+        "reason": "No usable foundational test command is declared.",
+        "recommendation": "Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile."
+      }
+    ]
+  },
+  {
+    "provider": "windsurf",
+    "ok": true,
+    "action": "dry-run",
+    "flavor": "general",
+    "changed": [
+      ".windsurf/skills/skill-tree-add-pending-task",
+      ".windsurf/skills/skill-tree-clarify-tasks",
+      ".windsurf/skills/skill-tree-create-documents-snapshot",
+      ".windsurf/skills/skill-tree-implement-all",
+      ".windsurf/skills/skill-tree-implement-next-future-task",
+      ".windsurf/skills/skill-tree-pr-review-cycle",
+      ".windsurf/skills/skill-tree-process-future-pending",
+      ".windsurf/skills/skill-tree-repo-documentation",
+      ".windsurf/skills/skill-tree-repo-documentation-audit",
+      ".windsurf/skills/skill-tree-work-through-next",
+      ".skill-tree/installation/source/common/references/decision-governance.md",
+      ".skill-tree/installation/source/common/references/development-practices.md",
+      ".skill-tree/installation/source/common/references/document-rules.md",
+      ".skill-tree/installation/source/common/references/documentation-output-contract.md",
+      ".skill-tree/installation/source/common/references/future-workflow.md",
+      ".skill-tree/installation/source/common/references/history-retention.md",
+      ".skill-tree/installation/source/common/references/installation-profile.md",
+      ".skill-tree/installation/source/common/references/orchestration.md",
+      ".skill-tree/installation/source/common/references/pending-task-format.md",
+      ".skill-tree/installation/source/common/references/pending-task-intake.md",
+      ".skill-tree/installation/source/common/references/plugin-invocation.md",
+      ".skill-tree/installation/source/common/references/pr-review-cycle.md",
+      ".skill-tree/installation/source/common/references/repository-discovery-checklist.md",
+      ".skill-tree/installation/source/common/references/run-workspaces.md",
+      ".skill-tree/installation/source/common/references/snapshot-rules.md",
+      ".skill-tree/installation/source/common/references/unity-safety.md",
+      ".skill-tree/installation/source/common/references/validation-policy.md",
+      ".skill-tree/installation/source/common/references/workflow-metadata.md",
+      ".skill-tree/installation/source/common/scripts/create-documentation-snapshot.py",
+      ".skill-tree/installation/source/common/scripts/decision-governance.py",
+      ".skill-tree/installation/source/common/scripts/decision-orchestration.py",
+      ".skill-tree/installation/source/common/scripts/inspect-unity-repository.py",
+      ".skill-tree/installation/source/common/scripts/plugin-hooks.js",
+      ".skill-tree/installation/source/common/scripts/plugin-invocation.py",
+      ".skill-tree/installation/source/common/scripts/plugin-processing.py",
+      ".skill-tree/installation/source/common/scripts/pr-review-state.py",
+      ".skill-tree/installation/source/common/scripts/run-workspaces.py",
+      ".skill-tree/installation/source/common/scripts/select-prioritized-task.py",
+      ".skill-tree/installation/source/common/scripts/validate-document-rules.py",
+      ".skill-tree/installation/source/common/scripts/validate-future-document.py",
+      ".skill-tree/installation/source/common/scripts/validate-repository-documentation.py",
+      ".skill-tree/installation/source/common/scripts/workflow-state.py",
+      ".skill-tree/installation/source/domains/general/sections.json",
+      ".skill-tree/installation/source/templates/invariants.json",
+      ".skill-tree/installation/source/templates/operations.json",
+      ".skill-tree/installation/source/config/capabilities.json",
+      ".skill-tree/installation/source/config/flavors.json",
+      ".skill-tree/installation/source/config/plugins/ponytail.json",
+      ".skill-tree/installation/source/config/plugins/task-editorial.json",
+      ".skill-tree/installation/source/config/plugins/task-interview.json",
+      ".skill-tree/installation/source/config/providers.json",
+      ".skill-tree/installation/source/config/resource-map.json",
+      ".skill-tree/installation/source/lib/composer.js",
+      ".skill-tree/installation/source/lib/execution-bindings.js",
+      ".skill-tree/installation/source/lib/installation.js",
+      ".skill-tree/installation/source/lib/plugin-acquisition.js",
+      ".skill-tree/installation/source/lib/plugin-bindings.js",
+      ".skill-tree/installation/source/lib/plugin-composition.js",
+      ".skill-tree/installation/source/lib/plugin-lifecycle.js",
+      ".skill-tree/installation/source/lib/plugin-management.js",
+      ".skill-tree/installation/source/lib/plugin-parameters.js",
+      ".skill-tree/installation/source/lib/plugin-registry.js",
+      ".skill-tree/installation/source/lib/plugin-runtime.js",
+      ".skill-tree/installation/source/lib/plugin-sources.js",
+      ".skill-tree/installation/source/lib/plugins.js",
+      ".skill-tree/installation/source/src/init-rules/skill-tree-skills.md",
+      ".skill-tree/installation/manager.js",
+      ".skill-tree/installation/profile.json"
+    ],
+    "profile_identity": "49f566f3a4c913c943729d2cac193758bf31d09a8105599c03c20fc4c5a5fe65",
+    "environment_identity": "4e461fd827d8e0b8d03a68ced1752df088e1a22eedd8c17d5a0e33e09a78ce29",
+    "input_fingerprints": {
+      ".node-version": null,
+      ".nvmrc": null,
+      ".skill-tree/config/repository.json": null,
+      ".skill-tree/installation/plugins.json": null,
+      ".skill-tree/validation-recipes.json": null,
+      ".skill-tree/worktree-profile.json": null,
+      "Cargo.toml": null,
+      "Packages/manifest.json": null,
+      "Packages/packages-lock.json": null,
+      "ProjectSettings/EditorSettings.asset": null,
+      "ProjectSettings/ProjectSettings.asset": null,
+      "ProjectSettings/ProjectVersion.txt": null,
+      "bun.lock": null,
+      "bun.lockb": null,
+      "npm-shrinkwrap.json": null,
+      "package-lock.json": null,
+      "package.json": null,
+      "pnpm-lock.yaml": null,
+      "pyproject.toml": null,
+      "pytest.ini": null,
+      "yarn.lock": null
+    },
+    "packages": [
+      {
+        "destination": ".windsurf/skills/skill-tree-add-pending-task",
+        "name": "skill-tree-add-pending-task",
+        "flavor": "general",
+        "identity": "8f6529a700d99194cd0d55960ba2df4046cf240ce8c8de32dcfcc7602ad852eb",
+        "providers": [
+          "windsurf"
+        ]
+      },
+      {
+        "destination": ".windsurf/skills/skill-tree-clarify-tasks",
+        "name": "skill-tree-clarify-tasks",
+        "flavor": "general",
+        "identity": "fdf6f2fd09584a5a861f54b759de7c67ca423badc478ebdaada039fa1077e941",
+        "providers": [
+          "windsurf"
+        ]
+      },
+      {
+        "destination": ".windsurf/skills/skill-tree-create-documents-snapshot",
+        "name": "skill-tree-create-documents-snapshot",
+        "flavor": "general",
+        "identity": "9fcc0b00fb742e391337491212040de94c81980f1a25925808cb39520a0cf8a5",
+        "providers": [
+          "windsurf"
+        ]
+      },
+      {
+        "destination": ".windsurf/skills/skill-tree-implement-all",
+        "name": "skill-tree-implement-all",
+        "flavor": "general",
+        "identity": "47f71883b277e05a40bfb22a9780e14f195b1ac7d184b29797515d07a3d5b536",
+        "providers": [
+          "windsurf"
+        ]
+      },
+      {
+        "destination": ".windsurf/skills/skill-tree-implement-next-future-task",
+        "name": "skill-tree-implement-next-future-task",
+        "flavor": "general",
+        "identity": "2b98e243acc4df6fb7e4d7c17d6315d7b9a20443e599297f5dc90553d0a627f8",
+        "providers": [
+          "windsurf"
+        ]
+      },
+      {
+        "destination": ".windsurf/skills/skill-tree-pr-review-cycle",
+        "name": "skill-tree-pr-review-cycle",
+        "flavor": "general",
+        "identity": "738ae13a31486799f00a0708c7127647f940bff4ebf3630fe50b755a2a6e9d2c",
+        "providers": [
+          "windsurf"
+        ]
+      },
+      {
+        "destination": ".windsurf/skills/skill-tree-process-future-pending",
+        "name": "skill-tree-process-future-pending",
+        "flavor": "general",
+        "identity": "c0abaa54ecf14fc8684446fdf300645ec3ef983cae8abc515732f0149bf9065e",
+        "providers": [
+          "windsurf"
+        ]
+      },
+      {
+        "destination": ".windsurf/skills/skill-tree-repo-documentation",
+        "name": "skill-tree-repo-documentation",
+        "flavor": "general",
+        "identity": "9dcd3aecda4fc553f0c5235ada76487d2235bc6d17bd7781524497097521b673",
+        "providers": [
+          "windsurf"
+        ]
+      },
+      {
+        "destination": ".windsurf/skills/skill-tree-repo-documentation-audit",
+        "name": "skill-tree-repo-documentation-audit",
+        "flavor": "general",
+        "identity": "cf43a8e5f71d00e37d93caa1112cf0b69c501b920c6dbebdd344e6fd1c470342",
+        "providers": [
+          "windsurf"
+        ]
+      },
+      {
+        "destination": ".windsurf/skills/skill-tree-work-through-next",
+        "name": "skill-tree-work-through-next",
+        "flavor": "general",
+        "identity": "240bda9dc55bd728ce8378afe4bcfbf138e4954c983b72820b7d7a3fcaa756b0",
+        "providers": [
+          "windsurf"
+        ]
+      }
+    ],
+    "policy": "Immediate focused feedback; scoped additional boundary checks; no implicit product execution.",
+    "facts": {
+      "test_assemblies": [],
+      "ui": [],
+      "package_manager": "npm",
+      "node": null,
+      "packages": {},
+      "capabilities": {}
+    },
+    "gaps": [
+      {
+        "key": "test-foundation",
+        "reason": "No usable foundational test command is declared.",
+        "recommendation": "Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile."
+      }
+    ]
+  },
+  {
+    "provider": "cline",
+    "ok": true,
+    "action": "dry-run",
+    "flavor": "general",
+    "changed": [
+      ".agents/skills/skill-tree-add-pending-task",
+      ".agents/skills/skill-tree-clarify-tasks",
+      ".agents/skills/skill-tree-create-documents-snapshot",
+      ".agents/skills/skill-tree-implement-all",
+      ".agents/skills/skill-tree-implement-next-future-task",
+      ".agents/skills/skill-tree-pr-review-cycle",
+      ".agents/skills/skill-tree-process-future-pending",
+      ".agents/skills/skill-tree-repo-documentation",
+      ".agents/skills/skill-tree-repo-documentation-audit",
+      ".agents/skills/skill-tree-work-through-next",
+      ".skill-tree/installation/source/common/references/decision-governance.md",
+      ".skill-tree/installation/source/common/references/development-practices.md",
+      ".skill-tree/installation/source/common/references/document-rules.md",
+      ".skill-tree/installation/source/common/references/documentation-output-contract.md",
+      ".skill-tree/installation/source/common/references/future-workflow.md",
+      ".skill-tree/installation/source/common/references/history-retention.md",
+      ".skill-tree/installation/source/common/references/installation-profile.md",
+      ".skill-tree/installation/source/common/references/orchestration.md",
+      ".skill-tree/installation/source/common/references/pending-task-format.md",
+      ".skill-tree/installation/source/common/references/pending-task-intake.md",
+      ".skill-tree/installation/source/common/references/plugin-invocation.md",
+      ".skill-tree/installation/source/common/references/pr-review-cycle.md",
+      ".skill-tree/installation/source/common/references/repository-discovery-checklist.md",
+      ".skill-tree/installation/source/common/references/run-workspaces.md",
+      ".skill-tree/installation/source/common/references/snapshot-rules.md",
+      ".skill-tree/installation/source/common/references/unity-safety.md",
+      ".skill-tree/installation/source/common/references/validation-policy.md",
+      ".skill-tree/installation/source/common/references/workflow-metadata.md",
+      ".skill-tree/installation/source/common/scripts/create-documentation-snapshot.py",
+      ".skill-tree/installation/source/common/scripts/decision-governance.py",
+      ".skill-tree/installation/source/common/scripts/decision-orchestration.py",
+      ".skill-tree/installation/source/common/scripts/inspect-unity-repository.py",
+      ".skill-tree/installation/source/common/scripts/plugin-hooks.js",
+      ".skill-tree/installation/source/common/scripts/plugin-invocation.py",
+      ".skill-tree/installation/source/common/scripts/plugin-processing.py",
+      ".skill-tree/installation/source/common/scripts/pr-review-state.py",
+      ".skill-tree/installation/source/common/scripts/run-workspaces.py",
+      ".skill-tree/installation/source/common/scripts/select-prioritized-task.py",
+      ".skill-tree/installation/source/common/scripts/validate-document-rules.py",
+      ".skill-tree/installation/source/common/scripts/validate-future-document.py",
+      ".skill-tree/installation/source/common/scripts/validate-repository-documentation.py",
+      ".skill-tree/installation/source/common/scripts/workflow-state.py",
+      ".skill-tree/installation/source/domains/general/sections.json",
+      ".skill-tree/installation/source/templates/invariants.json",
+      ".skill-tree/installation/source/templates/operations.json",
+      ".skill-tree/installation/source/config/capabilities.json",
+      ".skill-tree/installation/source/config/flavors.json",
+      ".skill-tree/installation/source/config/plugins/ponytail.json",
+      ".skill-tree/installation/source/config/plugins/task-editorial.json",
+      ".skill-tree/installation/source/config/plugins/task-interview.json",
+      ".skill-tree/installation/source/config/providers.json",
+      ".skill-tree/installation/source/config/resource-map.json",
+      ".skill-tree/installation/source/lib/composer.js",
+      ".skill-tree/installation/source/lib/execution-bindings.js",
+      ".skill-tree/installation/source/lib/installation.js",
+      ".skill-tree/installation/source/lib/plugin-acquisition.js",
+      ".skill-tree/installation/source/lib/plugin-bindings.js",
+      ".skill-tree/installation/source/lib/plugin-composition.js",
+      ".skill-tree/installation/source/lib/plugin-lifecycle.js",
+      ".skill-tree/installation/source/lib/plugin-management.js",
+      ".skill-tree/installation/source/lib/plugin-parameters.js",
+      ".skill-tree/installation/source/lib/plugin-registry.js",
+      ".skill-tree/installation/source/lib/plugin-runtime.js",
+      ".skill-tree/installation/source/lib/plugin-sources.js",
+      ".skill-tree/installation/source/lib/plugins.js",
+      ".skill-tree/installation/source/src/init-rules/skill-tree-skills.md",
+      ".skill-tree/installation/manager.js",
+      ".skill-tree/installation/profile.json"
+    ],
+    "profile_identity": "49f566f3a4c913c943729d2cac193758bf31d09a8105599c03c20fc4c5a5fe65",
+    "environment_identity": "4e461fd827d8e0b8d03a68ced1752df088e1a22eedd8c17d5a0e33e09a78ce29",
+    "input_fingerprints": {
+      ".node-version": null,
+      ".nvmrc": null,
+      ".skill-tree/config/repository.json": null,
+      ".skill-tree/installation/plugins.json": null,
+      ".skill-tree/validation-recipes.json": null,
+      ".skill-tree/worktree-profile.json": null,
+      "Cargo.toml": null,
+      "Packages/manifest.json": null,
+      "Packages/packages-lock.json": null,
+      "ProjectSettings/EditorSettings.asset": null,
+      "ProjectSettings/ProjectSettings.asset": null,
+      "ProjectSettings/ProjectVersion.txt": null,
+      "bun.lock": null,
+      "bun.lockb": null,
+      "npm-shrinkwrap.json": null,
+      "package-lock.json": null,
+      "package.json": null,
+      "pnpm-lock.yaml": null,
+      "pyproject.toml": null,
+      "pytest.ini": null,
+      "yarn.lock": null
+    },
+    "packages": [
+      {
+        "destination": ".agents/skills/skill-tree-add-pending-task",
+        "name": "skill-tree-add-pending-task",
+        "flavor": "general",
+        "identity": "8f6529a700d99194cd0d55960ba2df4046cf240ce8c8de32dcfcc7602ad852eb",
+        "providers": [
+          "cline"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-clarify-tasks",
+        "name": "skill-tree-clarify-tasks",
+        "flavor": "general",
+        "identity": "fdf6f2fd09584a5a861f54b759de7c67ca423badc478ebdaada039fa1077e941",
+        "providers": [
+          "cline"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-create-documents-snapshot",
+        "name": "skill-tree-create-documents-snapshot",
+        "flavor": "general",
+        "identity": "9fcc0b00fb742e391337491212040de94c81980f1a25925808cb39520a0cf8a5",
+        "providers": [
+          "cline"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-implement-all",
+        "name": "skill-tree-implement-all",
+        "flavor": "general",
+        "identity": "47f71883b277e05a40bfb22a9780e14f195b1ac7d184b29797515d07a3d5b536",
+        "providers": [
+          "cline"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-implement-next-future-task",
+        "name": "skill-tree-implement-next-future-task",
+        "flavor": "general",
+        "identity": "2b98e243acc4df6fb7e4d7c17d6315d7b9a20443e599297f5dc90553d0a627f8",
+        "providers": [
+          "cline"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-pr-review-cycle",
+        "name": "skill-tree-pr-review-cycle",
+        "flavor": "general",
+        "identity": "738ae13a31486799f00a0708c7127647f940bff4ebf3630fe50b755a2a6e9d2c",
+        "providers": [
+          "cline"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-process-future-pending",
+        "name": "skill-tree-process-future-pending",
+        "flavor": "general",
+        "identity": "c0abaa54ecf14fc8684446fdf300645ec3ef983cae8abc515732f0149bf9065e",
+        "providers": [
+          "cline"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-repo-documentation",
+        "name": "skill-tree-repo-documentation",
+        "flavor": "general",
+        "identity": "9dcd3aecda4fc553f0c5235ada76487d2235bc6d17bd7781524497097521b673",
+        "providers": [
+          "cline"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-repo-documentation-audit",
+        "name": "skill-tree-repo-documentation-audit",
+        "flavor": "general",
+        "identity": "cf43a8e5f71d00e37d93caa1112cf0b69c501b920c6dbebdd344e6fd1c470342",
+        "providers": [
+          "cline"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-work-through-next",
+        "name": "skill-tree-work-through-next",
+        "flavor": "general",
+        "identity": "240bda9dc55bd728ce8378afe4bcfbf138e4954c983b72820b7d7a3fcaa756b0",
+        "providers": [
+          "cline"
+        ]
+      }
+    ],
+    "policy": "Immediate focused feedback; scoped additional boundary checks; no implicit product execution.",
+    "facts": {
+      "test_assemblies": [],
+      "ui": [],
+      "package_manager": "npm",
+      "node": null,
+      "packages": {},
+      "capabilities": {}
+    },
+    "gaps": [
+      {
+        "key": "test-foundation",
+        "reason": "No usable foundational test command is declared.",
+        "recommendation": "Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile."
+      }
+    ]
+  },
+  {
+    "provider": "github-copilot",
+    "ok": true,
+    "action": "dry-run",
+    "flavor": "general",
+    "changed": [
+      ".agents/skills/skill-tree-add-pending-task",
+      ".agents/skills/skill-tree-clarify-tasks",
+      ".agents/skills/skill-tree-create-documents-snapshot",
+      ".agents/skills/skill-tree-implement-all",
+      ".agents/skills/skill-tree-implement-next-future-task",
+      ".agents/skills/skill-tree-pr-review-cycle",
+      ".agents/skills/skill-tree-process-future-pending",
+      ".agents/skills/skill-tree-repo-documentation",
+      ".agents/skills/skill-tree-repo-documentation-audit",
+      ".agents/skills/skill-tree-work-through-next",
+      ".skill-tree/installation/source/common/references/decision-governance.md",
+      ".skill-tree/installation/source/common/references/development-practices.md",
+      ".skill-tree/installation/source/common/references/document-rules.md",
+      ".skill-tree/installation/source/common/references/documentation-output-contract.md",
+      ".skill-tree/installation/source/common/references/future-workflow.md",
+      ".skill-tree/installation/source/common/references/history-retention.md",
+      ".skill-tree/installation/source/common/references/installation-profile.md",
+      ".skill-tree/installation/source/common/references/orchestration.md",
+      ".skill-tree/installation/source/common/references/pending-task-format.md",
+      ".skill-tree/installation/source/common/references/pending-task-intake.md",
+      ".skill-tree/installation/source/common/references/plugin-invocation.md",
+      ".skill-tree/installation/source/common/references/pr-review-cycle.md",
+      ".skill-tree/installation/source/common/references/repository-discovery-checklist.md",
+      ".skill-tree/installation/source/common/references/run-workspaces.md",
+      ".skill-tree/installation/source/common/references/snapshot-rules.md",
+      ".skill-tree/installation/source/common/references/unity-safety.md",
+      ".skill-tree/installation/source/common/references/validation-policy.md",
+      ".skill-tree/installation/source/common/references/workflow-metadata.md",
+      ".skill-tree/installation/source/common/scripts/create-documentation-snapshot.py",
+      ".skill-tree/installation/source/common/scripts/decision-governance.py",
+      ".skill-tree/installation/source/common/scripts/decision-orchestration.py",
+      ".skill-tree/installation/source/common/scripts/inspect-unity-repository.py",
+      ".skill-tree/installation/source/common/scripts/plugin-hooks.js",
+      ".skill-tree/installation/source/common/scripts/plugin-invocation.py",
+      ".skill-tree/installation/source/common/scripts/plugin-processing.py",
+      ".skill-tree/installation/source/common/scripts/pr-review-state.py",
+      ".skill-tree/installation/source/common/scripts/run-workspaces.py",
+      ".skill-tree/installation/source/common/scripts/select-prioritized-task.py",
+      ".skill-tree/installation/source/common/scripts/validate-document-rules.py",
+      ".skill-tree/installation/source/common/scripts/validate-future-document.py",
+      ".skill-tree/installation/source/common/scripts/validate-repository-documentation.py",
+      ".skill-tree/installation/source/common/scripts/workflow-state.py",
+      ".skill-tree/installation/source/domains/general/sections.json",
+      ".skill-tree/installation/source/templates/invariants.json",
+      ".skill-tree/installation/source/templates/operations.json",
+      ".skill-tree/installation/source/config/capabilities.json",
+      ".skill-tree/installation/source/config/flavors.json",
+      ".skill-tree/installation/source/config/plugins/ponytail.json",
+      ".skill-tree/installation/source/config/plugins/task-editorial.json",
+      ".skill-tree/installation/source/config/plugins/task-interview.json",
+      ".skill-tree/installation/source/config/providers.json",
+      ".skill-tree/installation/source/config/resource-map.json",
+      ".skill-tree/installation/source/lib/composer.js",
+      ".skill-tree/installation/source/lib/execution-bindings.js",
+      ".skill-tree/installation/source/lib/installation.js",
+      ".skill-tree/installation/source/lib/plugin-acquisition.js",
+      ".skill-tree/installation/source/lib/plugin-bindings.js",
+      ".skill-tree/installation/source/lib/plugin-composition.js",
+      ".skill-tree/installation/source/lib/plugin-lifecycle.js",
+      ".skill-tree/installation/source/lib/plugin-management.js",
+      ".skill-tree/installation/source/lib/plugin-parameters.js",
+      ".skill-tree/installation/source/lib/plugin-registry.js",
+      ".skill-tree/installation/source/lib/plugin-runtime.js",
+      ".skill-tree/installation/source/lib/plugin-sources.js",
+      ".skill-tree/installation/source/lib/plugins.js",
+      ".skill-tree/installation/source/src/init-rules/skill-tree-skills.md",
+      ".skill-tree/installation/manager.js",
+      ".skill-tree/installation/profile.json"
+    ],
+    "profile_identity": "49f566f3a4c913c943729d2cac193758bf31d09a8105599c03c20fc4c5a5fe65",
+    "environment_identity": "4e461fd827d8e0b8d03a68ced1752df088e1a22eedd8c17d5a0e33e09a78ce29",
+    "input_fingerprints": {
+      ".node-version": null,
+      ".nvmrc": null,
+      ".skill-tree/config/repository.json": null,
+      ".skill-tree/installation/plugins.json": null,
+      ".skill-tree/validation-recipes.json": null,
+      ".skill-tree/worktree-profile.json": null,
+      "Cargo.toml": null,
+      "Packages/manifest.json": null,
+      "Packages/packages-lock.json": null,
+      "ProjectSettings/EditorSettings.asset": null,
+      "ProjectSettings/ProjectSettings.asset": null,
+      "ProjectSettings/ProjectVersion.txt": null,
+      "bun.lock": null,
+      "bun.lockb": null,
+      "npm-shrinkwrap.json": null,
+      "package-lock.json": null,
+      "package.json": null,
+      "pnpm-lock.yaml": null,
+      "pyproject.toml": null,
+      "pytest.ini": null,
+      "yarn.lock": null
+    },
+    "packages": [
+      {
+        "destination": ".agents/skills/skill-tree-add-pending-task",
+        "name": "skill-tree-add-pending-task",
+        "flavor": "general",
+        "identity": "8f6529a700d99194cd0d55960ba2df4046cf240ce8c8de32dcfcc7602ad852eb",
+        "providers": [
+          "github-copilot"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-clarify-tasks",
+        "name": "skill-tree-clarify-tasks",
+        "flavor": "general",
+        "identity": "fdf6f2fd09584a5a861f54b759de7c67ca423badc478ebdaada039fa1077e941",
+        "providers": [
+          "github-copilot"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-create-documents-snapshot",
+        "name": "skill-tree-create-documents-snapshot",
+        "flavor": "general",
+        "identity": "9fcc0b00fb742e391337491212040de94c81980f1a25925808cb39520a0cf8a5",
+        "providers": [
+          "github-copilot"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-implement-all",
+        "name": "skill-tree-implement-all",
+        "flavor": "general",
+        "identity": "47f71883b277e05a40bfb22a9780e14f195b1ac7d184b29797515d07a3d5b536",
+        "providers": [
+          "github-copilot"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-implement-next-future-task",
+        "name": "skill-tree-implement-next-future-task",
+        "flavor": "general",
+        "identity": "2b98e243acc4df6fb7e4d7c17d6315d7b9a20443e599297f5dc90553d0a627f8",
+        "providers": [
+          "github-copilot"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-pr-review-cycle",
+        "name": "skill-tree-pr-review-cycle",
+        "flavor": "general",
+        "identity": "738ae13a31486799f00a0708c7127647f940bff4ebf3630fe50b755a2a6e9d2c",
+        "providers": [
+          "github-copilot"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-process-future-pending",
+        "name": "skill-tree-process-future-pending",
+        "flavor": "general",
+        "identity": "c0abaa54ecf14fc8684446fdf300645ec3ef983cae8abc515732f0149bf9065e",
+        "providers": [
+          "github-copilot"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-repo-documentation",
+        "name": "skill-tree-repo-documentation",
+        "flavor": "general",
+        "identity": "9dcd3aecda4fc553f0c5235ada76487d2235bc6d17bd7781524497097521b673",
+        "providers": [
+          "github-copilot"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-repo-documentation-audit",
+        "name": "skill-tree-repo-documentation-audit",
+        "flavor": "general",
+        "identity": "cf43a8e5f71d00e37d93caa1112cf0b69c501b920c6dbebdd344e6fd1c470342",
+        "providers": [
+          "github-copilot"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-work-through-next",
+        "name": "skill-tree-work-through-next",
+        "flavor": "general",
+        "identity": "240bda9dc55bd728ce8378afe4bcfbf138e4954c983b72820b7d7a3fcaa756b0",
+        "providers": [
+          "github-copilot"
+        ]
+      }
+    ],
+    "policy": "Immediate focused feedback; scoped additional boundary checks; no implicit product execution.",
+    "facts": {
+      "test_assemblies": [],
+      "ui": [],
+      "package_manager": "npm",
+      "node": null,
+      "packages": {},
+      "capabilities": {}
+    },
+    "gaps": [
+      {
+        "key": "test-foundation",
+        "reason": "No usable foundational test command is declared.",
+        "recommendation": "Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile."
+      }
+    ]
+  },
+  {
+    "provider": "opencode",
+    "ok": true,
+    "action": "dry-run",
+    "flavor": "general",
+    "changed": [
+      ".agents/skills/skill-tree-add-pending-task",
+      ".agents/skills/skill-tree-clarify-tasks",
+      ".agents/skills/skill-tree-create-documents-snapshot",
+      ".agents/skills/skill-tree-implement-all",
+      ".agents/skills/skill-tree-implement-next-future-task",
+      ".agents/skills/skill-tree-pr-review-cycle",
+      ".agents/skills/skill-tree-process-future-pending",
+      ".agents/skills/skill-tree-repo-documentation",
+      ".agents/skills/skill-tree-repo-documentation-audit",
+      ".agents/skills/skill-tree-work-through-next",
+      ".skill-tree/installation/source/common/references/decision-governance.md",
+      ".skill-tree/installation/source/common/references/development-practices.md",
+      ".skill-tree/installation/source/common/references/document-rules.md",
+      ".skill-tree/installation/source/common/references/documentation-output-contract.md",
+      ".skill-tree/installation/source/common/references/future-workflow.md",
+      ".skill-tree/installation/source/common/references/history-retention.md",
+      ".skill-tree/installation/source/common/references/installation-profile.md",
+      ".skill-tree/installation/source/common/references/orchestration.md",
+      ".skill-tree/installation/source/common/references/pending-task-format.md",
+      ".skill-tree/installation/source/common/references/pending-task-intake.md",
+      ".skill-tree/installation/source/common/references/plugin-invocation.md",
+      ".skill-tree/installation/source/common/references/pr-review-cycle.md",
+      ".skill-tree/installation/source/common/references/repository-discovery-checklist.md",
+      ".skill-tree/installation/source/common/references/run-workspaces.md",
+      ".skill-tree/installation/source/common/references/snapshot-rules.md",
+      ".skill-tree/installation/source/common/references/unity-safety.md",
+      ".skill-tree/installation/source/common/references/validation-policy.md",
+      ".skill-tree/installation/source/common/references/workflow-metadata.md",
+      ".skill-tree/installation/source/common/scripts/create-documentation-snapshot.py",
+      ".skill-tree/installation/source/common/scripts/decision-governance.py",
+      ".skill-tree/installation/source/common/scripts/decision-orchestration.py",
+      ".skill-tree/installation/source/common/scripts/inspect-unity-repository.py",
+      ".skill-tree/installation/source/common/scripts/plugin-hooks.js",
+      ".skill-tree/installation/source/common/scripts/plugin-invocation.py",
+      ".skill-tree/installation/source/common/scripts/plugin-processing.py",
+      ".skill-tree/installation/source/common/scripts/pr-review-state.py",
+      ".skill-tree/installation/source/common/scripts/run-workspaces.py",
+      ".skill-tree/installation/source/common/scripts/select-prioritized-task.py",
+      ".skill-tree/installation/source/common/scripts/validate-document-rules.py",
+      ".skill-tree/installation/source/common/scripts/validate-future-document.py",
+      ".skill-tree/installation/source/common/scripts/validate-repository-documentation.py",
+      ".skill-tree/installation/source/common/scripts/workflow-state.py",
+      ".skill-tree/installation/source/domains/general/sections.json",
+      ".skill-tree/installation/source/templates/invariants.json",
+      ".skill-tree/installation/source/templates/operations.json",
+      ".skill-tree/installation/source/config/capabilities.json",
+      ".skill-tree/installation/source/config/flavors.json",
+      ".skill-tree/installation/source/config/plugins/ponytail.json",
+      ".skill-tree/installation/source/config/plugins/task-editorial.json",
+      ".skill-tree/installation/source/config/plugins/task-interview.json",
+      ".skill-tree/installation/source/config/providers.json",
+      ".skill-tree/installation/source/config/resource-map.json",
+      ".skill-tree/installation/source/lib/composer.js",
+      ".skill-tree/installation/source/lib/execution-bindings.js",
+      ".skill-tree/installation/source/lib/installation.js",
+      ".skill-tree/installation/source/lib/plugin-acquisition.js",
+      ".skill-tree/installation/source/lib/plugin-bindings.js",
+      ".skill-tree/installation/source/lib/plugin-composition.js",
+      ".skill-tree/installation/source/lib/plugin-lifecycle.js",
+      ".skill-tree/installation/source/lib/plugin-management.js",
+      ".skill-tree/installation/source/lib/plugin-parameters.js",
+      ".skill-tree/installation/source/lib/plugin-registry.js",
+      ".skill-tree/installation/source/lib/plugin-runtime.js",
+      ".skill-tree/installation/source/lib/plugin-sources.js",
+      ".skill-tree/installation/source/lib/plugins.js",
+      ".skill-tree/installation/source/src/init-rules/skill-tree-skills.md",
+      ".skill-tree/installation/manager.js",
+      ".skill-tree/installation/profile.json"
+    ],
+    "profile_identity": "49f566f3a4c913c943729d2cac193758bf31d09a8105599c03c20fc4c5a5fe65",
+    "environment_identity": "4e461fd827d8e0b8d03a68ced1752df088e1a22eedd8c17d5a0e33e09a78ce29",
+    "input_fingerprints": {
+      ".node-version": null,
+      ".nvmrc": null,
+      ".skill-tree/config/repository.json": null,
+      ".skill-tree/installation/plugins.json": null,
+      ".skill-tree/validation-recipes.json": null,
+      ".skill-tree/worktree-profile.json": null,
+      "Cargo.toml": null,
+      "Packages/manifest.json": null,
+      "Packages/packages-lock.json": null,
+      "ProjectSettings/EditorSettings.asset": null,
+      "ProjectSettings/ProjectSettings.asset": null,
+      "ProjectSettings/ProjectVersion.txt": null,
+      "bun.lock": null,
+      "bun.lockb": null,
+      "npm-shrinkwrap.json": null,
+      "package-lock.json": null,
+      "package.json": null,
+      "pnpm-lock.yaml": null,
+      "pyproject.toml": null,
+      "pytest.ini": null,
+      "yarn.lock": null
+    },
+    "packages": [
+      {
+        "destination": ".agents/skills/skill-tree-add-pending-task",
+        "name": "skill-tree-add-pending-task",
+        "flavor": "general",
+        "identity": "8f6529a700d99194cd0d55960ba2df4046cf240ce8c8de32dcfcc7602ad852eb",
+        "providers": [
+          "opencode"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-clarify-tasks",
+        "name": "skill-tree-clarify-tasks",
+        "flavor": "general",
+        "identity": "fdf6f2fd09584a5a861f54b759de7c67ca423badc478ebdaada039fa1077e941",
+        "providers": [
+          "opencode"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-create-documents-snapshot",
+        "name": "skill-tree-create-documents-snapshot",
+        "flavor": "general",
+        "identity": "9fcc0b00fb742e391337491212040de94c81980f1a25925808cb39520a0cf8a5",
+        "providers": [
+          "opencode"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-implement-all",
+        "name": "skill-tree-implement-all",
+        "flavor": "general",
+        "identity": "47f71883b277e05a40bfb22a9780e14f195b1ac7d184b29797515d07a3d5b536",
+        "providers": [
+          "opencode"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-implement-next-future-task",
+        "name": "skill-tree-implement-next-future-task",
+        "flavor": "general",
+        "identity": "2b98e243acc4df6fb7e4d7c17d6315d7b9a20443e599297f5dc90553d0a627f8",
+        "providers": [
+          "opencode"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-pr-review-cycle",
+        "name": "skill-tree-pr-review-cycle",
+        "flavor": "general",
+        "identity": "738ae13a31486799f00a0708c7127647f940bff4ebf3630fe50b755a2a6e9d2c",
+        "providers": [
+          "opencode"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-process-future-pending",
+        "name": "skill-tree-process-future-pending",
+        "flavor": "general",
+        "identity": "c0abaa54ecf14fc8684446fdf300645ec3ef983cae8abc515732f0149bf9065e",
+        "providers": [
+          "opencode"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-repo-documentation",
+        "name": "skill-tree-repo-documentation",
+        "flavor": "general",
+        "identity": "9dcd3aecda4fc553f0c5235ada76487d2235bc6d17bd7781524497097521b673",
+        "providers": [
+          "opencode"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-repo-documentation-audit",
+        "name": "skill-tree-repo-documentation-audit",
+        "flavor": "general",
+        "identity": "cf43a8e5f71d00e37d93caa1112cf0b69c501b920c6dbebdd344e6fd1c470342",
+        "providers": [
+          "opencode"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-work-through-next",
+        "name": "skill-tree-work-through-next",
+        "flavor": "general",
+        "identity": "240bda9dc55bd728ce8378afe4bcfbf138e4954c983b72820b7d7a3fcaa756b0",
+        "providers": [
+          "opencode"
+        ]
+      }
+    ],
+    "policy": "Immediate focused feedback; scoped additional boundary checks; no implicit product execution.",
+    "facts": {
+      "test_assemblies": [],
+      "ui": [],
+      "package_manager": "npm",
+      "node": null,
+      "packages": {},
+      "capabilities": {}
+    },
+    "gaps": [
+      {
+        "key": "test-foundation",
+        "reason": "No usable foundational test command is declared.",
+        "recommendation": "Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile."
+      }
+    ]
+  },
+  {
+    "provider": "roo",
+    "ok": true,
+    "action": "dry-run",
+    "flavor": "general",
+    "changed": [
+      ".roo/skills/skill-tree-add-pending-task",
+      ".roo/skills/skill-tree-clarify-tasks",
+      ".roo/skills/skill-tree-create-documents-snapshot",
+      ".roo/skills/skill-tree-implement-all",
+      ".roo/skills/skill-tree-implement-next-future-task",
+      ".roo/skills/skill-tree-pr-review-cycle",
+      ".roo/skills/skill-tree-process-future-pending",
+      ".roo/skills/skill-tree-repo-documentation",
+      ".roo/skills/skill-tree-repo-documentation-audit",
+      ".roo/skills/skill-tree-work-through-next",
+      ".skill-tree/installation/source/common/references/decision-governance.md",
+      ".skill-tree/installation/source/common/references/development-practices.md",
+      ".skill-tree/installation/source/common/references/document-rules.md",
+      ".skill-tree/installation/source/common/references/documentation-output-contract.md",
+      ".skill-tree/installation/source/common/references/future-workflow.md",
+      ".skill-tree/installation/source/common/references/history-retention.md",
+      ".skill-tree/installation/source/common/references/installation-profile.md",
+      ".skill-tree/installation/source/common/references/orchestration.md",
+      ".skill-tree/installation/source/common/references/pending-task-format.md",
+      ".skill-tree/installation/source/common/references/pending-task-intake.md",
+      ".skill-tree/installation/source/common/references/plugin-invocation.md",
+      ".skill-tree/installation/source/common/references/pr-review-cycle.md",
+      ".skill-tree/installation/source/common/references/repository-discovery-checklist.md",
+      ".skill-tree/installation/source/common/references/run-workspaces.md",
+      ".skill-tree/installation/source/common/references/snapshot-rules.md",
+      ".skill-tree/installation/source/common/references/unity-safety.md",
+      ".skill-tree/installation/source/common/references/validation-policy.md",
+      ".skill-tree/installation/source/common/references/workflow-metadata.md",
+      ".skill-tree/installation/source/common/scripts/create-documentation-snapshot.py",
+      ".skill-tree/installation/source/common/scripts/decision-governance.py",
+      ".skill-tree/installation/source/common/scripts/decision-orchestration.py",
+      ".skill-tree/installation/source/common/scripts/inspect-unity-repository.py",
+      ".skill-tree/installation/source/common/scripts/plugin-hooks.js",
+      ".skill-tree/installation/source/common/scripts/plugin-invocation.py",
+      ".skill-tree/installation/source/common/scripts/plugin-processing.py",
+      ".skill-tree/installation/source/common/scripts/pr-review-state.py",
+      ".skill-tree/installation/source/common/scripts/run-workspaces.py",
+      ".skill-tree/installation/source/common/scripts/select-prioritized-task.py",
+      ".skill-tree/installation/source/common/scripts/validate-document-rules.py",
+      ".skill-tree/installation/source/common/scripts/validate-future-document.py",
+      ".skill-tree/installation/source/common/scripts/validate-repository-documentation.py",
+      ".skill-tree/installation/source/common/scripts/workflow-state.py",
+      ".skill-tree/installation/source/domains/general/sections.json",
+      ".skill-tree/installation/source/templates/invariants.json",
+      ".skill-tree/installation/source/templates/operations.json",
+      ".skill-tree/installation/source/config/capabilities.json",
+      ".skill-tree/installation/source/config/flavors.json",
+      ".skill-tree/installation/source/config/plugins/ponytail.json",
+      ".skill-tree/installation/source/config/plugins/task-editorial.json",
+      ".skill-tree/installation/source/config/plugins/task-interview.json",
+      ".skill-tree/installation/source/config/providers.json",
+      ".skill-tree/installation/source/config/resource-map.json",
+      ".skill-tree/installation/source/lib/composer.js",
+      ".skill-tree/installation/source/lib/execution-bindings.js",
+      ".skill-tree/installation/source/lib/installation.js",
+      ".skill-tree/installation/source/lib/plugin-acquisition.js",
+      ".skill-tree/installation/source/lib/plugin-bindings.js",
+      ".skill-tree/installation/source/lib/plugin-composition.js",
+      ".skill-tree/installation/source/lib/plugin-lifecycle.js",
+      ".skill-tree/installation/source/lib/plugin-management.js",
+      ".skill-tree/installation/source/lib/plugin-parameters.js",
+      ".skill-tree/installation/source/lib/plugin-registry.js",
+      ".skill-tree/installation/source/lib/plugin-runtime.js",
+      ".skill-tree/installation/source/lib/plugin-sources.js",
+      ".skill-tree/installation/source/lib/plugins.js",
+      ".skill-tree/installation/source/src/init-rules/skill-tree-skills.md",
+      ".skill-tree/installation/manager.js",
+      ".skill-tree/installation/profile.json"
+    ],
+    "profile_identity": "49f566f3a4c913c943729d2cac193758bf31d09a8105599c03c20fc4c5a5fe65",
+    "environment_identity": "4e461fd827d8e0b8d03a68ced1752df088e1a22eedd8c17d5a0e33e09a78ce29",
+    "input_fingerprints": {
+      ".node-version": null,
+      ".nvmrc": null,
+      ".skill-tree/config/repository.json": null,
+      ".skill-tree/installation/plugins.json": null,
+      ".skill-tree/validation-recipes.json": null,
+      ".skill-tree/worktree-profile.json": null,
+      "Cargo.toml": null,
+      "Packages/manifest.json": null,
+      "Packages/packages-lock.json": null,
+      "ProjectSettings/EditorSettings.asset": null,
+      "ProjectSettings/ProjectSettings.asset": null,
+      "ProjectSettings/ProjectVersion.txt": null,
+      "bun.lock": null,
+      "bun.lockb": null,
+      "npm-shrinkwrap.json": null,
+      "package-lock.json": null,
+      "package.json": null,
+      "pnpm-lock.yaml": null,
+      "pyproject.toml": null,
+      "pytest.ini": null,
+      "yarn.lock": null
+    },
+    "packages": [
+      {
+        "destination": ".roo/skills/skill-tree-add-pending-task",
+        "name": "skill-tree-add-pending-task",
+        "flavor": "general",
+        "identity": "8f6529a700d99194cd0d55960ba2df4046cf240ce8c8de32dcfcc7602ad852eb",
+        "providers": [
+          "roo"
+        ]
+      },
+      {
+        "destination": ".roo/skills/skill-tree-clarify-tasks",
+        "name": "skill-tree-clarify-tasks",
+        "flavor": "general",
+        "identity": "fdf6f2fd09584a5a861f54b759de7c67ca423badc478ebdaada039fa1077e941",
+        "providers": [
+          "roo"
+        ]
+      },
+      {
+        "destination": ".roo/skills/skill-tree-create-documents-snapshot",
+        "name": "skill-tree-create-documents-snapshot",
+        "flavor": "general",
+        "identity": "9fcc0b00fb742e391337491212040de94c81980f1a25925808cb39520a0cf8a5",
+        "providers": [
+          "roo"
+        ]
+      },
+      {
+        "destination": ".roo/skills/skill-tree-implement-all",
+        "name": "skill-tree-implement-all",
+        "flavor": "general",
+        "identity": "47f71883b277e05a40bfb22a9780e14f195b1ac7d184b29797515d07a3d5b536",
+        "providers": [
+          "roo"
+        ]
+      },
+      {
+        "destination": ".roo/skills/skill-tree-implement-next-future-task",
+        "name": "skill-tree-implement-next-future-task",
+        "flavor": "general",
+        "identity": "2b98e243acc4df6fb7e4d7c17d6315d7b9a20443e599297f5dc90553d0a627f8",
+        "providers": [
+          "roo"
+        ]
+      },
+      {
+        "destination": ".roo/skills/skill-tree-pr-review-cycle",
+        "name": "skill-tree-pr-review-cycle",
+        "flavor": "general",
+        "identity": "738ae13a31486799f00a0708c7127647f940bff4ebf3630fe50b755a2a6e9d2c",
+        "providers": [
+          "roo"
+        ]
+      },
+      {
+        "destination": ".roo/skills/skill-tree-process-future-pending",
+        "name": "skill-tree-process-future-pending",
+        "flavor": "general",
+        "identity": "c0abaa54ecf14fc8684446fdf300645ec3ef983cae8abc515732f0149bf9065e",
+        "providers": [
+          "roo"
+        ]
+      },
+      {
+        "destination": ".roo/skills/skill-tree-repo-documentation",
+        "name": "skill-tree-repo-documentation",
+        "flavor": "general",
+        "identity": "9dcd3aecda4fc553f0c5235ada76487d2235bc6d17bd7781524497097521b673",
+        "providers": [
+          "roo"
+        ]
+      },
+      {
+        "destination": ".roo/skills/skill-tree-repo-documentation-audit",
+        "name": "skill-tree-repo-documentation-audit",
+        "flavor": "general",
+        "identity": "cf43a8e5f71d00e37d93caa1112cf0b69c501b920c6dbebdd344e6fd1c470342",
+        "providers": [
+          "roo"
+        ]
+      },
+      {
+        "destination": ".roo/skills/skill-tree-work-through-next",
+        "name": "skill-tree-work-through-next",
+        "flavor": "general",
+        "identity": "240bda9dc55bd728ce8378afe4bcfbf138e4954c983b72820b7d7a3fcaa756b0",
+        "providers": [
+          "roo"
+        ]
+      }
+    ],
+    "policy": "Immediate focused feedback; scoped additional boundary checks; no implicit product execution.",
+    "facts": {
+      "test_assemblies": [],
+      "ui": [],
+      "package_manager": "npm",
+      "node": null,
+      "packages": {},
+      "capabilities": {}
+    },
+    "gaps": [
+      {
+        "key": "test-foundation",
+        "reason": "No usable foundational test command is declared.",
+        "recommendation": "Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile."
+      }
+    ]
+  },
+  {
+    "provider": "kilo",
+    "ok": true,
+    "action": "dry-run",
+    "flavor": "general",
+    "changed": [
+      ".kilocode/skills/skill-tree-add-pending-task",
+      ".kilocode/skills/skill-tree-clarify-tasks",
+      ".kilocode/skills/skill-tree-create-documents-snapshot",
+      ".kilocode/skills/skill-tree-implement-all",
+      ".kilocode/skills/skill-tree-implement-next-future-task",
+      ".kilocode/skills/skill-tree-pr-review-cycle",
+      ".kilocode/skills/skill-tree-process-future-pending",
+      ".kilocode/skills/skill-tree-repo-documentation",
+      ".kilocode/skills/skill-tree-repo-documentation-audit",
+      ".kilocode/skills/skill-tree-work-through-next",
+      ".skill-tree/installation/source/common/references/decision-governance.md",
+      ".skill-tree/installation/source/common/references/development-practices.md",
+      ".skill-tree/installation/source/common/references/document-rules.md",
+      ".skill-tree/installation/source/common/references/documentation-output-contract.md",
+      ".skill-tree/installation/source/common/references/future-workflow.md",
+      ".skill-tree/installation/source/common/references/history-retention.md",
+      ".skill-tree/installation/source/common/references/installation-profile.md",
+      ".skill-tree/installation/source/common/references/orchestration.md",
+      ".skill-tree/installation/source/common/references/pending-task-format.md",
+      ".skill-tree/installation/source/common/references/pending-task-intake.md",
+      ".skill-tree/installation/source/common/references/plugin-invocation.md",
+      ".skill-tree/installation/source/common/references/pr-review-cycle.md",
+      ".skill-tree/installation/source/common/references/repository-discovery-checklist.md",
+      ".skill-tree/installation/source/common/references/run-workspaces.md",
+      ".skill-tree/installation/source/common/references/snapshot-rules.md",
+      ".skill-tree/installation/source/common/references/unity-safety.md",
+      ".skill-tree/installation/source/common/references/validation-policy.md",
+      ".skill-tree/installation/source/common/references/workflow-metadata.md",
+      ".skill-tree/installation/source/common/scripts/create-documentation-snapshot.py",
+      ".skill-tree/installation/source/common/scripts/decision-governance.py",
+      ".skill-tree/installation/source/common/scripts/decision-orchestration.py",
+      ".skill-tree/installation/source/common/scripts/inspect-unity-repository.py",
+      ".skill-tree/installation/source/common/scripts/plugin-hooks.js",
+      ".skill-tree/installation/source/common/scripts/plugin-invocation.py",
+      ".skill-tree/installation/source/common/scripts/plugin-processing.py",
+      ".skill-tree/installation/source/common/scripts/pr-review-state.py",
+      ".skill-tree/installation/source/common/scripts/run-workspaces.py",
+      ".skill-tree/installation/source/common/scripts/select-prioritized-task.py",
+      ".skill-tree/installation/source/common/scripts/validate-document-rules.py",
+      ".skill-tree/installation/source/common/scripts/validate-future-document.py",
+      ".skill-tree/installation/source/common/scripts/validate-repository-documentation.py",
+      ".skill-tree/installation/source/common/scripts/workflow-state.py",
+      ".skill-tree/installation/source/domains/general/sections.json",
+      ".skill-tree/installation/source/templates/invariants.json",
+      ".skill-tree/installation/source/templates/operations.json",
+      ".skill-tree/installation/source/config/capabilities.json",
+      ".skill-tree/installation/source/config/flavors.json",
+      ".skill-tree/installation/source/config/plugins/ponytail.json",
+      ".skill-tree/installation/source/config/plugins/task-editorial.json",
+      ".skill-tree/installation/source/config/plugins/task-interview.json",
+      ".skill-tree/installation/source/config/providers.json",
+      ".skill-tree/installation/source/config/resource-map.json",
+      ".skill-tree/installation/source/lib/composer.js",
+      ".skill-tree/installation/source/lib/execution-bindings.js",
+      ".skill-tree/installation/source/lib/installation.js",
+      ".skill-tree/installation/source/lib/plugin-acquisition.js",
+      ".skill-tree/installation/source/lib/plugin-bindings.js",
+      ".skill-tree/installation/source/lib/plugin-composition.js",
+      ".skill-tree/installation/source/lib/plugin-lifecycle.js",
+      ".skill-tree/installation/source/lib/plugin-management.js",
+      ".skill-tree/installation/source/lib/plugin-parameters.js",
+      ".skill-tree/installation/source/lib/plugin-registry.js",
+      ".skill-tree/installation/source/lib/plugin-runtime.js",
+      ".skill-tree/installation/source/lib/plugin-sources.js",
+      ".skill-tree/installation/source/lib/plugins.js",
+      ".skill-tree/installation/source/src/init-rules/skill-tree-skills.md",
+      ".skill-tree/installation/manager.js",
+      ".skill-tree/installation/profile.json"
+    ],
+    "profile_identity": "49f566f3a4c913c943729d2cac193758bf31d09a8105599c03c20fc4c5a5fe65",
+    "environment_identity": "4e461fd827d8e0b8d03a68ced1752df088e1a22eedd8c17d5a0e33e09a78ce29",
+    "input_fingerprints": {
+      ".node-version": null,
+      ".nvmrc": null,
+      ".skill-tree/config/repository.json": null,
+      ".skill-tree/installation/plugins.json": null,
+      ".skill-tree/validation-recipes.json": null,
+      ".skill-tree/worktree-profile.json": null,
+      "Cargo.toml": null,
+      "Packages/manifest.json": null,
+      "Packages/packages-lock.json": null,
+      "ProjectSettings/EditorSettings.asset": null,
+      "ProjectSettings/ProjectSettings.asset": null,
+      "ProjectSettings/ProjectVersion.txt": null,
+      "bun.lock": null,
+      "bun.lockb": null,
+      "npm-shrinkwrap.json": null,
+      "package-lock.json": null,
+      "package.json": null,
+      "pnpm-lock.yaml": null,
+      "pyproject.toml": null,
+      "pytest.ini": null,
+      "yarn.lock": null
+    },
+    "packages": [
+      {
+        "destination": ".kilocode/skills/skill-tree-add-pending-task",
+        "name": "skill-tree-add-pending-task",
+        "flavor": "general",
+        "identity": "8f6529a700d99194cd0d55960ba2df4046cf240ce8c8de32dcfcc7602ad852eb",
+        "providers": [
+          "kilo"
+        ]
+      },
+      {
+        "destination": ".kilocode/skills/skill-tree-clarify-tasks",
+        "name": "skill-tree-clarify-tasks",
+        "flavor": "general",
+        "identity": "fdf6f2fd09584a5a861f54b759de7c67ca423badc478ebdaada039fa1077e941",
+        "providers": [
+          "kilo"
+        ]
+      },
+      {
+        "destination": ".kilocode/skills/skill-tree-create-documents-snapshot",
+        "name": "skill-tree-create-documents-snapshot",
+        "flavor": "general",
+        "identity": "9fcc0b00fb742e391337491212040de94c81980f1a25925808cb39520a0cf8a5",
+        "providers": [
+          "kilo"
+        ]
+      },
+      {
+        "destination": ".kilocode/skills/skill-tree-implement-all",
+        "name": "skill-tree-implement-all",
+        "flavor": "general",
+        "identity": "47f71883b277e05a40bfb22a9780e14f195b1ac7d184b29797515d07a3d5b536",
+        "providers": [
+          "kilo"
+        ]
+      },
+      {
+        "destination": ".kilocode/skills/skill-tree-implement-next-future-task",
+        "name": "skill-tree-implement-next-future-task",
+        "flavor": "general",
+        "identity": "2b98e243acc4df6fb7e4d7c17d6315d7b9a20443e599297f5dc90553d0a627f8",
+        "providers": [
+          "kilo"
+        ]
+      },
+      {
+        "destination": ".kilocode/skills/skill-tree-pr-review-cycle",
+        "name": "skill-tree-pr-review-cycle",
+        "flavor": "general",
+        "identity": "738ae13a31486799f00a0708c7127647f940bff4ebf3630fe50b755a2a6e9d2c",
+        "providers": [
+          "kilo"
+        ]
+      },
+      {
+        "destination": ".kilocode/skills/skill-tree-process-future-pending",
+        "name": "skill-tree-process-future-pending",
+        "flavor": "general",
+        "identity": "c0abaa54ecf14fc8684446fdf300645ec3ef983cae8abc515732f0149bf9065e",
+        "providers": [
+          "kilo"
+        ]
+      },
+      {
+        "destination": ".kilocode/skills/skill-tree-repo-documentation",
+        "name": "skill-tree-repo-documentation",
+        "flavor": "general",
+        "identity": "9dcd3aecda4fc553f0c5235ada76487d2235bc6d17bd7781524497097521b673",
+        "providers": [
+          "kilo"
+        ]
+      },
+      {
+        "destination": ".kilocode/skills/skill-tree-repo-documentation-audit",
+        "name": "skill-tree-repo-documentation-audit",
+        "flavor": "general",
+        "identity": "cf43a8e5f71d00e37d93caa1112cf0b69c501b920c6dbebdd344e6fd1c470342",
+        "providers": [
+          "kilo"
+        ]
+      },
+      {
+        "destination": ".kilocode/skills/skill-tree-work-through-next",
+        "name": "skill-tree-work-through-next",
+        "flavor": "general",
+        "identity": "240bda9dc55bd728ce8378afe4bcfbf138e4954c983b72820b7d7a3fcaa756b0",
+        "providers": [
+          "kilo"
+        ]
+      }
+    ],
+    "policy": "Immediate focused feedback; scoped additional boundary checks; no implicit product execution.",
+    "facts": {
+      "test_assemblies": [],
+      "ui": [],
+      "package_manager": "npm",
+      "node": null,
+      "packages": {},
+      "capabilities": {}
+    },
+    "gaps": [
+      {
+        "key": "test-foundation",
+        "reason": "No usable foundational test command is declared.",
+        "recommendation": "Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile."
+      }
+    ]
+  },
+  {
+    "provider": "continue",
+    "ok": true,
+    "action": "dry-run",
+    "flavor": "general",
+    "changed": [
+      ".continue/skills/skill-tree-add-pending-task",
+      ".continue/skills/skill-tree-clarify-tasks",
+      ".continue/skills/skill-tree-create-documents-snapshot",
+      ".continue/skills/skill-tree-implement-all",
+      ".continue/skills/skill-tree-implement-next-future-task",
+      ".continue/skills/skill-tree-pr-review-cycle",
+      ".continue/skills/skill-tree-process-future-pending",
+      ".continue/skills/skill-tree-repo-documentation",
+      ".continue/skills/skill-tree-repo-documentation-audit",
+      ".continue/skills/skill-tree-work-through-next",
+      ".skill-tree/installation/source/common/references/decision-governance.md",
+      ".skill-tree/installation/source/common/references/development-practices.md",
+      ".skill-tree/installation/source/common/references/document-rules.md",
+      ".skill-tree/installation/source/common/references/documentation-output-contract.md",
+      ".skill-tree/installation/source/common/references/future-workflow.md",
+      ".skill-tree/installation/source/common/references/history-retention.md",
+      ".skill-tree/installation/source/common/references/installation-profile.md",
+      ".skill-tree/installation/source/common/references/orchestration.md",
+      ".skill-tree/installation/source/common/references/pending-task-format.md",
+      ".skill-tree/installation/source/common/references/pending-task-intake.md",
+      ".skill-tree/installation/source/common/references/plugin-invocation.md",
+      ".skill-tree/installation/source/common/references/pr-review-cycle.md",
+      ".skill-tree/installation/source/common/references/repository-discovery-checklist.md",
+      ".skill-tree/installation/source/common/references/run-workspaces.md",
+      ".skill-tree/installation/source/common/references/snapshot-rules.md",
+      ".skill-tree/installation/source/common/references/unity-safety.md",
+      ".skill-tree/installation/source/common/references/validation-policy.md",
+      ".skill-tree/installation/source/common/references/workflow-metadata.md",
+      ".skill-tree/installation/source/common/scripts/create-documentation-snapshot.py",
+      ".skill-tree/installation/source/common/scripts/decision-governance.py",
+      ".skill-tree/installation/source/common/scripts/decision-orchestration.py",
+      ".skill-tree/installation/source/common/scripts/inspect-unity-repository.py",
+      ".skill-tree/installation/source/common/scripts/plugin-hooks.js",
+      ".skill-tree/installation/source/common/scripts/plugin-invocation.py",
+      ".skill-tree/installation/source/common/scripts/plugin-processing.py",
+      ".skill-tree/installation/source/common/scripts/pr-review-state.py",
+      ".skill-tree/installation/source/common/scripts/run-workspaces.py",
+      ".skill-tree/installation/source/common/scripts/select-prioritized-task.py",
+      ".skill-tree/installation/source/common/scripts/validate-document-rules.py",
+      ".skill-tree/installation/source/common/scripts/validate-future-document.py",
+      ".skill-tree/installation/source/common/scripts/validate-repository-documentation.py",
+      ".skill-tree/installation/source/common/scripts/workflow-state.py",
+      ".skill-tree/installation/source/domains/general/sections.json",
+      ".skill-tree/installation/source/templates/invariants.json",
+      ".skill-tree/installation/source/templates/operations.json",
+      ".skill-tree/installation/source/config/capabilities.json",
+      ".skill-tree/installation/source/config/flavors.json",
+      ".skill-tree/installation/source/config/plugins/ponytail.json",
+      ".skill-tree/installation/source/config/plugins/task-editorial.json",
+      ".skill-tree/installation/source/config/plugins/task-interview.json",
+      ".skill-tree/installation/source/config/providers.json",
+      ".skill-tree/installation/source/config/resource-map.json",
+      ".skill-tree/installation/source/lib/composer.js",
+      ".skill-tree/installation/source/lib/execution-bindings.js",
+      ".skill-tree/installation/source/lib/installation.js",
+      ".skill-tree/installation/source/lib/plugin-acquisition.js",
+      ".skill-tree/installation/source/lib/plugin-bindings.js",
+      ".skill-tree/installation/source/lib/plugin-composition.js",
+      ".skill-tree/installation/source/lib/plugin-lifecycle.js",
+      ".skill-tree/installation/source/lib/plugin-management.js",
+      ".skill-tree/installation/source/lib/plugin-parameters.js",
+      ".skill-tree/installation/source/lib/plugin-registry.js",
+      ".skill-tree/installation/source/lib/plugin-runtime.js",
+      ".skill-tree/installation/source/lib/plugin-sources.js",
+      ".skill-tree/installation/source/lib/plugins.js",
+      ".skill-tree/installation/source/src/init-rules/skill-tree-skills.md",
+      ".skill-tree/installation/manager.js",
+      ".skill-tree/installation/profile.json"
+    ],
+    "profile_identity": "49f566f3a4c913c943729d2cac193758bf31d09a8105599c03c20fc4c5a5fe65",
+    "environment_identity": "4e461fd827d8e0b8d03a68ced1752df088e1a22eedd8c17d5a0e33e09a78ce29",
+    "input_fingerprints": {
+      ".node-version": null,
+      ".nvmrc": null,
+      ".skill-tree/config/repository.json": null,
+      ".skill-tree/installation/plugins.json": null,
+      ".skill-tree/validation-recipes.json": null,
+      ".skill-tree/worktree-profile.json": null,
+      "Cargo.toml": null,
+      "Packages/manifest.json": null,
+      "Packages/packages-lock.json": null,
+      "ProjectSettings/EditorSettings.asset": null,
+      "ProjectSettings/ProjectSettings.asset": null,
+      "ProjectSettings/ProjectVersion.txt": null,
+      "bun.lock": null,
+      "bun.lockb": null,
+      "npm-shrinkwrap.json": null,
+      "package-lock.json": null,
+      "package.json": null,
+      "pnpm-lock.yaml": null,
+      "pyproject.toml": null,
+      "pytest.ini": null,
+      "yarn.lock": null
+    },
+    "packages": [
+      {
+        "destination": ".continue/skills/skill-tree-add-pending-task",
+        "name": "skill-tree-add-pending-task",
+        "flavor": "general",
+        "identity": "8f6529a700d99194cd0d55960ba2df4046cf240ce8c8de32dcfcc7602ad852eb",
+        "providers": [
+          "continue"
+        ]
+      },
+      {
+        "destination": ".continue/skills/skill-tree-clarify-tasks",
+        "name": "skill-tree-clarify-tasks",
+        "flavor": "general",
+        "identity": "fdf6f2fd09584a5a861f54b759de7c67ca423badc478ebdaada039fa1077e941",
+        "providers": [
+          "continue"
+        ]
+      },
+      {
+        "destination": ".continue/skills/skill-tree-create-documents-snapshot",
+        "name": "skill-tree-create-documents-snapshot",
+        "flavor": "general",
+        "identity": "9fcc0b00fb742e391337491212040de94c81980f1a25925808cb39520a0cf8a5",
+        "providers": [
+          "continue"
+        ]
+      },
+      {
+        "destination": ".continue/skills/skill-tree-implement-all",
+        "name": "skill-tree-implement-all",
+        "flavor": "general",
+        "identity": "47f71883b277e05a40bfb22a9780e14f195b1ac7d184b29797515d07a3d5b536",
+        "providers": [
+          "continue"
+        ]
+      },
+      {
+        "destination": ".continue/skills/skill-tree-implement-next-future-task",
+        "name": "skill-tree-implement-next-future-task",
+        "flavor": "general",
+        "identity": "2b98e243acc4df6fb7e4d7c17d6315d7b9a20443e599297f5dc90553d0a627f8",
+        "providers": [
+          "continue"
+        ]
+      },
+      {
+        "destination": ".continue/skills/skill-tree-pr-review-cycle",
+        "name": "skill-tree-pr-review-cycle",
+        "flavor": "general",
+        "identity": "738ae13a31486799f00a0708c7127647f940bff4ebf3630fe50b755a2a6e9d2c",
+        "providers": [
+          "continue"
+        ]
+      },
+      {
+        "destination": ".continue/skills/skill-tree-process-future-pending",
+        "name": "skill-tree-process-future-pending",
+        "flavor": "general",
+        "identity": "c0abaa54ecf14fc8684446fdf300645ec3ef983cae8abc515732f0149bf9065e",
+        "providers": [
+          "continue"
+        ]
+      },
+      {
+        "destination": ".continue/skills/skill-tree-repo-documentation",
+        "name": "skill-tree-repo-documentation",
+        "flavor": "general",
+        "identity": "9dcd3aecda4fc553f0c5235ada76487d2235bc6d17bd7781524497097521b673",
+        "providers": [
+          "continue"
+        ]
+      },
+      {
+        "destination": ".continue/skills/skill-tree-repo-documentation-audit",
+        "name": "skill-tree-repo-documentation-audit",
+        "flavor": "general",
+        "identity": "cf43a8e5f71d00e37d93caa1112cf0b69c501b920c6dbebdd344e6fd1c470342",
+        "providers": [
+          "continue"
+        ]
+      },
+      {
+        "destination": ".continue/skills/skill-tree-work-through-next",
+        "name": "skill-tree-work-through-next",
+        "flavor": "general",
+        "identity": "240bda9dc55bd728ce8378afe4bcfbf138e4954c983b72820b7d7a3fcaa756b0",
+        "providers": [
+          "continue"
+        ]
+      }
+    ],
+    "policy": "Immediate focused feedback; scoped additional boundary checks; no implicit product execution.",
+    "facts": {
+      "test_assemblies": [],
+      "ui": [],
+      "package_manager": "npm",
+      "node": null,
+      "packages": {},
+      "capabilities": {}
+    },
+    "gaps": [
+      {
+        "key": "test-foundation",
+        "reason": "No usable foundational test command is declared.",
+        "recommendation": "Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile."
+      }
+    ]
+  },
+  {
+    "provider": "kiro-cli",
+    "ok": true,
+    "action": "dry-run",
+    "flavor": "general",
+    "changed": [
+      ".kiro/skills/skill-tree-add-pending-task",
+      ".kiro/skills/skill-tree-clarify-tasks",
+      ".kiro/skills/skill-tree-create-documents-snapshot",
+      ".kiro/skills/skill-tree-implement-all",
+      ".kiro/skills/skill-tree-implement-next-future-task",
+      ".kiro/skills/skill-tree-pr-review-cycle",
+      ".kiro/skills/skill-tree-process-future-pending",
+      ".kiro/skills/skill-tree-repo-documentation",
+      ".kiro/skills/skill-tree-repo-documentation-audit",
+      ".kiro/skills/skill-tree-work-through-next",
+      ".skill-tree/installation/source/common/references/decision-governance.md",
+      ".skill-tree/installation/source/common/references/development-practices.md",
+      ".skill-tree/installation/source/common/references/document-rules.md",
+      ".skill-tree/installation/source/common/references/documentation-output-contract.md",
+      ".skill-tree/installation/source/common/references/future-workflow.md",
+      ".skill-tree/installation/source/common/references/history-retention.md",
+      ".skill-tree/installation/source/common/references/installation-profile.md",
+      ".skill-tree/installation/source/common/references/orchestration.md",
+      ".skill-tree/installation/source/common/references/pending-task-format.md",
+      ".skill-tree/installation/source/common/references/pending-task-intake.md",
+      ".skill-tree/installation/source/common/references/plugin-invocation.md",
+      ".skill-tree/installation/source/common/references/pr-review-cycle.md",
+      ".skill-tree/installation/source/common/references/repository-discovery-checklist.md",
+      ".skill-tree/installation/source/common/references/run-workspaces.md",
+      ".skill-tree/installation/source/common/references/snapshot-rules.md",
+      ".skill-tree/installation/source/common/references/unity-safety.md",
+      ".skill-tree/installation/source/common/references/validation-policy.md",
+      ".skill-tree/installation/source/common/references/workflow-metadata.md",
+      ".skill-tree/installation/source/common/scripts/create-documentation-snapshot.py",
+      ".skill-tree/installation/source/common/scripts/decision-governance.py",
+      ".skill-tree/installation/source/common/scripts/decision-orchestration.py",
+      ".skill-tree/installation/source/common/scripts/inspect-unity-repository.py",
+      ".skill-tree/installation/source/common/scripts/plugin-hooks.js",
+      ".skill-tree/installation/source/common/scripts/plugin-invocation.py",
+      ".skill-tree/installation/source/common/scripts/plugin-processing.py",
+      ".skill-tree/installation/source/common/scripts/pr-review-state.py",
+      ".skill-tree/installation/source/common/scripts/run-workspaces.py",
+      ".skill-tree/installation/source/common/scripts/select-prioritized-task.py",
+      ".skill-tree/installation/source/common/scripts/validate-document-rules.py",
+      ".skill-tree/installation/source/common/scripts/validate-future-document.py",
+      ".skill-tree/installation/source/common/scripts/validate-repository-documentation.py",
+      ".skill-tree/installation/source/common/scripts/workflow-state.py",
+      ".skill-tree/installation/source/domains/general/sections.json",
+      ".skill-tree/installation/source/templates/invariants.json",
+      ".skill-tree/installation/source/templates/operations.json",
+      ".skill-tree/installation/source/config/capabilities.json",
+      ".skill-tree/installation/source/config/flavors.json",
+      ".skill-tree/installation/source/config/plugins/ponytail.json",
+      ".skill-tree/installation/source/config/plugins/task-editorial.json",
+      ".skill-tree/installation/source/config/plugins/task-interview.json",
+      ".skill-tree/installation/source/config/providers.json",
+      ".skill-tree/installation/source/config/resource-map.json",
+      ".skill-tree/installation/source/lib/composer.js",
+      ".skill-tree/installation/source/lib/execution-bindings.js",
+      ".skill-tree/installation/source/lib/installation.js",
+      ".skill-tree/installation/source/lib/plugin-acquisition.js",
+      ".skill-tree/installation/source/lib/plugin-bindings.js",
+      ".skill-tree/installation/source/lib/plugin-composition.js",
+      ".skill-tree/installation/source/lib/plugin-lifecycle.js",
+      ".skill-tree/installation/source/lib/plugin-management.js",
+      ".skill-tree/installation/source/lib/plugin-parameters.js",
+      ".skill-tree/installation/source/lib/plugin-registry.js",
+      ".skill-tree/installation/source/lib/plugin-runtime.js",
+      ".skill-tree/installation/source/lib/plugin-sources.js",
+      ".skill-tree/installation/source/lib/plugins.js",
+      ".skill-tree/installation/source/src/init-rules/skill-tree-skills.md",
+      ".skill-tree/installation/manager.js",
+      ".skill-tree/installation/profile.json"
+    ],
+    "profile_identity": "49f566f3a4c913c943729d2cac193758bf31d09a8105599c03c20fc4c5a5fe65",
+    "environment_identity": "4e461fd827d8e0b8d03a68ced1752df088e1a22eedd8c17d5a0e33e09a78ce29",
+    "input_fingerprints": {
+      ".node-version": null,
+      ".nvmrc": null,
+      ".skill-tree/config/repository.json": null,
+      ".skill-tree/installation/plugins.json": null,
+      ".skill-tree/validation-recipes.json": null,
+      ".skill-tree/worktree-profile.json": null,
+      "Cargo.toml": null,
+      "Packages/manifest.json": null,
+      "Packages/packages-lock.json": null,
+      "ProjectSettings/EditorSettings.asset": null,
+      "ProjectSettings/ProjectSettings.asset": null,
+      "ProjectSettings/ProjectVersion.txt": null,
+      "bun.lock": null,
+      "bun.lockb": null,
+      "npm-shrinkwrap.json": null,
+      "package-lock.json": null,
+      "package.json": null,
+      "pnpm-lock.yaml": null,
+      "pyproject.toml": null,
+      "pytest.ini": null,
+      "yarn.lock": null
+    },
+    "packages": [
+      {
+        "destination": ".kiro/skills/skill-tree-add-pending-task",
+        "name": "skill-tree-add-pending-task",
+        "flavor": "general",
+        "identity": "8f6529a700d99194cd0d55960ba2df4046cf240ce8c8de32dcfcc7602ad852eb",
+        "providers": [
+          "kiro-cli"
+        ]
+      },
+      {
+        "destination": ".kiro/skills/skill-tree-clarify-tasks",
+        "name": "skill-tree-clarify-tasks",
+        "flavor": "general",
+        "identity": "fdf6f2fd09584a5a861f54b759de7c67ca423badc478ebdaada039fa1077e941",
+        "providers": [
+          "kiro-cli"
+        ]
+      },
+      {
+        "destination": ".kiro/skills/skill-tree-create-documents-snapshot",
+        "name": "skill-tree-create-documents-snapshot",
+        "flavor": "general",
+        "identity": "9fcc0b00fb742e391337491212040de94c81980f1a25925808cb39520a0cf8a5",
+        "providers": [
+          "kiro-cli"
+        ]
+      },
+      {
+        "destination": ".kiro/skills/skill-tree-implement-all",
+        "name": "skill-tree-implement-all",
+        "flavor": "general",
+        "identity": "47f71883b277e05a40bfb22a9780e14f195b1ac7d184b29797515d07a3d5b536",
+        "providers": [
+          "kiro-cli"
+        ]
+      },
+      {
+        "destination": ".kiro/skills/skill-tree-implement-next-future-task",
+        "name": "skill-tree-implement-next-future-task",
+        "flavor": "general",
+        "identity": "2b98e243acc4df6fb7e4d7c17d6315d7b9a20443e599297f5dc90553d0a627f8",
+        "providers": [
+          "kiro-cli"
+        ]
+      },
+      {
+        "destination": ".kiro/skills/skill-tree-pr-review-cycle",
+        "name": "skill-tree-pr-review-cycle",
+        "flavor": "general",
+        "identity": "738ae13a31486799f00a0708c7127647f940bff4ebf3630fe50b755a2a6e9d2c",
+        "providers": [
+          "kiro-cli"
+        ]
+      },
+      {
+        "destination": ".kiro/skills/skill-tree-process-future-pending",
+        "name": "skill-tree-process-future-pending",
+        "flavor": "general",
+        "identity": "c0abaa54ecf14fc8684446fdf300645ec3ef983cae8abc515732f0149bf9065e",
+        "providers": [
+          "kiro-cli"
+        ]
+      },
+      {
+        "destination": ".kiro/skills/skill-tree-repo-documentation",
+        "name": "skill-tree-repo-documentation",
+        "flavor": "general",
+        "identity": "9dcd3aecda4fc553f0c5235ada76487d2235bc6d17bd7781524497097521b673",
+        "providers": [
+          "kiro-cli"
+        ]
+      },
+      {
+        "destination": ".kiro/skills/skill-tree-repo-documentation-audit",
+        "name": "skill-tree-repo-documentation-audit",
+        "flavor": "general",
+        "identity": "cf43a8e5f71d00e37d93caa1112cf0b69c501b920c6dbebdd344e6fd1c470342",
+        "providers": [
+          "kiro-cli"
+        ]
+      },
+      {
+        "destination": ".kiro/skills/skill-tree-work-through-next",
+        "name": "skill-tree-work-through-next",
+        "flavor": "general",
+        "identity": "240bda9dc55bd728ce8378afe4bcfbf138e4954c983b72820b7d7a3fcaa756b0",
+        "providers": [
+          "kiro-cli"
+        ]
+      }
+    ],
+    "policy": "Immediate focused feedback; scoped additional boundary checks; no implicit product execution.",
+    "facts": {
+      "test_assemblies": [],
+      "ui": [],
+      "package_manager": "npm",
+      "node": null,
+      "packages": {},
+      "capabilities": {}
+    },
+    "gaps": [
+      {
+        "key": "test-foundation",
+        "reason": "No usable foundational test command is declared.",
+        "recommendation": "Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile."
+      }
+    ]
+  },
+  {
+    "provider": "qwen-code",
+    "ok": true,
+    "action": "dry-run",
+    "flavor": "general",
+    "changed": [
+      ".qwen/skills/skill-tree-add-pending-task",
+      ".qwen/skills/skill-tree-clarify-tasks",
+      ".qwen/skills/skill-tree-create-documents-snapshot",
+      ".qwen/skills/skill-tree-implement-all",
+      ".qwen/skills/skill-tree-implement-next-future-task",
+      ".qwen/skills/skill-tree-pr-review-cycle",
+      ".qwen/skills/skill-tree-process-future-pending",
+      ".qwen/skills/skill-tree-repo-documentation",
+      ".qwen/skills/skill-tree-repo-documentation-audit",
+      ".qwen/skills/skill-tree-work-through-next",
+      ".skill-tree/installation/source/common/references/decision-governance.md",
+      ".skill-tree/installation/source/common/references/development-practices.md",
+      ".skill-tree/installation/source/common/references/document-rules.md",
+      ".skill-tree/installation/source/common/references/documentation-output-contract.md",
+      ".skill-tree/installation/source/common/references/future-workflow.md",
+      ".skill-tree/installation/source/common/references/history-retention.md",
+      ".skill-tree/installation/source/common/references/installation-profile.md",
+      ".skill-tree/installation/source/common/references/orchestration.md",
+      ".skill-tree/installation/source/common/references/pending-task-format.md",
+      ".skill-tree/installation/source/common/references/pending-task-intake.md",
+      ".skill-tree/installation/source/common/references/plugin-invocation.md",
+      ".skill-tree/installation/source/common/references/pr-review-cycle.md",
+      ".skill-tree/installation/source/common/references/repository-discovery-checklist.md",
+      ".skill-tree/installation/source/common/references/run-workspaces.md",
+      ".skill-tree/installation/source/common/references/snapshot-rules.md",
+      ".skill-tree/installation/source/common/references/unity-safety.md",
+      ".skill-tree/installation/source/common/references/validation-policy.md",
+      ".skill-tree/installation/source/common/references/workflow-metadata.md",
+      ".skill-tree/installation/source/common/scripts/create-documentation-snapshot.py",
+      ".skill-tree/installation/source/common/scripts/decision-governance.py",
+      ".skill-tree/installation/source/common/scripts/decision-orchestration.py",
+      ".skill-tree/installation/source/common/scripts/inspect-unity-repository.py",
+      ".skill-tree/installation/source/common/scripts/plugin-hooks.js",
+      ".skill-tree/installation/source/common/scripts/plugin-invocation.py",
+      ".skill-tree/installation/source/common/scripts/plugin-processing.py",
+      ".skill-tree/installation/source/common/scripts/pr-review-state.py",
+      ".skill-tree/installation/source/common/scripts/run-workspaces.py",
+      ".skill-tree/installation/source/common/scripts/select-prioritized-task.py",
+      ".skill-tree/installation/source/common/scripts/validate-document-rules.py",
+      ".skill-tree/installation/source/common/scripts/validate-future-document.py",
+      ".skill-tree/installation/source/common/scripts/validate-repository-documentation.py",
+      ".skill-tree/installation/source/common/scripts/workflow-state.py",
+      ".skill-tree/installation/source/domains/general/sections.json",
+      ".skill-tree/installation/source/templates/invariants.json",
+      ".skill-tree/installation/source/templates/operations.json",
+      ".skill-tree/installation/source/config/capabilities.json",
+      ".skill-tree/installation/source/config/flavors.json",
+      ".skill-tree/installation/source/config/plugins/ponytail.json",
+      ".skill-tree/installation/source/config/plugins/task-editorial.json",
+      ".skill-tree/installation/source/config/plugins/task-interview.json",
+      ".skill-tree/installation/source/config/providers.json",
+      ".skill-tree/installation/source/config/resource-map.json",
+      ".skill-tree/installation/source/lib/composer.js",
+      ".skill-tree/installation/source/lib/execution-bindings.js",
+      ".skill-tree/installation/source/lib/installation.js",
+      ".skill-tree/installation/source/lib/plugin-acquisition.js",
+      ".skill-tree/installation/source/lib/plugin-bindings.js",
+      ".skill-tree/installation/source/lib/plugin-composition.js",
+      ".skill-tree/installation/source/lib/plugin-lifecycle.js",
+      ".skill-tree/installation/source/lib/plugin-management.js",
+      ".skill-tree/installation/source/lib/plugin-parameters.js",
+      ".skill-tree/installation/source/lib/plugin-registry.js",
+      ".skill-tree/installation/source/lib/plugin-runtime.js",
+      ".skill-tree/installation/source/lib/plugin-sources.js",
+      ".skill-tree/installation/source/lib/plugins.js",
+      ".skill-tree/installation/source/src/init-rules/skill-tree-skills.md",
+      ".skill-tree/installation/manager.js",
+      ".skill-tree/installation/profile.json"
+    ],
+    "profile_identity": "49f566f3a4c913c943729d2cac193758bf31d09a8105599c03c20fc4c5a5fe65",
+    "environment_identity": "4e461fd827d8e0b8d03a68ced1752df088e1a22eedd8c17d5a0e33e09a78ce29",
+    "input_fingerprints": {
+      ".node-version": null,
+      ".nvmrc": null,
+      ".skill-tree/config/repository.json": null,
+      ".skill-tree/installation/plugins.json": null,
+      ".skill-tree/validation-recipes.json": null,
+      ".skill-tree/worktree-profile.json": null,
+      "Cargo.toml": null,
+      "Packages/manifest.json": null,
+      "Packages/packages-lock.json": null,
+      "ProjectSettings/EditorSettings.asset": null,
+      "ProjectSettings/ProjectSettings.asset": null,
+      "ProjectSettings/ProjectVersion.txt": null,
+      "bun.lock": null,
+      "bun.lockb": null,
+      "npm-shrinkwrap.json": null,
+      "package-lock.json": null,
+      "package.json": null,
+      "pnpm-lock.yaml": null,
+      "pyproject.toml": null,
+      "pytest.ini": null,
+      "yarn.lock": null
+    },
+    "packages": [
+      {
+        "destination": ".qwen/skills/skill-tree-add-pending-task",
+        "name": "skill-tree-add-pending-task",
+        "flavor": "general",
+        "identity": "8f6529a700d99194cd0d55960ba2df4046cf240ce8c8de32dcfcc7602ad852eb",
+        "providers": [
+          "qwen-code"
+        ]
+      },
+      {
+        "destination": ".qwen/skills/skill-tree-clarify-tasks",
+        "name": "skill-tree-clarify-tasks",
+        "flavor": "general",
+        "identity": "fdf6f2fd09584a5a861f54b759de7c67ca423badc478ebdaada039fa1077e941",
+        "providers": [
+          "qwen-code"
+        ]
+      },
+      {
+        "destination": ".qwen/skills/skill-tree-create-documents-snapshot",
+        "name": "skill-tree-create-documents-snapshot",
+        "flavor": "general",
+        "identity": "9fcc0b00fb742e391337491212040de94c81980f1a25925808cb39520a0cf8a5",
+        "providers": [
+          "qwen-code"
+        ]
+      },
+      {
+        "destination": ".qwen/skills/skill-tree-implement-all",
+        "name": "skill-tree-implement-all",
+        "flavor": "general",
+        "identity": "47f71883b277e05a40bfb22a9780e14f195b1ac7d184b29797515d07a3d5b536",
+        "providers": [
+          "qwen-code"
+        ]
+      },
+      {
+        "destination": ".qwen/skills/skill-tree-implement-next-future-task",
+        "name": "skill-tree-implement-next-future-task",
+        "flavor": "general",
+        "identity": "2b98e243acc4df6fb7e4d7c17d6315d7b9a20443e599297f5dc90553d0a627f8",
+        "providers": [
+          "qwen-code"
+        ]
+      },
+      {
+        "destination": ".qwen/skills/skill-tree-pr-review-cycle",
+        "name": "skill-tree-pr-review-cycle",
+        "flavor": "general",
+        "identity": "738ae13a31486799f00a0708c7127647f940bff4ebf3630fe50b755a2a6e9d2c",
+        "providers": [
+          "qwen-code"
+        ]
+      },
+      {
+        "destination": ".qwen/skills/skill-tree-process-future-pending",
+        "name": "skill-tree-process-future-pending",
+        "flavor": "general",
+        "identity": "c0abaa54ecf14fc8684446fdf300645ec3ef983cae8abc515732f0149bf9065e",
+        "providers": [
+          "qwen-code"
+        ]
+      },
+      {
+        "destination": ".qwen/skills/skill-tree-repo-documentation",
+        "name": "skill-tree-repo-documentation",
+        "flavor": "general",
+        "identity": "9dcd3aecda4fc553f0c5235ada76487d2235bc6d17bd7781524497097521b673",
+        "providers": [
+          "qwen-code"
+        ]
+      },
+      {
+        "destination": ".qwen/skills/skill-tree-repo-documentation-audit",
+        "name": "skill-tree-repo-documentation-audit",
+        "flavor": "general",
+        "identity": "cf43a8e5f71d00e37d93caa1112cf0b69c501b920c6dbebdd344e6fd1c470342",
+        "providers": [
+          "qwen-code"
+        ]
+      },
+      {
+        "destination": ".qwen/skills/skill-tree-work-through-next",
+        "name": "skill-tree-work-through-next",
+        "flavor": "general",
+        "identity": "240bda9dc55bd728ce8378afe4bcfbf138e4954c983b72820b7d7a3fcaa756b0",
+        "providers": [
+          "qwen-code"
+        ]
+      }
+    ],
+    "policy": "Immediate focused feedback; scoped additional boundary checks; no implicit product execution.",
+    "facts": {
+      "test_assemblies": [],
+      "ui": [],
+      "package_manager": "npm",
+      "node": null,
+      "packages": {},
+      "capabilities": {}
+    },
+    "gaps": [
+      {
+        "key": "test-foundation",
+        "reason": "No usable foundational test command is declared.",
+        "recommendation": "Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile."
+      }
+    ]
+  },
+  {
+    "provider": "goose",
+    "ok": true,
+    "action": "dry-run",
+    "flavor": "general",
+    "changed": [
+      ".goose/skills/skill-tree-add-pending-task",
+      ".goose/skills/skill-tree-clarify-tasks",
+      ".goose/skills/skill-tree-create-documents-snapshot",
+      ".goose/skills/skill-tree-implement-all",
+      ".goose/skills/skill-tree-implement-next-future-task",
+      ".goose/skills/skill-tree-pr-review-cycle",
+      ".goose/skills/skill-tree-process-future-pending",
+      ".goose/skills/skill-tree-repo-documentation",
+      ".goose/skills/skill-tree-repo-documentation-audit",
+      ".goose/skills/skill-tree-work-through-next",
+      ".skill-tree/installation/source/common/references/decision-governance.md",
+      ".skill-tree/installation/source/common/references/development-practices.md",
+      ".skill-tree/installation/source/common/references/document-rules.md",
+      ".skill-tree/installation/source/common/references/documentation-output-contract.md",
+      ".skill-tree/installation/source/common/references/future-workflow.md",
+      ".skill-tree/installation/source/common/references/history-retention.md",
+      ".skill-tree/installation/source/common/references/installation-profile.md",
+      ".skill-tree/installation/source/common/references/orchestration.md",
+      ".skill-tree/installation/source/common/references/pending-task-format.md",
+      ".skill-tree/installation/source/common/references/pending-task-intake.md",
+      ".skill-tree/installation/source/common/references/plugin-invocation.md",
+      ".skill-tree/installation/source/common/references/pr-review-cycle.md",
+      ".skill-tree/installation/source/common/references/repository-discovery-checklist.md",
+      ".skill-tree/installation/source/common/references/run-workspaces.md",
+      ".skill-tree/installation/source/common/references/snapshot-rules.md",
+      ".skill-tree/installation/source/common/references/unity-safety.md",
+      ".skill-tree/installation/source/common/references/validation-policy.md",
+      ".skill-tree/installation/source/common/references/workflow-metadata.md",
+      ".skill-tree/installation/source/common/scripts/create-documentation-snapshot.py",
+      ".skill-tree/installation/source/common/scripts/decision-governance.py",
+      ".skill-tree/installation/source/common/scripts/decision-orchestration.py",
+      ".skill-tree/installation/source/common/scripts/inspect-unity-repository.py",
+      ".skill-tree/installation/source/common/scripts/plugin-hooks.js",
+      ".skill-tree/installation/source/common/scripts/plugin-invocation.py",
+      ".skill-tree/installation/source/common/scripts/plugin-processing.py",
+      ".skill-tree/installation/source/common/scripts/pr-review-state.py",
+      ".skill-tree/installation/source/common/scripts/run-workspaces.py",
+      ".skill-tree/installation/source/common/scripts/select-prioritized-task.py",
+      ".skill-tree/installation/source/common/scripts/validate-document-rules.py",
+      ".skill-tree/installation/source/common/scripts/validate-future-document.py",
+      ".skill-tree/installation/source/common/scripts/validate-repository-documentation.py",
+      ".skill-tree/installation/source/common/scripts/workflow-state.py",
+      ".skill-tree/installation/source/domains/general/sections.json",
+      ".skill-tree/installation/source/templates/invariants.json",
+      ".skill-tree/installation/source/templates/operations.json",
+      ".skill-tree/installation/source/config/capabilities.json",
+      ".skill-tree/installation/source/config/flavors.json",
+      ".skill-tree/installation/source/config/plugins/ponytail.json",
+      ".skill-tree/installation/source/config/plugins/task-editorial.json",
+      ".skill-tree/installation/source/config/plugins/task-interview.json",
+      ".skill-tree/installation/source/config/providers.json",
+      ".skill-tree/installation/source/config/resource-map.json",
+      ".skill-tree/installation/source/lib/composer.js",
+      ".skill-tree/installation/source/lib/execution-bindings.js",
+      ".skill-tree/installation/source/lib/installation.js",
+      ".skill-tree/installation/source/lib/plugin-acquisition.js",
+      ".skill-tree/installation/source/lib/plugin-bindings.js",
+      ".skill-tree/installation/source/lib/plugin-composition.js",
+      ".skill-tree/installation/source/lib/plugin-lifecycle.js",
+      ".skill-tree/installation/source/lib/plugin-management.js",
+      ".skill-tree/installation/source/lib/plugin-parameters.js",
+      ".skill-tree/installation/source/lib/plugin-registry.js",
+      ".skill-tree/installation/source/lib/plugin-runtime.js",
+      ".skill-tree/installation/source/lib/plugin-sources.js",
+      ".skill-tree/installation/source/lib/plugins.js",
+      ".skill-tree/installation/source/src/init-rules/skill-tree-skills.md",
+      ".skill-tree/installation/manager.js",
+      ".skill-tree/installation/profile.json"
+    ],
+    "profile_identity": "49f566f3a4c913c943729d2cac193758bf31d09a8105599c03c20fc4c5a5fe65",
+    "environment_identity": "4e461fd827d8e0b8d03a68ced1752df088e1a22eedd8c17d5a0e33e09a78ce29",
+    "input_fingerprints": {
+      ".node-version": null,
+      ".nvmrc": null,
+      ".skill-tree/config/repository.json": null,
+      ".skill-tree/installation/plugins.json": null,
+      ".skill-tree/validation-recipes.json": null,
+      ".skill-tree/worktree-profile.json": null,
+      "Cargo.toml": null,
+      "Packages/manifest.json": null,
+      "Packages/packages-lock.json": null,
+      "ProjectSettings/EditorSettings.asset": null,
+      "ProjectSettings/ProjectSettings.asset": null,
+      "ProjectSettings/ProjectVersion.txt": null,
+      "bun.lock": null,
+      "bun.lockb": null,
+      "npm-shrinkwrap.json": null,
+      "package-lock.json": null,
+      "package.json": null,
+      "pnpm-lock.yaml": null,
+      "pyproject.toml": null,
+      "pytest.ini": null,
+      "yarn.lock": null
+    },
+    "packages": [
+      {
+        "destination": ".goose/skills/skill-tree-add-pending-task",
+        "name": "skill-tree-add-pending-task",
+        "flavor": "general",
+        "identity": "8f6529a700d99194cd0d55960ba2df4046cf240ce8c8de32dcfcc7602ad852eb",
+        "providers": [
+          "goose"
+        ]
+      },
+      {
+        "destination": ".goose/skills/skill-tree-clarify-tasks",
+        "name": "skill-tree-clarify-tasks",
+        "flavor": "general",
+        "identity": "fdf6f2fd09584a5a861f54b759de7c67ca423badc478ebdaada039fa1077e941",
+        "providers": [
+          "goose"
+        ]
+      },
+      {
+        "destination": ".goose/skills/skill-tree-create-documents-snapshot",
+        "name": "skill-tree-create-documents-snapshot",
+        "flavor": "general",
+        "identity": "9fcc0b00fb742e391337491212040de94c81980f1a25925808cb39520a0cf8a5",
+        "providers": [
+          "goose"
+        ]
+      },
+      {
+        "destination": ".goose/skills/skill-tree-implement-all",
+        "name": "skill-tree-implement-all",
+        "flavor": "general",
+        "identity": "47f71883b277e05a40bfb22a9780e14f195b1ac7d184b29797515d07a3d5b536",
+        "providers": [
+          "goose"
+        ]
+      },
+      {
+        "destination": ".goose/skills/skill-tree-implement-next-future-task",
+        "name": "skill-tree-implement-next-future-task",
+        "flavor": "general",
+        "identity": "2b98e243acc4df6fb7e4d7c17d6315d7b9a20443e599297f5dc90553d0a627f8",
+        "providers": [
+          "goose"
+        ]
+      },
+      {
+        "destination": ".goose/skills/skill-tree-pr-review-cycle",
+        "name": "skill-tree-pr-review-cycle",
+        "flavor": "general",
+        "identity": "738ae13a31486799f00a0708c7127647f940bff4ebf3630fe50b755a2a6e9d2c",
+        "providers": [
+          "goose"
+        ]
+      },
+      {
+        "destination": ".goose/skills/skill-tree-process-future-pending",
+        "name": "skill-tree-process-future-pending",
+        "flavor": "general",
+        "identity": "c0abaa54ecf14fc8684446fdf300645ec3ef983cae8abc515732f0149bf9065e",
+        "providers": [
+          "goose"
+        ]
+      },
+      {
+        "destination": ".goose/skills/skill-tree-repo-documentation",
+        "name": "skill-tree-repo-documentation",
+        "flavor": "general",
+        "identity": "9dcd3aecda4fc553f0c5235ada76487d2235bc6d17bd7781524497097521b673",
+        "providers": [
+          "goose"
+        ]
+      },
+      {
+        "destination": ".goose/skills/skill-tree-repo-documentation-audit",
+        "name": "skill-tree-repo-documentation-audit",
+        "flavor": "general",
+        "identity": "cf43a8e5f71d00e37d93caa1112cf0b69c501b920c6dbebdd344e6fd1c470342",
+        "providers": [
+          "goose"
+        ]
+      },
+      {
+        "destination": ".goose/skills/skill-tree-work-through-next",
+        "name": "skill-tree-work-through-next",
+        "flavor": "general",
+        "identity": "240bda9dc55bd728ce8378afe4bcfbf138e4954c983b72820b7d7a3fcaa756b0",
+        "providers": [
+          "goose"
+        ]
+      }
+    ],
+    "policy": "Immediate focused feedback; scoped additional boundary checks; no implicit product execution.",
+    "facts": {
+      "test_assemblies": [],
+      "ui": [],
+      "package_manager": "npm",
+      "node": null,
+      "packages": {},
+      "capabilities": {}
+    },
+    "gaps": [
+      {
+        "key": "test-foundation",
+        "reason": "No usable foundational test command is declared.",
+        "recommendation": "Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile."
+      }
+    ]
+  },
+  {
+    "provider": "amp",
+    "ok": true,
+    "action": "dry-run",
+    "flavor": "general",
+    "changed": [
+      ".agents/skills/skill-tree-add-pending-task",
+      ".agents/skills/skill-tree-clarify-tasks",
+      ".agents/skills/skill-tree-create-documents-snapshot",
+      ".agents/skills/skill-tree-implement-all",
+      ".agents/skills/skill-tree-implement-next-future-task",
+      ".agents/skills/skill-tree-pr-review-cycle",
+      ".agents/skills/skill-tree-process-future-pending",
+      ".agents/skills/skill-tree-repo-documentation",
+      ".agents/skills/skill-tree-repo-documentation-audit",
+      ".agents/skills/skill-tree-work-through-next",
+      ".skill-tree/installation/source/common/references/decision-governance.md",
+      ".skill-tree/installation/source/common/references/development-practices.md",
+      ".skill-tree/installation/source/common/references/document-rules.md",
+      ".skill-tree/installation/source/common/references/documentation-output-contract.md",
+      ".skill-tree/installation/source/common/references/future-workflow.md",
+      ".skill-tree/installation/source/common/references/history-retention.md",
+      ".skill-tree/installation/source/common/references/installation-profile.md",
+      ".skill-tree/installation/source/common/references/orchestration.md",
+      ".skill-tree/installation/source/common/references/pending-task-format.md",
+      ".skill-tree/installation/source/common/references/pending-task-intake.md",
+      ".skill-tree/installation/source/common/references/plugin-invocation.md",
+      ".skill-tree/installation/source/common/references/pr-review-cycle.md",
+      ".skill-tree/installation/source/common/references/repository-discovery-checklist.md",
+      ".skill-tree/installation/source/common/references/run-workspaces.md",
+      ".skill-tree/installation/source/common/references/snapshot-rules.md",
+      ".skill-tree/installation/source/common/references/unity-safety.md",
+      ".skill-tree/installation/source/common/references/validation-policy.md",
+      ".skill-tree/installation/source/common/references/workflow-metadata.md",
+      ".skill-tree/installation/source/common/scripts/create-documentation-snapshot.py",
+      ".skill-tree/installation/source/common/scripts/decision-governance.py",
+      ".skill-tree/installation/source/common/scripts/decision-orchestration.py",
+      ".skill-tree/installation/source/common/scripts/inspect-unity-repository.py",
+      ".skill-tree/installation/source/common/scripts/plugin-hooks.js",
+      ".skill-tree/installation/source/common/scripts/plugin-invocation.py",
+      ".skill-tree/installation/source/common/scripts/plugin-processing.py",
+      ".skill-tree/installation/source/common/scripts/pr-review-state.py",
+      ".skill-tree/installation/source/common/scripts/run-workspaces.py",
+      ".skill-tree/installation/source/common/scripts/select-prioritized-task.py",
+      ".skill-tree/installation/source/common/scripts/validate-document-rules.py",
+      ".skill-tree/installation/source/common/scripts/validate-future-document.py",
+      ".skill-tree/installation/source/common/scripts/validate-repository-documentation.py",
+      ".skill-tree/installation/source/common/scripts/workflow-state.py",
+      ".skill-tree/installation/source/domains/general/sections.json",
+      ".skill-tree/installation/source/templates/invariants.json",
+      ".skill-tree/installation/source/templates/operations.json",
+      ".skill-tree/installation/source/config/capabilities.json",
+      ".skill-tree/installation/source/config/flavors.json",
+      ".skill-tree/installation/source/config/plugins/ponytail.json",
+      ".skill-tree/installation/source/config/plugins/task-editorial.json",
+      ".skill-tree/installation/source/config/plugins/task-interview.json",
+      ".skill-tree/installation/source/config/providers.json",
+      ".skill-tree/installation/source/config/resource-map.json",
+      ".skill-tree/installation/source/lib/composer.js",
+      ".skill-tree/installation/source/lib/execution-bindings.js",
+      ".skill-tree/installation/source/lib/installation.js",
+      ".skill-tree/installation/source/lib/plugin-acquisition.js",
+      ".skill-tree/installation/source/lib/plugin-bindings.js",
+      ".skill-tree/installation/source/lib/plugin-composition.js",
+      ".skill-tree/installation/source/lib/plugin-lifecycle.js",
+      ".skill-tree/installation/source/lib/plugin-management.js",
+      ".skill-tree/installation/source/lib/plugin-parameters.js",
+      ".skill-tree/installation/source/lib/plugin-registry.js",
+      ".skill-tree/installation/source/lib/plugin-runtime.js",
+      ".skill-tree/installation/source/lib/plugin-sources.js",
+      ".skill-tree/installation/source/lib/plugins.js",
+      ".skill-tree/installation/source/src/init-rules/skill-tree-skills.md",
+      ".skill-tree/installation/manager.js",
+      ".skill-tree/installation/profile.json"
+    ],
+    "profile_identity": "49f566f3a4c913c943729d2cac193758bf31d09a8105599c03c20fc4c5a5fe65",
+    "environment_identity": "4e461fd827d8e0b8d03a68ced1752df088e1a22eedd8c17d5a0e33e09a78ce29",
+    "input_fingerprints": {
+      ".node-version": null,
+      ".nvmrc": null,
+      ".skill-tree/config/repository.json": null,
+      ".skill-tree/installation/plugins.json": null,
+      ".skill-tree/validation-recipes.json": null,
+      ".skill-tree/worktree-profile.json": null,
+      "Cargo.toml": null,
+      "Packages/manifest.json": null,
+      "Packages/packages-lock.json": null,
+      "ProjectSettings/EditorSettings.asset": null,
+      "ProjectSettings/ProjectSettings.asset": null,
+      "ProjectSettings/ProjectVersion.txt": null,
+      "bun.lock": null,
+      "bun.lockb": null,
+      "npm-shrinkwrap.json": null,
+      "package-lock.json": null,
+      "package.json": null,
+      "pnpm-lock.yaml": null,
+      "pyproject.toml": null,
+      "pytest.ini": null,
+      "yarn.lock": null
+    },
+    "packages": [
+      {
+        "destination": ".agents/skills/skill-tree-add-pending-task",
+        "name": "skill-tree-add-pending-task",
+        "flavor": "general",
+        "identity": "8f6529a700d99194cd0d55960ba2df4046cf240ce8c8de32dcfcc7602ad852eb",
+        "providers": [
+          "amp"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-clarify-tasks",
+        "name": "skill-tree-clarify-tasks",
+        "flavor": "general",
+        "identity": "fdf6f2fd09584a5a861f54b759de7c67ca423badc478ebdaada039fa1077e941",
+        "providers": [
+          "amp"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-create-documents-snapshot",
+        "name": "skill-tree-create-documents-snapshot",
+        "flavor": "general",
+        "identity": "9fcc0b00fb742e391337491212040de94c81980f1a25925808cb39520a0cf8a5",
+        "providers": [
+          "amp"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-implement-all",
+        "name": "skill-tree-implement-all",
+        "flavor": "general",
+        "identity": "47f71883b277e05a40bfb22a9780e14f195b1ac7d184b29797515d07a3d5b536",
+        "providers": [
+          "amp"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-implement-next-future-task",
+        "name": "skill-tree-implement-next-future-task",
+        "flavor": "general",
+        "identity": "2b98e243acc4df6fb7e4d7c17d6315d7b9a20443e599297f5dc90553d0a627f8",
+        "providers": [
+          "amp"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-pr-review-cycle",
+        "name": "skill-tree-pr-review-cycle",
+        "flavor": "general",
+        "identity": "738ae13a31486799f00a0708c7127647f940bff4ebf3630fe50b755a2a6e9d2c",
+        "providers": [
+          "amp"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-process-future-pending",
+        "name": "skill-tree-process-future-pending",
+        "flavor": "general",
+        "identity": "c0abaa54ecf14fc8684446fdf300645ec3ef983cae8abc515732f0149bf9065e",
+        "providers": [
+          "amp"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-repo-documentation",
+        "name": "skill-tree-repo-documentation",
+        "flavor": "general",
+        "identity": "9dcd3aecda4fc553f0c5235ada76487d2235bc6d17bd7781524497097521b673",
+        "providers": [
+          "amp"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-repo-documentation-audit",
+        "name": "skill-tree-repo-documentation-audit",
+        "flavor": "general",
+        "identity": "cf43a8e5f71d00e37d93caa1112cf0b69c501b920c6dbebdd344e6fd1c470342",
+        "providers": [
+          "amp"
+        ]
+      },
+      {
+        "destination": ".agents/skills/skill-tree-work-through-next",
+        "name": "skill-tree-work-through-next",
+        "flavor": "general",
+        "identity": "240bda9dc55bd728ce8378afe4bcfbf138e4954c983b72820b7d7a3fcaa756b0",
+        "providers": [
+          "amp"
+        ]
+      }
+    ],
+    "policy": "Immediate focused feedback; scoped additional boundary checks; no implicit product execution.",
+    "facts": {
+      "test_assemblies": [],
+      "ui": [],
+      "package_manager": "npm",
+      "node": null,
+      "packages": {},
+      "capabilities": {}
+    },
+    "gaps": [
+      {
+        "key": "test-foundation",
+        "reason": "No usable foundational test command is declared.",
+        "recommendation": "Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile."
+      }
+    ]
+  }
+]
+Documentation setup remains separate: invoke skill-tree-repo-documentation. After queue creation, capture the persisted foundation finding through scripts/workflow-state.py capture-foundation <project>. No product execution performed.

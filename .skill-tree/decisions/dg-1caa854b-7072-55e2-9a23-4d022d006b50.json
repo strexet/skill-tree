@@ -1,0 +1,241 @@
+{
+  "acceptance": {
+    "actor": {
+      "context_id": "/root/catalog112",
+      "id": "/root/catalog112"
+    },
+    "answer": "accept",
+    "attempt_id": "DA-aed1724b-b1ba-440f-974a-0d5429f7c207",
+    "authority_digest": "932f83259ef917e0a8e4f88d67ef59c1f76db27d40c94e786e5e53fafcf4c828",
+    "context_identity": {
+      "decision_purpose": "plan",
+      "execution_snapshot_digest": "2b3810727090bf9eff4b7cda050de6cb2a1b6ec463f36250361c9391e6ca1786",
+      "id": "task:T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "kind": "task",
+      "orchestration_id": "DO-e5e261f9-5b38-51f1-8958-9a6fc0796037",
+      "plan_digest": "c60cb3ad1c2fa96e391d289753bd552764f7d85515e70e476a48638b372eacb7",
+      "required_checks_digest": "1757e84d176ef29a00382aa06bcaa5d1eca446d31cad0b29fc279fb82045c041",
+      "task_ids": [
+        "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+      ]
+    },
+    "decision_id": "DG-1caa854b-7072-55e2-9a23-4d022d006b50",
+    "digest": "33794b3ff181f453a8f711f5068fd6dfcccbb43893e98d14762414ea8a762724",
+    "kind": "specification-acceptance",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/catalog112",
+      "actor_id": "/root/catalog112",
+      "creation_reference": "Actual collaboration.spawn_agent returned /root/catalog112, separate active context.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/catalog112 returned the sealed-input JSON in collaboration final answer.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "a33b7d5111dd88b2cfed5590ff64bd572b3dbd261542bfc6ff5658442dcdd526",
+    "question_id": "installer110-plan-with-journal-isolation",
+    "rationale": "The revised plan preserves pending plugin transactions under the owned core installation lock, retains ordinary core recovery when the plugin channel is clear, and requires explicit owned recovery before replay. The regression exercises core-only repeat, wrong-digest submission and read-only inspection after a real interruption. The shared typed request and explicit preview confirmation cover both initial setup and later management.",
+    "role_receipts": {
+      "critic": "b76779ecf922103c1d88cc359855b252654e764bb5d59348abf5f4be4038fa3e",
+      "resolver": "1bf62b55f371fbb85d80a4796dedfc1744d7102764bb246c2e8b6bf04bce4b9a"
+    },
+    "semantic_fingerprint": "1d76317ea0c75e7d6c2deec19d43f3199ff2baccabafbffe790040d158a2f941"
+  },
+  "active_attempt_id": null,
+  "attempts": {
+    "DA-aed1724b-b1ba-440f-974a-0d5429f7c207": {
+      "actor": {
+        "context_id": "/root/catalog112",
+        "id": "/root/catalog112"
+      },
+      "authority_digest": "932f83259ef917e0a8e4f88d67ef59c1f76db27d40c94e786e5e53fafcf4c828",
+      "basis_digest": null,
+      "content_fingerprint": "1d76317ea0c75e7d6c2deec19d43f3199ff2baccabafbffe790040d158a2f941",
+      "evidence": {
+        "actor_context_id": "/root/catalog112",
+        "actor_id": "/root/catalog112",
+        "creation_reference": "Actual collaboration.spawn_agent returned /root/catalog112, separate active context.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/catalog112 returned the sealed-input JSON in collaboration final answer.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-aed1724b-b1ba-440f-974a-0d5429f7c207",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "a33b7d5111dd88b2cfed5590ff64bd572b3dbd261542bfc6ff5658442dcdd526",
+      "result": {
+        "answer": "accept",
+        "input_digest": "d4fb86bd6f734c6ef40b025601a32182bae6ad24a1e2a95dcf96ba1483ec4637",
+        "rationale": "The revised plan preserves pending plugin transactions under the owned core installation lock, retains ordinary core recovery when the plugin channel is clear, and requires explicit owned recovery before replay. The regression exercises core-only repeat, wrong-digest submission and read-only inspection after a real interruption. The shared typed request and explicit preview confirmation cover both initial setup and later management.",
+        "status": "answered"
+      },
+      "role": "resolver",
+      "semantic_fingerprint": "1d76317ea0c75e7d6c2deec19d43f3199ff2baccabafbffe790040d158a2f941",
+      "status": "answered"
+    },
+    "DA-fbbeba76-5782-4f93-9e97-e369ede85e23": {
+      "actor": {
+        "context_id": "/root/delivery132",
+        "id": "/root/delivery132"
+      },
+      "authority_digest": "932f83259ef917e0a8e4f88d67ef59c1f76db27d40c94e786e5e53fafcf4c828",
+      "basis_digest": "af8f60da87059a895267aecaa3a2c73f9fa1ad0ddffa4dbad22db051d78161fb",
+      "content_fingerprint": "1d76317ea0c75e7d6c2deec19d43f3199ff2baccabafbffe790040d158a2f941",
+      "evidence": {
+        "actor_context_id": "/root/delivery132",
+        "actor_id": "/root/delivery132",
+        "creation_reference": "Actual collaboration.spawn_agent returned /root/delivery132, separate active context.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/delivery132 returned the sealed-input JSON in collaboration final answer.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-fbbeba76-5782-4f93-9e97-e369ede85e23",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "a33b7d5111dd88b2cfed5590ff64bd572b3dbd261542bfc6ff5658442dcdd526",
+      "result": {
+        "answer": "accept",
+        "input_digest": "97cf383034582519dc741408ca8369ca384eb17576034d3ad1e7dc326e3d5e1d",
+        "rationale": "The revised plan preserves pending plugin journals under the core installer lock and keeps ordinary core recovery available when the plugin channel is clear. The interruption regression covers core-only repeat, mismatched confirmation, read-only inspection, explicit recovery, and replay of the original request.",
+        "status": "agree"
+      },
+      "role": "critic",
+      "semantic_fingerprint": "1d76317ea0c75e7d6c2deec19d43f3199ff2baccabafbffe790040d158a2f941",
+      "status": "agree"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the approved task and dependency scope. No source publication, remote, release, external trial, installation consent or actual native plugin execution. Required checks and real owner intent cannot be delegated away."
+    ],
+    "context_id": "task:T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+    },
+    "id": "approved-installer110",
+    "revision": 1
+  },
+  "authority_digest": "932f83259ef917e0a8e4f88d67ef59c1f76db27d40c94e786e5e53fafcf4c828",
+  "context": {
+    "content_fingerprint": "1d76317ea0c75e7d6c2deec19d43f3199ff2baccabafbffe790040d158a2f941",
+    "decision_purpose": "plan",
+    "execution_snapshot_digest": "2b3810727090bf9eff4b7cda050de6cb2a1b6ec463f36250361c9391e6ca1786",
+    "id": "task:T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+    "kind": "task",
+    "orchestration_id": "DO-e5e261f9-5b38-51f1-8958-9a6fc0796037",
+    "plan_digest": "c60cb3ad1c2fa96e391d289753bd552764f7d85515e70e476a48638b372eacb7",
+    "required_checks_digest": "1757e84d176ef29a00382aa06bcaa5d1eca446d31cad0b29fc279fb82045c041",
+    "semantic_fingerprint": "1d76317ea0c75e7d6c2deec19d43f3199ff2baccabafbffe790040d158a2f941",
+    "task_ids": [
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ]
+  },
+  "decision_hash": "47e875c7d57efce1120e52c668624be3500bb1e4a295191024fd6354181ebef2",
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "frontier_epoch": 1,
+  "history": [
+    {
+      "context_fingerprint": "1d76317ea0c75e7d6c2deec19d43f3199ff2baccabafbffe790040d158a2f941",
+      "detail": {},
+      "event": "started",
+      "mode_epoch": 1,
+      "previous_record_hash": null,
+      "sequence": 1
+    },
+    {
+      "context_fingerprint": "1d76317ea0c75e7d6c2deec19d43f3199ff2baccabafbffe790040d158a2f941",
+      "detail": {
+        "attempt_id": "DA-aed1724b-b1ba-440f-974a-0d5429f7c207",
+        "role": "resolver"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "e6974d84db2d1c60884d657e7660b927bf391b4fae355c299240016cc0cde169",
+      "sequence": 2
+    },
+    {
+      "context_fingerprint": "1d76317ea0c75e7d6c2deec19d43f3199ff2baccabafbffe790040d158a2f941",
+      "detail": {
+        "attempt_id": "DA-aed1724b-b1ba-440f-974a-0d5429f7c207",
+        "status": "answered"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "4a2492598bc500b95c1823b4be39edaef5c234e6091b4ea0152d4e116f99cd4b",
+      "sequence": 3
+    },
+    {
+      "context_fingerprint": "1d76317ea0c75e7d6c2deec19d43f3199ff2baccabafbffe790040d158a2f941",
+      "detail": {
+        "attempt_id": "DA-fbbeba76-5782-4f93-9e97-e369ede85e23",
+        "role": "critic"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "5d32b96a4d99f747eab68248e6e7a8c2933ceda2ab994b005aa9d49de3e0794a",
+      "sequence": 4
+    },
+    {
+      "context_fingerprint": "1d76317ea0c75e7d6c2deec19d43f3199ff2baccabafbffe790040d158a2f941",
+      "detail": {
+        "attempt_id": "DA-fbbeba76-5782-4f93-9e97-e369ede85e23",
+        "status": "agree"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "bce8ca418f8c79c38bfb8c78aeaaeb6afb641226bc53694c21cce30f16f07430",
+      "sequence": 5
+    },
+    {
+      "context_fingerprint": "1d76317ea0c75e7d6c2deec19d43f3199ff2baccabafbffe790040d158a2f941",
+      "detail": {
+        "acceptance_digest": "33794b3ff181f453a8f711f5068fd6dfcccbb43893e98d14762414ea8a762724"
+      },
+      "event": "accept",
+      "mode_epoch": 1,
+      "previous_record_hash": "58ed9e269ca4cdc9d4ce74887bd70a4567a485b62255fed0aa617abf6c759305",
+      "sequence": 6
+    }
+  ],
+  "id": "DG-1caa854b-7072-55e2-9a23-4d022d006b50",
+  "mode": "auto",
+  "mode_epoch": 1,
+  "prepared_attempt_id": "DA-fbbeba76-5782-4f93-9e97-e369ede85e23",
+  "question": {
+    "id": "installer110-plan-with-journal-isolation",
+    "kind": "specification-acceptance",
+    "options": [
+      {
+        "id": "accept",
+        "text": "Accept the revised plan."
+      },
+      {
+        "id": "revise",
+        "text": "Revise the plan with concrete reasons."
+      }
+    ],
+    "plan_text": "# T110 optional installer stage plan\n\nT-6ec57615-3512-4f91-98e8-efb12cde7d7f uses the existing provider/core installer, the T112 grouped catalog and the T131 shared plugin manager. The exact selected controller unit and prerequisite checks authorize implementation. Runtime observation and remote Git delivery are outside the installer test scope.\n\n## Entry points and default\n\n- Ordinary core installation, repeat installation and noninteractive commands request zero new external plugins. Complete core installation includes all eleven operations after manager131, including skill-tree-plugins. Explicit individual core selection retains its existing scoped behavior. Existing packages, exact binding IDs, order, conditions, disabled state and frozen HC requirements survive continue-without-new-plugins.\n- After all requested core provider/destination pairs successfully install and verify, interactive use offers Continue without new plugins as the default and Configure plugins as explicit opt-in. An empty response selects continue. Explicit --configure-plugins enters the same configuration flow in a terminal. Browsing never enables a plugin. Show an eligible bundle only when the current catalog scope has one and require explicit selection. Current production bundles are empty. Offer grouped known entries, direct source, and continue/exit.\n- Add --configure-plugins, --plugins <proposal.json> and --confirm-plugins <proposal-digest> to parseArgs. --configure-plugins and the supplied proposal path are mutually exclusive. Confirmation without a proposal is an invalid flag combination. --plugins without matching confirmation retains an explicit blocked plugin stage in live use. --non-interactive, --yes and -y only suppress prompts. A noninteractive explicit configuration request requires a resolved proposal and matching digest. It never reads interactive stdin.\n- Listing, --list-plugins, verify and uninstall do not enter setup. Reject conflicting new setup flags with these modes. Dry-run performs no plugin acquisition, prompt, state write or recovery. A supplied exact local proposal can be summarized and validated offline. A source needing remote resolution remains an explicit prerequisite. Preserve existing core list/dry-run output and exit semantics.\n\n## Shared manager boundary\n\n- Have T131 own a single configuration session/plan and apply path. Installer110 passes a verified target root, installed source, host/flavor and exact selected provider/destination scope to that API. Later skill-tree-plugins supplies the same source selection and ordered chain editor with the appropriate installed scope. Do not build a second editor or parallel known registry. Coordinate concrete export names when T131 lands.\n- Reuse catalogView for read-only grouped discovery, selectSource for exact vetted descriptors and manager direct normalization for repository/path/ref, raw URL, local sources and Claude-shaped metadata. Missing catalog, unsupported adapter and empty recommendations stay visible and leave custom input and skip available. Selecting a source grants no persistent known definition. Online inspection occurs only after explicit selection and approval for resolution. No source resolution runs from menu listing, noninteractive application of an exact resolved artifact, core-only repeat, dry-run or verification.\n- The shared editor displays current bindings and their complete occurrence sequence at canonical operation anchors. Preserve one stable occurrence ID per A–B–A slot, independent enabled/condition/instructions/parameters and full reposition/removal controls. Bind canonical resolved anchors and show effective values, secret references and origins without resolved secret material. Cancel at any step before activation leaves exact installed state untouched. Shared preview confirms versions/content, entries, dependency closure, adapter prerequisites, provider/destination set, order, readiness impact and frozen retained requirements.\n- One proposal is sealed for the project and shown once after resolution. An interactive confirmation explicitly selects the displayed proposal and digest, with skip/cancel on blank or EOF. A serialized application uses the same manager proposal/activation contract. Exact replay reconciles the original result without new writes, IDs or remote acquisition. Never call lifecycle application with a digest substituted by the installer.\n\n## Core gate, transaction and output\n\n- Use the existing core provider loop and per-provider errors. Perform one final owned verification after the last successful core provider and check that every originally selected destination still has the requested provider owner, operation and flavor. Keep scoped core operations valid. Skip plugin mutation if any provider fails. Report partial core success and the separate plugin prerequisite. Do not silently reduce the requested destination set.\n- The current lifecycle core identity does not encode physical provider paths or ownership aliases because composition hashes outputs by operation name. Seal an exact provider/destination scope fingerprint in the shared proposal or a trusted manager envelope. Validate it atomically during the lifecycle's existing locked apply path, including final owned state, alongside target/core/registry/digest. Avoid an outer lock around a function that takes the same installation lock. Permit exact replay to return its matching recorded receipt before new-mutation stale checks. Reject changed project, destination, scope, generation, candidate bytes, ordering, parameters or adapter identity.\n- Preserve separate core and plugin transactions. Failed/cancelled plugin setup keeps verified core results and existing plugins. Reuse the lifecycle transaction recovery channel for interrupted staging, old/new owned generation verification and replay. Unknown/unowned conflict remains blocked or recovery-required. No implicit recovery belongs in list or dry-run.\n- After a confirmed package/binding write, report the exact verified registry and whether owned profile composition is current or still requires refresh. If the shared manager supports an owned profile refresh as part of the confirmed setup, run it separately outside the lifecycle lock and verify the selected scope again. The profile update never re-admits or starts a parked run. A refresh failure preserves the already verified registry receipt and exposes the pending action. Never call skill helpers, dispatch hooks, initialize Future or claim successful candidate invocation.\n- Preserve default stdout's existing provider array and prose contract for existing no-plugin/list/verify/dry-run callers. Expose a separate explicit plugin-stage result for requested or interactive setup. The structured proposal path can return one envelope with core rows and plugin result. Interactive core rows appear before prompts. Preserve zero for core success with not-requested/skipped/cancelled setup and successful requested activation. Return nonzero for required core destination failure or requested plugin failed/blocked/recovery-required. Keep invalid CLI syntax separate. Stage status includes original receipt, replay status and refresh/admission prerequisites, without base64 payloads or private locators.\n\n## Red and focused validation\n\n1. Add test-plugin-installer.js and capture a real red assertion against the present CLI flags or missing setup stage. Exercise parse matrix and the same public main path used by the executable. Use an injected prompt IO factory or async ask/read adapter in main and shared manager, defaulted to production terminal IO. Test exact prompt order, default blank, cancel/EOF, explicit consent and prompt closure. Keep a separate spawned no-TTY CLI control for --yes and a real terminal smoke when feasible.\n2. Prove core-only fresh/repeat setup contains eleven operations and creates zero new packages or queue state. Build a real core provider partial failure using one unowned destination in a disposable project while another provider succeeds. Observe both core rows, no plugin prompt/acquisition and exact existing plugin bytes.\n3. Prepare a controlled local/HTTP/Git proposal through the shared manager and install via both interactive selection and --plugins/--confirm-plugins. Check wrong/missing/foreign/stale digest, stale provider scope with unchanged composition identity, and exact replay without repeat acquisition. A selected but unqualified source remains visibly optional. Empty catalog keeps manual install and skip available.\n4. Compare initial/later A–B–A configuration using identical shared editor input, exact IDs/order and independent parameters/conditions. Verify selected exact unbind, uninstall, forget and retained requirements through manager. A cancelled reorder or provider mismatch preserves registry/occurrences and parked bytes. Qualify explicit profile freshness and required admission separately.\n5. Hash target snapshots for read-only listing, dry-run and verify. Use acquisition and hook traps and assert no invocation. Inject an actual scoped transaction interruption, verify independently retained core success, then use existing lifecycle reconciliation and compare original request evidence. Never simulate success by returning a canned receipt from the test seam.\n6. Update installer docs and run exact plugin-installer-regressions, existing installer/catalog/manager and lifecycle checks, sync/strict validation, full Python and Node suites, installer list/dry-run and diff check. Review exact diff and owned installation snapshot before scoped local commit. Mark deterministic fixtures separately from any actual Codex interpretation.\n\n## Current manager interface and interaction\n\nUse the installed manager backend contract `managementInventory`, `prepareManagerRequest` and `applyManagerProposal`. Project-known discovery remains distinct from installed state. A selected public remote source requires an explicit online resolution choice before preparing. Private or local known definitions require a current explicit locator when acquisition cannot use the portable definition. Preserve the exact displayed source scope and selected provider destinations. The provider-scope seal is already inside the shared lifecycle transaction.\n\nThe interactive session uses the same typed request and full ordered occurrence configuration as later management. Group known entries by exact hook boundary, then allow direct source entry, repeated occurrences and the ordered binding editor with separate enablement, condition, parameters and instruction values. A typed JSON request can supply the complete complex configuration through the same shared manager API. Display one exact preview before asking for the digest confirmation. A blank or closed terminal chooses skip or cancellation. A confirmed change can refresh the owned profile separately and verify the same selected scope. Report a verified registry change and a pending refresh separately if owned refresh fails. Retained-run re-admission remains a separate controller gate.\n\nCapture the focused installer check and existing adjacent installer and manager controls before completing T110. Run the complete Python and Node suites against the final frozen source at the shared pre-merge boundary. The canonical merged target repeats owned install and exact local-delivery validation after Git integration.\n\n## Pending plugin journal isolation\n\nThe core installer preserves any pending plugin journal and package bytes under the existing owned installation lock, before a core-only invocation or an optional request can recover or write plugin state. Report explicit owned recovery as a prerequisite. Preserve ordinary core-channel recovery where no plugin journal is pending. List, verification and dry-run stay read-only. Confirmed optional activation keeps the existing manager transaction behavior. Reproduce a real registry activation interruption and assert that ordinary repeat, mismatched confirmation and read-only invocations preserve the journal and package bytes until explicit owned recovery. The original confirmed proposal then replays its owned result.\n",
+    "recommendation": "accept",
+    "significance": "significant",
+    "text": "Accept the revised optional plugin installer plan with isolated journal recovery, or identify a concrete remaining blocker."
+  },
+  "request_id": "DO-e5e261f9-5b38-51f1-8958-9a6fc0796037:question:2",
+  "revision": 6,
+  "schema": 1,
+  "start_digest": "2e340c120c4cbc0f066cde06ed4c4d89789de90800884f3b096dd921fe7b8df5",
+  "state": "accepted"
+}

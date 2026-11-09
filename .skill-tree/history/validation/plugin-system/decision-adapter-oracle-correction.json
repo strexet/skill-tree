@@ -1,0 +1,12 @@
+{
+  "task_id": "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99",
+  "record_kind": "test-oracle-correction",
+  "original_red_attempt": "C-6043e39c-2a45-4fe8-8b5d-cf1e4e74a0e6",
+  "finding": "The reused clarification test utility forwarded ok=False as request data instead of passing the expected failure to the CLI assertion. The original Auto legacy-confirmation case could pass without detecting the missing refusal. Ten other cases still established intended Red.",
+  "repair": "The adapter suite owns a mutate utility that passes ok explicitly to the CLI runner; the current correctly rejecting Auto implementation passes the corrected refusal case.",
+  "retained_diagnostic": ".skill-tree/artifacts/plugin-implementation/decision-adapter-first-green-iteration.txt",
+  "limits": [
+    "The original Red report and log remain unchanged.",
+    "The correction strengthens the refusal oracle and changes no acceptance criterion or product authorization."
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "canonical_before_refresh": {
+    ".skill-tree/clarifications/cl-17367e9a-121d-4130-be4a-e13d151acb46.json": "04fc8d15c5fce90779d57329413bd7a3e071479d73c333216f9edb3e029478db",
+    ".skill-tree/documents/future.json": "8e0c8e25c02bbd47f1f8cc946e0d7c7d5ae2dd1fef525a3c538ac09c0c9b23b2",
+    ".skill-tree/documents/future.md": "08865a835a4858d211eac7afad46d08a04f2a6b7cd821841041eb476e7f3c142",
+    ".skill-tree/history/task-outcomes.jsonl": "7c18f2fc2e6f3ed6cec5074ce6711579d8b13c3ba6610c0ba57fd27c8282a067"
+  },
+  "operations": 10,
+  "profile_identity": "6e57e574f69f9703eec430409a4a6cccb4efdc99302c392bdd3f7e6e08fbab87",
+  "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+  "source_commit": "4c0467a",
+  "status": "passed",
+  "verification": [
+    "Owned manager verification passed.",
+    "Canonical queue/index, terminal ledger and clarification bytes were preserved through installation before explicit readmission.",
+    "The same run was explicitly re-admitted and advanced with fifteen frozen roots and twenty-one admitted units."
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "execution_code_commit": "82eaf49b6cb35e65dfa30413228bddcb10190562",
+  "final_scoped_revalidation": {
+    "all_passed": true,
+    "capture_manifest_sha256": "c6d75520662883e6b74e9828438711fef909f95bb7e5b74c9a731fb8a4739624",
+    "static": 8,
+    "unit": 14
+  },
+  "implementation": {
+    "completed_tasks": 22,
+    "deferred_processing": {
+      "stale-check-reconciliation": "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+      "static-recipe-discovery": "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    },
+    "initial_roots": 15
+  },
+  "limits": [
+    "Full suites cover the final executable code. The subsequent source change corrected two documentation statements and refreshed static acceptance evidence.",
+    "Unit, terminal and owned installation evidence remain separate from archived bounded candidate and host observations."
+  ],
+  "node": {
+    "argv": [
+      "npm",
+      "run",
+      "test:node"
+    ],
+    "capture_sha256": "f7e8f4368952e0505f7b54c0005485ca357b045bf0d29c3602e0edf60f3fffbb",
+    "failed": 0,
+    "passed": 330
+  },
+  "python": {
+    "argv": [
+      "npm",
+      "run",
+      "test:py"
+    ],
+    "capture_sha256": "06da9b8fafeb5249af7d85ce7bd4149cdd022b708f8e1aff5b2710defbd5fff6",
+    "failed": 0,
+    "passed": 553
+  },
+  "reviewed_documentation_commit": "5c4e28c3ee34f1f9e385c82cde21f0886b202919",
+  "schema": 1,
+  "static_controls": {
+    "dry_run": "6cfc7fa48886d9983f7505f08e5c58d965104fbf052e18890deba86503219ab3",
+    "list": "fb9ae55cf4fab128f448e5b634d6917668a04f55662842a490b524588dda30f7",
+    "strict": "1302cebd2e1a3189239671ce4e62c846162c5c7fc73279eb4cb87432a0b93da5",
+    "sync": "ceffd15f7477e7cca73d33bc13b530b5430f5e4b9c12123f525a1fe3c65a5c78"
+  }
+}

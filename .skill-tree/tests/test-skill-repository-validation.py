@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -10,6 +11,46 @@ UNITY_INSPECT=ROOT/'skills/unity/skill-tree-repo-documentation/scripts/inspect-u
 SNAPSHOT=ROOT/'skills/general/skill-tree-create-documents-snapshot/scripts/create-documentation-snapshot.py'
 
 class RepositoryValidationTests(unittest.TestCase):
+    def test_snapshot_excludes_generated_ownership_from_default_and_explicit_scopes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            files={'README.md':'Project architecture.\n','.skill-tree/documents/technical.md':'Project architecture.\n','.skill-tree/skills/general/example/SKILL.md':'Agent project architecture.\n','.skill-tree/installation/source/common/references/rules.md':'Agent project architecture.\n'}
+            for relative,content in files.items():
+                target=root/relative;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(content)
+            config=root/'.skill-tree/config/repository.json';config.parent.mkdir(parents=True);config.write_text(json.dumps({'schema':1,'role':'source'}))
+            subprocess.run(['git','init',str(root)],check=True,capture_output=True)
+            subprocess.run(['git','-C',str(root),'add','.'],check=True,capture_output=True)
+            command=[sys.executable,str(SNAPSHOT),str(root),'--dry-run']
+            result=subprocess.run(command,capture_output=True,text=True)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertIn('- README.md',result.stdout)
+            self.assertIn('- .skill-tree/documents/technical.md',result.stdout)
+            self.assertNotIn('- .skill-tree/skills/',result.stdout)
+            self.assertNotIn('- .skill-tree/installation/',result.stdout)
+            for relative in ['.skill-tree/skills','.skill-tree/installation','.skill-tree/skills/general/example/SKILL.md']:
+                result=subprocess.run(command+['--include',relative],capture_output=True,text=True)
+                self.assertNotEqual(result.returncode,0,relative)
+            self.assertFalse(list(root.rglob('*.zip')))
+    def test_source_validation_excludes_self_installation_and_retains_source_checks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo=Path(tmp)
+            shutil.copytree(ROOT,repo/'.skill-tree',ignore=shutil.ignore_patterns('installation','artifacts','__pycache__'))
+            for name in ['AGENTS.md','CLAUDE.md','GEMINI.md','README.md','LICENSE','package.json','install.sh','install.ps1']:
+                shutil.copy2(ROOT.parent/name,repo/name)
+            installation=repo/'.skill-tree/installation'
+            backup=installation/'.backups/0'
+            backup.mkdir(parents=True)
+            (installation/'.last-transaction.json').write_text('{}\n')
+            (backup/'retained.py').write_text('not valid Python!\n')
+            (backup/'retained.md').write_text('You must retain this historical backup.\n')
+            command=[sys.executable,str(repo/'.skill-tree/scripts/validate-skill-repository.py'),'--strict','--format','json']
+            result=subprocess.run(command,capture_output=True,text=True)
+            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+            (repo/'.skill-tree/common/invalid_owned.py').write_text('not valid Python!\n')
+            result=subprocess.run(command,capture_output=True,text=True)
+            self.assertNotEqual(result.returncode,0)
+            self.assertIn('Invalid owned name: common/invalid_owned.py',result.stdout)
+            self.assertIn('invalid syntax',result.stdout)
     def test_strict_source_validation(self):
         result=subprocess.run([sys.executable,str(ROOT/'scripts/validate-skill-repository.py'),'--strict','--format','json'],capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)

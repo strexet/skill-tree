@@ -1,0 +1,108 @@
+{
+  "actual_lane": "static",
+  "actual_validator": {
+    "argv": [
+      "python3",
+      "-I",
+      "-B",
+      ".skill-tree/scripts/agent-conformance.py",
+      "core-decision-validate",
+      "--input",
+      ".skill-tree/history/validation/plugin-system/core127-native/report.json",
+      "--capture",
+      ".skill-tree/history/validation/plugin-system/core127-native/capture.json"
+    ],
+    "exit_code": 1,
+    "immutable_historical_artifacts": {
+      ".skill-tree/history/validation/plugin-system/core127-native/capture.json": "65475548db6a70be601c337dd89ae6c7bddf545e0017eac053865ff8dc7e70b8",
+      ".skill-tree/history/validation/plugin-system/core127-native/report.json": "56f43d1e35d3d5381b0866f026c4517ce90017153faf703c5604b12656c5be99",
+      ".skill-tree/scripts/agent-conformance.py": "0f7a79a83e69aad8c8f3a5c4d063b94616f1c6d786f0e13cc3027dee3401f49e"
+    },
+    "stderr": "Traceback (most recent call last):\n  File \"/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/scripts/agent-conformance.py\", line 711, in <module>\n    if __name__=='__main__':main()\n                            ^^^^^^\n  File \"/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/scripts/agent-conformance.py\", line 706, in main\n    elif args.command=='core-decision-validate':result=validate_core_decision_report(json.loads(args.input.read_text()),json.loads(args.capture.read_text()) if args.capture else None)\n                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/scripts/agent-conformance.py\", line 435, in validate_core_decision_report\n    try:return _validate_core_decision_report(report,trusted_capture)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/scripts/agent-conformance.py\", line 316, in _validate_core_decision_report\n    file=CORE/relative;require(file.is_file() and digest(file)==fingerprint,'Core source fingerprints differ from the current execution source')\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/scripts/agent-conformance.py\", line 304, in require\n    if not condition:raise ValueError(message)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: Core source fingerprints differ from the current execution source\n",
+    "stdout": ""
+  },
+  "attempt_id": "C-9c88d1ef-084d-4573-8296-48b0cca3db98",
+  "check_id": "decision-actual-actors",
+  "current_unit_receipts": {
+    "decision-core-standalone": {
+      "attempt_id": "C-d76d8e82-4f1e-4b60-afaf-a31d1fe0f4ed",
+      "counts": {
+        "discovered": 3,
+        "expected": 3,
+        "failed": 0,
+        "passed": 3,
+        "skipped": 0
+      }
+    },
+    "decision-observation-oracle": {
+      "attempt_id": "C-2fff07a0-c3a2-49dd-887e-8e24027a2a84",
+      "counts": {
+        "discovered": 10,
+        "expected": 10,
+        "failed": 0,
+        "passed": 10,
+        "skipped": 0
+      }
+    },
+    "decision-orchestration-unit": {
+      "attempt_id": "C-85644335-b9da-4e7b-8af1-fb6888189011",
+      "counts": {
+        "discovered": 30,
+        "expected": 30,
+        "failed": 0,
+        "passed": 30,
+        "skipped": 0
+      }
+    },
+    "decision-parent-adapters": {
+      "attempt_id": "C-3746e652-5ecd-4ea4-95f5-f9325b6ff840",
+      "counts": {
+        "discovered": 6,
+        "expected": 6,
+        "failed": 0,
+        "passed": 6,
+        "skipped": 0
+      }
+    }
+  },
+  "limits": [
+    "Bounded source compatibility and preserved prior observations. No fresh native or candidate qualification."
+  ],
+  "observations": [
+    "The historical significant Auto, Manual and switch contexts are request-only.",
+    "No historical scenario supplies a CL, task, Pending, run or hook context.",
+    "Core DG and DO modules and the owned observation validator retain the previous implementation. Processing-specific confirmation and fact guards do not activate on the captured request scopes."
+  ],
+  "original_contract_id": "O-16d60ab4-271a-4acb-8504-1e35053bfa99",
+  "profile_identity": "dd4a66be0c80310cd7412eda5e6603773a28e59861cf5fa731e78f807c21b7f5",
+  "result": "pass",
+  "schema": 1,
+  "source_commit": "2a6d240bf6f844d339d246bea57a437e9e3eb7fd",
+  "source_fingerprints": {
+    ".skill-tree/bin/install.js": "f322a379cd0f5846645d0e77cb6ac1bf36f4b479fa3ee9cbc5333e1714d6aa5f",
+    ".skill-tree/common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+    ".skill-tree/common/references/development-practices.md": "47402db618635e221d3e3944cb0f2dc88238e278a6e2c49f49491ce98e24fc14",
+    ".skill-tree/common/references/orchestration.md": "79313308e0b2f1833ab131ffd2b2c5fed4f18163b26b682f9234b17f285f8ca5",
+    ".skill-tree/common/references/workflow-metadata.md": "91264f18e09460d44decc0f09cbd7f9a8b12579822371956f228df58fc32f6f5",
+    ".skill-tree/common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    ".skill-tree/common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+    ".skill-tree/common/scripts/pr-review-state.py": "6bfb09e0273a6322c86c5f5915e8dc0503fa22416881c499c281c1dec570a3d1",
+    ".skill-tree/common/scripts/run-workspaces.py": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+    ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+    ".skill-tree/common/scripts/workflow-state.py": "ab47ba4e4ffe6c780f2d78e39093af8c6f98ffbd4b7114913aebfa951543ebb1",
+    ".skill-tree/config/resource-map.json": "9c82335ce439247fbfc56c50c817cdaf7a9b68901dbe69b4180f9081f1ada13f",
+    ".skill-tree/documents/implementation-plan.md": "61dc2c6e2974b003a6b83bbd31299600f900f9a03f7f1d23bba8707ad3457b90",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "ec64b261ef43c7e02a972f8d01ebed198e368f079869e96023b79718e7e50ed2",
+    ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+    ".skill-tree/lib/installation.js": "efb88bc5a28246aab36c7d1cb709f5ec4fb37dc736867c3533503e74c26fa431",
+    ".skill-tree/scripts/agent-conformance.py": "0f7a79a83e69aad8c8f3a5c4d063b94616f1c6d786f0e13cc3027dee3401f49e",
+    ".skill-tree/templates/invariants.json": "5a147a9ee4297250a6604f6a447fa10b57b9b94f3942044a9135790ce9c64b48",
+    ".skill-tree/templates/operations.json": "504c58534f010e57dbc45f0a276572b7690ea51ddb601f1b85dbf2dae16ab794",
+    ".skill-tree/tests/test-decision-conformance.py": "61f6a39d65dd54978b5a260268a653d87f8efc1fc6662571731fccd7c8a95cdf",
+    ".skill-tree/tests/test-decision-governance-installation.js": "eec5260b4fbb28a04d86361e81c35813eaf3d75f18c4f1524a1cf7269157ac83",
+    ".skill-tree/tests/test-decision-orchestration.py": "fc2ba0b10bc3511e2d7dbbc890abe5664a7c7d11c9dcf3c07fc8d6623afba1ea",
+    ".skill-tree/tests/test-orchestration-adapters.py": "2e1daa5f407445459068ec0af110c6be4995cd525b7ce02e32e69d20f3aeb26f"
+  },
+  "source_review_reference": ".skill-tree/history/validation/plugin-system/processing115-final6-independent-review.json",
+  "task_id": "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda"
+}

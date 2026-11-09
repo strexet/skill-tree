@@ -1,0 +1,10 @@
+{
+  "attempt_id": "C-4ef045ba-abf2-4f46-bf65-a9d22522f802",
+  "cleanup": "Original runner exited; fixture finalizers removed temporary installations and closed the local HTTP server.",
+  "corrected_test_hash": "d22373abecf9598a37a39f4a6fae8c0c2134749e2fed66b1e0c707b1bacdb0eb",
+  "prepared_test_hash": "bb8ff03a987d674331a2bff3066d2da8e96e6181975b130ff686cc042837caf4",
+  "reason": "A legitimate base64-tampering oracle correction changed the source after check preparation; the source guard rejected qualification.",
+  "reconciliation": "Temporarily restore the exact prepared test bytes only to close the original attempt as unavailable, then restore the corrected oracle and rerun a fresh check. No Red/pass is accepted for the drifted control.",
+  "retained_execution_log": ".skill-tree/history/validation/plugin-system/t-6f4500f7-91e2-410d-8172-a4c4cd232fc5-package-lifecycle-c-4ef045ba-abf2-4f46-bf65-a9d22522f802.txt",
+  "status": "unavailable"
+}

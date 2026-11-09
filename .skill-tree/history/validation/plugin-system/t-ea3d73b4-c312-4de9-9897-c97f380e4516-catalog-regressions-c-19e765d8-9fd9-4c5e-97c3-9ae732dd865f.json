@@ -1,0 +1,35 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-plugin-catalog.js"
+  ],
+  "attempt_id": "C-19e765d8-9fd9-4c5e-97c3-9ae732dd865f",
+  "check_id": "catalog-regressions",
+  "counts": {
+    "discovered": 11,
+    "expected": 11,
+    "failed": 0,
+    "passed": 11,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-ea3d73b4-c312-4de9-9897-c97f380e4516-catalog-regressions-c-19e765d8-9fd9-4c5e-97c3-9ae732dd865f.txt",
+  "result": "pass",
+  "reviewed_failure_reason": null,
+  "source_fingerprints": {
+    ".skill-tree/bin/install.js": "f322a379cd0f5846645d0e77cb6ac1bf36f4b479fa3ee9cbc5333e1714d6aa5f",
+    ".skill-tree/config/plugin-catalog.json": "0cac545a0f50891b859884865f7541f459bd8f9e3f3b3669fcf664b8890beb08",
+    ".skill-tree/documents/plugin-management-contract.md": "2b5c9aeb18dd30b06a809fd14e5222abf579a002187870167d61f6f7dda5b11a",
+    ".skill-tree/documents/plugin-recommendation-evidence.md": "e85766c749c19717f9eaf6d0c1049dfc48c31f77965e1e811a474e26a2cb2dd2",
+    ".skill-tree/documents/plugin-system-contract.md": "b25424efd0dc920376a8d32b9dd7ea27d6b644d966e167f690c8999dc2fa36f5",
+    ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84",
+    ".skill-tree/lib/plugin-catalog.js": "bcc842344ee7c7a8b3c37faa6f197e313826a82a4be99daf843163fa0030d143",
+    ".skill-tree/tests/test-plugin-catalog.js": "8e9b98889f515660b054ac63d5c8f8ce23597d9858f002db64ad6f2ab586f18b"
+  },
+  "task_id": "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+  "tool_wall_seconds": 10.793224457651377
+}

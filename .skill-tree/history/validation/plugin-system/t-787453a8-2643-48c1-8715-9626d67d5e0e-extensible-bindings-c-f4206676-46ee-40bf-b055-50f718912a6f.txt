@@ -1,0 +1,551 @@
+TAP version 13
+# Subtest: binding foundation exports runnable definition and identity APIs
+ok 1 - binding foundation exports runnable definition and identity APIs
+  ---
+  duration_ms: 0.513917
+  ...
+# Subtest: the actual owned operation catalog exposes before during and after without a fixed operation count
+not ok 2 - the actual owned operation catalog exposes before during and after without a fixed operation count
+  ---
+  duration_ms: 1.325958
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:23:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+    + []
+    - [
+    -   'skill-tree-add-pending-task',
+    -   'skill-tree-clarify-tasks',
+    -   'skill-tree-create-documents-snapshot',
+    -   'skill-tree-implement-all',
+    -   'skill-tree-implement-next-future-task',
+    -   'skill-tree-pr-review-cycle',
+    -   'skill-tree-process-future-pending',
+    -   'skill-tree-repo-documentation',
+    -   'skill-tree-repo-documentation-audit',
+    -   'skill-tree-work-through-next'
+    - ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'skill-tree-add-pending-task'
+    1: 'skill-tree-clarify-tasks'
+    2: 'skill-tree-create-documents-snapshot'
+    3: 'skill-tree-implement-all'
+    4: 'skill-tree-implement-next-future-task'
+    5: 'skill-tree-pr-review-cycle'
+    6: 'skill-tree-process-future-pending'
+    7: 'skill-tree-repo-documentation'
+    8: 'skill-tree-repo-documentation-audit'
+    9: 'skill-tree-work-through-next'
+  actual:
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:24:40)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: named anchors resolve only to an actual trusted owned callable boundary
+not ok 3 - named anchors resolve only to an actual trusted owned callable boundary
+  ---
+  duration_ms: 0.216125
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:31:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'unresolved'
+    - 'resolved'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'resolved'
+  actual: 'unresolved'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:34:101)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: a custom label missing an owned handler or operation remains visibly unresolved
+not ok 4 - a custom label missing an owned handler or operation remains visibly unresolved
+  ---
+  duration_ms: 0.223625
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:36:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /handler|boundary|callable/i. Input:
+    
+    'Binding location is not resolved'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: 'Binding location is not resolved'
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:41:9)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: free-text aliases map to verified locations while unknown and ambiguous text stays unresolved
+not ok 5 - free-text aliases map to verified locations while unknown and ambiguous text stays unresolved
+  ---
+  duration_ms: 0.1045
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:43:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'unresolved'
+    - 'resolved'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'resolved'
+  actual: 'unresolved'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:45:80)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: ordered repeated packages retain distinct occurrence values without package duplication
+not ok 6 - ordered repeated packages retain distinct occurrence values without package duplication
+  ---
+  duration_ms: 0.137875
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:48:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    0 !== 3
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 3
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:50:9)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: duplicate occurrence identities and missing packages are rejected independently of plugin multiplicity
+not ok 7 - duplicate occurrence identities and missing packages are rejected independently of plugin multiplicity
+  ---
+  duration_ms: 0.19425
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:52:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:53:9)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: moving and removing one occurrence preserve identity data and every unrelated occurrence
+not ok 8 - moving and removing one occurrence preserve identity data and every unrelated occurrence
+  ---
+  duration_ms: 0.297542
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:57:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      [
+    -   'c',
+        'a',
+        'b',
+    +   'c'
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'c'
+    1: 'a'
+    2: 'b'
+  actual:
+    0: 'a'
+    1: 'b'
+    2: 'c'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:59:9)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: effective parameters use project defaults and explicit occurrence/run overrides without core field mutation
+not ok 9 - effective parameters use project defaults and explicit occurrence/run overrides without core field mutation
+  ---
+  duration_ms: 0.321958
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:62:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    0 !== 1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:64:9)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: declarative conditions filter enabled occurrences in configured order
+not ok 10 - declarative conditions filter enabled occurrences in configured order
+  ---
+  duration_ms: 0.466
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:66:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+    + []
+    - [
+    -   'a',
+    -   'c'
+    - ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'a'
+    1: 'c'
+  actual:
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:68:9)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: unsupported executable conditions and non-JSON parameters are explicit failures without evaluation
+not ok 11 - unsupported executable conditions and non-JSON parameters are explicit failures without evaluation
+  ---
+  duration_ms: 0.191542
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:70:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:71:9)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: typed task-free contexts preserve request project document snapshot management and controller scopes
+not ok 12 - typed task-free contexts preserve request project document snapshot management and controller scopes
+  ---
+  duration_ms: 0.1835
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:76:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+    + {}
+    - {
+    -   id: 'request-1',
+    -   kind: 'request'
+    - }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    kind: 'request'
+    id: 'request-1'
+  actual:
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:78:117)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: real pending task group and review contexts reject fabricated identity shapes
+not ok 13 - real pending task group and review contexts reject fabricated identity shapes
+  ---
+  duration_ms: 0.149417
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:80:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+    + undefined
+    - [
+    -   'P-22222222-2222-4222-8222-222222222222'
+    - ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'P-22222222-2222-4222-8222-222222222222'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:81:9)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: pre-promotion and task-free dispatch use compatible typed contexts without manufacturing tasks
+not ok 14 - pre-promotion and task-free dispatch use compatible typed contexts without manufacturing tasks
+  ---
+  duration_ms: 0.115625
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:85:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    0 !== 1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:87:127)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: unresolved named locations remain visible instead of appearing in an executable selection
+not ok 15 - unresolved named locations remain visible instead of appearing in an executable selection
+  ---
+  duration_ms: 0.088791
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:90:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    0 !== 1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:91:212)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: catalog and sequence identities change with order parameters conditions and named-boundary versions
+not ok 16 - catalog and sequence identities change with order parameters conditions and named-boundary versions
+  ---
+  duration_ms: 0.424875
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:93:1'
+  failureType: 'testCodeFailure'
+  error: 'The "string" argument must be of type string. Received type object (null)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: ~
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:94:101)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: delivery identity distinguishes repeated occurrences controller leaf and explicit attempts
+not ok 17 - delivery identity distinguishes repeated occurrences controller leaf and explicit attempts
+  ---
+  duration_ms: 0.088875
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:97:1'
+  failureType: 'testCodeFailure'
+  error: 'The "string" argument must be of type string. Received type object (null)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: ~
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:99:9)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: same delivery with changed inputs conflicts while exact duplicate delivery is classified without executing anything
+not ok 18 - same delivery with changed inputs conflicts while exact duplicate delivery is classified without executing anything
+  ---
+  duration_ms: 0.07375
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:102:1'
+  failureType: 'testCodeFailure'
+  error: 'The "string" argument must be of type string. Received type object (null)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: ~
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:103:249)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: active lineage rejects real occurrence re-entry but finite A B A plugin sequences remain valid
+not ok 19 - active lineage rejects real occurrence re-entry but finite A B A plugin sequences remain valid
+  ---
+  duration_ms: 0.101208
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:105:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    0 !== 2
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 2
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:106:339)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: copied binding modules work without source checkout sibling skills or implicit project metadata
+not ok 20 - copied binding modules work without source checkout sibling skills or implicit project metadata
+  ---
+  duration_ms: 52.302417
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:108:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    node:assert:90
+      throw new AssertionError(obj);
+      ^
+    
+    AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+    
+    0 !== 2
+    
+        at [eval]:1:481
+        at runScriptInThisContext (node:internal/vm:209:10)
+        at node:internal/process/execution:118:14
+        at [eval]-wrapper:6:24
+        at runScript (node:internal/process/execution:101:62)
+        at evalScript (node:internal/process/execution:136:3)
+        at node:internal/main/eval_string:55:3 {
+      generatedMessage: true,
+      code: 'ERR_ASSERTION',
+      actual: 0,
+      expected: 2,
+      operator: 'strictEqual'
+    }
+    
+    Node.js v22.12.0
+    
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    [eval]:1:481
+    runScriptInThisContext (node:internal/vm:209:10)
+    node:internal/process/execution:118:14
+    [eval]-wrapper:6:24
+    runScript (node:internal/process/execution:101:62)
+    evalScript (node:internal/process/execution:136:3)
+    node:internal/main/eval_string:55:3 {
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-bindings.js:112:105)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+1..20
+# tests 20
+# suites 0
+# pass 1
+# fail 19
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 130.789792

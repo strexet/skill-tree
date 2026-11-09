@@ -1,0 +1,37 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-plugin-installer.js"
+  ],
+  "attempt_id": "C-bc409ca7-9faa-4a94-b795-8b4671b49512",
+  "check_id": "plugin-installer-regressions",
+  "counts": {
+    "discovered": 16,
+    "expected": 16,
+    "failed": 0,
+    "passed": 16,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-6ec57615-3512-4f91-98e8-efb12cde7d7f-plugin-installer-regressions-c-bc409ca7-9faa-4a94-b795-8b4671b49512.txt",
+  "result": "pass",
+  "reviewed_failure_reason": null,
+  "source_fingerprints": {
+    ".skill-tree/bin/install.js": "c7b6581b5aa5e3a9c150d3cd9bdf312a5324ea40ebd1605a4d4184318b606636",
+    ".skill-tree/documents/implementation-plan.md": "73692c86132c37dc8be19457f9bf33dc6ff87027cfad50de85a361bca6f09606",
+    ".skill-tree/documents/install.md": "d14bbeb9a886af9c0ad56637f05c05ba3bae83a29fdd21db6760a2e514c6f243",
+    ".skill-tree/documents/plugin-installation-contract.md": "c5cf887a2960a980955757e8ee01d4e4c11adad52795c7e3f3960c9b5f894eaf",
+    ".skill-tree/documents/plugin-management-contract.md": "2b5c9aeb18dd30b06a809fd14e5222abf579a002187870167d61f6f7dda5b11a",
+    ".skill-tree/documents/plugin-system-contract.md": "b25424efd0dc920376a8d32b9dd7ea27d6b644d966e167f690c8999dc2fa36f5",
+    ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84",
+    ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+    ".skill-tree/lib/plugin-catalog.js": "bcc842344ee7c7a8b3c37faa6f197e313826a82a4be99daf843163fa0030d143",
+    ".skill-tree/tests/test-plugin-installer.js": "9823534b0640224ec6cfd1e5cf0d6fd8383e64c15b49518a9bcc66386ccbafc5"
+  },
+  "task_id": "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+  "tool_wall_seconds": 107.09305433277041
+}

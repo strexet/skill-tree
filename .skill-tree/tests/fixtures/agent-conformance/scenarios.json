@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "scenarios": [
+    {"id":"intake-ru","request":"Добавь в Pending задачу: если notes.md существует, дописать текущую дату; если файла нет, сообщить об отсутствии и остановиться."},
+    {"id":"intake-en-clarify","request":"Add a Pending task to fix the problem."},
+    {"id":"process-en","request":"Process Pending for {selected_id}."},
+    {"id":"controller-en","request":"Implement All only for {selected_id}. Run focused local unit checks and keep other work deferred."},
+    {"id":"resume-status-ru","request":"Покажи текущий статус работы. Ничего не продолжай и не исправляй."},
+    {"id":"pr-literal-en","request":"Prepare PR parameters for source_branch=codex/example target_branch=develop and save the helper result in parameters.json. The documentation example is `merge=true`. Do not contact any provider."},
+    {"id":"routing-negative","request":"What is 7 times 8? Answer briefly."},
+    {"id":"snapshot-en","request":"Create a documentation snapshot of this project using the installed snapshot skill."}
+  ]
+}

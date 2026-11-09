@@ -1,0 +1,40 @@
+TAP version 13
+# Subtest: general installs eleven owned operations and runs offline management without the source checkout
+ok 1 - general installs eleven owned operations and runs offline management without the source checkout
+  ---
+  duration_ms: 2721.153083
+  ...
+# Subtest: web installs eleven owned operations and runs offline management without the source checkout
+ok 2 - web installs eleven owned operations and runs offline management without the source checkout
+  ---
+  duration_ms: 3894.366125
+  ...
+# Subtest: unity installs eleven owned operations and runs offline management without the source checkout
+ok 3 - unity installs eleven owned operations and runs offline management without the source checkout
+  ---
+  duration_ms: 2211.696125
+  ...
+# Subtest: installed manager custom source preview works when optional catalog data is absent
+ok 4 - installed manager custom source preview works when optional catalog data is absent
+  ---
+  duration_ms: 1059.17175
+  ...
+# Subtest: manager rejects executable bundle tampering before importing target code
+ok 5 - manager rejects executable bundle tampering before importing target code
+  ---
+  duration_ms: 926.33225
+  ...
+# Subtest: core-only repeat preserves installed packages and every ordered binding byte
+ok 6 - core-only repeat preserves installed packages and every ordered binding byte
+  ---
+  duration_ms: 3580.611708
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 14496.593

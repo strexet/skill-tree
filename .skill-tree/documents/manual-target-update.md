@@ -9,4 +9,6 @@ The existing target repository requires an explicit owner-selected update after 
 5. Preserve original history receipts/evidence bytes. Record relocated-reference mapping and honest stale/unavailable evidence in an update note; rebuild derived navigation/index data.
 6. Run metadata/package/source checks, review the diff and report the preserved next action. Product execution and controller continuation require applicable owner scope.
 
-The current source release performs no existing-target update, live provider installation or product execution.
+Existing-target updates and provider installation require explicit owner scope. Static package installation does not authorize product execution.
+
+A byte-matching relocated installation uses explicit `node .skill-tree/installation/manager.js --rebind`. The command verifies ownership, current inputs and deterministic composition before changing only the receipt root. Rebinding rejects edited packages, unknown maintenance files and pending transactions. Schema-3 locator recovery uses the exact queue ID and every unfinished worktree mapping; completed delivery mappings can be omitted. The bootstrap path preserves supported schemas and terminal history and performs no automatic conversion or continuation.

@@ -1,0 +1,33 @@
+{
+  "actual_lane": "static",
+  "attempt_id": "C-3ddc56de-723d-4aa2-af6c-4f20348cfe8f",
+  "check_id": "market-source-review",
+  "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+  "evidence_sha256": {
+    ".skill-tree/documents/plugin-market-research.md": "ecd71abef5a437184a547496834ac9e094b51ebee3bae945aa37e88dfb0a7679",
+    ".skill-tree/documents/plugin-system-research.md": "ad99e0d4bffd5bb60607eb525dbf8026d4986a1bf151f11b0a2fa62e111927d8",
+    ".skill-tree/history/research/plugin-comparison-proposal.md": "aa5f82cf9fd1ef256bac3205b7d1bb842605fa9862fc231f0cd556002fb1785f",
+    ".skill-tree/history/research/plugin-market-map.json": "5251739741dc234bddcda84d057940dc497a0b2e9ae8b2ada9996fab16d8bbf6",
+    ".skill-tree/history/validation/plugin-system/market-source-review.json": "ae97136dfc30a329d962df384e9a7c7df8526cb3225297931f5132ea6987eb60"
+  },
+  "limitations": [
+    "Current revalidation used retained primary-source records and their documented inspection date. It did not refresh network adoption counts, execute candidates or infer current market metrics or target-workflow improvement."
+  ],
+  "mismatches": [],
+  "result": "pass",
+  "review": [
+    "The dated 2026-11-05 market map retains 38 unique candidate entries from 11 candidate repository families, 19 repository revision/maintenance snapshots, 25 supporting records, eight primary adoption pages and seven outcome or methodology records.",
+    "The current inventory distinguishes discovery/popularity from measured target outcomes and retains exact revision and source references plus explicit dependency, maintenance, licensing and host/flavor gaps per candidate.",
+    "The original planning, processing, implementation, review, validation, documentation and domain shortlist includes supplied Ponytail and grill-me/grilling with explicit unsupported or unqualified alternatives. The original design cohort remains a historical proposal, separate from the subsequent narrower approved comparison.",
+    "The current research cross-links the recorded comparison while maintaining empty market recommendations and source-only limits for alternatives."
+  ],
+  "schema": 1,
+  "source_commit": "82eaf49b6cb35e65dfa30413228bddcb10190562",
+  "source_fingerprints": {
+    ".skill-tree/documents/plugin-market-research.md": "ecd71abef5a437184a547496834ac9e094b51ebee3bae945aa37e88dfb0a7679",
+    ".skill-tree/documents/plugin-system-research.md": "ad99e0d4bffd5bb60607eb525dbf8026d4986a1bf151f11b0a2fa62e111927d8",
+    ".skill-tree/history/research/plugin-market-map.json": "5251739741dc234bddcda84d057940dc497a0b2e9ae8b2ada9996fab16d8bbf6"
+  },
+  "task_id": "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+  "unit_captures_same_contract": {}
+}

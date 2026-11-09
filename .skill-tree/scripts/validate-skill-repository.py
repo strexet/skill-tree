@@ -2,6 +2,7 @@
 """Validate portable source structure, generated resources and document rules."""
 import argparse
 import ast
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -10,6 +11,12 @@ import subprocess
 import sys
 
 EXCEPTIONS={'SKILL.md','README.md','AGENTS.md','CLAUDE.md','GEMINI.md','LICENSE','package.json','package-lock.json'}
+EXTERNAL_NAMES={'tests/fixtures/task-processing/skills/productivity/writing-for-agents/SKILL-MECHANICS.md'}
+# Preserve exact decision inputs after contextual review of demonstrative references.
+REVIEWED_ARCHIVES={
+    'history/research/processing115-plan-v1.md':'96744edb2814d4ac201ddd943237b55d2432869b103c2cf4bbf7d3e1d4cec982',
+    'history/research/processing115-plan.md':'7c0c502bfa81a0613989dbe34f8cfd9ff83f967d8da5a45b2cf5c851acb5cb40',
+}
 
 def validate(strict=False):
     core=Path(__file__).resolve().parents[1];repo=core.parent;errors=[]
@@ -17,10 +24,14 @@ def validate(strict=False):
     for rel in ['AGENTS.md','README.md','LICENSE','package.json','install.sh','install.ps1']:
         if not (repo/rel).is_file():errors.append('Missing root entrypoint: '+rel)
     if json.loads((repo/'package.json').read_text()).get('license')!='MIT':errors.append('Package license must remain MIT')
+    if json.loads((repo/'package.json').read_text()).get('version')!=json.loads((core/'config/flavors.json').read_text()).get('release_version'):errors.append('Package version and flavor registry release_version disagree')
     for path in core.rglob('*'):
+        # Installed execution snapshots and transaction backups have separate receipt verification.
+        if path.is_relative_to(core/'installation'):continue
         if any(part in {'__pycache__','artifacts','.git'} for part in path.parts):continue
         if path.name in {'.writer-lock','.transaction.json'}:continue
-        if path.name not in EXCEPTIONS and not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*(?:\.[a-z0-9]+)*',path.name):errors.append('Invalid owned name: '+str(path.relative_to(core)))
+        relative=path.relative_to(core).as_posix()
+        if path.name not in EXCEPTIONS and relative not in EXTERNAL_NAMES and not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*(?:\.[a-z0-9]+)*',path.name):errors.append('Invalid owned name: '+relative)
         if path.suffix=='.py':
             try:ast.parse(path.read_text())
             except SyntaxError as exc:errors.append(str(exc))
@@ -53,8 +64,11 @@ def validate(strict=False):
     if strict:
         rulepath=core/'common/scripts/validate-document-rules.py';spec=importlib.util.spec_from_file_location('document_rules',rulepath);rules=importlib.util.module_from_spec(spec);spec.loader.exec_module(rules)
         for path in [*core.rglob('*.md'),repo/'README.md',repo/'AGENTS.md',repo/'CLAUDE.md',repo/'GEMINI.md']:
+            if path.is_relative_to(core/'installation'):continue
             if 'fixtures' not in path.parts and 'artifacts' not in path.parts:
-                errors.extend(rules.check(path,warnings_as_errors=True))
+                archived=REVIEWED_ARCHIVES.get(path.relative_to(core).as_posix()) if path.is_relative_to(core) else None
+                reviewed=archived is not None and hashlib.sha256(path.read_bytes()).hexdigest()==archived
+                errors.extend(rules.check(path,warnings_as_errors=not reviewed))
     manifest=core/'skill-tree.json'
     if manifest.exists():
         validator=core/'common/scripts/validate-repository-documentation.py'

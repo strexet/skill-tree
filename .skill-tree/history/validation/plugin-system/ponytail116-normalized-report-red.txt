@@ -1,0 +1,37 @@
+FFFF
+======================================================================
+FAIL: test_policy_bound_review_rejects_contradictory_success_payloads_at_record (__main__.PluginReviewPilotTests.test_policy_bound_review_rejects_contradictory_success_payloads_at_record) (status='passed', payload={'findings': [{'id': 'CONCRETE-REPORT-FINDING', 'path': 'source.py', 'line': 2, 'cause': 'The fixture returns an alleged invalid default.', 'consequence': 'The alleged contract violation remains for ordinary core substantiation.', 'severity': 'P1'}]})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 933, in test_policy_bound_review_rejects_contradictory_success_payloads_at_record
+    with self.assertRaisesRegex(ValueError,r'(?i)finding|question|status|outcome|conflict|report'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_policy_bound_review_rejects_contradictory_success_payloads_at_record (__main__.PluginReviewPilotTests.test_policy_bound_review_rejects_contradictory_success_payloads_at_record) (status='questions', payload={'findings': [{'id': 'CONCRETE-REPORT-FINDING', 'path': 'source.py', 'line': 2, 'cause': 'The fixture returns an alleged invalid default.', 'consequence': 'The alleged contract violation remains for ordinary core substantiation.', 'severity': 'P1'}]})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 933, in test_policy_bound_review_rejects_contradictory_success_payloads_at_record
+    with self.assertRaisesRegex(ValueError,r'(?i)finding|question|status|outcome|conflict|report'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_policy_bound_review_rejects_contradictory_success_payloads_at_record (__main__.PluginReviewPilotTests.test_policy_bound_review_rejects_contradictory_success_payloads_at_record) (status='passed', payload={'questions': [{'id': 'REVIEW-QUESTION', 'text': 'Which explicit fixture default is required?', 'options': [{'id': 'one', 'text': 'The existing default one.'}, {'id': 'two', 'text': 'The proposed default two.'}]}]})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 933, in test_policy_bound_review_rejects_contradictory_success_payloads_at_record
+    with self.assertRaisesRegex(ValueError,r'(?i)finding|question|status|outcome|conflict|report'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_policy_bound_review_rejects_contradictory_success_payloads_at_record (__main__.PluginReviewPilotTests.test_policy_bound_review_rejects_contradictory_success_payloads_at_record) (status='findings', payload={'questions': [{'id': 'REVIEW-QUESTION', 'text': 'Which explicit fixture default is required?', 'options': [{'id': 'one', 'text': 'The existing default one.'}, {'id': 'two', 'text': 'The proposed default two.'}]}]})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 933, in test_policy_bound_review_rejects_contradictory_success_payloads_at_record
+    with self.assertRaisesRegex(ValueError,r'(?i)finding|question|status|outcome|conflict|report'):
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 21.210s
+
+FAILED (failures=4)

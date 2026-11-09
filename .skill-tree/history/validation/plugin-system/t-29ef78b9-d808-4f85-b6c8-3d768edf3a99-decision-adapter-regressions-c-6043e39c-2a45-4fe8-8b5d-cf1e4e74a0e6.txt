@@ -1,0 +1,139 @@
+F.FFFF.FFF.FF
+======================================================================
+FAIL: test_auto_clarification_requires_and_freezes_bounded_authority (__main__.DecisionAdapterTests.test_auto_clarification_requires_and_freezes_bounded_authority)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-adapters.py", line 113, in test_auto_clarification_requires_and_freezes_bounded_authority
+    self.call('clarify-start', {'task_ids': [self.a], 'expected_source_hash': self.source_hash(), 'decision_mode': 'auto'}, ok=False)
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-task-clarification.py", line 44, in call
+    self.assertEqual(result.returncode, 0 if ok else 2, result.stdout + result.stderr)
+AssertionError: 0 != 2 : {
+  "answers": {},
+  "baselines": {
+    "T-2e30b438-4874-4482-adae-bdb050d2ff6c": {
+      "content_hash": "f5a0bf2a6f5e9b52a6e778d57e3b6d1e1cb44312262385e9a77bff1b7da9e42a",
+      "fields": {
+        "acceptance": "22008b7a07b56b983a30371199c5591f24272e78b2cbde4ffc74f5c6ac2f53ed",
+        "content": "76bb2e51f88a40360652075e86ee3de4980afc1d54c2f48ea73be5f8dac2ca11",
+        "dependencies": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "exclusions": "54b15da0d877a588a48aa8cb24fb26b2bdee370c2f5124ac477d8c2abebad680",
+        "goal": "66115f3cb3e55b8e79503614e7827bb503dcb1fe9dcaff87df67b4a10fd5cad4",
+        "required_plugin_policy": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "scope": "930129f15453ccbc1bb9594619965e63c496169ad67fdd2843eb9309eaea994b",
+        "title": "1ded7b2b659f97649919eb1d35c5839cb07da4ab0cb5236ee6af996f0797c4e7",
+        "validation": "61f5e7cc257a78a008e97d9b49b636a0002db2ef972b9d47856f6dc58587f00c"
+      },
+      "identity": {
+        "id": "T-2e30b438-4874-4482-adae-bdb050d2ff6c",
+        "parent_pending_ids": [
+          "P-6cf858dd-7f9a-4ce6-a677-2a2bc41131b2"
+        ],
+        "processing_run_id": "PR-e7495b9b-453c-4260-8b56-019a62dea913",
+        "related_task_id": null,
+        "relation": "main",
+        "root_task_id": "T-2e30b438-4874-4482-adae-bdb050d2ff6c"
+      }
+    }
+  },
+  "clarity": null,
+  "confirmation": null,
+  "created_at": "2026-11-06T04:42:01.692437+00:00",
+  "facts": {},
+  "id": "CL-759c83d1-5846-4745-a20e-641e145f0ba7",
+  "mode": "explicit",
+  "next_action": "Research source facts and prepare the independent decision frontier",
+  "no_progress_rounds": 0,
+  "questions": {},
+  "revision": 1,
+  "rounds": [],
+  "schema": 1,
+  "semantic_fingerprints": {
+    "T-2e30b438-4874-4482-adae-bdb050d2ff6c": "169004abcce47b50e1e55522c24b59f0168c5e04d6c240040e1cefab827ffef8"
+  },
+  "session_hash": "a4729ed45820acd0dfe54187c96894580669c4b5931266c4903a7ca4470a48c8",
+  "source_hash": "cf9d0804ef46a69a4a79640ae76b2076c97b160971d829dc887e8ea8be2f0b50",
+  "state": "researching",
+  "task_ids": [
+    "T-2e30b438-4874-4482-adae-bdb050d2ff6c"
+  ],
+  "task_revisions": [],
+  "updated_at": "2026-11-06T04:42:01.692644+00:00"
+}
+
+
+======================================================================
+FAIL: test_clarification_context_binds_session_question_purpose_and_real_semantics (__main__.DecisionAdapterTests.test_clarification_context_binds_session_question_purpose_and_real_semantics)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-adapters.py", line 124, in test_clarification_context_binds_session_question_purpose_and_real_semantics
+    self.assertEqual(answer.get('task_ids'), [self.a])
+AssertionError: None != ['T-a8e61e01-cb2a-49e3-82c1-4001f24b8387']
+
+======================================================================
+FAIL: test_decision_files_participate_in_existing_writer_compare_and_swap (__main__.DecisionAdapterTests.test_decision_files_participate_in_existing_writer_compare_and_swap)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-adapters.py", line 156, in test_decision_files_participate_in_existing_writer_compare_and_swap
+    with self.assertRaises(wf.WorkflowError):
+AssertionError: WorkflowError not raised
+
+======================================================================
+FAIL: test_every_workflow_or_review_package_carries_the_shared_helper (__main__.DecisionAdapterTests.test_every_workflow_or_review_package_carries_the_shared_helper)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-adapters.py", line 177, in test_every_workflow_or_review_package_carries_the_shared_helper
+    self.assertEqual(item['scripts'].get('decision-governance.py'), 'common/scripts/decision-governance.py', operation)
+AssertionError: None != 'common/scripts/decision-governance.py' : skill-tree-add-pending-task
+
+======================================================================
+FAIL: test_explicit_switch_reopens_current_confirmation_and_preserves_owner_history (__main__.DecisionAdapterTests.test_explicit_switch_reopens_current_confirmation_and_preserves_owner_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-adapters.py", line 143, in test_explicit_switch_reopens_current_confirmation_and_preserves_owner_history
+    self.assertEqual(session.get('decision_mode'), 'auto')
+AssertionError: None != 'auto'
+
+======================================================================
+FAIL: test_new_clarification_defaults_manual_before_auto_orchestration_activation (__main__.DecisionAdapterTests.test_new_clarification_defaults_manual_before_auto_orchestration_activation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-adapters.py", line 94, in test_new_clarification_defaults_manual_before_auto_orchestration_activation
+    self.assertEqual(session.get('decision_mode'), 'manual')
+AssertionError: None != 'manual'
+
+======================================================================
+FAIL: test_pre_promotion_decision_uses_real_pending_and_preserves_queue_state (__main__.DecisionAdapterTests.test_pre_promotion_decision_uses_real_pending_and_preserves_queue_state)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-adapters.py", line 88, in test_pre_promotion_decision_uses_real_pending_and_preserves_queue_state
+    self.assertEqual(record.get('context'), ctx)
+AssertionError: None != {'kind': 'pending', 'id': 'pending-scope:[277 chars]74']}
+
+======================================================================
+FAIL: test_review_context_changes_with_current_head_base_and_required_checks (__main__.DecisionAdapterTests.test_review_context_changes_with_current_head_base_and_required_checks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-adapters.py", line 165, in test_review_context_changes_with_current_head_base_and_required_checks
+    self.assertEqual(current.get('kind'), 'review')
+AssertionError: None != 'review'
+
+======================================================================
+FAIL: test_task_free_cli_creates_only_a_decision_without_future_or_run (__main__.DecisionAdapterTests.test_task_free_cli_creates_only_a_decision_without_future_or_run)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-adapters.py", line 71, in test_task_free_cli_creates_only_a_decision_without_future_or_run
+    self.assertRegex(record.get('id', ''), r'^DG-[a-f0-9-]{36}$')
+AssertionError: Regex didn't match: '^DG-[a-f0-9-]{36}$' not found in ''
+
+======================================================================
+FAIL: test_typed_task_scope_rejects_a_nonexistent_identity_atomically (__main__.DecisionAdapterTests.test_typed_task_scope_rejects_a_nonexistent_identity_atomically)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-adapters.py", line 79, in test_typed_task_scope_rejects_a_nonexistent_identity_atomically
+    with self.assertRaises(wf.WorkflowError):
+AssertionError: WorkflowError not raised
+
+----------------------------------------------------------------------
+Ran 13 tests in 1.624s
+
+FAILED (failures=10)

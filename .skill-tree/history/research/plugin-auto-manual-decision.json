@@ -1,0 +1,49 @@
+{
+  "approved_policy": {
+    "auto_confirmation": "A delegated resolver supplies actual answers and current specification acceptance within the recorded authority.",
+    "auto_roles": {
+      "arbiter": "A further arbiter resolves substantive disagreement; routine decisions need one resolver.",
+      "critic": "An independent critic checks assumptions, omitted consequences and task alignment for significant decisions.",
+      "executor": "Presents the question, options, recommendation and researched facts.",
+      "resolver": "A separate agent studies the context, selects a reasoned option and records the decision."
+    },
+    "decision_origin": "History preserves the real owner or delegated-agent author, rationale and independent-check evidence.",
+    "default_mode": "auto",
+    "delegation": "Product and technical decisions, including current clarified-specification acceptance, remain within agreed goals, scope and constraints. Out-of-authority requests return to the owner; existing authorizations persist.",
+    "internal_phases": [
+      "research",
+      "plan",
+      "plan-review",
+      "implementation",
+      "checks",
+      "review",
+      "finding-resolution",
+      "fixes",
+      "re-review"
+    ],
+    "manual_confirmation": "The owner supplies answers and final specification acceptance.",
+    "manual_selection": "Explicit switch; owner questions arrive in chat and actual answers are awaited at decision checkpoints.",
+    "mode_switch": "An explicit switch preserves accumulated state; unrelated project-default changes do not rewrite a parked run.",
+    "no_progress": "A repeated dispute or unchanged failure escalates one concrete owner question. Agent count and repeated endorsements supply no progress.",
+    "operation_structure": "The phases initially remain inside existing operations. Separate commands can follow a later standalone-use decision.",
+    "review_fix": "The reviewer reports a finding, the resolver substantiates or rejects the finding with evidence, the executor fixes accepted findings, and current required checks and review establish readiness."
+  },
+  "clarification_session": "CL-17367e9a-121d-4130-be4a-e13d151acb46",
+  "comparison_authorization": "W1 grants no comparison execution or additional resource scope.",
+  "decision_id": "W1",
+  "implementation_status": "not_implemented",
+  "owner_submission": {
+    "closing_excerpt": "Моя рекомендация для W1: **явные внутренние этапы + auto по умолчанию + manual по выбору + независимая проверка значимых решений**. W2 оставляем открытым.",
+    "excerpt_is_complete_submission": false,
+    "kind": "owner-message",
+    "opening_excerpt": "По w1 давай утвердим твои рекомендации:",
+    "reference": "Owner message dated 2026-11-06 beginning: По w1 давай утвердим твои рекомендации; the message quotes the full Auto/Manual recommendation and leaves W2 open."
+  },
+  "record_kind": "owner-workflow-decision",
+  "recorded_at": "2026-11-05T18:33:31.528497+00:00",
+  "required_pending_id": "P-09b5b828-dcdc-4d06-bee1-19e1787e34f4",
+  "schema": 1,
+  "status": "approved",
+  "superseded_policy_scope": "W1 extends Q6 final acceptance and related actual-answer rules only for legitimately delegated Auto decisions. Original approvals and terminal implementation outcomes remain historical evidence.",
+  "w2_status": "open"
+}

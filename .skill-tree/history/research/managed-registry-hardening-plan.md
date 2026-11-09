@@ -1,0 +1,24 @@
+# Managed Registry and Prerequisite Admission Plan
+
+## Admitted scope
+
+The explicit Implement All run selected T-54439a41-286c-4423-936c-eb27663509c3 as a required blocker beneath the admitted review pilot. The task repairs managed-operation registry authority and current invocation prerequisite consumption. The task preserves the existing installation format, original invocation identities, accepted prefixes and standalone operation closure.
+
+The retained missing-registry observation and current source establish the defect. The completed invocation dependency passed current 55 state, eight copied-installation and twelve oracle controls. The immutable actual-host report passed current static validation against the unchanged captured mandatory runtime identities. The current task introduces no actual-host, candidate-efficacy, native Skill, real-human consent or product-runtime qualification claim.
+
+## Implementation sequence
+
+1. Add requirements-led regression controls before changing runtime behavior. Use actual receipt-owned destinations for managed association, independent copies for portability, and the existing pure-engine and workflow bridge fixtures for current prerequisites and original-attempt retention. Record expected behavioral Red before the runtime repair.
+2. In the bundled composition/runtime layer, establish association from the actual execution project, exact package destination, operation and complete verified receipt inventory. Verify the existing deterministic receipt identity formula locally without importing installer/composer code. An associated selected operation requires the associated live registry; invalid relevant ownership claims remain prerequisites. Independent standalone copies and unrelated valid profiles retain current behavior.
+3. Apply global and current-occurrence prerequisites at preparation, invocation, returned-result qualification and acceptance. Keep other-occurrence requirements visible while permitting otherwise valid current incorporation. The default Node private delivery path and cached trusted Python callback path both enforce the same applicability before providers or sinks execute.
+4. Recheck business admission under the metadata writer transaction and preserve the original frozen configuration/watch baseline. Ordinary business transitions cannot adopt drift. Read, original reconciliation and explicitly authorized recovery remain available. Completed-chain current admission rejects applicable outstanding obligations without rewriting historical success.
+5. Prove the A to B to A sequence with distinct occurrence IDs and default Node delivery: an editor-only capability loss after A1 preserves A1, permits valid B incorporation, blocks A2, and restoration delivers the accepted B context to A2. Current/global holds block B. Retain empty, disabled and condition-excluded no-op controls without Future creation.
+6. Update the canonical invocation/metadata contracts, generate standalone resources, run current focused and full repository validation, review the complete scoped diff independently, resolve findings and repeat affected checks. Commit only reviewed task-owned source/evidence. Refresh the owned execution snapshot after the source commit with canonical queue/history preservation and explicit same-run re-admission.
+
+## Required evidence
+
+The three task check receipts cover managed composition, copied bridge and Python invocation admission. The focused controls assert both positive and negative behavior, exact original HC/HI and locator retention, no callback side effects while held, restoration under original inputs and explicit recovery boundaries. Each observed failure and correction remains in immutable validation artifacts.
+
+The operation frame additionally requires synchronization, strict validation, Python and Node suites, installer listing, a general all-operation temporary-target dry run and diff checks. A separate resolver accepts the concrete bounded plan, an independent critic checks the significant ownership and state assumptions, and substantive disagreement follows the existing arbitration protocol. A clean complete review creates no unnecessary fix.
+
+No package acquisition, network request, new actual provider trial, external plugin installation into the development project, publication, remote push, release or source version change belongs to the repair. Controlled temporary installation fixtures use scripted test configuration and retain separate qualification limits.

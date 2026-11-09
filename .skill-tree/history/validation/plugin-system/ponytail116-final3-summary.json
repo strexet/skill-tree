@@ -1,0 +1,69 @@
+{
+  "formal_focused_counts": {
+    "review_pilot": 42
+  },
+  "full_repository_counts": {
+    "node": 281,
+    "python": 491
+  },
+  "historical_evidence": "Original1Red, mixed33diagnostic, failed36, passed40/freeze2, three guarded repair Reds and normalized-shape Red remain immutable.",
+  "identity": {
+    "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+    "head": "57bbf013d08c2014aff87f379d2cd708063b81a6",
+    "source_digest": "b28052dbc57f0376a0d061168a165357035d1a40dc758344bd091f3b58fe7297"
+  },
+  "independent_source_review": ".skill-tree/history/validation/plugin-system/ponytail116-final-source-review.json",
+  "owned_activation": "Required after authorized local source commit; pending and not inferred from source qualification.",
+  "qualification": "Current authored/generated source, deterministic installed/state/linked-worktree integration and repository checks. No fresh actual Ponytail/native Skill/provider/efficacy qualification.",
+  "required_checks": [
+    {
+      "id": "review-pilot-regressions",
+      "reference": ".skill-tree/history/validation/plugin-system/t-18db6175-499f-4679-bf8d-f815c7b42411-review-pilot-regressions-c-9b28ce96-3972-46e3-a890-130a3ff21a5d.json",
+      "status": "passed"
+    },
+    {
+      "id": "affected-regressions",
+      "reference": ".skill-tree/history/validation/plugin-system/ponytail116-final3-affected-regressions.json",
+      "status": "passed"
+    },
+    {
+      "id": "sync-check",
+      "reference": ".skill-tree/history/validation/plugin-system/ponytail116-final3-sync-check.json",
+      "status": "passed"
+    },
+    {
+      "id": "strict-validation",
+      "reference": ".skill-tree/history/validation/plugin-system/ponytail116-final3-strict-validation.json",
+      "status": "passed"
+    },
+    {
+      "id": "python",
+      "reference": ".skill-tree/history/validation/plugin-system/ponytail116-final3-python.json",
+      "status": "passed"
+    },
+    {
+      "id": "node",
+      "reference": ".skill-tree/history/validation/plugin-system/ponytail116-final3-node.json",
+      "status": "passed"
+    },
+    {
+      "id": "installer-list",
+      "reference": ".skill-tree/history/validation/plugin-system/ponytail116-final3-installer-list.json",
+      "status": "passed"
+    },
+    {
+      "id": "installer-dry-run",
+      "reference": ".skill-tree/history/validation/plugin-system/ponytail116-final3-installer-dry-run.json",
+      "status": "passed"
+    },
+    {
+      "id": "diff-check",
+      "reference": ".skill-tree/history/validation/plugin-system/ponytail116-final3-diff-check.json",
+      "status": "passed"
+    }
+  ],
+  "schema": 1,
+  "source_freeze": ".skill-tree/history/validation/plugin-system/ponytail116-source-freeze3.json",
+  "source_paths_verified": 249,
+  "task_id": "T-18db6175-499f-4679-bf8d-f815c7b42411"
+}

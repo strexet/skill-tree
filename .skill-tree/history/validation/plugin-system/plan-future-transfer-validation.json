@@ -1,0 +1,108 @@
+{
+  "canonical_future_hash": "e3d1a5e9cd4ef3ac4798dd0767444317ecead22ae15e70391bd77bd40deae114",
+  "checks": [
+    {
+      "acceptance_criteria": 77,
+      "exit_code": 0,
+      "graph": "acyclic",
+      "id": "future-contract-and-graph",
+      "mapped_checks": 22,
+      "ready_tasks": 16,
+      "recipes": "resolved",
+      "requirement_groups": 14
+    },
+    {
+      "exit_code": 0,
+      "id": "strict-document-rules",
+      "scopes": [
+        ".skill-tree/documents/implementation-plan.md",
+        "canonical .skill-tree/documents/future.md"
+      ]
+    },
+    {
+      "exit_code": 0,
+      "id": "strict-future-document",
+      "scope": "canonical .skill-tree/documents/future.md"
+    },
+    {
+      "exit_code": 0,
+      "id": "strict-repository-documentation",
+      "scopes": [
+        "canonical queue repository",
+        "execution source worktree"
+      ],
+      "warnings": [
+        "Latest recorded audit is stale; historical verdicts remain unchanged"
+      ]
+    },
+    {
+      "command": "npm run sync:check",
+      "exit_code": 0,
+      "id": "sync"
+    },
+    {
+      "command": "npm run validate",
+      "exit_code": 0,
+      "id": "repository"
+    },
+    {
+      "command": "npm run test:py",
+      "exit_code": 0,
+      "id": "python",
+      "result": "OK",
+      "tests": 262
+    },
+    {
+      "command": "npm run test:node",
+      "exit_code": 0,
+      "failed": 0,
+      "id": "node",
+      "passed": 94,
+      "skipped": 0,
+      "tests": 94
+    },
+    {
+      "command": "node .skill-tree/bin/install.js --list",
+      "exit_code": 0,
+      "id": "installer-list"
+    },
+    {
+      "command": "node .skill-tree/bin/install.js --dry-run --all --target <temporary-project-root> --flavor general",
+      "exit_code": 0,
+      "id": "installer-dry-run"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "id": "diff-whitespace",
+      "scopes": [
+        "canonical queue repository",
+        "execution source worktree"
+      ]
+    },
+    {
+      "id": "independent-read-only-review",
+      "remaining_concrete_findings": [],
+      "result": "passed"
+    }
+  ],
+  "format": "skill-tree-specification-validation",
+  "limits": [
+    "Task specification and existing repository checks pass; future plugin features remain unimplemented.",
+    "No comparison trials, new implementation unit or local merge starts during the transfer.",
+    "The historical audit warning records changed document/task fingerprints and does not change historical verdicts."
+  ],
+  "preservation": {
+    "admitted_units": 21,
+    "completed_units": 5,
+    "current_task_id": "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+    "deferred_pending_id": "P-9bf5b8af-1e50-4f53-9ab9-56ef46997428",
+    "initial_roots": 15
+  },
+  "recorded_at": "2026-11-06T02:37:39.776949+00:00",
+  "research_hash": "dbd55e207e5b8ccc1c57f8c37fff8b226bcf9526101f71e2814a902f8819a4cd",
+  "research_record": ".skill-tree/history/research/plugin-plan-future-transfer.json",
+  "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+  "schema": 1,
+  "status": "passed"
+}

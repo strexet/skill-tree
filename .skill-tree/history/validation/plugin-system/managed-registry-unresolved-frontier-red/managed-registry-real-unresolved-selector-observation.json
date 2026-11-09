@@ -1,0 +1,33 @@
+{
+  "qualification": "Actual source-backed selector output in isolated managed fixture; no HC/HI/provider execution.",
+  "frozen": [
+    "editor-first",
+    "interview-middle",
+    "editor-final"
+  ],
+  "bindings": [
+    "interview-middle"
+  ],
+  "unresolved": [
+    {
+      "id": "editor-first",
+      "reason": "The registered boundary or plugin requires a compatible typed context"
+    },
+    {
+      "id": "editor-final",
+      "reason": "The registered boundary or plugin requires a compatible typed context"
+    }
+  ],
+  "prerequisites": [
+    {
+      "code": "incompatible-binding",
+      "binding_id": "editor-first",
+      "reason": "The registered boundary or plugin requires a compatible typed context"
+    },
+    {
+      "code": "incompatible-binding",
+      "binding_id": "editor-final",
+      "reason": "The registered boundary or plugin requires a compatible typed context"
+    }
+  ]
+}

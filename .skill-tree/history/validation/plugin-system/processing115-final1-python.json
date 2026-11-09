@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "npm",
+    "run",
+    "test:py"
+  ],
+  "changed_frozen_paths": [],
+  "cleanup_reserve_seconds": 20,
+  "discovered": 0,
+  "exit_code": -2,
+  "hard_deadline_seconds": 2100,
+  "name": "python",
+  "output": ".skill-tree/history/validation/plugin-system/processing115-final1-python.txt",
+  "qualification": "Deterministic source and isolated fixture qualification.",
+  "result": "fail",
+  "schema": 1,
+  "skipped": 0,
+  "source_freeze": ".skill-tree/history/validation/plugin-system/processing115-final1-source-freeze.json",
+  "source_freeze_sha256": "23a918bed89115eb9b18d49da0521ba5a5e82b0c4230fa19c7271a0166218ff9",
+  "temporary_target_empty": null,
+  "timed_out": false,
+  "tool_wall_seconds": 33.11049700016156
+}

@@ -1,0 +1,781 @@
+{
+  "canonical_future_hash": "e3d1a5e9cd4ef3ac4798dd0767444317ecead22ae15e70391bd77bd40deae114",
+  "canonical_queue": ".skill-tree/documents/future.md",
+  "design_references": {
+    ".skill-tree/documents/implementation-plan.md": "a27524408f659d3dff933c3b051dfa03a97baa70a7fd3435ad0ca4c9e701027c",
+    ".skill-tree/documents/plugin-management-contract.md": "a60532e58eea233ead997c77460b37d025e881f636e8d8e9ad20f57a6f1f67e5",
+    ".skill-tree/documents/plugin-system-contract.md": "e9a11058d9ae2c536eed60b58ee276340667774afb3f9677c421ee4986c48371",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "7cf06fd4258b49f886d82bce148b44e60be5e8eaad8d2fa385db5f52516b0b9c"
+  },
+  "evidence_limits": [
+    "Validation qualifies task specifications, dependency ordering and declared checks rather than the unimplemented plugin system.",
+    "Deterministic checks, actual-agent observations and owner-agreed comparison trials remain distinct mandatory future evidence.",
+    "Existing historical audits retain recorded source fingerprints and may correctly report stale after current task/document edits."
+  ],
+  "format": "skill-tree-plan-future-transfer",
+  "preservation": {
+    "completed_terminal_outcomes_unchanged": true,
+    "current_checkpoint_and_task_progress": true,
+    "existing_ten_main_ids": true,
+    "implementation_or_merge_started": false,
+    "installed_packages": "unchanged by processing",
+    "original_fifteen_roots": true,
+    "unrelated_deferred_pending": true
+  },
+  "prioritized_tasks": [
+    {
+      "acceptance_count": 4,
+      "checks": [
+        {
+          "acceptance_numbers": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "id": "local-delivery-regressions",
+          "recipe_id": "quality-python"
+        }
+      ],
+      "depends_on": [
+        "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+        "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+      ],
+      "parent_pending_ids": [
+        "P-a4d8c4d3-d7c0-45ec-ab61-e57e3d962977"
+      ],
+      "priority": 132,
+      "relation": "blocker",
+      "root_task_id": "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "status": "Ready",
+      "task_id": "T-93c83c5a-9074-42dc-b68c-a11ff8b51254",
+      "title": "Implement resumable verified local integration delivery gates"
+    },
+    {
+      "acceptance_count": 5,
+      "checks": [
+        {
+          "acceptance_numbers": [
+            1,
+            2,
+            3
+          ],
+          "id": "manager-regressions",
+          "recipe_id": "quality-node"
+        },
+        {
+          "acceptance_numbers": [
+            4
+          ],
+          "id": "manager-standalone-installation",
+          "recipe_id": "quality-node"
+        },
+        {
+          "acceptance_numbers": [
+            5
+          ],
+          "id": "manager-agent-observations",
+          "recipe_id": "static-inspection"
+        }
+      ],
+      "depends_on": [
+        "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+        "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+        "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+        "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+      ],
+      "parent_pending_ids": [
+        "P-edc462d9-992f-4c74-ab0a-b4e573109e7d"
+      ],
+      "priority": 131,
+      "relation": "blocker",
+      "root_task_id": "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "status": "Ready",
+      "task_id": "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad",
+      "title": "Implement the core Skill Tree Plugins management operation"
+    },
+    {
+      "acceptance_count": 4,
+      "checks": [
+        {
+          "acceptance_numbers": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "id": "extensible-bindings",
+          "recipe_id": "quality-node"
+        }
+      ],
+      "depends_on": [
+        "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+        "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5"
+      ],
+      "parent_pending_ids": [
+        "P-539a810d-cdb5-4901-bbfe-a2344698b78f"
+      ],
+      "priority": 130,
+      "relation": "blocker",
+      "root_task_id": "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "status": "Ready",
+      "task_id": "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+      "title": "Implement extensible all-operation and named plugin bindings"
+    },
+    {
+      "acceptance_count": 5,
+      "checks": [
+        {
+          "acceptance_numbers": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "id": "open-source-parameters",
+          "recipe_id": "quality-node"
+        }
+      ],
+      "depends_on": [
+        "T-2da07d09-0b1a-4407-b375-defd23720387",
+        "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc"
+      ],
+      "parent_pending_ids": [
+        "P-a3796e30-9b57-4c28-89b2-39db50a9bd93"
+      ],
+      "priority": 129,
+      "relation": "blocker",
+      "root_task_id": "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "status": "Ready",
+      "task_id": "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+      "title": "Implement open skill source import and parameter resolution"
+    },
+    {
+      "acceptance_count": 6,
+      "checks": [
+        {
+          "acceptance_numbers": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "id": "decision-state-regressions",
+          "recipe_id": "quality-python"
+        }
+      ],
+      "depends_on": [
+        "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+        "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+      ],
+      "parent_pending_ids": [
+        "P-09b5b828-dcdc-4d06-bee1-19e1787e34f4"
+      ],
+      "priority": 128,
+      "relation": "blocker",
+      "root_task_id": "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "status": "Ready",
+      "task_id": "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99",
+      "title": "Implement guarded Auto and Manual decision state and authority"
+    },
+    {
+      "acceptance_count": 6,
+      "checks": [
+        {
+          "acceptance_numbers": [
+            1,
+            2,
+            3
+          ],
+          "id": "decision-orchestration-unit",
+          "recipe_id": "quality-python"
+        },
+        {
+          "acceptance_numbers": [
+            4
+          ],
+          "id": "decision-core-standalone",
+          "recipe_id": "quality-node"
+        },
+        {
+          "acceptance_numbers": [
+            1,
+            5,
+            6
+          ],
+          "id": "decision-actual-actors",
+          "recipe_id": "static-inspection"
+        }
+      ],
+      "depends_on": [
+        "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99"
+      ],
+      "parent_pending_ids": [
+        "P-09b5b828-dcdc-4d06-bee1-19e1787e34f4"
+      ],
+      "priority": 127,
+      "relation": "blocker",
+      "root_task_id": "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "status": "Ready",
+      "task_id": "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda",
+      "title": "Implement and qualify core decision actors and internal phases"
+    },
+    {
+      "acceptance_count": 4,
+      "checks": [
+        {
+          "acceptance_numbers": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "id": "installation-design-review",
+          "recipe_id": "static-inspection"
+        }
+      ],
+      "depends_on": [
+        "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc"
+      ],
+      "parent_pending_ids": [
+        "P-14584d76-6e8b-418a-b04b-8de586f10f0a",
+        "P-15cb6414-b258-4d28-baf1-a6ce41fd21dc"
+      ],
+      "priority": 123,
+      "relation": "main",
+      "root_task_id": "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "status": "Ready",
+      "task_id": "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "title": "Specify plugin selection and consent behavior for installation"
+    },
+    {
+      "acceptance_count": 5,
+      "checks": [
+        {
+          "acceptance_numbers": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "id": "package-lifecycle",
+          "recipe_id": "quality-node"
+        }
+      ],
+      "depends_on": [
+        "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+        "T-2da07d09-0b1a-4407-b375-defd23720387",
+        "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9"
+      ],
+      "parent_pending_ids": [
+        "P-97789c00-ffd4-450f-a0ca-8cd5fd68f8de",
+        "P-15cb6414-b258-4d28-baf1-a6ce41fd21dc"
+      ],
+      "priority": 120,
+      "relation": "main",
+      "root_task_id": "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "status": "Ready",
+      "task_id": "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "title": "Implement pinned external plugin package lifecycle"
+    },
+    {
+      "acceptance_count": 5,
+      "checks": [
+        {
+          "acceptance_numbers": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "id": "standalone-plugin-composition",
+          "recipe_id": "quality-node"
+        }
+      ],
+      "depends_on": [
+        "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+        "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+        "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda"
+      ],
+      "parent_pending_ids": [
+        "P-97789c00-ffd4-450f-a0ca-8cd5fd68f8de",
+        "P-15cb6414-b258-4d28-baf1-a6ce41fd21dc"
+      ],
+      "priority": 119,
+      "relation": "main",
+      "root_task_id": "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "status": "Ready",
+      "task_id": "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "title": "Compose selected plugin hooks into standalone operations"
+    },
+    {
+      "acceptance_count": 7,
+      "checks": [
+        {
+          "acceptance_numbers": [
+            1,
+            2,
+            3,
+            5,
+            7
+          ],
+          "id": "hook-state-regressions",
+          "recipe_id": "quality-python"
+        },
+        {
+          "acceptance_numbers": [
+            6
+          ],
+          "id": "installed-agent-hook-evidence",
+          "recipe_id": "static-inspection"
+        },
+        {
+          "acceptance_numbers": [
+            4
+          ],
+          "id": "installed-hook-fixtures",
+          "recipe_id": "quality-node"
+        }
+      ],
+      "depends_on": [
+        "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+        "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda"
+      ],
+      "parent_pending_ids": [
+        "P-97789c00-ffd4-450f-a0ca-8cd5fd68f8de",
+        "P-15cb6414-b258-4d28-baf1-a6ce41fd21dc"
+      ],
+      "priority": 118,
+      "relation": "main",
+      "root_task_id": "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "status": "Ready",
+      "task_id": "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "title": "Implement resumable plugin invocation and result receipts"
+    },
+    {
+      "acceptance_count": 4,
+      "checks": [
+        {
+          "acceptance_numbers": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "id": "plugin-management",
+          "recipe_id": "quality-node"
+        }
+      ],
+      "depends_on": [
+        "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5"
+      ],
+      "parent_pending_ids": [
+        "P-50c04dfb-3cb6-4531-ae04-bd24bb232671",
+        "P-15cb6414-b258-4d28-baf1-a6ce41fd21dc"
+      ],
+      "priority": 117,
+      "relation": "main",
+      "root_task_id": "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "status": "Ready",
+      "task_id": "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "title": "Expose the installed plugin registry and exact-ID removal"
+    },
+    {
+      "acceptance_count": 4,
+      "checks": [
+        {
+          "acceptance_numbers": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "id": "review-pilot-regressions",
+          "recipe_id": "quality-python"
+        }
+      ],
+      "depends_on": [
+        "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+        "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda"
+      ],
+      "parent_pending_ids": [
+        "P-468bf390-905d-43c5-a161-604eb1a41244",
+        "P-15cb6414-b258-4d28-baf1-a6ce41fd21dc"
+      ],
+      "priority": 116,
+      "relation": "main",
+      "root_task_id": "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "status": "Ready",
+      "task_id": "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "title": "Integrate the pinned development-mode review pilot"
+    },
+    {
+      "acceptance_count": 7,
+      "checks": [
+        {
+          "acceptance_numbers": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "id": "interview-loop-regressions",
+          "recipe_id": "quality-python"
+        }
+      ],
+      "depends_on": [
+        "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+        "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+        "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99",
+        "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda"
+      ],
+      "parent_pending_ids": [
+        "P-c9ec2d76-0e74-46cd-afd4-ce3f46a7a60b",
+        "P-e5de6bf4-99d6-481e-b158-7d302efde259",
+        "P-15cb6414-b258-4d28-baf1-a6ce41fd21dc"
+      ],
+      "priority": 115,
+      "relation": "main",
+      "root_task_id": "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "status": "Ready",
+      "task_id": "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "title": "Integrate post-processing task wording, interviews and rework"
+    },
+    {
+      "acceptance_count": 4,
+      "checks": [
+        {
+          "acceptance_numbers": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "id": "comparative-evidence-review",
+          "recipe_id": "static-inspection"
+        }
+      ],
+      "depends_on": [
+        "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+        "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+        "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda",
+        "T-18db6175-499f-4679-bf8d-f815c7b42411",
+        "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69"
+      ],
+      "parent_pending_ids": [
+        "P-3f7df14a-88b7-48c8-ac14-eaef552d08aa",
+        "P-15cb6414-b258-4d28-baf1-a6ce41fd21dc"
+      ],
+      "priority": 114,
+      "relation": "main",
+      "root_task_id": "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "status": "Ready",
+      "task_id": "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "title": "Qualify shortlisted plugins against workflow baselines"
+    },
+    {
+      "acceptance_count": 3,
+      "checks": [
+        {
+          "acceptance_numbers": [
+            1,
+            2,
+            3
+          ],
+          "id": "catalog-regressions",
+          "recipe_id": "quality-node"
+        }
+      ],
+      "depends_on": [
+        "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+        "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5"
+      ],
+      "parent_pending_ids": [
+        "P-336855cb-5271-40b9-a142-95ed6102889b",
+        "P-15cb6414-b258-4d28-baf1-a6ce41fd21dc"
+      ],
+      "priority": 112,
+      "relation": "main",
+      "root_task_id": "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "status": "Ready",
+      "task_id": "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "title": "Implement the workflow-grouped catalog and evidence-backed bundles"
+    },
+    {
+      "acceptance_count": 4,
+      "checks": [
+        {
+          "acceptance_numbers": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "id": "plugin-installer-regressions",
+          "recipe_id": "quality-node"
+        }
+      ],
+      "depends_on": [
+        "T-2da07d09-0b1a-4407-b375-defd23720387",
+        "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+        "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+        "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+        "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad",
+        "T-93c83c5a-9074-42dc-b68c-a11ff8b51254"
+      ],
+      "parent_pending_ids": [
+        "P-14584d76-6e8b-418a-b04b-8de586f10f0a",
+        "P-15cb6414-b258-4d28-baf1-a6ce41fd21dc"
+      ],
+      "priority": 110,
+      "relation": "main",
+      "root_task_id": "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "status": "Ready",
+      "task_id": "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "title": "Implement confirmed recommended and alternative plugin installation"
+    }
+  ],
+  "processing_receipt": {
+    "created_ids": [
+      "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99",
+      "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda",
+      "T-93c83c5a-9074-42dc-b68c-a11ff8b51254"
+    ],
+    "dispositions": {
+      "P-09b5b828-dcdc-4d06-bee1-19e1787e34f4": {
+        "reason": "Source research decomposes W1 into state/authority and fully qualified core orchestration, upstream of external composition/runtime.",
+        "status": "promoted"
+      },
+      "P-15cb6414-b258-4d28-baf1-a6ce41fd21dc": {
+        "reason": "The complete plan extends existing main task definitions and preserves original IDs/provenance instead of creating duplicate implementation roots.",
+        "status": "promoted"
+      },
+      "P-a4d8c4d3-d7c0-45ec-ab61-e57e3d962977": {
+        "reason": "Source inspection reproduces a missing local-only delivery completion gate; a required infrastructure descendant implements the gate without performing final integration early.",
+        "status": "promoted"
+      }
+    },
+    "id": "PR-c05ed091-79f1-48a1-94e1-0021ebd64dde",
+    "reused_ids": [
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "selected_ids": [
+      "P-15cb6414-b258-4d28-baf1-a6ce41fd21dc",
+      "P-09b5b828-dcdc-4d06-bee1-19e1787e34f4",
+      "P-a4d8c4d3-d7c0-45ec-ab61-e57e3d962977"
+    ],
+    "task_keys": {
+      "decision-orchestration": "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda",
+      "decision-state": "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99",
+      "local-delivery-gate": "T-93c83c5a-9074-42dc-b68c-a11ff8b51254"
+    }
+  },
+  "queue_authority": "canonical worktree selected by the existing run locator; execution-worktree queue copies remain non-authoritative",
+  "recorded_at": "2026-11-06T02:34:51.240025+00:00",
+  "requirement_coverage": [
+    {
+      "check_ids": [
+        "installation-design-review",
+        "plugin-installer-regressions"
+      ],
+      "requirement": "Default core-only installation, actual optional consent, repeat/failure policy",
+      "task_ids": [
+        "T-2da07d09-0b1a-4407-b375-defd23720387",
+        "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+      ]
+    },
+    {
+      "check_ids": [
+        "open-source-parameters",
+        "package-lifecycle",
+        "hook-state-regressions",
+        "installed-agent-hook-evidence"
+      ],
+      "requirement": "Open URL/repository/raw/local/Claude sources, resource closure and effective extra parameters",
+      "task_ids": [
+        "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+        "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+        "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+      ]
+    },
+    {
+      "check_ids": [
+        "decision-state-regressions",
+        "decision-actual-actors",
+        "interview-loop-regressions"
+      ],
+      "requirement": "Auto/Manual state, authority, actor origin, switching, stale replies and final acceptance",
+      "task_ids": [
+        "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99",
+        "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda",
+        "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69"
+      ]
+    },
+    {
+      "check_ids": [
+        "decision-orchestration-unit",
+        "decision-core-standalone",
+        "decision-actual-actors"
+      ],
+      "requirement": "Core internal phases, resolver/critic/arbiter, unavailable actors and no-progress escalation",
+      "task_ids": [
+        "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda"
+      ]
+    },
+    {
+      "check_ids": [
+        "extensible-bindings",
+        "standalone-plugin-composition",
+        "hook-state-regressions",
+        "installed-hook-fixtures"
+      ],
+      "requirement": "All-operation/named anchors, task-free contexts, controller/leaf identity and recursion",
+      "task_ids": [
+        "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+        "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+        "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+      ]
+    },
+    {
+      "check_ids": [
+        "standalone-plugin-composition",
+        "hook-state-regressions",
+        "interview-loop-regressions"
+      ],
+      "requirement": "W2 pre-promotion P identities, current plan acceptance and atomic stable T holds",
+      "task_ids": [
+        "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+        "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+        "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69"
+      ]
+    },
+    {
+      "check_ids": [
+        "interview-loop-regressions"
+      ],
+      "requirement": "Four editorial/interview paths, guarded semantic revisions and affected rechecks",
+      "task_ids": [
+        "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69"
+      ]
+    },
+    {
+      "check_ids": [
+        "review-pilot-regressions"
+      ],
+      "requirement": "Pinned supplied Ponytail isolation, current review/fix and explicitly enabled readiness",
+      "task_ids": [
+        "T-18db6175-499f-4679-bf8d-f815c7b42411"
+      ]
+    },
+    {
+      "check_ids": [
+        "package-lifecycle"
+      ],
+      "requirement": "Owned transaction/run barriers, stopped handoff and changed-generation re-admission",
+      "task_ids": [
+        "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5"
+      ]
+    },
+    {
+      "check_ids": [
+        "plugin-management",
+        "manager-regressions"
+      ],
+      "requirement": "Single installed registry, every binding, exact removal and frozen missing obligations",
+      "task_ids": [
+        "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+        "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad"
+      ]
+    },
+    {
+      "check_ids": [
+        "manager-regressions",
+        "manager-standalone-installation",
+        "manager-agent-observations"
+      ],
+      "requirement": "Bootstrap/offline manager, shared initial/later actions and eleven-operation standalone installation",
+      "task_ids": [
+        "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad"
+      ]
+    },
+    {
+      "check_ids": [
+        "comparative-evidence-review"
+      ],
+      "requirement": "Refreshed finite trial consent, qualified matched baseline and separate application evidence",
+      "task_ids": [
+        "T-a583acd5-fc6b-4d37-97ec-02df969fea9e"
+      ]
+    },
+    {
+      "check_ids": [
+        "catalog-regressions"
+      ],
+      "requirement": "Grouped known catalog/recommendations distinct from arbitrary source admission and activation",
+      "task_ids": [
+        "T-ea3d73b4-c312-4de9-9897-c97f380e4516"
+      ]
+    },
+    {
+      "check_ids": [
+        "local-delivery-regressions",
+        "plugin-installer-regressions"
+      ],
+      "requirement": "Resumable local-only delivery gate and final merge/activation/re-admission/target validation tail",
+      "task_ids": [
+        "T-93c83c5a-9074-42dc-b68c-a11ff8b51254",
+        "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+      ]
+    }
+  ],
+  "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+  "schema": 1,
+  "scope": {
+    "admitted_units": 21,
+    "completed_units": 5,
+    "current_task_id": "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+    "deferred_pending_ids": [
+      "P-9bf5b8af-1e50-4f53-9ab9-56ef46997428"
+    ],
+    "initial_roots": 15,
+    "ready_units": 16
+  },
+  "source_delivery": {
+    "actual_final_merge": "controller tail after admitted implementation and current acceptance; not performed during plan transfer",
+    "branch": "codex/plugin-system",
+    "local_target": "codex/next-version"
+  },
+  "status": "specification-validated",
+  "validation": {
+    "complete_acceptance_mapping": "passed",
+    "completed_dependency_resolution": "passed",
+    "consumer_foundation_order": "passed",
+    "dependency_graph": "acyclic",
+    "independent_read_only_review": "passed; no remaining concrete findings",
+    "manager_composition_cycle_absent": true,
+    "manager_experiment_dependency_absent": true,
+    "profile_recipe_resolution": "passed",
+    "required_descendant_provenance": "passed",
+    "strict_headers_and_check_contracts": "passed"
+  }
+}

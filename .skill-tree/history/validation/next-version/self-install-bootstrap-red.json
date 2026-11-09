@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-self-installation.js"
+  ],
+  "assertion": "Verified clones and worktrees bootstrap without adopting modified ownership.",
+  "check_id": "regression",
+  "counts": {
+    "discovered": 4,
+    "expected": 4,
+    "failed": 3,
+    "passed": 1,
+    "skipped": 0
+  },
+  "log_path": ".skill-tree/artifacts/next-version/self-install-bootstrap-red.log",
+  "log_sha256": "b9366c0a1bc30200467f6b70a18c7105f97fe83a2c06464ea56f625408527ffd",
+  "phase": "red",
+  "task_id": "T-3e84aed1-948e-45a9-99f9-40edf0a516d3"
+}

@@ -1,0 +1,38 @@
+{
+  "actual_source_snapshot": {
+    "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+    "common/scripts/workflow-state.py": "791531838c16c1b362ade3b086e66dfb804da20c06b8828b0e71f251a08b0c5e"
+  },
+  "aggregate_contexts_including_failed_first_probe": 8,
+  "aggregate_spawn_followup_requests": 17,
+  "aggregate_wall_seconds_including_repair": 1275.656477,
+  "attempt_id": "C-16edd294-9523-4e56-8e78-89fc58045905",
+  "limits": {
+    "additional_review_finding": "Read-only integration review found clarification-bound mode changes stranded the existing frame; a requirements-led same-frame parent-policy repair precedes the corrected-source retry.",
+    "aggregate_explicit_spawn_followup_requests": 18,
+    "aggregate_new_actor_contexts": 8,
+    "aggregate_wall_seconds_including_repair": 1800,
+    "first_attempt_contexts": 3,
+    "first_attempt_explicit_requests": 6,
+    "first_attempt_failure": "actual-arbiter-input:predecessor-content-missing",
+    "original_actual_probe_seconds": 900,
+    "reason": "The first actual run exposed missing predecessor answer material in the sealed arbiter input; the first failure remains recorded. A bounded corrected-source retry is allowed within the same task, preserving aggregate actor and native-request ceilings.",
+    "recorded_at": "2026-11-06T06:14:00Z"
+  },
+  "native_accounting": {
+    "cost": null,
+    "exact_model": null,
+    "native_call_ids": null,
+    "tokens": null
+  },
+  "notes": [
+    "Three development repair/review contexts are outside the explicitly bounded qualification-probe counts.",
+    "The first failed actual probe remains immutable, including its original limit and source hashes.",
+    "The controlled adversarial critic proves transport and arbitration, not spontaneous critique or comparative efficacy.",
+    "Scripted fixture-owner submissions establish no real-human approval."
+  ],
+  "recorded_at": "2026-11-06T06:24:32.995499+00:00",
+  "result": "pass",
+  "scenarios": 3
+}

@@ -1,0 +1,113 @@
+{
+  "diagnostic_integrity": [
+    "Original unqualified subtest-count control is preserved; the corrected runner counts distinct discovered cases and never relabels the first result as Red.",
+    "The adapter expected-error utility correction strengthens a legitimate refusal oracle; original Red/log and diagnostic remain immutable."
+  ],
+  "focused_controls": {
+    "adapter_green": {
+      "attempt_id": "C-ce52ead0-7459-441f-81b5-1227dcfc9c2f",
+      "discovered": 24,
+      "failed": 0,
+      "passed": 24,
+      "skipped": 0
+    },
+    "adapter_red": {
+      "attempt_id": "C-6043e39c-2a45-4fe8-8b5d-cf1e4e74a0e6",
+      "discovered": 13,
+      "failed": 10,
+      "passed": 3,
+      "skipped": 0
+    },
+    "generic_green": {
+      "attempt_id": "C-f574f74b-d713-4a3c-a5e9-676a57f05dae",
+      "discovered": 25,
+      "failed": 0,
+      "passed": 25,
+      "skipped": 0
+    },
+    "generic_red": {
+      "attempt_id": "C-9d2128d1-3f13-47bc-b0a3-a4fe9d6f9197",
+      "discovered": 20,
+      "failed": 18,
+      "passed": 2,
+      "skipped": 0
+    }
+  },
+  "independent_reviews": [
+    {
+      "agent": "/root/current_plugin_contract_review",
+      "result": "passed",
+      "scope": "Generic authority, frontier, origin, replay, ownership and25 tests"
+    },
+    {
+      "agent": "/root/w1_foundation_research",
+      "result": "passed",
+      "scope": "Workflow/PR guards, standalone closure and cancellation repair"
+    }
+  ],
+  "limits": [
+    "State/helper fixtures use synthetic evidence and prove no actual host/model or real-human consent.",
+    "Default-Auto actor routing, core phases and actual independent actor qualification remain required task127 work.",
+    "The compatible state interface and legacy sessions retain Manual defaults; qualified host orchestration activates the approved Auto operation default separately.",
+    "No external plugin invocation, browser, Unity Editor/player/device, live provider or comparative efficacy trial occurred."
+  ],
+  "other_checks": [
+    "sync:check",
+    "strict repository validation",
+    "strict edited prose",
+    "strict source and canonical documentation validation",
+    "installer list",
+    "offline all-provider general temporary-target dry-run",
+    "git diff --check"
+  ],
+  "qualified_assertions": [
+    "Task-free guarded DG state and exact actual task/Pending/controller scope without implicit Future, run or worktree creation.",
+    "Manual owner versus delegated origin, bounded grants and reserved authorization/check/approval boundaries.",
+    "Original actor attempts, fixed role/candidate receipts, independent significant-decision criticism and arbitration, no friendly replacement or semantic A-to-B-to-A revival.",
+    "Explicit mode/authority switching, late/replay refusal, live current acceptance and supported formatting equivalence versus semantic invalidation.",
+    "Positive Auto clarification answer and separate final acceptance via live DG references; cross-session/purpose/epoch and wrong-question refusal.",
+    "Current PR decision evidence preserves publication authorization, check status, external approval and exact current review identity.",
+    "Cancellation waits for original reconciliation; cancelled parents reject late decisions; removed-scope cleanup preserves checkpoint and creates no queue.",
+    "Copied workflow/review packages execute the decision CLI independently across general/web/unity without original installation/source/sibling access."
+  ],
+  "recorded_at": "2026-11-06T05:09:35.781636+00:00",
+  "repository_tests": {
+    "evidence": [
+      ".skill-tree/history/validation/plugin-system/decision-all-python.txt",
+      ".skill-tree/history/validation/plugin-system/decision-all-node.txt"
+    ],
+    "failed": 0,
+    "node": 201,
+    "python": 311,
+    "skipped": 0
+  },
+  "resolved_review_finding": {
+    "controls": [
+      "test_cancellation_waits_for_original_actor_and_rejects_late_results",
+      "test_original_actor_cleanup_survives_missing_former_queue_without_recreation"
+    ],
+    "observation": "Cancellation could release an explicit hold while a bound actor remained pending; removed task scope could strand cleanup.",
+    "repair": "Shared pending-attempt guard before switch/cancel, terminal-parent refusal and non-answer original-attempt cleanup independent of live former scope."
+  },
+  "sources": {
+    ".skill-tree/bin/install.js": "6a3028764bcec61b7a95edabc8e2434dcdba2c718fc3fc99f0dcacb43701fdaf",
+    ".skill-tree/common/references/future-workflow.md": "d8c04b71daddb6df3b6e0198e87cd2497d2e7b9db50cfa9ec8222dae78344e24",
+    ".skill-tree/common/references/workflow-metadata.md": "c1a031314c6122fbbdbdbc73849bbe4cae6f93298d2f1ef172f6970470f2d249",
+    ".skill-tree/common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    ".skill-tree/common/scripts/pr-review-state.py": "3149a85987ef01913b163132fe19c59754f1b4939c336812fefe5a1fd0ae0834",
+    ".skill-tree/common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+    ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+    ".skill-tree/common/scripts/workflow-state.py": "b7524592a7e6a8126bb0ad846cc500884f725828e8133ccf2c80fcf2dc0e5e3b",
+    ".skill-tree/config/resource-map.json": "77317fe7b4e05e3ebb8ff8455053fcdee1b29399ef7894884284d5a7c45d16f3",
+    ".skill-tree/documents/implementation-plan.md": "d53373bb753c92ba770aca2af1d9dd4bea586888de5aa5320b454a2e056e84e1",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "ef81629dd2e76ed70a05896e57b38ca55571439af333da08ecebcf9d80bbe2ca",
+    ".skill-tree/documents/task-clarification-contract.md": "ceab4175e4e293fb9bba5b54c713ee769702c2b18e912ad784a1a7e99cf5e3dc",
+    ".skill-tree/lib/composer.js": "ebb4042086e61e32cd7c255df79befcdff06ae0b0bfaf2941d5d8facc1268e01",
+    ".skill-tree/lib/installation.js": "aff2c16139da198abc00a04e89a0bfe1a22bc826e38a722e146632b14164ef82",
+    ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+    ".skill-tree/tests/test-decision-adapters.py": "01f1b47b178cf01f98d2aa278d739e19da632b647a0fea5a162c110dce82e59f",
+    ".skill-tree/tests/test-decision-governance.py": "e95c38623875e3f145667fe8c2b06a896fe6a9d6775d58f5e3be60aa33f163a1"
+  },
+  "status": "passed",
+  "task_id": "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99"
+}

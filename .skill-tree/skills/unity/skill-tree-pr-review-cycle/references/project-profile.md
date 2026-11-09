@@ -38,8 +38,13 @@ Flavor: unity. Static compatibility only; execution remains unqualified.
     ]
   },
   "gaps": [],
-  "instruction_profile_id": "2cff0437d6b6950b91418dd07d87fc53a561b3b8277930f60b09986aa6c45cbd",
+  "instruction_profile_id": "ba6f256ea572bd23146d4a70a59b27227d6c1f3f9b449fa9d508530665d78d58",
   "recipes": {
+    "static-inspection": {
+      "assertion_contract": "explicit source and artifact assertions",
+      "input_paths": [],
+      "lane": "static"
+    },
     "unity-editmode": {
       "argv": [
         "Unity",
@@ -99,6 +104,7 @@ Flavor: unity. Static compatibility only; execution remains unqualified.
       "utf_version": "1.4.6"
     }
   },
+  "source_version": "0.3.0",
   "worktree_environment": {
     "exclusive_resources": [],
     "isolated_directories": [],

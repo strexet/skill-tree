@@ -1,0 +1,316 @@
+{
+  "acceptance": {
+    "actor": {
+      "context_id": "/root/registry117_architecture",
+      "id": "/root/registry117_architecture"
+    },
+    "answer": "lexical-entry",
+    "attempt_id": "DA-5a5cc20c-c16a-4e1f-a40f-744238c861cb",
+    "authority_digest": "d3fb8a7100ba85d9a362765d6a94cc974e805d08ce8122ccf59fcbd43467f545",
+    "context_identity": {
+      "decision_purpose": "decision",
+      "execution_snapshot_digest": "bb1a728e2feffd7e23469db04f591f36fccaa7f16668ff015e99f9e7709967df",
+      "id": "task:T-54439a41-286c-4423-936c-eb27663509c3",
+      "kind": "task",
+      "orchestration_id": "DO-8bbba2d8-4e09-51be-9291-d5ad65b02aa0",
+      "task_ids": [
+        "T-54439a41-286c-4423-936c-eb27663509c3"
+      ]
+    },
+    "decision_id": "DG-56b6731e-ae59-564d-9b7b-018c83f97242",
+    "digest": "91e30a1305aea68dfe614ffe58d2f724239cdeaa02721bf8abd3e8b6f0e95f5d",
+    "kind": "technical",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/registry117_architecture",
+      "actor_id": "/root/registry117_architecture",
+      "creation_reference": "Actual existing /root/registry117_architecture context; independent bounded implementation-plan resolver handoff for selected real task T-54439a41-286c-4423-936c-eb27663509c3.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/registry117_architecture returned the observed resolver result for the exact original sealed input; raw artifact managed-registry-hardening-resolver-actual-result.json.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "7a501d7ae8e0ee56714e68570cca7b37585cc1bca34674d34838703b032ff9e8",
+    "question_id": "managed-association-entry-identity",
+    "rationale": "Preserving the invoked lexical root retains the exact ownership claim before CLI and workflow normalization. The actual probe demonstrates both entry points erase that claim. Physical destination matching covers readable receipts but cannot recover the relevant claim when the receipt becomes unreadable and the resolved package resides outside the project. Preserve lexical and actual identities, validate the complete receipt inventory, and amend the plugin-hooks.js validation footprint before implementation. Independent copies remain separate because their invoked paths have no exact owned destination claim.",
+    "role_receipts": {
+      "critic": "52da42852caf9e88de454a03432d26d611517d4c9eb581f8f3a78eedda1cd8da",
+      "resolver": "9935cf3282a6a5e130563d97865cb93194f95a7b8c1798ece57792305dcae680"
+    },
+    "semantic_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66"
+  },
+  "active_attempt_id": null,
+  "attempts": {
+    "DA-14a6babf-0604-44e8-b6a0-84a2b9e54fb6": {
+      "actor": {
+        "context_id": "/root/invocation118_oracle",
+        "id": "/root/invocation118_oracle"
+      },
+      "authority_digest": "d3fb8a7100ba85d9a362765d6a94cc974e805d08ce8122ccf59fcbd43467f545",
+      "basis_digest": "927ada9af515aeac56fff91f1b01c2af01ba92eccc1583cfebc7adec2c5b0a6d",
+      "content_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66",
+      "evidence": {
+        "actor_context_id": "/root/invocation118_oracle",
+        "actor_id": "/root/invocation118_oracle",
+        "creation_reference": "Actual existing /root/invocation118_oracle context; independent technical critic, separate from root executor and both runtime authors.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/invocation118_oracle returned the observed critic result for the exact original sealed input; raw artifact managed-registry-hardening-critic-actual-result.json.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-14a6babf-0604-44e8-b6a0-84a2b9e54fb6",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "7a501d7ae8e0ee56714e68570cca7b37585cc1bca34674d34838703b032ff9e8",
+      "result": {
+        "evidence": [
+          ".skill-tree/artifacts/plugin-implementation/managed-registry-hardening-sealed-critic.json",
+          ".skill-tree/artifacts/plugin-implementation/managed-registry-owned-link-entry-observation.json",
+          ".skill-tree/common/scripts/plugin-hooks.js",
+          ".skill-tree/common/scripts/workflow-state.py",
+          ".skill-tree/history/research/managed-registry-hardening-plan.md"
+        ],
+        "input_digest": "72cb89f7ea2c50b9b0009470fb3242bc47487d3605c8b077f65b1bf6991ca872",
+        "rationale": "I agree with the resolver’s lexical-entry choice. The retained observation shows CLI and workflow normalization erase the invoked ownership path; physical matching cannot recover that information when the receipt is unreadable. Preserve lexical and actual identities, but use neither alone as ownership authority: full receipt, destination and inventory verification remains required, and independent copies retain standalone behavior. Add plugin-hooks.js to the guarded validation footprint and reconcile the current DO context before source edits; unchanged criteria do not make stale seals current. Later admission checks must avoid Node execution under the writer lock and must not rerun a draft-only During entry guard as completed-chain readiness. No implementation or test result is asserted.",
+        "status": "agree"
+      },
+      "role": "critic",
+      "semantic_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66",
+      "status": "agree"
+    },
+    "DA-5a5cc20c-c16a-4e1f-a40f-744238c861cb": {
+      "actor": {
+        "context_id": "/root/registry117_architecture",
+        "id": "/root/registry117_architecture"
+      },
+      "authority_digest": "d3fb8a7100ba85d9a362765d6a94cc974e805d08ce8122ccf59fcbd43467f545",
+      "basis_digest": null,
+      "content_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66",
+      "evidence": {
+        "actor_context_id": "/root/registry117_architecture",
+        "actor_id": "/root/registry117_architecture",
+        "creation_reference": "Actual existing /root/registry117_architecture context; independent bounded implementation-plan resolver handoff for selected real task T-54439a41-286c-4423-936c-eb27663509c3.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/registry117_architecture returned the observed resolver result for the exact original sealed input; raw artifact managed-registry-hardening-resolver-actual-result.json.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-5a5cc20c-c16a-4e1f-a40f-744238c861cb",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "7a501d7ae8e0ee56714e68570cca7b37585cc1bca34674d34838703b032ff9e8",
+      "result": {
+        "answer": "lexical-entry",
+        "evidence": [
+          ".skill-tree/artifacts/plugin-implementation/managed-registry-owned-link-entry-observation.json",
+          ".skill-tree/common/scripts/plugin-hooks.js",
+          ".skill-tree/common/scripts/workflow-state.py",
+          ".skill-tree/tests/test-plugin-composition.js",
+          ".skill-tree/tests/test-plugin-invocation-installation.js",
+          ".skill-tree/history/research/managed-registry-hardening-plan.md"
+        ],
+        "input_digest": "073561a292f98d89ddade4baa5caf63348e48a14c270f0278df061f616357264",
+        "rationale": "Preserving the invoked lexical root retains the exact ownership claim before CLI and workflow normalization. The actual probe demonstrates both entry points erase that claim. Physical destination matching covers readable receipts but cannot recover the relevant claim when the receipt becomes unreadable and the resolved package resides outside the project. Preserve lexical and actual identities, validate the complete receipt inventory, and amend the plugin-hooks.js validation footprint before implementation. Independent copies remain separate because their invoked paths have no exact owned destination claim.",
+        "status": "answered"
+      },
+      "role": "resolver",
+      "semantic_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66",
+      "status": "answered"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the admitted managed-registry and prerequisite-admission blocker and completed dependency scope; controlled local installation fixtures use scripted test input. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+    ],
+    "context_id": "task:T-54439a41-286c-4423-936c-eb27663509c3",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+    },
+    "id": "approved-managed-registry-hardening",
+    "revision": 1
+  },
+  "authority_digest": "d3fb8a7100ba85d9a362765d6a94cc974e805d08ce8122ccf59fcbd43467f545",
+  "context": {
+    "content_fingerprint": "7f339ce118c480e795de8d87fcbeffd0c09dfa1a17f0b5578e356680cda18bfb",
+    "decision_purpose": "decision",
+    "execution_snapshot_digest": "bb1a728e2feffd7e23469db04f591f36fccaa7f16668ff015e99f9e7709967df",
+    "id": "task:T-54439a41-286c-4423-936c-eb27663509c3",
+    "kind": "task",
+    "orchestration_id": "DO-8bbba2d8-4e09-51be-9291-d5ad65b02aa0",
+    "semantic_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66",
+    "task_ids": [
+      "T-54439a41-286c-4423-936c-eb27663509c3"
+    ]
+  },
+  "decision_hash": "f35e6e3eb30b0c6bd13c1e2ec9b2518a6cd3faa9166374bc9a7697e4447691be",
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "frontier_epoch": 1,
+  "history": [
+    {
+      "context_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66",
+      "detail": {},
+      "event": "started",
+      "mode_epoch": 1,
+      "previous_record_hash": null,
+      "sequence": 1
+    },
+    {
+      "context_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66",
+      "detail": {
+        "attempt_id": "DA-5a5cc20c-c16a-4e1f-a40f-744238c861cb",
+        "role": "resolver"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "87d07a9e3ae38b921e388c62732f43ff0c937c510b3208fbeef9cf88293b55ca",
+      "sequence": 2
+    },
+    {
+      "context_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66",
+      "detail": {
+        "attempt_id": "DA-5a5cc20c-c16a-4e1f-a40f-744238c861cb",
+        "status": "answered"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "8bb5beb53134e1816bdaf242f2db408cc1ebd1cb7e4cc83f76dc652c0e8c7d63",
+      "sequence": 3
+    },
+    {
+      "context_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66",
+      "detail": {
+        "attempt_id": "DA-14a6babf-0604-44e8-b6a0-84a2b9e54fb6",
+        "role": "critic"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "c80df1a8434a35330defccbaabeec07f5fffc253472acc6876061aa3098dc280",
+      "sequence": 4
+    },
+    {
+      "context_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66",
+      "detail": {
+        "attempt_id": "DA-14a6babf-0604-44e8-b6a0-84a2b9e54fb6",
+        "status": "agree"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "8bf7f3102aae2e7c635b425ba0e7d47da95980262df4e59c36585d14ffc2b00b",
+      "sequence": 5
+    },
+    {
+      "context_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66",
+      "detail": {
+        "acceptance_digest": "91e30a1305aea68dfe614ffe58d2f724239cdeaa02721bf8abd3e8b6f0e95f5d"
+      },
+      "event": "accept",
+      "mode_epoch": 1,
+      "previous_record_hash": "99bd2e6f423fa1c75d3db4ce612abd4c8daef4a7332057e07b634e0d973f50cf",
+      "sequence": 6
+    },
+    {
+      "context_fingerprint": "7f339ce118c480e795de8d87fcbeffd0c09dfa1a17f0b5578e356680cda18bfb",
+      "detail": {
+        "previous_context": {
+          "content_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66",
+          "decision_purpose": "decision",
+          "execution_snapshot_digest": "bb1a728e2feffd7e23469db04f591f36fccaa7f16668ff015e99f9e7709967df",
+          "id": "task:T-54439a41-286c-4423-936c-eb27663509c3",
+          "kind": "task",
+          "orchestration_id": "DO-8bbba2d8-4e09-51be-9291-d5ad65b02aa0",
+          "semantic_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66",
+          "task_ids": [
+            "T-54439a41-286c-4423-936c-eb27663509c3"
+          ]
+        },
+        "previous_question": {
+          "evidence": [
+            ".skill-tree/artifacts/plugin-implementation/managed-registry-owned-link-entry-observation.json",
+            ".skill-tree/lib/plugin-composition.js",
+            ".skill-tree/common/scripts/plugin-hooks.js",
+            ".skill-tree/common/scripts/workflow-state.py",
+            ".skill-tree/history/research/managed-registry-hardening-plan.md"
+          ],
+          "facts": [
+            "Actual receipt-owned symlink fixture CLI exits zero with no prerequisites; Node __dirname is relocated, argv[1] retains the lexical owned path.",
+            "WF resolves payload package_root and _hook_safe returns the real script; hook-start/next currently reports prepare with no attempts/Future.",
+            "An independent standalone copy normally is not the actual physical target of a live owned-destination claim; a matching physical claim remains relevant even when a caller normalizes a path.",
+            "Both alternatives remain within the admitted exact-association and standalone criteria. The physical-claims option must avoid adopting symlinks or performing unsafe traversal of unvalidated receipt paths; invalid relevant claims remain prerequisites. The lexical-entry option needs a routine source-footprint amendment before code changes."
+          ],
+          "id": "managed-association-entry-identity",
+          "kind": "technical",
+          "limits": "Task T-54439a41-286c-4423-936c-eb27663509c3 only; test fixtures and source repair, no external/plugin/native execution, source publication, installation consent or new ownership format.",
+          "options": [
+            {
+              "id": "physical-claims",
+              "text": "Keep existing entry normalization; in the bundled association layer treat profile destination claims resolving to the actual package root as relevant, then reject symlinked/conflicting claims with the current safe path and full receipt inventory checks."
+            },
+            {
+              "id": "lexical-entry",
+              "text": "Preserve the lexical invoked root through the CLI bootstrap and WF script transport; add plugin-hooks.js to current validation source declarations and cover both exact lexical and actual root identities."
+            }
+          ],
+          "recommendation": "physical-claims",
+          "significance": "significant",
+          "text": "Choose the bounded repair for the observed managed-destination symlink association loss after CLI/WF realpath normalization. Preserve independent copies and exact verified managed claims."
+        }
+      },
+      "event": "resume",
+      "mode_epoch": 1,
+      "previous_record_hash": "f8e910132a67faad1c371fc07996e82dd4a25473915afa663643096db2ef8f76",
+      "sequence": 7
+    }
+  ],
+  "id": "DG-56b6731e-ae59-564d-9b7b-018c83f97242",
+  "mode": "auto",
+  "mode_epoch": 1,
+  "prepared_attempt_id": "DA-14a6babf-0604-44e8-b6a0-84a2b9e54fb6",
+  "question": {
+    "evidence": [
+      ".skill-tree/artifacts/plugin-implementation/managed-registry-owned-link-entry-observation.json",
+      ".skill-tree/lib/plugin-composition.js",
+      ".skill-tree/common/scripts/plugin-hooks.js",
+      ".skill-tree/common/scripts/workflow-state.py",
+      ".skill-tree/history/research/managed-registry-hardening-plan.md"
+    ],
+    "facts": [
+      "Actual receipt-owned symlink fixture CLI exits zero with no prerequisites; Node __dirname is relocated, argv[1] retains the lexical owned path.",
+      "WF resolves payload package_root and _hook_safe returns the real script; hook-start/next currently reports prepare with no attempts/Future.",
+      "An independent standalone copy normally is not the actual physical target of a live owned-destination claim; a matching physical claim remains relevant even when a caller normalizes a path.",
+      "Both alternatives remain within the admitted exact-association and standalone criteria. The physical-claims option must avoid adopting symlinks or performing unsafe traversal of unvalidated receipt paths; invalid relevant claims remain prerequisites. The lexical-entry option needs a routine source-footprint amendment before code changes."
+    ],
+    "id": "managed-association-entry-identity",
+    "kind": "technical",
+    "limits": "Task T-54439a41-286c-4423-936c-eb27663509c3 only; test fixtures and source repair, no external/plugin/native execution, source publication, installation consent or new ownership format.",
+    "options": [
+      {
+        "id": "physical-claims",
+        "text": "Keep existing entry normalization; in the bundled association layer treat profile destination claims resolving to the actual package root as relevant, then reject symlinked/conflicting claims with the current safe path and full receipt inventory checks."
+      },
+      {
+        "id": "lexical-entry",
+        "text": "Preserve the lexical invoked root through the CLI bootstrap and WF script transport; add plugin-hooks.js to current validation source declarations and cover both exact lexical and actual root identities."
+      }
+    ],
+    "recommendation": "physical-claims",
+    "significance": "significant",
+    "text": "Choose the bounded repair for the observed managed-destination symlink association loss after CLI/WF realpath normalization. Preserve independent copies and exact verified managed claims."
+  },
+  "request_id": "DO-8bbba2d8-4e09-51be-9291-d5ad65b02aa0:question:3",
+  "revision": 7,
+  "schema": 1,
+  "start_digest": "e6d8ee37167ec141a74a151c15c43e6d57d8329a8ce9bf17d4034a5c38ba44e4",
+  "state": "accepted"
+}

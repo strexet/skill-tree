@@ -1,0 +1,18 @@
+{
+  "added_sources": [
+    ".skill-tree/lib/composer.js",
+    ".skill-tree/lib/installation.js",
+    ".skill-tree/bin/install.js",
+    ".skill-tree/templates/operations.json",
+    ".skill-tree/common/scripts/run-workspaces.py",
+    ".skill-tree/common/scripts/validate-document-rules.py"
+  ],
+  "preserved": [
+    "Original two check IDs, recipe parameters and every acceptance criterion.",
+    "No pending check attempt exists; original Red reports remain immutable.",
+    "Canonical queue/run ownership and frozen scope remain unchanged."
+  ],
+  "reason": "The adapter check now copies workflow and review packages for general/web/unity, removes original installation access and runs the decision CLI without Future metadata. Concrete installer/composer inputs and imported guard helpers participate in check freshness.",
+  "record_kind": "validation-source-coverage-refinement",
+  "task_id": "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99"
+}

@@ -1,0 +1,241 @@
+{
+  "acceptance": {
+    "actor": {
+      "context_id": "/root/catalog112",
+      "id": "/root/catalog112"
+    },
+    "answer": "accept",
+    "attempt_id": "DA-61329fb4-f324-4001-b95e-bc51bc269596",
+    "authority_digest": "c1137d6c71940940ce5cc86a6ca4c974a709215cc80d8ef36c9e88974857ccb8",
+    "context_identity": {
+      "decision_purpose": "plan",
+      "execution_snapshot_digest": "a61635ae4a82ae7898d60a2266c197ea4d8d4874edd0e81d0ffcccf682cc79db",
+      "id": "task:T-93c83c5a-9074-42dc-b68c-a11ff8b51254",
+      "kind": "task",
+      "orchestration_id": "DO-61012395-0edf-5632-a569-7aca46db8a57",
+      "plan_digest": "a231a416dc64d8fc99bb87bff79ed32c9bb10ace2dc3f77b16e15d6b9ca11cab",
+      "required_checks_digest": "426c3bbfe4f049d789019282fe2438073e32c54ddf1729225507939862138021",
+      "task_ids": [
+        "T-93c83c5a-9074-42dc-b68c-a11ff8b51254"
+      ]
+    },
+    "decision_id": "DG-3b26e207-6f66-5ddb-b9db-7f8620413c0f",
+    "digest": "963c3bc55cc15cd9981aaab24cee0e9868c9ed8e26f51f882e8ab140ea2c025d",
+    "kind": "specification-acceptance",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/catalog112",
+      "actor_id": "/root/catalog112",
+      "creation_reference": "Actual collaboration.spawn_agent returned /root/catalog112, separate active context.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/catalog112 returned the sealed-input JSON in collaboration final answer.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "1a8d55c29130b607dd07b46e33bb3d7de645fb3c46d38b036c5718be3d6a7cf8",
+    "question_id": "delivery132-plan-revision",
+    "rationale": "The revision closes the Git side-effect gap with explicit no-autostash, a fail-closed gate for executable hooks and signing policy, and disposable regressions. The target remains a proper ancestor of the current execution head. Focused infrastructure checks run at T132, complete suites run before the authorized merge, and canonical target activation and validation remain separate delivery gates.",
+    "role_receipts": {
+      "critic": "8b3a26c905bacdf2855bed687dccb29598713b942aaea1afe586052ec16f7a87",
+      "resolver": "2388d479d532280fedaf6b12226baaefa89a2b9c337d64f666c02589535ad8bd"
+    },
+    "semantic_fingerprint": "6c6e3614a02dbcc3da8f0c02983eb64ffda90c5ef07d07907dbf727519a8f062"
+  },
+  "active_attempt_id": null,
+  "attempts": {
+    "DA-61329fb4-f324-4001-b95e-bc51bc269596": {
+      "actor": {
+        "context_id": "/root/catalog112",
+        "id": "/root/catalog112"
+      },
+      "authority_digest": "c1137d6c71940940ce5cc86a6ca4c974a709215cc80d8ef36c9e88974857ccb8",
+      "basis_digest": null,
+      "content_fingerprint": "6c6e3614a02dbcc3da8f0c02983eb64ffda90c5ef07d07907dbf727519a8f062",
+      "evidence": {
+        "actor_context_id": "/root/catalog112",
+        "actor_id": "/root/catalog112",
+        "creation_reference": "Actual collaboration.spawn_agent returned /root/catalog112, separate active context.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/catalog112 returned the sealed-input JSON in collaboration final answer.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-61329fb4-f324-4001-b95e-bc51bc269596",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "1a8d55c29130b607dd07b46e33bb3d7de645fb3c46d38b036c5718be3d6a7cf8",
+      "result": {
+        "answer": "accept",
+        "input_digest": "24e78afd793090d28bf1f9252752bfa06239d973f7d2fd62341683dbf38e1c15",
+        "rationale": "The revision closes the Git side-effect gap with explicit no-autostash, a fail-closed gate for executable hooks and signing policy, and disposable regressions. The target remains a proper ancestor of the current execution head. Focused infrastructure checks run at T132, complete suites run before the authorized merge, and canonical target activation and validation remain separate delivery gates.",
+        "status": "answered"
+      },
+      "role": "resolver",
+      "semantic_fingerprint": "6c6e3614a02dbcc3da8f0c02983eb64ffda90c5ef07d07907dbf727519a8f062",
+      "status": "answered"
+    },
+    "DA-e10c9d45-5cd1-4f85-b702-0bb32f855c54": {
+      "actor": {
+        "context_id": "/root/evidence114",
+        "id": "/root/evidence114"
+      },
+      "authority_digest": "c1137d6c71940940ce5cc86a6ca4c974a709215cc80d8ef36c9e88974857ccb8",
+      "basis_digest": "613c60323aa80673c1582a1c203c79bdb92ec62e634a38ec8530a6f724ac5ab1",
+      "content_fingerprint": "6c6e3614a02dbcc3da8f0c02983eb64ffda90c5ef07d07907dbf727519a8f062",
+      "evidence": {
+        "actor_context_id": "/root/evidence114",
+        "actor_id": "/root/evidence114",
+        "creation_reference": "Actual collaboration.spawn_agent returned /root/evidence114, separate active context.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/evidence114 returned the sealed-input JSON in collaboration final answer.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-e10c9d45-5cd1-4f85-b702-0bb32f855c54",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "1a8d55c29130b607dd07b46e33bb3d7de645fb3c46d38b036c5718be3d6a7cf8",
+      "result": {
+        "answer": "accept",
+        "input_digest": "40a396c43abc8d502836cdb95ba382c274d4d298f9ff1a5e5255586269fc0e53",
+        "rationale": "The revision closes the Git side-effect gap with explicit no-autostash and no-signing flags, a preflight that stops on unsupported active hook or signing policy, and disposable regression controls. It preserves the immutable reviewed source, exact parent and tree checks, protected canonical state, scoped retained-run admission, and executed validation of the merged target. These gates satisfy the earlier review without changing ordinary PR delivery.",
+        "status": "agree"
+      },
+      "role": "critic",
+      "semantic_fingerprint": "6c6e3614a02dbcc3da8f0c02983eb64ffda90c5ef07d07907dbf727519a8f062",
+      "status": "agree"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the approved task and dependency scope. No source publication, remote, release, external trial, installation consent or actual native plugin execution. Required checks and real owner intent cannot be delegated away."
+    ],
+    "context_id": "task:T-93c83c5a-9074-42dc-b68c-a11ff8b51254",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+    },
+    "id": "approved-delivery132",
+    "revision": 1
+  },
+  "authority_digest": "c1137d6c71940940ce5cc86a6ca4c974a709215cc80d8ef36c9e88974857ccb8",
+  "context": {
+    "content_fingerprint": "6c6e3614a02dbcc3da8f0c02983eb64ffda90c5ef07d07907dbf727519a8f062",
+    "decision_purpose": "plan",
+    "execution_snapshot_digest": "a61635ae4a82ae7898d60a2266c197ea4d8d4874edd0e81d0ffcccf682cc79db",
+    "id": "task:T-93c83c5a-9074-42dc-b68c-a11ff8b51254",
+    "kind": "task",
+    "orchestration_id": "DO-61012395-0edf-5632-a569-7aca46db8a57",
+    "plan_digest": "a231a416dc64d8fc99bb87bff79ed32c9bb10ace2dc3f77b16e15d6b9ca11cab",
+    "required_checks_digest": "426c3bbfe4f049d789019282fe2438073e32c54ddf1729225507939862138021",
+    "semantic_fingerprint": "6c6e3614a02dbcc3da8f0c02983eb64ffda90c5ef07d07907dbf727519a8f062",
+    "task_ids": [
+      "T-93c83c5a-9074-42dc-b68c-a11ff8b51254"
+    ]
+  },
+  "decision_hash": "f6fee4a1cd6e7b0f56bc4d1c3ff77c087f34b49c6c22fa004555a4766fc04a73",
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "frontier_epoch": 1,
+  "history": [
+    {
+      "context_fingerprint": "6c6e3614a02dbcc3da8f0c02983eb64ffda90c5ef07d07907dbf727519a8f062",
+      "detail": {},
+      "event": "started",
+      "mode_epoch": 1,
+      "previous_record_hash": null,
+      "sequence": 1
+    },
+    {
+      "context_fingerprint": "6c6e3614a02dbcc3da8f0c02983eb64ffda90c5ef07d07907dbf727519a8f062",
+      "detail": {
+        "attempt_id": "DA-61329fb4-f324-4001-b95e-bc51bc269596",
+        "role": "resolver"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "6d50386f7908e40b5ca5c1765b39a4b28f464605238099664341d0f048db2432",
+      "sequence": 2
+    },
+    {
+      "context_fingerprint": "6c6e3614a02dbcc3da8f0c02983eb64ffda90c5ef07d07907dbf727519a8f062",
+      "detail": {
+        "attempt_id": "DA-61329fb4-f324-4001-b95e-bc51bc269596",
+        "status": "answered"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "2cbdb6f5532c1f2fa920fd22016e130e910f97ac6033b7bbaf567d02d3e72591",
+      "sequence": 3
+    },
+    {
+      "context_fingerprint": "6c6e3614a02dbcc3da8f0c02983eb64ffda90c5ef07d07907dbf727519a8f062",
+      "detail": {
+        "attempt_id": "DA-e10c9d45-5cd1-4f85-b702-0bb32f855c54",
+        "role": "critic"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "09f6da1360938c097c753f28f6ca39ca1f68accab8adee97b68c7eb1807ddecd",
+      "sequence": 4
+    },
+    {
+      "context_fingerprint": "6c6e3614a02dbcc3da8f0c02983eb64ffda90c5ef07d07907dbf727519a8f062",
+      "detail": {
+        "attempt_id": "DA-e10c9d45-5cd1-4f85-b702-0bb32f855c54",
+        "status": "agree"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "14ef753adfd5747ecccc3aad7c9ee1c3706e767bb91a57ec9ad6adf67147b6f4",
+      "sequence": 5
+    },
+    {
+      "context_fingerprint": "6c6e3614a02dbcc3da8f0c02983eb64ffda90c5ef07d07907dbf727519a8f062",
+      "detail": {
+        "acceptance_digest": "963c3bc55cc15cd9981aaab24cee0e9868c9ed8e26f51f882e8ab140ea2c025d"
+      },
+      "event": "accept",
+      "mode_epoch": 1,
+      "previous_record_hash": "920b359f739264d8600f0839bf5e9dce6fcb91dd0e4fd9c47045503ea81dcae0",
+      "sequence": 6
+    }
+  ],
+  "id": "DG-3b26e207-6f66-5ddb-b9db-7f8620413c0f",
+  "mode": "auto",
+  "mode_epoch": 1,
+  "prepared_attempt_id": "DA-e10c9d45-5cd1-4f85-b702-0bb32f855c54",
+  "question": {
+    "id": "delivery132-plan-revision",
+    "kind": "specification-acceptance",
+    "options": [
+      {
+        "id": "accept",
+        "text": "Accept the revised plan."
+      },
+      {
+        "id": "revise",
+        "text": "Revise the plan with concrete reasons."
+      }
+    ],
+    "plan_text": "# T132 local delivery plan\n\nTask T-93c83c5a-9074-42dc-b68c-a11ff8b51254 is the resumable local-delivery infrastructure blocker for installer110. The controller order authorizes a local merge from codex/plugin-system into codex/next-version. Infrastructure tests use disposable Git and installation fixtures. The current repository merge belongs to the controller tail.\n\n## Controller scheduling\n\nThe canonical index records catalog112 as a distinct initial root. Catalog112 depends on comparison114 and package lifecycle. Delivery132 depends on the already accepted clarification protocol and implementation. Both enter installer110 as prerequisites, alongside manager131. No graph edge directly connects catalog112 and delivery132. The controller keeps one current root and current task, however. The frozen root order selects comparison114, then catalog112 at priority 112 before installer110 at priority 110. Under installer110, delivery132 at priority 132 precedes manager131 at priority 131 when required completed-dependency revalidation is current. The implementation order follows actual advance output. The operation allows concurrent read-only research, test design and independent review. A separate run cannot claim these already admitted IDs, and no owner-scoped maintenance focus has been granted for skipping the current root.\n\n## Smallest implementation surface\n\n- Keep Git inspection and identity checks in run-workspaces.py. Keep selection, transitions, receipt validation, preservation and writer transactions in workflow-state.py. Existing shared script composition ships both files. Avoid new cross-package dependencies, a resource-map change, profile schema migration, alternate Git path and changes to PR behavior.\n- Teach finish to distinguish the recorded local-merge order before the ordinary pr=false branch. Resolve the exact reviewed committed source ref, worktree, HEAD, repository and source tree while final source acceptance is current. Require a clean index and only verified owned source dirt. Bind those values and the current implementation evidence into the immutable completion receipt before prep. Keep implementation completed, publication not-requested and order_completed false while delivery is pending. Persist a stopped handoff for the existing installer barrier and release completed implementation claims normally. Repeated finish returns the original immutable completion receipt without selecting a new head, changing accepted outcomes, resetting delivery or adding a second history entry. Retain existing local-result and PR orders. A local merge becomes terminal only after final delivery receipts. Use a typed local-integration receipt distinct from PR merge.\n- Expose an explicit selected-run local-delivery entry point with read-only inspection and narrow prepare, merge/reconcile, target admission, executed validation and completion actions. Preserve the original implementation completion snapshot. Existing Store.save records mutable delivery progress and event history with canonical writer and hash guards. Reuse one repository-common per-target Git lock with a reserved local namespace across preflight, original Git mutation, reconciliation and final check/receipt gates. Define lock order as target lock before short writer transaction. No metadata writer lock spans the Git merge, installation or validation commands.\n- Prepare from the immutable finish source identity and before Git mutation. Resolve canonical checkout, recorded source worktree, shared Git common directory, repository ID, exact stored authorized target branch, local target HEAD/ref and absence of unfinished Git state. Require the current authorized target HEAD to be the recorded baseline and a proper ancestor of the frozen source. Freeze both ordered parents, expected source tree and canonical preservation evidence. A moved or diverged target and a changed source remain explicit prerequisites. The existing repository has an ancestor target, so avoid a metadata-only target fork and generic merge-resolution policy.\n- Require clean Git indexes on both worktrees. Scope tolerated dirty or untracked files to exact receipt-proven owned installer bytes and recorded canonical workflow files, disjoint from incoming paths. Do not treat a prefix or receipt existence as proof. Verify exact profile ownership and actual bundle/package/bridge content. Identify receipt-owned file paths from the verified receipt and include the profile itself only after verification. A bridge file's unowned region is outside the installed-dirt allowance. Preserve exact tracked/untracked state for all other paths. Use NUL-delimited Git status/diff and compare complete POSIX path components in both directions to catch file/directory prefix conflicts. Include ignored incoming obstructions in the final check. Never pass --overwrite-ignore. A symlink or ambiguous path stays a prerequisite.\n- Use a narrow owned Git mutation with --no-ff --no-edit --no-overwrite-ignore and the prepared source OID. Under the same target lock, repeat Git identity, refs, incoming/collision and preservation checks immediately before Git. Reconcile an interrupted already-created commit before any second write. Reconcile the current target ref/HEAD, exact ordered parents, source ancestry and exact Git tree equal to the frozen source tree. That tree proof rejects a two-parent ours merge that discards incoming content. A missing merge, fast-forward, wrong parents/tree, moved source/target, unexpected Git state or overlap leaves delivery pending. A caller's asserted SHA supplies no Git evidence.\n- Use the owned installation verification and stopped-operation barrier. Independently compare the actual verified target profile source_digests against composer.sourceInputs on the merged target .skill-tree directory. The existing verify uses installed source bytes for deterministic self-consistency. At preparation freeze the target flavor, verified provider ownership and exact required destination set projected through the selected final source operations and provider matrix. Preserve old scoped target ownership and include explicitly selected new core operations. Verify the resulting receipt flavor, every expected provider/operation/destination and the target core profile identity alongside merged source, queue/project identity and verified activation evidence. A same-source installation of another flavor or provider scope fails admission. Use local source installer activation from the merged checkout. Ordinary manager --refresh-profile reads installed source and cannot introduce the newly merged generation.\n- Record explicit canonical target admission. Standard admit for the selected controller resolves its recorded execution worktree, so it cannot attest canonical target activation. Freeze the retained-run identities and their actual stop reasons at the handoff. After the canonical installer marks affected unfinished runs, record the exact retained stopped IDs requiring re-admission and verify only those selected IDs against their original worktrees. Do not use a target profile to satisfy a different worktree. Append explicit exact scoped re-admission receipts and normal event counters without rewriting implementation history. Preserve preexisting stop reasons, independent prerequisites, worktree dirt, claims and run scope. Preserve terminal historical runs exactly. No admission starts a run or clears unrelated blockers. The delivery order can clear its own refresh flag after explicit admission and remain stopped until delivery completion.\n- Compare preservation hashes for future.md, task outcomes and owned retained clarification, decision and invocation records. Compare a canonical structural projection of future.json allowing only expected selected delivery transitions, event increments and verified installer-owned refresh/admission fields for the exact affected runs. Include admitted IDs, task progress, claims, outstanding attempts, run identities and counters. Derived navigation regenerates from live canonical state. Inspect pre-existing workflow writer/transaction and core/plugin installation lock/journal paths before invoking any Store.lock or installer operation that can recover automatically. Repeat the journal guard under the short writer before recovery. An unrelated or uncertain journal is a prerequisite and remains byte-for-byte intact. Reconcile only a journal proven to belong to the exact recorded prior delivery action. Preserve unresolved original attempt barriers.\n- Execute final validation through the owned helper or its trusted fixed-argv runner with per-command deadlines and actual status/output evidence from the exact target root. The production CLI accepts no user-supplied commands, exit codes or pass assertions. A deterministic fixture runner can run a small fixed command set but cannot synthesize results. Seal a validation receipt to the exact current merge HEAD/tree, current target profile, accepted fixed checks and output digests. Before marking delivery complete, under the same per-target lock and short writer recheck immutable preparation, actual refs/tree, preserved state, current profile/evidence and scoped admissions. Missing or stale evidence keeps order_completed false.\n\n## Tests\n\n1. Red fixture proves that the existing pr=false order incorrectly reports local-result. Green cases cover the owner-authorized local merge order, existing ordinary no-merge/PR orders, exact committed finish source and repeated finish without mutation or re-freeze.\n2. Build a temporary repository with canonical target and registered linked source worktree. Freeze committed implementation acceptance, verify pending and immutable prep, reject source movement between finish and prep, and verify prepared source/target OIDs plus expected tree. Exercise actual no-fast-forward Git mutation and interruption/reconciliation of the original commit. Reject a fast-forward, wrong parent, two-parent ours tree, changed target or source, and unfinished Git state.\n3. Use actual receipt-owned tracked dirt in both worktrees and preserve it through the verified handoff. Reject a modified or unowned lookalike and dirty index. Cover NUL-safe unusual filenames, ignored exact obstruction, and both directions of file/directory prefix collisions. Verify the runner uses --no-overwrite-ignore and preserves obstructing content.\n4. Exercise owned installation in a disposable fixture. Show that the old self-consistent installed bundle fails the merged-source check, then activate the incoming generation. Verify writer/installer lock and pending hook/check barriers, preserved canonical queue, exact retained stopped scope and explicit profile re-admission. Execute a real fixed validation command, reject self-reported outcomes and changed evidence, and reach terminal only with every current receipt.\n5. Run focused T132 and run-workspace/installation cases before full synchronization, strict validation, full Python and Node suites, installer list and dry-run, and diff check. Independent review inspects transitions and migration compatibility. Infrastructure qualification performs no live repository merge.\n\n## Keeping revalidation bounded\n\nEdit only the selected shared logic, selected contracts and regression files. Use a dedicated new T132 test module for most fixture coverage and keep existing run-workspace edits limited to a cross-mode regression if needed. Leave validation definitions, worktree profile recipes and unrelated runtime scripts untouched. Compare final changed paths against the immutable validation_plan sources from the canonical outcomes and select stale checks through the controller. Separate known immediate dependency revalidation from the final required-contract sweep. A check with an unchanged definition, resolved recipe, source hashes and evidence stays reusable. A changed source needs a fresh current check receipt. Group compatible deterministic suite execution for efficiency while preserving individual assertions, inputs and receipt keys. Historical host captures remain bound to their original source and never become new native runs. Static requalification only covers observed unchanged source paths and currently verified compatibility under the specific contract. Preserve explicit unavailability when a contract requires an actual new observation. Refresh the owned source snapshot after accepted source changes and explicitly re-admit before continuation. Finish checks every required completed contract for current evidence.\n\n## Current repository integration tail\n\n1. After all admitted units and deferred processing finish, verify the exact reviewed source branch and head. Record finish as implementation-completed/local-delivery-pending. Check all current source evidence and the stopped canonical writer/installation barrier. No remote operations.\n2. Inventory final incoming paths and canonical tracked, staged and untracked status. At the recorded inspection, codex/next-version at 15da518 was an ancestor of codex/plugin-system at 2a6d240. Only .skill-tree/skill-tree.json overlapped the dirty tracked canonical paths. Ten untracked collisions currently match incoming blobs byte for byte. Both findings require a fresh check at the final heads. There are two other registered runs and both are terminal local-result.\n3. Preserve exact canonical queue, task outcome ledger and retained run/evidence bytes before any Git mutation. Preserve the generated navigation snapshot and archive only separately verified identical untracked overlaps outside incoming paths before preparation. The merge helper does not relocate or erase collisions. Leave unrelated files in place. Normalize the generated navigation overlap only from its tracked target content after preserving its current bytes. Allow only captured canonical metadata and receipt-proven installed dirt disjoint from every incoming path. Do not move the target through a metadata-only commit before the merge. Unexpected dirt or content mismatch holds the integration for review.\n4. Prepare the local delivery. Confirm exact prepared refs. Perform one local no-fast-forward merge into codex/next-version using the prepared source OID and --no-overwrite-ignore under the shared target lock. Preserve a stopped merge on conflict. Reconcile by actual two-parent commit with the exact source tree. Regenerate canonical navigation using the merged workflow manifest helper with canonical routing, and verify preserved queue/history. Do not replace canonical queue with the execution checkout copy.\n5. Use the merged source installer on the exact canonical target and existing provider/flavor, with explicit core-only configuration. Capture owned activation and verify merged-source digests. Re-admit the exact affected stopped retained run IDs as applicable, preserving unrelated history and independent stop reasons. Execute scoped target checks through the owned validation runner. Complete delivery against the merge HEAD before separate task-owned metadata bookkeeping.\n6. Complete delivery only with current evidence. Report separate implementation commit(s), actual merge commit, target profile and target checks, and remaining unqualified candidate evidence. Keep worktrees, original run records and deferred tasks. No push, PR, tags or publication.\n\n## Revision from independent W1 review\n\nThe fixed local Git command explicitly supplies `--no-autostash` and `--no-gpg-sign`. Inspect applicable executable merge, commit, ref-transaction and index hooks plus configured signing and merge signature verification before the mutating command. Unsupported active hook or signing policy holds the exact prepared delivery for separate resolution, preserving persistent Git configuration. The controlled Git fixture enables merge autostash and proves that no stash is created, while an executable hook marker proves that the policy gate stops before hook execution. The existing ordinary PR flow is outside the local-only gate.\n\nRun the exact local-delivery and run-workspace fixtures, synchronization, strict validation and installer checks at the infrastructure unit. Run the complete Python and Node suites at the shared final source boundary before the real authorized merge, preserving the separate canonical target verification afterward.\n",
+    "recommendation": "accept",
+    "significance": "significant",
+    "text": "Accept the revised exact local delivery plan or request a specific revision."
+  },
+  "request_id": "DO-61012395-0edf-5632-a569-7aca46db8a57:question:2",
+  "revision": 6,
+  "schema": 1,
+  "start_digest": "bef18f089b8a8bdcede595bebc4cc47799b29e44edd480dcd0b53b5bdc7c9442",
+  "state": "accepted"
+}

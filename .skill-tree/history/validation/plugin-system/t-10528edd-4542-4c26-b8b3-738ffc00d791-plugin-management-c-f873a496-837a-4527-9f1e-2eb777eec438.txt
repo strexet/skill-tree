@@ -1,0 +1,90 @@
+TAP version 13
+# Subtest: empty raw inventory works before installation or Future and never dispatches or acquires
+ok 1 - empty raw inventory works before installation or Future and never dispatches or acquires
+  ---
+  duration_ms: 65.596833
+  ...
+# Subtest: inventory derives exact installed identities and separates supplied known definitions
+ok 2 - inventory derives exact installed identities and separates supplied known definitions
+  ---
+  duration_ms: 823.246
+  ...
+# Subtest: both views expose repeated occurrence IDs with global and canonical point positions
+ok 3 - both views expose repeated occurrence IDs with global and canonical point positions
+  ---
+  duration_ms: 799.786708
+  ...
+# Subtest: owned file drift is reported without hiding healthy packages or repairing bytes
+ok 4 - owned file drift is reported without hiding healthy packages or repairing bytes
+  ---
+  duration_ms: 1323.953166
+  ...
+# Subtest: opaque malformed or changed registries are unavailable rather than trusted empty installs
+ok 5 - opaque malformed or changed registries are unavailable rather than trusted empty installs
+  ---
+  duration_ms: 754.325084
+  ...
+# Subtest: exact package removal preview lists all live occurrences and cancellation changes nothing
+ok 6 - exact package removal preview lists all live occurrences and cancellation changes nothing
+  ---
+  duration_ms: 831.468458
+  ...
+# Subtest: confirmed package removal atomically preserves core shared sources and history
+ok 7 - confirmed package removal atomically preserves core shared sources and history
+  ---
+  duration_ms: 1024.929
+  ...
+# Subtest: unbind and activation affect one occurrence while package uninstall remains strict
+ok 8 - unbind and activation affect one occurrence while package uninstall remains strict
+  ---
+  duration_ms: 1566.658375
+  ...
+# Subtest: unknown fuzzy IDs and dependent packages cannot silently cascade or select another package
+ok 9 - unknown fuzzy IDs and dependent packages cannot silently cascade or select another package
+  ---
+  duration_ms: 788.895792
+  ...
+# Subtest: removal applies only matching target digest and still-current registry consent
+ok 10 - removal applies only matching target digest and still-current registry consent
+  ---
+  duration_ms: 1683.27775
+  ...
+# Subtest: pending originals block removal and reconciled uninstall preserves frozen historical occurrences
+ok 11 - pending originals block removal and reconciled uninstall preserves frozen historical occurrences
+  ---
+  duration_ms: 1390.052791
+  ...
+# Subtest: frozen target associations and corrupt HC records remain explicit without claiming readiness
+ok 12 - frozen target associations and corrupt HC records remain explicit without claiming readiness
+  ---
+  duration_ms: 1440.364208
+  ...
+# Subtest: source CLI raw listing bypasses install selection and leaves a fresh target unchanged
+ok 13 - source CLI raw listing bypasses install selection and leaves a fresh target unchanged
+  ---
+  duration_ms: 337.658084
+  ...
+# Subtest: general installed manager lists installed plugins without source checkout or original acquisition files
+ok 14 - general installed manager lists installed plugins without source checkout or original acquisition files
+  ---
+  duration_ms: 1337.332125
+  ...
+# Subtest: web installed manager lists installed plugins without source checkout or original acquisition files
+ok 15 - web installed manager lists installed plugins without source checkout or original acquisition files
+  ---
+  duration_ms: 1338.543417
+  ...
+# Subtest: unity installed manager lists installed plugins without source checkout or original acquisition files
+ok 16 - unity installed manager lists installed plugins without source checkout or original acquisition files
+  ---
+  duration_ms: 1405.773833
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 17003.845667

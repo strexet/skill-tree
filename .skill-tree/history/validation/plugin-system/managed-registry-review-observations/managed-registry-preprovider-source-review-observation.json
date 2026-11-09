@@ -1,0 +1,9 @@
+{
+  "kind": "independent-controlled-preprovider-source-freshness-probe",
+  "private_callbacks": [
+    "provider"
+  ],
+  "error": "The original invocation declared source bytes changed; reconcile or explicitly retry against current sources",
+  "invocation_and_locator_unchanged": true,
+  "qualification": "Temporary controlled fixture; no real actor or provider invocation."
+}

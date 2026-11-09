@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import json
 import os
 import re
 import subprocess
@@ -68,11 +69,20 @@ def member_name(path: Path, root: Path, stamp: str, duplicate_basenames: set[str
 
 
 def candidates(root: Path, include: list[str] | None) -> list[Path]:
+    generated=[('.skill-tree','installation')]
+    declaration=root/'.skill-tree/config/repository.json'
+    if declaration.is_file():
+        data=json.loads(declaration.read_text())
+        if not isinstance(data,dict):raise ValueError('repository role requires an object')
+        if data.get('role')=='source':generated.append(('.skill-tree','skills'))
+    def excluded(path):
+        parts=path.relative_to(root).parts
+        return any(part in EXCLUDE_PARTS for part in parts) or any(parts[:len(prefix)]==prefix for prefix in generated)
     def permitted(path):
         resolved = path.resolve()
         if not resolved.is_relative_to(root):
             return False
-        return path.suffix == '.md' and not any(part in EXCLUDE_PARTS for part in path.relative_to(root).parts)
+        return path.suffix == '.md' and not excluded(path) and not excluded(resolved)
     tracked = sorted(path for path in tracked_markdown(root) if path.is_file() and permitted(path))
     if include is None:
         return [path for path in tracked if relevant(path, root)]
@@ -89,7 +99,7 @@ def candidates(root: Path, include: list[str] | None) -> list[Path]:
                 raise ValueError(f"snapshot scope requires permitted Markdown: {selection}")
             selected.add(path)  # Explicitly selected new files need not be tracked yet.
         elif path.is_dir():
-            if any(part in EXCLUDE_PARTS for part in path.relative_to(root).parts):
+            if excluded(path) or excluded(path.resolve()):
                 raise ValueError(f"snapshot scope is excluded: {selection}")
             members = [candidate for candidate in tracked if candidate.is_relative_to(path) and relevant(candidate, root)]
             if not members:

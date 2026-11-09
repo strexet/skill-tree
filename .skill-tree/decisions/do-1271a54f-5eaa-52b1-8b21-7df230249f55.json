@@ -1,0 +1,901 @@
+{
+  "acceptance": null,
+  "accepted_obligations": [
+    "4df8461f87f98036caf24bdc915cf020be7e9cf8c2bba2b82ab2fa61e6f8c2a3",
+    "58e08c376291f4a775e6065ed01008b09ad01c10324c2fd8f0b6d71859ba0e71"
+  ],
+  "actor_requests": {
+    "DA-6ca4e2c9-f678-4bf5-bfc2-d1c103f83383": {
+      "attempt_id": "DA-6ca4e2c9-f678-4bf5-bfc2-d1c103f83383",
+      "creation_evidence": {
+        "actor_context_id": "/root/composition119_plan_critic",
+        "actor_id": "/root/composition119_plan_critic",
+        "kind": "host-agent-created",
+        "provider": "Codex collaboration",
+        "reference": "Actual root tool creation /root/composition119_plan_critic; fresh fork_turns none, initially idle.",
+        "tool": "collaboration.spawn_agent"
+      },
+      "input": {
+        "actor": {
+          "context_id": "/root/composition119_plan_critic",
+          "id": "/root/composition119_plan_critic"
+        },
+        "authority": {
+          "allowed_kinds": [
+            "technical",
+            "product",
+            "specification-acceptance"
+          ],
+          "constraints": [
+            "Only the approved task and dependency scope. No source publication, remote, release, external trial, installation consent or actual native plugin execution. Required checks and real owner intent cannot be delegated away."
+          ],
+          "context_id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+          "evidence": {
+            "kind": "owner-message",
+            "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+          },
+          "id": "approved-composition119",
+          "revision": 1
+        },
+        "authority_digest": "d7cb4d3d704d0c3165dcf813b7e0e2e6bcc77c5be109348424e70163e8a4926e",
+        "context": {
+          "content_fingerprint": "700d5e255a05ea557b9a055859635cbd6ead6b478ed646b73ca99a79e3b5bfce",
+          "decision_purpose": "plan",
+          "execution_snapshot_digest": "974655dee91cee8a939f49fb78fe720a5c0631cf0e78d33b896eabe7e92e46a0",
+          "id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+          "kind": "task",
+          "orchestration_id": "DO-1271a54f-5eaa-52b1-8b21-7df230249f55",
+          "plan_digest": "a30b99e5ff90f6db95d5e5358e75168afb228cd2073c3ec2578b433ee9eddd32",
+          "required_checks_digest": "354d85eb182f77e55e32a7c87ae3311762fc5f81eeb2ff2ab5c1a3b8acb2df1d",
+          "semantic_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+          "task_ids": [
+            "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+          ]
+        },
+        "creation_evidence": {
+          "actor_context_id": "/root/composition119_plan_critic",
+          "actor_id": "/root/composition119_plan_critic",
+          "kind": "host-agent-created",
+          "provider": "Codex collaboration",
+          "reference": "Actual root tool creation /root/composition119_plan_critic; fresh fork_turns none, initially idle.",
+          "tool": "collaboration.spawn_agent"
+        },
+        "decision_hash": "1aa7177791539a52504405e63bf4acdce2b765ccd9ea270a02befcb2b93519bb",
+        "decision_id": "DG-f239f646-3dbb-59ce-9d93-f4314263e354",
+        "execution_snapshot": {
+          "common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+          "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+          "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+          "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+          "common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+          "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+          "common/scripts/workflow-state.py": "791531838c16c1b362ade3b086e66dfb804da20c06b8828b0e71f251a08b0c5e",
+          "owned-profile": "b94e943f4935b42712f668b194a7004b971e330dc9cc3f62955c338db6973271"
+        },
+        "mode": "auto",
+        "mode_epoch": 1,
+        "orchestration_id": "DO-1271a54f-5eaa-52b1-8b21-7df230249f55",
+        "orchestration_revision": 15,
+        "prior_role_results": {
+          "resolver": {
+            "actor": {
+              "context_id": "/root/composition119_plan_resolver",
+              "id": "/root/composition119_plan_resolver"
+            },
+            "evidence": {
+              "actor_context_id": "/root/composition119_plan_resolver",
+              "actor_id": "/root/composition119_plan_resolver",
+              "creation_reference": "Actual root tool creation /root/composition119_plan_resolver; fresh fork_turns none, initially idle.",
+              "kind": "delegated-agent",
+              "provider": "Codex collaboration",
+              "reference": "Actual /root/composition119_plan_resolver returned current v2 JSON in collaboration.final answer.",
+              "tool": "collaboration.followup_task"
+            },
+            "result": {
+              "answer": "accept",
+              "input_digest": "19e9b18a1ba08be9f0d8d012a80163520304727ee35d451a5a306b35c64b16b7",
+              "rationale": "The current sealed plan retains the task-119 scope, architecture, validation obligations and authority boundaries previously assessed. Replacing 'this plan' with 'the composition plan' makes the entity explicit without changing behavior or authorization. No material revision is required.",
+              "status": "answered"
+            },
+            "status": "answered"
+          }
+        },
+        "question": {
+          "id": "composition119-plan",
+          "kind": "specification-acceptance",
+          "options": [
+            {
+              "id": "accept",
+              "text": "Accept the current plan."
+            },
+            {
+              "id": "revise",
+              "text": "Revise the plan with concrete reasons."
+            }
+          ],
+          "plan_text": "# Standalone Plugin Composition Plan\n\n## Authorized result\n\nTask T-a9d7a827-fb25-4348-bcf7-867a449c58ef composes selected verified external plugin resources and ordered occurrences into registered operations. Composition remains offline and preserves core W1 authority and phases. Task 118 owns persisted native invocation and result receipts; task 117 owns live registry management. A composed boundary without a qualified executor exposes a prerequisite rather than claiming a plugin ran.\n\n## Implementation\n\n1. Add a focused plugin-composition module using the existing registry, binding and parameter APIs. Avoid importing lifecycle into composer because lifecycle already depends on installation and composer.\n2. Define executable owned before/during/after boundaries for the dynamically registered operation catalog and explicit W2 named aliases. Verify owner/version/context contracts; bind real selected Pending IDs before promotion and implementation During to the draft-plan phase before current acceptance and source edits.\n3. Resolve only verified owned registry/package inputs and selected operation bindings. Compose an operation-local ordered manifest plus one byte-preserving upstream/overlay resource closure per selected package. A-to-B-to-A remains three distinct binding rows with independent parameters; package-copy sharing never deduplicates occurrence execution.\n4. Make package content maps and hashing binary-safe. Retain strings for generated instructions and original Buffers for external resources. Preserve original BOM/binary bytes and keep raw upstream instructions separate from owned prose and generated entry points.\n5. Include registry, selected revisions/resources/order/configuration in profile and maintenance freshness identities. Preserve immutable parked configurations and stopped installation/admission barriers. Do not acquire packages, execute upstream helpers or refresh active runs during composition.\n6. Bundle only the necessary operation-local helper/reference closure through the resource map. Copy-only fixtures must run boundary preparation without the source or sibling installation. Missing native capabilities and unqualified invocation remain explicit unavailable prerequisites.\n7. Update the invocation and system contracts with current composed behavior and honest remaining task-118 qualification limits. Generate representative resources only through the canonical synchronizer.\n\n## Validation and review\n\nRequirements-led Node tests cover all three flavors, core-only zero holds, dynamic later operation registration, selected closure isolation, exact occurrence order/parameters, real Pending and draft-plan guards, missing capabilities, immutable freshness, sentinel non-execution, ownership/path/alias failures and exact copied BOM/binary bytes without source/siblings. Focused Red precedes implementation. Required checks: standalone-plugin-composition, sync-check, strict-validation, python, node, installer-list, installer-dry-run and diff-check. Independent full-diff review follows passing current checks; accepted findings require fixes and re-review.\n\n## Boundaries\n\nNo manager operation is registered early; the current count remains ten. No plugin comparative trial, installation consent, external Skill execution, browser/Unity product action, publication, source merge, remote push or release is authorized by the composition plan. The owner-authorized local source integration remains the controller tail after every admitted unit qualifies.\n",
+          "recommendation": "accept",
+          "significance": "significant",
+          "text": "Accept the exact approved-scope composition plan, or request a bounded revision."
+        },
+        "role": "critic",
+        "role_receipts": {
+          "resolver": "d5dfe7ddf30e922f70fb56ae554302ec0630faefb245e7cd96153bbc51ac595d"
+        },
+        "schema": 1
+      },
+      "input_digest": "20571ec4b589e7a49ce2d72186c6e4fc7f819d755249f1f2ae161251aab197a9"
+    },
+    "DA-6f186f6f-7880-455e-98bc-a6d7f2d95520": {
+      "attempt_id": "DA-6f186f6f-7880-455e-98bc-a6d7f2d95520",
+      "creation_evidence": {
+        "actor_context_id": "/root/composition119_plan_critic",
+        "actor_id": "/root/composition119_plan_critic",
+        "kind": "host-agent-created",
+        "provider": "Codex collaboration",
+        "reference": "Actual root tool creation /root/composition119_plan_critic; fresh fork_turns none, initially idle.",
+        "tool": "collaboration.spawn_agent"
+      },
+      "input": {
+        "actor": {
+          "context_id": "/root/composition119_plan_critic",
+          "id": "/root/composition119_plan_critic"
+        },
+        "authority": {
+          "allowed_kinds": [
+            "technical",
+            "product",
+            "specification-acceptance"
+          ],
+          "constraints": [
+            "Only the approved task and dependency scope. No source publication, remote, release, external trial, installation consent or actual native plugin execution. Required checks and real owner intent cannot be delegated away."
+          ],
+          "context_id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+          "evidence": {
+            "kind": "owner-message",
+            "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+          },
+          "id": "approved-composition119",
+          "revision": 1
+        },
+        "authority_digest": "d7cb4d3d704d0c3165dcf813b7e0e2e6bcc77c5be109348424e70163e8a4926e",
+        "context": {
+          "content_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+          "decision_purpose": "plan",
+          "execution_snapshot_digest": "974655dee91cee8a939f49fb78fe720a5c0631cf0e78d33b896eabe7e92e46a0",
+          "id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+          "kind": "task",
+          "orchestration_id": "DO-1271a54f-5eaa-52b1-8b21-7df230249f55",
+          "plan_digest": "f2e114a3b27fb58ce878e31d95b8c78215819cf72ceb776488e724d0f2a5e138",
+          "required_checks_digest": "354d85eb182f77e55e32a7c87ae3311762fc5f81eeb2ff2ab5c1a3b8acb2df1d",
+          "semantic_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+          "task_ids": [
+            "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+          ]
+        },
+        "creation_evidence": {
+          "actor_context_id": "/root/composition119_plan_critic",
+          "actor_id": "/root/composition119_plan_critic",
+          "kind": "host-agent-created",
+          "provider": "Codex collaboration",
+          "reference": "Actual root tool creation /root/composition119_plan_critic; fresh fork_turns none, initially idle.",
+          "tool": "collaboration.spawn_agent"
+        },
+        "decision_hash": "3e7db617490f03c2c11ad1a68b79f25cdd4d535cbbeb786874e04afa99959835",
+        "decision_id": "DG-dc4f2119-3467-5f45-8484-f321e043e406",
+        "execution_snapshot": {
+          "common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+          "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+          "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+          "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+          "common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+          "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+          "common/scripts/workflow-state.py": "791531838c16c1b362ade3b086e66dfb804da20c06b8828b0e71f251a08b0c5e",
+          "owned-profile": "b94e943f4935b42712f668b194a7004b971e330dc9cc3f62955c338db6973271"
+        },
+        "mode": "auto",
+        "mode_epoch": 1,
+        "orchestration_id": "DO-1271a54f-5eaa-52b1-8b21-7df230249f55",
+        "orchestration_revision": 6,
+        "prior_role_results": {
+          "resolver": {
+            "actor": {
+              "context_id": "/root/composition119_plan_resolver",
+              "id": "/root/composition119_plan_resolver"
+            },
+            "evidence": {
+              "actor_context_id": "/root/composition119_plan_resolver",
+              "actor_id": "/root/composition119_plan_resolver",
+              "creation_reference": "Actual root tool creation /root/composition119_plan_resolver; fresh fork_turns none, initially idle.",
+              "kind": "delegated-agent",
+              "provider": "Codex collaboration",
+              "reference": "Actual /root/composition119_plan_resolver returned JSON in collaboration.final answer.",
+              "tool": "collaboration.followup_task"
+            },
+            "result": {
+              "answer": "accept",
+              "input_digest": "08dad83896348f65c7da14d61fe6d019947528744b8ad939485dafd8cba1ed58",
+              "rationale": "The plan covers task 119's registered operation anchors, real Pending and draft-plan guards, standalone resource closure, ordered independent occurrences, and configuration freshness across all three flavors. Reusing registry verification, binding and parameter APIs fits current contracts; avoiding lifecycle imports prevents the existing installation/composer dependency cycle. Core W1 governance retains plan-change invalidation and current acceptance before source edits. Native invocation receipts remain task 118's responsibility, and later manager registration remains supported without an early eleven-operation claim. No material revision is required.",
+              "status": "answered"
+            },
+            "status": "answered"
+          }
+        },
+        "question": {
+          "id": "composition119-plan",
+          "kind": "specification-acceptance",
+          "options": [
+            {
+              "id": "accept",
+              "text": "Accept the current plan."
+            },
+            {
+              "id": "revise",
+              "text": "Revise the plan with concrete reasons."
+            }
+          ],
+          "plan_text": "# Standalone Plugin Composition Plan\n\n## Authorized result\n\nTask T-a9d7a827-fb25-4348-bcf7-867a449c58ef composes selected verified external plugin resources and ordered occurrences into registered operations. Composition remains offline and preserves core W1 authority and phases. Task 118 owns persisted native invocation and result receipts; task 117 owns live registry management. A composed boundary without a qualified executor exposes a prerequisite rather than claiming a plugin ran.\n\n## Implementation\n\n1. Add a focused plugin-composition module using the existing registry, binding and parameter APIs. Avoid importing lifecycle into composer because lifecycle already depends on installation and composer.\n2. Define executable owned before/during/after boundaries for the dynamically registered operation catalog and explicit W2 named aliases. Verify owner/version/context contracts; bind real selected Pending IDs before promotion and implementation During to the draft-plan phase before current acceptance and source edits.\n3. Resolve only verified owned registry/package inputs and selected operation bindings. Compose an operation-local ordered manifest plus one byte-preserving upstream/overlay resource closure per selected package. A-to-B-to-A remains three distinct binding rows with independent parameters; package-copy sharing never deduplicates occurrence execution.\n4. Make package content maps and hashing binary-safe. Retain strings for generated instructions and original Buffers for external resources. Preserve original BOM/binary bytes and keep raw upstream instructions separate from owned prose and generated entry points.\n5. Include registry, selected revisions/resources/order/configuration in profile and maintenance freshness identities. Preserve immutable parked configurations and stopped installation/admission barriers. Do not acquire packages, execute upstream helpers or refresh active runs during composition.\n6. Bundle only the necessary operation-local helper/reference closure through the resource map. Copy-only fixtures must run boundary preparation without the source or sibling installation. Missing native capabilities and unqualified invocation remain explicit unavailable prerequisites.\n7. Update the invocation and system contracts with current composed behavior and honest remaining task-118 qualification limits. Generate representative resources only through the canonical synchronizer.\n\n## Validation and review\n\nRequirements-led Node tests cover all three flavors, core-only zero holds, dynamic later operation registration, selected closure isolation, exact occurrence order/parameters, real Pending and draft-plan guards, missing capabilities, immutable freshness, sentinel non-execution, ownership/path/alias failures and exact copied BOM/binary bytes without source/siblings. Focused Red precedes implementation. Required checks: standalone-plugin-composition, sync-check, strict-validation, python, node, installer-list, installer-dry-run and diff-check. Independent full-diff review follows passing current checks; accepted findings require fixes and re-review.\n\n## Boundaries\n\nNo manager operation is registered early; the current count remains ten. No plugin comparative trial, installation consent, external Skill execution, browser/Unity product action, publication, source merge, remote push or release is authorized by this plan. The owner-authorized local source integration remains the controller tail after every admitted unit qualifies.\n",
+          "recommendation": "accept",
+          "significance": "significant",
+          "text": "Accept the exact approved-scope composition plan, or request a bounded revision."
+        },
+        "role": "critic",
+        "role_receipts": {
+          "resolver": "ab426d255d848b8212d8fc4c94d2ebcee0e5203e8b2d5e022639ed4575ef79c6"
+        },
+        "schema": 1
+      },
+      "input_digest": "8d5d802d8fc4b5f05e452b2c2a111ef8e4befeb3e07406422c593c186c2ea47a"
+    },
+    "DA-7df63e06-6a6e-48a7-b1fb-40c3eaf7b63e": {
+      "attempt_id": "DA-7df63e06-6a6e-48a7-b1fb-40c3eaf7b63e",
+      "creation_evidence": {
+        "actor_context_id": "/root/composition119_plan_resolver",
+        "actor_id": "/root/composition119_plan_resolver",
+        "kind": "host-agent-created",
+        "provider": "Codex collaboration",
+        "reference": "Actual root tool creation /root/composition119_plan_resolver; fresh fork_turns none, initially idle.",
+        "tool": "collaboration.spawn_agent"
+      },
+      "input": {
+        "actor": {
+          "context_id": "/root/composition119_plan_resolver",
+          "id": "/root/composition119_plan_resolver"
+        },
+        "authority": {
+          "allowed_kinds": [
+            "technical",
+            "product",
+            "specification-acceptance"
+          ],
+          "constraints": [
+            "Only the approved task and dependency scope. No source publication, remote, release, external trial, installation consent or actual native plugin execution. Required checks and real owner intent cannot be delegated away."
+          ],
+          "context_id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+          "evidence": {
+            "kind": "owner-message",
+            "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+          },
+          "id": "approved-composition119",
+          "revision": 1
+        },
+        "authority_digest": "d7cb4d3d704d0c3165dcf813b7e0e2e6bcc77c5be109348424e70163e8a4926e",
+        "context": {
+          "content_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+          "decision_purpose": "plan",
+          "execution_snapshot_digest": "974655dee91cee8a939f49fb78fe720a5c0631cf0e78d33b896eabe7e92e46a0",
+          "id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+          "kind": "task",
+          "orchestration_id": "DO-1271a54f-5eaa-52b1-8b21-7df230249f55",
+          "plan_digest": "f2e114a3b27fb58ce878e31d95b8c78215819cf72ceb776488e724d0f2a5e138",
+          "required_checks_digest": "354d85eb182f77e55e32a7c87ae3311762fc5f81eeb2ff2ab5c1a3b8acb2df1d",
+          "semantic_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+          "task_ids": [
+            "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+          ]
+        },
+        "creation_evidence": {
+          "actor_context_id": "/root/composition119_plan_resolver",
+          "actor_id": "/root/composition119_plan_resolver",
+          "kind": "host-agent-created",
+          "provider": "Codex collaboration",
+          "reference": "Actual root tool creation /root/composition119_plan_resolver; fresh fork_turns none, initially idle.",
+          "tool": "collaboration.spawn_agent"
+        },
+        "decision_hash": "7eeba8b21042cb7455f2b64de6fe09bafb76b2b7f3e53175d7c9ac17e1d308d5",
+        "decision_id": "DG-dc4f2119-3467-5f45-8484-f321e043e406",
+        "execution_snapshot": {
+          "common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+          "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+          "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+          "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+          "common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+          "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+          "common/scripts/workflow-state.py": "791531838c16c1b362ade3b086e66dfb804da20c06b8828b0e71f251a08b0c5e",
+          "owned-profile": "b94e943f4935b42712f668b194a7004b971e330dc9cc3f62955c338db6973271"
+        },
+        "mode": "auto",
+        "mode_epoch": 1,
+        "orchestration_id": "DO-1271a54f-5eaa-52b1-8b21-7df230249f55",
+        "orchestration_revision": 4,
+        "prior_role_results": {},
+        "question": {
+          "id": "composition119-plan",
+          "kind": "specification-acceptance",
+          "options": [
+            {
+              "id": "accept",
+              "text": "Accept the current plan."
+            },
+            {
+              "id": "revise",
+              "text": "Revise the plan with concrete reasons."
+            }
+          ],
+          "plan_text": "# Standalone Plugin Composition Plan\n\n## Authorized result\n\nTask T-a9d7a827-fb25-4348-bcf7-867a449c58ef composes selected verified external plugin resources and ordered occurrences into registered operations. Composition remains offline and preserves core W1 authority and phases. Task 118 owns persisted native invocation and result receipts; task 117 owns live registry management. A composed boundary without a qualified executor exposes a prerequisite rather than claiming a plugin ran.\n\n## Implementation\n\n1. Add a focused plugin-composition module using the existing registry, binding and parameter APIs. Avoid importing lifecycle into composer because lifecycle already depends on installation and composer.\n2. Define executable owned before/during/after boundaries for the dynamically registered operation catalog and explicit W2 named aliases. Verify owner/version/context contracts; bind real selected Pending IDs before promotion and implementation During to the draft-plan phase before current acceptance and source edits.\n3. Resolve only verified owned registry/package inputs and selected operation bindings. Compose an operation-local ordered manifest plus one byte-preserving upstream/overlay resource closure per selected package. A-to-B-to-A remains three distinct binding rows with independent parameters; package-copy sharing never deduplicates occurrence execution.\n4. Make package content maps and hashing binary-safe. Retain strings for generated instructions and original Buffers for external resources. Preserve original BOM/binary bytes and keep raw upstream instructions separate from owned prose and generated entry points.\n5. Include registry, selected revisions/resources/order/configuration in profile and maintenance freshness identities. Preserve immutable parked configurations and stopped installation/admission barriers. Do not acquire packages, execute upstream helpers or refresh active runs during composition.\n6. Bundle only the necessary operation-local helper/reference closure through the resource map. Copy-only fixtures must run boundary preparation without the source or sibling installation. Missing native capabilities and unqualified invocation remain explicit unavailable prerequisites.\n7. Update the invocation and system contracts with current composed behavior and honest remaining task-118 qualification limits. Generate representative resources only through the canonical synchronizer.\n\n## Validation and review\n\nRequirements-led Node tests cover all three flavors, core-only zero holds, dynamic later operation registration, selected closure isolation, exact occurrence order/parameters, real Pending and draft-plan guards, missing capabilities, immutable freshness, sentinel non-execution, ownership/path/alias failures and exact copied BOM/binary bytes without source/siblings. Focused Red precedes implementation. Required checks: standalone-plugin-composition, sync-check, strict-validation, python, node, installer-list, installer-dry-run and diff-check. Independent full-diff review follows passing current checks; accepted findings require fixes and re-review.\n\n## Boundaries\n\nNo manager operation is registered early; the current count remains ten. No plugin comparative trial, installation consent, external Skill execution, browser/Unity product action, publication, source merge, remote push or release is authorized by this plan. The owner-authorized local source integration remains the controller tail after every admitted unit qualifies.\n",
+          "recommendation": "accept",
+          "significance": "significant",
+          "text": "Accept the exact approved-scope composition plan, or request a bounded revision."
+        },
+        "role": "resolver",
+        "role_receipts": {},
+        "schema": 1
+      },
+      "input_digest": "08dad83896348f65c7da14d61fe6d019947528744b8ad939485dafd8cba1ed58"
+    },
+    "DA-9d6f3e6b-e8e7-48a2-a1c5-d57c30d141ef": {
+      "attempt_id": "DA-9d6f3e6b-e8e7-48a2-a1c5-d57c30d141ef",
+      "creation_evidence": {
+        "actor_context_id": "/root/composition119_plan_resolver",
+        "actor_id": "/root/composition119_plan_resolver",
+        "kind": "host-agent-created",
+        "provider": "Codex collaboration",
+        "reference": "Actual root tool creation /root/composition119_plan_resolver; fresh fork_turns none, initially idle.",
+        "tool": "collaboration.spawn_agent"
+      },
+      "input": {
+        "actor": {
+          "context_id": "/root/composition119_plan_resolver",
+          "id": "/root/composition119_plan_resolver"
+        },
+        "authority": {
+          "allowed_kinds": [
+            "technical",
+            "product",
+            "specification-acceptance"
+          ],
+          "constraints": [
+            "Only the approved task and dependency scope. No source publication, remote, release, external trial, installation consent or actual native plugin execution. Required checks and real owner intent cannot be delegated away."
+          ],
+          "context_id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+          "evidence": {
+            "kind": "owner-message",
+            "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+          },
+          "id": "approved-composition119",
+          "revision": 1
+        },
+        "authority_digest": "d7cb4d3d704d0c3165dcf813b7e0e2e6bcc77c5be109348424e70163e8a4926e",
+        "context": {
+          "content_fingerprint": "700d5e255a05ea557b9a055859635cbd6ead6b478ed646b73ca99a79e3b5bfce",
+          "decision_purpose": "plan",
+          "execution_snapshot_digest": "974655dee91cee8a939f49fb78fe720a5c0631cf0e78d33b896eabe7e92e46a0",
+          "id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+          "kind": "task",
+          "orchestration_id": "DO-1271a54f-5eaa-52b1-8b21-7df230249f55",
+          "plan_digest": "a30b99e5ff90f6db95d5e5358e75168afb228cd2073c3ec2578b433ee9eddd32",
+          "required_checks_digest": "354d85eb182f77e55e32a7c87ae3311762fc5f81eeb2ff2ab5c1a3b8acb2df1d",
+          "semantic_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+          "task_ids": [
+            "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+          ]
+        },
+        "creation_evidence": {
+          "actor_context_id": "/root/composition119_plan_resolver",
+          "actor_id": "/root/composition119_plan_resolver",
+          "kind": "host-agent-created",
+          "provider": "Codex collaboration",
+          "reference": "Actual root tool creation /root/composition119_plan_resolver; fresh fork_turns none, initially idle.",
+          "tool": "collaboration.spawn_agent"
+        },
+        "decision_hash": "cbb0e3c8348b0e3d79f24eeb7aca68d5781644ea541af9402d4d3492219977ab",
+        "decision_id": "DG-f239f646-3dbb-59ce-9d93-f4314263e354",
+        "execution_snapshot": {
+          "common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+          "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+          "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+          "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+          "common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+          "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+          "common/scripts/workflow-state.py": "791531838c16c1b362ade3b086e66dfb804da20c06b8828b0e71f251a08b0c5e",
+          "owned-profile": "b94e943f4935b42712f668b194a7004b971e330dc9cc3f62955c338db6973271"
+        },
+        "mode": "auto",
+        "mode_epoch": 1,
+        "orchestration_id": "DO-1271a54f-5eaa-52b1-8b21-7df230249f55",
+        "orchestration_revision": 13,
+        "prior_role_results": {},
+        "question": {
+          "id": "composition119-plan",
+          "kind": "specification-acceptance",
+          "options": [
+            {
+              "id": "accept",
+              "text": "Accept the current plan."
+            },
+            {
+              "id": "revise",
+              "text": "Revise the plan with concrete reasons."
+            }
+          ],
+          "plan_text": "# Standalone Plugin Composition Plan\n\n## Authorized result\n\nTask T-a9d7a827-fb25-4348-bcf7-867a449c58ef composes selected verified external plugin resources and ordered occurrences into registered operations. Composition remains offline and preserves core W1 authority and phases. Task 118 owns persisted native invocation and result receipts; task 117 owns live registry management. A composed boundary without a qualified executor exposes a prerequisite rather than claiming a plugin ran.\n\n## Implementation\n\n1. Add a focused plugin-composition module using the existing registry, binding and parameter APIs. Avoid importing lifecycle into composer because lifecycle already depends on installation and composer.\n2. Define executable owned before/during/after boundaries for the dynamically registered operation catalog and explicit W2 named aliases. Verify owner/version/context contracts; bind real selected Pending IDs before promotion and implementation During to the draft-plan phase before current acceptance and source edits.\n3. Resolve only verified owned registry/package inputs and selected operation bindings. Compose an operation-local ordered manifest plus one byte-preserving upstream/overlay resource closure per selected package. A-to-B-to-A remains three distinct binding rows with independent parameters; package-copy sharing never deduplicates occurrence execution.\n4. Make package content maps and hashing binary-safe. Retain strings for generated instructions and original Buffers for external resources. Preserve original BOM/binary bytes and keep raw upstream instructions separate from owned prose and generated entry points.\n5. Include registry, selected revisions/resources/order/configuration in profile and maintenance freshness identities. Preserve immutable parked configurations and stopped installation/admission barriers. Do not acquire packages, execute upstream helpers or refresh active runs during composition.\n6. Bundle only the necessary operation-local helper/reference closure through the resource map. Copy-only fixtures must run boundary preparation without the source or sibling installation. Missing native capabilities and unqualified invocation remain explicit unavailable prerequisites.\n7. Update the invocation and system contracts with current composed behavior and honest remaining task-118 qualification limits. Generate representative resources only through the canonical synchronizer.\n\n## Validation and review\n\nRequirements-led Node tests cover all three flavors, core-only zero holds, dynamic later operation registration, selected closure isolation, exact occurrence order/parameters, real Pending and draft-plan guards, missing capabilities, immutable freshness, sentinel non-execution, ownership/path/alias failures and exact copied BOM/binary bytes without source/siblings. Focused Red precedes implementation. Required checks: standalone-plugin-composition, sync-check, strict-validation, python, node, installer-list, installer-dry-run and diff-check. Independent full-diff review follows passing current checks; accepted findings require fixes and re-review.\n\n## Boundaries\n\nNo manager operation is registered early; the current count remains ten. No plugin comparative trial, installation consent, external Skill execution, browser/Unity product action, publication, source merge, remote push or release is authorized by the composition plan. The owner-authorized local source integration remains the controller tail after every admitted unit qualifies.\n",
+          "recommendation": "accept",
+          "significance": "significant",
+          "text": "Accept the exact approved-scope composition plan, or request a bounded revision."
+        },
+        "role": "resolver",
+        "role_receipts": {},
+        "schema": 1
+      },
+      "input_digest": "19e9b18a1ba08be9f0d8d012a80163520304727ee35d451a5a306b35c64b16b7"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the approved task and dependency scope. No source publication, remote, release, external trial, installation consent or actual native plugin execution. Required checks and real owner intent cannot be delegated away."
+    ],
+    "context_id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+    },
+    "id": "approved-composition119",
+    "revision": 1
+  },
+  "capabilities": {
+    "independent_actors": true
+  },
+  "checks": {
+    "identity": {
+      "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "head": "678aab048643da13512e0d1878d59c655d8077cd",
+      "source_digest": "f16fa26ccd25bd5c746325096a20f7eca11f9f188d9443b37902c67dddc5c7e1"
+    },
+    "passed": true,
+    "required_checks_digest": "354d85eb182f77e55e32a7c87ae3311762fc5f81eeb2ff2ab5c1a3b8acb2df1d",
+    "results": [
+      {
+        "id": "standalone-plugin-composition",
+        "reference": ".skill-tree/history/validation/plugin-system/t-a9d7a827-fb25-4348-bcf7-867a449c58ef-standalone-plugin-composition-c-a37a1c10-b484-4df0-8530-f3cef3ec3123.json",
+        "status": "passed"
+      },
+      {
+        "id": "sync-check",
+        "reference": ".skill-tree/history/validation/plugin-system/composition119-sync-check.txt",
+        "status": "passed"
+      },
+      {
+        "id": "strict-validation",
+        "reference": ".skill-tree/history/validation/plugin-system/composition119-validate.txt",
+        "status": "passed"
+      },
+      {
+        "id": "python",
+        "reference": ".skill-tree/history/validation/plugin-system/composition119-all-python.txt",
+        "status": "passed"
+      },
+      {
+        "id": "node",
+        "reference": ".skill-tree/history/validation/plugin-system/composition119-all-node.txt",
+        "status": "passed"
+      },
+      {
+        "id": "installer-list",
+        "reference": ".skill-tree/history/validation/plugin-system/composition119-list.txt",
+        "status": "passed"
+      },
+      {
+        "id": "installer-dry-run",
+        "reference": ".skill-tree/history/validation/plugin-system/composition119-dry-run.txt",
+        "status": "passed"
+      },
+      {
+        "id": "diff-check",
+        "reference": ".skill-tree/history/validation/plugin-system/composition119-diff-check.txt",
+        "status": "passed"
+      }
+    ]
+  },
+  "context": {
+    "content_fingerprint": "700d5e255a05ea557b9a055859635cbd6ead6b478ed646b73ca99a79e3b5bfce",
+    "id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+    "kind": "task",
+    "semantic_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+    "task_ids": [
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+    ]
+  },
+  "execution_snapshot": {
+    "common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+    "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+    "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+    "common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+    "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+    "common/scripts/workflow-state.py": "791531838c16c1b362ade3b086e66dfb804da20c06b8828b0e71f251a08b0c5e",
+    "owned-profile": "b94e943f4935b42712f668b194a7004b971e330dc9cc3f62955c338db6973271"
+  },
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "failure_observations": [],
+  "history": [
+    {
+      "detail": {},
+      "event": "start",
+      "phase": "research",
+      "previous_frame_hash": null,
+      "sequence": 1
+    },
+    {
+      "detail": {},
+      "event": "research",
+      "phase": "plan",
+      "previous_frame_hash": "9469476e01d23051739f2501e3de10cf4dd086ad4752dbb959846aa32238dab5",
+      "sequence": 2
+    },
+    {
+      "detail": {
+        "previous_acceptance": null,
+        "previous_plan": null
+      },
+      "event": "plan",
+      "phase": "plan-review",
+      "previous_frame_hash": "a12ecad65a8a30fa4e8a021804e0e04c921896ef6ac750eac42bf140a0334e52",
+      "sequence": 3
+    },
+    {
+      "detail": {
+        "decision_id": "DG-dc4f2119-3467-5f45-8484-f321e043e406",
+        "purpose": "plan"
+      },
+      "event": "question",
+      "phase": "plan-review",
+      "previous_frame_hash": "fda594217203be8b5b5e4e9a438a9f87364120f1471a809993a0f2b234cbd66d",
+      "sequence": 4
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-7df63e06-6a6e-48a7-b1fb-40c3eaf7b63e",
+        "input_digest": "08dad83896348f65c7da14d61fe6d019947528744b8ad939485dafd8cba1ed58"
+      },
+      "event": "prepare-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "98b10a5c4add4a4dfd39ce5441844443441d75b5af40cb429d70cbbcf14000cd",
+      "sequence": 5
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-7df63e06-6a6e-48a7-b1fb-40c3eaf7b63e",
+        "status": "answered"
+      },
+      "event": "record-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "a2f9925bcde85f5ba3441e2329d9e9a9b8bde56153151164086c50c87d6abf05",
+      "sequence": 6
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-6f186f6f-7880-455e-98bc-a6d7f2d95520",
+        "input_digest": "8d5d802d8fc4b5f05e452b2c2a111ef8e4befeb3e07406422c593c186c2ea47a"
+      },
+      "event": "prepare-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "25b5c5ddc4bab9fef031160ecc8c48a7ac9dbe17d4a45424bcfa3439f3bf59fa",
+      "sequence": 7
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-6f186f6f-7880-455e-98bc-a6d7f2d95520",
+        "status": "agree"
+      },
+      "event": "record-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "04fd191ebee69ffaa7af9e57e28ad59d553977e4a32532a800f22746c07d5931",
+      "sequence": 8
+    },
+    {
+      "detail": {
+        "acceptance_digest": "109c56c40a389b964d16b4427aa35fba58492003a2e2757e8cb57972f25a4ad7",
+        "decision_id": "DG-dc4f2119-3467-5f45-8484-f321e043e406"
+      },
+      "event": "accept-decision",
+      "phase": "plan-review",
+      "previous_frame_hash": "572ff09ce0be93cac5b486feb21b9411d2d6f46c0472251ce42a3e4bb2820aef",
+      "sequence": 9
+    },
+    {
+      "detail": {},
+      "event": "accept-plan",
+      "phase": "implement",
+      "previous_frame_hash": "308cb7f51734e6437336b5151ab6b3fd098bef6791890189c32d5ddb103279a0",
+      "sequence": 10
+    },
+    {
+      "detail": {
+        "previous_context": {
+          "content_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+          "id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+          "kind": "task",
+          "semantic_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+          "task_ids": [
+            "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+          ]
+        }
+      },
+      "event": "resume",
+      "phase": "implement",
+      "previous_frame_hash": "7f1af06e5714fed22005ba55b34b2b97e0039d94f2da391bba2e5edf9a06b05b",
+      "sequence": 11
+    },
+    {
+      "detail": {
+        "previous_acceptance": {
+          "actor": {
+            "context_id": "/root/composition119_plan_resolver",
+            "id": "/root/composition119_plan_resolver"
+          },
+          "answer": "accept",
+          "attempt_id": "DA-7df63e06-6a6e-48a7-b1fb-40c3eaf7b63e",
+          "authority_digest": "d7cb4d3d704d0c3165dcf813b7e0e2e6bcc77c5be109348424e70163e8a4926e",
+          "context_identity": {
+            "decision_purpose": "plan",
+            "execution_snapshot_digest": "974655dee91cee8a939f49fb78fe720a5c0631cf0e78d33b896eabe7e92e46a0",
+            "id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+            "kind": "task",
+            "orchestration_id": "DO-1271a54f-5eaa-52b1-8b21-7df230249f55",
+            "plan_digest": "f2e114a3b27fb58ce878e31d95b8c78215819cf72ceb776488e724d0f2a5e138",
+            "required_checks_digest": "354d85eb182f77e55e32a7c87ae3311762fc5f81eeb2ff2ab5c1a3b8acb2df1d",
+            "task_ids": [
+              "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+            ]
+          },
+          "decision_id": "DG-dc4f2119-3467-5f45-8484-f321e043e406",
+          "digest": "109c56c40a389b964d16b4427aa35fba58492003a2e2757e8cb57972f25a4ad7",
+          "kind": "specification-acceptance",
+          "mode": "auto",
+          "mode_epoch": 1,
+          "origin": {
+            "actor_context_id": "/root/composition119_plan_resolver",
+            "actor_id": "/root/composition119_plan_resolver",
+            "creation_reference": "Actual root tool creation /root/composition119_plan_resolver; fresh fork_turns none, initially idle.",
+            "kind": "delegated-agent",
+            "provider": "Codex collaboration",
+            "reference": "Actual /root/composition119_plan_resolver returned JSON in collaboration.final answer.",
+            "tool": "collaboration.followup_task"
+          },
+          "question_digest": "f4a95579d070902ca9d8ff74ff41fdc25a501ffb7228cd1172d5084398432ed9",
+          "question_id": "composition119-plan",
+          "rationale": "The plan covers task 119's registered operation anchors, real Pending and draft-plan guards, standalone resource closure, ordered independent occurrences, and configuration freshness across all three flavors. Reusing registry verification, binding and parameter APIs fits current contracts; avoiding lifecycle imports prevents the existing installation/composer dependency cycle. Core W1 governance retains plan-change invalidation and current acceptance before source edits. Native invocation receipts remain task 118's responsibility, and later manager registration remains supported without an early eleven-operation claim. No material revision is required.",
+          "role_receipts": {
+            "critic": "95c0bf4c718fb8d5ee16cea3c3e3781b4773484b0d213d958ff0f1d7e6594d00",
+            "resolver": "ab426d255d848b8212d8fc4c94d2ebcee0e5203e8b2d5e022639ed4575ef79c6"
+          },
+          "semantic_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427"
+        },
+        "previous_plan": {
+          "digest": "f2e114a3b27fb58ce878e31d95b8c78215819cf72ceb776488e724d0f2a5e138",
+          "reference": ".skill-tree/history/research/composition119-plan.md",
+          "required_checks": [
+            "standalone-plugin-composition",
+            "sync-check",
+            "strict-validation",
+            "python",
+            "node",
+            "installer-list",
+            "installer-dry-run",
+            "diff-check"
+          ]
+        }
+      },
+      "event": "plan",
+      "phase": "plan-review",
+      "previous_frame_hash": "e5fb536162309a1c86728ce3db6e34188fa23236f4cb0c0bf5b05f8070df1702",
+      "sequence": 12
+    },
+    {
+      "detail": {
+        "decision_id": "DG-f239f646-3dbb-59ce-9d93-f4314263e354",
+        "purpose": "plan"
+      },
+      "event": "question",
+      "phase": "plan-review",
+      "previous_frame_hash": "12a9ac011ee6836b69e363c146ba0a0ca2fd599d508ddc36cb9cddf544423730",
+      "sequence": 13
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-9d6f3e6b-e8e7-48a2-a1c5-d57c30d141ef",
+        "input_digest": "19e9b18a1ba08be9f0d8d012a80163520304727ee35d451a5a306b35c64b16b7"
+      },
+      "event": "prepare-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "d80be486bbffc0508a585c4433f65c9a19541617dad858a4982ba274cc107580",
+      "sequence": 14
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-9d6f3e6b-e8e7-48a2-a1c5-d57c30d141ef",
+        "status": "answered"
+      },
+      "event": "record-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "c98ac06b17efaefcbae900ec156a572ad368a0802bb13d47d773bd994096352b",
+      "sequence": 15
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-6ca4e2c9-f678-4bf5-bfc2-d1c103f83383",
+        "input_digest": "20571ec4b589e7a49ce2d72186c6e4fc7f819d755249f1f2ae161251aab197a9"
+      },
+      "event": "prepare-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "73b4408b7f492b963774cebc3ea3552b28a2273d0214a86fb8fdcfbbe45f568f",
+      "sequence": 16
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-6ca4e2c9-f678-4bf5-bfc2-d1c103f83383",
+        "status": "agree"
+      },
+      "event": "record-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "0791876f249427a830e4f70128f27f4e6b0c64abbac82f61895f56446872b890",
+      "sequence": 17
+    },
+    {
+      "detail": {
+        "acceptance_digest": "9e462662e31bf8324e66ffd049b3c5155c5dc816df83a1ec5cbacbeecb4ed672",
+        "decision_id": "DG-f239f646-3dbb-59ce-9d93-f4314263e354"
+      },
+      "event": "accept-decision",
+      "phase": "plan-review",
+      "previous_frame_hash": "d707099157f39da74b07f10b44ba4b8cd30bf5b89166d9fae5aab68e865f3aac",
+      "sequence": 18
+    },
+    {
+      "detail": {},
+      "event": "accept-plan",
+      "phase": "implement",
+      "previous_frame_hash": "6dd68b3ca32d6a6bea3a18dde0f48abd6845ed6e5adb3ed4447e74f2cfc7c693",
+      "sequence": 19
+    },
+    {
+      "detail": {},
+      "event": "implement",
+      "phase": "checks",
+      "previous_frame_hash": "b8098625fcc6cb0f18bfb7981a428c2b5d8a7c51972710d88fb6b3364c078b2d",
+      "sequence": 20
+    },
+    {
+      "detail": {},
+      "event": "checks",
+      "phase": "review",
+      "previous_frame_hash": "9452ef9e39b5ad38082f4f382b76c9dba9c49f48c65c8dbdc738e53be092513b",
+      "sequence": 21
+    },
+    {
+      "detail": {
+        "previous_resolutions": {},
+        "previous_review": null
+      },
+      "event": "review",
+      "phase": "ready",
+      "previous_frame_hash": "eef7ec4c073d3c3cc46727dbb6aaae849681e97b52a2da233ba517ab8814e7c5",
+      "sequence": 22
+    }
+  ],
+  "id": "DO-1271a54f-5eaa-52b1-8b21-7df230249f55",
+  "identity": {
+    "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+    "head": "678aab048643da13512e0d1878d59c655d8077cd",
+    "source_digest": "f16fa26ccd25bd5c746325096a20f7eca11f9f188d9443b37902c67dddc5c7e1"
+  },
+  "mode": "auto",
+  "orchestration_hash": "62a2dc7b31157f1eaf755d4a241cb019b3eb46c03b4d2fe82121e860f0b90ea9",
+  "owner_question": null,
+  "phase": "ready",
+  "phase_after_checks": "review",
+  "plan": {
+    "digest": "a30b99e5ff90f6db95d5e5358e75168afb228cd2073c3ec2578b433ee9eddd32",
+    "reference": ".skill-tree/history/research/composition119-plan.md",
+    "required_checks": [
+      "standalone-plugin-composition",
+      "sync-check",
+      "strict-validation",
+      "python",
+      "node",
+      "installer-list",
+      "installer-dry-run",
+      "diff-check"
+    ]
+  },
+  "plan_acceptance": {
+    "actor": {
+      "context_id": "/root/composition119_plan_resolver",
+      "id": "/root/composition119_plan_resolver"
+    },
+    "answer": "accept",
+    "attempt_id": "DA-9d6f3e6b-e8e7-48a2-a1c5-d57c30d141ef",
+    "authority_digest": "d7cb4d3d704d0c3165dcf813b7e0e2e6bcc77c5be109348424e70163e8a4926e",
+    "context_identity": {
+      "decision_purpose": "plan",
+      "execution_snapshot_digest": "974655dee91cee8a939f49fb78fe720a5c0631cf0e78d33b896eabe7e92e46a0",
+      "id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "kind": "task",
+      "orchestration_id": "DO-1271a54f-5eaa-52b1-8b21-7df230249f55",
+      "plan_digest": "a30b99e5ff90f6db95d5e5358e75168afb228cd2073c3ec2578b433ee9eddd32",
+      "required_checks_digest": "354d85eb182f77e55e32a7c87ae3311762fc5f81eeb2ff2ab5c1a3b8acb2df1d",
+      "task_ids": [
+        "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+      ]
+    },
+    "decision_id": "DG-f239f646-3dbb-59ce-9d93-f4314263e354",
+    "digest": "9e462662e31bf8324e66ffd049b3c5155c5dc816df83a1ec5cbacbeecb4ed672",
+    "kind": "specification-acceptance",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/composition119_plan_resolver",
+      "actor_id": "/root/composition119_plan_resolver",
+      "creation_reference": "Actual root tool creation /root/composition119_plan_resolver; fresh fork_turns none, initially idle.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/composition119_plan_resolver returned current v2 JSON in collaboration.final answer.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "b499434c62d62125d5158eab191b4ad741b94e391f5ea0e75e14ce5c1c269873",
+    "question_id": "composition119-plan",
+    "rationale": "The current sealed plan retains the task-119 scope, architecture, validation obligations and authority boundaries previously assessed. Replacing 'this plan' with 'the composition plan' makes the entity explicit without changing behavior or authorization. No material revision is required.",
+    "role_receipts": {
+      "critic": "49c21658b475d9ebb8dbab38954893d91fc543d91a428f521098e46ce29e8c36",
+      "resolver": "d5dfe7ddf30e922f70fb56ae554302ec0630faefb245e7cd96153bbc51ac595d"
+    },
+    "semantic_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427"
+  },
+  "prepared_actor": null,
+  "prerequisites": [],
+  "question_context": null,
+  "question_decision_id": null,
+  "question_purpose": "plan",
+  "question_sequence": 2,
+  "request_id": "composition119-implementation",
+  "research_reference": ".skill-tree/artifacts/plugin-implementation/composition119-task.txt; source API and independent composition119_readiness research",
+  "resolutions": {},
+  "resolved_obligations": [],
+  "review": {
+    "digest": "f093c0a0056b8b0a634b069877982eb3497a2cfde715d57a9308b89bb9f5d94c",
+    "findings": [],
+    "id": "composition119-full-current-diff",
+    "identity": {
+      "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "head": "678aab048643da13512e0d1878d59c655d8077cd",
+      "source_digest": "f16fa26ccd25bd5c746325096a20f7eca11f9f188d9443b37902c67dddc5c7e1"
+    },
+    "reference": ".skill-tree/history/validation/plugin-system/composition119-full-review.json"
+  },
+  "revision": 22,
+  "schema": 1,
+  "stagnation": {
+    "count": 0,
+    "key": null
+  },
+  "stagnation_limit": 3,
+  "start_digest": "0b5b4870f910ce2ef1838cad5c73899c3c1db4813f6215811606fa0ae685ddd7"
+}

@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "result": "pass",
+  "lane": "static",
+  "sources": {
+    ".skill-tree/documents/plugin-market-research.md": "ecd71abef5a437184a547496834ac9e094b51ebee3bae945aa37e88dfb0a7679",
+    ".skill-tree/documents/plugin-system-research.md": "18b222cd914f2090b2f5f4443c07cb28239099618e522e4b7babb3be5be55439",
+    ".skill-tree/history/research/plugin-market-map.json": "5251739741dc234bddcda84d057940dc497a0b2e9ae8b2ada9996fab16d8bbf6"
+  },
+  "market_snapshot_commit": "2a6d240bf6f844d339d246bea57a437e9e3eb7fd",
+  "assertions": [
+    "All original dated source, candidate, revision, license, dependency, host/flavor, adoption and upstream outcome records remain unchanged.",
+    "The original market shortlist and bounded proposal remain historical. The separately approved general Codex cohort identifies the newer actual study, negative-control amendment and empty eligible set.",
+    "The result adds observed evidence without promoting market discovery, compatibility or upstream reports into recommendations."
+  ]
+}

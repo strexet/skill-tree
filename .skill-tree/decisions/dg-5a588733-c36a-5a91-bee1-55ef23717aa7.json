@@ -1,0 +1,241 @@
+{
+  "acceptance": {
+    "actor": {
+      "context_id": "/root/delivery132",
+      "id": "/root/delivery132"
+    },
+    "answer": "accept",
+    "attempt_id": "DA-30f5fccb-7767-4824-a3e4-c4f543c72312",
+    "authority_digest": "bfaa7dd068d7a223bfefe9532a4bb4366827260c1e7212d8c7717badec06091f",
+    "context_identity": {
+      "decision_purpose": "plan",
+      "execution_snapshot_digest": "1af2472e7b9bf289cf79b4c16057cb5f06c1659d7a54594be3ac6c40a5b72996",
+      "id": "task:T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad",
+      "kind": "task",
+      "orchestration_id": "DO-7363d70e-c8ea-5de6-ab6a-e0c2102074b3",
+      "plan_digest": "22edd2665cdcb4de1fe635c9c52a149b1d1b8a3f58c71841f06bf52b2824e1bb",
+      "required_checks_digest": "7c8ad7bd14e8a8b7fa627c53f62843a800abd9086fe342528824f7527fb404c6",
+      "task_ids": [
+        "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad"
+      ]
+    },
+    "decision_id": "DG-5a588733-c36a-5a91-bee1-55ef23717aa7",
+    "digest": "bcfbc2f420184d725e8e68ac5a945be2ed3d3eb271485149b5a67253592bb167",
+    "kind": "specification-acceptance",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/delivery132",
+      "actor_id": "/root/delivery132",
+      "creation_reference": "Actual collaboration.spawn_agent returned /root/delivery132, separate active context.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/delivery132 returned the sealed-input JSON in collaboration final answer.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "14535f949e11bb64f5963a3693948a25ccff59ed350bcc09250827f31d1e2c32",
+    "question_id": "manager131-plan",
+    "rationale": "The sealed plan binds provider scope and the displayed proposal to the lifecycle transaction, preserves exact replay, and distinguishes catalog drift from executable ownership. It covers shared initial and later management, ordered duplicate occurrences, standalone CommonJS loading and exactly three controlled qualification contexts. The plan preserves core-only defaults and requires actual matching confirmation for mutation.",
+    "role_receipts": {
+      "critic": "25937e8fa1ed194e1c0656b03ea39f052d1cd7bcbb1b5b5723d36e816a895825",
+      "resolver": "9155bd56e384b6d16168f82a036dda2d4be20fd142cd5f985c14c7046b6dcee7"
+    },
+    "semantic_fingerprint": "1d25836613fc0d271f7944d1ca8c96f6a756632f15c20da4d7f79c59bbe75b3b"
+  },
+  "active_attempt_id": null,
+  "attempts": {
+    "DA-0e2a206e-1835-4dd0-8bf7-f2ba75e25d57": {
+      "actor": {
+        "context_id": "/root/evidence114",
+        "id": "/root/evidence114"
+      },
+      "authority_digest": "bfaa7dd068d7a223bfefe9532a4bb4366827260c1e7212d8c7717badec06091f",
+      "basis_digest": "d042917c4e125b1211533b1aed623dd3713cdc2cebf7329a297b9d9385387fa5",
+      "content_fingerprint": "1d25836613fc0d271f7944d1ca8c96f6a756632f15c20da4d7f79c59bbe75b3b",
+      "evidence": {
+        "actor_context_id": "/root/evidence114",
+        "actor_id": "/root/evidence114",
+        "creation_reference": "Actual collaboration.spawn_agent returned /root/evidence114, separate active context.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/evidence114 returned the sealed-input JSON in collaboration final answer.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-0e2a206e-1835-4dd0-8bf7-f2ba75e25d57",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "14535f949e11bb64f5963a3693948a25ccff59ed350bcc09250827f31d1e2c32",
+      "result": {
+        "answer": "accept",
+        "input_digest": "57f62dd1d609026e44b893dcaabc195b1ae14ee3768563f48d1c4f3ba3bf0c4c",
+        "rationale": "The refined plan addresses the review findings. Verified CommonJS boundaries cover ESM targets, catalog-only drift preserves safe read-only inspection, and known-only mutations refuse unrelated journals. The shared lifecycle binds the displayed proposal and provider scope through confirmation and activation while preserving existing action checks and exact replay. The positive actor, cancellation actor and independent grader use frozen local fixtures and recorded CLI evidence, with scripted answers kept separate from owner consent.",
+        "status": "agree"
+      },
+      "role": "critic",
+      "semantic_fingerprint": "1d25836613fc0d271f7944d1ca8c96f6a756632f15c20da4d7f79c59bbe75b3b",
+      "status": "agree"
+    },
+    "DA-30f5fccb-7767-4824-a3e4-c4f543c72312": {
+      "actor": {
+        "context_id": "/root/delivery132",
+        "id": "/root/delivery132"
+      },
+      "authority_digest": "bfaa7dd068d7a223bfefe9532a4bb4366827260c1e7212d8c7717badec06091f",
+      "basis_digest": null,
+      "content_fingerprint": "1d25836613fc0d271f7944d1ca8c96f6a756632f15c20da4d7f79c59bbe75b3b",
+      "evidence": {
+        "actor_context_id": "/root/delivery132",
+        "actor_id": "/root/delivery132",
+        "creation_reference": "Actual collaboration.spawn_agent returned /root/delivery132, separate active context.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/delivery132 returned the sealed-input JSON in collaboration final answer.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-30f5fccb-7767-4824-a3e4-c4f543c72312",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "14535f949e11bb64f5963a3693948a25ccff59ed350bcc09250827f31d1e2c32",
+      "result": {
+        "answer": "accept",
+        "input_digest": "cc83d48d0cca1049cc0ad461b9827ba8b92c69e36ba5c2e537bfc036cd6353f5",
+        "rationale": "The sealed plan binds provider scope and the displayed proposal to the lifecycle transaction, preserves exact replay, and distinguishes catalog drift from executable ownership. It covers shared initial and later management, ordered duplicate occurrences, standalone CommonJS loading and exactly three controlled qualification contexts. The plan preserves core-only defaults and requires actual matching confirmation for mutation.",
+        "status": "answered"
+      },
+      "role": "resolver",
+      "semantic_fingerprint": "1d25836613fc0d271f7944d1ca8c96f6a756632f15c20da4d7f79c59bbe75b3b",
+      "status": "answered"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the approved task and dependency scope. No source publication, remote, release, external trial, installation consent or actual native plugin execution. Required checks and real owner intent cannot be delegated away."
+    ],
+    "context_id": "task:T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+    },
+    "id": "approved-manager131",
+    "revision": 1
+  },
+  "authority_digest": "bfaa7dd068d7a223bfefe9532a4bb4366827260c1e7212d8c7717badec06091f",
+  "context": {
+    "content_fingerprint": "1d25836613fc0d271f7944d1ca8c96f6a756632f15c20da4d7f79c59bbe75b3b",
+    "decision_purpose": "plan",
+    "execution_snapshot_digest": "1af2472e7b9bf289cf79b4c16057cb5f06c1659d7a54594be3ac6c40a5b72996",
+    "id": "task:T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad",
+    "kind": "task",
+    "orchestration_id": "DO-7363d70e-c8ea-5de6-ab6a-e0c2102074b3",
+    "plan_digest": "22edd2665cdcb4de1fe635c9c52a149b1d1b8a3f58c71841f06bf52b2824e1bb",
+    "required_checks_digest": "7c8ad7bd14e8a8b7fa627c53f62843a800abd9086fe342528824f7527fb404c6",
+    "semantic_fingerprint": "1d25836613fc0d271f7944d1ca8c96f6a756632f15c20da4d7f79c59bbe75b3b",
+    "task_ids": [
+      "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad"
+    ]
+  },
+  "decision_hash": "3605146f6cf52bcc5ea6da9e92d690737d59cde8cc0a3e6758d84cbd1c3f3758",
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "frontier_epoch": 1,
+  "history": [
+    {
+      "context_fingerprint": "1d25836613fc0d271f7944d1ca8c96f6a756632f15c20da4d7f79c59bbe75b3b",
+      "detail": {},
+      "event": "started",
+      "mode_epoch": 1,
+      "previous_record_hash": null,
+      "sequence": 1
+    },
+    {
+      "context_fingerprint": "1d25836613fc0d271f7944d1ca8c96f6a756632f15c20da4d7f79c59bbe75b3b",
+      "detail": {
+        "attempt_id": "DA-30f5fccb-7767-4824-a3e4-c4f543c72312",
+        "role": "resolver"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "f0acbdb5e9fd39c5bdaa8dfde1997e1a4710fcf69b405086b080ce8fde5713cb",
+      "sequence": 2
+    },
+    {
+      "context_fingerprint": "1d25836613fc0d271f7944d1ca8c96f6a756632f15c20da4d7f79c59bbe75b3b",
+      "detail": {
+        "attempt_id": "DA-30f5fccb-7767-4824-a3e4-c4f543c72312",
+        "status": "answered"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "882aa3fb86e7a8e8983da4c2b906cb74f42b79063dc5359d33337ccd736c2d61",
+      "sequence": 3
+    },
+    {
+      "context_fingerprint": "1d25836613fc0d271f7944d1ca8c96f6a756632f15c20da4d7f79c59bbe75b3b",
+      "detail": {
+        "attempt_id": "DA-0e2a206e-1835-4dd0-8bf7-f2ba75e25d57",
+        "role": "critic"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "18033547c568d0a28f522b1856d0655b15898b8fba53ae8d05c98b95ebc068e9",
+      "sequence": 4
+    },
+    {
+      "context_fingerprint": "1d25836613fc0d271f7944d1ca8c96f6a756632f15c20da4d7f79c59bbe75b3b",
+      "detail": {
+        "attempt_id": "DA-0e2a206e-1835-4dd0-8bf7-f2ba75e25d57",
+        "status": "agree"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "5ed65bfd5432fa47f5c2bf1500b60418da63b19b3ac0ae29246ad76f54921042",
+      "sequence": 5
+    },
+    {
+      "context_fingerprint": "1d25836613fc0d271f7944d1ca8c96f6a756632f15c20da4d7f79c59bbe75b3b",
+      "detail": {
+        "acceptance_digest": "bcfbc2f420184d725e8e68ac5a945be2ed3d3eb271485149b5a67253592bb167"
+      },
+      "event": "accept",
+      "mode_epoch": 1,
+      "previous_record_hash": "a1596d9e234d6a9283650b8c6c20b80eef9ded88837d0b41df09071b4fc33464",
+      "sequence": 6
+    }
+  ],
+  "id": "DG-5a588733-c36a-5a91-bee1-55ef23717aa7",
+  "mode": "auto",
+  "mode_epoch": 1,
+  "prepared_attempt_id": "DA-0e2a206e-1835-4dd0-8bf7-f2ba75e25d57",
+  "question": {
+    "id": "manager131-plan",
+    "kind": "specification-acceptance",
+    "options": [
+      {
+        "id": "accept",
+        "text": "Accept the current plan."
+      },
+      {
+        "id": "revise",
+        "text": "Revise the plan with concrete reasons."
+      }
+    ],
+    "plan_text": "# T131 packaging and qualification plan\n\n## Scope\n\nImplement `T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad` as the eleventh core operation in General, Web and Unity. The task is a blocker of `T-6ec57615-3512-4f91-98e8-efb12cde7d7f` and depends on the open source/parameter, extensible binding, installed management and standalone composition units. Use the owning checkout's exact task criteria. T131 provides one interaction/backend contract for initial setup and later management. T110 wires the installer prompt and separate provider/plugin activation ordering. The operation remains available without curated data, external packages, target documentation, Future or a controller.\n\nApplicable installed contracts are Implement Next, installation profile, plugin invocation, core decision governance and validation policy. Source contracts are `plugin-management-contract.md`, `plugin-system-contract.md` and the approved implementation plan. Reuse current `plugin-management`, `plugin-lifecycle`, `plugin-sources`, `plugin-parameters` and `plugin-bindings` modules. T112 provides `loadCatalog(source)`, `catalogView(catalog,{known,inventory,host,flavor,point})` and `selectSource(catalog,id,{known})`. Catalog lookup retains full descriptor-level digest, dependency and adapter pins. Project-known private locators remain separate from public browse results.\n\n## Operation package\n\n- Author one `skill-tree-plugins` definition in `.skill-tree/templates/operations.json`. Suggested title is `Skill-Tree: Manage Plugins`. Suggested description is `Browse installed and known Skill Tree plugins, configure ordered bindings and parameters, and preview explicit installs, updates or removals.` Use current domain slots without new domain overrides. Standard before/during/after registration comes from the operation definition. Add named aliases only when a real management lifecycle phase calls them.\n- Map `common/scripts/plugin-manager.js` to package `scripts/plugin-manager.js` in `.skill-tree/config/resource-map.json`. Copy the existing decision and invocation closure used by task-free operations, including the required invariant references, `workflow-state.py`, `plugin-hooks.js`, `plugin-invocation.py`, `plugin-processing.py`, `decision-governance.py`, `decision-orchestration.py`, `run-workspaces.py`, `validate-document-rules.py` and Node dispatch dependencies. Add a short package-local management reference only if the argument/proposal contract outgrows the operation text. Keep canonical repository documents out of standalone links.\n- Use the composer to generate `SKILL.md`, UI metadata, project profile, owned resource manifest and helper copies in all three flavor trees. `npm run sync` is the only generated source mutation. Adding an operation changes the canonical boundary catalog included in existing representative packages. Review the generated manifest expansion mechanically and avoid unrelated template changes. Installer operation selection derives from the authored template. No installer operation allowlist or mandatory package-count constant is required.\n- Update current-state count and operation prose after deterministic and actual-actor qualification. Relevant locations include `README.md`, `.skill-tree/documents/skill-repository-creation-instructions.md`, `plugin-management-contract.md`, `plugin-system-contract.md`, `implementation-plan.md` and the current sections of `plugin-installation-contract.md` and `plugin-workflow-decisions.md`. Keep prior evidence and historical scope prose unchanged. Update the navigation manifest through the owned writer if document source digests change.\n\n### Suggested operation routing text\n\nStart with explicit project-root inventory using `node scripts/plugin-manager.js --project-root <project-root> --input -` and a JSON inventory action. Display installed packages, ordered current occurrences and grouped known choices with distinct suggested locations, qualification, provenance and unavailable prerequisites. Raw listing is an offline branch that returns before loading workflow operations or invoking hooks. An absent curated catalog retains direct URL/repository/raw/local intake and saved project-known discovery. A corrupt catalog retains an explicit diagnostic and cannot provide a recommendation.\n\nFor an explicit action, resolve exact package and occurrence identities and show one preview of the complete affected ordered chain. Report resolved source version and resources, adapter/host limits, all placements, enablement, independent conditions/values and origins, removed packages or bindings and frozen prerequisites. For source registration, show the portable definition and keep acquisition locators private. For arbitrary source or anchor input, resolve actual source/registered location or show the prerequisite. A user may add one occurrence of an installed package again and move/remove one exact occurrence independently. Pass the unchanged proposal and the actual matching confirmation to the apply action. A cancelled, missing or stale confirmation applies no change. Auto deliberation cannot grant plugin acquisition/enablement or publication consent.\n\nUse the existing bounded plugin hook sequence only for an explicitly selected management mutation. Freeze the current management request and exact proposal identity in a typed management context. Keep management hook routing in a distinct authorized proposal workflow. Use the original installed profile and registry for the before request-research, during prepared-proposal and after completed proposal-review checkpoints. Finish the configured proposal workflow before exact consent and activation. A contribution that changes the proposal requires a new preview and actual matching confirmation. Activation never starts an after pass against a refreshed configuration, because a changed generation invalidates the original dispatch inputs and may introduce a newly enabled package. Raw inventory, proposal-only inspection, cancellation and activation of a new binding never invoke newly installed content. Report a pending profile refresh and re-admission honestly. Absence of Future or task IDs never justifies creating placeholder workflow state.\n\n## Package-local bridge and shared interfaces\n\nThe bridge is the package entry point. Resolve the exact explicit project root and the package from the executing script path. Verify the registered provider destination in the owned project profile without hardcoding `.agents/skills`. Read the receipt with Node built-ins before importing dynamic target modules. Verify the package entry/helper manifest and a bounded complete project-owned maintenance module inventory. Reject symlinks, nonrelative receipt paths, unexpected module files, missing receipt paths and changed bytes before `require()`. Compare the maintenance `source/` files to both receipt bundle hashes and the flavor-filtered `source_digests` included in composition identity. The composer excludes other flavor directories and `config/repository.json` from the installed copy. Avoid loading target code to establish its own ownership.\n\nAfter bootstrap, delegate to one public backend, such as `managementInventory(root,{source,...})`, `prepareManagerRequest(root,request,options)` and `applyManagerProposal(root,proposal,confirmation,options)`. Use explicit JSON and argument vectors. Do not resolve a path relative to the caller's current directory or repository checkout. Use the verified target `.skill-tree/installation/source` for config and code. The operation is standalone within its owned target installation, with no required sibling skill or original checkout. Proposal input/output remains available over stdin/stdout to avoid writing private source paths into ordinary files. Keep public preview separate from any private serialized transaction envelope.\n\nThe shared backend reads the installed registry and project-known metadata as independent sources. T112's curated model is optional. When catalog data is absent, derive exact owned anchor grouping from the operation templates and project-known records with an explicit empty-curated catalog view. Use the existing source normalizer for direct input even when curated metadata is absent or unreadable. A selected curated ID returns T112's full lifecycle object. For known definitions, portable metadata owns display and stable identity, and private locators own local/acquisition access. Keep registry lifecycle as the only package/binding mutation authority. Use the same request/preview/apply backend from T110's initial installer option. Known-save/forget require expected identity and atomic ownership checks. Forget never removes installed state, original source or a frozen obligation.\n\nImplement occurrence changes over the current complete ordered list using `compileBindings`, `moveBinding` and `removeBinding`. Do not normalize away duplicates by package or boundary. Preview exact one-based point/global positions, condition and effective parameters/origins. A valid reordering keeps all IDs. Only the confirmed proposal reaches lifecycle activation. Profiles, registry generations, pending originals and receipts retain the ordinary CAS and stopped handoff checks. Optional mutation-hook routing remains outside writer/activation locks. Mark active or parked original evidence stale/prerequisite when required without replay, historical rewrite or implicit continuation.\n\n## Deterministic qualification\n\n1. Capture Red before implementation. The `manager-regressions` check runs `node --test .skill-tree/tests/test-plugin-manager.js`. Cover inventory from a fresh project without Future, no optional catalog, direct/custom source registration, known dedupe/collision, bounded private locator handling, install/update/forget/remove distinction, exact digest/owner consent, stale/cancel/replay, unsupported locations, ownership conflicts and retained frozen requirements. Test independently configured A–B–A occurrences with same-point alias resolution, reorder preserving IDs, independent condition/parameter/instruction values and single unbind followed by complete uninstall.\n2. The `manager-standalone-installation` check runs `node --test .skill-tree/tests/test-plugin-manager-installation.js`. Install all eleven operations per flavor into disposable General/Web/Unity targets through the normal owned installer. Verify generated resource and project receipts, remove the copied authoring source, invoke the package-local entry point from a different working directory and retain the installed maintenance bundle. Probe a provider destination outside `.agents/skills`, tampered/symlinked helper or module bytes and unknown ownership before require side effects. Test no-plugin install and repeat without source acquisition, then repeat with an existing fixture registry and compare before/after package/binding/queue bytes. Instrument raw inventory to reject network, child helper dispatch or incidental queue/controller writes.\n3. Run `npm run sync:check`, `npm run validate`, `npm run test:py`, `npm run test:node`, installer `--list`, installer General all-provider dry-run in a disposable project and `git diff --check`. Install the reviewed source into the execution worktree through the owned path, verify the actual operation package and preserve canonical checkpoint state. Current T131 package fixtures do not qualify actual installed agent behavior or any Unity/browser runtime.\n\n## Controlled actual agent qualification\n\nThe `manager-agent-observations` static-inspection receipt grades actual Codex management-agent work from a frozen disposable project after deterministic tests pass. Add a scoped `plugin-management-validate` route to `.skill-tree/scripts/agent-conformance.py` rather than recasting existing core, invocation or T114 evidence. Use exactly three contexts after freezing scenarios and trust inputs: a positive management actor, a cancellation actor and an independent read-only grader. Native internal collaboration establishes the actual actor identity. No external plugin actor, service or native Skill-tool claim is required for this check.\n\n- Start a fresh actor with the installed package and natural-language request to list the project, prepare two occurrences of the same source around another plugin, assign different values and reorder one occurrence. Include an actor-visible fixture with compatible pinned local source bytes and no Future. An independently frozen oracle expects exact scope, stable IDs, A–B–A and the exact reordered chain, parameter values, typed source/adapter and prerequisites.\n- Capture original host creation/context, actual reply, exact helper command, returned proposal digest and complete public chain, registry hashes and status before/after preview, and either cancellation or a stale confirmation rejection. If exercising confirmed application, provide one explicitly scripted fixture-owner response referencing the exact preview digest and independently inspect the actual resulting generation and order. A script response is fixture input, with no real-owner authorization claim. Root's independent check compares exact observed helper artifacts and expected preservation. Leave fixture worktrees/attempts terminal.\n- Bind the report and separate trusted root capture to current authored/generation/profile/fixture digests. Validate ordered scenario events and exact returned proposal bytes before accepting actor evidence. Record actual model/token/cost fields only when exposed. Preserve limitations for scripted inputs, source-backed local observation, no native Skill execution, no efficacy comparison and no other host or product/runtime qualification. No transcript-only or fabricated producer evidence satisfies acceptance.\n\n## Implementation decisions for shared management\n\nThe public backend uses `managementInventory`, `prepareManagerRequest` and `applyManagerProposal`. The helper accepts an explicit project root and one JSON action. Catalog listing and installed ownership remain separate read models. A missing optional catalog falls back to current registered boundaries and validated project-known definitions, while reporting catalog availability independently. Direct source normalization remains reachable in both conditions.\n\nUse a separate sealed project-known file under the owned installation directory with a monotonic generation, exact request receipts and portable source definitions. Save and forget use the existing installation and canonical writer coordination and an atomic same-directory replacement. The plugin lifecycle owns installed resources, package identity, binding configuration and rollback. Known registration and forgetting do not replace a package transaction or uninstall resources. Keep private locators out of portable state, display, serialized proposals and evidence. A local or private source that needs the locator again asks for an explicit current locator and verifies the admitted source identity. An ordinary public pinned source may be reused from portable data.\n\nPrepare projects, source, full closure, registry and selected provider scope before activation. The review presents the complete typed change, including registry base, provider destinations, installed resource ownership, package source/revision/content, all affected occurrences, independent values and origins, readiness implications, frozen requirements and unresolved prerequisites. Seal exact proposal identity and confirmation. The actual registry lifecycle rechecks source and generation with the existing lock. Any selected provider scope checked for activation binds the exact provider/destination map while preserving ordinary lifecycle replay. Fixture confirmations remain separate from real user consent.\n\nFor occurrence reorder, resolve aliases to the actual boundary, collect the matching global slots, apply the existing occurrence move to the point subsequence and put the reordered rows back into the same slots. Preserve all other operation/anchor rows and the exact binding IDs. Treat add, edit, enable, disable, exact unbind and uninstall as ordinary registry operations. Detect stale registry identity between reading the existing chain and creating the proposal. Reuse typed adapter context, per-occurrence conditions, parameters and extra instruction text.\n\nThe manager-local bridge checks the owned package and maintenance bundle before loading backend code. A saved local definition does not authorize file reads outside explicit acquisition. The same typed proposal API is the initial installer integration seam in T110. Keep CLI parsing and output stable enough for the actual actor packet to freeze the exact contract after deterministic smoke.\n\n## Execution and final check boundary\n\nRun both task-focused Node recipes, strict validation, generated synchronization, installer listing/dry-run and the controlled actual-agent observations before completing the manager unit. The complete Python and Node suites run at the shared final source boundary after installer integration. The separate actual-agent plan uses an original positive actor, an original cancellation actor and an independent grader, with the controller brokering actual installed CLI steps and independently recording proposal/effect bytes. A frozen fixture owner card binds the exact decision step and returned digest. Preserve raw actor output and lifecycle evidence separately from deterministic grades. Qualification covers controlled local Codex management interpretation only.\n\n\n## Pre-review refinements\n\nBind the exact provider and destination map into the shared lifecycle proposal as an optional sealed field for manager-owned requests. Compare the actual owned scope inside the existing lifecycle lock and again before staged activation. Exact original request replay retains existing priority over new mutation freshness checks. Legacy proposals without the field retain their current lifecycle behavior. This narrow lifecycle seam is required so the manager and optional installer can share one preview and apply contract.\n\nTreat optional catalog absence in a valid owned source generation separately from local modification of a receipt-owned catalog file. Valid catalog-free installations keep full custom intake and management. Catalog-only drift keeps a read-only installed view where the owned executable closure verifies, with a catalog diagnostic. Mutations require ordinary owned generation recovery. All executable and lifecycle ownership checks stay binding.\n\nGive the installed maintenance bundle and manager scripts explicit owned CommonJS module boundaries. Verify both in an actual Web fixture with a project `package.json` declaring `type: module`. Existing target package mode does not change the manager runtime module kind.\n\nKnown-only mutations refuse pending core and plugin transactions inside the coordination barrier. Existing installed-package configuration, enablement, unbind and removal use the existing management semantics and guarded lifecycle application. The manager envelope binds the typed public preview and underlying lifecycle proposal digest. Confirmed replay uses the exact original request. Fixtures exercise mismatched or relabelled proposals, pending unrelated journals, and a changed provider scope with the same core identity.\n",
+    "recommendation": "accept",
+    "significance": "significant",
+    "text": "Accept the exact approved-scope core plugin manager plan, or request a bounded revision."
+  },
+  "request_id": "DO-7363d70e-c8ea-5de6-ab6a-e0c2102074b3:question:1",
+  "revision": 6,
+  "schema": 1,
+  "start_digest": "5bc4d0cdd88f7fba2cf5351bdfa97b91be93f52352ba196cbec784a4fadea9e2",
+  "state": "accepted"
+}

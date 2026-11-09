@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/scripts/agent-conformance.py", line 711, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/scripts/agent-conformance.py", line 707, in main
+    elif args.command=='plugin-invocation-validate':result=validate_plugin_invocation_report(json.loads(args.input.read_text()),json.loads(args.capture.read_text()) if args.capture else None)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/scripts/agent-conformance.py", line 693, in validate_plugin_invocation_report
+    try:return _validate_plugin_invocation_report(report,trusted_capture)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/scripts/agent-conformance.py", line 472, in _validate_plugin_invocation_report
+    for path,fingerprint in sources.items():require(relative(path) and sha(fingerprint) and (CORE/path).is_file() and digest(CORE/path)==fingerprint,'An invocation source fingerprint is missing, stale or nonportable')
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/scripts/agent-conformance.py", line 462, in require
+    if not condition:raise ValueError(message)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: An invocation source fingerprint is missing, stale or nonportable

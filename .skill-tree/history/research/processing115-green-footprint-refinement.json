@@ -1,0 +1,14 @@
+{
+  "added_sources": [
+    ".skill-tree/common/scripts/plugin-processing.py",
+    ".skill-tree/tests/test-plugin-processing-installation.js"
+  ],
+  "current_content_fingerprint": "f632b6e833be121c2d00fe1d039db0c296e940acae0de097d0dfb465f9fe86fd",
+  "kind": "validation-source-footprint-completion",
+  "original_red_attempt": "C-430105db-7fea-4500-b3eb-fdb35e09ffdc",
+  "previous_content_fingerprint": "28974e2a7bb1dfde221030e41fa1530e59667064dfafb9d4d9bb98cab90aaa54",
+  "reason": "The authored processing helper and installed dispatcher controls now exist. Both join the actual required source footprint before current Green. The original Red evidence and exact acceptance criteria remain preserved.",
+  "retained_agreed_semantic_identity": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+  "schema": 1,
+  "task_id": "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69"
+}

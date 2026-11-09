@@ -1,0 +1,210 @@
+TAP version 13
+# Subtest: confirmed local installation preserves exact source closure, binary bytes and separate adaptation
+ok 1 - confirmed local installation preserves exact source closure, binary bytes and separate adaptation
+  ---
+  duration_ms: 477.255292
+  ...
+# Subtest: a complete source with missing native tools installs inertly and retains provenance
+ok 2 - a complete source with missing native tools installs inertly and retains provenance
+  ---
+  duration_ms: 425.098
+  ...
+# Subtest: proposal serialization excludes local locators and changed or absent consent rejects all writes
+ok 3 - proposal serialization excludes local locators and changed or absent consent rejects all writes
+  ---
+  duration_ms: 268.270458
+  ...
+# Subtest: exact duplicate requests recover original outcomes without new generations or occurrences
+ok 4 - exact duplicate requests recover original outcomes without new generations or occurrences
+  ---
+  duration_ms: 427.407625
+  ...
+# Subtest: stale proposal and conflicting request identity cannot overwrite a later configuration
+ok 5 - stale proposal and conflicting request identity cannot overwrite a later configuration
+  ---
+  duration_ms: 626.667958
+  ...
+# Subtest: matching repeat installation is an owned no-op and keeps frozen binding configuration
+ok 6 - matching repeat installation is an owned no-op and keeps frozen binding configuration
+  ---
+  duration_ms: 536.57925
+  ...
+# Subtest: modified and unowned package resources reject replacement without force adoption
+ok 7 - modified and unowned package resources reject replacement without force adoption
+  ---
+  duration_ms: 719.273708
+  ...
+# Subtest: missing required resources and tampered staged snapshot bytes reject before activation
+ok 8 - missing required resources and tampered staged snapshot bytes reject before activation
+  ---
+  duration_ms: 548.047958
+  ...
+# Subtest: configure enable and disable preserve independent repeated binding occurrences
+ok 9 - configure enable and disable preserve independent repeated binding occurrences
+  ---
+  duration_ms: 734.186209
+  ...
+# Subtest: package dependencies and uninstall remove every selected live binding while preserving original source
+ok 10 - package dependencies and uninstall remove every selected live binding while preserving original source
+  ---
+  duration_ms: 713.847625
+  ...
+# Subtest: plugin rollback restores binary resources as a new generation and preserves core rollback evidence
+ok 11 - plugin rollback restores binary resources as a new generation and preserves core rollback evidence
+  ---
+  duration_ms: 700.451167
+  ...
+# Subtest: interrupted registry activation recovers resources registry and bindings without duplicate delivery
+ok 12 - interrupted registry activation recovers resources registry and bindings without duplicate delivery
+  ---
+  duration_ms: 538.983167
+  ...
+# Subtest: writer locks and active retained runs reject activation and preserve all checkpoint state
+ok 13 - writer locks and active retained runs reject activation and preserve all checkpoint state
+  ---
+  duration_ms: 334.563917
+  ...
+# Subtest: installation treats a local merge order as unfinished until delivery receipts match
+ok 14 - installation treats a local merge order as unfinished until delivery receipts match
+  ---
+  duration_ms: 336.642417
+  ...
+# Subtest: changed plugin generations require current profile refresh and preserve retained run progress
+ok 15 - changed plugin generations require current profile refresh and preserve retained run progress
+  ---
+  duration_ms: 1336.299208
+  ...
+# Subtest: malformed multi-run registry cannot be treated as an empty safe handoff
+ok 16 - malformed multi-run registry cannot be treated as an empty safe handoff
+  ---
+  duration_ms: 434.443791
+  ...
+# Subtest: dangling owned-registry symlinks are conflicts rather than absent files
+ok 17 - dangling owned-registry symlinks are conflicts rather than absent files
+  ---
+  duration_ms: 274.4345
+  ...
+# Subtest: prototype-shaped request identities retain own receipts and replay idempotently
+ok 18 - prototype-shaped request identities retain own receipts and replay idempotently
+  ---
+  duration_ms: 448.393209
+  ...
+# Subtest: invalid binding JSON rejects without coercion or executing accessors
+ok 19 - invalid binding JSON rejects without coercion or executing accessors
+  ---
+  duration_ms: 246.451834
+  ...
+# Subtest: concurrent developer edits during plugin staging survive rejected update
+ok 20 - concurrent developer edits during plugin staging survive rejected update
+  ---
+  duration_ms: 514.603834
+  ...
+# Subtest: registry verification rejects inconsistent snapshot claims even with a recomputed registry digest
+ok 21 - registry verification rejects inconsistent snapshot claims even with a recomputed registry digest
+  ---
+  duration_ms: 401.875708
+  ...
+# Subtest: rehashing an unrelated extra owned resource cannot extend the inspected source closure
+ok 22 - rehashing an unrelated extra owned resource cannot extend the inspected source closure
+  ---
+  duration_ms: 427.296792
+  ...
+# Subtest: active focused maintenance blocks mutation even when the retained outer run is stopped
+ok 23 - active focused maintenance blocks mutation even when the retained outer run is stopped
+  ---
+  duration_ms: 324.881875
+  ...
+# Subtest: linked target honors canonical locks and explicit stopped handoff without changing queue copies
+ok 24 - linked target honors canonical locks and explicit stopped handoff without changing queue copies
+  ---
+  duration_ms: 700.502709
+  ...
+# Subtest: offline dry-run and inventory do not acquire remote sources or mutate installation state
+ok 25 - offline dry-run and inventory do not acquire remote sources or mutate installation state
+  ---
+  duration_ms: 256.456833
+  ...
+# Subtest: real raw HTTP acquisition resolves linked bytes without executing source scripts
+ok 26 - real raw HTTP acquisition resolves linked bytes without executing source scripts
+  ---
+  duration_ms: 21.771
+  ...
+# Subtest: cached normal and maintenance admission rejects changed plugin state and pending recovery
+ok 27 - cached normal and maintenance admission rejects changed plugin state and pending recovery
+  ---
+  duration_ms: 1073.466375
+  ...
+# Subtest: staging path aliases reject before overwriting resources or core rollback evidence
+ok 28 - staging path aliases reject before overwriting resources or core rollback evidence
+  ---
+  duration_ms: 250.913583
+  ...
+# Subtest: no-op request nonce cannot authorize a later mutation and replays its original outcome after progress
+ok 29 - no-op request nonce cannot authorize a later mutation and replays its original outcome after progress
+  ---
+  duration_ms: 752.850084
+  ...
+# Subtest: no-op receipt preserves both meaningful rollback channels and survives a new rollback generation
+ok 30 - no-op receipt preserves both meaningful rollback channels and survives a new rollback generation
+  ---
+  duration_ms: 860.644041
+  ...
+# Subtest: an unowned root resource named __proto__ remains visible to ownership verification
+ok 31 - an unowned root resource named __proto__ remains visible to ownership verification
+  ---
+  duration_ms: 406.82775
+  ...
+# Subtest: a declared upstream resource named __proto__ survives portable snapshot encoding and hydration
+ok 32 - a declared upstream resource named __proto__ survives portable snapshot encoding and hydration
+  ---
+  duration_ms: 422.266208
+  ...
+# Subtest: an explicitly declared cache-named resource updates and rolls back without disappearing from transactions
+ok 33 - an explicitly declared cache-named resource updates and rolls back without disappearing from transactions
+  ---
+  duration_ms: 710.752416
+  ...
+# Subtest: raw acquisition reads linked nested and binary resources as bytes without executing bundled helpers
+ok 34 - raw acquisition reads linked nested and binary resources as bytes without executing bundled helpers
+  ---
+  duration_ms: 6.083542
+  ...
+# Subtest: raw HTTP failures expose sanitized errors rather than source credentials or URLs
+ok 35 - raw HTTP failures expose sanitized errors rather than source credentials or URLs
+  ---
+  duration_ms: 1.930208
+  ...
+# Subtest: raw body and aggregate byte limits stop acquisition without returning partial success
+ok 36 - raw body and aggregate byte limits stop acquisition without returning partial success
+  ---
+  duration_ms: 3.55375
+  ...
+# Subtest: raw acquisition enforces one total timeout and closes an unresolved request
+ok 37 - raw acquisition enforces one total timeout and closes an unresolved request
+  ---
+  duration_ms: 42.358042
+  ...
+# Subtest: bare Git acquisition proves the actual commit and binary closure without checkout or retained temporary files
+ok 38 - bare Git acquisition proves the actual commit and binary closure without checkout or retained temporary files
+  ---
+  duration_ms: 408.906833
+  ...
+# Subtest: Git symlink resources and oversized content reject safely and clean temporary state
+ok 39 - Git symlink resources and oversized content reject safely and clean temporary state
+  ---
+  duration_ms: 987.707792
+  ...
+# Subtest: synchronous Git argument rejection sanitizes credential locators and cleans the initialized temporary repository
+ok 40 - synchronous Git argument rejection sanitizes credential locators and cleans the initialized temporary repository
+  ---
+  duration_ms: 52.785875
+  ...
+1..40
+# tests 40
+# suites 0
+# pass 40
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 18836.778125

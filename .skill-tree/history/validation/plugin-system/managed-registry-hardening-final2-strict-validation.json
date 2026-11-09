@@ -1,0 +1,13 @@
+{
+  "name": "strict-validation",
+  "argv": [
+    "npm",
+    "run",
+    "validate"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "tool_wall_seconds": 4.026064167264849,
+  "source_freeze": ".skill-tree/history/validation/plugin-system/managed-registry-hardening-source-freeze2.json",
+  "qualification": "Current frozen source/repository validation only; no actual candidate trial or universal native/product qualification."
+}

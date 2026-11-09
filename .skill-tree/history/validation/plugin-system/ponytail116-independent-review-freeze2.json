@@ -1,0 +1,79 @@
+{
+  "closed_findings": [
+    {
+      "closure": "WF rejects generic resolution for publication-bound status=findings and requires the actual ordinary publication contribution; the actual-DG regression uses the original grant/mode/executor and confirms no chain mutation.",
+      "id": "review-findings-generic-resolution-bypass"
+    },
+    {
+      "closure": "Required occurrence matching now uses the current trusted owned canonical event boundary; actual custom operation alias fixture composes, completes and reaches readiness.",
+      "id": "registered-named-review-anchor-unmatchable"
+    },
+    {
+      "closure": "After entry requires a current core report with zero unresolved findings. The same-head evidence-dismissal control then requires a legitimately placed pass, while plugin false-positive dismissal preserves the already accepted pass and original invocation bytes.",
+      "id": "after-admits-unresolved-core-frontier"
+    },
+    {
+      "closure": "Installed PR contract documents inspection, hook-attach, plugin-findings and review-reconcile receipt/context inputs.",
+      "id": "public-helper-interface"
+    }
+  ],
+  "findings": [
+    {
+      "bounded_resolution": "Define/reject the contradictory passed-plus-actionable-findings report shape at the policy-bound PR adapter boundary, or normalize it into mandatory ordinary finding incorporation. Avoid restricting arbitrary data in generic non-review plugin outputs.",
+      "finding": "A policy-bound publication review can submit status=passed together with a nonempty concrete findings array. Record currently validates the status but not this contradiction; passed with unchanged context obtains an automatic no-change receipt, bypassing _hook_transition and the new findings-only publication guard. Readiness can therefore see a completed stage while the concrete actionable findings were never incorporated into the publication ledger.",
+      "id": "contradictory-passed-actionable-findings-shape",
+      "locations": [
+        ".skill-tree/common/scripts/plugin-invocation.py:405",
+        ".skill-tree/common/scripts/plugin-invocation.py:423",
+        ".skill-tree/common/scripts/workflow-state.py:1864"
+      ],
+      "qualification": "Source path only; no new reproduction, result mutation or inferred current test result.",
+      "severity": "medium",
+      "status": "source-established-not-executed-pending-root-disposition"
+    }
+  ],
+  "format": "skill-tree-independent-source-review",
+  "frozen_paths_verified": 249,
+  "identity": {
+    "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+    "head": "57bbf013d08c2014aff87f379d2cd708063b81a6",
+    "source_digest": "0652c450413da8318ba5b80f1f76d08c07bead61bf7c9ffa978d5be5a7b66afe"
+  },
+  "navigation": {
+    "canonical_digest_count": 97,
+    "mismatches": [],
+    "new_descriptor_listed": true,
+    "path": ".skill-tree/skill-tree.json",
+    "sha256": "0705151ec40154fb9931807852636163a85907cc5cb5fdaeb3951a72f32de87e"
+  },
+  "parent_owned_validation": {
+    "current_full_pilot_and_repository_checks": "Running or parent-owned; this review does not assert their result.",
+    "reported_count": 5,
+    "selected_repairs_green": ".skill-tree/history/validation/plugin-system/ponytail116-review-repairs-green1.json"
+  },
+  "qualification": {
+    "canonical_metadata_writes": 0,
+    "native_actors": 0,
+    "new_fixtures": 0,
+    "provider_calls": 0,
+    "source_edits": 0,
+    "tests_executed": 0,
+    "writes": "This new ignored review artifact only."
+  },
+  "reviewed_preservation": [
+    "Ordinary actual-DG finding incorporation and evidence-backed ledger dismissal remain available; a decision to fix alone is not execution success.",
+    "Before/during and same-chain accepted prefix inputs remain historical and are not compared wholesale to later core-report digests.",
+    "Actual linked execution checkout/profile remains distinct from canonical publication storage.",
+    "Producer cleanup binds original actor/context/attempt/input/delivery and provider; actor self-report remains separate.",
+    "Immutable private delivery policy survives ordinary JSON/instruction overrides and trusted callback tamper controls.",
+    "Empty/disabled configuration, explicit disable/uninstall adoption, frozen configuration/source watch and no publication authority remain preserved.",
+    "Original raw source/license bytes and source-backed/native/efficacy qualification limits remain unchanged."
+  ],
+  "schema": 1,
+  "scope": "Final full source/contract/test reread after the three accepted repairs, preserving prior freeze1 review and isolated reproduction unchanged. No tests, new fixtures, actors, providers or metadata actions in this review.",
+  "source_freeze": ".skill-tree/history/validation/plugin-system/ponytail116-source-freeze2.json",
+  "source_freeze_sha256": "3742f7943e8503d6a2656b47dbd8fcbefe18c7d944c273262fdd37c69201d012",
+  "source_mismatches": [],
+  "task_id": "T-18db6175-499f-4679-bf8d-f815c7b42411",
+  "verdict": "one-report-shape-finding-pending-disposition"
+}

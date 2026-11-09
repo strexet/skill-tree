@@ -1,0 +1,66 @@
+{
+  "activation_conditions_verified": [
+    "449 Python and281 Node full source checks,44composition17copied80state focused checks, strict/sync/list/dry-run/diff, and independent full source review pass on unchanged freeze2 bytes.",
+    "Reviewed source committed as57bbf01; owned ten-operation runtime installed/verified and canonical state byte-preserved with same run admitted.",
+    "Controller explicitly selected this immutable completed118 contract for revalidation.",
+    "Captured mandatory current helper hashes and50 installed canonical dispatcher helper copies match the reviewed source; immutable historical actual artifacts remain unchanged."
+  ],
+  "analysis": {
+    "path": ".skill-tree/history/validation/plugin-system/invocation118-after-managed-guards-analysis.json",
+    "sha256": "3eeebb11f8c6f2cb983efc21287859867f64617190300daabf7b7f04d4d18e00"
+  },
+  "analysis_precommit_head": "f5e3734795b0f77bbd672ec8cdd8844730494438",
+  "attempt_id": "C-2324c151-d45a-4f54-9fc2-7eb28b4e5f4e",
+  "check_id": "installed-agent-hook-evidence",
+  "classification": "Current static compatibility composite using preserved historical actual-host observations and fresh deterministic guards; no fresh current-source native run.",
+  "committed_head": "57bbf013d08c2014aff87f379d2cd708063b81a6",
+  "current_full_repository_evidence": ".skill-tree/history/validation/plugin-system/managed-registry-hardening-final2-summary.json",
+  "current_source_digest": "007e7d1d78c7b87dd1f51b09be4cd86ad21a302f1f1588dfad02477a7a364d31",
+  "current_unit_evidence": [
+    ".skill-tree/history/validation/plugin-system/t-dae414c5-43e4-45db-a6f3-4ce4112440c5-hook-state-regressions-c-1ce0a8f6-0209-4ead-8c96-3e7b4091082f.json",
+    ".skill-tree/history/validation/plugin-system/t-dae414c5-43e4-45db-a6f3-4ce4112440c5-installed-hook-fixtures-c-a23f8bd3-9f5e-484d-acc3-5d85c4f4313b.json",
+    ".skill-tree/history/validation/plugin-system/t-dae414c5-43e4-45db-a6f3-4ce4112440c5-hook-observation-oracle-c-0e6aec4b-7e09-4d84-87b5-c28eef87db60.json"
+  ],
+  "historical_actual_evidence": {
+    "capture": {
+      "current_native_claim": false,
+      "path": ".skill-tree/history/validation/plugin-system/invocation118-native/capture.json",
+      "rewritten": false,
+      "sha256": "5f481b09a9cdd556971ae3b1ca12d1ab8e5147266d8378aae59703514526e0bd"
+    },
+    "grade": {
+      "current_native_claim": false,
+      "path": ".skill-tree/history/validation/plugin-system/invocation118-native/grade.json",
+      "rewritten": false,
+      "sha256": "7eb094e5e67ec6f9b26662c27c199ef38c39a3c63c51fee92c1e70e6225b888a"
+    },
+    "qualification": {
+      "current_native_claim": false,
+      "path": ".skill-tree/history/validation/plugin-system/invocation118-native/qualification.json",
+      "rewritten": false,
+      "sha256": "17564517f4b90435c1a66d9d1488856f05671523538dd9a131e8c1eb4495410e"
+    },
+    "report": {
+      "current_native_claim": false,
+      "path": ".skill-tree/history/validation/plugin-system/invocation118-native/report.json",
+      "rewritten": false,
+      "sha256": "cf002e5bb4448a5f870d5904e8905f1b3006fc05004e59430300d777877e8485"
+    }
+  },
+  "limitations": [
+    "Static AST/source compatibility is not a proof of arbitrary semantic equivalence.",
+    "Synthetic fixtures and scripted answers never count as actual host contexts, real-human approval, native Skill invocation, provider universality or candidate efficacy.",
+    "No new tokens/cost/model/native-call accounting is inferred; original unexposed fields and aggregate failed-attempt charges remain unchanged.",
+    "Raw installation receipts absent from historical evidence are not reconstructed as observed data.",
+    "Current strict source fingerprint validation remains intentionally fail-closed."
+  ],
+  "owned_activation_evidence": ".skill-tree/history/validation/plugin-system/managed-registry-hardening-owned-snapshot-refresh.json",
+  "owned_helper_copies_verified": 50,
+  "schema": 1,
+  "strict_current_native_validation": {
+    "evidence": ".skill-tree/history/validation/plugin-system/invocation118-after-managed-guards-expected-strict-rejection.json",
+    "passing_native_regrade": false,
+    "result": "expected-stale-source-rejection"
+  },
+  "task_id": "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+}

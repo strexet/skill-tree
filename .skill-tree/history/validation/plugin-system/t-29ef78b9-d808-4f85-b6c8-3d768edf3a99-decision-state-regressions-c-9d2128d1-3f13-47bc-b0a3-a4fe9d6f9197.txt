@@ -1,0 +1,251 @@
+E.FFFFFFFFFFFF.FFFFFEFFFFFFFFF
+======================================================================
+ERROR: test_acceptance_reference_binds_kind_mode_authority_and_exact_semantics (__main__.DecisionGovernanceTests.test_acceptance_reference_binds_kind_mode_authority_and_exact_semantics)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 154, in test_acceptance_reference_binds_kind_mode_authority_and_exact_semantics
+    record=self.complete(mode='auto');reference={'decision_id':record['id'],'acceptance_digest':record['acceptance']['digest']};expected={'context':self.context(),'mode':'auto','mode_epoch':record['mode_epoch'],'authority_digest':record['authority_digest'],'kind':'technical'}
+                                                                                                ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_revised_authority_revokes_current_acceptance_without_erasing_history (__main__.DecisionGovernanceTests.test_revised_authority_revokes_current_acceptance_without_erasing_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 140, in test_revised_authority_revokes_current_acceptance_without_erasing_history
+    record=self.complete(mode='auto');accepted=copy.deepcopy(record['acceptance']);record=self.change(record,'switch',mode='auto',authority=self.authority(revision=2,allowed_kinds=['product']));self.assertIsNone(record['acceptance']);self.assertNotEqual(record['authority_digest'],accepted['authority_digest']);self.assertTrue(record['history'])
+                                                                                                                                                                                                                                                                                         ~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+FAIL: test_auto_manual_auto_epoch_cycle_rejects_original_late_result (__main__.DecisionGovernanceTests.test_auto_manual_auto_epoch_cycle_rejects_original_late_result)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 120, in test_auto_manual_auto_epoch_cycle_rejects_original_late_result
+    with self.assertRaises(governance.DecisionError):self.change(record,'record',attempt_id=attempt,result={'status':'answered','answer':'json','rationale':'Late original response.'},evidence={'kind':'delegated-agent','reference':'unit late actor','actor_id':'unit-resolver-1','actor_context_id':'resolver-context-1'})
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_auto_rejects_executor_self_resolution_and_renamed_same_context (__main__.DecisionGovernanceTests.test_auto_rejects_executor_self_resolution_and_renamed_same_context) (actor={'id': 'unit-executor', 'context_id': 'different-context'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 97, in test_auto_rejects_executor_self_resolution_and_renamed_same_context
+    with self.subTest(actor=actor),self.assertRaises(governance.DecisionError):self.prepare(record,actor=actor)
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_auto_rejects_executor_self_resolution_and_renamed_same_context (__main__.DecisionGovernanceTests.test_auto_rejects_executor_self_resolution_and_renamed_same_context) (actor={'id': 'renamed-agent', 'context_id': 'executor-context'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 97, in test_auto_rejects_executor_self_resolution_and_renamed_same_context
+    with self.subTest(actor=actor),self.assertRaises(governance.DecisionError):self.prepare(record,actor=actor)
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_auto_resolver_acceptance_retains_delegated_origin (__main__.DecisionGovernanceTests.test_auto_resolver_acceptance_retains_delegated_origin)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 85, in test_auto_resolver_acceptance_retains_delegated_origin
+    record=self.complete(mode='auto');self.assertEqual(record['state'],'accepted');self.assertEqual(record['acceptance']['origin']['kind'],'delegated-agent');self.assertEqual(record['acceptance']['mode'],'auto')
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unimplemented' != 'accepted'
+- unimplemented
++ accepted
+
+
+======================================================================
+FAIL: test_content_only_resume_preserves_acceptance_but_semantic_change_reopens (__main__.DecisionGovernanceTests.test_content_only_resume_preserves_acceptance_but_semantic_change_reopens)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 137, in test_content_only_resume_preserves_acceptance_but_semantic_change_reopens
+    record=self.change(record,'resume',context=self.context(content_fingerprint=hash_text('semantic content two'),semantic_fingerprint=hash_text('semantic two')));self.assertEqual(record['state'],'open');self.assertIsNone(record['acceptance']);self.assertTrue(record['history'])
+                                                                                                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unimplemented' != 'open'
+- unimplemented
++ open
+
+
+======================================================================
+FAIL: test_exact_answer_replay_recovers_without_progress_but_conflict_rejects (__main__.DecisionGovernanceTests.test_exact_answer_replay_recovers_without_progress_but_conflict_rejects)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 125, in test_exact_answer_replay_recovers_without_progress_but_conflict_rejects
+    with self.assertRaises(governance.DecisionError):self.answer(record,answer='text')
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_manual_answer_acceptance_preserves_owner_provenance (__main__.DecisionGovernanceTests.test_manual_answer_acceptance_preserves_owner_provenance)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 81, in test_manual_answer_acceptance_preserves_owner_provenance
+    record=self.complete();self.assertEqual(record['state'],'accepted');self.assertEqual(record['acceptance']['origin']['kind'],'submitted-answer');self.assertEqual(record['acceptance']['mode'],'manual')
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unimplemented' != 'accepted'
+- unimplemented
++ accepted
+
+
+======================================================================
+FAIL: test_manual_rejects_delegated_and_recommendation_as_owner_answers (__main__.DecisionGovernanceTests.test_manual_rejects_delegated_and_recommendation_as_owner_answers) (kind='delegated-agent')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 90, in test_manual_rejects_delegated_and_recommendation_as_owner_answers
+    with self.subTest(kind=kind),self.assertRaises(governance.DecisionError):
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_manual_rejects_delegated_and_recommendation_as_owner_answers (__main__.DecisionGovernanceTests.test_manual_rejects_delegated_and_recommendation_as_owner_answers) (kind='recommendation')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 90, in test_manual_rejects_delegated_and_recommendation_as_owner_answers
+    with self.subTest(kind=kind),self.assertRaises(governance.DecisionError):
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_manual_rejects_delegated_and_recommendation_as_owner_answers (__main__.DecisionGovernanceTests.test_manual_rejects_delegated_and_recommendation_as_owner_answers) (kind='fixture-owner')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 90, in test_manual_rejects_delegated_and_recommendation_as_owner_answers
+    with self.subTest(kind=kind),self.assertRaises(governance.DecisionError):
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_out_of_grant_question_keeps_unresolved_record (__main__.DecisionGovernanceTests.test_out_of_grant_question_keeps_unresolved_record)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 150, in test_out_of_grant_question_keeps_unresolved_record
+    record=self.start(mode='auto',authority=self.authority(allowed_kinds=['product']));self.assertEqual(record['state'],'blocked');self.assertIsNone(record['acceptance'])
+                                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unimplemented' != 'blocked'
+- unimplemented
++ blocked
+
+
+======================================================================
+FAIL: test_pending_original_attempt_requires_reconciliation_before_mode_switch (__main__.DecisionGovernanceTests.test_pending_original_attempt_requires_reconciliation_before_mode_switch)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 114, in test_pending_original_attempt_requires_reconciliation_before_mode_switch
+    with self.assertRaises(governance.DecisionError):self.change(record,'switch',mode='manual')
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_reserved_actions_and_wildcard_grants_never_gain_delegated_authority (__main__.DecisionGovernanceTests.test_reserved_actions_and_wildcard_grants_never_gain_delegated_authority) (kind='installation-consent')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 146, in test_reserved_actions_and_wildcard_grants_never_gain_delegated_authority
+    with self.subTest(kind=kind),self.assertRaises(governance.DecisionError):self.start(mode='auto',question=self.question(kind=kind),authority=self.authority(allowed_kinds=['*',kind]))
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_reserved_actions_and_wildcard_grants_never_gain_delegated_authority (__main__.DecisionGovernanceTests.test_reserved_actions_and_wildcard_grants_never_gain_delegated_authority) (kind='publication')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 146, in test_reserved_actions_and_wildcard_grants_never_gain_delegated_authority
+    with self.subTest(kind=kind),self.assertRaises(governance.DecisionError):self.start(mode='auto',question=self.question(kind=kind),authority=self.authority(allowed_kinds=['*',kind]))
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_reserved_actions_and_wildcard_grants_never_gain_delegated_authority (__main__.DecisionGovernanceTests.test_reserved_actions_and_wildcard_grants_never_gain_delegated_authority) (kind='merge')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 146, in test_reserved_actions_and_wildcard_grants_never_gain_delegated_authority
+    with self.subTest(kind=kind),self.assertRaises(governance.DecisionError):self.start(mode='auto',question=self.question(kind=kind),authority=self.authority(allowed_kinds=['*',kind]))
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_reserved_actions_and_wildcard_grants_never_gain_delegated_authority (__main__.DecisionGovernanceTests.test_reserved_actions_and_wildcard_grants_never_gain_delegated_authority) (kind='check-result')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 146, in test_reserved_actions_and_wildcard_grants_never_gain_delegated_authority
+    with self.subTest(kind=kind),self.assertRaises(governance.DecisionError):self.start(mode='auto',question=self.question(kind=kind),authority=self.authority(allowed_kinds=['*',kind]))
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_reserved_actions_and_wildcard_grants_never_gain_delegated_authority (__main__.DecisionGovernanceTests.test_reserved_actions_and_wildcard_grants_never_gain_delegated_authority) (kind='external-approval')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 146, in test_reserved_actions_and_wildcard_grants_never_gain_delegated_authority
+    with self.subTest(kind=kind),self.assertRaises(governance.DecisionError):self.start(mode='auto',question=self.question(kind=kind),authority=self.authority(allowed_kinds=['*',kind]))
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_significant_decision_requires_independent_current_critic (__main__.DecisionGovernanceTests.test_significant_decision_requires_independent_current_critic)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 102, in test_significant_decision_requires_independent_current_critic
+    with self.assertRaises(governance.DecisionError):self.change(record,'accept')
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_stale_record_epoch_revision_and_context_guards_reject_atomically (__main__.DecisionGovernanceTests.test_stale_record_epoch_revision_and_context_guards_reject_atomically) (change={'expected_decision_hash': '0000000000000000000000000000000000000000000000000000000000000000'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 132, in test_stale_record_epoch_revision_and_context_guards_reject_atomically
+    with self.subTest(change=change),self.assertRaises(governance.DecisionError):governance.mutate(self.store,'decision-prepare',{**base,**change})
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_stale_record_epoch_revision_and_context_guards_reject_atomically (__main__.DecisionGovernanceTests.test_stale_record_epoch_revision_and_context_guards_reject_atomically) (change={'expected_decision_revision': 0})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 132, in test_stale_record_epoch_revision_and_context_guards_reject_atomically
+    with self.subTest(change=change),self.assertRaises(governance.DecisionError):governance.mutate(self.store,'decision-prepare',{**base,**change})
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_stale_record_epoch_revision_and_context_guards_reject_atomically (__main__.DecisionGovernanceTests.test_stale_record_epoch_revision_and_context_guards_reject_atomically) (change={'expected_mode_epoch': 2})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 132, in test_stale_record_epoch_revision_and_context_guards_reject_atomically
+    with self.subTest(change=change),self.assertRaises(governance.DecisionError):governance.mutate(self.store,'decision-prepare',{**base,**change})
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_stale_record_epoch_revision_and_context_guards_reject_atomically (__main__.DecisionGovernanceTests.test_stale_record_epoch_revision_and_context_guards_reject_atomically) (change={'expected_context_fingerprint': '1111111111111111111111111111111111111111111111111111111111111111'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 132, in test_stale_record_epoch_revision_and_context_guards_reject_atomically
+    with self.subTest(change=change),self.assertRaises(governance.DecisionError):governance.mutate(self.store,'decision-prepare',{**base,**change})
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_start_nonce_replays_matching_request_and_rejects_conflicting_reuse (__main__.DecisionGovernanceTests.test_start_nonce_replays_matching_request_and_rejects_conflicting_reuse)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 77, in test_start_nonce_replays_matching_request_and_rejects_conflicting_reuse
+    with self.assertRaises(governance.DecisionError):self.start(question=self.question(text='A changed decision.'))
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_substantive_disagreement_requires_further_independent_arbiter (__main__.DecisionGovernanceTests.test_substantive_disagreement_requires_further_independent_arbiter)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 108, in test_substantive_disagreement_requires_further_independent_arbiter
+    with self.assertRaises(governance.DecisionError):self.change(record,'accept')
+AssertionError: DecisionError not raised
+
+======================================================================
+FAIL: test_task_free_bootstrap_persists_only_decision_metadata_and_defaults_manual (__main__.DecisionGovernanceTests.test_task_free_bootstrap_persists_only_decision_metadata_and_defaults_manual)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 71, in test_task_free_bootstrap_persists_only_decision_metadata_and_defaults_manual
+    record=self.start();self.assertEqual(record['mode'],'manual');self.assertEqual(record['state'],'open');self.assertEqual(record['mode_epoch'],1)
+                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unimplemented' != 'open'
+- unimplemented
++ open
+
+
+======================================================================
+FAIL: test_writer_install_barriers_preserve_existing_queue_and_checkpoint_bytes (__main__.DecisionGovernanceTests.test_writer_install_barriers_preserve_existing_queue_and_checkpoint_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-governance.py", line 162, in test_writer_install_barriers_preserve_existing_queue_and_checkpoint_bytes
+    with self.assertRaises(Exception):self.start()
+AssertionError: Exception not raised
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.264s
+
+FAILED (failures=26, errors=2)

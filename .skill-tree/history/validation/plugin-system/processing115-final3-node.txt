@@ -1,0 +1,175 @@
+
+> skill-tree-skills@0.3.0 test:node
+> node --test .skill-tree/tests/test-*.js
+
+TAP version 13
+# Subtest: general clarification package runs independently of source and sibling packages
+ok 1 - general clarification package runs independently of source and sibling packages
+  ---
+  duration_ms: 1963.369584
+  ...
+# Subtest: web clarification package runs independently of source and sibling packages
+ok 2 - web clarification package runs independently of source and sibling packages
+  ---
+  duration_ms: 1490.426
+  ...
+# Subtest: unity clarification package runs independently of source and sibling packages
+ok 3 - unity clarification package runs independently of source and sibling packages
+  ---
+  duration_ms: 1587.869542
+  ...
+# Subtest: source recipe identities survive composition and retain freshness and collision checks
+ok 4 - source recipe identities survive composition and retain freshness and collision checks
+  ---
+  duration_ms: 78.35625
+  ...
+# Subtest: target role cannot inject source recipes
+ok 5 - target role cannot inject source recipes
+  ---
+  duration_ms: 108.149459
+  ...
+# Subtest: composition is deterministic, standalone and has the complete authored operation set for every flavor
+not ok 6 - composition is deterministic, standalone and has the complete authored operation set for every flavor
+  ---
+  duration_ms: 872.366125
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-composer.js:26:1'
+  failureType: 'testCodeFailure'
+  error: 'references/future-workflow.md#post-processing-task-applications'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-composer.js:35:76)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: static capability inputs detect additions, unsupported versions and conflicting locks
+ok 7 - static capability inputs detect additions, unsupported versions and conflicting locks
+  ---
+  duration_ms: 136.921959
+  ...
+# Subtest: missing foundation is a persisted capability gap while installation remains composable
+ok 8 - missing foundation is a persisted capability gap while installation remains composable
+  ---
+  duration_ms: 561.8185
+  ...
+# Subtest: resource collisions reject undeclared replacements and slot overrides preserve mandatory invariants
+ok 9 - resource collisions reject undeclared replacements and slot overrides preserve mandatory invariants
+  ---
+  duration_ms: 0.353542
+  ...
+# Subtest: adding test assemblies changes the inventory without executing project code
+ok 10 - adding test assemblies changes the inventory without executing project code
+  ---
+  duration_ms: 74.967541
+  ...
+# Subtest: Unity capability composition gates panel, input and performance fixtures before emission
+ok 11 - Unity capability composition gates panel, input and performance fixtures before emission
+  ---
+  duration_ms: 1242.464875
+  ...
+# Subtest: Web browser component runners retain browser effects and exact pinned conditional resources
+ok 12 - Web browser component runners retain browser effects and exact pinned conditional resources
+  ---
+  duration_ms: 654.254458
+  ...
+# Subtest: non-JavaScript Web roots use declared static recipes without importing executable configuration
+ok 13 - non-JavaScript Web roots use declared static recipes without importing executable configuration
+  ---
+  duration_ms: 21.947792
+  ...
+# Subtest: irrelevant input formatting can refresh environment identity without changing package bytes
+ok 14 - irrelevant input formatting can refresh environment identity without changing package bytes
+  ---
+  duration_ms: 680.753833
+  ...
+# Subtest: every flavor audit retains common metadata and prose validation without source dependencies
+ok 15 - every flavor audit retains common metadata and prose validation without source dependencies
+  ---
+  duration_ms: 910.15475
+  ...
+# Subtest: declared versions never masquerade as resolved capabilities
+ok 16 - declared versions never masquerade as resolved capabilities
+  ---
+  duration_ms: 390.76175
+  ...
+# Subtest: explicit recipe formats reject unknown lanes and unresolved command parameters
+ok 17 - explicit recipe formats reject unknown lanes and unresolved command parameters
+  ---
+  duration_ms: 32.692084
+  ...
+# Subtest: Unity required UTF flags require resolution evidence and track reload settings
+ok 18 - Unity required UTF flags require resolution evidence and track reload settings
+  ---
+  duration_ms: 43.868542
+  ...
+# Subtest: input fingerprints hash raw bytes even for an opaque dependency lock
+ok 19 - input fingerprints hash raw bytes even for an opaque dependency lock
+  ---
+  duration_ms: 47.986875
+  ...
+# Subtest: resolved UTF 1.6.0 supports the pinned Unity 6000.0 target without accepting unresolved or future versions
+ok 20 - resolved UTF 1.6.0 supports the pinned Unity 6000.0 target without accepting unresolved or future versions
+  ---
+  duration_ms: 317.969292
+  ...
+# Subtest: Unity BOM-prefixed JSON remains static input with unchanged raw-byte fingerprints
+ok 21 - Unity BOM-prefixed JSON remains static input with unchanged raw-byte fingerprints
+  ---
+  duration_ms: 26.815542
+  ...
+# Subtest: general core decision operations run with no source, siblings, Future or plugins
+ok 22 - general core decision operations run with no source, siblings, Future or plugins
+  ---
+  duration_ms: 14171.052041
+  ...
+# Subtest: web core decision operations run with no source, siblings, Future or plugins
+ok 23 - web core decision operations run with no source, siblings, Future or plugins
+  ---
+  duration_ms: 15738.019875
+  ...
+# Subtest: unity core decision operations run with no source, siblings, Future or plugins
+ok 24 - unity core decision operations run with no source, siblings, Future or plugins
+  ---
+  duration_ms: 14044.877667
+  ...
+# Subtest: binding composes exact roots, complete source identity and pinned 6.3 without executing a runner
+ok 25 - binding composes exact roots, complete source identity and pinned 6.3 without executing a runner
+  ---
+  duration_ms: 530.638375
+  ...
+# Subtest: binding refuses changed queue, isolated fixture or workspace runner before profile activation
+ok 26 - binding refuses changed queue, isolated fixture or workspace runner before profile activation
+  ---
+  duration_ms: 87.734333
+  ...
+# Subtest: binding refuses arbitrary roots, symlinks, overlap and missing source classification
+ok 27 - binding refuses arbitrary roots, symlinks, overlap and missing source classification
+  ---
+  duration_ms: 58.3485
+  ...
+# Subtest: binding refuses mismatched pins and non-product relabeling while retaining honest source blockers
+ok 28 - binding refuses mismatched pins and non-product relabeling while retaining honest source blockers
+  ---
+  duration_ms: 68.548375
+  ...
+# Subtest: embedded Pipeline uses reviewed package identity and version, never the file locator as a version
+ok 29 - embedded Pipeline uses reviewed package identity and version, never the file locator as a version
+  ---
+  duration_ms: 31.487584
+  ...
+# Subtest: canonical project owns runner source without a separate workspace tooling tree
+ok 30 - canonical project owns runner source without a separate workspace tooling tree
+  ---
+  duration_ms: 73.91425
+  ...
+# Subtest: empty or invalid automation scopes cannot silently drop runner fingerprints
+ok 31 - empty or invalid automation scopes cannot silently drop runner fingerprints
+  ---
+  duration_ms: 42.907291
+  ...

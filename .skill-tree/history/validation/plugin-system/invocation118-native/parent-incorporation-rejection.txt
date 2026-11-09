@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/artifacts/plugin-implementation/invocation118-native-harness.py", line 183, in <module>
+    cl_change('answer',round_id=current_session['rounds'][-1]['id'],question_id='incorporate',question_revision=current_session['questions']['incorporate']['revision'],answer=owner['answer'],evidence=owner['evidence'])
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/artifacts/plugin-implementation/invocation118-native-harness.py", line 109, in cl_change
+    current=session();return wf.clarification_mutate(store,'clarify-'+command,{'session_id':current['id'],'expected_session_hash':current['session_hash'],'expected_session_revision':current['revision'],'expected_source_hash':sha(store.text()),**value})
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-invocation118-native-bxyw9i42/.agents/skills/skill-tree-process-future-pending/scripts/workflow-state.py", line 2531, in clarification_mutate
+    if not question or not round_record or key not in round_record['question_ids'] or payload.get('question_revision')!=question['revision'] or round_record['question_revisions'][key]!=question['revision']:raise WorkflowError('Answer does not match the session round and question revision')
+                                                                                                                                                                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+invocation118_installed_workflow.WorkflowError: Answer does not match the session round and question revision

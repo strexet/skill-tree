@@ -1,0 +1,46 @@
+.F......F..FF
+======================================================================
+FAIL: test_auto_final_acceptance_cannot_use_legacy_owner_evidence (__main__.DecisionAdapterTests.test_auto_final_acceptance_cannot_use_legacy_owner_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-adapters.py", line 135, in test_auto_final_acceptance_cannot_use_legacy_owner_evidence
+    self.mutate('clarify-confirm', session, task_ids=[self.a], semantic_fingerprints=session['semantic_fingerprints'], evidence={'kind': 'owner-message', 'reference': 'Synthetic unit input, not a delegated Auto result.'}, ok=False)
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-task-clarification.py", line 58, in mutate
+    return self.call(command, {'session_id': session['id'], 'expected_source_hash': self.source_hash(), 'expected_session_hash': session['session_hash'], 'expected_session_revision': session['revision'], **extra})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-task-clarification.py", line 44, in call
+    self.assertEqual(result.returncode, 0 if ok else 2, result.stdout + result.stderr)
+AssertionError: 2 != 0 : {
+  "error": "Auto clarification requires a current delegated decision receipt",
+  "ok": false
+}
+
+
+======================================================================
+FAIL: test_pre_promotion_decision_uses_real_pending_and_preserves_queue_state (__main__.DecisionAdapterTests.test_pre_promotion_decision_uses_real_pending_and_preserves_queue_state)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-adapters.py", line 88, in test_pre_promotion_decision_uses_real_pending_and_preserves_queue_state
+    self.assertEqual(record.get('context'), ctx)
+AssertionError: None != {'kind': 'pending', 'id': 'pending-scope:[277 chars]1d']}
+
+======================================================================
+FAIL: test_task_free_cli_creates_only_a_decision_without_future_or_run (__main__.DecisionAdapterTests.test_task_free_cli_creates_only_a_decision_without_future_or_run)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-adapters.py", line 72, in test_task_free_cli_creates_only_a_decision_without_future_or_run
+    self.assertEqual(len(list((root / '.skill-tree/decisions').glob('dg-*.json'))), 1)
+AssertionError: 0 != 1
+
+======================================================================
+FAIL: test_typed_task_scope_rejects_a_nonexistent_identity_atomically (__main__.DecisionAdapterTests.test_typed_task_scope_rejects_a_nonexistent_identity_atomically)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-adapters.py", line 79, in test_typed_task_scope_rejects_a_nonexistent_identity_atomically
+    with self.assertRaises(wf.WorkflowError):
+AssertionError: WorkflowError not raised
+
+----------------------------------------------------------------------
+Ran 13 tests in 1.732s
+
+FAILED (failures=4)

@@ -1,0 +1,25 @@
+{
+  "kind": "in-memory-oracle-guard-omission-control",
+  "source_sha256": "0f7a79a83e69aad8c8f3a5c4d063b94616f1c6d786f0e13cc3027dee3401f49e",
+  "controls": [
+    {
+      "field": "resource_marker",
+      "current": "reject",
+      "only-nonce-guard-omitted": "admit"
+    },
+    {
+      "field": "parameter_marker",
+      "current": "reject",
+      "only-nonce-guard-omitted": "admit"
+    },
+    {
+      "field": "extra_instruction_marker",
+      "current": "reject",
+      "only-nonce-guard-omitted": "admit"
+    }
+  ],
+  "limits": [
+    "Synthetic test traces only; no actual host/candidate execution or source mutation.",
+    "The omitted guard existed only in an isolated in-memory module namespace; canonical source remained unchanged."
+  ]
+}

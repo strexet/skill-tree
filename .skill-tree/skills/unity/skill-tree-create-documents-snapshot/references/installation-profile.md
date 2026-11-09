@@ -1,16 +1,22 @@
 # Installation Profile
 
-The selected project root receives exactly one flavor: general, web or unity. Nine stable `skill-tree-*` operation names carry common invariants plus selected domain sections. The registry declares section slots and exact resource replacements; owner authorization, selection, checkpoint integrity, truthful evidence and publication boundaries are non-replaceable.
+The selected project root receives exactly one flavor: general, web or unity. Registered `skill-tree-*` operation names carry common invariants plus selected domain sections. The registry declares section slots and exact resource replacements; owner authorization, selection, checkpoint integrity, truthful evidence and publication boundaries are non-replaceable.
 
 Composition is deterministic and static. The capability resolver reads configuration as data, records known/absent/ambiguous/unsupported facts and emits concrete applicable recipes. Installation never evaluates project configuration, executes application code, upgrades dependencies or initializes documentation. Missing optional infrastructure does not prevent installation. Unknown essential compatibility produces a clear error.
 
 `.skill-tree/installation/profile.json` owns flavor, project identity, bounded input/inventory digests, recipes, capability gaps, source/output digests and provider destinations. Mutable workflow state remains separate. Project-scoped copy installation is supported; specialization through global, symlink or uncomposed upstream installation fails before writes.
 
+Current owned capability bundles expose `static-inspection` in the installation receipt and concrete project profile. The built-in entry uses the static lane, an empty input-path list and explicit source and artifact assertions. The entry has no command vector and supplies no runner qualification. An explicit recipe with the same ID takes precedence. Older owned bundles verify against the bundled capability definitions. The workflow helper resolves the same fallback for a legacy profile, and an update from current source adds the discovery entry.
+
 Owned matching packages support verified no-op, replacement and uninstall. Unowned or locally modified packages conflict even with `--force`. Complete staging, ownership validation, locking, journal/backups and recoverable destination replacement precede activation. Verification checks complete inventory/content, identity, flavor, bridge and profile freshness.
+
+Explicit `manager.js --rebind` changes only the machine-bound project root after complete ownership, freshness and deterministic composition verification of a relocated installation. Edited packages, unknown bundle content, changed inputs and unresolved installation transactions reject rebinding. Same-root rebind is a verified no-op. Canonical active controllers require a stopped handoff. Queue locator recovery remains a separate explicit workflow operation and preserves historical checkpoints. Rebinding supplies no format conversion, ownership adoption or continuation authorization.
 
 The self-contained local manager locates the target from the maintenance bundle and refreshes using installed source modules without source-checkout/network access. Explicit refresh preserves queue/checkpoint identities and required obligations. Active execution reaches a stopped cleanup/handoff point before activation. Failed refresh preserves the stale prior generation. Profile activation supplies no continuation instruction.
 
 Implementation admission checks bounded input digests once per invocation/resume and pins the profile in the checkpoint. Nested focused iterations reuse admission. Stale inputs return the exact local refresh command; read-only inspection and intake remain available. A toolchain change ends admission. Authorization and process/isolation verification remain execution-time requirements.
+
+The installed plugin registry participates in bounded profile identity, including the absent state. Cached execution also rejects a changed registry or pending plugin journal before continuation; owned recovery, profile refresh and explicit re-admission restore eligibility. Core and plugin transactions use separate journals, staging directories, backups and last-generation records under the same canonical installation/writer locks. Recovery honors active retained runs and focused maintenance. Binary plugin resources remain byte-preserving during activation and rollback.
 
 A missing foundational test framework persists as one deduplicated setup finding. Normal Add Pending captures or reuses the finding at highest-open-plus-one priority after a queue exists, returning the Pending ID. Setup covers framework research/selection, compatible configuration, meaningful smoke coverage, focused commands and profile refresh. Missing optional specialist packages never create automatic top-priority work. Intake and readiness grant no package upgrade or product-execution permission.
 
@@ -66,3 +72,10 @@ A binding declaration uses the following shape. Snapshot exclusions are explicit
 The example pins describe data syntax, not a qualified toolchain combination. The review records schema 1, queue/execution/workspace snapshot digests and a complete `differences` list with `path`, exact nullable `queue`/`execution` SHA-256 values, `classification` and `reason`. The locator records schema 1 plus exact absolute machine-local `queue_root` and `workspace_root`. The generated receipt never replaces an owner authorization or actual toolchain check.
 
 Registered worktree installations use the canonical installation/writer barrier and inspect every retained active run before activation. A worktree profile belongs to the exact execution root; profile refresh requires a stopped handoff and explicit re-admission. The portable worktree environment declaration records required file names, isolated mutable directories and exclusive resource keys without secret contents.
+
+
+## Merged target activation
+
+Local delivery verifies the installed generation against the source inputs in the exact canonical merge tree. Installed bundle verification alone establishes internal ownership and consistency. Target activation additionally checks the expected flavor and provider destinations, including newly admitted core operations.
+
+The stopped canonical handoff protects the live queue, existing outcomes and retained workflow records. The target profile receives explicit local-delivery admission. Each affected retained run receives separate admission from the verified profile in the recorded execution worktree. Admission retains independent stops and grants no execution authority. Current target validation binds the resulting profile to the recorded Git merge before local delivery completes.

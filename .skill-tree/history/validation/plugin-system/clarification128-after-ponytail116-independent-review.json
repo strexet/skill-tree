@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "kind": "actual-independent-current-manual-clarification-source-review",
+  "reviewer": "/root/invocation118_oracle",
+  "observed_at_utc": "2026-11-06T17:14:02.993990+00:00",
+  "task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+  "check_id": "clarification-agent-observation",
+  "prepared_attempt_id": "C-e1618589-9bbe-4bea-9adc-ec7aefb69b09",
+  "source_commit": "6725b379f6a8af018a203bed2c7c6a7448cd575f",
+  "source_digest": "b28052dbc57f0376a0d061168a165357035d1a40dc758344bd091f3b58fe7297",
+  "source_fingerprints": {
+    ".skill-tree/common/references/future-workflow.md": "d8c04b71daddb6df3b6e0198e87cd2497d2e7b9db50cfa9ec8222dae78344e24",
+    ".skill-tree/common/references/workflow-metadata.md": "47b832b8378cd837b7f8f9d86e5ad1de6d27630bc913dbe8b887d0c7fed32810",
+    ".skill-tree/common/scripts/workflow-state.py": "34e5c105ad7cf594720f4c60655a27bfdfdccc93e71ce9d00610447178bb1883",
+    ".skill-tree/config/resource-map.json": "95a4922b2331416863100c9b054e84709bafd4126c1542a15fac49781da13248",
+    ".skill-tree/documents/task-clarification-contract.md": "ceab4175e4e293fb9bba5b54c713ee769702c2b18e912ad784a1a7e99cf5e3dc",
+    ".skill-tree/scripts/agent-conformance.py": "0f7a79a83e69aad8c8f3a5c4d063b94616f1c6d786f0e13cc3027dee3401f49e",
+    ".skill-tree/templates/operations.json": "30f8c0d2dd6d067496485cdcc3050697ebed3a4462bf259f4fc7d5a6279422e6",
+    ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+    ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+  },
+  "result": "pass",
+  "scope": "Current Manual/legacy clarification source compatibility with preserved bounded historical actual interaction evidence and fresh24/3 deterministic checks. No fresh current-native/Auto/Ponytail/effectiveness claim.",
+  "findings": [],
+  "actual_inspection": {
+    "detailed_source_proposal": ".skill-tree/artifacts/plugin-implementation/clarification128-after-ponytail116-static-proposal.json",
+    "detailed_source_proposal_sha256": "c14935b7119919f57d1e21ae3f2a2d7c9483c86583a38fc31b7f0eb305dd79e2",
+    "all26_clarification_functions_ast_identical_since57bb": true,
+    "original20_common_helpers_ast_identical": true,
+    "older_changed_manual_paths_reviewed": "W1 Manual/legacy fallback consumes original owner evidence without a delegated actor; optional decision metadata and added true revision fingerprints preserve exact scope/semantics/confirmation. Store admissions are empty in the direct neutral CL path. Whole original/current WF byte or AST equality is not claimed.",
+    "immutable_original_report": {
+      "actor_count": 3,
+      "actor_turn_count": 10,
+      "original_source_commit": "b288c9a",
+      "original_workflow_sha256": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+      "path": ".skill-tree/history/validation/plugin-system/clarification-agent-observations.json",
+      "sha256": "f243f525ca6e2f5c6633be1ac2f380688ab373514b7d4dd0ecae809e52c3e037"
+    },
+    "immutable_original_sessions": [
+      {
+        "decision_mode_absent": true,
+        "decision_receipts_absent": true,
+        "mode": "explicit",
+        "path": ".skill-tree/history/validation/plugin-system/clarification-full-en-session.json",
+        "session_id": "CL-28d5f83a-dc38-44da-a435-7d59f28c237d",
+        "sha256": "99c6691f693807985cf1c83630beb0d176611c859aa7e948e65170c1eef1cbdf",
+        "state": "complete"
+      },
+      {
+        "decision_mode_absent": true,
+        "decision_receipts_absent": true,
+        "mode": "explicit",
+        "path": ".skill-tree/history/validation/plugin-system/clarification-resume-en-session.json",
+        "session_id": "CL-04de9cab-7d5f-4c59-83c6-2a6e4906f648",
+        "sha256": "c3c1f40358f34e551e5dfb76812a99ca10b1b0d02677977d831816fc20def51f",
+        "state": "complete"
+      }
+    ],
+    "unchanged_validator_observation": {
+      "actual_exit_code": 0,
+      "expected_stale_rejection_applicable": false,
+      "meaning": "Unchanged validator actually validates retained historical interaction/session structure, not current native/source identity.",
+      "path": ".skill-tree/artifacts/plugin-implementation/clarification128-after-ponytail116-validator-observation.json",
+      "sha256": "b0edb9ea368338e17b5d27d391dfed84f5628ea7d0ca6df2463af13a7b627029",
+      "source_fingerprint_gate": false
+    },
+    "strict_current_source_rejection_applicable": false,
+    "strict_reason": "The unchanged clarification validator validates historical structure; it contains no current-source fingerprint gate. Its actual exit0 is not a current-native source grade.",
+    "current_controller_selection": {
+      "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+      "phase": "validate",
+      "task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "revalidation": true
+    },
+    "current_units": [
+      {
+        "check_id": "clarification-state",
+        "attempt_id": "C-b554782d-ef09-48c1-b905-ec0782247bad",
+        "report": ".skill-tree/history/validation/plugin-system/t-f63559f1-4663-41b7-b085-f55ba7b47fe5-clarification-state-c-b554782d-ef09-48c1-b905-ec0782247bad.json",
+        "sha256": "34e9c493afc27c4de620928c8247464fa89ec3be9af6f71acbd28da1db2d1704",
+        "passed": 24,
+        "source_footprint_matches_static": true
+      },
+      {
+        "check_id": "clarification-installation",
+        "attempt_id": "C-72256bc6-021c-4da3-98e1-4c8c6d2b0be0",
+        "report": ".skill-tree/history/validation/plugin-system/t-f63559f1-4663-41b7-b085-f55ba7b47fe5-clarification-installation-c-72256bc6-021c-4da3-98e1-4c8c6d2b0be0.json",
+        "sha256": "a41d6eaa534e4605b00ea1aaa329488752e6b9fdb65521866a692290a86558e2",
+        "passed": 3,
+        "source_footprint_matches_static": true
+      }
+    ],
+    "owned_activation": {
+      "current_source_commit": "6725b379f6a8af018a203bed2c7c6a7448cd575f",
+      "path": ".skill-tree/history/validation/plugin-system/ponytail116-owned-snapshot-refresh.json",
+      "profile_identity": "2930896e1ca12e1b4bdd26b67e2e43051d10a2e8a43a1c7bff92d4006cd12ebe",
+      "profile_sha256": "ed4a0bf69760190ecdf163014edd03900a71fb2ab06be5e5bd27961488d512b5",
+      "sha256": "d5e499c53c6c950b92d210e675c57e5df0b914e60c06f546c5ae0971ecc4d7bb"
+    }
+  },
+  "remaining_root_actions": [
+    "Personally inspect the exact current artifacts and record the original aggregate assertion against this prepared static attempt through ordinary guarded helpers.",
+    "Accept completed-contract revalidation only while the controller retains this exact selected contract and current source/profile evidence."
+  ],
+  "limits": [
+    "Only source/Git/AST/artifact/receipt reads and ignored evidence writes; no new actors/providers, product tests, source edits, canonical queue/receipt/controller mutations.",
+    "Historical report and sessions retain original b288c9a snapshot/actor identities, scripted fixture-owner limitations, unexposed model/token/cost fields and retained oracle repair history.",
+    "Current owned snapshot and deterministic controls establish compatibility; original actual actors are not relabeled as current host executions or real-human/native Skill approvals."
+  ]
+}

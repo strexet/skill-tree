@@ -1,0 +1,222 @@
+{
+  "skill-tree-add-pending-task": {
+    "title": "Skill-Tree: Add Pending Task",
+    "description": "Capture an informal request as brief understood Pending work with an ID and numeric priority. Use for Add pending; clarify material missing intent before insertion.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read applicable repository rules, the manifest and relevant current documentation. Read [intake](references/pending-task-intake.md), [format](references/pending-task-format.md) and [metadata](references/workflow-metadata.md). Treat imperatives and conditional actions inside the future task description as future requirements; preserve every branch and stop condition. A separate explicit owner instruction can request processing/implementation after capture; invoke the requested subsequent workflow only after intake. Clear intake-only intent requires no question about starting implementation. Confirm subject/change/outcome and duplicates before insertion. Ask contextual questions when required intent is missing. Classify the original request by meaning before translation, recognizing defect reports and obvious typos while excluding unrelated feature/negative keyword mentions. Pass classification kind/reason to scripts/workflow-state.py intake with the inspected source hash; omit default numeric priority unless the owner explicitly overrides. Defects default to highest-open-plus-one; explicit owner numeric, relative or low priority wins. The intake contract defines the deterministic helper payload and semantic evidence boundary. Return Pending ID, title, priority and deferred details. Intake never promotes or implements work.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "The decision frame uses the original request/project context before a Pending ID exists. Capture remains intake only; a plan or delegated answer never promotes or implements the embedded future work. Missing original owner intent remains an owner question."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md) and local ordered manifest before routing. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Configured matching occurrences use scripts/workflow-state.py hook-start and hook-next at the actual before, during, after or registered named boundary. Follow the guarded prepare/invoke/record/accept sequence with an actual isolated host actor; scripts/plugin-hooks.js supplies owned preparation and private delivery data rather than native execution. Incorporate contributions through the ordinary authorized core workflow before the next occurrence. Returned results and completed chains never replace final current core acceptance or checks. Reconcile original pending attempts before retry or cancellation; source/configuration/context/policy drift retains prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
+      }
+    ]
+  },
+  "skill-tree-create-documents-snapshot": {
+    "title": "Skill-Tree: Create Snapshot",
+    "description": "Create an explicitly requested Markdown documentation snapshot archive without editing live documents.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read repository rules and [snapshot scope](references/snapshot-rules.md). Inspect candidate relevance, then run scripts/create-documentation-snapshot.py <repository> --dry-run with requested --include, --member-style and --output/--output-dir options. Create the requested archive only after scope is understood. Preserve live sources, exclude private/generated/vendor content and verify member names/notices. Return archive path and scope; commit only under explicit authorization.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "The decision frame uses bounded document/snapshot context and the requested archive scope. Operation execution creates only the authorized snapshot; the frame creates no Future task or implementation run."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md) and local ordered manifest before routing. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Configured matching occurrences use scripts/workflow-state.py hook-start and hook-next at the actual before, during, after or registered named boundary. Follow the guarded prepare/invoke/record/accept sequence with an actual isolated host actor; scripts/plugin-hooks.js supplies owned preparation and private delivery data rather than native execution. Incorporate contributions through the ordinary authorized core workflow before the next occurrence. Returned results and completed chains never replace final current core acceptance or checks. Reconcile original pending attempts before retry or cancellation; source/configuration/context/policy drift retains prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
+      }
+    ]
+  },
+  "skill-tree-implement-all": {
+    "title": "Skill-Tree: Implement All",
+    "description": "Implement all prioritized tasks or an explicitly selected group with required dependencies and resumable checkpoints; defer new nonblocking work.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read applicable rules, [orchestration](references/orchestration.md) and [metadata](references/workflow-metadata.md). Query the index/checkpoint first. Select an existing run explicitly for resume, or start mode all for a new isolated run. For an owner-selected group, pass the exact Ready T- IDs as snapshot_ids in the start JSON; omission selects the full initial prioritized queue. Report the frozen roots and required dependencies; preserve the recorded group on resume. Use scripts/workflow-state.py advance before handoffs. After scoped processing, automatically choose the recommended eligible unit inside the recorded root/snapshot boundary; routine next-action questions apply only to standalone processing. Material questions and execution stops remain binding. Follow bundled [intake](references/pending-task-intake.md) and [processing/implementation](references/future-workflow.md) contracts. Query compact history only when relevant. Return completed/deferred/blocked IDs, checks and next action. No scheduler or blanket execution permission is implied.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency. Read [development practices](references/development-practices.md) for test-oracle and behavior-preservation decisions.\n\nRead [run workspaces](references/run-workspaces.md) before source changes. Use one branch/worktree for the entire admitted root/snapshot, resolve canonical queue authority and atomically claim tasks/resources. New runs default to the current remote develop and require a separate workspace. Preserve multiple runs and explicit resume selection. Implementation acceptance offers local result, [PR review/fix](references/pr-review-cycle.md), or PR review/fix with authorized merge; no offer starts publication. Execute a recorded full-path instruction without repeated permission questions and retain separate implementation/publication outcomes."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "The controller retains the frozen root/snapshot and existing mode. Leaf operation frames own task plan/check/review decisions; the controller consumes matching leaf evidence without inventing another task-selection or implementation grant."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md) and local ordered manifest before routing. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Configured matching occurrences use scripts/workflow-state.py hook-start and hook-next at the actual before, during, after or registered named boundary. Follow the guarded prepare/invoke/record/accept sequence with an actual isolated host actor; scripts/plugin-hooks.js supplies owned preparation and private delivery data rather than native execution. Incorporate contributions through the ordinary authorized core workflow before the next occurrence. Returned results and completed chains never replace final current core acceptance or checks. Reconcile original pending attempts before retry or cancellation; source/configuration/context/policy drift retains prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
+      }
+    ]
+  },
+  "skill-tree-implement-next-future-task": {
+    "title": "Skill-Tree: Implement Next Task",
+    "description": "Implement the highest-priority Prioritized task or an exact task ID/name; capture findings and record acceptance evidence before completion.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read repository rules, [workflow](references/future-workflow.md), [metadata](references/workflow-metadata.md), selected task questions, current documentation and task-relevant source/tests. Use scripts/workflow-state.py select: highest priority wins, ties follow document order; exact IDs/names never fall back. A blocked selection stops. Implement minimal scoped changes and capture findings through intake with root/direct-parent context. Perform authorized validation and review, update current documentation, then complete with individual acceptance/source evidence. Required unrun checks prevent completion. Record authorized commits only after commit creation. Return completed/needs-dependencies/needs-clarification/validation-blocked outcome and captured IDs. Never implement from the queue alone.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency. Read [development practices](references/development-practices.md) for test-oracle and behavior-preservation decisions."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "The decision frame binds the exact admitted task and current source context. Draft plan and any during contribution precede current plan review/acceptance and source edits. Actual required check receipts and full review remain mandatory before terminal task completion."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md) and local ordered manifest before routing. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Configured matching occurrences use scripts/workflow-state.py hook-start and hook-next at the actual before, during, after or registered named boundary. Follow the guarded prepare/invoke/record/accept sequence with an actual isolated host actor; scripts/plugin-hooks.js supplies owned preparation and private delivery data rather than native execution. Incorporate contributions through the ordinary authorized core workflow before the next occurrence. Returned results and completed chains never replace final current core acceptance or checks. Reconcile original pending attempts before retry or cancellation; source/configuration/context/policy drift retains prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
+      }
+    ]
+  },
+  "skill-tree-process-future-pending": {
+    "title": "Skill-Tree: Process Pending Tasks",
+    "description": "Research Pending tasks selected by IDs or exact names and produce researched prioritized tasks with provenance. No selection processes the Pending Queue.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read applicable rules, current documentation, relevant implementation/configuration/tests and [workflow](references/future-workflow.md). Use scripts/workflow-state.py pending to resolve the complete selection before research. Read [metadata](references/workflow-metadata.md) for process payloads. Split oversized work, preserve Pending parent IDs, clarify required decisions and retain blocked intake. Apply researched dispositions through process with the inspected source hash. Return created/reused/retained/resolved IDs and the refreshed prioritized list with brief outcomes/blockers. Follow the workflow processing-result contract: standalone invocation presents next choices, places one recommended action last and waits for the developer; explicit Work Through Next/Implement All invocation returns to the bounded controller for automatic eligible selection. An active checkpoint alone implies no continuation.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "Before promotion, the decision frame uses the real selected Pending IDs. Source-backed in-scope decisions can use Auto; unresolved owner intent remains Pending. The standalone next-action selection still requires an actual developer instruction, while an explicitly launched controller retains the frozen automatic-selection scope."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md) and local ordered manifest before routing. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Configured matching occurrences use scripts/workflow-state.py hook-start and hook-next at the actual before, during, after or registered named boundary. Follow the guarded prepare/invoke/record/accept sequence with an actual isolated host actor; scripts/plugin-hooks.js supplies owned preparation and private delivery data rather than native execution. Incorporate contributions through the ordinary authorized core workflow before the next occurrence. Returned results and completed chains never replace final current core acceptance or checks. Reconcile original pending attempts before retry or cancellation; source/configuration/context/policy drift retains prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent.\n\nRead [post-processing task applications](references/future-workflow.md#post-processing-task-applications) for the after boundary. Processing creates the visible blocked task and the shared clarification session together when a matching task-editorial or task-interview application applies. Generic-only hooks retain the ordinary invocation and readiness workflow. Use the recorded session, event and configured order. Complete current contributions, affected wording rechecks and final mode-specific acceptance before Ready."
+      }
+    ]
+  },
+  "skill-tree-repo-documentation": {
+    "title": "Skill-Tree: Initialize Documents",
+    "description": "Initialize or repair current repository documentation, the Skill Tree navigation manifest and task index from source evidence.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read applicable repository rules and [output contract](references/documentation-output-contract.md). Inspect source using [discovery](references/repository-discovery-checklist.md). Create the required current document set; preserve unowned instructions. Read [metadata](references/workflow-metadata.md); initialize future.md explicitly, then refresh index and manifest. Capture confirmed documentation findings in Backlog with stable IDs and evidence. Review document rules and validators; report verified facts, unknowns and actual checks.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency. After queue setup, run scripts/workflow-state.py capture-foundation against the covered root; report the captured or reused Pending ID before implementation selection."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "The decision frame uses the actual project/document scope before Future setup. Metadata bootstrap occurs only through the separately authorized documentation operation; the frame creates no queue or implementation run."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md) and local ordered manifest before routing. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Configured matching occurrences use scripts/workflow-state.py hook-start and hook-next at the actual before, during, after or registered named boundary. Follow the guarded prepare/invoke/record/accept sequence with an actual isolated host actor; scripts/plugin-hooks.js supplies owned preparation and private delivery data rather than native execution. Incorporate contributions through the ordinary authorized core workflow before the next occurrence. Returned results and completed chains never replace final current core acceptance or checks. Reconcile original pending attempts before retry or cancellation; source/configuration/context/policy drift retains prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
+      }
+    ]
+  },
+  "skill-tree-repo-documentation-audit": {
+    "title": "Skill-Tree: Audit Documents",
+    "description": "Audit current repository documentation against implementation and persist bounded findings, coverage and source fingerprints.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read rules, manifest, current documents and [output contract](references/documentation-output-contract.md). Inspect relevant source/configuration/tests using [discovery](references/repository-discovery-checklist.md); document-to-document comparison alone is insufficient. Repair drift and missing required documents from current evidence. Capture confirmed issues in Backlog with IDs and evidence. Read [metadata](references/workflow-metadata.md) and [retention](references/history-retention.md); persist an audit with stable finding IDs, source coverage and unrun checks. Refresh manifest; run scripts/validate-repository-documentation.py and scoped scripts/validate-document-rules.py diagnostics; report corrections, unresolved findings and actual validation. No product implementation is implied.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "The decision frame uses bounded document/source inspection scope. Plan and review concern the authorized audit and repairs; governance supplies no product implementation permission."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md) and local ordered manifest before routing. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Configured matching occurrences use scripts/workflow-state.py hook-start and hook-next at the actual before, during, after or registered named boundary. Follow the guarded prepare/invoke/record/accept sequence with an actual isolated host actor; scripts/plugin-hooks.js supplies owned preparation and private delivery data rather than native execution. Incorporate contributions through the ordinary authorized core workflow before the next occurrence. Returned results and completed chains never replace final current core acceptance or checks. Reconcile original pending attempts before retry or cancellation; source/configuration/context/policy drift retains prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
+      }
+    ]
+  },
+  "skill-tree-work-through-next": {
+    "title": "Skill-Tree: Work Through Next",
+    "description": "Complete one prioritized main task and required blockers/subtasks through a resumable implementation and processing cycle.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read applicable rules, [orchestration](references/orchestration.md) and [metadata](references/workflow-metadata.md). Query the index/checkpoint first. Select an existing run explicitly for resume, or start mode next for a new isolated run. Use scripts/workflow-state.py advance before handoffs. After scoped processing, automatically choose the recommended eligible unit inside the recorded root/snapshot boundary; routine next-action questions apply only to standalone processing. Material questions and execution stops remain binding. Follow bundled [intake](references/pending-task-intake.md) and [processing/implementation](references/future-workflow.md) contracts. Query compact history only when relevant. Return completed/deferred/blocked IDs, checks and next action. No scheduler or blanket execution permission is implied.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency. Read [development practices](references/development-practices.md) for test-oracle and behavior-preservation decisions.\n\nRead [run workspaces](references/run-workspaces.md) before source changes. Use one branch/worktree for the entire admitted root/snapshot, resolve canonical queue authority and atomically claim tasks/resources. New runs default to the current remote develop and require a separate workspace. Preserve multiple runs and explicit resume selection. Implementation acceptance offers local result, [PR review/fix](references/pr-review-cycle.md), or PR review/fix with authorized merge; no offer starts publication. Execute a recorded full-path instruction without repeated permission questions and retain separate implementation/publication outcomes."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "The controller retains one selected root, required dependencies and existing mode. Leaf frames own current task phases; new nonblocking findings remain deferred and actor decisions never expand the root."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md) and local ordered manifest before routing. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Configured matching occurrences use scripts/workflow-state.py hook-start and hook-next at the actual before, during, after or registered named boundary. Follow the guarded prepare/invoke/record/accept sequence with an actual isolated host actor; scripts/plugin-hooks.js supplies owned preparation and private delivery data rather than native execution. Incorporate contributions through the ordinary authorized core workflow before the next occurrence. Returned results and completed chains never replace final current core acceptance or checks. Reconcile original pending attempts before retry or cancellation; source/configuration/context/policy drift retains prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
+      }
+    ]
+  },
+  "skill-tree-pr-review-cycle": {
+    "title": "Skill-Tree: PR Review Cycle",
+    "description": "Create or resume a PR from the selected branch, review the full diff, fix findings and repeat review until ready; merge only with explicit owner authorization.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read applicable project rules, the [PR review cycle](references/pr-review-cycle.md), [run workspace contract](references/run-workspaces.md) and [metadata](references/workflow-metadata.md). Resolve source_branch (current selected branch), target_branch (develop) and merge (false) from direct owner instructions; preserve explicit negatives and clarify conflicts. Verify repository, remote, worktree, current refs and existing PR before publication. Use available authorized provider tools and the bundled scripts/pr-review-state.py for resumable evidence. Review, publish actionable findings, fix and validate in the same branch, then re-review the current head/base. Self-review supplies no external approval. Stop at PR ready unless merge is explicitly authorized; authorized merge requires current checks/approvals, conditional head protection and confirmed provider merge evidence. Read [validation policy](references/validation-policy.md) for truthful execution claims.\n\nGenerated prose follows [document rules](references/document-rules.md). The controller completion offer supplies no publication authorization."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "The decision frame binds the complete current repository/base/head/target review identity. Reviewer findings receive evidence-backed resolution, authorized fixes, current checks and re-review. Decisions never replace required external approval, checks, PR creation or merge authorization."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md) and local ordered manifest before routing. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Configured matching occurrences use scripts/workflow-state.py hook-start and hook-next at the actual before, during, after or registered named boundary. Follow the guarded prepare/invoke/record/accept sequence with an actual isolated host actor; scripts/plugin-hooks.js supplies owned preparation and private delivery data rather than native execution. Incorporate contributions through the ordinary authorized core workflow before the next occurrence. Returned results and completed chains never replace final current core acceptance or checks. Reconcile original pending attempts before retry or cancellation; source/configuration/context/policy drift retains prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
+      }
+    ]
+  },
+  "skill-tree-clarify-tasks": {
+    "title": "Skill-Tree: Clarify Tasks",
+    "description": "Clarify an explicitly selected task or exact task group through source research, owner answers, guarded revisions and current shared-understanding confirmation.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read repository rules, [workflow](references/future-workflow.md), [metadata](references/workflow-metadata.md) and the selected task/source evidence. Use scripts/workflow-state.py clarify-start with exact unique prioritized task_ids and the inspected expected_source_hash. Resume the exact existing CL session for a [post-processing task application](references/future-workflow.md#post-processing-task-applications). The session holds only the selected tasks; clarification creates no implementation run or worktree. Research source-answerable facts, then use clarify-round to register decision prerequisites, task/semantic-field bindings and recommendations. Present the complete independent question frontier and obtain actual current-mode answers: owner submissions in Manual or the qualified bounded actor broker in Auto. Record actual answer evidence through clarify-answer; apply decisions through clarify-revise, preserving identity, provenance and validation metadata. Recheck clarity and the next frontier after revisions. Use clarify-confirm only after current-mode acceptance of the current exact task scope and semantic fingerprints: actual owner confirmation in Manual or a separate current specification decision in Auto. Every mutation requires the inspected queue hash; existing sessions also require session hash and revision. Use clarify-read before resuming; clarify-resume reconciles source drift within the frozen selection, while clarify-cancel records ended discussion without successful required interview evidence. Keep research and waits outside writer locks. Completion reports clarification acceptance and leaves implementation to a separate instruction.\n\nGenerated prose follows [document rules](references/document-rules.md). Source-backed interview execution and native external-skill invocation remain distinct evidence."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "Resolve the frozen decision mode before starting new discussion. New qualified Auto operation routing passes decision_mode auto, a bounded actual owner grant and the real executor/context to clarify-start; explicit Manual and legacy sessions remain Manual. Create exact parent-bound DG decisions and attach the existing decision ID to the core actor broker. Current specification acceptance remains separate from an individual answer. Reconcile original actors before switching or cancellation."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md) and local ordered manifest before routing. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Configured matching occurrences use scripts/workflow-state.py hook-start and hook-next at the actual before, during, after or registered named boundary. Follow the guarded prepare/invoke/record/accept sequence with an actual isolated host actor; scripts/plugin-hooks.js supplies owned preparation and private delivery data rather than native execution. Incorporate contributions through the ordinary authorized core workflow before the next occurrence. Returned results and completed chains never replace final current core acceptance or checks. Reconcile original pending attempts before retry or cancellation; source/configuration/context/policy drift retains prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
+      }
+    ]
+  },
+  "skill-tree-plugins": {
+    "title": "Skill-Tree: Manage Plugins",
+    "description": "Browse installed and known Skill Tree plugins, configure ordered bindings and parameters, and preview explicit installs, updates or removals.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Run node scripts/plugin-manager.js --project-root <project-root> --input - with a JSON envelope. Use {\"action\":\"inventory\"} for offline installed packages, ordered binding occurrences and grouped known sources. For human output pass format text and group_by plugin or point. Raw inventory returns without dispatch or queue initialization. Report installed, known, configured and available states separately. An absent curated catalog leaves direct source intake and project-known sources available.\n\nFor an explicit change, use {\"action\":\"prepare\",\"request\":{...}} with a stable request_id and the exact requested action. Save-known registers a source. Install and update accept sources and optional complete bindings. Bind accepts a binding. Configure accepts the complete bindings. Move uses an exact binding_id and zero-based index within the resolved point. Edit uses an exact binding_id and changes. Unbind, enable and disable target one exact binding_id. Uninstall and forget-known target an exact plugin_id. Reuse exact known IDs or accept a repository, skill or raw URL, local file or folder. Set resolve_remote true only for explicitly selected remote acquisition during preparation. Resolve free-text placement to an owned operation and anchor. Report unresolved placement as a prerequisite.\n\nShow the public preview, including exact versions, ownership, affected packages, ordered occurrence IDs, conditions, enablement, values and origins, adapter prerequisites and frozen requirements. The same package can appear repeatedly at one point. Moving an occurrence preserves the binding ID. Keep private locators and proposal data out of the chat and ordinary artifacts. After actual matching confirmation, send {\"action\":\"apply\",\"proposal\":{...},\"confirmation\":{\"proposal_digest\":\"<digest>\"}}. Discard a cancelled proposal. A changed preview requires a new confirmation. Report current profile refresh and re-admission requirements."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "Bind the management decision to the explicit request and current preview. Auto reasoning may evaluate in-scope options. Acquire only an explicitly selected source. Actual matching owner consent remains required for activation and mutations. Reuse explicit exact removal authorization when the verified preview preserves the complete authorized effect. Raw inventory and installation require no task identity. Never start a task, run or worktree for management."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin invocation contract](references/plugin-invocation.md) and the local ordered manifest for explicit management workflow actions. Raw inventory, cancellation and activation do not dispatch plugins. Configured existing occurrences use scripts/workflow-state.py hook-start and hook-next with the actual management request and proposal context. The before boundary follows explicit action admission, the during boundary follows preparation, and the after boundary follows review of the complete preview. The three proposal boundaries precede activation. Rebuild and present a changed preview before requesting matching consent. Use scripts/plugin-hooks.js for guarded preparation and private delivery, an actual isolated host actor for invocation, and ordinary guarded incorporation before continuing. Reconcile original attempts before retry or cancellation. A newly enabled package runs only in a later explicitly authorized workflow."
+      }
+    ]
+  }
+}

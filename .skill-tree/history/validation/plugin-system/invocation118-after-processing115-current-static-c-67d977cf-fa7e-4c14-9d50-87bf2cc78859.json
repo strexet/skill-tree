@@ -1,0 +1,103 @@
+{
+  "actual_lane": "static",
+  "actual_validator": {
+    "argv": [
+      "python3",
+      "-B",
+      ".skill-tree/scripts/agent-conformance.py",
+      "plugin-invocation-validate",
+      "--input",
+      ".skill-tree/history/validation/plugin-system/invocation118-native/report.json",
+      "--capture",
+      ".skill-tree/history/validation/plugin-system/invocation118-native/capture.json"
+    ],
+    "exit_code": 1,
+    "immutable_historical_artifacts": {
+      ".skill-tree/history/validation/plugin-system/invocation118-native/capture.json": "5f481b09a9cdd556971ae3b1ca12d1ab8e5147266d8378aae59703514526e0bd",
+      ".skill-tree/history/validation/plugin-system/invocation118-native/report.json": "cf002e5bb4448a5f870d5904e8905f1b3006fc05004e59430300d777877e8485",
+      ".skill-tree/scripts/agent-conformance.py": "0f7a79a83e69aad8c8f3a5c4d063b94616f1c6d786f0e13cc3027dee3401f49e"
+    },
+    "stderr": "Traceback (most recent call last):\n  File \"/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/scripts/agent-conformance.py\", line 711, in <module>\n    if __name__=='__main__':main()\n                            ^^^^^^\n  File \"/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/scripts/agent-conformance.py\", line 707, in main\n    elif args.command=='plugin-invocation-validate':result=validate_plugin_invocation_report(json.loads(args.input.read_text()),json.loads(args.capture.read_text()) if args.capture else None)\n                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/scripts/agent-conformance.py\", line 693, in validate_plugin_invocation_report\n    try:return _validate_plugin_invocation_report(report,trusted_capture)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/scripts/agent-conformance.py\", line 472, in _validate_plugin_invocation_report\n    for path,fingerprint in sources.items():require(relative(path) and sha(fingerprint) and (CORE/path).is_file() and digest(CORE/path)==fingerprint,'An invocation source fingerprint is missing, stale or nonportable')\n                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/scripts/agent-conformance.py\", line 462, in require\n    if not condition:raise ValueError(message)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: An invocation source fingerprint is missing, stale or nonportable\n",
+    "stdout": ""
+  },
+  "attempt_id": "C-67d977cf-fa7e-4c14-9d50-87bf2cc78859",
+  "check_id": "installed-agent-hook-evidence",
+  "current_unit_receipts": {
+    "hook-observation-oracle": {
+      "attempt_id": "C-ae199313-fbdd-4acd-988a-34347f8ecde5",
+      "counts": {
+        "discovered": 12,
+        "expected": 12,
+        "failed": 0,
+        "passed": 12,
+        "skipped": 0
+      }
+    },
+    "hook-state-regressions": {
+      "attempt_id": "C-7b493c5d-de43-4ffd-a7e2-2da2b33c46bf",
+      "counts": {
+        "discovered": 80,
+        "expected": 80,
+        "failed": 0,
+        "passed": 80,
+        "skipped": 0
+      }
+    },
+    "installed-hook-fixtures": {
+      "attempt_id": "C-e2a82ea3-e6d4-4a9f-9e4b-3005b02bb0f7",
+      "counts": {
+        "discovered": 17,
+        "expected": 17,
+        "failed": 0,
+        "passed": 17,
+        "skipped": 0
+      }
+    }
+  },
+  "limits": [
+    "Bounded source compatibility and preserved prior observations. No fresh native or candidate qualification."
+  ],
+  "observations": [
+    "Actual historical scope used the ordinary explicit Manual CL and generic A1, B, A2 bindings.",
+    "No captured binding contained a typed Processing application, recheck identity or review frontier.",
+    "Independent AST comparison matched ordinary engine start, proof, freshness and transition after excluding verified inapplicable typed branches.",
+    "Current canonical Processing After requires the live exact owned CL association when a required-processing record exists. The old explicitly prepared fixture has no such record. Current qualification stays conditional on that narrower path."
+  ],
+  "original_contract_id": "O-da4ded83-2e33-42c2-88a1-0ae8e4261fc2",
+  "profile_identity": "dd4a66be0c80310cd7412eda5e6603773a28e59861cf5fa731e78f807c21b7f5",
+  "result": "pass",
+  "schema": 1,
+  "source_commit": "2a6d240bf6f844d339d246bea57a437e9e3eb7fd",
+  "source_fingerprints": {
+    ".skill-tree/common/references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
+    ".skill-tree/common/references/workflow-metadata.md": "91264f18e09460d44decc0f09cbd7f9a8b12579822371956f228df58fc32f6f5",
+    ".skill-tree/common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    ".skill-tree/common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+    ".skill-tree/common/scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",
+    ".skill-tree/common/scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",
+    ".skill-tree/common/scripts/pr-review-state.py": "6bfb09e0273a6322c86c5f5915e8dc0503fa22416881c499c281c1dec570a3d1",
+    ".skill-tree/common/scripts/run-workspaces.py": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+    ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+    ".skill-tree/common/scripts/workflow-state.py": "ab47ba4e4ffe6c780f2d78e39093af8c6f98ffbd4b7114913aebfa951543ebb1",
+    ".skill-tree/config/resource-map.json": "9c82335ce439247fbfc56c50c817cdaf7a9b68901dbe69b4180f9081f1ada13f",
+    ".skill-tree/documents/implementation-plan.md": "61dc2c6e2974b003a6b83bbd31299600f900f9a03f7f1d23bba8707ad3457b90",
+    ".skill-tree/documents/plugin-management-contract.md": "dd9ee48ee9a3f64af0aebd475192637ff2e44e80fea9a5344a47c4d810451627",
+    ".skill-tree/documents/plugin-system-contract.md": "a50a26f11f3a839570d46588673be02ea86fe37a083bb14d8278bb8645f72634",
+    ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84",
+    ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+    ".skill-tree/lib/installation.js": "efb88bc5a28246aab36c7d1cb709f5ec4fb37dc736867c3533503e74c26fa431",
+    ".skill-tree/lib/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
+    ".skill-tree/lib/plugin-composition.js": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d",
+    ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    ".skill-tree/lib/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+    ".skill-tree/lib/plugin-runtime.js": "e704dce8f8019baae4f783bce8c6f5fdf5dfaf7961760ecad33ce3ab919b4338",
+    ".skill-tree/lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+    ".skill-tree/scripts/agent-conformance.py": "0f7a79a83e69aad8c8f3a5c4d063b94616f1c6d786f0e13cc3027dee3401f49e",
+    ".skill-tree/templates/operations.json": "504c58534f010e57dbc45f0a276572b7690ea51ddb601f1b85dbf2dae16ab794",
+    ".skill-tree/tests/test-plugin-conformance.py": "13475002ed224cb6270c3d5b32a6762e9cc2f2928a338104513c0e2062a088fd",
+    ".skill-tree/tests/test-plugin-invocation-installation.js": "fa16b6af4ae637415100fa2e0c3dcfeb9a7f392e168f61980ecd3c8fc84e1495",
+    ".skill-tree/tests/test-plugin-workflow.py": "a7ae1a514938920070a4c6a936d43fcac5d772168c3d9d40005dfe91ccaff44b"
+  },
+  "source_review_reference": ".skill-tree/history/validation/plugin-system/processing115-final6-independent-review.json",
+  "task_id": "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+}

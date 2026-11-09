@@ -1,0 +1,28 @@
+Traceback (most recent call last):
+  File "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-invocation118-native-r7qxnwj9/.agents/skills/skill-tree-process-future-pending/scripts/workflow-state.py", line 1850, in hook_action
+    try:return _hook_action(store,command,payload,private_delivery_provider=private_delivery_provider,private_delivery_sink=private_delivery_sink)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-invocation118-native-r7qxnwj9/.agents/skills/skill-tree-process-future-pending/scripts/workflow-state.py", line 1961, in _hook_action
+    result=helper.mutate(bound,cmd,normalized,proof=proof,verify_transition=lambda chain,attempt,receipt,after:_hook_transition(effective,chain,attempt,receipt,after),guard=guard)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-invocation118-native-r7qxnwj9/.agents/skills/skill-tree-process-future-pending/scripts/plugin-invocation.py", line 317, in mutate
+    attempt=exact_attempt(chain,payload);attempt_sources(attempt,proof);result=clone(payload.get('result'));require(isinstance(result,dict) and result.get('status') in OUTCOMES,'An actual supported invocation result is required')
+                                                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-invocation118-native-r7qxnwj9/.agents/skills/skill-tree-process-future-pending/scripts/plugin-invocation.py", line 24, in require
+    if not condition:raise InvocationError(message)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+skill_tree_plugin_invocation.InvocationError: An actual supported invocation result is required
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/artifacts/plugin-implementation/invocation118-native-harness.py", line 146, in <module>
+    recorded=change('record',attempt_id=attempt['id'],input_digest=attempt['input_digest'],delivery_digest=attempt['delivery_digest'],resolved_parameter_digest=attempt['resolved_parameter_digest'],result=result,evidence={'kind':'host-result','provider':dispatch['provider'],'tool':dispatch['tool'],'reference':returned['id'],'actor_id':p['actor']['id'],'actor_context_id':p['actor']['context_id'],'mechanism':'source-backed-context'})
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/artifacts/plugin-implementation/invocation118-native-harness.py", line 88, in change
+    current=frame();return wf.hook_action(store,'hook-'+command,{'chain_id':current['id'],'expected_chain_hash':current['chain_hash'],'expected_chain_revision':current['revision'],'expected_source_hash':sha(store.text()),**value})
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-invocation118-native-r7qxnwj9/.agents/skills/skill-tree-process-future-pending/scripts/workflow-state.py", line 1852, in hook_action
+    except ValueError as error:raise WorkflowError(str(error)) from error
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+invocation118_installed_workflow.WorkflowError: An actual supported invocation result is required

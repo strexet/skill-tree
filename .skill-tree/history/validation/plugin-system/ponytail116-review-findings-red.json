@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "kind": "focused-requirements-led-red-controls",
+  "result": "expected-red",
+  "exit_code": 1,
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-plugin-review.py",
+    "PluginReviewPilotTests.test_actual_generic_dg_resolution_cannot_bypass_review_finding_incorporation",
+    "PluginReviewPilotTests.test_owned_custom_named_after_alias_completes_and_satisfies_readiness",
+    "PluginReviewPilotTests.test_after_entry_rejects_unresolved_core_report_and_needs_clean_current_pass"
+  ],
+  "selected_tests": [
+    "test_actual_generic_dg_resolution_cannot_bypass_review_finding_incorporation",
+    "test_owned_custom_named_after_alias_completes_and_satisfies_readiness",
+    "test_after_entry_rejects_unresolved_core_report_and_needs_clean_current_pass"
+  ],
+  "discovered": 3,
+  "failures": 3,
+  "errors": 0,
+  "wall_seconds": 16.64787454204634,
+  "test_definition": {
+    "path": ".skill-tree/tests/test-plugin-review.py",
+    "sha256": "e49a5f0eb6ce634ee75be352cdcb1cd8c84169bb430203bb3eab1c9252d07d07"
+  },
+  "unchanged_runtime_paths_checked": 244,
+  "runtime_mismatches_after": [],
+  "runtime_source_freeze": ".skill-tree/history/validation/plugin-system/ponytail116-source-freeze1.json",
+  "raw_log": ".skill-tree/history/validation/plugin-system/ponytail116-review-findings-red.txt",
+  "raw_sha256": "23e368dab5e2b4798b57c55edb44137e138539c6ad8ed094e8eb331c891a16ed",
+  "qualification": "Three synthetic local regression controls on unchanged pre-repair runtime. No source repair, actor/provider invocation, actual owner consent or efficacy result."
+}

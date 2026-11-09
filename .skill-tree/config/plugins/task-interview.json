@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "id": "task-interview",
+  "source": {
+    "kind": "repository",
+    "url": "https://github.com/mattpocock/skills",
+    "ref": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "entry": "skills/productivity/grill-me/SKILL.md"
+  },
+  "resources": [
+    "LICENSE"
+  ],
+  "dependencies": [
+    "skills/productivity/grilling/SKILL.md"
+  ],
+  "capabilities": [
+    "codex-source-backed-context"
+  ],
+  "metadata": {
+    "title": "Pinned post-processing interview application",
+    "upstream_repository": "mattpocock/skills",
+    "upstream_skill_name": "grill-me",
+    "application": "task-interview",
+    "license": "MIT",
+    "license_resource": "LICENSE",
+    "source_verification": {
+      "expected_git_blob": "3947ff9c4ad980d14fc07fccbf659d47c114e81d",
+      "expected_entry_bytes": 157,
+      "expected_digests": {
+        "skills/productivity/grill-me/SKILL.md": "caaf8b8de1684f96e26b28f3c29189db5c89cce4b73e1c93d86164f66ef88637",
+        "LICENSE": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+        "skills/productivity/grilling/SKILL.md": "a146842ed93ca43d833550fa9adf02e58cb63c83fea9d4b4522995b82242d4e2"
+      },
+      "expected_content_digest": "a00d066087e3df89e6211c6fc04371969be8130b394966a28e302e33779cc341",
+      "evidence": ".skill-tree/tests/fixtures/task-processing/source-manifest.json"
+    },
+    "application_policy": {
+      "operation": "skill-tree-process-future-pending",
+      "suggested_anchor": "after",
+      "core_only_creates_binding": false,
+      "requires_explicit_install_enable_confirmation": true,
+      "readiness_effect": "An explicitly enabled matching task application requires the current owned CL, actual configured contributions, affected rechecks and current-mode acceptance before implementation."
+    },
+    "qualification": "Pinned source and declared adapter scope only. Source preparation and descriptor presence supply no successful external invocation, native-host qualification or comparative improvement evidence.",
+    "runtime_prerequisites": [
+      {
+        "name": "codex-source-backed-context",
+        "condition": "Every selected source-backed application invocation.",
+        "unavailable_effect": "The enabled invocation retains an explicit prerequisite."
+      },
+      {
+        "name": "fresh-factual-helper-context",
+        "condition": "An independent frontier question requires an unresolved source-answerable fact.",
+        "unavailable_effect": "The dependent branch retains a visible prerequisite; available independent frontier work remains eligible.",
+        "translation": "An actual observed controller-owned fresh helper can implement explicit delegated factual research when nested spawning is unavailable."
+      }
+    ],
+    "original_invocation": {
+      "disable_model_invocation": true,
+      "allow_implicit_invocation": false,
+      "native_tool": "Skill",
+      "sibling_skill": "grilling",
+      "translation": "Explicitly selected source-backed sibling dispatch and W1 mode routing; no native Skill or upstream implicit-invocation claim."
+    }
+  },
+  "adapter": {
+    "context_kinds": [
+      "task",
+      "task-group"
+    ],
+    "processing_application": {
+      "schema": 1,
+      "roles": [
+        "task-interview"
+      ],
+      "default_role": "task-interview",
+      "instructions": "Preserve the exact original grill-me wrapper and pinned grilling sibling. The wrapper declares user-only invocation and literally requests the native Skill tool; the source-backed application translates sibling dispatch and claims no native or implicit Skill invocation. Use the existing single shared CL session for the selected stable T-task and the frozen W1 decision mode, authority and epoch. Map dependent decisions, ask the complete independent frontier with recommendations, keep downstream questions behind unsettled prerequisites and require current answers and separate final specification acceptance. Manual records actual owner answers and confirmation. Auto records actual bounded DG resolver decisions, an independent critic for significant decisions and an arbiter for substantive disagreement; delegated origin remains delegated origin. A fact-dependent branch requires actual fresh factual-helper evidence. Explicit controller-owned fresh-helper delegation is a translation when nested spawning is unavailable; missing helper capacity retains the dependent prerequisite while independent frontier work can continue. Recommendations, silence, empty frontiers and generic acknowledgements supply no answers or final acceptance. Internal rounds preserve the same session; deliberately repeated configured interview occurrences remain separate calls. The core applies accepted revisions, affected editorial rechecks and final guarded release. Unavailable, stale, cancelled or uncertain obligations retain the hold until supported continuation or explicit accepted configuration reconciliation. Source preparation supplies no candidate execution, native invocation or efficacy evidence. Immutable application scope remains separate from replaceable parameters and extra instructions."
+    },
+    "parameter_defaults": {
+      "upstream": {
+        "values": {}
+      }
+    }
+  },
+  "expectedDigests": {
+    "skills/productivity/grill-me/SKILL.md": "caaf8b8de1684f96e26b28f3c29189db5c89cce4b73e1c93d86164f66ef88637",
+    "LICENSE": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+    "skills/productivity/grilling/SKILL.md": "a146842ed93ca43d833550fa9adf02e58cb63c83fea9d4b4522995b82242d4e2"
+  }
+}

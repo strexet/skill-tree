@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "result": "pass",
+  "qualification": "Affected Python/Node regression subsets actually executed inside the current full suites; no separate duplicate execution or extra native/host claim.",
+  "source_freeze": ".skill-tree/history/validation/plugin-system/ponytail116-source-freeze3.json",
+  "python_report": ".skill-tree/history/validation/plugin-system/ponytail116-final3-python.json",
+  "python_log_sha256": "c85d38c5e2e12a1c8bc8b005d054e7b75e3aa56230550922228b157077658477",
+  "actual_ok_test_methods": {
+    "test_orchestration_adapters": 6,
+    "test_plugin_review": 42,
+    "test_plugin_workflow": 80,
+    "test_pr_review_cycle": 27
+  },
+  "node_report": ".skill-tree/history/validation/plugin-system/ponytail116-final3-node.json",
+  "node_tests": 281,
+  "node_affected_suites": [
+    "plugin composition",
+    "copied invocation installation",
+    "registry/lifecycle/bindings"
+  ],
+  "limits": [
+    "Current deterministic source/installed fixtures only. No fresh actual Ponytail/native Skill/provider/efficacy result."
+  ]
+}

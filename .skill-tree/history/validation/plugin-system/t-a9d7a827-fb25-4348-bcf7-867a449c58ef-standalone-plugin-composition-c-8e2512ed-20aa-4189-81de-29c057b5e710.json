@@ -1,0 +1,46 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-plugin-composition.js"
+  ],
+  "attempt_id": "C-8e2512ed-20aa-4189-81de-29c057b5e710",
+  "check_id": "standalone-plugin-composition",
+  "counts": {
+    "discovered": 25,
+    "expected": 25,
+    "failed": 23,
+    "passed": 2,
+    "skipped": 0
+  },
+  "exit_code": 1,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-a9d7a827-fb25-4348-bcf7-867a449c58ef-standalone-plugin-composition-c-8e2512ed-20aa-4189-81de-29c057b5e710.txt",
+  "result": "red",
+  "reviewed_failure_reason": "The discovered requirements-led cases fail on absent per-operation plugin manifests, unimplemented trusted boundary preparation, missing byte-preserving closure and missing owned-resource verification; fixture setup and real Pending/DO guards execute without fixture syntax or intake failures.",
+  "source_fingerprints": {
+    ".skill-tree/common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+    ".skill-tree/common/references/plugin-invocation.md": "8aa43d1d68641d2cb73ff2e184525c9994ac674ba5b317d0027171368e7763b6",
+    ".skill-tree/common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+    ".skill-tree/common/scripts/plugin-hooks.js": "9c418368d074fecd3d3f931f3269ac45c15d64344c7285d9f4703cc6ea06cf15",
+    ".skill-tree/common/scripts/workflow-state.py": "791531838c16c1b362ade3b086e66dfb804da20c06b8828b0e71f251a08b0c5e",
+    ".skill-tree/config/resource-map.json": "829639608fb34169b13b3b82bfb7c2935036698963113bed9cb8559815391423",
+    ".skill-tree/documents/implementation-plan.md": "d53373bb753c92ba770aca2af1d9dd4bea586888de5aa5320b454a2e056e84e1",
+    ".skill-tree/documents/plugin-management-contract.md": "d5d68870bb0f44c356fdbd5423f3995dea33931eded820ffa335ac715cc24616",
+    ".skill-tree/documents/plugin-system-contract.md": "71e6274258abc6e0f7353c94c68c45f8641c0654dc29d624987918e844c26813",
+    ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84",
+    ".skill-tree/lib/composer.js": "ebb4042086e61e32cd7c255df79befcdff06ae0b0bfaf2941d5d8facc1268e01",
+    ".skill-tree/lib/installation.js": "aff2c16139da198abc00a04e89a0bfe1a22bc826e38a722e146632b14164ef82",
+    ".skill-tree/lib/plugin-bindings.js": "9ea7de58262993188ffa0b1abaf35e4819f9b635b1695561d21c793127299059",
+    ".skill-tree/lib/plugin-composition.js": "7613fcedc19c0a23206aaef28103918f7760c54aa068cb00760f8f606876a573",
+    ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    ".skill-tree/lib/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+    ".skill-tree/lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+    ".skill-tree/templates/operations.json": "9d8f9e0caf848c0b5908dadaebf24b334ab47e5035373235cf91847a89a28d16",
+    ".skill-tree/tests/test-plugin-composition.js": "0a38a4172ce26f3cb29879195666f0dcb8b9ce27f962aad2b53957620542bc14"
+  },
+  "task_id": "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+  "tool_wall_seconds": 14.493803583085537
+}

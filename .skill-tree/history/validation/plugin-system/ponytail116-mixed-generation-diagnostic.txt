@@ -1,0 +1,59 @@
+....F...EE.......................
+======================================================================
+ERROR: test_before_chain_skipping_after_stage_cannot_satisfy_after_obligation (__main__.PluginReviewPilotTests.test_before_chain_skipping_after_stage_cannot_satisfy_after_obligation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 425, in test_before_chain_skipping_after_stage_cannot_satisfy_after_obligation
+    before=self.complete(self.start(request_id='actual-before-phase'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 189, in start
+    return wf.hook_action(self.store,'hook-start',request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/workflow-state.py", line 1933, in hook_action
+    try:return _hook_action(store,command,payload,private_delivery_provider=private_delivery_provider,private_delivery_sink=private_delivery_sink)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/workflow-state.py", line 1980, in _hook_action
+    prepared=_hook_node(package_root,request);proof=prepared['proof'] if frame is None else prepared
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/workflow-state.py", line 1840, in _hook_node
+    if run.returncode:raise WorkflowError('Owned hook preparation failed: '+(run.stderr.strip().splitlines()[-1] if run.stderr.strip() else 'The owned Node bridge is unavailable'))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pilot_requirements_workflow.WorkflowError: Owned hook preparation failed: The actual selected operation context guard failed: owned_plugin_review.ReviewError: The review context differs from the actual publication review identity
+
+======================================================================
+ERROR: test_before_pass_cannot_replace_complete_core_review (__main__.PluginReviewPilotTests.test_before_pass_cannot_replace_complete_core_review)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 416, in test_before_pass_cannot_replace_complete_core_review
+    self.install(anchor='before');self.complete(self.start())
+                                                ^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 189, in start
+    return wf.hook_action(self.store,'hook-start',request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/workflow-state.py", line 1933, in hook_action
+    try:return _hook_action(store,command,payload,private_delivery_provider=private_delivery_provider,private_delivery_sink=private_delivery_sink)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/workflow-state.py", line 1980, in _hook_action
+    prepared=_hook_node(package_root,request);proof=prepared['proof'] if frame is None else prepared
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/workflow-state.py", line 1840, in _hook_node
+    if run.returncode:raise WorkflowError('Owned hook preparation failed: '+(run.stderr.strip().splitlines()[-1] if run.stderr.strip() else 'The owned Node bridge is unavailable'))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pilot_requirements_workflow.WorkflowError: Owned hook preparation failed: The actual selected operation context guard failed: owned_plugin_review.ReviewError: The review context differs from the actual publication review identity
+
+======================================================================
+FAIL: test_actual_plugin_finding_enters_core_ledger_and_needs_fix_checks_review_and_fresh_pilot (__main__.PluginReviewPilotTests.test_actual_plugin_finding_enters_core_ledger_and_needs_fix_checks_review_and_fresh_pilot)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 627, in test_actual_plugin_finding_enters_core_ledger_and_needs_fix_checks_review_and_fresh_pilot
+    self.assertEqual(self.cli('ready')['status'],'pr-ready')
+                     ^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 107, in cli
+    self.assertEqual(result.returncode,0 if ok else 2,result.stdout+result.stderr)
+AssertionError: 2 != 0 : {"ok": false, "error": "The attached review pass is stale for the current publication"}
+
+
+----------------------------------------------------------------------
+Ran 33 tests in 277.908s
+
+FAILED (failures=1, errors=2)

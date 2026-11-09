@@ -1,0 +1,119 @@
+{
+  "checked_date": "2026-11-05",
+  "created_task_ids": [
+    "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+    "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+    "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+    "T-2da07d09-0b1a-4407-b375-defd23720387",
+    "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+    "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+    "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+    "T-18db6175-499f-4679-bf8d-f815c7b42411",
+    "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+    "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+    "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+    "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+  ],
+  "dispositions": {
+    "P-14584d76-6e8b-418a-b04b-8de586f10f0a": {
+      "reason": "The existing flavor-only prompt and provider write loop support a separate interaction contract followed by confirmed catalog/lifecycle implementation.",
+      "status": "promoted"
+    },
+    "P-336855cb-5271-40b9-a142-95ed6102889b": {
+      "reason": "Catalog implementation has concrete metadata/listing seams and depends on contract, package lifecycle and evidence-backed recommendation results.",
+      "status": "promoted"
+    },
+    "P-3f7df14a-88b7-48c8-ac14-eaef552d08aa": {
+      "reason": "Primary-source discovery supports separate comprehensive market mapping and comparative qualification; install telemetry is not outcome evidence.",
+      "status": "promoted"
+    },
+    "P-468bf390-905d-43c5-a161-604eb1a41244": {
+      "reason": "The pinned upstream coding mode requires a bounded optional review adapter and normal current-head/base review gates.",
+      "status": "promoted"
+    },
+    "P-8f13728d-b0df-4097-afa3-677e7dc939b5": {
+      "reason": "A Ready design task can produce concrete alternatives and obtain actual owner agreement without changing the workflow during processing.",
+      "status": "promoted"
+    },
+    "P-97789c00-ffd4-450f-a0ca-8cd5fd68f8de": {
+      "reason": "Source inspection identifies four separate contract, package lifecycle, standalone composition and resumable protocol units; current helpers do not execute arbitrary skills.",
+      "status": "promoted"
+    },
+    "P-c9ec2d76-0e74-46cd-afd4-ce3f46a7a60b": {
+      "reason": "The supplied wrapper and delegated interview require dependency closure plus an owner-approved readiness and question/rework loop.",
+      "status": "promoted"
+    }
+  },
+  "inspected_revisions": {
+    "DietrichGebert/ponytail": "96608e078b2d5ea607c5c3b8b5a54d1c1fba6846",
+    "mattpocock/skills": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+  },
+  "observations": [
+    "Current workflow helpers persist agent-supplied decisions instead of providing a generic external skill executor.",
+    "The supplied development-mode skill has session lifetime; the interview wrapper delegates to a sibling skill through a host tool.",
+    "The installation prompt currently selects flavor only and enters provider writes without a plugin selection plan.",
+    "Market discovery sources establish candidate/adoption evidence, not completed task-effectiveness qualification."
+  ],
+  "plan_review": [
+    "Twelve task dependencies are acyclic and resolve within the promoted set.",
+    "Optional existing-operation core work has no blanket dependency on approval of unrelated new workflow stages.",
+    "Pilot-dependent readiness and review decisions require actual owner agreement; unrelated structural proposals may remain deferred."
+  ],
+  "processing_id": "PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45",
+  "qualification_limits": [
+    "The processing survey is not the comprehensive market map or comparative evaluation deliverable.",
+    "No external plugin installation, skill invocation, product implementation, commit or publication occurs during processing."
+  ],
+  "retained_controllers_unchanged": true,
+  "retained_pending_ids": [],
+  "reused_task_ids": [],
+  "reviewed_base_commit": "853c9130f7750aaf00368c47a59d598254ac0800",
+  "schema": 1,
+  "scope": "external-skill-plugin-system-pending-processing",
+  "selected_pending_ids": [
+    "P-97789c00-ffd4-450f-a0ca-8cd5fd68f8de",
+    "P-3f7df14a-88b7-48c8-ac14-eaef552d08aa",
+    "P-8f13728d-b0df-4097-afa3-677e7dc939b5",
+    "P-336855cb-5271-40b9-a142-95ed6102889b",
+    "P-468bf390-905d-43c5-a161-604eb1a41244",
+    "P-c9ec2d76-0e74-46cd-afd4-ce3f46a7a60b",
+    "P-14584d76-6e8b-418a-b04b-8de586f10f0a"
+  ],
+  "source_fingerprints": {
+    ".skill-tree/bin/install.js": "6a3028764bcec61b7a95edabc8e2434dcdba2c718fc3fc99f0dcacb43701fdaf",
+    ".skill-tree/common/references/future-workflow.md": "b2fe86a999bde83038850b7a69640260eaee4246773ec8eb4815ee60eaf7a98a",
+    ".skill-tree/common/references/installation-profile.md": "05d15601e98233e5367a9b1ad67832983a94e8b8e68bcd4f4c81e5f94bc792c5",
+    ".skill-tree/common/references/workflow-metadata.md": "6c3252f4564cecc532eec5cec4ad30c9373bea8f85e3c698b19308dd83ae7b9d",
+    ".skill-tree/common/scripts/pr-review-state.py": "a26cc95e66145a4917669466c3880f3d8252199a13c63b3e9e9f9fc30dc443d5",
+    ".skill-tree/common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+    ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+    ".skill-tree/documents/plugin-system-research.md": "37bfadbd3c54f6eff5a22f24d4f9121a8bbe18e9fbd2a08d8243756488ee8c7f",
+    ".skill-tree/lib/composer.js": "60d8ab877bccd80835529692a5d2df7ad42dafa966ab695c938ade3ac073b8e8",
+    ".skill-tree/lib/installation.js": "abc2bca0d228e774f9978a63ea3fe7c2cf7464d7d4e1d695441fc09f8a2146e0",
+    ".skill-tree/templates/invariants.json": "4545894b07fab5f222d15eddd17c220408a4be8a5e5f25da3a4a34ef06bb87b5",
+    ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+    ".skill-tree/tests/test-composer.js": "5ca873af2c79678664c3f32d40a189f93c3fa38da0a04ebc544a1e116271dad2",
+    ".skill-tree/tests/test-installation-integrity.js": "f7cf7a807740be4ce103038c25b0575dcd669a6e5a9ef7d6762ffbe762dafa56",
+    ".skill-tree/tests/test-pending-intake-boundary.py": "025445702e4d971d87589f2a5051bcc117c1d7a5359da3bf7957d8ddc4ddf5b9",
+    ".skill-tree/tests/test-pr-workspace-installation.js": "461c3fb9cd99fb49660680e3fcecdf46e6e9f367f9db2d268ff12598d9a466ed"
+  },
+  "source_hash_at_inspection": "259cd7be1655e29627fdbfaac5309358a1753501059278747fcbf0672e60ca99",
+  "supplied_sources": [
+    "https://github.com/DietrichGebert/ponytail/blob/main/skills/ponytail/SKILL.md",
+    "https://github.com/mattpocock/skills/blob/main/skills/productivity/grill-me/SKILL.md"
+  ],
+  "task_keys": {
+    "candidate-comparison": "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+    "installer-contract": "T-2da07d09-0b1a-4407-b375-defd23720387",
+    "interview-pilot": "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+    "market-map": "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+    "plugin-catalog": "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+    "plugin-composition": "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+    "plugin-contract": "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+    "plugin-installer": "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+    "plugin-packages": "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+    "plugin-protocol": "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+    "review-pilot": "T-18db6175-499f-4679-bf8d-f815c7b42411",
+    "workflow-decisions": "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+  }
+}

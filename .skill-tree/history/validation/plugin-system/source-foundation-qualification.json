@@ -1,0 +1,64 @@
+{
+  "focused_tests": {
+    "final_green": {
+      "attempt_id": "C-0865f4f9-059b-4792-b82d-2ebb6db84673",
+      "discovered": 38,
+      "failed": 0,
+      "passed": 38,
+      "skipped": 0
+    },
+    "initial_red": {
+      "attempt_id": "C-cacc3af0-b13e-427b-a0aa-3767a6a07bf1",
+      "discovered": 25,
+      "failed": 24,
+      "passed": 1,
+      "skipped": 0
+    }
+  },
+  "independent_review": {
+    "agent": "/root/w1_foundation_research",
+    "remaining_findings": [],
+    "result": "passed"
+  },
+  "limits": [
+    "Remote transport remains an explicit acquisition-adapter dependency rather than a claimed built-in network or native-host result.",
+    "Installed registry, owned lifecycle, dispatch and management remain downstream tasks."
+  ],
+  "oracle_review": "A forbidden resource path now rejects during normalization before acquisition. The regression assertion follows that earlier guarded boundary without weakening the source-path rejection requirement.",
+  "other_checks": [
+    "sync:check",
+    "strict repository validation",
+    "strict repository documentation",
+    "strict edited prose",
+    "installer list",
+    "general all-provider offline temporary-target dry-run",
+    "git diff --check"
+  ],
+  "repository_tests": {
+    "evidence": [
+      ".skill-tree/history/validation/plugin-system/source-foundation-all-python.txt",
+      ".skill-tree/history/validation/plugin-system/source-foundation-all-node.txt"
+    ],
+    "failed": 0,
+    "node": 132,
+    "python": 262,
+    "skipped": 0
+  },
+  "resolved_review_findings": [
+    "Atomic secret-reference replacement and origins in both directions.",
+    "Immutable revision and coherent source/entry identity during snapshot verification.",
+    "Windows/escaping/alias paths, root replacement and symlink refusal.",
+    "GitHub/GitLab folder and encoded links; SSH/Git transport normalization.",
+    "Declared remote directory closure with trailing separators."
+  ],
+  "sources": {
+    ".skill-tree/documents/plugin-management-contract.md": "0938f5e3355a490c67c724307c38954118c7b3315f184d3cb408cb2895f4d998",
+    ".skill-tree/documents/plugin-system-contract.md": "a954d148df40e7a22814fb1f8515d654140cff02f7fe14e1a65f6cad33732efc",
+    ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    ".skill-tree/lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+    ".skill-tree/lib/plugins.js": "d9d140a9a1c7df3682f95ace505a6d06bbac5823787329acd70834732de1d4d0",
+    ".skill-tree/tests/test-plugin-sources.js": "2dccdcbe210f1b8d24794f865eea0ffea830ad8ebe987dc1b7d09f0909b02b0e"
+  },
+  "status": "passed",
+  "task_id": "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9"
+}

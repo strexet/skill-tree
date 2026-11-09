@@ -1,0 +1,36 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-plugin-bindings.js"
+  ],
+  "attempt_id": "C-f4206676-46ee-40bf-b055-50f718912a6f",
+  "check_id": "extensible-bindings",
+  "counts": {
+    "discovered": 20,
+    "expected": 20,
+    "failed": 19,
+    "passed": 1,
+    "skipped": 0
+  },
+  "exit_code": 1,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-787453a8-2643-48c1-8715-9626d67d5e0e-extensible-bindings-c-f4206676-46ee-40bf-b055-50f718912a6f.txt",
+  "result": "red",
+  "reviewed_failure_reason": "Runnable binding API preserves only raw input rows; trusted anchors, unresolved locations, typed contexts, ordered independent parameters, conditions and replay/lineage identities are missing and requirements-derived assertions fail.",
+  "source_fingerprints": {
+    ".skill-tree/common/references/plugin-invocation.md": "3222aba32d1be175561730d3ed9ec5ea306533918439fbeba4a299f7eebc88ba",
+    ".skill-tree/documents/implementation-plan.md": "8c6aba1b915f6d80e4c49b7ced344d1909e10a78838ca46de346ddc0f828ad37",
+    ".skill-tree/documents/plugin-management-contract.md": "d5d68870bb0f44c356fdbd5423f3995dea33931eded820ffa335ac715cc24616",
+    ".skill-tree/documents/plugin-system-contract.md": "eeddb14292e115f489aa855f01f60ab922448317a3e9956d649148b177944680",
+    ".skill-tree/lib/composer.js": "ebb4042086e61e32cd7c255df79befcdff06ae0b0bfaf2941d5d8facc1268e01",
+    ".skill-tree/lib/plugin-bindings.js": "0a23c81df144269b9a73cc554af0ed19e78c3c3bfc55c208395e395569b8d2b0",
+    ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+    ".skill-tree/tests/test-plugin-bindings.js": "e46115d18a202c0d7d6f9cddd9dee3f229bf8fe3e495e1fb236e805bb35ac2df"
+  },
+  "task_id": "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+  "tool_wall_seconds": 0.18449766607955098
+}

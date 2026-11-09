@@ -1,0 +1,71 @@
+{
+  "checks": {
+    "final-execution-verify.txt": {
+      "capture_sha256": "907768fd8538e9225b641d6e746a6e46bd5cd18a6195c197e9b8ee6dfbd40924"
+    },
+    "final-installer-dry-run.txt": {
+      "capture_sha256": "ac2c2a9b0c850434a59f2e369a99f33099504bcfd4988a84755106626456b028"
+    },
+    "final-installer-list.txt": {
+      "capture_sha256": "fb9ae55cf4fab128f448e5b634d6917668a04f55662842a490b524588dda30f7"
+    },
+    "reconcile-formal-green.json": {
+      "counts": {
+        "discovered": 49,
+        "expected": 49,
+        "failed": 0,
+        "passed": 49,
+        "skipped": 0
+      },
+      "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-808ef7d0-5cc2-4e76-86f0-b4f9e1309497.json",
+      "sha256": "96a0428d4d1c45443bde6d0dbea95e33d81bd1312da36e438c9673b39ecf4779"
+    },
+    "reconcile-strict.txt": {
+      "capture_sha256": "1302cebd2e1a3189239671ce4e62c846162c5c7fc73279eb4cb87432a0b93da5"
+    },
+    "reconcile-sync-check.txt": {
+      "capture_sha256": "ceffd15f7477e7cca73d33bc13b530b5430f5e4b9c12123f525a1fe3c65a5c78"
+    },
+    "static-final-assert.json": {
+      "counts": null,
+      "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-static-recipe-discovery-contract-c-d85f610b-fb49-4f4a-9572-b7a00ac1e3ad.json",
+      "sha256": "2fb82838949ac9bae9c223711ceb5503faa6ad2ccb15318755a80ffb1c3ed5d3"
+    },
+    "static-final-node.json": {
+      "counts": {
+        "discovered": 25,
+        "expected": 25,
+        "failed": 0,
+        "passed": 25,
+        "skipped": 0
+      },
+      "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-1531c640-ad9d-4ce1-a151-4c0223dade7c.json",
+      "sha256": "2b63e5878f6534f45ad3ce8cc15465a40a36efae09a735a76e125b336c11f646"
+    }
+  },
+  "coverage": "Local source, real owned disposable installations and controlled local process-group fixtures.",
+  "node": {
+    "argv": [
+      "npm",
+      "run",
+      "test:node"
+    ],
+    "capture_sha256": "56597f591052d3f0282a5df0e283713895e8ced4c4e4931944aefef983c32ac2",
+    "failed": 0,
+    "passed": 332
+  },
+  "python": {
+    "argv": [
+      "npm",
+      "run",
+      "test:py"
+    ],
+    "capture_sha256": "3939b6a56ef054403f4d06f313acf386761b7cb3bfdb9473a4074e3f4aedb76a",
+    "failed": 0,
+    "passed": 562,
+    "tool_wall_seconds": 1558.556
+  },
+  "run_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+  "schema": 1,
+  "source_commit": "4eafad4fb158614f17ad4bbc00c5ed8468b7e588"
+}

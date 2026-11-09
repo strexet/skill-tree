@@ -1,0 +1,320 @@
+TAP version 13
+# Subtest: general copied invocation bridge retains all registered operation closures without source siblings or Future
+ok 1 - general copied invocation bridge retains all registered operation closures without source siblings or Future
+  ---
+  duration_ms: 6129.25675
+  ...
+# Subtest: web copied invocation bridge retains all registered operation closures without source siblings or Future
+ok 2 - web copied invocation bridge retains all registered operation closures without source siblings or Future
+  ---
+  duration_ms: 6349.652791
+  ...
+# Subtest: unity copied invocation bridge retains all registered operation closures without source siblings or Future
+ok 3 - unity copied invocation bridge retains all registered operation closures without source siblings or Future
+  ---
+  duration_ms: 5806.80725
+  ...
+# Subtest: copied hook entry loads verified Python source instead of timestamp-valid alternate bytecode
+ok 4 - copied hook entry loads verified Python source instead of timestamp-valid alternate bytecode
+  ---
+  duration_ms: 426.710042
+  ...
+# Subtest: a task-free prepared invocation blocks installation until the original attempt is reconciled
+ok 5 - a task-free prepared invocation blocks installation until the original attempt is reconciled
+  ---
+  duration_ms: 507.373125
+  ...
+# Subtest: private delivery resolves JSON secret values only into the adapter context while ordinary state keeps references
+ok 6 - private delivery resolves JSON secret values only into the adapter context while ordinary state keeps references
+  ---
+  duration_ms: 1082.408084
+  ...
+# Subtest: copied direct workflow entry rejects changed owned runtime source before import side effects
+ok 7 - copied direct workflow entry rejects changed owned runtime source before import side effects
+  ---
+  duration_ms: 328.793875
+  ...
+# Subtest: copied PR entry verifies owned inventory before loading workspace helpers
+ok 8 - copied PR entry verifies owned inventory before loading workspace helpers
+  ---
+  duration_ms: 291.634375
+  ...
+# Subtest: empty raw inventory works before installation or Future and never dispatches or acquires
+ok 9 - empty raw inventory works before installation or Future and never dispatches or acquires
+  ---
+  duration_ms: 72.910042
+  ...
+# Subtest: inventory derives exact installed identities and separates supplied known definitions
+ok 10 - inventory derives exact installed identities and separates supplied known definitions
+  ---
+  duration_ms: 871.214166
+  ...
+# Subtest: both views expose repeated occurrence IDs with global and canonical point positions
+ok 11 - both views expose repeated occurrence IDs with global and canonical point positions
+  ---
+  duration_ms: 763.622375
+  ...
+# Subtest: owned file drift is reported without hiding healthy packages or repairing bytes
+ok 12 - owned file drift is reported without hiding healthy packages or repairing bytes
+  ---
+  duration_ms: 1434.744541
+  ...
+# Subtest: opaque malformed or changed registries are unavailable rather than trusted empty installs
+ok 13 - opaque malformed or changed registries are unavailable rather than trusted empty installs
+  ---
+  duration_ms: 895.96325
+  ...
+# Subtest: exact package removal preview lists all live occurrences and cancellation changes nothing
+ok 14 - exact package removal preview lists all live occurrences and cancellation changes nothing
+  ---
+  duration_ms: 862.994542
+  ...
+# Subtest: confirmed package removal atomically preserves core shared sources and history
+ok 15 - confirmed package removal atomically preserves core shared sources and history
+  ---
+  duration_ms: 1056.122584
+  ...
+# Subtest: unbind and activation affect one occurrence while package uninstall remains strict
+ok 16 - unbind and activation affect one occurrence while package uninstall remains strict
+  ---
+  duration_ms: 1698.639416
+  ...
+# Subtest: unknown fuzzy IDs and dependent packages cannot silently cascade or select another package
+ok 17 - unknown fuzzy IDs and dependent packages cannot silently cascade or select another package
+  ---
+  duration_ms: 888.777042
+  ...
+# Subtest: removal applies only matching target digest and still-current registry consent
+ok 18 - removal applies only matching target digest and still-current registry consent
+  ---
+  duration_ms: 1915.133333
+  ...
+# Subtest: pending originals block removal and reconciled uninstall preserves frozen historical occurrences
+ok 19 - pending originals block removal and reconciled uninstall preserves frozen historical occurrences
+  ---
+  duration_ms: 1466.059292
+  ...
+# Subtest: frozen target associations and corrupt HC records remain explicit without claiming readiness
+ok 20 - frozen target associations and corrupt HC records remain explicit without claiming readiness
+  ---
+  duration_ms: 1488.423083
+  ...
+# Subtest: source CLI raw listing bypasses install selection and leaves a fresh target unchanged
+ok 21 - source CLI raw listing bypasses install selection and leaves a fresh target unchanged
+  ---
+  duration_ms: 317.769458
+  ...
+# Subtest: general installed manager lists installed plugins without source checkout or original acquisition files
+ok 22 - general installed manager lists installed plugins without source checkout or original acquisition files
+  ---
+  duration_ms: 1275.386958
+  ...
+# Subtest: web installed manager lists installed plugins without source checkout or original acquisition files
+ok 23 - web installed manager lists installed plugins without source checkout or original acquisition files
+  ---
+  duration_ms: 1342.232333
+  ...
+# Subtest: unity installed manager lists installed plugins without source checkout or original acquisition files
+ok 24 - unity installed manager lists installed plugins without source checkout or original acquisition files
+  ---
+  duration_ms: 1361.75125
+  ...
+# Subtest: source and parameter facade exposes the usable foundation without installation dependencies
+ok 25 - source and parameter facade exposes the usable foundation without installation dependencies
+  ---
+  duration_ms: 0.82625
+  ...
+# Subtest: local normalization separates the machine locator from portable discovery metadata
+ok 26 - local normalization separates the machine locator from portable discovery metadata
+  ---
+  duration_ms: 2.462
+  ...
+# Subtest: known source IDs preserve custom Claude provenance without an admission allowlist
+ok 27 - known source IDs preserve custom Claude provenance without an admission allowlist
+  ---
+  duration_ms: 0.698625
+  ...
+# Subtest: repository skill links preserve the selected ref and repository-relative entry
+ok 28 - repository skill links preserve the selected ref and repository-relative entry
+  ---
+  duration_ms: 0.254416
+  ...
+# Subtest: credential-bearing raw locators remain outside portable definitions
+ok 29 - credential-bearing raw locators remain outside portable definitions
+  ---
+  duration_ms: 0.124625
+  ...
+# Subtest: local snapshots preserve BOM, binary assets and original frontmatter bytes
+ok 30 - local snapshots preserve BOM, binary assets and original frontmatter bytes
+  ---
+  duration_ms: 3.741583
+  ...
+# Subtest: declared sibling resources and nested relative links form a closed source snapshot
+ok 31 - declared sibling resources and nested relative links form a closed source snapshot
+  ---
+  duration_ms: 3.034708
+  ...
+# Subtest: nonstandard instruction content retains upstream bytes and a separate adaptation overlay
+ok 32 - nonstandard instruction content retains upstream bytes and a separate adaptation overlay
+  ---
+  duration_ms: 1.034375
+  ...
+# Subtest: missing required source resources reject snapshots
+ok 33 - missing required source resources reject snapshots
+  ---
+  duration_ms: 1.505916
+  ...
+# Subtest: resource paths cannot escape the admitted source root
+ok 34 - resource paths cannot escape the admitted source root
+  ---
+  duration_ms: 1.149625
+  ...
+# Subtest: symlink resources reject acquisition without reading the target
+ok 35 - symlink resources reject acquisition without reading the target
+  ---
+  duration_ms: 1.305708
+  ...
+# Subtest: expected content fingerprints reject acquisition drift
+ok 36 - expected content fingerprints reject acquisition drift
+  ---
+  duration_ms: 1.124167
+  ...
+# Subtest: injected repository acquisition records immutable actual revision and actual resource bytes
+ok 37 - injected repository acquisition records immutable actual revision and actual resource bytes
+  ---
+  duration_ms: 0.556667
+  ...
+# Subtest: mutable repository labels cannot masquerade as resolved immutable revisions
+ok 38 - mutable repository labels cannot masquerade as resolved immutable revisions
+  ---
+  duration_ms: 0.147417
+  ...
+# Subtest: raw acquisition uses the actual acquired content snapshot and needs a real acquirer
+ok 39 - raw acquisition uses the actual acquired content snapshot and needs a real acquirer
+  ---
+  duration_ms: 0.704542
+  ...
+# Subtest: missing native capability permits complete inert resources without fake invocation
+ok 40 - missing native capability permits complete inert resources without fake invocation
+  ---
+  duration_ms: 1.553167
+  ...
+# Subtest: source inspection never executes a bundled helper or copies unrelated adjacent files
+ok 41 - source inspection never executes a bundled helper or copies unrelated adjacent files
+  ---
+  duration_ms: 2.208334
+  ...
+# Subtest: parameters apply upstream project binding run precedence with object merge and array/scalar/null replacement
+ok 42 - parameters apply upstream project binding run precedence with object merge and array/scalar/null replacement
+  ---
+  duration_ms: 0.859084
+  ...
+# Subtest: extra instruction text uses the highest explicit value including an empty string
+ok 43 - extra instruction text uses the highest explicit value including an empty string
+  ---
+  duration_ms: 0.092458
+  ...
+# Subtest: parameter origins and deterministic digest describe actual effective values
+ok 44 - parameter origins and deterministic digest describe actual effective values
+  ---
+  duration_ms: 0.227875
+  ...
+# Subtest: secret references stay references and no resolver reads secret values
+ok 45 - secret references stay references and no resolver reads secret values
+  ---
+  duration_ms: 0.127292
+  ...
+# Subtest: arbitrary plugin parameter names remain isolated from core authority and prototype state
+ok 46 - arbitrary plugin parameter names remain isolated from core authority and prototype state
+  ---
+  duration_ms: 0.085875
+  ...
+# Subtest: supported optional schemas validate concrete resolved values
+ok 47 - supported optional schemas validate concrete resolved values
+  ---
+  duration_ms: 0.278917
+  ...
+# Subtest: unsupported schema constraints and non-JSON values remain explicit failures
+ok 48 - unsupported schema constraints and non-JSON values remain explicit failures
+  ---
+  duration_ms: 0.162167
+  ...
+# Subtest: resolution leaves configuration inputs unchanged and snapshot validation rejects byte tampering
+ok 49 - resolution leaves configuration inputs unchanged and snapshot validation rejects byte tampering
+  ---
+  duration_ms: 1.088625
+  ...
+# Subtest: source ID collisions reject unrelated source reuse while matching known definitions remain reusable
+ok 50 - source ID collisions reject unrelated source reuse while matching known definitions remain reusable
+  ---
+  duration_ms: 0.242375
+  ...
+# Subtest: an acquired resource map cannot smuggle escaping paths into an otherwise valid snapshot
+ok 51 - an acquired resource map cannot smuggle escaping paths into an otherwise valid snapshot
+  ---
+  duration_ms: 0.115417
+  ...
+# Subtest: secret references atomically replace objects in both directions with matching origins
+ok 52 - secret references atomically replace objects in both directions with matching origins
+  ---
+  duration_ms: 0.105792
+  ...
+# Subtest: empty and null replacements preserve explicit origin and do not mutate layer inputs
+ok 53 - empty and null replacements preserve explicit origin and do not mutate layer inputs
+  ---
+  duration_ms: 0.09
+  ...
+# Subtest: parameter accessors never execute and nested unsupported schema constraints are explicit
+ok 54 - parameter accessors never execute and nested unsupported schema constraints are explicit
+  ---
+  duration_ms: 0.147041
+  ...
+# Subtest: snapshot verification rejects mutable repository revisions and inconsistent descriptor identity
+ok 55 - snapshot verification rejects mutable repository revisions and inconsistent descriptor identity
+  ---
+  duration_ms: 0.238791
+  ...
+# Subtest: portable resource paths reject Windows absolute paths on every host
+ok 56 - portable resource paths reject Windows absolute paths on every host
+  ---
+  duration_ms: 0.134125
+  ...
+# Subtest: acquired paths normalize once and reject aliases while staged paths stay canonical
+ok 57 - acquired paths normalize once and reject aliases while staged paths stay canonical
+  ---
+  duration_ms: 0.415584
+  ...
+# Subtest: a normalized local root replaced by a symlink rejects before outside source acquisition
+ok 58 - a normalized local root replaced by a symlink rejects before outside source acquisition
+  ---
+  duration_ms: 2.024
+  ...
+# Subtest: GitHub and GitLab folder links normalize to repository entry points with explicit overrides
+ok 59 - GitHub and GitLab folder links normalize to repository entry points with explicit overrides
+  ---
+  duration_ms: 0.267541
+  ...
+# Subtest: ssh and git URL strings remain repository acquisitions without credential exposure
+ok 60 - ssh and git URL strings remain repository acquisitions without credential exposure
+  ---
+  duration_ms: 0.103708
+  ...
+# Subtest: hosted ref and entry segments decode safely and encoded path escapes remain rejected
+ok 61 - hosted ref and entry segments decode safely and encoded path escapes remain rejected
+  ---
+  duration_ms: 0.12775
+  ...
+# Subtest: remote declared directory resources accept trailing separators without changing closure guards
+ok 62 - remote declared directory resources accept trailing separators without changing closure guards
+  ---
+  duration_ms: 0.3545
+  ...
+1..62
+# tests 62
+# suites 0
+# pass 62
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 21043.658584

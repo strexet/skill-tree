@@ -1,0 +1,75 @@
+..EEE.EE..
+======================================================================
+ERROR: test_explicit_overrides_are_frozen_before_any_attempt (__main__.PluginInvocationTests.test_explicit_overrides_are_frozen_before_any_attempt)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 157, in test_explicit_overrides_are_frozen_before_any_attempt
+    frame = self.start(request)
+            ^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 86, in start
+    return engine().start(self.store, request, proof=proof or self.proof(request))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/plugin-invocation.py", line 15, in start
+    raise InvocationError('Plugin invocation start is not implemented')
+hook_fixture_engine.InvocationError: Plugin invocation start is not implemented
+
+======================================================================
+ERROR: test_node_parameter_identity_is_not_recomputed_using_python_number_spelling (__main__.PluginInvocationTests.test_node_parameter_identity_is_not_recomputed_using_python_number_spelling)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 168, in test_node_parameter_identity_is_not_recomputed_using_python_number_spelling
+    frame = self.start(request)
+            ^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 86, in start
+    return engine().start(self.store, request, proof=proof or self.proof(request))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/plugin-invocation.py", line 15, in start
+    raise InvocationError('Plugin invocation start is not implemented')
+hook_fixture_engine.InvocationError: Plugin invocation start is not implemented
+
+======================================================================
+ERROR: test_order_and_same_package_occurrence_identity_remain_frozen (__main__.PluginInvocationTests.test_order_and_same_package_occurrence_identity_remain_frozen)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 120, in test_order_and_same_package_occurrence_identity_remain_frozen
+    request = self.request(rows); frame = self.start(request)
+                                          ^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 86, in start
+    return engine().start(self.store, request, proof=proof or self.proof(request))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/plugin-invocation.py", line 15, in start
+    raise InvocationError('Plugin invocation start is not implemented')
+hook_fixture_engine.InvocationError: Plugin invocation start is not implemented
+
+======================================================================
+ERROR: test_start_nonce_replay_is_nonmutating_and_conflicting_reuse_rejects (__main__.PluginInvocationTests.test_start_nonce_replay_is_nonmutating_and_conflicting_reuse_rejects)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 110, in test_start_nonce_replay_is_nonmutating_and_conflicting_reuse_rejects
+    request = self.request(); frame = self.start(request); before = self.files()
+                                      ^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 86, in start
+    return engine().start(self.store, request, proof=proof or self.proof(request))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/plugin-invocation.py", line 15, in start
+    raise InvocationError('Plugin invocation start is not implemented')
+hook_fixture_engine.InvocationError: Plugin invocation start is not implemented
+
+======================================================================
+ERROR: test_task_free_start_persists_only_owned_hook_metadata_without_future (__main__.PluginInvocationTests.test_task_free_start_persists_only_owned_hook_metadata_without_future)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 101, in test_task_free_start_persists_only_owned_hook_metadata_without_future
+    request = self.request(); frame = self.start(request)
+                                      ^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 86, in start
+    return engine().start(self.store, request, proof=proof or self.proof(request))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/plugin-invocation.py", line 15, in start
+    raise InvocationError('Plugin invocation start is not implemented')
+hook_fixture_engine.InvocationError: Plugin invocation start is not implemented
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.857s
+
+FAILED (errors=5)

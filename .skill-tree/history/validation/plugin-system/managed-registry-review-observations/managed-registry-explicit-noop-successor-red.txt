@@ -1,0 +1,29 @@
+FF
+======================================================================
+FAIL: test_explicit_no_selected_successor_retains_adoption_and_records_skips_without_hi (__main__.PluginInvocationTests.test_explicit_no_selected_successor_retains_adoption_and_records_skips_without_hi) (variant='disabled')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 519, in test_explicit_no_selected_successor_retains_adoption_and_records_skips_without_hi
+    self.assertEqual(new['state'],'complete');self.assertEqual(new['cursor'],1);self.assertEqual(new['attempts'],{})
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'active' != 'complete'
+- active
++ complete
+
+
+======================================================================
+FAIL: test_explicit_no_selected_successor_retains_adoption_and_records_skips_without_hi (__main__.PluginInvocationTests.test_explicit_no_selected_successor_retains_adoption_and_records_skips_without_hi) (variant='condition-excluded')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 519, in test_explicit_no_selected_successor_retains_adoption_and_records_skips_without_hi
+    self.assertEqual(new['state'],'complete');self.assertEqual(new['cursor'],1);self.assertEqual(new['attempts'],{})
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'active' != 'complete'
+- active
++ complete
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.180s
+
+FAILED (failures=2)

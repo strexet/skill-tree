@@ -1,0 +1,206 @@
+{
+  "acceptance": {
+    "actor": {
+      "context_id": "/root/registry117_architecture",
+      "id": "/root/registry117_architecture"
+    },
+    "answer": "reject-conflict",
+    "attempt_id": "DA-4b11b888-15bd-48b2-b222-274ca72a5bc3",
+    "authority_digest": "8e513ca2ec78101653022a6629bd3caf5c7059be3d2df34bb802c4ea1cf18422",
+    "context_identity": {
+      "decision_purpose": "decision",
+      "execution_snapshot_digest": "892007ebc4b973b4ab4120624f5bec28500cbc886a4f89498e1d341ad70cf8af",
+      "id": "task:T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "kind": "task",
+      "orchestration_id": "DO-0d91bb8c-2ac0-5ba7-8f56-e1aa50735cd1",
+      "task_ids": [
+        "T-18db6175-499f-4679-bf8d-f815c7b42411"
+      ]
+    },
+    "decision_id": "DG-8107bab2-f059-5148-a84e-8871946c010e",
+    "digest": "6a247fe8d4ed3d4ec450b66c63d6bfc84b05ef138316b36c211794d52e726f25",
+    "kind": "technical",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/registry117_architecture",
+      "actor_id": "/root/registry117_architecture",
+      "creation_reference": "Observed separately created existing /root/registry117_architecture context; actual resolver for the exact corrected optional pilot plan, independent of root executor.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/registry117_architecture returned the observed resolver result for the exact original sealed input; raw artifact ponytail116-shape-resolver-result.json.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "3b8032f404a3faf077a9c31e0f8193c59365edfaefc7658548f9d100bf9315bb",
+    "question_id": "ponytail116-normalized-report-shape",
+    "rationale": "The current record branch accepts a supported status plus arbitrary result fields, while passed with unchanged context receives a no-change receipt at accept. Therefore a nonempty reserved findings/questions field can be hidden by a contradictory successful status and avoid the corresponding ordinary publication obligation; the retained source review identifies the exact path. Rejecting that contradiction at record is the smallest bounded repair for frozen report-only publication review results. Nonempty reserved top-level findings must declare findings, and questions must declare questions; mixed obligations reject instead of being silently discarded. Preserve empty reserved arrays, ordinary notes, nested arbitrary JSON and generic non-review plugin results. Validation failure must retain the original attempt without a successful result; actual host reconciliation remains the cleanup path. The prospective controlled cases cover the four contradictions and a separate valid arbitrary-annotation result without adding invocation, installation or publication authority.",
+    "role_receipts": {
+      "resolver": "d861e96430280580d01dcc28c7eab55262210c4d71b3899c12d7520a570e74a2"
+    },
+    "semantic_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495"
+  },
+  "active_attempt_id": null,
+  "attempts": {
+    "DA-4b11b888-15bd-48b2-b222-274ca72a5bc3": {
+      "actor": {
+        "context_id": "/root/registry117_architecture",
+        "id": "/root/registry117_architecture"
+      },
+      "authority_digest": "8e513ca2ec78101653022a6629bd3caf5c7059be3d2df34bb802c4ea1cf18422",
+      "basis_digest": null,
+      "content_fingerprint": "f95f0f9f67330ae7ecd33441d79079cba3acdba9921ee62e0373d6652694eab3",
+      "evidence": {
+        "actor_context_id": "/root/registry117_architecture",
+        "actor_id": "/root/registry117_architecture",
+        "creation_reference": "Observed separately created existing /root/registry117_architecture context; actual resolver for the exact corrected optional pilot plan, independent of root executor.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/registry117_architecture returned the observed resolver result for the exact original sealed input; raw artifact ponytail116-shape-resolver-result.json.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-4b11b888-15bd-48b2-b222-274ca72a5bc3",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "3b8032f404a3faf077a9c31e0f8193c59365edfaefc7658548f9d100bf9315bb",
+      "result": {
+        "answer": "reject-conflict",
+        "evidence": [
+          ".skill-tree/artifacts/plugin-implementation/ponytail116-sealed-resolver.json",
+          ".skill-tree/history/validation/plugin-system/ponytail116-independent-review-freeze2.json",
+          ".skill-tree/history/validation/plugin-system/ponytail116-source-freeze2.json",
+          ".skill-tree/artifacts/plugin-implementation/ponytail116-tests/normalized-review-result-draft.py",
+          ".skill-tree/common/scripts/plugin-invocation.py:405",
+          ".skill-tree/common/scripts/plugin-invocation.py:423",
+          ".skill-tree/common/scripts/workflow-state.py:1864"
+        ],
+        "input_digest": "ee457433da36e1469c29c16c809fee5e69f0f82b65210a4677efaae8278327bc",
+        "rationale": "The current record branch accepts a supported status plus arbitrary result fields, while passed with unchanged context receives a no-change receipt at accept. Therefore a nonempty reserved findings/questions field can be hidden by a contradictory successful status and avoid the corresponding ordinary publication obligation; the retained source review identifies the exact path. Rejecting that contradiction at record is the smallest bounded repair for frozen report-only publication review results. Nonempty reserved top-level findings must declare findings, and questions must declare questions; mixed obligations reject instead of being silently discarded. Preserve empty reserved arrays, ordinary notes, nested arbitrary JSON and generic non-review plugin results. Validation failure must retain the original attempt without a successful result; actual host reconciliation remains the cleanup path. The prospective controlled cases cover the four contradictions and a separate valid arbitrary-annotation result without adding invocation, installation or publication authority.",
+        "status": "answered"
+      },
+      "role": "resolver",
+      "semantic_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+      "status": "answered"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the admitted optional pinned Ponytail review pilot and completed dependency scope; controlled local installation fixtures use scripted test input. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+    ],
+    "context_id": "task:T-18db6175-499f-4679-bf8d-f815c7b42411",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+    },
+    "id": "approved-ponytail116",
+    "revision": 1
+  },
+  "authority_digest": "8e513ca2ec78101653022a6629bd3caf5c7059be3d2df34bb802c4ea1cf18422",
+  "context": {
+    "content_fingerprint": "f95f0f9f67330ae7ecd33441d79079cba3acdba9921ee62e0373d6652694eab3",
+    "decision_purpose": "decision",
+    "execution_snapshot_digest": "892007ebc4b973b4ab4120624f5bec28500cbc886a4f89498e1d341ad70cf8af",
+    "id": "task:T-18db6175-499f-4679-bf8d-f815c7b42411",
+    "kind": "task",
+    "orchestration_id": "DO-0d91bb8c-2ac0-5ba7-8f56-e1aa50735cd1",
+    "semantic_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+    "task_ids": [
+      "T-18db6175-499f-4679-bf8d-f815c7b42411"
+    ]
+  },
+  "decision_hash": "7e0d3cba96b2f2fb9c53485a56f78540bec1ae267cb36f4b3114245c7eae729c",
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "frontier_epoch": 1,
+  "history": [
+    {
+      "context_fingerprint": "f95f0f9f67330ae7ecd33441d79079cba3acdba9921ee62e0373d6652694eab3",
+      "detail": {},
+      "event": "started",
+      "mode_epoch": 1,
+      "previous_record_hash": null,
+      "sequence": 1
+    },
+    {
+      "context_fingerprint": "f95f0f9f67330ae7ecd33441d79079cba3acdba9921ee62e0373d6652694eab3",
+      "detail": {
+        "attempt_id": "DA-4b11b888-15bd-48b2-b222-274ca72a5bc3",
+        "role": "resolver"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "c811f38a348723942ebcbd2fb90c034524c6b75eadee9915fdfafd9472d14285",
+      "sequence": 2
+    },
+    {
+      "context_fingerprint": "f95f0f9f67330ae7ecd33441d79079cba3acdba9921ee62e0373d6652694eab3",
+      "detail": {
+        "attempt_id": "DA-4b11b888-15bd-48b2-b222-274ca72a5bc3",
+        "status": "answered"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "49e17c2517ed665ee473c64d7cd0f898970c6cb1ad7bb734f6231fdb5db1bd25",
+      "sequence": 3
+    },
+    {
+      "context_fingerprint": "f95f0f9f67330ae7ecd33441d79079cba3acdba9921ee62e0373d6652694eab3",
+      "detail": {
+        "acceptance_digest": "6a247fe8d4ed3d4ec450b66c63d6bfc84b05ef138316b36c211794d52e726f25"
+      },
+      "event": "accept",
+      "mode_epoch": 1,
+      "previous_record_hash": "4cb018437bc194aa583dd8ea71594f684517c4a726cf49f821f5c1cec67829d5",
+      "sequence": 4
+    }
+  ],
+  "id": "DG-8107bab2-f059-5148-a84e-8871946c010e",
+  "mode": "auto",
+  "mode_epoch": 1,
+  "prepared_attempt_id": "DA-4b11b888-15bd-48b2-b222-274ca72a5bc3",
+  "question": {
+    "evidence": [
+      ".skill-tree/history/validation/plugin-system/ponytail116-independent-review-freeze2.json",
+      ".skill-tree/history/validation/plugin-system/ponytail116-source-freeze2.json",
+      ".skill-tree/artifacts/plugin-implementation/ponytail116-tests/normalized-review-result-draft.py"
+    ],
+    "facts": [
+      "The final current source review identifies status=passed plus nonempty findings: record accepts the report and passed/no-change acceptance bypasses the publication finding ledger.",
+      "The same semantic contradiction can use questions with findings, passed with questions, or findings with questions. The normalized status tag must not hide the other reserved obligation.",
+      "The four variants have prospective ignored tests using actual owned helpers and matching host context-end evidence; valid empty reserved arrays and arbitrary notes/nested JSON retain a separate positive control."
+    ],
+    "id": "ponytail116-normalized-report-shape",
+    "kind": "technical",
+    "options": [
+      {
+        "id": "reject-conflict",
+        "text": "Reject contradictory reserved findings/questions payloads for policy-bound review success outcomes while preserving ordinary annotations."
+      },
+      {
+        "id": "retain-with-proof",
+        "text": "Retain the current shape only with concrete contract and readiness evidence that required findings cannot be lost."
+      }
+    ],
+    "proposal_scope": [
+      "Apply only to frozen report-only policy-bound publication review results and successful statuses passed/findings/questions. Nonempty reserved top-level findings/questions must match the declared outcome; mixed reserved obligations reject rather than being silently ignored.",
+      "Keep generic custom-plugin result data, parameters, annotations and nested arbitrary JSON unchanged. Parse no free-text semantics and claim no universal model adherence.",
+      "Preserve actual raw producer input and original attempt identity: invalid record returns a visible validation failure and supplies no successful invocation or installation cleanup. Original host reconciliation remains the supported cleanup path.",
+      "Add meaningful focused Red before the minimal runtime guard, then fresh current required checks and final review. Existing40pass/281Nodepass and old reports remain historical evidence."
+    ],
+    "recommendation": "reject-conflict",
+    "significance": "routine",
+    "text": "Resolve a contradictory successful normalized review report that can silently omit actionable findings from the publication ledger."
+  },
+  "request_id": "DO-0d91bb8c-2ac0-5ba7-8f56-e1aa50735cd1:question:4",
+  "revision": 4,
+  "schema": 1,
+  "start_digest": "94b3d2d39606d9d0b523c1592baa01aceaa5c0d40724246a2230af53db92a902",
+  "state": "accepted"
+}

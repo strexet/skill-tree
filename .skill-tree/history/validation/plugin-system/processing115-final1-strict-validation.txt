@@ -1,0 +1,9 @@
+
+> skill-tree-skills@0.3.0 validate
+> python3 .skill-tree/scripts/validate-skill-repository.py --strict
+
+Invalid owned name: tests/fixtures/task-processing/skills/productivity/writing-for-agents/SKILL-MECHANICS.md
+/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/history/research/processing115-plan.md:45:495: Review entity reference: This
+/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/history/research/processing115-plan.md:49:333: Review entity reference: this
+/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/history/research/processing115-plan-v1.md:33:495: Review entity reference: This
+/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/history/research/processing115-plan-v1.md:37:333: Review entity reference: this

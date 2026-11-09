@@ -1,0 +1,44 @@
+{
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-plugin-review.py"
+  ],
+  "attempt_id": "C-1dfa12dd-d36e-4105-94b4-b79d916ec5c4",
+  "check_id": "review-pilot-regressions",
+  "counts": {
+    "discovered": 36,
+    "expected": 36,
+    "failed": 1,
+    "passed": 35,
+    "skipped": 0
+  },
+  "exit_code": 1,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-18db6175-499f-4679-bf8d-f815c7b42411-review-pilot-regressions-c-1dfa12dd-d36e-4105-94b4-b79d916ec5c4.txt",
+  "result": "fail",
+  "reviewed_failure_reason": null,
+  "source_fingerprints": {
+    ".skill-tree/common/references/plugin-invocation.md": "b9d95bf017fa037cecd0db9b95cbfe8fea7ed7ba889214d4b193dac78d1172e4",
+    ".skill-tree/common/references/pr-review-cycle.md": "e162704b7d00cd25e88dc9e139b0ab5c962dda0efd598608054bdf6e135a50be",
+    ".skill-tree/common/scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",
+    ".skill-tree/common/scripts/plugin-invocation.py": "d7a33a51d22362bb38eee8e3aeb4e3553d2675a4700529cc9419fbbe9f3ab16e",
+    ".skill-tree/common/scripts/pr-review-state.py": "81976f644fc07898fa2f01d8eb7f9260eac03b34b72448d7f5f4e27d7648fda0",
+    ".skill-tree/common/scripts/workflow-state.py": "7ee462a1ea665cff2ae960f3662097c2cbf4a6e36042faff036c5ceef1452a2d",
+    ".skill-tree/config/plugins/ponytail.json": "30ae89c79d4895184ef681b6a369cd2d0ae872fa4599df18f31eb7580e1aacbb",
+    ".skill-tree/config/resource-map.json": "95a4922b2331416863100c9b054e84709bafd4126c1542a15fac49781da13248",
+    ".skill-tree/documents/implementation-plan.md": "b6a1222b64d638bc1ab9a03f13abf454f195c95198f6aac7dd2e29637a0582e3",
+    ".skill-tree/documents/plugin-system-contract.md": "6e2d1a3ede5e9d1e4f64d73a8d48653b7927301afec8236ae1dec41d23c05010",
+    ".skill-tree/documents/plugin-system-research.md": "7e408525e7958f8c05dc8ed971edff9e75ddbb629f2117aee0d0498a6fc5790a",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "2341dd16a380768332194285cf8356e0326951860c38d96dbd1c10b7d19d37ce",
+    ".skill-tree/lib/plugin-composition.js": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a",
+    ".skill-tree/lib/plugin-runtime.js": "82830c2aff9ae2380f5cf2440a461f3a2d6d61c4141561db3ce1ae2346fac78d",
+    ".skill-tree/tests/fixtures/ponytail": "445fee6585cab8a9d9aa03ffe09cb6f18c2ca095c4c7b2a8834f10c6aa761bdf",
+    ".skill-tree/tests/test-plugin-invocation-installation.js": "fa16b6af4ae637415100fa2e0c3dcfeb9a7f392e168f61980ecd3c8fc84e1495",
+    ".skill-tree/tests/test-plugin-review.py": "84d35236d16342620a39358eeb1bcb028d1449297aa8cb4ffa0517e1b7026ce1",
+    ".skill-tree/tests/test-plugin-workflow.py": "a7ae1a514938920070a4c6a936d43fcac5d772168c3d9d40005dfe91ccaff44b"
+  },
+  "task_id": "T-18db6175-499f-4679-bf8d-f815c7b42411",
+  "tool_wall_seconds": 334.54104308318347
+}

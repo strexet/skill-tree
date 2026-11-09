@@ -1,0 +1,27 @@
+FF
+======================================================================
+FAIL: test_current_unresolved_selector_row_is_not_silently_skipped_or_counted_complete (__main__.PluginInvocationTests.test_current_unresolved_selector_row_is_not_silently_skipped_or_counted_complete) (remaining='next-selected')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 713, in test_current_unresolved_selector_row_is_not_silently_skipped_or_counted_complete
+    self.assertEqual(engine().next_action(self.store,frame['id'],proof=proof)['action'],'prerequisite')
+AssertionError: 'prepare' != 'prerequisite'
+- prepare
++ prerequisite
+
+
+======================================================================
+FAIL: test_current_unresolved_selector_row_is_not_silently_skipped_or_counted_complete (__main__.PluginInvocationTests.test_current_unresolved_selector_row_is_not_silently_skipped_or_counted_complete) (remaining='all-unresolved')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 713, in test_current_unresolved_selector_row_is_not_silently_skipped_or_counted_complete
+    self.assertEqual(engine().next_action(self.store,frame['id'],proof=proof)['action'],'prerequisite')
+AssertionError: 'prepare' != 'prerequisite'
+- prepare
++ prerequisite
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.276s
+
+FAILED (failures=2)

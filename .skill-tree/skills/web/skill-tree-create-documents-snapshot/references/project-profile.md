@@ -19,7 +19,7 @@ Flavor: web. Static compatibility only; execution remains unqualified.
     "ui": []
   },
   "gaps": [],
-  "instruction_profile_id": "4c1c1a7d0b9684c5a6d51c04fb2d4865b1441385bc5308c2d8b768de02ab7d8f",
+  "instruction_profile_id": "57a225f767b2c4635d3ad4686b25d00479d26c69df466200cbe12b93226346c8",
   "recipes": {
     "script-test": {
       "argv": [
@@ -33,8 +33,14 @@ Flavor: web. Static compatibility only; execution remains unqualified.
       ],
       "lane": "unit",
       "qualification": "static-recipe; runner unqualified"
+    },
+    "static-inspection": {
+      "assertion_contract": "explicit source and artifact assertions",
+      "input_paths": [],
+      "lane": "static"
     }
   },
+  "source_version": "0.3.0",
   "worktree_environment": {
     "exclusive_resources": [],
     "isolated_directories": [],

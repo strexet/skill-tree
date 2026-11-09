@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "built_in_recipes": {
+    "static-inspection": {
+      "lane": "static",
+      "input_paths": [],
+      "assertion_contract": "explicit source and artifact assertions"
+    }
+  },
+  "unity": {
+    "editor_patterns": [
+      "^6000\\.[03]\\.\\d+[abfp]\\d+$"
+    ],
+    "utf_patterns": [
+      "^1\\.4\\.\\d+$",
+      "^1\\.6\\.0$"
+    ],
+    "sources": [
+      "https://docs.unity3d.com/Packages/com.unity.test-framework@1.4/manual/reference-command-line.html",
+      "https://docs.unity.com/en-us/engine/6000.3/manual/uitoolkits/ui-system-compare",
+      "https://docs.unity.com/en-us/engine/6000.0/manual/packages-list/dependencies-lp/upm-conflicts-auto",
+      "https://docs.unity3d.com/Packages/com.unity.test-framework@1.6/manual/index.html",
+      "https://docs.unity3d.com/6000.2/Documentation/Manual/test-framework/reference-command-line.html"
+    ]
+  },
+  "web": {
+    "lock_versions": [
+      2,
+      3
+    ],
+    "sources": [
+      "https://docs.npmjs.com/cli/v11/configuring-npm/package-lock-json/"
+    ]
+  },
+  "inventory": {
+    "roots": [
+      "Assets",
+      "Packages",
+      "ProjectSettings",
+      "tests",
+      "test",
+      "src",
+      ".skill-tree/documents",
+      "e2e",
+      "config",
+      ".config"
+    ],
+    "extensions": [
+      ".asmdef",
+      ".uxml",
+      ".uss"
+    ],
+    "names": [
+      "playwright.config.ts",
+      "playwright.config.js",
+      "vitest.config.ts",
+      "vitest.config.js",
+      "jest.config.js",
+      "jest.config.ts",
+      "vite.config.ts",
+      "next.config.js",
+      "next.config.ts",
+      "validation-profile.json",
+      "validation-recipes.json",
+      "browser-policy.json"
+    ]
+  },
+  "lanes": [
+    "static",
+    "unit",
+    "integration",
+    "browser",
+    "unity-editmode",
+    "unity-playmode",
+    "visual",
+    "harness",
+    "build",
+    "server",
+    "player",
+    "device",
+    "native"
+  ]
+}
