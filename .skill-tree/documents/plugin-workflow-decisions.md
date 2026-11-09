@@ -82,11 +82,11 @@ Task `T-a583acd5-fc6b-4d37-97ec-02df969fea9e` records separate owner agreement f
 
 ## Approved decision W3: optional open plugin management
 
-Core installation defaults to zero new external plugins and includes the planned `skill-tree-plugins` operation. Optional setup during installation and later management use the same preview/confirmation flow. Repeat core installation preserves existing plugins; discovery/recommendation labels never select or acquire a package automatically.
+Core installation defaults to zero new external plugins and includes the `skill-tree-plugins` operation. Optional setup during installation and later management use the same preview/confirmation flow. Repeat core installation preserves existing plugins; discovery/recommendation labels never select or acquire a package automatically.
 
 The [management contract](plugin-management-contract.md) owns installed/known views, noncatalog URL/repository/raw/local imports, Claude/other source-host acceptance, registered all-operation/named anchors, additional instruction/JSON parameters and exact unbind/uninstall/forget actions. Catalog membership and producer labels supply no import allowlist. Native/source-backed capability status remains separate from imported/installed state.
 
-W3 retains actual configuration consent, core authorization/ownership and frozen-run requirements. Source/resource closure remains explicit; unavailable native tools never become a successful invocation. Recommendation labels still require matching outcome evidence, but unqualified custom/manual selection remains available with visible status. The current source has ten operations; eleven is the qualified target after the core manager implementation.
+W3 retains actual configuration consent, core authorization/ownership and frozen-run requirements. Source/resource closure remains explicit; unavailable native tools never become a successful invocation. Recommendation labels still require matching outcome evidence, but unqualified custom/manual selection remains available with visible status. The core defines eleven operations with the standalone manager.
 
 ## Review-pilot implementation interpretation
 

@@ -198,5 +198,25 @@
         "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md) and local ordered manifest before routing. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Configured matching occurrences use scripts/workflow-state.py hook-start and hook-next at the actual before, during, after or registered named boundary. Follow the guarded prepare/invoke/record/accept sequence with an actual isolated host actor; scripts/plugin-hooks.js supplies owned preparation and private delivery data rather than native execution. Incorporate contributions through the ordinary authorized core workflow before the next occurrence. Returned results and completed chains never replace final current core acceptance or checks. Reconcile original pending attempts before retry or cancellation; source/configuration/context/policy drift retains prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
       }
     ]
+  },
+  "skill-tree-plugins": {
+    "title": "Skill-Tree: Manage Plugins",
+    "description": "Browse installed and known Skill Tree plugins, configure ordered bindings and parameters, and preview explicit installs, updates or removals.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Run node scripts/plugin-manager.js --project-root <project-root> --input - with a JSON envelope. Use {\"action\":\"inventory\"} for offline installed packages, ordered binding occurrences and grouped known sources. For human output pass format text and group_by plugin or point. Raw inventory returns without dispatch or queue initialization. Report installed, known, configured and available states separately. An absent curated catalog leaves direct source intake and project-known sources available.\n\nFor an explicit change, use {\"action\":\"prepare\",\"request\":{...}} with a stable request_id and the exact requested action. Save-known registers a source. Install and update accept sources and optional complete bindings. Bind accepts a binding. Configure accepts the complete bindings. Move uses an exact binding_id and zero-based index within the resolved point. Edit uses an exact binding_id and changes. Unbind, enable and disable target one exact binding_id. Uninstall and forget-known target an exact plugin_id. Reuse exact known IDs or accept a repository, skill or raw URL, local file or folder. Set resolve_remote true only for explicitly selected remote acquisition during preparation. Resolve free-text placement to an owned operation and anchor. Report unresolved placement as a prerequisite.\n\nShow the public preview, including exact versions, ownership, affected packages, ordered occurrence IDs, conditions, enablement, values and origins, adapter prerequisites and frozen requirements. The same package can appear repeatedly at one point. Moving an occurrence preserves the binding ID. Keep private locators and proposal data out of the chat and ordinary artifacts. After actual matching confirmation, send {\"action\":\"apply\",\"proposal\":{...},\"confirmation\":{\"proposal_digest\":\"<digest>\"}}. Discard a cancelled proposal. A changed preview requires a new confirmation. Report current profile refresh and re-admission requirements."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "Bind the management decision to the explicit request and current preview. Auto reasoning may evaluate in-scope options. Acquire only an explicitly selected source. Actual matching owner consent remains required for activation and mutations. Reuse explicit exact removal authorization when the verified preview preserves the complete authorized effect. Raw inventory and installation require no task identity. Never start a task, run or worktree for management."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin invocation contract](references/plugin-invocation.md) and the local ordered manifest for explicit management workflow actions. Raw inventory, cancellation and activation do not dispatch plugins. Configured existing occurrences use scripts/workflow-state.py hook-start and hook-next with the actual management request and proposal context. The before boundary follows explicit action admission, the during boundary follows preparation, and the after boundary follows review of the complete preview. The three proposal boundaries precede activation. Rebuild and present a changed preview before requesting matching consent. Use scripts/plugin-hooks.js for guarded preparation and private delivery, an actual isolated host actor for invocation, and ordinary guarded incorporation before continuing. Reconcile original attempts before retry or cancellation. A newly enabled package runs only in a later explicitly authorized workflow."
+      }
+    ]
   }
 }

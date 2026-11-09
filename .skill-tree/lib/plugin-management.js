@@ -165,7 +165,7 @@ function formatInventory(view,{groupBy='plugin'}={}){
  if(!view.plugins.length)lines.push(view.status==='unavailable'?'Installed state is unavailable.':'No installed external packages.');
  lines.push('Known definitions: '+view.known.status);for(const entry of view.known.entries)lines.push('  '+entry.id+' ['+(entry.installed?'installed':'not installed')+']');
  if(view.catalog?.status==='unavailable')lines.push('Catalog is unavailable: '+view.catalog.reason);
- else if(view.catalog){
+ if(view.catalog?.entries?.length||view.catalog?.status==='ok'){
   const entries=new Map(view.catalog.entries.map(row=>[row.id,row])),suggested=new Set();
   function describe(entry){
    const evidence=entry.evidence?.kind??'project-known',adapter=entry.adapter?.status??'requires-preparation';
@@ -241,9 +241,470 @@ function managementSemantics(root,proposal){
   }
  }
 }
-function applyManagementChange(root,proposal,confirmation){proposal=clone(proposal||{});if(!proposal||!['uninstall','configure','enable','disable'].includes(proposal.operation))registry.fail('plugin-action','Select a supported installed-package management proposal');managementSemantics(root,proposal);return require('./plugin-lifecycle.js').applyProposal(root,proposal,confirmation);}
+function applyManagementChange(root,proposal,confirmation,options){proposal=clone(proposal||{});if(!proposal||!['uninstall','configure','enable','disable'].includes(proposal.operation))registry.fail('plugin-action','Select a supported installed-package management proposal');managementSemantics(root,proposal);return require('./plugin-lifecycle.js').applyProposal(root,proposal,confirmation,options);}
 function applyRemoval(root,proposal,confirmation){proposal=clone(proposal||{});if(proposal?.operation!=='uninstall')registry.fail('plugin-action','Package removal requires the original uninstall proposal');return applyManagementChange(root,proposal,confirmation);}
 function forgetKnown(){registry.fail('plugin-known-owner','Forgetting a known definition is separate from installed package removal and requires the known-definition owner');}
+const KNOWN = '.skill-tree/installation/plugin-known.json';
+const MANAGER_FORMAT = 'skill-tree-manager-proposal';
+const managerOperations = {
+  install: 'install', update: 'update', configure: 'configure', bind: 'configure', edit: 'configure',
+  move: 'configure', unbind: 'configure', enable: 'enable', disable: 'disable', uninstall: 'uninstall',
+};
+const managerFields = {
+  install: ['sources', 'bindings', 'resolve_remote'], update: ['sources', 'bindings', 'resolve_remote'],
+  configure: ['bindings'], bind: ['binding', 'index'], edit: ['binding_id', 'changes'],
+  move: ['binding_id', 'index'], unbind: ['binding_id'], enable: ['binding_id'], disable: ['binding_id'],
+  uninstall: ['plugin_id'], 'save-known': ['source', 'suggested_locations'], 'forget-known': ['plugin_id'],
+};
+const digest = value => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
+const same = (left, right) => registry.json(left) === registry.json(right);
+
+function readKnown(root) {
+  const file = registry.safe(root, KNOWN);
+  if (!fs.existsSync(file)) return registry.seal({
+    format: 'skill-tree-plugin-known', schema: 1, generation: 0, entries: {}, requests: {},
+  });
+  const value = readJson(root, KNOWN);
+  if (value.format !== 'skill-tree-plugin-known' || value.schema !== 1 || !Number.isSafeInteger(value.generation) ||
+      value.generation < 0 || !object(value.entries) || !object(value.requests) ||
+      value.identity !== registry.seal(value).identity) {
+    registry.fail('plugin-known-owner', 'Project-known source inventory requires explicit ownership recovery');
+  }
+  for (const [id, entry] of Object.entries(value.entries)) {
+    if (!registry.validId(id) || entry.definition?.id !== id || !object(entry.definition.source) ||
+        !Array.isArray(entry.suggested_locations) || typeof entry.requires_locator !== 'boolean' ||
+        own(entry, 'locator') || own(entry.definition, 'locator')) {
+      registry.fail('plugin-known-owner', 'Invalid portable project-known source record');
+    }
+  }
+  for (const [id, receipt] of Object.entries(value.requests)) {
+    if (receipt.request_id !== id || !digest(receipt.proposal_digest) ||
+        !['saved-known', 'forgot-known'].includes(receipt.action) || !Number.isSafeInteger(receipt.generation) ||
+        receipt.generation < 1 || receipt.generation > value.generation) {
+      registry.fail('plugin-known-owner', 'Invalid project-known source request history');
+    }
+  }
+  return value;
+}
+
+function managerCatalog(source, diagnostic) {
+  const catalog = require('./plugin-catalog.js');
+  const unavailable = reason => ({catalog: catalog.emptyCatalog(source), diagnostic: reason});
+  if (diagnostic) return unavailable(diagnostic);
+  try {
+    return {catalog: catalog.loadCatalog(source), diagnostic: null};
+  } catch (error) {
+    return unavailable(error.code === 'plugin-catalog' ? error.message : 'Owned curated catalog metadata is unavailable');
+  }
+}
+
+function managementInventory(root, {source = path.resolve(__dirname, '..'), host, flavor, point, catalogDiagnostic} = {}) {
+  let known, knownIssue;
+  try {
+    known = readKnown(root);
+  } catch (error) {
+    knownIssue = boundedError(error, 'project-known');
+  }
+  const view = inventory(root, {
+    operations: operationsFor(source), ...(known?.generation ? {known: known.entries} : {}),
+  });
+  if (knownIssue) {
+    view.known = {status: 'unavailable', entries: []};
+    view.issues.push(knownIssue);
+  }
+  const bundled = path.resolve(source) === path.resolve(root, '.skill-tree/installation/source');
+  if (bundled && !catalogDiagnostic) {
+    try {
+      if (view.issues.some(item => item.scope === 'core-receipt')) throw Error('Owned core receipt is unavailable');
+      if (!view.profile) {
+        const core = require('./installation.js');
+        core.verifyOwned(root, core.receipt(root, true));
+      }
+    } catch {
+      catalogDiagnostic = 'Owned curated catalog metadata could not be verified';
+    }
+  }
+  const {catalog, diagnostic} = managerCatalog(source, catalogDiagnostic);
+  view.catalog = require('./plugin-catalog.js').catalogView(catalog, {
+    host, flavor, point, known: known?.entries || {}, inventory: view,
+  });
+  if (diagnostic) view.catalog = {...view.catalog, status: 'unavailable', reason: diagnostic};
+  return view;
+}
+
+function managerLocation(request, catalog) {
+  const location = require('./plugin-bindings.js').resolveLocation(request, catalog.anchors);
+  if (location.status !== 'resolved') registry.fail('binding-anchor', location.reason || 'Select a registered executable location');
+  return location;
+}
+
+function bindingInput(row, catalog) {
+  if (!object(row)) registry.fail('plugin-binding', 'An explicit binding occurrence is required');
+  const {location, ...binding} = row;
+  if (location !== undefined) {
+    if (binding.operation !== undefined || binding.anchor !== undefined)
+      registry.fail('binding-anchor', 'Select one location or exact operation and anchor');
+    const resolved = managerLocation(location, catalog);
+    binding.operation = resolved.operation;
+    binding.anchor = resolved.anchor;
+  } else {
+    managerLocation(binding, catalog);
+  }
+  return {...binding, enabled: binding.enabled === undefined ? true : binding.enabled};
+}
+
+function sameManagerSource(left, right) {
+  if (left.kind !== right.kind || left.entry !== right.entry) return false;
+  return left.kind === 'local' ? left.locator_id === right.locator_id : left.url === right.url;
+}
+
+function managerSource(root, input, known, catalog) {
+  const {normalizeSource} = require('./plugin-sources.js');
+  const selected = object(input) ? input.known_id : undefined;
+  const id = selected ?? (typeof input === 'string' && (own(known, input) || catalog.entries.has(input)) ? input : undefined);
+  let descriptor = input;
+  let saved;
+  if (id !== undefined) {
+    descriptor = require('./plugin-catalog.js').selectSource(catalog, id, {known});
+    saved = own(known, id) ? known[id] : null;
+    if (saved?.requires_locator && !input.locator)
+      registry.fail('plugin-known-locator', 'The selected known source requires its explicit current acquisition locator');
+    if (object(input) && input.locator) descriptor = {...descriptor, locator: input.locator};
+  }
+  const normalized = normalizeSource(descriptor, {baseDir: root});
+  const {source} = normalized.definition;
+  if (source.kind === 'local' && source.locator_id !== registry.hash(normalized.locator.path))
+    registry.fail('plugin-known-locator', 'The local acquisition locator differs from the selected source identity');
+  if (source.kind !== 'local') {
+    const {definition} = normalizeSource({...normalized.definition, source: {...source, url: normalized.locator.url}}, {baseDir: root});
+    if (!sameManagerSource(source, definition.source))
+      registry.fail('plugin-known-locator', 'The remote acquisition locator differs from the selected source identity');
+  }
+  const registered = own(known, normalized.definition.id) ? known[normalized.definition.id] : null;
+  if (registered && !sameManagerSource(registered.definition.source, source))
+    registry.fail('plugin-known-conflict', 'The exact project-known identity names a different source');
+  const curated = catalog.entries.get(normalized.definition.id);
+  if (curated && !sameManagerSource(curated.row.source, source))
+    registry.fail('plugin-known-conflict', 'The exact curated identity names a different source');
+  const portable = {...normalized.definition};
+  for (const key of ['expectedDigests', 'package_dependencies']) {
+    if (object(descriptor) && own(descriptor, key)) portable[key] = descriptor[key];
+  }
+  const url = normalized.locator.url ? new URL(normalized.locator.url) : null;
+  const requiresLocator = source.kind === 'local' || Boolean(url?.username || url?.password || url?.search);
+  const privateLocator = requiresLocator && (normalized.locator.path || normalized.locator.url);
+  if (privateLocator && registry.json(portable).includes(JSON.stringify(privateLocator).slice(1, -1)))
+    registry.fail('plugin-known-locator', 'Private acquisition locators must remain outside portable source data');
+  return {portable, acquisition: {...portable, locator: normalized.locator}, requiresLocator};
+}
+
+function managerScope(root) {
+  const core = require('./installation.js');
+  const profile = core.receipt(root, true);
+  core.verifyOwned(root, profile);
+  return require('./plugin-lifecycle.js').providerScope(profile);
+}
+
+function managerDigest(proposal) {
+  const {digest: ignored, ...body} = proposal;
+  return registry.hash(registry.json(body));
+}
+
+function managerEnvelope(root, request, preview, mutation) {
+  const proposal = {
+    format: MANAGER_FORMAT, schema: 1, target_identity: registry.hash(fs.realpathSync(root)),
+    action: request.action, request_id: request.request_id, preview, mutation,
+  };
+  proposal.digest = managerDigest(proposal);
+  return {status: 'ready', preview: clone(preview), proposal, prerequisites: []};
+}
+
+function managerKnownPreview(action, scope, mutation) {
+  return {action, provider_scope: scope, known_generation: mutation.generation,
+    plugin_id: mutation.plugin_id, known: mutation.entry, preserves_installed_state: true};
+}
+
+function prepareKnownManager(root, request, known, catalog, scope) {
+  let pluginId = request.plugin_id;
+  let entry;
+  if (request.action === 'save-known') {
+    const selected = managerSource(root, request.source, known.entries, catalog);
+    pluginId = selected.portable.id;
+    const suggestions = request.suggested_locations ?? [];
+    if (!Array.isArray(suggestions)) registry.fail('plugin-known-owner', 'Known locations require an explicit list');
+    const places = new Map();
+    for (const suggestion of suggestions) {
+      const location = managerLocation(suggestion, catalog);
+      places.set(location.boundary_id, {operation: location.operation, anchor: location.anchor});
+    }
+    entry = {definition: selected.portable, suggested_locations: [...places.values()],
+      requires_locator: selected.requiresLocator};
+  } else {
+    if (!registry.validId(pluginId) || !own(known.entries, pluginId))
+      registry.fail('plugin-known-owner', 'Select an exact project-known plugin identity');
+    entry = null;
+  }
+  const mutation = {kind: 'known', generation: known.generation, identity: known.identity,
+    plugin_id: pluginId, entry, provider_scope: scope};
+  return managerEnvelope(root, request, managerKnownPreview(request.action, scope, mutation), mutation);
+}
+
+function managerBindingChange(base, request, catalog) {
+  const {moveBinding, removeBinding} = require('./plugin-bindings.js');
+  const selected = request.binding_id === undefined ? null : exactBinding(base, request.binding_id);
+  const operation = managerOperations[request.action];
+  const lifecycle = {request_id: request.request_id, operation};
+  let rows = base.bindings;
+  if (operation === 'enable' || operation === 'disable') {
+    if (!selected) registry.fail('plugin-selection', 'Select an exact binding occurrence ID');
+    return {...lifecycle, binding_ids: [selected.id]};
+  }
+  if (operation === 'uninstall') return {...lifecycle, plugin_ids: [exactPackage(base, request.plugin_id).id]};
+  if (request.action === 'unbind') return {...lifecycle, bindings: removeBinding(rows, selected?.id)};
+  if (request.action === 'configure' || request.bindings !== undefined) {
+    if (!Array.isArray(request.bindings)) registry.fail('plugin-binding', 'Supply the complete ordered binding sequence');
+    return {...lifecycle, bindings: request.bindings.map(row => {
+      const previous = rows.find(item => item.id === row?.id);
+      return previous && same(previous, row) ? previous : bindingInput(row, catalog);
+    })};
+  }
+  if (request.action === 'edit') {
+    const changes = request.changes;
+    if (!selected || !object(changes) || Object.keys(changes).some(key =>
+      !['operation', 'anchor', 'location', 'enabled', 'condition', 'parameters', 'instructions'].includes(key))) {
+      registry.fail('plugin-binding', 'Select an exact occurrence and its editable fields');
+    }
+    const edited = {...selected, ...changes};
+    if (own(changes, 'location')) {delete edited.operation;delete edited.anchor;}
+    if (changes.condition === null) delete edited.condition;
+    return {...lifecycle, bindings: rows.map(row => row.id === selected.id ? bindingInput(edited, catalog) : row)};
+  }
+  if (request.action === 'bind' || request.action === 'move') {
+    const row = request.action === 'bind' ? bindingInput(request.binding, catalog) : selected;
+    if (!row) registry.fail('plugin-selection', 'Select an exact binding occurrence ID');
+    if (request.action === 'bind' && rows.some(item => item.id === row.id))
+      registry.fail('binding-identity', 'The new occurrence ID is already configured');
+    const boundary = managerLocation(row, catalog).boundary_id;
+    const {resolveLocation} = require('./plugin-bindings.js');
+    const slots = rows.flatMap((item, index) =>
+      resolveLocation(item, catalog.anchors).boundary_id === boundary ? [index] : []);
+    if (request.action === 'move') {
+      const sequence = moveBinding(slots.map(index => rows[index]), row.id, request.index);
+      rows = [...rows];
+      slots.forEach((slot, index) => {rows[slot] = sequence[index];});
+    } else {
+      const index = request.index ?? slots.length;
+      if (!Number.isInteger(index) || index < 0 || index > slots.length)
+        registry.fail('binding-order', 'The requested occurrence position is outside the configured chain');
+      const slot = index < slots.length ? slots[index] : slots.length ? slots.at(-1) + 1 : rows.length;
+      rows = [...rows.slice(0, slot), row, ...rows.slice(slot)];
+    }
+    return {...lifecycle, bindings: rows};
+  }
+  return lifecycle;
+}
+
+function managerLifecyclePreview(action, proposal, operations) {
+  const issues = [];
+  const {rows} = rowsFor(proposal, operations, issues);
+  if (issues.length) registry.fail('plugin-binding', issues[0].message);
+  const packages = Object.values(proposal.packages).sort((left, right) => left.id.localeCompare(right.id));
+  return {
+    action, operation: proposal.operation, registry_generation: proposal.base_generation,
+    registry_identity: proposal.base_registry_identity, provider_scope: proposal.provider_scope,
+    packages: packages.map(record => ({
+      id: record.id, source: record.source, revision: record.revision, content_digest: record.content_digest,
+      destination: record.destination, entry: record.entry, dependencies: record.package_dependencies,
+      resources: record.files, adaptation: record.adaptation, execution: record.execution,
+    })),
+    bindings: rows.map(row => ({
+      ...row,
+      readiness: row.enabled ? proposal.packages[row.plugin_id].metadata?.application_policy?.readiness_effect ??
+        'A matching configured occurrence may participate in the later authorized workflow.' : 'The occurrence remains disabled.',
+    })),
+  };
+}
+
+function managerImpact(base, proposal, view, bindings, anchors) {
+  const proposedRows = new Map(bindings.map(row => [row.id, row]));
+  const proposedBindings = new Map(proposal.bindings.map(row => [row.id, row]));
+  const changed = new Set(view.bindings.filter(row => {
+    const next = proposedRows.get(row.id);
+    return !next || row.point_position !== next.point_position ||
+      !same(base.bindings[row.position - 1], proposedBindings.get(row.id));
+  }).map(row => row.id));
+  const previousRows = new Map(view.bindings.map(row => [row.id, row]));
+  const changedPoints = new Set([...view.bindings, ...bindings].filter(row =>
+    changed.has(row.id) || !previousRows.has(row.id)
+  ).map(row => row.point_id));
+  const packageChanges = Object.values(base.packages).filter(record => !same(record, proposal.packages[record.id]));
+  const removed = packageChanges.filter(record => !own(proposal.packages, record.id));
+  const {resolveLocation} = require('./plugin-bindings.js');
+  const affected = view.frozen_requirements.filter(record =>
+    record.requirements.bindings.some(row => changed.has(row.id) ||
+      changedPoints.has(resolveLocation(row, anchors).boundary_id)) ||
+    record.requirements.packages.some(pkg => packageChanges.some(row => row.id === pkg.id)));
+  return {
+    removed_packages: removed.map(row => ({id: row.id, source: row.source, destination: row.destination, resources: row.files})),
+    removed_bindings: base.bindings.filter(row => !proposedBindings.has(row.id)).map(row => row.id),
+    frozen_requirements: affected.filter(row => row.association === 'matched'),
+    uncertain_frozen_requirements: affected.filter(row => row.association === 'unknown'),
+  };
+}
+
+function managerPrerequisites(root, view) {
+  const core = require('./installation.js');
+  const issues = (view?.issues || []).filter(item => item.blocking !== false);
+  if (['core', 'plugins'].some(channel => fs.existsSync(registry.safe(root, core.transactionPaths(channel).journal)))) {
+    issues.push(issue('plugin-recovery', 'Owned installation recovery is required before a new manager mutation'));
+  }
+  try {
+    if (core.hasActiveOperation(root)) issues.push(issue('plugin-active', 'Reach a stopped workflow handoff before applying the proposal'));
+  } catch (error) {
+    issues.push(boundedError(error, 'workflow-state'));
+  }
+  return issues;
+}
+
+function managerOperationsFor(root) {
+  return operationsFor(registry.safe(root, '.skill-tree/installation/source'));
+}
+
+async function prepareManagerRequest(root, request, options = {}) {
+  request = clone(request);
+  if (!object(request) || typeof request.request_id !== 'string' || !request.request_id ||
+      request.request_id.length > 200 || /[\x00-\x1f]/.test(request.request_id)) {
+    registry.fail('plugin-request', 'A stable manager request identity is required');
+  }
+  if (!own(managerFields, request.action) || Object.keys(request).some(key =>
+    !['action', 'request_id', ...managerFields[request.action]].includes(key))) {
+    registry.fail('plugin-action', 'Select a supported manager action with its exact fields');
+  }
+  const source = options.source ?? path.resolve(__dirname, '..');
+  const scope = managerScope(root);
+  const known = readKnown(root);
+  const {catalog: knownCatalog} = managerCatalog(source);
+  const operations = managerOperationsFor(root);
+  const catalog = {...knownCatalog, anchors: require('./plugin-composition.js').createCatalog(operations)};
+  if (['save-known', 'forget-known'].includes(request.action)) {
+    const result = prepareKnownManager(root, request, known, catalog, scope);
+    const prerequisites = managerPrerequisites(root);
+    return prerequisites.length ? {...result, status: 'blocked', proposal: null, prerequisites} : result;
+  }
+  const base = registry.verifyInstalled(root);
+  const lifecycle = managerBindingChange(base, request, catalog);
+  if (['install', 'update'].includes(lifecycle.operation)) {
+    if (!Array.isArray(request.sources) || !request.sources.length)
+      registry.fail('plugin-source', 'Select explicit source inputs for installation or update');
+    lifecycle.sources = request.sources.map(input => {
+      const {acquisition} = managerSource(root, input, known.entries, catalog);
+      if (acquisition.source.kind !== 'local' && request.resolve_remote !== true && typeof options.acquire !== 'function')
+        registry.fail('source-acquisition-required', 'Explicit online source resolution is required before preview');
+      return acquisition;
+    });
+  }
+  const proposal = await require('./plugin-lifecycle.js').prepareProposal(root, lifecycle, {
+    bindProviderScope: true, acquire: options.acquire, availableCapabilities: options.availableCapabilities,
+  });
+  if (proposal.base_registry_identity !== base.identity || registry.readRegistry(root).identity !== base.identity)
+    registry.fail('plugin-stale', 'The installed generation changed during manager preparation');
+  const view = inventory(root, {operations});
+  const preview = managerLifecyclePreview(request.action, proposal, operations);
+  preview.impact = managerImpact(base, proposal, view, preview.bindings, catalog.anchors);
+  preview.requires_profile_refresh = !same(base.packages, proposal.packages) || !same(base.bindings, proposal.bindings);
+  const prerequisites = managerPrerequisites(root, view);
+  if (prerequisites.length) return {status: 'blocked', preview, proposal: null, prerequisites};
+  const bound = {...proposal, manager_action: request.action, manager_preview_digest: registry.hash(registry.json(preview)),
+    manager_impact_digest: registry.hash(registry.json(preview.impact))};
+  bound.digest = require('./plugin-lifecycle.js').proposalDigest(bound);
+  return managerEnvelope(root, request, preview, {kind: 'lifecycle', proposal: bound});
+}
+
+function applyKnownManager(root, envelope) {
+  const {mutation, action, request_id} = envelope;
+  const core = require('./installation.js');
+  return core.locked(root, () => {
+    const scope = managerScope(root);
+    const current = readKnown(root);
+    if (own(current.requests, request_id)) {
+      const receipt = current.requests[request_id];
+      if (receipt.proposal_digest !== envelope.digest)
+        registry.fail('plugin-replay', 'The known-source request identity conflicts with an earlier proposal');
+      return {...receipt, replayed: true, current_generation: current.generation};
+    }
+    if (!same(scope, mutation.provider_scope) || mutation.identity !== current.identity ||
+        mutation.generation !== current.generation) {
+      registry.fail('plugin-stale', 'The project-known generation or provider scope changed');
+    }
+    if (core.hasActiveOperation(root)) registry.fail('plugin-active', 'Reach a stopped workflow handoff before changing known sources');
+    const entries = {...current.entries};
+    if (action === 'save-known') {
+      if (mutation.entry?.definition?.id !== mutation.plugin_id || !registry.validId(mutation.plugin_id) ||
+          own(entries, mutation.plugin_id) && !sameManagerSource(entries[mutation.plugin_id].definition.source,
+            mutation.entry.definition.source)) registry.fail('plugin-known-owner', 'The proposed known source identity conflicts');
+      entries[mutation.plugin_id] = mutation.entry;
+    } else {
+      if (mutation.entry !== null || !own(entries, mutation.plugin_id))
+        registry.fail('plugin-known-owner', 'Select an exact existing known source to forget');
+      delete entries[mutation.plugin_id];
+    }
+    const receipt = {action: action === 'save-known' ? 'saved-known' : 'forgot-known', request_id,
+      proposal_digest: envelope.digest, generation: current.generation + 1};
+    const next = registry.seal({...current, generation: receipt.generation, entries,
+      requests: {...current.requests, [request_id]: receipt}});
+    const file = registry.safe(root, KNOWN);
+    const temporary = path.join(path.dirname(file), '.known-' + require('node:crypto').randomUUID() + '.tmp');
+    try {
+      const fd = fs.openSync(temporary, 'wx', 0o600);
+      try {fs.writeFileSync(fd, registry.json(next));fs.fsyncSync(fd);} finally {fs.closeSync(fd);}
+      if (readKnown(root).identity !== current.identity || !same(managerScope(root), scope))
+        registry.fail('plugin-stale', 'Project-known data or provider scope changed during activation');
+      fs.renameSync(temporary, file);
+    } finally {
+      if (fs.existsSync(temporary)) fs.unlinkSync(temporary);
+    }
+    return receipt;
+  }, {recoverPending: false});
+}
+
+function applyManagerProposal(root, envelope, confirmation) {
+  envelope = clone(envelope);
+  if (envelope?.format !== MANAGER_FORMAT || envelope.schema !== 1 ||
+      envelope.target_identity !== registry.hash(fs.realpathSync(root)) || envelope.digest !== managerDigest(envelope)) {
+    registry.fail('plugin-proposal', 'The manager proposal digest, target or content changed');
+  }
+  if (!object(confirmation) || Object.keys(confirmation).length !== 1 || confirmation.proposal_digest !== envelope.digest)
+    registry.fail('plugin-consent', 'Explicit confirmation of the exact manager proposal digest is required');
+  const {action, request_id, preview, mutation} = envelope;
+  if (mutation?.kind === 'known' && ['save-known', 'forget-known'].includes(action) &&
+      same(preview, managerKnownPreview(action, mutation.provider_scope, mutation))) {
+    return applyKnownManager(root, envelope);
+  }
+  const proposal = mutation?.proposal;
+  if (mutation?.kind !== 'lifecycle' || !own(managerOperations, action) ||
+      proposal?.operation !== managerOperations[action] || proposal.request_id !== request_id ||
+      proposal.manager_action !== action || !object(proposal.provider_scope) ||
+      proposal.manager_preview_digest !== registry.hash(registry.json(preview))) {
+    registry.fail('plugin-proposal', 'The public manager preview does not match the owned lifecycle proposal');
+  }
+  const exact = {proposal_digest: proposal.digest};
+  const options = {validateManagerImpact(base, candidate) {
+    const operations = managerOperationsFor(root);
+    const view = inventory(root, {operations});
+    const prerequisites = managerPrerequisites(root, view);
+    if (prerequisites.length) registry.fail('plugin-stale', prerequisites[0].message);
+    const bindings = managerLifecyclePreview(action, candidate, operations).bindings;
+    const anchors = require('./plugin-composition.js').createCatalog(operations);
+    const current = managerImpact(base, candidate, view, bindings, anchors);
+    if (candidate.manager_impact_digest !== registry.hash(registry.json(current)) || !same(preview.impact, current)) {
+      registry.fail('plugin-stale', 'The approved frozen requirements or mutation impact changed; prepare a fresh preview');
+    }
+  }};
+  return ['install', 'update'].includes(proposal.operation) ?
+    require('./plugin-lifecycle.js').applyProposal(root, proposal, exact, options) :
+    applyManagementChange(root, proposal, exact, options);
+}
+
 function listMain(root,args,{source=path.resolve(__dirname,'..')}={}){
  try{
   let selected=false,json=false,groupBy='plugin',grouped=false;
@@ -254,21 +715,9 @@ function listMain(root,args,{source=path.resolve(__dirname,'..')}={}){
    else registry.fail('plugin-view','Use --list-plugins [--json] [--group-by plugin|point] as one read-only operation');
   }
   if(!selected||!['plugin','point'].includes(groupBy))registry.fail('plugin-view','Use --list-plugins [--json] [--group-by plugin|point]');
-  const view=inventory(root,{operations:operationsFor(source)});
-  try{
-   const bundled=path.resolve(source)===path.resolve(root,'.skill-tree/installation/source');
-   if(bundled){
-    if(!view.profile){
-     const core=require('./installation.js');
-     core.verifyOwned(root,core.receipt(root,true));
-    }else if(view.issues.some(item=>item.scope==='core-receipt'))registry.fail('plugin-catalog','The bundled catalog ownership could not be verified');
-   }
-   const catalog=require('./plugin-catalog.js');
-   view.catalog=catalog.catalogView(catalog.loadCatalog(source),{inventory:view});
-  }catch(error){
-   view.catalog={status:'unavailable',reason:error.code==='plugin-catalog'?error.message:'Owned catalog metadata could not be read'};
-  }
+  const view=managementInventory(root,{source});
   process.stdout.write(json?JSON.stringify(view,null,2)+'\n':formatInventory(view,{groupBy}));return view.status==='ok'?0:view.status==='drift'?1:2;
  }catch(error){process.stderr.write(error.message+'\n');return 2;}
 }
-module.exports={inventory,formatInventory,prepareRemoval,applyRemoval,applyManagementChange,prepareUnbind,prepareActivation,forgetKnown,listMain};
+module.exports={inventory,formatInventory,prepareRemoval,applyRemoval,applyManagementChange,prepareUnbind,prepareActivation,forgetKnown,listMain,
+ managementInventory,prepareManagerRequest,applyManagerProposal};

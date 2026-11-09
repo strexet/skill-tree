@@ -37,9 +37,20 @@ function bindings(value,packages){
  registry.validateBindings(result,packages);return result;
 }
 function proposalDigest(proposal){const {digest,...content}=proposal;return registry.hash(registry.json(content));}
-function makeProposal(root,request,base,profile,packages,nextBindings,snapshots){
+function providerScope(profile){
+ const destinations=Object.fromEntries(Object.entries(profile.destinations).map(([relative,record])=>[
+  relative,{name:record.name,providers:[...(record.providers||[record.provider])].sort()}
+ ]));
+ return {flavor:profile.flavor,destinations};
+}
+function assertProviderScope(proposal,profile){
+ if(own(proposal,'provider_scope')&&registry.json(proposal.provider_scope)!==registry.json(providerScope(profile)))
+  registry.fail('plugin-stale','The confirmed provider or destination scope changed');
+}
+function makeProposal(root,request,base,profile,packages,nextBindings,snapshots,{bindProviderScope=false}={}){
  const proposed=registry.seal({...base,generation:base.generation+1,packages,bindings:nextBindings});registry.validateRegistry(proposed);
  const result={format:'skill-tree-plugin-proposal',schema:1,request_id:requestId(request.request_id),operation:request.operation,target_identity:targetIdentity(root),core_identity:profile.identity,base_generation:base.generation,base_registry_identity:base.identity,packages:clone(packages),bindings:clone(nextBindings),snapshots:clone(snapshots)};
+ if(bindProviderScope)result.provider_scope=providerScope(profile);
  result.digest=proposalDigest(result);return result;
 }
 async function prepareProposal(root,request,options={}){
@@ -71,7 +82,7 @@ async function prepareProposal(root,request,options={}){
   for(const id of request.plugin_ids){if(!own(packages,id))registry.fail('plugin-source','The selected plugin is not installed');delete packages[id];}
   nextBindings=nextBindings.filter(binding=>!request.plugin_ids.includes(binding.plugin_id));
  }
- const result=makeProposal(root,request,base,profile,packages,nextBindings,snapshots);return options.dryRun?{action:'dry-run',proposal:result,prerequisites:[]}:result;
+ const result=makeProposal(root,request,base,profile,packages,nextBindings,snapshots,options);return options.dryRun?{action:'dry-run',proposal:result,prerequisites:[]}:result;
 }
 function validateProposal(root,proposal,confirmation){
  if(!proposal||proposal.format!=='skill-tree-plugin-proposal'||proposal.schema!==1||proposal.target_identity!==targetIdentity(root)||!['install','update','configure','enable','disable','uninstall','rollback'].includes(proposal.operation)||proposal.digest!==proposalDigest(proposal))registry.fail('plugin-proposal','The plugin proposal digest, target or content changed');
@@ -104,19 +115,35 @@ function recordNoop(root,history,receipt,expected){
  }
  return receipt;
 }
-function applyProposal(root,proposal,confirmation){
+function replayReceipt(base,history,proposal){
+ const primary=own(base.requests,proposal.request_id)?base.requests[proposal.request_id]:null,noop=own(history.requests,proposal.request_id)?history.requests[proposal.request_id]:null;
+ if(primary&&noop&&primary.proposal_digest!==noop.proposal_digest)registry.fail('plugin-replay','Conflicting request history requires reconciliation');
+ const receipt=primary||noop;
+ if(!receipt)return null;
+ if(receipt.proposal_digest!==proposal.digest)registry.fail('plugin-replay','The request identity conflicts with an earlier proposal');
+ return {...clone(receipt),replayed:true,current_generation:base.generation};
+}
+function applyProposal(root,proposal,confirmation,{validateManagerImpact}={}){
  proposal=clone(proposal);confirmation=clone(confirmation||{});
  validateProposal(root,proposal,confirmation);
+ const managed=['manager_action','manager_preview_digest','manager_impact_digest'].some(field=>own(proposal,field));
+ if(managed&&typeof validateManagerImpact!=='function')
+  registry.fail('plugin-consent','A manager-bound proposal requires the exact manager preview and impact guard');
+ const lockOptions=managed?{recoverPending:false,onPending:()=>{
+  coreProfile(root);
+  const base=registry.verifyInstalled(root);
+  const replay=replayReceipt(base,registry.readNoopRequests(root,base.generation),proposal);
+  if(!replay)registry.fail('plugin-recovery','Owned installation recovery is required before a new manager mutation');
+  return replay;
+ }}:undefined;
  return core.locked(root,()=>{
   const profile=coreProfile(root),base=registry.verifyInstalled(root),noopBefore=core.treeHash(root,registry.NOOP_REQUESTS),history=registry.readNoopRequests(root,base.generation);
-  const primary=own(base.requests,proposal.request_id)?base.requests[proposal.request_id]:null,noop=own(history.requests,proposal.request_id)?history.requests[proposal.request_id]:null;
-  if(primary&&noop&&primary.proposal_digest!==noop.proposal_digest)registry.fail('plugin-replay','Conflicting request history requires reconciliation');
-  if(primary||noop){
-   const receipt=primary||noop;if(receipt.proposal_digest!==proposal.digest)registry.fail('plugin-replay','The request identity conflicts with an earlier proposal');
-   return {...clone(receipt),replayed:true,current_generation:base.generation};
-  }
+  const replay=replayReceipt(base,history,proposal);
+  if(replay)return replay;
   if(base.identity!==proposal.base_registry_identity||base.generation!==proposal.base_generation||profile.identity!==proposal.core_identity)registry.fail('plugin-stale','The proposal generation or core identity is stale');
+  assertProviderScope(proposal,profile);
   stoppedHandoff(root);
+  if(managed)validateManagerImpact(base,proposal);
   const changes=snapshotChanges(proposal,base);
   const next=registry.seal({...base,generation:base.generation+1,packages:clone(proposal.packages),bindings:clone(proposal.bindings)});registry.validateRegistry(next);
   if(registry.json(next.packages)===registry.json(base.packages)&&registry.json(next.bindings)===registry.json(base.bindings))return recordNoop(root,history,{action:'verified-no-op',generation:base.generation,request_id:proposal.request_id,proposal_digest:proposal.digest},noopBefore);
@@ -126,11 +153,14 @@ function applyProposal(root,proposal,confirmation){
   const expected=Object.fromEntries(Object.keys(changes).map(rel=>[rel,core.treeHash(root,rel,true)]));
   core.transaction(root,changes,expected,()=>{
    stoppedHandoff(root);validateProposal(root,proposal,confirmation);
-   if(registry.verifyInstalled(root).identity!==base.identity||coreProfile(root).identity!==profile.identity)registry.fail('plugin-stale','Project state changed during plugin staging');
+   const actualProfile=coreProfile(root);
+   if(registry.verifyInstalled(root).identity!==base.identity||actualProfile.identity!==profile.identity)registry.fail('plugin-stale','Project state changed during plugin staging');
+   assertProviderScope(proposal,actualProfile);
+   if(managed)validateManagerImpact(base,proposal);
    for(const encoded of Object.values(proposal.snapshots||{}))decodeSnapshot(encoded);
   },'plugins');
   registry.verifyInstalled(root);return {...receipt,requires_profile_refresh:true};
- });
+ },lockOptions);
 }
 function backupContents(root,entry){
  if(core.treeHash(root,entry.backup,true)!==entry.old)registry.fail('plugin-rollback','The retained plugin backup is missing or modified');
@@ -158,4 +188,4 @@ async function prepareRollback(root,request){
  return makeProposal(root,{...request,operation:'rollback'},base,profile,clone(previous.packages),clone(previous.bindings),snapshots);
 }
 function recoverPlugins(root){stoppedHandoff(root);return core.locked(root,()=>{stoppedHandoff(root);core.recover(root,'plugins');return {action:'recovered',registry:registry.verifyInstalled(root)};});}
-module.exports={prepareProposal,applyProposal,prepareRollback,recoverPlugins};
+module.exports={prepareProposal,applyProposal,prepareRollback,recoverPlugins,providerScope,proposalDigest};

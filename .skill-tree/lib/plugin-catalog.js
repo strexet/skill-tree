@@ -181,6 +181,12 @@ function validateRecommendations(data, eligibility, entries) {
   }
 }
 
+function emptyCatalog(source = path.resolve(__dirname, '..')) {
+  const operations = read(source, 'templates/operations.json');
+  return {anchors: createCatalog(operations), entries: new Map(),
+    recommendations: Object.fromEntries(flavors.map(flavor => [flavor, []]))};
+}
+
 function loadCatalog(source = path.resolve(__dirname, '..'), {manifest} = {}) {
   const data = manifest ?? read(source, 'config/plugin-catalog.json');
   const eligibility = read(source, 'config/plugin-catalog-eligibility.json');
@@ -350,4 +356,4 @@ function selectSource(catalog, id, {known = {}} = {}) {
   return clone(addition.locator ? {...addition.descriptor, locator: addition.locator} : addition.descriptor);
 }
 
-module.exports = {loadCatalog, catalogView, selectSource};
+module.exports = {loadCatalog, emptyCatalog, catalogView, selectSource};

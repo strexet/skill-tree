@@ -10,7 +10,7 @@ The [W3 management contract](plugin-management-contract.md) defines core-only in
 
 ## Verified source baseline
 
-Authored operations reside in `.skill-tree/templates/`; shared contracts/helpers reside in `.skill-tree/common/`; domain resources reside in `.skill-tree/domains/`. The deterministic composer owns generated representative packages under `.skill-tree/skills/general/`, `.skill-tree/skills/web/` and `.skill-tree/skills/unity/`. The source defines ten operations across three flavors; the approved `skill-tree-plugins` operation raises the planned count to eleven after implementation and qualification. Provider detection and installation destinations remain owned by `.skill-tree/config/providers.json`.
+Authored operations reside in `.skill-tree/templates/`; shared contracts/helpers reside in `.skill-tree/common/`; domain resources reside in `.skill-tree/domains/`. The deterministic composer owns generated representative packages under `.skill-tree/skills/general/`, `.skill-tree/skills/web/` and `.skill-tree/skills/unity/`. The source defines eleven operations across three flavors, including `skill-tree-plugins`. Provider detection and installation destinations remain owned by `.skill-tree/config/providers.json`.
 
 Initial accepted foundations comprise the shared clarification protocol, external plugin contract, manual clarification controller and dated market map. The [clarification qualification](../history/validation/plugin-system/clarification-agent-observations.json) distinguishes deterministic fixtures from two controlled actual-agent scenarios. The recorded host does not expose an exact inherited model identity or complete token/cost accounting. The recorded clarification observations establish no native external Skill invocation.
 

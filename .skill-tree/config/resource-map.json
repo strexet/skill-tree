@@ -156,6 +156,32 @@
       "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
+  "skill-tree-plugins": {
+    "references": {
+      "decision-governance.md": "common/references/decision-governance.md",
+      "installation-profile.md": "common/references/installation-profile.md",
+      "plugin-invocation.md": "common/references/plugin-invocation.md",
+      "validation-policy.md": "common/references/validation-policy.md"
+    },
+    "scripts": {
+      "decision-governance.py": "common/scripts/decision-governance.py",
+      "decision-orchestration.py": "common/scripts/decision-orchestration.py",
+      "package.json": "common/scripts/commonjs-package.json",
+      "plugin-bindings.js": "lib/plugin-bindings.js",
+      "plugin-composition.js": "lib/plugin-composition.js",
+      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
+      "plugin-invocation.py": "common/scripts/plugin-invocation.py",
+      "plugin-manager.js": "common/scripts/plugin-manager.js",
+      "plugin-parameters.js": "lib/plugin-parameters.js",
+      "plugin-processing.py": "common/scripts/plugin-processing.py",
+      "plugin-registry.js": "lib/plugin-registry.js",
+      "plugin-runtime.js": "lib/plugin-runtime.js",
+      "plugin-sources.js": "lib/plugin-sources.js",
+      "run-workspaces.py": "common/scripts/run-workspaces.py",
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
+  },
   "skill-tree-pr-review-cycle": {
     "references": {
       "decision-governance.md": "common/references/decision-governance.md",

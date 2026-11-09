@@ -1,0 +1,42 @@
+{
+  "actual_agent_contexts_in_replay": 0,
+  "historical_capture_sha256": "c1762d1213ea26e739e62711a88271974207abea862a10ee48989f52834f6bc9",
+  "historical_report_sha256": "5385aa06aeb9714e9dde1aba57f3e72e8099b149ac25f1b530187982ec16d10b",
+  "result": "pass",
+  "results": {
+    "n-move": {
+      "archived_request_sha256": "c57bb9ce680d1874725f5a7373a5476bd22527ea84b28c75b5216e685e68bccb",
+      "proposal_digest": "d68b11af6714012904ef873f21a06a6c2319e0d7e4a446a6296a8ffcae6c45ee",
+      "verified_same_preview_semantics": true,
+      "verified_unchanged_after_cancellation": true
+    },
+    "p-add": {
+      "archived_request_sha256": "8fd5f1287fde4c5b5ed1d86fa6f8939cb0404e0ad650655de85daf7dbc8e7e46",
+      "proposal_digest": "c5cfbb8dc5c32079955c3ab5e48f0b212afaf24557c00caf7b0d37c8b23a337a",
+      "verified_applied_generation": 2,
+      "verified_same_preview_semantics": true
+    },
+    "p-move": {
+      "archived_request_sha256": "ac35a8c46bd7d40a44f06043d4799f8fee6efb3dafa05a5f2975f26fbad9b9e1",
+      "proposal_digest": "2fb9a3a5d2eaaf1501c61b7aab86e795f6b30c9a4a4e74247daaad77ba74706d",
+      "verified_applied_generation": 3,
+      "verified_same_preview_semantics": true
+    }
+  },
+  "schema": 1,
+  "scope": "Deterministic installed CLI replay of archived requests on current source. Scripted inputs use freshly prepared fixture digests. Historical actual actors were not repeated.",
+  "source_changes_since_historical_observation": {
+    "lib/installation.js": {
+      "current": "eb1a1ddd234989971c5ca79d2e4d7b41d714a41bf07fa15c60056c56ecdf5036",
+      "observed": "2aefd416b8c2fcfa7f58cd75f78092e2c3c65f8a54b52437c7b29250b1dfcbf8"
+    },
+    "lib/plugin-lifecycle.js": {
+      "current": "dfc123c75b9f80e6ec13ca8b952c8972b1264607d13466926204bc88337a2f18",
+      "observed": "a58cfcfaf96b5d6ecc8af144a5556446a62a0bb88f0837b0df706bb130e74717"
+    },
+    "lib/plugin-management.js": {
+      "current": "93c16821325087240d98cd871dba0c3e3cedfad44f21b3bd19f067e166ec7673",
+      "observed": "1b530f7e5f3c2dab029c1d36e0b8a57b2a082815e154d01b9e7236b96d5fcd6e"
+    }
+  }
+}

@@ -694,8 +694,270 @@ def validate_plugin_invocation_report(report,trusted_capture=None):
     except (KeyError,TypeError,IndexError,AttributeError,OverflowError,UnicodeError,OSError) as error:raise ValueError('Malformed plugin invocation report or external native capture') from error
 
 
+MANAGER_PHASES = (
+    'p-add', 'p-preview', 'p-apply', 'p-move', 'p-move-preview', 'p-move-apply', 'p-final',
+    'n-move', 'n-preview', 'n-cancel', 'grade',
+)
+MANAGER_GRADES = {
+    'positive-preview': 'p-preview', 'positive-confirmation': 'p-apply',
+    'positive-reorder': 'p-move-preview', 'negative-cancellation': 'n-cancel',
+    'execution-boundary': 'p-final',
+}
+MANAGER_OPERATION = 'skill-tree-process-future-pending'
+MANAGER_POINT = MANAGER_OPERATION + ':after'
+MANAGER_REGISTRY = '.skill-tree/installation/plugins.json'
+MANAGER_PACKAGE = '.agents/skills/skill-tree-plugins'
+MANAGER_LIMITS = {'contexts': 3, 'spawn_or_follow_up_requests': 12, 'wall_seconds': 720, 'cleanup_seconds': 60}
+MANAGER_SOURCE_FILES = {
+    'templates/operations.json', 'config/resource-map.json', 'common/scripts/plugin-manager.js',
+    'lib/plugin-management.js', 'lib/plugin-lifecycle.js', 'lib/installation.js', 'scripts/agent-conformance.py',
+    'skills/general/skill-tree-plugins/SKILL.md', 'skills/general/skill-tree-plugins/scripts/plugin-manager.js',
+}
+
+
+def _manager_hash(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def _manager_json(data):
+    return json.dumps(data, sort_keys=True, ensure_ascii=False, allow_nan=False, separators=(',', ':')).encode()
+
+
+def _manager_sha(value):
+    return isinstance(value, str) and re.fullmatch('[a-f0-9]{64}', value) is not None
+
+
+def _manager_require(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+
+def _manager_bytes(record, *, portable=False):
+    import base64
+    data = base64.b64decode(record['base64'], validate=True)
+    _manager_require(record['sha256'] == _manager_hash(data), 'Manager capture bytes changed')
+    source = record.get('source_sha256', record['sha256'])
+    _manager_require(_manager_sha(source) and (source == record['sha256'] or (
+        portable and record.get('normalization') == 'fixture-path-redaction')),
+        'Manager capture normalization is not attributable')
+    return data
+
+
+def _manager_registry(snapshot):
+    raw = _manager_bytes(snapshot['registry'])
+    _manager_require(snapshot['files'][MANAGER_REGISTRY] == _manager_hash(raw), 'Registry bytes differ from fixture inventory')
+    registry = json.loads(raw)
+    _manager_require(registry['format'] == 'skill-tree-plugin-registry' and registry['schema'] == 1,
+                     'The fixture lacks an owned plugin registry')
+    _manager_require(not any(path == '.git' or path.startswith((
+        '.git/', '.skill-tree/documents/', '.skill-tree/invocations/', '.skill-tree/clarifications/',
+        '.skill-tree/decisions/', '.skill-tree/history/runs/', '.skill-tree/local/hook-locations/',
+    )) for path in snapshot['files']), 'The management fixture created workflow or invocation state')
+    return registry
+
+
+def _manager_cli(command, before, after):
+    expected_argv = ['node', '--require', '<fixture-network-guard>', MANAGER_PACKAGE + '/scripts/plugin-manager.js',
+                     '--project-root', '<fixture-root>', '--input', '-']
+    _manager_require(command['argv'] == expected_argv and command['exit_code'] == 0 and command['network_guard'] is True,
+                     'The original guarded installed CLI did not complete successfully')
+    request = json.loads(_manager_bytes(command['stdin']))
+    result = json.loads(_manager_bytes(command['stdout']))
+    _manager_bytes(command['stderr'])
+    _manager_require(_manager_registry(before) and _manager_registry(after), 'The managed fixture registry is unavailable')
+    return request, result
+
+
+def _manager_check_preview(command, action, actor, expected_rows):
+    _manager_require(command['before'] == command['after'], 'A manager preview changed the disposable project')
+    request, result = _manager_cli(command, command['before'], command['after'])
+    _manager_require(request == {'action': 'prepare', 'request': actor['request']} and request['request']['action'] == action,
+                     'The trusted broker did not run the exact observed manager request')
+    proposal = result['proposal']
+    _manager_require(result['status'] == 'ready' and _manager_sha(proposal['digest']),
+                     'The actual manager did not prepare an exact confirmation digest')
+    _manager_require(proposal['preview'] == result['preview']
+                     and proposal['mutation']['proposal']['bindings'] == expected_rows
+                     and proposal['mutation']['proposal']['base_generation'] == _manager_registry(command['before'])['generation'],
+                     'The rendered preview does not bind the exact prepared lifecycle configuration')
+    preview = result['preview']['bindings']
+    _manager_require([row['id'] for row in preview] == [row['id'] for row in expected_rows],
+                     'The actual preview does not show the complete configured chain')
+    for row, expected in zip(preview, expected_rows):
+        _manager_require(all(row.get(field) == expected.get(field)
+                             for field in ('plugin_id', 'operation', 'anchor', 'enabled', 'parameters', 'instructions', 'condition')),
+                         'An occurrence value differs from the reviewed preview')
+    return proposal
+
+
+def _manager_check_apply(command, proposal, preview_actor, apply_actor, expected_rows, authority):
+    before, after = command['before'], command['after']
+    request, receipt = _manager_cli(command, before, after)
+    approved = proposal['digest']
+    _manager_require(authority['kind'] == 'scripted-fixture-owner-input' and authority['decision'] == 'approve'
+                     and authority['proposal_digest'] == preview_actor['proposal_digest'] == apply_actor['proposal_digest'] == approved
+                     and preview_actor['decision'] == 'awaiting-confirmation' and apply_actor['decision'] == 'apply'
+                     and request == {'action': 'apply', 'proposal': proposal, 'confirmation': {'proposal_digest': approved}},
+                     'The confirmation or applied proposal differs from the displayed fixture proposal')
+    initial, final = _manager_registry(before), _manager_registry(after)
+    _manager_require(final['generation'] == initial['generation'] + 1 and final['packages'] == initial['packages']
+                     and final['bindings'] == expected_rows and isinstance(receipt, dict),
+                     'The real registry does not match the confirmed ordered configuration')
+    request_id = proposal['request_id']
+    recorded = final['requests'][request_id]
+    _manager_require(request_id not in initial['requests']
+                     and {key: value for key, value in final['requests'].items() if key != request_id} == initial['requests']
+                     and all(receipt.get(key) == value for key, value in recorded.items())
+                     and recorded['generation'] == final['generation']
+                     and recorded['proposal_digest'] == proposal['mutation']['proposal']['digest']
+                     and recorded['action'] == 'configured' and receipt['requires_profile_refresh'] is True,
+                     'The installed manager result does not match the actual transaction receipt')
+    delta = {path for path in set(before['files']) | set(after['files'])
+             if before['files'].get(path) != after['files'].get(path)}
+    _manager_require(MANAGER_REGISTRY in delta and all(path in {
+        MANAGER_REGISTRY, '.skill-tree/installation/.last-plugin-transaction.json',
+        '.skill-tree/installation/.plugin-backups',
+    } or path.startswith('.skill-tree/installation/.plugin-backups/') for path in delta),
+        'The confirmed configure action changed files outside the owned plugin transaction')
+
+
+def _validate_plugin_management_report(report, capture):
+    need = _manager_require
+    need(report['schema'] == 1 and report['kind'] == 'plugin-management-agent-conformance'
+         and capture is not report and capture['schema'] == 1 and capture['kind'] == 'plugin-management-native-capture',
+         'A separate trusted management capture is required')
+    need(report['capture_sha256'] == _manager_hash(_manager_json(capture)), 'Management report and trusted capture differ')
+    source = capture['source_snapshot']
+    need(source == report['source_snapshot'] and MANAGER_SOURCE_FILES <= set(source),
+         'The exact owned management source snapshot is required')
+    for relative, fingerprint in source.items():
+        target = (CORE / relative).resolve()
+        need(not Path(relative).is_absolute() and target.is_relative_to(CORE) and target.is_file()
+             and digest(target) == fingerprint, 'Manager source changed or is not portable: ' + relative)
+    frozen = capture['freeze']
+    need(capture['freeze_sha256'] == _manager_hash(_manager_json(frozen))
+         and frozen['source_snapshot'] == source and frozen['base_commit'] == capture['base_commit']
+         and frozen['harness_sha256'] == capture['harness_sha256'] and frozen['guard_sha256'] == capture['guard_sha256']
+         and frozen['oracle'] == capture['oracle'] and frozen['limits'] == MANAGER_LIMITS
+         and tuple(frozen['phases']) == MANAGER_PHASES and _manager_sha(frozen['plan_sha256']),
+         'The management fixture freeze differs from the admitted source, oracle or limits')
+    need(_manager_hash(_manager_bytes(capture['network_guard'])) == frozen['guard_sha256'],
+         'The original network and dispatch guard differs from the frozen helper')
+    need(report['limitations'] == ['controller-brokered-cli', 'scripted-fixture-owner-input', 'codex-general-only',
+                                   'no-plugin-dispatch', 'no-native-skill-qualification', 'unexposed-accounting'],
+         'Manager observation scope and accounting limitations are required')
+
+    events = capture['events']
+    need(tuple(event['phase'] for event in events) == MANAGER_PHASES
+         and report['event_ids'] == [event['id'] for event in events]
+         and len(set(report['event_ids'])) == len(events), 'The exact predeclared host event sequence is required')
+    identities, outputs = {}, {}
+    for event in events:
+        phase = event['phase']
+        role = {'p': 'positive', 'n': 'cancel', 'g': 'grader'}[phase[0]]
+        native = event['host']
+        identity = (native['actor_id'], native['context_id'])
+        need(native['provider'] == 'Codex collaboration'
+             and native['tool'] == ('collaboration.followup_task' if role in identities else 'collaboration.spawn_agent')
+             and all(isinstance(value, str) and value for value in (*identity, native['reference']))
+             and all(field in native for field in ('tool_call_id', 'model', 'tokens', 'cost')),
+             'Actual management actor identity or native capture evidence is missing')
+        need(identities.setdefault(role, identity) == identity, 'An actual management context changed mid-scenario')
+        _manager_bytes(event['prompt'], portable=True)
+        prompt_hash = event['prompt'].get('source_sha256', event['prompt']['sha256'])
+        need(prompt_hash.encode() in _manager_bytes(event['transport'], portable=True),
+             'The actual host transport does not bind the exact sealed instruction file')
+        output = _manager_bytes(event['reply'], portable=True).decode()
+        outputs[phase] = json.loads(output)
+    prompts = {event['phase']: _manager_bytes(event['prompt'], portable=True) for event in events}
+    need(len({value[0] for value in identities.values()}) == len({value[1] for value in identities.values()}) == 3,
+         'Positive, cancellation and grading contexts must be distinct')
+    accounting = capture['accounting']
+    need(accounting['contexts'] == 3 and accounting['spawn_or_follow_up_requests'] == len(events) <= 12
+         and type(accounting['wall_seconds']) in {int, float} and 0 <= accounting['wall_seconds'] <= 720,
+         'Management observations exceeded the frozen bound')
+    cleanup = capture['cleanup']
+    need(set(cleanup) <= set(identities) and all(
+        isinstance(item, dict) and item['status'] in {'completed', 'not_found'} and item['reference']
+        and (item['actor_id'], item['context_id']) == identities[role] for role, item in cleanup.items()),
+        'Management lifecycle telemetry belongs to another actor or claims an unobserved result')
+
+    steps, fixtures, authority = capture['steps'], capture['fixtures'], capture['authority']
+    need(set(steps) == {'p-add', 'p-apply', 'p-move', 'p-move-apply', 'n-move'}
+         and set(fixtures) == {'positive', 'cancel'} and set(authority) == {'p-apply', 'p-move-apply', 'n-cancel'},
+         'Incomplete controlled manager cases or mutation evidence')
+    oracle = capture['oracle']
+    initial, added, reordered = (oracle[key] for key in ('initial', 'added', 'reordered'))
+    need([row['id'] for row in initial] == ['editor-first', 'other-boundary', 'interview-middle']
+         and [row['id'] for row in added] == ['editor-first', 'other-boundary', 'interview-middle', 'editor-last']
+         and [row['id'] for row in reordered] == ['editor-last', 'other-boundary', 'editor-first', 'interview-middle']
+         and added[:-1] == initial and reordered == [added[3], added[1], added[0], added[2]]
+         and added[3]['plugin_id'] == initial[0]['plugin_id'] == 'fixture-editor'
+         and initial[2]['plugin_id'] == 'fixture-interview'
+         and added[3]['parameters'] == {'marker': 'after-interview', 'limit': 2},
+         'The frozen oracle changed the intended A–B–A or same-point move')
+    for name, rows in (('positive', initial), ('cancel', added)):
+        fixture = fixtures[name]
+        frozen_fixture = {key: fixture[key] for key in ('before', 'inventory', 'sources_before')}
+        need(frozen['fixtures'][name] == _manager_hash(_manager_json(frozen_fixture)),
+             'The initial installed fixture differs from its frozen byte inventory')
+        state = _manager_registry(fixture['before'])
+        need(state['bindings'] == rows and set(state['packages']) == {'fixture-editor', 'fixture-interview'}
+             and fixture['before'] == fixture['inventory']['after'] == fixture['inventory']['before'],
+             'The initial ordered fixture differs from the predeclared scenario')
+        need(fixture['before']['files'][MANAGER_PACKAGE + '/scripts/plugin-manager.js']
+             == source['common/scripts/plugin-manager.js']
+             and _manager_sha(fixture['before']['files']['.skill-tree/installation/profile.json']),
+             'The installed management entry point or owned profile was absent')
+        inventory, _ = _manager_cli(fixture['inventory'], fixture['before'], fixture['before'])
+        need(inventory == {'action': 'inventory'}, 'The fixture did not exercise raw installed inventory')
+        need(fixture['sources_before'] == fixture['sources_after'], 'Original local fixture sources changed')
+    need(steps['p-add']['before'] == fixtures['positive']['before']
+         and steps['p-add']['after'] == steps['p-apply']['before']
+         and steps['p-apply']['after'] == steps['p-move']['before']
+         and steps['p-move']['after'] == steps['p-move-apply']['before']
+         and steps['p-move-apply']['after'] == fixtures['positive']['after'],
+         'Positive previews and actual applications do not form one exact state sequence')
+    need(fixtures['cancel']['before'] == steps['n-move']['before'] == steps['n-move']['after'] == fixtures['cancel']['after'],
+         'The cancelled move changed the independent project')
+    first = _manager_check_preview(steps['p-add'], 'bind', outputs['p-add'], added)
+    _manager_check_apply(steps['p-apply'], first, outputs['p-preview'], outputs['p-apply'], added, authority['p-apply'])
+    second = _manager_check_preview(steps['p-move'], 'move', outputs['p-move'], reordered)
+    _manager_check_apply(steps['p-move-apply'], second, outputs['p-move-preview'], outputs['p-move-apply'],
+                         reordered, authority['p-move-apply'])
+    cancelled = _manager_check_preview(steps['n-move'], 'move', outputs['n-move'], reordered)
+    need(authority['n-cancel']['kind'] == 'scripted-fixture-owner-input'
+         and authority['n-cancel']['decision'] == 'cancel' and outputs['n-cancel']['decision'] == 'cancel'
+         and outputs['n-preview']['decision'] == 'awaiting-confirmation'
+         and authority['n-cancel']['proposal_digest'] == outputs['n-preview']['proposal_digest']
+         == outputs['n-cancel']['proposal_digest'] == cancelled['digest'],
+         'The actual cancellation does not bind the displayed unexecuted proposal')
+    for preview_phase, authority_phase, step in (
+        ('p-preview', 'p-apply', 'p-add'), ('p-move-preview', 'p-move-apply', 'p-move'),
+        ('n-preview', 'n-cancel', 'n-move'),
+    ):
+        actual = json.loads(_manager_bytes(steps[step]['stdout']))
+        public = {'preview': actual['preview'], 'proposal_digest': actual['proposal']['digest']}
+        need(_manager_json(public) in prompts[preview_phase] and _manager_json(authority[authority_phase]) in prompts[authority_phase],
+             'The recorded host turns did not deliver the actual public preview and exact scripted decision')
+    grades = outputs['grade']['assertions']
+    need(set(grades) == set(MANAGER_GRADES)
+         and all(grades[key] == {'status': 'observed', 'evidence': phase} for key, phase in MANAGER_GRADES.items())
+         and isinstance(outputs['grade']['rationale'], str) and outputs['grade']['rationale'].strip()
+         and report['grade'] == outputs['grade'], 'The actual independent grader did not accept the original management evidence')
+    return {'passed': True, 'scenarios': 2, 'actual_contexts': 3,
+            'scope': 'Observed source-backed General/Codex management with actual brokered CLI evidence and scripted fixture choices.'}
+
+
+def validate_plugin_management_report(report, trusted_capture=None):
+    try:
+        return _validate_plugin_management_report(report, trusted_capture)
+    except (KeyError, TypeError, IndexError, AttributeError, OverflowError, UnicodeError, OSError) as error:
+        raise ValueError('Malformed plugin management report or trusted capture') from error
+
+
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=['prepare','grade','validate','clarification-prepare','clarification-observe','clarification-interrupt','clarification-grade','clarification-validate','core-decision-validate','plugin-invocation-validate']);parser.add_argument('--scenario');parser.add_argument('--root',type=Path);parser.add_argument('--input',type=Path);parser.add_argument('--reply',type=Path);parser.add_argument('--observations',type=Path);parser.add_argument('--capture',type=Path);parser.add_argument('--phase');args=parser.parse_args()
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=['prepare','grade','validate','clarification-prepare','clarification-observe','clarification-interrupt','clarification-grade','clarification-validate','core-decision-validate','plugin-invocation-validate','plugin-management-validate']);parser.add_argument('--scenario');parser.add_argument('--root',type=Path);parser.add_argument('--input',type=Path);parser.add_argument('--reply',type=Path);parser.add_argument('--observations',type=Path);parser.add_argument('--capture',type=Path);parser.add_argument('--phase');args=parser.parse_args()
     if args.command=='prepare':result=prepare(args.scenario,args.root.resolve())
     elif args.command=='grade':result=grade(json.loads(args.input.read_text()),args.root.resolve(),args.reply.read_text())
     elif args.command=='validate':result=validate_report(json.loads(args.input.read_text()))
@@ -705,6 +967,7 @@ def main():
     elif args.command=='clarification-grade':result=grade_clarification(json.loads(args.input.read_text()),args.root.resolve(),json.loads(args.observations.read_text()))
     elif args.command=='core-decision-validate':result=validate_core_decision_report(json.loads(args.input.read_text()),json.loads(args.capture.read_text()) if args.capture else None)
     elif args.command=='plugin-invocation-validate':result=validate_plugin_invocation_report(json.loads(args.input.read_text()),json.loads(args.capture.read_text()) if args.capture else None)
+    elif args.command=='plugin-management-validate':result=validate_plugin_management_report(json.loads(args.input.read_text()),json.loads(args.capture.read_text()) if args.capture else None)
     else:result=validate_clarification_report(json.loads(args.input.read_text()))
     print(json.dumps(result,ensure_ascii=False,indent=2))
 

@@ -25,8 +25,8 @@ test('the actual owned operation catalog exposes before during and after without
  for(const operation of Object.keys(operations))for(const anchor of ['before','during','after']){
   const result=api.resolveLocation({operation,anchor},catalog);assert.equal(result.status,'resolved');assert.equal(result.boundary_id,operation+':'+anchor);
  }
- const later={...operations,'skill-tree-plugins':{title:'Skill Tree Plugins',sections:[{id:'operation',text:'Manage plugins.'}]}},boundaries={'skill-tree-plugins:after':{operation:'skill-tree-plugins',version:'1',context_kinds:['management'],handler:()=>{}}};
- assert.equal(api.resolveLocation({operation:'skill-tree-plugins',anchor:'after'},api.createAnchorCatalog(later,{boundaries})).status,'resolved');
+ const added='skill-tree-later-operation',later={...operations,[added]:{title:'Later Operation'}},boundaries={[added+':after']:{operation:added,version:'1',context_kinds:['management'],handler:()=>{}}};
+ assert.equal(api.resolveLocation({operation:added,anchor:'after'},api.createAnchorCatalog(later,{boundaries})).status,'resolved');
 });
 test('named anchors resolve only to an actual trusted owned callable boundary',()=>{
  let calls=0;const handler=()=>{calls++;},boundary={operation:implementOp,version:'plan-draft-v1',context_kinds:['task'],handler};

@@ -2,7 +2,7 @@
 
 ## Approved scope and implementation boundary
 
-[W3 owner approval](../history/research/plugin-management-decisions.json) defines a core-only default, optional plugin setup during installation and later management through `skill-tree-plugins`. The curated catalog supplies discovery and evidence annotations rather than an admission allowlist. The current source contains ten operations, pure source/parameter helpers and an owned lifecycle backend. The public plugin-management operation and generic invocation dispatcher remain separate implementation work. The planned management operation is the eleventh core operation after implementation and qualification.
+[W3 owner approval](../history/research/plugin-management-decisions.json) defines a core-only default, optional plugin setup during installation and later management through `skill-tree-plugins`. The curated catalog supplies discovery and evidence annotations rather than an admission allowlist. The core includes the standalone `skill-tree-plugins` operation and the owned source, parameter, lifecycle and invocation helpers. The optional installer stage integrates the same management interface as a separate delivery unit.
 
 ## Initial and repeat installation
 
@@ -26,6 +26,10 @@ The management agent accepts direct natural-language actions such as adding a su
 | Update | Resolve an explicit source revision/content update, show changed resources and configuration, and activate through the guarded lifecycle. |
 | Uninstall package | Preview and remove the exact owned package and every current project binding referencing the package, preserving shared resources, original source and history. |
 | Forget custom source | Remove the project discovery definition independently of installed state. Uninstall normally leaves the source known for reinstall. |
+
+The installed operation accepts explicit project scope and one structured request. From the installed package, `node scripts/plugin-manager.js --project-root <project-root> --input -` reads a JSON request on standard input. Inventory returns the current read view. Preparation returns a proposal and the complete preview. Application receives the exact proposal and matching confirmation. Project-known definitions and installed package resources have separate ownership and request receipts.
+
+The package helper verifies the owned executable resources before loading the project maintenance backend. Explicit CommonJS boundaries support Web projects with a different module default. A valid catalog-free installation retains direct source and project-known management. Catalog drift has a separate read-only diagnostic, and mutation requires a verified owned generation.
 
 ## Open source intake and adaptation
 
@@ -104,4 +108,4 @@ Ownership diagnostics preserve readable installed state. Package verification la
 
 `applyRemoval` accepts only the original uninstall proposal and matching digest. `applyManagementChange` delegates only the supported uninstall, configure and activation proposals to lifecycle application. The lifecycle retains target, ownership, generation, replay and pending-original checks. Invalid, stale, declined or cancelled confirmation supplies no mutation. Package uninstall removes every live occurrence while preserving shared dependencies, core packages, original sources and frozen historical records.
 
-A changed plugin generation requires the ordinary owned profile refresh and re-admission before composed routing uses the new defaults. Existing copied core-package resources remain under core ownership until the owned refresh; partial core-package deletion supplies no valid uninstall. The public preview/application API provides management behavior without implementing the later optional setup or management-skill interaction. Forgetting known metadata remains a distinct unavailable action until the known-definition owner exists.
+A changed plugin generation requires the ordinary owned profile refresh and re-admission before composed routing uses the new defaults. Existing copied core-package resources remain under core ownership until the owned refresh; partial core-package deletion supplies no valid uninstall. The public management API drives the installed operation and supplies the same proposal interface for optional installer setup. Forgetting a project-known definition applies a separate confirmed discovery update and preserves installed state.

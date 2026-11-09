@@ -1,6 +1,6 @@
 # Skill Tree
 
-Skill Tree provides ten portable operations for repository documentation, intake, research, implementation and resumable orchestration. One project-scoped installation selects general, web or unity. Common contracts and concrete project capabilities compose into standalone packages with stable `skill-tree-*` names.
+Skill Tree provides eleven portable operations for repository documentation, intake, research, implementation, resumable orchestration and plugin management. One project-scoped installation selects general, web or unity. Common contracts and concrete project capabilities compose into standalone packages with stable `skill-tree-*` names.
 
 [Installation](.skill-tree/documents/install.md) · [Validation](.skill-tree/common/references/validation-policy.md) · [Workflow](.skill-tree/common/references/future-workflow.md) · [Metadata](.skill-tree/common/references/workflow-metadata.md) · [Source manifest](.skill-tree/skill-tree.json) · [Conformance audit](.skill-tree/documents/workflow-redesign-conformance.md)
 
@@ -14,6 +14,8 @@ npm run test:node
 ```
 
 Project-scoped copy installation includes owned receipts and a self-contained local profile manager. Static discovery never starts an Editor, server, browser or test suite. Missing test infrastructure remains a deduplicated setup finding. Installation and documentation initialization are separate operations; unknown or modified packages conflict even with `--force`.
+
+Invoke `skill-tree-plugins` to browse known sources, inspect installed packages and configure ordered bindings. Complete core installation starts with zero external plugins. The [management contract](.skill-tree/documents/plugin-management-contract.md) describes source intake, parameter values and exact confirmation.
 
 Target documentation and task progress reside in `.skill-tree/documents/`. Schema 2 retains standalone single-run checkpoints; explicit workspace setup creates a schema-3 registry for isolated controllers sharing one canonical queue. Structured outcomes and bounded audit/run evidence reside in `.skill-tree/history/`. Focused Red/Green feedback remains immediate; compatible additional boundary checks can share a scoped group. Completion requires current passed check receipts.
 

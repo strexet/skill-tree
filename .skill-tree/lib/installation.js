@@ -185,13 +185,17 @@ function transaction(root,changes,expected={},beforeActivate=null,channel='core'
  if(fs.existsSync(c.safe(root,backups)))fs.rmSync(c.safe(root,backups),{recursive:true});
  fs.writeFileSync(c.safe(root,journal),c.json({schema:1,channel,entries}));recover(root,channel);
 }
-function locked(root,action){
+function locked(root,action,{recoverPending=true,onPending}={}){
  const owner=queueRoot(root),barrier=owner!==root?path.join(owner,INSTALL+'/.install-lock'):null;let barrierFd;
  if(barrier){fs.mkdirSync(path.dirname(barrier),{recursive:true});try{barrierFd=fs.openSync(barrier,'wx',0o600);fs.writeFileSync(barrierFd,c.json({pid:process.pid,host:require('node:os').hostname()}));}catch{throw Error('Canonical installation lock exists');}}
  const dir=c.safe(root,INSTALL);fs.mkdirSync(dir,{recursive:true});const lock=c.safe(root,INSTALL+'/.install-lock');let fd;
  try{fd=fs.openSync(lock,'wx',0o600);}catch{if(barrier){fs.closeSync(barrierFd);fs.unlinkSync(barrier);}throw Error('Installation lock exists; inspect PID/host before explicit removal');}
  try{fs.writeFileSync(fd,c.json({pid:process.pid,host:require('node:os').hostname()}));if(fs.existsSync(c.safe(owner,'.skill-tree/.writer-lock')))throw Error('Workflow writer lock exists; reach a cleanup/handoff boundary before installation');
   const pending=['core','plugins'].some(channel=>fs.existsSync(c.safe(root,transactionPaths(channel).journal)));
+  if(pending&&!recoverPending){
+   if(typeof onPending==='function')return onPending();
+   throw Error('Owned installation recovery is required before this operation');
+  }
   if(pending&&hasActiveOperation(root))throw Error('Active controller must reach a stopped cleanup/handoff before transaction recovery');
   recover(root);recover(root,'plugins');return action();
  }finally{fs.closeSync(fd);fs.unlinkSync(lock);if(barrier){fs.closeSync(barrierFd);fs.unlinkSync(barrier);}}
@@ -202,6 +206,7 @@ function bundle(source,flavor){
   if(rel==='config/repository.json')continue;
   files['source/'+rel]=c.read(source,rel);
  }
+ files['package.json']='{"type":"commonjs"}\n';
  files['manager.js']="#!/usr/bin/env node\n'use strict';\nconst path=require('node:path');\nconst manager=require('./source/lib/installation.js');\nprocess.exitCode=manager.localMain(path.resolve(__dirname,'../..'),path.join(__dirname,'source'),process.argv.slice(2));\n";
  return files;
 }

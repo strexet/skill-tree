@@ -154,6 +154,36 @@
       },
       {
         "anchor": "before",
+        "operation": "skill-tree-plugins",
+        "phrase": "before skill-tree-plugins"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-plugins",
+        "phrase": "before skill-tree: manage plugins"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-plugins",
+        "phrase": "during skill-tree-plugins"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-plugins",
+        "phrase": "during skill-tree: manage plugins"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-plugins",
+        "phrase": "after skill-tree-plugins"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-plugins",
+        "phrase": "after skill-tree: manage plugins"
+      },
+      {
+        "anchor": "before",
         "operation": "skill-tree-pr-review-cycle",
         "phrase": "before skill-tree-pr-review-cycle"
       },
@@ -378,7 +408,7 @@
         "phrase": "after-validation skill-tree-repo-documentation-audit"
       }
     ],
-    "digest": "338b8b0a143d005f4f24e8a675c8cdb73ff385b653c05657461adbbfe55dc29d",
+    "digest": "d62c6d7cc2ca6d8e822d51985c33226aee9ca01c25acb5b15b4cf96bca75a379",
     "entries": [
       {
         "anchor": "before",
@@ -662,6 +692,63 @@
           "review"
         ],
         "operation": "skill-tree-implement-next-future-task",
+        "status": "resolved",
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-plugins:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-plugins",
+        "status": "resolved",
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-plugins:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-plugins",
+        "status": "resolved",
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-plugins:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-plugins",
         "status": "resolved",
         "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
@@ -1242,6 +1329,7 @@
       "skill-tree-create-documents-snapshot",
       "skill-tree-implement-all",
       "skill-tree-implement-next-future-task",
+      "skill-tree-plugins",
       "skill-tree-pr-review-cycle",
       "skill-tree-process-future-pending",
       "skill-tree-repo-documentation",
@@ -1249,10 +1337,10 @@
       "skill-tree-work-through-next"
     ]
   },
-  "configuration_digest": "ae02579d687b0a71ae2e2b9d00a5bc9f16d474deb985d0036a88c96039a52d46",
+  "configuration_digest": "636ccbb959eabeca5768493198e482bd921e189bfbf96c709690525c366fe632",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "3b941efbc225aae06291bb64b8901b4a1ff535a1d8ef0ef9407dd243dcb6e46f",
+  "identity": "7d96165dbb80e2113f8acfd51b1d2fec49069b2471afc90310d1081f03a4e9c0",
   "operation": "skill-tree-repo-documentation-audit",
   "operations": {
     "skill-tree-add-pending-task": {
@@ -1269,6 +1357,9 @@
     },
     "skill-tree-implement-next-future-task": {
       "title": "Skill-Tree: Implement Next Task"
+    },
+    "skill-tree-plugins": {
+      "title": "Skill-Tree: Manage Plugins"
     },
     "skill-tree-pr-review-cycle": {
       "title": "Skill-Tree: PR Review Cycle"
