@@ -1,0 +1,1890 @@
+{
+  "accounting": {
+    "actual_human_rework": "unknown",
+    "calibration": {
+      "evidence_sha256": "36db6636c2137e240b21c3b777f3cf31c5e6c5de2ed9fca89fe81a17694629e2",
+      "result": "pass"
+    },
+    "charged": {
+      "contexts": 47,
+      "inventory_calls": 0,
+      "lifecycle_interrupts": 47,
+      "observation_calls": 0,
+      "spawn_or_follow_up_requests": 64
+    },
+    "disposition": "unqualified",
+    "elapsed_seconds": 3357.585,
+    "limits": {
+      "arms": 2,
+      "calibrations": 2,
+      "cleanup_seconds": 300,
+      "contexts": 54,
+      "fixtures": 8,
+      "inventory_calls": 1,
+      "lifecycle_interrupts": 54,
+      "maximum_active_arm_workers": 2,
+      "maximum_live_jobs": 3,
+      "observation_calls": 120,
+      "repetitions": 2,
+      "spawn_or_follow_up_requests": 95,
+      "task_seconds": 3600
+    },
+    "model": "unknown",
+    "observed": {
+      "continue": 2,
+      "dispatch": 15,
+      "interrupt": 47,
+      "returned": 49,
+      "spawn": 47
+    },
+    "stop_reason": "All planned arm slots were recorded and the remaining work is original judge cleanup and evidence verification.",
+    "underlying_api_calls": "unknown",
+    "unexposed_tokens_and_cost": "unknown",
+    "unresolved_cleanup": [
+      "arm-D1-2-candidate",
+      "arm-D2-1-candidate",
+      "arm-P2-1-baseline",
+      "arm-P2-2-baseline"
+    ],
+    "wall_seconds": 3357.585
+  },
+  "applications": {
+    "documentation-editorial": {
+      "application": "documentation-editorial",
+      "boundary_id": "skill-tree-repo-documentation-audit:after",
+      "content_digest": "a07c7cf13cd8f42c869d7fb261ce2576339749eb5fead2433d98beb3be73d30f",
+      "flavor": "general",
+      "host": "Codex source-backed-context",
+      "pairs": [
+        {
+          "case": "D1",
+          "rep": 1,
+          "status": "unavailable"
+        },
+        {
+          "case": "D1",
+          "rep": 2,
+          "status": "unavailable"
+        },
+        {
+          "case": "D2",
+          "rep": 1,
+          "status": "unavailable"
+        },
+        {
+          "case": "D2",
+          "rep": 2,
+          "status": "unavailable"
+        }
+      ],
+      "plugin_id": "writing-for-agents-documentation-report",
+      "reasons": [
+        "The terminal ledger is unqualified or has unresolved original cleanup.",
+        "D1 repeat 1 has unavailable paired evidence.",
+        "D1 repeat 2 has unavailable paired evidence.",
+        "D2 repeat 1 has unavailable paired evidence.",
+        "D2 repeat 2 has unavailable paired evidence.",
+        "No same correctness criterion improved in both fixed planted repetitions."
+      ],
+      "recurring_improvements": [],
+      "source": {
+        "entry": "skills/productivity/writing-for-agents/SKILL.md",
+        "kind": "repository",
+        "ref": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "url": "https://github.com/mattpocock/skills"
+      },
+      "status": "unqualified"
+    },
+    "review-ponytail": {
+      "application": "review-ponytail",
+      "boundary_id": "skill-tree-pr-review-cycle:after",
+      "content_digest": "14147d26122fb21e825ff59f20d3eedd79ebdbf05c17eaae93daf67826ec5615",
+      "flavor": "general",
+      "host": "Codex source-backed-context",
+      "pairs": [
+        {
+          "case": "R1",
+          "rep": 1,
+          "status": "unavailable"
+        },
+        {
+          "case": "R1",
+          "rep": 2,
+          "status": "unavailable"
+        },
+        {
+          "added_criteria": [],
+          "baseline_supported": [
+            1
+          ],
+          "candidate_supported": [
+            1
+          ],
+          "case": "R2",
+          "lost_criteria": [],
+          "rep": 1,
+          "status": "observed"
+        },
+        {
+          "added_criteria": [],
+          "baseline_supported": [
+            1
+          ],
+          "candidate_supported": [
+            1
+          ],
+          "case": "R2",
+          "lost_criteria": [],
+          "rep": 2,
+          "status": "observed"
+        }
+      ],
+      "plugin_id": "ponytail",
+      "reasons": [
+        "The terminal ledger is unqualified or has unresolved original cleanup.",
+        "R1 repeat 1 has unavailable paired evidence.",
+        "R1 repeat 2 has unavailable paired evidence.",
+        "No same correctness criterion improved in both fixed planted repetitions."
+      ],
+      "recurring_improvements": [],
+      "source": {
+        "entry": "skills/ponytail/SKILL.md",
+        "kind": "repository",
+        "ref": "96608e078b2d5ea607c5c3b8b5a54d1c1fba6846",
+        "url": "https://github.com/DietrichGebert/ponytail"
+      },
+      "status": "unqualified"
+    },
+    "task-editorial": {
+      "application": "task-editorial",
+      "boundary_id": "skill-tree-process-future-pending:after",
+      "content_digest": "a07c7cf13cd8f42c869d7fb261ce2576339749eb5fead2433d98beb3be73d30f",
+      "flavor": "general",
+      "host": "Codex source-backed-context",
+      "pairs": [
+        {
+          "case": "E1",
+          "rep": 1,
+          "status": "unavailable"
+        },
+        {
+          "case": "E1",
+          "rep": 2,
+          "status": "unavailable"
+        },
+        {
+          "case": "E2",
+          "rep": 1,
+          "status": "unavailable"
+        },
+        {
+          "case": "E2",
+          "rep": 2,
+          "status": "unavailable"
+        }
+      ],
+      "plugin_id": "task-editorial",
+      "reasons": [
+        "The terminal ledger is unqualified or has unresolved original cleanup.",
+        "E1 repeat 1 has unavailable paired evidence.",
+        "E1 repeat 2 has unavailable paired evidence.",
+        "E2 repeat 1 has unavailable paired evidence.",
+        "E2 repeat 2 has unavailable paired evidence.",
+        "No same correctness criterion improved in both fixed planted repetitions."
+      ],
+      "recurring_improvements": [],
+      "source": {
+        "entry": "skills/productivity/writing-for-agents/SKILL.md",
+        "kind": "repository",
+        "ref": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "url": "https://github.com/mattpocock/skills"
+      },
+      "status": "unqualified"
+    },
+    "task-interview": {
+      "application": "task-interview",
+      "boundary_id": "skill-tree-process-future-pending:after",
+      "content_digest": "a00d066087e3df89e6211c6fc04371969be8130b394966a28e302e33779cc341",
+      "flavor": "general",
+      "host": "Codex source-backed-context",
+      "pairs": [
+        {
+          "case": "P1",
+          "rep": 1,
+          "status": "unavailable"
+        },
+        {
+          "case": "P1",
+          "rep": 2,
+          "status": "unavailable"
+        },
+        {
+          "case": "P2",
+          "rep": 1,
+          "status": "unavailable"
+        },
+        {
+          "case": "P2",
+          "rep": 2,
+          "status": "unavailable"
+        }
+      ],
+      "plugin_id": "task-interview",
+      "reasons": [
+        "The terminal ledger is unqualified or has unresolved original cleanup.",
+        "P1 repeat 1 has unavailable paired evidence.",
+        "P1 repeat 2 has unavailable paired evidence.",
+        "P2 repeat 1 has unavailable paired evidence.",
+        "P2 repeat 2 has unavailable paired evidence.",
+        "No same correctness criterion improved in both fixed planted repetitions."
+      ],
+      "recurring_improvements": [],
+      "source": {
+        "entry": "skills/productivity/grill-me/SKILL.md",
+        "kind": "repository",
+        "ref": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "url": "https://github.com/mattpocock/skills"
+      },
+      "status": "unqualified"
+    }
+  },
+  "cells": [
+    {
+      "arm": "baseline",
+      "case": "E1",
+      "evidence": [
+        {
+          "path": "packets/arm-E1-1-baseline/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "120b780a30e7709d9ff029547809b841e770858eea8edd3f1196b96ffb2c11da"
+        },
+        {
+          "path": "host/arm-E1-1-baseline/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "626d7fac1fa4edf9f2d10a432ae8e5d03d22d444663ace53e8f97740f14e289d"
+        },
+        {
+          "path": "host/arm-E1-1-baseline/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "e98d39d59c4c1339f78cb999b431e7d8e95503abf5c86ffd79ab881ffdf39c87"
+        },
+        {
+          "path": "host/arm-E1-1-baseline/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "82717bcc5297c2b681cd849ea20b6ad24166c98f825f4f9823d56dfebd1e2ed1"
+        }
+      ],
+      "hard_gates_pass": true,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 56.925,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 1,
+        "token_usage": null
+      },
+      "record": {
+        "path": "results/E1/1-baseline.json",
+        "sha256": "fcc8cfe0ab97e714509f0c0605f015ffc16de389bd242fe6b5ecc962056f0d1b"
+      },
+      "rep": 1,
+      "status": "observed"
+    },
+    {
+      "arm": "candidate",
+      "case": "E1",
+      "evidence": [
+        {
+          "path": "packets/arm-E1-1-candidate/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "71853b86091fd6d666dd5b045be9cbfa301bbf18a2a2f5e3274f368628be95ef"
+        },
+        {
+          "path": "host/arm-E1-1-candidate/dispatch-0.json",
+          "root": "comparison-run",
+          "sha256": "29bbfe8ea0301d81c6015134a12750510cf20fe0545c90617fc0b62b7a22d53b"
+        },
+        {
+          "path": "host/arm-E1-1-candidate/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "fac6d36411c57af6ed43826157cd4dfa07044357610f7c3fc6f9edc93213d578"
+        },
+        {
+          "path": "host/arm-E1-1-candidate/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "9373574c2911a387cb4e6537761e382b464f923b905cd5cad6f7a35907cd295b"
+        },
+        {
+          "path": "host/arm-E1-1-candidate/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "98de694278d994d307743ed176839d8a5b743f0feaaad6dd2b17d5512643e019"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 122.212,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 2,
+        "token_usage": null
+      },
+      "reason": "{\n  \"reason\": \"Processing findings bind the exact affected selected task fields\",\n  \"status\": \"unavailable\"\n}",
+      "record": {
+        "path": "results/E1/1-candidate.json",
+        "sha256": "a6b1054ed325a4719a515b782afb70edd0f4e424b956989e6f81c3f96ddb31a2"
+      },
+      "rep": 1,
+      "status": "unavailable"
+    },
+    {
+      "arm": "baseline",
+      "case": "E1",
+      "evidence": [
+        {
+          "path": "packets/arm-E1-2-baseline/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "5a21649637b354adee2a76e5af8fca4ec95bd0a011b33ea90b156d64721d7cb3"
+        },
+        {
+          "path": "host/arm-E1-2-baseline/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "b9549a6ae3acf29cec42007993d1ae8d734522ed4ee5ea313a1af3797786f44f"
+        },
+        {
+          "path": "host/arm-E1-2-baseline/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "7490b3b965dc8fb4b88e762d461b87f48dca252aa3880730c4a306b14da06022"
+        },
+        {
+          "path": "host/arm-E1-2-baseline/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "09dfb2b295e98e66ae74460639372a33c666ead81fd1f456d3caed38581149be"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 81.906,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 1,
+        "token_usage": null
+      },
+      "reason": "{\n  \"reason\": \"Generated prose violates document rules: Explicit entity required: their\",\n  \"status\": \"unavailable\"\n}",
+      "record": {
+        "path": "results/E1/2-baseline.json",
+        "sha256": "8f5ed8b01c156cd1ef9291c9d912292853949997d18f1e5907c003a3558798c5"
+      },
+      "rep": 2,
+      "status": "unavailable"
+    },
+    {
+      "arm": "candidate",
+      "case": "E1",
+      "evidence": [
+        {
+          "path": "packets/arm-E1-2-candidate/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "e6b52fc982758da49273c22c75dca640cf6b9aa356845511abe9e3bd14f4d1a9"
+        },
+        {
+          "path": "host/arm-E1-2-candidate/dispatch-0.json",
+          "root": "comparison-run",
+          "sha256": "356221727a9294107c760b81c3e494e1681976cd7a993021f60fa4cd20270c81"
+        },
+        {
+          "path": "host/arm-E1-2-candidate/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "991329355446c5bf7a47a138e2512f74cd37fb4bc7af7fc3d83486cdac6e3f73"
+        },
+        {
+          "path": "host/arm-E1-2-candidate/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "b7130535ad0566c7aa528f6cc75d14a94d6bc2d60ea6e18550c6868b9ac99ae6"
+        },
+        {
+          "path": "host/arm-E1-2-candidate/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "35642f2001c617f4a74bbdac0c4a25f542cc60dc13092595d7a879ac4ec51561"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 80.105,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 2,
+        "token_usage": null
+      },
+      "reason": "{\n  \"reason\": \"Processing findings bind the exact affected selected task fields\",\n  \"status\": \"unavailable\"\n}",
+      "record": {
+        "path": "results/E1/2-candidate.json",
+        "sha256": "c305de77d61c52c7a7642adab87e7fb19d81d0ec837a855df589f4adb90209fe"
+      },
+      "rep": 2,
+      "status": "unavailable"
+    },
+    {
+      "arm": "baseline",
+      "case": "E2",
+      "evidence": [
+        {
+          "path": "packets/arm-E2-1-baseline/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "519954fa6e61bc0d0b0a400cffe595e0986456ba469dcefbec069a38c3406624"
+        },
+        {
+          "path": "host/arm-E2-1-baseline/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "dfe58d2509e703a1c5390ae576075fa38d89280988a2b73d974b05e76513146b"
+        },
+        {
+          "path": "host/arm-E2-1-baseline/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "ba2c43e593fed4c856a3773bbbb6790c33047ad7058fc53821e3a0d57945c73f"
+        },
+        {
+          "path": "host/arm-E2-1-baseline/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "d19f7c8b8fb11ee6fa214fc265d14bcd10d60b6541869b8e53eb714fdde7f78c"
+        }
+      ],
+      "hard_gates_pass": true,
+      "independent_judgment": {
+        "false_positives": [],
+        "quality_supported": [
+          1
+        ],
+        "rationale": "A single review passed with no findings, treating the formatting as incidental and preserving the task semantics and contract.",
+        "regressions": []
+      },
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 33.405,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 1,
+        "token_usage": null
+      },
+      "record": {
+        "path": "results/E2/1-baseline.json",
+        "sha256": "363edbadd1dc4125d4ba56b2b0a42ca8fc6b00fd5a37c193bc68ecb74542e6e4"
+      },
+      "rep": 1,
+      "status": "observed"
+    },
+    {
+      "arm": "candidate",
+      "case": "E2",
+      "evidence": [
+        {
+          "path": "packets/arm-E2-1-candidate/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "84cec635cb5f4b60376e41ed55f485bb62c0b5936ae7dcabace7e73362c434a2"
+        },
+        {
+          "path": "host/arm-E2-1-candidate/dispatch-0.json",
+          "root": "comparison-run",
+          "sha256": "fdeb5ebcd3b97a3b8e29eba866fe166297023fb50e21ed5774392dd312d54e45"
+        },
+        {
+          "path": "host/arm-E2-1-candidate/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "b12394f4aa36d80028f0eaeed5d9b7bb4b66ffef72049901631893e10b77f30e"
+        },
+        {
+          "path": "host/arm-E2-1-candidate/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "0acd55019300f839a7f424c55110266c354248203c230dda58b553d2572102e6"
+        },
+        {
+          "path": "host/arm-E2-1-candidate/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "9e71b676fca4bf363b2b444c7903286064389089548dc39adff3b59cd25d78f9"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 69.922,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 2,
+        "token_usage": null
+      },
+      "reason": "{\n  \"reason\": \"Processing findings bind the exact affected selected task fields\",\n  \"status\": \"unavailable\"\n}",
+      "record": {
+        "path": "results/E2/1-candidate.json",
+        "sha256": "f0e15629fc0aa3a94779a87e7ab2493ad09417a0bea010d1337a0ba06c4862eb"
+      },
+      "rep": 1,
+      "status": "unavailable"
+    },
+    {
+      "arm": "baseline",
+      "case": "E2",
+      "evidence": [
+        {
+          "path": "packets/arm-E2-2-baseline/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "e3a386cf49d57ec0e8a735fba81f36ca315f9a5c6bc7c1c63de24bcfffd27a15"
+        },
+        {
+          "path": "host/arm-E2-2-baseline/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "7233bfcea8c68d307310a5c6f6cd798bf9469c0a6d8f5475e84c2a89584c605c"
+        },
+        {
+          "path": "host/arm-E2-2-baseline/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "cc09c853eefa041e71a98c307f627ac8e6b93695d966bf546ab5c2ece52a9e9d"
+        },
+        {
+          "path": "host/arm-E2-2-baseline/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "12d959b05ce4ba39cdcff2fcd90abe46c971d875907fb5d81ee86c648d3cf498"
+        }
+      ],
+      "hard_gates_pass": true,
+      "independent_judgment": {
+        "false_positives": [],
+        "quality_supported": [
+          1
+        ],
+        "rationale": "A single review passed with no findings, treating the formatting as incidental and preserving the task semantics and contract.",
+        "regressions": []
+      },
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 57.454,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 1,
+        "token_usage": null
+      },
+      "record": {
+        "path": "results/E2/2-baseline.json",
+        "sha256": "956a144224ac1691cb0a236d5ac1e36940b8ebcfb3e331415744578677756c20"
+      },
+      "rep": 2,
+      "status": "observed"
+    },
+    {
+      "arm": "candidate",
+      "case": "E2",
+      "evidence": [
+        {
+          "path": "packets/arm-E2-2-candidate/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "ad0fe98f72b6f9bdd8a46f65a81409228b77d5db9509467de97ae7c3de027946"
+        },
+        {
+          "path": "host/arm-E2-2-candidate/dispatch-0.json",
+          "root": "comparison-run",
+          "sha256": "854b99747f94c48a08a9e2f58d8749f2d9994482fbd96dd0d0cb0f91d991b4dc"
+        },
+        {
+          "path": "host/arm-E2-2-candidate/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "0db5b70e863037e6f1ebdd6c03ca2d587aad681decf08fcc3569b0407148583c"
+        },
+        {
+          "path": "host/arm-E2-2-candidate/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "3964b437a089eaed7a68bf02429457b6cc2f886bb1a0246f620a32d5c612c17d"
+        },
+        {
+          "path": "host/arm-E2-2-candidate/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "499ce471d06ab2182a1c553dbc7efe274bd1534d025726002829e08b0092bd0e"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 101.162,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 2,
+        "token_usage": null
+      },
+      "reason": "{\n  \"reason\": \"Processing findings bind the exact affected selected task fields\",\n  \"status\": \"unavailable\"\n}",
+      "record": {
+        "path": "results/E2/2-candidate.json",
+        "sha256": "351f2ff75fdc6777b68ba93d4ac2ae814932c87c46105f6069877b12e5e7050a"
+      },
+      "rep": 2,
+      "status": "unavailable"
+    },
+    {
+      "arm": "baseline",
+      "case": "P1",
+      "evidence": [
+        {
+          "path": "packets/arm-P1-1-baseline/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "9ebf470da5256e7378b23c221d99e0c7ae695a3bf5477ded7522b619eaa76dc7"
+        },
+        {
+          "path": "host/arm-P1-1-baseline/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "2f11f61b46658570db6ad00f258ae807608e69eb9f010e4c135fa86ca87c9c1d"
+        },
+        {
+          "path": "host/arm-P1-1-baseline/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "54183f1e98634f1fd18cda187c78cda363c2b946b75080986d481f91ed912299"
+        },
+        {
+          "path": "host/arm-P1-1-baseline/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "72426dc1272a6ccbc3df752ad2c2d93fe3095386012a2cadfc4881f34ce255ab"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 82.203,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 1,
+        "token_usage": null
+      },
+      "reason": "{\n  \"reason\": \"P1 requires the factual predecessor and the actual dependent owner choice\",\n  \"status\": \"unavailable\"\n}",
+      "record": {
+        "path": "results/P1/1-baseline.json",
+        "sha256": "6341c7541d7124cb55942e45304c92726e56559a95d00324c6db1592c7015175"
+      },
+      "rep": 1,
+      "status": "unavailable"
+    },
+    {
+      "arm": "candidate",
+      "case": "P1",
+      "evidence": [
+        {
+          "path": "packets/arm-P1-1-candidate/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "2d0bfdf963fdf2179f15932b430ea079bb9c6bab878ded0cfd8635930cf0c5b7"
+        },
+        {
+          "path": "host/arm-P1-1-candidate/dispatch-0.json",
+          "root": "comparison-run",
+          "sha256": "871ae515c903cf61cd7e17e9470a7f9e22eeaf8923a2c7136b6a45a72db4d895"
+        },
+        {
+          "path": "host/arm-P1-1-candidate/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "05f33d5240ae01a5bf1a01470db9d4ab2a51f33ac893a1b58486e8d3ae58e538"
+        },
+        {
+          "path": "host/arm-P1-1-candidate/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "650b970b14470b0b89422c56725ae8962f8abc39882dacb16cf8492cc6fce50a"
+        },
+        {
+          "path": "host/arm-P1-1-candidate/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "c6c6b55a7dd3181d60929ed6b1cee68a4ffe416bf6093e55d41bb59d94d5ee3f"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 96.967,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 2,
+        "token_usage": null
+      },
+      "reason": "{\n  \"reason\": \"P1 requires the factual predecessor and the actual dependent owner choice\",\n  \"status\": \"unavailable\"\n}",
+      "record": {
+        "path": "results/P1/1-candidate.json",
+        "sha256": "65adcf8545740ca938d9e9ece6803714e79d3c6b3ed25ec2da9cccd86164ba8b"
+      },
+      "rep": 1,
+      "status": "unavailable"
+    },
+    {
+      "arm": "baseline",
+      "case": "P1",
+      "evidence": [
+        {
+          "path": "packets/arm-P1-2-baseline/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "835ae3d95e0db38e57c3a0e99a80ce883a3064a7522ca50dff8e58bec490fc95"
+        },
+        {
+          "path": "host/arm-P1-2-baseline/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "42169c6f3a9badcf3a07e22a7034c374c2c78a0e98333c05f6aa37aeb4a4ee9e"
+        },
+        {
+          "path": "host/arm-P1-2-baseline/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "95a97494c3da690cf3fbeb1a90dc07ffba22aba1c728694ece4ce20c2b18e577"
+        },
+        {
+          "path": "host/arm-P1-2-baseline/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "292d13adb160352e9ff496ebc3956de22746de1ad7fc19e91b263fd4ccda1773"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 63.406,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 1,
+        "token_usage": null
+      },
+      "reason": "{\n  \"reason\": \"P1 requires the factual predecessor and the actual dependent owner choice\",\n  \"status\": \"unavailable\"\n}",
+      "record": {
+        "path": "results/P1/2-baseline.json",
+        "sha256": "eb955437fc90e6cd18a1c1b77360de917e79c8ed2b7cb087e59a4f1a88140cfa"
+      },
+      "rep": 2,
+      "status": "unavailable"
+    },
+    {
+      "arm": "candidate",
+      "case": "P1",
+      "evidence": [
+        {
+          "path": "packets/arm-P1-2-candidate/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "6484bd791b6e6ae8cfb396209b402c3149c0a019739b45b7e3d05da4fe35d149"
+        },
+        {
+          "path": "host/arm-P1-2-candidate/dispatch-0.json",
+          "root": "comparison-run",
+          "sha256": "a341b856e369d831be5ba0a2039778c8155999621173d5649177941de655a95d"
+        },
+        {
+          "path": "host/arm-P1-2-candidate/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "d81a1b6f9c883239df9652423972b994f05449aa7da5f6a2aafe3d24406c14fc"
+        },
+        {
+          "path": "host/arm-P1-2-candidate/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "9d0f81d3618e483e9c1b1bca8662e8b6eda11af4c4dff202c4c4694c040af4b5"
+        },
+        {
+          "path": "host/arm-P1-2-candidate/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "a4b6ee98d5192dec8e5cfe7c0a9b22c8af935fdd22533ff6beefb7995114df77"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 89.424,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 2,
+        "token_usage": null
+      },
+      "reason": "{\n  \"reason\": \"The actual question has no predeclared scripted owner answer\",\n  \"status\": \"unavailable\"\n}",
+      "record": {
+        "path": "results/P1/2-candidate.json",
+        "sha256": "0328efa78b7fcf5fa571846f6469e49d124f0feab1caa9bee656570b5485923e"
+      },
+      "rep": 2,
+      "status": "unavailable"
+    },
+    {
+      "arm": "baseline",
+      "case": "P2",
+      "evidence": [
+        {
+          "path": "packets/arm-P2-1-baseline/after-fact.json",
+          "root": "comparison-run",
+          "sha256": "014ac9ce242d47fec97ae80c3b74bd4e8190ae14cedafb4fe42453c8145984d9"
+        },
+        {
+          "path": "host/arm-P2-1-baseline/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "a55a06054711994ba05d047baf086f461d1ee318857abd4301e57910a3ef9ad8"
+        },
+        {
+          "path": "host/arm-P2-1-baseline/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "8f1fa3ee3d417709b86781ead3c73b640cdcec6e5e6731b836e65bf97ce54db5"
+        },
+        {
+          "path": "host/arm-P2-1-baseline/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "69b76c07b674d902b0833980993382a36e893b5e2ac0dc028438c5374b2eee78"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 124.718,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 1,
+        "token_usage": null
+      },
+      "reason": "Question bindings require explicit semantic fields. Original final observed. Lifecycle interrupt returned not_found.",
+      "record": {
+        "path": "results/P2/1-baseline.json",
+        "sha256": "e958efc4c79443326d4cd4e9301b9eb5fc4329b1f0e096092fd1ee3a5fe45eed"
+      },
+      "rep": 1,
+      "status": "unavailable"
+    },
+    {
+      "arm": "candidate",
+      "case": "P2",
+      "evidence": [
+        {
+          "path": "packets/arm-P2-1-candidate/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "8ecee01717e7d470f86a451a637d17bfc038af8c963145e2f51f6044f28ab9e9"
+        },
+        {
+          "path": "host/arm-P2-1-candidate/continue-1.json",
+          "root": "comparison-run",
+          "sha256": "39ce66af7c6e12478b3adee3cde1960be3a8627ec73b73da5950d695bc2d7488"
+        },
+        {
+          "path": "host/arm-P2-1-candidate/continue-2.json",
+          "root": "comparison-run",
+          "sha256": "8774a74ac8ae7c762e358378c37f01064a4eb7b7d8882c89cc69996105d27198"
+        },
+        {
+          "path": "host/arm-P2-1-candidate/dispatch-0.json",
+          "root": "comparison-run",
+          "sha256": "a7a8fe5062929388c96563be93873f47163016da74e7338744ffc924fac5ad93"
+        },
+        {
+          "path": "host/arm-P2-1-candidate/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "77482403e3dd2227a7ea8fb39c2abc1aca4d029715c01bebd4b4dade34e003d4"
+        },
+        {
+          "path": "host/arm-P2-1-candidate/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "08fae7ffca8ac9c2c25dbda91ba1457877e6031c529944fa999c8559cad11980"
+        },
+        {
+          "path": "host/arm-P2-1-candidate/returned-1.json",
+          "root": "comparison-run",
+          "sha256": "d866706117963cff10db19b02e4f29b43ea62a7c560a59a6179696756dcf31b3"
+        },
+        {
+          "path": "host/arm-P2-1-candidate/returned-2.json",
+          "root": "comparison-run",
+          "sha256": "33b195efbb3a8b7bcaa79d7d98eb06fa00c8e49d50598e6aececb99deaef8e1e"
+        },
+        {
+          "path": "host/arm-P2-1-candidate/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "f08c4b0cf6fbc7d8951bd0ffcecf2a8d061a911ddeedecebf593984287926610"
+        }
+      ],
+      "hard_gates_pass": true,
+      "independent_judgment": {
+        "false_positives": [],
+        "quality_supported": [
+          1
+        ],
+        "rationale": "The workflow rejected the stale reply and waited for a current owner answer. Withheld confirmation kept the same task on hold. After the edit, only the export destination question was presented again, and the independent validation answer was preserved.",
+        "regressions": []
+      },
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 180.13,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 4,
+        "token_usage": null
+      },
+      "record": {
+        "path": "results/P2/1-candidate.json",
+        "sha256": "e2e1bd8a543f6dcbbbda7c048c3afa647b8a82293c6f07ea5ebda994f74f70bd"
+      },
+      "rep": 1,
+      "status": "observed"
+    },
+    {
+      "arm": "baseline",
+      "case": "P2",
+      "evidence": [
+        {
+          "path": "packets/arm-P2-2-baseline/after-fact.json",
+          "root": "comparison-run",
+          "sha256": "014ac9ce242d47fec97ae80c3b74bd4e8190ae14cedafb4fe42453c8145984d9"
+        },
+        {
+          "path": "host/arm-P2-2-baseline/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "e45dafc8d68419f29007fa02da65f83672acf3fb01eac590a01e9a8388fa67eb"
+        },
+        {
+          "path": "host/arm-P2-2-baseline/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "99f879779bb45a1952516b128e85bc430c2e3b147358b1cc9432b29ed0adf8ec"
+        },
+        {
+          "path": "host/arm-P2-2-baseline/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "5cc990bcdee3b6a5f1d79aa92276eda0d48008ae3177e26554573c223cc761c4"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 118.006,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 1,
+        "token_usage": null
+      },
+      "reason": "Question bindings require explicit semantic fields. Original final observed. Lifecycle interrupt returned not_found.",
+      "record": {
+        "path": "results/P2/2-baseline.json",
+        "sha256": "ac30ffeca8f9d2c2aaf0519f96bf59d0d52e879c048df2296cf9a33af2346265"
+      },
+      "rep": 2,
+      "status": "unavailable"
+    },
+    {
+      "arm": "candidate",
+      "case": "P2",
+      "evidence": [
+        {
+          "path": "packets/arm-P2-2-candidate/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "f7d89bb273e28e2b4e9574376bd190e2b9071ca97f9dfc97bf67d59dbbc50a9f"
+        },
+        {
+          "path": "host/arm-P2-2-candidate/dispatch-0.json",
+          "root": "comparison-run",
+          "sha256": "44105475246f0ad0db45ef84c96bc88689b444d1447ec6e46386673d83a98de3"
+        },
+        {
+          "path": "host/arm-P2-2-candidate/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "3978330d1b3c8fdc4dbbea308e4a1f57b2e915aaa62d153b6530d947008b9fee"
+        },
+        {
+          "path": "host/arm-P2-2-candidate/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "029a4d3327b8cbfb08f546b1b82e32251196b6049213ecaec02c62ad31d63108"
+        },
+        {
+          "path": "host/arm-P2-2-candidate/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "cfd8aac91ae195e896f3da87c38c2db333ee63f0a6de1cc58cbf169e9d78cb74"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 93.754,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 2,
+        "token_usage": null
+      },
+      "reason": "{\n  \"reason\": \"Question bindings require explicit semantic fields\",\n  \"status\": \"unavailable\"\n}",
+      "record": {
+        "path": "results/P2/2-candidate.json",
+        "sha256": "3c2dd3940ba9e2a02c8c936e29c2ef54839b6b25b024464d4fe3e5806f6f824d"
+      },
+      "rep": 2,
+      "status": "unavailable"
+    },
+    {
+      "arm": "baseline",
+      "case": "D1",
+      "evidence": [
+        {
+          "path": "packets/arm-D1-1-baseline/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "42ddf8b9559aee6ba0aac18086481c5deee326c361993a1b5424ff61855216c9"
+        },
+        {
+          "path": "host/arm-D1-1-baseline/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "ce11cbdd375a7ab3da0baf4faa781a5985691187a22631a101b2ceb8652e3bc0"
+        },
+        {
+          "path": "host/arm-D1-1-baseline/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "404ff8a4a91377f23f4658d0d02319f4426f5f3700f466f26f3c775ffbe9b568"
+        },
+        {
+          "path": "host/arm-D1-1-baseline/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "bd4184d47ec65f6acb0e3c12bf22762ca8b515d589a4e1ca771c7aec80e62368"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 56.77,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 1,
+        "token_usage": null
+      },
+      "reason": "{\"ok\": false, \"error\": \"Pinned source resource acknowledgments are invalid\"}",
+      "record": {
+        "path": "results/D1/1-baseline.json",
+        "sha256": "dac7298430d8c45c306a528b508b4243566c45f72dab4716053683afbc611c70"
+      },
+      "rep": 1,
+      "status": "unavailable"
+    },
+    {
+      "arm": "candidate",
+      "case": "D1",
+      "evidence": [
+        {
+          "path": "packets/arm-D1-1-candidate/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "ccde365e8cf96fcb353a0fc9cef2ceed8973f1803a996147126eab9b87a9bb73"
+        },
+        {
+          "path": "host/arm-D1-1-candidate/dispatch-0.json",
+          "root": "comparison-run",
+          "sha256": "d9ef8e9b7df8f2e1da4940224028b1735e164eb493e952d6f93d609589fcf453"
+        },
+        {
+          "path": "host/arm-D1-1-candidate/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "97a2c4d44c34b6569af54ff15faefed803e0d138f9acf392dab2fd055d98a22e"
+        },
+        {
+          "path": "host/arm-D1-1-candidate/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "addf7444c270a25c16118618bbb45a8347f691ded35f4bec9fe92bf225566a6b"
+        },
+        {
+          "path": "host/arm-D1-1-candidate/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "66ed9c384f924a90e0bf95483b43681f7d5b49c1c4c1a7906350fd9e3cb088bc"
+        }
+      ],
+      "hard_gates_pass": true,
+      "independent_judgment": {
+        "false_positives": [],
+        "quality_supported": [
+          1
+        ],
+        "rationale": "Identifies the stale README target and obsolete command using docs/exports.md:3 and package.json:5. The proposed AGENTS.md wording gives a concrete trigger but only asks the agent to read the guide, leaving completion of that handoff unobservable. Preserves the version-field rule and strict documentation check and presents scoped proposals without claiming incorporation.",
+        "regressions": []
+      },
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 102.277,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 2,
+        "token_usage": null
+      },
+      "record": {
+        "path": "results/D1/1-candidate.json",
+        "sha256": "390a9832b54ee0499e16be664da9caf20069864cafa6eef685af6e064a3947d5"
+      },
+      "rep": 1,
+      "status": "observed"
+    },
+    {
+      "arm": "baseline",
+      "case": "D1",
+      "evidence": [
+        {
+          "path": "packets/arm-D1-2-baseline/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "42ddf8b9559aee6ba0aac18086481c5deee326c361993a1b5424ff61855216c9"
+        },
+        {
+          "path": "host/arm-D1-2-baseline/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "b63f7858118172a31a1a09e7e67a6de5c1fd608bcbaf74eb66ee419ee9f99f1b"
+        },
+        {
+          "path": "host/arm-D1-2-baseline/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "fe3c84f9933490fb1c874c0710f6a9e6237adcb8b27a8f876c4a2024da33f1df"
+        },
+        {
+          "path": "host/arm-D1-2-baseline/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "9d5c4a46c5c78ad77befcd880f8de520a8e4aaef2d392a53f3e9f1f788b3ff76"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 87.905,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 1,
+        "token_usage": null
+      },
+      "reason": "{\"ok\": false, \"error\": \"Pinned source resource acknowledgments are invalid\"}",
+      "record": {
+        "path": "results/D1/2-baseline.json",
+        "sha256": "fdadbfeec9d766aee080d082a802ee7bfa975e05021db1bbefa838bd7b780e77"
+      },
+      "rep": 2,
+      "status": "unavailable"
+    },
+    {
+      "arm": "candidate",
+      "case": "D1",
+      "evidence": [
+        {
+          "path": "packets/arm-D1-2-candidate/adapter-invoke.json",
+          "root": "comparison-run",
+          "sha256": "dd042adc7e75375637c763641bdcb8410651b9aaa370c67521cdbc0f0f1f6b09"
+        },
+        {
+          "path": "host/arm-D1-2-candidate/dispatch-0.json",
+          "root": "comparison-run",
+          "sha256": "8102d3b6b61cfd4077397a6c41434ee709d21e2459265186623aa27b9d300278"
+        },
+        {
+          "path": "host/arm-D1-2-candidate/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "c590f773735c7209fefdfe04d85b37bfc15adb8498b53cd52ef0cae412e4e52b"
+        },
+        {
+          "path": "host/arm-D1-2-candidate/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "716ac66aa4c8620cba7f411bb89cfee9b02758b759a9d17ff0512fe1906f070d"
+        },
+        {
+          "path": "host/arm-D1-2-candidate/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "f1936c234b0e9ede4fb8154635d485b43df31e25f8c129b312c90070ee27251b"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 150.252,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 2,
+        "token_usage": null
+      },
+      "reason": "Original documentation output was observed. The host lifecycle interrupt returned not_found, so the required completion receipt is unavailable.",
+      "record": {
+        "path": "results/D1/2-candidate.json",
+        "sha256": "341c7a63ca4cbbb6f455378c052f8a301cbf076e1f968c6907ce8460e5e83e6f"
+      },
+      "rep": 2,
+      "status": "unavailable"
+    },
+    {
+      "arm": "baseline",
+      "case": "D2",
+      "evidence": [
+        {
+          "path": "packets/arm-D2-1-baseline/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "42ddf8b9559aee6ba0aac18086481c5deee326c361993a1b5424ff61855216c9"
+        },
+        {
+          "path": "host/arm-D2-1-baseline/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "cafdb169b5183d4d4b97dc9df126370d0d8906f9e80af5d7aac026d7e102cf11"
+        },
+        {
+          "path": "host/arm-D2-1-baseline/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "2e8426dac4f131d7253431ff5e06000a213d83bf348a550641f4d3b6311cd5ac"
+        },
+        {
+          "path": "host/arm-D2-1-baseline/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "47cb37fe427cf3239314f11cb5e8aa99a9aaf2a963325e4b281dc1f3cb51946a"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 81.936,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 1,
+        "token_usage": null
+      },
+      "reason": "{\"ok\": false, \"error\": \"Pinned source resource acknowledgments are invalid\"}",
+      "record": {
+        "path": "results/D2/1-baseline.json",
+        "sha256": "c39182a7da3317408581d7a0231ca2be4683664b0bfca6145f41d042c3883c72"
+      },
+      "rep": 1,
+      "status": "unavailable"
+    },
+    {
+      "arm": "candidate",
+      "case": "D2",
+      "evidence": [
+        {
+          "path": "packets/arm-D2-1-candidate/adapter-invoke.json",
+          "root": "comparison-run",
+          "sha256": "91583c71bdca2e783abad26171873f6549cbddeb9ac5e8f9b5d90513f216031e"
+        },
+        {
+          "path": "host/arm-D2-1-candidate/dispatch-0.json",
+          "root": "comparison-run",
+          "sha256": "f550cf9d6ee81a393c3a17107e9a458ba33d0fd9b148233225bb79d48a7668f3"
+        },
+        {
+          "path": "host/arm-D2-1-candidate/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "e5ba84ccf4bff90f20aa111b9eaba857b438be925e2513eb861786553582db87"
+        },
+        {
+          "path": "host/arm-D2-1-candidate/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "e538b945a7237e10dc04828de9d5e5f2d8b42b6a565debced90237026f0bd5cd"
+        },
+        {
+          "path": "host/arm-D2-1-candidate/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "8d343317179bac07561174001dda0785378ae0dd1b82737bef0a0f2c443014d6"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 113.442,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 2,
+        "token_usage": null
+      },
+      "reason": "Original documentation output was observed. The lifecycle interrupt returned not_found, so the required completion receipt is unavailable.",
+      "record": {
+        "path": "results/D2/1-candidate.json",
+        "sha256": "ec30e80d9eb33ecbe489fc6b0b36aeb3cbf4aa87dbb6428c48f0b9197a8201ad"
+      },
+      "rep": 1,
+      "status": "unavailable"
+    },
+    {
+      "arm": "baseline",
+      "case": "D2",
+      "evidence": [
+        {
+          "path": "packets/arm-D2-2-baseline/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "42ddf8b9559aee6ba0aac18086481c5deee326c361993a1b5424ff61855216c9"
+        },
+        {
+          "path": "host/arm-D2-2-baseline/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "d8527456b753acfb07acca449417a18b1661bc612b8c5057d639e45a6c7f8d44"
+        },
+        {
+          "path": "host/arm-D2-2-baseline/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "090be9b71aca2706e2b2ccaba0065e6a38af0bcb473cd93e75e0695d06fe3da8"
+        },
+        {
+          "path": "host/arm-D2-2-baseline/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "a6a286270cb3c7439c9a8d31d781b31470eaf21a6707cab7e1b51397efa43595"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 77.917,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 1,
+        "token_usage": null
+      },
+      "reason": "{\"ok\": false, \"error\": \"Pinned source resource acknowledgments are invalid\"}",
+      "record": {
+        "path": "results/D2/2-baseline.json",
+        "sha256": "37768d2f7ce62099928da5888089e5d5bf9f7346dc7337f9fd82655b51c20e99"
+      },
+      "rep": 2,
+      "status": "unavailable"
+    },
+    {
+      "arm": "candidate",
+      "case": "D2",
+      "evidence": [
+        {
+          "path": "packets/arm-D2-2-candidate/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "63b5767588f5dfbd5c2e8e02970b84b19058c840b766d16684f58d90b16cb28f"
+        },
+        {
+          "path": "host/arm-D2-2-candidate/dispatch-0.json",
+          "root": "comparison-run",
+          "sha256": "00452a33f0c5488a23363a7df0725fab402ce5d4d18f08254183492e603c05fb"
+        },
+        {
+          "path": "host/arm-D2-2-candidate/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "b8b81070a6d066bc70006c159cd83d5e82e86e5a402d9c29f27e1c4d50c2ad32"
+        },
+        {
+          "path": "host/arm-D2-2-candidate/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "e897ea17fa217380b773fe65895c4ab44c8373d24249edf1684d34e11b4e2960"
+        },
+        {
+          "path": "host/arm-D2-2-candidate/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "f9226d7fc48934ba3cb225c3c6564e994fec7c7e480984f0a2c0948fbb31d3f3"
+        }
+      ],
+      "hard_gates_pass": true,
+      "independent_judgment": {
+        "false_positives": [],
+        "quality_supported": [
+          1
+        ],
+        "rationale": "The report preserves navigation and repository rules in its proposals, clarifies the skill trigger using AGENTS.md, and specifies an observable completion result. Its three contract-check findings identify the same syntax-only command in package.json. It flags no formatting defects. The packet provides no independent source excerpts to verify the reported wording.",
+        "regressions": []
+      },
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 99.887,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 2,
+        "token_usage": null
+      },
+      "record": {
+        "path": "results/D2/2-candidate.json",
+        "sha256": "b3dc17a9443cc020379a361c88c21a716a967ec510642ae6a092c2ef7166e1e4"
+      },
+      "rep": 2,
+      "status": "observed"
+    },
+    {
+      "arm": "baseline",
+      "case": "R1",
+      "evidence": [
+        {
+          "path": "packets/arm-R1-1-baseline/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "af6047f7550714b894b3ab2091e576e113f22118a3ed076f2ec6f7721405c65f"
+        },
+        {
+          "path": "host/arm-R1-1-baseline/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "8da12f6b9ed4e07d3d57275eaaab2c0040a3422db43397a0f73860a30e9470b7"
+        },
+        {
+          "path": "host/arm-R1-1-baseline/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "8409b2bd2a9a9330afeefcdd07f68f22480541202ad5e574ebde3b2d9faed400"
+        },
+        {
+          "path": "host/arm-R1-1-baseline/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "43eac0298c82ce4a25d40d61fe38315ce25d03fb00a2df94f0c58f3e262fe88e"
+        }
+      ],
+      "hard_gates_pass": true,
+      "independent_judgment": {
+        "false_positives": [],
+        "quality_supported": [],
+        "rationale": "The common core caught the planted cutoff regression for baseline credit. The observed pass supplied neither an additional correctness finding nor a safe simplification. Publication stayed blocked, but dispatch occurred with an unresolved core finding.",
+        "regressions": [
+          "Hard criterion 3 failed. Ponytail dispatched before the common core review was ready."
+        ]
+      },
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 31.022,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 1,
+        "token_usage": null
+      },
+      "record": {
+        "path": "results/R1/1-baseline.json",
+        "sha256": "391966845677418affc3f195e9ded951925130b6950fd1d23a2c2e5370458832"
+      },
+      "rep": 1,
+      "status": "observed"
+    },
+    {
+      "arm": "candidate",
+      "case": "R1",
+      "evidence": [
+        {
+          "path": "evidence/arm-R1-1-candidate/1-core-result.json",
+          "root": "comparison-run",
+          "sha256": "0dae01c30c818bc9edea7f768724f126dca2586790d6833f7548853042839095"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 0,
+        "host_elapsed_seconds": null,
+        "lifecycle_interrupts": 0,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 0,
+        "token_usage": null
+      },
+      "reason": "The shared full core review already reported unresolved findings, so owned After did not dispatch Ponytail.",
+      "record": {
+        "path": "results/R1/1-candidate.json",
+        "sha256": "6dca483f18346bcacbdb44e90bcfc14f140c402b12298637946337826efe1ef1"
+      },
+      "rep": 1,
+      "status": "unavailable"
+    },
+    {
+      "arm": "baseline",
+      "case": "R1",
+      "evidence": [
+        {
+          "path": "packets/arm-R1-2-baseline/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "e0e43007681e4490f15356dba3a305f2c9feef918f5573cad49473d4fb6051c1"
+        },
+        {
+          "path": "host/arm-R1-2-baseline/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "80cc67b6b36260173371b98c445e9af09378ee3fe11dbdcef8aacd5af9f45913"
+        },
+        {
+          "path": "host/arm-R1-2-baseline/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "ef9d16fbb26c57abe8e809b5e6cfc777e36a4e4684e683b80462f8d7edcf6f70"
+        },
+        {
+          "path": "host/arm-R1-2-baseline/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "89b947c60b26e66c004000883c3a8915f02955ea40d19fde0eb86bcdc74cc7c9"
+        }
+      ],
+      "hard_gates_pass": true,
+      "independent_judgment": {
+        "false_positives": [],
+        "quality_supported": [],
+        "rationale": "The common core caught the planted cutoff regression for baseline credit. The observed pass supplied neither an additional correctness finding nor a safe simplification. Publication stayed blocked, but dispatch occurred with an unresolved core finding.",
+        "regressions": [
+          "Hard criterion 3 failed. Ponytail dispatched before the common core review was ready."
+        ]
+      },
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 73.731,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 1,
+        "token_usage": null
+      },
+      "record": {
+        "path": "results/R1/2-baseline.json",
+        "sha256": "fd9f463c78b883eba0de43d36d69287cd64ddd5fc6a615956926822ededec83c"
+      },
+      "rep": 2,
+      "status": "observed"
+    },
+    {
+      "arm": "candidate",
+      "case": "R1",
+      "evidence": [
+        {
+          "path": "evidence/arm-R1-2-candidate/1-core-result.json",
+          "root": "comparison-run",
+          "sha256": "a806ccfac8b8e4626547f2c7c6ad81263381a69c5ad4ba0313cf7134f396afec"
+        }
+      ],
+      "hard_gates_pass": false,
+      "metrics": {
+        "host_contexts": 0,
+        "host_elapsed_seconds": null,
+        "lifecycle_interrupts": 0,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 0,
+        "token_usage": null
+      },
+      "reason": "The shared full core review already reported unresolved findings, so owned After did not dispatch Ponytail.",
+      "record": {
+        "path": "results/R1/2-candidate.json",
+        "sha256": "a0330edc5bda6e6c04c670f6fb266982e97b3eb7a6f6a4bbe4b7b00889909145"
+      },
+      "rep": 2,
+      "status": "unavailable"
+    },
+    {
+      "arm": "baseline",
+      "case": "R2",
+      "evidence": [
+        {
+          "path": "packets/arm-R2-1-baseline/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "109e0fc5b5b50d22cf9007860a1232583f9a1a96e2656c0a32b74ea5f1c7b725"
+        },
+        {
+          "path": "host/arm-R2-1-baseline/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "92592842901e9bcc1f67b3289328d5594ca6b3c4c2b15f668d22c1970f2d2db0"
+        },
+        {
+          "path": "host/arm-R2-1-baseline/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "31879fb232bd51caafc3ae1fbd89b53db141a01e1efbe28148691e8b1b23785f"
+        },
+        {
+          "path": "host/arm-R2-1-baseline/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "59ffe785b6b1f5226eb5fcacf77de7a2b3c2dcd4460cff1980e1a4042e5e1de1"
+        }
+      ],
+      "hard_gates_pass": true,
+      "independent_judgment": {
+        "false_positives": [],
+        "quality_supported": [
+          1
+        ],
+        "rationale": "The review passed with no findings and marked the clean fixture PR-ready. It surfaced no decoy, scope expansion, or mode leak. The blinded output omits host context, so the return binding cannot be assessed.",
+        "regressions": []
+      },
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 43.653,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 1,
+        "token_usage": null
+      },
+      "record": {
+        "path": "results/R2/1-baseline.json",
+        "sha256": "c953bc500d421f51b6f8fae836c961f7279bfd19c1c9ed3c17bf73cdf0a4a83e"
+      },
+      "rep": 1,
+      "status": "observed"
+    },
+    {
+      "arm": "candidate",
+      "case": "R2",
+      "evidence": [
+        {
+          "path": "packets/arm-R2-1-candidate/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "a688204ff74aaaeb17b4648ac42d503cf0999bc5b20af654cd6f85c487ff3668"
+        },
+        {
+          "path": "host/arm-R2-1-candidate/dispatch-0.json",
+          "root": "comparison-run",
+          "sha256": "2bf0decfcd51f564e884764804ad9f267e7f26cf6270f9cc85812f23f7dad765"
+        },
+        {
+          "path": "host/arm-R2-1-candidate/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "454febb1fd170858fe78573c793fbe9958b2ea88a3db5fa0ddd93897a0f39fe6"
+        },
+        {
+          "path": "host/arm-R2-1-candidate/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "6d22ce91cdfc768eed3e439226c5da508a52a01592027b2a7463a213f8cd53ef"
+        },
+        {
+          "path": "host/arm-R2-1-candidate/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "3eb7bc99b1406b380690d637b90260d04c8e043d5305d4c1fc6b19dbcf311951"
+        }
+      ],
+      "hard_gates_pass": true,
+      "independent_judgment": {
+        "false_positives": [],
+        "quality_supported": [
+          1
+        ],
+        "rationale": "The review passed with no findings and marked the clean fixture PR-ready. It surfaced no decoy, scope expansion, or mode leak. The blinded output omits host context, so the return binding cannot be assessed.",
+        "regressions": []
+      },
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 74.596,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 2,
+        "token_usage": null
+      },
+      "record": {
+        "path": "results/R2/1-candidate.json",
+        "sha256": "7dbbd06d319fb81e1ba83a2b4e3d09e2e184551d9597f2ad3ac5017e5eee7e0c"
+      },
+      "rep": 1,
+      "status": "observed"
+    },
+    {
+      "arm": "baseline",
+      "case": "R2",
+      "evidence": [
+        {
+          "path": "packets/arm-R2-2-baseline/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "97b2e06cf0ebdc4bc89dfb040b1e745905e306a94b78a6042ccff54b34a8c770"
+        },
+        {
+          "path": "host/arm-R2-2-baseline/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "985c5db202a876d428a114684c3237a4ff9f0d0cab07f417c07c684deaf7bd67"
+        },
+        {
+          "path": "host/arm-R2-2-baseline/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "53325b750198f8366f220bc5fd4a2cbdc13e1db9f12a62c762e122ff8aab29b0"
+        },
+        {
+          "path": "host/arm-R2-2-baseline/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "ba7737a78c584d55fdbd5b55b9cda0ba0bf2953f3582b7c765aa0df746ceb701"
+        }
+      ],
+      "hard_gates_pass": true,
+      "independent_judgment": {
+        "false_positives": [],
+        "quality_supported": [
+          1
+        ],
+        "rationale": "The review passed with no findings and marked the clean fixture PR-ready. It surfaced no decoy, scope expansion, or mode leak. The blinded output omits host context, so the return binding cannot be assessed.",
+        "regressions": []
+      },
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 36.253,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 1,
+        "token_usage": null
+      },
+      "record": {
+        "path": "results/R2/2-baseline.json",
+        "sha256": "e5e7b154e0f61af4766ad6416761230ba7f6efa36896accbd6ea371356fd70a8"
+      },
+      "rep": 2,
+      "status": "observed"
+    },
+    {
+      "arm": "candidate",
+      "case": "R2",
+      "evidence": [
+        {
+          "path": "packets/arm-R2-2-candidate/fixture-report.json",
+          "root": "comparison-run",
+          "sha256": "5bf1469e7eea17bd0beb2c8325759321101da0c2b42e464ae11e506f2c5504d5"
+        },
+        {
+          "path": "host/arm-R2-2-candidate/dispatch-0.json",
+          "root": "comparison-run",
+          "sha256": "46dde188d7ada77203ba494625fee55930a3f8d22d781c73cde860d34c4a3c09"
+        },
+        {
+          "path": "host/arm-R2-2-candidate/interrupt-0.json",
+          "root": "comparison-run",
+          "sha256": "b87b0c666c2cfb4e9be6cedc93937c1ee8f6eb2ea264ee040fba977126737c0e"
+        },
+        {
+          "path": "host/arm-R2-2-candidate/returned-0.json",
+          "root": "comparison-run",
+          "sha256": "dc37a775ae8a4dd9d3396bd19271f00f3610841690b2ebbd04d2635be6824a24"
+        },
+        {
+          "path": "host/arm-R2-2-candidate/spawn-0.json",
+          "root": "comparison-run",
+          "sha256": "9c366462d80488e8d8073b60901a84ccd2670cd89ca06f57b633f11b0ceec0e3"
+        }
+      ],
+      "hard_gates_pass": true,
+      "independent_judgment": {
+        "false_positives": [],
+        "quality_supported": [
+          1
+        ],
+        "rationale": "The review passed with no findings and marked the clean fixture PR-ready. It surfaced no decoy, scope expansion, or mode leak. The blinded output omits host context, so the return binding cannot be assessed.",
+        "regressions": []
+      },
+      "metrics": {
+        "host_contexts": 1,
+        "host_elapsed_seconds": 78.883,
+        "lifecycle_interrupts": 1,
+        "model_identity": null,
+        "monetary_cost": null,
+        "real_human_rework_seconds": null,
+        "spawn_or_follow_up_requests": 2,
+        "token_usage": null
+      },
+      "record": {
+        "path": "results/R2/2-candidate.json",
+        "sha256": "3f8a798572ea1115b2afe3661d70653228d179c66f6a5f72c53a0931e88a0600"
+      },
+      "rep": 2,
+      "status": "observed"
+    }
+  ],
+  "decision_mode": "manual",
+  "evidence_scope": "Bounded report and comparison evidence only. Native Skill invocation, live providers, other flavors, and automatic installation remain outside the study.",
+  "expiry": "Observations are historical. Requalification is required after relevant source, dependency, adapter, profile, host, model, fixture, rubric or boundary changes; general Codex evidence does not transfer to other hosts or flavors.",
+  "host_capture": {
+    "file_count": 160,
+    "sha256": "b9d2d3e2401a9d1014172ecf5c4da47abdfbcc8ce5822520358898426b6bc268",
+    "unreconciled": []
+  },
+  "identity": {
+    "freeze_sha256": "b79ad8f9054041090bfc176e45c9442a6c7f6aeefbd4b14fb8d6f8d6df8bf899",
+    "ledger_sha256": "991bc43c5427428822ff8d266142d23492acd731ee26e6dd07b94d91def82a0a",
+    "owner_agreement_sha256": "4f97398fb678ab365bcfe623d110e3002fca9f4428a216be7bdfcfa2d34f8c2c",
+    "profile_sha256": "d6a384d8a5a655895de3a39aa3d2753ee16b136aa859b45fefed92c91b2b7f00",
+    "proposal_sha256": "aa5f82cf9fd1ef256bac3205b7d1bb842605fa9862fc231f0cd556002fb1785f",
+    "report_verifier_frozen": false,
+    "report_verifier_sha256": "f3546d2bbb2c8d71ab3bc301b6407b4a6a09acbc39890964197c4d5d16caa63a",
+    "rubric_sha256": "fcf0ce4b5ea1b674667f54064876f7b0e5bc82d209d37e841a6f7560f1206405",
+    "source_freeze_sha256": "36e5a6f1bb777e2f778fa5e2a54b9d1d9d9408513130c833b7b04e865c678a12",
+    "stage_sha256": "4a19fb91e8aa9eba82032e2f704ccd0f3a2bfdf0edd87ba4448d35953ef37308"
+  },
+  "judges": {
+    "D1": {
+      "judgment_sha256": "d328da37ab1627f46965a2d3e93bfcf0a5cd31353a5f262ad6270bd5dc687dd8",
+      "packet_sha256": "16e6ae15a2ad1d0dfa4f94303277a14c71dd07d5b5423e4813a9629cb2908a83",
+      "status": "observed"
+    },
+    "D2": {
+      "judgment_sha256": "b36553d7972a8c3d7025d6dec9c896328568b814367de3e60ade6f5188f13d2d",
+      "packet_sha256": "586f21df6f98377fb71047ab14655c72e02be93ac0a161bac7ba62e4f7d36960",
+      "status": "observed"
+    },
+    "E1": {
+      "reason": "Missing regular evidence file: E1-judgment.json",
+      "status": "unavailable"
+    },
+    "E2": {
+      "judgment_sha256": "20bdd0fe86f63bc0be1c361fbbbfddf29a23ffc8d9b9bfe4ad19d48ea11af7a6",
+      "packet_sha256": "7fc21c29fed8b5df8d8c202a280ad0e5ef875eaaf0603e446118f9d817797cf9",
+      "status": "observed"
+    },
+    "P1": {
+      "judgment_sha256": "fe7e54fa7771d54b4269ee11cab9a53a9815c42fe55be0ca705ca57f7a1fe99d",
+      "packet_sha256": "cb7782189f9e622944df52a1834326513fabb5c8962a5e5bb606640c3c221014",
+      "status": "observed"
+    },
+    "P2": {
+      "judgment_sha256": "35bcb6ee7daa6f795cd020ab86cd0da01cd0d32b233379be603ae869c6f4ed53",
+      "packet_sha256": "11248ea458b4ce356b63560ae37e1df70287746848c76edaca1d8b6179e11857",
+      "status": "observed"
+    },
+    "R1": {
+      "judgment_sha256": "ce7e3974b61b1fea60bbd7fefc020c114098dfa9cdc423666f1be9269a7e60ac",
+      "packet_sha256": "dfe428e7a226efadf6b937d90b5bbcf333649e526703de37f152764d3b1afbc7",
+      "status": "observed"
+    },
+    "R2": {
+      "judgment_sha256": "d356ba51f2171e1689e4e0e1d3d25e52be103e6d1a705e2657dc2ae9fc8e8842",
+      "packet_sha256": "1c5731ebb41aa873be3649a06373a0d7a1db99a5fc9ab66cd8af68ef155e8838",
+      "status": "observed"
+    }
+  },
+  "kind": "bounded-skill-tree-plugin-comparison-results",
+  "portable_capture": {
+    "path": ".skill-tree/history/research/plugin-comparison-capture.json",
+    "sha256": "ebdbc935115baf77d2c52e5869003fa3f2cc1f506ea8f66a62518e3abeab2ed0"
+  },
+  "profile_identity": "dd4a66be0c80310cd7412eda5e6603773a28e59861cf5fa731e78f807c21b7f5",
+  "qualification_holds": [
+    "The terminal ledger is unqualified or has unresolved original cleanup."
+  ],
+  "recommendations": {
+    "general": {
+      "eligible": [],
+      "status": "evaluated"
+    },
+    "unity": {
+      "eligible": [],
+      "reason": "The frozen study uses a general Codex source-backed profile.",
+      "status": "unqualified"
+    },
+    "web": {
+      "eligible": [],
+      "reason": "The frozen study uses a general Codex source-backed profile.",
+      "status": "unqualified"
+    }
+  },
+  "schema": 1,
+  "source_commit": "2a6d240bf6f844d339d246bea57a437e9e3eb7fd",
+  "study_notes": {
+    "not_observed": "No native Skill tool, Auto decision outcome, other provider or flavor, applied documentation repair, hosted PR, browser, Unity or live-service result is qualified.",
+    "original_cleanup": "Four original lifecycle completion receipts remain unavailable. Disposable hook state was reconciled separately; this supplies no missing host receipt.",
+    "r1_judgment": "The blind R1 judgment attributes dispatch to baseline artifacts. The shared core review and owned gate evidence show no Ponytail dispatch in either repeat. The original judgment remains captured; the attribution supplies no finding or gate-failure evidence."
+  }
+}

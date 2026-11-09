@@ -4679,7 +4679,8 @@
       "priority": 114,
       "scope": "The fixed 8-fixture, 36-worker + 8-judge + 8-factual-helper + 2-calibration proposal (54 contexts, at most 96 explicit spawn/follow-up requests, 60 task-specific minutes) remains pending actual owner agreement in task 114. Local deterministic staging precedes trial freeze; external acquisition/runtime remains separately scoped.",
       "agreement_evidence": null
-    }
+    },
+    "superseded_for_execution_by": ".skill-tree/history/research/plugin-comparison-proposal.md"
   },
   "schema": 1,
   "record_kind": "dated-primary-source-market-map",
@@ -4735,7 +4736,8 @@
         "unity": []
       }
     },
-    "reason": "No target-workflow candidate comparison exists. Adoption, package compatibility and upstream reports alone establish no recommendation eligibility."
+    "reason": "The bounded general Codex comparison did not establish any recommendation. Other flavors remain unqualified. Adoption, source compatibility and upstream reports supply discovery evidence.",
+    "comparison_evidence": ".skill-tree/history/research/plugin-comparison-results.json"
   },
   "coverage": {
     "candidate_entry_texts": 38,

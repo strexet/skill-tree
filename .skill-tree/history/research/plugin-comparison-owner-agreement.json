@@ -1,0 +1,35 @@
+{
+  "calibrations_started_at_agreement": 0,
+  "candidate_workers_started_at_agreement": 0,
+  "decision_mode": "manual",
+  "kind": "comparison-owner-agreement",
+  "limits": {
+    "arms": 2,
+    "calibrations": 2,
+    "cleanup_seconds": 300,
+    "contexts": 54,
+    "fixtures": 8,
+    "inventory_calls": 1,
+    "lifecycle_interrupts": 54,
+    "maximum_active_arm_workers": 2,
+    "maximum_live_jobs": 3,
+    "observation_calls": 120,
+    "repetitions": 2,
+    "spawn_or_follow_up_requests": 95,
+    "task_seconds": 3600
+  },
+  "owner_submission": {
+    "answer": "Согласовать план и лимиты",
+    "kind": "submitted-answer",
+    "reference": "Current conversation reply to request_user_input_async call_f3aedce9ef8243b68edb41afcb118abd question 0."
+  },
+  "proposal": ".skill-tree/history/research/plugin-comparison-proposal.md",
+  "proposal_sha256": "aa5f82cf9fd1ef256bac3205b7d1bb842605fa9862fc231f0cd556002fb1785f",
+  "recorded_at": "2026-11-09T06:40:03.782406+00:00",
+  "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+  "schema": 1,
+  "scope": "Disposable local Codex source-backed comparison with scripted fixture-owner submissions. Fixture and scoring inputs freeze before any calibration.",
+  "source_commit": "2a6d240bf6f844d339d246bea57a437e9e3eb7fd",
+  "status": "approved",
+  "task_id": "T-a583acd5-fc6b-4d37-97ec-02df969fea9e"
+}

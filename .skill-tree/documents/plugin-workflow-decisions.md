@@ -78,7 +78,7 @@ The catalog records task-editorial and skill/document applications separately. P
 
 ### Separate comparative qualification decision
 
-The market study contains a finite proposal of eight fixtures, 36 worker trials, eight blind judges, eight factual helpers and two activation calibrations: at most 54 spawned contexts, 96 explicit host-turn requests and 60 task-specific minutes. Task `T-a583acd5-fc6b-4d37-97ec-02df969fea9e` owns actual agreement before comparison execution and records the current W1 baseline before freezing trials. W1/W2 approval supplies no comparison execution authority, favorable recommendation evidence, external acquisition or native/runtime scope.
+Task `T-a583acd5-fc6b-4d37-97ec-02df969fea9e` records separate owner agreement for eight two-arm fixtures and a pinned W1 Manual baseline. The [comparison evidence](plugin-recommendation-evidence.md) preserves the approved scope, results and remaining qualification limits. W1/W2 approval supplies no comparison execution authority, favorable recommendation evidence, external acquisition or native/runtime scope.
 
 ## Approved decision W3: optional open plugin management
 

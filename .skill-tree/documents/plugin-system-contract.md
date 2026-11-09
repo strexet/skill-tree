@@ -60,6 +60,8 @@ Long invocation, research and owner waits occur outside the writer lock. Receipt
 
 Source inspection establishes content, compatibility prerequisites and available primary evidence. Installation telemetry and popularity supply discovery evidence. Recommendation eligibility requires bounded comparison in the target workflow against a no-plugin baseline, with actual activation evidence, independent behavioral/finding oracles, negative controls, measured quality outcomes and explicit time/cost limitations.
 
+The [recorded general Codex comparison](plugin-recommendation-evidence.md) supplies bounded source-backed observations and an empty eligible set. Qualification requires current source, dependency, adapter, host, profile and workflow identities. Historical outcomes remain attached to the original identities.
+
 Unqualified or compatibility-only candidates remain distinguishable in manual catalog selection. The recommendation set can be empty when no candidate qualifies. A separate hosted marketplace, universal host support and favorable outcomes are outside the approved assumptions.
 
 ## Contract examples

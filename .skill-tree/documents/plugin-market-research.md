@@ -213,9 +213,9 @@ Shortlist membership identifies defensible comparison work rather than an instal
 
 General/web/unity recommendation arrays remain empty at every integration point. Missing host, dependency, license or authorization evidence retains an explicit unqualified/unsupported outcome rather than an unrelated workflow change.
 
-## Finite comparison proposal
+## Original market comparison proposal
 
-The fixed proposal is pending actual owner agreement in task `T-a583acd5-fc6b-4d37-97ec-02df969fea9e`, priority 114. The market task executes no comparison. Eight fixtures have two fixed repetitions: six fixtures contain core and one candidate arm, while R1/R2 contain core, supplied ponytail-session and separate report-only ponytail-review arms. The review alternative does not substitute the supplied pilot identity.
+The original market proposal below records the source-only research scope. The owner approved a narrower [eight-fixture comparison](../history/research/plugin-comparison-proposal.md) in task `T-a583acd5-fc6b-4d37-97ec-02df969fea9e`. The [executed cohort](plugin-recommendation-evidence.md) supplies the current qualification evidence and empty eligible set. Eight fixtures have two fixed repetitions: six fixtures contain core and one candidate arm, while R1/R2 contain core, supplied ponytail-session and separate report-only ponytail-review arms. The review alternative does not substitute the supplied pilot identity.
 
 Processing baseline already contains the core shared clarification loop derived from the same inspected grilling protocol. Processing A/B therefore measures incremental external wrapper/resource/adapter value over the real core baseline, rather than the benefit of having an interview. Shared protocol content remains identical across arms. Baseline receives no additional external entry/resources, candidate-arm outputs or state. Independently frozen criteria judge actual quality rather than vocabulary/source overlap; no independent invention or general protocol-effect claim follows.
 
