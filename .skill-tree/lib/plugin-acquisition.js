@@ -1,24 +1,13 @@
 'use strict';
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const http=require('node:http'),https=require('node:https'),cp=require('node:child_process');
+const {linkedResources}=require('./plugin-sources.js');
 function error(code,message){const result=Error(message);result.code=code;return result;}
 function relative(value){
  if(typeof value!=='string'||!value||path.posix.isAbsolute(value)||/^[a-z]:/i.test(value)||value.includes('\\')||value.includes('\0')||value.split('/').includes('..'))throw error('source-path','An acquired resource requires a bounded relative path');
  const normalized=path.posix.normalize(value).replace(/\/+$/,'');if(!normalized||normalized==='.')throw error('source-path','An acquired resource cannot name the source root');return normalized;
 }
 function resourcePaths(values=[]){if(!Array.isArray(values))throw error('source-path','Source resources require a path list');return values.map(value=>relative(typeof value==='string'?value:value?.path));}
-function links(rel,bytes){
- if(!/\.(md|markdown|txt)$/i.test(rel))return [];
- const result=[];
- for(const match of bytes.toString('utf8').matchAll(/\]\((?:<([^>]+)>|([^\n)]+))\)/g)){
-  let target=(match[1]||match[2]).trim().split(/\s+["']/)[0];
-  if(!target||target.startsWith('#')||target.startsWith('//')||/^[a-z][a-z0-9+.-]*:/i.test(target))continue;
-  try{target=decodeURIComponent(target.split('#')[0].split('?')[0]);}catch{throw error('source-path','Malformed local resource link');}
-  if(!target)continue;if(path.posix.isAbsolute(target)||target.includes('\\'))throw error('source-path','Absolute resource links are unsupported');
-  result.push(relative(path.posix.join(path.posix.dirname(rel),target)));
- }
- return result;
-}
 function limits(options){
  const selected={timeoutMs:options.timeoutMs??30000,maxBytes:options.maxBytes??16*1024*1024,maxFiles:options.maxFiles??256};
  selected.maxRepositoryBytes=options.maxRepositoryBytes??selected.maxBytes*4;
@@ -33,7 +22,7 @@ async function closure(definition,read,budget){
   const rel=relative(queue.shift());if(visited.has(rel))continue;visited.add(rel);remaining(budget);
   const value=await read(rel);
   if(Array.isArray(value)){queue.push(...value);continue;}
-  account(budget,value.length);files[rel]=Buffer.from(value);queue.push(...links(rel,files[rel]));
+  account(budget,value.length);files[rel]=Buffer.from(value);queue.push(...linkedResources(rel,files[rel]));
  }
  if(!Object.hasOwn(files,entry))throw error('source-missing','The instruction entry is not a file');return files;
 }

@@ -186,6 +186,53 @@ test('shared manager previews exact A-B-A and preserves order across cancellatio
   noWorkflow(f);
 });
 
+test('manager preview derives readiness from the actual boundary and validates active adaptations', async t => {
+  const f = temporaryProject(t);
+  const source = f.definitions[0];
+  source.metadata.application_policy = {readiness_effect: 'This source claims no readiness effect.'};
+  source.adapter = {processing_application: {schema: 1, roles: ['task-editorial'], default_role: 'task-editorial'}};
+  const prepared = await preview(f, {
+    action: 'install', request_id: 'preview-readiness', sources: [source], bindings: [
+      occurrence('editor', source.id, {anchor: 'after-task-creation'}),
+      occurrence('ordinary', source.id, {anchor: 'before'}),
+      occurrence('review', source.id, {operation: 'skill-tree-pr-review-cycle'}),
+      occurrence('excluded', source.id, {condition: false}),
+    ],
+  });
+  const effects = Object.fromEntries(prepared.preview.bindings.map(row => [row.id, row.readiness]));
+  assert.match(effects.editor, /task-editorial.*acceptance before implementation/);
+  assert.match(effects.ordinary, /participate/);
+  assert.match(effects.review, /before PR readiness/);
+  assert.match(effects.excluded, /condition excludes/);
+  const before = core.treeHash(f.root, '.skill-tree');
+  source.adapter.processing_application.default_role = 'missing-role';
+  await assert.rejects(prepareManagerRequest(f.root, {
+    action: 'install', request_id: 'invalid-readiness', sources: [source], bindings: [occurrence('editor', source.id)],
+  }), {code: 'runtime-application'});
+  assert.equal(core.treeHash(f.root, '.skill-tree'), before);
+});
+
+test('unreadable project-known state reports drift without hiding installed plugins', async t => {
+  const f = temporaryProject(t);
+  await apply(f, await preview(f, {
+    action: 'install', request_id: 'before-known-drift', sources: [f.definitions[0]],
+  }));
+  core.refresh(f.root, f.source);
+  write(f.root, '.skill-tree/installation/plugin-known.json', '{invalid');
+  const before = core.treeHash(f.root, '.skill-tree');
+  const inventory = inspect(f);
+  assert.equal(inventory.status, 'drift');
+  assert.equal(inventory.known.status, 'unavailable');
+  assert.deepEqual(inventory.plugins.map(row => row.id), [f.definitions[0].id]);
+  assert.ok(inventory.issues.some(issue => issue.scope === 'project-known'));
+  assert.equal(core.treeHash(f.root, '.skill-tree'), before);
+  await apply(f, await preview(f, {
+    action: 'uninstall', request_id: 'uninstall-with-known-drift', plugin_id: f.definitions[0].id,
+  }));
+  assert.deepEqual(Object.keys(current(f).packages), []);
+  assert.equal(fs.readFileSync(path.join(f.root, '.skill-tree/installation/plugin-known.json'), 'utf8'), '{invalid');
+});
+
 test('exact unbind, package uninstall and forget preserve independent owned records', async t => {
   const f = temporaryProject(t);
   const first = f.definitions[0];

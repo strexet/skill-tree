@@ -45,8 +45,10 @@ function resolveProfile(source,root,flavor) {
  root=fs.realpathSync(root);
  const registry=readJson(source,'config/flavors.json'),rules=readJson(source,'config/capabilities.json');
  if(!registry.flavors[flavor])throw Error('Unknown flavor: '+flavor);
+ const pluginRegistry=fs.existsSync(safe(source,'lib/plugin-registry.js'));
+ const pluginComposition=read(source,'lib/plugin-composition.js');
  const fixed=['package.json','package-lock.json','npm-shrinkwrap.json','yarn.lock','pnpm-lock.yaml','bun.lock','bun.lockb','.nvmrc','.node-version','pyproject.toml','pytest.ini','Cargo.toml','ProjectSettings/ProjectVersion.txt','ProjectSettings/EditorSettings.asset','ProjectSettings/ProjectSettings.asset','Packages/manifest.json','Packages/packages-lock.json','.skill-tree/validation-recipes.json','.skill-tree/worktree-profile.json'];
- fixed.push('.skill-tree/config/repository.json','.skill-tree/installation/plugins.json');
+ if(pluginRegistry)fixed.push('.skill-tree/config/repository.json','.skill-tree/installation/plugins.json');
  const discovered=inventory(root,rules.inventory),inputs={};
  for(const rel of [...new Set([...fixed,...discovered])].sort()){inputs[rel]=inputDigest(root,rel);}
  const facts={test_assemblies:[],ui:[]},recipes={},gaps=[];
@@ -91,7 +93,7 @@ function resolveProfile(source,root,flavor) {
   else if(!facts.test_assemblies.length)gaps.push({key:'test-foundation',reason:'UTF exists without a discovered test assembly.',recommendation:'Configure the existing UTF framework and one meaningful EditMode test assembly; preserve package pins.'});
  } else if(!Object.values(recipes).some(r=>['unit','integration','browser'].includes(r.lane)))gaps.push({key:'test-foundation',reason:'No usable foundational test command is declared.',recommendation:'Research existing tools, select or configure a compatible foundational test framework, add one meaningful smoke test, document focused commands and refresh the profile.'});
  const explicit=readJson(root,'.skill-tree/validation-recipes.json',null);
- const sourceRegistry=readJson(root,'.skill-tree/config/repository.json',null);
+ const sourceRegistry=pluginRegistry?readJson(root,'.skill-tree/config/repository.json',null):null;
  const sourceRecipes=sourceRegistry?.role==='source'?{schema:sourceRegistry.schema,recipes:sourceRegistry.recipes||{}}:null;
  const execution_bindings=explicit?bindings.resolveBindings(root,explicit):{};
  for(const binding of Object.values(execution_bindings))for(const rel of [binding.locator,binding.review_path])inputs[rel]=inputDigest(root,rel);
@@ -119,10 +121,15 @@ function resolveProfile(source,root,flavor) {
  if(worktree_environment.schema!==1)throw Error('Unsupported worktree environment declaration');
  for(const key of ['required_files','isolated_directories'])for(const rel of worktree_environment[key]||[])safe(root,rel);
  if((worktree_environment.exclusive_resources||[]).some(key=>typeof key!=='string'||!key))throw Error('Explicit runtime resource identities required');
- const pluginInputs=plugins.resolveInputs(root,readJson(source,'templates/operations.json'));
- for(const record of Object.values(pluginInputs.packages))for(const relative of Object.keys(record.files))inputs[record.destination+'/'+relative]=inputDigest(root,record.destination+'/'+relative);
- const environment_id=hash(json({flavor,inputs,facts,recipes,execution_bindings,worktree_environment,plugins:pluginInputs}));
- return {format:'skill-tree-profile',schema:1,composer_version:registry.composer_version,source_version:registry.release_version||null,flavor,project_root:root,inputs,inventory:discovered,facts,recipes,gaps,environment_id,execution_bindings,worktree_environment,plugins:pluginInputs,qualification:'static compatibility only; product execution unqualified'};
+ const environment={flavor,inputs,facts,recipes,execution_bindings,worktree_environment};
+ if(pluginComposition){
+  const pluginInputs=plugins.resolveInputs(root,readJson(source,'templates/operations.json'),hash(pluginComposition));
+  for(const record of Object.values(pluginInputs.packages))for(const relative of Object.keys(record.files))inputs[record.destination+'/'+relative]=inputDigest(root,record.destination+'/'+relative);
+  environment.plugins=pluginInputs;
+ }
+ // Verify earlier receipts using the format of the owned source bundle.
+ const source_version=registry.release_version||(pluginRegistry?null:undefined);
+ return {format:'skill-tree-profile',schema:1,composer_version:registry.composer_version,source_version,...environment,project_root:root,inventory:discovered,gaps,environment_id:hash(json(environment)),qualification:'static compatibility only; product execution unqualified'};
 }
 function mergeSections(common,additions,replaceable=[]) {
  const result=common.map(s=>({...s}));
@@ -169,7 +176,7 @@ function compose(source,profile,selected=null) {
   files['references/project-profile.md']='# Concrete Project Profile\n\nFlavor: '+profile.flavor+'. Static compatibility only; execution remains unqualified.\n\n```json\n'+json({source_version:profile.source_version,instruction_profile_id:hash(json({flavor:profile.flavor,facts:profile.facts,recipes:profile.recipes,gaps:profile.gaps})),facts:profile.facts,recipes:profile.recipes,gaps:profile.gaps,worktree_environment:profile.worktree_environment})+'```\n';
   files['SKILL.md']='---\nname: '+name+'\ndescription: '+JSON.stringify('['+profile.flavor+'] '+op.description)+'\nlicense: MIT\n---\n\n# '+op.title+'\n\nFlavor: '+profile.flavor+'. Read the [concrete project profile](references/project-profile.md).\n\n'+sections.map(s=>s.text).join('\n\n')+'\n';
   files['agents/openai.yaml']='interface:\n  display_name: '+JSON.stringify(op.title+' ('+profile.flavor+')')+'\n  short_description: '+JSON.stringify(profile.flavor+' Skill Tree workflow')+'\n';
-  const contribution=plugins.composeOperation(source,profile,name,files);files=mergeResources(files,contribution.files);
+  if(profile.plugins){const contribution=plugins.composeOperation(source,profile,name,files);files=mergeResources(files,contribution.files);}
   for(const [rel,content] of Object.entries(files)){if(typeof content!=='string'&&!Buffer.isBuffer(content))throw Error('Missing composition resource: '+rel);safe(source,rel);}
   for(const [rel,content] of Object.entries(files).filter(([rel])=>rel.endsWith('.md')&&!rel.startsWith('plugins/'))){
    for(const match of content.matchAll(/\]\(([^)]+)\)/g)){

@@ -203,7 +203,7 @@ def progress(frame):frame['stagnation']={'key':None,'count':0}
 
 
 def identity(value):
-    require(isinstance(value,dict) and all(isinstance(value.get(k),str) and re.fullmatch('(?:[a-f0-9]{40}|[a-f0-9]{64})',value[k]) for k in ('head','base_oid')) and isinstance(value.get('source_digest'),str) and dg.SHA.fullmatch(value['source_digest']),'Current implementation identity requires exact head, base and source digest');return deepcopy(value)
+    require(isinstance(value,dict) and set(value)=={'head','base_oid','source_digest'} and all(isinstance(value[k],str) and re.fullmatch('(?:[a-f0-9]{40}|[a-f0-9]{64})',value[k]) for k in ('head','base_oid')) and isinstance(value['source_digest'],str) and dg.SHA.fullmatch(value['source_digest']),'Current implementation identity requires exact head, base and source digest');return deepcopy(value)
 
 
 def question_command(store,buffer,frame,payload):
@@ -310,7 +310,7 @@ def mutate(store,command,payload):
                 obligation=digest({'review':review_obligations(frame),'finding':finding_id,'disposition':disposition})
                 if obligation not in frame['resolved_obligations']:frame['resolved_obligations'].append(obligation);progress(frame)
             elif command=='fix':
-                clear_decision(store,frame);fresh_plan(store,frame);fresh_resolutions(store,frame);require(frame['phase']=='fix' and text(payload.get('reference')),'Only accepted current findings authorize the fix phase');ids=payload.get('fixed_ids');require(isinstance(ids,list) and len(ids)==len(set(ids)) and set(ids)=={key for key,value in frame['resolutions'].items() if value['disposition']=='fix'},'Fix evidence must cover exactly the accepted findings');current=identity(payload.get('identity'));require(current!=frame['identity'],'A claimed fix requires changed current source identity');detail={'review':deepcopy(frame['review']),'resolutions':deepcopy(frame['resolutions'])};frame.update(identity=current,checks=None,review=None,resolutions={},phase='checks',phase_after_checks='re-review',question_decision_id=None,question_context=None,acceptance=None,prepared_actor=None);progress(frame)
+                clear_decision(store,frame);fresh_plan(store,frame);fresh_resolutions(store,frame);require(frame['phase']=='fix' and text(payload.get('reference')),'Only accepted current findings authorize the fix phase');ids=payload.get('fixed_ids');require(isinstance(ids,list) and len(ids)==len(set(ids)) and set(ids)=={key for key,value in frame['resolutions'].items() if value['disposition']=='fix'},'Fix evidence must cover exactly the accepted findings');current=identity(payload.get('identity'));require(current['source_digest']!=frame['identity']['source_digest'],'A claimed fix requires a changed current source digest');detail={'review':deepcopy(frame['review']),'resolutions':deepcopy(frame['resolutions'])};frame.update(identity=current,checks=None,review=None,resolutions={},phase='checks',phase_after_checks='re-review',question_decision_id=None,question_context=None,acceptance=None,prepared_actor=None);progress(frame)
             elif command=='resume':
                 no_pending(store,frame);context=dg.validate_context(payload.get('context',frame['context']));parent_policy=payload.get('parent_policy_reconciliation');detail={'previous_context':deepcopy(frame['context'])}
                 if parent_policy is not None:
@@ -335,7 +335,9 @@ def mutate(store,command,payload):
                 if 'identity' in payload:
                     current=identity(payload['identity'])
                     if current!=frame['identity']:
-                        detail.update(previous_identity=deepcopy(frame['identity']),previous_review=deepcopy(frame['review']));following='re-review' if frame['review'] else 'review';frame.update(identity=current,checks=None,review=None,resolutions={},question_decision_id=None,question_context=None,acceptance=None,prepared_actor=None,phase_after_checks=following)
+                        previous_review=frame['review'];previous_identity=frame['identity']
+                        retained_review=previous_review if previous_review and previous_review['findings'] and current['source_digest']==previous_identity['source_digest'] else None
+                        detail.update(previous_identity=deepcopy(previous_identity),previous_review=deepcopy(previous_review));following='re-review' if previous_review else 'review';frame.update(identity=current,checks=None,review=retained_review,resolutions={},question_decision_id=None,question_context=None,acceptance=None,prepared_actor=None,phase_after_checks=following)
                         if frame['plan_acceptance']:fresh_plan(store,frame);frame['phase']='checks'
                 if 'execution_snapshot' in payload:
                     if snapshot_changed:

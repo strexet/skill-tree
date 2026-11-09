@@ -21,10 +21,10 @@ function specs(operations){
  if(!object(operations))fail('composition-operation','An owned operation catalog is required');
  return Object.fromEntries(Object.keys(operations).sort().map(name=>{const op=operations[name];if(!object(op))fail('composition-operation','An owned operation requires a definition');return [name,{title:typeof op.title==='string'?op.title:name,...(own(op,'plugin_anchors')?{plugin_anchors:clone(op.plugin_anchors)}:{})}];}));
 }
-function createCatalog(operations){
+function createCatalog(operations,version=VERSION){
  const declared=specs(operations),boundaries={},named=[],aliases=[];
  for(const operation of Object.keys(declared)){
-  for(const phase of phases)boundaries[operation+':'+phase]={operation,version:VERSION,context_kinds:kinds,handler:request=>guardBoundary(request.package_root,request,operation,phase)};
+  for(const phase of phases)boundaries[operation+':'+phase]={operation,version,context_kinds:kinds,handler:request=>guardBoundary(request.package_root,request,operation,phase)};
   const locations={...(namedDefaults[operation]||{})},extra=declared[operation].plugin_anchors||{};
   if(!object(extra))fail('composition-anchor','Owned named anchors require a name-to-phase map');
   for(const [name,phase]of Object.entries(extra)){if(!registry.validId(name)||!phases.includes(phase)||phases.includes(name)||own(locations,name)&&locations[name]!==phase)fail('composition-anchor','A named anchor must map to an unchanged actual owned phase');locations[name]=phase;}
@@ -34,9 +34,9 @@ function createCatalog(operations){
 }
 function portableCatalog(catalog){return {operations:catalog.operations,entries:catalog.entries,aliases:catalog.aliases,digest:catalog.digest};}
 function defaults(packages){return Object.fromEntries(Object.entries(packages).filter(([,record])=>own(record.adaptation||{},'parameter_defaults')).map(([id,record])=>[id,clone(record.adaptation.parameter_defaults)]));}
-function resolveInputs(root,operations){
+function resolveInputs(root,operations,version){
  if(fs.existsSync(registry.safe(root,'.skill-tree/installation/.plugin-journal.json')))fail('composition-transaction','Plugin transaction recovery remains required before composition');
- const value=registry.verifyInstalled(root),catalog=createCatalog(operations),compiled=bindings.compileBindings(value.bindings,{packages:value.packages,catalog,parameterDefaults:defaults(value.packages)});
+ const value=registry.verifyInstalled(root),catalog=createCatalog(operations,version),compiled=bindings.compileBindings(value.bindings,{packages:value.packages,catalog,parameterDefaults:defaults(value.packages)});
  return {format:'skill-tree-plugin-composition-inputs',schema:1,registry_present:fs.existsSync(registry.safe(root,registry.REGISTRY)),registry_identity:value.identity,configuration_digest:compiled.configuration_digest,operations:specs(operations),definitions:clone(value.bindings),packages:clone(value.packages),parameter_defaults:defaults(value.packages),catalog:portableCatalog(catalog),unresolved:compiled.bindings.filter(row=>row.location.status!=='resolved').map(row=>({id:row.id,operation:row.operation,anchor:row.anchor,reason:row.location.reason}))};
 }
 function packageClosure(packages,selected){
@@ -49,7 +49,8 @@ function composeOperation(source,profile,operation,ownedFiles){
  const ownedResources=Object.fromEntries(Object.entries(ownedFiles).map(([relative,content])=>{registry.relative(relative);if(relative===MANIFEST||relative.startsWith('plugins/')||typeof content!=='string'&&!Buffer.isBuffer(content))fail('composition-resource','An owned composition resource is invalid or conflicts with plugin resources');return [relative,hash(content)];}));
  const operations=readJson(source,'templates/operations.json');
  if(!own(operations,operation))fail('composition-operation','The selected operation is not registered');
- const current=resolveInputs(profile.project_root,operations);
+ const version=hash(fs.readFileSync(registry.safe(source,'lib/plugin-composition.js')));
+ const current=resolveInputs(profile.project_root,operations,version);
  if(!profile.plugins||registry.json(current)!==registry.json(profile.plugins))fail('composition-stale','Plugin inputs changed; explicitly refresh the frozen profile before composition');
  const definitions=current.definitions.filter(row=>row.operation===operation),ids=packageClosure(current.packages,definitions.map(row=>row.plugin_id)),packages={},files={};
  for(const id of ids){
@@ -58,7 +59,7 @@ function composeOperation(source,profile,operation,ownedFiles){
   packages[id]={...clone(record),destination:base,entry:base+'/'+record.entry,files:inventory};
  }
  const parameterDefaults=Object.fromEntries(ids.filter(id=>own(current.parameter_defaults,id)).map(id=>[id,current.parameter_defaults[id]]));
- const catalog=createCatalog(operations),compiled=bindings.compileBindings(definitions,{packages,catalog,parameterDefaults});
+ const catalog=createCatalog(operations,version),compiled=bindings.compileBindings(definitions,{packages,catalog,parameterDefaults});
  const manifest=registry.seal({format:'skill-tree-plugin-bindings',schema:1,operation,owned_resources:ownedResources,operations:current.operations,registry_present:current.registry_present,registry_identity:current.registry_identity,configuration_digest:compiled.configuration_digest,definitions,bindings:clone(compiled.bindings),packages,parameter_defaults:parameterDefaults,catalog:portableCatalog(catalog)});
  files[MANIFEST]=registry.json(manifest);return {files,manifest};
 }

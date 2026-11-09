@@ -457,7 +457,7 @@ async function activateSetup(target, source, manager, args, flavor, providers, s
       } catch {
         if (receipt.requires_profile_refresh) {
           try {
-            manager.refresh(target, source);
+            manager.refresh(target, installedSource);
             verifiedCore(manager, target, source, flavor, selections);
             return stage;
           } catch {

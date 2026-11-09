@@ -280,6 +280,10 @@ test('interrupted optional activation keeps verified core results and requires o
   assertNoWorkflow(f);
 
   const owner = path.join(f.root, '.skill-tree/installation/manager.js');
+  const rollback = run(f, ['--rollback'], {file: owner});
+  assert.notEqual(rollback.status, 0);
+  assert.match(rollback.stderr, /plugin installation recovery/i);
+  assert.equal(core.treeHash(f.root, '.skill-tree'), paused);
   const recovered = run(f, ['--recover'], {file: owner});
   assert.equal(recovered.status, 0, recovered.stderr + recovered.stdout);
   assert.equal(fs.existsSync(path.join(f.root, journal)), false);
@@ -293,6 +297,72 @@ test('interrupted optional activation keeps verified core results and requires o
   assert.match(JSON.stringify(stage(replay).plugins), /"replayed":true/);
   assert.deepEqual(rawRegistry(f), bytes);
   assertNoWorkflow(f);
+});
+
+test('core refresh and rollback retain binary plugin resources in cache-named directories', async t => {
+  const f = setup(t), skill = f.sources[0].path;
+  const relative = '__pycache__/fixture.bin', bytes = Buffer.from([0, 255, 128, 13, 10]);
+  fs.appendFileSync(path.join(skill, 'SKILL.md'), `\n[Binary resource](${relative}).\n`);
+  write(skill, relative, bytes);
+  assert.equal(run(f, ['--yes']).status, 0);
+  const proposal = await installProposal(f);
+  assert.equal(run(f, confirm(store(f, proposal), proposal)).status, 0);
+  const owner = path.join(f.root, '.skill-tree/installation/manager.js');
+  const manage = flag => {
+    const result = run(f, [flag], {file: owner});
+    assert.equal(result.status, 0, result.stderr + result.stdout);
+  };
+  manage('--refresh-profile');
+  const installed = path.join(f.root, '.agents/skills', op, 'plugins/fixture-editor/upstream', relative);
+  assert.deepEqual(fs.readFileSync(installed), bytes);
+  const before = core.treeHash(f.root, '.agents/skills/' + op);
+  const projectInputs = write(f.root, 'package.json', '{"scripts":{"test":"node --test"}}');
+  manage('--refresh-profile');
+  assert.notEqual(core.treeHash(f.root, '.agents/skills/' + op), before);
+  fs.unlinkSync(projectInputs);
+  manage('--rollback');
+  assert.deepEqual(fs.readFileSync(installed), bytes);
+  assert.equal(core.treeHash(f.root, '.agents/skills/' + op), before);
+  manage('--verify');
+  assertNoWorkflow(f);
+});
+
+test('core can be reinstalled after initial rollback with an independent plugin generation', async t => {
+  const f = setup(t);
+  assert.equal(run(f, ['--yes']).status, 0);
+  const proposal = await installProposal(f);
+  manager.applyManagerProposal(f.root, proposal, {proposal_digest: proposal.digest});
+  const bytes = rawRegistry(f);
+  const owner = path.join(f.root, '.skill-tree/installation/manager.js');
+  const rolled = run(f, ['--rollback'], {file: owner});
+  assert.equal(rolled.status, 0, rolled.stderr);
+  assert.equal(core.receipt(f.root), null);
+  assert.deepEqual(rawRegistry(f), bytes);
+  const reinstalled = run(f, ['--yes']);
+  assert.equal(reinstalled.status, 0, reinstalled.stderr + reinstalled.stdout);
+  assert.deepEqual(rawRegistry(f), bytes);
+  assert.equal(run(f, ['--verify'], {file: owner}).status, 0);
+  assertNoWorkflow(f);
+});
+
+test('unowned plugin staging and backup files survive rejected core and plugin activation', async t => {
+  for (const key of ['stage', 'backups']) {
+    const f = setup(t), relative = core.transactionPaths('plugins')[key] + '/unrelated.txt';
+    const marker = write(f.root, relative, 'Keep these local bytes.');
+    const initial = run(f, ['--yes']);
+    assert.notEqual(initial.status, 0);
+    assert.match(initial.stdout + initial.stderr, /unowned maintenance/i);
+    assert.equal(fs.readFileSync(marker, 'utf8'), 'Keep these local bytes.');
+    fs.unlinkSync(marker);
+    fs.rmdirSync(path.dirname(marker));
+    assert.equal(run(f, ['--yes']).status, 0);
+    write(f.root, relative, 'Keep these local bytes.');
+    const proposal = await installProposal(f);
+    assert.throws(() => manager.applyManagerProposal(f.root, proposal, {proposal_digest: proposal.digest}), /staging already exists|unowned.*backups/i);
+    assert.equal(fs.readFileSync(marker, 'utf8'), 'Keep these local bytes.');
+    assert.equal(fs.existsSync(path.join(f.root, registry.REGISTRY)), false);
+    assertNoWorkflow(f);
+  }
 });
 
 function interactive(f, flags, answers, {only = ['codex'], scopeChange, allowUnused = false} = {}) {
@@ -322,6 +392,8 @@ function interactive(f, flags, answers, {only = ['codex'], scopeChange, allowUnu
     "          const claude = owned.filter(row => row.provider === 'claude-code');",
     "          if (!claude.length) throw Error('Fixture has no Claude destinations to remove');",
     '          core.uninstall(root, claude);',
+    "        } else if (scopeChange.action === 'edit-source') {",
+    '          fs.appendFileSync(scopeChange.file, scopeChange.append);',
     '        } else {',
     '          core.install(root, ' + JSON.stringify(source) + ", 'web', owned);",
     '        }',
@@ -426,6 +498,31 @@ test('interactive EOF exits the optional stage without selecting a recommendatio
   assert.equal(questions.length, 1);
   assert.doesNotMatch(result.stdout, /"status":\s*"installed"/i);
   assert.equal(fs.existsSync(path.join(f.root, registry.REGISTRY)), false);
+  assertNoWorkflow(f);
+});
+
+test('optional plugin confirmation refreshes from the installed core after a source checkout edit', t => {
+  const f = setup(t), checkout = path.join(f.base, 'checkout');
+  for (const relative of ['common', 'config', 'domains', 'lib', 'src', 'templates', 'skills/general']) {
+    fs.cpSync(path.join(source, relative), path.join(checkout, relative), {recursive: true});
+  }
+  const resource = 'common/references/decision-governance.md';
+  const original = fs.readFileSync(path.join(checkout, resource));
+  const request = {action: 'install', request_id: 'install-on-verified-core', sources: f.sources, bindings};
+  const {result, events} = interactive(f, ['--source', checkout, '--configure-plugins'], ['request', JSON.stringify(request), 'y'], {
+    scopeChange: {at: 3, action: 'edit-source', file: path.join(checkout, resource), append: '\nUnreviewed source edit.\n'},
+  });
+  assert.equal(result.status, 0, result.stderr + result.stdout);
+  assert.ok(events.some(event => event.action === 'edit-source'));
+  const stage = JSON.parse(result.stdout.slice(result.stdout.lastIndexOf('\n{') + 1)).plugin_stage;
+  assert.equal(stage.status, 'installed');
+  assert.equal(stage.profile, 'current');
+  const owned = '.skill-tree/installation/source';
+  assert.deepEqual(fs.readFileSync(path.join(f.root, owned, resource)), original);
+  assert.notDeepEqual(fs.readFileSync(path.join(checkout, resource)), original);
+  const receipt = core.verify(f.root, source);
+  assert.equal(receipt.source_digests[resource], registry.hash(original));
+  assert.deepEqual(registry.verifyInstalled(f.root).bindings.map(row => row.id), bindings.map(row => row.id));
   assertNoWorkflow(f);
 });
 

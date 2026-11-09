@@ -187,4 +187,4 @@ function deliveryData(packageRoot,payload,resolveSecret){
  if(application)data.processing_application=application;
  return {payload:data,dispatch_identity:dispatch,input_digest:request.input_digest,delivery_digest:digest(data),resolved_parameter_digest:resolved.digest,configuration_parameter_digest:row.effective.digest,contains_secrets:secrets.length>0};
 }
-module.exports={freezePlan,occurrencePlan,readinessPlan,requirementPlan,deliveryData,canonical,digest};
+module.exports={freezePlan,occurrencePlan,readinessPlan,requirementPlan,deliveryData,processingApplication,invocationPolicy,canonical,digest};

@@ -769,7 +769,7 @@ def _main_editors(record, completed):
     for item in completed.values():
         key = _editor_key(record, item)
         if key:
-            editors[key] = item
+            editors[key, item[2]['input']['parameter_digest']] = item
     return editors
 
 
@@ -853,7 +853,7 @@ def affected_editors(store, record, current, require_complete=False):
     matched = {key: item[1]['accepted_context'] for key, item in latest.items()}
     derived = _completed_rechecks(store, record, require_complete)
     for mandate, _, item in derived:
-        key = mandate['editorial_policy']
+        key = mandate['editorial_policy'], item[2]['input']['parameter_digest']
         require(key in latest, 'The recheck no longer has an original registered editorial application')
         matched[key] = item[1]['accepted_context']
     return main, derived, {key: latest[key] for key, value in matched.items() if _point(value) != current}
@@ -869,6 +869,10 @@ def create_recheck(store, record, payload):
     key = _editor_key(record, item)
     for mandate in req['rechecks'].values():
         if mandate['editorial_policy'] != key or mandate.get('retired'):
+            continue
+        original = main['attempts'].get(mandate['origin_attempt_id'])
+        require(original is not None, 'The affected editorial mandate lacks its original accepted attempt')
+        if original['input']['parameter_digest'] != item[2]['input']['parameter_digest']:
             continue
         if mandate['chain_id']:
             previous = wf.hook_helper().read(store, mandate['chain_id'])

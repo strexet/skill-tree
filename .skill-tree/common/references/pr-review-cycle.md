@@ -25,7 +25,7 @@ Review the entire current diff and relevant context. Inspect existing reviews, i
 
 Fix defects in the same source branch/worktree. Reproduce a defect with meaningful regression checks when feasible; explain a material validation limitation. Use scoped commits, push without force and reply in the corresponding thread with the actual fix/check evidence. Resolve a discussion only after verifying the fix at the new head. Re-review new commits and affected surrounding behavior. Preserve previous rounds and failed checks as history. Operation keys bind semantic request digests; changed content uses a new key.
 
-A new head, changed target or material base change invalidates the affected review/validation. The helper conservatively invalidates the full review on any base/head/target or discussion/check snapshot change. Obtain another real review and validation pass; a formal statement that fixes exist supplies no evidence. Retargeting preserves publication identity through the explicit `--publication-id` and a recorded owner scope change.
+A new head, changed target or material base change invalidates the affected review and finding verification. The helper conservatively invalidates the full review on any base/head/target or discussion/check snapshot change. Obtain another real review and validation pass. A formal statement that fixes exist supplies no evidence. Retargeting preserves publication identity through `init --publication-id` with an explicit owner instruction naming the new target. Merge consent for the previous target remains historical. A legacy merge authorization with no recorded target requires a new explicit owner merge instruction for the current target.
 
 ## Optional bounded review passes
 

@@ -6,7 +6,7 @@ const INSTALL='.skill-tree/installation',PROFILE=INSTALL+'/profile.json';
 function filesAt(root,rel,includeCaches=false){
  const full=c.safe(root,rel);if(!fs.existsSync(full))return null;
  if(fs.lstatSync(full).isFile())return {'':c.hash(fs.readFileSync(full))};
- const out={};function walk(dir,prefix){for(const e of fs.readdirSync(dir,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){if(e.name==='__pycache__'&&!includeCaches)continue;const child=path.join(dir,e.name),key=prefix+e.name;if(e.isSymbolicLink())throw Error('Symlink in owned package: '+rel+'/'+key);if(e.isDirectory())walk(child,key+'/');else if(e.isFile())Object.defineProperty(out,key,{value:c.hash(fs.readFileSync(child)),enumerable:true,writable:true,configurable:true});else throw Error('Unsupported owned entry: '+key);}}walk(full,'');return out;
+ const out={};function walk(dir,prefix){for(const e of fs.readdirSync(dir,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){if(e.name==='__pycache__'&&!includeCaches&&!prefix.startsWith('plugins/'))continue;const child=path.join(dir,e.name),key=prefix+e.name;if(e.isSymbolicLink())throw Error('Symlink in owned package: '+rel+'/'+key);if(e.isDirectory())walk(child,key+'/');else if(e.isFile())Object.defineProperty(out,key,{value:c.hash(fs.readFileSync(child)),enumerable:true,writable:true,configurable:true});else throw Error('Unsupported owned entry: '+key);}}walk(full,'');return out;
 }
 const owners=record=>record.providers||[record.provider];
 function compositionIdentity(profile){
@@ -145,6 +145,20 @@ function transactionPaths(channel='core'){
  if(!['core','plugins'].includes(channel))throw Error('Unsupported installation transaction channel');
  return channel==='core'?{stage:INSTALL+'/.staging',backups:INSTALL+'/.backups',journal:INSTALL+'/.journal.json',last:INSTALL+'/.last-transaction.json'}:{stage:INSTALL+'/.plugin-staging',backups:INSTALL+'/.plugin-backups',journal:INSTALL+'/.plugin-journal.json',last:INSTALL+'/.last-plugin-transaction.json'};
 }
+function verifyPluginBackups(root){
+ const {backups,last}=transactionPaths('plugins'),directory=c.safe(root,backups);
+ const actual=fs.existsSync(directory)?fs.readdirSync(directory).sort():[];
+ const retained=c.readJson(root,last,null);
+ const conflict=()=>Error('Unowned or modified retained plugin backups');
+ if(!retained){if(fs.existsSync(directory)||fs.existsSync(c.safe(root,last)))throw conflict();return;}
+ if(retained.schema!==1||retained.channel!=='plugins'||!Array.isArray(retained.entries))throw conflict();
+ const expected=[];
+ for(const {backup,old} of retained.entries){
+  if(typeof backup!=='string'||path.posix.dirname(backup)!==backups||!/^\d+$/.test(path.posix.basename(backup))||treeHash(root,backup,true)!==old)throw conflict();
+  if(old!==null)expected.push(path.posix.basename(backup));
+ }
+ if(c.json(actual)!==c.json(expected.sort()))throw conflict();
+}
 function recover(root,channel='core'){
  const paths=transactionPaths(channel),journal=c.readJson(root,paths.journal,null);if(!journal)return;
  const tree=rel=>treeHash(root,rel,channel==='plugins');
@@ -162,28 +176,47 @@ function recover(root,channel='core'){
   if(fs.existsSync(dest)){fs.mkdirSync(path.dirname(backup),{recursive:true});if(fs.existsSync(backup))throw Error('Recovery backup conflict: '+e.dest);fs.renameSync(dest,backup);}
   if(e.staged){fs.mkdirSync(path.dirname(dest),{recursive:true});fs.renameSync(c.safe(root,e.staged),dest);}
  }
- fs.writeFileSync(c.safe(root,paths.last),c.json(journal));
- fs.unlinkSync(c.safe(root,paths.journal));
+ if(channel==='core'&&journal.entries.some(entry=>entry.dest===PROFILE&&entry.next===null)){
+  // An initial-generation rollback leaves no core manager or rollback owner.
+  const source=INSTALL+'/source';
+  if(Object.keys(filesAt(root,source)||{}).length)throw Error('Unexpected maintenance source remained after rollback');
+  fs.rmSync(c.safe(root,source),{recursive:true,force:true});
+  fs.rmSync(c.safe(root,paths.last),{force:true});
+  fs.rmSync(c.safe(root,paths.backups),{recursive:true,force:true});
+ }else fs.writeFileSync(c.safe(root,paths.last),c.json(journal));
  fs.rmSync(c.safe(root,paths.stage),{recursive:true,force:true});
+ fs.unlinkSync(c.safe(root,paths.journal));
  // Backups retain one completed generation for explicit reviewed rollback.
 }
 function transaction(root,changes,expected={},beforeActivate=null,channel='core'){
  const {stage,backups,journal}=transactionPaths(channel);
- const tree=rel=>treeHash(root,rel,channel==='plugins');
- if(fs.existsSync(c.safe(root,stage)))fs.rmSync(c.safe(root,stage),{recursive:true});
- for(const [dest,hash] of Object.entries(expected))if(tree(dest)!==hash)throw Error('Destination changed after ownership validation: '+dest);
- const entries=[];let n=0;
- for(const [dest,change] of Object.entries(changes)){
-  const old=Object.hasOwn(expected,dest)?expected[dest]:tree(dest),backup=backups+'/'+n,staged=change===null?null:stage+'/'+n;
-  if(change!==null){if(typeof change==='string'||Buffer.isBuffer(change)||change instanceof Uint8Array){const p=c.safe(root,staged);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,change);}else materialize(root,staged,change);}
-  const next=staged?tree(staged):null;
-  if(old!==next)entries.push({dest,old,next,backup,staged});n++;
+ const plugin=channel==='plugins',tree=rel=>treeHash(root,rel,plugin);
+ const staging=c.safe(root,stage),journalPath=c.safe(root,journal);
+ if(fs.existsSync(staging)){
+  if(plugin)throw Error('Plugin staging already exists; inspect the retained files before retrying');
+  fs.rmSync(staging,{recursive:true});
  }
- for(const [dest,hash] of Object.entries(expected))if(tree(dest)!==hash)throw Error('Destination changed during staging: '+dest);
- if(beforeActivate){try{beforeActivate();}catch(error){fs.rmSync(c.safe(root,stage),{recursive:true,force:true});throw error;}}
- if(!entries.length){fs.rmSync(c.safe(root,stage),{recursive:true,force:true});return;}
- if(fs.existsSync(c.safe(root,backups)))fs.rmSync(c.safe(root,backups),{recursive:true});
- fs.writeFileSync(c.safe(root,journal),c.json({schema:1,channel,entries}));recover(root,channel);
+ for(const [dest,hash] of Object.entries(expected))if(tree(dest)!==hash)throw Error('Destination changed after ownership validation: '+dest);
+ fs.mkdirSync(staging);
+ try{
+  const entries=[];let n=0;
+  for(const [dest,change] of Object.entries(changes)){
+   const old=Object.hasOwn(expected,dest)?expected[dest]:tree(dest),backup=backups+'/'+n,staged=change===null?null:stage+'/'+n;
+   if(change!==null){if(typeof change==='string'||Buffer.isBuffer(change)||change instanceof Uint8Array){const p=c.safe(root,staged);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,change);}else materialize(root,staged,change);}
+   const next=staged?tree(staged):null;
+   if(old!==next)entries.push({dest,old,next,backup,staged});n++;
+  }
+  for(const [dest,hash] of Object.entries(expected))if(tree(dest)!==hash)throw Error('Destination changed during staging: '+dest);
+  if(beforeActivate)beforeActivate();
+  if(!entries.length)return;
+  if(plugin)verifyPluginBackups(root);
+  if(fs.existsSync(c.safe(root,backups)))fs.rmSync(c.safe(root,backups),{recursive:true});
+  const metadata=plugin?{}:{project_root:fs.realpathSync(root)};
+  fs.writeFileSync(journalPath,c.json({schema:1,channel,entries,...metadata}));
+ }finally{
+  if(!fs.existsSync(journalPath))fs.rmSync(staging,{recursive:true,force:true});
+ }
+ recover(root,channel);
 }
 function locked(root,action,{recoverPending=true,recoverPluginPending=true,onPending}={}){
  const owner=queueRoot(root),barrier=owner!==root?path.join(owner,INSTALL+'/.install-lock'):null;let barrierFd;
@@ -215,7 +248,17 @@ function bundle(source,flavor){
 function plan(root,source,flavor,selections,options={}){
  const profileBefore=treeHash(root,PROFILE);const old=receipt(root);if(old)verifyOwned(root,old);
  const workflowBefore=treeHash(root,WORKFLOW);
- if(!old&&fs.existsSync(c.safe(root,INSTALL))&&fs.readdirSync(c.safe(root,INSTALL)).some(name=>name!=='.install-lock'))throw Error('Unowned maintenance directory conflict');
+ if(!old&&fs.existsSync(c.safe(root,INSTALL))){
+  const {REGISTRY,PACKAGES,NOOP_REQUESTS,verifyInstalled}=require('./plugin-registry.js');
+  const {backups,last}=transactionPaths('plugins');
+  // Owned plugin state survives removal of the independent core generation.
+  const allowed=new Set(['.install-lock','plugin-known.json',...[REGISTRY,PACKAGES,NOOP_REQUESTS,backups,last].map(rel=>path.posix.basename(rel))]);
+  if(fs.readdirSync(c.safe(root,INSTALL)).some(name=>!allowed.has(name)))throw Error('Unowned maintenance directory conflict');
+  if(fs.existsSync(c.safe(root,backups))||fs.existsSync(c.safe(root,last))){
+   if(!fs.existsSync(c.safe(root,REGISTRY)))throw Error('Unowned maintenance directory conflict');
+   verifyInstalled(root);verifyPluginBackups(root);
+  }
+ }
  if(hasActiveOperation(root))throw Error('Active controller must checkpoint at a stopped cleanup/handoff point before installation or refresh');
  if(old)for(const rel of Object.keys(old.destinations))selections.push({rel,provider:old.destinations[rel].provider,name:old.destinations[rel].name});
  const merged={};for(const item of selections){if(!merged[item.rel])merged[item.rel]={...item,providers:[]};merged[item.rel].providers=[...new Set([...merged[item.rel].providers,...(item.providers||[item.provider])])].sort();}
@@ -238,7 +281,13 @@ function plan(root,source,flavor,selections,options={}){
  const maintenance=bundle(source,flavor),bundle_digests={};
  for(const [rel,content] of Object.entries(maintenance)){const dest=INSTALL+'/'+rel;if(fs.existsSync(c.safe(root,dest))&&!old?.bundle_digests[dest])throw Error('Unowned maintenance file conflict: '+dest);changes[dest]=content;bundle_digests[dest]=c.hash(content);}
  for(const rel of Object.keys(old?.bundle_digests||{}))if(!bundle_digests[rel])changes[rel]=null;
- const next={...profile,source_digests:built.source_digests,destinations,bridges,bundle_digests,identity:built.identity};
+ let source_digests=built.source_digests;
+ if(old&&source===c.safe(root,INSTALL+'/source')){
+  if(Object.entries(source_digests).some(([rel,digest])=>old.source_digests[rel]!==digest))throw Error('Bundle and source recipe identities disagree');
+  source_digests=old.source_digests;
+ }
+ const next={...profile,source_digests,destinations,bridges,bundle_digests};
+ next.identity=compositionIdentity(next);
  changes[PROFILE]=c.json(next);
  if(old?.identity!==next.identity){const stopped=stoppedWorkflow(root);if(stopped)changes[WORKFLOW]=stopped;}
  const expected={};
@@ -257,10 +306,11 @@ function plan(root,source,flavor,selections,options={}){
  return {profile:next,changes,delta,old,expected};
 }
 function verify(root,source,allowForeign=false){
+ if(fs.existsSync(c.safe(root,transactionPaths().journal)))throw Error('Core installation recovery is required before profile verification');
  if(fs.existsSync(c.safe(root,transactionPaths('plugins').journal)))throw Error('Plugin installation recovery is required before profile verification');
  const p=receipt(root,true,allowForeign);verifyOwned(root,p);const bundleSource=c.safe(root,INSTALL+'/source');
  const now=c.resolveProfile(bundleSource,root,p.flavor);
- for(const field of ['source_version','inputs','inventory','facts','recipes','gaps','environment_id','execution_bindings','worktree_environment'])if(c.json(now[field])!==c.json(p[field]))throw Error('Profile refresh-required or resolved profile mismatch: node .skill-tree/installation/manager.js --refresh-profile');
+ for(const field of ['source_version','inputs','inventory','facts','recipes','gaps','environment_id','execution_bindings','worktree_environment','plugins'])if(c.json(now[field])!==c.json(p[field]))throw Error('Profile refresh-required or resolved profile mismatch: node .skill-tree/installation/manager.js --refresh-profile');
  if(p.identity!==compositionIdentity(p))throw Error('Composition receipt identity mismatch');
  const generated=c.compose(bundleSource,now,[...new Set(Object.values(p.destinations).map(record=>record.name))]);
  const providers=c.readJson(bundleSource,'config/providers.json').providers;
@@ -309,28 +359,46 @@ function restoreGeneration(root){
  const changes={},expected={};
  for(const e of last.entries){
   if(e.dest===WORKFLOW)continue;
-  if(treeHash(root,e.dest)!==e.next)throw Error('Rollback conflicts with current content: '+e.dest);
-  expected[e.dest]=e.next;
-  if(e.old===null){changes[e.dest]=null;continue;}
-  if(treeHash(root,e.backup)!==e.old)throw Error('Rollback backup is unavailable: '+e.dest);
-  const full=c.safe(root,e.backup);
-  if(fs.lstatSync(full).isFile())changes[e.dest]=fs.readFileSync(full,'utf8');
-  else changes[e.dest]=Object.fromEntries(Object.keys(filesAt(root,e.backup)).map(rel=>[rel,fs.readFileSync(c.safe(root,e.backup+'/'+rel),'utf8')]));
+  const current=treeHash(root,e.dest),full=e.old===null?null:c.safe(root,e.backup);
+  if(full&&treeHash(root,e.backup)!==e.old)throw Error('Rollback backup is unavailable: '+e.dest);
+  const previous=e.dest===PROFILE&&full?JSON.parse(fs.readFileSync(full)):null;
+  if(current!==e.next){
+   const project_root=last.project_root||previous?.project_root;
+   if(e.dest!==PROFILE||!project_root||c.hash(c.json({'':c.hash(c.json({...p,project_root}))}))!==e.next)throw Error('Rollback conflicts with current content: '+e.dest);
+  }
+  expected[e.dest]=current;
+  if(!full){changes[e.dest]=null;continue;}
+  if(fs.lstatSync(full).isFile()){
+   if(previous&&previous.project_root!==p.project_root){
+    const rebound=c.json({...previous,project_root:p.project_root});
+    if(rebound===c.json(p))throw Error('No retained rollback generation for the rebound project root');
+    changes[e.dest]=rebound;
+   }else changes[e.dest]=fs.readFileSync(full);
+  }
+  else changes[e.dest]=Object.fromEntries(Object.keys(filesAt(root,e.backup)).map(rel=>[rel,fs.readFileSync(c.safe(root,e.backup+'/'+rel))]));
  }
  const stopped=stoppedWorkflow(root);if(stopped){changes[WORKFLOW]=stopped;expected[WORKFLOW]=treeHash(root,WORKFLOW);}
  transaction(root,changes,expected);return {action:'generation rolled back; project dependencies unchanged; verify freshness before admission'};
 }
-function rollback(root){return locked(root,()=>restoreGeneration(root));}
+function rollback(root){return locked(root,()=>restoreGeneration(root),{recoverPending:false,recoverPluginPending:false});}
 function rebind(root,source){
- if(['core','plugins'].some(channel=>{const p=transactionPaths(channel);return fs.existsSync(c.safe(root,p.journal))||fs.existsSync(c.safe(root,p.stage));}))throw Error('Recover the original installation transaction before explicit rebind');
  verify(root,source,true);
  return locked(root,()=>{
+  if(['core','plugins'].some(channel=>fs.existsSync(c.safe(root,transactionPaths(channel).stage))))throw Error('Recover the original installation transaction before explicit rebind');
   const p=verify(root,source,true),project_root=fs.realpathSync(root);
   if(p.project_root===project_root)return {action:'verified no-op current'};
   if(hasActiveOperation(root))throw Error('Active controller must reach a stopped handoff before rebind');
-  transaction(root,{[PROFILE]:c.json({...p,project_root})},{[PROFILE]:treeHash(root,PROFILE)},()=>verify(root,source,true));
+  // A move changes only the receipt. Keep the retained package generation for rollback.
+  const before=treeHash(root,PROFILE),staging=fs.mkdtempSync(c.safe(root,INSTALL+'/.rebind-'));
+  try{
+   const staged=path.join(staging,'profile.json');
+   fs.writeFileSync(staged,c.json({...p,project_root}));
+   verify(root,source,true);
+   if(treeHash(root,PROFILE)!==before)throw Error('Ownership receipt changed during rebind');
+   fs.renameSync(staged,c.safe(root,PROFILE));
+  }finally{fs.rmSync(staging,{recursive:true,force:true});}
   verify(root,source);return {action:'verified installation rebound; recover the queue locator explicitly when required'};
- });
+ },{recoverPending:false});
 }
 function localMain(root,source,args){
  try{

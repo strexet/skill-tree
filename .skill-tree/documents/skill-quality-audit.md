@@ -2,7 +2,7 @@
 
 ## Scope
 
-The next-version source retains release base 0.3.0 and contains the six reviewed audit repairs. The installed general Skill Tree operations own intake, research, exact task selection, progress, acceptance receipts and audit evidence. Product changes remain on `codex/next-version` without commit or publication.
+The quality audit covers six reviewed repairs on the 0.3.0 release base. The general Skill Tree operations own intake, research, exact task selection, progress, acceptance receipts and audit evidence.
 
 The canonical audit history preserves the original defect observations. Current task outcomes reside in `history/task-outcomes.jsonl`; compact regression receipts and actual-agent observations reside in `history/validation/next-version/`. Required current documents and derived navigation remain present.
 

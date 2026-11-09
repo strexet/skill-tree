@@ -51,27 +51,54 @@ class ReviewError(ValueError):
 def digest(value):
     return hashlib.sha256(json.dumps(value,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
 
+def instruction_lines(text):
+    visible = []
+    fence = None
+    quoted = False
+    for line in text.splitlines():
+        marker = re.match(r'^ {0,3}(`{3,}|~{3,})(.*)$', line)
+        if fence is not None:
+            if marker and marker[1][0] == fence[0] and len(marker[1]) >= len(fence) and not marker[2].strip():
+                fence = None
+        elif not line.strip():
+            quoted = False
+        elif re.match(r'^ {0,3}>', line):
+            quoted = True
+        elif not quoted:
+            if marker and (marker[1][0] == '~' or '`' not in marker[2]):
+                fence = marker[1]
+            elif not line.startswith(('    ', '\t')):
+                visible.append(line)
+                continue
+        visible.append('\ufffc' if line.strip() else '')
+    return '\n'.join(visible)
+
+
 def instructions(text):
-    # Only the current owner's direct instruction enters the authorization parser.
-    text=re.sub(r'(?ms)^\s*(`{3,}|~{3,})[^\n]*\n.*?^\s*\1[^\n]*', '', text)
-    text=re.sub(r'(`+).*?\1', '', text, flags=re.S)
-    text=re.sub(r'(?m)^\s*>.*$', '', text)
-    return re.sub(r'"[^"\n]*"|«[^»]*»|“[^”]*”|\x27[^\x27\n]*\x27', '', text)
+    # Keep positions for inline branch names following direct instruction words.
+    quoted = r'(?<!`)(`+)(?!`).*?(?<!`)\1(?!`)|"[^"]*"|«[^»]*»|“[^”]*”|(?<!\w)\x27[^\x27]*\x27(?!\w)'
+    return re.sub(quoted, lambda match: '\ufffc' * len(match[0]), text, flags=re.S)
+
+
+def branch_operand(text, offset):
+    return re.compile(r'[ \t]*(?:(`+)([\w./-]+)\1|([\w./-]+))').match(text, offset)
 
 def parameters(current_branch, payload):
-    text=instructions(payload.get('instruction','')) if payload.get('instruction_origin','owner')=='owner' else ''
+    raw=instruction_lines(payload.get('instruction','')) if payload.get('instruction_origin','owner')=='owner' else ''
+    text=instructions(raw)
     original=text
     positive=[];negative=[]
     for match in re.finditer(r'\bmerge\s*=\s*(true|false)\b',text,re.I):
         (positive if match[1].casefold()=='true' else negative).append(match.span())
-    neg=r'\b(?:без\s+(?:merge|мерд?ж\w*)|не\s+(?:merge|мерд?ж\w*|см[е]?рд?ж\w*|вмерд?ж\w*)|without\s+merge|do\s+not\s+merge|don[’\x27]t\s+merge|no\s+merge)\b'
+    neg=r'\b(?:без\s+(?:merge|мерд?ж\w*|слияния)|не\s+(?:merge|мерд?ж\w*|см[е]?рд?ж\w*|вмерд?ж\w*|соль[её]м|слей|сливай|сливать|слить)|without\s+merge|do\s+not\s+merge|don[’\x27]t\s+merge|no\s+merge)\b'
     negative+= [m.span() for m in re.finditer(neg,text,re.I)]
     scrub=list(text)
     for start,end in negative:
         scrub[start:end]=' '*(end-start)
     affirmative=''.join(scrub)
     natural_original=''.join(' ' if a==' ' and b!=' ' else b for a,b in zip(affirmative,original))
-    pos=r'\b(?:with\s+merge|с\s+(?:merge|мерд?жем)|(?:затем\s+)?(?:см[е]?рд?жи|смржи|вмерд?жи)(?:ть)?|then\s+merge)\b'
+    action=r'(?:см[е]?рд?жи(?:ть)?|смржи|вмерд?жи(?:ть)?|соль[её]м|слей|сливай|слить)'
+    pos=r'\b(?:with\s+merge|с\s+(?:merge|мерд?жем)|(?:затем\s+)?'+action+r'|then\s+merge)\b'
     positive+=[m.span() for m in re.finditer(pos,affirmative,re.I)]
     if 'merge' in payload:
         if type(payload['merge']) is not bool:raise ReviewError('merge requires a boolean')
@@ -81,12 +108,23 @@ def parameters(current_branch, payload):
     choices={'source_branch':[], 'target_branch':[]}
     for key in choices:
         if payload.get(key):choices[key].append(payload[key])
-        choices[key]+=[m[1] for m in re.finditer(r'\b'+key+r'\s*=\s*([\w./-]+)',original,re.I)]
-    pair=re.search(r'(?:\bиз|\bfrom)\s+([\w./-]+)\s+(?:в|to|into)\s+([\w./-]+)',original,re.I)
-    if pair:
-        choices['source_branch'].append(pair[1]);choices['target_branch'].append(pair[2])
-    target=re.search(r'(?:см[е]?рд?жи|смржи|вмерд?жи|then\s+merge|with\s+merge|мерд?жем)\s+(?:в|into|to)\s+([\w./-]+)',natural_original,re.I)
-    if target:choices['target_branch'].append(target[1])
+        for match in re.finditer(r'\b'+key+r'[ \t]*=',original,re.I):
+            operand=branch_operand(raw,match.end())
+            if not operand:raise ReviewError('An explicit named '+key+' is required')
+            choices[key].append(operand[2] or operand[3])
+    for match in re.finditer(r'\b(?:из|from)\b(?=[ \t])',original,re.I):
+        source=branch_operand(raw,match.end())
+        if source is None:continue
+        destination=re.compile(r'[ \t]+(?:в|to|into)\b',re.I).match(original,source.end())
+        if destination is None:continue
+        target=branch_operand(raw,destination.end())
+        if not target:raise ReviewError('An explicit named target branch is required')
+        choices['source_branch'].append(source[2] or source[3]);choices['target_branch'].append(target[2] or target[3])
+    target_clause=r'\b(?:'+action+r'|then\s+merge|with\s+merge|мерд?жем)(?:[ \t]+(?:эту[ \t]+)?ветку)?[ \t]+(?:в|into|to)\b'
+    for match in re.finditer(target_clause,natural_original,re.I):
+        target=branch_operand(raw,match.end())
+        if not target:raise ReviewError('An explicit named target branch is required')
+        choices['target_branch'].append(target[2] or target[3])
     result={}
     for key,default in [('source_branch',current_branch),('target_branch','develop')]:
         values=set(choices[key])
@@ -96,7 +134,8 @@ def parameters(current_branch, payload):
     if result['source_branch']==result['target_branch']:raise ReviewError('Source and target branches differ')
     result['merge']=bool(positive)
     result['merge_explicit']=bool(positive or negative)
-    result['authorization']={'pr':payload.get('instruction_origin','owner')=='owner','merge':bool(positive),'origin':payload.get('instruction_origin','owner'),'instruction_digest':digest(text)}
+    result['target_explicit']=bool(choices['target_branch'])
+    result['authorization']={'pr':payload.get('instruction_origin','owner')=='owner','merge':bool(positive),'origin':payload.get('instruction_origin','owner'),'instruction_digest':digest(text),'target_branch':result['target_branch']}
     return result
 
 def preflight(root,payload):
@@ -139,14 +178,31 @@ def decision_acceptance(store,record,snapshot,reference,expected):
     if accepted not in receipts:receipts.append(deepcopy(accepted))
     return result
 
-def reconcile(record,snapshot):
+def reconcile(record,snapshot,*,retarget=None):
     record=deepcopy(record)
     for key in ['repo_id','remote','remote_id','source_branch']:
         if record['identity'].get(key)!=snapshot.get(key):raise ReviewError('Publication repository/source identity conflict')
+    previous_target=record['identity']['target_branch']
+    target_changed=previous_target!=snapshot['target_branch']
+    if target_changed:
+        authorization=(retarget or {}).get('authorization',{})
+        if not ((retarget or {}).get('target_explicit') and authorization.get('origin')=='owner'
+                and authorization.get('pr') and authorization.get('target_branch')==snapshot['target_branch']):
+            raise ReviewError('Publication retarget requires its explicit identity and a current owner instruction for the new target')
+        previous=deepcopy(record['authorization']);previous.setdefault('target_branch',previous_target)
+        record.setdefault('authorization_history',[]).append(previous)
+        record['authorization']=deepcopy(authorization)
     pr=snapshot.get('pr')
     if record.get('pr') and pr and record['pr']['id']!=pr['id']:raise ReviewError('Existing PR identity conflict')
     if pr:record['pr']=pr
-    changed=record['identity']!=identity(snapshot) or record.get('snapshot_key')!=review_key(snapshot)
+    current_identity=identity(snapshot)
+    changed=record['identity']!=current_identity or record.get('snapshot_key')!=review_key(snapshot)
+    if record['identity']!=current_identity:
+        for finding in record.get('findings',{}).values():
+            if finding.get('status') in {'verified-fixed','dismissed'}:
+                finding['status']='open'
+                for key in ('verified_head','verification_evidence','dismissal_reason'):
+                    finding.pop(key,None)
     record['identity']=identity(snapshot);record['snapshot_key']=review_key(snapshot)
     if snapshot.get('state')=='CLOSED':
         record['status']='blocked';record['blocked_reason']='The selected PR is closed without merge';return record
@@ -175,7 +231,7 @@ def reviewed(record,snapshot,payload):
             raise ReviewError('Actionable finding requires location, cause, consequence and severity')
     ledger=record.setdefault('findings',{})
     for finding in findings:ledger[finding['id']]=deepcopy(finding)
-    unresolved=[f for f in ledger.values() if f.get('status','open') not in {'verified-fixed','dismissed'}]
+    unresolved=[f for f in ledger.values() if not finding_verified(f,snapshot)]
     # A claimed fix requires independently recorded verification of the current revision.
     if any(f.get('status') in {'verified-fixed','dismissed'} and (f.get('verified_head')!=snapshot['head'] or not f.get('verification_evidence')) for f in findings):
         raise ReviewError('Fixed finding requires current-head verification evidence')
@@ -183,6 +239,12 @@ def reviewed(record,snapshot,payload):
     record['review']={'key':review_key(snapshot),'head':snapshot['head'],'base_oid':snapshot['base_oid'],'findings':findings,'unresolved':len(unresolved),'independent_approval':False,'evidence':payload.get('evidence',[])}
     record['rounds']=record.get('rounds',[])+[deepcopy(record['review'])]
     return record
+
+
+def finding_verified(finding,snapshot):
+    return (finding.get('status') in {'verified-fixed','dismissed'}
+            and finding.get('verified_head')==snapshot['head'] and bool(finding.get('verification_evidence')))
+
 
 REVIEW_OPERATION='skill-tree-pr-review-cycle'
 REVIEW_PHASES={'before':'before','during':'during','after':'after','before-review':'before','after-core-inspection':'during','before-pr-ready':'after'}
@@ -412,7 +474,7 @@ def ready(record,snapshot,*,store=None):
         _review_requirement_admission(store,record,snapshot);hook_admission(store,record,snapshot)
     if not record.get('pr') or not record['pr'].get('id') or not record['pr'].get('url'):raise ReviewError('PR readiness requires the existing provider PR identity and URL')
     review=record.get('review')
-    if not review or review['key']!=review_key(snapshot) or review['unresolved'] or any(f.get('status','open') not in {'verified-fixed','dismissed'} for f in record.get('findings',{}).values()):
+    if not review or review['key']!=review_key(snapshot) or review['unresolved'] or any(not finding_verified(f,snapshot) for f in record.get('findings',{}).values()):
         raise ReviewError('Current full review or actionable finding verification remains incomplete')
     if any(not t.get('resolved') and (t.get('required') or t.get('actionable')) for t in snapshot.get('threads',[])):
         raise ReviewError('Mandatory/actionable PR discussions remain unresolved')
@@ -427,7 +489,8 @@ def merge_gate(record,snapshot,*,store=None):
     record=ready(record,snapshot,store=store)
     if record['status']=='merged':return record
     authorization=record['authorization']
-    if not authorization.get('merge') or not authorization.get('pr') or authorization.get('origin')!='owner':raise ReviewError('Merge lacks explicit owner authorization')
+    if (not authorization.get('merge') or not authorization.get('pr') or authorization.get('origin')!='owner'
+            or authorization.get('target_branch')!=snapshot['target_branch']):raise ReviewError('Merge lacks explicit owner authorization for the current target')
     if snapshot.get('approvals_known') is not True:raise ReviewError('Required approval policy is unknown')
     if snapshot.get('approvals_required') and not snapshot.get('approved'):raise ReviewError('External approval requirements remain unsatisfied')
     if snapshot.get('mergeable')!='MERGEABLE':raise ReviewError('Merge conflict or unknown mergeability')
@@ -564,10 +627,11 @@ def main(argv=None):
                     if args.command=='init':
                         params=parameters(snapshot['source_branch'],payload)
                         if params['source_branch']!=snapshot['source_branch'] or params['target_branch']!=snapshot['target_branch']:raise ReviewError('Publication parameter/snapshot identity conflict')
-                        result=reconcile(record,snapshot) if record else new_record(snapshot,params)
+                        retarget=bool(record and record['identity']['target_branch']!=snapshot['target_branch'])
+                        result=reconcile(record,snapshot,retarget=params if args.publication_id else None) if record else new_record(snapshot,params)
                         result['publication_id']=key
                         if prepared_review and 'review_requirements' not in result:result['review_requirements']=_frozen_review_requirements(store,prepared_review)
-                        if record and params['merge_explicit']:
+                        if record and not retarget and params['merge_explicit']:
                             result.setdefault('authorization_history',[]).append(deepcopy(result['authorization']))
                             result['authorization']=params['authorization']
                     else:

@@ -67,6 +67,7 @@ test('static inspection stays resolvable on an owned legacy profile and appears 
  const legacyCapabilities = JSON.parse(fs.readFileSync(config));
  delete legacyCapabilities.built_in_recipes;
  fs.writeFileSync(config, JSON.stringify(legacyCapabilities));
+ fs.appendFileSync(path.join(legacySource, 'lib/plugin-composition.js'), '\n// Prior owned composition bytes.\n');
 
  const legacy = run(root, [...inspectionSelection, '--source', legacySource]);
  assert.equal(legacy.status, 0, legacy.stdout + legacy.stderr);
@@ -95,6 +96,7 @@ test('invalid manager combinations reject before writes while explicit rollback 
  }
  const rolled=spawnSync(process.execPath,[entry,'--rollback'],{encoding:'utf8',timeout:15000});assert.equal(rolled.status,0,rolled.stderr);
  assert.ok(!fs.existsSync(path.join(root,'.skill-tree/installation/profile.json')));
+ assert.equal(run(root).status,0);assert.equal(run(root,['--verify']).status,0);
 });
 test('installed release version matches the bundled source and forged receipt versions fail verification',t=>{
  const root=setup(t);assert.equal(run(root).status,0);
@@ -114,12 +116,23 @@ test('noninteractive missing flavor, global, symlink and upstream specialization
 test('owned no-op is verified; dry-run reports conflicts without writes',t=>{const root=setup(t);assert.equal(run(root).status,0);const profile=path.join(root,'.skill-tree/installation/profile.json'),before=fs.readFileSync(profile,'utf8');assert.match(run(root).stdout,/current|no-op/);assert.equal(fs.readFileSync(profile,'utf8'),before);fs.writeFileSync(path.join(root,'.agents/skills/skill-tree-add-pending-task/extra.txt'),'local');const r=run(root,['--dry-run','--force']);assert.notEqual(r.status,0);assert.equal(fs.readFileSync(profile,'utf8'),before);});
 test('interrupted replacement rolls forward from the journal and preserves unrelated content',t=>{
  const root=setup(t),manager=require('../lib/installation.js');assert.equal(run(root).status,0);
- fs.writeFileSync(path.join(root,'unrelated.txt'),'keep');fs.writeFileSync(path.join(root,'package.json'),JSON.stringify({scripts:{test:'node --test'}}));
- const original=fs.renameSync;let count=0;
- fs.renameSync=(...args)=>{count++;if(count===2)throw Error('fixture interruption');return original(...args);};
- try{assert.throws(()=>manager.refresh(fs.realpathSync(root),path.resolve(__dirname,'..')),/fixture interruption/);}finally{fs.renameSync=original;}
+ fs.writeFileSync(path.join(root,'unrelated.txt'),'keep');
+ const source=path.resolve(__dirname,'..'),name='skill-tree-add-pending-task';
+ const original=fs.renameSync;
+ fs.renameSync=()=>{throw Error('fixture interruption');};
+ try{assert.throws(()=>manager.install(fs.realpathSync(root),source,'general',[{rel:'.claude/skills/'+name,name,provider:'claude-code'}]),/fixture interruption/);}finally{fs.renameSync=original;}
  assert.ok(fs.existsSync(path.join(root,'.skill-tree/installation/.journal.json')));
- manager.locked(fs.realpathSync(root),()=>{});assert.equal(run(root,['--verify']).status,0);assert.equal(fs.readFileSync(path.join(root,'unrelated.txt'),'utf8'),'keep');
+ const entry=path.join(root,'.skill-tree/installation/manager.js'),before=manager.treeHash(root,'.skill-tree');
+ manager.verifyOwned(root,manager.receipt(fs.realpathSync(root),true));
+ for(const flags of [['--verify'],['--rollback']]){
+  const rejected=spawnSync(process.execPath,[entry,...flags],{encoding:'utf8',timeout:15000});
+  assert.notEqual(rejected.status,0);assert.match(rejected.stderr,/recovery/i);
+  assert.equal(manager.treeHash(root,'.skill-tree'),before);
+ }
+ const recovered=spawnSync(process.execPath,[entry,'--recover'],{encoding:'utf8',timeout:15000});
+ assert.equal(recovered.status,0,recovered.stderr);assert.equal(run(root,['--verify']).status,0);
+ assert.ok(fs.existsSync(path.join(root,'.claude/skills',name,'SKILL.md')));
+ assert.equal(fs.readFileSync(path.join(root,'unrelated.txt'),'utf8'),'keep');
 });
 test('flavor switch updates all owned packages; stopped pending validation survives refresh and rollback',t=>{
  const root=setup(t);assert.equal(run(root).status,0);

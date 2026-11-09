@@ -756,7 +756,14 @@ fs.writeFileSync(file,JSON.stringify(operations,null,2)+'\n');"""
         for field,value in [('head','c'*40),('base_oid','e'*40),('target_branch','release/fixture')]:
             self.install();self.core_review();self.complete(self.start())
             self.snapshot[field]=value
-            self.cli('observe');self.core_review();self.held()
+            if field=='target_branch':
+                self.cli('observe',ok=False)
+                changed=self.cli('init',target_branch=value,instruction='Synthetic owner explicitly retargets the existing publication.')
+                self.assertFalse(changed['authorization']['merge'])
+                self.assertEqual(changed['authorization_history'][-1]['target_branch'],'develop')
+            else:
+                self.cli('observe')
+            self.core_review();self.held()
 
     def test_findings_cannot_be_accepted_without_current_core_resolution(self):
         self.install();self.core_review();returned,_=self.returned(self.start(),'findings',

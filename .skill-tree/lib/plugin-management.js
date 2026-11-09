@@ -324,6 +324,7 @@ function managementInventory(root, {source = path.resolve(__dirname, '..'), host
   if (knownIssue) {
     view.known = {status: 'unavailable', entries: []};
     view.issues.push(knownIssue);
+    if (view.status === 'ok') view.status = 'drift';
   }
   const bundled = path.resolve(source) === path.resolve(root, '.skill-tree/installation/source');
   if (bundled && !catalogDiagnostic) {
@@ -529,6 +530,22 @@ function managerBindingChange(base, request, catalog) {
   return lifecycle;
 }
 
+function bindingReadiness(row, record) {
+  if (!row.enabled) return 'The occurrence remains disabled.';
+  if (row.condition === false) return 'The condition excludes this occurrence.';
+  if (row.location.status !== 'resolved') return 'The configured location is unresolved.';
+  const runtime = require('./plugin-runtime.js');
+  runtime.invocationPolicy(record);
+  if (row.location.boundary_id === 'skill-tree-process-future-pending:after') {
+    const application = runtime.processingApplication(row, record);
+    if (application) return 'An enabled matching ' + application.role + ' occurrence requires current clarification, applicable rechecks and current-mode acceptance before implementation.';
+  }
+  if (row.operation === 'skill-tree-pr-review-cycle') {
+    return 'An enabled matching occurrence must complete for the current review identity before PR readiness.';
+  }
+  return 'A matching configured occurrence may participate in the later authorized workflow.';
+}
+
 function managerLifecyclePreview(action, proposal, operations) {
   const issues = [];
   const {rows} = rowsFor(proposal, operations, issues);
@@ -544,8 +561,7 @@ function managerLifecyclePreview(action, proposal, operations) {
     })),
     bindings: rows.map(row => ({
       ...row,
-      readiness: row.enabled ? proposal.packages[row.plugin_id].metadata?.application_policy?.readiness_effect ??
-        'A matching configured occurrence may participate in the later authorized workflow.' : 'The occurrence remains disabled.',
+      readiness: bindingReadiness(row, proposal.packages[row.plugin_id]),
     })),
   };
 }
@@ -609,7 +625,8 @@ async function prepareManagerRequest(root, request, options = {}) {
   const scope = managerScope(root);
   const selections = options.selections ?? [];
   assertManagerSelections(scope, selections, options.expectedFlavor);
-  const known = readKnown(root);
+  const sourceAction = ['install', 'update', 'save-known', 'forget-known'].includes(request.action);
+  const known = sourceAction ? readKnown(root) : null;
   const {catalog: knownCatalog} = managerCatalog(source);
   const operations = managerOperationsFor(root);
   const catalog = {...knownCatalog, anchors: require('./plugin-composition.js').createCatalog(operations)};

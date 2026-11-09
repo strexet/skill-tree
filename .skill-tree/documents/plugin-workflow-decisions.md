@@ -28,7 +28,7 @@ The owner requires a project-local registry showing installed plugin IDs, exact 
 
 The management task supplies a documented exact-ID removal command with affected package/binding preview and guarded lifecycle removal. Unknown identities, ownership drift, remaining dependents and parked-run requirements receive explicit outcomes. Removal preserves core packages, unrelated files and historical receipts. Removing a required plugin never establishes successful invocation or silently changes frozen run configuration.
 
-## Remaining research deliverables
+## Research deliverables
 
 The market study owns the current ecosystem map, justified shortlist and bounded comparison plan. Comparative qualification owns observed outcomes and recommendation eligibility. The workflow design task owns concrete proposals for additional stages or operation splits; new structural changes require actual owner agreement. Research deliverables do not presume favorable plugin outcomes or universal host compatibility.
 
@@ -58,7 +58,7 @@ The automatic review/fix cycle separates the reviewer, resolver and executor rol
 
 Processed Pending `P-09b5b828-dcdc-4d06-bee1-19e1787e34f4` supplies provenance for required foundation tasks `T-29ef78b9-d808-4f85-b6c8-3d768edf3a99` (Auto/Manual state and authority) and `T-43931d2c-5bb5-4eca-8ba8-069c503b2cda` (core decision actors, internal phases and qualification). The [processing record](../history/research/plugin-plan-future-transfer.json) preserves the handoff; canonical Future owns exact consumer dependencies and current progress. The design task contains no workflow implementation. The completed manual clarification controller and original contracts retain immutable terminal evidence.
 
-| Unfinished consumer | Required specification alignment before implementation |
+| Consumer at W1 handoff | Required specification alignment before implementation |
 | --- | --- |
 | Composition `T-a9d7a827-fb25-4348-bcf7-867a449c58ef` | Standalone operations carry W1 modes, internal phases and authority routing. Core-only operations receive approved core W1 behavior; optional plugins create no unrelated global obligation. |
 | Invocation `T-dae414c5-43e4-45db-a6f3-4ce4112440c5` | Inputs and receipts bind mode, delegation, actual actor/role evidence and explicit mode-switch history while retaining current-source and frozen-scope guards. |

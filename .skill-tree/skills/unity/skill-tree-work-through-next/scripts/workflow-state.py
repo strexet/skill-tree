@@ -1312,7 +1312,11 @@ def local_delivery_action(store, action, payload):
             if action == 'merge' and head == prepared['target_head']:
                 workspaces.local_preflight_collisions(store.root, prepared['incoming'], dirt)
                 _delivery_writer_barrier(store, owner)
-                workspaces.run_local_merge(store.root, prepared['source_head'])
+                with store.lock(local_delivery=owner):
+                    _delivery_install_barrier(store.root)
+                    if file_hash(store.state) != before:
+                        raise WorkflowError('Canonical workflow changed before local integration')
+                    workspaces.run_local_merge(store.root, store.source_root, prepared)
                 _, head, _ = _delivery_preflight(store, state, run, prepared)
             merge = workspaces.local_merge_receipt(store.root, prepared, head)
             if action in ('merge', 'reconcile'):

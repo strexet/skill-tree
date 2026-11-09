@@ -254,6 +254,63 @@ class LocalDeliveryTests(unittest.TestCase):
         self.assertEqual((self.root / relative).read_text(), 'ignored target bytes\n')
         self.assert_pending()
 
+    def test_target_checkout_change_between_preflight_and_merge_never_writes_another_branch(self):
+        self.run_local()
+        prepared = self.action('prepare')['local_integration']['preparation']
+        original_policy = ws.local_git_policy
+
+        def switch_before_git_locks(root):
+            original_policy(root)
+            self.git(root, 'switch', '-c', 'other')
+
+        with patch.object(ws, 'local_git_policy', side_effect=switch_before_git_locks):
+            with self.assertRaisesRegex(ws.RunError, 'prepared target branch or head changed'):
+                self.action('merge')
+        self.assertEqual(self.git(self.root, 'branch', '--show-current'), 'other')
+        self.assertEqual(self.git(self.root, 'rev-parse', 'HEAD'), prepared['target_head'])
+        self.assertEqual((self.root / 'source.py').read_text(), 'value = 1\n')
+        self.assertFalse((self.root / '.git/index.lock').exists())
+        self.assert_pending()
+
+    def test_target_ref_movement_after_locked_preflight_fails_before_checkout(self):
+        self.run_local()
+        prepared = self.action('prepare')['local_integration']['preparation']
+        original_transaction = ws.local_ref_transaction
+        moved = self.git(self.root, 'commit-tree', prepared['target_head'] + '^{tree}',
+                         '-p', prepared['target_head'], '-m', 'Competing exact ref update')
+
+        def move_before_ref_lock(*args):
+            self.git(self.source, 'update-ref', prepared['target_ref'], moved, prepared['target_head'])
+            return original_transaction(*args)
+
+        with patch.object(ws, 'local_ref_transaction', side_effect=move_before_ref_lock):
+            with self.assertRaisesRegex(ws.RunError, 'exact local source or target ref'):
+                self.action('merge')
+        self.assertEqual(self.git(self.root, 'rev-parse', 'HEAD'), moved)
+        self.assertEqual((self.root / 'source.py').read_text(), 'value = 1\n')
+        self.assertFalse((self.root / '.git/index.lock').exists())
+        self.assert_pending()
+
+    def test_symbolic_target_alias_at_same_tip_fails_before_checkout(self):
+        self.run_local()
+        prepared = self.action('prepare')['local_integration']['preparation']
+        original_transaction = ws.local_ref_transaction
+        alias = 'refs/heads/alias-tip'
+        self.git(self.source, 'update-ref', alias, prepared['target_head'])
+
+        def alias_before_ref_lock(*args):
+            self.git(self.source, 'symbolic-ref', prepared['target_ref'], alias)
+            return original_transaction(*args)
+
+        with patch.object(ws, 'local_ref_transaction', side_effect=alias_before_ref_lock):
+            with self.assertRaisesRegex(ws.RunError, 'direct prepared Git branch refs'):
+                self.action('merge')
+        self.assertEqual(self.git(self.root, 'symbolic-ref', prepared['target_ref']), alias)
+        self.assertEqual(self.git(self.root, 'rev-parse', 'HEAD'), prepared['target_head'])
+        self.assertEqual((self.root / 'source.py').read_text(), 'value = 1\n')
+        self.assertFalse((self.root / '.git/index.lock').exists())
+        self.assert_pending()
+
     def test_owned_merge_disables_autostash_and_preserves_owned_dirt(self):
         self.run_local(owned_dirty=True)
         owned = (self.root / OWNED_FILE).read_bytes()

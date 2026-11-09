@@ -36,6 +36,21 @@ test('declared sibling resources and nested relative links form a closed source 
  const s=await api.resolveSource(descriptor(root,{entry:'skills/wrapper/SKILL.md',dependencies:['skills/grilling/SKILL.md']}));
  assert.deepEqual(Object.keys(s.files).sort(),['skills/grilling/SKILL.md','skills/wrapper/SKILL.md','skills/wrapper/references/detail.md','skills/wrapper/references/main.md']);
 });
+test('Markdown links preserve referenced files and skip literal code and comments',async t=>{
+ const markdown=[
+  'Read [the instructions][Main Notes], [Shortcut], ![Diagram][], and [version](references/v2(guide).md "Guide").',
+  'These are inline examples: `[literal](missing-inline.md)` and `<!-- literal comment marker`.',
+  '', '```markdown', '[literal](missing-fenced.md)', '[Fake]: missing-example.md', '<!-- literal comment marker', '```',
+  '', '~~~markdown', '[literal][unused]', '~~~',
+  '', '<!--', '[comment](missing-comment.md)', '```literal fence marker', '-->',
+  '', '[main notes]: <references/main notes.md#details>', '[shortcut]:', '  references/shortcut.md',
+  '[diagram]: assets/diagram.png', '[unused]: missing-unused.md',
+ ].join('\n');
+ const files={'SKILL.md':markdown,'references/main notes.md':'# Notes','references/shortcut.md':'# Shortcut','references/v2(guide).md':'# Guide','assets/diagram.png':Buffer.from([0,255,128])};
+ const snapshot=await api.resolveSource(descriptor(fixture(t,files)));
+ assert.deepEqual(Object.keys(snapshot.files).sort(),Object.keys(files).sort());
+ assert.deepEqual(snapshot.files['assets/diagram.png'],files['assets/diagram.png']);
+});
 test('nonstandard instruction content retains upstream bytes and a separate adaptation overlay',async t=>{
  const bytes=Buffer.from('Custom instructions without YAML.\n'),root=fixture(t,{'guide.txt':bytes}),s=await api.resolveSource(descriptor(root,{entry:'guide.txt',adapter:{mode:'source-backed',instructions:'Use as bounded context.'}}));
  assert.deepEqual(s.files['guide.txt'],bytes);assert.equal(s.adaptation.instructions,'Use as bounded context.');assert.equal(s.metadata.frontmatter,null);

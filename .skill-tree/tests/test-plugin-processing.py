@@ -529,12 +529,14 @@ class PluginProcessingTests(unittest.TestCase):
         self.assert_released(initial,session,[chain])
         self.assertEqual(len(chain['attempts']),1)
 
-    def run_interview_rework(self,final_editor):
+    def run_interview_rework(self,final_editor,matching_editor=True):
         rows=[self.row(key,role) for key,role in zip(BINDINGS,ROLES)]
         if final_editor:
             rows.append(self.row(FINAL_EDITOR,'task-editorial'))
         self.install(rows=rows)
         override={BINDINGS[0]:{'values':{'fixture_marker':'frozen-run-a'},'instructions':'Explicit run wording for A.'}}
+        if final_editor and matching_editor:
+            override[FINAL_EDITOR]=override[BINDINGS[0]]
         receipt,published=self.process(run_overrides=override)
         tid=receipt['created_ids'][0]
         initial=published['tasks'][0]
@@ -583,7 +585,7 @@ class PluginProcessingTests(unittest.TestCase):
         initial,session,main=self.run_interview_rework(final_editor=True)
         main,private_c=self.returned(main)
         self.assertEqual(private_c['binding_id'],FINAL_EDITOR)
-        self.assertEqual(private_c['parameters']['fixture_marker'],FINAL_EDITOR)
+        self.assertEqual(private_c['parameters']['fixture_marker'],'frozen-run-a')
         self.assertIn('Preserve explicit interview outcome.',private_c['context']['body'])
         self.assertIn('recorded interview scope.',private_c['context']['body'])
         main=self.accept(main)
@@ -595,6 +597,28 @@ class PluginProcessingTests(unittest.TestCase):
         self.assertEqual([stage['binding_id'] for stage in main['stages']],list(BINDINGS)+[FINAL_EDITOR])
         self.assertEqual(len(main['attempts']),3)
         self.assertEqual(len({attempt['actor']['context_id'] for attempt in main['attempts'].values()}),3)
+
+    def test_later_editor_with_different_parameters_does_not_discharge_affected_first_editor(self):
+        initial,session,main=self.run_interview_rework(final_editor=True,matching_editor=False)
+        main,private_c=self.returned(main)
+        self.assertEqual(private_c['binding_id'],FINAL_EDITOR)
+        self.assertEqual(private_c['parameters']['fixture_marker'],FINAL_EDITOR)
+        main=self.accept(main)
+        session=self.session(session['id'])
+        session=self.cl(session,'clarify-round',clarity=self.clarity())
+        self.assert_rejected_without_writes(lambda:self.confirm(session))
+        session=self.cl(session,'clarify-processing-recheck',origin_binding_id=BINDINGS[0])
+        mandate=next(iter(session['processing_requirements']['rechecks'].values()))
+        derived=self.hook_start(session,request_id=mandate['request_id'],event=mandate['event'],context=mandate['context'])
+        derived,private_a=self.returned(derived)
+        self.assertEqual(private_a['binding_id'],BINDINGS[0])
+        self.assertEqual(private_a['parameters']['fixture_marker'],'frozen-run-a')
+        self.assertEqual(private_a['extra_instructions'],'Explicit run wording for A.')
+        derived=self.accept(derived)
+        if derived['state']!='complete':
+            derived=self.hook(derived,'prepare')
+        session=self.confirm(self.session(session['id']))
+        self.assert_released(initial,session,[main,derived])
 
     def test_a_b_without_c_rechecks_only_affected_a_and_preserves_main_chain(self):
         initial,session,main=self.run_interview_rework(final_editor=False)

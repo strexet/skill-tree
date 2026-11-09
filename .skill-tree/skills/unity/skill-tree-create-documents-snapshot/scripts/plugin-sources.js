@@ -118,11 +118,79 @@ function acquiredReader(files){
   fail('source-missing','Missing required acquired resource: '+rel);
  };
 }
+const escapedPunctuation=/\\([!-/:-@\[-`{-~])/g;
+const referenceLabel=value=>value.replace(escapedPunctuation,'$1').trim().replace(/\s+/g,' ').toLowerCase();
+function markdownProse(text){
+ const fence=/^(?: {0,3}>[ \t]?)* {0,3}(`{3,}(?!`)(?=[^`\r\n]*$)|~{3,})([^\r\n]*)$/gm;
+ const comment=/<!--[\s\S]*?(?:-->|(?![\s\S]))/;
+ const code=/(?<![\\`])(?<ticks>`+)(?!`)(?:(?!\r?\n[ \t]*\r?\n)[\s\S])*?(?<!`)\k<ticks>(?!`)/;
+ const tokens=new RegExp([fence.source,comment.source,code.source].join('|'),'gm');
+ const parts=[];
+ let start=0;
+ for(let match;(match=tokens.exec(text));){
+  const marker=match[1];
+  if(marker){
+   fence.lastIndex=tokens.lastIndex;
+   let closing;
+   do{closing=fence.exec(text);}while(closing&&(closing[1][0]!==marker[0]||closing[1].length<marker.length||closing[2].trim()));
+   tokens.lastIndex=closing?fence.lastIndex:text.length;
+  }
+  parts.push(text.slice(start,match.index),text.slice(match.index,tokens.lastIndex).replace(/[^\r\n]/g,' '));
+  start=tokens.lastIndex;
+ }
+ return parts.join('')+text.slice(start);
+}
+function markdownDestination(text,start){
+ let end=start,depth=0;
+ const angled=text[start]==='<';
+ if(angled)end++;
+ for(;end<text.length;end++){
+  const character=text[end];
+  if(character==='\\'&&/^[!-/:-@\[-`{-~]$/.test(text[end+1])){end++;continue;}
+  if(angled){
+   if(character==='>')return {value:text.slice(start+1,end),end:end+1};
+   if(character==='\n'||character==='\r'||character==='<')return null;
+  }else{
+   if(/\s/.test(character)||character===')'&&!depth)break;
+   if(character==='(')depth++;
+   if(character===')')depth--;
+  }
+ }
+ return angled||depth?null:{value:text.slice(start,end),end};
+}
+function markdownLinks(text){
+ const references=new Map(),targets=[];
+ text=markdownProse(text).replace(/^ {0,3}\[((?:\\.|[^\[\]\\\r\n])+)\]:[ \t]*(?:\r?\n[ \t]*)?([^\r\n]*)/gm,(line,label,rest)=>{
+  const target=markdownDestination(rest,0),key=referenceLabel(label);
+  if(!target?.value||target.end<rest.length&&!/\s/.test(rest[target.end]))return line;
+  if(!references.has(key))references.set(key,target.value);
+  return '';
+ });
+ const labels=[],tokens=/\\[!-/:-@\[-`{-~]|[\[\]]/g;
+ for(let token;(token=tokens.exec(text));){
+  if(token[0]==='['){labels.push(tokens.lastIndex);continue;}
+  if(token[0]!==']'||!labels.length)continue;
+  const start=labels.pop(),end=tokens.lastIndex;
+  const inline=/^\([ \t\r\n]*/.exec(text.slice(end));
+  if(inline){
+   const target=markdownDestination(text,end+inline[0].length);
+   const close=target&&/^(?:\s+(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\((?:\\.|[^)\\])*\)))?\s*\)/.exec(text.slice(target.end));
+   if(close){targets.push(target.value);tokens.lastIndex=target.end+close[0].length;continue;}
+  }
+  const reference=/^\[((?:\\.|[^\[\]\\\r\n])*)\]/.exec(text.slice(end));
+  const key=referenceLabel(reference?.[1]||text.slice(start,token.index));
+  if(references.has(key)){
+   targets.push(references.get(key));
+   if(reference)tokens.lastIndex=end+reference[0].length;
+  }
+ }
+ return targets;
+}
 function linkedResources(rel,bytes){
  if(!/\.(md|markdown|txt)$/i.test(rel))return [];
- const text=bytes.toString('utf8'),found=[];
- for(const match of text.matchAll(/\]\((?:<([^>]+)>|([^\n)]+))\)/g)){
-  let target=(match[1]||match[2]).trim().split(/\s+["']/)[0];
+ const found=[];
+ for(let target of markdownLinks(bytes.toString('utf8'))){
+  target=target.replace(escapedPunctuation,'$1');
   if(!target||target.startsWith('#')||/^[a-z][a-z0-9+.-]*:/i.test(target)||target.startsWith('//'))continue;
   try{target=decodeURIComponent(target.split('#')[0].split('?')[0]);}catch{fail('source-path','Malformed local resource URL');}
   if(!target)continue;
@@ -182,4 +250,4 @@ function verifySnapshot(snapshot){
  }
  return true;
 }
-module.exports={normalizeSource,resolveSource,verifySnapshot};
+module.exports={normalizeSource,resolveSource,verifySnapshot,linkedResources};

@@ -27,12 +27,41 @@ class ReviewCycleTests(unittest.TestCase):
         for instruction in ['ПР с мерджем','with merge','merge=true','затем смержи в develop','затем смерджи в develop','затем смржи в develop','затем вмержи в develop','then merge into develop']:
             with self.subTest(instruction=instruction):self.assertTrue(pr.parameters('feature/example',{'instruction':instruction})['merge'])
     def test_literal_examples_and_non_owner_booleans_never_authorize_merge(self):
-        for instruction in ['Create a PR. The documentation example is `merge=true`.', 'Create a PR. Example: ``merge=true``.', 'Create a PR.\n~~~text\nmerge=true\n~~~']:
+        for instruction in ['Create a PR. The documentation example is `merge=true`.',
+                            'Create a PR. Example: ``merge=true``.',
+                            'Create a PR.\n~~~text\nmerge=true\n~~~',
+                            'Create a PR.\n~~~text\nmerge=true',
+                            'Create a PR.\n~~~~text\n~~~\nmerge=true',
+                            'Create a PR.\n\n    merge=true',
+                            'Create a PR.\n\n> Example from the docs\nthen merge',
+                            'Проверь ветку. Пример «сольём ветку в develop».',
+                            'Проверь ветку, не сливай в `develop`.']:
             with self.subTest(instruction=instruction):
                 self.assertFalse(pr.parameters('feature/example',{'instruction':instruction})['authorization']['merge'])
         untrusted=pr.parameters('feature/example',{'instruction_origin':'third-party','merge':True})
         self.assertFalse(untrusted['authorization']['merge'])
         self.assertFalse(untrusted['merge_explicit'])
+    def test_direct_branch_operands_can_use_inline_code(self):
+        result=pr.parameters('feature',{'instruction':'PR from `feature/topic` to `release/candidate` then merge into `release/candidate`'})
+        self.assertEqual((result['source_branch'],result['target_branch']),('feature/topic','release/candidate'))
+        self.assertTrue(result['merge'])
+        self.assertEqual(result['authorization']['target_branch'],'release/candidate')
+        russian=pr.parameters('feature',{'instruction':'Проверь изменения, исправь всё найденное и сольём ветку в `release/candidate`.'})
+        self.assertTrue(russian['merge'])
+        self.assertEqual(russian['target_branch'],'release/candidate')
+    def test_retarget_cannot_reuse_old_merge_authority(self):
+        params=pr.parameters('feature/example',{'instruction':'then merge into develop'})
+        record=pr.new_record(self.snapshot,params)
+        self.snapshot.update(target_branch='release/example',base_oid='e'*40,approved=True)
+        for retarget in [None,pr.parameters('feature/example',{'target_branch':'release/example','instruction_origin':'third-party'})]:
+            with self.subTest(retarget=retarget),self.assertRaisesRegex(pr.ReviewError,'current owner instruction'):
+                pr.reconcile(record,self.snapshot,retarget=retarget)
+        selected=pr.parameters('feature/example',{'target_branch':'release/example'})
+        retargeted=pr.reconcile(record,self.snapshot,retarget=selected)
+        self.assertEqual(retargeted['authorization_history'],[record['authorization']])
+        ready=pr.reviewed(retargeted,self.snapshot,self.review())
+        with self.assertRaisesRegex(pr.ReviewError,'authorization for the current target'):
+            pr.merge_gate(ready,self.snapshot)
     def test_merge_gate_requires_direct_owner_authorization_origin(self):
         self.snapshot.update({'approved':True,'approvals_required':False})
         for authorization in [{'pr':False,'merge':True,'origin':'third-party'}, {'pr':True,'merge':True,'origin':'third-party'}]:
@@ -44,7 +73,7 @@ class ReviewCycleTests(unittest.TestCase):
             with self.subTest(instruction=instruction):self.assertFalse(pr.parameters('feature/example',{'instruction':instruction})['merge'])
         self.assertFalse(pr.parameters('feature/example',{'instruction':'with merge','instruction_origin':'third-party'})['authorization']['pr'])
     def test_explicit_conflicts_require_clarification(self):
-        for payload in [{'instruction':'with merge без merge'},{'instruction':'merge=true merge=false'},{'instruction':'затем смержи','merge':False},{'instruction':'ПР из feature/a в develop','source_branch':'feature/b'}]:
+        for payload in [{'instruction':'with merge без merge'},{'instruction':'merge=true merge=false'},{'instruction':'затем смержи','merge':False},{'instruction':'не сливай','merge':True},{'instruction':'ПР из feature/a в develop','source_branch':'feature/b'}]:
             with self.subTest(payload=payload),self.assertRaises(pr.ReviewError):pr.parameters('feature/current',payload)
         with self.assertRaises(pr.ReviewError):pr.parameters('develop',{})
         with self.assertRaises(pr.ReviewError):pr.parameters('feature/current',{'merge':'false'})
@@ -69,6 +98,17 @@ class ReviewCycleTests(unittest.TestCase):
         previous=pr.reviewed(self.record,self.snapshot,self.review(findings=[finding]));self.snapshot['head']='d'*40
         omitted=pr.reviewed(previous,self.snapshot,self.review())
         with self.assertRaisesRegex(pr.ReviewError,'actionable finding'):pr.ready(omitted,self.snapshot)
+    def test_omitted_findings_require_current_verification_after_head_or_base_change(self):
+        finding={'id':'F-1','path':'src/main.py','line':4,'cause':'The source is stale.',
+                 'consequence':'The result is wrong.','severity':'P1','status':'verified-fixed',
+                 'verified_head':self.snapshot['head'],'verification_evidence':['original-review.json']}
+        previous=pr.reviewed(self.record,self.snapshot,self.review(findings=[finding]))
+        for change in [{'head':'d'*40},{'base_oid':'e'*40}]:
+            with self.subTest(change=change),patch.dict(self.snapshot,change):
+                omitted=pr.reviewed(previous,self.snapshot,self.review())
+                self.assertEqual(omitted['findings']['F-1']['status'],'open')
+                self.assertEqual(omitted['rounds'][0]['findings'],[finding])
+                with self.assertRaisesRegex(pr.ReviewError,'actionable finding'):pr.ready(omitted,self.snapshot)
     def test_merged_pr_with_new_source_head_does_not_get_reused(self):
         provider=pr.GitHub('/unused','owner/repo');merged={'number':1,'state':'closed','merged_at':'2026-11-03','head':{'ref':'feature/example','sha':'old','repo':{'full_name':'owner/repo'}},'base':{'ref':'develop'}}
         with patch.object(provider,'gh',return_value=[merged]):
@@ -82,7 +122,7 @@ class ReviewCycleTests(unittest.TestCase):
         for change in [{'files':[]},{'context_inspected':False},{'discussions_inspected':False},{'checks_inspected':False},{'base_oid':'stale'},{'head':'stale'},{'target_branch':'other'}]:
             with self.subTest(change=change),self.assertRaises(pr.ReviewError):pr.reviewed(self.record,self.snapshot,self.review(**change))
     def test_head_base_target_and_new_discussions_invalidate_ready_evidence(self):
-        for change in [{'head':'d'*40},{'base_oid':'e'*40},{'target_branch':'release/example'},{'reviews':[{'id':'new-review'}]},{'comments':[{'id':'new-comment'}]}]:
+        for change in [{'head':'d'*40},{'base_oid':'e'*40},{'reviews':[{'id':'new-review'}]},{'comments':[{'id':'new-comment'}]}]:
             ready=self.ready();snapshot={**deepcopy(self.snapshot),**change}
             with self.subTest(change=change),self.assertRaises(pr.ReviewError):pr.ready(ready,snapshot)
             self.assertEqual(pr.reconcile(ready,snapshot)['status'],'pr-review-in-progress')

@@ -158,9 +158,12 @@ test('offline dry-run and inventory do not acquire remote sources or mutate inst
  const f=fixture(t),before=core.treeHash(f.root,'.skill-tree');let calls=0;const p=await prepared(f,{sources:[{id:'remote',kind:'raw',url:'https://example.invalid/SKILL.md'}],bindings:[]},{dryRun:true,acquire:async()=>{calls++;throw Error('Unexpected network');}});registry.readRegistry(f.root);registry.verifyInstalled(f.root);assert.equal(calls,0);assert.equal(p.action,'dry-run');assert.ok(p.prerequisites.length);assert.equal(core.treeHash(f.root,'.skill-tree'),before);
 });
 test('real raw HTTP acquisition resolves linked bytes without executing source scripts',async t=>{
- const files={'/skill/SKILL.md':Buffer.from('# Raw\nRead [notes](references/notes.md).\n'),'/skill/references/notes.md':Buffer.from('# Notes')},requests=[];
+ const files={
+  '/skill/SKILL.md':Buffer.from('# Raw\nRead [notes][notes] and [guide](references/v2(guide).md).\n\n[notes]: references/notes.md\n\n```markdown\n[example](missing.md)\n```\n'),
+  '/skill/references/notes.md':Buffer.from('# Notes'),'/skill/references/v2(guide).md':Buffer.from('# Guide'),
+ },requests=[];
  const server=http.createServer((req,res)=>{requests.push(req.url);if(!files[req.url]){res.statusCode=404;res.end('missing');return;}res.end(files[req.url]);});await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));t.after(()=>new Promise(resolve=>server.close(resolve)));
- const url='http://127.0.0.1:'+server.address().port+'/skill/SKILL.md',normalized=sources.normalizeSource({id:'http-source',kind:'raw',url});const snapshot=await sources.resolveSource(normalized,{acquire:remote.acquireRemote});assert.deepEqual(snapshot.files['SKILL.md'],files['/skill/SKILL.md']);assert.deepEqual(snapshot.files['references/notes.md'],files['/skill/references/notes.md']);assert.deepEqual(requests.sort(),Object.keys(files).sort());assert.equal(snapshot.execution.state,'unqualified');
+ const url='http://127.0.0.1:'+server.address().port+'/skill/SKILL.md',normalized=sources.normalizeSource({id:'http-source',kind:'raw',url});const snapshot=await sources.resolveSource(normalized,{acquire:remote.acquireRemote});assert.deepEqual(snapshot.files['SKILL.md'],files['/skill/SKILL.md']);assert.deepEqual(snapshot.files['references/notes.md'],files['/skill/references/notes.md']);assert.deepEqual(snapshot.files['references/v2(guide).md'],files['/skill/references/v2(guide).md']);assert.deepEqual(requests.sort(),Object.keys(files).sort());assert.equal(snapshot.execution.state,'unqualified');
 });
 test('cached normal and maintenance admission rejects changed plugin state and pending recovery',async t=>{
  const f=fixture(t),helper=path.join(sourceRoot,'common/scripts/workflow-state.py'),initial=core.receipt(f.root,true).identity;

@@ -43,4 +43,6 @@ A recorded local-merge order completes implementation first and leaves delivery 
 
 Prepare and reconcile the selected local delivery through the bundled workflow helper. The local mutation requires the prepared repository and exact refs, disjoint preserved local files, an idle Git and workflow state, and the approved merge policy. A repeated request reconciles a previously created merge before considering a new Git operation. An interruption preserves the original preparation.
 
+The helper protects the canonical Git HEAD and index while Git prepares the exact named source and target refs. The named target update compares the old tip before advancing to the reviewed two-parent commit. A moved ref or another checked-out branch stops before the canonical checkout is updated. The protected mutation requires a Git files-backed ref store and an ordinary index. A remaining Git lock or uncertain checkout after interruption requires explicit recovery before retry.
+
 Completion requires the actual two-parent merge with the expected tree, an owned installation from the merged target source, scoped re-admission of affected retained runs and executed target validation. Keep the target merge result distinct from source implementation acceptance and provider-confirmed PR delivery.

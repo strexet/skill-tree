@@ -160,6 +160,22 @@ class OrchestrationTests(unittest.TestCase):
         frame=self.change(frame,'question',question=question,purpose='finding-resolution',finding_id=finding['id']);frame=self.prepare(frame);frame=self.answer(frame,answer='fix');frame=self.change(frame,'accept-decision');frame=self.change(frame,'resolve',finding_id=finding['id'],disposition='fix',decision_receipt=frame['acceptance'],reference='Synthetic accepted finding.');self.assertEqual(frame['phase'],'fix')
         frame=self.change(frame,'fix',identity=self.identity(2),fixed_ids=[finding['id']],reference='Synthetic scoped fix.');self.assertEqual(frame['phase'],'checks');frame=self.change(frame,'checks',identity=self.identity(2),results=[{'id':'unit','status':'passed','reference':'Synthetic post-fix check.'}]);self.assertEqual(frame['phase'],'re-review');frame=self.change(frame,'review',identity=self.identity(2),review_id='review-two',findings=[],reference='Synthetic current clean review.');self.assertEqual(frame['phase'],'ready')
 
+    def test_metadata_head_or_base_changes_cannot_claim_a_fix_without_source_change(self):
+        finding=self.finding();frame=self.reviewed([finding])
+        question=self.question(options=[{'id':'fix','text':'Fix the finding.'},{'id':'reject','text':'Reject with evidence.'}],recommendation='fix')
+        frame=self.decision(frame,'finding-resolution',question,finding_id=finding['id'],answer='fix')
+        frame=self.change(frame,'resolve',finding_id=finding['id'],disposition='fix',decision_receipt=frame['acceptance'],reference='Synthetic fix decision.')
+        before=self.snapshot()
+        for changed in [{'arbitrary':'metadata'},{'head':'2'*40},{'base_oid':'c'*40}]:
+            with self.subTest(changed=changed),self.assertRaises(flow.OrchestrationError):
+                self.change(frame,'fix',identity={**self.identity(),**changed},fixed_ids=[finding['id']],reference='Unchanged source.')
+        self.assertEqual(self.snapshot(),before)
+        empty_commit={**self.identity(),'head':'2'*40}
+        resumed=self.change(frame,'resume',identity=empty_commit)
+        resumed=self.change(resumed,'checks',identity=empty_commit,results=[{'id':'unit','status':'passed','reference':'Current check.'}])
+        with self.assertRaisesRegex(flow.OrchestrationError,'cannot erase'):
+            self.change(resumed,'review',identity=empty_commit,review_id='new-head',findings=[],reference='Omitted unresolved finding.')
+
     def test_changed_review_identity_invalidates_earlier_finding_receipt(self):
         options=[{'id':'fix','text':'Fix the current finding.'},{'id':'reject','text':'Reject with current evidence.'}]
         frame=self.reviewed([self.finding()]);frame=self.decision(frame,'finding-resolution',self.question(options=options,recommendation='fix'),finding_id=self.finding()['id'],answer='fix');old=copy.deepcopy(frame['acceptance']);frame=self.change(frame,'review',identity=self.identity(),review_id='review-two',findings=[self.finding()],reference='Synthetic new review.');self.assertEqual(frame['phase'],'resolution');before=self.snapshot()

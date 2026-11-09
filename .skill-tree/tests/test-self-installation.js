@@ -13,6 +13,22 @@ test('explicit rebind verifies relocated ownership and remains idempotent',t=>{
  const before=fs.readFileSync(receipt,'utf8');assert.equal(command(moved,['--rebind']).status,0);assert.equal(fs.readFileSync(receipt,'utf8'),before);
  assert.equal(command(original,['--verify']).status,0);
 });
+test('rebind preserves the retained package generation and rollback uses the new project root',t=>{
+ const directory=fixture(t),original=path.join(directory,'original'),moved=path.join(directory,'moved');install(original);
+ const ownedPackages=installation.treeHash(original,'.agents/skills');
+ fs.writeFileSync(path.join(original,'package.json'),'{"scripts":{"test":"node --test"}}');
+ assert.equal(command(original,['--refresh-profile']).status,0);
+ fs.cpSync(original,moved,{recursive:true});
+ const last=path.join(moved,'.skill-tree/installation/.last-transaction.json'),retained=fs.readFileSync(last);
+ assert.equal(command(moved,['--rebind']).status,0);
+ assert.deepEqual(fs.readFileSync(last),retained);
+ fs.unlinkSync(path.join(moved,'package.json'));
+ const rollback=command(moved,['--rollback']);assert.equal(rollback.status,0,rollback.stderr);
+ assert.equal(command(moved,['--verify']).status,0);
+ assert.equal(installation.treeHash(moved,'.agents/skills'),ownedPackages);
+ assert.equal(installation.receipt(fs.realpathSync(moved),true).project_root,fs.realpathSync(moved));
+ assert.equal(command(original,['--verify']).status,0);
+});
 test('rebind never adopts edited packages, unknown bundle files or pending transactions',t=>{
  const directory=fixture(t),original=path.join(directory,'original');install(original);
  for(const kind of ['package','bundle','journal','inputs']){

@@ -7,10 +7,12 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import socket
 import stat
 import subprocess
 import tempfile
+from threading import Timer
 import uuid
 
 class RunError(ValueError):
@@ -361,13 +363,15 @@ def local_git_environment():
         raise RunError('Local delivery requires the recorded Git environment without repository or index overrides')
 
 
-def local_git(root, *args, accepted=(0,)):
+def local_git_args(root, *args):
     local_git_environment()
-    result = subprocess.run(
-        ['git', '--no-replace-objects', '--no-optional-locks', '--literal-pathspecs', '-C', str(root),
-         '-c', 'core.fsmonitor=false', '-c', 'diff.autoRefreshIndex=false', *map(str, args)],
-        capture_output=True, timeout=45,
-    )
+    return ['git', '--no-replace-objects', '--no-optional-locks', '--literal-pathspecs', '-C', str(root),
+            '-c', 'core.fsmonitor=false', '-c', 'diff.autoRefreshIndex=false', *map(str, args)]
+
+
+def local_git(root, *args, accepted=(0,), index=None):
+    environment = None if index is None else {**os.environ, 'GIT_INDEX_FILE': str(index)}
+    result = subprocess.run(local_git_args(root, *args), env=environment, capture_output=True, timeout=45)
     if result.returncode not in accepted:
         raise RunError('Local Git operation failed: ' + str(args[0]))
     return result
@@ -514,10 +518,104 @@ def local_git_policy(root):
             raise RunError('Local merge is blocked by an executable Git hook: ' + name)
 
 
-def run_local_merge(root, source_head):
+@contextmanager
+def local_git_lock(path):
+    try:
+        fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    except FileExistsError as error:
+        raise RunError('An existing Git lock requires an idle checkout: ' + path.name) from error
+    os.close(fd)
+    try:
+        yield
+    finally:
+        path.unlink(missing_ok=True)
+
+
+@contextmanager
+def local_ref_transaction(root, hooks, source_ref, source_head, target_ref, target_head, merge):
+    args = local_git_args(root, '-c', f'core.hooksPath={hooks}', 'update-ref', '-m',
+                          'Skill Tree local merge', '--stdin')
+    with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                          stderr=subprocess.DEVNULL, text=True) as process:
+        timer = Timer(45, process.terminate)
+        timer.daemon = True
+        timer.start()
+        try:
+            commands = ('start\noption no-deref\n'
+                        f'verify {source_ref} {source_head}\noption no-deref\n'
+                        f'update {target_ref} {merge} {target_head}\nprepare\n')
+            process.stdin.write(commands)
+            process.stdin.flush()
+            if process.stdout.readline() != 'start: ok\n' or process.stdout.readline() != 'prepare: ok\n':
+                raise RunError('The exact local source or target ref could not be locked for integration')
+        finally:
+            timer.cancel()
+        try:
+            yield process
+        finally:
+            if not process.stdin.closed:
+                # EOF aborts an uncommitted prepared transaction and releases its locks.
+                process.stdin.close()
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.terminate()
+                process.wait(timeout=5)
+
+
+def run_local_merge(root, source_root, preparation):
+    source_ref, source_head = preparation['source_ref'], preparation['source_head']
+    target_ref, target_head = preparation['target_ref'], preparation['target_head']
     local_git_policy(root)
-    local_git(root, 'merge', '--no-ff', '--no-edit', '--no-overwrite-ignore',
-              '--no-autostash', '--no-gpg-sign', source_head)
+    if any(Path(local_git_text(path, 'rev-parse', '--show-toplevel')).resolve() != path
+           for path in (root, source_root)):
+        raise RunError('Protected local merge requires the recorded source and target Git worktrees')
+    storage = local_git(root, 'config', '--get', 'extensions.refStorage', accepted=(0, 1)).stdout.strip()
+    if storage not in (b'', b'files'):
+        raise RunError('Protected local merge requires a files-backed Git ref store')
+    head_path = Path(local_git_text(root, 'rev-parse', '--path-format=absolute', '--git-path', 'HEAD'))
+    index_path = Path(local_git_text(root, 'rev-parse', '--path-format=absolute', '--git-path', 'index'))
+    if head_path.is_symlink() or index_path.is_symlink() or not index_path.is_file():
+        raise RunError('Protected local merge requires ordinary Git HEAD and index paths')
+    with local_git_lock(index_path.with_suffix('.lock')), local_git_lock(head_path.with_suffix('.lock')):
+        if (local_git_text(root, 'symbolic-ref', '--no-recurse', 'HEAD') != target_ref
+                or local_git_text(root, 'rev-parse', '--verify', target_ref) != target_head):
+            raise RunError('The exact prepared target branch or head changed before integration')
+        unfinished(root)
+        local_git_policy(root)
+        dirt = {path for path in local_worktree_dirt(root) if not local_unchanged_file(root, path)}
+        local_preflight_collisions(root, preparation['incoming'], dirt)
+        with tempfile.TemporaryDirectory(prefix='skill-tree-local-merge-', dir=index_path.parent) as workspace:
+            hooks = Path(workspace) / 'hooks'
+            hooks.mkdir()
+            index = Path(workspace) / 'index'
+            shutil.copy2(index_path, index)
+            merge = local_git_text(root, 'commit-tree', preparation['source_tree'], '--no-gpg-sign',
+                                   '-p', target_head, '-p', source_head, '-m', f'Merge {source_ref} into {target_ref}')
+            # Run the ref transaction from the distinct source worktree so Git
+            # does not try to acquire the canonical worktree's protected HEAD lock.
+            with local_ref_transaction(source_root, hooks, source_ref, source_head, target_ref, target_head, merge) as process:
+                if any(local_git(root, 'symbolic-ref', '--quiet', '--no-recurse', ref, accepted=(0, 1)).returncode == 0
+                       for ref in (source_ref, target_ref)):
+                    raise RunError('Protected local merge requires direct prepared Git branch refs')
+                checkout = ('--work-tree', root, '-c', f'core.hooksPath={hooks}', 'read-tree', '-u', '-m')
+                local_git(root, *checkout, '-n', target_head, merge, index=index)
+                local_git(root, *checkout, target_head, merge, index=index)
+                try:
+                    output, _ = process.communicate('commit\n', timeout=45)
+                    if process.returncode or output != 'commit: ok\n':
+                        raise RunError('The exact prepared Git ref transaction did not confirm the merge')
+                except (OSError, subprocess.SubprocessError, RunError, KeyboardInterrupt):
+                    if process.poll() is None:
+                        process.terminate()
+                        process.wait(timeout=5)
+                    observed = local_git_text(root, 'rev-parse', '--verify', target_ref)
+                    if observed == merge:
+                        os.replace(index, index_path)
+                    elif observed == target_head:
+                        local_git(root, *checkout, merge, target_head, index=index)
+                    raise
+                os.replace(index, index_path)
 
 
 def environment(store, payload=None):
