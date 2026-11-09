@@ -1,0 +1,28 @@
+{
+  "actual_lane": "static",
+  "attempt_id": "C-ded4654c-eace-4cee-9951-c8e4d3477551",
+  "check_id": "clarification-agent-observation",
+  "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+  "evidence": [
+    ".skill-tree/history/validation/plugin-system/clarification-agent-observations.json",
+    ".skill-tree/documents/task-clarification-contract.md"
+  ],
+  "result": "pass",
+  "review": [
+    "The existing conformance validator returns passed with two exact historical actual-agent scenarios. Both are explicit Manual clarification paths with scripted fixture-owner evidence. The original capture is unchanged.",
+    "Current source keeps the direct explicit clarification protocol separate from Processing After. New Processing fact, adoption and release guards apply to required-processing sessions only. The source inspection and historical validator provide no new current-host or product observation."
+  ],
+  "schema": 1,
+  "source_fingerprints": {
+    ".skill-tree/common/references/future-workflow.md": "13edfc2edf90e86351f3f047f3b3a4bbf696de54f3bac5010fb6fb19dbbdc603",
+    ".skill-tree/common/references/workflow-metadata.md": "91264f18e09460d44decc0f09cbd7f9a8b12579822371956f228df58fc32f6f5",
+    ".skill-tree/common/scripts/workflow-state.py": "ab47ba4e4ffe6c780f2d78e39093af8c6f98ffbd4b7114913aebfa951543ebb1",
+    ".skill-tree/config/resource-map.json": "9c82335ce439247fbfc56c50c817cdaf7a9b68901dbe69b4180f9081f1ada13f",
+    ".skill-tree/documents/task-clarification-contract.md": "ceab4175e4e293fb9bba5b54c713ee769702c2b18e912ad784a1a7e99cf5e3dc",
+    ".skill-tree/scripts/agent-conformance.py": "0f7a79a83e69aad8c8f3a5c4d063b94616f1c6d786f0e13cc3027dee3401f49e",
+    ".skill-tree/templates/operations.json": "504c58534f010e57dbc45f0a276572b7690ea51ddb601f1b85dbf2dae16ab794",
+    ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+    ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+  },
+  "task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+}

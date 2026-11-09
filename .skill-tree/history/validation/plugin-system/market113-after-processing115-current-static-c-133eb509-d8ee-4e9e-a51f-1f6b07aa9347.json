@@ -1,0 +1,27 @@
+{
+  "actual_lane": "static",
+  "actual_validator": null,
+  "attempt_id": "C-133eb509-d8ee-4e9e-a51f-1f6b07aa9347",
+  "check_id": "market-source-review",
+  "current_unit_receipts": {},
+  "limits": [
+    "Bounded source compatibility and preserved prior observations. No fresh native or candidate qualification."
+  ],
+  "observations": [
+    "Dated primary-source market coverage and candidate metadata remain byte-identical to the reviewed market map and research.",
+    "Research additions identify the two pinned post-processing applications and their known source/host boundaries. They do not relabel adoption signals as observed efficacy.",
+    "The comparison remains separately authorized and requires a fresh finite plan."
+  ],
+  "original_contract_id": "O-f6a04cbc-50b5-487e-bbb4-c6d9587df89e",
+  "profile_identity": "dd4a66be0c80310cd7412eda5e6603773a28e59861cf5fa731e78f807c21b7f5",
+  "result": "pass",
+  "schema": 1,
+  "source_commit": "2a6d240bf6f844d339d246bea57a437e9e3eb7fd",
+  "source_fingerprints": {
+    ".skill-tree/documents/plugin-market-research.md": "cdedbf889a7136f8390089b0d70448c59de91e6622e6a23c9c222da744852621",
+    ".skill-tree/documents/plugin-system-research.md": "afc16dc346548ddc378df6671d12392b57ea5dbdc38be13807fc1a1cd5f33fd3",
+    ".skill-tree/history/research/plugin-market-map.json": "031c37aa5827f4b3193589ea45bcc8d34dd985522425555c8c0245f2683c00f0"
+  },
+  "source_review_reference": ".skill-tree/history/validation/plugin-system/processing115-final6-independent-review.json",
+  "task_id": "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d"
+}

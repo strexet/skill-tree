@@ -1,0 +1,29 @@
+{
+  "actual_lane": "static",
+  "attempt_id": "C-bfc0cb35-fc29-4cf5-b610-2b8849a85b83",
+  "check_id": "installation-design-review",
+  "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+  "evidence": [
+    ".skill-tree/history/validation/plugin-system/installation-design-c-d9625ef2-71a4-4141-a692-55dca017b48d.json",
+    ".skill-tree/history/validation/plugin-system/catalog112-checks.json",
+    ".skill-tree/history/validation/plugin-system/catalog112-independent-review.json"
+  ],
+  "result": "pass",
+  "review": [
+    "Current approved installation contract retains zero-plugin default, all selected core provider destinations verified before setup, exact version and ordered occurrence/parameter preview, explicit matching digest, and separate setup outcomes.",
+    "Owned read-only listing now exposes matching and unknown registry states, optional discovery rows and exact descriptors. No code path selects or activates a recommendation.",
+    "Current catalog data has empty recommendation arrays, passes standalone offline core profile parity, and preserves direct source normalization. The initial and later mutation/editor interfaces remain downstream implementation."
+  ],
+  "schema": 1,
+  "source_fingerprints": {
+    ".skill-tree/bin/install.js": "f322a379cd0f5846645d0e77cb6ac1bf36f4b479fa3ee9cbc5333e1714d6aa5f",
+    ".skill-tree/common/references/installation-profile.md": "05801326c3aa3e325a1ccf170a7fbbc678d7e2ae804bb6a8fef6c3a05d2fbee8",
+    ".skill-tree/documents/implementation-plan.md": "61dc2c6e2974b003a6b83bbd31299600f900f9a03f7f1d23bba8707ad3457b90",
+    ".skill-tree/documents/plugin-installation-contract.md": "ea6c2a851977fb27b418217f16f712a0dcda2297b474859f72a7a9622636d89d",
+    ".skill-tree/documents/plugin-management-contract.md": "dd9ee48ee9a3f64af0aebd475192637ff2e44e80fea9a5344a47c4d810451627",
+    ".skill-tree/documents/plugin-system-contract.md": "b25424efd0dc920376a8d32b9dd7ea27d6b644d966e167f690c8999dc2fa36f5",
+    ".skill-tree/documents/plugin-system-research.md": "18b222cd914f2090b2f5f4443c07cb28239099618e522e4b7babb3be5be55439",
+    ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84"
+  },
+  "task_id": "T-2da07d09-0b1a-4407-b375-defd23720387"
+}

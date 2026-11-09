@@ -1,0 +1,64 @@
+{
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-decision-governance.py"
+  ],
+  "attempt_id": "C-03d0f0f4-1e50-4432-a827-dace5a432f23",
+  "baseline": {
+    "last_accepted": {
+      "discovered": 25,
+      "expected": 25,
+      "failed": 0,
+      "passed": 25,
+      "skipped": 0
+    },
+    "original": {
+      "discovered": 25,
+      "expected": 25,
+      "failed": 0,
+      "passed": 25,
+      "skipped": 0
+    }
+  },
+  "check_id": "decision-state-regressions",
+  "count_error": null,
+  "counts": {
+    "discovered": 25,
+    "expected": 25,
+    "failed": 0,
+    "passed": 25,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limitations": [
+    "Focused unit fixture evidence. No new actual actor or product qualification."
+  ],
+  "log_sha256": "6f73ef5488071a5cebaf0f04c81856c42ae654003fc3c79bd63561216520fbc0",
+  "output": ".skill-tree/history/validation/plugin-system/t-29ef78b9-d808-4f85-b6c8-3d768edf3a99-decision-state-regressions-c-03d0f0f4-1e50-4432-a827-dace5a432f23.txt",
+  "owned_profile_identity": "56e828eacced91072ba944c318a5291a21b88be7f83b90a2248f53fdae95806a",
+  "process_group_clean": true,
+  "result": "pass",
+  "source_commit": "82eaf49b6cb35e65dfa30413228bddcb10190562",
+  "sources": {
+    ".skill-tree/bin/install.js": "c7b6581b5aa5e3a9c150d3cd9bdf312a5324ea40ebd1605a4d4184318b606636",
+    ".skill-tree/common/references/future-workflow.md": "13edfc2edf90e86351f3f047f3b3a4bbf696de54f3bac5010fb6fb19dbbdc603",
+    ".skill-tree/common/references/workflow-metadata.md": "1fff0a891987404ac7bc43d536b0798c08ee6c16a6e3367cbfc9a0f3c54b7fa3",
+    ".skill-tree/common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    ".skill-tree/common/scripts/pr-review-state.py": "6bfb09e0273a6322c86c5f5915e8dc0503fa22416881c499c281c1dec570a3d1",
+    ".skill-tree/common/scripts/run-workspaces.py": "306a8dad9d834250febd3fff4b109f0fb8b00711232705e483787bc1cdab5f20",
+    ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+    ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+    ".skill-tree/config/resource-map.json": "bd4b539b8aad5d6b55aba3609073f28b7e879fa7e8c3edf60dbbf28f9e56ad26",
+    ".skill-tree/documents/implementation-plan.md": "73692c86132c37dc8be19457f9bf33dc6ff87027cfad50de85a361bca6f09606",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "6fe2f5fa216a0759bc2bba77b05a20c6b24de9df19c7a6d7756405008a07bc36",
+    ".skill-tree/documents/task-clarification-contract.md": "ceab4175e4e293fb9bba5b54c713ee769702c2b18e912ad784a1a7e99cf5e3dc",
+    ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+    ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+    ".skill-tree/templates/operations.json": "af81ff4d4b003ef8e8dac292995b3227d5fb45d80666dd80b83b4111d1ded050",
+    ".skill-tree/tests/test-decision-adapters.py": "01f1b47b178cf01f98d2aa278d739e19da632b647a0fea5a162c110dce82e59f",
+    ".skill-tree/tests/test-decision-governance.py": "e95c38623875e3f145667fe8c2b06a896fe6a9d6775d58f5e3be60aa33f163a1"
+  },
+  "task_id": "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99",
+  "timed_out": false,
+  "tool_wall_seconds": 0.993
+}

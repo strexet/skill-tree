@@ -15,7 +15,7 @@
   ],
   "node_composer_repair": {
     "capture_sha256": "3a3f79915f03700949cd79590f3286ba075b763b7634cfdc1d8a29a0d258a325",
-    "count": 12
+    "count": 18
   },
   "node_full": {
     "capture_sha256": "f7e8f4368952e0505f7b54c0005485ca357b045bf0d29c3602e0edf60f3fffbb",

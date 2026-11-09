@@ -1,0 +1,100 @@
+{
+  "actual_lane": "static",
+  "attempt_id": "C-98f1d4ab-6a9b-4c23-9aaf-829d80f2498a",
+  "check_id": "decision-actual-actors",
+  "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+  "evidence_sha256": {
+    ".skill-tree/history/validation/plugin-system/core127-after-processing115-current-static-c-9c88d1ef-084d-4573-8296-48b0cca3db98.json": "1a4ca0532e4759850fc1911f89d8b57110af34ce9f0213ca6e717eda349754e6",
+    ".skill-tree/history/validation/plugin-system/core127-native/capture.json": "65475548db6a70be601c337dd89ae6c7bddf545e0017eac053865ff8dc7e70b8",
+    ".skill-tree/history/validation/plugin-system/core127-native/qualification.json": "bb9feadfef705d7d50ca60b3463b4dc3247eebd1f2ad5fc790791867f75586a9",
+    ".skill-tree/history/validation/plugin-system/core127-native/report.json": "56f43d1e35d3d5381b0866f026c4517ce90017153faf703c5604b12656c5be99"
+  },
+  "limitations": [
+    "Historical native observations bind the original source only. Current source receives static compatibility and deterministic fixture coverage."
+  ],
+  "mismatches": [],
+  "result": "pass",
+  "review": [
+    "The original qualification records distinct actual resolver, critic and arbiter contexts, Manual owner-fixture waits and explicit switch/resume. The earlier failed attempt, bounded corrected retry, actual authority/context and unknown accounting remain recorded.",
+    "The current strict oracle correctly rejects the original capture against changed execution-source fingerprints. The current installed decision governance, oracle and parent adapters retain independent actor identity and receipt rules in separate exact tests.",
+    "The optional installer change alters no decision orchestration or host evidence scripts."
+  ],
+  "schema": 1,
+  "source_commit": "82eaf49b6cb35e65dfa30413228bddcb10190562",
+  "source_fingerprints": {
+    ".skill-tree/bin/install.js": "c7b6581b5aa5e3a9c150d3cd9bdf312a5324ea40ebd1605a4d4184318b606636",
+    ".skill-tree/common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+    ".skill-tree/common/references/development-practices.md": "47402db618635e221d3e3944cb0f2dc88238e278a6e2c49f49491ce98e24fc14",
+    ".skill-tree/common/references/orchestration.md": "6f33932cfd3f05e2e35d501f8684beb31feb38811fee5a149d72624b3fba15e7",
+    ".skill-tree/common/references/workflow-metadata.md": "1fff0a891987404ac7bc43d536b0798c08ee6c16a6e3367cbfc9a0f3c54b7fa3",
+    ".skill-tree/common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    ".skill-tree/common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+    ".skill-tree/common/scripts/pr-review-state.py": "6bfb09e0273a6322c86c5f5915e8dc0503fa22416881c499c281c1dec570a3d1",
+    ".skill-tree/common/scripts/run-workspaces.py": "306a8dad9d834250febd3fff4b109f0fb8b00711232705e483787bc1cdab5f20",
+    ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+    ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+    ".skill-tree/config/resource-map.json": "bd4b539b8aad5d6b55aba3609073f28b7e879fa7e8c3edf60dbbf28f9e56ad26",
+    ".skill-tree/documents/implementation-plan.md": "73692c86132c37dc8be19457f9bf33dc6ff87027cfad50de85a361bca6f09606",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "6fe2f5fa216a0759bc2bba77b05a20c6b24de9df19c7a6d7756405008a07bc36",
+    ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+    ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+    ".skill-tree/scripts/agent-conformance.py": "e14b387f60d200fea4484c4a40d359c5a8d1339e26abf2addb82d5c8ab5a1e16",
+    ".skill-tree/templates/invariants.json": "5a147a9ee4297250a6604f6a447fa10b57b9b94f3942044a9135790ce9c64b48",
+    ".skill-tree/templates/operations.json": "af81ff4d4b003ef8e8dac292995b3227d5fb45d80666dd80b83b4111d1ded050",
+    ".skill-tree/tests/test-decision-conformance.py": "61f6a39d65dd54978b5a260268a653d87f8efc1fc6662571731fccd7c8a95cdf",
+    ".skill-tree/tests/test-decision-governance-installation.js": "eec5260b4fbb28a04d86361e81c35813eaf3d75f18c4f1524a1cf7269157ac83",
+    ".skill-tree/tests/test-decision-orchestration.py": "fc2ba0b10bc3511e2d7dbbc890abe5664a7c7d11c9dcf3c07fc8d6623afba1ea",
+    ".skill-tree/tests/test-orchestration-adapters.py": "2e1daa5f407445459068ec0af110c6be4995cd525b7ce02e32e69d20f3aeb26f"
+  },
+  "task_id": "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda",
+  "unit_captures_same_contract": {
+    "decision-core-standalone": {
+      "attempt_id": "C-272c4aba-7d61-49ec-b6f3-f770498a245d",
+      "counts": {
+        "discovered": 3,
+        "expected": 3,
+        "failed": 0,
+        "passed": 3,
+        "skipped": 0
+      },
+      "raw_capture_sha256": "5a793dfb04938702a77ec5feb8b61e08918e98c92b568d130d1cd42bc3a0e34c",
+      "result": "pass"
+    },
+    "decision-observation-oracle": {
+      "attempt_id": "C-ceff03e0-47c1-4af5-a633-58ea8bb28478",
+      "counts": {
+        "discovered": 10,
+        "expected": 10,
+        "failed": 0,
+        "passed": 10,
+        "skipped": 0
+      },
+      "raw_capture_sha256": "08cc70196cb5c5b28a43b54048dc784caeaccae364c77d9a24b5a4035a77b2e9",
+      "result": "pass"
+    },
+    "decision-orchestration-unit": {
+      "attempt_id": "C-631ad6d4-9009-4c36-ab2b-2fcb596712b7",
+      "counts": {
+        "discovered": 30,
+        "expected": 30,
+        "failed": 0,
+        "passed": 30,
+        "skipped": 0
+      },
+      "raw_capture_sha256": "250af4f4fdc3dcccbcabcb4f8ee2ef92939f6856bf15c4f5c3a0ea0c2c8143e8",
+      "result": "pass"
+    },
+    "decision-parent-adapters": {
+      "attempt_id": "C-a7c79a9a-e302-4419-8384-db81654bb8f3",
+      "counts": {
+        "discovered": 6,
+        "expected": 6,
+        "failed": 0,
+        "passed": 6,
+        "skipped": 0
+      },
+      "raw_capture_sha256": "83f7574549e52eab6d8c5b41f3455d0b15252539a0a707afe9a6299086e777fa",
+      "result": "pass"
+    }
+  }
+}

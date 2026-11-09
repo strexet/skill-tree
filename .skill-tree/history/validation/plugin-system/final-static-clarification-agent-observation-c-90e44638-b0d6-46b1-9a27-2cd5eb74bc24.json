@@ -1,0 +1,61 @@
+{
+  "actual_lane": "static",
+  "attempt_id": "C-90e44638-b0d6-46b1-9a27-2cd5eb74bc24",
+  "check_id": "clarification-agent-observation",
+  "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+  "evidence_sha256": {
+    ".skill-tree/documents/task-clarification-contract.md": "ceab4175e4e293fb9bba5b54c713ee769702c2b18e912ad784a1a7e99cf5e3dc",
+    ".skill-tree/history/validation/plugin-system/clarification-agent-observation-c-ded4654c-eace-4cee-9951-c8e4d3477551.json": "3a6a276f50bbf0b9de754522cc426c74596d5ff0f73ed1f9ea4ad9fd07a47919",
+    ".skill-tree/history/validation/plugin-system/clarification-agent-observations.json": "f243f525ca6e2f5c6633be1ac2f380688ab373514b7d4dd0ecae809e52c3e037"
+  },
+  "limitations": [
+    "Bounded actual-agent clarification observations with scripted fixture-owner inputs; no real-human or native external-skill qualification."
+  ],
+  "mismatches": [],
+  "result": "pass",
+  "review": [
+    "The current structural oracle accepted two original clarification scenarios. The archived report records question rounds, actual independent roles, source-aware answers, task revision and explicit confirmation.",
+    "The original fixture-owner answers, accepted tool paths and retained oracle failure remain distinguished from real owner consent and native external-skill invocation.",
+    "The current clarification state and standalone installation checks are captured separately."
+  ],
+  "schema": 1,
+  "source_commit": "82eaf49b6cb35e65dfa30413228bddcb10190562",
+  "source_fingerprints": {
+    ".skill-tree/common/references/future-workflow.md": "13edfc2edf90e86351f3f047f3b3a4bbf696de54f3bac5010fb6fb19dbbdc603",
+    ".skill-tree/common/references/workflow-metadata.md": "1fff0a891987404ac7bc43d536b0798c08ee6c16a6e3367cbfc9a0f3c54b7fa3",
+    ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+    ".skill-tree/config/resource-map.json": "bd4b539b8aad5d6b55aba3609073f28b7e879fa7e8c3edf60dbbf28f9e56ad26",
+    ".skill-tree/documents/task-clarification-contract.md": "ceab4175e4e293fb9bba5b54c713ee769702c2b18e912ad784a1a7e99cf5e3dc",
+    ".skill-tree/scripts/agent-conformance.py": "e14b387f60d200fea4484c4a40d359c5a8d1339e26abf2addb82d5c8ab5a1e16",
+    ".skill-tree/templates/operations.json": "af81ff4d4b003ef8e8dac292995b3227d5fb45d80666dd80b83b4111d1ded050",
+    ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+    ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+  },
+  "task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+  "unit_captures_same_contract": {
+    "clarification-installation": {
+      "attempt_id": "C-b2ba4adf-fd21-4f68-b821-9e2ccbaa8ecb",
+      "counts": {
+        "discovered": 3,
+        "expected": 3,
+        "failed": 0,
+        "passed": 3,
+        "skipped": 0
+      },
+      "raw_capture_sha256": "a7e48a935c79ad452fb542a0a81f5271ed79f6190bb186df6c7ecf593cfc7c7e",
+      "result": "pass"
+    },
+    "clarification-state": {
+      "attempt_id": "C-3554ca3a-4d41-403d-87eb-9b0307cbf3cc",
+      "counts": {
+        "discovered": 24,
+        "expected": 24,
+        "failed": 0,
+        "passed": 24,
+        "skipped": 0
+      },
+      "raw_capture_sha256": "f31524885de85c5157ad1b07a9d0a3e6464ddcd9e52199af57d37114d5203cff",
+      "result": "pass"
+    }
+  }
+}

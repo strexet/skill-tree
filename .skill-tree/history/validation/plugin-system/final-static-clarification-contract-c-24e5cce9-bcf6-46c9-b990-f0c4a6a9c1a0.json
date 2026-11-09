@@ -1,0 +1,36 @@
+{
+  "actual_lane": "static",
+  "attempt_id": "C-24e5cce9-bcf6-46c9-b990-f0c4a6a9c1a0",
+  "check_id": "clarification-contract",
+  "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+  "evidence_sha256": {
+    ".skill-tree/common/references/future-workflow.md": "13edfc2edf90e86351f3f047f3b3a4bbf696de54f3bac5010fb6fb19dbbdc603",
+    ".skill-tree/common/references/workflow-metadata.md": "1fff0a891987404ac7bc43d536b0798c08ee6c16a6e3367cbfc9a0f3c54b7fa3",
+    ".skill-tree/common/scripts/plugin-processing.py": "2cec937076f1449996a5db4ebdc9c16b9cc90f35abeb728195d55924851dde44",
+    ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+    ".skill-tree/documents/task-clarification-contract.md": "ceab4175e4e293fb9bba5b54c713ee769702c2b18e912ad784a1a7e99cf5e3dc",
+    ".skill-tree/history/validation/plugin-system/clarification-contract-review.json": "b4fe3db773808bbf59411cb6371193d35345718d7de381d42cb1ebc3048e33d7"
+  },
+  "limitations": [
+    "Revalidation covers the design contract and current source paths. No actual owner answer, actor execution, host qualification or historical outcome was recreated."
+  ],
+  "mismatches": [],
+  "result": "pass",
+  "review": [
+    "The current contract and shared helper preserve exact selected Prioritized task identities, ranked stable scope, source-backed facts and dependency-ordered questions. An explicit session requires no plugin engine, worktree or implementation run.",
+    "The queue, session hash and revision guard writes. Separate case-sensitive semantic fields bind confirmation. Supported presentation-only changes preserve confirmation; affected semantic changes reopen the dependent answers and confirmation while retaining unrelated answers.",
+    "Manual still requires actual submitted owner answers and current owner confirmation after concrete goal, scope, dependencies, acceptance and feasible validation. Approved W1 Auto uses distinct current delegated answer and specification-acceptance references; that separate route supplies no owner provenance and preserves authority, mode epoch and original-attempt reconciliation.",
+    "The pinned upstream grilling derivation remains recorded. The implemented post-processing adapter reuses the current clarification facts, frontier and semantics functions. An interruption retains the exact session and hold rather than resuming implementation."
+  ],
+  "schema": 1,
+  "source_commit": "82eaf49b6cb35e65dfa30413228bddcb10190562",
+  "source_fingerprints": {
+    ".skill-tree/common/references/future-workflow.md": "13edfc2edf90e86351f3f047f3b3a4bbf696de54f3bac5010fb6fb19dbbdc603",
+    ".skill-tree/common/references/workflow-metadata.md": "1fff0a891987404ac7bc43d536b0798c08ee6c16a6e3367cbfc9a0f3c54b7fa3",
+    ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+    ".skill-tree/documents/plugin-system-research.md": "ad99e0d4bffd5bb60607eb525dbf8026d4986a1bf151f11b0a2fa62e111927d8",
+    ".skill-tree/documents/task-clarification-contract.md": "ceab4175e4e293fb9bba5b54c713ee769702c2b18e912ad784a1a7e99cf5e3dc"
+  },
+  "task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+  "unit_captures_same_contract": {}
+}
