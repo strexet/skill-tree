@@ -1,5 +1,12 @@
 {
   "schema": 1,
+  "built_in_recipes": {
+    "static-inspection": {
+      "lane": "static",
+      "input_paths": [],
+      "assertion_contract": "explicit source and artifact assertions"
+    }
+  },
   "unity": {
     "editor_patterns": [
       "^6000\\.[03]\\.\\d+[abfp]\\d+$"

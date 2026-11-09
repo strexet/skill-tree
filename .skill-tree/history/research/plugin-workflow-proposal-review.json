@@ -1,0 +1,18 @@
+{
+  "limitations": [
+    "No task acceptance or owner agreement is claimed."
+  ],
+  "observations": [
+    "W1/W2 preserve Q1-Q11 and the design-only boundary.",
+    "Initial anchors preserve full core review and required checks, put after-review before readiness/merge, and deduplicate leaf/controller invocation.",
+    "Processing creates the visible task and required hold atomically before interview launch.",
+    "Comparative qualification remains a separate pending decision."
+  ],
+  "owner_decisions": [],
+  "reviewer": "Independent flow_design_proposal_review and root source inspection",
+  "session_id": "CL-17367e9a-121d-4130-be4a-e13d151acb46",
+  "source": ".skill-tree/documents/plugin-workflow-decisions.md",
+  "source_sha256": "de895d3000c122a4a9306973b97702451c32829cbfb281dde9197727f2c31a85",
+  "status": "proposal_reviewed_owner_decisions_pending",
+  "task_id": "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+}

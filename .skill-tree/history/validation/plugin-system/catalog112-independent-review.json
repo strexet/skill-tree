@@ -1,0 +1,37 @@
+{
+  "findings": [],
+  "independent_tests": {
+    "failed": 0,
+    "passed": 27
+  },
+  "limits": [
+    "No comparative improvement, acquisition consent, native host or product-runtime claim."
+  ],
+  "mechanism": "Actual independent Codex collaboration worker",
+  "resolved": [
+    "Actual-only bindings remain visible with point filtering.",
+    "Malformed registry and malformed catalog are isolated.",
+    "Curated sources forbid acquisition transport overrides and retain exact pins.",
+    "Custom discovery hides private locators and unknown location inputs.",
+    "Independent evidence controls status and validates scope and package closure."
+  ],
+  "result": "clean",
+  "reviewer": "/root/evidence114",
+  "schema": 1,
+  "scope": "Frozen complete task source diff and portable catalog behavior",
+  "source": {
+    "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+    "head": "1f537862d1bff5ecb9e808f659bbf861e990cf5e",
+    "source_digest": "4608b793cd231dacee949523cc2a5a91286c84bb1ebb2db185362939d171c345"
+  },
+  "source_fingerprints": {
+    ".skill-tree/config/plugin-catalog-eligibility.json": "92a81b29135aaf8deb94c86f56481dfaa5fe9b543ab461c492aceab56efe1042",
+    ".skill-tree/config/plugin-catalog.json": "0cac545a0f50891b859884865f7541f459bd8f9e3f3b3669fcf664b8890beb08",
+    ".skill-tree/documents/plugin-recommendation-evidence.md": "e85766c749c19717f9eaf6d0c1049dfc48c31f77965e1e811a474e26a2cb2dd2",
+    ".skill-tree/documents/plugin-system-contract.md": "b25424efd0dc920376a8d32b9dd7ea27d6b644d966e167f690c8999dc2fa36f5",
+    ".skill-tree/lib/plugin-catalog.js": "addf5eed8f38af78d77c5ffda5d9f07ebae7097db6264284b7c0c617a71efef3",
+    ".skill-tree/lib/plugin-management.js": "e908c1573dcece80909b15d52f5a77c8e61d1499bc4863f0d30bfc8a0a6ba86e",
+    ".skill-tree/skill-tree.json": "0d701c94326246adfb1eaef3f11a18a22375731c976bd6805e28c0543cc69dab",
+    ".skill-tree/tests/test-plugin-catalog.js": "8e9b98889f515660b054ac63d5c8f8ce23597d9858f002db64ad6f2ab586f18b"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "npm",
+    "run",
+    "sync:check"
+  ],
+  "changed_frozen_paths": [],
+  "cleanup_reserve_seconds": 20,
+  "exit_code": 0,
+  "hard_deadline_seconds": 120,
+  "name": "sync-check",
+  "output": ".skill-tree/history/validation/plugin-system/processing115-final4-sync-check.txt",
+  "qualification": "Deterministic source and isolated fixture qualification.",
+  "result": "pass",
+  "schema": 1,
+  "source_freeze": ".skill-tree/history/validation/plugin-system/processing115-final4-source-freeze.json",
+  "source_freeze_sha256": "d6e01e992af75f9daba77fbb3aea7dce69dc1867883a388e4325bab8ebf482a7",
+  "temporary_target_empty": null,
+  "timed_out": false,
+  "tool_wall_seconds": 3.420456583146006
+}

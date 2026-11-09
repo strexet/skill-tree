@@ -1,0 +1,498 @@
+{
+  "changes": [
+    {
+      "after": null,
+      "before": {
+        "body": "### Define the shared iterative task clarification protocol\n\n```yaml\nid: T-21b1c999-8586-4e70-a3bc-69cad3ea65aa\npriority: 131\nstatus: Ready\nparent_pending_ids: [\"P-e5de6bf4-99d6-481e-b158-7d302efde259\"]\nprocessing_run_id: PR-595a7e56-0da2-4b81-afc6-f5cff249c1e2\nroot_task_id: T-21b1c999-8586-4e70-a3bc-69cad3ea65aa\nrelated_task_id: null\nrelation: main\ndepends_on: []\n```\n\nGoal:\n- Specify the shared explicit task-clarification protocol and the common interview loop derived from the inspected upstream grilling protocol for owner-invoked sessions and the planned post-processing adapter.\n\nCurrent behavior:\n- Existing helpers resolve task groups and persist guarded transactions but provide no clarification-round or task-revision command. The processing reuse interface merges provenance/dependencies and ignores supplied task bodies.\n\nTouch:\n- `.skill-tree/documents/task-clarification-contract.md`\n- `.skill-tree/common/references/future-workflow.md`\n- `.skill-tree/common/references/workflow-metadata.md`\n- `.skill-tree/common/scripts/workflow-state.py`\n- `.skill-tree/documents/plugin-system-research.md`\n\nImplementation constraints:\n- Product decisions receive actual owner answers; facts come from source research. Silence never settles a question or confirms clarity.\n- Keep explicit clarification independent of implementation-run creation, source worktree provisioning and mandatory global workflow stages. Native external-skill invocation requires a verified adapter; a manual source-backed interview remains distinguishable from an installed controller.\n\nValidation:\n- Strategy: source-backed contract design with positive, negative, stale-answer and interrupted-round examples.\n```json\n{\n  \"checks\": [\n    {\n      \"id\": \"clarification-contract\",\n      \"recipe_id\": \"static-inspection\",\n      \"criteria\": [\n        \"The shared protocol defines exact task/group scope, dependency-ordered question rounds, source facts, actual owner answers, guarded revisions and interruption/resume.\",\n        \"Completion requires concrete goals, scope, dependencies, acceptance and feasible validation, no unresolved mandatory decisions and actual owner confirmation bound to the current task revision.\",\n        \"The shared loop derives from the inspected upstream grilling protocol and supports explicit clarification without a generic plugin engine; the planned post-processing adapter reuses the same loop.\",\n        \"The contract separates complete-content write guards from semantic confirmation identity; formatting-only edits preserve confirmation, semantic edits reopen affected answers and final confirmation, and unrelated answers remain valid.\"\n      ],\n      \"sources\": [\n        \".skill-tree/documents/task-clarification-contract.md\",\n        \".skill-tree/common/references/future-workflow.md\",\n        \".skill-tree/common/references/workflow-metadata.md\",\n        \".skill-tree/common/scripts/workflow-state.py\",\n        \".skill-tree/documents/plugin-system-research.md\"\n      ],\n      \"parameters\": {},\n      \"assertion\": \"The shared protocol defines exact task/group scope, dependency-ordered question rounds, source facts, actual owner answers, guarded revisions and interruption/resume. Completion requires concrete goals, scope, dependencies, acceptance and feasible validation, no unresolved mandatory decisions and actual owner confirmation bound to the current task revision. The shared loop derives from the inspected upstream grilling protocol and supports explicit clarification without a generic plugin engine; the planned post-processing adapter reuses the same loop. The contract separates complete-content write guards from semantic confirmation identity; formatting-only edits preserve confirmation, semantic edits reopen affected answers and final confirmation, and unrelated answers remain valid.\",\n      \"timing\": \"immediate\"\n    }\n  ]\n}\n```\n\nAcceptance:\n- The shared protocol defines exact task/group scope, dependency-ordered question rounds, source facts, actual owner answers, guarded revisions and interruption/resume.\n- Completion requires concrete goals, scope, dependencies, acceptance and feasible validation, no unresolved mandatory decisions and actual owner confirmation bound to the current task revision.\n- The shared loop derives from the inspected upstream grilling protocol and supports explicit clarification without a generic plugin engine; the planned post-processing adapter reuses the same loop.\n- The contract separates complete-content write guards from semantic confirmation identity; formatting-only edits preserve confirmation, semantic edits reopen affected answers and final confirmation, and unrelated answers remain valid.\n\n\nApproved clarification decisions:\n- Q2: An enabled post-processing interview is required before implementation; actual answers, revisions and rechecks are necessary. Core-only projects receive no mandatory global interview.\n- Q3: Codex is the first verified plugin invocation host. The contract remains portable; invocation on other hosts is explicitly unqualified or unavailable until verified. Existing core installation support remains unchanged.\n- Q6: Processing with an enabled interview creates a visible stable-ID T-task in a non-implementable clarification state; the same task becomes Ready only after actual answers, revisions, rechecks and owner confirmation.\n- Q8: Semantic changes reopen affected answers and final confirmation while preserving unrelated answers; formatting-only changes preserve confirmation. Semantic identity covers goal, scope, exclusions, dependencies, acceptance, validation and required plugin policy.\n- Decision evidence: `.skill-tree/documents/plugin-workflow-decisions.md`; Q1-Q11 have actual owner approval. Final shared-understanding confirmation remains separate.\n\n",
+        "queue": "Prioritized Next Changes"
+      },
+      "task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa"
+    }
+  ],
+  "checkpoint_after": {
+    "admission": {
+      "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+      "flavor": "general",
+      "identity": "4265c0e60a86aef2e7a0a2948e17dfc2b20d9bd0e24dd9a16d7546d2fb8d093f"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "completed_ids": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa"
+    ],
+    "completion_refs": {
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa": "O-ac001b97-eb35-4d59-b454-0c99270a12df"
+    },
+    "current_task_id": null,
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Commit the approved changes, then Implement All from and back into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+    "limits": {},
+    "mode": "all",
+    "next_action": "Select required task or finish root",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "resume-parent",
+    "processing_results": [],
+    "required_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "root_task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+    "snapshot": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "started_at": "2026-11-05T11:44:41.702298+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "branch": "codex/plugin-system",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests continuing from the current codex/next-version branch instead of develop and merging all results into codex/next-version.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-0304315b-587e-489c-ac51-861258b13eb0"
+    },
+    "workspace_state": "ready"
+  },
+  "checkpoint_before": {
+    "admission": {
+      "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+      "flavor": "general",
+      "identity": "4265c0e60a86aef2e7a0a2948e17dfc2b20d9bd0e24dd9a16d7546d2fb8d093f"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "completed_ids": [],
+    "current_task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Commit the approved changes, then Implement All from and back into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+    "limits": {},
+    "mode": "all",
+    "next_action": "Validate the reviewed clarification contract.",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "implement",
+    "processing_results": [],
+    "required_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "root_task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+    "snapshot": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "started_at": "2026-11-05T11:44:41.702298+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "branch": "codex/plugin-system",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests continuing from the current codex/next-version branch instead of develop and merging all results into codex/next-version.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-0304315b-587e-489c-ac51-861258b13eb0"
+    },
+    "workspace_state": "ready"
+  },
+  "id": "E-2b44a21f-ff66-417c-871d-d8d0c8856edf",
+  "outcomes": [
+    {
+      "acceptance": [
+        {
+          "criterion": "The shared protocol defines exact task/group scope, dependency-ordered question rounds, source facts, actual owner answers, guarded revisions and interruption/resume.",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/plugin-system/clarification-contract-review.json",
+              "sha256": "b4fe3db773808bbf59411cb6371193d35345718d7de381d42cb1ebc3048e33d7"
+            }
+          ],
+          "required": true,
+          "result": "pass"
+        },
+        {
+          "criterion": "Completion requires concrete goals, scope, dependencies, acceptance and feasible validation, no unresolved mandatory decisions and actual owner confirmation bound to the current task revision.",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/plugin-system/clarification-contract-review.json",
+              "sha256": "b4fe3db773808bbf59411cb6371193d35345718d7de381d42cb1ebc3048e33d7"
+            }
+          ],
+          "required": true,
+          "result": "pass"
+        },
+        {
+          "criterion": "The shared loop derives from the inspected upstream grilling protocol and supports explicit clarification without a generic plugin engine; the planned post-processing adapter reuses the same loop.",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/plugin-system/clarification-contract-review.json",
+              "sha256": "b4fe3db773808bbf59411cb6371193d35345718d7de381d42cb1ebc3048e33d7"
+            }
+          ],
+          "required": true,
+          "result": "pass"
+        },
+        {
+          "criterion": "The contract separates complete-content write guards from semantic confirmation identity; formatting-only edits preserve confirmation, semantic edits reopen affected answers and final confirmation, and unrelated answers remain valid.",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/plugin-system/clarification-contract-review.json",
+              "sha256": "b4fe3db773808bbf59411cb6371193d35345718d7de381d42cb1ebc3048e33d7"
+            }
+          ],
+          "required": true,
+          "result": "pass"
+        }
+      ],
+      "boundary_validation": "not-required",
+      "check_results": [
+        {
+          "check": {
+            "assertion": "The shared protocol defines exact task/group scope, dependency-ordered question rounds, source facts, actual owner answers, guarded revisions and interruption/resume. Completion requires concrete goals, scope, dependencies, acceptance and feasible validation, no unresolved mandatory decisions and actual owner confirmation bound to the current task revision. The shared loop derives from the inspected upstream grilling protocol and supports explicit clarification without a generic plugin engine; the planned post-processing adapter reuses the same loop. The contract separates complete-content write guards from semantic confirmation identity; formatting-only edits preserve confirmation, semantic edits reopen affected answers and final confirmation, and unrelated answers remain valid.",
+            "criteria": [
+              "The shared protocol defines exact task/group scope, dependency-ordered question rounds, source facts, actual owner answers, guarded revisions and interruption/resume.",
+              "Completion requires concrete goals, scope, dependencies, acceptance and feasible validation, no unresolved mandatory decisions and actual owner confirmation bound to the current task revision.",
+              "The shared loop derives from the inspected upstream grilling protocol and supports explicit clarification without a generic plugin engine; the planned post-processing adapter reuses the same loop.",
+              "The contract separates complete-content write guards from semantic confirmation identity; formatting-only edits preserve confirmation, semantic edits reopen affected answers and final confirmation, and unrelated answers remain valid."
+            ],
+            "id": "clarification-contract",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/documents/task-clarification-contract.md",
+              ".skill-tree/common/references/future-workflow.md",
+              ".skill-tree/common/references/workflow-metadata.md",
+              ".skill-tree/common/scripts/workflow-state.py",
+              ".skill-tree/documents/plugin-system-research.md"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "The shared protocol defines exact task/group scope, dependency-ordered question rounds, source facts, actual owner answers, guarded revisions and interruption/resume. Completion requires concrete goals, scope, dependencies, acceptance and feasible validation, no unresolved mandatory decisions and actual owner confirmation bound to the current task revision. The shared loop derives from the inspected upstream grilling protocol and supports explicit clarification without a generic plugin engine; the planned post-processing adapter reuses the same loop. The contract separates complete-content write guards from semantic confirmation identity; formatting-only edits preserve confirmation, semantic edits reopen affected answers and final confirmation, and unrelated answers remain valid.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-badf7b90-00f2-41c4-a6bf-eccda3135e81",
+            "classification": "executed-control",
+            "cleanup": "Source inspection and documentation validation start no product, provider or model process.",
+            "definition": "68485d9304d5655c399c4a89d1ff23cc23a8d278864030c2f90bf826335d5ab8",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/plugin-system/clarification-contract-review.json",
+                "sha256": "b4fe3db773808bbf59411cb6371193d35345718d7de381d42cb1ebc3048e33d7"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "3d62943b218f27b6c238ec31f97af8c2bc60fca5d09ec89c2a8ecddef632b732",
+            "payload_hash": "aceccebce5c38fe4cdd8a1549f25eefe126db1d52a78b606ec539df1fee1a5c5",
+            "recorded_at": "2026-11-05T11:55:36.518473+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+              ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+              ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+              ".skill-tree/documents/plugin-system-research.md": "252ea8eac8c950fa1a6c8a2ea0a774f81dd9b69850fc7fecc99eff52373e7bb7",
+              ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406"
+            }
+          }
+        }
+      ],
+      "commits": [],
+      "depends_on": [],
+      "disposition": "completed",
+      "evidence": [
+        {
+          "available": true,
+          "path": ".skill-tree/history/validation/plugin-system/clarification-contract-review.json",
+          "sha256": "b4fe3db773808bbf59411cb6371193d35345718d7de381d42cb1ebc3048e33d7"
+        }
+      ],
+      "followup_ids": [],
+      "id": "O-ac001b97-eb35-4d59-b454-0c99270a12df",
+      "limitations": [
+        "Executable controller behavior remains the separate implementation task."
+      ],
+      "outcome": "The shared task clarification contract defines guarded exact-scope rounds, semantic confirmation, interruption and safe standalone integration.",
+      "parent_pending_ids": [
+        "P-e5de6bf4-99d6-481e-b158-7d302efde259"
+      ],
+      "recorded_at": "2026-11-05T11:55:36.973894+00:00",
+      "related_task_id": null,
+      "root_task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+      "source_fingerprints": {
+        ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+        ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+        ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+        ".skill-tree/documents/plugin-system-research.md": "252ea8eac8c950fa1a6c8a2ea0a774f81dd9b69850fc7fecc99eff52373e7bb7",
+        ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406"
+      },
+      "task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "title": "Define the shared iterative task clarification protocol",
+      "validation_group_id": null,
+      "validation_plan": [
+        {
+          "assertion": "The shared protocol defines exact task/group scope, dependency-ordered question rounds, source facts, actual owner answers, guarded revisions and interruption/resume. Completion requires concrete goals, scope, dependencies, acceptance and feasible validation, no unresolved mandatory decisions and actual owner confirmation bound to the current task revision. The shared loop derives from the inspected upstream grilling protocol and supports explicit clarification without a generic plugin engine; the planned post-processing adapter reuses the same loop. The contract separates complete-content write guards from semantic confirmation identity; formatting-only edits preserve confirmation, semantic edits reopen affected answers and final confirmation, and unrelated answers remain valid.",
+          "criteria": [
+            "The shared protocol defines exact task/group scope, dependency-ordered question rounds, source facts, actual owner answers, guarded revisions and interruption/resume.",
+            "Completion requires concrete goals, scope, dependencies, acceptance and feasible validation, no unresolved mandatory decisions and actual owner confirmation bound to the current task revision.",
+            "The shared loop derives from the inspected upstream grilling protocol and supports explicit clarification without a generic plugin engine; the planned post-processing adapter reuses the same loop.",
+            "The contract separates complete-content write guards from semantic confirmation identity; formatting-only edits preserve confirmation, semantic edits reopen affected answers and final confirmation, and unrelated answers remain valid."
+          ],
+          "id": "clarification-contract",
+          "parameters": {},
+          "recipe_id": "static-inspection",
+          "sources": [
+            ".skill-tree/documents/task-clarification-contract.md",
+            ".skill-tree/common/references/future-workflow.md",
+            ".skill-tree/common/references/workflow-metadata.md",
+            ".skill-tree/common/scripts/workflow-state.py",
+            ".skill-tree/documents/plugin-system-research.md"
+          ],
+          "timing": "immediate"
+        }
+      ],
+      "validation_signature": "68485d9304d5655c399c4a89d1ff23cc23a8d278864030c2f90bf826335d5ab8"
+    }
+  ],
+  "progress_changes": [
+    {
+      "after": null,
+      "before": {
+        "admission": {
+          "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+          "flavor": "general",
+          "identity": "5d85a146bd944fe3a11890a9cb126ccd07dd1520825058a8d888b8a6fc22b76b"
+        },
+        "checks": {
+          "clarification-contract": {
+            "attempt": {
+              "attempt_id": "C-badf7b90-00f2-41c4-a6bf-eccda3135e81",
+              "definition": "68485d9304d5655c399c4a89d1ff23cc23a8d278864030c2f90bf826335d5ab8",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "key": "3d62943b218f27b6c238ec31f97af8c2bc60fca5d09ec89c2a8ecddef632b732",
+              "launch": null,
+              "prepared_at": "2026-11-05T11:55:09.405487+00:00",
+              "recipe": {
+                "assertion_contract": "explicit source and artifact assertions",
+                "input_paths": [],
+                "lane": "static"
+              },
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/documents/plugin-system-research.md": "252ea8eac8c950fa1a6c8a2ea0a774f81dd9b69850fc7fecc99eff52373e7bb7",
+                ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406"
+              }
+            },
+            "receipts": {
+              "C-badf7b90-00f2-41c4-a6bf-eccda3135e81": {
+                "actual_lane": "static",
+                "assertions": [
+                  {
+                    "assertion": "The shared protocol defines exact task/group scope, dependency-ordered question rounds, source facts, actual owner answers, guarded revisions and interruption/resume. Completion requires concrete goals, scope, dependencies, acceptance and feasible validation, no unresolved mandatory decisions and actual owner confirmation bound to the current task revision. The shared loop derives from the inspected upstream grilling protocol and supports explicit clarification without a generic plugin engine; the planned post-processing adapter reuses the same loop. The contract separates complete-content write guards from semantic confirmation identity; formatting-only edits preserve confirmation, semantic edits reopen affected answers and final confirmation, and unrelated answers remain valid.",
+                    "result": "pass"
+                  }
+                ],
+                "attempt_id": "C-badf7b90-00f2-41c4-a6bf-eccda3135e81",
+                "classification": "executed-control",
+                "cleanup": "Source inspection and documentation validation start no product, provider or model process.",
+                "definition": "68485d9304d5655c399c4a89d1ff23cc23a8d278864030c2f90bf826335d5ab8",
+                "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/clarification-contract-review.json",
+                    "sha256": "b4fe3db773808bbf59411cb6371193d35345718d7de381d42cb1ebc3048e33d7"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "3d62943b218f27b6c238ec31f97af8c2bc60fca5d09ec89c2a8ecddef632b732",
+                "payload_hash": "aceccebce5c38fe4cdd8a1549f25eefe126db1d52a78b606ec539df1fee1a5c5",
+                "recorded_at": "2026-11-05T11:55:36.518473+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                  ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+                  ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                  ".skill-tree/documents/plugin-system-research.md": "252ea8eac8c950fa1a6c8a2ea0a774f81dd9b69850fc7fecc99eff52373e7bb7",
+                  ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406"
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "static",
+              "assertions": [
+                {
+                  "assertion": "The shared protocol defines exact task/group scope, dependency-ordered question rounds, source facts, actual owner answers, guarded revisions and interruption/resume. Completion requires concrete goals, scope, dependencies, acceptance and feasible validation, no unresolved mandatory decisions and actual owner confirmation bound to the current task revision. The shared loop derives from the inspected upstream grilling protocol and supports explicit clarification without a generic plugin engine; the planned post-processing adapter reuses the same loop. The contract separates complete-content write guards from semantic confirmation identity; formatting-only edits preserve confirmation, semantic edits reopen affected answers and final confirmation, and unrelated answers remain valid.",
+                  "result": "pass"
+                }
+              ],
+              "attempt_id": "C-badf7b90-00f2-41c4-a6bf-eccda3135e81",
+              "classification": "executed-control",
+              "cleanup": "Source inspection and documentation validation start no product, provider or model process.",
+              "definition": "68485d9304d5655c399c4a89d1ff23cc23a8d278864030c2f90bf826335d5ab8",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/clarification-contract-review.json",
+                  "sha256": "b4fe3db773808bbf59411cb6371193d35345718d7de381d42cb1ebc3048e33d7"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "3d62943b218f27b6c238ec31f97af8c2bc60fca5d09ec89c2a8ecddef632b732",
+              "payload_hash": "aceccebce5c38fe4cdd8a1549f25eefe126db1d52a78b606ec539df1fee1a5c5",
+              "recorded_at": "2026-11-05T11:55:36.518473+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/documents/plugin-system-research.md": "252ea8eac8c950fa1a6c8a2ea0a774f81dd9b69850fc7fecc99eff52373e7bb7",
+                ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406"
+              }
+            }
+          }
+        },
+        "definition": "68485d9304d5655c399c4a89d1ff23cc23a8d278864030c2f90bf826335d5ab8",
+        "execution_sessions": {},
+        "partial_work": [
+          ".skill-tree/documents/task-clarification-contract.md",
+          ".skill-tree/common/references/future-workflow.md",
+          ".skill-tree/common/references/workflow-metadata.md"
+        ],
+        "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+        "stage": "awaiting-validation"
+      },
+      "task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa"
+    }
+  ],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+  "schema": 1,
+  "sequence": 13
+}

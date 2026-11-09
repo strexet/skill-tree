@@ -1,0 +1,17 @@
+{
+  "qualification": "Temporary controlled no-op metadata review, no actors or providers.",
+  "observations": [
+    {
+      "variant": "disabled",
+      "exit": 0,
+      "result": "{\"state\": \"active\", \"next\": \"prepare\", \"admission_error\": \"An existing required hook chain remains unfinished: HC-7b4ac231-124d-5991-8330-8a9abec52411\", \"future_created\": false}",
+      "error": ""
+    },
+    {
+      "variant": "false-condition",
+      "exit": 0,
+      "result": "{\"state\": \"active\", \"next\": \"prepare\", \"admission_error\": \"An existing required hook chain remains unfinished: HC-7b4ac231-124d-5991-8330-8a9abec52411\", \"future_created\": false}",
+      "error": ""
+    }
+  ]
+}

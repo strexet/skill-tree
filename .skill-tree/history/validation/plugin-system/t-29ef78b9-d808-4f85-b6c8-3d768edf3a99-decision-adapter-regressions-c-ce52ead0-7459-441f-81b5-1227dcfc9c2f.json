@@ -1,0 +1,43 @@
+{
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-decision-adapters.py"
+  ],
+  "attempt_id": "C-ce52ead0-7459-441f-81b5-1227dcfc9c2f",
+  "check_id": "decision-adapter-regressions",
+  "counts": {
+    "discovered": 24,
+    "expected": 24,
+    "failed": 0,
+    "passed": 24,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-29ef78b9-d808-4f85-b6c8-3d768edf3a99-decision-adapter-regressions-c-ce52ead0-7459-441f-81b5-1227dcfc9c2f.txt",
+  "result": "pass",
+  "reviewed_failure_reason": null,
+  "source_fingerprints": {
+    ".skill-tree/bin/install.js": "6a3028764bcec61b7a95edabc8e2434dcdba2c718fc3fc99f0dcacb43701fdaf",
+    ".skill-tree/common/references/future-workflow.md": "d8c04b71daddb6df3b6e0198e87cd2497d2e7b9db50cfa9ec8222dae78344e24",
+    ".skill-tree/common/references/workflow-metadata.md": "c1a031314c6122fbbdbdbc73849bbe4cae6f93298d2f1ef172f6970470f2d249",
+    ".skill-tree/common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    ".skill-tree/common/scripts/pr-review-state.py": "3149a85987ef01913b163132fe19c59754f1b4939c336812fefe5a1fd0ae0834",
+    ".skill-tree/common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+    ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+    ".skill-tree/common/scripts/workflow-state.py": "b7524592a7e6a8126bb0ad846cc500884f725828e8133ccf2c80fcf2dc0e5e3b",
+    ".skill-tree/config/resource-map.json": "77317fe7b4e05e3ebb8ff8455053fcdee1b29399ef7894884284d5a7c45d16f3",
+    ".skill-tree/documents/implementation-plan.md": "d53373bb753c92ba770aca2af1d9dd4bea586888de5aa5320b454a2e056e84e1",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "ef81629dd2e76ed70a05896e57b38ca55571439af333da08ecebcf9d80bbe2ca",
+    ".skill-tree/documents/task-clarification-contract.md": "ceab4175e4e293fb9bba5b54c713ee769702c2b18e912ad784a1a7e99cf5e3dc",
+    ".skill-tree/lib/composer.js": "ebb4042086e61e32cd7c255df79befcdff06ae0b0bfaf2941d5d8facc1268e01",
+    ".skill-tree/lib/installation.js": "aff2c16139da198abc00a04e89a0bfe1a22bc826e38a722e146632b14164ef82",
+    ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+    ".skill-tree/tests/test-decision-adapters.py": "01f1b47b178cf01f98d2aa278d739e19da632b647a0fea5a162c110dce82e59f",
+    ".skill-tree/tests/test-decision-governance.py": "e95c38623875e3f145667fe8c2b06a896fe6a9d6775d58f5e3be60aa33f163a1"
+  },
+  "task_id": "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99",
+  "tool_wall_seconds": 7.2125968327745795
+}

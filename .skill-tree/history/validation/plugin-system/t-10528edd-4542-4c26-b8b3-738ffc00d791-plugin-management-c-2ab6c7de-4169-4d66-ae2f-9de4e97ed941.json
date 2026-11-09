@@ -1,0 +1,45 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-plugin-management.js"
+  ],
+  "attempt_id": "C-2ab6c7de-4169-4d66-ae2f-9de4e97ed941",
+  "check_id": "plugin-management",
+  "counts": {
+    "discovered": 16,
+    "expected": 16,
+    "failed": 16,
+    "passed": 0,
+    "skipped": 0
+  },
+  "exit_code": 1,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-10528edd-4542-4c26-b8b3-738ffc00d791-plugin-management-c-2ab6c7de-4169-4d66-ae2f-9de4e97ed941.txt",
+  "result": "red",
+  "reviewed_failure_reason": "The current source facade has no installed inventory or exact-ID management APIs and the CLI has no read-only plugin list route; sixteen requirements-led cases fail their feature-availability boundary before implementation.",
+  "source_fingerprints": {
+    ".skill-tree/bin/install.js": "6a3028764bcec61b7a95edabc8e2434dcdba2c718fc3fc99f0dcacb43701fdaf",
+    ".skill-tree/documents/implementation-plan.md": "d53373bb753c92ba770aca2af1d9dd4bea586888de5aa5320b454a2e056e84e1",
+    ".skill-tree/documents/install.md": "2b1667f1c126a75b9835aa1ba7a5dc03a61c51ab40e293279dde94a8903f32e2",
+    ".skill-tree/documents/plugin-installation-contract.md": "159c86c891e4f26186628c83825d928c0c91b0e033162a7d4d6594f956464520",
+    ".skill-tree/documents/plugin-management-contract.md": "d5d68870bb0f44c356fdbd5423f3995dea33931eded820ffa335ac715cc24616",
+    ".skill-tree/documents/plugin-system-contract.md": "a6e21d2c3b1bbc7fe45605bccddbd22c3f63c8f36c67a65712b67d4530c1a0d8",
+    ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84",
+    ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+    ".skill-tree/lib/installation.js": "bad4bfdadd9a7a87841af4f5599dbd0b698b602655deaa45ea1b05a924c9bdd9",
+    ".skill-tree/lib/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
+    ".skill-tree/lib/plugin-composition.js": "3a2b5af0329c6e0a98754c512388df0d447f0d08181fa39fd8cf7fa4905225db",
+    ".skill-tree/lib/plugin-lifecycle.js": "05f1604a464385532cdda5d1b729c6286aac625c2bb279495b44b30155fc4e9e",
+    ".skill-tree/lib/plugin-management.js": "8cbccff56296899a47a51b9b8ebf2209187a5359301e373e22e2c6cb7d957b6c",
+    ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    ".skill-tree/lib/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+    ".skill-tree/lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+    ".skill-tree/lib/plugins.js": "d9d140a9a1c7df3682f95ace505a6d06bbac5823787329acd70834732de1d4d0",
+    ".skill-tree/tests/test-plugin-management.js": "50f8892ceb5092a218b77001432bb3722c50301eba404add2606b594a7ca89bb"
+  },
+  "task_id": "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+  "tool_wall_seconds": 0.17807429237291217
+}

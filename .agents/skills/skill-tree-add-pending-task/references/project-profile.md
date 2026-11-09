@@ -13,8 +13,77 @@ Flavor: general. Static compatibility only; execution remains unqualified.
     "ui": []
   },
   "gaps": [],
-  "instruction_profile_id": "5797acd6c02b9711fb22903b1277efa65e219e5550c754de019e0d8e76f9af2c",
+  "instruction_profile_id": "6829d9d8c3ccc5eeeb45d98a5885da819252e286d9919ec0d6202346b0cf8081",
   "recipes": {
+    "pending-boundary-installation": {
+      "argv": [
+        "node",
+        "--test",
+        ".skill-tree/tests/test-pending-boundary-installation.js"
+      ],
+      "input_paths": [
+        ".skill-tree/config/repository.json"
+      ],
+      "lane": "unit",
+      "qualification": "owner-declared static recipe; runner unqualified"
+    },
+    "pending-boundary-unit": {
+      "argv": [
+        "python3",
+        ".skill-tree/tests/test-pending-intake-boundary.py"
+      ],
+      "input_paths": [
+        ".skill-tree/config/repository.json"
+      ],
+      "lane": "unit",
+      "qualification": "owner-declared static recipe; runner unqualified"
+    },
+    "pending-priority-installation": {
+      "argv": [
+        "node",
+        "--test",
+        ".skill-tree/tests/test-pending-priority-installation.js"
+      ],
+      "input_paths": [
+        ".skill-tree/config/repository.json"
+      ],
+      "lane": "unit",
+      "qualification": "owner-declared static recipe; runner unqualified"
+    },
+    "pending-priority-unit": {
+      "argv": [
+        "python3",
+        ".skill-tree/tests/test-pending-priority.py"
+      ],
+      "input_paths": [
+        ".skill-tree/config/repository.json"
+      ],
+      "lane": "unit",
+      "qualification": "owner-declared static recipe; runner unqualified"
+    },
+    "quality-node": {
+      "argv": [
+        "node",
+        "--test",
+        "{test_path}"
+      ],
+      "input_paths": [
+        ".skill-tree/config/repository.json"
+      ],
+      "lane": "unit",
+      "qualification": "owner-declared static recipe; runner unqualified"
+    },
+    "quality-python": {
+      "argv": [
+        "python3",
+        "{test_path}"
+      ],
+      "input_paths": [
+        ".skill-tree/config/repository.json"
+      ],
+      "lane": "unit",
+      "qualification": "owner-declared static recipe; runner unqualified"
+    },
     "script-test-node": {
       "argv": [
         "npm",
@@ -40,6 +109,11 @@ Flavor: general. Static compatibility only; execution remains unqualified.
       ],
       "lane": "unit",
       "qualification": "static-recipe; runner unqualified"
+    },
+    "static-inspection": {
+      "assertion_contract": "explicit source and artifact assertions",
+      "input_paths": [],
+      "lane": "static"
     }
   },
   "source_version": "0.3.0",

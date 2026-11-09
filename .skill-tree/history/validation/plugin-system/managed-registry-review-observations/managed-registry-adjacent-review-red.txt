@@ -1,0 +1,183 @@
+FFFFFF
+======================================================================
+FAIL: test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation (__main__.PluginWorkflowBridgeTests.test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation) (kind='source-drift')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1320, in test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation
+    self.assertEqual(calls,[]);self.assertEqual(self.invocation_bytes(frame),before)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['provider'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'provider'
+
+- ['provider']
++ []
+
+======================================================================
+FAIL: test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation (__main__.PluginWorkflowBridgeTests.test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation) (kind='already-invoking')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1320, in test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation
+    self.assertEqual(calls,[]);self.assertEqual(self.invocation_bytes(frame),before)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['provider'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'provider'
+
+- ['provider']
++ []
+
+======================================================================
+FAIL: test_finish_rejects_carrier_reference_disappearance_before_writer_entry (__main__.PluginWorkflowBridgeTests.test_finish_rejects_carrier_reference_disappearance_before_writer_entry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1409, in test_finish_rejects_carrier_reference_disappearance_before_writer_entry
+    with self.assertRaisesRegex(ValueError,'reference|selection|preflight|changed|carrier|admission'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_start_rechecks_completed_dependency_preflight_inside_the_writer (__main__.PluginWorkflowBridgeTests.test_start_rechecks_completed_dependency_preflight_inside_the_writer)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1435, in test_start_rechecks_completed_dependency_preflight_inside_the_writer
+    with self.assertRaisesRegex(ValueError,'reference|selection|preflight|changed|identity|admission'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_pr_ready_and_merge_gate_prepare_referenced_review_chains_outside_writer (__main__.PluginWorkflowBridgeTests.test_pr_ready_and_merge_gate_prepare_referenced_review_chains_outside_writer) (disappeared_carrier='ready')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1577, in test_pr_ready_and_merge_gate_prepare_referenced_review_chains_outside_writer
+    self.assertEqual(code,2,output.getvalue());self.assertEqual(path.read_bytes(),changed[0])
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : {
+  "publication_id": "dddddddddddddddddddddddddddddddd",
+  "authorization": {
+    "instruction_digest": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126",
+    "merge": true,
+    "origin": "owner",
+    "pr": true
+  },
+  "ci": "not-configured",
+  "findings": {},
+  "hook_chains": [
+    "HC-c1c7f7e4-f24c-5006-b47a-ca3bd22aba8c"
+  ],
+  "identity": {
+    "repo_id": "controlled-repository",
+    "remote": "origin",
+    "source_branch": "feature/controlled",
+    "target_branch": "develop",
+    "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "remote_id": null
+  },
+  "operations": {},
+  "pr": {
+    "id": "PR-controlled",
+    "url": "https://example.invalid/pr/1",
+    "number": 1
+  },
+  "review": {
+    "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "evidence": [
+      "controlled-review.json"
+    ],
+    "findings": [],
+    "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "independent_approval": false,
+    "key": "76450ad09108eb874cebbb1f087f1f98812e6ff68a2bf71706897214e965b0e4",
+    "unresolved": 0
+  },
+  "rounds": [
+    {
+      "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "evidence": [
+        "controlled-review.json"
+      ],
+      "findings": [],
+      "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "independent_approval": false,
+      "key": "76450ad09108eb874cebbb1f087f1f98812e6ff68a2bf71706897214e965b0e4",
+      "unresolved": 0
+    }
+  ],
+  "schema": 1,
+  "snapshot_key": "76450ad09108eb874cebbb1f087f1f98812e6ff68a2bf71706897214e965b0e4",
+  "status": "pr-ready"
+}
+
+
+======================================================================
+FAIL: test_pr_ready_and_merge_gate_prepare_referenced_review_chains_outside_writer (__main__.PluginWorkflowBridgeTests.test_pr_ready_and_merge_gate_prepare_referenced_review_chains_outside_writer) (disappeared_carrier='merge-gate')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1577, in test_pr_ready_and_merge_gate_prepare_referenced_review_chains_outside_writer
+    self.assertEqual(code,2,output.getvalue());self.assertEqual(path.read_bytes(),changed[0])
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : {
+  "publication_id": "dddddddddddddddddddddddddddddddd",
+  "authorization": {
+    "instruction_digest": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126",
+    "merge": true,
+    "origin": "owner",
+    "pr": true
+  },
+  "ci": "not-configured",
+  "findings": {},
+  "hook_chains": [
+    "HC-c1c7f7e4-f24c-5006-b47a-ca3bd22aba8c"
+  ],
+  "identity": {
+    "repo_id": "controlled-repository",
+    "remote": "origin",
+    "source_branch": "feature/controlled",
+    "target_branch": "develop",
+    "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "remote_id": null
+  },
+  "operations": {},
+  "pr": {
+    "id": "PR-controlled",
+    "url": "https://example.invalid/pr/1",
+    "number": 1
+  },
+  "review": {
+    "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "evidence": [
+      "controlled-review.json"
+    ],
+    "findings": [],
+    "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "independent_approval": false,
+    "key": "76450ad09108eb874cebbb1f087f1f98812e6ff68a2bf71706897214e965b0e4",
+    "unresolved": 0
+  },
+  "rounds": [
+    {
+      "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "evidence": [
+        "controlled-review.json"
+      ],
+      "findings": [],
+      "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "independent_approval": false,
+      "key": "76450ad09108eb874cebbb1f087f1f98812e6ff68a2bf71706897214e965b0e4",
+      "unresolved": 0
+    }
+  ],
+  "schema": 1,
+  "snapshot_key": "76450ad09108eb874cebbb1f087f1f98812e6ff68a2bf71706897214e965b0e4",
+  "status": "pr-ready"
+}
+
+
+----------------------------------------------------------------------
+Ran 4 tests in 34.441s
+
+FAILED (failures=6)

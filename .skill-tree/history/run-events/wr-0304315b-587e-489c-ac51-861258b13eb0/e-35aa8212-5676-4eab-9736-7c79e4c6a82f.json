@@ -1,0 +1,1326 @@
+{
+  "changes": [],
+  "checkpoint_after": {
+    "admission": {
+      "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+      "flavor": "general",
+      "identity": "8c1b83e0842048aa830c643c0388c4e18fa625d2a26d0291084462acd084e1b8"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "completed_ids": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc"
+    ],
+    "completion_refs": {
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa": "O-ac001b97-eb35-4d59-b454-0c99270a12df",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": "O-6ad524b7-13eb-4fca-82b8-4e53e092ad2c"
+    },
+    "current_task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+    "cycle_signature": "136b452046719917a4108fc25f21075e4e0dd3d275642317ba54fddddb91f27d",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Commit the approved changes, then Implement All from and back into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+    "limits": {},
+    "mode": "all",
+    "next_action": "Run current clarification checks and actual-agent qualification in isolated source fixtures.",
+    "partial_work": [],
+    "pending_ids": [
+      "P-9bf5b8af-1e50-4f53-9ab9-56ef46997428"
+    ],
+    "phase": "capture-findings",
+    "processing_results": [],
+    "required_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "root_task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+    "snapshot": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "started_at": "2026-11-05T11:44:41.702298+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "branch": "codex/plugin-system",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests continuing from the current codex/next-version branch instead of develop and merging all results into codex/next-version.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-0304315b-587e-489c-ac51-861258b13eb0"
+    },
+    "workspace_state": "ready"
+  },
+  "checkpoint_before": {
+    "admission": {
+      "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+      "flavor": "general",
+      "identity": "8c1b83e0842048aa830c643c0388c4e18fa625d2a26d0291084462acd084e1b8"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "completed_ids": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc"
+    ],
+    "completion_refs": {
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa": "O-ac001b97-eb35-4d59-b454-0c99270a12df",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": "O-6ad524b7-13eb-4fca-82b8-4e53e092ad2c"
+    },
+    "current_task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+    "cycle_signature": "136b452046719917a4108fc25f21075e4e0dd3d275642317ba54fddddb91f27d",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Commit the approved changes, then Implement All from and back into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+    "limits": {},
+    "mode": "all",
+    "next_action": "Run current clarification checks and actual-agent qualification in isolated source fixtures.",
+    "partial_work": [],
+    "pending_ids": [
+      "P-9bf5b8af-1e50-4f53-9ab9-56ef46997428"
+    ],
+    "phase": "capture-findings",
+    "processing_results": [],
+    "required_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "root_task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+    "snapshot": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "started_at": "2026-11-05T11:44:41.702298+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "branch": "codex/plugin-system",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests continuing from the current codex/next-version branch instead of develop and merging all results into codex/next-version.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-0304315b-587e-489c-ac51-861258b13eb0"
+    },
+    "workspace_state": "ready"
+  },
+  "id": "E-35aa8212-5676-4eab-9736-7c79e4c6a82f",
+  "outcomes": [],
+  "progress_changes": [
+    {
+      "after": {
+        "admission": {
+          "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+          "flavor": "general",
+          "identity": "4265c0e60a86aef2e7a0a2948e17dfc2b20d9bd0e24dd9a16d7546d2fb8d093f"
+        },
+        "checks": {
+          "clarification-agent-observation": {
+            "attempt": {
+              "attempt_id": "C-2ae9571a-3304-4689-8bc4-56c9e5cd2852",
+              "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "key": "c465e7f43eccb88de255d3b9ba6c9dd31b2c5824d219aae51ae77cd4a996bac0",
+              "launch": null,
+              "prepared_at": "2026-11-05T12:45:24.341395+00:00",
+              "recipe": {
+                "assertion_contract": "explicit source and artifact assertions",
+                "input_paths": [],
+                "lane": "static"
+              },
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                ".skill-tree/scripts/agent-conformance.py": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
+                ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+              }
+            },
+            "receipts": {
+              "C-cfb2793f-8765-4ab3-bf78-e8b1e7b6f72a": {
+                "actual_lane": "static",
+                "attempt_id": "C-cfb2793f-8765-4ab3-bf78-e8b1e7b6f72a",
+                "classification": "executed-control",
+                "cleanup": "Actor turns are complete and no product/provider process is active. Isolated fixture files remain retained for trace review and final grading before cleanup.",
+                "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+                "diagnostic_key": "123d73e0bb6a2a57fe9aec77dabb89c290c3653942bb33b9ffd47e5aa9cc026a",
+                "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/clarification-observation-oracle-failure.json",
+                    "sha256": "28e6602f883e51c1818b7b29177ea8767b7d9c718f4fae1c8a3427ee05245ecb"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_signature": "observation-oracle-rejects-substantiated-combined-confirmation",
+                "key": "67bb5f0b6f23fb08dddb57536fd4412bfd3ffefe2c46b1bec04209a7e0c59f0b",
+                "payload_hash": "89c7ce87f7d850aff0377250bf1d70c2cfe46de83a12f7d3a73cc9e4bf1c3886",
+                "recorded_at": "2026-11-05T12:36:46.448675+00:00",
+                "result": "fail",
+                "sources": {
+                  ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                  ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                  ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                  ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                  ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                  ".skill-tree/scripts/agent-conformance.py": "23a186296f078b08b5f8928297efddae99d5be1ee0664c43228f93bafe8aa43b",
+                  ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                  ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                  ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "static",
+              "attempt_id": "C-cfb2793f-8765-4ab3-bf78-e8b1e7b6f72a",
+              "classification": "executed-control",
+              "cleanup": "Actor turns are complete and no product/provider process is active. Isolated fixture files remain retained for trace review and final grading before cleanup.",
+              "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+              "diagnostic_key": "123d73e0bb6a2a57fe9aec77dabb89c290c3653942bb33b9ffd47e5aa9cc026a",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/clarification-observation-oracle-failure.json",
+                  "sha256": "28e6602f883e51c1818b7b29177ea8767b7d9c718f4fae1c8a3427ee05245ecb"
+                }
+              ],
+              "execution_sessions": {},
+              "failure_signature": "observation-oracle-rejects-substantiated-combined-confirmation",
+              "key": "67bb5f0b6f23fb08dddb57536fd4412bfd3ffefe2c46b1bec04209a7e0c59f0b",
+              "payload_hash": "89c7ce87f7d850aff0377250bf1d70c2cfe46de83a12f7d3a73cc9e4bf1c3886",
+              "recorded_at": "2026-11-05T12:36:46.448675+00:00",
+              "result": "fail",
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                ".skill-tree/scripts/agent-conformance.py": "23a186296f078b08b5f8928297efddae99d5be1ee0664c43228f93bafe8aa43b",
+                ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+              }
+            }
+          },
+          "clarification-installation": {
+            "attempt": {
+              "attempt_id": "C-cbf928d1-7778-4206-8571-b9f0f5d6e2dd",
+              "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+              "environment_identity": "f0894dc23ed75131582b99c8ea92e2f66565c8edd37a96428c39b33ba0a2c8a3",
+              "key": "cc7a9e4f983c2f7cd372645a1c6b08455bc2b621c193d0eef3ee1dbcc6e1c98d",
+              "launch": null,
+              "prepared_at": "2026-11-05T12:45:24.039388+00:00",
+              "recipe": {
+                "argv": [
+                  "node",
+                  "--test",
+                  ".skill-tree/tests/test-clarification-installation.js"
+                ],
+                "input_paths": [
+                  ".skill-tree/config/repository.json"
+                ],
+                "lane": "unit",
+                "qualification": "owner-declared static recipe; runner unqualified"
+              },
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                ".skill-tree/scripts/agent-conformance.py": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
+                ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+              }
+            },
+            "receipts": {
+              "C-27d851f5-802c-4d81-82f1-606156f0aee3": {
+                "actual_lane": "unit",
+                "attempt_id": "C-27d851f5-802c-4d81-82f1-606156f0aee3",
+                "classification": "executed-control",
+                "cleanup": "All temporary CLI, Git and installed-package fixtures were removed; no product, network or provider operation occurred.",
+                "counts": {
+                  "discovered": 3,
+                  "expected": 3,
+                  "failed": 0,
+                  "passed": 3,
+                  "skipped": 0
+                },
+                "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+                "environment_identity": "f0894dc23ed75131582b99c8ea92e2f66565c8edd37a96428c39b33ba0a2c8a3",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/clarification-installation-green.json",
+                    "sha256": "42028cb3e6cd28371f504d8a46f4889d556d75d460bd40e0be5c7ab2b3783db4"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "6fc90c105a8f0f81657456698dde94d6a8c888d56025c015414acb2a2b61194d",
+                "payload_hash": "9a73e2cee2ab572519b3c33e59dc622d05fe33ae85d441b4ebf48dea5d20fd1f",
+                "recorded_at": "2026-11-05T12:20:26.102706+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                  ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                  ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                  ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                  ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                  ".skill-tree/scripts/agent-conformance.py": "23a186296f078b08b5f8928297efddae99d5be1ee0664c43228f93bafe8aa43b",
+                  ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                  ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                  ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+                }
+              },
+              "C-8a212a56-0318-4e1c-9735-042c90411f71": {
+                "actual_lane": "unit",
+                "attempt_id": "C-8a212a56-0318-4e1c-9735-042c90411f71",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories were removed by runner cleanup; no product or provider operation occurred.",
+                "counts": {
+                  "discovered": 3,
+                  "expected": 3,
+                  "failed": 3,
+                  "passed": 0,
+                  "skipped": 0
+                },
+                "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+                "environment_identity": "f0894dc23ed75131582b99c8ea92e2f66565c8edd37a96428c39b33ba0a2c8a3",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/clarification-installation-red.json",
+                    "sha256": "bb648604c3e154f1b1e324ae91fa62dcd61430e1ca07a624842b8151cccccfb4"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_category": "expected-behavior",
+                "key": "258f11f99569fe002a11681ce2fb065e139b2edca2e626b4d69bbc7342d035a3",
+                "payload_hash": "726cfc7468044ddcf01d188dc8ca04d53e6b7f30478eedb90c0da3d798184e2a",
+                "recorded_at": "2026-11-05T12:02:29.889096+00:00",
+                "result": "red",
+                "sources": {
+                  ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                  ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+                  ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                  ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                  ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406",
+                  ".skill-tree/scripts/agent-conformance.py": "dd7f691f223ab886c84b151e22de295a513907ee0a728b40357c7ad382f7837d",
+                  ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+                  ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                  ".skill-tree/tests/test-task-clarification.py": "1adcc17c4fbcce04d1089f630ca117a18a0dc36c649e48c69ee1a63af32a241d"
+                }
+              },
+              "C-cbf928d1-7778-4206-8571-b9f0f5d6e2dd": {
+                "actual_lane": "unit",
+                "attempt_id": "C-cbf928d1-7778-4206-8571-b9f0f5d6e2dd",
+                "classification": "executed-control",
+                "cleanup": "All temporary deterministic fixtures were removed by runner cleanup; no product or provider operation occurred.",
+                "counts": {
+                  "discovered": 3,
+                  "expected": 3,
+                  "failed": 0,
+                  "passed": 3,
+                  "skipped": 0
+                },
+                "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+                "environment_identity": "f0894dc23ed75131582b99c8ea92e2f66565c8edd37a96428c39b33ba0a2c8a3",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/clarification-installation-green.json",
+                    "sha256": "e97916d59206bdf3687b73063a6f21d0b9c6f8dbb5e0cfb23da72faee0af9ebc"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "cc7a9e4f983c2f7cd372645a1c6b08455bc2b621c193d0eef3ee1dbcc6e1c98d",
+                "payload_hash": "3d789b2e70dbba0cb4eb4af36d3b53d30dc7bb953ba4168b2349264eb1fa0573",
+                "recorded_at": "2026-11-05T12:47:20.423263+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                  ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                  ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                  ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                  ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                  ".skill-tree/scripts/agent-conformance.py": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
+                  ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                  ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                  ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+                }
+              }
+            },
+            "red": {
+              "actual_lane": "unit",
+              "attempt_id": "C-8a212a56-0318-4e1c-9735-042c90411f71",
+              "classification": "executed-control",
+              "cleanup": "Temporary fixture repositories were removed by runner cleanup; no product or provider operation occurred.",
+              "counts": {
+                "discovered": 3,
+                "expected": 3,
+                "failed": 3,
+                "passed": 0,
+                "skipped": 0
+              },
+              "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+              "environment_identity": "f0894dc23ed75131582b99c8ea92e2f66565c8edd37a96428c39b33ba0a2c8a3",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/clarification-installation-red.json",
+                  "sha256": "bb648604c3e154f1b1e324ae91fa62dcd61430e1ca07a624842b8151cccccfb4"
+                }
+              ],
+              "execution_sessions": {},
+              "failure_category": "expected-behavior",
+              "key": "258f11f99569fe002a11681ce2fb065e139b2edca2e626b4d69bbc7342d035a3",
+              "payload_hash": "726cfc7468044ddcf01d188dc8ca04d53e6b7f30478eedb90c0da3d798184e2a",
+              "recorded_at": "2026-11-05T12:02:29.889096+00:00",
+              "result": "red",
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406",
+                ".skill-tree/scripts/agent-conformance.py": "dd7f691f223ab886c84b151e22de295a513907ee0a728b40357c7ad382f7837d",
+                ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+                ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                ".skill-tree/tests/test-task-clarification.py": "1adcc17c4fbcce04d1089f630ca117a18a0dc36c649e48c69ee1a63af32a241d"
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-cbf928d1-7778-4206-8571-b9f0f5d6e2dd",
+              "classification": "executed-control",
+              "cleanup": "All temporary deterministic fixtures were removed by runner cleanup; no product or provider operation occurred.",
+              "counts": {
+                "discovered": 3,
+                "expected": 3,
+                "failed": 0,
+                "passed": 3,
+                "skipped": 0
+              },
+              "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+              "environment_identity": "f0894dc23ed75131582b99c8ea92e2f66565c8edd37a96428c39b33ba0a2c8a3",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/clarification-installation-green.json",
+                  "sha256": "e97916d59206bdf3687b73063a6f21d0b9c6f8dbb5e0cfb23da72faee0af9ebc"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "cc7a9e4f983c2f7cd372645a1c6b08455bc2b621c193d0eef3ee1dbcc6e1c98d",
+              "payload_hash": "3d789b2e70dbba0cb4eb4af36d3b53d30dc7bb953ba4168b2349264eb1fa0573",
+              "recorded_at": "2026-11-05T12:47:20.423263+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                ".skill-tree/scripts/agent-conformance.py": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
+                ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+              }
+            }
+          },
+          "clarification-state": {
+            "attempt": {
+              "attempt_id": "C-b26cd04a-d68f-4e70-bf5d-5b254963c9ed",
+              "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+              "environment_identity": "6bd4b2810df0ddaebd33b53a2b603b767a1e5d8a50f61b8b6f188c651acd2c3a",
+              "key": "183acf09a025bfdb9c8a668f118e9832b9de829a8aed5658f1b0237b98d349be",
+              "launch": null,
+              "prepared_at": "2026-11-05T12:45:23.720249+00:00",
+              "recipe": {
+                "argv": [
+                  "python3",
+                  ".skill-tree/tests/test-task-clarification.py"
+                ],
+                "input_paths": [
+                  ".skill-tree/config/repository.json"
+                ],
+                "lane": "unit",
+                "qualification": "owner-declared static recipe; runner unqualified"
+              },
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                ".skill-tree/scripts/agent-conformance.py": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
+                ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+              }
+            },
+            "receipts": {
+              "C-3ae06f53-7ea7-492e-b585-1b9adcb4c886": {
+                "actual_lane": "unit",
+                "attempt_id": "C-3ae06f53-7ea7-492e-b585-1b9adcb4c886",
+                "classification": "executed-control",
+                "cleanup": "All temporary CLI, Git and installed-package fixtures were removed; no product, network or provider operation occurred.",
+                "counts": {
+                  "discovered": 24,
+                  "expected": 24,
+                  "failed": 0,
+                  "passed": 24,
+                  "skipped": 0
+                },
+                "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+                "environment_identity": "6bd4b2810df0ddaebd33b53a2b603b767a1e5d8a50f61b8b6f188c651acd2c3a",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/clarification-state-green.json",
+                    "sha256": "d4c275fac732ade46c31e5e0667879814440aa1cc934075842498b34437a221d"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "513e43c255902d2c662b0ed2abe38371d1e6100271d92ae7df5c4e9c5e7eaacf",
+                "payload_hash": "64fdfc5b6a232e32d7631331cfe34dfe9757e7bc99a488f2a0d86845c5bf24b0",
+                "recorded_at": "2026-11-05T12:20:25.967463+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                  ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                  ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                  ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                  ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                  ".skill-tree/scripts/agent-conformance.py": "23a186296f078b08b5f8928297efddae99d5be1ee0664c43228f93bafe8aa43b",
+                  ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                  ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                  ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+                }
+              },
+              "C-5efd6fc7-f8d7-47f9-9886-54b95164a21b": {
+                "actual_lane": "unit",
+                "attempt_id": "C-5efd6fc7-f8d7-47f9-9886-54b95164a21b",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories were removed by runner cleanup; no product or provider operation occurred.",
+                "counts": {
+                  "discovered": 9,
+                  "expected": 9,
+                  "failed": 9,
+                  "passed": 0,
+                  "skipped": 0
+                },
+                "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+                "environment_identity": "6bd4b2810df0ddaebd33b53a2b603b767a1e5d8a50f61b8b6f188c651acd2c3a",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/clarification-state-red.json",
+                    "sha256": "4c6c644e130ef606c06125c71ea3ce2b06ec9a89f534d99be0a969251d0ef246"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_category": "expected-behavior",
+                "key": "6d68e8b61de6096498db615e44886d92512dc09f93adbabfdc528a4b143eb975",
+                "payload_hash": "50715291982de91afbb2f537d174bca4562035e290355100f1e3cc6ded158181",
+                "recorded_at": "2026-11-05T12:02:29.761597+00:00",
+                "result": "red",
+                "sources": {
+                  ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                  ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+                  ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                  ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                  ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406",
+                  ".skill-tree/scripts/agent-conformance.py": "dd7f691f223ab886c84b151e22de295a513907ee0a728b40357c7ad382f7837d",
+                  ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+                  ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                  ".skill-tree/tests/test-task-clarification.py": "1adcc17c4fbcce04d1089f630ca117a18a0dc36c649e48c69ee1a63af32a241d"
+                }
+              },
+              "C-b26cd04a-d68f-4e70-bf5d-5b254963c9ed": {
+                "actual_lane": "unit",
+                "attempt_id": "C-b26cd04a-d68f-4e70-bf5d-5b254963c9ed",
+                "classification": "executed-control",
+                "cleanup": "All temporary deterministic fixtures were removed by runner cleanup; no product or provider operation occurred.",
+                "counts": {
+                  "discovered": 24,
+                  "expected": 24,
+                  "failed": 0,
+                  "passed": 24,
+                  "skipped": 0
+                },
+                "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+                "environment_identity": "6bd4b2810df0ddaebd33b53a2b603b767a1e5d8a50f61b8b6f188c651acd2c3a",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/clarification-state-green.json",
+                    "sha256": "c157cac3674d4e22ba273cf4bfead3d471b64214550d56da5387af3636d269c7"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "183acf09a025bfdb9c8a668f118e9832b9de829a8aed5658f1b0237b98d349be",
+                "payload_hash": "7ed749a642d569dec3b49b98fff91466e69d386bf77ed8c4b3ca6df0d474b43a",
+                "recorded_at": "2026-11-05T12:47:20.286676+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                  ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                  ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                  ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                  ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                  ".skill-tree/scripts/agent-conformance.py": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
+                  ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                  ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                  ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+                }
+              }
+            },
+            "red": {
+              "actual_lane": "unit",
+              "attempt_id": "C-5efd6fc7-f8d7-47f9-9886-54b95164a21b",
+              "classification": "executed-control",
+              "cleanup": "Temporary fixture repositories were removed by runner cleanup; no product or provider operation occurred.",
+              "counts": {
+                "discovered": 9,
+                "expected": 9,
+                "failed": 9,
+                "passed": 0,
+                "skipped": 0
+              },
+              "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+              "environment_identity": "6bd4b2810df0ddaebd33b53a2b603b767a1e5d8a50f61b8b6f188c651acd2c3a",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/clarification-state-red.json",
+                  "sha256": "4c6c644e130ef606c06125c71ea3ce2b06ec9a89f534d99be0a969251d0ef246"
+                }
+              ],
+              "execution_sessions": {},
+              "failure_category": "expected-behavior",
+              "key": "6d68e8b61de6096498db615e44886d92512dc09f93adbabfdc528a4b143eb975",
+              "payload_hash": "50715291982de91afbb2f537d174bca4562035e290355100f1e3cc6ded158181",
+              "recorded_at": "2026-11-05T12:02:29.761597+00:00",
+              "result": "red",
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406",
+                ".skill-tree/scripts/agent-conformance.py": "dd7f691f223ab886c84b151e22de295a513907ee0a728b40357c7ad382f7837d",
+                ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+                ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                ".skill-tree/tests/test-task-clarification.py": "1adcc17c4fbcce04d1089f630ca117a18a0dc36c649e48c69ee1a63af32a241d"
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-b26cd04a-d68f-4e70-bf5d-5b254963c9ed",
+              "classification": "executed-control",
+              "cleanup": "All temporary deterministic fixtures were removed by runner cleanup; no product or provider operation occurred.",
+              "counts": {
+                "discovered": 24,
+                "expected": 24,
+                "failed": 0,
+                "passed": 24,
+                "skipped": 0
+              },
+              "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+              "environment_identity": "6bd4b2810df0ddaebd33b53a2b603b767a1e5d8a50f61b8b6f188c651acd2c3a",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/clarification-state-green.json",
+                  "sha256": "c157cac3674d4e22ba273cf4bfead3d471b64214550d56da5387af3636d269c7"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "183acf09a025bfdb9c8a668f118e9832b9de829a8aed5658f1b0237b98d349be",
+              "payload_hash": "7ed749a642d569dec3b49b98fff91466e69d386bf77ed8c4b3ca6df0d474b43a",
+              "recorded_at": "2026-11-05T12:47:20.286676+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                ".skill-tree/scripts/agent-conformance.py": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
+                ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+              }
+            }
+          }
+        },
+        "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+        "execution_sessions": {},
+        "partial_work": [
+          ".skill-tree/common/scripts/workflow-state.py",
+          ".skill-tree/templates/operations.json",
+          ".skill-tree/config/resource-map.json",
+          ".skill-tree/scripts/agent-conformance.py",
+          ".skill-tree/tests/test-task-clarification.py",
+          ".skill-tree/tests/test-clarification-installation.js"
+        ],
+        "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+        "stage": "awaiting-validation"
+      },
+      "before": {
+        "admission": {
+          "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+          "flavor": "general",
+          "identity": "4265c0e60a86aef2e7a0a2948e17dfc2b20d9bd0e24dd9a16d7546d2fb8d093f"
+        },
+        "checks": {
+          "clarification-agent-observation": {
+            "attempt": {
+              "attempt_id": "C-2ae9571a-3304-4689-8bc4-56c9e5cd2852",
+              "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "key": "c465e7f43eccb88de255d3b9ba6c9dd31b2c5824d219aae51ae77cd4a996bac0",
+              "launch": null,
+              "prepared_at": "2026-11-05T12:45:24.341395+00:00",
+              "recipe": {
+                "assertion_contract": "explicit source and artifact assertions",
+                "input_paths": [],
+                "lane": "static"
+              },
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                ".skill-tree/scripts/agent-conformance.py": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
+                ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+              }
+            },
+            "receipts": {
+              "C-cfb2793f-8765-4ab3-bf78-e8b1e7b6f72a": {
+                "actual_lane": "static",
+                "attempt_id": "C-cfb2793f-8765-4ab3-bf78-e8b1e7b6f72a",
+                "classification": "executed-control",
+                "cleanup": "Actor turns are complete and no product/provider process is active. Isolated fixture files remain retained for trace review and final grading before cleanup.",
+                "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+                "diagnostic_key": "123d73e0bb6a2a57fe9aec77dabb89c290c3653942bb33b9ffd47e5aa9cc026a",
+                "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/clarification-observation-oracle-failure.json",
+                    "sha256": "28e6602f883e51c1818b7b29177ea8767b7d9c718f4fae1c8a3427ee05245ecb"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_signature": "observation-oracle-rejects-substantiated-combined-confirmation",
+                "key": "67bb5f0b6f23fb08dddb57536fd4412bfd3ffefe2c46b1bec04209a7e0c59f0b",
+                "payload_hash": "89c7ce87f7d850aff0377250bf1d70c2cfe46de83a12f7d3a73cc9e4bf1c3886",
+                "recorded_at": "2026-11-05T12:36:46.448675+00:00",
+                "result": "fail",
+                "sources": {
+                  ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                  ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                  ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                  ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                  ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                  ".skill-tree/scripts/agent-conformance.py": "23a186296f078b08b5f8928297efddae99d5be1ee0664c43228f93bafe8aa43b",
+                  ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                  ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                  ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "static",
+              "attempt_id": "C-cfb2793f-8765-4ab3-bf78-e8b1e7b6f72a",
+              "classification": "executed-control",
+              "cleanup": "Actor turns are complete and no product/provider process is active. Isolated fixture files remain retained for trace review and final grading before cleanup.",
+              "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+              "diagnostic_key": "123d73e0bb6a2a57fe9aec77dabb89c290c3653942bb33b9ffd47e5aa9cc026a",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/clarification-observation-oracle-failure.json",
+                  "sha256": "28e6602f883e51c1818b7b29177ea8767b7d9c718f4fae1c8a3427ee05245ecb"
+                }
+              ],
+              "execution_sessions": {},
+              "failure_signature": "observation-oracle-rejects-substantiated-combined-confirmation",
+              "key": "67bb5f0b6f23fb08dddb57536fd4412bfd3ffefe2c46b1bec04209a7e0c59f0b",
+              "payload_hash": "89c7ce87f7d850aff0377250bf1d70c2cfe46de83a12f7d3a73cc9e4bf1c3886",
+              "recorded_at": "2026-11-05T12:36:46.448675+00:00",
+              "result": "fail",
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                ".skill-tree/scripts/agent-conformance.py": "23a186296f078b08b5f8928297efddae99d5be1ee0664c43228f93bafe8aa43b",
+                ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+              }
+            }
+          },
+          "clarification-installation": {
+            "attempt": {
+              "attempt_id": "C-cbf928d1-7778-4206-8571-b9f0f5d6e2dd",
+              "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+              "environment_identity": "f0894dc23ed75131582b99c8ea92e2f66565c8edd37a96428c39b33ba0a2c8a3",
+              "key": "cc7a9e4f983c2f7cd372645a1c6b08455bc2b621c193d0eef3ee1dbcc6e1c98d",
+              "launch": null,
+              "prepared_at": "2026-11-05T12:45:24.039388+00:00",
+              "recipe": {
+                "argv": [
+                  "node",
+                  "--test",
+                  ".skill-tree/tests/test-clarification-installation.js"
+                ],
+                "input_paths": [
+                  ".skill-tree/config/repository.json"
+                ],
+                "lane": "unit",
+                "qualification": "owner-declared static recipe; runner unqualified"
+              },
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                ".skill-tree/scripts/agent-conformance.py": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
+                ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+              }
+            },
+            "receipts": {
+              "C-27d851f5-802c-4d81-82f1-606156f0aee3": {
+                "actual_lane": "unit",
+                "attempt_id": "C-27d851f5-802c-4d81-82f1-606156f0aee3",
+                "classification": "executed-control",
+                "cleanup": "All temporary CLI, Git and installed-package fixtures were removed; no product, network or provider operation occurred.",
+                "counts": {
+                  "discovered": 3,
+                  "expected": 3,
+                  "failed": 0,
+                  "passed": 3,
+                  "skipped": 0
+                },
+                "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+                "environment_identity": "f0894dc23ed75131582b99c8ea92e2f66565c8edd37a96428c39b33ba0a2c8a3",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/clarification-installation-green.json",
+                    "sha256": "42028cb3e6cd28371f504d8a46f4889d556d75d460bd40e0be5c7ab2b3783db4"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "6fc90c105a8f0f81657456698dde94d6a8c888d56025c015414acb2a2b61194d",
+                "payload_hash": "9a73e2cee2ab572519b3c33e59dc622d05fe33ae85d441b4ebf48dea5d20fd1f",
+                "recorded_at": "2026-11-05T12:20:26.102706+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                  ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                  ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                  ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                  ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                  ".skill-tree/scripts/agent-conformance.py": "23a186296f078b08b5f8928297efddae99d5be1ee0664c43228f93bafe8aa43b",
+                  ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                  ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                  ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+                }
+              },
+              "C-8a212a56-0318-4e1c-9735-042c90411f71": {
+                "actual_lane": "unit",
+                "attempt_id": "C-8a212a56-0318-4e1c-9735-042c90411f71",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories were removed by runner cleanup; no product or provider operation occurred.",
+                "counts": {
+                  "discovered": 3,
+                  "expected": 3,
+                  "failed": 3,
+                  "passed": 0,
+                  "skipped": 0
+                },
+                "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+                "environment_identity": "f0894dc23ed75131582b99c8ea92e2f66565c8edd37a96428c39b33ba0a2c8a3",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/clarification-installation-red.json",
+                    "sha256": "bb648604c3e154f1b1e324ae91fa62dcd61430e1ca07a624842b8151cccccfb4"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_category": "expected-behavior",
+                "key": "258f11f99569fe002a11681ce2fb065e139b2edca2e626b4d69bbc7342d035a3",
+                "payload_hash": "726cfc7468044ddcf01d188dc8ca04d53e6b7f30478eedb90c0da3d798184e2a",
+                "recorded_at": "2026-11-05T12:02:29.889096+00:00",
+                "result": "red",
+                "sources": {
+                  ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                  ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+                  ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                  ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                  ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406",
+                  ".skill-tree/scripts/agent-conformance.py": "dd7f691f223ab886c84b151e22de295a513907ee0a728b40357c7ad382f7837d",
+                  ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+                  ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                  ".skill-tree/tests/test-task-clarification.py": "1adcc17c4fbcce04d1089f630ca117a18a0dc36c649e48c69ee1a63af32a241d"
+                }
+              }
+            },
+            "red": {
+              "actual_lane": "unit",
+              "attempt_id": "C-8a212a56-0318-4e1c-9735-042c90411f71",
+              "classification": "executed-control",
+              "cleanup": "Temporary fixture repositories were removed by runner cleanup; no product or provider operation occurred.",
+              "counts": {
+                "discovered": 3,
+                "expected": 3,
+                "failed": 3,
+                "passed": 0,
+                "skipped": 0
+              },
+              "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+              "environment_identity": "f0894dc23ed75131582b99c8ea92e2f66565c8edd37a96428c39b33ba0a2c8a3",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/clarification-installation-red.json",
+                  "sha256": "bb648604c3e154f1b1e324ae91fa62dcd61430e1ca07a624842b8151cccccfb4"
+                }
+              ],
+              "execution_sessions": {},
+              "failure_category": "expected-behavior",
+              "key": "258f11f99569fe002a11681ce2fb065e139b2edca2e626b4d69bbc7342d035a3",
+              "payload_hash": "726cfc7468044ddcf01d188dc8ca04d53e6b7f30478eedb90c0da3d798184e2a",
+              "recorded_at": "2026-11-05T12:02:29.889096+00:00",
+              "result": "red",
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406",
+                ".skill-tree/scripts/agent-conformance.py": "dd7f691f223ab886c84b151e22de295a513907ee0a728b40357c7ad382f7837d",
+                ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+                ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                ".skill-tree/tests/test-task-clarification.py": "1adcc17c4fbcce04d1089f630ca117a18a0dc36c649e48c69ee1a63af32a241d"
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-27d851f5-802c-4d81-82f1-606156f0aee3",
+              "classification": "executed-control",
+              "cleanup": "All temporary CLI, Git and installed-package fixtures were removed; no product, network or provider operation occurred.",
+              "counts": {
+                "discovered": 3,
+                "expected": 3,
+                "failed": 0,
+                "passed": 3,
+                "skipped": 0
+              },
+              "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+              "environment_identity": "f0894dc23ed75131582b99c8ea92e2f66565c8edd37a96428c39b33ba0a2c8a3",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/clarification-installation-green.json",
+                  "sha256": "42028cb3e6cd28371f504d8a46f4889d556d75d460bd40e0be5c7ab2b3783db4"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "6fc90c105a8f0f81657456698dde94d6a8c888d56025c015414acb2a2b61194d",
+              "payload_hash": "9a73e2cee2ab572519b3c33e59dc622d05fe33ae85d441b4ebf48dea5d20fd1f",
+              "recorded_at": "2026-11-05T12:20:26.102706+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                ".skill-tree/scripts/agent-conformance.py": "23a186296f078b08b5f8928297efddae99d5be1ee0664c43228f93bafe8aa43b",
+                ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+              }
+            }
+          },
+          "clarification-state": {
+            "attempt": {
+              "attempt_id": "C-b26cd04a-d68f-4e70-bf5d-5b254963c9ed",
+              "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+              "environment_identity": "6bd4b2810df0ddaebd33b53a2b603b767a1e5d8a50f61b8b6f188c651acd2c3a",
+              "key": "183acf09a025bfdb9c8a668f118e9832b9de829a8aed5658f1b0237b98d349be",
+              "launch": null,
+              "prepared_at": "2026-11-05T12:45:23.720249+00:00",
+              "recipe": {
+                "argv": [
+                  "python3",
+                  ".skill-tree/tests/test-task-clarification.py"
+                ],
+                "input_paths": [
+                  ".skill-tree/config/repository.json"
+                ],
+                "lane": "unit",
+                "qualification": "owner-declared static recipe; runner unqualified"
+              },
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                ".skill-tree/scripts/agent-conformance.py": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
+                ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+              }
+            },
+            "receipts": {
+              "C-3ae06f53-7ea7-492e-b585-1b9adcb4c886": {
+                "actual_lane": "unit",
+                "attempt_id": "C-3ae06f53-7ea7-492e-b585-1b9adcb4c886",
+                "classification": "executed-control",
+                "cleanup": "All temporary CLI, Git and installed-package fixtures were removed; no product, network or provider operation occurred.",
+                "counts": {
+                  "discovered": 24,
+                  "expected": 24,
+                  "failed": 0,
+                  "passed": 24,
+                  "skipped": 0
+                },
+                "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+                "environment_identity": "6bd4b2810df0ddaebd33b53a2b603b767a1e5d8a50f61b8b6f188c651acd2c3a",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/clarification-state-green.json",
+                    "sha256": "d4c275fac732ade46c31e5e0667879814440aa1cc934075842498b34437a221d"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "513e43c255902d2c662b0ed2abe38371d1e6100271d92ae7df5c4e9c5e7eaacf",
+                "payload_hash": "64fdfc5b6a232e32d7631331cfe34dfe9757e7bc99a488f2a0d86845c5bf24b0",
+                "recorded_at": "2026-11-05T12:20:25.967463+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                  ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                  ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                  ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                  ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                  ".skill-tree/scripts/agent-conformance.py": "23a186296f078b08b5f8928297efddae99d5be1ee0664c43228f93bafe8aa43b",
+                  ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                  ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                  ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+                }
+              },
+              "C-5efd6fc7-f8d7-47f9-9886-54b95164a21b": {
+                "actual_lane": "unit",
+                "attempt_id": "C-5efd6fc7-f8d7-47f9-9886-54b95164a21b",
+                "classification": "executed-control",
+                "cleanup": "Temporary fixture repositories were removed by runner cleanup; no product or provider operation occurred.",
+                "counts": {
+                  "discovered": 9,
+                  "expected": 9,
+                  "failed": 9,
+                  "passed": 0,
+                  "skipped": 0
+                },
+                "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+                "environment_identity": "6bd4b2810df0ddaebd33b53a2b603b767a1e5d8a50f61b8b6f188c651acd2c3a",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/clarification-state-red.json",
+                    "sha256": "4c6c644e130ef606c06125c71ea3ce2b06ec9a89f534d99be0a969251d0ef246"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_category": "expected-behavior",
+                "key": "6d68e8b61de6096498db615e44886d92512dc09f93adbabfdc528a4b143eb975",
+                "payload_hash": "50715291982de91afbb2f537d174bca4562035e290355100f1e3cc6ded158181",
+                "recorded_at": "2026-11-05T12:02:29.761597+00:00",
+                "result": "red",
+                "sources": {
+                  ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                  ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+                  ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                  ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                  ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406",
+                  ".skill-tree/scripts/agent-conformance.py": "dd7f691f223ab886c84b151e22de295a513907ee0a728b40357c7ad382f7837d",
+                  ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+                  ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                  ".skill-tree/tests/test-task-clarification.py": "1adcc17c4fbcce04d1089f630ca117a18a0dc36c649e48c69ee1a63af32a241d"
+                }
+              },
+              "C-b26cd04a-d68f-4e70-bf5d-5b254963c9ed": {
+                "actual_lane": "unit",
+                "attempt_id": "C-b26cd04a-d68f-4e70-bf5d-5b254963c9ed",
+                "classification": "executed-control",
+                "cleanup": "All temporary deterministic fixtures were removed by runner cleanup; no product or provider operation occurred.",
+                "counts": {
+                  "discovered": 24,
+                  "expected": 24,
+                  "failed": 0,
+                  "passed": 24,
+                  "skipped": 0
+                },
+                "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+                "environment_identity": "6bd4b2810df0ddaebd33b53a2b603b767a1e5d8a50f61b8b6f188c651acd2c3a",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/clarification-state-green.json",
+                    "sha256": "c157cac3674d4e22ba273cf4bfead3d471b64214550d56da5387af3636d269c7"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "183acf09a025bfdb9c8a668f118e9832b9de829a8aed5658f1b0237b98d349be",
+                "payload_hash": "7ed749a642d569dec3b49b98fff91466e69d386bf77ed8c4b3ca6df0d474b43a",
+                "recorded_at": "2026-11-05T12:47:20.286676+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                  ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                  ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                  ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                  ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                  ".skill-tree/scripts/agent-conformance.py": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
+                  ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                  ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                  ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+                }
+              }
+            },
+            "red": {
+              "actual_lane": "unit",
+              "attempt_id": "C-5efd6fc7-f8d7-47f9-9886-54b95164a21b",
+              "classification": "executed-control",
+              "cleanup": "Temporary fixture repositories were removed by runner cleanup; no product or provider operation occurred.",
+              "counts": {
+                "discovered": 9,
+                "expected": 9,
+                "failed": 9,
+                "passed": 0,
+                "skipped": 0
+              },
+              "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+              "environment_identity": "6bd4b2810df0ddaebd33b53a2b603b767a1e5d8a50f61b8b6f188c651acd2c3a",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/clarification-state-red.json",
+                  "sha256": "4c6c644e130ef606c06125c71ea3ce2b06ec9a89f534d99be0a969251d0ef246"
+                }
+              ],
+              "execution_sessions": {},
+              "failure_category": "expected-behavior",
+              "key": "6d68e8b61de6096498db615e44886d92512dc09f93adbabfdc528a4b143eb975",
+              "payload_hash": "50715291982de91afbb2f537d174bca4562035e290355100f1e3cc6ded158181",
+              "recorded_at": "2026-11-05T12:02:29.761597+00:00",
+              "result": "red",
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+                ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406",
+                ".skill-tree/scripts/agent-conformance.py": "dd7f691f223ab886c84b151e22de295a513907ee0a728b40357c7ad382f7837d",
+                ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+                ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                ".skill-tree/tests/test-task-clarification.py": "1adcc17c4fbcce04d1089f630ca117a18a0dc36c649e48c69ee1a63af32a241d"
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-b26cd04a-d68f-4e70-bf5d-5b254963c9ed",
+              "classification": "executed-control",
+              "cleanup": "All temporary deterministic fixtures were removed by runner cleanup; no product or provider operation occurred.",
+              "counts": {
+                "discovered": 24,
+                "expected": 24,
+                "failed": 0,
+                "passed": 24,
+                "skipped": 0
+              },
+              "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+              "environment_identity": "6bd4b2810df0ddaebd33b53a2b603b767a1e5d8a50f61b8b6f188c651acd2c3a",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/clarification-state-green.json",
+                  "sha256": "c157cac3674d4e22ba273cf4bfead3d471b64214550d56da5387af3636d269c7"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "183acf09a025bfdb9c8a668f118e9832b9de829a8aed5658f1b0237b98d349be",
+              "payload_hash": "7ed749a642d569dec3b49b98fff91466e69d386bf77ed8c4b3ca6df0d474b43a",
+              "recorded_at": "2026-11-05T12:47:20.286676+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+                ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+                ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+                ".skill-tree/scripts/agent-conformance.py": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
+                ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+                ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+                ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+              }
+            }
+          }
+        },
+        "definition": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689",
+        "execution_sessions": {},
+        "partial_work": [
+          ".skill-tree/common/scripts/workflow-state.py",
+          ".skill-tree/templates/operations.json",
+          ".skill-tree/config/resource-map.json",
+          ".skill-tree/scripts/agent-conformance.py",
+          ".skill-tree/tests/test-task-clarification.py",
+          ".skill-tree/tests/test-clarification-installation.js"
+        ],
+        "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+        "stage": "awaiting-validation"
+      },
+      "task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    }
+  ],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+  "schema": 1,
+  "sequence": 43
+}

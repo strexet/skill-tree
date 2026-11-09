@@ -1,0 +1,7 @@
+{
+  "qualification": "Expected strict current-source rejection of immutable historical core native capture; no passing native regrade.",
+  "actual_exit_code": 1,
+  "actual_error": "Core source fingerprints differ from the current execution source",
+  "source_analysis": ".skill-tree/history/validation/plugin-system/core127-after-managed-guards-analysis.json",
+  "current_native_run": false
+}

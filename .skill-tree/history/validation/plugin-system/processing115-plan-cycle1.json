@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "kind": "actual-significant-plan-review-cycle",
+  "orchestration_id": "DO-d49ac4a6-1e7c-5849-af1b-ca15b4fbd7b9",
+  "decision_id": "DG-c836250b-75e7-55e3-bdca-e1c41b03fb52",
+  "outcome": "revise",
+  "accepted_actual_arbitration": {
+    "actor": {
+      "context_id": "/root/plan_full_flow_review",
+      "id": "/root/plan_full_flow_review"
+    },
+    "answer": "revise",
+    "attempt_id": "DA-1104f5b7-e7a1-483f-a62e-be2b657f380b",
+    "authority_digest": "556c2bf6e342789bf72381588c679c861e8a4fdca1280ac9f54d73ead5d00b2f",
+    "context_identity": {
+      "decision_purpose": "plan",
+      "execution_snapshot_digest": "941d19ff6c8ad07dcf3f97f250025edd6ed0342ac3e88da4db8189b58191b517",
+      "id": "task:T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "kind": "task",
+      "orchestration_id": "DO-d49ac4a6-1e7c-5849-af1b-ca15b4fbd7b9",
+      "plan_digest": "96744edb2814d4ac201ddd943237b55d2432869b103c2cf4bbf7d3e1d4cec982",
+      "required_checks_digest": "6c9ac759ee228409db73ce5788f8a5f9f33175be01f2d30dcabf341d73f87917",
+      "task_ids": [
+        "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69"
+      ]
+    },
+    "decision_id": "DG-c836250b-75e7-55e3-bdca-e1c41b03fb52",
+    "digest": "4a2af36c0841940795d47baf0fdbfe9f19b4619bbb2628932d237a0f0d4b7f85",
+    "kind": "specification-acceptance",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/plan_full_flow_review",
+      "actor_id": "/root/plan_full_flow_review",
+      "creation_reference": "Observed separately created existing /root/plan_full_flow_review context; actual arbiter for the exact current optional post-processing plan, independent of root executor.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/plan_full_flow_review returned the observed arbiter result for the exact original sealed input; raw artifact processing115-arbiter-plan1-actual.json.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "8a223760dc8c1b57ef8405478ef26f29714d5e537eb1ebe324fddfd2d169b578",
+    "question_id": "processing115-plan",
+    "rationale": "The resolver is correct that atomic publication, one shared CL, real current-mode answers, contiguous revision evidence and exact mechanical finalization are suitably bounded. The critic identifies a material completion gap in the exact sealed plan: line23 explains how an explicit later C editor satisfies a recheck, but supplies no executable path for A-editor then B-interview when B semantically revises the task and C is absent. Existing plugin-invocation start/prepare creates stages from the entire frozen configuration and advances a satisfied prefix; it cannot selectively revisit accepted A. Node frozenPlan independently reconstructs the full owned configuration and rejects a caller-supplied reduced configuration. Preserving a stale A or restarting B violates the approved affected-recheck contract; permanently holding an otherwise supported configuration is not completion. Revise narrowly: the owning CL registers an exact affected editorial recheck mandate derived from the frozen original occurrence, application role, parameters/package/configuration/watch identity, current task fingerprints and current mode/authority/epoch. Execute the mandate as one fresh ordinary HC/HI through the existing prepare/invoke/record/accept path. Existing owned manifest reconstruction must validate the original frozen configuration and derive only that authenticated affected selection; arbitrary caller subsets, parameters or completed chains cannot authorize the recheck. Preserve the original HC/HI and accepted prefix unchanged, with no second actor broker or independent ledger. Final acceptance may consume only the exact CL-registered current recheck result. A matching explicit C can discharge the same obligation once and creates no fourth invocation. Add actual A-B-without-C and editor-only post-revision controls, repeated editorial occurrences/parameters, no B replay, matching C reuse, forged or stale mandate/subset rejection and source/policy drift. Retain current prerequisite, provenance, final-acceptance and exact finalization guards. This is a bounded technical plan repair within task115, not acceptance of implementation, candidate efficacy, installation consent or task114 trials.",
+    "role_receipts": {
+      "arbiter": "9c6d8df16b9a17a15b6f581e011cefe805c40d327f9c12cd89bcafd0c0b7114d",
+      "critic": "31f2b52770007999be132be4fb4acd84d3a9b80809ffef07833849bdeab742c4",
+      "resolver": "252f1c315ba9c169d63583dbbbf9a9f61007fff1d387cd93f92ef6654f27afca"
+    },
+    "semantic_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28"
+  },
+  "original_plan": ".skill-tree/history/research/processing115-plan-v1.md",
+  "original_plan_sha256": "96744edb2814d4ac201ddd943237b55d2432869b103c2cf4bbf7d3e1d4cec982",
+  "roles": {
+    "resolver": {
+      "status": "answered",
+      "role": "resolver",
+      "answer": "accept",
+      "rationale": "The plan is sufficient for the admitted optional post-processing application scope. The current process implementation publishes Ready tasks without a linked CL, while Store.save already supports atomic extra records; the proposed first Red therefore tests the actual missing business boundary. Trusted generic application roles, frozen configuration and exact output ownership preserve arbitrary compatible ordering, repeated occurrences and core-only behavior without candidate-ID routing. The plan separates raw pinned upstream instructions and user-only/native metadata from the explicitly declared source-backed translation, retains the grilling sibling and license, and requires real fresh fact exploration where needed. One CL owns dependent rounds, actual current-mode answers, guarded revisions and separate final acceptance; contiguous revision evidence closes the multi-round gap without restarting the external interview. Current-input editorial rechecks remain distinct from configured calls, and a matching later C pass can discharge the affected recheck once. Exact finalization is narrowly limited to the recorded owned marker/status transformation, live after-bytes, current CL policy/acceptance and registered original completed HC hashes; it preserves original HC and confirmation history and cannot normalize arbitrary edits. Required hold, drift, cancellation, mode-switch, cleanup and adversarial controls are explicit. The reviewed footprint may use existing helper/runtime seams only after concrete touched sources enter validation. This accepts the implementation plan, not successful execution, installation consent, native/candidate effectiveness or task114 trials.",
+      "evidence": [
+        ".skill-tree/artifacts/plugin-implementation/processing115-sealed-resolver.json",
+        ".skill-tree/history/research/processing115-plan.md",
+        ".skill-tree/artifacts/plugin-implementation/task115-source-gap-proposal.json",
+        ".skill-tree/artifacts/plugin-implementation/task115-source/source-manifest.json",
+        ".skill-tree/artifacts/plugin-implementation/task115-source/task115-adapter-source-proposal.json",
+        ".skill-tree/artifacts/plugin-implementation/task115-source/skills/productivity/writing-for-agents/SKILL.md",
+        ".skill-tree/artifacts/plugin-implementation/task115-source/skills/productivity/grill-me/SKILL.md",
+        ".skill-tree/artifacts/plugin-implementation/task115-source/skills/productivity/grilling/SKILL.md",
+        ".skill-tree/common/scripts/workflow-state.py",
+        ".skill-tree/common/scripts/plugin-invocation.py",
+        ".skill-tree/documents/plugin-workflow-decisions.md"
+      ],
+      "input_digest": "9ba095d8d4a812770bb25541f7d3d85cdb312876b519ac5e6daf772ced8ed8ae"
+    },
+    "critic": {
+      "status": "disagree",
+      "answer": "revise",
+      "rationale": "The plan adequately bounds atomic blocked publication, real current-mode answers, multi-round contiguous CL revision evidence and exact marker/status finalization. Existing requirementPlan is metadata-only and deliberately skips the business handler; actual Pending/proposal/source/allocated-T validation before inspection and inside the Process writer can authenticate prospective output inspection without inventing a new Node endpoint. One material implementation gap remains: the editor A then interview B configuration with no explicit C. After B changes the task, A's accepted wording input is stale and the agreed contract requires an affected editorial recheck without restarting B or replaying the whole prefix. The plan explains how an explicit current C discharges that obligation but does not define the no-C path. Current engine cursor/resume only retries the current original and cannot selectively replay an accepted stage; Node frozenPlan rebuilds the full verified configuration and rejects an arbitrary reduced configuration. Merely retaining the hold leaves a supported configuration unable to finish; silently reusing A or restarting B violates acceptance. Revise narrowly to define an owned CL-bound recheck execution: preserve the original HC/HI and accepted prefix unchanged, derive a fresh affected editorial-only recheck mandate from the frozen original occurrence/parameters/current task fingerprint/current policy, validate that mandate through the existing dispatcher and record the fresh actual HC/HI as an exact CL-registered recheck. The trusted mandate may authorize only the affected subset; caller parameters or arbitrary completed chains cannot supply it. A matching explicit C discharges the same obligation once without another call. Add A-B-without-C, editor-only post-revision, repeated compatible editorial occurrence and forged/stale subset controls. Keep shared CL question rounds, original B execution, task provenance, exact finalization mapping, capability/Auto authority holds and all qualification limits intact.",
+      "evidence": [
+        ".skill-tree/artifacts/plugin-implementation/processing115-sealed-critic.json",
+        ".skill-tree/history/research/processing115-plan.md",
+        ".skill-tree/artifacts/plugin-implementation/task115-source-gap-proposal.json",
+        ".skill-tree/documents/implementation-plan.md:50",
+        ".skill-tree/documents/implementation-plan.md:65",
+        ".skill-tree/common/scripts/plugin-invocation.py",
+        ".skill-tree/lib/plugin-runtime.js",
+        ".skill-tree/lib/plugin-bindings.js",
+        ".skill-tree/lib/plugin-composition.js",
+        ".skill-tree/common/scripts/workflow-state.py"
+      ],
+      "input_digest": "cd4f399df814148964fcf448948006942b5ce159943d1978df8678e54f92d08b"
+    },
+    "arbiter": {
+      "status": "answered",
+      "role": "arbiter",
+      "answer": "revise",
+      "rationale": "The resolver is correct that atomic publication, one shared CL, real current-mode answers, contiguous revision evidence and exact mechanical finalization are suitably bounded. The critic identifies a material completion gap in the exact sealed plan: line23 explains how an explicit later C editor satisfies a recheck, but supplies no executable path for A-editor then B-interview when B semantically revises the task and C is absent. Existing plugin-invocation start/prepare creates stages from the entire frozen configuration and advances a satisfied prefix; it cannot selectively revisit accepted A. Node frozenPlan independently reconstructs the full owned configuration and rejects a caller-supplied reduced configuration. Preserving a stale A or restarting B violates the approved affected-recheck contract; permanently holding an otherwise supported configuration is not completion. Revise narrowly: the owning CL registers an exact affected editorial recheck mandate derived from the frozen original occurrence, application role, parameters/package/configuration/watch identity, current task fingerprints and current mode/authority/epoch. Execute the mandate as one fresh ordinary HC/HI through the existing prepare/invoke/record/accept path. Existing owned manifest reconstruction must validate the original frozen configuration and derive only that authenticated affected selection; arbitrary caller subsets, parameters or completed chains cannot authorize the recheck. Preserve the original HC/HI and accepted prefix unchanged, with no second actor broker or independent ledger. Final acceptance may consume only the exact CL-registered current recheck result. A matching explicit C can discharge the same obligation once and creates no fourth invocation. Add actual A-B-without-C and editor-only post-revision controls, repeated editorial occurrences/parameters, no B replay, matching C reuse, forged or stale mandate/subset rejection and source/policy drift. Retain current prerequisite, provenance, final-acceptance and exact finalization guards. This is a bounded technical plan repair within task115, not acceptance of implementation, candidate efficacy, installation consent or task114 trials.",
+      "evidence": [
+        ".skill-tree/artifacts/plugin-implementation/processing115-sealed-arbiter.json",
+        ".skill-tree/artifacts/plugin-implementation/processing115-resolver-plan1-actual.json",
+        ".skill-tree/artifacts/plugin-implementation/processing115-critic-plan1-actual.json",
+        ".skill-tree/history/research/processing115-plan.md:23",
+        ".skill-tree/common/scripts/plugin-invocation.py:225",
+        ".skill-tree/common/scripts/plugin-invocation.py:345",
+        ".skill-tree/lib/plugin-runtime.js:52",
+        ".skill-tree/lib/plugin-runtime.js:86",
+        ".skill-tree/common/references/plugin-invocation.md:87"
+      ],
+      "input_digest": "a3c3a167461768486f631f1ce4359cb8571d0eeac2bad0176544d95e7811296d"
+    }
+  },
+  "limits": [
+    "Actual delegated plan decisions and source review only; no implementation, check result, native candidate execution, owner answer or comparison consent."
+  ]
+}

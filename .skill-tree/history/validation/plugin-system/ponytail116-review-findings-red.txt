@@ -1,0 +1,33 @@
+FFF
+======================================================================
+FAIL: test_actual_generic_dg_resolution_cannot_bypass_review_finding_incorporation (__main__.PluginReviewPilotTests.test_actual_generic_dg_resolution_cannot_bypass_review_finding_incorporation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 783, in test_actual_generic_dg_resolution_cannot_bypass_review_finding_incorporation
+    with self.assertRaisesRegex(ValueError,r'(?i)finding|review|publication|incorporat|contribution'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_owned_custom_named_after_alias_completes_and_satisfies_readiness (__main__.PluginReviewPilotTests.test_owned_custom_named_after_alias_completes_and_satisfies_readiness)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 528, in test_owned_custom_named_after_alias_completes_and_satisfies_readiness
+    self.assertEqual(self.cli('ready')['status'],'pr-ready')
+                     ^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 107, in cli
+    self.assertEqual(result.returncode,0 if ok else 2,result.stdout+result.stderr)
+AssertionError: 2 != 0 : {"ok": false, "error": "A configured enabled review occurrence is missing a unique explicitly attached current completed pass: ponytail-review-once"}
+
+
+======================================================================
+FAIL: test_after_entry_rejects_unresolved_core_report_and_needs_clean_current_pass (__main__.PluginReviewPilotTests.test_after_entry_rejects_unresolved_core_report_and_needs_clean_current_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 537, in test_after_entry_rejects_unresolved_core_report_and_needs_clean_current_pass
+    with self.assertRaisesRegex(ValueError,r'(?i)unresolved|finding|core|review|clean'):
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 3 tests in 16.416s
+
+FAILED (failures=3)

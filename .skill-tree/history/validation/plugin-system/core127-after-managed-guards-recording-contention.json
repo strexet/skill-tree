@@ -1,0 +1,6 @@
+{
+  "attempt_id": "C-dc5784e0-2720-4e02-96e9-55ae63a57002",
+  "recording_issue": "Concurrent independent unit wrappers attempted canonical result recording at the same time. The exclusive writer rejected one metadata call; no source or validation failure occurred.",
+  "recovery": "All parallel calls completed and the writer lock was absent. The original immutable passing report was recorded sequentially against the same attempt, sources and environment; no test rerun, identity substitution or lock removal.",
+  "test_result": "passed10/10"
+}

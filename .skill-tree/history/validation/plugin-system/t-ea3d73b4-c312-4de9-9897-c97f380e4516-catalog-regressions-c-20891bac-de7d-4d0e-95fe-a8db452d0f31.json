@@ -1,0 +1,56 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-plugin-catalog.js"
+  ],
+  "attempt_id": "C-20891bac-de7d-4d0e-95fe-a8db452d0f31",
+  "baseline": {
+    "last_accepted": {
+      "discovered": 11,
+      "expected": 11,
+      "failed": 0,
+      "passed": 11,
+      "skipped": 0
+    },
+    "original": {
+      "discovered": 11,
+      "expected": 11,
+      "failed": 0,
+      "passed": 11,
+      "skipped": 0
+    }
+  },
+  "check_id": "catalog-regressions",
+  "count_error": null,
+  "counts": {
+    "discovered": 11,
+    "expected": 11,
+    "failed": 0,
+    "passed": 11,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limitations": [
+    "Focused unit fixture evidence. No new actual actor or product qualification."
+  ],
+  "log_sha256": "2cc5501b5b6362efbb89055e36324972e11d2097383a54705e777b61405dac37",
+  "output": ".skill-tree/history/validation/plugin-system/t-ea3d73b4-c312-4de9-9897-c97f380e4516-catalog-regressions-c-20891bac-de7d-4d0e-95fe-a8db452d0f31.txt",
+  "owned_profile_identity": "56e828eacced91072ba944c318a5291a21b88be7f83b90a2248f53fdae95806a",
+  "process_group_clean": true,
+  "result": "pass",
+  "source_commit": "82eaf49b6cb35e65dfa30413228bddcb10190562",
+  "sources": {
+    ".skill-tree/bin/install.js": "c7b6581b5aa5e3a9c150d3cd9bdf312a5324ea40ebd1605a4d4184318b606636",
+    ".skill-tree/config/plugin-catalog.json": "0cac545a0f50891b859884865f7541f459bd8f9e3f3b3669fcf664b8890beb08",
+    ".skill-tree/documents/plugin-management-contract.md": "2b5c9aeb18dd30b06a809fd14e5222abf579a002187870167d61f6f7dda5b11a",
+    ".skill-tree/documents/plugin-recommendation-evidence.md": "e85766c749c19717f9eaf6d0c1049dfc48c31f77965e1e811a474e26a2cb2dd2",
+    ".skill-tree/documents/plugin-system-contract.md": "b25424efd0dc920376a8d32b9dd7ea27d6b644d966e167f690c8999dc2fa36f5",
+    ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84",
+    ".skill-tree/lib/plugin-catalog.js": "bcc842344ee7c7a8b3c37faa6f197e313826a82a4be99daf843163fa0030d143",
+    ".skill-tree/tests/test-plugin-catalog.js": "8e9b98889f515660b054ac63d5c8f8ce23597d9858f002db64ad6f2ab586f18b"
+  },
+  "task_id": "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+  "timed_out": false,
+  "tool_wall_seconds": 6.67
+}

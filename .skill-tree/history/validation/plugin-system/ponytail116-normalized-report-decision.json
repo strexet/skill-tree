@@ -1,0 +1,176 @@
+{
+  "schema": 1,
+  "kind": "actual-routine-auto-normalized-report-decision",
+  "orchestration_id": "DO-0d91bb8c-2ac0-5ba7-8f56-e1aa50735cd1",
+  "orchestration_revision": 28,
+  "decision_id": "DG-8107bab2-f059-5148-a84e-8871946c010e",
+  "acceptance": {
+    "actor": {
+      "context_id": "/root/registry117_architecture",
+      "id": "/root/registry117_architecture"
+    },
+    "answer": "reject-conflict",
+    "attempt_id": "DA-4b11b888-15bd-48b2-b222-274ca72a5bc3",
+    "authority_digest": "8e513ca2ec78101653022a6629bd3caf5c7059be3d2df34bb802c4ea1cf18422",
+    "context_identity": {
+      "decision_purpose": "decision",
+      "execution_snapshot_digest": "892007ebc4b973b4ab4120624f5bec28500cbc886a4f89498e1d341ad70cf8af",
+      "id": "task:T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "kind": "task",
+      "orchestration_id": "DO-0d91bb8c-2ac0-5ba7-8f56-e1aa50735cd1",
+      "task_ids": [
+        "T-18db6175-499f-4679-bf8d-f815c7b42411"
+      ]
+    },
+    "decision_id": "DG-8107bab2-f059-5148-a84e-8871946c010e",
+    "digest": "6a247fe8d4ed3d4ec450b66c63d6bfc84b05ef138316b36c211794d52e726f25",
+    "kind": "technical",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/registry117_architecture",
+      "actor_id": "/root/registry117_architecture",
+      "creation_reference": "Observed separately created existing /root/registry117_architecture context; actual resolver for the exact corrected optional pilot plan, independent of root executor.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/registry117_architecture returned the observed resolver result for the exact original sealed input; raw artifact ponytail116-shape-resolver-result.json.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "3b8032f404a3faf077a9c31e0f8193c59365edfaefc7658548f9d100bf9315bb",
+    "question_id": "ponytail116-normalized-report-shape",
+    "rationale": "The current record branch accepts a supported status plus arbitrary result fields, while passed with unchanged context receives a no-change receipt at accept. Therefore a nonempty reserved findings/questions field can be hidden by a contradictory successful status and avoid the corresponding ordinary publication obligation; the retained source review identifies the exact path. Rejecting that contradiction at record is the smallest bounded repair for frozen report-only publication review results. Nonempty reserved top-level findings must declare findings, and questions must declare questions; mixed obligations reject instead of being silently discarded. Preserve empty reserved arrays, ordinary notes, nested arbitrary JSON and generic non-review plugin results. Validation failure must retain the original attempt without a successful result; actual host reconciliation remains the cleanup path. The prospective controlled cases cover the four contradictions and a separate valid arbitrary-annotation result without adding invocation, installation or publication authority.",
+    "role_receipts": {
+      "resolver": "d861e96430280580d01dcc28c7eab55262210c4d71b3899c12d7520a570e74a2"
+    },
+    "semantic_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495"
+  },
+  "sealed_role": {
+    "attempt_id": "DA-4b11b888-15bd-48b2-b222-274ca72a5bc3",
+    "creation_evidence": {
+      "actor_context_id": "/root/registry117_architecture",
+      "actor_id": "/root/registry117_architecture",
+      "kind": "host-agent-created",
+      "provider": "Codex collaboration",
+      "reference": "Observed separately created existing /root/registry117_architecture context; actual resolver for the exact corrected optional pilot plan, independent of root executor.",
+      "tool": "collaboration.spawn_agent"
+    },
+    "input": {
+      "actor": {
+        "context_id": "/root/registry117_architecture",
+        "id": "/root/registry117_architecture"
+      },
+      "authority": {
+        "allowed_kinds": [
+          "technical",
+          "product",
+          "specification-acceptance"
+        ],
+        "constraints": [
+          "Only the admitted optional pinned Ponytail review pilot and completed dependency scope; controlled local installation fixtures use scripted test input. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+        ],
+        "context_id": "task:T-18db6175-499f-4679-bf8d-f815c7b42411",
+        "evidence": {
+          "kind": "owner-message",
+          "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+        },
+        "id": "approved-ponytail116",
+        "revision": 1
+      },
+      "authority_digest": "8e513ca2ec78101653022a6629bd3caf5c7059be3d2df34bb802c4ea1cf18422",
+      "context": {
+        "content_fingerprint": "f95f0f9f67330ae7ecd33441d79079cba3acdba9921ee62e0373d6652694eab3",
+        "decision_purpose": "decision",
+        "execution_snapshot_digest": "892007ebc4b973b4ab4120624f5bec28500cbc886a4f89498e1d341ad70cf8af",
+        "id": "task:T-18db6175-499f-4679-bf8d-f815c7b42411",
+        "kind": "task",
+        "orchestration_id": "DO-0d91bb8c-2ac0-5ba7-8f56-e1aa50735cd1",
+        "semantic_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+        "task_ids": [
+          "T-18db6175-499f-4679-bf8d-f815c7b42411"
+        ]
+      },
+      "creation_evidence": {
+        "actor_context_id": "/root/registry117_architecture",
+        "actor_id": "/root/registry117_architecture",
+        "kind": "host-agent-created",
+        "provider": "Codex collaboration",
+        "reference": "Observed separately created existing /root/registry117_architecture context; actual resolver for the exact corrected optional pilot plan, independent of root executor.",
+        "tool": "collaboration.spawn_agent"
+      },
+      "decision_hash": "c811f38a348723942ebcbd2fb90c034524c6b75eadee9915fdfafd9472d14285",
+      "decision_id": "DG-8107bab2-f059-5148-a84e-8871946c010e",
+      "execution_snapshot": {
+        "common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+        "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+        "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+        "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+        "common/scripts/run-workspaces.py": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+        "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+        "common/scripts/workflow-state.py": "76589e1dca50664128650f706ab413003039a1725b74f24ba2dcb9d9a622d029",
+        "owned-profile": "ebf57d7eca68c867d67018fac17fe54e6dd1919db53f891975b8d7d98def70a5"
+      },
+      "mode": "auto",
+      "mode_epoch": 1,
+      "orchestration_id": "DO-0d91bb8c-2ac0-5ba7-8f56-e1aa50735cd1",
+      "orchestration_revision": 25,
+      "prior_role_results": {},
+      "question": {
+        "evidence": [
+          ".skill-tree/history/validation/plugin-system/ponytail116-independent-review-freeze2.json",
+          ".skill-tree/history/validation/plugin-system/ponytail116-source-freeze2.json",
+          ".skill-tree/artifacts/plugin-implementation/ponytail116-tests/normalized-review-result-draft.py"
+        ],
+        "facts": [
+          "The final current source review identifies status=passed plus nonempty findings: record accepts the report and passed/no-change acceptance bypasses the publication finding ledger.",
+          "The same semantic contradiction can use questions with findings, passed with questions, or findings with questions. The normalized status tag must not hide the other reserved obligation.",
+          "The four variants have prospective ignored tests using actual owned helpers and matching host context-end evidence; valid empty reserved arrays and arbitrary notes/nested JSON retain a separate positive control."
+        ],
+        "id": "ponytail116-normalized-report-shape",
+        "kind": "technical",
+        "options": [
+          {
+            "id": "reject-conflict",
+            "text": "Reject contradictory reserved findings/questions payloads for policy-bound review success outcomes while preserving ordinary annotations."
+          },
+          {
+            "id": "retain-with-proof",
+            "text": "Retain the current shape only with concrete contract and readiness evidence that required findings cannot be lost."
+          }
+        ],
+        "proposal_scope": [
+          "Apply only to frozen report-only policy-bound publication review results and successful statuses passed/findings/questions. Nonempty reserved top-level findings/questions must match the declared outcome; mixed reserved obligations reject rather than being silently ignored.",
+          "Keep generic custom-plugin result data, parameters, annotations and nested arbitrary JSON unchanged. Parse no free-text semantics and claim no universal model adherence.",
+          "Preserve actual raw producer input and original attempt identity: invalid record returns a visible validation failure and supplies no successful invocation or installation cleanup. Original host reconciliation remains the supported cleanup path.",
+          "Add meaningful focused Red before the minimal runtime guard, then fresh current required checks and final review. Existing40pass/281Nodepass and old reports remain historical evidence."
+        ],
+        "recommendation": "reject-conflict",
+        "significance": "routine",
+        "text": "Resolve a contradictory successful normalized review report that can silently omit actionable findings from the publication ledger."
+      },
+      "role": "resolver",
+      "role_receipts": {},
+      "schema": 1
+    },
+    "input_digest": "ee457433da36e1469c29c16c809fee5e69f0f82b65210a4677efaae8278327bc"
+  },
+  "actual_result": {
+    "status": "answered",
+    "answer": "reject-conflict",
+    "rationale": "The current record branch accepts a supported status plus arbitrary result fields, while passed with unchanged context receives a no-change receipt at accept. Therefore a nonempty reserved findings/questions field can be hidden by a contradictory successful status and avoid the corresponding ordinary publication obligation; the retained source review identifies the exact path. Rejecting that contradiction at record is the smallest bounded repair for frozen report-only publication review results. Nonempty reserved top-level findings must declare findings, and questions must declare questions; mixed obligations reject instead of being silently discarded. Preserve empty reserved arrays, ordinary notes, nested arbitrary JSON and generic non-review plugin results. Validation failure must retain the original attempt without a successful result; actual host reconciliation remains the cleanup path. The prospective controlled cases cover the four contradictions and a separate valid arbitrary-annotation result without adding invocation, installation or publication authority.",
+    "evidence": [
+      ".skill-tree/artifacts/plugin-implementation/ponytail116-sealed-resolver.json",
+      ".skill-tree/history/validation/plugin-system/ponytail116-independent-review-freeze2.json",
+      ".skill-tree/history/validation/plugin-system/ponytail116-source-freeze2.json",
+      ".skill-tree/artifacts/plugin-implementation/ponytail116-tests/normalized-review-result-draft.py",
+      ".skill-tree/common/scripts/plugin-invocation.py:405",
+      ".skill-tree/common/scripts/plugin-invocation.py:423",
+      ".skill-tree/common/scripts/workflow-state.py:1864"
+    ],
+    "input_digest": "ee457433da36e1469c29c16c809fee5e69f0f82b65210a4677efaae8278327bc"
+  },
+  "scope": "Policy-bound publication review success results only; reserved top-level status/findings/questions consistency. No generic annotations/parameter/output-data restriction or free-text inference.",
+  "limits": [
+    "Decision evidence supplies no passing tests or successful actor invocation.",
+    "No external approval, owner installation consent, publication or comparison/native trial authority."
+  ]
+}

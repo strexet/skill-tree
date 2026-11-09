@@ -1,0 +1,24 @@
+{
+  "qualification": "Requirements-led synthetic engine and actual owned Node selector fixtures; no actual host actor or plugin efficacy claim.",
+  "finding": "Current unresolved occurrences are absent from selected bindings; current admission must retain the unresolved frontier before skipping any occurrence.",
+  "observed_before_frontier_fix": {
+    "pure_selector_shaped": {
+      "discovered": 1,
+      "failed_assertion_entries": 2,
+      "errors": 0,
+      "skipped": 0
+    },
+    "real_owned_selector": {
+      "discovered": 1,
+      "failed_assertion_entries": 2,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "artifacts": {
+    "managed-registry-unresolved-selector-red.txt": "fceb01e4786c850f8238e0cc77e771f6d972c03db3c851afbb12590c44b43b16",
+    "managed-registry-actual-unresolved-selector-red.txt": "d4fdda1bb0e1faabccbd628153d0d9db022f9244d6805342487df5cba53638cb",
+    "managed-registry-real-unresolved-selector-observation.json": "f8b71c6e24e99dd642b1a1fbed9f339c7f2dfb0d62e92ac1d4766392a09d2414"
+  },
+  "source_limits": "Runtime implementation and additional readiness controls were in progress. These observations establish the stated pre-fix regression; current final source qualification requires the later frozen full focused checks."
+}

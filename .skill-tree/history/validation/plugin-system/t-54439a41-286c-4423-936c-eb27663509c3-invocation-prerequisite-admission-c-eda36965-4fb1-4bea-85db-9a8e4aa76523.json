@@ -1,0 +1,64 @@
+{
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-plugin-workflow.py"
+  ],
+  "attempt_id": "C-eda36965-4fb1-4bea-85db-9a8e4aa76523",
+  "baseline": {
+    "last_accepted": {
+      "discovered": 80,
+      "expected": 80,
+      "failed": 0,
+      "passed": 80,
+      "skipped": 0
+    },
+    "original": {
+      "discovered": 80,
+      "expected": 80,
+      "failed": 0,
+      "passed": 80,
+      "skipped": 0
+    }
+  },
+  "check_id": "invocation-prerequisite-admission",
+  "count_error": null,
+  "counts": {
+    "discovered": 80,
+    "expected": 80,
+    "failed": 0,
+    "passed": 80,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limitations": [
+    "Focused unit fixture evidence. No new actual actor or product qualification."
+  ],
+  "log_sha256": "d606fd9f2e1a644d5417097e98f0d4338c4bc85c8b6cd9e39a933a80e516234a",
+  "output": ".skill-tree/history/validation/plugin-system/t-54439a41-286c-4423-936c-eb27663509c3-invocation-prerequisite-admission-c-eda36965-4fb1-4bea-85db-9a8e4aa76523.txt",
+  "owned_profile_identity": "56e828eacced91072ba944c318a5291a21b88be7f83b90a2248f53fdae95806a",
+  "process_group_clean": true,
+  "result": "pass",
+  "source_commit": "82eaf49b6cb35e65dfa30413228bddcb10190562",
+  "sources": {
+    ".skill-tree/common/references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
+    ".skill-tree/common/references/workflow-metadata.md": "1fff0a891987404ac7bc43d536b0798c08ee6c16a6e3367cbfc9a0f3c54b7fa3",
+    ".skill-tree/common/scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",
+    ".skill-tree/common/scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",
+    ".skill-tree/common/scripts/pr-review-state.py": "6bfb09e0273a6322c86c5f5915e8dc0503fa22416881c499c281c1dec570a3d1",
+    ".skill-tree/common/scripts/run-workspaces.py": "306a8dad9d834250febd3fff4b109f0fb8b00711232705e483787bc1cdab5f20",
+    ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+    ".skill-tree/config/resource-map.json": "bd4b539b8aad5d6b55aba3609073f28b7e879fa7e8c3edf60dbbf28f9e56ad26",
+    ".skill-tree/history/research/plugin-managed-registry-absence-observation.json": "05b7bfc7869b32ea561d9af13ee8886ef2be87a60c645c7e5ebd2f5c71738ecf",
+    ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+    ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+    ".skill-tree/lib/plugin-composition.js": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d",
+    ".skill-tree/lib/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+    ".skill-tree/lib/plugin-runtime.js": "e704dce8f8019baae4f783bce8c6f5fdf5dfaf7961760ecad33ce3ab919b4338",
+    ".skill-tree/tests/test-plugin-composition.js": "0ac136430c64c82c8d0fe3a55c8cf75526f7a29ca6f21fe9902ec317f2a569d8",
+    ".skill-tree/tests/test-plugin-invocation-installation.js": "fa16b6af4ae637415100fa2e0c3dcfeb9a7f392e168f61980ecd3c8fc84e1495",
+    ".skill-tree/tests/test-plugin-workflow.py": "a7ae1a514938920070a4c6a936d43fcac5d772168c3d9d40005dfe91ccaff44b"
+  },
+  "task_id": "T-54439a41-286c-4423-936c-eb27663509c3",
+  "timed_out": false,
+  "tool_wall_seconds": 353.016
+}

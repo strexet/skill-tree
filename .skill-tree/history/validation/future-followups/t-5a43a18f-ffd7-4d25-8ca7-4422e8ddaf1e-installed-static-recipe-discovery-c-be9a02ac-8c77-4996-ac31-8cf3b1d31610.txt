@@ -1,0 +1,189 @@
+TAP version 13
+# Subtest: static inspection appears in the owned profile and explicit declarations take precedence
+not ok 1 - static inspection appears in the owned profile and explicit declarations take precedence
+  ---
+  duration_ms: 356.250875
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/tests/test-installation-integrity.js:31:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+    + undefined
+    - {
+    -   assertion_contract: 'explicit source and artifact assertions',
+    -   input_paths: [],
+    -   lane: 'static'
+    - }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    lane: 'static'
+    input_paths:
+    assertion_contract: 'explicit source and artifact assertions'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/tests/test-installation-integrity.js:36:9)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.start (node:internal/test_runner/test:833:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: static inspection stays resolvable on an owned legacy profile and appears after source update
+not ok 2 - static inspection stays resolvable on an owned legacy profile and appears after source update
+  ---
+  duration_ms: 919.552167
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/tests/test-installation-integrity.js:56:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+    + undefined
+    - {
+    -   assertion_contract: 'explicit source and artifact assertions',
+    -   input_paths: [],
+    -   lane: 'static'
+    - }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    lane: 'static'
+    input_paths:
+    assertion_contract: 'explicit source and artifact assertions'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/tests/test-installation-integrity.js:84:9)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: invalid manager combinations reject before writes while explicit rollback remains available
+ok 3 - invalid manager combinations reject before writes while explicit rollback remains available
+  ---
+  duration_ms: 1328.725417
+  ...
+# Subtest: installed release version matches the bundled source and forged receipt versions fail verification
+ok 4 - installed release version matches the bundled source and forged receipt versions fail verification
+  ---
+  duration_ms: 828.203542
+  ...
+# Subtest: force never adopts an unowned package
+ok 5 - force never adopts an unowned package
+  ---
+  duration_ms: 150.073792
+  ...
+# Subtest: verify rejects a false-positive entrypoint and locally modified packages survive force/uninstall
+ok 6 - verify rejects a false-positive entrypoint and locally modified packages survive force/uninstall
+  ---
+  duration_ms: 993.524917
+  ...
+# Subtest: maintenance refresh works without source access and detects newly added tools
+ok 7 - maintenance refresh works without source access and detects newly added tools
+  ---
+  duration_ms: 1960.429959
+  ...
+# Subtest: noninteractive missing flavor, global, symlink and upstream specialization fail without writes
+ok 8 - noninteractive missing flavor, global, symlink and upstream specialization fail without writes
+  ---
+  duration_ms: 226.932084
+  ...
+# Subtest: owned no-op is verified; dry-run reports conflicts without writes
+ok 9 - owned no-op is verified; dry-run reports conflicts without writes
+  ---
+  duration_ms: 1509.923125
+  ...
+# Subtest: interrupted replacement rolls forward from the journal and preserves unrelated content
+ok 10 - interrupted replacement rolls forward from the journal and preserves unrelated content
+  ---
+  duration_ms: 1638.711792
+  ...
+# Subtest: flavor switch updates all owned packages; stopped pending validation survives refresh and rollback
+ok 11 - flavor switch updates all owned packages; stopped pending validation survives refresh and rollback
+  ---
+  duration_ms: 2045.069959
+  ...
+# Subtest: missing foundation is deferred without a queue and captured exactly once after setup
+ok 12 - missing foundation is deferred without a queue and captured exactly once after setup
+  ---
+  duration_ms: 1049.049125
+  ...
+# Subtest: an active executing controller blocks replacement and malformed maintenance ownership is preserved
+ok 13 - an active executing controller blocks replacement and malformed maintenance ownership is preserved
+  ---
+  duration_ms: 928.91325
+  ...
+# Subtest: untracked maintenance source is a conflict and cannot be adopted by refresh
+ok 14 - untracked maintenance source is a conflict and cannot be adopted by refresh
+  ---
+  duration_ms: 964.4185
+  ...
+# Subtest: refresh refuses incompatible workflow state without replacing packages or receipts
+ok 15 - refresh refuses incompatible workflow state without replacing packages or receipts
+  ---
+  duration_ms: 858.285542
+  ...
+# Subtest: refresh refuses an unresolved standalone execution attempt and the workflow writer lock
+ok 16 - refresh refuses an unresolved standalone execution attempt and the workflow writer lock
+  ---
+  duration_ms: 922.317667
+  ...
+# Subtest: standalone profile refresh stops a waiting controller and preserves progress across rollback
+ok 17 - standalone profile refresh stops a waiting controller and preserves progress across rollback
+  ---
+  duration_ms: 2026.311292
+  ...
+# Subtest: a concurrent edit during staging is preserved and activation refuses the changed destination
+ok 18 - a concurrent edit during staging is preserved and activation refuses the changed destination
+  ---
+  duration_ms: 1197.887542
+  ...
+# Subtest: a real controller re-admits after local refresh without resetting task progress
+ok 19 - a real controller re-admits after local refresh without resetting task progress
+  ---
+  duration_ms: 3533.705167
+  ...
+# Subtest: shared provider destinations retain every recorded owner during scoped uninstall
+ok 20 - shared provider destinations retain every recorded owner during scoped uninstall
+  ---
+  duration_ms: 2512.011792
+  ...
+# Subtest: verification rejects a forged flavor and rehashed unrelated package content
+ok 21 - verification rejects a forged flavor and rehashed unrelated package content
+  ---
+  duration_ms: 770.819625
+  ...
+# Subtest: shared bridges survive uninstall until the final recorded provider releases the package
+ok 22 - shared bridges survive uninstall until the final recorded provider releases the package
+  ---
+  duration_ms: 2484.872583
+  ...
+# Subtest: input drift during staging preserves the previous owned generation
+ok 23 - input drift during staging preserves the previous owned generation
+  ---
+  duration_ms: 1165.8785
+  ...
+# Subtest: post-activation input drift rolls back the owned generation without reverting project inputs
+ok 24 - post-activation input drift rolls back the owned generation without reverting project inputs
+  ---
+  duration_ms: 1568.4645
+  ...
+# Subtest: local refresh catches a Web runner major change and omits unsupported fixture instructions
+ok 25 - local refresh catches a Web runner major change and omits unsupported fixture instructions
+  ---
+  duration_ms: 1548.355375
+  ...
+1..25
+# tests 25
+# suites 0
+# pass 23
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 33567.726833

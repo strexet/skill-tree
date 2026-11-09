@@ -1,0 +1,296 @@
+{
+  "acceptance": {
+    "actor": {
+      "context_id": "/root/reconcile_plan",
+      "id": "/root/reconcile_plan"
+    },
+    "answer": "revise",
+    "attempt_id": "DA-9a9bf82d-4d47-4427-9d0c-ff39270810ef",
+    "authority_digest": "b09448af6fb02b1014c954372a9873219f5cbfd5824d1531e6dc6b692d106194",
+    "context_identity": {
+      "decision_purpose": "plan",
+      "execution_snapshot_digest": "66ef06658810e8965a9cf19fb81b0fa403ce252eea8082aab57eec0398a42bf2",
+      "id": "task:T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+      "kind": "task",
+      "orchestration_id": "DO-a0fd688d-471c-5efc-810d-fab595be8daf",
+      "plan_digest": "3a4040b43590e0b8fb321cfeedbdd36e387408f62a3e3fde916b8340da685305",
+      "required_checks_digest": "8de540991c92972d436bba35218e0a879a8db3e331f2621ad97eef514a06c8c4",
+      "task_ids": [
+        "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656"
+      ]
+    },
+    "decision_id": "DG-a49b51e4-438c-55b5-92ca-0211e3289186",
+    "digest": "055abb500a891996c3d167c6b3b5f7a5af2df6b0a62e3337fe66ce204c19f58e",
+    "kind": "specification-acceptance",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/reconcile_plan",
+      "actor_id": "/root/reconcile_plan",
+      "creation_reference": "Actual collaboration.spawn_agent returned /root/reconcile_plan.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "/root/reconcile_plan returned the actual sealed-input answer in collaboration.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "6482a231484120686dc2bd776b6b940a56c8e39da441fe4e99264490eabcb152",
+    "question_id": "reconcile-plan-3a4040b4",
+    "rationale": "Cancellation must prove that the original runner group stopped. Checking a group supplied for the first time at cancellation proves only that the named group is absent. Bind the exact attempt to a verified live local runner before drift and require cleanup to match that durable binding. Keep legacy attempts pending when no corroborating ownership record exists, and test that an unrelated exited group cannot close an attempt.",
+    "role_receipts": {
+      "arbiter": "57f519cce08be7d98ac4b043b978fe08fd7c5791e4ec04bb6318beb89b2a4740",
+      "critic": "cc86977ec3c0114d6e1d07a1726055ae5cd12d79573c89567afdda73b84c0fd9",
+      "resolver": "7282143f7ba91e09cff92e8340fd4feedd33c853cbfe207e04ab5994212a9bd1"
+    },
+    "semantic_fingerprint": "9527cd1e7d1b215b77808bbb740583e39374ec497aeae6feed4d1bfdf8fa4d44"
+  },
+  "active_attempt_id": null,
+  "attempts": {
+    "DA-185b8b3c-b296-4431-85a0-8a491603cbdc": {
+      "actor": {
+        "context_id": "/root/static_discovery",
+        "id": "/root/static_discovery"
+      },
+      "authority_digest": "b09448af6fb02b1014c954372a9873219f5cbfd5824d1531e6dc6b692d106194",
+      "basis_digest": null,
+      "content_fingerprint": "9527cd1e7d1b215b77808bbb740583e39374ec497aeae6feed4d1bfdf8fa4d44",
+      "evidence": {
+        "actor_context_id": "/root/static_discovery",
+        "actor_id": "/root/static_discovery",
+        "creation_reference": "Actual collaboration.spawn_agent returned /root/static_discovery.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "/root/static_discovery returned the actual sealed-input answer in collaboration.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-185b8b3c-b296-4431-85a0-8a491603cbdc",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "6482a231484120686dc2bd776b6b940a56c8e39da441fe4e99264490eabcb152",
+      "result": {
+        "answer": "accept",
+        "input_digest": "c4325e89e99b0e4d7c48c7704a1142ee02a35f8fde9626f61e9815451784d692",
+        "rationale": "The plan checks affirmative drift against the original attempt under the writer and binds cancellation to an exact cleanup observation in the selected scope. The local process-group check fails closed when cleanup is live or uncertain. A separate receipt preserves earlier results and blocks late submissions without granting acceptance or resumption.",
+        "status": "answered"
+      },
+      "role": "resolver",
+      "semantic_fingerprint": "9527cd1e7d1b215b77808bbb740583e39374ec497aeae6feed4d1bfdf8fa4d44",
+      "status": "answered"
+    },
+    "DA-9a9bf82d-4d47-4427-9d0c-ff39270810ef": {
+      "actor": {
+        "context_id": "/root/reconcile_plan",
+        "id": "/root/reconcile_plan"
+      },
+      "authority_digest": "b09448af6fb02b1014c954372a9873219f5cbfd5824d1531e6dc6b692d106194",
+      "basis_digest": "28b64e41ca9d64307f25ff009248db18cc0650d408f19a78434c6657e3c19345",
+      "content_fingerprint": "9527cd1e7d1b215b77808bbb740583e39374ec497aeae6feed4d1bfdf8fa4d44",
+      "evidence": {
+        "actor_context_id": "/root/reconcile_plan",
+        "actor_id": "/root/reconcile_plan",
+        "creation_reference": "Actual collaboration.spawn_agent returned /root/reconcile_plan.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "/root/reconcile_plan returned the actual sealed-input answer in collaboration.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-9a9bf82d-4d47-4427-9d0c-ff39270810ef",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "6482a231484120686dc2bd776b6b940a56c8e39da441fe4e99264490eabcb152",
+      "result": {
+        "answer": "revise",
+        "input_digest": "d3ed94c7d2f11b8952f2f3716a46d2eff7c8ed92018c120c7422a67744dd4a52",
+        "rationale": "Cancellation must prove that the original runner group stopped. Checking a group supplied for the first time at cancellation proves only that the named group is absent. Bind the exact attempt to a verified live local runner before drift and require cleanup to match that durable binding. Keep legacy attempts pending when no corroborating ownership record exists, and test that an unrelated exited group cannot close an attempt.",
+        "status": "answered"
+      },
+      "role": "arbiter",
+      "semantic_fingerprint": "9527cd1e7d1b215b77808bbb740583e39374ec497aeae6feed4d1bfdf8fa4d44",
+      "status": "answered"
+    },
+    "DA-ce672fbc-1cb9-40d5-b7da-9830ba546ebc": {
+      "actor": {
+        "context_id": "/root/delivery_review",
+        "id": "/root/delivery_review"
+      },
+      "authority_digest": "b09448af6fb02b1014c954372a9873219f5cbfd5824d1531e6dc6b692d106194",
+      "basis_digest": "3fb078f333afbb7a2f02d0ca3a9f28b9439a08e22d180549b48e9f771ba50436",
+      "content_fingerprint": "9527cd1e7d1b215b77808bbb740583e39374ec497aeae6feed4d1bfdf8fa4d44",
+      "evidence": {
+        "actor_context_id": "/root/delivery_review",
+        "actor_id": "/root/delivery_review",
+        "creation_reference": "Actual collaboration.spawn_agent returned /root/delivery_review.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "/root/delivery_review returned the actual sealed-input answer in collaboration.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-ce672fbc-1cb9-40d5-b7da-9830ba546ebc",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "6482a231484120686dc2bd776b6b940a56c8e39da441fe4e99264490eabcb152",
+      "result": {
+        "answer": "revise",
+        "input_digest": "d0ed1ae4099fa1b2bec32b13ee0c000e364c85c575bd53f0dabc13bcaa029c36",
+        "rationale": "The cleanup JSON can name any absent process group because the prepared check does not record a runner group. A signal-zero inquiry then proves absence of the supplied group without establishing that the original runner stopped. Require an independently inspectable launch or process-ownership record that binds the group to the exact attempt, and test rejection of an unrelated absent group. Keep legacy attempts pending when that binding cannot be corroborated.",
+        "status": "disagree"
+      },
+      "role": "critic",
+      "semantic_fingerprint": "9527cd1e7d1b215b77808bbb740583e39374ec497aeae6feed4d1bfdf8fa4d44",
+      "status": "disagree"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the two explicitly selected task scopes and the local codex/next-version delivery. No new runtime, network, plugin, remote or publication authority."
+    ],
+    "context_id": "task:T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Owner explicitly invoked Implement All for the two deferred Future tasks and approved Auto delegated technical decisions."
+    },
+    "id": "future-followups-reconcile",
+    "revision": 1
+  },
+  "authority_digest": "b09448af6fb02b1014c954372a9873219f5cbfd5824d1531e6dc6b692d106194",
+  "context": {
+    "content_fingerprint": "9527cd1e7d1b215b77808bbb740583e39374ec497aeae6feed4d1bfdf8fa4d44",
+    "decision_purpose": "plan",
+    "execution_snapshot_digest": "66ef06658810e8965a9cf19fb81b0fa403ce252eea8082aab57eec0398a42bf2",
+    "id": "task:T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+    "kind": "task",
+    "orchestration_id": "DO-a0fd688d-471c-5efc-810d-fab595be8daf",
+    "plan_digest": "3a4040b43590e0b8fb321cfeedbdd36e387408f62a3e3fde916b8340da685305",
+    "required_checks_digest": "8de540991c92972d436bba35218e0a879a8db3e331f2621ad97eef514a06c8c4",
+    "semantic_fingerprint": "9527cd1e7d1b215b77808bbb740583e39374ec497aeae6feed4d1bfdf8fa4d44",
+    "task_ids": [
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656"
+    ]
+  },
+  "decision_hash": "f2120235e49118223865ccb39b7d21208ad75b0c08b3da42fd114a5dc8e4c931",
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "frontier_epoch": 1,
+  "history": [
+    {
+      "context_fingerprint": "9527cd1e7d1b215b77808bbb740583e39374ec497aeae6feed4d1bfdf8fa4d44",
+      "detail": {},
+      "event": "started",
+      "mode_epoch": 1,
+      "previous_record_hash": null,
+      "sequence": 1
+    },
+    {
+      "context_fingerprint": "9527cd1e7d1b215b77808bbb740583e39374ec497aeae6feed4d1bfdf8fa4d44",
+      "detail": {
+        "attempt_id": "DA-185b8b3c-b296-4431-85a0-8a491603cbdc",
+        "role": "resolver"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "913eed821cc7e9ceccd9b61814d4807833805209354ac960bba556e8efb4a6ff",
+      "sequence": 2
+    },
+    {
+      "context_fingerprint": "9527cd1e7d1b215b77808bbb740583e39374ec497aeae6feed4d1bfdf8fa4d44",
+      "detail": {
+        "attempt_id": "DA-185b8b3c-b296-4431-85a0-8a491603cbdc",
+        "status": "answered"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "8f4a745c4efbf3005c45dbdcabc308891acbea1d65232e2e1ace51f9852f240b",
+      "sequence": 3
+    },
+    {
+      "context_fingerprint": "9527cd1e7d1b215b77808bbb740583e39374ec497aeae6feed4d1bfdf8fa4d44",
+      "detail": {
+        "attempt_id": "DA-ce672fbc-1cb9-40d5-b7da-9830ba546ebc",
+        "role": "critic"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "f731be3bdf8f0ecfcb146fbd3f365ad2d397146a01167e987250921a9d293785",
+      "sequence": 4
+    },
+    {
+      "context_fingerprint": "9527cd1e7d1b215b77808bbb740583e39374ec497aeae6feed4d1bfdf8fa4d44",
+      "detail": {
+        "attempt_id": "DA-ce672fbc-1cb9-40d5-b7da-9830ba546ebc",
+        "status": "disagree"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "e56eceb1b3ecdf036b12416273a6442ccc60359d17da2f5ffed1718a504b5841",
+      "sequence": 5
+    },
+    {
+      "context_fingerprint": "9527cd1e7d1b215b77808bbb740583e39374ec497aeae6feed4d1bfdf8fa4d44",
+      "detail": {
+        "attempt_id": "DA-9a9bf82d-4d47-4427-9d0c-ff39270810ef",
+        "role": "arbiter"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "0daa366fb325e3dad0ffa9af716cb7929489f4463c35921d1cdd2c77b190f639",
+      "sequence": 6
+    },
+    {
+      "context_fingerprint": "9527cd1e7d1b215b77808bbb740583e39374ec497aeae6feed4d1bfdf8fa4d44",
+      "detail": {
+        "attempt_id": "DA-9a9bf82d-4d47-4427-9d0c-ff39270810ef",
+        "status": "answered"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "bdfda30fe84a44c62d74d0f1cff0e0d52e1fb653cae6b7a64875671c1296a8e6",
+      "sequence": 7
+    },
+    {
+      "context_fingerprint": "9527cd1e7d1b215b77808bbb740583e39374ec497aeae6feed4d1bfdf8fa4d44",
+      "detail": {
+        "acceptance_digest": "055abb500a891996c3d167c6b3b5f7a5af2df6b0a62e3337fe66ce204c19f58e"
+      },
+      "event": "accept",
+      "mode_epoch": 1,
+      "previous_record_hash": "a7c5e3423eaea793081a9c6924728b966fb3f51f9e61fda7be0b5f70efd4f165",
+      "sequence": 8
+    }
+  ],
+  "id": "DG-a49b51e4-438c-55b5-92ca-0211e3289186",
+  "mode": "auto",
+  "mode_epoch": 1,
+  "prepared_attempt_id": "DA-9a9bf82d-4d47-4427-9d0c-ff39270810ef",
+  "question": {
+    "id": "reconcile-plan-3a4040b4",
+    "kind": "specification-acceptance",
+    "options": [
+      {
+        "id": "accept",
+        "text": "Accept current plan."
+      },
+      {
+        "id": "revise",
+        "text": "Revise current plan."
+      }
+    ],
+    "plan_text": "# Reconcile an interrupted stale prepared check\n\nAdd an owned workflow helper command reconcile-check. The inspect action is read-only and takes exact task_id, check_id and attempt_id with the explicitly selected run or standalone scope. The cancel action also requires the original expected_key and expected_definition, exact observed current data from inspection, and a repository-relative cleanup path with its SHA-256. Use the existing task/claim/scope lookup and workspace identity. Preserve a parked stop, admission, budgets and task stage. Cancellation grants no execution or resume.\n\nRecompute the current task definition and original covered source digests under the writer. Use the current check key when the check can still be evaluated. Directly verified source or definition drift is sufficient when the current key is unavailable or the original check is removed. An absent check key without affirmative observed drift is insufficient. The cancel request must exactly match the current observation, so a reverted or further changed source requires fresh inspection. Current verification never runs a recipe.\n\nRequire an ordinary bounded no-symlink cleanup JSON file under the selected execution checkout. Match the exact task, check, attempt, run or standalone scope, original key, definition and environment, along with local observer host, observation time after preparation, positive original process group and zero observed live processes. Recheck that the same local process group is absent with a signal-zero inquiry. Live or uncertain state, foreign host, nonlocal execution and external/product sessions without matching proof stay pending. The helper never stops a process. The supported proof is the original local non-product runner group; the helper does not infer unrelated service cleanup.\n\nKeep the original prepared attempt and previous Red and result unchanged. Atomically add a distinct cancelled-no-result receipt in the existing attempt receipt carrier and a canonical history copy keyed by the original C identity, including evidence digest and a reconciliation request digest. This uses the existing installer and task-revision pending-attempt recognition. Exact scope and request replay return the same receipt after later preparation or completion. Conflicting replay and any late result submission for the cancelled C identity fail closed, including after source reversion. Pending attempts remain acceptance blockers even when an older result still matches.\n\nCapture a real behavioral Red before implementation. Focused disposable tests cover explicit selected/standalone scope, read-only inspection, actual live and then exited disposable process group, wrong evidence and identity, fresh and changed observations, removal or unavailable current check with positive drift, preserved prior Red/pass and parked state, installer barrier compatibility, exact replay/conflict, late result rejection and new prepare/pass/completion. Retain generated source ownership and revalidate the first task against the final shared Python/reference changes.\n",
+    "recommendation": "accept",
+    "significance": "significant",
+    "text": "Accept the current source-backed implementation plan or identify a material required revision."
+  },
+  "request_id": "DO-a0fd688d-471c-5efc-810d-fab595be8daf:question:1",
+  "revision": 8,
+  "schema": 1,
+  "start_digest": "fd906cdb589e85bac4756cada3ce466a53b238842e0f6d3c834e712384767d03",
+  "state": "accepted"
+}

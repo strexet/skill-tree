@@ -1,0 +1,475 @@
+{
+  "claims": {
+    "conditional_static_compatibility_supported": true,
+    "controller_selection_observed_by_this_proposal": false,
+    "current_checks_observed_by_this_proposal": false,
+    "fresh_current_native_qualification": false,
+    "owned_activation_observed_by_this_proposal": false
+  },
+  "classification": "Read-only static proposal. Historical actual role observations retain their original source identity; no current actor run, new test result or acceptance.",
+  "current_source": {
+    "baseline_commit": "57bbf013d08c2014aff87f379d2cd708063b81a6",
+    "baseline_workflow_sha256": "76589e1dca50664128650f706ab413003039a1725b74f24ba2dcb9d9a622d029",
+    "file_entries_checked": 249,
+    "freeze": {
+      "path": ".skill-tree/history/validation/plugin-system/ponytail116-source-freeze3.json",
+      "sha256": "0b4725def129fa03efa04d8a223ba01b73823244cb9318137e5ad79c839ae5f2"
+    },
+    "mismatches": [],
+    "nonfile_entries": [],
+    "source_digest": "b28052dbc57f0376a0d061168a165357035d1a40dc758344bd091f3b58fe7297",
+    "workflow_sha256": "34e5c105ad7cf594720f4c60655a27bfdfdccc93e71ce9d00610447178bb1883"
+  },
+  "format": "skill-tree-core127-static-source-compatibility-proposal",
+  "historical_analysis": {
+    "path": ".skill-tree/history/validation/plugin-system/core127-after-managed-guards-analysis.json",
+    "sha256": "922c2c5c214c613aa8c8e83616e80dce5d8966af729785e8db14191da53ea582"
+  },
+  "historical_observations": {
+    "native_capture_event_count": 24,
+    "qualification_limits": [
+      "Controlled adversarial critic establishes transport/arbitration, not spontaneous critique quality or comparative efficacy.",
+      "Scripted fixture-owner submissions establish no real-human approval.",
+      "Historical profile hashes, source hashes and captured role events remain original; no fresh current-source role invocation is claimed."
+    ],
+    "scenario_count": 3,
+    "scenarios": [
+      {
+        "captured_owned_profile_sha256": [
+          "406e0f1a0a0ff368290b5a8217c8626a1437ee7e3b48b2da8860aff6d0d31a4f"
+        ],
+        "context_kind": "request",
+        "labels": [
+          "final"
+        ],
+        "observation_count": 1,
+        "phases": [
+          "research"
+        ],
+        "scenario_id": "core-auto-significant",
+        "task_pending_run_session_fields": [],
+        "transitions": [
+          "start",
+          "question",
+          "prepare-actor",
+          "record-actor",
+          "accept-decision"
+        ]
+      },
+      {
+        "captured_owned_profile_sha256": [
+          "a884c10950c5f6b41d729c8a31cdceed0241317692ff7ec5ef8d7de87442abb2"
+        ],
+        "context_kind": "request",
+        "labels": [
+          "manual-wait",
+          "final"
+        ],
+        "observation_count": 2,
+        "phases": [
+          "research"
+        ],
+        "scenario_id": "core-manual",
+        "task_pending_run_session_fields": [],
+        "transitions": [
+          "start",
+          "question",
+          "prepare-actor",
+          "record-actor",
+          "accept-decision"
+        ]
+      },
+      {
+        "captured_owned_profile_sha256": [
+          "5c1d96535fa7520bd873cb57705c1326fba1833f236a57a53c0e082b63fe1f05"
+        ],
+        "context_kind": "request",
+        "labels": [
+          "original-pending",
+          "reconciled",
+          "switched",
+          "resumed",
+          "final"
+        ],
+        "observation_count": 5,
+        "phases": [
+          "research"
+        ],
+        "scenario_id": "core-switch-resume",
+        "task_pending_run_session_fields": [],
+        "transitions": [
+          "start",
+          "question",
+          "prepare-actor",
+          "reconcile-actor",
+          "switch-mode",
+          "resume",
+          "record-actor",
+          "accept-decision"
+        ]
+      }
+    ],
+    "state_observation_count": 8
+  },
+  "historical_provenance": {
+    "commit": "1fcbf1e1023810bd16ecc7b9d58c3713b5a67b1e",
+    "matches_immutable_capture": true,
+    "prior_artifact": ".skill-tree/artifacts/plugin-implementation/core127-after118-compatibility-analysis.json",
+    "prior_artifact_sha256": "811bff80b8aa7b94d28e62362ecd308ab45406a89e6b3db5d8f834bd60a224fc",
+    "prior_raw_source_matches_git_blob": true,
+    "workflow_git_blob": "c2ba084916970cf9e9222218658c5c51ac465e50",
+    "workflow_sha256": "791531838c16c1b362ade3b086e66dfb804da20c06b8828b0e71f251a08b0c5e"
+  },
+  "historical_selected_closure": {
+    "Store.__init__": {
+      "current_ast_sha256": "ee7b380e33094b42d3b05b175966ecf827a402208d00988285c19a836b55c8ec",
+      "historical_ast_sha256": "ee7b380e33094b42d3b05b175966ecf827a402208d00988285c19a836b55c8ec",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "Store.commit": {
+      "current_ast_sha256": "bf048ed1092412383eff06f1f774e01baa50e88b8f01c7bcf0606e4698796f90",
+      "historical_ast_sha256": "7fb97b6bcdbbec53b1b3923b27f89958893b9099a775bef903de3a28b6667bc5",
+      "identical": false,
+      "unchanged_from_managed_guards": true
+    },
+    "Store.guard": {
+      "current_ast_sha256": "f8977c7d46bac3b5ca1349304e45197a2eb66b05727c1c6ce2d7a33f5c0c1c71",
+      "historical_ast_sha256": "f8977c7d46bac3b5ca1349304e45197a2eb66b05727c1c6ce2d7a33f5c0c1c71",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "Store.load": {
+      "current_ast_sha256": "83470c2be086353d8e60e8be333d11993586364274f13d315408d5407f0b7cca",
+      "historical_ast_sha256": "83470c2be086353d8e60e8be333d11993586364274f13d315408d5407f0b7cca",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "Store.owned": {
+      "current_ast_sha256": "b9da6caf8c2efe4737bbc00c088ce20c982d3269f53c0a156f9277abb6b924f8",
+      "historical_ast_sha256": "b9da6caf8c2efe4737bbc00c088ce20c982d3269f53c0a156f9277abb6b924f8",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "Store.recover": {
+      "current_ast_sha256": "48e9cbc080c7ab6677533a80b4dbb08bae36c695e5d54ac6d3ba705b0f4e13cd",
+      "historical_ast_sha256": "48e9cbc080c7ab6677533a80b4dbb08bae36c695e5d54ac6d3ba705b0f4e13cd",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "Store.replace": {
+      "current_ast_sha256": "d3722f276bd0134e1d3c077b390d35dac86879d7c6e56fb8757891a40dc59e7a",
+      "historical_ast_sha256": "d3722f276bd0134e1d3c077b390d35dac86879d7c6e56fb8757891a40dc59e7a",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "clarification_answer_evidence": {
+      "current_ast_sha256": "171685cfe72fff30c51e07b27ced64630fb74fa2bf72ba4b2d34be0edb31b1e5",
+      "historical_ast_sha256": "171685cfe72fff30c51e07b27ced64630fb74fa2bf72ba4b2d34be0edb31b1e5",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "clarification_decision_context": {
+      "current_ast_sha256": "ee0ca3bee1aac62e58cc5c6db874d30d71b219751a2cebf3d3401ad1904e1c7a",
+      "historical_ast_sha256": "ee0ca3bee1aac62e58cc5c6db874d30d71b219751a2cebf3d3401ad1904e1c7a",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "clarification_decision_policy": {
+      "current_ast_sha256": "8937c3b2a9ac3980d92cef2473e3eed794b323e60d19736f36ee353d167db842",
+      "historical_ast_sha256": "8937c3b2a9ac3980d92cef2473e3eed794b323e60d19736f36ee353d167db842",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "clarification_evidence": {
+      "current_ast_sha256": "d85cf9fcf03d4de496936a7398dc44003dde0a881a1d864632a23130641c6adf",
+      "historical_ast_sha256": "d85cf9fcf03d4de496936a7398dc44003dde0a881a1d864632a23130641c6adf",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "clarification_mutate": {
+      "current_ast_sha256": "c3d71b3d927455f219a099fa998ef9a740f021c874305a7ef429aceb7af53356",
+      "historical_ast_sha256": "c3d71b3d927455f219a099fa998ef9a740f021c874305a7ef429aceb7af53356",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "clarification_read": {
+      "current_ast_sha256": "fb78490224da396a3785da9ee11a2b25120b2c719a55d91fb1f1ed4351b5e708",
+      "historical_ast_sha256": "fb78490224da396a3785da9ee11a2b25120b2c719a55d91fb1f1ed4351b5e708",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "decision_action": {
+      "current_ast_sha256": "7732aef60ec38d1f2a553f052320da1402000957d470d77203ae0a99e05a25ec",
+      "historical_ast_sha256": "7732aef60ec38d1f2a553f052320da1402000957d470d77203ae0a99e05a25ec",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "decision_context_guard": {
+      "current_ast_sha256": "79e9fe2e4d19543df677a2f2d1f6aba6a39b9de28474d58cfcb1d1236232aeb3",
+      "historical_ast_sha256": "79e9fe2e4d19543df677a2f2d1f6aba6a39b9de28474d58cfcb1d1236232aeb3",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "digest": {
+      "current_ast_sha256": "c26444e3b9e5b3416d9e8a05e620f1bc78ea784ece561d00bb60721757cb82b3",
+      "historical_ast_sha256": "c26444e3b9e5b3416d9e8a05e620f1bc78ea784ece561d00bb60721757cb82b3",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "dump": {
+      "current_ast_sha256": "c232f3eb0bc33fce3d248234bb784c39b9d343f3e0a5b366d721bca81e970b45",
+      "historical_ast_sha256": "c232f3eb0bc33fce3d248234bb784c39b9d343f3e0a5b366d721bca81e970b45",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "file_hash": {
+      "current_ast_sha256": "54365fa1671a9bb47a76efcc108fc5bfff86e05a22bb4ba7983fdb9d76c7cd5d",
+      "historical_ast_sha256": "54365fa1671a9bb47a76efcc108fc5bfff86e05a22bb4ba7983fdb9d76c7cd5d",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "now": {
+      "current_ast_sha256": "0821e5547e33e30630380f395c75e3500724b22f7503542276fd6b766cc36e0f",
+      "historical_ast_sha256": "0821e5547e33e30630380f395c75e3500724b22f7503542276fd6b766cc36e0f",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "orchestration_execution_snapshot": {
+      "current_ast_sha256": "24fe42da31a5261376caefb9e20a1d450dc457732e2dbaa8c5697288231d0e3b",
+      "historical_ast_sha256": "24fe42da31a5261376caefb9e20a1d450dc457732e2dbaa8c5697288231d0e3b",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "valid_id": {
+      "current_ast_sha256": "3240d1adfa103b581dc4b57ae787155eefaacf6070d9d0eb5a2f841cb83ccccd",
+      "historical_ast_sha256": "3240d1adfa103b581dc4b57ae787155eefaacf6070d9d0eb5a2f841cb83ccccd",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    },
+    "validate_run": {
+      "current_ast_sha256": "f9813684b42969b8cbe91bc14d7a57c7827f2b1cad6e4d1cae107972fa791b5f",
+      "historical_ast_sha256": "f9813684b42969b8cbe91bc14d7a57c7827f2b1cad6e4d1cae107972fa791b5f",
+      "identical": true,
+      "unchanged_from_managed_guards": true
+    }
+  },
+  "immutable_historical_artifacts": {
+    ".skill-tree/history/validation/plugin-system/core127-native/capture.json": "65475548db6a70be601c337dd89ae6c7bddf545e0017eac053865ff8dc7e70b8",
+    ".skill-tree/history/validation/plugin-system/core127-native/grade.json": "19051bb3ebbde34778178ab8143791a90518cd78bcc54e2b2453ae03de16c95c",
+    ".skill-tree/history/validation/plugin-system/core127-native/qualification.json": "bb9feadfef705d7d50ca60b3463b4dc3247eebd1f2ad5fc790791867f75586a9",
+    ".skill-tree/history/validation/plugin-system/core127-native/report.json": "56f43d1e35d3d5381b0866f026c4517ce90017153faf703c5604b12656c5be99"
+  },
+  "managed_baseline_selected_closure": {
+    "Store.__init__": {
+      "baseline_ast_sha256": "ee7b380e33094b42d3b05b175966ecf827a402208d00988285c19a836b55c8ec",
+      "current_ast_sha256": "ee7b380e33094b42d3b05b175966ecf827a402208d00988285c19a836b55c8ec",
+      "identical": true
+    },
+    "Store.commit": {
+      "baseline_ast_sha256": "bf048ed1092412383eff06f1f774e01baa50e88b8f01c7bcf0606e4698796f90",
+      "current_ast_sha256": "bf048ed1092412383eff06f1f774e01baa50e88b8f01c7bcf0606e4698796f90",
+      "identical": true
+    },
+    "Store.guard": {
+      "baseline_ast_sha256": "f8977c7d46bac3b5ca1349304e45197a2eb66b05727c1c6ce2d7a33f5c0c1c71",
+      "current_ast_sha256": "f8977c7d46bac3b5ca1349304e45197a2eb66b05727c1c6ce2d7a33f5c0c1c71",
+      "identical": true
+    },
+    "Store.load": {
+      "baseline_ast_sha256": "83470c2be086353d8e60e8be333d11993586364274f13d315408d5407f0b7cca",
+      "current_ast_sha256": "83470c2be086353d8e60e8be333d11993586364274f13d315408d5407f0b7cca",
+      "identical": true
+    },
+    "Store.lock": {
+      "baseline_ast_sha256": "f4da8bf5775487f21bb8c5c71aab7ee3aeea35b74db04d7518719d73c658a8b6",
+      "current_ast_sha256": "f4da8bf5775487f21bb8c5c71aab7ee3aeea35b74db04d7518719d73c658a8b6",
+      "identical": true
+    },
+    "Store.owned": {
+      "baseline_ast_sha256": "b9da6caf8c2efe4737bbc00c088ce20c982d3269f53c0a156f9277abb6b924f8",
+      "current_ast_sha256": "b9da6caf8c2efe4737bbc00c088ce20c982d3269f53c0a156f9277abb6b924f8",
+      "identical": true
+    },
+    "Store.recover": {
+      "baseline_ast_sha256": "48e9cbc080c7ab6677533a80b4dbb08bae36c695e5d54ac6d3ba705b0f4e13cd",
+      "current_ast_sha256": "48e9cbc080c7ab6677533a80b4dbb08bae36c695e5d54ac6d3ba705b0f4e13cd",
+      "identical": true
+    },
+    "Store.replace": {
+      "baseline_ast_sha256": "d3722f276bd0134e1d3c077b390d35dac86879d7c6e56fb8757891a40dc59e7a",
+      "current_ast_sha256": "d3722f276bd0134e1d3c077b390d35dac86879d7c6e56fb8757891a40dc59e7a",
+      "identical": true
+    },
+    "decision_action": {
+      "baseline_ast_sha256": "7732aef60ec38d1f2a553f052320da1402000957d470d77203ae0a99e05a25ec",
+      "current_ast_sha256": "7732aef60ec38d1f2a553f052320da1402000957d470d77203ae0a99e05a25ec",
+      "identical": true
+    },
+    "decision_context_guard": {
+      "baseline_ast_sha256": "79e9fe2e4d19543df677a2f2d1f6aba6a39b9de28474d58cfcb1d1236232aeb3",
+      "current_ast_sha256": "79e9fe2e4d19543df677a2f2d1f6aba6a39b9de28474d58cfcb1d1236232aeb3",
+      "identical": true
+    },
+    "decision_helper": {
+      "baseline_ast_sha256": "50dcb35f533debda5040372926b93b591e314f3dba585316f3b72e9e6aa9ed83",
+      "current_ast_sha256": "50dcb35f533debda5040372926b93b591e314f3dba585316f3b72e9e6aa9ed83",
+      "identical": true
+    },
+    "main": {
+      "baseline_ast_sha256": "d6c400d26c0691ee2254f2e4e8fa0d65f3d72614695ca5b1a54993a89e15706a",
+      "current_ast_sha256": "d6c400d26c0691ee2254f2e4e8fa0d65f3d72614695ca5b1a54993a89e15706a",
+      "identical": true
+    },
+    "orchestration_action": {
+      "baseline_ast_sha256": "869346563d36ed4af16b648df1979f4c93acb9b2725b15576329f0e52c5bc328",
+      "current_ast_sha256": "869346563d36ed4af16b648df1979f4c93acb9b2725b15576329f0e52c5bc328",
+      "identical": true
+    },
+    "orchestration_execution_snapshot": {
+      "baseline_ast_sha256": "24fe42da31a5261376caefb9e20a1d450dc457732e2dbaa8c5697288231d0e3b",
+      "current_ast_sha256": "24fe42da31a5261376caefb9e20a1d450dc457732e2dbaa8c5697288231d0e3b",
+      "identical": true
+    },
+    "owned_module": {
+      "baseline_ast_sha256": "0167b7a9cebc88069087d40587abb0845da1bad81b90129beba7b273548813bb",
+      "current_ast_sha256": "0167b7a9cebc88069087d40587abb0845da1bad81b90129beba7b273548813bb",
+      "identical": true
+    }
+  },
+  "operations_not_performed": [
+    "No tests, provider/native role requests or candidate trial.",
+    "No source/queue/profile/installed/historical evidence edits, commits or publication.",
+    "Only this ignored proposal artifact is written."
+  ],
+  "reached_closure_reasoning": {
+    "current_delta": "Since managed guards the only changed WF functions are _hook_action and _hook_transition, with one added _hook_review_frontier. Core request-only role paths call none of these. The lazy PR module import exists only inside the new frontier helper, which returns before import unless proof has publication_id. Module initialization adds function definitions only.",
+    "historical_scope": "Three request-only contexts and eight recorded state observations remain in research. No task_ids, pending_ids, run_id or clarification session exists in these contexts; no HC is created or admitted.",
+    "role_envelopes": "DG and DO bytes, role routing, sealed question/input construction, predecessor evidence, mode/grant acceptance and no-progress policy remain byte-identical to original capture sources. Reached WF adapters and CLI routing are unchanged from managed baseline; own-source loader now verifies current operation inventory, so a valid newly activated current bundle is a required condition.",
+    "store": "Store.__init__, lock, commit and owned loader are AST-identical to reviewed managed-guard baseline. Actual lock initializes _hook_active_admissions=[] and writer flags; unchanged request-only decision guard/action and DO paths cannot register hook admissions. Commit admission loop stays empty; navigation-only followup flag stays false for decision writes. Added invocation CAS inventory is read-only and creates no HC/Future. The previous explicit transaction-body normalization argument remains at the historical analysis reference, not replaced by a whole-function equality claim to1f.",
+    "strict_boundary": "Historical WF hash differs from current. The unchanged strict current-source core validator must reject the original historical report/capture as a fresh current-native report. No snapshot/profile/role/accounting field is rewritten."
+  },
+  "required_conditions": [
+    "Pass fresh selected core127 unit, standalone, parent-adapter and oracle checks on the final116 source footprint; no earlier Green substitutes.",
+    "Pass current116 and invocation/owned-loader deterministic contracts on the exact frozen source; these are separate from historical actor quality and native qualification.",
+    "Finish authorized116 commit and owned installer refresh, validate actual operation ownership/current inventory and re-admission.",
+    "Let the explicit controller select the completed core127 dependency and its revalidation contract before any acceptance record.",
+    "If a changed reachable role or envelope behavior is discovered, or current-native acceptance is explicitly required, use a separately authorized finite actual run instead of this static proposal."
+  ],
+  "schema": 1,
+  "source_modules": {
+    "common/references/decision-governance.md": {
+      "byte_identical_historical": true,
+      "byte_identical_managed_baseline": true,
+      "current_sha256": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+      "historical_git_commit": "1fcbf1e1023810bd16ecc7b9d58c3713b5a67b1e",
+      "historical_sha256": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3"
+    },
+    "common/references/validation-policy.md": {
+      "byte_identical_historical": true,
+      "byte_identical_managed_baseline": true,
+      "current_sha256": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+      "historical_git_commit": "1fcbf1e1023810bd16ecc7b9d58c3713b5a67b1e",
+      "historical_sha256": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7"
+    },
+    "common/scripts/decision-governance.py": {
+      "byte_identical_historical": true,
+      "byte_identical_managed_baseline": true,
+      "current_sha256": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+      "historical_git_commit": "1fcbf1e1023810bd16ecc7b9d58c3713b5a67b1e",
+      "historical_sha256": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286"
+    },
+    "common/scripts/decision-orchestration.py": {
+      "byte_identical_historical": true,
+      "byte_identical_managed_baseline": true,
+      "current_sha256": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+      "historical_git_commit": "1fcbf1e1023810bd16ecc7b9d58c3713b5a67b1e",
+      "historical_sha256": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145"
+    },
+    "common/scripts/run-workspaces.py": {
+      "byte_identical_historical": false,
+      "byte_identical_managed_baseline": true,
+      "current_sha256": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+      "historical_git_commit": "1fcbf1e1023810bd16ecc7b9d58c3713b5a67b1e",
+      "historical_sha256": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac"
+    },
+    "common/scripts/validate-document-rules.py": {
+      "byte_identical_historical": true,
+      "byte_identical_managed_baseline": true,
+      "current_sha256": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+      "historical_git_commit": "1fcbf1e1023810bd16ecc7b9d58c3713b5a67b1e",
+      "historical_sha256": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7"
+    }
+  },
+  "status": "CONDITIONAL-awaiting-current-selected-checks-owned-activation-and-controller-selection",
+  "workflow_changes_from_historical": {
+    "added_functions": [
+      "Store.expect_unchanged",
+      "_hook_action",
+      "_hook_admission",
+      "_hook_admission_inputs",
+      "_hook_admission_key",
+      "_hook_admission_selection",
+      "_hook_admitted_context",
+      "_hook_admitted_pending_context",
+      "_hook_context_links",
+      "_hook_controller",
+      "_hook_inventory_guard",
+      "_hook_locator",
+      "_hook_locator_path",
+      "_hook_mutable_source",
+      "_hook_node",
+      "_hook_pending_admission",
+      "_hook_policy_guard",
+      "_hook_register",
+      "_hook_resolution_context",
+      "_hook_review_frontier",
+      "_hook_safe",
+      "_hook_scope_matches",
+      "_hook_scope_source_guard",
+      "_hook_scope_source_hash",
+      "_hook_scope_sources",
+      "_hook_source_store",
+      "_hook_supersession",
+      "_hook_transition",
+      "_hook_watch",
+      "_hook_watch_guard",
+      "_start_selection",
+      "actual_hook_context",
+      "hook_action",
+      "hook_admission",
+      "hook_helper",
+      "hook_pending_admission",
+      "owned_module",
+      "prepare_hook_admission"
+    ],
+    "changed_shared_functions": [
+      "Store.commit",
+      "Store.lock",
+      "advance",
+      "assert_prose",
+      "clarification_admission",
+      "clarification_revise",
+      "complete",
+      "decision_helper",
+      "finish",
+      "main",
+      "orchestration_action",
+      "process",
+      "start"
+    ],
+    "removed_functions": [],
+    "same_function_count": 104
+  },
+  "workflow_changes_since_managed_guards": {
+    "added_functions": [
+      "_hook_review_frontier"
+    ],
+    "changed_shared_functions": [
+      "_hook_action",
+      "_hook_transition"
+    ],
+    "removed_functions": [],
+    "same_function_count": 152
+  }
+}

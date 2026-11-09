@@ -1,0 +1,101 @@
+{
+  "findings": [
+    {
+      "finding": "A publication-bound returned findings result can still complete through the generic core-resolution branch with an actual same-grant/mode/executor DG accept answer, bypassing guarded plugin-findings/publication-ledger incorporation. Matching complete stage then counts at readiness while the publication ledger remains empty. A decision to substantiate a future fix therefore becomes pr-ready without an actual fix or dismissal.",
+      "id": "review-findings-generic-resolution-bypass",
+      "locations": [
+        ".skill-tree/common/scripts/workflow-state.py:1901",
+        ".skill-tree/common/scripts/pr-review-state.py:353",
+        ".skill-tree/common/scripts/pr-review-state.py:408"
+      ],
+      "proposed_guard": "For publication-bound review findings, require a guarded matching ordinary publication contribution/resolution ledger receipt before stage/readiness satisfaction. A legitimate evidence-backed dismissal must remain represented in that ledger; generic accept/resolve without ledger evidence must not satisfy the configured review pass. Keep task/plan generic resolution behavior scoped separately.",
+      "regression": "Use an actual controlled DG accept/resolve for the exact original review HI/result under the original grant, then verify the generic receipt cannot yield a current completed publication requirement or pr-ready with an empty ledger.",
+      "reproduction": {
+        "actual_readiness": {
+          "core_unresolved": 0,
+          "findings": {},
+          "review_plugin_contributions": {},
+          "status": "pr-ready"
+        },
+        "bypass_observed": true,
+        "fixture_removed": true,
+        "path": ".skill-tree/artifacts/plugin-implementation/ponytail116-generic-resolution-reproduction.json",
+        "sha256": "1141347ef4aeaeb656a34d296ed51ca37cb2b024834db557d74588a2f397aee2",
+        "source_mismatches_after": []
+      },
+      "severity": "high",
+      "status": "independently-reproduced"
+    },
+    {
+      "finding": "Readiness derives a chain phase from a fixed REVIEW_PHASES alias map, while existing composition supports arbitrary registered operation.plugin_anchors. A valid additional named alias resolves to an owned canonical phase and can run through the actual guard, yet cannot satisfy readiness because the unlisted alias string never equals before/during/after.",
+      "id": "registered-named-review-anchor-unmatchable",
+      "locations": [
+        ".skill-tree/common/scripts/pr-review-state.py:351",
+        ".skill-tree/lib/plugin-composition.js:28"
+      ],
+      "proposed_guard": "Use the verified frozen event/binding canonical boundary identity when matching the review phase, retaining registered aliases instead of adding an alias-name allowlist.",
+      "regression": "Register an additional owned named anchor mapped to after in an isolated source copy; complete/attach its real stage, require ordinary core review, and verify current readiness accepts the canonical phase rather than remaining permanently held.",
+      "severity": "medium",
+      "status": "source-established-not-executed"
+    },
+    {
+      "finding": "The after phase guard requires only a current full review record/key and does not require its core actionable findings to be resolved. The after pass can therefore run before the approved complete core review/fix cycle. A later evidence-backed core dismissal with no head/provider-snapshot change leaves hook_context equal; completed readiness counts the earlier complete stage without rechecking its sealed core_review_digest.",
+      "id": "after-admits-unresolved-core-frontier",
+      "locations": [
+        ".skill-tree/common/scripts/pr-review-state.py:213",
+        ".skill-tree/common/scripts/pr-review-state.py:351"
+      ],
+      "proposed_guard": "Establish the resolved current core review frontier before the after contribution, and preserve the intended phase/currentness check when counting the accepted after stage. Keep existing before/during prefix semantics and ordered plugin contribution behavior separate.",
+      "regression": "Record a genuine full core report with an unresolved core finding; the after pass cannot be admitted as the required post-cycle contribution. Resolve/dismiss the core finding through the ordinary evidence path without changing head and prove only a properly placed current after pass supplies readiness.",
+      "severity": "medium",
+      "status": "source-established-not-executed"
+    }
+  ],
+  "format": "skill-tree-independent-source-review",
+  "frozen_paths_verified": 248,
+  "full_review_complete": true,
+  "identity": {
+    "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+    "head": "57bbf013d08c2014aff87f379d2cd708063b81a6",
+    "source_digest": "526cb014454af1fe99b122a0d3358e9d923c9a97d880bae1523b58e0df5e4155"
+  },
+  "limits": [
+    "The current formal36 run is parent-owned and this review neither alters its sources nor claims its result.",
+    "The first original meaningful Red and mixed diagnostic failures remain separate historical artifacts; no reconstructed behavioral Red or old-source native-current claim is made.",
+    "Any fix invalidates this freeze verdict and requires renewed affected checks plus final diff review."
+  ],
+  "prior_review": {
+    "path": ".skill-tree/artifacts/plugin-implementation/ponytail116-independent-review-freeze1.json",
+    "retained_unchanged": true,
+    "sha256": "0b01805ffb6be3bd43a694697edbcca7d4f0ca94ffe8f4cf57756d9e662ad462"
+  },
+  "qualification": {
+    "authored_or_generated_source_edited": false,
+    "bounded_negative_reproductions": 1,
+    "canonical_metadata_written": false,
+    "full_product_tests_executed_by_reviewer": 0,
+    "native_actors_started": 0,
+    "provider_calls": 0,
+    "writes": "New ignored review/reproduction artifacts and disposable isolated fixture metadata only."
+  },
+  "schema": 1,
+  "scope": "Full authored runtime/PR/WF diff, descriptor, original fixtures, behavioral tests and public/generated contracts against HEAD57bbf01. Source review plus exactly one parent-authorized isolated negative reproduction; no full test rerun or native/provider invocation.",
+  "source_freeze": ".skill-tree/history/validation/plugin-system/ponytail116-source-freeze1.json",
+  "source_freeze_sha256": "cfa5334be78d1d8d146e927a840126aacabf69258978b11c64739683d11a92c5",
+  "source_mismatches": [],
+  "task_id": "T-18db6175-499f-4679-bf8d-f815c7b42411",
+  "verdict": "changes-requested",
+  "verified_positive_points": [
+    "The configured-but-never-started gate inspects a real publication carrier and current owned configuration.",
+    "Metadata-only requirement/readiness proof remains separate from business authority; ordinary engine proof_check and Node business APIs reject its use for start/prepare/delivery/record/accept.",
+    "Private owned delivery carries sealed immutable policy independently of replaceable extras and ordinary JSON; callback tamper controls inspect actual default Node envelopes and preserve original HI on rejection.",
+    "Context-end evidence is top-level producer evidence, matches creation provider and original actor/context/attempt/input/delivery; nested actor claims and foreign providers are covered.",
+    "Per-chain repeated attempts with isolated policy reject reused original actor/context; generic no-policy invocation remains compatible.",
+    "Actual first core inspection admits During and still requires final core review; before contributions preserve final core review, and skipped other-phase stages do not count as passes.",
+    "The current positive plugin finding test uses an actual DG incorporation, ordinary ledger namespace, independent before/after functional assertion, new head/checks/full review and a fresh current pilot; this positive path does not cover the separate generic-resolution bypass.",
+    "Real linked-worktree fixture distinguishes execution source/profile from canonical publication routing.",
+    "Explicit disable and uninstall adoption use actual controlled current DG acceptance, retain frozen obligation history and supply no invented execution success.",
+    "Original entry/license digests, Git blob identity and complete two-resource closure remain distinct from adapter policy; the descriptor is inert and source-backed/native/efficacy claims remain bounded.",
+    "Public helper documentation now exposes inspection, hook-attach, plugin-findings and review-reconcile with their receipt/context requirements."
+  ]
+}

@@ -42,6 +42,22 @@ Complete payload: task_id, outcome, acceptance entries with criterion/result/req
 
 Audit payload: scope, sources, findings with stable id/observation/status, checks and coverage_gaps; optional corrections/task links. Refresh manifest after metadata/audit changes. Use history queries by task identity/component; query views mark expired or changed evidence unavailable without rewriting recorded verdicts. Run cycle only after a completed orchestration iteration; unchanged task/dependency state stops further handoffs.
 
+## Plugin invocation metadata
+
+The [invocation contract](plugin-invocation.md#guarded-invocation-chains) owns ordered plugin execution and acceptance. Canonical schema-1 chain records reside in `.skill-tree/invocations/hc-<uuid>.json` with stable `HC-` identities, integer revisions and chain hashes. Original `HI-` attempts retain isolated actor creation, sealed public inputs, dispatch/result evidence and accepted core transitions. Chains remain separate from task definitions, clarification sessions, decision records, check receipts and controller checkpoints. Linked controllers retain chain references without widening admitted task scope.
+
+The workflow CLI exposes `hook-start`, `hook-read`, `hook-next`, `hook-prepare`, `hook-invoke`, `hook-record`, `hook-accept`, `hook-reconcile`, `hook-resume` and `hook-pending` through the ordinary repository and structured `--input` convention. Read accepts `--id HC-<uuid>`. Existing mutations require `chain_id`, `expected_chain_hash` and `expected_chain_revision`; an existing queue also requires the inspected `expected_source_hash`. The bridge obtains trusted current proofs from the verified owned Node closure rather than caller-provided JSON proofs.
+
+Start freezes effective configuration, occurrence order, package identities, context, mode, bounded authority and execution inputs. Preparation seals an original isolated actor attempt; invocation binds actual producer and private delivery digests. A returned result remains unaccepted until a no-change receipt or verified ordinary core incorporation/resolution advances the cursor. Each following occurrence receives the accepted current context. Chain completion supplies one readiness obligation alongside current core acceptance, checks and authorization. Source/configuration/context/policy drift, failures and unresolved originals remain visible prerequisites rather than successful results.
+
+Explicit resume preserves frozen configuration and accepted history. Configuration adoption creates an explicitly authorized replacement chain with a guarded predecessor reference. Reconciliation remains available for original pending attempts after scope removal or revocation without recreating tasks or asserting success. Prepared, invoking and unknown attempts participate in the owned installation barrier before Future initialization. Task-free inspection and empty core-only routing create no fabricated queue or plugin obligation.
+
+Reference-level public parameters remain separate from private resolved delivery values. Trusted in-process private provider/sink callbacks run outside the writer lock; JSON cannot install callbacks. Machine-local package/execution locators reside under `.skill-tree/local/hook-locations/` rather than portable chain metadata. Actor execution, secret resolution and owner waits remain outside writer transactions. A host supplies actual source-backed invocation evidence and sanitizes returned capture; stored state alone supplies no native Skill call, human approval or candidate-effectiveness evidence.
+
+Current global and current-occurrence prerequisites gate business transitions before private provider callbacks and inside the writer transaction. Other-occurrence requirements remain visible without blocking valid current incorporation or rewriting accepted prefixes. Ordinary business transitions preserve the frozen configuration/watch baseline; drift requires explicit supported recovery. Associated managed operations retain live registry authority through exact project, destination and verified receipt inventory evidence. Independent standalone copies retain standalone operation, and empty optional configurations create no new hold. Completed-chain readiness still checks applicable outstanding obligations.
+
+Completed readiness proofs use the dedicated `completed-readiness` kind and cannot substitute for ordinary business proofs. The workflow preflights exact scoped chain references outside the writer and retains an operation-local in-memory cache of current chain, locator, admitted-context and watch identities. Pure writer/commit checks reject stale or missing matching preflight without executing Node. Completed During readiness preserves accepted planning history after the draft frontier advances. Core/PR callers preserve existing selection, authority and publication gates; empty reference sets acquire no Node dependency or persistent readiness record.
+
 ## Metadata consistency checks
 
 The repository documentation validator reads persisted manifests and indexes without refresh or checkpoint replacement. Validation checks JSON structure, repository-relative paths, canonical source-digest coverage/freshness, installed skill entrypoints/resources, task-index equality, source hashes, required dependency closure/cycles and active-run identity consistency. Invalid state requires a concrete repair; validation never resets state. A stale audit supplies a warning and never changes the recorded verdict.
@@ -54,6 +70,18 @@ Queue/index schemas 2 and 3 store `task_progress` independently of the selected 
 
 `begin` admits standalone implementation or reuses controller admission; `implemented` preserves the task and marks awaiting-validation. `prepare-check` freezes source/test, recipe, environment and group/check-set fingerprints before execution. `record-check` requires the original attempt ID, actual lane/environment, classification, matching artifacts and actual cleanup. Test lanes require nonzero expected discovery and no required skips. Static/visual lanes require matching assertions. Expected behavioral Red remains separate from a final pass. `reuse-check` deduplicates only identical compatible checks inside an admitted group. `complete` verifies stored results and matching acceptance artifacts before terminal queue/progress removal.
 
+### Reconcile an interrupted check
+
+Use `reconcile-check <project-root> --input <request.json>` and select the original controller with `--run-id` when applicable. Every request identifies the exact `task_id`, `check_id` and prepared `attempt_id`. The read-only `inspect` action returns the original key and definition, the observed current identity and the runner binding.
+
+The launcher starts an authorized local runner in a dedicated POSIX process group. The `bind-runner` action records the launcher-reported `process_group` while the group leader is live and the prepared inputs still match. The request includes the inspected `expected_key` and `expected_definition`. The helper verifies and records the live group on the current host. A conflicting group cannot replace the binding. One local group owns at most one pending attempt.
+
+The current observation can include changed recipe inputs when the retained profile inputs reproduce the original environment identity and the current key is unavailable.
+
+After verified drift and cleanup, the `cancel` action requires the same original key and definition, exact current `observed` data and `cleanup` with a repository-relative `path` and `sha256`. The ordinary JSON artifact uses schema 1 and kind `local-process-group-cleanup`. The artifact records the task, check, attempt, run or standalone scope, original key, definition, environment identity, host, bound process group, aware `observed_at` time and `observed_live_processes` of zero. The helper checks current absence of the original group. Active groups, uncertain cleanup and unbound legacy attempts remain pending. External and product execution require matching cleanup beyond the local process group.
+
+The owned transaction preserves the original attempt and earlier Red and result records. The distinct `cancelled-no-result` receipt closes the pending attempt and survives in `.skill-tree/history/check-reconciliations/`. Matching replay returns the original receipt. Conflicting replay and late result submission fail without changing state. Cancellation permits ordinary fresh preparation subject to the existing admission and stop rules.
+
 `admit` explicitly rechecks profile freshness on controller resume; nested focused checks reuse the pin. `resume-task` records a resolved blocking condition and re-admits the profile without recreating the task/checkpoint or erasing observed failures. A resolution record grants no new execution authorization. `capture-foundation` retains a finding without a queue or captures/reuses one highest-open-plus-one Pending after setup. Helpers never launch a product during intake, composition or admission.
 
 Check receipts are immutable per attempt ID. Repeated delivery recovers the original receipt; conflicting replay fails. An unresolved prepared attempt requires recovery before another control. A new Red invalidates final Green eligibility while retaining the useful Red/Green artifacts. Shared evidence validates the selected check independently of other pending obligations. Scheduler decisions require current matching immediate evidence.
@@ -64,6 +92,140 @@ Product lanes require an owned execution session even when no new process launch
 
 `accept-revalidation` accepts current passing checks for a required completed contract selected by advance. Temporary `task_progress` entries carry `revalidation: true`; immutable terminal history owns the completed check definitions. The active run retains accepted `revalidated_checks`, without another outcome ledger or rewritten terminal record. Finish rejects stale/missing required completed evidence and unresolved revalidation attempts. A blocked-task resume can clear only the execution stop owned by the same admitted task; unrelated stops remain binding. History views refresh artifact availability and source matching without changing recorded verdicts.
 
+## Local delivery records
+
+A recorded `pr=false`, `merge=true`, `mode=local-merge` order creates a pending local delivery after implementation acceptance. The immutable finish record binds the reviewed source commit and tree, repository and execution worktree. The mutable delivery record retains prepared source and target refs, canonical preservation fingerprints, actual merge evidence, target profile admission and validation. A repeated finish supplies the same original completion.
+
+Select the existing run explicitly with `--run-id`. Use `local-delivery-status`, `local-delivery-prepare`, `local-delivery-merge` and `local-delivery-reconcile` for Git delivery. After activation from the merged target source, use `local-delivery-admit-target`, any required `local-delivery-admit-retained`, `local-delivery-validate` and `local-delivery-complete`. Preparation pins the existing ancestor target and the reviewed source. Reconciliation reads the actual target ref, both ordered parent objects and the expected tree directly from Git.
+
+The same repository-local target lock protects the prepared Git operation and receipt gates. Workflow writer and installer barriers protect canonical state. Owned validation executes fixed checks on the exact target and records actual results and evidence digests. Missing, stale or unproven evidence retains pending delivery. Completion records the local integration class and original merge identity.
+
+## Task clarification contract
+
+The `skill-tree-clarify-tasks` operation exposes the following metadata-only interface through the bundled helper. Canonical mutable records reside in `.skill-tree/clarifications/cl-<uuid>.json` with schema 1, stable `CL-<uuid>` identity and integer revision. Records contain exact selected task IDs, source and semantic baselines, facts, rounds/questions/answers, revision evidence, confirmation, state and next action. The queue/index remain task authorities; implementation progress, run checkpoints and terminal ledgers remain separate.
+
+Clarification commands: `clarify-start`, `clarify-read`, `clarify-round`, `clarify-answer`, `clarify-revise`, `clarify-confirm`, `clarify-resume`, `clarify-cancel` and `clarify-switch-mode`. Commands use the existing root and structured `--input` convention; read accepts `--id CL-<uuid>`. Start supplies exact unique `task_ids` and `expected_source_hash`; existing-session mutators additionally supply `session_id`, `expected_session_hash` and `expected_session_revision`. Source/session hashes are complete-content guards, not semantic identities.
+
+Round payloads supply stable question IDs, prerequisite IDs, task/semantic-field bindings, recommendations and source facts. Answer payloads bind actual submitted Manual evidence or a validated Auto decision reference to the exact session, round, question revision and parent mode epoch. Revision payloads identify exact selected tasks, replacement content and permitted dependency changes; fixed provenance/relationship fields and optional validation metadata remain preserved. Confirmation payloads bind actual Manual owner evidence or separate Auto specification acceptance to the current exact scope and semantic fingerprints after clarity recheck. Resume reconciles drift without new selection; cancellation records the reason without asserting satisfied required interviews.
+
+Session-only commands write only the session through the canonical writer lock. Revisions atomically update task definitions, derived index/manifest and session while preserving parked runs, claims, counters and progress. The lock snapshots session files as owned mutable inputs. Every stale/conflicting guard, invalid task/dependency or unmatched answer/confirmation rejects before mutation. Separate semantic projections cover goals, scope, exclusions, dependencies, acceptance, validation, required plugin policy and remaining substantive content; the validation signature alone supplies insufficient coverage.
+
+## Post-processing session records
+
+`process` freezes the inspected output proposal and current owned after-Processing configuration before the writer. The transaction publishes blocked task definitions, the task index and each matching `required-processing` CL record together. The `processing_requirements` record retains the exact configured order, scope, owned task markers, contributions, affected rechecks and registered chain identities. A matching typed task application creates the shared hold. Empty and generic-only configurations use ordinary Processing. Mixed chains preserve eligible generic occurrences in the original order. The exact source and guarded proposed output identities remain mandatory through commit.
+
+For a new Auto processing session, `decision_authority` binds the actual selected Pending scope through `pending-scope:<comma-separated P IDs>` in selection order. The session derives the exact `task-scope:<T ID>` authority while retaining the original grant and owner-origin evidence. `decision_executor` supplies the real executor and context. Supply `codex-source-backed-context` in `capabilities` when the host can create the isolated actor, deliver the owned input and capture the actual result. Missing Auto authority or capability leaves the task visibly held. Explicit Manual retains owner answer routing.
+
+`clarify-processing-contribute` identifies the registered `chain_id` and original `attempt_id`. The contribution uses the original `HI-` ID as `processing_contribution_id` in the `hook-accept` receipt. Registration binds the returned obligations to the shared session. Current answers and any contiguous guarded task revisions supply a verified contribution receipt for `hook-accept`. The next configured occurrence receives the actual accepted task content. Current clarity and final mode-specific acceptance remain separate from individual contribution acceptance.
+
+`clarify-processing-recheck` names the affected `origin_binding_id`. The owned mandate binds the original configuration and current task input. Use the recorded derived event and context for the new guarded chain. `clarify-processing-adopt` uses an exact current core decision to reconcile a changed configuration while retaining the original history. All existing-session commands require the inspected queue hash, session hash and revision.
+
+Processing of a selected required child can append the exact dependency to a parent with an exact released session. An open parent session requires completion before promotion. The same writer transaction preserves the original release receipt, appends the guarded task revision and updates the session, queue and controller admission. The parent keeps the same identity and recorded progress. Pending original invocations or checks require reconciliation before attachment. Ordinary task reuse cannot replace the parent session or provenance.
+
+A processing confirmation decision requires the current completed obligations and clarity recheck. A new configuration or source adoption invalidates earlier Auto confirmation references. Fact-dependent Auto answer references bind the facts offered for the question. Final confirmation releases only the exact controller-owned marker and status. The release receipt binds before and after task fingerprints and the exact registered accepted chains. Earlier contribution history retains the original inputs. Current readiness verifies the accepted revision lineage and the mechanical release. Ordinary hook preparation continues to bind the live task.
+
+## Guarded decision records
+
+The shared `decision-governance.py` helper owns `.skill-tree/decisions/dg-<uuid>.json` records through the existing canonical writer/installation barrier. `workflow-state.py` exposes `decision-start`, `decision-read`, `decision-prepare`, `decision-record`, `decision-reconcile`, `decision-switch`, `decision-resume` and `decision-accept`. Read never creates metadata. A task-free decision creates no Future, implementation run or worktree. Existing queue mutations require the inspected `expected_source_hash`; the decision helper never loads or saves a controller.
+
+A record freezes typed context, semantic/content identities, question/options/recommendation, mode/epoch, bounded authority, actual executor and original `DA-` attempts. Existing mutators require `decision_id`, `expected_decision_hash`, `expected_decision_revision`, `expected_mode_epoch` and `expected_context_fingerprint`. Preparation records the role and distinct actor/context. Submitted results retain actual owner or delegated origin. Significant decisions require current independent criticism; substantive disagreement retains arbitration. A new label cannot manufacture independence or erase an unsettled role.
+
+`clarify-start` accepts separate `decision_mode`, `decision_authority` and `decision_executor` fields. Legacy sessions and the compatible state interface retain Manual defaults until separately qualified operation routing selects Auto. `clarification_decision_context` and `clarification_decision_question` derive exact parent bindings. Auto answer/confirmation payloads supply `decision_receipt: {decision_id, acceptance_digest}`. References validate live current mode, authority, purpose and semantic scope; old acceptance or a product answer cannot impersonate current specification acceptance. Explicit switching records previous policy and confirmation while preserving history. Formatting equivalence preserves semantic validity; changed semantics reopen affected acceptance.
+
+Switching and session cancellation require original pending actors to be reconciled first. Cancelled parents reject late preparation, recording and acceptance. Original-attempt reconciliation retains exact record/attempt guards while permitting cleanup after removal of the former scope; cleanup never recreates Future or records a successful answer.
+
+The PR adapter binds decisions to exact repository/head/base/target and review-policy identity. A decision receipt adds decision evidence without changing publication authorization, review completion, check status or external approval. State helpers validate submitted evidence; actual host delegation and automatic actor/default-mode activation require separate orchestration qualification.
+
+## Core operation phase frames
+
+The `decision-orchestration.py` helper owns `.skill-tree/decisions/do-<uuid>.json` frames separately from DG authority and answer records. The workflow CLI exposes `orchestration-start`, `orchestration-read`, `orchestration-next`, `orchestration-question`, actor preparation/recording/reconciliation, mode switching, decision acceptance, research, plan/accept-plan, implementation, checks, review, resolution, fixes, resume and unchanged-failure observation. The command names use the `orchestration-` prefix. Existing mutations require `orchestration_id`, `expected_orchestration_hash` and `expected_orchestration_revision`; an existing queue also requires the inspected `expected_source_hash`. Read and next-action inspection create no metadata.
+
+Start freezes actual typed context, bounded authority, executor, mode, host capabilities and execution snapshot. New frames default to Auto; explicit Manual and stored modes remain binding. The CLI pins actual bundle/reference hashes and the owned profile digest. Changed core inputs require original-actor reconciliation and explicit resume; old plan/decision/check/review acceptance never becomes current through a source update. Phase-owned decisions bind the execution generation. Task-free frames create no queue, implementation run or worktree.
+
+Question attachment creates one DG decision or binds an existing exact context/mode/grant/executor-owned DG identity. Actor preparation records the actual host creation event and returns `prepared_actor` with the original `attempt_id`, sealed `input`, `input_digest` and creation evidence. The host delivers the sealed input outside the writer lock, then records the matching actual returned result. A separate trusted host capture establishes actual tool observations; supplied JSON labels alone establish no native authenticity.
+
+DG mutation and the corresponding DO frame change share one recoverable transaction. Current plans, required-check sets, source/head/base identities, review findings and individual resolutions guard phase transitions. A clean review creates no fix. A frame's ready phase never replaces actual operation validation receipts, task completion, external approval or publication authorization. Repeated unchanged obligations persist one owner question without treating new timestamps, review IDs, actor counts or repeated endorsements as progress.
+
 ## Workspace helper interface
 
 `workspace-setup` explicitly enables the compatible run registry and optionally adopts an existing checkpoint. `runs` lists retained runs. `recover-locator` and `recover-workspace` preserve identities while resolving explicitly inspected machine-state gaps. `environment` inspects declared prerequisites without reading secrets or launching runtimes. `resource` owns exclusive runtime claims. `export-run` and `replay-events` transfer scoped semantic changes without replacing canonical queue files. The run workspace contract defines payloads and conflict behavior.
+
+
+## Clarification payloads
+
+`clarify-start` accepts the exact `task_ids`, inspected `expected_source_hash` and optional `mode: explicit|required-interview`. The returned session includes `id`, integer `revision` and computed `session_hash`. `clarify-read --id CL-<uuid>` returns the current record without mutation. Every existing-session mutation supplies the following guard fields; placeholders represent exact inspected values.
+
+```json
+{
+  "session_id": "CL-<uuid>",
+  "expected_source_hash": "<complete-queue-sha256>",
+  "expected_session_hash": "<complete-session-sha256>",
+  "expected_session_revision": 1
+}
+```
+
+`clarify-round` merges stable question definitions and source facts. Question IDs use lowercase kebab-case. `bindings` maps selected task IDs to semantic fields: `title`, `goal`, `scope`, `exclusions`, `dependencies`, `acceptance`, `validation`, `required_plugin_policy` or `content`. An unchanged question retains the question revision; an edited definition advances the revision and reopens affected answers. The round returns a `CR-` identity, complete independent `question_ids` frontier and matching question revisions. Dependent questions stay registered for a later round.
+
+```json
+{
+  "questions": [
+    {
+      "id": "storage-choice",
+      "text": "Which storage boundary applies?",
+      "recommendation": "Keep the selected project-local boundary.",
+      "prerequisites": [],
+      "bindings": {"T-<uuid>": ["scope", "dependencies"]}
+    },
+    {
+      "id": "migration-choice",
+      "text": "Which migration behavior follows the storage decision?",
+      "recommendation": "Preserve existing records within the selected boundary.",
+      "prerequisites": ["storage-choice"],
+      "bindings": {"T-<uuid>": ["acceptance", "validation"]}
+    }
+  ],
+  "facts": [
+    {
+      "id": "storage-source",
+      "observation": "The inspected source defines project-local storage.",
+      "sources": [{"path": "src/storage.py", "sha256": "<inspected-file-sha256>"}],
+      "limitations": ["Runtime behavior remains unqualified."]
+    }
+  ]
+}
+```
+
+Source paths resolve against the caller execution checkout, independently of canonical queue routing. Stored source-origin identity and file hashes retain the inspected checkout boundary. Changed or unavailable facts block clarity/confirmation until fresh research replaces the facts. Fact `limitations` can be an empty list when supported.
+
+`clarify-answer` requires the displayed round/question identity, exact question revision, actual submitted answer and source evidence. Evidence kind is `owner-message` or `submitted-answer`; a nonempty `reference` identifies the actual owner submission. Recommendations, defaults and elapsed waits never qualify. An exact duplicate answer returns without another session write; conflicting replay rejects mutation.
+
+```json
+{
+  "round_id": "CR-<uuid>",
+  "question_id": "storage-choice",
+  "question_revision": 1,
+  "answer": "Keep storage within the selected project.",
+  "evidence": {"kind": "owner-message", "reference": "Owner message identifying the submitted storage decision."}
+}
+```
+
+`clarify-revise` accepts `tasks`, a nonempty list of objects with exact selected `task_id` and optional replacement `title`, `body` or `depends_on`. Replacement `body` contains the task sections without the task heading/metadata header. Omitted fields remain preserved. Replacement dependencies are exact `T-` IDs. Fixed provenance/relationship fields and optional validation headers remain unchanged. Open prepared implementation attempts require safe recovery before revision. Invalid acceptance/check mapping, missing dependencies, cycles and unowned tasks reject the complete transaction.
+
+A `clarify-round` payload with an empty decision frontier records the clarity rubric below. Every rubric value requires source-backed assessment; `evidence` contains concrete recheck observations. A false assessment preserves the research prerequisite. A true complete rubric with no unresolved mandatory questions permits current shared-understanding confirmation.
+
+```json
+{
+  "clarity": {
+    "goals": true,
+    "scope": true,
+    "exclusions": true,
+    "dependencies": true,
+    "acceptance": true,
+    "validation": true,
+    "decisions": true,
+    "evidence": ["The selected task, accepted decisions and inspected sources define feasible observable acceptance."]
+  }
+}
+```
+
+`clarify-confirm` supplies `task_ids` in the returned frozen order, the exact returned `semantic_fingerprints` mapping and actual owner `evidence` with the same evidence shape as an answer. The owner confirms the displayed current task summary after recheck; a prepared confirmation request supplies no approval. `clarify-resume` reconciles current source drift without selecting new tasks or resuming implementation. `clarify-cancel` requires a nonempty `reason`; a required-interview cancellation retains the unsatisfied admission hold. Repeated unchanged rounds persist a blocked state and concrete next action.

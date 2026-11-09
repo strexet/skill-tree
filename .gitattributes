@@ -1,0 +1,2 @@
+# Verbatim test-runner evidence retains indented blank lines from TAP diagnostics.
+/.skill-tree/history/validation/**/*.txt whitespace=-blank-at-eol

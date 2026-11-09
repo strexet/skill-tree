@@ -1,0 +1,54 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-plugin-invocation-installation.js"
+  ],
+  "attempt_id": "C-de4aeab8-96c8-4e05-96aa-b448f0258c8f",
+  "check_id": "installed-hook-fixtures",
+  "counts": {
+    "discovered": 8,
+    "expected": 8,
+    "failed": 0,
+    "passed": 8,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-dae414c5-43e4-45db-a6f3-4ce4112440c5-installed-hook-fixtures-c-de4aeab8-96c8-4e05-96aa-b448f0258c8f.txt",
+  "result": "pass",
+  "reviewed_failure_reason": null,
+  "source_fingerprints": {
+    ".skill-tree/common/references/plugin-invocation.md": "227e6607d1d2dac181a9bc60ef94f679c328bf3e048c0dfb301594c19e0ee2a1",
+    ".skill-tree/common/references/workflow-metadata.md": "d493bacb30bdf7a1253defe91752684e4838ac5d0f31b94c7b5dde5a0693f14d",
+    ".skill-tree/common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    ".skill-tree/common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+    ".skill-tree/common/scripts/plugin-hooks.js": "3ed78006e6abfb8a70cf191f1b310f41b50f3c60b3131bca3722c89af6753102",
+    ".skill-tree/common/scripts/plugin-invocation.py": "281165ce83ed4309e4c841721b4461c71a447c4070c496a3c7ca37598af64d7d",
+    ".skill-tree/common/scripts/pr-review-state.py": "ff725312f91b5c207b841dbb9995024021196f89b131c667741355b05fc46c87",
+    ".skill-tree/common/scripts/run-workspaces.py": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+    ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+    ".skill-tree/common/scripts/workflow-state.py": "57383709635e780c6d207834fba5396583f1ecfe86ac2456380fabf755b6a68b",
+    ".skill-tree/config/resource-map.json": "95a4922b2331416863100c9b054e84709bafd4126c1542a15fac49781da13248",
+    ".skill-tree/documents/implementation-plan.md": "d53373bb753c92ba770aca2af1d9dd4bea586888de5aa5320b454a2e056e84e1",
+    ".skill-tree/documents/plugin-management-contract.md": "dd9ee48ee9a3f64af0aebd475192637ff2e44e80fea9a5344a47c4d810451627",
+    ".skill-tree/documents/plugin-system-contract.md": "ad81db5c53c25df9326b6f9c679ac33e8ae15e32e51ec19d95b352ef1d68a2fc",
+    ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+    ".skill-tree/lib/installation.js": "efb88bc5a28246aab36c7d1cb709f5ec4fb37dc736867c3533503e74c26fa431",
+    ".skill-tree/lib/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
+    ".skill-tree/lib/plugin-composition.js": "3a2b5af0329c6e0a98754c512388df0d447f0d08181fa39fd8cf7fa4905225db",
+    ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    ".skill-tree/lib/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+    ".skill-tree/lib/plugin-runtime.js": "5e9827cc3e59fece6a95afd76f90181e7f2c9eb6a049f0c9a0c7a6ad6730dcb8",
+    ".skill-tree/lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+    ".skill-tree/scripts/agent-conformance.py": "0f7a79a83e69aad8c8f3a5c4d063b94616f1c6d786f0e13cc3027dee3401f49e",
+    ".skill-tree/templates/operations.json": "30f8c0d2dd6d067496485cdcc3050697ebed3a4462bf259f4fc7d5a6279422e6",
+    ".skill-tree/tests/test-plugin-conformance.py": "13475002ed224cb6270c3d5b32a6762e9cc2f2928a338104513c0e2062a088fd",
+    ".skill-tree/tests/test-plugin-invocation-installation.js": "c8f3bba8c056978b54c37bc55f5b0d18779898bc87d8ae16d75fd16ca74be7f4",
+    ".skill-tree/tests/test-plugin-workflow.py": "f2fdd4638645daf03f43ee20c09123e851e021cf239bf48bd47544f6d8d53d01"
+  },
+  "task_id": "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+  "tool_wall_seconds": 20.14646725030616
+}

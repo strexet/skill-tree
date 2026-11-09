@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "result": "expected-red",
+  "exit_code": 1,
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-plugin-review.py",
+    "PluginReviewPilotTests.test_policy_bound_review_rejects_contradictory_success_payloads_at_record"
+  ],
+  "discovered_methods": 1,
+  "failed_subtest_controls": 4,
+  "wall_seconds": 21.408440959174186,
+  "test_definition": {
+    "path": ".skill-tree/tests/test-plugin-review.py",
+    "sha256": "ae5892d9fc09be097d360ee4fe7e145593278e7fa6ec76d77cc8c723908c7eaa"
+  },
+  "unchanged_runtime_paths_checked": 245,
+  "runtime_mismatches_after": [],
+  "pre_repair_source_freeze": ".skill-tree/history/validation/plugin-system/ponytail116-source-freeze2.json",
+  "log": ".skill-tree/history/validation/plugin-system/ponytail116-normalized-report-red.txt",
+  "qualification": "Four synthetic contradictory-shape assertions in one test method; current pre-repair actual owned record path, no source repair/native/provider/owner consent claim."
+}

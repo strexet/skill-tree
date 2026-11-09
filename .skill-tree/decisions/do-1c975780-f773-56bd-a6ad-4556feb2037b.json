@@ -1,0 +1,586 @@
+{
+  "acceptance": null,
+  "accepted_obligations": [
+    "26ef3335df601ed8c59604239edf1aaefdd83a74e5f0bb6afd42d8841e4975b0"
+  ],
+  "actor_requests": {
+    "DA-8c755c9e-328a-4be7-b7aa-dff822d17ec3": {
+      "attempt_id": "DA-8c755c9e-328a-4be7-b7aa-dff822d17ec3",
+      "creation_evidence": {
+        "actor_context_id": "/root/invocation118_plan_resolver",
+        "actor_id": "/root/invocation118_plan_resolver",
+        "kind": "host-agent-created",
+        "provider": "Codex collaboration",
+        "reference": "Actual root native creation /root/invocation118_plan_resolver; fork_turns none, initially idle.",
+        "tool": "collaboration.spawn_agent"
+      },
+      "input": {
+        "actor": {
+          "context_id": "/root/invocation118_plan_resolver",
+          "id": "/root/invocation118_plan_resolver"
+        },
+        "authority": {
+          "allowed_kinds": [
+            "technical",
+            "product",
+            "specification-acceptance"
+          ],
+          "constraints": [
+            "Only the approved task and dependency scope, including the finite controlled source-backed adapter qualification. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+          ],
+          "context_id": "task:T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+          "evidence": {
+            "kind": "owner-message",
+            "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+          },
+          "id": "approved-invocation118",
+          "revision": 1
+        },
+        "authority_digest": "386e89783ad8d71fca68376613f39c580f267b8f2e21088fb88a3e3ca052ec1c",
+        "context": {
+          "content_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+          "decision_purpose": "plan",
+          "execution_snapshot_digest": "d4c331a3e65b029b9719b4e87e22219b0cbbeb45f8d9f8307295fa5f31cdcfd9",
+          "id": "task:T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+          "kind": "task",
+          "orchestration_id": "DO-1c975780-f773-56bd-a6ad-4556feb2037b",
+          "plan_digest": "161a71ec19ab4830605e63494d29c3aab01b9740f989e1a1b9e4c219e64a95dc",
+          "required_checks_digest": "8427c0a28c4de42473e55307d5b742f300bbb061e6886ab399f65744643c9cc4",
+          "semantic_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+          "task_ids": [
+            "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+          ]
+        },
+        "creation_evidence": {
+          "actor_context_id": "/root/invocation118_plan_resolver",
+          "actor_id": "/root/invocation118_plan_resolver",
+          "kind": "host-agent-created",
+          "provider": "Codex collaboration",
+          "reference": "Actual root native creation /root/invocation118_plan_resolver; fork_turns none, initially idle.",
+          "tool": "collaboration.spawn_agent"
+        },
+        "decision_hash": "698eaafbaa165a984213389dcd16aebe4986e41bca06bbdc818469ff01eb1bae",
+        "decision_id": "DG-07f50e85-fc3d-545d-9a66-d0ba5cdf8422",
+        "execution_snapshot": {
+          "common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+          "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+          "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+          "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+          "common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+          "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+          "common/scripts/workflow-state.py": "791531838c16c1b362ade3b086e66dfb804da20c06b8828b0e71f251a08b0c5e",
+          "owned-profile": "e8b39a2b9da8852bd17ad177018fb7c9e11b07638b8d9feeb49223dafe7e98b3"
+        },
+        "mode": "auto",
+        "mode_epoch": 1,
+        "orchestration_id": "DO-1c975780-f773-56bd-a6ad-4556feb2037b",
+        "orchestration_revision": 4,
+        "prior_role_results": {},
+        "question": {
+          "id": "invocation118-plan",
+          "kind": "specification-acceptance",
+          "options": [
+            {
+              "id": "accept",
+              "text": "Accept the current plan."
+            },
+            {
+              "id": "revise",
+              "text": "Revise the plan with concrete reasons."
+            }
+          ],
+          "plan_text": "# Resumable Plugin Invocation Plan\n\n## Authorized result\n\nTask T-dae414c5-43e4-45db-a6f3-4ce4112440c5 adds guarded resumable plugin execution receipts to the qualified composition boundary. Actual host tools execute outside metadata locks. The initial supported mechanism is an honestly labelled source-backed Codex instruction/resource context. A native Skill tool remains unclaimed. Catalog recommendation experiments, specialist pilot policy and public management retain separate tasks.\n\n## State and integration\n\n1. A standalone `plugin-invocation.py` engine uses the existing Store protocol and one HC record under `.skill-tree/invocations/`. Neutral task-free commands create no Future, controller or fabricated task. Records bind revisions, hashes, operation/event, typed scope, ordered definitions, exact package/resource identities, mode/authority, explicit overrides, cursor, original attempts and historical context transitions.\n2. `hook-start`, `hook-next`, `hook-prepare`, `hook-invoke`, `hook-record`, `hook-accept`, `hook-reconcile` and `hook-resume` separate selection, original attempt creation, actual host start, returned transport result, accepted incorporation and final readiness. Questions, findings, unavailable actors and uncertain attempts retain unresolved obligations. Duplicate delivery reconciles the original result; conflicting replay, stale input and active recursive re-entry reject mutation.\n3. Ordered definitions remain frozen; selection and each envelope use the latest accepted context at the cursor. Earlier completed-prefix receipts keep the original stage input. B incorporation uses ordinary guarded core revision evidence before A2; incorporation does not require final CL confirmation or Ready status. Final readiness remains blocked until the full chain and applicable current core acceptance/checks qualify.\n4. The owned JS resolver remains authoritative for effective values, condition selection and parameter/delivery identity. Python never substitutes a differently formatted JSON digest for the JS parameter digest. Configuration references, ephemeral resolved delivery values and whole-envelope identity remain separate. Secret values reach only the permitted invocation context and never ordinary ledgers, previews, history, exports or persisted sealed files. Nonsecret marker fixtures qualify native forwarding; a fake provider qualifies secret separation without claiming a real service integration.\n5. Owned Node preparation and actual host calls occur before/outside the writer lock. Preparation captures trusted inventory/scope proofs; the writer then rechecks relevant inputs and compare-and-swap guards through reads. Ordinary CL/DO/processing helpers apply proposed changes separately. Acceptance verifies the exact recorded before/after transition; an interrupted incorporation remains blocked and reconciles actual core history.\n6. Workflow and PR adapters expose the engine and enforce live registered chain obligations without replacing authorization, required checks or independent approval. Source-only owned Python loading protects new entry paths against matching bytecode-cache substitution. Store snapshots include invocation files; controller metadata retains frozen references without a schema migration. Installer and lifecycle barriers inspect pending/uncertain invocation records before the no-Future early return. Malformed records and uncertain originals retain prerequisites.\n7. Resource maps and bootstrap inventories contain the new standalone helper closure. Composition resolves only the explicitly supported adapter planning prerequisite; missing capabilities, unresolved anchors, changed ownership/configuration and stale scope remain prerequisites. Pilot115 owns atomic post-processing/editor/interview policy and final specification acceptance; pilot116 owns Ponytail attachment and current PR policy.\n\n## Requirements-led qualification\n\nPython state and bridge controls cover exact JSON and extra instructions, nested/Unicode/exponent values, reserved-looking data, secret separation, task-free/Pending/task/review scope, replay/conflicts, stale source/profile/review identities, explicit frozen overrides, failure/question/rework/unknown recovery, recursion and same-package occurrence independence. A-to-B-to-A controls verify current accepted context, retained prefix evidence and interrupted incorporation. Pending task-free invocations prevent installation/replacement and participate in ordinary CAS recovery.\n\nCopied general/web/unity fixtures remove source and siblings, retain dynamic operation registration, verify resources and source-only runtime loading, and preserve no-plugin behavior without optional tools or queue creation. A required oracle suite independently rejects semantic capture corruptions while retaining valid checksums.\n\n## Bounded actual host observation\n\nThree real isolated actors load controlled installed plugin resources and sealed inputs in A1, B and A2 order. Distinct upstream, JSON-parameter and extra-instruction nonces establish actual forwarding. B returns a proposed T-task addition. The parent incorporates the proposal through ordinary guarded clarification revision using explicitly scripted Manual fixture-owner input. A2 reads the incorporated addition. Final fixture confirmation follows the chain; scripted fixture inputs never supply real-human business approval.\n\nThe parent separately captures actual creation/dispatch/result events, actor/context identities, exact resource/input/output bindings and ordinary core revision evidence. The oracle compares expected nonce values and actual before/after task bytes rather than actor-supplied success flags. Missing native events, collapsed occurrences, reordered incorporation, changed markers/context, unresolved originals and invented human/native provenance reject qualification. Unexposed exact model, native call IDs, tokens and cost remain null.\n\nLimits are six new qualification contexts, twelve explicit spawn/follow-up requests and 1,800 total wall seconds including cleanup. The final sixty seconds remain cleanup reserve. Nominal execution uses three contexts and six requests. Reserve permits one corrected-source rerun after a retained concrete failure; favorable resampling and unrelated comparative candidate trials remain excluded.\n\n## Completion\n\nFocused Red precedes implementation. Required task checks include state, copied installation, actual-host observation and the independent oracle. Repository sync, strict validation, Python/Node suites, installer list/dry-run and diff checks precede independent full-diff review. Findings follow current core resolution/fix/re-review. Authorized scoped commits precede terminal acceptance; owned stopped-handoff activation preserves canonical state and explicit re-admission. Local merge into codex/next-version remains the controller tail after every admitted unit qualifies. No PR, push, release, tag or license change is authorized by the invocation plan.\n",
+          "recommendation": "accept",
+          "significance": "significant",
+          "text": "Accept the exact approved-scope invocation plan, or request a bounded revision."
+        },
+        "role": "resolver",
+        "role_receipts": {},
+        "schema": 1
+      },
+      "input_digest": "535f0e3601ed89dc01670e1c16265f07d6468f705d791978f497f0587a259ae4"
+    },
+    "DA-af9950aa-532d-4f5c-9b8d-1db0406b203c": {
+      "attempt_id": "DA-af9950aa-532d-4f5c-9b8d-1db0406b203c",
+      "creation_evidence": {
+        "actor_context_id": "/root/invocation118_plan_critic",
+        "actor_id": "/root/invocation118_plan_critic",
+        "kind": "host-agent-created",
+        "provider": "Codex collaboration",
+        "reference": "Actual root native creation /root/invocation118_plan_critic; fork_turns none, initially idle.",
+        "tool": "collaboration.spawn_agent"
+      },
+      "input": {
+        "actor": {
+          "context_id": "/root/invocation118_plan_critic",
+          "id": "/root/invocation118_plan_critic"
+        },
+        "authority": {
+          "allowed_kinds": [
+            "technical",
+            "product",
+            "specification-acceptance"
+          ],
+          "constraints": [
+            "Only the approved task and dependency scope, including the finite controlled source-backed adapter qualification. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+          ],
+          "context_id": "task:T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+          "evidence": {
+            "kind": "owner-message",
+            "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+          },
+          "id": "approved-invocation118",
+          "revision": 1
+        },
+        "authority_digest": "386e89783ad8d71fca68376613f39c580f267b8f2e21088fb88a3e3ca052ec1c",
+        "context": {
+          "content_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+          "decision_purpose": "plan",
+          "execution_snapshot_digest": "d4c331a3e65b029b9719b4e87e22219b0cbbeb45f8d9f8307295fa5f31cdcfd9",
+          "id": "task:T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+          "kind": "task",
+          "orchestration_id": "DO-1c975780-f773-56bd-a6ad-4556feb2037b",
+          "plan_digest": "161a71ec19ab4830605e63494d29c3aab01b9740f989e1a1b9e4c219e64a95dc",
+          "required_checks_digest": "8427c0a28c4de42473e55307d5b742f300bbb061e6886ab399f65744643c9cc4",
+          "semantic_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+          "task_ids": [
+            "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+          ]
+        },
+        "creation_evidence": {
+          "actor_context_id": "/root/invocation118_plan_critic",
+          "actor_id": "/root/invocation118_plan_critic",
+          "kind": "host-agent-created",
+          "provider": "Codex collaboration",
+          "reference": "Actual root native creation /root/invocation118_plan_critic; fork_turns none, initially idle.",
+          "tool": "collaboration.spawn_agent"
+        },
+        "decision_hash": "d3b713c00a5e99765d6b1f486a754593121bcc5c804f53f570d9700a881ff3f8",
+        "decision_id": "DG-07f50e85-fc3d-545d-9a66-d0ba5cdf8422",
+        "execution_snapshot": {
+          "common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+          "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+          "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+          "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+          "common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+          "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+          "common/scripts/workflow-state.py": "791531838c16c1b362ade3b086e66dfb804da20c06b8828b0e71f251a08b0c5e",
+          "owned-profile": "e8b39a2b9da8852bd17ad177018fb7c9e11b07638b8d9feeb49223dafe7e98b3"
+        },
+        "mode": "auto",
+        "mode_epoch": 1,
+        "orchestration_id": "DO-1c975780-f773-56bd-a6ad-4556feb2037b",
+        "orchestration_revision": 6,
+        "prior_role_results": {
+          "resolver": {
+            "actor": {
+              "context_id": "/root/invocation118_plan_resolver",
+              "id": "/root/invocation118_plan_resolver"
+            },
+            "evidence": {
+              "actor_context_id": "/root/invocation118_plan_resolver",
+              "actor_id": "/root/invocation118_plan_resolver",
+              "creation_reference": "Actual root native creation /root/invocation118_plan_resolver; fork_turns none, initially idle.",
+              "kind": "delegated-agent",
+              "provider": "Codex collaboration",
+              "reference": "Actual /root/invocation118_plan_resolver returned matching sealed JSON in collaboration.final answer.",
+              "tool": "collaboration.followup_task"
+            },
+            "result": {
+              "answer": "accept",
+              "input_digest": "535f0e3601ed89dc01670e1c16265f07d6468f705d791978f497f0587a259ae4",
+              "rationale": "The plan covers task118's guarded occurrence identity, frozen configuration, sequential current-context delivery, replay/recovery and standalone installation requirements. JS retains parameter identity authority; secret delivery stays ephemeral. Existing clarification revision permits B's task-content incorporation before final confirmation, while final readiness retains current core acceptance and checks. The finite source-backed Codex observation uses independent host evidence and semantic controls without claiming native Skill execution, real-human approval or comparative qualification.",
+              "status": "answered"
+            },
+            "status": "answered"
+          }
+        },
+        "question": {
+          "id": "invocation118-plan",
+          "kind": "specification-acceptance",
+          "options": [
+            {
+              "id": "accept",
+              "text": "Accept the current plan."
+            },
+            {
+              "id": "revise",
+              "text": "Revise the plan with concrete reasons."
+            }
+          ],
+          "plan_text": "# Resumable Plugin Invocation Plan\n\n## Authorized result\n\nTask T-dae414c5-43e4-45db-a6f3-4ce4112440c5 adds guarded resumable plugin execution receipts to the qualified composition boundary. Actual host tools execute outside metadata locks. The initial supported mechanism is an honestly labelled source-backed Codex instruction/resource context. A native Skill tool remains unclaimed. Catalog recommendation experiments, specialist pilot policy and public management retain separate tasks.\n\n## State and integration\n\n1. A standalone `plugin-invocation.py` engine uses the existing Store protocol and one HC record under `.skill-tree/invocations/`. Neutral task-free commands create no Future, controller or fabricated task. Records bind revisions, hashes, operation/event, typed scope, ordered definitions, exact package/resource identities, mode/authority, explicit overrides, cursor, original attempts and historical context transitions.\n2. `hook-start`, `hook-next`, `hook-prepare`, `hook-invoke`, `hook-record`, `hook-accept`, `hook-reconcile` and `hook-resume` separate selection, original attempt creation, actual host start, returned transport result, accepted incorporation and final readiness. Questions, findings, unavailable actors and uncertain attempts retain unresolved obligations. Duplicate delivery reconciles the original result; conflicting replay, stale input and active recursive re-entry reject mutation.\n3. Ordered definitions remain frozen; selection and each envelope use the latest accepted context at the cursor. Earlier completed-prefix receipts keep the original stage input. B incorporation uses ordinary guarded core revision evidence before A2; incorporation does not require final CL confirmation or Ready status. Final readiness remains blocked until the full chain and applicable current core acceptance/checks qualify.\n4. The owned JS resolver remains authoritative for effective values, condition selection and parameter/delivery identity. Python never substitutes a differently formatted JSON digest for the JS parameter digest. Configuration references, ephemeral resolved delivery values and whole-envelope identity remain separate. Secret values reach only the permitted invocation context and never ordinary ledgers, previews, history, exports or persisted sealed files. Nonsecret marker fixtures qualify native forwarding; a fake provider qualifies secret separation without claiming a real service integration.\n5. Owned Node preparation and actual host calls occur before/outside the writer lock. Preparation captures trusted inventory/scope proofs; the writer then rechecks relevant inputs and compare-and-swap guards through reads. Ordinary CL/DO/processing helpers apply proposed changes separately. Acceptance verifies the exact recorded before/after transition; an interrupted incorporation remains blocked and reconciles actual core history.\n6. Workflow and PR adapters expose the engine and enforce live registered chain obligations without replacing authorization, required checks or independent approval. Source-only owned Python loading protects new entry paths against matching bytecode-cache substitution. Store snapshots include invocation files; controller metadata retains frozen references without a schema migration. Installer and lifecycle barriers inspect pending/uncertain invocation records before the no-Future early return. Malformed records and uncertain originals retain prerequisites.\n7. Resource maps and bootstrap inventories contain the new standalone helper closure. Composition resolves only the explicitly supported adapter planning prerequisite; missing capabilities, unresolved anchors, changed ownership/configuration and stale scope remain prerequisites. Pilot115 owns atomic post-processing/editor/interview policy and final specification acceptance; pilot116 owns Ponytail attachment and current PR policy.\n\n## Requirements-led qualification\n\nPython state and bridge controls cover exact JSON and extra instructions, nested/Unicode/exponent values, reserved-looking data, secret separation, task-free/Pending/task/review scope, replay/conflicts, stale source/profile/review identities, explicit frozen overrides, failure/question/rework/unknown recovery, recursion and same-package occurrence independence. A-to-B-to-A controls verify current accepted context, retained prefix evidence and interrupted incorporation. Pending task-free invocations prevent installation/replacement and participate in ordinary CAS recovery.\n\nCopied general/web/unity fixtures remove source and siblings, retain dynamic operation registration, verify resources and source-only runtime loading, and preserve no-plugin behavior without optional tools or queue creation. A required oracle suite independently rejects semantic capture corruptions while retaining valid checksums.\n\n## Bounded actual host observation\n\nThree real isolated actors load controlled installed plugin resources and sealed inputs in A1, B and A2 order. Distinct upstream, JSON-parameter and extra-instruction nonces establish actual forwarding. B returns a proposed T-task addition. The parent incorporates the proposal through ordinary guarded clarification revision using explicitly scripted Manual fixture-owner input. A2 reads the incorporated addition. Final fixture confirmation follows the chain; scripted fixture inputs never supply real-human business approval.\n\nThe parent separately captures actual creation/dispatch/result events, actor/context identities, exact resource/input/output bindings and ordinary core revision evidence. The oracle compares expected nonce values and actual before/after task bytes rather than actor-supplied success flags. Missing native events, collapsed occurrences, reordered incorporation, changed markers/context, unresolved originals and invented human/native provenance reject qualification. Unexposed exact model, native call IDs, tokens and cost remain null.\n\nLimits are six new qualification contexts, twelve explicit spawn/follow-up requests and 1,800 total wall seconds including cleanup. The final sixty seconds remain cleanup reserve. Nominal execution uses three contexts and six requests. Reserve permits one corrected-source rerun after a retained concrete failure; favorable resampling and unrelated comparative candidate trials remain excluded.\n\n## Completion\n\nFocused Red precedes implementation. Required task checks include state, copied installation, actual-host observation and the independent oracle. Repository sync, strict validation, Python/Node suites, installer list/dry-run and diff checks precede independent full-diff review. Findings follow current core resolution/fix/re-review. Authorized scoped commits precede terminal acceptance; owned stopped-handoff activation preserves canonical state and explicit re-admission. Local merge into codex/next-version remains the controller tail after every admitted unit qualifies. No PR, push, release, tag or license change is authorized by the invocation plan.\n",
+          "recommendation": "accept",
+          "significance": "significant",
+          "text": "Accept the exact approved-scope invocation plan, or request a bounded revision."
+        },
+        "role": "critic",
+        "role_receipts": {
+          "resolver": "3d7f4a29b1e4ecb25f2cfc3a69d947f7812b52d1214174f02c39af531889f422"
+        },
+        "schema": 1
+      },
+      "input_digest": "b179ea20083a3ea6ed156068ece1fdc3fb29669d21b20c9a81bb7b28221ac3db"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the approved task and dependency scope, including the finite controlled source-backed adapter qualification. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+    ],
+    "context_id": "task:T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+    },
+    "id": "approved-invocation118",
+    "revision": 1
+  },
+  "capabilities": {
+    "independent_actors": true
+  },
+  "checks": {
+    "identity": {
+      "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "head": "1fcbf1e1023810bd16ecc7b9d58c3713b5a67b1e",
+      "source_digest": "cb0d7b39d213f0386eba0cbdc783e324469ed2c5f92c5d78303132cec7eedb78"
+    },
+    "passed": true,
+    "required_checks_digest": "8427c0a28c4de42473e55307d5b742f300bbb061e6886ab399f65744643c9cc4",
+    "results": [
+      {
+        "id": "hook-state-regressions",
+        "reference": ".skill-tree/history/validation/plugin-system/t-dae414c5-43e4-45db-a6f3-4ce4112440c5-hook-state-regressions-c-04426b40-6b01-4403-9655-c542d0e1ec21.json",
+        "status": "passed"
+      },
+      {
+        "id": "installed-agent-hook-evidence",
+        "reference": ".skill-tree/history/validation/plugin-system/invocation118-native/report.json",
+        "status": "passed"
+      },
+      {
+        "id": "installed-hook-fixtures",
+        "reference": ".skill-tree/history/validation/plugin-system/t-dae414c5-43e4-45db-a6f3-4ce4112440c5-installed-hook-fixtures-c-0a1b0d8b-1250-4cab-88f9-68c0e64e8c9f.json",
+        "status": "passed"
+      },
+      {
+        "id": "hook-observation-oracle",
+        "reference": ".skill-tree/history/validation/plugin-system/t-dae414c5-43e4-45db-a6f3-4ce4112440c5-hook-observation-oracle-c-ce69a27b-b89c-42a4-9c67-c6c94ac573c9.json",
+        "status": "passed"
+      },
+      {
+        "id": "sync-check",
+        "reference": ".skill-tree/history/validation/plugin-system/invocation118-sync-check.txt",
+        "status": "passed"
+      },
+      {
+        "id": "strict-validation",
+        "reference": ".skill-tree/history/validation/plugin-system/invocation118-validate.txt",
+        "status": "passed"
+      },
+      {
+        "id": "python",
+        "reference": ".skill-tree/history/validation/plugin-system/invocation118-all-python.txt",
+        "status": "passed"
+      },
+      {
+        "id": "node",
+        "reference": ".skill-tree/history/validation/plugin-system/invocation118-all-node.txt",
+        "status": "passed"
+      },
+      {
+        "id": "installer-list",
+        "reference": ".skill-tree/history/validation/plugin-system/invocation118-list.txt",
+        "status": "passed"
+      },
+      {
+        "id": "installer-dry-run",
+        "reference": ".skill-tree/history/validation/plugin-system/invocation118-dry-run.txt",
+        "status": "passed"
+      },
+      {
+        "id": "diff-check",
+        "reference": ".skill-tree/history/validation/plugin-system/invocation118-diff-check.txt",
+        "status": "passed"
+      }
+    ]
+  },
+  "context": {
+    "content_fingerprint": "70e46d34fab96448db4ee53866e8b1523aa3e0365eabaea97cf6a4e86567f9db",
+    "id": "task:T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+    "kind": "task",
+    "semantic_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+    "task_ids": [
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+    ]
+  },
+  "execution_snapshot": {
+    "common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+    "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+    "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+    "common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+    "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+    "common/scripts/workflow-state.py": "791531838c16c1b362ade3b086e66dfb804da20c06b8828b0e71f251a08b0c5e",
+    "owned-profile": "e8b39a2b9da8852bd17ad177018fb7c9e11b07638b8d9feeb49223dafe7e98b3"
+  },
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "failure_observations": [],
+  "history": [
+    {
+      "detail": {},
+      "event": "start",
+      "phase": "research",
+      "previous_frame_hash": null,
+      "sequence": 1
+    },
+    {
+      "detail": {},
+      "event": "research",
+      "phase": "plan",
+      "previous_frame_hash": "0290c2923488023fe546daf70e705a29c5e2a7d08258d5230294c250521f7354",
+      "sequence": 2
+    },
+    {
+      "detail": {
+        "previous_acceptance": null,
+        "previous_plan": null
+      },
+      "event": "plan",
+      "phase": "plan-review",
+      "previous_frame_hash": "684892129f508bd44cecacf984540c9033483dd827d4b63e98da73e1efc6c686",
+      "sequence": 3
+    },
+    {
+      "detail": {
+        "decision_id": "DG-07f50e85-fc3d-545d-9a66-d0ba5cdf8422",
+        "purpose": "plan"
+      },
+      "event": "question",
+      "phase": "plan-review",
+      "previous_frame_hash": "79e1b3cd721e6aab4863499bf60f391fb4b810ca4de8ab25a4f4b658369d4490",
+      "sequence": 4
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-8c755c9e-328a-4be7-b7aa-dff822d17ec3",
+        "input_digest": "535f0e3601ed89dc01670e1c16265f07d6468f705d791978f497f0587a259ae4"
+      },
+      "event": "prepare-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "f0707982adc006643e661168f243be179305d22ffdeb15ef98b9f46d4299769b",
+      "sequence": 5
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-8c755c9e-328a-4be7-b7aa-dff822d17ec3",
+        "status": "answered"
+      },
+      "event": "record-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "0c58421993daa4fc05dec65965ac1fa3668cfb09492b23dd09239cbda1c405d7",
+      "sequence": 6
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-af9950aa-532d-4f5c-9b8d-1db0406b203c",
+        "input_digest": "b179ea20083a3ea6ed156068ece1fdc3fb29669d21b20c9a81bb7b28221ac3db"
+      },
+      "event": "prepare-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "67e1e8a98d00572ae423d9f77befcc8844a1e489dd3721ef7570f32582c357e1",
+      "sequence": 7
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-af9950aa-532d-4f5c-9b8d-1db0406b203c",
+        "status": "agree"
+      },
+      "event": "record-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "833a67701a45e0dadbefcbf328fe9742a96b9c9304521bfc12d4e42f2a236b82",
+      "sequence": 8
+    },
+    {
+      "detail": {
+        "acceptance_digest": "56a231f7f8108f71e393a26ed40fcf6f9dc0ddab3ccd81f3fe2162eed2372528",
+        "decision_id": "DG-07f50e85-fc3d-545d-9a66-d0ba5cdf8422"
+      },
+      "event": "accept-decision",
+      "phase": "plan-review",
+      "previous_frame_hash": "2d278a61ca4c4771a4fad35d902b5c82a9a05a9f20cea4ded3eaaa8738056111",
+      "sequence": 9
+    },
+    {
+      "detail": {},
+      "event": "accept-plan",
+      "phase": "implement",
+      "previous_frame_hash": "5590491d14ce28ad97eae960d19cab27be28360286432c515aa65c7f94c36a5c",
+      "sequence": 10
+    },
+    {
+      "detail": {
+        "previous_context": {
+          "content_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+          "id": "task:T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+          "kind": "task",
+          "semantic_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+          "task_ids": [
+            "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+          ]
+        }
+      },
+      "event": "resume",
+      "phase": "implement",
+      "previous_frame_hash": "2ee45cbbeccade119bd25e2b3c4cffd63e01aa98270824fa3046c1f0bf815020",
+      "sequence": 11
+    },
+    {
+      "detail": {
+        "previous_context": {
+          "content_fingerprint": "fca96414b17579a4b7cef4a9bfa7c2d4f0d47fa77403474ac12d2f6674d68939",
+          "id": "task:T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+          "kind": "task",
+          "semantic_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96",
+          "task_ids": [
+            "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+          ]
+        }
+      },
+      "event": "resume",
+      "phase": "implement",
+      "previous_frame_hash": "308d7a4b8102d0794b197fa0b9f67a774190bf6a93e94955f8be31c5176d6969",
+      "sequence": 12
+    },
+    {
+      "detail": {},
+      "event": "implement",
+      "phase": "checks",
+      "previous_frame_hash": "91af2ae1bf7b442a70c3186c413132fe7be0d95d27b7b9c795036a52c792c752",
+      "sequence": 13
+    },
+    {
+      "detail": {},
+      "event": "checks",
+      "phase": "review",
+      "previous_frame_hash": "332e568e71e435119db2c0a8de991764b020a1daccd0fafa31483bf177430472",
+      "sequence": 14
+    },
+    {
+      "detail": {
+        "previous_resolutions": {},
+        "previous_review": null
+      },
+      "event": "review",
+      "phase": "ready",
+      "previous_frame_hash": "172fae07d62157ce4f8588161d0161da4cf06b91daa0c984df18f34679b8f937",
+      "sequence": 15
+    }
+  ],
+  "id": "DO-1c975780-f773-56bd-a6ad-4556feb2037b",
+  "identity": {
+    "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+    "head": "1fcbf1e1023810bd16ecc7b9d58c3713b5a67b1e",
+    "source_digest": "cb0d7b39d213f0386eba0cbdc783e324469ed2c5f92c5d78303132cec7eedb78"
+  },
+  "mode": "auto",
+  "orchestration_hash": "6ceb0355d85cd95d557464ebccd5e1d8480eaef85c7d1a042102939c60914fab",
+  "owner_question": null,
+  "phase": "ready",
+  "phase_after_checks": "review",
+  "plan": {
+    "digest": "161a71ec19ab4830605e63494d29c3aab01b9740f989e1a1b9e4c219e64a95dc",
+    "reference": ".skill-tree/history/research/invocation118-plan.md",
+    "required_checks": [
+      "hook-state-regressions",
+      "installed-agent-hook-evidence",
+      "installed-hook-fixtures",
+      "hook-observation-oracle",
+      "sync-check",
+      "strict-validation",
+      "python",
+      "node",
+      "installer-list",
+      "installer-dry-run",
+      "diff-check"
+    ]
+  },
+  "plan_acceptance": {
+    "actor": {
+      "context_id": "/root/invocation118_plan_resolver",
+      "id": "/root/invocation118_plan_resolver"
+    },
+    "answer": "accept",
+    "attempt_id": "DA-8c755c9e-328a-4be7-b7aa-dff822d17ec3",
+    "authority_digest": "386e89783ad8d71fca68376613f39c580f267b8f2e21088fb88a3e3ca052ec1c",
+    "context_identity": {
+      "decision_purpose": "plan",
+      "execution_snapshot_digest": "d4c331a3e65b029b9719b4e87e22219b0cbbeb45f8d9f8307295fa5f31cdcfd9",
+      "id": "task:T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "kind": "task",
+      "orchestration_id": "DO-1c975780-f773-56bd-a6ad-4556feb2037b",
+      "plan_digest": "161a71ec19ab4830605e63494d29c3aab01b9740f989e1a1b9e4c219e64a95dc",
+      "required_checks_digest": "8427c0a28c4de42473e55307d5b742f300bbb061e6886ab399f65744643c9cc4",
+      "task_ids": [
+        "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+      ]
+    },
+    "decision_id": "DG-07f50e85-fc3d-545d-9a66-d0ba5cdf8422",
+    "digest": "56a231f7f8108f71e393a26ed40fcf6f9dc0ddab3ccd81f3fe2162eed2372528",
+    "kind": "specification-acceptance",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/invocation118_plan_resolver",
+      "actor_id": "/root/invocation118_plan_resolver",
+      "creation_reference": "Actual root native creation /root/invocation118_plan_resolver; fork_turns none, initially idle.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/invocation118_plan_resolver returned matching sealed JSON in collaboration.final answer.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "27dc78e3bbaafb6cc73d560c29cb409eee3de18ba6915b8e92e477f0ccef1c7e",
+    "question_id": "invocation118-plan",
+    "rationale": "The plan covers task118's guarded occurrence identity, frozen configuration, sequential current-context delivery, replay/recovery and standalone installation requirements. JS retains parameter identity authority; secret delivery stays ephemeral. Existing clarification revision permits B's task-content incorporation before final confirmation, while final readiness retains current core acceptance and checks. The finite source-backed Codex observation uses independent host evidence and semantic controls without claiming native Skill execution, real-human approval or comparative qualification.",
+    "role_receipts": {
+      "critic": "a9d816808a03a74a8d7a1ba3872cb18a449337bb854158dce1cffab0d3394830",
+      "resolver": "3d7f4a29b1e4ecb25f2cfc3a69d947f7812b52d1214174f02c39af531889f422"
+    },
+    "semantic_fingerprint": "4badc481c958485f8cdf17e0adfa1a9b4144303c472f79f05f53ec65198b9b96"
+  },
+  "prepared_actor": null,
+  "prerequisites": [],
+  "question_context": null,
+  "question_decision_id": null,
+  "question_purpose": "plan",
+  "question_sequence": 1,
+  "request_id": "invocation118-implementation",
+  "research_reference": ".skill-tree/artifacts/plugin-implementation/invocation118-task.txt; source API and independent invocation118_architecture and invocation118_validation_design research",
+  "resolutions": {},
+  "resolved_obligations": [],
+  "review": {
+    "digest": "022bc86329843e3af5ef617f73d83df658dd4949ab47e0b94de30dcd322626d9",
+    "findings": [],
+    "id": "invocation118-full-current-diff",
+    "identity": {
+      "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "head": "1fcbf1e1023810bd16ecc7b9d58c3713b5a67b1e",
+      "source_digest": "cb0d7b39d213f0386eba0cbdc783e324469ed2c5f92c5d78303132cec7eedb78"
+    },
+    "reference": ".skill-tree/history/validation/plugin-system/invocation118-full-review.json"
+  },
+  "revision": 15,
+  "schema": 1,
+  "stagnation": {
+    "count": 0,
+    "key": null
+  },
+  "stagnation_limit": 3,
+  "start_digest": "da338618d3a8f7a78509d58033cb64d0a46cca49f182a08220d5eeb0dcf7e40f"
+}

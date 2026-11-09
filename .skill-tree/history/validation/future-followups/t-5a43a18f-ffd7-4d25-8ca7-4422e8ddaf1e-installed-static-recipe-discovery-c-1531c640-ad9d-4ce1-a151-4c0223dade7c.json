@@ -1,0 +1,37 @@
+{
+  "actual_lane": "unit",
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-installation-integrity.js"
+  ],
+  "attempt_id": "C-1531c640-ad9d-4ce1-a151-4c0223dade7c",
+  "check_id": "installed-static-recipe-discovery",
+  "classification": "executed-control",
+  "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+  "counts": {
+    "discovered": 25,
+    "expected": 25,
+    "failed": 0,
+    "passed": 25,
+    "skipped": 0
+  },
+  "environment_identity": "fc8ee3019b8cb5546b19deb9d1d3afd37b78e6c0af3c82554015647de7ba59fd",
+  "evidence": [
+    ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-1531c640-ad9d-4ce1-a151-4c0223dade7c.json",
+    ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-1531c640-ad9d-4ce1-a151-4c0223dade7c.txt"
+  ],
+  "exit_code": 0,
+  "failure_anchor": null,
+  "result": "pass",
+  "sources": {
+    ".skill-tree/common/scripts/workflow-state.py": "7c4204c84fdc3518c11bf2e1466a41257a826ec9746a824fc10d3f367c23b4d2",
+    ".skill-tree/lib/composer.js": "9605ce43a0e99aff77dbf1e223dd7afcf326917753db7963de5bf1d61bdcd04b",
+    ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+    ".skill-tree/tests/test-installation-integrity.js": "e35c56daaa49c70da68c82af216291a98494f83e2f4f927ab56302b603a4586c"
+  },
+  "task_id": "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+  "timing": {
+    "tool_wall_seconds": 69.51605033315718
+  }
+}

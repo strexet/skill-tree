@@ -9,9 +9,41 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import uuid
 
-_spec=importlib.util.spec_from_file_location('pr_workspaces',Path(__file__).with_name('run-workspaces.py'))
-ws=importlib.util.module_from_spec(_spec);_spec.loader.exec_module(ws)
+def owned_module(name,path):
+    path=Path(path)
+    if path.is_symlink() or path.parent.is_symlink():raise ValueError('Owned Python helpers cannot use symlinks')
+    source=path.read_bytes();package_root=path.parent.parent;manifest_path=package_root/'references/plugin-bindings.json'
+    if manifest_path.exists() or (package_root/'SKILL.md').exists():
+        if not manifest_path.is_file() or manifest_path.is_symlink() or manifest_path.parent.is_symlink():raise ValueError('The owned package inventory is unavailable')
+        manifest=json.loads(manifest_path.read_text())
+        if not isinstance(manifest,dict):raise ValueError('The owned package inventory is invalid')
+        inventory=manifest.get('owned_resources')
+        if not isinstance(inventory,dict) or not inventory or path.relative_to(package_root).as_posix() not in inventory:raise ValueError('The owned package inventory does not contain the requested helper')
+        for relative,expected in inventory.items():
+            if not isinstance(relative,str) or not relative or relative.startswith(('/','\\')) or '\\' in relative or '\0' in relative or re.match(r'^[A-Za-z]:',relative) or any(part in {'','.','..'} for part in relative.split('/')) or not isinstance(expected,str) or re.fullmatch('[a-f0-9]{64}',expected) is None:raise ValueError('The owned package inventory has invalid resource metadata')
+            resource=package_root
+            for part in relative.split('/'):
+                resource=resource/part
+                if resource.is_symlink():raise ValueError('Owned package resources cannot use symlinks')
+            if not resource.is_file():raise ValueError('Owned package resource bytes differ: '+relative)
+            current=source if resource==path else resource.read_bytes()
+            if hashlib.sha256(current).hexdigest()!=expected:raise ValueError('Owned package resource bytes differ: '+relative)
+    spec=importlib.util.spec_from_file_location(name,path);module=importlib.util.module_from_spec(spec)
+    previous=(sys.pycache_prefix,sys.dont_write_bytecode)
+    prefix=path.parent/('.owned-source-'+uuid.uuid4().hex)
+    if prefix.exists():raise ValueError('A fresh source-only helper prefix is required')
+    try:
+        sys.pycache_prefix=str(prefix);sys.dont_write_bytecode=True
+        exec(compile(source,str(path),'exec'),module.__dict__)
+    finally:sys.pycache_prefix,sys.dont_write_bytecode=previous
+    return module
+
+try:ws=owned_module('pr_workspaces',Path(__file__).with_name('run-workspaces.py'))
+except (ValueError,OSError) as error:
+    if __name__!='__main__':raise
+    print(json.dumps({'ok':False,'error':str(error)},ensure_ascii=True,sort_keys=True));raise SystemExit(2)
 
 class ReviewError(ValueError):
     pass
@@ -19,40 +51,80 @@ class ReviewError(ValueError):
 def digest(value):
     return hashlib.sha256(json.dumps(value,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
 
+def instruction_lines(text):
+    visible = []
+    fence = None
+    quoted = False
+    for line in text.splitlines():
+        marker = re.match(r'^ {0,3}(`{3,}|~{3,})(.*)$', line)
+        if fence is not None:
+            if marker and marker[1][0] == fence[0] and len(marker[1]) >= len(fence) and not marker[2].strip():
+                fence = None
+        elif not line.strip():
+            quoted = False
+        elif re.match(r'^ {0,3}>', line):
+            quoted = True
+        elif not quoted:
+            if marker and (marker[1][0] == '~' or '`' not in marker[2]):
+                fence = marker[1]
+            elif not line.startswith(('    ', '\t')):
+                visible.append(line)
+                continue
+        visible.append('\ufffc' if line.strip() else '')
+    return '\n'.join(visible)
+
+
 def instructions(text):
-    # Only the current owner's direct instruction enters the authorization parser.
-    text=re.sub(r'(?ms)^\s*```.*?^\s*```[^\n]*', '', text)
-    text=re.sub(r'(?m)^\s*>.*$', '', text)
-    return re.sub(r'"[^"\n]*"|«[^»]*»|“[^”]*”|\x27[^\x27\n]*\x27', '', text)
+    # Keep positions for inline branch names following direct instruction words.
+    quoted = r'(?<!`)(`+)(?!`).*?(?<!`)\1(?!`)|"[^"]*"|«[^»]*»|“[^”]*”|(?<!\w)\x27[^\x27]*\x27(?!\w)'
+    return re.sub(quoted, lambda match: '\ufffc' * len(match[0]), text, flags=re.S)
+
+
+def branch_operand(text, offset):
+    return re.compile(r'[ \t]*(?:(`+)([\w./-]+)\1|([\w./-]+))').match(text, offset)
 
 def parameters(current_branch, payload):
-    text=instructions(payload.get('instruction','')) if payload.get('instruction_origin','owner')=='owner' else ''
+    raw=instruction_lines(payload.get('instruction','')) if payload.get('instruction_origin','owner')=='owner' else ''
+    text=instructions(raw)
     original=text
     positive=[];negative=[]
     for match in re.finditer(r'\bmerge\s*=\s*(true|false)\b',text,re.I):
         (positive if match[1].casefold()=='true' else negative).append(match.span())
-    neg=r'\b(?:без\s+(?:merge|мерд?ж\w*)|не\s+(?:merge|мерд?ж\w*|см[е]?рд?ж\w*|вмерд?ж\w*)|without\s+merge|do\s+not\s+merge|don[’\x27]t\s+merge|no\s+merge)\b'
+    neg=r'\b(?:без\s+(?:merge|мерд?ж\w*|слияния)|не\s+(?:merge|мерд?ж\w*|см[е]?рд?ж\w*|вмерд?ж\w*|соль[её]м|слей|сливай|сливать|слить)|without\s+merge|do\s+not\s+merge|don[’\x27]t\s+merge|no\s+merge)\b'
     negative+= [m.span() for m in re.finditer(neg,text,re.I)]
     scrub=list(text)
     for start,end in negative:
         scrub[start:end]=' '*(end-start)
     affirmative=''.join(scrub)
     natural_original=''.join(' ' if a==' ' and b!=' ' else b for a,b in zip(affirmative,original))
-    pos=r'\b(?:with\s+merge|с\s+(?:merge|мерд?жем)|(?:затем\s+)?(?:см[е]?рд?жи|смржи|вмерд?жи)(?:ть)?|then\s+merge)\b'
+    action=r'(?:см[е]?рд?жи(?:ть)?|смржи|вмерд?жи(?:ть)?|соль[её]м|слей|сливай|слить)'
+    pos=r'\b(?:with\s+merge|с\s+(?:merge|мерд?жем)|(?:затем\s+)?'+action+r'|then\s+merge)\b'
     positive+=[m.span() for m in re.finditer(pos,affirmative,re.I)]
     if 'merge' in payload:
         if type(payload['merge']) is not bool:raise ReviewError('merge requires a boolean')
-        (positive if payload['merge'] else negative).append((0,0))
+        if payload.get('instruction_origin','owner')=='owner':
+            (positive if payload['merge'] else negative).append((0,0))
     if positive and negative:raise ReviewError('Conflicting explicit merge instructions require clarification')
     choices={'source_branch':[], 'target_branch':[]}
     for key in choices:
         if payload.get(key):choices[key].append(payload[key])
-        choices[key]+=[m[1] for m in re.finditer(r'\b'+key+r'\s*=\s*([\w./-]+)',original,re.I)]
-    pair=re.search(r'(?:\bиз|\bfrom)\s+([\w./-]+)\s+(?:в|to|into)\s+([\w./-]+)',original,re.I)
-    if pair:
-        choices['source_branch'].append(pair[1]);choices['target_branch'].append(pair[2])
-    target=re.search(r'(?:см[е]?рд?жи|смржи|вмерд?жи|then\s+merge|with\s+merge|мерд?жем)\s+(?:в|into|to)\s+([\w./-]+)',natural_original,re.I)
-    if target:choices['target_branch'].append(target[1])
+        for match in re.finditer(r'\b'+key+r'[ \t]*=',original,re.I):
+            operand=branch_operand(raw,match.end())
+            if not operand:raise ReviewError('An explicit named '+key+' is required')
+            choices[key].append(operand[2] or operand[3])
+    for match in re.finditer(r'\b(?:из|from)\b(?=[ \t])',original,re.I):
+        source=branch_operand(raw,match.end())
+        if source is None:continue
+        destination=re.compile(r'[ \t]+(?:в|to|into)\b',re.I).match(original,source.end())
+        if destination is None:continue
+        target=branch_operand(raw,destination.end())
+        if not target:raise ReviewError('An explicit named target branch is required')
+        choices['source_branch'].append(source[2] or source[3]);choices['target_branch'].append(target[2] or target[3])
+    target_clause=r'\b(?:'+action+r'|then\s+merge|with\s+merge|мерд?жем)(?:[ \t]+(?:эту[ \t]+)?ветку)?[ \t]+(?:в|into|to)\b'
+    for match in re.finditer(target_clause,natural_original,re.I):
+        target=branch_operand(raw,match.end())
+        if not target:raise ReviewError('An explicit named target branch is required')
+        choices['target_branch'].append(target[2] or target[3])
     result={}
     for key,default in [('source_branch',current_branch),('target_branch','develop')]:
         values=set(choices[key])
@@ -62,7 +134,8 @@ def parameters(current_branch, payload):
     if result['source_branch']==result['target_branch']:raise ReviewError('Source and target branches differ')
     result['merge']=bool(positive)
     result['merge_explicit']=bool(positive or negative)
-    result['authorization']={'pr':payload.get('instruction_origin','owner')=='owner','merge':bool(positive),'origin':payload.get('instruction_origin','owner'),'instruction_digest':digest(text)}
+    result['target_explicit']=bool(choices['target_branch'])
+    result['authorization']={'pr':payload.get('instruction_origin','owner')=='owner','merge':bool(positive),'origin':payload.get('instruction_origin','owner'),'instruction_digest':digest(text),'target_branch':result['target_branch']}
     return result
 
 def preflight(root,payload):
@@ -88,14 +161,48 @@ def identity(snapshot):
 def review_key(snapshot):
     return digest({key:snapshot.get(key) for key in ['head','base_oid','target_branch','changed_files','threads','reviews','comments','checks','checks_known','required_checks_missing','approvals_known','approvals_required','approved']})
 
-def reconcile(record,snapshot):
+def decision_context(snapshot,purpose='finding-resolution'):
+    if not isinstance(purpose,str) or not re.fullmatch(r'[a-z][a-z0-9-]*',purpose):raise ReviewError('Review decision requires an exact bounded purpose')
+    scope={key:snapshot.get(key) for key in ['repo_id','remote','remote_id','source_branch','target_branch','head','base_oid']}
+    semantic=digest({'scope':scope,'review_key':review_key(snapshot),'purpose':purpose})
+    return {'kind':'review','id':'review:'+digest(scope),'head':snapshot.get('head'),'base_oid':snapshot.get('base_oid'),'target_branch':snapshot.get('target_branch'),'purpose':purpose,'semantic_fingerprint':semantic,'content_fingerprint':digest(snapshot)}
+
+def decision_acceptance(store,record,snapshot,reference,expected):
+    if record.get('identity')!=identity(snapshot):raise ReviewError('Decision requires the current review repository, head, base and target')
+    if expected.get('kind') not in {'technical','product','specification-acceptance'}:raise ReviewError('Delegated review decisions cannot replace publication authority, checks or external approval')
+    purpose=expected.get('context',{}).get('purpose','finding-resolution')
+    helper=owned_module('review_decision_governance',Path(__file__).with_name('decision-governance.py'))
+    try:accepted=helper.acceptance_reference(store,reference,{**expected,'context':decision_context(snapshot,purpose)})
+    except ValueError as error:raise ReviewError(str(error)) from error
+    result=deepcopy(record);receipts=result.setdefault('decision_receipts',[])
+    if accepted not in receipts:receipts.append(deepcopy(accepted))
+    return result
+
+def reconcile(record,snapshot,*,retarget=None):
     record=deepcopy(record)
     for key in ['repo_id','remote','remote_id','source_branch']:
         if record['identity'].get(key)!=snapshot.get(key):raise ReviewError('Publication repository/source identity conflict')
+    previous_target=record['identity']['target_branch']
+    target_changed=previous_target!=snapshot['target_branch']
+    if target_changed:
+        authorization=(retarget or {}).get('authorization',{})
+        if not ((retarget or {}).get('target_explicit') and authorization.get('origin')=='owner'
+                and authorization.get('pr') and authorization.get('target_branch')==snapshot['target_branch']):
+            raise ReviewError('Publication retarget requires its explicit identity and a current owner instruction for the new target')
+        previous=deepcopy(record['authorization']);previous.setdefault('target_branch',previous_target)
+        record.setdefault('authorization_history',[]).append(previous)
+        record['authorization']=deepcopy(authorization)
     pr=snapshot.get('pr')
     if record.get('pr') and pr and record['pr']['id']!=pr['id']:raise ReviewError('Existing PR identity conflict')
     if pr:record['pr']=pr
-    changed=record['identity']!=identity(snapshot) or record.get('snapshot_key')!=review_key(snapshot)
+    current_identity=identity(snapshot)
+    changed=record['identity']!=current_identity or record.get('snapshot_key')!=review_key(snapshot)
+    if record['identity']!=current_identity:
+        for finding in record.get('findings',{}).values():
+            if finding.get('status') in {'verified-fixed','dismissed'}:
+                finding['status']='open'
+                for key in ('verified_head','verification_evidence','dismissal_reason'):
+                    finding.pop(key,None)
     record['identity']=identity(snapshot);record['snapshot_key']=review_key(snapshot)
     if snapshot.get('state')=='CLOSED':
         record['status']='blocked';record['blocked_reason']='The selected PR is closed without merge';return record
@@ -109,7 +216,7 @@ def reconcile(record,snapshot):
     return record
 
 def reviewed(record,snapshot,payload):
-    record=reconcile(record,snapshot)
+    record=inspected(record,snapshot,payload)
     if record['status']=='merged':return record
     if record['status']=='blocked':raise ReviewError(record['blocked_reason'])
     if payload.get('head')!=snapshot['head'] or payload.get('base_oid')!=snapshot['base_oid'] or payload.get('target_branch')!=snapshot['target_branch']:
@@ -124,7 +231,7 @@ def reviewed(record,snapshot,payload):
             raise ReviewError('Actionable finding requires location, cause, consequence and severity')
     ledger=record.setdefault('findings',{})
     for finding in findings:ledger[finding['id']]=deepcopy(finding)
-    unresolved=[f for f in ledger.values() if f.get('status','open') not in {'verified-fixed','dismissed'}]
+    unresolved=[f for f in ledger.values() if not finding_verified(f,snapshot)]
     # A claimed fix requires independently recorded verification of the current revision.
     if any(f.get('status') in {'verified-fixed','dismissed'} and (f.get('verified_head')!=snapshot['head'] or not f.get('verification_evidence')) for f in findings):
         raise ReviewError('Fixed finding requires current-head verification evidence')
@@ -133,13 +240,241 @@ def reviewed(record,snapshot,payload):
     record['rounds']=record.get('rounds',[])+[deepcopy(record['review'])]
     return record
 
-def ready(record,snapshot):
+
+def finding_verified(finding,snapshot):
+    return (finding.get('status') in {'verified-fixed','dismissed'}
+            and finding.get('verified_head')==snapshot['head'] and bool(finding.get('verification_evidence')))
+
+
+REVIEW_OPERATION='skill-tree-pr-review-cycle'
+REVIEW_PHASES={'before':'before','during':'during','after':'after','before-review':'before','after-core-inspection':'during','before-pr-ready':'after'}
+
+
+def _review_path(store,publication_id):
+    if not isinstance(publication_id,str) or not re.fullmatch(r'[a-f0-9]{32}',publication_id):raise ReviewError('An exact owned publication identity is required')
+    path=store.root/'.skill-tree/history/publications'/('pub-'+publication_id+'.json')
+    if any(part.is_symlink() for part in [path,*path.parents]):raise ReviewError('Publication metadata cannot use symlinks')
+    return path
+
+
+def inspected(record,snapshot,payload):
+    record=reconcile(record,snapshot)
+    if any(payload.get(key)!=snapshot[key] for key in ['head','base_oid','target_branch']) or set(payload.get('files',[]))!=set(snapshot['changed_files']) or not all(payload.get(key) is True for key in ['context_inspected','discussions_inspected','checks_inspected']):raise ReviewError('Current complete core inspection is required')
+    record['inspection']={'key':review_key(snapshot),'head':snapshot['head'],'base_oid':snapshot['base_oid'],'files':deepcopy(snapshot['changed_files']),'evidence':deepcopy(payload.get('evidence',[]))}
+    return record
+
+
+def review_phase_guard(store,context,phase):
+    publication_id=context.get('publication_id');path=_review_path(store,publication_id)
+    if not path.is_file():raise ReviewError('The review invocation requires its existing owned publication')
+    record=json.loads(path.read_text());phase=REVIEW_PHASES.get(phase,phase)
+    if phase not in {'before','during','after'}:raise ReviewError('The review phase is unavailable')
+    if any(record.get('identity',{}).get(key)!=context.get(key) for key in ['head','base_oid','target_branch']):raise ReviewError('The plugin review belongs to another publication head/base/target')
+    scope={name:record['identity'].get(name) for name in ['repo_id','remote','remote_id','source_branch','target_branch']}
+    if context.get('id')!='review-hook:'+digest(scope) or context.get('semantic_fingerprint')!=digest({'scope':scope,'review_key':record.get('snapshot_key')}):raise ReviewError('The review context differs from the actual publication review identity')
+    key=record.get('snapshot_key');core=record.get('review') if phase=='after' else record.get('inspection') or record.get('review') if phase=='during' else None
+    if phase in {'during','after'} and (not core or core.get('key')!=key):raise ReviewError('The configured review phase requires current full core review or inspection')
+    if phase=='after' and core.get('unresolved')!=0:raise ReviewError('The after phase requires a current core review with zero unresolved findings')
+    if record.get('status') in {'blocked','merged'}:raise ReviewError('The publication is not an active review scope')
+    return {'publication_id':publication_id,'publication_hash':hashlib.sha256(path.read_bytes()).hexdigest(),'phase':phase,
+        'core_review_key':core.get('key') if core else None,'core_review_digest':digest(core) if core else None}
+
+
+def _review_root(store,record,package_root=None):
+    candidate=Path(package_root).absolute() if package_root else Path(__file__).parent.parent
+    if not (candidate/'references/plugin-bindings.json').is_file():
+        relative=(record or {}).get('review_requirements',{}).get('operation_package')
+        if relative:
+            if Path(relative).is_absolute() or any(part in {'','..','.'} for part in relative.split('/')):raise ReviewError('The frozen review operation package must remain repository-relative')
+            candidate=store.source_root/relative
+    if (candidate/'references/plugin-bindings.json').is_file():return candidate
+    registry=store.source_root/'.skill-tree/installation/plugins.json'
+    if registry.is_file():
+        value=json.loads(registry.read_text());packages=value.get('packages',{})
+        if any(row.get('operation')==REVIEW_OPERATION and row.get('enabled') and packages.get(row.get('plugin_id'),{}).get('adaptation',{}).get('invocation_policy') for row in value.get('bindings',[])):raise ReviewError('Configured review plugins require the explicitly trusted composed operation package')
+    return None
+
+
+def review_requirement_plan(store,snapshot,*,package_root=None,run_overrides=None,record=None,publication_id=None):
+    if getattr(store,'_writer_active',False):raise ReviewError('Review requirement preparation must run outside the writer lock')
+    root=_review_root(store,record,package_root)
+    if root is None:return None
+    wf=owned_module('review_requirement_workflow',Path(__file__).with_name('workflow-state.py'))
+    watch=wf._hook_watch(root,store.source_root);manifest=json.loads((root/'references/plugin-bindings.json').read_text())
+    if not manifest.get('definitions') and not (record or {}).get('review_requirements'):return None
+    phases={};proofs={};configuration=None
+    for phase in ['before','during','after']:
+        context=hook_context(snapshot)
+        if publication_id:context['publication_id']=publication_id
+        value=wf._hook_node(root,{'runtime_action':'requirement-plan','project_root':str(store.source_root),'event':{'id':'review-requirements-'+phase,'operation':REVIEW_OPERATION,'anchor':phase},'context':context,'capabilities':['codex-source-backed-context'],'adapter':{'provider':'codex','mechanism':'source-backed-context'},'run_overrides':deepcopy(run_overrides or {})})
+        if configuration is not None and configuration!=value['configuration']:raise ReviewError('Review configuration changed during requirement preparation')
+        configuration=value['configuration'];proof=value['proof'];proofs[phase]=proof
+        phases[phase]=[row['id'] for row in proof['bindings']]+[row['id'] for row in proof.get('unresolved',[])]
+    return {'configuration':configuration,'phases':phases,'proofs':proofs,'watch':watch,'package_root':str(root)}
+
+
+def _frozen_review_requirements(store,prepared,history=None):
+    root=Path(prepared['package_root']).resolve()
+    try:relative=root.relative_to(store.source_root).as_posix()
+    except ValueError:relative=None
+    return {'schema':1,'configuration_digest':prepared['configuration']['configuration_digest'],'configuration':deepcopy(prepared['configuration']),
+        'execution_snapshot':deepcopy(prepared['proofs']['after']['execution_snapshot']),'phases':deepcopy(prepared['phases']),
+        'operation_package':relative,'history':deepcopy(history or []),'outcome':'required' if any(prepared['phases'].values()) else 'disabled'}
+
+
+def review_configuration_context(snapshot,publication_id,before_configuration_digest,after_configuration_digest):
+    value=decision_context(snapshot,'review-plugin-configuration');value.update(publication_id=publication_id,before_configuration_digest=before_configuration_digest,after_configuration_digest=after_configuration_digest)
+    value['semantic_fingerprint']=digest({key:item for key,item in value.items() if key not in {'semantic_fingerprint','content_fingerprint'}});value['content_fingerprint']=value['semantic_fingerprint'];return value
+
+
+def reconcile_review_requirements(store,record,snapshot,publication_id,prepared,reference):
+    old=record.get('review_requirements')
+    if old is None or prepared is None:raise ReviewError('Explicit review reconciliation requires both frozen and inspected configuration')
+    dg=owned_module('review_policy_governance',Path(__file__).with_name('decision-governance.py'));decision=dg.read(store,reference.get('decision_id'))
+    context=review_configuration_context(snapshot,publication_id,old['configuration_digest'],prepared['configuration']['configuration_digest'])
+    accepted=dg.acceptance_reference(store,reference,{'context':context,'mode':decision['mode'],'kind':'technical','authority_digest':decision['authority_digest']})
+    if accepted['answer']!='adopt':raise ReviewError('The current core decision did not adopt the review configuration')
+    engine=owned_module('review_policy_invocations',Path(__file__).with_name('plugin-invocation.py'));refs=set(record.get('hook_chains',[]))
+    for row in engine.pending_scan(store):
+        chain=engine.read(store,row['chain_id'])
+        if row['chain_id'] in refs or chain.get('context',{}).get('publication_id')==publication_id:raise ReviewError('Reconcile original pending review actors before changing the required policy')
+    result=deepcopy(record);history=list(old.get('history',[]))+[{'configuration_digest':old['configuration_digest'],'hook_chains':list(refs),'decision_receipt':deepcopy(reference),'outcome':'explicit-configuration-adoption'}]
+    result['review_requirements']=_frozen_review_requirements(store,prepared,history);result['hook_chains']=[]
+    return result
+
+
+def review_findings_context(snapshot,publication_id,chain_id,attempt_id,result_digest):
+    value=decision_context(snapshot,'review-plugin-findings');value.update(publication_id=publication_id,hook_chain_id=chain_id,hook_attempt_id=attempt_id,hook_result_digest=result_digest)
+    value['semantic_fingerprint']=digest({key:item for key,item in value.items() if key not in {'semantic_fingerprint','content_fingerprint'}});value['content_fingerprint']=value['semantic_fingerprint'];return value
+
+
+def incorporate_review_findings(store,record,snapshot,publication_id,payload):
+    engine=owned_module('review_finding_engine',Path(__file__).with_name('plugin-invocation.py'));chain=engine.read(store,payload.get('chain_id'))
+    attempt=chain['attempts'].get(payload.get('attempt_id'))
+    if chain['context']!=hook_context(snapshot,publication_id) or attempt is None or attempt['status']!='returned' or attempt['result']['status']!='findings':raise ReviewError('A current original returned review finding contribution is required')
+    values=attempt['result'].get('findings')
+    if not isinstance(values,list) or not values:raise ReviewError('A finding contribution must contain actual nonempty findings')
+    output=[]
+    for finding in values:
+        if not isinstance(finding,dict) or any(not finding.get(key) for key in ['id','path','line','cause','consequence','severity']) or finding['path'] not in snapshot['changed_files'] or type(finding['line']) is not int or finding['line']<1:raise ReviewError('Plugin findings require concrete current changed-file locations, cause and consequence')
+        if finding.get('status','open')!='open':raise ReviewError('A plugin cannot self-verify or dismiss a finding')
+        item=deepcopy(finding);item['id']=attempt['id']+':'+str(finding['id']);item['source_attempt_id']=attempt['id'];output.append(item)
+    if len({item['id'] for item in output})!=len(output):raise ReviewError('Review contribution finding identities must be distinct')
+    result_digest=engine.digest(attempt['result']);reference=payload.get('decision_receipt')
+    if not isinstance(reference,dict):raise ReviewError('Actual W1 finding substantiation requires a current core decision receipt')
+    dg=owned_module('review_findings_governance',Path(__file__).with_name('decision-governance.py'));decision=dg.read(store,reference.get('decision_id'))
+    context=review_findings_context(snapshot,publication_id,chain['id'],attempt['id'],result_digest)
+    accepted=dg.acceptance_reference(store,reference,{'context':context,'mode':decision['mode'],'kind':'technical','authority_digest':decision['authority_digest']})
+    if accepted['answer']!='incorporate':raise ReviewError('The current core decision did not substantiate the review findings')
+    result=deepcopy(record);contribution_id='RC-'+digest({'attempt_id':attempt['id'],'result_digest':result_digest})[:32]
+    contribution={'id':contribution_id,'chain_id':chain['id'],'attempt_id':attempt['id'],'result_digest':result_digest,'head':snapshot['head'],'base_oid':snapshot['base_oid'],
+        'findings':output,'decision_receipt':deepcopy(reference)}
+    ledger=result.setdefault('review_plugin_contributions',{})
+    if contribution_id in ledger and ledger[contribution_id]!=contribution:raise ReviewError('Conflicting original review finding contribution')
+    for finding in output:
+        existing=result.setdefault('findings',{}).get(finding['id'])
+        if existing is not None and existing!=finding:raise ReviewError('A finding contribution cannot overwrite an existing core resolution')
+        result['findings'][finding['id']]=finding
+    ledger[contribution_id]=contribution
+    receipt={'kind':'core-incorporation','publication_id':publication_id,'contribution_id':contribution_id,'reference':'.skill-tree/history/publications/pub-'+publication_id+'.json#'+contribution_id,
+        'before':engine.digest(chain['context']),'after':engine.digest(chain['context'])}
+    result['contribution_receipt']=receipt;return result
+
+
+def verify_review_contribution(store,chain,attempt,receipt,after):
+    publication_id=receipt.get('publication_id')
+    if publication_id!=chain['context'].get('publication_id') or after!=chain['context']:raise ReviewError('Review incorporation cannot substitute another publication context')
+    record=json.loads(_review_path(store,publication_id).read_text());contribution=record.get('review_plugin_contributions',{}).get(receipt.get('contribution_id'))
+    engine=owned_module('review_contribution_engine',Path(__file__).with_name('plugin-invocation.py'))
+    if not contribution or contribution['chain_id']!=chain['id'] or contribution['attempt_id']!=attempt['id'] or contribution['result_digest']!=engine.digest(attempt['result']) or contribution['head']!=after['head'] or contribution['base_oid']!=after['base_oid']:raise ReviewError('The actual review contribution differs from the original returned result')
+    if not contribution['findings'] or any(record.get('findings',{}).get(item['id'])!=item for item in contribution['findings']):raise ReviewError('The actual accepted review findings are missing or changed')
+    dg=owned_module('review_contribution_governance',Path(__file__).with_name('decision-governance.py'));decision=dg.read(store,contribution['decision_receipt']['decision_id'])
+    # The original snapshot context is sealed by the accepted DG context and the
+    # current publication core identity; mutation cannot invent a role result.
+    accepted=dg.acceptance_reference(store,contribution['decision_receipt'],{'context':decision['context'],'mode':decision['mode'],'kind':'technical','authority_digest':decision['authority_digest']})
+    if accepted['answer']!='incorporate' or decision['context'].get('publication_id')!=publication_id or decision['context'].get('hook_chain_id')!=chain['id'] or decision['context'].get('hook_attempt_id')!=attempt['id'] or decision['context'].get('hook_result_digest')!=engine.digest(attempt['result']):raise ReviewError('The current W1 review finding acceptance is invalid')
+    return deepcopy(receipt)
+
+
+def _review_requirement_admission(store,record,snapshot):
+    frozen=record.get('review_requirements');prepared=getattr(store,'_review_requirement_preflight',None)
+    if not getattr(store,'_writer_active',False):
+        prepared=review_requirement_plan(store,snapshot,record=record,run_overrides=(frozen or {}).get('configuration',{}).get('run_overrides',{}),publication_id=record.get('publication_id'))
+    if prepared is None:
+        if frozen and any(frozen['phases'].values()):raise ReviewError('Current configured review requirements are unavailable')
+        return
+    wf=owned_module('review_requirement_admission',Path(__file__).with_name('workflow-state.py'));wf._hook_watch_guard(prepared['watch'],prepared['package_root'])
+    if frozen is None:raise ReviewError('Configured review plugins require a frozen publication requirement plan before readiness')
+    if frozen['configuration_digest']!=prepared['configuration']['configuration_digest'] or frozen['execution_snapshot']!=prepared['proofs']['after']['execution_snapshot']:raise ReviewError('Frozen review plugin configuration or source changed; explicit reconciliation is required')
+    engine=owned_module('review_requirement_engine',Path(__file__).with_name('plugin-invocation.py'));chains=[engine.read(store,value) for value in record.get('hook_chains',[])]
+    for phase,ids in prepared['phases'].items():
+        for binding_id in ids:
+            matched=[]
+            for chain in chains:
+                if chain['context']!=hook_context(snapshot,record.get('publication_id')) or chain['configuration']['configuration_digest']!=frozen['configuration_digest'] or chain['event'].get('operation')!=REVIEW_OPERATION or chain['event'].get('boundary_id')!=prepared['proofs'][phase]['event'].get('boundary_id'):continue
+                stage=next((stage for stage in chain['stages'] if stage['binding_id']==binding_id),None)
+                if stage and stage['status']=='complete':matched.append(chain)
+            if len(matched)!=1:raise ReviewError('A configured enabled review occurrence is missing a unique explicitly attached current completed pass: '+binding_id)
+    for proof in prepared['proofs'].values():
+        if proof.get('unresolved') or any(item.get('code') not in {'invocation-unqualified','unsupported-adapter','missing-capability'} for item in proof.get('prerequisites',[])):raise ReviewError('Current review plugin configuration has unresolved prerequisites')
+
+
+def hook_context(snapshot,publication_id=None):
+    scope={key:snapshot.get(key) for key in ['repo_id','remote','remote_id','source_branch','target_branch']}
+    value={'kind':'review','id':'review-hook:'+digest(scope),'head':snapshot.get('head'),'base_oid':snapshot.get('base_oid'),'target_branch':snapshot.get('target_branch'),'semantic_fingerprint':digest({'scope':scope,'review_key':review_key(snapshot)}),'content_fingerprint':digest(snapshot)}
+    if publication_id:value['publication_id']=publication_id
+    return value
+
+def _retire_review_hook_references(store,record,snapshot):
+    if not record or not record.get('hook_chains'):return record
+    engine=owned_module('review_retirement_engine',Path(__file__).with_name('plugin-invocation.py'))
+    current=[hook_context(snapshot),hook_context(snapshot,record.get('publication_id'))];retired=[];retained=[];states={}
+    for value in record['hook_chains']:
+        chain=engine.read(store,value)
+        if chain['context'] not in current and not any(attempt['status'] in engine.PENDING for attempt in chain['attempts'].values()):
+            retired.append(value);states[value]={'state':chain['state'],'context':deepcopy(chain['context']),'attempt_statuses':{key:attempt['status'] for key,attempt in chain['attempts'].items()}}
+        else:retained.append(value)
+    if not retired:return record
+    result=deepcopy(record);result.setdefault('review_hook_history',[]).append({'identity':deepcopy(record['identity']),'snapshot_key':record.get('snapshot_key'),'hook_chains':retired,'states':states,'outcome':'review-snapshot-invalidated'})
+    result['hook_chains']=retained;return result
+
+
+def attach_hook_chain(store,record,snapshot,chain_id):
+    ws.validate_hook_references(record)
+    if record.get('identity')!=identity(snapshot):raise ReviewError('Hook attachment requires the exact current review snapshot')
+    engine=owned_module('review_plugin_invocation',Path(__file__).with_name('plugin-invocation.py'))
+    try:chain=engine.read(store,chain_id)
+    except ValueError as error:raise ReviewError(str(error)) from error
+    if chain['context']!=hook_context(snapshot,record.get('publication_id')) and chain['context']!=hook_context(snapshot):raise ReviewError('Hook chain belongs to another review scope or current head/base')
+    result=deepcopy(record);refs=result.setdefault('hook_chains',[])
+    if chain_id not in refs:refs.append(chain_id)
+    return result
+
+def hook_admission(store,record,snapshot):
+    wf=owned_module('review_hook_workflow',Path(__file__).with_name('workflow-state.py'))
+    engine=owned_module('review_admission_engine',Path(__file__).with_name('plugin-invocation.py'))
+    for pending in engine.pending_scan(store):
+        chain=engine.read(store,pending['chain_id'])
+        if chain['context'].get('publication_id')==record.get('publication_id') and record.get('publication_id'):raise ReviewError('Original pending review actors require host cleanup before publication readiness')
+    for value in record.get('hook_chains',[]):
+        chain=engine.read(store,value)
+        if chain['context'] not in [hook_context(snapshot),hook_context(snapshot,record.get('publication_id'))]:raise ReviewError('The attached review pass is stale for the current publication')
+    try:wf.hook_admission(store,chain_ids=record.get('hook_chains',[]))
+    except (ValueError,OSError) as error:raise ReviewError('Current review hook obligations remain unresolved: '+str(error)) from error
+
+
+def ready(record,snapshot,*,store=None):
+    ws.validate_hook_references(record)
+    if store is not None:record=_retire_review_hook_references(store,record,snapshot)
     record=reconcile(record,snapshot)
     if record['status']=='merged':return record
     if record['status']=='blocked':raise ReviewError(record['blocked_reason'])
+    if (record.get('hook_chains') or any(record.get('review_requirements',{}).get('phases',{}).values())) and store is None:raise ReviewError('Current hook readiness requires the live owned store')
+    if store is not None:
+        _review_requirement_admission(store,record,snapshot);hook_admission(store,record,snapshot)
     if not record.get('pr') or not record['pr'].get('id') or not record['pr'].get('url'):raise ReviewError('PR readiness requires the existing provider PR identity and URL')
     review=record.get('review')
-    if not review or review['key']!=review_key(snapshot) or review['unresolved']:
+    if not review or review['key']!=review_key(snapshot) or review['unresolved'] or any(not finding_verified(f,snapshot) for f in record.get('findings',{}).values()):
         raise ReviewError('Current full review or actionable finding verification remains incomplete')
     if any(not t.get('resolved') and (t.get('required') or t.get('actionable')) for t in snapshot.get('threads',[])):
         raise ReviewError('Mandatory/actionable PR discussions remain unresolved')
@@ -150,10 +485,12 @@ def ready(record,snapshot):
     record['ci']='not-configured' if not checks else 'required-checks-passed'
     record['status']='pr-ready';return record
 
-def merge_gate(record,snapshot):
-    record=ready(record,snapshot)
+def merge_gate(record,snapshot,*,store=None):
+    record=ready(record,snapshot,store=store)
     if record['status']=='merged':return record
-    if not record['authorization'].get('merge'):raise ReviewError('Merge lacks explicit owner authorization')
+    authorization=record['authorization']
+    if (not authorization.get('merge') or not authorization.get('pr') or authorization.get('origin')!='owner'
+            or authorization.get('target_branch')!=snapshot['target_branch']):raise ReviewError('Merge lacks explicit owner authorization for the current target')
     if snapshot.get('approvals_known') is not True:raise ReviewError('Required approval policy is unknown')
     if snapshot.get('approvals_required') and not snapshot.get('approved'):raise ReviewError('External approval requirements remain unsatisfied')
     if snapshot.get('mergeable')!='MERGEABLE':raise ReviewError('Merge conflict or unknown mergeability')
@@ -227,7 +564,7 @@ class GitHub:
 
 def new_record(snapshot,params):
     if not params['authorization'].get('pr'):raise ReviewError('Publication requires the direct owner invocation')
-    return {'schema':1,'identity':identity(snapshot),'authorization':params['authorization'],'status':'pr-review-in-progress','pr':snapshot.get('pr'),'rounds':[],'operations':{}}
+    return {'schema':1,'identity':identity(snapshot),'snapshot_key':review_key(snapshot),'authorization':params['authorization'],'status':'pr-review-in-progress','pr':snapshot.get('pr'),'rounds':[],'operations':{}}
 
 def operation(record,key,request,result=None):
     record=deepcopy(record);ops=record.setdefault('operations',{});signature=digest(request)
@@ -256,7 +593,7 @@ def local_fast_forward(root,target,remote):
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command',choices=['parameters','preflight','init','observe','review','ready','merge-gate','operation','block'])
+    parser.add_argument('command',choices=['parameters','preflight','init','observe','review','ready','merge-gate','operation','block','hook-attach','inspection','review-reconcile','plugin-findings'])
     parser.add_argument('root',type=Path);parser.add_argument('--input',type=Path,required=True);parser.add_argument('--publication-id')
     args=parser.parse_args(argv)
     try:
@@ -268,29 +605,50 @@ def main(argv=None):
             canonical=ws.canonical(root);snapshot=payload.get('snapshot',{})
             key=args.publication_id or digest({k:snapshot[k] for k in ['repo_id','remote','source_branch','target_branch']})[:32]
             if not re.fullmatch(r'[a-f0-9]{32}',key):raise ReviewError('Invalid publication ID')
-            spec=importlib.util.spec_from_file_location('pr_workflow',Path(__file__).with_name('workflow-state.py'));wf=importlib.util.module_from_spec(spec);spec.loader.exec_module(wf)
-            store=wf.Store(canonical,allow_unselected=True)
+            wf=owned_module('pr_workflow',Path(__file__).with_name('workflow-state.py'))
+            store=wf.Store(root,allow_unselected=True)
             with ws.publication_lock(root,snapshot.get('remote','origin'),snapshot.get('target_branch',key)):
+                carrier=canonical/('.skill-tree/history/publications/pub-'+key+'.json');carrier_hash=hashlib.sha256(carrier.read_bytes()).hexdigest() if carrier.exists() else None
+                original=json.loads(carrier.read_text()) if carrier.exists() else None
+                overrides=payload.get('run_overrides',(original or {}).get('review_requirements',{}).get('configuration',{}).get('run_overrides',{}))
+                prepared_review=review_requirement_plan(store,snapshot,record=original,package_root=payload.get('package_root'),run_overrides=overrides,publication_id=key)
+                store._review_requirement_preflight=prepared_review
+                if args.command in {'ready','merge-gate'}:
+                    prior=canonical/('.skill-tree/history/publications/pub-'+key+'.json')
+                    inspected_carrier=_retire_review_hook_references(store,json.loads(prior.read_text()),snapshot) if prior.exists() else None
+                    if inspected_carrier:
+                        wf.prepare_hook_admission(store,chain_ids=inspected_carrier.get('hook_chains',[]))
                 with store.lock():
                     relative='.skill-tree/history/publications/pub-'+key+'.json';path=canonical/relative
                     record=json.loads(path.read_text()) if path.exists() else None
+                    if (hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None)!=carrier_hash:raise ReviewError('The inspected publication carrier changed before the writer')
+                    if prepared_review:wf._hook_watch_guard(prepared_review['watch'],prepared_review['package_root'])
+                    record=_retire_review_hook_references(store,record,snapshot)
                     if args.command=='init':
                         params=parameters(snapshot['source_branch'],payload)
                         if params['source_branch']!=snapshot['source_branch'] or params['target_branch']!=snapshot['target_branch']:raise ReviewError('Publication parameter/snapshot identity conflict')
-                        result=reconcile(record,snapshot) if record else new_record(snapshot,params)
-                        if record and params['merge_explicit']:
+                        retarget=bool(record and record['identity']['target_branch']!=snapshot['target_branch'])
+                        result=reconcile(record,snapshot,retarget=params if args.publication_id else None) if record else new_record(snapshot,params)
+                        result['publication_id']=key
+                        if prepared_review and 'review_requirements' not in result:result['review_requirements']=_frozen_review_requirements(store,prepared_review)
+                        if record and not retarget and params['merge_explicit']:
                             result.setdefault('authorization_history',[]).append(deepcopy(result['authorization']))
                             result['authorization']=params['authorization']
                     else:
                         if not record:raise ReviewError('Initialize or select the existing publication record')
                         if args.command=='observe':result=reconcile(record,snapshot)
                         elif args.command=='review':result=reviewed(record,snapshot,payload['review'])
-                        elif args.command=='ready':result=ready(record,snapshot)
-                        elif args.command=='merge-gate':result=merge_gate(record,snapshot)
+                        elif args.command=='inspection':result=inspected(record,snapshot,payload['inspection'])
+                        elif args.command=='review-reconcile':result=reconcile_review_requirements(store,record,snapshot,key,prepared_review,payload['decision_receipt'])
+                        elif args.command=='plugin-findings':result=incorporate_review_findings(store,record,snapshot,key,payload)
+                        elif args.command=='hook-attach':result=attach_hook_chain(store,record,snapshot,payload['chain_id'])
+                        elif args.command=='ready':result=ready(record,snapshot,store=store)
+                        elif args.command=='merge-gate':result=merge_gate(record,snapshot,store=store)
                         elif args.command=='block':
                             if not payload.get('reason'):raise ReviewError('Publication block requires the actual prerequisite or failure')
                             result=deepcopy(record);result['status']='blocked';result['blocked_reason']=payload['reason']
                         else:result=operation(record,payload['key'],payload['request'],payload.get('result'))
+                    if prepared_review:wf._hook_watch_guard(prepared_review['watch'],prepared_review['package_root'])
                     store.commit({relative:json.dumps(result,sort_keys=True,indent=2)+'\n'})
                     if store.state.exists():
                         state=store.load();registry=state.get('run_registry')

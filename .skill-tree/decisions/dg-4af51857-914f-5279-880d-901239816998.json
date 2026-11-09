@@ -1,0 +1,241 @@
+{
+  "acceptance": {
+    "actor": {
+      "context_id": "/root/delivery132",
+      "id": "/root/delivery132"
+    },
+    "answer": "revise",
+    "attempt_id": "DA-3d4fc6a5-37c9-476d-a22b-291f854017bf",
+    "authority_digest": "d4a015077f24772b74c5b2d85cb06c1cfeef32b4bc974795ad9adf841d1d7c0b",
+    "context_identity": {
+      "decision_purpose": "plan",
+      "execution_snapshot_digest": "ae5d295c61da93338086e004ade206fa45cd532d246b2fd54dc55ae35578f62f",
+      "id": "task:T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "kind": "task",
+      "orchestration_id": "DO-b7287c37-1a47-59c1-bf18-e55c378ea7bc",
+      "plan_digest": "27a23b4e465b29e8436804263fa3b26b9580ed8e108656ae45722b0edd59cf4f",
+      "required_checks_digest": "76c935bb4364108d1204b6542b10fecd2fd6252b0e242c863336617ce2a3c2f1",
+      "task_ids": [
+        "T-ea3d73b4-c312-4de9-9897-c97f380e4516"
+      ]
+    },
+    "decision_id": "DG-4af51857-914f-5279-880d-901239816998",
+    "digest": "0c7293e093a7bcd03f7903f8cb232a17619e24f9f9635411d802a5afb3a433c6",
+    "kind": "specification-acceptance",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/delivery132",
+      "actor_id": "/root/delivery132",
+      "creation_reference": "Actual collaboration.spawn_agent returned /root/delivery132, separate active context.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/delivery132 returned the sealed-input JSON in collaboration final answer.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "325236d77c84a09558a972ab9fdfcb943363ba65da53c07d44948bd0a30dc6b8",
+    "question_id": "catalog112-plan",
+    "rationale": "The sealed plan leaves two acceptance behaviors implicit. Specify that T112 merges validated project-known definitions into canonical suggested and actual location groups while preserving installed identity and occurrence order. Only persistence and mutations belong to manager131. Require recommendation eligibility to come from a separate trusted projection of accepted comparison evidence, bound to the exact application, revision, content, adapter, dependencies, host, flavor and location. A catalog row cannot qualify itself. Add regressions for both boundaries and retain the empty production recommendation sets.",
+    "role_receipts": {
+      "critic": "50238b2adca2c2113985368ba7152bfd8bf5c8129d00b0acef049e94e2785484",
+      "resolver": "79c5c1a6d2d14f826ea29ed8b2855ec75c077d55acd32b66bc6182f3bd148273"
+    },
+    "semantic_fingerprint": "61ce13b965b4b307a6f383302d24d8ae276e17f818a877d0c16891511f475d86"
+  },
+  "active_attempt_id": null,
+  "attempts": {
+    "DA-3d4fc6a5-37c9-476d-a22b-291f854017bf": {
+      "actor": {
+        "context_id": "/root/delivery132",
+        "id": "/root/delivery132"
+      },
+      "authority_digest": "d4a015077f24772b74c5b2d85cb06c1cfeef32b4bc974795ad9adf841d1d7c0b",
+      "basis_digest": null,
+      "content_fingerprint": "61ce13b965b4b307a6f383302d24d8ae276e17f818a877d0c16891511f475d86",
+      "evidence": {
+        "actor_context_id": "/root/delivery132",
+        "actor_id": "/root/delivery132",
+        "creation_reference": "Actual collaboration.spawn_agent returned /root/delivery132, separate active context.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/delivery132 returned the sealed-input JSON in collaboration final answer.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-3d4fc6a5-37c9-476d-a22b-291f854017bf",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "325236d77c84a09558a972ab9fdfcb943363ba65da53c07d44948bd0a30dc6b8",
+      "result": {
+        "answer": "revise",
+        "input_digest": "814cde689aeff8297acf71a87043533ce01528e2243c40a58766f1793b65580d",
+        "rationale": "The sealed plan leaves two acceptance behaviors implicit. Specify that T112 merges validated project-known definitions into canonical suggested and actual location groups while preserving installed identity and occurrence order. Only persistence and mutations belong to manager131. Require recommendation eligibility to come from a separate trusted projection of accepted comparison evidence, bound to the exact application, revision, content, adapter, dependencies, host, flavor and location. A catalog row cannot qualify itself. Add regressions for both boundaries and retain the empty production recommendation sets.",
+        "status": "answered"
+      },
+      "role": "resolver",
+      "semantic_fingerprint": "61ce13b965b4b307a6f383302d24d8ae276e17f818a877d0c16891511f475d86",
+      "status": "answered"
+    },
+    "DA-5bcc48c5-b3b1-4f69-8aa8-303b64a29dbb": {
+      "actor": {
+        "context_id": "/root/evidence114",
+        "id": "/root/evidence114"
+      },
+      "authority_digest": "d4a015077f24772b74c5b2d85cb06c1cfeef32b4bc974795ad9adf841d1d7c0b",
+      "basis_digest": "1e9b16ce36b96853385fb8496faed43cb2f52c6a07992412dbbabe81591dbb3b",
+      "content_fingerprint": "61ce13b965b4b307a6f383302d24d8ae276e17f818a877d0c16891511f475d86",
+      "evidence": {
+        "actor_context_id": "/root/evidence114",
+        "actor_id": "/root/evidence114",
+        "creation_reference": "Actual collaboration.spawn_agent returned /root/evidence114, separate active context.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/evidence114 returned the sealed-input JSON in collaboration final answer.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-5bcc48c5-b3b1-4f69-8aa8-303b64a29dbb",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "325236d77c84a09558a972ab9fdfcb943363ba65da53c07d44948bd0a30dc6b8",
+      "result": {
+        "answer": "revise",
+        "input_digest": "918483f82d49a62d42fbe7d5494c17da0f5fe18e80840d0876c97f68e0d109e2",
+        "rationale": "The canonical task requires T112 to merge curated and project-known definitions in the read-only view. Define the portable input, identity collisions, unavailable installed state and actual binding order, while leaving persistence and mutation to the manager. Recommendation eligibility must come from a separate owned evidence projection bound to the exact application, revision, content, adapter, dependency closure, host, flavor and executable location. Catalog metadata grants no installation authority. Preserve the empty production recommendation sets and verify these boundaries with focused tests.",
+        "status": "agree"
+      },
+      "role": "critic",
+      "semantic_fingerprint": "61ce13b965b4b307a6f383302d24d8ae276e17f818a877d0c16891511f475d86",
+      "status": "agree"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the approved task and dependency scope. No source publication, remote, release, external trial, installation consent or actual native plugin execution. Required checks and real owner intent cannot be delegated away."
+    ],
+    "context_id": "task:T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+    },
+    "id": "approved-catalog112",
+    "revision": 1
+  },
+  "authority_digest": "d4a015077f24772b74c5b2d85cb06c1cfeef32b4bc974795ad9adf841d1d7c0b",
+  "context": {
+    "content_fingerprint": "61ce13b965b4b307a6f383302d24d8ae276e17f818a877d0c16891511f475d86",
+    "decision_purpose": "plan",
+    "execution_snapshot_digest": "ae5d295c61da93338086e004ade206fa45cd532d246b2fd54dc55ae35578f62f",
+    "id": "task:T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+    "kind": "task",
+    "orchestration_id": "DO-b7287c37-1a47-59c1-bf18-e55c378ea7bc",
+    "plan_digest": "27a23b4e465b29e8436804263fa3b26b9580ed8e108656ae45722b0edd59cf4f",
+    "required_checks_digest": "76c935bb4364108d1204b6542b10fecd2fd6252b0e242c863336617ce2a3c2f1",
+    "semantic_fingerprint": "61ce13b965b4b307a6f383302d24d8ae276e17f818a877d0c16891511f475d86",
+    "task_ids": [
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516"
+    ]
+  },
+  "decision_hash": "c6e9212f13bd5751b4258a39b4945cc17aeb481eedc2d2748a786b6f323edd30",
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "frontier_epoch": 1,
+  "history": [
+    {
+      "context_fingerprint": "61ce13b965b4b307a6f383302d24d8ae276e17f818a877d0c16891511f475d86",
+      "detail": {},
+      "event": "started",
+      "mode_epoch": 1,
+      "previous_record_hash": null,
+      "sequence": 1
+    },
+    {
+      "context_fingerprint": "61ce13b965b4b307a6f383302d24d8ae276e17f818a877d0c16891511f475d86",
+      "detail": {
+        "attempt_id": "DA-3d4fc6a5-37c9-476d-a22b-291f854017bf",
+        "role": "resolver"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "e056fd4f7c638baa78aa60535a960dca06087b9c04265aa040e3899ba372d2a6",
+      "sequence": 2
+    },
+    {
+      "context_fingerprint": "61ce13b965b4b307a6f383302d24d8ae276e17f818a877d0c16891511f475d86",
+      "detail": {
+        "attempt_id": "DA-3d4fc6a5-37c9-476d-a22b-291f854017bf",
+        "status": "answered"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "64d0571824a5d599664702dd9ac242edc8ee7d2bfe554e3652d2857a5c2c7841",
+      "sequence": 3
+    },
+    {
+      "context_fingerprint": "61ce13b965b4b307a6f383302d24d8ae276e17f818a877d0c16891511f475d86",
+      "detail": {
+        "attempt_id": "DA-5bcc48c5-b3b1-4f69-8aa8-303b64a29dbb",
+        "role": "critic"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "5efa6bb7c75fb2943f2c5f82fe85abdd801073f4f348d3a726513f20bf89649f",
+      "sequence": 4
+    },
+    {
+      "context_fingerprint": "61ce13b965b4b307a6f383302d24d8ae276e17f818a877d0c16891511f475d86",
+      "detail": {
+        "attempt_id": "DA-5bcc48c5-b3b1-4f69-8aa8-303b64a29dbb",
+        "status": "agree"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "dfe60369a42070cb6bf21b42ee79436578578c8d4b8368ecad0b83012147f840",
+      "sequence": 5
+    },
+    {
+      "context_fingerprint": "61ce13b965b4b307a6f383302d24d8ae276e17f818a877d0c16891511f475d86",
+      "detail": {
+        "acceptance_digest": "0c7293e093a7bcd03f7903f8cb232a17619e24f9f9635411d802a5afb3a433c6"
+      },
+      "event": "accept",
+      "mode_epoch": 1,
+      "previous_record_hash": "799c8a4c3b981403117c49ffaa744b5788d7734b8480a5de25c9a90e2675777a",
+      "sequence": 6
+    }
+  ],
+  "id": "DG-4af51857-914f-5279-880d-901239816998",
+  "mode": "auto",
+  "mode_epoch": 1,
+  "prepared_attempt_id": "DA-5bcc48c5-b3b1-4f69-8aa8-303b64a29dbb",
+  "question": {
+    "id": "catalog112-plan",
+    "kind": "specification-acceptance",
+    "options": [
+      {
+        "id": "accept",
+        "text": "Accept the current plan."
+      },
+      {
+        "id": "revise",
+        "text": "Revise the plan with concrete reasons."
+      }
+    ],
+    "plan_text": "# T112 implementation plan for the workflow-grouped plugin catalog\n\n## Scope and inputs\n\nTask `T-ea3d73b4-c312-4de9-9897-c97f380e4516` implements the curated catalog, recommendations and manual alternatives. Dependencies `T-a583acd5-fc6b-4d37-97ec-02df969fea9e` and `T-6f4500f7-91e2-410d-8172-a4c4cd232fc5` provide comparative evidence and source normalization. The task uses the existing Implement All controller and execution worktree.\n\nRead `.skill-tree/documents/plugin-system-contract.md`, `.skill-tree/documents/plugin-management-contract.md`, approved integration anchors in `.skill-tree/documents/implementation-plan.md` and Q3/Q4/Q10 in `.skill-tree/documents/plugin-workflow-decisions.md`. Use the dated 38-candidate primary-source map at `.skill-tree/history/research/plugin-market-map.json`, T114's accepted comparison report and the existing pinned descriptors in `.skill-tree/config/plugins/`. The observed comparison scope is Codex source-backed General in Manual with scripted fixture answers. T114 supports zero recommendations in every flavor. Preserve application, boundary, revision/content, source, host, flavor and comparison identity without treating activity or discovery as incremental benefit.\n\nT112 owns static catalog metadata, read-only views and a source selection boundary. Optional confirmed installation belongs to T110. Project custom persistence and configuration actions belong to the manager task. No service, online lookup, install, dispatch, workflow start, queue change or native capability claim enters the catalog path.\n\n## Data and public behavior\n\n- Add the portable `.skill-tree/config/plugin-catalog.json` and loader/query in `.skill-tree/lib/plugin-catalog.js`. The owned maintenance bundle already copies `config/`, `lib/` and operation templates through `composer.sourceInputs`. A catalog load uses only owned files available in the bundle and never requires history, the authoring checkout, remote APIs or installed plugin bytes.\n- Use a versioned list with unique stable IDs, display labels, descriptor reference or inline definition, immutable revision, entry, source/provenance and license evidence, explicit resource/package dependencies, application-specific evidence status, host/flavor applicability status, and actual suggested operation/anchor pairs. Evidence summary retains dated market/fixture provenance. Historical reports remain linked from the documents and cross-checked in repository tests.\n- Include distinct entries for the four T114 applications. Use current package IDs and descriptors for `ponytail`, `task-editorial` and `task-interview`. Record the fourth application, `writing-for-agents-documentation-report`, at Documentation Audit after with the report-only document context and both pinned resources, never the task-editorial policy. If the trial-only adapter has no shipped descriptor, keep the catalog row clearly marked as requiring adapter preparation. The separately named upstream `ponytail-review` is a source-inspection alternative, with its own source path and evidence. Add a compact subset of useful source-backed planning, review, and implementation/validation alternatives. Link the full market map separately. Catalog coverage is complete for curated entries and does not restrict direct/custom source intake.\n- Reuse `plugin-composition.createCatalog(operations)` and `plugin-bindings.resolveLocation` for all authored locations. Group alternatives by canonical callable boundary ID, with stable lexical ordering of groups and IDs. A named alias and its phase resolve to the same grouping key. An entry may appear once in each distinct suggested group. Suggestions carry no binding, enabled state or execution authority. Distinguish proposed anchors from actual registry bindings, including an A–B–A chain.\n- Keep explicit empty recommendation arrays for General, Web and Unity. Include all available curated entries in manual groups with `unqualified`, `compatibility-only` or `unsupported` and prerequisites as appropriate. Host/flavor filtering keeps applicable uncertain entries visible and returns explicit status rather than silently promoting them. The unfiltered query contains every curated entry.\n- Catalog selection returns the full cloned lifecycle source object or explicit acquisition prerequisites. Maintain top-level `expectedDigests` and `package_dependencies`, the original source/resource list, adapter policy and capabilities. `plugin-lifecycle.prepareProposal` reads these fields from the input object at lines 56–57. The bare ID or a normalized definition drops those fields. Dependencies named by research can remain explicit unresolved source requirements. Do not fabricate a registry package dependency for a sibling resource already included in the descriptor. Keep custom source normalization available separately from curated lookup.\n- Validate schema and strict distinct IDs, bounded reference paths, immutable revisions and normalized identity, digest/resource mapping, known host/flavor/status values, resolvable exact anchors and exact dependency IDs. Reject duplicate same-entry anchors resolving to one boundary, unknown recommendation IDs, dependency closure gaps or cycles, and recommendations without eligible evidence matching the exact application, revision/content, host/flavor and point. Distinct named applications may deliberately share an upstream source while retaining separate identity and evidence.\n- Extend the shared read-only `plugin-management.listMain` path used by both `.skill-tree/bin/install.js --list-plugins` and installed `manager.js --list-plugins`. Maintain existing commands, flags, JSON fields, status/exit codes and installed ownership/frozen-requirement details. Add an explicit grouped catalog view with recommendations and manual alternatives. Retain programmatic `plugins.inventory(root)` behavior when the caller supplied no known definitions. Catalog availability and installed presence/revision derive from separate inputs. An ID collision with a different installed source/revision is explicit. An unavailable installed registry never becomes a claim of absence. No other command changes behavior in T112.\n\n## Test-first validation\n\n1. Add `.skill-tree/tests/test-plugin-catalog.js` and capture the focused red result before runtime implementation. Check all shipped rows, exact anchor grouping, deterministic host/flavor and point filtering, preserved unqualified/unsupported status, empty recommendations and stable JSON ordering. Use test-only metadata mutations for invalid anchor, alias duplication, duplicate ID, unknown recommendation reference, dependency gap/cycle and mismatched scope/evidence. A test-only positive case verifies the validator contract without creating a production recommendation.\n2. Assert all three existing pinned descriptors preserve exact selected source/revision, resources, expected digest map, adapter/capabilities and dependency fields. Verify the catalog cannot treat the separate writing-for-agents applications, or upstream Ponytail and Ponytail Review, as equivalent. Verify unknown catalog lookup fails clearly while a compatible noncatalog URL continues through ordinary normalization.\n3. Compare source installer and installed maintenance manager JSON and human output in isolated fresh General/Web/Unity projects. Install core from a copied composer source, remove that source, and run the installed maintenance manager from a different working directory. Compare curated ID, immutable source/revision, evidence, dependencies, groups and recommendations. Assert actual installed registry/packages/bindings remain separate, target tree and queue stay byte-identical during listing, no plugin acquisition/dispatch occurs and missing or conflicting installed state remains visible. Use controlled installed fixtures, no third-party fetch or native runtime.\n4. Update `.skill-tree/documents/plugin-system-contract.md` and `.skill-tree/documents/plugin-recommendation-evidence.md` with the concrete read-only flow, evidence boundary, compact map and safe downstream contract. Run the exact `catalog-regressions` quality-node check, existing plugin-management/installer tests, `npm run sync:check`, `npm run validate`, `npm run test:py`, `npm run test:node`, installer `--list`, installer General dry-run in an owned temporary root and `git diff --check`. Refresh owned execution installation via the installer after reviewed source changes. Record actual source/check evidence separately from T114 host evidence. Run independent final-diff review before scoped commit.\n",
+    "recommendation": "accept",
+    "significance": "significant",
+    "text": "Accept the exact approved-scope catalog plan, or request a bounded revision."
+  },
+  "request_id": "DO-b7287c37-1a47-59c1-bf18-e55c378ea7bc:question:1",
+  "revision": 6,
+  "schema": 1,
+  "start_digest": "44ef08f392b4520c00373270955437b22fbf29c38fffbf836139a8a11ca11311",
+  "state": "accepted"
+}

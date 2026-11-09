@@ -1,0 +1,67 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-plugin-composition.js"
+  ],
+  "attempt_id": "C-01b9d13b-15f6-4449-b1bc-bac4ee47c963",
+  "baseline": {
+    "last_accepted": {
+      "discovered": 44,
+      "expected": 28,
+      "failed": 0,
+      "passed": 44,
+      "skipped": 0
+    },
+    "original": {
+      "discovered": 28,
+      "expected": 28,
+      "failed": 0,
+      "passed": 28,
+      "skipped": 0
+    }
+  },
+  "check_id": "standalone-plugin-composition",
+  "count_error": null,
+  "counts": {
+    "discovered": 44,
+    "expected": 28,
+    "failed": 0,
+    "passed": 44,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limitations": [
+    "Focused unit fixture evidence. No new actual actor or product qualification."
+  ],
+  "log_sha256": "4ae7937e942d3a9369dc1ddaad7a511e21b292e24d40f564404d102eb60175d6",
+  "output": ".skill-tree/history/validation/plugin-system/t-a9d7a827-fb25-4348-bcf7-867a449c58ef-standalone-plugin-composition-c-01b9d13b-15f6-4449-b1bc-bac4ee47c963.txt",
+  "owned_profile_identity": "56e828eacced91072ba944c318a5291a21b88be7f83b90a2248f53fdae95806a",
+  "process_group_clean": true,
+  "result": "pass",
+  "source_commit": "82eaf49b6cb35e65dfa30413228bddcb10190562",
+  "sources": {
+    ".skill-tree/common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+    ".skill-tree/common/references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
+    ".skill-tree/common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+    ".skill-tree/common/scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",
+    ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+    ".skill-tree/config/resource-map.json": "bd4b539b8aad5d6b55aba3609073f28b7e879fa7e8c3edf60dbbf28f9e56ad26",
+    ".skill-tree/documents/implementation-plan.md": "73692c86132c37dc8be19457f9bf33dc6ff87027cfad50de85a361bca6f09606",
+    ".skill-tree/documents/plugin-management-contract.md": "2b5c9aeb18dd30b06a809fd14e5222abf579a002187870167d61f6f7dda5b11a",
+    ".skill-tree/documents/plugin-system-contract.md": "b25424efd0dc920376a8d32b9dd7ea27d6b644d966e167f690c8999dc2fa36f5",
+    ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84",
+    ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+    ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+    ".skill-tree/lib/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
+    ".skill-tree/lib/plugin-composition.js": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d",
+    ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    ".skill-tree/lib/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+    ".skill-tree/lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+    ".skill-tree/templates/operations.json": "af81ff4d4b003ef8e8dac292995b3227d5fb45d80666dd80b83b4111d1ded050",
+    ".skill-tree/tests/test-plugin-composition.js": "0ac136430c64c82c8d0fe3a55c8cf75526f7a29ca6f21fe9902ec317f2a569d8"
+  },
+  "task_id": "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+  "timed_out": false,
+  "tool_wall_seconds": 83.054
+}

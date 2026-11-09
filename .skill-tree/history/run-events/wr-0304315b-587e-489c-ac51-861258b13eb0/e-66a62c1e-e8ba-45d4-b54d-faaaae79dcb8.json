@@ -1,0 +1,492 @@
+{
+  "changes": [
+    {
+      "after": null,
+      "before": {
+        "body": "### Build a dated evidence map of the external skill market\n\n```yaml\nid: T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d\npriority: 125\nstatus: Ready\nparent_pending_ids: [\"P-3f7df14a-88b7-48c8-ac14-eaef552d08aa\"]\nprocessing_run_id: PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45\nroot_task_id: T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d\nrelated_task_id: null\nrelation: main\ndepends_on: []\n```\n\nGoal:\n- Perform the detailed Internet market study requested by the owner and identify defensible candidates for each relevant workflow location.\n\nCurrent behavior:\n- The processing survey identifies primary ecosystems and compatibility issues but completes no comprehensive market evaluation or candidate recommendation.\n\nTouch:\n- `.skill-tree/documents/plugin-system-research.md`\n- `.skill-tree/history/research/plugin-market-map.json`\n- `.skill-tree/documents/plugin-market-research.md`\n- `.skill-tree/documents/agent-compatibility.md`\n\nImplementation constraints:\n- Inspect actual current skill packages and source-owned evaluation evidence rather than deriving efficacy from stars, installs or promotional lists.\n- Use the source families and supplied revisions in the processing report as starting points, rechecking freshness and recording unknowns.\n\nValidation:\n- Strategy: exploratory primary-source research with traceable records and explicit evidence levels.\n```json\n{\n  \"checks\": [\n    {\n      \"id\": \"market-source-review\",\n      \"recipe_id\": \"static-inspection\",\n      \"criteria\": [\n        \"The market map covers distribution ecosystems and relevant planning, processing, implementation, review, validation, documentation and domain candidates with dated primary sources.\",\n        \"Candidate records distinguish adoption signals from demonstrated outcomes and identify revision, maintenance, license, dependencies and host/flavor compatibility.\",\n        \"The research defines a justified comparison shortlist and bounded evaluation plan, including both supplied pilots and unsupported or unqualified cases.\"\n      ],\n      \"sources\": [\n        \".skill-tree/documents/plugin-system-research.md\",\n        \".skill-tree/history/research/plugin-market-map.json\",\n        \".skill-tree/documents/plugin-market-research.md\"\n      ],\n      \"parameters\": {},\n      \"assertion\": \"The market map covers distribution ecosystems and relevant planning, processing, implementation, review, validation, documentation and domain candidates with dated primary sources. Candidate records distinguish adoption signals from demonstrated outcomes and identify revision, maintenance, license, dependencies and host/flavor compatibility. The research defines a justified comparison shortlist and bounded evaluation plan, including both supplied pilots and unsupported or unqualified cases.\",\n      \"timing\": \"immediate\"\n    }\n  ]\n}\n```\n\nAcceptance:\n- The market map covers distribution ecosystems and relevant planning, processing, implementation, review, validation, documentation and domain candidates with dated primary sources.\n- Candidate records distinguish adoption signals from demonstrated outcomes and identify revision, maintenance, license, dependencies and host/flavor compatibility.\n- The research defines a justified comparison shortlist and bounded evaluation plan, including both supplied pilots and unsupported or unqualified cases.\n\n\nApproved clarification decisions:\n- Q3: Codex is the first verified plugin invocation host. The contract remains portable; invocation on other hosts is explicitly unqualified or unavailable until verified. Existing core installation support remains unchanged.\n- Q4: Recommendations prioritize demonstrated task/review quality improvement, with explicit time/cost reporting and limitations; adoption alone supplies no outcome evidence.\n- Q10: Recommended bundles require bounded comparison evidence in the target workflow. Untested or compatibility-only candidates remain manually selectable with explicit evidence status; no eligible candidate produces an explicit empty recommendation set.\n- Decision evidence: `.skill-tree/documents/plugin-workflow-decisions.md`; Q1-Q11 have actual owner approval. Final shared-understanding confirmation remains separate.\n\n",
+        "queue": "Prioritized Next Changes"
+      },
+      "task_id": "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d"
+    }
+  ],
+  "checkpoint_after": {
+    "admission": {
+      "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+      "flavor": "general",
+      "identity": "8c1b83e0842048aa830c643c0388c4e18fa625d2a26d0291084462acd084e1b8"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "completed_ids": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d"
+    ],
+    "completion_refs": {
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa": "O-ac001b97-eb35-4d59-b454-0c99270a12df",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": "O-6ad524b7-13eb-4fca-82b8-4e53e092ad2c",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d": "O-f6a04cbc-50b5-487e-bbb4-c6d9587df89e",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5": "O-a734f372-7d4d-4069-9960-939f4bcb0617"
+    },
+    "current_task_id": null,
+    "cycle_signature": "d4e9345a5b73c7fbcae3ca724cd52c572195a3abf0236950934e11d2f8f330b6",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Commit the approved changes, then Implement All from and back into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+    "limits": {},
+    "mode": "all",
+    "next_action": "Select required task or finish root",
+    "partial_work": [],
+    "pending_ids": [
+      "P-9bf5b8af-1e50-4f53-9ab9-56ef46997428"
+    ],
+    "phase": "resume-parent",
+    "processing_results": [],
+    "required_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "root_task_id": "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+    "snapshot": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "started_at": "2026-11-05T11:44:41.702298+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "branch": "codex/plugin-system",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests continuing from the current codex/next-version branch instead of develop and merging all results into codex/next-version.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-0304315b-587e-489c-ac51-861258b13eb0"
+    },
+    "workspace_state": "ready"
+  },
+  "checkpoint_before": {
+    "admission": {
+      "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+      "flavor": "general",
+      "identity": "8c1b83e0842048aa830c643c0388c4e18fa625d2a26d0291084462acd084e1b8"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "completed_ids": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "completion_refs": {
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa": "O-ac001b97-eb35-4d59-b454-0c99270a12df",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": "O-6ad524b7-13eb-4fca-82b8-4e53e092ad2c",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5": "O-a734f372-7d4d-4069-9960-939f4bcb0617"
+    },
+    "current_task_id": "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+    "cycle_signature": "d4e9345a5b73c7fbcae3ca724cd52c572195a3abf0236950934e11d2f8f330b6",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Commit the approved changes, then Implement All from and back into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+    "limits": {},
+    "mode": "all",
+    "next_action": "implement",
+    "partial_work": [],
+    "pending_ids": [
+      "P-9bf5b8af-1e50-4f53-9ab9-56ef46997428"
+    ],
+    "phase": "implement",
+    "processing_results": [],
+    "required_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "root_task_id": "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+    "snapshot": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "started_at": "2026-11-05T11:44:41.702298+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "branch": "codex/plugin-system",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests continuing from the current codex/next-version branch instead of develop and merging all results into codex/next-version.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-0304315b-587e-489c-ac51-861258b13eb0"
+    },
+    "workspace_state": "ready"
+  },
+  "id": "E-66a62c1e-e8ba-45d4-b54d-faaaae79dcb8",
+  "outcomes": [
+    {
+      "acceptance": [
+        {
+          "criterion": "The market map covers distribution ecosystems and relevant planning, processing, implementation, review, validation, documentation and domain candidates with dated primary sources.",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/plugin-system/market-source-review.json",
+              "sha256": "ae97136dfc30a329d962df384e9a7c7df8526cb3225297931f5132ea6987eb60"
+            }
+          ],
+          "required": true,
+          "result": "pass"
+        },
+        {
+          "criterion": "Candidate records distinguish adoption signals from demonstrated outcomes and identify revision, maintenance, license, dependencies and host/flavor compatibility.",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/plugin-system/market-source-review.json",
+              "sha256": "ae97136dfc30a329d962df384e9a7c7df8526cb3225297931f5132ea6987eb60"
+            }
+          ],
+          "required": true,
+          "result": "pass"
+        },
+        {
+          "criterion": "The research defines a justified comparison shortlist and bounded evaluation plan, including both supplied pilots and unsupported or unqualified cases.",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/plugin-system/market-source-review.json",
+              "sha256": "ae97136dfc30a329d962df384e9a7c7df8526cb3225297931f5132ea6987eb60"
+            }
+          ],
+          "required": true,
+          "result": "pass"
+        }
+      ],
+      "boundary_validation": "not-required",
+      "check_results": [
+        {
+          "check": {
+            "assertion": "The market map covers distribution ecosystems and relevant planning, processing, implementation, review, validation, documentation and domain candidates with dated primary sources. Candidate records distinguish adoption signals from demonstrated outcomes and identify revision, maintenance, license, dependencies and host/flavor compatibility. The research defines a justified comparison shortlist and bounded evaluation plan, including both supplied pilots and unsupported or unqualified cases.",
+            "criteria": [
+              "The market map covers distribution ecosystems and relevant planning, processing, implementation, review, validation, documentation and domain candidates with dated primary sources.",
+              "Candidate records distinguish adoption signals from demonstrated outcomes and identify revision, maintenance, license, dependencies and host/flavor compatibility.",
+              "The research defines a justified comparison shortlist and bounded evaluation plan, including both supplied pilots and unsupported or unqualified cases."
+            ],
+            "id": "market-source-review",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/documents/plugin-system-research.md",
+              ".skill-tree/history/research/plugin-market-map.json",
+              ".skill-tree/documents/plugin-market-research.md"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "The market map covers distribution ecosystems and relevant planning, processing, implementation, review, validation, documentation and domain candidates with dated primary sources. Candidate records distinguish adoption signals from demonstrated outcomes and identify revision, maintenance, license, dependencies and host/flavor compatibility. The research defines a justified comparison shortlist and bounded evaluation plan, including both supplied pilots and unsupported or unqualified cases.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-7f0722f7-84bf-4d4e-a317-8b726813d7e5",
+            "classification": "executed-control",
+            "cleanup": "Read-only source review and local static checks completed; no candidate process, native host session or product runtime was started.",
+            "definition": "fefee39001c313b7fc1716b87e62aa1a45660db9fcd22f3a256dd97af7c4f474",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/plugin-system/market-source-review.json",
+                "sha256": "ae97136dfc30a329d962df384e9a7c7df8526cb3225297931f5132ea6987eb60"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "0e80f0cfcfbeb1aa6fdf749b367d116c1b691ea7ed7bc1d14c3ed3e67c304c61",
+            "payload_hash": "d61877d782551ec272e955d72ddecce9a350a98cbaa4c48c7e48d9444cbc8f57",
+            "recorded_at": "2026-11-05T13:44:29.447819+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/documents/plugin-market-research.md": "cdedbf889a7136f8390089b0d70448c59de91e6622e6a23c9c222da744852621",
+              ".skill-tree/documents/plugin-system-research.md": "6a8062f4bb9c39abc9f0e1ef513d6af2e2f50a2b0f8616b30007c8e6bd718205",
+              ".skill-tree/history/research/plugin-market-map.json": "031c37aa5827f4b3193589ea45bcc8d34dd985522425555c8c0245f2683c00f0"
+            }
+          }
+        }
+      ],
+      "commits": [],
+      "depends_on": [],
+      "disposition": "completed",
+      "evidence": [
+        {
+          "available": true,
+          "path": ".skill-tree/history/validation/plugin-system/market-source-review.json",
+          "sha256": "ae97136dfc30a329d962df384e9a7c7df8526cb3225297931f5132ea6987eb60"
+        }
+      ],
+      "followup_ids": [],
+      "id": "O-f6a04cbc-50b5-487e-bbb4-c6d9587df89e",
+      "limitations": [
+        "No target-workflow comparison, candidate invocation or runtime qualification occurred; recommendations remain empty and task114 requires actual owner agreement before trials."
+      ],
+      "outcome": "The dated market map records38 pinned candidate entries with source, license, dependency, maintenance, host/flavor and outcome evidence, a justified shortlist and a finite proposed comparison.",
+      "parent_pending_ids": [
+        "P-3f7df14a-88b7-48c8-ac14-eaef552d08aa"
+      ],
+      "recorded_at": "2026-11-05T13:44:34.657368+00:00",
+      "related_task_id": null,
+      "root_task_id": "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+      "source_fingerprints": {
+        ".skill-tree/documents/plugin-market-research.md": "cdedbf889a7136f8390089b0d70448c59de91e6622e6a23c9c222da744852621",
+        ".skill-tree/documents/plugin-system-research.md": "6a8062f4bb9c39abc9f0e1ef513d6af2e2f50a2b0f8616b30007c8e6bd718205",
+        ".skill-tree/history/research/plugin-market-map.json": "031c37aa5827f4b3193589ea45bcc8d34dd985522425555c8c0245f2683c00f0"
+      },
+      "task_id": "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "title": "Build a dated evidence map of the external skill market",
+      "validation_group_id": null,
+      "validation_plan": [
+        {
+          "assertion": "The market map covers distribution ecosystems and relevant planning, processing, implementation, review, validation, documentation and domain candidates with dated primary sources. Candidate records distinguish adoption signals from demonstrated outcomes and identify revision, maintenance, license, dependencies and host/flavor compatibility. The research defines a justified comparison shortlist and bounded evaluation plan, including both supplied pilots and unsupported or unqualified cases.",
+          "criteria": [
+            "The market map covers distribution ecosystems and relevant planning, processing, implementation, review, validation, documentation and domain candidates with dated primary sources.",
+            "Candidate records distinguish adoption signals from demonstrated outcomes and identify revision, maintenance, license, dependencies and host/flavor compatibility.",
+            "The research defines a justified comparison shortlist and bounded evaluation plan, including both supplied pilots and unsupported or unqualified cases."
+          ],
+          "id": "market-source-review",
+          "parameters": {},
+          "recipe_id": "static-inspection",
+          "sources": [
+            ".skill-tree/documents/plugin-system-research.md",
+            ".skill-tree/history/research/plugin-market-map.json",
+            ".skill-tree/documents/plugin-market-research.md"
+          ],
+          "timing": "immediate"
+        }
+      ],
+      "validation_signature": "fefee39001c313b7fc1716b87e62aa1a45660db9fcd22f3a256dd97af7c4f474"
+    }
+  ],
+  "progress_changes": [
+    {
+      "after": null,
+      "before": {
+        "admission": {
+          "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+          "flavor": "general",
+          "identity": "8c1b83e0842048aa830c643c0388c4e18fa625d2a26d0291084462acd084e1b8"
+        },
+        "checks": {
+          "market-source-review": {
+            "attempt": {
+              "attempt_id": "C-7f0722f7-84bf-4d4e-a317-8b726813d7e5",
+              "definition": "fefee39001c313b7fc1716b87e62aa1a45660db9fcd22f3a256dd97af7c4f474",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "key": "0e80f0cfcfbeb1aa6fdf749b367d116c1b691ea7ed7bc1d14c3ed3e67c304c61",
+              "launch": null,
+              "prepared_at": "2026-11-05T13:39:30.622724+00:00",
+              "recipe": {
+                "assertion_contract": "explicit source and artifact assertions",
+                "input_paths": [],
+                "lane": "static"
+              },
+              "sources": {
+                ".skill-tree/documents/plugin-market-research.md": "cdedbf889a7136f8390089b0d70448c59de91e6622e6a23c9c222da744852621",
+                ".skill-tree/documents/plugin-system-research.md": "6a8062f4bb9c39abc9f0e1ef513d6af2e2f50a2b0f8616b30007c8e6bd718205",
+                ".skill-tree/history/research/plugin-market-map.json": "031c37aa5827f4b3193589ea45bcc8d34dd985522425555c8c0245f2683c00f0"
+              }
+            },
+            "receipts": {
+              "C-7f0722f7-84bf-4d4e-a317-8b726813d7e5": {
+                "actual_lane": "static",
+                "assertions": [
+                  {
+                    "assertion": "The market map covers distribution ecosystems and relevant planning, processing, implementation, review, validation, documentation and domain candidates with dated primary sources. Candidate records distinguish adoption signals from demonstrated outcomes and identify revision, maintenance, license, dependencies and host/flavor compatibility. The research defines a justified comparison shortlist and bounded evaluation plan, including both supplied pilots and unsupported or unqualified cases.",
+                    "result": "pass"
+                  }
+                ],
+                "attempt_id": "C-7f0722f7-84bf-4d4e-a317-8b726813d7e5",
+                "classification": "executed-control",
+                "cleanup": "Read-only source review and local static checks completed; no candidate process, native host session or product runtime was started.",
+                "definition": "fefee39001c313b7fc1716b87e62aa1a45660db9fcd22f3a256dd97af7c4f474",
+                "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/market-source-review.json",
+                    "sha256": "ae97136dfc30a329d962df384e9a7c7df8526cb3225297931f5132ea6987eb60"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "0e80f0cfcfbeb1aa6fdf749b367d116c1b691ea7ed7bc1d14c3ed3e67c304c61",
+                "payload_hash": "d61877d782551ec272e955d72ddecce9a350a98cbaa4c48c7e48d9444cbc8f57",
+                "recorded_at": "2026-11-05T13:44:29.447819+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/documents/plugin-market-research.md": "cdedbf889a7136f8390089b0d70448c59de91e6622e6a23c9c222da744852621",
+                  ".skill-tree/documents/plugin-system-research.md": "6a8062f4bb9c39abc9f0e1ef513d6af2e2f50a2b0f8616b30007c8e6bd718205",
+                  ".skill-tree/history/research/plugin-market-map.json": "031c37aa5827f4b3193589ea45bcc8d34dd985522425555c8c0245f2683c00f0"
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "static",
+              "assertions": [
+                {
+                  "assertion": "The market map covers distribution ecosystems and relevant planning, processing, implementation, review, validation, documentation and domain candidates with dated primary sources. Candidate records distinguish adoption signals from demonstrated outcomes and identify revision, maintenance, license, dependencies and host/flavor compatibility. The research defines a justified comparison shortlist and bounded evaluation plan, including both supplied pilots and unsupported or unqualified cases.",
+                  "result": "pass"
+                }
+              ],
+              "attempt_id": "C-7f0722f7-84bf-4d4e-a317-8b726813d7e5",
+              "classification": "executed-control",
+              "cleanup": "Read-only source review and local static checks completed; no candidate process, native host session or product runtime was started.",
+              "definition": "fefee39001c313b7fc1716b87e62aa1a45660db9fcd22f3a256dd97af7c4f474",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/market-source-review.json",
+                  "sha256": "ae97136dfc30a329d962df384e9a7c7df8526cb3225297931f5132ea6987eb60"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "0e80f0cfcfbeb1aa6fdf749b367d116c1b691ea7ed7bc1d14c3ed3e67c304c61",
+              "payload_hash": "d61877d782551ec272e955d72ddecce9a350a98cbaa4c48c7e48d9444cbc8f57",
+              "recorded_at": "2026-11-05T13:44:29.447819+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/documents/plugin-market-research.md": "cdedbf889a7136f8390089b0d70448c59de91e6622e6a23c9c222da744852621",
+                ".skill-tree/documents/plugin-system-research.md": "6a8062f4bb9c39abc9f0e1ef513d6af2e2f50a2b0f8616b30007c8e6bd718205",
+                ".skill-tree/history/research/plugin-market-map.json": "031c37aa5827f4b3193589ea45bcc8d34dd985522425555c8c0245f2683c00f0"
+              }
+            }
+          }
+        },
+        "definition": "fefee39001c313b7fc1716b87e62aa1a45660db9fcd22f3a256dd97af7c4f474",
+        "execution_sessions": {},
+        "partial_work": [
+          ".skill-tree/documents/plugin-market-research.md",
+          ".skill-tree/history/research/plugin-market-map.json",
+          ".skill-tree/documents/plugin-system-research.md",
+          ".skill-tree/documents/agent-compatibility.md"
+        ],
+        "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+        "stage": "awaiting-validation"
+      },
+      "task_id": "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d"
+    }
+  ],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+  "schema": 1,
+  "sequence": 52
+}

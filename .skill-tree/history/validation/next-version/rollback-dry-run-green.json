@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-installation-integrity.js"
+  ],
+  "assertion": "Accepted dry-run requests preserve installation state.",
+  "check_id": "regression",
+  "counts": {
+    "discovered": 23,
+    "expected": 23,
+    "failed": 0,
+    "passed": 23,
+    "skipped": 0
+  },
+  "log_path": ".skill-tree/artifacts/next-version/rollback-dry-run-green.log",
+  "log_sha256": "152d6a41b81c69783ee3ffb6086c4852f557f41979e8a9c4d4a0d4545833e124",
+  "phase": "green",
+  "task_id": "T-8ad254c8-6df6-476c-81e1-082efba07019"
+}

@@ -1,0 +1,46 @@
+{
+  "anchors": [
+    "workflow-state.py:clarification_tasks",
+    "workflow-state.py:clarification_questions",
+    "workflow-state.py:clarification_round",
+    "workflow-state.py:clarification_evidence",
+    "workflow-state.py:clarification_guard",
+    "workflow-state.py:clarification_revise",
+    "workflow-state.py:clarification_mutate",
+    "workflow-state.py:clarification_semantics",
+    "workflow-state.py:clarification_invalidate"
+  ],
+  "attempt_id": "C-7d046848-891f-44cc-8a03-33525aaaf4f3",
+  "check_id": "clarification-contract",
+  "criteria": [
+    "The shared protocol defines exact task/group scope, dependency-ordered question rounds, source facts, actual owner answers, guarded revisions and interruption/resume.",
+    "Completion requires concrete goals, scope, dependencies, acceptance and feasible validation, no unresolved mandatory decisions and actual owner confirmation bound to the current task revision.",
+    "The shared loop derives from the inspected upstream grilling protocol and supports explicit clarification without a generic plugin engine; the planned post-processing adapter reuses the same loop.",
+    "The contract separates complete-content write guards from semantic confirmation identity; formatting-only edits preserve confirmation, semantic edits reopen affected answers and final confirmation, and unrelated answers remain valid."
+  ],
+  "limitations": [
+    "Static current contract revalidation only; no new host/native execution or revised terminal outcome is claimed."
+  ],
+  "observations": [
+    "Exact unique selected T identities, canonical session isolation and parked state neutrality remain explicit.",
+    "clarification_questions/clarification_round retain prerequisite frontier and current clarity; clarification_evidence accepts actual owner-message/submitted-answer evidence rather than recommendations or silence.",
+    "clarification_guard/revise/mutate retain complete-content/session guards, exact task/provenance preservation and current exact-scope/semantic confirmation.",
+    "clarification_semantics/invalidate retain formatting equivalence, affected-answer reopening and unrelated answers.",
+    "The inspected pinned upstream grilling derivation and shared explicit loop remain separate from the future generic plugin adapter.",
+    "The new cached plugin-generation admission guard affects implementation admission, supplies no answers and removes no clarification hold.",
+    "Current W1 Auto/Manual policy remains approved future implementation; the current manual controller and original terminal outcome remain unchanged."
+  ],
+  "result": "pass",
+  "reviewers": [
+    "Root source and current manual-state inspection",
+    "Independent /root/w1_foundation_research complete four-criterion/five-source review"
+  ],
+  "source_fingerprints": {
+    ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+    ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+    ".skill-tree/common/scripts/workflow-state.py": "f531546773a653809e09af093a1dddfacca763517b13cebf9b00673ab959737f",
+    ".skill-tree/documents/plugin-system-research.md": "df72f246f13a3a4186a0035f9dec75b3dcc9dcc511de1ecf66a7bc0c62462a31",
+    ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec"
+  },
+  "task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa"
+}

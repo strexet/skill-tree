@@ -1,0 +1,334 @@
+{
+  "acceptance": {
+    "actor": {
+      "context_id": "/root/plan_full_flow_review",
+      "id": "/root/plan_full_flow_review"
+    },
+    "answer": "revise",
+    "attempt_id": "DA-1104f5b7-e7a1-483f-a62e-be2b657f380b",
+    "authority_digest": "556c2bf6e342789bf72381588c679c861e8a4fdca1280ac9f54d73ead5d00b2f",
+    "context_identity": {
+      "decision_purpose": "plan",
+      "execution_snapshot_digest": "941d19ff6c8ad07dcf3f97f250025edd6ed0342ac3e88da4db8189b58191b517",
+      "id": "task:T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "kind": "task",
+      "orchestration_id": "DO-d49ac4a6-1e7c-5849-af1b-ca15b4fbd7b9",
+      "plan_digest": "96744edb2814d4ac201ddd943237b55d2432869b103c2cf4bbf7d3e1d4cec982",
+      "required_checks_digest": "6c9ac759ee228409db73ce5788f8a5f9f33175be01f2d30dcabf341d73f87917",
+      "task_ids": [
+        "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69"
+      ]
+    },
+    "decision_id": "DG-c836250b-75e7-55e3-bdca-e1c41b03fb52",
+    "digest": "4a2af36c0841940795d47baf0fdbfe9f19b4619bbb2628932d237a0f0d4b7f85",
+    "kind": "specification-acceptance",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/plan_full_flow_review",
+      "actor_id": "/root/plan_full_flow_review",
+      "creation_reference": "Observed separately created existing /root/plan_full_flow_review context; actual arbiter for the exact current optional post-processing plan, independent of root executor.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/plan_full_flow_review returned the observed arbiter result for the exact original sealed input; raw artifact processing115-arbiter-plan1-actual.json.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "8a223760dc8c1b57ef8405478ef26f29714d5e537eb1ebe324fddfd2d169b578",
+    "question_id": "processing115-plan",
+    "rationale": "The resolver is correct that atomic publication, one shared CL, real current-mode answers, contiguous revision evidence and exact mechanical finalization are suitably bounded. The critic identifies a material completion gap in the exact sealed plan: line23 explains how an explicit later C editor satisfies a recheck, but supplies no executable path for A-editor then B-interview when B semantically revises the task and C is absent. Existing plugin-invocation start/prepare creates stages from the entire frozen configuration and advances a satisfied prefix; it cannot selectively revisit accepted A. Node frozenPlan independently reconstructs the full owned configuration and rejects a caller-supplied reduced configuration. Preserving a stale A or restarting B violates the approved affected-recheck contract; permanently holding an otherwise supported configuration is not completion. Revise narrowly: the owning CL registers an exact affected editorial recheck mandate derived from the frozen original occurrence, application role, parameters/package/configuration/watch identity, current task fingerprints and current mode/authority/epoch. Execute the mandate as one fresh ordinary HC/HI through the existing prepare/invoke/record/accept path. Existing owned manifest reconstruction must validate the original frozen configuration and derive only that authenticated affected selection; arbitrary caller subsets, parameters or completed chains cannot authorize the recheck. Preserve the original HC/HI and accepted prefix unchanged, with no second actor broker or independent ledger. Final acceptance may consume only the exact CL-registered current recheck result. A matching explicit C can discharge the same obligation once and creates no fourth invocation. Add actual A-B-without-C and editor-only post-revision controls, repeated editorial occurrences/parameters, no B replay, matching C reuse, forged or stale mandate/subset rejection and source/policy drift. Retain current prerequisite, provenance, final-acceptance and exact finalization guards. This is a bounded technical plan repair within task115, not acceptance of implementation, candidate efficacy, installation consent or task114 trials.",
+    "role_receipts": {
+      "arbiter": "9c6d8df16b9a17a15b6f581e011cefe805c40d327f9c12cd89bcafd0c0b7114d",
+      "critic": "31f2b52770007999be132be4fb4acd84d3a9b80809ffef07833849bdeab742c4",
+      "resolver": "252f1c315ba9c169d63583dbbbf9a9f61007fff1d387cd93f92ef6654f27afca"
+    },
+    "semantic_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28"
+  },
+  "active_attempt_id": null,
+  "attempts": {
+    "DA-1104f5b7-e7a1-483f-a62e-be2b657f380b": {
+      "actor": {
+        "context_id": "/root/plan_full_flow_review",
+        "id": "/root/plan_full_flow_review"
+      },
+      "authority_digest": "556c2bf6e342789bf72381588c679c861e8a4fdca1280ac9f54d73ead5d00b2f",
+      "basis_digest": "d1b64a236d348fe3547a9328cfaf9ab0d5da1ffa2ad012a02a82fbce9aabb60c",
+      "content_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+      "evidence": {
+        "actor_context_id": "/root/plan_full_flow_review",
+        "actor_id": "/root/plan_full_flow_review",
+        "creation_reference": "Observed separately created existing /root/plan_full_flow_review context; actual arbiter for the exact current optional post-processing plan, independent of root executor.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/plan_full_flow_review returned the observed arbiter result for the exact original sealed input; raw artifact processing115-arbiter-plan1-actual.json.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-1104f5b7-e7a1-483f-a62e-be2b657f380b",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "8a223760dc8c1b57ef8405478ef26f29714d5e537eb1ebe324fddfd2d169b578",
+      "result": {
+        "answer": "revise",
+        "evidence": [
+          ".skill-tree/artifacts/plugin-implementation/processing115-sealed-arbiter.json",
+          ".skill-tree/artifacts/plugin-implementation/processing115-resolver-plan1-actual.json",
+          ".skill-tree/artifacts/plugin-implementation/processing115-critic-plan1-actual.json",
+          ".skill-tree/history/research/processing115-plan.md:23",
+          ".skill-tree/common/scripts/plugin-invocation.py:225",
+          ".skill-tree/common/scripts/plugin-invocation.py:345",
+          ".skill-tree/lib/plugin-runtime.js:52",
+          ".skill-tree/lib/plugin-runtime.js:86",
+          ".skill-tree/common/references/plugin-invocation.md:87"
+        ],
+        "input_digest": "a3c3a167461768486f631f1ce4359cb8571d0eeac2bad0176544d95e7811296d",
+        "rationale": "The resolver is correct that atomic publication, one shared CL, real current-mode answers, contiguous revision evidence and exact mechanical finalization are suitably bounded. The critic identifies a material completion gap in the exact sealed plan: line23 explains how an explicit later C editor satisfies a recheck, but supplies no executable path for A-editor then B-interview when B semantically revises the task and C is absent. Existing plugin-invocation start/prepare creates stages from the entire frozen configuration and advances a satisfied prefix; it cannot selectively revisit accepted A. Node frozenPlan independently reconstructs the full owned configuration and rejects a caller-supplied reduced configuration. Preserving a stale A or restarting B violates the approved affected-recheck contract; permanently holding an otherwise supported configuration is not completion. Revise narrowly: the owning CL registers an exact affected editorial recheck mandate derived from the frozen original occurrence, application role, parameters/package/configuration/watch identity, current task fingerprints and current mode/authority/epoch. Execute the mandate as one fresh ordinary HC/HI through the existing prepare/invoke/record/accept path. Existing owned manifest reconstruction must validate the original frozen configuration and derive only that authenticated affected selection; arbitrary caller subsets, parameters or completed chains cannot authorize the recheck. Preserve the original HC/HI and accepted prefix unchanged, with no second actor broker or independent ledger. Final acceptance may consume only the exact CL-registered current recheck result. A matching explicit C can discharge the same obligation once and creates no fourth invocation. Add actual A-B-without-C and editor-only post-revision controls, repeated editorial occurrences/parameters, no B replay, matching C reuse, forged or stale mandate/subset rejection and source/policy drift. Retain current prerequisite, provenance, final-acceptance and exact finalization guards. This is a bounded technical plan repair within task115, not acceptance of implementation, candidate efficacy, installation consent or task114 trials.",
+        "role": "arbiter",
+        "status": "answered"
+      },
+      "role": "arbiter",
+      "semantic_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+      "status": "answered"
+    },
+    "DA-74fd808a-8ec7-4ebc-b2d6-6107e089bfd7": {
+      "actor": {
+        "context_id": "/root/registry117_architecture",
+        "id": "/root/registry117_architecture"
+      },
+      "authority_digest": "556c2bf6e342789bf72381588c679c861e8a4fdca1280ac9f54d73ead5d00b2f",
+      "basis_digest": "d526b8c97b29318a39c758c2927ebceaeac685710030b800513c7db54bb73a44",
+      "content_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+      "evidence": {
+        "actor_context_id": "/root/registry117_architecture",
+        "actor_id": "/root/registry117_architecture",
+        "creation_reference": "Observed separately created existing /root/registry117_architecture context; actual critic for the exact current optional post-processing plan, independent of root executor.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/registry117_architecture returned the observed critic result for the exact original sealed input; raw artifact processing115-critic-plan1-actual.json.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-74fd808a-8ec7-4ebc-b2d6-6107e089bfd7",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "8a223760dc8c1b57ef8405478ef26f29714d5e537eb1ebe324fddfd2d169b578",
+      "result": {
+        "answer": "revise",
+        "evidence": [
+          ".skill-tree/artifacts/plugin-implementation/processing115-sealed-critic.json",
+          ".skill-tree/history/research/processing115-plan.md",
+          ".skill-tree/artifacts/plugin-implementation/task115-source-gap-proposal.json",
+          ".skill-tree/documents/implementation-plan.md:50",
+          ".skill-tree/documents/implementation-plan.md:65",
+          ".skill-tree/common/scripts/plugin-invocation.py",
+          ".skill-tree/lib/plugin-runtime.js",
+          ".skill-tree/lib/plugin-bindings.js",
+          ".skill-tree/lib/plugin-composition.js",
+          ".skill-tree/common/scripts/workflow-state.py"
+        ],
+        "input_digest": "cd4f399df814148964fcf448948006942b5ce159943d1978df8678e54f92d08b",
+        "rationale": "The plan adequately bounds atomic blocked publication, real current-mode answers, multi-round contiguous CL revision evidence and exact marker/status finalization. Existing requirementPlan is metadata-only and deliberately skips the business handler; actual Pending/proposal/source/allocated-T validation before inspection and inside the Process writer can authenticate prospective output inspection without inventing a new Node endpoint. One material implementation gap remains: the editor A then interview B configuration with no explicit C. After B changes the task, A's accepted wording input is stale and the agreed contract requires an affected editorial recheck without restarting B or replaying the whole prefix. The plan explains how an explicit current C discharges that obligation but does not define the no-C path. Current engine cursor/resume only retries the current original and cannot selectively replay an accepted stage; Node frozenPlan rebuilds the full verified configuration and rejects an arbitrary reduced configuration. Merely retaining the hold leaves a supported configuration unable to finish; silently reusing A or restarting B violates acceptance. Revise narrowly to define an owned CL-bound recheck execution: preserve the original HC/HI and accepted prefix unchanged, derive a fresh affected editorial-only recheck mandate from the frozen original occurrence/parameters/current task fingerprint/current policy, validate that mandate through the existing dispatcher and record the fresh actual HC/HI as an exact CL-registered recheck. The trusted mandate may authorize only the affected subset; caller parameters or arbitrary completed chains cannot supply it. A matching explicit C discharges the same obligation once without another call. Add A-B-without-C, editor-only post-revision, repeated compatible editorial occurrence and forged/stale subset controls. Keep shared CL question rounds, original B execution, task provenance, exact finalization mapping, capability/Auto authority holds and all qualification limits intact.",
+        "status": "disagree"
+      },
+      "role": "critic",
+      "semantic_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+      "status": "disagree"
+    },
+    "DA-a0721c02-fc63-456c-bf68-392255d73a6d": {
+      "actor": {
+        "context_id": "/root/invocation118_oracle",
+        "id": "/root/invocation118_oracle"
+      },
+      "authority_digest": "556c2bf6e342789bf72381588c679c861e8a4fdca1280ac9f54d73ead5d00b2f",
+      "basis_digest": null,
+      "content_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+      "evidence": {
+        "actor_context_id": "/root/invocation118_oracle",
+        "actor_id": "/root/invocation118_oracle",
+        "creation_reference": "Observed separately created existing /root/invocation118_oracle context; actual resolver for the exact current optional post-processing plan, independent of root executor.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/invocation118_oracle returned the observed resolver result for the exact original sealed input; raw artifact processing115-resolver-plan1-actual.json.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-a0721c02-fc63-456c-bf68-392255d73a6d",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "8a223760dc8c1b57ef8405478ef26f29714d5e537eb1ebe324fddfd2d169b578",
+      "result": {
+        "answer": "accept",
+        "evidence": [
+          ".skill-tree/artifacts/plugin-implementation/processing115-sealed-resolver.json",
+          ".skill-tree/history/research/processing115-plan.md",
+          ".skill-tree/artifacts/plugin-implementation/task115-source-gap-proposal.json",
+          ".skill-tree/artifacts/plugin-implementation/task115-source/source-manifest.json",
+          ".skill-tree/artifacts/plugin-implementation/task115-source/task115-adapter-source-proposal.json",
+          ".skill-tree/artifacts/plugin-implementation/task115-source/skills/productivity/writing-for-agents/SKILL.md",
+          ".skill-tree/artifacts/plugin-implementation/task115-source/skills/productivity/grill-me/SKILL.md",
+          ".skill-tree/artifacts/plugin-implementation/task115-source/skills/productivity/grilling/SKILL.md",
+          ".skill-tree/common/scripts/workflow-state.py",
+          ".skill-tree/common/scripts/plugin-invocation.py",
+          ".skill-tree/documents/plugin-workflow-decisions.md"
+        ],
+        "input_digest": "9ba095d8d4a812770bb25541f7d3d85cdb312876b519ac5e6daf772ced8ed8ae",
+        "rationale": "The plan is sufficient for the admitted optional post-processing application scope. The current process implementation publishes Ready tasks without a linked CL, while Store.save already supports atomic extra records; the proposed first Red therefore tests the actual missing business boundary. Trusted generic application roles, frozen configuration and exact output ownership preserve arbitrary compatible ordering, repeated occurrences and core-only behavior without candidate-ID routing. The plan separates raw pinned upstream instructions and user-only/native metadata from the explicitly declared source-backed translation, retains the grilling sibling and license, and requires real fresh fact exploration where needed. One CL owns dependent rounds, actual current-mode answers, guarded revisions and separate final acceptance; contiguous revision evidence closes the multi-round gap without restarting the external interview. Current-input editorial rechecks remain distinct from configured calls, and a matching later C pass can discharge the affected recheck once. Exact finalization is narrowly limited to the recorded owned marker/status transformation, live after-bytes, current CL policy/acceptance and registered original completed HC hashes; it preserves original HC and confirmation history and cannot normalize arbitrary edits. Required hold, drift, cancellation, mode-switch, cleanup and adversarial controls are explicit. The reviewed footprint may use existing helper/runtime seams only after concrete touched sources enter validation. This accepts the implementation plan, not successful execution, installation consent, native/candidate effectiveness or task114 trials.",
+        "role": "resolver",
+        "status": "answered"
+      },
+      "role": "resolver",
+      "semantic_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+      "status": "answered"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the admitted optional pinned task-editorial and interview applications and completed dependency scope; controlled local installation fixtures use scripted test input. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+    ],
+    "context_id": "task:T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+    },
+    "id": "approved-processing115",
+    "revision": 1
+  },
+  "authority_digest": "556c2bf6e342789bf72381588c679c861e8a4fdca1280ac9f54d73ead5d00b2f",
+  "context": {
+    "content_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+    "decision_purpose": "plan",
+    "execution_snapshot_digest": "941d19ff6c8ad07dcf3f97f250025edd6ed0342ac3e88da4db8189b58191b517",
+    "id": "task:T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+    "kind": "task",
+    "orchestration_id": "DO-d49ac4a6-1e7c-5849-af1b-ca15b4fbd7b9",
+    "plan_digest": "96744edb2814d4ac201ddd943237b55d2432869b103c2cf4bbf7d3e1d4cec982",
+    "required_checks_digest": "6c9ac759ee228409db73ce5788f8a5f9f33175be01f2d30dcabf341d73f87917",
+    "semantic_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+    "task_ids": [
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69"
+    ]
+  },
+  "decision_hash": "785c3aa3c67b48a70222700e4d8b69e1bc363228efebadfb12328a043e8126d6",
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "frontier_epoch": 1,
+  "history": [
+    {
+      "context_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+      "detail": {},
+      "event": "started",
+      "mode_epoch": 1,
+      "previous_record_hash": null,
+      "sequence": 1
+    },
+    {
+      "context_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+      "detail": {
+        "attempt_id": "DA-a0721c02-fc63-456c-bf68-392255d73a6d",
+        "role": "resolver"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "ced42a82165eaec592027cebe61c06e88cfbc1cb8ae621b617ebfc585cb09235",
+      "sequence": 2
+    },
+    {
+      "context_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+      "detail": {
+        "attempt_id": "DA-a0721c02-fc63-456c-bf68-392255d73a6d",
+        "status": "answered"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "e5e5378d7affefb12e8d29cb8cea338ac7d4fe225a7b5997a114d0a542313a9f",
+      "sequence": 3
+    },
+    {
+      "context_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+      "detail": {
+        "attempt_id": "DA-74fd808a-8ec7-4ebc-b2d6-6107e089bfd7",
+        "role": "critic"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "2a45f3eee19d75a93948728434ef904bff32fe3fe74cca1674e629c4cebecaa9",
+      "sequence": 4
+    },
+    {
+      "context_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+      "detail": {
+        "attempt_id": "DA-74fd808a-8ec7-4ebc-b2d6-6107e089bfd7",
+        "status": "disagree"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "942026b71b74e8d47e2452b71c26a9fb97f0a059de2d0d82a07282406e5aa5f1",
+      "sequence": 5
+    },
+    {
+      "context_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+      "detail": {
+        "attempt_id": "DA-1104f5b7-e7a1-483f-a62e-be2b657f380b",
+        "role": "arbiter"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "c1b5dcc5034013dde138e4f2d617bc1725a483986b6d9e63dcbe9575c5c95024",
+      "sequence": 6
+    },
+    {
+      "context_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+      "detail": {
+        "attempt_id": "DA-1104f5b7-e7a1-483f-a62e-be2b657f380b",
+        "status": "answered"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "677ee71bd1a6d872b86a294e2386988d60025262d80047b9e53a208e462b8d4b",
+      "sequence": 7
+    },
+    {
+      "context_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+      "detail": {
+        "acceptance_digest": "4a2af36c0841940795d47baf0fdbfe9f19b4619bbb2628932d237a0f0d4b7f85"
+      },
+      "event": "accept",
+      "mode_epoch": 1,
+      "previous_record_hash": "dfa781af06219f4e15efe96de289882a44265f8af9e8e703535b10ee1189762d",
+      "sequence": 8
+    }
+  ],
+  "id": "DG-c836250b-75e7-55e3-bdca-e1c41b03fb52",
+  "mode": "auto",
+  "mode_epoch": 1,
+  "prepared_attempt_id": "DA-1104f5b7-e7a1-483f-a62e-be2b657f380b",
+  "question": {
+    "id": "processing115-plan",
+    "kind": "specification-acceptance",
+    "options": [
+      {
+        "id": "accept",
+        "text": "Accept the current plan."
+      },
+      {
+        "id": "revise",
+        "text": "Revise the plan with concrete reasons."
+      }
+    ],
+    "plan_text": "# Post-processing task application plan\n\n## Scope and research\n\nThe admitted task T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69 supplies optional task-editorial and interview applications through the existing ordered plugin engine and shared clarification controller. The selected root and dependency boundary, core-only default, original owner W1/W2/W3 decisions and separate comparison task114 consent remain binding. Current source commit `6725b379`, the task115 source-gap proposal and pinned source acquisition provide the implementation baseline. The plan adds application orchestration inside existing Process/CL operations.\n\nThe exact Matt source revision is `4ae2317ddb22b046e26455e4f9c9b3aaaf62212d`. Original `writing-for-agents` entry, `SKILL-MECHANICS.md`, `grill-me` entry, `grilling` sibling and MIT LICENSE form two separately pinned resource closures. Optional adjacent host metadata remains original provenance. The wrapper retains original user-only metadata and literal native Skill requirement. The explicitly selected source-backed adapter translates sibling dispatch and W1 answer routing; native invocation and other-host support retain the actual unqualified state. Task wording uses task-document structure and constraints. Skill/document maintenance remains a separate application.\n\n## Application configuration and atomic publication\n\nTrusted frozen descriptor adaptation and explicit per-occurrence application settings identify task-editorial, task-interview and ordinary compatible contributions. Application roles receive bounded validation; candidate IDs and instruction prose supply no routing authority. Existing package acquisition, parameters, bindings, repeated occurrences, conditions, named boundary mapping and configuration digests remain the generic pipeline. Descriptor suggestions create no installed binding or automatic activation.\n\nProcessing preparation outside the writer derives actual selected Pending identities and proposed new/reused T identities from the guarded researched processing proposal. Trusted current requirement preparation freezes matching after-Processing occurrences, package/source/profile/watch identities, conditions, order, parameters and current decision policy. Metadata-only preparation starts no actor. Core-only and excluded/disabled optional configurations retain the current path and require no optional Node/provider capability. The existing transaction rechecks the exact observed identities before publishing.\n\nAn enabled applicable post-processing obligation publishes the visible T definition, owned blocking marker, shared CL record and frozen ordered obligations in one recoverable Store.save transaction. Stable task IDs, provenance and task relationships survive all rounds. Exact scope ownership prevents reused or split outputs from stealing another active session. Neither/editor-only/interview-only/both configurations use the same mechanism, with no intermediate implementable Ready interval.\n\n## Contribution, rework and current acceptance\n\nThe existing hook prepare/invoke/record/accept sequence owns actual isolated host dispatch and result provenance. The application adapter returns bounded wording proposals, concrete findings or dependent questions. Ordinary guarded CL commands apply task revisions and actual current-mode answers. The same session owns rounds, task revisions, affected rechecks and final specification acceptance. Editor-only semantic questions use core clarification while external interview execution remains absent. Internal questions do not restart the plugin; an explicitly repeated interview occurrence remains a separate configured call.\n\nApplication receipts bind the original chain/attempt/result, exact task/session/round and current policy. Required returned questions and findings receive actual guarded answer/revision/resolution evidence. A generic acknowledgement cannot complete the required interview. Multi-round incorporation verifies a contiguous exact revision path from the original stage input to the current task rather than pretending the final TR alone starts at the original input.\n\nEditorial proposals preserve stable identity, Pending/processing provenance, required task sections, constraints and dependencies. Semantic edits reopen affected answers and final acceptance; unrelated settled answers survive. Supported formatting equivalence retains semantic confirmation. An actual later configured editorial occurrence on the current accepted input satisfies the affected wording recheck under the frozen application policy. The explicit A-editor, B-interview, C-editor example executes both editorial occurrences with separate IDs and delivers accepted B additions to C. Matching current C evidence supplies the required recheck without a fabricated duplicate call. Stale wording results and unresolved configured occurrences retain the hold.\n\nAuto consumes actual bounded DG answers and a separate current delegated final specification decision. Manual consumes actual owner answers and confirmation. Current mode, authority and epoch remain guarded; switching reconciles original pending actors and retains history. Fresh factual exploration remains an observed independent prerequisite, including controller-owned delegation translation when nested spawning is unavailable. Unsupported asynchronous/conditional host paths retain visible prerequisites. Out-of-authority choices return to the owner.\n\nFrozen obligations survive cancellation, unavailable or adverse results, transport uncertainty, changed project defaults and package removal. Explicit accepted configuration reconciliation records a distinct policy change; removal/disable supplies no successful answer or invocation. Core/standalone processing handoffs and the existing no-progress stop remain intact.\n\n## Exact finalization\n\nThe visible owned blocking marker/status remains through plugin work and current final acceptance. Finalization removes only the exact recorded controller-owned marker and releases the owned status in the same guarded transaction. A CL-local receipt records before/after content and semantic maps, immutable task/provenance IDs, accepted mode/authority/epoch and exact registered completed HC IDs/hashes. Existing unresolved questions prevent Ready. The proof validates the mechanical transformation byte-for-byte; arbitrary content changes cannot use the mapping.\n\nOriginal HC input/context/history and original confirmation evidence remain immutable. Readiness and clarification admission may use the explicit finalization mapping only for the exact registered original result and live receipt.after task bytes under current CL acceptance/policy. Ordinary prepare/invoke and new hook contexts always use actual live tasks. Later semantic changes, source/policy drift or unrelated edits retain the established freshness rules and reopen affected obligations. This uses existing CL state and creates no second authoritative ledger or generic status/marker normalization.\n\n## Validation and delivery\n\nThe first meaningful failing fixture performs actual temporary owned installation and normal Processing with an enabled matching obligation. The first committed task must already be visibly blocked, linked to the actual CL/frozen requirement and unselectable before an HC starts; current source publishes Ready without CL and fails this behavior. A core-only positive control remains. Original pinned resources form inert fixture prerequisites rather than plugin runtime execution.\n\nFocused tests cover the four configurations; actual ordered A-B-C forwarding; repeated other compatible occurrences and changed order; strict task/provenance/constraint preservation; semantic versus formatting changes; current Auto/Manual answer and acceptance guards; no false interview in editorial-only mode; interrupted, stale, failed, unavailable, cancelled and removed obligations; pending attempts and mode switching; multi-round incorporation; exact mechanical release and adversarial bypasses; standalone installed closure and core-only routing. Synthetic host/owner controls retain the actual classification. Existing actual task118/task127 evidence supplies only the recorded bounded mechanism scope, not new candidate invocation or efficacy.\n\nTask-owned source/check footprints cover every touched helper, runtime, descriptor, reference, resource map and fixture before qualifying checks. Authored templates/common resources drive generation. Required focused checks and source synchronization, strict validation, Python/Node, installer list/dry-run and diff checks precede full independent source review and authorized local commit. Reviewed committed source activates through the owned stopped-handoff installer, preserving canonical state before same-run re-admission. Source/static/synthetic/installed qualification, actual native invocation and comparative recommendations remain separate claims.\n\n## Reviewed implementation footprint\n\nThe authored footprint includes `config/plugins/task-editorial.json`, `config/plugins/task-interview.json`, `common/scripts/workflow-state.py`, the existing `common/scripts/plugin-invocation.py` result/incorporation boundary when required, `common/references/future-workflow.md`, `common/references/workflow-metadata.md`, `common/references/plugin-invocation.md`, `templates/operations.json`, the processing tests and pinned fixture resources, applicable installed/copied test controls, and the existing plan/workflow/research documents. A small `common/scripts/plugin-processing.py` helper and matching `config/resource-map.json` entry are permitted if application logic otherwise obscures the existing controller; the helper owns no independent ledger or actor broker. Any necessary Node requirement preparation delta uses the existing runtime/composition/parameter boundaries and matching tests rather than another execution path. Source/fixture closure and concrete task validation footprints receive the same reviewed scope before qualifying checks.\n",
+    "recommendation": "accept",
+    "significance": "significant",
+    "text": "Accept the exact admitted optional post-processing task application plan, or request a bounded revision."
+  },
+  "request_id": "DO-d49ac4a6-1e7c-5849-af1b-ca15b4fbd7b9:question:1",
+  "revision": 8,
+  "schema": 1,
+  "start_digest": "187e92ee90c9c0d0a3c9a5644db766c3030371d9626ba5c8f4aaf6bfd0808f59",
+  "state": "accepted"
+}

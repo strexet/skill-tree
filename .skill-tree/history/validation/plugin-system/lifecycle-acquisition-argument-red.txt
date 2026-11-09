@@ -1,0 +1,29 @@
+TAP version 13
+# Subtest: synchronous Git argument rejection sanitizes credential locators and cleans the initialized temporary repository
+not ok 1 - synchronous Git argument rejection sanitizes credential locators and cleans the initialized temporary repository
+  ---
+  duration_ms: 24.146834
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/fixtures/plugin-acquisition-cases.js:43:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The validation function is expected to return "true". Received false
+    
+    Caught error:
+    
+    TypeError [ERR_INVALID_ARG_VALUE]: The argument 'args[13]' must be a string without null bytes. Received 'https://dummy-boundary-user:dummy-boundary-password@example.invalid/repository.git\x00'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/fixtures/plugin-acquisition-cases.js:49:4)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 91.878208

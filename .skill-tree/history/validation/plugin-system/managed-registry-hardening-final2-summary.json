@@ -1,0 +1,72 @@
+{
+  "formal_focused_counts": {
+    "composition": 44,
+    "copied": 17,
+    "python_state_bridge": 80
+  },
+  "full_repository_counts": {
+    "node": 281,
+    "python": 449
+  },
+  "full_review": ".skill-tree/history/validation/plugin-system/managed-registry-hardening-final-review2.json",
+  "identity": {
+    "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+    "head": "f5e3734795b0f77bbd672ec8cdd8844730494438",
+    "source_digest": "007e7d1d78c7b87dd1f51b09be4cd86ad21a302f1f1588dfad02477a7a364d31"
+  },
+  "qualification": "Current authored/generated source, deterministic copied/state fixtures and repository checks. No new actual native/provider or comparative plugin efficacy qualification. Historical actual observations remain immutable with conditional compatibility only when selected.",
+  "required_checks": [
+    {
+      "id": "managed-registry-composition",
+      "reference": ".skill-tree/history/validation/plugin-system/t-54439a41-286c-4423-936c-eb27663509c3-managed-registry-composition-c-2eac4863-4dfe-4b93-aebe-42f98c306c63.json",
+      "status": "passed"
+    },
+    {
+      "id": "managed-registry-copied-bridge",
+      "reference": ".skill-tree/history/validation/plugin-system/t-54439a41-286c-4423-936c-eb27663509c3-managed-registry-copied-bridge-c-35e257a2-d2bf-4354-9ca2-056f96646773.json",
+      "status": "passed"
+    },
+    {
+      "id": "invocation-prerequisite-admission",
+      "reference": ".skill-tree/history/validation/plugin-system/t-54439a41-286c-4423-936c-eb27663509c3-invocation-prerequisite-admission-c-b7749e7e-bee0-4ed0-8601-1a13909212c5.json",
+      "status": "passed"
+    },
+    {
+      "id": "sync-check",
+      "reference": ".skill-tree/history/validation/plugin-system/managed-registry-hardening-final2-sync-check.json",
+      "status": "passed"
+    },
+    {
+      "id": "strict-validation",
+      "reference": ".skill-tree/history/validation/plugin-system/managed-registry-hardening-final2-strict-validation.json",
+      "status": "passed"
+    },
+    {
+      "id": "python",
+      "reference": ".skill-tree/history/validation/plugin-system/managed-registry-hardening-final2-python.json",
+      "status": "passed"
+    },
+    {
+      "id": "node",
+      "reference": ".skill-tree/history/validation/plugin-system/managed-registry-hardening-final2-node.json",
+      "status": "passed"
+    },
+    {
+      "id": "installer-list",
+      "reference": ".skill-tree/history/validation/plugin-system/managed-registry-hardening-final2-installer-list.json",
+      "status": "passed"
+    },
+    {
+      "id": "installer-dry-run",
+      "reference": ".skill-tree/history/validation/plugin-system/managed-registry-hardening-final2-installer-dry-run.json",
+      "status": "passed"
+    },
+    {
+      "id": "diff-check",
+      "reference": ".skill-tree/history/validation/plugin-system/managed-registry-hardening-final2-diff-check.json",
+      "status": "passed"
+    }
+  ],
+  "source_freeze": ".skill-tree/history/validation/plugin-system/managed-registry-hardening-source-freeze2.json",
+  "task_id": "T-54439a41-286c-4423-936c-eb27663509c3"
+}

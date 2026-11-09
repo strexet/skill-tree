@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "node",
+    ".skill-tree/bin/install.js",
+    "--dry-run",
+    "--all",
+    "--target",
+    "{target}",
+    "--flavor",
+    "general"
+  ],
+  "changed_frozen_paths": [],
+  "cleanup_reserve_seconds": 20,
+  "exit_code": 0,
+  "hard_deadline_seconds": 120,
+  "name": "installer-dry-run",
+  "output": ".skill-tree/history/validation/plugin-system/processing115-final6-installer-dry-run.txt",
+  "qualification": "Deterministic source and isolated fixture qualification.",
+  "result": "pass",
+  "schema": 1,
+  "source_freeze": ".skill-tree/history/validation/plugin-system/processing115-final6-source-freeze.json",
+  "source_freeze_sha256": "36e5a6f1bb777e2f778fa5e2a54b9d1d9d9408513130c833b7b04e865c678a12",
+  "temporary_target_empty": true,
+  "timed_out": false,
+  "tool_wall_seconds": 7.0345177496783435
+}

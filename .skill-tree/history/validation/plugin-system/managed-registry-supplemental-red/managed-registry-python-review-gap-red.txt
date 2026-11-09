@@ -1,0 +1,61 @@
+FFFFFFF
+======================================================================
+FAIL: test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch (__main__.PluginInvocationTests.test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch) (kind='global', command='invoke')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 731, in test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch (__main__.PluginInvocationTests.test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch) (kind='global', command='record')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 731, in test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch (__main__.PluginInvocationTests.test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch) (kind='global', command='accept')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 731, in test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch (__main__.PluginInvocationTests.test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch) (kind='current', command='invoke')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 731, in test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch (__main__.PluginInvocationTests.test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch) (kind='current', command='record')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 731, in test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch (__main__.PluginInvocationTests.test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch) (kind='current', command='accept')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 731, in test_writer_transaction_consumes_a_new_applicable_hold_before_business_branch
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_completed_hook_admission_rechecks_prerequisite_only_hold_without_rewriting_history (__main__.PluginWorkflowBridgeTests.test_completed_hook_admission_rechecks_prerequisite_only_hold_without_rewriting_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1275, in test_completed_hook_admission_rechecks_prerequisite_only_hold_without_rewriting_history
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 2 tests in 7.183s
+
+FAILED (failures=7)

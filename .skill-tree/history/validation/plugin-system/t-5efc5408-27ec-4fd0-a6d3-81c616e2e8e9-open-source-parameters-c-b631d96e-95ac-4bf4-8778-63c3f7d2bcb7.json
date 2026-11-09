@@ -1,0 +1,54 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-plugin-sources.js"
+  ],
+  "attempt_id": "C-b631d96e-95ac-4bf4-8778-63c3f7d2bcb7",
+  "baseline": {
+    "last_accepted": {
+      "discovered": 38,
+      "expected": 38,
+      "failed": 0,
+      "passed": 38,
+      "skipped": 0
+    },
+    "original": {
+      "discovered": 38,
+      "expected": 38,
+      "failed": 0,
+      "passed": 38,
+      "skipped": 0
+    }
+  },
+  "check_id": "open-source-parameters",
+  "count_error": null,
+  "counts": {
+    "discovered": 38,
+    "expected": 38,
+    "failed": 0,
+    "passed": 38,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limitations": [
+    "Focused unit fixture evidence. No new actual actor or product qualification."
+  ],
+  "log_sha256": "b78367fd3ab75417c5612c9914f82f87ad3a65f684f13a6f9be61338b40e45ba",
+  "output": ".skill-tree/history/validation/plugin-system/t-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9-open-source-parameters-c-b631d96e-95ac-4bf4-8778-63c3f7d2bcb7.txt",
+  "owned_profile_identity": "56e828eacced91072ba944c318a5291a21b88be7f83b90a2248f53fdae95806a",
+  "process_group_clean": true,
+  "result": "pass",
+  "source_commit": "82eaf49b6cb35e65dfa30413228bddcb10190562",
+  "sources": {
+    ".skill-tree/documents/plugin-management-contract.md": "2b5c9aeb18dd30b06a809fd14e5222abf579a002187870167d61f6f7dda5b11a",
+    ".skill-tree/documents/plugin-system-contract.md": "b25424efd0dc920376a8d32b9dd7ea27d6b644d966e167f690c8999dc2fa36f5",
+    ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    ".skill-tree/lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+    ".skill-tree/lib/plugins.js": "ac1953986cb59aca438f29202816f7c5bcdbc0f156651b0ef88819dd00ea2acc",
+    ".skill-tree/tests/test-plugin-sources.js": "2dccdcbe210f1b8d24794f865eea0ffea830ad8ebe987dc1b7d09f0909b02b0e"
+  },
+  "task_id": "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+  "timed_out": false,
+  "tool_wall_seconds": 0.452
+}

@@ -1,0 +1,25 @@
+{
+  "canonical_before_refresh": {
+    ".skill-tree/clarifications/cl-17367e9a-121d-4130-be4a-e13d151acb46.json": "04fc8d15c5fce90779d57329413bd7a3e071479d73c333216f9edb3e029478db",
+    ".skill-tree/documents/future.json": "49724a22c86fba5efe1d81bcf5c754d9483346171db397d32364b184f01f21c8",
+    ".skill-tree/documents/future.md": "d4d8418cc1c6f2d50159af49dbda5a76695605f8914961be9cee03dcd4498004",
+    ".skill-tree/history/task-outcomes.jsonl": "46f9152f02eebfa33ec257204edee48952c300c6e19d3d7c44137caee8394a47"
+  },
+  "completed_units": 8,
+  "current_task_id": "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+  "flavor": "general",
+  "limits": [
+    "The core snapshot includes backend code but creates no external installed-plugin registry or package."
+  ],
+  "operations": 10,
+  "profile_identity": "10877850bb1ec6f2f17ef8b8e340d582ef64fe0cb0f883feb13c988446242915",
+  "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+  "source_commit": "eea7830",
+  "status": "passed",
+  "verification": [
+    "Owned installer updated only the existing Codex installation from reviewed source.",
+    "Owned local manager verification passed.",
+    "Canonical queue, checkpoint, terminal ledger and clarification files remained byte-identical before explicit profile re-admission.",
+    "The same run was explicitly re-admitted after refresh with fifteen roots and twenty-one admitted units preserved."
+  ]
+}

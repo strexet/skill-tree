@@ -1,0 +1,21 @@
+{
+  "canonical_before_refresh": {
+    ".skill-tree/clarifications/cl-17367e9a-121d-4130-be4a-e13d151acb46.json": "04fc8d15c5fce90779d57329413bd7a3e071479d73c333216f9edb3e029478db",
+    ".skill-tree/documents/future.json": "9b426b19e6bdc16e780f4757aa1e5f22d8b871367b382bc672885d3ed81d4b43",
+    ".skill-tree/documents/future.md": "4aa98937827f2f198fc583b22682d027dea8069e8cbd7a008ac8648d6999071c",
+    ".skill-tree/history/task-outcomes.jsonl": "139880031196b15241501ce562e2e7a7af40377de4a799f142d1107d448be3c1"
+  },
+  "limits": [
+    "The existing frozen controller/session mode remains unchanged; bounded actual qualification supports newly activated core routing only."
+  ],
+  "operations": 10,
+  "profile_identity": "72fbf5ca812e1ce052060c5517d64bf063d86d9345b1c749817e097db18f3b55",
+  "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+  "source_commit": "678aab048643da13512e0d1878d59c655d8077cd",
+  "status": "passed",
+  "verification": [
+    "Owned manager verified the activated source generation.",
+    "Canonical Future, terminal ledger, clarification and decision bytes remained unchanged through installation before explicit admission.",
+    "The same fifteen-root/twenty-one-unit run was explicitly re-admitted."
+  ]
+}

@@ -1,0 +1,37 @@
+# Plugin Recommendation Evidence
+
+The 2026-11-09 comparison leaves the recommended set empty for every integration point in general, web and Unity. The four evaluated applications remain unqualified for recommendation. Catalog discovery and explicit manual selection remain available where source, dependencies, location and host requirements permit. [Comparison result](../history/research/plugin-comparison-results.json), [portable evidence](../history/research/plugin-comparison-capture.json), [market inventory](plugin-market-research.md)
+
+## Cohort
+
+The approved comparison uses eight fixtures, two fixed repetitions and matched no-plugin and candidate arms on the pinned Skill Tree commit and general Codex profile. Both arms use W1 Manual with scripted fixture-owner answers. The review arms share the actual full core report for each repetition. The interview baseline retains the core clarification loop, so the comparison tests the incremental value of the external wrapper and resources. The documentation arm measures report quality on inspected sources. [Approved proposal](../history/research/plugin-comparison-proposal.md), [owner agreement](../history/research/plugin-comparison-owner-agreement.json)
+
+The positive calibration records the original source-backed dispatch, pinned resource acknowledgment, guarded result and lifecycle completion. The core-only negative calibration records a completed `noop`, empty bindings, absent registry and invocation state, zero candidate dispatches and zero reported candidate resource reads. The original validator rejected three unrelated report items. The owner approved scoring the negative control using the retained nonactivation evidence and excluding the unrelated report items. The original rejection remains in the archive. No calibration was repeated. [Original deviation](../history/research/plugin-comparison-calibration-deviation.json), [owner-approved amendment](../history/research/plugin-comparison-calibration-amendment.json)
+
+## Outcomes
+
+| Application and location | Observations | Recommendation status |
+| --- | --- | --- |
+| `writing-for-agents` task editorial, Process After | The owned handler rejected candidate field bindings in E1 and E2. The E1 baseline had a possible semantic change and a separate prose rejection. The E1 judge returned an invalid regression field. Both E2 core baselines returned no findings. | Unqualified. The editorial output and evaluation contracts left both fixtures without an observed pair. |
+| `grill-me` plus `grilling`, Process After | P1 could not establish matched factual and owner-decision rounds. The scripted-answer matcher assigned some natural questions to the wrong answer or found no match. P2 repeat 1 exercised both pinned resources, actual factual delegation, stale-answer rejection and selective reopening after an edit. The stable task remained held. Other P2 outcomes used an unsupported semantic binding field. | Unqualified. One supported candidate path supplies bounded mechanism evidence. |
+| `writing-for-agents` documentation report, Documentation Audit After | Candidate outputs identified planted defects and exercised the conditional mechanics resource. One repetition in each fixture completed the guarded report. Core-only responses listed ordinary inspected files in the plugin resource acknowledgment field and failed the fixture contract. The other two candidate closures lacked original completion receipts. | Unqualified. The observed report proposals provide no matched quality gain or evidence of applied repairs. |
+| Original Ponytail, PR Review After | The full core review found the planted cutoff defect in both R1 repetitions. The owned gate withheld both Ponytail dispatches while that finding remained open. Both R2 pairs completed with zero findings and equivalent independent scores. | Unqualified. R2 supports clean bounded execution. R1 supplies no observed incremental candidate result. |
+
+The R1 blind judge attributed a dispatch to a core-only report in each repetition. The full core reports, the owned gate and the captured host events show zero R1 Ponytail dispatches. The archive preserves the original judgment and the contradictory attribution carries no scoring weight. [Comparison result](../history/research/plugin-comparison-results.json), [portable evidence](../history/research/plugin-comparison-capture.json)
+
+Twelve of 32 cells have admitted observations and twenty are unavailable, including the two intentionally gated Ponytail cells. Two of sixteen pairs are fully observed. Seven of eight blind judgments satisfy the recorded structure. Four original lifecycle completion receipts remain unavailable because the lifecycle tool returned `not_found` after the recorded final responses. Separate local reconciliation closed the remaining disposable hook attempts. The study retains an unqualified disposition and the missing host receipts remain visible.
+
+## Cost and applicability
+
+The complete record charges 47 of 54 new contexts, 64 of 95 launch or continuation requests and 47 of 54 lifecycle calls. The elapsed 55 minutes 58 seconds includes the owner decision wait and cleanup. For the two fully observed R2 pairs, baseline worker time was 43.653 and 36.253 seconds versus 74.596 and 78.883 seconds with Ponytail. Each baseline used one launch request and each candidate used one launch and one delivery follow-up. Exact model identifier, underlying API calls, token usage, monetary cost and actual human rework were unavailable. The small matched R2 sample supports only the recorded R2 timings.
+
+The archive retains portable host captures, fixture and adapter identities, raw judgment output, the terminal ledger and replayable capture checksums. Portable path-redacted records retain the original byte digest and a separate digest for the archived text. Exact unredacted staging and freeze files remain local to the comparison workspace. The report verifier was written after the input freeze and applies the frozen rubric. [Portable evidence](../history/research/plugin-comparison-capture.json)
+
+Evidence applies to the pinned revisions, dependencies, adapters, general Codex profile, host behavior and fixture conditions. Changes to an evidence identity or relevant workflow gate require requalification before reuse. Auto-mode efficacy, native Skill-tool execution, other providers or flavors, browser and Unity runtime behavior and live PR behavior remain unqualified.
+
+Ponytail Review remains a separate discovery candidate. Superpowers verification, Sentry findings and documentation skills, Vercel React guidance and the Unity URP validator remain source-inspected alternatives with separate prerequisites. The market inventory records each alternative’s application boundaries and evidence. [Market inventory](plugin-market-research.md#shortlist-by-integration-point)
+
+
+## Catalog projection
+
+The repository catalog exposes the four study applications separately, alongside selected source-inspection alternatives. Known sources are grouped under Process After, Documentation Audit After Validation, PR Review After and Implement After. Suggested locations establish no installed binding. The catalog preserves the application status and prerequisites and ships a separate eligibility projection tied to the recorded comparison. The production projection and all flavor recommendation arrays are empty. [Catalog entries](../config/plugin-catalog.json), [eligibility projection](../config/plugin-catalog-eligibility.json)

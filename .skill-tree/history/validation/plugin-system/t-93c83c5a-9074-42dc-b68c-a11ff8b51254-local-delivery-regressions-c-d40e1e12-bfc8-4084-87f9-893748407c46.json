@@ -1,0 +1,35 @@
+{
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-local-delivery.py"
+  ],
+  "attempt_id": "C-d40e1e12-bfc8-4084-87f9-893748407c46",
+  "check_id": "local-delivery-regressions",
+  "counts": {
+    "discovered": 27,
+    "expected": 27,
+    "failed": 0,
+    "passed": 27,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-93c83c5a-9074-42dc-b68c-a11ff8b51254-local-delivery-regressions-c-d40e1e12-bfc8-4084-87f9-893748407c46.txt",
+  "result": "pass",
+  "reviewed_failure_reason": null,
+  "source_fingerprints": {
+    ".skill-tree/common/references/installation-profile.md": "5719d29e503c669cd091a70564aa4c93abf1a582811308c8fdea9b9345eace7e",
+    ".skill-tree/common/references/orchestration.md": "6f33932cfd3f05e2e35d501f8684beb31feb38811fee5a149d72624b3fba15e7",
+    ".skill-tree/common/references/workflow-metadata.md": "1fff0a891987404ac7bc43d536b0798c08ee6c16a6e3367cbfc9a0f3c54b7fa3",
+    ".skill-tree/common/scripts/run-workspaces.py": "306a8dad9d834250febd3fff4b109f0fb8b00711232705e483787bc1cdab5f20",
+    ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+    ".skill-tree/documents/implementation-plan.md": "61dc2c6e2974b003a6b83bbd31299600f900f9a03f7f1d23bba8707ad3457b90",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "b95866fb03aae68d5491cef59c2f79b09ad8fe4c659af9759b1755e2c8a0901d",
+    ".skill-tree/tests/test-local-delivery.py": "e421596fdabf21094995263558798d2e63b4c942d2966af180ef3fd749430026",
+    ".skill-tree/tests/test-run-workspaces.py": "b117053816d23fcefefa60497d0fe0b008e60c64ab0ea4f1881e1eb85209ba9e"
+  },
+  "task_id": "T-93c83c5a-9074-42dc-b68c-a11ff8b51254",
+  "tool_wall_seconds": 214.41771995881572
+}

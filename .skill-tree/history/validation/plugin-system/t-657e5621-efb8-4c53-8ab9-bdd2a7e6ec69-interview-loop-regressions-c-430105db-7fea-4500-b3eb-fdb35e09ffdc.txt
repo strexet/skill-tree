@@ -1,0 +1,16 @@
+F.
+======================================================================
+FAIL: test_00_enabled_applications_block_first_publication_before_any_hook_start (__main__.PluginProcessingTests.test_00_enabled_applications_block_first_publication_before_any_hook_start)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-processing.py", line 124, in test_00_enabled_applications_block_first_publication_before_any_hook_start
+    self.assertEqual(task['status'],'Blocked pending answers',
+AssertionError: 'Ready' != 'Blocked pending answers'
+- Ready
++ Blocked pending answers
+ : The first published T-task must already carry its configured post-processing hold.
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.499s
+
+FAILED (failures=1)

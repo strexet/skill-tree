@@ -1,0 +1,97 @@
+{
+  "accepted_plan": {
+    "digest": "7c0c502bfa81a0613989dbe34f8cfd9ff83f967d8da5a45b2cf5c851acb5cb40",
+    "reference": ".skill-tree/history/research/processing115-plan.md",
+    "required_checks": [
+      "interview-loop-regressions",
+      "affected-regressions",
+      "sync-check",
+      "strict-validation",
+      "python",
+      "node",
+      "installer-list",
+      "installer-dry-run",
+      "diff-check"
+    ]
+  },
+  "actual_plan_acceptance": {
+    "actor": {
+      "context_id": "/root/invocation118_oracle",
+      "id": "/root/invocation118_oracle"
+    },
+    "answer": "accept",
+    "attempt_id": "DA-43dcff08-4ac5-4844-99d4-11122d36839a",
+    "authority_digest": "556c2bf6e342789bf72381588c679c861e8a4fdca1280ac9f54d73ead5d00b2f",
+    "context_identity": {
+      "decision_purpose": "plan",
+      "execution_snapshot_digest": "941d19ff6c8ad07dcf3f97f250025edd6ed0342ac3e88da4db8189b58191b517",
+      "id": "task:T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "kind": "task",
+      "orchestration_id": "DO-d49ac4a6-1e7c-5849-af1b-ca15b4fbd7b9",
+      "plan_digest": "7c0c502bfa81a0613989dbe34f8cfd9ff83f967d8da5a45b2cf5c851acb5cb40",
+      "required_checks_digest": "6c9ac759ee228409db73ce5788f8a5f9f33175be01f2d30dcabf341d73f87917",
+      "task_ids": [
+        "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69"
+      ]
+    },
+    "decision_id": "DG-26b4b75f-941e-54c6-9668-5031f2249b0c",
+    "digest": "1543fe995ebba6859476c6ae286382eb4248822351d4799f88748e4bda172ddf",
+    "kind": "specification-acceptance",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/invocation118_oracle",
+      "actor_id": "/root/invocation118_oracle",
+      "creation_reference": "Observed separately created existing /root/invocation118_oracle context; actual resolver for the exact current optional post-processing plan, independent of root executor.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/invocation118_oracle returned the observed resolver result for the exact original sealed input; raw artifact processing115-resolver-plan2-actual.json.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "5d7567ca1bcb3628e22855c14093d04789e8823010c9e256d271b2552114d17d",
+    "question_id": "processing115-plan-v2",
+    "rationale": "The revised specification closes the material no-C completion gap identified by the prior critic and arbiter. The current engine cannot revisit accepted A and frozenPlan rejects reduced caller configuration; v2 therefore preserves the entire original frozen configuration and runs an explicitly CL-registered fresh ordinary HC/HI under an owned current execution mask. Mandate identity binds origin, occurrence, package/effective parameters, live task input and current mode/authority/epoch. The mask is reconstructed by the actual CL guard for business and completed-readiness paths, while metadata-only requirement inspection supplies neither a mask nor business authority. Original configured A/B completion remains independently required; skipped derived stages cannot impersonate those original occurrences or another interview. Matching explicit C discharges the same affected obligation once, and A-B-without-C or editor-only post-revision has a concrete fresh recheck path without B replay. Exact selected-task revision lineage preserves the original main chain through derived wording changes and the later mechanical release, rather than globally ignoring context drift or rewriting historical inputs/acceptance. The added no-C, editor-only, C-without-fourth-call, forged/stale/cross-session mask, unselected-interview, capability, source/parameter/authority and unrelated-chain controls cover the introduced boundary. Atomic visible blocking, one multi-round CL, actual current-mode answers, separate final acceptance, current editorial evidence, exact finalization and qualification/owner limits remain intact. This accepts the bounded plan; implementation and its meaningful failing controls still require execution and independent validation.",
+    "role_receipts": {
+      "critic": "82e235b2db108707a51f1f4ef6b0941e211419e29432561a3f10a13ae4e55536",
+      "resolver": "1f3b231619467f28f6b9c70265ce1ea213b925cd4e0576518653e9ec66499665"
+    },
+    "semantic_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28"
+  },
+  "added_sources": [
+    ".skill-tree/common/scripts/plugin-processing.py",
+    ".skill-tree/common/scripts/plugin-invocation.py",
+    ".skill-tree/common/scripts/workflow-state.py",
+    ".skill-tree/common/scripts/run-workspaces.py",
+    ".skill-tree/common/scripts/decision-governance.py",
+    ".skill-tree/common/scripts/decision-orchestration.py",
+    ".skill-tree/common/scripts/validate-document-rules.py",
+    ".skill-tree/common/scripts/plugin-hooks.js",
+    ".skill-tree/common/scripts/pr-review-state.py",
+    ".skill-tree/lib/plugin-runtime.js",
+    ".skill-tree/lib/plugin-composition.js",
+    ".skill-tree/lib/plugin-bindings.js",
+    ".skill-tree/lib/plugin-parameters.js",
+    ".skill-tree/lib/plugin-registry.js",
+    ".skill-tree/lib/plugin-sources.js",
+    ".skill-tree/lib/plugin-lifecycle.js",
+    ".skill-tree/lib/installation.js",
+    ".skill-tree/lib/composer.js",
+    ".skill-tree/common/references/workflow-metadata.md",
+    ".skill-tree/common/references/plugin-invocation.md",
+    ".skill-tree/common/references/decision-governance.md",
+    ".skill-tree/config/resource-map.json",
+    ".skill-tree/templates/operations.json",
+    ".skill-tree/tests/test-plugin-workflow.py",
+    ".skill-tree/tests/test-plugin-invocation-installation.js",
+    ".skill-tree/tests/test-task-clarification.py",
+    ".skill-tree/tests/test-orchestration-adapters.py",
+    ".skill-tree/tests/test-plugin-processing-installation.js",
+    ".skill-tree/tests/fixtures/task-processing"
+  ],
+  "current_content_fingerprint": "927742fe279b9c5aa663d8df86c47bdf795710c08f57e89cfcb171c084c77806",
+  "kind": "validation-footprint-refinement",
+  "original_content_fingerprint": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+  "reason": "Concrete helper, frozen runtime, application receipt, copied fixture and raw resource inputs implement the accepted admitted post-processing plan. Task identity, provenance, dependencies, goal, acceptance criteria, recipe, assertion and scope remain unchanged.",
+  "retained_agreed_semantic_identity": "49f997a2591bb17c9a5ce4e0aa15f90a4d3410a98c488c913b71d477ce0ded28",
+  "task_id": "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69"
+}

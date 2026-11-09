@@ -1,0 +1,68 @@
+{
+  "files": {
+    ".skill-tree/bin/install.js": "c7b6581b5aa5e3a9c150d3cd9bdf312a5324ea40ebd1605a4d4184318b606636",
+    ".skill-tree/documents/install.md": "d14bbeb9a886af9c0ad56637f05c05ba3bae83a29fdd21db6760a2e514c6f243",
+    ".skill-tree/documents/plugin-installation-contract.md": "c5cf887a2960a980955757e8ee01d4e4c11adad52795c7e3f3960c9b5f894eaf",
+    ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+    ".skill-tree/lib/plugin-lifecycle.js": "16182707bbaa23cd98b7e7a67e722ea4353d71bede5426f19f9228e30aa84d5b",
+    ".skill-tree/lib/plugin-management.js": "9eac76130885864fb06ddc2a3311805e761f22857d21bc8cfcb9ee508a4c2660",
+    ".skill-tree/skill-tree.json": "c763b0cb73337889eeba28a5dd53469e9441043ff07cd88515263fa34fa48260",
+    ".skill-tree/tests/test-composer.js": "6e43a2ba7c1fc4c89476d57a80e21d8b84a5c401a4ca93ae315b2073e9d9bd12",
+    ".skill-tree/tests/test-plugin-installer.js": "9823534b0640224ec6cfd1e5cf0d6fd8383e64c15b49518a9bcc66386ccbafc5"
+  },
+  "limits": [
+    "Installer and local fixture lifecycle qualification. External plugin execution, hosted providers and new recommendation effectiveness are outside this evidence."
+  ],
+  "node_composer_repair": {
+    "capture_sha256": "3a3f79915f03700949cd79590f3286ba075b763b7634cfdc1d8a29a0d258a325",
+    "count": 18
+  },
+  "node_full": {
+    "capture_sha256": "f7e8f4368952e0505f7b54c0005485ca357b045bf0d29c3602e0edf60f3fffbb",
+    "count": 330,
+    "passed": 330
+  },
+  "observed_terminal_control": "Actual disposable terminal. Enter chose skipped. Core verification passed. Plugin registry and Future files remained absent.",
+  "red": {
+    "installer110-cli-red.txt": "85405429028a790492fedbaa5738765d137041ec983bf50cf2e876e64fe3ed91",
+    "installer110-provider-race-red.txt": "7e7958a3a48e8d8d3ce0fbeaf60d1705178be4f196942a62be0347f69a74f936",
+    "installer110-source-red.txt": "b131afb07e8d35b3f6b648d2d254469073519adace75228713fbfea3f689ae9d"
+  },
+  "results": {
+    "adjacent-node": {
+      "capture_sha256": "c36597af5192ff095921c8ec251a7baf2d3d22d088cb49af6eb1dcbbfc49385f",
+      "status": "passed"
+    },
+    "diff-check": {
+      "capture_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "status": "passed"
+    },
+    "installer-dry-run": {
+      "capture_sha256": "6cfc7fa48886d9983f7505f08e5c58d965104fbf052e18890deba86503219ab3",
+      "status": "passed"
+    },
+    "installer-list": {
+      "capture_sha256": "fb9ae55cf4fab128f448e5b634d6917668a04f55662842a490b524588dda30f7",
+      "status": "passed"
+    },
+    "plugin-installer-regressions": {
+      "evidence": ".skill-tree/history/validation/plugin-system/t-6ec57615-3512-4f91-98e8-efb12cde7d7f-plugin-installer-regressions-c-bc409ca7-9faa-4a94-b795-8b4671b49512.json",
+      "sha256": "35858359eef8acc368862ff667f599a05e63a9cc0ea0994460d4f750cdcaf8c7",
+      "status": "passed"
+    },
+    "strict-validation": {
+      "capture_sha256": "1302cebd2e1a3189239671ce4e62c846162c5c7fc73279eb4cb87432a0b93da5",
+      "status": "passed"
+    },
+    "sync-check": {
+      "capture_sha256": "ceffd15f7477e7cca73d33bc13b530b5430f5e4b9c12123f525a1fe3c65a5c78",
+      "status": "passed"
+    }
+  },
+  "schema": 1,
+  "source": {
+    "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+    "head": "9f55d8ff64945a3eefb7e6aac4b22760395c631f",
+    "source_digest": "ced497a87f2fab9fc00dff70b29be1780cb8f72840c58c40b0a710c61c553ede"
+  }
+}

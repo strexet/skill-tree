@@ -1,0 +1,104 @@
+{
+  "after_future_hash": "e578346f1bdafa82890baa01a33293231bc4ebf6cb83819aed922dd1caa42846",
+  "amended_tasks": [
+    {
+      "checks": [
+        "manager-regressions",
+        "manager-standalone-installation",
+        "manager-agent-observations"
+      ],
+      "id": "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad",
+      "priority": 131,
+      "title": "Implement the core Skill Tree Plugins management operation"
+    },
+    {
+      "checks": [
+        "extensible-bindings"
+      ],
+      "id": "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+      "priority": 130,
+      "title": "Implement extensible all-operation and named plugin bindings"
+    },
+    {
+      "checks": [
+        "installation-design-review"
+      ],
+      "id": "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "priority": 123,
+      "title": "Specify plugin selection and consent behavior for installation"
+    },
+    {
+      "checks": [
+        "standalone-plugin-composition"
+      ],
+      "id": "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "priority": 119,
+      "title": "Compose selected plugin hooks into standalone operations"
+    },
+    {
+      "checks": [
+        "hook-state-regressions",
+        "installed-agent-hook-evidence",
+        "installed-hook-fixtures"
+      ],
+      "id": "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "priority": 118,
+      "title": "Implement resumable plugin invocation and result receipts"
+    },
+    {
+      "checks": [
+        "plugin-management"
+      ],
+      "id": "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "priority": 117,
+      "title": "Expose the installed plugin registry and exact-ID removal"
+    },
+    {
+      "checks": [
+        "interview-loop-regressions"
+      ],
+      "id": "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "priority": 115,
+      "title": "Integrate post-processing task wording, interviews and rework"
+    },
+    {
+      "checks": [
+        "plugin-installer-regressions"
+      ],
+      "id": "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "priority": 110,
+      "title": "Implement confirmed recommended and alternative plugin installation"
+    }
+  ],
+  "before_future_hash": "e3d1a5e9cd4ef3ac4798dd0767444317ecead22ae15e70391bd77bd40deae114",
+  "format": "skill-tree-task-amendment",
+  "limits": "The amendment validates planned task specifications rather than implementing plugin sequencing.",
+  "owner_direction": "Configure arbitrary plugin order and repeated identical plugins at one entry point during installation or later skill-tree-plugins use; the supplied processing example is editorial A, interview B with task additions, editorial C.",
+  "recorded_at": "2026-11-06T02:40:50.277314+00:00",
+  "requirements": [
+    "Independent stable occurrence IDs and configurable order for all compatible plugins.",
+    "Same package repeats at one anchor without duplicate resource installation.",
+    "Per-occurrence parameters, conditions, enabled state, move and exact removal.",
+    "Sequential accepted-context forwarding and occurrence-specific receipts/resume.",
+    "Same-binding replay and true recursive re-entry remain guarded; finite repeated packages remain valid.",
+    "Initial setup and later management share exact chain preview/confirmation.",
+    "Required final acceptance/freshness and frozen parked configuration remain binding."
+  ],
+  "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+  "schema": 1,
+  "scope": "Owner-approved clarification of existing unstarted Ready tasks; no new Pending, task root, implementation or runtime activation.",
+  "supersedes_affected_specifications_from": ".skill-tree/history/research/plugin-plan-future-transfer.json",
+  "totals": {
+    "acceptance_criteria": 86,
+    "checks": 22,
+    "ready": 16
+  },
+  "validation": {
+    "acceptance_mapping": "complete",
+    "checkpoint_and_progress": "preserved",
+    "dependency_graph": "acyclic",
+    "metadata_and_ids": "unchanged",
+    "recipes": "resolved",
+    "terminal_outcome_hash": "a7e900522d0a1f5d3df9553e668171626ab8022e3a0f75a56823628a9eeb0580"
+  }
+}

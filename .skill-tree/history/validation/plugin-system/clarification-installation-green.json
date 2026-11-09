@@ -1,0 +1,28 @@
+{
+  "assertion": "Standalone general/web/unity fixtures verify the copied clarification entry point and resource closure without source-checkout or sibling-package dependencies.",
+  "attempt_id": "C-cbf928d1-7778-4206-8571-b9f0f5d6e2dd",
+  "check_id": "clarification-installation",
+  "cleanup": "All temporary deterministic fixtures were removed by runner cleanup; no product or provider operation occurred.",
+  "command": "node --test .skill-tree/tests/test-clarification-installation.js",
+  "counts": {
+    "discovered": 3,
+    "expected": 3,
+    "failed": 0,
+    "passed": 3,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "runner_output": "TAP version 13\n# Subtest: general clarification package runs independently of source and sibling packages\nok 1 - general clarification package runs independently of source and sibling packages\n  ---\n  duration_ms: 587.906875\n  ...\n# Subtest: web clarification package runs independently of source and sibling packages\nok 2 - web clarification package runs independently of source and sibling packages\n  ---\n  duration_ms: 571.481625\n  ...\n# Subtest: unity clarification package runs independently of source and sibling packages\nok 3 - unity clarification package runs independently of source and sibling packages\n  ---\n  duration_ms: 571.094166\n  ...\n1..3\n# tests 3\n# suites 0\n# pass 3\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 1803.5555\n",
+  "source_fingerprints": {
+    ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+    ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+    ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+    ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+    ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+    ".skill-tree/scripts/agent-conformance.py": "2fe8271bcf8b564f490e305efb3eca9075960a61d0185c251eb58b87a5747b88",
+    ".skill-tree/templates/operations.json": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266",
+    ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+    ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+  },
+  "task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+}

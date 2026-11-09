@@ -1,0 +1,11 @@
+{
+  "result": "pass",
+  "scope": "Static archive and study contract inspection. Historical candidate efficacy remains unqualified.",
+  "capture_sha256": "ebdbc935115baf77d2c52e5869003fa3f2cc1f506ea8f66a62518e3abeab2ed0",
+  "result_sha256": "1463e6846ed1c4d91c6affc252fff923d709f67bd6fdcf8cd8866210f004779b",
+  "original_report_replayed_on_frozen_baseline_sha256": "a487e8a035a97553c4210d17530764409d5ae32e529b3af0d564c76e3f4690a8",
+  "exact_or_path_redacted_captures_verified": 269,
+  "fixed_cells": 32,
+  "unavailable_cells": 20,
+  "eligible_recommendations": 0
+}

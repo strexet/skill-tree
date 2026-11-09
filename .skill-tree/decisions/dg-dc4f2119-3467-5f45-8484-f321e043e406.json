@@ -1,0 +1,282 @@
+{
+  "acceptance": {
+    "actor": {
+      "context_id": "/root/composition119_plan_resolver",
+      "id": "/root/composition119_plan_resolver"
+    },
+    "answer": "accept",
+    "attempt_id": "DA-7df63e06-6a6e-48a7-b1fb-40c3eaf7b63e",
+    "authority_digest": "d7cb4d3d704d0c3165dcf813b7e0e2e6bcc77c5be109348424e70163e8a4926e",
+    "context_identity": {
+      "decision_purpose": "plan",
+      "execution_snapshot_digest": "974655dee91cee8a939f49fb78fe720a5c0631cf0e78d33b896eabe7e92e46a0",
+      "id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "kind": "task",
+      "orchestration_id": "DO-1271a54f-5eaa-52b1-8b21-7df230249f55",
+      "plan_digest": "f2e114a3b27fb58ce878e31d95b8c78215819cf72ceb776488e724d0f2a5e138",
+      "required_checks_digest": "354d85eb182f77e55e32a7c87ae3311762fc5f81eeb2ff2ab5c1a3b8acb2df1d",
+      "task_ids": [
+        "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+      ]
+    },
+    "decision_id": "DG-dc4f2119-3467-5f45-8484-f321e043e406",
+    "digest": "109c56c40a389b964d16b4427aa35fba58492003a2e2757e8cb57972f25a4ad7",
+    "kind": "specification-acceptance",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/composition119_plan_resolver",
+      "actor_id": "/root/composition119_plan_resolver",
+      "creation_reference": "Actual root tool creation /root/composition119_plan_resolver; fresh fork_turns none, initially idle.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/composition119_plan_resolver returned JSON in collaboration.final answer.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "f4a95579d070902ca9d8ff74ff41fdc25a501ffb7228cd1172d5084398432ed9",
+    "question_id": "composition119-plan",
+    "rationale": "The plan covers task 119's registered operation anchors, real Pending and draft-plan guards, standalone resource closure, ordered independent occurrences, and configuration freshness across all three flavors. Reusing registry verification, binding and parameter APIs fits current contracts; avoiding lifecycle imports prevents the existing installation/composer dependency cycle. Core W1 governance retains plan-change invalidation and current acceptance before source edits. Native invocation receipts remain task 118's responsibility, and later manager registration remains supported without an early eleven-operation claim. No material revision is required.",
+    "role_receipts": {
+      "critic": "95c0bf4c718fb8d5ee16cea3c3e3781b4773484b0d213d958ff0f1d7e6594d00",
+      "resolver": "ab426d255d848b8212d8fc4c94d2ebcee0e5203e8b2d5e022639ed4575ef79c6"
+    },
+    "semantic_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427"
+  },
+  "active_attempt_id": null,
+  "attempts": {
+    "DA-6f186f6f-7880-455e-98bc-a6d7f2d95520": {
+      "actor": {
+        "context_id": "/root/composition119_plan_critic",
+        "id": "/root/composition119_plan_critic"
+      },
+      "authority_digest": "d7cb4d3d704d0c3165dcf813b7e0e2e6bcc77c5be109348424e70163e8a4926e",
+      "basis_digest": "307cbdb7c5c22e3d3699050ece6425d930deaeae4aecf8d7fb720790a4fa900b",
+      "content_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+      "evidence": {
+        "actor_context_id": "/root/composition119_plan_critic",
+        "actor_id": "/root/composition119_plan_critic",
+        "creation_reference": "Actual root tool creation /root/composition119_plan_critic; fresh fork_turns none, initially idle.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/composition119_plan_critic returned JSON in collaboration.final answer.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-6f186f6f-7880-455e-98bc-a6d7f2d95520",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "f4a95579d070902ca9d8ff74ff41fdc25a501ffb7228cd1172d5084398432ed9",
+      "result": {
+        "answer": "accept",
+        "input_digest": "8d5d802d8fc4b5f05e452b2c2a111ef8e4befeb3e07406422c593c186c2ea47a",
+        "rationale": "The resolver's acceptance is supported by the canonical task and current APIs. Task T-a9d7a827 requires selected standalone composition, unchanged locked invariants, capability prerequisites and freshness across general/web/unity; the plan covers those requirements without claiming invocation118 completion. plugin-bindings.js requires current callable owner/version/context registrations, preserves ordered independent occurrences and recompiles serialized configurations; the proposed dynamic boundaries and A-to-B-to-A handling match those contracts. The plan explicitly retains real selected Pending identities before promotion and places implementation During before current-plan acceptance and source edits, consistent with operations.json and the approved anchor map. Byte-preserving resource copies and binary-safe maps/hashing address composer's current string-only resource handling, while copied-operation fixtures test the required source/sibling independence. Frozen configurations, stopped admission barriers, W1 acceptance invalidation and explicit unavailable prerequisites preserve the consequential workflow boundaries. The current ten-operation count and deferred manager/native qualification claims remain accurate. No material plan revision is warranted.",
+        "status": "agree"
+      },
+      "role": "critic",
+      "semantic_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+      "status": "agree"
+    },
+    "DA-7df63e06-6a6e-48a7-b1fb-40c3eaf7b63e": {
+      "actor": {
+        "context_id": "/root/composition119_plan_resolver",
+        "id": "/root/composition119_plan_resolver"
+      },
+      "authority_digest": "d7cb4d3d704d0c3165dcf813b7e0e2e6bcc77c5be109348424e70163e8a4926e",
+      "basis_digest": null,
+      "content_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+      "evidence": {
+        "actor_context_id": "/root/composition119_plan_resolver",
+        "actor_id": "/root/composition119_plan_resolver",
+        "creation_reference": "Actual root tool creation /root/composition119_plan_resolver; fresh fork_turns none, initially idle.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/composition119_plan_resolver returned JSON in collaboration.final answer.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-7df63e06-6a6e-48a7-b1fb-40c3eaf7b63e",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "f4a95579d070902ca9d8ff74ff41fdc25a501ffb7228cd1172d5084398432ed9",
+      "result": {
+        "answer": "accept",
+        "input_digest": "08dad83896348f65c7da14d61fe6d019947528744b8ad939485dafd8cba1ed58",
+        "rationale": "The plan covers task 119's registered operation anchors, real Pending and draft-plan guards, standalone resource closure, ordered independent occurrences, and configuration freshness across all three flavors. Reusing registry verification, binding and parameter APIs fits current contracts; avoiding lifecycle imports prevents the existing installation/composer dependency cycle. Core W1 governance retains plan-change invalidation and current acceptance before source edits. Native invocation receipts remain task 118's responsibility, and later manager registration remains supported without an early eleven-operation claim. No material revision is required.",
+        "status": "answered"
+      },
+      "role": "resolver",
+      "semantic_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+      "status": "answered"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the approved task and dependency scope. No source publication, remote, release, external trial, installation consent or actual native plugin execution. Required checks and real owner intent cannot be delegated away."
+    ],
+    "context_id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+    },
+    "id": "approved-composition119",
+    "revision": 1
+  },
+  "authority_digest": "d7cb4d3d704d0c3165dcf813b7e0e2e6bcc77c5be109348424e70163e8a4926e",
+  "context": {
+    "content_fingerprint": "700d5e255a05ea557b9a055859635cbd6ead6b478ed646b73ca99a79e3b5bfce",
+    "decision_purpose": "plan",
+    "execution_snapshot_digest": "974655dee91cee8a939f49fb78fe720a5c0631cf0e78d33b896eabe7e92e46a0",
+    "id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+    "kind": "task",
+    "orchestration_id": "DO-1271a54f-5eaa-52b1-8b21-7df230249f55",
+    "plan_digest": "f2e114a3b27fb58ce878e31d95b8c78215819cf72ceb776488e724d0f2a5e138",
+    "required_checks_digest": "354d85eb182f77e55e32a7c87ae3311762fc5f81eeb2ff2ab5c1a3b8acb2df1d",
+    "semantic_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+    "task_ids": [
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+    ]
+  },
+  "decision_hash": "48930a71b241a41ba20a122c8789a13d483d77daf3a4f4b32e01aa02e308757c",
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "frontier_epoch": 1,
+  "history": [
+    {
+      "context_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+      "detail": {},
+      "event": "started",
+      "mode_epoch": 1,
+      "previous_record_hash": null,
+      "sequence": 1
+    },
+    {
+      "context_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+      "detail": {
+        "attempt_id": "DA-7df63e06-6a6e-48a7-b1fb-40c3eaf7b63e",
+        "role": "resolver"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "7eeba8b21042cb7455f2b64de6fe09bafb76b2b7f3e53175d7c9ac17e1d308d5",
+      "sequence": 2
+    },
+    {
+      "context_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+      "detail": {
+        "attempt_id": "DA-7df63e06-6a6e-48a7-b1fb-40c3eaf7b63e",
+        "status": "answered"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "2d36319432d75c7181b23cc1282e6520bf73fa795f02718f5914f013a64ecf08",
+      "sequence": 3
+    },
+    {
+      "context_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+      "detail": {
+        "attempt_id": "DA-6f186f6f-7880-455e-98bc-a6d7f2d95520",
+        "role": "critic"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "3e7db617490f03c2c11ad1a68b79f25cdd4d535cbbeb786874e04afa99959835",
+      "sequence": 4
+    },
+    {
+      "context_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+      "detail": {
+        "attempt_id": "DA-6f186f6f-7880-455e-98bc-a6d7f2d95520",
+        "status": "agree"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "3ed05701a11a00265c95c04240c8a3a3506972f2e6872c2795fe1f2324eb7041",
+      "sequence": 5
+    },
+    {
+      "context_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+      "detail": {
+        "acceptance_digest": "109c56c40a389b964d16b4427aa35fba58492003a2e2757e8cb57972f25a4ad7"
+      },
+      "event": "accept",
+      "mode_epoch": 1,
+      "previous_record_hash": "a242ec0b716ea8f49478978673304af2263bd7af9ac868d789b1200a5b885c4d",
+      "sequence": 6
+    },
+    {
+      "context_fingerprint": "700d5e255a05ea557b9a055859635cbd6ead6b478ed646b73ca99a79e3b5bfce",
+      "detail": {
+        "previous_context": {
+          "content_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+          "decision_purpose": "plan",
+          "execution_snapshot_digest": "974655dee91cee8a939f49fb78fe720a5c0631cf0e78d33b896eabe7e92e46a0",
+          "id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+          "kind": "task",
+          "orchestration_id": "DO-1271a54f-5eaa-52b1-8b21-7df230249f55",
+          "plan_digest": "f2e114a3b27fb58ce878e31d95b8c78215819cf72ceb776488e724d0f2a5e138",
+          "required_checks_digest": "354d85eb182f77e55e32a7c87ae3311762fc5f81eeb2ff2ab5c1a3b8acb2df1d",
+          "semantic_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+          "task_ids": [
+            "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+          ]
+        },
+        "previous_question": {
+          "id": "composition119-plan",
+          "kind": "specification-acceptance",
+          "options": [
+            {
+              "id": "accept",
+              "text": "Accept the current plan."
+            },
+            {
+              "id": "revise",
+              "text": "Revise the plan with concrete reasons."
+            }
+          ],
+          "plan_text": "# Standalone Plugin Composition Plan\n\n## Authorized result\n\nTask T-a9d7a827-fb25-4348-bcf7-867a449c58ef composes selected verified external plugin resources and ordered occurrences into registered operations. Composition remains offline and preserves core W1 authority and phases. Task 118 owns persisted native invocation and result receipts; task 117 owns live registry management. A composed boundary without a qualified executor exposes a prerequisite rather than claiming a plugin ran.\n\n## Implementation\n\n1. Add a focused plugin-composition module using the existing registry, binding and parameter APIs. Avoid importing lifecycle into composer because lifecycle already depends on installation and composer.\n2. Define executable owned before/during/after boundaries for the dynamically registered operation catalog and explicit W2 named aliases. Verify owner/version/context contracts; bind real selected Pending IDs before promotion and implementation During to the draft-plan phase before current acceptance and source edits.\n3. Resolve only verified owned registry/package inputs and selected operation bindings. Compose an operation-local ordered manifest plus one byte-preserving upstream/overlay resource closure per selected package. A-to-B-to-A remains three distinct binding rows with independent parameters; package-copy sharing never deduplicates occurrence execution.\n4. Make package content maps and hashing binary-safe. Retain strings for generated instructions and original Buffers for external resources. Preserve original BOM/binary bytes and keep raw upstream instructions separate from owned prose and generated entry points.\n5. Include registry, selected revisions/resources/order/configuration in profile and maintenance freshness identities. Preserve immutable parked configurations and stopped installation/admission barriers. Do not acquire packages, execute upstream helpers or refresh active runs during composition.\n6. Bundle only the necessary operation-local helper/reference closure through the resource map. Copy-only fixtures must run boundary preparation without the source or sibling installation. Missing native capabilities and unqualified invocation remain explicit unavailable prerequisites.\n7. Update the invocation and system contracts with current composed behavior and honest remaining task-118 qualification limits. Generate representative resources only through the canonical synchronizer.\n\n## Validation and review\n\nRequirements-led Node tests cover all three flavors, core-only zero holds, dynamic later operation registration, selected closure isolation, exact occurrence order/parameters, real Pending and draft-plan guards, missing capabilities, immutable freshness, sentinel non-execution, ownership/path/alias failures and exact copied BOM/binary bytes without source/siblings. Focused Red precedes implementation. Required checks: standalone-plugin-composition, sync-check, strict-validation, python, node, installer-list, installer-dry-run and diff-check. Independent full-diff review follows passing current checks; accepted findings require fixes and re-review.\n\n## Boundaries\n\nNo manager operation is registered early; the current count remains ten. No plugin comparative trial, installation consent, external Skill execution, browser/Unity product action, publication, source merge, remote push or release is authorized by this plan. The owner-authorized local source integration remains the controller tail after every admitted unit qualifies.\n",
+          "recommendation": "accept",
+          "significance": "significant",
+          "text": "Accept the exact approved-scope composition plan, or request a bounded revision."
+        }
+      },
+      "event": "resume",
+      "mode_epoch": 1,
+      "previous_record_hash": "ca6b1e66e06f6977017a1e6d63282bb53bf83977d650dab904c708f78477d394",
+      "sequence": 7
+    }
+  ],
+  "id": "DG-dc4f2119-3467-5f45-8484-f321e043e406",
+  "mode": "auto",
+  "mode_epoch": 1,
+  "prepared_attempt_id": "DA-6f186f6f-7880-455e-98bc-a6d7f2d95520",
+  "question": {
+    "id": "composition119-plan",
+    "kind": "specification-acceptance",
+    "options": [
+      {
+        "id": "accept",
+        "text": "Accept the current plan."
+      },
+      {
+        "id": "revise",
+        "text": "Revise the plan with concrete reasons."
+      }
+    ],
+    "plan_text": "# Standalone Plugin Composition Plan\n\n## Authorized result\n\nTask T-a9d7a827-fb25-4348-bcf7-867a449c58ef composes selected verified external plugin resources and ordered occurrences into registered operations. Composition remains offline and preserves core W1 authority and phases. Task 118 owns persisted native invocation and result receipts; task 117 owns live registry management. A composed boundary without a qualified executor exposes a prerequisite rather than claiming a plugin ran.\n\n## Implementation\n\n1. Add a focused plugin-composition module using the existing registry, binding and parameter APIs. Avoid importing lifecycle into composer because lifecycle already depends on installation and composer.\n2. Define executable owned before/during/after boundaries for the dynamically registered operation catalog and explicit W2 named aliases. Verify owner/version/context contracts; bind real selected Pending IDs before promotion and implementation During to the draft-plan phase before current acceptance and source edits.\n3. Resolve only verified owned registry/package inputs and selected operation bindings. Compose an operation-local ordered manifest plus one byte-preserving upstream/overlay resource closure per selected package. A-to-B-to-A remains three distinct binding rows with independent parameters; package-copy sharing never deduplicates occurrence execution.\n4. Make package content maps and hashing binary-safe. Retain strings for generated instructions and original Buffers for external resources. Preserve original BOM/binary bytes and keep raw upstream instructions separate from owned prose and generated entry points.\n5. Include registry, selected revisions/resources/order/configuration in profile and maintenance freshness identities. Preserve immutable parked configurations and stopped installation/admission barriers. Do not acquire packages, execute upstream helpers or refresh active runs during composition.\n6. Bundle only the necessary operation-local helper/reference closure through the resource map. Copy-only fixtures must run boundary preparation without the source or sibling installation. Missing native capabilities and unqualified invocation remain explicit unavailable prerequisites.\n7. Update the invocation and system contracts with current composed behavior and honest remaining task-118 qualification limits. Generate representative resources only through the canonical synchronizer.\n\n## Validation and review\n\nRequirements-led Node tests cover all three flavors, core-only zero holds, dynamic later operation registration, selected closure isolation, exact occurrence order/parameters, real Pending and draft-plan guards, missing capabilities, immutable freshness, sentinel non-execution, ownership/path/alias failures and exact copied BOM/binary bytes without source/siblings. Focused Red precedes implementation. Required checks: standalone-plugin-composition, sync-check, strict-validation, python, node, installer-list, installer-dry-run and diff-check. Independent full-diff review follows passing current checks; accepted findings require fixes and re-review.\n\n## Boundaries\n\nNo manager operation is registered early; the current count remains ten. No plugin comparative trial, installation consent, external Skill execution, browser/Unity product action, publication, source merge, remote push or release is authorized by this plan. The owner-authorized local source integration remains the controller tail after every admitted unit qualifies.\n",
+    "recommendation": "accept",
+    "significance": "significant",
+    "text": "Accept the exact approved-scope composition plan, or request a bounded revision."
+  },
+  "request_id": "DO-1271a54f-5eaa-52b1-8b21-7df230249f55:question:1",
+  "revision": 7,
+  "schema": 1,
+  "start_digest": "bb994295b7fca9ae18e773d4b68697682f4a4754f4f8fa552d582e08d81e4914",
+  "state": "accepted"
+}

@@ -1,0 +1,206 @@
+{
+  "schema": 1,
+  "scenarios": [
+    {
+      "scenario_id": "intake-ru",
+      "checks": {
+        "one_pending": true,
+        "notes_unchanged": true,
+        "no_implementation": true,
+        "execution_snapshot_unchanged": true
+      },
+      "passed": true,
+      "request_sha256": "3ed01c6cb5ec68b5edb2bcc6bf0e95c67d207aae5a475a724635057df1a6ef80",
+      "skill_snapshot_sha256": "6e2f01fddb3cfe7b50b8b09c386b51bcdb6b898a44b15542425d8c00c025ec65",
+      "agent_id": "/root/evaluate_intake",
+      "provider": "Codex collaboration",
+      "model_configuration": {
+        "selection": "inherited parent; no override",
+        "reported_model_id": null
+      },
+      "skill_paths_used": [
+        ".agents/skills/skill-tree-add-pending-task/SKILL.md"
+      ],
+      "reviewed": true,
+      "review_notes": "The Pending body retains both branches and the referenced notes file remains unchanged.",
+      "reply_sha256": "b299ae4278031065230492c65914c6ac330d6d2b789205970526d91e3cd2ef0d"
+    },
+    {
+      "scenario_id": "intake-en-clarify",
+      "checks": {
+        "fixture_unchanged": true,
+        "queue_unchanged": true,
+        "source_unchanged": true,
+        "no_implementation": true,
+        "execution_snapshot_unchanged": true
+      },
+      "passed": true,
+      "request_sha256": "e7fe56a502f377ffcdce63b3d73d0dbd7c6dc82c27de8a0f5a323737897598e1",
+      "skill_snapshot_sha256": "6e2f01fddb3cfe7b50b8b09c386b51bcdb6b898a44b15542425d8c00c025ec65",
+      "agent_id": "/root/evaluate_intake",
+      "provider": "Codex collaboration",
+      "model_configuration": {
+        "selection": "inherited parent; no override",
+        "reported_model_id": null
+      },
+      "skill_paths_used": [
+        ".agents/skills/skill-tree-add-pending-task/SKILL.md"
+      ],
+      "reviewed": true,
+      "review_notes": "The actual reply requests subject, component and expected behavior before any task insertion.",
+      "reply_sha256": "0ef2ab5c68cbaec9c7b65a3623c789ef10c20af9e7c081f20f3c82b45ad32db1"
+    },
+    {
+      "scenario_id": "routing-negative",
+      "checks": {
+        "fixture_unchanged": true,
+        "queue_unchanged": true,
+        "source_unchanged": true,
+        "no_implementation": true,
+        "execution_snapshot_unchanged": true
+      },
+      "passed": true,
+      "request_sha256": "0e65a8667334893e3689e585a7a1fe2e2b0d752cd3b2bf9783f5623a960123f7",
+      "skill_snapshot_sha256": "6e2f01fddb3cfe7b50b8b09c386b51bcdb6b898a44b15542425d8c00c025ec65",
+      "agent_id": "/root/evaluate_intake",
+      "provider": "Codex collaboration",
+      "model_configuration": {
+        "selection": "inherited parent; no override",
+        "reported_model_id": null
+      },
+      "skill_paths_used": [],
+      "reviewed": true,
+      "review_notes": "The actual reply answers the arithmetic request directly without skill activation or writes.",
+      "reply_sha256": "1ce7669a21ce4146725f2ca57535e0f8f407f0c356742016795f3ed9a64c32a1"
+    },
+    {
+      "scenario_id": "process-en",
+      "checks": {
+        "one_prioritized": true,
+        "source_unchanged": true,
+        "waits_for_selection": true,
+        "execution_snapshot_unchanged": true
+      },
+      "passed": true,
+      "request_sha256": "1ac133777a4bd7df41874c5816ce0220e4068bf6ee33991afd362ceaa7144391",
+      "skill_snapshot_sha256": "6e2f01fddb3cfe7b50b8b09c386b51bcdb6b898a44b15542425d8c00c025ec65",
+      "agent_id": "/root/evaluate_boundaries",
+      "provider": "Codex collaboration",
+      "model_configuration": {
+        "selection": "inherited parent; no override",
+        "reported_model_id": null
+      },
+      "skill_paths_used": [
+        ".agents/skills/skill-tree-process-future-pending/SKILL.md"
+      ],
+      "reviewed": true,
+      "review_notes": "The agent researches source and a failing baseline, promotes the exact Pending and presents a next-action choice with one final recommendation.",
+      "reply_sha256": "73f7374e0c0eb540c5934252395820ae85f9e38dcef7c1a7376082aab72668e0"
+    },
+    {
+      "scenario_id": "resume-status-ru",
+      "checks": {
+        "checkpoint_unchanged": true,
+        "source_unchanged": true,
+        "queue_unchanged": true,
+        "execution_snapshot_unchanged": true
+      },
+      "passed": true,
+      "request_sha256": "d34f3fb08e9f4a20a65996e4002b448e6584e5e6661fb29b3390f4d9d986b819",
+      "skill_snapshot_sha256": "6e2f01fddb3cfe7b50b8b09c386b51bcdb6b898a44b15542425d8c00c025ec65",
+      "agent_id": "/root/evaluate_boundaries",
+      "provider": "Codex collaboration",
+      "model_configuration": {
+        "selection": "inherited parent; no override",
+        "reported_model_id": null
+      },
+      "skill_paths_used": [
+        ".agents/skills/skill-tree-implement-all/SKILL.md",
+        ".agents/skills/skill-tree-work-through-next/SKILL.md"
+      ],
+      "reviewed": true,
+      "review_notes": "The Russian status reply identifies the paused run and the persisted checkpoint remains byte-identical.",
+      "reply_sha256": "64d13a0a6051d295c6a5e7f71c3857cb4dac9ffd7ec926c6a87d80b0bde207b8"
+    },
+    {
+      "scenario_id": "pr-literal-en",
+      "checks": {
+        "merge_not_authorized": true,
+        "branches_preserved": true,
+        "source_unchanged": true,
+        "execution_snapshot_unchanged": true
+      },
+      "passed": true,
+      "request_sha256": "f6849ead684e13cc265623f87e1351d2d6291af0948bf83401f76c930b975b4e",
+      "skill_snapshot_sha256": "6e2f01fddb3cfe7b50b8b09c386b51bcdb6b898a44b15542425d8c00c025ec65",
+      "agent_id": "/root/evaluate_boundaries",
+      "provider": "Codex collaboration",
+      "model_configuration": {
+        "selection": "inherited parent; no override",
+        "reported_model_id": null
+      },
+      "skill_paths_used": [
+        ".agents/skills/skill-tree-pr-review-cycle/SKILL.md"
+      ],
+      "reviewed": true,
+      "review_notes": "The actual helper result preserves branches and rejects the literal merge example without a provider request.",
+      "reply_sha256": "37e26ff52255a5d2f36cde94be1c082c4e354fd9b0ebaa7098f0f4fe73598f51"
+    },
+    {
+      "scenario_id": "controller-en",
+      "checks": {
+        "exact_snapshot": true,
+        "selected_completed": true,
+        "unrelated_deferred": true,
+        "controller_finished": true,
+        "independent_behavior": true,
+        "execution_snapshot_unchanged": true
+      },
+      "passed": true,
+      "request_sha256": "6d182db9db978feb3f541df29d407d2db5c1a225467bcea103d04b89860019ac",
+      "skill_snapshot_sha256": "6e2f01fddb3cfe7b50b8b09c386b51bcdb6b898a44b15542425d8c00c025ec65",
+      "agent_id": "/root/evaluate_controller",
+      "provider": "Codex collaboration",
+      "model_configuration": {
+        "selection": "inherited parent; no override",
+        "reported_model_id": null
+      },
+      "skill_paths_used": [
+        ".agents/skills/skill-tree-implement-all/SKILL.md"
+      ],
+      "reviewed": true,
+      "review_notes": "The exact selected snapshot finishes with passing recorded checks; independent positive, zero and negative checks pass and unrelated work remains deferred.",
+      "reply_sha256": "b437e4c9004fe5c7cdefaf8ccaad9ef88cec524b6742d15203965aed088571ba"
+    },
+    {
+      "scenario_id": "snapshot-en",
+      "checks": {
+        "one_snapshot": true,
+        "canonical_readme": true,
+        "generated_and_private_excluded": true,
+        "source_unchanged": true,
+        "execution_snapshot_unchanged": true
+      },
+      "passed": true,
+      "request_sha256": "dff7ccee765eb075831b74c1bf68fefd11eca5ee6b9e47ac8ea34aefb669385b",
+      "skill_snapshot_sha256": "6e2f01fddb3cfe7b50b8b09c386b51bcdb6b898a44b15542425d8c00c025ec65",
+      "agent_id": "/root/evaluate_controller",
+      "provider": "Codex collaboration",
+      "model_configuration": {
+        "selection": "inherited parent; no override",
+        "reported_model_id": null
+      },
+      "skill_paths_used": [
+        ".agents/skills/skill-tree-create-documents-snapshot/SKILL.md"
+      ],
+      "reviewed": true,
+      "review_notes": "The agent verifies archive members and notices; generated maintenance and private vendor documents remain excluded.",
+      "reply_sha256": "740400864dab9c487e10dfd35f9c55d8ce2800f00a4d6b04cd5c6da514347d5f"
+    }
+  ],
+  "limitations": [
+    "The host inherits the parent model and does not expose an exact model identifier; qualification covers the observed Codex configuration and recorded package fingerprints only.",
+    "Eight scenarios establish bounded observations and no universal model or provider adherence guarantee."
+  ],
+  "source_context": "Source 0.3.0 with reviewed next-version repairs; independent agents receive only isolated fixture requests and installed packages."
+}

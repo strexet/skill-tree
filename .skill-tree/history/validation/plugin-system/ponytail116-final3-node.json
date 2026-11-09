@@ -1,0 +1,19 @@
+{
+  "name": "node",
+  "argv": [
+    "npm",
+    "run",
+    "test:node"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "tool_wall_seconds": 72.8173199580051,
+  "source_freeze": ".skill-tree/history/validation/plugin-system/ponytail116-source-freeze3.json",
+  "source_freeze_sha256": "0b4725def129fa03efa04d8a223ba01b73823244cb9318137e5ad79c839ae5f2",
+  "changed_frozen_paths": [],
+  "qualification": "Current source/repository deterministic validation only; no new actual host/candidate/native Skill, efficacy, browser/device/provider or universal qualification.",
+  "tests": 281,
+  "pass": 281,
+  "fail": 0,
+  "skipped": 0
+}

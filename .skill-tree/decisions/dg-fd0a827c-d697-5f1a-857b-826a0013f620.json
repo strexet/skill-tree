@@ -1,0 +1,264 @@
+{
+  "acceptance": {
+    "actor": {
+      "context_id": "/root/registry117_architecture",
+      "id": "/root/registry117_architecture"
+    },
+    "answer": "revise",
+    "attempt_id": "DA-de250a50-6a83-4fe0-aba0-59675a255b77",
+    "authority_digest": "8e513ca2ec78101653022a6629bd3caf5c7059be3d2df34bb802c4ea1cf18422",
+    "context_identity": {
+      "decision_purpose": "plan",
+      "execution_snapshot_digest": "892007ebc4b973b4ab4120624f5bec28500cbc886a4f89498e1d341ad70cf8af",
+      "id": "task:T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "kind": "task",
+      "orchestration_id": "DO-0d91bb8c-2ac0-5ba7-8f56-e1aa50735cd1",
+      "plan_digest": "9c146289518ae25a9f6be4fc45c0c41dfebf84d4ce050b25b9d67c43b54f92b5",
+      "required_checks_digest": "8cec77fe3a5c47c791bdf8899f6f8b3fb6936aa0f1aa7ea4600c35dc3beaf3f9",
+      "task_ids": [
+        "T-18db6175-499f-4679-bf8d-f815c7b42411"
+      ]
+    },
+    "decision_id": "DG-fd0a827c-d697-5f1a-857b-826a0013f620",
+    "digest": "c6ea9964261c8d1c7008a3ec4c8a9eac8058fd42cfa4a245b1e5c0605ccd26a0",
+    "kind": "specification-acceptance",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/registry117_architecture",
+      "actor_id": "/root/registry117_architecture",
+      "creation_reference": "Observed separately created existing /root/registry117_architecture context; current optional pilot plan resolver independent of root executor.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/registry117_architecture returned the observed resolver result for the exact original sealed input; raw artifact ponytail116-resolver-result.json.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "6921462f0e3a994f9b5811822a0b8a252aff842a4bcb07eb67a9d96074d90fa7",
+    "question_id": "ponytail116-plan",
+    "rationale": "The bounded optional pilot, pinned source, readiness obligations and qualification limits are appropriate, but the inspected draft cannot yet establish the promised owned activation boundary. The descriptor stores parameter_defaults.values/instructions where compileBindings consumes upstream/project layers; a direct current-source compile yields empty effective values and instructions. Correctly layered extra instructions can also be replaced by binding/run instructions, so the report-only/session-lifetime policy must remain in authoritative owned delivery or core review policy rather than depending on replaceable extras. Revise the plan narrowly to require the supported default layering, an invariant report-only/isolated-lifetime/observed-cleanup boundary independent of user extras, and an effective composed-delivery regression proving overrides cannot remove that boundary or satisfy cleanup by self-report. Preserve the stated source pin, optional installation, full core review and no-new-native-or-efficacy-claim limits.",
+    "role_receipts": {
+      "critic": "db8cd08b5622791ee3fb5f6abb0a6e37d270e3b6218659259b93c069c9111fbf",
+      "resolver": "6d906a9655c9dca8329cc694220012b82f88c1184a9133a2fb4a4c0657be3abe"
+    },
+    "semantic_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495"
+  },
+  "active_attempt_id": null,
+  "attempts": {
+    "DA-49a75ddb-66f5-4c36-bde8-5f29f478ce18": {
+      "actor": {
+        "context_id": "/root/invocation118_oracle",
+        "id": "/root/invocation118_oracle"
+      },
+      "authority_digest": "8e513ca2ec78101653022a6629bd3caf5c7059be3d2df34bb802c4ea1cf18422",
+      "basis_digest": "31e2e0b44b9983f770d6a9e17b622a53a55a0710f4ab23a2877a38e3a8b29ddc",
+      "content_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+      "evidence": {
+        "actor_context_id": "/root/invocation118_oracle",
+        "actor_id": "/root/invocation118_oracle",
+        "creation_reference": "Observed separately created existing /root/invocation118_oracle context; independent critic of optional pilot plan and current resolver correction.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/invocation118_oracle returned the observed critic result for the exact original sealed input; raw artifact ponytail116-critic-result.json.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-49a75ddb-66f5-4c36-bde8-5f29f478ce18",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "6921462f0e3a994f9b5811822a0b8a252aff842a4bcb07eb67a9d96074d90fa7",
+      "result": {
+        "answer": "revise",
+        "evidence": [
+          ".skill-tree/artifacts/plugin-implementation/ponytail116-sealed-critic.json",
+          ".skill-tree/history/research/ponytail116-plan.md",
+          ".skill-tree/artifacts/plugin-implementation/ponytail116-plan-revision-draft.md",
+          ".skill-tree/artifacts/plugin-implementation/ponytail116-source/ponytail-source-definition.json",
+          ".skill-tree/artifacts/plugin-implementation/ponytail116-source/source-manifest.json",
+          ".skill-tree/artifacts/plugin-implementation/ponytail116-source/skills/ponytail/SKILL.md",
+          ".skill-tree/lib/plugin-bindings.js:179",
+          ".skill-tree/lib/plugin-parameters.js:108",
+          ".skill-tree/lib/plugin-runtime.js:97",
+          ".skill-tree/common/scripts/pr-review-state.py:204",
+          ".skill-tree/documents/implementation-plan.md:40"
+        ],
+        "input_digest": "0e9c96f8865d4cc2db64e494190ed889162783ba1921eeb00616c67b4cd9e37a",
+        "rationale": "Agree with the resolver correction for the original sealed plan. compileBindings reads parameter_defaults.upstream/project/schema, while the inspected descriptor puts values/instructions directly under parameter_defaults; those defaults therefore do not become the effective delivery. resolveParameters also replaces instructions at later binding/run layers, so replaceable extras cannot establish the promised report-only session boundary. Revise narrowly to put supported defaults in the actual layers and place an immutable owned adapter policy in the sealed effective configuration/private delivery independently of user extras. PR readiness must consume matching original-attempt/actor host-observed context-end evidence; a returned result or actor self-report alone cannot satisfy cleanup. The proposed draft revision addresses these requirements with real composed-delivery override and cleanup controls and retains configured-but-unstarted holds, explicit publication-carrier attachment, frozen occurrence/currentness guards and complete core review at every approved placement. The source pin and two-file closure are verified, and the before/during/after meanings match the approved W2 anchors. No additional material plan-scope defect was found. This critic result requests revision of the original plan; it does not accept an unsealed replacement, authorize actual installation, launch a native pilot or establish Ponytail efficacy.",
+        "status": "agree"
+      },
+      "role": "critic",
+      "semantic_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+      "status": "agree"
+    },
+    "DA-de250a50-6a83-4fe0-aba0-59675a255b77": {
+      "actor": {
+        "context_id": "/root/registry117_architecture",
+        "id": "/root/registry117_architecture"
+      },
+      "authority_digest": "8e513ca2ec78101653022a6629bd3caf5c7059be3d2df34bb802c4ea1cf18422",
+      "basis_digest": null,
+      "content_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+      "evidence": {
+        "actor_context_id": "/root/registry117_architecture",
+        "actor_id": "/root/registry117_architecture",
+        "creation_reference": "Observed separately created existing /root/registry117_architecture context; current optional pilot plan resolver independent of root executor.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/registry117_architecture returned the observed resolver result for the exact original sealed input; raw artifact ponytail116-resolver-result.json.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-de250a50-6a83-4fe0-aba0-59675a255b77",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "6921462f0e3a994f9b5811822a0b8a252aff842a4bcb07eb67a9d96074d90fa7",
+      "result": {
+        "answer": "revise",
+        "evidence": [
+          ".skill-tree/artifacts/plugin-implementation/ponytail116-sealed-resolver.json",
+          ".skill-tree/artifacts/plugin-implementation/ponytail116-source/ponytail-source-definition.json",
+          ".skill-tree/artifacts/plugin-implementation/ponytail116-source/skills/ponytail/SKILL.md",
+          ".skill-tree/lib/plugin-bindings.js:179",
+          ".skill-tree/lib/plugin-parameters.js:108",
+          ".skill-tree/lib/plugin-runtime.js:97",
+          ".skill-tree/common/scripts/pr-review-state.py:204",
+          ".skill-tree/documents/future.md:839"
+        ],
+        "input_digest": "62b647347703d3608714ca0e8b35ae3c8be0da6226fe5beb7bdfc2fe864e1bc3",
+        "rationale": "The bounded optional pilot, pinned source, readiness obligations and qualification limits are appropriate, but the inspected draft cannot yet establish the promised owned activation boundary. The descriptor stores parameter_defaults.values/instructions where compileBindings consumes upstream/project layers; a direct current-source compile yields empty effective values and instructions. Correctly layered extra instructions can also be replaced by binding/run instructions, so the report-only/session-lifetime policy must remain in authoritative owned delivery or core review policy rather than depending on replaceable extras. Revise the plan narrowly to require the supported default layering, an invariant report-only/isolated-lifetime/observed-cleanup boundary independent of user extras, and an effective composed-delivery regression proving overrides cannot remove that boundary or satisfy cleanup by self-report. Preserve the stated source pin, optional installation, full core review and no-new-native-or-efficacy-claim limits.",
+        "status": "answered"
+      },
+      "role": "resolver",
+      "semantic_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+      "status": "answered"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the admitted optional pinned Ponytail review pilot and completed dependency scope; controlled local installation fixtures use scripted test input. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+    ],
+    "context_id": "task:T-18db6175-499f-4679-bf8d-f815c7b42411",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+    },
+    "id": "approved-ponytail116",
+    "revision": 1
+  },
+  "authority_digest": "8e513ca2ec78101653022a6629bd3caf5c7059be3d2df34bb802c4ea1cf18422",
+  "context": {
+    "content_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+    "decision_purpose": "plan",
+    "execution_snapshot_digest": "892007ebc4b973b4ab4120624f5bec28500cbc886a4f89498e1d341ad70cf8af",
+    "id": "task:T-18db6175-499f-4679-bf8d-f815c7b42411",
+    "kind": "task",
+    "orchestration_id": "DO-0d91bb8c-2ac0-5ba7-8f56-e1aa50735cd1",
+    "plan_digest": "9c146289518ae25a9f6be4fc45c0c41dfebf84d4ce050b25b9d67c43b54f92b5",
+    "required_checks_digest": "8cec77fe3a5c47c791bdf8899f6f8b3fb6936aa0f1aa7ea4600c35dc3beaf3f9",
+    "semantic_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+    "task_ids": [
+      "T-18db6175-499f-4679-bf8d-f815c7b42411"
+    ]
+  },
+  "decision_hash": "72d554c1ed045415c84cb19c74e8e9d3e63e7530dd01d30a23b256401fd6e1e5",
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "frontier_epoch": 1,
+  "history": [
+    {
+      "context_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+      "detail": {},
+      "event": "started",
+      "mode_epoch": 1,
+      "previous_record_hash": null,
+      "sequence": 1
+    },
+    {
+      "context_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+      "detail": {
+        "attempt_id": "DA-de250a50-6a83-4fe0-aba0-59675a255b77",
+        "role": "resolver"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "75be3758fd889d03aa79872a3b6081ac86ad859f6787982692347efacad1b5d5",
+      "sequence": 2
+    },
+    {
+      "context_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+      "detail": {
+        "attempt_id": "DA-de250a50-6a83-4fe0-aba0-59675a255b77",
+        "status": "answered"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "54af401688dac2fc0663cf5ae7b4a3b2c6f13beadc54751d7a2bd910310edf41",
+      "sequence": 3
+    },
+    {
+      "context_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+      "detail": {
+        "attempt_id": "DA-49a75ddb-66f5-4c36-bde8-5f29f478ce18",
+        "role": "critic"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "6347b389fd63c83d6195eef03a9eea91ec71fe8c641f12019117d1a84063404a",
+      "sequence": 4
+    },
+    {
+      "context_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+      "detail": {
+        "attempt_id": "DA-49a75ddb-66f5-4c36-bde8-5f29f478ce18",
+        "status": "agree"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "069051997d2359a1e80db5328b86839c4922dbc7f9e57587767e62458481663e",
+      "sequence": 5
+    },
+    {
+      "context_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+      "detail": {
+        "acceptance_digest": "c6ea9964261c8d1c7008a3ec4c8a9eac8058fd42cfa4a245b1e5c0605ccd26a0"
+      },
+      "event": "accept",
+      "mode_epoch": 1,
+      "previous_record_hash": "58a7224028e5e1934734894d6dfb47a1a5034a7fe89799b07e3c0036ae78e64f",
+      "sequence": 6
+    }
+  ],
+  "id": "DG-fd0a827c-d697-5f1a-857b-826a0013f620",
+  "mode": "auto",
+  "mode_epoch": 1,
+  "prepared_attempt_id": "DA-49a75ddb-66f5-4c36-bde8-5f29f478ce18",
+  "question": {
+    "id": "ponytail116-plan",
+    "kind": "specification-acceptance",
+    "options": [
+      {
+        "id": "accept",
+        "text": "Accept the current plan."
+      },
+      {
+        "id": "revise",
+        "text": "Revise the plan with concrete reasons."
+      }
+    ],
+    "plan_text": "# Optional Ponytail Review Pilot Implementation Plan\n\n## Scope and authority\n\nTask `T-18db6175-499f-4679-bf8d-f815c7b42411` integrates the exact original Ponytail skill as an optional bounded contribution. The source-backed Codex invocation and W1 core decisions remain the qualified execution mechanisms. Core-only installation retains zero external packages and bindings. The task creates no remote publication, actual project plugin installation consent, candidate comparison or merge authority.\n\n## Research and source identity\n\nThe source descriptor pins `DietrichGebert/ponytail` revision `96608e078b2d5ea607c5c3b8b5a54d1c1fba6846`, entry `skills/ponytail/SKILL.md` and the inspected MIT license. Raw source bytes and the complete inspected resource closure retain independent digests; the adapter overlay never rewrites upstream instructions. The source inspection records the actual resource/dependency facts and session-wide behavior.\n\n## Behavioral changes\n\nAn optional descriptor proposes the default `skill-tree-pr-review-cycle:after` binding and compatible before/during alternatives. The descriptor does not activate any binding. Each occurrence retains an independent ID, parameters and order through the existing binding system. The owned overlay restricts the upstream session mode to one fresh isolated report-only actor and requires observed cleanup; parent execution never adopts the upstream mode.\n\nPR readiness inspects configured current review obligations as well as attached chain references. An enabled but never-started occurrence cannot disappear from readiness. Actual current full core review remains mandatory for every placement. The after placement follows the full core pass and before readiness. During contributes after core inspection while preserving the complete core result. Before may contribute before core review without satisfying core review. Exact head/base/target, current configuration, source/resources, capabilities and ordinary invocation receipts remain binding. Frozen obligations survive configuration changes until explicit supported reconciliation records the change.\n\nReturned findings enter ordinary W1 substantiation or evidence-backed dismissal, authorized fixes, required checks and repeated full review. Failed, unavailable, cancelled, uncertain or stale execution retains an explicit hold. Explicit disabling records a configuration decision and supplies no execution success. Plugin output cannot satisfy independent external approval or authorize publication/merge.\n\n## Verification\n\nThe descriptor pins entry SHA256 `9badd22a32e19cb884e46dfa8d3aae82bb81dfa5484105b8b4f0262df823a509`, license SHA256 `fb1bc6909ac3ef82d5c22106e32ef682b0cff66788fa915fb9b53b15c9d2f3ab` and inspected two-resource content digest `14147d26122fb21e825ff59f20d3eedd79ebdbf05c17eaae93daf67826ec5615`. The reviewed raw source manifest and original-byte fixtures preserve provenance separately from the adapter overlay.\n\nThe first focused behavioral regression demonstrates that a configured enabled review pass with no attached invocation currently permits readiness incorrectly. Requirements-led controls then cover zero-plugin/default behavior; current completed passes; before/during/after placement; incomplete core review; failed/missing/stale capability and session/context cleanup; wrong head/base/target; current configuration/resource drift; independent actor reuse; accepted findings and post-fix invalidation; explicit disable/reconciliation; and unchanged external approval/merge gates. The fixtures use controlled local acquisition and observed pinned bytes without executing upstream helpers or publishing.\n\nFocused fixtures qualify deterministic PR/invocation integration. Preserved earlier actual source-backed invocation observations establish only the recorded host contract. The task does not claim new native Skill invocation, broad provider support or comparative Ponytail efficacy. Any additional actual-host pilot requires a separately recorded finite functional qualification plan; comparative calibration/trials remain behind task114 actual owner agreement.\n\nFinal verification includes the focused review pilot suite, affected PR/invocation/composition suites, sync check, strict repository validation, full Python/Node suites, installer list/dry-run and diff check. An independent agent reviews the complete authored/generated diff. Reviewed source is committed locally, then the owned installation refresh preserves canonical queue/history and explicitly re-admits the same run before controller continuation.\n",
+    "recommendation": "accept",
+    "significance": "significant",
+    "text": "Accept the exact admitted optional Ponytail review pilot plan, or request a bounded revision."
+  },
+  "request_id": "DO-0d91bb8c-2ac0-5ba7-8f56-e1aa50735cd1:question:1",
+  "revision": 6,
+  "schema": 1,
+  "start_digest": "953a7c3514685e4443d969edbd6e21f3af7820e984ecae5c5a3f1ef3ede77fa8",
+  "state": "accepted"
+}

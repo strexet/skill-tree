@@ -1,0 +1,200 @@
+TAP version 13
+# Subtest: composition exposes real callable composition and boundary APIs
+ok 1 - composition exposes real callable composition and boundary APIs
+  ---
+  duration_ms: 0.78375
+  ...
+# Subtest: general core-only composition covers registered operations with W1 and no optional plugin hold
+ok 2 - general core-only composition covers registered operations with W1 and no optional plugin hold
+  ---
+  duration_ms: 363.843083
+  ...
+# Subtest: web core-only composition covers registered operations with W1 and no optional plugin hold
+ok 3 - web core-only composition covers registered operations with W1 and no optional plugin hold
+  ---
+  duration_ms: 364.435041
+  ...
+# Subtest: unity core-only composition covers registered operations with W1 and no optional plugin hold
+ok 4 - unity core-only composition covers registered operations with W1 and no optional plugin hold
+  ---
+  duration_ms: 334.480875
+  ...
+# Subtest: general composes A-to-B-to-A occurrences in exact order with independent parameters
+ok 5 - general composes A-to-B-to-A occurrences in exact order with independent parameters
+  ---
+  duration_ms: 630.770792
+  ...
+# Subtest: web composes A-to-B-to-A occurrences in exact order with independent parameters
+ok 6 - web composes A-to-B-to-A occurrences in exact order with independent parameters
+  ---
+  duration_ms: 619.712791
+  ...
+# Subtest: unity composes A-to-B-to-A occurrences in exact order with independent parameters
+ok 7 - unity composes A-to-B-to-A occurrences in exact order with independent parameters
+  ---
+  duration_ms: 654.318333
+  ...
+# Subtest: selected operation closure excludes unrelated plugins and preserves locked core instructions
+ok 8 - selected operation closure excludes unrelated plugins and preserves locked core instructions
+  ---
+  duration_ms: 603.7715
+  ...
+# Subtest: upstream BOM and binary bytes survive composition and original-byte hashing
+ok 9 - upstream BOM and binary bytes survive composition and original-byte hashing
+  ---
+  duration_ms: 582.398917
+  ...
+# Subtest: owned catalog registers all operation phases and approved named aliases with callable guards
+ok 10 - owned catalog registers all operation phases and approved named aliases with callable guards
+  ---
+  duration_ms: 35.420458
+  ...
+# Subtest: a later registered operation composes through the same extension without a fixed manager count
+ok 11 - a later registered operation composes through the same extension without a fixed manager count
+  ---
+  duration_ms: 751.162583
+  ...
+# Subtest: an unknown configured label remains unresolved and never supplies a successful executable boundary
+ok 12 - an unknown configured label remains unresolved and never supplies a successful executable boundary
+  ---
+  duration_ms: 608.568875
+  ...
+# Subtest: missing native tools remain explicit unavailable prerequisites for noncatalog cross-host sources
+ok 13 - missing native tools remain explicit unavailable prerequisites for noncatalog cross-host sources
+  ---
+  duration_ms: 616.831125
+  ...
+# Subtest: composition installation list and dry-run never execute an upstream helper or mutate plugin configuration
+ok 14 - composition installation list and dry-run never execute an upstream helper or mutate plugin configuration
+  ---
+  duration_ms: 3714.49275
+  ...
+# Subtest: general copied installed operation prepares without source installation or sibling packages
+ok 15 - general copied installed operation prepares without source installation or sibling packages
+  ---
+  duration_ms: 926.897208
+  ...
+# Subtest: web copied installed operation prepares without source installation or sibling packages
+ok 16 - web copied installed operation prepares without source installation or sibling packages
+  ---
+  duration_ms: 921.652792
+  ...
+# Subtest: unity copied installed operation prepares without source installation or sibling packages
+ok 17 - unity copied installed operation prepares without source installation or sibling packages
+  ---
+  duration_ms: 960.354875
+  ...
+# Subtest: Processing before and during bind actual selected Pending identities and preserve unresolved intake bytes
+ok 18 - Processing before and during bind actual selected Pending identities and preserve unresolved intake bytes
+  ---
+  duration_ms: 1603.689042
+  ...
+# Subtest: Processing guard rejects fabricated absent or premature task context without changing the queue
+not ok 19 - Processing guard rejects fabricated absent or premature task context without changing the queue
+  ---
+  duration_ms: 963.9885
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:109:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /Pending|pending|context|selected/i. Input:
+    
+    'Error: Traceback (most recent call last):\n' +
+      '  File "<string>", line 14, in <module>\n' +
+      '  File "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-plugin-composition-htipBi/only-package/scripts/workflow-state.py", line 166, in resolve\n' +
+      "    raise WorkflowError('Absent or ambiguous task selection: '+value)\n" +
+      'owned_plugin_workflow.WorkflowError: Absent or ambiguous task selection: P-11111111-1111-4111-8111-111111111111'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: |-
+    Traceback (most recent call last):
+      File "<string>", line 14, in <module>
+      File "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-plugin-composition-htipBi/only-package/scripts/workflow-state.py", line 166, in resolve
+        raise WorkflowError('Absent or ambiguous task selection: '+value)
+    owned_plugin_workflow.WorkflowError: Absent or ambiguous task selection: P-11111111-1111-4111-8111-111111111111
+  stack: |-
+    fail (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-composition.js:17:41)
+    guardBoundary (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-composition.js:119:31)
+    Object.handler (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-composition.js:26:125)
+    Object.prepareBoundary (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-composition.js:130:55)
+    /Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:110:421
+    getActual (node:assert:498:5)
+    Function.throws (node:assert:644:24)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:110:404)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:110:404)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: implementation During requires the matching actual draft-plan frame before acceptance
+not ok 20 - implementation During requires the matching actual draft-plan frame before acceptance
+  ---
+  duration_ms: 848.377958
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:112:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /orchestration|draft|plan|frame/i. Input:
+    
+    'Error: Parameters require finite, acyclic JSON data'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: 'Parameters require finite, acyclic JSON data'
+  stack: |-
+    error (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-parameters.js:6:43)
+    clone (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-parameters.js:12:57)
+    clone (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-parameters.js:21:18)
+    Object.resolveParameters (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-parameters.js:111:46)
+    clone (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-composition.js:5:31)
+    Object.prepareBoundary (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-composition.js:123:16)
+    /Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:113:568
+    getActual (node:assert:498:5)
+    Function.throws (node:assert:644:24)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:113:551)
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:113:551)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: implementation During rejects research-only and already accepted plans without stale readiness
+ok 21 - implementation During rejects research-only and already accepted plans without stale readiness
+  ---
+  duration_ms: 1712.324
+  ...
+# Subtest: a materially changed draft loses old acceptance before the next During preparation
+ok 22 - a materially changed draft loses old acceptance before the next During preparation
+  ---
+  duration_ms: 860.829125
+  ...
+# Subtest: sequence edits change profile and composition identity without mutating the frozen previous manifest
+ok 23 - sequence edits change profile and composition identity without mutating the frozen previous manifest
+  ---
+  duration_ms: 811.929084
+  ...
+# Subtest: modified owned resources and escaping registry paths cannot enter a composed package
+ok 24 - modified owned resources and escaping registry paths cannot enter a composed package
+  ---
+  duration_ms: 1111.408958
+  ...
+# Subtest: copied operation detects changed local plugin bytes before preparing any occurrence
+ok 25 - copied operation detects changed local plugin bytes before preparing any occurrence
+  ---
+  duration_ms: 608.127375
+  ...
+1..25
+# tests 25
+# suites 0
+# pass 23
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 21301.91725

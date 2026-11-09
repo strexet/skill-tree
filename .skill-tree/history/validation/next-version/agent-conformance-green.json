@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-agent-conformance.py"
+  ],
+  "assertion": "Actual bounded agent scenarios verify routing and workflow boundaries.",
+  "check_id": "regression",
+  "counts": {
+    "discovered": 5,
+    "expected": 5,
+    "failed": 0,
+    "passed": 5,
+    "skipped": 0
+  },
+  "log_path": ".skill-tree/artifacts/next-version/agent-conformance-green.log",
+  "log_sha256": "a3261d9561c583b0c77a5635aab42d4e364d1fa151611dafb58231dc0008fbda",
+  "phase": "green",
+  "task_id": "T-f0d56c17-e6cc-4393-a1f2-bb154f11323c"
+}

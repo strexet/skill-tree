@@ -1,0 +1,22 @@
+{
+  "kind": "controlled-readonly-source-entry-path-probe",
+  "source_runtime_unchanged": true,
+  "lexical_owned_root": "/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-owned-link-entry-probe-XNUafj/project/.agents/skills/skill-tree-add-pending-task",
+  "actual_relocated_root": "/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-owned-link-entry-probe-XNUafj/relocated-operation",
+  "cli": {
+    "exit": 0,
+    "argument_observation": "{\"diagnostic\":\"entry-argument\",\"package_root\":\"/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-owned-link-entry-probe-XNUafj/relocated-operation\",\"argv1\":\"/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-owned-link-entry-probe-XNUafj/project/.agents/skills/skill-tree-add-pending-task/scripts/plugin-hooks.js\"}",
+    "proof": {
+      "prerequisites": [],
+      "bindings": [
+        "controlled-entry"
+      ]
+    }
+  },
+  "workflow": {
+    "exit": 0,
+    "output": "{\"requested_package_root\": \"/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-owned-link-entry-probe-XNUafj/project/.agents/skills/skill-tree-add-pending-task\", \"node_package_roots\": [\"/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-owned-link-entry-probe-XNUafj/relocated-operation\", \"/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-owned-link-entry-probe-XNUafj/relocated-operation\"], \"next_action\": \"prepare\", \"attempts\": 0, \"future_created\": false}",
+    "error": ""
+  },
+  "actors_created": 0
+}

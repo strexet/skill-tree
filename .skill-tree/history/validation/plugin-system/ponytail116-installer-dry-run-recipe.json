@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "kind": "executed-temporary-installation-dry-run-recipe",
+  "report": ".skill-tree/history/validation/plugin-system/ponytail116-final3-installer-dry-run.json",
+  "actual_inner_argv": [
+    "node",
+    ".skill-tree/bin/install.js",
+    "--dry-run",
+    "--all",
+    "--target",
+    "$TEMPORARY_PROJECT_ROOT",
+    "--flavor",
+    "general"
+  ],
+  "runner": {
+    "path": ".skill-tree/artifacts/plugin-implementation/ponytail116-installer-dry-run.py",
+    "sha256": "ab468f4e2f484287e1f4eea5f98c23178120df5adc69cda8e2bcf6f68cbfe721",
+    "source": "import subprocess,tempfile,sys\nfrom pathlib import Path\nr=Path(__file__).resolve().parents[3]\nwith tempfile.TemporaryDirectory(prefix='skill-tree-ponytail-dry-run-') as temporary:\n root=Path(temporary);before=list(root.iterdir());run=subprocess.run(['node','.skill-tree/bin/install.js','--dry-run','--all','--target',str(root),'--flavor','general'],cwd=r,capture_output=True,text=True);sys.stdout.write(run.stdout);sys.stderr.write(run.stderr);assert list(root.iterdir())==before,'Dry-run wrote project files';raise SystemExit(run.returncode)\n"
+  },
+  "assertions": [
+    "The actual temporary target directory remained empty after the installer dry run.",
+    "TemporaryDirectory cleanup removed the disposable target before process exit.",
+    "The current249-file source freeze remained unchanged."
+  ],
+  "limits": [
+    "Controlled source installer dry-run only; no plugin installation/invocation or provider/runtime qualification."
+  ]
+}

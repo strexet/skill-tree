@@ -1,0 +1,260 @@
+{
+  "acceptance": {
+    "actor": {
+      "context_id": "/root/invocation118_architecture",
+      "id": "/root/invocation118_architecture"
+    },
+    "answer": "accept",
+    "attempt_id": "DA-f08d81cd-bb42-4c9b-b665-c708304bb17a",
+    "authority_digest": "d3fb8a7100ba85d9a362765d6a94cc974e805d08ce8122ccf59fcbd43467f545",
+    "context_identity": {
+      "decision_purpose": "decision",
+      "execution_snapshot_digest": "bb1a728e2feffd7e23469db04f591f36fccaa7f16668ff015e99f9e7709967df",
+      "id": "task:T-54439a41-286c-4423-936c-eb27663509c3",
+      "kind": "task",
+      "orchestration_id": "DO-8bbba2d8-4e09-51be-9291-d5ad65b02aa0",
+      "task_ids": [
+        "T-54439a41-286c-4423-936c-eb27663509c3"
+      ]
+    },
+    "decision_id": "DG-59ea7f14-bcca-5d81-9508-77c98bf217e8",
+    "digest": "7839920fe446ae801145fb4d998e9366d033b11dd5d046ae246018338b5a2790",
+    "kind": "technical",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/invocation118_architecture",
+      "actor_id": "/root/invocation118_architecture",
+      "creation_reference": "Actual existing /root/invocation118_architecture context; selected-task technical resolver separate from root executor, with independent critic to follow.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/invocation118_architecture returned the observed resolver result for the exact original sealed input; raw artifact managed-registry-hardening-resolver-actual-result.json.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "59cbbacb1bdc6063f9b177675a9cd1db6f62329f1aae6d13fb7146560619121d",
+    "question_id": "managed-completed-readiness-admission",
+    "rationale": "The design preserves the completed During contract by separating metadata readiness from draft-only business admission, consumes current applicable obligations without relabeling accepted occurrences, and keeps Node preparation outside writer scopes. Exact scoped preflight identity, repeated selection, pure writer/commit rechecks and operation-lifetime cache prevent silent drift adoption while preserving unrelated scope and recovery boundaries. The listed focused controls cover the observed bypasses and the affected core/PR call closure; no new product intent or provider trial is delegated.",
+    "role_receipts": {
+      "critic": "434cbf2d0378b0fd67cffc6e1de1def09051b73a1f90ce8d39644f330bd9db54",
+      "resolver": "0e2d3bb8448ee073938a8fa96eb1c1c033159026239d8a58e4d9878b07d2fe50"
+    },
+    "semantic_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66"
+  },
+  "active_attempt_id": null,
+  "attempts": {
+    "DA-47491d96-26f2-44ff-8ee7-d3be14e04701": {
+      "actor": {
+        "context_id": "/root/invocation118_oracle",
+        "id": "/root/invocation118_oracle"
+      },
+      "authority_digest": "d3fb8a7100ba85d9a362765d6a94cc974e805d08ce8122ccf59fcbd43467f545",
+      "basis_digest": "8e1a1371404a91c92920bb448a02a8b54407e41399add0ff4dfa98683cc6d22b",
+      "content_fingerprint": "7f339ce118c480e795de8d87fcbeffd0c09dfa1a17f0b5578e356680cda18bfb",
+      "evidence": {
+        "actor_context_id": "/root/invocation118_oracle",
+        "actor_id": "/root/invocation118_oracle",
+        "creation_reference": "Actual existing /root/invocation118_oracle context; independent technical critic, separate from root executor and both runtime authors.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/invocation118_oracle returned the observed critic result for the exact original sealed input; raw artifact managed-registry-hardening-critic-actual-result.json.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-47491d96-26f2-44ff-8ee7-d3be14e04701",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "59cbbacb1bdc6063f9b177675a9cd1db6f62329f1aae6d13fb7146560619121d",
+      "result": {
+        "evidence": [
+          ".skill-tree/artifacts/plugin-implementation/managed-registry-hardening-sealed-critic.json",
+          ".skill-tree/artifacts/plugin-implementation/managed-registry-readiness-design.txt",
+          ".skill-tree/common/scripts/workflow-state.py",
+          ".skill-tree/common/scripts/pr-review-state.py",
+          ".skill-tree/lib/plugin-runtime.js",
+          ".skill-tree/history/research/managed-registry-hardening-plan.md"
+        ],
+        "input_digest": "a634b89ee3cf9fe5197495b70f77ce2aeef2d228937f4d53ca2cc3b06e93e9d2",
+        "rationale": "The separation is sound: completed readiness verifies current ownership, frozen configuration and applicable obligations without rerunning draft-only During admission or invalidating historical project-source snapshots. The operation-scoped Store cache, exact HC/locator/context/watch identities, repeated selection and pure writer/commit rechecks address stale-proof reuse and newly matching obligations. The proposed caller coverage includes core selection, processing, completion, controller/maintenance finish and PR ready/merge gates; implementation controls must exercise nested selection and completed-task contexts as well as direct calls. No-ref paths retain no Node requirement. The completed-readiness proof must be explicitly rejected by every ordinary business path. No unresolved design conflict found; implementation and qualification remain unclaimed.",
+        "status": "agree"
+      },
+      "role": "critic",
+      "semantic_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66",
+      "status": "agree"
+    },
+    "DA-f08d81cd-bb42-4c9b-b665-c708304bb17a": {
+      "actor": {
+        "context_id": "/root/invocation118_architecture",
+        "id": "/root/invocation118_architecture"
+      },
+      "authority_digest": "d3fb8a7100ba85d9a362765d6a94cc974e805d08ce8122ccf59fcbd43467f545",
+      "basis_digest": null,
+      "content_fingerprint": "7f339ce118c480e795de8d87fcbeffd0c09dfa1a17f0b5578e356680cda18bfb",
+      "evidence": {
+        "actor_context_id": "/root/invocation118_architecture",
+        "actor_id": "/root/invocation118_architecture",
+        "creation_reference": "Actual existing /root/invocation118_architecture context; selected-task technical resolver separate from root executor, with independent critic to follow.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/invocation118_architecture returned the observed resolver result for the exact original sealed input; raw artifact managed-registry-hardening-resolver-actual-result.json.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-f08d81cd-bb42-4c9b-b665-c708304bb17a",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "59cbbacb1bdc6063f9b177675a9cd1db6f62329f1aae6d13fb7146560619121d",
+      "result": {
+        "answer": "accept",
+        "evidence": [
+          ".skill-tree/artifacts/plugin-implementation/managed-registry-hardening-sealed-resolver.json",
+          ".skill-tree/common/scripts/workflow-state.py",
+          ".skill-tree/common/scripts/pr-review-state.py",
+          ".skill-tree/lib/plugin-runtime.js",
+          ".skill-tree/artifacts/plugin-implementation/managed-registry-python-review-gap-red.txt",
+          ".skill-tree/history/research/managed-registry-hardening-plan.md"
+        ],
+        "input_digest": "042608cc57aa0ac73f54fd374b71c60014e9dc6a9b5bd59a1308bcc43a67fac9",
+        "rationale": "The design preserves the completed During contract by separating metadata readiness from draft-only business admission, consumes current applicable obligations without relabeling accepted occurrences, and keeps Node preparation outside writer scopes. Exact scoped preflight identity, repeated selection, pure writer/commit rechecks and operation-lifetime cache prevent silent drift adoption while preserving unrelated scope and recovery boundaries. The listed focused controls cover the observed bypasses and the affected core/PR call closure; no new product intent or provider trial is delegated.",
+        "status": "answered"
+      },
+      "role": "resolver",
+      "semantic_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66",
+      "status": "answered"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the admitted managed-registry and prerequisite-admission blocker and completed dependency scope; controlled local installation fixtures use scripted test input. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+    ],
+    "context_id": "task:T-54439a41-286c-4423-936c-eb27663509c3",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+    },
+    "id": "approved-managed-registry-hardening",
+    "revision": 1
+  },
+  "authority_digest": "d3fb8a7100ba85d9a362765d6a94cc974e805d08ce8122ccf59fcbd43467f545",
+  "context": {
+    "content_fingerprint": "7f339ce118c480e795de8d87fcbeffd0c09dfa1a17f0b5578e356680cda18bfb",
+    "decision_purpose": "decision",
+    "execution_snapshot_digest": "bb1a728e2feffd7e23469db04f591f36fccaa7f16668ff015e99f9e7709967df",
+    "id": "task:T-54439a41-286c-4423-936c-eb27663509c3",
+    "kind": "task",
+    "orchestration_id": "DO-8bbba2d8-4e09-51be-9291-d5ad65b02aa0",
+    "semantic_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66",
+    "task_ids": [
+      "T-54439a41-286c-4423-936c-eb27663509c3"
+    ]
+  },
+  "decision_hash": "7beb96c6d39e3c988947bbc6c3f9ed053d0af7727281cec18a719b7426be1701",
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "frontier_epoch": 1,
+  "history": [
+    {
+      "context_fingerprint": "7f339ce118c480e795de8d87fcbeffd0c09dfa1a17f0b5578e356680cda18bfb",
+      "detail": {},
+      "event": "started",
+      "mode_epoch": 1,
+      "previous_record_hash": null,
+      "sequence": 1
+    },
+    {
+      "context_fingerprint": "7f339ce118c480e795de8d87fcbeffd0c09dfa1a17f0b5578e356680cda18bfb",
+      "detail": {
+        "attempt_id": "DA-f08d81cd-bb42-4c9b-b665-c708304bb17a",
+        "role": "resolver"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "6dc50ba316e859a48653418a718a673f56fe64ae81abc0f775b02333b1157e98",
+      "sequence": 2
+    },
+    {
+      "context_fingerprint": "7f339ce118c480e795de8d87fcbeffd0c09dfa1a17f0b5578e356680cda18bfb",
+      "detail": {
+        "attempt_id": "DA-f08d81cd-bb42-4c9b-b665-c708304bb17a",
+        "status": "answered"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "48fdc60ee85baa2b9ab8739c33732f497ab24e02cb316d116c496a4d69e99917",
+      "sequence": 3
+    },
+    {
+      "context_fingerprint": "7f339ce118c480e795de8d87fcbeffd0c09dfa1a17f0b5578e356680cda18bfb",
+      "detail": {
+        "attempt_id": "DA-47491d96-26f2-44ff-8ee7-d3be14e04701",
+        "role": "critic"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "41148681d86cd346648e5564ed1f7d1ffeaecee4c909a8eb45b0123600805dfe",
+      "sequence": 4
+    },
+    {
+      "context_fingerprint": "7f339ce118c480e795de8d87fcbeffd0c09dfa1a17f0b5578e356680cda18bfb",
+      "detail": {
+        "attempt_id": "DA-47491d96-26f2-44ff-8ee7-d3be14e04701",
+        "status": "agree"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "71f84246d6a11134238a4baed3cf543fc018c17d41b4ecfbfd9a1dbcada529b8",
+      "sequence": 5
+    },
+    {
+      "context_fingerprint": "7f339ce118c480e795de8d87fcbeffd0c09dfa1a17f0b5578e356680cda18bfb",
+      "detail": {
+        "acceptance_digest": "7839920fe446ae801145fb4d998e9366d033b11dd5d046ae246018338b5a2790"
+      },
+      "event": "accept",
+      "mode_epoch": 1,
+      "previous_record_hash": "5ab53ae5a1cfe1f095016cbecfc72db62e57baa6159408e5e87238e4dc142350",
+      "sequence": 6
+    }
+  ],
+  "id": "DG-59ea7f14-bcca-5d81-9508-77c98bf217e8",
+  "mode": "auto",
+  "mode_epoch": 1,
+  "prepared_attempt_id": "DA-47491d96-26f2-44ff-8ee7-d3be14e04701",
+  "question": {
+    "actual_proposal_author": "/root/invocation118_architecture; read-only source/call-closure proposal retained in actual collaboration messages.",
+    "id": "managed-completed-readiness-admission",
+    "kind": "technical",
+    "options": [
+      {
+        "id": "accept",
+        "text": "Accept the bounded design and targeted controls."
+      },
+      {
+        "id": "revise",
+        "text": "Revise with specific source-backed reasons."
+      }
+    ],
+    "proposal": "The owned Node runtime adds a dedicated read-only readiness-plan endpoint with proof_kind completed-readiness. The endpoint verifies the current operation resource closure, exact managed association, frozen configuration, selected retained context and adapter facts, but does not rerun ordinary draft-only During admission or rehash completed HI project source snapshots. Ordinary freeze, occurrence and delivery paths retain their existing actual-scope guards and cannot consume completed-readiness proof as a business proof.\n\nPython prepare_hook_admission runs outside writer scopes and retains an ephemeral trusted Store-only proof cache. Cache identity binds the exact selected HC set, chain hash/revision, raw private locator hash, actual admitted context, original watch map and execution root. No JSON/caller proof or persistent second readiness ledger supplies authority. Direct public hook_admission outside the writer prepares and pure-validates. Inside the writer, a missing or mismatching current preflight yields a prerequisite without starting Node. The pure check re-enumerates matching actual chains, resolves replacement lineage, verifies scope/context/watch/policy/HC/locator identities and consumes applicable global or unknown/malformed outstanding requirements. Historical binding-specific capability loss does not retroactively invalidate accepted occurrences. Relevant additions or drift reject without writing; known unrelated scoped obligations do not block the selected task. The cache belongs only to the current operation and receives pure writer/commit rechecks rather than becoming a reusable stale acceptance.\n\nReal callers prepare before their writer scopes and repeat guarded selection inside: process uses only promoted/resolved selected Pending; complete only completed disposition and exact task; begin/select/advance/current next selection preserve exact scope and required dependency boundaries; start derives the exact selected snapshot/dependency closure without mutating state during preflight and recomputes inside; finish prepares exact current controller or maintenance chain references. PR readiness and merge-gate prepare referenced WF chains with the actual review context under the publication lock before the writer lock; ordinary publication authorization remains unchanged. No-ref and core-only operations create no Node requirement, external plugin hold, Future or invocation.\n\nFocused controls cover completed admission hold/restoration with unchanged historical HC bytes; completed During after ordinary plan acceptance/phase progress; actual core and PR call paths with Node outside writer; stale matching HC/locator/watch or added matching references between preflight and lock; known unrelated scope preservation; direct engine writer-entry prerequisite changes. Existing selected-task, source, controller, publication, cancellation and original-attempt recovery guards remain mandatory. No native providers, actual product actions, new task scope, source publication or runtime-check bypass is authorized.",
+    "recommendation": "accept",
+    "significance": "significant",
+    "source_evidence": [
+      ".skill-tree/common/scripts/workflow-state.py",
+      ".skill-tree/common/scripts/pr-review-state.py",
+      ".skill-tree/lib/plugin-runtime.js",
+      ".skill-tree/artifacts/plugin-implementation/managed-registry-python-review-gap-red.txt",
+      ".skill-tree/history/research/managed-registry-hardening-plan.md"
+    ],
+    "text": "Accept this bounded completed-readiness preflight and pure writer-admission design, or request concrete revision."
+  },
+  "request_id": "DO-8bbba2d8-4e09-51be-9291-d5ad65b02aa0:question:4",
+  "revision": 6,
+  "schema": 1,
+  "start_digest": "17fb9ed1429dad1cdc635a1aad05373ae034716df9b5e121bb309922c5eb2bde",
+  "state": "accepted"
+}

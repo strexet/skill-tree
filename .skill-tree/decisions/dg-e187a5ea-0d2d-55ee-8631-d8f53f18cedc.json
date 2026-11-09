@@ -1,0 +1,264 @@
+{
+  "acceptance": {
+    "actor": {
+      "context_id": "/root/registry117_architecture",
+      "id": "/root/registry117_architecture"
+    },
+    "answer": "accept",
+    "attempt_id": "DA-6a91d04a-04cf-4294-baf5-ee095a6cda58",
+    "authority_digest": "0d726895486c9336033e20feebab8295d0c4d31aa17f4a5c675bc63bf9cf6de1",
+    "context_identity": {
+      "decision_purpose": "plan",
+      "execution_snapshot_digest": "4b5c32aa8d64f5aae12deed1795a1ac45e8f4c8bb582d8f51fa203dcbffb70a3",
+      "id": "task:T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "kind": "task",
+      "orchestration_id": "DO-082ded1b-1c9a-5ff9-8637-50f026dc0f68",
+      "plan_digest": "ea77aa50615b09df3be1a0efc147cd0b9a221e20920e97556220ca245d2b36ef",
+      "required_checks_digest": "0492313787472d178506f8f3f5c2b9dd4e13ccc5a5a2ed47dde406e18826b157",
+      "task_ids": [
+        "T-10528edd-4542-4c26-b8b3-738ffc00d791"
+      ]
+    },
+    "decision_id": "DG-e187a5ea-0d2d-55ee-8631-d8f53f18cedc",
+    "digest": "3d35da0c46a5a92e6a7dd218e2467f80458a7eeb460b9e38d96e3afa6285713b",
+    "kind": "specification-acceptance",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/registry117_architecture",
+      "actor_id": "/root/registry117_architecture",
+      "creation_reference": "Actual root creation of /root/registry117_architecture for independent source research before the sealed current plan handoff.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/registry117_architecture returned the exact sealed plan resolver JSON through collaboration final answer.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "a2d75a15f917cbacd0437301d078d15ae14c51222f2fe1bdd17928e4f9efd2b9",
+    "question_id": "registry117-plan",
+    "rationale": "The plan satisfies task117 through the existing authoritative registry and lifecycle, preserves the pure facade import boundary, and adds offline inventory without creating Future or known-source state. Exact-ID proposal preparation and application retain confirmation, replay, ownership, dependency and pending-invocation guards. Frozen requirements and uncertain installation association remain explicit. The CLI stays read-only while later tasks retain installer interaction and management-skill ownership. The sealed input and plan-file digests match; implementation and test results remain unclaimed.",
+    "role_receipts": {
+      "critic": "e1113382027011382a7a3575c60a56273e29da03619e121a529cd0cc79fb3382",
+      "resolver": "b77766abe8516853ce6f47eaaf1a829ed6844fd2e88b8c5d0f8c4c0495bda1bc"
+    },
+    "semantic_fingerprint": "30dd390075ebe3a76707cb1c8e2672cc5bb0f3a36e5a5263fdef7a56e47cc87c"
+  },
+  "active_attempt_id": null,
+  "attempts": {
+    "DA-436a2dc2-7d03-4444-adcd-f433f7ccc05f": {
+      "actor": {
+        "context_id": "/root/invocation118_oracle",
+        "id": "/root/invocation118_oracle"
+      },
+      "authority_digest": "0d726895486c9336033e20feebab8295d0c4d31aa17f4a5c675bc63bf9cf6de1",
+      "basis_digest": "308f8e837a6074603037982fedd0d3d171967388b0f329389bef1919c05547cf",
+      "content_fingerprint": "30dd390075ebe3a76707cb1c8e2672cc5bb0f3a36e5a5263fdef7a56e47cc87c",
+      "evidence": {
+        "actor_context_id": "/root/invocation118_oracle",
+        "actor_id": "/root/invocation118_oracle",
+        "creation_reference": "Actual root creation /root/invocation118_oracle, independent of the executor and registry117 resolver; subsequent current sealed critic input is supplied explicitly.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/invocation118_oracle returned same substantive verdict for the same sealed critic attempt, corrected to required critic status agree after root requested the wrong schema.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-436a2dc2-7d03-4444-adcd-f433f7ccc05f",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "a2d75a15f917cbacd0437301d078d15ae14c51222f2fe1bdd17928e4f9efd2b9",
+      "result": {
+        "evidence": [
+          ".skill-tree/history/research/registry117-plan.md",
+          ".skill-tree/artifacts/plugin-implementation/registry117-task.txt",
+          ".skill-tree/artifacts/plugin-implementation/registry117-sealed-critic.json",
+          ".skill-tree/documents/plugin-management-contract.md",
+          ".skill-tree/history/research/plugin-management-decisions.json",
+          ".skill-tree/lib/plugins.js",
+          ".skill-tree/lib/plugin-registry.js",
+          ".skill-tree/lib/plugin-lifecycle.js",
+          ".skill-tree/lib/installation.js",
+          ".skill-tree/bin/install.js"
+        ],
+        "input_digest": "da7dfbfd035aa9d5c3e8d7c9e200d70235df6badf27b831bd8e40929bc0b1148",
+        "rationale": "The plan preserves one authoritative installed registry and delegates exact package removal, occurrence unbind and activation changes to the existing confirmed lifecycle. Read-only inventory stays offline, creates no Future or known-source state, preserves ordered repeated occurrences and distinguishes configured capabilities from verified invocation. Frozen HC requirements require explicit installation association; canonical queue sharing alone supplies no association. Claude and other source-host metadata remain provenance without implying runtime support. The public CLI remains read-only, while later tasks retain catalog persistence, installation interaction and the management skill. The sealed input and plan digests match. No implementation, test or runtime result is asserted.",
+        "status": "agree"
+      },
+      "role": "critic",
+      "semantic_fingerprint": "30dd390075ebe3a76707cb1c8e2672cc5bb0f3a36e5a5263fdef7a56e47cc87c",
+      "status": "agree"
+    },
+    "DA-6a91d04a-04cf-4294-baf5-ee095a6cda58": {
+      "actor": {
+        "context_id": "/root/registry117_architecture",
+        "id": "/root/registry117_architecture"
+      },
+      "authority_digest": "0d726895486c9336033e20feebab8295d0c4d31aa17f4a5c675bc63bf9cf6de1",
+      "basis_digest": null,
+      "content_fingerprint": "30dd390075ebe3a76707cb1c8e2672cc5bb0f3a36e5a5263fdef7a56e47cc87c",
+      "evidence": {
+        "actor_context_id": "/root/registry117_architecture",
+        "actor_id": "/root/registry117_architecture",
+        "creation_reference": "Actual root creation of /root/registry117_architecture for independent source research before the sealed current plan handoff.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/registry117_architecture returned the exact sealed plan resolver JSON through collaboration final answer.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-6a91d04a-04cf-4294-baf5-ee095a6cda58",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "a2d75a15f917cbacd0437301d078d15ae14c51222f2fe1bdd17928e4f9efd2b9",
+      "result": {
+        "answer": "accept",
+        "evidence": [
+          ".skill-tree/history/research/registry117-plan.md",
+          ".skill-tree/artifacts/plugin-implementation/registry117-task.txt",
+          ".skill-tree/lib/plugins.js:4",
+          ".skill-tree/lib/plugin-registry.js:30",
+          ".skill-tree/lib/plugin-lifecycle.js:45",
+          ".skill-tree/lib/plugin-lifecycle.js:107",
+          ".skill-tree/lib/installation.js:84",
+          ".skill-tree/lib/installation.js:184",
+          ".skill-tree/lib/installation.js:312",
+          ".skill-tree/bin/install.js:250"
+        ],
+        "input_digest": "a13864fd029919a5ba1d28c78c79597fc26a2b426f1ca8308f8becc8a71e9b47",
+        "rationale": "The plan satisfies task117 through the existing authoritative registry and lifecycle, preserves the pure facade import boundary, and adds offline inventory without creating Future or known-source state. Exact-ID proposal preparation and application retain confirmation, replay, ownership, dependency and pending-invocation guards. Frozen requirements and uncertain installation association remain explicit. The CLI stays read-only while later tasks retain installer interaction and management-skill ownership. The sealed input and plan-file digests match; implementation and test results remain unclaimed.",
+        "status": "answered"
+      },
+      "role": "resolver",
+      "semantic_fingerprint": "30dd390075ebe3a76707cb1c8e2672cc5bb0f3a36e5a5263fdef7a56e47cc87c",
+      "status": "answered"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the approved inventory/removal task and dependency scope; controlled local fixture installation/removal uses explicitly scripted test input. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+    ],
+    "context_id": "task:T-10528edd-4542-4c26-b8b3-738ffc00d791",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+    },
+    "id": "approved-registry117",
+    "revision": 1
+  },
+  "authority_digest": "0d726895486c9336033e20feebab8295d0c4d31aa17f4a5c675bc63bf9cf6de1",
+  "context": {
+    "content_fingerprint": "30dd390075ebe3a76707cb1c8e2672cc5bb0f3a36e5a5263fdef7a56e47cc87c",
+    "decision_purpose": "plan",
+    "execution_snapshot_digest": "4b5c32aa8d64f5aae12deed1795a1ac45e8f4c8bb582d8f51fa203dcbffb70a3",
+    "id": "task:T-10528edd-4542-4c26-b8b3-738ffc00d791",
+    "kind": "task",
+    "orchestration_id": "DO-082ded1b-1c9a-5ff9-8637-50f026dc0f68",
+    "plan_digest": "ea77aa50615b09df3be1a0efc147cd0b9a221e20920e97556220ca245d2b36ef",
+    "required_checks_digest": "0492313787472d178506f8f3f5c2b9dd4e13ccc5a5a2ed47dde406e18826b157",
+    "semantic_fingerprint": "30dd390075ebe3a76707cb1c8e2672cc5bb0f3a36e5a5263fdef7a56e47cc87c",
+    "task_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791"
+    ]
+  },
+  "decision_hash": "5bbd5c6c7376ada089e6cccfaf71d234f1cc57478a33014b036b136ffc68d687",
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "frontier_epoch": 1,
+  "history": [
+    {
+      "context_fingerprint": "30dd390075ebe3a76707cb1c8e2672cc5bb0f3a36e5a5263fdef7a56e47cc87c",
+      "detail": {},
+      "event": "started",
+      "mode_epoch": 1,
+      "previous_record_hash": null,
+      "sequence": 1
+    },
+    {
+      "context_fingerprint": "30dd390075ebe3a76707cb1c8e2672cc5bb0f3a36e5a5263fdef7a56e47cc87c",
+      "detail": {
+        "attempt_id": "DA-6a91d04a-04cf-4294-baf5-ee095a6cda58",
+        "role": "resolver"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "48c66361ac8a4f2bd3546faf04796ef9bb5cd2b9b30c9ad55f62acd51d470389",
+      "sequence": 2
+    },
+    {
+      "context_fingerprint": "30dd390075ebe3a76707cb1c8e2672cc5bb0f3a36e5a5263fdef7a56e47cc87c",
+      "detail": {
+        "attempt_id": "DA-6a91d04a-04cf-4294-baf5-ee095a6cda58",
+        "status": "answered"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "d9e65b623ac88e7ce0b307fb36b411fa28e3c17050a5103d29a4b9335c9ab7e2",
+      "sequence": 3
+    },
+    {
+      "context_fingerprint": "30dd390075ebe3a76707cb1c8e2672cc5bb0f3a36e5a5263fdef7a56e47cc87c",
+      "detail": {
+        "attempt_id": "DA-436a2dc2-7d03-4444-adcd-f433f7ccc05f",
+        "role": "critic"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "e8021054dbfe0fb25886cb28b80665fbe2b39adc36b28b4b0ae320c0e22f1bbc",
+      "sequence": 4
+    },
+    {
+      "context_fingerprint": "30dd390075ebe3a76707cb1c8e2672cc5bb0f3a36e5a5263fdef7a56e47cc87c",
+      "detail": {
+        "attempt_id": "DA-436a2dc2-7d03-4444-adcd-f433f7ccc05f",
+        "status": "agree"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "eb8a1ce21279dfe04efa6177db791223b789a327bb857a92f1905cd7bd7fe744",
+      "sequence": 5
+    },
+    {
+      "context_fingerprint": "30dd390075ebe3a76707cb1c8e2672cc5bb0f3a36e5a5263fdef7a56e47cc87c",
+      "detail": {
+        "acceptance_digest": "3d35da0c46a5a92e6a7dd218e2467f80458a7eeb460b9e38d96e3afa6285713b"
+      },
+      "event": "accept",
+      "mode_epoch": 1,
+      "previous_record_hash": "b24c38301ada1d5cc306d8ab5519f21709932017682b537fe1cd22f065c62725",
+      "sequence": 6
+    }
+  ],
+  "id": "DG-e187a5ea-0d2d-55ee-8631-d8f53f18cedc",
+  "mode": "auto",
+  "mode_epoch": 1,
+  "prepared_attempt_id": "DA-436a2dc2-7d03-4444-adcd-f433f7ccc05f",
+  "question": {
+    "id": "registry117-plan",
+    "kind": "specification-acceptance",
+    "options": [
+      {
+        "id": "accept",
+        "text": "Accept the current plan."
+      },
+      {
+        "id": "revise",
+        "text": "Revise the plan with concrete reasons."
+      }
+    ],
+    "plan_text": "# Installed Plugin Inventory and Removal Plan\n\n## Scope and existing owners\n\nTask T-10528edd-4542-4c26-b8b3-738ffc00d791 exposes the existing single installed registry and exact-ID removal. The lifecycle already owns pinned package records, dependency validation, ordered occurrence mutation, matching proposal confirmation, replay and installation barriers. The source and parameter facade remains independently importable. Catalog persistence, the optional installation stage and the management skill remain owned by later admitted tasks.\n\n## Interfaces and views\n\nA new lazy management module exposes inventory, human formatting, removal preparation/application, exact occurrence unbind and activation configuration through the plugins facade. Inventory reads the existing registry without acquisition, recovery, workflow helper execution or writer locks. The facade loads management dependencies only for a management call. Source and parameter calls keep the existing import boundary.\n\nInstalled packages retain source/revision/content identity, relative destinations, package dependencies, recorded adapter/capability status and every configured occurrence. Occurrence rows retain distinct IDs, one-based global and point positions, operation/anchor, enabled state, conditions, reference-level JSON parameters and extra instructions. Human grouping supports plugin or integration point; grouping never rewrites array order. Configured and independently verified location metadata remain distinguishable. Enabled configuration supplies no successful invocation or readiness conclusion.\n\nKnown definitions remain a separate input owner. The inventory can display explicitly supplied known metadata separately from installed packages; an absent catalog is reported as unavailable rather than fabricated recommendations. Listing never acquires a direct source or creates known state.\n\nReadable registry ownership drift remains visible with structured diagnostics. Malformed or foreign installed state reports an unavailable inventory and an explicit issue without recovery or ownership adoption. Unknown IDs and namespaces reject exact-ID mutation; no fuzzy package matching occurs.\n\n## Frozen requirements and mutations\n\nThe existing Node HC reader becomes a reusable read-only record reader without weakening installer checksum/schema checks. Inventory reports frozen package/occurrence requirements separately from current project defaults. Canonical queue location alone cannot associate another execution checkout with the selected installation; private execution locators or exact recorded run mapping establish association, and uncertain association remains explicit. Frozen snapshots, historical results and pending attempt states remain unchanged.\n\nRemoval preparation selects an exact plugin ID, reports affected destinations and every occurrence, and exposes dependency, ownership, pending-attempt and frozen-requirement consequences. The original lifecycle proposal remains the mutation authority. Matching confirmation delegates the original proposal to lifecycle application, preserving stale/replay checks and barriers. A failed or cancelled proposal leaves installed state unchanged. Package removal clears every live occurrence of the selected package and preserves original local sources, core files, shared dependencies and unrelated content.\n\nUnbind selects one exact occurrence and prepares the remaining ordered array through configure. Disable or enable changes activation through the existing lifecycle operation. Forgetting a known definition remains a distinct unavailable action until the known-definition owner exists. The API never interprets package uninstall as unbind, disable or forgetting.\n\n## CLI boundary\n\nThe source installer adds --list-plugins --target <project>, optional --json and --group-by plugin|point. Read-only routing precedes flavor/provider selection and optional installation work. The installed manager exposes the same list route independently of the caller working directory and source checkout. Invalid mixtures reject before writes. Full removal interaction and optional setup remain in the later installer and management-skill tasks; typed removal APIs already provide exact proposal/application behavior.\n\n## Verification and completion\n\nRequirements-led Node fixtures precede implementation. Cases cover no-profile/no-Future listing, offline human/JSON and installed-manager parity, ordered repeated occurrences, parameters and capability labels, granular versus opaque drift, exact package and occurrence actions, matching/stale/replayed confirmation, dependency/shared-source preservation, task-free pending HC barriers, and retained frozen requirements with explicit installation association. Existing lifecycle tests remain backend coverage rather than duplicated transaction tests. Source-free copied manager fixtures cover general, web and unity without claiming product or provider execution.\n\nThe required plugin-management check, sync check, strict validation, complete Python/Node suites, installer list/dry-run and diff check precede independent full-diff review and the authorized scoped commit. Owned stopped-handoff activation preserves canonical state and re-admits the same frozen run. No live plugin registry is created in the source repository for validation.\n",
+    "recommendation": "accept",
+    "significance": "significant",
+    "text": "Accept the exact approved-scope installed inventory and removal plan, or request a bounded revision."
+  },
+  "request_id": "DO-082ded1b-1c9a-5ff9-8637-50f026dc0f68:question:1",
+  "revision": 6,
+  "schema": 1,
+  "start_digest": "89bd13f1bbd9222f4bf0c815d144abe255e9b935c145ef243622a0a83be1e7fd",
+  "state": "accepted"
+}

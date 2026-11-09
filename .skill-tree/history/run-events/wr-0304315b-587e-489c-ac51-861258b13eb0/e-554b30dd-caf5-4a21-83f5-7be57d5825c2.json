@@ -1,0 +1,356 @@
+{
+  "changes": [],
+  "checkpoint_after": {
+    "admission": {
+      "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+      "flavor": "general",
+      "identity": "4265c0e60a86aef2e7a0a2948e17dfc2b20d9bd0e24dd9a16d7546d2fb8d093f"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "completed_ids": [],
+    "current_task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Commit the approved changes, then Implement All from and back into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+    "limits": {},
+    "mode": "all",
+    "next_action": "Validate the reviewed clarification contract.",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "implement",
+    "processing_results": [],
+    "required_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "root_task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+    "snapshot": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "started_at": "2026-11-05T11:44:41.702298+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "branch": "codex/plugin-system",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests continuing from the current codex/next-version branch instead of develop and merging all results into codex/next-version.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-0304315b-587e-489c-ac51-861258b13eb0"
+    },
+    "workspace_state": "ready"
+  },
+  "checkpoint_before": {
+    "admission": {
+      "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+      "flavor": "general",
+      "identity": "4265c0e60a86aef2e7a0a2948e17dfc2b20d9bd0e24dd9a16d7546d2fb8d093f"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "completed_ids": [],
+    "current_task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Commit the approved changes, then Implement All from and back into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+    "limits": {},
+    "mode": "all",
+    "next_action": "Validate the reviewed clarification contract.",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "implement",
+    "processing_results": [],
+    "required_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "root_task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+    "snapshot": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "started_at": "2026-11-05T11:44:41.702298+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "branch": "codex/plugin-system",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests continuing from the current codex/next-version branch instead of develop and merging all results into codex/next-version.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-0304315b-587e-489c-ac51-861258b13eb0"
+    },
+    "workspace_state": "ready"
+  },
+  "id": "E-554b30dd-caf5-4a21-83f5-7be57d5825c2",
+  "outcomes": [],
+  "progress_changes": [
+    {
+      "after": {
+        "admission": {
+          "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+          "flavor": "general",
+          "identity": "5d85a146bd944fe3a11890a9cb126ccd07dd1520825058a8d888b8a6fc22b76b"
+        },
+        "checks": {
+          "clarification-contract": {
+            "attempt": {
+              "attempt_id": "C-badf7b90-00f2-41c4-a6bf-eccda3135e81",
+              "definition": "68485d9304d5655c399c4a89d1ff23cc23a8d278864030c2f90bf826335d5ab8",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "key": "3d62943b218f27b6c238ec31f97af8c2bc60fca5d09ec89c2a8ecddef632b732",
+              "launch": null,
+              "prepared_at": "2026-11-05T11:55:09.405487+00:00",
+              "recipe": {
+                "assertion_contract": "explicit source and artifact assertions",
+                "input_paths": [],
+                "lane": "static"
+              },
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/documents/plugin-system-research.md": "252ea8eac8c950fa1a6c8a2ea0a774f81dd9b69850fc7fecc99eff52373e7bb7",
+                ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406"
+              }
+            },
+            "receipts": {
+              "C-badf7b90-00f2-41c4-a6bf-eccda3135e81": {
+                "actual_lane": "static",
+                "assertions": [
+                  {
+                    "assertion": "The shared protocol defines exact task/group scope, dependency-ordered question rounds, source facts, actual owner answers, guarded revisions and interruption/resume. Completion requires concrete goals, scope, dependencies, acceptance and feasible validation, no unresolved mandatory decisions and actual owner confirmation bound to the current task revision. The shared loop derives from the inspected upstream grilling protocol and supports explicit clarification without a generic plugin engine; the planned post-processing adapter reuses the same loop. The contract separates complete-content write guards from semantic confirmation identity; formatting-only edits preserve confirmation, semantic edits reopen affected answers and final confirmation, and unrelated answers remain valid.",
+                    "result": "pass"
+                  }
+                ],
+                "attempt_id": "C-badf7b90-00f2-41c4-a6bf-eccda3135e81",
+                "classification": "executed-control",
+                "cleanup": "Source inspection and documentation validation start no product, provider or model process.",
+                "definition": "68485d9304d5655c399c4a89d1ff23cc23a8d278864030c2f90bf826335d5ab8",
+                "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/clarification-contract-review.json",
+                    "sha256": "b4fe3db773808bbf59411cb6371193d35345718d7de381d42cb1ebc3048e33d7"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "3d62943b218f27b6c238ec31f97af8c2bc60fca5d09ec89c2a8ecddef632b732",
+                "payload_hash": "aceccebce5c38fe4cdd8a1549f25eefe126db1d52a78b606ec539df1fee1a5c5",
+                "recorded_at": "2026-11-05T11:55:36.518473+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                  ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+                  ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                  ".skill-tree/documents/plugin-system-research.md": "252ea8eac8c950fa1a6c8a2ea0a774f81dd9b69850fc7fecc99eff52373e7bb7",
+                  ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406"
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "static",
+              "assertions": [
+                {
+                  "assertion": "The shared protocol defines exact task/group scope, dependency-ordered question rounds, source facts, actual owner answers, guarded revisions and interruption/resume. Completion requires concrete goals, scope, dependencies, acceptance and feasible validation, no unresolved mandatory decisions and actual owner confirmation bound to the current task revision. The shared loop derives from the inspected upstream grilling protocol and supports explicit clarification without a generic plugin engine; the planned post-processing adapter reuses the same loop. The contract separates complete-content write guards from semantic confirmation identity; formatting-only edits preserve confirmation, semantic edits reopen affected answers and final confirmation, and unrelated answers remain valid.",
+                  "result": "pass"
+                }
+              ],
+              "attempt_id": "C-badf7b90-00f2-41c4-a6bf-eccda3135e81",
+              "classification": "executed-control",
+              "cleanup": "Source inspection and documentation validation start no product, provider or model process.",
+              "definition": "68485d9304d5655c399c4a89d1ff23cc23a8d278864030c2f90bf826335d5ab8",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/clarification-contract-review.json",
+                  "sha256": "b4fe3db773808bbf59411cb6371193d35345718d7de381d42cb1ebc3048e33d7"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "3d62943b218f27b6c238ec31f97af8c2bc60fca5d09ec89c2a8ecddef632b732",
+              "payload_hash": "aceccebce5c38fe4cdd8a1549f25eefe126db1d52a78b606ec539df1fee1a5c5",
+              "recorded_at": "2026-11-05T11:55:36.518473+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/documents/plugin-system-research.md": "252ea8eac8c950fa1a6c8a2ea0a774f81dd9b69850fc7fecc99eff52373e7bb7",
+                ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406"
+              }
+            }
+          }
+        },
+        "definition": "68485d9304d5655c399c4a89d1ff23cc23a8d278864030c2f90bf826335d5ab8",
+        "execution_sessions": {},
+        "partial_work": [
+          ".skill-tree/documents/task-clarification-contract.md",
+          ".skill-tree/common/references/future-workflow.md",
+          ".skill-tree/common/references/workflow-metadata.md"
+        ],
+        "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+        "stage": "awaiting-validation"
+      },
+      "before": {
+        "admission": {
+          "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+          "flavor": "general",
+          "identity": "5d85a146bd944fe3a11890a9cb126ccd07dd1520825058a8d888b8a6fc22b76b"
+        },
+        "checks": {
+          "clarification-contract": {
+            "attempt": {
+              "attempt_id": "C-badf7b90-00f2-41c4-a6bf-eccda3135e81",
+              "definition": "68485d9304d5655c399c4a89d1ff23cc23a8d278864030c2f90bf826335d5ab8",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "key": "3d62943b218f27b6c238ec31f97af8c2bc60fca5d09ec89c2a8ecddef632b732",
+              "launch": null,
+              "prepared_at": "2026-11-05T11:55:09.405487+00:00",
+              "recipe": {
+                "assertion_contract": "explicit source and artifact assertions",
+                "input_paths": [],
+                "lane": "static"
+              },
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+                ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+                ".skill-tree/documents/plugin-system-research.md": "252ea8eac8c950fa1a6c8a2ea0a774f81dd9b69850fc7fecc99eff52373e7bb7",
+                ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406"
+              }
+            }
+          }
+        },
+        "definition": "68485d9304d5655c399c4a89d1ff23cc23a8d278864030c2f90bf826335d5ab8",
+        "execution_sessions": {},
+        "partial_work": [
+          ".skill-tree/documents/task-clarification-contract.md",
+          ".skill-tree/common/references/future-workflow.md",
+          ".skill-tree/common/references/workflow-metadata.md"
+        ],
+        "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+        "stage": "awaiting-validation"
+      },
+      "task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa"
+    }
+  ],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+  "schema": 1,
+  "sequence": 12
+}

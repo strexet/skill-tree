@@ -1,0 +1,32 @@
+{
+  "findings": [],
+  "independent_tests": {
+    "failed": 0,
+    "passed": 4
+  },
+  "limits": [
+    "All merge and installation behavior was exercised in disposable fixture repositories. The current run has no actual canonical merge yet."
+  ],
+  "mechanism": "Actual independent Codex collaboration worker",
+  "red": {
+    "failure": "The old finish operation set order_completed true before local Git integration.",
+    "sha256": "194638fdc8871afa01603020fcc0f0bcdf51484a2d55c553e34fb8f0abd2cac2"
+  },
+  "resolved": [
+    "Read-only preflight disables index writes and replacement objects.",
+    "Original reviewed source is checked before verifier execution.",
+    "Local Git refuses conflicting hook, branch and signing policy and verifies exact ordered parents and source tree.",
+    "Recovery binds the original action and retained ID.",
+    "Final admission preserves unrelated stops and verifies target ownership and executed validation.",
+    "Python and Node reject legacy local-result as completed delivery."
+  ],
+  "result": "clean",
+  "reviewer": "/root/evidence114",
+  "schema": 1,
+  "scope": "Complete local delivery source diff, scoped Git policy, reviewed ref and trust handoff",
+  "source": {
+    "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+    "head": "6d87274080c73931a94594bedb0225efa3e8f68d",
+    "source_digest": "c94db8d5433b6689f3fe7ad56c4520f72f19f40347aa733bb88ebe7a96824fb0"
+  }
+}

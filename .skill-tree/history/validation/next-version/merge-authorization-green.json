@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-pr-review-cycle.py"
+  ],
+  "assertion": "Only direct owner authorization enables merge.",
+  "check_id": "regression",
+  "counts": {
+    "discovered": 27,
+    "expected": 27,
+    "failed": 0,
+    "passed": 27,
+    "skipped": 0
+  },
+  "log_path": ".skill-tree/artifacts/next-version/merge-authorization-green.log",
+  "log_sha256": "dbb212ef4c90d2b5c0df23a39f3994e9d475f73adca2f32d642f7d632fe18a1f",
+  "phase": "green",
+  "task_id": "T-ddd0d0b4-f0a0-4e45-b57f-9fb6ba999af9"
+}

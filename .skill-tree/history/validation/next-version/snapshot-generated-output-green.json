@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-skill-repository-validation.py"
+  ],
+  "assertion": "Snapshot scope excludes generated packages and installed bundles.",
+  "check_id": "regression",
+  "counts": {
+    "discovered": 6,
+    "expected": 6,
+    "failed": 0,
+    "passed": 6,
+    "skipped": 0
+  },
+  "log_path": ".skill-tree/artifacts/next-version/snapshot-generated-output-green.log",
+  "log_sha256": "ea954538def979ed7f37cf150a7238a15bb9512972447aed9843ff2255718850",
+  "phase": "green",
+  "task_id": "T-2b7d02a9-6169-4d41-a90e-282878a05f23"
+}

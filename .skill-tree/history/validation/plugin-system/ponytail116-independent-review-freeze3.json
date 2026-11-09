@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "kind": "independent-bounded-source-review",
+  "task_id": "T-18db6175-499f-4679-bf8d-f815c7b42411",
+  "observed_at_utc": "2026-11-06T16:36:49.512778+00:00",
+  "reviewer": "/root/invocation118_oracle",
+  "verdict": "conditionally-clean-pending-current-checks-and-owned-activation",
+  "source_freeze": {
+    "path": ".skill-tree/history/validation/plugin-system/ponytail116-source-freeze3.json",
+    "sha256": "0b4725def129fa03efa04d8a223ba01b73823244cb9318137e5ad79c839ae5f2",
+    "identity": {
+      "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "head": "57bbf013d08c2014aff87f379d2cd708063b81a6",
+      "source_digest": "b28052dbc57f0376a0d061168a165357035d1a40dc758344bd091f3b58fe7297"
+    },
+    "checked_sources": 249,
+    "mismatches": []
+  },
+  "navigation": {
+    "path": ".skill-tree/skill-tree.json",
+    "sha256": "7513f2aec8bfc26b57cfbd0856ebd7169a4d077f4e9b0377b2b6077bc87f14b2",
+    "checked_source_digests": 97,
+    "mismatches": []
+  },
+  "runtime_identities": {
+    ".skill-tree/common/scripts/plugin-invocation.py": "11b97675583753ccc391492de556e71d74bb39ab0b43cce64412469d6ef85e77",
+    ".skill-tree/common/scripts/workflow-state.py": "34e5c105ad7cf594720f4c60655a27bfdfdccc93e71ce9d00610447178bb1883",
+    ".skill-tree/common/scripts/pr-review-state.py": "6bfb09e0273a6322c86c5f5915e8dc0503fa22416881c499c281c1dec570a3d1",
+    ".skill-tree/lib/plugin-runtime.js": "82830c2aff9ae2380f5cf2440a461f3a2d6d61c4141561db3ce1ae2346fac78d",
+    ".skill-tree/lib/plugin-composition.js": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a",
+    ".skill-tree/tests/test-plugin-review.py": "ae5892d9fc09be097d360ee4fe7e145593278e7fa6ec76d77cc8c723908c7eaa"
+  },
+  "prior_reviews_preserved": [
+    {
+      "path": ".skill-tree/artifacts/plugin-implementation/ponytail116-independent-review-freeze1-final.json",
+      "sha256": "f6deaf1f6428575d5409383d9837d74808177c86fb5e00faf18d035cc0dd5236"
+    },
+    {
+      "path": ".skill-tree/artifacts/plugin-implementation/ponytail116-independent-review-freeze2.json",
+      "sha256": "526780509d463710ba994e0413b7d243263c2b147cd89f41cbfe0ad8c70ff170"
+    }
+  ],
+  "closed_findings": [
+    {
+      "id": "R1",
+      "basis": "Publication-bound findings require actual guarded publication contribution incorporation before stage acceptance; generic DG accept/resolve/dismiss cannot substitute that contribution. WF bytes remain identical to reviewed freeze2."
+    },
+    {
+      "id": "R2",
+      "basis": "Required occurrence matching uses the trusted prepared canonical boundary_id, exact occurrence and complete accepted stage; registered named anchors remain supported. PR bytes remain identical to reviewed freeze2."
+    },
+    {
+      "id": "R3",
+      "basis": "AFTER phase entry requires a current core report with zero unresolved findings. Completed valid prefix is not compared to a later internal core report digest; ordinary evidence-backed dismissal preserves unchanged bound input evidence. PR bytes remain identical to reviewed freeze2."
+    },
+    {
+      "id": "R4",
+      "basis": "Engine record checks original sealed report-only policy plus publication review context and successful outcome. Every nonempty reserved top-level findings/questions payload requires its matching status tag. The guard executes before context-end/result/state assignment; conflicting original attempts retain invoking status and no accepted result. Generic output without this policy, nested annotations, notes and empty reserved values retain existing result-data handling."
+    }
+  ],
+  "new_findings": [],
+  "evidence_reviewed": [
+    {
+      "path": ".skill-tree/history/validation/plugin-system/ponytail116-normalized-report-red.json",
+      "sha256": "99643746c473ca2800e915bc9dabd731bf0dfaa621d0db915f41257742c60cd9",
+      "scope": "Retained expected-red record: four contradictory-shape controls within one discovered test method; no rerun performed by reviewer."
+    },
+    {
+      "path": ".skill-tree/history/validation/plugin-system/ponytail116-normalized-report-green1.json",
+      "sha256": "d8d4b6f45feb7273a87fa4a107a7941ba992d5e72ef68ff713a59cd918551324",
+      "scope": "Recorded selected two-method synthetic Green; independent review read the controls and does not extend their qualification."
+    },
+    {
+      "path": ".skill-tree/history/validation/plugin-system/ponytail116-normalized-report-decision.json",
+      "sha256": "909cdf301f2bd67e3bc55f48b5aac3b5e7e331c261dd53b6742ad82e9daa86b4",
+      "scope": "Actual routine Auto DO28 reject-conflict decision; review confirms implementation is limited to accepted boundary."
+    }
+  ],
+  "limits": [
+    "Read-only source and recorded-evidence review. No tests, disposable fixture, provider request, actor creation, canonical queue or metadata mutation performed by reviewer.",
+    "Current formal 42-method check, full Python/Node checks, mandatory light checks and owned activation remain separate controller evidence; this report supplies no successful outcome for pending work.",
+    "Historical actual invocation118 evidence remains historical. No fresh actual Ponytail, native Skill, universal containment or candidate-effectiveness qualification is claimed.",
+    "Only this new ignored review report was written; all prior review and reproduction reports remain unchanged."
+  ]
+}

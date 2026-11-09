@@ -1,0 +1,33 @@
+{
+  "assertion": "Initial installation defaults to core only with the management operation; optional initial/later plugin setup shows exact sources/revisions, bindings, effective parameters, adapter status and readiness effects before plugin writes, and confirmation activates exactly the displayed proposal. Known-entry browsing and direct noncatalog source input share the same selection flow; continuing without new plugins preserves a functional core and already installed packages/bindings. The interaction contract defines actual consent, noninteractive/repeat behavior, separate core/plugin transaction outcomes, optional-stage failure recovery and offline/no-write listing or dry-run semantics. Recommendation evidence is an annotation rather than a source allowlist or default selection; an empty eligible set still supports custom source selection and the core-only default. The interaction contract exposes identical generic occurrence/order controls during optional installation and later skill-tree-plugins use: add repeated same-plugin bindings at one anchor, move/configure/remove an exact occurrence, and preview/confirm the complete ordered chain with no plugin-specific restriction.",
+  "changed_sources": [
+    ".skill-tree/documents/plugin-management-contract.md"
+  ],
+  "limits": [
+    "Static contract revalidation; plugin setup/activation remains the downstream implementation scope."
+  ],
+  "prior_unchanged_scope_evidence": [
+    {
+      "available": true,
+      "path": ".skill-tree/history/validation/plugin-system/installation-design-c-ac1ae866-d298-4fc0-9372-4834ad43fc76.json",
+      "sha256": "eedffad715af09728b7d69803ce373af5a2fccd0d96858de21e727f2cc61dd53"
+    }
+  ],
+  "review": [
+    "The only changed design input adds the tested source/parameter helper interface; default core-only setup, exact proposal confirmation, stage recovery and generic ordered occurrences remain unchanged.",
+    "Local reads and explicit remote acquisition remain distinct from activation and host execution.",
+    "Schema subset, atomic secret references, effective values/origins and no core-field overwrite conform to the existing exact-configuration preview contract.",
+    "Owned execution installation refresh was verified and the current run explicitly re-admitted with original scope/current checkpoint retained."
+  ],
+  "sources": {
+    ".skill-tree/bin/install.js": "6a3028764bcec61b7a95edabc8e2434dcdba2c718fc3fc99f0dcacb43701fdaf",
+    ".skill-tree/common/references/installation-profile.md": "05d15601e98233e5367a9b1ad67832983a94e8b8e68bcd4f4c81e5f94bc792c5",
+    ".skill-tree/documents/implementation-plan.md": "8c6aba1b915f6d80e4c49b7ced344d1909e10a78838ca46de346ddc0f828ad37",
+    ".skill-tree/documents/plugin-installation-contract.md": "159c86c891e4f26186628c83825d928c0c91b0e033162a7d4d6594f956464520",
+    ".skill-tree/documents/plugin-management-contract.md": "0938f5e3355a490c67c724307c38954118c7b3315f184d3cb408cb2895f4d998",
+    ".skill-tree/documents/plugin-system-contract.md": "a954d148df40e7a22814fb1f8515d654140cff02f7fe14e1a65f6cad33732efc",
+    ".skill-tree/documents/plugin-system-research.md": "4c042f33b94830141a99263d632322993d445a411d8e08d4f9d0692f01a926c7",
+    ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84"
+  },
+  "status": "passed"
+}

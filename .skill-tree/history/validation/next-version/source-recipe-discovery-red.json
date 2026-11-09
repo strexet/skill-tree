@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "npm",
+    "run",
+    "test:node"
+  ],
+  "assertion": "Source recipe identities remain available after installation.",
+  "check_id": "regression",
+  "counts": {
+    "discovered": 86,
+    "expected": 86,
+    "failed": 1,
+    "passed": 85,
+    "skipped": 0
+  },
+  "log_path": ".skill-tree/artifacts/next-version/source-recipe-discovery-red.log",
+  "log_sha256": "8d1b99f4266d285b9660b550710f8a4acee8d091e4fbe8016fefbe4dc9f07c36",
+  "phase": "red",
+  "task_id": "T-0cc5ccda-2837-4324-98a9-fd59abb1891f"
+}

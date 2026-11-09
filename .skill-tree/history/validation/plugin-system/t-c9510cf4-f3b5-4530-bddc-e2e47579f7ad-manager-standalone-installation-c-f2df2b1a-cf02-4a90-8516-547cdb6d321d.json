@@ -1,0 +1,58 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-plugin-manager-installation.js"
+  ],
+  "attempt_id": "C-f2df2b1a-cf02-4a90-8516-547cdb6d321d",
+  "baseline": {
+    "last_accepted": {
+      "discovered": 6,
+      "expected": 6,
+      "failed": 0,
+      "passed": 6,
+      "skipped": 0
+    },
+    "original": {
+      "discovered": 6,
+      "expected": 6,
+      "failed": 0,
+      "passed": 6,
+      "skipped": 0
+    }
+  },
+  "check_id": "manager-standalone-installation",
+  "count_error": null,
+  "counts": {
+    "discovered": 6,
+    "expected": 6,
+    "failed": 0,
+    "passed": 6,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limitations": [
+    "Focused unit fixture evidence. No new actual actor or product qualification."
+  ],
+  "log_sha256": "13b8d98d84009fbe63bb9d94c44ed1dbe90073123f93f8919f19b18137d6de79",
+  "output": ".skill-tree/history/validation/plugin-system/t-c9510cf4-f3b5-4530-bddc-e2e47579f7ad-manager-standalone-installation-c-f2df2b1a-cf02-4a90-8516-547cdb6d321d.txt",
+  "owned_profile_identity": "56e828eacced91072ba944c318a5291a21b88be7f83b90a2248f53fdae95806a",
+  "process_group_clean": true,
+  "result": "pass",
+  "source_commit": "82eaf49b6cb35e65dfa30413228bddcb10190562",
+  "sources": {
+    ".skill-tree/common/scripts/plugin-manager.js": "c0ad080ab70c18375c6bccdfc5da3242bafef83cf2353a4cbbd833b4d72c6929",
+    ".skill-tree/config/resource-map.json": "bd4b539b8aad5d6b55aba3609073f28b7e879fa7e8c3edf60dbbf28f9e56ad26",
+    ".skill-tree/documents/implementation-plan.md": "73692c86132c37dc8be19457f9bf33dc6ff87027cfad50de85a361bca6f09606",
+    ".skill-tree/documents/plugin-management-contract.md": "2b5c9aeb18dd30b06a809fd14e5222abf579a002187870167d61f6f7dda5b11a",
+    ".skill-tree/documents/plugin-system-contract.md": "b25424efd0dc920376a8d32b9dd7ea27d6b644d966e167f690c8999dc2fa36f5",
+    ".skill-tree/lib/plugin-management.js": "9eac76130885864fb06ddc2a3311805e761f22857d21bc8cfcb9ee508a4c2660",
+    ".skill-tree/scripts/agent-conformance.py": "e14b387f60d200fea4484c4a40d359c5a8d1339e26abf2addb82d5c8ab5a1e16",
+    ".skill-tree/templates/operations.json": "af81ff4d4b003ef8e8dac292995b3227d5fb45d80666dd80b83b4111d1ded050",
+    ".skill-tree/tests/test-plugin-manager-installation.js": "262c5b2a25de516c5bf2f7eb9db38ab846246b1af47de74ab3734362dda01586",
+    ".skill-tree/tests/test-plugin-manager.js": "a27224a37c7f8a1a6768c8cb93e90b6611a06c953743e8b6abb77b9238caac3e"
+  },
+  "task_id": "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad",
+  "timed_out": false,
+  "tool_wall_seconds": 12.933
+}

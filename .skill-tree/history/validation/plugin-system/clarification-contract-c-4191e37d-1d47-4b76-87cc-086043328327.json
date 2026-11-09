@@ -1,0 +1,27 @@
+{
+  "actual_lane": "static",
+  "attempt_id": "C-4191e37d-1d47-4b76-87cc-086043328327",
+  "check_id": "clarification-contract",
+  "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+  "evidence": [
+    ".skill-tree/history/validation/plugin-system/clarification-contract-review.json",
+    ".skill-tree/history/validation/plugin-system/clarification-contract-revalidation-pre-governance.json",
+    ".skill-tree/documents/task-clarification-contract.md"
+  ],
+  "result": "pass",
+  "review": [
+    "The current shared protocol retains exact session scope, independently sourced facts, dependency-ordered rounds, guarded revisions, interruption, resume and complete current clarity.",
+    "Complete source/session CAS protects writes separately from semantic question and acceptance fingerprints. Formatting preserves current answers and confirmation; affected semantic branches reopen without discarding unrelated answers.",
+    "Current W1 sources retain actual Manual owner answers and current explicit owner confirmation. Auto uses actual delegated evidence only under the approved exact authority and mode. The configured post-processing adapter applies the same loop without changing ordinary scope.",
+    "Original current-source and protocol-derivation evidence remains linked. The new catalog supplies no clarification or implementation authority."
+  ],
+  "schema": 1,
+  "source_fingerprints": {
+    ".skill-tree/common/references/future-workflow.md": "13edfc2edf90e86351f3f047f3b3a4bbf696de54f3bac5010fb6fb19dbbdc603",
+    ".skill-tree/common/references/workflow-metadata.md": "91264f18e09460d44decc0f09cbd7f9a8b12579822371956f228df58fc32f6f5",
+    ".skill-tree/common/scripts/workflow-state.py": "ab47ba4e4ffe6c780f2d78e39093af8c6f98ffbd4b7114913aebfa951543ebb1",
+    ".skill-tree/documents/plugin-system-research.md": "18b222cd914f2090b2f5f4443c07cb28239099618e522e4b7babb3be5be55439",
+    ".skill-tree/documents/task-clarification-contract.md": "ceab4175e4e293fb9bba5b54c713ee769702c2b18e912ad784a1a7e99cf5e3dc"
+  },
+  "task_id": "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa"
+}

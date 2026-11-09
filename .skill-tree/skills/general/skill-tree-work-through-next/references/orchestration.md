@@ -35,3 +35,14 @@ Advance returns implement or validate. Awaiting-validation units keep the specif
 ## Publication handoff
 
 Finish preserves implementation acceptance independently of delivery. Offer local result, PR review/fix, or PR review/fix with an explicit merge target. No offer starts publication. A recorded full-path owner instruction continues through the bundled [PR review cycle](pr-review-cycle.md) without repeated authorization questions. PR readiness, merge confirmation and publication blockers remain separate persisted outcomes.
+
+
+## Authorized local integration
+
+A recorded local-merge order completes implementation first and leaves delivery pending. The immutable implementation receipt freezes the reviewed committed source and current acceptance. The selected run owns one canonical target branch, a prepared pair of Git parents and the expected source tree. A local-result order without merge authority retains the ordinary implementation handoff.
+
+Prepare and reconcile the selected local delivery through the bundled workflow helper. The local mutation requires the prepared repository and exact refs, disjoint preserved local files, an idle Git and workflow state, and the approved merge policy. A repeated request reconciles a previously created merge before considering a new Git operation. An interruption preserves the original preparation.
+
+The helper protects the canonical Git HEAD and index while Git prepares the exact named source and target refs. The named target update compares the old tip before advancing to the reviewed two-parent commit. A moved ref or another checked-out branch stops before the canonical checkout is updated. The protected mutation requires a Git files-backed ref store and an ordinary index. A remaining Git lock or uncertain checkout after interruption requires explicit recovery before retry.
+
+Completion requires the actual two-parent merge with the expected tree, an owned installation from the merged target source, scoped re-admission of affected retained runs and executed target validation. Keep the target merge result distinct from source implementation acceptance and provider-confirmed PR delivery.

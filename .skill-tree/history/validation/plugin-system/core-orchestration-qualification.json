@@ -1,0 +1,99 @@
+{
+  "actual_host": "core127-native/qualification.json",
+  "checks": [
+    "sync:check",
+    "strict repository validation",
+    "installer list",
+    "all-provider general dry-run",
+    "git diff --check"
+  ],
+  "focused_checks": {
+    "core": {
+      "counts": {
+        "discovered": 30,
+        "expected": 30,
+        "failed": 0,
+        "passed": 30,
+        "skipped": 0
+      },
+      "report": ".skill-tree/history/validation/plugin-system/t-43931d2c-5bb5-4eca-8ba8-069c503b2cda-decision-orchestration-unit-c-7d447866-7a15-40d3-9b79-2d6bdc89fcf8.json",
+      "result": "pass"
+    },
+    "oracle": {
+      "counts": {
+        "discovered": 10,
+        "expected": 10,
+        "failed": 0,
+        "passed": 10,
+        "skipped": 0
+      },
+      "report": ".skill-tree/history/validation/plugin-system/t-43931d2c-5bb5-4eca-8ba8-069c503b2cda-decision-observation-oracle-c-60441b14-ab48-464c-949f-b0a6f87ec5e0.json",
+      "result": "pass"
+    },
+    "parent": {
+      "counts": {
+        "discovered": 6,
+        "expected": 6,
+        "failed": 0,
+        "passed": 6,
+        "skipped": 0
+      },
+      "report": ".skill-tree/history/validation/plugin-system/t-43931d2c-5bb5-4eca-8ba8-069c503b2cda-decision-parent-adapters-c-228d3388-6527-4315-9028-53540c87346f.json",
+      "result": "pass"
+    },
+    "standalone": {
+      "counts": {
+        "discovered": 3,
+        "expected": 3,
+        "failed": 0,
+        "passed": 3,
+        "skipped": 0
+      },
+      "report": ".skill-tree/history/validation/plugin-system/t-43931d2c-5bb5-4eca-8ba8-069c503b2cda-decision-core-standalone-c-b583607f-0719-42f8-8b53-70f9f94fa3a8.json",
+      "result": "pass"
+    }
+  },
+  "limitations": [
+    "Three bounded source-backed Codex core actor scenarios establish no universal operation/provider, external Skill invocation, plugin comparative efficacy, browser, Unity or product runtime qualification.",
+    "Manual and switch fixture-owner submissions are scripted, never real-human approvals.",
+    "Unexposed exact model, native tool-call IDs, tokens and cost remain null.",
+    "The existing frozen controller/session mode is preserved; new default-Auto routing activates after owned snapshot refresh.",
+    "The manager addition owns the eventual eleven-operation claim."
+  ],
+  "qualified_assertions": [
+    "Guarded core Auto/Manual phase and independent role transport; separate real actual-context evidence for three bounded scenarios.",
+    "Current public predecessor results and receipt digests forwarded to critic and arbiter.",
+    "CL-bound same-frame parent policy resume after contiguous actual parent mode history and original reconciliation.",
+    "Copied registered ten-operation general/web/unity closure without source, original installation or sibling dependencies.",
+    "No silent Manual fallback, synthetic native provenance, plugin installation consent, publication or check/approval substitution."
+  ],
+  "recorded_at": "2026-11-06T06:25:50.281227+00:00",
+  "repository_tests": {
+    "failed": 0,
+    "node": 204,
+    "python": 357,
+    "skipped": 0
+  },
+  "resolved_findings": [
+    "Actual arbiter received hashes without predecessor answers; first failed probe retained.",
+    "Clarification-bound mode switch stranded the existing DO frame; six adapter regressions guard explicit same-frame parent-policy reconciliation."
+  ],
+  "reviews": [
+    {
+      "agent": "/root/core127_forward_material",
+      "result": "passed",
+      "scope": "Predecessor forwarding and current frontier regression."
+    },
+    {
+      "agent": "/root/core127_material_oracle",
+      "result": "passed",
+      "scope": "Independent content and native capture oracle; 16 malformed-material negative controls."
+    },
+    {
+      "agent": "/root/core127_final_review",
+      "result": "passed after repair",
+      "scope": "Phase/authority/currentness and CL-bound same-frame parent reconciliation."
+    }
+  ],
+  "task_id": "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda"
+}

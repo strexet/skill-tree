@@ -1,0 +1,41 @@
+{
+  "adjacent_node_log_sha256": "51051872b8f7e948ded4d05bfeca408ec4cd8534bbb709d58dc164c70c73ef8a",
+  "counts": {
+    "adjacent_node": 44,
+    "local_delivery_python": 27,
+    "run_workspace_python": 32
+  },
+  "observations": {
+    "diff-check": {
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "status": "passed"
+    },
+    "installer-dry-run": {
+      "log_sha256": "9ac9074c00f1e7891b67a737e1c32eb7f22fe62d577d2ac725afcc7c5abd3f1d",
+      "status": "passed"
+    },
+    "installer-list": {
+      "log_sha256": "3409cf3586f805759b4433f1a13e75c0b55e8a8f72355a9c237ab19e13978955",
+      "status": "passed"
+    },
+    "local-delivery-regressions": {
+      "log_sha256": "e5df83cc82e9d6c2f9229695dd42aa990cc334fd8403b3cb8fd10b14608bf5fe",
+      "status": "passed"
+    },
+    "run-workspace-regressions": {
+      "log_sha256": "41061ac6b27d142f4447b646e03524e1ee3afb5bca2d0ec7395faa1e9ee87c6a",
+      "status": "passed"
+    },
+    "strict-validation": {
+      "log_sha256": "1302cebd2e1a3189239671ce4e62c846162c5c7fc73279eb4cb87432a0b93da5",
+      "status": "passed"
+    },
+    "sync-check": {
+      "log_sha256": "ceffd15f7477e7cca73d33bc13b530b5430f5e4b9c12123f525a1fe3c65a5c78",
+      "status": "passed"
+    }
+  },
+  "schema": 1,
+  "scope": "Real Git objects and owned installations in disposable fixtures. The final source suites and canonical local merge are separate controller delivery gates.",
+  "source_freeze_sha256": "4b443812b81f523a56492c1e02ca6c5a3e50c212f1bc37359d1ef6a4e223dfb4"
+}

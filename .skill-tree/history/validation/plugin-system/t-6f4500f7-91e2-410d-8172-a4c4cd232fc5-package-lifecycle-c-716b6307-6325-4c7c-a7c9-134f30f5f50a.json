@@ -1,0 +1,45 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-plugin-installation.js"
+  ],
+  "attempt_id": "C-716b6307-6325-4c7c-a7c9-134f30f5f50a",
+  "check_id": "package-lifecycle",
+  "counts": {
+    "discovered": 39,
+    "expected": 39,
+    "failed": 0,
+    "passed": 39,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-6f4500f7-91e2-410d-8172-a4c4cd232fc5-package-lifecycle-c-716b6307-6325-4c7c-a7c9-134f30f5f50a.txt",
+  "result": "pass",
+  "reviewed_failure_reason": null,
+  "source_fingerprints": {
+    ".skill-tree/bin/install.js": "6a3028764bcec61b7a95edabc8e2434dcdba2c718fc3fc99f0dcacb43701fdaf",
+    ".skill-tree/common/references/installation-profile.md": "05801326c3aa3e325a1ccf170a7fbbc678d7e2ae804bb6a8fef6c3a05d2fbee8",
+    ".skill-tree/common/scripts/run-workspaces.py": "e189ff78d4e770dff3f128f28b5dc8e3de9060883b126a0cb441e0448627d7ac",
+    ".skill-tree/common/scripts/workflow-state.py": "791531838c16c1b362ade3b086e66dfb804da20c06b8828b0e71f251a08b0c5e",
+    ".skill-tree/documents/plugin-installation-contract.md": "159c86c891e4f26186628c83825d928c0c91b0e033162a7d4d6594f956464520",
+    ".skill-tree/documents/plugin-management-contract.md": "d5d68870bb0f44c356fdbd5423f3995dea33931eded820ffa335ac715cc24616",
+    ".skill-tree/documents/plugin-system-contract.md": "eeddb14292e115f489aa855f01f60ab922448317a3e9956d649148b177944680",
+    ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84",
+    ".skill-tree/lib/composer.js": "ebb4042086e61e32cd7c255df79befcdff06ae0b0bfaf2941d5d8facc1268e01",
+    ".skill-tree/lib/installation.js": "aff2c16139da198abc00a04e89a0bfe1a22bc826e38a722e146632b14164ef82",
+    ".skill-tree/lib/plugin-acquisition.js": "7bac01aa2440363225b4b9606362feeee1f162ed7adbad6a92ebda21fee6adbc",
+    ".skill-tree/lib/plugin-lifecycle.js": "05f1604a464385532cdda5d1b729c6286aac625c2bb279495b44b30155fc4e9e",
+    ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    ".skill-tree/lib/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+    ".skill-tree/lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+    ".skill-tree/lib/plugins.js": "d9d140a9a1c7df3682f95ace505a6d06bbac5823787329acd70834732de1d4d0",
+    ".skill-tree/tests/fixtures/plugin-acquisition-cases.js": "a53d684eb5b8cbb3bd5674d74e7600b14f3e14069ea8ff859fce73b58f116ad1",
+    ".skill-tree/tests/test-plugin-installation.js": "bbfb824146efbde96737078b69b02b7fdca60ced5fe8df48a88329163ca74f0f"
+  },
+  "task_id": "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+  "tool_wall_seconds": 12.649019958917052
+}

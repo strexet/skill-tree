@@ -1,0 +1,57 @@
+{
+  "kind": "core-decision-agent-conformance",
+  "limitations": [
+    "Trusted parent capture records actually observed native calls/results; arbitrary user-authored JSON cannot cryptographically prove a native call.",
+    "Core Auto critic counterposition is deliberately seeded to exercise arbitration; no comparative or spontaneous-critique efficacy is inferred.",
+    "Manual and mode-switch owner inputs are scripted fixture-owner submissions, not real-human approval.",
+    "Inherited exact model, native tool-call IDs, tokens and cost are unexposed and remain null; actual actor/call counts are separately observable.",
+    "Source-backed Codex collaboration components are qualified only for the bounded fixtures; native external Skill invocation and universal operation/provider adherence remain unqualified."
+  ],
+  "scenarios": [
+    {
+      "event_ids": [
+        "core-auto-significant-event-1",
+        "core-auto-significant-event-2",
+        "core-auto-significant-event-3",
+        "core-auto-significant-event-4",
+        "core-auto-significant-event-5",
+        "core-auto-significant-event-6",
+        "core-auto-significant-event-7",
+        "core-auto-significant-event-8"
+      ],
+      "scenario_id": "core-auto-significant"
+    },
+    {
+      "event_ids": [
+        "core-manual-event-1",
+        "core-manual-event-2",
+        "core-manual-event-3",
+        "core-manual-event-4",
+        "core-manual-event-5",
+        "core-manual-event-6"
+      ],
+      "scenario_id": "core-manual"
+    },
+    {
+      "event_ids": [
+        "core-switch-resume-event-1",
+        "core-switch-resume-event-2",
+        "core-switch-resume-event-3",
+        "core-switch-resume-event-4",
+        "core-switch-resume-event-5",
+        "core-switch-resume-event-6",
+        "core-switch-resume-event-7",
+        "core-switch-resume-event-8",
+        "core-switch-resume-event-9",
+        "core-switch-resume-event-10"
+      ],
+      "scenario_id": "core-switch-resume"
+    }
+  ],
+  "schema": 1,
+  "source_snapshot": {
+    "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+    "common/scripts/workflow-state.py": "791531838c16c1b362ade3b086e66dfb804da20c06b8828b0e71f251a08b0c5e"
+  }
+}

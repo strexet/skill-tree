@@ -1,0 +1,63 @@
+{
+  "actual_lane": "static",
+  "attempt_id": "C-836ff0c5-b669-4d8e-8e85-a9383936b902",
+  "check_id": "manager-agent-observations",
+  "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+  "evidence_sha256": {
+    ".skill-tree/history/validation/plugin-system/installer110-independent-review.json": "2f533db16b7ea94fb958071008ba456ed2d9630ce4935a4f611859a5fd7a4088",
+    ".skill-tree/history/validation/plugin-system/installer110-manager-archived-replay.json": "7bb774fa8361cee32f36e585c27c019401daa5ecf9e8dafb57870a609916d2ec",
+    ".skill-tree/history/validation/plugin-system/manager131-actual-agent-capture.json": "c1762d1213ea26e739e62711a88271974207abea862a10ee48989f52834f6bc9",
+    ".skill-tree/history/validation/plugin-system/manager131-actual-agent-report.json": "5385aa06aeb9714e9dde1aba57f3e72e8099b149ac25f1b530187982ec16d10b"
+  },
+  "limitations": [
+    "Archived agent interpretation and current deterministic replay qualify distinct lanes. No native third-party candidate invocation is claimed."
+  ],
+  "mismatches": [],
+  "result": "pass",
+  "review": [
+    "The original exact actor capture and report retain two bounded scenarios, three distinct actual contexts and eleven host requests with scripted fixture-owner inputs.",
+    "Current installed CLI replay replays p-add, p-move and n-move, preserving the preview semantics, exact local generations 2 and 3 and cancellation bytes. Fixture digests were newly resolved. No actual agent was launched in the current replay.",
+    "The current independent installer review confirms unchanged shared manager entry points and exact proposal handling."
+  ],
+  "schema": 1,
+  "source_commit": "82eaf49b6cb35e65dfa30413228bddcb10190562",
+  "source_fingerprints": {
+    ".skill-tree/common/scripts/plugin-manager.js": "c0ad080ab70c18375c6bccdfc5da3242bafef83cf2353a4cbbd833b4d72c6929",
+    ".skill-tree/config/resource-map.json": "bd4b539b8aad5d6b55aba3609073f28b7e879fa7e8c3edf60dbbf28f9e56ad26",
+    ".skill-tree/documents/implementation-plan.md": "73692c86132c37dc8be19457f9bf33dc6ff87027cfad50de85a361bca6f09606",
+    ".skill-tree/documents/plugin-management-contract.md": "2b5c9aeb18dd30b06a809fd14e5222abf579a002187870167d61f6f7dda5b11a",
+    ".skill-tree/documents/plugin-system-contract.md": "b25424efd0dc920376a8d32b9dd7ea27d6b644d966e167f690c8999dc2fa36f5",
+    ".skill-tree/lib/plugin-management.js": "9eac76130885864fb06ddc2a3311805e761f22857d21bc8cfcb9ee508a4c2660",
+    ".skill-tree/scripts/agent-conformance.py": "e14b387f60d200fea4484c4a40d359c5a8d1339e26abf2addb82d5c8ab5a1e16",
+    ".skill-tree/templates/operations.json": "af81ff4d4b003ef8e8dac292995b3227d5fb45d80666dd80b83b4111d1ded050",
+    ".skill-tree/tests/test-plugin-manager-installation.js": "262c5b2a25de516c5bf2f7eb9db38ab846246b1af47de74ab3734362dda01586",
+    ".skill-tree/tests/test-plugin-manager.js": "a27224a37c7f8a1a6768c8cb93e90b6611a06c953743e8b6abb77b9238caac3e"
+  },
+  "task_id": "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad",
+  "unit_captures_same_contract": {
+    "manager-regressions": {
+      "attempt_id": "C-d78a47fa-b38c-412a-bf98-9f2769d88079",
+      "counts": {
+        "discovered": 12,
+        "expected": 12,
+        "failed": 0,
+        "passed": 12,
+        "skipped": 0
+      },
+      "raw_capture_sha256": "649a0592bf066a3b46528891765112be837d2dd3a1dc880f88e356017d87e45e",
+      "result": "pass"
+    },
+    "manager-standalone-installation": {
+      "attempt_id": "C-f2df2b1a-cf02-4a90-8516-547cdb6d321d",
+      "counts": {
+        "discovered": 6,
+        "expected": 6,
+        "failed": 0,
+        "passed": 6,
+        "skipped": 0
+      },
+      "raw_capture_sha256": "13b8d98d84009fbe63bb9d94c44ed1dbe90073123f93f8919f19b18137d6de79",
+      "result": "pass"
+    }
+  }
+}

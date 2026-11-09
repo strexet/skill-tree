@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "npm",
+    "run",
+    "test:node"
+  ],
+  "cancelled": null,
+  "changed_frozen_paths": [],
+  "cleanup_reserve_seconds": 20,
+  "exit_code": 1,
+  "fail": null,
+  "hard_deadline_seconds": 900,
+  "name": "node",
+  "output": ".skill-tree/history/validation/plugin-system/processing115-final3-node.txt",
+  "pass": null,
+  "qualification": "Deterministic source and isolated fixture qualification.",
+  "result": "fail",
+  "schema": 1,
+  "skipped": null,
+  "source_freeze": ".skill-tree/history/validation/plugin-system/processing115-final3-source-freeze.json",
+  "source_freeze_sha256": "36238c8683166b0ec66687065601174007a721d8745852f3d31615b35146e51b",
+  "temporary_target_empty": null,
+  "tests": null,
+  "timed_out": false,
+  "tool_wall_seconds": 54.03672995790839
+}

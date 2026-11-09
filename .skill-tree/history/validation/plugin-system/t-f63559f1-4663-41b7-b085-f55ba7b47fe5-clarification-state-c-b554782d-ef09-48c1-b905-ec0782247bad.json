@@ -1,0 +1,35 @@
+{
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-task-clarification.py"
+  ],
+  "attempt_id": "C-b554782d-ef09-48c1-b905-ec0782247bad",
+  "check_id": "clarification-state",
+  "counts": {
+    "discovered": 24,
+    "expected": 24,
+    "failed": 0,
+    "passed": 24,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-f63559f1-4663-41b7-b085-f55ba7b47fe5-clarification-state-c-b554782d-ef09-48c1-b905-ec0782247bad.txt",
+  "result": "pass",
+  "reviewed_failure_reason": null,
+  "source_fingerprints": {
+    ".skill-tree/common/references/future-workflow.md": "d8c04b71daddb6df3b6e0198e87cd2497d2e7b9db50cfa9ec8222dae78344e24",
+    ".skill-tree/common/references/workflow-metadata.md": "47b832b8378cd837b7f8f9d86e5ad1de6d27630bc913dbe8b887d0c7fed32810",
+    ".skill-tree/common/scripts/workflow-state.py": "34e5c105ad7cf594720f4c60655a27bfdfdccc93e71ce9d00610447178bb1883",
+    ".skill-tree/config/resource-map.json": "95a4922b2331416863100c9b054e84709bafd4126c1542a15fac49781da13248",
+    ".skill-tree/documents/task-clarification-contract.md": "ceab4175e4e293fb9bba5b54c713ee769702c2b18e912ad784a1a7e99cf5e3dc",
+    ".skill-tree/scripts/agent-conformance.py": "0f7a79a83e69aad8c8f3a5c4d063b94616f1c6d786f0e13cc3027dee3401f49e",
+    ".skill-tree/templates/operations.json": "30f8c0d2dd6d067496485cdcc3050697ebed3a4462bf259f4fc7d5a6279422e6",
+    ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+    ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+  },
+  "task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+  "tool_wall_seconds": 15.836286625359207
+}

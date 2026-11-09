@@ -1,0 +1,640 @@
+{
+  "changes": [
+    {
+      "after": null,
+      "before": {
+        "body": "### Discuss and agree workflow extension decisions with the owner\n\n```yaml\nid: T-a5a738da-c182-4206-bb61-75ffa21946fb\npriority: 124\nstatus: Ready\nparent_pending_ids: [\"P-8f13728d-b0df-4097-afa3-677e7dc939b5\"]\nprocessing_run_id: PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45\nroot_task_id: T-a5a738da-c182-4206-bb61-75ffa21946fb\nrelated_task_id: null\nrelation: main\ndepends_on: []\n```\n\nGoal:\n- Co-design a complete workflow extension map through active owner discussion; produce a decision record before changing stages or readiness behavior.\n\nCurrent behavior:\n- Processing currently publishes Ready tasks immediately. The approved enabled-interview policy requires a visible stable-ID T-task with an implementation hold until the interview and owner confirmation complete.\n\nTouch:\n- `.skill-tree/documents/plugin-system-contract.md`\n- `.skill-tree/documents/implementation-plan.md`\n- `.skill-tree/history/research/plugin-hook-decisions.json`\n- `.skill-tree/documents/plugin-system-research.md`\n- `.skill-tree/documents/plugin-workflow-decisions.md`\n- `.skill-tree/templates/operations.json`\n- `.skill-tree/common/references/future-workflow.md`\n- `.skill-tree/common/references/orchestration.md`\n- `.skill-tree/common/scripts/workflow-state.py`\n\nImplementation constraints:\n- A proposed stage, task recommendation or installed plugin never supplies owner agreement. No workflow implementation belongs to the design unit.\n\nDecision boundary:\n- Present a concrete proposal before requesting agreement. Preserve standalone processing waits and explicit bounded-controller continuation.\n\nValidation:\n- Strategy: exploratory design with source inspection, owner discussion and recorded actual decisions.\n```json\n{\n  \"checks\": [\n    {\n      \"id\": \"owner-decision-evidence\",\n      \"recipe_id\": \"static-inspection\",\n      \"criteria\": [\n        \"The owner receives concrete alternatives for existing hook boundaries, missing stages and possible operation splits, with costs and workflow tradeoffs.\",\n        \"Actual owner decisions record approved, rejected or deferred structural changes and the permitted optional hook map.\",\n        \"Every decision consumed by a dependent pilot is actually resolved and approved before the design task completes; unrelated structural proposals can remain explicitly rejected or deferred.\"\n      ],\n      \"sources\": [\n        \".skill-tree/documents/plugin-system-research.md\",\n        \".skill-tree/documents/plugin-workflow-decisions.md\",\n        \".skill-tree/common/references/future-workflow.md\",\n        \".skill-tree/common/scripts/workflow-state.py\",\n        \".skill-tree/documents/implementation-plan.md\",\n        \".skill-tree/history/research/plugin-hook-decisions.json\",\n        \".skill-tree/documents/plugin-system-contract.md\"\n      ],\n      \"parameters\": {},\n      \"assertion\": \"The owner receives concrete alternatives for existing hook boundaries, missing stages and possible operation splits, with costs and workflow tradeoffs. Actual owner decisions record approved, rejected or deferred structural changes and the permitted optional hook map. Every decision consumed by a dependent pilot is actually resolved and approved before the design task completes; unrelated structural proposals can remain explicitly rejected or deferred.\",\n      \"timing\": \"immediate\"\n    }\n  ]\n}\n```\n\nAcceptance:\n- The owner receives concrete alternatives for existing hook boundaries, missing stages and possible operation splits, with costs and workflow tradeoffs.\n- Actual owner decisions record approved, rejected or deferred structural changes and the permitted optional hook map.\n- Every decision consumed by a dependent pilot is actually resolved and approved before the design task completes; unrelated structural proposals can remain explicitly rejected or deferred.\n\n\nApproved clarification decisions:\n- Q1: Ponytail is an additional bounded review pass focused on unnecessary complexity and minimal complete changes; findings follow the ordinary authorized fix/re-review flow, and before/during/after placement remains configurable.\n- Q2: An enabled post-processing interview is required before implementation; actual answers, revisions and rechecks are necessary. Core-only projects receive no mandatory global interview.\n- Q3: Codex is the first verified plugin invocation host. The contract remains portable; invocation on other hosts is explicitly unqualified or unavailable until verified. Existing core installation support remains unchanged.\n- Q4: Recommendations prioritize demonstrated task/review quality improvement, with explicit time/cost reporting and limitations; adoption alone supplies no outcome evidence.\n- Q5: Ponytail defaults to an additional bounded pass after the ordinary full review and before PR readiness; before/during/after placement remains configurable.\n- Q6: Processing with an enabled interview creates a visible stable-ID T-task in a non-implementable clarification state; the same task becomes Ready only after actual answers, revisions, rechecks and owner confirmation.\n- Q7: An enabled Ponytail pass must complete before PR readiness. Missing capability, failure or unavailability retains a visible block; explicit disabling never counts as successful execution.\n- Decision evidence: `.skill-tree/documents/plugin-workflow-decisions.md`; Q1-Q11 have actual owner approval. Final shared-understanding confirmation remains separate.\n\nApproved workflow decisions:\n- W1: The owner approves explicit internal research, plan, plan review, implementation, checks, review, finding resolution, fixes and re-review within existing operations. Auto is the default: a separate resolver records reasoned decisions; significant decisions receive an independent critic, and substantive disagreement receives an arbiter. Manual presents questions and recommendations in chat and awaits actual owner answers at decision checkpoints.\n- W1: Delegated Auto answers and final specification acceptance remain within agreed goals, scope and constraints, with real actor, authority, rationale and independent-check evidence. Manual retains actual owner answers and confirmation. Explicit mode switches preserve accumulated state and existing authorization. Out-of-authority requests and repeated no-progress disputes or failures escalate one concrete owner question. Actual checks and current review establish readiness.\n- W1 implementation handoff: Required Pending P-09b5b828-dcdc-4d06-bee1-19e1787e34f4 captures the shared foundation for interview consumer T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69 and related composition, invocation and review consumers. The design task changes no workflow implementation or historical terminal outcome.\n- W2: The owner approves the exact before/during/after anchor map, complete core work, leaf/controller deduplication and after-review before PR readiness. The approved post-processing task-wording application uses writing-for-agents before grilling and an affected wording recheck after revisions, preserving identity, constraints, dependencies and current mode-specific final acceptance before Ready. Placement supplies no demonstrated improvement or automatic installation. W1/W2 supply no comparison execution scope.\n- Decision evidence: .skill-tree/history/research/plugin-auto-manual-decision.json, .skill-tree/history/research/plugin-hook-decisions.json and .skill-tree/documents/plugin-workflow-decisions.md. The implementation plan owns the approved map, execution sequence and required specification-alignment handoff. The owner requests an approved-plan commit, complete document review and fixes, then a second commit.\n\n",
+        "queue": "Prioritized Next Changes"
+      },
+      "task_id": "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+    }
+  ],
+  "checkpoint_after": {
+    "admission": {
+      "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+      "flavor": "general",
+      "identity": "8c1b83e0842048aa830c643c0388c4e18fa625d2a26d0291084462acd084e1b8"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "completed_ids": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+    ],
+    "completion_refs": {
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa": "O-ac001b97-eb35-4d59-b454-0c99270a12df",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": "O-6ad524b7-13eb-4fca-82b8-4e53e092ad2c",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb": "O-bd95d91a-b289-4f0b-a449-0628cbec0fb3",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d": "O-f6a04cbc-50b5-487e-bbb4-c6d9587df89e",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5": "O-a734f372-7d4d-4069-9960-939f4bcb0617"
+    },
+    "current_task_id": null,
+    "cycle_signature": "74e647dba4829251f05e62d48cd0d7c59c5a95fb1d9a0b5a8c41ed4f1102c2f7",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Commit the approved changes, then Implement All from and back into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+    "limits": {},
+    "mode": "all",
+    "next_action": "Select required task or finish root",
+    "partial_work": [
+      "Both actual owner decisions and shared design-scope confirmation are recorded.",
+      "The first plan commit is6aacf9f. Complete source/requirements review and repair of nine findings are accepted by three independent reviewers.",
+      "Current work validates the bounded design task and creates the second requested plan-review commit; product implementation remains outside this documentation phase."
+    ],
+    "pending_ids": [
+      "P-9bf5b8af-1e50-4f53-9ab9-56ef46997428",
+      "P-09b5b828-dcdc-4d06-bee1-19e1787e34f4"
+    ],
+    "phase": "resume-parent",
+    "processing_results": [],
+    "required_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "root_task_id": "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+    "snapshot": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "started_at": "2026-11-05T11:44:41.702298+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "branch": "codex/plugin-system",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests continuing from the current codex/next-version branch instead of develop and merging all results into codex/next-version.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-0304315b-587e-489c-ac51-861258b13eb0"
+    },
+    "workspace_state": "ready"
+  },
+  "checkpoint_before": {
+    "admission": {
+      "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+      "flavor": "general",
+      "identity": "8c1b83e0842048aa830c643c0388c4e18fa625d2a26d0291084462acd084e1b8"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "completed_ids": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d"
+    ],
+    "completion_refs": {
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa": "O-ac001b97-eb35-4d59-b454-0c99270a12df",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": "O-6ad524b7-13eb-4fca-82b8-4e53e092ad2c",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d": "O-f6a04cbc-50b5-487e-bbb4-c6d9587df89e",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5": "O-a734f372-7d4d-4069-9960-939f4bcb0617"
+    },
+    "current_task_id": "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+    "cycle_signature": "74e647dba4829251f05e62d48cd0d7c59c5a95fb1d9a0b5a8c41ed4f1102c2f7",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Commit the approved changes, then Implement All from and back into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+    "limits": {},
+    "mode": "all",
+    "next_action": "Validate the current design task and reviewed source contracts, then create the second owner-requested documentation commit before handing off required W1 processing.",
+    "partial_work": [
+      "Both actual owner decisions and shared design-scope confirmation are recorded.",
+      "The first plan commit is6aacf9f. Complete source/requirements review and repair of nine findings are accepted by three independent reviewers.",
+      "Current work validates the bounded design task and creates the second requested plan-review commit; product implementation remains outside this documentation phase."
+    ],
+    "pending_ids": [
+      "P-9bf5b8af-1e50-4f53-9ab9-56ef46997428",
+      "P-09b5b828-dcdc-4d06-bee1-19e1787e34f4"
+    ],
+    "phase": "validate-plan",
+    "processing_results": [],
+    "required_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "root_task_id": "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+    "snapshot": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "started_at": "2026-11-05T11:44:41.702298+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "branch": "codex/plugin-system",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests continuing from the current codex/next-version branch instead of develop and merging all results into codex/next-version.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-0304315b-587e-489c-ac51-861258b13eb0"
+    },
+    "workspace_state": "ready"
+  },
+  "id": "E-ab229c81-e41c-498c-bb2f-5a99bc4817dd",
+  "outcomes": [
+    {
+      "acceptance": [
+        {
+          "criterion": "The owner receives concrete alternatives for existing hook boundaries, missing stages and possible operation splits, with costs and workflow tradeoffs.",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/audits/audit-a-8a21958d-a282-4d9a-b939-4eede8925ee6.json",
+              "sha256": "5e87d6c8b7f25b4701cd121db96cff85eb26546f585e962f389a3357fa92bc35"
+            },
+            {
+              "available": true,
+              "path": ".skill-tree/history/research/plugin-auto-manual-decision.json",
+              "sha256": "77adbf24970ab1a5ea81270c948c1b2416dcf890d776540cad0dce2fb63e1772"
+            },
+            {
+              "available": true,
+              "path": ".skill-tree/history/research/plugin-hook-decisions.json",
+              "sha256": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461"
+            },
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/plugin-system/plan-full-review.json",
+              "sha256": "29f3bcd6a4bf2e3466e4d7815d1e64dd7f727e5e16e2a4149dd7451940d1dd26"
+            }
+          ],
+          "required": true,
+          "result": "pass"
+        },
+        {
+          "criterion": "Actual owner decisions record approved, rejected or deferred structural changes and the permitted optional hook map.",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/audits/audit-a-8a21958d-a282-4d9a-b939-4eede8925ee6.json",
+              "sha256": "5e87d6c8b7f25b4701cd121db96cff85eb26546f585e962f389a3357fa92bc35"
+            },
+            {
+              "available": true,
+              "path": ".skill-tree/history/research/plugin-auto-manual-decision.json",
+              "sha256": "77adbf24970ab1a5ea81270c948c1b2416dcf890d776540cad0dce2fb63e1772"
+            },
+            {
+              "available": true,
+              "path": ".skill-tree/history/research/plugin-hook-decisions.json",
+              "sha256": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461"
+            },
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/plugin-system/plan-full-review.json",
+              "sha256": "29f3bcd6a4bf2e3466e4d7815d1e64dd7f727e5e16e2a4149dd7451940d1dd26"
+            }
+          ],
+          "required": true,
+          "result": "pass"
+        },
+        {
+          "criterion": "Every decision consumed by a dependent pilot is actually resolved and approved before the design task completes; unrelated structural proposals can remain explicitly rejected or deferred.",
+          "evidence": [
+            {
+              "available": true,
+              "path": ".skill-tree/history/audits/audit-a-8a21958d-a282-4d9a-b939-4eede8925ee6.json",
+              "sha256": "5e87d6c8b7f25b4701cd121db96cff85eb26546f585e962f389a3357fa92bc35"
+            },
+            {
+              "available": true,
+              "path": ".skill-tree/history/research/plugin-auto-manual-decision.json",
+              "sha256": "77adbf24970ab1a5ea81270c948c1b2416dcf890d776540cad0dce2fb63e1772"
+            },
+            {
+              "available": true,
+              "path": ".skill-tree/history/research/plugin-hook-decisions.json",
+              "sha256": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461"
+            },
+            {
+              "available": true,
+              "path": ".skill-tree/history/validation/plugin-system/plan-full-review.json",
+              "sha256": "29f3bcd6a4bf2e3466e4d7815d1e64dd7f727e5e16e2a4149dd7451940d1dd26"
+            }
+          ],
+          "required": true,
+          "result": "pass"
+        }
+      ],
+      "boundary_validation": "not-required",
+      "check_results": [
+        {
+          "check": {
+            "assertion": "The owner receives concrete alternatives for existing hook boundaries, missing stages and possible operation splits, with costs and workflow tradeoffs. Actual owner decisions record approved, rejected or deferred structural changes and the permitted optional hook map. Every decision consumed by a dependent pilot is actually resolved and approved before the design task completes; unrelated structural proposals can remain explicitly rejected or deferred.",
+            "criteria": [
+              "The owner receives concrete alternatives for existing hook boundaries, missing stages and possible operation splits, with costs and workflow tradeoffs.",
+              "Actual owner decisions record approved, rejected or deferred structural changes and the permitted optional hook map.",
+              "Every decision consumed by a dependent pilot is actually resolved and approved before the design task completes; unrelated structural proposals can remain explicitly rejected or deferred."
+            ],
+            "id": "owner-decision-evidence",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/documents/plugin-system-research.md",
+              ".skill-tree/documents/plugin-workflow-decisions.md",
+              ".skill-tree/common/references/future-workflow.md",
+              ".skill-tree/common/scripts/workflow-state.py",
+              ".skill-tree/documents/implementation-plan.md",
+              ".skill-tree/history/research/plugin-hook-decisions.json",
+              ".skill-tree/documents/plugin-system-contract.md"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "The owner receives concrete alternatives for existing hook boundaries, missing stages and possible operation splits, with costs and workflow tradeoffs. Actual owner decisions record approved, rejected or deferred structural changes and the permitted optional hook map. Every decision consumed by a dependent pilot is actually resolved and approved before the design task completes; unrelated structural proposals can remain explicitly rejected or deferred.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-ec2cbe45-3b55-4288-9c86-d466f684e9c5",
+            "classification": "executed-control",
+            "cleanup": "Complete source/document review and repository checks finished. The temporary all-provider dry-run target was removed. No candidate/plugin or product/native runtime session was started.",
+            "definition": "952c5948fc0ff1bde57a03f62e8d620600e93931fd83a82e15348f68b1de0af6",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/research/plugin-auto-manual-decision.json",
+                "sha256": "77adbf24970ab1a5ea81270c948c1b2416dcf890d776540cad0dce2fb63e1772"
+              },
+              {
+                "available": true,
+                "path": ".skill-tree/history/research/plugin-hook-decisions.json",
+                "sha256": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461"
+              },
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/plugin-system/plan-full-review.json",
+                "sha256": "29f3bcd6a4bf2e3466e4d7815d1e64dd7f727e5e16e2a4149dd7451940d1dd26"
+              },
+              {
+                "available": true,
+                "path": ".skill-tree/history/audits/audit-a-8a21958d-a282-4d9a-b939-4eede8925ee6.json",
+                "sha256": "5e87d6c8b7f25b4701cd121db96cff85eb26546f585e962f389a3357fa92bc35"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "22b9eac8d1275104997ea27438eae8cb38e64a928ffb8dae1b79f8c7aa4f8882",
+            "payload_hash": "6c5948170b72109b0f698f40d8731a1498145c26ec8149e6692af806239a01bf",
+            "recorded_at": "2026-11-05T18:56:01.159796+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+              ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+              ".skill-tree/documents/implementation-plan.md": "384dc9b9aa674dfa10a3ffc0597804b5525ee8395d9382bd27a9d382df27b9e4",
+              ".skill-tree/documents/plugin-system-contract.md": "19001702f22e73de4ae224d49e895e7db8f15f4b599a070c2c09fd7c4337eadf",
+              ".skill-tree/documents/plugin-system-research.md": "6a8062f4bb9c39abc9f0e1ef513d6af2e2f50a2b0f8616b30007c8e6bd718205",
+              ".skill-tree/documents/plugin-workflow-decisions.md": "3630d4e9906afd8e1b0b1e5ae7a25c089a99f467121a2f353556df9f1ca72869",
+              ".skill-tree/history/research/plugin-hook-decisions.json": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461"
+            }
+          }
+        }
+      ],
+      "commits": [],
+      "depends_on": [],
+      "disposition": "completed",
+      "evidence": [
+        {
+          "available": true,
+          "path": ".skill-tree/history/audits/audit-a-8a21958d-a282-4d9a-b939-4eede8925ee6.json",
+          "sha256": "5e87d6c8b7f25b4701cd121db96cff85eb26546f585e962f389a3357fa92bc35"
+        },
+        {
+          "available": true,
+          "path": ".skill-tree/history/research/plugin-auto-manual-decision.json",
+          "sha256": "77adbf24970ab1a5ea81270c948c1b2416dcf890d776540cad0dce2fb63e1772"
+        },
+        {
+          "available": true,
+          "path": ".skill-tree/history/research/plugin-hook-decisions.json",
+          "sha256": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461"
+        },
+        {
+          "available": true,
+          "path": ".skill-tree/history/validation/plugin-system/plan-full-review.json",
+          "sha256": "29f3bcd6a4bf2e3466e4d7815d1e64dd7f727e5e16e2a4149dd7451940d1dd26"
+        }
+      ],
+      "followup_ids": [],
+      "id": "O-bd95d91a-b289-4f0b-a449-0628cbec0fb3",
+      "limitations": [
+        "The design task implements no plugin runtime or delegated decision engine. Comparative trials retain a separate actual owner-agreement gate."
+      ],
+      "outcome": "The approved W1 and W2 design defines Auto/Manual governance, deterministic internal hooks and post-processing task-wording review. Full source-backed document review resolves nine findings and records required implementation handoffs.",
+      "parent_pending_ids": [
+        "P-8f13728d-b0df-4097-afa3-677e7dc939b5"
+      ],
+      "recorded_at": "2026-11-05T18:56:06.795440+00:00",
+      "related_task_id": null,
+      "root_task_id": "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+      "source_fingerprints": {
+        ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+        ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+        ".skill-tree/documents/implementation-plan.md": "384dc9b9aa674dfa10a3ffc0597804b5525ee8395d9382bd27a9d382df27b9e4",
+        ".skill-tree/documents/plugin-system-contract.md": "19001702f22e73de4ae224d49e895e7db8f15f4b599a070c2c09fd7c4337eadf",
+        ".skill-tree/documents/plugin-system-research.md": "6a8062f4bb9c39abc9f0e1ef513d6af2e2f50a2b0f8616b30007c8e6bd718205",
+        ".skill-tree/documents/plugin-workflow-decisions.md": "3630d4e9906afd8e1b0b1e5ae7a25c089a99f467121a2f353556df9f1ca72869",
+        ".skill-tree/history/research/plugin-hook-decisions.json": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461"
+      },
+      "task_id": "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "title": "Discuss and agree workflow extension decisions with the owner",
+      "validation_group_id": null,
+      "validation_plan": [
+        {
+          "assertion": "The owner receives concrete alternatives for existing hook boundaries, missing stages and possible operation splits, with costs and workflow tradeoffs. Actual owner decisions record approved, rejected or deferred structural changes and the permitted optional hook map. Every decision consumed by a dependent pilot is actually resolved and approved before the design task completes; unrelated structural proposals can remain explicitly rejected or deferred.",
+          "criteria": [
+            "The owner receives concrete alternatives for existing hook boundaries, missing stages and possible operation splits, with costs and workflow tradeoffs.",
+            "Actual owner decisions record approved, rejected or deferred structural changes and the permitted optional hook map.",
+            "Every decision consumed by a dependent pilot is actually resolved and approved before the design task completes; unrelated structural proposals can remain explicitly rejected or deferred."
+          ],
+          "id": "owner-decision-evidence",
+          "parameters": {},
+          "recipe_id": "static-inspection",
+          "sources": [
+            ".skill-tree/documents/plugin-system-research.md",
+            ".skill-tree/documents/plugin-workflow-decisions.md",
+            ".skill-tree/common/references/future-workflow.md",
+            ".skill-tree/common/scripts/workflow-state.py",
+            ".skill-tree/documents/implementation-plan.md",
+            ".skill-tree/history/research/plugin-hook-decisions.json",
+            ".skill-tree/documents/plugin-system-contract.md"
+          ],
+          "timing": "immediate"
+        }
+      ],
+      "validation_signature": "952c5948fc0ff1bde57a03f62e8d620600e93931fd83a82e15348f68b1de0af6"
+    }
+  ],
+  "progress_changes": [
+    {
+      "after": null,
+      "before": {
+        "admission": {
+          "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+          "flavor": "general",
+          "identity": "8c1b83e0842048aa830c643c0388c4e18fa625d2a26d0291084462acd084e1b8"
+        },
+        "checks": {
+          "owner-decision-evidence": {
+            "attempt": {
+              "attempt_id": "C-ec2cbe45-3b55-4288-9c86-d466f684e9c5",
+              "definition": "952c5948fc0ff1bde57a03f62e8d620600e93931fd83a82e15348f68b1de0af6",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "key": "22b9eac8d1275104997ea27438eae8cb38e64a928ffb8dae1b79f8c7aa4f8882",
+              "launch": null,
+              "prepared_at": "2026-11-05T18:55:27.171984+00:00",
+              "recipe": {
+                "assertion_contract": "explicit source and artifact assertions",
+                "input_paths": [],
+                "lane": "static"
+              },
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                ".skill-tree/documents/implementation-plan.md": "384dc9b9aa674dfa10a3ffc0597804b5525ee8395d9382bd27a9d382df27b9e4",
+                ".skill-tree/documents/plugin-system-contract.md": "19001702f22e73de4ae224d49e895e7db8f15f4b599a070c2c09fd7c4337eadf",
+                ".skill-tree/documents/plugin-system-research.md": "6a8062f4bb9c39abc9f0e1ef513d6af2e2f50a2b0f8616b30007c8e6bd718205",
+                ".skill-tree/documents/plugin-workflow-decisions.md": "3630d4e9906afd8e1b0b1e5ae7a25c089a99f467121a2f353556df9f1ca72869",
+                ".skill-tree/history/research/plugin-hook-decisions.json": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461"
+              }
+            },
+            "receipts": {
+              "C-ec2cbe45-3b55-4288-9c86-d466f684e9c5": {
+                "actual_lane": "static",
+                "assertions": [
+                  {
+                    "assertion": "The owner receives concrete alternatives for existing hook boundaries, missing stages and possible operation splits, with costs and workflow tradeoffs. Actual owner decisions record approved, rejected or deferred structural changes and the permitted optional hook map. Every decision consumed by a dependent pilot is actually resolved and approved before the design task completes; unrelated structural proposals can remain explicitly rejected or deferred.",
+                    "result": "pass"
+                  }
+                ],
+                "attempt_id": "C-ec2cbe45-3b55-4288-9c86-d466f684e9c5",
+                "classification": "executed-control",
+                "cleanup": "Complete source/document review and repository checks finished. The temporary all-provider dry-run target was removed. No candidate/plugin or product/native runtime session was started.",
+                "definition": "952c5948fc0ff1bde57a03f62e8d620600e93931fd83a82e15348f68b1de0af6",
+                "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/research/plugin-auto-manual-decision.json",
+                    "sha256": "77adbf24970ab1a5ea81270c948c1b2416dcf890d776540cad0dce2fb63e1772"
+                  },
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/research/plugin-hook-decisions.json",
+                    "sha256": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461"
+                  },
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/plugin-system/plan-full-review.json",
+                    "sha256": "29f3bcd6a4bf2e3466e4d7815d1e64dd7f727e5e16e2a4149dd7451940d1dd26"
+                  },
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/audits/audit-a-8a21958d-a282-4d9a-b939-4eede8925ee6.json",
+                    "sha256": "5e87d6c8b7f25b4701cd121db96cff85eb26546f585e962f389a3357fa92bc35"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "22b9eac8d1275104997ea27438eae8cb38e64a928ffb8dae1b79f8c7aa4f8882",
+                "payload_hash": "6c5948170b72109b0f698f40d8731a1498145c26ec8149e6692af806239a01bf",
+                "recorded_at": "2026-11-05T18:56:01.159796+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                  ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                  ".skill-tree/documents/implementation-plan.md": "384dc9b9aa674dfa10a3ffc0597804b5525ee8395d9382bd27a9d382df27b9e4",
+                  ".skill-tree/documents/plugin-system-contract.md": "19001702f22e73de4ae224d49e895e7db8f15f4b599a070c2c09fd7c4337eadf",
+                  ".skill-tree/documents/plugin-system-research.md": "6a8062f4bb9c39abc9f0e1ef513d6af2e2f50a2b0f8616b30007c8e6bd718205",
+                  ".skill-tree/documents/plugin-workflow-decisions.md": "3630d4e9906afd8e1b0b1e5ae7a25c089a99f467121a2f353556df9f1ca72869",
+                  ".skill-tree/history/research/plugin-hook-decisions.json": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461"
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "static",
+              "assertions": [
+                {
+                  "assertion": "The owner receives concrete alternatives for existing hook boundaries, missing stages and possible operation splits, with costs and workflow tradeoffs. Actual owner decisions record approved, rejected or deferred structural changes and the permitted optional hook map. Every decision consumed by a dependent pilot is actually resolved and approved before the design task completes; unrelated structural proposals can remain explicitly rejected or deferred.",
+                  "result": "pass"
+                }
+              ],
+              "attempt_id": "C-ec2cbe45-3b55-4288-9c86-d466f684e9c5",
+              "classification": "executed-control",
+              "cleanup": "Complete source/document review and repository checks finished. The temporary all-provider dry-run target was removed. No candidate/plugin or product/native runtime session was started.",
+              "definition": "952c5948fc0ff1bde57a03f62e8d620600e93931fd83a82e15348f68b1de0af6",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/research/plugin-auto-manual-decision.json",
+                  "sha256": "77adbf24970ab1a5ea81270c948c1b2416dcf890d776540cad0dce2fb63e1772"
+                },
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/research/plugin-hook-decisions.json",
+                  "sha256": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461"
+                },
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/plugin-system/plan-full-review.json",
+                  "sha256": "29f3bcd6a4bf2e3466e4d7815d1e64dd7f727e5e16e2a4149dd7451940d1dd26"
+                },
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/audits/audit-a-8a21958d-a282-4d9a-b939-4eede8925ee6.json",
+                  "sha256": "5e87d6c8b7f25b4701cd121db96cff85eb26546f585e962f389a3357fa92bc35"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "22b9eac8d1275104997ea27438eae8cb38e64a928ffb8dae1b79f8c7aa4f8882",
+              "payload_hash": "6c5948170b72109b0f698f40d8731a1498145c26ec8149e6692af806239a01bf",
+              "recorded_at": "2026-11-05T18:56:01.159796+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+                ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+                ".skill-tree/documents/implementation-plan.md": "384dc9b9aa674dfa10a3ffc0597804b5525ee8395d9382bd27a9d382df27b9e4",
+                ".skill-tree/documents/plugin-system-contract.md": "19001702f22e73de4ae224d49e895e7db8f15f4b599a070c2c09fd7c4337eadf",
+                ".skill-tree/documents/plugin-system-research.md": "6a8062f4bb9c39abc9f0e1ef513d6af2e2f50a2b0f8616b30007c8e6bd718205",
+                ".skill-tree/documents/plugin-workflow-decisions.md": "3630d4e9906afd8e1b0b1e5ae7a25c089a99f467121a2f353556df9f1ca72869",
+                ".skill-tree/history/research/plugin-hook-decisions.json": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461"
+              }
+            }
+          }
+        },
+        "definition": "952c5948fc0ff1bde57a03f62e8d620600e93931fd83a82e15348f68b1de0af6",
+        "execution_sessions": {},
+        "partial_work": [
+          ".skill-tree/documents/implementation-plan.md",
+          ".skill-tree/documents/plugin-workflow-decisions.md",
+          ".skill-tree/documents/plugin-system-contract.md",
+          ".skill-tree/history/research/plugin-hook-decisions.json",
+          ".skill-tree/history/validation/plugin-system/plan-full-review.json"
+        ],
+        "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+        "stage": "awaiting-validation"
+      },
+      "task_id": "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+    }
+  ],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+  "schema": 1,
+  "sequence": 65
+}

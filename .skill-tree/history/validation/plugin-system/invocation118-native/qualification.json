@@ -1,0 +1,50 @@
+{
+  "limits": {
+    "cleanup_seconds": 60,
+    "contexts": 6,
+    "requests": 12,
+    "wall_seconds": 1800
+  },
+  "consumed": {
+    "contexts": 4,
+    "requests": 8,
+    "wall_seconds": 571.7509870529175
+  },
+  "cleanup": {
+    "fixtures_removed": true,
+    "actual_actor_cleanup": {
+      "elapsed_seconds": 571.6745388507843,
+      "observed": {
+        "actors": [
+          {
+            "id": "/root/inv118_a1_retry",
+            "reference": "collaboration.interrupt_agent observed previous_status.completed with the exact actual inv118_a1_retry result.",
+            "status": "stopped"
+          },
+          {
+            "id": "/root/inv118_b_retry",
+            "reference": "collaboration.interrupt_agent observed previous_status.completed with the exact actual inv118_b_retry result.",
+            "status": "stopped"
+          },
+          {
+            "id": "/root/inv118_a2_retry",
+            "reference": "collaboration.interrupt_agent observed previous_status.completed with the exact actual inv118_a2_retry result.",
+            "status": "stopped"
+          }
+        ]
+      },
+      "recorded_utc": "2026-11-06T09:15:21.006622+00:00"
+    },
+    "completed_before_wall_seconds": 571.7509870529175
+  },
+  "parent_harness_recoveries": [
+    {
+      "logs": [
+        "invocation118-native-incorporation-resume.txt"
+      ],
+      "original_attempt_id": "HI-cc457b1f-f8c4-441e-b682-b85b4f54890a",
+      "reason": "Strip task header from replacement body; reuse the actual already accepted scripted answer after the guarded rejection. No actor rerun."
+    }
+  ],
+  "limitation": "Raw actor JSON is retained as observed. Scripted fixture-owner inputs are not real-human business approval. Parent replacement-body and stale-round rejections were recovered from the same original B result without another actor request. Exact model, native call IDs, tokens and cost were not exposed."
+}

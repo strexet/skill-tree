@@ -1,0 +1,10 @@
+{
+  "kind": "independent-controlled-preprovider-original-state-probe",
+  "original_status_before": "invoking",
+  "private_callbacks": [
+    "provider"
+  ],
+  "error": "Only the original prepared attempt can begin invocation",
+  "invocation_and_locator_unchanged": true,
+  "qualification": "Temporary controlled fixture; no real actor/provider execution."
+}

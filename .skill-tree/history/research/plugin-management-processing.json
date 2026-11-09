@@ -1,0 +1,40 @@
+{
+  "intake": {
+    "depends_on": [],
+    "id": "P-50c04dfb-3cb6-4531-ae04-bd24bb232671",
+    "parent_pending_ids": [],
+    "priority": 100,
+    "processing_run_id": null,
+    "related_task_id": null,
+    "relation": "main",
+    "root_task_id": null,
+    "status": "Pending"
+  },
+  "limits": "Planning and task specification only; no product implementation or implementation run.",
+  "owner_request": "И касательно добавляемых плагинов: нужно иметь какой-то реестр \"что установлено и в какие места\" + возможно легко удалить соответствующие плагины.",
+  "processing": {
+    "created_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791"
+    ],
+    "dispositions": {
+      "P-50c04dfb-3cb6-4531-ae04-bd24bb232671": {
+        "reason": "Source research finds reusable owned installation receipts, stopped-operation guards and uninstall transactions, but no external-plugin registry or owner-facing binding/removal interface. A separate management task reuses the planned lifecycle.",
+        "status": "promoted"
+      }
+    },
+    "id": "PR-5420f7ac-ede8-4a34-bac5-a7d84f405fff",
+    "reused_ids": [],
+    "selected_ids": [
+      "P-50c04dfb-3cb6-4531-ae04-bd24bb232671"
+    ],
+    "task_keys": {
+      "plugin-management": "T-10528edd-4542-4c26-b8b3-738ffc00d791"
+    }
+  },
+  "record_kind": "source-backed-targeted-processing",
+  "sources": [
+    ".skill-tree/lib/installation.js",
+    ".skill-tree/bin/install.js",
+    ".skill-tree/documents/future.md"
+  ]
+}

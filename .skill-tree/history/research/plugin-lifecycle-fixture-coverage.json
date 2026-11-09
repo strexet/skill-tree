@@ -1,0 +1,15 @@
+{
+  "added_check_inputs": [
+    ".skill-tree/tests/fixtures/plugin-acquisition-cases.js",
+    ".skill-tree/common/scripts/workflow-state.py",
+    ".skill-tree/lib/plugin-sources.js",
+    ".skill-tree/lib/plugin-parameters.js"
+  ],
+  "format": "skill-tree-validation-plan-refinement",
+  "new_guard": "Cached normal/focused-maintenance continuation rejects changed registry state or pending recovery before profile refresh/re-admission.",
+  "reason": "The mapped lifecycle check imports six actual acquisition fixtures and the real cached-admission guard; complete source/test fingerprints retain the actual transitive assertions.",
+  "recorded_at": "2026-11-06T03:39:55.898944+00:00",
+  "schema": 1,
+  "scope": "Existing lifecycle acceptance and dependencies remain unchanged. Original Red and rejected oracle-drift evidence remain immutable.",
+  "task_id": "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5"
+}

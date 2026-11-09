@@ -1,0 +1,196 @@
+{
+  "acceptance": {
+    "actor": {
+      "context_id": "/root/registry117_architecture",
+      "id": "/root/registry117_architecture"
+    },
+    "answer": "accept",
+    "attempt_id": "DA-9d5d0e5a-0682-48d4-8cc3-41efb398ad90",
+    "authority_digest": "d3fb8a7100ba85d9a362765d6a94cc974e805d08ce8122ccf59fcbd43467f545",
+    "context_identity": {
+      "decision_purpose": "plan",
+      "execution_snapshot_digest": "bb1a728e2feffd7e23469db04f591f36fccaa7f16668ff015e99f9e7709967df",
+      "id": "task:T-54439a41-286c-4423-936c-eb27663509c3",
+      "kind": "task",
+      "orchestration_id": "DO-8bbba2d8-4e09-51be-9291-d5ad65b02aa0",
+      "plan_digest": "7caf2e7f9e8afffdf15015c00b75662c8a67e1e951c8d068a2ba41d023b71b40",
+      "required_checks_digest": "6877e84dd498fb8c75a6621a79a4e23c4ff5f4312578e1425aff64e1e3252b80",
+      "task_ids": [
+        "T-54439a41-286c-4423-936c-eb27663509c3"
+      ]
+    },
+    "decision_id": "DG-54ca714a-1675-5e96-86ac-f63cb1d19754",
+    "digest": "ce57267b4a9b88b1a20e75ef174f18363ef9a471b887309c7f3bab43e0450078",
+    "kind": "specification-acceptance",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/registry117_architecture",
+      "actor_id": "/root/registry117_architecture",
+      "creation_reference": "Actual existing /root/registry117_architecture independent resolver for the two literal editorial plan corrections; original significant decisions remain retained.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/registry117_architecture returned the observed resolver result for the exact original sealed input; raw artifact managed-registry-hardening-resolver-actual-result.json.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "031c72672bf0c6cb653edcd291666d5fa889d76ea74de8845b16e1bc195b82de",
+    "question_id": "managed-registry-hardening-editorial-acceptance",
+    "rationale": "Verified that the current plan exactly matches the sealed text and differs from the preserved approved plan only by the two declared editorial substitutions. Both original and current plan hashes match their recorded digests. Scope, checks, authority and technical decisions remain unchanged.",
+    "role_receipts": {
+      "resolver": "1da0050806d819303fc178018f6188a93b975810756de31a40d5f553ed575036"
+    },
+    "semantic_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66"
+  },
+  "active_attempt_id": null,
+  "attempts": {
+    "DA-9d5d0e5a-0682-48d4-8cc3-41efb398ad90": {
+      "actor": {
+        "context_id": "/root/registry117_architecture",
+        "id": "/root/registry117_architecture"
+      },
+      "authority_digest": "d3fb8a7100ba85d9a362765d6a94cc974e805d08ce8122ccf59fcbd43467f545",
+      "basis_digest": null,
+      "content_fingerprint": "7f339ce118c480e795de8d87fcbeffd0c09dfa1a17f0b5578e356680cda18bfb",
+      "evidence": {
+        "actor_context_id": "/root/registry117_architecture",
+        "actor_id": "/root/registry117_architecture",
+        "creation_reference": "Actual existing /root/registry117_architecture independent resolver for the two literal editorial plan corrections; original significant decisions remain retained.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/registry117_architecture returned the observed resolver result for the exact original sealed input; raw artifact managed-registry-hardening-resolver-actual-result.json.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-9d5d0e5a-0682-48d4-8cc3-41efb398ad90",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "031c72672bf0c6cb653edcd291666d5fa889d76ea74de8845b16e1bc195b82de",
+      "result": {
+        "answer": "accept",
+        "evidence": [
+          ".skill-tree/artifacts/plugin-implementation/managed-registry-hardening-sealed-resolver.json",
+          ".skill-tree/artifacts/plugin-implementation/managed-registry-hardening-plan-approved-before-editorial.json",
+          ".skill-tree/history/research/managed-registry-hardening-plan.md"
+        ],
+        "input_digest": "0fd3ff74883cf57f30c8e337ca7b2d64be517a8f9092d40098828633862c055e",
+        "rationale": "Verified that the current plan exactly matches the sealed text and differs from the preserved approved plan only by the two declared editorial substitutions. Both original and current plan hashes match their recorded digests. Scope, checks, authority and technical decisions remain unchanged.",
+        "status": "answered"
+      },
+      "role": "resolver",
+      "semantic_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66",
+      "status": "answered"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the admitted managed-registry and prerequisite-admission blocker and completed dependency scope; controlled local installation fixtures use scripted test input. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+    ],
+    "context_id": "task:T-54439a41-286c-4423-936c-eb27663509c3",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+    },
+    "id": "approved-managed-registry-hardening",
+    "revision": 1
+  },
+  "authority_digest": "d3fb8a7100ba85d9a362765d6a94cc974e805d08ce8122ccf59fcbd43467f545",
+  "context": {
+    "content_fingerprint": "7f339ce118c480e795de8d87fcbeffd0c09dfa1a17f0b5578e356680cda18bfb",
+    "decision_purpose": "plan",
+    "execution_snapshot_digest": "bb1a728e2feffd7e23469db04f591f36fccaa7f16668ff015e99f9e7709967df",
+    "id": "task:T-54439a41-286c-4423-936c-eb27663509c3",
+    "kind": "task",
+    "orchestration_id": "DO-8bbba2d8-4e09-51be-9291-d5ad65b02aa0",
+    "plan_digest": "7caf2e7f9e8afffdf15015c00b75662c8a67e1e951c8d068a2ba41d023b71b40",
+    "required_checks_digest": "6877e84dd498fb8c75a6621a79a4e23c4ff5f4312578e1425aff64e1e3252b80",
+    "semantic_fingerprint": "ebc4009c2abec3e31fde6c0097575364963d5bfa163d7bac8e607f339335da66",
+    "task_ids": [
+      "T-54439a41-286c-4423-936c-eb27663509c3"
+    ]
+  },
+  "decision_hash": "4c5b952d4c046bbcf2dce50d0885fcbedab629ff74b8b4f8eb5882ed95caab35",
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "frontier_epoch": 1,
+  "history": [
+    {
+      "context_fingerprint": "7f339ce118c480e795de8d87fcbeffd0c09dfa1a17f0b5578e356680cda18bfb",
+      "detail": {},
+      "event": "started",
+      "mode_epoch": 1,
+      "previous_record_hash": null,
+      "sequence": 1
+    },
+    {
+      "context_fingerprint": "7f339ce118c480e795de8d87fcbeffd0c09dfa1a17f0b5578e356680cda18bfb",
+      "detail": {
+        "attempt_id": "DA-9d5d0e5a-0682-48d4-8cc3-41efb398ad90",
+        "role": "resolver"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "171dc04d77c7ce16477d6e1a9df94f33d7ffb5246362223cc95de600aedda4b1",
+      "sequence": 2
+    },
+    {
+      "context_fingerprint": "7f339ce118c480e795de8d87fcbeffd0c09dfa1a17f0b5578e356680cda18bfb",
+      "detail": {
+        "attempt_id": "DA-9d5d0e5a-0682-48d4-8cc3-41efb398ad90",
+        "status": "answered"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "5300af415ab6b94a685dcdac0d7830e507e96ff1c644c5443085db2742118dbf",
+      "sequence": 3
+    },
+    {
+      "context_fingerprint": "7f339ce118c480e795de8d87fcbeffd0c09dfa1a17f0b5578e356680cda18bfb",
+      "detail": {
+        "acceptance_digest": "ce57267b4a9b88b1a20e75ef174f18363ef9a471b887309c7f3bab43e0450078"
+      },
+      "event": "accept",
+      "mode_epoch": 1,
+      "previous_record_hash": "34f496e3fda493cce4898ddf04af785c4ae46d45a06d12297dce122d7bd4b96f",
+      "sequence": 4
+    }
+  ],
+  "id": "DG-54ca714a-1675-5e96-86ac-f63cb1d19754",
+  "mode": "auto",
+  "mode_epoch": 1,
+  "prepared_attempt_id": "DA-9d5d0e5a-0682-48d4-8cc3-41efb398ad90",
+  "question": {
+    "editorial_delta": [
+      "this concrete bounded plan -> the concrete bounded plan",
+      "this repair -> the repair"
+    ],
+    "id": "managed-registry-hardening-editorial-acceptance",
+    "kind": "specification-acceptance",
+    "options": [
+      {
+        "id": "accept",
+        "text": "Accept the editorial-only current plan."
+      },
+      {
+        "id": "revise",
+        "text": "Request a concrete correction."
+      }
+    ],
+    "plan_text": "# Managed Registry and Prerequisite Admission Plan\n\n## Admitted scope\n\nThe explicit Implement All run selected T-54439a41-286c-4423-936c-eb27663509c3 as a required blocker beneath the admitted review pilot. The task repairs managed-operation registry authority and current invocation prerequisite consumption. The task preserves the existing installation format, original invocation identities, accepted prefixes and standalone operation closure.\n\nThe retained missing-registry observation and current source establish the defect. The completed invocation dependency passed current 55 state, eight copied-installation and twelve oracle controls. The immutable actual-host report passed current static validation against the unchanged captured mandatory runtime identities. The current task introduces no actual-host, candidate-efficacy, native Skill, real-human consent or product-runtime qualification claim.\n\n## Implementation sequence\n\n1. Add requirements-led regression controls before changing runtime behavior. Use actual receipt-owned destinations for managed association, independent copies for portability, and the existing pure-engine and workflow bridge fixtures for current prerequisites and original-attempt retention. Record expected behavioral Red before the runtime repair.\n2. In the bundled composition/runtime layer, establish association from the actual execution project, exact package destination, operation and complete verified receipt inventory. Verify the existing deterministic receipt identity formula locally without importing installer/composer code. An associated selected operation requires the associated live registry; invalid relevant ownership claims remain prerequisites. Independent standalone copies and unrelated valid profiles retain current behavior.\n3. Apply global and current-occurrence prerequisites at preparation, invocation, returned-result qualification and acceptance. Keep other-occurrence requirements visible while permitting otherwise valid current incorporation. The default Node private delivery path and cached trusted Python callback path both enforce the same applicability before providers or sinks execute.\n4. Recheck business admission under the metadata writer transaction and preserve the original frozen configuration/watch baseline. Ordinary business transitions cannot adopt drift. Read, original reconciliation and explicitly authorized recovery remain available. Completed-chain current admission rejects applicable outstanding obligations without rewriting historical success.\n5. Prove the A to B to A sequence with distinct occurrence IDs and default Node delivery: an editor-only capability loss after A1 preserves A1, permits valid B incorporation, blocks A2, and restoration delivers the accepted B context to A2. Current/global holds block B. Retain empty, disabled and condition-excluded no-op controls without Future creation.\n6. Update the canonical invocation/metadata contracts, generate standalone resources, run current focused and full repository validation, review the complete scoped diff independently, resolve findings and repeat affected checks. Commit only reviewed task-owned source/evidence. Refresh the owned execution snapshot after the source commit with canonical queue/history preservation and explicit same-run re-admission.\n\n## Required evidence\n\nThe three task check receipts cover managed composition, copied bridge and Python invocation admission. The focused controls assert both positive and negative behavior, exact original HC/HI and locator retention, no callback side effects while held, restoration under original inputs and explicit recovery boundaries. Each observed failure and correction remains in immutable validation artifacts.\n\nThe operation frame additionally requires synchronization, strict validation, Python and Node suites, installer listing, a general all-operation temporary-target dry run and diff checks. A separate resolver accepts the concrete bounded plan, an independent critic checks the significant ownership and state assumptions, and substantive disagreement follows the existing arbitration protocol. A clean complete review creates no unnecessary fix.\n\nNo package acquisition, network request, new actual provider trial, external plugin installation into the development project, publication, remote push, release or source version change belongs to the repair. Controlled temporary installation fixtures use scripted test configuration and retain separate qualification limits.\n",
+    "qualification": "No implementation, source scope, required checks, authority or acceptance criteria changed. Earlier significant plan and ownership/readiness decisions retain actual independent criticism; this question accepts only literal editorial-equivalent text.",
+    "recommendation": "accept",
+    "significance": "routine",
+    "text": "Accept the literal plan after two strict-prose entity corrections only, or request a concrete revision. The approved scope, checks, implementations and prior significant technical decisions are unchanged."
+  },
+  "request_id": "DO-8bbba2d8-4e09-51be-9291-d5ad65b02aa0:question:5",
+  "revision": 4,
+  "schema": 1,
+  "start_digest": "d51a0fbc250ea6f6fd0a0ed8f1660270b314bbc93af9ec1591257d3b091e7a5a",
+  "state": "accepted"
+}

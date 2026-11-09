@@ -1,0 +1,21 @@
+{
+  "canonical_before_refresh": {
+    ".skill-tree/clarifications/cl-17367e9a-121d-4130-be4a-e13d151acb46.json": "04fc8d15c5fce90779d57329413bd7a3e071479d73c333216f9edb3e029478db",
+    ".skill-tree/documents/future.json": "5209999927fd266611ba549eb15344c783dbc4122a910c3e451799132fb3681b",
+    ".skill-tree/documents/future.md": "34a4149d1080f3167649c5de95ffb6b0e49e3a2aa9179689463c97027bda5c90",
+    ".skill-tree/history/task-outcomes.jsonl": "357251fad51b96e4578ffb99c9e2e39673144519544acd5a1f52547f22de7cb5"
+  },
+  "limits": [
+    "State helpers and explicit Auto records do not activate automatic actor routing or claim actual host qualification."
+  ],
+  "operations": 10,
+  "profile_identity": "a8254488abfa87236de621a629db42d5a1a8dfcb1e831655d723af8011bf3bee",
+  "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+  "source_commit": "45e893a",
+  "status": "passed",
+  "verification": [
+    "Owned manager verification passed.",
+    "Canonical queue/index, terminal ledger and session/decision bytes remained unchanged through installation before explicit admission.",
+    "The same fifteen-root/twenty-one-unit run was explicitly re-admitted."
+  ]
+}

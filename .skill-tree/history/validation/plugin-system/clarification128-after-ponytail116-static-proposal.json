@@ -1,0 +1,198 @@
+{
+  "check_id": "clarification-agent-observation",
+  "conditions": [
+    "Root must run/record fresh selected current24 state and3 standalone checks on the exact current source/profile and inspect their real reports.",
+    "Root must inspect this exact bounded proposal and actual retained validator result, prepare/record current selected clarification-agent-observation static evidence through ordinary helpers, and accept revalidation only while this contract remains controller-selected.",
+    "A changed reachable Manual answer/revision/confirmation/actor behavior or an explicit fresh-current-host requirement would require a separately authorized finite actual qualification. Old actors alone do not establish current native or Auto behavior."
+  ],
+  "current_controller": {
+    "current_task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+    "phase": "validate",
+    "profile_identity": "2930896e1ca12e1b4bdd26b67e2e43051d10a2e8a43a1c7bff92d4006cd12ebe",
+    "revalidation": true,
+    "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+    "stage": "awaiting-validation"
+  },
+  "current_source_analysis": {
+    "all_manual_cl_functions_ast_identical_57bb": {
+      "clarification_acceptance_current": "343981e90b58705ab034bf076e7beccd9673ebb87c53c799f27ada7333763abf",
+      "clarification_admission": "983aaecd9d9183304c86059516477a13e523027e1d6696be03d7d4fbe7f4183b",
+      "clarification_answer_evidence": "171685cfe72fff30c51e07b27ced64630fb74fa2bf72ba4b2d34be0edb31b1e5",
+      "clarification_baselines": "6511d422ec642518de112f27e1d2ab6baadc19ff743fde72056d22f0adc9d2a1",
+      "clarification_decision_context": "ee0ca3bee1aac62e58cc5c6db874d30d71b219751a2cebf3d3401ad1904e1c7a",
+      "clarification_decision_mode": "af596e10129264ba2734f2537b5d97ce21edbc39a89b9cf8641ecdd41b10f365",
+      "clarification_decision_policy": "8937c3b2a9ac3980d92cef2473e3eed794b323e60d19736f36ee353d167db842",
+      "clarification_decision_question": "837382f12d93deb1f311452a7cfc64dfaae7854a4aa0b2c1085d8c6902562d93",
+      "clarification_evidence": "d85cf9fcf03d4de496936a7398dc44003dde0a881a1d864632a23130641c6adf",
+      "clarification_fingerprints": "8717dc6f0a42b7209a61329833b7d84202bdbf32fb489d57437d6cdca94ece9e",
+      "clarification_guard": "346ef00a8e15be64c9502ecd064bec012412803e21c159b60643ad84a568e10c",
+      "clarification_identity": "3c80a9a53d8c040c96d9851d6fe14bacd7eed2c8726ecc17c94984dbf4e04654",
+      "clarification_invalidate": "790ba5d5bf67200c428f78a45205fe2eab39b40a83ebaa803e772c7f8ba04a28",
+      "clarification_mutate": "c3d71b3d927455f219a099fa998ef9a740f021c874305a7ef429aceb7af53356",
+      "clarification_path": "6bca1884aa73c18f5d293a21bf0679316842587e6e6c46d2d74abf588a7f2957",
+      "clarification_pending_decisions": "c3cfcf282a35111174e23d733eb4574053ea12e4a5c2d01eeb402faa40228fb7",
+      "clarification_questions": "19b91dd4800b7f2afdbf99b43cde7902cb852a3cddd1f9691f68dc03f195b9bb",
+      "clarification_read": "fb78490224da396a3785da9ee11a2b25120b2c719a55d91fb1f1ed4351b5e708",
+      "clarification_revise": "f790d1074ebe36ca479910c4a9439ba08f1734a2bf91b678e0aca4fb90edbb62",
+      "clarification_round": "4e32107b62f475bd4ad5b3d4fec0a4b29b39c3cc78b1b30244bf1a3db2bdba16",
+      "clarification_semantics": "bbb7dc4ee63359a5e857c9d2914bdb6ba14eb5dca982fa282c70aabe52f01a12",
+      "clarification_stale_facts": "cbeee4ec972ce097fe228203f6db04b0879acd6dcc91dbe455c093126099de03",
+      "clarification_start": "02acae697f39f839d60b0e7a0fb3e78fe5ec0d282c3a895cb35e6b59d09237e2",
+      "clarification_tasks": "31ab0ec0a058f0098a7d28a5e69e0ce931de47c5d1b4d0641048d1ffdb5d29ea",
+      "clarification_text_semantics": "7456936d9918c02fd2dd1ed0151f393ec2bdcd30271dc22b18634640f4058aa2",
+      "clarification_write": "92992cebc34a8a4f3b62735d801b0902c0952348cbc5b5aa32c7cd16eba42089"
+    },
+    "bounded_changed_paths": [
+      "Manual/legacy clarification_decision_mode defaults to manual; absent delegated receipt returns original clarification_evidence and does not construct a DG/actor. Original sessions have no decision mode or DG receipt.",
+      "New manual starts add explicit mode/epoch/history metadata. Question decision_kind remains optional; old question definitions omit it. Round mode epoch defaults0, so original legacy rounds remain current; Manual next-action messages retain original question and confirmation behavior.",
+      "Task revision adds true before/after per-task fingerprints and content-change history while unchanged parse/provenance/dependency/CAS/semantic invalidation helpers preserve original task scope and confirmation boundary. No byte-identical current session/output claim is made.",
+      "Clarification answer/confirm still require actual owner-message/submitted-answer evidence in Manual. Final confirmation remains exact current tasks and semantics after clarity. Mode switching and Auto delegation remain separate paths, not qualified by old Manual actors.",
+      "Store lock/commit differ from original b288c9a, but are unchanged since57bb. Direct neutral clarify-start/round/answer/revise/resume/confirm paths register no hook admissions; lock initializes admissions empty and the new commit admission loop is vacuous. Existing transaction/ownership/CAS logic stays active.",
+      "The only116 WF changes are _hook_action, _hook_transition and added _hook_review_frontier. Direct Manual clarification commands do not call those hook paths or import publication review. Configured generic plugin obligations and later implementation admission retain their independent core gates.",
+      "Current installed instruction/default routing may expose qualified Auto separately; this proposal covers compatible Manual/legacy behavior and does not claim the original implicit request would force Manual against a different explicit current mode."
+    ],
+    "manual_functions_changed_since57bb": [],
+    "original_b288c9a_identical_cl_helpers": {
+      "clarification_baselines": "6511d422ec642518de112f27e1d2ab6baadc19ff743fde72056d22f0adc9d2a1",
+      "clarification_evidence": "d85cf9fcf03d4de496936a7398dc44003dde0a881a1d864632a23130641c6adf",
+      "clarification_fingerprints": "8717dc6f0a42b7209a61329833b7d84202bdbf32fb489d57437d6cdca94ece9e",
+      "clarification_guard": "346ef00a8e15be64c9502ecd064bec012412803e21c159b60643ad84a568e10c",
+      "clarification_identity": "3c80a9a53d8c040c96d9851d6fe14bacd7eed2c8726ecc17c94984dbf4e04654",
+      "clarification_invalidate": "790ba5d5bf67200c428f78a45205fe2eab39b40a83ebaa803e772c7f8ba04a28",
+      "clarification_path": "6bca1884aa73c18f5d293a21bf0679316842587e6e6c46d2d74abf588a7f2957",
+      "clarification_read": "fb78490224da396a3785da9ee11a2b25120b2c719a55d91fb1f1ed4351b5e708",
+      "clarification_semantics": "bbb7dc4ee63359a5e857c9d2914bdb6ba14eb5dca982fa282c70aabe52f01a12",
+      "clarification_stale_facts": "cbeee4ec972ce097fe228203f6db04b0879acd6dcc91dbe455c093126099de03",
+      "clarification_tasks": "31ab0ec0a058f0098a7d28a5e69e0ce931de47c5d1b4d0641048d1ffdb5d29ea",
+      "clarification_text_semantics": "7456936d9918c02fd2dd1ed0151f393ec2bdcd30271dc22b18634640f4058aa2",
+      "clarification_write": "92992cebc34a8a4f3b62735d801b0902c0952348cbc5b5aa32c7cd16eba42089"
+    },
+    "original_b288c9a_identical_common_helpers": {
+      "Store.__init__": "ee7b380e33094b42d3b05b175966ecf827a402208d00988285c19a836b55c8ec",
+      "Store.guard": "f8977c7d46bac3b5ca1349304e45197a2eb66b05727c1c6ce2d7a33f5c0c1c71",
+      "Store.load": "83470c2be086353d8e60e8be333d11993586364274f13d315408d5407f0b7cca",
+      "Store.owned": "b9da6caf8c2efe4737bbc00c088ce20c982d3269f53c0a156f9277abb6b924f8",
+      "Store.recover": "48e9cbc080c7ab6677533a80b4dbb08bae36c695e5d54ac6d3ba705b0f4e13cd",
+      "Store.replace": "d3722f276bd0134e1d3c077b390d35dac86879d7c6e56fb8757891a40dc59e7a",
+      "Store.save": "d3a1e073cbcaa7345711839980f4e4a61587e2585f7e64f8cafba651d4269e8c",
+      "Store.text": "29a4453f72c020a6c41103259bc4854e792dc2cd763ba4dfa98fd38c0d843d2b",
+      "binding_path": "999047dd49e8a6d9f3cab6b6815dc06057e1a19cac71648674672037562cf8eb",
+      "binding_snapshot": "8d753fc9e4cfe85dbbb5cc79044f61064f4f3755c2a3b00f9a7bbc94e34a124a",
+      "dump": "c232f3eb0bc33fce3d248234bb784c39b9d343f3e0a5b366d721bca81e970b45",
+      "file_hash": "54365fa1671a9bb47a76efcc108fc5bfff86e05a22bb4ba7983fdb9d76c7cd5d",
+      "identity": "28219871964d9a6bd39814c9e7f09da1548d2c2bb6ee05cd0460586757164f1a",
+      "index": "54f80c8446e44179b353b66528cb890c3712313ca78c16642c1b3fdc0c3d3ed4",
+      "insert": "4f00003c61b80868391fedd808d864093a0cc25d3e560614b29a0fd4736e4199",
+      "manifest": "ecf234e588e0e27fff03c8fa5214cfabd6403aac3392b2bd8ed8afa5636d46bc",
+      "now": "0821e5547e33e30630380f395c75e3500724b22f7503542276fd6b766cc36e0f",
+      "parse": "bcb8b0e245ff872319e9016ba1f12ede052b5e4b8f7ffc8ecd3a245790296175",
+      "render": "1b2b808729bc6ab02a3c7948c617d050bc201b682b6cd077a261d52e022bb13d",
+      "validate_dependencies": "8254dd942c7d98bd7f025dff7b68d4b7d12c00b560ffba573c907f85154f5127"
+    },
+    "original_changed_cl_functions": [
+      "clarification_admission",
+      "clarification_start",
+      "clarification_questions",
+      "clarification_round",
+      "clarification_revise",
+      "clarification_mutate"
+    ],
+    "store_lock_commit_ast_identical_57bb": true,
+    "workflow_sha256": "34e5c105ad7cf594720f4c60655a27bfdfdccc93e71ce9d00610447178bb1883"
+  },
+  "format": "skill-tree-manual-clarification-current-static-compatibility-proposal",
+  "immutable_historical_actual": {
+    "all_original_static_evidence_sha256_match": true,
+    "original_limits": [
+      "Fixture-owner messages are controlled scripted inputs rather than real-human acceptance.",
+      "The current inherited host model identifier and token/cost telemetry remain unexposed; no model override is applied.",
+      "Actual-agent observations cover general-flavor fixtures; general/web/unity standalone package behavior has separate deterministic evidence.",
+      "Native external Skill invocation remains unavailable and unqualified; the actors apply installed source-backed instructions.",
+      "The resume actor initially misclassifies a built-in static recipe as unavailable; owner-directed source verification corrects the fact before confirmation.",
+      "The corrected oracle recognizes a substantiated combined owner answer and unchanged-summary confirmation; original events remain intact and no agent turn or owner submission is invented.",
+      "The observations establish bounded clarification interaction and state behavior rather than comparative plugin effectiveness or universal agent adherence."
+    ],
+    "report": {
+      "actor_count": 3,
+      "actor_turn_count": 10,
+      "original_source_commit": "b288c9a",
+      "original_workflow_sha256": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+      "path": ".skill-tree/history/validation/plugin-system/clarification-agent-observations.json",
+      "sha256": "f243f525ca6e2f5c6633be1ac2f380688ab373514b7d4dd0ecae809e52c3e037"
+    },
+    "sessions": [
+      {
+        "decision_mode_absent": true,
+        "decision_receipts_absent": true,
+        "mode": "explicit",
+        "path": ".skill-tree/history/validation/plugin-system/clarification-full-en-session.json",
+        "session_id": "CL-28d5f83a-dc38-44da-a435-7d59f28c237d",
+        "sha256": "99c6691f693807985cf1c83630beb0d176611c859aa7e948e65170c1eef1cbdf",
+        "state": "complete"
+      },
+      {
+        "decision_mode_absent": true,
+        "decision_receipts_absent": true,
+        "mode": "explicit",
+        "path": ".skill-tree/history/validation/plugin-system/clarification-resume-en-session.json",
+        "session_id": "CL-04de9cab-7d5f-4c59-83c6-2a6e4906f648",
+        "sha256": "c3c1f40358f34e551e5dfb76812a99ca10b1b0d02677977d831816fc20def51f",
+        "state": "complete"
+      }
+    ]
+  },
+  "immutable_original_contract": {
+    "assertion": "Bounded independent actual-agent observations demonstrate round, answer, task-revision and confirmation boundaries, with helper behavior and native skill invocation reported separately.",
+    "historical_static_attempt": "C-2ae9571a-3304-4689-8bc4-56c9e5cd2852",
+    "id": "O-a734f372-7d4d-4069-9960-939f4bcb0617",
+    "outcome_unchanged": true,
+    "validation_signature": "17333f40030339c63ee0efaa3439f98ba13e224179973ee5775c4c9f73afe689"
+  },
+  "observed_at_utc": "2026-11-06T17:13:18.761770+00:00",
+  "operations_performed": [
+    "Read-only exact contract, historical artifacts, actual source/AST/Git and current activation/selection inspection.",
+    "One unchanged historical-structure validator invocation (exit0); no product tests, actors or provider calls.",
+    "Only ignored validator evidence and this proposal written; no source, canonical queue, receipts, acceptance or controller writes."
+  ],
+  "owned_activation": {
+    "current_source_commit": "6725b379f6a8af018a203bed2c7c6a7448cd575f",
+    "path": ".skill-tree/history/validation/plugin-system/ponytail116-owned-snapshot-refresh.json",
+    "profile_identity": "2930896e1ca12e1b4bdd26b67e2e43051d10a2e8a43a1c7bff92d4006cd12ebe",
+    "profile_sha256": "ed4a0bf69760190ecdf163014edd03900a71fb2ab06be5e5bd27961488d512b5",
+    "sha256": "d5e499c53c6c950b92d210e675c57e5df0b914e60c06f546c5ae0971ecc4d7bb"
+  },
+  "prior_applicability": {
+    "limit": "Prior report establishes only b288c9a to4c0467a applicability. Its old whole-Store/manual-source statements are not copied as a present-time identity claim.",
+    "path": ".skill-tree/history/validation/plugin-system/clarification-manual-source-applicability.json",
+    "sha256": "2521bb79552542b29076efce64c7493cd0b6bd4d546a9e3dd92a059a852aa37b"
+  },
+  "required_current_checks": {
+    "clarification-installation": 3,
+    "clarification-state": 24
+  },
+  "reviewer": "/root/invocation118_oracle",
+  "schema": 1,
+  "source_commit": "6725b379f6a8af018a203bed2c7c6a7448cd575f",
+  "source_digest": "b28052dbc57f0376a0d061168a165357035d1a40dc758344bd091f3b58fe7297",
+  "source_freeze": {
+    "files_verified": 249,
+    "mismatches": [],
+    "path": ".skill-tree/history/validation/plugin-system/ponytail116-source-freeze3.json",
+    "sha256": "0b4725def129fa03efa04d8a223ba01b73823244cb9318137e5ad79c839ae5f2"
+  },
+  "status": "conditional-root-selected-checks-inspection-and-recording-required",
+  "task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+  "validator_observation": {
+    "actual_exit_code": 0,
+    "expected_stale_rejection_applicable": false,
+    "meaning": "Unchanged validator actually validates retained historical interaction/session structure, not current native/source identity.",
+    "path": ".skill-tree/artifacts/plugin-implementation/clarification128-after-ponytail116-validator-observation.json",
+    "sha256": "b0edb9ea368338e17b5d27d391dfed84f5628ea7d0ca6df2463af13a7b627029",
+    "source_fingerprint_gate": false
+  },
+  "verdict": {
+    "bounded_manual_historical_actual_plus_current_static_compatibility_supported": true,
+    "fresh_current_native_qualification": false,
+    "material_findings": []
+  }
+}

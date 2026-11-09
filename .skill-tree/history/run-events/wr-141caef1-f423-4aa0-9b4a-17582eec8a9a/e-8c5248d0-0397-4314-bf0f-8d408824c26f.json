@@ -1,0 +1,198 @@
+{
+  "changes": [],
+  "checkpoint_after": {
+    "admission": {
+      "environment_id": "4d1be2a553210a1f2e81b45d5e3c7d0c0eceefadad15a7fcc0a4c195c4b690f9",
+      "flavor": "general",
+      "identity": "1fd25c38a896a61eefb001e4fd271e699e4f332f59e893228120700751c4b865"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ],
+    "completed_ids": [
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656"
+    ],
+    "completion_refs": {
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656": "O-7a007cdb-e2ba-45c5-b505-71b5157ba627",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e": "O-28f9fdea-3574-4241-a352-150610cdbd00"
+    },
+    "current_task_id": "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+    "cycle_signature": "d3acf2b6ff39dad78ebe6e3c30c30b2b305ed96ccadc48390435b67c719c7def",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Implement both deferred Future tasks using skill-tree-implement-all and merge into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+    "limits": {},
+    "mode": "all",
+    "next_action": "validate",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "validate",
+    "processing_results": [],
+    "required_ids": [
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ],
+    "root_task_id": "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+    "snapshot": [
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656"
+    ],
+    "started_at": "2026-11-09T10:29:15.272535+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "23c34b77ae55363bfb4dc9fc2c2fa9f6abb2492b",
+      "branch": "codex/future-followups",
+      "local_base": true,
+      "local_base_authorization": "Owner explicitly requested Implement All for the two deferred Future tasks using the local codex/next-version base and local merge back.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a"
+    },
+    "workspace_state": "ready"
+  },
+  "checkpoint_before": {
+    "admission": {
+      "environment_id": "4d1be2a553210a1f2e81b45d5e3c7d0c0eceefadad15a7fcc0a4c195c4b690f9",
+      "flavor": "general",
+      "identity": "1fd25c38a896a61eefb001e4fd271e699e4f332f59e893228120700751c4b865"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ],
+    "completed_ids": [
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656"
+    ],
+    "completion_refs": {
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656": "O-7a007cdb-e2ba-45c5-b505-71b5157ba627",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e": "O-28f9fdea-3574-4241-a352-150610cdbd00"
+    },
+    "current_task_id": "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+    "cycle_signature": "d3acf2b6ff39dad78ebe6e3c30c30b2b305ed96ccadc48390435b67c719c7def",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Implement both deferred Future tasks using skill-tree-implement-all and merge into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+    "limits": {},
+    "mode": "all",
+    "next_action": "validate",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "validate",
+    "processing_results": [],
+    "required_ids": [
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ],
+    "root_task_id": "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+    "snapshot": [
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656"
+    ],
+    "started_at": "2026-11-09T10:29:15.272535+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "23c34b77ae55363bfb4dc9fc2c2fa9f6abb2492b",
+      "branch": "codex/future-followups",
+      "local_base": true,
+      "local_base_authorization": "Owner explicitly requested Implement All for the two deferred Future tasks using the local codex/next-version base and local merge back.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a"
+    },
+    "workspace_state": "ready"
+  },
+  "id": "E-8c5248d0-0397-4314-bf0f-8d408824c26f",
+  "outcomes": [],
+  "progress_changes": [
+    {
+      "after": {
+        "admission": {
+          "environment_id": "4d1be2a553210a1f2e81b45d5e3c7d0c0eceefadad15a7fcc0a4c195c4b690f9",
+          "flavor": "general",
+          "identity": "1fd25c38a896a61eefb001e4fd271e699e4f332f59e893228120700751c4b865"
+        },
+        "checks": {
+          "installed-static-recipe-discovery": {
+            "attempt": {
+              "attempt_id": "C-1531c640-ad9d-4ce1-a151-4c0223dade7c",
+              "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+              "environment_identity": "fc8ee3019b8cb5546b19deb9d1d3afd37b78e6c0af3c82554015647de7ba59fd",
+              "key": "ace9b0caf71594231ea886b5215aa697f5b4d41cff983e1519d1d5c94fd7d784",
+              "launch": null,
+              "prepared_at": "2026-11-09T10:49:49.253353+00:00",
+              "recipe": {
+                "argv": [
+                  "node",
+                  "--test",
+                  ".skill-tree/tests/test-installation-integrity.js"
+                ],
+                "input_paths": [
+                  ".skill-tree/config/repository.json"
+                ],
+                "lane": "unit",
+                "qualification": "owner-declared static recipe; runner unqualified"
+              },
+              "sources": {
+                ".skill-tree/common/scripts/workflow-state.py": "7c4204c84fdc3518c11bf2e1466a41257a826ec9746a824fc10d3f367c23b4d2",
+                ".skill-tree/lib/composer.js": "9605ce43a0e99aff77dbf1e223dd7afcf326917753db7963de5bf1d61bdcd04b",
+                ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                ".skill-tree/tests/test-installation-integrity.js": "e35c56daaa49c70da68c82af216291a98494f83e2f4f927ab56302b603a4586c"
+              }
+            }
+          }
+        },
+        "execution_sessions": {},
+        "revalidation": true,
+        "run_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+        "stage": "awaiting-validation"
+      },
+      "before": {
+        "admission": {
+          "environment_id": "4d1be2a553210a1f2e81b45d5e3c7d0c0eceefadad15a7fcc0a4c195c4b690f9",
+          "flavor": "general",
+          "identity": "1fd25c38a896a61eefb001e4fd271e699e4f332f59e893228120700751c4b865"
+        },
+        "checks": {},
+        "revalidation": true,
+        "run_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+        "stage": "awaiting-validation"
+      },
+      "task_id": "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    }
+  ],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "run_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+  "schema": 1,
+  "sequence": 38
+}

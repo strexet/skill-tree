@@ -1,0 +1,272 @@
+{
+  "acceptance": {
+    "actor": {
+      "context_id": "/root/registry117_architecture",
+      "id": "/root/registry117_architecture"
+    },
+    "answer": "fix",
+    "attempt_id": "DA-f2ca05d2-16d9-4dcc-b76a-2fceb6742fee",
+    "authority_digest": "8e513ca2ec78101653022a6629bd3caf5c7059be3d2df34bb802c4ea1cf18422",
+    "context_identity": {
+      "decision_purpose": "decision",
+      "execution_snapshot_digest": "892007ebc4b973b4ab4120624f5bec28500cbc886a4f89498e1d341ad70cf8af",
+      "id": "task:T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "kind": "task",
+      "orchestration_id": "DO-0d91bb8c-2ac0-5ba7-8f56-e1aa50735cd1",
+      "task_ids": [
+        "T-18db6175-499f-4679-bf8d-f815c7b42411"
+      ]
+    },
+    "decision_id": "DG-57d58610-7a9c-5abf-9660-c29170b75b3b",
+    "digest": "d79373c4300fb09a4b378bcb61bf2e976971180573ac92a75fa6147f481b8d14",
+    "kind": "technical",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/registry117_architecture",
+      "actor_id": "/root/registry117_architecture",
+      "creation_reference": "Observed separately created existing /root/registry117_architecture context; actual resolver for the exact corrected optional pilot plan, independent of root executor.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/registry117_architecture returned the observed resolver result for the exact original sealed input; raw artifact ponytail116-review-repair-resolver-result.json.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "fa2c29350b44f54a8e4f2291c35a7abf01648c143d9c6dd3030b71b3dc92866b",
+    "question_id": "ponytail116-freeze1-review-repair",
+    "rationale": "The retained actual-DG reproduction establishes that generic review-result resolution can produce a completed stage and pr-ready while both the publication findings ledger and contribution ledger remain empty. That contradicts the accepted ordinary finding-resolution requirement; generic task/plan resolution should remain unchanged, while publication-bound findings require matching guarded contribution/resolution ledger evidence, including legitimate evidence-backed dismissal. The alias defect follows directly from composition's trusted named-anchor support versus readiness's fixed string map: matching must use the verified canonical event/binding boundary and exact completed occurrence. The after guard currently admits a report with unresolved core findings and readiness does not bind the accepted stable core frontier; require a resolved current core report at entry and retain the current accepted after-frontier identity at satisfaction. Preserve before/during prefixes and allow normal plugin finding ingestion while final readiness still requires all actionable ledger findings resolved and fresh review after fixes. The approval-restoration failure is an incorrect fixture expectation: archived attachment references require explicit current reattachment or a fresh pass, rather than silent reactivation. These are bounded contract repairs and fixture corrections, not new publication, native-execution or comparison authority.",
+    "role_receipts": {
+      "critic": "d0860e28710b4730407259c4528f8af6daef4864998fe46f96fe9a87a32fe4df",
+      "resolver": "91e03184b75297df051f6e6927a474a7c4896459869e4f52cc6821913c7d0e94"
+    },
+    "semantic_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495"
+  },
+  "active_attempt_id": null,
+  "attempts": {
+    "DA-08f9a43e-72c7-47d3-825d-57ecab087c00": {
+      "actor": {
+        "context_id": "/root/invocation118_oracle",
+        "id": "/root/invocation118_oracle"
+      },
+      "authority_digest": "8e513ca2ec78101653022a6629bd3caf5c7059be3d2df34bb802c4ea1cf18422",
+      "basis_digest": "2117272f3fcd3b53144eb5d38740ecc39ede57783f355e8f6c52aadddc2db611",
+      "content_fingerprint": "f95f0f9f67330ae7ecd33441d79079cba3acdba9921ee62e0373d6652694eab3",
+      "evidence": {
+        "actor_context_id": "/root/invocation118_oracle",
+        "actor_id": "/root/invocation118_oracle",
+        "creation_reference": "Observed separately created existing /root/invocation118_oracle context; actual critic for the exact corrected optional pilot plan, independent of root executor.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/invocation118_oracle returned the observed critic result for the exact original sealed input; raw artifact ponytail116-review-repair-critic-result.json.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-08f9a43e-72c7-47d3-825d-57ecab087c00",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "fa2c29350b44f54a8e4f2291c35a7abf01648c143d9c6dd3030b71b3dc92866b",
+      "result": {
+        "answer": "fix",
+        "evidence": [
+          ".skill-tree/artifacts/plugin-implementation/ponytail116-sealed-critic.json",
+          ".skill-tree/history/validation/plugin-system/ponytail116-independent-review-freeze1-final.json",
+          ".skill-tree/history/validation/plugin-system/ponytail116-generic-resolution-reproduction.json",
+          ".skill-tree/history/validation/plugin-system/t-18db6175-499f-4679-bf8d-f815c7b42411-review-pilot-regressions-c-1dfa12dd-d36e-4105-94b4-b79d916ec5c4.json",
+          ".skill-tree/common/scripts/workflow-state.py",
+          ".skill-tree/common/scripts/pr-review-state.py",
+          ".skill-tree/common/scripts/plugin-invocation.py",
+          ".skill-tree/lib/plugin-composition.js",
+          ".skill-tree/history/research/ponytail116-plan.md"
+        ],
+        "input_digest": "7fce57ff2400bf8f04e0c2b3c72ba2591938b8c781ffd58a15d5190f16846f8b",
+        "rationale": "Agree with the bounded repairs. The retained actual-DG reproduction proves a real readiness bypass under the original chain grant, mode and executor; publication-bound review findings must require a matching ordinary contribution/resolution ledger, while generic task/plan resolution remains unchanged and legitimate evidence-backed review dismissal remains available. Canonical named-boundary matching must use the trusted owned event/binding identity and exact complete occurrence rather than an alias-name allowlist. For the after phase, establish a current resolved CORE review frontier at entry; this closes the demonstrated premature pass. Any additional readiness frontier check must distinguish final required current acceptance from historical earlier inputs. Do not compare every accepted stage to the latest whole core-report digest: ordinary plugin incorporation/dismissal or ordered later contributions can legitimately update that report, and such a check could force an automatic whole-chain restart. Preserve accepted before/during and same-chain prefixes, permit normal finding ingestion, and add the positive ledger-dismissal control alongside the three meaningful negative controls. A narrower equivalent stable frontier check is explicitly allowed by the question and preferable where it preserves those invariants. Correct the approval-restoration fixture to require explicit current reattachment or a fresh qualifying pass; archived references cannot silently reactivate, and external approval/merge gates remain independent. Preserve all original failure/observation artifacts and capture meaningful new Red before runtime repair. These changes implement the accepted pilot contract without new product scope, native experiment, installation or publication authority.",
+        "status": "agree"
+      },
+      "role": "critic",
+      "semantic_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+      "status": "agree"
+    },
+    "DA-f2ca05d2-16d9-4dcc-b76a-2fceb6742fee": {
+      "actor": {
+        "context_id": "/root/registry117_architecture",
+        "id": "/root/registry117_architecture"
+      },
+      "authority_digest": "8e513ca2ec78101653022a6629bd3caf5c7059be3d2df34bb802c4ea1cf18422",
+      "basis_digest": null,
+      "content_fingerprint": "f95f0f9f67330ae7ecd33441d79079cba3acdba9921ee62e0373d6652694eab3",
+      "evidence": {
+        "actor_context_id": "/root/registry117_architecture",
+        "actor_id": "/root/registry117_architecture",
+        "creation_reference": "Observed separately created existing /root/registry117_architecture context; actual resolver for the exact corrected optional pilot plan, independent of root executor.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/registry117_architecture returned the observed resolver result for the exact original sealed input; raw artifact ponytail116-review-repair-resolver-result.json.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-f2ca05d2-16d9-4dcc-b76a-2fceb6742fee",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "fa2c29350b44f54a8e4f2291c35a7abf01648c143d9c6dd3030b71b3dc92866b",
+      "result": {
+        "answer": "fix",
+        "evidence": [
+          ".skill-tree/artifacts/plugin-implementation/ponytail116-sealed-resolver.json",
+          ".skill-tree/history/validation/plugin-system/ponytail116-independent-review-freeze1-final.json",
+          ".skill-tree/history/validation/plugin-system/ponytail116-generic-resolution-reproduction.json",
+          ".skill-tree/history/validation/plugin-system/t-18db6175-499f-4679-bf8d-f815c7b42411-review-pilot-regressions-c-1dfa12dd-d36e-4105-94b4-b79d916ec5c4.json",
+          ".skill-tree/common/scripts/workflow-state.py",
+          ".skill-tree/common/scripts/pr-review-state.py",
+          ".skill-tree/lib/plugin-composition.js",
+          ".skill-tree/common/scripts/plugin-invocation.py"
+        ],
+        "input_digest": "220ce5515dc0356b6d534a781936426fa280a240931e1dc7e52039a29ab3ebe2",
+        "rationale": "The retained actual-DG reproduction establishes that generic review-result resolution can produce a completed stage and pr-ready while both the publication findings ledger and contribution ledger remain empty. That contradicts the accepted ordinary finding-resolution requirement; generic task/plan resolution should remain unchanged, while publication-bound findings require matching guarded contribution/resolution ledger evidence, including legitimate evidence-backed dismissal. The alias defect follows directly from composition's trusted named-anchor support versus readiness's fixed string map: matching must use the verified canonical event/binding boundary and exact completed occurrence. The after guard currently admits a report with unresolved core findings and readiness does not bind the accepted stable core frontier; require a resolved current core report at entry and retain the current accepted after-frontier identity at satisfaction. Preserve before/during prefixes and allow normal plugin finding ingestion while final readiness still requires all actionable ledger findings resolved and fresh review after fixes. The approval-restoration failure is an incorrect fixture expectation: archived attachment references require explicit current reattachment or a fresh pass, rather than silent reactivation. These are bounded contract repairs and fixture corrections, not new publication, native-execution or comparison authority.",
+        "status": "answered"
+      },
+      "role": "resolver",
+      "semantic_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+      "status": "answered"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the admitted optional pinned Ponytail review pilot and completed dependency scope; controlled local installation fixtures use scripted test input. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+    ],
+    "context_id": "task:T-18db6175-499f-4679-bf8d-f815c7b42411",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+    },
+    "id": "approved-ponytail116",
+    "revision": 1
+  },
+  "authority_digest": "8e513ca2ec78101653022a6629bd3caf5c7059be3d2df34bb802c4ea1cf18422",
+  "context": {
+    "content_fingerprint": "f95f0f9f67330ae7ecd33441d79079cba3acdba9921ee62e0373d6652694eab3",
+    "decision_purpose": "decision",
+    "execution_snapshot_digest": "892007ebc4b973b4ab4120624f5bec28500cbc886a4f89498e1d341ad70cf8af",
+    "id": "task:T-18db6175-499f-4679-bf8d-f815c7b42411",
+    "kind": "task",
+    "orchestration_id": "DO-0d91bb8c-2ac0-5ba7-8f56-e1aa50735cd1",
+    "semantic_fingerprint": "bd27869b38d71820f19140bd0bd9ef405b811890301be4f515d02b9c7774d495",
+    "task_ids": [
+      "T-18db6175-499f-4679-bf8d-f815c7b42411"
+    ]
+  },
+  "decision_hash": "a12cebcbf48de67b2d52c4f173cf3468b0b53b01f1ebd7f63e4702a1447c0132",
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "frontier_epoch": 1,
+  "history": [
+    {
+      "context_fingerprint": "f95f0f9f67330ae7ecd33441d79079cba3acdba9921ee62e0373d6652694eab3",
+      "detail": {},
+      "event": "started",
+      "mode_epoch": 1,
+      "previous_record_hash": null,
+      "sequence": 1
+    },
+    {
+      "context_fingerprint": "f95f0f9f67330ae7ecd33441d79079cba3acdba9921ee62e0373d6652694eab3",
+      "detail": {
+        "attempt_id": "DA-f2ca05d2-16d9-4dcc-b76a-2fceb6742fee",
+        "role": "resolver"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "691cf26ec7054b7b3a2fa565d491527d89ec84d959a8bb03703687619f5ebb21",
+      "sequence": 2
+    },
+    {
+      "context_fingerprint": "f95f0f9f67330ae7ecd33441d79079cba3acdba9921ee62e0373d6652694eab3",
+      "detail": {
+        "attempt_id": "DA-f2ca05d2-16d9-4dcc-b76a-2fceb6742fee",
+        "status": "answered"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "3e243f4f90b92ead632b8bc951ee56769a2a033775a242c3314d0b8c3628fd23",
+      "sequence": 3
+    },
+    {
+      "context_fingerprint": "f95f0f9f67330ae7ecd33441d79079cba3acdba9921ee62e0373d6652694eab3",
+      "detail": {
+        "attempt_id": "DA-08f9a43e-72c7-47d3-825d-57ecab087c00",
+        "role": "critic"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "ba04872245711e54bd43cfb378c807ed77e3d60b670887173ac900cd987907f7",
+      "sequence": 4
+    },
+    {
+      "context_fingerprint": "f95f0f9f67330ae7ecd33441d79079cba3acdba9921ee62e0373d6652694eab3",
+      "detail": {
+        "attempt_id": "DA-08f9a43e-72c7-47d3-825d-57ecab087c00",
+        "status": "agree"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "5fde8a4f46f1637532561651caf203acbe322cde780637be83939a51766c7c56",
+      "sequence": 5
+    },
+    {
+      "context_fingerprint": "f95f0f9f67330ae7ecd33441d79079cba3acdba9921ee62e0373d6652694eab3",
+      "detail": {
+        "acceptance_digest": "d79373c4300fb09a4b378bcb61bf2e976971180573ac92a75fa6147f481b8d14"
+      },
+      "event": "accept",
+      "mode_epoch": 1,
+      "previous_record_hash": "71ffb1896376c25483f65ca9c6485cc072e34e1f8e88b581f5f3e25d8d12a91c",
+      "sequence": 6
+    }
+  ],
+  "id": "DG-57d58610-7a9c-5abf-9660-c29170b75b3b",
+  "mode": "auto",
+  "mode_epoch": 1,
+  "prepared_attempt_id": "DA-08f9a43e-72c7-47d3-825d-57ecab087c00",
+  "question": {
+    "evidence": [
+      ".skill-tree/history/validation/plugin-system/ponytail116-independent-review-freeze1-final.json",
+      ".skill-tree/history/validation/plugin-system/ponytail116-generic-resolution-reproduction.json",
+      ".skill-tree/history/validation/plugin-system/t-18db6175-499f-4679-bf8d-f815c7b42411-review-pilot-regressions-c-1dfa12dd-d36e-4105-94b4-b79d916ec5c4.json"
+    ],
+    "id": "ponytail116-freeze1-review-repair",
+    "kind": "technical",
+    "limits": [
+      "No new root/task goal, installation consent, comparison/native experiment, publication, release or owner decision.",
+      "Preserve actual first Red, mixed diagnostic, stable failed36 attempt, source freeze1 and reviewer negative observations. Add meaningful new Red controls before runtime repair, then run fresh current focused and required full checks."
+    ],
+    "options": [
+      {
+        "id": "fix",
+        "text": "Repair the demonstrated readiness/alias/phase guards and add focused regressions, preserving normal evidence-backed resolution and historical receipts."
+      },
+      {
+        "id": "dismiss",
+        "text": "Dismiss a finding only with concrete current-source counterevidence."
+      }
+    ],
+    "proposed_repairs": [
+      "Publication-bound returned review findings require guarded ordinary publication contribution/resolution evidence before successful stage/readiness; generic DG accept/resolve/dismiss without the ledger cannot satisfy the obligation. Preserve evidence-backed dismissal through the ordinary finding ledger.",
+      "Match registered named aliases through the current trusted canonical boundary/event identity and exact completed occurrence, rather than a fixed string alias map.",
+      "Require the after entry frontier to contain current complete core review with zero unresolved core findings. Preserve exact accepted current after-frontier identity at readiness or justify a narrower equivalent guard without allowing the demonstrated early-pass reuse.",
+      "Correct the approval-restoration fixture: restored snapshot identity does not automatically reactivate archived attachment references. Require an explicit current attachment or fresh pass; external approval and owner merge authority remain independent."
+    ],
+    "recommendation": "fix",
+    "significance": "significant",
+    "text": "Resolve the three independently established review-pilot defects and the stale-attachment fixture expectation within the accepted implementation scope."
+  },
+  "request_id": "DO-0d91bb8c-2ac0-5ba7-8f56-e1aa50735cd1:question:3",
+  "revision": 6,
+  "schema": 1,
+  "start_digest": "b3f1eb4fd3a4b4a3dfe9064c7de3614dcdb0b778410a0cf96994d6da7e96bf7c",
+  "state": "accepted"
+}

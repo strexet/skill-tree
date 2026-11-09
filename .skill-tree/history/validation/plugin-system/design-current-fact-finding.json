@@ -1,0 +1,26 @@
+{
+  "approval_criteria": "All three owner-design criteria retain actual approval; no new owner decision is missing.",
+  "attempt_id": "C-9933e6e8-7065-4483-abe5-dd9db36eb1b8",
+  "finding": {
+    "line": 17,
+    "observation": "The plan calls production lifecycle and registry code unimplemented after the owned source backend and binding foundation passed qualification.",
+    "path": ".skill-tree/documents/implementation-plan.md",
+    "required_repair": "The plan distinguishes approved design, recorded baseline evidence and current component qualification without a stale global absence claim.",
+    "severity": "P2"
+  },
+  "limits": [
+    "Static documentation/source consistency review only; no runtime or Auto activation."
+  ],
+  "result": "fail",
+  "reviewer": "Root and independent /root/installer_consent_research",
+  "source_fingerprints": {
+    ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+    ".skill-tree/common/scripts/workflow-state.py": "f531546773a653809e09af093a1dddfacca763517b13cebf9b00673ab959737f",
+    ".skill-tree/documents/implementation-plan.md": "8c6aba1b915f6d80e4c49b7ced344d1909e10a78838ca46de346ddc0f828ad37",
+    ".skill-tree/documents/plugin-system-contract.md": "eeddb14292e115f489aa855f01f60ab922448317a3e9956d649148b177944680",
+    ".skill-tree/documents/plugin-system-research.md": "df72f246f13a3a4186a0035f9dec75b3dcc9dcc511de1ecf66a7bc0c62462a31",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "ef81629dd2e76ed70a05896e57b38ca55571439af333da08ecebcf9d80bbe2ca",
+    ".skill-tree/history/research/plugin-hook-decisions.json": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461"
+  },
+  "task_id": "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+}

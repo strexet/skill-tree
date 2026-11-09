@@ -1,0 +1,71 @@
+TAP version 13
+# Subtest: general copied invocation bridge retains all registered operation closures without source siblings or Future
+not ok 1 - general copied invocation bridge retains all registered operation closures without source siblings or Future
+  ---
+  duration_ms: 625.999708
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-invocation-installation.js:11:47'
+  failureType: 'testCodeFailure'
+  error: 'skill-tree-add-pending-task requires its own plugin-invocation.py'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-invocation-installation.js:24:202)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.start (node:internal/test_runner/test:833:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: web copied invocation bridge retains all registered operation closures without source siblings or Future
+not ok 2 - web copied invocation bridge retains all registered operation closures without source siblings or Future
+  ---
+  duration_ms: 596.29875
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-invocation-installation.js:11:47'
+  failureType: 'testCodeFailure'
+  error: 'skill-tree-add-pending-task requires its own plugin-invocation.py'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-invocation-installation.js:24:202)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: unity copied invocation bridge retains all registered operation closures without source siblings or Future
+not ok 3 - unity copied invocation bridge retains all registered operation closures without source siblings or Future
+  ---
+  duration_ms: 619.007416
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-invocation-installation.js:11:47'
+  failureType: 'testCodeFailure'
+  error: 'skill-tree-add-pending-task requires its own plugin-invocation.py'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-invocation-installation.js:24:202)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:934:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:633:18)
+    Test.postRun (node:internal/test_runner/test:1045:19)
+    Test.run (node:internal/test_runner/test:973:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 0
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1917.3165

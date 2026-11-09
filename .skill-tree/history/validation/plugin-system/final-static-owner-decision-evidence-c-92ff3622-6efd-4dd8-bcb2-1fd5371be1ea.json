@@ -1,0 +1,42 @@
+{
+  "actual_lane": "static",
+  "attempt_id": "C-92ff3622-6efd-4dd8-bcb2-1fd5371be1ea",
+  "check_id": "owner-decision-evidence",
+  "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+  "evidence_sha256": {
+    ".skill-tree/documents/implementation-plan.md": "73692c86132c37dc8be19457f9bf33dc6ff87027cfad50de85a361bca6f09606",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "6fe2f5fa216a0759bc2bba77b05a20c6b24de9df19c7a6d7756405008a07bc36",
+    ".skill-tree/history/audits/audit-a-8a21958d-a282-4d9a-b939-4eede8925ee6.json": "5e87d6c8b7f25b4701cd121db96cff85eb26546f585e962f389a3357fa92bc35",
+    ".skill-tree/history/research/plugin-auto-manual-decision.json": "77adbf24970ab1a5ea81270c948c1b2416dcf890d776540cad0dce2fb63e1772",
+    ".skill-tree/history/research/plugin-comparison-owner-agreement.json": "4f97398fb678ab365bcfe623d110e3002fca9f4428a216be7bdfcfa2d34f8c2c",
+    ".skill-tree/history/research/plugin-grill-session.json": "4d998fe3106628fbf69773f9c81e944ee422cf330c58e0bfc2a85e3b58d61a47",
+    ".skill-tree/history/research/plugin-hook-decisions.json": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461",
+    ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84",
+    ".skill-tree/history/research/plugin-sequence-task-amendment.json": "611ec02103eda9e7668fc952a51c326bed1ce3ac6e6697a3cc9c85855919b532",
+    ".skill-tree/history/validation/plugin-system/plan-full-review.json": "29f3bcd6a4bf2e3466e4d7815d1e64dd7f727e5e16e2a4149dd7451940d1dd26"
+  },
+  "limitations": [
+    "The review uses the original owner submissions and earlier full-document review. No fresh owner decision, new activation, trial, or changed historical acceptance is inferred."
+  ],
+  "mismatches": [],
+  "result": "pass",
+  "review": [
+    "Preserved W1 owner submission approves internal phases, Auto default, bounded separate resolution/criticism/arbitration and explicit Manual. Out-of-authority and unchanged-no-progress cases still return a concrete owner question. Standalone plan/report, release/deployment and retrospective operations remain outside the initial approved set.",
+    "Preserved W2 owner submission approves concrete current operation anchors, full core work, controller/leaf deduplication, after-review before readiness, and the stable-ID post-processing wording, interview and affected-recheck sequence. The associated design proposal and full-document review record retain alternatives, costs, scope exclusions and resolved review findings.",
+    "Preserved W3 actual owner direction supersedes default plugin bundles and fixed placement exclusions while retaining explicit consent, open source/parameter selection, exact-ID removal and parked-run guards. The ordered occurrence amendment records a separate confirmed A\u2013B\u2013A direction.",
+    "Current pilot plans identify their approved decision inputs, and comparable execution was authorized separately. The approval records themselves supply no execution, acquisition, publication, recommendation, or additional workflow-stage authority."
+  ],
+  "schema": 1,
+  "source_commit": "82eaf49b6cb35e65dfa30413228bddcb10190562",
+  "source_fingerprints": {
+    ".skill-tree/common/references/future-workflow.md": "13edfc2edf90e86351f3f047f3b3a4bbf696de54f3bac5010fb6fb19dbbdc603",
+    ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+    ".skill-tree/documents/implementation-plan.md": "73692c86132c37dc8be19457f9bf33dc6ff87027cfad50de85a361bca6f09606",
+    ".skill-tree/documents/plugin-system-contract.md": "b25424efd0dc920376a8d32b9dd7ea27d6b644d966e167f690c8999dc2fa36f5",
+    ".skill-tree/documents/plugin-system-research.md": "ad99e0d4bffd5bb60607eb525dbf8026d4986a1bf151f11b0a2fa62e111927d8",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "6fe2f5fa216a0759bc2bba77b05a20c6b24de9df19c7a6d7756405008a07bc36",
+    ".skill-tree/history/research/plugin-hook-decisions.json": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461"
+  },
+  "task_id": "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+  "unit_captures_same_contract": {}
+}
