@@ -13,7 +13,7 @@ Flavor: general. Static compatibility only; execution remains unqualified.
     "ui": []
   },
   "gaps": [],
-  "instruction_profile_id": "b59d1bf6910f2c01d97bb9106a51afa92aa873723864bb92c1838716ab56ce4f",
+  "instruction_profile_id": "6829d9d8c3ccc5eeeb45d98a5885da819252e286d9919ec0d6202346b0cf8081",
   "recipes": {
     "pending-boundary-installation": {
       "argv": [
@@ -109,6 +109,11 @@ Flavor: general. Static compatibility only; execution remains unqualified.
       ],
       "lane": "unit",
       "qualification": "static-recipe; runner unqualified"
+    },
+    "static-inspection": {
+      "assertion_contract": "explicit source and artifact assertions",
+      "input_paths": [],
+      "lane": "static"
     }
   },
   "source_version": "0.3.0",

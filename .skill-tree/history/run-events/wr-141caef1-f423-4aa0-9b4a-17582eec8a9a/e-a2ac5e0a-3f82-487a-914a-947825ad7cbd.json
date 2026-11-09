@@ -1,0 +1,676 @@
+{
+  "changes": [],
+  "checkpoint_after": {
+    "admission": {
+      "environment_id": "336e2cb9af5c0b7c4e26a2cf51165a4b3c44810c5799631d90e6183a6525c40c",
+      "flavor": "general",
+      "identity": "56e828eacced91072ba944c318a5291a21b88be7f83b90a2248f53fdae95806a"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ],
+    "completed_ids": [],
+    "current_task_id": "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Implement both deferred Future tasks using skill-tree-implement-all and merge into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+    "limits": {},
+    "mode": "all",
+    "next_action": "implement",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "implement",
+    "processing_results": [],
+    "required_ids": [
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ],
+    "root_task_id": "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+    "snapshot": [
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656"
+    ],
+    "started_at": "2026-11-09T10:29:15.272535+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "23c34b77ae55363bfb4dc9fc2c2fa9f6abb2492b",
+      "branch": "codex/future-followups",
+      "local_base": true,
+      "local_base_authorization": "Owner explicitly requested Implement All for the two deferred Future tasks using the local codex/next-version base and local merge back.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a"
+    },
+    "workspace_state": "ready"
+  },
+  "checkpoint_before": {
+    "admission": {
+      "environment_id": "336e2cb9af5c0b7c4e26a2cf51165a4b3c44810c5799631d90e6183a6525c40c",
+      "flavor": "general",
+      "identity": "56e828eacced91072ba944c318a5291a21b88be7f83b90a2248f53fdae95806a"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ],
+    "completed_ids": [],
+    "current_task_id": "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Implement both deferred Future tasks using skill-tree-implement-all and merge into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+    "limits": {},
+    "mode": "all",
+    "next_action": "implement",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "implement",
+    "processing_results": [],
+    "required_ids": [
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ],
+    "root_task_id": "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+    "snapshot": [
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656"
+    ],
+    "started_at": "2026-11-09T10:29:15.272535+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "23c34b77ae55363bfb4dc9fc2c2fa9f6abb2492b",
+      "branch": "codex/future-followups",
+      "local_base": true,
+      "local_base_authorization": "Owner explicitly requested Implement All for the two deferred Future tasks using the local codex/next-version base and local merge back.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a"
+    },
+    "workspace_state": "ready"
+  },
+  "id": "E-a2ac5e0a-3f82-487a-914a-947825ad7cbd",
+  "outcomes": [],
+  "progress_changes": [
+    {
+      "after": {
+        "admission": {
+          "environment_id": "336e2cb9af5c0b7c4e26a2cf51165a4b3c44810c5799631d90e6183a6525c40c",
+          "flavor": "general",
+          "identity": "56e828eacced91072ba944c318a5291a21b88be7f83b90a2248f53fdae95806a"
+        },
+        "checks": {
+          "installed-static-recipe-discovery": {
+            "attempt": {
+              "attempt_id": "C-5b9ac7d5-64cf-42c9-baf0-d2879b11fd90",
+              "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+              "environment_identity": "fc8ee3019b8cb5546b19deb9d1d3afd37b78e6c0af3c82554015647de7ba59fd",
+              "key": "09c028e7afacf07e6fc92a88a37f92d67d357d7cce5a90c71b040a13ebace8da",
+              "launch": null,
+              "prepared_at": "2026-11-09T10:35:51.950417+00:00",
+              "recipe": {
+                "argv": [
+                  "node",
+                  "--test",
+                  ".skill-tree/tests/test-installation-integrity.js"
+                ],
+                "input_paths": [
+                  ".skill-tree/config/repository.json"
+                ],
+                "lane": "unit",
+                "qualification": "owner-declared static recipe; runner unqualified"
+              },
+              "sources": {
+                ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+                ".skill-tree/lib/composer.js": "9605ce43a0e99aff77dbf1e223dd7afcf326917753db7963de5bf1d61bdcd04b",
+                ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                ".skill-tree/tests/test-installation-integrity.js": "e35c56daaa49c70da68c82af216291a98494f83e2f4f927ab56302b603a4586c"
+              }
+            },
+            "receipts": {
+              "C-5b9ac7d5-64cf-42c9-baf0-d2879b11fd90": {
+                "actual_lane": "unit",
+                "attempt_id": "C-5b9ac7d5-64cf-42c9-baf0-d2879b11fd90",
+                "classification": "executed-control",
+                "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+                "counts": {
+                  "discovered": 25,
+                  "expected": 25,
+                  "failed": 0,
+                  "passed": 25,
+                  "skipped": 0
+                },
+                "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+                "environment_identity": "fc8ee3019b8cb5546b19deb9d1d3afd37b78e6c0af3c82554015647de7ba59fd",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-5b9ac7d5-64cf-42c9-baf0-d2879b11fd90.json",
+                    "sha256": "8799fe7da824d59f7377326ffdd3fe5a07ec68251fd8f765a5c82e6d0f60aa09"
+                  },
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-5b9ac7d5-64cf-42c9-baf0-d2879b11fd90.txt",
+                    "sha256": "4c53eb613e2298ffed4f67a5a9c1eeda50d18fd28f84bdfdb36d66ad09031cd1"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "09c028e7afacf07e6fc92a88a37f92d67d357d7cce5a90c71b040a13ebace8da",
+                "payload_hash": "1b31e78ad7f433753f490587699f6507970e6596a27a7838a4a583ac2f89e7cf",
+                "recorded_at": "2026-11-09T10:36:28.020511+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+                  ".skill-tree/lib/composer.js": "9605ce43a0e99aff77dbf1e223dd7afcf326917753db7963de5bf1d61bdcd04b",
+                  ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                  ".skill-tree/tests/test-installation-integrity.js": "e35c56daaa49c70da68c82af216291a98494f83e2f4f927ab56302b603a4586c"
+                },
+                "timing": {
+                  "tool_wall_seconds": 35.293186333961785
+                }
+              },
+              "C-be9a02ac-8c77-4996-ac31-8cf3b1d31610": {
+                "actual_lane": "unit",
+                "attempt_id": "C-be9a02ac-8c77-4996-ac31-8cf3b1d31610",
+                "classification": "executed-control",
+                "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+                "counts": {
+                  "discovered": 25,
+                  "expected": 25,
+                  "failed": 2,
+                  "passed": 23,
+                  "skipped": 0
+                },
+                "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+                "environment_identity": "fc8ee3019b8cb5546b19deb9d1d3afd37b78e6c0af3c82554015647de7ba59fd",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-be9a02ac-8c77-4996-ac31-8cf3b1d31610.json",
+                    "sha256": "1b6462fe160916e418c661e540381e5b2ade04ef4d3c89e7ad271f3c6eaac3b2"
+                  },
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-be9a02ac-8c77-4996-ac31-8cf3b1d31610.txt",
+                    "sha256": "0f36230361e2adf343395d8110d8f72ceb731b097eaae12198bab50c1a066b7d"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_category": "expected-behavior",
+                "key": "57f3d7fad4cdf9b6a32da8648605e8d96d1bb856a072460cf5371c2c011c14cb",
+                "payload_hash": "9c1c56dcfb34f5c8201b1e063c53e412aa0b5950334427c687eb42f0037b7ecd",
+                "recorded_at": "2026-11-09T10:34:07.542459+00:00",
+                "result": "red",
+                "sources": {
+                  ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+                  ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+                  ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                  ".skill-tree/tests/test-installation-integrity.js": "e35c56daaa49c70da68c82af216291a98494f83e2f4f927ab56302b603a4586c"
+                },
+                "timing": {
+                  "tool_wall_seconds": 33.62698658276349
+                }
+              }
+            },
+            "red": {
+              "actual_lane": "unit",
+              "attempt_id": "C-be9a02ac-8c77-4996-ac31-8cf3b1d31610",
+              "classification": "executed-control",
+              "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+              "counts": {
+                "discovered": 25,
+                "expected": 25,
+                "failed": 2,
+                "passed": 23,
+                "skipped": 0
+              },
+              "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+              "environment_identity": "fc8ee3019b8cb5546b19deb9d1d3afd37b78e6c0af3c82554015647de7ba59fd",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-be9a02ac-8c77-4996-ac31-8cf3b1d31610.json",
+                  "sha256": "1b6462fe160916e418c661e540381e5b2ade04ef4d3c89e7ad271f3c6eaac3b2"
+                },
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-be9a02ac-8c77-4996-ac31-8cf3b1d31610.txt",
+                  "sha256": "0f36230361e2adf343395d8110d8f72ceb731b097eaae12198bab50c1a066b7d"
+                }
+              ],
+              "execution_sessions": {},
+              "failure_category": "expected-behavior",
+              "key": "57f3d7fad4cdf9b6a32da8648605e8d96d1bb856a072460cf5371c2c011c14cb",
+              "payload_hash": "9c1c56dcfb34f5c8201b1e063c53e412aa0b5950334427c687eb42f0037b7ecd",
+              "recorded_at": "2026-11-09T10:34:07.542459+00:00",
+              "result": "red",
+              "sources": {
+                ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+                ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+                ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                ".skill-tree/tests/test-installation-integrity.js": "e35c56daaa49c70da68c82af216291a98494f83e2f4f927ab56302b603a4586c"
+              },
+              "timing": {
+                "tool_wall_seconds": 33.62698658276349
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-5b9ac7d5-64cf-42c9-baf0-d2879b11fd90",
+              "classification": "executed-control",
+              "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+              "counts": {
+                "discovered": 25,
+                "expected": 25,
+                "failed": 0,
+                "passed": 25,
+                "skipped": 0
+              },
+              "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+              "environment_identity": "fc8ee3019b8cb5546b19deb9d1d3afd37b78e6c0af3c82554015647de7ba59fd",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-5b9ac7d5-64cf-42c9-baf0-d2879b11fd90.json",
+                  "sha256": "8799fe7da824d59f7377326ffdd3fe5a07ec68251fd8f765a5c82e6d0f60aa09"
+                },
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-5b9ac7d5-64cf-42c9-baf0-d2879b11fd90.txt",
+                  "sha256": "4c53eb613e2298ffed4f67a5a9c1eeda50d18fd28f84bdfdb36d66ad09031cd1"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "09c028e7afacf07e6fc92a88a37f92d67d357d7cce5a90c71b040a13ebace8da",
+              "payload_hash": "1b31e78ad7f433753f490587699f6507970e6596a27a7838a4a583ac2f89e7cf",
+              "recorded_at": "2026-11-09T10:36:28.020511+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+                ".skill-tree/lib/composer.js": "9605ce43a0e99aff77dbf1e223dd7afcf326917753db7963de5bf1d61bdcd04b",
+                ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                ".skill-tree/tests/test-installation-integrity.js": "e35c56daaa49c70da68c82af216291a98494f83e2f4f927ab56302b603a4586c"
+              },
+              "timing": {
+                "tool_wall_seconds": 35.293186333961785
+              }
+            }
+          },
+          "static-recipe-discovery-contract": {
+            "attempt": {
+              "attempt_id": "C-ddfc7377-d578-4fdd-abe4-f2cdd828a4f9",
+              "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "key": "f751ab236d50ca5aa4f0a13ea118c632188f3324b4306e2d7269df2eac1de1f2",
+              "launch": null,
+              "prepared_at": "2026-11-09T10:36:28.743729+00:00",
+              "recipe": {
+                "assertion_contract": "explicit source and artifact assertions",
+                "input_paths": [],
+                "lane": "static"
+              },
+              "sources": {
+                ".skill-tree/common/references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
+                ".skill-tree/common/references/validation-policy.md": "2b68bdd7280aa2eb2e9534ad1f1e79a34292ad4839843331cd156db5547bfe7d",
+                ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+                ".skill-tree/documents/install.md": "b684297991c8e9ae3f97ffc23a52a91b256147d799335c5ad984b90361fb21c7",
+                ".skill-tree/lib/composer.js": "9605ce43a0e99aff77dbf1e223dd7afcf326917753db7963de5bf1d61bdcd04b"
+              }
+            },
+            "receipts": {
+              "C-ddfc7377-d578-4fdd-abe4-f2cdd828a4f9": {
+                "actual_lane": "static",
+                "assertions": [
+                  {
+                    "assertion": "Owned profile discovery and the bundled validation documentation identify static-inspection as an assertion-only built-in fallback when no explicit recipe overrides the ID.",
+                    "result": "pass"
+                  }
+                ],
+                "attempt_id": "C-ddfc7377-d578-4fdd-abe4-f2cdd828a4f9",
+                "classification": "executed-control",
+                "cleanup": "Read-only source and installed fixture evidence inspected.",
+                "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+                "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-static-recipe-discovery-contract-c-ddfc7377-d578-4fdd-abe4-f2cdd828a4f9.json",
+                    "sha256": "be52d00f13ab2f58727deec9e1d18f76b1745231d05113f6f1a24f36e4db0519"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "f751ab236d50ca5aa4f0a13ea118c632188f3324b4306e2d7269df2eac1de1f2",
+                "payload_hash": "819bbd1a0ed7e870e9c64401e429fddc92dbfb3d7dbec54b7a7cce9f67cbe8bb",
+                "recorded_at": "2026-11-09T10:36:29.240913+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
+                  ".skill-tree/common/references/validation-policy.md": "2b68bdd7280aa2eb2e9534ad1f1e79a34292ad4839843331cd156db5547bfe7d",
+                  ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+                  ".skill-tree/documents/install.md": "b684297991c8e9ae3f97ffc23a52a91b256147d799335c5ad984b90361fb21c7",
+                  ".skill-tree/lib/composer.js": "9605ce43a0e99aff77dbf1e223dd7afcf326917753db7963de5bf1d61bdcd04b"
+                }
+              }
+            },
+            "result": {
+              "actual_lane": "static",
+              "assertions": [
+                {
+                  "assertion": "Owned profile discovery and the bundled validation documentation identify static-inspection as an assertion-only built-in fallback when no explicit recipe overrides the ID.",
+                  "result": "pass"
+                }
+              ],
+              "attempt_id": "C-ddfc7377-d578-4fdd-abe4-f2cdd828a4f9",
+              "classification": "executed-control",
+              "cleanup": "Read-only source and installed fixture evidence inspected.",
+              "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-static-recipe-discovery-contract-c-ddfc7377-d578-4fdd-abe4-f2cdd828a4f9.json",
+                  "sha256": "be52d00f13ab2f58727deec9e1d18f76b1745231d05113f6f1a24f36e4db0519"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "f751ab236d50ca5aa4f0a13ea118c632188f3324b4306e2d7269df2eac1de1f2",
+              "payload_hash": "819bbd1a0ed7e870e9c64401e429fddc92dbfb3d7dbec54b7a7cce9f67cbe8bb",
+              "recorded_at": "2026-11-09T10:36:29.240913+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
+                ".skill-tree/common/references/validation-policy.md": "2b68bdd7280aa2eb2e9534ad1f1e79a34292ad4839843331cd156db5547bfe7d",
+                ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+                ".skill-tree/documents/install.md": "b684297991c8e9ae3f97ffc23a52a91b256147d799335c5ad984b90361fb21c7",
+                ".skill-tree/lib/composer.js": "9605ce43a0e99aff77dbf1e223dd7afcf326917753db7963de5bf1d61bdcd04b"
+              }
+            }
+          }
+        },
+        "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+        "execution_sessions": {},
+        "partial_work": [
+          ".skill-tree/config/capabilities.json",
+          ".skill-tree/lib/composer.js",
+          ".skill-tree/common/references/validation-policy.md",
+          ".skill-tree/common/references/installation-profile.md",
+          ".skill-tree/documents/install.md",
+          ".skill-tree/tests/test-installation-integrity.js"
+        ],
+        "run_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+        "stage": "awaiting-validation"
+      },
+      "before": {
+        "admission": {
+          "environment_id": "336e2cb9af5c0b7c4e26a2cf51165a4b3c44810c5799631d90e6183a6525c40c",
+          "flavor": "general",
+          "identity": "56e828eacced91072ba944c318a5291a21b88be7f83b90a2248f53fdae95806a"
+        },
+        "checks": {
+          "installed-static-recipe-discovery": {
+            "attempt": {
+              "attempt_id": "C-5b9ac7d5-64cf-42c9-baf0-d2879b11fd90",
+              "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+              "environment_identity": "fc8ee3019b8cb5546b19deb9d1d3afd37b78e6c0af3c82554015647de7ba59fd",
+              "key": "09c028e7afacf07e6fc92a88a37f92d67d357d7cce5a90c71b040a13ebace8da",
+              "launch": null,
+              "prepared_at": "2026-11-09T10:35:51.950417+00:00",
+              "recipe": {
+                "argv": [
+                  "node",
+                  "--test",
+                  ".skill-tree/tests/test-installation-integrity.js"
+                ],
+                "input_paths": [
+                  ".skill-tree/config/repository.json"
+                ],
+                "lane": "unit",
+                "qualification": "owner-declared static recipe; runner unqualified"
+              },
+              "sources": {
+                ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+                ".skill-tree/lib/composer.js": "9605ce43a0e99aff77dbf1e223dd7afcf326917753db7963de5bf1d61bdcd04b",
+                ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                ".skill-tree/tests/test-installation-integrity.js": "e35c56daaa49c70da68c82af216291a98494f83e2f4f927ab56302b603a4586c"
+              }
+            },
+            "receipts": {
+              "C-5b9ac7d5-64cf-42c9-baf0-d2879b11fd90": {
+                "actual_lane": "unit",
+                "attempt_id": "C-5b9ac7d5-64cf-42c9-baf0-d2879b11fd90",
+                "classification": "executed-control",
+                "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+                "counts": {
+                  "discovered": 25,
+                  "expected": 25,
+                  "failed": 0,
+                  "passed": 25,
+                  "skipped": 0
+                },
+                "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+                "environment_identity": "fc8ee3019b8cb5546b19deb9d1d3afd37b78e6c0af3c82554015647de7ba59fd",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-5b9ac7d5-64cf-42c9-baf0-d2879b11fd90.json",
+                    "sha256": "8799fe7da824d59f7377326ffdd3fe5a07ec68251fd8f765a5c82e6d0f60aa09"
+                  },
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-5b9ac7d5-64cf-42c9-baf0-d2879b11fd90.txt",
+                    "sha256": "4c53eb613e2298ffed4f67a5a9c1eeda50d18fd28f84bdfdb36d66ad09031cd1"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "09c028e7afacf07e6fc92a88a37f92d67d357d7cce5a90c71b040a13ebace8da",
+                "payload_hash": "1b31e78ad7f433753f490587699f6507970e6596a27a7838a4a583ac2f89e7cf",
+                "recorded_at": "2026-11-09T10:36:28.020511+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+                  ".skill-tree/lib/composer.js": "9605ce43a0e99aff77dbf1e223dd7afcf326917753db7963de5bf1d61bdcd04b",
+                  ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                  ".skill-tree/tests/test-installation-integrity.js": "e35c56daaa49c70da68c82af216291a98494f83e2f4f927ab56302b603a4586c"
+                },
+                "timing": {
+                  "tool_wall_seconds": 35.293186333961785
+                }
+              },
+              "C-be9a02ac-8c77-4996-ac31-8cf3b1d31610": {
+                "actual_lane": "unit",
+                "attempt_id": "C-be9a02ac-8c77-4996-ac31-8cf3b1d31610",
+                "classification": "executed-control",
+                "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+                "counts": {
+                  "discovered": 25,
+                  "expected": 25,
+                  "failed": 2,
+                  "passed": 23,
+                  "skipped": 0
+                },
+                "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+                "environment_identity": "fc8ee3019b8cb5546b19deb9d1d3afd37b78e6c0af3c82554015647de7ba59fd",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-be9a02ac-8c77-4996-ac31-8cf3b1d31610.json",
+                    "sha256": "1b6462fe160916e418c661e540381e5b2ade04ef4d3c89e7ad271f3c6eaac3b2"
+                  },
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-be9a02ac-8c77-4996-ac31-8cf3b1d31610.txt",
+                    "sha256": "0f36230361e2adf343395d8110d8f72ceb731b097eaae12198bab50c1a066b7d"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_category": "expected-behavior",
+                "key": "57f3d7fad4cdf9b6a32da8648605e8d96d1bb856a072460cf5371c2c011c14cb",
+                "payload_hash": "9c1c56dcfb34f5c8201b1e063c53e412aa0b5950334427c687eb42f0037b7ecd",
+                "recorded_at": "2026-11-09T10:34:07.542459+00:00",
+                "result": "red",
+                "sources": {
+                  ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+                  ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+                  ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                  ".skill-tree/tests/test-installation-integrity.js": "e35c56daaa49c70da68c82af216291a98494f83e2f4f927ab56302b603a4586c"
+                },
+                "timing": {
+                  "tool_wall_seconds": 33.62698658276349
+                }
+              }
+            },
+            "red": {
+              "actual_lane": "unit",
+              "attempt_id": "C-be9a02ac-8c77-4996-ac31-8cf3b1d31610",
+              "classification": "executed-control",
+              "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+              "counts": {
+                "discovered": 25,
+                "expected": 25,
+                "failed": 2,
+                "passed": 23,
+                "skipped": 0
+              },
+              "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+              "environment_identity": "fc8ee3019b8cb5546b19deb9d1d3afd37b78e6c0af3c82554015647de7ba59fd",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-be9a02ac-8c77-4996-ac31-8cf3b1d31610.json",
+                  "sha256": "1b6462fe160916e418c661e540381e5b2ade04ef4d3c89e7ad271f3c6eaac3b2"
+                },
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-be9a02ac-8c77-4996-ac31-8cf3b1d31610.txt",
+                  "sha256": "0f36230361e2adf343395d8110d8f72ceb731b097eaae12198bab50c1a066b7d"
+                }
+              ],
+              "execution_sessions": {},
+              "failure_category": "expected-behavior",
+              "key": "57f3d7fad4cdf9b6a32da8648605e8d96d1bb856a072460cf5371c2c011c14cb",
+              "payload_hash": "9c1c56dcfb34f5c8201b1e063c53e412aa0b5950334427c687eb42f0037b7ecd",
+              "recorded_at": "2026-11-09T10:34:07.542459+00:00",
+              "result": "red",
+              "sources": {
+                ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+                ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+                ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                ".skill-tree/tests/test-installation-integrity.js": "e35c56daaa49c70da68c82af216291a98494f83e2f4f927ab56302b603a4586c"
+              },
+              "timing": {
+                "tool_wall_seconds": 33.62698658276349
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-5b9ac7d5-64cf-42c9-baf0-d2879b11fd90",
+              "classification": "executed-control",
+              "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+              "counts": {
+                "discovered": 25,
+                "expected": 25,
+                "failed": 0,
+                "passed": 25,
+                "skipped": 0
+              },
+              "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+              "environment_identity": "fc8ee3019b8cb5546b19deb9d1d3afd37b78e6c0af3c82554015647de7ba59fd",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-5b9ac7d5-64cf-42c9-baf0-d2879b11fd90.json",
+                  "sha256": "8799fe7da824d59f7377326ffdd3fe5a07ec68251fd8f765a5c82e6d0f60aa09"
+                },
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-installed-static-recipe-discovery-c-5b9ac7d5-64cf-42c9-baf0-d2879b11fd90.txt",
+                  "sha256": "4c53eb613e2298ffed4f67a5a9c1eeda50d18fd28f84bdfdb36d66ad09031cd1"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "09c028e7afacf07e6fc92a88a37f92d67d357d7cce5a90c71b040a13ebace8da",
+              "payload_hash": "1b31e78ad7f433753f490587699f6507970e6596a27a7838a4a583ac2f89e7cf",
+              "recorded_at": "2026-11-09T10:36:28.020511+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+                ".skill-tree/lib/composer.js": "9605ce43a0e99aff77dbf1e223dd7afcf326917753db7963de5bf1d61bdcd04b",
+                ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                ".skill-tree/tests/test-installation-integrity.js": "e35c56daaa49c70da68c82af216291a98494f83e2f4f927ab56302b603a4586c"
+              },
+              "timing": {
+                "tool_wall_seconds": 35.293186333961785
+              }
+            }
+          },
+          "static-recipe-discovery-contract": {
+            "attempt": {
+              "attempt_id": "C-ddfc7377-d578-4fdd-abe4-f2cdd828a4f9",
+              "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+              "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+              "key": "f751ab236d50ca5aa4f0a13ea118c632188f3324b4306e2d7269df2eac1de1f2",
+              "launch": null,
+              "prepared_at": "2026-11-09T10:36:28.743729+00:00",
+              "recipe": {
+                "assertion_contract": "explicit source and artifact assertions",
+                "input_paths": [],
+                "lane": "static"
+              },
+              "sources": {
+                ".skill-tree/common/references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
+                ".skill-tree/common/references/validation-policy.md": "2b68bdd7280aa2eb2e9534ad1f1e79a34292ad4839843331cd156db5547bfe7d",
+                ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+                ".skill-tree/documents/install.md": "b684297991c8e9ae3f97ffc23a52a91b256147d799335c5ad984b90361fb21c7",
+                ".skill-tree/lib/composer.js": "9605ce43a0e99aff77dbf1e223dd7afcf326917753db7963de5bf1d61bdcd04b"
+              }
+            }
+          }
+        },
+        "definition": "27c60e708cd5d4995276d4473b45de062a2c4c3e09f2754ad5bdfbb67191667a",
+        "execution_sessions": {},
+        "partial_work": [
+          ".skill-tree/config/capabilities.json",
+          ".skill-tree/lib/composer.js",
+          ".skill-tree/common/references/validation-policy.md",
+          ".skill-tree/common/references/installation-profile.md",
+          ".skill-tree/documents/install.md",
+          ".skill-tree/tests/test-installation-integrity.js"
+        ],
+        "run_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+        "stage": "awaiting-validation"
+      },
+      "task_id": "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    }
+  ],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "run_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+  "schema": 1,
+  "sequence": 13
+}

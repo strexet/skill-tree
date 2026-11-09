@@ -1,0 +1,70 @@
+{
+  "checks": [
+    {
+      "argv": [
+        "node",
+        ".skill-tree/installation/manager.js",
+        "--verify"
+      ],
+      "exit_code": 0,
+      "id": "owned-installation",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "907768fd8538e9225b641d6e746a6e46bd5cd18a6195c197e9b8ee6dfbd40924"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "sync:check"
+      ],
+      "exit_code": 0,
+      "id": "source-sync",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "ceffd15f7477e7cca73d33bc13b530b5430f5e4b9c12123f525a1fe3c65a5c78"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "validate"
+      ],
+      "exit_code": 0,
+      "id": "repository-validation",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "1302cebd2e1a3189239671ce4e62c846162c5c7fc73279eb4cb87432a0b93da5"
+    },
+    {
+      "argv": [
+        "node",
+        ".skill-tree/bin/install.js",
+        "--list"
+      ],
+      "exit_code": 0,
+      "id": "installer-list",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "fb9ae55cf4fab128f448e5b634d6917668a04f55662842a490b524588dda30f7"
+    },
+    {
+      "argv": [
+        "git",
+        "--no-replace-objects",
+        "--no-optional-locks",
+        "-c",
+        "core.fsmonitor=false",
+        "-c",
+        "diff.autoRefreshIndex=false",
+        "diff",
+        "--check",
+        "23c34b77ae55363bfb4dc9fc2c2fa9f6abb2492b",
+        "8f0b9381f00991cf34a15c4b0307ae359e598b91",
+        "--"
+      ],
+      "exit_code": 0,
+      "id": "incoming-diff",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "merge_commit": "8f0b9381f00991cf34a15c4b0307ae359e598b91",
+  "profile_identity": "1fd25c38a896a61eefb001e4fd271e699e4f332f59e893228120700751c4b865"
+}

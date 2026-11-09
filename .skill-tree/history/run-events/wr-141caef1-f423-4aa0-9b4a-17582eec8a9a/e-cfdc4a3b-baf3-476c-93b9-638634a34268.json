@@ -1,0 +1,635 @@
+{
+  "changes": [],
+  "checkpoint_after": {
+    "admission": {
+      "environment_id": "4d1be2a553210a1f2e81b45d5e3c7d0c0eceefadad15a7fcc0a4c195c4b690f9",
+      "flavor": "general",
+      "identity": "2c751051a407743a08954fc730d8723f100b85b73d8443948f6012dee031f9bc"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ],
+    "completed_ids": [
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ],
+    "completion_refs": {
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e": "O-28f9fdea-3574-4241-a352-150610cdbd00"
+    },
+    "current_task_id": "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+    "cycle_signature": "169e3ba626a2ed70d0adf9ad50365b11dc00d1f395f501a7a24a4d69ecd7b4c9",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Implement both deferred Future tasks using skill-tree-implement-all and merge into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+    "limits": {},
+    "mode": "all",
+    "next_action": "implement",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "implement",
+    "processing_results": [],
+    "required_ids": [
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ],
+    "root_task_id": "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+    "snapshot": [
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656"
+    ],
+    "started_at": "2026-11-09T10:29:15.272535+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "23c34b77ae55363bfb4dc9fc2c2fa9f6abb2492b",
+      "branch": "codex/future-followups",
+      "local_base": true,
+      "local_base_authorization": "Owner explicitly requested Implement All for the two deferred Future tasks using the local codex/next-version base and local merge back.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a"
+    },
+    "workspace_state": "ready"
+  },
+  "checkpoint_before": {
+    "admission": {
+      "environment_id": "4d1be2a553210a1f2e81b45d5e3c7d0c0eceefadad15a7fcc0a4c195c4b690f9",
+      "flavor": "general",
+      "identity": "2c751051a407743a08954fc730d8723f100b85b73d8443948f6012dee031f9bc"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ],
+    "completed_ids": [
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ],
+    "completion_refs": {
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e": "O-28f9fdea-3574-4241-a352-150610cdbd00"
+    },
+    "current_task_id": "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+    "cycle_signature": "169e3ba626a2ed70d0adf9ad50365b11dc00d1f395f501a7a24a4d69ecd7b4c9",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Implement both deferred Future tasks using skill-tree-implement-all and merge into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+    "limits": {},
+    "mode": "all",
+    "next_action": "implement",
+    "partial_work": [],
+    "pending_ids": [],
+    "phase": "implement",
+    "processing_results": [],
+    "required_ids": [
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+    ],
+    "root_task_id": "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656",
+    "snapshot": [
+      "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e",
+      "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656"
+    ],
+    "started_at": "2026-11-09T10:29:15.272535+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "23c34b77ae55363bfb4dc9fc2c2fa9f6abb2492b",
+      "branch": "codex/future-followups",
+      "local_base": true,
+      "local_base_authorization": "Owner explicitly requested Implement All for the two deferred Future tasks using the local codex/next-version base and local merge back.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a"
+    },
+    "workspace_state": "ready"
+  },
+  "id": "E-cfdc4a3b-baf3-476c-93b9-638634a34268",
+  "outcomes": [],
+  "progress_changes": [
+    {
+      "after": {
+        "admission": {
+          "environment_id": "4d1be2a553210a1f2e81b45d5e3c7d0c0eceefadad15a7fcc0a4c195c4b690f9",
+          "flavor": "general",
+          "identity": "2c751051a407743a08954fc730d8723f100b85b73d8443948f6012dee031f9bc"
+        },
+        "checks": {
+          "stale-check-reconciliation-regressions": {
+            "attempt": {
+              "attempt_id": "C-8b846e15-9ac2-4bc3-bd5a-a1d6071ecc48",
+              "definition": "6c794f0635f9b8cff086be5448a0a2d22acae0b2411c496e6de06e4a30698bf6",
+              "environment_identity": "b84b549c923b045af0429dc2e77a60d1a7e18f46be84bfffe29be678b61621a9",
+              "key": "2e2d7ee98c74f796f29a9618f0b26b3cb53eb4088d32ea6a91bab235cffbcdea",
+              "launch": null,
+              "prepared_at": "2026-11-09T10:47:28.982236+00:00",
+              "recipe": {
+                "argv": [
+                  "python3",
+                  ".skill-tree/tests/test-workflow-state.py"
+                ],
+                "input_paths": [
+                  ".skill-tree/config/repository.json"
+                ],
+                "lane": "unit",
+                "qualification": "owner-declared static recipe; runner unqualified"
+              },
+              "sources": {
+                ".skill-tree/common/references/validation-policy.md": "4b0370124139f3203f944e84f9c3768d5d1f9a693ee26bb70260425a3add42b6",
+                ".skill-tree/common/references/workflow-metadata.md": "7ae4e5254fe3b2c70dcbccf75dd48bf95f200bfc7cab702c058d7869177cfea8",
+                ".skill-tree/common/scripts/workflow-state.py": "2088d51a08cd3551801dffa1fc11c54491aa1c5b7f19a629e1bddedae48af06e",
+                ".skill-tree/history/validation/plugin-system/processing115-interrupted-focused-attempt.json": "5673a5d9b8275792038d6ddf2281cefb405308936448ad6891c0ee3b7823dbf3",
+                ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                ".skill-tree/tests/test-workflow-state.py": "f3af1aa6360d10229bfce09bc6b0a76e6d60cc641a45e5c854ad6c589a21910e"
+              }
+            },
+            "receipts": {
+              "C-0c5b5d80-5512-4d25-a2ca-340077e774c2": {
+                "actual_lane": "unit",
+                "attempt_id": "C-0c5b5d80-5512-4d25-a2ca-340077e774c2",
+                "classification": "executed-control",
+                "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+                "counts": {
+                  "discovered": 46,
+                  "expected": 46,
+                  "failed": 6,
+                  "passed": 40,
+                  "skipped": 0
+                },
+                "definition": "6c794f0635f9b8cff086be5448a0a2d22acae0b2411c496e6de06e4a30698bf6",
+                "environment_identity": "b84b549c923b045af0429dc2e77a60d1a7e18f46be84bfffe29be678b61621a9",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-0c5b5d80-5512-4d25-a2ca-340077e774c2.json",
+                    "sha256": "c190ddd57fc098f5a9244f09683ba3dbe6a9edf084c7b8783a6348a8d237c800"
+                  },
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-0c5b5d80-5512-4d25-a2ca-340077e774c2.txt",
+                    "sha256": "ede8abb6e01b826bfafacb744a779ee6b84f3781df8984d9a45cea8b616bcf66"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_category": "expected-behavior",
+                "key": "7e3d172fca4408fad45ec5409267b862f982899a06ad61013d839241f720a8b7",
+                "payload_hash": "32b41614f4b5025a9da120db53bb3e5cb0dfd21490b96989e286e523b6565283",
+                "recorded_at": "2026-11-09T10:43:27.752282+00:00",
+                "result": "red",
+                "sources": {
+                  ".skill-tree/common/references/validation-policy.md": "d44adf21dfa175520e1ad4f832672bb43325f2f5d6322123e355eca4eb5bb7f4",
+                  ".skill-tree/common/references/workflow-metadata.md": "1fff0a891987404ac7bc43d536b0798c08ee6c16a6e3367cbfc9a0f3c54b7fa3",
+                  ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+                  ".skill-tree/history/validation/plugin-system/processing115-interrupted-focused-attempt.json": "5673a5d9b8275792038d6ddf2281cefb405308936448ad6891c0ee3b7823dbf3",
+                  ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                  ".skill-tree/tests/test-workflow-state.py": "81d384f1268ec27d680f1407424cfa98c9d4d3e9b085fb66435100ff86702187"
+                },
+                "timing": {
+                  "tool_wall_seconds": 14.414900542236865
+                }
+              },
+              "C-8b846e15-9ac2-4bc3-bd5a-a1d6071ecc48": {
+                "actual_lane": "unit",
+                "attempt_id": "C-8b846e15-9ac2-4bc3-bd5a-a1d6071ecc48",
+                "classification": "executed-control",
+                "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+                "counts": {
+                  "discovered": 49,
+                  "expected": 49,
+                  "failed": 3,
+                  "passed": 46,
+                  "skipped": 0
+                },
+                "definition": "6c794f0635f9b8cff086be5448a0a2d22acae0b2411c496e6de06e4a30698bf6",
+                "environment_identity": "b84b549c923b045af0429dc2e77a60d1a7e18f46be84bfffe29be678b61621a9",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-8b846e15-9ac2-4bc3-bd5a-a1d6071ecc48.json",
+                    "sha256": "fb464b1d3db8d9f8eac38e1efa3f05784d83125cbb7d592dfca33671f54f2a25"
+                  },
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-8b846e15-9ac2-4bc3-bd5a-a1d6071ecc48.txt",
+                    "sha256": "35d92c7958380b3248fa1665b29f5162660f3939a89b1e44df7468187e9dacd1"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_category": "expected-behavior",
+                "key": "2e2d7ee98c74f796f29a9618f0b26b3cb53eb4088d32ea6a91bab235cffbcdea",
+                "payload_hash": "843947c859ca235246c1b6d87e453defe8d38cf042d6b381fa8f4e89acbd0409",
+                "recorded_at": "2026-11-09T10:47:48.207144+00:00",
+                "result": "red",
+                "sources": {
+                  ".skill-tree/common/references/validation-policy.md": "4b0370124139f3203f944e84f9c3768d5d1f9a693ee26bb70260425a3add42b6",
+                  ".skill-tree/common/references/workflow-metadata.md": "7ae4e5254fe3b2c70dcbccf75dd48bf95f200bfc7cab702c058d7869177cfea8",
+                  ".skill-tree/common/scripts/workflow-state.py": "2088d51a08cd3551801dffa1fc11c54491aa1c5b7f19a629e1bddedae48af06e",
+                  ".skill-tree/history/validation/plugin-system/processing115-interrupted-focused-attempt.json": "5673a5d9b8275792038d6ddf2281cefb405308936448ad6891c0ee3b7823dbf3",
+                  ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                  ".skill-tree/tests/test-workflow-state.py": "f3af1aa6360d10229bfce09bc6b0a76e6d60cc641a45e5c854ad6c589a21910e"
+                },
+                "timing": {
+                  "tool_wall_seconds": 18.349294832907617
+                }
+              },
+              "C-c8695616-7eeb-4eef-8f43-2763618a9e2d": {
+                "actual_lane": "unit",
+                "attempt_id": "C-c8695616-7eeb-4eef-8f43-2763618a9e2d",
+                "classification": "executed-control",
+                "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+                "counts": {
+                  "discovered": 46,
+                  "expected": 46,
+                  "failed": 0,
+                  "passed": 46,
+                  "skipped": 0
+                },
+                "definition": "6c794f0635f9b8cff086be5448a0a2d22acae0b2411c496e6de06e4a30698bf6",
+                "environment_identity": "b84b549c923b045af0429dc2e77a60d1a7e18f46be84bfffe29be678b61621a9",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-c8695616-7eeb-4eef-8f43-2763618a9e2d.json",
+                    "sha256": "3e2078e605afe30384065711edbf2e39f4bd8755257e6885533c562d67fefadf"
+                  },
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-c8695616-7eeb-4eef-8f43-2763618a9e2d.txt",
+                    "sha256": "7b11175eba8c5bad6503875b13ce4102f6e62620862352c621f27cacf8f8e2bd"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "f1d0c66a26783850f2e5b57b30e0739022ef1ceda1363b30e3fe920eb5d894e9",
+                "payload_hash": "1a13a461f2dd4883ed618c01db0daf077a4c8e614d9235c4d6a314744919c67e",
+                "recorded_at": "2026-11-09T10:45:27.023677+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/validation-policy.md": "4b0370124139f3203f944e84f9c3768d5d1f9a693ee26bb70260425a3add42b6",
+                  ".skill-tree/common/references/workflow-metadata.md": "7ae4e5254fe3b2c70dcbccf75dd48bf95f200bfc7cab702c058d7869177cfea8",
+                  ".skill-tree/common/scripts/workflow-state.py": "2088d51a08cd3551801dffa1fc11c54491aa1c5b7f19a629e1bddedae48af06e",
+                  ".skill-tree/history/validation/plugin-system/processing115-interrupted-focused-attempt.json": "5673a5d9b8275792038d6ddf2281cefb405308936448ad6891c0ee3b7823dbf3",
+                  ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                  ".skill-tree/tests/test-workflow-state.py": "81d384f1268ec27d680f1407424cfa98c9d4d3e9b085fb66435100ff86702187"
+                },
+                "timing": {
+                  "tool_wall_seconds": 14.878285333048552
+                }
+              }
+            },
+            "red": {
+              "actual_lane": "unit",
+              "attempt_id": "C-8b846e15-9ac2-4bc3-bd5a-a1d6071ecc48",
+              "classification": "executed-control",
+              "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+              "counts": {
+                "discovered": 49,
+                "expected": 49,
+                "failed": 3,
+                "passed": 46,
+                "skipped": 0
+              },
+              "definition": "6c794f0635f9b8cff086be5448a0a2d22acae0b2411c496e6de06e4a30698bf6",
+              "environment_identity": "b84b549c923b045af0429dc2e77a60d1a7e18f46be84bfffe29be678b61621a9",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-8b846e15-9ac2-4bc3-bd5a-a1d6071ecc48.json",
+                  "sha256": "fb464b1d3db8d9f8eac38e1efa3f05784d83125cbb7d592dfca33671f54f2a25"
+                },
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-8b846e15-9ac2-4bc3-bd5a-a1d6071ecc48.txt",
+                  "sha256": "35d92c7958380b3248fa1665b29f5162660f3939a89b1e44df7468187e9dacd1"
+                }
+              ],
+              "execution_sessions": {},
+              "failure_category": "expected-behavior",
+              "key": "2e2d7ee98c74f796f29a9618f0b26b3cb53eb4088d32ea6a91bab235cffbcdea",
+              "payload_hash": "843947c859ca235246c1b6d87e453defe8d38cf042d6b381fa8f4e89acbd0409",
+              "recorded_at": "2026-11-09T10:47:48.207144+00:00",
+              "result": "red",
+              "sources": {
+                ".skill-tree/common/references/validation-policy.md": "4b0370124139f3203f944e84f9c3768d5d1f9a693ee26bb70260425a3add42b6",
+                ".skill-tree/common/references/workflow-metadata.md": "7ae4e5254fe3b2c70dcbccf75dd48bf95f200bfc7cab702c058d7869177cfea8",
+                ".skill-tree/common/scripts/workflow-state.py": "2088d51a08cd3551801dffa1fc11c54491aa1c5b7f19a629e1bddedae48af06e",
+                ".skill-tree/history/validation/plugin-system/processing115-interrupted-focused-attempt.json": "5673a5d9b8275792038d6ddf2281cefb405308936448ad6891c0ee3b7823dbf3",
+                ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                ".skill-tree/tests/test-workflow-state.py": "f3af1aa6360d10229bfce09bc6b0a76e6d60cc641a45e5c854ad6c589a21910e"
+              },
+              "timing": {
+                "tool_wall_seconds": 18.349294832907617
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-8b846e15-9ac2-4bc3-bd5a-a1d6071ecc48",
+              "classification": "executed-control",
+              "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+              "counts": {
+                "discovered": 49,
+                "expected": 49,
+                "failed": 3,
+                "passed": 46,
+                "skipped": 0
+              },
+              "definition": "6c794f0635f9b8cff086be5448a0a2d22acae0b2411c496e6de06e4a30698bf6",
+              "environment_identity": "b84b549c923b045af0429dc2e77a60d1a7e18f46be84bfffe29be678b61621a9",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-8b846e15-9ac2-4bc3-bd5a-a1d6071ecc48.json",
+                  "sha256": "fb464b1d3db8d9f8eac38e1efa3f05784d83125cbb7d592dfca33671f54f2a25"
+                },
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-8b846e15-9ac2-4bc3-bd5a-a1d6071ecc48.txt",
+                  "sha256": "35d92c7958380b3248fa1665b29f5162660f3939a89b1e44df7468187e9dacd1"
+                }
+              ],
+              "execution_sessions": {},
+              "failure_category": "expected-behavior",
+              "key": "2e2d7ee98c74f796f29a9618f0b26b3cb53eb4088d32ea6a91bab235cffbcdea",
+              "payload_hash": "843947c859ca235246c1b6d87e453defe8d38cf042d6b381fa8f4e89acbd0409",
+              "recorded_at": "2026-11-09T10:47:48.207144+00:00",
+              "result": "red",
+              "sources": {
+                ".skill-tree/common/references/validation-policy.md": "4b0370124139f3203f944e84f9c3768d5d1f9a693ee26bb70260425a3add42b6",
+                ".skill-tree/common/references/workflow-metadata.md": "7ae4e5254fe3b2c70dcbccf75dd48bf95f200bfc7cab702c058d7869177cfea8",
+                ".skill-tree/common/scripts/workflow-state.py": "2088d51a08cd3551801dffa1fc11c54491aa1c5b7f19a629e1bddedae48af06e",
+                ".skill-tree/history/validation/plugin-system/processing115-interrupted-focused-attempt.json": "5673a5d9b8275792038d6ddf2281cefb405308936448ad6891c0ee3b7823dbf3",
+                ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                ".skill-tree/tests/test-workflow-state.py": "f3af1aa6360d10229bfce09bc6b0a76e6d60cc641a45e5c854ad6c589a21910e"
+              },
+              "timing": {
+                "tool_wall_seconds": 18.349294832907617
+              }
+            }
+          }
+        },
+        "definition": "6c794f0635f9b8cff086be5448a0a2d22acae0b2411c496e6de06e4a30698bf6",
+        "execution_sessions": {},
+        "partial_work": [
+          ".skill-tree/common/scripts/workflow-state.py",
+          ".skill-tree/common/references/workflow-metadata.md",
+          ".skill-tree/common/references/validation-policy.md",
+          ".skill-tree/tests/test-workflow-state.py"
+        ],
+        "run_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+        "stage": "awaiting-validation"
+      },
+      "before": {
+        "admission": {
+          "environment_id": "4d1be2a553210a1f2e81b45d5e3c7d0c0eceefadad15a7fcc0a4c195c4b690f9",
+          "flavor": "general",
+          "identity": "2c751051a407743a08954fc730d8723f100b85b73d8443948f6012dee031f9bc"
+        },
+        "checks": {
+          "stale-check-reconciliation-regressions": {
+            "attempt": {
+              "attempt_id": "C-8b846e15-9ac2-4bc3-bd5a-a1d6071ecc48",
+              "definition": "6c794f0635f9b8cff086be5448a0a2d22acae0b2411c496e6de06e4a30698bf6",
+              "environment_identity": "b84b549c923b045af0429dc2e77a60d1a7e18f46be84bfffe29be678b61621a9",
+              "key": "2e2d7ee98c74f796f29a9618f0b26b3cb53eb4088d32ea6a91bab235cffbcdea",
+              "launch": null,
+              "prepared_at": "2026-11-09T10:47:28.982236+00:00",
+              "recipe": {
+                "argv": [
+                  "python3",
+                  ".skill-tree/tests/test-workflow-state.py"
+                ],
+                "input_paths": [
+                  ".skill-tree/config/repository.json"
+                ],
+                "lane": "unit",
+                "qualification": "owner-declared static recipe; runner unqualified"
+              },
+              "sources": {
+                ".skill-tree/common/references/validation-policy.md": "4b0370124139f3203f944e84f9c3768d5d1f9a693ee26bb70260425a3add42b6",
+                ".skill-tree/common/references/workflow-metadata.md": "7ae4e5254fe3b2c70dcbccf75dd48bf95f200bfc7cab702c058d7869177cfea8",
+                ".skill-tree/common/scripts/workflow-state.py": "2088d51a08cd3551801dffa1fc11c54491aa1c5b7f19a629e1bddedae48af06e",
+                ".skill-tree/history/validation/plugin-system/processing115-interrupted-focused-attempt.json": "5673a5d9b8275792038d6ddf2281cefb405308936448ad6891c0ee3b7823dbf3",
+                ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                ".skill-tree/tests/test-workflow-state.py": "f3af1aa6360d10229bfce09bc6b0a76e6d60cc641a45e5c854ad6c589a21910e"
+              }
+            },
+            "receipts": {
+              "C-0c5b5d80-5512-4d25-a2ca-340077e774c2": {
+                "actual_lane": "unit",
+                "attempt_id": "C-0c5b5d80-5512-4d25-a2ca-340077e774c2",
+                "classification": "executed-control",
+                "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+                "counts": {
+                  "discovered": 46,
+                  "expected": 46,
+                  "failed": 6,
+                  "passed": 40,
+                  "skipped": 0
+                },
+                "definition": "6c794f0635f9b8cff086be5448a0a2d22acae0b2411c496e6de06e4a30698bf6",
+                "environment_identity": "b84b549c923b045af0429dc2e77a60d1a7e18f46be84bfffe29be678b61621a9",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-0c5b5d80-5512-4d25-a2ca-340077e774c2.json",
+                    "sha256": "c190ddd57fc098f5a9244f09683ba3dbe6a9edf084c7b8783a6348a8d237c800"
+                  },
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-0c5b5d80-5512-4d25-a2ca-340077e774c2.txt",
+                    "sha256": "ede8abb6e01b826bfafacb744a779ee6b84f3781df8984d9a45cea8b616bcf66"
+                  }
+                ],
+                "execution_sessions": {},
+                "failure_category": "expected-behavior",
+                "key": "7e3d172fca4408fad45ec5409267b862f982899a06ad61013d839241f720a8b7",
+                "payload_hash": "32b41614f4b5025a9da120db53bb3e5cb0dfd21490b96989e286e523b6565283",
+                "recorded_at": "2026-11-09T10:43:27.752282+00:00",
+                "result": "red",
+                "sources": {
+                  ".skill-tree/common/references/validation-policy.md": "d44adf21dfa175520e1ad4f832672bb43325f2f5d6322123e355eca4eb5bb7f4",
+                  ".skill-tree/common/references/workflow-metadata.md": "1fff0a891987404ac7bc43d536b0798c08ee6c16a6e3367cbfc9a0f3c54b7fa3",
+                  ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+                  ".skill-tree/history/validation/plugin-system/processing115-interrupted-focused-attempt.json": "5673a5d9b8275792038d6ddf2281cefb405308936448ad6891c0ee3b7823dbf3",
+                  ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                  ".skill-tree/tests/test-workflow-state.py": "81d384f1268ec27d680f1407424cfa98c9d4d3e9b085fb66435100ff86702187"
+                },
+                "timing": {
+                  "tool_wall_seconds": 14.414900542236865
+                }
+              },
+              "C-c8695616-7eeb-4eef-8f43-2763618a9e2d": {
+                "actual_lane": "unit",
+                "attempt_id": "C-c8695616-7eeb-4eef-8f43-2763618a9e2d",
+                "classification": "executed-control",
+                "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+                "counts": {
+                  "discovered": 46,
+                  "expected": 46,
+                  "failed": 0,
+                  "passed": 46,
+                  "skipped": 0
+                },
+                "definition": "6c794f0635f9b8cff086be5448a0a2d22acae0b2411c496e6de06e4a30698bf6",
+                "environment_identity": "b84b549c923b045af0429dc2e77a60d1a7e18f46be84bfffe29be678b61621a9",
+                "evidence": [
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-c8695616-7eeb-4eef-8f43-2763618a9e2d.json",
+                    "sha256": "3e2078e605afe30384065711edbf2e39f4bd8755257e6885533c562d67fefadf"
+                  },
+                  {
+                    "available": true,
+                    "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-c8695616-7eeb-4eef-8f43-2763618a9e2d.txt",
+                    "sha256": "7b11175eba8c5bad6503875b13ce4102f6e62620862352c621f27cacf8f8e2bd"
+                  }
+                ],
+                "execution_sessions": {},
+                "key": "f1d0c66a26783850f2e5b57b30e0739022ef1ceda1363b30e3fe920eb5d894e9",
+                "payload_hash": "1a13a461f2dd4883ed618c01db0daf077a4c8e614d9235c4d6a314744919c67e",
+                "recorded_at": "2026-11-09T10:45:27.023677+00:00",
+                "result": "pass",
+                "sources": {
+                  ".skill-tree/common/references/validation-policy.md": "4b0370124139f3203f944e84f9c3768d5d1f9a693ee26bb70260425a3add42b6",
+                  ".skill-tree/common/references/workflow-metadata.md": "7ae4e5254fe3b2c70dcbccf75dd48bf95f200bfc7cab702c058d7869177cfea8",
+                  ".skill-tree/common/scripts/workflow-state.py": "2088d51a08cd3551801dffa1fc11c54491aa1c5b7f19a629e1bddedae48af06e",
+                  ".skill-tree/history/validation/plugin-system/processing115-interrupted-focused-attempt.json": "5673a5d9b8275792038d6ddf2281cefb405308936448ad6891c0ee3b7823dbf3",
+                  ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                  ".skill-tree/tests/test-workflow-state.py": "81d384f1268ec27d680f1407424cfa98c9d4d3e9b085fb66435100ff86702187"
+                },
+                "timing": {
+                  "tool_wall_seconds": 14.878285333048552
+                }
+              }
+            },
+            "red": {
+              "actual_lane": "unit",
+              "attempt_id": "C-0c5b5d80-5512-4d25-a2ca-340077e774c2",
+              "classification": "executed-control",
+              "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+              "counts": {
+                "discovered": 46,
+                "expected": 46,
+                "failed": 6,
+                "passed": 40,
+                "skipped": 0
+              },
+              "definition": "6c794f0635f9b8cff086be5448a0a2d22acae0b2411c496e6de06e4a30698bf6",
+              "environment_identity": "b84b549c923b045af0429dc2e77a60d1a7e18f46be84bfffe29be678b61621a9",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-0c5b5d80-5512-4d25-a2ca-340077e774c2.json",
+                  "sha256": "c190ddd57fc098f5a9244f09683ba3dbe6a9edf084c7b8783a6348a8d237c800"
+                },
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-0c5b5d80-5512-4d25-a2ca-340077e774c2.txt",
+                  "sha256": "ede8abb6e01b826bfafacb744a779ee6b84f3781df8984d9a45cea8b616bcf66"
+                }
+              ],
+              "execution_sessions": {},
+              "failure_category": "expected-behavior",
+              "key": "7e3d172fca4408fad45ec5409267b862f982899a06ad61013d839241f720a8b7",
+              "payload_hash": "32b41614f4b5025a9da120db53bb3e5cb0dfd21490b96989e286e523b6565283",
+              "recorded_at": "2026-11-09T10:43:27.752282+00:00",
+              "result": "red",
+              "sources": {
+                ".skill-tree/common/references/validation-policy.md": "d44adf21dfa175520e1ad4f832672bb43325f2f5d6322123e355eca4eb5bb7f4",
+                ".skill-tree/common/references/workflow-metadata.md": "1fff0a891987404ac7bc43d536b0798c08ee6c16a6e3367cbfc9a0f3c54b7fa3",
+                ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+                ".skill-tree/history/validation/plugin-system/processing115-interrupted-focused-attempt.json": "5673a5d9b8275792038d6ddf2281cefb405308936448ad6891c0ee3b7823dbf3",
+                ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                ".skill-tree/tests/test-workflow-state.py": "81d384f1268ec27d680f1407424cfa98c9d4d3e9b085fb66435100ff86702187"
+              },
+              "timing": {
+                "tool_wall_seconds": 14.414900542236865
+              }
+            },
+            "result": {
+              "actual_lane": "unit",
+              "attempt_id": "C-c8695616-7eeb-4eef-8f43-2763618a9e2d",
+              "classification": "executed-control",
+              "cleanup": "The focused runner exited. Disposable fixtures used their test finalizers.",
+              "counts": {
+                "discovered": 46,
+                "expected": 46,
+                "failed": 0,
+                "passed": 46,
+                "skipped": 0
+              },
+              "definition": "6c794f0635f9b8cff086be5448a0a2d22acae0b2411c496e6de06e4a30698bf6",
+              "environment_identity": "b84b549c923b045af0429dc2e77a60d1a7e18f46be84bfffe29be678b61621a9",
+              "evidence": [
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-c8695616-7eeb-4eef-8f43-2763618a9e2d.json",
+                  "sha256": "3e2078e605afe30384065711edbf2e39f4bd8755257e6885533c562d67fefadf"
+                },
+                {
+                  "available": true,
+                  "path": ".skill-tree/history/validation/future-followups/t-3fe8425d-6740-4b45-99cf-f2b0b29c3656-stale-check-reconciliation-regressions-c-c8695616-7eeb-4eef-8f43-2763618a9e2d.txt",
+                  "sha256": "7b11175eba8c5bad6503875b13ce4102f6e62620862352c621f27cacf8f8e2bd"
+                }
+              ],
+              "execution_sessions": {},
+              "key": "f1d0c66a26783850f2e5b57b30e0739022ef1ceda1363b30e3fe920eb5d894e9",
+              "payload_hash": "1a13a461f2dd4883ed618c01db0daf077a4c8e614d9235c4d6a314744919c67e",
+              "recorded_at": "2026-11-09T10:45:27.023677+00:00",
+              "result": "pass",
+              "sources": {
+                ".skill-tree/common/references/validation-policy.md": "4b0370124139f3203f944e84f9c3768d5d1f9a693ee26bb70260425a3add42b6",
+                ".skill-tree/common/references/workflow-metadata.md": "7ae4e5254fe3b2c70dcbccf75dd48bf95f200bfc7cab702c058d7869177cfea8",
+                ".skill-tree/common/scripts/workflow-state.py": "2088d51a08cd3551801dffa1fc11c54491aa1c5b7f19a629e1bddedae48af06e",
+                ".skill-tree/history/validation/plugin-system/processing115-interrupted-focused-attempt.json": "5673a5d9b8275792038d6ddf2281cefb405308936448ad6891c0ee3b7823dbf3",
+                ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+                ".skill-tree/tests/test-workflow-state.py": "81d384f1268ec27d680f1407424cfa98c9d4d3e9b085fb66435100ff86702187"
+              },
+              "timing": {
+                "tool_wall_seconds": 14.878285333048552
+              }
+            }
+          }
+        },
+        "definition": "6c794f0635f9b8cff086be5448a0a2d22acae0b2411c496e6de06e4a30698bf6",
+        "execution_sessions": {},
+        "partial_work": [
+          ".skill-tree/common/scripts/workflow-state.py",
+          ".skill-tree/common/references/workflow-metadata.md",
+          ".skill-tree/common/references/validation-policy.md",
+          ".skill-tree/tests/test-workflow-state.py"
+        ],
+        "run_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+        "stage": "awaiting-validation"
+      },
+      "task_id": "T-3fe8425d-6740-4b45-99cf-f2b0b29c3656"
+    }
+  ],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "run_id": "WR-141caef1-f423-4aa0-9b4a-17582eec8a9a",
+  "schema": 1,
+  "sequence": 29
+}
