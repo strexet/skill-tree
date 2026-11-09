@@ -55,8 +55,32 @@ The inventory retains source/revision/content identities, owned destinations, de
 
 Readable resource drift remains visible with diagnostics. Opaque or foreign ownership remains unavailable without recovery or adoption. Exit codes are zero for a healthy view, one for readable drift and two for unavailable state or invalid arguments. The list route rejects installation-option mixtures; JSON and grouping options require the list route.
 
-Frozen HC requirements remain separate from current defaults. The view records chain state and verified, foreign or uncertain installation association without claiming readiness. Removal preserves frozen state and can expose missing requirements. Typed exact-ID preview/application APIs reside in the [management backend](plugin-management-contract.md#installed-inventory-and-exact-id-management); the dedicated management skill remains a later operation.
+Frozen HC requirements remain separate from current defaults. The view records chain state and verified, foreign or uncertain installation association without claiming readiness. Removal preserves frozen state and can expose missing requirements. The installed `skill-tree-plugins` operation previews and applies exact-ID changes through the [shared management backend](plugin-management-contract.md#installed-inventory-and-exact-id-management).
 
-## External plugin installation design
+## Optional external plugins
 
-The current installer manages core Skill Tree operations and exposes no external-plugin setup flags. The approved [plugin installation interaction contract](plugin-installation-contract.md) defines the core-only default, optional initial/later setup, exact proposal consent, ordered repeated bindings and separate stage recovery for the corresponding implementation tasks. The design contract supplies no current acquisition or invocation capability.
+A complete core installation includes `skill-tree-plugins` and adds zero external plugins by default. A terminal offers to continue without new plugins or configure plugins after every selected core destination verifies. Use `--configure-plugins` to enter setup directly.
+
+```sh
+node .skill-tree/bin/install.js --target <project-root> --only codex --flavor general --configure-plugins
+node .skill-tree/bin/install.js --target <project-root> --only codex --plugins <proposal.json> --confirm-plugins <proposal-digest> --non-interactive
+```
+
+Setup groups known candidates by workflow point and accepts direct source URLs, local files or directories, and typed source descriptors. The `request` option accepts the same manager request as inline JSON or `@file`. For an ordered chain, supply the complete array of binding occurrences. Each occurrence carries a separate ID, plugin, location, parameters, enabled state, optional condition and extra instructions. Repeating a package in one location uses a distinct ID for each occurrence.
+
+An eligible recommendation appears only when the catalog has qualifying evidence for the selected flavor and host. The current recommendation sets are empty. Individual known or custom sources remain selectable. The terminal asks before resolving a remote source and shows the exact proposal before asking whether to activate the proposal. `--yes` only suppresses prompts. A structured request requires a matching proposal digest. Save the `proposal` object from a manager preview as the proposal file.
+
+The structured result separates core provider rows from `plugin_stage`. Skipping or cancelling keeps verified core and existing plugin state. A provider failure blocks the plugin stage. An interrupted plugin transaction requires explicit owned recovery. `--dry-run` with a supplied proposal compares the proposal with the offline plan and skips activation. Installation never invokes a selected plugin or starts a parked run. See the [installation contract](plugin-installation-contract.md) for consent and recovery details.
+
+### Remove an installed plugin by ID
+
+Run `skill-tree-plugins` and select the exact plugin ID from the installed inventory. The uninstall preview lists every binding occurrence, the affected package resources and the frozen run requirements. Confirm the exact preview to apply the removal. Use an exact binding ID with `unbind` when only one occurrence should be removed.
+
+For a Codex installation, the equivalent typed preview command from the project root is:
+
+```sh
+printf '%s\n' '{"action":"prepare","request":{"action":"uninstall","request_id":"remove-example-plugin","plugin_id":"example-plugin"}}' |
+  node .agents/skills/skill-tree-plugins/scripts/plugin-manager.js --project-root . --input -
+```
+
+Pass the returned `proposal` and `confirmation` containing the reviewed `proposal_digest` to the manager with `action: "apply"`. The installed registry is `.skill-tree/installation/plugins.json`. The owned manager applies the confirmed change and preserves frozen run requirements for explicit reconciliation.

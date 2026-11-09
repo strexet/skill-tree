@@ -123,6 +123,18 @@ function replayReceipt(base,history,proposal){
  if(receipt.proposal_digest!==proposal.digest)registry.fail('plugin-replay','The request identity conflicts with an earlier proposal');
  return {...clone(receipt),replayed:true,current_generation:base.generation};
 }
+function inspectProposal(root,proposal,confirmation,profile){
+ validateProposal(root,proposal,confirmation);
+ const base=registry.verifyInstalled(root);
+ const replay=replayReceipt(base,registry.readNoopRequests(root,base.generation),proposal);
+ if(replay)return null;
+ if(base.identity!==proposal.base_registry_identity||base.generation!==proposal.base_generation||profile.identity!==proposal.core_identity)
+  registry.fail('plugin-stale','The proposal generation or core identity is stale');
+ assertProviderScope(proposal,profile);
+ registry.validateRegistry(registry.seal({...base,generation:base.generation+1,packages:proposal.packages,bindings:proposal.bindings}));
+ snapshotChanges(proposal,base);
+ return base;
+}
 function applyProposal(root,proposal,confirmation,{validateManagerImpact}={}){
  proposal=clone(proposal);confirmation=clone(confirmation||{});
  validateProposal(root,proposal,confirmation);
@@ -188,4 +200,4 @@ async function prepareRollback(root,request){
  return makeProposal(root,{...request,operation:'rollback'},base,profile,clone(previous.packages),clone(previous.bindings),snapshots);
 }
 function recoverPlugins(root){stoppedHandoff(root);return core.locked(root,()=>{stoppedHandoff(root);core.recover(root,'plugins');return {action:'recovered',registry:registry.verifyInstalled(root)};});}
-module.exports={prepareProposal,applyProposal,prepareRollback,recoverPlugins,providerScope,proposalDigest};
+module.exports={prepareProposal,applyProposal,prepareRollback,recoverPlugins,providerScope,proposalDigest,inspectProposal,validateProposal};

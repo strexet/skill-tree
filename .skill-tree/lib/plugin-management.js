@@ -259,6 +259,25 @@ const managerFields = {
 const digest = value => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
 const same = (left, right) => registry.json(left) === registry.json(right);
 
+function assertKnownEntry(id, entry) {
+  if (!registry.validId(id) || !object(entry) || entry.definition?.id !== id || !object(entry.definition.source) ||
+      !Array.isArray(entry.suggested_locations) || typeof entry.requires_locator !== 'boolean' ||
+      own(entry, 'locator') || own(entry.definition, 'locator')) {
+    registry.fail('plugin-known-owner', 'Invalid portable project-known source record');
+  }
+}
+
+function assertKnownChange(current, action, mutation) {
+  const id = mutation.plugin_id;
+  if (action === 'save-known') {
+    assertKnownEntry(id, mutation.entry);
+    if (own(current.entries, id) && !sameManagerSource(current.entries[id].definition.source, mutation.entry.definition.source))
+      registry.fail('plugin-known-owner', 'The proposed known source identity conflicts');
+  } else if (!registry.validId(id) || mutation.entry !== null || !own(current.entries, id)) {
+    registry.fail('plugin-known-owner', 'Select an exact existing known source to forget');
+  }
+}
+
 function readKnown(root) {
   const file = registry.safe(root, KNOWN);
   if (!fs.existsSync(file)) return registry.seal({
@@ -270,13 +289,7 @@ function readKnown(root) {
       value.identity !== registry.seal(value).identity) {
     registry.fail('plugin-known-owner', 'Project-known source inventory requires explicit ownership recovery');
   }
-  for (const [id, entry] of Object.entries(value.entries)) {
-    if (!registry.validId(id) || entry.definition?.id !== id || !object(entry.definition.source) ||
-        !Array.isArray(entry.suggested_locations) || typeof entry.requires_locator !== 'boolean' ||
-        own(entry, 'locator') || own(entry.definition, 'locator')) {
-      registry.fail('plugin-known-owner', 'Invalid portable project-known source record');
-    }
-  }
+  for (const [id, entry] of Object.entries(value.entries)) assertKnownEntry(id, entry);
   for (const [id, receipt] of Object.entries(value.requests)) {
     if (receipt.request_id !== id || !digest(receipt.proposal_digest) ||
         !['saved-known', 'forgot-known'].includes(receipt.action) || !Number.isSafeInteger(receipt.generation) ||
@@ -403,6 +416,18 @@ function managerScope(root) {
   const profile = core.receipt(root, true);
   core.verifyOwned(root, profile);
   return require('./plugin-lifecycle.js').providerScope(profile);
+}
+
+function assertManagerSelections(scope, selections, expectedFlavor) {
+  if (!object(scope) || !object(scope.destinations))
+    registry.fail('plugin-proposal', 'The manager proposal requires an exact provider and destination scope');
+  if (expectedFlavor !== undefined && scope.flavor !== expectedFlavor)
+    registry.fail('plugin-stale', 'The confirmed scope differs from the originally selected core flavor');
+  for (const {rel, name, provider} of selections) {
+    const record = scope.destinations[rel];
+    if (record?.name !== name || !Array.isArray(record.providers) || !record.providers.includes(provider))
+      registry.fail('plugin-stale', 'The confirmed scope omits an originally selected core provider or destination');
+  }
 }
 
 function managerDigest(proposal) {
@@ -582,6 +607,8 @@ async function prepareManagerRequest(root, request, options = {}) {
   }
   const source = options.source ?? path.resolve(__dirname, '..');
   const scope = managerScope(root);
+  const selections = options.selections ?? [];
+  assertManagerSelections(scope, selections, options.expectedFlavor);
   const known = readKnown(root);
   const {catalog: knownCatalog} = managerCatalog(source);
   const operations = managerOperationsFor(root);
@@ -606,6 +633,7 @@ async function prepareManagerRequest(root, request, options = {}) {
   const proposal = await require('./plugin-lifecycle.js').prepareProposal(root, lifecycle, {
     bindProviderScope: true, acquire: options.acquire, availableCapabilities: options.availableCapabilities,
   });
+  assertManagerSelections(proposal.provider_scope, selections, options.expectedFlavor);
   if (proposal.base_registry_identity !== base.identity || registry.readRegistry(root).identity !== base.identity)
     registry.fail('plugin-stale', 'The installed generation changed during manager preparation');
   const view = inventory(root, {operations});
@@ -637,17 +665,10 @@ function applyKnownManager(root, envelope) {
       registry.fail('plugin-stale', 'The project-known generation or provider scope changed');
     }
     if (core.hasActiveOperation(root)) registry.fail('plugin-active', 'Reach a stopped workflow handoff before changing known sources');
+    assertKnownChange(current, action, mutation);
     const entries = {...current.entries};
-    if (action === 'save-known') {
-      if (mutation.entry?.definition?.id !== mutation.plugin_id || !registry.validId(mutation.plugin_id) ||
-          own(entries, mutation.plugin_id) && !sameManagerSource(entries[mutation.plugin_id].definition.source,
-            mutation.entry.definition.source)) registry.fail('plugin-known-owner', 'The proposed known source identity conflicts');
-      entries[mutation.plugin_id] = mutation.entry;
-    } else {
-      if (mutation.entry !== null || !own(entries, mutation.plugin_id))
-        registry.fail('plugin-known-owner', 'Select an exact existing known source to forget');
-      delete entries[mutation.plugin_id];
-    }
+    if (action === 'save-known') entries[mutation.plugin_id] = mutation.entry;
+    else delete entries[mutation.plugin_id];
     const receipt = {action: action === 'save-known' ? 'saved-known' : 'forgot-known', request_id,
       proposal_digest: envelope.digest, generation: current.generation + 1};
     const next = registry.seal({...current, generation: receipt.generation, entries,
@@ -667,7 +688,7 @@ function applyKnownManager(root, envelope) {
   }, {recoverPending: false});
 }
 
-function applyManagerProposal(root, envelope, confirmation) {
+function verifiedManagerProposal(root, envelope, confirmation, selections, expectedFlavor) {
   envelope = clone(envelope);
   if (envelope?.format !== MANAGER_FORMAT || envelope.schema !== 1 ||
       envelope.target_identity !== registry.hash(fs.realpathSync(root)) || envelope.digest !== managerDigest(envelope)) {
@@ -676,29 +697,69 @@ function applyManagerProposal(root, envelope, confirmation) {
   if (!object(confirmation) || Object.keys(confirmation).length !== 1 || confirmation.proposal_digest !== envelope.digest)
     registry.fail('plugin-consent', 'Explicit confirmation of the exact manager proposal digest is required');
   const {action, request_id, preview, mutation} = envelope;
+  if (typeof request_id !== 'string' || !request_id || request_id.length > 200 || /[\x00-\x1f]/.test(request_id))
+    registry.fail('plugin-proposal', 'A stable manager request identity is required');
+  let scope;
   if (mutation?.kind === 'known' && ['save-known', 'forget-known'].includes(action) &&
       same(preview, managerKnownPreview(action, mutation.provider_scope, mutation))) {
-    return applyKnownManager(root, envelope);
+    scope = mutation.provider_scope;
+  } else {
+    const proposal = mutation?.proposal;
+    if (mutation?.kind !== 'lifecycle' || !own(managerOperations, action) ||
+        proposal?.operation !== managerOperations[action] || proposal.request_id !== request_id ||
+        proposal.manager_action !== action || !same(proposal.provider_scope, preview?.provider_scope) ||
+        proposal.manager_preview_digest !== registry.hash(registry.json(preview))) {
+      registry.fail('plugin-proposal', 'The public manager preview does not match the owned lifecycle proposal');
+    }
+    require('./plugin-lifecycle.js').validateProposal(root, proposal, {proposal_digest: proposal.digest});
+    scope = proposal.provider_scope;
   }
-  const proposal = mutation?.proposal;
-  if (mutation?.kind !== 'lifecycle' || !own(managerOperations, action) ||
-      proposal?.operation !== managerOperations[action] || proposal.request_id !== request_id ||
-      proposal.manager_action !== action || !object(proposal.provider_scope) ||
-      proposal.manager_preview_digest !== registry.hash(registry.json(preview))) {
-    registry.fail('plugin-proposal', 'The public manager preview does not match the owned lifecycle proposal');
+  assertManagerSelections(scope, selections, expectedFlavor);
+  return envelope;
+}
+
+function validateCurrentManagerPreview(root, action, preview, base, proposal) {
+  const operations = managerOperationsFor(root);
+  const view = inventory(root, {operations});
+  const prerequisites = managerPrerequisites(root, view);
+  if (prerequisites.length) registry.fail('plugin-stale', prerequisites[0].message);
+  const current = managerLifecyclePreview(action, proposal, operations);
+  const anchors = require('./plugin-composition.js').createCatalog(operations);
+  current.impact = managerImpact(base, proposal, view, current.bindings, anchors);
+  current.requires_profile_refresh = !same(base.packages, proposal.packages) || !same(base.bindings, proposal.bindings);
+  if (proposal.manager_impact_digest !== registry.hash(registry.json(current.impact)) || !same(preview, current))
+    registry.fail('plugin-stale', 'The approved preview or frozen requirements changed; prepare a fresh preview');
+}
+
+function inspectManagerProposal(root, envelope, confirmation, {profile, selections = [], expectedFlavor}) {
+  const verified = verifiedManagerProposal(root, envelope, confirmation, selections, expectedFlavor);
+  const {mutation, action, request_id, digest: proposalDigest} = verified;
+  const lifecycle = require('./plugin-lifecycle.js');
+  if (mutation.kind === 'lifecycle') {
+    const proposal = mutation.proposal;
+    const base = lifecycle.inspectProposal(root, proposal, {proposal_digest: proposal.digest}, profile);
+    if (base) validateCurrentManagerPreview(root, action, verified.preview, base, proposal);
+  } else {
+    const current = readKnown(root);
+    const recorded = own(current.requests, request_id) ? current.requests[request_id] : null;
+    if (recorded && recorded.proposal_digest !== proposalDigest)
+      registry.fail('plugin-replay', 'The known-source request identity conflicts with an earlier proposal');
+    if (!recorded && (!same(lifecycle.providerScope(profile), mutation.provider_scope) ||
+        current.identity !== mutation.identity || current.generation !== mutation.generation))
+      registry.fail('plugin-stale', 'The project-known generation or provider scope changed');
+    if (!recorded) assertKnownChange(current, action, mutation);
   }
+  return verified.preview;
+}
+
+function applyManagerProposal(root, envelope, confirmation, {selections = [], expectedFlavor} = {}) {
+  envelope = verifiedManagerProposal(root, envelope, confirmation, selections, expectedFlavor);
+  const {action, preview, mutation} = envelope;
+  if (mutation.kind === 'known') return applyKnownManager(root, envelope);
+  const proposal = mutation.proposal;
   const exact = {proposal_digest: proposal.digest};
   const options = {validateManagerImpact(base, candidate) {
-    const operations = managerOperationsFor(root);
-    const view = inventory(root, {operations});
-    const prerequisites = managerPrerequisites(root, view);
-    if (prerequisites.length) registry.fail('plugin-stale', prerequisites[0].message);
-    const bindings = managerLifecyclePreview(action, candidate, operations).bindings;
-    const anchors = require('./plugin-composition.js').createCatalog(operations);
-    const current = managerImpact(base, candidate, view, bindings, anchors);
-    if (candidate.manager_impact_digest !== registry.hash(registry.json(current)) || !same(preview.impact, current)) {
-      registry.fail('plugin-stale', 'The approved frozen requirements or mutation impact changed; prepare a fresh preview');
-    }
+    validateCurrentManagerPreview(root, action, preview, base, candidate);
   }};
   return ['install', 'update'].includes(proposal.operation) ?
     require('./plugin-lifecycle.js').applyProposal(root, proposal, exact, options) :
@@ -720,4 +781,4 @@ function listMain(root,args,{source=path.resolve(__dirname,'..')}={}){
  }catch(error){process.stderr.write(error.message+'\n');return 2;}
 }
 module.exports={inventory,formatInventory,prepareRemoval,applyRemoval,applyManagementChange,prepareUnbind,prepareActivation,forgetKnown,listMain,
- managementInventory,prepareManagerRequest,applyManagerProposal};
+ managementInventory,prepareManagerRequest,inspectManagerProposal,applyManagerProposal};

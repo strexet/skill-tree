@@ -185,13 +185,15 @@ function transaction(root,changes,expected={},beforeActivate=null,channel='core'
  if(fs.existsSync(c.safe(root,backups)))fs.rmSync(c.safe(root,backups),{recursive:true});
  fs.writeFileSync(c.safe(root,journal),c.json({schema:1,channel,entries}));recover(root,channel);
 }
-function locked(root,action,{recoverPending=true,onPending}={}){
+function locked(root,action,{recoverPending=true,recoverPluginPending=true,onPending}={}){
  const owner=queueRoot(root),barrier=owner!==root?path.join(owner,INSTALL+'/.install-lock'):null;let barrierFd;
  if(barrier){fs.mkdirSync(path.dirname(barrier),{recursive:true});try{barrierFd=fs.openSync(barrier,'wx',0o600);fs.writeFileSync(barrierFd,c.json({pid:process.pid,host:require('node:os').hostname()}));}catch{throw Error('Canonical installation lock exists');}}
  const dir=c.safe(root,INSTALL);fs.mkdirSync(dir,{recursive:true});const lock=c.safe(root,INSTALL+'/.install-lock');let fd;
  try{fd=fs.openSync(lock,'wx',0o600);}catch{if(barrier){fs.closeSync(barrierFd);fs.unlinkSync(barrier);}throw Error('Installation lock exists; inspect PID/host before explicit removal');}
  try{fs.writeFileSync(fd,c.json({pid:process.pid,host:require('node:os').hostname()}));if(fs.existsSync(c.safe(owner,'.skill-tree/.writer-lock')))throw Error('Workflow writer lock exists; reach a cleanup/handoff boundary before installation');
-  const pending=['core','plugins'].some(channel=>fs.existsSync(c.safe(root,transactionPaths(channel).journal)));
+  const pluginPending=fs.existsSync(c.safe(root,transactionPaths('plugins').journal));
+  if(pluginPending&&!recoverPluginPending)throw Error('Plugin installation recovery is required; use the owned manager --recover');
+  const pending=pluginPending||fs.existsSync(c.safe(root,transactionPaths('core').journal));
   if(pending&&!recoverPending){
    if(typeof onPending==='function')return onPending();
    throw Error('Owned installation recovery is required before this operation');
@@ -279,7 +281,7 @@ function install(root,source,flavor,selections,options={}){
    throw error;
   }
   return {profile:result.profile,delta:result.delta,action:result.delta.length?'installed':'verified no-op current'};
- });
+ },{recoverPluginPending:options.recoverPluginPending});
 }
 function uninstall(root,selections,options={}){
  function action(){const p=receipt(root,true);verifyOwned(root,p);if(hasActiveOperation(root))throw Error('Active controller must stop before uninstall');const next=JSON.parse(c.json(p)),changes={},expected={};
@@ -298,9 +300,9 @@ function uninstall(root,selections,options={}){
   next.identity=compositionIdentity(next);const stopped=stoppedWorkflow(root);if(stopped){changes[WORKFLOW]=stopped;expected[WORKFLOW]=treeHash(root,WORKFLOW);}
   changes[PROFILE]=c.json(next);expected[PROFILE]=treeHash(root,PROFILE);if(!options.dryRun)transaction(root,changes,expected);return {action:options.dryRun?'dry-run uninstall':'removed',profile:next,delta:Object.keys(changes)};
  }
- return options.dryRun?action():locked(root,action);
+ return options.dryRun?action():locked(root,action,{recoverPluginPending:options.recoverPluginPending});
 }
-function refresh(root,source,dryRun=false){const p=receipt(root,true);return install(root,source,p.flavor,Object.entries(p.destinations).map(([rel,d])=>({rel,provider:d.provider,name:d.name})),{dryRun,bridges:Object.keys(p.bridges||{})});}
+function refresh(root,source,dryRun=false){const p=receipt(root,true);return install(root,source,p.flavor,Object.entries(p.destinations).map(([rel,d])=>({rel,provider:d.provider,name:d.name})),{dryRun,bridges:Object.keys(p.bridges||{}),recoverPluginPending:false});}
 function restoreGeneration(root){
  const p=receipt(root,true);verifyOwned(root,p);if(hasActiveOperation(root))throw Error('Stop the active controller before rollback');
  const last=c.readJson(root,INSTALL+'/.last-transaction.json',null);if(!last)throw Error('No retained generation for rollback');
