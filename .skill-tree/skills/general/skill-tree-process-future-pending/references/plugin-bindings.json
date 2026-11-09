@@ -378,7 +378,7 @@
         "phrase": "after-validation skill-tree-repo-documentation-audit"
       }
     ],
-    "digest": "4577b60f5d898f6e7e8fc295a7fd73a2cb72e7d739f4eb2b0f46437f18037838",
+    "digest": "338b8b0a143d005f4f24e8a675c8cdb73ff385b653c05657461adbbfe55dc29d",
     "entries": [
       {
         "anchor": "before",
@@ -397,7 +397,7 @@
         ],
         "operation": "skill-tree-add-pending-task",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "during",
@@ -416,7 +416,7 @@
         ],
         "operation": "skill-tree-add-pending-task",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "after",
@@ -435,7 +435,7 @@
         ],
         "operation": "skill-tree-add-pending-task",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before",
@@ -454,7 +454,7 @@
         ],
         "operation": "skill-tree-clarify-tasks",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "during",
@@ -473,7 +473,7 @@
         ],
         "operation": "skill-tree-clarify-tasks",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "after",
@@ -492,7 +492,7 @@
         ],
         "operation": "skill-tree-clarify-tasks",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before",
@@ -511,7 +511,7 @@
         ],
         "operation": "skill-tree-create-documents-snapshot",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "during",
@@ -530,7 +530,7 @@
         ],
         "operation": "skill-tree-create-documents-snapshot",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "after",
@@ -549,7 +549,7 @@
         ],
         "operation": "skill-tree-create-documents-snapshot",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before",
@@ -568,7 +568,7 @@
         ],
         "operation": "skill-tree-implement-all",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "during",
@@ -587,7 +587,7 @@
         ],
         "operation": "skill-tree-implement-all",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "after",
@@ -606,7 +606,7 @@
         ],
         "operation": "skill-tree-implement-all",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before",
@@ -625,7 +625,7 @@
         ],
         "operation": "skill-tree-implement-next-future-task",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "during",
@@ -644,7 +644,7 @@
         ],
         "operation": "skill-tree-implement-next-future-task",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "after",
@@ -663,7 +663,7 @@
         ],
         "operation": "skill-tree-implement-next-future-task",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before",
@@ -682,7 +682,7 @@
         ],
         "operation": "skill-tree-pr-review-cycle",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "during",
@@ -701,7 +701,7 @@
         ],
         "operation": "skill-tree-pr-review-cycle",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "after",
@@ -720,7 +720,7 @@
         ],
         "operation": "skill-tree-pr-review-cycle",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before",
@@ -739,7 +739,7 @@
         ],
         "operation": "skill-tree-process-future-pending",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "during",
@@ -758,7 +758,7 @@
         ],
         "operation": "skill-tree-process-future-pending",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "after",
@@ -777,7 +777,7 @@
         ],
         "operation": "skill-tree-process-future-pending",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before",
@@ -796,7 +796,7 @@
         ],
         "operation": "skill-tree-repo-documentation",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "during",
@@ -815,7 +815,7 @@
         ],
         "operation": "skill-tree-repo-documentation",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "after",
@@ -834,7 +834,7 @@
         ],
         "operation": "skill-tree-repo-documentation",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before",
@@ -853,7 +853,7 @@
         ],
         "operation": "skill-tree-repo-documentation-audit",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "during",
@@ -872,7 +872,7 @@
         ],
         "operation": "skill-tree-repo-documentation-audit",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "after",
@@ -891,7 +891,7 @@
         ],
         "operation": "skill-tree-repo-documentation-audit",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before",
@@ -910,7 +910,7 @@
         ],
         "operation": "skill-tree-work-through-next",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "during",
@@ -929,7 +929,7 @@
         ],
         "operation": "skill-tree-work-through-next",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "after",
@@ -948,7 +948,7 @@
         ],
         "operation": "skill-tree-work-through-next",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before-research",
@@ -967,7 +967,7 @@
         ],
         "operation": "skill-tree-implement-next-future-task",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "after-draft-plan",
@@ -986,7 +986,7 @@
         ],
         "operation": "skill-tree-implement-next-future-task",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before-task-completion",
@@ -1005,7 +1005,7 @@
         ],
         "operation": "skill-tree-implement-next-future-task",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before-review",
@@ -1024,7 +1024,7 @@
         ],
         "operation": "skill-tree-pr-review-cycle",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "after-core-inspection",
@@ -1043,7 +1043,7 @@
         ],
         "operation": "skill-tree-pr-review-cycle",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before-pr-ready",
@@ -1062,7 +1062,7 @@
         ],
         "operation": "skill-tree-pr-review-cycle",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before-research",
@@ -1081,7 +1081,7 @@
         ],
         "operation": "skill-tree-process-future-pending",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before-task-formulation",
@@ -1100,7 +1100,7 @@
         ],
         "operation": "skill-tree-process-future-pending",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "after-task-creation",
@@ -1119,7 +1119,7 @@
         ],
         "operation": "skill-tree-process-future-pending",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before-research",
@@ -1138,7 +1138,7 @@
         ],
         "operation": "skill-tree-repo-documentation",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before-formulation",
@@ -1157,7 +1157,7 @@
         ],
         "operation": "skill-tree-repo-documentation",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "after-validation",
@@ -1176,7 +1176,7 @@
         ],
         "operation": "skill-tree-repo-documentation",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before-research",
@@ -1195,7 +1195,7 @@
         ],
         "operation": "skill-tree-repo-documentation-audit",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "before-formulation",
@@ -1214,7 +1214,7 @@
         ],
         "operation": "skill-tree-repo-documentation-audit",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       },
       {
         "anchor": "after-validation",
@@ -1233,7 +1233,7 @@
         ],
         "operation": "skill-tree-repo-documentation-audit",
         "status": "resolved",
-        "version": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a"
+        "version": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d"
       }
     ],
     "operations": [
@@ -1249,10 +1249,10 @@
       "skill-tree-work-through-next"
     ]
   },
-  "configuration_digest": "e21377e35a961fe9029b0cf74790a90e13aa5e3bef92da80e6d990e0c348f1ae",
+  "configuration_digest": "ae02579d687b0a71ae2e2b9d00a5bc9f16d474deb985d0036a88c96039a52d46",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "648e262926e8531a7bd0f5fa1ddbfa41a08cf11dde84ae46b3314393ff1ae083",
+  "identity": "2178a8e257f9903a02412023d5eab381743f4da2a2555f64d9e6e5f6098041d8",
   "operation": "skill-tree-process-future-pending",
   "operations": {
     "skill-tree-add-pending-task": {
@@ -1287,34 +1287,35 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "9756b699c8d65f965da989b71d7eed6665132007b88c7b1bc220b7e27cd670bd",
+    "SKILL.md": "e339697810f53077e25428fc35ee1ff14e1d5c2dc8736b091cd5ffacd17bc1fd",
     "agents/openai.yaml": "9c213332d595206b3757ae4452a4e0e73acccce3b36a3b992f855ae317aa1bbb",
     "references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
-    "references/future-workflow.md": "d8c04b71daddb6df3b6e0198e87cd2497d2e7b9db50cfa9ec8222dae78344e24",
+    "references/future-workflow.md": "13edfc2edf90e86351f3f047f3b3a4bbf696de54f3bac5010fb6fb19dbbdc603",
     "references/history-retention.md": "e34302d1665162c5c94bd1adea7cbdf32a36325bb4a6db1eafab24fc236c3585",
     "references/installation-profile.md": "05801326c3aa3e325a1ccf170a7fbbc678d7e2ae804bb6a8fef6c3a05d2fbee8",
     "references/pending-task-format.md": "6c0a90ea992f2c19a26e4f95fc4e45b7ff89d25c0cc8e2c49c11cfa8bad2d8ba",
     "references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
-    "references/plugin-invocation.md": "afd0aefd29290d8cd18bfe1ab0c40e3d4a2fc6fd856072f920085f421d489732",
+    "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/project-profile.md": "306f870858d6a04e096bc57878154fb996f413482437e995dc7b0dfc49952748",
     "references/run-workspaces.md": "d9a97bc8ee56ef0aa6f254075df08e2946fdc61c578328a52f6991dbd723468c",
     "references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
-    "references/workflow-metadata.md": "47b832b8378cd837b7f8f9d86e5ad1de6d27630bc913dbe8b887d0c7fed32810",
+    "references/workflow-metadata.md": "91264f18e09460d44decc0f09cbd7f9a8b12579822371956f228df58fc32f6f5",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
     "scripts/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
-    "scripts/plugin-composition.js": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a",
+    "scripts/plugin-composition.js": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d",
     "scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",
-    "scripts/plugin-invocation.py": "11b97675583753ccc391492de556e71d74bb39ab0b43cce64412469d6ef85e77",
+    "scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",
     "scripts/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    "scripts/plugin-processing.py": "2cec937076f1449996a5db4ebdc9c16b9cc90f35abeb728195d55924851dde44",
     "scripts/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
-    "scripts/plugin-runtime.js": "82830c2aff9ae2380f5cf2440a461f3a2d6d61c4141561db3ce1ae2346fac78d",
+    "scripts/plugin-runtime.js": "e704dce8f8019baae4f783bce8c6f5fdf5dfaf7961760ecad33ce3ab919b4338",
     "scripts/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
     "scripts/run-workspaces.py": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     "scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
-    "scripts/workflow-state.py": "34e5c105ad7cf594720f4c60655a27bfdfdccc93e71ce9d00610447178bb1883"
+    "scripts/workflow-state.py": "ab47ba4e4ffe6c780f2d78e39093af8c6f98ffbd4b7114913aebfa951543ebb1"
   },
   "packages": {},
   "parameter_defaults": {},

@@ -1,0 +1,36 @@
+{
+  "actual_error": "An invocation source fingerprint is missing, stale or nonportable",
+  "argv": [
+    "python3",
+    "-B",
+    ".skill-tree/scripts/agent-conformance.py",
+    "plugin-invocation-validate",
+    "--input",
+    ".skill-tree/history/validation/plugin-system/invocation118-native/report.json",
+    "--capture",
+    ".skill-tree/history/validation/plugin-system/invocation118-native/capture.json"
+  ],
+  "current_head": "6725b379f6a8af018a203bed2c7c6a7448cd575f",
+  "exit_code": 1,
+  "grader_sha256": "0f7a79a83e69aad8c8f3a5c4d063b94616f1c6d786f0e13cc3027dee3401f49e",
+  "immutable_artifacts_before_and_after": {
+    "capture": "5f481b09a9cdd556971ae3b1ca12d1ab8e5147266d8378aae59703514526e0bd",
+    "grade": "7eb094e5e67ec6f9b26662c27c199ef38c39a3c63c51fee92c1e70e6225b888a",
+    "qualification": "17564517f4b90435c1a66d9d1488856f05671523538dd9a131e8c1eb4495410e",
+    "report": "cf002e5bb4448a5f870d5904e8905f1b3006fc05004e59430300d777877e8485"
+  },
+  "kind": "actual-expected-current-strict-native-rejection",
+  "limits": [
+    "Actual unchanged strict CLI rejection of historical report/capture on current sources only. No fresh actual actors/native/provider execution or efficacy qualification.",
+    "Original report/capture/grade/qualification and grader remained unchanged. This command stops at the stale-source gate before any success qualification.",
+    "This expected rejection does not itself establish bounded static compatibility or acceptance; current selected deterministic checks, owned activation and controller authorization remain separate."
+  ],
+  "observed_at_utc": "2026-11-06T17:02:33.050329+00:00",
+  "original_artifacts_unchanged": true,
+  "projection": "Portable field projection of the actual unchanged strict CLI rejection; original raw output remains immutable and is not relabeled current-native success.",
+  "raw_observation_sha256": "ae96ebf7c9b2a9a663697c1bc1cfc35d316c3fad5b41a4a47c1480a250bd4251",
+  "result": "expected-rejection",
+  "schema": 1,
+  "source_digest": "b28052dbc57f0376a0d061168a165357035d1a40dc758344bd091f3b58fe7297",
+  "wall_seconds": 0.060981791000813246
+}

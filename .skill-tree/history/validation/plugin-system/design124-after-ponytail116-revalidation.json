@@ -1,0 +1,35 @@
+{
+  "actual_lane": "static",
+  "attempt_id": "C-bb484f2c-a147-4b2d-b02e-2ebbc8006112",
+  "check_id": "owner-decision-evidence",
+  "limitations": [
+    "This is current source/approval consistency inspection with unchanged actual owner evidence. No new owner answer, comparative consent, native invocation or terminal outcome is inferred."
+  ],
+  "observations": [
+    "Root inspected original W1/W2 owner submissions, later W3 direction and current plan/workflow/contract sections.",
+    "The actual W1 internal stages, qualified Auto default, separate delegated roles and Manual switching remain preserved.",
+    "Approved W2 bounded operation anchors, stable task identity, task wording and affected rechecks remain explicit; later W3 permits registered named placement and repeated compatible occurrences without creating new core stages.",
+    "Current pinned optional Ponytail implementation follows approved full-review addition and preserves core readiness; missing external interview115 implementation remains a separate admitted unit.",
+    "The historical W1 record leaves W2 open at that earlier timestamp; the later original W2 owner record closes W2 and is not overwritten.",
+    "Comparative114 execution still requires separate actual finite-trial consent."
+  ],
+  "original_owner_evidence_unchanged": {
+    ".skill-tree/history/audits/audit-a-8a21958d-a282-4d9a-b939-4eede8925ee6.json": "5e87d6c8b7f25b4701cd121db96cff85eb26546f585e962f389a3357fa92bc35",
+    ".skill-tree/history/research/plugin-auto-manual-decision.json": "77adbf24970ab1a5ea81270c948c1b2416dcf890d776540cad0dce2fb63e1772",
+    ".skill-tree/history/research/plugin-hook-decisions.json": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461",
+    ".skill-tree/history/validation/plugin-system/plan-full-review.json": "29f3bcd6a4bf2e3466e4d7815d1e64dd7f727e5e16e2a4149dd7451940d1dd26"
+  },
+  "result": "pass",
+  "schema": 1,
+  "source_commit": "6725b379f6a8af018a203bed2c7c6a7448cd575f",
+  "source_fingerprints": {
+    ".skill-tree/common/references/future-workflow.md": "d8c04b71daddb6df3b6e0198e87cd2497d2e7b9db50cfa9ec8222dae78344e24",
+    ".skill-tree/common/scripts/workflow-state.py": "34e5c105ad7cf594720f4c60655a27bfdfdccc93e71ce9d00610447178bb1883",
+    ".skill-tree/documents/implementation-plan.md": "b6a1222b64d638bc1ab9a03f13abf454f195c95198f6aac7dd2e29637a0582e3",
+    ".skill-tree/documents/plugin-system-contract.md": "a50a26f11f3a839570d46588673be02ea86fe37a083bb14d8278bb8645f72634",
+    ".skill-tree/documents/plugin-system-research.md": "7e408525e7958f8c05dc8ed971edff9e75ddbb629f2117aee0d0498a6fc5790a",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "2341dd16a380768332194285cf8356e0326951860c38d96dbd1c10b7d19d37ce",
+    ".skill-tree/history/research/plugin-hook-decisions.json": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461"
+  },
+  "task_id": "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+}

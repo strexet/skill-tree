@@ -7,6 +7,7 @@ const hash=value=>crypto.createHash('sha256').update(value).digest('hex');
 const kinds=['request','project','document','snapshot','management','controller','pending','task','task-group','review'],phases=['before','during','after'];
 const MANIFEST='references/plugin-bindings.json',VERSION=hash(fs.readFileSync(__filename));
 const processOperation='skill-tree-process-future-pending',implementOperation='skill-tree-implement-next-future-task';
+const hasProcessingRecheck=context=>object(context)&&(own(context,'processing_recheck_id')||own(context,'processing_recheck_digest'));
 const namedDefaults={
  'skill-tree-process-future-pending':{'before-research':'before','before-task-formulation':'during','after-task-creation':'after'},
  'skill-tree-implement-next-future-task':{'before-research':'before','after-draft-plan':'during','before-task-completion':'after'},
@@ -114,6 +115,19 @@ function associatedInstallation(packageRoot,projectRoot,verified){
  }
  return true;
 }
+function installationPrerequisites(packageRoot,projectRoot,verified){
+ const associated=associatedInstallation(packageRoot,projectRoot,verified);
+ const liveRegistry=registry.safe(projectRoot,registry.REGISTRY);
+ if(fs.existsSync(liveRegistry)){
+  const current=registry.verifyInstalled(projectRoot);
+  if(current.identity!==verified.manifest.registry_identity){
+   return [{code:'configuration-stale',reason:'The live plugin generation differs from the frozen operation; explicit refresh and parked-run reconciliation remain required.'}];
+  }
+ }else if(associated&&verified.manifest.registry_present){
+  return [{code:'registry-required',reason:'The associated managed operation requires the frozen live plugin registry; explicit registry recovery remains required.'}];
+ }
+ return [];
+}
 const guardProgram=String.raw`import hashlib,importlib.util,json,sys
 from pathlib import Path
 sys.pycache_prefix=sys.argv[2]
@@ -123,6 +137,17 @@ def capture(path):
  path=Path(path);value=path.read_bytes() if path.exists() else None;watched[path]=value;return value
 for base in {s.base,root/'.skill-tree'}:
  if any((base/relative).exists() for relative in ['.writer-lock','.transaction.json','installation/.install-lock','installation/.journal.json','installation/.plugin-journal.json']):raise ValueError('The current owned workflow or installation transaction must finish before plugin boundary preparation')
+def processing_recheck():
+ capture(s.future)
+ capture(w.clarification_path(s,context.get('session_id')))
+ return w.processing_recheck_guard(s,context,p['event'],readiness=p['processing_readiness'])
+def finish(proof):
+ for path,previous in watched.items():
+  if (path.read_bytes() if path.exists() else None)!=previous:raise ValueError('The actual selected workflow context changed during boundary preparation')
+ print(json.dumps(proof))
+if p['processing_readiness']:
+ finish({'kind':'actual-owned-scope','processing_recheck':processing_recheck()})
+ sys.exit(0)
 if operation=='skill-tree-process-future-pending':
  if phase in {'before','during'} and context['kind']!='pending':raise ValueError('Processing before and during require the actual selected Pending context')
  if phase=='after' and context['kind'] not in {'task','task-group'}:raise ValueError('Processing after requires the actual created task context')
@@ -131,12 +156,16 @@ if context['kind'] in {'pending','task','task-group'}:
  capture(s.future);tasks=w.parse(s.text());key='pending_ids' if context['kind']=='pending' else 'task_ids';queue='Pending Queue' if key=='pending_ids' else 'Prioritized Next Changes';selected=w.resolve(tasks,context[key],queue)
  if key=='task_ids' and set(context.get('pending_ids',[]))-{value for task in selected for value in task['parent_pending_ids']}:raise ValueError('Task context Pending provenance differs from actual selected tasks')
  if operation=='skill-tree-implement-next-future-task' and any(task['status']!='Ready' for task in selected):raise ValueError('Blocked selected tasks cannot enter implementation')
+ if operation=='skill-tree-process-future-pending' and phase=='after':
+  w.processing_scope_guard(s,context,package_root=p['package_root'])
 if context['kind']=='controller':
  capture(s.future);capture(s.state);state=s.load();runs=state.get('run_registry',{}).get('runs',{})
  if state.get('active_run'):runs={**runs,state['active_run']['id']:state['active_run']}
  run=runs.get(context['run_id'])
  if not run or set(context.get('task_ids',[]))-set(run.get('admitted_task_ids',run.get('snapshot',[]))+run.get('required_ids',[])):raise ValueError('The controller context exceeds the actual recorded run scope')
 proof={'kind':'actual-owned-scope'}
+if 'processing_recheck_id' in context:
+ proof['processing_recheck']=processing_recheck()
 if operation=='skill-tree-pr-review-cycle' and 'publication_id' in context:
  review=w.owned_module('owned_plugin_review',Path(sys.argv[1]).with_name('pr-review-state.py'))
  publication=review._review_path(s,context['publication_id']);original=capture(publication)
@@ -151,10 +180,8 @@ if operation=='skill-tree-implement-next-future-task' and phase=='during':
  for key in ['kind','id','task_ids','pending_ids','semantic_fingerprint','content_fingerprint']:
   if context.get(key)!=frame['context'].get(key):raise ValueError('The draft-plan frame belongs to another selected task scope or context')
  proof.update(orchestration_id=identity,orchestration_hash=frame['orchestration_hash'],plan_digest=frame['plan']['digest'])
-for path,previous in watched.items():
- if (path.read_bytes() if path.exists() else None)!=previous:raise ValueError('The actual selected workflow context changed during boundary preparation')
-print(json.dumps(proof))`;
-function guardBoundary(packageRoot,request,operation,phase){
+finish(proof)`;
+function guardBoundary(packageRoot,request,operation,phase,processingReadiness=false){
  if(typeof request.project_root!=='string'||!fs.existsSync(request.project_root)||!fs.statSync(request.project_root).isDirectory())fail('composition-context','An explicit existing execution project root is required');
  const context=bindings.validateContext(request.context),needsWorkflow=['pending','task','task-group','controller'].includes(context.kind)||operation===processOperation||operation===implementOperation||operation==='skill-tree-pr-review-cycle'&&own(context,'publication_id');
  if(!needsWorkflow)return {kind:'task-free',context_kind:context.kind};
@@ -162,24 +189,37 @@ function guardBoundary(packageRoot,request,operation,phase){
  if(!fs.existsSync(helper))fail('composition-context','The local owned workflow helper closure is missing');
  const cachePrefix=path.join(os.tmpdir(),'skill-tree-owned-source-'+crypto.randomUUID());
  if(fs.existsSync(cachePrefix))fail('composition-context','A fresh nonexistent bytecode lookup prefix is required');
- const run=spawnSync('python3',['-I','-B','-c',guardProgram,helper,cachePrefix],{input:JSON.stringify({...request,operation,phase,context}),encoding:'utf8',timeout:10000,maxBuffer:1024*1024});
+ const ownedRequest={...request,operation,phase,context,package_root:packageRoot,processing_readiness:processingReadiness};
+ const run=spawnSync('python3',['-I','-B','-c',guardProgram,helper,cachePrefix],{
+  input:JSON.stringify(ownedRequest),encoding:'utf8',timeout:10000,maxBuffer:1024*1024
+ });
  if(run.error||run.status!==0)fail('composition-context','The actual selected operation context guard failed: '+(run.stderr||run.stdout||run.error?.message||'The owned helper is unavailable').trim().split('\n').at(-1));
  return JSON.parse(run.stdout);
 }
 function prepareMetadata(packageRoot,payload,readiness){
  const request=clone(payload),verified=verifiedManifest(packageRoot),{manifest,catalog,compiled}=verified;
  if(request.event?.operation!==manifest.operation)fail('composition-operation','The event must identify the actual composed operation');
- const selected=bindings.selectBindings(compiled,request.event,request.context),location=bindings.resolveLocation(request.event,catalog),prerequisites=[];
+ const location=bindings.resolveLocation(request.event,catalog),prerequisites=[];
+ let recheckGuard=null;
+ if(hasProcessingRecheck(request.context)){
+  if(location.status!=='resolved'||location.boundary_id!==processOperation+':after')fail('composition-context','An editorial recheck requires the actual Processing after boundary');
+  const {processing_recheck_id:id,processing_recheck_digest:mandate}=request.context;
+  if(typeof id!=='string'||!id.trim()||typeof mandate!=='string'||!/^[a-f0-9]{64}$/.test(mandate))fail('composition-context','An editorial recheck requires the exact owned mandate identity');
+  const [held]=installationPrerequisites(packageRoot,request.project_root,verified);
+  if(held)fail(held.code,held.reason);
+  recheckGuard=guardBoundary(packageRoot,{...request,event:{...request.event,boundary_id:location.boundary_id}},processOperation,'after',readiness);
+  if(!object(recheckGuard.processing_recheck))fail('composition-context','The actual clarification must authorize the editorial recheck');
+ }
+ const eligibilityContext=readiness?recheckGuard?.processing_recheck?.selection_context??request.context:request.context;
+ const selected=bindings.selectBindings(compiled,request.event,eligibilityContext);
  const configured=compiled.bindings.some(row=>row.enabled&&row.operation===request.event.operation&&(row.anchor===request.event.anchor||row.location.status==='resolved'&&location.status==='resolved'&&row.location.boundary_id===location.boundary_id));
- const base={bindings:selected.bindings,unresolved:selected.unresolved,prerequisites,event:selected.event,context:selected.context,configuration_digest:compiled.configuration_digest,boundary_id:location.boundary_id||null,invocation:'not-executed'};
+ const base={bindings:selected.bindings,unresolved:selected.unresolved,prerequisites,event:selected.event,context:recheckGuard?bindings.validateContext(request.context):selected.context,configuration_digest:compiled.configuration_digest,boundary_id:location.boundary_id||null,invocation:'not-executed'};
  if(location.status!=='resolved'){prerequisites.push({code:'unresolved-anchor',reason:location.reason});return {...base,status:'prerequisite'};}
- if(!configured||!selected.bindings.length&&!selected.unresolved.length)return {...base,status:'noop'};
+ if(!recheckGuard&&(!configured||!selected.bindings.length&&!selected.unresolved.length))return {...base,status:'noop'};
  if(!readiness&&manifest.operation==='skill-tree-pr-review-cycle'&&selected.bindings.some(row=>own(manifest.packages[row.plugin_id].adaptation||{},'invocation_policy'))&&!own(selected.context,'publication_id'))fail('composition-context','The policy-bound review invocation requires the actual owned publication identity');
- const proof=readiness?null:catalog.boundaries[location.boundary_id].handler({...request,package_root:packageRoot});
+ const proof=recheckGuard||(readiness?null:catalog.boundaries[location.boundary_id].handler({...request,package_root:packageRoot}));
  for(const item of selected.unresolved)prerequisites.push({code:'incompatible-binding',binding_id:item.id,reason:item.reason});
- const associated=associatedInstallation(packageRoot,request.project_root,verified),liveRegistry=registry.safe(request.project_root,registry.REGISTRY);
- if(fs.existsSync(liveRegistry)){const current=registry.verifyInstalled(request.project_root);if(current.identity!==manifest.registry_identity)prerequisites.push({code:'configuration-stale',reason:'The live plugin generation differs from the frozen operation; explicit refresh and parked-run reconciliation remain required.'});}
- else if(associated&&manifest.registry_present)prerequisites.push({code:'registry-required',reason:'The associated managed operation requires the frozen live plugin registry; explicit registry recovery remains required.'});
+ if(!recheckGuard)prerequisites.push(...installationPrerequisites(packageRoot,request.project_root,verified));
  const available=request.capabilities||[];
  if(!Array.isArray(available)||available.some(value=>typeof value!=='string'))fail('composition-capability','Capabilities require explicit named host facts');
  for(const row of selected.bindings){const record=manifest.packages[row.plugin_id],missing=(record.execution?.required||[]).filter(value=>!available.includes(value));if(missing.length)prerequisites.push({code:'missing-capability',binding_id:row.id,plugin_id:row.plugin_id,missing});prerequisites.push({code:'invocation-unqualified',binding_id:row.id,plugin_id:row.plugin_id,reason:'The boundary is prepared only; persisted actual host invocation and result qualification remain required.'});}
@@ -190,4 +230,4 @@ function prepareBoundary(packageRoot,payload){
  return prepareMetadata(packageRoot,payload,false);
 }
 function prepareReadinessBoundary(packageRoot,payload){return {...prepareMetadata(packageRoot,payload,true),proof_kind:'completed-readiness'};}
-module.exports={createCatalog,resolveInputs,composeOperation,prepareBoundary,prepareReadinessBoundary,verifiedManifest};
+module.exports={createCatalog,resolveInputs,composeOperation,prepareBoundary,prepareReadinessBoundary,verifiedManifest,hasProcessingRecheck};

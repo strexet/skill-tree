@@ -64,6 +64,8 @@ Semantic edits reopen affected questions and final acceptance. Unrelated settled
 
 The shared clarification controller owns rounds, answers, revisions and acceptance. The interview plugin is not restarted on every internal question. After rework, only affected editorial/clarification obligations repeat. Post-processing placement is approved; application-specific incremental benefit remains unqualified until comparison.
 
+The accepted Processing implementation keeps the full frozen configuration for an affected editorial recheck. The shared CL record authorizes one affected occurrence in a fresh chain after the configured chain finishes. A current configured editor can fulfill the recheck before another chain starts. Exact registered revision lineage retains the earlier results through authorized wording changes and the final marker release. The source plan records the application contract and validation boundaries. [Processing implementation plan](../history/research/processing115-plan.md)
+
 ## Review and fix
 
 The supplied Ponytail pilot remains the exact upstream `skills/ponytail/SKILL.md` identity. When the pilot is explicitly installed/enabled, the suggested placement is an additional isolated pass after the full core review/fix cycle and before PR readiness. Core-only installation includes no Ponytail binding. Before/during placement remains configurable through the approved anchors. Session-wide upstream behavior requires a fresh bounded context and explicit cleanup. The separate `ponytail-review` entry remains a distinct alternative and never silently replaces the supplied pilot.

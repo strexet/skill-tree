@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "kind": "actual-unchanged-historical-clarification-structure-validation",
+  "observed_at_utc": "2026-11-06T17:11:39.744839+00:00",
+  "argv": [
+    "python3",
+    "-B",
+    ".skill-tree/scripts/agent-conformance.py",
+    "clarification-validate",
+    "--input",
+    ".skill-tree/history/validation/plugin-system/clarification-agent-observations.json"
+  ],
+  "exit_code": 0,
+  "stdout": "{\n  \"passed\": true,\n  \"scenarios\": 2,\n  \"scope\": \"Bounded actual-agent clarification observations with scripted fixture-owner inputs; no real-human or native external-skill qualification.\"\n}\n",
+  "stderr": "",
+  "wall_seconds": 0.055241874884814024,
+  "result": "pass",
+  "validated_scope": {
+    "passed": true,
+    "scenarios": 2,
+    "scope": "Bounded actual-agent clarification observations with scripted fixture-owner inputs; no real-human or native external-skill qualification."
+  },
+  "unchanged_inputs_and_grader": {
+    ".skill-tree/history/validation/plugin-system/clarification-agent-observations.json": "f243f525ca6e2f5c6633be1ac2f380688ab373514b7d4dd0ecae809e52c3e037",
+    ".skill-tree/history/validation/plugin-system/clarification-full-en-session.json": "99c6691f693807985cf1c83630beb0d176611c859aa7e948e65170c1eef1cbdf",
+    ".skill-tree/history/validation/plugin-system/clarification-resume-en-session.json": "c3c1f40358f34e551e5dfb76812a99ca10b1b0d02677977d831816fc20def51f",
+    ".skill-tree/scripts/agent-conformance.py": "0f7a79a83e69aad8c8f3a5c4d063b94616f1c6d786f0e13cc3027dee3401f49e"
+  },
+  "current_head": "6725b379f6a8af018a203bed2c7c6a7448cd575f",
+  "source_fingerprint_gate": false,
+  "expected_stale_rejection_applicable": false,
+  "log": ".skill-tree/artifacts/plugin-implementation/clarification128-after-ponytail116-validator-observation.txt",
+  "log_sha256": "e75e58fa4b40a18c2be48e4cf9ecdda65634db272302448a977121907c9dee10",
+  "limits": [
+    "The unchanged clarification validator checks original structural interaction/session evidence and does not compare report source_fingerprints to current source bytes. No stale-source rejection or current-native qualification is inferred.",
+    "Historical actual report and both session artifacts retain their original identities; no new actual actor/provider/test or real-human approval occurred.",
+    "Current Manual/legacy CL compatibility requires separate source analysis, current selected state/standalone receipts and owned snapshot identity."
+  ]
+}

@@ -32,7 +32,7 @@ test('composition is deterministic, standalone and has the complete authored ope
   for(const [name,files] of Object.entries(a.packages)) {
    assert.ok(!name.includes('unity-'));assert.equal((files['SKILL.md'].match(/^name:/gm)||[]).length,1);
    assert.match(files['SKILL.md'],new RegExp('Flavor: '+flavor));
-   for(const match of files['SKILL.md'].matchAll(/\]\(([^)]+)\)/g)) assert.ok(files[match[1]],match[1]);
+   for(const match of files['SKILL.md'].matchAll(/\]\(([^)]+)\)/g)) assert.ok(files[match[1].split('#',1)[0]],match[1]);
    assert.ok(files['scripts/workflow-state.py']||name==='skill-tree-create-documents-snapshot');
    assert.ok(!Object.values(files).join('').includes('If Unity 6'));
   }

@@ -1,0 +1,75 @@
+{
+  "attempt": {
+    "attempt_id": "C-d42dbd17-2d0f-403b-aef0-c58d683bf83f",
+    "definition": "3b4cd0a7b8857bf2581fec3dea3dfd69329d09294a0db3449bd8ad99e3961c9c",
+    "environment_identity": "eeeb4932c53dd75e9bdfb9e19f67586c513cdacc29a4566773770da3aafabbbf",
+    "key": "8b1bfd55076bb0332b05153bc3f26ce545db8b1e96e10675da4c209b6e365b50",
+    "launch": null,
+    "prepared_at": "2026-11-09T05:20:18.703923+00:00",
+    "recipe": {
+      "argv": [
+        "python3",
+        ".skill-tree/tests/test-plugin-processing.py"
+      ],
+      "input_paths": [
+        ".skill-tree/config/repository.json"
+      ],
+      "lane": "unit",
+      "qualification": "owner-declared static recipe; runner unqualified"
+    },
+    "sources": {
+      ".skill-tree/common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+      ".skill-tree/common/references/future-workflow.md": "265a074c72aa661bd753af30df17a538ed487adbded5da0981fce064c28cf437",
+      ".skill-tree/common/references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
+      ".skill-tree/common/references/workflow-metadata.md": "109cd0c393c7fc4fa28c8c7b10c46d12abad7f9a4988b6040f036e82fbdf451f",
+      ".skill-tree/common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+      ".skill-tree/common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+      ".skill-tree/common/scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",
+      ".skill-tree/common/scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",
+      ".skill-tree/common/scripts/plugin-processing.py": "5e9553aac0d574da61f47b83b335c5a898e24407e78baaf7f20cc729dc8403e4",
+      ".skill-tree/common/scripts/pr-review-state.py": "6bfb09e0273a6322c86c5f5915e8dc0503fa22416881c499c281c1dec570a3d1",
+      ".skill-tree/common/scripts/run-workspaces.py": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+      ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+      ".skill-tree/common/scripts/workflow-state.py": "43479b8fc409a0910051f5cecd976c9e9b475b153fa489411138047a58385d79",
+      ".skill-tree/config/plugins/task-editorial.json": "55abff9aeba98b670afce9d7a783c7d0b497a657cc32e8fea974a1eeb648aa2e",
+      ".skill-tree/config/plugins/task-interview.json": "77b654102b28e33161c4cce8e1aec76c33ece2a93468203e5a2b5c9affc0a8a1",
+      ".skill-tree/config/resource-map.json": "9c82335ce439247fbfc56c50c817cdaf7a9b68901dbe69b4180f9081f1ada13f",
+      ".skill-tree/documents/implementation-plan.md": "61dc2c6e2974b003a6b83bbd31299600f900f9a03f7f1d23bba8707ad3457b90",
+      ".skill-tree/documents/plugin-management-contract.md": "dd9ee48ee9a3f64af0aebd475192637ff2e44e80fea9a5344a47c4d810451627",
+      ".skill-tree/documents/plugin-system-contract.md": "a50a26f11f3a839570d46588673be02ea86fe37a083bb14d8278bb8645f72634",
+      ".skill-tree/documents/plugin-system-research.md": "afc16dc346548ddc378df6671d12392b57ea5dbdc38be13807fc1a1cd5f33fd3",
+      ".skill-tree/documents/plugin-workflow-decisions.md": "ec64b261ef43c7e02a972f8d01ebed198e368f079869e96023b79718e7e50ed2",
+      ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+      ".skill-tree/lib/installation.js": "efb88bc5a28246aab36c7d1cb709f5ec4fb37dc736867c3533503e74c26fa431",
+      ".skill-tree/lib/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
+      ".skill-tree/lib/plugin-composition.js": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d",
+      ".skill-tree/lib/plugin-lifecycle.js": "05f1604a464385532cdda5d1b729c6286aac625c2bb279495b44b30155fc4e9e",
+      ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+      ".skill-tree/lib/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+      ".skill-tree/lib/plugin-runtime.js": "e704dce8f8019baae4f783bce8c6f5fdf5dfaf7961760ecad33ce3ab919b4338",
+      ".skill-tree/lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+      ".skill-tree/templates/operations.json": "a88e76b268463c68b692aef2dead95d84e7fc1ddd6ccc31f8ed831178c05ab8b",
+      ".skill-tree/tests/fixtures/task-processing": "5602b601dc1004f69548558350d377efb44636a92d70f85fb7495380f6cc52e5",
+      ".skill-tree/tests/test-orchestration-adapters.py": "2e1daa5f407445459068ec0af110c6be4995cd525b7ce02e32e69d20f3aeb26f",
+      ".skill-tree/tests/test-plugin-invocation-installation.js": "fa16b6af4ae637415100fa2e0c3dcfeb9a7f392e168f61980ecd3c8fc84e1495",
+      ".skill-tree/tests/test-plugin-processing-installation.js": "edbd51b427d21d63c7410109371a6e81ebc497e87934010042f44ea0ec69fe94",
+      ".skill-tree/tests/test-plugin-processing.py": "d5787918de1f09f358e0115a8d15e5d1cee51afb57d53683647fa9906dc4d04e",
+      ".skill-tree/tests/test-plugin-workflow.py": "a7ae1a514938920070a4c6a936d43fcac5d772168c3d9d40005dfe91ccaff44b",
+      ".skill-tree/tests/test-task-clarification.py": "ff37056815b463d4188ba9ca616d4ea2a35b6978afc162884b57ea0d0c7ab7c5"
+    }
+  },
+  "check_id": "interview-loop-regressions",
+  "cleanup": {
+    "observed_live_processes": 0,
+    "process_group": 67303
+  },
+  "disposition": "cancelled-no-result",
+  "kind": "interrupted-stale-check-reconciliation",
+  "observed_current_key": "61a2737ecfdc03b1e6703f8de42b36deeb6adab59520baca0bb7cdb966c520e1",
+  "original_red_attempt_id": "C-430105db-7fea-4500-b3eb-fdb35e09ffdc",
+  "reason": "Stopped the original unit runner after independent review identified source changes required before qualification. The prepared source identity no longer matches.",
+  "recorded_at": "2026-11-09T05:28:01.604801+00:00",
+  "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+  "schema": 1,
+  "task_id": "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69"
+}

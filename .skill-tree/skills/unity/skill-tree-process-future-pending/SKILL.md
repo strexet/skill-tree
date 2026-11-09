@@ -1,6 +1,6 @@
 ---
 name: skill-tree-process-future-pending
-description: "[unity] Research Pending tasks selected by IDs or exact names and produce Ready prioritized tasks with provenance. No selection processes the Pending Queue."
+description: "[unity] Research Pending tasks selected by IDs or exact names and produce researched prioritized tasks with provenance. No selection processes the Pending Queue."
 license: MIT
 ---
 
@@ -19,6 +19,8 @@ Generated prose follows [document rules](references/document-rules.md). No unrel
 Before promotion, the decision frame uses the real selected Pending IDs. Source-backed in-scope decisions can use Auto; unresolved owner intent remains Pending. The standalone next-action selection still requires an actual developer instruction, while an explicitly launched controller retains the frozen automatic-selection scope.
 
 Read the [plugin binding and invocation boundaries](references/plugin-invocation.md) and local ordered manifest before routing. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Configured matching occurrences use scripts/workflow-state.py hook-start and hook-next at the actual before, during, after or registered named boundary. Follow the guarded prepare/invoke/record/accept sequence with an actual isolated host actor; scripts/plugin-hooks.js supplies owned preparation and private delivery data rather than native execution. Incorporate contributions through the ordinary authorized core workflow before the next occurrence. Returned results and completed chains never replace final current core acceptance or checks. Reconcile original pending attempts before retry or cancellation; source/configuration/context/policy drift retains prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent.
+
+Read [post-processing task applications](references/future-workflow.md#post-processing-task-applications) for the after boundary. Processing creates the visible blocked task and the shared clarification session together when a matching task-editorial or task-interview application applies. Generic-only hooks retain the ordinary invocation and readiness workflow. Use the recorded session, event and configured order. Complete current contributions, affected wording rechecks and final mode-specific acceptance before Ready.
 
 Prefer deterministic logic and UTF EditMode assertions. Focused PlayMode fixtures cover lifecycle, frames, physics and coroutines. Preserve serialized identity and pinned packages. Verify exact Editor ownership, save/service isolation, authorization, deadlines and cleanup before execution. Player builds, device runs and external services require matching scope. Read [Unity safety](references/unity-safety.md). Read [Unity development](references/unity-development.md) for test seams, lane selection and lifecycle cleanup.
 

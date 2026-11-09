@@ -1,0 +1,207 @@
+{
+  "schema": 1,
+  "record_kind": "pinned-upstream-source-fixture",
+  "task_id": "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+  "repository": "mattpocock/skills",
+  "revision": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+  "acquired_at": "2026-11-06T17:04:52.742720+00:00",
+  "acquisition": "GitHub connector fetch_file encoding=base64 at exact immutable ref. Original bytes decoded without newline, Unicode or frontmatter transformation.",
+  "commit_verification": {
+    "sha": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "tree_sha": "a73b182b5f22565e829e0969eb0bfd284508a7b8",
+    "committer_date": "2026-10-31T14:23:30Z",
+    "api_url": "https://api.github.com/repos/mattpocock/skills/git/commits/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "source_url": "https://github.com/mattpocock/skills/commit/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+  },
+  "files": [
+    {
+      "path": "skills/productivity/writing-for-agents/SKILL.md",
+      "bytes": 10886,
+      "git_blob_sha1": "a37608daf6e835e767deecfb498facecaaba82ba",
+      "sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+      "github_api_blob_sha1": "a37608daf6e835e767deecfb498facecaaba82ba",
+      "source_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/writing-for-agents/SKILL.md",
+      "market_entry_blob_match": true,
+      "role": "required_instruction_or_license_closure"
+    },
+    {
+      "path": "skills/productivity/writing-for-agents/SKILL-MECHANICS.md",
+      "bytes": 2629,
+      "git_blob_sha1": "9cdbdb22aadc438755392216e75ad9a14cc9832e",
+      "sha256": "c768e6307c7c10728c401c213f2c4ba71c542127eeb7ad2956aabd15a0fa0059",
+      "github_api_blob_sha1": "9cdbdb22aadc438755392216e75ad9a14cc9832e",
+      "source_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/writing-for-agents/SKILL-MECHANICS.md",
+      "market_entry_blob_match": "No prior market entry hash recorded for this supporting resource.",
+      "role": "required_instruction_or_license_closure"
+    },
+    {
+      "path": "skills/productivity/grill-me/SKILL.md",
+      "bytes": 157,
+      "git_blob_sha1": "3947ff9c4ad980d14fc07fccbf659d47c114e81d",
+      "sha256": "caaf8b8de1684f96e26b28f3c29189db5c89cce4b73e1c93d86164f66ef88637",
+      "github_api_blob_sha1": "3947ff9c4ad980d14fc07fccbf659d47c114e81d",
+      "source_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/grill-me/SKILL.md",
+      "market_entry_blob_match": true,
+      "role": "required_instruction_or_license_closure"
+    },
+    {
+      "path": "skills/productivity/grilling/SKILL.md",
+      "bytes": 2077,
+      "git_blob_sha1": "d2f09a18e6a6c65c55f1271ba08dfeaf06f0bed3",
+      "sha256": "a146842ed93ca43d833550fa9adf02e58cb63c83fea9d4b4522995b82242d4e2",
+      "github_api_blob_sha1": "d2f09a18e6a6c65c55f1271ba08dfeaf06f0bed3",
+      "source_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/grilling/SKILL.md",
+      "market_entry_blob_match": true,
+      "role": "required_instruction_or_license_closure"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1068,
+      "git_blob_sha1": "f1dd2c09108dde1a5f56097cee8461b3ea834499",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "github_api_blob_sha1": "f1dd2c09108dde1a5f56097cee8461b3ea834499",
+      "source_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/LICENSE",
+      "market_entry_blob_match": "No prior market entry hash recorded for this supporting resource.",
+      "role": "required_instruction_or_license_closure"
+    },
+    {
+      "path": "skills/productivity/writing-for-agents/agents/openai.yaml",
+      "bytes": 102,
+      "git_blob_sha1": "079c933b75743dec18b5d0c01006def20b6aad26",
+      "sha256": "eacb24b2a618cfb81dacb0416f4fdd75ddf3a8060f8ddb99aae1b1e301907e4b",
+      "source_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/writing-for-agents/agents/openai.yaml",
+      "role": "adjacent_optional_host_metadata_not_loaded_as_instruction_dependency"
+    },
+    {
+      "path": "skills/productivity/grill-me/agents/openai.yaml",
+      "bytes": 137,
+      "git_blob_sha1": "4d6fb0c746c5d21364dce5d0cf8c51eab9712e7b",
+      "sha256": "c061e39c3e0f9d865fb1b97556d485704af2a8a58f4b8221a8917a5c2074a32b",
+      "source_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/grill-me/agents/openai.yaml",
+      "role": "adjacent_optional_host_metadata_not_loaded_as_instruction_dependency"
+    },
+    {
+      "path": "skills/productivity/grilling/agents/openai.yaml",
+      "bytes": 113,
+      "git_blob_sha1": "ddbdb96139c0c1dfe6bca698f39d0465674b8a39",
+      "sha256": "1411d7df7d99b7e621a1ff8283c8133cc2464be63d064e52d8ce169c6800ee9b",
+      "source_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/grilling/agents/openai.yaml",
+      "role": "adjacent_optional_host_metadata_not_loaded_as_instruction_dependency"
+    }
+  ],
+  "required_closure_file_count": 5,
+  "adjacent_host_metadata_file_count": 3,
+  "source_closures": {
+    "task-editorial": {
+      "entry": "skills/productivity/writing-for-agents/SKILL.md",
+      "files": [
+        "LICENSE",
+        "skills/productivity/writing-for-agents/SKILL-MECHANICS.md",
+        "skills/productivity/writing-for-agents/SKILL.md"
+      ],
+      "expected_digests": {
+        "LICENSE": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+        "skills/productivity/writing-for-agents/SKILL-MECHANICS.md": "c768e6307c7c10728c401c213f2c4ba71c542127eeb7ad2956aabd15a0fa0059",
+        "skills/productivity/writing-for-agents/SKILL.md": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a"
+      },
+      "source_content_digest": "a07c7cf13cd8f42c869d7fb261ce2576339749eb5fead2433d98beb3be73d30f",
+      "content_digest_format": "SHA256(JSON.stringify({entry,digests})) with repository-relative digest keys sorted."
+    },
+    "task-interview": {
+      "entry": "skills/productivity/grill-me/SKILL.md",
+      "files": [
+        "LICENSE",
+        "skills/productivity/grill-me/SKILL.md",
+        "skills/productivity/grilling/SKILL.md"
+      ],
+      "expected_digests": {
+        "LICENSE": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+        "skills/productivity/grill-me/SKILL.md": "caaf8b8de1684f96e26b28f3c29189db5c89cce4b73e1c93d86164f66ef88637",
+        "skills/productivity/grilling/SKILL.md": "a146842ed93ca43d833550fa9adf02e58cb63c83fea9d4b4522995b82242d4e2"
+      },
+      "source_content_digest": "a00d066087e3df89e6211c6fc04371969be8130b394966a28e302e33779cc341",
+      "content_digest_format": "SHA256(JSON.stringify({entry,digests})) with repository-relative digest keys sorted."
+    },
+    "grilling-protocol-if-independently-packaged": {
+      "entry": "skills/productivity/grilling/SKILL.md",
+      "files": [
+        "LICENSE",
+        "skills/productivity/grilling/SKILL.md"
+      ],
+      "expected_digests": {
+        "LICENSE": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+        "skills/productivity/grilling/SKILL.md": "a146842ed93ca43d833550fa9adf02e58cb63c83fea9d4b4522995b82242d4e2"
+      },
+      "source_content_digest": "a8420051be452913759f8e79ed60373c27cacb47800fd50db6eabfb666143553",
+      "content_digest_format": "SHA256(JSON.stringify({entry,digests})) with repository-relative digest keys sorted."
+    }
+  },
+  "reference_edges": [
+    {
+      "from": "skills/productivity/writing-for-agents/SKILL.md",
+      "to": "skills/productivity/writing-for-agents/SKILL-MECHANICS.md",
+      "kind": "relative_markdown_reference",
+      "lines": [
+        8,
+        59
+      ]
+    },
+    {
+      "from": "skills/productivity/writing-for-agents/SKILL-MECHANICS.md",
+      "to": "skills/productivity/writing-for-agents/SKILL.md",
+      "kind": "relative_markdown_reference",
+      "lines": [
+        3
+      ]
+    },
+    {
+      "from": "skills/productivity/grill-me/SKILL.md",
+      "to": "skills/productivity/grilling/SKILL.md",
+      "kind": "explicit_native_Skill_tool_name_dependency_not_a_markdown_link",
+      "lines": [
+        7
+      ],
+      "resolution": "The original entry says to invoke grilling with the Skill tool; a standalone source closure must explicitly declare the sibling path."
+    }
+  ],
+  "host_metadata_facts": {
+    "writing-for-agents": {
+      "path": "skills/productivity/writing-for-agents/agents/openai.yaml",
+      "facts": [
+        "OpenAI interface display_name and short_description only. No tool/dependency declaration in this file."
+      ]
+    },
+    "grill-me": {
+      "path": "skills/productivity/grill-me/agents/openai.yaml",
+      "facts": [
+        "OpenAI interface display_name and short_description.",
+        "policy.allow_implicit_invocation is false; SKILL.md independently contains disable-model-invocation: true."
+      ]
+    },
+    "grilling": {
+      "path": "skills/productivity/grilling/agents/openai.yaml",
+      "facts": [
+        "OpenAI interface display_name and short_description only. No tool/dependency declaration in this file."
+      ]
+    }
+  },
+  "closure_limits": [
+    "The three inspected instruction directories contain agents/openai.yaml metadata. All three original metadata files are preserved separately as adjacent host declarations; no instruction entry links or loads them as a required instruction dependency.",
+    "AGENTS.md, CLAUDE.md, package.json, --help and other environment examples in the writing reference describe target-context lookups; they are not bundled sibling dependencies.",
+    "The mechanics resource links back to the same writing SKILL.md. The cycle contains two inspected files and introduces no further resource.",
+    "No scripts, executable helpers, remote services or dependency installations are required by the inspected instruction text. The grill-me wrapper separately requires the native Skill tool, and grilling conditionally requires fresh factual subagents.",
+    "Root MIT license evidence does not verify redistribution packaging, host invocation or candidate efficacy."
+  ],
+  "descriptor_paths": [
+    ".skill-tree/config/plugins/task-editorial.json",
+    ".skill-tree/config/plugins/task-interview.json"
+  ],
+  "evidence_boundary": {
+    "source_identity_verified": true,
+    "candidate_entry_market_matches": 3,
+    "upstream_bytes_transformed": false,
+    "candidate_or_upstream_execution_during_acquisition": false,
+    "native_skill_invocation_during_acquisition": false,
+    "qualification": "Source identity, closure, license and original host declarations. Fixture copying and descriptor metadata supply no actual adapter invocation or comparative efficacy evidence."
+  }
+}

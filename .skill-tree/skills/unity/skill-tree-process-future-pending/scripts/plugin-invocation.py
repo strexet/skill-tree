@@ -301,6 +301,11 @@ def next_action(store,chain_id,*,proof=None):
     except InvocationError as error:return {**base,'action':'prerequisite','prerequisites':[{'code':'stale-preparation','reason':str(error)}]}
     held=applicable_prerequisites(chain,proof)
     if held:return {**base,'action':'prerequisite','prerequisites':held}
+    if chain['context'].get('processing_recheck_id'):
+        selected={row['id'] for row in proof['bindings']}
+        binding=next((row['id'] for row in chain['configuration']['bindings'][chain['cursor']:] if row['enabled'] and row['id'] in selected),None)
+        if binding is None:return {**base,'action':'advance-unselected'}
+        return {**base,'action':'prepare','binding_id':binding}
     return {**base,'action':'prepare','binding_id':chain['configuration']['bindings'][chain['cursor']]['id']}
 
 
@@ -323,6 +328,55 @@ def invocation_policy(package):
     require('instructions' not in value or isinstance(value['instructions'],str),'Immutable invocation policy instructions must be text')
     require(all(item=='return-proposals' for item in value['allowed_actions']),'Report-only invocations cannot authorize writes or publication')
     return clone(value)
+
+
+def processing_application(configuration, row):
+    """Resolve the application from the frozen package and binding."""
+    package=configuration['packages'][row['plugin_id']]
+    adaptation=package.get('adaptation', {})
+    require(isinstance(adaptation,dict),'Processing package adaptation requires a structured declaration')
+    if 'processing_application' not in adaptation:
+        require('application' not in row,'The selected Processing binding has no application declaration')
+        return None
+    declaration=adaptation['processing_application']
+    require(isinstance(declaration,dict) and type(declaration.get('schema')) is int and declaration['schema']==1,
+            'A Processing application requires a schema-one declaration')
+    roles=declaration.get('roles')
+    require(isinstance(roles,list) and roles
+            and all(isinstance(role,str) and role in {'task-editorial','task-interview'} for role in roles)
+            and len(set(roles))==len(roles),'The Processing application roles are invalid')
+    role=declaration.get('default_role')
+    require('default_role' not in declaration or role in roles,'The default Processing application role is invalid')
+    require('instructions' not in declaration or isinstance(declaration['instructions'],str),
+            'Processing application instructions require text')
+    if 'application' in row:
+        setting=row['application']
+        require(isinstance(setting,dict) and set(setting)=={'role'} and setting['role'] in roles,
+                'The selected Processing application role is unsupported')
+        role=setting['role']
+    if role is None:
+        return None
+    return {'role':role,**({'instructions':declaration['instructions']} if 'instructions' in declaration else {})}
+
+
+def sealed_processing_application(chain,row,proof):
+    event=chain['event']
+    operation='skill-tree-process-future-pending'
+    boundary=operation+':after'
+    location=row.get('location')
+    after=event['operation']==operation and (event['anchor']=='after'
+            or event.get('boundary_id')==boundary or isinstance(location,dict) and location.get('boundary_id')==boundary)
+    application=processing_application(chain['configuration'],row) if after else None
+    observed=proof.get('processing_applications',{})
+    require(isinstance(observed,dict) and observed.get(row['id'])==application
+            and (application is not None or row['id'] not in observed),
+            'The owned proof differs from the frozen Processing application')
+    if application is not None:
+        policy=chain['configuration'].get('execution_policy')
+        require(isinstance(policy,dict) and isinstance(policy.get('allowed_actions'),list)
+                and all(action=='return-proposals' for action in policy['allowed_actions']),
+                'Processing applications may only return proposals')
+    return application
 
 
 def review_frontier(attempt,proof):
@@ -366,6 +420,8 @@ def prepare(chain,payload,proof):
     sealed={'chain_id':chain['id'],'attempt_id':original,'binding_id':row['id'],'index':chain['cursor'],'event':clone(chain['event']),'context':clone(chain['context']),'configuration_digest':chain['configuration']['configuration_digest'],'mode':chain['mode'],'epoch':chain['epoch'],'execution_snapshot_digest':digest(chain['execution_snapshot']),'authority_digest':digest(chain['authority']),'authority':clone(chain['authority']),'scope_source_snapshot':scope_snapshot(proof.get('scope_source_snapshot',{})),'package_identity':package,'parameters':clone(row['effective']['values']),'extra_instructions':row['effective']['instructions'],'parameter_digest':row['effective']['digest'],'lineage':lineage}
     if 'execution_policy' in chain['configuration']:sealed['execution_policy']=clone(chain['configuration']['execution_policy'])
     if policy:sealed['invocation_policy']=policy
+    application=sealed_processing_application(chain,row,proof)
+    if application is not None:sealed['processing_application']=application
     frontier=proof.get('guard') or {}
     if frontier.get('publication_id'):sealed['review_frontier']={key:clone(frontier.get(key)) for key in ['publication_id','phase','core_review_key','core_review_digest']}
     attempt={'id':original,'index':chain['cursor'],'binding_id':row['id'],'status':'prepared','actor':who,'creation_evidence':created,'invoke_evidence':None,'result_evidence':None,'input':sealed,'input_digest':digest(sealed),'delivery_digest':None,'resolved_parameter_digest':None,'result':None}
@@ -407,6 +463,10 @@ def mutate(store,command,payload,*,proof=None,verify_transition=None,guard=None)
             for key in ['input_digest','delivery_digest','resolved_parameter_digest']:
                 if key in result:require(result[key]==attempt[key],'Returned output acknowledges another invocation input')
             require(not any(result.get(key) for key in ['real_human','human_approved','native_skill_called','native_tool_called']) and result.get('mechanism','source-backed-context')=='source-backed-context','Source-backed results cannot invent human approval or native Skill execution')
+            if attempt['input'].get('processing_application') is not None and result['status'] in {'passed','findings','questions'}:
+                for key in ('findings','questions'):
+                    items=result.get(key,[])
+                    require(isinstance(items,list) and bool(items)==(result['status']==key) and all(isinstance(item,dict) for item in items),'A processing report requires the structured payload matching its result status')
             if attempt['input'].get('invocation_policy') is not None:
                 if attempt['input']['invocation_policy'].get('kind')=='report-only' and attempt['input']['context'].get('kind')=='review' and attempt['input']['context'].get('publication_id') and result['status'] in {'passed','findings','questions'}:
                     require(all(not result.get(key) or result['status']==key for key in ['findings','questions']),'A report-only review result outcome must match every nonempty reserved findings or questions payload')

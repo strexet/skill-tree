@@ -1,0 +1,41 @@
+{
+  "actual_lane": "static",
+  "attempt_id": "C-f46f928a-9880-45c6-bd58-756f45433829",
+  "check_id": "decision-actual-actors",
+  "current_unit_checks": [
+    {
+      "attempt_id": "C-e6544e0b-0d5f-4428-b440-61444078a321",
+      "check_id": "decision-orchestration-unit",
+      "passed": 30
+    },
+    {
+      "attempt_id": "C-9c09bef3-ae3f-4cc6-8a91-532843eda5bf",
+      "check_id": "decision-core-standalone",
+      "passed": 3
+    },
+    {
+      "attempt_id": "C-dbbb341b-313f-413e-960d-5a8ef3ee7914",
+      "check_id": "decision-observation-oracle",
+      "passed": 10
+    },
+    {
+      "attempt_id": "C-cdd87a57-a48d-4fb6-a491-420547db51a1",
+      "check_id": "decision-parent-adapters",
+      "passed": 6
+    }
+  ],
+  "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+  "format": "skill-tree-current-static-composite-check",
+  "fresh_native_roles": false,
+  "historical_native_source_rejection_retained": true,
+  "metadata_written": false,
+  "proposal_sha256": "4800671fe448f09f602686314361418048b0d3de41a3f27acfa7aef380bf9004",
+  "result": "pass",
+  "schema": 1,
+  "scope": "Conditional current static core request-role compatibility plus immutable historical observations; no fresh native role grade, new consent or publication authority.",
+  "source_analysis": ".skill-tree/artifacts/plugin-implementation/core127-after-ponytail116-readonly-analysis.json",
+  "source_commit": "6725b379f6a8af018a203bed2c7c6a7448cd575f",
+  "source_freeze_checked_paths": 249,
+  "task_id": "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda",
+  "wrapper_sha256": "3d102b246ac1502a6d8dc8cbfeb6543c31af63128f751060b501b65c05612fec"
+}

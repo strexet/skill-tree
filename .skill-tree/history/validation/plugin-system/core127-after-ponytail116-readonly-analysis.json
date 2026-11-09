@@ -1,0 +1,135 @@
+{
+  "format": "skill-tree-independent-core127-readonly-compatibility",
+  "frozen_paths_verified": 249,
+  "immutable_actual_artifacts": {
+    ".skill-tree/history/validation/plugin-system/core127-native/capture.json": "65475548db6a70be601c337dd89ae6c7bddf545e0017eac053865ff8dc7e70b8",
+    ".skill-tree/history/validation/plugin-system/core127-native/grade.json": "19051bb3ebbde34778178ab8143791a90518cd78bcc54e2b2453ae03de16c95c",
+    ".skill-tree/history/validation/plugin-system/core127-native/qualification.json": "bb9feadfef705d7d50ca60b3463b4dc3247eebd1f2ad5fc790791867f75586a9",
+    ".skill-tree/history/validation/plugin-system/core127-native/report.json": "56f43d1e35d3d5381b0866f026c4517ce90017153faf703c5604b12656c5be99"
+  },
+  "mismatches": [],
+  "reasoning": [
+    "Historical core127 contexts are request-only research frames; no task, Pending, run, clarification session or HC admission enters the captured role path.",
+    "DG/DO modules and reached WF/Store/owned-loader methods are unchanged from the reviewed managed-guard baseline. Store lock/commit admission bookkeeping starts empty for this path; no added PR hook can register an obligation. Loader acceptance still requires exact current owned package inventory rather than a source fallback.",
+    "Current source/profile/catalog/opaque execution hashes differ from original observations. Historical role captures remain historical; no wire/full-source equivalence or current-native grading is asserted.",
+    "Core request-role compatibility is bounded; task/PR/plugin application paths require their separate current deterministic evidence."
+  ],
+  "remaining_conditions": [
+    "Explicit controller selection of completed core127 revalidation; no active state alone grants continuation.",
+    "Fresh selected unit/standalone/parent/oracle receipts on the exact current source footprint.",
+    "Wrapper/proposal binds actual prepared static attempt, exact current profile/activation and all immutable evidence before execution."
+  ],
+  "reviewed_proposal": ".skill-tree/artifacts/plugin-implementation/core127-after-ponytail116-static-proposal.json",
+  "reviewed_proposal_sha256": "2bb68612ff53747e20860860050bf229ac7ee91a2b642347536d1af9a964ff15",
+  "schema": 1,
+  "selected_closure": {
+    "Store.__init__": {
+      "current_ast_sha256": "ee7b380e33094b42d3b05b175966ecf827a402208d00988285c19a836b55c8ec",
+      "identical_to57": true
+    },
+    "Store.commit": {
+      "current_ast_sha256": "bf048ed1092412383eff06f1f774e01baa50e88b8f01c7bcf0606e4698796f90",
+      "identical_to57": true
+    },
+    "Store.guard": {
+      "current_ast_sha256": "f8977c7d46bac3b5ca1349304e45197a2eb66b05727c1c6ce2d7a33f5c0c1c71",
+      "identical_to57": true
+    },
+    "Store.load": {
+      "current_ast_sha256": "83470c2be086353d8e60e8be333d11993586364274f13d315408d5407f0b7cca",
+      "identical_to57": true
+    },
+    "Store.lock": {
+      "current_ast_sha256": "f4da8bf5775487f21bb8c5c71aab7ee3aeea35b74db04d7518719d73c658a8b6",
+      "identical_to57": true
+    },
+    "Store.owned": {
+      "current_ast_sha256": "b9da6caf8c2efe4737bbc00c088ce20c982d3269f53c0a156f9277abb6b924f8",
+      "identical_to57": true
+    },
+    "Store.recover": {
+      "current_ast_sha256": "48e9cbc080c7ab6677533a80b4dbb08bae36c695e5d54ac6d3ba705b0f4e13cd",
+      "identical_to57": true
+    },
+    "Store.replace": {
+      "current_ast_sha256": "d3722f276bd0134e1d3c077b390d35dac86879d7c6e56fb8757891a40dc59e7a",
+      "identical_to57": true
+    },
+    "decision_action": {
+      "current_ast_sha256": "7732aef60ec38d1f2a553f052320da1402000957d470d77203ae0a99e05a25ec",
+      "identical_to57": true
+    },
+    "decision_context_guard": {
+      "current_ast_sha256": "79e9fe2e4d19543df677a2f2d1f6aba6a39b9de28474d58cfcb1d1236232aeb3",
+      "identical_to57": true
+    },
+    "decision_helper": {
+      "current_ast_sha256": "50dcb35f533debda5040372926b93b591e314f3dba585316f3b72e9e6aa9ed83",
+      "identical_to57": true
+    },
+    "main": {
+      "current_ast_sha256": "d6c400d26c0691ee2254f2e4e8fa0d65f3d72614695ca5b1a54993a89e15706a",
+      "identical_to57": true
+    },
+    "orchestration_action": {
+      "current_ast_sha256": "869346563d36ed4af16b648df1979f4c93acb9b2725b15576329f0e52c5bc328",
+      "identical_to57": true
+    },
+    "orchestration_execution_snapshot": {
+      "current_ast_sha256": "24fe42da31a5261376caefb9e20a1d450dc457732e2dbaa8c5697288231d0e3b",
+      "identical_to57": true
+    },
+    "owned_module": {
+      "current_ast_sha256": "0167b7a9cebc88069087d40587abb0845da1bad81b90129beba7b273548813bb",
+      "identical_to57": true
+    }
+  },
+  "source_commit": "6725b379f6a8af018a203bed2c7c6a7448cd575f",
+  "source_freeze": {
+    "path": ".skill-tree/history/validation/plugin-system/ponytail116-source-freeze3.json",
+    "sha256": "0b4725def129fa03efa04d8a223ba01b73823244cb9318137e5ad79c839ae5f2"
+  },
+  "source_modules": {
+    "common/references/decision-governance.md": {
+      "matches_prior_proposal": true,
+      "sha256": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3"
+    },
+    "common/references/validation-policy.md": {
+      "matches_prior_proposal": true,
+      "sha256": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7"
+    },
+    "common/scripts/decision-governance.py": {
+      "matches_prior_proposal": true,
+      "sha256": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286"
+    },
+    "common/scripts/decision-orchestration.py": {
+      "matches_prior_proposal": true,
+      "sha256": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145"
+    },
+    "common/scripts/run-workspaces.py": {
+      "matches_prior_proposal": true,
+      "sha256": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb"
+    },
+    "common/scripts/validate-document-rules.py": {
+      "matches_prior_proposal": true,
+      "sha256": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7"
+    }
+  },
+  "strict_observation": ".skill-tree/artifacts/plugin-implementation/core127-after-ponytail116-expected-strict-rejection.json",
+  "verdict": {
+    "conditional_static_compatibility_supported": true,
+    "formal_check_prepared_or_consumed": false,
+    "fresh_current_native_qualification": false
+  },
+  "workflow_delta_from57": {
+    "added": [
+      "_hook_review_frontier"
+    ],
+    "changed": [
+      "_hook_action",
+      "_hook_transition"
+    ],
+    "removed": []
+  },
+  "writes": "Only ignored independent analysis and actual strict-rejection artifacts; no canonical metadata, historical evidence, source or test change."
+}

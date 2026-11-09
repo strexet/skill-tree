@@ -248,7 +248,7 @@ def remove(text,ids):
 
 def rewrite_meta(text,task_id,changes):
     task=resolve(parse(text),[task_id])[0]
-    meta={k:deepcopy(task[k]) for k in FIELDS};meta.update(changes)
+    meta={k:deepcopy(task[k]) for k in FIELDS+OPTIONAL_FIELDS if k in task};meta.update(changes)
     validate_metadata(meta,task['queue'])
     match=re.match(r'^###[^\n]+\n\s*```yaml\n.*?\n```\s*',task['body'],re.S)
     entry=render(task['title'],meta,task['body'][match.end():])
@@ -492,105 +492,140 @@ def capture_foundation(store):
     result=intake(store,{'title':title,'description':gap['reason'],'expected_behavior':gap['recommendation'],'priority':max((t['priority'] for t in tasks),default=100)+1,'priority_reason':'Missing foundational validation requires researched setup before dependent acceptance.'})
     return {'status':'captured','pending_id':result['id'],'priority':result['priority']}
 
+def processing_helper():
+    # The helper shares the workflow API without importing a sibling entry point.
+    from types import SimpleNamespace
+    module=owned_module('skill_tree_processing',Path(__file__).with_name('plugin-processing.py'))
+    module.wf=SimpleNamespace(**globals())
+    return module
+
+
 def process(store,payload):
-    """Apply researched dispositions; receipt scope is explicitly selected first."""
+    """Apply researched dispositions and publish optional holds atomically."""
     proposed=payload.get('dispositions',{})
     due=[tid for tid,row in proposed.items() if isinstance(row,dict) and row.get('status') in {'promoted','resolved'}] if isinstance(proposed,dict) else []
     if due:prepare_hook_admission(store,scope={'kind':'pending','pending_ids':due})
+    specs=payload.get('tasks',[])
+    if not isinstance(specs,list) or any(not isinstance(spec,dict) for spec in specs):
+        raise WorkflowError('Processing tasks require a list of objects')
+    assigned=[spec.get('reuse_id') or identity('T') for spec in specs]
+    pr=identity('PR')
+    application=processing_helper() if specs else None
+    prepared=application.prepare_publication(store,payload,assigned,pr) if application else None
     with store.lock():
-        store.guard(payload.get('expected_source_hash'));text=store.text();tasks=parse(text);state=store.load(text)
-        selected=resolve(tasks,payload.get('selectors',[]),'Pending Queue'); selected_ids={t['id'] for t in selected}
-        dispositions=payload.get('dispositions',{})
-        if set(dispositions)!=selected_ids: raise WorkflowError('Every selected Pending ID requires one disposition')
-        for result in dispositions.values():
-            if result.get('status') not in {'promoted','retained','resolved'} or not result.get('reason'): raise WorkflowError('Processing disposition requires status and reason')
-        for result in dispositions.values():assert_prose(result['reason'])
-        due=[tid for tid,result in dispositions.items() if result.get('status') in {'promoted','resolved'}]
+        store.guard(payload.get('expected_source_hash'))
+        text=store.text();state=store.load(text)
         if due:hook_admission(store,scope={'kind':'pending','pending_ids':due})
-        specs=payload.get('tasks',[])
-        if not isinstance(specs,list) or any(not isinstance(spec,dict) for spec in specs):raise WorkflowError('Processing tasks require a list of objects')
-        # Allocate every identity before resolving forward references; no writes occur until validation succeeds.
-        assigned=[spec.get('reuse_id') or identity('T') for spec in specs];keys={}
-        for spec,task_id in zip(specs,assigned):
-            key=spec.get('key')
-            if key is not None:
-                if not isinstance(key,str) or not re.fullmatch(r'[a-z][a-z0-9-]*',key):raise WorkflowError('Task key requires lowercase kebab-case')
-                if key in keys:raise WorkflowError('Duplicate task key: '+key)
-                keys[key]=task_id
-        def dependencies(spec):
-            values=spec.get('depends_on',[])
-            if not isinstance(values,list):raise WorkflowError('Task dependencies require a list')
-            result=[]
-            for value in values:
-                if isinstance(value,str) and value.startswith('@'):
-                    if value[1:] not in keys:raise WorkflowError('Unknown task key: '+value)
-                    value=keys[value[1:]]
-                if not valid_id(value,'T'):raise WorkflowError('Dependency requires a T- ID or @task-key')
-                if value in result:raise WorkflowError('Duplicate dependency: '+value)
-                result.append(value)
-            return result
-        pr=identity('PR');produced=[];reused=[]; consumed=set();run=state['active_run']
-        for spec,task_id in zip(specs,assigned):
-            parents=spec.get('parent_pending_ids',[])
-            if not parents or not set(parents).issubset(selected_ids): raise WorkflowError('Produced task requires selected Pending provenance')
-            sources=[t for t in selected if t['id'] in parents]
-            contexts={(t['root_task_id'],t['related_task_id'],t['relation']) for t in sources}
-            if len(contexts)!=1: raise WorkflowError('Conflicting task roots/relationships require clarification before merge')
-            root,parent,relation=next(iter(contexts));consumed.update(parents)
-            if any(dispositions[p]['status']!='promoted' for p in parents): raise WorkflowError('Produced task conflicts with Pending disposition')
-            if spec.get('reuse_id'):
-                reused_task=resolve(parse(text),[spec['reuse_id']],'Prioritized Next Changes')[0]
-                if (reused_task['root_task_id'],reused_task['related_task_id'],reused_task['relation'])!=(root or reused_task['id'],parent,relation): raise WorkflowError('Reused task relationship conflicts')
-                merged=list(dict.fromkeys(reused_task['parent_pending_ids']+parents))
-                deps=list(dict.fromkeys(reused_task['depends_on']+dependencies(spec)))
-                text=rewrite_meta(text,reused_task['id'],{'parent_pending_ids':merged,'processing_run_id':pr,'depends_on':deps});reused.append(reused_task['id']); continue
-            assert_prose(spec['title']+'\n'+spec['body'])
-            priority=spec.get('priority',max(t['priority'] for t in sources))
-            meta={'id':task_id,'priority':priority,'status':'Ready','parent_pending_ids':parents,'processing_run_id':pr,'root_task_id':root or task_id,'related_task_id':parent,'relation':relation,'depends_on':dependencies(spec)}
-            meta.update({key:spec[key] for key in OPTIONAL_FIELDS if spec.get(key) is not None})
-            validate_metadata(meta,'Prioritized Next Changes')
-            if any(t['id'] not in parents and normalized(t['title'])==normalized(spec['title']) for t in parse(text)): raise WorkflowError('Duplicate produced title requires explicit reuse')
-            text=insert(text,'Prioritized Next Changes',render(spec['title'],meta,spec['body']));produced.append(task_id)
-        if {p for p in selected_ids if dispositions[p]['status']=='promoted'}!=consumed: raise WorkflowError('Promoted Pending task requires produced or reused task')
-        for source in selected:
-            if dispositions[source['id']]['status']=='retained':
-                old=resolve(parse(text),[source['id']])[0]
-                lines=text.splitlines(keepends=True)
-                body=old['body'].rstrip()+'\n\nProcessing blocker:\n- '+dispositions[source['id']]['reason']+'\n\n'
-                lines[old['start']:old['end']]=[body];text=''.join(lines)
-        # Attach promoted required work to the direct parent before removing intake.
-        updated=parse(text)
+        if application:application.guard_publication(store,payload,prepared)
+        before_text=text;text,receipt=_processing_proposal(store,payload,text,state,assigned,pr)
+        extras={};sessions={}
+        if prepared and prepared['sessions']:
+            text,sessions=application.publish(store,text,state,receipt,prepared)
+            receipt['clarification_sessions']={tid:record['id'] for tid,record in sessions.items()}
+        if application:
+            text,reopened=application.attach_existing_changes(store,before_text,text,receipt,state)
+            extras=application.publication_writes(store,text,sessions,reopened)
+            if reopened:receipt['reopened_clarification_sessions']={tid:record['id'] for tid,record in reopened.items()}
+            run=state['active_run']
+            if run and any(tid in run['admitted_task_ids'] for tid in sessions.keys()|reopened.keys()):
+                run['next_action']='Complete the held post-processing clarification before implementation'
+        store.save(text,state,extras)
+        return receipt
+
+
+def _processing_proposal(store,payload,text,state,assigned,pr):
+    """Build the same prospective output inside and outside the writer."""
+    tasks=parse(text)
+    selected=resolve(tasks,payload.get('selectors',[]),'Pending Queue'); selected_ids={t['id'] for t in selected}
+    dispositions=payload.get('dispositions',{})
+    if set(dispositions)!=selected_ids: raise WorkflowError('Every selected Pending ID requires one disposition')
+    for result in dispositions.values():
+        if result.get('status') not in {'promoted','retained','resolved'} or not result.get('reason'): raise WorkflowError('Processing disposition requires status and reason')
+    for result in dispositions.values():assert_prose(result['reason'])
+    due=[tid for tid,result in dispositions.items() if result.get('status') in {'promoted','resolved'}]
+    specs=payload.get('tasks',[])
+    if not isinstance(specs,list) or any(not isinstance(spec,dict) for spec in specs):raise WorkflowError('Processing tasks require a list of objects')
+    # Allocate every identity before resolving forward references; no writes occur until validation succeeds.
+    keys={}
+    for spec,task_id in zip(specs,assigned):
+        key=spec.get('key')
+        if key is not None:
+            if not isinstance(key,str) or not re.fullmatch(r'[a-z][a-z0-9-]*',key):raise WorkflowError('Task key requires lowercase kebab-case')
+            if key in keys:raise WorkflowError('Duplicate task key: '+key)
+            keys[key]=task_id
+    def dependencies(spec):
+        values=spec.get('depends_on',[])
+        if not isinstance(values,list):raise WorkflowError('Task dependencies require a list')
+        result=[]
+        for value in values:
+            if isinstance(value,str) and value.startswith('@'):
+                if value[1:] not in keys:raise WorkflowError('Unknown task key: '+value)
+                value=keys[value[1:]]
+            if not valid_id(value,'T'):raise WorkflowError('Dependency requires a T- ID or @task-key')
+            if value in result:raise WorkflowError('Duplicate dependency: '+value)
+            result.append(value)
+        return result
+    produced=[];reused=[]; consumed=set();run=state['active_run']
+    for spec,task_id in zip(specs,assigned):
+        parents=spec.get('parent_pending_ids',[])
+        if not parents or not set(parents).issubset(selected_ids): raise WorkflowError('Produced task requires selected Pending provenance')
+        sources=[t for t in selected if t['id'] in parents]
+        contexts={(t['root_task_id'],t['related_task_id'],t['relation']) for t in sources}
+        if len(contexts)!=1: raise WorkflowError('Conflicting task roots/relationships require clarification before merge')
+        root,parent,relation=next(iter(contexts));consumed.update(parents)
+        if any(dispositions[p]['status']!='promoted' for p in parents): raise WorkflowError('Produced task conflicts with Pending disposition')
+        if spec.get('reuse_id'):
+            reused_task=resolve(parse(text),[spec['reuse_id']],'Prioritized Next Changes')[0]
+            if (reused_task['root_task_id'],reused_task['related_task_id'],reused_task['relation'])!=(root or reused_task['id'],parent,relation): raise WorkflowError('Reused task relationship conflicts')
+            merged=list(dict.fromkeys(reused_task['parent_pending_ids']+parents))
+            deps=list(dict.fromkeys(reused_task['depends_on']+dependencies(spec)))
+            text=rewrite_meta(text,reused_task['id'],{'parent_pending_ids':merged,'processing_run_id':pr,'depends_on':deps});reused.append(reused_task['id']); continue
+        assert_prose(spec['title']+'\n'+spec['body'])
+        priority=spec.get('priority',max(t['priority'] for t in sources))
+        meta={'id':task_id,'priority':priority,'status':'Ready','parent_pending_ids':parents,'processing_run_id':pr,'root_task_id':root or task_id,'related_task_id':parent,'relation':relation,'depends_on':dependencies(spec)}
+        meta.update({key:spec[key] for key in OPTIONAL_FIELDS if spec.get(key) is not None})
+        validate_metadata(meta,'Prioritized Next Changes')
+        if any(t['id'] not in parents and normalized(t['title'])==normalized(spec['title']) for t in parse(text)): raise WorkflowError('Duplicate produced title requires explicit reuse')
+        text=insert(text,'Prioritized Next Changes',render(spec['title'],meta,spec['body']));produced.append(task_id)
+    if {p for p in selected_ids if dispositions[p]['status']=='promoted'}!=consumed: raise WorkflowError('Promoted Pending task requires produced or reused task')
+    for source in selected:
+        if dispositions[source['id']]['status']=='retained':
+            old=resolve(parse(text),[source['id']])[0]
+            lines=text.splitlines(keepends=True)
+            body=old['body'].rstrip()+'\n\nProcessing blocker:\n- '+dispositions[source['id']]['reason']+'\n\n'
+            lines[old['start']:old['end']]=[body];text=''.join(lines)
+    # Attach promoted required work to the direct parent before removing intake.
+    updated=parse(text)
+    for tid in produced+reused:
+        child=resolve(updated,[tid])[0]
+        if child['relation'] in {'blocker','subtask'}:
+            parent_task=resolve(parse(text),[child['related_task_id']],'Prioritized Next Changes')[0]
+            text=rewrite_meta(text,parent_task['id'],{'depends_on':list(dict.fromkeys(parent_task['depends_on']+[tid]))})
+        if run:
+            key='required_ids' if child['relation'] in {'blocker','subtask'} else 'deferred_ids'
+            if tid not in run[key]:run[key].append(tid)
+    text=remove(text,{p for p in selected_ids if dispositions[p]['status']!='retained'})
+    completed={o['task_id'] for o in store.outcomes() if o.get('disposition')=='completed'}
+    validate_dependencies(parse(text),completed)
+    receipt={'id':pr,'pending_contexts':{task['id']:{'semantic_fingerprint':digest(clarification_text_semantics(task['body']).encode()),'content_fingerprint':digest(task['body'].encode())} for task in selected},'selected_ids':[t['id'] for t in selected],'created_ids':produced,'reused_ids':reused,'task_keys':keys,'dispositions':dispositions}
+    if run:
+        run['processing_results'].append(receipt)
+        if not run.get('stop_reason'):run['phase']='dependencies';run['next_action']='Select required task'
+        allowed=set(run['admitted_task_ids']);introduced=set();updated=parse(text)
         for tid in produced+reused:
             child=resolve(updated,[tid])[0]
-            if child['relation'] in {'blocker','subtask'}:
-                parent_task=resolve(parse(text),[child['related_task_id']],'Prioritized Next Changes')[0]
-                text=rewrite_meta(text,parent_task['id'],{'depends_on':list(dict.fromkeys(parent_task['depends_on']+[tid]))})
-            if run:
-                key='required_ids' if child['relation'] in {'blocker','subtask'} else 'deferred_ids'
-                if tid not in run[key]:run[key].append(tid)
-        text=remove(text,{p for p in selected_ids if dispositions[p]['status']!='retained'})
-        completed={o['task_id'] for o in store.outcomes() if o.get('disposition')=='completed'}
-        validate_dependencies(parse(text),completed)
-        receipt={'id':pr,'pending_contexts':{task['id']:{'semantic_fingerprint':digest(clarification_text_semantics(task['body']).encode()),'content_fingerprint':digest(task['body'].encode())} for task in selected},'selected_ids':[t['id'] for t in selected],'created_ids':produced,'reused_ids':reused,'task_keys':keys,'dispositions':dispositions}
-        if run:
-            run['processing_results'].append(receipt)
-            if not run.get('stop_reason'):run['phase']='dependencies';run['next_action']='Select required task'
-            allowed=set(run['admitted_task_ids']);introduced=set();updated=parse(text)
-            for tid in produced+reused:
-                child=resolve(updated,[tid])[0]
-                if child['relation'] in {'blocker','subtask'} and child['related_task_id'] in allowed:
-                    introduced.update(dependency_scope(updated,{'snapshot':[tid]}))
-            if dependency_scope(updated,run)-allowed-introduced:raise WorkflowError('Processing cannot admit a dependency outside the captured required scope')
-            run['admitted_task_ids']=sorted(allowed|introduced);run['required_ids']=list(dict.fromkeys(run['required_ids']+sorted(introduced)));run['admitted_groups']=admitted_groups(updated,run)
-            focus=run.get('maintenance')
-            if focus:
-                focused=dependency_scope(updated,focus)
-                if not focused.issubset(set(focus['admitted_task_ids'])|introduced):raise WorkflowError('Processing cannot expand the maintenance scope outside captured required work')
-                for task in updated:
-                    if task['id'] in focused and any(recipe_for(store,check)[0]['lane'] not in {'static','unit'} for check in check_specs(task)):raise WorkflowError('Maintenance descendants require non-product validation')
-                focus['admitted_task_ids']=sorted(focused);focus['required_ids']=sorted(focused)
-        store.save(text,state)
-        return receipt
+            if child['relation'] in {'blocker','subtask'} and child['related_task_id'] in allowed:
+                introduced.update(dependency_scope(updated,{'snapshot':[tid]}))
+        if dependency_scope(updated,run)-allowed-introduced:raise WorkflowError('Processing cannot admit a dependency outside the captured required scope')
+        run['admitted_task_ids']=sorted(allowed|introduced);run['required_ids']=list(dict.fromkeys(run['required_ids']+sorted(introduced)));run['admitted_groups']=admitted_groups(updated,run)
+        focus=run.get('maintenance')
+        if focus:
+            focused=dependency_scope(updated,focus)
+            if not focused.issubset(set(focus['admitted_task_ids'])|introduced):raise WorkflowError('Processing cannot expand the maintenance scope outside captured required work')
+            for task in updated:
+                if task['id'] in focused and any(recipe_for(store,check)[0]['lane'] not in {'static','unit'} for check in check_specs(task)):raise WorkflowError('Maintenance descendants require non-product validation')
+            focus['admitted_task_ids']=sorted(focused);focus['required_ids']=sorted(focused)
+    return text,receipt
 
 def _start_selection(store,mode,selector,workspace,text=None):
     tasks=parse(store.text() if text is None else text);options=workspace or {}
@@ -707,7 +742,10 @@ def next_task(store):
     if pending:return {'phase':'process-required','root_task_id':root,'pending_ids':pending}
     if task.get('completed_contract'):
         return {'phase':'validate','task_id':task['id'],'root_task_id':root,'completed_contract':True,'title':task['title'],'body':task['body'],'checks':check_specs(task)}
-    if task['status']!='Ready':raise WorkflowError('Selected required task has blocking unresolved questions: '+task['id'])
+    if task['status']!='Ready':
+        session=processing_helper().session_for_task(store,task['id'])
+        if session:raise WorkflowError('Selected required task has an open post-processing hold: '+session['id']+' — '+session['next_action'])
+        raise WorkflowError('Selected required task has blocking unresolved questions: '+task['id'])
     clarification_admission(store,task['id'])
     run['admitted_groups']=admitted_groups(tasks,run)
     stage=state['task_progress'].get(task['id'],{}).get('stage')
@@ -1335,6 +1373,7 @@ def begin_task(store,payload):
 def mark_implemented(store,payload):
     with store.lock():
         text=store.text();state=store.load(text);task=resolve(parse(text),[payload['task_id']],'Prioritized Next Changes')[0]
+        if task['status']!='Ready':processing_helper().guard_implementation_progress(store,task)
         entry=state['task_progress'].get(task['id'])
         if not entry or entry['stage']=='blocked':raise WorkflowError('Begin or resume implementation before marking the unit implemented')
         assert_scope(store,state,parse(text),task['id'])
@@ -1344,6 +1383,7 @@ def mark_implemented(store,payload):
 def prepare_check(store,payload):
     with store.lock():
         text=store.text();state=store.load(text);task,check=get_check(store,state,payload);entry=state['task_progress'].get(task['id'])
+        if task.get('status')=='Blocked pending answers':processing_helper().guard_implementation_progress(store,task)
         if task.get('completed_contract') and not entry:entry=state['task_progress'].setdefault(task['id'],{'stage':'awaiting-validation','checks':{},'revalidation':True,'admission':state['active_run']['admission'],'run_id':state['active_run']['id']})
         if not entry or entry['stage']=='blocked':raise WorkflowError('Begin implementation before check preparation')
         assert_scope(store,state,parse(text),task['id'])
@@ -1457,6 +1497,7 @@ def resume_task(store,payload):
 def reuse_check(store,payload):
     with store.lock():
         text=store.text();state=store.load(text);source,source_check=get_check(store,state,{'task_id':payload['from_task_id'],'check_id':payload['from_check_id']});target,target_check=get_check(store,state,payload)
+        if target.get('status')=='Blocked pending answers':processing_helper().guard_implementation_progress(store,target)
         if not state['active_run'] or not source.get('validation_group_id') or source.get('validation_group_id')!=target.get('validation_group_id'):raise WorkflowError('Shared evidence requires an admitted compatible group')
         assert_scope(store,state,parse(text),target['id'])
         records=validate_task_checks(store,source['id'],state,source_check['id']);record=next(item['result'] for item in records if item['check']['id']==source_check['id'])
@@ -1857,6 +1898,11 @@ def _hook_resolution_context(ctx,chain,attempt,purpose):
 
 
 def _hook_transition(store,chain,attempt,receipt,after):
+    if chain['context'].get('session_id'):
+        application=processing_helper()
+        if application.linked(store,chain['context']):
+            if not isinstance(receipt,dict):raise WorkflowError('Use the original registered post-processing contribution')
+            return application.verify_contribution(store,chain,attempt,receipt,after)
     helper=hook_helper()
     if not isinstance(receipt,dict):raise WorkflowError('Hook incorporation requires actual ordinary core transition evidence')
     before=chain['context']
@@ -1965,7 +2011,12 @@ def _hook_action(store,command,payload,*,private_delivery_provider=None,private_
     orchestration_id=payload.get('orchestration_id') or (locator or {}).get('orchestration_id') or ctx.get('orchestration_id')
     if orchestration_id:ctx['orchestration_id']=orchestration_id
     if frame is None and ctx.get('kind')=='review' and payload.get('publication_id'):ctx['publication_id']=payload['publication_id']
-    ctx=actual_hook_context(effective,ctx)
+    application=processing_helper() if ctx.get('session_id') or 'processing_recheck_id' in ctx or 'processing_recheck_digest' in ctx else None
+    session=application.linked(effective,ctx) if application else None
+    if session:application.guard_package(effective,session,package_root)
+    completed_processing=bool(session and frame and frame['state']=='complete' and cmd=='next')
+    ctx=application.readiness_context(effective,session,frame) if completed_processing else actual_hook_context(effective,ctx)
+    if session and frame and not completed_processing:application.check_live(session,frame,ctx)
     run_locator=None
     if ctx.get('run_id'):
         selected=Store(execution_root,ctx['run_id']);selected.load()
@@ -1975,18 +2026,25 @@ def _hook_action(store,command,payload,*,private_delivery_provider=None,private_
     request={'runtime_action':'freeze-chain' if frame is None else 'readiness-plan' if cmd=='next' and frame['state']=='complete' else 'occurrence-plan','project_root':str(execution_root),'event':ev,'context':ctx,'capabilities':deepcopy(payload.get('capabilities',(locator or {}).get('capabilities',[]))),'adapter':deepcopy(payload.get('adapter',(locator or {}).get('adapter',{'provider':'codex','mechanism':'source-backed-context'})))}
     if orchestration_id:request['orchestration_id']=orchestration_id
     if frame is None:
-        request['run_overrides']=deepcopy(payload.get('run_overrides',{}))
-        if 'execution_policy' in payload:request['execution_policy']=deepcopy(payload['execution_policy'])
+        frozen=session['processing_requirements']['configuration'] if session else {}
+        request['run_overrides']=deepcopy(payload.get('run_overrides',frozen.get('run_overrides',{})))
+        if 'execution_policy' in payload or 'execution_policy' in frozen:request['execution_policy']=deepcopy(payload.get('execution_policy',frozen.get('execution_policy')))
+        if session:
+            request['capabilities']=deepcopy(payload.get('capabilities',session['processing_requirements']['capabilities']))
+            request['adapter']=deepcopy(payload.get('adapter',session['processing_requirements']['adapter']))
     else:request['configuration']=configuration
     prepared=_hook_node(package_root,request);proof=prepared['proof'] if frame is None else prepared
+    if session and frame:application.check_snapshot(session,proof['execution_snapshot'])
     if frame is None:
+        if proof['event'].get('boundary_id')==processing_helper().BOUNDARY:processing_scope_guard(effective,ctx,package_root=package_root)
         configuration=prepared['configuration']
+        if session:application.check_start(effective,session,ctx,proof['event'],configuration,proof['execution_snapshot'],payload)
         request_id=payload.get('request_id');existing=False
         if isinstance(request_id,str) and request_id.strip():
             original_id='HC-'+str(uuid.uuid5(uuid.NAMESPACE_URL,'skill-tree-invocation:'+request_id))
             existing=helper.location(store,original_id).exists()
         candidate={'configuration':configuration,'state':'active','cursor':0,'prepared_attempt_id':None,'attempts':{}}
-        if not proof.get('bindings') and not proof.get('unresolved') and not helper.applicable_prerequisites(candidate,proof) and not payload.get('supersedes_chain_id') and not existing:
+        if not session and not proof.get('bindings') and not proof.get('unresolved') and not helper.applicable_prerequisites(candidate,proof) and not payload.get('supersedes_chain_id') and not existing:
             return {'status':'noop','state':'complete','bindings':[]}
     original_source=frame['attempts'].get(payload.get('attempt_id') or frame.get('prepared_attempt_id')) if frame is not None and cmd in {'invoke','record','accept','next'} else None
     scoped_sources=_hook_scope_sources(effective,ctx,original_source)
@@ -2005,11 +2063,29 @@ def _hook_action(store,command,payload,*,private_delivery_provider=None,private_
     if locator is not None and business:
         if watch!=locator['watch']:raise WorkflowError('The frozen hook resource watch changed; explicitly reconcile and resume before adopting a new baseline')
         watch=deepcopy(locator['watch'])
+    if session and business and cmd in {'accept','record'}:
+        original=frame['attempts'].get(payload.get('attempt_id'))
+        result=payload.get('result') if cmd=='record' else (original or {}).get('result')
+        if original and isinstance(result,dict) and result.get('status') in {'passed','findings','questions'}:
+            questions,_=application._question_specs(session,{**original,'result':result})
+            clarification_questions(deepcopy(session),questions)
+    mode=normalized.get('mode',frame['mode'] if frame else 'auto');grant=normalized.get('authority',frame['authority'] if frame else None);executor=normalized.get('executor',frame['executor'] if frame else None)
+    if session and not completed_processing and cmd!='next':
+        _hook_policy_guard(effective,ctx,mode,grant,executor)
+        if session.get('decision_executor') is not None and executor!=session['decision_executor']:
+            raise WorkflowError('Post-processing requires the frozen clarification executor')
+        if frame and business and frame['context'].get('parent_mode_epoch')!=ctx.get('parent_mode_epoch'):
+            raise WorkflowError('Explicitly resume under the current post-processing policy before using an old result')
+    if 'processing_recheck_id' in ctx or 'processing_recheck_digest' in ctx:
+        if processing_recheck_guard(effective,ctx,proof['event'],readiness=completed_processing)!=(proof.get('guard') or {}).get('processing_recheck'):
+            raise WorkflowError('The current owned processing recheck differs from preparation')
     if business:
         helper.guards(frame,normalized)
         helper.proof_check(frame,proof,context_value=ctx if cmd=='accept' else None);helper.require_business_admission(frame,proof)
         _hook_review_frontier(effective,ctx,proof.get('guard') or {})
     if cmd=='invoke':
+        if session and (application.linked(effective,ctx)['session_hash']!=session['session_hash'] or actual_hook_context(effective,ctx)!=ctx):
+            raise WorkflowError('The owned post-processing scope changed before private delivery')
         original=frame['attempts'].get(payload.get('attempt_id'))
         if not original or payload.get('input_digest')!=original['input_digest']:raise WorkflowError('Hook dispatch does not match the original attempt input')
         if original['id']!=frame['prepared_attempt_id'] or original['status']!='prepared':raise WorkflowError('Only the original prepared attempt can begin invocation')
@@ -2025,6 +2101,7 @@ def _hook_action(store,command,payload,*,private_delivery_provider=None,private_
         for key,expected in {'chain_id':frame['id'],'attempt_id':original['id'],'binding_id':original['binding_id'],'context':ctx,'event':proof['event'],'input_digest':original['input_digest'],'mode':frame['mode'],'authority':frame['authority']}.items():
             if private_input.get(key)!=expected:raise WorkflowError('The trusted private delivery differs from the original current invocation')
         if private_input.get('invocation_policy')!=original['input'].get('invocation_policy'):raise WorkflowError('Private delivery differs from the sealed immutable invocation policy')
+        if private_input.get('processing_application')!=original['input'].get('processing_application'):raise WorkflowError('Private delivery differs from the sealed processing application policy')
         for key in ['allowed_tools','allowed_actions']:
             if private_input.get(key)!=original['input'].get('execution_policy',{}).get(key):raise WorkflowError('Private delivery tools or actions differ from the original sealed execution policy')
         proof['delivery']={key:delivery[key] for key in ['input_digest','delivery_digest','resolved_parameter_digest']}
@@ -2032,7 +2109,6 @@ def _hook_action(store,command,payload,*,private_delivery_provider=None,private_
     chain_id=frame['id'] if frame else 'HC-'+str(uuid.uuid5(uuid.NAMESPACE_URL,'skill-tree-invocation:'+normalized.get('request_id','')))
     private_path=_hook_locator_path(effective,chain_id);private_expected=locator['_locator_hash'] if locator else file_hash(private_path)
     private={'schema':1,'chain_id':chain_id,'canonical_root':str(effective.root),'package_root':str(package_root),'execution_root':str(execution_root),'watch':watch,'capabilities':request['capabilities'],'adapter':request['adapter'],'orchestration_id':orchestration_id}
-    mode=normalized.get('mode',frame['mode'] if frame else 'auto');grant=normalized.get('authority',frame['authority'] if frame else None);executor=normalized.get('executor',frame['executor'] if frame else None)
     def guard(current,operation,values):
         _hook_watch_guard(watch,package_root)
         if business:
@@ -2044,6 +2120,17 @@ def _hook_action(store,command,payload,*,private_delivery_provider=None,private_
         elif normalized.get('expected_source_hash') is not None:raise WorkflowError('Hook queue context changed; reread before mutation')
         if actual_hook_context(effective,ctx)!=ctx:raise WorkflowError('The actual selected hook scope changed during preparation')
         frontier=proof.get('guard') or {}
+        if (frame is None or business) and proof['event'].get('boundary_id')==processing_helper().BOUNDARY:processing_scope_guard(effective,ctx,package_root=package_root)
+        if session:
+            latest=application.linked(effective,ctx)
+            application.guard_package(effective,latest,package_root)
+            if latest['session_hash']!=session['session_hash']:raise WorkflowError('Post-processing clarification changed during invocation preparation')
+            if frame is None:application.check_start(effective,latest,ctx,proof['event'],configuration,proof['execution_snapshot'],normalized)
+            else:
+                application.check_live(latest,frame,ctx)
+                application.check_snapshot(latest,proof['execution_snapshot'])
+        if 'processing_recheck_id' in ctx or 'processing_recheck_digest' in ctx:
+            if processing_recheck_guard(effective,ctx,proof['event'])!=frontier.get('processing_recheck'):raise WorkflowError('The owned processing recheck guard changed before commit')
         _hook_review_frontier(effective,ctx,frontier)
         if frontier.get('orchestration_id'):
             core=owned_module('skill_tree_hook_orchestration_guard',Path(__file__).with_name('decision-orchestration.py')).read(effective,frontier['orchestration_id'])
@@ -2057,12 +2144,15 @@ def _hook_action(store,command,payload,*,private_delivery_provider=None,private_
         def commit(self,writes):
             guard(frame or {},cmd,normalized);merged=dict(writes)
             relative_path=private_path.relative_to(effective.root).as_posix();effective.expect_unchanged(relative_path,private_expected);merged[relative_path]=json.dumps(private,sort_keys=True,ensure_ascii=True,indent=2)+'\n'
-            if frame is None:_hook_register(effective,merged,ctx,chain_id)
+            if frame is None:
+                _hook_register(effective,merged,ctx,chain_id)
+                if session:application.register_chain(effective,merged,deepcopy(session),ctx,chain_id,grant,executor)
             effective.commit(merged)
     bound=BoundStore()
     if cmd=='next':
         try:
-            _hook_watch_guard(locator['watch'],locator['package_root']);_hook_policy_guard(effective,ctx,mode,grant,executor)
+            _hook_watch_guard(locator['watch'],locator['package_root'])
+            if not completed_processing:_hook_policy_guard(effective,ctx,mode,grant,executor)
         except WorkflowError as error:return {'chain_id':frame['id'],'state':frame['state'],'cursor':frame['cursor'],'action':'prerequisite','prerequisites':[{'code':'current-hook-inputs','reason':str(error)}]}
         return helper.next_action(bound,frame['id'],proof=proof)
     if frame is None:return helper.start(bound,normalized,proof=proof,verify_supersession=lambda old,new,receipt:_hook_supersession(effective,old,new,receipt),guard=guard)
@@ -2110,12 +2200,15 @@ def _hook_admission_selection(store,scope,chain_ids):
             value='HC-'+path.stem[3:]
             if not valid_id(value,'HC'):raise WorkflowError('Unrecognized hook metadata requires recovery')
             frame=helper.read(store,value)
-            if _hook_scope_matches(frame,scope):selected.append(value)
+            if _hook_scope_matches(frame,scope) and not (frame['context'].get('session_id') and processing_helper().retired_chain(store,frame)):
+                selected.append(value)
     else:
         if not isinstance(chain_ids,list) or len(chain_ids)!=len(set(chain_ids)) or any(not valid_id(item,'HC') for item in chain_ids):raise WorkflowError('Hook admission requires distinct exact chain references')
         selected=list(chain_ids)
     result=[]
     for original in selected:
+        initial=helper.read(store,original)
+        if initial['context'].get('session_id') and processing_helper().retired_chain(store,initial):continue
         current=original;seen=set();lineage=[]
         while True:
             if current in seen:raise WorkflowError('Hook replacement lineage contains a cycle')
@@ -2132,12 +2225,18 @@ def _hook_admission_inputs(store,item,scope):
     helper=hook_helper();frame=helper.read(store,item['chain_id'])
     if frame['state']!='complete':raise WorkflowError('An existing required hook chain remains unfinished: '+frame['id'])
     location=_hook_locator(store,frame['id']);execution=_hook_source_store(store,location['execution_root']);execution._hook_readiness=True;_hook_watch_guard(location['watch'],location['package_root'])
-    actual=deepcopy(scope) if isinstance(scope,dict) and scope.get('kind')=='review' else _hook_admitted_context(execution,frame['context'])
-    if actual!=frame['context']:raise WorkflowError('The completed hook result is stale for the actual current scope')
-    _hook_policy_guard(execution,actual,frame['mode'],frame['authority'],frame['executor'])
+    application=processing_helper() if frame['context'].get('session_id') else None
+    session=application.linked(execution,frame['context']) if application else None
+    if session:
+        actual=application.readiness_context(execution,session,frame)
+    else:
+        actual=deepcopy(scope) if isinstance(scope,dict) and scope.get('kind')=='review' else _hook_admitted_context(execution,frame['context'])
+        if actual!=frame['context']:raise WorkflowError('The completed hook result is stale for the actual current scope')
+        _hook_policy_guard(execution,actual,frame['mode'],frame['authority'],frame['executor'])
     if frame['stages'] and frame['stages'][-1].get('accepted_context')!=actual:raise WorkflowError('The final hook stage does not bind the current accepted context')
     identity={'chain_hash':frame['chain_hash'],'revision':frame['revision'],'locator_hash':location['_locator_hash'],
         'context':actual,'watch':location['watch'],'execution_root':location['execution_root']}
+    if session:identity['processing_session_hash']=session['session_hash']
     return frame,location,identity
 
 
@@ -2189,6 +2288,9 @@ def _hook_admission(store,scope=None,chain_ids=None,*,register=True,navigation_f
             frame=helper.read(store,item['chain_id']);location=_hook_locator(store,frame['id']);_hook_watch_guard(location['watch'],location['package_root'])
             identity={'chain_hash':frame['chain_hash'],'revision':frame['revision'],'locator_hash':location['_locator_hash'],
                 'context':frame['context'],'watch':location['watch'],'execution_root':location['execution_root']}
+            if frame['context'].get('session_id'):
+                session=processing_helper().linked(store,frame['context'])
+                if session:identity['processing_session_hash']=session['session_hash']
         else:frame,location,identity=_hook_admission_inputs(store,item,scope)
         entry=cached['entries'].get(frame['id'])
         if entry is None or entry['identity']!=identity:raise WorkflowError('Current hook readiness identity changed after preflight')
@@ -2278,6 +2380,19 @@ def decision_action(store,command,payload):
     if command not in DECISION_COMMANDS:raise WorkflowError('Unknown decision operation')
     if command=='decision-start':context=payload.get('context',{})
     else:context=payload.get('context') if command=='decision-resume' else helper.read(store,payload.get('decision_id'))['context']
+    cleanup=command=='decision-reconcile'
+    confirmation=None;prepared=None
+    def awaiting_confirmation():
+        parent=clarification_read(store,context['session_id'])
+        if parent['mode']=='required-processing' and parent['state']!='awaiting-confirmation':raise WorkflowError('Post-processing decisions require current clarification readiness before final confirmation')
+        return parent
+    if not cleanup and isinstance(context,dict) and context.get('session_id') and context.get('purpose')=='confirmation':
+        inspected=awaiting_confirmation()
+        if inspected['mode']=='required-processing':
+            confirmation=processing_helper();prepared=confirmation.prepare_release(store,inspected)
+    def scope_guard():
+        decision_context_guard(store,context,allow_stale=cleanup)
+        if confirmation:confirmation.guard_release(store,awaiting_confirmation(),prepared,register=False)
     class BoundStore:
         def __getattr__(self,key):return getattr(store,key)
         def guard(self):
@@ -2288,8 +2403,8 @@ def decision_action(store,command,payload):
         @contextmanager
         def lock(self):
             with store.lock():
-                self.guard();decision_context_guard(store,context,allow_stale=command=='decision-reconcile')
-                if context.get('session_id') and command!='decision-reconcile':
+                self.guard();scope_guard()
+                if context.get('session_id') and not cleanup:
                     session=clarification_read(store,context['session_id'])
                     if session['state']=='cancelled':raise WorkflowError('Cancelled clarification permits only original-attempt reconciliation')
                     current=None if command=='decision-start' else helper.read(store,payload['decision_id'])
@@ -2306,7 +2421,7 @@ def decision_action(store,command,payload):
                     if any(candidate.get(key)!=value for key,value in question.items()):raise WorkflowError('Decision question differs from the current clarification question or acceptance purpose')
                 yield
         def commit(self,writes):
-            self.guard();decision_context_guard(store,context,allow_stale=command=='decision-reconcile');return store.commit(writes)
+            self.guard();scope_guard();return store.commit(writes)
     try:
         bound=BoundStore()
         return helper.start(bound,payload) if command=='decision-start' else helper.mutate(bound,command,payload)
@@ -2354,8 +2469,13 @@ def clarification_decision_context(record,purpose,question_id=None):
         if not question:raise WorkflowError('Decision requires a current clarification question')
         identity.update(question_id=question_id,question_revision=question['revision'])
         semantics={tid:{field:record['baselines'][tid]['fields'][field] for field in fields} for tid,fields in question['bindings'].items()}
+        if record['mode']=='required-processing':
+            offered=next((round_record for round_record in reversed(record['rounds']) if question_id in round_record['question_ids']),{})
+            facts=offered.get('fact_fingerprints',{}).get(question_id)
+            if facts:semantics={'bound_fields':semantics,'fact_fingerprints':facts}
     else:
-        identity.update(question_id='final-confirmation',question_revision=1)
+        generation=len(record['processing_requirements']['adoptions']) if record['mode']=='required-processing' else 0
+        identity.update(question_id='final-confirmation',question_revision=1+generation)
         semantics=record['semantic_fingerprints']
     semantic=digest(dump({'identity':identity,'mode':clarification_decision_mode(record),'semantics':semantics}).encode())
     content=digest(dump({'identity':identity,'content':{tid:b['content_hash'] for tid,b in record['baselines'].items()}}).encode())
@@ -2400,6 +2520,7 @@ def clarification_answer_evidence(store,record,payload,purpose,question_id=None)
         expected['authority_digest']=decision['authority_digest']
         accepted=helper.acceptance_reference(store,reference,expected)
         if not isinstance(accepted,dict) or not isinstance(accepted.get('origin'),dict):raise WorkflowError('Decision acceptance lacks actual producer evidence')
+        if purpose=='confirmation' and record['mode']=='required-processing' and accepted.get('answer')!='accept':raise WorkflowError('Specification confirmation requires an affirmative accept decision')
     except (ValueError,AttributeError,KeyError) as error:raise WorkflowError('Invalid current clarification decision receipt: '+str(error)) from error
     if purpose=='answer':
         option=next((item for item in decision['question']['options'] if item['id']==accepted.get('answer')),None)
@@ -2413,7 +2534,14 @@ def clarification_pending_decisions(store,record):
         if decision.get('context',{}).get('session_id')==record['id'] and decision.get('active_attempt_id'):pending.append(decision['id'])
     return pending
 
-CLARIFICATION_COMMANDS={'clarify-start','clarify-read','clarify-round','clarify-answer','clarify-revise','clarify-confirm','clarify-resume','clarify-cancel','clarify-switch-mode'}
+CLARIFICATION_COMMANDS={'clarify-start','clarify-read','clarify-round','clarify-answer','clarify-revise','clarify-confirm','clarify-resume','clarify-cancel','clarify-switch-mode','clarify-processing-contribute','clarify-processing-recheck','clarify-processing-adopt'}
+
+
+def processing_scope_guard(store,context,*,package_root):
+    processing_helper().scope_guard(store,context,package_root)
+
+def processing_recheck_guard(store,context,event,readiness=False):
+    return processing_helper().recheck_guard(store,context,event,readiness)
 
 def clarification_path(store,session_id):
     if not valid_id(session_id,'CL'):raise WorkflowError('Clarification requires an exact CL- identity')
@@ -2507,6 +2635,9 @@ def clarification_admission(store,task_id,hook_gate=True):
     for path in sorted((store.base/'clarifications').glob('*.json')):
         record=clarification_read(store,'CL-'+path.stem[3:])
         if task_id not in record['task_ids']:continue
+        if record['mode']=='required-processing':
+            processing_helper().admit(store,record,tasks.get(task_id))
+            continue
         if record['mode']=='explicit' and record['state']=='cancelled':continue
         fresh=not clarification_stale_facts(store,record)
         for tid in record['task_ids']:
@@ -2617,6 +2748,8 @@ def clarification_questions(record,specs):
             if key in record['answers'] and any(not record['answers'].get(p,{}).get('valid') for p in q['prerequisites']):record['answers'][key]['valid']=False
 
 def clarification_round(store,record,payload):
+    application=processing_helper() if record['mode']=='required-processing' else None
+    if application:application.guard_questions(record,payload.get('questions',[]))
     clarification_questions(record,payload.get('questions',[]))
     facts=payload.get('facts',[])
     if not isinstance(facts,list):raise WorkflowError('Source facts require a list')
@@ -2626,9 +2759,11 @@ def clarification_round(store,record,payload):
             path=binding_path(store.source_root,source['path'])
             if not source.get('sha256') or file_hash(path)!=source['sha256']:raise WorkflowError('Source fact does not match inspected source bytes')
         record['facts'][fact['id']]={**deepcopy(fact),'source_origin':digest(str(store.source_root.resolve()).encode())}
+    fact_contexts=application.fact_contexts(store,record) if application else {}
+    if application:application.invalidate_fact_answers(record,fact_contexts)
     settled={key for key,answer in record['answers'].items() if answer['valid']}
     unresolved=[key for key,q in record['questions'].items() if q['required'] and key not in settled]
-    frontier=[key for key,q in record['questions'].items() if key not in settled and set(q['prerequisites']).issubset(settled)]
+    frontier=[key for key,q in record['questions'].items() if key not in settled and fact_contexts.get(key,{}) is not None and set(q['prerequisites']).issubset(settled)]
     clarity=payload.get('clarity')
     if clarity is not None:
         fields={'goals','scope','exclusions','dependencies','acceptance','validation','decisions'}
@@ -2639,10 +2774,11 @@ def clarification_round(store,record,payload):
     record['progress_signature']=progress
     round_record={'id':identity('CR'),'question_ids':frontier,'question_revisions':{key:record['questions'][key]['revision'] for key in frontier},'source_hash':file_hash(store.future),'semantic_fingerprints':record['semantic_fingerprints']}
     if 'decision_mode' in record:round_record['decision_mode_epoch']=record.get('decision_mode_epoch',0)
+    if application:round_record['fact_fingerprints']={key:fact_contexts[key] for key in frontier if fact_contexts[key]}
     record['rounds'].append(round_record)
     checked=record.get('clarity')
     record['stale_facts']=clarification_stale_facts(store,record)
-    if record['stale_facts']:record.update(state='blocked',clarity=None,confirmation=None,next_action='Research changed or unavailable source facts in the original execution checkout: '+', '.join(record['stale_facts']))
+    if record['stale_facts'] and not (application and frontier):record.update(state='blocked',clarity=None,confirmation=None,next_action='Research changed or unavailable source facts in the original execution checkout: '+', '.join(record['stale_facts']))
     elif record['no_progress_rounds']>=2:record.update(state='blocked',next_action='Resolve the unchanged decision or source-research prerequisite before another round')
     elif frontier:record.update(state='awaiting-answers',next_action='Prepare bounded independent delegated decisions for the current question frontier' if clarification_decision_mode(record)=='auto' else 'Present every independent question with its recommendation and wait for actual owner answers')
     elif unresolved:record.update(state='blocked',next_action='Resolve unsettled question prerequisites')
@@ -2650,10 +2786,15 @@ def clarification_round(store,record,payload):
         record.update(state='awaiting-confirmation',next_action='Obtain current delegated specification acceptance under the frozen authority' if clarification_decision_mode(record)=='auto' else 'Present the current selected task summary and request explicit shared-understanding confirmation')
     else:record.update(state='researching',next_action='Research remaining facts and record a complete clarity recheck')
 
-def clarification_revise(store,record,payload):
+def clarification_progress_guard(state,task_id):
+    for slot in state.get('task_progress',{}).get(task_id,{}).get('checks',{}).values():
+        attempt=slot.get('attempt')
+        if attempt and not any(item.get('attempt_id')==attempt['attempt_id'] for item in [slot.get('result',{}),slot.get('red',{}),*slot.get('receipts',{}).values()]):raise WorkflowError('Recover the prepared implementation check before task revision')
+
+def clarification_revise(store,record,payload,base_text=None):
     specs=payload.get('tasks')
     if not isinstance(specs,list) or not specs:raise WorkflowError('Task revision requires nonempty replacement specifications')
-    text=store.text();old_text=text;before_tasks=parse(text);seen=set()
+    text=store.text() if base_text is None else base_text;old_text=text;before_tasks=parse(text);seen=set()
     # Validate existing checkpoint without projecting or persisting a selected implementation run.
     state=Store(store.root,allow_unselected=True,neutral=True).load(text);persisted=json.loads(store.state.read_text()) if store.state.exists() else state
     for spec in specs:
@@ -2661,9 +2802,7 @@ def clarification_revise(store,record,payload):
         tid=spec.get('task_id')
         if tid not in record['task_ids'] or tid in seen:raise WorkflowError('Task revision requires exact unique selected tasks')
         seen.add(tid);task=clarification_tasks(store,[tid],text)[0]
-        for slot in persisted.get('task_progress',{}).get(tid,{}).get('checks',{}).values():
-            attempt=slot.get('attempt')
-            if attempt and not any(item.get('attempt_id')==attempt['attempt_id'] for item in [slot.get('result',{}),slot.get('red',{}),*slot.get('receipts',{}).values()]):raise WorkflowError('Recover the prepared implementation check before task revision')
+        clarification_progress_guard(persisted,tid)
         meta={key:deepcopy(task[key]) for key in FIELDS+OPTIONAL_FIELDS if key in task}
         if 'depends_on' in spec:meta['depends_on']=spec['depends_on']
         match=re.match(r'^###[^\n]+\n\s*```yaml\n.*?\n```\s*',task['body'],re.S)
@@ -2678,10 +2817,22 @@ def clarification_revise(store,record,payload):
     tasks=parse(text)
     if [(t['id'],t['queue']) for t in before_tasks]!=[(t['id'],t['queue']) for t in tasks] or any(old['body']!=new['body'] for old,new in zip(before_tasks,tasks) if old['id'] not in seen):raise WorkflowError('Task revision changes unselected tasks or queue membership')
     validate_dependencies(tasks,{o['task_id'] for o in store.outcomes() if o['disposition']=='completed'})
+    if record['mode']=='required-processing':
+        application=processing_helper()
+        for old,new in zip(before_tasks,tasks):
+            if old['id'] in seen:application.guard_revision(store,record,old,new)
     before_baselines=clarification_baselines([task for task in before_tasks if task['id'] in record['task_ids']]);before_semantics=clarification_fingerprints(before_baselines)
     baselines=clarification_baselines(clarification_tasks(store,record['task_ids'],text));after_semantics=clarification_fingerprints(baselines);changed=clarification_invalidate(record,baselines)
     revision_fingerprints={tid:{'before':{'semantic_fingerprint':before_semantics[tid],'content_fingerprint':before_baselines[tid]['content_hash']},'after':{'semantic_fingerprint':after_semantics[tid],'content_fingerprint':baselines[tid]['content_hash']}} for tid in record['task_ids']}
     record['task_revisions'].append({'id':identity('TR'),'task_ids':[tid for tid in record['task_ids'] if tid in seen],'task_fingerprints':revision_fingerprints,'content_changed_task_ids':[tid for tid in record['task_ids'] if before_baselines[tid]['content_hash']!=baselines[tid]['content_hash']],'source_before':digest(old_text.encode()),'source_after':digest(text.encode()),'changed_fields':{key:sorted(value) for key,value in changed.items()},'recorded_at':now()})
+    return _clarification_queue_writes(store,record,text,persisted)
+
+
+def _clarification_queue_writes(store,record,text,persisted=None):
+    if persisted is None:
+        neutral=Store(store.root,allow_unselected=True,neutral=True)
+        state=neutral.load()
+        persisted=json.loads(store.state.read_text()) if store.state.exists() else state
     persisted['source_hash']=digest(text.encode());persisted['tasks']=index(text)
     manifest_value=manifest(store);state_rel='.skill-tree/documents/future.json'
     if not any(f['path']==state_rel for f in manifest_value['files']):manifest_value['files'].append({'path':state_rel,'role':'generated-index-and-active-state','owner':'skill-tree'})
@@ -2690,17 +2841,45 @@ def clarification_revise(store,record,payload):
     return {'.skill-tree/documents/future.md':text,state_rel:dump(persisted),'.skill-tree/skill-tree.json':dump(manifest_value)}
 
 def clarification_mutate(store,command,payload):
+    prepared=None
+    if command in {'clarify-confirm','clarify-processing-adopt'}:
+        inspected=clarification_guard(store,payload)
+        if inspected['mode']=='required-processing':
+            application=processing_helper()
+            if command=='clarify-confirm':
+                prepared=application.prepare_release(store,inspected)
+            else:
+                prepared=application.prepare_adoption(store,inspected,payload)
+                if 'decision_receipt' not in payload:
+                    return {'decision_context':prepared['decision_context'],
+                            'configuration_digest':prepared['configuration']['configuration_digest'],
+                            'execution_snapshot':prepared['proof']['execution_snapshot'],
+                            'required_bindings':list(application._selected(prepared['configuration'],prepared['proof']))}
     with store.lock():
         record=clarification_guard(store,payload);tasks=clarification_tasks(store,record['task_ids']);baselines=clarification_baselines(tasks)
         if any(baselines[tid]['identity']!=record['baselines'][tid]['identity'] for tid in record['task_ids']):raise WorkflowError('Selected task provenance or relationship identity changed; preserve the clarification and resolve the conflict')
-        if record['state']=='cancelled':raise WorkflowError('Cancelled clarification remains terminal; start a new explicit session')
+        application=processing_helper() if record['mode']=='required-processing' else None
+        if command.startswith('clarify-processing-') and not application:raise WorkflowError('An actual required post-processing session is needed')
+        if record['state']=='cancelled' and command!='clarify-processing-adopt':raise WorkflowError('Cancelled clarification remains terminal; start a new explicit session')
+        if command=='clarify-switch-mode':
+            mode_evidence=clarification_evidence(payload.get('evidence'))
+            new_policy=clarification_decision_policy(record,payload)
+            old_policy={key:record.get(key,'manual' if key=='decision_mode' else None) for key in new_policy}
+            if new_policy==old_policy:return record
+        reopened=None
+        if application and record['state']=='complete' and command in {'clarify-resume','clarify-revise','clarify-switch-mode','clarify-processing-adopt'}:
+            application.pending_guard(store,record)
+            reopened=application.reopen(store,record,tasks[0],allow_drift=command=='clarify-resume')
+            if reopened:baselines=clarification_baselines(clarification_tasks(store,record['task_ids'],reopened))
         if command=='clarify-resume':
+            if application and not reopened:application.recover_held_revision(store,record,tasks[0],baselines)
             clarification_invalidate(record,baselines)
+            if application:application.invalidate_fact_answers(record,application.fact_contexts(store,record))
             if record['state']=='blocked':record.update(state='researching',next_action='Resolve the recorded prerequisite and recheck the same selected tasks')
             record['stale_facts']=clarification_stale_facts(store,record)
             if record['stale_facts']:record.update(state='blocked',clarity=None,confirmation=None,next_action='Research changed or unavailable source facts in the original execution checkout: '+', '.join(record['stale_facts']))
         elif any(baselines[tid]['content_hash']!=record['baselines'][tid]['content_hash'] for tid in record['task_ids']):raise WorkflowError('Selected task source changed; resume clarification to reconcile drift')
-        writes=None
+        writes=_clarification_queue_writes(store,record,reopened) if reopened else None
         if command=='clarify-round':
             if record['state']=='complete':raise WorkflowError('Completed clarification requires semantic drift before another round')
             clarification_round(store,record,payload)
@@ -2708,6 +2887,7 @@ def clarification_mutate(store,command,payload):
             key=payload.get('question_id');question=record['questions'].get(key);round_record=next((r for r in record['rounds'] if r['id']==payload.get('round_id')),None)
             if not question or not round_record or key not in round_record['question_ids'] or payload.get('question_revision')!=question['revision'] or round_record['question_revisions'][key]!=question['revision']:raise WorkflowError('Answer does not match the session round and question revision')
             if round_record.get('decision_mode_epoch',0)!=record.get('decision_mode_epoch',0):raise WorkflowError('Answer belongs to a previous decision mode epoch')
+            if application and application.fact_contexts(store,record)[key]!=round_record.get('fact_fingerprints',{}).get(key,{}):raise WorkflowError('Question factual prerequisites changed; research and prepare a current round before answering')
             if not isinstance(payload.get('answer'),str) or not payload['answer'].strip():raise WorkflowError('Actual submitted owner answer is required')
             evidence,decision_receipt=clarification_answer_evidence(store,record,payload,'answer',key)
             answer={'round_id':round_record['id'],'question_revision':question['revision'],'answer':payload['answer'],'evidence':evidence,'valid':True}
@@ -2720,30 +2900,43 @@ def clarification_mutate(store,command,payload):
             if round_record!=record['rounds'][-1] or any(not record['answers'].get(p,{}).get('valid') for p in question['prerequisites']):raise WorkflowError('Answer round is stale or its prerequisites remain unsettled')
             if old:record.setdefault('answer_history',[]).append({'question_id':key,**deepcopy(old)})
             record['answers'][key]=answer;record.update(state='revising',clarity=None,confirmation=None,next_action='Apply accepted decisions to the selected tasks and recheck the decision frontier')
-        elif command=='clarify-revise':writes=clarification_revise(store,record,payload)
+        elif command=='clarify-revise':writes=clarification_revise(store,record,payload,reopened)
+        elif command=='clarify-processing-contribute':
+            if record['state']=='complete':raise WorkflowError('Resume the exact released post-processing task before incorporating another result')
+            application.register_contribution(store,record,payload)
+        elif command=='clarify-processing-recheck':
+            if record['state']=='complete':raise WorkflowError('Resume the exact released post-processing task before starting a recheck')
+            application.create_recheck(store,record,payload)
+        elif command=='clarify-processing-adopt':application.adopt(store,record,payload,prepared)
         elif command=='clarify-confirm':
             if clarification_stale_facts(store,record):raise WorkflowError('Source facts changed after research; resume and recheck before confirmation')
             if record['state']!='awaiting-confirmation' or payload.get('task_ids')!=record['task_ids'] or payload.get('semantic_fingerprints')!=record['semantic_fingerprints']:raise WorkflowError('Confirmation must match the current exact scope and semantic task fingerprints after clarity recheck')
-            evidence,decision_receipt=clarification_answer_evidence(store,record,payload,'confirmation')
-            record['confirmation']={'task_ids':record['task_ids'],'semantic_fingerprints':record['semantic_fingerprints'],'evidence':evidence,'recorded_at':now()}
-            if 'decision_mode' in record:record['confirmation'].update(decision_mode=clarification_decision_mode(record),decision_mode_epoch=record.get('decision_mode_epoch',0))
-            if decision_receipt is not None:record['confirmation']['decision_receipt']=decision_receipt
+            frames=application.guard_release(store,record,prepared) if application else None
+            retained=application and not ('evidence' in payload or 'decision_receipt' in payload) and clarification_acceptance_current(store,record)
+            if not retained:
+                evidence,decision_receipt=clarification_answer_evidence(store,record,payload,'confirmation')
+                record['confirmation']={'task_ids':record['task_ids'],'semantic_fingerprints':record['semantic_fingerprints'],'evidence':evidence,'recorded_at':now()}
+                if 'decision_mode' in record:record['confirmation'].update(decision_mode=clarification_decision_mode(record),decision_mode_epoch=record.get('decision_mode_epoch',0))
+                if decision_receipt is not None:record['confirmation']['decision_receipt']=decision_receipt
             record.update(state='complete',next_action='Report clarification acceptance; wait for a separate implementation instruction')
+            if application:writes=_clarification_queue_writes(store,record,application.finalize(store,record,frames))
         elif command=='clarify-switch-mode':
-            evidence=clarification_evidence(payload.get('evidence'))
-            policy=clarification_decision_policy(record,payload)
-            previous={key:record.get(key,'manual' if key=='decision_mode' else None) for key in policy}
-            if policy==previous:return record
             if clarification_pending_decisions(store,record):raise WorkflowError('Reconcile or cancel the original pending delegated decision before switching mode')
-            record.setdefault('decision_mode_history',[]).append({'previous_policy':previous,'previous_epoch':record.get('decision_mode_epoch',0),'previous_confirmation':deepcopy(record.get('confirmation')),'evidence':evidence,'recorded_at':now()})
-            record.update(policy);record['decision_mode_epoch']=record.get('decision_mode_epoch',0)+1
+            if application:
+                application.pending_guard(store,record)
+                application.policy_switched(store,record)
+            record.setdefault('decision_mode_history',[]).append({'previous_policy':old_policy,'previous_epoch':record.get('decision_mode_epoch',0),'previous_confirmation':deepcopy(record.get('confirmation')),'evidence':mode_evidence,'recorded_at':now()})
+            record.update(new_policy);record['decision_mode_epoch']=record.get('decision_mode_epoch',0)+1
             record.update(state='researching',confirmation=None,clarity=None,next_action='Recheck current clarity and obtain acceptance under the explicitly selected mode and authority')
         elif command=='clarify-cancel':
             if not isinstance(payload.get('reason'),str) or not payload['reason'].strip():raise WorkflowError('Cancellation requires an explicit reason')
             if clarification_pending_decisions(store,record):raise WorkflowError('Reconcile or cancel original pending delegated decisions before cancelling clarification')
+            if application:
+                if record['state']=='complete':raise WorkflowError('Resume a released task before cancelling post-processing clarification')
+                application.pending_guard(store,record)
             record.update(state='cancelled',cancellation={'reason':payload['reason'],'recorded_at':now()},next_action='Report cancelled discussion and any unsatisfied required interview obligation')
         record['revision']+=1
-        if command!='clarify-revise':record['source_hash']=file_hash(store.future)
+        if writes is None:record['source_hash']=file_hash(store.future)
         store.guard(payload['expected_source_hash'])
         return clarification_write(store,record,writes)
 
