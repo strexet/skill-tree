@@ -1,0 +1,42 @@
+................................E.FF.............
+======================================================================
+ERROR: test_reconcile_proves_recipe_only_drift_from_the_original_owned_profile (__main__.WorkflowStateTests.test_reconcile_proves_recipe_only_drift_from_the_original_owned_profile)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/tests/test-workflow-state.py", line 623, in test_reconcile_proves_recipe_only_drift_from_the_original_owned_profile
+    inspected = wf.reconcile_check(self.store,request)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/common/scripts/workflow-state.py", line 2051, in reconcile_check
+    observed,stale=check_drift(store,state,task,payload['check_id'],attempt)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/common/scripts/workflow-state.py", line 1976, in check_drift
+    try:observed['key']=check_snapshot(store,task,current,state)['key']
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/common/scripts/workflow-state.py", line 1817, in check_snapshot
+    recipe,environment=recipe_for(store,check)
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/common/scripts/workflow-state.py", line 1756, in recipe_for
+    if profile and any(profile.get('inputs',{}).get(rel)!=value for rel,value in inputs.items()):raise WorkflowError('Profile refresh-required: node .skill-tree/installation/manager.js --refresh-profile')
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+workflow_runtime.WorkflowError: Profile refresh-required: node .skill-tree/installation/manager.js --refresh-profile
+
+======================================================================
+FAIL: test_reconcile_rejects_one_live_runner_binding_for_two_pending_attempts (__main__.WorkflowStateTests.test_reconcile_rejects_one_live_runner_binding_for_two_pending_attempts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/tests/test-workflow-state.py", line 590, in test_reconcile_rejects_one_live_runner_binding_for_two_pending_attempts
+    with self.assertRaises(wf.WorkflowError):
+AssertionError: WorkflowError not raised
+
+======================================================================
+FAIL: test_reconcile_rejects_parent_attempt_outside_current_maintenance_focus (__main__.WorkflowStateTests.test_reconcile_rejects_parent_attempt_outside_current_maintenance_focus)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-future-followups/.skill-tree/tests/test-workflow-state.py", line 572, in test_reconcile_rejects_parent_attempt_outside_current_maintenance_focus
+    with self.assertRaises(wf.WorkflowError):
+AssertionError: WorkflowError not raised
+
+----------------------------------------------------------------------
+Ran 49 tests in 18.227s
+
+FAILED (failures=2, errors=1)

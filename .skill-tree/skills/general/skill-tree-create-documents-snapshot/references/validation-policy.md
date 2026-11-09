@@ -28,6 +28,8 @@ Controllers freeze admitted in-scope group members. Work Through Next admits onl
 
 Source/check-set changes invalidate affected results. Unaffected passes remain available. Progress detection counts stage transitions and newly resolved obligations, excluding timestamps and repeated logs. Finish refuses pending, failed, stale or unavailable required checks. Required validation never becomes optional during completion.
 
+A pending attempt blocks acceptance even when an earlier result passes or the current task removes the check. For local runner recovery, bind the live original process group to the prepared attempt before drift. After cleanup, `reconcile-check` verifies current drift and absence of the bound group and records a cancellation receipt. Earlier results, recorded stops and admission remain separate. The workflow metadata contract defines the exact request and evidence fields.
+
 ## Final run evidence
 
 Finish checks the current sources, recipe/environment, group contract and artifacts of required completed checks. Changed evidence returns a validate handoff for the immutable completed contract. `prepare-check` and `record-check` perform the due verification; `accept-revalidation` retains the new receipts in the existing run and removes temporary revalidation progress. The queue and original terminal outcome remain unchanged. Revalidation never reimplements a completed unit or creates another task/dependency graph. A pending revalidation attempt prevents finish even when an earlier matching pass exists.

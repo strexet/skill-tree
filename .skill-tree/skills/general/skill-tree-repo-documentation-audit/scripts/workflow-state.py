@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 import re
 import socket
+import stat
 import subprocess
 import sys
 import tempfile
@@ -1887,13 +1888,17 @@ def accept_revalidation(store,payload):
         state['task_progress'].pop(task['id']);execution_run(state['active_run'])['next_action']='Select remaining due checks or finish the preserved run'
         store.save(text,state);return {'task_id':task['id'],'phase':'revalidated','checks':[entry['check']['id'] for entry in results]}
 
-def get_check(store,state,payload):
-    progress_owner=state.get('task_progress',{}).get(payload['task_id'],{}).get('run_id')
+def scoped_check_task(store,state,tid):
+    progress_owner=state.get('task_progress',{}).get(tid,{}).get('run_id')
     if progress_owner and (not state['active_run'] or state['active_run']['id']!=progress_owner):raise WorkflowError('Task validation progress belongs to another run')
-    task=validation_task(store,payload['task_id'])
+    task=validation_task(store,tid)
     allowed=state['active_run'] and task.get('completed_contract') and task['id'] in state['active_run']['admitted_task_ids'] and task['id'] in state['active_run']['required_ids']
     if task.get('completed_contract') and not allowed:raise WorkflowError('Completed validation contract is outside the active scope')
     if state['active_run'] and task['id'] not in scope_ids(parse(store.text()),state['active_run']) and not allowed:raise WorkflowError('Task is outside the admitted controller scope')
+    return task
+
+def get_check(store,state,payload):
+    task=scoped_check_task(store,state,payload['task_id'])
     matches=[check for check in check_specs(task) if check['id']==payload['check_id']]
     if len(matches)!=1:raise WorkflowError('Absent check identity')
     return task,matches[0]
@@ -1957,6 +1962,204 @@ def mark_implemented(store,payload):
         entry['stage']='awaiting-validation';entry['definition']=task_signature(task);entry['partial_work']=payload.get('changed_files',[])
         store.save(text,state);return {'task_id':task['id'],'phase':'validate','checks':check_specs(task)}
 
+def pending_check_attempt(slot):
+    attempt=slot.get('attempt')
+    if attempt and not any(record.get('attempt_id')==attempt['attempt_id']
+                           for record in (slot.get('result',{}),slot.get('red',{}),*slot.get('receipts',{}).values())):
+        return attempt
+    return None
+
+def observed_recipe_input_drift(store,attempt):
+    recipe=attempt['recipe']
+    paths=recipe.get('input_paths',[])
+    profile_path=store.source_root/'.skill-tree/installation/profile.json'
+    if not paths or recipe.get('execution_binding') or recipe.get('lane') in PRODUCT_LANES or not profile_path.is_file():
+        return None
+    profile=json.loads(profile_path.read_text())
+    inputs=profile.get('inputs',{})
+    original={path:inputs.get(path) for path in paths}
+    original_environment=digest(dump({'recipe':recipe,'inputs':original}).encode())
+    if original_environment!=attempt['environment_identity']:
+        return None
+    current=fingerprints(store,paths)
+    return current if current!=original else None
+
+def check_drift(store,state,task,check_id,attempt):
+    observed={'key':None,'definition':task_signature(task),'sources':fingerprints(store,list(attempt['sources']))}
+    direct=any(observed[key]!=attempt[key] for key in ('definition','sources'))
+    current=next((check for check in check_specs(task) if check['id']==check_id),None)
+    if current:
+        try:observed['key']=check_snapshot(store,task,current,state)['key']
+        except WorkflowError:
+            recipe_inputs=observed_recipe_input_drift(store,attempt)
+            if recipe_inputs is not None:
+                observed['recipe_inputs']=recipe_inputs
+                direct=True
+            if not direct:raise
+    if observed['key'] is None and not direct:
+        raise WorkflowError('Current check identity is unavailable without verified drift')
+    return observed,direct or observed['key']!=attempt['key']
+
+def check_reconciliation_target(store,state,payload,run_id):
+    tid=payload['task_id'];cid=payload['check_id']
+    task=scoped_check_task(store,state,tid)
+    entry=state['task_progress'].get(tid,{})
+    owner=state.get('run_registry',{}).get('claims',{}).get(tid)
+    if entry.get('run_id')!=run_id or (owner is not None and owner!=run_id):
+        raise WorkflowError('The prepared check belongs to another run or standalone scope')
+    focus=(state['active_run'] or {}).get('maintenance')
+    if focus:
+        required_revalidation=entry.get('revalidation') and tid in focus['admitted_task_ids'] and tid in focus['required_ids']
+        if tid not in scope_ids(parse(store.text()),focus) and not required_revalidation:
+            raise WorkflowError('The prepared check is outside the active maintenance scope')
+    slot=entry.get('checks',{}).get(cid,{})
+    attempt=pending_check_attempt(slot)
+    if not attempt or attempt['attempt_id']!=payload['attempt_id']:
+        raise WorkflowError('Select the exact original pending check attempt')
+    origin={key:payload[key] for key in ('task_id','check_id','attempt_id')}
+    origin.update(run_id=run_id,expected_key=attempt['key'],expected_definition=attempt['definition'],
+                  environment_identity=attempt['environment_identity'])
+    return task,slot,attempt,origin
+
+def check_runner_group(value):
+    if type(value) is not int or not 1<value<=2**31-1:
+        raise WorkflowError('Supply the original positive dedicated process group')
+    if not all(hasattr(os,name) for name in ('getpgid','getpgrp','killpg','O_NOFOLLOW','O_DIRECTORY','O_NONBLOCK')):
+        raise WorkflowError('Local POSIX process-group inspection is unavailable')
+    if value==os.getpgrp():
+        raise WorkflowError('The workflow helper group cannot own the original runner')
+    return value
+
+def check_runner_timestamp(value):
+    try:parsed=datetime.fromisoformat(value.replace('Z','+00:00'))
+    except (AttributeError,TypeError,ValueError) as error:
+        raise WorkflowError('Runner observation requires a valid time') from error
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise WorkflowError('Runner observation requires a timezone')
+    return parsed
+
+def read_check_cleanup_artifact(root,relative):
+    path=binding_path(root,relative)
+    dir_flags=os.O_RDONLY|os.O_NOFOLLOW|os.O_DIRECTORY
+    directory=os.open(root,dir_flags)
+    try:
+        for part in path.relative_to(root).parts[:-1]:
+            child=os.open(part,dir_flags,dir_fd=directory)
+            os.close(directory)
+            directory=child
+        fd=os.open(path.name,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK,dir_fd=directory)
+        with os.fdopen(fd,'rb') as stream:
+            if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+                raise WorkflowError('Runner cleanup evidence requires an ordinary file')
+            return stream.read(65537)
+    finally:
+        os.close(directory)
+
+def check_cleanup_evidence(store,reference,origin,binding):
+    if not isinstance(reference,dict) or set(reference)!={'path','sha256'} or not isinstance(reference['sha256'],str) or not re.fullmatch('[a-f0-9]{64}',reference['sha256']):
+        raise WorkflowError('Supply the exact cleanup artifact path and SHA-256')
+    try:
+        raw=read_check_cleanup_artifact(store.source_root,reference['path'])
+        if len(raw)>65536 or digest(raw)!=reference['sha256']:
+            raise WorkflowError('The original runner cleanup artifact changed')
+        proof=json.loads(raw)
+    except (OSError,UnicodeError,json.JSONDecodeError,NotImplementedError) as error:
+        raise WorkflowError('The original runner cleanup artifact is unreadable') from error
+    expected={**origin,'schema':1,'kind':'local-process-group-cleanup',
+              'host':binding['host'],'process_group':binding['process_group'],'observed_live_processes':0}
+    if (not isinstance(proof,dict) or set(proof)!=set(expected)|{'observed_at'} or
+            any(type(proof[key]) is not type(value) or proof[key]!=value for key,value in expected.items())):
+        raise WorkflowError('Cleanup evidence must identify the exact bound original runner and zero observed live processes')
+    at=check_runner_timestamp(proof['observed_at'])
+    if not check_runner_timestamp(binding['bound_at'])<=at<=datetime.now(timezone.utc):
+        raise WorkflowError('Cleanup observation must follow the original live runner binding')
+    return {**reference,'observation':proof}
+
+def reconcile_check(store,payload):
+    fields={'task_id','check_id','attempt_id','action'}
+    action=payload.get('action') if isinstance(payload,dict) else None
+    actions={'inspect':set(),'bind-runner':{'expected_key','expected_definition','process_group'},
+             'cancel':{'expected_key','expected_definition','observed','cleanup'}}
+    if (not isinstance(action,str) or action not in actions or set(payload)!=fields|actions[action] or
+            not valid_id(payload['task_id'],'T') or not valid_id(payload['attempt_id'],'C') or
+            not isinstance(payload['check_id'],str) or not re.fullmatch('[a-z][a-z0-9-]*',payload['check_id'])):
+        raise WorkflowError('Reconcile check requires an action and exact task, check and attempt identities')
+    if action=='inspect':
+        state=store.load();run=state['active_run']
+        if run:workspaces.ensure_workspace(store,run)
+        task,slot,attempt,origin=check_reconciliation_target(store,state,payload,run['id'] if run else None)
+        observed,stale=check_drift(store,state,task,payload['check_id'],attempt)
+        return {**origin,'observed':observed,'stale':stale,
+                'runner_binding':slot.get('runner_bindings',{}).get(attempt['attempt_id'])}
+    with store.lock():
+        text=store.text();state=store.load(text);run=state['active_run'];run_id=run['id'] if run else None
+        if run:workspaces.ensure_workspace(store,run)
+        reference='.skill-tree/history/check-reconciliations/'+payload['attempt_id'].lower()+'.json'
+        archive=binding_path(store.root,reference)
+        request_digest=digest(dump(payload).encode())
+        if action=='cancel' and archive.exists():
+            if not archive.is_file():raise WorkflowError('Original cancellation archive is invalid')
+            try:receipt=json.loads(archive.read_text())
+            except (OSError,UnicodeError,json.JSONDecodeError) as error:
+                raise WorkflowError('Original cancellation archive is unreadable') from error
+            if (not isinstance(receipt,dict) or receipt.get('status')!='cancelled-no-result' or receipt.get('run_id')!=run_id or
+                    any(receipt.get(key)!=payload[key] for key in ('task_id','check_id','attempt_id')) or
+                    receipt.get('request_digest')!=request_digest):
+                raise WorkflowError('Conflicting replay of the original check reconciliation')
+            return receipt
+        task,slot,attempt,origin=check_reconciliation_target(store,state,payload,run_id)
+        if any(payload[key]!=origin[key] for key in ('expected_key','expected_definition')):
+            raise WorkflowError('Original prepared check key or definition changed')
+        recipe=attempt['recipe']
+        if recipe.get('lane') in PRODUCT_LANES or recipe.get('execution_binding'):
+            raise WorkflowError('Original runner requires cleanup evidence beyond the local process group')
+        group_binding=slot.get('runner_bindings',{}).get(attempt['attempt_id'])
+        if action=='bind-runner':
+            group=check_runner_group(payload['process_group'])
+            if group_binding:
+                if group_binding.get('process_group')!=group or group_binding.get('host')!=socket.gethostname():
+                    raise WorkflowError('Conflicting binding for the original check runner')
+                return group_binding
+            _,stale=check_drift(store,state,task,payload['check_id'],attempt)
+            if stale:raise WorkflowError('Bind the live original runner before source or check drift')
+            host=socket.gethostname()
+            for progress in state['task_progress'].values():
+                for other in progress['checks'].values():
+                    pending=pending_check_attempt(other)
+                    if not pending:continue
+                    owner_binding=other.get('runner_bindings',{}).get(pending['attempt_id'],{})
+                    if owner_binding.get('host')==host and owner_binding.get('process_group')==group:
+                        raise WorkflowError('The local runner group already owns another pending attempt')
+            try:
+                if os.getpgid(group)!=group:raise WorkflowError('The reported process must lead the dedicated runner group')
+                os.killpg(group,0)
+            except OSError as error:raise WorkflowError('The original local runner group cannot be verified live') from error
+            binding={**origin,'host':host,'process_group':group,'bound_at':now()}
+            slot.setdefault('runner_bindings',{})[attempt['attempt_id']]=binding
+            store.save(text,state,update_navigation=False)
+            return binding
+        if (not group_binding or any(group_binding.get(key)!=value for key,value in origin.items()) or
+                group_binding.get('host')!=socket.gethostname()):
+            raise WorkflowError('The original attempt lacks a verified live runner binding on this host')
+        observed,stale=check_drift(store,state,task,payload['check_id'],attempt)
+        if not stale or observed!=payload['observed']:
+            raise WorkflowError('Reconciliation requires the exact current observation of source or check drift')
+        group=check_runner_group(group_binding['process_group'])
+        cleanup=check_cleanup_evidence(store,payload['cleanup'],origin,group_binding)
+        if check_drift(store,state,task,payload['check_id'],attempt)!=(observed,True):
+            raise WorkflowError('Source or check drift changed during cleanup verification')
+        try:os.killpg(group,0)
+        except ProcessLookupError:pass
+        except OSError as error:raise WorkflowError('The bound original runner group cleanup is uncertain') from error
+        else:raise WorkflowError('The bound original runner group remains live')
+        receipt={**origin,'status':'cancelled-no-result','original_attempt':deepcopy(attempt),
+                 'runner_binding':deepcopy(group_binding),'observed':observed,'cleanup':cleanup,
+                 'request_digest':request_digest,'recorded_at':now()}
+        slot.setdefault('receipts',{})[attempt['attempt_id']]=receipt
+        store.expect_unchanged(reference,None)
+        store.save(text,state,{reference:dump(receipt)},update_navigation=False)
+        return receipt
+
 def prepare_check(store,payload):
     with store.lock():
         text=store.text();state=store.load(text);task,check=get_check(store,state,payload);entry=state['task_progress'].get(task['id'])
@@ -1964,8 +2167,8 @@ def prepare_check(store,payload):
         if task.get('completed_contract') and not entry:entry=state['task_progress'].setdefault(task['id'],{'stage':'awaiting-validation','checks':{},'revalidation':True,'admission':state['active_run']['admission'],'run_id':state['active_run']['id']})
         if not entry or entry['stage']=='blocked':raise WorkflowError('Begin implementation before check preparation')
         assert_scope(store,state,parse(text),task['id'])
-        slot=entry['checks'].get(check['id'],{});previous=slot.get('attempt')
-        if previous and not any(record.get('attempt_id')==previous['attempt_id'] for record in [slot.get('result',{}),slot.get('red',{}),*slot.get('receipts',{}).values()]):raise WorkflowError('Recover and close the original pending check attempt before preparing another control')
+        slot=entry['checks'].get(check['id'],{})
+        if pending_check_attempt(slot):raise WorkflowError('Recover and close the original pending check attempt before preparing another control')
         if state['active_run']:
             target=execution_run(state['active_run']);enforce_limits(target);target['admitted_groups']=admitted_groups(parse(text),target)
         recipe,environment=recipe_for(store,check);execution_session(store,recipe,environment,entry,payload.get('execution'),require_current=True)
@@ -1990,6 +2193,7 @@ def record_check(store,payload):
         text=store.text();state=store.load(text);task,check=get_check(store,state,payload);entry=state['task_progress'].get(task['id'],{});slot=entry.get('checks',{}).get(check['id'],{});attempt=slot.get('attempt')
         delivered=slot.get('receipts',{}).get(payload.get('attempt_id'))
         if delivered:
+            if delivered.get('status')=='cancelled-no-result':raise WorkflowError('The original check attempt was cancelled without a result')
             if delivered.get('payload_hash')!=digest(dump(payload).encode()):raise WorkflowError('Conflicting replay of the original check receipt')
             return deepcopy(delivered)
         if not attempt or attempt['attempt_id']!=payload.get('attempt_id'):raise WorkflowError('Recover the original prepared check attempt; never invent a receipt')
@@ -2044,6 +2248,9 @@ def validate_task_checks(store,tid,state=None,check_id=None):
     state=state or store.load();task=validation_task(store,tid);entry=state['task_progress'].get(tid)
     if not entry or entry['stage'] not in {'implementing','awaiting-validation'}:raise WorkflowError('Task implementation/check progress is missing or blocked')
     assert_admission(store,state,tid)
+    for cid,slot in entry['checks'].items():
+        if (check_id is None or cid==check_id) and pending_check_attempt(slot):
+            raise WorkflowError('Required check has a pending attempt: '+cid)
     records=[]
     for check in check_specs(task):
         if check_id is not None and check['id']!=check_id:continue
@@ -3365,8 +3572,7 @@ def clarification_round(store,record,payload):
 
 def clarification_progress_guard(state,task_id):
     for slot in state.get('task_progress',{}).get(task_id,{}).get('checks',{}).values():
-        attempt=slot.get('attempt')
-        if attempt and not any(item.get('attempt_id')==attempt['attempt_id'] for item in [slot.get('result',{}),slot.get('red',{}),*slot.get('receipts',{}).values()]):raise WorkflowError('Recover the prepared implementation check before task revision')
+        if pending_check_attempt(slot):raise WorkflowError('Recover the prepared implementation check before task revision')
 
 def clarification_revise(store,record,payload,base_text=None):
     specs=payload.get('tasks')
@@ -3519,7 +3725,7 @@ def clarification_mutate(store,command,payload):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     args=parser.parse_args(argv)
     try:
         store=Store(args.root,args.run_id,allow_unselected=args.command in {'index','runs','manifest','start','workspace-setup','recover-locator'},route_queue=args.command!='recover-locator');payload=json.loads(args.input.read_text()) if args.input else {}
@@ -3563,6 +3769,7 @@ def main(argv=None):
         elif cmd=='implemented':result=mark_implemented(store,payload)
         elif cmd=='prepare-check':result=prepare_check(store,payload)
         elif cmd=='record-check':result=record_check(store,payload)
+        elif cmd=='reconcile-check':result=reconcile_check(store,payload)
         elif cmd=='reuse-check':result=reuse_check(store,payload)
         elif cmd=='admit':result=resume_admission(store)
         elif cmd=='focus-maintenance':result=focus_maintenance(store,payload)
