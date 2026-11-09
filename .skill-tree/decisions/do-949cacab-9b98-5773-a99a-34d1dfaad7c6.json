@@ -1,0 +1,1129 @@
+{
+  "acceptance": null,
+  "accepted_obligations": [
+    "dab287e325478514033f36371a534e1dd25a1ae5ca26fb4e856335fcffb5b533",
+    "add14b86f0c224992e77cd92618136dc27534e9be108ea5d5e9d32e5dd81cae2"
+  ],
+  "actor_requests": {
+    "DA-117e468e-a66d-42de-86ca-3f4fa611857e": {
+      "attempt_id": "DA-117e468e-a66d-42de-86ca-3f4fa611857e",
+      "creation_evidence": {
+        "actor_context_id": "/root/registry117_architecture",
+        "actor_id": "/root/registry117_architecture",
+        "kind": "host-agent-created",
+        "provider": "Codex collaboration",
+        "reference": "Actual root creation /root/registry117_architecture; current independent research and sealed Pending-processing resolver handoff remain separate from the executor.",
+        "tool": "collaboration.spawn_agent"
+      },
+      "input": {
+        "actor": {
+          "context_id": "/root/registry117_architecture",
+          "id": "/root/registry117_architecture"
+        },
+        "authority": {
+          "allowed_kinds": [
+            "technical",
+            "product",
+            "specification-acceptance"
+          ],
+          "constraints": [
+            "Only research and promotion of the exact selected Pending into one required blocker within admitted pilot116. No runtime implementation occurs during processing. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+          ],
+          "context_id": "pending:P-c82aef73-0818-41a8-9466-d29c5d9bbeaf",
+          "evidence": {
+            "kind": "owner-message",
+            "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+          },
+          "id": "approved-managed-registry-process",
+          "revision": 1
+        },
+        "authority_digest": "ca440fe48ebe90937130a039b6e7f1574224234921d742a74c0295fc83282c85",
+        "context": {
+          "content_fingerprint": "10252bac98f0f49e709a7b96e30843537990918b342888f45bc66a5b3c93fb6e",
+          "decision_purpose": "plan",
+          "execution_snapshot_digest": "bb1a728e2feffd7e23469db04f591f36fccaa7f16668ff015e99f9e7709967df",
+          "id": "pending:P-c82aef73-0818-41a8-9466-d29c5d9bbeaf",
+          "kind": "pending",
+          "orchestration_id": "DO-949cacab-9b98-5773-a99a-34d1dfaad7c6",
+          "pending_ids": [
+            "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf"
+          ],
+          "plan_digest": "78a273e506bf3c92f93c4e5943a8a9ec37e34846740c0d23bc11ee7a8ce91f38",
+          "required_checks_digest": "59c01bb22f127c3bb829062627eff91156e0094ec11f73811f2db9fdb49ff6db",
+          "semantic_fingerprint": "04edf9a87baac985fe6a43fdf6b28866699b5492696b759c25debe031d4dc821"
+        },
+        "creation_evidence": {
+          "actor_context_id": "/root/registry117_architecture",
+          "actor_id": "/root/registry117_architecture",
+          "kind": "host-agent-created",
+          "provider": "Codex collaboration",
+          "reference": "Actual root creation /root/registry117_architecture; current independent research and sealed Pending-processing resolver handoff remain separate from the executor.",
+          "tool": "collaboration.spawn_agent"
+        },
+        "decision_hash": "9823876a61c7bcca2d3f4166238c5c60152429abca3d062aabe6daace7ab27ce",
+        "decision_id": "DG-700b8746-92c6-5eb3-a93a-9e9a138d42e1",
+        "execution_snapshot": {
+          "common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+          "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+          "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+          "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+          "common/scripts/run-workspaces.py": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+          "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+          "common/scripts/workflow-state.py": "57383709635e780c6d207834fba5396583f1ecfe86ac2456380fabf755b6a68b",
+          "owned-profile": "11ff391bdcedc7200592174ce1495d68802168665563584bb27d2dce8f48cd40"
+        },
+        "mode": "auto",
+        "mode_epoch": 1,
+        "orchestration_id": "DO-949cacab-9b98-5773-a99a-34d1dfaad7c6",
+        "orchestration_revision": 4,
+        "prior_role_results": {},
+        "question": {
+          "id": "managed-registry-process-plan",
+          "kind": "specification-acceptance",
+          "options": [
+            {
+              "id": "accept",
+              "text": "Accept the current plan."
+            },
+            {
+              "id": "revise",
+              "text": "Revise the plan with concrete reasons."
+            }
+          ],
+          "plan_text": "# Managed Registry Hardening Processing Plan\n\n## Selected scope and researched result\n\nThe explicit Implement All controller selected Pending P-c82aef73-0818-41a8-9466-d29c5d9bbeaf as required work beneath the already admitted Ponytail pilot T-18db6175-499f-4679-bf8d-f815c7b42411. Processing produces one Ready blocker definition and updates the recorded dependency closure. Processing performs no runtime implementation, provider trial, installation or publication.\n\nThe retained observation proves missing managed-registry authority at both preparation APIs while normal uninstall remains stale and an independent copy remains usable. Source research also identifies prerequisite consumption at invoke, record, accept and completed-next boundaries. A preparation-only repair does not establish the original-attempt invariant. The candidate therefore combines exact managed-operation association with current business-prerequisite admission as one bounded repair.\n\n## Candidate and validation\n\nThe candidate artifact `.skill-tree/artifacts/plugin-implementation/managed-registry-process-candidate.json` uses the actual Pending identity and a T-free task key. The normal guarded processing helper allocates the real T identity only during the final authorized queue transaction. The candidate contains researched current/desired behavior, source touch points, seven observable criteria and three focused Node/Python check plans. The invocation dependency is already admitted and completed; current dependency verification remains controller-owned.\n\nThe processing result requires three static checks: current source research, candidate prose/check/source validation, and exact scope/provenance review. A separate Auto resolver accepts the concrete candidate, an independent critic checks the significant ownership and prerequisite assumptions, and substantive disagreement requires the normal arbiter. No owner product choice remains missing. The recorded authority covers only the selected required task definition and existing dependency scope.\n\nThe completed definition artifact precedes source/check validation and final full candidate review. The final atomic `process` call publishes the reviewed definition with the inspected Future hash and original Pending provenance. The processing frame reaches readiness while the real Pending scope still exists; the actual processing receipt separately records the committed identities and dispositions. The controller then selects eligible required work without a standalone next-action question.\n\n## Preserved boundaries\n\nThe repair requires the actual execution root and exact current package destination, record and complete manifest/resource identity. Canonical queue sharing, profile presence or a copied manifest flag supplies no ownership. Existing copied-operation closure permits builtin and bundled data helpers without importing the installer or composer. Legitimate standalone copies and no-plugin/condition-false no-ops remain preserved.\n\nCurrent prerequisites and unresolved locations cannot advance original invocation attempts, including private cached-delivery paths. Held records and actual cleanup remain inspectable. The implementation retains frozen history and current mode/authority rather than inventing execution success. Focused synthetic and copied fixtures establish the declared guard assertions; actual native/provider and candidate-efficacy qualification remain separate.\n",
+          "recommendation": "accept",
+          "significance": "significant",
+          "task_candidate": {
+            "dispositions": {
+              "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf": {
+                "reason": "Repository/source research confirms a bounded registry-authority and prerequisite-consumption repair required before the already admitted pilot116.",
+                "status": "promoted"
+              }
+            },
+            "expected_source_hash": "3c64e84ff90a3b7792b2c0fa7b0574ce69896894755df11842aeb51b83cd4696",
+            "selectors": [
+              "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf"
+            ],
+            "tasks": [
+              {
+                "body": "Goal:\n- Retain managed plugin registry authority and current prerequisites through the selected operation invocation before the admitted review/interview pilots rely on the runtime gates.\n\nCurrent behavior:\n- The controlled observation on source633e716 reproduces one selected binding with no prerequisite after deletion of the managed registry; the owned profile and composed manifest remain unchanged. Normal managed uninstall already returns configuration-stale, and a copied standalone operation remains usable without profile or registry.\n- Current engine preparation checks prerequisite arrays, but invoke, record and accept can ignore prerequisite-only changes when configuration, context and source identity stay equal. The trusted cached private-delivery provider can avoid the default Node delivery admission path.\n\nDesired behavior:\n- The existing runtime distinguishes an associated owned installation from an independent standalone operation and retains required registry authority without a new ownership format.\n- Current owned preparation prerequisites gate business transitions before private callback resolution and within the writer transaction. Original cleanup and historical inspection remain available.\n\nTouch:\n- `.skill-tree/lib/plugin-composition.js`\n- `.skill-tree/lib/plugin-runtime.js`\n- `.skill-tree/lib/plugin-registry.js`\n- `.skill-tree/lib/installation.js`\n- `.skill-tree/lib/composer.js`\n- `.skill-tree/common/scripts/plugin-invocation.py`\n- `.skill-tree/common/scripts/workflow-state.py`\n- `.skill-tree/common/references/plugin-invocation.md`\n- `.skill-tree/common/references/workflow-metadata.md`\n- `.skill-tree/tests/test-plugin-composition.js`\n- `.skill-tree/tests/test-plugin-invocation-installation.js`\n- `.skill-tree/tests/test-plugin-workflow.py`\n\nImplementation constraints:\n- Exact operation association uses the current verified manifest/resource closure and real project-owned profile/destination evidence. The existing small deterministic receipt identity formula remains source-verified against the installer rather than imported through an unavailable runtime dependency.\n- Present-registry stale checks, copied standalone resources, empty/false-condition no-ops, original HI/HC identities, mode/authority and accepted-prefix history remain binding.\n- The helper records no successful invocation from prerequisite data. Actual fixture actors, network calls and product actions remain outside the focused repair.\n\nSource research:\n- `.skill-tree/history/research/plugin-managed-registry-absence-observation.json` retains the concrete four-scenario observation and qualification limits.\n- Source and independent control analysis identify the callback and business-proof consumption seam; a preparation-only repair leaves the in-flight invariant unverified.\n\nValidation:\n- Strategy: requirements-led focused Red/Green across real isolated managed/copy fixtures and original-attempt state controls.\n```json\n{\n  \"checks\": [\n    {\n      \"id\": \"managed-registry-composition\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration.\",\n        \"Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association.\",\n        \"Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback.\",\n        \"Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\",\n        \"Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/plugin-composition.js\",\n        \".skill-tree/lib/plugin-runtime.js\",\n        \".skill-tree/lib/plugin-registry.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/common/scripts/plugin-invocation.py\",\n        \".skill-tree/common/scripts/workflow-state.py\",\n        \".skill-tree/common/references/plugin-invocation.md\",\n        \".skill-tree/common/references/workflow-metadata.md\",\n        \".skill-tree/tests/test-plugin-composition.js\",\n        \".skill-tree/tests/test-plugin-invocation-installation.js\",\n        \".skill-tree/tests/test-plugin-workflow.py\",\n        \".skill-tree/history/research/plugin-managed-registry-absence-observation.json\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-composition.js\"\n      },\n      \"assertion\": \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration. Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association. Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback. Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh. Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\",\n      \"timing\": \"immediate\"\n    },\n    {\n      \"id\": \"managed-registry-copied-bridge\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration.\",\n        \"Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association.\",\n        \"Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback.\",\n        \"Current trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history.\",\n        \"Completed-chain next/admission never reports current success while a current mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution.\",\n        \"Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\",\n        \"Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/plugin-composition.js\",\n        \".skill-tree/lib/plugin-runtime.js\",\n        \".skill-tree/lib/plugin-registry.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/common/scripts/plugin-invocation.py\",\n        \".skill-tree/common/scripts/workflow-state.py\",\n        \".skill-tree/common/references/plugin-invocation.md\",\n        \".skill-tree/common/references/workflow-metadata.md\",\n        \".skill-tree/tests/test-plugin-composition.js\",\n        \".skill-tree/tests/test-plugin-invocation-installation.js\",\n        \".skill-tree/tests/test-plugin-workflow.py\",\n        \".skill-tree/history/research/plugin-managed-registry-absence-observation.json\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-invocation-installation.js\"\n      },\n      \"assertion\": \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration. Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association. Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback. Current trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history. Completed-chain next/admission never reports current success while a current mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution. Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh. Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\",\n      \"timing\": \"immediate\"\n    },\n    {\n      \"id\": \"invocation-prerequisite-admission\",\n      \"recipe_id\": \"quality-python\",\n      \"criteria\": [\n        \"Current trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history.\",\n        \"Completed-chain next/admission never reports current success while a current mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution.\",\n        \"Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/plugin-composition.js\",\n        \".skill-tree/lib/plugin-runtime.js\",\n        \".skill-tree/lib/plugin-registry.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/common/scripts/plugin-invocation.py\",\n        \".skill-tree/common/scripts/workflow-state.py\",\n        \".skill-tree/common/references/plugin-invocation.md\",\n        \".skill-tree/common/references/workflow-metadata.md\",\n        \".skill-tree/tests/test-plugin-composition.js\",\n        \".skill-tree/tests/test-plugin-invocation-installation.js\",\n        \".skill-tree/tests/test-plugin-workflow.py\",\n        \".skill-tree/history/research/plugin-managed-registry-absence-observation.json\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-workflow.py\"\n      },\n      \"assertion\": \"Current trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history. Completed-chain next/admission never reports current success while a current mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution. Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\",\n      \"timing\": \"immediate\"\n    }\n  ]\n}\n```\n\nAcceptance:\n- A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration.\n- Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association.\n- Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback.\n- Current trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history.\n- Completed-chain next/admission never reports current success while a current mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution.\n- Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\n- Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\n",
+                "depends_on": [
+                  "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+                ],
+                "key": "managed-registry-prerequisites",
+                "parent_pending_ids": [
+                  "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf"
+                ],
+                "title": "Guard managed registry authority and invocation prerequisites"
+              }
+            ]
+          },
+          "text": "Accept the exact researched T-free task candidate and bounded processing plan, or request a bounded revision."
+        },
+        "role": "resolver",
+        "role_receipts": {},
+        "schema": 1
+      },
+      "input_digest": "f7e937c84bbacf465a2cf0a9b8edccfb191a62368e0b3b92109563008df20ba2"
+    },
+    "DA-33b9f7d1-4bd4-43c9-8e1a-416f6a48dae6": {
+      "attempt_id": "DA-33b9f7d1-4bd4-43c9-8e1a-416f6a48dae6",
+      "creation_evidence": {
+        "actor_context_id": "/root/invocation118_oracle",
+        "actor_id": "/root/invocation118_oracle",
+        "kind": "host-agent-created",
+        "provider": "Codex collaboration",
+        "reference": "Actual root creation /root/invocation118_oracle, independent of executor, processing resolver and critic; actual sealed arbitration handoff follows the substantive disagreement.",
+        "tool": "collaboration.spawn_agent"
+      },
+      "input": {
+        "actor": {
+          "context_id": "/root/invocation118_oracle",
+          "id": "/root/invocation118_oracle"
+        },
+        "authority": {
+          "allowed_kinds": [
+            "technical",
+            "product",
+            "specification-acceptance"
+          ],
+          "constraints": [
+            "Only research and promotion of the exact selected Pending into one required blocker within admitted pilot116. No runtime implementation occurs during processing. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+          ],
+          "context_id": "pending:P-c82aef73-0818-41a8-9466-d29c5d9bbeaf",
+          "evidence": {
+            "kind": "owner-message",
+            "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+          },
+          "id": "approved-managed-registry-process",
+          "revision": 1
+        },
+        "authority_digest": "ca440fe48ebe90937130a039b6e7f1574224234921d742a74c0295fc83282c85",
+        "context": {
+          "content_fingerprint": "10252bac98f0f49e709a7b96e30843537990918b342888f45bc66a5b3c93fb6e",
+          "decision_purpose": "plan",
+          "execution_snapshot_digest": "bb1a728e2feffd7e23469db04f591f36fccaa7f16668ff015e99f9e7709967df",
+          "id": "pending:P-c82aef73-0818-41a8-9466-d29c5d9bbeaf",
+          "kind": "pending",
+          "orchestration_id": "DO-949cacab-9b98-5773-a99a-34d1dfaad7c6",
+          "pending_ids": [
+            "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf"
+          ],
+          "plan_digest": "78a273e506bf3c92f93c4e5943a8a9ec37e34846740c0d23bc11ee7a8ce91f38",
+          "required_checks_digest": "59c01bb22f127c3bb829062627eff91156e0094ec11f73811f2db9fdb49ff6db",
+          "semantic_fingerprint": "04edf9a87baac985fe6a43fdf6b28866699b5492696b759c25debe031d4dc821"
+        },
+        "creation_evidence": {
+          "actor_context_id": "/root/invocation118_oracle",
+          "actor_id": "/root/invocation118_oracle",
+          "kind": "host-agent-created",
+          "provider": "Codex collaboration",
+          "reference": "Actual root creation /root/invocation118_oracle, independent of executor, processing resolver and critic; actual sealed arbitration handoff follows the substantive disagreement.",
+          "tool": "collaboration.spawn_agent"
+        },
+        "decision_hash": "74296eebd17e50b3724686aeada04a444e3210417e83ca4ea0d69827a6476475",
+        "decision_id": "DG-700b8746-92c6-5eb3-a93a-9e9a138d42e1",
+        "execution_snapshot": {
+          "common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+          "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+          "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+          "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+          "common/scripts/run-workspaces.py": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+          "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+          "common/scripts/workflow-state.py": "57383709635e780c6d207834fba5396583f1ecfe86ac2456380fabf755b6a68b",
+          "owned-profile": "11ff391bdcedc7200592174ce1495d68802168665563584bb27d2dce8f48cd40"
+        },
+        "mode": "auto",
+        "mode_epoch": 1,
+        "orchestration_id": "DO-949cacab-9b98-5773-a99a-34d1dfaad7c6",
+        "orchestration_revision": 8,
+        "prior_role_results": {
+          "critic": {
+            "actor": {
+              "context_id": "/root/invocation118_architecture",
+              "id": "/root/invocation118_architecture"
+            },
+            "evidence": {
+              "actor_context_id": "/root/invocation118_architecture",
+              "actor_id": "/root/invocation118_architecture",
+              "creation_reference": "Actual root creation /root/invocation118_architecture; independent of current executor and processing resolver.",
+              "kind": "delegated-agent",
+              "provider": "Codex collaboration",
+              "reference": "Actual /root/invocation118_architecture returned substantive current-occurrence/prefix criticism for the exact sealed processing candidate.",
+              "tool": "collaboration.followup_task"
+            },
+            "result": {
+              "evidence": [
+                ".skill-tree/artifacts/plugin-implementation/managed-registry-process-sealed-critic.json",
+                ".skill-tree/artifacts/plugin-implementation/managed-registry-process-candidate.json",
+                ".skill-tree/lib/plugin-composition.js:152",
+                ".skill-tree/lib/plugin-runtime.js:40",
+                ".skill-tree/common/scripts/plugin-invocation.py:176",
+                ".skill-tree/common/references/plugin-invocation.md"
+              ],
+              "input_digest": "0d552dd2a7469e43d1991b448613d721af5d2ca736d2d79145dac167f19559ae",
+              "rationale": "The scope, Pending provenance, ownership association and standalone protections are sound. Revise prerequisite admission to distinguish global/current-occurrence obligations from requirements belonging only to another occurrence. Current preparation aggregates binding-specific prerequisites across the selected chain; blanket consumption could block a valid downstream contribution because an earlier or future binding lacks a capability. Add an explicit A→B→A control: applicable global/current-stage prerequisites block advancement, while unrelated occurrence prerequisites remain visible without retroactively invalidating accepted prefixes or preventing B's otherwise valid incorporation. Final readiness still requires applicable outstanding obligations. Also state that business transitions cannot silently rebind the frozen configuration/watch baseline; reconciliation and explicit resume remain separate recovery paths.",
+              "status": "disagree"
+            },
+            "status": "disagree"
+          },
+          "resolver": {
+            "actor": {
+              "context_id": "/root/registry117_architecture",
+              "id": "/root/registry117_architecture"
+            },
+            "evidence": {
+              "actor_context_id": "/root/registry117_architecture",
+              "actor_id": "/root/registry117_architecture",
+              "creation_reference": "Actual root creation /root/registry117_architecture; current independent research and sealed Pending-processing resolver handoff remain separate from the executor.",
+              "kind": "delegated-agent",
+              "provider": "Codex collaboration",
+              "reference": "Actual /root/registry117_architecture returned matching sealed Pending-processing resolver JSON through collaboration final answer.",
+              "tool": "collaboration.followup_task"
+            },
+            "result": {
+              "answer": "accept",
+              "evidence": [
+                ".skill-tree/history/research/managed-registry-hardening-process-plan.md",
+                ".skill-tree/artifacts/plugin-implementation/managed-registry-process-candidate.json",
+                ".skill-tree/artifacts/plugin-implementation/managed-registry-process-research-reference-correction.json",
+                ".skill-tree/history/research/plugin-managed-registry-absence-observation.json",
+                ".skill-tree/lib/plugin-composition.js:149",
+                ".skill-tree/common/scripts/plugin-invocation.py:176",
+                ".skill-tree/common/scripts/plugin-invocation.py:235",
+                ".skill-tree/common/scripts/plugin-invocation.py:305",
+                ".skill-tree/common/scripts/plugin-invocation.py:328",
+                ".skill-tree/common/scripts/workflow-state.py:1915"
+              ],
+              "input_digest": "f7e937c84bbacf465a2cf0a9b8edccfb191a62368e0b3b92109563008df20ba2",
+              "rationale": "The candidate stays within the selected Pending and admitted pilot116 blocker scope, preserves actual Pending provenance and allocates no fabricated T identity. Exact operation/profile association preserves legitimate standalone copies, while prerequisite consumption at invoke, record, accept and completed-next closes the related cached-delivery gap visible in current source. Seven observable criteria and three focused checks cover both boundaries without installer dependencies or native-execution claims. The sealed input, plan and candidate match exactly; the research-reference correction changes no facts or authority. Processing authorizes the definition only, with implementation and qualification still separate.",
+              "status": "answered"
+            },
+            "status": "answered"
+          }
+        },
+        "question": {
+          "id": "managed-registry-process-plan",
+          "kind": "specification-acceptance",
+          "options": [
+            {
+              "id": "accept",
+              "text": "Accept the current plan."
+            },
+            {
+              "id": "revise",
+              "text": "Revise the plan with concrete reasons."
+            }
+          ],
+          "plan_text": "# Managed Registry Hardening Processing Plan\n\n## Selected scope and researched result\n\nThe explicit Implement All controller selected Pending P-c82aef73-0818-41a8-9466-d29c5d9bbeaf as required work beneath the already admitted Ponytail pilot T-18db6175-499f-4679-bf8d-f815c7b42411. Processing produces one Ready blocker definition and updates the recorded dependency closure. Processing performs no runtime implementation, provider trial, installation or publication.\n\nThe retained observation proves missing managed-registry authority at both preparation APIs while normal uninstall remains stale and an independent copy remains usable. Source research also identifies prerequisite consumption at invoke, record, accept and completed-next boundaries. A preparation-only repair does not establish the original-attempt invariant. The candidate therefore combines exact managed-operation association with current business-prerequisite admission as one bounded repair.\n\n## Candidate and validation\n\nThe candidate artifact `.skill-tree/artifacts/plugin-implementation/managed-registry-process-candidate.json` uses the actual Pending identity and a T-free task key. The normal guarded processing helper allocates the real T identity only during the final authorized queue transaction. The candidate contains researched current/desired behavior, source touch points, seven observable criteria and three focused Node/Python check plans. The invocation dependency is already admitted and completed; current dependency verification remains controller-owned.\n\nThe processing result requires three static checks: current source research, candidate prose/check/source validation, and exact scope/provenance review. A separate Auto resolver accepts the concrete candidate, an independent critic checks the significant ownership and prerequisite assumptions, and substantive disagreement requires the normal arbiter. No owner product choice remains missing. The recorded authority covers only the selected required task definition and existing dependency scope.\n\nThe completed definition artifact precedes source/check validation and final full candidate review. The final atomic `process` call publishes the reviewed definition with the inspected Future hash and original Pending provenance. The processing frame reaches readiness while the real Pending scope still exists; the actual processing receipt separately records the committed identities and dispositions. The controller then selects eligible required work without a standalone next-action question.\n\n## Preserved boundaries\n\nThe repair requires the actual execution root and exact current package destination, record and complete manifest/resource identity. Canonical queue sharing, profile presence or a copied manifest flag supplies no ownership. Existing copied-operation closure permits builtin and bundled data helpers without importing the installer or composer. Legitimate standalone copies and no-plugin/condition-false no-ops remain preserved.\n\nCurrent prerequisites and unresolved locations cannot advance original invocation attempts, including private cached-delivery paths. Held records and actual cleanup remain inspectable. The implementation retains frozen history and current mode/authority rather than inventing execution success. Focused synthetic and copied fixtures establish the declared guard assertions; actual native/provider and candidate-efficacy qualification remain separate.\n",
+          "recommendation": "accept",
+          "significance": "significant",
+          "task_candidate": {
+            "dispositions": {
+              "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf": {
+                "reason": "Repository/source research confirms a bounded registry-authority and prerequisite-consumption repair required before the already admitted pilot116.",
+                "status": "promoted"
+              }
+            },
+            "expected_source_hash": "3c64e84ff90a3b7792b2c0fa7b0574ce69896894755df11842aeb51b83cd4696",
+            "selectors": [
+              "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf"
+            ],
+            "tasks": [
+              {
+                "body": "Goal:\n- Retain managed plugin registry authority and current prerequisites through the selected operation invocation before the admitted review/interview pilots rely on the runtime gates.\n\nCurrent behavior:\n- The controlled observation on source633e716 reproduces one selected binding with no prerequisite after deletion of the managed registry; the owned profile and composed manifest remain unchanged. Normal managed uninstall already returns configuration-stale, and a copied standalone operation remains usable without profile or registry.\n- Current engine preparation checks prerequisite arrays, but invoke, record and accept can ignore prerequisite-only changes when configuration, context and source identity stay equal. The trusted cached private-delivery provider can avoid the default Node delivery admission path.\n\nDesired behavior:\n- The existing runtime distinguishes an associated owned installation from an independent standalone operation and retains required registry authority without a new ownership format.\n- Current owned preparation prerequisites gate business transitions before private callback resolution and within the writer transaction. Original cleanup and historical inspection remain available.\n\nTouch:\n- `.skill-tree/lib/plugin-composition.js`\n- `.skill-tree/lib/plugin-runtime.js`\n- `.skill-tree/lib/plugin-registry.js`\n- `.skill-tree/lib/installation.js`\n- `.skill-tree/lib/composer.js`\n- `.skill-tree/common/scripts/plugin-invocation.py`\n- `.skill-tree/common/scripts/workflow-state.py`\n- `.skill-tree/common/references/plugin-invocation.md`\n- `.skill-tree/common/references/workflow-metadata.md`\n- `.skill-tree/tests/test-plugin-composition.js`\n- `.skill-tree/tests/test-plugin-invocation-installation.js`\n- `.skill-tree/tests/test-plugin-workflow.py`\n\nImplementation constraints:\n- Exact operation association uses the current verified manifest/resource closure and real project-owned profile/destination evidence. The existing small deterministic receipt identity formula remains source-verified against the installer rather than imported through an unavailable runtime dependency.\n- Present-registry stale checks, copied standalone resources, empty/false-condition no-ops, original HI/HC identities, mode/authority and accepted-prefix history remain binding.\n- The helper records no successful invocation from prerequisite data. Actual fixture actors, network calls and product actions remain outside the focused repair.\n\nSource research:\n- `.skill-tree/history/research/plugin-managed-registry-absence-observation.json` retains the concrete four-scenario observation and qualification limits.\n- Source and independent control analysis identify the callback and business-proof consumption seam; a preparation-only repair leaves the in-flight invariant unverified.\n\nValidation:\n- Strategy: requirements-led focused Red/Green across real isolated managed/copy fixtures and original-attempt state controls.\n```json\n{\n  \"checks\": [\n    {\n      \"id\": \"managed-registry-composition\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration.\",\n        \"Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association.\",\n        \"Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback.\",\n        \"Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\",\n        \"Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/plugin-composition.js\",\n        \".skill-tree/lib/plugin-runtime.js\",\n        \".skill-tree/lib/plugin-registry.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/common/scripts/plugin-invocation.py\",\n        \".skill-tree/common/scripts/workflow-state.py\",\n        \".skill-tree/common/references/plugin-invocation.md\",\n        \".skill-tree/common/references/workflow-metadata.md\",\n        \".skill-tree/tests/test-plugin-composition.js\",\n        \".skill-tree/tests/test-plugin-invocation-installation.js\",\n        \".skill-tree/tests/test-plugin-workflow.py\",\n        \".skill-tree/history/research/plugin-managed-registry-absence-observation.json\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-composition.js\"\n      },\n      \"assertion\": \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration. Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association. Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback. Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh. Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\",\n      \"timing\": \"immediate\"\n    },\n    {\n      \"id\": \"managed-registry-copied-bridge\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration.\",\n        \"Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association.\",\n        \"Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback.\",\n        \"Current trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history.\",\n        \"Completed-chain next/admission never reports current success while a current mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution.\",\n        \"Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\",\n        \"Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/plugin-composition.js\",\n        \".skill-tree/lib/plugin-runtime.js\",\n        \".skill-tree/lib/plugin-registry.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/common/scripts/plugin-invocation.py\",\n        \".skill-tree/common/scripts/workflow-state.py\",\n        \".skill-tree/common/references/plugin-invocation.md\",\n        \".skill-tree/common/references/workflow-metadata.md\",\n        \".skill-tree/tests/test-plugin-composition.js\",\n        \".skill-tree/tests/test-plugin-invocation-installation.js\",\n        \".skill-tree/tests/test-plugin-workflow.py\",\n        \".skill-tree/history/research/plugin-managed-registry-absence-observation.json\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-invocation-installation.js\"\n      },\n      \"assertion\": \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration. Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association. Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback. Current trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history. Completed-chain next/admission never reports current success while a current mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution. Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh. Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\",\n      \"timing\": \"immediate\"\n    },\n    {\n      \"id\": \"invocation-prerequisite-admission\",\n      \"recipe_id\": \"quality-python\",\n      \"criteria\": [\n        \"Current trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history.\",\n        \"Completed-chain next/admission never reports current success while a current mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution.\",\n        \"Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/plugin-composition.js\",\n        \".skill-tree/lib/plugin-runtime.js\",\n        \".skill-tree/lib/plugin-registry.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/common/scripts/plugin-invocation.py\",\n        \".skill-tree/common/scripts/workflow-state.py\",\n        \".skill-tree/common/references/plugin-invocation.md\",\n        \".skill-tree/common/references/workflow-metadata.md\",\n        \".skill-tree/tests/test-plugin-composition.js\",\n        \".skill-tree/tests/test-plugin-invocation-installation.js\",\n        \".skill-tree/tests/test-plugin-workflow.py\",\n        \".skill-tree/history/research/plugin-managed-registry-absence-observation.json\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-workflow.py\"\n      },\n      \"assertion\": \"Current trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history. Completed-chain next/admission never reports current success while a current mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution. Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\",\n      \"timing\": \"immediate\"\n    }\n  ]\n}\n```\n\nAcceptance:\n- A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration.\n- Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association.\n- Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback.\n- Current trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history.\n- Completed-chain next/admission never reports current success while a current mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution.\n- Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\n- Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\n",
+                "depends_on": [
+                  "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+                ],
+                "key": "managed-registry-prerequisites",
+                "parent_pending_ids": [
+                  "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf"
+                ],
+                "title": "Guard managed registry authority and invocation prerequisites"
+              }
+            ]
+          },
+          "text": "Accept the exact researched T-free task candidate and bounded processing plan, or request a bounded revision."
+        },
+        "role": "arbiter",
+        "role_receipts": {
+          "critic": "2c66fd9fb8838f103cb86404d6674ba212ab346c0e57ea55fdbbed6f30c9d1b4",
+          "resolver": "6be0cf98e24e9f297c15e0cae02b7d3176a56d1fd9e0f625d7dca46fcb38dce0"
+        },
+        "schema": 1
+      },
+      "input_digest": "9429d94d324757e1c08e693e4a4bc61991e9b53aed010229d4cf176fc0ac3323"
+    },
+    "DA-68bb8073-7736-4d8f-a359-be6ac14c6787": {
+      "attempt_id": "DA-68bb8073-7736-4d8f-a359-be6ac14c6787",
+      "creation_evidence": {
+        "actor_context_id": "/root/invocation118_architecture",
+        "actor_id": "/root/invocation118_architecture",
+        "kind": "host-agent-created",
+        "provider": "Codex collaboration",
+        "reference": "Actual root creation /root/invocation118_architecture; independent of current executor and processing resolver.",
+        "tool": "collaboration.spawn_agent"
+      },
+      "input": {
+        "actor": {
+          "context_id": "/root/invocation118_architecture",
+          "id": "/root/invocation118_architecture"
+        },
+        "authority": {
+          "allowed_kinds": [
+            "technical",
+            "product",
+            "specification-acceptance"
+          ],
+          "constraints": [
+            "Only research and promotion of the exact selected Pending into one required blocker within admitted pilot116. No runtime implementation occurs during processing. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+          ],
+          "context_id": "pending:P-c82aef73-0818-41a8-9466-d29c5d9bbeaf",
+          "evidence": {
+            "kind": "owner-message",
+            "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+          },
+          "id": "approved-managed-registry-process",
+          "revision": 1
+        },
+        "authority_digest": "ca440fe48ebe90937130a039b6e7f1574224234921d742a74c0295fc83282c85",
+        "context": {
+          "content_fingerprint": "10252bac98f0f49e709a7b96e30843537990918b342888f45bc66a5b3c93fb6e",
+          "decision_purpose": "plan",
+          "execution_snapshot_digest": "bb1a728e2feffd7e23469db04f591f36fccaa7f16668ff015e99f9e7709967df",
+          "id": "pending:P-c82aef73-0818-41a8-9466-d29c5d9bbeaf",
+          "kind": "pending",
+          "orchestration_id": "DO-949cacab-9b98-5773-a99a-34d1dfaad7c6",
+          "pending_ids": [
+            "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf"
+          ],
+          "plan_digest": "bec8558a71522ef1a11890fb943ef7f44635689ea57caee75fa90f638d154eea",
+          "required_checks_digest": "59c01bb22f127c3bb829062627eff91156e0094ec11f73811f2db9fdb49ff6db",
+          "semantic_fingerprint": "04edf9a87baac985fe6a43fdf6b28866699b5492696b759c25debe031d4dc821"
+        },
+        "creation_evidence": {
+          "actor_context_id": "/root/invocation118_architecture",
+          "actor_id": "/root/invocation118_architecture",
+          "kind": "host-agent-created",
+          "provider": "Codex collaboration",
+          "reference": "Actual root creation /root/invocation118_architecture; independent of current executor and processing resolver.",
+          "tool": "collaboration.spawn_agent"
+        },
+        "decision_hash": "a7e98bfa51b0b3f737cf2308320e66b5c7dc5f409f458ff64c620ce16f3781c8",
+        "decision_id": "DG-23ff72b9-ca4d-58d9-86d6-a21c33e7a944",
+        "execution_snapshot": {
+          "common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+          "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+          "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+          "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+          "common/scripts/run-workspaces.py": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+          "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+          "common/scripts/workflow-state.py": "57383709635e780c6d207834fba5396583f1ecfe86ac2456380fabf755b6a68b",
+          "owned-profile": "11ff391bdcedc7200592174ce1495d68802168665563584bb27d2dce8f48cd40"
+        },
+        "mode": "auto",
+        "mode_epoch": 1,
+        "orchestration_id": "DO-949cacab-9b98-5773-a99a-34d1dfaad7c6",
+        "orchestration_revision": 15,
+        "prior_role_results": {
+          "resolver": {
+            "actor": {
+              "context_id": "/root/registry117_architecture",
+              "id": "/root/registry117_architecture"
+            },
+            "evidence": {
+              "actor_context_id": "/root/registry117_architecture",
+              "actor_id": "/root/registry117_architecture",
+              "creation_reference": "Actual root creation /root/registry117_architecture; current independent research and sealed Pending-processing resolver handoff remain separate from the executor.",
+              "kind": "delegated-agent",
+              "provider": "Codex collaboration",
+              "reference": "Actual /root/registry117_architecture returned the observed resolver result for the exact original sealed input; raw artifact managed-registry-process-resolver-actual-result.json.",
+              "tool": "collaboration.followup_task"
+            },
+            "result": {
+              "answer": "accept",
+              "evidence": [
+                ".skill-tree/artifacts/plugin-implementation/managed-registry-process-sealed-resolver.json",
+                ".skill-tree/artifacts/plugin-implementation/managed-registry-process-candidate.json",
+                ".skill-tree/history/research/managed-registry-hardening-process-plan.md",
+                ".skill-tree/lib/plugin-composition.js:139",
+                ".skill-tree/common/scripts/plugin-invocation.py:176",
+                ".skill-tree/common/scripts/plugin-invocation.py:235",
+                ".skill-tree/common/scripts/workflow-state.py:1915"
+              ],
+              "input_digest": "79d677f5b3434ab0a9edd08d4d8f0c397ab9a53a9c1fda823c69edefdfe8440e",
+              "rationale": "The revised definition explicitly gates applicable global/current-occurrence prerequisites while isolating other-occurrence requirements, requires A-to-B-to-A coverage retaining the accepted B contribution, and forbids silent frozen configuration/watch adoption during business transitions. Managed-operation association, standalone/no-op preservation and separate recovery paths remain bounded to the selected Pending blocker. The sealed input, authored plan and T-free candidate match exactly. This accepts the processing definition only; implementation, checks and runtime qualification remain separate.",
+              "status": "answered"
+            },
+            "status": "answered"
+          }
+        },
+        "question": {
+          "id": "managed-registry-process-plan-v2",
+          "kind": "specification-acceptance",
+          "options": [
+            {
+              "id": "accept",
+              "text": "Accept the current revised plan."
+            },
+            {
+              "id": "revise",
+              "text": "Revise with concrete reasons."
+            }
+          ],
+          "plan_text": "# Managed Registry Hardening Processing Plan\n\n## Selected scope and researched result\n\nThe explicit Implement All controller selected Pending P-c82aef73-0818-41a8-9466-d29c5d9bbeaf as required work beneath the already admitted Ponytail pilot T-18db6175-499f-4679-bf8d-f815c7b42411. Processing produces one Ready blocker definition and updates the recorded dependency closure. Processing performs no runtime implementation, provider trial, installation or publication.\n\nThe retained observation proves missing managed-registry authority at both preparation APIs while normal uninstall remains stale and an independent copy remains usable. Source research also identifies prerequisite consumption at invoke, record, accept and completed-next boundaries. A preparation-only repair does not establish the original-attempt invariant. The candidate therefore combines exact managed-operation association with current business-prerequisite admission as one bounded repair.\n\n## Candidate and validation\n\nThe candidate artifact `.skill-tree/artifacts/plugin-implementation/managed-registry-process-candidate.json` uses the actual Pending identity and a T-free task key. The normal guarded processing helper allocates the real T identity only during the final authorized queue transaction. The candidate contains researched current/desired behavior, source touch points, seven observable criteria and three focused Node/Python check plans. The invocation dependency is already admitted and completed; current dependency verification remains controller-owned.\n\nThe processing result requires three static checks: current source research, candidate prose/check/source validation, and exact scope/provenance review. A separate Auto resolver accepts the concrete candidate, an independent critic checks the significant ownership and prerequisite assumptions, and substantive disagreement requires the normal arbiter. No owner product choice remains missing. The recorded authority covers only the selected required task definition and existing dependency scope.\n\nThe completed definition artifact precedes source/check validation and final full candidate review. The final atomic `process` call publishes the reviewed definition with the inspected Future hash and original Pending provenance. The processing frame reaches readiness while the real Pending scope still exists; the actual processing receipt separately records the committed identities and dispositions. The controller then selects eligible required work without a standalone next-action question.\n\n## Preserved boundaries\n\nThe repair requires the actual execution root and exact current package destination, record and complete manifest/resource identity. Canonical queue sharing, profile presence or a copied manifest flag supplies no ownership. Existing copied-operation closure permits builtin and bundled data helpers without importing the installer or composer. Legitimate standalone copies and no-plugin/condition-false no-ops remain preserved.\n\nApplicable global and current-occurrence prerequisites and unresolved locations cannot advance original invocation attempts, including private cached-delivery paths. Requirements belonging only to another occurrence remain visible and gate that occurrence without blocking otherwise valid current incorporation or invalidating accepted prefixes. An A to B to A control must retain the accepted B contribution while proving both applicable blocking and unrelated-occurrence isolation. Final readiness retains applicable outstanding obligations. Business transitions cannot silently replace the frozen configuration or watch baseline; explicit resume and reconciliation remain separate recovery paths. Held records and actual cleanup remain inspectable. The implementation retains frozen history and current mode/authority rather than inventing execution success. Focused synthetic and copied fixtures establish the declared guard assertions; actual native/provider and candidate-efficacy qualification remain separate.\n",
+          "recommendation": "accept",
+          "significance": "significant",
+          "task_candidate": {
+            "dispositions": {
+              "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf": {
+                "reason": "Repository/source research confirms a bounded registry-authority and prerequisite-consumption repair required before the already admitted pilot116.",
+                "status": "promoted"
+              }
+            },
+            "expected_source_hash": "3c64e84ff90a3b7792b2c0fa7b0574ce69896894755df11842aeb51b83cd4696",
+            "selectors": [
+              "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf"
+            ],
+            "tasks": [
+              {
+                "body": "Goal:\n- Retain managed plugin registry authority and current prerequisites through the selected operation invocation before the admitted review/interview pilots rely on the runtime gates.\n\nCurrent behavior:\n- The controlled observation on source633e716 reproduces one selected binding with no prerequisite after deletion of the managed registry; the owned profile and composed manifest remain unchanged. Normal managed uninstall already returns configuration-stale, and a copied standalone operation remains usable without profile or registry.\n- Current engine preparation checks prerequisite arrays, but invoke, record and accept can ignore prerequisite-only changes when configuration, context and source identity stay equal. The trusted cached private-delivery provider can avoid the default Node delivery admission path.\n\nDesired behavior:\n- The existing runtime distinguishes an associated owned installation from an independent standalone operation and retains required registry authority without a new ownership format.\n- Applicable global and current-occurrence owned preparation prerequisites gate business transitions before private callback resolution and within the writer transaction. Other-occurrence prerequisites remain visible without blocking valid current incorporation or rewriting accepted prefixes. Original cleanup and historical inspection remain available; explicit recovery alone can adopt a new frozen configuration/watch baseline.\n\nTouch:\n- `.skill-tree/lib/plugin-composition.js`\n- `.skill-tree/lib/plugin-runtime.js`\n- `.skill-tree/lib/plugin-registry.js`\n- `.skill-tree/lib/installation.js`\n- `.skill-tree/lib/composer.js`\n- `.skill-tree/common/scripts/plugin-invocation.py`\n- `.skill-tree/common/scripts/workflow-state.py`\n- `.skill-tree/common/references/plugin-invocation.md`\n- `.skill-tree/common/references/workflow-metadata.md`\n- `.skill-tree/tests/test-plugin-composition.js`\n- `.skill-tree/tests/test-plugin-invocation-installation.js`\n- `.skill-tree/tests/test-plugin-workflow.py`\n\nImplementation constraints:\n- Exact operation association uses the current verified manifest/resource closure and real project-owned profile/destination evidence. The existing small deterministic receipt identity formula remains source-verified against the installer rather than imported through an unavailable runtime dependency.\n- Present-registry stale checks, copied standalone resources, empty/false-condition no-ops, original HI/HC identities, mode/authority and accepted-prefix history remain binding.\n- The helper records no successful invocation from prerequisite data. Actual fixture actors, network calls and product actions remain outside the focused repair.\n\nSource research:\n- `.skill-tree/history/research/plugin-managed-registry-absence-observation.json` retains the concrete four-scenario observation and qualification limits.\n- Source and independent control analysis identify the callback and business-proof consumption seam; a preparation-only repair leaves the in-flight invariant unverified.\n\nValidation:\n- Strategy: requirements-led focused Red/Green across real isolated managed/copy fixtures and original-attempt state controls.\n```json\n{\n  \"checks\": [\n    {\n      \"id\": \"managed-registry-composition\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration.\",\n        \"Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association.\",\n        \"Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback.\",\n        \"Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\",\n        \"Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/plugin-composition.js\",\n        \".skill-tree/lib/plugin-runtime.js\",\n        \".skill-tree/lib/plugin-registry.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/common/scripts/plugin-invocation.py\",\n        \".skill-tree/common/scripts/workflow-state.py\",\n        \".skill-tree/common/references/plugin-invocation.md\",\n        \".skill-tree/common/references/workflow-metadata.md\",\n        \".skill-tree/tests/test-plugin-composition.js\",\n        \".skill-tree/tests/test-plugin-invocation-installation.js\",\n        \".skill-tree/tests/test-plugin-workflow.py\",\n        \".skill-tree/history/research/plugin-managed-registry-absence-observation.json\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-composition.js\"\n      },\n      \"assertion\": \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration. Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association. Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback. Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh. Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\",\n      \"timing\": \"immediate\"\n    },\n    {\n      \"id\": \"managed-registry-copied-bridge\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration.\",\n        \"Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association.\",\n        \"Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback.\",\n        \"Applicable global and current-occurrence trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Prerequisites belonging only to another occurrence remain visible and gate that occurrence without retroactively invalidating accepted prefixes or blocking otherwise valid current incorporation. An A to B to A control proves applicable blocking and unrelated-occurrence isolation while retaining the accepted B contribution. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history.\",\n        \"Completed-chain next/admission never reports current success while an applicable outstanding mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution. Business transitions cannot silently replace frozen configuration or watch baselines; explicit resume and reconciliation remain separate recovery paths.\",\n        \"Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\",\n        \"Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/plugin-composition.js\",\n        \".skill-tree/lib/plugin-runtime.js\",\n        \".skill-tree/lib/plugin-registry.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/common/scripts/plugin-invocation.py\",\n        \".skill-tree/common/scripts/workflow-state.py\",\n        \".skill-tree/common/references/plugin-invocation.md\",\n        \".skill-tree/common/references/workflow-metadata.md\",\n        \".skill-tree/tests/test-plugin-composition.js\",\n        \".skill-tree/tests/test-plugin-invocation-installation.js\",\n        \".skill-tree/tests/test-plugin-workflow.py\",\n        \".skill-tree/history/research/plugin-managed-registry-absence-observation.json\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-invocation-installation.js\"\n      },\n      \"assertion\": \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration. Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association. Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback. Applicable global and current-occurrence trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Prerequisites belonging only to another occurrence remain visible and gate that occurrence without retroactively invalidating accepted prefixes or blocking otherwise valid current incorporation. An A to B to A control proves applicable blocking and unrelated-occurrence isolation while retaining the accepted B contribution. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history. Completed-chain next/admission never reports current success while an applicable outstanding mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution. Business transitions cannot silently replace frozen configuration or watch baselines; explicit resume and reconciliation remain separate recovery paths. Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh. Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\",\n      \"timing\": \"immediate\"\n    },\n    {\n      \"id\": \"invocation-prerequisite-admission\",\n      \"recipe_id\": \"quality-python\",\n      \"criteria\": [\n        \"Applicable global and current-occurrence trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Prerequisites belonging only to another occurrence remain visible and gate that occurrence without retroactively invalidating accepted prefixes or blocking otherwise valid current incorporation. An A to B to A control proves applicable blocking and unrelated-occurrence isolation while retaining the accepted B contribution. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history.\",\n        \"Completed-chain next/admission never reports current success while an applicable outstanding mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution. Business transitions cannot silently replace frozen configuration or watch baselines; explicit resume and reconciliation remain separate recovery paths.\",\n        \"Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/plugin-composition.js\",\n        \".skill-tree/lib/plugin-runtime.js\",\n        \".skill-tree/lib/plugin-registry.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/common/scripts/plugin-invocation.py\",\n        \".skill-tree/common/scripts/workflow-state.py\",\n        \".skill-tree/common/references/plugin-invocation.md\",\n        \".skill-tree/common/references/workflow-metadata.md\",\n        \".skill-tree/tests/test-plugin-composition.js\",\n        \".skill-tree/tests/test-plugin-invocation-installation.js\",\n        \".skill-tree/tests/test-plugin-workflow.py\",\n        \".skill-tree/history/research/plugin-managed-registry-absence-observation.json\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-workflow.py\"\n      },\n      \"assertion\": \"Applicable global and current-occurrence trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Prerequisites belonging only to another occurrence remain visible and gate that occurrence without retroactively invalidating accepted prefixes or blocking otherwise valid current incorporation. An A to B to A control proves applicable blocking and unrelated-occurrence isolation while retaining the accepted B contribution. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history. Completed-chain next/admission never reports current success while an applicable outstanding mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution. Business transitions cannot silently replace frozen configuration or watch baselines; explicit resume and reconciliation remain separate recovery paths. Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\",\n      \"timing\": \"immediate\"\n    }\n  ]\n}\n```\n\nAcceptance:\n- A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration.\n- Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association.\n- Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback.\n- Applicable global and current-occurrence trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Prerequisites belonging only to another occurrence remain visible and gate that occurrence without retroactively invalidating accepted prefixes or blocking otherwise valid current incorporation. An A to B to A control proves applicable blocking and unrelated-occurrence isolation while retaining the accepted B contribution. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history.\n- Completed-chain next/admission never reports current success while an applicable outstanding mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution. Business transitions cannot silently replace frozen configuration or watch baselines; explicit resume and reconciliation remain separate recovery paths.\n- Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\n- Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\n",
+                "depends_on": [
+                  "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+                ],
+                "key": "managed-registry-prerequisites",
+                "parent_pending_ids": [
+                  "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf"
+                ],
+                "title": "Guard managed registry authority and invocation prerequisites"
+              }
+            ]
+          },
+          "text": "Accept the arbiter-revised exact T-free task candidate and bounded processing plan, or request a concrete bounded revision."
+        },
+        "role": "critic",
+        "role_receipts": {
+          "resolver": "7e475fb3bfb5bef2e0e10f9bb0f4676bd4ff394a8a20a8cf8d536a51d3812247"
+        },
+        "schema": 1
+      },
+      "input_digest": "78d59b1f7d6eea5a453f54e46deb25e48a1a562a2e7c613f917f64217030c9d6"
+    },
+    "DA-719127da-b225-4173-8d6e-2d44185bcb83": {
+      "attempt_id": "DA-719127da-b225-4173-8d6e-2d44185bcb83",
+      "creation_evidence": {
+        "actor_context_id": "/root/registry117_architecture",
+        "actor_id": "/root/registry117_architecture",
+        "kind": "host-agent-created",
+        "provider": "Codex collaboration",
+        "reference": "Actual root creation /root/registry117_architecture; current independent research and sealed Pending-processing resolver handoff remain separate from the executor.",
+        "tool": "collaboration.spawn_agent"
+      },
+      "input": {
+        "actor": {
+          "context_id": "/root/registry117_architecture",
+          "id": "/root/registry117_architecture"
+        },
+        "authority": {
+          "allowed_kinds": [
+            "technical",
+            "product",
+            "specification-acceptance"
+          ],
+          "constraints": [
+            "Only research and promotion of the exact selected Pending into one required blocker within admitted pilot116. No runtime implementation occurs during processing. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+          ],
+          "context_id": "pending:P-c82aef73-0818-41a8-9466-d29c5d9bbeaf",
+          "evidence": {
+            "kind": "owner-message",
+            "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+          },
+          "id": "approved-managed-registry-process",
+          "revision": 1
+        },
+        "authority_digest": "ca440fe48ebe90937130a039b6e7f1574224234921d742a74c0295fc83282c85",
+        "context": {
+          "content_fingerprint": "10252bac98f0f49e709a7b96e30843537990918b342888f45bc66a5b3c93fb6e",
+          "decision_purpose": "plan",
+          "execution_snapshot_digest": "bb1a728e2feffd7e23469db04f591f36fccaa7f16668ff015e99f9e7709967df",
+          "id": "pending:P-c82aef73-0818-41a8-9466-d29c5d9bbeaf",
+          "kind": "pending",
+          "orchestration_id": "DO-949cacab-9b98-5773-a99a-34d1dfaad7c6",
+          "pending_ids": [
+            "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf"
+          ],
+          "plan_digest": "bec8558a71522ef1a11890fb943ef7f44635689ea57caee75fa90f638d154eea",
+          "required_checks_digest": "59c01bb22f127c3bb829062627eff91156e0094ec11f73811f2db9fdb49ff6db",
+          "semantic_fingerprint": "04edf9a87baac985fe6a43fdf6b28866699b5492696b759c25debe031d4dc821"
+        },
+        "creation_evidence": {
+          "actor_context_id": "/root/registry117_architecture",
+          "actor_id": "/root/registry117_architecture",
+          "kind": "host-agent-created",
+          "provider": "Codex collaboration",
+          "reference": "Actual root creation /root/registry117_architecture; current independent research and sealed Pending-processing resolver handoff remain separate from the executor.",
+          "tool": "collaboration.spawn_agent"
+        },
+        "decision_hash": "c7c3f448a912d0d489ed6d28ab5aa9dbe370a52d68db5ed22c4296ad55c96473",
+        "decision_id": "DG-23ff72b9-ca4d-58d9-86d6-a21c33e7a944",
+        "execution_snapshot": {
+          "common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+          "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+          "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+          "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+          "common/scripts/run-workspaces.py": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+          "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+          "common/scripts/workflow-state.py": "57383709635e780c6d207834fba5396583f1ecfe86ac2456380fabf755b6a68b",
+          "owned-profile": "11ff391bdcedc7200592174ce1495d68802168665563584bb27d2dce8f48cd40"
+        },
+        "mode": "auto",
+        "mode_epoch": 1,
+        "orchestration_id": "DO-949cacab-9b98-5773-a99a-34d1dfaad7c6",
+        "orchestration_revision": 13,
+        "prior_role_results": {},
+        "question": {
+          "id": "managed-registry-process-plan-v2",
+          "kind": "specification-acceptance",
+          "options": [
+            {
+              "id": "accept",
+              "text": "Accept the current revised plan."
+            },
+            {
+              "id": "revise",
+              "text": "Revise with concrete reasons."
+            }
+          ],
+          "plan_text": "# Managed Registry Hardening Processing Plan\n\n## Selected scope and researched result\n\nThe explicit Implement All controller selected Pending P-c82aef73-0818-41a8-9466-d29c5d9bbeaf as required work beneath the already admitted Ponytail pilot T-18db6175-499f-4679-bf8d-f815c7b42411. Processing produces one Ready blocker definition and updates the recorded dependency closure. Processing performs no runtime implementation, provider trial, installation or publication.\n\nThe retained observation proves missing managed-registry authority at both preparation APIs while normal uninstall remains stale and an independent copy remains usable. Source research also identifies prerequisite consumption at invoke, record, accept and completed-next boundaries. A preparation-only repair does not establish the original-attempt invariant. The candidate therefore combines exact managed-operation association with current business-prerequisite admission as one bounded repair.\n\n## Candidate and validation\n\nThe candidate artifact `.skill-tree/artifacts/plugin-implementation/managed-registry-process-candidate.json` uses the actual Pending identity and a T-free task key. The normal guarded processing helper allocates the real T identity only during the final authorized queue transaction. The candidate contains researched current/desired behavior, source touch points, seven observable criteria and three focused Node/Python check plans. The invocation dependency is already admitted and completed; current dependency verification remains controller-owned.\n\nThe processing result requires three static checks: current source research, candidate prose/check/source validation, and exact scope/provenance review. A separate Auto resolver accepts the concrete candidate, an independent critic checks the significant ownership and prerequisite assumptions, and substantive disagreement requires the normal arbiter. No owner product choice remains missing. The recorded authority covers only the selected required task definition and existing dependency scope.\n\nThe completed definition artifact precedes source/check validation and final full candidate review. The final atomic `process` call publishes the reviewed definition with the inspected Future hash and original Pending provenance. The processing frame reaches readiness while the real Pending scope still exists; the actual processing receipt separately records the committed identities and dispositions. The controller then selects eligible required work without a standalone next-action question.\n\n## Preserved boundaries\n\nThe repair requires the actual execution root and exact current package destination, record and complete manifest/resource identity. Canonical queue sharing, profile presence or a copied manifest flag supplies no ownership. Existing copied-operation closure permits builtin and bundled data helpers without importing the installer or composer. Legitimate standalone copies and no-plugin/condition-false no-ops remain preserved.\n\nApplicable global and current-occurrence prerequisites and unresolved locations cannot advance original invocation attempts, including private cached-delivery paths. Requirements belonging only to another occurrence remain visible and gate that occurrence without blocking otherwise valid current incorporation or invalidating accepted prefixes. An A to B to A control must retain the accepted B contribution while proving both applicable blocking and unrelated-occurrence isolation. Final readiness retains applicable outstanding obligations. Business transitions cannot silently replace the frozen configuration or watch baseline; explicit resume and reconciliation remain separate recovery paths. Held records and actual cleanup remain inspectable. The implementation retains frozen history and current mode/authority rather than inventing execution success. Focused synthetic and copied fixtures establish the declared guard assertions; actual native/provider and candidate-efficacy qualification remain separate.\n",
+          "recommendation": "accept",
+          "significance": "significant",
+          "task_candidate": {
+            "dispositions": {
+              "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf": {
+                "reason": "Repository/source research confirms a bounded registry-authority and prerequisite-consumption repair required before the already admitted pilot116.",
+                "status": "promoted"
+              }
+            },
+            "expected_source_hash": "3c64e84ff90a3b7792b2c0fa7b0574ce69896894755df11842aeb51b83cd4696",
+            "selectors": [
+              "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf"
+            ],
+            "tasks": [
+              {
+                "body": "Goal:\n- Retain managed plugin registry authority and current prerequisites through the selected operation invocation before the admitted review/interview pilots rely on the runtime gates.\n\nCurrent behavior:\n- The controlled observation on source633e716 reproduces one selected binding with no prerequisite after deletion of the managed registry; the owned profile and composed manifest remain unchanged. Normal managed uninstall already returns configuration-stale, and a copied standalone operation remains usable without profile or registry.\n- Current engine preparation checks prerequisite arrays, but invoke, record and accept can ignore prerequisite-only changes when configuration, context and source identity stay equal. The trusted cached private-delivery provider can avoid the default Node delivery admission path.\n\nDesired behavior:\n- The existing runtime distinguishes an associated owned installation from an independent standalone operation and retains required registry authority without a new ownership format.\n- Applicable global and current-occurrence owned preparation prerequisites gate business transitions before private callback resolution and within the writer transaction. Other-occurrence prerequisites remain visible without blocking valid current incorporation or rewriting accepted prefixes. Original cleanup and historical inspection remain available; explicit recovery alone can adopt a new frozen configuration/watch baseline.\n\nTouch:\n- `.skill-tree/lib/plugin-composition.js`\n- `.skill-tree/lib/plugin-runtime.js`\n- `.skill-tree/lib/plugin-registry.js`\n- `.skill-tree/lib/installation.js`\n- `.skill-tree/lib/composer.js`\n- `.skill-tree/common/scripts/plugin-invocation.py`\n- `.skill-tree/common/scripts/workflow-state.py`\n- `.skill-tree/common/references/plugin-invocation.md`\n- `.skill-tree/common/references/workflow-metadata.md`\n- `.skill-tree/tests/test-plugin-composition.js`\n- `.skill-tree/tests/test-plugin-invocation-installation.js`\n- `.skill-tree/tests/test-plugin-workflow.py`\n\nImplementation constraints:\n- Exact operation association uses the current verified manifest/resource closure and real project-owned profile/destination evidence. The existing small deterministic receipt identity formula remains source-verified against the installer rather than imported through an unavailable runtime dependency.\n- Present-registry stale checks, copied standalone resources, empty/false-condition no-ops, original HI/HC identities, mode/authority and accepted-prefix history remain binding.\n- The helper records no successful invocation from prerequisite data. Actual fixture actors, network calls and product actions remain outside the focused repair.\n\nSource research:\n- `.skill-tree/history/research/plugin-managed-registry-absence-observation.json` retains the concrete four-scenario observation and qualification limits.\n- Source and independent control analysis identify the callback and business-proof consumption seam; a preparation-only repair leaves the in-flight invariant unverified.\n\nValidation:\n- Strategy: requirements-led focused Red/Green across real isolated managed/copy fixtures and original-attempt state controls.\n```json\n{\n  \"checks\": [\n    {\n      \"id\": \"managed-registry-composition\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration.\",\n        \"Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association.\",\n        \"Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback.\",\n        \"Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\",\n        \"Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/plugin-composition.js\",\n        \".skill-tree/lib/plugin-runtime.js\",\n        \".skill-tree/lib/plugin-registry.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/common/scripts/plugin-invocation.py\",\n        \".skill-tree/common/scripts/workflow-state.py\",\n        \".skill-tree/common/references/plugin-invocation.md\",\n        \".skill-tree/common/references/workflow-metadata.md\",\n        \".skill-tree/tests/test-plugin-composition.js\",\n        \".skill-tree/tests/test-plugin-invocation-installation.js\",\n        \".skill-tree/tests/test-plugin-workflow.py\",\n        \".skill-tree/history/research/plugin-managed-registry-absence-observation.json\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-composition.js\"\n      },\n      \"assertion\": \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration. Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association. Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback. Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh. Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\",\n      \"timing\": \"immediate\"\n    },\n    {\n      \"id\": \"managed-registry-copied-bridge\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration.\",\n        \"Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association.\",\n        \"Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback.\",\n        \"Applicable global and current-occurrence trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Prerequisites belonging only to another occurrence remain visible and gate that occurrence without retroactively invalidating accepted prefixes or blocking otherwise valid current incorporation. An A to B to A control proves applicable blocking and unrelated-occurrence isolation while retaining the accepted B contribution. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history.\",\n        \"Completed-chain next/admission never reports current success while an applicable outstanding mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution. Business transitions cannot silently replace frozen configuration or watch baselines; explicit resume and reconciliation remain separate recovery paths.\",\n        \"Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\",\n        \"Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/plugin-composition.js\",\n        \".skill-tree/lib/plugin-runtime.js\",\n        \".skill-tree/lib/plugin-registry.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/common/scripts/plugin-invocation.py\",\n        \".skill-tree/common/scripts/workflow-state.py\",\n        \".skill-tree/common/references/plugin-invocation.md\",\n        \".skill-tree/common/references/workflow-metadata.md\",\n        \".skill-tree/tests/test-plugin-composition.js\",\n        \".skill-tree/tests/test-plugin-invocation-installation.js\",\n        \".skill-tree/tests/test-plugin-workflow.py\",\n        \".skill-tree/history/research/plugin-managed-registry-absence-observation.json\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-invocation-installation.js\"\n      },\n      \"assertion\": \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration. Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association. Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback. Applicable global and current-occurrence trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Prerequisites belonging only to another occurrence remain visible and gate that occurrence without retroactively invalidating accepted prefixes or blocking otherwise valid current incorporation. An A to B to A control proves applicable blocking and unrelated-occurrence isolation while retaining the accepted B contribution. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history. Completed-chain next/admission never reports current success while an applicable outstanding mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution. Business transitions cannot silently replace frozen configuration or watch baselines; explicit resume and reconciliation remain separate recovery paths. Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh. Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\",\n      \"timing\": \"immediate\"\n    },\n    {\n      \"id\": \"invocation-prerequisite-admission\",\n      \"recipe_id\": \"quality-python\",\n      \"criteria\": [\n        \"Applicable global and current-occurrence trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Prerequisites belonging only to another occurrence remain visible and gate that occurrence without retroactively invalidating accepted prefixes or blocking otherwise valid current incorporation. An A to B to A control proves applicable blocking and unrelated-occurrence isolation while retaining the accepted B contribution. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history.\",\n        \"Completed-chain next/admission never reports current success while an applicable outstanding mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution. Business transitions cannot silently replace frozen configuration or watch baselines; explicit resume and reconciliation remain separate recovery paths.\",\n        \"Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/plugin-composition.js\",\n        \".skill-tree/lib/plugin-runtime.js\",\n        \".skill-tree/lib/plugin-registry.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/common/scripts/plugin-invocation.py\",\n        \".skill-tree/common/scripts/workflow-state.py\",\n        \".skill-tree/common/references/plugin-invocation.md\",\n        \".skill-tree/common/references/workflow-metadata.md\",\n        \".skill-tree/tests/test-plugin-composition.js\",\n        \".skill-tree/tests/test-plugin-invocation-installation.js\",\n        \".skill-tree/tests/test-plugin-workflow.py\",\n        \".skill-tree/history/research/plugin-managed-registry-absence-observation.json\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-workflow.py\"\n      },\n      \"assertion\": \"Applicable global and current-occurrence trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Prerequisites belonging only to another occurrence remain visible and gate that occurrence without retroactively invalidating accepted prefixes or blocking otherwise valid current incorporation. An A to B to A control proves applicable blocking and unrelated-occurrence isolation while retaining the accepted B contribution. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history. Completed-chain next/admission never reports current success while an applicable outstanding mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution. Business transitions cannot silently replace frozen configuration or watch baselines; explicit resume and reconciliation remain separate recovery paths. Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\",\n      \"timing\": \"immediate\"\n    }\n  ]\n}\n```\n\nAcceptance:\n- A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration.\n- Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association.\n- Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback.\n- Applicable global and current-occurrence trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Prerequisites belonging only to another occurrence remain visible and gate that occurrence without retroactively invalidating accepted prefixes or blocking otherwise valid current incorporation. An A to B to A control proves applicable blocking and unrelated-occurrence isolation while retaining the accepted B contribution. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history.\n- Completed-chain next/admission never reports current success while an applicable outstanding mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution. Business transitions cannot silently replace frozen configuration or watch baselines; explicit resume and reconciliation remain separate recovery paths.\n- Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\n- Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\n",
+                "depends_on": [
+                  "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+                ],
+                "key": "managed-registry-prerequisites",
+                "parent_pending_ids": [
+                  "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf"
+                ],
+                "title": "Guard managed registry authority and invocation prerequisites"
+              }
+            ]
+          },
+          "text": "Accept the arbiter-revised exact T-free task candidate and bounded processing plan, or request a concrete bounded revision."
+        },
+        "role": "resolver",
+        "role_receipts": {},
+        "schema": 1
+      },
+      "input_digest": "79d677f5b3434ab0a9edd08d4d8f0c397ab9a53a9c1fda823c69edefdfe8440e"
+    },
+    "DA-f6efc169-fa54-4c50-af70-37590f711789": {
+      "attempt_id": "DA-f6efc169-fa54-4c50-af70-37590f711789",
+      "creation_evidence": {
+        "actor_context_id": "/root/invocation118_architecture",
+        "actor_id": "/root/invocation118_architecture",
+        "kind": "host-agent-created",
+        "provider": "Codex collaboration",
+        "reference": "Actual root creation /root/invocation118_architecture; independent of current executor and processing resolver.",
+        "tool": "collaboration.spawn_agent"
+      },
+      "input": {
+        "actor": {
+          "context_id": "/root/invocation118_architecture",
+          "id": "/root/invocation118_architecture"
+        },
+        "authority": {
+          "allowed_kinds": [
+            "technical",
+            "product",
+            "specification-acceptance"
+          ],
+          "constraints": [
+            "Only research and promotion of the exact selected Pending into one required blocker within admitted pilot116. No runtime implementation occurs during processing. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+          ],
+          "context_id": "pending:P-c82aef73-0818-41a8-9466-d29c5d9bbeaf",
+          "evidence": {
+            "kind": "owner-message",
+            "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+          },
+          "id": "approved-managed-registry-process",
+          "revision": 1
+        },
+        "authority_digest": "ca440fe48ebe90937130a039b6e7f1574224234921d742a74c0295fc83282c85",
+        "context": {
+          "content_fingerprint": "10252bac98f0f49e709a7b96e30843537990918b342888f45bc66a5b3c93fb6e",
+          "decision_purpose": "plan",
+          "execution_snapshot_digest": "bb1a728e2feffd7e23469db04f591f36fccaa7f16668ff015e99f9e7709967df",
+          "id": "pending:P-c82aef73-0818-41a8-9466-d29c5d9bbeaf",
+          "kind": "pending",
+          "orchestration_id": "DO-949cacab-9b98-5773-a99a-34d1dfaad7c6",
+          "pending_ids": [
+            "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf"
+          ],
+          "plan_digest": "78a273e506bf3c92f93c4e5943a8a9ec37e34846740c0d23bc11ee7a8ce91f38",
+          "required_checks_digest": "59c01bb22f127c3bb829062627eff91156e0094ec11f73811f2db9fdb49ff6db",
+          "semantic_fingerprint": "04edf9a87baac985fe6a43fdf6b28866699b5492696b759c25debe031d4dc821"
+        },
+        "creation_evidence": {
+          "actor_context_id": "/root/invocation118_architecture",
+          "actor_id": "/root/invocation118_architecture",
+          "kind": "host-agent-created",
+          "provider": "Codex collaboration",
+          "reference": "Actual root creation /root/invocation118_architecture; independent of current executor and processing resolver.",
+          "tool": "collaboration.spawn_agent"
+        },
+        "decision_hash": "59b1652ecec53c83c529a3efb3827fa05c6e23215fe3b46a9d763ee39d07f887",
+        "decision_id": "DG-700b8746-92c6-5eb3-a93a-9e9a138d42e1",
+        "execution_snapshot": {
+          "common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+          "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+          "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+          "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+          "common/scripts/run-workspaces.py": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+          "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+          "common/scripts/workflow-state.py": "57383709635e780c6d207834fba5396583f1ecfe86ac2456380fabf755b6a68b",
+          "owned-profile": "11ff391bdcedc7200592174ce1495d68802168665563584bb27d2dce8f48cd40"
+        },
+        "mode": "auto",
+        "mode_epoch": 1,
+        "orchestration_id": "DO-949cacab-9b98-5773-a99a-34d1dfaad7c6",
+        "orchestration_revision": 6,
+        "prior_role_results": {
+          "resolver": {
+            "actor": {
+              "context_id": "/root/registry117_architecture",
+              "id": "/root/registry117_architecture"
+            },
+            "evidence": {
+              "actor_context_id": "/root/registry117_architecture",
+              "actor_id": "/root/registry117_architecture",
+              "creation_reference": "Actual root creation /root/registry117_architecture; current independent research and sealed Pending-processing resolver handoff remain separate from the executor.",
+              "kind": "delegated-agent",
+              "provider": "Codex collaboration",
+              "reference": "Actual /root/registry117_architecture returned matching sealed Pending-processing resolver JSON through collaboration final answer.",
+              "tool": "collaboration.followup_task"
+            },
+            "result": {
+              "answer": "accept",
+              "evidence": [
+                ".skill-tree/history/research/managed-registry-hardening-process-plan.md",
+                ".skill-tree/artifacts/plugin-implementation/managed-registry-process-candidate.json",
+                ".skill-tree/artifacts/plugin-implementation/managed-registry-process-research-reference-correction.json",
+                ".skill-tree/history/research/plugin-managed-registry-absence-observation.json",
+                ".skill-tree/lib/plugin-composition.js:149",
+                ".skill-tree/common/scripts/plugin-invocation.py:176",
+                ".skill-tree/common/scripts/plugin-invocation.py:235",
+                ".skill-tree/common/scripts/plugin-invocation.py:305",
+                ".skill-tree/common/scripts/plugin-invocation.py:328",
+                ".skill-tree/common/scripts/workflow-state.py:1915"
+              ],
+              "input_digest": "f7e937c84bbacf465a2cf0a9b8edccfb191a62368e0b3b92109563008df20ba2",
+              "rationale": "The candidate stays within the selected Pending and admitted pilot116 blocker scope, preserves actual Pending provenance and allocates no fabricated T identity. Exact operation/profile association preserves legitimate standalone copies, while prerequisite consumption at invoke, record, accept and completed-next closes the related cached-delivery gap visible in current source. Seven observable criteria and three focused checks cover both boundaries without installer dependencies or native-execution claims. The sealed input, plan and candidate match exactly; the research-reference correction changes no facts or authority. Processing authorizes the definition only, with implementation and qualification still separate.",
+              "status": "answered"
+            },
+            "status": "answered"
+          }
+        },
+        "question": {
+          "id": "managed-registry-process-plan",
+          "kind": "specification-acceptance",
+          "options": [
+            {
+              "id": "accept",
+              "text": "Accept the current plan."
+            },
+            {
+              "id": "revise",
+              "text": "Revise the plan with concrete reasons."
+            }
+          ],
+          "plan_text": "# Managed Registry Hardening Processing Plan\n\n## Selected scope and researched result\n\nThe explicit Implement All controller selected Pending P-c82aef73-0818-41a8-9466-d29c5d9bbeaf as required work beneath the already admitted Ponytail pilot T-18db6175-499f-4679-bf8d-f815c7b42411. Processing produces one Ready blocker definition and updates the recorded dependency closure. Processing performs no runtime implementation, provider trial, installation or publication.\n\nThe retained observation proves missing managed-registry authority at both preparation APIs while normal uninstall remains stale and an independent copy remains usable. Source research also identifies prerequisite consumption at invoke, record, accept and completed-next boundaries. A preparation-only repair does not establish the original-attempt invariant. The candidate therefore combines exact managed-operation association with current business-prerequisite admission as one bounded repair.\n\n## Candidate and validation\n\nThe candidate artifact `.skill-tree/artifacts/plugin-implementation/managed-registry-process-candidate.json` uses the actual Pending identity and a T-free task key. The normal guarded processing helper allocates the real T identity only during the final authorized queue transaction. The candidate contains researched current/desired behavior, source touch points, seven observable criteria and three focused Node/Python check plans. The invocation dependency is already admitted and completed; current dependency verification remains controller-owned.\n\nThe processing result requires three static checks: current source research, candidate prose/check/source validation, and exact scope/provenance review. A separate Auto resolver accepts the concrete candidate, an independent critic checks the significant ownership and prerequisite assumptions, and substantive disagreement requires the normal arbiter. No owner product choice remains missing. The recorded authority covers only the selected required task definition and existing dependency scope.\n\nThe completed definition artifact precedes source/check validation and final full candidate review. The final atomic `process` call publishes the reviewed definition with the inspected Future hash and original Pending provenance. The processing frame reaches readiness while the real Pending scope still exists; the actual processing receipt separately records the committed identities and dispositions. The controller then selects eligible required work without a standalone next-action question.\n\n## Preserved boundaries\n\nThe repair requires the actual execution root and exact current package destination, record and complete manifest/resource identity. Canonical queue sharing, profile presence or a copied manifest flag supplies no ownership. Existing copied-operation closure permits builtin and bundled data helpers without importing the installer or composer. Legitimate standalone copies and no-plugin/condition-false no-ops remain preserved.\n\nCurrent prerequisites and unresolved locations cannot advance original invocation attempts, including private cached-delivery paths. Held records and actual cleanup remain inspectable. The implementation retains frozen history and current mode/authority rather than inventing execution success. Focused synthetic and copied fixtures establish the declared guard assertions; actual native/provider and candidate-efficacy qualification remain separate.\n",
+          "recommendation": "accept",
+          "significance": "significant",
+          "task_candidate": {
+            "dispositions": {
+              "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf": {
+                "reason": "Repository/source research confirms a bounded registry-authority and prerequisite-consumption repair required before the already admitted pilot116.",
+                "status": "promoted"
+              }
+            },
+            "expected_source_hash": "3c64e84ff90a3b7792b2c0fa7b0574ce69896894755df11842aeb51b83cd4696",
+            "selectors": [
+              "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf"
+            ],
+            "tasks": [
+              {
+                "body": "Goal:\n- Retain managed plugin registry authority and current prerequisites through the selected operation invocation before the admitted review/interview pilots rely on the runtime gates.\n\nCurrent behavior:\n- The controlled observation on source633e716 reproduces one selected binding with no prerequisite after deletion of the managed registry; the owned profile and composed manifest remain unchanged. Normal managed uninstall already returns configuration-stale, and a copied standalone operation remains usable without profile or registry.\n- Current engine preparation checks prerequisite arrays, but invoke, record and accept can ignore prerequisite-only changes when configuration, context and source identity stay equal. The trusted cached private-delivery provider can avoid the default Node delivery admission path.\n\nDesired behavior:\n- The existing runtime distinguishes an associated owned installation from an independent standalone operation and retains required registry authority without a new ownership format.\n- Current owned preparation prerequisites gate business transitions before private callback resolution and within the writer transaction. Original cleanup and historical inspection remain available.\n\nTouch:\n- `.skill-tree/lib/plugin-composition.js`\n- `.skill-tree/lib/plugin-runtime.js`\n- `.skill-tree/lib/plugin-registry.js`\n- `.skill-tree/lib/installation.js`\n- `.skill-tree/lib/composer.js`\n- `.skill-tree/common/scripts/plugin-invocation.py`\n- `.skill-tree/common/scripts/workflow-state.py`\n- `.skill-tree/common/references/plugin-invocation.md`\n- `.skill-tree/common/references/workflow-metadata.md`\n- `.skill-tree/tests/test-plugin-composition.js`\n- `.skill-tree/tests/test-plugin-invocation-installation.js`\n- `.skill-tree/tests/test-plugin-workflow.py`\n\nImplementation constraints:\n- Exact operation association uses the current verified manifest/resource closure and real project-owned profile/destination evidence. The existing small deterministic receipt identity formula remains source-verified against the installer rather than imported through an unavailable runtime dependency.\n- Present-registry stale checks, copied standalone resources, empty/false-condition no-ops, original HI/HC identities, mode/authority and accepted-prefix history remain binding.\n- The helper records no successful invocation from prerequisite data. Actual fixture actors, network calls and product actions remain outside the focused repair.\n\nSource research:\n- `.skill-tree/history/research/plugin-managed-registry-absence-observation.json` retains the concrete four-scenario observation and qualification limits.\n- Source and independent control analysis identify the callback and business-proof consumption seam; a preparation-only repair leaves the in-flight invariant unverified.\n\nValidation:\n- Strategy: requirements-led focused Red/Green across real isolated managed/copy fixtures and original-attempt state controls.\n```json\n{\n  \"checks\": [\n    {\n      \"id\": \"managed-registry-composition\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration.\",\n        \"Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association.\",\n        \"Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback.\",\n        \"Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\",\n        \"Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/plugin-composition.js\",\n        \".skill-tree/lib/plugin-runtime.js\",\n        \".skill-tree/lib/plugin-registry.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/common/scripts/plugin-invocation.py\",\n        \".skill-tree/common/scripts/workflow-state.py\",\n        \".skill-tree/common/references/plugin-invocation.md\",\n        \".skill-tree/common/references/workflow-metadata.md\",\n        \".skill-tree/tests/test-plugin-composition.js\",\n        \".skill-tree/tests/test-plugin-invocation-installation.js\",\n        \".skill-tree/tests/test-plugin-workflow.py\",\n        \".skill-tree/history/research/plugin-managed-registry-absence-observation.json\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-composition.js\"\n      },\n      \"assertion\": \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration. Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association. Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback. Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh. Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\",\n      \"timing\": \"immediate\"\n    },\n    {\n      \"id\": \"managed-registry-copied-bridge\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration.\",\n        \"Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association.\",\n        \"Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback.\",\n        \"Current trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history.\",\n        \"Completed-chain next/admission never reports current success while a current mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution.\",\n        \"Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\",\n        \"Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/plugin-composition.js\",\n        \".skill-tree/lib/plugin-runtime.js\",\n        \".skill-tree/lib/plugin-registry.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/common/scripts/plugin-invocation.py\",\n        \".skill-tree/common/scripts/workflow-state.py\",\n        \".skill-tree/common/references/plugin-invocation.md\",\n        \".skill-tree/common/references/workflow-metadata.md\",\n        \".skill-tree/tests/test-plugin-composition.js\",\n        \".skill-tree/tests/test-plugin-invocation-installation.js\",\n        \".skill-tree/tests/test-plugin-workflow.py\",\n        \".skill-tree/history/research/plugin-managed-registry-absence-observation.json\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-invocation-installation.js\"\n      },\n      \"assertion\": \"A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration. Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association. Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback. Current trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history. Completed-chain next/admission never reports current success while a current mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution. Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh. Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\",\n      \"timing\": \"immediate\"\n    },\n    {\n      \"id\": \"invocation-prerequisite-admission\",\n      \"recipe_id\": \"quality-python\",\n      \"criteria\": [\n        \"Current trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history.\",\n        \"Completed-chain next/admission never reports current success while a current mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution.\",\n        \"Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/plugin-composition.js\",\n        \".skill-tree/lib/plugin-runtime.js\",\n        \".skill-tree/lib/plugin-registry.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/common/scripts/plugin-invocation.py\",\n        \".skill-tree/common/scripts/workflow-state.py\",\n        \".skill-tree/common/references/plugin-invocation.md\",\n        \".skill-tree/common/references/workflow-metadata.md\",\n        \".skill-tree/tests/test-plugin-composition.js\",\n        \".skill-tree/tests/test-plugin-invocation-installation.js\",\n        \".skill-tree/tests/test-plugin-workflow.py\",\n        \".skill-tree/history/research/plugin-managed-registry-absence-observation.json\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-workflow.py\"\n      },\n      \"assertion\": \"Current trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history. Completed-chain next/admission never reports current success while a current mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution. Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\",\n      \"timing\": \"immediate\"\n    }\n  ]\n}\n```\n\nAcceptance:\n- A selected plugin at an exactly associated managed operation retains the required live registry authority; missing, unreadable or inconsistent required state prevents successful freeze and occurrence preparation instead of becoming an empty or executable standalone configuration.\n- Managed association binds the actual execution project, exact current package destination, operation name, profile and destination identities, complete verified operation inventory and raw manifest digest. Canonical queue sharing, operation name, profile presence or manifest registry-present metadata alone establishes no association.\n- Source-free standalone copies without an associated owned profile/global registry remain usable. An independent copy beside an unrelated valid profile acquires no new missing-registry obligation. A relevant conflicting or unverifiable ownership claim remains an explicit prerequisite without ownership adoption or silent standalone fallback.\n- Current trusted prerequisites or unresolved bindings prevent prepare, invoke, returned-result qualification and accept from advancing the original attempt or cursor, including cached private-delivery callbacks. Held start/read and original reconciliation remain available; restoration or explicit retry retains matching original identities and frozen history.\n- Completed-chain next/admission never reports current success while a current mandatory prerequisite remains. Historical completion and accepted prefixes remain retained without relabeling old evidence as current execution.\n- Core-only, disabled and condition-excluded hook sets create no optional hold or Future state. Ordinary confirmed managed uninstall still retains stale-configuration prerequisites before refresh.\n- Copied operation resource closure remains self-contained and uses no installer/composer import, source-checkout or sibling fallback, acquisition, network or provider execution. Focused qualification separates deterministic fixture evidence from actual host, native and candidate-efficacy claims.\n",
+                "depends_on": [
+                  "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+                ],
+                "key": "managed-registry-prerequisites",
+                "parent_pending_ids": [
+                  "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf"
+                ],
+                "title": "Guard managed registry authority and invocation prerequisites"
+              }
+            ]
+          },
+          "text": "Accept the exact researched T-free task candidate and bounded processing plan, or request a bounded revision."
+        },
+        "role": "critic",
+        "role_receipts": {
+          "resolver": "6be0cf98e24e9f297c15e0cae02b7d3176a56d1fd9e0f625d7dca46fcb38dce0"
+        },
+        "schema": 1
+      },
+      "input_digest": "0d552dd2a7469e43d1991b448613d721af5d2ca736d2d79145dac167f19559ae"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only research and promotion of the exact selected Pending into one required blocker within admitted pilot116. No runtime implementation occurs during processing. No source publication, remote, release, comparative candidate trial, actual installation consent or real product/service actions. Required checks and real owner intent cannot be delegated away."
+    ],
+    "context_id": "pending:P-c82aef73-0818-41a8-9466-d29c5d9bbeaf",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+    },
+    "id": "approved-managed-registry-process",
+    "revision": 1
+  },
+  "capabilities": {
+    "independent_actors": true
+  },
+  "checks": {
+    "identity": {
+      "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "head": "f5e3734795b0f77bbd672ec8cdd8844730494438",
+      "source_digest": "45a688a9e8f50bf86602ef37f41f0927c380bb26a75f3c2e6dc3788c817309a2"
+    },
+    "passed": true,
+    "required_checks_digest": "59c01bb22f127c3bb829062627eff91156e0094ec11f73811f2db9fdb49ff6db",
+    "results": [
+      {
+        "id": "candidate-spec-validation",
+        "reference": ".skill-tree/history/research/managed-registry-hardening-processing-validation.json",
+        "status": "passed"
+      },
+      {
+        "id": "pending-source-research",
+        "reference": ".skill-tree/history/research/managed-registry-hardening-processing-validation.json",
+        "status": "passed"
+      },
+      {
+        "id": "candidate-scope-review",
+        "reference": ".skill-tree/history/research/managed-registry-hardening-processing-validation.json",
+        "status": "passed"
+      }
+    ]
+  },
+  "context": {
+    "content_fingerprint": "10252bac98f0f49e709a7b96e30843537990918b342888f45bc66a5b3c93fb6e",
+    "id": "pending:P-c82aef73-0818-41a8-9466-d29c5d9bbeaf",
+    "kind": "pending",
+    "pending_ids": [
+      "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf"
+    ],
+    "semantic_fingerprint": "04edf9a87baac985fe6a43fdf6b28866699b5492696b759c25debe031d4dc821"
+  },
+  "execution_snapshot": {
+    "common/references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
+    "common/references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+    "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+    "common/scripts/run-workspaces.py": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+    "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+    "common/scripts/workflow-state.py": "57383709635e780c6d207834fba5396583f1ecfe86ac2456380fabf755b6a68b",
+    "owned-profile": "11ff391bdcedc7200592174ce1495d68802168665563584bb27d2dce8f48cd40"
+  },
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "failure_observations": [],
+  "history": [
+    {
+      "detail": {},
+      "event": "start",
+      "phase": "research",
+      "previous_frame_hash": null,
+      "sequence": 1
+    },
+    {
+      "detail": {},
+      "event": "research",
+      "phase": "plan",
+      "previous_frame_hash": "8c1af3b3214c9bbf37da82dd169ae3ee2facb1325e4c558ed2b097ac025c4636",
+      "sequence": 2
+    },
+    {
+      "detail": {
+        "previous_acceptance": null,
+        "previous_plan": null
+      },
+      "event": "plan",
+      "phase": "plan-review",
+      "previous_frame_hash": "ab16e66520add44ea1fab258ab37a0b5dffceb75cab4e61cba0cfd6e0fb8bd46",
+      "sequence": 3
+    },
+    {
+      "detail": {
+        "decision_id": "DG-700b8746-92c6-5eb3-a93a-9e9a138d42e1",
+        "purpose": "plan"
+      },
+      "event": "question",
+      "phase": "plan-review",
+      "previous_frame_hash": "23535046ff5e899fab71e2e710a47c530fe7bde2ca71b4a2e78e9b783ae888b6",
+      "sequence": 4
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-117e468e-a66d-42de-86ca-3f4fa611857e",
+        "input_digest": "f7e937c84bbacf465a2cf0a9b8edccfb191a62368e0b3b92109563008df20ba2"
+      },
+      "event": "prepare-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "4fc8c769a77ca102810c8fafdd45d4dc0d5a40292cbdea8ae7302f96205d7aa7",
+      "sequence": 5
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-117e468e-a66d-42de-86ca-3f4fa611857e",
+        "status": "answered"
+      },
+      "event": "record-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "12ce5792c879036d8507aca5068b7d8fcf2d57587f6ad673fafcf3fad825e652",
+      "sequence": 6
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-f6efc169-fa54-4c50-af70-37590f711789",
+        "input_digest": "0d552dd2a7469e43d1991b448613d721af5d2ca736d2d79145dac167f19559ae"
+      },
+      "event": "prepare-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "ed947a5fb3f8d4af842eb6b9ee9e5675fac61214aab041e2dfa33f8786a7d667",
+      "sequence": 7
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-f6efc169-fa54-4c50-af70-37590f711789",
+        "status": "disagree"
+      },
+      "event": "record-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "2f0337c856e39aa6ec4cc5062d426c2cac08417ba8bff62a10fd28f939325968",
+      "sequence": 8
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-33b9f7d1-4bd4-43c9-8e1a-416f6a48dae6",
+        "input_digest": "9429d94d324757e1c08e693e4a4bc61991e9b53aed010229d4cf176fc0ac3323"
+      },
+      "event": "prepare-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "889f2940795c634d7f82614b4fae9497701f4134e9158269d2ed0738450f3c9c",
+      "sequence": 9
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-33b9f7d1-4bd4-43c9-8e1a-416f6a48dae6",
+        "status": "answered"
+      },
+      "event": "record-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "7303f798e237852c511f68aafff817682efcdcde1a1917f17ae99439f988aa31",
+      "sequence": 10
+    },
+    {
+      "detail": {
+        "acceptance_digest": "7ba8ed5541b2162ac2fcc5982846127789b27ccbd8dadfcf27c3a70b8f36bc96",
+        "decision_id": "DG-700b8746-92c6-5eb3-a93a-9e9a138d42e1"
+      },
+      "event": "accept-decision",
+      "phase": "plan-review",
+      "previous_frame_hash": "820f94a8ac6f98e2b125c9cce0157344f3576a62036dd478c78a8a1746a2be06",
+      "sequence": 11
+    },
+    {
+      "detail": {
+        "previous_acceptance": null,
+        "previous_plan": {
+          "digest": "78a273e506bf3c92f93c4e5943a8a9ec37e34846740c0d23bc11ee7a8ce91f38",
+          "reference": ".skill-tree/history/research/managed-registry-hardening-process-plan.md",
+          "required_checks": [
+            "pending-source-research",
+            "candidate-spec-validation",
+            "candidate-scope-review"
+          ]
+        }
+      },
+      "event": "plan",
+      "phase": "plan-review",
+      "previous_frame_hash": "dfd2f52ad95491419a1b49ad9805c70135e8a35928a5a7a57bc4ba74e562979d",
+      "sequence": 12
+    },
+    {
+      "detail": {
+        "decision_id": "DG-23ff72b9-ca4d-58d9-86d6-a21c33e7a944",
+        "purpose": "plan"
+      },
+      "event": "question",
+      "phase": "plan-review",
+      "previous_frame_hash": "6c5b732cb58af7e99211e911da6e39784b96228a416c5c89214b0de6fb0a9c6d",
+      "sequence": 13
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-719127da-b225-4173-8d6e-2d44185bcb83",
+        "input_digest": "79d677f5b3434ab0a9edd08d4d8f0c397ab9a53a9c1fda823c69edefdfe8440e"
+      },
+      "event": "prepare-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "ebef3e046bc86191026737c37debe738c668d0829080ea6b37882b79040e4635",
+      "sequence": 14
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-719127da-b225-4173-8d6e-2d44185bcb83",
+        "status": "answered"
+      },
+      "event": "record-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "47d451fa34952248f82b4a2b61838ec85db1c366526efda5950750ded56c3fa1",
+      "sequence": 15
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-68bb8073-7736-4d8f-a359-be6ac14c6787",
+        "input_digest": "78d59b1f7d6eea5a453f54e46deb25e48a1a562a2e7c613f917f64217030c9d6"
+      },
+      "event": "prepare-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "4d7add46e09d16dd05c5853075b34ebbba2efda0146cf2e362aced22d42548bc",
+      "sequence": 16
+    },
+    {
+      "detail": {
+        "attempt_id": "DA-68bb8073-7736-4d8f-a359-be6ac14c6787",
+        "status": "agree"
+      },
+      "event": "record-actor",
+      "phase": "plan-review",
+      "previous_frame_hash": "266c2be61465ff2dd6f28dc4ece4c1f620295bd827f8cd7524c19ae34bda2f69",
+      "sequence": 17
+    },
+    {
+      "detail": {
+        "acceptance_digest": "1b2c5e8b66ff8c7dcd4a4b14e85ad34e5503bcc9611ef3bc6d50720ad5097777",
+        "decision_id": "DG-23ff72b9-ca4d-58d9-86d6-a21c33e7a944"
+      },
+      "event": "accept-decision",
+      "phase": "plan-review",
+      "previous_frame_hash": "87c8f0c417c8b09b2ac326cecb225ccd7f150145f35c23cd1a193ad9d1082e3f",
+      "sequence": 18
+    },
+    {
+      "detail": {},
+      "event": "accept-plan",
+      "phase": "implement",
+      "previous_frame_hash": "5acb0507840aabfb0138c0ec3f546ca46ad076cc81294a031add47833beeabfc",
+      "sequence": 19
+    },
+    {
+      "detail": {},
+      "event": "implement",
+      "phase": "checks",
+      "previous_frame_hash": "7b54112db24f0fa8a9c0bf22b02946c2b1078467b68c70e6f941523b4a1211a8",
+      "sequence": 20
+    },
+    {
+      "detail": {},
+      "event": "checks",
+      "phase": "review",
+      "previous_frame_hash": "4759399b32509b1b9c5e2303bab1e279ee12aba8af7949669a907fcca47dbd7f",
+      "sequence": 21
+    },
+    {
+      "detail": {
+        "previous_resolutions": {},
+        "previous_review": null
+      },
+      "event": "review",
+      "phase": "ready",
+      "previous_frame_hash": "2728f0f36b7889e6c9268119e4244be9ea148a751603d48f80a400bbb7675693",
+      "sequence": 22
+    }
+  ],
+  "id": "DO-949cacab-9b98-5773-a99a-34d1dfaad7c6",
+  "identity": {
+    "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+    "head": "f5e3734795b0f77bbd672ec8cdd8844730494438",
+    "source_digest": "45a688a9e8f50bf86602ef37f41f0927c380bb26a75f3c2e6dc3788c817309a2"
+  },
+  "mode": "auto",
+  "orchestration_hash": "d85c488d6a53d222c4de187ec44ea3cea5e14d86bab6cded2555ae450a2e7b29",
+  "owner_question": null,
+  "phase": "ready",
+  "phase_after_checks": "review",
+  "plan": {
+    "digest": "bec8558a71522ef1a11890fb943ef7f44635689ea57caee75fa90f638d154eea",
+    "reference": ".skill-tree/history/research/managed-registry-hardening-process-plan.md",
+    "required_checks": [
+      "pending-source-research",
+      "candidate-spec-validation",
+      "candidate-scope-review"
+    ]
+  },
+  "plan_acceptance": {
+    "actor": {
+      "context_id": "/root/registry117_architecture",
+      "id": "/root/registry117_architecture"
+    },
+    "answer": "accept",
+    "attempt_id": "DA-719127da-b225-4173-8d6e-2d44185bcb83",
+    "authority_digest": "ca440fe48ebe90937130a039b6e7f1574224234921d742a74c0295fc83282c85",
+    "context_identity": {
+      "decision_purpose": "plan",
+      "execution_snapshot_digest": "bb1a728e2feffd7e23469db04f591f36fccaa7f16668ff015e99f9e7709967df",
+      "id": "pending:P-c82aef73-0818-41a8-9466-d29c5d9bbeaf",
+      "kind": "pending",
+      "orchestration_id": "DO-949cacab-9b98-5773-a99a-34d1dfaad7c6",
+      "pending_ids": [
+        "P-c82aef73-0818-41a8-9466-d29c5d9bbeaf"
+      ],
+      "plan_digest": "bec8558a71522ef1a11890fb943ef7f44635689ea57caee75fa90f638d154eea",
+      "required_checks_digest": "59c01bb22f127c3bb829062627eff91156e0094ec11f73811f2db9fdb49ff6db"
+    },
+    "decision_id": "DG-23ff72b9-ca4d-58d9-86d6-a21c33e7a944",
+    "digest": "1b2c5e8b66ff8c7dcd4a4b14e85ad34e5503bcc9611ef3bc6d50720ad5097777",
+    "kind": "specification-acceptance",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/registry117_architecture",
+      "actor_id": "/root/registry117_architecture",
+      "creation_reference": "Actual root creation /root/registry117_architecture; current independent research and sealed Pending-processing resolver handoff remain separate from the executor.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/registry117_architecture returned the observed resolver result for the exact original sealed input; raw artifact managed-registry-process-resolver-actual-result.json.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "38e8e31d611cc87fb552f24b5fe47ca48644a2901d02b1baeb39a58d9d6aed17",
+    "question_id": "managed-registry-process-plan-v2",
+    "rationale": "The revised definition explicitly gates applicable global/current-occurrence prerequisites while isolating other-occurrence requirements, requires A-to-B-to-A coverage retaining the accepted B contribution, and forbids silent frozen configuration/watch adoption during business transitions. Managed-operation association, standalone/no-op preservation and separate recovery paths remain bounded to the selected Pending blocker. The sealed input, authored plan and T-free candidate match exactly. This accepts the processing definition only; implementation, checks and runtime qualification remain separate.",
+    "role_receipts": {
+      "critic": "54bd8ce7c399033abc6c8d56c2c294b2437574b87fdcbe7b310ad50af18ed2c0",
+      "resolver": "7e475fb3bfb5bef2e0e10f9bb0f4676bd4ff394a8a20a8cf8d536a51d3812247"
+    },
+    "semantic_fingerprint": "04edf9a87baac985fe6a43fdf6b28866699b5492696b759c25debe031d4dc821"
+  },
+  "prepared_actor": null,
+  "prerequisites": [],
+  "question_context": null,
+  "question_decision_id": null,
+  "question_purpose": "plan",
+  "question_sequence": 2,
+  "request_id": "managed-registry-process-implementation",
+  "research_reference": ".skill-tree/artifacts/plugin-implementation/managed-registry-process-task.txt; source API and independent managed-registry-process_architecture and invocation118_architecture research",
+  "resolutions": {},
+  "resolved_obligations": [],
+  "review": {
+    "digest": "3d471839af8a2a6699e5e4cae08a757f55f5fb5dbdf7b4246610591f8edbb6c3",
+    "findings": [],
+    "id": "managed-registry-definition-review-v2",
+    "identity": {
+      "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "head": "f5e3734795b0f77bbd672ec8cdd8844730494438",
+      "source_digest": "45a688a9e8f50bf86602ef37f41f0927c380bb26a75f3c2e6dc3788c817309a2"
+    },
+    "reference": ".skill-tree/history/research/managed-registry-hardening-processing-validation.json; actual sealed independent critic checked complete revised candidate and plan."
+  },
+  "revision": 22,
+  "schema": 1,
+  "stagnation": {
+    "count": 0,
+    "key": null
+  },
+  "stagnation_limit": 3,
+  "start_digest": "2c83f836402364a66d2101e60d1eaf9590acb388c33cf3410f9db08fa95d222a"
+}

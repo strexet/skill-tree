@@ -1,0 +1,321 @@
+{
+  "answers": {
+    "initial-hook-map": {
+      "answer": "Actual W2 approval covers the displayed exact anchors and task-wording flow. The owner requests the first approved plan commit, full document review/fixes and second commit; independent closure checks retain the approved behavior and separate comparison gate.",
+      "evidence": {
+        "kind": "owner-message",
+        "reference": "Actual current owner message recorded in plugin-hook-decisions.json beginning W2 - согласен с твоими рекомендациями."
+      },
+      "question_revision": 3,
+      "round_id": "CR-dd2e18fb-47bf-4a77-b5f2-fe45dca22c62",
+      "valid": true
+    },
+    "operation-structure": {
+      "answer": "Actual W1 approval of the complete displayed Auto/Manual recommendation remains unchanged. The current owner authorizes all plan corrections; independent reviewers confirm the repairs clarify the approved scope without a new product decision.",
+      "evidence": {
+        "kind": "owner-message",
+        "reference": "Actual W1 owner message recorded in plugin-auto-manual-decision.json and the current owner request to finalize/review/repair the plan."
+      },
+      "question_revision": 2,
+      "round_id": "CR-dd2e18fb-47bf-4a77-b5f2-fe45dca22c62",
+      "valid": true
+    }
+  },
+  "baselines": {
+    "T-a5a738da-c182-4206-bb61-75ffa21946fb": {
+      "content_hash": "a7d61d3f9f72eb731d111c7e0adf0c41ec7d6680ea2e52c047a98199f7d3b0e0",
+      "fields": {
+        "acceptance": "0a83fef0172075ab78be924f67d535580d0497a130d3b300ef73578c360d6a9d",
+        "content": "6dc3d45d831e5e4b128c59d63a74880af4a7f34d05173d789c4359800bc7470d",
+        "dependencies": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "exclusions": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "goal": "d4813a2c1ec5b1ef938cfa3e244d04b0a35f17fc2701226e177584b26db8ac05",
+        "required_plugin_policy": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "scope": "42c41b6edc471ceb7d26d4e65c064679a93e3c6d3648f8bed0c31026e3fb3510",
+        "title": "efaec8f9048a044a046cecaf85f58bf8859bb7df667cb2fe0aba72ccf8404226",
+        "validation": "29fc5dfdc9365f7e497ad967af71e15dc9e289a796ed7492f2ac3ad44876d950"
+      },
+      "identity": {
+        "id": "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+        "parent_pending_ids": [
+          "P-8f13728d-b0df-4097-afa3-677e7dc939b5"
+        ],
+        "processing_run_id": "PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45",
+        "related_task_id": null,
+        "relation": "main",
+        "root_task_id": "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+      }
+    }
+  },
+  "clarity": {
+    "assessment": {
+      "acceptance": true,
+      "decisions": true,
+      "dependencies": true,
+      "evidence": [
+        "Both displayed design decisions have actual owner approval; the current owner also authorizes plan review and repair.",
+        "The entire first committed plan has three independent full reviews and root source review. All nine findings are resolved with no new material product choice.",
+        "Current-source facts distinguish manual runtime from approved future behavior, preserve initial roots and required descendant handling, and retain separate bounded comparison agreement."
+      ],
+      "exclusions": true,
+      "goals": true,
+      "scope": true,
+      "validation": true
+    },
+    "semantic_fingerprints": {
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb": "e2cd469a02560e6760f0b12e0e28fdd0a0a62d4dbf3c29578f9189f9c684adaa"
+    }
+  },
+  "confirmation": {
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Combined actual owner confirmation of the displayed W1 specification and current W2 anchor/task-wording recommendations, recorded in plugin-auto-manual-decision.json and plugin-hook-decisions.json. The current owner also requests final plan corrections. This confirms the displayed policy scope, not a claim that the owner read the later repaired document byte-for-byte; independent reviews confirm no new material choice."
+    },
+    "recorded_at": "2026-11-05T18:55:16.833275+00:00",
+    "semantic_fingerprints": {
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb": "e2cd469a02560e6760f0b12e0e28fdd0a0a62d4dbf3c29578f9189f9c684adaa"
+    },
+    "task_ids": [
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+    ]
+  },
+  "created_at": "2026-11-05T13:47:01.130668+00:00",
+  "facts": {
+    "current-flow-and-approved-pilots": {
+      "id": "current-flow-and-approved-pilots",
+      "limitations": [
+        "The source-level design acceptance is distinct from future Auto/Manual/plugin implementation and comparison qualification.",
+        "The original four accepted foundations and immutable outcomes remain unchanged."
+      ],
+      "observation": "Actual owner W1/W2 messages approve the displayed decision modes, exact anchors and task-wording sequence. The owner requests full document review and repairs. Three independent complete-document reviews plus root source inspection resolve nine documentation/metadata findings without a new material product choice. Current runtime remains manual-only; no external plugin infrastructure or comparison is implemented by the design task.",
+      "source_origin": "bd536c7ffbe1da9377d4108984dd4442a1876c1b56fdd8cffb64ca467bcd22eb",
+      "sources": [
+        {
+          "path": ".skill-tree/documents/implementation-plan.md",
+          "sha256": "384dc9b9aa674dfa10a3ffc0597804b5525ee8395d9382bd27a9d382df27b9e4"
+        },
+        {
+          "path": ".skill-tree/documents/plugin-workflow-decisions.md",
+          "sha256": "3630d4e9906afd8e1b0b1e5ae7a25c089a99f467121a2f353556df9f1ca72869"
+        },
+        {
+          "path": ".skill-tree/documents/plugin-system-contract.md",
+          "sha256": "19001702f22e73de4ae224d49e895e7db8f15f4b599a070c2c09fd7c4337eadf"
+        },
+        {
+          "path": ".skill-tree/history/research/plugin-auto-manual-decision.json",
+          "sha256": "77adbf24970ab1a5ea81270c948c1b2416dcf890d776540cad0dce2fb63e1772"
+        },
+        {
+          "path": ".skill-tree/history/research/plugin-hook-decisions.json",
+          "sha256": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461"
+        },
+        {
+          "path": ".skill-tree/history/validation/plugin-system/plan-full-review.json",
+          "sha256": "29f3bcd6a4bf2e3466e4d7815d1e64dd7f727e5e16e2a4149dd7451940d1dd26"
+        },
+        {
+          "path": ".skill-tree/documents/task-clarification-contract.md",
+          "sha256": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec"
+        },
+        {
+          "path": ".skill-tree/common/scripts/workflow-state.py",
+          "sha256": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52"
+        },
+        {
+          "path": ".skill-tree/templates/operations.json",
+          "sha256": "8c2b7606bb460b02f3a6786e6e1856c6c8a906bce4866bb780e764548465a266"
+        }
+      ]
+    }
+  },
+  "id": "CL-17367e9a-121d-4130-be4a-e13d151acb46",
+  "mode": "explicit",
+  "next_action": "Report clarification acceptance; wait for a separate implementation instruction",
+  "no_progress_rounds": 0,
+  "progress_signature": "6dc7816d31b6452e4c91d90dd6b3bfa3fd4ac3c344cb3ec7f2c0a02e8d3472da",
+  "questions": {
+    "initial-hook-map": {
+      "bindings": {
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb": [
+          "scope",
+          "required_plugin_policy",
+          "acceptance"
+        ]
+      },
+      "id": "initial-hook-map",
+      "prerequisites": [],
+      "recommendation": "Adopt the complete displayed W2 anchor and task-wording recommendations. Preserve task identity, requirements, dependencies and semantic freshness; treat application-specific quality benefit as unqualified until comparison.",
+      "required": true,
+      "revision": 3,
+      "text": "W2: Approve the exact Process Pending, Implement Next, document and PR review before/during/after anchor map, atomic configured task holds, complete core execution, no duplicate controller invocation and after-review before PR-ready; include writing-for-agents post-processing task wording review before grilling, affected recheck after revisions and current mode-specific final acceptance before Ready?"
+    },
+    "operation-structure": {
+      "bindings": {
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb": [
+          "scope",
+          "exclusions",
+          "acceptance"
+        ]
+      },
+      "id": "operation-structure",
+      "prerequisites": [],
+      "recommendation": "Adopt the complete Auto/Manual proposal displayed in chat and quoted verbatim by the owner in the actual W1 approval. Preserve actual decision origin, agreed goals/scope/constraints, existing authorizations and current checks/review.",
+      "required": true,
+      "revision": 2,
+      "text": "W1: Approve explicit internal research, plan, plan review, implementation, checks, review, finding resolution, fixes and re-review inside existing operations; default Auto with bounded reasoned resolver decisions and final specification acceptance, independent critic for significant decisions and arbiter for disagreement; explicit Manual owner checkpoints, state-preserving switches and no-progress/out-of-authority escalation?"
+    }
+  },
+  "revision": 20,
+  "rounds": [
+    {
+      "id": "CR-915a4d0e-c3fb-4e5c-8120-253f7fcd11c9",
+      "question_ids": [
+        "operation-structure",
+        "initial-hook-map"
+      ],
+      "question_revisions": {
+        "initial-hook-map": 1,
+        "operation-structure": 1
+      },
+      "semantic_fingerprints": {
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb": "871903ca9418be0a88f29d58656d0389b62ccba61493849e34b6c26027800075"
+      },
+      "source_hash": "fb762fa69b6a7d5584ec5d51e6d09845c15ac5bb61708dbe890c6a0348f61f79"
+    },
+    {
+      "id": "CR-3c1f432b-00fa-4acc-89bf-9fd2562b8da8",
+      "question_ids": [
+        "initial-hook-map",
+        "operation-structure"
+      ],
+      "question_revisions": {
+        "initial-hook-map": 2,
+        "operation-structure": 2
+      },
+      "semantic_fingerprints": {
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb": "9baa4accb6e2ba64b34d8d7f374f5bb8827e718d150a54be3d13dfdb8cf32a4c"
+      },
+      "source_hash": "de1e297f8b29177cf81f115eb8f0786912d6b8da7c422db4747bb6b53d4daf87"
+    },
+    {
+      "id": "CR-a97689f8-5d3c-4473-8947-e8979b245c69",
+      "question_ids": [
+        "initial-hook-map"
+      ],
+      "question_revisions": {
+        "initial-hook-map": 2
+      },
+      "semantic_fingerprints": {
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb": "9baa4accb6e2ba64b34d8d7f374f5bb8827e718d150a54be3d13dfdb8cf32a4c"
+      },
+      "source_hash": "de1e297f8b29177cf81f115eb8f0786912d6b8da7c422db4747bb6b53d4daf87"
+    },
+    {
+      "id": "CR-258e9dea-1181-4ef7-8522-7d968eb9aa81",
+      "question_ids": [
+        "initial-hook-map",
+        "operation-structure"
+      ],
+      "question_revisions": {
+        "initial-hook-map": 3,
+        "operation-structure": 2
+      },
+      "semantic_fingerprints": {
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb": "38687b1ab0de6ad4f7fc5b0745c6d86624822e486aed53e15b546837d73dcef0"
+      },
+      "source_hash": "7142cd6ad63dce354e36aeca143a76ccec4165dd16f50c3a56aa5fec4e1a7cf3"
+    },
+    {
+      "id": "CR-783aabc2-d2a1-4745-a929-729f93fe6b6a",
+      "question_ids": [],
+      "question_revisions": {},
+      "semantic_fingerprints": {
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb": "38687b1ab0de6ad4f7fc5b0745c6d86624822e486aed53e15b546837d73dcef0"
+      },
+      "source_hash": "7142cd6ad63dce354e36aeca143a76ccec4165dd16f50c3a56aa5fec4e1a7cf3"
+    },
+    {
+      "id": "CR-dd2e18fb-47bf-4a77-b5f2-fe45dca22c62",
+      "question_ids": [
+        "initial-hook-map",
+        "operation-structure"
+      ],
+      "question_revisions": {
+        "initial-hook-map": 3,
+        "operation-structure": 2
+      },
+      "semantic_fingerprints": {
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb": "e2cd469a02560e6760f0b12e0e28fdd0a0a62d4dbf3c29578f9189f9c684adaa"
+      },
+      "source_hash": "f68cfc4e0c8a4864bdeec5f501f80b994d78f5b3298924bf3b4b8378d1ed6bf7"
+    },
+    {
+      "id": "CR-77b74888-6aef-4f2a-8dd2-be05e3c59e34",
+      "question_ids": [],
+      "question_revisions": {},
+      "semantic_fingerprints": {
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb": "e2cd469a02560e6760f0b12e0e28fdd0a0a62d4dbf3c29578f9189f9c684adaa"
+      },
+      "source_hash": "f68cfc4e0c8a4864bdeec5f501f80b994d78f5b3298924bf3b4b8378d1ed6bf7"
+    }
+  ],
+  "schema": 1,
+  "semantic_fingerprints": {
+    "T-a5a738da-c182-4206-bb61-75ffa21946fb": "e2cd469a02560e6760f0b12e0e28fdd0a0a62d4dbf3c29578f9189f9c684adaa"
+  },
+  "source_hash": "f68cfc4e0c8a4864bdeec5f501f80b994d78f5b3298924bf3b4b8378d1ed6bf7",
+  "stale_facts": [],
+  "state": "complete",
+  "task_ids": [
+    "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+  ],
+  "task_revisions": [
+    {
+      "changed_fields": {
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb": [
+          "content"
+        ]
+      },
+      "id": "TR-9410db10-e801-4eb8-81af-715766a9518d",
+      "recorded_at": "2026-11-05T18:35:08.026098+00:00",
+      "source_after": "de1e297f8b29177cf81f115eb8f0786912d6b8da7c422db4747bb6b53d4daf87",
+      "source_before": "86b2495779742a71278040156d42dc1dba381a331f9f78a4f363c213bc0b8760",
+      "task_ids": [
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+      ]
+    },
+    {
+      "changed_fields": {
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb": [
+          "content",
+          "scope",
+          "validation"
+        ]
+      },
+      "id": "TR-998037d8-44bd-470f-b4bc-e92e704a26ed",
+      "recorded_at": "2026-11-05T18:44:32.431678+00:00",
+      "source_after": "7142cd6ad63dce354e36aeca143a76ccec4165dd16f50c3a56aa5fec4e1a7cf3",
+      "source_before": "de1e297f8b29177cf81f115eb8f0786912d6b8da7c422db4747bb6b53d4daf87",
+      "task_ids": [
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+      ]
+    },
+    {
+      "changed_fields": {
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb": [
+          "scope",
+          "validation"
+        ]
+      },
+      "id": "TR-83dadeb3-cde0-45de-96b6-8a02875e2f66",
+      "recorded_at": "2026-11-05T18:55:16.678935+00:00",
+      "source_after": "f68cfc4e0c8a4864bdeec5f501f80b994d78f5b3298924bf3b4b8378d1ed6bf7",
+      "source_before": "366ed4765a212689c35b6183d8ef19e195af5aab9acabc9c62fced088698afe3",
+      "task_ids": [
+        "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+      ]
+    }
+  ],
+  "updated_at": "2026-11-05T18:55:16.833414+00:00"
+}

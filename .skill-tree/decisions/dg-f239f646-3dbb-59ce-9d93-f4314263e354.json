@@ -1,0 +1,241 @@
+{
+  "acceptance": {
+    "actor": {
+      "context_id": "/root/composition119_plan_resolver",
+      "id": "/root/composition119_plan_resolver"
+    },
+    "answer": "accept",
+    "attempt_id": "DA-9d6f3e6b-e8e7-48a2-a1c5-d57c30d141ef",
+    "authority_digest": "d7cb4d3d704d0c3165dcf813b7e0e2e6bcc77c5be109348424e70163e8a4926e",
+    "context_identity": {
+      "decision_purpose": "plan",
+      "execution_snapshot_digest": "974655dee91cee8a939f49fb78fe720a5c0631cf0e78d33b896eabe7e92e46a0",
+      "id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "kind": "task",
+      "orchestration_id": "DO-1271a54f-5eaa-52b1-8b21-7df230249f55",
+      "plan_digest": "a30b99e5ff90f6db95d5e5358e75168afb228cd2073c3ec2578b433ee9eddd32",
+      "required_checks_digest": "354d85eb182f77e55e32a7c87ae3311762fc5f81eeb2ff2ab5c1a3b8acb2df1d",
+      "task_ids": [
+        "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+      ]
+    },
+    "decision_id": "DG-f239f646-3dbb-59ce-9d93-f4314263e354",
+    "digest": "9e462662e31bf8324e66ffd049b3c5155c5dc816df83a1ec5cbacbeecb4ed672",
+    "kind": "specification-acceptance",
+    "mode": "auto",
+    "mode_epoch": 1,
+    "origin": {
+      "actor_context_id": "/root/composition119_plan_resolver",
+      "actor_id": "/root/composition119_plan_resolver",
+      "creation_reference": "Actual root tool creation /root/composition119_plan_resolver; fresh fork_turns none, initially idle.",
+      "kind": "delegated-agent",
+      "provider": "Codex collaboration",
+      "reference": "Actual /root/composition119_plan_resolver returned current v2 JSON in collaboration.final answer.",
+      "tool": "collaboration.followup_task"
+    },
+    "question_digest": "b499434c62d62125d5158eab191b4ad741b94e391f5ea0e75e14ce5c1c269873",
+    "question_id": "composition119-plan",
+    "rationale": "The current sealed plan retains the task-119 scope, architecture, validation obligations and authority boundaries previously assessed. Replacing 'this plan' with 'the composition plan' makes the entity explicit without changing behavior or authorization. No material revision is required.",
+    "role_receipts": {
+      "critic": "49c21658b475d9ebb8dbab38954893d91fc543d91a428f521098e46ce29e8c36",
+      "resolver": "d5dfe7ddf30e922f70fb56ae554302ec0630faefb245e7cd96153bbc51ac595d"
+    },
+    "semantic_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427"
+  },
+  "active_attempt_id": null,
+  "attempts": {
+    "DA-6ca4e2c9-f678-4bf5-bfc2-d1c103f83383": {
+      "actor": {
+        "context_id": "/root/composition119_plan_critic",
+        "id": "/root/composition119_plan_critic"
+      },
+      "authority_digest": "d7cb4d3d704d0c3165dcf813b7e0e2e6bcc77c5be109348424e70163e8a4926e",
+      "basis_digest": "01de9e29cc6dba4187fff77074c72234b07772c10858a39d42f9912abc2497c8",
+      "content_fingerprint": "700d5e255a05ea557b9a055859635cbd6ead6b478ed646b73ca99a79e3b5bfce",
+      "evidence": {
+        "actor_context_id": "/root/composition119_plan_critic",
+        "actor_id": "/root/composition119_plan_critic",
+        "creation_reference": "Actual root tool creation /root/composition119_plan_critic; fresh fork_turns none, initially idle.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/composition119_plan_critic returned current v2 JSON in collaboration.final answer.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-6ca4e2c9-f678-4bf5-bfc2-d1c103f83383",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "b499434c62d62125d5158eab191b4ad741b94e391f5ea0e75e14ce5c1c269873",
+      "result": {
+        "answer": "accept",
+        "input_digest": "20571ec4b589e7a49ce2d72186c6e4fc7f819d755249f1f2ae161251aab197a9",
+        "rationale": "The current sealed plan and resolver assessment remain consistent with the canonical task and reviewed source contracts. The wording change names the composition plan explicitly and changes no scope, architecture, guards, validation obligations or authority boundaries. No material revision is required.",
+        "status": "agree"
+      },
+      "role": "critic",
+      "semantic_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+      "status": "agree"
+    },
+    "DA-9d6f3e6b-e8e7-48a2-a1c5-d57c30d141ef": {
+      "actor": {
+        "context_id": "/root/composition119_plan_resolver",
+        "id": "/root/composition119_plan_resolver"
+      },
+      "authority_digest": "d7cb4d3d704d0c3165dcf813b7e0e2e6bcc77c5be109348424e70163e8a4926e",
+      "basis_digest": null,
+      "content_fingerprint": "700d5e255a05ea557b9a055859635cbd6ead6b478ed646b73ca99a79e3b5bfce",
+      "evidence": {
+        "actor_context_id": "/root/composition119_plan_resolver",
+        "actor_id": "/root/composition119_plan_resolver",
+        "creation_reference": "Actual root tool creation /root/composition119_plan_resolver; fresh fork_turns none, initially idle.",
+        "kind": "delegated-agent",
+        "provider": "Codex collaboration",
+        "reference": "Actual /root/composition119_plan_resolver returned current v2 JSON in collaboration.final answer.",
+        "tool": "collaboration.followup_task"
+      },
+      "frontier_epoch": 1,
+      "id": "DA-9d6f3e6b-e8e7-48a2-a1c5-d57c30d141ef",
+      "mode": "auto",
+      "mode_epoch": 1,
+      "question_digest": "b499434c62d62125d5158eab191b4ad741b94e391f5ea0e75e14ce5c1c269873",
+      "result": {
+        "answer": "accept",
+        "input_digest": "19e9b18a1ba08be9f0d8d012a80163520304727ee35d451a5a306b35c64b16b7",
+        "rationale": "The current sealed plan retains the task-119 scope, architecture, validation obligations and authority boundaries previously assessed. Replacing 'this plan' with 'the composition plan' makes the entity explicit without changing behavior or authorization. No material revision is required.",
+        "status": "answered"
+      },
+      "role": "resolver",
+      "semantic_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+      "status": "answered"
+    }
+  },
+  "authority": {
+    "allowed_kinds": [
+      "technical",
+      "product",
+      "specification-acceptance"
+    ],
+    "constraints": [
+      "Only the approved task and dependency scope. No source publication, remote, release, external trial, installation consent or actual native plugin execution. Required checks and real owner intent cannot be delegated away."
+    ],
+    "context_id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+    "evidence": {
+      "kind": "owner-message",
+      "reference": "Explicit current Implement All and approved W1 bounded Auto delegation, W2/W3 plugin scope."
+    },
+    "id": "approved-composition119",
+    "revision": 1
+  },
+  "authority_digest": "d7cb4d3d704d0c3165dcf813b7e0e2e6bcc77c5be109348424e70163e8a4926e",
+  "context": {
+    "content_fingerprint": "700d5e255a05ea557b9a055859635cbd6ead6b478ed646b73ca99a79e3b5bfce",
+    "decision_purpose": "plan",
+    "execution_snapshot_digest": "974655dee91cee8a939f49fb78fe720a5c0631cf0e78d33b896eabe7e92e46a0",
+    "id": "task:T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+    "kind": "task",
+    "orchestration_id": "DO-1271a54f-5eaa-52b1-8b21-7df230249f55",
+    "plan_digest": "a30b99e5ff90f6db95d5e5358e75168afb228cd2073c3ec2578b433ee9eddd32",
+    "required_checks_digest": "354d85eb182f77e55e32a7c87ae3311762fc5f81eeb2ff2ab5c1a3b8acb2df1d",
+    "semantic_fingerprint": "4bd662c0ae27a155dd082741d3518ea82bae683ad7e7733f59369899efc7d427",
+    "task_ids": [
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+    ]
+  },
+  "decision_hash": "48c3d2ac0447e2c99afeea93e7493a596733fdd6c9baa72b3e72d701d12471fc",
+  "executor": {
+    "context_id": "/root",
+    "id": "/root"
+  },
+  "frontier_epoch": 1,
+  "history": [
+    {
+      "context_fingerprint": "700d5e255a05ea557b9a055859635cbd6ead6b478ed646b73ca99a79e3b5bfce",
+      "detail": {},
+      "event": "started",
+      "mode_epoch": 1,
+      "previous_record_hash": null,
+      "sequence": 1
+    },
+    {
+      "context_fingerprint": "700d5e255a05ea557b9a055859635cbd6ead6b478ed646b73ca99a79e3b5bfce",
+      "detail": {
+        "attempt_id": "DA-9d6f3e6b-e8e7-48a2-a1c5-d57c30d141ef",
+        "role": "resolver"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "cbb0e3c8348b0e3d79f24eeb7aca68d5781644ea541af9402d4d3492219977ab",
+      "sequence": 2
+    },
+    {
+      "context_fingerprint": "700d5e255a05ea557b9a055859635cbd6ead6b478ed646b73ca99a79e3b5bfce",
+      "detail": {
+        "attempt_id": "DA-9d6f3e6b-e8e7-48a2-a1c5-d57c30d141ef",
+        "status": "answered"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "7584b75f8b0c2976a1f8ba73ca3e52dbd57ef619997fb01c25017c3ac08d151e",
+      "sequence": 3
+    },
+    {
+      "context_fingerprint": "700d5e255a05ea557b9a055859635cbd6ead6b478ed646b73ca99a79e3b5bfce",
+      "detail": {
+        "attempt_id": "DA-6ca4e2c9-f678-4bf5-bfc2-d1c103f83383",
+        "role": "critic"
+      },
+      "event": "prepare",
+      "mode_epoch": 1,
+      "previous_record_hash": "1aa7177791539a52504405e63bf4acdce2b765ccd9ea270a02befcb2b93519bb",
+      "sequence": 4
+    },
+    {
+      "context_fingerprint": "700d5e255a05ea557b9a055859635cbd6ead6b478ed646b73ca99a79e3b5bfce",
+      "detail": {
+        "attempt_id": "DA-6ca4e2c9-f678-4bf5-bfc2-d1c103f83383",
+        "status": "agree"
+      },
+      "event": "record",
+      "mode_epoch": 1,
+      "previous_record_hash": "49e7db93d608532aa41619c8f60deb307ce9db6f94e9ef9cf247a6f73d9be104",
+      "sequence": 5
+    },
+    {
+      "context_fingerprint": "700d5e255a05ea557b9a055859635cbd6ead6b478ed646b73ca99a79e3b5bfce",
+      "detail": {
+        "acceptance_digest": "9e462662e31bf8324e66ffd049b3c5155c5dc816df83a1ec5cbacbeecb4ed672"
+      },
+      "event": "accept",
+      "mode_epoch": 1,
+      "previous_record_hash": "a1a4370a0fb550554fba000de0adb00c2a5e83ce36f2c32386c062550dda711a",
+      "sequence": 6
+    }
+  ],
+  "id": "DG-f239f646-3dbb-59ce-9d93-f4314263e354",
+  "mode": "auto",
+  "mode_epoch": 1,
+  "prepared_attempt_id": "DA-6ca4e2c9-f678-4bf5-bfc2-d1c103f83383",
+  "question": {
+    "id": "composition119-plan",
+    "kind": "specification-acceptance",
+    "options": [
+      {
+        "id": "accept",
+        "text": "Accept the current plan."
+      },
+      {
+        "id": "revise",
+        "text": "Revise the plan with concrete reasons."
+      }
+    ],
+    "plan_text": "# Standalone Plugin Composition Plan\n\n## Authorized result\n\nTask T-a9d7a827-fb25-4348-bcf7-867a449c58ef composes selected verified external plugin resources and ordered occurrences into registered operations. Composition remains offline and preserves core W1 authority and phases. Task 118 owns persisted native invocation and result receipts; task 117 owns live registry management. A composed boundary without a qualified executor exposes a prerequisite rather than claiming a plugin ran.\n\n## Implementation\n\n1. Add a focused plugin-composition module using the existing registry, binding and parameter APIs. Avoid importing lifecycle into composer because lifecycle already depends on installation and composer.\n2. Define executable owned before/during/after boundaries for the dynamically registered operation catalog and explicit W2 named aliases. Verify owner/version/context contracts; bind real selected Pending IDs before promotion and implementation During to the draft-plan phase before current acceptance and source edits.\n3. Resolve only verified owned registry/package inputs and selected operation bindings. Compose an operation-local ordered manifest plus one byte-preserving upstream/overlay resource closure per selected package. A-to-B-to-A remains three distinct binding rows with independent parameters; package-copy sharing never deduplicates occurrence execution.\n4. Make package content maps and hashing binary-safe. Retain strings for generated instructions and original Buffers for external resources. Preserve original BOM/binary bytes and keep raw upstream instructions separate from owned prose and generated entry points.\n5. Include registry, selected revisions/resources/order/configuration in profile and maintenance freshness identities. Preserve immutable parked configurations and stopped installation/admission barriers. Do not acquire packages, execute upstream helpers or refresh active runs during composition.\n6. Bundle only the necessary operation-local helper/reference closure through the resource map. Copy-only fixtures must run boundary preparation without the source or sibling installation. Missing native capabilities and unqualified invocation remain explicit unavailable prerequisites.\n7. Update the invocation and system contracts with current composed behavior and honest remaining task-118 qualification limits. Generate representative resources only through the canonical synchronizer.\n\n## Validation and review\n\nRequirements-led Node tests cover all three flavors, core-only zero holds, dynamic later operation registration, selected closure isolation, exact occurrence order/parameters, real Pending and draft-plan guards, missing capabilities, immutable freshness, sentinel non-execution, ownership/path/alias failures and exact copied BOM/binary bytes without source/siblings. Focused Red precedes implementation. Required checks: standalone-plugin-composition, sync-check, strict-validation, python, node, installer-list, installer-dry-run and diff-check. Independent full-diff review follows passing current checks; accepted findings require fixes and re-review.\n\n## Boundaries\n\nNo manager operation is registered early; the current count remains ten. No plugin comparative trial, installation consent, external Skill execution, browser/Unity product action, publication, source merge, remote push or release is authorized by the composition plan. The owner-authorized local source integration remains the controller tail after every admitted unit qualifies.\n",
+    "recommendation": "accept",
+    "significance": "significant",
+    "text": "Accept the exact approved-scope composition plan, or request a bounded revision."
+  },
+  "request_id": "DO-1271a54f-5eaa-52b1-8b21-7df230249f55:question:2",
+  "revision": 6,
+  "schema": 1,
+  "start_digest": "4cecc8a79acf427f815a6ef6a0d64ee62c2fd5bf62b755c800d17547c293d6a7",
+  "state": "accepted"
+}

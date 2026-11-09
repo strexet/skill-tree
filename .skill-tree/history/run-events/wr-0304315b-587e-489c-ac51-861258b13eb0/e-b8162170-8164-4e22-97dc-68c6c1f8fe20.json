@@ -1,0 +1,494 @@
+{
+  "changes": [
+    {
+      "after": null,
+      "before": {
+        "body": "### Support extensible plugin bindings across workflow operations\n\n```yaml\nid: P-539a810d-cdb5-4901-bbfe-a2344698b78f\npriority: 130\nstatus: Pending\nparent_pending_ids: []\nprocessing_run_id: null\nroot_task_id: T-a9d7a827-fb25-4348-bcf7-867a449c58ef\nrelated_task_id: T-a9d7a827-fb25-4348-bcf7-867a449c58ef\nrelation: blocker\ndepends_on: []\n```\n\nDescription:\n- Extend before/during/after placement beyond the fixed initial map to every operation and registered named internal anchor. Support multiple independent bindings, conditions, order and binding parameters, including explicit controller and leaf placements.\n\nExpected behavior:\n- Bindings resolve to actual dispatch points with exact event/selection identity. Intentional multiple placements remain distinct; duplicate delivery and recursive dispatch are detected. Core selection, authorization and transaction guards remain mandatory.\n\nRequest classification:\n- other: The owner expands the planned plugin capability and changes the installation default; existing implemented core behavior is not reported defective.\n\nCurrent context:\n- Required W3 descendant inside the existing frozen plugin-system roots. Source currently has ten operations; management raises the implemented count only after qualification. Research preserves an acyclic import/lifecycle/composition/runtime/management order and aligns affected existing task checks.\n\nSource:\n- .skill-tree/history/research/plugin-management-decisions.json; actual current owner instruction.\n\n",
+        "queue": "Pending Queue"
+      },
+      "task_id": "P-539a810d-cdb5-4901-bbfe-a2344698b78f"
+    },
+    {
+      "after": null,
+      "before": {
+        "body": "### Support open external skill sources and flexible parameters\n\n```yaml\nid: P-a3796e30-9b57-4c28-89b2-39db50a9bd93\npriority: 129\nstatus: Pending\nparent_pending_ids: []\nprocessing_run_id: null\nroot_task_id: T-6f4500f7-91e2-410d-8172-a4c4cd232fc5\nrelated_task_id: T-6f4500f7-91e2-410d-8172-a4c4cd232fc5\nrelation: blocker\ndepends_on: []\n```\n\nDescription:\n- Normalize noncatalog repository URLs/paths/refs, raw instruction URLs and local files/folders; preserve original bytes/provenance and separate adaptation overlays. Accept Claude/other authoring-host skill sources and arbitrary instruction text/JSON parameters.\n\nExpected behavior:\n- Imported known definitions and owned content snapshots remain distinct from installed/executable state. Optional schemas, parameter precedence and capability mapping produce visible effective configuration; missing native tools do not prevent known registration or inert package installation, and never establish successful execution.\n\nRequest classification:\n- other: The owner expands the planned plugin capability and changes the installation default; existing implemented core behavior is not reported defective.\n\nCurrent context:\n- Required W3 descendant inside the existing frozen plugin-system roots. Source currently has ten operations; management raises the implemented count only after qualification. Research preserves an acyclic import/lifecycle/composition/runtime/management order and aligns affected existing task checks.\n\nSource:\n- .skill-tree/history/research/plugin-management-decisions.json; actual current owner instruction.\n\n",
+        "queue": "Pending Queue"
+      },
+      "task_id": "P-a3796e30-9b57-4c28-89b2-39db50a9bd93"
+    },
+    {
+      "after": null,
+      "before": {
+        "body": "### Add the core Skill Tree Plugins management operation\n\n```yaml\nid: P-edc462d9-992f-4c74-ab0a-b4e573109e7d\npriority: 131\nstatus: Pending\nparent_pending_ids: []\nprocessing_run_id: null\nroot_task_id: T-6ec57615-3512-4f91-98e8-efb12cde7d7f\nrelated_task_id: T-6ec57615-3512-4f91-98e8-efb12cde7d7f\nrelation: blocker\ndepends_on: []\n```\n\nDescription:\n- Provide skill-tree-plugins in the core-only installation. Show known curated/custom sources and installed plugins with all actual bindings, parameters, destinations and adapter status; share optional initial setup with later install/configure/remove.\n\nExpected behavior:\n- Offline listing works with zero external plugins. Users can add a link/path, save a known source, install/configure, bind/unbind, enable/disable, update, uninstall or forget a custom entry. Default core install acquires no plugin; repeat install preserves existing plugins. Removal is exact, previewed, owned and preserves original sources, shared resources and history.\n\nRequest classification:\n- other: The owner expands the planned plugin capability and changes the installation default; existing implemented core behavior is not reported defective.\n\nCurrent context:\n- Required W3 descendant inside the existing frozen plugin-system roots. Source currently has ten operations; management raises the implemented count only after qualification. Research preserves an acyclic import/lifecycle/composition/runtime/management order and aligns affected existing task checks.\n\nSource:\n- .skill-tree/history/research/plugin-management-decisions.json; actual current owner instruction.\n\n",
+        "queue": "Pending Queue"
+      },
+      "task_id": "P-edc462d9-992f-4c74-ab0a-b4e573109e7d"
+    },
+    {
+      "after": {
+        "body": "### Implement open skill source import and parameter resolution\n\n```yaml\nid: T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9\npriority: 129\nstatus: Ready\nparent_pending_ids: [\"P-a3796e30-9b57-4c28-89b2-39db50a9bd93\"]\nprocessing_run_id: PR-9ffb62ea-745b-4d44-a772-dad8d1c35f5b\nroot_task_id: T-6f4500f7-91e2-410d-8172-a4c4cd232fc5\nrelated_task_id: T-6f4500f7-91e2-410d-8172-a4c4cd232fc5\nrelation: blocker\ndepends_on: [\"T-2da07d09-0b1a-4407-b375-defd23720387\", \"T-6d3df9b8-1712-4a41-b38e-aed827e28bfc\"]\n```\n\nGoal:\n- Implement W3 noncatalog/cross-host source intake, preserved snapshots and flexible parameter resolution as shared lifecycle foundations.\n\nTouch:\n- `.skill-tree/lib/plugin-sources.js`\n- `.skill-tree/lib/plugin-parameters.js`\n- `.skill-tree/lib/plugins.js`\n- `.skill-tree/tests/test-plugin-sources.js`\n- `.skill-tree/documents/plugin-management-contract.md`\n\nImplementation constraints:\n- The curated catalog and authoring-host labels never act as import allowlists.\n- Complete required source resources and owned content remain mandatory; missing native execution capabilities can remain visibly inactive.\n- The source/parameter foundation does not depend on the consuming lifecycle or runtime operation.\n\nValidation:\n- Strategy: test-first focused behavioral fixtures; actual agent observations remain separate from deterministic helper evidence.\n```json\n{\n  \"checks\": [\n    {\n      \"id\": \"open-source-parameters\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"Catalog IDs, repository/path/ref URLs, raw instruction URLs and local files/folders normalize into stable known definitions and immutable content/resource snapshots without a source-host or catalog allowlist.\",\n        \"Claude-shaped and nonstandard instruction fixtures preserve original bytes/metadata and separate owned wrappers/adaptation overlays; known registration and inert installation remain distinct from runnable support and missing native capabilities.\",\n        \"Additional instruction text and arbitrary JSON resolve upstream, project, binding and explicit run precedence with optional schema validation, visible origins and no overwrite of core authority/identity fields.\",\n        \"Owned snapshot paths are portable and repository-relative; machine-local acquisition locators and resolved secret values stay outside portable descriptors, ordinary views and receipts.\",\n        \"Missing source resources, source drift, path escapes and conflicting identities reject activation; offline listing and acquisition execute no source helper or native dependency installer.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/plugin-sources.js\",\n        \".skill-tree/lib/plugin-parameters.js\",\n        \".skill-tree/lib/plugins.js\",\n        \".skill-tree/tests/test-plugin-sources.js\",\n        \".skill-tree/documents/plugin-management-contract.md\",\n        \".skill-tree/documents/plugin-system-contract.md\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-sources.js\"\n      },\n      \"assertion\": \"Catalog IDs, repository/path/ref URLs, raw instruction URLs and local files/folders normalize into stable known definitions and immutable content/resource snapshots without a source-host or catalog allowlist. Claude-shaped and nonstandard instruction fixtures preserve original bytes/metadata and separate owned wrappers/adaptation overlays; known registration and inert installation remain distinct from runnable support and missing native capabilities. Additional instruction text and arbitrary JSON resolve upstream, project, binding and explicit run precedence with optional schema validation, visible origins and no overwrite of core authority/identity fields. Owned snapshot paths are portable and repository-relative; machine-local acquisition locators and resolved secret values stay outside portable descriptors, ordinary views and receipts. Missing source resources, source drift, path escapes and conflicting identities reject activation; offline listing and acquisition execute no source helper or native dependency installer.\",\n      \"timing\": \"immediate\"\n    }\n  ]\n}\n```\n\nAcceptance:\n- Catalog IDs, repository/path/ref URLs, raw instruction URLs and local files/folders normalize into stable known definitions and immutable content/resource snapshots without a source-host or catalog allowlist.\n- Claude-shaped and nonstandard instruction fixtures preserve original bytes/metadata and separate owned wrappers/adaptation overlays; known registration and inert installation remain distinct from runnable support and missing native capabilities.\n- Additional instruction text and arbitrary JSON resolve upstream, project, binding and explicit run precedence with optional schema validation, visible origins and no overwrite of core authority/identity fields.\n- Owned snapshot paths are portable and repository-relative; machine-local acquisition locators and resolved secret values stay outside portable descriptors, ordinary views and receipts.\n- Missing source resources, source drift, path escapes and conflicting identities reject activation; offline listing and acquisition execute no source helper or native dependency installer.\n\nApproved decision evidence:\n- `.skill-tree/history/research/plugin-management-decisions.json`; W3 is actual owner direction, with no claim that the capability is already implemented.\n\n",
+        "queue": "Prioritized Next Changes"
+      },
+      "before": null,
+      "task_id": "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9"
+    },
+    {
+      "after": {
+        "body": "### Implement confirmed recommended and alternative plugin installation\n\n```yaml\nid: T-6ec57615-3512-4f91-98e8-efb12cde7d7f\npriority: 110\nstatus: Ready\nparent_pending_ids: [\"P-14584d76-6e8b-418a-b04b-8de586f10f0a\"]\nprocessing_run_id: PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45\nroot_task_id: T-6ec57615-3512-4f91-98e8-efb12cde7d7f\nrelated_task_id: null\nrelation: main\ndepends_on: [\"T-2da07d09-0b1a-4407-b375-defd23720387\", \"T-ea3d73b4-c312-4de9-9897-c97f380e4516\", \"T-dae414c5-43e4-45db-a6f3-4ce4112440c5\", \"T-10528edd-4542-4c26-b8b3-738ffc00d791\", \"T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad\"]\n```\n\nGoal:\n- Wire the grouped catalog, confirmed plugin acquisition and owned lifecycle into the existing installer according to the agreed interaction contract.\n\nTouch:\n- `.skill-tree/bin/install.js`\n- `.skill-tree/lib/installation.js`\n- `.skill-tree/lib/plugin-catalog.js`\n- `.skill-tree/tests/test-plugin-installer.js`\n- `.skill-tree/documents/plugin-installation-contract.md`\n- `.skill-tree/documents/install.md`\n\nImplementation constraints:\n- Plugin installation never executes the selected skills or grants new workflow-stage/publication permission.\n- Use existing provider destinations and ownership/transaction barriers; record truthful provider results and preserve unrelated files.\n\nValidation:\n- Strategy: test-first focused behavioral regressions.\n```json\n{\n  \"checks\": [\n    {\n      \"id\": \"plugin-installer-regressions\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"The installation flow presents exact recommended versions, hook locations, enabled state and readiness effects with actual install, skip or choose-other-plugin actions once per project; confirmation installs and enables exactly the displayed configuration.\",\n        \"Choose-other lists the full available catalog grouped by integration points and installs only the confirmed compatible selection; skip preserves core-only behavior.\",\n        \"Noninteractive, repeat, dry-run, provider-partial-failure and interrupted/rollback cases follow the agreed policy without hidden network, helper execution or inferred consent.\",\n        \"An empty eligible recommendation set supports explicit manual selection or core-only skip; successful installation links to the installed registry and documented exact-ID removal command.\"\n      ],\n      \"sources\": [\n        \".skill-tree/bin/install.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/lib/plugin-catalog.js\",\n        \".skill-tree/tests/test-plugin-installer.js\",\n        \".skill-tree/documents/plugin-installation-contract.md\",\n        \".skill-tree/documents/install.md\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-installer.js\"\n      },\n      \"assertion\": \"The installation flow presents exact recommended versions, hook locations, enabled state and readiness effects with actual install, skip or choose-other-plugin actions once per project; confirmation installs and enables exactly the displayed configuration. Choose-other lists the full available catalog grouped by integration points and installs only the confirmed compatible selection; skip preserves core-only behavior. Noninteractive, repeat, dry-run, provider-partial-failure and interrupted/rollback cases follow the agreed policy without hidden network, helper execution or inferred consent. An empty eligible recommendation set supports explicit manual selection or core-only skip; successful installation links to the installed registry and documented exact-ID removal command.\",\n      \"timing\": \"immediate\"\n    }\n  ]\n}\n```\n\nAcceptance:\n- The installation flow presents exact recommended versions, hook locations, enabled state and readiness effects with actual install, skip or choose-other-plugin actions once per project; confirmation installs and enables exactly the displayed configuration.\n- Choose-other lists the full available catalog grouped by integration points and installs only the confirmed compatible selection; skip preserves core-only behavior.\n- Noninteractive, repeat, dry-run, provider-partial-failure and interrupted/rollback cases follow the agreed policy without hidden network, helper execution or inferred consent.\n- An empty eligible recommendation set supports explicit manual selection or core-only skip; successful installation links to the installed registry and documented exact-ID removal command.\n\n\nApproved clarification decisions:\n- Q3: Codex is the first verified plugin invocation host. The contract remains portable; invocation on other hosts is explicitly unqualified or unavailable until verified. Existing core installation support remains unchanged.\n- Q4: Recommendations prioritize demonstrated task/review quality improvement, with explicit time/cost reporting and limitations; adoption alone supplies no outcome evidence.\n- Q9: Project defaults permit explicit temporary per-run overrides. The effective configuration is recorded and frozen across resume; persistent edits are explicit and never silently satisfy or replace parked-run obligations.\n- Q10: Recommended bundles require bounded comparison evidence in the target workflow. Untested or compatibility-only candidates remain manually selectable with explicit evidence status; no eligible candidate produces an explicit empty recommendation set.\n- Q11: The installation proposal displays exact versions, hook locations, enabled state and readiness effects. Actual confirmation installs and enables exactly the displayed configuration; skill execution occurs later in authorized workflows.\n- Decision evidence: `.skill-tree/documents/plugin-workflow-decisions.md`; Q1-Q11 have actual owner approval. Final shared-understanding confirmation remains separate.\n\n",
+        "queue": "Prioritized Next Changes"
+      },
+      "before": {
+        "body": "### Implement confirmed recommended and alternative plugin installation\n\n```yaml\nid: T-6ec57615-3512-4f91-98e8-efb12cde7d7f\npriority: 110\nstatus: Ready\nparent_pending_ids: [\"P-14584d76-6e8b-418a-b04b-8de586f10f0a\"]\nprocessing_run_id: PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45\nroot_task_id: T-6ec57615-3512-4f91-98e8-efb12cde7d7f\nrelated_task_id: null\nrelation: main\ndepends_on: [\"T-2da07d09-0b1a-4407-b375-defd23720387\", \"T-ea3d73b4-c312-4de9-9897-c97f380e4516\", \"T-dae414c5-43e4-45db-a6f3-4ce4112440c5\", \"T-10528edd-4542-4c26-b8b3-738ffc00d791\"]\n```\n\nGoal:\n- Wire the grouped catalog, confirmed plugin acquisition and owned lifecycle into the existing installer according to the agreed interaction contract.\n\nTouch:\n- `.skill-tree/bin/install.js`\n- `.skill-tree/lib/installation.js`\n- `.skill-tree/lib/plugin-catalog.js`\n- `.skill-tree/tests/test-plugin-installer.js`\n- `.skill-tree/documents/plugin-installation-contract.md`\n- `.skill-tree/documents/install.md`\n\nImplementation constraints:\n- Plugin installation never executes the selected skills or grants new workflow-stage/publication permission.\n- Use existing provider destinations and ownership/transaction barriers; record truthful provider results and preserve unrelated files.\n\nValidation:\n- Strategy: test-first focused behavioral regressions.\n```json\n{\n  \"checks\": [\n    {\n      \"id\": \"plugin-installer-regressions\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"The installation flow presents exact recommended versions, hook locations, enabled state and readiness effects with actual install, skip or choose-other-plugin actions once per project; confirmation installs and enables exactly the displayed configuration.\",\n        \"Choose-other lists the full available catalog grouped by integration points and installs only the confirmed compatible selection; skip preserves core-only behavior.\",\n        \"Noninteractive, repeat, dry-run, provider-partial-failure and interrupted/rollback cases follow the agreed policy without hidden network, helper execution or inferred consent.\",\n        \"An empty eligible recommendation set supports explicit manual selection or core-only skip; successful installation links to the installed registry and documented exact-ID removal command.\"\n      ],\n      \"sources\": [\n        \".skill-tree/bin/install.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/lib/plugin-catalog.js\",\n        \".skill-tree/tests/test-plugin-installer.js\",\n        \".skill-tree/documents/plugin-installation-contract.md\",\n        \".skill-tree/documents/install.md\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-installer.js\"\n      },\n      \"assertion\": \"The installation flow presents exact recommended versions, hook locations, enabled state and readiness effects with actual install, skip or choose-other-plugin actions once per project; confirmation installs and enables exactly the displayed configuration. Choose-other lists the full available catalog grouped by integration points and installs only the confirmed compatible selection; skip preserves core-only behavior. Noninteractive, repeat, dry-run, provider-partial-failure and interrupted/rollback cases follow the agreed policy without hidden network, helper execution or inferred consent. An empty eligible recommendation set supports explicit manual selection or core-only skip; successful installation links to the installed registry and documented exact-ID removal command.\",\n      \"timing\": \"immediate\"\n    }\n  ]\n}\n```\n\nAcceptance:\n- The installation flow presents exact recommended versions, hook locations, enabled state and readiness effects with actual install, skip or choose-other-plugin actions once per project; confirmation installs and enables exactly the displayed configuration.\n- Choose-other lists the full available catalog grouped by integration points and installs only the confirmed compatible selection; skip preserves core-only behavior.\n- Noninteractive, repeat, dry-run, provider-partial-failure and interrupted/rollback cases follow the agreed policy without hidden network, helper execution or inferred consent.\n- An empty eligible recommendation set supports explicit manual selection or core-only skip; successful installation links to the installed registry and documented exact-ID removal command.\n\n\nApproved clarification decisions:\n- Q3: Codex is the first verified plugin invocation host. The contract remains portable; invocation on other hosts is explicitly unqualified or unavailable until verified. Existing core installation support remains unchanged.\n- Q4: Recommendations prioritize demonstrated task/review quality improvement, with explicit time/cost reporting and limitations; adoption alone supplies no outcome evidence.\n- Q9: Project defaults permit explicit temporary per-run overrides. The effective configuration is recorded and frozen across resume; persistent edits are explicit and never silently satisfy or replace parked-run obligations.\n- Q10: Recommended bundles require bounded comparison evidence in the target workflow. Untested or compatibility-only candidates remain manually selectable with explicit evidence status; no eligible candidate produces an explicit empty recommendation set.\n- Q11: The installation proposal displays exact versions, hook locations, enabled state and readiness effects. Actual confirmation installs and enables exactly the displayed configuration; skill execution occurs later in authorized workflows.\n- Decision evidence: `.skill-tree/documents/plugin-workflow-decisions.md`; Q1-Q11 have actual owner approval. Final shared-understanding confirmation remains separate.\n\n",
+        "queue": "Prioritized Next Changes"
+      },
+      "task_id": "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    },
+    {
+      "after": {
+        "body": "### Implement pinned external plugin package lifecycle\n\n```yaml\nid: T-6f4500f7-91e2-410d-8172-a4c4cd232fc5\npriority: 120\nstatus: Ready\nparent_pending_ids: [\"P-97789c00-ffd4-450f-a0ca-8cd5fd68f8de\"]\nprocessing_run_id: PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45\nroot_task_id: T-6f4500f7-91e2-410d-8172-a4c4cd232fc5\nrelated_task_id: null\nrelation: main\ndepends_on: [\"T-6d3df9b8-1712-4a41-b38e-aed827e28bfc\", \"T-2da07d09-0b1a-4407-b375-defd23720387\", \"T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9\"]\n```\n\nGoal:\n- Implement explicit source/dependency resolution and owned local plugin generations using the existing installation/profile transaction boundary.\n\nTouch:\n- `.skill-tree/installation/plugins.json`\n- `.skill-tree/lib/plugins.js`\n- `.skill-tree/lib/composer.js`\n- `.skill-tree/lib/installation.js`\n- `.skill-tree/bin/install.js`\n- `.skill-tree/tests/test-plugin-installation.js`\n- `.skill-tree/documents/plugin-system-contract.md`\n- `.skill-tree/documents/plugin-installation-contract.md`\n\nImplementation constraints:\n- The owned project-local registry `.skill-tree/installation/plugins.json` records plugin generations, provenance, destinations, dependencies and configured operation/hook bindings. Package, registry and binding changes share the installation transaction.\n- Remote acquisition is a distinct confirmed install action, never hidden in static composition, verification or dry-run.\n- Preserve upstream content/license provenance and repository-local paths; no implicit global or symlink installation, format conversion or unreviewed helper execution.\n\nValidation:\n- Strategy: test-first focused behavioral regressions.\n```json\n{\n  \"checks\": [\n    {\n      \"id\": \"package-lifecycle\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"Exact external revisions, complete local resources and required sibling/native-tool dependencies resolve into an owned project-scoped plugin generation.\",\n        \"Modified or unknown ownership, missing dependencies, unsupported host requirements, drift and interrupted replacement fail or recover without corrupting core packages and checkpoints.\",\n        \"Enable, disable, update, uninstall and rollback follow the agreed consent/lifecycle contract; ordinary dry-run remains offline and no installation executes a skill.\",\n        \"The canonical registry, owned package generation and configured hook bindings update or roll back atomically; install confirmation enables only displayed bindings and the registry supports downstream inventory views without requiring the management interface.\"\n      ],\n      \"sources\": [\n        \".skill-tree/installation/plugins.json\",\n        \".skill-tree/lib/plugins.js\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/bin/install.js\",\n        \".skill-tree/tests/test-plugin-installation.js\",\n        \".skill-tree/documents/plugin-system-contract.md\",\n        \".skill-tree/documents/plugin-installation-contract.md\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-installation.js\"\n      },\n      \"assertion\": \"Exact external revisions, complete local resources and required sibling/native-tool dependencies resolve into an owned project-scoped plugin generation. Modified or unknown ownership, missing dependencies, unsupported host requirements, drift and interrupted replacement fail or recover without corrupting core packages and checkpoints. Enable, disable, update, uninstall and rollback follow the agreed consent/lifecycle contract; ordinary dry-run remains offline and no installation executes a skill. The canonical registry, owned package generation and configured hook bindings update or roll back atomically; install confirmation enables only displayed bindings and the registry supports downstream inventory views without requiring the management interface.\",\n      \"timing\": \"immediate\"\n    }\n  ]\n}\n```\n\nAcceptance:\n- Exact external revisions, complete local resources and required sibling/native-tool dependencies resolve into an owned project-scoped plugin generation.\n- Modified or unknown ownership, missing dependencies, unsupported host requirements, drift and interrupted replacement fail or recover without corrupting core packages and checkpoints.\n- Enable, disable, update, uninstall and rollback follow the agreed consent/lifecycle contract; ordinary dry-run remains offline and no installation executes a skill.\n- The canonical registry, owned package generation and configured hook bindings update or roll back atomically; install confirmation enables only displayed bindings and the registry supports downstream inventory views without requiring the management interface.\n\n\nApproved clarification decisions:\n- Q3: Codex is the first verified plugin invocation host. The contract remains portable; invocation on other hosts is explicitly unqualified or unavailable until verified. Existing core installation support remains unchanged.\n- Q9: Project defaults permit explicit temporary per-run overrides. The effective configuration is recorded and frozen across resume; persistent edits are explicit and never silently satisfy or replace parked-run obligations.\n- Q11: The installation proposal displays exact versions, hook locations, enabled state and readiness effects. Actual confirmation installs and enables exactly the displayed configuration; skill execution occurs later in authorized workflows.\n- Decision evidence: `.skill-tree/documents/plugin-workflow-decisions.md`; Q1-Q11 have actual owner approval. Final shared-understanding confirmation remains separate.\n\n",
+        "queue": "Prioritized Next Changes"
+      },
+      "before": {
+        "body": "### Implement pinned external plugin package lifecycle\n\n```yaml\nid: T-6f4500f7-91e2-410d-8172-a4c4cd232fc5\npriority: 120\nstatus: Ready\nparent_pending_ids: [\"P-97789c00-ffd4-450f-a0ca-8cd5fd68f8de\"]\nprocessing_run_id: PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45\nroot_task_id: T-6f4500f7-91e2-410d-8172-a4c4cd232fc5\nrelated_task_id: null\nrelation: main\ndepends_on: [\"T-6d3df9b8-1712-4a41-b38e-aed827e28bfc\", \"T-2da07d09-0b1a-4407-b375-defd23720387\"]\n```\n\nGoal:\n- Implement explicit source/dependency resolution and owned local plugin generations using the existing installation/profile transaction boundary.\n\nTouch:\n- `.skill-tree/installation/plugins.json`\n- `.skill-tree/lib/plugins.js`\n- `.skill-tree/lib/composer.js`\n- `.skill-tree/lib/installation.js`\n- `.skill-tree/bin/install.js`\n- `.skill-tree/tests/test-plugin-installation.js`\n- `.skill-tree/documents/plugin-system-contract.md`\n- `.skill-tree/documents/plugin-installation-contract.md`\n\nImplementation constraints:\n- The owned project-local registry `.skill-tree/installation/plugins.json` records plugin generations, provenance, destinations, dependencies and configured operation/hook bindings. Package, registry and binding changes share the installation transaction.\n- Remote acquisition is a distinct confirmed install action, never hidden in static composition, verification or dry-run.\n- Preserve upstream content/license provenance and repository-local paths; no implicit global or symlink installation, format conversion or unreviewed helper execution.\n\nValidation:\n- Strategy: test-first focused behavioral regressions.\n```json\n{\n  \"checks\": [\n    {\n      \"id\": \"package-lifecycle\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"Exact external revisions, complete local resources and required sibling/native-tool dependencies resolve into an owned project-scoped plugin generation.\",\n        \"Modified or unknown ownership, missing dependencies, unsupported host requirements, drift and interrupted replacement fail or recover without corrupting core packages and checkpoints.\",\n        \"Enable, disable, update, uninstall and rollback follow the agreed consent/lifecycle contract; ordinary dry-run remains offline and no installation executes a skill.\",\n        \"The canonical registry, owned package generation and configured hook bindings update or roll back atomically; install confirmation enables only displayed bindings and the registry supports downstream inventory views without requiring the management interface.\"\n      ],\n      \"sources\": [\n        \".skill-tree/installation/plugins.json\",\n        \".skill-tree/lib/plugins.js\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/lib/installation.js\",\n        \".skill-tree/bin/install.js\",\n        \".skill-tree/tests/test-plugin-installation.js\",\n        \".skill-tree/documents/plugin-system-contract.md\",\n        \".skill-tree/documents/plugin-installation-contract.md\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-installation.js\"\n      },\n      \"assertion\": \"Exact external revisions, complete local resources and required sibling/native-tool dependencies resolve into an owned project-scoped plugin generation. Modified or unknown ownership, missing dependencies, unsupported host requirements, drift and interrupted replacement fail or recover without corrupting core packages and checkpoints. Enable, disable, update, uninstall and rollback follow the agreed consent/lifecycle contract; ordinary dry-run remains offline and no installation executes a skill. The canonical registry, owned package generation and configured hook bindings update or roll back atomically; install confirmation enables only displayed bindings and the registry supports downstream inventory views without requiring the management interface.\",\n      \"timing\": \"immediate\"\n    }\n  ]\n}\n```\n\nAcceptance:\n- Exact external revisions, complete local resources and required sibling/native-tool dependencies resolve into an owned project-scoped plugin generation.\n- Modified or unknown ownership, missing dependencies, unsupported host requirements, drift and interrupted replacement fail or recover without corrupting core packages and checkpoints.\n- Enable, disable, update, uninstall and rollback follow the agreed consent/lifecycle contract; ordinary dry-run remains offline and no installation executes a skill.\n- The canonical registry, owned package generation and configured hook bindings update or roll back atomically; install confirmation enables only displayed bindings and the registry supports downstream inventory views without requiring the management interface.\n\n\nApproved clarification decisions:\n- Q3: Codex is the first verified plugin invocation host. The contract remains portable; invocation on other hosts is explicitly unqualified or unavailable until verified. Existing core installation support remains unchanged.\n- Q9: Project defaults permit explicit temporary per-run overrides. The effective configuration is recorded and frozen across resume; persistent edits are explicit and never silently satisfy or replace parked-run obligations.\n- Q11: The installation proposal displays exact versions, hook locations, enabled state and readiness effects. Actual confirmation installs and enables exactly the displayed configuration; skill execution occurs later in authorized workflows.\n- Decision evidence: `.skill-tree/documents/plugin-workflow-decisions.md`; Q1-Q11 have actual owner approval. Final shared-understanding confirmation remains separate.\n\n",
+        "queue": "Prioritized Next Changes"
+      },
+      "task_id": "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5"
+    },
+    {
+      "after": {
+        "body": "### Implement extensible all-operation and named plugin bindings\n\n```yaml\nid: T-787453a8-2643-48c1-8715-9626d67d5e0e\npriority: 130\nstatus: Ready\nparent_pending_ids: [\"P-539a810d-cdb5-4901-bbfe-a2344698b78f\"]\nprocessing_run_id: PR-9ffb62ea-745b-4d44-a772-dad8d1c35f5b\nroot_task_id: T-a9d7a827-fb25-4348-bcf7-867a449c58ef\nrelated_task_id: T-a9d7a827-fb25-4348-bcf7-867a449c58ef\nrelation: blocker\ndepends_on: [\"T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9\", \"T-6f4500f7-91e2-410d-8172-a4c4cd232fc5\"]\n```\n\nGoal:\n- Provide W3 extensible binding definitions, actual anchor resolution, dispatch identities and standalone composition inputs.\n\nTouch:\n- `.skill-tree/lib/plugin-bindings.js`\n- `.skill-tree/lib/composer.js`\n- `.skill-tree/common/references/plugin-invocation.md`\n- `.skill-tree/tests/test-plugin-bindings.js`\n- `.skill-tree/documents/plugin-management-contract.md`\n\nImplementation constraints:\n- A custom label requires an executable dispatch boundary; unresolved mapping remains visible.\n- Explicit controller and leaf locations are not deduplicated into one call; only accidental same-event delivery deduplicates.\n- Core invariants and ownership barriers remain mandatory at every anchor.\n\nValidation:\n- Strategy: test-first focused behavioral fixtures; actual agent observations remain separate from deterministic helper evidence.\n```json\n{\n  \"checks\": [\n    {\n      \"id\": \"extensible-bindings\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"Every owned operation accepts explicit before/during/after or registered executable named bindings, with independent binding IDs, deterministic order, conditions and parameter overrides.\",\n        \"Natural-language/custom location resolution produces an actual dispatch mapping or a visible unresolved state; Pending/task/review identity and core authorization/check/transaction guards remain intact.\",\n        \"Intentional controller and leaf placements remain distinct, while duplicate binding/event delivery and recursive dispatch lineage produce deterministic guarded outcomes without fabricated successful integration.\",\n        \"Binding changes and effective parameters participate in composition/freshness identities; standalone fixtures preserve resource closure and stopped-handoff refresh behavior.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/plugin-bindings.js\",\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/common/references/plugin-invocation.md\",\n        \".skill-tree/tests/test-plugin-bindings.js\",\n        \".skill-tree/documents/plugin-management-contract.md\",\n        \".skill-tree/documents/plugin-system-contract.md\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-bindings.js\"\n      },\n      \"assertion\": \"Every owned operation accepts explicit before/during/after or registered executable named bindings, with independent binding IDs, deterministic order, conditions and parameter overrides. Natural-language/custom location resolution produces an actual dispatch mapping or a visible unresolved state; Pending/task/review identity and core authorization/check/transaction guards remain intact. Intentional controller and leaf placements remain distinct, while duplicate binding/event delivery and recursive dispatch lineage produce deterministic guarded outcomes without fabricated successful integration. Binding changes and effective parameters participate in composition/freshness identities; standalone fixtures preserve resource closure and stopped-handoff refresh behavior.\",\n      \"timing\": \"immediate\"\n    }\n  ]\n}\n```\n\nAcceptance:\n- Every owned operation accepts explicit before/during/after or registered executable named bindings, with independent binding IDs, deterministic order, conditions and parameter overrides.\n- Natural-language/custom location resolution produces an actual dispatch mapping or a visible unresolved state; Pending/task/review identity and core authorization/check/transaction guards remain intact.\n- Intentional controller and leaf placements remain distinct, while duplicate binding/event delivery and recursive dispatch lineage produce deterministic guarded outcomes without fabricated successful integration.\n- Binding changes and effective parameters participate in composition/freshness identities; standalone fixtures preserve resource closure and stopped-handoff refresh behavior.\n\nApproved decision evidence:\n- `.skill-tree/history/research/plugin-management-decisions.json`; W3 is actual owner direction, with no claim that the capability is already implemented.\n\n",
+        "queue": "Prioritized Next Changes"
+      },
+      "before": null,
+      "task_id": "T-787453a8-2643-48c1-8715-9626d67d5e0e"
+    },
+    {
+      "after": {
+        "body": "### Compose selected plugin hooks into standalone operations\n\n```yaml\nid: T-a9d7a827-fb25-4348-bcf7-867a449c58ef\npriority: 119\nstatus: Ready\nparent_pending_ids: [\"P-97789c00-ffd4-450f-a0ca-8cd5fd68f8de\"]\nprocessing_run_id: PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45\nroot_task_id: T-a9d7a827-fb25-4348-bcf7-867a449c58ef\nrelated_task_id: null\nrelation: main\ndepends_on: [\"T-6f4500f7-91e2-410d-8172-a4c4cd232fc5\", \"T-787453a8-2643-48c1-8715-9626d67d5e0e\"]\n```\n\nGoal:\n- Extend canonical composition and bundled instructions with the agreed provider-neutral invocation and verified native capability routing.\n\nTouch:\n- `.skill-tree/lib/composer.js`\n- `.skill-tree/config/resource-map.json`\n- `.skill-tree/templates/operations.json`\n- `.skill-tree/common/references/plugin-invocation.md`\n- `.skill-tree/tests/test-plugin-composition.js`\n- `.skill-tree/documents/plugin-system-contract.md`\n\nImplementation constraints:\n- Generate representative and installed resources only through canonical composition. Do not append unbounded external instructions to every skill.\n- Separate context-scoped skill use from native host plugin bundles and decline unsupported invocation instead of claiming a nonexistent tool call. Core-only operations preserve current readiness. Enabled interview and review gates follow Q6/Q7; no mandatory global stage belongs to the core.\n\nValidation:\n- Strategy: test-first focused behavioral regressions.\n```json\n{\n  \"checks\": [\n    {\n      \"id\": \"standalone-plugin-composition\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"Configured plugins compose only into selected existing-operation hook points in deterministic order without replacing locked invariants.\",\n        \"A copied installed operation retains the declared plugin resource closure without the source checkout or unrelated sibling packages; unsupported host capabilities return an explicit prerequisite.\",\n        \"Plugin selection, revisions and content participate in profile/maintenance identities, freshness checks and stopped-handoff refresh behavior for general, web and unity.\",\n        \"Core-only composition retains current readiness; selected interview and review hooks expose the approved holds, default placement and project/run configuration without creating a global mandatory stage.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/config/resource-map.json\",\n        \".skill-tree/templates/operations.json\",\n        \".skill-tree/common/references/plugin-invocation.md\",\n        \".skill-tree/tests/test-plugin-composition.js\",\n        \".skill-tree/documents/plugin-system-contract.md\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-composition.js\"\n      },\n      \"assertion\": \"Configured plugins compose only into selected existing-operation hook points in deterministic order without replacing locked invariants. A copied installed operation retains the declared plugin resource closure without the source checkout or unrelated sibling packages; unsupported host capabilities return an explicit prerequisite. Plugin selection, revisions and content participate in profile/maintenance identities, freshness checks and stopped-handoff refresh behavior for general, web and unity. Core-only composition retains current readiness; selected interview and review hooks expose the approved holds, default placement and project/run configuration without creating a global mandatory stage.\",\n      \"timing\": \"immediate\"\n    }\n  ]\n}\n```\n\nAcceptance:\n- Configured plugins compose only into selected existing-operation hook points in deterministic order without replacing locked invariants.\n- A copied installed operation retains the declared plugin resource closure without the source checkout or unrelated sibling packages; unsupported host capabilities return an explicit prerequisite.\n- Plugin selection, revisions and content participate in profile/maintenance identities, freshness checks and stopped-handoff refresh behavior for general, web and unity.\n- Core-only composition retains current readiness; selected interview and review hooks expose the approved holds, default placement and project/run configuration without creating a global mandatory stage.\n\n\nApproved clarification decisions:\n- Q1: Ponytail is an additional bounded review pass focused on unnecessary complexity and minimal complete changes; findings follow the ordinary authorized fix/re-review flow, and before/during/after placement remains configurable.\n- Q3: Codex is the first verified plugin invocation host. The contract remains portable; invocation on other hosts is explicitly unqualified or unavailable until verified. Existing core installation support remains unchanged.\n- Q5: Ponytail defaults to an additional bounded pass after the ordinary full review and before PR readiness; before/during/after placement remains configurable.\n- Q9: Project defaults permit explicit temporary per-run overrides. The effective configuration is recorded and frozen across resume; persistent edits are explicit and never silently satisfy or replace parked-run obligations.\n- Decision evidence: `.skill-tree/documents/plugin-workflow-decisions.md`; Q1-Q11 have actual owner approval. Final shared-understanding confirmation remains separate.\n\n",
+        "queue": "Prioritized Next Changes"
+      },
+      "before": {
+        "body": "### Compose selected plugin hooks into standalone operations\n\n```yaml\nid: T-a9d7a827-fb25-4348-bcf7-867a449c58ef\npriority: 119\nstatus: Ready\nparent_pending_ids: [\"P-97789c00-ffd4-450f-a0ca-8cd5fd68f8de\"]\nprocessing_run_id: PR-e41ce0ec-099e-4072-ace9-59e7acb2ec45\nroot_task_id: T-a9d7a827-fb25-4348-bcf7-867a449c58ef\nrelated_task_id: null\nrelation: main\ndepends_on: [\"T-6f4500f7-91e2-410d-8172-a4c4cd232fc5\"]\n```\n\nGoal:\n- Extend canonical composition and bundled instructions with the agreed provider-neutral invocation and verified native capability routing.\n\nTouch:\n- `.skill-tree/lib/composer.js`\n- `.skill-tree/config/resource-map.json`\n- `.skill-tree/templates/operations.json`\n- `.skill-tree/common/references/plugin-invocation.md`\n- `.skill-tree/tests/test-plugin-composition.js`\n- `.skill-tree/documents/plugin-system-contract.md`\n\nImplementation constraints:\n- Generate representative and installed resources only through canonical composition. Do not append unbounded external instructions to every skill.\n- Separate context-scoped skill use from native host plugin bundles and decline unsupported invocation instead of claiming a nonexistent tool call. Core-only operations preserve current readiness. Enabled interview and review gates follow Q6/Q7; no mandatory global stage belongs to the core.\n\nValidation:\n- Strategy: test-first focused behavioral regressions.\n```json\n{\n  \"checks\": [\n    {\n      \"id\": \"standalone-plugin-composition\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"Configured plugins compose only into selected existing-operation hook points in deterministic order without replacing locked invariants.\",\n        \"A copied installed operation retains the declared plugin resource closure without the source checkout or unrelated sibling packages; unsupported host capabilities return an explicit prerequisite.\",\n        \"Plugin selection, revisions and content participate in profile/maintenance identities, freshness checks and stopped-handoff refresh behavior for general, web and unity.\",\n        \"Core-only composition retains current readiness; selected interview and review hooks expose the approved holds, default placement and project/run configuration without creating a global mandatory stage.\"\n      ],\n      \"sources\": [\n        \".skill-tree/lib/composer.js\",\n        \".skill-tree/config/resource-map.json\",\n        \".skill-tree/templates/operations.json\",\n        \".skill-tree/common/references/plugin-invocation.md\",\n        \".skill-tree/tests/test-plugin-composition.js\",\n        \".skill-tree/documents/plugin-system-contract.md\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-composition.js\"\n      },\n      \"assertion\": \"Configured plugins compose only into selected existing-operation hook points in deterministic order without replacing locked invariants. A copied installed operation retains the declared plugin resource closure without the source checkout or unrelated sibling packages; unsupported host capabilities return an explicit prerequisite. Plugin selection, revisions and content participate in profile/maintenance identities, freshness checks and stopped-handoff refresh behavior for general, web and unity. Core-only composition retains current readiness; selected interview and review hooks expose the approved holds, default placement and project/run configuration without creating a global mandatory stage.\",\n      \"timing\": \"immediate\"\n    }\n  ]\n}\n```\n\nAcceptance:\n- Configured plugins compose only into selected existing-operation hook points in deterministic order without replacing locked invariants.\n- A copied installed operation retains the declared plugin resource closure without the source checkout or unrelated sibling packages; unsupported host capabilities return an explicit prerequisite.\n- Plugin selection, revisions and content participate in profile/maintenance identities, freshness checks and stopped-handoff refresh behavior for general, web and unity.\n- Core-only composition retains current readiness; selected interview and review hooks expose the approved holds, default placement and project/run configuration without creating a global mandatory stage.\n\n\nApproved clarification decisions:\n- Q1: Ponytail is an additional bounded review pass focused on unnecessary complexity and minimal complete changes; findings follow the ordinary authorized fix/re-review flow, and before/during/after placement remains configurable.\n- Q3: Codex is the first verified plugin invocation host. The contract remains portable; invocation on other hosts is explicitly unqualified or unavailable until verified. Existing core installation support remains unchanged.\n- Q5: Ponytail defaults to an additional bounded pass after the ordinary full review and before PR readiness; before/during/after placement remains configurable.\n- Q9: Project defaults permit explicit temporary per-run overrides. The effective configuration is recorded and frozen across resume; persistent edits are explicit and never silently satisfy or replace parked-run obligations.\n- Decision evidence: `.skill-tree/documents/plugin-workflow-decisions.md`; Q1-Q11 have actual owner approval. Final shared-understanding confirmation remains separate.\n\n",
+        "queue": "Prioritized Next Changes"
+      },
+      "task_id": "T-a9d7a827-fb25-4348-bcf7-867a449c58ef"
+    },
+    {
+      "after": {
+        "body": "### Implement the core Skill Tree Plugins management operation\n\n```yaml\nid: T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad\npriority: 131\nstatus: Ready\nparent_pending_ids: [\"P-edc462d9-992f-4c74-ab0a-b4e573109e7d\"]\nprocessing_run_id: PR-9ffb62ea-745b-4d44-a772-dad8d1c35f5b\nroot_task_id: T-6ec57615-3512-4f91-98e8-efb12cde7d7f\nrelated_task_id: T-6ec57615-3512-4f91-98e8-efb12cde7d7f\nrelation: blocker\ndepends_on: [\"T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9\", \"T-787453a8-2643-48c1-8715-9626d67d5e0e\", \"T-10528edd-4542-4c26-b8b3-738ffc00d791\", \"T-a9d7a827-fb25-4348-bcf7-867a449c58ef\"]\n```\n\nGoal:\n- Add the core skill-tree-plugins operation and shared initial/later management flow without depending on completed marketplace recommendation experiments.\n\nTouch:\n- `.skill-tree/templates/operations.json`\n- `.skill-tree/config/resource-map.json`\n- `.skill-tree/common/scripts/plugin-manager.js`\n- `.skill-tree/lib/plugin-management.js`\n- `.skill-tree/tests/test-plugin-manager.js`\n- `.skill-tree/tests/test-plugin-manager-installation.js`\n- `.skill-tree/scripts/agent-conformance.py`\n- `.skill-tree/documents/plugin-management-contract.md`\n\nImplementation constraints:\n- The current source has ten operations; eleven becomes an implemented claim only after generation and qualification.\n- Optional curated data may be absent; custom source management and zero-plugin views remain functional.\n- Unknown ownership and parked requirements remain explicit rather than silently cleared by removal.\n\nValidation:\n- Strategy: test-first focused behavioral fixtures; actual agent observations remain separate from deterministic helper evidence.\n```json\n{\n  \"checks\": [\n    {\n      \"id\": \"manager-regressions\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"The core includes the standalone skill-tree-plugins operation with zero external packages; known/installed and human/machine views remain offline and show every actual binding, destination, enabled state, parameter summary and adapter prerequisite.\",\n        \"Initial optional setup and later management share add-source/save-known/install/configure/bind/unbind/enable/disable/update/uninstall/forget flows with one exact reviewable mutation proposal and no implicit skill invocation.\",\n        \"Unbind changes one location; uninstall removes only selected owned package/bindings and normally keeps known registration; forget-known remains separate and preserves installed state, original local sources, shared resources and historical/frozen requirements.\",\n        \"General, web and unity installation fixtures contain eleven self-contained operations after implementation; core-only and repeat installations acquire no new external plugin and preserve existing plugin state.\",\n        \"Controlled actual-agent management observations distinguish scripted fixture answers, concrete proposals and helper evidence from real owner consent and universal native-host or candidate qualification.\"\n      ],\n      \"sources\": [\n        \".skill-tree/templates/operations.json\",\n        \".skill-tree/config/resource-map.json\",\n        \".skill-tree/common/scripts/plugin-manager.js\",\n        \".skill-tree/lib/plugin-management.js\",\n        \".skill-tree/tests/test-plugin-manager.js\",\n        \".skill-tree/tests/test-plugin-manager-installation.js\",\n        \".skill-tree/scripts/agent-conformance.py\",\n        \".skill-tree/documents/plugin-management-contract.md\",\n        \".skill-tree/documents/plugin-system-contract.md\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-manager.js\"\n      },\n      \"assertion\": \"The core includes the standalone skill-tree-plugins operation with zero external packages; known/installed and human/machine views remain offline and show every actual binding, destination, enabled state, parameter summary and adapter prerequisite. Initial optional setup and later management share add-source/save-known/install/configure/bind/unbind/enable/disable/update/uninstall/forget flows with one exact reviewable mutation proposal and no implicit skill invocation. Unbind changes one location; uninstall removes only selected owned package/bindings and normally keeps known registration; forget-known remains separate and preserves installed state, original local sources, shared resources and historical/frozen requirements. General, web and unity installation fixtures contain eleven self-contained operations after implementation; core-only and repeat installations acquire no new external plugin and preserve existing plugin state. Controlled actual-agent management observations distinguish scripted fixture answers, concrete proposals and helper evidence from real owner consent and universal native-host or candidate qualification.\",\n      \"timing\": \"immediate\"\n    },\n    {\n      \"id\": \"manager-standalone-installation\",\n      \"recipe_id\": \"quality-node\",\n      \"criteria\": [\n        \"General, web and unity installation fixtures contain eleven self-contained operations after implementation; core-only and repeat installations acquire no new external plugin and preserve existing plugin state.\"\n      ],\n      \"sources\": [\n        \".skill-tree/templates/operations.json\",\n        \".skill-tree/config/resource-map.json\",\n        \".skill-tree/common/scripts/plugin-manager.js\",\n        \".skill-tree/lib/plugin-management.js\",\n        \".skill-tree/tests/test-plugin-manager.js\",\n        \".skill-tree/tests/test-plugin-manager-installation.js\",\n        \".skill-tree/scripts/agent-conformance.py\",\n        \".skill-tree/documents/plugin-management-contract.md\",\n        \".skill-tree/documents/plugin-system-contract.md\"\n      ],\n      \"parameters\": {\n        \"test_path\": \".skill-tree/tests/test-plugin-manager-installation.js\"\n      },\n      \"assertion\": \"General, web and unity installation fixtures contain eleven self-contained operations after implementation; core-only and repeat installations acquire no new external plugin and preserve existing plugin state.\",\n      \"timing\": \"immediate\"\n    },\n    {\n      \"id\": \"manager-agent-observations\",\n      \"recipe_id\": \"static-inspection\",\n      \"criteria\": [\n        \"Controlled actual-agent management observations distinguish scripted fixture answers, concrete proposals and helper evidence from real owner consent and universal native-host or candidate qualification.\"\n      ],\n      \"sources\": [\n        \".skill-tree/templates/operations.json\",\n        \".skill-tree/config/resource-map.json\",\n        \".skill-tree/common/scripts/plugin-manager.js\",\n        \".skill-tree/lib/plugin-management.js\",\n        \".skill-tree/tests/test-plugin-manager.js\",\n        \".skill-tree/tests/test-plugin-manager-installation.js\",\n        \".skill-tree/scripts/agent-conformance.py\",\n        \".skill-tree/documents/plugin-management-contract.md\",\n        \".skill-tree/documents/plugin-system-contract.md\"\n      ],\n      \"parameters\": {},\n      \"assertion\": \"Controlled actual-agent management observations distinguish scripted fixture answers, concrete proposals and helper evidence from real owner consent and universal native-host or candidate qualification.\",\n      \"timing\": \"immediate\"\n    }\n  ]\n}\n```\n\nAcceptance:\n- The core includes the standalone skill-tree-plugins operation with zero external packages; known/installed and human/machine views remain offline and show every actual binding, destination, enabled state, parameter summary and adapter prerequisite.\n- Initial optional setup and later management share add-source/save-known/install/configure/bind/unbind/enable/disable/update/uninstall/forget flows with one exact reviewable mutation proposal and no implicit skill invocation.\n- Unbind changes one location; uninstall removes only selected owned package/bindings and normally keeps known registration; forget-known remains separate and preserves installed state, original local sources, shared resources and historical/frozen requirements.\n- General, web and unity installation fixtures contain eleven self-contained operations after implementation; core-only and repeat installations acquire no new external plugin and preserve existing plugin state.\n- Controlled actual-agent management observations distinguish scripted fixture answers, concrete proposals and helper evidence from real owner consent and universal native-host or candidate qualification.\n\nApproved decision evidence:\n- `.skill-tree/history/research/plugin-management-decisions.json`; W3 is actual owner direction, with no claim that the capability is already implemented.\n\n",
+        "queue": "Prioritized Next Changes"
+      },
+      "before": null,
+      "task_id": "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad"
+    }
+  ],
+  "checkpoint_after": {
+    "admission": {
+      "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+      "flavor": "general",
+      "identity": "8c1b83e0842048aa830c643c0388c4e18fa625d2a26d0291084462acd084e1b8"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "completed_ids": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+    ],
+    "completion_refs": {
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa": "O-ac001b97-eb35-4d59-b454-0c99270a12df",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": "O-6ad524b7-13eb-4fca-82b8-4e53e092ad2c",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb": "O-bd95d91a-b289-4f0b-a449-0628cbec0fb3",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d": "O-f6a04cbc-50b5-487e-bbb4-c6d9587df89e",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5": "O-a734f372-7d4d-4069-9960-939f4bcb0617"
+    },
+    "current_task_id": "T-2da07d09-0b1a-4407-b375-defd23720387",
+    "cycle_signature": "880f594d7e94441fce227368cc1efff77eeef1c0eb933b0c0b4268b28b3c8b8c",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Commit the approved changes, then Implement All from and back into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+    "limits": {},
+    "mode": "all",
+    "next_action": "Select required task",
+    "partial_work": [
+      "Five frozen roots retain accepted outcomes, including workflow design124 with actual W1/W2 approval.",
+      "First plan commit:6aacf9f. Full source-backed review resolves nine findings; independent closure checks report no new material choice.",
+      "Repository checks pass:262Python tests,94Node tests, source/metadata/prose validation, installer listing,15successful --all dry-run provider selections and owned snapshot verification.",
+      "The changed completed plugin contract130 has accepted current-source revalidation without changing the original outcome."
+    ],
+    "pending_ids": [
+      "P-9bf5b8af-1e50-4f53-9ab9-56ef46997428",
+      "P-09b5b828-dcdc-4d06-bee1-19e1787e34f4",
+      "P-a3796e30-9b57-4c28-89b2-39db50a9bd93",
+      "P-539a810d-cdb5-4901-bbfe-a2344698b78f",
+      "P-edc462d9-992f-4c74-ab0a-b4e573109e7d"
+    ],
+    "phase": "dependencies",
+    "processing_results": [
+      {
+        "created_ids": [
+          "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+          "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+          "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad"
+        ],
+        "dispositions": {
+          "P-539a810d-cdb5-4901-bbfe-a2344698b78f": {
+            "reason": "Source research and actual W3 direction define a required acyclic descendant with observable acceptance and existing validation recipes.",
+            "status": "promoted"
+          },
+          "P-a3796e30-9b57-4c28-89b2-39db50a9bd93": {
+            "reason": "Source research and actual W3 direction define a required acyclic descendant with observable acceptance and existing validation recipes.",
+            "status": "promoted"
+          },
+          "P-edc462d9-992f-4c74-ab0a-b4e573109e7d": {
+            "reason": "Source research and actual W3 direction define a required acyclic descendant with observable acceptance and existing validation recipes.",
+            "status": "promoted"
+          }
+        },
+        "id": "PR-9ffb62ea-745b-4d44-a772-dad8d1c35f5b",
+        "reused_ids": [],
+        "selected_ids": [
+          "P-539a810d-cdb5-4901-bbfe-a2344698b78f",
+          "P-edc462d9-992f-4c74-ab0a-b4e573109e7d",
+          "P-a3796e30-9b57-4c28-89b2-39db50a9bd93"
+        ],
+        "task_keys": {
+          "extensible-bindings": "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+          "open-sources": "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+          "plugins-manager": "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad"
+        }
+      }
+    ],
+    "required_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+      "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+      "T-c9510cf4-f3b5-4530-bddc-e2e47579f7ad"
+    ],
+    "revalidated_checks": {
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": [
+        {
+          "check": {
+            "assertion": "The external plugin contract defines pinned identity, dependency closure, host invocation, activation lifetime, input/result envelopes and existing-operation hook names. The contract preserves standalone resources, core authorization and acceptance boundaries, offline composition and guarded resume semantics. Workflow-changing choices and unresolved host limitations are explicitly routed to the owner workflow decision task. Project defaults, explicit temporary run overrides and frozen effective configuration are defined separately from installed-package state; confirmed installation enables only the exact displayed hooks and readiness effects.",
+            "criteria": [
+              "The external plugin contract defines pinned identity, dependency closure, host invocation, activation lifetime, input/result envelopes and existing-operation hook names.",
+              "The contract preserves standalone resources, core authorization and acceptance boundaries, offline composition and guarded resume semantics.",
+              "Workflow-changing choices and unresolved host limitations are explicitly routed to the owner workflow decision task.",
+              "Project defaults, explicit temporary run overrides and frozen effective configuration are defined separately from installed-package state; confirmed installation enables only the exact displayed hooks and readiness effects."
+            ],
+            "id": "contract-review",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/documents/plugin-system-research.md",
+              ".skill-tree/documents/plugin-system-contract.md",
+              ".skill-tree/templates/invariants.json",
+              ".skill-tree/common/scripts/workflow-state.py",
+              ".skill-tree/common/scripts/pr-review-state.py"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "The external plugin contract defines pinned identity, dependency closure, host invocation, activation lifetime, input/result envelopes and existing-operation hook names. The contract preserves standalone resources, core authorization and acceptance boundaries, offline composition and guarded resume semantics. Workflow-changing choices and unresolved host limitations are explicitly routed to the owner workflow decision task. Project defaults, explicit temporary run overrides and frozen effective configuration are defined separately from installed-package state; confirmed installation enables only the exact displayed hooks and readiness effects.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-ba817c31-3e32-4bee-af1b-75ea5e667540",
+            "classification": "executed-control",
+            "cleanup": "Read-only static source/contract review completed; no candidate or product runtime invoked.",
+            "definition": "aef081fb8634f6b58160c2a7ca2bbaf2f863c7d7cd0874802e8cd8d7e071e01c",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/plugin-system/plugin-contract-revalidation.json",
+                "sha256": "ad55aa856893ecf41e94054536ab28e7d73c11040a918751f70c56e803206cb9"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "a10f77bfa506e522edff0c5993dfd91cbfdfa9d833a5ec3de79950c58ad364cb",
+            "payload_hash": "78919ad698384450ec2236f1e3631017f3340755a546bfbd7128f44420d4a538",
+            "recorded_at": "2026-11-05T18:57:22.370705+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common/scripts/pr-review-state.py": "a26cc95e66145a4917669466c3880f3d8252199a13c63b3e9e9f9fc30dc443d5",
+              ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+              ".skill-tree/documents/plugin-system-contract.md": "19001702f22e73de4ae224d49e895e7db8f15f4b599a070c2c09fd7c4337eadf",
+              ".skill-tree/documents/plugin-system-research.md": "6a8062f4bb9c39abc9f0e1ef513d6af2e2f50a2b0f8616b30007c8e6bd718205",
+              ".skill-tree/templates/invariants.json": "4545894b07fab5f222d15eddd17c220408a4be8a5e5f25da3a4a34ef06bb87b5"
+            }
+          }
+        }
+      ]
+    },
+    "root_task_id": "T-2da07d09-0b1a-4407-b375-defd23720387",
+    "snapshot": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "started_at": "2026-11-05T11:44:41.702298+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "branch": "codex/plugin-system",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests continuing from the current codex/next-version branch instead of develop and merging all results into codex/next-version.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-0304315b-587e-489c-ac51-861258b13eb0"
+    },
+    "workspace_state": "ready"
+  },
+  "checkpoint_before": {
+    "admission": {
+      "environment_id": "61ad09328e7b0328aad8ef8250be99df3131b0554b9ff8921bd79bd9c478f81d",
+      "flavor": "general",
+      "identity": "8c1b83e0842048aa830c643c0388c4e18fa625d2a26d0291084462acd084e1b8"
+    },
+    "admitted_groups": {},
+    "admitted_task_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "completed_ids": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+    ],
+    "completion_refs": {
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa": "O-ac001b97-eb35-4d59-b454-0c99270a12df",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": "O-6ad524b7-13eb-4fca-82b8-4e53e092ad2c",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb": "O-bd95d91a-b289-4f0b-a449-0628cbec0fb3",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d": "O-f6a04cbc-50b5-487e-bbb4-c6d9587df89e",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5": "O-a734f372-7d4d-4069-9960-939f4bcb0617"
+    },
+    "current_task_id": "T-2da07d09-0b1a-4407-b375-defd23720387",
+    "cycle_signature": "880f594d7e94441fce227368cc1efff77eeef1c0eb933b0c0b4268b28b3c8b8c",
+    "deferred_ids": [],
+    "delivery": {
+      "authorization": {
+        "merge": true,
+        "mode": "local-merge",
+        "owner_instruction": "Commit the approved changes, then Implement All from and back into codex/next-version.",
+        "pr": false,
+        "target_branch": "codex/next-version"
+      },
+      "implementation": "in-progress",
+      "publication": "not-requested",
+      "status": "implementation-in-progress"
+    },
+    "id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+    "limits": {},
+    "mode": "all",
+    "next_action": "After the second owner-requested plan-review commit succeeds, process required Pending P-09b5b828-dcdc-4d06-bee1-19e1787e34f4 and align shared foundation/editorial consumer dependencies, acceptance and check mappings before affected implementation. Continue the frozen snapshot through existing admission rules; local integration target remains codex/next-version.",
+    "partial_work": [
+      "Five frozen roots retain accepted outcomes, including workflow design124 with actual W1/W2 approval.",
+      "First plan commit:6aacf9f. Full source-backed review resolves nine findings; independent closure checks report no new material choice.",
+      "Repository checks pass:262Python tests,94Node tests, source/metadata/prose validation, installer listing,15successful --all dry-run provider selections and owned snapshot verification.",
+      "The changed completed plugin contract130 has accepted current-source revalidation without changing the original outcome."
+    ],
+    "pending_ids": [
+      "P-9bf5b8af-1e50-4f53-9ab9-56ef46997428",
+      "P-09b5b828-dcdc-4d06-bee1-19e1787e34f4",
+      "P-a3796e30-9b57-4c28-89b2-39db50a9bd93",
+      "P-539a810d-cdb5-4901-bbfe-a2344698b78f",
+      "P-edc462d9-992f-4c74-ab0a-b4e573109e7d"
+    ],
+    "phase": "capture-findings",
+    "processing_results": [],
+    "required_ids": [
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+    ],
+    "revalidated_checks": {
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc": [
+        {
+          "check": {
+            "assertion": "The external plugin contract defines pinned identity, dependency closure, host invocation, activation lifetime, input/result envelopes and existing-operation hook names. The contract preserves standalone resources, core authorization and acceptance boundaries, offline composition and guarded resume semantics. Workflow-changing choices and unresolved host limitations are explicitly routed to the owner workflow decision task. Project defaults, explicit temporary run overrides and frozen effective configuration are defined separately from installed-package state; confirmed installation enables only the exact displayed hooks and readiness effects.",
+            "criteria": [
+              "The external plugin contract defines pinned identity, dependency closure, host invocation, activation lifetime, input/result envelopes and existing-operation hook names.",
+              "The contract preserves standalone resources, core authorization and acceptance boundaries, offline composition and guarded resume semantics.",
+              "Workflow-changing choices and unresolved host limitations are explicitly routed to the owner workflow decision task.",
+              "Project defaults, explicit temporary run overrides and frozen effective configuration are defined separately from installed-package state; confirmed installation enables only the exact displayed hooks and readiness effects."
+            ],
+            "id": "contract-review",
+            "parameters": {},
+            "recipe_id": "static-inspection",
+            "sources": [
+              ".skill-tree/documents/plugin-system-research.md",
+              ".skill-tree/documents/plugin-system-contract.md",
+              ".skill-tree/templates/invariants.json",
+              ".skill-tree/common/scripts/workflow-state.py",
+              ".skill-tree/common/scripts/pr-review-state.py"
+            ],
+            "timing": "immediate"
+          },
+          "result": {
+            "actual_lane": "static",
+            "assertions": [
+              {
+                "assertion": "The external plugin contract defines pinned identity, dependency closure, host invocation, activation lifetime, input/result envelopes and existing-operation hook names. The contract preserves standalone resources, core authorization and acceptance boundaries, offline composition and guarded resume semantics. Workflow-changing choices and unresolved host limitations are explicitly routed to the owner workflow decision task. Project defaults, explicit temporary run overrides and frozen effective configuration are defined separately from installed-package state; confirmed installation enables only the exact displayed hooks and readiness effects.",
+                "result": "pass"
+              }
+            ],
+            "attempt_id": "C-ba817c31-3e32-4bee-af1b-75ea5e667540",
+            "classification": "executed-control",
+            "cleanup": "Read-only static source/contract review completed; no candidate or product runtime invoked.",
+            "definition": "aef081fb8634f6b58160c2a7ca2bbaf2f863c7d7cd0874802e8cd8d7e071e01c",
+            "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+            "evidence": [
+              {
+                "available": true,
+                "path": ".skill-tree/history/validation/plugin-system/plugin-contract-revalidation.json",
+                "sha256": "ad55aa856893ecf41e94054536ab28e7d73c11040a918751f70c56e803206cb9"
+              }
+            ],
+            "execution_sessions": {},
+            "key": "a10f77bfa506e522edff0c5993dfd91cbfdfa9d833a5ec3de79950c58ad364cb",
+            "payload_hash": "78919ad698384450ec2236f1e3631017f3340755a546bfbd7128f44420d4a538",
+            "recorded_at": "2026-11-05T18:57:22.370705+00:00",
+            "result": "pass",
+            "sources": {
+              ".skill-tree/common/scripts/pr-review-state.py": "a26cc95e66145a4917669466c3880f3d8252199a13c63b3e9e9f9fc30dc443d5",
+              ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+              ".skill-tree/documents/plugin-system-contract.md": "19001702f22e73de4ae224d49e895e7db8f15f4b599a070c2c09fd7c4337eadf",
+              ".skill-tree/documents/plugin-system-research.md": "6a8062f4bb9c39abc9f0e1ef513d6af2e2f50a2b0f8616b30007c8e6bd718205",
+              ".skill-tree/templates/invariants.json": "4545894b07fab5f222d15eddd17c220408a4be8a5e5f25da3a4a34ef06bb87b5"
+            }
+          }
+        }
+      ]
+    },
+    "root_task_id": "T-2da07d09-0b1a-4407-b375-defd23720387",
+    "snapshot": [
+      "T-21b1c999-8586-4e70-a3bc-69cad3ea65aa",
+      "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+      "T-f63559f1-4663-41b7-b085-f55ba7b47fe5",
+      "T-dbebbff9-9d4f-42c6-9377-f9d00cf12b3d",
+      "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+      "T-2da07d09-0b1a-4407-b375-defd23720387",
+      "T-6f4500f7-91e2-410d-8172-a4c4cd232fc5",
+      "T-a9d7a827-fb25-4348-bcf7-867a449c58ef",
+      "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+      "T-10528edd-4542-4c26-b8b3-738ffc00d791",
+      "T-18db6175-499f-4679-bf8d-f815c7b42411",
+      "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+      "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+      "T-ea3d73b4-c312-4de9-9897-c97f380e4516",
+      "T-6ec57615-3512-4f91-98e8-efb12cde7d7f"
+    ],
+    "started_at": "2026-11-05T11:44:41.702298+00:00",
+    "stop_reason": null,
+    "workspace": {
+      "base_branch": "codex/next-version",
+      "base_commit": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "branch": "codex/plugin-system",
+      "local_base": true,
+      "local_base_authorization": "The owner explicitly requests continuing from the current codex/next-version branch instead of develop and merging all results into codex/next-version.",
+      "remote": "origin",
+      "remote_id": "cc0975ee29d819aab9672bac15c0d527fcf251e4899c5a3318953a0807800ba3",
+      "repo_id": "26c85f327f885b5833abee3f37e09c90cf077aac75a2475e763081ddddddd2fc",
+      "worktree_id": "WR-0304315b-587e-489c-ac51-861258b13eb0"
+    },
+    "workspace_state": "ready"
+  },
+  "id": "E-b8162170-8164-4e22-97dc-68c6c1f8fe20",
+  "outcomes": [],
+  "progress_changes": [],
+  "queue_id": "Q-baca17ff-3f03-44a0-afaf-96bad724e123",
+  "run_id": "WR-0304315b-587e-489c-ac51-861258b13eb0",
+  "schema": 1,
+  "sequence": 76
+}
