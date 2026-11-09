@@ -1,0 +1,28 @@
+{
+  "copied_processing_node_controls": 3,
+  "full_node": {
+    "discovered": 284,
+    "reference": ".skill-tree/history/validation/plugin-system/processing115-final6-node.json",
+    "sha256": "044f6573e6052997476d4980521a3037be81aeb33d8ae5d6417dcd3894495f3f"
+  },
+  "full_python": {
+    "discovered": 526,
+    "reference": ".skill-tree/history/validation/plugin-system/processing115-final6-python.json",
+    "sha256": "a89d98be43816874550c2f7199b29ad95d123fdc99b1a51972347bd993d8de57"
+  },
+  "name": "affected-regressions",
+  "observed_python_modules": {
+    "test_decision_governance": 25,
+    "test_orchestration_adapters": 6,
+    "test_plugin_processing": 35,
+    "test_plugin_review": 42,
+    "test_plugin_workflow": 80,
+    "test_task_clarification": 24,
+    "test_workflow_state": 40
+  },
+  "qualification": "Actual current deterministic tests and copied fixture controls. The full Python and Node runs used the same frozen source. No new actual external candidate invocation.",
+  "result": "pass",
+  "schema": 1,
+  "source_freeze": ".skill-tree/history/validation/plugin-system/processing115-final6-source-freeze.json",
+  "source_freeze_sha256": "36e5a6f1bb777e2f778fa5e2a54b9d1d9d9408513130c833b7b04e865c678a12"
+}

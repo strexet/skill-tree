@@ -1,0 +1,39 @@
+{
+  "actual_lane": "static",
+  "attempt_id": "C-a3f81fcb-d0b3-4b28-97be-72f1221832de",
+  "check_id": "contract-review",
+  "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+  "evidence_sha256": {
+    ".skill-tree/common/scripts/pr-review-state.py": "6bfb09e0273a6322c86c5f5915e8dc0503fa22416881c499c281c1dec570a3d1",
+    ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+    ".skill-tree/documents/plugin-system-contract.md": "b25424efd0dc920376a8d32b9dd7ea27d6b644d966e167f690c8999dc2fa36f5",
+    ".skill-tree/documents/plugin-system-research.md": "ad99e0d4bffd5bb60607eb525dbf8026d4986a1bf151f11b0a2fa62e111927d8",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "6fe2f5fa216a0759bc2bba77b05a20c6b24de9df19c7a6d7756405008a07bc36",
+    ".skill-tree/history/validation/plugin-system/plugin-contract-review.json": "2125fd2547ddffd660c7af101f55c284022d62d9d3c82a8e0d573b05f974cd16",
+    ".skill-tree/templates/invariants.json": "5a147a9ee4297250a6604f6a447fa10b57b9b94f3942044a9135790ce9c64b48"
+  },
+  "limitations": [
+    "Static contract coverage only. Current source-backed and historical native/provider qualification remain separate and limited to matching recorded evidence."
+  ],
+  "mismatches": [
+    "The lifecycle section describes the core manager as planned even though the current installer includes the implemented skill-tree-plugins operation. The current installation and management contracts describe the implemented status. No lifecycle obligation or execution result changes."
+  ],
+  "result": "pass",
+  "review": [
+    "Current contract defines immutable descriptor and content identities, sibling/local dependency closure, host capability and source-backed actor requirements, bounded activation lifetime, typed input/result/receipt, and registered owned workflow anchors.",
+    "Common invariants and current hook/publication guards preserve independent core authorization, required checks, standalone resource closure, offline composition, exact current source and frozen invocation/attachment requirements.",
+    "Project defaults, explicit temporary overrides, frozen effective configuration and registry package state remain separate. Installation uses an actual matching proposal confirmation over exact bindings and readiness consequences. Explicit reconfiguration never manufactures successful invocation or readmission.",
+    "W1/W2/W3 approval and separate host qualification retain unresolved native/other-provider limits. Task and review readiness continue to depend on current core checks and accepted results rather than compatibility, preparation, or installation alone."
+  ],
+  "schema": 1,
+  "source_commit": "82eaf49b6cb35e65dfa30413228bddcb10190562",
+  "source_fingerprints": {
+    ".skill-tree/common/scripts/pr-review-state.py": "6bfb09e0273a6322c86c5f5915e8dc0503fa22416881c499c281c1dec570a3d1",
+    ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+    ".skill-tree/documents/plugin-system-contract.md": "b25424efd0dc920376a8d32b9dd7ea27d6b644d966e167f690c8999dc2fa36f5",
+    ".skill-tree/documents/plugin-system-research.md": "ad99e0d4bffd5bb60607eb525dbf8026d4986a1bf151f11b0a2fa62e111927d8",
+    ".skill-tree/templates/invariants.json": "5a147a9ee4297250a6604f6a447fa10b57b9b94f3942044a9135790ce9c64b48"
+  },
+  "task_id": "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+  "unit_captures_same_contract": {}
+}

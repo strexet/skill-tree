@@ -1,0 +1,200 @@
+TAP version 13
+# Subtest: source and parameter facade exposes the usable foundation without installation dependencies
+ok 1 - source and parameter facade exposes the usable foundation without installation dependencies
+  ---
+  duration_ms: 0.615125
+  ...
+# Subtest: local normalization separates the machine locator from portable discovery metadata
+ok 2 - local normalization separates the machine locator from portable discovery metadata
+  ---
+  duration_ms: 1.849917
+  ...
+# Subtest: known source IDs preserve custom Claude provenance without an admission allowlist
+ok 3 - known source IDs preserve custom Claude provenance without an admission allowlist
+  ---
+  duration_ms: 0.624167
+  ...
+# Subtest: repository skill links preserve the selected ref and repository-relative entry
+ok 4 - repository skill links preserve the selected ref and repository-relative entry
+  ---
+  duration_ms: 0.235042
+  ...
+# Subtest: credential-bearing raw locators remain outside portable definitions
+ok 5 - credential-bearing raw locators remain outside portable definitions
+  ---
+  duration_ms: 0.523417
+  ...
+# Subtest: local snapshots preserve BOM, binary assets and original frontmatter bytes
+ok 6 - local snapshots preserve BOM, binary assets and original frontmatter bytes
+  ---
+  duration_ms: 3.046292
+  ...
+# Subtest: declared sibling resources and nested relative links form a closed source snapshot
+ok 7 - declared sibling resources and nested relative links form a closed source snapshot
+  ---
+  duration_ms: 2.715791
+  ...
+# Subtest: nonstandard instruction content retains upstream bytes and a separate adaptation overlay
+ok 8 - nonstandard instruction content retains upstream bytes and a separate adaptation overlay
+  ---
+  duration_ms: 0.854875
+  ...
+# Subtest: missing required source resources reject snapshots
+ok 9 - missing required source resources reject snapshots
+  ---
+  duration_ms: 1.107542
+  ...
+# Subtest: resource paths cannot escape the admitted source root
+ok 10 - resource paths cannot escape the admitted source root
+  ---
+  duration_ms: 0.727167
+  ...
+# Subtest: symlink resources reject acquisition without reading the target
+ok 11 - symlink resources reject acquisition without reading the target
+  ---
+  duration_ms: 0.855542
+  ...
+# Subtest: expected content fingerprints reject acquisition drift
+ok 12 - expected content fingerprints reject acquisition drift
+  ---
+  duration_ms: 0.609417
+  ...
+# Subtest: injected repository acquisition records immutable actual revision and actual resource bytes
+ok 13 - injected repository acquisition records immutable actual revision and actual resource bytes
+  ---
+  duration_ms: 0.42525
+  ...
+# Subtest: mutable repository labels cannot masquerade as resolved immutable revisions
+ok 14 - mutable repository labels cannot masquerade as resolved immutable revisions
+  ---
+  duration_ms: 0.125583
+  ...
+# Subtest: raw acquisition uses the actual acquired content snapshot and needs a real acquirer
+ok 15 - raw acquisition uses the actual acquired content snapshot and needs a real acquirer
+  ---
+  duration_ms: 0.256083
+  ...
+# Subtest: missing native capability permits complete inert resources without fake invocation
+ok 16 - missing native capability permits complete inert resources without fake invocation
+  ---
+  duration_ms: 0.91175
+  ...
+# Subtest: source inspection never executes a bundled helper or copies unrelated adjacent files
+ok 17 - source inspection never executes a bundled helper or copies unrelated adjacent files
+  ---
+  duration_ms: 1.179459
+  ...
+# Subtest: parameters apply upstream project binding run precedence with object merge and array/scalar/null replacement
+ok 18 - parameters apply upstream project binding run precedence with object merge and array/scalar/null replacement
+  ---
+  duration_ms: 0.716375
+  ...
+# Subtest: extra instruction text uses the highest explicit value including an empty string
+ok 19 - extra instruction text uses the highest explicit value including an empty string
+  ---
+  duration_ms: 0.067667
+  ...
+# Subtest: parameter origins and deterministic digest describe actual effective values
+ok 20 - parameter origins and deterministic digest describe actual effective values
+  ---
+  duration_ms: 0.198459
+  ...
+# Subtest: secret references stay references and no resolver reads secret values
+ok 21 - secret references stay references and no resolver reads secret values
+  ---
+  duration_ms: 0.115667
+  ...
+# Subtest: arbitrary plugin parameter names remain isolated from core authority and prototype state
+ok 22 - arbitrary plugin parameter names remain isolated from core authority and prototype state
+  ---
+  duration_ms: 0.082
+  ...
+# Subtest: supported optional schemas validate concrete resolved values
+ok 23 - supported optional schemas validate concrete resolved values
+  ---
+  duration_ms: 0.264667
+  ...
+# Subtest: unsupported schema constraints and non-JSON values remain explicit failures
+ok 24 - unsupported schema constraints and non-JSON values remain explicit failures
+  ---
+  duration_ms: 0.149291
+  ...
+# Subtest: resolution leaves configuration inputs unchanged and snapshot validation rejects byte tampering
+ok 25 - resolution leaves configuration inputs unchanged and snapshot validation rejects byte tampering
+  ---
+  duration_ms: 0.874167
+  ...
+# Subtest: source ID collisions reject unrelated source reuse while matching known definitions remain reusable
+ok 26 - source ID collisions reject unrelated source reuse while matching known definitions remain reusable
+  ---
+  duration_ms: 0.206291
+  ...
+# Subtest: an acquired resource map cannot smuggle escaping paths into an otherwise valid snapshot
+ok 27 - an acquired resource map cannot smuggle escaping paths into an otherwise valid snapshot
+  ---
+  duration_ms: 0.098667
+  ...
+# Subtest: secret references atomically replace objects in both directions with matching origins
+ok 28 - secret references atomically replace objects in both directions with matching origins
+  ---
+  duration_ms: 0.0965
+  ...
+# Subtest: empty and null replacements preserve explicit origin and do not mutate layer inputs
+ok 29 - empty and null replacements preserve explicit origin and do not mutate layer inputs
+  ---
+  duration_ms: 0.07825
+  ...
+# Subtest: parameter accessors never execute and nested unsupported schema constraints are explicit
+ok 30 - parameter accessors never execute and nested unsupported schema constraints are explicit
+  ---
+  duration_ms: 0.123166
+  ...
+# Subtest: snapshot verification rejects mutable repository revisions and inconsistent descriptor identity
+ok 31 - snapshot verification rejects mutable repository revisions and inconsistent descriptor identity
+  ---
+  duration_ms: 0.207083
+  ...
+# Subtest: portable resource paths reject Windows absolute paths on every host
+ok 32 - portable resource paths reject Windows absolute paths on every host
+  ---
+  duration_ms: 0.124375
+  ...
+# Subtest: acquired paths normalize once and reject aliases while staged paths stay canonical
+ok 33 - acquired paths normalize once and reject aliases while staged paths stay canonical
+  ---
+  duration_ms: 0.224042
+  ...
+# Subtest: a normalized local root replaced by a symlink rejects before outside source acquisition
+ok 34 - a normalized local root replaced by a symlink rejects before outside source acquisition
+  ---
+  duration_ms: 1.316709
+  ...
+# Subtest: GitHub and GitLab folder links normalize to repository entry points with explicit overrides
+ok 35 - GitHub and GitLab folder links normalize to repository entry points with explicit overrides
+  ---
+  duration_ms: 0.187167
+  ...
+# Subtest: ssh and git URL strings remain repository acquisitions without credential exposure
+ok 36 - ssh and git URL strings remain repository acquisitions without credential exposure
+  ---
+  duration_ms: 0.083917
+  ...
+# Subtest: hosted ref and entry segments decode safely and encoded path escapes remain rejected
+ok 37 - hosted ref and entry segments decode safely and encoded path escapes remain rejected
+  ---
+  duration_ms: 0.106625
+  ...
+# Subtest: remote declared directory resources accept trailing separators without changing closure guards
+ok 38 - remote declared directory resources accept trailing separators without changing closure guards
+  ---
+  duration_ms: 0.276042
+  ...
+1..38
+# tests 38
+# suites 0
+# pass 38
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 98.247625

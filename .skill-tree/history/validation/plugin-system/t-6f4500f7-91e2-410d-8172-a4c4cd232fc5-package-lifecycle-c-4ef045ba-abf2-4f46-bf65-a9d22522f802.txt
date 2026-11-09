@@ -1,0 +1,304 @@
+TAP version 13
+# Subtest: confirmed local installation preserves exact source closure, binary bytes and separate adaptation
+not ok 1 - confirmed local installation preserves exact source closure, binary bytes and separate adaptation
+  ---
+  duration_ms: 159.818375
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:21:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'unimplemented'
+    - 'installed'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'installed'
+  actual: 'unimplemented'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:25:9)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: a complete source with missing native tools installs inertly and retains provenance
+not ok 2 - a complete source with missing native tools installs inertly and retains provenance
+  ---
+  duration_ms: 137.475125
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:27:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading 'execution')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:29:86)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: proposal serialization excludes local locators and changed or absent consent rejects all writes
+not ok 3 - proposal serialization excludes local locators and changed or absent consent rejects all writes
+  ---
+  duration_ms: 132.695084
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:31:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /^[a-f0-9]{64}$/. Input:
+    
+    'unimplemented'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: 'unimplemented'
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:33:68)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: exact duplicate requests recover original outcomes without new generations or occurrences
+not ok 4 - exact duplicate requests recover original outcomes without new generations or occurrences
+  ---
+  duration_ms: 124.341625
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:37:1'
+  failureType: 'testCodeFailure'
+  error: "ENOENT: no such file or directory, open '/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-plugin-lifecycle-gdXhiM/target/.skill-tree/installation/plugins.json'"
+  code: 'ENOENT'
+  stack: |-
+    Object.openSync (node:fs:561:18)
+    Object.readFileSync (node:fs:445:35)
+    read (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:18:27)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:38:71)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: stale proposal and conflicting request identity cannot overwrite a later configuration
+not ok 5 - stale proposal and conflicting request identity cannot overwrite a later configuration
+  ---
+  duration_ms: 128.882375
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:41:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:44:9)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: matching repeat installation is an owned no-op and keeps frozen binding configuration
+not ok 6 - matching repeat installation is an owned no-op and keeps frozen binding configuration
+  ---
+  duration_ms: 130.013958
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:47:1'
+  failureType: 'testCodeFailure'
+  error: "ENOENT: no such file or directory, open '/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-plugin-lifecycle-wq5U1u/target/.skill-tree/installation/plugins.json'"
+  code: 'ENOENT'
+  stack: |-
+    Object.openSync (node:fs:561:18)
+    Object.readFileSync (node:fs:445:35)
+    read (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:18:27)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:48:53)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: modified and unowned package resources reject replacement without force adoption
+not ok 7 - modified and unowned package resources reject replacement without force adoption
+  ---
+  duration_ms: 124.0395
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:51:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading 'destination')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:52:119)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: missing required resources and tampered staged snapshot bytes reject before activation
+not ok 8 - missing required resources and tampered staged snapshot bytes reject before activation
+  ---
+  duration_ms: 124.503417
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:56:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:57:55)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: configure enable and disable preserve independent repeated binding occurrences
+not ok 9 - configure enable and disable preserve independent repeated binding occurrences
+  ---
+  duration_ms: 132.759125
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:60:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+    + []
+    - [
+    -   false,
+    -   true
+    - ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: false
+    1: true
+  actual:
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:62:217)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: package dependencies and uninstall remove every selected live binding while preserving original source
+not ok 10 - package dependencies and uninstall remove every selected live binding while preserving original source
+  ---
+  duration_ms: 129.379541
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:65:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:67:2)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: plugin rollback restores binary resources as a new generation and preserves core rollback evidence
+not ok 11 - plugin rollback restores binary resources as a new generation and preserves core rollback evidence
+  ---
+  duration_ms: 130.366542
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:71:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(r.generation>generation)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:74:191)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: interrupted registry activation recovers resources registry and bindings without duplicate delivery
+not ok 12 - interrupted registry activation recovers resources registry and bindings without duplicate delivery
+  ---
+  duration_ms: 123.538583
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:76:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:79:13)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: writer locks and active retained runs reject activation and preserve all checkpoint state
+not ok 13 - writer locks and active retained runs reject activation and preserve all checkpoint state
+  ---
+  duration_ms: 126.884709
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:82:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:83:127)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: changed plugin generations require current profile refresh and preserve retained run progress
+not ok 14 - changed plugin generations require current profile refresh and preserve retained run progress
+  ---
+  duration_ms: 129.041584
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:86:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:88:283)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: offline dry-run and inventory do not acquire remote sources or mutate installation state
+not ok 15 - offline dry-run and inventory do not acquire remote sources or mutate installation state
+  ---
+  duration_ms: 128.38575
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:91:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - 'dry-run'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'dry-run'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:92:358)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+# Subtest: real raw HTTP acquisition resolves linked bytes without executing source scripts
+not ok 16 - real raw HTTP acquisition resolves linked bytes without executing source scripts
+  ---
+  duration_ms: 7.305583
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:94:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing required acquired resource: SKILL.md'
+  code: 'source-missing'
+  stack: |-
+    fail (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-sources.js:6:41)
+    /Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-sources.js:118:3
+    Object.resolveSource (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-sources.js:157:15)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-installation.js:97:157)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 0
+# fail 16
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2049.589834

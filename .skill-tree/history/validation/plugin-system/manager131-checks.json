@@ -1,0 +1,47 @@
+{
+  "counts": {
+    "combined_node": 79,
+    "current_replay_agent_contexts": 0,
+    "manager": 12,
+    "original_actual_agent_contexts": 3,
+    "original_actual_agent_scenarios": 2,
+    "standalone": 6
+  },
+  "observations": {
+    "diff-check": {
+      "artifact_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "status": "passed"
+    },
+    "installer-dry-run": {
+      "artifact_sha256": "1963615710a77cec631742ca8f6bf57f270d13b1ca18442df853f03aa39e5fb6",
+      "status": "passed"
+    },
+    "installer-list": {
+      "artifact_sha256": "fb9ae55cf4fab128f448e5b634d6917668a04f55662842a490b524588dda30f7",
+      "status": "passed"
+    },
+    "manager-agent-observations": {
+      "artifact_sha256": "c43ad81ff662de4a7062c53cb1773655617ef8255b83f2773eff4f30aadfb4e6",
+      "status": "passed"
+    },
+    "manager-regressions": {
+      "artifact_sha256": "da5ce4b93c55c40159237375e8d3447268c1d9a425ac66ef58265783411ca4fb",
+      "status": "passed"
+    },
+    "manager-standalone-installation": {
+      "artifact_sha256": "c714a92e84e3efd34023e7841a23d840c9f5abc1262980eb87ddd2af0df8f574",
+      "status": "passed"
+    },
+    "strict-validation": {
+      "artifact_sha256": "1302cebd2e1a3189239671ce4e62c846162c5c7fc73279eb4cb87432a0b93da5",
+      "status": "passed"
+    },
+    "sync-check": {
+      "artifact_sha256": "ceffd15f7477e7cca73d33bc13b530b5430f5e4b9c12123f525a1fe3c65a5c78",
+      "status": "passed"
+    }
+  },
+  "repaired_red_sha256": "1c193627c8ee18213f0cf155c745e1ec43d4fe218cfc51aae075373ef89c9b6c",
+  "schema": 1,
+  "source_freeze_sha256": "f23a263f0db62214fc483802d9383af703ec920ffcc4dd785968e96860155053"
+}

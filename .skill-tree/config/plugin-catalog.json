@@ -1,0 +1,442 @@
+{
+  "schema": 1,
+  "entries": [
+    {
+      "id": "ponytail",
+      "title": "Ponytail — bounded follow-up review",
+      "application": "review-ponytail",
+      "source": {
+        "entry": "skills/ponytail/SKILL.md",
+        "kind": "repository",
+        "ref": "96608e078b2d5ea607c5c3b8b5a54d1c1fba6846",
+        "url": "https://github.com/DietrichGebert/ponytail"
+      },
+      "descriptor": "config/plugins/ponytail.json",
+      "content_digest": "14147d26122fb21e825ff59f20d3eedd79ebdbf05c17eaae93daf67826ec5615",
+      "locations": [
+        {
+          "operation": "skill-tree-pr-review-cycle",
+          "anchor": "after"
+        }
+      ],
+      "license": {
+        "identifier": "MIT",
+        "source": "https://github.com/DietrichGebert/ponytail/blob/96608e078b2d5ea607c5c3b8b5a54d1c1fba6846/LICENSE"
+      },
+      "status": "unqualified",
+      "adapter": {
+        "status": "available",
+        "context_kinds": [
+          "review"
+        ],
+        "prerequisites": [
+          "Requires the complete current core review and an isolated source-backed context."
+        ]
+      },
+      "hosts": {
+        "codex": "observed",
+        "other": "unqualified"
+      },
+      "flavors": {
+        "general": "unqualified",
+        "unity": "unqualified",
+        "web": "unqualified"
+      },
+      "evidence": {
+        "kind": "comparison",
+        "reference": ".skill-tree/history/research/plugin-comparison-results.json",
+        "sha256": "1463e6846ed1c4d91c6affc252fff923d709f67bd6fdcf8cd8866210f004779b",
+        "scope": "General Codex source-backed W1 Manual"
+      }
+    },
+    {
+      "id": "ponytail-review",
+      "title": "Ponytail Review",
+      "application": "ponytail-review",
+      "source": {
+        "kind": "repository",
+        "url": "https://github.com/DietrichGebert/ponytail",
+        "ref": "96608e078b2d5ea607c5c3b8b5a54d1c1fba6846",
+        "entry": "skills/ponytail-review/SKILL.md"
+      },
+      "descriptor": null,
+      "content_digest": null,
+      "locations": [
+        {
+          "operation": "skill-tree-pr-review-cycle",
+          "anchor": "after"
+        }
+      ],
+      "license": {
+        "identifier": "MIT",
+        "source": "https://github.com/DietrichGebert/ponytail/blob/96608e078b2d5ea607c5c3b8b5a54d1c1fba6846/LICENSE"
+      },
+      "status": "compatibility-only",
+      "adapter": {
+        "status": "requires-preparation",
+        "context_kinds": [
+          "review"
+        ],
+        "prerequisites": [
+          "Distinct report-only source. Inspect full closure and prepare an adapter."
+        ]
+      },
+      "hosts": {
+        "codex": "unqualified",
+        "other": "unqualified"
+      },
+      "flavors": {
+        "general": "unqualified",
+        "unity": "unqualified",
+        "web": "unqualified"
+      },
+      "evidence": {
+        "kind": "source-inspection",
+        "reference": ".skill-tree/history/research/plugin-market-map.json",
+        "candidate_id": "ponytail-review",
+        "observed_date": "2026-11-05"
+      }
+    },
+    {
+      "id": "sentry-find-bugs",
+      "title": "Sentry Find Bugs",
+      "application": "sentry-find-bugs",
+      "source": {
+        "kind": "repository",
+        "url": "https://github.com/getsentry/skills",
+        "ref": "0c464f411bdfb8d4c12314b36264d06cb2f60270",
+        "entry": "skills/find-bugs/SKILL.md"
+      },
+      "descriptor": null,
+      "content_digest": null,
+      "locations": [
+        {
+          "operation": "skill-tree-pr-review-cycle",
+          "anchor": "after"
+        }
+      ],
+      "license": {
+        "identifier": "Apache-2.0",
+        "source": "https://github.com/getsentry/skills/blob/0c464f411bdfb8d4c12314b36264d06cb2f60270/LICENSE"
+      },
+      "status": "compatibility-only",
+      "adapter": {
+        "status": "requires-preparation",
+        "context_kinds": [
+          "review"
+        ],
+        "prerequisites": [
+          "Requires complete Git diff and branch evidence. Inspect authentication and tool needs before enabling."
+        ]
+      },
+      "hosts": {
+        "codex": "unqualified",
+        "other": "unqualified"
+      },
+      "flavors": {
+        "general": "unqualified",
+        "unity": "unqualified",
+        "web": "unqualified"
+      },
+      "evidence": {
+        "kind": "source-inspection",
+        "reference": ".skill-tree/history/research/plugin-market-map.json",
+        "candidate_id": "sentry-find-bugs",
+        "observed_date": "2026-11-05"
+      }
+    },
+    {
+      "id": "superpowers-verification",
+      "title": "Superpowers Verification Before Completion",
+      "application": "superpowers-verification",
+      "source": {
+        "kind": "repository",
+        "url": "https://github.com/obra/superpowers",
+        "ref": "22f0b463e7a5e579904dd6211a520321035526f7",
+        "entry": "skills/verification-before-completion/SKILL.md"
+      },
+      "descriptor": null,
+      "content_digest": null,
+      "locations": [
+        {
+          "operation": "skill-tree-implement-next-future-task",
+          "anchor": "after"
+        }
+      ],
+      "license": {
+        "identifier": "MIT",
+        "source": "https://github.com/obra/superpowers/blob/22f0b463e7a5e579904dd6211a520321035526f7/LICENSE"
+      },
+      "status": "compatibility-only",
+      "adapter": {
+        "status": "requires-preparation",
+        "context_kinds": [
+          "task"
+        ],
+        "prerequisites": [
+          "Requires current validation evidence, full source closure and explicit action boundaries."
+        ]
+      },
+      "hosts": {
+        "codex": "unqualified",
+        "other": "unqualified"
+      },
+      "flavors": {
+        "general": "unqualified",
+        "unity": "unqualified",
+        "web": "unqualified"
+      },
+      "evidence": {
+        "kind": "source-inspection",
+        "reference": ".skill-tree/history/research/plugin-market-map.json",
+        "candidate_id": "superpowers-verification",
+        "observed_date": "2026-11-05"
+      }
+    },
+    {
+      "id": "task-editorial",
+      "title": "Writing for Agents — task wording",
+      "application": "task-editorial",
+      "source": {
+        "entry": "skills/productivity/writing-for-agents/SKILL.md",
+        "kind": "repository",
+        "ref": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "url": "https://github.com/mattpocock/skills"
+      },
+      "descriptor": "config/plugins/task-editorial.json",
+      "content_digest": "a07c7cf13cd8f42c869d7fb261ce2576339749eb5fead2433d98beb3be73d30f",
+      "locations": [
+        {
+          "operation": "skill-tree-process-future-pending",
+          "anchor": "after"
+        }
+      ],
+      "license": {
+        "identifier": "MIT",
+        "source": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/LICENSE"
+      },
+      "status": "unqualified",
+      "adapter": {
+        "status": "available",
+        "context_kinds": [
+          "task"
+        ],
+        "prerequisites": [
+          "Requires the pinned editorial resource and exact selected task semantics."
+        ]
+      },
+      "hosts": {
+        "codex": "unqualified",
+        "other": "unqualified"
+      },
+      "flavors": {
+        "general": "unqualified",
+        "unity": "unqualified",
+        "web": "unqualified"
+      },
+      "evidence": {
+        "kind": "comparison",
+        "reference": ".skill-tree/history/research/plugin-comparison-results.json",
+        "sha256": "1463e6846ed1c4d91c6affc252fff923d709f67bd6fdcf8cd8866210f004779b",
+        "scope": "General Codex source-backed W1 Manual"
+      }
+    },
+    {
+      "id": "task-interview",
+      "title": "Grill Me — task clarification",
+      "application": "task-interview",
+      "source": {
+        "entry": "skills/productivity/grill-me/SKILL.md",
+        "kind": "repository",
+        "ref": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "url": "https://github.com/mattpocock/skills"
+      },
+      "descriptor": "config/plugins/task-interview.json",
+      "content_digest": "a00d066087e3df89e6211c6fc04371969be8130b394966a28e302e33779cc341",
+      "locations": [
+        {
+          "operation": "skill-tree-process-future-pending",
+          "anchor": "after"
+        }
+      ],
+      "license": {
+        "identifier": "MIT",
+        "source": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/LICENSE"
+      },
+      "status": "unqualified",
+      "adapter": {
+        "status": "available",
+        "context_kinds": [
+          "task"
+        ],
+        "prerequisites": [
+          "Requires the pinned grilling sibling and current W1 decision route."
+        ]
+      },
+      "hosts": {
+        "codex": "observed",
+        "other": "unqualified"
+      },
+      "flavors": {
+        "general": "unqualified",
+        "unity": "unqualified",
+        "web": "unqualified"
+      },
+      "evidence": {
+        "kind": "comparison",
+        "reference": ".skill-tree/history/research/plugin-comparison-results.json",
+        "sha256": "1463e6846ed1c4d91c6affc252fff923d709f67bd6fdcf8cd8866210f004779b",
+        "scope": "General Codex source-backed W1 Manual"
+      }
+    },
+    {
+      "id": "unity-urp-validation",
+      "title": "Unity URP Render Graph Validation",
+      "application": "unity-urp-validation",
+      "source": {
+        "kind": "repository",
+        "url": "https://github.com/Unity-Technologies/skills",
+        "ref": "ba28c24fc7e569fa0fd5b6bf16ab2bb0acef0594",
+        "entry": "skills/validate-urp-render-graph-renderer-feature/SKILL.md"
+      },
+      "descriptor": null,
+      "content_digest": null,
+      "locations": [
+        {
+          "operation": "skill-tree-pr-review-cycle",
+          "anchor": "after"
+        }
+      ],
+      "license": {
+        "identifier": "Unity Companion License for Unity-dependent projects",
+        "source": "https://github.com/Unity-Technologies/skills/blob/ba28c24fc7e569fa0fd5b6bf16ab2bb0acef0594/LICENSE.md"
+      },
+      "status": "compatibility-only",
+      "adapter": {
+        "status": "requires-preparation",
+        "context_kinds": [
+          "review"
+        ],
+        "prerequisites": [
+          "Requires matching Unity and URP versions and a Unity-dependent target under the inspected license."
+        ]
+      },
+      "hosts": {
+        "codex": "unqualified",
+        "other": "unqualified"
+      },
+      "flavors": {
+        "general": "unqualified",
+        "unity": "unqualified",
+        "web": "unqualified"
+      },
+      "evidence": {
+        "kind": "source-inspection",
+        "reference": ".skill-tree/history/research/plugin-market-map.json",
+        "candidate_id": "unity-urp-validation",
+        "observed_date": "2026-11-05"
+      }
+    },
+    {
+      "id": "vercel-react",
+      "title": "Vercel React Best Practices",
+      "application": "vercel-react",
+      "source": {
+        "kind": "repository",
+        "url": "https://github.com/vercel-labs/agent-skills",
+        "ref": "1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62",
+        "entry": "skills/react-best-practices/SKILL.md"
+      },
+      "descriptor": null,
+      "content_digest": null,
+      "locations": [
+        {
+          "operation": "skill-tree-pr-review-cycle",
+          "anchor": "after"
+        }
+      ],
+      "license": {
+        "identifier": "MIT",
+        "source": "https://github.com/vercel-labs/agent-skills/blob/1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62/skills/react-best-practices/SKILL.md"
+      },
+      "status": "compatibility-only",
+      "adapter": {
+        "status": "requires-preparation",
+        "context_kinds": [
+          "review"
+        ],
+        "prerequisites": [
+          "Requires matching React version and complete pinned rules. Browser and performance evidence stay separate."
+        ]
+      },
+      "hosts": {
+        "codex": "unqualified",
+        "other": "unqualified"
+      },
+      "flavors": {
+        "general": "unqualified",
+        "unity": "unqualified",
+        "web": "unqualified"
+      },
+      "evidence": {
+        "kind": "source-inspection",
+        "reference": ".skill-tree/history/research/plugin-market-map.json",
+        "candidate_id": "vercel-react",
+        "observed_date": "2026-11-05"
+      }
+    },
+    {
+      "id": "writing-for-agents-documentation-report",
+      "title": "Writing for Agents — documentation report",
+      "application": "documentation-editorial",
+      "source": {
+        "entry": "skills/productivity/writing-for-agents/SKILL.md",
+        "kind": "repository",
+        "ref": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "url": "https://github.com/mattpocock/skills"
+      },
+      "descriptor": null,
+      "content_digest": "a07c7cf13cd8f42c869d7fb261ce2576339749eb5fead2433d98beb3be73d30f",
+      "locations": [
+        {
+          "operation": "skill-tree-repo-documentation-audit",
+          "anchor": "after-validation"
+        }
+      ],
+      "license": {
+        "identifier": "MIT",
+        "source": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/LICENSE"
+      },
+      "status": "unqualified",
+      "adapter": {
+        "status": "requires-preparation",
+        "context_kinds": [
+          "document"
+        ],
+        "prerequisites": [
+          "Requires a documentation-specific report adapter and the pinned SKILL-MECHANICS.md resource."
+        ]
+      },
+      "hosts": {
+        "codex": "observed",
+        "other": "unqualified"
+      },
+      "flavors": {
+        "general": "unqualified",
+        "unity": "unqualified",
+        "web": "unqualified"
+      },
+      "evidence": {
+        "kind": "comparison",
+        "reference": ".skill-tree/history/research/plugin-comparison-results.json",
+        "sha256": "1463e6846ed1c4d91c6affc252fff923d709f67bd6fdcf8cd8866210f004779b",
+        "scope": "General Codex source-backed W1 Manual"
+      }
+    }
+  ],
+  "recommendations": {
+    "general": [],
+    "unity": [],
+    "web": []
+  }
+}

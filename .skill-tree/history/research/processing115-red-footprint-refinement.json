@@ -1,0 +1,10 @@
+{
+  "future_authored_paths_not_yet_runtime_inputs": [
+    ".skill-tree/common/scripts/plugin-processing.py",
+    ".skill-tree/tests/test-plugin-processing-installation.js"
+  ],
+  "kind": "pre-red-source-footprint-refinement",
+  "mandatory_addition_before_green_if_authored": true,
+  "reason": "The first behavioral Red exercises existing Processing runtime. Prospective helper and copied-test files do not exist and are not runtime inputs yet; inert descriptors and original source fixtures remain required. Actual future helper/test inputs join the same unchanged check contract before qualifying Green. No acceptance criterion, assertion, recipe or current runtime input is removed.",
+  "task_id": "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69"
+}

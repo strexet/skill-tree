@@ -1,0 +1,452 @@
+{
+  "claims": {
+    "conditional_static_compatibility_supported": true,
+    "controller_selection_observed_by_this_proposal": false,
+    "current_tests_observed_by_this_proposal": false,
+    "fresh_current_native_qualification": false,
+    "owned_activation_observed_by_this_proposal": false
+  },
+  "classification": "Read-only conditional static source proposal retaining historical actual source identity; no new current native run, test result or acceptance.",
+  "contextual_ast_proof": {
+    "accept": {
+      "baseline_ast_sha256": "3df84b4a4f155edb440b208859db0d43542d6e35cfb44867da959c39252fb609",
+      "current_full_branch_ast_sha256": "4a9715d1110799d6e1a7b2fc0da63f2c63891431df76bb4c7e2f9bfe552b09c6",
+      "full_current_branch_identical_baseline": false,
+      "normalized_current_ast_sha256": "3df84b4a4f155edb440b208859db0d43542d6e35cfb44867da959c39252fb609",
+      "policy_free_normalized_identical": true,
+      "removed_only": "review_frontier() no-op because original lacks review_frontier; invocation_policy optional block false because original input lacks policy."
+    },
+    "invoke": {
+      "baseline_ast_sha256": "a36e9684ddc4489fe834127013b9c265112f1e66a5db03610bb7bf589bf2f016",
+      "current_full_branch_ast_sha256": "339c2b9cb37d1d5fc56105581f7c6009232f354a3dc2a38655ccce7999e614de",
+      "full_current_branch_identical_baseline": false,
+      "normalized_current_ast_sha256": "a36e9684ddc4489fe834127013b9c265112f1e66a5db03610bb7bf589bf2f016",
+      "policy_free_normalized_identical": true,
+      "removed_only": "review_frontier() no-op because original lacks review_frontier; invocation_policy optional block false because original input lacks policy."
+    },
+    "ordinary_task_incorporation": {
+      "baseline_ast_sha256": "8516329e5e62bee24ea8666c9bd9fa5c381e824c2461bae639c7495909a91810",
+      "normalized_current_ast_sha256": "8516329e5e62bee24ea8666c9bd9fa5c381e824c2461bae639c7495909a91810",
+      "policy_free_normalized_identical": true,
+      "removed_only": "Two publication-bound review If blocks false for the actual task context; ordinary CL revision verification is retained."
+    },
+    "prepare": {
+      "baseline_ast_sha256": "513bccb71dca6f2434cee02b247648ead188e9394f5717feb16025839ea71bd3",
+      "normalized_current_ast_sha256": "513bccb71dca6f2434cee02b247648ead188e9394f5717feb16025839ea71bd3",
+      "policy_free_normalized_identical": true,
+      "removed_only": "Policy getter/false policy blocks, guard-local assignment/false publication frontier sealing; captured adaptation is empty and context is task."
+    },
+    "record": {
+      "baseline_ast_sha256": "a3f61ab07f9491d083a7954e6a8d06d41b7356feb54ac3ef0ffbeb59462555a7",
+      "current_full_branch_ast_sha256": "e2954845f4d2cc51504851b2ea49d0baad77e7e00ea05fa9d0597b54dda0d832",
+      "full_current_branch_identical_baseline": false,
+      "normalized_current_ast_sha256": "a3f61ab07f9491d083a7954e6a8d06d41b7356feb54ac3ef0ffbeb59462555a7",
+      "policy_free_normalized_identical": true,
+      "removed_only": "review_frontier() no-op because original lacks review_frontier; invocation_policy optional block false because original input lacks policy."
+    }
+  },
+  "current_source": {
+    "baseline_commit": "57bbf013d08c2014aff87f379d2cd708063b81a6",
+    "freeze": {
+      "path": ".skill-tree/history/validation/plugin-system/ponytail116-source-freeze3.json",
+      "sha256": "0b4725def129fa03efa04d8a223ba01b73823244cb9318137e5ad79c839ae5f2"
+    },
+    "frozen_file_count": 249,
+    "mismatches": [],
+    "source_digest": "b28052dbc57f0376a0d061168a165357035d1a40dc758344bd091f3b58fe7297"
+  },
+  "format": "skill-tree-invocation118-static-compatibility-proposal",
+  "historical_actual_scope": {
+    "capture": {
+      "path": ".skill-tree/history/validation/plugin-system/invocation118-native/capture.json",
+      "sha256": "5f481b09a9cdd556971ae3b1ca12d1ab8e5147266d8378aae59703514526e0bd"
+    },
+    "chain_schema": 1,
+    "chain_schema_python_type": "int",
+    "dispatch_facts": [
+      {
+        "binding_id": "editor-first",
+        "context_kind": "task",
+        "delivery_policy_present": false,
+        "input_policy_present": false,
+        "private_delivery_keys": [
+          "allowed_actions",
+          "allowed_tools",
+          "attempt_id",
+          "authority",
+          "authority_digest",
+          "binding_id",
+          "chain_id",
+          "context",
+          "dispatch_identity",
+          "event",
+          "extra_instructions",
+          "input_digest",
+          "mechanism",
+          "mode",
+          "parameters",
+          "plugin",
+          "provider",
+          "scope_source_snapshot"
+        ],
+        "public_input_keys": [
+          "attempt_id",
+          "authority",
+          "authority_digest",
+          "binding_id",
+          "chain_id",
+          "configuration_digest",
+          "context",
+          "epoch",
+          "event",
+          "execution_policy",
+          "execution_snapshot_digest",
+          "extra_instructions",
+          "index",
+          "lineage",
+          "mode",
+          "package_identity",
+          "parameter_digest",
+          "parameters",
+          "scope_source_snapshot"
+        ],
+        "publication_id_present": false,
+        "review_frontier_present": false,
+        "tools_actions_match_sealed_execution_policy": true
+      },
+      {
+        "binding_id": "grill-middle",
+        "context_kind": "task",
+        "delivery_policy_present": false,
+        "input_policy_present": false,
+        "private_delivery_keys": [
+          "allowed_actions",
+          "allowed_tools",
+          "attempt_id",
+          "authority",
+          "authority_digest",
+          "binding_id",
+          "chain_id",
+          "context",
+          "dispatch_identity",
+          "event",
+          "extra_instructions",
+          "input_digest",
+          "mechanism",
+          "mode",
+          "parameters",
+          "plugin",
+          "provider",
+          "scope_source_snapshot"
+        ],
+        "public_input_keys": [
+          "attempt_id",
+          "authority",
+          "authority_digest",
+          "binding_id",
+          "chain_id",
+          "configuration_digest",
+          "context",
+          "epoch",
+          "event",
+          "execution_policy",
+          "execution_snapshot_digest",
+          "extra_instructions",
+          "index",
+          "lineage",
+          "mode",
+          "package_identity",
+          "parameter_digest",
+          "parameters",
+          "scope_source_snapshot"
+        ],
+        "publication_id_present": false,
+        "review_frontier_present": false,
+        "tools_actions_match_sealed_execution_policy": true
+      },
+      {
+        "binding_id": "editor-final",
+        "context_kind": "task",
+        "delivery_policy_present": false,
+        "input_policy_present": false,
+        "private_delivery_keys": [
+          "allowed_actions",
+          "allowed_tools",
+          "attempt_id",
+          "authority",
+          "authority_digest",
+          "binding_id",
+          "chain_id",
+          "context",
+          "dispatch_identity",
+          "event",
+          "extra_instructions",
+          "input_digest",
+          "mechanism",
+          "mode",
+          "parameters",
+          "plugin",
+          "provider",
+          "scope_source_snapshot"
+        ],
+        "public_input_keys": [
+          "attempt_id",
+          "authority",
+          "authority_digest",
+          "binding_id",
+          "chain_id",
+          "configuration_digest",
+          "context",
+          "epoch",
+          "event",
+          "execution_policy",
+          "execution_snapshot_digest",
+          "extra_instructions",
+          "index",
+          "lineage",
+          "mode",
+          "package_identity",
+          "parameter_digest",
+          "parameters",
+          "scope_source_snapshot"
+        ],
+        "publication_id_present": false,
+        "review_frontier_present": false,
+        "tools_actions_match_sealed_execution_policy": true
+      }
+    ],
+    "event": {
+      "anchor": "after",
+      "boundary_id": "skill-tree-process-future-pending:after",
+      "id": "invocation118-after-processing",
+      "operation": "skill-tree-process-future-pending"
+    },
+    "existing_limits": [
+      "Static AST/source compatibility is not a proof of arbitrary semantic equivalence.",
+      "Synthetic fixtures and scripted answers never count as actual host contexts, real-human approval, native Skill invocation, provider universality or candidate efficacy.",
+      "No new tokens/cost/model/native-call accounting is inferred; original unexposed fields and aggregate failed-attempt charges remain unchanged.",
+      "Raw installation receipts absent from historical evidence are not reconstructed as observed data.",
+      "Current strict source fingerprint validation remains intentionally fail-closed."
+    ],
+    "mode": "manual",
+    "package_adaptations": {
+      "controlled-editor": {},
+      "controlled-grill": {}
+    }
+  },
+  "historical_source_commit": "633e716def20d09847913bc432b0cfaf1e58bb63",
+  "immutable_historical_artifacts": {
+    "capture": {
+      "matches_prior_immutable_sha256": true,
+      "path": ".skill-tree/history/validation/plugin-system/invocation118-native/capture.json",
+      "sha256": "5f481b09a9cdd556971ae3b1ca12d1ab8e5147266d8378aae59703514526e0bd"
+    },
+    "grade": {
+      "matches_prior_immutable_sha256": true,
+      "path": ".skill-tree/history/validation/plugin-system/invocation118-native/grade.json",
+      "sha256": "7eb094e5e67ec6f9b26662c27c199ef38c39a3c63c51fee92c1e70e6225b888a"
+    },
+    "qualification": {
+      "matches_prior_immutable_sha256": true,
+      "path": ".skill-tree/history/validation/plugin-system/invocation118-native/qualification.json",
+      "sha256": "17564517f4b90435c1a66d9d1488856f05671523538dd9a131e8c1eb4495410e"
+    },
+    "report": {
+      "matches_prior_immutable_sha256": true,
+      "path": ".skill-tree/history/validation/plugin-system/invocation118-native/report.json",
+      "sha256": "cf002e5bb4448a5f870d5904e8905f1b3006fc05004e59430300d777877e8485"
+    }
+  },
+  "mandatory_source_comparison": {
+    "common/scripts/decision-governance.py": {
+      "byte_identical_managed_baseline": true,
+      "byte_identical_original": true,
+      "current_sha256": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+      "git_matches_immutable_capture": true,
+      "historical_capture_sha256": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+      "historical_git_sha256": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286"
+    },
+    "common/scripts/decision-orchestration.py": {
+      "byte_identical_managed_baseline": true,
+      "byte_identical_original": true,
+      "current_sha256": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+      "git_matches_immutable_capture": true,
+      "historical_capture_sha256": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+      "historical_git_sha256": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145"
+    },
+    "common/scripts/plugin-hooks.js": {
+      "byte_identical_managed_baseline": false,
+      "byte_identical_original": false,
+      "current_sha256": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",
+      "git_matches_immutable_capture": true,
+      "historical_capture_sha256": "3ed78006e6abfb8a70cf191f1b310f41b50f3c60b3131bca3722c89af6753102",
+      "historical_git_sha256": "3ed78006e6abfb8a70cf191f1b310f41b50f3c60b3131bca3722c89af6753102"
+    },
+    "common/scripts/plugin-invocation.py": {
+      "byte_identical_managed_baseline": false,
+      "byte_identical_original": false,
+      "current_sha256": "11b97675583753ccc391492de556e71d74bb39ab0b43cce64412469d6ef85e77",
+      "git_matches_immutable_capture": true,
+      "historical_capture_sha256": "281165ce83ed4309e4c841721b4461c71a447c4070c496a3c7ca37598af64d7d",
+      "historical_git_sha256": "281165ce83ed4309e4c841721b4461c71a447c4070c496a3c7ca37598af64d7d"
+    },
+    "common/scripts/run-workspaces.py": {
+      "byte_identical_managed_baseline": true,
+      "byte_identical_original": true,
+      "current_sha256": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+      "git_matches_immutable_capture": true,
+      "historical_capture_sha256": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+      "historical_git_sha256": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb"
+    },
+    "common/scripts/validate-document-rules.py": {
+      "byte_identical_managed_baseline": true,
+      "byte_identical_original": true,
+      "current_sha256": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+      "git_matches_immutable_capture": true,
+      "historical_capture_sha256": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+      "historical_git_sha256": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7"
+    },
+    "common/scripts/workflow-state.py": {
+      "byte_identical_managed_baseline": false,
+      "byte_identical_original": false,
+      "current_sha256": "34e5c105ad7cf594720f4c60655a27bfdfdccc93e71ce9d00610447178bb1883",
+      "git_matches_immutable_capture": true,
+      "historical_capture_sha256": "57383709635e780c6d207834fba5396583f1ecfe86ac2456380fabf755b6a68b",
+      "historical_git_sha256": "57383709635e780c6d207834fba5396583f1ecfe86ac2456380fabf755b6a68b"
+    },
+    "lib/plugin-bindings.js": {
+      "byte_identical_managed_baseline": true,
+      "byte_identical_original": true,
+      "current_sha256": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
+      "git_matches_immutable_capture": true,
+      "historical_capture_sha256": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
+      "historical_git_sha256": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba"
+    },
+    "lib/plugin-composition.js": {
+      "byte_identical_managed_baseline": false,
+      "byte_identical_original": false,
+      "current_sha256": "97e6d36970047ad256d97a22093d889d0f7fd094a07cb3fa64fe907a5d618a3a",
+      "git_matches_immutable_capture": true,
+      "historical_capture_sha256": "3a2b5af0329c6e0a98754c512388df0d447f0d08181fa39fd8cf7fa4905225db",
+      "historical_git_sha256": "3a2b5af0329c6e0a98754c512388df0d447f0d08181fa39fd8cf7fa4905225db"
+    },
+    "lib/plugin-parameters.js": {
+      "byte_identical_managed_baseline": true,
+      "byte_identical_original": true,
+      "current_sha256": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+      "git_matches_immutable_capture": true,
+      "historical_capture_sha256": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+      "historical_git_sha256": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915"
+    },
+    "lib/plugin-registry.js": {
+      "byte_identical_managed_baseline": true,
+      "byte_identical_original": true,
+      "current_sha256": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+      "git_matches_immutable_capture": true,
+      "historical_capture_sha256": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+      "historical_git_sha256": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005"
+    },
+    "lib/plugin-runtime.js": {
+      "byte_identical_managed_baseline": false,
+      "byte_identical_original": false,
+      "current_sha256": "82830c2aff9ae2380f5cf2440a461f3a2d6d61c4141561db3ce1ae2346fac78d",
+      "git_matches_immutable_capture": true,
+      "historical_capture_sha256": "5e9827cc3e59fece6a95afd76f90181e7f2c9eb6a049f0c9a0c7a6ad6730dcb8",
+      "historical_git_sha256": "5e9827cc3e59fece6a95afd76f90181e7f2c9eb6a049f0c9a0c7a6ad6730dcb8"
+    },
+    "lib/plugin-sources.js": {
+      "byte_identical_managed_baseline": true,
+      "byte_identical_original": true,
+      "current_sha256": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+      "git_matches_immutable_capture": true,
+      "historical_capture_sha256": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+      "historical_git_sha256": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6"
+    }
+  },
+  "node_base_definition_lines": {
+    "const data=": {
+      "byte_identical_managed_baseline": true,
+      "byte_identical_original": true,
+      "current_line_sha256": "99ef9b5fe4333d59ba55715b271cd7b83d43371a6f8978aaeef6cfec510cfc4b"
+    },
+    "const dispatch=": {
+      "byte_identical_managed_baseline": true,
+      "byte_identical_original": true,
+      "current_line_sha256": "921a3831ff991119f88132930cb93ba65cd3ab0306798fe9bca06d3ab88619e9"
+    },
+    "const values=": {
+      "byte_identical_managed_baseline": true,
+      "byte_identical_original": true,
+      "current_line_sha256": "8159a037546d83b9e061917ea34a7e1ddc5fb72ce13cf7f3991571e9e75d80dd"
+    },
+    "return {payload:data,": {
+      "byte_identical_managed_baseline": true,
+      "byte_identical_original": true,
+      "current_line_sha256": "499f68a28a1a4c517288fc0755a5977287bb1cf9aeae382b6e3b396f43e334b4"
+    }
+  },
+  "operations_not_performed": [
+    "No tests, actual candidate/native/provider requests, source/queue/profile/installed changes, commit or publication.",
+    "Only this ignored proposal written; no original or prior evidence rewritten."
+  ],
+  "prior_historical_to_managed_analysis": {
+    "path": ".skill-tree/history/validation/plugin-system/invocation118-after-managed-guards-analysis.json",
+    "sha256": "3eeebb11f8c6f2cb983efc21287859867f64617190300daabf7b7f04d4d18e00"
+  },
+  "python_changes_since_managed_guards": {
+    "engine": {
+      "added_functions": [
+        "context_end",
+        "invocation_policy",
+        "review_frontier"
+      ],
+      "changed_shared_functions": [
+        "mutate",
+        "prepare",
+        "raw"
+      ],
+      "removed_functions": []
+    },
+    "workflow": {
+      "added_functions": [
+        "_hook_review_frontier"
+      ],
+      "changed_shared_functions": [
+        "_hook_action",
+        "_hook_transition"
+      ],
+      "removed_functions": []
+    }
+  },
+  "required_conditions": [
+    "Pass fresh selected118 state, copied installation/standalone, parameter/privacy and independent conformance/oracle checks against final116 source.",
+    "Current116 and required full lanes must pass separately; historical actual evidence supplies no current Green.",
+    "Complete authorized116 commit, owned installer refresh, exact current ownership/profile/source closure and re-admission with canonical queue/history preserved.",
+    "Explicit controller must select completed118 and ordinary revalidation contract before recording acceptance.",
+    "A changed reachable task/parameter/actor/incorporation behavior or explicit current-native requirement needs a separately authorized finite actual run."
+  ],
+  "reviewed_new_paths": {
+    "cached_delivery": "Current WF invocation_policy comparison uses .get on original/public private payload; both absent normalize to None in all3 actual captured dispatches. New allowed_tools/actions exact comparisons equal the already sealed execution_policy in each capture. Identity checks remain before sink/outside writer; they do not launch another actor/provider. Current analogous DP must be derived from current owned input, never old opaque digests.",
+    "identity_limit": "Full source, manifest/catalog/profile/configuration/execution/public input/dispatch/private delivery and chain/history hashes intentionally differ. No whole-source or wire-byte/hash equality is claimed; an analogous current run recomputes actual current identities. Original capture source/profile/model/token/cost fields remain immutable.",
+    "node_nonreview_path": "New composition PR guardProgram/guardBoundary and missing-publication check only select PR/policy review contexts; captured operation is Process Pending and context.kind task. Existing task/CL guard remains active. CLI adds requirement-plan only, unused by original freeze/occurrence/delivery. Base values/dispatch/data/return-envelope definition lines remain source-identical. Optional private policy append is false for captured empty adaptation, preserving18 private keys.",
+    "original_lifetime_and_result": "Fresh-per-attempt, host context-end, terminal cleanup policy and normalized top-level findings/questions guards are conditional on sealed invocation_policy, absent in captured inputs. Existing per-occurrence separation and generic result/custom-data behavior remain. New raw schema type check accepts the captured integer1, intentionally rejecting boolean/noninteger metadata.",
+    "policy_absence": "Actual adapters controlled-editor and controlled-grill are empty. Python returns None and Node returns undefined; no public invocation_policy/review_frontier or private invocation_policy key is appended. Explicit-null/invalid policies are outside this branch and are not generalized as compatible.",
+    "workflow_pr_inertness": "Added _hook_review_frontier returns before lazy PR import when proof.guard has no publication_id. Start publication copying requires kind review. Both new transition guards require publication-bound review; ordinary task/CL incorporation verifier normalizes exactly to managed baseline. No publication/frontier is fabricated for the captured task.",
+    "writer": "Store lock/commit/owned loader remain AST-identical to managed baseline. Existing scoped-source/watch/CAS barriers remain; new PR policy paths are inapplicable. No host actor/private provider is invoked under writer locks."
+  },
+  "schema": 1,
+  "status": "CONDITIONAL-awaiting-current-selected-checks-owned-activation-and-controller-selection",
+  "strict_native_validator": {
+    "changed_original_mandatory_paths": [
+      "common/scripts/plugin-hooks.js",
+      "common/scripts/plugin-invocation.py",
+      "common/scripts/workflow-state.py",
+      "lib/plugin-composition.js",
+      "lib/plugin-runtime.js"
+    ],
+    "path": ".skill-tree/scripts/agent-conformance.py",
+    "rule": "_validate_plugin_invocation_report requires report/capture source maps equal and every fingerprint equal current bytes before qualification. Five mandatory hashes mismatch; old evidence must reject as fresh current-native. This is source inspection, not a newly executed grader.",
+    "sha256": "0f7a79a83e69aad8c8f3a5c4d063b94616f1c6d786f0e13cc3027dee3401f49e",
+    "unchanged_from_managed_baseline": true
+  }
+}

@@ -1,0 +1,50 @@
+TAP version 13
+# Subtest: general copied invocation bridge retains all registered operation closures without source siblings or Future
+ok 1 - general copied invocation bridge retains all registered operation closures without source siblings or Future
+  ---
+  duration_ms: 5967.502625
+  ...
+# Subtest: web copied invocation bridge retains all registered operation closures without source siblings or Future
+ok 2 - web copied invocation bridge retains all registered operation closures without source siblings or Future
+  ---
+  duration_ms: 5630.80925
+  ...
+# Subtest: unity copied invocation bridge retains all registered operation closures without source siblings or Future
+ok 3 - unity copied invocation bridge retains all registered operation closures without source siblings or Future
+  ---
+  duration_ms: 5605.180875
+  ...
+# Subtest: copied hook entry loads verified Python source instead of timestamp-valid alternate bytecode
+ok 4 - copied hook entry loads verified Python source instead of timestamp-valid alternate bytecode
+  ---
+  duration_ms: 395.603667
+  ...
+# Subtest: a task-free prepared invocation blocks installation until the original attempt is reconciled
+ok 5 - a task-free prepared invocation blocks installation until the original attempt is reconciled
+  ---
+  duration_ms: 496.497959
+  ...
+# Subtest: private delivery resolves JSON secret values only into the adapter context while ordinary state keeps references
+ok 6 - private delivery resolves JSON secret values only into the adapter context while ordinary state keeps references
+  ---
+  duration_ms: 1197.034042
+  ...
+# Subtest: copied direct workflow entry rejects changed owned runtime source before import side effects
+ok 7 - copied direct workflow entry rejects changed owned runtime source before import side effects
+  ---
+  duration_ms: 320.467041
+  ...
+# Subtest: copied PR entry verifies owned inventory before loading workspace helpers
+ok 8 - copied PR entry verifies owned inventory before loading workspace helpers
+  ---
+  duration_ms: 295.847542
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 20000.456667

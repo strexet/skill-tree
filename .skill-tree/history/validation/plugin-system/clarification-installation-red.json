@@ -1,0 +1,28 @@
+{
+  "attempt_id": "C-8a212a56-0318-4e1c-9735-042c90411f71",
+  "check_id": "clarification-installation",
+  "cleanup": "Temporary fixture repositories were removed by runner cleanup; no product or provider operation occurred.",
+  "counts": {
+    "discovered": 3,
+    "expected": 3,
+    "failed": 3,
+    "passed": 0,
+    "skipped": 0
+  },
+  "failure_category": "expected-behavior",
+  "observed_failure": "The installer rejects the requested skill-tree-clarify-tasks entry point; each flavor assertion expects a standalone copied clarification package.",
+  "result": "red",
+  "runner_output": "TAP version 13\n# Subtest: general clarification package runs independently of source and sibling packages\nnot ok 1 - general clarification package runs independently of source and sibling packages\n  ---\n  duration_ms: 62.875\n  location: '{source_root}/.skill-tree/tests/test-clarification-installation.js:15:51'\n  failureType: 'testCodeFailure'\n  error: |-\n    error: unknown skill: skill-tree-clarify-tasks\n    \n    \n    2 !== 0\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 0\n  actual: 2\n  operator: 'strictEqual'\n  stack: |-\n    run ({source_root}/.skill-tree/tests/test-clarification-installation.js:7:10)\n    TestContext.<anonymous> ({source_root}/.skill-tree/tests/test-clarification-installation.js:27:3)\n    Test.runInAsyncScope (node:async_hooks:211:14)\n    Test.run (node:internal/test_runner/test:934:25)\n    Test.start (node:internal/test_runner/test:833:17)\n    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)\n  ...\n# Subtest: web clarification package runs independently of source and sibling packages\nnot ok 2 - web clarification package runs independently of source and sibling packages\n  ---\n  duration_ms: 57.86975\n  location: '{source_root}/.skill-tree/tests/test-clarification-installation.js:15:51'\n  failureType: 'testCodeFailure'\n  error: |-\n    error: unknown skill: skill-tree-clarify-tasks\n    \n    \n    2 !== 0\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 0\n  actual: 2\n  operator: 'strictEqual'\n  stack: |-\n    run ({source_root}/.skill-tree/tests/test-clarification-installation.js:7:10)\n    TestContext.<anonymous> ({source_root}/.skill-tree/tests/test-clarification-installation.js:27:3)\n    Test.runInAsyncScope (node:async_hooks:211:14)\n    Test.run (node:internal/test_runner/test:934:25)\n    Test.processPendingSubtests (node:internal/test_runner/test:633:18)\n    Test.postRun (node:internal/test_runner/test:1045:19)\n    Test.run (node:internal/test_runner/test:973:12)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)\n  ...\n# Subtest: unity clarification package runs independently of source and sibling packages\nnot ok 3 - unity clarification package runs independently of source and sibling packages\n  ---\n  duration_ms: 59.066875\n  location: '{source_root}/.skill-tree/tests/test-clarification-installation.js:15:51'\n  failureType: 'testCodeFailure'\n  error: |-\n    error: unknown skill: skill-tree-clarify-tasks\n    \n    \n    2 !== 0\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 0\n  actual: 2\n  operator: 'strictEqual'\n  stack: |-\n    run ({source_root}/.skill-tree/tests/test-clarification-installation.js:7:10)\n    TestContext.<anonymous> ({source_root}/.skill-tree/tests/test-clarification-installation.js:27:3)\n    Test.runInAsyncScope (node:async_hooks:211:14)\n    Test.run (node:internal/test_runner/test:934:25)\n    Test.processPendingSubtests (node:internal/test_runner/test:633:18)\n    Test.postRun (node:internal/test_runner/test:1045:19)\n    Test.run (node:internal/test_runner/test:973:12)\n    async Test.processPendingSubtests (node:internal/test_runner/test:633:7)\n  ...\n1..3\n# tests 3\n# suites 0\n# pass 0\n# fail 3\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 249.914417\n",
+  "source_fingerprints": {
+    ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+    ".skill-tree/common/references/workflow-metadata.md": "0538ff976dcd1a2490c32bf3d87d9c321458e920ad1ed14f3d34dcf1a9db70bb",
+    ".skill-tree/common/scripts/workflow-state.py": "27e51566dfb61391163487ede8d32bdd8a94488380b127b3ed0d46f66df76c47",
+    ".skill-tree/config/resource-map.json": "5344b514c4d46a4004ab75c6f9040377bdd621ff66703ec95cd2a29c131dce0e",
+    ".skill-tree/documents/task-clarification-contract.md": "4774e7ccc181cfaea50900f5bd5b12fd9703142262a4ed909de9620049fc9406",
+    ".skill-tree/scripts/agent-conformance.py": "dd7f691f223ab886c84b151e22de295a513907ee0a728b40357c7ad382f7837d",
+    ".skill-tree/templates/operations.json": "299ac7cb9b0521e122c9e62038a47c09aa103a90151ed1e90efe38f8f4a02c91",
+    ".skill-tree/tests/test-clarification-installation.js": "8111464b7b22930700f3a90465bd15df8d381b0c52a583168be4c5e43c4f0292",
+    ".skill-tree/tests/test-task-clarification.py": "1adcc17c4fbcce04d1089f630ca117a18a0dc36c649e48c69ee1a63af32a241d"
+  },
+  "task_id": "T-f63559f1-4663-41b7-b085-f55ba7b47fe5"
+}

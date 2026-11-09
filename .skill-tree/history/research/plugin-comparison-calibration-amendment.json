@@ -1,0 +1,35 @@
+{
+  "additional_calibrations": 0,
+  "freeze_sha256": "b79ad8f9054041090bfc176e45c9442a6c7f6aeefbd4b14fb8d6f8d6df8bf899",
+  "limits": {
+    "arms": 2,
+    "calibrations": 2,
+    "cleanup_seconds": 300,
+    "contexts": 54,
+    "fixtures": 8,
+    "inventory_calls": 1,
+    "lifecycle_interrupts": 54,
+    "maximum_active_arm_workers": 2,
+    "maximum_live_jobs": 3,
+    "observation_calls": 120,
+    "repetitions": 2,
+    "spawn_or_follow_up_requests": 95,
+    "task_seconds": 3600
+  },
+  "negative_core_read_sha256": "a1892e6847e56f8b5b270c15b922d8751915ee0678affce9789009e76b2ba74c",
+  "negative_no_activation_pass": true,
+  "negative_original_format_verdict": "rejected",
+  "negative_raw_return_sha256": "6f3b26b412f811c2a37081502078abcd6385d5eaa7fcd7d278ec1d7c7d37c7a9",
+  "original_rejection_sha256": "929c310b787a1f8edd9ab02b2f40b151d50688535abae5bc2c4409911267c39b",
+  "out_of_scope_report_items_excluded": 3,
+  "owner_submission": {
+    "answer": "Принять проверку `noop` и продолжить",
+    "kind": "submitted-answer",
+    "reference": "Current conversation reply to request_user_input_async call_c623b1c1f4c94e1289db10c786c6b4d4 question 0."
+  },
+  "positive_record_sha256": "23ab7971bb2fe38d5bd9633cc7da7b282d30e94f09a3f93cd2558262e4483bf1",
+  "positive_source_backed_pass": true,
+  "recorded_at": "2026-11-09T07:22:04.043214+00:00",
+  "schema": 1,
+  "status": "approved"
+}

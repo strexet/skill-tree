@@ -1,0 +1,21 @@
+{
+  "checked": [
+    "Legacy no-request output, provider rows and offline read-only paths.",
+    "Explicit terminal or serialized consent and shared current preview validation.",
+    "Selected core flavor and provider/destination scope preserved through preparation and activation.",
+    "Separate core and plugin outcomes, retained interrupted state and explicit recovery.",
+    "Focused 16/16, adjacent 110/110 and scoped diff check passed."
+  ],
+  "disposition": "Full current production and documentation diff reviewed after the installer fixes.",
+  "findings": [],
+  "limits": [
+    "Independent source and test-evidence review. The reviewer did not invoke any external plugin or launch another test process."
+  ],
+  "reviewer": "/root/delivery132",
+  "schema": 1,
+  "source": {
+    "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+    "head": "9f55d8ff64945a3eefb7e6aac4b22760395c631f",
+    "source_digest": "ced497a87f2fab9fc00dff70b29be1780cb8f72840c58c40b0a710c61c553ede"
+  }
+}

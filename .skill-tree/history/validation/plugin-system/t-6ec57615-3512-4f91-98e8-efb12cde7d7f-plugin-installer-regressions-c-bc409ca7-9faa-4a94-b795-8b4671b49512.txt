@@ -1,0 +1,90 @@
+TAP version 13
+# Subtest: core-only first and repeat installs keep the legacy output and default to zero external plugins
+ok 1 - core-only first and repeat installs keep the legacy output and default to zero external plugins
+  ---
+  duration_ms: 4501.005833
+  ...
+# Subtest: setup flags require explicit noninteractive proposal consent and reject conflicting operations
+ok 2 - setup flags require explicit noninteractive proposal consent and reject conflicting operations
+  ---
+  duration_ms: 666.63425
+  ...
+# Subtest: a serialized shared-manager proposal activates exact A–B–A, replays offline, and preserves core-only repeat
+ok 3 - a serialized shared-manager proposal activates exact A–B–A, replays offline, and preserves core-only repeat
+  ---
+  duration_ms: 32581.958709
+  ...
+# Subtest: one real provider failure preserves another provider result and blocks the optional stage
+ok 4 - one real provider failure preserves another provider result and blocks the optional stage
+  ---
+  duration_ms: 12460.398917
+  ...
+# Subtest: adding a provider without changing composition identity makes an old scope proposal stale
+ok 5 - adding a provider without changing composition identity makes an old scope proposal stale
+  ---
+  duration_ms: 7191.923375
+  ...
+# Subtest: interrupted optional activation keeps verified core results and requires owned recovery
+ok 6 - interrupted optional activation keeps verified core results and requires owned recovery
+  ---
+  duration_ms: 10442.534333
+  ...
+# Subtest: ordinary interactive blank keeps the core-only default and closes the one prompt session
+ok 7 - ordinary interactive blank keeps the core-only default and closes the one prompt session
+  ---
+  duration_ms: 2446.399667
+  ...
+# Subtest: initial interactive typed request uses the manager chain and cancelling later reorder preserves parked evidence
+ok 8 - initial interactive typed request uses the manager chain and cancelling later reorder preserves parked evidence
+  ---
+  duration_ms: 12250.616167
+  ...
+# Subtest: interactive EOF exits the optional stage without selecting a recommendation
+ok 9 - interactive EOF exits the optional stage without selecting a recommendation
+  ---
+  duration_ms: 1993.440833
+  ...
+# Subtest: known browsing offers grouped alternatives and a direct local source can install repeated occurrences
+ok 10 - known browsing offers grouped alternatives and a direct local source can install repeated occurrences
+  ---
+  duration_ms: 5840.338333
+  ...
+# Subtest: a typed remote request still requires the separate online resolution choice
+ok 11 - a typed remote request still requires the separate online resolution choice
+  ---
+  duration_ms: 1464.3485
+  ...
+# Subtest: remove-provider during prompt preparation blocks plugin activation
+ok 12 - remove-provider during prompt preparation blocks plugin activation
+  ---
+  duration_ms: 2838.820541
+  ...
+# Subtest: switch-flavor during prompt preparation blocks plugin activation
+ok 13 - switch-flavor during prompt preparation blocks plugin activation
+  ---
+  duration_ms: 2466.558166
+  ...
+# Subtest: offline dry-run rejects digest-correct malformed manager envelopes without writes
+ok 14 - offline dry-run rejects digest-correct malformed manager envelopes without writes
+  ---
+  duration_ms: 5807.519541
+  ...
+# Subtest: legacy core-only invocation resolves a symlink target before selecting provider paths
+ok 15 - legacy core-only invocation resolves a symlink target before selecting provider paths
+  ---
+  duration_ms: 926.929541
+  ...
+# Subtest: a rehashed incomplete save-known entry cannot pass offline inspection or live application
+ok 16 - a rehashed incomplete save-known entry cannot pass offline inspection or live application
+  ---
+  duration_ms: 3002.522459
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 106992.351292

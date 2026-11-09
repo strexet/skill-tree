@@ -1,0 +1,18 @@
+{
+  "name": "installer-dry-run",
+  "argv": [
+    "node",
+    ".skill-tree/bin/install.js",
+    "--dry-run",
+    "--all",
+    "--target",
+    "/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-managed-registry-dry-y8tpuxip",
+    "--flavor",
+    "general"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "tool_wall_seconds": 3.1108329170383513,
+  "source_freeze": ".skill-tree/history/validation/plugin-system/managed-registry-hardening-source-freeze.json",
+  "qualification": "Current frozen source/repository validation only; no actual candidate trial or universal native/product qualification."
+}

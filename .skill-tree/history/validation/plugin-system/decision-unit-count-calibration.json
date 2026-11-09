@@ -1,0 +1,12 @@
+{
+  "record_kind": "qualification-runner-correction",
+  "task_id": "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99",
+  "unqualified_attempt": "C-2a46d794-9029-4444-aa9b-6ddaf850c98a",
+  "reason": "The local report adapter summed unittest failing subtests as discovered test cases, producing28 failures for20 discovered cases. The control was recorded as fail, never Red or passing evidence.",
+  "correction": "The local report adapter now counts distinct FAIL/ERROR case identities from actual unittest output. The same unchanged runnable scaffold and tests produce20 discovered cases,18 failed cases and2 passes.",
+  "qualified_red_attempt": "C-9d2128d1-3f13-47bc-b0a3-a4fe9d6f9197",
+  "preserved": [
+    "Original report/log and recorded attempt remain immutable.",
+    "No product source or test oracle was weakened or changed between the two generic controls."
+  ]
+}

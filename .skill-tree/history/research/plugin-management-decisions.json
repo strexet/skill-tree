@@ -1,0 +1,43 @@
+{
+  "approved_scope": [
+    "Core-only installation by default; explicit optional plugin setup during initial installation or later.",
+    "Core skill-tree-plugins operation with installed/known views and all actual bindings, install/configure/remove flows.",
+    "Noncatalog external sources, including URL/repository/raw document/local file/folder and Claude/other authoring-host skills.",
+    "Extensible before/during/after and registered named placement across operations, including explicitly selected controller/leaf positions.",
+    "Additional instruction text and arbitrary structured parameters with explicit effective configuration.",
+    "Simple removal of packages or individual bindings with preserved source/history/ownership."
+  ],
+  "current_operations": 10,
+  "decision_id": "W3",
+  "implementation_status": "planned_not_implemented",
+  "owner_submission": {
+    "kind": "owner-message",
+    "reference": "Actual current owner message selecting core-only default, optional initial/later plugins, a skill-tree-plugins manager, unlisted cross-host source import, flexible placements, additional parameters and easy removal.",
+    "text": "Давай все таки по умолчанию флоу установки без плагинов. Но должна быть возможность их установить во время установки и позже после установки. Нужно что-то типа скила skill tree plugins - это отобразит установленные и известные скилы с текущими точками установки и запустит флоу установки/удаления. Также туда должна быть возможность добавить скилы не из реестра — нужно сделать это максимально гибко: подключение чего угодно хоть куда (подойдут и скилы не для codex, а для Claude например; можно просто передать ссылку и тп), продумать передачу дополнительных параметров в скилы, легкое удаление того что установлено."
+  },
+  "planned_operations": 11,
+  "preserved_scope": [
+    "Actual confirmation binds displayed install/configuration; installation executes no skill.",
+    "Existing owner authorization, immutable outcomes, canonical queue and source ownership remain binding.",
+    "Recommendation quality labels retain evidence requirements; a catalog is not an import allowlist."
+  ],
+  "primary_source_research": [
+    {
+      "observation": "Skills contain instructions and optional resources; compatibility/tool fields describe environment-specific requirements.",
+      "url": "https://agentskills.io/specification"
+    },
+    {
+      "observation": "Anthropic publishes Claude skill folders containing SKILL.md and supporting resources; source format and actual host execution remain separate.",
+      "url": "https://github.com/anthropics/skills/blob/main/README.md"
+    }
+  ],
+  "record_kind": "owner-workflow-decision",
+  "recorded_at": "2026-11-06T01:28:23.738383+00:00",
+  "schema": 1,
+  "status": "approved",
+  "supersedes": [
+    "Universal/default plugin-bundle selection or acquisition.",
+    "Fixed four-operation admission whitelist and blanket exclusion of intake/snapshot/clarification/controller bindings.",
+    "Source-host labels or curated catalog membership as import admission restrictions."
+  ]
+}

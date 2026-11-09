@@ -1,0 +1,49 @@
+{
+  "actors_started": 0,
+  "actual_exit_code": 0,
+  "authored_source_paths_checked": 63,
+  "distinct_lstat_paths_checked": 492,
+  "execution_root": "$EXECUTION_ROOT",
+  "execution_root_ancestors_checked": {
+    "count": 7,
+    "all_observed_ancestors_checked_without_symlink": true
+  },
+  "format": "skill-tree-owned-path-supplemental-observation",
+  "installed_destination_roots_checked": 10,
+  "installed_inventory_files_checked": 292,
+  "intentional_exclusion": "Dispatcher/installer __pycache__ entries remain excluded; no bytecode-execution or cache-integrity qualification is inferred.",
+  "limits": [
+    "This is a current live path/inventory observation, not a reconstruction of filesystem state when the earlier composite wrapper ran.",
+    "The earlier wrapper/proposal/report and accepted receipts are retained unchanged; this observation supplements the missing ancestor/destination-base check rather than relabeling old evidence.",
+    "Earlier owned installer verification and activation remain separate evidence.",
+    "No operating-system sandbox, universal race exclusion, historical-native-current or candidate efficacy claim follows."
+  ],
+  "maintenance_bundle_paths_checked": 53,
+  "metadata_written": false,
+  "observed_utc": "2026-11-06T15:20:41.795781+00:00",
+  "owned_profile_identity": "f485fb6f8f52f98a75ba2dae64195b1a127b1076c017b2a7fcad22f372405bf7",
+  "owned_profile_sha256": "ebf57d7eca68c867d67018fac17fe54e6dd1919db53f891975b8d7d98def70a5",
+  "prior_composite_artifacts_unchanged": {
+    ".skill-tree/artifacts/plugin-implementation/core127-after-managed-guards-composite-check.py": "a3057fd5d2015ef09d28ed492d191f5d4d863b529dc6b702d971f26c6a829923",
+    ".skill-tree/artifacts/plugin-implementation/core127-after-managed-guards-composite-payload-proposal.json": "3bd17cb6d98bd116b2f0af66d6e912897dc885a595e2b6d43890d15a009c8026",
+    ".skill-tree/artifacts/plugin-implementation/core127-after-managed-guards-composite-proposal.json": "7e2cc54d59cc1dbe384b3055a98acd3aed7ceff6a1cd3d6e36730971402bbd16",
+    ".skill-tree/history/validation/plugin-system/core127-after-managed-guards-revalidation.json": "426fb1f671d2054a62c80718f0865559ac20f1f2942bbae0c5093bfa531104a7"
+  },
+  "prior_static_source_commit": "57bbf013d08c2014aff87f379d2cd708063b81a6",
+  "product_tests_run": 0,
+  "provider_calls": 0,
+  "relative_path_and_ancestor_guards": "Every observed source/bundle/destination root and resource is checked from the verified lexical root with lstat before hashing/listing; destination traversal does not follow symlinks.",
+  "result": "pass",
+  "schema": 1,
+  "script": {
+    "path": ".skill-tree/artifacts/plugin-implementation/core127-owned-paths-supplemental-check.py",
+    "sha256": "cb9310488511b23c6cd84bc2566b9d4def652f3965626da318cee0577addf974"
+  },
+  "source_commit": "57bbf013d08c2014aff87f379d2cd708063b81a6",
+  "symlinks_observed": [],
+  "raw_observation": {
+    "path": ".skill-tree/artifacts/plugin-implementation/core127-owned-paths-supplemental-observation.json",
+    "sha256": "28720bcfd96283e427c9ff7f318e53e92d06b0fcbfc1ab8ca589c2d3302a5a87",
+    "portable_projection": true
+  }
+}

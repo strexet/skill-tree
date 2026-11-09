@@ -3,17 +3,19 @@ const fs=require('node:fs');
 const path=require('node:path');
 const crypto=require('node:crypto');
 const bindings=require('./execution-bindings.js');
+const plugins=require('./plugin-composition.js');
 const hash=value=>crypto.createHash('sha256').update(value).digest('hex');
 function stable(value) {
+ if(Buffer.isBuffer(value))return value;
  if(Array.isArray(value)) return value.map(stable);
  if(value && typeof value==='object') return Object.fromEntries(Object.keys(value).sort().map(k=>[k,stable(value[k])]));
  return value;
 }
 const json=value=>JSON.stringify(stable(value),null,2)+'\n';
 function safe(root,rel) {
- if(typeof rel!=='string'||path.isAbsolute(rel)||rel.split(/[\\/]/).includes('..'))throw Error('Expected repository-relative path: '+rel);
+ if(typeof rel!=='string'||path.isAbsolute(rel)||path.win32.isAbsolute(rel)||rel.split(/[\\/]/).includes('..'))throw Error('Expected repository-relative path: '+rel);
  const full=path.resolve(root,rel),base=fs.realpathSync(root);
- let ancestor=path.resolve(root);for(const part of rel.split(/[\\/]/).filter(Boolean)){ancestor=path.join(ancestor,part);if(fs.existsSync(ancestor)&&fs.lstatSync(ancestor).isSymbolicLink())throw Error('Symlink input is unsupported: '+rel);}
+ let ancestor=path.resolve(root);for(const part of rel.split(/[\\/]/).filter(Boolean)){ancestor=path.join(ancestor,part);try{if(fs.lstatSync(ancestor).isSymbolicLink())throw Error('Symlink input is unsupported: '+rel);}catch(error){if(error.code!=='ENOENT')throw error;}}
  let current=full;
  while(!fs.existsSync(current)&&current!==path.dirname(current))current=path.dirname(current);
  if(fs.existsSync(current)){const real=fs.realpathSync(current);if(real!==base&&!real.startsWith(base+path.sep))throw Error('Path escapes root: '+rel);}
@@ -44,7 +46,7 @@ function resolveProfile(source,root,flavor) {
  const registry=readJson(source,'config/flavors.json'),rules=readJson(source,'config/capabilities.json');
  if(!registry.flavors[flavor])throw Error('Unknown flavor: '+flavor);
  const fixed=['package.json','package-lock.json','npm-shrinkwrap.json','yarn.lock','pnpm-lock.yaml','bun.lock','bun.lockb','.nvmrc','.node-version','pyproject.toml','pytest.ini','Cargo.toml','ProjectSettings/ProjectVersion.txt','ProjectSettings/EditorSettings.asset','ProjectSettings/ProjectSettings.asset','Packages/manifest.json','Packages/packages-lock.json','.skill-tree/validation-recipes.json','.skill-tree/worktree-profile.json'];
- fixed.push('.skill-tree/config/repository.json');
+ fixed.push('.skill-tree/config/repository.json','.skill-tree/installation/plugins.json');
  const discovered=inventory(root,rules.inventory),inputs={};
  for(const rel of [...new Set([...fixed,...discovered])].sort()){inputs[rel]=inputDigest(root,rel);}
  const facts={test_assemblies:[],ui:[]},recipes={},gaps=[];
@@ -115,8 +117,10 @@ function resolveProfile(source,root,flavor) {
  if(worktree_environment.schema!==1)throw Error('Unsupported worktree environment declaration');
  for(const key of ['required_files','isolated_directories'])for(const rel of worktree_environment[key]||[])safe(root,rel);
  if((worktree_environment.exclusive_resources||[]).some(key=>typeof key!=='string'||!key))throw Error('Explicit runtime resource identities required');
- const environment_id=hash(json({flavor,inputs,facts,recipes,execution_bindings,worktree_environment}));
- return {format:'skill-tree-profile',schema:1,composer_version:registry.composer_version,source_version:registry.release_version||null,flavor,project_root:root,inputs,inventory:discovered,facts,recipes,gaps,environment_id,execution_bindings,worktree_environment,qualification:'static compatibility only; product execution unqualified'};
+ const pluginInputs=plugins.resolveInputs(root,readJson(source,'templates/operations.json'));
+ for(const record of Object.values(pluginInputs.packages))for(const relative of Object.keys(record.files))inputs[record.destination+'/'+relative]=inputDigest(root,record.destination+'/'+relative);
+ const environment_id=hash(json({flavor,inputs,facts,recipes,execution_bindings,worktree_environment,plugins:pluginInputs}));
+ return {format:'skill-tree-profile',schema:1,composer_version:registry.composer_version,source_version:registry.release_version||null,flavor,project_root:root,inputs,inventory:discovered,facts,recipes,gaps,environment_id,execution_bindings,worktree_environment,plugins:pluginInputs,qualification:'static compatibility only; product execution unqualified'};
 }
 function mergeSections(common,additions,replaceable=[]) {
  const result=common.map(s=>({...s}));
@@ -134,7 +138,7 @@ function mergeResources(common,additions,replacements={}) {
 function sourceInputs(source) {
  const result={};
  for(const dir of ['common','domains','templates','config','lib','src']) {
-  function walk(rel){for(const e of fs.readdirSync(safe(source,rel),{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){if(e.name==='__pycache__')continue;const p=path.posix.join(rel,e.name);if(e.isDirectory())walk(p);else result[p]=hash(read(source,p));}}
+  function walk(rel){for(const e of fs.readdirSync(safe(source,rel),{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){if(e.name==='__pycache__')continue;const p=path.posix.join(rel,e.name);if(e.isDirectory())walk(p);else result[p]=hash(fs.readFileSync(safe(source,p)));}}
   walk(dir);
  }return result;
 }
@@ -163,8 +167,9 @@ function compose(source,profile,selected=null) {
   files['references/project-profile.md']='# Concrete Project Profile\n\nFlavor: '+profile.flavor+'. Static compatibility only; execution remains unqualified.\n\n```json\n'+json({source_version:profile.source_version,instruction_profile_id:hash(json({flavor:profile.flavor,facts:profile.facts,recipes:profile.recipes,gaps:profile.gaps})),facts:profile.facts,recipes:profile.recipes,gaps:profile.gaps,worktree_environment:profile.worktree_environment})+'```\n';
   files['SKILL.md']='---\nname: '+name+'\ndescription: '+JSON.stringify('['+profile.flavor+'] '+op.description)+'\nlicense: MIT\n---\n\n# '+op.title+'\n\nFlavor: '+profile.flavor+'. Read the [concrete project profile](references/project-profile.md).\n\n'+sections.map(s=>s.text).join('\n\n')+'\n';
   files['agents/openai.yaml']='interface:\n  display_name: '+JSON.stringify(op.title+' ('+profile.flavor+')')+'\n  short_description: '+JSON.stringify(profile.flavor+' Skill Tree workflow')+'\n';
-  for(const [rel,content] of Object.entries(files)){if(typeof content!=='string')throw Error('Missing composition resource: '+rel);safe(source,rel);}
-  for(const [rel,content] of Object.entries(files).filter(([rel])=>rel.endsWith('.md'))){
+  const contribution=plugins.composeOperation(source,profile,name,files);files=mergeResources(files,contribution.files);
+  for(const [rel,content] of Object.entries(files)){if(typeof content!=='string'&&!Buffer.isBuffer(content))throw Error('Missing composition resource: '+rel);safe(source,rel);}
+  for(const [rel,content] of Object.entries(files).filter(([rel])=>rel.endsWith('.md')&&!rel.startsWith('plugins/'))){
    for(const match of content.matchAll(/\]\(([^)]+)\)/g)){
     const target=match[1].split('#')[0];if(!target||/^https?:/.test(target))continue;
     const resolved=path.posix.normalize(path.posix.join(path.posix.dirname(rel),target));

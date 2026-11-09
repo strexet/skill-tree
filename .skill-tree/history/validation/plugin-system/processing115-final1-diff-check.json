@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "changed_frozen_paths": [],
+  "cleanup_reserve_seconds": 20,
+  "exit_code": 0,
+  "hard_deadline_seconds": 60,
+  "name": "diff-check",
+  "output": ".skill-tree/history/validation/plugin-system/processing115-final1-diff-check.txt",
+  "qualification": "Deterministic source and isolated fixture qualification.",
+  "result": "pass",
+  "schema": 1,
+  "source_freeze": ".skill-tree/history/validation/plugin-system/processing115-final1-source-freeze.json",
+  "source_freeze_sha256": "23a918bed89115eb9b18d49da0521ba5a5e82b0c4230fa19c7271a0166218ff9",
+  "temporary_target_empty": null,
+  "timed_out": false,
+  "tool_wall_seconds": 0.3741405410692096
+}

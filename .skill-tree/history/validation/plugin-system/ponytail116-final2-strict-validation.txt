@@ -1,0 +1,5 @@
+
+> skill-tree-skills@0.3.0 validate
+> python3 .skill-tree/scripts/validate-skill-repository.py --strict
+
+skill repository valid

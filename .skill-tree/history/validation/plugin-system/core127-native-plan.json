@@ -1,0 +1,41 @@
+{
+  "accounting": "Exact inherited model/native call IDs/tokens/cost remain unexposed; observable actor/turn counts and wall time are retained.",
+  "amendment": {
+    "additional_review_finding": "Read-only integration review found clarification-bound mode changes stranded the existing frame; a requirements-led same-frame parent-policy repair precedes the corrected-source retry.",
+    "aggregate_explicit_spawn_followup_requests": 18,
+    "aggregate_new_actor_contexts": 8,
+    "aggregate_wall_seconds_including_repair": 1800,
+    "first_attempt_contexts": 3,
+    "first_attempt_explicit_requests": 6,
+    "first_attempt_failure": "actual-arbiter-input:predecessor-content-missing",
+    "original_actual_probe_seconds": 900,
+    "reason": "The first actual run exposed missing predecessor answer material in the sealed arbiter input; the first failure remains recorded. A bounded corrected-source retry is allowed within the same task, preserving aggregate actor and native-request ceilings.",
+    "recorded_at": "2026-11-06T06:14:00Z"
+  },
+  "attempt_id": "C-41c1206a-105e-4f70-85f1-1e2a194e9a01",
+  "capture_trust": "The primary host captures actually observed tool results outside actor write scope; report JSON alone supplies no native authenticity.",
+  "cases": [
+    "Auto resolver, deliberately adversarial significant critic and arbiter in actual distinct contexts.",
+    "Actual Manual worker wait followed by a clearly scripted fixture-owner submission and current acceptance.",
+    "An actual held old result, original attempt cancellation, explicit Manual switch/resume, stale delivery rejection and current scripted-owner acceptance."
+  ],
+  "check_id": "decision-actual-actors",
+  "exclusions": [
+    "No external Skill tool invocation, provider/browser/Unity/product execution, dependency acquisition or publication.",
+    "No real-human task/business approval or plugin comparative efficacy claim."
+  ],
+  "limits": {
+    "actual_probe_seconds": 900,
+    "cleanup_reserve_seconds": 60,
+    "explicit_spawn_followup_requests": 18,
+    "new_actor_contexts": 8
+  },
+  "recorded_at": "2026-11-06T06:03:17.339022+00:00",
+  "scope": "Three isolated source-backed Codex core orchestration probes, separate from comparative plugin trials and real product/native qualification.",
+  "source_snapshot": {
+    "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    "common/scripts/decision-orchestration.py": "3acb6b5c9fb0a0f4ebb8b432f996fad2b306e899001ffaa17f0b22cb219a8f20",
+    "common/scripts/workflow-state.py": "3ecaa964defe0eb9858f4b269566f4c1d5a71cf22a009c7602683673d0c5d268"
+  },
+  "task_id": "T-43931d2c-5bb5-4eca-8ba8-069c503b2cda"
+}

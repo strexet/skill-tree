@@ -1,0 +1,13 @@
+{
+  "name": "sync-check",
+  "argv": [
+    "npm",
+    "run",
+    "sync:check"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "tool_wall_seconds": 1.2106051249429584,
+  "source_freeze": ".skill-tree/history/validation/plugin-system/managed-registry-hardening-source-freeze2.json",
+  "qualification": "Current frozen source/repository validation only; no actual candidate trial or universal native/product qualification."
+}

@@ -1,0 +1,37 @@
+{
+  "argv": [
+    "python3",
+    ".skill-tree/tests/test-decision-governance.py"
+  ],
+  "attempt_id": "C-9d2128d1-3f13-47bc-b0a3-a4fe9d6f9197",
+  "check_id": "decision-state-regressions",
+  "counts": {
+    "discovered": 20,
+    "expected": 20,
+    "failed": 18,
+    "passed": 2,
+    "skipped": 0
+  },
+  "exit_code": 1,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-29ef78b9-d808-4f85-b6c8-3d768edf3a99-decision-state-regressions-c-9d2128d1-3f13-47bc-b0a3-a4fe9d6f9197.txt",
+  "result": "red",
+  "reviewed_failure_reason": "Runnable ledger has no persisted decision behavior; eighteen distinct test cases fail on absent authority/origin, mode, attempt, drift/replay and acceptance behavior. Failing unittest subtests are counted once per discovered case.",
+  "source_fingerprints": {
+    ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+    ".skill-tree/common/references/workflow-metadata.md": "379bbc93e4f6ac2be37edcfb7fe0b77ccf289ddbe82414cb6352336d58a75a6d",
+    ".skill-tree/common/scripts/decision-governance.py": "e88b13dd672368b061170cc11063faf03a0ebc3a250b733fa080a0af95e5e7f2",
+    ".skill-tree/common/scripts/pr-review-state.py": "1d2e65703ea01a964b85e98823e73a20765f4e6f984f04c57e53ff31d262fa5d",
+    ".skill-tree/common/scripts/workflow-state.py": "3a1b22339e6821edaa5658c54a8cfbd80ada93ea0cf8e6ddde700a45025c5315",
+    ".skill-tree/config/resource-map.json": "819fe6eabeda2fa9e0b62ba2aaa7635f902be5e50d69660380bf371b246eb608",
+    ".skill-tree/documents/implementation-plan.md": "d53373bb753c92ba770aca2af1d9dd4bea586888de5aa5320b454a2e056e84e1",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "ef81629dd2e76ed70a05896e57b38ca55571439af333da08ecebcf9d80bbe2ca",
+    ".skill-tree/documents/task-clarification-contract.md": "c80a3677b3c21acef5bf066fa384981e915e99b596d331bb9b28f556d31f4eec",
+    ".skill-tree/tests/test-decision-adapters.py": "0e947255bc8e09ae862f97867c157dfae8dfc02c335a7063840039d9d4aa37ac",
+    ".skill-tree/tests/test-decision-governance.py": "431c9f9725f288888d3969879d0cc1178a8033578213c7b923859217099fd2bb"
+  },
+  "task_id": "T-29ef78b9-d808-4f85-b6c8-3d768edf3a99",
+  "tool_wall_seconds": 0.3253460833802819
+}

@@ -1,0 +1,627 @@
+{
+  "author_scope": {
+    "actual_actors_started": 0,
+    "authored_source_changed": false,
+    "provider_requests": 0,
+    "runtime_metadata_mutated": false,
+    "tests_executed": 0,
+    "writes": "This ignored analysis artifact only."
+  },
+  "check_id": "installed-agent-hook-evidence",
+  "classification": "Current bounded source compatibility of immutable historical actual observations plus current deterministic guards; not a new native grade.",
+  "conditional_recommendation": {
+    "activation_conditions": [
+      "All final current focused checks and required full repository validation pass on freeze2 bytes.",
+      "Reviewed task-owned source is committed and the owned execution snapshot is activated through the installer with canonical queue/checkpoint/history preservation.",
+      "The explicit controller selects the immutable completed118 contract for revalidation; this artifact alone neither selects nor advances it.",
+      "The current source/installed identities match the reviewed freeze; any later source change receives renewed compatibility review."
+    ],
+    "fresh_actual_budget_rule": "A fresh probe would require its own concrete reviewed finite budget; the old qualification already consumed4/6 contexts and8/12 requests, so its remaining reserve cannot silently fund three fresh contexts. No actual providers or candidate114 experiments are authorized by this artifact.",
+    "fresh_actual_trigger": [
+      "A change to native actor creation/dispatch/result producer identity, host isolation/lifetime, parameter or envelope semantics, B incorporation or A2 context order cannot be justified by the bounded unchanged-path analysis.",
+      "An applicable acceptance requirement explicitly demands a fresh current-source actual-host observation.",
+      "Current deterministic controls or owned activation uncover a changed positive host/adapter path."
+    ],
+    "record_only_after_selection": "Consume the preserved immutable contract with current unit/static source-compatibility evidence, retaining the original actual capture as historical and the old strict validator stale rejection. Do not rewrite terminal outcome, check assertions or native report/source identities.",
+    "result": "Bounded static compatibility reuse is technically defensible for the preserved actual A-B-A observation once all current required checks, owned activation and exact frozen identity are verified. This is not a fresh native run or a replacement current native-validator pass."
+  },
+  "current_deterministic_evidence_required": {
+    "carrier_fixture_correction": {
+      "limit": "The invalid prior carrier Red mutations were withdrawn; corrected controls prove current Green only. No reconstructed old-source Red is claimed.",
+      "path": ".skill-tree/artifacts/plugin-implementation/managed-registry-carrier-fixture-qualification-correction.json",
+      "sha256": "632b64fc37e94f8b506f23cdf07d98cd9834e192a8dc27455a257607b5b8d30e"
+    },
+    "ownership_limit": "Current deterministic tests using real receipt-owned destinations establish the new managed-association branch. They do not retrofit raw profile/registry bytes into historical capture or establish fresh actual provider/native execution.",
+    "qualification_status": "Sources inspected; formal current results and final full repository checks remain a parent-owned prerequisite. No tests were run by this analysis.",
+    "required_lanes": [
+      {
+        "coverage": "Actual receipt-owned selected destinations, full profile/inventory formula, absent/unreadable/stale registry, lexical/physical symlink claims, unrelated valid profile, standalone/noop, per-occurrence capability isolation, dedicated read-only readiness.",
+        "expected_discovery": 44,
+        "path": ".skill-tree/tests/test-plugin-composition.js"
+      },
+      {
+        "coverage": "Copied general/web/unity closure and CLI/WF entry transport, secret forwarding/reference separation, owned source loading, managed vs standalone distinction, read-only readiness without source siblings.",
+        "expected_discovery": 17,
+        "path": ".skill-tree/tests/test-plugin-invocation-installation.js"
+      },
+      {
+        "coverage": "Current/global/unresolved prepare/invoke/record/accept, source/status/context/watch before cached callbacks, writer/CAS, exact resource inventory additions, completed readiness/current carriers, actual default Node A-B-A and ordinary CL B incorporation, explicit noops/recovery.",
+        "expected_discovery": 80,
+        "path": ".skill-tree/tests/test-plugin-workflow.py"
+      }
+    ],
+    "source_hashes": {
+      ".skill-tree/tests/test-plugin-composition.js": "0ac136430c64c82c8d0fe3a55c8cf75526f7a29ca6f21fe9902ec317f2a569d8",
+      ".skill-tree/tests/test-plugin-invocation-installation.js": "fa16b6af4ae637415100fa2e0c3dcfeb9a7f392e168f61980ecd3c8fc84e1495",
+      ".skill-tree/tests/test-plugin-workflow.py": "a7ae1a514938920070a4c6a936d43fcac5d772168c3d9d40005dfe91ccaff44b"
+    },
+    "specific_negative_controls": [
+      "test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation",
+      "test_actual_node_unresolved_current_location_never_skips_to_later_or_complete",
+      "test_pure_writer_readiness_rechecks_exact_resource_inventory_without_node",
+      "test_finish_rejects_carrier_reference_disappearance_before_writer_entry",
+      "test_start_rechecks_completed_dependency_preflight_inside_the_writer",
+      "test_business_transition_cannot_silently_replace_the_original_watch_baseline"
+    ],
+    "specific_positive_controls": [
+      "test_trusted_private_delivery_callbacks_dispatch_once_outside_metadata_lock",
+      "test_default_node_a_b_a_isolates_other_capability_holds_and_preserves_guarded_b_contribution",
+      "test_core_callers_prepare_exact_scoped_readiness_before_writer_entry",
+      "test_upstream_manifest_named_json_remains_an_ordinary_pinned_resource"
+    ]
+  },
+  "current_identity": {
+    "final_required_check_completion_verified": false,
+    "freeze_identity": {
+      "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+      "head": "f5e3734795b0f77bbd672ec8cdd8844730494438",
+      "source_digest": "007e7d1d78c7b87dd1f51b09be4cd86ad21a302f1f1588dfad02477a7a364d31"
+    },
+    "freeze_path": ".skill-tree/history/validation/plugin-system/managed-registry-hardening-source-freeze2.json",
+    "freeze_sha256": "8a1614bbfd4e048d325ea20cd6a4ee72b858cdd7dab730d5a7b2c7903f879a63",
+    "frozen_paths_checked": 265,
+    "mismatches": [],
+    "owned_runtime_activation_verified": false
+  },
+  "format": "skill-tree-static-compatibility-analysis",
+  "historical_actual_scope": {
+    "aggregate_retained_qualification": {
+      "contexts": 4,
+      "requests": 8,
+      "wall_seconds": 571.7509870529175
+    },
+    "chain_observations": [
+      {
+        "cursor": 0,
+        "event": "invocation118-event-1",
+        "label": "start",
+        "persisted_prerequisites": [],
+        "state": "active"
+      },
+      {
+        "cursor": 1,
+        "event": "invocation118-event-5",
+        "label": "after-editor-first",
+        "persisted_prerequisites": [],
+        "state": "active"
+      },
+      {
+        "cursor": 1,
+        "event": "invocation118-event-9",
+        "label": "b-returned",
+        "persisted_prerequisites": [],
+        "state": "active"
+      },
+      {
+        "cursor": 2,
+        "event": "invocation118-event-13",
+        "label": "after-grill-middle",
+        "persisted_prerequisites": [],
+        "state": "active"
+      },
+      {
+        "cursor": 3,
+        "event": "invocation118-event-17",
+        "label": "chain-complete",
+        "persisted_prerequisites": [],
+        "state": "complete"
+      },
+      {
+        "cursor": 3,
+        "event": "invocation118-event-20",
+        "label": "final",
+        "persisted_prerequisites": [],
+        "state": "complete"
+      }
+    ],
+    "creation_dispatch_result_order": [
+      {
+        "attempt_id": null,
+        "binding_id": null,
+        "id": "invocation118-event-1",
+        "kind": "chain-observed",
+        "sequence": 1
+      },
+      {
+        "attempt_id": null,
+        "binding_id": "editor-first",
+        "id": "invocation118-event-2",
+        "kind": "actor-created",
+        "sequence": 2
+      },
+      {
+        "attempt_id": "HI-fbcb0664-9e92-4157-909f-f25a5e7c092e",
+        "binding_id": "editor-first",
+        "id": "invocation118-event-3",
+        "kind": "actor-dispatched",
+        "sequence": 3
+      },
+      {
+        "attempt_id": "HI-fbcb0664-9e92-4157-909f-f25a5e7c092e",
+        "binding_id": "editor-first",
+        "id": "invocation118-event-4",
+        "kind": "actor-returned",
+        "sequence": 4
+      },
+      {
+        "attempt_id": null,
+        "binding_id": null,
+        "id": "invocation118-event-5",
+        "kind": "chain-observed",
+        "sequence": 5
+      },
+      {
+        "attempt_id": null,
+        "binding_id": "grill-middle",
+        "id": "invocation118-event-6",
+        "kind": "actor-created",
+        "sequence": 6
+      },
+      {
+        "attempt_id": "HI-cc457b1f-f8c4-441e-b682-b85b4f54890a",
+        "binding_id": "grill-middle",
+        "id": "invocation118-event-7",
+        "kind": "actor-dispatched",
+        "sequence": 7
+      },
+      {
+        "attempt_id": "HI-cc457b1f-f8c4-441e-b682-b85b4f54890a",
+        "binding_id": "grill-middle",
+        "id": "invocation118-event-8",
+        "kind": "actor-returned",
+        "sequence": 8
+      },
+      {
+        "attempt_id": null,
+        "binding_id": null,
+        "id": "invocation118-event-9",
+        "kind": "chain-observed",
+        "sequence": 9
+      },
+      {
+        "attempt_id": null,
+        "binding_id": null,
+        "id": "invocation118-event-10",
+        "kind": "scripted-owner-input",
+        "sequence": 10
+      },
+      {
+        "attempt_id": null,
+        "binding_id": null,
+        "id": "invocation118-event-11",
+        "kind": "scripted-owner-input",
+        "sequence": 11
+      },
+      {
+        "attempt_id": "HI-cc457b1f-f8c4-441e-b682-b85b4f54890a",
+        "binding_id": "grill-middle",
+        "id": "invocation118-event-12",
+        "kind": "core-incorporation",
+        "sequence": 12
+      },
+      {
+        "attempt_id": null,
+        "binding_id": null,
+        "id": "invocation118-event-13",
+        "kind": "chain-observed",
+        "sequence": 13
+      },
+      {
+        "attempt_id": null,
+        "binding_id": "editor-final",
+        "id": "invocation118-event-14",
+        "kind": "actor-created",
+        "sequence": 14
+      },
+      {
+        "attempt_id": "HI-2f7e88be-f585-4abe-b6fc-fa9139b5d918",
+        "binding_id": "editor-final",
+        "id": "invocation118-event-15",
+        "kind": "actor-dispatched",
+        "sequence": 15
+      },
+      {
+        "attempt_id": "HI-2f7e88be-f585-4abe-b6fc-fa9139b5d918",
+        "binding_id": "editor-final",
+        "id": "invocation118-event-16",
+        "kind": "actor-returned",
+        "sequence": 16
+      },
+      {
+        "attempt_id": null,
+        "binding_id": null,
+        "id": "invocation118-event-17",
+        "kind": "chain-observed",
+        "sequence": 17
+      },
+      {
+        "attempt_id": null,
+        "binding_id": null,
+        "id": "invocation118-event-18",
+        "kind": "scripted-owner-input",
+        "sequence": 18
+      },
+      {
+        "attempt_id": null,
+        "binding_id": null,
+        "id": "invocation118-event-19",
+        "kind": "core-confirmation",
+        "sequence": 19
+      },
+      {
+        "attempt_id": null,
+        "binding_id": null,
+        "id": "invocation118-event-20",
+        "kind": "chain-observed",
+        "sequence": 20
+      }
+    ],
+    "enabled_binding_order": [
+      "editor-first",
+      "grill-middle",
+      "editor-final"
+    ],
+    "event_count": 20,
+    "fixed_limits": {
+      "cleanup_seconds": 60,
+      "contexts": 6,
+      "requests": 12,
+      "wall_seconds": 1800
+    },
+    "harness_adapter_facts": {
+      "capabilities_argument": [
+        "codex-source-backed-context"
+      ],
+      "not_an_independent_raw_host_capability_attestation": true,
+      "path": ".skill-tree/artifacts/plugin-implementation/invocation118-native-harness.py"
+    },
+    "mode": "manual",
+    "nominal_contexts": 3,
+    "nominal_creation_plus_dispatch_requests": 6,
+    "ownership_capture_limit": "The actual capture retains raw operation manifest and six plugin resources plus protected-file SHA inventory and HC execution snapshot. It does not retain raw installation profile or global registry bytes. The historical receipt association cannot be independently replayed from absent raw receipt data.",
+    "package_runtime_requirements": {
+      "controlled-editor": {
+        "missing": [],
+        "required": [],
+        "state": "unqualified"
+      },
+      "controlled-grill": {
+        "missing": [],
+        "required": [],
+        "state": "unqualified"
+      }
+    },
+    "protected_inventory_unchanged": true,
+    "raw_profile_or_global_registry_bytes_captured": false,
+    "scenario": "source-backed-a-b-a",
+    "scope_source_snapshots": [
+      {
+        "source.py": "e13df8c44af5dea1e412403910b99cc5a48f2ccbf68a66b3374d6ab9cef9fc65"
+      },
+      {
+        "source.py": "e13df8c44af5dea1e412403910b99cc5a48f2ccbf68a66b3374d6ab9cef9fc65"
+      },
+      {
+        "source.py": "e13df8c44af5dea1e412403910b99cc5a48f2ccbf68a66b3374d6ab9cef9fc65"
+      }
+    ],
+    "scripted_owner_inputs_are_real_human_approval": false,
+    "source_backed_mechanism": "Codex collaboration source-backed contexts; no native Skill call."
+  },
+  "historical_source_provenance": {
+    "git_oid": "633e716def20d09847913bc432b0cfaf1e58bb63",
+    "retrieval": "Read-only git show of the exact original .skill-tree paths; each reconstructed byte hash equals the fingerprint already in the independent historical capture. No raw helper source was invented as a capture field."
+  },
+  "immutable_actual_evidence": {
+    "capture": {
+      "current_native_claim": false,
+      "path": ".skill-tree/history/validation/plugin-system/invocation118-native/capture.json",
+      "rewritten": false,
+      "sha256": "5f481b09a9cdd556971ae3b1ca12d1ab8e5147266d8378aae59703514526e0bd"
+    },
+    "grade": {
+      "current_native_claim": false,
+      "path": ".skill-tree/history/validation/plugin-system/invocation118-native/grade.json",
+      "rewritten": false,
+      "sha256": "7eb094e5e67ec6f9b26662c27c199ef38c39a3c63c51fee92c1e70e6225b888a"
+    },
+    "qualification": {
+      "current_native_claim": false,
+      "path": ".skill-tree/history/validation/plugin-system/invocation118-native/qualification.json",
+      "rewritten": false,
+      "sha256": "17564517f4b90435c1a66d9d1488856f05671523538dd9a131e8c1eb4495410e"
+    },
+    "report": {
+      "current_native_claim": false,
+      "path": ".skill-tree/history/validation/plugin-system/invocation118-native/report.json",
+      "rewritten": false,
+      "sha256": "cf002e5bb4448a5f870d5904e8905f1b3006fc05004e59430300d777877e8485"
+    }
+  },
+  "limitations": [
+    "Static AST/source compatibility is not a proof of arbitrary semantic equivalence.",
+    "Synthetic fixtures and scripted answers never count as actual host contexts, real-human approval, native Skill invocation, provider universality or candidate efficacy.",
+    "No new tokens/cost/model/native-call accounting is inferred; original unexposed fields and aggregate failed-attempt charges remain unchanged.",
+    "Raw installation receipts absent from historical evidence are not reconstructed as observed data.",
+    "Current strict source fingerprint validation remains intentionally fail-closed."
+  ],
+  "mandatory_source_comparison": {
+    "common/scripts/decision-governance.py": {
+      "byte_identical": true,
+      "captured_sha256": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+      "current_sha256": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+      "git_blob_sha256": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286"
+    },
+    "common/scripts/decision-orchestration.py": {
+      "byte_identical": true,
+      "captured_sha256": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+      "current_sha256": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+      "git_blob_sha256": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145"
+    },
+    "common/scripts/plugin-hooks.js": {
+      "byte_identical": false,
+      "captured_sha256": "3ed78006e6abfb8a70cf191f1b310f41b50f3c60b3131bca3722c89af6753102",
+      "current_sha256": "fd5d304848f526b827318f181d572caae76db089961e1e01a7f54d03d50023d2",
+      "git_blob_sha256": "3ed78006e6abfb8a70cf191f1b310f41b50f3c60b3131bca3722c89af6753102"
+    },
+    "common/scripts/plugin-invocation.py": {
+      "byte_identical": false,
+      "captured_sha256": "281165ce83ed4309e4c841721b4461c71a447c4070c496a3c7ca37598af64d7d",
+      "current_sha256": "9b7e42042d72579247cd4f09bc45388b652ec7d0d0bc95354c0002849811f124",
+      "git_blob_sha256": "281165ce83ed4309e4c841721b4461c71a447c4070c496a3c7ca37598af64d7d"
+    },
+    "common/scripts/run-workspaces.py": {
+      "byte_identical": true,
+      "captured_sha256": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+      "current_sha256": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+      "git_blob_sha256": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb"
+    },
+    "common/scripts/validate-document-rules.py": {
+      "byte_identical": true,
+      "captured_sha256": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+      "current_sha256": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+      "git_blob_sha256": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7"
+    },
+    "common/scripts/workflow-state.py": {
+      "byte_identical": false,
+      "captured_sha256": "57383709635e780c6d207834fba5396583f1ecfe86ac2456380fabf755b6a68b",
+      "current_sha256": "76589e1dca50664128650f706ab413003039a1725b74f24ba2dcb9d9a622d029",
+      "git_blob_sha256": "57383709635e780c6d207834fba5396583f1ecfe86ac2456380fabf755b6a68b"
+    },
+    "lib/plugin-bindings.js": {
+      "byte_identical": true,
+      "captured_sha256": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
+      "current_sha256": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
+      "git_blob_sha256": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba"
+    },
+    "lib/plugin-composition.js": {
+      "byte_identical": false,
+      "captured_sha256": "3a2b5af0329c6e0a98754c512388df0d447f0d08181fa39fd8cf7fa4905225db",
+      "current_sha256": "7e61980fa8c3ce5d5f1d0807f8cc38a1f264a201db57f208d8300e31cd3db00e",
+      "git_blob_sha256": "3a2b5af0329c6e0a98754c512388df0d447f0d08181fa39fd8cf7fa4905225db"
+    },
+    "lib/plugin-parameters.js": {
+      "byte_identical": true,
+      "captured_sha256": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+      "current_sha256": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+      "git_blob_sha256": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915"
+    },
+    "lib/plugin-registry.js": {
+      "byte_identical": true,
+      "captured_sha256": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+      "current_sha256": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+      "git_blob_sha256": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005"
+    },
+    "lib/plugin-runtime.js": {
+      "byte_identical": false,
+      "captured_sha256": "5e9827cc3e59fece6a95afd76f90181e7f2c9eb6a049f0c9a0c7a6ad6730dcb8",
+      "current_sha256": "0c2cc89e184b509ccf2d99de6f0cd6cca47b958967899a8440e5be02fad68c6f",
+      "git_blob_sha256": "5e9827cc3e59fece6a95afd76f90181e7f2c9eb6a049f0c9a0c7a6ad6730dcb8"
+    },
+    "lib/plugin-sources.js": {
+      "byte_identical": true,
+      "captured_sha256": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+      "current_sha256": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+      "git_blob_sha256": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6"
+    }
+  },
+  "positive_path_preservation": {
+    "cached_delivery_bridge": "Historical harness calls provider/sink exactly once per original HI outside the lock. Current WF adds exact original status, sealed context, source, frozen-watch and inventory checks before that callback and repeats guards under writer/CAS. With unchanged historical positive inputs these are admission checks, not new actor or delivery branches.",
+    "core_B_incorporation": "_hook_transition, actual_hook_context, context links, ordinary clarification mutation/write and source-snapshot helpers remain AST-identical to captured633. Current accept alone permits the actual after-context override. B changes are incorporated by the same ordinary CL task-revision receipt before A2 reads accepted context; A1 and B original inputs remain historical.",
+    "engine_ast": {
+      "common/scripts/plugin-invocation.py": {
+        "added_ast_functions": [
+          "applicable_prerequisites",
+          "record_not_selected",
+          "require_business_admission"
+        ],
+        "ast_equality_limit": "AST equality does not establish current native execution or unrestricted semantic equivalence.",
+        "changed_existing_ast_functions": [
+          "mutate",
+          "next_action",
+          "prepare",
+          "proof_check",
+          "start"
+        ],
+        "relevant_identical_ast_functions": {
+          "actor": "1a4a24f5d88e6d7849ef4e29e102e0e802860af215762ae2088f6e03130b6a51",
+          "attempt_sources": "0be337501a2b631271e12f540c983feb30c80b2688bcc43dfab588757082eb8f",
+          "authority": "66b156cc253618cc672ac35b6598f978f7825666714329f9aa42e00f0f44ccff",
+          "clone": "2371eba38b9aeceac21894cf7bda9e4c64d59fbc8bcf17da2fe06e42c73e6716",
+          "configuration": "9afd66dfe1deb6585bbd76a92a7148f038fe5f222fdbfbc35878b91c437500a4",
+          "digest": "bdfa541008523ebfd68da1cf40e506326676c6c1b1ac88ada756fefbe333a772",
+          "encoded_write": "7919f9d669363a7284680747d09aeb018d2a6fd214fc05c6ce7507c061657ea4",
+          "exact_attempt": "1a5f93e8f162292d8548944a0d633bec9ed03426f79708f06ae1bcb2307bb81c",
+          "producer": "b6e1e699e1f913cb975d01e4f1baa9b118cc7cfe03a655510a231d6e4d2f4395",
+          "raw": "ac118f615321b209fca8e2d0f76961c8e25f48ed0945c7befa466e620353cd61",
+          "scope_snapshot": "91aa103836c4b7cf3a56eab679b61c914ddcf9585487ce6b07a415bcfd6bb71b"
+        },
+        "removed_ast_functions": []
+      },
+      "common/scripts/workflow-state.py": {
+        "added_ast_functions": [
+          "_hook_admission_inputs",
+          "_hook_admission_key",
+          "_hook_admission_selection",
+          "_hook_inventory_guard",
+          "_start_selection",
+          "prepare_hook_admission"
+        ],
+        "ast_equality_limit": "AST equality does not establish current native execution or unrestricted semantic equivalence.",
+        "changed_existing_ast_functions": [
+          "Store.commit",
+          "Store.lock",
+          "_hook_action",
+          "_hook_admission",
+          "_hook_controller",
+          "_hook_node",
+          "_hook_watch",
+          "_hook_watch_guard",
+          "advance",
+          "clarification_admission",
+          "complete",
+          "finish",
+          "hook_admission",
+          "process",
+          "start"
+        ],
+        "relevant_identical_ast_functions": {
+          "_hook_admitted_context": "ca923e6606ff77c634538af905e549767d8af30d3330896a4434c6adf5f1ff19",
+          "_hook_admitted_pending_context": "da824eeac4969d4f1edf8fb7eada7e40720b1939563bb911141ed499fa2bf0b8",
+          "_hook_context_links": "77ea4874e664063227dfa564009c891bfc3d4a425d98f593b15eab0b9f6d198f",
+          "_hook_policy_guard": "defe557e9f8fe7c53736eac7f5b3658206e0c59d4649011b43d472a808a288df",
+          "_hook_scope_source_guard": "7de0c56d37b174146f0204de7db55de139c01cce78bfb3085de138adca49ca28",
+          "_hook_scope_sources": "326753009cb9cfd5c0969921fda522c89cbcd9f9751af7eacd95b5f9732b7e61",
+          "_hook_transition": "8516329e5e62bee24ea8666c9bd9fa5c381e824c2461bae639c7495909a91810",
+          "actual_hook_context": "b87773b77e395560399ff2faa3e9cf34b2c457e87f063fe531999ed887464978",
+          "clarification_mutate": "c3d71b3d927455f219a099fa998ef9a740f021c874305a7ef429aceb7af53356",
+          "clarification_write": "92992cebc34a8a4f3b62735d801b0902c0952348cbc5b5aa32c7cd16eba42089",
+          "digest": "c26444e3b9e5b3416d9e8a05e620f1bc78ea784ece561d00bb60721757cb82b3",
+          "orchestration_action": "869346563d36ed4af16b648df1979f4c93acb9b2725b15576329f0e52c5bc328"
+        },
+        "removed_ast_functions": []
+      }
+    },
+    "new_readiness_branch": "Completed-readiness is a new read-only branch for final core/PR readiness. It preserves completed During history, skips draft-only entry guards and cannot authorize prepare/invoke/record/accept/retry. The historical actual probe did not claim this new branch; current deterministic tests must qualify it separately.",
+    "noops_and_adoption": "Disabled/condition-excluded cold starts return no-op without inventing actors or Future. Existing request replays still read original HI/HC; explicit configuration-adoption with all excluded rows records skipped stages and completion only after current core authorization. These new side paths are not claimed as historical native observations.",
+    "opaque_identity_boundary": "An analogous current run must recompute these identities from its actual installed current package. This analysis does not substitute them into old evidence or claim byte-identical envelopes/checksums.",
+    "opaque_identity_changes_expected": [
+      "Owned helper and reference byte hashes",
+      "Raw operation manifest digest and identity",
+      "Owned profile/source/output composition identities",
+      "Catalog handler source version and derived binding/configuration digests",
+      "Execution snapshot digest",
+      "Public input digest",
+      "Dispatch input digest",
+      "Private delivery digest",
+      "Subsequent chain/history checksums"
+    ],
+    "parameter_contract": "JSON resolution, canonical hashing, per-occurrence effective parameter/instruction values and private delivery data-object field construction retain the same source definitions. Marker values, Unicode/numeric JSON, ordinary authority-named data and repeated A parameters stay data; mode/grant/policy remain separate sealed fields.",
+    "private_delivery_keys": [
+      "allowed_actions",
+      "allowed_tools",
+      "attempt_id",
+      "authority",
+      "authority_digest",
+      "binding_id",
+      "chain_id",
+      "context",
+      "dispatch_identity",
+      "event",
+      "extra_instructions",
+      "input_digest",
+      "mechanism",
+      "mode",
+      "parameters",
+      "plugin",
+      "provider",
+      "scope_source_snapshot"
+    ],
+    "public_input_keys": [
+      "attempt_id",
+      "authority",
+      "authority_digest",
+      "binding_id",
+      "chain_id",
+      "configuration_digest",
+      "context",
+      "epoch",
+      "event",
+      "execution_policy",
+      "execution_snapshot_digest",
+      "extra_instructions",
+      "index",
+      "lineage",
+      "mode",
+      "package_identity",
+      "parameter_digest",
+      "parameters",
+      "scope_source_snapshot"
+    ],
+    "runtime_guard_additions": "Business APIs still select the same enabled A1/B/A2 rows. Empty prerequisite lists admit each original occurrence. Current and unknown/global holds reject before private resolution; known other-occurrence holds no longer block valid B. Existing actor, invocation and result evidence normalization and invoke/record/accept branch bodies remain AST-identical after admission.",
+    "unchanged_engine_transition_bodies": {
+      "accept": {
+        "current_body_ast_sha256": "3df84b4a4f155edb440b208859db0d43542d6e35cfb44867da959c39252fb609",
+        "identical": true
+      },
+      "invoke": {
+        "current_body_ast_sha256": "a36e9684ddc4489fe834127013b9c265112f1e66a5db03610bb7bf589bf2f016",
+        "identical": true
+      },
+      "record": {
+        "current_body_ast_sha256": "a3f61ab07f9491d083a7954e6a8d06d41b7356feb54ac3ef0ffbeb59462555a7",
+        "identical": true
+      }
+    },
+    "unchanged_private_delivery_object_definition": {
+      "byte_identical_line": true,
+      "current_line_sha256": "573a4eae2e3c1b2478258e06bf56ad7a038d386c52247a28317cb7ff9f52c99b"
+    },
+    "unchanged_public_input_seal_assignment": {
+      "current_ast_sha256": "15529c144bcca801bcb2f283779693767c8f47eb704d3c09abc1345cdfaf5862",
+      "identical": true
+    },
+    "writer_behavior": "Store.lock initializes empty admission bookkeeping; hook/ordinary CL transactions with no core-readiness admissions retain the existing CAS/journal behavior. Pure inventory checks verify the explicit operation root only, including raw manifest and plugin files. Node/private providers/host actors remain outside writer locks."
+  },
+  "schema": 1,
+  "status": "conditional-awaiting-final-required-checks-owned-activation-and-controller-selection",
+  "strict_current_native_validator": {
+    "changed_mandatory_paths": [
+      "common/scripts/plugin-hooks.js",
+      "common/scripts/plugin-invocation.py",
+      "common/scripts/workflow-state.py",
+      "lib/plugin-composition.js",
+      "lib/plugin-runtime.js"
+    ],
+    "expected_current_result_for_unchanged_historical_bundle": "Reject stale captured source; inferred directly from the unchanged strict guard and five mismatching mandatory source hashes, not reported as a newly executed grader test.",
+    "must_not_change": [
+      "Historical capture/report/grade/qualification bytes",
+      "Strict current-source validator or its mandatory-source set",
+      "Historical source snapshots, actor records, accounting or exposed-null fields"
+    ],
+    "path": ".skill-tree/scripts/agent-conformance.py",
+    "rule": "_validate_plugin_invocation_report requires every captured source fingerprint to equal current source bytes before loading/qualifying observations.",
+    "source_sha256": "0f7a79a83e69aad8c8f3a5c4d063b94616f1c6d786f0e13cc3027dee3401f49e"
+  },
+  "subject_task_id": "T-dae414c5-43e4-45db-a6f3-4ce4112440c5"
+}

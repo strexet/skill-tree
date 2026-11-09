@@ -1,0 +1,57 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-plugin-bindings.js"
+  ],
+  "attempt_id": "C-85d95a76-dc53-4d52-9d43-91a83b0a5074",
+  "baseline": {
+    "last_accepted": {
+      "discovered": 30,
+      "expected": 30,
+      "failed": 0,
+      "passed": 30,
+      "skipped": 0
+    },
+    "original": {
+      "discovered": 30,
+      "expected": 30,
+      "failed": 0,
+      "passed": 30,
+      "skipped": 0
+    }
+  },
+  "check_id": "extensible-bindings",
+  "count_error": null,
+  "counts": {
+    "discovered": 30,
+    "expected": 30,
+    "failed": 0,
+    "passed": 30,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "limitations": [
+    "Focused unit fixture evidence. No new actual actor or product qualification."
+  ],
+  "log_sha256": "bf9b9ed8c534daf412899acdd29a3d84a23cfe46e948506bcd1371eb13b610f9",
+  "output": ".skill-tree/history/validation/plugin-system/t-787453a8-2643-48c1-8715-9626d67d5e0e-extensible-bindings-c-85d95a76-dc53-4d52-9d43-91a83b0a5074.txt",
+  "owned_profile_identity": "56e828eacced91072ba944c318a5291a21b88be7f83b90a2248f53fdae95806a",
+  "process_group_clean": true,
+  "result": "pass",
+  "source_commit": "5c4e28c3ee34f1f9e385c82cde21f0886b202919",
+  "sources": {
+    ".skill-tree/common/references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
+    ".skill-tree/documents/implementation-plan.md": "73692c86132c37dc8be19457f9bf33dc6ff87027cfad50de85a361bca6f09606",
+    ".skill-tree/documents/plugin-management-contract.md": "2b5c9aeb18dd30b06a809fd14e5222abf579a002187870167d61f6f7dda5b11a",
+    ".skill-tree/documents/plugin-system-contract.md": "35af053252eb88060cfa32f71fb3b1c7b3bbe7afb5d60cc0a937c41b686a8038",
+    ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+    ".skill-tree/lib/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
+    ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    ".skill-tree/templates/operations.json": "af81ff4d4b003ef8e8dac292995b3227d5fb45d80666dd80b83b4111d1ded050",
+    ".skill-tree/tests/test-plugin-bindings.js": "7159d362a7d5aa21f69a93b678c01373ee10d568423cd9fac7918f78f4668049"
+  },
+  "task_id": "T-787453a8-2643-48c1-8715-9626d67d5e0e",
+  "timed_out": false,
+  "tool_wall_seconds": 0.347
+}

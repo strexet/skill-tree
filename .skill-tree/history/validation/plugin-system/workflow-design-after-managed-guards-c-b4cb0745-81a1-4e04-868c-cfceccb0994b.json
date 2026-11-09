@@ -1,0 +1,28 @@
+{
+  "actual_decision_evidence": {
+    "w1": ".skill-tree/history/research/plugin-auto-manual-decision.json",
+    "w2": ".skill-tree/history/research/plugin-hook-decisions.json",
+    "w3": ".skill-tree/history/research/plugin-management-decisions.json"
+  },
+  "attempt_id": "C-b4cb0745-81a1-4e04-868c-cfceccb0994b",
+  "findings": [
+    "Actual W1 selects internal stages, bounded default Auto/separate actors and explicit Manual; standalone splits remain a later usage choice.",
+    "Actual later W2 record closes the W2 question that was still open in the historical W1 submission, preserving the original records unchanged.",
+    "Approved map retains optional before/during/after boundaries, additional full-review pass before readiness, wording/interview/rework and current final acceptance.",
+    "W3 preserves core-only default and optional open-source management; installer consent and publication remain explicit.",
+    "The new source adds registry/prerequisite/readiness verification within the approved anchors rather than a new unapproved structural stage.",
+    "Finite comparative proposal still requires separate actual owner agreement; W1/W2/W3 and this revalidation do not grant it."
+  ],
+  "qualification": "Current static revalidation of actual preserved owner design decisions; no new approval, implementation outcome, native trial or comparison consent is manufactured.",
+  "result": "pass",
+  "sources": {
+    ".skill-tree/common/references/future-workflow.md": "d8c04b71daddb6df3b6e0198e87cd2497d2e7b9db50cfa9ec8222dae78344e24",
+    ".skill-tree/common/scripts/workflow-state.py": "76589e1dca50664128650f706ab413003039a1725b74f24ba2dcb9d9a622d029",
+    ".skill-tree/documents/implementation-plan.md": "d53373bb753c92ba770aca2af1d9dd4bea586888de5aa5320b454a2e056e84e1",
+    ".skill-tree/documents/plugin-system-contract.md": "ad81db5c53c25df9326b6f9c679ac33e8ae15e32e51ec19d95b352ef1d68a2fc",
+    ".skill-tree/documents/plugin-system-research.md": "df72f246f13a3a4186a0035f9dec75b3dcc9dcc511de1ecf66a7bc0c62462a31",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "2bc848663455a1c9fcf682c5fa50dfe4a0e1f19de8421223265cb80845dbbcad",
+    ".skill-tree/history/research/plugin-hook-decisions.json": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461"
+  },
+  "task_id": "T-a5a738da-c182-4206-bb61-75ffa21946fb"
+}

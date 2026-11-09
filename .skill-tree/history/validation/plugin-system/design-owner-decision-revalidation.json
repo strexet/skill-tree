@@ -1,0 +1,40 @@
+{
+  "attempt_id": "C-f9cfe3a8-bc02-443c-b6a1-e64a4f36a002",
+  "check_id": "owner-decision-evidence",
+  "closed_findings": [
+    ".skill-tree/history/validation/plugin-system/design-current-fact-finding.json"
+  ],
+  "limitations": [
+    "Current static approval/source revalidation only; no new owner approval, actor invocation, trial agreement or terminal outcome is invented."
+  ],
+  "observations": [
+    "Actual W1 owner submission approves internal phases, Auto default, bounded delegation, independent significant-decision criticism, arbitration and explicit Manual choice.",
+    "Actual W2 owner submission approves the exact selected/core-guarded initial anchor map, current plan acceptance before edits, stable-ID task quality flow and after-review before readiness.",
+    "W3 actual owner direction supersedes default plugin bundles and fixed placement restrictions while preserving core-only default and actual mutation consent.",
+    "No consumed pilot choice remains unresolved; unrelated standalone planning/release/retrospective operations remain outside the approved initial scope.",
+    "The stale blanket implementation-absence sentence is replaced by canonical Future/component qualification authority; initial manual observations retain their historical source/host limits.",
+    "The current manual runtime remains separate from planned W1 mode activation; pure backend/binding code establishes no Auto or candidate host invocation.",
+    "Comparison114 retains a separate actual bounded-trial agreement gate."
+  ],
+  "result": "pass",
+  "reviewers": [
+    "Independent /root/installer_consent_research verifies all three immutable approval criteria and identifies one stale current-state sentence.",
+    "Root verifies the bounded documentation repair and current source/approval consistency after the repair."
+  ],
+  "source_fingerprints": {
+    ".skill-tree/common/references/future-workflow.md": "f7113bb4b6185b072d157d06d772c71477b8a5b7a600db8c2903e56b3a536487",
+    ".skill-tree/common/scripts/workflow-state.py": "f531546773a653809e09af093a1dddfacca763517b13cebf9b00673ab959737f",
+    ".skill-tree/documents/implementation-plan.md": "d53373bb753c92ba770aca2af1d9dd4bea586888de5aa5320b454a2e056e84e1",
+    ".skill-tree/documents/plugin-system-contract.md": "eeddb14292e115f489aa855f01f60ab922448317a3e9956d649148b177944680",
+    ".skill-tree/documents/plugin-system-research.md": "df72f246f13a3a4186a0035f9dec75b3dcc9dcc511de1ecf66a7bc0c62462a31",
+    ".skill-tree/documents/plugin-workflow-decisions.md": "ef81629dd2e76ed70a05896e57b38ca55571439af333da08ecebcf9d80bbe2ca",
+    ".skill-tree/history/research/plugin-hook-decisions.json": "5606bc091c67691fc14e60d4e81a979c6316532ba606b6743e59954f1b6a2461"
+  },
+  "task_id": "T-a5a738da-c182-4206-bb61-75ffa21946fb",
+  "validation": [
+    "Strict edited plan prose passed.",
+    "Source navigation manifest was regenerated through the owned helper.",
+    "Strict source documentation validation passed with only the pre-existing historical-audit staleness notice.",
+    "git diff --check passed."
+  ]
+}

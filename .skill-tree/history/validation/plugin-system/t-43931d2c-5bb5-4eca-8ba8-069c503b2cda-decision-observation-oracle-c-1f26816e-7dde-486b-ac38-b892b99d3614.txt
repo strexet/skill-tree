@@ -1,0 +1,389 @@
+FFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFFF
+======================================================================
+FAIL: test_actual_creation_identity_request_hash_and_sealed_result_digest_are_required (__main__.CoreDecisionConformanceTests.test_actual_creation_identity_request_hash_and_sealed_result_digest_are_required) (variant='missing-creation')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 128, in test_actual_creation_identity_request_hash_and_sealed_result_digest_are_required
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_actual_creation_identity_request_hash_and_sealed_result_digest_are_required (__main__.CoreDecisionConformanceTests.test_actual_creation_identity_request_hash_and_sealed_result_digest_are_required) (variant='wrong-actor')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 128, in test_actual_creation_identity_request_hash_and_sealed_result_digest_are_required
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_actual_creation_identity_request_hash_and_sealed_result_digest_are_required (__main__.CoreDecisionConformanceTests.test_actual_creation_identity_request_hash_and_sealed_result_digest_are_required) (variant='no-provider')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 128, in test_actual_creation_identity_request_hash_and_sealed_result_digest_are_required
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_actual_creation_identity_request_hash_and_sealed_result_digest_are_required (__main__.CoreDecisionConformanceTests.test_actual_creation_identity_request_hash_and_sealed_result_digest_are_required) (variant='no-request-hash')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 128, in test_actual_creation_identity_request_hash_and_sealed_result_digest_are_required
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_actual_creation_identity_request_hash_and_sealed_result_digest_are_required (__main__.CoreDecisionConformanceTests.test_actual_creation_identity_request_hash_and_sealed_result_digest_are_required) (variant='input-digest')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 128, in test_actual_creation_identity_request_hash_and_sealed_result_digest_are_required
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_actual_creation_identity_request_hash_and_sealed_result_digest_are_required (__main__.CoreDecisionConformanceTests.test_actual_creation_identity_request_hash_and_sealed_result_digest_are_required) (variant='executor-self')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 128, in test_actual_creation_identity_request_hash_and_sealed_result_digest_are_required
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_captured_result_disagreement_and_final_acceptance_must_match_ledger (__main__.CoreDecisionConformanceTests.test_captured_result_disagreement_and_final_acceptance_must_match_ledger) (variant='result')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 138, in test_captured_result_disagreement_and_final_acceptance_must_match_ledger
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_captured_result_disagreement_and_final_acceptance_must_match_ledger (__main__.CoreDecisionConformanceTests.test_captured_result_disagreement_and_final_acceptance_must_match_ledger) (variant='critic')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 138, in test_captured_result_disagreement_and_final_acceptance_must_match_ledger
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_captured_result_disagreement_and_final_acceptance_must_match_ledger (__main__.CoreDecisionConformanceTests.test_captured_result_disagreement_and_final_acceptance_must_match_ledger) (variant='arbiter')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 138, in test_captured_result_disagreement_and_final_acceptance_must_match_ledger
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_captured_result_disagreement_and_final_acceptance_must_match_ledger (__main__.CoreDecisionConformanceTests.test_captured_result_disagreement_and_final_acceptance_must_match_ledger) (variant='acceptance')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 138, in test_captured_result_disagreement_and_final_acceptance_must_match_ledger
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_current_source_and_do_execution_snapshot_must_match_external_capture (__main__.CoreDecisionConformanceTests.test_current_source_and_do_execution_snapshot_must_match_external_capture) (variant='report-source')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 116, in test_current_source_and_do_execution_snapshot_must_match_external_capture
+    with self.subTest(variant=variant):self.reject(value,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_current_source_and_do_execution_snapshot_must_match_external_capture (__main__.CoreDecisionConformanceTests.test_current_source_and_do_execution_snapshot_must_match_external_capture) (variant='capture-source')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 116, in test_current_source_and_do_execution_snapshot_must_match_external_capture
+    with self.subTest(variant=variant):self.reject(value,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_current_source_and_do_execution_snapshot_must_match_external_capture (__main__.CoreDecisionConformanceTests.test_current_source_and_do_execution_snapshot_must_match_external_capture) (variant='do-source')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 116, in test_current_source_and_do_execution_snapshot_must_match_external_capture
+    with self.subTest(variant=variant):self.reject(value,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_manual_worker_wait_precedes_scripted_owner_and_completion_without_human_claim (__main__.CoreDecisionConformanceTests.test_manual_worker_wait_precedes_scripted_owner_and_completion_without_human_claim) (variant='no-wait')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 149, in test_manual_worker_wait_precedes_scripted_owner_and_completion_without_human_claim
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_manual_worker_wait_precedes_scripted_owner_and_completion_without_human_claim (__main__.CoreDecisionConformanceTests.test_manual_worker_wait_precedes_scripted_owner_and_completion_without_human_claim) (variant='owner-first')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 149, in test_manual_worker_wait_precedes_scripted_owner_and_completion_without_human_claim
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_manual_worker_wait_precedes_scripted_owner_and_completion_without_human_claim (__main__.CoreDecisionConformanceTests.test_manual_worker_wait_precedes_scripted_owner_and_completion_without_human_claim) (variant='human')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 149, in test_manual_worker_wait_precedes_scripted_owner_and_completion_without_human_claim
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_manual_worker_wait_precedes_scripted_owner_and_completion_without_human_claim (__main__.CoreDecisionConformanceTests.test_manual_worker_wait_precedes_scripted_owner_and_completion_without_human_claim) (variant='no-completion')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 149, in test_manual_worker_wait_precedes_scripted_owner_and_completion_without_human_claim
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_manual_worker_wait_precedes_scripted_owner_and_completion_without_human_claim (__main__.CoreDecisionConformanceTests.test_manual_worker_wait_precedes_scripted_owner_and_completion_without_human_claim) (variant='wait-accepted')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 149, in test_manual_worker_wait_precedes_scripted_owner_and_completion_without_human_claim
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_missing_duplicate_or_unbound_capture_event_ids_reject (__main__.CoreDecisionConformanceTests.test_missing_duplicate_or_unbound_capture_event_ids_reject) (variant='missing-scenario')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 106, in test_missing_duplicate_or_unbound_capture_event_ids_reject
+    with self.subTest(variant=variant):self.reject(value,capture)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_missing_duplicate_or_unbound_capture_event_ids_reject (__main__.CoreDecisionConformanceTests.test_missing_duplicate_or_unbound_capture_event_ids_reject) (variant='duplicate-row')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 106, in test_missing_duplicate_or_unbound_capture_event_ids_reject
+    with self.subTest(variant=variant):self.reject(value,capture)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_missing_duplicate_or_unbound_capture_event_ids_reject (__main__.CoreDecisionConformanceTests.test_missing_duplicate_or_unbound_capture_event_ids_reject) (variant='unknown-event')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 106, in test_missing_duplicate_or_unbound_capture_event_ids_reject
+    with self.subTest(variant=variant):self.reject(value,capture)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_missing_duplicate_or_unbound_capture_event_ids_reject (__main__.CoreDecisionConformanceTests.test_missing_duplicate_or_unbound_capture_event_ids_reject) (variant='duplicate-event')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 106, in test_missing_duplicate_or_unbound_capture_event_ids_reject
+    with self.subTest(variant=variant):self.reject(value,capture)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_missing_duplicate_or_unbound_capture_event_ids_reject (__main__.CoreDecisionConformanceTests.test_missing_duplicate_or_unbound_capture_event_ids_reject) (variant='cross-scenario')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 106, in test_missing_duplicate_or_unbound_capture_event_ids_reject
+    with self.subTest(variant=variant):self.reject(value,capture)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_original_pending_requires_explicit_reconcile_switch_resume_and_rejected_stale_delivery (__main__.CoreDecisionConformanceTests.test_original_pending_requires_explicit_reconcile_switch_resume_and_rejected_stale_delivery) (variant='pending')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 160, in test_original_pending_requires_explicit_reconcile_switch_resume_and_rejected_stale_delivery
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_original_pending_requires_explicit_reconcile_switch_resume_and_rejected_stale_delivery (__main__.CoreDecisionConformanceTests.test_original_pending_requires_explicit_reconcile_switch_resume_and_rejected_stale_delivery) (variant='reconcile')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 160, in test_original_pending_requires_explicit_reconcile_switch_resume_and_rejected_stale_delivery
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_original_pending_requires_explicit_reconcile_switch_resume_and_rejected_stale_delivery (__main__.CoreDecisionConformanceTests.test_original_pending_requires_explicit_reconcile_switch_resume_and_rejected_stale_delivery) (variant='switch')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 160, in test_original_pending_requires_explicit_reconcile_switch_resume_and_rejected_stale_delivery
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_original_pending_requires_explicit_reconcile_switch_resume_and_rejected_stale_delivery (__main__.CoreDecisionConformanceTests.test_original_pending_requires_explicit_reconcile_switch_resume_and_rejected_stale_delivery) (variant='resume')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 160, in test_original_pending_requires_explicit_reconcile_switch_resume_and_rejected_stale_delivery
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_original_pending_requires_explicit_reconcile_switch_resume_and_rejected_stale_delivery (__main__.CoreDecisionConformanceTests.test_original_pending_requires_explicit_reconcile_switch_resume_and_rejected_stale_delivery) (variant='stale')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 160, in test_original_pending_requires_explicit_reconcile_switch_resume_and_rejected_stale_delivery
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_original_pending_requires_explicit_reconcile_switch_resume_and_rejected_stale_delivery (__main__.CoreDecisionConformanceTests.test_original_pending_requires_explicit_reconcile_switch_resume_and_rejected_stale_delivery) (variant='different-attempt')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 160, in test_original_pending_requires_explicit_reconcile_switch_resume_and_rejected_stale_delivery
+    with self.subTest(variant=variant):self.reject(report,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_report_native_labels_and_all_true_checks_cannot_supply_capture (__main__.CoreDecisionConformanceTests.test_report_native_labels_and_all_true_checks_cannot_supply_capture)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 95, in test_report_native_labels_and_all_true_checks_cannot_supply_capture
+    self.reject(report,None)
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_snapshot_checksums_and_current_scope_mode_cannot_be_forged_by_report (__main__.CoreDecisionConformanceTests.test_snapshot_checksums_and_current_scope_mode_cannot_be_forged_by_report) (variant='hash')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 171, in test_snapshot_checksums_and_current_scope_mode_cannot_be_forged_by_report
+    with self.subTest(variant=variant):self.reject(value,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_snapshot_checksums_and_current_scope_mode_cannot_be_forged_by_report (__main__.CoreDecisionConformanceTests.test_snapshot_checksums_and_current_scope_mode_cannot_be_forged_by_report) (variant='mode')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 171, in test_snapshot_checksums_and_current_scope_mode_cannot_be_forged_by_report
+    with self.subTest(variant=variant):self.reject(value,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_snapshot_checksums_and_current_scope_mode_cannot_be_forged_by_report (__main__.CoreDecisionConformanceTests.test_snapshot_checksums_and_current_scope_mode_cannot_be_forged_by_report) (variant='scope')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 171, in test_snapshot_checksums_and_current_scope_mode_cannot_be_forged_by_report
+    with self.subTest(variant=variant):self.reject(value,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_snapshot_checksums_and_current_scope_mode_cannot_be_forged_by_report (__main__.CoreDecisionConformanceTests.test_snapshot_checksums_and_current_scope_mode_cannot_be_forged_by_report) (variant='epoch')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 171, in test_snapshot_checksums_and_current_scope_mode_cannot_be_forged_by_report
+    with self.subTest(variant=variant):self.reject(value,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_snapshot_checksums_and_current_scope_mode_cannot_be_forged_by_report (__main__.CoreDecisionConformanceTests.test_snapshot_checksums_and_current_scope_mode_cannot_be_forged_by_report) (variant='limitations')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 171, in test_snapshot_checksums_and_current_scope_mode_cannot_be_forged_by_report
+    with self.subTest(variant=variant):self.reject(value,external)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-decision-conformance.py", line 87, in reject
+    with self.assertRaises(ValueError):grader.validate_core_decision_report(report,capture)
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 9 tests in 1.190s
+
+FAILED (failures=35)

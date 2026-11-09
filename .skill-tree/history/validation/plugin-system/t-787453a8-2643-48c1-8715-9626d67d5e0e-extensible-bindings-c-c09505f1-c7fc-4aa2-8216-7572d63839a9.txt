@@ -1,0 +1,160 @@
+TAP version 13
+# Subtest: binding foundation exports runnable definition and identity APIs
+ok 1 - binding foundation exports runnable definition and identity APIs
+  ---
+  duration_ms: 0.590083
+  ...
+# Subtest: the actual owned operation catalog exposes before during and after without a fixed operation count
+ok 2 - the actual owned operation catalog exposes before during and after without a fixed operation count
+  ---
+  duration_ms: 31.604584
+  ...
+# Subtest: named anchors resolve only to an actual trusted owned callable boundary
+ok 3 - named anchors resolve only to an actual trusted owned callable boundary
+  ---
+  duration_ms: 0.815625
+  ...
+# Subtest: a custom label missing an owned handler or operation remains visibly unresolved
+ok 4 - a custom label missing an owned handler or operation remains visibly unresolved
+  ---
+  duration_ms: 2.758375
+  ...
+# Subtest: free-text aliases map to verified locations while unknown and ambiguous text stays unresolved
+ok 5 - free-text aliases map to verified locations while unknown and ambiguous text stays unresolved
+  ---
+  duration_ms: 3.851417
+  ...
+# Subtest: ordered repeated packages retain distinct occurrence values without package duplication
+ok 6 - ordered repeated packages retain distinct occurrence values without package duplication
+  ---
+  duration_ms: 5.297709
+  ...
+# Subtest: duplicate occurrence identities and missing packages are rejected independently of plugin multiplicity
+ok 7 - duplicate occurrence identities and missing packages are rejected independently of plugin multiplicity
+  ---
+  duration_ms: 4.183125
+  ...
+# Subtest: moving and removing one occurrence preserve identity data and every unrelated occurrence
+ok 8 - moving and removing one occurrence preserve identity data and every unrelated occurrence
+  ---
+  duration_ms: 0.312125
+  ...
+# Subtest: effective parameters use project defaults and explicit occurrence/run overrides without core field mutation
+ok 9 - effective parameters use project defaults and explicit occurrence/run overrides without core field mutation
+  ---
+  duration_ms: 3.642709
+  ...
+# Subtest: declarative conditions filter enabled occurrences in configured order
+ok 10 - declarative conditions filter enabled occurrences in configured order
+  ---
+  duration_ms: 8.983917
+  ...
+# Subtest: unsupported executable conditions and non-JSON parameters are explicit failures without evaluation
+ok 11 - unsupported executable conditions and non-JSON parameters are explicit failures without evaluation
+  ---
+  duration_ms: 4.932166
+  ...
+# Subtest: declarative defaults and run override accessors reject before extracting any parameter layer
+ok 12 - declarative defaults and run override accessors reject before extracting any parameter layer
+  ---
+  duration_ms: 1.061875
+  ...
+# Subtest: typed task-free contexts preserve request project document snapshot management and controller scopes
+ok 13 - typed task-free contexts preserve request project document snapshot management and controller scopes
+  ---
+  duration_ms: 0.439666
+  ...
+# Subtest: real pending task group and review contexts reject fabricated identity shapes
+ok 14 - real pending task group and review contexts reject fabricated identity shapes
+  ---
+  duration_ms: 0.675458
+  ...
+# Subtest: pre-promotion and task-free dispatch use compatible typed contexts without manufacturing tasks
+ok 15 - pre-promotion and task-free dispatch use compatible typed contexts without manufacturing tasks
+  ---
+  duration_ms: 4.12325
+  ...
+# Subtest: unresolved named locations remain visible instead of appearing in an executable selection
+ok 16 - unresolved named locations remain visible instead of appearing in an executable selection
+  ---
+  duration_ms: 4.327958
+  ...
+# Subtest: catalog and sequence identities change with order parameters conditions and named-boundary versions
+ok 17 - catalog and sequence identities change with order parameters conditions and named-boundary versions
+  ---
+  duration_ms: 13.335833
+  ...
+# Subtest: configuration identity includes independent enabled instruction and run override values
+ok 18 - configuration identity includes independent enabled instruction and run override values
+  ---
+  duration_ms: 9.107958
+  ...
+# Subtest: mixed operation and anchor bindings select only the actual boundary in preserved order
+ok 19 - mixed operation and anchor bindings select only the actual boundary in preserved order
+  ---
+  duration_ms: 8.279625
+  ...
+# Subtest: named aliases of one actual boundary select and produce identities with the returned boundary event
+ok 20 - named aliases of one actual boundary select and produce identities with the returned boundary event
+  ---
+  duration_ms: 12.3785
+  ...
+# Subtest: cross-operation boundary ownership and serialized handler metadata cannot invent callable locations
+ok 21 - cross-operation boundary ownership and serialized handler metadata cannot invent callable locations
+  ---
+  duration_ms: 3.012166
+  ...
+# Subtest: catalog metadata and compiled sequence data cannot mutate behind current configuration identities
+ok 22 - catalog metadata and compiled sequence data cannot mutate behind current configuration identities
+  ---
+  duration_ms: 3.801416
+  ...
+# Subtest: context forms reject empty duplicate nonapplicable task identities and Windows paths
+ok 23 - context forms reject empty duplicate nonapplicable task identities and Windows paths
+  ---
+  duration_ms: 0.218958
+  ...
+# Subtest: condition presence distinguishes null false and missing without inherited-field or accessor evaluation
+ok 24 - condition presence distinguishes null false and missing without inherited-field or accessor evaluation
+  ---
+  duration_ms: 7.302791
+  ...
+# Subtest: core authority and context fields cannot be supplied as binding-level plugin data
+ok 25 - core authority and context fields cannot be supplied as binding-level plugin data
+  ---
+  duration_ms: 2.030375
+  ...
+# Subtest: delivery identity distinguishes repeated occurrences controller leaf and explicit attempts
+ok 26 - delivery identity distinguishes repeated occurrences controller leaf and explicit attempts
+  ---
+  duration_ms: 0.405792
+  ...
+# Subtest: same delivery with changed inputs conflicts while exact duplicate delivery is classified without executing anything
+ok 27 - same delivery with changed inputs conflicts while exact duplicate delivery is classified without executing anything
+  ---
+  duration_ms: 0.309667
+  ...
+# Subtest: context-only drift changes input identity while mismatched operation and boundary events reject
+ok 28 - context-only drift changes input identity while mismatched operation and boundary events reject
+  ---
+  duration_ms: 0.231125
+  ...
+# Subtest: active lineage rejects real occurrence re-entry but finite A B A plugin sequences remain valid
+ok 29 - active lineage rejects real occurrence re-entry but finite A B A plugin sequences remain valid
+  ---
+  duration_ms: 0.368334
+  ...
+# Subtest: copied binding modules work without source checkout sibling skills or implicit project metadata
+ok 30 - copied binding modules work without source checkout sibling skills or implicit project metadata
+  ---
+  duration_ms: 60.99475
+  ...
+1..30
+# tests 30
+# suites 0
+# pass 30
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 303.168209

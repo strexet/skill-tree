@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "task_id": "T-18db6175-499f-4679-bf8d-f815c7b42411",
+  "repository": "DietrichGebert/ponytail",
+  "revision": "96608e078b2d5ea607c5c3b8b5a54d1c1fba6846",
+  "entry": "skills/ponytail/SKILL.md",
+  "acquired_at": "2026-11-06T15:07:08.015027+00:00",
+  "acquisition": "GitHub connector fetch_file encoding=base64 at exact immutable ref; bytes decoded without text transformation.",
+  "files": [
+    {
+      "path": "skills/ponytail/SKILL.md",
+      "bytes": 3496,
+      "git_blob_sha1": "d64edd32265ba21cbf5270158f04e97d96925f27",
+      "sha256": "9badd22a32e19cb884e46dfa8d3aae82bb81dfa5484105b8b4f0262df823a509",
+      "source_url": "https://github.com/DietrichGebert/ponytail/blob/96608e078b2d5ea607c5c3b8b5a54d1c1fba6846/skills/ponytail/SKILL.md"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1071,
+      "git_blob_sha1": "715d483338cea4365f0d91a27799cf61226d6bcf",
+      "sha256": "fb1bc6909ac3ef82d5c22106e32ef682b0cff66788fa915fb9b53b15c9d2f3ab",
+      "source_url": "https://github.com/DietrichGebert/ponytail/blob/96608e078b2d5ea607c5c3b8b5a54d1c1fba6846/LICENSE"
+    }
+  ],
+  "source_content_digest": "14147d26122fb21e825ff59f20d3eedd79ebdbf05c17eaae93daf67826ec5615",
+  "source_content_digest_format": "plugin-sources contentDigest: SHA256(JSON.stringify({entry,digests})) with sorted resource keys.",
+  "closure": {
+    "resources": [
+      "LICENSE"
+    ],
+    "dependencies": [],
+    "scripts_or_sibling_resources_referenced_by_entry": [],
+    "excluded": [
+      "skills/ponytail-review/SKILL.md",
+      "benchmarks/",
+      "other skills and host bundles"
+    ]
+  },
+  "executed_upstream": false,
+  "activated_plugin": false,
+  "limitations": [
+    "Source identity/license closure only; no current review invocation or efficacy result.",
+    "No installation, composition, package registry, queue or task metadata changed."
+  ]
+}

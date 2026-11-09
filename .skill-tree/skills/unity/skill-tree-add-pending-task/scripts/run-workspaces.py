@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import re
 import socket
+import stat
 import subprocess
 import tempfile
 import uuid
@@ -19,6 +20,31 @@ TERMINAL = {'local-result', 'merged'}
 
 def delivery_finished(run):
     delivery=run.get('delivery',{})
+    if local_merge_order(run):
+        integration = delivery.get('local_integration')
+        if not isinstance(integration, dict):
+            return False
+        merge, admission, validation = (integration.get(key) for key in ('merge', 'target_admission', 'validation'))
+        if not all(isinstance(item, dict) for item in (merge, admission, validation)):
+            return False
+        def git_object(value):
+            return isinstance(value, str) and re.fullmatch(r'(?:[a-f0-9]{40}|[a-f0-9]{64})', value) is not None
+
+        def sha256(value):
+            return isinstance(value, str) and re.fullmatch(r'[a-f0-9]{64}', value) is not None
+
+        parents, checks, evidence = merge.get('parents'), validation.get('checks'), validation.get('evidence')
+        return (delivery.get('implementation') == 'completed' and delivery.get('status') == 'merged'
+                and delivery.get('order_completed') is True
+                and git_object(merge.get('commit')) and git_object(merge.get('tree'))
+                and isinstance(parents, list) and len(parents) == 2 and all(map(git_object, parents))
+                and admission.get('merge_commit') == validation.get('merge_commit') == merge['commit']
+                and sha256(admission.get('profile_identity'))
+                and validation.get('profile_identity') == admission['profile_identity']
+                and isinstance(checks, list) and bool(checks)
+                and all(isinstance(item, dict) and type(item.get('exit_code')) is int and item['exit_code'] == 0 for item in checks)
+                and isinstance(evidence, list) and len(evidence) == 1 and isinstance(evidence[0], dict)
+                and isinstance(evidence[0].get('path'), str) and sha256(evidence[0].get('sha256')))
     return delivery.get('status') in TERMINAL or (delivery.get('status')=='pr-ready' and not delivery.get('authorization',{}).get('merge'))
 
 def git(root, *args):
@@ -95,12 +121,27 @@ def setup(store, payload):
         atomic(runtime_file(store.root), locator)
         return registry
 
+def validate_hook_references(run):
+    values=run.get('hook_chains',[])
+    if not isinstance(values,list) or any(not isinstance(value,str) or not re.fullmatch(r'HC-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}',value) for value in values) or len(values)!=len(set(values)):raise RunError('Controller hook references require exact distinct chain identities')
+    return values
+
+def register_hook_reference(run,chain_id,task_ids=()):
+    validate_hook_references(run)
+    if not isinstance(chain_id,str) or not re.fullmatch(r'HC-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}',chain_id):raise RunError('An exact hook chain identity is required')
+    scope=set(run.get('admitted_task_ids',run.get('snapshot',[])))|set(run.get('required_ids',[]))
+    if set(task_ids)-scope:raise RunError('Hook registration exceeds the recorded controller task scope')
+    result=deepcopy(run);refs=result.setdefault('hook_chains',[])
+    if chain_id not in refs:refs.append(chain_id)
+    return result
+
 def validate_registry(registry):
     if not isinstance(registry, dict) or registry.get('schema') != 1 or not re.fullmatch(r'Q-[a-f0-9-]{36}', registry.get('queue_id', '')):
         raise RunError('Unsupported run registry; explicit recovery required')
     if any(not isinstance(registry.get(k), dict) for k in ['runs', 'claims', 'resources']):
         raise RunError('Corrupt run registry collections')
     for rid, run in registry['runs'].items():
+        validate_hook_references(run)
         if run.get('id') != rid:
             raise RunError('Run registry identity conflict')
     for tid, rid in registry['claims'].items():
@@ -296,6 +337,188 @@ def publication_lock(root, remote, target):
         yield
     finally:
         path.unlink(missing_ok=True)
+
+def local_merge_order(run):
+    authorization = run.get('delivery', {}).get('authorization', {})
+    return authorization.get('pr') is False and authorization.get('merge') is True
+
+
+def local_merge_target(root, run):
+    authorization = run.get('delivery', {}).get('authorization', {})
+    workspace = run.get('workspace', {})
+    if authorization.get('mode', 'local-merge') != 'local-merge':
+        raise RunError('Local merge requires the recorded local-merge delivery order')
+    target = branch(root, authorization.get('target_branch'))
+    if workspace.get('base_branch') != target or workspace.get('branch') == target:
+        raise RunError('Local merge requires the exact authorized base target and separate source branch')
+    return target
+
+
+def local_git_environment():
+    overrides = {'GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR', 'GIT_OBJECT_DIRECTORY',
+                 'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_NAMESPACE', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG_COUNT'}
+    if overrides.intersection(os.environ):
+        raise RunError('Local delivery requires the recorded Git environment without repository or index overrides')
+
+
+def local_git(root, *args, accepted=(0,)):
+    local_git_environment()
+    result = subprocess.run(
+        ['git', '--no-replace-objects', '--no-optional-locks', '--literal-pathspecs', '-C', str(root),
+         '-c', 'core.fsmonitor=false', '-c', 'diff.autoRefreshIndex=false', *map(str, args)],
+        capture_output=True, timeout=45,
+    )
+    if result.returncode not in accepted:
+        raise RunError('Local Git operation failed: ' + str(args[0]))
+    return result
+
+
+def local_git_text(root, *args):
+    return local_git(root, *args).stdout.decode('utf-8').strip()
+
+
+def local_git_paths(root, *args):
+    raw = local_git(root, *args).stdout
+    try:
+        return set(raw.decode('utf-8').split('\0')[:-1])
+    except UnicodeError as exc:
+        raise RunError('Local integration requires unambiguous UTF-8 Git paths') from exc
+
+
+def local_overlap(left, right):
+    return left == right or left.startswith(right + '/') or right.startswith(left + '/')
+
+
+def local_source_identity(store, run):
+    local_git_environment()
+    ensure_workspace(store, run)
+    workspace = run['workspace']
+    root = store.source_root
+    head = local_git_text(root, 'rev-parse', '--verify', 'HEAD^{commit}')
+    reference = 'refs/heads/' + workspace['branch']
+    if local_git_text(root, 'symbolic-ref', 'HEAD') != reference or local_git_text(root, 'rev-parse', '--verify', reference) != head:
+        raise RunError('Local integration source branch or head changed')
+    return {
+        'repository': workspace['repo_id'], 'source_ref': reference, 'source_head': head,
+        'source_tree': local_git_text(root, 'rev-parse', head + '^{tree}'),
+    }
+
+
+def local_target_head(store, run):
+    target = local_merge_target(store.root, run)
+    if store.root == store.source_root or common_dir(store.root) != common_dir(store.source_root):
+        raise RunError('The canonical target and registered source must be distinct worktrees of one repository')
+    unfinished(store.root)
+    ref = 'refs/heads/' + target
+    if local_git_text(store.root, 'symbolic-ref', 'HEAD') != ref:
+        raise RunError('The canonical worktree does not have the authorized target branch checked out')
+    head = local_git_text(store.root, 'rev-parse', '--verify', ref + '^{commit}')
+    if local_git_text(store.root, 'rev-parse', '--verify', 'HEAD^{commit}') != head:
+        raise RunError('The canonical target HEAD and branch ref disagree')
+    return ref, head
+
+
+def local_worktree_dirt(root):
+    staged = local_git_paths(root, 'diff', '--cached', '--name-only', '--no-renames', '-z', '--')
+    hidden = local_git(root, 'ls-files', '-v', '-z').stdout.split(b'\0')
+    if staged or any(item and (item[:1].islower() or item.startswith(b'S ')) for item in hidden):
+        raise RunError('Local integration requires a clean, fully visible Git index')
+    changed = local_git_paths(root, 'diff', '--name-only', '--no-renames', '-z', '--')
+    others = local_git_paths(root, 'ls-files', '--others', '--exclude-standard', '-z')
+    return changed | others
+
+
+def local_unchanged_file(root, relative):
+    path = root / relative
+    if path.is_symlink() or not path.is_file():
+        return False
+    entries = local_git(root, 'ls-files', '--stage', '-z', '--', relative).stdout.split(b'\0')[:-1]
+    if len(entries) != 1:
+        return False
+    details, _ = entries[0].split(b'\t', 1)
+    mode, indexed, stage = details.split()
+    expected_mode = b'100755' if path.stat().st_mode & stat.S_IXUSR else b'100644'
+    if stage != b'0' or mode != expected_mode:
+        return False
+    # The index stat cache may be stale even when the file bytes are unchanged.
+    # Read the blob identity without refreshing the index or running Git filters.
+    current = local_git(root, 'hash-object', '--no-filters', '--', relative).stdout.strip()
+    return current == indexed
+
+
+def local_incoming(root, target_head, source_head):
+    return local_git_paths(root, 'diff', '--name-only', '--no-renames', '-z', target_head, source_head, '--')
+
+
+def local_preflight_collisions(root, incoming, dirt):
+    ignored = local_git_paths(root, 'ls-files', '--others', '--ignored', '--exclude-standard', '-z')
+    paths = dirt | ignored
+    # An empty ignored directory is absent from ls-files, and a symlink
+    # ancestor must not be followed during preflight.
+    tracked = local_git_paths(root, 'ls-files', '-z')
+    for relative in incoming:
+        if any(local_overlap(relative, path) for path in paths):
+            raise RunError('Incoming path has a tracked or untracked worktree collision: ' + repr(relative))
+        parts = relative.split('/')
+        for index in range(1, len(parts) + 1):
+            component = '/'.join(parts[:index])
+            actual = root / component
+            if actual.is_symlink():
+                raise RunError('Incoming path has a symlink obstruction: ' + repr(component))
+            if index == len(parts) and component not in tracked and actual.exists():
+                if not actual.is_dir() or not any(path.startswith(component + '/') for path in tracked):
+                    raise RunError('Incoming path has an untracked obstruction: ' + repr(component))
+
+
+def local_merge_base(store, run, source, target_head):
+    if target_head != run['workspace']['base_commit'] or target_head == source['source_head']:
+        raise RunError('The authorized target moved, diverged or has no incoming source commit')
+    result = local_git(store.root, 'merge-base', '--is-ancestor', target_head, source['source_head'], accepted=(0, 1))
+    if result.returncode:
+        raise RunError('The authorized target must be an ancestor of the reviewed source')
+
+
+def local_merge_receipt(root, preparation, current_head):
+    if current_head == preparation['target_head']:
+        raise RunError('The exact prepared local merge has not occurred')
+    parents = local_git_text(root, 'show', '-s', '--format=%P', current_head).split()
+    if parents != [preparation['target_head'], preparation['source_head']]:
+        raise RunError('The target does not have the exact prepared two-parent local merge')
+    tree = local_git_text(root, 'rev-parse', current_head + '^{tree}')
+    if tree != preparation['source_tree']:
+        raise RunError('The local merge tree does not match the reviewed incoming source tree')
+    return {'commit': current_head, 'parents': parents, 'tree': tree}
+
+
+def local_git_policy(root):
+    for key in ('commit.gpgSign', 'merge.verifySignatures'):
+        result = local_git(root, 'config', '--type=bool', '--get', key, accepted=(0, 1))
+        if result.returncode == 0 and result.stdout.strip() != b'false':
+            raise RunError('Local merge requires separate handling of the enabled Git signing policy: ' + key)
+    target = local_git_text(root, 'symbolic-ref', '--short', 'HEAD')
+    options = local_git(root, 'config', '--get-all', 'branch.' + target + '.mergeOptions', accepted=(0, 1))
+    if options.stdout.strip():
+        raise RunError('Local merge is blocked by branch-specific Git merge options')
+    configured = local_git(root, 'config', '--path', '--get', 'core.hooksPath', accepted=(0, 1))
+    if configured.returncode == 0:
+        value = configured.stdout.decode('utf-8').rstrip('\n')
+        if not value:
+            raise RunError('Local merge requires an unambiguous Git hook directory')
+        hooks = root / value
+    else:
+        hooks = Path(local_git_text(root, 'rev-parse', '--path-format=absolute', '--git-path', 'hooks'))
+    for name in ('pre-merge-commit', 'prepare-commit-msg', 'commit-msg', 'post-commit',
+                 'post-merge', 'reference-transaction', 'post-index-change'):
+        location = hooks / name
+        if location.is_file() and os.access(location, os.X_OK):
+            raise RunError('Local merge is blocked by an executable Git hook: ' + name)
+
+
+def run_local_merge(root, source_head):
+    local_git_policy(root)
+    local_git(root, 'merge', '--no-ff', '--no-edit', '--no-overwrite-ignore',
+              '--no-autostash', '--no-gpg-sign', source_head)
+
 
 def environment(store, payload=None):
     """Inspect prerequisites without reading secret contents or launching processes."""

@@ -1,0 +1,26 @@
+{
+  "task_id": "T-6d3df9b8-1712-4a41-b38e-aed827e28bfc",
+  "check_id": "contract-review",
+  "attempt_id": "C-ba817c31-3e32-4bee-af1b-75ea5e667540",
+  "assertion": "The external plugin contract defines pinned identity, dependency closure, host invocation, activation lifetime, input/result envelopes and existing-operation hook names. The contract preserves standalone resources, core authorization and acceptance boundaries, offline composition and guarded resume semantics. Workflow-changing choices and unresolved host limitations are explicitly routed to the owner workflow decision task. Project defaults, explicit temporary run overrides and frozen effective configuration are defined separately from installed-package state; confirmed installation enables only the exact displayed hooks and readiness effects.",
+  "result": "pass",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/scripts/pr-review-state.py": "a26cc95e66145a4917669466c3880f3d8252199a13c63b3e9e9f9fc30dc443d5",
+    ".skill-tree/common/scripts/workflow-state.py": "8dd23f17854937d9143329259e2af42a7319edc4ffed8b13117243d4bd7b9d52",
+    ".skill-tree/documents/plugin-system-contract.md": "19001702f22e73de4ae224d49e895e7db8f15f4b599a070c2c09fd7c4337eadf",
+    ".skill-tree/documents/plugin-system-research.md": "6a8062f4bb9c39abc9f0e1ef513d6af2e2f50a2b0f8616b30007c8e6bd718205",
+    ".skill-tree/templates/invariants.json": "4545894b07fab5f222d15eddd17c220408a4be8a5e5f25da3a4a34ef06bb87b5"
+  },
+  "reviewer": "Root source review and independent plan_current_source_facts verification against the unchanged immutable assertion",
+  "observations": [
+    "Pinned identity, resource/dependency closure, standalone owned copies and bounded activation retain the existing interface.",
+    "Current source checks and authorization guards remain mandatory; plan/contract changes implement no Auto or external-plugin runtime.",
+    "Offline composition, result envelopes, guarded attempts/replay and distinct installed/default/frozen configuration remain explicit.",
+    "Actual W1/W2 evidence resolves the initial design choices; missing capabilities and further material choices retain prerequisite/owner boundaries.",
+    "Exact installation confirmation still binds displayed versions, hooks, enabled state and readiness effects."
+  ],
+  "limitations": [
+    "Contract-design revalidation only. Original terminal outcome and immutable assertion remain unchanged; executable integration remains a separate delivery."
+  ]
+}

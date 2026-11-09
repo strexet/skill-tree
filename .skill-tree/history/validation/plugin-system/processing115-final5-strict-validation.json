@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "npm",
+    "run",
+    "validate"
+  ],
+  "changed_frozen_paths": [],
+  "cleanup_reserve_seconds": 20,
+  "exit_code": 0,
+  "hard_deadline_seconds": 120,
+  "name": "strict-validation",
+  "output": ".skill-tree/history/validation/plugin-system/processing115-final5-strict-validation.txt",
+  "qualification": "Deterministic source and isolated fixture qualification.",
+  "result": "pass",
+  "schema": 1,
+  "source_freeze": ".skill-tree/history/validation/plugin-system/processing115-final5-source-freeze.json",
+  "source_freeze_sha256": "deeecda124d3d4f74e2decf9e7dd568fb40ff245f3bda5c99713cd947ec8ea63",
+  "temporary_target_empty": null,
+  "timed_out": false,
+  "tool_wall_seconds": 11.082479500211775
+}

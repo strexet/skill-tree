@@ -1,11 +1,12 @@
 # Current Features
 
-All three flavors expose the same nine operation names.
+All three flavors expose the same eleven operation names.
 
 | Operation | Current responsibility |
 | --- | --- |
 | `skill-tree-add-pending-task` | Capture understood intent with identity, semantic classification and numeric priority. |
 | `skill-tree-process-future-pending` | Research selected Pending work and record scoped dispositions and dependencies. |
+| `skill-tree-clarify-tasks` | Refine an exact task/group through researched question rounds, guarded revisions and current owner confirmation. |
 | `skill-tree-implement-next-future-task` | Implement an exact or highest-priority eligible Prioritized task with acceptance evidence. |
 | `skill-tree-work-through-next` | Orchestrate one root and required dependencies through a retained checkpoint. |
 | `skill-tree-implement-all` | Orchestrate the initial Prioritized snapshot or an explicit selected group. |
@@ -13,6 +14,7 @@ All three flavors expose the same nine operation names.
 | `skill-tree-repo-documentation-audit` | Inspect implementation, repair document drift and persist findings and coverage. |
 | `skill-tree-create-documents-snapshot` | Create an explicit bounded documentation archive. |
 | `skill-tree-pr-review-cycle` | Record PR review/fix progress and gate explicitly authorized publication and merge. |
+| `skill-tree-plugins` | Inspect installed and known sources, preview exact package changes and configure ordered binding occurrences. |
 
 General packages use discovered repository recipes. Web packages add browser and hosted-evidence boundaries. Unity packages add Editor, package, fixture and runtime isolation contracts. Concrete specialization follows resolved capabilities.
 

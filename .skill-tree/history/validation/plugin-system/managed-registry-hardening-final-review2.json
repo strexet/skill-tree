@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "result": "clean",
+  "scope": "Complete authored runtime/caller/test/contracts diff with generated source identity verification; source review only, not test/provider execution or current native capture qualification.",
+  "source_freeze": ".skill-tree/history/validation/plugin-system/managed-registry-hardening-source-freeze2.json",
+  "source_freeze_sha256": "8a1614bbfd4e048d325ea20cd6a4ee72b858cdd7dab730d5a7b2c7903f879a63",
+  "identity": {
+    "base_oid": "15da5183000dcdf2d59e2bf7d7f6bf1f8ec50173",
+    "head": "f5e3734795b0f77bbd672ec8cdd8844730494438",
+    "source_digest": "007e7d1d78c7b87dd1f51b09be4cd86ad21a302f1f1588dfad02477a7a364d31"
+  },
+  "verified_sources": 265,
+  "reviewers": [
+    {
+      "actor_id": "/root/invocation118_oracle",
+      "kind": "independent-full-source-review",
+      "tool": "collaboration.followup_task",
+      "actual_result": "All previous findings are closed; last context override is accept-only, actual CL drift control checks zero callbacks. All 265 final freeze paths match; no new material finding, edits, test/provider calls or current-native claim."
+    },
+    {
+      "actor_id": "/root/registry117_architecture",
+      "kind": "independent-Python-WF-PR-component-and-last-delta-review",
+      "tool": "collaboration.followup_task",
+      "actual_result": "Final WF76589e1d and testsa7ae1a51 delta is clean; prepare/invoke/record retain frozen context, accept alone permits the verified after-context. Prior source/status/watch findings remain closed. Node author component review excludes Node authorship."
+    }
+  ],
+  "findings": [],
+  "qualification_corrections": [
+    ".skill-tree/history/validation/plugin-system/managed-registry-review-observations/managed-registry-carrier-fixture-qualification-correction.json"
+  ],
+  "limits": [
+    "Current passing formal checks and full repository lanes are required separately.",
+    "Historical actual native reports remain immutable and require bounded current compatibility analysis when their completed contract is selected."
+  ]
+}

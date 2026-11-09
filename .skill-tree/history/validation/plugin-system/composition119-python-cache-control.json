@@ -1,0 +1,10 @@
+{
+  "evidence_sha256": "d9b8281f0492cdb91c0965080c754baa9172e038a5dbfabf8bac2aad527f4c40",
+  "finding": "timestamp-bytecode-precedes-reviewed-source",
+  "limits": [
+    "A controlled source-backed unit finding, not product-host or external Skill qualification."
+  ],
+  "observation": "An isolated Python -I -B control executed controlled alternate cached code while the original source bytes remained unchanged.",
+  "raw_observation": ".skill-tree/history/validation/plugin-system/composition119-python-cache-observation.json",
+  "required_repair": "Set a fresh nonexistent pycache prefix before any owned helper import and keep bytecode writing disabled. Existing caches remain untouched."
+}

@@ -1,0 +1,71 @@
+F
+======================================================================
+FAIL: test_00_owned_enabled_live_publication_without_started_chain_blocks_readiness (__main__.PluginReviewPilotTests.test_00_owned_enabled_live_publication_without_started_chain_blocks_readiness)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 207, in test_00_owned_enabled_live_publication_without_started_chain_blocks_readiness
+    self.held()
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 198, in held
+    previous=self.publication.read_bytes();result=self.cli('ready',ok=False)
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-review.py", line 106, in cli
+    self.assertEqual(result.returncode,0 if ok else 2,result.stdout+result.stderr)
+AssertionError: 0 != 2 : {
+  "publication_id": "dddddddddddddddddddddddddddddddd",
+  "authorization": {
+    "instruction_digest": "df484877198fc37f4fbf07a3349fc378a3bc047e1541138712d222837ce0fe0f",
+    "merge": true,
+    "origin": "owner",
+    "pr": true
+  },
+  "findings": {},
+  "identity": {
+    "repo_id": "pilot-fixture-repository",
+    "remote": "origin",
+    "source_branch": "feature/pilot-fixture",
+    "target_branch": "develop",
+    "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "remote_id": null
+  },
+  "operations": {},
+  "pr": {
+    "id": "PR-pilot-fixture",
+    "number": 1,
+    "url": "https://example.invalid/pr/1"
+  },
+  "review": {
+    "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "evidence": [
+      "Synthetic full core diff/context/check observation."
+    ],
+    "findings": [],
+    "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "independent_approval": false,
+    "key": "c1bd286c3881ef825c9a1e61eaa7d86f49ca6a46f55f0be9628f8ac8adb9a0e6",
+    "unresolved": 0
+  },
+  "rounds": [
+    {
+      "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "evidence": [
+        "Synthetic full core diff/context/check observation."
+      ],
+      "findings": [],
+      "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "independent_approval": false,
+      "key": "c1bd286c3881ef825c9a1e61eaa7d86f49ca6a46f55f0be9628f8ac8adb9a0e6",
+      "unresolved": 0
+    }
+  ],
+  "schema": 1,
+  "snapshot_key": "c1bd286c3881ef825c9a1e61eaa7d86f49ca6a46f55f0be9628f8ac8adb9a0e6",
+  "status": "pr-ready",
+  "ci": "required-checks-passed"
+}
+
+
+----------------------------------------------------------------------
+Ran 1 test in 1.316s
+
+FAILED (failures=1)

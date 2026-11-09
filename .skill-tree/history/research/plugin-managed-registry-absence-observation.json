@@ -1,0 +1,145 @@
+{
+  "cleanup": {
+    "commits_created": false,
+    "controller_or_queue_changes": false,
+    "repository_registry_created": false,
+    "repository_source_changes": false,
+    "temporary_fixture_tree_removed": true
+  },
+  "finding": {
+    "consequence": "Managed registry absence is indistinguishable from the legitimate standalone mode at this preparation boundary. The preparation proof can retain a selected binding after loss of its installed-state authority.",
+    "location": ".skill-tree/lib/plugin-composition.js:149",
+    "observation": "The managed live-registry check runs only when the registry file exists. Deleting the registry while retaining the owned profile and composed package leaves both preparation paths without a stale-configuration prerequisite.",
+    "preserved_contract": "A source-free copied operation with no owned profile or global registry remains a legitimate standalone use case. Canonical queue sharing alone does not associate an execution checkout with an installation."
+  },
+  "kind": "controlled-local-managed-registry-absence-observation",
+  "limitations": [
+    "This observation records deterministic local preparation behavior only. No actual agent, native Skill call, plugin execution, provider integration or candidate-efficacy qualification occurred.",
+    "The fixture used local resource acquisition and scripted test consent; the fixture supplies no real installation consent or business approval.",
+    "Temporary package/profile bytes were removed during cleanup; their before/after equality booleans are observed, while exact values were not retained.",
+    "Actual runtime dispatch after registry deletion was not attempted."
+  ],
+  "method": [
+    "Create an isolated temporary checkout, installed project and controlled local SKILL.md source.",
+    "Install the selected core operation; prepare and apply the controlled plugin lifecycle proposal with explicitly scripted fixture confirmation; refresh the owned profile.",
+    "Read baseline runtime.freezePlan proof. Retain the registry bytes, owned profile bytes and composed manifest bytes.",
+    "Delete only the managed registry file; obtain freezePlan and occurrencePlan proofs against the retained compiled configuration.",
+    "Copy the operation into an independent directory and prepare the copied operation against an empty project with no owned profile or global registry.",
+    "Restore the exact original registry bytes; prepare and apply normal exact-ID lifecycle uninstall; obtain both proofs from the old composed operation.",
+    "Remove the complete temporary fixture tree."
+  ],
+  "observations": {
+    "before": {
+      "freeze": {
+        "live_bindings": 1,
+        "prerequisites": [],
+        "unresolved": 0
+      }
+    },
+    "manual_registry_deletion": {
+      "composed_manifest_unchanged": true,
+      "freeze": {
+        "live_bindings": 1,
+        "prerequisites": [],
+        "unresolved": 0
+      },
+      "occurrence": {
+        "live_bindings": 1,
+        "prerequisites": [],
+        "unresolved": 0
+      },
+      "owned_profile_unchanged": true,
+      "registry_path": ".skill-tree/installation/plugins.json"
+    },
+    "no_future_created": true,
+    "normal_managed_uninstall": {
+      "freeze": {
+        "live_bindings": 1,
+        "prerequisites": [
+          "configuration-stale"
+        ],
+        "unresolved": 0
+      },
+      "occurrence": {
+        "live_bindings": 1,
+        "prerequisites": [
+          "configuration-stale"
+        ],
+        "unresolved": 0
+      }
+    },
+    "standalone_no_profile_no_global_registry": {
+      "freeze": {
+        "live_bindings": 1,
+        "prerequisites": [],
+        "unresolved": 0
+      }
+    }
+  },
+  "provenance": {
+    "completed_output_chunk": "cf2863",
+    "initial_output_chunk": "9a90ea",
+    "observations_retained_as": "Exact scalar proof fields from the completed local probe output; no unobserved profile or manifest digest values are asserted.",
+    "tool": "functions.exec / tools.exec_command, followed by tools.write_stdin"
+  },
+  "recorded_at": "2026-11-06T11:41:35.209624+00:00",
+  "schema": 1,
+  "scope": {
+    "actual_actor_contexts": 0,
+    "actual_native_invocations": 0,
+    "anchor": "before",
+    "binding_id": "controlled-before",
+    "context_kind": "request",
+    "controlled_plugin_id": "controlled",
+    "flavor": "general",
+    "host_capability_data": [
+      "codex-source-backed-context"
+    ],
+    "network_requests": 0,
+    "operation": "skill-tree-add-pending-task",
+    "provider_destination": "codex",
+    "source_kind": "local"
+  },
+  "source_commit": "633e716def20d09847913bc432b0cfaf1e58bb63",
+  "source_identity": {
+    "current_worktree_hash_note": "Current worktree hashes are recording-time measurements during task117 development, not additional probe observations.",
+    "method": "The probe extracted the exact .skill-tree Git archive at the reported source commit into a temporary checkout and installed from that checkout. Hashes below were reconstructed from the same pinned Git blobs when recording this observation.",
+    "source_fingerprints": {
+      ".skill-tree/common/scripts/plugin-hooks.js": {
+        "current_worktree_matches_probed_commit_at_recording": true,
+        "current_worktree_sha256_at_recording": "3ed78006e6abfb8a70cf191f1b310f41b50f3c60b3131bca3722c89af6753102",
+        "probed_commit_sha256": "3ed78006e6abfb8a70cf191f1b310f41b50f3c60b3131bca3722c89af6753102"
+      },
+      ".skill-tree/lib/installation.js": {
+        "current_worktree_matches_probed_commit_at_recording": false,
+        "current_worktree_sha256_at_recording": "efb88bc5a28246aab36c7d1cb709f5ec4fb37dc736867c3533503e74c26fa431",
+        "probed_commit_sha256": "bad4bfdadd9a7a87841af4f5599dbd0b698b602655deaa45ea1b05a924c9bdd9"
+      },
+      ".skill-tree/lib/plugin-composition.js": {
+        "current_worktree_matches_probed_commit_at_recording": true,
+        "current_worktree_sha256_at_recording": "3a2b5af0329c6e0a98754c512388df0d447f0d08181fa39fd8cf7fa4905225db",
+        "probed_commit_sha256": "3a2b5af0329c6e0a98754c512388df0d447f0d08181fa39fd8cf7fa4905225db"
+      },
+      ".skill-tree/lib/plugin-lifecycle.js": {
+        "current_worktree_matches_probed_commit_at_recording": true,
+        "current_worktree_sha256_at_recording": "05f1604a464385532cdda5d1b729c6286aac625c2bb279495b44b30155fc4e9e",
+        "probed_commit_sha256": "05f1604a464385532cdda5d1b729c6286aac625c2bb279495b44b30155fc4e9e"
+      },
+      ".skill-tree/lib/plugin-registry.js": {
+        "current_worktree_matches_probed_commit_at_recording": true,
+        "current_worktree_sha256_at_recording": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+        "probed_commit_sha256": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005"
+      },
+      ".skill-tree/lib/plugin-runtime.js": {
+        "current_worktree_matches_probed_commit_at_recording": true,
+        "current_worktree_sha256_at_recording": "5e9827cc3e59fece6a95afd76f90181e7f2c9eb6a049f0c9a0c7a6ad6730dcb8",
+        "probed_commit_sha256": "5e9827cc3e59fece6a95afd76f90181e7f2c9eb6a049f0c9a0c7a6ad6730dcb8"
+      }
+    }
+  },
+  "triage": {
+    "queue_action_performed": false,
+    "recommendation": "Capture a separate hardening Pending item, nonblocking for inventory/removal task117, and require the managed-registry-absence control before the future Ponytail pilot116 relies on stale-configuration gating.",
+    "suggested_acceptance": "An actually associated owned installation with a registry requirement returns an explicit prerequisite when the live registry is absent or unreadable; standalone copies without an owned profile/global registry remain usable."
+  }
+}

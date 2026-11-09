@@ -1,0 +1,1 @@
+git diff --check passed after source freeze and canonical generation.

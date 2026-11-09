@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "qualification": "Supplemental requirements-led deterministic fixture observations before runtime repair; no actual native/provider, human approval, product runtime or plugin efficacy claim.",
+  "baseline_runtime_commit": "f5e3734795b0f77bbd672ec8cdd8844730494438",
+  "baseline_runtime_source_fingerprints": {
+    ".skill-tree/lib/plugin-composition.js": "3a2b5af0329c6e0a98754c512388df0d447f0d08181fa39fd8cf7fa4905225db",
+    ".skill-tree/lib/plugin-runtime.js": "5e9827cc3e59fece6a95afd76f90181e7f2c9eb6a049f0c9a0c7a6ad6730dcb8",
+    ".skill-tree/common/scripts/plugin-hooks.js": "3ed78006e6abfb8a70cf191f1b310f41b50f3c60b3131bca3722c89af6753102",
+    ".skill-tree/common/scripts/plugin-invocation.py": "281165ce83ed4309e4c841721b4461c71a447c4070c496a3c7ca37598af64d7d",
+    ".skill-tree/common/scripts/workflow-state.py": "57383709635e780c6d207834fba5396583f1ecfe86ac2456380fabf755b6a68b"
+  },
+  "baseline_fact_evidence": "Actual Node and Python authors confirmed unchanged runtime at supplemental observations; root verified all four original runtime files byte-identical before official Red and before repair release.",
+  "original_official_red": [
+    "C-ce373634-5b80-4334-979b-100ceff3df40",
+    "C-9f4f2d85-4c5e-458f-bdeb-5aca5e68255b",
+    "C-3e06e5e3-2227-4c29-b31a-1d7fa553e981"
+  ],
+  "supplemental_observed": {
+    "non_manifest_resealed_receipt": {
+      "discovered": 1,
+      "failed": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "owned_symlink_entry_cli": {
+      "discovered": 3,
+      "failed": 3,
+      "errors": 0,
+      "skipped": 0
+    },
+    "python_admission_and_writer_entry": {
+      "discovered": 2,
+      "failed_assertion_entries": 7,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "historical_test_hashes": {
+    "composition42": "c829f69c154335b176739d0c6591a85fb0bd7212189cff4a9f279ab53371f9d7",
+    "copied14": "a7861d4512c4555d2ec5c748d7fd034efdfb206181dcefdddf754893d545dd70",
+    "python66": "88962ea3529379fa296678dd74b25e6206bff9d012d9065ecdb6f8ad233631c6"
+  },
+  "qualification_limits": [
+    "Executable CLI failure precedes WF assertions in the added entry tests; independent controlled entry observation separately records the actual WF bypass.",
+    "Later additional combined assertions or readiness controls are not relabeled as having been executed in these historical Red observations.",
+    "Initial Python fixture errors were corrected before frozen official Red and are not counted as product defects."
+  ],
+  "artifacts": {
+    "managed-registry-complete-resource-red-local.txt": "743bc58a37d9ea7f835e73103efebb86036812a548f5f20b6f80011785666551",
+    "managed-registry-owned-entry-red-local.txt": "672a87c2e7380560c744d8c8aa04933b5bdfc7188e2795cc9c16e5461ea2bf37",
+    "managed-registry-python-review-gap-red.txt": "bbff88888833a11a35509e8bd02a3d558761925d0bc856956ffd9796391e4d5c",
+    "managed-registry-owned-link-entry-observation.json": "f81faf3f7fabb442c6af1f6f562ef8ca12abcb715b7652da07916eb4561c290d"
+  }
+}

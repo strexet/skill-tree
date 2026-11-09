@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "id": "task-editorial",
+  "source": {
+    "kind": "repository",
+    "url": "https://github.com/mattpocock/skills",
+    "ref": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "entry": "skills/productivity/writing-for-agents/SKILL.md"
+  },
+  "resources": [
+    "LICENSE",
+    "skills/productivity/writing-for-agents/SKILL-MECHANICS.md"
+  ],
+  "dependencies": [],
+  "capabilities": [
+    "codex-source-backed-context"
+  ],
+  "metadata": {
+    "title": "Pinned task-wording editorial application",
+    "upstream_repository": "mattpocock/skills",
+    "upstream_skill_name": "writing-for-agents",
+    "application": "task-editorial",
+    "license": "MIT",
+    "license_resource": "LICENSE",
+    "source_verification": {
+      "expected_git_blob": "a37608daf6e835e767deecfb498facecaaba82ba",
+      "expected_entry_bytes": 10886,
+      "expected_digests": {
+        "skills/productivity/writing-for-agents/SKILL.md": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+        "LICENSE": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+        "skills/productivity/writing-for-agents/SKILL-MECHANICS.md": "c768e6307c7c10728c401c213f2c4ba71c542127eeb7ad2956aabd15a0fa0059"
+      },
+      "expected_content_digest": "a07c7cf13cd8f42c869d7fb261ce2576339749eb5fead2433d98beb3be73d30f",
+      "evidence": ".skill-tree/tests/fixtures/task-processing/source-manifest.json"
+    },
+    "application_policy": {
+      "operation": "skill-tree-process-future-pending",
+      "suggested_anchor": "after",
+      "core_only_creates_binding": false,
+      "requires_explicit_install_enable_confirmation": true,
+      "readiness_effect": "An explicitly enabled matching task application requires the current owned CL, actual configured contributions, affected rechecks and current-mode acceptance before implementation."
+    },
+    "qualification": "Pinned source and declared adapter scope only. Source preparation and descriptor presence supply no successful external invocation, native-host qualification or comparative improvement evidence.",
+    "runtime_prerequisites": [
+      {
+        "name": "codex-source-backed-context",
+        "condition": "Every selected source-backed application invocation.",
+        "unavailable_effect": "The enabled invocation retains an explicit prerequisite."
+      }
+    ],
+    "application_boundary": "Task wording and skill/agent-document maintenance remain separate applications."
+  },
+  "adapter": {
+    "context_kinds": [
+      "task",
+      "task-group"
+    ],
+    "processing_application": {
+      "schema": 1,
+      "roles": [
+        "task-editorial"
+      ],
+      "default_role": "task-editorial",
+      "instructions": "Apply the exact pinned writing-for-agents reference to the selected T-task document under repository task-document rules. Preserve the stable task ID, Pending and processing provenance, relationships, constraints, dependency graph and required Goal/Touch/Validation/Acceptance structure and check mapping. Return bounded task-wording proposals, concrete findings or questions bound to the exact current task input. The core applies authorized guarded revisions and owns readiness. A task remains a task; skill frontmatter, native invocation flags and agent-document maintenance belong to separate applications. The SKILL-MECHANICS resource remains available for the original conditional skill-document branch; the task application supplies no skill conversion. Editorial pruning and phrasing preserve required constraints and authorization rules. Semantic changes require affected clarification and wording rechecks; supported formatting-only changes retain semantic validity. Distinct configured occurrences retain separate identities and order; current matching later editorial evidence can satisfy an affected recheck once. Project, queue, provider and installation writes remain core responsibilities. Immutable application scope remains separate from replaceable parameters and extra instructions."
+    },
+    "parameter_defaults": {
+      "upstream": {
+        "values": {}
+      }
+    }
+  },
+  "expectedDigests": {
+    "skills/productivity/writing-for-agents/SKILL.md": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+    "LICENSE": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+    "skills/productivity/writing-for-agents/SKILL-MECHANICS.md": "c768e6307c7c10728c401c213f2c4ba71c542127eeb7ad2956aabd15a0fa0059"
+  }
+}

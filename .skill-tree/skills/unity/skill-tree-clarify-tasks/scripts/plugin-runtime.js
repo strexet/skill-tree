@@ -1,0 +1,190 @@
+'use strict';
+// Owned preparation only. Native host execution remains outside this module.
+const fs=require('node:fs'),crypto=require('node:crypto');
+const composition=require('./plugin-composition.js'),bindings=require('./plugin-bindings.js'),parameters=require('./plugin-parameters.js'),registry=require('./plugin-registry.js');
+const own=(value,key)=>Object.hasOwn(value,key),object=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
+const clone=value=>parameters.resolveParameters({run:{values:value}}).values;
+function canonical(value){if(Array.isArray(value))return '['+value.map(canonical).join(',')+']';if(object(value))return '{'+Object.keys(value).sort().map(key=>JSON.stringify(key)+':'+canonical(value[key])).join(',')+'}';return JSON.stringify(value);}
+const digest=value=>crypto.createHash('sha256').update(canonical(clone(value))).digest('hex');
+const bytesHash=value=>crypto.createHash('sha256').update(value).digest('hex');
+function fail(code,message){const error=Error(message);error.code=code;throw error;}
+function same(left,right){return canonical(left)===canonical(right);}
+function snapshot(packageRoot,manifest,projectRoot){
+ const result={};
+ const library=new Set(['plugin-runtime.js','plugin-composition.js','plugin-bindings.js','plugin-parameters.js','plugin-registry.js','plugin-sources.js']);
+ const common=new Set(['workflow-state.py','plugin-invocation.py','plugin-processing.py','run-workspaces.py','decision-governance.py','decision-orchestration.py','validate-document-rules.py','plugin-hooks.js']);
+ for(const [relative,sum]of Object.entries(manifest.owned_resources)){
+  if(relative.startsWith('scripts/')&&library.has(relative.slice(8)))result['lib/'+relative.slice(8)]=sum;
+  else if(relative.startsWith('scripts/')&&common.has(relative.slice(8)))result['common/scripts/'+relative.slice(8)]=sum;
+  else if(relative.startsWith('references/')&&['decision-governance.md','validation-policy.md'].includes(relative.slice(11)))result['common/'+relative]=sum;
+  result['owned/'+relative]=sum;
+ }
+ result['operation-manifest']=bytesHash(fs.readFileSync(registry.safe(packageRoot,'references/plugin-bindings.json')));
+ const profile=registry.safe(projectRoot,'.skill-tree/installation/profile.json');result['owned-profile']=fs.existsSync(profile)?bytesHash(fs.readFileSync(profile)):null;
+ return result;
+}
+function supportedAdapter(request){
+ const adapter=request.adapter||{provider:'codex',mechanism:'source-backed-context'};
+ return adapter.provider==='codex'&&adapter.mechanism==='source-backed-context'&&Array.isArray(request.capabilities)&&request.capabilities.includes('codex-source-backed-context');
+}
+function executionPolicy(value){
+ const policy=clone(value||{allowed_tools:['read-pinned-resources','read-scoped-context'],allowed_actions:['return-proposals']});
+ if(!object(policy))fail('runtime-authority','An owned execution policy is required');
+ for(const key of ['allowed_tools','allowed_actions'])if(!Array.isArray(policy[key])||policy[key].some(item=>typeof item!=='string'||!item)||new Set(policy[key]).size!==policy[key].length)fail('runtime-authority','Allowed tools and actions require distinct bounded names');return policy;
+}
+function compiledConfiguration(manifest,runOverrides={},policyValue){
+ const catalog=composition.createCatalog(manifest.operations),compiled=bindings.compileBindings(manifest.definitions,{packages:manifest.packages,catalog,parameterDefaults:manifest.parameter_defaults,runOverrides});
+ const policy=executionPolicy(policyValue);
+ return {catalog,compiled,configuration:{configuration_digest:digest({binding_configuration_digest:compiled.configuration_digest,execution_policy:policy}),binding_configuration_digest:compiled.configuration_digest,execution_policy:policy,bindings:clone(compiled.bindings),definitions:clone(manifest.definitions),packages:clone(manifest.packages),parameter_defaults:clone(manifest.parameter_defaults),run_overrides:clone(runOverrides),manifest_identity:manifest.identity,operation:manifest.operation}};
+}
+function businessRequest(payload){if(own(payload,'proof_kind')||own(payload,'readiness_kind'))fail('runtime-proof','Completed readiness cannot substitute for business preparation');return clone(payload);}
+const processingAfter='skill-tree-process-future-pending:after';
+const processingRoles=new Set(['task-editorial','task-interview']);
+function requireProposalActions(policy){
+ if(policy.allowed_actions.some(action=>action!=='return-proposals')){
+  fail('runtime-application','A Processing application permits proposal actions only');
+ }
+}
+function processingApplication(row,record){
+ const declaration=record.adaptation?.processing_application,hasOverride=own(row,'application');
+ if(declaration===undefined&&!hasOverride)return undefined;
+ if(!object(declaration)||declaration.schema!==1||!Array.isArray(declaration.roles)||!declaration.roles.length||
+    declaration.roles.some(role=>!processingRoles.has(role))||new Set(declaration.roles).size!==declaration.roles.length||
+    own(declaration,'default_role')&&!declaration.roles.includes(declaration.default_role)||
+    own(declaration,'instructions')&&typeof declaration.instructions!=='string'){
+  fail('runtime-application','A Processing application requires a bounded immutable role declaration');
+ }
+ if(hasOverride&&(!object(row.application)||Object.keys(row.application).length!==1||
+    !own(row.application,'role')||!declaration.roles.includes(row.application.role))){
+  fail('runtime-application','The occurrence must select exactly one declared Processing application role');
+ }
+ const role=hasOverride?row.application.role:declaration.default_role;
+ if(role===undefined)return undefined;
+ return {role,...(own(declaration,'instructions')?{instructions:declaration.instructions}:{})};
+}
+function recheckSelection(selection,prerequisites,boundary,configuration){
+ const mandate=boundary.guard?.processing_recheck;
+ const {processing_recheck_id:recheckId,processing_recheck_digest:mandateDigest}=boundary.context;
+ if(!object(mandate)||mandate.recheck_id!==recheckId||mandate.mandate_digest!==mandateDigest||
+    mandate.configuration_digest!==configuration.configuration_digest||
+    !Array.isArray(mandate.binding_ids)||mandate.binding_ids.length!==1){
+  fail('runtime-recheck','The editorial recheck requires the exact owned clarification mandate and full frozen configuration');
+ }
+ const target=mandate.binding_ids[0],origin=configuration.bindings.find(row=>row.id===target);
+ if(!origin||processingApplication(origin,configuration.packages[origin.plugin_id])?.role!=='task-editorial'){
+  fail('runtime-recheck','The editorial recheck mandate must bind one frozen editorial occurrence');
+ }
+ const frozenIds=new Set(configuration.bindings.map(row=>row.id));
+ const relevant=(item,key)=>!object(item)||!frozenIds.has(item[key])||item[key]===target;
+ const eligible=selection.bindings.filter(row=>row.id===target),unresolved=selection.unresolved.filter(item=>relevant(item,'id'));
+ const retained=prerequisites.filter(item=>relevant(item,'binding_id'));
+ if(!eligible.length||retained.some(item=>item?.binding_id===target&&item.code==='missing-capability')){
+  retained.push({code:'required-recheck-ineligible',reason:'The mandated editorial occurrence requires current eligibility and capability.'});
+ }
+ return {bindings:eligible,unresolved,prerequisites:retained,diagnostics:{
+  binding_ids:selection.bindings.map(row=>row.id),unresolved:clone(selection.unresolved),prerequisites:clone(prerequisites)
+ }};
+}
+function proofFor(packageRoot,manifest,request,configuration,compiled,catalog,readiness=false){
+ const boundary=readiness?composition.prepareReadinessBoundary(packageRoot,request):composition.prepareBoundary(packageRoot,request);
+ const eligibilityContext=readiness?boundary.guard?.processing_recheck?.selection_context??request.context:request.context;
+ const selection=bindings.selectBindings(compiled,request.event,eligibilityContext);
+ const prerequisites=boundary.prerequisites.filter(item=>item.code!=='invocation-unqualified'||!supportedAdapter(request));
+ const current=composition.hasProcessingRecheck(request.context)
+  ?recheckSelection(selection,prerequisites,boundary,configuration)
+  :{bindings:selection.bindings,unresolved:selection.unresolved,prerequisites};
+ if(current.bindings.length&&!supportedAdapter(request))current.prerequisites.push({code:'unsupported-adapter',reason:'The current host must explicitly support the source-backed Codex context adapter.'});
+ const applications={};
+ if(selection.event.boundary_id===processingAfter){
+  for(const row of current.bindings){
+   const application=processingApplication(row,configuration.packages[row.plugin_id]);
+   if(application)applications[row.id]=application;
+  }
+ }
+ if(Object.keys(applications).length)requireProposalActions(configuration.execution_policy);
+ return {
+  ...(readiness?{proof_kind:'completed-readiness'}:{}),
+  configuration_digest:configuration.configuration_digest,context:clone(boundary.context),event:clone(selection.event),
+  bindings:clone(current.bindings),unresolved:clone(current.unresolved),prerequisites:clone(current.prerequisites),
+  execution_snapshot:snapshot(packageRoot,manifest,request.project_root),guard:boundary.guard||null,
+  adapter:{provider:'codex',mechanism:'source-backed-context',native_skill_tool:false},
+  ...(Object.keys(applications).length?{processing_applications:applications}:{}),
+  ...(current.diagnostics?{processing_recheck_diagnostics:current.diagnostics}:{})
+ };
+}
+function freezePlan(packageRoot,payload){
+ const request=businessRequest(payload),{manifest}=composition.verifiedManifest(packageRoot),{configuration,compiled,catalog}=compiledConfiguration(manifest,request.run_overrides||{},request.execution_policy);
+ if(request.event?.operation!==manifest.operation)fail('runtime-operation','The hook event differs from the composed operation');
+ return {configuration,proof:proofFor(packageRoot,manifest,request,configuration,compiled,catalog)};
+}
+function frozenPlan(packageRoot,payload,readiness){
+ const request=clone(payload),{manifest}=composition.verifiedManifest(packageRoot),frozen=request.configuration;
+ if(!object(frozen)||frozen.operation!==manifest.operation||request.event?.operation!==manifest.operation)fail('runtime-configuration','The frozen operation configuration is required');
+ if(frozen.manifest_identity!==manifest.identity)return {...(readiness?{proof_kind:'completed-readiness',guard:null,adapter:{provider:'codex',mechanism:'source-backed-context',native_skill_tool:false}}:{}),configuration_digest:frozen.configuration_digest,context:clone(request.context),event:clone(request.event),bindings:[],unresolved:[],prerequisites:[{code:'configuration-stale',reason:'The owned operation changed; explicitly reconcile the frozen chain before continuation.'}],execution_snapshot:snapshot(packageRoot,manifest,request.project_root)};
+ const current=compiledConfiguration(manifest,frozen.run_overrides||{},frozen.execution_policy);
+ if(!same(current.configuration,frozen))fail('runtime-configuration','The recorded frozen configuration differs from the owned definitions and explicit overrides');
+ return proofFor(packageRoot,manifest,request,current.configuration,current.compiled,current.catalog,readiness);
+}
+function occurrencePlan(packageRoot,payload){return frozenPlan(packageRoot,businessRequest(payload),false);}
+function readinessPlan(packageRoot,payload){return frozenPlan(packageRoot,payload,true);}
+function requirementPlan(packageRoot,payload){
+ if(composition.hasProcessingRecheck(payload.context))fail('runtime-recheck','Requirement inspection cannot authorize an editorial recheck mandate');
+ const request=clone(payload),{manifest}=composition.verifiedManifest(packageRoot),{configuration,compiled,catalog}=compiledConfiguration(manifest,request.run_overrides||{},request.execution_policy);
+ if(request.event?.operation!==manifest.operation)fail('runtime-operation','The requirement event differs from the composed operation');
+ return {configuration,proof:proofFor(packageRoot,manifest,request,configuration,compiled,catalog,true)};
+}
+function invocationPolicy(record){
+ const policy=record.adaptation?.invocation_policy;
+ if(policy===undefined)return undefined;
+ if(!object(policy)||policy.schema!==1||policy.context_lifetime!=='single-attempt'||policy.kind!=='report-only'||policy.require_context_end!==true||policy.fresh_context_per_attempt!==true)fail('runtime-policy','A supported isolated report-only invocation policy is required');
+ for(const key of ['allowed_tools','allowed_actions'])if(!Array.isArray(policy[key])||policy[key].some(value=>typeof value!=='string'||!value)||new Set(policy[key]).size!==policy[key].length)fail('runtime-policy','The immutable invocation policy requires distinct bounded tools and actions');
+ if(own(policy,'instructions')&&typeof policy.instructions!=='string')fail('runtime-policy','The immutable invocation policy instructions require text');
+ if(policy.allowed_actions.some(value=>value!=='return-proposals'))fail('runtime-policy','A review invocation cannot authorize writes or publication');
+ return clone(policy);
+}
+function resolvePrivate(value,resolver,secrets){
+ if(object(value)&&Object.keys(value).length===1&&own(value,'$secret')){
+  const name=value.$secret;if(typeof name!=='string'||!name||typeof resolver!=='function')fail('runtime-secret','A permitted invocation-context secret provider is required');
+  let resolved;try{resolved=resolver(name);}catch{fail('runtime-secret','The invocation-context secret provider is unavailable');}
+  if(resolved===undefined)fail('runtime-secret','The invocation-context secret provider did not resolve a required reference');
+  const safe=clone(resolved);secrets.push(safe);return safe;
+ }
+ if(Array.isArray(value))return value.map(item=>resolvePrivate(item,resolver,secrets));
+ if(object(value))return Object.fromEntries(Object.keys(value).map(key=>[key,resolvePrivate(value[key],resolver,secrets)]));return value;
+}
+function deliveryData(packageRoot,payload,resolveSecret){
+ const request=businessRequest(payload),proof=occurrencePlan(packageRoot,request),input=request.public_input;
+ if(!object(input)||typeof request.input_digest!=='string'||!/^[a-f0-9]{64}$/.test(request.input_digest))fail('runtime-input','The original public attempt and exact input digest are required');
+ if(request.binding_id!==undefined&&request.binding_id!==input.binding_id)fail('runtime-input','Private delivery must retain the exact original binding identity');
+ const frozenIds=new Set(request.configuration.bindings.map(item=>item.id));
+ if(!frozenIds.has(input.binding_id))fail('runtime-binding','The original binding is absent from the frozen configuration');
+ // Raw requirements remain visible; only global and this original occurrence gate delivery.
+ const applicable=(item,key)=>!object(item)||!own(item,key)||typeof item[key]!=='string'||!frozenIds.has(item[key])||item[key]===input.binding_id;
+ if(proof.prerequisites.some(item=>applicable(item,'binding_id'))||proof.unresolved.some(item=>applicable(item,'id')))fail('runtime-prerequisite','The current hook preparation has applicable unresolved prerequisites');
+ const row=proof.bindings.find(item=>item.id===input.binding_id);
+ if(!row)fail('runtime-binding','The original binding is not eligible in the current accepted context');
+ const owned=composition.verifiedManifest(packageRoot),rebuilt=compiledConfiguration(owned.manifest,request.configuration.run_overrides||{},request.configuration.execution_policy);
+ const deliverySelection=bindings.selectBindings(rebuilt.compiled,{...request.event,attempt_id:request.attempt_id},request.context),deliveryRow=deliverySelection.bindings.find(item=>item.id===row.id);
+ if(!deliveryRow)fail('runtime-binding','The actual invocation occurrence is no longer selected');
+ const record=request.configuration.packages[row.plugin_id],secrets=[],invocation=invocationPolicy(record);
+ if(!same(invocation??null,input.invocation_policy??null))fail('runtime-policy','Private delivery differs from the sealed immutable invocation policy');
+ const application=own(proof.processing_applications||{},row.id)?proof.processing_applications[row.id]:undefined;
+ if(!same(application??null,input.processing_application??null))fail('runtime-application','Private delivery differs from the sealed immutable Processing application');
+ const grant=clone(request.authority);if(!object(grant)||!same(grant,input.authority)||grant.context_id!==input.context?.id||!Array.isArray(grant.constraints)||!grant.constraints.length)fail('runtime-authority','The exact sealed bounded core authority must accompany private delivery');
+ const policy=executionPolicy(request.configuration.execution_policy);
+ if(!same(policy,input.execution_policy))fail('runtime-authority','Private delivery must retain the sealed allowed tools and actions');
+ if(application)requireProposalActions(policy);
+ if(invocation&&(['allowed_tools','allowed_actions'].some(key=>policy[key].some(value=>!invocation[key].includes(value)))))fail('runtime-policy','The effective tools or actions exceed the immutable report-only policy');
+ if(!same(input.context,proof.context)||!same(input.event,proof.event)||input.chain_id!==request.chain_id||input.attempt_id!==request.attempt_id||input.binding_id!==row.id||input.configuration_digest!==request.configuration.configuration_digest)fail('runtime-input','Private delivery must retain the exact sealed occurrence and accepted context');
+ if(request.execution_policy!==undefined&&!same(policy,executionPolicy(request.execution_policy)))fail('runtime-authority','Private delivery cannot replace the frozen allowed tools or actions');
+ const values=resolvePrivate(row.effective.values,resolveSecret,secrets),options={run:{values,instructions:row.effective.instructions}};
+ // The declared configuration schema already validated references before private resolution.
+ const resolved=parameters.resolveParameters(options);
+ const dispatch=bindings.dispatchIdentity(deliveryRow,deliverySelection.event,deliverySelection.context,{configuration_digest:request.configuration.configuration_digest,parameters:resolved.values,extra_instructions:resolved.instructions});
+ const data={dispatch_identity:dispatch,mechanism:'source-backed-context',provider:'codex',mode:input.mode,authority:grant,authority_digest:input.authority_digest,allowed_tools:policy.allowed_tools,allowed_actions:policy.allowed_actions,chain_id:request.chain_id,attempt_id:request.attempt_id,binding_id:row.id,event:clone(proof.event),plugin:{plugin_id:row.plugin_id,revision:record.revision,content_digest:record.content_digest,entry:record.entry,resource_digests:clone(record.files)},context:clone(proof.context),scope_source_snapshot:clone(input.scope_source_snapshot||{}),parameters:resolved.values,extra_instructions:resolved.instructions,input_digest:request.input_digest};
+ if([data.chain_id,data.attempt_id].some(value=>typeof value!=='string'||!value))fail('runtime-input','The actual chain and original attempt identities are required');
+ if(invocation)data.invocation_policy=invocation;
+ if(application)data.processing_application=application;
+ return {payload:data,dispatch_identity:dispatch,input_digest:request.input_digest,delivery_digest:digest(data),resolved_parameter_digest:resolved.digest,configuration_parameter_digest:row.effective.digest,contains_secrets:secrets.length>0};
+}
+module.exports={freezePlan,occurrencePlan,readinessPlan,requirementPlan,deliveryData,canonical,digest};

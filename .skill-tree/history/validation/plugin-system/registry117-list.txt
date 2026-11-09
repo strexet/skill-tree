@@ -1,0 +1,46 @@
+Flavors: general, web, unity
+Providers:
+claude-code	Claude Code	tier=1	soft=false
+codex	OpenAI Codex	tier=1	soft=false
+gemini-cli	Gemini CLI	tier=1	soft=false
+cursor	Cursor	tier=1	soft=false
+windsurf	Windsurf	tier=1	soft=false
+cline	Cline	tier=1	soft=false
+github-copilot	GitHub Copilot	tier=1	soft=false
+opencode	OpenCode	tier=1	soft=false
+roo	Roo Code	tier=1	soft=false
+kilo	Kilo Code	tier=1	soft=false
+continue	Continue	tier=1	soft=false
+junie	JetBrains Junie	tier=1	soft=true
+kiro-cli	Kiro CLI	tier=1	soft=false
+openhands	OpenHands	tier=1	soft=true
+qwen-code	Qwen Code	tier=1	soft=false
+goose	Goose	tier=1	soft=false
+aider-desk	AiderDesk	tier=1	soft=true
+amp	Sourcegraph Amp	tier=1	soft=false
+warp	Warp	tier=1	soft=true
+replit	Replit Agent	tier=1	soft=true
+antigravity	Antigravity	tier=2	soft=true
+augment	Augment	tier=2	soft=true
+bob	IBM Bob	tier=2	soft=true
+crush	Crush	tier=2	soft=true
+devin	Devin for Terminal	tier=2	soft=true
+droid	Droid	tier=2	soft=true
+forgecode	ForgeCode	tier=2	soft=true
+iflow-cli	iFlow CLI	tier=2	soft=true
+rovodev	Rovo Dev	tier=2	soft=true
+tabnine-cli	Tabnine CLI	tier=2	soft=true
+trae	Trae	tier=2	soft=true
+generic	Generic Manual Fallback	tier=3	soft=true
+
+Logical operations:
+skill-tree-add-pending-task
+skill-tree-clarify-tasks
+skill-tree-create-documents-snapshot
+skill-tree-implement-all
+skill-tree-implement-next-future-task
+skill-tree-pr-review-cycle
+skill-tree-process-future-pending
+skill-tree-repo-documentation
+skill-tree-repo-documentation-audit
+skill-tree-work-through-next

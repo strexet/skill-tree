@@ -1,0 +1,7 @@
+{
+  "kind": "fixture-construction-preflight-not-feature-qualification",
+  "profile_registry_identity_match": true,
+  "canonical_hc_checksum_accepted": true,
+  "prepared_then_reconciled": true,
+  "no_future": true
+}

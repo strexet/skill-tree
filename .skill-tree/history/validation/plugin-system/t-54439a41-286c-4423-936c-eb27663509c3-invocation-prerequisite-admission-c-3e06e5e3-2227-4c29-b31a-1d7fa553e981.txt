@@ -1,0 +1,202 @@
+...FFFFFFFFF.....................F......F..................F...FFF.F......
+======================================================================
+FAIL: test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically (__main__.PluginInvocationTests.test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically) (kind='global', command='invoke')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 696, in test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically (__main__.PluginInvocationTests.test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically) (kind='global', command='record')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 696, in test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically (__main__.PluginInvocationTests.test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically) (kind='global', command='accept')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 696, in test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically (__main__.PluginInvocationTests.test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically) (kind='current', command='invoke')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 696, in test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically (__main__.PluginInvocationTests.test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically) (kind='current', command='record')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 696, in test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically (__main__.PluginInvocationTests.test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically) (kind='current', command='accept')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 696, in test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically (__main__.PluginInvocationTests.test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically) (kind='unresolved', command='invoke')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 696, in test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically (__main__.PluginInvocationTests.test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically) (kind='unresolved', command='record')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 696, in test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically (__main__.PluginInvocationTests.test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically) (kind='unresolved', command='accept')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 696, in test_applicable_prerequisites_and_unresolved_rows_block_each_business_transition_atomically
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_held_start_stays_inspectable_and_completed_next_requires_current_global_admission (__main__.PluginInvocationTests.test_held_start_stays_inspectable_and_completed_next_requires_current_global_admission)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 710, in test_held_start_stays_inspectable_and_completed_next_requires_current_global_admission
+    self.assertEqual(engine().next_action(self.store,complete['id'],proof=self.held_proof(request,'global'))['action'],'prerequisite')
+AssertionError: 'complete' != 'prerequisite'
+- complete
++ prerequisite
+
+
+======================================================================
+FAIL: test_other_occurrence_requirements_preserve_current_contribution_and_accepted_prefix (__main__.PluginInvocationTests.test_other_occurrence_requirements_preserve_current_contribution_and_accepted_prefix)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 719, in test_other_occurrence_requirements_preserve_current_contribution_and_accepted_prefix
+    try:request,frame=self.returned(request,status='findings',suffix='middle',frame=frame,proof=other)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 146, in returned
+    frame = self.prepared(frame,request,suffix,proof)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 106, in prepared
+    return self.change(frame, 'prepare', proof=proof or self.proof(request),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 92, in change
+    return engine().mutate(self.store, command, {'chain_id':frame['id'],
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/plugin-invocation.py", line 304, in mutate
+    if command=='prepare':detail=prepare(chain,payload,proof)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/plugin-invocation.py", line 273, in prepare
+    require(not proof.get('unresolved') and not proof.get('prerequisites'),'The owned boundary still has unresolved prerequisites')
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/plugin-invocation.py", line 24, in require
+    if not condition:raise InvocationError(message)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+hook_fixture_engine.InvocationError: The owned boundary still has unresolved prerequisites
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 720, in test_other_occurrence_requirements_preserve_current_contribution_and_accepted_prefix
+    except ValueError as error:self.fail('Another occurrence prerequisite incorrectly blocked current B: '+str(error))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Another occurrence prerequisite incorrectly blocked current B: The owned boundary still has unresolved prerequisites
+
+======================================================================
+FAIL: test_business_transition_cannot_silently_replace_the_original_watch_baseline (__main__.PluginWorkflowBridgeTests.test_business_transition_cannot_silently_replace_the_original_watch_baseline)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1243, in test_business_transition_cannot_silently_replace_the_original_watch_baseline
+    with self.assertRaisesRegex(ValueError,'watch|configuration|registry|changed|reconcile|prerequisite|drift'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation (__main__.PluginWorkflowBridgeTests.test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation) (kind='global')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1225, in test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation (__main__.PluginWorkflowBridgeTests.test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation) (kind='current')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1225, in test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation (__main__.PluginWorkflowBridgeTests.test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation) (kind='unresolved')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1225, in test_current_hold_rejects_cached_private_delivery_before_provider_or_sink_without_mutation
+    with self.assertRaisesRegex(ValueError,'prerequisite|unresolved|admission|held'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_default_node_a_b_a_isolates_other_capability_holds_and_preserves_guarded_b_contribution (__main__.PluginWorkflowBridgeTests.test_default_node_a_b_a_isolates_other_capability_holds_and_preserves_guarded_b_contribution)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/workflow-state.py", line 1850, in hook_action
+    try:return _hook_action(store,command,payload,private_delivery_provider=private_delivery_provider,private_delivery_sink=private_delivery_sink)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/workflow-state.py", line 1961, in _hook_action
+    result=helper.mutate(bound,cmd,normalized,proof=proof,verify_transition=lambda chain,attempt,receipt,after:_hook_transition(effective,chain,attempt,receipt,after),guard=guard)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/plugin-invocation.py", line 304, in mutate
+    if command=='prepare':detail=prepare(chain,payload,proof)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/plugin-invocation.py", line 273, in prepare
+    require(not proof.get('unresolved') and not proof.get('prerequisites'),'The owned boundary still has unresolved prerequisites')
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/plugin-invocation.py", line 24, in require
+    if not condition:raise InvocationError(message)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+skill_tree_plugin_invocation.InvocationError: The owned boundary still has unresolved prerequisites
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1278, in test_default_node_a_b_a_isolates_other_capability_holds_and_preserves_guarded_b_contribution
+    try:frame=self.returned(frame,status='findings')
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 871, in returned
+    frame=self.prepare_bridge(frame);attempt=frame['attempts'][frame['prepared_attempt_id']];actor=attempt['actor']
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 857, in prepare_bridge
+    return self.change(frame,'prepare',actor=actor,creation_evidence={'kind':'host-agent-created',
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 851, in change
+    return wf.hook_action(self.store,'hook-'+command,{'chain_id':frame['id'],
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/common/scripts/workflow-state.py", line 1852, in hook_action
+    except ValueError as error:raise WorkflowError(str(error)) from error
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+hook_fixture_workflow.WorkflowError: The owned boundary still has unresolved prerequisites
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-workflow.py", line 1279, in test_default_node_a_b_a_isolates_other_capability_holds_and_preserves_guarded_b_contribution
+    except ValueError as error:self.fail('Other-occurrence editor holds blocked the default Node B delivery: '+str(error))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Other-occurrence editor holds blocked the default Node B delivery: The owned boundary still has unresolved prerequisites
+
+----------------------------------------------------------------------
+Ran 64 tests in 95.800s
+
+FAILED (failures=16)

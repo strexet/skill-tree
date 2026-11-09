@@ -1,0 +1,42 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-plugin-invocation-installation.js"
+  ],
+  "attempt_id": "C-122fb884-21e1-467b-b3e1-24e0a9506878",
+  "check_id": "installed-hook-fixtures",
+  "counts": {
+    "discovered": 3,
+    "expected": 3,
+    "failed": 3,
+    "passed": 0,
+    "skipped": 0
+  },
+  "exit_code": 1,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-dae414c5-43e4-45db-a6f3-4ce4112440c5-installed-hook-fixtures-c-122fb884-21e1-467b-b3e1-24e0a9506878.txt",
+  "result": "red",
+  "reviewed_failure_reason": "Three discovered copied-flavor fixtures reject the absent new runtime helper and hook CLI while current core installation succeeds.",
+  "source_fingerprints": {
+    ".skill-tree/common/scripts/plugin-hooks.js": "f9bb267afaa1f22945d26a0a4d914f0b2035a5b22b73c14a4d0ce148bcd2e630",
+    ".skill-tree/common/scripts/plugin-invocation.py": "149e67d3114f883ff41292d94791780a50125d06da18c7f7423320a92f919f7a",
+    ".skill-tree/config/resource-map.json": "b1ed3e6844826e9372c72207f6be207f0d4f4d69c5420b87e5847a6f4252fed3",
+    ".skill-tree/documents/implementation-plan.md": "d53373bb753c92ba770aca2af1d9dd4bea586888de5aa5320b454a2e056e84e1",
+    ".skill-tree/documents/plugin-management-contract.md": "d5d68870bb0f44c356fdbd5423f3995dea33931eded820ffa335ac715cc24616",
+    ".skill-tree/documents/plugin-system-contract.md": "8d1161206d5913e6d51b994a8b152ea0d7af321c87446e865bcbdedd2999141e",
+    ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+    ".skill-tree/lib/installation.js": "aff2c16139da198abc00a04e89a0bfe1a22bc826e38a722e146632b14164ef82",
+    ".skill-tree/lib/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
+    ".skill-tree/lib/plugin-composition.js": "f0212aa28d0642233a5f8470d02bd99f6ac27e8951ab3771b59a1ffb89e54745",
+    ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    ".skill-tree/lib/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+    ".skill-tree/lib/plugin-runtime.js": "007586bb9d67c109d6ff6a22427f816b9a2438565dc73a025e8c039573c12036",
+    ".skill-tree/lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+    ".skill-tree/tests/test-plugin-invocation-installation.js": "17befdfe3f11817da2cce8dc24f4d1dfe082c72394139298aef9fba29dde290e"
+  },
+  "task_id": "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+  "tool_wall_seconds": 1.9725878750905395
+}

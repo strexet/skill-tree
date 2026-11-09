@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "task_id": "T-657e5621-efb8-4c53-8ab9-bdd2a7e6ec69",
+  "check_id": "interview-loop-regressions",
+  "lane": "unit",
+  "assertion": "The first actually committed configured post-processing T publication already has its stable blocked state and same-transaction CL requirements; the core-only positive control remains Ready.",
+  "cheaper_evidence_insufficient": "Source inspection identified Ready publication; the runnable temporary owned installation and actual process transaction establish the behavioral missing contract and core-only baseline.",
+  "expected_discovered_tests": 2,
+  "hard_deadline_seconds": 120,
+  "cleanup_reserve_seconds": 20,
+  "authorization": "Current admitted Implement All task115 and actual accepted significant plan DO-d49ac4a6-1e7c-5849-af1b-ca15b4fbd7b9 revision20.",
+  "qualification": "Synthetic/inert local installed metadata fixtures only; no candidate/native/owner or comparative execution."
+}

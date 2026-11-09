@@ -1,0 +1,95 @@
+{
+  "actual_lane": "static",
+  "attempt_id": "C-54d88d86-bf72-4f18-a905-c4aabbc4e3a3",
+  "check_id": "installed-agent-hook-evidence",
+  "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+  "evidence_sha256": {
+    ".skill-tree/history/validation/plugin-system/installed-agent-hook-evidence-c-0d0fd56b-0a6f-4636-897a-6fcf75c5a72a.json": "2d2e27379fd91a7fd38e2afa90123d9b0328ca183135fe17c7eee090da5ce6d1",
+    ".skill-tree/history/validation/plugin-system/installer110-independent-review.json": "2f533db16b7ea94fb958071008ba456ed2d9630ce4935a4f611859a5fd7a4088",
+    ".skill-tree/history/validation/plugin-system/invocation118-native/capture.json": "5f481b09a9cdd556971ae3b1ca12d1ab8e5147266d8378aae59703514526e0bd",
+    ".skill-tree/history/validation/plugin-system/invocation118-native/qualification.json": "17564517f4b90435c1a66d9d1488856f05671523538dd9a131e8c1eb4495410e",
+    ".skill-tree/history/validation/plugin-system/invocation118-native/report.json": "cf002e5bb4448a5f870d5904e8905f1b3006fc05004e59430300d777877e8485"
+  },
+  "limitations": [
+    "Historical native evidence remains tied to the original scope. No candidate or actual hook actor was invoked for this source compatibility review."
+  ],
+  "mismatches": [],
+  "result": "pass",
+  "review": [
+    "The original installed fixture observed actual bounded hook actor invocations with forwarded markers, independent repeated occurrences and later accepted context. Original rejected and repaired receipts and cleanup limitations remain recorded.",
+    "The current strict native invocation oracle rejects historical source promotion. The optional installer diff changes the core lock refusal and explicit recovery path, with no workflow invocation or result acceptance call.",
+    "Current hook workflow, installation fixtures and conformance controls are captured separately under the exact current contracts.",
+    "The formerly stale planned-manager and installer wording now describes the implemented shared confirmed setup. Current read-only source and evidence were checked after the prose correction."
+  ],
+  "schema": 1,
+  "source_commit": "5c4e28c3ee34f1f9e385c82cde21f0886b202919",
+  "source_fingerprints": {
+    ".skill-tree/common/references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
+    ".skill-tree/common/references/workflow-metadata.md": "1fff0a891987404ac7bc43d536b0798c08ee6c16a6e3367cbfc9a0f3c54b7fa3",
+    ".skill-tree/common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    ".skill-tree/common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+    ".skill-tree/common/scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",
+    ".skill-tree/common/scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",
+    ".skill-tree/common/scripts/pr-review-state.py": "6bfb09e0273a6322c86c5f5915e8dc0503fa22416881c499c281c1dec570a3d1",
+    ".skill-tree/common/scripts/run-workspaces.py": "306a8dad9d834250febd3fff4b109f0fb8b00711232705e483787bc1cdab5f20",
+    ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+    ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+    ".skill-tree/config/resource-map.json": "bd4b539b8aad5d6b55aba3609073f28b7e879fa7e8c3edf60dbbf28f9e56ad26",
+    ".skill-tree/documents/implementation-plan.md": "73692c86132c37dc8be19457f9bf33dc6ff87027cfad50de85a361bca6f09606",
+    ".skill-tree/documents/plugin-management-contract.md": "2b5c9aeb18dd30b06a809fd14e5222abf579a002187870167d61f6f7dda5b11a",
+    ".skill-tree/documents/plugin-system-contract.md": "35af053252eb88060cfa32f71fb3b1c7b3bbe7afb5d60cc0a937c41b686a8038",
+    ".skill-tree/history/research/plugin-management-decisions.json": "289df0951384f1770e67ff5e0c6f32e79c452e7fde8a0e278b793b7f096fee84",
+    ".skill-tree/lib/composer.js": "3099a592f7d9fbcb03d73409b322517c6ac2bf3ecd81c517450a66c48347e90d",
+    ".skill-tree/lib/installation.js": "68456b1ab761dc3b47a17219c50960462465f7e5c8615c8de6ddb2c5a953c657",
+    ".skill-tree/lib/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
+    ".skill-tree/lib/plugin-composition.js": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d",
+    ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    ".skill-tree/lib/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+    ".skill-tree/lib/plugin-runtime.js": "e704dce8f8019baae4f783bce8c6f5fdf5dfaf7961760ecad33ce3ab919b4338",
+    ".skill-tree/lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
+    ".skill-tree/scripts/agent-conformance.py": "e14b387f60d200fea4484c4a40d359c5a8d1339e26abf2addb82d5c8ab5a1e16",
+    ".skill-tree/templates/operations.json": "af81ff4d4b003ef8e8dac292995b3227d5fb45d80666dd80b83b4111d1ded050",
+    ".skill-tree/tests/test-plugin-conformance.py": "13475002ed224cb6270c3d5b32a6762e9cc2f2928a338104513c0e2062a088fd",
+    ".skill-tree/tests/test-plugin-invocation-installation.js": "fa16b6af4ae637415100fa2e0c3dcfeb9a7f392e168f61980ecd3c8fc84e1495",
+    ".skill-tree/tests/test-plugin-workflow.py": "a7ae1a514938920070a4c6a936d43fcac5d772168c3d9d40005dfe91ccaff44b"
+  },
+  "task_id": "T-dae414c5-43e4-45db-a6f3-4ce4112440c5",
+  "unit_captures_same_contract": {
+    "hook-observation-oracle": {
+      "attempt_id": "C-99c89ef1-a647-48d8-a570-59e1365d1514",
+      "counts": {
+        "discovered": 12,
+        "expected": 12,
+        "failed": 0,
+        "passed": 12,
+        "skipped": 0
+      },
+      "raw_capture_sha256": "cd3f386122fe4d97b999ffc7ad4483dbd9e26fcc7b00b3a678f0a18c806114bd",
+      "result": "pass"
+    },
+    "hook-state-regressions": {
+      "attempt_id": "C-c5c5f999-8018-42a9-9a19-639f614fa634",
+      "counts": {
+        "discovered": 80,
+        "expected": 55,
+        "failed": 0,
+        "passed": 80,
+        "skipped": 0
+      },
+      "raw_capture_sha256": "05c8befed39472b36a6554631a63d4de389328aceb1f6cb92935da20ce194c30",
+      "result": "pass"
+    },
+    "installed-hook-fixtures": {
+      "attempt_id": "C-176404bd-0d00-4be2-b17e-c0b5f24374f0",
+      "counts": {
+        "discovered": 17,
+        "expected": 8,
+        "failed": 0,
+        "passed": 17,
+        "skipped": 0
+      },
+      "raw_capture_sha256": "e70dfef88de5bebd0a787b99d0c433808a5a0518312fe93f8fde4d893360a35a",
+      "result": "pass"
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "budget_used": {
+    "contexts": 2,
+    "inventory_calls": 0,
+    "lifecycle_interrupts": 2,
+    "observation_calls": 0,
+    "spawn_or_follow_up_requests": 3
+  },
+  "freeze_sha256": "b79ad8f9054041090bfc176e45c9442a6c7f6aeefbd4b14fb8d6f8d6df8bf899",
+  "negative": {
+    "actual_candidate_dispatches": 0,
+    "actual_candidate_resources_reported": [],
+    "core_boundary": "core-only-noop",
+    "frozen_validator_verdict": "rejected",
+    "invocation_directory_exists": false,
+    "live_core_observation_sha256": "a1892e6847e56f8b5b270c15b922d8751915ee0678affce9789009e76b2ba74c",
+    "original_error": "{\"ok\": false, \"error\": \"Negative calibration did not observe nonactivation\"}",
+    "original_result_sha256": "6f3b26b412f811c2a37081502078abcd6385d5eaa7fcd7d278ec1d7c7d37c7a9",
+    "out_of_scope_report_items": 3,
+    "plugin_registry_exists": false,
+    "prepare_core_boundary": {
+      "bindings": [],
+      "state": "complete",
+      "status": "noop"
+    }
+  },
+  "positive": {
+    "chain_id": "HC-81556066-7c94-5291-a53a-560110c44cae",
+    "record_sha256": "23ab7971bb2fe38d5bd9633cc7da7b282d30e94f09a3f93cd2558262e4483bf1",
+    "verdict": "passed"
+  },
+  "proposal_sha256": "aa5f82cf9fd1ef256bac3205b7d1bb842605fa9862fc231f0cd556002fb1785f",
+  "proposed_resolution": "Keep the original rejected report. Qualify nonactivation using only the already captured core no-op, absence of registry and invocation state, zero deliveries and the original resource observation. Exclude the unrelated report items from scoring. No new actor, calibration call or budget increase.",
+  "schema": 1,
+  "status": "awaiting-protocol-decision",
+  "trial_workers_started": 0
+}

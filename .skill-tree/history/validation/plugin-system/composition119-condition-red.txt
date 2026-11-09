@@ -1,0 +1,27 @@
+TAP version 13
+# Subtest: condition-excluded Processing occurrence is a task-free no-op without Pending or DO guards
+not ok 1 - condition-excluded Processing occurrence is a task-free no-op without Pending or DO guards
+  ---
+  duration_ms: 752.386792
+  location: '/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:132:1'
+  failureType: 'testCodeFailure'
+  error: 'The actual selected operation context guard failed: ValueError: Processing before and during require the actual selected Pending context'
+  code: 'composition-context'
+  stack: |-
+    fail (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-composition.js:17:41)
+    guardBoundary (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-composition.js:120:31)
+    Object.handler (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-composition.js:26:125)
+    Object.prepareBoundary (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/lib/plugin-composition.js:136:55)
+    TestContext.<anonymous> (/Users/petr/Projects/_skills/_my/skill-tree-plugin-system/.skill-tree/tests/test-plugin-composition.js:134:21)
+    async Test.run (node:internal/test_runner/test:935:9)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 833.149625

@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-plugin-sources.js"
+  ],
+  "attempt_id": "C-cacc3af0-b13e-427b-a0aa-3767a6a07bf1",
+  "check_id": "open-source-parameters",
+  "counts": {
+    "discovered": 25,
+    "expected": 25,
+    "failed": 24,
+    "passed": 1,
+    "skipped": 0
+  },
+  "exit_code": 1,
+  "limits": [
+    "Unit fixture qualification only; no actual candidate-agent or product-host claim."
+  ],
+  "output": ".skill-tree/history/validation/plugin-system/t-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9-open-source-parameters-c-cacc3af0-b13e-427b-a0aa-3767a6a07bf1.txt",
+  "result": "red",
+  "reviewed_failure_reason": "The runnable foundation API deliberately rejects supported source normalization, snapshots and parameter resolution; requirements-derived assertions fail while facade loading and test discovery succeed.",
+  "source_fingerprints": {
+    ".skill-tree/documents/plugin-management-contract.md": "f43a728e75b2faae51640c5cadf9d9b484d1d010c33368784d5ed859e3b156a1",
+    ".skill-tree/documents/plugin-system-contract.md": "a954d148df40e7a22814fb1f8515d654140cff02f7fe14e1a65f6cad33732efc",
+    ".skill-tree/lib/plugin-parameters.js": "d1ef75758a836e19132bb30e0c87a54cc28483ef329e8a8f2381ab2706bb0aa8",
+    ".skill-tree/lib/plugin-sources.js": "52603b50a2003c9dcd150002b8daed07aa0da3b9fef346bcfe09154e12a7bf08",
+    ".skill-tree/lib/plugins.js": "f47526dcfbbfa2f7af030020a70e3b47c86f5f4bf6def178ebdabde3d10d9999",
+    ".skill-tree/tests/test-plugin-sources.js": "78a05737e70ed1ce79ea0b74619119126683f89094e98b1408ecc2d8afc7f8b5"
+  },
+  "task_id": "T-5efc5408-27ec-4fd0-a6d3-81c616e2e8e9",
+  "tool_wall_seconds": 0.14656066708266735
+}

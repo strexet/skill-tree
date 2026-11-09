@@ -1,0 +1,50 @@
+{
+  "kind": "plugin-invocation-agent-conformance",
+  "limitations": [
+    "The trusted parent capture records actually observed native creation/dispatch/results; arbitrary JSON cannot cryptographically prove tool origin.",
+    "Fixture-owner inputs are explicitly scripted and establish no real-human business approval.",
+    "Unexposed exact model, native call IDs, tokens and cost remain null; actual actor/request counts remain explicit.",
+    "This bounded source-backed Codex instruction/resource observation claims no native Skill call, provider universality or comparative plugin efficacy."
+  ],
+  "scenario": {
+    "event_ids": [
+      "invocation118-event-1",
+      "invocation118-event-2",
+      "invocation118-event-3",
+      "invocation118-event-4",
+      "invocation118-event-5",
+      "invocation118-event-6",
+      "invocation118-event-7",
+      "invocation118-event-8",
+      "invocation118-event-9",
+      "invocation118-event-10",
+      "invocation118-event-11",
+      "invocation118-event-12",
+      "invocation118-event-13",
+      "invocation118-event-14",
+      "invocation118-event-15",
+      "invocation118-event-16",
+      "invocation118-event-17",
+      "invocation118-event-18",
+      "invocation118-event-19",
+      "invocation118-event-20"
+    ],
+    "id": "source-backed-a-b-a"
+  },
+  "schema": 1,
+  "source_snapshot": {
+    "common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
+    "common/scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
+    "common/scripts/plugin-hooks.js": "3ed78006e6abfb8a70cf191f1b310f41b50f3c60b3131bca3722c89af6753102",
+    "common/scripts/plugin-invocation.py": "281165ce83ed4309e4c841721b4461c71a447c4070c496a3c7ca37598af64d7d",
+    "common/scripts/run-workspaces.py": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+    "common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
+    "common/scripts/workflow-state.py": "57383709635e780c6d207834fba5396583f1ecfe86ac2456380fabf755b6a68b",
+    "lib/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
+    "lib/plugin-composition.js": "3a2b5af0329c6e0a98754c512388df0d447f0d08181fa39fd8cf7fa4905225db",
+    "lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
+    "lib/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
+    "lib/plugin-runtime.js": "5e9827cc3e59fece6a95afd76f90181e7f2c9eb6a049f0c9a0c7a6ad6730dcb8",
+    "lib/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6"
+  }
+}

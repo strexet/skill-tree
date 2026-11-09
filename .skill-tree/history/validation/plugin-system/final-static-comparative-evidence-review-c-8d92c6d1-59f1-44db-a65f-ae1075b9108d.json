@@ -1,0 +1,42 @@
+{
+  "actual_lane": "static",
+  "attempt_id": "C-8d92c6d1-59f1-44db-a65f-ae1075b9108d",
+  "check_id": "comparative-evidence-review",
+  "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+  "evidence_sha256": {
+    ".skill-tree/config/plugin-catalog-eligibility.json": "92a81b29135aaf8deb94c86f56481dfaa5fe9b543ab461c492aceab56efe1042",
+    ".skill-tree/documents/plugin-recommendation-evidence.md": "e85766c749c19717f9eaf6d0c1049dfc48c31f77965e1e811a474e26a2cb2dd2",
+    ".skill-tree/history/research/plugin-comparison-calibration-amendment.json": "36db6636c2137e240b21c3b777f3cf31c5e6c5de2ed9fca89fe81a17694629e2",
+    ".skill-tree/history/research/plugin-comparison-calibration-deviation.json": "e08af048bc80c6847a92c7322893d0d438292b23fd166bc3ed052fa2c835ca81",
+    ".skill-tree/history/research/plugin-comparison-capture.json": "ebdbc935115baf77d2c52e5869003fa3f2cc1f506ea8f66a62518e3abeab2ed0",
+    ".skill-tree/history/research/plugin-comparison-owner-agreement.json": "4f97398fb678ab365bcfe623d110e3002fca9f4428a216be7bdfcfa2d34f8c2c",
+    ".skill-tree/history/research/plugin-comparison-proposal.md": "aa5f82cf9fd1ef256bac3205b7d1bb842605fa9862fc231f0cd556002fb1785f",
+    ".skill-tree/history/research/plugin-comparison-results.json": "1463e6846ed1c4d91c6affc252fff923d709f67bd6fdcf8cd8866210f004779b",
+    ".skill-tree/history/validation/plugin-system/comparison114-portable-review.json": "4ddad90a354144c784e485879d2779307ccbaf5b4addb74a49332318695a799d"
+  },
+  "limitations": [
+    "Current static archive/contract verification only. No trial, actor, calibration, native skill, provider, browser or Unity operation was repeated or newly qualified. The original format rejection, missing cells and unavailable accounting remain preserved."
+  ],
+  "mismatches": [],
+  "result": "pass",
+  "review": [
+    "The recorded actual owner agreement precedes input freeze, with zero started calibration/worker contexts at approval. Both matched arms use the same exact pinned W1 Manual baseline and general Codex profile, and the amended negative control retains original rejection, zero dispatch, noop and no repeated calibration.",
+    "The portable verifier rechecked 269 archive entries against retained exact or separately path-redacted hashes, the owner proposal/agreement/freeze, evidence references and the 32 fixed cohort slots. Twelve observed and twenty unavailable cells leave two complete pairs. Missing original lifecycle receipts remain unresolved historical evidence.",
+    "The four application outcomes remain separately unqualified, with no recommendation for general, Web or Unity. The catalog eligibility projection remains empty and manual source selection remains available.",
+    "Time, request and context accounting remain bounded by the approved limits. Unexposed model identity, token/accounting data, monetary cost and actual human rework remain unknown. Source/host, fixture, dependency, adapter and source configuration applicability remain limited to the frozen comparison.",
+    "The formerly stale planned-manager and installer wording now describes the implemented shared confirmed setup. Current read-only source and evidence were checked after the prose correction."
+  ],
+  "schema": 1,
+  "source_commit": "5c4e28c3ee34f1f9e385c82cde21f0886b202919",
+  "source_fingerprints": {
+    ".skill-tree/documents/implementation-plan.md": "73692c86132c37dc8be19457f9bf33dc6ff87027cfad50de85a361bca6f09606",
+    ".skill-tree/documents/plugin-recommendation-evidence.md": "e85766c749c19717f9eaf6d0c1049dfc48c31f77965e1e811a474e26a2cb2dd2",
+    ".skill-tree/documents/plugin-system-contract.md": "35af053252eb88060cfa32f71fb3b1c7b3bbe7afb5d60cc0a937c41b686a8038",
+    ".skill-tree/documents/plugin-system-research.md": "4c4bd02dd56b92fc82030d4440dace33cdab9aa390dac8efccb4af5d249356a1",
+    ".skill-tree/history/research/plugin-comparison-results.json": "1463e6846ed1c4d91c6affc252fff923d709f67bd6fdcf8cd8866210f004779b",
+    ".skill-tree/history/research/plugin-market-map.json": "5251739741dc234bddcda84d057940dc497a0b2e9ae8b2ada9996fab16d8bbf6",
+    ".skill-tree/scripts/agent-conformance.py": "e14b387f60d200fea4484c4a40d359c5a8d1339e26abf2addb82d5c8ab5a1e16"
+  },
+  "task_id": "T-a583acd5-fc6b-4d37-97ec-02df969fea9e",
+  "unit_captures_same_contract": {}
+}
