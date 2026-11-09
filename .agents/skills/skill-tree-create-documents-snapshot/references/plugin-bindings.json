@@ -1340,7 +1340,7 @@
   "configuration_digest": "90933e866bbf725ee70ef7b18ae91d1d862e6d7179225d2d75196370e13a7962",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "624d8e4a2c002495fa7d673dc84da90d90da8c040c272f56aba4796104e27ed8",
+  "identity": "287909c08651168529879574a840d64fc4117663803f3df7bfe1e3b9ff129c2a",
   "operation": "skill-tree-create-documents-snapshot",
   "operations": {
     "skill-tree-add-pending-task": {
@@ -1384,7 +1384,7 @@
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
-    "references/project-profile.md": "67e1d8634ca34c47f333165e44fb7619f57f810a6196f45f4b5d6d368bfb5e36",
+    "references/project-profile.md": "c852f4073f7e9a485c718c6ca32af059c92c746ad1b0b0d74fdef2220666997a",
     "references/snapshot-rules.md": "18142120546fcd532e496fbd14aefbe449fa63da40cbcca577db249b91dcd30e",
     "references/validation-policy.md": "4b0370124139f3203f944e84f9c3768d5d1f9a693ee26bb70260425a3add42b6",
     "scripts/create-documentation-snapshot.py": "612aea11e766621747490ddeb13dd24e980cdd30c499d0756635b1c3cce1df93",

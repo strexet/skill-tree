@@ -1340,7 +1340,7 @@
   "configuration_digest": "90933e866bbf725ee70ef7b18ae91d1d862e6d7179225d2d75196370e13a7962",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "14e190fb7ed5425f01498f04b013651e0da74d492fed83c0a3d67d585e428187",
+  "identity": "f86423d2a045cfd0d0f1e94f37677be39a114cc7bc1039d685718edc794b8bc8",
   "operation": "skill-tree-repo-documentation-audit",
   "operations": {
     "skill-tree-add-pending-task": {
@@ -1388,7 +1388,7 @@
     "references/pending-task-format.md": "6c0a90ea992f2c19a26e4f95fc4e45b7ff89d25c0cc8e2c49c11cfa8bad2d8ba",
     "references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
-    "references/project-profile.md": "f22068a8b2e170ebef5949b6bc118b72a8776997c37c009caba98fd1d6c4eb39",
+    "references/project-profile.md": "15f369ebfe1872146e44e5333e1f8639cc03ba039e9e5c973ca8963cb2ac8ccf",
     "references/repository-discovery-checklist.md": "a112230c076fea515c437e3e7407c575ee6690d772eaa28e68f80c720c7a621c",
     "references/run-workspaces.md": "d9a97bc8ee56ef0aa6f254075df08e2946fdc61c578328a52f6991dbd723468c",
     "references/ugui-testing.md": "873c236f793ff3c9ece8f0d0346c5c48513e8220406fce216751571c58b79073",

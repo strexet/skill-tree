@@ -1340,7 +1340,7 @@
   "configuration_digest": "90933e866bbf725ee70ef7b18ae91d1d862e6d7179225d2d75196370e13a7962",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "67245ddcd298573706349d150a67b6a53a6c4c037a1d1b751e802788da462803",
+  "identity": "001404040c63324a856c3a8db0c1a27852f786ae9722c59ab27eac95de0fe927",
   "operation": "skill-tree-work-through-next",
   "operations": {
     "skill-tree-add-pending-task": {
@@ -1391,7 +1391,7 @@
     "references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/pr-review-cycle.md": "c63c901451e6d3effd33284cff2f7347fff73e832677541d148dfec9fd4414c5",
-    "references/project-profile.md": "f22068a8b2e170ebef5949b6bc118b72a8776997c37c009caba98fd1d6c4eb39",
+    "references/project-profile.md": "15f369ebfe1872146e44e5333e1f8639cc03ba039e9e5c973ca8963cb2ac8ccf",
     "references/run-workspaces.md": "d9a97bc8ee56ef0aa6f254075df08e2946fdc61c578328a52f6991dbd723468c",
     "references/ugui-testing.md": "873c236f793ff3c9ece8f0d0346c5c48513e8220406fce216751571c58b79073",
     "references/unity-development.md": "f65dc5e0e69df84d3204fe70339a7dfa53fcd0d57a2b97f8e57d34a399e5f640",

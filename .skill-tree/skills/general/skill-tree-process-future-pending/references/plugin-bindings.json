@@ -1340,7 +1340,7 @@
   "configuration_digest": "90933e866bbf725ee70ef7b18ae91d1d862e6d7179225d2d75196370e13a7962",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "ef7dc18597a38f3aae6ad1c5d1deba4b3dda0936dca2b2e6280e1d3af292022e",
+  "identity": "b40751f57c40b28817e36419f8a5c93e7863df0f09e2a42cfa646e5104fd8a19",
   "operation": "skill-tree-process-future-pending",
   "operations": {
     "skill-tree-add-pending-task": {
@@ -1388,7 +1388,7 @@
     "references/pending-task-format.md": "6c0a90ea992f2c19a26e4f95fc4e45b7ff89d25c0cc8e2c49c11cfa8bad2d8ba",
     "references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
-    "references/project-profile.md": "3f207ab43977a278f2e7ad246bbf75bc9dbc9b7d41a9f80241bb5f24c644f075",
+    "references/project-profile.md": "e880123c1237a88d5c2c765b105d7bba3bd7b5d68240a8c242a7fd9d13408164",
     "references/run-workspaces.md": "d9a97bc8ee56ef0aa6f254075df08e2946fdc61c578328a52f6991dbd723468c",
     "references/validation-policy.md": "4b0370124139f3203f944e84f9c3768d5d1f9a693ee26bb70260425a3add42b6",
     "references/workflow-metadata.md": "0b4635c90c434e691d0cd2fafc2f4950a663eae912f55a4f003ca7ea3486f011",
