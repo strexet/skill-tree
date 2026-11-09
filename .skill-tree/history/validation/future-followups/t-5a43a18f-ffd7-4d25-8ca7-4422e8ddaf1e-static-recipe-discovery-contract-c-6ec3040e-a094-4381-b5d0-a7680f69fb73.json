@@ -1,0 +1,27 @@
+{
+  "actual_lane": "static",
+  "assertions": [
+    {
+      "assertion": "Owned profile discovery and the bundled validation documentation identify static-inspection as an assertion-only built-in fallback when no explicit recipe overrides the ID.",
+      "result": "pass"
+    }
+  ],
+  "attempt_id": "C-6ec3040e-a094-4381-b5d0-a7680f69fb73",
+  "check_id": "static-recipe-discovery-contract",
+  "classification": "executed-control",
+  "cleanup": "Read-only source and installed fixture evidence inspected.",
+  "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+  "evidence": [
+    ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-static-recipe-discovery-contract-c-6ec3040e-a094-4381-b5d0-a7680f69fb73.json"
+  ],
+  "result": "pass",
+  "review": "Reviewed the final bundle marker, composer, installed fixtures and corrected documentation. The built-in recipe exactly matches the Python static assertion fallback and has no argv. Explicit recipe declarations retain precedence and may supply different fields. Older owned profiles verify and upgrade with the same resolved fallback identity.",
+  "sources": {
+    ".skill-tree/common/references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
+    ".skill-tree/common/references/validation-policy.md": "d44adf21dfa175520e1ad4f832672bb43325f2f5d6322123e355eca4eb5bb7f4",
+    ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+    ".skill-tree/documents/install.md": "6174ac3a81a3072b45db28246d73886089ab13238f1e59708260b0fc1d4fba4a",
+    ".skill-tree/lib/composer.js": "9605ce43a0e99aff77dbf1e223dd7afcf326917753db7963de5bf1d61bdcd04b"
+  },
+  "task_id": "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+}

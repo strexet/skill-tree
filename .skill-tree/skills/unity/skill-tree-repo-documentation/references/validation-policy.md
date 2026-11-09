@@ -4,6 +4,8 @@
 
 The task Validation section owns required check IDs, criterion mapping and task parameters. A fenced JSON object contains `checks`, with entries containing `id`, `recipe_id`, `criteria`, `sources`, `parameters` and `timing`. Timing is `immediate`, `group-end` or `before-dependent-work`. The profile owns concrete recipes and environment facts. Task headers own optional `validation_group_id` and `boundary_validation`; group membership never expands controller scope.
 
+Owned profiles list the built-in `static-inspection` fallback when no explicit recipe owns the ID. The built-in recipe uses the static lane for explicit source and artifact assertions and has no executable argument vector. An explicit recipe retains precedence. Older profiles may resolve the same fallback without a discovery entry.
+
 Small task bodies require Goal, Touch, Validation and Acceptance. Optional sections contain substantive constraints only. Every acceptance bullet requires a mapped check. Default strategy is test-first for meaningful behavior changes; characterization, exploratory or not-applicable requires a concise task-specific reason when suitable. Existing adequate matching evidence remains reusable.
 
 ## Focused feedback
@@ -25,6 +27,8 @@ Reports record actual assertions/artifacts or nonzero expected/discovered test c
 Controllers freeze admitted in-scope group members. Work Through Next admits only the selected root and required descendants; Implement All admits only the frozen initial roots and required descendants. Another root can join an unresolved batch only as an eligible declared member of the same group. Standalone implementation never executes another member. Shared check reuse requires identical recipe, parameters, relevant source/tests and environment while preserving criterion coverage. Missing out-of-scope prerequisites block the exact check; artificial subgroups cannot weaken acceptance.
 
 Source/check-set changes invalidate affected results. Unaffected passes remain available. Progress detection counts stage transitions and newly resolved obligations, excluding timestamps and repeated logs. Finish refuses pending, failed, stale or unavailable required checks. Required validation never becomes optional during completion.
+
+A pending attempt blocks acceptance even when an earlier result passes or the current task removes the check. For local runner recovery, bind the live original process group to the prepared attempt before drift. After cleanup, `reconcile-check` verifies current drift and absence of the bound group and records a cancellation receipt. Earlier results, recorded stops and admission remain separate. The workflow metadata contract defines the exact request and evidence fields.
 
 ## Final run evidence
 

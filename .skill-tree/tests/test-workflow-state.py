@@ -243,4 +243,404 @@ class WorkflowStateTests(unittest.TestCase):
         wf.process(self.store,payload);wf.record_cycle(self.store);wf.process(self.store,payload)
         self.assertEqual(wf.record_cycle(self.store)['phase'],'blocked')
 
+    def _check_request(self, task, attempt):
+        return {'action':'inspect','task_id':task['id'],'check_id':'behavior','attempt_id':attempt['attempt_id']}
+
+    def _cleanup_request(self, request, inspection, group, **overrides):
+        from datetime import datetime, timezone
+        import socket
+        proof = {
+            'schema':1,'kind':'local-process-group-cleanup',
+            **{key:request[key] for key in ('task_id','check_id','attempt_id')},
+            **{key:inspection[key] for key in ('run_id','expected_key','expected_definition','environment_identity')},
+            'host':socket.gethostname(),'process_group':group,'observed_live_processes':0,
+            'observed_at':datetime.now(timezone.utc).isoformat(),
+        }
+        proof.update(overrides)
+        path = self.root/'check-cleanup.json'
+        path.write_text(json.dumps(proof))
+        return {**request,'action':'cancel',
+                **{key:inspection[key] for key in ('expected_key','expected_definition','observed')},
+                'cleanup':{'path':path.name,'sha256':wf.file_hash(path)}}
+
+    def _runner_binding_request(self, request, inspection, group):
+        return {**request,'action':'bind-runner','expected_key':inspection['expected_key'],
+                'expected_definition':inspection['expected_definition'],'process_group':group}
+
+    def _bind_test_runner(self, request, process):
+        import socket
+        inspection = wf.reconcile_check(self.store,request)
+        binding = self._runner_binding_request(request,inspection,process.pid)
+        receipt = wf.reconcile_check(self.store,binding)
+        self.assertEqual(receipt['process_group'],process.pid)
+        self.assertEqual(receipt['host'],socket.gethostname())
+        self.assertTrue(receipt['bound_at'])
+        return binding
+
+    def _owned_test_group(self, *, live=False):
+        import subprocess
+        import sys
+        process = subprocess.Popen([sys.executable,'-c','import time; time.sleep(60)' if live else 'pass'],
+                                   start_new_session=True)
+        def cleanup():
+            if process.poll() is None:
+                process.terminate()
+            process.wait(timeout=10)
+        self.addCleanup(cleanup)
+        if not live:
+            process.wait(timeout=10)
+        return process
+
+    def _workflow_bytes(self):
+        return {path.relative_to(self.store.base):path.read_bytes()
+                for path in self.store.base.rglob('*') if path.is_file()}
+
+    def _static_check_result(self, task, attempt):
+        return {'task_id':task['id'],'check_id':attempt['check_id'],'attempt_id':attempt['attempt_id'],
+                'result':'pass','classification':'executed-control','actual_lane':'static',
+                'environment_identity':attempt['environment_identity'],
+                'assertions':[{'assertion':'Preserve isolated state.','result':'pass'}],
+                'cleanup':'The disposable fixture exited.','evidence':['test-report.json']}
+
+    def _installation_operation_active(self):
+        import subprocess
+        probe = subprocess.run(
+            ['node','-e','console.log(require(process.argv[1]).hasActiveOperation(process.argv[2]))',
+             str(ROOT/'lib/installation.js'),str(self.root)],
+            capture_output=True,text=True,check=True,timeout=15,
+        )
+        return json.loads(probe.stdout)
+
+    def test_stale_check_inspection_uses_the_cli_without_writes(self):
+        import subprocess
+        import sys
+        task = self.main()
+        wf.begin_task(self.store,{'task_id':task['id']})
+        attempt = wf.prepare_check(self.store,{'task_id':task['id'],'check_id':'behavior'})
+        request = self.root/'inspect-check.json'
+        request.write_text(json.dumps(self._check_request(task,attempt)))
+        before = self._workflow_bytes()
+        probe = subprocess.run([sys.executable,'-B',str(ROOT/'common/scripts/workflow-state.py'),
+                                'reconcile-check',str(self.root),'--input',str(request)],
+                               capture_output=True,text=True,timeout=15)
+        self.assertEqual(probe.returncode,0,probe.stdout+probe.stderr)
+        report = json.loads(probe.stdout)
+        self.assertEqual(report['expected_key'],attempt['key'])
+        self.assertEqual(report['expected_definition'],attempt['definition'])
+        self.assertEqual(report['environment_identity'],attempt['environment_identity'])
+        self.assertIsNone(report['run_id'])
+        self.assertEqual(report['observed'],{key:attempt[key] for key in ('key','definition','sources')})
+        self.assertFalse(report['stale'])
+        self.assertEqual(before,self._workflow_bytes())
+
+    def test_reconcile_preserves_old_pass_and_allows_fresh_check_after_verified_exit(self):
+        task = self.main()
+        tid = task['id']
+        source = self.root/'source.cs'
+        baseline = source.read_bytes()
+        wf.begin_task(self.store,{'task_id':tid})
+        previous = wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'})
+        old_pass = wf.record_check(self.store,self._static_check_result(task,previous))
+        attempt = wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'})
+        request = self._check_request(task,attempt)
+        with self.assertRaises(wf.WorkflowError):
+            wf.validate_task_checks(self.store,tid)
+        self.assertTrue(self._installation_operation_active())
+
+        process = self._owned_test_group(live=True)
+        self._bind_test_runner(request,process)
+        source.write_text('The fixture source changed during validation.\n')
+        inspected = wf.reconcile_check(self.store,request)
+        self.assertTrue(inspected['stale'])
+        unrelated = self._owned_test_group()
+        self.assertNotEqual(unrelated.pid,process.pid)
+        before = self._workflow_bytes()
+        with self.assertRaises(wf.WorkflowError):
+            wf.reconcile_check(self.store,self._cleanup_request(request,inspected,unrelated.pid))
+        self.assertEqual(before,self._workflow_bytes())
+        cancel = self._cleanup_request(request,inspected,process.pid)
+        before = self._workflow_bytes()
+        with self.assertRaises(wf.WorkflowError):
+            wf.reconcile_check(self.store,cancel)
+        self.assertEqual(before,self._workflow_bytes())
+        self.assertIsNone(process.poll(),'Reconciliation must not terminate a process')
+
+        process.terminate()
+        process.wait(timeout=10)
+        cancel = self._cleanup_request(request,inspected,process.pid)
+        original = self.store.load()['task_progress'][tid]['checks']['behavior']['attempt']
+        closed = wf.reconcile_check(self.store,cancel)
+        self.assertEqual(closed['status'],'cancelled-no-result')
+        self.assertEqual(closed['original_attempt'],original)
+        self.assertNotIn('result',closed)
+        self.assertNotIn('counts',closed)
+        slot = self.store.load()['task_progress'][tid]['checks']['behavior']
+        self.assertEqual(slot['attempt'],original)
+        self.assertEqual(slot['result'],old_pass)
+        self.assertFalse(self._installation_operation_active())
+        with self.assertRaises(wf.WorkflowError):
+            wf.validate_task_checks(self.store,tid)
+
+        source.write_bytes(baseline)
+        after_close = self._workflow_bytes()
+        with self.assertRaises(wf.WorkflowError):
+            wf.record_check(self.store,self._static_check_result(task,attempt))
+        self.assertEqual(after_close,self._workflow_bytes())
+
+        source.write_text('The fixture source changed during validation.\n')
+        fresh = wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'})
+        self.assertNotEqual(fresh['attempt_id'],attempt['attempt_id'])
+        before_replay = self._workflow_bytes()
+        self.assertEqual(wf.reconcile_check(self.store,cancel),closed)
+        with self.assertRaises(wf.WorkflowError):
+            wf.reconcile_check(self.store,{**cancel,'expected_key':'0'*64})
+        self.assertEqual(before_replay,self._workflow_bytes())
+        wf.record_check(self.store,self._static_check_result(task,fresh))
+        wf.mark_implemented(self.store,{'task_id':tid})
+        finished = wf.complete(self.store,{
+            'task_id':tid,'outcome':'The scoped behavior preserves isolated state.',
+            'acceptance':[{'criterion':'Preserve isolated state.','result':'pass','evidence':['test-report.json']}],
+            'source_fingerprints':wf.fingerprints(self.store,['source.cs']),
+        })
+        self.assertEqual(finished['check_results'][0]['result']['attempt_id'],fresh['attempt_id'])
+        self.assertEqual(wf.reconcile_check(self.store,cancel),closed)
+
+    def test_reconcile_rejects_fresh_moved_and_mismatched_cleanup_without_mutation(self):
+        task = self.main()
+        tid = task['id']
+        source = self.root/'source.cs'
+        wf.begin_task(self.store,{'task_id':tid})
+        attempt = wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'})
+        request = self._check_request(task,attempt)
+        process = self._owned_test_group(live=True)
+        binding = self._bind_test_runner(request,process)
+        other_live = self._owned_test_group(live=True)
+        group = process.pid
+        fresh = wf.reconcile_check(self.store,request)
+
+        def rejected(payload):
+            before = self._workflow_bytes()
+            with self.assertRaises(wf.WorkflowError):
+                wf.reconcile_check(self.store,payload)
+            self.assertEqual(before,self._workflow_bytes())
+
+        rejected({**binding,'process_group':other_live.pid})
+        self.assertIsNone(process.poll())
+        self.assertIsNone(other_live.poll())
+        process.terminate()
+        process.wait(timeout=10)
+        rejected(self._cleanup_request(request,fresh,group))
+        source.write_text('The first fixture revision changed.\n')
+        inspected = wf.reconcile_check(self.store,request)
+        cancel = self._cleanup_request(request,inspected,group)
+        rejected({**cancel,'expected_definition':'0'*64})
+        rejected({**cancel,'attempt_id':wf.identity('C')})
+        rejected({**cancel,'cleanup':{**cancel['cleanup'],'sha256':'0'*64}})
+        rejected({**cancel,'cleanup':{**cancel['cleanup'],'path':'missing-cleanup.json'}})
+        rejected(self._cleanup_request(request,inspected,group,run_id=wf.identity('WR')))
+        rejected(self._cleanup_request(request,inspected,group,host='foreign-fixture.invalid'))
+        rejected(self._cleanup_request(request,inspected,group,observed_live_processes=1))
+        rejected(self._cleanup_request(request,inspected,group,observed_at='2000-01-01T00:00:00+00:00'))
+        rejected(self._cleanup_request(request,inspected,group,environment_identity='0'*64))
+        cancel = self._cleanup_request(request,inspected,group)
+        alias = self.root/'cleanup-alias.json'
+        alias.symlink_to(self.root/'check-cleanup.json')
+        rejected({**cancel,'cleanup':{**cancel['cleanup'],'path':alias.name}})
+        source.write_text('The second fixture revision changed.\n')
+        rejected(cancel)
+        with self.assertRaises(wf.WorkflowError):
+            wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'})
+
+    def test_stale_unbound_attempt_rejects_retroactive_binding_and_cleanup(self):
+        task = self.main()
+        wf.begin_task(self.store,{'task_id':task['id']})
+        attempt = wf.prepare_check(self.store,{'task_id':task['id'],'check_id':'behavior'})
+        request = self._check_request(task,attempt)
+        (self.root/'source.cs').write_text('The fixture source changed before binding.\n')
+        inspected = wf.reconcile_check(self.store,request)
+        self.assertTrue(inspected['stale'])
+        runner = self._owned_test_group(live=True)
+        before = self._workflow_bytes()
+        with self.assertRaises(wf.WorkflowError):
+            wf.reconcile_check(self.store,self._runner_binding_request(request,inspected,runner.pid))
+        self.assertEqual(before,self._workflow_bytes())
+        self.assertIsNone(runner.poll())
+        runner.terminate()
+        runner.wait(timeout=10)
+        with self.assertRaises(wf.WorkflowError):
+            wf.reconcile_check(self.store,self._cleanup_request(request,inspected,runner.pid))
+        self.assertEqual(before,self._workflow_bytes())
+        with self.assertRaises(wf.WorkflowError):
+            wf.prepare_check(self.store,{'task_id':task['id'],'check_id':'behavior'})
+
+    def test_reconcile_can_observe_a_removed_check_without_fabricating_a_current_key(self):
+        task = self.main()
+        wf.begin_task(self.store,{'task_id':task['id']})
+        attempt = wf.prepare_check(self.store,{'task_id':task['id'],'check_id':'behavior'})
+        request = self._check_request(task,attempt)
+        runner = self._owned_test_group(live=True)
+        self._bind_test_runner(request,runner)
+        self.store.future.write_text(self.store.text().replace('"id": "behavior"','"id": "replacement"'))
+        inspected = wf.reconcile_check(self.store,request)
+        self.assertTrue(inspected['stale'])
+        self.assertIsNone(inspected['observed']['key'])
+        self.assertNotEqual(inspected['observed']['definition'],attempt['definition'])
+        replacement = wf.prepare_check(self.store,{'task_id':task['id'],'check_id':'replacement'})
+        wf.record_check(self.store,self._static_check_result(task,replacement))
+        wf.mark_implemented(self.store,{'task_id':task['id']})
+        completion = {
+            'task_id':task['id'],'outcome':'The scoped behavior preserves isolated state.',
+            'acceptance':[{'criterion':'Preserve isolated state.','result':'pass','evidence':['test-report.json']}],
+            'source_fingerprints':wf.fingerprints(self.store,['source.cs']),
+        }
+        before = self._workflow_bytes()
+        with self.assertRaises(wf.WorkflowError):
+            wf.complete(self.store,completion)
+        self.assertEqual(before,self._workflow_bytes())
+        runner.terminate()
+        runner.wait(timeout=10)
+        closed = wf.reconcile_check(self.store,self._cleanup_request(request,inspected,runner.pid))
+        self.assertEqual(closed['status'],'cancelled-no-result')
+        finished = wf.complete(self.store,completion)
+        self.assertEqual(finished['check_results'][0]['result']['attempt_id'],replacement['attempt_id'])
+
+    def test_reconcile_only_closes_selected_scope_and_preserves_a_parked_run_and_red(self):
+        source_config = self.store.base/'config/repository.json'
+        config = json.loads(source_config.read_text())
+        config['recipes'] = {'static-inspection':{'lane':'unit','argv':['fixture'],'input_paths':[]}}
+        source_config.write_text(json.dumps(config))
+        outside = self.main('Standalone fixture')
+        wf.begin_task(self.store,{'task_id':outside['id']})
+        outside_attempt = wf.prepare_check(self.store,{'task_id':outside['id'],'check_id':'behavior'})
+        task = self.main('Controller fixture',priority=150)
+        tid = task['id']
+        run = wf.start(self.store,'next',tid)
+        wf.begin_task(self.store,{'task_id':tid})
+        red = wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'})
+        wf.record_check(self.store,{
+            'task_id':tid,'check_id':'behavior','attempt_id':red['attempt_id'],
+            'result':'red','classification':'executed-control','actual_lane':'unit',
+            'environment_identity':red['environment_identity'],'failure_category':'expected-behavior',
+            'counts':{'expected':1,'discovered':1,'passed':0,'failed':1,'skipped':0},
+            'cleanup':'The disposable fixture exited.','evidence':['test-report.json'],
+        })
+        attempt = wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'})
+        request = self._check_request(task,attempt)
+        runner = self._owned_test_group(live=True)
+        self._bind_test_runner(request,runner)
+        wf.checkpoint(self.store,{'phase':'blocked','stop_reason':'Owner review remains pending'})
+        (self.root/'source.cs').write_text('The fixture source changed during validation.\n')
+        inspection = wf.reconcile_check(self.store,request)
+        self.assertEqual(inspection['run_id'],run['id'])
+        parked = self.store.load()
+        with self.assertRaises(wf.WorkflowError):
+            wf.reconcile_check(self.store,self._check_request(outside,outside_attempt))
+        self.assertEqual(self.store.load(),parked)
+        runner.terminate()
+        runner.wait(timeout=10)
+        wf.reconcile_check(self.store,self._cleanup_request(request,inspection,runner.pid))
+        current = self.store.load()
+        self.assertEqual(current['active_run'],parked['active_run'])
+        self.assertEqual(current['task_progress'][outside['id']],parked['task_progress'][outside['id']])
+        self.assertEqual(current['task_progress'][tid]['stage'],parked['task_progress'][tid]['stage'])
+        self.assertEqual(current['task_progress'][tid]['checks']['behavior']['red'],
+                         parked['task_progress'][tid]['checks']['behavior']['red'])
+        self.assertEqual(current['task_progress'][tid]['checks']['behavior']['result'],
+                         parked['task_progress'][tid]['checks']['behavior']['result'])
+        with self.assertRaises(wf.WorkflowError):
+            wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'})
+
+    def test_reconcile_rejects_parent_attempt_outside_current_maintenance_focus(self):
+        parent = self.main('Parked parent fixture',priority=150)
+        maintenance = self.main('Focused infrastructure fixture')
+        wf.start(self.store,'all')
+        wf.begin_task(self.store,{'task_id':parent['id']})
+        attempt = wf.prepare_check(self.store,{'task_id':parent['id'],'check_id':'behavior'})
+        request = self._check_request(parent,attempt)
+        runner = self._owned_test_group(live=True)
+        self._bind_test_runner(request,runner)
+        wf.checkpoint(self.store,{'phase':'blocked','stop_reason':'Owner review remains pending'})
+        (self.root/'source.cs').write_text('The parked fixture source changed.\n')
+        inspected = wf.reconcile_check(self.store,request)
+        runner.terminate()
+        runner.wait(timeout=10)
+        cancel = self._cleanup_request(request,inspected,runner.pid)
+        wf.focus_maintenance(self.store,{
+            'task_id':maintenance['id'],'instruction':'Inspect the scoped infrastructure fixture.',
+        })
+        before = self._workflow_bytes()
+        with self.assertRaises(wf.WorkflowError):
+            wf.reconcile_check(self.store,cancel)
+        self.assertEqual(before,self._workflow_bytes())
+
+    def test_reconcile_rejects_one_live_runner_binding_for_two_pending_attempts(self):
+        first = self.main('First runner fixture')
+        second = self.main('Second runner fixture')
+        wf.start(self.store,'all')
+        requests = []
+        for task in (first,second):
+            wf.begin_task(self.store,{'task_id':task['id']})
+            attempt = wf.prepare_check(self.store,{'task_id':task['id'],'check_id':'behavior'})
+            requests.append(self._check_request(task,attempt))
+        runner = self._owned_test_group(live=True)
+        self._bind_test_runner(requests[0],runner)
+        inspection = wf.reconcile_check(self.store,requests[1])
+        binding = self._runner_binding_request(requests[1],inspection,runner.pid)
+        before = self._workflow_bytes()
+        with self.assertRaises(wf.WorkflowError):
+            wf.reconcile_check(self.store,binding)
+        self.assertEqual(before,self._workflow_bytes())
+        self.assertIsNone(runner.poll())
+
+    def test_reconcile_proves_recipe_only_drift_from_the_original_owned_profile(self):
+        import subprocess
+        import sys
+        task = self.main('Installed recipe fixture')
+        tid = task['id']
+        recipe_input = self.root/'recipe-input.txt'
+        recipe_input.write_text('The original recipe input.\n')
+        (self.store.base/'validation-recipes.json').write_text(json.dumps({
+            'schema':1,'recipes':{'static-inspection':{
+                'lane':'unit','argv':[sys.executable,'-c','pass'],'input_paths':[recipe_input.name],
+            }},
+        }))
+        installed = subprocess.run(
+            ['node',str(ROOT/'bin/install.js'),'--target',str(self.root),'--only','codex',
+             '--skills','skill-tree-implement-all','--flavor','general','--copy','--non-interactive'],
+            capture_output=True,text=True,timeout=45,
+        )
+        self.assertEqual(installed.returncode,0,installed.stdout+installed.stderr)
+        profile = self.store.base/'installation/profile.json'
+        original_profile = profile.read_bytes()
+        self.assertEqual(json.loads(original_profile)['inputs'][recipe_input.name],wf.file_hash(recipe_input))
+        wf.begin_task(self.store,{'task_id':tid})
+        attempt = wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'})
+        request = self._check_request(task,attempt)
+        runner = self._owned_test_group(live=True)
+        self._bind_test_runner(request,runner)
+
+        recipe_input.write_text('The scoped recipe input changed.\n')
+        inspected = wf.reconcile_check(self.store,request)
+        self.assertTrue(inspected['stale'])
+        self.assertIsNone(inspected['observed']['key'])
+        self.assertEqual(inspected['observed']['definition'],attempt['definition'])
+        self.assertEqual(inspected['observed']['sources'],attempt['sources'])
+        self.assertEqual(inspected['observed']['recipe_inputs'][recipe_input.name],wf.file_hash(recipe_input))
+        self.assertTrue(self._installation_operation_active())
+        runner.terminate()
+        runner.wait(timeout=10)
+        cancel = self._cleanup_request(request,inspected,runner.pid)
+
+        forged = json.loads(original_profile)
+        forged['inputs'][recipe_input.name] = '0'*64
+        profile.write_text(json.dumps(forged))
+        before = self._workflow_bytes()
+        with self.assertRaises(wf.WorkflowError):
+            wf.reconcile_check(self.store,cancel)
+        self.assertEqual(before,self._workflow_bytes())
+        profile.write_bytes(original_profile)
+        closed = wf.reconcile_check(self.store,cancel)
+        self.assertEqual(closed['status'],'cancelled-no-result')
+        self.assertFalse(self._installation_operation_active())
+
 if __name__=='__main__':unittest.main()

@@ -1,0 +1,27 @@
+{
+  "actual_lane": "static",
+  "assertions": [
+    {
+      "assertion": "Owned profile discovery and the bundled validation documentation identify static-inspection as an assertion-only built-in fallback when no explicit recipe overrides the ID.",
+      "result": "pass"
+    }
+  ],
+  "attempt_id": "C-ddfc7377-d578-4fdd-abe4-f2cdd828a4f9",
+  "check_id": "static-recipe-discovery-contract",
+  "classification": "executed-control",
+  "cleanup": "Read-only source and installed fixture evidence inspected.",
+  "environment_identity": "26b981652d3f5ae52b9ca446f1825e2b696d42481df21d6606e95f227dd433ab",
+  "evidence": [
+    ".skill-tree/history/validation/future-followups/t-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e-static-recipe-discovery-contract-c-ddfc7377-d578-4fdd-abe4-f2cdd828a4f9.json"
+  ],
+  "result": "pass",
+  "review": "Compared the capabilities entry with the fallback in workflow-state.py. The entry is static, assertion-only, has empty input paths and lacks argv. Composer selects explicit declarations first and reads the fallback from the owned bundle. The maintained profile, validation and installation docs identify the discovery and legacy paths. The current installed fixture verified older-bundle compatibility and explicit precedence.",
+  "sources": {
+    ".skill-tree/common/references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
+    ".skill-tree/common/references/validation-policy.md": "2b68bdd7280aa2eb2e9534ad1f1e79a34292ad4839843331cd156db5547bfe7d",
+    ".skill-tree/common/scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9",
+    ".skill-tree/documents/install.md": "b684297991c8e9ae3f97ffc23a52a91b256147d799335c5ad984b90361fb21c7",
+    ".skill-tree/lib/composer.js": "9605ce43a0e99aff77dbf1e223dd7afcf326917753db7963de5bf1d61bdcd04b"
+  },
+  "task_id": "T-5a43a18f-ffd7-4d25-8ca7-4422e8ddaf1e"
+}

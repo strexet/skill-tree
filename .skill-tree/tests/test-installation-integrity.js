@@ -2,6 +2,89 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const cli=path.resolve(__dirname,'../bin/install.js');
 function setup(t){const root=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-owned-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));return root;}
 function run(root,extra=[],entry=cli){return spawnSync(process.execPath,[entry,'--target',root,'--only','codex','--flavor','general',...extra],{encoding:'utf8',timeout:15000});}
+
+const inspectionOperation = 'skill-tree-work-through-next';
+const inspectionSelection = ['--skills', inspectionOperation];
+const inspectionPackage = path.join('.agents/skills', inspectionOperation);
+const inspectionProfile = '.skill-tree/installation/profile.json';
+const fallbackInspection = {
+ lane: 'static',
+ input_paths: [],
+ assertion_contract: 'explicit source and artifact assertions',
+};
+
+function resolvedInspection(root) {
+ const script = [
+  'import json, runpy, sys',
+  'from pathlib import Path',
+  'helper = runpy.run_path(sys.argv[1])',
+  'store = helper["Store"](Path(sys.argv[2]))',
+  'recipe, identity = helper["recipe_for"](store, {"recipe_id": "static-inspection", "parameters": {}})',
+  'print(json.dumps({"recipe": recipe, "identity": identity}))',
+ ].join('\n');
+ const helper = path.join(root, inspectionPackage, 'scripts/workflow-state.py');
+ const result = spawnSync('python3', ['-B', '-c', script, helper, root], {encoding: 'utf8', timeout: 15000});
+ assert.equal(result.status, 0, result.stdout + result.stderr);
+ return JSON.parse(result.stdout);
+}
+
+test('static inspection appears in the owned profile and explicit declarations take precedence', t => {
+ const root = setup(t);
+ const first = run(root, inspectionSelection);
+ assert.equal(first.status, 0, first.stdout + first.stderr);
+ const profile = () => JSON.parse(fs.readFileSync(path.join(root, inspectionProfile)));
+ assert.deepEqual(profile().recipes['static-inspection'], fallbackInspection);
+ assert.ok(profile().gaps.some(gap => gap.key === 'test-foundation'));
+ const doc = fs.readFileSync(path.join(root, inspectionPackage, 'references/project-profile.md'), 'utf8');
+ const concrete = JSON.parse(doc.match(/```json\n([\s\S]*?)\n```/)[1]);
+ assert.deepEqual(concrete.recipes['static-inspection'], fallbackInspection);
+ assert.deepEqual(resolvedInspection(root).recipe, fallbackInspection);
+
+ const declaration = '.skill-tree/validation-recipes.json';
+ const explicit = {lane: 'static', argv: ['node', 'explicit-inspection.js'], input_paths: []};
+ fs.writeFileSync(path.join(root, declaration), JSON.stringify({schema: 1, recipes: {'static-inspection': explicit}}));
+ const manager = path.join(root, '.skill-tree/installation/manager.js');
+ const refreshed = spawnSync(process.execPath, [manager, '--refresh-profile'], {encoding: 'utf8', timeout: 15000});
+ assert.equal(refreshed.status, 0, refreshed.stdout + refreshed.stderr);
+ const recipe = resolvedInspection(root).recipe;
+ assert.deepEqual(recipe, profile().recipes['static-inspection']);
+ assert.deepEqual(recipe.argv, explicit.argv);
+ assert.deepEqual(recipe.input_paths, [declaration]);
+ assert.equal(recipe.assertion_contract, undefined);
+});
+
+test('static inspection stays resolvable on an owned legacy profile and appears after source update', t => {
+ const root = setup(t);
+ const legacySource = setup(t);
+ const source = path.resolve(__dirname, '..');
+ for (const name of ['common', 'config', 'domains', 'lib', 'src', 'templates']) {
+  fs.cpSync(path.join(source, name), path.join(legacySource, name), {recursive: true});
+ }
+ const catalogEntry = path.join('skills/general', inspectionOperation, 'SKILL.md');
+ fs.mkdirSync(path.dirname(path.join(legacySource, catalogEntry)), {recursive: true});
+ fs.copyFileSync(path.join(source, catalogEntry), path.join(legacySource, catalogEntry));
+ const config = path.join(legacySource, 'config/capabilities.json');
+ const legacyCapabilities = JSON.parse(fs.readFileSync(config));
+ delete legacyCapabilities.built_in_recipes;
+ fs.writeFileSync(config, JSON.stringify(legacyCapabilities));
+
+ const legacy = run(root, [...inspectionSelection, '--source', legacySource]);
+ assert.equal(legacy.status, 0, legacy.stdout + legacy.stderr);
+ const profileFile = path.join(root, inspectionProfile);
+ const legacyReceipt = fs.readFileSync(profileFile);
+ assert.equal(JSON.parse(legacyReceipt).recipes['static-inspection'], undefined);
+ const verified = run(root, [...inspectionSelection, '--verify']);
+ assert.equal(verified.status, 0, verified.stdout + verified.stderr);
+ assert.deepEqual(fs.readFileSync(profileFile), legacyReceipt);
+ const original = resolvedInspection(root);
+ assert.deepEqual(original.recipe, fallbackInspection);
+
+ const updated = run(root, inspectionSelection);
+ assert.equal(updated.status, 0, updated.stdout + updated.stderr);
+ assert.deepEqual(JSON.parse(fs.readFileSync(profileFile)).recipes['static-inspection'], fallbackInspection);
+ assert.deepEqual(resolvedInspection(root), original);
+});
+
 test('invalid manager combinations reject before writes while explicit rollback remains available',t=>{
  const manager=require('../lib/installation.js'),root=setup(t);assert.equal(run(root).status,0);
  const entry=path.join(root,'.skill-tree/installation/manager.js'),before=manager.treeHash(root,'.skill-tree');

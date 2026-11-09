@@ -105,6 +105,8 @@ function resolveProfile(source,root,flavor) {
  }
  if(Object.values(recipes).some(r=>['unit','integration','browser','unity-editmode'].includes(r.lane)))gaps.splice(0,gaps.length,...gaps.filter(g=>g.key!=='test-foundation'));}
  }
+ const staticInspection=rules.built_in_recipes?.['static-inspection'];
+ if(staticInspection&&!Object.hasOwn(recipes,'static-inspection'))recipes['static-inspection']=staticInspection;
  const unresolved=Object.entries(facts.packages).filter(([,value])=>value.state==='ambiguous').map(([name])=>name);
  if(unresolved.length)gaps.push({key:'unresolved-package-versions',packages:unresolved,reason:'Dependency declarations lack resolved version evidence; version-specific resources are unavailable until supported lock evidence is supplied.'});
  facts.capabilities={};
