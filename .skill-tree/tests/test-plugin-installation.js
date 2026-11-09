@@ -83,6 +83,34 @@ test('writer locks and active retained runs reject activation and preserve all c
  const f=fixture(t),p=await prepared(f);fs.writeFileSync(path.join(f.root,'.skill-tree/.writer-lock'),'owned fixture');assert.throws(()=>lifecycle.applyProposal(f.root,p,confirm(p)),/writer|lock/i);fs.unlinkSync(path.join(f.root,'.skill-tree/.writer-lock'));
  const state={format:'skill-tree-future',schema:3,tasks:[],active_run:null,task_progress:{},run_registry:{schema:1,runs:{first:{id:'first',phase:'validate',stop_reason:null},other:{id:'other',phase:'implement',stop_reason:null}}}};fs.mkdirSync(path.join(f.root,'.skill-tree/documents'));const file=path.join(f.root,'.skill-tree/documents/future.json');fs.writeFileSync(file,JSON.stringify(state));const before=read(f.root,'.skill-tree/documents/future.json');assert.throws(()=>lifecycle.applyProposal(f.root,p,confirm(p)),/active|handoff|stop/i);assert.deepEqual(read(f.root,'.skill-tree/documents/future.json'),before);assert.equal(fs.existsSync(path.join(f.root,registry.REGISTRY)),false);
 });
+test('installation treats a local merge order as unfinished until delivery receipts match',t=>{
+ const {root}=fixture(t),folder=path.join(root,'.skill-tree/documents');
+ fs.mkdirSync(folder);
+ const file=path.join(folder,'future.json');
+ const run={id:'local',phase:'completed',delivery:{
+  implementation:'completed',status:'local-result',order_completed:true,
+  authorization:{pr:false,merge:true,mode:'local-merge'},
+ }};
+ const state={format:'skill-tree-future',schema:3,tasks:[],active_run:null,task_progress:{},
+  run_registry:{schema:1,runs:{local:run}}};
+ const save=()=>fs.writeFileSync(file,JSON.stringify(state));
+ save();
+ assert.equal(core.hasActiveOperation(root),true);
+
+ const commit='1'.repeat(40),profileIdentity='2'.repeat(64);
+ run.delivery.status='merged';
+ run.delivery.local_integration={
+  merge:{commit,tree:'3'.repeat(40),parents:['4'.repeat(40),'5'.repeat(40)]},
+  target_admission:{merge_commit:commit,profile_identity:profileIdentity},
+  validation:{merge_commit:commit,profile_identity:'stale',checks:[{exit_code:0}],
+   evidence:[{path:'.skill-tree/history/runs/local-validation.json',sha256:'6'.repeat(64)}]},
+ };
+ save();
+ assert.equal(core.hasActiveOperation(root),true);
+ run.delivery.local_integration.validation.profile_identity=profileIdentity;
+ save();
+ assert.equal(core.hasActiveOperation(root),false);
+});
 test('changed plugin generations require current profile refresh and preserve retained run progress',async t=>{
  const f=fixture(t),state={format:'skill-tree-future',schema:3,tasks:[],active_run:null,task_progress:{retained:{stage:'awaiting-validation',checks:{}}},run_registry:{schema:1,runs:{first:{id:'first',phase:'awaiting-validation',stop_reason:null,snapshot:['keep']},second:{id:'second',phase:'blocked',stop_reason:'retain owner wait',snapshot:['other']}}}};fs.mkdirSync(path.join(f.root,'.skill-tree/documents'));fs.writeFileSync(path.join(f.root,'.skill-tree/documents/future.json'),JSON.stringify(state));
  const helper=path.join(f.root,'.agents/skills/skill-tree-add-pending-task/scripts/workflow-state.py');

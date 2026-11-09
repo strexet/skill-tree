@@ -80,6 +80,14 @@ Product lanes require an owned execution session even when no new process launch
 
 `accept-revalidation` accepts current passing checks for a required completed contract selected by advance. Temporary `task_progress` entries carry `revalidation: true`; immutable terminal history owns the completed check definitions. The active run retains accepted `revalidated_checks`, without another outcome ledger or rewritten terminal record. Finish rejects stale/missing required completed evidence and unresolved revalidation attempts. A blocked-task resume can clear only the execution stop owned by the same admitted task; unrelated stops remain binding. History views refresh artifact availability and source matching without changing recorded verdicts.
 
+## Local delivery records
+
+A recorded `pr=false`, `merge=true`, `mode=local-merge` order creates a pending local delivery after implementation acceptance. The immutable finish record binds the reviewed source commit and tree, repository and execution worktree. The mutable delivery record retains prepared source and target refs, canonical preservation fingerprints, actual merge evidence, target profile admission and validation. A repeated finish supplies the same original completion.
+
+Select the existing run explicitly with `--run-id`. Use `local-delivery-status`, `local-delivery-prepare`, `local-delivery-merge` and `local-delivery-reconcile` for Git delivery. After activation from the merged target source, use `local-delivery-admit-target`, any required `local-delivery-admit-retained`, `local-delivery-validate` and `local-delivery-complete`. Preparation pins the existing ancestor target and the reviewed source. Reconciliation reads the actual target ref, both ordered parent objects and the expected tree directly from Git.
+
+The same repository-local target lock protects the prepared Git operation and receipt gates. Workflow writer and installer barriers protect canonical state. Owned validation executes fixed checks on the exact target and records actual results and evidence digests. Missing, stale or unproven evidence retains pending delivery. Completion records the local integration class and original merge identity.
+
 ## Task clarification contract
 
 The `skill-tree-clarify-tasks` operation exposes the following metadata-only interface through the bundled helper. Canonical mutable records reside in `.skill-tree/clarifications/cl-<uuid>.json` with schema 1, stable `CL-<uuid>` identity and integer revision. Records contain exact selected task IDs, source and semantic baselines, facts, rounds/questions/answers, revision evidence, confirmation, state and next action. The queue/index remain task authorities; implementation progress, run checkpoints and terminal ledgers remain separate.

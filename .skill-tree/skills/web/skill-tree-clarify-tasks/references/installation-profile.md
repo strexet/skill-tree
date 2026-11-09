@@ -70,3 +70,10 @@ A binding declaration uses the following shape. Snapshot exclusions are explicit
 The example pins describe data syntax, not a qualified toolchain combination. The review records schema 1, queue/execution/workspace snapshot digests and a complete `differences` list with `path`, exact nullable `queue`/`execution` SHA-256 values, `classification` and `reason`. The locator records schema 1 plus exact absolute machine-local `queue_root` and `workspace_root`. The generated receipt never replaces an owner authorization or actual toolchain check.
 
 Registered worktree installations use the canonical installation/writer barrier and inspect every retained active run before activation. A worktree profile belongs to the exact execution root; profile refresh requires a stopped handoff and explicit re-admission. The portable worktree environment declaration records required file names, isolated mutable directories and exclusive resource keys without secret contents.
+
+
+## Merged target activation
+
+Local delivery verifies the installed generation against the source inputs in the exact canonical merge tree. Installed bundle verification alone establishes internal ownership and consistency. Target activation additionally checks the expected flavor and provider destinations, including newly admitted core operations.
+
+The stopped canonical handoff protects the live queue, existing outcomes and retained workflow records. The target profile receives explicit local-delivery admission. Each affected retained run receives separate admission from the verified profile in the recorded execution worktree. Admission retains independent stops and grants no execution authority. Current target validation binds the resulting profile to the recorded Git merge before local delivery completes.

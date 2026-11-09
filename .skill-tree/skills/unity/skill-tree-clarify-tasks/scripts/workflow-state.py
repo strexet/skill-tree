@@ -267,7 +267,7 @@ class Store:
             raise WorkflowError('Metadata path outside owned directory: '+relative)
         return path
     @contextmanager
-    def lock(self):
+    def lock(self, *, local_delivery=None):
         self.base.mkdir(exist_ok=True)
         if (self.base/'installation/.install-lock').exists():raise WorkflowError('Installation lock exists; implementation waits for the owned profile transaction')
         path=self.base/'.writer-lock'
@@ -276,6 +276,7 @@ class Store:
         try:
             os.write(fd,dump({'pid':os.getpid(),'host':socket.gethostname()}).encode());os.close(fd)
             if (self.base/'installation/.install-lock').exists():raise WorkflowError('Installation lock exists; preserve the profile handoff')
+            self._local_delivery = local_delivery
             self.recover()
             mutable=[self.future,self.state,self.base/'skill-tree.json',self.base/'history/task-outcomes.jsonl',*list((self.base/'history').rglob('*.json')),*list((self.base/'clarifications').glob('*.json')),*list((self.base/'decisions').glob('*.json')),*list((self.base/'invocations').glob('*.json'))]
             self._write_hashes={p.relative_to(self.root).as_posix():file_hash(p) for p in mutable}
@@ -295,8 +296,11 @@ class Store:
             Path(temp).unlink(missing_ok=True)
     def recover(self):
         journal=self.base/'.transaction.json'
-        if not journal.exists(): return
+        if not journal.exists() and not journal.is_symlink(): return
+        if journal.is_symlink():raise WorkflowError('Workflow transaction journal cannot be a symlink')
         record=json.loads(journal.read_text())
+        if record.get('local_delivery') != getattr(self, '_local_delivery', None):
+            raise WorkflowError('Workflow transaction journal requires its exact original local delivery action')
         if record.get('format')!='skill-tree-transaction' or not isinstance(record.get('writes'),list): raise WorkflowError('Unsupported transaction state')
         # Validate every target before replay, including already-applied writes.
         for write in record['writes']:
@@ -311,6 +315,8 @@ class Store:
         for admission in admissions:
             _hook_admission(self,admission['scope'],admission['chain_ids'],register=False,navigation_followup=navigation_followup)
         record={'format':'skill-tree-transaction','writes':[]}
+        if getattr(self, '_local_delivery', None) is not None:
+            record['local_delivery'] = self._local_delivery
         for rel,content in writes.items():
             path=self.owned(rel);actual=file_hash(path);expected=getattr(self,'_write_hashes',{}).get(rel,actual)
             if actual!=expected:raise WorkflowError('Metadata changed during the operation; preserve developer changes: '+rel)
@@ -358,7 +364,7 @@ class Store:
         if not path.exists(): return []
         try: return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
         except json.JSONDecodeError as exc: raise WorkflowError('Corrupt task outcome ledger') from exc
-    def save(self,text,state,extras=None):
+    def save(self,text,state,extras=None,*,update_navigation=True):
         state['source_hash']=digest(text.encode());state['tasks']=index(text)
         writes=dict(extras or {})
         if text!=self.text(): writes['.skill-tree/documents/future.md']=text
@@ -367,7 +373,8 @@ class Store:
         writes['.skill-tree/documents/future.json']=dump(persisted)
         self.commit(writes)
         if 'run_registry' in persisted:state['run_registry']=persisted['run_registry']
-        self.commit({'.skill-tree/skill-tree.json':dump(manifest(self))})
+        if update_navigation:
+            self.commit({'.skill-tree/skill-tree.json':dump(manifest(self))})
     def record_run_event(self,text,state,writes):
         registry=state.get('run_registry');rid=self.selected_run_id
         if not registry or not rid:return
@@ -847,12 +854,578 @@ def complete(store,payload):
         state['task_progress'].pop(task['id'],None)
         text=remove(text,{task['id']});store.save(text,state,{'.skill-tree/history/task-outcomes.jsonl':ledger});return record
 
+LOCAL_DELIVERY_COMMANDS = {
+    'local-delivery-' + name: action for name, action in (
+        ('status', 'status'), ('prepare', 'prepare'), ('merge', 'merge'), ('reconcile', 'reconcile'),
+        ('admit-target', 'admit-target'), ('admit-retained', 'admit-retained'),
+        ('validate', 'validate-target'), ('complete', 'complete'),
+    )
+}
+
+
+def _delivery_receipt_path(run, suffix=''):
+    return '.skill-tree/history/runs/run-' + run['id'].lower() + suffix + '.json'
+
+
+def _delivery_install_barrier(root):
+    for relative in ('.skill-tree/installation/.install-lock', '.skill-tree/installation/.journal.json',
+                     '.skill-tree/installation/.plugin-journal.json'):
+        path = root / relative
+        if path.exists() or path.is_symlink():
+            raise WorkflowError('Local delivery requires explicit resolution of the installation lock or journal: ' + relative)
+
+
+def _delivery_writer_barrier(store, owner):
+    _delivery_install_barrier(store.root)
+    path = store.base / '.writer-lock'
+    if path.exists() or path.is_symlink():
+        raise WorkflowError('Local delivery requires the canonical workflow writer to stop')
+    journal = store.base / '.transaction.json'
+    if journal.exists() or journal.is_symlink():
+        if journal.is_symlink() or json.loads(journal.read_text()).get('local_delivery') != owner:
+            raise WorkflowError('Unrelated or uncertain workflow transaction journal requires explicit recovery')
+
+
+def _delivery_inspect_installation(root, source, *, current=False):
+    library = source / '.skill-tree/lib/installation.js'
+    profile = root / '.skill-tree/installation/profile.json'
+    if not library.is_file():
+        if current or profile.exists() or (root / '.skill-tree/invocations').exists():
+            raise WorkflowError('The reviewed owned installation verifier is unavailable')
+        return {'paths': [], 'scope': None, 'active': False}
+    if (library.is_symlink() or library.parent.is_symlink()
+            or workspaces.local_git(source, 'ls-files', '--error-unmatch', '--', '.skill-tree/lib/installation.js',
+                                    accepted=(0, 1)).returncode
+            or workspaces.local_git(source, 'diff', '--quiet', '--', '.skill-tree/lib/', accepted=(0, 1)).returncode):
+        raise WorkflowError('Local delivery requires the tracked reviewed owned installation verifier')
+    script = r"""
+const path = require('node:path');
+const [root, source, current] = process.argv.slice(1);
+const directory = path.join(source, '.skill-tree');
+const core = require(path.join(directory, 'lib/installation.js'));
+const composer = require(path.join(directory, 'lib/composer.js'));
+const profile = core.receipt(root, current === 'true');
+const active = core.hasActiveOperation(root);
+if (!profile) { console.log(JSON.stringify({paths: [], scope: null, active})); process.exit(0); }
+core.verifyOwned(root, profile);
+const paths = new Set([core.PROFILE, ...Object.keys(profile.bundle_digests)]);
+const destinations = {}, installed = new Map();
+for (const [relative, record] of Object.entries(profile.destinations)) {
+  for (const file of Object.keys(record.files)) paths.add(relative + '/' + file);
+  const owners = [...(record.providers || [record.provider])].sort();
+  destinations[relative] = {name: record.name, providers: owners};
+  for (const provider of owners) {
+    if (!installed.has(provider)) installed.set(provider, new Set());
+    installed.get(provider).add(record.name);
+  }
+}
+if (current === 'true') {
+  core.verify(root, directory);
+  if (composer.json(composer.sourceInputs(directory)) !== composer.json(profile.source_digests))
+    throw Error('The target owned generation does not match the exact merged source');
+} else {
+  const previous = path.join(root, core.INSTALL, 'source');
+  const priorOperations = Object.keys(composer.readJson(previous, 'templates/operations.json'));
+  const nextOperations = Object.keys(composer.readJson(directory, 'templates/operations.json'));
+  const matrix = composer.readJson(directory, 'config/providers.json').providers;
+  for (const [provider, names] of installed) {
+    if (!priorOperations.every(name => names.has(name))) continue;
+    const owner = matrix.find(item => item.id === provider);
+    if (!owner) throw Error('A retained target provider is unavailable');
+    for (const name of nextOperations) {
+      const relative = path.posix.join(provider === 'generic' ? '' : owner.projectPath, name);
+      const record = destinations[relative] || {name, providers: []};
+      if (record.name !== name) throw Error('A retained target destination conflicts with an incoming core operation');
+      destinations[relative] = {...record, providers: [...new Set([...record.providers, provider])].sort()};
+    }
+  }
+}
+console.log(JSON.stringify({paths: [...paths].sort(), active, scope: {flavor: profile.flavor, destinations},
+  admission: {identity: profile.identity, environment_id: profile.environment_id, flavor: profile.flavor}}));
+"""
+    environment = {key: value for key, value in os.environ.items() if key not in {'NODE_OPTIONS', 'NODE_PATH'}}
+    result = subprocess.run(['node', '-e', script, str(root), str(source), str(current).lower()],
+                            capture_output=True, text=True, timeout=35, env=environment)
+    if result.returncode:
+        reason = next((line.removeprefix('Error: ') for line in result.stderr.splitlines() if line.startswith('Error: ')),
+                      'Owned installation verification failed')
+        raise WorkflowError(reason)
+    return json.loads(result.stdout)
+
+
+def _delivery_path_hash(root, relative):
+    path = root
+    for part in relative.split('/'):
+        path = path / part
+        if path.is_symlink():
+            raise WorkflowError('Local delivery requires an ordinary owned file: ' + repr(relative))
+    return file_hash(path) if path.is_file() else None
+
+
+def _delivery_metadata_path(relative, *, canonical):
+    if relative.startswith('.skill-tree/history/'):
+        return True
+    return canonical and (relative in {'.skill-tree/documents/future.md', '.skill-tree/documents/future.json',
+                                       '.skill-tree/skill-tree.json'}
+                          or relative.startswith(('.skill-tree/clarifications/', '.skill-tree/decisions/',
+                                                  '.skill-tree/invocations/')))
+
+
+def _delivery_dirt(root, source, *, canonical):
+    dirt = workspaces.local_worktree_dirt(root)
+    if any(relative.startswith('.skill-tree/lib/') for relative in dirt):
+        raise WorkflowError('Local integration requires the reviewed owned installation verifier bytes')
+    installed = _delivery_inspect_installation(root, source)
+    owned = set(installed['paths'])
+    preserved = set()
+    for relative in dirt:
+        if relative not in owned and not _delivery_metadata_path(relative, canonical=canonical):
+            if workspaces.local_unchanged_file(root, relative):
+                continue
+            raise WorkflowError('Dirty worktree has no matching owned delivery scope: ' + repr(relative))
+        if _delivery_path_hash(root, relative) is None:
+            raise WorkflowError('A preserved local delivery path is missing: ' + repr(relative))
+        preserved.add(relative)
+    return preserved, installed
+
+
+def _delivery_freeze_source(store, run, expected=None):
+    source = workspaces.local_source_identity(store, run)
+    if expected is not None and source != {key: value for key, value in expected.items() if key != 'preserved_dirt'}:
+        raise WorkflowError('The source head, tree or worktree changed after implementation acceptance')
+    _delivery_install_barrier(store.source_root)
+    dirt, _ = _delivery_dirt(store.source_root, store.source_root, canonical=False)
+    source['preserved_dirt'] = {relative: _delivery_path_hash(store.source_root, relative) for relative in sorted(dirt)}
+    return source
+
+
+def _delivery_original(store, run):
+    delivery = run['delivery']
+    ref = _delivery_receipt_path(run)
+    if not delivery.get('implementation_receipt_sha256'):
+        raise WorkflowError('Local delivery requires an immutable implementation acceptance receipt')
+    if _delivery_path_hash(store.root, ref) != delivery['implementation_receipt_sha256']:
+        raise WorkflowError('The immutable local implementation completion receipt changed or is unavailable')
+    original = json.loads(store.owned(ref).read_text())
+    original_delivery = original.get('delivery', {})
+    if (original.get('id') != run['id'] or original.get('workspace') != run.get('workspace')
+            or original_delivery.get('authorization') != delivery.get('authorization')
+            or original_delivery.get('reviewed_source') != delivery.get('reviewed_source')):
+        raise WorkflowError('The immutable local implementation completion identity differs')
+    return original
+
+
+def _delivery_state_projection(state, run_id, retained):
+    projection = deepcopy(state)
+    projection['active_run'] = None
+    registry = projection['run_registry']
+    own = registry['runs'][run_id]
+    for field in ('delivery', 'profile_refresh_required', 'stop_reason', 'next_action'):
+        own.pop(field, None)
+    for retained_id in retained:
+        record = registry['runs'][retained_id]
+        for field in ('profile_refresh_required', 'admission', 'local_delivery_readmissions'):
+            record.pop(field, None)
+    registry.pop('applied_events', None)
+    for changed in (run_id, *retained):
+        registry.get('event_sequences', {}).pop(changed, None)
+    return digest(dump(projection).encode())
+
+
+def _delivery_preservation(store, state, run, incoming, dirt):
+    retained = {}
+    for retained_id, candidate in state['run_registry']['runs'].items():
+        if retained_id == run['id'] or workspaces.delivery_finished(candidate):
+            continue
+        if not candidate.get('stop_reason') or candidate.get('maintenance'):
+            raise WorkflowError('Retained local run requires a stopped handoff: ' + retained_id)
+        retained[retained_id] = {
+            'admission': candidate['admission'], 'profile_refresh_required': candidate.get('profile_refresh_required'),
+            'local_delivery_readmissions': candidate.get('local_delivery_readmissions', []),
+        }
+    files = {'.skill-tree/documents/future.md', '.skill-tree/history/task-outcomes.jsonl'}
+    files.update(path for path in dirt if _delivery_metadata_path(path, canonical=True))
+    for name in ('clarifications', 'decisions', 'invocations', 'history/run-events'):
+        directory = store.base / name
+        files.update(path.relative_to(store.root).as_posix() for path in directory.rglob('*')
+                     if path.is_file() or path.is_symlink())
+    files.difference_update({'.skill-tree/documents/future.json', '.skill-tree/skill-tree.json'})
+    return {
+        'files': {relative: _delivery_path_hash(store.root, relative) for relative in sorted(files)
+                  if not any(workspaces.local_overlap(relative, path) for path in incoming)},
+        'state_sha256': _delivery_state_projection(state, run['id'], retained),
+        'applied_events': state['run_registry'].get('applied_events', []),
+        'sequences': {rid: state['run_registry']['event_sequences'].get(rid, 0) for rid in (run['id'], *retained)},
+        'retained': retained,
+    }
+
+
+def _delivery_assert_preserved(store, state, run, preservation):
+    retained = preservation['retained']
+    if _delivery_state_projection(state, run['id'], retained) != preservation['state_sha256']:
+        raise WorkflowError('The preserved canonical workflow or retained scope changed')
+    registry = state['run_registry']
+    previous_events = preservation['applied_events']
+    current_events = registry.get('applied_events', [])
+    if current_events[:len(previous_events)] != previous_events:
+        raise WorkflowError('The preserved workflow event history changed')
+    sequences = dict(preservation['sequences'])
+    for event_id in current_events[len(previous_events):]:
+        if not valid_id(event_id, 'E'):
+            raise WorkflowError('A local delivery workflow event has an invalid identity')
+        candidates = [store.base / 'history/run-events' / rid.lower() / (event_id.lower() + '.json')
+                      for rid in sequences]
+        records = [path for path in candidates if path.is_file() and not path.is_symlink()]
+        if len(records) != 1:
+            raise WorkflowError('A workflow event outside the prepared local delivery scope appeared')
+        event = json.loads(records[0].read_text())
+        rid = event.get('run_id')
+        if (rid not in sequences or records[0].parent.name != rid.lower() or event.get('id') != event_id
+                or event.get('queue_id') != registry['queue_id'] or event.get('sequence') != sequences[rid] + 1
+                or any(event.get(key) for key in ('changes', 'progress_changes', 'outcomes'))):
+            raise WorkflowError('A workflow event changed outside the exact local delivery scope')
+        sequences[rid] += 1
+    if any(registry['event_sequences'].get(rid, 0) != count for rid, count in sequences.items()):
+        raise WorkflowError('The preserved workflow event counters changed')
+    for relative, expected in preservation['files'].items():
+        if _delivery_path_hash(store.root, relative) != expected:
+            raise WorkflowError('A preserved canonical queue or history file changed: ' + relative)
+    for retained_id, prior in retained.items():
+        current = state['run_registry']['runs'][retained_id]
+        entries = current.get('local_delivery_readmissions', [])
+        if entries == prior['local_delivery_readmissions']:
+            if (current['admission'] != prior['admission']
+                    or current.get('profile_refresh_required') not in (prior['profile_refresh_required'], True)):
+                raise WorkflowError('A retained run changed outside scoped local delivery admission')
+        elif (len(entries) != len(prior['local_delivery_readmissions']) + 1
+              or entries[:-1] != prior['local_delivery_readmissions']
+              or entries[-1].get('delivery_run_id') != run['id']
+              or entries[-1].get('admission') != current['admission']
+              or current.get('profile_refresh_required')):
+            raise WorkflowError('A retained local delivery re-admission receipt conflicts with the stopped run')
+
+
+def _delivery_preflight(store, state, run, preparation=None):
+    if run.get('stop_reason') != 'Local delivery pending':
+        raise WorkflowError('Local delivery requires its original stopped handoff')
+    reviewed = run['delivery']['reviewed_source']
+    if _delivery_freeze_source(store, run, reviewed) != reviewed:
+        raise WorkflowError('The source head, worktree or preserved source bytes changed after implementation acceptance')
+    ref, head = workspaces.local_target_head(store, run)
+    dirt, installed = _delivery_dirt(store.root, store.source_root, canonical=True)
+    if installed['active']:
+        raise WorkflowError('Canonical execution requires a stopped installation and workflow handoff')
+    if preparation is None:
+        workspaces.local_merge_base(store, run, reviewed, head)
+        incoming = workspaces.local_incoming(store.root, head, reviewed['source_head'])
+        workspaces.local_preflight_collisions(store.root, incoming, dirt)
+        preparation = {
+            **{key: value for key, value in reviewed.items() if key != 'preserved_dirt'},
+            'target_ref': ref, 'target_head': head, 'incoming': sorted(incoming), 'target_scope': installed['scope'],
+            'prior_target_profile': installed.get('admission', {}).get('identity'),
+            'preservation': _delivery_preservation(store, state, run, incoming, dirt),
+        }
+    elif ref != preparation['target_ref']:
+        raise WorkflowError('The prepared target branch identity changed')
+    elif head == preparation['target_head'] and (installed['scope'] != preparation['target_scope']
+            or installed.get('admission', {}).get('identity') != preparation['prior_target_profile']):
+        raise WorkflowError('The prepared target ownership or installation profile changed before merge')
+    _delivery_assert_preserved(store, state, run, preparation['preservation'])
+    return preparation, head, dirt
+
+
+def _delivery_verified_target(store, preparation, merge):
+    expected = preparation['target_scope']
+    if not expected:
+        raise WorkflowError('Local delivery has no previously verified target flavor and provider scope')
+    inspected = _delivery_inspect_installation(store.root, store.root, current=True)
+    if inspected['scope'] != expected:
+        raise WorkflowError('Target flavor, provider or destination scope differs from the prepared local delivery')
+    if inspected['active']:
+        raise WorkflowError('Canonical execution requires a stopped installation and workflow handoff')
+    profile = inspected['admission']['identity']
+    affected = [rid for rid, previous in preparation['preservation']['retained'].items()
+                if preparation['prior_target_profile'] != profile or previous['profile_refresh_required']]
+    return {'merge_commit': merge['commit'], 'profile_identity': profile,
+            'admission': inspected['admission'], 'scope': expected, 'affected_retained': sorted(affected)}
+
+
+def _local_delivery_commands(merge):
+    return (
+        ('owned-installation', ('node', '.skill-tree/installation/manager.js', '--verify')),
+        ('source-sync', ('npm', 'run', 'sync:check')),
+        ('repository-validation', ('npm', 'run', 'validate')),
+        ('installer-list', ('node', '.skill-tree/bin/install.js', '--list')),
+        ('incoming-diff', ('git', '--no-replace-objects', '--no-optional-locks', '-c', 'core.fsmonitor=false',
+                           '-c', 'diff.autoRefreshIndex=false', 'diff', '--check', merge['parents'][0], merge['commit'], '--')),
+    )
+
+
+def _run_local_delivery_checks(root, merge):
+    checks = []
+    for name, argv in _local_delivery_commands(merge):
+        result = subprocess.run(argv, cwd=root, capture_output=True, timeout=120)
+        if result.returncode:
+            raise WorkflowError('Current local target validation failed: ' + name)
+        checks.append({'id': name, 'argv': list(argv), 'exit_code': result.returncode,
+                       'stdout_sha256': digest(result.stdout), 'stderr_sha256': digest(result.stderr)})
+    return checks
+
+
+def _delivery_validate_record(store, run, integration, admission):
+    validation = integration.get('validation', {})
+    if (validation.get('merge_commit') != admission['merge_commit']
+            or validation.get('profile_identity') != admission['profile_identity']
+            or not validation.get('checks') or any(check.get('exit_code') != 0 for check in validation['checks'])
+            or len(validation.get('evidence', [])) != 1):
+        raise WorkflowError('Current executed validation is required before local delivery completion')
+    evidence = validation['evidence'][0]
+    if (evidence.get('path') != _delivery_receipt_path(run, '-local-validation')
+            or _delivery_path_hash(store.root, evidence['path']) != evidence.get('sha256')):
+        raise WorkflowError('Local target validation evidence is missing or changed')
+    report = json.loads(store.owned(evidence['path']).read_text())
+    if report != {key: value for key, value in validation.items() if key != 'evidence'}:
+        raise WorkflowError('The fixed local validation report differs from its recorded result')
+
+
+def _delivery_save(store, run_id, expected, owner, change, extras=None, *, guard=None):
+    with store.lock(local_delivery=owner):
+        _delivery_install_barrier(store.root)
+        if file_hash(store.state) != expected:
+            raise WorkflowError('Canonical workflow changed during the local delivery action')
+        text = store.text()
+        state = store.load(text)
+        run = state['active_run']
+        if run['id'] != run_id:
+            raise WorkflowError('Local delivery workflow identity changed')
+        if guard is not None:
+            guard(state, run)
+        change(run)
+        store.save(text, state, extras, update_navigation=False)
+
+
+def _delivery_admit_retained(store, state, run, preparation, merge, admission, retained_id, owner, before):
+    if retained_id not in admission['affected_retained']:
+        raise WorkflowError('Select an exact retained stopped run from the prepared local delivery scope')
+    retained = state['run_registry']['runs'][retained_id]
+    entries = retained.get('local_delivery_readmissions', [])
+    if entries and entries[-1].get('delivery_run_id') == run['id']:
+        if entries[-1]['merge_commit'] != merge['commit']:
+            raise WorkflowError('The original retained re-admission binds another merge')
+        return
+    if not retained.get('profile_refresh_required'):
+        raise WorkflowError('The selected retained run has no affected installation profile to re-admit')
+    retained_store = Store(store.root, retained_id)
+    retained_store.load()
+    workspaces.ensure_workspace(retained_store, retained)
+    _delivery_install_barrier(retained_store.source_root)
+    profile_path = '.skill-tree/installation/profile.json'
+    profile_hash = _delivery_path_hash(retained_store.source_root, profile_path)
+    admitted = admit_profile(retained_store)
+    prior = preparation['preservation']['retained'][retained_id]['admission']
+    if admitted['identity'] == 'repository-local' and prior.get('identity') != 'repository-local':
+        raise WorkflowError('The retained stopped run lost its previously owned installation profile')
+    receipt = {'delivery_run_id': run['id'], 'merge_commit': merge['commit'],
+               'run_id': retained_id, 'admission': admitted}
+
+    def update(record):
+        record['admission'] = admitted
+        record.pop('profile_refresh_required', None)
+        record.setdefault('local_delivery_readmissions', []).append(receipt)
+
+    def guard(current, record):
+        selected = current['run_registry']['runs'][run['id']]
+        if selected.get('stop_reason') != 'Local delivery pending':
+            raise WorkflowError('The original stopped local delivery handoff changed during re-admission')
+        _delivery_assert_preserved(store, current, selected, preparation['preservation'])
+        workspaces.ensure_workspace(retained_store, record)
+        _delivery_install_barrier(retained_store.source_root)
+        if _delivery_path_hash(retained_store.source_root, profile_path) != profile_hash:
+            raise WorkflowError('The retained worktree profile changed during scoped re-admission')
+
+    _delivery_save(retained_store, retained_id, before, owner, update, guard=guard)
+
+
+def _delivery_retained_current(store, state, run, admission):
+    fingerprints = {}
+    for retained_id in admission['affected_retained']:
+        retained = state['run_registry']['runs'][retained_id]
+        entries = retained.get('local_delivery_readmissions', [])
+        if (retained.get('profile_refresh_required') or not entries
+                or entries[-1].get('delivery_run_id') != run['id']
+                or entries[-1].get('merge_commit') != admission['merge_commit']):
+            raise WorkflowError('Affected retained runs require exact scoped re-admission')
+        retained_store = Store(store.root, retained_id)
+        retained_store.load()
+        workspaces.ensure_workspace(retained_store, retained)
+        _delivery_install_barrier(retained_store.source_root)
+        profile = '.skill-tree/installation/profile.json'
+        fingerprints[retained_id] = _delivery_path_hash(retained_store.source_root, profile)
+        if admit_profile(retained_store) != entries[-1]['admission']:
+            raise WorkflowError('A retained stopped admission changed after local re-admission')
+    return fingerprints
+
+
+def local_delivery_action(store, action, payload):
+    if not valid_id(store.run_id, 'WR'):
+        raise WorkflowError('Local delivery requires an explicit --run-id')
+    if action not in LOCAL_DELIVERY_COMMANDS.values() or not isinstance(payload, dict):
+        raise WorkflowError('Select an exact local delivery action')
+    if (set(payload) != ({'run_id'} if action == 'admit-retained' else set())
+            or action == 'admit-retained' and not valid_id(payload.get('run_id'), 'WR')):
+        raise WorkflowError('Local delivery only accepts the exact scoped action inputs')
+    workspaces.local_git_environment()
+    run = store.load()['active_run']
+    if not run or not workspaces.local_merge_order(run):
+        raise WorkflowError('The selected run has no authorized local-merge order')
+    if action == 'status':
+        return run['delivery']
+    target = workspaces.local_merge_target(store.root, run)
+    owner = {'run_id': run['id'], 'action': action, **({'retained_run_id': payload['run_id']} if payload else {})}
+    with workspaces.publication_lock(store.root, 'local', target):
+        _delivery_writer_barrier(store, owner)
+        if (store.base / '.transaction.json').exists():
+            with store.lock(local_delivery=owner):
+                pass
+        state = store.load()
+        run = state['active_run']
+        _delivery_original(store, run)
+        delivery = run['delivery']
+        if workspaces.delivery_finished(run):
+            if action == 'complete':
+                return delivery
+            raise WorkflowError('The selected local delivery is already completed')
+        before = file_hash(store.state)
+        integration = deepcopy(delivery.get('local_integration', {}))
+        preparation = integration.get('preparation')
+        if not preparation and action != 'prepare':
+            raise WorkflowError('Prepare the exact authorized local delivery before continuation')
+        prepared, head, dirt = _delivery_preflight(store, state, run, preparation)
+        extras = None
+        if action == 'prepare':
+            if preparation and head != preparation['target_head']:
+                raise WorkflowError('The prepared target head has moved; reconcile the original merge')
+            workspaces.local_preflight_collisions(store.root, prepared['incoming'], dirt)
+            integration['preparation'] = prepared
+        else:
+            if action == 'merge' and head == prepared['target_head']:
+                workspaces.local_preflight_collisions(store.root, prepared['incoming'], dirt)
+                _delivery_writer_barrier(store, owner)
+                workspaces.run_local_merge(store.root, prepared['source_head'])
+                _, head, _ = _delivery_preflight(store, state, run, prepared)
+            merge = workspaces.local_merge_receipt(store.root, prepared, head)
+            if action in ('merge', 'reconcile'):
+                integration['merge'] = merge
+            elif integration.get('merge') != merge:
+                raise WorkflowError('Reconcile the exact actual local merge before target activation')
+            else:
+                admission = _delivery_verified_target(store, prepared, merge)
+                if action == 'admit-target':
+                    integration['target_admission'] = admission
+                elif integration.get('target_admission') != admission:
+                    raise WorkflowError('Explicit current canonical target re-admission is required')
+                elif action == 'admit-retained':
+                    _delivery_admit_retained(store, state, run, prepared, merge, admission, payload['run_id'], owner, before)
+                    return store.load()['active_run']['delivery']
+                elif action == 'validate-target':
+                    if 'validation' in integration:
+                        try:
+                            _delivery_validate_record(store, run, integration, admission)
+                        except (WorkflowError, ValueError):
+                            pass
+                        else:
+                            return delivery
+                    checks = _run_local_delivery_checks(store.root, merge)
+                    report = {'merge_commit': merge['commit'], 'profile_identity': admission['profile_identity'], 'checks': checks}
+                    path = _delivery_receipt_path(run, '-local-validation')
+                    content = dump(report)
+                    extras = {path: content}
+                    integration['validation'] = {**report, 'evidence': [{'path': path, 'sha256': digest(content.encode())}]}
+                elif action == 'complete':
+                    _delivery_validate_record(store, run, integration, admission)
+                    retained_profiles = _delivery_retained_current(store, state, run, admission)
+        _, current_head, _ = _delivery_preflight(store, store.load(), run, prepared)
+        if current_head != head:
+            raise WorkflowError('The exact canonical target head changed during local delivery')
+        if action in {'validate-target', 'complete'} and _delivery_verified_target(store, prepared, integration['merge']) != admission:
+            raise WorkflowError('The verified target installation changed during local delivery')
+        if (integration == delivery.get('local_integration') and action != 'complete'
+                and not (action == 'admit-target' and run.get('profile_refresh_required'))):
+            return delivery
+
+        def update(record):
+            record['delivery']['local_integration'] = integration
+            if action == 'admit-target':
+                record.pop('profile_refresh_required', None)
+            elif action == 'complete':
+                record['delivery'].update(status='merged', order_completed=True)
+                record['stop_reason'] = None
+                record['next_action'] = None
+
+        profile_hash = _delivery_path_hash(store.root, '.skill-tree/installation/profile.json')
+
+        def guard(current, record):
+            if workspaces.local_target_head(store, record)[1] != head:
+                raise WorkflowError('The canonical target head changed before receipt recording')
+            if workspaces.local_source_identity(store, record)['source_head'] != prepared['source_head']:
+                raise WorkflowError('The reviewed source head changed before receipt recording')
+            if _delivery_path_hash(store.root, '.skill-tree/installation/profile.json') != profile_hash:
+                raise WorkflowError('The target installation changed before receipt recording')
+            _delivery_assert_preserved(store, current, record, prepared['preservation'])
+            if action == 'complete':
+                _delivery_validate_record(store, record, integration, admission)
+                for rid, expected in retained_profiles.items():
+                    retained = Store(store.root, rid)
+                    retained.load()
+                    if _delivery_path_hash(retained.source_root, '.skill-tree/installation/profile.json') != expected:
+                        raise WorkflowError('A retained stopped admission changed before local completion')
+
+        _delivery_save(store, run['id'], before, owner, update, extras, guard=guard)
+        return store.load()['active_run']['delivery']
+
+
 def finish(store):
+    inspected = store.load().get('active_run')
+    if inspected and workspaces.local_merge_order(inspected) and not inspected.get('maintenance'):
+        workspaces.local_git_environment()
+        if inspected['delivery']['implementation'] == 'completed':
+            return _delivery_original(store, inspected)
+        target = workspaces.local_merge_target(store.root, inspected)
+        owner = {'run_id': inspected['id'], 'action': 'finish'}
+        with workspaces.publication_lock(store.root, 'local', target):
+            _delivery_writer_barrier(store, owner)
+            if (store.base / '.transaction.json').exists():
+                with store.lock(local_delivery=owner):
+                    pass
+                inspected = store.load()['active_run']
+                if inspected['delivery']['implementation'] == 'completed':
+                    return _delivery_original(store, inspected)
+            before = store.load()
+            _implementation_finish_checks(store, before, before['active_run'], store.text())
+            reviewed = _delivery_freeze_source(store, before['active_run'])
+            return _finish_implementation(store, reviewed, owner)
+    return _finish_implementation(store)
+
+
+def _implementation_finish_checks(store, state, run, text):
+    enforce_limits(run)
+    done={o['task_id'] for o in store.outcomes() if o['disposition']=='completed'}
+    required=set(run['snapshot']+run['required_ids'])
+    if not required.issubset(done):raise WorkflowError('Main tasks or required descendants remain incomplete')
+    if any(t['id'] in run['pending_ids'] and t['relation'] in {'blocker','subtask'} for t in parse(text)):raise WorkflowError('Required Pending tasks remain')
+    followups=[t for t in parse(text) if t['id'] in run['pending_ids'] and t['relation']=='followup']
+    if any(t['id'] not in {p for r in run['processing_results'] for p in r['selected_ids']} for t in followups):raise WorkflowError('Nonblocking findings require one processing pass before finish')
+    assert_admission(store,state)
+    stale=stale_completed_checks(store,state)
+    if stale:raise WorkflowError('Required completed check evidence is stale or unavailable: '+stale[0]['task_id']+'/'+stale[0]['check_id']+'; advance selects the preserved contract for revalidation')
+
+
+def _finish_implementation(store, reviewed=None, owner=None):
     inspected=store.load().get('active_run')
     if inspected:
         references=execution_run(inspected).get('hook_chains',[])
         prepare_hook_admission(store,chain_ids=references)
-    with store.lock():
+    with store.lock(local_delivery=owner) if owner else store.lock():
         text=store.text();state=store.load(text);run=state['active_run']
         if not run:raise WorkflowError('No active run')
         if run.get('maintenance'):
@@ -867,24 +1440,28 @@ def finish(store):
             del run['maintenance']
             ref='.skill-tree/history/runs/scope-'+summary['id'].lower()+'.json';run.setdefault('history_refs',[]).append(ref)
             store.save(text,state,{ref:dump(summary)});return summary
-        enforce_limits(run)
-        done={o['task_id'] for o in store.outcomes() if o['disposition']=='completed'}
-        required=set(run['snapshot']+run['required_ids'])
-        if not required.issubset(done):raise WorkflowError('Main tasks or required descendants remain incomplete')
-        if any(t['id'] in run['pending_ids'] and t['relation'] in {'blocker','subtask'} for t in parse(text)):raise WorkflowError('Required Pending tasks remain')
-        followups=[t for t in parse(text) if t['id'] in run['pending_ids'] and t['relation']=='followup']
-        if any(t['id'] not in {p for r in run['processing_results'] for p in r['selected_ids']} for t in followups):raise WorkflowError('Nonblocking findings require one processing pass before finish')
-        assert_admission(store,state)
-        stale=stale_completed_checks(store,state)
-        if stale:raise WorkflowError('Required completed check evidence is stale or unavailable: '+stale[0]['task_id']+'/'+stale[0]['check_id']+'; advance selects the preserved contract for revalidation')
+        _implementation_finish_checks(store, state, run, text)
         hook_admission(store,chain_ids=run.get('hook_chains',[]))
         run.setdefault('delivery',{'publication':'not-requested','authorization':{}}).update({'implementation':'completed','status':'implementation-completed'})
-        if not run['delivery'].get('authorization',{}).get('pr'):run['delivery']['status']='local-result'
+        if reviewed is not None:
+            if workspaces.local_source_identity(store, run) != {key: value for key, value in reviewed.items() if key != 'preserved_dirt'}:
+                raise WorkflowError('The reviewed source changed before freezing implementation acceptance')
+            run['delivery'].update(status='local-delivery-pending', reviewed_source=reviewed)
+            run['stop_reason'] = 'Local delivery pending'
+        elif not run['delivery'].get('authorization',{}).get('pr'):
+            run['delivery']['status']='local-result'
         run['delivery']['order_completed']=run['delivery']['status']=='local-result'
         summary=deepcopy(run);summary['finished_at']=now();summary['phase']='completed';summary['next_action']=None
-        if state.get('run_registry'):state['run_registry']['runs'][run['id']]=summary
-        state['active_run']=None;store.save(text,state,{'.skill-tree/history/runs/run-'+run['id'].lower()+'.json':dump(summary)})
-    prune(store,True);return summary
+        original = dump(summary)
+        if state.get('run_registry'):
+            registered = deepcopy(summary)
+            if reviewed is not None:
+                registered['delivery']['implementation_receipt_sha256'] = digest(original.encode())
+                registered['next_action'] = 'Prepare the exact authorized local delivery'
+            state['run_registry']['runs'][run['id']]=registered
+        state['active_run']=None;store.save(text,state,{_delivery_receipt_path(run): original})
+    if reviewed is None:prune(store,True)
+    return summary
 
 def record_cycle(store):
     with store.lock():
@@ -2942,13 +3519,15 @@ def clarification_mutate(store,command,payload):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|{'refresh','manifest','index','read','select','pending','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     args=parser.parse_args(argv)
     try:
         store=Store(args.root,args.run_id,allow_unselected=args.command in {'index','runs','manifest','start','workspace-setup','recover-locator'},route_queue=args.command!='recover-locator');payload=json.loads(args.input.read_text()) if args.input else {}
         if args.expected_source_hash:payload['expected_source_hash']=args.expected_source_hash
         cmd=args.command
-        if cmd in HOOK_COMMANDS:
+        if cmd in LOCAL_DELIVERY_COMMANDS:
+            result=local_delivery_action(store,LOCAL_DELIVERY_COMMANDS[cmd],payload)
+        elif cmd in HOOK_COMMANDS:
             store=Store(args.root,allow_unselected=True,neutral=True)
             if args.id:payload['chain_id']=args.id
             result=hook_action(store,cmd,payload)

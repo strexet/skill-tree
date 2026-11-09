@@ -57,8 +57,22 @@ function workflowState(root){
  return state;
 }
 function unfinishedRun(run){
- if(!run)return false;const delivery=run.delivery||{};
- return !(delivery.implementation==='completed'&&(['local-result','merged'].includes(delivery.status)||delivery.status==='pr-ready'&&!delivery.authorization?.merge));
+ if(!run)return false;
+ const delivery=run.delivery||{},authorization=delivery.authorization||{};
+ if(authorization.pr===false&&authorization.merge===true){
+  const {merge,target_admission:target,validation}=delivery.local_integration||{};
+  const gitObject=value=>typeof value==='string'&&/^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(value);
+  const sha256=value=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
+  const exactMerge=gitObject(merge?.commit)&&gitObject(merge.tree)
+   &&Array.isArray(merge.parents)&&merge.parents.length===2&&merge.parents.every(gitObject);
+  const exactTarget=exactMerge&&target?.merge_commit===merge.commit&&sha256(target.profile_identity);
+  const checked=exactTarget&&validation?.merge_commit===merge.commit&&validation.profile_identity===target.profile_identity
+   &&Array.isArray(validation.checks)&&validation.checks.length>0&&validation.checks.every(check=>check?.exit_code===0)
+   &&Array.isArray(validation.evidence)&&validation.evidence.length===1
+   &&typeof validation.evidence[0]?.path==='string'&&sha256(validation.evidence[0].sha256);
+  return !(delivery.implementation==='completed'&&delivery.status==='merged'&&delivery.order_completed===true&&checked);
+ }
+ return !(delivery.implementation==='completed'&&(['local-result','merged'].includes(delivery.status)||delivery.status==='pr-ready'&&!authorization.merge));
 }
 function hookCanonicalDocument(raw){
  // Preserve owned Python JSON numeric/string tokens; JS numeric rendering differs.

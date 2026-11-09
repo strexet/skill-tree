@@ -1252,7 +1252,7 @@
   "configuration_digest": "ae02579d687b0a71ae2e2b9d00a5bc9f16d474deb985d0036a88c96039a52d46",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "bd8094b61a0b6c605e5502f48ea9a6ed6fabf1f66912073da393b41fe7d40171",
+  "identity": "03f78e82bb204cf2af7727a8554b378ecd26b354d8e1b469efa3fe21acfd77e4",
   "operation": "skill-tree-pr-review-cycle",
   "operations": {
     "skill-tree-add-pending-task": {
@@ -1291,14 +1291,14 @@
     "agents/openai.yaml": "46baa0254b82eae1451d45fc3e00290d6b20b37be1306ed5e2d3da8585778529",
     "references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
-    "references/installation-profile.md": "05801326c3aa3e325a1ccf170a7fbbc678d7e2ae804bb6a8fef6c3a05d2fbee8",
+    "references/installation-profile.md": "5719d29e503c669cd091a70564aa4c93abf1a582811308c8fdea9b9345eace7e",
     "references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/pr-review-cycle.md": "987532f697e54f6502f31286e57054316255d0a000d3d93686c6701bdc14f0ef",
     "references/project-profile.md": "306f870858d6a04e096bc57878154fb996f413482437e995dc7b0dfc49952748",
     "references/run-workspaces.md": "d9a97bc8ee56ef0aa6f254075df08e2946fdc61c578328a52f6991dbd723468c",
     "references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
-    "references/workflow-metadata.md": "91264f18e09460d44decc0f09cbd7f9a8b12579822371956f228df58fc32f6f5",
+    "references/workflow-metadata.md": "1fff0a891987404ac7bc43d536b0798c08ee6c16a6e3367cbfc9a0f3c54b7fa3",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
     "scripts/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
@@ -1311,9 +1311,9 @@
     "scripts/plugin-runtime.js": "e704dce8f8019baae4f783bce8c6f5fdf5dfaf7961760ecad33ce3ab919b4338",
     "scripts/plugin-sources.js": "8d542a0bbe5d1354932eb98971c36999c0a2b2acbdce5f6a19a709f0d53e9db6",
     "scripts/pr-review-state.py": "6bfb09e0273a6322c86c5f5915e8dc0503fa22416881c499c281c1dec570a3d1",
-    "scripts/run-workspaces.py": "62433483798a9cf9818a1aae8d22d4eb32d531e02b4d00316075753450af7bdb",
+    "scripts/run-workspaces.py": "306a8dad9d834250febd3fff4b109f0fb8b00711232705e483787bc1cdab5f20",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "ab47ba4e4ffe6c780f2d78e39093af8c6f98ffbd4b7114913aebfa951543ebb1"
+    "scripts/workflow-state.py": "e88a8f6d04030e90a8e5b38b72644e5b769afc53511d2d6393dcf1cffeed67d9"
   },
   "packages": {},
   "parameter_defaults": {},
