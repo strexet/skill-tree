@@ -1340,7 +1340,7 @@
   "configuration_digest": "636ccbb959eabeca5768493198e482bd921e189bfbf96c709690525c366fe632",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "32ac9398d86b2d796b24eab9fea19a4668c879591967649262016cf9ff169ba5",
+  "identity": "eb8db3d10cbf8a38f5129267b3153a3e383628c32b95e92be434200499258466",
   "operation": "skill-tree-plugins",
   "operations": {
     "skill-tree-add-pending-task": {
@@ -1381,10 +1381,10 @@
     "SKILL.md": "e6e52babdfd66b30bfa8d557905970b7dacd2c8c17edd3907c17ef8396522eca",
     "agents/openai.yaml": "c4fa85db8e83d8fb3390a66833e63e1e6c3d4e6bf051a26ab57f3b40ed40770a",
     "references/decision-governance.md": "cbbafe0de458903b87d8e7f72180d324946ece6d8361396cf4f1dcd0b29472a3",
-    "references/installation-profile.md": "5719d29e503c669cd091a70564aa4c93abf1a582811308c8fdea9b9345eace7e",
+    "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
-    "references/project-profile.md": "306f870858d6a04e096bc57878154fb996f413482437e995dc7b0dfc49952748",
-    "references/validation-policy.md": "89d6edd12f5cba959a354016d4125b2e4feee1611354b7049595128cec3a88f7",
+    "references/project-profile.md": "3f207ab43977a278f2e7ad246bbf75bc9dbc9b7d41a9f80241bb5f24c644f075",
+    "references/validation-policy.md": "d44adf21dfa175520e1ad4f832672bb43325f2f5d6322123e355eca4eb5bb7f4",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "45bd289e1c062a97e95937d1976a09f1a84e4e5edc6af9ca1a825697f45d3145",
     "scripts/package.json": "8005a3491db7d92f36ac66369861589f9c47123d3a7c71e643fc2c06168cd45a",

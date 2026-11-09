@@ -4,6 +4,8 @@
 
 The task Validation section owns required check IDs, criterion mapping and task parameters. A fenced JSON object contains `checks`, with entries containing `id`, `recipe_id`, `criteria`, `sources`, `parameters` and `timing`. Timing is `immediate`, `group-end` or `before-dependent-work`. The profile owns concrete recipes and environment facts. Task headers own optional `validation_group_id` and `boundary_validation`; group membership never expands controller scope.
 
+Owned profiles list the built-in `static-inspection` fallback when no explicit recipe owns the ID. The built-in recipe uses the static lane for explicit source and artifact assertions and has no executable argument vector. An explicit recipe retains precedence. Older profiles may resolve the same fallback without a discovery entry.
+
 Small task bodies require Goal, Touch, Validation and Acceptance. Optional sections contain substantive constraints only. Every acceptance bullet requires a mapped check. Default strategy is test-first for meaningful behavior changes; characterization, exploratory or not-applicable requires a concise task-specific reason when suitable. Existing adequate matching evidence remains reusable.
 
 ## Focused feedback

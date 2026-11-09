@@ -13,7 +13,7 @@ Flavor: general. Static compatibility only; execution remains unqualified.
     "ui": []
   },
   "gaps": [],
-  "instruction_profile_id": "e6c677af5de0e378fab4112ef5a4e6665b1dff37a31d08730464db52df91c5b2",
+  "instruction_profile_id": "5dc086595fea9db82dd4605fa7edced5ece09025b18fcaa2830c1d83ab1f73f9",
   "recipes": {
     "script-test": {
       "argv": [
@@ -27,6 +27,11 @@ Flavor: general. Static compatibility only; execution remains unqualified.
       ],
       "lane": "unit",
       "qualification": "static-recipe; runner unqualified"
+    },
+    "static-inspection": {
+      "assertion_contract": "explicit source and artifact assertions",
+      "input_paths": [],
+      "lane": "static"
     }
   },
   "source_version": "0.3.0",
