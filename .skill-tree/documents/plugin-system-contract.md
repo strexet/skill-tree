@@ -64,6 +64,12 @@ The [recorded general Codex comparison](plugin-recommendation-evidence.md) suppl
 
 Unqualified or compatibility-only candidates remain distinguishable in manual catalog selection. The recommendation set can be empty when no candidate qualifies. A separate hosted marketplace, universal host support and favorable outcomes are outside the approved assumptions.
 
+## Catalog and installed state
+
+The project installer and the installed maintenance manager expose the same read-only `--list-plugins` view. The catalog groups pinned known sources by registered workflow boundary. Suggested locations and actual installed binding occurrences occupy separate fields. Known source identity and installed revision/content remain visible independently, including unavailable and conflicting installed state. The read-only view accepts project-known definitions from the project management layer.
+
+Catalog selection supplies the exact packaged source descriptor for lifecycle preview when the complete descriptor is available. Source-inspection entries can retain explicit adapter, license, resource and host prerequisites. Custom import stays available without a matching catalog entry. The separate evidence projection qualifies recommendation membership for an exact source, adapter and location. Catalog data grants no installation, invocation or readiness authority.
+
 ## Contract examples
 
 | Case | Required outcome |

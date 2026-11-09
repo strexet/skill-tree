@@ -164,6 +164,32 @@ function formatInventory(view,{groupBy='plugin'}={}){
  if(groupBy==='point')for(const plugin of view.plugins.filter(item=>!item.bindings.length))lines.push('Unbound package '+plugin.id+' @ '+display(plugin.revision)+'; destination='+display(plugin.destination));
  if(!view.plugins.length)lines.push(view.status==='unavailable'?'Installed state is unavailable.':'No installed external packages.');
  lines.push('Known definitions: '+view.known.status);for(const entry of view.known.entries)lines.push('  '+entry.id+' ['+(entry.installed?'installed':'not installed')+']');
+ if(view.catalog?.status==='unavailable')lines.push('Catalog is unavailable: '+view.catalog.reason);
+ else if(view.catalog){
+  const entries=new Map(view.catalog.entries.map(row=>[row.id,row])),suggested=new Set();
+  function describe(entry){
+   const evidence=entry.evidence?.kind??'project-known',adapter=entry.adapter?.status??'requires-preparation';
+   return entry.id+' @ '+display(entry.revision)+' ['+entry.status+'; installed: '+entry.installed+
+    '; evidence: '+evidence+'; adapter: '+adapter+']; source='+display(entry.source)+
+    '; prerequisites='+display(entry.adapter?.prerequisites??[])+
+    (entry.unresolved_locations?.length?'; unresolved suggested locations: '+entry.unresolved_locations.length:'')+
+    (entry.known_conflict?'; conflicting project-known source':'');
+  }
+  lines.push('Catalog suggestions by integration point:');
+  for(const point of view.catalog.groups){
+   if(!point.suggested.length)continue;
+   lines.push('  '+point.boundary_id);
+   for(const id of point.suggested){suggested.add(id);lines.push('    '+describe(entries.get(id)));}
+  }
+  const unplaced=view.catalog.entries.filter(entry=>!suggested.has(entry.id));
+  if(unplaced.length){
+   lines.push('Catalog entries without a suggested point:');
+   for(const entry of unplaced)lines.push('  '+describe(entry));
+  }
+  for(const [flavor,bundle]of Object.entries(view.catalog.recommendations)){
+   lines.push('Catalog recommendations ('+flavor+'): '+(bundle.length?bundle.map(row=>row.id+' at '+row.boundary_id).join(', '):'none'));
+  }
+ }
  for(const frozen of view.frozen_requirements)lines.push('Frozen '+frozen.chain_id+' ['+display(frozen.chain_state)+'; '+frozen.association+'; runs '+frozen.run_presence+'] '+JSON.stringify(frozen.requirements)+'; original attempts='+JSON.stringify(frozen.original_attempts));
  for(const item of view.issues)lines.push('Issue '+item.code+': '+display(item.message));return lines.join('\n')+'\n';
 }
@@ -228,7 +254,21 @@ function listMain(root,args,{source=path.resolve(__dirname,'..')}={}){
    else registry.fail('plugin-view','Use --list-plugins [--json] [--group-by plugin|point] as one read-only operation');
   }
   if(!selected||!['plugin','point'].includes(groupBy))registry.fail('plugin-view','Use --list-plugins [--json] [--group-by plugin|point]');
-  const view=inventory(root,{operations:operationsFor(source)});process.stdout.write(json?JSON.stringify(view,null,2)+'\n':formatInventory(view,{groupBy}));return view.status==='ok'?0:view.status==='drift'?1:2;
+  const view=inventory(root,{operations:operationsFor(source)});
+  try{
+   const bundled=path.resolve(source)===path.resolve(root,'.skill-tree/installation/source');
+   if(bundled){
+    if(!view.profile){
+     const core=require('./installation.js');
+     core.verifyOwned(root,core.receipt(root,true));
+    }else if(view.issues.some(item=>item.scope==='core-receipt'))registry.fail('plugin-catalog','The bundled catalog ownership could not be verified');
+   }
+   const catalog=require('./plugin-catalog.js');
+   view.catalog=catalog.catalogView(catalog.loadCatalog(source),{inventory:view});
+  }catch(error){
+   view.catalog={status:'unavailable',reason:error.code==='plugin-catalog'?error.message:'Owned catalog metadata could not be read'};
+  }
+  process.stdout.write(json?JSON.stringify(view,null,2)+'\n':formatInventory(view,{groupBy}));return view.status==='ok'?0:view.status==='drift'?1:2;
  }catch(error){process.stderr.write(error.message+'\n');return 2;}
 }
 module.exports={inventory,formatInventory,prepareRemoval,applyRemoval,applyManagementChange,prepareUnbind,prepareActivation,forgetKnown,listMain};

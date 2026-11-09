@@ -1585,6 +1585,11 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/lib/plugin-catalog.js",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/lib/plugin-composition.js",
       "role": "canonical"
     },
@@ -1700,6 +1705,16 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/config/plugin-catalog-eligibility.json",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/config/plugin-catalog.json",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/config/plugins/ponytail.json",
       "role": "canonical"
     },
@@ -1811,6 +1826,8 @@
     ".skill-tree/common/scripts/workflow-state.py": "ab47ba4e4ffe6c780f2d78e39093af8c6f98ffbd4b7114913aebfa951543ebb1",
     ".skill-tree/config/capabilities.json": "fc9572cc6a65f689fd7a750560a897593fd7b90df50eadea3954e242556626c5",
     ".skill-tree/config/flavors.json": "cc2e8ec2e54af53232ab2813a219d3d00a5d7e8b75d2d85ca20f4c0db28231a8",
+    ".skill-tree/config/plugin-catalog-eligibility.json": "92a81b29135aaf8deb94c86f56481dfaa5fe9b543ab461c492aceab56efe1042",
+    ".skill-tree/config/plugin-catalog.json": "0cac545a0f50891b859884865f7541f459bd8f9e3f3b3669fcf664b8890beb08",
     ".skill-tree/config/plugins/ponytail.json": "30ae89c79d4895184ef681b6a369cd2d0ae872fa4599df18f31eb7580e1aacbb",
     ".skill-tree/config/plugins/task-editorial.json": "55abff9aeba98b670afce9d7a783c7d0b497a657cc32e8fea974a1eeb648aa2e",
     ".skill-tree/config/plugins/task-interview.json": "77b654102b28e33161c4cce8e1aec76c33ece2a93468203e5a2b5c9affc0a8a1",
@@ -1829,8 +1846,8 @@
     ".skill-tree/documents/plugin-installation-contract.md": "ea6c2a851977fb27b418217f16f712a0dcda2297b474859f72a7a9622636d89d",
     ".skill-tree/documents/plugin-management-contract.md": "dd9ee48ee9a3f64af0aebd475192637ff2e44e80fea9a5344a47c4d810451627",
     ".skill-tree/documents/plugin-market-research.md": "ecd71abef5a437184a547496834ac9e094b51ebee3bae945aa37e88dfb0a7679",
-    ".skill-tree/documents/plugin-recommendation-evidence.md": "2ec0c9d936a5bde95ae80e654023114de106bc64c9856001f57077db546d1d42",
-    ".skill-tree/documents/plugin-system-contract.md": "ac11a1419785a457a1452866b40bf928438f2142e879ed6f0298a376add3510c",
+    ".skill-tree/documents/plugin-recommendation-evidence.md": "e85766c749c19717f9eaf6d0c1049dfc48c31f77965e1e811a474e26a2cb2dd2",
+    ".skill-tree/documents/plugin-system-contract.md": "b25424efd0dc920376a8d32b9dd7ea27d6b644d966e167f690c8999dc2fa36f5",
     ".skill-tree/documents/plugin-system-research.md": "18b222cd914f2090b2f5f4443c07cb28239099618e522e4b7babb3be5be55439",
     ".skill-tree/documents/plugin-workflow-decisions.md": "b95866fb03aae68d5491cef59c2f79b09ad8fe4c659af9759b1755e2c8a0901d",
     ".skill-tree/documents/project.md": "419e0ced059c4f8130006e2f2b5c745fdb05944facc576671f19356b198ba934",
@@ -1861,9 +1878,10 @@
     ".skill-tree/lib/installation.js": "efb88bc5a28246aab36c7d1cb709f5ec4fb37dc736867c3533503e74c26fa431",
     ".skill-tree/lib/plugin-acquisition.js": "7bac01aa2440363225b4b9606362feeee1f162ed7adbad6a92ebda21fee6adbc",
     ".skill-tree/lib/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
+    ".skill-tree/lib/plugin-catalog.js": "addf5eed8f38af78d77c5ffda5d9f07ebae7097db6264284b7c0c617a71efef3",
     ".skill-tree/lib/plugin-composition.js": "f7dc718bc8570a217b37299231450d4a9e988b4ae909ed1b5ef29be22849514d",
     ".skill-tree/lib/plugin-lifecycle.js": "05f1604a464385532cdda5d1b729c6286aac625c2bb279495b44b30155fc4e9e",
-    ".skill-tree/lib/plugin-management.js": "b11d63f1fa249eed8ae5a8bed6f880bae9c17ee38da78618bccc5ce4945d2d8d",
+    ".skill-tree/lib/plugin-management.js": "e908c1573dcece80909b15d52f5a77c8e61d1499bc4863f0d30bfc8a0a6ba86e",
     ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
     ".skill-tree/lib/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
     ".skill-tree/lib/plugin-runtime.js": "e704dce8f8019baae4f783bce8c6f5fdf5dfaf7961760ecad33ce3ab919b4338",

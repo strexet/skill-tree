@@ -30,3 +30,8 @@ The archive retains portable host captures, fixture and adapter identities, raw 
 Evidence applies to the pinned revisions, dependencies, adapters, general Codex profile, host behavior and fixture conditions. Changes to an evidence identity or relevant workflow gate require requalification before reuse. Auto-mode efficacy, native Skill-tool execution, other providers or flavors, browser and Unity runtime behavior and live PR behavior remain unqualified.
 
 Ponytail Review remains a separate discovery candidate. Superpowers verification, Sentry findings and documentation skills, Vercel React guidance and the Unity URP validator remain source-inspected alternatives with separate prerequisites. The market inventory records each alternative’s application boundaries and evidence. [Market inventory](plugin-market-research.md#shortlist-by-integration-point)
+
+
+## Catalog projection
+
+The repository catalog exposes the four study applications separately, alongside selected source-inspection alternatives. Known sources are grouped under Process After, Documentation Audit After Validation, PR Review After and Implement After. Suggested locations establish no installed binding. The catalog preserves the application status and prerequisites and ships a separate eligibility projection tied to the recorded comparison. The production projection and all flavor recommendation arrays are empty. [Catalog entries](../config/plugin-catalog.json), [eligibility projection](../config/plugin-catalog-eligibility.json)
