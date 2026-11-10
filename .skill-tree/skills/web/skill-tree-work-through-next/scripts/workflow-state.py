@@ -711,14 +711,15 @@ def next_task(store):
     enforce_limits(execution_run(run));assert_admission(store,state)
     if run.get('maintenance'):
         state=deepcopy(state);run=deepcopy(run['maintenance']);state['active_run']=run
-    tasks=parse(store.text());by_id={t['id']:t for t in tasks};done={o['task_id'] for o in store.outcomes() if o['disposition']=='completed'}
+    tasks=parse(store.text());by_id={t['id']:t for t in tasks};completed={o['task_id']:o for o in store.outcomes() if o['disposition']=='completed'}
+    done=set(completed)
     validate_dependencies(tasks,done)
     visiting=set();visited=set()
     def walk(tid):
         if tid in done:
-            if state.get('run_registry') and not completed_dependency_integrated(store,state,tid):
-                task=validation_task(store,tid)
-                return [{**task,'priority':0,'completed_contract':True}]
+            if state.get('run_registry'):
+                gap=completed_source_gap(store,state,completed[tid])
+                if gap:return [{**gap,'priority':0,'completed_contract':True}]
             return []
         if tid in visiting:raise WorkflowError('Dependency cycle: '+tid)
         if tid not in by_id:raise WorkflowError('Missing task without completion evidence: '+tid)
@@ -736,8 +737,8 @@ def next_task(store):
         remaining=[tid for tid in run['snapshot'] if tid not in done]
         if not remaining:
             stale=stale_completed_checks(store,state)
-            if stale:
-                task=validation_task(store,stale[0]['task_id']);return {'phase':'validate','task_id':task['id'],'root_task_id':root,'completed_contract':True,'body':task['body'],'checks':check_specs(task)}
+            gap=stale[0] if stale else first_completed_source_gap(store,state,completed)
+            if gap:return completed_revalidation_handoff(store,root,gap)
             return {'phase':'deferred-processing','pending_ids':[t['id'] for t in tasks if t['queue']=='Pending Queue' and t['id'] in run['pending_ids'] and t['relation']=='followup']}
         # Current priorities decide remaining initial roots; absent entries never count as done.
         for tid in remaining:
@@ -749,7 +750,7 @@ def next_task(store):
     pending=[t['id'] for t in tasks if t['queue']=='Pending Queue' and t['root_task_id']==root and t['relation'] in {'blocker','subtask'}]
     if pending:return {'phase':'process-required','root_task_id':root,'pending_ids':pending}
     if task.get('completed_contract'):
-        return {'phase':'validate','task_id':task['id'],'root_task_id':root,'completed_contract':True,'title':task['title'],'body':task['body'],'checks':check_specs(task)}
+        return completed_revalidation_handoff(store,root,task)
     if task['status']!='Ready':
         session=processing_helper().session_for_task(store,task['id'])
         if session:raise WorkflowError('Selected required task has an open post-processing hold: '+session['id']+' — '+session['next_action'])
@@ -773,6 +774,13 @@ def next_task(store):
     clarification_admission(store,task['id'])
     return {'phase':'validate' if stage=='awaiting-validation' else 'implement','root_task_id':root,'task_id':task['id'],'title':task['title'],'priority':task['priority'],'body':task['body'],'checks':check_specs(task)}
 
+def completed_revalidation_handoff(store,root,gap):
+    task=validation_task(store,gap['task_id'])
+    handoff={'phase':'validate','task_id':task['id'],'root_task_id':root,'completed_contract':True,
+             'title':task['title'],'body':task['body'],'checks':check_specs(task)}
+    if 'source_review' in gap:handoff.update(checks=[],source_review=gap['source_review'])
+    return handoff
+
 def advance(store):
     # Read-only selection prepares the exact initial and group-switched hook scopes.
     next_task(store)
@@ -782,7 +790,7 @@ def advance(store):
         run['admitted_groups']=admitted_groups(parse(text),run)
         run['phase']=result['phase'];run['current_task_id']=result.get('task_id');run['root_task_id']=result.get('root_task_id',run['root_task_id']);run['next_action']=result['phase']
         if result.get('task_id') and result['task_id'] not in run['required_ids']:run['required_ids'].append(result['task_id'])
-        if result.get('completed_contract'):
+        if result.get('completed_contract') and 'source_review' not in result:
             tid=result['task_id'];entry=state['task_progress'].get(tid)
             if entry and entry.get('run_id') not in {None,state['active_run']['id']}:raise WorkflowError('Task validation progress belongs to another run')
             if not entry:state['task_progress'][tid]={'stage':'awaiting-validation','checks':{},'revalidation':True,'admission':run['admission'],'run_id':state['active_run']['id']}
@@ -827,6 +835,9 @@ def complete(store,payload):
             if run:enforce_limits(execution_run(run))
             if task['status']!='Ready':raise WorkflowError('Blocked task cannot complete')
             if any(dep not in done for dep in task['depends_on']):raise WorkflowError('Required dependencies remain incomplete')
+            if run and state.get('run_registry'):
+                for dep in task['depends_on']:
+                    if not completed_dependency_integrated(store,state,dep):raise WorkflowError('Completed dependency requires reviewed source integration into the selected worktree: '+dep)
             if any(t['queue']=='Pending Queue' and t['related_task_id']==task['id'] and t['relation'] in {'blocker','subtask'} for t in tasks):raise WorkflowError('Required Pending work remains unprocessed')
             checks=payload.get('acceptance',[])
             if not checks or any(not c.get('criterion') or not c.get('result') for c in checks):raise WorkflowError('Completion requires individual acceptance results')
@@ -1414,15 +1425,33 @@ def finish(store):
 
 def _implementation_finish_checks(store, state, run, text):
     enforce_limits(run)
-    done={o['task_id'] for o in store.outcomes() if o['disposition']=='completed'}
+    completed={o['task_id']:o for o in store.outcomes() if o['disposition']=='completed'}
     required=set(run['snapshot']+run['required_ids'])
-    if not required.issubset(done):raise WorkflowError('Main tasks or required descendants remain incomplete')
+    if not required.issubset(completed):raise WorkflowError('Main tasks or required descendants remain incomplete')
     if any(t['id'] in run['pending_ids'] and t['relation'] in {'blocker','subtask'} for t in parse(text)):raise WorkflowError('Required Pending tasks remain')
     followups=[t for t in parse(text) if t['id'] in run['pending_ids'] and t['relation']=='followup']
     if any(t['id'] not in {p for r in run['processing_results'] for p in r['selected_ids']} for t in followups):raise WorkflowError('Nonblocking findings require one processing pass before finish')
     assert_admission(store,state)
     stale=stale_completed_checks(store,state)
     if stale:raise WorkflowError('Required completed check evidence is stale or unavailable: '+stale[0]['task_id']+'/'+stale[0]['check_id']+'; advance selects the preserved contract for revalidation')
+    require_current_completed_sources(store,state,completed)
+
+
+def first_completed_source_gap(store,state,completed):
+    run=state['active_run']
+    for tid in dict.fromkeys(run['snapshot']+run['required_ids']):
+        if tid in completed:
+            gap=completed_source_gap(store,state,completed[tid])
+            if gap:return gap
+    return None
+
+
+def require_current_completed_sources(store,state,completed):
+    gap=first_completed_source_gap(store,state,completed)
+    if gap:
+        reason=('Completed contract revalidation does not cover recorded source fingerprints'
+                if 'source_review' in gap else 'Completed contract requires reviewed source integration')
+        raise WorkflowError(reason+': '+gap['task_id']+'; advance selects the remaining revalidation')
 
 
 def _finish_implementation(store, reviewed=None, owner=None):
@@ -1436,10 +1465,11 @@ def _finish_implementation(store, reviewed=None, owner=None):
         if run.get('maintenance'):
             focus=run['maintenance'];enforce_limits(focus)
             assert_admission(store,state)
-            done={o['task_id'] for o in store.outcomes() if o['disposition']=='completed'}
-            if not set(focus['required_ids']).issubset(done):raise WorkflowError('Maintenance scope remains incomplete')
+            completed={o['task_id']:o for o in store.outcomes() if o['disposition']=='completed'}
+            if not set(focus['required_ids']).issubset(completed):raise WorkflowError('Maintenance scope remains incomplete')
             context=deepcopy(state);context['active_run']=deepcopy(focus)
             if stale_completed_checks(store,context):raise WorkflowError('Maintenance acceptance evidence is stale')
+            require_current_completed_sources(store,context,completed)
             hook_admission(store,chain_ids=focus.get('hook_chains',[]))
             summary=deepcopy(focus);summary.update({'finished_at':now(),'phase':'completed','next_action':None})
             del run['maintenance']
@@ -1475,7 +1505,10 @@ def record_cycle(store):
         run=execution_run(run)
         semantic_fields=['id','queue','priority','status','parent_pending_ids','root_task_id','related_task_id','relation','depends_on']
         task_state=[{key:task[key] for key in semantic_fields} for task in state['tasks']]
-        signature=digest(dump({'tasks':task_state,'outcomes':[o['task_id'] for o in store.outcomes()],'revalidated':{tid:[entry['result']['key'] for entry in checks] for tid,checks in run.get('revalidated_checks',{}).items()},'progress':{tid:{'stage':entry['stage'],'diagnostics':{cid:slot.get('result',{}).get('diagnostic_key') for cid,slot in entry['checks'].items() if slot.get('result',{}).get('diagnostic_key')},'checks':{cid:slot.get('result',{}).get('key') if slot.get('result',{}).get('result')=='pass' else None for cid,slot in entry['checks'].items() if slot.get('result',{}).get('result')=='pass'}} for tid,entry in state['task_progress'].items()}}).encode())
+        cycle={'tasks':task_state,'outcomes':[o['task_id'] for o in store.outcomes()],'revalidated':{tid:[entry['result']['key'] for entry in checks] for tid,checks in run.get('revalidated_checks',{}).items()},'progress':{tid:{'stage':entry['stage'],'diagnostics':{cid:slot.get('result',{}).get('diagnostic_key') for cid,slot in entry['checks'].items() if slot.get('result',{}).get('diagnostic_key')},'checks':{cid:slot.get('result',{}).get('key') if slot.get('result',{}).get('result')=='pass' else None for cid,slot in entry['checks'].items() if slot.get('result',{}).get('result')=='pass'}} for tid,entry in state['task_progress'].items()}}
+        if run.get('revalidation_source_reviews'):
+            cycle['revalidation_source_reviews']={tid:review['sources'] for tid,review in run['revalidation_source_reviews'].items()}
+        signature=digest(dump(cycle).encode())
         if run.get('cycle_signature')==signature:
             run['phase']='blocked';run['stop_reason']='Completed cycle without task/dependency progress';run['next_action']='Resolve recorded blocker before resumption'
         run['cycle_signature']=signature;store.save(text,state);return run
@@ -1862,35 +1895,97 @@ def stale_completed_checks(store,state,task_ids=None):
             except (WorkflowError,KeyError):stale.append({'task_id':tid,'check_id':check['id']})
     return stale
 
-def completed_dependency_integrated(store,state,tid):
-    """Accept exact original sources or current accepted, fully covered revalidation."""
-    run=execution_run(state['active_run'])
+def uncovered_completion_sources(store,tid,results):
+    record=next(o for o in store.outcomes() if o['task_id']==tid and o['disposition']=='completed')
+    covered={path for item in results for path in item['result']['sources']}
+    return fingerprints(store,record.get('source_fingerprints',{}).keys()-covered)
+
+def source_review_claims(tid,sources,results):
+    receipts={item['check']['id']:{'key':item['result']['key'],'attempt_id':item['result']['attempt_id']}
+              for item in results}
+    return {'task_id':tid,'sources':sources,'checks_sha256':digest(dump(receipts).encode())}
+
+def completed_source_gap(store,state,record):
+    """Return the next validation requirement for a completed contract."""
+    tid=record['task_id']
+    run=state['active_run']
     if tid not in run['admitted_task_ids'] or tid not in run['required_ids']:raise WorkflowError('Completed dependency is outside the admitted controller scope')
-    entry=state['task_progress'].get(tid,{})
-    if entry.get('revalidation'):return False
-    record=next((o for o in store.outcomes() if o['task_id']==tid and o['disposition']=='completed'),None)
-    expected=record.get('source_fingerprints',{}) if record else {}
+    gap={'task_id':tid}
+    if state['task_progress'].get(tid,{}).get('revalidation'):return gap
+    expected=record.get('source_fingerprints',{})
     if not expected:raise WorkflowError('Completed dependency lacks source fingerprints; explicit source integration review is required: '+tid)
     current=fingerprints(store,list(expected))
     if any(value is None for value in current.values()):raise WorkflowError('Completed dependency source input is unavailable: '+tid)
-    if current==expected:return True
+    if current==expected:return None
     results=run.get('revalidated_checks',{}).get(tid)
-    if not results:return False
-    context=deepcopy(state);context['active_run']=deepcopy(run)
-    if stale_completed_checks(store,context,[tid]):return False
+    if not results or stale_completed_checks(store,state,[tid]):return gap
     covered={path:value for item in results for path,value in item['result']['sources'].items()}
-    if not set(expected).issubset(covered):raise WorkflowError('Completed dependency revalidation does not cover recorded source fingerprints: '+tid)
-    return all(covered[path]==value for path,value in current.items())
+    if any(covered[path]!=current[path] for path in current.keys() & covered.keys()):return gap
+    uncovered={path:value for path,value in current.items() if path not in covered}
+    if uncovered:
+        claims=source_review_claims(tid,uncovered,results)
+        review=run.get('revalidation_source_reviews',{}).get(tid,{})
+        if any(review.get(key)!=value for key,value in claims.items()) or not evidence_pointer(store,review['evidence'])['available']:
+            return {**gap,'source_review':claims}
+    return None
+
+def completed_dependency_integrated(store,state,tid):
+    record=next((o for o in store.outcomes() if o['task_id']==tid and o['disposition']=='completed'),{'task_id':tid})
+    gap=completed_source_gap(store,{**state,'active_run':execution_run(state['active_run'])},record)
+    if gap and 'source_review' in gap:
+        raise WorkflowError('Completed dependency revalidation does not cover recorded source fingerprints: '+tid)
+    return gap is None
+
+def read_source_review(store,reference,claims):
+    inspected_hash=reference.get('sha256') if isinstance(reference,dict) else None
+    if not isinstance(inspected_hash,str) or not re.fullmatch(r'[a-f0-9]{64}',inspected_hash):
+        raise WorkflowError('Source review requires the inspected evidence SHA-256')
+    relative=reference.get('path')
+    path=binding_path(store.source_root,relative)
+    try:
+        if not path.is_file():raise WorkflowError('Source review evidence requires a file')
+        content=path.read_bytes()
+    except OSError as exc:
+        raise WorkflowError('Source review evidence could not be read: '+relative) from exc
+    if digest(content)!=inspected_hash:
+        raise WorkflowError('Required acceptance evidence missing or mismatched: '+relative)
+    try:
+        report=json.loads(content)
+    except ValueError as exc:
+        raise WorkflowError('Source review artifact requires a JSON object') from exc
+    if not isinstance(report,dict) or any(report.get(key)!=value for key,value in claims.items()):
+        raise WorkflowError('Source review artifact must match the task, uncovered fingerprints and accepted checks')
+    return {'path':relative,'sha256':inspected_hash,'available':True}
 
 def accept_revalidation(store,payload):
     with store.lock():
-        text=store.text();state=store.load(text);task=validation_task(store,payload['task_id'])
-        if not task.get('completed_contract') or not state['task_progress'].get(task['id'],{}).get('revalidation'):raise WorkflowError('No completed-contract revalidation is prepared')
-        assert_scope(store,state,parse(text),task['id'])
-        results=validate_task_checks(store,task['id'],state)
-        execution_run(state['active_run']).setdefault('revalidated_checks',{})[task['id']]=results
-        state['task_progress'].pop(task['id']);execution_run(state['active_run'])['next_action']='Select remaining due checks or finish the preserved run'
-        store.save(text,state);return {'task_id':task['id'],'phase':'revalidated','checks':[entry['check']['id'] for entry in results]}
+        text=store.text();state=store.load(text);tid=payload['task_id'];task=validation_task(store,tid)
+        if not task.get('completed_contract') or not state['active_run']:raise WorkflowError('No completed-contract revalidation is prepared')
+        run=execution_run(state['active_run'])
+        if 'source_review' in payload:
+            workspaces.ensure_workspace(store,state['active_run'])
+            enforce_limits(run);assert_admission(store,state,tid)
+            if tid not in run['admitted_task_ids'] or tid not in run['required_ids']:
+                raise WorkflowError('Completed dependency is outside the admitted controller scope')
+            results=run.get('revalidated_checks',{}).get(tid)
+            if not results or stale_completed_checks(store,{**state,'active_run':run},[tid]):
+                raise WorkflowError('Source review requires current accepted completed-contract checks')
+            review=payload['source_review']
+            missing=uncovered_completion_sources(store,tid,results)
+            if not missing or None in missing.values() or not isinstance(review,dict) or review.get('sources')!=missing:
+                raise WorkflowError('Source review requires the exact current uncovered completion fingerprints')
+            claims=source_review_claims(tid,missing,results)
+            evidence=read_source_review(store,review.get('evidence'),claims)
+            run.setdefault('revalidation_source_reviews',{})[tid]={**claims,'evidence':evidence}
+        else:
+            if not state['task_progress'].get(tid,{}).get('revalidation'):raise WorkflowError('No completed-contract revalidation is prepared')
+            assert_scope(store,state,parse(text),tid)
+            results=validate_task_checks(store,tid,state)
+            run.setdefault('revalidated_checks',{})[tid]=results
+            run.get('revalidation_source_reviews',{}).pop(tid,None)
+            state['task_progress'].pop(tid)
+        run['next_action']='Select remaining due checks or finish the preserved run'
+        store.save(text,state);return {'task_id':tid,'phase':'revalidated','checks':[entry['check']['id'] for entry in results]}
 
 def scoped_check_task(store,state,tid):
     progress_owner=state.get('task_progress',{}).get(tid,{}).get('run_id')

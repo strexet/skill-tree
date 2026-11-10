@@ -134,11 +134,13 @@ class MaintenanceScopeTests(unittest.TestCase):
         self.assertIn(self.child,after['completed_ids']);self.assertNotIn('maintenance',after)
         with self.assertRaisesRegex(wf.WorkflowError,'Run stopped'):wf.next_task(self.store)
     def test_maintenance_revalidates_completed_dependency_without_touching_parked_run(self):
+        output=self.root/'output.txt';output.write_text('Completed output.\n')
         def complete_unit(tid):
             wf.begin_task(self.store,{'task_id':tid});wf.mark_implemented(self.store,{'task_id':tid})
             attempt=wf.prepare_check(self.store,{'task_id':tid,'check_id':'static'})
             wf.record_check(self.store,{'task_id':tid,'check_id':'static','attempt_id':attempt['attempt_id'],'result':'pass','classification':'executed-control','actual_lane':'static','environment_identity':attempt['environment_identity'],'assertions':[{'assertion':'The value remains preserved.','result':'pass'}],'evidence':['report.json'],'cleanup':'No product process was launched.'})
-            wf.complete(self.store,{'task_id':tid,'outcome':'The value remains preserved.','acceptance':[{'criterion':'Preserve the value.','result':'pass','evidence':['report.json']}],'source_fingerprints':wf.fingerprints(self.store,['source.py'])})
+            sources=['source.py',output.name] if tid==self.child else ['source.py']
+            wf.complete(self.store,{'task_id':tid,'outcome':'The value remains preserved.','acceptance':[{'criterion':'Preserve the value.','result':'pass','evidence':['report.json']}],'source_fingerprints':wf.fingerprints(self.store,sources)})
         self.focus();complete_unit(self.child);wf.finish(self.store)
         next_id=self.task('Next infrastructure',self.root_id)
         with self.store.lock():
@@ -147,10 +149,29 @@ class MaintenanceScopeTests(unittest.TestCase):
         (self.root/'source.py').write_text('value=2')
         complete_unit(next_id)
         self.assertEqual(wf.advance(self.store)['task_id'],self.child)
-        attempt=wf.prepare_check(self.store,{'task_id':self.child,'check_id':'static'})
-        wf.record_check(self.store,{'task_id':self.child,'check_id':'static','attempt_id':attempt['attempt_id'],'result':'pass','classification':'executed-control','actual_lane':'static','environment_identity':attempt['environment_identity'],'assertions':[{'assertion':'The value remains preserved.','result':'pass'}],'evidence':['report.json'],'cleanup':'Static inspection only.'})
-        wf.accept_revalidation(self.store,{'task_id':self.child})
+        def accept_check():
+            attempt=wf.prepare_check(self.store,{'task_id':self.child,'check_id':'static'})
+            wf.record_check(self.store,{'task_id':self.child,'check_id':'static','attempt_id':attempt['attempt_id'],'result':'pass','classification':'executed-control','actual_lane':'static','environment_identity':attempt['environment_identity'],'assertions':[{'assertion':'The value remains preserved.','result':'pass'}],'evidence':['report.json'],'cleanup':'Static inspection only.'})
+            wf.accept_revalidation(self.store,{'task_id':self.child})
+        accept_check()
+        review=self.root/'source-review.json'
+        def accept_review():
+            handoff=wf.advance(self.store)
+            self.assertEqual((handoff['task_id'],handoff['checks']),(self.child,[]))
+            claims=handoff['source_review']
+            review.write_text(wf.dump(claims))
+            source_review={'sources':claims['sources'],'evidence':{'path':review.name,'sha256':wf.file_hash(review)}}
+            wf.accept_revalidation(self.store,{'task_id':self.child,'source_review':source_review})
+        accept_review()
         run=self.store.load()['active_run'];self.assertIn(self.child,run['maintenance']['revalidated_checks']);self.assertNotIn('revalidated_checks',run)
+        inspected=review.read_bytes();review.write_text('Changed after acceptance.\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'does not cover'):
+            wf.finish(self.store)
+        review.write_bytes(inspected)
+        accept_check()
+        with self.assertRaisesRegex(wf.WorkflowError,'does not cover'):
+            wf.finish(self.store)
+        accept_review()
         wf.finish(self.store)
         run=self.store.load()['active_run']
         for key in ['id','root_task_id','current_task_id','phase','stop_reason','next_action','partial_work','admission','limits']:self.assertEqual(run[key],self.before[key],key)
