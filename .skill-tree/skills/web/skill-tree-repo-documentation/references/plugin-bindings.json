@@ -1340,7 +1340,7 @@
   "configuration_digest": "90933e866bbf725ee70ef7b18ae91d1d862e6d7179225d2d75196370e13a7962",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "91b8c2d5e27356c28f23d5a415a2ed4aa3e4f84037a06510d139c8be971aba1c",
+  "identity": "728173032b6a0275c0c9f97b5d2a8c23a38ceb7399b1947f6fa3fcb9ea9180b4",
   "operation": "skill-tree-repo-documentation",
   "operations": {
     "skill-tree-add-pending-task": {
@@ -1391,9 +1391,9 @@
     "references/project-profile.md": "a2fa0f0f6f445c854f8f32d06653fbb641742811766f8258b58823684d7e1144",
     "references/repository-discovery-checklist.md": "a112230c076fea515c437e3e7407c575ee6690d772eaa28e68f80c720c7a621c",
     "references/run-workspaces.md": "d9a97bc8ee56ef0aa6f254075df08e2946fdc61c578328a52f6991dbd723468c",
-    "references/validation-policy.md": "08a22e99d0f654ed39a32f407b29730b49e66ebec42b52aacc1d6c7f1fe09fad",
+    "references/validation-policy.md": "2bb1e9675fe3bc08cbcb9aa4b9534368416faba7ffaaf6b5aaff417456f434d3",
     "references/web-development.md": "a8e55f4d58ad64056707801a3c31aa56eb884755fd12ef08c341680d73645bc9",
-    "references/workflow-metadata.md": "4cb9939a008b29c6fa6920774fdef3e46856984afe78b53c9d2ab4f3b213eeee",
+    "references/workflow-metadata.md": "eea7ee03ec910e9bf312b93b7f872b568f10c40f9c972484106a86fff742abdb",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "d2c5ac475033ae06321fc7917ddf96232a0e442bef7c5db537891e12164fd404",
     "scripts/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
@@ -1409,7 +1409,7 @@
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     "scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
     "scripts/validate-repository-documentation.py": "a9833b258675765a24de4205f5b87a6e34a90913408e97957582e007c78ba911",
-    "scripts/workflow-state.py": "cc04e378ed47ed92dd609e43b3c052d91da5eaf91ebaa498418b520cb5e72d65"
+    "scripts/workflow-state.py": "4858a30010717655bdb0f1ff4515b054d17258d62a98ad68f8922e6f8e5ab531"
   },
   "packages": {},
   "parameter_defaults": {},

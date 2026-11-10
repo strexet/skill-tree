@@ -154,9 +154,15 @@ class MaintenanceScopeTests(unittest.TestCase):
             wf.record_check(self.store,{'task_id':self.child,'check_id':'static','attempt_id':attempt['attempt_id'],'result':'pass','classification':'executed-control','actual_lane':'static','environment_identity':attempt['environment_identity'],'assertions':[{'assertion':'The value remains preserved.','result':'pass'}],'evidence':['report.json'],'cleanup':'Static inspection only.'})
             wf.accept_revalidation(self.store,{'task_id':self.child})
         accept_check()
-        review=self.root/'source-review.md';review.write_text('The output preserves the integration contract.\n')
-        source_review={'sources':wf.fingerprints(self.store,[output.name]),'evidence':{'path':review.name,'sha256':wf.file_hash(review)}}
-        wf.accept_revalidation(self.store,{'task_id':self.child,'source_review':source_review})
+        review=self.root/'source-review.json'
+        def accept_review():
+            handoff=wf.advance(self.store)
+            self.assertEqual((handoff['task_id'],handoff['checks']),(self.child,[]))
+            claims=handoff['source_review']
+            review.write_text(wf.dump(claims))
+            source_review={'sources':claims['sources'],'evidence':{'path':review.name,'sha256':wf.file_hash(review)}}
+            wf.accept_revalidation(self.store,{'task_id':self.child,'source_review':source_review})
+        accept_review()
         run=self.store.load()['active_run'];self.assertIn(self.child,run['maintenance']['revalidated_checks']);self.assertNotIn('revalidated_checks',run)
         inspected=review.read_bytes();review.write_text('Changed after acceptance.\n')
         with self.assertRaisesRegex(wf.WorkflowError,'does not cover'):
@@ -165,7 +171,7 @@ class MaintenanceScopeTests(unittest.TestCase):
         accept_check()
         with self.assertRaisesRegex(wf.WorkflowError,'does not cover'):
             wf.finish(self.store)
-        wf.accept_revalidation(self.store,{'task_id':self.child,'source_review':source_review})
+        accept_review()
         wf.finish(self.store)
         run=self.store.load()['active_run']
         for key in ['id','root_task_id','current_task_id','phase','stop_reason','next_action','partial_work','admission','limits']:self.assertEqual(run[key],self.before[key],key)
