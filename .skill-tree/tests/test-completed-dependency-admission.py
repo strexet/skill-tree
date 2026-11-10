@@ -106,6 +106,11 @@ class CompletedDependencyAdmissionTests(unittest.TestCase):
     def test_incomplete_source_coverage_never_establishes_integration(self):
         child, parent, store = self.dependency()
         self.revalidate(store, child)
+        self.add_completion_output(store, child)
+        with self.assertRaisesRegex(wf.WorkflowError, 'does not cover'):
+            wf.begin_task(store, {'task_id':parent})
+
+    def add_completion_output(self, store, child):
         extra = store.source_root/'output.txt'
         extra.write_text('Recorded output not covered by the check.\n')
         # Model an original completion with an additional output fingerprint.
@@ -113,8 +118,51 @@ class CompletedDependencyAdmissionTests(unittest.TestCase):
         record = next(o for o in outcomes if o['task_id']==child)
         record['source_fingerprints'].update(wf.fingerprints(store, ['output.txt']))
         (store.base/'history/task-outcomes.jsonl').write_text(''.join(json.dumps(o)+'\n' for o in outcomes))
+        return extra
+
+    def test_source_review_supplements_accepted_checks_and_expires_on_drift(self):
+        child, parent, store = self.dependency()
+        extra = self.add_completion_output(store, child)
+        extra.write_text('Current reviewed output.\n')
+        self.revalidate(store, child)
+        cycle_before = wf.record_cycle(store)['cycle_signature']
+        ledger = (store.base/'history/task-outcomes.jsonl').read_bytes()
+        accepted = store.load()['active_run']['revalidated_checks'][child]
+        evidence = store.source_root/'source-review.md'
+        evidence.write_text('The output preserves the integration contract.\n')
+        review = {'sources':wf.fingerprints(store, ['output.txt']),
+                  'evidence':{'path':evidence.name,'sha256':wf.file_hash(evidence)}}
+        with self.assertRaisesRegex(wf.WorkflowError, 'exact current uncovered'):
+            wf.accept_revalidation(store, {'task_id':child, 'source_review':{
+                **review, 'sources':wf.fingerprints(store, ['output.txt', 'source.py'])}})
+        inspected = evidence.read_bytes()
+        evidence.write_text('Changed before acceptance.\n')
+        with self.assertRaisesRegex(wf.WorkflowError, 'evidence missing or mismatched'):
+            wf.accept_revalidation(store, {'task_id':child, 'source_review':review})
+        evidence.write_bytes(inspected)
+        wf.accept_revalidation(store, {'task_id':child, 'source_review':review})
+        self.assertNotEqual(wf.record_cycle(store)['cycle_signature'], cycle_before)
+        self.assertEqual(wf.advance(store)['task_id'], parent)
+        wf.begin_task(store, {'task_id':parent})
+        self.assertEqual(store.load()['active_run']['revalidated_checks'][child], accepted)
+        self.assertEqual((store.base/'history/task-outcomes.jsonl').read_bytes(), ledger)
+        extra.write_text('Changed after review.\n')
         with self.assertRaisesRegex(wf.WorkflowError, 'does not cover'):
             wf.begin_task(store, {'task_id':parent})
+        extra.write_text('Current reviewed output.\n')
+        evidence.write_text('Changed after review.\n')
+        with self.assertRaisesRegex(wf.WorkflowError, 'does not cover'):
+            wf.complete(store, {'task_id':parent, 'outcome':'The consumer is ready.'})
+        (store.source_root/'source.py').write_text('value = 4\n')
+        self.revalidate(store, child)
+        self.assertNotIn(child, store.load()['active_run']['revalidation_source_reviews'])
+        wf.accept_revalidation(store, {'task_id':child, 'source_review':{
+            **review, 'evidence':{'path':evidence.name,'sha256':wf.file_hash(evidence)}}})
+        self.assertIsNone(wf.record_cycle(store)['stop_reason'])
+        evidence.write_text('The same review with a wording change.\n')
+        wf.accept_revalidation(store, {'task_id':child, 'source_review':{
+            **review, 'evidence':{'path':evidence.name,'sha256':wf.file_hash(evidence)}}})
+        self.assertIn('without task/dependency progress', wf.record_cycle(store)['stop_reason'])
 
     def test_pending_attempt_invalidates_prior_accepted_dependency(self):
         child, parent, store = self.dependency()

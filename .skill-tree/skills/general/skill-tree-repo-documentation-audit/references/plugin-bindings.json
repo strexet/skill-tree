@@ -1340,7 +1340,7 @@
   "configuration_digest": "90933e866bbf725ee70ef7b18ae91d1d862e6d7179225d2d75196370e13a7962",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "e9db4917ca12c1a543212c954db75671d44a689465b8f83965b68f460f7bba48",
+  "identity": "6b925d9d49081b296ca293b2eba20a78ab191510b75fd41b21bd6f336bdb0fce",
   "operation": "skill-tree-repo-documentation-audit",
   "operations": {
     "skill-tree-add-pending-task": {
@@ -1391,8 +1391,8 @@
     "references/project-profile.md": "e880123c1237a88d5c2c765b105d7bba3bd7b5d68240a8c242a7fd9d13408164",
     "references/repository-discovery-checklist.md": "a112230c076fea515c437e3e7407c575ee6690d772eaa28e68f80c720c7a621c",
     "references/run-workspaces.md": "d9a97bc8ee56ef0aa6f254075df08e2946fdc61c578328a52f6991dbd723468c",
-    "references/validation-policy.md": "4b0370124139f3203f944e84f9c3768d5d1f9a693ee26bb70260425a3add42b6",
-    "references/workflow-metadata.md": "0b4635c90c434e691d0cd2fafc2f4950a663eae912f55a4f003ca7ea3486f011",
+    "references/validation-policy.md": "08a22e99d0f654ed39a32f407b29730b49e66ebec42b52aacc1d6c7f1fe09fad",
+    "references/workflow-metadata.md": "4cb9939a008b29c6fa6920774fdef3e46856984afe78b53c9d2ab4f3b213eeee",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "d2c5ac475033ae06321fc7917ddf96232a0e442bef7c5db537891e12164fd404",
     "scripts/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
@@ -1408,7 +1408,7 @@
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     "scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
     "scripts/validate-repository-documentation.py": "a9833b258675765a24de4205f5b87a6e34a90913408e97957582e007c78ba911",
-    "scripts/workflow-state.py": "1957375646b85a90be8279fc46648c98b951d59d4d7798465f307ba82d813913"
+    "scripts/workflow-state.py": "cc04e378ed47ed92dd609e43b3c052d91da5eaf91ebaa498418b520cb5e72d65"
   },
   "packages": {},
   "parameter_defaults": {},

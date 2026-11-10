@@ -92,6 +92,8 @@ Product lanes require an owned execution session even when no new process launch
 
 `accept-revalidation` accepts current passing checks for a required completed contract selected by advance. Temporary `task_progress` entries carry `revalidation: true`; immutable terminal history owns the completed check definitions. The active run retains accepted `revalidated_checks`, without another outcome ledger or rewritten terminal record. Finish rejects stale/missing required completed evidence and unresolved revalidation attempts. A blocked-task resume can clear only the execution stop owned by the same admitted task; unrelated stops remain binding. History views refresh artifact availability and source matching without changing recorded verdicts.
 
+When accepted checks omit paths from the original completion fingerprints, a separate `accept-revalidation` call may supply `source_review` with `sources` and `evidence`. Supply hashes for the exact uncovered completion paths and an evidence object with the repository-relative `path` and inspected `sha256` of the review artifact. The run verifies the artifact hash and retains the review separately from check results. A later revalidation acceptance clears the previous review.
+
 ## Local delivery records
 
 A recorded `pr=false`, `merge=true`, `mode=local-merge` order creates a pending local delivery after implementation acceptance. The immutable finish record binds the reviewed source commit and tree, repository and execution worktree. The mutable delivery record retains prepared source and target refs, canonical preservation fingerprints, actual merge evidence, target profile admission and validation. A repeated finish supplies the same original completion.
