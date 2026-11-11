@@ -4,7 +4,7 @@ The catalog separates analytical models, techniques and player effects. The play
 
 ## Choose a card
 
-Start with a source-backed observation and the intended player experience. Use the last column to locate a likely method. Read the matched card and any relevant overlap only. For a weak payoff, start with [setup and payoff](narrative-craft-information.md#setup-payoff). For competing accounts, start with [attributed testimony](narrative-craft-testimony.md#rashomon). If a quiet scene already sustains atmosphere or pacing, retaining the scene is a supported conclusion. A quiet scene that already serves the intended function can remain unchanged.
+Start with a source-backed observation and the intended player experience. Use the last column to locate a likely method. Read the matched card and any relevant overlap only. For a weak payoff, start with [setup and payoff](narrative-craft-information.md#setup-payoff). For competing accounts, start with [attributed testimony](narrative-craft-testimony.md#rashomon). If a quiet scene already sustains atmosphere or pacing, retaining the scene is a supported conclusion.
 
 Every card names the selection signal, source attribution or playbook locator, game adaptation, intended player experience, misuse risk, concrete example and suitable evidence. Record an observed result separately from an intended effect. An authored clue and an executed clue presentation support different claims from an observed player interpretation.
 

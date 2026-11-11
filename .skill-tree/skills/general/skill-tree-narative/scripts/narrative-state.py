@@ -5,7 +5,7 @@ import argparse
 import hashlib
 import json
 import os
-from pathlib import Path, PureWindowsPath
+from pathlib import Path
 import re
 import sys
 from tempfile import NamedTemporaryFile
@@ -70,7 +70,7 @@ def valid_digest(value):
 def relative_parts(relative):
     require(
         isinstance(relative, str) and "\\" not in relative and "\0" not in relative
-        and not PureWindowsPath(relative).drive and relative
+        and ":" not in relative and relative
         and all(part not in {"", ".", ".."} for part in relative.split("/")),
         "Repository-relative path required",
     )
@@ -446,11 +446,19 @@ class Project:
         result.update({
             "normative": {"closure_valid": not result["unresolved"],
                           "selected_changes": result["ids"], "dependent_records": result["affected"]},
-            "optional": self.impact_optional(metadata, provenance, retired, touched),
-            "dramatic": self.impact_dramatic(dramatic, metadata, retired, touched),
-            "suspected": self.impact_suspected(suspected, touched),
-            "work_pins": self.impact_work_pins(work_pins, snapshot, continuity, selected, entries, revisions),
+            "optional": [],
+            "dramatic": [],
+            "suspected": [],
         })
+        if touched:
+            result.update({
+                "optional": self.impact_optional(metadata, provenance, retired, touched),
+                "dramatic": self.impact_dramatic(dramatic, metadata, retired, touched),
+                "suspected": self.impact_suspected(suspected, touched),
+            })
+        result["work_pins"] = self.impact_work_pins(
+            work_pins, snapshot, continuity, selected, entries, revisions, retired,
+        )
         return result
 
     @staticmethod
@@ -531,7 +539,7 @@ class Project:
                     })
         return sorted(rows, key=canonical)
 
-    def impact_work_pins(self, paths, snapshot, continuity, selected, entries, revisions):
+    def impact_work_pins(self, paths, snapshot, continuity, selected, entries, revisions, retired):
         rows, seen = [], set()
         for path in sorted(set(paths)):
             manifest = parse_json(read_text(self.owned(path)))
@@ -559,13 +567,20 @@ class Project:
                     row["comparison"] = "different-continuity"
                 else:
                     old_entries = current["entries"]
-                    dependents_to_review = sorted(set(dependents(entries, selected))
-                                                  | set(dependents(old_entries, selected)))
                     old_revisions = {key: entry["revision"] for key, entry in old_entries.items()}
-                    relevant = set(selected) | set(dependents_to_review)
+                    roots = selected
+                    retirement_changes = set()
+                    if snapshot is not None:
+                        retirement_changes = set(current["retired"]) ^ retired
+                        revision_changes = {key for key in old_revisions.keys() | revisions.keys()
+                                            if old_revisions.get(key) != revisions.get(key)}
+                        roots = revision_changes | retirement_changes
+                    dependents_to_review = sorted(set(dependents(entries, roots))
+                                                  | set(dependents(old_entries, roots)))
+                    relevant = set(roots) | set(dependents_to_review)
                     unavailable = relevant - revisions.keys() if snapshot is None else set()
                     changed = sorted(key for key in relevant - unavailable
-                                     if old_revisions.get(key) != revisions.get(key))
+                                     if key in retirement_changes or old_revisions.get(key) != revisions.get(key))
                     row["comparison"] = ("already-selected" if snapshot == pin["digest"] else
                                          "selected-snapshot" if snapshot is not None else "draft-scope-unverified")
                     row["if_moved"] = {
@@ -699,7 +714,8 @@ def arguments():
             scope.add_argument("--drafts", action="store_true")
             scope.add_argument("--snapshot")
             if name == "impact":
-                command.add_argument("--ids", required=True, nargs="+")
+                command.add_argument("--ids", nargs="+", default=[],
+                                     help="record IDs, optional for a snapshot comparison with --work-pin")
                 command.add_argument("--extended", action="store_true")
                 command.add_argument("--work-pin", action="append", default=[])
                 command.add_argument("--dramatic", action="append", default=[])
@@ -716,7 +732,12 @@ def arguments():
             command.add_argument("--expected-proposal", required=True)
             command.add_argument("--decision", required=True)
             command.add_argument("--review-packet")
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.command == "impact" and not args.ids:
+        pin_only = args.snapshot is not None and args.work_pin and not (args.dramatic or args.suspected)
+        if not pin_only:
+            parser.error("impact requires --ids unless comparing accepted work pins only")
+    return args
 
 
 def main():

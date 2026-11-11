@@ -31,7 +31,7 @@ Equal("Read the relay log by the selector.", ChoiceMap(tagged)["discover-log"].t
 var renamed = new Story(compiled.Replace("Read the relay log by the selector.", "Inspect the relay log.", StringComparison.Ordinal));
 renamed.ContinueMaximally();
 Equal("Inspect the relay log.", ChoiceMap(renamed)["discover-log"].text.Trim());
-Equal("discover-log,skip-log", string.Join(",", ChoiceMap(renamed).Keys.Order()));
+AssertChoices(new[] { "discover-log", "skip-log" }, ChoiceMap(renamed).Keys);
 Console.WriteLine("PASS renamed label preserves identity");
 
 var duplicate = new Story(compiled.Replace("choice-id: skip-log", "choice-id: discover-log", StringComparison.Ordinal));
@@ -54,15 +54,26 @@ static void Replay(string compiled, JsonElement trace)
     AssertState(story, trace.GetProperty("initial_state"));
     var output = story.ContinueMaximally();
     Contains(output, "A blue seal");
-    foreach (var step in trace.GetProperty("steps").EnumerateArray())
+    var steps = trace.GetProperty("steps");
+    var stepCount = steps.GetArrayLength();
+    if (stepCount == 0)
+        throw new InvalidOperationException($"Trace '{id}' has no steps");
+    for (var index = 0; index < stepCount; index++)
     {
+        var step = steps[index];
         var beat = step.GetProperty("node").GetString();
-        var action = step.TryGetProperty("action", out var actionValue) ? actionValue.GetString() : null;
+        var finalStep = index == stepCount - 1;
+        var hasAction = step.TryGetProperty("action", out var actionValue);
+        var action = hasAction && actionValue.ValueKind == JsonValueKind.String ? actionValue.GetString() : null;
         try
         {
+            if (finalStep && hasAction)
+                throw new InvalidOperationException("Expected a final step without an action");
+            if (!finalStep && string.IsNullOrWhiteSpace(action))
+                throw new InvalidOperationException("Expected an action before the final step");
             var choices = ChoiceMap(story);
-            var expected = step.GetProperty("offered").EnumerateArray().Select(value => value.GetString()).Order();
-            Equal(string.Join(",", expected), string.Join(",", choices.Keys.Order()));
+            var expected = step.GetProperty("offered").EnumerateArray().Select(value => value.GetString());
+            AssertChoices(expected, choices.Keys);
             if (step.TryGetProperty("feedback", out var feedback))
                 foreach (var marker in feedback.EnumerateArray())
                     Contains(output, marker.GetString()!);
@@ -85,7 +96,7 @@ static void Replay(string compiled, JsonElement trace)
                 var restored = new Story(compiled);
                 restored.state.LoadJson(story.state.ToJson());
                 var restoredChoices = ChoiceMap(restored);
-                Equal(string.Join(",", choices.Keys.Order()), string.Join(",", restoredChoices.Keys.Order()));
+                AssertChoices(choices.Keys, restoredChoices.Keys);
                 foreach (var choice in choices)
                     Equal(choice.Value.text, restoredChoices[choice.Key].text);
                 story = restored;
@@ -112,6 +123,15 @@ static void Replay(string compiled, JsonElement trace)
         }
     }
     Console.WriteLine($"PASS {id}");
+}
+
+static void AssertChoices(IEnumerable<string?> expected, IEnumerable<string> actual)
+{
+    var expectedIds = expected.Order(StringComparer.Ordinal).ToArray();
+    var actualIds = actual.Order(StringComparer.Ordinal).ToArray();
+    if (!expectedIds.SequenceEqual(actualIds, StringComparer.Ordinal))
+        throw new InvalidOperationException(
+            $"Expected offered IDs {JsonSerializer.Serialize(expectedIds)}, received {JsonSerializer.Serialize(actualIds)}");
 }
 
 static void AssertState(Story story, JsonElement state)

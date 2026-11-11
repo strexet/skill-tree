@@ -1,5 +1,6 @@
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -60,6 +61,31 @@ class RouteContractTests(unittest.TestCase):
             self.assertEqual(code, 2)
             self.assertEqual(report['diagnostic']['code'], 'malformed-contract')
 
+    def test_malformed_trace_is_a_contract_error(self):
+        with tempfile.TemporaryDirectory() as work:
+            directory = Path(work)
+            path = self.fixture(directory)
+            corpus = json.loads(path.read_text())
+            contract_path = directory / 'route-contract.example.json'
+            contract = json.loads(contract_path.read_text())
+            trace = contract['traces'][0]
+            trace['steps'][0]['offered'] = 'discover-log'
+            contract_path.write_text(json.dumps(contract))
+            for expected in (None, 'malformed-contract', 'offered-mismatch'):
+                with self.subTest(expected=expected):
+                    target = contract_path
+                    if expected is not None:
+                        corpus['cases'] = [{'id': 'malformed-trace', 'traces': [trace],
+                                            'expected_diagnostic': expected}]
+                        path.write_text(json.dumps(corpus))
+                        target = path
+                    code, report = self.invoke(target)
+                    self.assertEqual(code, 2, report)
+                    self.assertEqual(report['diagnostic']['code'], 'malformed-contract')
+                    if expected != 'malformed-contract':
+                        self.assertEqual(report['diagnostic']['route'], trace['id'])
+                        self.assertEqual(report['diagnostic']['field'], 'step 0.offered')
+
     def test_unexpected_result_reports_route_and_step(self):
         with tempfile.TemporaryDirectory() as work:
             path = self.fixture(Path(work), 'route-contract.example.json')
@@ -89,11 +115,15 @@ class RouteContractTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as work:
             path = self.fixture(Path(work), 'route-contract.example.json')
             contract = json.loads(path.read_text())
-            contract['state_registry'] = '../outside.json'
-            path.write_text(json.dumps(contract))
-            code, report = self.invoke(path)
-            self.assertEqual(code, 2)
-            self.assertEqual(report['diagnostic']['code'], 'malformed-contract')
+            if os.name != 'nt':
+                shutil.copyfile(FIXTURES / 'state-registry.example.json', path.parent / 'C:registry.json')
+            for locator in ('../outside.json', 'C:registry.json', 'registry\0.json'):
+                with self.subTest(locator=locator):
+                    contract['state_registry'] = locator
+                    path.write_text(json.dumps(contract))
+                    code, report = self.invoke(path)
+                    self.assertEqual(code, 2)
+                    self.assertEqual(report['diagnostic']['code'], 'malformed-contract')
 
 
 if __name__ == '__main__':

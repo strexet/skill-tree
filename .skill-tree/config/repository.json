@@ -4,19 +4,12 @@
   "recipes": {
     "quality-python": {
       "lane": "unit",
-      "argv": [
-        "python3",
-        "{test_path}"
-      ],
+      "argv": ["python3", "{test_path}"],
       "input_paths": []
     },
     "quality-node": {
       "lane": "unit",
-      "argv": [
-        "node",
-        "--test",
-        "{test_path}"
-      ],
+      "argv": ["node", "--test", "{test_path}"],
       "input_paths": []
     },
     "pending-boundary-unit": {
@@ -55,11 +48,14 @@
     },
     "narrative-ink-replay": {
       "lane": "integration",
-      "argv": [
-        "bash",
-        ".skill-tree/examples/narrative/run-paths.sh"
-      ],
-      "input_paths": []
+      "argv": ["bash", ".skill-tree/examples/narrative/run-paths.sh"],
+      "input_paths": [
+        ".skill-tree/examples/narrative/run-paths.sh",
+        ".skill-tree/examples/narrative/quest.ink",
+        ".skill-tree/examples/narrative/route-traces.json",
+        ".skill-tree/examples/narrative/runtime-check/program.cs",
+        ".skill-tree/examples/narrative/runtime-check/runtime-check.csproj"
+      ]
     }
   }
 }

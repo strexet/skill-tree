@@ -11,6 +11,10 @@ ID = re.compile(r'[a-z][a-z0-9]*(?:[-_][a-z0-9]+)*\Z')
 SHA = re.compile(r'[a-f0-9]{64}\Z')
 EXITS = {'terminal', 'continuation'}
 OPS = {'eq', 'ne', 'lt', 'lte', 'gt', 'gte'}
+ROUTE_DIAGNOSTICS = {
+    'unavailable-state', 'unavailable-action', 'offered-mismatch', 'state-mismatch',
+    'missing-exit', 'exit-mismatch', 'node-mismatch', 'visit-limit', 'repeated-unique-effect',
+}
 
 
 class RouteError(ValueError):
@@ -43,7 +47,8 @@ def load(path):
 def locate(origin, relative):
     require(isinstance(relative, str) and relative, 'locator')
     parts = relative.split('/')
-    require(all(part not in {'', '.', '..'} for part in parts) and '\\' not in relative, relative)
+    require(all(part not in {'', '.', '..'} for part in parts)
+            and not any(char in relative for char in ('\\', ':', '\0')), 'portable relative locator')
     path = origin.parent
     for part in parts:
         path = path / part
@@ -217,7 +222,8 @@ def check_trace(model, trace, values):
 def check_case(model, traces, values, expected=None):
     validate_model(model, values)
     require(isinstance(traces, list) and traces, 'traces')
-    require(expected is None or isinstance(expected, str) and len(traces) == 1, 'expected diagnostic')
+    require(expected is None or isinstance(expected, str) and expected in ROUTE_DIAGNOSTICS
+            and len(traces) == 1, 'expected route diagnostic')
     seen, rows = set(), []
     for trace in traces:
         name = trace.get('id') if isinstance(trace, dict) else None
@@ -227,7 +233,9 @@ def check_case(model, traces, values, expected=None):
         try:
             check_trace(model, trace, values)
         except RouteError as error:
-            diagnostic = {'route': name, **error.diagnostic}
+            if error.diagnostic['code'] not in ROUTE_DIAGNOSTICS:
+                raise RouteError(error.diagnostic['code'], error.diagnostic['field'], route=name) from error
+            diagnostic = error.diagnostic
         observed = diagnostic['code'] if diagnostic else None
         rows.append({'id':name, 'expected_diagnostic':expected, 'observed_diagnostic':diagnostic,
                      'result':'pass' if observed == expected else 'fail'})

@@ -197,7 +197,9 @@ class NarrativeStateTests(unittest.TestCase):
         markdown, _ = self.draft("law-memory")
         proposal = self.propose("law-memory")
         _, decision_file = self.files(proposal)
-        self.accept(proposal, decision="../decision.json", error="Repository-relative path")
+        for decision in ("../decision.json", "review/Z:/decision.json", "review/decision.json:notes"):
+            with self.subTest(decision=decision):
+                self.accept(proposal, decision=decision, error="Repository-relative path")
         markdown.unlink()
         markdown.symlink_to(decision_file)
         self.accept(proposal, error="Symlinks are unsupported")

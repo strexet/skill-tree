@@ -38,7 +38,9 @@ class ImpactTests(unittest.TestCase):
                                                  "relationships": list(relationships)})
 
     def accept(self, selected, base=None, retire=()):
-        args = ["--work", "work-main", "--continuity", "continuity-main", "--ids", *selected]
+        args = ["--work", "work-main", "--continuity", "continuity-main"]
+        if selected:
+            args.extend(["--ids", *selected])
         if base is not None:
             args.extend(["--base", base])
         if retire:
@@ -111,25 +113,75 @@ class ImpactTests(unittest.TestCase):
                 self.assertEqual(row["target_status"], "active")
 
 
-    def test_old_pin_and_unchanged_dependent(self):
+    def test_old_pin_reports_entire_snapshot_delta_and_unchanged_dependents(self):
         self.draft("law-pack")
+        self.draft("law-tide")
         self.draft("scene-relay", ["law-pack"])
-        historical = self.accept(["law-pack", "scene-relay"])
+        self.draft("scene-quay", ["law-tide"])
+        self.draft("scene-legacy")
+        historical = self.accept(["law-pack", "law-tide", "scene-relay", "scene-quay", "scene-legacy"])
         historical_path = self.root / ".narrative/snapshots" / (historical + ".json")
         before = historical_path.read_bytes()
         self.draft("law-pack", text="Proposed replacement.")
-        candidate = self.accept(["law-pack"], base=historical)
+        self.draft("law-tide", text="Updated tide boundary.")
+        self.draft("event-relief")
+        candidate = self.accept(["law-pack", "law-tide", "event-relief"], base=historical, retire=["scene-legacy"])
         old_pin = self.pin("work-historical", historical)
         current_pin = self.pin("work-current", candidate)
         report = self.command("impact", "--snapshot", candidate, "--ids", "law-pack",
                               "--work-pin", old_pin, "--work-pin", current_pin)
         pins = {row["work"]: row for row in report["work_pins"]}
-        self.assertEqual(pins["work-current"]["comparison"], "already-selected")
+        self.assertEqual(report["normative"]["dependent_records"], ["scene-relay"])
         self.assertEqual(pins["work-historical"]["historical_pin"], "preserved")
-        self.assertEqual(pins["work-historical"]["if_moved"],
-                         {"changed_records": ["law-pack"], "unchanged_dependents": ["scene-relay"]})
+        self.assertEqual(pins["work-historical"]["if_moved"], {
+            "changed_records": ["event-relief", "law-pack", "law-tide", "scene-legacy"],
+            "unchanged_dependents": ["scene-quay", "scene-relay"],
+        })
+        self.assertEqual(pins["work-current"]["comparison"], "already-selected")
+        self.assertEqual(pins["work-current"]["if_moved"],
+                         {"changed_records": [], "unchanged_dependents": []})
         self.assertEqual(historical_path.read_bytes(), before)
         self.assertEqual(json.loads((self.root / old_pin).read_text())["canon_pin"]["digest"], historical)
+
+    def test_pin_delta_includes_retirement_changes_without_active_revisions(self):
+        self.draft("law-pack")
+        historical = self.accept(["law-pack"])
+        self.draft("scene-interim")
+        intermediate = self.accept(["scene-interim"], base=historical)
+        current = self.accept(["law-pack"], base=intermediate, retire=["scene-interim"])
+
+        old_pin = self.pin("work-historical", historical)
+        new_pin = self.pin("work-current", current)
+        for source_pin, target in [(old_pin, current), (new_pin, historical)]:
+            with self.subTest(source_pin=source_pin):
+                report = self.command("impact", "--snapshot", target, "--ids", "law-pack",
+                                      "--work-pin", source_pin)
+                self.assertEqual(report["work_pins"][0]["if_moved"], {
+                    "changed_records": ["scene-interim"],
+                    "unchanged_dependents": [],
+                })
+
+    def test_pin_only_comparison_can_report_an_all_retired_target(self):
+        self.draft("law-pack")
+        historical = self.accept(["law-pack"])
+        current = self.accept([], base=historical, retire=["law-pack"])
+        pin = self.pin("work-historical", historical)
+
+        report = self.command("impact", "--snapshot", current, "--work-pin", pin)
+        for field in ("ids", "affected", "optional", "dramatic", "suspected"):
+            self.assertEqual(report[field], [], field)
+        self.assertEqual(report["work_pins"][0]["if_moved"], {
+            "changed_records": ["law-pack"],
+            "unchanged_dependents": [],
+        })
+
+        self.command("impact", "--snapshot", current, status=2, parse=False)
+        self.command("impact", "--drafts", "--work-pin", pin, status=2, parse=False)
+
+        for flag in ("--dramatic", "--suspected"):
+            with self.subTest(flag=flag):
+                self.command("impact", "--snapshot", current, "--work-pin", pin, flag,
+                             "missing.json", status=2, parse=False)
 
     def test_missing_draft_dependent_is_not_inferred_as_removed(self):
         self.draft("law-pack")

@@ -1,6 +1,12 @@
 # Bounded Narrative Route Checks
 
-Run `python3 .skill-tree/common/scripts/narrative-route-check.py .skill-tree/examples/narrative/route-traces.json` for the finite declared corpus. The checker accepts a single v1 contract or the bundled corpus wrapper. Corpus case definitions reuse the base state registry and can override the model for a narrow adverse fixture.
+Set `NARRATIVE_ROUTE_CHECK` to the installed skill's `scripts/narrative-route-check.py` and `ROUTE_CONTRACT` to the selected project JSON file.
+
+```sh
+python3 "$NARRATIVE_ROUTE_CHECK" "$ROUTE_CONTRACT"
+```
+
+The checker accepts a single v1 contract or a corpus wrapper. Corpus case definitions reuse the base state registry and can override the model for a narrow adverse fixture. The Skill Tree source checkout supplies the example corpus at `.skill-tree/examples/narrative/route-traces.json`.
 
 The checker reads JSON and evaluates declared actions, predicates, assignments and visit limits. Effects are typed assignments. A key marked `unique_effect` permits one grant during the trace. An `on_enter_once` effect applies only on the first entry to a node. Re-entry remains legal within the declared budget.
 

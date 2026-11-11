@@ -15,10 +15,21 @@ The schema 1 review packet carries the fields below. A packet uses the exact pro
 | `work`, `continuity`, `base` | Exact proposal scope and base snapshot or null. |
 | `record_scope` | `selected`, `retired` and `unchanged_dependents` match proposal `ids`, `retire` and `affected` respectively. |
 | `review_sources` | Exact ordered `path` and `sha256` pairs. |
-| `reviewer` | `id`, `role` and `evidence` identify the actual review. Use an independent reviewer for consequential changes. |
-| `coverage` | List of `kind`, `scope` and `evidence` for reviewed cases. |
-| `findings` | List of `id`, `scope`, `severity`, `status` and `evidence`. Include a `resolution` for a resolved or dismissed blocker. |
-| `packet_digest` | SHA-256 of the UTF-8 canonical JSON object excluding `packet_digest`. Sort keys, use compact separators and reject duplicate keys. |
+| `reviewer` | Nonempty strings for `id`, `role` and `evidence` identify the actual review. Use an independent reviewer for consequential changes. |
+| `coverage` | Nonempty list of reviewed cases. Each case has nonempty `kind` and `scope` strings and a nonempty `evidence` list of nonempty strings. |
+| `findings` | List of `id`, `scope`, `severity`, `status` and `evidence`. Each `evidence` list contains at least one nonempty string. Include a nonempty `resolution` string for a resolved or dismissed blocker. |
+| `packet_digest` | Lowercase SHA-256 hex digest of the canonical UTF-8 packet body. |
+
+Compute the digest from the packet object without the `packet_digest` field. Parse source JSON with duplicate-key rejection before encoding.
+
+```python
+import hashlib
+import json
+
+body = {key: value for key, value in packet.items() if key != "packet_digest"}
+encoded = json.dumps(body, ensure_ascii=False, sort_keys=True, allow_nan=False, separators=(",", ":"))
+packet["packet_digest"] = hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+```
 
 A finding scope is `in-scope` or `out-of-scope`. Severity is `blocker` or `note`. Status is `open`, `resolved` or `dismissed`. Open in-scope blockers hold approval. Record concrete resolution evidence for resolved blockers or a source-backed reason for dismissal. Unrelated unresolved work can remain visible outside the selected scope. Confirm current coverage after a repair.
 
