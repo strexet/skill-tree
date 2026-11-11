@@ -1,6 +1,6 @@
 # Current Features
 
-All three flavors expose the same eleven operation names.
+All three flavors expose the same operation names.
 
 | Operation | Current responsibility |
 | --- | --- |
@@ -15,6 +15,7 @@ All three flavors expose the same eleven operation names.
 | `skill-tree-create-documents-snapshot` | Create an explicit bounded documentation archive. |
 | `skill-tree-pr-review-cycle` | Record PR review/fix progress and gate explicitly authorized publication and merge. |
 | `skill-tree-plugins` | Inspect installed and known sources, preview exact package changes and configure ordered binding occurrences. |
+| `skill-tree-narative` | Develop narrative drafts, review continuity and gameplay, and record explicitly accepted canon snapshots. |
 
 General packages use discovered repository recipes. Web packages add browser and hosted-evidence boundaries. Unity packages add Editor, package, fixture and runtime isolation contracts. Concrete specialization follows resolved capabilities.
 

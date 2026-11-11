@@ -4,12 +4,19 @@
   "recipes": {
     "quality-python": {
       "lane": "unit",
-      "argv": ["python3", "{test_path}"],
+      "argv": [
+        "python3",
+        "{test_path}"
+      ],
       "input_paths": []
     },
     "quality-node": {
       "lane": "unit",
-      "argv": ["node", "--test", "{test_path}"],
+      "argv": [
+        "node",
+        "--test",
+        "{test_path}"
+      ],
       "input_paths": []
     },
     "pending-boundary-unit": {
@@ -43,6 +50,14 @@
         "node",
         "--test",
         ".skill-tree/tests/test-pending-priority-installation.js"
+      ],
+      "input_paths": []
+    },
+    "narrative-ink-replay": {
+      "lane": "integration",
+      "argv": [
+        "bash",
+        ".skill-tree/examples/narrative/run-paths.sh"
       ],
       "input_paths": []
     }

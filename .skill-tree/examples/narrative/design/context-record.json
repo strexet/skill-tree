@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "fixture_scope": "Synthetic context resolution and drift example",
+  "fixture_setup": {
+    "record_ids": [
+      "law-pack",
+      "event-trip",
+      "character-ilya"
+    ],
+    "work_id": "work-ridge",
+    "continuity_id": "continuity-ridge",
+    "decision_path": "fixture-first-decision.json",
+    "author": "Synthetic fixture author",
+    "reason": "The disposable fixture qualifies an exact first-work pin.",
+    "draft_contents": {
+      "drafts/lift-after.md": "# Proposed lift aftermath\n\nThe lift reaches the crew and clinic stock warms.\n",
+      "drafts/cooler-after.md": "# Proposed cooler aftermath\n\nCold stock remains and the crew waits.\n"
+    }
+  },
+  "context": {
+    "context_id": "context-ridge-outcomes",
+    "work_id": "work-ridge",
+    "ip_id": "ip-ridge",
+    "continuity_id": "continuity-ridge",
+    "period": {
+      "label": "Emergency shift after the lift-house short",
+      "anchor_event_id": "event-trip",
+      "elapsed": "Within the same service window"
+    },
+    "canon_pin": {
+      "state": "accepted",
+      "digest": "cd741be1e668b8710f3cc89d6c7c9f0f3de70017490b4149727fcfa641ff1e02"
+    },
+    "predecessor": null,
+    "route": {
+      "state": "unresolved",
+      "candidates": [
+        "outcome-lift",
+        "outcome-cooler"
+      ]
+    },
+    "request_scope": {
+      "mode": "read-only",
+      "intent": "Compare outcome variants and preserve the accepted base."
+    },
+    "accepted_selection": [
+      {
+        "record_id": "character-ilya",
+        "revision": "ae9de0ae2c5af55affd822fe91b9c20951c02588617354877a5eae6bf169dbf8",
+        "role": "accepted-canon"
+      },
+      {
+        "record_id": "event-trip",
+        "revision": "3bbb5d7aff69cff805d3307490f14fd32a52b384f21c0375f9bd8aef74622280",
+        "role": "accepted-canon"
+      },
+      {
+        "record_id": "law-pack",
+        "revision": "085af8c83b8e6b4b39416898988441da36cb95168f04e6998ec692dc48f4cb74",
+        "role": "accepted-canon"
+      }
+    ],
+    "draft_alternatives": [
+      {
+        "group_id": "alternative-lift",
+        "route": "outcome-lift",
+        "sources": [
+          {
+            "source_id": "draft-lift-after",
+            "path": "drafts/lift-after.md",
+            "sha256": "93780eec8ef7b42f27bbaf5d33c2678670499b52ce1bbad24eefe70720c1f5bc",
+            "role": "working-draft"
+          }
+        ]
+      },
+      {
+        "group_id": "alternative-cooler",
+        "route": "outcome-cooler",
+        "sources": [
+          {
+            "source_id": "draft-cooler-after",
+            "path": "drafts/cooler-after.md",
+            "sha256": "873bd5f831edaed759a612647284e8daea0ff75c32a7e4961dc28c742aa7cbf8",
+            "role": "working-draft"
+          }
+        ]
+      }
+    ],
+    "findings": [
+      {
+        "finding_id": "finding-lift-stock",
+        "depends_on": [
+          "draft-lift-after"
+        ]
+      },
+      {
+        "finding_id": "finding-cooler-wait",
+        "depends_on": [
+          "draft-cooler-after"
+        ]
+      },
+      {
+        "finding_id": "finding-relay-order",
+        "depends_on": [
+          "event-trip"
+        ]
+      }
+    ],
+    "open_decisions": [
+      {
+        "decision_id": "decision-ridge-outcome",
+        "state": "unresolved",
+        "depends_on": [
+          "draft-lift-after",
+          "draft-cooler-after"
+        ],
+        "holds": [
+          "Later scene that asserts one chosen outcome"
+        ]
+      }
+    ]
+  },
+  "drift_case": {
+    "changed_source_id": "draft-lift-after",
+    "replacement_text": "# Revised lift aftermath\n\nThe lift reaches the crew. The timing of stock loss remains unresolved.\n",
+    "replacement_sha256": "0acbe532067e5487347c63d4ef74aa17720e2ba8de6161e3898c2ccc70245b62",
+    "refresh_findings": [
+      "finding-lift-stock"
+    ],
+    "reopen_decisions": [
+      "decision-ridge-outcome"
+    ],
+    "preserve_findings": [
+      "finding-cooler-wait",
+      "finding-relay-order"
+    ],
+    "preserve_accepted_snapshot": "cd741be1e668b8710f3cc89d6c7c9f0f3de70017490b4149727fcfa641ff1e02"
+  }
+}

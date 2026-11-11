@@ -1,0 +1,20 @@
+{
+  "active": ["scene-relay"],
+  "retired": ["law-early-switch"],
+  "valid": {
+    "id": "scene-relay",
+    "kind": "scene",
+    "depends_on": [],
+    "relationships": [
+      {"kind": "mentions", "target": "law-early-switch", "scope": "historical account"},
+      {"kind": "adapted-from", "target": "scene-first-log", "scope": "earlier episode"}
+    ]
+  },
+  "invalid": {
+    "id": "scene-relay",
+    "kind": "scene",
+    "depends_on": ["law-early-switch"],
+    "relationships": [{"kind": "mentions", "target": "law-early-switch", "scope": "historical account"}]
+  },
+  "expected": {"valid": "The historical mention is allowed and absent adaptation origin remains reviewable.", "invalid": "The required retired target blocks the candidate."}
+}

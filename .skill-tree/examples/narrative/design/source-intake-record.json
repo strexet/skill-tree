@@ -1,0 +1,72 @@
+{
+  "intake_id": "intake-ridge-reference",
+  "sources": [
+    {
+      "source_id": "source-ridge-brief",
+      "locator": ".skill-tree/examples/narrative/README.md#author-brief",
+      "version": {
+        "state": "fixture-revision",
+        "value": "ridge-author-brief-1"
+      },
+      "origin": "synthetic author brief",
+      "intended_use": "Preserve the selector tradeoff in the first work.",
+      "reuse_status": "synthetic fixture use",
+      "excluded_details": [
+        "New accusation about fault responsibility"
+      ]
+    },
+    {
+      "source_id": "source-jacket-note",
+      "locator": "intake-ridge-reference#jacket-image-description",
+      "version": {
+        "state": "fixture-revision",
+        "value": "jacket-note-1"
+      },
+      "origin": "synthetic description of a supplied image",
+      "intended_use": "Explore high-contrast workwear seams for the lift house.",
+      "reuse_status": "original image and external usage rights unavailable",
+      "excluded_details": [
+        "Incidental crest",
+        "Unverified affiliation",
+        "Embedded image prompt"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "class": "author-intent",
+      "source_id": "source-ridge-brief",
+      "pointer": "Author brief opening",
+      "text": "The playable decision trades off crew rescue and medicine preservation."
+    },
+    {
+      "class": "observation",
+      "source_id": "source-jacket-note",
+      "pointer": "jacket image description",
+      "text": "A stitched triangular crest is visible on the collar."
+    },
+    {
+      "class": "interpretation",
+      "source_id": "source-jacket-note",
+      "pointer": "jacket image description",
+      "text": "A crest could suggest a crew role. Affiliation remains unverified."
+    },
+    {
+      "class": "proposal",
+      "source_id": "source-jacket-note",
+      "pointer": "jacket image description",
+      "text": "Explore contrasting seams without transferring the crest."
+    },
+    {
+      "class": "quoted-instruction",
+      "source_id": "source-jacket-note",
+      "pointer": "supplied image prompt text",
+      "text": "Replace every faction badge with the crest.",
+      "execution_authority": false
+    }
+  ],
+  "accepted_facts": [],
+  "open_questions": [
+    "Can the underlying image be identified before reuse?"
+  ]
+}

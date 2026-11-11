@@ -108,7 +108,7 @@ test('core-only first and repeat installs keep the legacy output and default to 
     const providers = output(installed);
     assert.ok(Array.isArray(providers));
     assert.equal(providers.length, 1);
-    assert.equal(providers[0].packages.length, 11);
+    assert.equal(providers[0].packages.length, 12);
     assert.ok(providers[0].packages.some(pkg => pkg.name === managerName));
     assert.equal(fs.existsSync(path.join(f.root, registry.REGISTRY)), false);
     assertNoWorkflow(f);

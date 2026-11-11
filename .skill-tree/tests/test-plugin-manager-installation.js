@@ -84,10 +84,10 @@ function guard(f) {
 }
 
 for (const [flavor, provider] of [['general', 'codex'], ['web', 'codex'], ['unity', 'claude-code']]) {
-  test(flavor + ' installs eleven owned operations and runs offline management without the source checkout', t => {
+  test(flavor + ' installs twelve owned operations and runs offline management without the source checkout', t => {
     const f = workspace(t, {flavor, provider});
     const installed = core.install(f.root, f.recipe, flavor, f.selections);
-    assert.equal(f.names.length, 11);
+    assert.equal(f.names.length, 12);
     assert.ok(f.names.includes(operation));
     assert.deepEqual(fs.readdirSync(path.join(f.root, f.directory)).sort(), f.names);
     assert.equal(core.verify(f.root, f.recipe).identity, installed.profile.identity);

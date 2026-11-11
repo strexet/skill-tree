@@ -273,6 +273,107 @@
       ]
     },
     {
+      "entrypoint": ".skill-tree/skills/general/skill-tree-narative/SKILL.md",
+      "name": "skill-tree-narative",
+      "resources": [
+        ".skill-tree/skills/general/skill-tree-narative/SKILL.md",
+        ".skill-tree/skills/general/skill-tree-narative/agents/openai.yaml",
+        ".skill-tree/skills/general/skill-tree-narative/references/decision-governance.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/document-rules.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/future-workflow.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/installation-profile.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-canon-approval.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-character-appearance.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-character-card.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-character-state.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-character-voice-review.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-claims.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-context.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-continuity-review.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-craft-catalog.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-craft-composition.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-craft-expression.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-craft-information.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-craft-interaction.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-craft-interactive.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-craft-testimony.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-craft-values.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-craft-world.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-cultural-practice.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-dialogue-revision.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-disclosure.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-dramatic-links.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-dramatic-route-review.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-dramaturgical-review.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-faction-design.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-gameplay-agency.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-gameplay-feedback.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-handoffs.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-human-playtest.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-impact.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-ink-handoff.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-intake-routing.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-interviews.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-ip-brief.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-legend-versions.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-library.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-location-design.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-object-design.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-participant-substitution.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-pattern-repetition.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-predecessor-policy.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-qualification.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-quest-design.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-quest-outcomes.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-quest-revision-checks.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-quest-revision.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-relationships.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-review-packet.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-review.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-route-checks.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-route-contract.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-scene-adaptation.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-scene-design.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-source-intake.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-state-registry.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-story-arc-review.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-story-arcs.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-topic-routing.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-unity-adapter.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-unity-qualification.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-visual-reference-review.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-work-manifest.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-workflow.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-world-consequences.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-world-laws.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/narrative-world-transitions.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/pending-task-format.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/pending-task-intake.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/plugin-bindings.json",
+        ".skill-tree/skills/general/skill-tree-narative/references/plugin-invocation.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/project-profile.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/run-workspaces.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/validation-policy.md",
+        ".skill-tree/skills/general/skill-tree-narative/references/workflow-metadata.md",
+        ".skill-tree/skills/general/skill-tree-narative/scripts/decision-governance.py",
+        ".skill-tree/skills/general/skill-tree-narative/scripts/decision-orchestration.py",
+        ".skill-tree/skills/general/skill-tree-narative/scripts/narrative-route-check.py",
+        ".skill-tree/skills/general/skill-tree-narative/scripts/narrative-state.py",
+        ".skill-tree/skills/general/skill-tree-narative/scripts/plugin-bindings.js",
+        ".skill-tree/skills/general/skill-tree-narative/scripts/plugin-composition.js",
+        ".skill-tree/skills/general/skill-tree-narative/scripts/plugin-hooks.js",
+        ".skill-tree/skills/general/skill-tree-narative/scripts/plugin-invocation.py",
+        ".skill-tree/skills/general/skill-tree-narative/scripts/plugin-parameters.js",
+        ".skill-tree/skills/general/skill-tree-narative/scripts/plugin-processing.py",
+        ".skill-tree/skills/general/skill-tree-narative/scripts/plugin-registry.js",
+        ".skill-tree/skills/general/skill-tree-narative/scripts/plugin-runtime.js",
+        ".skill-tree/skills/general/skill-tree-narative/scripts/plugin-sources.js",
+        ".skill-tree/skills/general/skill-tree-narative/scripts/run-workspaces.py",
+        ".skill-tree/skills/general/skill-tree-narative/scripts/validate-document-rules.py",
+        ".skill-tree/skills/general/skill-tree-narative/scripts/workflow-state.py"
+      ]
+    },
+    {
       "entrypoint": ".skill-tree/skills/general/skill-tree-plugins/SKILL.md",
       "name": "skill-tree-plugins",
       "resources": [
@@ -682,6 +783,111 @@
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/scripts/select-prioritized-task.py",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/scripts/validate-document-rules.py",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/scripts/workflow-state.py"
+      ]
+    },
+    {
+      "entrypoint": ".skill-tree/skills/unity/skill-tree-narative/SKILL.md",
+      "name": "skill-tree-narative",
+      "resources": [
+        ".skill-tree/skills/unity/skill-tree-narative/SKILL.md",
+        ".skill-tree/skills/unity/skill-tree-narative/agents/openai.yaml",
+        ".skill-tree/skills/unity/skill-tree-narative/references/decision-governance.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/document-rules.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/future-workflow.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/installation-profile.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-canon-approval.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-character-appearance.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-character-card.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-character-state.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-character-voice-review.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-claims.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-context.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-continuity-review.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-craft-catalog.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-craft-composition.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-craft-expression.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-craft-information.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-craft-interaction.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-craft-interactive.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-craft-testimony.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-craft-values.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-craft-world.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-cultural-practice.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-dialogue-revision.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-disclosure.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-dramatic-links.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-dramatic-route-review.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-dramaturgical-review.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-faction-design.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-gameplay-agency.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-gameplay-feedback.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-handoffs.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-human-playtest.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-impact.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-ink-handoff.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-intake-routing.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-interviews.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-ip-brief.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-legend-versions.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-library.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-location-design.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-object-design.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-participant-substitution.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-pattern-repetition.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-predecessor-policy.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-qualification.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-quest-design.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-quest-outcomes.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-quest-revision-checks.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-quest-revision.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-relationships.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-review-packet.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-review.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-route-checks.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-route-contract.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-scene-adaptation.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-scene-design.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-source-intake.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-state-registry.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-story-arc-review.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-story-arcs.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-topic-routing.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-unity-adapter.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-unity-qualification.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-visual-reference-review.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-work-manifest.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-workflow.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-world-consequences.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-world-laws.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/narrative-world-transitions.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/pending-task-format.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/pending-task-intake.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/plugin-bindings.json",
+        ".skill-tree/skills/unity/skill-tree-narative/references/plugin-invocation.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/project-profile.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/run-workspaces.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/ugui-testing.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/unity-development.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/unity-safety.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/validation-policy.md",
+        ".skill-tree/skills/unity/skill-tree-narative/references/workflow-metadata.md",
+        ".skill-tree/skills/unity/skill-tree-narative/scripts/decision-governance.py",
+        ".skill-tree/skills/unity/skill-tree-narative/scripts/decision-orchestration.py",
+        ".skill-tree/skills/unity/skill-tree-narative/scripts/inspect-unity-repository.py",
+        ".skill-tree/skills/unity/skill-tree-narative/scripts/narrative-route-check.py",
+        ".skill-tree/skills/unity/skill-tree-narative/scripts/narrative-state.py",
+        ".skill-tree/skills/unity/skill-tree-narative/scripts/plugin-bindings.js",
+        ".skill-tree/skills/unity/skill-tree-narative/scripts/plugin-composition.js",
+        ".skill-tree/skills/unity/skill-tree-narative/scripts/plugin-hooks.js",
+        ".skill-tree/skills/unity/skill-tree-narative/scripts/plugin-invocation.py",
+        ".skill-tree/skills/unity/skill-tree-narative/scripts/plugin-parameters.js",
+        ".skill-tree/skills/unity/skill-tree-narative/scripts/plugin-processing.py",
+        ".skill-tree/skills/unity/skill-tree-narative/scripts/plugin-registry.js",
+        ".skill-tree/skills/unity/skill-tree-narative/scripts/plugin-runtime.js",
+        ".skill-tree/skills/unity/skill-tree-narative/scripts/plugin-sources.js",
+        ".skill-tree/skills/unity/skill-tree-narative/scripts/run-workspaces.py",
+        ".skill-tree/skills/unity/skill-tree-narative/scripts/validate-document-rules.py",
+        ".skill-tree/skills/unity/skill-tree-narative/scripts/workflow-state.py"
       ]
     },
     {
@@ -1106,6 +1312,108 @@
       ]
     },
     {
+      "entrypoint": ".skill-tree/skills/web/skill-tree-narative/SKILL.md",
+      "name": "skill-tree-narative",
+      "resources": [
+        ".skill-tree/skills/web/skill-tree-narative/SKILL.md",
+        ".skill-tree/skills/web/skill-tree-narative/agents/openai.yaml",
+        ".skill-tree/skills/web/skill-tree-narative/references/decision-governance.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/document-rules.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/future-workflow.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/installation-profile.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-canon-approval.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-character-appearance.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-character-card.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-character-state.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-character-voice-review.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-claims.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-context.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-continuity-review.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-craft-catalog.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-craft-composition.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-craft-expression.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-craft-information.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-craft-interaction.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-craft-interactive.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-craft-testimony.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-craft-values.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-craft-world.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-cultural-practice.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-dialogue-revision.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-disclosure.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-dramatic-links.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-dramatic-route-review.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-dramaturgical-review.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-faction-design.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-gameplay-agency.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-gameplay-feedback.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-handoffs.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-human-playtest.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-impact.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-ink-handoff.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-intake-routing.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-interviews.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-ip-brief.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-legend-versions.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-library.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-location-design.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-object-design.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-participant-substitution.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-pattern-repetition.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-predecessor-policy.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-qualification.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-quest-design.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-quest-outcomes.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-quest-revision-checks.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-quest-revision.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-relationships.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-review-packet.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-review.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-route-checks.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-route-contract.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-scene-adaptation.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-scene-design.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-source-intake.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-state-registry.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-story-arc-review.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-story-arcs.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-topic-routing.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-unity-adapter.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-unity-qualification.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-visual-reference-review.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-work-manifest.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-workflow.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-world-consequences.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-world-laws.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/narrative-world-transitions.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/pending-task-format.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/pending-task-intake.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/plugin-bindings.json",
+        ".skill-tree/skills/web/skill-tree-narative/references/plugin-invocation.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/project-profile.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/run-workspaces.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/validation-policy.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/web-development.md",
+        ".skill-tree/skills/web/skill-tree-narative/references/workflow-metadata.md",
+        ".skill-tree/skills/web/skill-tree-narative/scripts/decision-governance.py",
+        ".skill-tree/skills/web/skill-tree-narative/scripts/decision-orchestration.py",
+        ".skill-tree/skills/web/skill-tree-narative/scripts/narrative-route-check.py",
+        ".skill-tree/skills/web/skill-tree-narative/scripts/narrative-state.py",
+        ".skill-tree/skills/web/skill-tree-narative/scripts/plugin-bindings.js",
+        ".skill-tree/skills/web/skill-tree-narative/scripts/plugin-composition.js",
+        ".skill-tree/skills/web/skill-tree-narative/scripts/plugin-hooks.js",
+        ".skill-tree/skills/web/skill-tree-narative/scripts/plugin-invocation.py",
+        ".skill-tree/skills/web/skill-tree-narative/scripts/plugin-parameters.js",
+        ".skill-tree/skills/web/skill-tree-narative/scripts/plugin-processing.py",
+        ".skill-tree/skills/web/skill-tree-narative/scripts/plugin-registry.js",
+        ".skill-tree/skills/web/skill-tree-narative/scripts/plugin-runtime.js",
+        ".skill-tree/skills/web/skill-tree-narative/scripts/plugin-sources.js",
+        ".skill-tree/skills/web/skill-tree-narative/scripts/run-workspaces.py",
+        ".skill-tree/skills/web/skill-tree-narative/scripts/validate-document-rules.py",
+        ".skill-tree/skills/web/skill-tree-narative/scripts/workflow-state.py"
+      ]
+    },
+    {
       "entrypoint": ".skill-tree/skills/web/skill-tree-plugins/SKILL.md",
       "name": "skill-tree-plugins",
       "resources": [
@@ -1380,6 +1688,11 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/documents/narrative-workflow.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/documents/plugin-installation-contract.md",
       "role": "canonical"
     },
@@ -1510,6 +1823,331 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-canon-approval.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-character-appearance.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-character-card.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-character-state.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-character-voice-review.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-claims.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-context.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-continuity-review.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-craft-catalog.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-craft-composition.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-craft-expression.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-craft-information.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-craft-interaction.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-craft-interactive.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-craft-testimony.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-craft-values.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-craft-world.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-cultural-practice.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-dialogue-revision.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-disclosure.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-dramatic-links.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-dramatic-route-review.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-dramaturgical-review.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-faction-design.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-gameplay-agency.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-gameplay-feedback.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-handoffs.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-human-playtest.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-impact.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-ink-handoff.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-intake-routing.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-interviews.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-ip-brief.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-legend-versions.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-library.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-location-design.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-object-design.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-participant-substitution.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-pattern-repetition.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-predecessor-policy.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-qualification.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-quest-design.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-quest-outcomes.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-quest-revision-checks.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-quest-revision.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-relationships.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-review-packet.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-review.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-route-checks.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-route-contract.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-scene-adaptation.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-scene-design.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-source-intake.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-state-registry.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-story-arc-review.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-story-arcs.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-topic-routing.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-unity-adapter.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-unity-qualification.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-visual-reference-review.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-work-manifest.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-workflow.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-world-consequences.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-world-laws.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/references/narrative-world-transitions.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/common/references/orchestration.md",
       "role": "canonical"
     },
@@ -1586,6 +2224,16 @@
     {
       "owner": "skill-tree",
       "path": ".skill-tree/common/scripts/inspect-unity-repository.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/scripts/narrative-route-check.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/scripts/narrative-state.py",
       "role": "canonical"
     },
     {
@@ -1904,6 +2552,71 @@
     ".skill-tree/common/references/future-workflow.md": "2d45a2bb87717f382a0a03f54fe9f8f5dfe2f4fc6d063616b974bfe9e4df3cd8",
     ".skill-tree/common/references/history-retention.md": "e34302d1665162c5c94bd1adea7cbdf32a36325bb4a6db1eafab24fc236c3585",
     ".skill-tree/common/references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
+    ".skill-tree/common/references/narrative-canon-approval.md": "d36ed0534797cfbc8ab8d996093a48e82f26b05c6bdccbbde87cd9c34fd7a65b",
+    ".skill-tree/common/references/narrative-character-appearance.md": "4c0f460e36b59b0dc8e5c3e25f4c92d7c57402f9359301880a2c695a4aa34f15",
+    ".skill-tree/common/references/narrative-character-card.md": "324b75b03b26f45c7cfc9b4a6b2fb73c1bb824689034ef8ec2e7f9cae67de8bc",
+    ".skill-tree/common/references/narrative-character-state.md": "7aa3a612e04d6957d132488a85f645b1fa1fadbc5cab5212b4804ebd32bc92bd",
+    ".skill-tree/common/references/narrative-character-voice-review.md": "be6d65e817dfd254ce2103df5554e16dc79e782495b70b79261dff09543953ec",
+    ".skill-tree/common/references/narrative-claims.md": "4ca41ccf801d874c46ddd8a3c521e8c9bb103f0d6bbea981ef7f1d5e95094893",
+    ".skill-tree/common/references/narrative-context.md": "1aa0e22f687b3fd3c717ea39f4ec76ba4681fba8cbe0b31dfd53a31c38a2ed03",
+    ".skill-tree/common/references/narrative-continuity-review.md": "f2b77c736a124a405031a134feb157e255a62425a6066058dd341e78e9dc0d1e",
+    ".skill-tree/common/references/narrative-craft-catalog.md": "aae606fbd16c80923ea1079c8cf0b0e41eac2efee04432da783b882efead87e7",
+    ".skill-tree/common/references/narrative-craft-composition.md": "48a0e15d98a8495beda133a55b9e8d94aee8b6b8f7f3f9a1df6a49dc0f195e0c",
+    ".skill-tree/common/references/narrative-craft-expression.md": "302cabf8882467ce30121b106471aea9decbebf17f283d01141015eb286a1985",
+    ".skill-tree/common/references/narrative-craft-information.md": "2fde7174b2a2e7695bf7eaafca54165b2688e7c6d6c8af095de0293804e2ebf7",
+    ".skill-tree/common/references/narrative-craft-interaction.md": "465d0cbb025a6711fc1ef72879b165367dbaeccb116e96b1a9ad6357452485e3",
+    ".skill-tree/common/references/narrative-craft-interactive.md": "f13fb3f8d6bd17fd96d913a6de0d9be0bfca36b44be3e96d1af2567f152d85e4",
+    ".skill-tree/common/references/narrative-craft-testimony.md": "9e56a54bd7f184d1b541ba3639113f64e9af0035d545340a6e72c43fd046a9f6",
+    ".skill-tree/common/references/narrative-craft-values.md": "d21980b370cdd81432ab3b701e9491eadf75338bb9b3ae22a40856230027a0c1",
+    ".skill-tree/common/references/narrative-craft-world.md": "e94d87231d1e51bd89e46ccc7a671620215e99357d63c8be151758d7731d523d",
+    ".skill-tree/common/references/narrative-cultural-practice.md": "02a45d34f96a1e12a0f15605cbdbace49c4b9181fd7da8058bb91c7684f23770",
+    ".skill-tree/common/references/narrative-dialogue-revision.md": "3124bc93bc78506eb5e663af0b96158f4645942580fb9554932a15bfb82629be",
+    ".skill-tree/common/references/narrative-disclosure.md": "e4018ac2a42d6ce68f856a6a7b16c60541e3babb7cdd45b13f95d92b05ab29fb",
+    ".skill-tree/common/references/narrative-dramatic-links.md": "11d81dafd0836689838e59a9d58803fae70d7c707bcc7bb1b2239d70af408644",
+    ".skill-tree/common/references/narrative-dramatic-route-review.md": "9a794b560584239f23ba828b0287b765dde9ffbb58fa81ba7eb8579a57d2455a",
+    ".skill-tree/common/references/narrative-dramaturgical-review.md": "0c064af8d1b1b9fda4c192cd2d3f6a784a8ef01bcc1bf9b3dcc6e3f68b35a87c",
+    ".skill-tree/common/references/narrative-faction-design.md": "4a887ea952d1856a6a975f5c298639040cc7dd9495bec330e07fa316a92b1c3d",
+    ".skill-tree/common/references/narrative-gameplay-agency.md": "f852ab7e4545120d9b51c24b325e24c9c109d332a476a4217abb8412dd4db2bd",
+    ".skill-tree/common/references/narrative-gameplay-feedback.md": "56b715b83cfd47e503389c0061189e78538602cd35cf5dbfc6aaa3c63313f4e4",
+    ".skill-tree/common/references/narrative-handoffs.md": "3affd2bc3aa5e6171635ac8dcc9281168a2ae48e3214a43039a4264c344df4b9",
+    ".skill-tree/common/references/narrative-human-playtest.md": "f6894df614f45fbdc059147ab2100d9abed8cbb9dcd37ddbc5d02f0fd4b31238",
+    ".skill-tree/common/references/narrative-impact.md": "ac514067f92f7a91c18955668b699f88b408cd02dca24b84e2d115af8a317223",
+    ".skill-tree/common/references/narrative-ink-handoff.md": "9ca128284831ced2b28f829beea0e9b728fd9ce4de22e71c908404610cad2b50",
+    ".skill-tree/common/references/narrative-intake-routing.md": "54c87565f163aa500a2ec1ca50052f764e5f9e7997c2a0ada6ac862805bc7828",
+    ".skill-tree/common/references/narrative-interviews.md": "6a2ff17e9822fe46a76c15675c1a2fa34965d93b77bfea5dc8e2bb264a3ed94f",
+    ".skill-tree/common/references/narrative-ip-brief.md": "90eecb7410356932e525b02a0127fea12a45ce7afcc1160eccd98de8e0ffa862",
+    ".skill-tree/common/references/narrative-legend-versions.md": "427060606cf327d82ca55affec0e340f6cfd85fa129bfca468acebe4c662eb11",
+    ".skill-tree/common/references/narrative-library.md": "8b2ac7d6154e091ee7ddb868cd9de5869a48d709183a7b30299505773c3f9cc5",
+    ".skill-tree/common/references/narrative-location-design.md": "ee1fbe11a8e9c98311c996b63e14c900cf0bb015bb3a3c8643d553df3e3f388c",
+    ".skill-tree/common/references/narrative-object-design.md": "96650ed1db040dba75729a2bf5e6e68fda6de9eac23e2a97e21548b9d35f23e6",
+    ".skill-tree/common/references/narrative-participant-substitution.md": "33b475a990737e518a509ec621c41d827812cb2e73035511de1276e6135077f4",
+    ".skill-tree/common/references/narrative-pattern-repetition.md": "1e76214075b236d986eb20ea015b38f50bccf591da6db6e6ad498b4017158a9e",
+    ".skill-tree/common/references/narrative-predecessor-policy.md": "9ac6dbbcd6722832a66669b546d20b7e4416f47fedee1af81c1ab317046bf82e",
+    ".skill-tree/common/references/narrative-qualification.md": "aeebe8cec30f6c61a62f71553145c07545bf2725bbcca2694d9efa762cb293d4",
+    ".skill-tree/common/references/narrative-quest-design.md": "275cd36304396c3183cb17c4b8631ccc52d3902b4154af3e69a4aebaf298d028",
+    ".skill-tree/common/references/narrative-quest-outcomes.md": "98caee0f8451c36eab5689f8ee41f058e1cbf41b6c8e218746f09dccbfbee1f9",
+    ".skill-tree/common/references/narrative-quest-revision-checks.md": "1925de21390b1467f3a6bda97c0e4fe66dd4350bc8effa56efb1c469daeb30ba",
+    ".skill-tree/common/references/narrative-quest-revision.md": "89ed0c8c769cffea178f8ae0659e85a76573a5b878300f09c45715db161fd01b",
+    ".skill-tree/common/references/narrative-relationships.md": "81df919fb1a3568d3da9cf77333b707a186a452254af0704a79cda5bdde2bd03",
+    ".skill-tree/common/references/narrative-review-packet.md": "6b5454ba8168abeb3f95cfb4fec12197650017f701c6719d064b93d7fc9562f8",
+    ".skill-tree/common/references/narrative-review.md": "2cd3b55934d371892067bf641c8e6c8cf6c96f3b773a1791b88e59d9ba54a8c9",
+    ".skill-tree/common/references/narrative-route-checks.md": "f538002607307b039346690e7d52b1daa9a348b063d98da5ec5f01ad8a946ba8",
+    ".skill-tree/common/references/narrative-route-contract.md": "7f0a27526846d91dcb6704a4b049323f189f01388cc4581a02b7a02b53ed6033",
+    ".skill-tree/common/references/narrative-scene-adaptation.md": "6af029fc95502545a64c755faeee39febcfdced1ce9ca0fd5c8b6fa5c07696ad",
+    ".skill-tree/common/references/narrative-scene-design.md": "df59f5fac98cfdc0cd50eea3a739506dc5cea9db166cb9c530cd65baeaa020cf",
+    ".skill-tree/common/references/narrative-source-intake.md": "3032b30bb81c55e89d68f3bdf2df4679a2da599c30efbf096d65ebe049e54855",
+    ".skill-tree/common/references/narrative-state-registry.md": "edd9e1ccb1ed44d550a1ab9353bcadc39218fecff4d47e5d4857438b5e846396",
+    ".skill-tree/common/references/narrative-story-arc-review.md": "a7160b4c2eef21940cea79d42e59c4fac4c33840507f9782f851d7787e9f35db",
+    ".skill-tree/common/references/narrative-story-arcs.md": "b37b1beceb2f3bd32567606e491cfde77145ecabc9765512e9f1523e368c38f9",
+    ".skill-tree/common/references/narrative-topic-routing.md": "f5c0740176b813f744e99181a2307a179bf82cfaee1d8faad9481bae13f5ffc3",
+    ".skill-tree/common/references/narrative-unity-adapter.md": "e12669b2a4a8e5a2441b1adedce0156f8ee8745c1e7fcc64e143e139cab9468a",
+    ".skill-tree/common/references/narrative-unity-qualification.md": "064887632f00660cadeea8b8da41048a0193dad43dd64874ef62437e3619ab95",
+    ".skill-tree/common/references/narrative-visual-reference-review.md": "e1d95342931b3210852253f286a7db1e448fc41176e55f9e6eba7b013f4cc50c",
+    ".skill-tree/common/references/narrative-work-manifest.md": "8ebb5307073e2a0acf23f31525113484ad042af6a0a8bdf58a99cc8ac9ddb2a8",
+    ".skill-tree/common/references/narrative-workflow.md": "b681124f1c3654dfd3e03a6ee69e98c96fcb630e428eb86659db353c0f80a4f0",
+    ".skill-tree/common/references/narrative-world-consequences.md": "4bc622b5153a8f1578d98278dd2f9c85efa81f6b16cf42a943658e764ae9f0b3",
+    ".skill-tree/common/references/narrative-world-laws.md": "9a8bfb2c7bf880477108e1470713647b2b030ebe213af184ad3ee50e9b3ffd1a",
+    ".skill-tree/common/references/narrative-world-transitions.md": "aa323d03e2c4635972632c58f350fa785c34a8fc812776ccec5fe895dab15209",
     ".skill-tree/common/references/orchestration.md": "20343c1398f712fdb67da4dae67e3c5860a7fc43989185281198aa67d31c0aae",
     ".skill-tree/common/references/pending-task-format.md": "6c0a90ea992f2c19a26e4f95fc4e45b7ff89d25c0cc8e2c49c11cfa8bad2d8ba",
     ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
@@ -1920,6 +2633,8 @@
     ".skill-tree/common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     ".skill-tree/common/scripts/decision-orchestration.py": "d2c5ac475033ae06321fc7917ddf96232a0e442bef7c5db537891e12164fd404",
     ".skill-tree/common/scripts/inspect-unity-repository.py": "794230aca0f338a9d5a6ce7dd62df2016c9d13fb9622174429f9188225fb78e9",
+    ".skill-tree/common/scripts/narrative-route-check.py": "f4d1e2706851de813ab5c26307e319d72ec60e1fb450dfc6d7917a5544161a8c",
+    ".skill-tree/common/scripts/narrative-state.py": "0a145418d12547e4c0ed30cfaee7fab1669c09c4f7c6d9ed1c641b4e770f8611",
     ".skill-tree/common/scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",
     ".skill-tree/common/scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",
     ".skill-tree/common/scripts/plugin-manager.js": "c0ad080ab70c18375c6bccdfc5da3242bafef83cf2353a4cbbd833b4d72c6929",
@@ -1939,18 +2654,19 @@
     ".skill-tree/config/plugins/task-editorial.json": "55abff9aeba98b670afce9d7a783c7d0b497a657cc32e8fea974a1eeb648aa2e",
     ".skill-tree/config/plugins/task-interview.json": "77b654102b28e33161c4cce8e1aec76c33ece2a93468203e5a2b5c9affc0a8a1",
     ".skill-tree/config/providers.json": "80255fe3fb67e32d71cc7791aee1e51c1d34a508d4c77b6ca852521907ede97a",
-    ".skill-tree/config/repository.json": "3c26162b83118090e970b09b23a926ac7daf4487bf7a4a0ac78244fd54c8182a",
-    ".skill-tree/config/resource-map.json": "bd4b539b8aad5d6b55aba3609073f28b7e879fa7e8c3edf60dbbf28f9e56ad26",
+    ".skill-tree/config/repository.json": "5090cb6dc6fe61d7fa20ddbf0d6c64e81de932c084510e770752d40bcae68466",
+    ".skill-tree/config/resource-map.json": "d62df676d7ca4df9020a8afe40bfb5c4ab2d13c05477a2ce6b8f98991c42ac6c",
     ".skill-tree/documents/agent-compatibility.md": "4dfa4fda89268be8e111e3653cb3b08ce71fcf9df8a60eac1345e05f3dabe0fd",
     ".skill-tree/documents/build-and-release.md": "ef1216f1e0e058d288afb40d76d3826047fff1a9f15d70350ebc5fae9901130c",
     ".skill-tree/documents/dependencies.md": "e524d1d314d8c443e000260860e71fca6db4bd6938e86cb7443379a6fb2db4f3",
-    ".skill-tree/documents/features.md": "dcf0fdbc4632b2d1f3439ba3ece1f20956ed19fec97d9c14f4ba1790e434e2c9",
+    ".skill-tree/documents/features.md": "f41872237b16c8b0bec5fa76e2cf7f91763f72192aa406eb090604d254837186",
     ".skill-tree/documents/future.md": "05a1f55b7a7202ce1a56bb01919c016110a355ca8de0fe746183d6e62853e634",
-    ".skill-tree/documents/implementation-plan.md": "1c9591fb0378c06673de0337b4cf85d722795546feea48ea1d5729e5db0c88c3",
+    ".skill-tree/documents/implementation-plan.md": "4a5f573aed129e25d7596c82168778a378fac6a90c5762b98a6646c537bba02e",
     ".skill-tree/documents/install.md": "c4201aab93985ef1d6b1e6a764c4e924c48fdaeb33a740913ac5be9be3afb8f2",
     ".skill-tree/documents/installation-architecture.md": "fd548f5be2a74fbfdb416a748e62869771d80f04acb47b246d4488effe083eea",
     ".skill-tree/documents/manual-target-update.md": "f83c49a885b75d27d250d53d5f00936bc1c9e3d45998518cb0045ef8734e3482",
-    ".skill-tree/documents/plugin-installation-contract.md": "c5cf887a2960a980955757e8ee01d4e4c11adad52795c7e3f3960c9b5f894eaf",
+    ".skill-tree/documents/narrative-workflow.md": "568eafbf201349ac24dc6836a4c2c9dea0fa82370f0bd4d6d67cf502117ab5fa",
+    ".skill-tree/documents/plugin-installation-contract.md": "47686da484fcd72a15e90d2a476be6e26a6260bc479aad8fb39ae41dad50fdf2",
     ".skill-tree/documents/plugin-management-contract.md": "9dbeeec7795dafae6c46ce48545a464c67344a3d930115db49941e5ac41d400d",
     ".skill-tree/documents/plugin-market-research.md": "ecd71abef5a437184a547496834ac9e094b51ebee3bae945aa37e88dfb0a7679",
     ".skill-tree/documents/plugin-recommendation-evidence.md": "e85766c749c19717f9eaf6d0c1049dfc48c31f77965e1e811a474e26a2cb2dd2",
@@ -1963,7 +2679,7 @@
     ".skill-tree/documents/rules.md": "95187a9653e27bdba89d9de3bbc7055eceda1a79d3589465d0c5d6814762970c",
     ".skill-tree/documents/security.md": "4d767dfdb5f52a6d1dd3fc06a0012dcadd748373d17dc1f5c4a89d440afbec2d",
     ".skill-tree/documents/skill-quality-audit.md": "b6c5dc863ba7fbecf8afebadc65197a7c84eb7502a6af30b448d61c776c1e3b9",
-    ".skill-tree/documents/skill-repository-creation-instructions.md": "dc069cf256e47d0b0c3d0bcbf9989c7da1e4c625133a73d97b9fc5087fc04fcf",
+    ".skill-tree/documents/skill-repository-creation-instructions.md": "2c2aa358f8a02134adf0cbd00a55a29a9fd25e7c5728567cb6c0005274352a22",
     ".skill-tree/documents/task-clarification-contract.md": "ceab4175e4e293fb9bba5b54c713ee769702c2b18e912ad784a1a7e99cf5e3dc",
     ".skill-tree/documents/technical.md": "b2ffc458051ab045b10414c951db184292c4ea3de9ca3cc000ca1cead47d82b0",
     ".skill-tree/documents/testing.md": "de169454b70a54d39629fe7399ea03842f36aae439cdb9c4433022d9e2b7dcd8",
@@ -2000,7 +2716,7 @@
     ".skill-tree/scripts/validate-skill-repository.py": "ae28d08f0c4f34f7ca3ba06c439a5e0519a80a5664e65709bf54376b275b05d4",
     ".skill-tree/src/init-rules/skill-tree-skills.md": "74cb9a275ce1bcd845c31eae44101e79e5adcd02875d84f1a4c8feb1744716fd",
     ".skill-tree/templates/invariants.json": "5a147a9ee4297250a6604f6a447fa10b57b9b94f3942044a9135790ce9c64b48",
-    ".skill-tree/templates/operations.json": "af81ff4d4b003ef8e8dac292995b3227d5fb45d80666dd80b83b4111d1ded050"
+    ".skill-tree/templates/operations.json": "61dc44ee9839d4d9ebf12c0f7ec0a1ccf6ca7ee74d2d51eedaafb399f5f6322b"
   },
   "state": ".skill-tree/documents/future.json",
   "validation_commands": [
