@@ -1,0 +1,917 @@
+{
+  "schema_version": 1,
+  "base_contract": "route-contract.example.json",
+  "cases": [
+    {
+      "id": "ridge-pilot",
+      "traces": [
+        {
+          "id": "ridge-discover-lift",
+          "initial_state": {
+            "knows_trip_cause": false,
+            "pack_state": "ready",
+            "crew_rescued": false,
+            "medicine_cold": false,
+            "incident_receipts": 0
+          },
+          "steps": [
+            {
+              "node": "scene-ridge-station",
+              "offered": [
+                "discover-log",
+                "skip-log"
+              ],
+              "action": "discover-log"
+            },
+            {
+              "node": "scene-ridge-selector",
+              "offered": [
+                "power-lift",
+                "power-cooler",
+                "try-heater"
+              ],
+              "action": "power-lift",
+              "exposure": [
+                "scene-relay"
+              ],
+              "feedback": [
+                "The pack is good"
+              ]
+            },
+            {
+              "node": "scene-report",
+              "offered": [
+                "close-logbook",
+                "revisit-logbook"
+              ],
+              "action": "close-logbook",
+              "feedback": [
+                "workers step down",
+                "vials in a tray marked for disposal"
+              ]
+            },
+            {
+              "node": "end-ridge",
+              "offered": []
+            }
+          ],
+          "expected_state": {
+            "knows_trip_cause": true,
+            "pack_state": "spent",
+            "crew_rescued": true,
+            "medicine_cold": false,
+            "incident_receipts": 1
+          },
+          "expected_exit": "terminal"
+        },
+        {
+          "id": "ridge-discover-cooler",
+          "initial_state": {
+            "knows_trip_cause": false,
+            "pack_state": "ready",
+            "crew_rescued": false,
+            "medicine_cold": false,
+            "incident_receipts": 0
+          },
+          "steps": [
+            {
+              "node": "scene-ridge-station",
+              "offered": [
+                "discover-log",
+                "skip-log"
+              ],
+              "action": "discover-log"
+            },
+            {
+              "node": "scene-ridge-selector",
+              "offered": [
+                "power-lift",
+                "power-cooler",
+                "try-heater"
+              ],
+              "action": "power-cooler",
+              "exposure": [
+                "scene-relay"
+              ],
+              "feedback": [
+                "The pack is good"
+              ]
+            },
+            {
+              "node": "scene-report",
+              "offered": [
+                "close-logbook",
+                "revisit-logbook"
+              ],
+              "action": "close-logbook",
+              "feedback": [
+                "nurse keeps the vials",
+                "relief crew climbs up at dawn"
+              ]
+            },
+            {
+              "node": "end-ridge",
+              "offered": []
+            }
+          ],
+          "expected_state": {
+            "knows_trip_cause": true,
+            "pack_state": "spent",
+            "crew_rescued": false,
+            "medicine_cold": true,
+            "incident_receipts": 1
+          },
+          "expected_exit": "terminal"
+        },
+        {
+          "id": "ridge-discover-heater",
+          "initial_state": {
+            "knows_trip_cause": false,
+            "pack_state": "ready",
+            "crew_rescued": false,
+            "medicine_cold": false,
+            "incident_receipts": 0
+          },
+          "steps": [
+            {
+              "node": "scene-ridge-station",
+              "offered": [
+                "discover-log",
+                "skip-log"
+              ],
+              "action": "discover-log"
+            },
+            {
+              "node": "scene-ridge-selector",
+              "offered": [
+                "power-lift",
+                "power-cooler",
+                "try-heater"
+              ],
+              "action": "try-heater",
+              "exposure": [
+                "scene-relay"
+              ],
+              "feedback": [
+                "The pack is good"
+              ]
+            },
+            {
+              "node": "scene-report",
+              "offered": [
+                "close-logbook",
+                "revisit-logbook"
+              ],
+              "action": "close-logbook",
+              "feedback": [
+                "isolation latch falls shut",
+                "refuge stays dark"
+              ]
+            },
+            {
+              "node": "end-ridge",
+              "offered": []
+            }
+          ],
+          "expected_state": {
+            "knows_trip_cause": true,
+            "pack_state": "isolated",
+            "crew_rescued": false,
+            "medicine_cold": false,
+            "incident_receipts": 1
+          },
+          "expected_exit": "terminal"
+        },
+        {
+          "id": "ridge-skip-lift",
+          "initial_state": {
+            "knows_trip_cause": false,
+            "pack_state": "ready",
+            "crew_rescued": false,
+            "medicine_cold": false,
+            "incident_receipts": 0
+          },
+          "steps": [
+            {
+              "node": "scene-ridge-station",
+              "offered": [
+                "discover-log",
+                "skip-log"
+              ],
+              "action": "skip-log"
+            },
+            {
+              "node": "scene-ridge-selector",
+              "offered": [
+                "power-lift",
+                "power-cooler",
+                "try-heater"
+              ],
+              "action": "power-lift",
+              "exposure": [],
+              "feedback": [
+                "reserve needle is green"
+              ]
+            },
+            {
+              "node": "scene-report",
+              "offered": [
+                "close-logbook",
+                "revisit-logbook"
+              ],
+              "action": "close-logbook",
+              "feedback": [
+                "workers step down",
+                "vials in a tray marked for disposal"
+              ]
+            },
+            {
+              "node": "end-ridge",
+              "offered": []
+            }
+          ],
+          "expected_state": {
+            "knows_trip_cause": false,
+            "pack_state": "spent",
+            "crew_rescued": true,
+            "medicine_cold": false,
+            "incident_receipts": 1
+          },
+          "expected_exit": "terminal"
+        },
+        {
+          "id": "ridge-skip-cooler",
+          "initial_state": {
+            "knows_trip_cause": false,
+            "pack_state": "ready",
+            "crew_rescued": false,
+            "medicine_cold": false,
+            "incident_receipts": 0
+          },
+          "steps": [
+            {
+              "node": "scene-ridge-station",
+              "offered": [
+                "discover-log",
+                "skip-log"
+              ],
+              "action": "skip-log"
+            },
+            {
+              "node": "scene-ridge-selector",
+              "offered": [
+                "power-lift",
+                "power-cooler",
+                "try-heater"
+              ],
+              "action": "power-cooler",
+              "exposure": [],
+              "feedback": [
+                "reserve needle is green"
+              ]
+            },
+            {
+              "node": "scene-report",
+              "offered": [
+                "close-logbook",
+                "revisit-logbook"
+              ],
+              "action": "close-logbook",
+              "feedback": [
+                "nurse keeps the vials",
+                "relief crew climbs up at dawn"
+              ]
+            },
+            {
+              "node": "end-ridge",
+              "offered": []
+            }
+          ],
+          "expected_state": {
+            "knows_trip_cause": false,
+            "pack_state": "spent",
+            "crew_rescued": false,
+            "medicine_cold": true,
+            "incident_receipts": 1
+          },
+          "expected_exit": "terminal"
+        },
+        {
+          "id": "ridge-skip-heater",
+          "initial_state": {
+            "knows_trip_cause": false,
+            "pack_state": "ready",
+            "crew_rescued": false,
+            "medicine_cold": false,
+            "incident_receipts": 0
+          },
+          "steps": [
+            {
+              "node": "scene-ridge-station",
+              "offered": [
+                "discover-log",
+                "skip-log"
+              ],
+              "action": "skip-log"
+            },
+            {
+              "node": "scene-ridge-selector",
+              "offered": [
+                "power-lift",
+                "power-cooler",
+                "try-heater"
+              ],
+              "action": "try-heater",
+              "exposure": [],
+              "feedback": [
+                "reserve needle is green"
+              ]
+            },
+            {
+              "node": "scene-report",
+              "offered": [
+                "close-logbook",
+                "revisit-logbook"
+              ],
+              "action": "close-logbook",
+              "feedback": [
+                "isolation latch falls shut",
+                "refuge stays dark"
+              ]
+            },
+            {
+              "node": "end-ridge",
+              "offered": []
+            }
+          ],
+          "expected_state": {
+            "knows_trip_cause": false,
+            "pack_state": "isolated",
+            "crew_rescued": false,
+            "medicine_cold": false,
+            "incident_receipts": 1
+          },
+          "expected_exit": "terminal"
+        },
+        {
+          "id": "ridge-restore-repeat",
+          "initial_state": {
+            "knows_trip_cause": false,
+            "pack_state": "ready",
+            "crew_rescued": false,
+            "medicine_cold": false,
+            "incident_receipts": 0
+          },
+          "steps": [
+            {
+              "node": "scene-ridge-station",
+              "offered": [
+                "discover-log",
+                "skip-log"
+              ],
+              "action": "skip-log"
+            },
+            {
+              "node": "scene-ridge-selector",
+              "offered": [
+                "power-lift",
+                "power-cooler",
+                "try-heater"
+              ],
+              "action": "power-lift",
+              "exposure": [],
+              "feedback": [
+                "reserve needle is green"
+              ]
+            },
+            {
+              "node": "scene-report",
+              "offered": [
+                "close-logbook",
+                "revisit-logbook"
+              ],
+              "action": "revisit-logbook",
+              "feedback": [
+                "workers step down",
+                "vials in a tray marked for disposal"
+              ],
+              "save_point": true
+            },
+            {
+              "node": "scene-report",
+              "offered": [
+                "close-logbook",
+                "revisit-logbook"
+              ],
+              "action": "revisit-logbook",
+              "feedback": [
+                "already in the ledger"
+              ]
+            },
+            {
+              "node": "scene-report",
+              "offered": [
+                "close-logbook",
+                "revisit-logbook"
+              ],
+              "action": "close-logbook",
+              "feedback": [
+                "already in the ledger"
+              ]
+            },
+            {
+              "node": "end-ridge",
+              "offered": []
+            }
+          ],
+          "expected_state": {
+            "knows_trip_cause": false,
+            "pack_state": "spent",
+            "crew_rescued": true,
+            "medicine_cold": false,
+            "incident_receipts": 1
+          },
+          "expected_exit": "terminal",
+          "visit_limits": {
+            "scene-report": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "refusal-continues",
+      "model": {
+        "entry": "offer",
+        "nodes": {
+          "offer": {
+            "actions": {
+              "decline": {
+                "target": "shelter"
+              }
+            }
+          },
+          "shelter": {
+            "actions": {},
+            "exit": "continuation"
+          }
+        }
+      },
+      "traces": [
+        {
+          "id": "refusal-continues",
+          "initial_state": {
+            "knows_trip_cause": false,
+            "pack_state": "ready",
+            "crew_rescued": false,
+            "medicine_cold": false,
+            "incident_receipts": 0
+          },
+          "steps": [
+            {
+              "node": "offer",
+              "offered": [
+                "decline"
+              ],
+              "action": "decline"
+            },
+            {
+              "node": "shelter",
+              "offered": []
+            }
+          ],
+          "expected_state": {},
+          "expected_exit": "continuation"
+        }
+      ]
+    },
+    {
+      "id": "mutual-gates",
+      "model": {
+        "entry": "gate",
+        "nodes": {
+          "gate": {
+            "actions": {
+              "continue": {
+                "target": "end",
+                "when": {
+                  "all": [
+                    {
+                      "key": "crew_rescued",
+                      "op": "eq",
+                      "value": true
+                    },
+                    {
+                      "key": "medicine_cold",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "end": {
+            "actions": {},
+            "exit": "terminal"
+          }
+        }
+      },
+      "traces": [
+        {
+          "id": "mutual-gates",
+          "initial_state": {
+            "knows_trip_cause": false,
+            "pack_state": "ready",
+            "crew_rescued": false,
+            "medicine_cold": false,
+            "incident_receipts": 0
+          },
+          "steps": [
+            {
+              "node": "gate",
+              "offered": [],
+              "action": "continue"
+            },
+            {
+              "node": "end",
+              "offered": []
+            }
+          ],
+          "expected_state": {},
+          "expected_exit": "terminal"
+        }
+      ],
+      "expected_diagnostic": "unavailable-action"
+    },
+    {
+      "id": "wrong-all-for-any",
+      "model": {
+        "entry": "gate",
+        "nodes": {
+          "gate": {
+            "actions": {
+              "continue": {
+                "target": "end",
+                "when": {
+                  "all": [
+                    {
+                      "key": "crew_rescued",
+                      "op": "eq",
+                      "value": true
+                    },
+                    {
+                      "key": "medicine_cold",
+                      "op": "eq",
+                      "value": false
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "end": {
+            "actions": {},
+            "exit": "terminal"
+          }
+        }
+      },
+      "traces": [
+        {
+          "id": "wrong-all-for-any",
+          "initial_state": {
+            "knows_trip_cause": false,
+            "pack_state": "ready",
+            "crew_rescued": false,
+            "medicine_cold": false,
+            "incident_receipts": 0
+          },
+          "steps": [
+            {
+              "node": "gate",
+              "offered": [
+                "continue"
+              ],
+              "action": "continue"
+            },
+            {
+              "node": "end",
+              "offered": []
+            }
+          ],
+          "expected_state": {},
+          "expected_exit": "terminal"
+        }
+      ],
+      "expected_diagnostic": "offered-mismatch"
+    },
+    {
+      "id": "incompatible-outcomes",
+      "model": {
+        "entry": "selector",
+        "nodes": {
+          "selector": {
+            "actions": {
+              "continue": {
+                "target": "end",
+                "effects": {
+                  "crew_rescued": true
+                }
+              }
+            }
+          },
+          "end": {
+            "actions": {},
+            "exit": "terminal"
+          }
+        }
+      },
+      "traces": [
+        {
+          "id": "incompatible-outcomes",
+          "initial_state": {
+            "knows_trip_cause": false,
+            "pack_state": "ready",
+            "crew_rescued": false,
+            "medicine_cold": false,
+            "incident_receipts": 0
+          },
+          "steps": [
+            {
+              "node": "selector",
+              "offered": [
+                "continue"
+              ],
+              "action": "continue"
+            },
+            {
+              "node": "end",
+              "offered": []
+            }
+          ],
+          "expected_state": {
+            "crew_rescued": true,
+            "medicine_cold": true
+          },
+          "expected_exit": "terminal"
+        }
+      ],
+      "expected_diagnostic": "state-mismatch"
+    },
+    {
+      "id": "unavailable-actor",
+      "model": {
+        "entry": "call-crew",
+        "nodes": {
+          "call-crew": {
+            "actions": {
+              "continue": {
+                "target": "end",
+                "when": {
+                  "key": "crew_rescued",
+                  "op": "eq",
+                  "value": true
+                }
+              }
+            }
+          },
+          "end": {
+            "actions": {},
+            "exit": "terminal"
+          }
+        }
+      },
+      "traces": [
+        {
+          "id": "unavailable-actor",
+          "initial_state": {
+            "knows_trip_cause": false,
+            "pack_state": "ready",
+            "crew_rescued": false,
+            "medicine_cold": false,
+            "incident_receipts": 0
+          },
+          "steps": [
+            {
+              "node": "call-crew",
+              "offered": [],
+              "action": "continue"
+            },
+            {
+              "node": "end",
+              "offered": []
+            }
+          ],
+          "expected_state": {},
+          "expected_exit": "terminal"
+        }
+      ],
+      "expected_diagnostic": "unavailable-action"
+    },
+    {
+      "id": "duplicate-receipt",
+      "model": {
+        "entry": "ledger",
+        "nodes": {
+          "ledger": {
+            "actions": {
+              "revisit-logbook": {
+                "target": "ledger",
+                "effects": {
+                  "incident_receipts": 1
+                }
+              },
+              "close-logbook": {
+                "target": "end",
+                "effects": {
+                  "incident_receipts": 1
+                }
+              }
+            }
+          },
+          "end": {
+            "actions": {},
+            "exit": "terminal"
+          }
+        }
+      },
+      "traces": [
+        {
+          "id": "duplicate-receipt",
+          "initial_state": {
+            "knows_trip_cause": false,
+            "pack_state": "ready",
+            "crew_rescued": false,
+            "medicine_cold": false,
+            "incident_receipts": 0
+          },
+          "steps": [
+            {
+              "node": "ledger",
+              "offered": [
+                "close-logbook",
+                "revisit-logbook"
+              ],
+              "action": "revisit-logbook"
+            },
+            {
+              "node": "ledger",
+              "offered": [
+                "close-logbook",
+                "revisit-logbook"
+              ],
+              "action": "close-logbook"
+            },
+            {
+              "node": "end",
+              "offered": []
+            }
+          ],
+          "expected_state": {},
+          "expected_exit": "terminal",
+          "visit_limits": {
+            "ledger": 2
+          }
+        }
+      ],
+      "expected_diagnostic": "repeated-unique-effect"
+    },
+    {
+      "id": "refusal-no-exit",
+      "model": {
+        "entry": "offer",
+        "nodes": {
+          "offer": {
+            "actions": {
+              "decline": {
+                "target": "blocked"
+              }
+            }
+          },
+          "blocked": {
+            "actions": {}
+          }
+        }
+      },
+      "traces": [
+        {
+          "id": "refusal-no-exit",
+          "initial_state": {
+            "knows_trip_cause": false,
+            "pack_state": "ready",
+            "crew_rescued": false,
+            "medicine_cold": false,
+            "incident_receipts": 0
+          },
+          "steps": [
+            {
+              "node": "offer",
+              "offered": [
+                "decline"
+              ],
+              "action": "decline"
+            },
+            {
+              "node": "blocked",
+              "offered": []
+            }
+          ],
+          "expected_state": {},
+          "expected_exit": "terminal"
+        }
+      ],
+      "expected_diagnostic": "missing-exit"
+    },
+    {
+      "id": "unproductive-loop",
+      "model": {
+        "entry": "gate",
+        "nodes": {
+          "gate": {
+            "actions": {
+              "continue": {
+                "target": "gate"
+              }
+            }
+          }
+        }
+      },
+      "traces": [
+        {
+          "id": "unproductive-loop",
+          "initial_state": {
+            "knows_trip_cause": false,
+            "pack_state": "ready",
+            "crew_rescued": false,
+            "medicine_cold": false,
+            "incident_receipts": 0
+          },
+          "steps": [
+            {
+              "node": "gate",
+              "offered": [
+                "continue"
+              ],
+              "action": "continue"
+            },
+            {
+              "node": "gate",
+              "offered": []
+            }
+          ],
+          "expected_state": {},
+          "expected_exit": "terminal"
+        }
+      ],
+      "expected_diagnostic": "visit-limit"
+    },
+    {
+      "id": "missing-state",
+      "model": {
+        "entry": "gate",
+        "nodes": {
+          "gate": {
+            "actions": {
+              "continue": {
+                "target": "end",
+                "when": {
+                  "key": "crew_rescued",
+                  "op": "eq",
+                  "value": true
+                }
+              }
+            }
+          },
+          "end": {
+            "actions": {},
+            "exit": "terminal"
+          }
+        }
+      },
+      "traces": [
+        {
+          "id": "missing-state",
+          "initial_state": {
+            "knows_trip_cause": false,
+            "pack_state": "ready",
+            "medicine_cold": false,
+            "incident_receipts": 0
+          },
+          "steps": [
+            {
+              "node": "gate",
+              "offered": [],
+              "action": "continue"
+            },
+            {
+              "node": "end",
+              "offered": []
+            }
+          ],
+          "expected_state": {},
+          "expected_exit": "terminal"
+        }
+      ],
+      "expected_diagnostic": "unavailable-state"
+    }
+  ]
+}

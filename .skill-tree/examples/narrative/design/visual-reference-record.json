@@ -1,0 +1,49 @@
+{
+  "reference_id": "reference-ilya-seams",
+  "entity_id": "character-ilya",
+  "state_id": "state-ilya-ridge-opening",
+  "artifact_status": "reference",
+  "design_status": "proposed-design",
+  "origin": {
+    "kind": "synthetic description of a generated clothing concept",
+    "locator": "source-jacket-note",
+    "version": {
+      "state": "fixture-revision",
+      "value": "jacket-note-1"
+    },
+    "usage_status": "original artifact and usage permission unavailable"
+  },
+  "decision": {
+    "status": "unresolved",
+    "decision_id": null,
+    "intended_use": "Propose contrasting workwear seams for the opening brief."
+  },
+  "selected_features": [
+    "High-contrast outer seams",
+    "Compact layered silhouette"
+  ],
+  "excluded_features": [
+    "Incidental triangular collar crest",
+    "Any implied faction affiliation",
+    "Later incident-witness strap"
+  ],
+  "comparison": [
+    {
+      "view": "described three-quarter view",
+      "expected": "Broad shoulder line and visible seam contrast",
+      "evidence": "Text description includes seams and a crest. Silhouette alignment remains uncertain without the image.",
+      "status": "partial-evidence"
+    },
+    {
+      "view": "gameplay-distance selector pose",
+      "expected": "Shoulder outline and readable lever-check gesture",
+      "evidence": "No pose artifact supplied.",
+      "status": "unavailable"
+    }
+  ],
+  "review_questions": [
+    "Can the original image and usage terms be located?",
+    "Does the proposed seam contrast need a separate original design?"
+  ],
+  "canon_effect": "none"
+}

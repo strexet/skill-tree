@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "work_id": "work-ridge",
+  "continuity_id": "continuity-ridge",
+  "source": {
+    "draft_id": "draft-ridge-route-example"
+  },
+  "state_registry": "state-registry.example.json",
+  "entry": "scene-ridge-station",
+  "nodes": {
+    "scene-ridge-station": {
+      "actions": {
+        "discover-log": {
+          "target": "scene-ridge-selector",
+          "effects": {
+            "knows_trip_cause": true
+          }
+        },
+        "skip-log": {
+          "target": "scene-ridge-selector"
+        }
+      }
+    },
+    "scene-ridge-selector": {
+      "actions": {
+        "power-lift": {
+          "target": "scene-report",
+          "effects": {
+            "pack_state": "spent",
+            "crew_rescued": true
+          }
+        },
+        "power-cooler": {
+          "target": "scene-report",
+          "effects": {
+            "pack_state": "spent",
+            "medicine_cold": true
+          }
+        },
+        "try-heater": {
+          "target": "scene-report",
+          "effects": {
+            "pack_state": "isolated"
+          }
+        }
+      }
+    },
+    "scene-report": {
+      "on_enter_once": {
+        "incident_receipts": 1
+      },
+      "actions": {
+        "close-logbook": {
+          "target": "end-ridge"
+        },
+        "revisit-logbook": {
+          "target": "scene-report"
+        }
+      }
+    },
+    "end-ridge": {
+      "exit": "terminal",
+      "actions": {}
+    }
+  },
+  "traces": [
+    {
+      "id": "ridge-discover-lift",
+      "initial_state": {
+        "knows_trip_cause": false,
+        "pack_state": "ready",
+        "crew_rescued": false,
+        "medicine_cold": false,
+        "incident_receipts": 0
+      },
+      "steps": [
+        {
+          "node": "scene-ridge-station",
+          "offered": [
+            "discover-log",
+            "skip-log"
+          ],
+          "action": "discover-log"
+        },
+        {
+          "node": "scene-ridge-selector",
+          "offered": [
+            "power-lift",
+            "power-cooler",
+            "try-heater"
+          ],
+          "action": "power-lift",
+          "exposure": [
+            "scene-relay"
+          ]
+        },
+        {
+          "node": "scene-report",
+          "offered": [
+            "close-logbook",
+            "revisit-logbook"
+          ],
+          "action": "close-logbook"
+        },
+        {
+          "node": "end-ridge",
+          "offered": []
+        }
+      ],
+      "expected_state": {
+        "knows_trip_cause": true,
+        "pack_state": "spent",
+        "crew_rescued": true,
+        "medicine_cold": false,
+        "incident_receipts": 1
+      },
+      "expected_exit": "terminal"
+    }
+  ]
+}

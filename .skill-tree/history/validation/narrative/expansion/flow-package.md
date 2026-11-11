@@ -1,0 +1,5 @@
+# Compose and install the expanded narrative operation
+
+The generated general, web and Unity operations retain the same narrative slug and open the topic router. The owned installer created and verified all three temporary targets. Each installed package matched all 65 narrative reference files and both narrative helpers byte for byte, and the installed state helper initialized a fresh record store. The composer resolved the 34 indexed method anchors in all three flavors. The adverse composition fixture removed the registered claims topic and rejected the dangling router link. Generation checks, strict repository validation, installer discovery and the general dry run passed. The worktree profile was refreshed through the owned installer. The Unity-profile check covered capability routing and package contents. Native project behavior requires separate evidence.
+
+Strict prose and structured fixture parsing passed for the selected source paths. The recorded checks cover authored content and the stated fixture walkthroughs.

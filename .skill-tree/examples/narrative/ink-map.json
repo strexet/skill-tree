@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "work_id": "work-ridge",
+  "quest_id": "quest-ridge",
+  "authoritative_source": "quest.ink",
+  "compiler_release": "inklecate-v1.2.1",
+  "scenes": {
+    "scene-ridge-station": {
+      "knot": "ridge_station",
+      "choices": [
+        "discover-log",
+        "skip-log"
+      ]
+    },
+    "scene-relay": {
+      "knot": "relay_log",
+      "choices": [],
+      "optional": true
+    },
+    "scene-ridge-selector": {
+      "knot": "selector",
+      "choices": [
+        "power-lift",
+        "power-cooler",
+        "try-heater"
+      ]
+    },
+    "scene-ridge-lift": {
+      "knot": "lift",
+      "choices": []
+    },
+    "scene-ridge-cooler": {
+      "knot": "cooler",
+      "choices": []
+    },
+    "scene-ridge-heater": {
+      "knot": "heater",
+      "choices": []
+    },
+    "scene-report": {
+      "knot": "report",
+      "choices": [
+        "close-logbook",
+        "revisit-logbook"
+      ]
+    }
+  },
+  "unmapped_authoring_beats": [
+    "proposed-refusal"
+  ],
+  "terminal_exit": "end-ridge"
+}

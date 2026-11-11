@@ -1,0 +1,10 @@
+{
+  "scope": {"continuity": "continuity-ridge", "period": "storm night", "place": "ridge station", "route": "all selector routes"},
+  "claims": [
+    {"id": "claim-early-trip", "kind": "established-fact", "subject": "heater lead", "assertion": "The heater lead shorted at 06:12.", "source": {"record": "event-trip", "locator": "records/event-trip.md", "fixture_revision": "authored-pilot"}},
+    {"id": "claim-ilya-storm", "kind": "attributed-statement", "holder": "character-ilya", "subject": "heater lead", "assertion": "The storm caused the pack fault.", "source": {"record": "character-ilya", "locator": "records/character-ilya.md", "fixture_revision": "authored-pilot"}},
+    {"id": "claim-clinic-guess", "kind": "attributed-statement", "holder": "clinic attendant", "subject": "heater lead", "assertion": "The heater short predates the lightning.", "source": {"locator": "synthetic counterstatement for review", "fixture_revision": "contrast case"}}
+  ],
+  "adverse_case": {"id": "claim-late-trip", "kind": "established-fact", "subject": "heater lead", "assertion": "The same heater lead first shorted at 06:40.", "source": {"locator": "synthetic incompatible candidate", "fixture_revision": "negative case"}},
+  "expected": {"normal": "The two attributed statements can coexist.", "adverse": "The established times conflict in the same scope."}
+}

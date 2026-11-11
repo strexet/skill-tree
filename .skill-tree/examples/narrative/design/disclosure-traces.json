@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "scope": {
+    "work": "work-ridge",
+    "continuity": "continuity-ridge",
+    "period": "storm-night",
+    "candidate": "synthetic review of the authored standalone pilot"
+  },
+  "world_order": [
+    {"event": "event-trip", "time": "06:12", "source": "records/event-trip.md"},
+    {"event": "reset-isolation", "time": "06:24", "source": "records/event-trip.md"},
+    {"event": "capacity-check", "time": "06:32", "source": "records/event-trip.md"},
+    {"event": "first-lightning", "time": "06:40", "source": "records/event-trip.md"}
+  ],
+  "presentation_sources": [
+    {"beat": "ridge_station", "source": "quest.ink", "disclosure": "Ilya states the storm belief."},
+    {"beat": "relay_log", "source": "quest.ink", "disclosure": "The relay log presents the short and lightning times."},
+    {"beat": "selector", "source": "quest.ink", "disclosure": "A route-specific line or visible equipment cues precede circuit selection."},
+    {"beat": "report", "source": "quest.ink", "disclosure": "The current logbook records one incident receipt."}
+  ],
+  "routes": [
+    {
+      "id": "ridge-discover-lift",
+      "actions": ["discover-log", "power-lift", "close-logbook"],
+      "beats": ["ridge_station", "relay_log", "selector", "lift", "report"],
+      "acquisitions": [
+        {"holder": "character-ilya", "claim": "claim-ilya-storm", "beat": "ridge_station", "mode": "inference", "state": "attributed-belief", "source": "records/character-ilya.md"},
+        {"holder": "player", "claim": "claim-early-trip", "beat": "relay_log", "mode": "direct-observation", "state": "presented-clue", "source": "quest.ink#relay_log"},
+        {"holder": "player-character", "claim": "claim-early-trip", "beat": "relay_log", "mode": "direct-observation", "state": "supported-knowledge", "source": "quest.ink#relay_log"},
+        {"holder": "character-ilya", "claim": "claim-early-trip", "beat": "relay_log", "mode": "direct-observation", "state": "supported-knowledge", "source": "records/scene-relay.md"}
+      ],
+      "chosen_interpretation": {"status": "not-observed"},
+      "observed_understanding": {"status": "not-observed"}
+    },
+    {
+      "id": "ridge-skip-lift",
+      "actions": ["skip-log", "power-lift", "close-logbook"],
+      "beats": ["ridge_station", "selector", "lift", "report"],
+      "acquisitions": [
+        {"holder": "character-ilya", "claim": "claim-ilya-storm", "beat": "ridge_station", "mode": "inference", "state": "attributed-belief", "source": "records/character-ilya.md"},
+        {"holder": "player", "claim": "claim-early-trip", "beat": "selector", "mode": "withheld", "state": "not-presented", "source": "quest.ink#selector"},
+        {"holder": "player-character", "claim": "claim-early-trip", "beat": "selector", "mode": "withheld", "state": "unsupported-knowledge", "source": "quest.ink#selector"},
+        {"holder": "character-ilya", "claim": "claim-early-trip", "beat": "selector", "mode": "withheld", "state": "unsupported-knowledge", "source": "records/scene-relay.md"}
+      ],
+      "chosen_interpretation": {"status": "not-observed"},
+      "observed_understanding": {"status": "not-observed"}
+    }
+  ],
+  "proposed_alternative": {
+    "status": "unimplemented-design-option",
+    "route": "ridge-skip-lift",
+    "beat": "report",
+    "source": "A dated maintenance card attached to the incident board.",
+    "effect": "The player character can obtain timing evidence after selecting a circuit. The option does not supply earlier knowledge at the selector."
+  },
+  "adverse": {
+    "route": "ridge-skip-lift",
+    "beat": "selector",
+    "holder": "character-ilya",
+    "proposed_line": "The short was at 06:12.",
+    "expected": "Knowledge leak because no earlier source is available to Ilya on the skip route."
+  }
+}

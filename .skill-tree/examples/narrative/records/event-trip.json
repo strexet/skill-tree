@@ -1,0 +1,7 @@
+{
+  "id": "event-trip",
+  "kind": "event",
+  "depends_on": [
+    "law-pack"
+  ]
+}

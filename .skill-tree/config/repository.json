@@ -45,6 +45,17 @@
         ".skill-tree/tests/test-pending-priority-installation.js"
       ],
       "input_paths": []
+    },
+    "narrative-ink-replay": {
+      "lane": "integration",
+      "argv": ["bash", ".skill-tree/examples/narrative/run-paths.sh"],
+      "input_paths": [
+        ".skill-tree/examples/narrative/run-paths.sh",
+        ".skill-tree/examples/narrative/quest.ink",
+        ".skill-tree/examples/narrative/route-traces.json",
+        ".skill-tree/examples/narrative/runtime-check/program.cs",
+        ".skill-tree/examples/narrative/runtime-check/runtime-check.csproj"
+      ]
     }
   }
 }

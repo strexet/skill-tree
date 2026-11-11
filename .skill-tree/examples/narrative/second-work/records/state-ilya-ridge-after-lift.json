@@ -1,0 +1,32 @@
+{
+  "id": "state-ilya-ridge-after-lift",
+  "kind": "character-state",
+  "depends_on": [
+    "character-ilya",
+    "event-trip",
+    "quest-ridge"
+  ],
+  "identity_id": "character-ilya",
+  "continuity_id": "continuity-ridge",
+  "period": {
+    "label": "Next service shift",
+    "anchor_event_id": "event-trip",
+    "elapsed": "One service shift later"
+  },
+  "requires_outcomes": [
+    "outcome-lift"
+  ],
+  "event_refs": [
+    {
+      "record_id": "event-trip"
+    },
+    {
+      "record_id": "quest-ridge",
+      "outcome_id": "outcome-lift"
+    }
+  ],
+  "retained_traits": [
+    "Crew-first concern",
+    "Concrete equipment language"
+  ]
+}

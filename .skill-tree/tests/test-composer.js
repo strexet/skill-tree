@@ -5,7 +5,7 @@ const os = require('node:os');
 const path = require('node:path');
 const source = path.resolve(__dirname, '..');
 const c = require('../lib/composer.js');
-const expectedOperations = ['skill-tree-add-pending-task','skill-tree-clarify-tasks','skill-tree-create-documents-snapshot','skill-tree-implement-all','skill-tree-implement-next-future-task','skill-tree-plugins','skill-tree-pr-review-cycle','skill-tree-process-future-pending','skill-tree-repo-documentation','skill-tree-repo-documentation-audit','skill-tree-work-through-next'];
+const expectedOperations = ['skill-tree-add-pending-task','skill-tree-clarify-tasks','skill-tree-create-documents-snapshot','skill-tree-implement-all','skill-tree-implement-next-future-task','skill-tree-narative','skill-tree-plugins','skill-tree-pr-review-cycle','skill-tree-process-future-pending','skill-tree-repo-documentation','skill-tree-repo-documentation-audit','skill-tree-work-through-next'];
 function fixture(t) { const root=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-compose-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));return root; }
 function write(root,rel,data) { const p=path.join(root,rel);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,typeof data==='string'?data:JSON.stringify(data)); }
 test('source recipe identities survive composition and retain freshness and collision checks',t=>{
@@ -120,4 +120,39 @@ test('Unity BOM-prefixed JSON remains static input with unchanged raw-byte finge
  const rel='Assets/Tests/Fixture.asmdef';write(root,rel,'\uFEFF'+JSON.stringify({name:'Fixture',optionalUnityReferences:['TestAssemblies']}));const before=fs.readFileSync(path.join(root,rel));
  const p=c.resolveProfile(source,root,'unity');assert.ok(p.facts.test_assemblies.includes(rel));assert.equal(p.inputs[rel],c.hash(before));assert.deepEqual(fs.readFileSync(path.join(root,rel)),before);
  write(root,rel,'\uFEFF{broken');assert.throws(()=>c.resolveProfile(source,root,'unity'),SyntaxError);
+});
+
+test('narrative topic navigation and every craft card resolve in all profiles', t => {
+  for (const flavor of ['general', 'web', 'unity']) {
+    const root = fixture(t);
+    if (flavor === 'unity') {
+      write(root, 'ProjectSettings/ProjectVersion.txt', 'm_EditorVersion: 6000.0.83f1');
+      write(root, 'Packages/manifest.json', {dependencies: {}});
+    }
+    const profile = c.resolveProfile(source, root, flavor);
+    const skill = c.compose(source, profile, ['skill-tree-narative']).packages['skill-tree-narative'];
+    assert.match(skill['SKILL.md'], /references\/narrative-topic-routing\.md/);
+    assert.ok(skill['scripts/narrative-route-check.py']);
+    const catalog = skill['references/narrative-craft-catalog.md']
+      .split('## Coverage index')[1].split('## Example application')[0];
+    const links = [...catalog.matchAll(/\]\((narrative-craft-[a-z-]+\.md)#([a-z-]+)\)/g)];
+    assert.equal(links.length, 34);
+    assert.equal(new Set(links.map(match => match[0])).size, 34);
+    for (const [, file, anchor] of links) {
+      assert.ok(skill['references/' + file].includes('id="' + anchor + '"'), file + '#' + anchor);
+    }
+  }
+});
+
+test('narrative composition rejects a missing topic referenced by the router', t => {
+  const sourceCopy = fixture(t);
+  for (const dir of ['common', 'domains', 'templates', 'config', 'lib', 'src']) {
+    fs.cpSync(path.join(source, dir), path.join(sourceCopy, dir), {recursive: true});
+  }
+  const resourceMap = JSON.parse(fs.readFileSync(path.join(sourceCopy, 'config/resource-map.json'), 'utf8'));
+  delete resourceMap['skill-tree-narative'].references['narrative-claims.md'];
+  write(sourceCopy, 'config/resource-map.json', resourceMap);
+  const profile = c.resolveProfile(sourceCopy, fixture(t), 'general');
+  assert.throws(() => c.compose(sourceCopy, profile, ['skill-tree-narative']),
+    /Missing composed link: .*narrative-claims\.md/);
 });
