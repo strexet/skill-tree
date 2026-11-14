@@ -25,6 +25,7 @@
       "plugin-sources.js": "lib/plugin-sources.js",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "task-grouping-migration.py": "common/scripts/task-grouping-migration.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
@@ -58,6 +59,7 @@
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "select-prioritized-task.py": "common/scripts/select-prioritized-task.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "task-grouping-migration.py": "common/scripts/task-grouping-migration.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
@@ -85,6 +87,7 @@
       "plugin-sources.js": "lib/plugin-sources.js",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "task-grouping-migration.py": "common/scripts/task-grouping-migration.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
@@ -120,6 +123,7 @@
       "pr-review-state.py": "common/scripts/pr-review-state.py",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "task-grouping-migration.py": "common/scripts/task-grouping-migration.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
@@ -153,6 +157,7 @@
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "select-prioritized-task.py": "common/scripts/select-prioritized-task.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "task-grouping-migration.py": "common/scripts/task-grouping-migration.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
@@ -250,6 +255,7 @@
       "plugin-sources.js": "lib/plugin-sources.js",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "task-grouping-migration.py": "common/scripts/task-grouping-migration.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
@@ -276,6 +282,7 @@
       "plugin-sources.js": "lib/plugin-sources.js",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "task-grouping-migration.py": "common/scripts/task-grouping-migration.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
@@ -306,6 +313,7 @@
       "pr-review-state.py": "common/scripts/pr-review-state.py",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "task-grouping-migration.py": "common/scripts/task-grouping-migration.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
@@ -338,6 +346,7 @@
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "validate-future-document.py": "common/scripts/validate-future-document.py",
+      "task-grouping-migration.py": "common/scripts/task-grouping-migration.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
@@ -372,6 +381,7 @@
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "validate-future-document.py": "common/scripts/validate-future-document.py",
       "validate-repository-documentation.py": "common/scripts/validate-repository-documentation.py",
+      "task-grouping-migration.py": "common/scripts/task-grouping-migration.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
@@ -406,6 +416,7 @@
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
       "validate-future-document.py": "common/scripts/validate-future-document.py",
       "validate-repository-documentation.py": "common/scripts/validate-repository-documentation.py",
+      "task-grouping-migration.py": "common/scripts/task-grouping-migration.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
     }
   },
@@ -441,6 +452,7 @@
       "pr-review-state.py": "common/scripts/pr-review-state.py",
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "task-grouping-migration.py": "common/scripts/task-grouping-migration.py",
       "workflow-state.py": "common/scripts/workflow-state.py"
     }
   }

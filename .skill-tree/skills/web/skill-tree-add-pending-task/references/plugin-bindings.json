@@ -1428,7 +1428,7 @@
   "configuration_digest": "b8996e3dce328966e3de5689fbc479249b1a4fdaf4c54be07eec21e96ba4ca53",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "59608205eb0392f6e2ef41c53d8d0d768ef0958aaa192461b3e2c0dd55b684e1",
+  "identity": "ac0dd9b3d82651e64308ebd46066423feaa7ba8a041d5ba75ca53672b4fcd00e",
   "operation": "skill-tree-add-pending-task",
   "operations": {
     "skill-tree-add-pending-task": {
@@ -1469,19 +1469,19 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "6941d4aeea6ea5e95d37a0729c25b6058c0679a6a574cc9d707b432db50889fb",
+    "SKILL.md": "7255c7869d33dcf81d843af8e0767271b043af8644f8152970adffc8149d96fa",
     "agents/openai.yaml": "94c2cbb46483713fbd990e37c62cff1332c04f29622a2414dac3b7800960c279",
     "references/decision-governance.md": "390934d262f20952edb78a59b52f3e64567b830e1723f5bde8716e193722ff2b",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
-    "references/pending-task-format.md": "6c0a90ea992f2c19a26e4f95fc4e45b7ff89d25c0cc8e2c49c11cfa8bad2d8ba",
-    "references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+    "references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
+    "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/project-profile.md": "a2fa0f0f6f445c854f8f32d06653fbb641742811766f8258b58823684d7e1144",
     "references/run-workspaces.md": "d9a97bc8ee56ef0aa6f254075df08e2946fdc61c578328a52f6991dbd723468c",
     "references/validation-policy.md": "2bb1e9675fe3bc08cbcb9aa4b9534368416faba7ffaaf6b5aaff417456f434d3",
     "references/web-development.md": "a8e55f4d58ad64056707801a3c31aa56eb884755fd12ef08c341680d73645bc9",
-    "references/workflow-metadata.md": "eea7ee03ec910e9bf312b93b7f872b568f10c40f9c972484106a86fff742abdb",
+    "references/workflow-metadata.md": "9396023a381c11ed1b53015524ecbd74c117d60b2c8cffd40678332d23158473",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "d2c5ac475033ae06321fc7917ddf96232a0e442bef7c5db537891e12164fd404",
     "scripts/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
@@ -1494,8 +1494,9 @@
     "scripts/plugin-runtime.js": "62caaa416cb4f375fef45edb71c1cbe3b2f9c0acb734a95e0b9099470cf6c8a5",
     "scripts/plugin-sources.js": "13d853f9e64dec84cf92f4026ac71e4384e186cd96200543e400a852a46e4693",
     "scripts/run-workspaces.py": "b7f0987bc4f9d8bd17a53d5cc11995d5d418eee741040435e3e1d6eae13e4f0b",
+    "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "4858a30010717655bdb0f1ff4515b054d17258d62a98ad68f8922e6f8e5ab531"
+    "scripts/workflow-state.py": "155dbbfc258a34d6af598a69041bcbf50c0c970f374069d34898d4e6254e7a69"
   },
   "packages": {},
   "parameter_defaults": {},

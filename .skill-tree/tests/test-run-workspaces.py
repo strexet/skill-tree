@@ -23,9 +23,12 @@ class RunWorkspaceTests(unittest.TestCase):
     def call(self,root,*args):
         result=subprocess.run(['git','-C',str(root),*map(str,args)],capture_output=True,text=True,timeout=20)
         self.assertEqual(result.returncode,0,result.stderr);return result.stdout.strip()
-    def task(self,title='Task',deps=()):
+    def task(self,title='Task',deps=(),topic=None,priority=100):
         store=wf.Store(self.root,allow_unselected=True)
-        p=wf.intake(store,{'title':title,'description':'Preserve scoped source behavior.','expected_behavior':'Preserve scoped source behavior.'})
+        payload={'title':title,'description':'Preserve scoped source behavior.','expected_behavior':'Preserve scoped source behavior.','priority':priority}
+        if topic is not None:
+            payload.update(topic=topic,intake_batch_id=wf.identity('IB'),expected_source_hash=wf.file_hash(store.future))
+        p=wf.intake(store,payload)
         body='Goal:\n- Preserve scoped source behavior.\n\nTouch:\n- source.py\n\nValidation:\n```json\n'+json.dumps({'checks':[{'id':'behavior','recipe_id':'static-inspection','criteria':['Preserve scoped source behavior.'],'sources':['source.py'],'parameters':{},'assertion':'Preserve scoped source behavior.','timing':'immediate'}]})+'\n```\n\nAcceptance:\n- Preserve scoped source behavior.\n'
         return wf.process(store,{'selectors':[p['id']],'dispositions':{p['id']:{'status':'promoted','reason':'The fixture establishes the required source boundary.'}},'tasks':[{'title':title,'body':body,'depends_on':list(deps),'parent_pending_ids':[p['id']]}]})['created_ids'][0]
     def start(self,tid,**options):
@@ -77,6 +80,58 @@ class RunWorkspaceTests(unittest.TestCase):
                 wf.start(wf.Store(self.root,allow_unselected=True),'all',workspace={'snapshot_ids':[chosen,wf.identity('T')]})
             provision.assert_not_called()
         self.assertEqual(before,self.store.state.read_bytes());self.assertEqual(locator,ws.runtime(self.root))
+    def test_group_preview_from_linked_checkout_uses_canonical_queue_and_frozen_scope(self):
+        dep = self.task('Outside prerequisite', topic='infrastructure', priority=130)
+        first = self.task('First grouped root', [dep], topic='director')
+        second = self.task('Later equal priority root', [dep], topic='director')
+        unrelated = self.task('Unrelated root', topic='other')
+        linked = self.base/'group-preview'
+        self.call(self.root, 'worktree', 'add', '-b', 'fixture/group-preview', linked, 'develop')
+        (linked/'.skill-tree/documents/future.md').write_text('Stale noncanonical queue copy.\n')
+
+        selection = {'queue':'prioritized','topic':'director'}
+        preview = wf.group_selection(wf.Store(linked), selection)
+        self.assertEqual(preview['ids'], [second, first])
+        self.assertEqual(preview['outside_dependencies'], [dep])
+        self.assertEqual(preview['source_hash'], wf.file_hash(self.store.future))
+        self.assertNotEqual(preview['source_hash'], wf.file_hash(linked/'.skill-tree/documents/future.md'))
+        run = wf.start(wf.Store(self.root, allow_unselected=True), 'all', workspace={
+            'snapshot_ids':preview['ids'],
+            'expected_source_hash':preview['source_hash'],
+        })
+        self.assertEqual(run['snapshot'], [second, first])
+        self.assertEqual(set(run['admitted_task_ids']), {first, second, dep})
+
+        with self.store.lock():
+            queue = self.store.text()
+            queue = wf.rewrite_meta(queue, first, {'topic':'other'})
+            queue = wf.rewrite_meta(queue, unrelated, {'topic':'director'})
+            self.store.save(queue, self.store.load())
+        self.assertEqual(wf.group_selection(wf.Store(linked), selection)['ids'], [unrelated, second])
+        resumed = wf.Store(self.location(run)).load()['active_run']
+        self.assertEqual(resumed['snapshot'], run['snapshot'])
+        self.assertEqual(resumed['admitted_task_ids'], run['admitted_task_ids'])
+        self.assertEqual(wf.Store(self.location(run)).load()['run_registry']['claims'],
+                         {tid:run['id'] for tid in (first, second, dep)})
+    def test_stale_group_preview_never_reserves_a_run(self):
+        self.task('Originally selected root', topic='director')
+        preview = wf.group_selection(self.store, {'queue':'prioritized','topic':'director'})
+        self.task('New root after preview', topic='director')
+        before = self.store.state.read_bytes()
+        before_queue = self.store.future.read_bytes()
+        locator = ws.runtime(self.root)
+        with patch.object(ws, 'provision') as provision:
+            with self.assertRaisesRegex(wf.WorkflowError, 'Source changed'):
+                wf.start(wf.Store(self.root, allow_unselected=True), 'all', workspace={
+                    'snapshot_ids':preview['ids'],
+                    'expected_source_hash':preview['source_hash'],
+                })
+            with self.assertRaisesRegex(wf.WorkflowError, 'Resolve group filters'):
+                wf.start(wf.Store(self.root, allow_unselected=True), 'all', workspace={'topic':'director'})
+            provision.assert_not_called()
+        self.assertEqual(self.store.state.read_bytes(), before)
+        self.assertEqual(self.store.future.read_bytes(), before_queue)
+        self.assertEqual(ws.runtime(self.root), locator)
     def test_missing_default_base_stops_without_a_reserved_run(self):
         tid=self.task();self.call(self.root,'push','origin',':develop');self.call(self.root,'update-ref','-d','refs/remotes/origin/develop')
         with self.assertRaises(ws.RunError):self.start(tid)

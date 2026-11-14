@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 from contextlib import contextmanager
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import hashlib
 import importlib.util
 import json
@@ -22,7 +22,11 @@ import uuid
 QUEUES = ['Pending Queue', 'Prioritized Next Changes', 'Backlog']
 FIELDS = ['id', 'priority', 'status', 'parent_pending_ids', 'processing_run_id', 'root_task_id', 'related_task_id', 'relation', 'depends_on']
 SECTIONS = ['Goal', 'Touch', 'Validation', 'Acceptance']
-OPTIONAL_FIELDS = ['validation_group_id','boundary_validation']
+VALIDATION_FIELDS = ['validation_group_id','boundary_validation']
+TASK_GROUPING_COMPATIBILITY = 1
+GROUPING_FIELDS = ['topic','intake_batch_ids']
+OPTIONAL_FIELDS = VALIDATION_FIELDS + GROUPING_FIELDS
+TOPIC_PATTERN = re.compile(r'[a-z][a-z0-9]*(?:-[a-z0-9]+)*')
 RELATIONS = {'main', 'blocker', 'subtask', 'followup'}
 TERMINAL = {'completed', 'cancelled', 'superseded', 'merged'}
 FORMAT = 'skill-tree-future'
@@ -97,6 +101,28 @@ def assert_prose(text):
     errors=rules.check_text(text)
     if errors:raise WorkflowError('Generated prose violates document rules: '+', '.join(errors))
 
+def grouping_fields(task):
+    return {key:deepcopy(task[key]) for key in GROUPING_FIELDS if key in task}
+
+def merged_grouping(sources):
+    topics={source['topic'] for source in sources if 'topic' in source}
+    if len(topics)>1:raise WorkflowError('Conflicting named topics require separate tasks')
+    batches=list(dict.fromkeys(batch for source in sources for batch in source.get('intake_batch_ids',[])))
+    result={'topic':next(iter(topics))} if topics else {}
+    if batches:result['intake_batch_ids']=batches
+    return result
+
+def validate_grouping(meta, queue):
+    if 'topic' in meta:
+        topic=meta['topic']
+        if not isinstance(topic,str) or not TOPIC_PATTERN.fullmatch(topic):
+            raise WorkflowError('Topic requires a lowercase kebab-case key')
+    if 'intake_batch_ids' in meta:
+        batches=meta['intake_batch_ids']
+        if (not isinstance(batches,list) or not batches or any(not valid_id(v,'IB') for v in batches)
+                or len(set(batches))!=len(batches) or queue=='Pending Queue' and len(batches)!=1):
+            raise WorkflowError('Intake batch IDs require unique IB identities and exactly one for a Pending task')
+
 def validate_metadata(meta, queue):
     missing = set(FIELDS)-set(meta)
     if missing:
@@ -124,6 +150,7 @@ def validate_metadata(meta, queue):
         raise WorkflowError('Prioritized tasks require Pending provenance')
     if meta.get('validation_group_id') is not None and not valid_id(meta['validation_group_id'],'VG'):raise WorkflowError('Invalid validation group identity')
     if meta.get('boundary_validation','not-required') not in {'not-required','group-end','before-dependent-work'}:raise WorkflowError('Invalid boundary validation classification')
+    validate_grouping(meta,queue)
     if meta['id'] in meta['depends_on']:
         raise WorkflowError('A task cannot depend on the task identity')
 
@@ -223,7 +250,7 @@ def validate_dependencies(tasks, completed_ids=()):
 
 def render(title,meta,body):
     if not title.strip() or '\n' in title: raise WorkflowError('Task title requires one nonempty line')
-    header='\n'.join(k+': '+(json.dumps(meta[k],ensure_ascii=False) if not isinstance(meta[k],str) else meta[k]) for k in FIELDS+[key for key in OPTIONAL_FIELDS if meta.get(key) is not None])
+    header='\n'.join(k+': '+(json.dumps(meta[k],ensure_ascii=False) if k=='topic' or not isinstance(meta[k],str) else meta[k]) for k in FIELDS+[key for key in OPTIONAL_FIELDS if meta.get(key) is not None])
     return '### '+title+'\n\n```yaml\n'+header+'\n```\n\n'+body.strip()+'\n\n'
 
 def insert(text,queue,entry):
@@ -381,10 +408,11 @@ class Store:
         if not registry or not rid:return
         old=json.loads(self.state.read_text()) if self.state.exists() else {}
         before={t['id']:t for t in parse(self.text())};after={t['id']:t for t in parse(text)}
-        changes=[]
+        changes=[];grouped=[]
         for tid in sorted(set(before)|set(after)):
             a=before.get(tid);b=after.get(tid)
             if (a or {}).get('body')!=(b or {}).get('body'):
+                grouped.extend(task for task in (a,b) if task)
                 changes.append({'task_id':tid,'before':a and {'queue':a['queue'],'body':a['body']},'after':b and {'queue':b['queue'],'body':b['body']}})
         ledger=writes.get('.skill-tree/history/task-outcomes.jsonl','')
         prior_ids={r['id'] for r in self.outcomes()}
@@ -400,6 +428,12 @@ class Store:
         sequence=state['run_registry'].setdefault('event_sequences',{}).get(rid,0)+1
         state['run_registry']['event_sequences'][rid]=sequence
         event={'sequence':sequence,'schema':1,'id':identity('E'),'queue_id':registry['queue_id'],'run_id':rid,'changes':changes,'progress_changes':progress_changes,'outcomes':outcomes,'checkpoint_before':prior,'checkpoint_after':current}
+        receipts=[]
+        for batch in event_intake_origins(grouped+outcomes):
+            rel=intake_receipt_path(batch)
+            receipt=validate_intake_receipt(json.loads(writes[rel]),batch) if rel in writes else read_intake_receipt(self,batch)
+            if receipt:receipts.append(receipt)
+        if receipts:event['intake_receipts']=receipts
         state['run_registry'].setdefault('applied_events',[]).append(event['id'])
         writes['.skill-tree/history/run-events/'+rid.lower()+'/'+event['id'].lower()+'.json']=dump(event)
     def guard(self,expected):
@@ -431,59 +465,153 @@ def validate_run(run):
         if not isinstance(focus,dict) or not valid_id(focus.get('id'),'MF') or not run.get('stop_reason') or focus.get('execution_restriction')!='static-unit-only' or not focus.get('instruction') or not isinstance(focus.get('admission'),dict):raise WorkflowError('Corrupt maintenance scope')
         if any(not isinstance(focus.get(key),list) or not set(focus[key]).issubset(run['admitted_task_ids']) for key in ['snapshot','required_ids','admitted_task_ids']):raise WorkflowError('Maintenance scope expands the preserved controller')
 
+INTAKE_RECEIPTS = '.skill-tree/history/intake-batches/'
+
+def intake_receipt_path(batch_id):
+    if not valid_id(batch_id,'IB'):raise WorkflowError('Intake batch requires a canonical IB identity')
+    return INTAKE_RECEIPTS+batch_id.lower()+'.json'
+
+def validate_intake_receipt(receipt,batch_id):
+    if (not isinstance(receipt,dict) or receipt.get('schema')!=1 or receipt.get('id')!=batch_id
+            or set(receipt)!={'schema','id','created_at','request_sha256','items'}
+            or not isinstance(receipt.get('request_sha256'),str) or not re.fullmatch('[a-f0-9]{64}',receipt['request_sha256'])
+            or not isinstance(receipt.get('items'),list) or not receipt['items']):
+        raise WorkflowError('Invalid intake batch receipt')
+    try:created=datetime.fromisoformat(receipt['created_at'])
+    except (TypeError,ValueError) as exc:raise WorkflowError('Invalid intake receipt creation time') from exc
+    if created.utcoffset()!=timedelta(0):raise WorkflowError('Intake receipt creation time requires UTC')
+    ids=set()
+    for item in receipt['items']:
+        if not isinstance(item,dict) or not set(item)<=set(FIELDS+GROUPING_FIELDS):
+            raise WorkflowError('Invalid intake receipt item')
+        validate_metadata(item,'Pending Queue')
+        if item.get('intake_batch_ids')!=[batch_id] or item['id'] in ids:
+            raise WorkflowError('Invalid intake receipt membership')
+        ids.add(item['id'])
+    return receipt
+
+def read_intake_receipt(store,batch_id):
+    rel=intake_receipt_path(batch_id)
+    path=store.root/rel
+    if any(part.is_symlink() for part in [path,*path.parents] if part.is_relative_to(store.base)):
+        raise WorkflowError('Intake receipt cannot use a symlink')
+    path=store.owned(rel)
+    if not path.exists():return None
+    return validate_intake_receipt(json.loads(path.read_text()),batch_id)
+
+def intake_item(text,state,payload,batch_id):
+    tasks=parse(text)
+    if not isinstance(payload,dict) or not isinstance(payload.get('title'),str) or not payload['title'].strip():
+        raise WorkflowError('Intake item requires a title')
+    matches=[t for t in tasks if normalized(t['title'])==normalized(payload['title'])]
+    if matches: raise WorkflowError('Possible duplicate task; clarify update/reuse before intake: '+matches[0]['id'])
+    relation=payload.get('relation','main');priority=payload.get('priority')
+    classification=payload.get('classification')
+    if classification is not None:
+        if not isinstance(classification,dict) or not isinstance(classification.get('kind'),str) or classification['kind'] not in {'defect','other'} or not isinstance(classification.get('reason'),str) or not classification['reason'].strip():
+            raise WorkflowError('Intake classification requires defect/other kind and a semantic reason')
+    defect=classification is not None and classification['kind']=='defect'
+    placement=payload.get('relative_priority')
+    if placement is not None:
+        if priority is not None:raise WorkflowError('Conflicting numeric and relative priorities require owner clarification')
+        if not isinstance(placement,dict) or not isinstance(placement.get('direction'),str) or placement['direction'] not in {'above','below'}:
+            raise WorkflowError('Relative priority requires above/below direction and an exact open task ID')
+        anchors=[task for task in tasks if task['id']==placement.get('task_id')]
+        if len(anchors)!=1:raise WorkflowError('Relative priority requires an exact open task ID')
+        priority=anchors[0]['priority']+(1 if placement['direction']=='above' else -1)
+    parent=payload.get('related_task_id');root=payload.get('root_task_id')
+    related_priority=None
+    if relation!='main':
+        related=resolve(tasks,[parent],'Prioritized Next Changes')[0]
+        expected_root=related['root_task_id'] or related['id']
+        if root!=expected_root: raise WorkflowError('Finding root does not match direct parent')
+        root_task=resolve(tasks,[root],'Prioritized Next Changes')[0]
+        related_priority=max((t['priority'] for t in tasks),default=100)+1 if relation in {'blocker','subtask'} else root_task['priority']-1
+    automatic_defect=priority is None and defect and not payload.get('low_priority')
+    if priority is None and defect:
+        priority=25 if payload.get('low_priority') else max((t['priority'] for t in tasks),default=100)+1
+    if priority is None and related_priority is not None:priority=related_priority
+    if priority is None: priority=25 if payload.get('low_priority') else 100
+    meta={'id':identity('P'),'priority':priority,'status':'Pending','parent_pending_ids':[],'processing_run_id':None,'root_task_id':root,'related_task_id':parent,'relation':relation,'depends_on':[]}
+    if 'topic' in payload:meta['topic']=payload['topic']
+    if batch_id is not None:meta['intake_batch_ids']=[batch_id]
+    validate_metadata(meta,'Pending Queue')
+    for field in ['description','expected_behavior']:
+        if not isinstance(payload.get(field),str) or not payload[field].strip(): raise WorkflowError('Intake requires understood '+field)
+    body='Description:\n- '+payload['description']+'\n\nExpected behavior:\n- '+payload['expected_behavior']
+    if classification is not None:
+        body+='\n\nRequest classification:\n- '+classification['kind']+': '+classification['reason']
+    for field,label in [('context','Current context'),('source','Source'),('priority_reason','Priority rationale')]:
+        if payload.get(field): body+='\n\n'+label+':\n- '+payload[field]
+    if automatic_defect and not payload.get('priority_reason'):
+        body+='\n\nPriority rationale:\n- Defect intake receives the highest open Pending, Prioritized or Backlog priority plus one; an empty queue uses the default-100 baseline.'
+    assert_prose(payload['title']+'\n'+body)
+    text=insert(text,'Pending Queue',render(payload['title'],meta,body))
+    run=state['active_run']
+    if run:
+        run['pending_ids'].append(meta['id'])
+        if not run.get('stop_reason'):run['phase']='capture-findings'
+        focus=run.get('maintenance')
+        if focus and parent in focus['admitted_task_ids']:focus['pending_ids'].append(meta['id'])
+    return text,meta
+
+def require_grouped_intake_profile(store):
+    profile_path=store.owned('.skill-tree/installation/profile.json')
+    if not profile_path.exists():return
+    profile=json.loads(profile_path.read_text())
+    proof=profile.get('task_grouping',{})
+    if profile.get('project_root')!=str(store.root) or proof.get('schema')!=TASK_GROUPING_COMPATIBILITY:
+        raise WorkflowError('Grouped intake requires a compatible owned canonical installation')
+    manager=store.owned('.skill-tree/installation/manager.js')
+    environment={key:value for key,value in os.environ.items() if key not in {'NODE_OPTIONS','NODE_PATH'}}
+    try:result=subprocess.run(['node',str(manager),'--verify'],capture_output=True,text=True,timeout=30,env=environment)
+    except (OSError,subprocess.TimeoutExpired) as exc:raise WorkflowError('Could not verify the owned canonical grouping installation') from exc
+    if result.returncode:raise WorkflowError('Grouped intake requires a verified owned canonical installation: '+(result.stderr or result.stdout).strip())
+
+
 def intake(store,payload):
     with store.lock():
-        store.guard(payload.get('expected_source_hash'));text=store.text();tasks=parse(text);state=store.load(text)
-        matches=[t for t in tasks if normalized(t['title'])==normalized(payload['title'])]
-        if matches: raise WorkflowError('Possible duplicate task; clarify update/reuse before intake: '+matches[0]['id'])
-        relation=payload.get('relation','main');priority=payload.get('priority')
-        classification=payload.get('classification')
-        if classification is not None:
-            if not isinstance(classification,dict) or not isinstance(classification.get('kind'),str) or classification['kind'] not in {'defect','other'} or not isinstance(classification.get('reason'),str) or not classification['reason'].strip():
-                raise WorkflowError('Intake classification requires defect/other kind and a semantic reason')
-        defect=classification is not None and classification['kind']=='defect'
-        placement=payload.get('relative_priority')
-        if placement is not None:
-            if priority is not None:raise WorkflowError('Conflicting numeric and relative priorities require owner clarification')
-            if not isinstance(placement,dict) or not isinstance(placement.get('direction'),str) or placement['direction'] not in {'above','below'}:
-                raise WorkflowError('Relative priority requires above/below direction and an exact open task ID')
-            anchors=[task for task in tasks if task['id']==placement.get('task_id')]
-            if len(anchors)!=1:raise WorkflowError('Relative priority requires an exact open task ID')
-            priority=anchors[0]['priority']+(1 if placement['direction']=='above' else -1)
-        parent=payload.get('related_task_id');root=payload.get('root_task_id')
-        related_priority=None
-        if relation!='main':
-            related=resolve(tasks,[parent],'Prioritized Next Changes')[0]
-            expected_root=related['root_task_id'] or related['id']
-            if root!=expected_root: raise WorkflowError('Finding root does not match direct parent')
-            root_task=resolve(tasks,[root],'Prioritized Next Changes')[0]
-            related_priority=max((t['priority'] for t in tasks),default=100)+1 if relation in {'blocker','subtask'} else root_task['priority']-1
-        automatic_defect=priority is None and defect and not payload.get('low_priority')
-        if priority is None and defect:
-            priority=25 if payload.get('low_priority') else max((t['priority'] for t in tasks),default=100)+1
-        if priority is None and related_priority is not None:priority=related_priority
-        if priority is None: priority=25 if payload.get('low_priority') else 100
-        meta={'id':identity('P'),'priority':priority,'status':'Pending','parent_pending_ids':[],'processing_run_id':None,'root_task_id':root,'related_task_id':parent,'relation':relation,'depends_on':[]}
-        validate_metadata(meta,'Pending Queue')
-        for field in ['description','expected_behavior']:
-            if not isinstance(payload.get(field),str) or not payload[field].strip(): raise WorkflowError('Intake requires understood '+field)
-        body='Description:\n- '+payload['description']+'\n\nExpected behavior:\n- '+payload['expected_behavior']
-        if classification is not None:
-            body+='\n\nRequest classification:\n- '+classification['kind']+': '+classification['reason']
-        for field,label in [('context','Current context'),('source','Source'),('priority_reason','Priority rationale')]:
-            if payload.get(field): body+='\n\n'+label+':\n- '+payload[field]
-        if automatic_defect and not payload.get('priority_reason'):
-            body+='\n\nPriority rationale:\n- Defect intake receives the highest open Pending, Prioritized or Backlog priority plus one; an empty queue uses the default-100 baseline.'
-        assert_prose(payload['title']+'\n'+body)
-        text=insert(text,'Pending Queue',render(payload['title'],meta,body))
-        run=state['active_run']
-        if run:
-            run['pending_ids'].append(meta['id'])
-            if not run.get('stop_reason'):run['phase']='capture-findings'
-            focus=run.get('maintenance')
-            if focus and parent in focus['admitted_task_ids']:focus['pending_ids'].append(meta['id'])
-        store.save(text,state)
-        return meta
+        batched='items' in payload
+        if batched and set(payload)-{'items','intake_batch_id','expected_source_hash'}:
+            raise WorkflowError('Batch input permits items, intake batch identity and source guard')
+        items=payload['items'] if batched else [payload]
+        if not isinstance(items,list) or not items or any(not isinstance(item,dict) for item in items):
+            raise WorkflowError('Intake batch requires a nonempty list of items')
+        if batched and any(set(item)&{'items','intake_batch_id','intake_batch_ids','expected_source_hash'} for item in items):
+            raise WorkflowError('The intake envelope owns batch identity and source guard')
+        if not batched and 'intake_batch_ids' in payload:
+            raise WorkflowError('Intake batch provenance is assigned by intake')
+        batch_id=payload.get('intake_batch_id')
+        if batched or 'intake_batch_id' in payload or 'topic' in payload:
+            if not valid_id(batch_id,'IB'):raise WorkflowError('Grouped intake requires a caller-held IB identity')
+        if batch_id is not None:
+            rel=intake_receipt_path(batch_id)
+            request_sha=digest(dump({'batched':batched,'items':[{k:v for k,v in item.items()
+                if k not in {'expected_source_hash','intake_batch_id'}} for item in items]}).encode())
+            receipt=read_intake_receipt(store,batch_id)
+            if receipt:
+                if receipt['request_sha256']!=request_sha:raise WorkflowError('Intake batch identity already belongs to a different request')
+                navigation=manifest(store)
+                if file_hash(store.base/'skill-tree.json')!=digest(dump(navigation).encode()):
+                    store.commit({'.skill-tree/skill-tree.json':dump(navigation)})
+                return receipt if batched else receipt['items'][0]
+            if not payload.get('expected_source_hash'):raise WorkflowError('New grouped intake requires the inspected source hash')
+            require_grouped_intake_profile(store)
+            store.expect_unchanged(rel,None)
+        store.guard(payload.get('expected_source_hash'))
+        text=store.text()
+        state=store.load(text)
+        created=[]
+        for item in items:
+            text,meta=intake_item(text,state,item,batch_id)
+            created.append(meta)
+        extras=None
+        if batch_id is not None:
+            receipt={'schema':1,'id':batch_id,'created_at':now(),'request_sha256':request_sha,'items':created}
+            validate_intake_receipt(receipt,batch_id)
+            extras={rel:dump(receipt)}
+        store.save(text,state,extras)
+        return receipt if batched else created[0]
 
 def capture_foundation(store):
     profile=store.source_root/'.skill-tree/installation/profile.json'
@@ -510,6 +638,8 @@ def processing_helper():
 
 def process(store,payload):
     """Apply researched dispositions and publish optional holds atomically."""
+    if {'topic', 'intake_batch_ids', 'group'} & payload.keys():
+        raise WorkflowError('Resolve group filters before processing and pass the exact Pending IDs and source hash')
     proposed=payload.get('dispositions',{})
     due=[tid for tid,row in proposed.items() if isinstance(row,dict) and row.get('status') in {'promoted','resolved'}] if isinstance(proposed,dict) else []
     if due:prepare_hook_admission(store,scope={'kind':'pending','pending_ids':due})
@@ -556,6 +686,7 @@ def _processing_proposal(store,payload,text,state,assigned,pr):
     # Allocate every identity before resolving forward references; no writes occur until validation succeeds.
     keys={}
     for spec,task_id in zip(specs,assigned):
+        if set(spec).intersection(GROUPING_FIELDS):raise WorkflowError('Processing grouping must derive from actual Pending origins')
         key=spec.get('key')
         if key is not None:
             if not isinstance(key,str) or not re.fullmatch(r'[a-z][a-z0-9-]*',key):raise WorkflowError('Task key requires lowercase kebab-case')
@@ -587,11 +718,12 @@ def _processing_proposal(store,payload,text,state,assigned,pr):
             if (reused_task['root_task_id'],reused_task['related_task_id'],reused_task['relation'])!=(root or reused_task['id'],parent,relation): raise WorkflowError('Reused task relationship conflicts')
             merged=list(dict.fromkeys(reused_task['parent_pending_ids']+parents))
             deps=list(dict.fromkeys(reused_task['depends_on']+dependencies(spec)))
-            text=rewrite_meta(text,reused_task['id'],{'parent_pending_ids':merged,'processing_run_id':pr,'depends_on':deps});reused.append(reused_task['id']); continue
+            text=rewrite_meta(text,reused_task['id'],{'parent_pending_ids':merged,'processing_run_id':pr,'depends_on':deps,**merged_grouping([reused_task]+sources)});reused.append(reused_task['id']); continue
         assert_prose(spec['title']+'\n'+spec['body'])
         priority=spec.get('priority',max(t['priority'] for t in sources))
         meta={'id':task_id,'priority':priority,'status':'Ready','parent_pending_ids':parents,'processing_run_id':pr,'root_task_id':root or task_id,'related_task_id':parent,'relation':relation,'depends_on':dependencies(spec)}
-        meta.update({key:spec[key] for key in OPTIONAL_FIELDS if spec.get(key) is not None})
+        meta.update({key:spec[key] for key in VALIDATION_FIELDS if spec.get(key) is not None})
+        meta.update(merged_grouping(sources))
         validate_metadata(meta,'Prioritized Next Changes')
         if any(t['id'] not in parents and normalized(t['title'])==normalized(spec['title']) for t in parse(text)): raise WorkflowError('Duplicate produced title requires explicit reuse')
         text=insert(text,'Prioritized Next Changes',render(spec['title'],meta,spec['body']));produced.append(task_id)
@@ -635,6 +767,75 @@ def _processing_proposal(store,payload,text,state,assigned,pr):
             focus['admitted_task_ids']=sorted(focused);focus['required_ids']=sorted(focused)
     return text,receipt
 
+def group_selection(store, payload):
+    """Resolve an explicit group from one read of the canonical queue."""
+    queues = {'pending': 'Pending Queue', 'prioritized': 'Prioritized Next Changes'}
+    if (not isinstance(payload, dict) or set(payload)-{'queue', 'topic', 'intake_batch_ids'}
+            or not isinstance(payload.get('queue'), str) or payload['queue'] not in queues):
+        raise WorkflowError('Group selection requires pending or prioritized queue and explicit filters')
+    if not {'topic', 'intake_batch_ids'} & payload.keys():
+        raise WorkflowError('Group selection requires an exact topic or explicit intake batch IDs')
+    topic = payload.get('topic')
+    if 'topic' in payload and (not isinstance(topic, str) or not TOPIC_PATTERN.fullmatch(topic)):
+        raise WorkflowError('Group selection requires a lowercase kebab-case topic')
+    batch_ids = payload.get('intake_batch_ids', [])
+    if 'intake_batch_ids' in payload and (
+            not isinstance(batch_ids, list) or not batch_ids
+            or any(not valid_id(batch_id, 'IB') for batch_id in batch_ids)
+            or len(set(batch_ids)) != len(batch_ids)):
+        raise WorkflowError('Group selection requires a nonempty list of distinct intake batch IDs')
+    receipt_members = {}
+    for batch_id in batch_ids:
+        receipt = read_intake_receipt(store, batch_id)
+        if receipt is None:
+            raise WorkflowError('Unknown intake batch: '+batch_id)
+        receipt_members[batch_id] = {item['id'] for item in receipt['items']}
+    queue = store.owned('.skill-tree/documents/future.md').read_bytes()
+    tasks = parse(queue.decode('utf-8'))
+    requested = set(batch_ids)
+    group = sorted(
+        (task for task in tasks if task['queue'] == queues[payload['queue']]
+         and (topic is None or task.get('topic') == topic)
+         and (not requested or requested.intersection(task.get('intake_batch_ids', [])))),
+        key=lambda task: -task['priority'],
+    )
+    if not group:
+        raise WorkflowError('The explicit group has no tasks in the selected queue')
+    for task in group:
+        for batch_id, origins in event_intake_origins([task]).items():
+            if batch_id in receipt_members and not origins.intersection(receipt_members[batch_id]):
+                raise WorkflowError('Selected task lacks original Pending provenance: '+task['id'])
+    ids = [task['id'] for task in group]
+    outside = dependency_scope(tasks, {'snapshot': ids}) - set(ids)
+    return {
+        'ids': ids,
+        'tasks': group,
+        'outside_dependencies': sorted(outside),
+        'source_hash': digest(queue),
+    }
+
+
+def recent_intake_batches(store, payload):
+    """List recent recorded invocations without selecting a task."""
+    if (not isinstance(payload, dict) or set(payload)-{'limit'}
+            or type(payload.get('limit', 10)) is not int or payload.get('limit', 10) < 1):
+        raise WorkflowError('Recent intake batch limit requires a positive integer')
+    directory = store.owned(INTAKE_RECEIPTS)
+    if directory.is_symlink():
+        raise WorkflowError('Intake receipt directory cannot use a symlink')
+    receipts = []
+    for path in directory.glob('ib-*.json'):
+        receipt = read_intake_receipt(store, 'IB-'+path.stem[3:])
+        if receipt is not None:
+            receipts.append(receipt)
+    receipts.sort(key=lambda receipt: (datetime.fromisoformat(receipt['created_at']), receipt['id']), reverse=True)
+    return [
+        {'id': receipt['id'], 'created_at': receipt['created_at'],
+         'pending_ids': [item['id'] for item in receipt['items']]}
+        for receipt in receipts[:payload.get('limit', 10)]
+    ]
+
+
 def _start_selection(store,mode,selector,workspace,text=None):
     tasks=parse(store.text() if text is None else text);options=workspace or {}
     scoped='snapshot_ids' in options
@@ -655,11 +856,20 @@ def _start_selection(store,mode,selector,workspace,text=None):
     return tasks,chosen,snapshot
 
 def start(store,mode,selector=None,limits=None,workspace=None):
+    options = workspace or {}
+    if {'topic', 'intake_batch_ids', 'group'} & options.keys():
+        raise WorkflowError('Resolve group filters before start and pass the exact snapshot IDs and source hash')
+    expected_hash = options.get('expected_source_hash')
+    if 'expected_source_hash' in options:
+        if not isinstance(expected_hash, str) or not re.fullmatch('[a-f0-9]{64}', expected_hash):
+            raise WorkflowError('Start source guard requires the inspected queue SHA-256')
+        store.guard(expected_hash)
     admission=admit_profile(store)
     pre_tasks,pre_chosen,pre_snapshot=_start_selection(store,mode,selector,workspace)
     for tid in dependency_scope(pre_tasks,{'snapshot':pre_snapshot}):prepare_hook_admission(store,scope=tid)
     with store.lock():
         text=store.text();state=store.load(text)
+        store.guard(expected_hash)
         registry=state.get('run_registry')
         if not registry and state['active_run'] is not None: raise WorkflowError('Active run exists; resume the recorded run')
         if not registry and workspaces.common_dir(store.root):raise WorkflowError('Git controllers require workspace-setup before start')
@@ -857,6 +1067,7 @@ def complete(store,payload):
                 if not required_refs.issubset({ref['path'] for ref in accepted['evidence']}):raise WorkflowError('Acceptance evidence does not match the required check receipts')
         task_context={'semantic_fingerprint':clarification_fingerprints(clarification_baselines([task]))[task['id']],'content_fingerprint':digest(task['body'].encode())}
         record={'task_context':task_context,'run_id':state['active_run']['id'] if state['active_run'] else None,'validation_group_id':task.get('validation_group_id'),'boundary_validation':task.get('boundary_validation','not-required'),'validation_plan':check_specs(task),'validation_signature':task_signature(task),'check_results':validation_records,'depends_on':task['depends_on'],'id':identity('O'),'task_id':task['id'],'title':task['title'],'root_task_id':task['root_task_id'],'related_task_id':task['related_task_id'],'parent_pending_ids':task['parent_pending_ids'],'disposition':disposition,'outcome':payload['outcome'],'acceptance':payload.get('acceptance',[]),'limitations':payload.get('limitations',[]),'followup_ids':payload.get('followup_ids',[]),'source_fingerprints':payload.get('source_fingerprints',{}),'commits':payload.get('commits',[]),'evidence':[evidence_pointer(store,e) for e in payload.get('evidence',[])],'recorded_at':now()}
+        record.update(grouping_fields(task))
         ledger=''.join(json.dumps(o,ensure_ascii=False,sort_keys=True)+'\n' for o in outcomes+[record])
         if state['active_run']:
             run=state['active_run'];run.setdefault('completion_refs',{})[task['id']]=record['id'];run['completed_ids'].append(task['id']) if disposition=='completed' else None
@@ -2407,25 +2618,70 @@ def export_run(store):
     workspaces.atomic(path,package)
     return {'path':relative,'events':len(events),'queue_id':package['queue_id']}
 
+def event_intake_origins(tasks):
+    origins={}
+    for task in tasks:
+        pending=set(task.get('parent_pending_ids',[]))
+        if task.get('queue')=='Pending Queue':pending.add(task['id'])
+        for batch in task.get('intake_batch_ids',[]):origins.setdefault(batch,set()).update(pending)
+    return origins
+
+
+def replay_intake_receipts(store,event,grouped,extras):
+    origins=event_intake_origins(grouped+event['outcomes'])
+    supplied=event.get('intake_receipts',[])
+    if not isinstance(supplied,list):raise WorkflowError('Invalid event intake receipts')
+    seen=set()
+    for value in supplied:
+        batch=value.get('id') if isinstance(value,dict) else None
+        if batch not in origins or batch in seen:raise WorkflowError('Event intake receipt lacks distinct task lineage')
+        seen.add(batch)
+        receipt=validate_intake_receipt(value,batch)
+        if not origins[batch].intersection(item['id'] for item in receipt['items']):raise WorkflowError('Event intake receipt lacks original Pending provenance')
+        rel=intake_receipt_path(batch)
+        existing=json.loads(extras[rel]) if rel in extras else read_intake_receipt(store,batch)
+        if existing and existing!=receipt:raise WorkflowError('Event intake receipt conflict: '+batch)
+        if not existing:
+            store.expect_unchanged(rel,None)
+            extras[rel]=dump(receipt)
+
+
 def replay_events(store,payload):
     # Semantic compare-and-swap deltas preserve unrelated queue entries and outcomes.
     with store.lock():
         text=store.text();state=store.load(text);registry=state.get('run_registry')
         if not registry or payload.get('schema')!=1 or payload.get('queue_id')!=registry['queue_id']:raise WorkflowError('Event replay queue identity mismatch')
-        applied=set(registry.get('applied_events',[]));outcomes=store.outcomes();outcome_ids={o['id']:o for o in outcomes}
+        applied=set(registry.get('applied_events',[]));outcomes=store.outcomes();outcome_ids={o['id']:o for o in outcomes};extras={}
         for event in payload.get('events',[]):
-            if event.get('id') in applied:continue
+            if event.get('id') in applied:
+                receipts=event.get('intake_receipts',[])
+                if not isinstance(receipts,list):raise WorkflowError('Invalid event intake receipts')
+                for value in receipts:
+                    batch=value.get('id') if isinstance(value,dict) else None
+                    rel=intake_receipt_path(batch)
+                    existing=json.loads(extras[rel]) if rel in extras else read_intake_receipt(store,batch)
+                    if existing!=validate_intake_receipt(value,batch):raise WorkflowError('Event intake receipt conflict: '+batch)
+                continue
             locator=workspaces.runtime(store.root);run_path=locator['worktrees'].get(event['run_id']) if locator else None
             if not run_path:raise WorkflowError('Event replay requires an explicitly recovered run worktree locator')
             event=workspaces.restore_envelope(event,run_path,store.root,payload.get('local_paths',{}))
             if event.get('queue_id')!=registry['queue_id'] or event.get('run_id')!=payload.get('run_id'):raise WorkflowError('Event replay run identity mismatch')
+            grouped=[]
             for change in event['changes']:
+                if event.get('intake_receipts'):
+                    for version in (change['before'],change['after']):
+                        if version:
+                            empty='# Future Work\n\n## Pending Task Format\n\n'+''.join('## '+queue+'\n\n'+(version['body'] if queue==version['queue'] else '') for queue in QUEUES)
+                            entry=parse(empty)
+                            if len(entry)!=1 or entry[0]['id']!=change['task_id']:raise WorkflowError('Invalid event task lineage')
+                            grouped.extend(entry)
                 matches=[t for t in parse(text) if t['id']==change['task_id']]
                 current={'queue':matches[0]['queue'],'body':matches[0]['body']} if matches else None
                 if current==change['after']:continue
                 if current!=change['before']:raise WorkflowError('Event conflicts with canonical task: '+change['task_id'])
                 if matches:text=remove(text,{change['task_id']})
                 if change['after']:text=insert(text,change['after']['queue'],change['after']['body'])
+            replay_intake_receipts(store,event,grouped,extras)
             for change in event.get('progress_changes',[]):
                 tid=change['task_id'];current_progress=state['task_progress'].get(tid)
                 if current_progress==change['after']:continue
@@ -2445,7 +2701,8 @@ def replay_events(store,payload):
         validate_dependencies(parse(text),{o['task_id'] for o in outcomes if o['disposition']=='completed'})
         registry['applied_events']=sorted(applied)
         ledger=''.join(json.dumps(o,ensure_ascii=False,sort_keys=True)+'\n' for o in outcomes)
-        store.save(text,state,{'.skill-tree/history/task-outcomes.jsonl':ledger})
+        extras['.skill-tree/history/task-outcomes.jsonl']=ledger
+        store.save(text,state,extras)
         return {'applied_events':len(applied)}
 
 
@@ -3476,7 +3733,7 @@ def clarification_semantics(task):
     fields={key:[] for key in CLARIFICATION_FIELDS-{'title','dependencies'}}
     for name,lines in sections.items():fields[mapping.get(name,'content')].append((name,clarification_text_semantics(''.join(lines))))
     fields={key:value for key,value in fields.items()}
-    fields['validation'].append(('metadata',{key:task.get(key) for key in OPTIONAL_FIELDS}))
+    fields['validation'].append(('metadata',{key:task.get(key) for key in VALIDATION_FIELDS}))
     fields['content'].append(('identity',clarification_identity(task)))
     fields.update(title=task['title'],dependencies=task['depends_on'])
     return {key:digest(dump(value).encode()) for key,value in fields.items()}
@@ -3824,7 +4081,7 @@ def clarification_mutate(store,command,payload):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     args=parser.parse_args(argv)
     try:
         store=Store(args.root,args.run_id,allow_unselected=args.command in {'index','runs','manifest','start','workspace-setup','recover-locator'},route_queue=args.command!='recover-locator');payload=json.loads(args.input.read_text()) if args.input else {}
@@ -3862,6 +4119,22 @@ def main(argv=None):
         elif cmd=='select':
             result=select(parse(store.text()),args.id);clarification_admission(store,result['id'])
         elif cmd=='pending':result=resolve(parse(store.text()),args.names or ([args.id] if args.id else []),'Pending Queue')
+        elif cmd=='group-selection':
+            if args.id is not None or args.names is not None or args.apply:
+                raise WorkflowError('Group selection accepts only a read-only group payload')
+            result=group_selection(store,payload)
+        elif cmd=='recent-batches':
+            if args.id is not None or args.names is not None or args.apply:
+                raise WorkflowError('Recent intake batches accepts only a read-only limit payload')
+            result=recent_intake_batches(store,payload)
+        elif cmd in {'task-grouping-preview','task-grouping-apply'}:
+            from types import SimpleNamespace
+            if args.run_id or args.id or args.names is not None or args.apply:
+                raise WorkflowError('Task grouping migration requires an exact standalone migration payload')
+            store=Store(args.root,allow_unselected=True,neutral=True)
+            helper=owned_module('skill_tree_task_grouping_migration',Path(__file__).with_name('task-grouping-migration.py'))
+            helper.wf=SimpleNamespace(**globals())
+            result=helper.migrate(store,cmd,payload)
         elif cmd=='intake':result=intake(store,payload)
         elif cmd=='capture-foundation':result=capture_foundation(store)
         elif cmd=='begin':result=begin_task(store,payload)

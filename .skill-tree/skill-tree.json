@@ -124,6 +124,7 @@
         ".skill-tree/skills/general/skill-tree-add-pending-task/scripts/plugin-runtime.js",
         ".skill-tree/skills/general/skill-tree-add-pending-task/scripts/plugin-sources.js",
         ".skill-tree/skills/general/skill-tree-add-pending-task/scripts/run-workspaces.py",
+        ".skill-tree/skills/general/skill-tree-add-pending-task/scripts/task-grouping-migration.py",
         ".skill-tree/skills/general/skill-tree-add-pending-task/scripts/validate-document-rules.py",
         ".skill-tree/skills/general/skill-tree-add-pending-task/scripts/workflow-state.py"
       ]
@@ -161,6 +162,7 @@
         ".skill-tree/skills/general/skill-tree-clarify-tasks/scripts/plugin-sources.js",
         ".skill-tree/skills/general/skill-tree-clarify-tasks/scripts/run-workspaces.py",
         ".skill-tree/skills/general/skill-tree-clarify-tasks/scripts/select-prioritized-task.py",
+        ".skill-tree/skills/general/skill-tree-clarify-tasks/scripts/task-grouping-migration.py",
         ".skill-tree/skills/general/skill-tree-clarify-tasks/scripts/validate-document-rules.py",
         ".skill-tree/skills/general/skill-tree-clarify-tasks/scripts/workflow-state.py"
       ]
@@ -192,6 +194,7 @@
         ".skill-tree/skills/general/skill-tree-create-documents-snapshot/scripts/plugin-runtime.js",
         ".skill-tree/skills/general/skill-tree-create-documents-snapshot/scripts/plugin-sources.js",
         ".skill-tree/skills/general/skill-tree-create-documents-snapshot/scripts/run-workspaces.py",
+        ".skill-tree/skills/general/skill-tree-create-documents-snapshot/scripts/task-grouping-migration.py",
         ".skill-tree/skills/general/skill-tree-create-documents-snapshot/scripts/validate-document-rules.py",
         ".skill-tree/skills/general/skill-tree-create-documents-snapshot/scripts/workflow-state.py"
       ]
@@ -231,6 +234,7 @@
         ".skill-tree/skills/general/skill-tree-implement-all/scripts/plugin-sources.js",
         ".skill-tree/skills/general/skill-tree-implement-all/scripts/pr-review-state.py",
         ".skill-tree/skills/general/skill-tree-implement-all/scripts/run-workspaces.py",
+        ".skill-tree/skills/general/skill-tree-implement-all/scripts/task-grouping-migration.py",
         ".skill-tree/skills/general/skill-tree-implement-all/scripts/validate-document-rules.py",
         ".skill-tree/skills/general/skill-tree-implement-all/scripts/workflow-state.py"
       ]
@@ -268,6 +272,7 @@
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/scripts/plugin-sources.js",
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/scripts/run-workspaces.py",
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/scripts/select-prioritized-task.py",
+        ".skill-tree/skills/general/skill-tree-implement-next-future-task/scripts/task-grouping-migration.py",
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/scripts/validate-document-rules.py",
         ".skill-tree/skills/general/skill-tree-implement-next-future-task/scripts/workflow-state.py"
       ]
@@ -369,6 +374,7 @@
         ".skill-tree/skills/general/skill-tree-narative/scripts/plugin-runtime.js",
         ".skill-tree/skills/general/skill-tree-narative/scripts/plugin-sources.js",
         ".skill-tree/skills/general/skill-tree-narative/scripts/run-workspaces.py",
+        ".skill-tree/skills/general/skill-tree-narative/scripts/task-grouping-migration.py",
         ".skill-tree/skills/general/skill-tree-narative/scripts/validate-document-rules.py",
         ".skill-tree/skills/general/skill-tree-narative/scripts/workflow-state.py"
       ]
@@ -399,6 +405,7 @@
         ".skill-tree/skills/general/skill-tree-plugins/scripts/plugin-runtime.js",
         ".skill-tree/skills/general/skill-tree-plugins/scripts/plugin-sources.js",
         ".skill-tree/skills/general/skill-tree-plugins/scripts/run-workspaces.py",
+        ".skill-tree/skills/general/skill-tree-plugins/scripts/task-grouping-migration.py",
         ".skill-tree/skills/general/skill-tree-plugins/scripts/validate-document-rules.py",
         ".skill-tree/skills/general/skill-tree-plugins/scripts/workflow-state.py"
       ]
@@ -433,6 +440,7 @@
         ".skill-tree/skills/general/skill-tree-pr-review-cycle/scripts/plugin-sources.js",
         ".skill-tree/skills/general/skill-tree-pr-review-cycle/scripts/pr-review-state.py",
         ".skill-tree/skills/general/skill-tree-pr-review-cycle/scripts/run-workspaces.py",
+        ".skill-tree/skills/general/skill-tree-pr-review-cycle/scripts/task-grouping-migration.py",
         ".skill-tree/skills/general/skill-tree-pr-review-cycle/scripts/validate-document-rules.py",
         ".skill-tree/skills/general/skill-tree-pr-review-cycle/scripts/workflow-state.py"
       ]
@@ -468,6 +476,7 @@
         ".skill-tree/skills/general/skill-tree-process-future-pending/scripts/plugin-runtime.js",
         ".skill-tree/skills/general/skill-tree-process-future-pending/scripts/plugin-sources.js",
         ".skill-tree/skills/general/skill-tree-process-future-pending/scripts/run-workspaces.py",
+        ".skill-tree/skills/general/skill-tree-process-future-pending/scripts/task-grouping-migration.py",
         ".skill-tree/skills/general/skill-tree-process-future-pending/scripts/validate-document-rules.py",
         ".skill-tree/skills/general/skill-tree-process-future-pending/scripts/validate-future-document.py",
         ".skill-tree/skills/general/skill-tree-process-future-pending/scripts/workflow-state.py"
@@ -505,6 +514,7 @@
         ".skill-tree/skills/general/skill-tree-repo-documentation/scripts/plugin-runtime.js",
         ".skill-tree/skills/general/skill-tree-repo-documentation/scripts/plugin-sources.js",
         ".skill-tree/skills/general/skill-tree-repo-documentation/scripts/run-workspaces.py",
+        ".skill-tree/skills/general/skill-tree-repo-documentation/scripts/task-grouping-migration.py",
         ".skill-tree/skills/general/skill-tree-repo-documentation/scripts/validate-document-rules.py",
         ".skill-tree/skills/general/skill-tree-repo-documentation/scripts/validate-future-document.py",
         ".skill-tree/skills/general/skill-tree-repo-documentation/scripts/validate-repository-documentation.py",
@@ -543,6 +553,7 @@
         ".skill-tree/skills/general/skill-tree-repo-documentation-audit/scripts/plugin-runtime.js",
         ".skill-tree/skills/general/skill-tree-repo-documentation-audit/scripts/plugin-sources.js",
         ".skill-tree/skills/general/skill-tree-repo-documentation-audit/scripts/run-workspaces.py",
+        ".skill-tree/skills/general/skill-tree-repo-documentation-audit/scripts/task-grouping-migration.py",
         ".skill-tree/skills/general/skill-tree-repo-documentation-audit/scripts/validate-document-rules.py",
         ".skill-tree/skills/general/skill-tree-repo-documentation-audit/scripts/validate-future-document.py",
         ".skill-tree/skills/general/skill-tree-repo-documentation-audit/scripts/validate-repository-documentation.py",
@@ -584,6 +595,7 @@
         ".skill-tree/skills/general/skill-tree-work-through-next/scripts/plugin-sources.js",
         ".skill-tree/skills/general/skill-tree-work-through-next/scripts/pr-review-state.py",
         ".skill-tree/skills/general/skill-tree-work-through-next/scripts/run-workspaces.py",
+        ".skill-tree/skills/general/skill-tree-work-through-next/scripts/task-grouping-migration.py",
         ".skill-tree/skills/general/skill-tree-work-through-next/scripts/validate-document-rules.py",
         ".skill-tree/skills/general/skill-tree-work-through-next/scripts/workflow-state.py"
       ]
@@ -621,6 +633,7 @@
         ".skill-tree/skills/unity/skill-tree-add-pending-task/scripts/plugin-runtime.js",
         ".skill-tree/skills/unity/skill-tree-add-pending-task/scripts/plugin-sources.js",
         ".skill-tree/skills/unity/skill-tree-add-pending-task/scripts/run-workspaces.py",
+        ".skill-tree/skills/unity/skill-tree-add-pending-task/scripts/task-grouping-migration.py",
         ".skill-tree/skills/unity/skill-tree-add-pending-task/scripts/validate-document-rules.py",
         ".skill-tree/skills/unity/skill-tree-add-pending-task/scripts/workflow-state.py"
       ]
@@ -662,6 +675,7 @@
         ".skill-tree/skills/unity/skill-tree-clarify-tasks/scripts/plugin-sources.js",
         ".skill-tree/skills/unity/skill-tree-clarify-tasks/scripts/run-workspaces.py",
         ".skill-tree/skills/unity/skill-tree-clarify-tasks/scripts/select-prioritized-task.py",
+        ".skill-tree/skills/unity/skill-tree-clarify-tasks/scripts/task-grouping-migration.py",
         ".skill-tree/skills/unity/skill-tree-clarify-tasks/scripts/validate-document-rules.py",
         ".skill-tree/skills/unity/skill-tree-clarify-tasks/scripts/workflow-state.py"
       ]
@@ -697,6 +711,7 @@
         ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/scripts/plugin-runtime.js",
         ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/scripts/plugin-sources.js",
         ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/scripts/run-workspaces.py",
+        ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/scripts/task-grouping-migration.py",
         ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/scripts/validate-document-rules.py",
         ".skill-tree/skills/unity/skill-tree-create-documents-snapshot/scripts/workflow-state.py"
       ]
@@ -740,6 +755,7 @@
         ".skill-tree/skills/unity/skill-tree-implement-all/scripts/plugin-sources.js",
         ".skill-tree/skills/unity/skill-tree-implement-all/scripts/pr-review-state.py",
         ".skill-tree/skills/unity/skill-tree-implement-all/scripts/run-workspaces.py",
+        ".skill-tree/skills/unity/skill-tree-implement-all/scripts/task-grouping-migration.py",
         ".skill-tree/skills/unity/skill-tree-implement-all/scripts/validate-document-rules.py",
         ".skill-tree/skills/unity/skill-tree-implement-all/scripts/workflow-state.py"
       ]
@@ -781,6 +797,7 @@
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/scripts/plugin-sources.js",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/scripts/run-workspaces.py",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/scripts/select-prioritized-task.py",
+        ".skill-tree/skills/unity/skill-tree-implement-next-future-task/scripts/task-grouping-migration.py",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/scripts/validate-document-rules.py",
         ".skill-tree/skills/unity/skill-tree-implement-next-future-task/scripts/workflow-state.py"
       ]
@@ -886,6 +903,7 @@
         ".skill-tree/skills/unity/skill-tree-narative/scripts/plugin-runtime.js",
         ".skill-tree/skills/unity/skill-tree-narative/scripts/plugin-sources.js",
         ".skill-tree/skills/unity/skill-tree-narative/scripts/run-workspaces.py",
+        ".skill-tree/skills/unity/skill-tree-narative/scripts/task-grouping-migration.py",
         ".skill-tree/skills/unity/skill-tree-narative/scripts/validate-document-rules.py",
         ".skill-tree/skills/unity/skill-tree-narative/scripts/workflow-state.py"
       ]
@@ -920,6 +938,7 @@
         ".skill-tree/skills/unity/skill-tree-plugins/scripts/plugin-runtime.js",
         ".skill-tree/skills/unity/skill-tree-plugins/scripts/plugin-sources.js",
         ".skill-tree/skills/unity/skill-tree-plugins/scripts/run-workspaces.py",
+        ".skill-tree/skills/unity/skill-tree-plugins/scripts/task-grouping-migration.py",
         ".skill-tree/skills/unity/skill-tree-plugins/scripts/validate-document-rules.py",
         ".skill-tree/skills/unity/skill-tree-plugins/scripts/workflow-state.py"
       ]
@@ -958,6 +977,7 @@
         ".skill-tree/skills/unity/skill-tree-pr-review-cycle/scripts/plugin-sources.js",
         ".skill-tree/skills/unity/skill-tree-pr-review-cycle/scripts/pr-review-state.py",
         ".skill-tree/skills/unity/skill-tree-pr-review-cycle/scripts/run-workspaces.py",
+        ".skill-tree/skills/unity/skill-tree-pr-review-cycle/scripts/task-grouping-migration.py",
         ".skill-tree/skills/unity/skill-tree-pr-review-cycle/scripts/validate-document-rules.py",
         ".skill-tree/skills/unity/skill-tree-pr-review-cycle/scripts/workflow-state.py"
       ]
@@ -997,6 +1017,7 @@
         ".skill-tree/skills/unity/skill-tree-process-future-pending/scripts/plugin-runtime.js",
         ".skill-tree/skills/unity/skill-tree-process-future-pending/scripts/plugin-sources.js",
         ".skill-tree/skills/unity/skill-tree-process-future-pending/scripts/run-workspaces.py",
+        ".skill-tree/skills/unity/skill-tree-process-future-pending/scripts/task-grouping-migration.py",
         ".skill-tree/skills/unity/skill-tree-process-future-pending/scripts/validate-document-rules.py",
         ".skill-tree/skills/unity/skill-tree-process-future-pending/scripts/validate-future-document.py",
         ".skill-tree/skills/unity/skill-tree-process-future-pending/scripts/workflow-state.py"
@@ -1038,6 +1059,7 @@
         ".skill-tree/skills/unity/skill-tree-repo-documentation/scripts/plugin-runtime.js",
         ".skill-tree/skills/unity/skill-tree-repo-documentation/scripts/plugin-sources.js",
         ".skill-tree/skills/unity/skill-tree-repo-documentation/scripts/run-workspaces.py",
+        ".skill-tree/skills/unity/skill-tree-repo-documentation/scripts/task-grouping-migration.py",
         ".skill-tree/skills/unity/skill-tree-repo-documentation/scripts/validate-document-rules.py",
         ".skill-tree/skills/unity/skill-tree-repo-documentation/scripts/validate-future-document.py",
         ".skill-tree/skills/unity/skill-tree-repo-documentation/scripts/validate-repository-documentation.py",
@@ -1080,6 +1102,7 @@
         ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/scripts/plugin-runtime.js",
         ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/scripts/plugin-sources.js",
         ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/scripts/run-workspaces.py",
+        ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/scripts/task-grouping-migration.py",
         ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/scripts/validate-document-rules.py",
         ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/scripts/validate-future-document.py",
         ".skill-tree/skills/unity/skill-tree-repo-documentation-audit/scripts/validate-repository-documentation.py",
@@ -1125,6 +1148,7 @@
         ".skill-tree/skills/unity/skill-tree-work-through-next/scripts/plugin-sources.js",
         ".skill-tree/skills/unity/skill-tree-work-through-next/scripts/pr-review-state.py",
         ".skill-tree/skills/unity/skill-tree-work-through-next/scripts/run-workspaces.py",
+        ".skill-tree/skills/unity/skill-tree-work-through-next/scripts/task-grouping-migration.py",
         ".skill-tree/skills/unity/skill-tree-work-through-next/scripts/validate-document-rules.py",
         ".skill-tree/skills/unity/skill-tree-work-through-next/scripts/workflow-state.py"
       ]
@@ -1159,6 +1183,7 @@
         ".skill-tree/skills/web/skill-tree-add-pending-task/scripts/plugin-runtime.js",
         ".skill-tree/skills/web/skill-tree-add-pending-task/scripts/plugin-sources.js",
         ".skill-tree/skills/web/skill-tree-add-pending-task/scripts/run-workspaces.py",
+        ".skill-tree/skills/web/skill-tree-add-pending-task/scripts/task-grouping-migration.py",
         ".skill-tree/skills/web/skill-tree-add-pending-task/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-add-pending-task/scripts/workflow-state.py"
       ]
@@ -1197,6 +1222,7 @@
         ".skill-tree/skills/web/skill-tree-clarify-tasks/scripts/plugin-sources.js",
         ".skill-tree/skills/web/skill-tree-clarify-tasks/scripts/run-workspaces.py",
         ".skill-tree/skills/web/skill-tree-clarify-tasks/scripts/select-prioritized-task.py",
+        ".skill-tree/skills/web/skill-tree-clarify-tasks/scripts/task-grouping-migration.py",
         ".skill-tree/skills/web/skill-tree-clarify-tasks/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-clarify-tasks/scripts/workflow-state.py"
       ]
@@ -1229,6 +1255,7 @@
         ".skill-tree/skills/web/skill-tree-create-documents-snapshot/scripts/plugin-runtime.js",
         ".skill-tree/skills/web/skill-tree-create-documents-snapshot/scripts/plugin-sources.js",
         ".skill-tree/skills/web/skill-tree-create-documents-snapshot/scripts/run-workspaces.py",
+        ".skill-tree/skills/web/skill-tree-create-documents-snapshot/scripts/task-grouping-migration.py",
         ".skill-tree/skills/web/skill-tree-create-documents-snapshot/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-create-documents-snapshot/scripts/workflow-state.py"
       ]
@@ -1269,6 +1296,7 @@
         ".skill-tree/skills/web/skill-tree-implement-all/scripts/plugin-sources.js",
         ".skill-tree/skills/web/skill-tree-implement-all/scripts/pr-review-state.py",
         ".skill-tree/skills/web/skill-tree-implement-all/scripts/run-workspaces.py",
+        ".skill-tree/skills/web/skill-tree-implement-all/scripts/task-grouping-migration.py",
         ".skill-tree/skills/web/skill-tree-implement-all/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-implement-all/scripts/workflow-state.py"
       ]
@@ -1307,6 +1335,7 @@
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/scripts/plugin-sources.js",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/scripts/run-workspaces.py",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/scripts/select-prioritized-task.py",
+        ".skill-tree/skills/web/skill-tree-implement-next-future-task/scripts/task-grouping-migration.py",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-implement-next-future-task/scripts/workflow-state.py"
       ]
@@ -1409,6 +1438,7 @@
         ".skill-tree/skills/web/skill-tree-narative/scripts/plugin-runtime.js",
         ".skill-tree/skills/web/skill-tree-narative/scripts/plugin-sources.js",
         ".skill-tree/skills/web/skill-tree-narative/scripts/run-workspaces.py",
+        ".skill-tree/skills/web/skill-tree-narative/scripts/task-grouping-migration.py",
         ".skill-tree/skills/web/skill-tree-narative/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-narative/scripts/workflow-state.py"
       ]
@@ -1440,6 +1470,7 @@
         ".skill-tree/skills/web/skill-tree-plugins/scripts/plugin-runtime.js",
         ".skill-tree/skills/web/skill-tree-plugins/scripts/plugin-sources.js",
         ".skill-tree/skills/web/skill-tree-plugins/scripts/run-workspaces.py",
+        ".skill-tree/skills/web/skill-tree-plugins/scripts/task-grouping-migration.py",
         ".skill-tree/skills/web/skill-tree-plugins/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-plugins/scripts/workflow-state.py"
       ]
@@ -1475,6 +1506,7 @@
         ".skill-tree/skills/web/skill-tree-pr-review-cycle/scripts/plugin-sources.js",
         ".skill-tree/skills/web/skill-tree-pr-review-cycle/scripts/pr-review-state.py",
         ".skill-tree/skills/web/skill-tree-pr-review-cycle/scripts/run-workspaces.py",
+        ".skill-tree/skills/web/skill-tree-pr-review-cycle/scripts/task-grouping-migration.py",
         ".skill-tree/skills/web/skill-tree-pr-review-cycle/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-pr-review-cycle/scripts/workflow-state.py"
       ]
@@ -1511,6 +1543,7 @@
         ".skill-tree/skills/web/skill-tree-process-future-pending/scripts/plugin-runtime.js",
         ".skill-tree/skills/web/skill-tree-process-future-pending/scripts/plugin-sources.js",
         ".skill-tree/skills/web/skill-tree-process-future-pending/scripts/run-workspaces.py",
+        ".skill-tree/skills/web/skill-tree-process-future-pending/scripts/task-grouping-migration.py",
         ".skill-tree/skills/web/skill-tree-process-future-pending/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-process-future-pending/scripts/validate-future-document.py",
         ".skill-tree/skills/web/skill-tree-process-future-pending/scripts/workflow-state.py"
@@ -1549,6 +1582,7 @@
         ".skill-tree/skills/web/skill-tree-repo-documentation/scripts/plugin-runtime.js",
         ".skill-tree/skills/web/skill-tree-repo-documentation/scripts/plugin-sources.js",
         ".skill-tree/skills/web/skill-tree-repo-documentation/scripts/run-workspaces.py",
+        ".skill-tree/skills/web/skill-tree-repo-documentation/scripts/task-grouping-migration.py",
         ".skill-tree/skills/web/skill-tree-repo-documentation/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-repo-documentation/scripts/validate-future-document.py",
         ".skill-tree/skills/web/skill-tree-repo-documentation/scripts/validate-repository-documentation.py",
@@ -1588,6 +1622,7 @@
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/scripts/plugin-runtime.js",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/scripts/plugin-sources.js",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/scripts/run-workspaces.py",
+        ".skill-tree/skills/web/skill-tree-repo-documentation-audit/scripts/task-grouping-migration.py",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/scripts/validate-future-document.py",
         ".skill-tree/skills/web/skill-tree-repo-documentation-audit/scripts/validate-repository-documentation.py",
@@ -1630,6 +1665,7 @@
         ".skill-tree/skills/web/skill-tree-work-through-next/scripts/plugin-sources.js",
         ".skill-tree/skills/web/skill-tree-work-through-next/scripts/pr-review-state.py",
         ".skill-tree/skills/web/skill-tree-work-through-next/scripts/run-workspaces.py",
+        ".skill-tree/skills/web/skill-tree-work-through-next/scripts/task-grouping-migration.py",
         ".skill-tree/skills/web/skill-tree-work-through-next/scripts/validate-document-rules.py",
         ".skill-tree/skills/web/skill-tree-work-through-next/scripts/workflow-state.py"
       ]
@@ -2273,6 +2309,11 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/common/scripts/task-grouping-migration.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/common/scripts/validate-document-rules.py",
       "role": "canonical"
     },
@@ -2549,8 +2590,8 @@
     ".skill-tree/common/references/development-practices.md": "47402db618635e221d3e3944cb0f2dc88238e278a6e2c49f49491ce98e24fc14",
     ".skill-tree/common/references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     ".skill-tree/common/references/documentation-output-contract.md": "34d40d7d8a53b08c5078421cb999b1b3d606506c8b6c9cb5d78273cce73e1008",
-    ".skill-tree/common/references/future-workflow.md": "2d45a2bb87717f382a0a03f54fe9f8f5dfe2f4fc6d063616b974bfe9e4df3cd8",
-    ".skill-tree/common/references/history-retention.md": "e34302d1665162c5c94bd1adea7cbdf32a36325bb4a6db1eafab24fc236c3585",
+    ".skill-tree/common/references/future-workflow.md": "c1b087b5a957de56432f5918eed221ed193558f0ffbf9d27f0eaf2b1e197e91a",
+    ".skill-tree/common/references/history-retention.md": "27ccf1029d9d65454f3d18dc05a0f72b57ce96417196a82fc2ad268cfffb7bb6",
     ".skill-tree/common/references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
     ".skill-tree/common/references/narrative-canon-approval.md": "d36ed0534797cfbc8ab8d996093a48e82f26b05c6bdccbbde87cd9c34fd7a65b",
     ".skill-tree/common/references/narrative-character-appearance.md": "4c0f460e36b59b0dc8e5c3e25f4c92d7c57402f9359301880a2c695a4aa34f15",
@@ -2617,9 +2658,9 @@
     ".skill-tree/common/references/narrative-world-consequences.md": "4bc622b5153a8f1578d98278dd2f9c85efa81f6b16cf42a943658e764ae9f0b3",
     ".skill-tree/common/references/narrative-world-laws.md": "9a8bfb2c7bf880477108e1470713647b2b030ebe213af184ad3ee50e9b3ffd1a",
     ".skill-tree/common/references/narrative-world-transitions.md": "aa323d03e2c4635972632c58f350fa785c34a8fc812776ccec5fe895dab15209",
-    ".skill-tree/common/references/orchestration.md": "20343c1398f712fdb67da4dae67e3c5860a7fc43989185281198aa67d31c0aae",
-    ".skill-tree/common/references/pending-task-format.md": "6c0a90ea992f2c19a26e4f95fc4e45b7ff89d25c0cc8e2c49c11cfa8bad2d8ba",
-    ".skill-tree/common/references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+    ".skill-tree/common/references/orchestration.md": "04831ab7373542979b39c4e28eac8152526ba03a54b94088a9bcbb02bb6a2279",
+    ".skill-tree/common/references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
+    ".skill-tree/common/references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
     ".skill-tree/common/references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     ".skill-tree/common/references/pr-review-cycle.md": "c63c901451e6d3effd33284cff2f7347fff73e832677541d148dfec9fd4414c5",
     ".skill-tree/common/references/repository-discovery-checklist.md": "a112230c076fea515c437e3e7407c575ee6690d772eaa28e68f80c720c7a621c",
@@ -2627,7 +2668,7 @@
     ".skill-tree/common/references/snapshot-rules.md": "18142120546fcd532e496fbd14aefbe449fa63da40cbcca577db249b91dcd30e",
     ".skill-tree/common/references/unity-safety.md": "ff6e0063e3a26f60d8655a08beb33ef19ffa2f27fce9c5efd573480b1b81e6ac",
     ".skill-tree/common/references/validation-policy.md": "2bb1e9675fe3bc08cbcb9aa4b9534368416faba7ffaaf6b5aaff417456f434d3",
-    ".skill-tree/common/references/workflow-metadata.md": "eea7ee03ec910e9bf312b93b7f872b568f10c40f9c972484106a86fff742abdb",
+    ".skill-tree/common/references/workflow-metadata.md": "9396023a381c11ed1b53015524ecbd74c117d60b2c8cffd40678332d23158473",
     ".skill-tree/common/scripts/commonjs-package.json": "8005a3491db7d92f36ac66369861589f9c47123d3a7c71e643fc2c06168cd45a",
     ".skill-tree/common/scripts/create-documentation-snapshot.py": "612aea11e766621747490ddeb13dd24e980cdd30c499d0756635b1c3cce1df93",
     ".skill-tree/common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
@@ -2642,10 +2683,11 @@
     ".skill-tree/common/scripts/pr-review-state.py": "99f7e6082d128ca24fd5d778cdc716d7a5b85dec41c19b97481e2f80b364839b",
     ".skill-tree/common/scripts/run-workspaces.py": "b7f0987bc4f9d8bd17a53d5cc11995d5d418eee741040435e3e1d6eae13e4f0b",
     ".skill-tree/common/scripts/select-prioritized-task.py": "93f12ac5a333fb072bf8d9d849d08e3b422af856d582d492902647efe35c896f",
+    ".skill-tree/common/scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     ".skill-tree/common/scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
     ".skill-tree/common/scripts/validate-repository-documentation.py": "a9833b258675765a24de4205f5b87a6e34a90913408e97957582e007c78ba911",
-    ".skill-tree/common/scripts/workflow-state.py": "4858a30010717655bdb0f1ff4515b054d17258d62a98ad68f8922e6f8e5ab531",
+    ".skill-tree/common/scripts/workflow-state.py": "155dbbfc258a34d6af598a69041bcbf50c0c970f374069d34898d4e6254e7a69",
     ".skill-tree/config/capabilities.json": "7213710d95b954beb121c20e177edec9c7deab27f509154b8fb61f3c03f01a04",
     ".skill-tree/config/flavors.json": "6cd3d878c4f91bbaf50c12a2f095ac1f13cb9ae74070118d061f4f108089a62d",
     ".skill-tree/config/plugin-catalog-eligibility.json": "92a81b29135aaf8deb94c86f56481dfaa5fe9b543ab461c492aceab56efe1042",
@@ -2655,7 +2697,7 @@
     ".skill-tree/config/plugins/task-interview.json": "77b654102b28e33161c4cce8e1aec76c33ece2a93468203e5a2b5c9affc0a8a1",
     ".skill-tree/config/providers.json": "80255fe3fb67e32d71cc7791aee1e51c1d34a508d4c77b6ca852521907ede97a",
     ".skill-tree/config/repository.json": "94ff8bf68b8271a4313c5d80c92bd9b2c55660ecd0f541ed261f6abd98d38da0",
-    ".skill-tree/config/resource-map.json": "d62df676d7ca4df9020a8afe40bfb5c4ab2d13c05477a2ce6b8f98991c42ac6c",
+    ".skill-tree/config/resource-map.json": "2c1890226ca74e1283247fde5b0090dc20014855200da98f35868ccdaa50e438",
     ".skill-tree/documents/agent-compatibility.md": "4dfa4fda89268be8e111e3653cb3b08ce71fcf9df8a60eac1345e05f3dabe0fd",
     ".skill-tree/documents/build-and-release.md": "ef1216f1e0e058d288afb40d76d3826047fff1a9f15d70350ebc5fae9901130c",
     ".skill-tree/documents/dependencies.md": "e524d1d314d8c443e000260860e71fca6db4bd6938e86cb7443379a6fb2db4f3",
@@ -2664,7 +2706,7 @@
     ".skill-tree/documents/implementation-plan.md": "4a5f573aed129e25d7596c82168778a378fac6a90c5762b98a6646c537bba02e",
     ".skill-tree/documents/install.md": "c4201aab93985ef1d6b1e6a764c4e924c48fdaeb33a740913ac5be9be3afb8f2",
     ".skill-tree/documents/installation-architecture.md": "fd548f5be2a74fbfdb416a748e62869771d80f04acb47b246d4488effe083eea",
-    ".skill-tree/documents/manual-target-update.md": "f83c49a885b75d27d250d53d5f00936bc1c9e3d45998518cb0045ef8734e3482",
+    ".skill-tree/documents/manual-target-update.md": "d519eb7d0b4593bb820a5a79fa4025c3a663439baf3f018638da8069f03ffa2a",
     ".skill-tree/documents/narrative-workflow.md": "568eafbf201349ac24dc6836a4c2c9dea0fa82370f0bd4d6d67cf502117ab5fa",
     ".skill-tree/documents/plugin-installation-contract.md": "47686da484fcd72a15e90d2a476be6e26a6260bc479aad8fb39ae41dad50fdf2",
     ".skill-tree/documents/plugin-management-contract.md": "9dbeeec7795dafae6c46ce48545a464c67344a3d930115db49941e5ac41d400d",
@@ -2698,7 +2740,7 @@
     ".skill-tree/domains/web/sections.json": "705a5dca39a2a0baa64f0043d6d188ade153c7dff553fcf55bfd25256b2bb2c7",
     ".skill-tree/lib/composer.js": "3150242f47f8cb96e7067562e39e95e688894153a25168b2e3d412ae5215930c",
     ".skill-tree/lib/execution-bindings.js": "4087f0855eac260dc7ec4008be24015b3645ac7f53e11b3f7f7eccab5434a852",
-    ".skill-tree/lib/installation.js": "2f18fe11dbd1c45ff45d44b4a5577810aa79de8bbd9329264002cbb6f0f93a55",
+    ".skill-tree/lib/installation.js": "9d506dfd231a08e3fd0ebb569427f080bdf40a9ce043833823315e64f1046bc6",
     ".skill-tree/lib/plugin-acquisition.js": "2958d2d00fbbcd7b0876a790c87374eb91bb072bde34878554b13258b5411aab",
     ".skill-tree/lib/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
     ".skill-tree/lib/plugin-catalog.js": "bcc842344ee7c7a8b3c37faa6f197e313826a82a4be99daf843163fa0030d143",
@@ -2716,7 +2758,7 @@
     ".skill-tree/scripts/validate-skill-repository.py": "ae28d08f0c4f34f7ca3ba06c439a5e0519a80a5664e65709bf54376b275b05d4",
     ".skill-tree/src/init-rules/skill-tree-skills.md": "74cb9a275ce1bcd845c31eae44101e79e5adcd02875d84f1a4c8feb1744716fd",
     ".skill-tree/templates/invariants.json": "5a147a9ee4297250a6604f6a447fa10b57b9b94f3942044a9135790ce9c64b48",
-    ".skill-tree/templates/operations.json": "61dc44ee9839d4d9ebf12c0f7ec0a1ccf6ca7ee74d2d51eedaafb399f5f6322b"
+    ".skill-tree/templates/operations.json": "91c141cd9a129598d12c92d686cf998d3cea193c806f50d5a85449f4641d466a"
   },
   "state": ".skill-tree/documents/future.json",
   "validation_commands": [
