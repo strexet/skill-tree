@@ -1,0 +1,68 @@
+{
+  "checks": [
+    {
+      "evidence": "Owned installations compose both policies and preserve independent choices.",
+      "id": "defaults-and-activation",
+      "result": "pass"
+    },
+    {
+      "evidence": "Exact candidate and target Git objects, target-side locks, declared input bytes, rename detection and an explicit candidate unlock were verified.",
+      "id": "pr-lock-contract",
+      "result": "pass"
+    },
+    {
+      "evidence": "Source-backed findings retain their original location after a complete revert. A plugin annotation supplies no built-in policy authority.",
+      "id": "review-findings",
+      "result": "pass"
+    },
+    {
+      "evidence": "Protected numeric precision, literal example data and unrelated operations were exercised by the integrated regression checks.",
+      "id": "adapter-scope",
+      "result": "pass"
+    },
+    {
+      "evidence": "The integrated focused Node run passed 31 checks including Director installation and task grouping.",
+      "id": "director-integration",
+      "result": "pass"
+    }
+  ],
+  "coverage_gaps": [
+    "The audit covers local Git and controlled provider snapshots. Live publication is outside the requested local merge scope."
+  ],
+  "findings": [],
+  "id": "A-746e18e2-a898-4ca4-b87f-50eb6cc3eadf",
+  "recorded_at": "2026-11-15T06:45:12.407781+00:00",
+  "scope": "Development defaults integrated with Director",
+  "source_fingerprints": {
+    ".skill-tree/common/references/development-practices.md": "467f46fe631af23c9b3c6dadcbeb6d4c20f311601e2e2f419f16ffc0a534b72e",
+    ".skill-tree/common/scripts/pr-review-state.py": "bd0a42611d3d729fff6ead8f2c1f11fd0018f9e170cae13278a2cec58b6710b4",
+    ".skill-tree/config/resource-map.json": "f25fdef28aae1bf163093789d964fc7e2adb04e43db20d55ca2cbd9f53099abf",
+    ".skill-tree/documents/install.md": "cf21be582e06254899feac09bdb5849fd2c5ea3d0b9e7b3a17a5c28ce62bd8a0",
+    ".skill-tree/documents/plugin-management-contract.md": "54c051459cd99563f7cdbbaf01966b6cd2d73e5beefc435f0a9ecd353f2c7873",
+    ".skill-tree/lib/api-contract-locks.js": "eaac3e411ab7ddea36cedb4c48f0a0d0c5e737509466f0f86587df51a34fe594",
+    ".skill-tree/lib/composer.js": "da1195138ba77e8089c99d8a45e2627e2b145755ea7fea8b06f3680f1c0af861",
+    ".skill-tree/lib/development-policies.js": "9d3036e0dd2b2aaf070f3ec92f9e1d6d6830fe35cd8ebb1a78135c3ad792a2fd",
+    ".skill-tree/lib/installation.js": "85c71d5716a64c92e360dac6ab9e88e92507bc75ca2fb7167c4fcd4f217cac6c",
+    ".skill-tree/tests/test-api-contract-locks.js": "73a13bb9dab6723eab43695e556db858536fc675add0c90e9346a94838a5867a",
+    ".skill-tree/tests/test-direct-replacement-policy.js": "baa8c1d4be2af41957fd65cc1b0453c4e4238b7b7a32cca8e8e53915501656d4",
+    ".skill-tree/tests/test-director-installation.js": "3721c721ae9323093ed3c2c674c3937800cbf64e5bc73afede1062f3c75cadef",
+    ".skill-tree/tests/test-plugin-review.py": "7185f28e14f49fa2321e8adcffa215a3b584d1bca8f9dccff23b18a5d8f146c8",
+    ".skill-tree/tests/test-task-grouping-upgrade.js": "7495216c5d98b58251bde62e2c0ce2e7af9c723ce6687b0fdda0eb6755730371"
+  },
+  "sources": [
+    ".skill-tree/documents/install.md",
+    ".skill-tree/documents/plugin-management-contract.md",
+    ".skill-tree/common/references/development-practices.md",
+    ".skill-tree/lib/api-contract-locks.js",
+    ".skill-tree/lib/development-policies.js",
+    ".skill-tree/lib/installation.js",
+    ".skill-tree/lib/composer.js",
+    ".skill-tree/config/resource-map.json",
+    ".skill-tree/common/scripts/pr-review-state.py",
+    ".skill-tree/tests/test-api-contract-locks.js",
+    ".skill-tree/tests/test-plugin-review.py",
+    ".skill-tree/tests/test-direct-replacement-policy.js",
+    ".skill-tree/tests/test-director-installation.js",
+    ".skill-tree/tests/test-task-grouping-upgrade.js"
+  ]
+}

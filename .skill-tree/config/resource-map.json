@@ -155,7 +155,9 @@
       "runtime/tests/fixtures/director/fixture-manifest.json": "tests/fixtures/director/fixture-manifest.json",
       "runtime/tests/fixtures/director/game/check-carry.py": "tests/fixtures/director/game/check-carry.py",
       "runtime/tests/fixtures/director/story/carry-belt.json": "tests/fixtures/director/story/carry-belt.json",
-      "runtime/tests/fixtures/director/story/carry-hand.json": "tests/fixtures/director/story/carry-hand.json"
+      "runtime/tests/fixtures/director/story/carry-hand.json": "tests/fixtures/director/story/carry-hand.json",
+      "runtime/lib/api-contract-locks.js": "lib/api-contract-locks.js",
+      "runtime/lib/development-policies.js": "lib/development-policies.js"
     }
   },
   "skill-tree-director-decide": {
@@ -217,7 +219,9 @@
       "runtime/tests/fixtures/director/fixture-manifest.json": "tests/fixtures/director/fixture-manifest.json",
       "runtime/tests/fixtures/director/game/check-carry.py": "tests/fixtures/director/game/check-carry.py",
       "runtime/tests/fixtures/director/story/carry-belt.json": "tests/fixtures/director/story/carry-belt.json",
-      "runtime/tests/fixtures/director/story/carry-hand.json": "tests/fixtures/director/story/carry-hand.json"
+      "runtime/tests/fixtures/director/story/carry-hand.json": "tests/fixtures/director/story/carry-hand.json",
+      "runtime/lib/api-contract-locks.js": "lib/api-contract-locks.js",
+      "runtime/lib/development-policies.js": "lib/development-policies.js"
     }
   },
   "skill-tree-director-install": {
@@ -280,7 +284,9 @@
       "runtime/tests/fixtures/director/fixture-manifest.json": "tests/fixtures/director/fixture-manifest.json",
       "runtime/tests/fixtures/director/game/check-carry.py": "tests/fixtures/director/game/check-carry.py",
       "runtime/tests/fixtures/director/story/carry-belt.json": "tests/fixtures/director/story/carry-belt.json",
-      "runtime/tests/fixtures/director/story/carry-hand.json": "tests/fixtures/director/story/carry-hand.json"
+      "runtime/tests/fixtures/director/story/carry-hand.json": "tests/fixtures/director/story/carry-hand.json",
+      "runtime/lib/api-contract-locks.js": "lib/api-contract-locks.js",
+      "runtime/lib/development-policies.js": "lib/development-policies.js"
     }
   },
   "skill-tree-director-intake": {
@@ -342,7 +348,9 @@
       "runtime/tests/fixtures/director/fixture-manifest.json": "tests/fixtures/director/fixture-manifest.json",
       "runtime/tests/fixtures/director/game/check-carry.py": "tests/fixtures/director/game/check-carry.py",
       "runtime/tests/fixtures/director/story/carry-belt.json": "tests/fixtures/director/story/carry-belt.json",
-      "runtime/tests/fixtures/director/story/carry-hand.json": "tests/fixtures/director/story/carry-hand.json"
+      "runtime/tests/fixtures/director/story/carry-hand.json": "tests/fixtures/director/story/carry-hand.json",
+      "runtime/lib/api-contract-locks.js": "lib/api-contract-locks.js",
+      "runtime/lib/development-policies.js": "lib/development-policies.js"
     }
   },
   "skill-tree-director-plan": {
@@ -404,7 +412,9 @@
       "runtime/tests/fixtures/director/fixture-manifest.json": "tests/fixtures/director/fixture-manifest.json",
       "runtime/tests/fixtures/director/game/check-carry.py": "tests/fixtures/director/game/check-carry.py",
       "runtime/tests/fixtures/director/story/carry-belt.json": "tests/fixtures/director/story/carry-belt.json",
-      "runtime/tests/fixtures/director/story/carry-hand.json": "tests/fixtures/director/story/carry-hand.json"
+      "runtime/tests/fixtures/director/story/carry-hand.json": "tests/fixtures/director/story/carry-hand.json",
+      "runtime/lib/api-contract-locks.js": "lib/api-contract-locks.js",
+      "runtime/lib/development-policies.js": "lib/development-policies.js"
     }
   },
   "skill-tree-director-review": {
@@ -467,7 +477,9 @@
       "runtime/tests/fixtures/director/fixture-manifest.json": "tests/fixtures/director/fixture-manifest.json",
       "runtime/tests/fixtures/director/game/check-carry.py": "tests/fixtures/director/game/check-carry.py",
       "runtime/tests/fixtures/director/story/carry-belt.json": "tests/fixtures/director/story/carry-belt.json",
-      "runtime/tests/fixtures/director/story/carry-hand.json": "tests/fixtures/director/story/carry-hand.json"
+      "runtime/tests/fixtures/director/story/carry-hand.json": "tests/fixtures/director/story/carry-hand.json",
+      "runtime/lib/api-contract-locks.js": "lib/api-contract-locks.js",
+      "runtime/lib/development-policies.js": "lib/development-policies.js"
     }
   },
   "skill-tree-director-run": {
@@ -529,7 +541,9 @@
       "runtime/tests/fixtures/director/fixture-manifest.json": "tests/fixtures/director/fixture-manifest.json",
       "runtime/tests/fixtures/director/game/check-carry.py": "tests/fixtures/director/game/check-carry.py",
       "runtime/tests/fixtures/director/story/carry-belt.json": "tests/fixtures/director/story/carry-belt.json",
-      "runtime/tests/fixtures/director/story/carry-hand.json": "tests/fixtures/director/story/carry-hand.json"
+      "runtime/tests/fixtures/director/story/carry-hand.json": "tests/fixtures/director/story/carry-hand.json",
+      "runtime/lib/api-contract-locks.js": "lib/api-contract-locks.js",
+      "runtime/lib/development-policies.js": "lib/development-policies.js"
     }
   },
   "skill-tree-director-setup": {
@@ -591,7 +605,9 @@
       "runtime/tests/fixtures/director/fixture-manifest.json": "tests/fixtures/director/fixture-manifest.json",
       "runtime/tests/fixtures/director/game/check-carry.py": "tests/fixtures/director/game/check-carry.py",
       "runtime/tests/fixtures/director/story/carry-belt.json": "tests/fixtures/director/story/carry-belt.json",
-      "runtime/tests/fixtures/director/story/carry-hand.json": "tests/fixtures/director/story/carry-hand.json"
+      "runtime/tests/fixtures/director/story/carry-hand.json": "tests/fixtures/director/story/carry-hand.json",
+      "runtime/lib/api-contract-locks.js": "lib/api-contract-locks.js",
+      "runtime/lib/development-policies.js": "lib/development-policies.js"
     }
   },
   "skill-tree-director-status": {
@@ -653,7 +669,9 @@
       "runtime/tests/fixtures/director/fixture-manifest.json": "tests/fixtures/director/fixture-manifest.json",
       "runtime/tests/fixtures/director/game/check-carry.py": "tests/fixtures/director/game/check-carry.py",
       "runtime/tests/fixtures/director/story/carry-belt.json": "tests/fixtures/director/story/carry-belt.json",
-      "runtime/tests/fixtures/director/story/carry-hand.json": "tests/fixtures/director/story/carry-hand.json"
+      "runtime/tests/fixtures/director/story/carry-hand.json": "tests/fixtures/director/story/carry-hand.json",
+      "runtime/lib/api-contract-locks.js": "lib/api-contract-locks.js",
+      "runtime/lib/development-policies.js": "lib/development-policies.js"
     }
   },
   "skill-tree-implement-all": {
@@ -690,7 +708,9 @@
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "task-grouping-migration.py": "common/scripts/task-grouping-migration.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
-      "workflow-state.py": "common/scripts/workflow-state.py"
+      "workflow-state.py": "common/scripts/workflow-state.py",
+      "api-contract-locks.js": "lib/api-contract-locks.js",
+      "development-policies.js": "lib/development-policies.js"
     }
   },
   "skill-tree-implement-next-future-task": {
@@ -884,7 +904,9 @@
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "task-grouping-migration.py": "common/scripts/task-grouping-migration.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
-      "workflow-state.py": "common/scripts/workflow-state.py"
+      "workflow-state.py": "common/scripts/workflow-state.py",
+      "api-contract-locks.js": "lib/api-contract-locks.js",
+      "development-policies.js": "lib/development-policies.js"
     }
   },
   "skill-tree-process-future-pending": {
@@ -1027,7 +1049,9 @@
       "run-workspaces.py": "common/scripts/run-workspaces.py",
       "task-grouping-migration.py": "common/scripts/task-grouping-migration.py",
       "validate-document-rules.py": "common/scripts/validate-document-rules.py",
-      "workflow-state.py": "common/scripts/workflow-state.py"
+      "workflow-state.py": "common/scripts/workflow-state.py",
+      "api-contract-locks.js": "lib/api-contract-locks.js",
+      "development-policies.js": "lib/development-policies.js"
     }
   }
 }

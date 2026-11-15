@@ -132,6 +132,7 @@ function envelope(input) {
     inventory: ['action', 'format', 'group_by', 'host', 'flavor', 'point'],
     prepare: ['action', 'request'],
     apply: ['action', 'proposal', 'confirmation'],
+    'set-builtin': ['action', 'policy', 'enabled'],
   };
   if (!object(input) || !own(fields, input.action) || Object.keys(input).some(key => !fields[input.action].includes(key))) {
     throw Error('Select an inventory, prepare or apply management envelope');
@@ -157,6 +158,12 @@ async function main(args) {
     return input.format === 'text' ? manager.formatInventory(view, {groupBy: input.group_by}) : JSON.stringify(view, null, 2) + '\n';
   }
   require(path.join(options.source, 'lib/installation.js')).verifyOwned(root, profile);
+  if (input.action === 'set-builtin') {
+    const core = require(path.join(options.source, 'lib/installation.js'));
+    const policy = require(path.join(options.source, 'lib/development-policies.js'));
+    const result = core.updateDevelopmentPolicy(root, options.source, config => policy.toggle(config, input.policy, input.enabled));
+    return JSON.stringify({action: result.action, built_in_policies: result.profile.development_policies.policies}, null, 2) + '\n';
+  }
   const value = await (input.action === 'prepare'
     ? manager.prepareManagerRequest(root, input.request, options)
     : manager.applyManagerProposal(root, input.proposal, input.confirmation, options));
