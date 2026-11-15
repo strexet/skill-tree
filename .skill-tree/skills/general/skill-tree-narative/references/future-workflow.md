@@ -10,6 +10,8 @@ Add Pending preserves imperatives and conditional branches in the future task de
 
 Resolve optional Pending IDs or exact normalized names before mutation; no input selects the Pending Queue. Absent/ambiguous selections stop without fallback. Read repository rules, document map, relevant current documentation, implementation, configuration, assets/data, tests and source history when needed. Never process from future.md alone.
 
+For an explicit topic or intake batch group, preview the Pending queue with `group-selection`. Report exact selected identities and freeze the inspected source hash. Pass the exact nonempty P- list to Processing as `selectors`. Stop on invalid, empty or stale selections and inspect the group again before any mutation.
+
 Verify scope, duplicates, existing behavior, dependencies, observable outcomes, failure paths and validation availability. Split excessive tasks into independently executable units; retain every originating Pending ID. Merge only compatible intent and relationship context. Clarify product choices with contextual options and recommendations. Missing mandatory context remains Pending with an explicit blocker. Promote researched work after essential intake intent is resolved. Record created, reused, retained and resolved identities. An enabled matching after-Processing obligation creates a visible blocked task through the shared clarification session. No implementation is implied.
 
 ## Processing Result and Next Action

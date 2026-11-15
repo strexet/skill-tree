@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "kind": "director-lantern-art-manifest",
+  "task_id": "T-2d4cdd62-11bd-49b7-906f-343a0df202f3",
+  "source_run_id": "WR-acc2606d-9665-458b-81dc-d02e4a6b12db",
+  "fixture_id": "director-held-lantern",
+  "fixture_sha256": "75a61c410b39276274823483172d43895dc26624c68fc99aed2c9685f809ba3e",
+  "profile_sha256": "1742dfd3c00b75226cb08bb98edf93f0d912059320bd742f918443dc1aa0742e",
+  "original_snapshot": {
+    "files": 202,
+    "sha256": "d809735818ecb9c7ac795ca4d6453b522658fe50a41535cf14c31aec16e024ea"
+  },
+  "blender_executable_sha256": "53c8e8266f4e3f619a7c3e87c3a8d34a846339d50f55ebe193cf9ad3528153da",
+  "producer_sha256": "e4ac61eb4e846da4e6d9c293df01a57f6bb8fbdaa74648e7e1e180979b160ec2"
+}

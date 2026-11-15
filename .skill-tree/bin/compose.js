@@ -7,7 +7,7 @@ const c=require('../lib/composer.js');
 const source=path.resolve(__dirname,'..');
 function representativeOutputs(){
  const outputs={};
- for(const flavor of ['general','web','unity']) {
+ for(const flavor of c.flavorNames(source)) {
   const root=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-source-'));
   try{
    const write=(rel,value)=>{const full=path.join(root,rel);fs.mkdirSync(path.dirname(full),{recursive:true});fs.writeFileSync(full,typeof value==='string'?value:c.json(value));};

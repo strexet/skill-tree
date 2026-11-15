@@ -136,7 +136,8 @@ class LocalDeliveryTests(unittest.TestCase):
 
     def copy_source_generation(self):
         target = self.root / '.skill-tree'
-        for directory in ('common', 'domains', 'templates', 'config', 'lib', 'src', 'bin'):
+        for directory in ('common', 'domains', 'templates', 'config', 'lib', 'src', 'bin',
+                          'tests/fixtures/director'):
             shutil.copytree(CORE / directory, target / directory, dirs_exist_ok=True,
                             ignore=shutil.ignore_patterns('__pycache__'))
         for entry in (CORE / 'skills/general').glob('*/SKILL.md'):
@@ -145,7 +146,8 @@ class LocalDeliveryTests(unittest.TestCase):
             shutil.copyfile(entry, destination)
         self.git(self.root, 'add', '.skill-tree/common', '.skill-tree/domains',
                  '.skill-tree/templates', '.skill-tree/config', '.skill-tree/lib',
-                 '.skill-tree/src', '.skill-tree/bin', '.skill-tree/skills')
+                 '.skill-tree/src', '.skill-tree/bin', '.skill-tree/skills',
+                 '.skill-tree/tests/fixtures/director')
         self.git(self.root, 'commit', '-m', 'Fixture owned source generation')
 
     def registry_run(self, run_id=None):

@@ -1,0 +1,6 @@
+{
+  "name": "DirectorLanternPlayTests",
+  "references": ["DirectorLanternFixture"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "autoReferenced": false
+}

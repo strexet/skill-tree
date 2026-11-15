@@ -5,3 +5,5 @@ Pending entries use a level-three title, the fixed metadata header and concise n
 Source verification requirements: inspect current code, configuration, data, documentation and tests before promotion. Verify official external behavior when task assumptions depend on a package/platform/service. Correct contradicted assumptions rather than promoting unsupported work.
 
 Runtime/product behavior, data/model behavior, acceptance criteria and documentation updates may be included briefly when already understood. Detailed research belongs to Process Pending. Current features remain in features.md; planned work remains in future.md.
+
+Optional grouping metadata records a topic and the original intake batch. Legacy Pending records can omit both fields.

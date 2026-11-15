@@ -44,7 +44,7 @@ function workspace(t, {flavor = 'general', provider = 'codex', withoutCatalog = 
     json(root, 'Packages/packages-lock.json', {dependencies: {'com.unity.test-framework': {version: '1.6.0'}}});
   }
   const directory = provider === 'claude-code' ? '.claude/skills' : '.agents/skills';
-  const names = Object.keys(require('../templates/operations.json')).sort();
+  const names = require('../config/flavors.json').core_operations.slice().sort();
   const selections = names.map(name => ({provider, name, rel: directory + '/' + name}));
   const manager = path.join(root, directory, operation, 'scripts/plugin-manager.js');
   return {tmp, root, recipe, cwd, manager, directory, names, selections};

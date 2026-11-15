@@ -1,0 +1,7 @@
+{
+  "name": "DirectorLanternEditTests",
+  "references": ["DirectorLanternFixture"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "autoReferenced": false
+}

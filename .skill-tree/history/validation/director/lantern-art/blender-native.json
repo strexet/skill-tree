@@ -1,0 +1,67 @@
+{
+  "artifact": {
+    "bytes": 25596,
+    "path": "DirectorLantern.fbx",
+    "sha256": "a29f05d0d78a9af6acf6b7121abd838a1b95ce1c9c178ddbc76886974d117307"
+  },
+  "build": "02f0899d78e3",
+  "kind": "director-lantern-blender-runtime",
+  "manifest_sha256": "75a61c410b39276274823483172d43895dc26624c68fc99aed2c9685f809ba3e",
+  "native_reimport": {
+    "dimensions": [
+      0.21,
+      0.21,
+      0.322
+    ],
+    "mesh_names": [
+      "CarryGrip",
+      "LanternBody",
+      "LanternCap",
+      "LanternFoot"
+    ],
+    "socket_distance": 0.197231,
+    "sockets": {
+      "BeltSocket": [
+        0.1,
+        0.0,
+        0.11
+      ],
+      "GripSocket": [
+        0.0,
+        0.0,
+        0.28
+      ]
+    },
+    "vertices": 260
+  },
+  "pid": 49121,
+  "pre_export": {
+    "dimensions": [
+      0.21,
+      0.21,
+      0.322
+    ],
+    "mesh_names": [
+      "CarryGrip",
+      "LanternBody",
+      "LanternCap",
+      "LanternFoot"
+    ],
+    "socket_distance": 0.197231,
+    "sockets": {
+      "BeltSocket": [
+        0.1,
+        0.0,
+        0.11
+      ],
+      "GripSocket": [
+        0.0,
+        0.0,
+        0.28
+      ]
+    },
+    "vertices": 260
+  },
+  "schema": 1,
+  "version": "5.3.0"
+}

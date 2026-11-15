@@ -10,6 +10,8 @@ Implement through the implementation contract. Capture understood findings with 
 
 Start mode all to freeze the initial Prioritized identities. An explicit owner-selected group supplies exact prioritized T- IDs through the start payload's `snapshot_ids`; omission selects the full initial Prioritized queue. Resolve the requested group before starting, report the selected roots and required dependencies, and preserve the recorded snapshot on resume. A selected group follows numeric priority and document tie order. Pending/Backlog items require normal research and promotion before selection. The selected root group differs from `validation_group_id`, which batches validation inside admitted scope.
 
+Use `group-selection` with the prioritized queue for an explicit topic or batch group. The read-only preview reports exact root readiness and required dependencies outside the selection. A blocked root stops admission of the group. Pass `snapshot_ids` and the preview source hash as `expected_source_hash` to start. A stale preview requires current inspection. Later retagging and batch additions leave the recorded snapshot intact.
+
 Execute the same dependency cycle for remaining snapshot roots by current priority. Include required discovered work; exclude unrelated roots and new nonblocking tasks. Completion records deduplicate dependencies shared by initial roots. Absent tasks without evidence stop execution.
 
 ## Processing Handoff

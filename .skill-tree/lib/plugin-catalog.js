@@ -181,9 +181,18 @@ function validateRecommendations(data, eligibility, entries) {
   }
 }
 
+function projectFlavors(source) {
+  try {
+    return Object.keys(read(source, 'config/flavors.json').flavors);
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+    return [...flavors];
+  }
+}
+
 function emptyCatalog(source = path.resolve(__dirname, '..')) {
   const operations = read(source, 'templates/operations.json');
-  return {anchors: createCatalog(operations), entries: new Map(),
+  return {anchors: createCatalog(operations), entries: new Map(), projectFlavors: projectFlavors(source),
     recommendations: Object.fromEntries(flavors.map(flavor => [flavor, []]))};
 }
 
@@ -235,7 +244,7 @@ function loadCatalog(source = path.resolve(__dirname, '..'), {manifest} = {}) {
   const available = [...entries.values()].filter(entry => entry.descriptor);
   verifyPackageClosure(new Map(available.map(({row, descriptor}) => [row.id, descriptor.package_dependencies])), 'package');
   validateRecommendations(data.recommendations, eligibility, entries);
-  return {anchors, entries, recommendations: clone(data.recommendations)};
+  return {anchors, entries, recommendations: clone(data.recommendations), projectFlavors: projectFlavors(source)};
 }
 
 function publicSource(value) {
@@ -282,7 +291,7 @@ function installedStatus(inventory, row) {
 
 function catalogView(catalog, {host, flavor, point, known = {}, inventory} = {}) {
   if (host !== undefined && !hosts.includes(host)) fail('Unknown catalog host filter');
-  if (flavor !== undefined && !flavors.includes(flavor)) fail('Unknown catalog flavor filter');
+  if (flavor !== undefined && !(catalog.projectFlavors || flavors).includes(flavor)) fail('Unknown catalog flavor filter');
   const boundary = point === undefined ? undefined : locationsFor([point], catalog.anchors, true).resolved[0].boundary_id;
   const {additions, matches, conflicts} = knownDefinitions(known, catalog);
   const entries = [], points = new Map();

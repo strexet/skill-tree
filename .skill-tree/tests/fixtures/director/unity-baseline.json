@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "kind": "director-unity-baseline-manifest",
+  "fixture_id": "skill-tree-sandbox",
+  "source_paths": [
+    "Assets",
+    "Packages",
+    "ProjectSettings"
+  ],
+  "child_flavor": "unity",
+  "recipe_id": "unity-editmode",
+  "lane": "unity-editmode",
+  "test_filter": "SkillTreeSandbox.Tests.BuildSceneTests.EnabledBuildScenesResolveToSceneAssets",
+  "tool_pins": {
+    "editor": "6000.3.27f2",
+    "editor_revision": "22188f149405",
+    "test_framework": "1.6.0",
+    "pipeline": "1.0.0-pre.1"
+  },
+  "startup_normalization": {
+    "package": "com.unity.ai.inference",
+    "version": "2.6.1",
+    "vendor_source_sha256": "4ed379c32595e393d1e92ff74a2234ade3a3d69c2372f555677655f58fef3fa3"
+  },
+  "isolation": {
+    "resource_scope": "director-disposable-unity-editor",
+    "generated_directories": [
+      "Library",
+      "Temp",
+      "Logs",
+      "obj",
+      "Builds",
+      "UserSettings"
+    ],
+    "saves_need_observed_isolation": true,
+    "runtime_sequence": [
+      "pipeline-probe",
+      "owned-process-cleanup",
+      "batch-editmode",
+      "owned-process-cleanup"
+    ]
+  },
+  "observed_baseline": {
+    "receipt": ".skill-tree/history/validation/director/unity-baseline.json",
+    "profile_identity": "c5994d9a455f4f62454a3497f8b496ccd844f699ccb8e62aa632db63afc3afcd",
+    "original_snapshot": {
+      "files": 202,
+      "sha256": "d809735818ecb9c7ac795ca4d6453b522658fe50a41535cf14c31aec16e024ea"
+    },
+    "runtime_snapshot": {
+      "files": 202,
+      "sha256": "0c910a089373fcbd0a4f6b0607bb8ca5e6b89a5e6f3d4d1151170a85ac5e7274"
+    },
+    "pipeline_project_sha256": "45a7939d0d479028dce62817eda109d35f71c9f62713d73713da7f316023fcfd",
+    "pipeline_pid": 90554,
+    "editmode_pid": 92772,
+    "editmode_report_sha256": "126e01bbdffd514ed79312713f5a97065d51549db5035c4f91c01e268f087f3b"
+  }
+}

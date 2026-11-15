@@ -3,6 +3,10 @@ const fs=require('node:fs'),path=require('node:path');
 const c=require('./composer.js');
 const BEGIN='<!-- BEGIN skill-tree-skills -->',END='<!-- END skill-tree-skills -->';
 const INSTALL='.skill-tree/installation',PROFILE=INSTALL+'/profile.json';
+const TASK_GROUPING_SOURCE='common/scripts/workflow-state.py';
+const TASK_GROUPING_BUNDLE=INSTALL+'/source/'+TASK_GROUPING_SOURCE;
+const TASK_GROUPING_HELPER='scripts/workflow-state.py';
+const taskGroupingMarker=/^TASK_GROUPING_COMPATIBILITY = 1\r?$/m;
 function filesAt(root,rel,includeCaches=false){
  const full=c.safe(root,rel);if(!fs.existsSync(full))return null;
  if(fs.lstatSync(full).isFile())return {'':c.hash(fs.readFileSync(full))};
@@ -49,6 +53,65 @@ function queueRoot(root){
  return data.canonical_root;
 }
 const WORKFLOW='.skill-tree/documents/future.json';
+function groupedTaskHeaders(root){
+ const future=c.read(queueRoot(root),'.skill-tree/documents/future.md');
+ if(future===null)return false;
+ const lines=future.split(/\r?\n/),queues=new Set(['Pending Queue','Prioritized Next Changes','Backlog']);
+ let fenced=false,inQueue=false;
+ for(let index=0;index<lines.length;index++){
+  const line=lines[index];
+  if(line.startsWith('```')){fenced=!fenced;continue;}
+  if(fenced)continue;
+  const heading=line.match(/^##\s+(.+?)\s*$/);
+  if(heading)inQueue=queues.has(heading[1]);
+  if(!inQueue||!/^###\s+\S/.test(line))continue;
+  let header=index+1;
+  while(header<lines.length&&!lines[header].trim())header++;
+  if(lines[header]!=='```yaml')continue;
+  for(let field=header+1;field<lines.length&&!lines[field].startsWith('```');field++){
+   if(/^\s*(?:topic|intake_batch_ids)\s*:/.test(lines[field]))return true;
+  }
+ }
+ return false;
+}
+function taskGroupingProof(profile,readSource){
+ const source=readSource();
+ if(source===null||!taskGroupingMarker.test(String(source)))return undefined;
+ const digest=c.hash(source);
+ if(profile.source_digests[TASK_GROUPING_SOURCE]!==digest||profile.bundle_digests[TASK_GROUPING_BUNDLE]!==digest)return undefined;
+ const helpers=Object.entries(profile.destinations).filter(([,record])=>Object.hasOwn(record.files,TASK_GROUPING_HELPER));
+ if(!helpers.length||helpers.some(([,record])=>record.files[TASK_GROUPING_HELPER]!==digest))return undefined;
+ return {schema:1,source_helper_sha256:digest,package_helpers:Object.fromEntries(helpers.map(([rel])=>[rel+'/'+TASK_GROUPING_HELPER,digest]))};
+}
+function verifyTaskGroupingProof(profile,readFile){
+ if(!profile||!Object.hasOwn(profile,'task_grouping'))return undefined;
+ const proof=taskGroupingProof(profile,()=>readFile(TASK_GROUPING_BUNDLE));
+ if(!proof||c.json(proof)!==c.json(profile.task_grouping)||Object.entries(proof.package_helpers).some(([rel,digest])=>{
+  const file=readFile(rel);return file===null||c.hash(file)!==digest;
+ }))throw Error('Task grouping capability does not match owned source and package bytes');
+ return proof;
+}
+function groupingFileReader(root,changes={}){
+ return relative=>{
+  if(Object.hasOwn(changes,relative))return changes[relative];
+  const packagePath=path.posix.dirname(path.posix.dirname(relative));
+  if(Object.hasOwn(changes,packagePath))return changes[packagePath]?.[TASK_GROUPING_HELPER]??null;
+  const file=c.safe(root,relative);
+  return fs.existsSync(file)?fs.readFileSync(file):null;
+ };
+}
+function requireGroupedQueueCompatibility(root,profile,readFile=groupingFileReader(root)){
+ if(groupedTaskHeaders(root)&&!verifyTaskGroupingProof(profile,readFile))throw Error('Grouped task headers require a compatible owned installation generation');
+}
+function verifyTaskGroupingProfile(root){
+ root=fs.realpathSync(root);
+ const profileFile=c.safe(root,PROFILE),before=fs.existsSync(profileFile)?c.hash(fs.readFileSync(profileFile)):null;
+ const profile=verify(root,c.safe(root,INSTALL+'/source'));
+ const proof=verifyTaskGroupingProof(profile,groupingFileReader(root));
+ if(!proof)throw Error('Owned profile lacks verified task grouping support');
+ if(!before||c.hash(fs.readFileSync(profileFile))!==before)throw Error('Owned profile changed during task grouping verification');
+ return {project_root:root,profile_identity:profile.identity,profile_sha256:before,...proof};
+}
 function workflowState(root){
  const state=c.readJson(queueRoot(root),WORKFLOW,null);if(state===null)return null;
  if(state.format!=='skill-tree-future'||![2,3].includes(state.schema)||!Array.isArray(state.tasks)||!state.task_progress||typeof state.task_progress!=='object'||Array.isArray(state.task_progress)||!(state.active_run===null||state.active_run&&typeof state.active_run==='object'))throw Error('Unsupported workflow schema; use the manual update checklist');
@@ -170,6 +233,18 @@ function recover(root,channel='core'){
   if(actual!==e.old&&actual!==e.next&&!(actual===null&&backup===e.old))throw Error('Interrupted installation conflicts: '+e.dest);
   if(e.next!==null&&actual!==e.next&&stage!==e.next)throw Error('Missing or modified staged generation: '+e.dest);
  }
+ if(channel==='core'&&groupedTaskHeaders(root)){
+  const readNext=relative=>{
+   const entry=journal.entries.find(item=>relative===item.dest||relative.startsWith(item.dest+'/'));
+   if(!entry)return groupingFileReader(root)(relative);
+   if(entry.next===null)return null;
+   const stage=tree(entry.dest)===entry.next?entry.dest:entry.staged;
+   const file=c.safe(root,stage+relative.slice(entry.dest.length));
+   return fs.existsSync(file)?fs.readFileSync(file):null;
+  };
+  const nextProfile=readNext(PROFILE);
+  requireGroupedQueueCompatibility(root,nextProfile===null?null:JSON.parse(nextProfile),readNext);
+ }
  for(const e of journal.entries){
   if(tree(e.dest)===e.next)continue;
   const dest=c.safe(root,e.dest),backup=c.safe(root,e.backup);
@@ -260,8 +335,9 @@ function plan(root,source,flavor,selections,options={}){
   }
  }
  if(hasActiveOperation(root))throw Error('Active controller must checkpoint at a stopped cleanup/handoff point before installation or refresh');
- if(old)for(const rel of Object.keys(old.destinations))selections.push({rel,provider:old.destinations[rel].provider,name:old.destinations[rel].name});
- const merged={};for(const item of selections){if(!merged[item.rel])merged[item.rel]={...item,providers:[]};merged[item.rel].providers=[...new Set([...merged[item.rel].providers,...(item.providers||[item.provider])])].sort();}
+ const requested=[...selections];
+ if(old)for(const [rel,record] of Object.entries(old.destinations))requested.push({rel,provider:record.provider,providers:owners(record),name:record.name});
+ const merged={};for(const item of requested){if(!merged[item.rel])merged[item.rel]={...item,providers:[]};merged[item.rel].providers=[...new Set([...merged[item.rel].providers,...(item.providers||[item.provider])])].sort();}
  const unique=Object.values(merged),names=[...new Set(unique.map(s=>s.name))];
  const profile=c.resolveProfile(source,root,flavor),built=c.compose(source,profile,names),changes={},destinations={...(old?.destinations||{})};
  for(const item of unique){
@@ -287,7 +363,10 @@ function plan(root,source,flavor,selections,options={}){
   source_digests=old.source_digests;
  }
  const next={...profile,source_digests,destinations,bridges,bundle_digests};
+ const grouping=taskGroupingProof(next,()=>maintenance['source/'+TASK_GROUPING_SOURCE]??null);
+ if(grouping)next.task_grouping=grouping;
  next.identity=compositionIdentity(next);
+ requireGroupedQueueCompatibility(root,next,groupingFileReader(root,changes));
  changes[PROFILE]=c.json(next);
  if(old?.identity!==next.identity){const stopped=stoppedWorkflow(root);if(stopped)changes[WORKFLOW]=stopped;}
  const expected={};
@@ -319,19 +398,26 @@ function verify(root,source,allowForeign=false){
   if(owners(record).some(id=>{const provider=providers.find(p=>p.id===id);return !provider||rel!==path.posix.join(provider.id==='generic'?'':provider.projectPath,record.name);}))throw Error('Provider ownership disagrees with the scoped destination: '+rel);
  }
  for(const [rel,digest] of Object.entries(p.bundle_digests))if(rel.startsWith(INSTALL+'/source/')&&p.source_digests[rel.slice((INSTALL+'/source/').length)]!==digest)throw Error('Bundle and source recipe identities disagree');
+ const grouping=verifyTaskGroupingProof(p,groupingFileReader(root));
+ if(!grouping)requireGroupedQueueCompatibility(root,p);
  return p;
 }
 function install(root,source,flavor,selections,options={}){
  if(options.dryRun){const result=plan(root,source,flavor,selections,options);return {profile:result.profile,delta:result.delta,action:'dry-run'};}
  return locked(root,()=>{
   const result=plan(root,source,flavor,selections,options);
-  transaction(root,result.changes,result.expected,()=>{const current=c.resolveProfile(source,root,flavor);if(current.environment_id!==result.profile.environment_id)throw Error('Project inputs changed during profile staging; refresh from current inputs');});
+  options.guardPlan?.(result);
+  transaction(root,result.changes,result.expected,()=>{
+   const current=c.resolveProfile(source,root,flavor);
+   if(current.environment_id!==result.profile.environment_id)throw Error('Project inputs changed during profile staging; refresh from current inputs');
+   options.guardPlan?.(result);
+  });
   try{verify(root,source);}catch(error){
    if(result.delta.length){try{restoreGeneration(root);}catch(recovery){throw Error('Profile verification failed; preserved generation backups require conflict review: '+error.message+'; '+recovery.message);}}
    throw error;
   }
   return {profile:result.profile,delta:result.delta,action:result.delta.length?'installed':'verified no-op current'};
- },{recoverPluginPending:options.recoverPluginPending});
+ },{recoverPending:options.recoverPending,recoverPluginPending:options.recoverPluginPending});
 }
 function uninstall(root,selections,options={}){
  function action(){const p=receipt(root,true);verifyOwned(root,p);if(hasActiveOperation(root))throw Error('Active controller must stop before uninstall');const next=JSON.parse(c.json(p)),changes={},expected={};
@@ -347,6 +433,10 @@ function uninstall(root,selections,options={}){
     const current=c.read(root,rel),block=bridgeBlock(current);changes[rel]=current.replace(block,'');expected[rel]=treeHash(root,rel);delete next.bridges[rel];
    }
   }
+  delete next.task_grouping;
+  const grouping=taskGroupingProof(next,()=>groupingFileReader(root)(TASK_GROUPING_BUNDLE));
+  if(grouping)next.task_grouping=grouping;
+  requireGroupedQueueCompatibility(root,next,groupingFileReader(root,changes));
   next.identity=compositionIdentity(next);const stopped=stoppedWorkflow(root);if(stopped){changes[WORKFLOW]=stopped;expected[WORKFLOW]=treeHash(root,WORKFLOW);}
   changes[PROFILE]=c.json(next);expected[PROFILE]=treeHash(root,PROFILE);if(!options.dryRun)transaction(root,changes,expected);return {action:options.dryRun?'dry-run uninstall':'removed',profile:next,delta:Object.keys(changes)};
  }
@@ -377,10 +467,12 @@ function restoreGeneration(root){
   }
   else changes[e.dest]=Object.fromEntries(Object.keys(filesAt(root,e.backup)).map(rel=>[rel,fs.readFileSync(c.safe(root,e.backup+'/'+rel))]));
  }
+ const nextProfile=Object.hasOwn(changes,PROFILE)?changes[PROFILE]:c.json(p);
+ requireGroupedQueueCompatibility(root,nextProfile===null?null:JSON.parse(nextProfile),groupingFileReader(root,changes));
  const stopped=stoppedWorkflow(root);if(stopped){changes[WORKFLOW]=stopped;expected[WORKFLOW]=treeHash(root,WORKFLOW);}
  transaction(root,changes,expected);return {action:'generation rolled back; project dependencies unchanged; verify freshness before admission'};
 }
-function rollback(root){return locked(root,()=>restoreGeneration(root),{recoverPending:false,recoverPluginPending:false});}
+function rollback(root,{guard}={}){return locked(root,()=>{guard?.();return restoreGeneration(root);},{recoverPending:false,recoverPluginPending:false});}
 function rebind(root,source){
  verify(root,source,true);
  return locked(root,()=>{
@@ -414,4 +506,4 @@ function localMain(root,source,args){
   const result=refresh(root,source,args.includes('--dry-run'));console.log(c.json({action:result.action,changed:result.delta,facts:result.profile.facts,gaps:result.profile.gaps}));return 0;
  }catch(error){console.error(error.message);return 2;}
 }
-module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,readHookRecords,pendingHookOperation,stoppedWorkflow,plan,install,verify,uninstall,refresh,rollback,rebind,localMain};
+module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,readHookRecords,pendingHookOperation,stoppedWorkflow,plan,install,verify,verifyTaskGroupingProfile,uninstall,refresh,rollback,rebind,localMain};

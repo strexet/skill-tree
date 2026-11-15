@@ -503,7 +503,7 @@ test('interactive EOF exits the optional stage without selecting a recommendatio
 
 test('optional plugin confirmation refreshes from the installed core after a source checkout edit', t => {
   const f = setup(t), checkout = path.join(f.base, 'checkout');
-  for (const relative of ['common', 'config', 'domains', 'lib', 'src', 'templates', 'skills/general']) {
+  for (const relative of ['common', 'config', 'domains', 'lib', 'src', 'templates', 'skills/general', 'tests/fixtures/director']) {
     fs.cpSync(path.join(source, relative), path.join(checkout, relative), {recursive: true});
   }
   const resource = 'common/references/decision-governance.md';

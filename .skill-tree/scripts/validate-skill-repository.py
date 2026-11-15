@@ -24,7 +24,8 @@ def validate(strict=False):
     for rel in ['AGENTS.md','README.md','LICENSE','package.json','install.sh','install.ps1']:
         if not (repo/rel).is_file():errors.append('Missing root entrypoint: '+rel)
     if json.loads((repo/'package.json').read_text()).get('license')!='MIT':errors.append('Package license must remain MIT')
-    if json.loads((repo/'package.json').read_text()).get('version')!=json.loads((core/'config/flavors.json').read_text()).get('release_version'):errors.append('Package version and flavor registry release_version disagree')
+    registry=json.loads((core/'config/flavors.json').read_text())
+    if json.loads((repo/'package.json').read_text()).get('version')!=registry.get('release_version'):errors.append('Package version and flavor registry release_version disagree')
     for path in core.rglob('*'):
         # Installed execution snapshots and transaction backups have separate receipt verification.
         if path.is_relative_to(core/'installation'):continue
@@ -35,11 +36,24 @@ def validate(strict=False):
         if path.suffix=='.py':
             try:ast.parse(path.read_text())
             except SyntaxError as exc:errors.append(str(exc))
-    actual={p.parent.name for p in (core/'skills').glob('*/*/SKILL.md')}
-    if actual!=set(mapping):errors.append('Skill catalog and resource map disagree')
-    for flavor in ['general','web','unity']:
-      for name,resources in mapping.items():
-        package=core/'skills'/flavor/name;text=(package/'SKILL.md').read_text()
+    operations=json.loads((core/'templates/operations.json').read_text())
+    core_names=registry.get('core_operations',[])
+    expected={}
+    for flavor,recipe in registry['flavors'].items():
+        names=[*core_names,*recipe.get('operations',[])]
+        if not names or len(names)!=len(set(names)) or set(names)-set(mapping):
+            errors.append('Invalid flavor operation membership: '+flavor)
+        expected[flavor]=set(names)
+    actual={(p.parent.parent.name,p.parent.name) for p in (core/'skills').glob('*/*/SKILL.md')}
+    if actual!={(flavor,name) for flavor,names in expected.items() for name in names}:
+        errors.append('Generated skill catalog and flavor operation membership disagree')
+    declared=set().union(*expected.values())
+    if declared!=set(mapping) or declared!=set(operations):errors.append('Flavor membership, operation templates and resource map disagree')
+    for flavor,names in expected.items():
+      for name in sorted(names & set(mapping)):
+        resources=mapping[name];package=core/'skills'/flavor/name
+        if not (package/'SKILL.md').is_file():continue
+        text=(package/'SKILL.md').read_text()
         if not re.fullmatch(r'skill-tree-[a-z0-9]+(?:-[a-z0-9]+)*',name) or len(name)>64:errors.append('Invalid skill name: '+name)
         match=re.match(r'---\n(.*?)\n---\n',text,re.S)
         if not match or 'name: '+name+'\n' not in match[1]+'\n':errors.append('Invalid frontmatter: '+name)

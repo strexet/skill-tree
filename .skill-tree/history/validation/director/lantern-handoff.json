@@ -1,0 +1,261 @@
+{
+  "acceptance": {
+    "delivery": "unreviewed",
+    "next_requirement_after_matching_check": "eligible",
+    "previous_requirement": "eligible",
+    "replacement_while_unverified": "held"
+  },
+  "blender": {
+    "attempt_id": "C-dddc9ddd-d1d8-4c7b-a60c-ec345480e080",
+    "manifest": {
+      "path": ".skill-tree/history/validation/director/lantern-art.json",
+      "sha256": "1ef6fa6a7462b1777df02c60b979356b9da4d36160b912d3fa4e9eb984485c50"
+    },
+    "model": {
+      "artifact": {
+        "path": ".skill-tree/history/validation/director/lantern-art/directorlantern.fbx",
+        "sha256": "a29f05d0d78a9af6acf6b7121abd838a1b95ce1c9c178ddbc76886974d117307"
+      },
+      "native_reimport": {
+        "path": ".skill-tree/history/validation/director/lantern-art/blender-native.json",
+        "sha256": "74f9f0e1342af1a9b6c71c416cf85ed689023ee5b20b6e7e41c30f95a59a0e15"
+      },
+      "pin": {
+        "adapter": "blender-observed",
+        "area_id": "art",
+        "record_id": "cave-lantern",
+        "revision": "r001",
+        "role": "geometry",
+        "sha256": "a29f05d0d78a9af6acf6b7121abd838a1b95ce1c9c178ddbc76886974d117307",
+        "status": "verified",
+        "strength": "required"
+      }
+    },
+    "original_sandbox": {
+      "after": {
+        "files": 202,
+        "sha256": "d809735818ecb9c7ac795ca4d6453b522658fe50a41535cf14c31aec16e024ea"
+      },
+      "before": {
+        "files": 202,
+        "sha256": "d809735818ecb9c7ac795ca4d6453b522658fe50a41535cf14c31aec16e024ea"
+      }
+    },
+    "path": ".skill-tree/history/validation/director/lantern-art-result.json",
+    "sha256": "dc639c7de62b3e42f3ba5429b46fd9100d735b0759a3d2e49743a17b295b28ed"
+  },
+  "change": {
+    "next": {
+      "check": "SkillTreeSandbox.Director.DirectorLanternCarry.BeltPickupAndCarryThroughCave",
+      "observed_batch": "2dc96be9cb3c9d7afbb0e96e7d09c4f4d550e0e51bc42b8ca08d69673ab7270f",
+      "socket": "BeltSocket",
+      "source": {
+        "path": ".skill-tree/tests/fixtures/director/story/carry-belt.json",
+        "sha256": "7928010f5bdba1e66e535325dfa838f1d55bd4ac9d3ed944f64d1129f2363953"
+      },
+      "source_pin": {
+        "adapter": "fixture-narrative",
+        "area_id": "story",
+        "record_id": "cave-lantern-carry",
+        "revision": "r002",
+        "role": "carry-requirement",
+        "sha256": "7928010f5bdba1e66e535325dfa838f1d55bd4ac9d3ed944f64d1129f2363953",
+        "status": "verified",
+        "strength": "required"
+      },
+      "wrapper": {
+        "path": ".skill-tree/history/validation/director/lantern-art/lantern-belt.json",
+        "sha256": "ea76afa7aa26db0e2a2c91439852ec8bfd8a798e200070fbdea15890a29e9b4a"
+      },
+      "wrapper_pin": {
+        "adapter": "blender-observed",
+        "area_id": "art",
+        "record_id": "lantern-carry-wrapper",
+        "revision": "r002",
+        "role": "attachment-wrapper",
+        "sha256": "ea76afa7aa26db0e2a2c91439852ec8bfd8a798e200070fbdea15890a29e9b4a",
+        "status": "verified",
+        "strength": "required"
+      }
+    },
+    "previous": {
+      "check": "SkillTreeSandbox.Director.DirectorLanternCarry.HandPickupAndCarryThroughCave",
+      "observed_batch": "2dc96be9cb3c9d7afbb0e96e7d09c4f4d550e0e51bc42b8ca08d69673ab7270f",
+      "socket": "GripSocket",
+      "source": {
+        "path": ".skill-tree/tests/fixtures/director/story/carry-hand.json",
+        "sha256": "598b028fc47f8449589ab3421e6e2678146d96cd196f2f9183967773e5181f92"
+      },
+      "source_pin": {
+        "adapter": "fixture-narrative",
+        "area_id": "story",
+        "record_id": "cave-lantern-carry",
+        "revision": "r001",
+        "role": "carry-requirement",
+        "sha256": "598b028fc47f8449589ab3421e6e2678146d96cd196f2f9183967773e5181f92",
+        "status": "verified",
+        "strength": "required"
+      },
+      "wrapper": {
+        "path": ".skill-tree/history/validation/director/lantern-art/lantern-hand.json",
+        "sha256": "cc2a88653d7563cc8ef6f452ee8997dbe55c0cff2fc3b593c245f7f6abcc9131"
+      },
+      "wrapper_pin": {
+        "adapter": "blender-observed",
+        "area_id": "art",
+        "record_id": "lantern-carry-wrapper",
+        "revision": "r001",
+        "role": "attachment-wrapper",
+        "sha256": "cc2a88653d7563cc8ef6f452ee8997dbe55c0cff2fc3b593c245f7f6abcc9131",
+        "status": "verified",
+        "strength": "required"
+      }
+    }
+  },
+  "fixture_id": "director-held-lantern",
+  "impact": {
+    "affected": [
+      {
+        "assignment_id": "lantern-attachment",
+        "paths": [
+          [
+            "lantern-attachment"
+          ]
+        ]
+      },
+      {
+        "assignment_id": "lantern-cave-carry",
+        "paths": [
+          [
+            "lantern-attachment",
+            "lantern-cave-carry"
+          ]
+        ]
+      }
+    ],
+    "coverage": "recorded-paths",
+    "current": [
+      "lantern-model-geometry",
+      "lantern-repeat-import",
+      "wall-mount-diagnostic"
+    ],
+    "source": {
+      "adapter": "fixture-narrative",
+      "area_id": "story",
+      "record_id": "cave-lantern-carry"
+    },
+    "superseded": [
+      "lantern-attachment",
+      "lantern-cave-carry"
+    ],
+    "unknown": [],
+    "unrecorded": [
+      "animation",
+      "blog"
+    ]
+  },
+  "independent_checks": {
+    "lantern-model-geometry": {
+      "artifact": {
+        "path": ".skill-tree/history/validation/director/lantern-art/directorlantern.fbx",
+        "sha256": "a29f05d0d78a9af6acf6b7121abd838a1b95ce1c9c178ddbc76886974d117307"
+      },
+      "native_reimport": {
+        "path": ".skill-tree/history/validation/director/lantern-art/blender-native.json",
+        "sha256": "74f9f0e1342af1a9b6c71c416cf85ed689023ee5b20b6e7e41c30f95a59a0e15"
+      },
+      "pin": {
+        "adapter": "blender-observed",
+        "area_id": "art",
+        "record_id": "cave-lantern",
+        "revision": "r001",
+        "role": "geometry",
+        "sha256": "a29f05d0d78a9af6acf6b7121abd838a1b95ce1c9c178ddbc76886974d117307",
+        "status": "verified",
+        "strength": "required"
+      }
+    },
+    "lantern-repeat-import": {
+      "artifact_sha256": "a29f05d0d78a9af6acf6b7121abd838a1b95ce1c9c178ddbc76886974d117307",
+      "check": "SkillTreeSandbox.Director.DirectorLanternImport.RepeatedImportPreservesGuidMeshAndMetricSockets",
+      "report_sha256": "c24b317af90bf6316ccabc9efe00f706b4d36af3a059f227dd38531fa407de6a"
+    },
+    "wall-mount-diagnostic": {
+      "check": "SkillTreeSandbox.Director.DirectorLanternImport.WrongTargetAndWallMountedControlRejectAttachment",
+      "control": {
+        "guid": "26676c7dcdcf941d99dda41b1fb88b2e",
+        "meta_sha256": "fde70f35414674e501db92a21ff3d59c30197afa25541657f94ab1e0b0242cf2",
+        "path": "Assets/SkillTree3D/LanternPilot/Lantern.prefab",
+        "sha256": "f7c1c4608f9375a36a61217f6229d2e1e8adbc0c9e072cc21ed2ffd2244652c9",
+        "wall_socket": "MountOrigin"
+      },
+      "report_sha256": "c24b317af90bf6316ccabc9efe00f706b4d36af3a059f227dd38531fa407de6a"
+    }
+  },
+  "kind": "director-lantern-handoff-observation",
+  "projection_sha256": "33e7d414dc0707fce9353ee193977e988302a2c7503fc4cb318db25d5b811b9c",
+  "schema": 1,
+  "scope": "disposable-native-fixture",
+  "source_run_id": "WR-acc2606d-9665-458b-81dc-d02e4a6b12db",
+  "task_id": "T-2d4cdd62-11bd-49b7-906f-343a0df202f3",
+  "unity": {
+    "editmode": {
+      "cases": [
+        "SkillTreeSandbox.Director.DirectorLanternImport.RepeatedImportPreservesGuidMeshAndMetricSockets",
+        "SkillTreeSandbox.Director.DirectorLanternImport.WrongTargetAndWallMountedControlRejectAttachment"
+      ],
+      "log": {
+        "path": "editmode/editor.log",
+        "sha256": "c02de52a1773f7a663741949b4dbace1bf9f8cfb2671779b377a88b4e145fcfb"
+      },
+      "path": ".skill-tree/history/validation/director/lantern-editmode.json",
+      "pid": 16163,
+      "recipe_id": "unity-editmode",
+      "sha256": "7c93e024ff71dc28080bffeeffa1bf9bc8334dde5cba397f0f05dfa2c2fb117e",
+      "xml": {
+        "path": "editmode/report.xml",
+        "sha256": "c24b317af90bf6316ccabc9efe00f706b4d36af3a059f227dd38531fa407de6a"
+      }
+    },
+    "observation": {
+      "path": "lantern-unity-observed.json",
+      "sha256": "6e0d5fda2404d4dbff28feba8fc60da91ac7fef5039419fdced1f8dd5638f58f"
+    },
+    "playmode": {
+      "cases": [
+        "SkillTreeSandbox.Director.DirectorLanternCarry.BeltPickupAndCarryThroughCave",
+        "SkillTreeSandbox.Director.DirectorLanternCarry.HandPickupAndCarryThroughCave"
+      ],
+      "log": {
+        "path": "playmode/editor.log",
+        "sha256": "6134698ae4d831be5898cace44cb18b1c913ed758ef05832ecf2f99fca7214d2"
+      },
+      "path": ".skill-tree/history/validation/director/lantern-playmode.json",
+      "pid": 20499,
+      "recipe_id": "unity-playmode",
+      "sha256": "4ab5eda8c5ad2db0529e33eb109ce1ea4cd2e7bb040d0108cb8049b53791278b",
+      "xml": {
+        "path": "playmode/report.xml",
+        "sha256": "2dc96be9cb3c9d7afbb0e96e7d09c4f4d550e0e51bc42b8ca08d69673ab7270f"
+      }
+    },
+    "profile": {
+      "identity": "ade2131145959d07d34df018d7d370a2dffdb8578e2e59b33121d908157234c2",
+      "queue_id": "Q-2fe6667a-de15-4e8c-8f1c-df52d2a506e0",
+      "sha256": "5572d1958868cc5a9ec3e11dea970f1c5e64c548aad075a1bb1312cfac5e8e8e"
+    },
+    "project_path_sha256": "45a7939d0d479028dce62817eda109d35f71c9f62713d73713da7f316023fcfd"
+  },
+  "verification_sources": {
+    ".skill-tree/common/scripts/director-plans.py": "b28d8e4326dda6c390586759e36750c74cb909169ff244ecfe7af1e359bfb863",
+    ".skill-tree/history/validation/director/unity-baseline.json": "2f1f43ab7462442ab4cc8fd7add3ac5ce0fb72a0205a4987b1fb97f96363bb68",
+    ".skill-tree/tests/fixtures/director/lantern-fixture.json": "75a61c410b39276274823483172d43895dc26624c68fc99aed2c9685f809ba3e",
+    ".skill-tree/tests/fixtures/director/produce-lantern-blender.py": "e4ac61eb4e846da4e6d9c293df01a57f6bb8fbdaa74648e7e1e180979b160ec2",
+    ".skill-tree/tests/fixtures/director/project-lantern-handoff.py": "155fd9e3108c1175c7722e6e77f842a1a784d6be60afa12ba78b5c3166278b43",
+    ".skill-tree/tests/fixtures/director/run-unity-lantern.py": "810a8548fb35c074ce212d5ae56e3cae17515f0e1db97dd4a06f2e7a8e98463b",
+    ".skill-tree/tests/fixtures/director/unity-baseline.json": "5ce5e2f4639f3348521108fd4fa9091bfef02a2d95e3dbac7f5655bb2ae6af0d",
+    ".skill-tree/tests/fixtures/director/verify-lantern-art.py": "7477bda73ff2c4b3ebdf92b873bb653bd42db0a67d310957c64f900dfbada98f",
+    ".skill-tree/tests/fixtures/director/verify-unity-baseline.py": "882feb1213d8960eedb6f61449b25241997b2a6876bcecc332e88c35a87244cb",
+    ".skill-tree/tests/fixtures/director/verify-unity-lantern.py": "3e93925a0e522b1db9f841db192e69b001bf8de3789a8159411170df440d1538"
+  }
+}
