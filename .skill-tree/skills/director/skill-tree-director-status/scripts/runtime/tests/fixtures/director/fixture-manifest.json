@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "areas": {
+    "story": "story",
+    "art": "art",
+    "game": "game"
+  },
+  "base_branch": "main",
+  "remote": "origin",
+  "story": {
+    "id": "cave-lantern-carry",
+    "accepted": {
+      "path": "story/carry-hand.json",
+      "sha256": "598b028fc47f8449589ab3421e6e2678146d96cd196f2f9183967773e5181f92",
+      "revision": "r001"
+    },
+    "changed": {
+      "path": "story/carry-belt.json",
+      "sha256": "7928010f5bdba1e66e535325dfa838f1d55bd4ac9d3ed944f64d1129f2363953",
+      "revision": "r002"
+    }
+  },
+  "artifact": {
+    "path": "art/lantern.json",
+    "sha256": "57639220b41a1d2bbd2f04e007db5b047ca54891b5e26893b9ae5e178ca6f853",
+    "id": "cave-lantern",
+    "revision": "r001"
+  },
+  "consumer": {
+    "path": "game/check-carry.py",
+    "sha256": "7db771c89997a0b05251e0ad7e996f83cfd10bbfca8229d3f0a3dade745aa308",
+    "failure": "attachment mismatch: expected belt, found hand"
+  },
+  "fault_point": "before-workspace-create"
+}

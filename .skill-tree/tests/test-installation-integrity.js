@@ -53,16 +53,63 @@ test('static inspection appears in the owned profile and explicit declarations t
  assert.equal(recipe.assertion_contract, undefined);
 });
 
-test('static inspection stays resolvable on an owned legacy profile and appears after source update', t => {
- const root = setup(t);
+function copiedSource(t) {
  const legacySource = setup(t);
  const source = path.resolve(__dirname, '..');
  for (const name of ['common', 'config', 'domains', 'lib', 'src', 'templates']) {
   fs.cpSync(path.join(source, name), path.join(legacySource, name), {recursive: true});
  }
+ const resources = Object.values(require('../config/resource-map.json'));
+ const mappedFixtures = resources.flatMap(groups => Object.values(groups).flatMap(files => Object.values(files)))
+  .filter(relative => relative.startsWith('tests/fixtures/director/'));
  const catalogEntry = path.join('skills/general', inspectionOperation, 'SKILL.md');
- fs.mkdirSync(path.dirname(path.join(legacySource, catalogEntry)), {recursive: true});
- fs.copyFileSync(path.join(source, catalogEntry), path.join(legacySource, catalogEntry));
+ for (const relative of new Set([catalogEntry, ...mappedFixtures])) {
+  fs.mkdirSync(path.dirname(path.join(legacySource, relative)), {recursive: true});
+  fs.copyFileSync(path.join(source, relative), path.join(legacySource, relative));
+ }
+ return legacySource;
+}
+
+test('external sources without membership exports still list, install and verify', t => {
+ const root = setup(t);
+ const legacySource = copiedSource(t);
+ const flavorFile = path.join(legacySource, 'config/flavors.json');
+ const membership = JSON.parse(fs.readFileSync(flavorFile));
+ delete membership.core_operations;
+ delete membership.flavors.director;
+ fs.writeFileSync(flavorFile, JSON.stringify(membership));
+ for (const relative of ['templates/operations.json', 'config/resource-map.json']) {
+  const file = path.join(legacySource, relative);
+  const current = JSON.parse(fs.readFileSync(file));
+  const core = Object.fromEntries(Object.entries(current).filter(([name]) => !name.startsWith('skill-tree-director-')));
+  fs.writeFileSync(file, JSON.stringify(core));
+ }
+ const composer = path.join(legacySource, 'lib/composer.js');
+ fs.appendFileSync(composer, '\ndelete module.exports.flavorNames;\ndelete module.exports.operationNames;\n');
+
+ const external = ['--source', legacySource];
+ const listed = run(root, [...external, '--list']);
+ assert.equal(listed.status, 0, listed.stdout + listed.stderr);
+ assert.match(listed.stdout, /Flavors: general, web, unity\n/);
+ assert.ok(listed.stdout.split('\n').includes(inspectionOperation));
+ assert.ok(!listed.stdout.includes('skill-tree-director-'));
+ const dry = run(root, [...inspectionSelection, ...external, '--dry-run']);
+ assert.equal(dry.status, 0, dry.stdout + dry.stderr);
+ assert.deepEqual(fs.readdirSync(root), []);
+ const legacy = run(root, [...inspectionSelection, ...external]);
+ assert.equal(legacy.status, 0, legacy.stdout + legacy.stderr);
+ const profileFile = path.join(root, inspectionProfile);
+ const legacyReceipt = fs.readFileSync(profileFile);
+ for (const selection of [external, []]) {
+  const verified = run(root, [...inspectionSelection, ...selection, '--verify']);
+  assert.equal(verified.status, 0, verified.stdout + verified.stderr);
+  assert.deepEqual(fs.readFileSync(profileFile), legacyReceipt);
+ }
+});
+
+test('static inspection stays resolvable on an owned legacy profile and appears after source update', t => {
+ const root = setup(t);
+ const legacySource = copiedSource(t);
  const config = path.join(legacySource, 'config/capabilities.json');
  const legacyCapabilities = JSON.parse(fs.readFileSync(config));
  delete legacyCapabilities.built_in_recipes;

@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "narrative": {
+    "status": "source-verified",
+    "source": "common/scripts/narrative-state.py",
+    "sha256": "ad6618d06fc1b2cac79694a64ff5733bdd03a330e0714851e04e185d108c1388"
+  },
+  "artworkshop": {
+    "status": "unsupported",
+    "observed_source_sha256": "6cef226a82b646e11de36d018b5df18fd291d52b36d306a146719b74fb09ecad",
+    "reason": "A reviewed current installed ArtWorkshop adapter is required."
+  },
+  "logs": {
+    "status": "unsupported",
+    "observed_source_sha256": "4dcae8ec5bc099a2c65f7b3d151e7b6e5d3b86401789611f587f18387e7a8480",
+    "reason": "A reviewed current installed logs adapter is required."
+  }
+}

@@ -290,6 +290,35 @@ def create_reserved(store, run, path):
     run['workspace_state'] = 'ready'
     store.source_root = path
 
+
+def inspect_directed_reservation(store, run, requested=None):
+    """Check lost-acknowledgement inputs without creating or switching a checkout."""
+    expected = run.get('dispatch_workspace_sha256')
+    if expected is None or delivery_finished(run):
+        return
+    if run.get('workspace_state') != 'reserved':
+        view = deepcopy(store)
+        ensure_workspace(view, run)
+        if local_git_text(view.source_root, 'rev-parse', '--show-toplevel') != str(view.source_root):
+            raise RunError('Recorded Director worktree is not the exact Git checkout root')
+        return
+    locator = runtime(store.root)
+    recorded = locator['worktrees'].get(run['id']) if locator else None
+    spec = run['workspace']
+    ref = 'refs/heads/' + spec['branch']
+    branch_tip = local_git(store.root, 'rev-parse', '--verify', '--quiet', ref, accepted=(0, 1)).stdout.decode().strip()
+    if branch_tip and branch_tip != spec['base_commit']:
+        raise RunError('Reserved Director source branch differs from the recorded Git base')
+    if requested is None and recorded is None:
+        return  # Reservation predates locator write. Recovery requires the original path.
+    path = Path(requested or recorded).resolve()
+    if hashlib.sha256(str(path).encode()).hexdigest() != expected or recorded and Path(recorded).resolve() != path:
+        raise RunError('Director reservation requires the original exact worktree path')
+    if path.exists() and (not path.is_dir() or common_dir(path) != common_dir(store.root)
+                          or local_git_text(path, 'rev-parse', '--show-toplevel') != str(path)
+                          or local_git_text(path, 'symbolic-ref', '--quiet', '--short', 'HEAD') != spec['branch']):
+        raise RunError('Reserved Director worktree has a conflicting ownership or branch')
+
 def recover_locator(store, payload):
     """Explicitly repair local paths only; never rewrite portable checkpoints."""
     with store.lock():
@@ -631,19 +660,20 @@ def environment(store, payload=None):
     if profile_path.exists() and profile.get('inputs',{}).get('.skill-tree/worktree-profile.json')!=actual:raise RunError('Worktree environment declaration changed; review and refresh the exact worktree profile')
     if policy.get('schema')!=1:raise RunError('Unsupported worktree environment profile')
     flavor=profile['flavor'];defaults={'general':['build','dist','.cache'],'web':['node_modules','dist','build','.next','.cache'],'unity':['Library','Temp','Logs','obj','Builds']}
+    layout=('unity' if profile.get('facts',{}).get('editor') else 'general') if flavor=='director' else flavor
     missing=[]
     for rel in policy.get('required_files',[]):
         path=Path(rel)
         if path.is_absolute() or '..' in path.parts:raise RunError('Environment prerequisites require repository-relative paths')
         if not (root/path).is_file():missing.append(rel)
-    directories=list(dict.fromkeys(defaults[flavor]+policy.get('isolated_directories',[])))
+    directories=list(dict.fromkeys(defaults[layout]+policy.get('isolated_directories',[])))
     for rel in directories:
         path=Path(rel)
         if path.is_absolute() or '..' in path.parts:raise RunError('Mutable directories require repository-relative paths')
         actual=root/path
         if actual.exists() and not actual.resolve().is_relative_to(root):raise RunError('Concurrent mutable directory sharing lacks verified support: '+rel)
     required_resources=list(policy.get('exclusive_resources',[]))
-    if payload.get('runtime') and flavor=='unity' and not required_resources:
+    if payload.get('runtime') and layout=='unity' and not required_resources:
         raise RunError('Unity runtime requires an explicit Editor/MCP/save/fixture resource policy')
     for key in required_resources if payload.get('runtime') else []:
         claim=registry['resources'].get(key) if registry else None
@@ -661,6 +691,7 @@ def recover_workspace(store,payload):
         requested=payload.get('worktree') or data['worktrees'].get(rid)
         if not requested:raise RunError('Recovery requires the recorded or explicitly relocated worktree path')
         path=Path(requested).resolve()
+        if run.get('workspace_state')=='reserved':inspect_directed_reservation(store,run,path)
         if path.exists():
             if common_dir(path)!=common_dir(store.root) or git(path,'symbolic-ref','--short','HEAD')!=spec['branch']:
                 raise RunError('Recovery never switches a conflicting worktree branch')

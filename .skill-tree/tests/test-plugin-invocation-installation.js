@@ -3,7 +3,7 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),{spawnSync}=require('node:child_process');
 const composer=require('../lib/composer.js'),installation=require('../lib/installation.js');
-const core=path.resolve(__dirname,'..'),operations=Object.keys(require('../templates/operations.json')).sort();
+const core=path.resolve(__dirname,'..'),operations=require('../config/flavors.json').core_operations.slice().sort();
 function write(root,relative,value){const file=path.join(root,relative);fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,Buffer.isBuffer(value)||typeof value==='string'?value:JSON.stringify(value));}
 function files(root){const out={};function visit(relative){for(const e of fs.readdirSync(path.join(root,relative),{withFileTypes:true})){const next=path.posix.join(relative,e.name);assert.equal(e.isSymbolicLink(),false);if(e.isDirectory())visit(next);else out[next]=fs.readFileSync(path.join(root,next));}}visit('');return out;}
 function python(args,cwd,expected=0){const run=spawnSync('python3',['-I','-B',...args],{cwd,encoding:'utf8',timeout:30000});assert.equal(run.status,expected,run.stdout+run.stderr);return run.stdout;}

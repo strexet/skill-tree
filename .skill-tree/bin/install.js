@@ -5,11 +5,13 @@ const crypto = require("node:crypto");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
+const {flavorNames, operationNames} = require("../lib/composer.js");
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const PROVIDERS_FILE = path.join(REPO_ROOT, "config", "providers.json");
 
 function usage() {
+  const flavors = flavorNames(REPO_ROOT).join("|");
   return `Usage: node .skill-tree/bin/install.js [options]
 
 Options:
@@ -17,7 +19,7 @@ Options:
   --only <provider-id>          Select provider id from .skill-tree/config/providers.json (repeatable)
   --agent <upstream-profile>    Explicit upstream skills CLI profile passthrough (repeatable)
   --skills <names...>           Select one or more skills
-  --flavor general|web|unity    Select the project workflow flavor\n  --global                      Unsupported for project specialization
+  --flavor ${flavors}    Select the project workflow flavor\n  --global                      Unsupported for project specialization
   --project                     Install to project path (default)
   --target <path>               Project root or explicit generic destination
   --source <path>               Explicit local Skill Tree source repository
@@ -45,12 +47,8 @@ function loadProviders(file = PROVIDERS_FILE) {
   return JSON.parse(fs.readFileSync(file, "utf8"));
 }
 
-function listSkills(sourceRoot = REPO_ROOT) {
-  const dir = path.join(sourceRoot, "skills", "general");
-  if (!fs.existsSync(dir)) return [];
-  return fs.readdirSync(dir)
-    .filter((name) => fs.existsSync(path.join(dir, name, "SKILL.md")))
-    .sort();
+function listSkills(sourceRoot = REPO_ROOT, flavor = "general") {
+  return operationNames(sourceRoot, flavor);
 }
 
 function parseArgs(argv) {
@@ -251,8 +249,8 @@ function selectedProviders(args, matrix) {
   });
 }
 
-function selectedSkills(args, sourceRoot) {
-  const available = listSkills(sourceRoot);
+function selectedSkills(args, sourceRoot, flavor = "general") {
+  const available = listSkills(sourceRoot, flavor);
   if (args.skills.length === 0 || args.skills.includes("*")) return available;
   for (const skill of args.skills) {
     if (!available.includes(skill)) throw new Error(`unknown skill: ${skill}`);
@@ -287,11 +285,12 @@ function installBase(provider, args) {
   return path.join(targetRoot, provider.projectPath);
 }
 
-function printList(matrix) {
-  console.log("Flavors: general, web, unity\nProviders:");
+function printList(matrix, source, flavor) {
+  const flavors = flavorNames(source);
+  console.log("Flavors: " + flavors.join(", ") + "\nProviders:");
   for (const provider of matrix.providers) console.log(`${provider.id}\t${provider.label}\ttier=${provider.tier}\tsoft=${provider.soft}`);
   console.log("\nLogical operations:");
-  for (const skill of listSkills()) console.log(skill);
+  for (const skill of [...new Set((flavor ? [flavor] : flavors).flatMap(name => listSkills(source, name)))].sort()) console.log(skill);
 }
 
 const setupAdvice = "Documentation setup remains separate: invoke skill-tree-repo-documentation. After queue creation, capture the persisted foundation finding through scripts/workflow-state.py capture-foundation <project>. No product execution performed.";
@@ -492,9 +491,9 @@ async function main(argv = process.argv.slice(2), {promptFactory} = {}) {
       return await require(path.join(REPO_ROOT, "lib/plugins.js")).listMain(target, listArgs, {source: REPO_ROOT});
     }
     const matrix = loadProviders();
-    if (args.list) { printList(matrix); return 0; }
+    if (args.list) { printList(matrix, sourceRoot(args), args.flavor); return 0; }
     if (args.global || args.symlink || args.agent.length || !isLocalSource(args.source)) {
-      throw Error("Project specialization supports local project-scoped copy installation; global, symlink and uncomposed upstream paths are unsupported. Use --target <project> --flavor general|web|unity --copy.");
+      throw Error("Project specialization supports local project-scoped copy installation; global, symlink and uncomposed upstream paths are unsupported. Use --target <project> --flavor <project flavor> --copy.");
     }
     if (!args.target) throw Error("Select the covered project explicitly with --target <repository>");
     const target = fs.realpathSync(path.resolve(args.target));
@@ -502,20 +501,21 @@ async function main(argv = process.argv.slice(2), {promptFactory} = {}) {
     if (!fs.statSync(target).isDirectory()) throw Error("Target must be a project directory");
     const source = sourceRoot(args);
     const manager = require(path.join(source, "lib/installation.js"));
+    const composer = require(path.join(source, "lib/composer.js"));
+    const flavors = flavorNames(source);
     const prior = manager.receipt(target);
     const interactive = !args.nonInteractive && (Boolean(promptFactory) || Boolean(process.stdin.isTTY && process.stdout.isTTY));
     if (args.configurePlugins && !args.dryRun && !interactive) {
       throw Error("--configure-plugins requires an interactive terminal. Use --plugins with --confirm-plugins for noninteractive setup.");
     }
     const flavor = args.flavor || prior?.flavor ||
-      (interactive && !args.dryRun ? await ask("Choose flavor (general, web, unity): ") : null);
-    if (!["general", "web", "unity"].includes(flavor)) {
-      throw Error("Fresh noninteractive installation requires --flavor general|web|unity; --yes never selects a flavor");
+      (interactive && !args.dryRun ? await ask("Choose flavor (" + flavors.join(", ") + "): ") : null);
+    if (!flavors.includes(flavor)) {
+      throw Error("Fresh noninteractive installation requires --flavor " + flavors.join("|") + "; --yes never selects a flavor");
     }
     const providers = selectedProviders(args, matrix);
     if (!providers.length) throw Error("No providers selected; use --only or --all");
-    const skills = selectedSkills(args, source);
-    const composer = require(path.join(source, "lib/composer.js"));
+    const skills = selectedSkills(args, source, flavor);
     const selections = [], rows = [];
     for (const provider of providers) {
       try {

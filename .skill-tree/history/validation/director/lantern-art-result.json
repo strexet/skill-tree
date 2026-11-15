@@ -1,0 +1,55 @@
+{
+  "artifact": {
+    "bytes": 25596,
+    "path": "DirectorLantern.fbx",
+    "sha256": "a29f05d0d78a9af6acf6b7121abd838a1b95ce1c9c178ddbc76886974d117307"
+  },
+  "attempt_id": "C-dddc9ddd-d1d8-4c7b-a60c-ec345480e080",
+  "deadline": "2026-11-15T02:16:38.509258+00:00",
+  "fixture_id": "director-held-lantern",
+  "kind": "director-lantern-art-result",
+  "manifest_sha256": "1ef6fa6a7462b1777df02c60b979356b9da4d36160b912d3fa4e9eb984485c50",
+  "native": {
+    "path": "blender-native.json",
+    "sha256": "74f9f0e1342af1a9b6c71c416cf85ed689023ee5b20b6e7e41c30f95a59a0e15"
+  },
+  "prepared_at": "2026-11-15T02:01:39.759946+00:00",
+  "process": {
+    "exit_code": 0,
+    "finished_at": "2026-11-15T02:01:55.957631+00:00",
+    "log": {
+      "path": "blender.log",
+      "sha256": "f5781a40495f967be41695bf7c0b2cf35946fef36b9af0d9f09d80954865847d"
+    },
+    "pid": 49121,
+    "process_group_cleared": true,
+    "started_at": "2026-11-15T02:01:54.429021+00:00"
+  },
+  "profile_sha256": "1742dfd3c00b75226cb08bb98edf93f0d912059320bd742f918443dc1aa0742e",
+  "schema": 1,
+  "source_after": {
+    "files": 202,
+    "sha256": "d809735818ecb9c7ac795ca4d6453b522658fe50a41535cf14c31aec16e024ea"
+  },
+  "source_before": {
+    "files": 202,
+    "sha256": "d809735818ecb9c7ac795ca4d6453b522658fe50a41535cf14c31aec16e024ea"
+  },
+  "source_run_id": "WR-acc2606d-9665-458b-81dc-d02e4a6b12db",
+  "task_id": "T-2d4cdd62-11bd-49b7-906f-343a0df202f3",
+  "tool": {
+    "build": "02f0899d78e3",
+    "executable_sha256": "53c8e8266f4e3f619a7c3e87c3a8d34a846339d50f55ebe193cf9ad3528153da",
+    "version": "5.3.0"
+  },
+  "wrappers": {
+    "belt": {
+      "path": "lantern-belt.json",
+      "sha256": "ea76afa7aa26db0e2a2c91439852ec8bfd8a798e200070fbdea15890a29e9b4a"
+    },
+    "hand": {
+      "path": "lantern-hand.json",
+      "sha256": "cc2a88653d7563cc8ef6f452ee8997dbe55c0cff2fc3b593c245f7f6abcc9131"
+    }
+  }
+}

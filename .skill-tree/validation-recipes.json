@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "recipes": {
+    "director-codex-observed": {
+      "lane": "native",
+      "argv": [
+        "python3",
+        ".skill-tree/tests/fixtures/director/verify-codex-host.py",
+        "{project_root}"
+      ],
+      "input_paths": [
+        ".skill-tree/tests/fixtures/director/verify-codex-host.py"
+      ]
+    },
+    "director-blender-observed": {
+      "lane": "native",
+      "argv": [
+        "python3",
+        ".skill-tree/tests/fixtures/director/verify-lantern-art.py",
+        "{project_root}"
+      ],
+      "input_paths": [
+        ".skill-tree/tests/fixtures/director/lantern-fixture.json",
+        ".skill-tree/tests/fixtures/director/produce-lantern-blender.py",
+        ".skill-tree/tests/fixtures/director/run-lantern-blender.py",
+        ".skill-tree/tests/fixtures/director/verify-lantern-art.py"
+      ]
+    }
+  }
+}

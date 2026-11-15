@@ -1,0 +1,19 @@
+{
+  "check_id": "director-actual-codex",
+  "created_at": "2026-11-15T01:23:07.005500+00:00",
+  "fixture_id": "native-codex-fixture",
+  "kind": "director-codex-host-manifest",
+  "profile_sha256": "e903d31a9d59977f877bd48580301a01ff8a875afa03c7fda68a5cdb42d6f06d",
+  "result_path": ".skill-tree/history/validation/director/codex-host-result.json",
+  "schema": 1,
+  "source_run_id": "WR-acc2606d-9665-458b-81dc-d02e4a6b12db",
+  "sources": {
+    ".skill-tree/common/scripts/director-dispatch.py": "e7f0b8514c5facbe99dbf1d7ffd8cd1b24de55e6dc1ecd704473e17ab7ceba9a",
+    ".skill-tree/common/scripts/director-questions.py": "db9a54c1824c7fc9ec1f11d5fd51ac4bfe49cf1805b9a12eb3ead1a83d323761",
+    ".skill-tree/common/scripts/director-run.py": "90dd2d6c010e6f09636659c24a6d2918f5450d6e627a9fac850ed971bbf4751d",
+    ".skill-tree/common/scripts/director-state.py": "07dc505df5c65c0902a9f148ef63b09266918bfbc942f08863398aa431525ba6",
+    ".skill-tree/tests/fixtures/director/verify-codex-host.py": "3b320ba0b69497f612788e6fafb23cf473c63d76364db0c284145321a992d135",
+    ".skill-tree/validation-recipes.json": "3434366802c62b635fcff1cb58b2cb895240595eca978edfd1295b976d208769"
+  },
+  "task_id": "T-0440b3b6-2c5a-4bab-a932-670f06a14663"
+}

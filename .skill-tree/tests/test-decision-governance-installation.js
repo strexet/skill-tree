@@ -5,7 +5,7 @@ const {spawnSync} = require('node:child_process');
 const composer = require('../lib/composer.js');
 const installation = require('../lib/installation.js');
 const core = path.resolve(__dirname, '..');
-const operations = Object.keys(require('../templates/operations.json')).sort();
+const operations = require('../config/flavors.json').core_operations.slice().sort();
 
 function write(root, relative, value) {
   const file = path.join(root, relative);

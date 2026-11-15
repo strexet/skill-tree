@@ -427,7 +427,7 @@ class Store:
         if not changes and not outcomes and not progress_changes and prior==current:return
         sequence=state['run_registry'].setdefault('event_sequences',{}).get(rid,0)+1
         state['run_registry']['event_sequences'][rid]=sequence
-        event={'sequence':sequence,'schema':1,'id':identity('E'),'queue_id':registry['queue_id'],'run_id':rid,'changes':changes,'progress_changes':progress_changes,'outcomes':outcomes,'checkpoint_before':prior,'checkpoint_after':current}
+        event={'sequence':sequence,'schema':1,'id':identity('E'),'queue_id':registry['queue_id'],'run_id':rid,'recorded_at':now(),'changes':changes,'progress_changes':progress_changes,'outcomes':outcomes,'checkpoint_before':prior,'checkpoint_after':current}
         receipts=[]
         for batch in event_intake_origins(grouped+outcomes):
             rel=intake_receipt_path(batch)
@@ -569,8 +569,23 @@ def require_grouped_intake_profile(store):
     if result.returncode:raise WorkflowError('Grouped intake requires a verified owned canonical installation: '+(result.stderr or result.stdout).strip())
 
 
+def director_dispatch_helper():
+    from types import SimpleNamespace
+    helper=owned_module('skill_tree_director_dispatch',Path(__file__).with_name('director-dispatch.py'))
+    helper.wf=SimpleNamespace(**globals())
+    return helper
+
+def child_dispatch(operation,payload,*,start_context=None):
+    if 'director_dispatch' not in payload:return None,payload
+    dispatch=director_dispatch_helper().ChildDispatch(operation,payload,start_context)
+    return dispatch,dispatch.payload
+
 def intake(store,payload):
+    dispatch,payload=child_dispatch('intake',payload)
     with store.lock():
+        if dispatch:
+            replay=dispatch.observed(store)
+            if replay is not None:return replay
         batched='items' in payload
         if batched and set(payload)-{'items','intake_batch_id','expected_source_hash'}:
             raise WorkflowError('Batch input permits items, intake batch identity and source guard')
@@ -591,6 +606,7 @@ def intake(store,payload):
             receipt=read_intake_receipt(store,batch_id)
             if receipt:
                 if receipt['request_sha256']!=request_sha:raise WorkflowError('Intake batch identity already belongs to a different request')
+                if dispatch:raise WorkflowError('Existing intake batch has no matching Director receipt; review original provenance')
                 navigation=manifest(store)
                 if file_hash(store.base/'skill-tree.json')!=digest(dump(navigation).encode()):
                     store.commit({'.skill-tree/skill-tree.json':dump(navigation)})
@@ -605,13 +621,15 @@ def intake(store,payload):
         for item in items:
             text,meta=intake_item(text,state,item,batch_id)
             created.append(meta)
-        extras=None
+        extras={}
         if batch_id is not None:
             receipt={'schema':1,'id':batch_id,'created_at':now(),'request_sha256':request_sha,'items':created}
             validate_intake_receipt(receipt,batch_id)
             extras={rel:dump(receipt)}
+        result=receipt if batched else created[0]
+        if dispatch:extras.update(dispatch.extras(store,result))
         store.save(text,state,extras)
-        return receipt if batched else created[0]
+        return result
 
 def capture_foundation(store):
     profile=store.source_root/'.skill-tree/installation/profile.json'
@@ -638,6 +656,12 @@ def processing_helper():
 
 def process(store,payload):
     """Apply researched dispositions and publish optional holds atomically."""
+    dispatch,payload=child_dispatch('process',payload)
+    if dispatch:
+        with store.lock():
+            replay=dispatch.observed(store)
+            if replay is not None:return replay
+            store.guard(payload['expected_source_hash'])
     if {'topic', 'intake_batch_ids', 'group'} & payload.keys():
         raise WorkflowError('Resolve group filters before processing and pass the exact Pending IDs and source hash')
     proposed=payload.get('dispositions',{})
@@ -651,6 +675,9 @@ def process(store,payload):
     application=processing_helper() if specs else None
     prepared=application.prepare_publication(store,payload,assigned,pr) if application else None
     with store.lock():
+        if dispatch:
+            replay=dispatch.observed(store)
+            if replay is not None:return replay
         store.guard(payload.get('expected_source_hash'))
         text=store.text();state=store.load(text)
         if due:hook_admission(store,scope={'kind':'pending','pending_ids':due})
@@ -667,6 +694,7 @@ def process(store,payload):
             run=state['active_run']
             if run and any(tid in run['admitted_task_ids'] for tid in sessions.keys()|reopened.keys()):
                 run['next_action']='Complete the held post-processing clarification before implementation'
+        if dispatch:extras.update(dispatch.extras(store,receipt))
         store.save(text,state,extras)
         return receipt
 
@@ -856,24 +884,32 @@ def _start_selection(store,mode,selector,workspace,text=None):
     return tasks,chosen,snapshot
 
 def start(store,mode,selector=None,limits=None,workspace=None):
-    options = workspace or {}
+    dispatch,options=child_dispatch('start',workspace or {},start_context={'mode':mode,'selector':selector,'limits':limits})
+    if dispatch:
+        with store.lock():
+            replay=dispatch.observed(store)
+            if replay is not None:return replay
+            store.guard(options['expected_source_hash'])
     if {'topic', 'intake_batch_ids', 'group'} & options.keys():
         raise WorkflowError('Resolve group filters before start and pass the exact snapshot IDs and source hash')
     expected_hash = options.get('expected_source_hash')
     if 'expected_source_hash' in options:
         if not isinstance(expected_hash, str) or not re.fullmatch('[a-f0-9]{64}', expected_hash):
             raise WorkflowError('Start source guard requires the inspected queue SHA-256')
-        store.guard(expected_hash)
+        if not dispatch:store.guard(expected_hash)
     admission=admit_profile(store)
-    pre_tasks,pre_chosen,pre_snapshot=_start_selection(store,mode,selector,workspace)
+    pre_tasks,pre_chosen,pre_snapshot=_start_selection(store,mode,selector,options)
     for tid in dependency_scope(pre_tasks,{'snapshot':pre_snapshot}):prepare_hook_admission(store,scope=tid)
     with store.lock():
+        if dispatch:
+            replay=dispatch.observed(store)
+            if replay is not None:return replay
         text=store.text();state=store.load(text)
         store.guard(expected_hash)
         registry=state.get('run_registry')
         if not registry and state['active_run'] is not None: raise WorkflowError('Active run exists; resume the recorded run')
         if not registry and workspaces.common_dir(store.root):raise WorkflowError('Git controllers require workspace-setup before start')
-        tasks,chosen,snapshot=_start_selection(store,mode,selector,workspace,text)
+        tasks,chosen,snapshot=_start_selection(store,mode,selector,options,text)
         run={'id':identity('WR'),'mode':mode,'snapshot':snapshot,'root_task_id':chosen['id'],'current_task_id':chosen['id'],'phase':'implement','required_ids':[chosen['id']],'deferred_ids':[],'pending_ids':[],'processing_results':[],'completed_ids':[],'limits':limits or {},'partial_work':[],'stop_reason':None,'next_action':'Implement selected task','started_at':now()}
         for tid in dependency_scope(tasks,run):clarification_admission(store,tid)
         run['admission']=admission;run['admitted_task_ids']=sorted(dependency_scope(tasks,run));run['required_ids']=list(run['admitted_task_ids']);run['admitted_groups']=admitted_groups(tasks,run)
@@ -881,9 +917,11 @@ def start(store,mode,selector=None,limits=None,workspace=None):
             done={o['task_id'] for o in store.outcomes() if o['disposition']=='completed'}
             conflicts={tid:registry['claims'][tid] for tid in run['admitted_task_ids'] if tid not in done and tid in registry['claims']}
             if conflicts:raise WorkflowError('Required task claims conflict: '+dump(conflicts))
-            path=workspaces.provision(store,run,workspace or {})
+            path=workspaces.provision(store,run,options)
+            if dispatch:run['dispatch_workspace_sha256']=digest(str(path).encode())
             registry['runs'][run['id']]=run;store.selected_run_id=run['id'];store.run_id=run['id']
-        validate_run(run);state['active_run']=run;store.save(text,state)
+        validate_run(run);state['active_run']=run
+        store.save(text,state,dispatch.extras(store,run) if dispatch else None)
         if registry:
             # A failed Git operation leaves the reserved run and claims for explicit recovery.
             workspaces.create_reserved(store,run,path);store.save(text,state)
@@ -1012,6 +1050,8 @@ def checkpoint(store,payload):
     with store.lock():
         text=store.text();state=store.load(text);run=state['active_run']
         if not run:raise WorkflowError('No active run')
+        if run.get('director_question_hold') and any(key in payload and payload[key]!=run.get(key) for key in ('phase','stop_reason','next_action')):
+            raise WorkflowError('A Director question holds this checkpoint; use the exact Director answer handoff')
         consumed=payload.get('validation_consumed',{})
         if not isinstance(consumed,dict):raise WorkflowError('Invalid consumed validation counters')
         for k,v in consumed.items():
@@ -2646,6 +2686,19 @@ def replay_intake_receipts(store,event,grouped,extras):
             extras[rel]=dump(receipt)
 
 
+def run_event_recorded_at(event):
+    if 'recorded_at' not in event:
+        return None
+    value=event['recorded_at']
+    try:
+        recorded=datetime.fromisoformat(value.replace('Z','+00:00'))
+    except (AttributeError, TypeError, ValueError) as error:
+        raise WorkflowError('Run event recording time requires a valid UTC timestamp') from error
+    if recorded.utcoffset()!=timedelta(0):
+        raise WorkflowError('Run event recording time requires a valid UTC timestamp')
+    return recorded.isoformat()
+
+
 def replay_events(store,payload):
     # Semantic compare-and-swap deltas preserve unrelated queue entries and outcomes.
     with store.lock():
@@ -2653,6 +2706,7 @@ def replay_events(store,payload):
         if not registry or payload.get('schema')!=1 or payload.get('queue_id')!=registry['queue_id']:raise WorkflowError('Event replay queue identity mismatch')
         applied=set(registry.get('applied_events',[]));outcomes=store.outcomes();outcome_ids={o['id']:o for o in outcomes};extras={}
         for event in payload.get('events',[]):
+            run_event_recorded_at(event)
             if event.get('id') in applied:
                 receipts=event.get('intake_receipts',[])
                 if not isinstance(receipts,list):raise WorkflowError('Invalid event intake receipts')
@@ -4081,13 +4135,23 @@ def clarification_mutate(store,command,payload):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     args=parser.parse_args(argv)
     try:
         store=Store(args.root,args.run_id,allow_unselected=args.command in {'index','runs','manifest','start','workspace-setup','recover-locator'},route_queue=args.command!='recover-locator');payload=json.loads(args.input.read_text()) if args.input else {}
         if args.expected_source_hash:payload['expected_source_hash']=args.expected_source_hash
         cmd=args.command
-        if cmd in LOCAL_DELIVERY_COMMANDS:
+        if cmd in {'intake','process','start'} and 'director_dispatch' in payload:
+            if args.run_id or args.names is not None or args.apply or (args.id and cmd!='start'):
+                raise WorkflowError('Directed dispatch cannot infer a child or select another run')
+            store=Store(args.root,allow_unselected=True,neutral=True)
+        if cmd in {'director-dispatch-read','director-dispatch'}:
+            if args.run_id or args.id or args.names is not None or args.apply:
+                raise WorkflowError('Director dispatch requires exact canonical child input')
+            store=Store(args.root,allow_unselected=True,neutral=True)
+            helper=director_dispatch_helper()
+            result=helper.observe(store,payload) if cmd=='director-dispatch-read' else helper.apply(store,payload)
+        elif cmd in LOCAL_DELIVERY_COMMANDS:
             result=local_delivery_action(store,LOCAL_DELIVERY_COMMANDS[cmd],payload)
         elif cmd in HOOK_COMMANDS:
             store=Store(args.root,allow_unselected=True,neutral=True)

@@ -1,0 +1,155 @@
+# Director Workflow Contract
+
+Director coordinates related Skill Tree areas from one Codex conversation. The parent workspace owns a project objective, exact cross-area assignments, assignment dependencies and a review record. Narrative owns canon, art owns approved references and models, Unity owns game implementation and tests, and an optional public area owns published material. The source maintenance area owns Skill Tree implementation tasks. Each area retains the applicable Skill Tree queue, authorizations, runtime bindings and acceptance rules.
+
+## Ownership and identity
+
+Version 1 portable metadata has a stable Director ID, area IDs, objective IDs and assignment IDs. Each area records the area role, canonical queue identity, Git identity when applicable, repository-relative scope, declared capabilities, supported interface and allowed effects. A local binding resolves the area identity to current checkout or runtime paths. A moved path requires identity verification and an explicit rebind. An unavailable binding leaves the area visible with binding status and the last accepted evidence.
+
+A shared repository can own several folder areas under one canonical Future queue and writer. Linked worktrees share that queue and Git common directory. A separate repository owns an independent queue even when the checkout path is nested under Director. Configured external paths support the same independent topology. Folder scopes, worktree identities and cloned queue identities participate in duplicate and overlapping writer checks. A portable manifest stores relative scope and stable references. The machine-local binding stores absolute paths and execution locators.
+
+Each child receipt links the Director objective and assignment to exact area, queue, P, T and WR identities as applicable, the operation attempt and the immutable resulting artifact or outcome. The child queue owns child Pending, Prioritized and historical state. Parent objectives retain acceptance criteria and links to child work. A Director ledger records a local state change before a child effect and reconciles the effect through an exact canonical child receipt. Each writer owns a separate transaction independently.
+
+## Register areas
+
+Use `python3 .skill-tree/common/scripts/director-state.py setup-preview <director-root> --input <request.json>` from the source checkout. The request identifies `director_id` and exact `areas`. Each area supplies a stable `id`, `role`, canonical `checkout` path, relative `scope`, capability tokens, an interface declaration `{"kind":"skill-tree","version":1}` and allowed effects. Optional expected queue and repository IDs restrict a binding to previously reviewed identities. Register one `source-maintenance` area backed by a canonical Skill Tree source. Separate repositories use existing verified Skill Tree profiles and registered Core queue identities. Shared folder scopes use the same canonical owner.
+
+Use `setup-apply` with the reviewed `expected_preview_sha256` and identical area request. The parent stores `.skill-tree/director/registry.json` and local `.skill-tree/artifacts/director/local-bindings.json` through one guarded writer. The selected child checkouts and Core queues receive no writes. Linked checkout input resolves to the canonical queue owner. Duplicate queue writers, an overlapping writable scope, symlinks and stale probes stop application.
+
+Use `rebind-preview` with `director_id`, `area_id` and the exact available canonical checkout. Use `rebind` with the reviewed digest after verifying the same queue and repository identity. A moved checkout can require Core locator recovery first. Rebind updates the local queue binding for all registered areas on the same owner and leaves the portable declaration unchanged.
+
+## Inspect current status
+
+Use `status` with a Director root and an optional JSON request containing exact assignments to inspect. Each entry identifies an assignment and registered area. Entries can supply exact task and run IDs, proposed workspace kind, area-relative write paths and stable exclusive resource keys. An absent local binding remains visible as `unbound`. The status report distinguishes unavailable roots, mismatched queue or repository identity, scoped dirt, overlapping writes and conflicting runtime claims. A child run is visible through the exact registered queue and locator.
+
+Status returns recommendations for serial checkout, artifact directory, registered Git worktree and separate clone or runtime. The ability to isolate source and the availability of runtime claims have distinct checks. Write overlap uses canonical source scope across linked worktrees. A recommendation creates no checkout or claim and grants no launch authority. Status shows available independent work only when current scoped inputs demonstrate disjoint writes and resources. Director coordinates directly from the parent root.
+
+## Objectives, plans and source pins
+
+An objective records a stable identity, revision, digest, owner reference and observable acceptance. A plan freezes the objective revision, exact assignment set, plan revision and digest. Each assignment names the qualified area capability, allowed write paths and resources, existing task IDs or bounded intake scope, source pins, dependencies, expected result, matching check, authority and stop conditions. The worker brief projects the selected assignment and relevant pins. Preview reports missing, inferred and unsupported inputs, required external dependencies and overlap. Cycles and missing required inputs hold execution before mutation.
+
+A source pin identifies the owning area, record or artifact, accepted revision, content SHA-256 and semantic role. An edge names the consuming assignment, check and requirement strength. Required, optional and expressly provisional edges carry distinct acceptance consequences. The carried-lantern fixture pins a cave quest requirement, form, scale, grip, attachment and game checks. A story change from hand to belt revisits only recorded affected links where narrow coverage exists. A whole-document pin uses conservative impact. An authored extinction event requires a matching story pin before entering product scope. A provisional proxy carries preliminary checks and an explicit final replacement gate.
+
+The completed-work index separates owner acceptance, current source, evidence availability, consumer verification, integration and delivery. Status projects recorded objective and child health. Plan projects impacted pins and proposes exact amendments. A changed source opens affected recorded consumers and preserves historical and independent evidence. An approved amendment binds the frozen next revision after affected writers reconcile.
+
+## Keep objective and completion records
+
+Use `objective-preview` with the stable objective ID, owner reference, original intent and acceptance criteria. An existing objective requires the current revision digest. `objective-apply` binds the reviewed preview and records the exact next revision. A matching retry returns the original receipt. `objective-read` can select the current objective or a retained revision. The parent workspace owns the objective journal and the existing recovery transaction.
+
+`plan-pin` records the reviewed plan revision, exact objective revision and assignment task references. A revision retains earlier pins. `outcome-link` checks the named child queue, task, original run, terminal outcome and matching check and artifact evidence. Outcome records retain the original child owner and provenance. Availability, source freshness, verified integration and delivery remain separate observations. The child queue supplies evidence and receives no objective journal write.
+
+## Preview and freeze assignments
+
+Use `plan-preview` with exact plan and objective revisions and the selected assignments. The preview validates declared effect scopes, canonical area ownership, current qualified capabilities, exact child task or bounded intake and source pins. The preview returns a digest, portable assignment scope, a scoped worker brief and unverified coverage. A required missing pin, ambiguous area, dependency cycle or unsafe overlap stops preview before any write.
+
+Use `plan-freeze` with the same request and the reviewed `expected_preview_sha256`. The objective journal retains the frozen plan and digest. A repeated exact request preserves one plan version. `plan-context` and `plan-impact` read the frozen revision. Request `plan_context` inside status to include pinned sources and use `plan-impact` to inspect recorded consumers for an exact changed source. Representative fixture artifacts can support fixture planning. Real ArtWorkshop qualification requires verified source and runtime evidence for the selected area.
+
+## Effects and decisions
+
+Owner design approval accepts a plan revision. Execution selection authorizes specific child effects on that revision. Delivery retains independent authority. Read-only status, plan preview and audit supply no task execution. A current confirmed plan can authorize exact child intake, processing and launch when current profiles, IDs, scope, dependencies and resource claims match. Installation, commit, publication, scheduling and wider rollout require applicable authority. Standalone Process Pending preserves the normal next-action handoff. Child controllers preserve original admission and claims.
+
+Before a child mutation, Director records intent with stable Director, assignment, operation and destination identities, a semantic payload digest and current-state guards. The child effect and receipt share the child transaction. Identical replay recovers original P, T or WR identity. A different payload under the same key conflicts. A lost response requires exact reconciliation, including Git workspace creation when applicable. Incomplete provenance holds the ambiguous effect for review.
+
+Director first resolves child questions using accepted pinned facts, approved defaults and current authority. Material unresolved product choices reach the owner in one question with options, a recommendation, affected areas and the blocked action. Director product decisions start in Manual mode. Scoped Auto requires actual independent actors, bounded authority and current decision evidence. Question and answer receipts bind plan, assignment, child run, recipient, actor, authority and attempt. An expired, late, stale or wrong-context delivery has no effect. An absent or declined answer keeps the decision pending. A waiting run checkpoints and resumes the same worktree once the applicable decision arrives. Independent work can continue within the independent assignment authority. Pause stops new dispatch, cancellation preserves work, and repeated unchanged failures leave one concrete blocker.
+
+## Reconcile a child dispatch
+
+Record the exact parent `dispatch-intent` before invoking an authorized child mutation. The protocol binds the Director and assignment IDs, canonical queue, operation, frozen plan digest and exact semantic request. The queue hash guards a first application and stays outside the semantic retry identity.
+
+Probe `director-dispatch-read` in the selected canonical child checkout before a new effect. The supported `director-dispatch` interface accepts the original typed intake, process or start request and the required selection. A successful child write retains the original receipt in the same canonical transaction. A matching retry recovers the original effect result, while a changed request under the same key fails. An unknown receiver or missing provenance requires review before dispatch. A reserved launch recovers the same matching worktree and run ID through the child workspace contract.
+
+## Run an approved plan and resolve questions
+
+`run-start` selects the exact objective and frozen plan digest, an explicit assignment set that includes required dependencies, current owner evidence and the authorized effect for each selected assignment. New intake uses the frozen assignment. Processing binds a separately reviewed exact task specification and rejects unplanned write paths and checks. `run-dispatch` uses the exact current run and child queue digests. The original canonical receipt reconciles a repeated request. `run-status` reads the Director run, waiting assignments, dependency and resource conflicts, and eligible next effects. `run-pause` stops new dispatch, `run-resume` rechecks the current plan, and `run-cancel` retains child checkpoints, receipts and edits.
+
+`decide-open` records one question for the exact running child task and worktree after verifying child Core support for the hold. A verified approved default delivers the pinned fact. A material question names the addressed owner, distinct options, recommendation, affected areas, blocked action and UTC deadline. The original child checkpoint remains held while independent assignments can advance. `decide-answer` requires the original question, attempt, queue and run with current owner evidence. An accepted answer restores the original child checkpoint. Explicit child continuation uses the existing controller admission. An absent response keeps the hold. Identical delivery can be observed again without a second child effect.
+
+## Review cross-area handoffs
+
+Use `python3 .skill-tree/common/scripts/director-handoff.py review-preview <director-root> --input <request.json>` from the source checkout. Select the exact frozen objective and plan digest and provide each edge with producer and consumer assignments, the source pin, the accepted producer artifact ID and the repository-relative path observed by the consumer check. The outcome links name exact child task, run, outcome and receipt evidence. The consumer check must fingerprint the accepted producer bytes.
+
+Review reports producer acceptance, consumer evidence, integration and delivery separately. Missing or stale required coverage holds objective acceptance. A provisional artifact supports only the recorded preliminary check and keeps the final artifact gate open. `review-apply` archives the reviewed result with the original identities and receipt. `review-read` retrieves the immutable archive.
+
+`impact-preview` compares consecutive frozen revisions of the same plan and reports affected and independent assignments. `amend-apply` verifies the preview digest and reconciles affected writers before applying the approved amendment. Affected prior evidence becomes superseded in current review. Unchanged assignments can reuse matching evidence across the accepted amendment. Original archives retain historical proof.
+
+## Workspace selection and packaging
+
+Director coordination runs from the registered parent root. Serial work can use an existing clean or disjoint checkout. A scoped candidate can use an isolated artifact directory. A Git child controller can use the recorded worktree. An independent clone or runtime can supply required tool or writer isolation. Source checkout isolation and runtime isolation require separate evidence. Unity uses one named verified Editor, an exact project, independent caches, saves and outputs, and appropriate resource claims. Preserve existing child edits and locks.
+
+The Director flavor contains setup, intake, plan, run, decide, status, review, audit and install alongside required Core operations. General, web and unity retain existing package membership. The initial seven Director operations established the package and topology pilot before maintenance qualification. Source maintenance starts from exact read-only audit evidence and separately authorized Pending, processing and implementation. A stopped owned installer handoff applies a pinned repair candidate to a selected canary. Source acceptance, installed generation verification and replay of the original failed scenario remain separate. D8 audit, bounded source repair and pinned canary follow pilot qualification. D9 adoption of externally completed work, milestone reconstruction and optional operator decisions follow D8 at lower priority.
+
+## Audit selected runs
+
+Use `audit` with an exact `director_run_id` and a `selections` list. Each selection names the registered `assignment_id` and canonical child `run_id`. Add exact `event_ids` to narrow the reviewed events. An optional `journal_export_sha256` reads an existing portable export from the recorded worktree. The audit creates no export or queue entry. Run status includes normalized Director dispatch state and verified owner waits.
+
+Start diagnosis with `director_timeline` for the parent dispatch, recovery, question and lifecycle stages. An empty `selections` list inspects the parent alone. Use `child_status` for the current checkpoint, unresolved check attempts and coverage, and `child_timeline` for checkpoint transitions, prepared and recorded checks and final outcomes. Event references carry the owning queue, exact identity, sequence and repository-relative path. Check records retain the recorded lane, timing, diagnostic fingerprint and evidence hashes when present. Known holds distinguish profile refresh, Director questions, repeated unchanged failures and host-policy rejection. Private error text, question content and local paths remain in the owning context.
+
+New events carry UTC recording times. Older child events retain sequence numbers and available check receipt times. Older Director runs can have an incomplete parent timeline. Audit reports missing sequence ranges for a full child selection, and reports missing selected IDs for an explicit subset. A reviewed export can supply the exact missing events. Audit reports recorded observations without assigning times to old events or inferring results for unresolved attempts.
+
+Source findings group by component, symptom, checked conditions and generation. The evidence preserves both canonical identity and exact byte fingerprints. A confirmed finding needs a matching executed check, a reproducible bounded observation and the verified installed helper. Other product failures, runtime prerequisites and owner waits remain observations. Missing or changed evidence is visible as incomplete coverage. Queue-ready findings contain controlled behavior summaries and portable evidence references. Source repair requires a separately authorized exact selection.
+
+## Route a confirmed source repair
+
+Use `repair-preview` to re-observe the exact confirmed source finding and bound maintenance area. `repair-intake` requires explicit maintenance authority and links one canonical Pending request to original run and check evidence. Research and process the exact task using the normal Core boundary. Select the exact reviewed child task for bounded source implementation.
+
+Use `repair-candidate-preview` and `repair-candidate-apply` to retain reviewed source bytes, owned composed output and the original failing assertion. A repair candidate requires exact canonical Pending, task, run and outcome references with matching failed and repaired checks. Candidate creation supplies no target installation authority.
+
+## Install the Director flavor
+
+Use `node .skill-tree/bin/install.js --list --flavor director` to inspect operation membership. Use an explicit target and `--dry-run --all --flavor director` to preview project scope. An owned installation or flavor change requires a stopped checkpoint and current target verification. Verify the installed target through the project-owned installation manager.
+
+The shared-folder topology uses one canonical queue for distinct scopes. The external topology uses the verified profile of the registered external project. A moved external checkout requires Core locator reconciliation, owned profile rebind and guarded Director rebind. A plan with changed execution inputs requires current admission before another effect.
+
+## Verify the repaired generation on one target
+
+The source candidate retains the accepted prior failure, reviewed repair, exact source inventory and exact composed output inventory. Select one stopped Codex installation on a disposable linked worktree, the original queue, task and run, a current owner authority reference, and any product paths whose bytes require preservation. Keep the candidate source snapshot immutable. The source candidate alone grants no installation authority.
+
+Use `python3 scripts/director-entry.py preview --input <request.json>` to inspect the exact previous and planned profiles. The request holds the exact local target and candidate source, the reviewed candidate, the candidate digest and the selected scope. Preview performs no writes. Retain the returned portable preview and exact digest.
+
+Use `apply` with the reviewed preview digest and original local target and candidate. The owned installer checks the same stopped handoff and exact composition under the writer lock. Activation verifies ownership and candidate digests. The selected queue, checkout, stopped checkpoint, existing history, plugin bindings and protected files remain intact. Candidate activation holds wider rollout and still requires replay.
+
+Use `reconcile` to inspect the exact prior profile, candidate generation or matching interrupted journal. Running `recover` requires the observed journal digest and original preview. Mixed, stale and unrecognized effects stay held for review.
+
+Use the current child Core operation to explicitly admit the same original run into the newly verified profile. Replay checks the retained admission event and original task/worktree identities before executing the exact installed snapshot helper in dry-run mode against the original Markdown input. The replay result preserves the original lane and links the candidate, profile and same run. A successful replay supplies canary evidence for the selected target. Wider rollout requires separate selection.
+
+The replay report records elapsed time and an execution cause. Distinct causes identify a timeout, a launch failure, an unsuccessful process exit or a report that fails the original assertion. Exact target and scenario identities remain available for diagnosis. The report excludes process output and local paths.
+
+Use `rollback-preview` and `rollback` for an explicitly reviewed reversal of the exact current candidate generation. The owned manager verifies the retained transaction and destination bytes. Review a conflict before another attempt. Re-admit the same run under the restored profile before subsequent execution.
+
+## Adopt existing child work
+
+Use `adopt-preview` in Director review with the exact frozen plan, assignment and canonical child task, run and outcome. A previously completed canonical task can supply the original immutable task body fingerprint for a new plan. The existing child launch path requires a live Prioritized task.
+
+The selected result can bind a child run, accepted artifact, scoped recorded commit or accepted Manual owner decision. Adoption checks the frozen scope, current required pins, matching child checks and evidence bytes. An existing Director dispatch requires reconciliation through the original run. Use `adopt-apply` for the exact reviewed basis and owner authority. Use `adopt-read` to inspect the original receipt and current status. Adoption writes a parent receipt and retains original child ownership and delivery.
+
+## Record and reconstruct milestones
+
+Use `milestone-preview` to select an exact frozen plan and retained story, art and game evidence. Select public evidence when relevant. An accepted Narrative pin can establish story evidence. Art and game require matching checked child results or accepted adoptions. The required check covers the owning area and any linked artifacts belong to the assignment write scope. Supply the reviewed cross-area handoff when the plan contains required edges. A required provisional asset holds final acceptance until verified replacement.
+
+Use `milestone-apply` with the reviewed digest and exact owner authority to retain a reproducible slice. `milestone-read` reports archived evidence, current objective revision, current role evidence, missing inputs and applicable handoff status. An approved amendment affecting a required role holds the superseded milestone while preserving historical evidence. Current approval and release qualification remain separate. Release requires explicit delivery authority.
+
+## Operator selections after the pilot
+
+The pilot exercised one owner wait and an independent sibling, exact hand and belt dependency revalidation, one isolated Editor, and a pinned update on one disposable target. Context and impact remain in status and plan. Current resource control uses serial acquisition and exact named claims. Provisional asset work uses a named preliminary check and a separate final replacement gate.
+
+Future creative variants require a shared accepted baseline, independent outputs and an explicit selected result. Future automated arbitration, notifications, scheduling, separate context commands and external hosts require an observed recurring need, selected authority and a bounded success and failure interaction. The pilot evidence remains available in the [Codex observation](../history/validation/director/codex-host-result.json), [lantern handoff](../history/validation/director/lantern-handoff.json) and [repair canary](../history/validation/director/repair-canary.json).
+
+The portable lantern handoff retains the compact receipts, original fingerprints and fixture model. Byte-exact replay of the historical Blender attempt uses the retained machine-local archive with the original installed profile and raw process log.
+
+## Baselines and fixture gates
+
+The implementation branch starts at the reviewed `origin/develop` commit `d2ddd0a7837329f11bde03e31f4fef65549f432c` and contains grouping prerequisite `408820caa79e188152fd33d7f4b9c7779553391b`. The committed migration evidence supplies exact completed-dependency source coverage. The [Narrative workflow](narrative-workflow.md) and `narrative-state.py` are present at the reviewed develop baseline. The latter has SHA-256 `ad6618d06fc1b2cac79694a64ff5733bdd03a330e0714851e04e185d108c1388`.
+
+The observed `codex/skill-tree-3d-creature-reference` checkout at the develop base carries uncommitted ArtWorkshop source `3d-workshop.py` with SHA-256 `6cef226a82b646e11de36d018b5df18fd291d52b36d306a146719b74fb09ecad`. The observed `codex/skill-tree-logs` checkout at the same base carries uncommitted `skill-tree-logs.py` with SHA-256 `4dcae8ec5bc099a2c65f7b3d151e7b6e5d3b86401789611f587f18387e7a8480`. The two local source hashes record reviewed source provenance. Adapter and package admission require a verified selected generation and current qualification. A missing or changed reviewed capability remains visible.
+
+| Lane | Required evidence |
+| --- | --- |
+| Static | Canonical ownership, exact task and source inputs, schemas, portable references and matching review. |
+| Portable behavior | Disposable three-area tree, local Git baseline and queue, two story revisions, exact art bytes, a failing consumer, independent dirty work and interruption recovery. |
+| Actual Codex | Observed independent host actor and actual owner input, exact stopped and resumed child run, wrong-recipient and duplicate controls with unaffected sibling progress. |
+| Native tools | Approved disposable copy of `skill-tree-sandbox`, verified current tool identities and owned child recipes, matching Editor, stock build-scene EditMode, later lantern import and carry checks and corresponding cleanup. |
+| Package and topology | Actual owned package inventory and verification, shared-root and external child fixtures, moved-path rebind and cross-area recovery. |
+
+The Unity baseline preserves original Assets and metadata, Packages manifest and lock, and ProjectSettings through byte comparisons. Native qualification records Editor, Test Framework, Pipeline and Blender builds, exact copy, PID and profile, run method, input pins, fresh report digests and cleanup. Fixture tests and source verifiers cannot substitute for observed child execution. The original sandbox and product environments remain outside fixture writes.
+
+Existing [workspace](../common/references/run-workspaces.md), [workflow metadata](../common/references/workflow-metadata.md), [decision governance](../common/references/decision-governance.md), [validation](../common/references/validation-policy.md) and [installation profile](../common/references/installation-profile.md) contracts govern the relevant child effects. Checkpoint state and past success supply evidence for review and no new authority.

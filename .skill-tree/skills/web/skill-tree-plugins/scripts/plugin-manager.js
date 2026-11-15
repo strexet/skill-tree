@@ -56,10 +56,14 @@ function verifyCommonJs(root, location, expected) {
 function verifyProfile(root, packageRoot) {
   const profile = JSON.parse(fs.readFileSync(ownedPath(root, maintenance + '/profile.json'), 'utf8'));
   if (profile?.format !== 'skill-tree-profile' || profile.schema !== 1 || profile.project_root !== root ||
-      !['general', 'web', 'unity'].includes(profile.flavor) || !object(profile.source_digests) ||
+      typeof profile.flavor !== 'string' || !object(profile.source_digests) ||
       !object(profile.bundle_digests) || !object(profile.destinations)) {
     throw Error('An owned project profile is required before loading the plugin manager');
   }
+  const flavorFile = 'config/flavors.json';
+  const flavors = JSON.parse(ownedBytes(root, bundledSource + '/' + flavorFile,
+    profile.bundle_digests[bundledSource + '/' + flavorFile]));
+  if (!object(flavors.flavors) || !own(flavors.flavors, profile.flavor)) throw Error('Unknown owned project flavor');
   const outputs = Object.fromEntries(Object.values(profile.destinations).map(record => [record.name, record.files]));
   if (seal({
     flavor: profile.flavor, environment_id: profile.environment_id,

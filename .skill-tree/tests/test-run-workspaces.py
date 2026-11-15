@@ -1,5 +1,6 @@
 import importlib.util
 import json
+from datetime import datetime, timedelta
 from pathlib import Path
 import shutil
 import subprocess
@@ -201,6 +202,11 @@ class RunWorkspaceTests(unittest.TestCase):
     def test_semantic_event_export_has_no_absolute_workspace_locator(self):
         run=self.start(self.task());store=wf.Store(self.location(run));wf.checkpoint(store,{'partial_work':['source.py']});result=wf.export_run(store);data=json.loads((store.source_root/result['path']).read_text())
         self.assertEqual(data['run_id'],run['id']);self.assertTrue(data['events']);self.assertNotIn(str(self.base),json.dumps(data));self.assertEqual(data['checkpoint']['partial_work'],['source.py'])
+        for event in data['events']:
+            recorded=datetime.fromisoformat(event['recorded_at'])
+            self.assertEqual(recorded.utcoffset(),timedelta(0))
+            path=self.store.base/'history/run-events'/run['id'].lower()/(event['id'].lower()+'.json')
+            self.assertEqual(json.loads(path.read_text())['recorded_at'],event['recorded_at'])
     def test_reserved_workspace_recovery_keeps_run_id_and_original_claims(self):
         tid=self.task()
         with patch.object(ws,'create_reserved',side_effect=ws.RunError('Synthetic interruption')):
@@ -209,9 +215,17 @@ class RunWorkspaceTests(unittest.TestCase):
         self.assertEqual(recovered['id'],run['id']);self.assertEqual(recovered['workspace_state'],'ready');self.assertEqual(wf.Store(self.base/'recovered').load()['run_registry']['claims'][tid],run['id'])
     def test_export_replay_is_idempotent_on_the_canonical_owner(self):
         run=self.start(self.task());store=wf.Store(self.location(run));wf.checkpoint(store,{'partial_work':['source.py']});export=wf.export_run(store)
-        envelope=json.loads((store.source_root/export['path']).read_text());before=self.store.state.read_bytes()
+        envelope=json.loads((store.source_root/export['path']).read_text())
         first=wf.replay_events(store,envelope);second=wf.replay_events(store,envelope)
         self.assertEqual(first,second);self.assertEqual(wf.Store(self.location(run)).load()['active_run']['partial_work'],['source.py'])
+        legacy=[{key:value for key,value in event.items() if key!='recorded_at'} for event in envelope['events']]
+        self.assertEqual(wf.replay_events(store,{**envelope,'events':legacy}),first)
+        before=self.store.state.read_bytes()
+        for invalid in (None, 'malformed', '2026-11-15T10:00:00', '2026-11-15T10:00:00+01:00'):
+            event={**envelope['events'][-1],'recorded_at':invalid}
+            with self.subTest(recorded_at=invalid), self.assertRaisesRegex(wf.WorkflowError,'valid UTC timestamp'):
+                wf.replay_events(store,{**envelope,'events':[event]})
+        self.assertEqual(self.store.state.read_bytes(),before)
     def test_export_preserves_pending_check_attempts_owned_by_the_selected_run(self):
         tid=self.task();run=self.start(tid);store=wf.Store(self.location(run));wf.begin_task(store,{'task_id':tid})
         attempt=wf.prepare_check(store,{'task_id':tid,'check_id':'behavior'});export=wf.export_run(store);envelope=json.loads((store.source_root/export['path']).read_text())

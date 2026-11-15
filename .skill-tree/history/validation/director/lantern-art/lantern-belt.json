@@ -1,0 +1,30 @@
+{
+  "artifact": {
+    "path": "DirectorLantern.fbx",
+    "sha256": "a29f05d0d78a9af6acf6b7121abd838a1b95ce1c9c178ddbc76886974d117307"
+  },
+  "attachment": "belt",
+  "belt_socket": [
+    0.1,
+    0,
+    0.11
+  ],
+  "grip_socket": [
+    0,
+    0,
+    0.28
+  ],
+  "revision": "r002",
+  "scale_meters": [
+    0.21,
+    0.21,
+    0.322
+  ],
+  "schema": 1,
+  "socket": "BeltSocket",
+  "story": {
+    "id": "cave-lantern-carry",
+    "revision": "r002",
+    "sha256": "7928010f5bdba1e66e535325dfa838f1d55bd4ac9d3ed944f64d1129f2363953"
+  }
+}

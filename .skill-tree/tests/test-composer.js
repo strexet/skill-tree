@@ -156,3 +156,41 @@ test('narrative composition rejects a missing topic referenced by the router', t
   assert.throws(() => c.compose(sourceCopy, profile, ['skill-tree-narative']),
     /Missing composed link: .*narrative-claims\.md/);
 });
+
+test('Director selects the scoped additional operations and packages the exact runtime for each', t => {
+  const root = fixture(t);
+  const names = ['setup', 'intake', 'plan', 'run', 'decide', 'status', 'review', 'audit', 'install']
+    .map(name => 'skill-tree-director-' + name).sort();
+  const profile = c.resolveProfile(source, root, 'director');
+  const built = c.compose(source, profile);
+  assert.deepEqual(c.compose(source, profile), built);
+  assert.deepEqual(Object.keys(built.packages).sort(), [...expectedOperations, ...names].sort());
+  for (const name of names) {
+    const files = built.packages[name];
+    const runtime = 'scripts/runtime/';
+    assert.ok(files['scripts/director-entry.py']);
+    assert.equal(files[runtime + 'common/scripts/director-state.py'], c.read(source, 'common/scripts/director-state.py'));
+    assert.ok(files[runtime + 'common/scripts/director-handoff.py']);
+    assert.ok(files[runtime + 'lib/installation.js']);
+    assert.ok(files[runtime + 'tests/fixtures/director/fixture-manifest.json']);
+  }
+  assert.equal(profile.facts.director.narrative.status, 'source-verified');
+  assert.equal(profile.facts.director.artworkshop.status, 'unsupported');
+  assert.equal(profile.facts.director.logs.status, 'unsupported');
+  assert.throws(() => c.compose(source, c.resolveProfile(source, root, 'general'), [names[0]]), /unavailable for flavor/);
+  assert.ok(built.packages['skill-tree-director-install']['scripts/runtime/lib/director-canary.js']);
+});
+
+test('Director profile discovers a shared Unity checkout without asserting runtime qualification', t => {
+  const root = fixture(t);
+  assert.equal(c.resolveProfile(source, root, 'director').facts.director.unity.status, 'unavailable');
+  write(root, 'ProjectSettings/ProjectVersion.txt', 'm_EditorVersion: 6000.3.27f2');
+  write(root, 'Packages/manifest.json', {dependencies: {'com.unity.test-framework': '1.6.0'}});
+  write(root, 'Packages/packages-lock.json', {dependencies: {'com.unity.test-framework': {version: '1.6.0'}}});
+  write(root, 'Assets/Tests/Fixture.asmdef', {name: 'Fixture', optionalUnityReferences: ['TestAssemblies']});
+  const profile = c.resolveProfile(source, root, 'director');
+  assert.equal(profile.facts.director.unity.status, 'recipe-discovered');
+  assert.equal(profile.recipes['unity-editmode'].utf_version, '1.6.0');
+  assert.match(profile.recipes['unity-playmode'].qualification, /isolated fixture required/);
+  assert.equal(c.resolveProfile(source, root, 'general').recipes['unity-editmode'], undefined);
+});

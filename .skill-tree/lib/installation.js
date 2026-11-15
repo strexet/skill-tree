@@ -406,13 +406,18 @@ function install(root,source,flavor,selections,options={}){
  if(options.dryRun){const result=plan(root,source,flavor,selections,options);return {profile:result.profile,delta:result.delta,action:'dry-run'};}
  return locked(root,()=>{
   const result=plan(root,source,flavor,selections,options);
-  transaction(root,result.changes,result.expected,()=>{const current=c.resolveProfile(source,root,flavor);if(current.environment_id!==result.profile.environment_id)throw Error('Project inputs changed during profile staging; refresh from current inputs');});
+  options.guardPlan?.(result);
+  transaction(root,result.changes,result.expected,()=>{
+   const current=c.resolveProfile(source,root,flavor);
+   if(current.environment_id!==result.profile.environment_id)throw Error('Project inputs changed during profile staging; refresh from current inputs');
+   options.guardPlan?.(result);
+  });
   try{verify(root,source);}catch(error){
    if(result.delta.length){try{restoreGeneration(root);}catch(recovery){throw Error('Profile verification failed; preserved generation backups require conflict review: '+error.message+'; '+recovery.message);}}
    throw error;
   }
   return {profile:result.profile,delta:result.delta,action:result.delta.length?'installed':'verified no-op current'};
- },{recoverPluginPending:options.recoverPluginPending});
+ },{recoverPending:options.recoverPending,recoverPluginPending:options.recoverPluginPending});
 }
 function uninstall(root,selections,options={}){
  function action(){const p=receipt(root,true);verifyOwned(root,p);if(hasActiveOperation(root))throw Error('Active controller must stop before uninstall');const next=JSON.parse(c.json(p)),changes={},expected={};
@@ -467,7 +472,7 @@ function restoreGeneration(root){
  const stopped=stoppedWorkflow(root);if(stopped){changes[WORKFLOW]=stopped;expected[WORKFLOW]=treeHash(root,WORKFLOW);}
  transaction(root,changes,expected);return {action:'generation rolled back; project dependencies unchanged; verify freshness before admission'};
 }
-function rollback(root){return locked(root,()=>restoreGeneration(root),{recoverPending:false,recoverPluginPending:false});}
+function rollback(root,{guard}={}){return locked(root,()=>{guard?.();return restoreGeneration(root);},{recoverPending:false,recoverPluginPending:false});}
 function rebind(root,source){
  verify(root,source,true);
  return locked(root,()=>{

@@ -9,7 +9,9 @@ node .skill-tree/bin/install.js --target <project-root> --only codex --flavor un
 node .skill-tree/bin/install.js --target <project-root> --only codex --verify
 ```
 
-Fresh noninteractive installation requires `--flavor general|web|unity`; interactive installation asks once. `--yes` never chooses a flavor. Repeat installation retains the receipt flavor; explicit switches regenerate all owned packages in the scope. `--skills` selects logical operations. `--all` selects non-soft provider-matrix entries; soft providers require explicit selection. Generic provider target denotes the covered root and explicit discovery destination. Global, symlink and uncomposed upstream specialization fail before writes.
+Fresh noninteractive installation requires `--flavor general|web|unity|director`; interactive installation asks once. `--yes` never chooses a flavor. Repeat installation retains the receipt flavor; explicit switches regenerate all owned packages in the scope. `--skills` selects logical operations. `--all` selects non-soft provider-matrix entries; soft providers require explicit selection. Generic provider target denotes the covered root and explicit discovery destination. Global, symlink and uncomposed upstream specialization fail before writes.
+
+Install the director flavor at the coordinating project root. Child projects retain the flavor appropriate for each registered area. The [Director workflow](director-workflow.md) describes scope registration and verification.
 
 Dry-run reports facts, gaps, exact changed destinations and ownership conflicts without writes. Matching installations are verified no-ops. `--force` cannot adopt unowned content or discard local modifications. A stopped cleanup/handoff checkpoint precedes replacement during a controller. Optional `--with-init` inserts a receipt-owned bridge while preserving surrounding instructions. Scoped `--uninstall` removes only matching owned packages; `--with-init` removes the bridge when no packages remain.
 

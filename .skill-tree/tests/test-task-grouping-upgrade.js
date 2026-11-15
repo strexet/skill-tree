@@ -63,7 +63,7 @@ function fixture(t, flavor = 'general', schema = 2) {
  const root = path.join(directory, 'target');
  const legacy = path.join(directory, 'legacy');
  fs.mkdirSync(root);
- for (const folder of ['common', 'config', 'domains', 'lib', 'src', 'templates']) {
+ for (const folder of ['common', 'config', 'domains', 'lib', 'src', 'templates', 'tests/fixtures/director']) {
   fs.cpSync(path.join(source, folder), path.join(legacy, folder), {recursive: true});
  }
  const sourceBody = fs.readFileSync(path.join(source, workflowSource), 'utf8');

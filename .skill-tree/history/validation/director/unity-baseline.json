@@ -1,0 +1,103 @@
+{
+  "batch": {
+    "exit_code": 0,
+    "finished_at": "2026-11-15T00:42:31.193430+00:00",
+    "log": {
+      "path": "reports-revalidated/editmode.log",
+      "sha256": "2f7dba4ba64376e17b885288564380370433774639a4d9a61ba8bec6539aa0e0"
+    },
+    "pid": 92772,
+    "report": {
+      "path": "reports-revalidated/editmode.xml",
+      "sha256": "126e01bbdffd514ed79312713f5a97065d51549db5035c4f91c01e268f087f3b"
+    },
+    "started_at": "2026-11-15T00:42:03.311273+00:00"
+  },
+  "cleanup": {
+    "observed_at": "2026-11-15T00:42:39.533635+00:00",
+    "observed_live_pids": [],
+    "owned_pids": [
+      90554,
+      92772
+    ],
+    "resource_released": true
+  },
+  "fixture_id": "skill-tree-sandbox",
+  "isolation": {
+    "path": "reports-revalidated/isolation.json",
+    "sha256": "4510271dffc71e4180e6025f5fdb70dba1cceb41891b1461898edf507ee538c3"
+  },
+  "kind": "director-unity-baseline-receipt",
+  "lane": "unity-editmode",
+  "origin": "observed-unity-editor",
+  "pipeline": {
+    "observed_at": "2026-11-15T00:42:02.325931+00:00",
+    "observed_pid": 90554,
+    "process": {
+      "path": "reports-revalidated/pipeline-process.txt",
+      "sha256": "b6e65562354f9d39df9cd897b4a20388cd4f7dbfd29328d296c80f2e639b6158"
+    },
+    "requested_pid": 90554,
+    "save_probe": {
+      "path": "reports-revalidated/persistent-path.json",
+      "sha256": "207b0389993dd26ccf232af09ae1960ada5061922ea677657da3dfab9ae42343"
+    },
+    "started_at": "2026-11-15T00:41:08.982301+00:00",
+    "status": {
+      "path": "reports-revalidated/pipeline-state.json",
+      "sha256": "247a476f53152d43f2687af6bb4a8a9984109c008414a7a447f076f17bb2ea5c"
+    },
+    "stopped_at": "2026-11-15T00:42:02.476453+00:00"
+  },
+  "profile": {
+    "base_commit": "92dcd15687fa95b518979537a10694fe87cb11a5",
+    "environment_id": "2cf5cfd503911af16bcc8d7d36c0bdd83ab63a939775c963caad69ad883af39e",
+    "flavor": "unity",
+    "identity": "c5994d9a455f4f62454a3497f8b496ccd844f699ccb8e62aa632db63afc3afcd",
+    "queue_id": "Q-2fe6667a-de15-4e8c-8f1c-df52d2a506e0",
+    "receipt_sha256": "953d6cd1f59cc334eeb4254aa3e8648d02fe1728eb2ca1cde1b90a28dd97807b",
+    "verified": true
+  },
+  "recipe_id": "unity-editmode",
+  "run_id": "WR-acc2606d-9665-458b-81dc-d02e4a6b12db",
+  "schema": 1,
+  "scope": {
+    "copy_before": {
+      "files": 202,
+      "sha256": "d809735818ecb9c7ac795ca4d6453b522658fe50a41535cf14c31aec16e024ea"
+    },
+    "original_after": {
+      "files": 202,
+      "sha256": "d809735818ecb9c7ac795ca4d6453b522658fe50a41535cf14c31aec16e024ea"
+    },
+    "original_before": {
+      "files": 202,
+      "sha256": "d809735818ecb9c7ac795ca4d6453b522658fe50a41535cf14c31aec16e024ea"
+    },
+    "original_path_sha256": "ca3321438f2a3e77f8598304791df6fc3b1f84e4da9f07eb4bc0ceba731f0489",
+    "project_path_sha256": "45a7939d0d479028dce62817eda109d35f71c9f62713d73713da7f316023fcfd",
+    "runtime_after": {
+      "files": 202,
+      "sha256": "0c910a089373fcbd0a4f6b0607bb8ca5e6b89a5e6f3d4d1151170a85ac5e7274"
+    },
+    "runtime_before": {
+      "files": 202,
+      "sha256": "0c910a089373fcbd0a4f6b0607bb8ca5e6b89a5e6f3d4d1151170a85ac5e7274"
+    }
+  },
+  "startup_recovery": {
+    "result": "passed with stale profile after Unity normalization",
+    "settings_after_sha256": "a5da8455274336009b2382704a133b944a61b9f2f123f4196c14ea084db58570",
+    "settings_before_sha256": "f9ceface5bfee860ce0ed2e4eba431ec6db2ef7d2a66493ac74e3abef58066e4"
+  },
+  "test_filter": "SkillTreeSandbox.Tests.BuildSceneTests.EnabledBuildScenesResolveToSceneAssets",
+  "tools": {
+    "blender_build": "02f0899d78e3",
+    "blender_version": "5.3.0",
+    "editor": "6000.3.27f2",
+    "editor_revision": "22188f149405",
+    "pipeline": "1.0.0-pre.1",
+    "test_framework": "1.6.0",
+    "unity_cli": "1.0.0-beta.15"
+  }
+}

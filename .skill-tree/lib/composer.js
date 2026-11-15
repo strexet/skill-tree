@@ -41,10 +41,24 @@ function inventory(root,rules) {
  for(const name of rules.names)if(fs.existsSync(safe(root,name)))out.push(name);
  return [...new Set(out)].sort();
 }
+function flavorNames(source) {
+ return Object.keys(readJson(source,'config/flavors.json').flavors||{});
+}
+function operationNames(source,flavor) {
+ const registry=readJson(source,'config/flavors.json'),operations=readJson(source,'templates/operations.json');
+ if(!Object.hasOwn(registry.flavors,flavor))throw Error('Unknown flavor: '+flavor);
+ const recipe=registry.flavors[flavor];
+ if(registry.core_operations===undefined&&!Object.hasOwn(registry.flavors,'director'))return Object.keys(operations).sort();
+ const core=registry.core_operations,extra=recipe.operations||[];
+ if(!Array.isArray(core)||!Array.isArray(extra))throw Error('Invalid operation membership: '+flavor);
+ const names=[...core,...extra];
+ if(new Set(names).size!==names.length||names.some(name=>typeof name!=='string'||!Object.hasOwn(operations,name)))throw Error('Invalid operation membership: '+flavor);
+ return names.sort();
+}
 function resolveProfile(source,root,flavor) {
  root=fs.realpathSync(root);
  const registry=readJson(source,'config/flavors.json'),rules=readJson(source,'config/capabilities.json');
- if(!registry.flavors[flavor])throw Error('Unknown flavor: '+flavor);
+ if(!Object.hasOwn(registry.flavors,flavor))throw Error('Unknown flavor: '+flavor);
  const pluginRegistry=fs.existsSync(safe(source,'lib/plugin-registry.js'));
  const pluginComposition=read(source,'lib/plugin-composition.js');
  const fixed=['package.json','package-lock.json','npm-shrinkwrap.json','yarn.lock','pnpm-lock.yaml','bun.lock','bun.lockb','.nvmrc','.node-version','pyproject.toml','pytest.ini','Cargo.toml','ProjectSettings/ProjectVersion.txt','ProjectSettings/EditorSettings.asset','ProjectSettings/ProjectSettings.asset','Packages/manifest.json','Packages/packages-lock.json','.skill-tree/validation-recipes.json','.skill-tree/worktree-profile.json'];
@@ -71,7 +85,8 @@ function resolveProfile(source,root,flavor) {
   const lane=/playwright|cypress|--browser\b/.test(command)||/browser|e2e/.test(name)?'browser':/test:(api|integration)/.test(name)?'integration':/^(dev|start|preview)$/.test(name)?'server':name==='build'?'build':/lint|typecheck|check/.test(name)?'static':'unit';
   recipes['script-'+name.replace(/:/g,'-')]={lane,argv:[manager,'run',name],command_digest:hash(command),input_paths:['package.json',...locks,...discovered.filter(p=>/config|policy/.test(p))],qualification:'static-recipe; runner unqualified'};
  }
- if(flavor==='unity'){
+ const unityLayout=flavor==='unity'||(flavor==='director'&&inputs['ProjectSettings/ProjectVersion.txt']!==null);
+ if(unityLayout){
   const version=read(root,'ProjectSettings/ProjectVersion.txt')?.match(/m_EditorVersion:\s*(\S+)/)?.[1];
   if(!version)throw Error('Unity root requires ProjectSettings/ProjectVersion.txt');
   if(!rules.unity.editor_patterns.some(p=>new RegExp(p).test(version)))throw Error('Unsupported Unity version: '+version);
@@ -111,6 +126,14 @@ function resolveProfile(source,root,flavor) {
  if(staticInspection&&!Object.hasOwn(recipes,'static-inspection'))recipes['static-inspection']=staticInspection;
  const unresolved=Object.entries(facts.packages).filter(([,value])=>value.state==='ambiguous').map(([name])=>name);
  if(unresolved.length)gaps.push({key:'unresolved-package-versions',packages:unresolved,reason:'Dependency declarations lack resolved version evidence; version-specific resources are unavailable until supported lock evidence is supplied.'});
+ if(flavor==='director'){
+  const director=readJson(source,'domains/director/capabilities.json');
+  const narrative=director.narrative;
+  if(director.schema!==1||!narrative||inputDigest(source,narrative.source)!==narrative.sha256)throw Error('Director Narrative source pin changed');
+  facts.director={narrative:{status:narrative.status,sha256:narrative.sha256},
+   artworkshop:director.artworkshop,logs:director.logs,
+   unity:{status:unityLayout&&recipes['unity-editmode']?'recipe-discovered':'unavailable'}};
+ }
  facts.capabilities={};
  for(const [id,rule] of Object.entries(registry.flavors[flavor].capabilities||{})){
   const pkg=facts.packages[rule.package],state=!pkg?'absent':pkg.state!=='known'?'ambiguous':new RegExp(rule.version_pattern).test(pkg.version)?'known':'unsupported';
@@ -149,7 +172,12 @@ function sourceInputs(source) {
  for(const dir of ['common','domains','templates','config','lib','src']) {
   function walk(rel){for(const e of fs.readdirSync(safe(source,rel),{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){if(e.name==='__pycache__')continue;const p=path.posix.join(rel,e.name);if(e.isDirectory())walk(p);else result[p]=hash(fs.readFileSync(safe(source,p)));}}
   walk(dir);
- }return result;
+ }
+ const resourceMap=readJson(source,'config/resource-map.json');
+ for(const resources of Object.values(resourceMap))for(const group of Object.values(resources))for(const rel of Object.values(group)){
+  if(rel.startsWith('tests/fixtures/director/'))result[rel]=hash(fs.readFileSync(safe(source,rel)));
+ }
+ return result;
 }
 function matches(profile,predicate){
  if(predicate.all)return predicate.all.every(p=>matches(profile,p));
@@ -164,8 +192,8 @@ function matches(profile,predicate){
 function compose(source,profile,selected=null) {
  const registry=readJson(source,'config/flavors.json'),recipe=registry.flavors[profile.flavor];if(!recipe)throw Error('Unknown flavor');
  const operations=readJson(source,'templates/operations.json'),mapping=readJson(source,'config/resource-map.json'),mandatory=readJson(source,'templates/invariants.json'),domain=readJson(source,recipe.sections),packages={};
- const names=selected||Object.keys(operations).sort();
- for(const name of names){const op=operations[name];if(!op)throw Error('Unknown operation: '+name);
+ const available=operationNames(source,profile.flavor),names=selected||available;
+ for(const name of names){const op=operations[name];if(!available.includes(name))throw Error('Operation unavailable for flavor '+profile.flavor+': '+name);
   let sections=mergeSections(mergeSections(mandatory,op.sections),domain,recipe.replaceable_slots||[]);
   const active=(recipe.conditional_resources||[]).filter(item=>matches(profile,item.when));
   sections=mergeSections(sections,active.map((item,index)=>({id:'capability-'+index,text:item.instruction})));
@@ -191,4 +219,4 @@ function compose(source,profile,selected=null) {
  for(const [name,files] of Object.entries(packages))output_digests[name]=Object.fromEntries(Object.entries(files).map(([rel,content])=>[rel,hash(content)]));
  return {packages,source_digests,output_digests,identity:hash(json({flavor:profile.flavor,environment_id:profile.environment_id,source_digests,output_digests}))};
 }
-module.exports={hash,json,safe,read,readJson,inventory,resolveProfile,mergeSections,mergeResources,sourceInputs,matches,compose};
+module.exports={hash,json,safe,read,readJson,inventory,resolveProfile,mergeSections,mergeResources,sourceInputs,matches,compose,flavorNames,operationNames};
