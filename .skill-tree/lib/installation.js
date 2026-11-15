@@ -1,6 +1,7 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path');
 const c=require('./composer.js');
+const development=require('./development-policies.js');
 const BEGIN='<!-- BEGIN skill-tree-skills -->',END='<!-- END skill-tree-skills -->';
 const INSTALL='.skill-tree/installation',PROFILE=INSTALL+'/profile.json';
 function filesAt(root,rel,includeCaches=false){
@@ -263,7 +264,9 @@ function plan(root,source,flavor,selections,options={}){
  if(old)for(const rel of Object.keys(old.destinations))selections.push({rel,provider:old.destinations[rel].provider,name:old.destinations[rel].name});
  const merged={};for(const item of selections){if(!merged[item.rel])merged[item.rel]={...item,providers:[]};merged[item.rel].providers=[...new Set([...merged[item.rel].providers,...(item.providers||[item.provider])])].sort();}
  const unique=Object.values(merged),names=[...new Set(unique.map(s=>s.name))];
- const profile=c.resolveProfile(source,root,flavor),built=c.compose(source,profile,names),changes={},destinations={...(old?.destinations||{})};
+ const profile=c.resolveProfile(source,root,flavor,options),built=c.compose(source,profile,names),changes={},destinations={...(old?.destinations||{})};
+ const policyBefore=treeHash(root,development.CONFIG);
+ if(Object.hasOwn(options,'developmentPolicy'))changes[development.CONFIG]=options.developmentPolicy;
  for(const item of unique){
   const current=filesAt(root,item.rel),owned=old?.destinations[item.rel];
   if(current&&!owned)throw Error('Unowned destination conflict, including --force: '+item.rel);
@@ -274,7 +277,8 @@ function plan(root,source,flavor,selections,options={}){
  for(const rel of new Set([...(options.bridges||[]),...Object.keys(old?.bridges||{})])){
   const current=c.read(root,rel)||'',existing=bridgeBlock(current);bridgeBefore[rel]=treeHash(root,rel);
   if(existing&&!old?.bridges[rel])throw Error('Unowned bridge conflict: '+rel);
-  const block=BEGIN+'\n'+c.read(source,'src/init-rules/skill-tree-skills.md').trim()+'\nFlavor: '+flavor+'. Profile: `.skill-tree/installation/profile.json`.\n'+END;
+  const policyInstructions=development.instructions(profile);
+  const block=BEGIN+'\n'+c.read(source,'src/init-rules/skill-tree-skills.md').trim()+'\nFlavor: '+flavor+'. Profile: `.skill-tree/installation/profile.json`.\n'+(policyInstructions?'\n'+policyInstructions+'\n':'')+END;
   changes[rel]=existing?current.replace(existing,block):current+(current.endsWith('\n')?'\n':'\n\n')+block+'\n';
   bridges[rel]={hash:c.hash(block),providers:[...new Set([...(old?.bridges[rel]?.providers||[]),...(options.bridges?.includes(rel)&&options.provider?[options.provider]:[])])].sort()};
  }
@@ -295,6 +299,7 @@ function plan(root,source,flavor,selections,options={}){
   if(old?.destinations[rel])expected[rel]=c.hash(c.json(old.destinations[rel].files));
   else if(old?.bundle_digests[rel])expected[rel]=c.hash(c.json({'':old.bundle_digests[rel]}));
   else if(rel===PROFILE)expected[rel]=profileBefore;
+  else if(rel===development.CONFIG)expected[rel]=policyBefore;
   else if(rel===WORKFLOW)expected[rel]=workflowBefore;
   else if(Object.hasOwn(bridgeBefore,rel))expected[rel]=bridgeBefore[rel];
   else expected[rel]=null;
@@ -310,7 +315,7 @@ function verify(root,source,allowForeign=false){
  if(fs.existsSync(c.safe(root,transactionPaths('plugins').journal)))throw Error('Plugin installation recovery is required before profile verification');
  const p=receipt(root,true,allowForeign);verifyOwned(root,p);const bundleSource=c.safe(root,INSTALL+'/source');
  const now=c.resolveProfile(bundleSource,root,p.flavor);
- for(const field of ['source_version','inputs','inventory','facts','recipes','gaps','environment_id','execution_bindings','worktree_environment','plugins'])if(c.json(now[field])!==c.json(p[field]))throw Error('Profile refresh-required or resolved profile mismatch: node .skill-tree/installation/manager.js --refresh-profile');
+ for(const field of ['source_version','inputs','inventory','facts','recipes','gaps','environment_id','execution_bindings','worktree_environment','plugins','development_policies'])if(c.json(now[field])!==c.json(p[field]))throw Error('Profile refresh-required or resolved profile mismatch: node .skill-tree/installation/manager.js --refresh-profile');
  if(p.identity!==compositionIdentity(p))throw Error('Composition receipt identity mismatch');
  const generated=c.compose(bundleSource,now,[...new Set(Object.values(p.destinations).map(record=>record.name))]);
  const providers=c.readJson(bundleSource,'config/providers.json').providers;
@@ -324,8 +329,9 @@ function verify(root,source,allowForeign=false){
 function install(root,source,flavor,selections,options={}){
  if(options.dryRun){const result=plan(root,source,flavor,selections,options);return {profile:result.profile,delta:result.delta,action:'dry-run'};}
  return locked(root,()=>{
-  const result=plan(root,source,flavor,selections,options);
-  transaction(root,result.changes,result.expected,()=>{const current=c.resolveProfile(source,root,flavor);if(current.environment_id!==result.profile.environment_id)throw Error('Project inputs changed during profile staging; refresh from current inputs');});
+  const planned=options.updateDevelopmentPolicy?{...options,developmentPolicy:options.updateDevelopmentPolicy()}:options;
+  const result=plan(root,source,flavor,selections,planned);
+  transaction(root,result.changes,result.expected,()=>{const current=c.resolveProfile(source,root,flavor,planned);if(current.environment_id!==result.profile.environment_id)throw Error('Project inputs changed during profile staging; refresh from current inputs');});
   try{verify(root,source);}catch(error){
    if(result.delta.length){try{restoreGeneration(root);}catch(recovery){throw Error('Profile verification failed; preserved generation backups require conflict review: '+error.message+'; '+recovery.message);}}
    throw error;
@@ -353,6 +359,17 @@ function uninstall(root,selections,options={}){
  return options.dryRun?action():locked(root,action,{recoverPluginPending:options.recoverPluginPending});
 }
 function refresh(root,source,dryRun=false){const p=receipt(root,true);return install(root,source,p.flavor,Object.entries(p.destinations).map(([rel,d])=>({rel,provider:d.provider,name:d.name})),{dryRun,bridges:Object.keys(p.bridges||{}),recoverPluginPending:false});}
+function updateDevelopmentPolicy(root,source,update) {
+ const p=receipt(root,true);
+ const selections=Object.entries(p.destinations).map(([rel,d])=>({rel,provider:d.provider,name:d.name}));
+ return install(root,source,p.flavor,selections,{recoverPluginPending:false,updateDevelopmentPolicy:()=>{
+  if(verify(root,source).identity!==p.identity)throw Error('Development policy changed during preparation; retry against current state');
+  const raw=c.read(root,development.CONFIG);
+  const config=development.configuration(raw);
+  const next=update(config);
+  return c.json(config)===c.json(next)?raw:development.encode(next);
+ }});
+}
 function restoreGeneration(root){
  const p=receipt(root,true);verifyOwned(root,p);if(hasActiveOperation(root))throw Error('Stop the active controller before rollback');
  const last=c.readJson(root,INSTALL+'/.last-transaction.json',null);if(!last)throw Error('No retained generation for rollback');
@@ -402,8 +419,9 @@ function rebind(root,source){
 }
 function localMain(root,source,args){
  try{
+  if(['lock-api','unlock-api'].includes(args[0])){console.log(c.json(require('./api-contract-locks.js').runCommand(root,source,args[0],args.slice(1))));return 0;}
   if(args.includes('--list-plugins'))return require('./plugins.js').listMain(root,args,{source});
-  if(args.some(a=>!['--refresh-profile','--dry-run','--verify','--recover','--rollback','--rebind'].includes(a)))throw Error('Usage: manager.js --refresh-profile [--dry-run] | --verify | --recover | --rollback | --rebind');
+  if(args.some(a=>!['--refresh-profile','--dry-run','--verify','--recover','--rollback','--rebind'].includes(a)))throw Error('Usage: manager.js --refresh-profile [--dry-run] | --verify | --recover | --rollback | --rebind | lock-api <target> [--file <path>] [--baseline <ref>] | unlock-api <target|--all>');
   const operations=args.filter(a=>a!=='--dry-run');
   if(operations.length!==1||args.filter(a=>a==='--dry-run').length>1||args.includes('--dry-run')&&operations[0]!=='--refresh-profile')throw Error('Select exactly one manager operation; --dry-run applies only to --refresh-profile');
   if(args.includes('--rebind')){console.log(c.json(rebind(root,source)));return 0;}
@@ -414,4 +432,4 @@ function localMain(root,source,args){
   const result=refresh(root,source,args.includes('--dry-run'));console.log(c.json({action:result.action,changed:result.delta,facts:result.profile.facts,gaps:result.profile.gaps}));return 0;
  }catch(error){console.error(error.message);return 2;}
 }
-module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,readHookRecords,pendingHookOperation,stoppedWorkflow,plan,install,verify,uninstall,refresh,rollback,rebind,localMain};
+module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,readHookRecords,pendingHookOperation,stoppedWorkflow,plan,install,verify,uninstall,refresh,rollback,rebind,localMain,updateDevelopmentPolicy};

@@ -4,6 +4,7 @@ const path=require('node:path');
 const crypto=require('node:crypto');
 const bindings=require('./execution-bindings.js');
 const plugins=require('./plugin-composition.js');
+const development=require('./development-policies.js');
 const hash=value=>crypto.createHash('sha256').update(value).digest('hex');
 function stable(value) {
  if(Buffer.isBuffer(value))return value;
@@ -41,7 +42,7 @@ function inventory(root,rules) {
  for(const name of rules.names)if(fs.existsSync(safe(root,name)))out.push(name);
  return [...new Set(out)].sort();
 }
-function resolveProfile(source,root,flavor) {
+function resolveProfile(source,root,flavor,options={}) {
  root=fs.realpathSync(root);
  const registry=readJson(source,'config/flavors.json'),rules=readJson(source,'config/capabilities.json');
  if(!registry.flavors[flavor])throw Error('Unknown flavor: '+flavor);
@@ -121,7 +122,10 @@ function resolveProfile(source,root,flavor) {
  if(worktree_environment.schema!==1)throw Error('Unsupported worktree environment declaration');
  for(const key of ['required_files','isolated_directories'])for(const rel of worktree_environment[key]||[])safe(root,rel);
  if((worktree_environment.exclusive_resources||[]).some(key=>typeof key!=='string'||!key))throw Error('Explicit runtime resource identities required');
- const environment={flavor,inputs,facts,recipes,execution_bindings,worktree_environment};
+ const policy=Object.hasOwn(options,'developmentPolicy')?options.developmentPolicy:read(root,development.CONFIG);
+ const development_policies=development.effective(policy);
+ inputs[development.CONFIG]=development_policies.input_digest;
+ const environment={flavor,inputs,facts,recipes,execution_bindings,worktree_environment,development_policies};
  if(pluginComposition){
   const pluginInputs=plugins.resolveInputs(root,readJson(source,'templates/operations.json'),hash(pluginComposition));
   for(const record of Object.values(pluginInputs.packages))for(const relative of Object.keys(record.files))inputs[record.destination+'/'+relative]=inputDigest(root,record.destination+'/'+relative);
@@ -174,7 +178,8 @@ function compose(source,profile,selected=null) {
   files=mergeResources(files,domainFiles,recipe.replacements||{});
   for(const item of active){const extra={};for(const [dest,src] of Object.entries(item.resources))extra[dest]=read(source,src);files=mergeResources(files,extra,item.replacements||{});}
   files['references/project-profile.md']='# Concrete Project Profile\n\nFlavor: '+profile.flavor+'. Static compatibility only; execution remains unqualified.\n\n```json\n'+json({source_version:profile.source_version,instruction_profile_id:hash(json({flavor:profile.flavor,facts:profile.facts,recipes:profile.recipes,gaps:profile.gaps})),facts:profile.facts,recipes:profile.recipes,gaps:profile.gaps,worktree_environment:profile.worktree_environment})+'```\n';
-  files['SKILL.md']='---\nname: '+name+'\ndescription: '+JSON.stringify('['+profile.flavor+'] '+op.description)+'\nlicense: MIT\n---\n\n# '+op.title+'\n\nFlavor: '+profile.flavor+'. Read the [concrete project profile](references/project-profile.md).\n\n'+sections.map(s=>s.text).join('\n\n')+'\n';
+  const policyInstructions=development.instructions(profile,name);
+  files['SKILL.md']='---\nname: '+name+'\ndescription: '+JSON.stringify('['+profile.flavor+'] '+op.description)+'\nlicense: MIT\n---\n\n# '+op.title+'\n\nFlavor: '+profile.flavor+'. Read the [concrete project profile](references/project-profile.md).\n\n'+sections.map(s=>s.text).join('\n\n')+'\n'+(policyInstructions?'\n'+policyInstructions:'');
   files['agents/openai.yaml']='interface:\n  display_name: '+JSON.stringify(op.title+' ('+profile.flavor+')')+'\n  short_description: '+JSON.stringify(profile.flavor+' Skill Tree workflow')+'\n';
   if(profile.plugins){const contribution=plugins.composeOperation(source,profile,name,files);files=mergeResources(files,contribution.files);}
   for(const [rel,content] of Object.entries(files)){if(typeof content!=='string'&&!Buffer.isBuffer(content))throw Error('Missing composition resource: '+rel);safe(source,rel);}

@@ -106,8 +106,10 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "api-contract-locks.js": "lib/api-contract-locks.js",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
+      "development-policies.js": "lib/development-policies.js",
       "plugin-bindings.js": "lib/plugin-bindings.js",
       "plugin-composition.js": "lib/plugin-composition.js",
       "plugin-hooks.js": "common/scripts/plugin-hooks.js",
@@ -292,8 +294,10 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "api-contract-locks.js": "lib/api-contract-locks.js",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
+      "development-policies.js": "lib/development-policies.js",
       "plugin-bindings.js": "lib/plugin-bindings.js",
       "plugin-composition.js": "lib/plugin-composition.js",
       "plugin-hooks.js": "common/scripts/plugin-hooks.js",
@@ -427,8 +431,10 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "api-contract-locks.js": "lib/api-contract-locks.js",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
+      "development-policies.js": "lib/development-policies.js",
       "plugin-bindings.js": "lib/plugin-bindings.js",
       "plugin-composition.js": "lib/plugin-composition.js",
       "plugin-hooks.js": "common/scripts/plugin-hooks.js",

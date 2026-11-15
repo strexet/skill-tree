@@ -830,7 +830,7 @@ fs.writeFileSync(file,JSON.stringify(operations,null,2)+'\n');"""
 
     def test_actual_plugin_finding_enters_core_ledger_and_needs_fix_checks_review_and_fresh_pilot(self):
         self.install();self.core_review()
-        finding={'id':'PLUGIN-ONE','path':'source.py','line':2,
+        finding={'id':'PLUGIN-ONE','path':'source.py','line':2,'development_policy':'not-a-built-in',
             'cause':'The fixture returns the old constant.',
             'consequence':'The required fixture value is wrong.','severity':'P1'}
         frame,_=self.returned(self.start(),'findings',result_extra={'findings':[finding]})
@@ -851,6 +851,7 @@ fs.writeFileSync(file,JSON.stringify(operations,null,2)+'\n');"""
         ledger=contribution['findings'];self.assertEqual(len(ledger),1)
         identity,tracked=next(iter(ledger.items()))
         self.assertNotEqual(identity,finding['id'],'External IDs require a contribution namespace.')
+        self.assertNotIn('development_policy',tracked)
         for key in ['path','line','cause','consequence','severity']:self.assertEqual(tracked[key],finding[key])
         self.assertEqual(contribution['review'],original_review)
         self.assertEqual(contribution['rounds'],original_rounds)

@@ -153,13 +153,13 @@ def preflight(root,payload):
     base=ws.git(root,'rev-parse','--verify','refs/remotes/'+remote+'/'+target+'^{commit}')
     head=ws.git(root,'rev-parse','HEAD');changed=ws.git(root,'diff','--name-only',base+'...'+head).splitlines()
     if not changed:raise ReviewError('No changes relative to the current target branch')
-    return {**params,'repo_id':ws.repo_id(root),'remote':remote,'remote_id':hashlib.sha256(url.encode()).hexdigest(),'head':head,'base_oid':base,'changed_files':changed}
+    return {**params,'repo_id':ws.repo_id(root),'remote':remote,'remote_id':hashlib.sha256(url.encode()).hexdigest(),'head':head,'base_oid':base,'changed_files':changed,'candidate_objects_required':True}
 
 def identity(snapshot):
     return {**{key:snapshot[key] for key in ['repo_id','remote','source_branch','target_branch','head','base_oid']},'remote_id':snapshot.get('remote_id')}
 
 def review_key(snapshot):
-    return digest({key:snapshot.get(key) for key in ['head','base_oid','target_branch','changed_files','threads','reviews','comments','checks','checks_known','required_checks_missing','approvals_known','approvals_required','approved']})
+    return digest({key:snapshot.get(key) for key in ['head','base_oid','target_branch','changed_files','candidate_objects_required','threads','reviews','comments','checks','checks_known','required_checks_missing','approvals_known','approvals_required','approved']})
 
 def decision_context(snapshot,purpose='finding-resolution'):
     if not isinstance(purpose,str) or not re.fullmatch(r'[a-z][a-z0-9-]*',purpose):raise ReviewError('Review decision requires an exact bounded purpose')
@@ -215,7 +215,109 @@ def reconcile(record,snapshot,*,retarget=None):
         record['status']='pr-review-in-progress'
     return record
 
-def reviewed(record,snapshot,payload):
+DEVELOPMENT_POLICIES = frozenset({'direct-replacement', 'network-polling'})
+POLICY_FINDING_PREFIX = 'development-policy:'
+
+
+def enabled_development_policies(store):
+    if store is None:
+        return DEVELOPMENT_POLICIES
+    root = Path(store.source_root)
+    profile = root / '.skill-tree/installation/profile.json'
+    config = root / '.skill-tree/development-policies.json'
+    if profile.is_symlink() or config.is_symlink():
+        raise ReviewError('Owned development policy paths cannot use symlinks')
+    try:
+        active = json.loads(profile.read_text()).get('development_policies') if profile.exists() else None
+        config_bytes = config.read_bytes() if config.exists() else None
+        overrides = json.loads(config_bytes).get('policies', {}) if config_bytes is not None else {}
+    except (OSError, ValueError, AttributeError) as error:
+        raise ReviewError('Cannot read the owned development policy installation') from error
+    if active is None and config_bytes is None:
+        return DEVELOPMENT_POLICIES
+    actual = hashlib.sha256(config_bytes).hexdigest() if config_bytes is not None else None
+    if not isinstance(active, dict) or active.get('input_digest') != actual:
+        raise ReviewError('Development policies require a current owned installation profile')
+    rows = active.get('policies')
+    if (not isinstance(rows, list) or len(rows) != len(DEVELOPMENT_POLICIES) or
+            any(not isinstance(row, dict) or type(row.get('id')) is not str or
+                type(row.get('enabled')) is not bool for row in rows) or
+            {row['id'] for row in rows} != DEVELOPMENT_POLICIES):
+        raise ReviewError('The owned development policies are invalid')
+    if (not isinstance(overrides, dict) or
+            any(row['enabled'] is not overrides.get(row['id'], True) for row in rows)):
+        raise ReviewError('The owned development policy settings differ from project configuration')
+    return {row['id'] for row in rows if row['enabled']}
+
+
+def policy_source(root, snapshot, path, line, excerpt):
+    head = snapshot['head']
+    if (not re.fullmatch('[a-f0-9]{40}|[a-f0-9]{64}', head) or type(path) is not str or
+            path not in snapshot['changed_files'] or any(part in {'', '.', '..'} for part in path.split('/')) or
+            '\\' in path or '\0' in path or type(line) is not int or line < 1 or
+            type(excerpt) is not str or not excerpt.strip()):
+        raise ReviewError('A policy violation requires a changed file and exact candidate source line')
+    try:
+        result = subprocess.run(['git', '--no-replace-objects', '-C', str(root), 'show', head + ':' + path],
+                                capture_output=True, timeout=10)
+        lines = result.stdout.decode('utf-8').split('\n')
+    except (OSError, subprocess.TimeoutExpired, UnicodeError) as error:
+        raise ReviewError('Cannot read the policy candidate source') from error
+    if result.returncode or line > len(lines) or lines[line-1].removesuffix('\r') != excerpt:
+        raise ReviewError('Policy evidence differs from the exact candidate source')
+
+
+def policy_findings(store, snapshot, observations, enabled):
+    if not isinstance(observations, list) or (observations and store is None):
+        raise ReviewError('Policy observations require an owned review workspace and a list')
+    findings = {}
+    notes = []
+    for row in observations:
+        if (not isinstance(row, dict) or type(row.get('policy')) is not str or
+                row['policy'] not in DEVELOPMENT_POLICIES):
+            raise ReviewError('Select an exact built-in development policy')
+        if row['policy'] not in enabled:
+            continue
+        if row.get('outcome') == 'inconclusive':
+            missing = row.get('missing_fact')
+            if type(missing) is not str or not missing.strip():
+                raise ReviewError('An inconclusive policy observation requires the missing fact')
+            notes.append({'policy': row['policy'], 'outcome': 'inconclusive', 'missing_fact': missing})
+            continue
+        if row.get('outcome') != 'violation':
+            raise ReviewError('Unknown development policy observation outcome')
+        fields = ('id', 'cause', 'consequence', 'severity')
+        if (any(type(row.get(field)) is not str or not row[field].strip() for field in fields) or
+                not re.fullmatch('[a-z0-9][a-z0-9-]{0,79}', row['id'])):
+            raise ReviewError('A policy violation requires a stable ID, source-backed cause, consequence and severity')
+        policy_source(store.source_root, snapshot, row.get('path'), row.get('line'), row.get('source_line'))
+        key = POLICY_FINDING_PREFIX + row['policy'] + ':' + row['id']
+        if key in findings:
+            raise ReviewError('Duplicate development policy finding: ' + key)
+        findings[key] = {**{field: row[field] for field in (*fields, 'path', 'line', 'source_line')},
+                         'id': key, 'development_policy': row['policy'], 'status': 'open',
+                         'observed_head': snapshot['head']}
+    return findings, notes
+
+
+def finding_policy(finding):
+    policy = finding.get('development_policy')
+    key = finding.get('id')
+    if type(policy) is str and policy in DEVELOPMENT_POLICIES and isinstance(key, str) and key.startswith(
+            POLICY_FINDING_PREFIX + policy + ':'):
+        return policy
+    return None
+
+
+def unresolved_findings(record, snapshot, store=None, enabled=None):
+    if enabled is None:
+        enabled = enabled_development_policies(store)
+    return [finding for finding in record.get('findings', {}).values()
+            if ((policy := finding_policy(finding)) is None or policy in enabled)
+            and not finding_verified(finding, snapshot)]
+
+
+def reviewed(record,snapshot,payload,*,store=None):
     record=inspected(record,snapshot,payload)
     if record['status']=='merged':return record
     if record['status']=='blocked':raise ReviewError(record['blocked_reason'])
@@ -225,18 +327,34 @@ def reviewed(record,snapshot,payload):
         raise ReviewError('Review requires the full diff and necessary surrounding context')
     if not payload.get('discussions_inspected') or not payload.get('checks_inspected'):
         raise ReviewError('Review requires current reviews, inline discussions and CI results')
-    findings=payload.get('findings',[])
-    for finding in findings:
-        if any(not finding.get(key) for key in ['id','path','line','cause','consequence','severity']) or finding['path'] not in snapshot['changed_files'] or type(finding['line']) is not int or finding['line']<1:
-            raise ReviewError('Actionable finding requires location, cause, consequence and severity')
+    enabled = enabled_development_policies(store)
+    observed, notes = policy_findings(store, snapshot, payload.get('development_policy_observations', []), enabled)
     ledger=record.setdefault('findings',{})
-    for finding in findings:ledger[finding['id']]=deepcopy(finding)
-    unresolved=[f for f in ledger.values() if not finding_verified(f,snapshot)]
-    # A claimed fix requires independently recorded verification of the current revision.
-    if any(f.get('status') in {'verified-fixed','dismissed'} and (f.get('verified_head')!=snapshot['head'] or not f.get('verification_evidence')) for f in findings):
-        raise ReviewError('Fixed finding requires current-head verification evidence')
-    if any(f.get('status')=='dismissed' and not f.get('dismissal_reason') for f in findings):raise ReviewError('Dismissed finding requires an evidence-backed reason')
+    findings=deepcopy(payload.get('findings',[]))
+    for finding in findings:
+        if not isinstance(finding, dict) or not isinstance(finding.get('id'), str) or 'development_policy' in finding:
+            raise ReviewError('Submit new policy findings through development policy observations and use string finding IDs')
+        if finding['id'].startswith(POLICY_FINDING_PREFIX):
+            previous = ledger.get(finding['id'], {})
+            if not finding_policy(previous) or finding.get('status') not in {'verified-fixed', 'dismissed'} or finding['id'] in observed:
+                raise ReviewError('A previous policy finding requires current-head resolution evidence')
+            finding.update({key: previous[key] for key in ('development_policy', 'path', 'line', 'source_line', 'observed_head')})
+        elif (finding.get('path') not in snapshot['changed_files'] or
+              type(finding.get('line')) is not int or finding['line'] < 1):
+            raise ReviewError('Actionable finding requires a current changed-file location')
+        if any(not finding.get(key) for key in ['id','cause','consequence','severity']):
+            raise ReviewError('Actionable finding requires location, cause, consequence and severity')
+        if finding.get('status') in {'verified-fixed','dismissed'} and (finding.get('verified_head')!=snapshot['head'] or not finding.get('verification_evidence')):
+            raise ReviewError('Fixed finding requires current-head verification evidence')
+        if finding.get('status')=='dismissed' and not finding.get('dismissal_reason'):
+            raise ReviewError('Dismissed finding requires an evidence-backed reason')
+        ledger[finding['id']]=deepcopy(finding)
+    ledger.update(observed)
+    findings.extend(observed.values())
+    unresolved=unresolved_findings(record,snapshot,enabled=enabled)
     record['review']={'key':review_key(snapshot),'head':snapshot['head'],'base_oid':snapshot['base_oid'],'findings':findings,'unresolved':len(unresolved),'independent_approval':False,'evidence':payload.get('evidence',[])}
+    if notes:
+        record['review']['development_policy_notes'] = notes
     record['rounds']=record.get('rounds',[])+[deepcopy(record['review'])]
     return record
 
@@ -358,7 +476,7 @@ def incorporate_review_findings(store,record,snapshot,publication_id,payload):
     for finding in values:
         if not isinstance(finding,dict) or any(not finding.get(key) for key in ['id','path','line','cause','consequence','severity']) or finding['path'] not in snapshot['changed_files'] or type(finding['line']) is not int or finding['line']<1:raise ReviewError('Plugin findings require concrete current changed-file locations, cause and consequence')
         if finding.get('status','open')!='open':raise ReviewError('A plugin cannot self-verify or dismiss a finding')
-        item=deepcopy(finding);item['id']=attempt['id']+':'+str(finding['id']);item['source_attempt_id']=attempt['id'];output.append(item)
+        item=deepcopy(finding);item.pop('development_policy',None);item['id']=attempt['id']+':'+str(finding['id']);item['source_attempt_id']=attempt['id'];output.append(item)
     if len({item['id'] for item in output})!=len(output):raise ReviewError('Review contribution finding identities must be distinct')
     result_digest=engine.digest(attempt['result']);reference=payload.get('decision_receipt')
     if not isinstance(reference,dict):raise ReviewError('Actual W1 finding substantiation requires a current core decision receipt')
@@ -463,6 +581,25 @@ def hook_admission(store,record,snapshot):
     except (ValueError,OSError) as error:raise ReviewError('Current review hook obligations remain unresolved: '+str(error)) from error
 
 
+def api_lock_admission(store,snapshot):
+    root=Path(store.source_root)
+    script=Path(__file__).with_name('api-contract-locks.js')
+    if not script.is_file():script=Path(__file__).resolve().parents[2]/'lib/api-contract-locks.js'
+    try:
+        result=subprocess.run(['node',str(script),'review',str(root)],input=json.dumps(snapshot),
+                              capture_output=True,text=True,timeout=30)
+    except (OSError,subprocess.TimeoutExpired) as error:
+        raise ReviewError('API lock review did not return current evidence') from error
+    try:evidence=json.loads(result.stdout)
+    except ValueError:
+        raise ReviewError('API lock review is unavailable: '+result.stderr.strip())
+    if result.returncode or evidence.get('failures'):
+        raise ReviewError('API lock review blocked readiness: '+('; '.join(evidence.get('failures',[])) or 'no current evidence'))
+    if not evidence.get('reviewer'):return None
+    return {'head':snapshot['head'],'base_oid':snapshot['base_oid'],'affected':evidence['affected'],
+            'plugin_id':'api-lock-review','stage':'before-pr-ready'}
+
+
 def ready(record,snapshot,*,store=None):
     ws.validate_hook_references(record)
     if store is not None:record=_retire_review_hook_references(store,record,snapshot)
@@ -472,9 +609,19 @@ def ready(record,snapshot,*,store=None):
     if (record.get('hook_chains') or any(record.get('review_requirements',{}).get('phases',{}).values())) and store is None:raise ReviewError('Current hook readiness requires the live owned store')
     if store is not None:
         _review_requirement_admission(store,record,snapshot);hook_admission(store,record,snapshot)
+        api_locks=api_lock_admission(store,snapshot)
+        if api_locks:record['api_lock_review']=api_locks
+        else:record.pop('api_lock_review',None)
     if not record.get('pr') or not record['pr'].get('id') or not record['pr'].get('url'):raise ReviewError('PR readiness requires the existing provider PR identity and URL')
     review=record.get('review')
-    if not review or review['key']!=review_key(snapshot) or review['unresolved'] or any(not finding_verified(f,snapshot) for f in record.get('findings',{}).values()):
+    if not review or review['key']!=review_key(snapshot):
+        raise ReviewError('Current full review or actionable finding verification remains incomplete')
+    unresolved = unresolved_findings(record, snapshot, store)
+    if unresolved:
+        policy = next((finding for finding in unresolved if finding_policy(finding)), None)
+        if policy:
+            raise ReviewError('Development policy ' + policy['development_policy'] + ' blocked review at ' +
+                              policy['path'] + ':' + str(policy['line']) + ': ' + policy['cause'])
         raise ReviewError('Current full review or actionable finding verification remains incomplete')
     if any(not t.get('resolved') and (t.get('required') or t.get('actionable')) for t in snapshot.get('threads',[])):
         raise ReviewError('Mandatory/actionable PR discussions remain unresolved')
@@ -557,7 +704,7 @@ class GitHub:
         for check in raw.get('statusCheckRollup') or []:
             name=check.get('name') or check.get('context');status=check.get('conclusion') or check.get('state') or check.get('status') or 'UNKNOWN'
             checks.append({'name':name,'status':'success' if status=='SUCCESS' else status.lower(),'required':name in required})
-        return {**context,'head':raw['headRefOid'],'base_oid':raw['baseRefOid'],'changed_files':[f['filename'] for f in files],'pr':{'id':raw['id'],'number':raw['number'],'url':raw['url']},'state':raw['state'],'merge_commit':(raw.get('mergeCommit') or {}).get('oid'),'mergeable':raw['mergeable'],'reviews':reviews,'comments':comments+inline,'threads':threads,'checks':checks,'checks_known':policy.get('checks_known') is True,'required_checks_missing':sorted(required-{c['name'] for c in checks}),'approvals_known':policy.get('approvals_known') is True,'approvals_required':policy.get('approvals_required',True),'approved':raw.get('reviewDecision')=='APPROVED'}
+        return {**context,'head':raw['headRefOid'],'base_oid':raw['baseRefOid'],'candidate_objects_required':True,'changed_files':[f['filename'] for f in files],'pr':{'id':raw['id'],'number':raw['number'],'url':raw['url']},'state':raw['state'],'merge_commit':(raw.get('mergeCommit') or {}).get('oid'),'mergeable':raw['mergeable'],'reviews':reviews,'comments':comments+inline,'threads':threads,'checks':checks,'checks_known':policy.get('checks_known') is True,'required_checks_missing':sorted(required-{c['name'] for c in checks}),'approvals_known':policy.get('approvals_known') is True,'approvals_required':policy.get('approvals_required',True),'approved':raw.get('reviewDecision')=='APPROVED'}
     def merge(self,number,head,method):
         if method not in {'merge','squash','rebase'}:raise ReviewError('Repository-approved merge method required')
         return self.gh('api','--method','PUT','repos/'+self.repository+'/pulls/'+str(number)+'/merge','-f','sha='+head,'-f','merge_method='+method)
@@ -637,7 +784,7 @@ def main(argv=None):
                     else:
                         if not record:raise ReviewError('Initialize or select the existing publication record')
                         if args.command=='observe':result=reconcile(record,snapshot)
-                        elif args.command=='review':result=reviewed(record,snapshot,payload['review'])
+                        elif args.command=='review':result=reviewed(record,snapshot,payload['review'],store=store)
                         elif args.command=='inspection':result=inspected(record,snapshot,payload['inspection'])
                         elif args.command=='review-reconcile':result=reconcile_review_requirements(store,record,snapshot,key,prepared_review,payload['decision_receipt'])
                         elif args.command=='plugin-findings':result=incorporate_review_findings(store,record,snapshot,key,payload)

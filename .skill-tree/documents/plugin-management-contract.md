@@ -10,6 +10,33 @@ The default path installs or updates core Skill Tree without acquiring, enabling
 
 A core update preserves already installed packages, bindings and frozen run requirements. Continue without new plugins never means uninstall existing plugins. Core activation and optional plugin activation have explicit transaction boundaries: a failed or cancelled optional-plugin stage preserves the successful core installation and leaves no partially activated plugin generation. Installed resources and bindings remain unchanged until a matching plugin proposal is confirmed.
 
+## Built-in development policies
+
+The offline plugin inventory reports each built-in policy and current setting. `direct-replacement` and `network-polling` enable by default on fresh installs and upgrades when the project preference is unset. The policies help reduce redundant implementations and avoid unjustified recurring network requests. Explicit project preferences survive future installation changes.
+
+Use `skill-tree-plugins` with the exact built-in policy ID and explicit enabled state. The installed manager accepts `{"action":"set-builtin","policy":"direct-replacement","enabled":false}` as a structured request. The owned installation transaction applies the preference together with updated project instructions, package inventory and any owned instruction bridge. The ordinary stopped-run boundary protects activation.
+
+## Public API locks
+
+An owner can pin an exact public contract or a declared named set. The current Git commit supplies the default baseline. An explicit commit or tag selects another baseline. The command stores the resolved commit and a digest of each protected contract. When the selected contract or a declared input has uncommitted changes, choose a baseline explicitly. Other working tree edits remain valid.
+
+```sh
+node .skill-tree/installation/manager.js lock-api 'GET /items' --file openapi.json
+node .skill-tree/installation/manager.js lock-api public-api --baseline v1.4
+node .skill-tree/installation/manager.js unlock-api public-api
+node .skill-tree/installation/manager.js unlock-api --all
+```
+
+Declare named contracts and sets in `.skill-tree/api-contracts.json` using schema 1. A contract entry uses `openapi` and `operation`, or a portable `file` and an owner-declared list of exact current PR check names in `checks`. Optional `inputs` name additional repository-relative files affecting the declared contract. Optional `consumers` name supported integrations. The `sets` map contains named arrays of exact contract IDs. Locking a set pins the then-current membership.
+
+The built-in adapter compares exact operations in JSON OpenAPI 3.0 and 3.1 documents, including inherited parameters and local JSON Pointer references. The adapter requires lossless numeric representation within the protected operation and referenced objects. Operations using rebased or dynamic schema references require a project-declared check. A change in the protected operation projection blocks readiness, including changes to annotations inside that projection. Use a project-declared file contract with an appropriate check for YAML or reference formats outside the built-in adapter.
+
+The first lock attaches `api-lock-review` before PR readiness. The inventory shows the reviewer as managed by `lock-api`. An affected check must have current successful evidence. Repositories configured with a Git remote require local commit objects for the exact review candidate and target. The reviewer inspects the exact Git candidate and target and includes both sides of file renames in the affected-file check. A target-side lock continues to apply to a branch created before the lock. A committed change to the managed configuration must match the owned candidate configuration. Additional locks and partial unlock update the verified project configuration at `.skill-tree/development-policies.json`. The final unlock removes the reviewer. Command output names the stage, reviewer action and active locks. Both other built-in switches remain independent.
+
+## Development policy evidence in PR review
+
+Review the changed behavior and actual caller path. Use the installed review operation's `development_policy_observations` input to submit a confirmed violation. Supply the policy ID, stable observation ID, changed-file path, one-based line, exact candidate line, cause, consequence and severity. The review helper verifies the line against the Git object for the current PR head before adding the finding to the review ledger. Resolve a previously recorded finding through the normal current-head verification process. The resolution retains the recorded source location when the fix removes the file from the diff. Record inconclusive evidence with the missing fact. An inconclusive observation leaves the independent checks and review obligations in force.
+
 ## Offline management entry point
 
 Opening `skill-tree-plugins` uses a no-dispatch inventory path and shows installed/known views without network acquisition, including immediately after core installation before task documentation or future.md exists. Raw inventory bypasses plugin hooks and starts no queue, controller or worktree. Explicit management workflow actions can dispatch configured management anchors; a read-only view never hides plugin execution. The installed view shows stable plugin IDs, exact source/content revisions, destinations, all binding IDs/locations, enabled state, order/conditions, parameter summaries, adapter status and dependency or parked-run requirements. The known view combines curated entries and project-added sources, identifies installed state and separates suggested locations from actual bindings.

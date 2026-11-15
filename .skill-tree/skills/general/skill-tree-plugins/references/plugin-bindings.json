@@ -1428,7 +1428,7 @@
   "configuration_digest": "b8996e3dce328966e3de5689fbc479249b1a4fdaf4c54be07eec21e96ba4ca53",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "0c1be2644c66e7d15b34c071f238be332e6d1dcdec5b0aab52cc878230ba5410",
+  "identity": "bd47f34b78c3e67639f7a5e9b82d773c1f5802f24befadc0b40209bd00e14122",
   "operation": "skill-tree-plugins",
   "operations": {
     "skill-tree-add-pending-task": {
@@ -1469,7 +1469,7 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "e6e52babdfd66b30bfa8d557905970b7dacd2c8c17edd3907c17ef8396522eca",
+    "SKILL.md": "23d0903d99604e7e57a57009a00b04a1b69ace89939d2c6790ffda32789d9384",
     "agents/openai.yaml": "c4fa85db8e83d8fb3390a66833e63e1e6c3d4e6bf051a26ab57f3b40ed40770a",
     "references/decision-governance.md": "390934d262f20952edb78a59b52f3e64567b830e1723f5bde8716e193722ff2b",
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
@@ -1483,7 +1483,7 @@
     "scripts/plugin-composition.js": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8",
     "scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",
     "scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",
-    "scripts/plugin-manager.js": "c0ad080ab70c18375c6bccdfc5da3242bafef83cf2353a4cbbd833b4d72c6929",
+    "scripts/plugin-manager.js": "094749e213b75d5eb65c3cf7f4db3a414be5895fc5c643968b3506206d06a530",
     "scripts/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
     "scripts/plugin-processing.py": "4f4418c8e67a723a2cdd53b43246cb4507f0419bd7ca76b901334e78bb1406ec",
     "scripts/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",

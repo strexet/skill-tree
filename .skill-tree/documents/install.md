@@ -42,6 +42,12 @@ Resolved package capabilities use supported npm lockfile 2/3 or Unity package-lo
 
 Provider references protect shared discovery destinations such as `.agents/skills`. Removing one provider retains a package or bridge still referenced by another provider. Verification includes deterministic recomposition from the owned bundle, resolved facts, package identities and complete inventories. Installer output reports profile/environment identities, input fingerprints, package identities/provider references and validation policy.
 
+## Built-in development policies
+
+Direct replacement keeps one active path by prompting implementation and review to trace entry points, migrate consumers and retire superseded behavior. The network polling policy helps choose lifecycle requests or suitable subscriptions and checks the lifecycle of justified recurring refreshes.
+
+Fresh installations and ordinary upgrades enable both policies for projects without explicit settings. Manage each switch independently through `skill-tree-plugins`. Explicit settings survive refresh, reinstall, upgrade and flavor changes. The owned installer projects current settings into implementation and review instructions and any installed instruction bridge.
+
 ## Installed plugin inventory
 
 The source installer and installed manager expose offline installed-plugin views without flavor/provider selection, Future initialization, source acquisition or plugin dispatch. Human output groups the current occurrences by plugin or integration point; JSON includes the full installed and point projections.

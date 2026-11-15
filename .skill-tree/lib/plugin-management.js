@@ -142,6 +142,10 @@ function inventory(root,options={}){
  try{value=registry.readRegistry(root);}catch(error){issues.push(boundedError(error,'installed-registry'));return {...base,status:'unavailable'};}
  base.known=knownEntries(options.known,value.packages);
  const receipt=profileInspection(root,value,issues);base.profile=receipt.profile;base.derived_copies=receipt.copies;
+ const policy=require('./development-policies.js');
+ const currentPolicy=policy.effective(require('./composer.js').read(root,policy.CONFIG));
+ base.built_in_policies=currentPolicy.policies;
+ base.managed_review_plugin=currentPolicy.lock_review;
  if(receipt.status==='unavailable')return {...base,status:'unavailable'};
  const inspected=packageInspection(root,value);issues.push(...inspected.issues);
  let operations=options.operations;
@@ -159,6 +163,8 @@ function bindingLine(row){return '  '+row.position+'. '+row.id+' -> '+display(ro
 function formatInventory(view,{groupBy='plugin'}={}){
  if(!['plugin','point'].includes(groupBy))registry.fail('plugin-view','Group by plugin or point');
  const lines=['Installed plugins: '+view.status];
+ for(const row of view.built_in_policies||[])lines.push('Built-in '+row.id+' ['+(row.enabled?'enabled':'disabled')+', '+row.origin+']');
+ if(view.managed_review_plugin)lines.push('Built-in api-lock-review [enabled, managed by lock-api]');
  if(groupBy==='plugin')for(const plugin of view.plugins){lines.push(plugin.id+' @ '+display(plugin.revision)+' ['+plugin.content_digest+'] '+plugin.ownership.scope+':'+plugin.ownership.status+'; destination='+display(plugin.destination)+'; execution='+display(plugin.execution));for(const row of plugin.bindings)lines.push(bindingLine(row));}
  else for(const point of view.points){lines.push(display(point.operation)+' / '+display(point.anchor)+' ['+point.status+']');for(const row of point.bindings)lines.push(bindingLine(row)+'; plugin='+row.plugin_id);}
  if(groupBy==='point')for(const plugin of view.plugins.filter(item=>!item.bindings.length))lines.push('Unbound package '+plugin.id+' @ '+display(plugin.revision)+'; destination='+display(plugin.destination));
