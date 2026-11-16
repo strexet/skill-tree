@@ -2220,7 +2220,7 @@
   "configuration_digest": "6c9c54cbbfd279e05ade9bd3581b37c93b4c7ce9d7895d7895eb7fd94e4f96c1",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "4714aa7e9417464578a8d7857faa7f6aff7ec17285b882ff39420412d63579c0",
+  "identity": "58baff0dc3aba2fa685a5188ed663149584e48205e23cc1bdba8fe1f39930235",
   "operation": "skill-tree-create-documents-snapshot",
   "operations": {
     "skill-tree-add-pending-task": {
@@ -2294,7 +2294,7 @@
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
-    "references/project-profile.md": "15f369ebfe1872146e44e5333e1f8639cc03ba039e9e5c973ca8963cb2ac8ccf",
+    "references/project-profile.md": "586873d78cc7cee736cc8c2575afba3001892546cd2737c1729ea82c15e420d9",
     "references/snapshot-rules.md": "18142120546fcd532e496fbd14aefbe449fa63da40cbcca577db249b91dcd30e",
     "references/ugui-testing.md": "873c236f793ff3c9ece8f0d0346c5c48513e8220406fce216751571c58b79073",
     "references/unity-development.md": "f65dc5e0e69df84d3204fe70339a7dfa53fcd0d57a2b97f8e57d34a399e5f640",

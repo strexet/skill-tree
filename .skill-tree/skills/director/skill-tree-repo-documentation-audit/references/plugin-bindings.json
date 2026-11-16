@@ -2220,7 +2220,7 @@
   "configuration_digest": "6c9c54cbbfd279e05ade9bd3581b37c93b4c7ce9d7895d7895eb7fd94e4f96c1",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "079bd34a788cfc5b37e65ac6ee3514009779a5e4f0afe40c88c53da5af09ef38",
+  "identity": "e0967d88f4c32747f3b76c96b7f81c1632fdd8ef7b8d8e7e883d6d939493f3c9",
   "operation": "skill-tree-repo-documentation-audit",
   "operations": {
     "skill-tree-add-pending-task": {
@@ -2298,7 +2298,7 @@
     "references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
     "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
-    "references/project-profile.md": "09fdc4d2afc54362ca1381cef5ced1492f6b13e40002875dc47683568e74f70c",
+    "references/project-profile.md": "1445db873c68ddc732e73cfaf837472ada271cc125e1b3fb815045073a7384d3",
     "references/repository-discovery-checklist.md": "a112230c076fea515c437e3e7407c575ee6690d772eaa28e68f80c720c7a621c",
     "references/run-workspaces.md": "d9a97bc8ee56ef0aa6f254075df08e2946fdc61c578328a52f6991dbd723468c",
     "references/validation-policy.md": "2bb1e9675fe3bc08cbcb9aa4b9534368416faba7ffaaf6b5aaff417456f434d3",

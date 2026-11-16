@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.5.0 (2026-11-16)
+
+### Added
+
+- The Director flavor coordinates registered project folders and repositories from Codex. Nine Director operations cover planning, child dispatch, owner decisions, evidence review, run diagnostics and controlled installation.
+- Narrative workflows support story drafts, continuity and gameplay review, author-approved canon snapshots and source-backed handoffs into Director plans.
+- Tasks support topics and intake batches. Grouped selection and guarded migration preserve task identities and queue history.
+- Built-in direct replacement and network polling policies apply by default. Reviewed API contract locks pin a baseline and verify affected contracts before PR readiness.
+
+### Changed
+
+- Completed dependencies require matching current validation and reviewed source coverage before dependent work proceeds.
+- New run events carry UTC recording times, and Core replay accepts legacy events. Director Audit reports missing event sequences, unresolved checks and repeated failures.
+
 ## 0.4.0 (2026-11-09)
 
 ### Added

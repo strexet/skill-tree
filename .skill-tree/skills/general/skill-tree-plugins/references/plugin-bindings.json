@@ -2220,7 +2220,7 @@
   "configuration_digest": "6c9c54cbbfd279e05ade9bd3581b37c93b4c7ce9d7895d7895eb7fd94e4f96c1",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "eb5f8b316b9d9f815433e3378a5fcbfe09db692d8cdc8542bcb629c99e7462a4",
+  "identity": "a5e85ec75bedf2cacbcb541aef703971e4747d452896faa6a0a565a5e4a32fb9",
   "operation": "skill-tree-plugins",
   "operations": {
     "skill-tree-add-pending-task": {
@@ -2293,7 +2293,7 @@
     "references/decision-governance.md": "390934d262f20952edb78a59b52f3e64567b830e1723f5bde8716e193722ff2b",
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
-    "references/project-profile.md": "e880123c1237a88d5c2c765b105d7bba3bd7b5d68240a8c242a7fd9d13408164",
+    "references/project-profile.md": "e184e46ad1056717633052666d173e52d472441024d59e801b4d868315a02933",
     "references/validation-policy.md": "2bb1e9675fe3bc08cbcb9aa4b9534368416faba7ffaaf6b5aaff417456f434d3",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "d2c5ac475033ae06321fc7917ddf96232a0e442bef7c5db537891e12164fd404",

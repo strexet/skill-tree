@@ -1,6 +1,6 @@
 # Current Features
 
-All three flavors expose the same operation names.
+All four flavors expose twelve core operations. The director flavor adds nine operations for cross-project coordination. The [Director workflow](director-workflow.md) documents the additional operations and evidence boundaries.
 
 | Operation | Current responsibility |
 | --- | --- |
