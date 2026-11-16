@@ -5,15 +5,16 @@
 | `.skill-tree/templates/` | Authored operation instructions and locked invariants. |
 | `.skill-tree/common/references/` | Shared canonical workflow and validation contracts. |
 | `.skill-tree/common/scripts/` | Canonical workflow, review, validation and snapshot helpers. |
-| `.skill-tree/domains/` | General, web and unity sections and conditional resources. |
+| `.skill-tree/domains/` | General, web, unity and Director sections and conditional resources. |
 | `.skill-tree/config/` | Flavor, capability, provider, resource and source-role registries. |
 | `.skill-tree/lib/` | Composer, installation and execution-binding implementation. |
 | `.skill-tree/bin/` | Installer CLI. |
 | `.skill-tree/scripts/` | Source generator, strict validator and Python suite runner. |
-| `.skill-tree/skills/` | Generated representative packages for all three flavors. |
+| `.skill-tree/skills/` | Generated representative packages for all four flavors. |
 | `.agents/skills/` | Installed general execution snapshot for repository development. |
 | `.skill-tree/installation/` | Owned installation receipt, local manager and maintenance bundle. |
 | `.skill-tree/documents/` | Current documentation, task definitions and progress. |
+| [Director workflow](director-workflow.md) | Coordination ownership, immutable cross-area references, authorization and pilot gates. |
 | `.skill-tree/history/` | Audit records, compact task outcomes and retained workflow evidence. |
 | `.skill-tree/artifacts/` | Ignored detailed reports and local audit probes. |
 | `.skill-tree/tests/` | Python and Node behavioral fixtures and test documentation. |

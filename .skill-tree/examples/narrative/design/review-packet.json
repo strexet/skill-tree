@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "proposal_digest": "807c18871ec202ac08ab65500c5b157cff06006c0ee1ee120dc610cf9ffefde3",
+  "work": "work-ridge",
+  "continuity": "continuity-ridge",
+  "base": "764d9dcf477c0d0bdb23aae70d83f3b53c515d730aba4fe9e4b5ad463079e110",
+  "record_scope": {
+    "selected": [
+      "event-trip"
+    ],
+    "retired": [],
+    "unchanged_dependents": [
+      "scene-relay"
+    ]
+  },
+  "review_sources": [
+    {
+      "path": "ink/relay.ink",
+      "sha256": "4fbb5a4c46a36acf2487d06555588c5baedc2a863adda81fa72d7c980fd28279"
+    },
+    {
+      "path": "work-ridge.md",
+      "sha256": "528bd6e0c10576feeffbfb15ab4ba0a25a2b9f4b10f87bb00689ea48577658d0"
+    }
+  ],
+  "reviewer": {
+    "id": "fixture-reviewer",
+    "role": "independent-reviewer",
+    "evidence": "Synthetic review example. No actual reviewer identity is asserted."
+  },
+  "coverage": [
+    {
+      "kind": "continuity",
+      "scope": "Relay timing on both reviewed routes",
+      "evidence": [
+        "event-trip",
+        "scene-relay",
+        "work-ridge.md"
+      ]
+    },
+    {
+      "kind": "runtime-source-inspection",
+      "scope": "Relay display source only",
+      "evidence": [
+        "ink/relay.ink"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "finding-trip-time",
+      "scope": "in-scope",
+      "severity": "blocker",
+      "status": "resolved",
+      "evidence": [
+        "event-trip",
+        "ink/relay.ink"
+      ],
+      "resolution": "The revised event and relay text agree on the trip time."
+    },
+    {
+      "id": "finding-live-playtest",
+      "scope": "out-of-scope",
+      "severity": "note",
+      "status": "open",
+      "evidence": [
+        "work-ridge.md"
+      ]
+    }
+  ],
+  "packet_digest": "d5c6838530897eb48eb364de9d2d3b073c5f1634282b7a9ac3bfa0169231511f"
+}

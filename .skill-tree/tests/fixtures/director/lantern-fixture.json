@@ -1,0 +1,71 @@
+{
+  "fixture_id": "director-held-lantern",
+  "kind": "director-lantern-fixture",
+  "model": {
+    "asset": "DirectorLantern.fbx",
+    "form": "handheld",
+    "id": "cave-lantern",
+    "revision": "r001",
+    "scale_meters": [
+      0.21,
+      0.21,
+      0.322
+    ],
+    "sockets": {
+      "BeltSocket": [
+        0.1,
+        0,
+        0.11
+      ],
+      "GripSocket": [
+        0,
+        0,
+        0.28
+      ]
+    }
+  },
+  "profile_recipe": "director-blender-observed",
+  "schema": 1,
+  "source_fixture_id": "skill-tree-sandbox",
+  "story": {
+    "belt": {
+      "path": ".skill-tree/tests/fixtures/director/story/carry-belt.json",
+      "revision": "r002",
+      "sha256": "7928010f5bdba1e66e535325dfa838f1d55bd4ac9d3ed944f64d1129f2363953"
+    },
+    "hand": {
+      "path": ".skill-tree/tests/fixtures/director/story/carry-hand.json",
+      "revision": "r001",
+      "sha256": "598b028fc47f8449589ab3421e6e2678146d96cd196f2f9183967773e5181f92"
+    },
+    "id": "cave-lantern-carry"
+  },
+  "tool_pins": {
+    "blender_build": "02f0899d78e3",
+    "blender_version": "5.3.0",
+    "editor": "6000.3.27f2",
+    "editor_revision": "22188f149405",
+    "pipeline": "1.0.0-pre.1",
+    "test_framework": "1.6.0",
+    "unity_cli": "1.0.0-beta.15"
+  },
+  "wall_control": {
+    "guid": "26676c7dcdcf941d99dda41b1fb88b2e",
+    "meta_sha256": "fde70f35414674e501db92a21ff3d59c30197afa25541657f94ab1e0b0242cf2",
+    "path": "Assets/SkillTree3D/LanternPilot/Lantern.prefab",
+    "sha256": "f7c1c4608f9375a36a61217f6229d2e1e8adbc0c9e072cc21ed2ffd2244652c9",
+    "wall_socket": "MountOrigin"
+  },
+  "wrappers": {
+    "belt": {
+      "path": "lantern-belt.json",
+      "revision": "r002",
+      "socket": "BeltSocket"
+    },
+    "hand": {
+      "path": "lantern-hand.json",
+      "revision": "r001",
+      "socket": "GripSocket"
+    }
+  }
+}

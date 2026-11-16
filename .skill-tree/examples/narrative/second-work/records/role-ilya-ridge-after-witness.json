@@ -1,0 +1,10 @@
+{
+  "id": "role-ilya-ridge-after-witness",
+  "kind": "work-role",
+  "depends_on": [
+    "state-ilya-ridge-after-lift"
+  ],
+  "work_id": "work-ridge-after",
+  "state_id": "state-ilya-ridge-after-lift",
+  "purpose": "Witness crew arrival and stock loss."
+}

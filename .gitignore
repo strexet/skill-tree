@@ -15,6 +15,7 @@ build/
 tmp/
 
 .skill-tree/artifacts/
+.skill-tree/history/validation/director/lantern-art/blender.log
 .skill-tree/.writer-lock
 .skill-tree/.transaction.json
 .skill-tree/installation/.install-lock

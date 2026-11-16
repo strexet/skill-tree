@@ -1,0 +1,170 @@
+{
+  "approved_ids": [
+    "T-2af7dde3-2aa5-429a-a950-b61e216e9cc8",
+    "T-63d24095-46d0-4519-bb47-145d03a67a61",
+    "T-db7c42c4-902d-456b-85bb-ef78b084ff06",
+    "T-ed480f55-9288-46c4-b3b5-cf8a47bf7306",
+    "T-cc0df271-f419-4976-abfe-2e3c7d559c8f",
+    "T-09594a04-d60b-4376-8198-38b5e191370b",
+    "T-4df3310a-ff4d-4584-bc1e-b7fb66032958",
+    "T-8b57b3ea-9c1f-4acc-af98-0eb1b7a8fc88",
+    "T-126094c5-4a1b-47d2-81d7-b1cceb4c3b09",
+    "T-0440b3b6-2c5a-4bab-a932-670f06a14663",
+    "T-bc24e5fe-ff0a-4cdc-b8c8-c143ac2fb1cb",
+    "T-2d4cdd62-11bd-49b7-906f-343a0df202f3",
+    "T-de652e9a-cead-48d3-bb44-134759a56c2f",
+    "T-1b36db34-b9f9-487f-9d70-8b4328b6e939",
+    "T-04ec75c9-7cc2-4d19-aabd-35117718d1e2",
+    "T-8f9d3521-01da-4944-ab86-7c24abd60047",
+    "T-5797df6d-aacf-4211-bba3-deb88cab54d9",
+    "T-ea6358b9-0bba-4cb3-8eaf-f5dea24ca6d8",
+    "T-15ca7b47-135c-4022-a789-4c529d74e88b"
+  ],
+  "checks": {
+    "director_root_depends_on_migration": true,
+    "exact_original_markdown_after_removing_new_headers": true,
+    "exact_retry_replayed": true,
+    "historical_batch_fields_absent": true,
+    "outcomes_ledger_preserved": true,
+    "queue_order_preserved": true,
+    "run_registry_and_progress_preserved": true,
+    "unrelated_entries_equal": true
+  },
+  "migration_receipt": ".skill-tree/history/task-grouping-migrations/39f2bd26ceb362d69fcd2c60fd63513ee35de43ef4074155211509818094a270.json",
+  "migration_receipt_sha256": "bb634d9ddab25950070291a102abc72279b983feac0cb71aaed1013640454d68",
+  "migration_task_id": "T-803c7bcd-de46-45ed-905d-9f8be7b41960",
+  "preview_sha256": "39f2bd26ceb362d69fcd2c60fd63513ee35de43ef4074155211509818094a270",
+  "processing_run_id": "PR-c22092d4-34fa-4bab-9b4e-a8d2a7b120ab",
+  "result_sha256": "7667d49161c113763fd65cf43984470b624e359a0e4f85f3a781e39cab70c68d",
+  "run_id": "WR-1be26142-9edf-4e3c-aa55-a2faa2ba5a50",
+  "schema": 1,
+  "source_sha256": "a5b1ac115d8af4353b4ea20f47e17495a719f8f03d7092d50f721a8625c34a43",
+  "stopped_runs": [
+    {
+      "branch": "codex/task-grouping",
+      "checkpoint_sha256": "0f3011e62757708929e6bb91d4a0cfe0aa7439bd4b7c958566189fe3b1fa0aab",
+      "id": "WR-1be26142-9edf-4e3c-aa55-a2faa2ba5a50",
+      "next_action": "Verify and activate compatible owned generation, then apply exact reviewed topic migration",
+      "phase": "refresh-profile",
+      "profile_refresh_required": true,
+      "stop_reason": "Installation profile changed; re-admit before continuation"
+    },
+    {
+      "branch": "codex/skill-tree-3d-creature-reference",
+      "checkpoint_sha256": "f78e513624b7738aedbfaf0f8902c50d9a0dcc5c3791dc87fe06f844e0537f8b",
+      "id": "WR-d4e3f8f1-a6d7-4e3e-baf6-e0de6b0cd3a4",
+      "next_action": "Record the observed owner decision on model revision r005. Apply any requested clay geometry corrections before progressing to the next Blender stage.",
+      "phase": "blocked",
+      "profile_refresh_required": true,
+      "stop_reason": "The owner requested facial, tail tip and hock or paw refinements for the r004 Blender blockouts. Model revision r005 delivers the scoped clay corrections and awaits review of the exact comparison packet."
+    }
+  ],
+  "topic": "director",
+  "topic_selection": {
+    "ids": [
+      "T-2af7dde3-2aa5-429a-a950-b61e216e9cc8",
+      "T-63d24095-46d0-4519-bb47-145d03a67a61",
+      "T-db7c42c4-902d-456b-85bb-ef78b084ff06",
+      "T-ed480f55-9288-46c4-b3b5-cf8a47bf7306",
+      "T-cc0df271-f419-4976-abfe-2e3c7d559c8f",
+      "T-09594a04-d60b-4376-8198-38b5e191370b",
+      "T-4df3310a-ff4d-4584-bc1e-b7fb66032958",
+      "T-8b57b3ea-9c1f-4acc-af98-0eb1b7a8fc88",
+      "T-126094c5-4a1b-47d2-81d7-b1cceb4c3b09",
+      "T-0440b3b6-2c5a-4bab-a932-670f06a14663",
+      "T-bc24e5fe-ff0a-4cdc-b8c8-c143ac2fb1cb",
+      "T-2d4cdd62-11bd-49b7-906f-343a0df202f3",
+      "T-de652e9a-cead-48d3-bb44-134759a56c2f",
+      "T-1b36db34-b9f9-487f-9d70-8b4328b6e939",
+      "T-04ec75c9-7cc2-4d19-aabd-35117718d1e2",
+      "T-8f9d3521-01da-4944-ab86-7c24abd60047",
+      "T-5797df6d-aacf-4211-bba3-deb88cab54d9",
+      "T-ea6358b9-0bba-4cb3-8eaf-f5dea24ca6d8",
+      "T-15ca7b47-135c-4022-a789-4c529d74e88b"
+    ],
+    "outside_dependencies": [
+      "T-803c7bcd-de46-45ed-905d-9f8be7b41960",
+      "T-8633ce73-63e0-4962-9fe8-7e9351ad6384"
+    ]
+  },
+  "verified_profiles": {
+    "WR-1be26142-9edf-4e3c-aa55-a2faa2ba5a50": {
+      "package_helpers": {
+        ".agents/skills/skill-tree-add-pending-task/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-clarify-tasks/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-create-documents-snapshot/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-implement-all/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-implement-next-future-task/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-plugins/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-pr-review-cycle/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-process-future-pending/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-repo-documentation-audit/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-repo-documentation/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-work-through-next/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed"
+      },
+      "profile_identity": "085b6ce8c3f68627a26c2fdd6b3ca928e0ea8e72bba3d475fe607f58dc401a55",
+      "profile_sha256": "6b39aebd47236d458dfd44beff1d4b235acba90635f987edeb9b79cf0f5c286c",
+      "schema": 1,
+      "source_helper_sha256": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed"
+    },
+    "WR-d4e3f8f1-a6d7-4e3e-baf6-e0de6b0cd3a4": {
+      "package_helpers": {
+        ".agents/skills/skill-tree-3d/scripts/workflow-state.py": "155dbbfc258a34d6af598a69041bcbf50c0c970f374069d34898d4e6254e7a69",
+        ".agents/skills/skill-tree-add-pending-task/scripts/workflow-state.py": "155dbbfc258a34d6af598a69041bcbf50c0c970f374069d34898d4e6254e7a69",
+        ".agents/skills/skill-tree-clarify-tasks/scripts/workflow-state.py": "155dbbfc258a34d6af598a69041bcbf50c0c970f374069d34898d4e6254e7a69",
+        ".agents/skills/skill-tree-create-documents-snapshot/scripts/workflow-state.py": "155dbbfc258a34d6af598a69041bcbf50c0c970f374069d34898d4e6254e7a69",
+        ".agents/skills/skill-tree-implement-all/scripts/workflow-state.py": "155dbbfc258a34d6af598a69041bcbf50c0c970f374069d34898d4e6254e7a69",
+        ".agents/skills/skill-tree-implement-next-future-task/scripts/workflow-state.py": "155dbbfc258a34d6af598a69041bcbf50c0c970f374069d34898d4e6254e7a69",
+        ".agents/skills/skill-tree-narative/scripts/workflow-state.py": "155dbbfc258a34d6af598a69041bcbf50c0c970f374069d34898d4e6254e7a69",
+        ".agents/skills/skill-tree-plugins/scripts/workflow-state.py": "155dbbfc258a34d6af598a69041bcbf50c0c970f374069d34898d4e6254e7a69",
+        ".agents/skills/skill-tree-pr-review-cycle/scripts/workflow-state.py": "155dbbfc258a34d6af598a69041bcbf50c0c970f374069d34898d4e6254e7a69",
+        ".agents/skills/skill-tree-process-future-pending/scripts/workflow-state.py": "155dbbfc258a34d6af598a69041bcbf50c0c970f374069d34898d4e6254e7a69",
+        ".agents/skills/skill-tree-repo-documentation-audit/scripts/workflow-state.py": "155dbbfc258a34d6af598a69041bcbf50c0c970f374069d34898d4e6254e7a69",
+        ".agents/skills/skill-tree-repo-documentation/scripts/workflow-state.py": "155dbbfc258a34d6af598a69041bcbf50c0c970f374069d34898d4e6254e7a69",
+        ".agents/skills/skill-tree-work-through-next/scripts/workflow-state.py": "155dbbfc258a34d6af598a69041bcbf50c0c970f374069d34898d4e6254e7a69"
+      },
+      "profile_identity": "057cfc10d765373c462f430faa0c962d15a3a5d70a8495faeccc837f79605d01",
+      "profile_sha256": "f97a34a16ca62f943942fbe7c9b7ceeedcc556c2e59fc28161a5490b64a1f0fa",
+      "schema": 1,
+      "source_helper_sha256": "155dbbfc258a34d6af598a69041bcbf50c0c970f374069d34898d4e6254e7a69"
+    },
+    "canonical": {
+      "package_helpers": {
+        ".agents/skills/skill-tree-add-pending-task/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-clarify-tasks/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-create-documents-snapshot/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-implement-all/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-implement-next-future-task/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-plugins/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-pr-review-cycle/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-process-future-pending/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-repo-documentation-audit/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-repo-documentation/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-work-through-next/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed"
+      },
+      "profile_identity": "ade537baf20e3a67f3e9d801a75137b255e12af0fa8bf7f93acb6a556a440790",
+      "profile_sha256": "cba20f98f89aaaf3f16ad88fa2aaac3daa437940bb1ed2f066973ad505371096",
+      "schema": 1,
+      "source_helper_sha256": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed"
+    },
+    "invoking-worktree": {
+      "package_helpers": {
+        ".agents/skills/skill-tree-add-pending-task/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-clarify-tasks/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-create-documents-snapshot/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-implement-all/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-implement-next-future-task/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-plugins/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-pr-review-cycle/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-process-future-pending/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-repo-documentation-audit/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-repo-documentation/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed",
+        ".agents/skills/skill-tree-work-through-next/scripts/workflow-state.py": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed"
+      },
+      "profile_identity": "085b6ce8c3f68627a26c2fdd6b3ca928e0ea8e72bba3d475fe607f58dc401a55",
+      "profile_sha256": "6b39aebd47236d458dfd44beff1d4b235acba90635f987edeb9b79cf0f5c286c",
+      "schema": 1,
+      "source_helper_sha256": "521997ace7de427d05a94ee1480d9ba7bcb92d5b7ffeca0132bf62ed11448bed"
+    }
+  }
+}

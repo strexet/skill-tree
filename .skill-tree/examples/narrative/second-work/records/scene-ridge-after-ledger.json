@@ -1,0 +1,27 @@
+{
+  "id": "scene-ridge-after-ledger",
+  "kind": "scene",
+  "depends_on": [
+    "role-ilya-ridge-after-witness",
+    "scene-report"
+  ],
+  "work_id": "work-ridge-after",
+  "requires_outcomes": [
+    "outcome-lift"
+  ],
+  "requires_participants": [
+    "character-ilya"
+  ],
+  "relationships": [
+    {
+      "kind": "adapted-from",
+      "target": "scene-relay",
+      "scope": "work-ridge"
+    }
+  ],
+  "adapted_from": {
+    "work_id": "work-ridge",
+    "continuity_id": "continuity-ridge",
+    "record_id": "scene-relay"
+  }
+}

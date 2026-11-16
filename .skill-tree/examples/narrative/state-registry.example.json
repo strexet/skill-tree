@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "work_id": "work-ridge",
+  "values": {
+    "knows_trip_cause": {
+      "type": "boolean",
+      "initial": false,
+      "owner": "ink",
+      "scope": "playthrough",
+      "persistence": "same-build",
+      "missing": "unavailable",
+      "meaning": "The log establishes the fuse and lead sequence within the pilot.",
+      "read_sites": [
+        "scene-ridge-selector"
+      ],
+      "write_events": [
+        "discover-log"
+      ]
+    },
+    "pack_state": {
+      "type": "enum",
+      "initial": "ready",
+      "owner": "ink",
+      "scope": "playthrough",
+      "persistence": "same-build",
+      "missing": "unavailable",
+      "allowed": [
+        "ready",
+        "spent",
+        "isolated"
+      ],
+      "read_sites": [
+        "scene-report"
+      ],
+      "write_events": [
+        "power-lift",
+        "power-cooler",
+        "try-heater"
+      ]
+    },
+    "crew_rescued": {
+      "type": "boolean",
+      "initial": false,
+      "owner": "ink",
+      "scope": "playthrough",
+      "persistence": "same-build",
+      "missing": "unavailable",
+      "read_sites": [
+        "scene-report"
+      ],
+      "write_events": [
+        "power-lift"
+      ]
+    },
+    "medicine_cold": {
+      "type": "boolean",
+      "initial": false,
+      "owner": "ink",
+      "scope": "playthrough",
+      "persistence": "same-build",
+      "missing": "unavailable",
+      "read_sites": [
+        "scene-report"
+      ],
+      "write_events": [
+        "power-cooler"
+      ]
+    },
+    "incident_receipts": {
+      "type": "integer",
+      "initial": 0,
+      "owner": "ink",
+      "scope": "playthrough",
+      "persistence": "same-build",
+      "missing": "unavailable",
+      "minimum": 0,
+      "maximum": 1,
+      "unique_effect": true,
+      "read_sites": [
+        "scene-report"
+      ],
+      "write_events": [
+        "report-entry"
+      ]
+    }
+  },
+  "synthetic_host_examples": {
+    "relay_exposed": {
+      "type": "boolean",
+      "initial": false,
+      "owner": "ink",
+      "scope": "playthrough",
+      "persistence": "same-build",
+      "missing": "unavailable",
+      "meaning": "The player was offered evidence.",
+      "read_sites": [
+        "report"
+      ],
+      "write_events": [
+        "read-log"
+      ]
+    },
+    "trip_interpretation": {
+      "type": "enum",
+      "initial": "unexpressed",
+      "owner": "ink",
+      "scope": "playthrough",
+      "persistence": "same-build",
+      "missing": "unavailable",
+      "allowed": [
+        "unexpressed",
+        "short-circuit",
+        "storm"
+      ],
+      "meaning": "A player selected an interpretation.",
+      "read_sites": [
+        "report"
+      ],
+      "write_events": [
+        "state-hypothesis"
+      ]
+    },
+    "protagonist_knows_trip": {
+      "type": "boolean",
+      "initial": false,
+      "owner": "ink",
+      "scope": "playthrough",
+      "persistence": "same-build",
+      "missing": "unavailable",
+      "meaning": "The protagonist possesses the established fact.",
+      "read_sites": [
+        "report"
+      ],
+      "write_events": [
+        "confirm-log"
+      ]
+    },
+    "ilya_belief": {
+      "type": "enum",
+      "initial": "storm",
+      "owner": "ink",
+      "scope": "playthrough",
+      "persistence": "same-build",
+      "missing": "unavailable",
+      "allowed": [
+        "storm",
+        "uncertain",
+        "short-circuit"
+      ],
+      "meaning": "An NPC belief can differ from the established fact.",
+      "read_sites": [
+        "report"
+      ],
+      "write_events": [
+        "hear-confirmation"
+      ]
+    },
+    "crew_safe": {
+      "type": "boolean",
+      "initial": false,
+      "owner": "unity",
+      "scope": "persistent",
+      "persistence": "host-save-v1",
+      "missing": "migration-required",
+      "read_sites": [
+        "arrival"
+      ],
+      "write_events": [
+        "complete-rescue"
+      ]
+    }
+  },
+  "save_policy": {
+    "version": 1,
+    "compatible": "same-build",
+    "unsupported": "explicit-failure",
+    "legacy": "No implicit defaults. A named migration must be separately approved and validated."
+  }
+}

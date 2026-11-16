@@ -1,0 +1,7 @@
+{
+  "id": "character-ilya",
+  "kind": "character",
+  "depends_on": [
+    "event-trip"
+  ]
+}

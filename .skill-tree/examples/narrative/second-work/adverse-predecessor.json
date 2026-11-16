@@ -1,0 +1,18 @@
+{
+  "case_id": "ridge-after-incompatible-cooling",
+  "work_id": "work-ridge-after",
+  "predecessor_outcome_ids": [
+    "outcome-cooler"
+  ],
+  "state_id": "state-ilya-ridge-after-lift",
+  "expected": {
+    "code": "incompatible-predecessor-outcome",
+    "source_record_id": "quest-ridge",
+    "requires": [
+      "outcome-lift"
+    ],
+    "selected": [
+      "outcome-cooler"
+    ]
+  }
+}

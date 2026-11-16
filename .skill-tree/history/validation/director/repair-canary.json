@@ -1,0 +1,45 @@
+{
+  "acknowledgement_retry": {
+    "acknowledgement": "recovered-exact-candidate",
+    "replay_status": "required",
+    "status": "installed",
+    "wider_rollout": "held"
+  },
+  "activation": {
+    "acknowledgement": "observed",
+    "replay_status": "required",
+    "status": "installed",
+    "wider_rollout": "held"
+  },
+  "admission_profile": "91c431f9589f51088617e714f870c139678cafa44b5aa8fb5fe9cd82147d6a23",
+  "candidate_sha256": "8d79f3ecd8361a591e8e85833ca56565fdd8631a3620f15691219923a2d25a17",
+  "disposable_fixture": "source-repair-original-report",
+  "kind": "director-repair-canary-observation",
+  "preview_sha256": "71952a6ae07b04072270264e7c9d8dfae43ab24e2d8b62c4c5066b6d3c88b2b4",
+  "replay": {
+    "candidate_sha256": "8d79f3ecd8361a591e8e85833ca56565fdd8631a3620f15691219923a2d25a17",
+    "exit_code": 0,
+    "lane": "unit",
+    "observation": "markdown-extension-preserved",
+    "profile_identity": "91c431f9589f51088617e714f870c139678cafa44b5aa8fb5fe9cd82147d6a23",
+    "recipe_id": "director-snapshot-canary",
+    "run_id": "WR-70826e6a-64d6-40b9-9aec-eac2e7e6888b",
+    "scenario_sha256": "d6577f6e63980585336a24fda825522462f7d48c157b2fd5a66535ada4be6d89",
+    "status": "verified-replay",
+    "wider_rollout": "separate-authority-required"
+  },
+  "schema": 1,
+  "scope": {
+    "authority_ref": "owner-selected-director-implementation",
+    "flavor": "director",
+    "preserve_paths": [
+      ".skill-tree/development-policies.json"
+    ],
+    "provider": "codex",
+    "queue_id": "Q-15b255aa-8e21-4a6e-87f2-e15758cdf26c",
+    "run_id": "WR-70826e6a-64d6-40b9-9aec-eac2e7e6888b",
+    "task_id": "T-d839c5e2-3e9e-4843-a7e1-15ed4d786432"
+  },
+  "source_task_id": "T-5797df6d-aacf-4211-bba3-deb88cab54d9",
+  "target_previous_profile_sha256": "46f96e56ddf4401679e67cc836a17901f64f383f18029b4e53fb87e0f7905dcb"
+}

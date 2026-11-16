@@ -1,0 +1,137 @@
+{
+  "example_scope": "synthetic proposal",
+  "identity": {
+    "identity_id": "character-ilya",
+    "source": {
+      "record_id": "character-ilya",
+      "revision": "ridge-fixture-identity"
+    },
+    "recognizable_traits": [
+      "Crew-first concern",
+      "Concrete equipment language"
+    ]
+  },
+  "states": [
+    {
+      "state_id": "state-ilya-ridge-opening",
+      "identity_id": "character-ilya",
+      "continuity_id": "continuity-ridge",
+      "period": {
+        "label": "Emergency shift",
+        "anchor_event_id": "event-trip",
+        "elapsed": "Same service window"
+      },
+      "requires_outcomes": [],
+      "event_refs": [
+        {
+          "record_id": "event-trip",
+          "revision": "ridge-fixture-relay-log"
+        }
+      ],
+      "retained_traits": [
+        "Crew-first concern"
+      ],
+      "goals": [
+        "Secure rescue"
+      ],
+      "obligations": [
+        "Record the allocation"
+      ],
+      "relationships": [
+        "Crew waiting for service"
+      ],
+      "knowledge": {
+        "belief": "Storm caused pack failure",
+        "limit": "Relay chronology unavailable before inspection"
+      },
+      "appearance_id": "appearance-ilya-shift"
+    },
+    {
+      "state_id": "state-ilya-ridge-after-lift",
+      "identity_id": "character-ilya",
+      "continuity_id": "continuity-ridge",
+      "period": {
+        "label": "Next service shift",
+        "anchor_event_id": "event-trip",
+        "elapsed": "One service shift later"
+      },
+      "requires_outcomes": [
+        "outcome-lift"
+      ],
+      "event_refs": [
+        {
+          "record_id": "quest-ridge",
+          "revision": "ridge-fixture-path-contract",
+          "outcome_id": "outcome-lift"
+        }
+      ],
+      "retained_traits": [
+        "Crew-first concern",
+        "Concrete equipment language"
+      ],
+      "goals": [
+        "Record safe arrival and warn about stock loss"
+      ],
+      "obligations": [
+        "Document chosen service and cost"
+      ],
+      "relationships": [
+        "Crew arrived",
+        "Clinic stock unavailable from the selected allocation"
+      ],
+      "knowledge": {
+        "supported": "Observed lift rescue and warmed stock",
+        "limit": "Relay ordering depends on earlier inspection"
+      },
+      "appearance_id": "appearance-ilya-after-lift"
+    }
+  ],
+  "roles": [
+    {
+      "role_id": "role-ilya-ridge-operator",
+      "work_id": "work-ridge",
+      "state_id": "state-ilya-ridge-opening",
+      "purpose": "Help frame the selector tradeoff."
+    },
+    {
+      "role_id": "role-ilya-ridge-after-witness",
+      "work_id": "work-ridge-after",
+      "state_id": "state-ilya-ridge-after-lift",
+      "purpose": "Describe witnessed rescue and the associated cost."
+    }
+  ],
+  "review_cases": [
+    {
+      "case_id": "select-lift-state",
+      "work_id": "work-ridge-after",
+      "continuity_id": "continuity-ridge",
+      "period_label": "Next service shift",
+      "outcome_ids": [
+        "outcome-lift"
+      ],
+      "expected_state_id": "state-ilya-ridge-after-lift"
+    },
+    {
+      "case_id": "reject-cooling-for-lift-state",
+      "work_id": "work-ridge-after",
+      "continuity_id": "continuity-ridge",
+      "period_label": "Next service shift",
+      "outcome_ids": [
+        "outcome-cooler"
+      ],
+      "candidate_state_id": "state-ilya-ridge-after-lift",
+      "expected_finding": "State requires lift outcome."
+    },
+    {
+      "case_id": "reject-wrong-continuity",
+      "work_id": "work-ridge-after",
+      "continuity_id": "continuity-alternate",
+      "period_label": "Next service shift",
+      "outcome_ids": [
+        "outcome-lift"
+      ],
+      "candidate_state_id": "state-ilya-ridge-after-lift",
+      "expected_finding": "State continuity differs from work continuity."
+    }
+  ]
+}

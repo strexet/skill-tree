@@ -9,7 +9,9 @@ node .skill-tree/bin/install.js --target <project-root> --only codex --flavor un
 node .skill-tree/bin/install.js --target <project-root> --only codex --verify
 ```
 
-Fresh noninteractive installation requires `--flavor general|web|unity`; interactive installation asks once. `--yes` never chooses a flavor. Repeat installation retains the receipt flavor; explicit switches regenerate all owned packages in the scope. `--skills` selects logical operations. `--all` selects non-soft provider-matrix entries; soft providers require explicit selection. Generic provider target denotes the covered root and explicit discovery destination. Global, symlink and uncomposed upstream specialization fail before writes.
+Fresh noninteractive installation requires `--flavor general|web|unity|director`; interactive installation asks once. `--yes` never chooses a flavor. Repeat installation retains the receipt flavor; explicit switches regenerate all owned packages in the scope. `--skills` selects logical operations. `--all` selects non-soft provider-matrix entries; soft providers require explicit selection. Generic provider target denotes the covered root and explicit discovery destination. Global, symlink and uncomposed upstream specialization fail before writes.
+
+Install the director flavor at the coordinating project root. Child projects retain the flavor appropriate for each registered area. The [Director workflow](director-workflow.md) describes scope registration and verification.
 
 Dry-run reports facts, gaps, exact changed destinations and ownership conflicts without writes. Matching installations are verified no-ops. `--force` cannot adopt unowned content or discard local modifications. A stopped cleanup/handoff checkpoint precedes replacement during a controller. Optional `--with-init` inserts a receipt-owned bridge while preserving surrounding instructions. Scoped `--uninstall` removes only matching owned packages; `--with-init` removes the bridge when no packages remain.
 
@@ -41,6 +43,12 @@ Non-JavaScript projects and unsupported executable configuration use `.skill-tre
 Resolved package capabilities use supported npm lockfile 2/3 or Unity package-lock evidence. Exact declarations remain declared facts rather than resolved versions. Unresolved optional Web specialization is reported as a capability gap and omitted from generated instructions; required UTF flags need a supported resolved version before composition. Other package-manager lockfiles remain fingerprinted static inputs and can use explicit owner-declared recipes without guessed version-specific APIs. Recipe lanes use the versioned capability registry; task parameters become concrete argument-vector values at check preparation.
 
 Provider references protect shared discovery destinations such as `.agents/skills`. Removing one provider retains a package or bridge still referenced by another provider. Verification includes deterministic recomposition from the owned bundle, resolved facts, package identities and complete inventories. Installer output reports profile/environment identities, input fingerprints, package identities/provider references and validation policy.
+
+## Built-in development policies
+
+Direct replacement keeps one active path by prompting implementation and review to trace entry points, migrate consumers and retire superseded behavior. The network polling policy helps choose lifecycle requests or suitable subscriptions and checks the lifecycle of justified recurring refreshes.
+
+Fresh installations and ordinary upgrades enable both policies for projects without explicit settings. Manage each switch independently through `skill-tree-plugins`. Explicit settings survive refresh, reinstall, upgrade and flavor changes. The owned installer projects current settings into implementation and review instructions and any installed instruction bridge.
 
 ## Installed plugin inventory
 

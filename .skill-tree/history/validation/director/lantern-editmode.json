@@ -1,0 +1,83 @@
+{
+  "artifact": {
+    "bytes": 25596,
+    "path": "DirectorLantern.fbx",
+    "sha256": "a29f05d0d78a9af6acf6b7121abd838a1b95ce1c9c178ddbc76886974d117307"
+  },
+  "asset_sources": {
+    "Resources/DirectorLantern.fbx": "a29f05d0d78a9af6acf6b7121abd838a1b95ce1c9c178ddbc76886974d117307",
+    "Resources/lantern-belt.json": "ea76afa7aa26db0e2a2c91439852ec8bfd8a798e200070fbdea15890a29e9b4a",
+    "Resources/lantern-hand.json": "cc2a88653d7563cc8ef6f452ee8997dbe55c0cff2fc3b593c245f7f6abcc9131",
+    "edit-mode/director-lantern-edit-tests.asmdef": "18743d8b785daf28812adfb5336b679c2149b93729e4a063cdf6a9d472a9eb5e",
+    "edit-mode/director-lantern-import.cs": "c7fac0b1868f8247bc4a704a3450e3ed60f5db00d175ad509d5575d06d86b1eb",
+    "play-mode/director-lantern-carry.cs": "668a365f5b91a8bfcbcb31d4d8aea68428a4a28e4242798d17dabff893caf335",
+    "play-mode/director-lantern-play-tests.asmdef": "675f25c85c25f38dbbc4e941344b493d88279c53da7a4a6f15bac8f4b463811e",
+    "runtime/DirectorLanternPickup.cs": "0e7edbed193b5ab618d6b2ee596cb3faf19456fb1e5a043690f14295a55a537e",
+    "runtime/director-lantern-fixture.asmdef": "75d610a180c3f75392d0deb1dfa7f32fc5e4f4f72cb1bcf6c63865b0c8bccdf1"
+  },
+  "baseline_sha256": "2f1f43ab7462442ab4cc8fd7add3ac5ce0fb72a0205a4987b1fb97f96363bb68",
+  "batch": {
+    "cases": [
+      "SkillTreeSandbox.Director.DirectorLanternImport.RepeatedImportPreservesGuidMeshAndMetricSockets",
+      "SkillTreeSandbox.Director.DirectorLanternImport.WrongTargetAndWallMountedControlRejectAttachment"
+    ],
+    "exit_code": 0,
+    "finished_at": "2026-11-15T02:14:00.631447+00:00",
+    "lane": "unity-editmode",
+    "log": {
+      "path": "editmode/editor.log",
+      "sha256": "c02de52a1773f7a663741949b4dbace1bf9f8cfb2671779b377a88b4e145fcfb"
+    },
+    "pid": 16163,
+    "recipe_id": "unity-editmode",
+    "report": {
+      "path": "editmode/report.xml",
+      "sha256": "c24b317af90bf6316ccabc9efe00f706b4d36af3a059f227dd38531fa407de6a"
+    },
+    "started_at": "2026-11-15T02:13:24.567145+00:00",
+    "test_filter": "SkillTreeSandbox.Director.DirectorLanternImport"
+  },
+  "evidence": {
+    "art": {
+      "path": "lantern-art-result.json",
+      "sha256": "dc639c7de62b3e42f3ba5429b46fd9100d735b0759a3d2e49743a17b295b28ed"
+    },
+    "observation": {
+      "path": "lantern-unity-observed.json",
+      "sha256": "6e0d5fda2404d4dbff28feba8fc60da91ac7fef5039419fdced1f8dd5638f58f"
+    },
+    "pipeline_status": {
+      "path": "pipeline-state.json",
+      "sha256": "e67a81b2a56236e3c95c5eef098bd98fffd46791bbcf8ffbf83eb7f19949ceb9"
+    },
+    "save_probe": {
+      "path": "persistent-path.json",
+      "sha256": "c299d2ebd455a6d6eec332680b28693a49a67445e8798167669cd764f4fbd1b1"
+    }
+  },
+  "fixture_id": "director-held-lantern",
+  "fixture_sha256": "75a61c410b39276274823483172d43895dc26624c68fc99aed2c9685f809ba3e",
+  "kind": "director-lantern-unity-receipt",
+  "launcher_sha256": "810a8548fb35c074ce212d5ae56e3cae17515f0e1db97dd4a06f2e7a8e98463b",
+  "mode": "EditMode",
+  "origin": "observed-unity-editor",
+  "profile": {
+    "identity": "ade2131145959d07d34df018d7d370a2dffdb8578e2e59b33121d908157234c2",
+    "queue_id": "Q-2fe6667a-de15-4e8c-8f1c-df52d2a506e0",
+    "sha256": "5572d1958868cc5a9ec3e11dea970f1c5e64c548aad075a1bb1312cfac5e8e8e"
+  },
+  "project_path_sha256": "45a7939d0d479028dce62817eda109d35f71c9f62713d73713da7f316023fcfd",
+  "schema": 1,
+  "source_run_id": "WR-acc2606d-9665-458b-81dc-d02e4a6b12db",
+  "task_id": "T-2d4cdd62-11bd-49b7-906f-343a0df202f3",
+  "wrappers": {
+    "belt": {
+      "path": "lantern-belt.json",
+      "sha256": "ea76afa7aa26db0e2a2c91439852ec8bfd8a798e200070fbdea15890a29e9b4a"
+    },
+    "hand": {
+      "path": "lantern-hand.json",
+      "sha256": "cc2a88653d7563cc8ef6f452ee8997dbe55c0cff2fc3b593c245f7f6abcc9131"
+    }
+  }
+}

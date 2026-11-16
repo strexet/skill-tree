@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "work_id": "work-ridge",
+  "quest_id": "quest-ridge",
+  "synthetic": true,
+  "query": {
+    "id": "query-rescue-state",
+    "owner": "unity",
+    "result": {
+      "crew_safe": "boolean"
+    }
+  },
+  "command": {
+    "choice_id": "power-lift",
+    "id": "complete-rescue",
+    "owner": "unity",
+    "parameters": {
+      "occurrence_id": "stable-id",
+      "campaign_id": "stable-id"
+    },
+    "transaction_key": [
+      "campaign_id",
+      "occurrence_id",
+      "complete-rescue"
+    ],
+    "acknowledgement": {
+      "status": [
+        "applied",
+        "replayed",
+        "unavailable"
+      ],
+      "crew_safe": "boolean-or-unknown"
+    },
+    "duplicate": "Return prior acknowledgement and preserve the previous write count.",
+    "unavailable": "Preserve unknown and present pending or alternate gameplay feedback."
+  },
+  "values": {
+    "knows_trip_cause": {
+      "owner": "ink",
+      "writer": "discover-log"
+    },
+    "crew_safe": {
+      "owner": "unity",
+      "writer": "complete-rescue"
+    }
+  },
+  "save": {
+    "story_version": "same-build",
+    "adapter_schema": 1,
+    "unknown_version": "require-compatible-host-or-explicit-restart",
+    "migration": "author-and-host-approval-required"
+  }
+}

@@ -11,4 +11,6 @@ The existing target repository requires an explicit owner-selected update after 
 
 Existing-target updates and provider installation require explicit owner scope. Static package installation does not authorize product execution.
 
+A queue that uses optional task grouping requires an owned generation with verified grouping support. The installation receipt binds the supported parser to exact bundled source and installed operation bytes. Verify the canonical checkout and participating worktrees before writing grouped headers. Activation and rollback use the actual canonical task headers to reject a generation that cannot read the queue. Package rollback preserves workflow progress. A linked worktree keeps the existing queue owner, operation inventory and exact runtime bindings during upgrade.
+
 A byte-matching relocated installation uses explicit `node .skill-tree/installation/manager.js --rebind`. The command verifies ownership, current inputs and deterministic composition before changing only the receipt root. Rebinding rejects edited packages, unknown maintenance files and pending transactions. Schema-3 locator recovery uses the exact queue ID and every unfinished worktree mapping; completed delivery mappings can be omitted. The bootstrap path preserves supported schemas and terminal history and performs no automatic conversion or continuation.

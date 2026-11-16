@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "work_id": "work-ridge",
+  "ip_id": "ip-ridge",
+  "continuity_id": "continuity-ridge",
+  "period": {
+    "label": "Emergency shift after the lift-house short",
+    "anchor_event_id": "event-trip",
+    "elapsed": "Within the same service window"
+  },
+  "purpose": "Test a bounded reserve allocation choice and optional fault investigation.",
+  "canon_pin": {
+    "state": "empty",
+    "digest": null
+  }
+}

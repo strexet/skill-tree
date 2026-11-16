@@ -5,7 +5,7 @@ const os = require('node:os');
 const path = require('node:path');
 const source = path.resolve(__dirname, '..');
 const c = require('../lib/composer.js');
-const expectedOperations = ['skill-tree-add-pending-task','skill-tree-clarify-tasks','skill-tree-create-documents-snapshot','skill-tree-implement-all','skill-tree-implement-next-future-task','skill-tree-plugins','skill-tree-pr-review-cycle','skill-tree-process-future-pending','skill-tree-repo-documentation','skill-tree-repo-documentation-audit','skill-tree-work-through-next'];
+const expectedOperations = ['skill-tree-add-pending-task','skill-tree-clarify-tasks','skill-tree-create-documents-snapshot','skill-tree-implement-all','skill-tree-implement-next-future-task','skill-tree-narative','skill-tree-plugins','skill-tree-pr-review-cycle','skill-tree-process-future-pending','skill-tree-repo-documentation','skill-tree-repo-documentation-audit','skill-tree-work-through-next'];
 function fixture(t) { const root=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-compose-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));return root; }
 function write(root,rel,data) { const p=path.join(root,rel);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,typeof data==='string'?data:JSON.stringify(data)); }
 test('source recipe identities survive composition and retain freshness and collision checks',t=>{
@@ -120,4 +120,77 @@ test('Unity BOM-prefixed JSON remains static input with unchanged raw-byte finge
  const rel='Assets/Tests/Fixture.asmdef';write(root,rel,'\uFEFF'+JSON.stringify({name:'Fixture',optionalUnityReferences:['TestAssemblies']}));const before=fs.readFileSync(path.join(root,rel));
  const p=c.resolveProfile(source,root,'unity');assert.ok(p.facts.test_assemblies.includes(rel));assert.equal(p.inputs[rel],c.hash(before));assert.deepEqual(fs.readFileSync(path.join(root,rel)),before);
  write(root,rel,'\uFEFF{broken');assert.throws(()=>c.resolveProfile(source,root,'unity'),SyntaxError);
+});
+
+test('narrative topic navigation and every craft card resolve in all profiles', t => {
+  for (const flavor of ['general', 'web', 'unity']) {
+    const root = fixture(t);
+    if (flavor === 'unity') {
+      write(root, 'ProjectSettings/ProjectVersion.txt', 'm_EditorVersion: 6000.0.83f1');
+      write(root, 'Packages/manifest.json', {dependencies: {}});
+    }
+    const profile = c.resolveProfile(source, root, flavor);
+    const skill = c.compose(source, profile, ['skill-tree-narative']).packages['skill-tree-narative'];
+    assert.match(skill['SKILL.md'], /references\/narrative-topic-routing\.md/);
+    assert.ok(skill['scripts/narrative-route-check.py']);
+    const catalog = skill['references/narrative-craft-catalog.md']
+      .split('## Coverage index')[1].split('## Example application')[0];
+    const links = [...catalog.matchAll(/\]\((narrative-craft-[a-z-]+\.md)#([a-z-]+)\)/g)];
+    assert.equal(links.length, 34);
+    assert.equal(new Set(links.map(match => match[0])).size, 34);
+    for (const [, file, anchor] of links) {
+      assert.ok(skill['references/' + file].includes('id="' + anchor + '"'), file + '#' + anchor);
+    }
+  }
+});
+
+test('narrative composition rejects a missing topic referenced by the router', t => {
+  const sourceCopy = fixture(t);
+  for (const dir of ['common', 'domains', 'templates', 'config', 'lib', 'src']) {
+    fs.cpSync(path.join(source, dir), path.join(sourceCopy, dir), {recursive: true});
+  }
+  const resourceMap = JSON.parse(fs.readFileSync(path.join(sourceCopy, 'config/resource-map.json'), 'utf8'));
+  delete resourceMap['skill-tree-narative'].references['narrative-claims.md'];
+  write(sourceCopy, 'config/resource-map.json', resourceMap);
+  const profile = c.resolveProfile(sourceCopy, fixture(t), 'general');
+  assert.throws(() => c.compose(sourceCopy, profile, ['skill-tree-narative']),
+    /Missing composed link: .*narrative-claims\.md/);
+});
+
+test('Director selects the scoped additional operations and packages the exact runtime for each', t => {
+  const root = fixture(t);
+  const names = ['setup', 'intake', 'plan', 'run', 'decide', 'status', 'review', 'audit', 'install']
+    .map(name => 'skill-tree-director-' + name).sort();
+  const profile = c.resolveProfile(source, root, 'director');
+  const built = c.compose(source, profile);
+  assert.deepEqual(c.compose(source, profile), built);
+  assert.deepEqual(Object.keys(built.packages).sort(), [...expectedOperations, ...names].sort());
+  for (const name of names) {
+    const files = built.packages[name];
+    const runtime = 'scripts/runtime/';
+    assert.ok(files['scripts/director-entry.py']);
+    assert.equal(files[runtime + 'common/scripts/director-state.py'], c.read(source, 'common/scripts/director-state.py'));
+    assert.ok(files[runtime + 'common/scripts/director-handoff.py']);
+    assert.ok(files[runtime + 'lib/installation.js']);
+    assert.ok(files[runtime + 'tests/fixtures/director/fixture-manifest.json']);
+  }
+  assert.equal(profile.facts.director.narrative.status, 'source-verified');
+  assert.equal(profile.facts.director.artworkshop.status, 'unsupported');
+  assert.equal(profile.facts.director.logs.status, 'unsupported');
+  assert.throws(() => c.compose(source, c.resolveProfile(source, root, 'general'), [names[0]]), /unavailable for flavor/);
+  assert.ok(built.packages['skill-tree-director-install']['scripts/runtime/lib/director-canary.js']);
+});
+
+test('Director profile discovers a shared Unity checkout without asserting runtime qualification', t => {
+  const root = fixture(t);
+  assert.equal(c.resolveProfile(source, root, 'director').facts.director.unity.status, 'unavailable');
+  write(root, 'ProjectSettings/ProjectVersion.txt', 'm_EditorVersion: 6000.3.27f2');
+  write(root, 'Packages/manifest.json', {dependencies: {'com.unity.test-framework': '1.6.0'}});
+  write(root, 'Packages/packages-lock.json', {dependencies: {'com.unity.test-framework': {version: '1.6.0'}}});
+  write(root, 'Assets/Tests/Fixture.asmdef', {name: 'Fixture', optionalUnityReferences: ['TestAssemblies']});
+  const profile = c.resolveProfile(source, root, 'director');
+  assert.equal(profile.facts.director.unity.status, 'recipe-discovered');
+  assert.equal(profile.recipes['unity-editmode'].utf_version, '1.6.0');
+  assert.match(profile.recipes['unity-playmode'].qualification, /isolated fixture required/);
+  assert.equal(c.resolveProfile(source, root, 'general').recipes['unity-editmode'], undefined);
 });

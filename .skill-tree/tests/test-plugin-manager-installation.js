@@ -44,7 +44,7 @@ function workspace(t, {flavor = 'general', provider = 'codex', withoutCatalog = 
     json(root, 'Packages/packages-lock.json', {dependencies: {'com.unity.test-framework': {version: '1.6.0'}}});
   }
   const directory = provider === 'claude-code' ? '.claude/skills' : '.agents/skills';
-  const names = Object.keys(require('../templates/operations.json')).sort();
+  const names = require('../config/flavors.json').core_operations.slice().sort();
   const selections = names.map(name => ({provider, name, rel: directory + '/' + name}));
   const manager = path.join(root, directory, operation, 'scripts/plugin-manager.js');
   return {tmp, root, recipe, cwd, manager, directory, names, selections};
@@ -84,10 +84,10 @@ function guard(f) {
 }
 
 for (const [flavor, provider] of [['general', 'codex'], ['web', 'codex'], ['unity', 'claude-code']]) {
-  test(flavor + ' installs eleven owned operations and runs offline management without the source checkout', t => {
+  test(flavor + ' installs twelve owned operations and runs offline management without the source checkout', t => {
     const f = workspace(t, {flavor, provider});
     const installed = core.install(f.root, f.recipe, flavor, f.selections);
-    assert.equal(f.names.length, 11);
+    assert.equal(f.names.length, 12);
     assert.ok(f.names.includes(operation));
     assert.deepEqual(fs.readdirSync(path.join(f.root, f.directory)).sort(), f.names);
     assert.equal(core.verify(f.root, f.recipe).identity, installed.profile.identity);

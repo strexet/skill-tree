@@ -134,6 +134,35 @@
           "instruction": "Use the [performance fixture](references/performance-testing.md) for admitted allocation/timing measurements."
         }
       ]
+    },
+    "director": {
+      "sections": "domains/director/sections.json",
+      "resources": {},
+      "operations": [
+        "skill-tree-director-audit",
+        "skill-tree-director-decide",
+        "skill-tree-director-install",
+        "skill-tree-director-intake",
+        "skill-tree-director-plan",
+        "skill-tree-director-review",
+        "skill-tree-director-run",
+        "skill-tree-director-setup",
+        "skill-tree-director-status"
+      ]
     }
-  }
+  },
+  "core_operations": [
+    "skill-tree-add-pending-task",
+    "skill-tree-clarify-tasks",
+    "skill-tree-create-documents-snapshot",
+    "skill-tree-implement-all",
+    "skill-tree-implement-next-future-task",
+    "skill-tree-narative",
+    "skill-tree-plugins",
+    "skill-tree-pr-review-cycle",
+    "skill-tree-process-future-pending",
+    "skill-tree-repo-documentation",
+    "skill-tree-repo-documentation-audit",
+    "skill-tree-work-through-next"
+  ]
 }

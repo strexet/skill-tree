@@ -1,0 +1,10 @@
+{
+  "id": "quest-ridge",
+  "kind": "quest",
+  "depends_on": [
+    "law-pack",
+    "character-ilya",
+    "scene-relay",
+    "scene-report"
+  ]
+}

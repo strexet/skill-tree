@@ -211,7 +211,10 @@ class TaskClarificationTests(unittest.TestCase):
         self.assertEqual(list((self.store.base / 'history/run-events').glob('**/*.json')), [])
 
     def test_revision_preserves_optional_headers_and_rejects_pending_attempt(self):
-        text = self.store.text().replace('id: ' + self.a + '\n', 'id: ' + self.a + '\nvalidation_group_id: ' + wf.identity('VG') + '\nboundary_validation: group-end\n', 1)
+        header = ('id: ' + self.a + '\nvalidation_group_id: ' + wf.identity('VG')
+                  + '\nboundary_validation: group-end\ntopic: \"director\"\nintake_batch_ids: '
+                  + json.dumps([wf.identity('IB')]) + '\n')
+        text = self.store.text().replace('id: ' + self.a + '\n', header, 1)
         self.store.future.write_text(text)
         before_task = wf.resolve(wf.parse(text), [self.a])[0]
         wf.begin_task(self.store, {'task_id': self.a})

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "work_id": "work-ridge-after",
+  "ip_id": "ip-ridge",
+  "continuity_id": "continuity-ridge",
+  "period": {
+    "label": "Next service shift",
+    "anchor_event_id": "event-trip",
+    "elapsed": "One service shift later"
+  },
+  "purpose": "Review a later incident-witness scene on a fixed lift predecessor.",
+  "canon_pin": {
+    "state": "unresolved",
+    "digest": null
+  },
+  "predecessor": {
+    "work_id": "work-ridge",
+    "snapshot_digest": null,
+    "mode": "fixed-outcome",
+    "outcome_ids": [
+      "outcome-lift"
+    ],
+    "fact_refs": [
+      {
+        "record_id": "quest-ridge",
+        "locator": "Ridge Pack path contract, lift result"
+      }
+    ]
+  }
+}

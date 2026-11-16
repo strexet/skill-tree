@@ -4,7 +4,7 @@
 
 The [approved workflow decisions](plugin-workflow-decisions.md), [management contract](plugin-management-contract.md) and [ordered-occurrence amendment](../history/research/plugin-sequence-task-amendment.json) define the installation policy. The contract owns selection, preview, consent and stage outcomes. The management contract owns source intake, binding semantics and removal actions; the external plugin contract owns resource closure and invocation.
 
-The installer selects a flavor and installs core operations through provider-specific transactions. A complete core installation includes eleven operations, including the standalone `skill-tree-plugins` manager. Optional setup and later management use the same typed requests and confirmed lifecycle. Offline `--list-plugins` reports installed, known and curated entries. Installation supplies no skill invocation, workflow continuation or publication authority.
+The installer selects a flavor and installs core operations through provider-specific transactions. A complete core installation includes the standalone `skill-tree-plugins` manager. Optional setup and later management use the same typed requests and confirmed lifecycle. Offline `--list-plugins` reports installed, known and curated entries. Installation supplies no skill invocation, workflow continuation or publication authority.
 
 ## Default installation and optional setup
 
