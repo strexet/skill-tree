@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "measurements": {
+    "path": "lengths.json",
+    "sha256": "04af49bf07aba424a147b00a037ceaed9630cdf4b5e3e32171fdba866948fedf"
+  },
+  "visual-manifest": {
+    "path": "visuals.json",
+    "sha256": "abbea1711e8c6d9161ee528049cf40fa04a9f667cd2146a02ce79c5a38c4318b"
+  },
+  "blend": {
+    "path": "stride.blend",
+    "sha256": "dd592d7d2d06a0281be9067f99abd41ea4e076892b639d7e2a00d7efabfbb93b"
+  },
+  "clip": {
+    "path": "stride.fbx",
+    "sha256": "f2fe35896d7174eef5f32d2cd457d1f0af8e36fcc2614d6f21e82c07889dff3e"
+  },
+  "segments": 4,
+  "quarter-frame-samples": 17,
+  "max-error-m": 4.470348557994441e-08,
+  "tolerance-m": 1e-06,
+  "native-measurements": "pass",
+  "one-millimetre-negative-control": "rejected",
+  "scope": "Measured evaluated Blender rig and native rendered whole frames. No full stage or Unity qualification.",
+  "rest-source": {
+    "path": "stride-rest.blend",
+    "sha256": "c64a3e5c08354429ca98cd6b8b31dbe9380114907766d5d1cfbe85560f29b6c1"
+  },
+  "rest-measurements": {
+    "path": "bind-lengths.json",
+    "sha256": "6a9b5ad2fd99b4874bb8ebd14c43334ba379ad3e2f2236a797a942910abcfb5f"
+  },
+  "exact-independent-visual-review": {
+    "path": "independent-visual-review.json",
+    "sha256": "9fb746079280960c8737d7f9a746275ecac710f82b59a9162a0fd409cdbc63bb"
+  }
+}
