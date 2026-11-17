@@ -152,6 +152,12 @@
     }
   },
   "core_operations": [
+    "skill-tree-3d",
+    "skill-tree-3d-blender",
+    "skill-tree-3d-motion",
+    "skill-tree-3d-references",
+    "skill-tree-3d-texture",
+    "skill-tree-3d-unity",
     "skill-tree-add-pending-task",
     "skill-tree-clarify-tasks",
     "skill-tree-create-documents-snapshot",

@@ -4,6 +4,186 @@
     "aliases": [
       {
         "anchor": "before",
+        "operation": "skill-tree-3d",
+        "phrase": "before skill-tree-3d"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d",
+        "phrase": "before skill tree 3d"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d",
+        "phrase": "during skill-tree-3d"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d",
+        "phrase": "during skill tree 3d"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d",
+        "phrase": "after skill-tree-3d"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d",
+        "phrase": "after skill tree 3d"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-blender",
+        "phrase": "before skill-tree-3d-blender"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-blender",
+        "phrase": "before skill tree 3d blender geometry"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-blender",
+        "phrase": "during skill-tree-3d-blender"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-blender",
+        "phrase": "during skill tree 3d blender geometry"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-blender",
+        "phrase": "after skill-tree-3d-blender"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-blender",
+        "phrase": "after skill tree 3d blender geometry"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-motion",
+        "phrase": "before skill-tree-3d-motion"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-motion",
+        "phrase": "before skill tree 3d motion"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-motion",
+        "phrase": "during skill-tree-3d-motion"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-motion",
+        "phrase": "during skill tree 3d motion"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-motion",
+        "phrase": "after skill-tree-3d-motion"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-motion",
+        "phrase": "after skill tree 3d motion"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-references",
+        "phrase": "before skill-tree-3d-references"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-references",
+        "phrase": "before skill tree 3d references"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-references",
+        "phrase": "during skill-tree-3d-references"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-references",
+        "phrase": "during skill tree 3d references"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-references",
+        "phrase": "after skill-tree-3d-references"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-references",
+        "phrase": "after skill tree 3d references"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-texture",
+        "phrase": "before skill-tree-3d-texture"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-texture",
+        "phrase": "before skill tree 3d textures"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-texture",
+        "phrase": "during skill-tree-3d-texture"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-texture",
+        "phrase": "during skill tree 3d textures"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-texture",
+        "phrase": "after skill-tree-3d-texture"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-texture",
+        "phrase": "after skill tree 3d textures"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-unity",
+        "phrase": "before skill-tree-3d-unity"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-unity",
+        "phrase": "before skill tree 3d unity integration"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-unity",
+        "phrase": "during skill-tree-3d-unity"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-unity",
+        "phrase": "during skill tree 3d unity integration"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-unity",
+        "phrase": "after skill-tree-3d-unity"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-unity",
+        "phrase": "after skill tree 3d unity integration"
+      },
+      {
+        "anchor": "before",
         "operation": "skill-tree-add-pending-task",
         "phrase": "before skill-tree-add-pending-task"
       },
@@ -708,8 +888,350 @@
         "phrase": "after-validation skill-tree-repo-documentation-audit"
       }
     ],
-    "digest": "3cbd9717322f1ab6343c5f32e173dc906b26a5c47fea570fe6877963c59d34c9",
+    "digest": "2bcf62216fb02632a30875536ea1cf4d06978a02ff8dec271bdc1eb425cde9e9",
     "entries": [
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-3d:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d",
+        "status": "resolved",
+        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-3d:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d",
+        "status": "resolved",
+        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-3d:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d",
+        "status": "resolved",
+        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-3d-blender:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-blender",
+        "status": "resolved",
+        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-3d-blender:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-blender",
+        "status": "resolved",
+        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-3d-blender:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-blender",
+        "status": "resolved",
+        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-3d-motion:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-motion",
+        "status": "resolved",
+        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-3d-motion:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-motion",
+        "status": "resolved",
+        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-3d-motion:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-motion",
+        "status": "resolved",
+        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-3d-references:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-references",
+        "status": "resolved",
+        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-3d-references:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-references",
+        "status": "resolved",
+        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-3d-references:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-references",
+        "status": "resolved",
+        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-3d-texture:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-texture",
+        "status": "resolved",
+        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-3d-texture:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-texture",
+        "status": "resolved",
+        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-3d-texture:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-texture",
+        "status": "resolved",
+        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-3d-unity:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-unity",
+        "status": "resolved",
+        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-3d-unity:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-unity",
+        "status": "resolved",
+        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-3d-unity:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-unity",
+        "status": "resolved",
+        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+      },
       {
         "anchor": "before",
         "boundary_id": "skill-tree-add-pending-task:before",
@@ -2194,6 +2716,12 @@
       }
     ],
     "operations": [
+      "skill-tree-3d",
+      "skill-tree-3d-blender",
+      "skill-tree-3d-motion",
+      "skill-tree-3d-references",
+      "skill-tree-3d-texture",
+      "skill-tree-3d-unity",
       "skill-tree-add-pending-task",
       "skill-tree-clarify-tasks",
       "skill-tree-create-documents-snapshot",
@@ -2217,12 +2745,30 @@
       "skill-tree-work-through-next"
     ]
   },
-  "configuration_digest": "6c9c54cbbfd279e05ade9bd3581b37c93b4c7ce9d7895d7895eb7fd94e4f96c1",
+  "configuration_digest": "3ac57655a04aeed71db4072569410c02b4b69395f0ea5bfaf3f482db6796297c",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "8c630d70497f3d1b41de9f44bcd07e0feefb0bb34c960ddcc50cd004c50b9153",
+  "identity": "1fd0d1a23ef85d0f4a31b9208ad21dba9bbc97ef4f57173f122dc0e120bd56d3",
   "operation": "skill-tree-add-pending-task",
   "operations": {
+    "skill-tree-3d": {
+      "title": "Skill Tree 3D"
+    },
+    "skill-tree-3d-blender": {
+      "title": "Skill Tree 3D Blender Geometry"
+    },
+    "skill-tree-3d-motion": {
+      "title": "Skill Tree 3D Motion"
+    },
+    "skill-tree-3d-references": {
+      "title": "Skill Tree 3D References"
+    },
+    "skill-tree-3d-texture": {
+      "title": "Skill Tree 3D Textures"
+    },
+    "skill-tree-3d-unity": {
+      "title": "Skill Tree 3D Unity Integration"
+    },
     "skill-tree-add-pending-task": {
       "title": "Skill-Tree: Add Pending Task"
     },
