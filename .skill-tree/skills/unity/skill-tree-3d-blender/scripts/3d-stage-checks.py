@@ -350,10 +350,18 @@ def unity_motion_scope(scope, clips, shots):
         if named_map(contact, {"max-slip-m", "max-penetration-m"}):
             if not all(number(limit) and limit >= 0 for limit in contact.values()):
                 return False
-        elif not (named_map(contact, {"no-plant-reason"}) and isinstance(contact["no-plant-reason"], str)
-                  and contact["no-plant-reason"].strip()):
+        elif not (isinstance(contact, dict) and set(contact) in
+                  ({"no-plant-reason"}, {"no-plant-reason", "max-penetration-m"})
+                  and isinstance(contact["no-plant-reason"], str) and contact["no-plant-reason"].strip()
+                  and number(contact.get("max-penetration-m", 0)) and contact.get("max-penetration-m", 0) >= 0):
             return False
     return bool(pure) and set(clips) <= pure and valid_blend_intervals(scope, pure)
+
+
+def blend_cycles(scope, interval):
+    looping_clips = {row["sequence"][0] for case, row in scope["cases"].items()
+                     if row["kind"] == "clip" and scope["ranges"][case]["loop"]}
+    return tuple(interval[end] in looping_clips for end in ("from", "to"))
 
 
 def valid_blend_intervals(scope, pure):
@@ -371,11 +379,13 @@ def valid_blend_intervals(scope, pure):
         points = interval["samples"]
         if not isinstance(points, dict) or "0.5" not in points or not set(points) <= BLEND_POINTS:
             return False
+        looping = any(blend_cycles(scope, interval))
         for case in points.values():
             if not isinstance(case, str) or case in covered:
                 return False
             definition = scope["cases"].get(case, {})
-            if definition.get("kind") != "hold" or definition.get("sequence") != [interval["from"], interval["to"]]:
+            if (definition.get("kind") != "hold" or definition.get("sequence") != [interval["from"], interval["to"]]
+                    or scope["ranges"][case]["loop"] is not looping):
                 return False
             covered.add(case)
     return covered == {case for case, row in scope["cases"].items() if row["kind"] == "hold"}
@@ -411,42 +421,59 @@ def unity_motion_checks(root, workshop, artifacts, observations, packet, *, veri
     result = {"unity-motion-capture": True}
     for case, stats in traces.items():
         contact = scope["cases"][case]["contact"]
-        if "max-slip-m" not in contact:
-            continue
-        result[f"unity-contact-{case}"] = (
-            stats["planted-pairs"] > 0 and stats["max-slip-m"] <= contact["max-slip-m"]
-            and stats["max-penetration-m"] <= contact["max-penetration-m"])
+        result[f"unity-contact-{case}"] = contact_passes(stats, contact)
     for interval in scope.get("blend-holds", {}).values():
         for value, case in interval["samples"].items():
-            result[f"unity-hold-{case}"] = settled_blend(
-                held[case], scope["ranges"][case], float(value), interval["basis"])
+            settled = settled_blend(held[case], scope["ranges"][case], float(value),
+                                    interval["basis"], blend_cycles(scope, interval))
+            if settled is None:
+                return {"unity-motion-capture": False}
+            result[f"unity-hold-{case}"] = settled
     return result
 
 
-def settled_blend(record, span, target, basis):
-    """Validate actual held values and shared cycle coverage on the frozen sample grid."""
+def settled_blend(record, span, target, basis, cyclic=None):
+    """Return None for incomplete evidence and a verdict for a complete hold trace."""
+    if cyclic is None:
+        cyclic = (span["loop"], span["loop"])
     if not named_map(record, {"basis", "samples"}) or record["basis"] != basis:
-        return False
+        return None
     start, end = 4 * span["start"], 4 * span["end"]
     samples = record["samples"]
     if not isinstance(samples, list) or len(samples) != end - start + 1:
-        return False
-    phases = []
+        return None
+    phases, values = [], []
     for tick, row in enumerate(samples, start):
         if (not named_map(row, {"tick", "value", "phases"}) or type(row["tick"]) is not int or row["tick"] != tick
-                or not number(row["value"]) or abs(row["value"] - target) > .01):
-            return False
+                or not number(row["value"])):
+            return None
+        values.append(row["value"])
         pair = row["phases"]
-        if span["loop"]:
-            if not isinstance(pair, list) or len(pair) != 2 or not all(map(number, pair)):
-                return False
+        if any(cyclic):
+            if (not isinstance(pair, list) or len(pair) != 2
+                    or any(not (number(phase) if loop else phase is None) for loop, phase in zip(cyclic, pair))):
+                return None
             phases.append(pair)
-    if not span["loop"]:
+        elif pair is not None:
+            return None
+    if any(abs(value - target) > .01 for value in values):
+        return False
+    if not any(cyclic):
         return True
-    first, last = phases[0], phases[-1]
-    return (all(end - start >= 2 - 1e-6 for start, end in zip(first, last))
-            and all(all(end >= start for start, end in zip(prev, cur)) for prev, cur in zip(phases, phases[1:]))
-            and all(abs((right - left) - (first[1] - first[0])) <= .02 for left, right in phases))
+    for loop, track in zip(cyclic, zip(*phases)):
+        if loop and (track[-1] - track[0] < 2 - 1e-6
+                     or any(not 0 <= cur - prev < 1 for prev, cur in zip(track, track[1:]))):
+            return False
+    return not all(cyclic) or all(abs((right - left) - (phases[0][1] - phases[0][0])) <= .02
+                                  for left, right in phases)
+
+
+def contact_passes(stats, contact):
+    if stats["max-penetration-m"] > contact.get("max-penetration-m", 0):
+        return False
+    if "no-plant-reason" in contact:
+        return stats["support-samples"] == 0
+    return stats["planted-pairs"] > 0 and stats["max-slip-m"] <= contact["max-slip-m"]
 
 
 def unity_contact_metrics(frames, span):
@@ -455,13 +482,14 @@ def unity_contact_metrics(frames, span):
     if not isinstance(frames, list) or len(frames) != end - start + 1:
         return None
     anchors, previous = {}, {}
-    slip, penetration, pairs = 0.0, 0.0, 0
+    slip, penetration, pairs, supported = 0.0, 0.0, 0, 0
     for tick, frame in enumerate(frames, start):
         if (not named_map(frame, {"tick", "support", "floor-clearance-m"})
                 or type(frame["tick"]) is not int or frame["tick"] != tick
                 or not number(frame["floor-clearance-m"]) or not isinstance(frame["support"], dict)):
             return None
         current = frame["support"]
+        supported += bool(current)
         for foot, uv in current.items():
             if not isinstance(foot, str) or not foot or not isinstance(uv, list) or len(uv) != 2 or not all(map(number, uv)):
                 return None
@@ -472,7 +500,14 @@ def unity_contact_metrics(frames, span):
         anchors = {foot: anchors.get(foot, uv) for foot, uv in current.items()}
         previous = current
         penetration = max(penetration, -frame["floor-clearance-m"])
-    return {"planted-pairs": pairs, "max-slip-m": slip, "max-penetration-m": penetration}
+    return {"planted-pairs": pairs, "support-samples": supported,
+            "max-slip-m": slip, "max-penetration-m": penetration}
+
+
+def matching_blend_scope(receipt, scope):
+    expected = {name: {key: interval[key] for key in ("from", "to", "basis")}
+                for name, interval in scope.get("blend-holds", {}).items()}
+    return receipt.get("continuous-blends") == expected
 
 
 def verified_scene(root, workshop, artifacts, observations, packet):
@@ -541,8 +576,7 @@ def evaluate(root, stage, packet, candidate, report, workshop, *, verify_media=T
             result.update(unity_motion_checks(root, workshop, artifacts, observations, packet, verify_media=verify_media))
             if verify_media:
                 receipt = load_observation(root, workshop, observations.get("scene-receipt"))
-                result["unity-blend-scope"] = (receipt.get("continuous-blends") is
-                                              bool(packet["requirements"]["unity-motion-review"].get("blend-holds")))
+                result["unity-blend-scope"] = matching_blend_scope(receipt, packet["requirements"]["unity-motion-review"])
         elif verify_media:
             receipt = load_observation(root, workshop, observations.get("scene-receipt"))
             result["unity-animation-scope"] = receipt.get("animated") is False

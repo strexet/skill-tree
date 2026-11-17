@@ -169,18 +169,25 @@ test('the read-only scope guard retries one process timeout with a fresh source 
  const state=workflow(f),{files}=build(f),packageRoot=mount(f,files),before=metadataBytes(f.root);
  const input={project_root:f.root,event:event(processing,'before'),context:{kind:'pending',id:'actual-pending-scope',pending_ids:[state.pending_id]},capabilities:[]};
  const run=spawnSync(process.execPath,['-e',String.raw`
-const assert=require('node:assert/strict'),child=require('node:child_process'),fs=require('node:fs');
+const assert=require('node:assert/strict'),child=require('node:child_process'),fs=require('node:fs'),path=require('node:path');
 const spawn=child.spawnSync,prefixes=[];
+const root=process.argv[2],input=JSON.parse(process.argv[3]);
+const manifest=fs.realpathSync(path.join(root,'references/plugin-bindings.json'));
+const read=fs.readFileSync,originalManifest=read(manifest);
 let mode='recover',attempts=0;
+let manifestReads=0;
+fs.readFileSync=(file,...options)=>{
+ if(mode==='changed-manifest'&&file===manifest&&++manifestReads===2)fs.appendFileSync(manifest,'\n');
+ return read(file,...options);
+};
 child.spawnSync=(file,args,options)=>{
  if(file!=='python3'||!args[3]?.includes('owned_plugin_workflow'))return spawn(file,args,options);
  attempts++;prefixes.push(args[5]);
  if(mode==='changed-resource')fs.appendFileSync(args[4],'\n# Changed while the guard was waiting.\n');
- if(mode==='always-timeout'||mode==='changed-resource'||(mode==='recover'&&attempts===1))return {error:{code:'ETIMEDOUT',message:'spawnSync python3 ETIMEDOUT'},status:null};
+ if(mode==='always-timeout'||mode==='changed-resource'||(attempts===1&&['recover','changed-manifest'].includes(mode)))return {error:{code:'ETIMEDOUT',message:'spawnSync python3 ETIMEDOUT'},status:null};
  return spawn(file,args,options);
 };
 const {prepareBoundary}=require(process.argv[1]);
-const root=process.argv[2],input=JSON.parse(process.argv[3]);
 const result=prepareBoundary(root,input);
 assert.equal(result.guard.kind,'actual-owned-scope');
 assert.equal(result.invocation,'not-executed');
@@ -193,6 +200,10 @@ mode='invalid-scope';attempts=0;
 const invalid={...input,context:{...input.context,pending_ids:['P-11111111-1111-4111-8111-111111111111']}};
 assert.throws(()=>prepareBoundary(root,invalid),/Pending|pending|context|selected/i);
 assert.equal(attempts,1);
+mode='changed-manifest';attempts=0;
+assert.throws(()=>prepareBoundary(root,input),/owned scope manifest changed/);
+assert.equal(attempts,1);
+fs.writeFileSync(manifest,originalManifest);
 mode='changed-resource';attempts=0;
 assert.throws(()=>prepareBoundary(root,input),/owned dispatcher resource changed/);
 assert.equal(attempts,1);

@@ -664,6 +664,9 @@ class ArtStages(unittest.TestCase):
         self.assertFalse(check(scope, {}, plan["shots"]))
         interval["samples"] = {"0.5": "half"}
         self.assertTrue(check(scope, {"trot"}, plan["shots"]))
+        ranges["half"] = {**ranges["walk"], "end": 1, "loop": False}
+        self.assertFalse(check(scope, {"trot"}, plan["shots"]))
+        ranges["half"] = ranges["walk"]
         interval["samples"]["0.75"] = "half"
         self.assertFalse(check(scope, {}, plan["shots"]))
 
@@ -677,9 +680,50 @@ class ArtStages(unittest.TestCase):
             [{**row, "value": row["tick"] / 8} for row in rows],
             [{**row, "phases": [p / 2 for p in row["phases"]]} for row in rows],
             rows[:-1] + [{**rows[-1], "phases": [2.01, 2.25]}],
+            [{**row, "phases": [0, .2]} for row in rows[:-1]] + rows[-1:],
             rows[1:],
         ):
             self.assertFalse(check({"basis": "weight", "samples": modified}, span, .5, "weight"))
+
+    def test_held_blend_requires_contact_free_and_finite_evidence_to_match(self):
+        checks = stages.stage_checks
+        span = {"start": 0, "end": 2, "fps": 30, "loop": True}
+        frames = [{"tick": tick, "floor-clearance-m": 0, "support": {}} for tick in range(9)]
+        contact = {"no-plant-reason": "Airborne movement"}
+        self.assertTrue(checks.contact_passes(checks.unity_contact_metrics(frames, span), contact))
+        frames[4]["support"] = {"left": [0, 0]}
+        self.assertFalse(checks.contact_passes(checks.unity_contact_metrics(frames, span), contact))
+        frames[4].update({"support": {}, "floor-clearance-m": -.001})
+        stats = checks.unity_contact_metrics(frames, span)
+        self.assertFalse(checks.contact_passes(stats, contact))
+        self.assertTrue(checks.contact_passes(stats, {**contact, "max-penetration-m": .001}))
+
+        rows = [{"tick": i, "value": .5, "phases": [i / 4, None]} for i in range(9)]
+        record = {"basis": "weight", "samples": rows}
+        self.assertTrue(checks.settled_blend(record, span, .5, "weight", (True, False)))
+        self.assertIsNone(checks.settled_blend(record, span, .5, "weight"))
+        finite = {**span, "loop": False}
+        self.assertIsNone(checks.settled_blend(record, finite, .5, "weight"))
+        record["samples"] = [{**row, "phases": None} for row in rows]
+        self.assertTrue(checks.settled_blend(record, finite, .5, "weight"))
+        self.assertIsNone(checks.settled_blend(None, span, .5, "weight"))
+
+    def test_scene_blend_inventory_must_match_all_planned_intervals(self):
+        check = stages.stage_checks.matching_blend_scope
+        walk_trot = {"basis": "weight", "from": "walk", "to": "trot"}
+        trot_run = {"basis": "control", "from": "trot", "to": "run"}
+        scope = {"blend-holds": {"walk-trot": {**walk_trot, "samples": {"0.5": "half"}}}}
+        receipt = {"continuous-blends": {"walk-trot": walk_trot}}
+        self.assertTrue(check(receipt, scope))
+        self.assertTrue(check({"continuous-blends": {}}, {}))
+        self.assertFalse(check({}, {}))
+        self.assertFalse(check({"continuous-blends": True}, scope))
+        receipt["continuous-blends"]["trot-run"] = trot_run
+        self.assertFalse(check(receipt, scope))
+        scope["blend-holds"]["trot-run"] = {**trot_run, "samples": {"0.5": "run-half"}}
+        self.assertTrue(check(receipt, scope))
+        receipt["continuous-blends"]["trot-run"] = {**trot_run, "basis": "weight"}
+        self.assertFalse(check(receipt, scope))
 
     def test_reconcile_interrupted_producer_requires_matching_pin(self):
         self.init("references")
