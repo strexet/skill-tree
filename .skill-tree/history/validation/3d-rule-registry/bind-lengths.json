@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "kind": "biological-bind-lengths",
+  "source": {
+    "path": "stride-rest.blend",
+    "sha256": "c64a3e5c08354429ca98cd6b8b31dbe9380114907766d5d1cfbe85560f29b6c1"
+  },
+  "rest-lengths-m": {
+    "left-upper": 0.5,
+    "left-lower": 0.5,
+    "right-upper": 0.5,
+    "right-lower": 0.5
+  }
+}

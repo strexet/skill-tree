@@ -6,6 +6,7 @@ from pathlib import Path
 from shutil import which
 import subprocess
 from tempfile import TemporaryDirectory
+from unittest.mock import patch
 import unittest
 
 
@@ -33,7 +34,7 @@ class ArtStages(unittest.TestCase):
         return stages.execute(self.root, "test-workflow", action, values)
 
     def init(self, goal="export", motion=False, fixture=True, diagnostic=False, mirrored=False, temporal=False,
-             unity_motion=False):
+             unity_motion=False, bones=None, exceptions=(), **extra):
         selected = list(stages.DEPENDENCIES)
         if goal != "motion" and not motion:
             selected.remove("motion")
@@ -71,9 +72,188 @@ class ArtStages(unittest.TestCase):
                           "underside": "grazing-underbody", "oblique": "reverse-axilla"},
                 "ranges": {"walk": {"start": 1, "end": 5, "fps": 30, "loop": True}},
             }
+        if bones:
+            self.plan["motion"]["requirements"]["bone-segments"] = bones
+        if exceptions:
+            self.plan["motion"]["requirements"]["bone-length-exceptions"] = list(exceptions)
         options = {"neutral-symmetry": self.mirrored_scope()} if mirrored else {}
         self.call("init", asset="asset.test", target="target.test", goal=goal, motion=motion,
-                  orthographic=True, fixture=fixture, stages=self.plan, **options)
+                  orthographic=True, fixture=fixture, stages=self.plan, **options, **extra)
+
+    def configure_rules(self, *rows):
+        (self.root / "validation-rules.json").write_text(json.dumps({"schema": 1, "overrides": rows}))
+
+    def rule(self, stage, name):
+        return self.call("rules", stage=stage)["rules"][stage]["rules"][name]
+
+    def test_effective_rules_show_order_and_advisory_outcome(self):
+        name = "consistent-views"
+        self.configure_rules(
+            {"scope": "asset", "selector": "asset.test", "rule": name, "severity": "advisory"},
+            {"scope": "project", "rule": name, "parameters": {"minimum-anchors": 3}},
+            {"scope": "asset-family", "selector": "humanoid", "rule": name, "enabled": True},
+            {"scope": "task-type", "selector": "revision", "rule": name, "severity": "required"},
+            {"scope": "stage", "selector": "references", "rule": name, "severity": "advisory"},
+            {"scope": "default", "rule": name, "enabled": False},
+        )
+        self.init(goal="references", **{"asset-family": "humanoid", "task-type": "revision"})
+        effective = self.rule("references", name)
+        self.assertEqual(effective["severity"], "advisory")
+        self.assertEqual(effective["origins"]["enabled"], "asset-family:humanoid")
+        self.assertEqual(effective["origins"]["severity"], "asset:asset.test")
+        self.assertEqual(effective["parameters"]["minimum-anchors"], 3)
+        attempt = self.submit(self.begin("references"), self.references())
+        self.assertEqual(attempt["status"], "review")
+        self.assertEqual(attempt["rule-results"][name]["result"], "fail")
+
+    def test_rule_disable_and_configuration_errors(self):
+        name = "consistent-views"
+        row = {"scope": "project", "rule": name, "enabled": False}
+        self.configure_rules(row)
+        self.init(goal="references")
+        attempt = self.submit(self.begin("references"), {})
+        self.assertEqual(attempt["status"], "review")
+        self.assertEqual(attempt["rule-results"][name]["result"], "disabled")
+        for bad in ({"scope": "stage", "selector": "unknown", "rule": name, "enabled": True},
+                    {"scope": "project", "rule": "unknown", "enabled": True},
+                    {"scope": "project", "rule": name, "parameters": {"unknown": 1}}):
+            with self.subTest(bad=bad):
+                self.configure_rules(bad)
+                with self.assertRaises(ValueError):
+                    self.call("rules")
+        self.configure_rules(row, row)
+        with self.assertRaisesRegex(ValueError, "Duplicate"):
+            self.call("rules")
+
+    def test_rule_retirement_archives_receipt_and_invalidates_current_attempt(self):
+        name = "consistent-views"
+        self.init(goal="references")
+        attempt = self.submit(self.begin("references"), self.references())
+        self.review(attempt)
+        self.approve(attempt)
+        with patch.dict(stages.validation_rules.CATALOG[name], {"lifecycle": "retired"}):
+            self.assertEqual(self.call("inspect")["stages"]["references"], "stale")
+            decision = self.artifact({"observation": "Prior attempt has no running side effect."})
+            self.call("reconcile", stage="references", attempt=attempt["id"], actor="author",
+                      resolution={"method": "rule-retired", "reason": "Archive prior rule check.", "evidence": decision})
+            archived = self.call("inspect")["state"]["stages"]["references"]["history"][0]
+            self.assertEqual(archived["rule-results"][name]["result"], "pass")
+            self.assertEqual(self.rule("references", name)["origins"]["enabled"], "retirement")
+            self.configure_rules({"scope": "project", "rule": name, "enabled": True})
+            with self.assertRaisesRegex(ValueError, "retired"):
+                self.call("rules")
+
+    def test_static_prop_geometry_rejects_infeasible_required_baseline(self):
+        with self.assertRaisesRegex(ValueError, "blockout.*requires at least 1"):
+            self.init(goal="detail", **{"asset-family": "static-prop"})
+        self.assertFalse((self.root / "workshop-local/stages/test-workflow.json").exists())
+        self.configure_rules({"scope": "project", "rule": "protected-form", "severity": "advisory"})
+        self.init(goal="detail", **{"asset-family": "static-prop"})
+        self.assertEqual(self.rule("blockout", "protected-form")["severity"], "advisory")
+
+    def test_changed_geometry_rule_rejects_infeasible_baseline_before_dispatch(self):
+        self.init(goal="blockout")
+        r = self.submit(self.begin("references"), self.references())
+        self.review(r)
+        self.approve(r)
+        clay = self.begin("clay")
+        r = self.submit(clay, self.clay(clay))
+        self.review(r)
+        self.approve(r)
+        self.configure_rules({"scope": "stage", "selector": "blockout",
+                              "rule": "protected-form", "parameters": {"minimum-features": 1}})
+        with self.assertRaisesRegex(ValueError, "blockout.*requires at least 1"):
+            self.begin("blockout")
+        self.assertNotIn("blockout", self.call("inspect")["state"]["stages"])
+
+    def test_biological_length_protection_cannot_be_disabled(self):
+        self.configure_rules({"scope": "asset-family", "selector": "quadruped",
+                              "rule": "biological-segment-lengths", "enabled": False})
+        with self.assertRaisesRegex(ValueError, "protected"):
+            self.init(goal="motion", motion=True, **{"asset-family": "quadruped"})
+
+    @staticmethod
+    def bones():
+        return {"left-upper": {"bone": "left_upper", "head": "left_root", "tail": "left_joint",
+                               "bind-length-m": 0.5},
+                "right-upper": {"bone": "right_upper", "head": "right_root", "tail": "right_joint",
+                                "bind-length-m": 0.5}}
+
+    def test_biological_length_scope_and_evaluated_samples(self):
+        exception = {"kind": "bone-length-exception", "origin": "owner", "asset": "asset.test",
+                     "segments": ["left-upper"], "clips": ["walk"],
+                     "instruction": "Allow left upper segment stretch in Walk.",
+                     "reference": "Isolated fixture instruction"}
+        with self.assertRaisesRegex(ValueError, "observed owner scope"):
+            self.init("motion", motion=True, diagnostic=True, temporal=True, bones=self.bones(),
+                      exceptions=[self.artifact({**exception, "origin": "agent"})],
+                      **{"asset-family": "quadruped"})
+        self.init("motion", motion=True, diagnostic=True, temporal=True, bones=self.bones(),
+                  exceptions=[self.artifact(exception)], **{"asset-family": "quadruped"})
+        self.assertEqual(self.call("rules", stage="motion")["rules"]["motion"]["motion-exceptions"],
+                         [["walk", "left-upper"]])
+        detail = self.through_detail()["candidate"]["artifacts"]["blend"]
+        bind_evidence = {"kind": "biological-bind-lengths", "source": detail,
+                         "rest-lengths-m": {"left_upper": 0.5, "right_upper": 0.5}}
+        artifacts = {name: self.artifact(name.encode()) for name in ("clip", *self.plan["motion"]["shots"])}
+        artifacts["blend"] = self.artifact(b"animated fixture", "blend")
+        views = {}
+        for (role, shot), forward in zip(self.plan["motion"]["requirements"]["temporal-review"]["views"].items(),
+                                         ([0, -1, 0], [0, 1, 0], [0, 0, 1], [0.6, 0.8, 0])):
+            views[role] = {"shot": shot, "camera": {"name": shot, "forward": forward}}
+            for speed, step in stages.stage_checks.MOTION_SAMPLE_STEP.items():
+                key = f"{role}-{speed}"
+                artifacts[key] = self.artifact(key.encode(), "mp4")
+                views[role][speed] = {"video": artifacts[key], "ticks": list(range(4, 21, step))}
+        capture = {"kind": "temporal-motion-capture", "scene": "Scene",
+                   "blend": artifacts["blend"], "clip": artifacts["clip"],
+                   "clips": {"walk": {"action": "Walk", "fps": 30, "views": views}}}
+        observation = {"clips": {"walk": {"sample_count": 17, "between_keys": True, "loop_ok": True,
+                                          "intersections": 0, "penetrations": 0, "max_slip_m": 0}},
+                       "temporal-motion-capture": self.artifact(capture),
+                       "bone-bind-lengths": self.artifact(bind_evidence)}
+        samples = [{"tick": tick, "lengths": {"left-upper": {"joint-m": 0.6, "bone-m": 0.6},
+                                             "right-upper": {"joint-m": 0.5, "bone-m": 0.5}}}
+                   for tick in range(4, 21)]
+        evidence = {"kind": "biological-segment-lengths", "scene": "Scene",
+                    "blend": artifacts["blend"], "clip": artifacts["clip"], "segments": self.bones(),
+                    "clips": {"walk": {"action": "Walk", "samples": samples}}}
+        name = "biological-segment-lengths"
+        missing = self.submit(self.begin("motion"), observation, artifacts=artifacts)
+        self.assertEqual(missing["failures"], ["technical-" + name])
+        self.repair(missing, "collect-length-measurement")
+        samples[3]["lengths"]["right-upper"]["bone-m"] = 0.51
+        pin = self.artifact(evidence)
+        bad = self.submit(self.begin("motion"), {**observation, "bone-lengths": pin}, "r2", artifacts)
+        self.assertEqual(bad["failures"], ["technical-" + name])
+        self.repair(bad, "repair-right-upper")
+        samples[3]["lengths"]["right-upper"]["bone-m"] = 0.5
+        pin = self.artifact(evidence)
+        for revision, bad_baseline, method in (
+            ("r3", {**bind_evidence, "source": artifacts["blend"]}, "measure-admitted-rest-rig"),
+            ("r4", {**bind_evidence, "rest-lengths-m": {"left_upper": 0.5, "right_upper": 0.53}},
+             "restore-original-bind-lengths"),
+            ("r5", {**bind_evidence, "rest-lengths-m": {**bind_evidence["rest-lengths-m"], "third_bone": 0.5}},
+             "include-complete-anatomical-inventory"),
+        ):
+            mismatched = self.submit(self.begin("motion"), {**observation, "bone-lengths": pin,
+                                     "bone-bind-lengths": self.artifact(bad_baseline)}, revision, artifacts)
+            self.assertEqual(mismatched["failures"], ["technical-" + name])
+            self.repair(mismatched, method, self.artifact({"observation": method}))
+        good = self.submit(self.begin("motion"), {**observation, "bone-lengths": pin}, "r6", artifacts)
+        self.assertEqual(good["status"], "review")
+        self.assertEqual(good["rule-results"][name]["evidence"]["bone-lengths"], pin)
+        (self.root / pin["path"]).write_bytes(b"changed")
+        self.assertEqual(self.call("inspect")["stages"]["motion"], "stale")
+
+    def test_config_drift_changes_only_affected_rule_revision(self):
+        self.init("blockout")
+        before = self.call("rules")["rules"]
+        self.configure_rules({"scope": "stage", "selector": "blockout",
+                              "rule": "protected-form", "parameters": {"minimum-features": 2}})
+        after = self.call("rules")["rules"]
+        self.assertEqual(before["references"]["revision"], after["references"]["revision"])
+        self.assertNotEqual(before["blockout"]["revision"], after["blockout"]["revision"])
 
     def mirrored_scope(self):
         return {"kind": "mirrored", "basis": self.artifact(b"Brief requires a mirror-symmetric animal."),
@@ -413,7 +593,7 @@ class ArtStages(unittest.TestCase):
         self.assertEqual(held["failures"], ["axilla-pinch"])
 
     def test_live_motion_requires_distinct_playback_views_and_full_ranges(self):
-        self.init("motion", motion=True, diagnostic=True, mirrored=True, temporal=True)
+        self.init("motion", motion=True, diagnostic=True, mirrored=True, temporal=True, bones=self.bones())
         request = {"asset": "asset.test", "target": {"id": "target.test", "revision": "r1", "checkout_id": "checkout.test"},
                    "goal": "motion", "stages": self.plan, "neutral-symmetry": self.mirrored_scope()}
         requirements = self.plan["motion"]["requirements"]
@@ -433,7 +613,28 @@ class ArtStages(unittest.TestCase):
                  "stages": {"motion": {"current": {"status": "accepted"}}}}
         with self.assertRaisesRegex(ValueError, "Requalify legacy live motion"):
             stages.patch(self.root, self.root / "state.json", state, "begin", {"stage": "export", "actor": "author"})
-        self.assertEqual(state["stages"]["motion"]["current"]["status"], "accepted")
+        legacy = state["stages"]["motion"]["current"]
+        legacy["observation_pins"] = {"temporal-motion-capture": self.artifact({"legacy": True})}
+        with self.assertRaisesRegex(ValueError, "Requalify legacy live motion"):
+            stages.patch(self.root, self.root / "state.json", state, "begin", {"stage": "export", "actor": "author"})
+        self.assertEqual(legacy["status"], "accepted")
+
+    def test_legacy_motion_next_reports_requalification_and_keeps_accepted_receipt(self):
+        self.init(goal="export", motion=True)
+        state = self.call("inspect")["state"]
+        state["fixture"] = False
+        state.pop("rule-context")
+        # Model previously accepted predecessors using matching stored seals.
+        for stage in ("references", "clay", "blockout", "detail", "texture", "motion"):
+            packet = {"inputs": {}, "predecessors": {}}
+            state["stages"][stage] = {"current": {"status": "accepted", "packet": packet}, "history": []}
+        state["stages"]["motion"]["current"]["observation_pins"] = {
+            "temporal-motion-capture": self.artifact({"scene": "Legacy accepted scene"})}
+        self.assertEqual(stages.stage_status(self.root, state, "motion"), "accepted")
+        step, = stages.frontier(self.root, state)
+        self.assertEqual(step["stage"], "export")
+        self.assertEqual(step["status"], "blocked")
+        self.assertIn("Requalify legacy live motion", step["reason"])
 
     @unittest.skipUnless(which("ffmpeg") and which("ffprobe"), "Local media tools are unavailable")
     def test_decoded_video_count_and_cadence_disagree_with_claimed_grid(self):

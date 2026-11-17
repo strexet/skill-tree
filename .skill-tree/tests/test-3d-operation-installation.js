@@ -75,7 +75,7 @@ test('the scoped 3D operation installs and verifies without its source in every 
       const command = path.join(skills, name, 'scripts', '3d-stages.py');
       const payload = {
         schema: 1, asset: 'fixture.asset', target: 'fixture.target', goal: 'references',
-        fixture: true, stages: {
+        fixture: true, 'asset-family': 'humanoid', stages: {
           references: {
             inputs: {}, allowed: ['silhouette'], protected: [], shots: ['side'],
             requirements: {'shot-states': {side: 'neutral'}},
@@ -89,6 +89,19 @@ test('the scoped 3D operation installs and verifies without its source in every 
       assert.ifError(invoke.error);
       assert.equal(invoke.status, 0, invoke.stderr);
       assert.deepEqual(JSON.parse(invoke.stdout).steps, [{stage: 'references', status: 'pending'}]);
+      fs.writeFileSync(path.join(target, 'validation-rules.json'), JSON.stringify({
+        schema: 1,
+        overrides: [{scope: 'asset-family', selector: 'humanoid', rule: 'consistent-views', enabled: false}],
+      }));
+      const preview = spawnSync('python3', [
+        '-B', command, '--root', target, '--run', name, 'rules',
+      ], {cwd: scratch, encoding: 'utf8', timeout: 10_000});
+      assert.ifError(preview.error);
+      assert.equal(preview.status, 0, preview.stderr);
+      const rules = JSON.parse(preview.stdout).rules.references;
+      assert.match(rules.revision, /^[a-f0-9]{64}$/);
+      assert.equal(rules.rules['consistent-views'].enabled, false);
+      assert.equal(rules.rules['consistent-views'].origins.enabled, 'asset-family:humanoid');
     }
     runNode(scratch, path.join(target, '.skill-tree/installation/manager.js'), ['--verify'],
       `Verify standalone ${flavor} installation`);

@@ -15,6 +15,52 @@ python3 scripts/3d-stages.py --root "$WORKSHOP" --run lantern-r1 next
 
 The plan has `schema: 1`, `asset`, `target`, `goal`, optional `motion` and `orthographic` booleans, and a `stages` object. Include exactly the predecessor closure of the goal. A live target contains the exact ID, revision and checkout ID. A fixture target uses a stable string ID. A plan for Unity delivery includes references, clay, blockout, detail, texture, export, Unity and delivery. A moving asset also supplies motion, which starts from detail and joins texture at export. A plan for a clay-only model can stop at blockout or detail. Each stage defines `inputs`, `allowed`, `protected` and `shots`. Inputs use a map of named `{path, sha256}` pins. The other fields are lists of scope descriptions, protected quantities or features, and stable shot IDs. Orthographic plans include front, left profile and top. The planned symmetry checks supply opposite views when applicable. Keep fixed shot roles tied to pose, framing and subject landmarks. Reference requirements freeze `shot-states` keyed by shot. Motion requirements freeze every clip in `clips`, with `minimum-samples` and `max-slip-m` per clip. Geometry requirements freeze protected baselines in `protected-values` with a value and, where applicable, tolerance and unit. Unity requirements name required `controls`, including controls for an animated review scene.
 
+### Configurable validation rules
+
+The workshop root accepts an optional `validation-rules.json` containing `schema: 1` and an `overrides` array. Each entry names a `scope`, a `rule` and at least one of `enabled`, `severity` or `parameters`. The `stage`, `task-type`, `asset-family` and `asset` scopes also name a `selector`. The `project` scope applies to the current workshop root. Precedence runs from catalog defaults through `default`, `stage`, `task-type`, `asset-family`, `project` and `asset`, with the last matching entry controlling each declared field. Entry order has no effect. Duplicate scope, selector and rule combinations, unknown selectors, unknown rules and invalid parameter values reject configuration.
+
+```json
+{
+  "schema": 1,
+  "overrides": [
+    {
+      "scope": "asset-family",
+      "selector": "static-prop",
+      "rule": "protected-form",
+      "parameters": {"minimum-features": 2}
+    },
+    {
+      "scope": "asset",
+      "selector": "lamp",
+      "rule": "consistent-views",
+      "severity": "advisory"
+    }
+  ]
+}
+```
+
+The plan selects `task-type: "creation"` or `"revision"` and a stable `asset` ID. The default task type is creation. The `asset-family` values are `quadruped`, `humanoid`, `other-biological`, `static-prop`, `mechanical` and `unclassified`. A resolved anatomical neutral pose supplies the corresponding family and rejects a conflicting explicit value. A new live motion plan identifies an applicable family from the actual brief and rig. A static prop uses a route without motion. A live motion attempt from a legacy plan requires a current plan before new production or acceptance. Stored accepted records remain readable. The `next` command reports a blocked step when a new downstream handoff requires current motion acceptance.
+
+| Rule ID | Applicability | Evidence and parameters |
+| --- | --- | --- |
+| `consistent-views` | References | The technical report supplies comparable poses, expressions and anchors. `minimum-anchors` is a positive integer. |
+| `protected-form` | Blockout and detail | The technical report supplies candidate measurements against frozen protected baselines. `minimum-features` is a nonnegative integer. Static props default to at least one feature. Planning and dispatch reject a required minimum above the number of frozen features. |
+| `biological-segment-lengths` | Motion for quadrupeds, humanoids and other biological subjects | The technical report pins measured Blender lengths. The required tolerance of one micrometre and required severity are protected. |
+
+Run `python3 scripts/3d-stages.py --root "$WORKSHOP" --run lamp-r1 rules` to preview the effective revision, settings, evidence and origin of each decision. The stage packet freezes the effective revision. The technical record references the unique attempt and exact artifact set. The independent review references the candidate digest, including the technical report pin. Required failures hold the stage. Advisory failures remain visible in the attempt for review. Configuration changes that alter a frozen effective revision make the current attempt stale. Reconcile the original attempt and any associated side effects before issuing a new packet. The controller retains the archived packet, measured results and review.
+
+The authored registry in `3d-validation-rules.py` owns stable IDs, applicability, parameter defaults, declared evidence, severity and definition revisions. Add a new stable ID with a matching evaluator and representative fixtures. Increase the definition revision when the contract changes. Retain a retired ID with lifecycle `retired` and keep the retired rule records. A retired definition appears disabled and rejects new enablement. Regenerate standalone copies from the authored source.
+
+#### Length evidence for biological motion
+
+Motion requirements include a `bone-segments` map keyed by the anatomical segments covered by the brief and evaluated rig. Each segment names the rig `bone`, the distinct anatomical `head` and `tail` markers and the positive `bind-length-m`. Cover both sides and all applicable clips. The frozen temporal review supplies the sampled action ranges. The producer measures evaluated joint marker distance and evaluated bone length in world metres at every quarter-frame from start through end, including both sides of each loop seam.
+
+The technical report pins `bone-bind-lengths` and `bone-lengths`. The schema-1 bind receipt has `kind: "biological-bind-lengths"`, the exact admitted detail Blend `source` pin and a `rest-lengths-m` map covering the complete anatomical bone inventory from the admitted source. Measure rest distances in world metres on the admitted geometry or rig. Every measured anatomical bone must match one planned segment and the corresponding frozen bind length.
+
+The schema-1 `bone-lengths` record has `kind: "biological-segment-lengths"`, the exact `scene`, candidate `blend` and `clip` pins, the frozen `segments` map, and `clips` indexed by the planned clip IDs. Each clip contains the exact Blender `action` and ordered `samples`. A sample includes an integer `tick` in quarter-frame units and `lengths` keyed by every segment ID. Each length record holds `joint-m` and `bone-m`. The motion capture pins the same Blender scene, candidate revisions and actions. The independent playback review covers reach and visible deformation alongside the measured evidence.
+
+A separately recorded owner instruction may permit a length change for specific clips and segments. Put the instruction pins under `bone-length-exceptions` in the motion requirements. Each schema-1 decision record supplies `kind: "bone-length-exception"`, `origin: "owner"`, the exact `asset`, nonempty `segments` and `clips` lists, the observed `instruction` and the source `reference`. Each listed segment and clip must exist in the frozen plan. Exceptions cover only the listed pairs and retain every sample and both measurements.
+
 ### Neutral symmetry contract
 
 For a new live plan, freeze a top-level `neutral-symmetry` object with a resolved `kind` and a `basis` pin. Use the [neutral modeling rule](3d-workflow.md#exact-symmetry-in-the-neutral-model) to interpret the brief. Ask for clarification when symmetric or intentionally asymmetric intent remains uncertain.

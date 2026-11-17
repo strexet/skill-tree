@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "blend": {
+    "path": "stride.blend",
+    "sha256": "dd592d7d2d06a0281be9067f99abd41ea4e076892b639d7e2a00d7efabfbb93b"
+  },
+  "clip": {
+    "path": "stride.fbx",
+    "sha256": "f2fe35896d7174eef5f32d2cd457d1f0af8e36fcc2614d6f21e82c07889dff3e"
+  },
+  "measurements": {
+    "path": "lengths.json",
+    "sha256": "04af49bf07aba424a147b00a037ceaed9630cdf4b5e3e32171fdba866948fedf"
+  },
+  "shots": {
+    "1": {
+      "path": "stride-frame-1.png",
+      "sha256": "77b14caec044102f8d418bca358817754152271588b1a3914f0c4d914c4a8d72"
+    },
+    "2": {
+      "path": "stride-frame-2.png",
+      "sha256": "2e6987fb781e13095d418666b5e92b6c8cbf0e58e85cdc59c0ae36d29d158ddf"
+    },
+    "3": {
+      "path": "stride-frame-3.png",
+      "sha256": "6b6435c5c4ce2cdc21e6b098c98062f79d0f751203292338f46535fe7300a583"
+    },
+    "4": {
+      "path": "stride-frame-4.png",
+      "sha256": "6afd12b753a77d779ddd92fefe8877170f1dfef3197e8afce9274e0ed763ff42"
+    },
+    "5": {
+      "path": "stride-frame-5.png",
+      "sha256": "b5c82a4680bd0115473bff42da69ca9d87ed58c2afe6e3ba5be63ef416788923"
+    }
+  }
+}

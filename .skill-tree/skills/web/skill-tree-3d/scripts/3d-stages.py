@@ -16,6 +16,10 @@ spec.loader.exec_module(workshop)
 checks_spec = importlib.util.spec_from_file_location("art_workshop_stage_checks", source.with_name("3d-stage-checks.py"))
 stage_checks = importlib.util.module_from_spec(checks_spec)
 checks_spec.loader.exec_module(stage_checks)
+rules_spec = importlib.util.spec_from_file_location("art_workshop_validation_rules",
+                                                   source.with_name("3d-validation-rules.py"))
+validation_rules = importlib.util.module_from_spec(rules_spec)
+rules_spec.loader.exec_module(validation_rules)
 require = workshop.require
 digest = workshop.digest
 def require_id(value):
@@ -46,7 +50,7 @@ VIEW_NAMES = ("front", "side", "top")
 SYMMETRY_STAGES = {"references", "clay", "blockout", "detail"}
 NEUTRAL_POSES = {"humanoid-t", "humanoid-arms-down", "quadruped-square", "species-neutral", "object-neutral"}
 COMMANDS = ("init", "inspect", "next", "begin", "submit", "review", "approve",
-            "repair", "reconcile", "revise")
+            "repair", "reconcile", "revise", "rules")
 
 
 def dependencies(plan, stage):
@@ -142,7 +146,7 @@ def plan_for(root, request, *, new_run=True):
                 f"Visual stage requires distinct named shots: {stage}")
         requirements = row.get("requirements", {})
         require(isinstance(requirements, dict), "Stage requirements must be an object")
-        permitted = {"references": {"shot-states"}, "motion": {"clips", "temporal-review"},
+        permitted = {"references": {"shot-states"}, "motion": {"clips", "temporal-review", "bone-segments", "bone-length-exceptions"},
                      "unity": {"controls", "unity-motion-review"},
                      "blockout": {"protected-values"}, "detail": {"protected-values"}}.get(stage, set())
         if stage in SURFACE_REVIEW:
@@ -202,12 +206,35 @@ def plan_for(root, request, *, new_run=True):
     return {stage: plan[stage] for stage in DEPENDENCIES if stage in selected}
 
 
+def stage_rules(root, state, stage, overrides=None):
+    context = state.get("rule-context")
+    if context is None:
+        return None
+    if overrides is None:
+        overrides = validation_rules.read_configuration(root, workshop, DEPENDENCIES)
+    snapshot = validation_rules.effective(stage, context, overrides, workshop)
+    requirements = state["plan"][stage].get("requirements", {})
+    if validation_rules.LENGTH_RULE in snapshot["rules"]:
+        require("temporal-review" in requirements, "Protected motion requires exact clip sample ranges")
+        pairs = validation_rules.motion_exceptions(root, requirements, state["asset"], workshop, load_pins)
+        snapshot.pop("revision")
+        snapshot["motion-exceptions"] = [list(pair) for pair in pairs]
+        snapshot["motion-requirements"] = digest(requirements)
+        snapshot["revision"] = digest(snapshot)
+    else:
+        require(not {"bone-segments", "bone-length-exceptions"}.intersection(requirements),
+                "Bone measurements and exceptions require an applicable biological motion rule")
+    return snapshot
+
+
 def stage_status(root, state, stage):
     slot = state["stages"].get(stage, {})
     current = slot.get("current")
     if current is None:
         return "pending"
     try:
+        if current["packet"].get("validation-rules") != stage_rules(root, state, stage):
+            return "stale"
         sealed_inputs = current["packet"]["inputs"]
         if sealed_inputs:
             load_pins(root, sealed_inputs)
@@ -232,6 +259,43 @@ def stage_status(root, state, stage):
     return current["status"]
 
 
+def geometry_plan_hold(stage, scope, policy):
+    rule = policy["rules"].get("protected-form") if policy else None
+    if rule and rule["enabled"] and rule["severity"] == "required":
+        minimum = rule["parameters"]["minimum-features"]
+        if len(scope["protected"]) < minimum:
+            return f"{stage} requires at least {minimum} planned protected geometry features"
+    return None
+
+
+def motion_handoff_hold(state, stage):
+    if state["fixture"]:
+        return None
+    plan = state["plan"]
+    if stage == "motion":
+        if "rule-context" not in state:
+            return "Replan unfinished live motion with an asset family and current protection rules"
+        if "temporal-review" not in plan[stage].get("requirements", {}):
+            return "Replan unfinished live motion with frozen temporal review coverage"
+    if stage not in {"export", "unity", "delivery"}:
+        return None
+    motion = state["stages"].get("motion", {}).get("current")
+    if motion is not None:
+        rule_context = state.get("rule-context")
+        pins = motion.get("observation_pins", {})
+        if not (rule_context and "validation-rules" in motion.get("packet", {})
+                and "temporal-motion-capture" in pins):
+            return "Requalify legacy live motion with current rules and temporal playback before downstream execution"
+        if rule_context["asset-family"] in validation_rules.BIOLOGICAL:
+            result = motion.get("rule-results", {}).get(validation_rules.LENGTH_RULE, {})
+            if result.get("result") != "pass" or not {"bone-bind-lengths", "bone-lengths"} <= pins.keys():
+                return "Requalify biological motion with protected length evidence before downstream execution"
+    if stage in {"unity", "delivery"} and "motion" in plan:
+        if "unity-motion-review" not in plan.get("unity", {}).get("requirements", {}):
+            return "Replan unfinished animated Unity review with frozen motion scenarios"
+    return None
+
+
 def frontier(root, state):
     pending = []
     for stage in DEPENDENCIES:
@@ -241,7 +305,17 @@ def frontier(root, state):
         if status == "accepted":
             continue
         if all(stage_status(root, state, dep) == "accepted" for dep in dependencies(state["plan"], stage)):
-            pending.append({"stage": stage, "status": status})
+            step = {"stage": stage, "status": status}
+            if status in {"pending", "building", "review", "owner-review"}:
+                reason = motion_handoff_hold(state, stage)
+                if reason is None and status == "pending" and stage in {"blockout", "detail"}:
+                    try:
+                        reason = geometry_plan_hold(stage, state["plan"][stage], stage_rules(root, state, stage))
+                    except (OSError, ValueError) as error:
+                        reason = str(error)
+                if reason:
+                    step.update(status="blocked", reason=reason)
+            pending.append(step)
     return pending
 
 
@@ -323,8 +397,11 @@ def submit(root, state, stage, attempt, request):
     require(check.get("attempt") == attempt["id"] and check.get("stage") == stage
             and check.get("artifacts") == digest(artifacts), "Technical report refers to another candidate")
     results = check.get("checks", {})
-    require(isinstance(results, dict) and set(CHECKS[stage]) <= set(results)
+    policy = packet.get("validation-rules")
+    managed = policy["rules"] if policy else {}
+    require(isinstance(results, dict) and set(CHECKS[stage]) - managed.keys() <= results.keys()
             and all(type(value) is bool for value in results.values()), "The stage checks are incomplete")
+    results = {name: ok for name, ok in results.items() if name not in managed}
     analysis = review_checks(root, stage, attempt, candidate, check, verify_media=not state["fixture"])
     pin_keys = {"texture": ("baseline-lock", "candidate-lock"), "unity": ("scene-receipt",)}.get(stage, ())
     pin_keys += tuple(key for key in ("neutral-reference-symmetry", "neutral-geometry-symmetry",
@@ -334,7 +411,14 @@ def submit(root, state, stage, attempt, request):
     if all(analysis.values()) and observation_pins:
         load_pins(root, observation_pins)
         attempt["observation_pins"] = observation_pins
-    failed = sorted({name for outcome in (results, analysis) for name, ok in outcome.items() if not ok})
+    failed = {name for outcome in (results, analysis) for name, ok in outcome.items() if not ok}
+    if policy:
+        outcomes, pins = stage_checks.evaluate_managed(root, packet, candidate, check, workshop)
+        attempt["rule-results"] = outcomes
+        if pins:
+            attempt.setdefault("observation_pins", {}).update(pins)
+        failed.update(name for name, row in outcomes.items()
+                      if row["severity"] == "required" and row["result"] == "fail")
     attempt["candidate"] = candidate
     attempt["candidate_digest"] = digest(candidate)
     previous = [
@@ -404,15 +488,9 @@ def patch(root, path, state, action, request):
     require(stage in state["plan"], "Stage is outside the selected plan")
     temporal = state["plan"][stage].get("requirements", {}).get("temporal-review")
     unity_motion = state["plan"].get("unity", {}).get("requirements", {}).get("unity-motion-review")
-    if stage == "motion" and not state["fixture"] and action in {"begin", "submit", "review"}:
-        require(temporal is not None, "Replan unfinished live motion with frozen temporal review coverage")
-    if stage in {"export", "unity", "delivery"} and not state["fixture"] and action in {
-            "begin", "submit", "review", "approve"}:
-        motion = state["stages"].get("motion", {}).get("current")
-        require(motion is None or "temporal-motion-capture" in motion.get("observation_pins", {}),
-                "Requalify legacy live motion with temporal playback before downstream execution")
-        if stage in {"unity", "delivery"} and "motion" in state["plan"]:
-            require(unity_motion is not None, "Replan unfinished animated Unity review with frozen motion scenarios")
+    if action in {"begin", "submit", "review", "approve"}:
+        reason = motion_handoff_hold(state, stage)
+        require(reason is None, reason)
     slot = state["stages"].setdefault(stage, {"history": []})
     status = stage_status(root, state, stage)
     current = slot.get("current")
@@ -446,6 +524,11 @@ def patch(root, path, state, action, request):
         packet = {"asset": state["asset"], "target": state["target"], "stage": stage, "producer": actor,
                   **deepcopy(scope), "predecessors": {dep: item["seal"] for dep, item in preds.items()},
                   "supplied": supplied}
+        policy = stage_rules(root, state, stage)
+        reason = geometry_plan_hold(stage, scope, policy)
+        require(reason is None, reason)
+        if policy is not None:
+            packet["validation-rules"] = policy
         if slot["history"]:
             previous = slot["history"][-1]
             packet["repair"] = previous.get("resolution")
@@ -551,8 +634,15 @@ def patch(root, path, state, action, request):
 def execute(root, run, action, request):
     require(require_id(run), "Run requires an exact stable ID")
     path = workshop.rooted(root, f"{workshop.LOCAL}/stages/{run}.json")
-    if action in {"inspect", "next"}:
+    if action in {"inspect", "next", "rules"}:
         state = workshop.read_record(path, "stage workflow")
+        if action == "rules":
+            stage = request.get("stage")
+            require(set(request) <= {"stage"} and (stage is None or stage in state["plan"]),
+                    "Rule preview requires a stage in the selected plan")
+            overrides = validation_rules.read_configuration(root, workshop, DEPENDENCIES)
+            selected = (stage,) if stage is not None else state["plan"]
+            return {"rules": {name: stage_rules(root, state, name, overrides) for name in selected}}
         next_steps = frontier(root, state)
         if action == "next":
             status = "continue" if next_steps else "complete"
@@ -574,8 +664,16 @@ def execute(root, run, action, request):
             plan = plan_for(root, request, new_run=not path.exists())
             state = {"schema": 1, "run": run, "asset": request["asset"], "target": target,
                      "fixture": request.get("fixture", False), "plan": plan, "stages": {}}
-            if path.exists():
-                previous = workshop.read_record(path, "stage workflow")
+            previous = workshop.read_record(path, "stage workflow") if path.exists() else None
+            if previous is None or "rule-context" in previous:
+                context = validation_rules.context(request, "motion" in plan, workshop)
+                state["rule-context"] = context
+                overrides = validation_rules.read_configuration(root, workshop, DEPENDENCIES)
+                for stage in (stage for stage in plan if stage in {"blockout", "detail", "motion"}):
+                    policy = stage_rules(root, state, stage, overrides)
+                    reason = geometry_plan_hold(stage, plan[stage], policy)
+                    require(reason is None, reason)
+            if previous is not None:
                 require({**previous, "stages": {}} == state, "Run already belongs to another plan")
                 return {"status": "existing", "steps": frontier(root, previous)}
             path.parent.mkdir(exist_ok=True)

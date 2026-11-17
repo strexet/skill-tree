@@ -18,7 +18,10 @@ def named_map(value, names):
 
 
 def number(value):
-    return type(value) in {int, float} and isfinite(value)
+    try:
+        return type(value) in {int, float} and isfinite(value)
+    except OverflowError:
+        return False
 
 
 def verified_pin(root, workshop, pin):
@@ -28,7 +31,7 @@ def verified_pin(root, workshop, pin):
     return path.is_file() and workshop.file_hash(path) == pin["sha256"]
 
 
-def consistent_views(shots, expected, observations):
+def consistent_views(shots, expected, observations, minimum=1):
     rows = observations.get("views")
     if not named_map(rows, shots):
         return False
@@ -41,7 +44,7 @@ def consistent_views(shots, expected, observations):
         anchors = row.get("anchors")
         if state != expected[shot] or not isinstance(expression, str) or not expression:
             return False
-        if not isinstance(anchors, dict) or not anchors:
+        if not isinstance(anchors, dict) or len(anchors) < minimum:
             return False
         for feature in anchors.values():
             if not named_map(feature, {"side", "contact", "anchor"}) or feature["side"] not in {
@@ -69,9 +72,9 @@ def matches_clay(shots, observations, supplied):
     return {"matched-views": matched, "clay-only": volume}
 
 
-def protected_form(packet, observations):
+def protected_form(packet, observations, minimum=0):
     rows = observations.get("protected")
-    if not named_map(rows, packet["protected"]):
+    if not named_map(rows, packet["protected"]) or len(rows) < minimum:
         return False
     expected = packet.get("requirements", {}).get("protected-values", {})
     for name, row in rows.items():
@@ -550,13 +553,18 @@ def evaluate(root, stage, packet, candidate, report, workshop, *, verify_media=T
         elif stage in {"blockout", "detail"}:
             symmetry["neutral-geometry-symmetry"] = neutral_geometry_symmetry(root, workshop, observations, scope,
                                                                              artifacts["blend"])
+    managed = packet.get("validation-rules", {}).get("rules", {})
     if stage == "references":
-        return {"consistent-views": consistent_views(packet["shots"], packet["requirements"]["shot-states"], observations),
-                **symmetry}
+        if "consistent-views" not in managed:
+            symmetry["consistent-views"] = consistent_views(packet["shots"], packet["requirements"]["shot-states"],
+                                                            observations)
+        return symmetry
     if stage == "clay":
         return {**matches_clay(packet["shots"], observations, packet["supplied"]["references"]), **symmetry}
     if stage in {"blockout", "detail"}:
-        return {"protected-form": protected_form(packet, observations), **symmetry}
+        if "protected-form" not in managed:
+            symmetry["protected-form"] = protected_form(packet, observations)
+        return symmetry
     if stage == "texture":
         return {"surface-only": locked_texture(root, workshop, observations, packet, artifacts)}
     if stage == "motion":
@@ -584,3 +592,103 @@ def evaluate(root, stage, packet, candidate, report, workshop, *, verify_media=T
     if stage == "delivery":
         return {"preserved-overrides": preserved_delivery(observations)}
     raise ValueError(f"No observation policy for {stage}")
+
+
+def biological_bind_lengths(packet, record, tolerance):
+    """Compare planned anatomical coverage and lengths with the admitted detail source."""
+    source = packet["supplied"].get("detail", {}).get("blend")
+    segments = packet["requirements"]["bone-segments"]
+    lengths = record.get("rest-lengths-m")
+    if (source is None or record.get("kind") != "biological-bind-lengths" or record.get("source") != source
+            or not named_map(lengths, (spec["bone"] for spec in segments.values()))):
+        return False
+    for segment in segments.values():
+        actual = lengths[segment["bone"]]
+        if (not number(actual) or actual <= 0
+                or abs(actual - segment["bind-length-m"]) > tolerance):
+            return False
+    return True
+
+
+def biological_lengths(root, workshop, packet, artifacts, record, observations, tolerance):
+    """Check exact clip coverage and two evaluated length observations per segment."""
+    requirements = packet["requirements"]
+    segments = requirements["bone-segments"]
+    ranges = requirements["temporal-review"]["ranges"]
+    clips = record.get("clips")
+    if (record.get("kind") != "biological-segment-lengths"
+            or any(name not in artifacts or record.get(name) != artifacts[name] for name in ("blend", "clip"))
+            or record.get("segments") != segments or not named_map(clips, ranges)):
+        return False
+    capture = load_observation(root, workshop, observations.get("temporal-motion-capture"))
+    if (not named_map(capture.get("clips"), ranges) or not isinstance(capture.get("scene"), str)
+            or not capture["scene"].strip() or record.get("scene") != capture["scene"]):
+        return False
+    allowed = {tuple(pair) for pair in packet["validation-rules"]["motion-exceptions"]}
+    for clip, row in clips.items():
+        span = ranges[clip]
+        first, last = 4 * span["start"], 4 * span["end"]
+        recorded_clip = capture["clips"][clip]
+        if (not isinstance(recorded_clip, dict) or not named_map(row, ("action", "samples"))
+                or not isinstance(row["action"], str) or not row["action"].strip()
+                or row["action"] != recorded_clip.get("action")):
+            return False
+        samples = row["samples"]
+        if not isinstance(samples, list) or len(samples) != last - first + 1:
+            return False
+        for tick, sample in enumerate(samples, first):
+            if (not named_map(sample, ("tick", "lengths")) or type(sample["tick"]) is not int
+                    or sample["tick"] != tick or not named_map(sample["lengths"], segments)):
+                return False
+            for segment, values in sample["lengths"].items():
+                if not named_map(values, ("joint-m", "bone-m")) or any(
+                        not number(value) or value <= 0 for value in values.values()):
+                    return False
+                if (clip, segment) not in allowed:
+                    baseline = segments[segment]["bind-length-m"]
+                    if any(abs(value - baseline) > tolerance for value in values.values()):
+                        return False
+    return True
+
+
+def evaluate_managed(root, packet, candidate, report, workshop):
+    """Evaluate enabled definitions against candidate-bound evidence."""
+    observations = report.get("observations", {})
+    artifacts = candidate["artifacts"]
+    outcomes, pins = {}, {}
+    for name, row in packet["validation-rules"]["rules"].items():
+        outcome = {"severity": row["severity"], "definition-revision": row["definition-revision"],
+                   "result": "disabled"}
+        outcomes[name] = outcome
+        if not row["enabled"]:
+            continue
+        evidence = row["evidence"]
+        outcome["evidence"] = {"technical": candidate["technical"]}
+        records = {}
+        ready = all(key in artifacts for key in evidence.get("artifacts", ()))
+        ready &= all(key in observations for key in evidence.get("observations", ()))
+        for key in evidence.get("observation-pins", ()):
+            pin = observations.get(key)
+            try:
+                record = load_observation(root, workshop, pin)
+            except (OSError, ValueError):
+                record = {}
+            if record:
+                records[key] = record
+                outcome["evidence"][key] = pins[key] = pin
+            else:
+                ready = False
+        passed = False
+        parameters = row["parameters"]
+        if ready and name == "consistent-views":
+            passed = consistent_views(packet["shots"], packet["requirements"]["shot-states"], observations,
+                                      parameters["minimum-anchors"])
+        elif ready and name == "protected-form":
+            passed = protected_form(packet, observations, parameters["minimum-features"])
+        elif ready and name == "biological-segment-lengths":
+            tolerance = parameters["numerical-error-m"]
+            passed = (biological_bind_lengths(packet, records["bone-bind-lengths"], tolerance)
+                      and biological_lengths(root, workshop, packet, artifacts, records["bone-lengths"],
+                                             observations, tolerance))
+        outcome["result"] = "pass" if passed else "fail"
+    return outcomes, pins
