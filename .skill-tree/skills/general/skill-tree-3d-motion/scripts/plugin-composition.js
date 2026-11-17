@@ -188,12 +188,22 @@ function guardBoundary(packageRoot,request,operation,phase,processingReadiness=f
  if(!needsWorkflow)return {kind:'task-free',context_kind:context.kind};
  const helper=registry.safe(packageRoot,'scripts/workflow-state.py');
  if(!fs.existsSync(helper))fail('composition-context','The local owned workflow helper closure is missing');
- const cachePrefix=path.join(os.tmpdir(),'skill-tree-owned-source-'+crypto.randomUUID());
- if(fs.existsSync(cachePrefix))fail('composition-context','A fresh nonexistent bytecode lookup prefix is required');
+ const manifestDigest=hash(fs.readFileSync(registry.safe(packageRoot,MANIFEST)));
  const ownedRequest={...request,operation,phase,context,package_root:packageRoot,processing_readiness:processingReadiness};
- const run=spawnSync('python3',['-I','-B','-c',guardProgram,helper,cachePrefix],{
-  input:JSON.stringify(ownedRequest),encoding:'utf8',timeout:10000,maxBuffer:1024*1024
- });
+ const input=JSON.stringify(ownedRequest);
+ const checkScope=()=>{
+  const cachePrefix=path.join(os.tmpdir(),'skill-tree-owned-source-'+crypto.randomUUID());
+  if(fs.existsSync(cachePrefix))fail('composition-context','A fresh nonexistent bytecode lookup prefix is required');
+  return spawnSync('python3',['-I','-B','-c',guardProgram,helper,cachePrefix],{
+   input,encoding:'utf8',timeout:10000,maxBuffer:1024*1024
+  });
+ };
+ let run=checkScope();
+ // The bridge allows one fresh scope check before actor invocation.
+ if(run.error?.code==='ETIMEDOUT'){
+  if(verifiedManifest(packageRoot).manifest_digest!==manifestDigest)fail('composition-context','The owned scope manifest changed during the timed-out check');
+  run=checkScope();
+ }
  if(run.error||run.status!==0)fail('composition-context','The actual selected operation context guard failed: '+(run.stderr||run.stdout||run.error?.message||'The owned helper is unavailable').trim().split('\n').at(-1));
  return JSON.parse(run.stdout);
 }

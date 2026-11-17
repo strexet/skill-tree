@@ -164,6 +164,43 @@ print(json.dumps({'cache_file':str(cache),'source_sha256':hashlib.sha256(origina
  assert.equal(fs.existsSync(marker),false);assert.deepEqual(fs.readFileSync(control.cache_file),originalCache,'Existing bytecode belongs to the fixture and must remain untouched.');assert.deepEqual(fs.readFileSync(helper),originalSource);assert.deepEqual(read(packageRoot,manifestPath),originalManifest);assert.deepEqual(metadataBytes(f.root),before);
 });
 
+test('the read-only scope guard retries one process timeout with a fresh source lookup',async t=>{
+ const f=await fixture(t,{rows:[row('guarded','editor',{anchor:'before'})],ids:['editor']});
+ const state=workflow(f),{files}=build(f),packageRoot=mount(f,files),before=metadataBytes(f.root);
+ const input={project_root:f.root,event:event(processing,'before'),context:{kind:'pending',id:'actual-pending-scope',pending_ids:[state.pending_id]},capabilities:[]};
+ const run=spawnSync(process.execPath,['-e',String.raw`
+const assert=require('node:assert/strict'),child=require('node:child_process'),fs=require('node:fs');
+const spawn=child.spawnSync,prefixes=[];
+let mode='recover',attempts=0;
+child.spawnSync=(file,args,options)=>{
+ if(file!=='python3'||!args[3]?.includes('owned_plugin_workflow'))return spawn(file,args,options);
+ attempts++;prefixes.push(args[5]);
+ if(mode==='changed-resource')fs.appendFileSync(args[4],'\n# Changed while the guard was waiting.\n');
+ if(mode==='always-timeout'||mode==='changed-resource'||(mode==='recover'&&attempts===1))return {error:{code:'ETIMEDOUT',message:'spawnSync python3 ETIMEDOUT'},status:null};
+ return spawn(file,args,options);
+};
+const {prepareBoundary}=require(process.argv[1]);
+const root=process.argv[2],input=JSON.parse(process.argv[3]);
+const result=prepareBoundary(root,input);
+assert.equal(result.guard.kind,'actual-owned-scope');
+assert.equal(result.invocation,'not-executed');
+assert.equal(attempts,2);
+assert.notEqual(prefixes[0],prefixes[1]);
+mode='always-timeout';attempts=0;
+assert.throws(()=>prepareBoundary(root,input),/ETIMEDOUT/);
+assert.equal(attempts,2);
+mode='invalid-scope';attempts=0;
+const invalid={...input,context:{...input.context,pending_ids:['P-11111111-1111-4111-8111-111111111111']}};
+assert.throws(()=>prepareBoundary(root,invalid),/Pending|pending|context|selected/i);
+assert.equal(attempts,1);
+mode='changed-resource';attempts=0;
+assert.throws(()=>prepareBoundary(root,input),/owned dispatcher resource changed/);
+assert.equal(attempts,1);
+`,path.join(core,'lib/plugin-composition.js'),packageRoot,JSON.stringify(input)],{encoding:'utf8',timeout:30000});
+ assert.equal(run.status,0,run.stdout+run.stderr);
+ assert.deepEqual(metadataBytes(f.root),before);
+});
+
 // Managed positive controls use the actual receipt-owned destination, never mount().
 async function managedOperation(t,options={}){
  const f=await fixture(t,{rows:[row('managed','editor',{operation:intake,anchor:'before'})],ids:['editor'],...options});

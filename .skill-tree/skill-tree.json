@@ -5301,7 +5301,7 @@
     ".skill-tree/lib/plugin-acquisition.js": "2958d2d00fbbcd7b0876a790c87374eb91bb072bde34878554b13258b5411aab",
     ".skill-tree/lib/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
     ".skill-tree/lib/plugin-catalog.js": "b1af4b99b6b9b1fa1afe6a78a6d1dc5101307ebff6b2533cb7ce4ac267bb761d",
-    ".skill-tree/lib/plugin-composition.js": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8",
+    ".skill-tree/lib/plugin-composition.js": "262b6bb1c032b214c5bf401a427733bd99bb309c21e24f22668204d6fa79037d",
     ".skill-tree/lib/plugin-lifecycle.js": "16182707bbaa23cd98b7e7a67e722ea4353d71bede5426f19f9228e30aa84d5b",
     ".skill-tree/lib/plugin-management.js": "711141d6544d601cd12605ec52693fbada109b6562ab7888ce5ca1490909bace",
     ".skill-tree/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
