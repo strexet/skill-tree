@@ -4,6 +4,186 @@
     "aliases": [
       {
         "anchor": "before",
+        "operation": "skill-tree-3d",
+        "phrase": "before skill-tree-3d"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d",
+        "phrase": "before skill tree 3d"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d",
+        "phrase": "during skill-tree-3d"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d",
+        "phrase": "during skill tree 3d"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d",
+        "phrase": "after skill-tree-3d"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d",
+        "phrase": "after skill tree 3d"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-blender",
+        "phrase": "before skill-tree-3d-blender"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-blender",
+        "phrase": "before skill tree 3d blender geometry"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-blender",
+        "phrase": "during skill-tree-3d-blender"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-blender",
+        "phrase": "during skill tree 3d blender geometry"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-blender",
+        "phrase": "after skill-tree-3d-blender"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-blender",
+        "phrase": "after skill tree 3d blender geometry"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-motion",
+        "phrase": "before skill-tree-3d-motion"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-motion",
+        "phrase": "before skill tree 3d motion"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-motion",
+        "phrase": "during skill-tree-3d-motion"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-motion",
+        "phrase": "during skill tree 3d motion"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-motion",
+        "phrase": "after skill-tree-3d-motion"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-motion",
+        "phrase": "after skill tree 3d motion"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-references",
+        "phrase": "before skill-tree-3d-references"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-references",
+        "phrase": "before skill tree 3d references"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-references",
+        "phrase": "during skill-tree-3d-references"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-references",
+        "phrase": "during skill tree 3d references"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-references",
+        "phrase": "after skill-tree-3d-references"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-references",
+        "phrase": "after skill tree 3d references"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-texture",
+        "phrase": "before skill-tree-3d-texture"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-texture",
+        "phrase": "before skill tree 3d textures"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-texture",
+        "phrase": "during skill-tree-3d-texture"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-texture",
+        "phrase": "during skill tree 3d textures"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-texture",
+        "phrase": "after skill-tree-3d-texture"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-texture",
+        "phrase": "after skill tree 3d textures"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-unity",
+        "phrase": "before skill-tree-3d-unity"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-unity",
+        "phrase": "before skill tree 3d unity integration"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-unity",
+        "phrase": "during skill-tree-3d-unity"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-unity",
+        "phrase": "during skill tree 3d unity integration"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-unity",
+        "phrase": "after skill-tree-3d-unity"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-unity",
+        "phrase": "after skill tree 3d unity integration"
+      },
+      {
+        "anchor": "before",
         "operation": "skill-tree-add-pending-task",
         "phrase": "before skill-tree-add-pending-task"
       },
@@ -708,8 +888,350 @@
         "phrase": "after-validation skill-tree-repo-documentation-audit"
       }
     ],
-    "digest": "3cbd9717322f1ab6343c5f32e173dc906b26a5c47fea570fe6877963c59d34c9",
+    "digest": "cdf47cdc6df62dd1990291112ff6262e5ed1b3f7fdf8deb926f587858796bd29",
     "entries": [
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-3d:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-3d:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-3d:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-3d-blender:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-blender",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-3d-blender:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-blender",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-3d-blender:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-blender",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-3d-motion:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-motion",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-3d-motion:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-motion",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-3d-motion:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-motion",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-3d-references:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-references",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-3d-references:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-references",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-3d-references:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-references",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-3d-texture:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-texture",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-3d-texture:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-texture",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-3d-texture:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-texture",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-3d-unity:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-unity",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-3d-unity:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-unity",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-3d-unity:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-unity",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
       {
         "anchor": "before",
         "boundary_id": "skill-tree-add-pending-task:before",
@@ -727,7 +1249,7 @@
         ],
         "operation": "skill-tree-add-pending-task",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -746,7 +1268,7 @@
         ],
         "operation": "skill-tree-add-pending-task",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -765,7 +1287,7 @@
         ],
         "operation": "skill-tree-add-pending-task",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -784,7 +1306,7 @@
         ],
         "operation": "skill-tree-clarify-tasks",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -803,7 +1325,7 @@
         ],
         "operation": "skill-tree-clarify-tasks",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -822,7 +1344,7 @@
         ],
         "operation": "skill-tree-clarify-tasks",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -841,7 +1363,7 @@
         ],
         "operation": "skill-tree-create-documents-snapshot",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -860,7 +1382,7 @@
         ],
         "operation": "skill-tree-create-documents-snapshot",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -879,7 +1401,7 @@
         ],
         "operation": "skill-tree-create-documents-snapshot",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -898,7 +1420,7 @@
         ],
         "operation": "skill-tree-director-audit",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -917,7 +1439,7 @@
         ],
         "operation": "skill-tree-director-audit",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -936,7 +1458,7 @@
         ],
         "operation": "skill-tree-director-audit",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -955,7 +1477,7 @@
         ],
         "operation": "skill-tree-director-decide",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -974,7 +1496,7 @@
         ],
         "operation": "skill-tree-director-decide",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -993,7 +1515,7 @@
         ],
         "operation": "skill-tree-director-decide",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -1012,7 +1534,7 @@
         ],
         "operation": "skill-tree-director-install",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -1031,7 +1553,7 @@
         ],
         "operation": "skill-tree-director-install",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -1050,7 +1572,7 @@
         ],
         "operation": "skill-tree-director-install",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -1069,7 +1591,7 @@
         ],
         "operation": "skill-tree-director-intake",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -1088,7 +1610,7 @@
         ],
         "operation": "skill-tree-director-intake",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -1107,7 +1629,7 @@
         ],
         "operation": "skill-tree-director-intake",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -1126,7 +1648,7 @@
         ],
         "operation": "skill-tree-director-plan",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -1145,7 +1667,7 @@
         ],
         "operation": "skill-tree-director-plan",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -1164,7 +1686,7 @@
         ],
         "operation": "skill-tree-director-plan",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -1183,7 +1705,7 @@
         ],
         "operation": "skill-tree-director-review",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -1202,7 +1724,7 @@
         ],
         "operation": "skill-tree-director-review",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -1221,7 +1743,7 @@
         ],
         "operation": "skill-tree-director-review",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -1240,7 +1762,7 @@
         ],
         "operation": "skill-tree-director-run",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -1259,7 +1781,7 @@
         ],
         "operation": "skill-tree-director-run",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -1278,7 +1800,7 @@
         ],
         "operation": "skill-tree-director-run",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -1297,7 +1819,7 @@
         ],
         "operation": "skill-tree-director-setup",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -1316,7 +1838,7 @@
         ],
         "operation": "skill-tree-director-setup",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -1335,7 +1857,7 @@
         ],
         "operation": "skill-tree-director-setup",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -1354,7 +1876,7 @@
         ],
         "operation": "skill-tree-director-status",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -1373,7 +1895,7 @@
         ],
         "operation": "skill-tree-director-status",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -1392,7 +1914,7 @@
         ],
         "operation": "skill-tree-director-status",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -1411,7 +1933,7 @@
         ],
         "operation": "skill-tree-implement-all",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -1430,7 +1952,7 @@
         ],
         "operation": "skill-tree-implement-all",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -1449,7 +1971,7 @@
         ],
         "operation": "skill-tree-implement-all",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -1468,7 +1990,7 @@
         ],
         "operation": "skill-tree-implement-next-future-task",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -1487,7 +2009,7 @@
         ],
         "operation": "skill-tree-implement-next-future-task",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -1506,7 +2028,7 @@
         ],
         "operation": "skill-tree-implement-next-future-task",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -1525,7 +2047,7 @@
         ],
         "operation": "skill-tree-narative",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -1544,7 +2066,7 @@
         ],
         "operation": "skill-tree-narative",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -1563,7 +2085,7 @@
         ],
         "operation": "skill-tree-narative",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -1582,7 +2104,7 @@
         ],
         "operation": "skill-tree-plugins",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -1601,7 +2123,7 @@
         ],
         "operation": "skill-tree-plugins",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -1620,7 +2142,7 @@
         ],
         "operation": "skill-tree-plugins",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -1639,7 +2161,7 @@
         ],
         "operation": "skill-tree-pr-review-cycle",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -1658,7 +2180,7 @@
         ],
         "operation": "skill-tree-pr-review-cycle",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -1677,7 +2199,7 @@
         ],
         "operation": "skill-tree-pr-review-cycle",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -1696,7 +2218,7 @@
         ],
         "operation": "skill-tree-process-future-pending",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -1715,7 +2237,7 @@
         ],
         "operation": "skill-tree-process-future-pending",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -1734,7 +2256,7 @@
         ],
         "operation": "skill-tree-process-future-pending",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -1753,7 +2275,7 @@
         ],
         "operation": "skill-tree-repo-documentation",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -1772,7 +2294,7 @@
         ],
         "operation": "skill-tree-repo-documentation",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -1791,7 +2313,7 @@
         ],
         "operation": "skill-tree-repo-documentation",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -1810,7 +2332,7 @@
         ],
         "operation": "skill-tree-repo-documentation-audit",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -1829,7 +2351,7 @@
         ],
         "operation": "skill-tree-repo-documentation-audit",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -1848,7 +2370,7 @@
         ],
         "operation": "skill-tree-repo-documentation-audit",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -1867,7 +2389,7 @@
         ],
         "operation": "skill-tree-work-through-next",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -1886,7 +2408,7 @@
         ],
         "operation": "skill-tree-work-through-next",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -1905,7 +2427,7 @@
         ],
         "operation": "skill-tree-work-through-next",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-research",
@@ -1924,7 +2446,7 @@
         ],
         "operation": "skill-tree-implement-next-future-task",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after-draft-plan",
@@ -1943,7 +2465,7 @@
         ],
         "operation": "skill-tree-implement-next-future-task",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-task-completion",
@@ -1962,7 +2484,7 @@
         ],
         "operation": "skill-tree-implement-next-future-task",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-review",
@@ -1981,7 +2503,7 @@
         ],
         "operation": "skill-tree-pr-review-cycle",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after-core-inspection",
@@ -2000,7 +2522,7 @@
         ],
         "operation": "skill-tree-pr-review-cycle",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-pr-ready",
@@ -2019,7 +2541,7 @@
         ],
         "operation": "skill-tree-pr-review-cycle",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-research",
@@ -2038,7 +2560,7 @@
         ],
         "operation": "skill-tree-process-future-pending",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-task-formulation",
@@ -2057,7 +2579,7 @@
         ],
         "operation": "skill-tree-process-future-pending",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after-task-creation",
@@ -2076,7 +2598,7 @@
         ],
         "operation": "skill-tree-process-future-pending",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-research",
@@ -2095,7 +2617,7 @@
         ],
         "operation": "skill-tree-repo-documentation",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-formulation",
@@ -2114,7 +2636,7 @@
         ],
         "operation": "skill-tree-repo-documentation",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after-validation",
@@ -2133,7 +2655,7 @@
         ],
         "operation": "skill-tree-repo-documentation",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-research",
@@ -2152,7 +2674,7 @@
         ],
         "operation": "skill-tree-repo-documentation-audit",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-formulation",
@@ -2171,7 +2693,7 @@
         ],
         "operation": "skill-tree-repo-documentation-audit",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after-validation",
@@ -2190,10 +2712,16 @@
         ],
         "operation": "skill-tree-repo-documentation-audit",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       }
     ],
     "operations": [
+      "skill-tree-3d",
+      "skill-tree-3d-blender",
+      "skill-tree-3d-motion",
+      "skill-tree-3d-references",
+      "skill-tree-3d-texture",
+      "skill-tree-3d-unity",
       "skill-tree-add-pending-task",
       "skill-tree-clarify-tasks",
       "skill-tree-create-documents-snapshot",
@@ -2217,12 +2745,30 @@
       "skill-tree-work-through-next"
     ]
   },
-  "configuration_digest": "6c9c54cbbfd279e05ade9bd3581b37c93b4c7ce9d7895d7895eb7fd94e4f96c1",
+  "configuration_digest": "4cb4f20b30adc9871ed9c76b06e18f47696577aff008b46ba8ff5bdf327cde96",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "8a7f1a3b1e5993f69cd8ff8e30b73cea8ffa34987e4b37466043d614acb4f64d",
+  "identity": "a072fc054119e566ae99e89be64fb65e9f0e8a60741c7fdd533adc796afe0a22",
   "operation": "skill-tree-create-documents-snapshot",
   "operations": {
+    "skill-tree-3d": {
+      "title": "Skill Tree 3D"
+    },
+    "skill-tree-3d-blender": {
+      "title": "Skill Tree 3D Blender Geometry"
+    },
+    "skill-tree-3d-motion": {
+      "title": "Skill Tree 3D Motion"
+    },
+    "skill-tree-3d-references": {
+      "title": "Skill Tree 3D References"
+    },
+    "skill-tree-3d-texture": {
+      "title": "Skill Tree 3D Textures"
+    },
+    "skill-tree-3d-unity": {
+      "title": "Skill Tree 3D Unity Integration"
+    },
     "skill-tree-add-pending-task": {
       "title": "Skill-Tree: Add Pending Task"
     },
@@ -2302,7 +2848,7 @@
     "scripts/decision-orchestration.py": "d2c5ac475033ae06321fc7917ddf96232a0e442bef7c5db537891e12164fd404",
     "scripts/director-dispatch.py": "e7f0b8514c5facbe99dbf1d7ffd8cd1b24de55e6dc1ecd704473e17ab7ceba9a",
     "scripts/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
-    "scripts/plugin-composition.js": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8",
+    "scripts/plugin-composition.js": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b",
     "scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",
     "scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",
     "scripts/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
