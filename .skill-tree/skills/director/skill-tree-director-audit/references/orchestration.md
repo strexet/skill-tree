@@ -18,7 +18,7 @@ Execute the same dependency cycle for remaining snapshot roots by current priori
 
 An explicitly launched/resumed controller automatically selects the recommended eligible next unit after targeted processing through advance/next. Report the scoped prioritized units and the chosen ID/reason; no routine next-action question interrupts the authorized root/snapshot cycle. Required closure/snapshot boundaries, deferred findings and task-specific execution policy remain binding. Missing material decisions require questions; unsafe isolation, mandatory failures without a repair path and the repeated-unchanged-failure circuit breaker stop execution.
 
-Standalone Process Pending prints the global prioritized list and a developer-choice handoff with one recommended action last. A stored active checkpoint alone never activates the automatic path. Flow completion reports deferred choices and starts no additional root/snapshot. Follow the processing-result contract in future-workflow.md.
+Standalone Process Pending prints the global prioritized list and follows the [processing-result contract](future-workflow.md#processing-result-and-next-action) for the next action. A stored active checkpoint alone never activates the automatic path. Flow completion reports deferred choices and starts no additional root or snapshot. Use the [visible owner handoff contract](decision-governance.md#visible-owner-handoff) for controller stops that need owner input.
 
 ## Boundaries
 
