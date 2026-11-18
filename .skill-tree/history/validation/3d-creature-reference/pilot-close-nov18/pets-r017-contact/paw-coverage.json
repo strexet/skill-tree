@@ -10,6 +10,11 @@
         "Gallop": 60,
         "Trot": 84,
         "Walk": 128
+      },
+      "stride_metres": {
+        "Gallop": 0.46,
+        "Trot": 0.244,
+        "Walk": 0.183
       }
     },
     {
@@ -20,7 +25,16 @@
         "Gallop": 56,
         "Trot": 104,
         "Walk": 160
+      },
+      "stride_metres": {
+        "Gallop": 1.23,
+        "Trot": 0.4,
+        "Walk": 0.275
       }
     }
+  ],
+  "world_travel_xz": [
+    1,
+    0
   ]
 }

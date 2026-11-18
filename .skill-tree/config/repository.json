@@ -55,8 +55,23 @@
         "{project_root}",
         "--queue",
         "{queue_root}",
+        "--local-native-archive",
         "--control",
         "{control}"
+      ],
+      "input_paths": [
+        ".skill-tree/examples/3d/recipes/character/creatures/verify-catalog-pilot.py"
+      ]
+    },
+    "creature-catalog-closeout-package": {
+      "lane": "static",
+      "argv": [
+        "python3",
+        ".skill-tree/examples/3d/recipes/character/creatures/verify-catalog-pilot.py",
+        "--project",
+        "{project_root}",
+        "--control",
+        "package"
       ],
       "input_paths": [
         ".skill-tree/examples/3d/recipes/character/creatures/verify-catalog-pilot.py"
