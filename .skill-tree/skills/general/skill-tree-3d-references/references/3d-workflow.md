@@ -104,6 +104,8 @@ Animated scenes also pass [Unity motion acceptance](3d-stages.md#unity-motion-ac
 
 Show a representative image or contact sheet from the exact current packet inline in the requesting chat before opening the owner decision. Keep links to the exact revision artifacts for full-size inspection. When inline display is unavailable, post a direct link to the exact preview in the same chat before asking for approval.
 
+End the reply with the exact [owner request](decision-governance.md#visible-owner-handoff). Ask for each independently approvable asset separately, name the exact revision and state what approval enables.
+
 Use the current ArtWorkshop visual review policy for final packets. Bind the approved or owner-named baseline, permitted edits, protected features, required views and assembled scene coverage to the review scope. Verify the scoped changes on the current artifacts. Record the observed preview and prompt events in the requesting conversation so the approval transition can verify the exact presentation.
 
 ## Example lantern request
