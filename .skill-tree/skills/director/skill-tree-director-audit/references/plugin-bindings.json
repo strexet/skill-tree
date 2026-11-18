@@ -544,6 +544,36 @@
       },
       {
         "anchor": "before",
+        "operation": "skill-tree-full-cycle",
+        "phrase": "before skill-tree-full-cycle"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-full-cycle",
+        "phrase": "before skill-tree: full cycle"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-full-cycle",
+        "phrase": "during skill-tree-full-cycle"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-full-cycle",
+        "phrase": "during skill-tree: full cycle"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-full-cycle",
+        "phrase": "after skill-tree-full-cycle"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-full-cycle",
+        "phrase": "after skill-tree: full cycle"
+      },
+      {
+        "anchor": "before",
         "operation": "skill-tree-implement-all",
         "phrase": "before skill-tree-implement-all"
       },
@@ -888,7 +918,7 @@
         "phrase": "after-validation skill-tree-repo-documentation-audit"
       }
     ],
-    "digest": "cdf47cdc6df62dd1990291112ff6262e5ed1b3f7fdf8deb926f587858796bd29",
+    "digest": "ec98c07134188057d3f07ea01042c374be1d3b9d7d7402fff15086a457ef72a2",
     "entries": [
       {
         "anchor": "before",
@@ -1918,6 +1948,63 @@
       },
       {
         "anchor": "before",
+        "boundary_id": "skill-tree-full-cycle:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-full-cycle",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-full-cycle:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-full-cycle",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-full-cycle:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-full-cycle",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
         "boundary_id": "skill-tree-implement-all:before",
         "context_kinds": [
           "request",
@@ -2734,6 +2821,7 @@
       "skill-tree-director-run",
       "skill-tree-director-setup",
       "skill-tree-director-status",
+      "skill-tree-full-cycle",
       "skill-tree-implement-all",
       "skill-tree-implement-next-future-task",
       "skill-tree-narative",
@@ -2745,10 +2833,10 @@
       "skill-tree-work-through-next"
     ]
   },
-  "configuration_digest": "4cb4f20b30adc9871ed9c76b06e18f47696577aff008b46ba8ff5bdf327cde96",
+  "configuration_digest": "ea848ac9e2f5717503d211fcca3f7acfe62b1b4d0453a44a23f0b90527f45187",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "f41adaad1c00c6b5d4557d8e7546220835ec2c72eb68c619292088d6613e5320",
+  "identity": "c50faf339aec4c8161b3c839d1372fabb71c383d109c07adcba942751f22a67c",
   "operation": "skill-tree-director-audit",
   "operations": {
     "skill-tree-3d": {
@@ -2805,6 +2893,9 @@
     "skill-tree-director-status": {
       "title": "Skill-Tree Director: Status"
     },
+    "skill-tree-full-cycle": {
+      "title": "Skill-Tree: Full Cycle"
+    },
     "skill-tree-implement-all": {
       "title": "Skill-Tree: Implement All"
     },
@@ -2834,9 +2925,9 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "9d69c455f79906a62733483c957432518f4f4036923fdd9f9cc0679e07f4041b",
+    "SKILL.md": "284f78bb02ae3c33352bd11f97f971427edcf55e57cf03c15c2f2f794c1a14f7",
     "agents/openai.yaml": "8a366400c980d7f4bc6ab27694b7dbb1d957283f2dcfdd835c4530f3a40b8a81",
-    "references/decision-governance.md": "281c4fdf3759b1158b60a20d3c160799d00beff23fe1bfb2f8aa43eaacc85800",
+    "references/decision-governance.md": "52f8dc84c7cae4b9aa3aaa010d3ffb605ab79f5d75aaa36b9370d51e49305222",
     "references/development-practices.md": "467f46fe631af23c9b3c6dadcbeb6d4c20f311601e2e2f419f16ffc0a534b72e",
     "references/director-capabilities.json": "8cc57eb2504e2fa8cfa270d5181074fca7d5ae020a8f34608dfa6e98f018c4ca",
     "references/director-workflow.md": "d6e79264a8e6d8d79d224a6b134f6d9bd64e40e856d32d70be7dd8f91cf08fbf",
@@ -2877,11 +2968,11 @@
     "scripts/runtime/common/scripts/narrative-state.py": "ad6618d06fc1b2cac79694a64ff5733bdd03a330e0714851e04e185d108c1388",
     "scripts/runtime/common/scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",
     "scripts/runtime/common/scripts/plugin-processing.py": "4f4418c8e67a723a2cdd53b43246cb4507f0419bd7ca76b901334e78bb1406ec",
-    "scripts/runtime/common/scripts/pr-review-state.py": "bd0a42611d3d729fff6ead8f2c1f11fd0018f9e170cae13278a2cec58b6710b4",
+    "scripts/runtime/common/scripts/pr-review-state.py": "1515cbf6aaa5175def788e94858972156196b530284b8fc86b3a2ae044a7072e",
     "scripts/runtime/common/scripts/run-workspaces.py": "16f585306c6ec250f7b823b6c09c197917975399062175f16fdb4a2ab834818d",
     "scripts/runtime/common/scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/runtime/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/runtime/common/scripts/workflow-state.py": "eb2fb9e493afd40ed2807336b544a77ef9ce42cdf459539cbf03da851aaf042a",
+    "scripts/runtime/common/scripts/workflow-state.py": "e6bcfd6acf37e8675a682d3f07ddc4ad0b24c3e723288d3d96b9a4988943e27e",
     "scripts/runtime/lib/api-contract-locks.js": "eaac3e411ab7ddea36cedb4c48f0a0d0c5e737509466f0f86587df51a34fe594",
     "scripts/runtime/lib/composer.js": "da1195138ba77e8089c99d8a45e2627e2b145755ea7fea8b06f3680f1c0af861",
     "scripts/runtime/lib/development-policies.js": "9d3036e0dd2b2aaf070f3ec92f9e1d6d6830fe35cd8ebb1a78135c3ad792a2fd",

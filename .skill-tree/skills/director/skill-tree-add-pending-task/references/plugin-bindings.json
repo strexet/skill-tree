@@ -544,6 +544,36 @@
       },
       {
         "anchor": "before",
+        "operation": "skill-tree-full-cycle",
+        "phrase": "before skill-tree-full-cycle"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-full-cycle",
+        "phrase": "before skill-tree: full cycle"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-full-cycle",
+        "phrase": "during skill-tree-full-cycle"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-full-cycle",
+        "phrase": "during skill-tree: full cycle"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-full-cycle",
+        "phrase": "after skill-tree-full-cycle"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-full-cycle",
+        "phrase": "after skill-tree: full cycle"
+      },
+      {
+        "anchor": "before",
         "operation": "skill-tree-implement-all",
         "phrase": "before skill-tree-implement-all"
       },
@@ -888,7 +918,7 @@
         "phrase": "after-validation skill-tree-repo-documentation-audit"
       }
     ],
-    "digest": "cdf47cdc6df62dd1990291112ff6262e5ed1b3f7fdf8deb926f587858796bd29",
+    "digest": "ec98c07134188057d3f07ea01042c374be1d3b9d7d7402fff15086a457ef72a2",
     "entries": [
       {
         "anchor": "before",
@@ -1918,6 +1948,63 @@
       },
       {
         "anchor": "before",
+        "boundary_id": "skill-tree-full-cycle:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-full-cycle",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-full-cycle:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-full-cycle",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-full-cycle:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-full-cycle",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
         "boundary_id": "skill-tree-implement-all:before",
         "context_kinds": [
           "request",
@@ -2734,6 +2821,7 @@
       "skill-tree-director-run",
       "skill-tree-director-setup",
       "skill-tree-director-status",
+      "skill-tree-full-cycle",
       "skill-tree-implement-all",
       "skill-tree-implement-next-future-task",
       "skill-tree-narative",
@@ -2745,10 +2833,10 @@
       "skill-tree-work-through-next"
     ]
   },
-  "configuration_digest": "4cb4f20b30adc9871ed9c76b06e18f47696577aff008b46ba8ff5bdf327cde96",
+  "configuration_digest": "ea848ac9e2f5717503d211fcca3f7acfe62b1b4d0453a44a23f0b90527f45187",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "5cd11f914923ce41db3d0a3818c00da99581e19af5d1f9b824b2e5c07bf97854",
+  "identity": "d995748f02e8b0373562e282a67b11ebca190b859cad2eb54985e5b3df920fbe",
   "operation": "skill-tree-add-pending-task",
   "operations": {
     "skill-tree-3d": {
@@ -2805,6 +2893,9 @@
     "skill-tree-director-status": {
       "title": "Skill-Tree Director: Status"
     },
+    "skill-tree-full-cycle": {
+      "title": "Skill-Tree: Full Cycle"
+    },
     "skill-tree-implement-all": {
       "title": "Skill-Tree: Implement All"
     },
@@ -2834,9 +2925,9 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "58b66333de6c4c8d006db5a7ad71f11eb44cdd7febda45f90f57f3f75a621d61",
+    "SKILL.md": "8a406ec7945716235f33396f6953ae8be659fe05eb58b9fec2b4d3e0b46e71bb",
     "agents/openai.yaml": "39709a53fe2c1ad974d49dcd13fafe2102ac13ebe659b97131ffa319526e3c04",
-    "references/decision-governance.md": "281c4fdf3759b1158b60a20d3c160799d00beff23fe1bfb2f8aa43eaacc85800",
+    "references/decision-governance.md": "52f8dc84c7cae4b9aa3aaa010d3ffb605ab79f5d75aaa36b9370d51e49305222",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
     "references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
@@ -2861,7 +2952,7 @@
     "scripts/run-workspaces.py": "16f585306c6ec250f7b823b6c09c197917975399062175f16fdb4a2ab834818d",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "eb2fb9e493afd40ed2807336b544a77ef9ce42cdf459539cbf03da851aaf042a"
+    "scripts/workflow-state.py": "e6bcfd6acf37e8675a682d3f07ddc4ad0b24c3e723288d3d96b9a4988943e27e"
   },
   "packages": {},
   "parameter_defaults": {},

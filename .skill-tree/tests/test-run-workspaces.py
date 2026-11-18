@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -50,6 +51,28 @@ class RunWorkspaceTests(unittest.TestCase):
         with self.assertRaisesRegex(ws.RunError,'Multiple runs'):wf.Store(self.root).load()
         self.assertEqual(wf.Store(self.root,first['id']).load()['active_run']['id'],first['id'])
         self.assertEqual(wf.Store(self.location(second)).load()['active_run']['id'],second['id'])
+    def test_standalone_capture_and_processing_preserve_an_existing_controller(self):
+        new_root=self.task('Explicit next root')
+        existing=self.start(self.task('Existing controller root'))
+
+        def standalone(command,payload,*options):
+            request=self.base/'standalone.json'
+            request.write_text(json.dumps(payload))
+            result=subprocess.check_output([sys.executable,str(CORE/'common/scripts/workflow-state.py'),
+                command,str(self.root),'--standalone','--input',str(request),*options],text=True)
+            return json.loads(result)
+
+        request={'title':'Separate request','description':'Inspect existing behavior.',
+                 'expected_behavior':'Record existing behavior.'}
+        batch=standalone('intake',{'items':[request],'intake_batch_id':wf.identity('IB'),
+                                   'expected_source_hash':wf.file_hash(self.store.future)})
+        pending=batch['items'][0]['id']
+        processed=standalone('process',{'selectors':[pending],'expected_source_hash':wf.file_hash(self.store.future),
+            'dispositions':{pending:{'status':'resolved','reason':'The requested behavior is already present.'}}})
+        self.assertEqual(processed['selected_ids'],[pending])
+        started=standalone('start',{'expected_source_hash':wf.file_hash(self.store.future)},'--id',new_root)
+        self.assertEqual(started['snapshot'],[new_root])
+        self.assertEqual(wf.Store(self.root,existing['id']).load()['active_run'],existing)
     def test_overlapping_claims_and_dependency_claims_are_atomic(self):
         shared=self.task('Shared');a=self.task('First',[shared]);b=self.task('Second',[shared]);first=self.start(a);before=self.store.state.read_bytes()
         with self.assertRaisesRegex(wf.WorkflowError,'claims conflict'):self.start(b)

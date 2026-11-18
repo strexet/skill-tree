@@ -399,17 +399,26 @@ def review_phase_guard(store,context,phase):
 
 
 def _review_root(store,record,package_root=None):
-    candidate=Path(package_root).absolute() if package_root else Path(__file__).parent.parent
-    if not (candidate/'references/plugin-bindings.json').is_file():
+    def owns_review(candidate):
+        manifest=candidate/'references/plugin-bindings.json'
+        return manifest.is_file() and json.loads(manifest.read_text()).get('operation')==REVIEW_OPERATION
+
+    if package_root is not None:
+        candidate=Path(package_root).absolute()
+        if not owns_review(candidate):raise ReviewError('The explicit package must own the PR review operation')
+        return candidate
+    candidate=Path(__file__).parent.parent
+    if not owns_review(candidate):
         relative=(record or {}).get('review_requirements',{}).get('operation_package')
         if relative:
             if Path(relative).is_absolute() or any(part in {'','..','.'} for part in relative.split('/')):raise ReviewError('The frozen review operation package must remain repository-relative')
             candidate=store.source_root/relative
-    if (candidate/'references/plugin-bindings.json').is_file():return candidate
+            if not owns_review(candidate):raise ReviewError('The frozen PR review operation package is missing or changed')
+    if owns_review(candidate):return candidate
     registry=store.source_root/'.skill-tree/installation/plugins.json'
     if registry.is_file():
-        value=json.loads(registry.read_text());packages=value.get('packages',{})
-        if any(row.get('operation')==REVIEW_OPERATION and row.get('enabled') and packages.get(row.get('plugin_id'),{}).get('adaptation',{}).get('invocation_policy') for row in value.get('bindings',[])):raise ReviewError('Configured review plugins require the explicitly trusted composed operation package')
+        value=json.loads(registry.read_text())
+        if any(row.get('operation')==REVIEW_OPERATION and row.get('enabled') for row in value.get('bindings',[])):raise ReviewError('Configured review plugins require the explicitly trusted composed operation package')
     return None
 
 

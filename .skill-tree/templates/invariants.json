@@ -7,7 +7,7 @@
   {
     "id": "owner-response",
     "locked": true,
-    "text": "Follow the [visible owner handoff contract](references/decision-governance.md#visible-owner-handoff) for stops, waits, questions, choices and approvals. Put the exact required action or direct question at the end of the ordinary reply. When a decision has several viable options, compare all options, mark one recommendation inline and explain the recommendation after the option list."
+    "text": "Follow the [visible owner handoff contract](references/decision-governance.md#visible-owner-handoff) for stops, waits, questions, choices and approvals. Put the exact required action or direct question at the end of the ordinary reply. When a decision has several viable options, compare all options, mark one recommendation inline and explain the recommendation after the option list. When no owner action is required and useful follow-on work exists, offer one concrete next action with exact scope. A short direct continuation reply can select the one unambiguous offer under the existing permission and prerequisite rules."
   },
   {
     "id": "decision-governance",
