@@ -408,6 +408,7 @@ def _review_root(store,record,package_root=None):
         if not owns_review(candidate):raise ReviewError('The explicit package must own the PR review operation')
         return candidate
     candidate=Path(__file__).parent.parent
+    composed=(candidate/'references/plugin-bindings.json').is_file()
     if not owns_review(candidate):
         relative=(record or {}).get('review_requirements',{}).get('operation_package')
         if relative:
@@ -417,8 +418,11 @@ def _review_root(store,record,package_root=None):
     if owns_review(candidate):return candidate
     registry=store.source_root/'.skill-tree/installation/plugins.json'
     if registry.is_file():
-        value=json.loads(registry.read_text())
-        if any(row.get('operation')==REVIEW_OPERATION and row.get('enabled') for row in value.get('bindings',[])):raise ReviewError('Configured review plugins require the explicitly trusted composed operation package')
+        value=json.loads(registry.read_text());packages=value.get('packages',{})
+        # Source-checkout callers can still use the existing attached review-chain path.
+        if any(row.get('operation')==REVIEW_OPERATION and row.get('enabled') and
+               (composed or packages.get(row.get('plugin_id'),{}).get('adaptation',{}).get('invocation_policy'))
+               for row in value.get('bindings',[])):raise ReviewError('Configured review plugins require the explicitly trusted composed operation package')
     return None
 
 

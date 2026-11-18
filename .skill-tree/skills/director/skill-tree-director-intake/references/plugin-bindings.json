@@ -2836,7 +2836,7 @@
   "configuration_digest": "ea848ac9e2f5717503d211fcca3f7acfe62b1b4d0453a44a23f0b90527f45187",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "76501f88c671c09d8329cf91acc0840354d01690671974e0a87516bf2ec0d91e",
+  "identity": "080610d6c87e743cc1cf6ef25a06147920202a3ed8814efc455d93101315f74d",
   "operation": "skill-tree-director-intake",
   "operations": {
     "skill-tree-3d": {
@@ -2966,7 +2966,7 @@
     "scripts/runtime/common/scripts/narrative-state.py": "ad6618d06fc1b2cac79694a64ff5733bdd03a330e0714851e04e185d108c1388",
     "scripts/runtime/common/scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",
     "scripts/runtime/common/scripts/plugin-processing.py": "4f4418c8e67a723a2cdd53b43246cb4507f0419bd7ca76b901334e78bb1406ec",
-    "scripts/runtime/common/scripts/pr-review-state.py": "1515cbf6aaa5175def788e94858972156196b530284b8fc86b3a2ae044a7072e",
+    "scripts/runtime/common/scripts/pr-review-state.py": "74adda3783c9c2832bca3f51998b7a589c7ff066f50bac358c20d9930dbb2a04",
     "scripts/runtime/common/scripts/run-workspaces.py": "16f585306c6ec250f7b823b6c09c197917975399062175f16fdb4a2ab834818d",
     "scripts/runtime/common/scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/runtime/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
