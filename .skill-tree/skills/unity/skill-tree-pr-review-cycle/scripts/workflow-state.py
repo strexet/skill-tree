@@ -4136,11 +4136,14 @@ def clarification_mutate(store,command,payload):
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser.add_argument('--standalone',action='store_true',help='Use the canonical queue without attaching to an existing controller for intake, process or start.')
     args=parser.parse_args(argv)
     try:
-        store=Store(args.root,args.run_id,allow_unselected=args.command in {'index','runs','manifest','start','workspace-setup','recover-locator'},route_queue=args.command!='recover-locator');payload=json.loads(args.input.read_text()) if args.input else {}
-        if args.expected_source_hash:payload['expected_source_hash']=args.expected_source_hash
         cmd=args.command
+        if args.standalone and (cmd not in {'intake','process','start'} or args.run_id):
+            raise WorkflowError('Standalone routing requires intake, process or start without an existing run ID')
+        store=Store(args.root,args.run_id,allow_unselected=args.standalone or cmd in {'index','runs','manifest','start','workspace-setup','recover-locator'},route_queue=cmd!='recover-locator',neutral=args.standalone);payload=json.loads(args.input.read_text()) if args.input else {}
+        if args.expected_source_hash:payload['expected_source_hash']=args.expected_source_hash
         if cmd in {'intake','process','start'} and 'director_dispatch' in payload:
             if args.run_id or args.names is not None or args.apply or (args.id and cmd!='start'):
                 raise WorkflowError('Directed dispatch cannot infer a child or select another run')

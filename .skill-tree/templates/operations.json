@@ -39,6 +39,26 @@
       }
     ]
   },
+  "skill-tree-full-cycle": {
+    "title": "Skill-Tree: Full Cycle",
+    "description": "Deliver an explicitly requested task or task group through Pending, research, scoped implementation, one PR review-and-fix cycle and merge to develop.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Use for a direct full-cycle delivery request. Read applicable repository rules, the manifest and the [full-cycle contract](references/full-cycle.md). Reuse Add Pending, Process Pending, exact Work Through Next or exact-snapshot Implement All, and PR Review Cycle. Use the bundled workflow, processing, validation and PR helpers. Bind one intake batch to the exact processed roots, one isolated controller run and one shared publication. Require all scoped acceptance before opening the PR. Review the full current diff, fix actionable findings, validate and re-review as needed, then merge into develop under the original direct grant and current provider gates. Preserve the exact checkpoint on required questions, blockers or uncertain effects. Resume from verified receipts and established authority. Report the accepted tasks and confirmed publication or the exact prerequisite."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "The full-cycle frame binds the original owner request, batch and publication target. Existing leaf frames own decisions and evidence for intake, processing, implementation and PR review. A delegated result grants no new task scope, authorization or external approval."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation contract](references/plugin-invocation.md). Use scripts/workflow-state.py hook-start and hook-next at the full-cycle phases defined in the [full-cycle contract](references/full-cycle.md). Preserve matching bindings at each delegated operation's own boundaries. Empty matching configuration adds no prerequisite. Required unavailable packages, contexts, unresolved attempts or drift hold the current checkpoint. Plugin and resolver results never replace current validation, owner authorization or provider approval."
+      }
+    ]
+  },
   "skill-tree-implement-all": {
     "title": "Skill-Tree: Implement All",
     "description": "Implement all prioritized tasks or an explicitly selected group with required dependencies and resumable checkpoints; defer new nonblocking work.",
