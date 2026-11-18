@@ -2748,7 +2748,7 @@
   "configuration_digest": "4cb4f20b30adc9871ed9c76b06e18f47696577aff008b46ba8ff5bdf327cde96",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "6ebd0c508d2634adfec7ada493095e533ef1c2dd0d485e388c73f21f9777561e",
+  "identity": "0502521645ba80ef02966e5163e156a702a5139b902617d3c1ac85c8c12c08d6",
   "operation": "skill-tree-work-through-next",
   "operations": {
     "skill-tree-3d": {
@@ -2834,15 +2834,15 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "8533a57ac4b932f185e3995d0b10b592103887d69990a8dfc6a9b926948c5734",
+    "SKILL.md": "4a1c178ac3eb89354fdfdef813d272f8d6137da3dc4a2cc1c9ee08279e6aeb71",
     "agents/openai.yaml": "c895db343cf970775d5e9426c09d5e12d89751b7686f4d778e1cf1668175ee31",
-    "references/decision-governance.md": "390934d262f20952edb78a59b52f3e64567b830e1723f5bde8716e193722ff2b",
+    "references/decision-governance.md": "281c4fdf3759b1158b60a20d3c160799d00beff23fe1bfb2f8aa43eaacc85800",
     "references/development-practices.md": "467f46fe631af23c9b3c6dadcbeb6d4c20f311601e2e2f419f16ffc0a534b72e",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
-    "references/future-workflow.md": "c1b087b5a957de56432f5918eed221ed193558f0ffbf9d27f0eaf2b1e197e91a",
+    "references/future-workflow.md": "907963a86e8c4e0c3cd615fc0fe38195d19c4d1fb5c11e5fa158668b3b7fb023",
     "references/history-retention.md": "27ccf1029d9d65454f3d18dc05a0f72b57ce96417196a82fc2ad268cfffb7bb6",
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
-    "references/orchestration.md": "04831ab7373542979b39c4e28eac8152526ba03a54b94088a9bcbb02bb6a2279",
+    "references/orchestration.md": "271d68e3615f0555403aa12195c8559e092aab9ca68d0da846b65cdd5a72f116",
     "references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
     "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",

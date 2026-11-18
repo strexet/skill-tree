@@ -2748,7 +2748,7 @@
   "configuration_digest": "4cb4f20b30adc9871ed9c76b06e18f47696577aff008b46ba8ff5bdf327cde96",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "bd3355d0d66b46e76940a6117070b13da69548da390f23cd3ef788a5550fd45d",
+  "identity": "26fa2c815a3683acac3ec4a6cf300a861970a8f4672954a3ed86c52a5de3abd6",
   "operation": "skill-tree-director-decide",
   "operations": {
     "skill-tree-3d": {
@@ -2834,17 +2834,17 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "a5e28aaef87169ee0fa377af98e7648fffb1a8387e2f5c563ba79d1360693938",
+    "SKILL.md": "5b4e855afd41464940a49137cf74a91d94d4c5cf85e64da00365f183afbb7fd0",
     "agents/openai.yaml": "5ec2b2b2bed42854dc439d6b2f91381cc6ea5e7e4857814d614657de346f01b2",
-    "references/decision-governance.md": "390934d262f20952edb78a59b52f3e64567b830e1723f5bde8716e193722ff2b",
+    "references/decision-governance.md": "281c4fdf3759b1158b60a20d3c160799d00beff23fe1bfb2f8aa43eaacc85800",
     "references/development-practices.md": "467f46fe631af23c9b3c6dadcbeb6d4c20f311601e2e2f419f16ffc0a534b72e",
     "references/director-capabilities.json": "8cc57eb2504e2fa8cfa270d5181074fca7d5ae020a8f34608dfa6e98f018c4ca",
     "references/director-workflow.md": "d6e79264a8e6d8d79d224a6b134f6d9bd64e40e856d32d70be7dd8f91cf08fbf",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
-    "references/future-workflow.md": "c1b087b5a957de56432f5918eed221ed193558f0ffbf9d27f0eaf2b1e197e91a",
+    "references/future-workflow.md": "907963a86e8c4e0c3cd615fc0fe38195d19c4d1fb5c11e5fa158668b3b7fb023",
     "references/history-retention.md": "27ccf1029d9d65454f3d18dc05a0f72b57ce96417196a82fc2ad268cfffb7bb6",
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
-    "references/orchestration.md": "04831ab7373542979b39c4e28eac8152526ba03a54b94088a9bcbb02bb6a2279",
+    "references/orchestration.md": "271d68e3615f0555403aa12195c8559e092aab9ca68d0da846b65cdd5a72f116",
     "references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
     "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",

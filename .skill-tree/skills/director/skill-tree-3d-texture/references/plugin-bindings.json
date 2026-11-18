@@ -2748,7 +2748,7 @@
   "configuration_digest": "4cb4f20b30adc9871ed9c76b06e18f47696577aff008b46ba8ff5bdf327cde96",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "bd6df3c59c2c39e2ee5015c7eb0c98aeb781c6fc0dbe896f59d3962c3d5ae61e",
+  "identity": "addd3fc85eaf082f294ea1b3be3ab0729eab42f3ebf18ef60c9d76ad65d74a33",
   "operation": "skill-tree-3d-texture",
   "operations": {
     "skill-tree-3d": {
@@ -2834,16 +2834,16 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "4847e3e29c5cd4d80b81cf49ec1337b4b7303c7949d5d05c3a9f73e19a1aee08",
+    "SKILL.md": "299f0602875a4bc69e587cfdb6056e62dd1ce9b7aa35c62a3c22bfbd3f56f6a2",
     "agents/openai.yaml": "99210d024d0b0771121b4550bf706c6da6abc2fb3b88d4967b8a827bcf2165e8",
     "references/3d-authoring-roles.md": "04c2f2b6bf78408f7fa029e9ac9137fa72a98c09d7a772baae6ee65ae5f92051",
     "references/3d-stages.md": "61137321d19c01d4e848000553222bd5b7da336d5ab1b1d1ceeed84a1a9e9eb7",
     "references/3d-unity-roles.md": "474bc107b8c74d33ecd035e1a21b1c0ade4f953ad2659d18e1270740d6f52559",
-    "references/3d-workflow.md": "286ea25ec730f0066bcd29cd6866c1165608b54a5c3a38aa1dd41ec34e93365f",
+    "references/3d-workflow.md": "04f4a3dca5abc63e016b916541c787006478ad9b883c56d53811addeccdea6db",
     "references/3d-workshop-roles.md": "ed3cd2f786a61bb9a76ff4dfa2141ded4d43852c11ab8dfe6d11afe95bb8c8af",
-    "references/decision-governance.md": "390934d262f20952edb78a59b52f3e64567b830e1723f5bde8716e193722ff2b",
+    "references/decision-governance.md": "281c4fdf3759b1158b60a20d3c160799d00beff23fe1bfb2f8aa43eaacc85800",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
-    "references/future-workflow.md": "c1b087b5a957de56432f5918eed221ed193558f0ffbf9d27f0eaf2b1e197e91a",
+    "references/future-workflow.md": "907963a86e8c4e0c3cd615fc0fe38195d19c4d1fb5c11e5fa158668b3b7fb023",
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
     "references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
     "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",

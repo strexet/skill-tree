@@ -8,6 +8,23 @@ Auto is the approved default for newly activated qualified operation routing. Ex
 
 The DG ledger owns question, authority, actual origin, original attempts and current acceptance. The DO frame owns operation phases, current plan/check/review identities, referenced decisions and progress. A DO frame creates no Future queue, controller run or worktree. Bounded state fixtures establish no actual actor execution.
 
+## Visible owner handoff
+
+When execution stops, waits or finishes, state what is complete, what remains, why progress stopped and who owns the next step. When owner input is required, end the ordinary reply with a clearly labeled request. Name the exact action or question and state what happens after the answer or action. Put each currently answerable independent question on a separate line. Defer dependent questions until the necessary facts are available. Include the complete request in the reply without a separate question popup, selection card or modal. Mandatory host authorization controls remain binding.
+
+For each decision with multiple viable options, list all viable options and explain the relevant consequences and tradeoffs. Evaluate the options against the current goal, constraints and evidence. Mark one option inline as recommended in the reply language, with `(рекомендую)` in Russian. After the list, explain why the recommended option fits best and disclose any uncertainty or assumption that could change the recommendation. End with the direct question. The recommendation grants no approval.
+
+Use the stopping condition to make the handoff actionable:
+
+- Approval, consent or authorization: identify the exact item, revision, operation and scope. State the consequence of approval and any cost, affected access or recovery limit. Ask separately for independently approvable items.
+- Missing or conflicting requirements or a choice of approach: name the missing fact or conflict, the work that depends on the answer and the effect of each viable choice.
+- Access or owner-only recovery: identify the unavailable resource, the smallest action needed, where to take the action and the signal that access is restored. Keep credentials out of the conversation.
+- Manual validation: name the artifact, version and environment, the observable result to check, and the evidence or verdict to return.
+- Repeated failure, scope change or uncertain external outcome: describe the concrete blocker, preserved work and checks already performed. For an uncertain side effect, identify the attempted action and the evidence needed to reconcile the outcome before any retry.
+- Explicit pause, external wait or completion: state the continuation trigger or next authorized step. When no owner action is due, say so without adding a question.
+
+While owner input is pending, continue independent authorized work when possible and keep the blocked work separate. Preserve the current checkpoint and existing continuation and approval rules. When the owner already supplied the exact choice or authorization, proceed within the authorized scope.
+
 ## Actual actor handoff
 
 The host supplies a separate resolver context for Auto decisions. Significant decisions require an independent critic. Substantive disagreement requires an independent arbiter. Reusing an executor, actor or context under another label supplies no independence. Actual host tools create and execute actor contexts outside metadata writer locks; the Python helper prepares and validates records rather than invoking a native tool.

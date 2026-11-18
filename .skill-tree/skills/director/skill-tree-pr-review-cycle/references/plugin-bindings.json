@@ -2748,7 +2748,7 @@
   "configuration_digest": "4cb4f20b30adc9871ed9c76b06e18f47696577aff008b46ba8ff5bdf327cde96",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "6c18449b1fbbd9ec54799a6f4b641ab1c7bf67d9e37611ee68384f21a94ba700",
+  "identity": "4322aac0c1350c2b6344aa209cc74c3cabbf7a281f152e005e0ebd1c8a295647",
   "operation": "skill-tree-pr-review-cycle",
   "operations": {
     "skill-tree-3d": {
@@ -2834,9 +2834,9 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "4b4c2cac602f21ef5317c24dcc0653b8c7c1315421410668cd09b1618693d7e7",
+    "SKILL.md": "c9b0b24cc91d88a11fa136a99424b7c3edbc4b1014419438edab25f4eb7e53d0",
     "agents/openai.yaml": "f9b409444900104b71b2c07fa693db3c655cc82f5840063445f8b38baf86f760",
-    "references/decision-governance.md": "390934d262f20952edb78a59b52f3e64567b830e1723f5bde8716e193722ff2b",
+    "references/decision-governance.md": "281c4fdf3759b1158b60a20d3c160799d00beff23fe1bfb2f8aa43eaacc85800",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
     "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
