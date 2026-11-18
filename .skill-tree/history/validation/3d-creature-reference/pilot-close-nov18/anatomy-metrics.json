@@ -1,0 +1,355 @@
+{
+  "schema": 1,
+  "method": "Use FBX BindPose matrices for corresponding bilateral humerus and thigh attachment midpoints. Estimate tail arc from tail joint segment lengths to the penultimate joint, then from that joint to the distal skin extent projected along the final joint segment. Select actual tail vertices with at least 0.8 summed tail influence. Compare within-model tail arc-to-torso ratios across scale.",
+  "scope": "A metric of proportions, finite detail in both exported skinned LODs, and a qualitative visual comparison. The accepted model is smaller in absolute meters, so its physically shorter tail occupies a larger fraction of the torso.",
+  "bind_pose_measurements": [
+    {
+      "model": "original-pilot-baseline",
+      "source": {
+        "path": ".skill-tree/history/validation/3d-creatures/quadrupeds/cat.fbx",
+        "sha256": "02585cea95a8a1a455e68c7a55ed0d8b5c4f2dd21c80b6e968925a90b8aaf923"
+      },
+      "unit_scale_factor": 100,
+      "shoulder_joints_xyz_m": {
+        "UpperFrontLeft": [
+          0.12399999797344208,
+          0.5,
+          0.2849999964237213
+        ],
+        "UpperFrontRight": [
+          -0.12399999797344208,
+          0.5,
+          0.2849999964237213
+        ]
+      },
+      "hip_joints_xyz_m": {
+        "UpperRearLeft": [
+          0.11500000208616257,
+          0.5,
+          -0.2720000147819519
+        ],
+        "UpperRearRight": [
+          -0.11500000208616257,
+          0.5,
+          -0.2720000147819519
+        ]
+      },
+      "shoulder_midpoint_xyz_m": [
+        0.0,
+        0.5,
+        0.2849999964237213
+      ],
+      "hip_midpoint_xyz_m": [
+        0.0,
+        0.5,
+        -0.2720000147819519
+      ],
+      "shoulder_to_hip_m": 0.5570000112056732,
+      "tail_joints_xyz_m": {
+        "Tail1": [
+          0.0,
+          0.5434000492095947,
+          -0.34549999237060547
+        ],
+        "Tail2": [
+          0.0,
+          0.6139600872993469,
+          -0.4998500347137451
+        ],
+        "Tail3": [
+          0.0,
+          0.713919997215271,
+          -0.6365600824356079
+        ],
+        "TailTip": [
+          0.0,
+          0.7653700709342957,
+          -0.7526900768280029
+        ]
+      },
+      "tail_turn_degrees": [
+        11.6064178422464,
+        12.27840207140709
+      ],
+      "levels": [
+        {
+          "mesh": "PetSkin",
+          "tail_vertex_count": 70,
+          "terminal_vertex_index": 1196,
+          "terminal_vertex_xyz_m": [
+            0.0011992332292720675,
+            0.7619954943656921,
+            -0.7541850805282593
+          ],
+          "terminal_projected_span_m": 0.12701681305826673,
+          "joint_chain_to_penultimate_m": 0.3390699384359452,
+          "estimated_tail_arc_m": 0.4660867514942119,
+          "tail_arc_by_shoulder_to_hip": 0.8367805064946553
+        },
+        {
+          "mesh": "PetSkin_LOD1",
+          "tail_vertex_count": 42,
+          "terminal_vertex_index": 449,
+          "terminal_vertex_xyz_m": [
+            0.0019403999904170632,
+            0.7622972130775452,
+            -0.7540513873100281
+          ],
+          "terminal_projected_span_m": 0.1270167946141324,
+          "joint_chain_to_penultimate_m": 0.3390699384359452,
+          "estimated_tail_arc_m": 0.4660867330500776,
+          "tail_arc_by_shoulder_to_hip": 0.8367804733813089
+        }
+      ]
+    },
+    {
+      "model": "historical-r014",
+      "source": {
+        "path": ".skill-tree/history/validation/3d-creature-reference/geometry/quadrupeds/r014/cat.fbx",
+        "sha256": "9e10a487a9191b9b0bdb1b1cd473a096646eaf27f958e082f664adcf2fcd8873"
+      },
+      "unit_scale_factor": 100,
+      "shoulder_joints_xyz_m": {
+        "UpperFrontLeft": [
+          0.07999999821186066,
+          0.4440000057220459,
+          0.24240000545978546
+        ],
+        "UpperFrontRight": [
+          -0.07999999821186066,
+          0.4440000057220459,
+          0.24240000545978546
+        ]
+      },
+      "hip_joints_xyz_m": {
+        "UpperRearLeft": [
+          0.07699999958276749,
+          0.4300000071525574,
+          -0.20286999642848969
+        ],
+        "UpperRearRight": [
+          -0.07699999958276749,
+          0.4300000071525574,
+          -0.20286999642848969
+        ]
+      },
+      "shoulder_midpoint_xyz_m": [
+        0.0,
+        0.4440000057220459,
+        0.24240000545978546
+      ],
+      "hip_midpoint_xyz_m": [
+        0.0,
+        0.4300000071525574,
+        -0.20286999642848969
+      ],
+      "shoulder_to_hip_m": 0.44549003865578213,
+      "tail_joints_xyz_m": {
+        "Tail1": [
+          0.0,
+          0.4546299874782562,
+          -0.25383999943733215
+        ],
+        "Tail2": [
+          0.0,
+          0.3001374900341034,
+          -0.35657501220703125
+        ],
+        "Tail3": [
+          0.0,
+          0.14356960356235504,
+          -0.446014404296875
+        ],
+        "TailTip": [
+          0.0,
+          0.15396998822689056,
+          -0.5586599707603455
+        ]
+      },
+      "tail_turn_degrees": [
+        3.8860995725385603,
+        65.53790805859438
+      ],
+      "levels": [
+        {
+          "mesh": "PetSkin",
+          "tail_vertex_count": 557,
+          "terminal_vertex_index": 1886,
+          "terminal_vertex_xyz_m": [
+            -0.0015939638251438737,
+            0.14562426507472992,
+            -0.556813657283783
+          ],
+          "terminal_projected_span_m": 0.11051889524331679,
+          "joint_chain_to_penultimate_m": 0.3658461462034984,
+          "estimated_tail_arc_m": 0.47636504144681524,
+          "tail_arc_by_shoulder_to_hip": 1.0693057085725084
+        },
+        {
+          "mesh": "PetSkin_LOD1",
+          "tail_vertex_count": 146,
+          "terminal_vertex_index": 726,
+          "terminal_vertex_xyz_m": [
+            -0.002484231488779187,
+            0.14525261521339417,
+            -0.5531200170516968
+          ],
+          "terminal_projected_span_m": 0.1068067298369824,
+          "joint_chain_to_penultimate_m": 0.3658461462034984,
+          "estimated_tail_arc_m": 0.47265287604048084,
+          "tail_arc_by_shoulder_to_hip": 1.0609729399711374
+        }
+      ]
+    },
+    {
+      "model": "accepted-r017",
+      "source": {
+        "path": ".skill-tree/artifacts/catalog-pets-r001/unity/Assets/Pets/cat.fbx",
+        "sha256": "364cb8f7c0a8ecfc6732ff0ed070da1cbaedb8af1c876be0bd3bba9f2c72f5e4"
+      },
+      "unit_scale_factor": 100,
+      "shoulder_joints_xyz_m": {
+        "Upper.LF": [
+          -0.024000009521842003,
+          0.15800002217292786,
+          0.026999996975064278
+        ],
+        "Upper.RF": [
+          -0.024000003933906555,
+          0.15800002217292786,
+          -0.026999998837709427
+        ]
+      },
+      "hip_joints_xyz_m": {
+        "Thigh.LH": [
+          0.15800000727176666,
+          0.17499999701976776,
+          0.026999998837709427
+        ],
+        "Thigh.RH": [
+          0.15800000727176666,
+          0.17499999701976776,
+          -0.027000002562999725
+        ]
+      },
+      "shoulder_midpoint_xyz_m": [
+        -0.02400000672787428,
+        0.15800002217292786,
+        -9.313225746154785e-10
+      ],
+      "hip_midpoint_xyz_m": [
+        0.15800000727176666,
+        0.17499999701976776,
+        -1.862645149230957e-09
+      ],
+      "shoulder_to_hip_m": 0.18279224338210495,
+      "tail_joints_xyz_m": {
+        "Tail.01": [
+          0.1809999942779541,
+          0.20100000500679016,
+          1.3999882313205244e-16
+        ],
+        "Tail.02": [
+          0.21400000154972076,
+          0.17799997329711914,
+          -7.0304925762189e-18
+        ],
+        "Tail.03": [
+          0.23200000822544098,
+          0.13100001215934753,
+          1.1709087001311909e-15
+        ],
+        "Tail.04": [
+          0.2500000298023224,
+          0.08300001919269562,
+          1.110436582806983e-15
+        ],
+        "Tail.05": [
+          0.28200000524520874,
+          0.057000041007995605,
+          1.66729997101272e-15
+        ]
+      },
+      "tail_turn_degrees": [
+        34.16884087201019,
+        0.39972909084948116,
+        30.350072562754598
+      ],
+      "levels": [
+        {
+          "mesh": "Cat_unified_skin_LOD0",
+          "tail_vertex_count": 8606,
+          "terminal_vertex_index": 127977,
+          "terminal_vertex_xyz_m": [
+            0.3140832781791687,
+            0.044669587165117264,
+            0.0
+          ],
+          "terminal_projected_span_m": 0.07390679436528788,
+          "joint_chain_to_penultimate_m": 0.14181730250632396,
+          "estimated_tail_arc_m": 0.21572409687161184,
+          "tail_arc_by_shoulder_to_hip": 1.180160015984195
+        },
+        {
+          "mesh": "Cat_unified_skin_LOD1",
+          "tail_vertex_count": 2263,
+          "terminal_vertex_index": 16923,
+          "terminal_vertex_xyz_m": [
+            0.3141155242919922,
+            0.04467371478676796,
+            -2.8313215807429515e-06
+          ],
+          "terminal_projected_span_m": 0.07392921817795269,
+          "joint_chain_to_penultimate_m": 0.14181730250632396,
+          "estimated_tail_arc_m": 0.21574652068427663,
+          "tail_arc_by_shoulder_to_hip": 1.180282689748956
+        }
+      ]
+    }
+  ],
+  "accepted_ratio_increase_vs_original_percent": 41.03579216107527,
+  "accepted_ratio_increase_vs_r014_percent": 10.36694244900962,
+  "silhouette_review": {
+    "method": "Qualitative silhouette comparison of the original profile, the accepted r017 native profile and the selected reference. Separate framing precludes direct pixel size comparison.",
+    "views": {
+      "cat": {
+        "original_profile": {
+          "path": ".skill-tree/history/validation/3d-creature-reference/native/comparisons/r003/baseline-profile-frames/cat.png",
+          "sha256": "662189d9fee0856155cba25a817161bb7b2c08cf35510c67666eb29997e1e676"
+        },
+        "current_profile": {
+          "path": ".skill-tree/artifacts/catalog-pets-r001/evidence/frames/cat-idle-lod0-view0/000.png",
+          "sha256": "867045cd9649621963ba845d0ced98b909f7f152fea9d640cb4862476569460f"
+        },
+        "selected_neutral_reference": {
+          "path": ".skill-tree/history/validation/3d-creature-reference/reference/r004/color/cat-orthographic.png",
+          "sha256": "90109b98aae0cf7ac6283815ebcb84b54c886ef82d637d7a5bc5fba95c7301e8"
+        }
+      },
+      "dog": {
+        "original_profile": {
+          "path": ".skill-tree/history/validation/3d-creature-reference/native/comparisons/r003/baseline-profile-frames/dog.png",
+          "sha256": "370cfba8c5f26da74c7b046057bb43c3e8ba0861da3f3d91a4fd17dfafef9420"
+        },
+        "current_profile": {
+          "path": ".skill-tree/artifacts/catalog-pets-r001/evidence/frames/dog-idle-lod0-view0/000.png",
+          "sha256": "53898c9c93157857a4f99a2795aeca6e75fd20e328719b84f4b30730b6818845"
+        },
+        "selected_neutral_reference": {
+          "path": ".skill-tree/history/validation/3d-creature-reference/reference/r004/color/dog-orthographic.png",
+          "sha256": "8fb336d69b17ad18291f4c7724dfb07810f128b21c01e7999737241778928321"
+        }
+      }
+    },
+    "cat": "The accepted cat fills the upper shoulder and haunch, merging both volumes into the trunk before narrowing toward the feet. The original faceted model shows narrow separate-looking upper limb struts. The accepted back-to-tail silhouette descends out of the rump and rounds toward the distal taper in the selected reference direction.",
+    "dog": "The accepted dog shows a filled-in shoulder and a fuller proximal thigh that merge into the chest and rump, then taper toward the distal leg. The original profile shows discrete narrow faceted proximal links. The accepted contours follow the broad proximal shapes in the selected neutral reference.",
+    "current_catalog_overview": {
+      "path": ".skill-tree/artifacts/catalog-pets-r001/previews/catalog-overview.png",
+      "sha256": "211f4a035639b412be929ddfc7aaf217b6cb2e9454221f50aabe97634386d942"
+    },
+    "native_baseline_comparison": {
+      "path": ".skill-tree/history/validation/3d-creature-reference/native/comparisons/r003/unity-verification.json",
+      "sha256": "d6c5d40a8ddd4f5259c868041ebadff12cc6ff5a173389deabc42b9c3d0c56ce"
+    }
+  }
+}

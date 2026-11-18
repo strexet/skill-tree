@@ -1,0 +1,40 @@
+{
+  "accepted_fish_entries": [
+    "base.reference-led-fish-longfin@r004",
+    "base.reference-led-fish-roundfin@r004"
+  ],
+  "accepted_fish_inventory": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/catalog/fish-r004-accepted/inventory.json",
+    "sha256": "00d773bbe825c9494a12e66ae53ebb1664a7d9b9685a9db4bc024a2457741d5f"
+  },
+  "accepted_pet_entries": {
+    "base.reference-led-cat@r017": "accepted",
+    "base.reference-led-dog@r017": "accepted"
+  },
+  "accepted_pet_inventory": {
+    "path": ".skill-tree/artifacts/catalog-pets-r001/catalog/accepted-r017/inventory.json",
+    "sha256": "80454ba5f1a7f4bc2b447b2438f5d7cf3f700e444e44d915b0d013b6acb7633c"
+  },
+  "before_after_packet": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/native/comparisons/r003/unity-verification.json",
+    "sha256": "d6c5d40a8ddd4f5259c868041ebadff12cc6ff5a173389deabc42b9c3d0c56ce"
+  },
+  "exact_catalog_reuse": [
+    "base.reference-led-cat@r017",
+    "base.reference-led-dog@r017",
+    "base.reference-led-fish-longfin@r004",
+    "base.reference-led-fish-roundfin@r004"
+  ],
+  "guide_verification": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/reference/r004/pose-guides/guide-verification.json",
+    "sha256": "84c9eac37c16659d7e66c2f62b97a17c1d7f5b49619fb0ddebec3060f33a003e"
+  },
+  "measured_reference_handoff": {
+    "path": ".skill-tree/examples/3d/recipes/character/creatures/readme.md",
+    "sha256": "68cd519a8f4b5d8f3c75e96e2d487c2aface1beb247ff592510068f81a28f82c"
+  },
+  "schema": 1,
+  "scope": "Project-local catalog reuse within the recorded Unity profiles.",
+  "status": "passed",
+  "task_id": "T-fc3d6c8e-fffb-49d8-b71b-d617c01eac94"
+}
