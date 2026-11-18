@@ -1,0 +1,44 @@
+{
+  "accepted_at_utc": "2026-11-13T07:05:05.897555+00:00",
+  "accepted_catalog": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/catalog/fish-r004-accepted/inventory.json",
+    "sha256": "00d773bbe825c9494a12e66ae53ebb1664a7d9b9685a9db4bc024a2457741d5f"
+  },
+  "accepted_ids": [
+    "base.reference-led-fish-longfin@r004",
+    "base.reference-led-fish-roundfin@r004"
+  ],
+  "catalog_search": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/catalog/fish-r004-accepted/search-result.json",
+    "sha256": "15fbfcf9d3f277601f3fa8bfeefcc28fb05668b208f43a4f91a4ba79508ffb3e"
+  },
+  "catalog_view": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/catalog/fish-r004-accepted/view.html",
+    "sha256": "1ec7fe9db416eb7d01bef877062e0776b6dfc71c372939f8caaf1d885396e034"
+  },
+  "distribution_query_action": "search",
+  "native": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/native/comparisons/r003/unity-verification.json",
+    "sha256": "d6c5d40a8ddd4f5259c868041ebadff12cc6ff5a173389deabc42b9c3d0c56ce"
+  },
+  "origin": "actual",
+  "original_catalog": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/catalog/r003/inventory.json",
+    "sha256": "1137d09d746b6274928778e5a74f919b68e9dda22e96db14f3efa2021ab1c177"
+  },
+  "owner_decision": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/review/r003/owner-decision.json",
+    "sha256": "d626d51e8f9cc7f176dae1f15805df3bf49593871e3d226e8624664893d58c63"
+  },
+  "owner_requested_revision": [
+    "cat",
+    "dog"
+  ],
+  "review_packet": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/review/r003/visual-review-packet.json",
+    "sha256": "eb305c3e012d324d6cbc00e59ab945623b8a722e77841cef603b465c1c14ef68"
+  },
+  "schema": 1,
+  "scope": "Owner-approved original fish FBX bytes. Reuse is qualified for the existing local Unity sandbox profile.",
+  "status": "passed"
+}

@@ -1,0 +1,16 @@
+{
+  "exit_code": 0,
+  "input_sha256": "b13a747cbad37ad24b8047d13bb93173e3465834f1bcdbb174788a612843e7b5",
+  "observed_identity_sha256": "18c58276f6f9b4d75382c606e9807e6bc594bf8384367bf1b841855dce25e1a1",
+  "protected": {
+    "fixture_settings_sha256": "0f4c599f30bcf3785e86a4be811047840994723efcad7a3de4cb55665a5295e8",
+    "protected_reports": 6,
+    "protected_source_files": 97,
+    "runtime_verified": true,
+    "schema": 1,
+    "status": "passed"
+  },
+  "status": "Passed",
+  "test": "CatalogPawPlantTests.SampleCatalogPlants",
+  "test_source_sha256": "1c75569a86fa48203e76c062640ff8070f5beaa2e4b341853bee7776c7d6903e"
+}

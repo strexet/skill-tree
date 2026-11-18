@@ -1,0 +1,45 @@
+{
+  "approved_references": 4,
+  "approved_specimens": [
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/reference/r001/cat.png",
+      "sha256": "1c277a65fec9da9ad1cca30c154b243c62dccac3fff64051bf611eec562da423",
+      "specimen": "cat"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/reference/r001/dog.png",
+      "sha256": "994e193f12523dd594338044b5fdcf892bfd4daa86e06f8ed0201f18e9f68700",
+      "specimen": "dog"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/reference/r001/fish-longfin.png",
+      "sha256": "130018d1d6c5a17db73fa8d828279933b19d0ce1802f6927901c9ece8e1b5f93",
+      "specimen": "fish-longfin"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/reference/r001/fish-roundfin.png",
+      "sha256": "34016a5d91e8c9c38b426ce8b01ec6e6a8151e7c4cccc506fe5e150f88ff771f",
+      "specimen": "fish-roundfin"
+    }
+  ],
+  "guide_verification": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/reference/r004/pose-guides/guide-verification.json",
+    "sha256": "84c9eac37c16659d7e66c2f62b97a17c1d7f5b49619fb0ddebec3060f33a003e"
+  },
+  "later_pet_approval": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/reference/r004/neutral-reference-approval.json",
+    "sha256": "0a8be023d105da0e366b0cea50abc4753167aeb454ba8fb329c6267f0fe35a80"
+  },
+  "original_packet": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/reference/r001/reference-packet.json",
+    "sha256": "9809b387a41a23b1edb21ded559b51504d4650c17dba51377a8b3eb1f0838c57"
+  },
+  "original_reference_revision": "r001",
+  "pre_model_chronology": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/reference-verification.json",
+    "sha256": "1e12aee584fa3471fa3c777289ec3503e45d3090faab5a3be06f6cfdf7d15d42"
+  },
+  "schema": 1,
+  "status": "passed",
+  "task_id": "T-fc3d6c8e-fffb-49d8-b71b-d617c01eac94"
+}

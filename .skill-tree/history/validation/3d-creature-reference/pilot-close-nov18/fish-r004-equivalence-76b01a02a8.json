@@ -1,0 +1,46 @@
+{
+  "current_fixture_preflight": {
+    "path": ".skill-tree/history/validation/3d-stage-workflow/native-qualification-nov18/isolation-preflight.json",
+    "sha256": "f2b9beecc6681e73b37b7c7bc0a110c49d96e3606e4653282203b68345196a6a"
+  },
+  "current_fixture_sha256": "099858446923339f1531ba00a6050fbd392ea309bb4082ea2510fab6e8eea8f6",
+  "current_profile_identity": "76b01a02a83895af324916bbbda208e89847c9e5f0bea5ba2c014a659b348b1d",
+  "editor_sha256": "0f26afd3390d7f1d4c7d637d09fecf51ef592b6bc84f9fa87da9e6746d071739",
+  "fixture_sources": {
+    "Assets/SkillTreeCreatureFixture/Input/fish-longfin.fbx": "19688ef23f023bc9815fabdf02ceaf36bd83d0e90067f93e5bc5b4eaa6136e14",
+    "Assets/SkillTreeCreatureFixture/Input/fish-roundfin.fbx": "d774b3ad1b486669d00bdd44a102a974ff98d5108d5b394842334ab1afc3737b",
+    "Assets/SkillTreeCreatureFixture/editmode/creature-editmode.asmdef": "4fda86780cf787e095937a2f3941d9a03ae1b3ff2aad9a88b35676d55ddccc64",
+    "Assets/SkillTreeCreatureFixture/editmode/creature-import-tests.cs": "ac02211dca89259eb1f5a53800bd4ec4c9fec38496b613970244d04046044799",
+    "Assets/SkillTreeCreatureFixture/playmode/creature-motion-tests.cs": "5840793e8431297a918c5bee9e0c2b396f109155704375a529ed609a43eb6801",
+    "Assets/SkillTreeCreatureFixture/playmode/creature-playmode.asmdef": "cad280da741c762ecbf5f8ed56c3abc18dff67fcd56d39a55eea7ca199fb722a",
+    "Assets/SkillTreeCreatureFixture/shared/creature-contract.cs": "0aa9cc7a216bfa15aad0950655f71e3bbf7510b3c173e4caa92b3b88ba94d936",
+    "Assets/SkillTreeCreatureFixture/shared/creature-fixture.asmdef": "fc34b0a8c9b268877f83c2b7735a50de3016d579411324f9d0a99c964fad6a6d"
+  },
+  "historical_fixture_identity": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/native/fish/r004/identity.json",
+    "sha256": "054b03fc2f8929d9142de09dc45e26f33098544091589c45bd1b5c50c38d41df"
+  },
+  "historical_profile_identity": "365ea22326971ac8a4d6ae50bd37ae1f0dff1db63c719a6d0c1e0c88ce2085cd",
+  "manifest_sha256": "28c2d41ae2506f3d5576cc66a048d26ae6124b0267a8714585f7a35cb03c07a1",
+  "method": "Archived exact native results verified by source equivalence within the current owned validation session. No native test was launched for this replay.",
+  "model_import": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/native/fish/r004/editmode/import.json",
+    "sha256": "f9cab4ce3024484d005d92b2fbe68d2184e1cc0cd23d590204b7bc63b2b5fe50"
+  },
+  "model_sha256": {
+    "fish-longfin": "19688ef23f023bc9815fabdf02ceaf36bd83d0e90067f93e5bc5b4eaa6136e14",
+    "fish-roundfin": "d774b3ad1b486669d00bdd44a102a974ff98d5108d5b394842334ab1afc3737b"
+  },
+  "packages_lock_sha256": "a517f072ea38327611b57a4c71beea158fb11cb2f8c4e16772cd43d2b8a5ec8d",
+  "schema": 1,
+  "source_unchanged_after_native_preflight": {
+    "fixture_settings_sha256": "3fe0ef22d6c10586d9778725828efa8eb63d5d72c5229ab5a355a55c85ed0918",
+    "protected_reports": 6,
+    "protected_source_files": 384,
+    "runtime_verified": true,
+    "schema": 1,
+    "status": "passed"
+  },
+  "status": "passed",
+  "task_id": "T-fc3d6c8e-fffb-49d8-b71b-d617c01eac94"
+}

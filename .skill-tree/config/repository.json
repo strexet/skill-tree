@@ -46,6 +46,22 @@
       ],
       "input_paths": []
     },
+    "creature-catalog-native-receipts": {
+      "lane": "native",
+      "argv": [
+        "python3",
+        ".skill-tree/examples/3d/recipes/character/creatures/verify-catalog-pilot.py",
+        "--project",
+        "{project_root}",
+        "--queue",
+        "{queue_root}",
+        "--control",
+        "{control}"
+      ],
+      "input_paths": [
+        ".skill-tree/examples/3d/recipes/character/creatures/verify-catalog-pilot.py"
+      ]
+    },
     "narrative-ink-replay": {
       "lane": "integration",
       "argv": ["bash", ".skill-tree/examples/narrative/run-paths.sh"],

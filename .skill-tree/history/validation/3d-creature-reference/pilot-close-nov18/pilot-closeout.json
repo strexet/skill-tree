@@ -1,0 +1,453 @@
+{
+  "accepted_catalog_entries": [
+    "base.reference-led-cat@r017",
+    "base.reference-led-dog@r017",
+    "base.reference-led-fish-longfin@r004",
+    "base.reference-led-fish-roundfin@r004"
+  ],
+  "archive_scope": "The canonical controller journal, ignored Unity catalog files, raw editor logs and archived fish fixtures remain in the local execution workspaces. Hash-pinned original observations remain available there.",
+  "checks": [
+    {
+      "actual_lane": "static",
+      "attempt_id": "C-8b555765-4855-4af3-ad97-4e6f419b0a26",
+      "criteria": [
+        "The owner approves the exact four displayed species and variant references before any Blender blockout or model revision."
+      ],
+      "id": "creature-reference-approval",
+      "package_evidence": [
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/reference-reconciliation.json",
+          "sha256": "c3267509096e389dc22557e302eae163239d0ff1bf3bb823dfc8343b64915f8a"
+        }
+      ],
+      "recipe_id": "static-inspection",
+      "result": "pass",
+      "retained_evidence": [
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/reference-verification.json",
+          "sha256": "1e12aee584fa3471fa3c777289ec3503e45d3090faab5a3be06f6cfdf7d15d42"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/reference/r001/owner-approval.json",
+          "sha256": "e43b1e54460246432932823deeb2892a58ca321e25e028ab163a45745240f4e3"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/reference/r002/owner-approval.json",
+          "sha256": "7be76684ef7a3b8e164daa20be69f1418a0ffb67acee3a73e1a14314663f1058"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/reference/r004/neutral-reference-approval.json",
+          "sha256": "0a8be023d105da0e366b0cea50abc4753167aeb454ba8fb329c6267f0fe35a80"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/reference/r004/pose-guides/guide-verification.json",
+          "sha256": "84c9eac37c16659d7e66c2f62b97a17c1d7f5b49619fb0ddebec3060f33a003e"
+        }
+      ]
+    },
+    {
+      "actual_lane": "static",
+      "attempt_id": "C-a66f654c-3c44-452b-b2ec-7f1f8b2cdb9c",
+      "criteria": [
+        "The revised cat, dog and both fish match the approved design with recognizable silhouettes and plausible proportions. The cat and dog have fuller upper limbs. The cat has a longer curved tail. Both fish have a tapered caudal junction without a visible body and fin intersection."
+      ],
+      "id": "creature-anatomy-review",
+      "package_evidence": [
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/anatomy-metrics.json",
+          "sha256": "3f833fa7dd5dbd343ef81a81f87b0df713d15b669f2e680e767926cf8a1f4abf"
+        }
+      ],
+      "recipe_id": "static-inspection",
+      "result": "pass",
+      "retained_evidence": [
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/measure-cat-tail.py",
+          "sha256": "0fd0689f7d0079cbdc1651792883c6b8b59084318ad760897459247c735d9926"
+        },
+        {
+          "path": ".skill-tree/artifacts/catalog-pets-r001/previews/catalog-overview.png",
+          "sha256": "211f4a035639b412be929ddfc7aaf217b6cb2e9454221f50aabe97634386d942"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/geometry/fish/geometry-verification.json",
+          "sha256": "57bf8cb8dca39167ddc350a01922f9eb4e680e84314ebc3d9e5e402ebaf6efd7"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/native/comparisons/r003/unity-verification.json",
+          "sha256": "d6c5d40a8ddd4f5259c868041ebadff12cc6ff5a173389deabc42b9c3d0c56ce"
+        },
+        {
+          "path": ".skill-tree/artifacts/catalog-pets-r001/evidence/independent-visual-review.json",
+          "sha256": "2ac252a3791f8dec10d7db53aceb621d3bcde0fe33fb1decf7b13c7d0caf8986"
+        },
+        {
+          "path": ".skill-tree/artifacts/catalog-pets-r001/evidence/playmode-urp.xml",
+          "sha256": "2c9595ce6baba167fcd234082d3b081caf4d7cefe0050eeeb3a99570b47b5e94"
+        }
+      ]
+    },
+    {
+      "actual_lane": "static",
+      "attempt_id": "C-b4c4baef-17fd-472f-9d0d-e18b73de212b",
+      "criteria": [
+        "The reusable animal route requires approved concept and measured references before modeling. The chosen reference sheets and visually approved model revisions become traceable catalog examples."
+      ],
+      "id": "creature-reuse-package",
+      "package_evidence": [
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/catalog-reconciliation.json",
+          "sha256": "0509532d05b562ba437778596b22dbc61b2a989939f5ae8eea9584748fba9ab7"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-owner-acceptance.json",
+          "sha256": "94d2fa7d514a394986696e860c95da5b7281e1d3408e20d23da5c038839faff3"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/catalog/fish-r004-accepted/acceptance-verification.json",
+          "sha256": "5e9164ca36e50f0bd8a9b985ea4eda146eee025f40aec9513e44ae127207c7e0"
+        }
+      ],
+      "recipe_id": "static-inspection",
+      "result": "pass",
+      "retained_evidence": [
+        {
+          "path": ".skill-tree/examples/3d/recipes/character/creatures/readme.md",
+          "sha256": "68cd519a8f4b5d8f3c75e96e2d487c2aface1beb247ff592510068f81a28f82c"
+        },
+        {
+          "path": ".skill-tree/common/references/3d-authoring-roles.md",
+          "sha256": "7b5b7904c6143d7815747563430ed2656e610f1bf7089501f111ceceadaa4eef"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/reference/r004/pose-guides/guide-verification.json",
+          "sha256": "84c9eac37c16659d7e66c2f62b97a17c1d7f5b49619fb0ddebec3060f33a003e"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/native/comparisons/r003/unity-verification.json",
+          "sha256": "d6c5d40a8ddd4f5259c868041ebadff12cc6ff5a173389deabc42b9c3d0c56ce"
+        }
+      ]
+    },
+    {
+      "actual_lane": "native",
+      "attempt_id": "C-0a6f0610-c4dd-4df3-aaa7-6e935ef83b23",
+      "criteria": [
+        "The revised cat and dog import with valid Generic rigs and stable prefab and clip references across forced reimport."
+      ],
+      "id": "pet-revision-import",
+      "package_evidence": [
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pet-import-native-verdict.json",
+          "sha256": "cb5857558c3bd5efdd22843dc5a173f5ba8d48602488c80ac1ada7bbd827d90b"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/catalog-native-identity.json",
+          "sha256": "690d5f77e650b70b15918b03b3640328698654e427165177b1a52c78f227e93f"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-owner-acceptance.json",
+          "sha256": "94d2fa7d514a394986696e860c95da5b7281e1d3408e20d23da5c038839faff3"
+        }
+      ],
+      "recipe_id": "creature-catalog-native-receipts",
+      "result": "pass",
+      "retained_evidence": [
+        {
+          "path": ".skill-tree/artifacts/catalog-pets-r001/evidence/cat-editmode.json",
+          "sha256": "680b50c9510912910d92318a03dc5530e3e46fedc3f84c65052f6545d4d259c0"
+        },
+        {
+          "path": ".skill-tree/artifacts/catalog-pets-r001/evidence/dog-editmode.json",
+          "sha256": "3ea87e4e2b9980436759ce7309b54d1bd5c8a267038a292f424ff251ee7e4f21"
+        }
+      ]
+    },
+    {
+      "actual_lane": "native",
+      "attempt_id": "C-60ce2367-f227-44cf-80a2-bc8fee9d237d",
+      "criteria": [
+        "The revised cat and dog retain the four clips, planted paw contacts and both skinned LODs in Unity."
+      ],
+      "id": "pet-revision-motion",
+      "package_evidence": [
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pet-motion-native-verdict.json",
+          "sha256": "9f12951aa7ccc709f618bed81130058107dbba7a71af692888e445ace2eb17c7"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/catalog-native-identity.json",
+          "sha256": "690d5f77e650b70b15918b03b3640328698654e427165177b1a52c78f227e93f"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-owner-acceptance.json",
+          "sha256": "94d2fa7d514a394986696e860c95da5b7281e1d3408e20d23da5c038839faff3"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/placement-reconciliation.json",
+          "sha256": "88217113f903aede643a8dc34bd4844797e937bf2a5850b3d4bd8db735a8c304"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/paw-1-samples.csv",
+          "sha256": "48c030fd7d8304e07f5e64af16b7e8598fe45ddd663f975bbc7d3f0ca647b527"
+        }
+      ],
+      "recipe_id": "creature-catalog-native-receipts",
+      "result": "pass",
+      "retained_evidence": [
+        {
+          "path": ".skill-tree/artifacts/catalog-pets-r001/evidence/cat-editmode.json",
+          "sha256": "680b50c9510912910d92318a03dc5530e3e46fedc3f84c65052f6545d4d259c0"
+        },
+        {
+          "path": ".skill-tree/artifacts/catalog-pets-r001/evidence/dog-editmode.json",
+          "sha256": "3ea87e4e2b9980436759ce7309b54d1bd5c8a267038a292f424ff251ee7e4f21"
+        },
+        {
+          "path": ".skill-tree/artifacts/catalog-pets-r001/evidence/playmode-urp.xml",
+          "sha256": "2c9595ce6baba167fcd234082d3b081caf4d7cefe0050eeeb3a99570b47b5e94"
+        },
+        {
+          "path": ".skill-tree/artifacts/catalog-pets-r001/evidence/unity-playmode-receipt.json",
+          "sha256": "31edcd3aa21ee2cddb903b050435fe428a8736b01bf671eb08ef827ea7761bcb"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/paw-1.xml",
+          "sha256": "4087d56b733f711b0a3cf07394fea7c5c29e14d6f5fecfd9c32322e8c8b6881a"
+        }
+      ]
+    },
+    {
+      "actual_lane": "unity-editmode",
+      "attempt_id": "C-193f38c8-c5b8-4e6f-8209-2b33cbde65e3",
+      "criteria": [
+        "The revised longfin and roundfin fish import with valid Generic rigs and stable prefab and clip references across forced reimport."
+      ],
+      "id": "fish-revision-import",
+      "package_evidence": [
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/fish-r004-equivalence-76b01a02a8.json",
+          "sha256": "eef1603f2a373b6f37c9a83abb21482b1cf630b1e703708ebb1c3e110d8898f2"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/catalog/fish-r004-accepted/acceptance-verification.json",
+          "sha256": "5e9164ca36e50f0bd8a9b985ea4eda146eee025f40aec9513e44ae127207c7e0"
+        }
+      ],
+      "recipe_id": "creature-fish-unity-editmode",
+      "result": "pass",
+      "retained_evidence": [
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/native/fish/r004/editmode/native-result.json",
+          "sha256": "119ddfe66288c1c3b26c40e7b21101747e8a2ff5e7f5714c009ddbd2d4f154aa"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/native/fish/r004/editmode/nunit.xml",
+          "sha256": "bd73ca062e33d21033785b933606eb62f3949443e0a30fbbd9df9695e16dc732"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/native/fish/r004/editmode/private-nunit.xml",
+          "sha256": "bd73ca062e33d21033785b933606eb62f3949443e0a30fbbd9df9695e16dc732"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/native/fish/r004/editmode/import.json",
+          "sha256": "f9cab4ce3024484d005d92b2fbe68d2184e1cc0cd23d590204b7bc63b2b5fe50"
+        }
+      ]
+    },
+    {
+      "actual_lane": "unity-playmode",
+      "attempt_id": "C-41e7da96-c8ba-4d63-95fa-9a37fd2079a8",
+      "criteria": [
+        "Both revised fish retain continuous swim and turn animation with tail and fin motion, contained renderer bounds and correct camera edge visibility."
+      ],
+      "id": "fish-revision-motion",
+      "package_evidence": [
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/fish-r004-equivalence-76b01a02a8.json",
+          "sha256": "eef1603f2a373b6f37c9a83abb21482b1cf630b1e703708ebb1c3e110d8898f2"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/catalog/fish-r004-accepted/acceptance-verification.json",
+          "sha256": "5e9164ca36e50f0bd8a9b985ea4eda146eee025f40aec9513e44ae127207c7e0"
+        }
+      ],
+      "recipe_id": "creature-fish-unity-playmode",
+      "result": "pass",
+      "retained_evidence": [
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/native/fish/r004/playmode/native-result.json",
+          "sha256": "6df7809c7737521709e73f29826c335318fd00bccb39f5327ce39ac33de73bdd"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/native/fish/r004/playmode/nunit.xml",
+          "sha256": "1fcb330fd1b45d390a0f0b57d3a3c8f6bcc64f5b430923245e3d4e419a579613"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/native/fish/r004/playmode/private-nunit.xml",
+          "sha256": "1fcb330fd1b45d390a0f0b57d3a3c8f6bcc64f5b430923245e3d4e419a579613"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/native/fish/r004/playmode/fish-longfin/motion-receipt.json",
+          "sha256": "5b8cf01624183ebcf22488818174787a4587bfe339ab73846880c0db424d9eb9"
+        },
+        {
+          "path": ".skill-tree/history/validation/3d-creature-reference/native/fish/r004/playmode/fish-roundfin/motion-receipt.json",
+          "sha256": "f96920db1a8b7891958b512d7bedc8b4df242b2ad603244fcb8cd96050dbeede"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "outcome_id": "O-c247e578-e748-4cc4-8c73-97834d87b096",
+      "result": "completed",
+      "task_id": "T-70fc3f8b-3bbf-4bcf-b40d-c1c033f5e037"
+    },
+    {
+      "outcome_id": "O-3f31387b-5d82-47b8-a293-f5fe6e37f45a",
+      "result": "completed",
+      "task_id": "T-a5526d30-808b-46d1-a690-e3bb7f150cf6"
+    },
+    {
+      "outcome_id": "O-16347dc2-5362-4b88-9aaa-d8dce52895f3",
+      "result": "completed",
+      "task_id": "T-d617a439-6e69-4390-a5a2-4b302a56b28d"
+    },
+    {
+      "outcome_id": "O-b8ebb665-94b9-4792-b837-79ebe4bf504c",
+      "result": "completed",
+      "task_id": "T-2545723f-cb87-4782-b94d-7df7f5b4f138"
+    },
+    {
+      "outcome_id": "O-31e8c364-a083-42f5-9b16-d8e6a32e8ee1",
+      "result": "completed",
+      "task_id": "T-d8c802e0-ac74-4411-bb5a-9e97cfc93bed"
+    }
+  ],
+  "kind": "creature-pilot-closeout",
+  "limitations": [
+    "Catalog use is local to the recorded Unity Editor profiles.",
+    "The r017 contact check qualifies raw steady Walk and Trot states for both skinned LODs with prescribed forward travel. The runtime prefab exposes in-place states.",
+    "The supplementary dog Gallop LOD1 right forepaw reached 2.37 mm above the floor against the separate 2.0 mm comparison threshold. The required Walk and Trot checks satisfied both the original and comparison budgets."
+  ],
+  "native_samples": 4736,
+  "original_source_fingerprints": [
+    {
+      "path": ".skill-tree/config/repository.json",
+      "sha256": "12b75acc530648726d53058c94df0be77e3215fd5de1f15e17086c88d68b00a7"
+    },
+    {
+      "path": ".skill-tree/examples/3d/recipes/character/creatures/verify-catalog-pilot.py",
+      "sha256": "bb2c9a92db019b9b5f37b8b9fbec236faf2713e7c4afd9b0bf0faefabbb97ec4"
+    }
+  ],
+  "outcome": "The reference-led creature pilot qualifies the accepted cat and dog r017 and both accepted fish r004 for local catalog reuse. Exact model provenance, anatomy, native import and motion are verified.",
+  "outcome_id": "O-a0cdbf01-c143-4b79-ab35-a03efb207482",
+  "package_files": [
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/catalog-pets-r017-acceptance.json",
+      "sha256": "94d2fa7d514a394986696e860c95da5b7281e1d3408e20d23da5c038839faff3"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/catalog/fish-r004-accepted/acceptance-verification.json",
+      "sha256": "5e9164ca36e50f0bd8a9b985ea4eda146eee025f40aec9513e44ae127207c7e0"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/anatomy-metrics.json",
+      "sha256": "3f833fa7dd5dbd343ef81a81f87b0df713d15b669f2e680e767926cf8a1f4abf"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/reference-reconciliation.json",
+      "sha256": "c3267509096e389dc22557e302eae163239d0ff1bf3bb823dfc8343b64915f8a"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/catalog-reconciliation.json",
+      "sha256": "0509532d05b562ba437778596b22dbc61b2a989939f5ae8eea9584748fba9ab7"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/catalog-native-identity.json",
+      "sha256": "690d5f77e650b70b15918b03b3640328698654e427165177b1a52c78f227e93f"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pet-import-native-verdict.json",
+      "sha256": "cb5857558c3bd5efdd22843dc5a173f5ba8d48602488c80ac1ada7bbd827d90b"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pet-motion-native-verdict.json",
+      "sha256": "9f12951aa7ccc709f618bed81130058107dbba7a71af692888e445ace2eb17c7"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-owner-acceptance.json",
+      "sha256": "94d2fa7d514a394986696e860c95da5b7281e1d3408e20d23da5c038839faff3"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/fish-r004-equivalence-76b01a02a8.json",
+      "sha256": "eef1603f2a373b6f37c9a83abb21482b1cf630b1e703708ebb1c3e110d8898f2"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/workflow-3d-packaging-current.log",
+      "sha256": "21c96ae72be110f648e02682d10542e5b2256c0b5925a0d61331c0303f09fc47"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/placement-reconciliation.json",
+      "sha256": "88217113f903aede643a8dc34bd4844797e937bf2a5850b3d4bd8db735a8c304"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/paw-1-samples.csv",
+      "sha256": "48c030fd7d8304e07f5e64af16b7e8598fe45ddd663f975bbc7d3f0ca647b527"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/catalog-paw-plant-tests.cs",
+      "sha256": "1c75569a86fa48203e76c062640ff8070f5beaa2e4b341853bee7776c7d6903e"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/paw-1-native.json",
+      "sha256": "79c0283ff624f4a3a27bae22284fcfaa4ba5b9e1199383e8a893b432a8d1ea34"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/paw-1-process.json",
+      "sha256": "3f4000bfaec8c8640ad9e9df18527d94add4f66188b3b4d69df3e2aaec79270e"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/isolation-verified.json",
+      "sha256": "6cfbe6f76c48029864d60e8b899004d5d7ebb02221926645358f7b64576ba621"
+    },
+    {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/paw-coverage.json",
+      "sha256": "e82e14df42a0072f366933957b0e903415717a99bd60606ebbb250215aa42e1e"
+    }
+  ],
+  "recorded_at": "2026-11-18T12:10:11.168803+00:00",
+  "repository_validation": {
+    "focused_blender_deadline": "passed",
+    "full_python": "interrupted after a Blender worker deadline failure during the concurrent run",
+    "node_passed": 380,
+    "strict": "passed"
+  },
+  "required_paw_contacts": {
+    "cat": {
+      "maximum_absolute_height_mm": 1.88056508,
+      "maximum_slide_mm": 1.1196366687178954,
+      "required_cases": 16
+    },
+    "dog": {
+      "maximum_absolute_height_mm": 0.64674957,
+      "maximum_slide_mm": 1.3675223259785063,
+      "required_cases": 16
+    }
+  },
+  "result": "completed",
+  "retained_native_request": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/paw-request.json",
+    "sha256": "b13a747cbad37ad24b8047d13bb93173e3465834f1bcdbb174788a612843e7b5"
+  },
+  "run_id": "WR-d4e3f8f1-a6d7-4e3e-baf6-e0de6b0cd3a4",
+  "run_receipt": {
+    "path": ".skill-tree/history/runs/run-wr-d4e3f8f1-a6d7-4e3e-baf6-e0de6b0cd3a4.json",
+    "sha256": "aea3daec7d4ae961e8bf088fc43c976640497d8194a9ff42bec83100a003078d"
+  },
+  "schema": 1,
+  "task_id": "T-fc3d6c8e-fffb-49d8-b71b-d617c01eac94",
+  "terminal_outcome_sha256": "bfdd307963c656c9ff459d620844a4daa4c5c48b0919a44d9fae95baab2ea94a"
+}

@@ -1,0 +1,105 @@
+{
+  "accepted_catalog": {
+    "path": ".skill-tree/artifacts/catalog-pets-r001/catalog/accepted-r017/inventory.json",
+    "sha256": "80454ba5f1a7f4bc2b447b2438f5d7cf3f700e444e44d915b0d013b6acb7633c"
+  },
+  "catalog_search": {
+    "path": ".skill-tree/artifacts/catalog-pets-r001/catalog/accepted-r017/search-result.json",
+    "sha256": "78d7a6da709433651d4aa0c3362ff3153ef6b2e4a76dc73a51d6404c0f855e3f"
+  },
+  "evidence_root": "creature-pilot worktree",
+  "kind": "creature-catalog-acceptance",
+  "model_candidates": [
+    {
+      "blender": {
+        "path": ".skill-tree/artifacts/catalog-pets-r001/sources/cat-motion.blend",
+        "sha256": "b0fe44224163830cf87356f6b447f281d7c29662ffa4662235ee2aed06e333af"
+      },
+      "entry": "base.reference-led-cat@r017",
+      "lod_triangles": [
+        518880,
+        87038
+      ],
+      "maximum_high_lod_body_error_mm": 0.008653586730360985,
+      "model_art_approval": "awaiting-owner",
+      "native_receipt": {
+        "path": ".skill-tree/artifacts/catalog-pets-r001/catalog/cat-technical.json",
+        "sha256": "8d8c8a126f6ee72e84f40d45ef11b24ad97382cec05e6c3d6610bac3ef921804"
+      },
+      "prefab": {
+        "path": ".skill-tree/artifacts/catalog-pets-r001/unity/Assets/Resources/Pets/cat.prefab",
+        "sha256": "79ac0ee915210a7f4cab599f96edb45e1c576ee79d59ab841c3a7667c4492d3d"
+      },
+      "preview": {
+        "path": ".skill-tree/artifacts/catalog-pets-r001/previews/cat.mp4",
+        "sha256": "c7644c6af89d025d6d7370dce4a45fb5a2320eb1e18c50eae74e3899ce5ee4a2"
+      },
+      "unity_model": {
+        "path": ".skill-tree/artifacts/catalog-pets-r001/unity/Assets/Pets/cat.fbx",
+        "sha256": "364cb8f7c0a8ecfc6732ff0ed070da1cbaedb8af1c876be0bd3bba9f2c72f5e4"
+      }
+    },
+    {
+      "blender": {
+        "path": ".skill-tree/artifacts/catalog-pets-r001/sources/dog-gallop.blend",
+        "sha256": "05483033ac0c05aec34f23e7c2ba231a51f3c497dfd21f4aa60d4d8f82d41ce4"
+      },
+      "entry": "base.reference-led-dog@r017",
+      "lod_triangles": [
+        941514,
+        155864
+      ],
+      "maximum_high_lod_body_error_mm": 0.008661672472953796,
+      "model_art_approval": "awaiting-owner",
+      "native_receipt": {
+        "path": ".skill-tree/artifacts/catalog-pets-r001/catalog/dog-technical.json",
+        "sha256": "7329a5973b42e3de597bb9d92e346b5bc82334749e52c761887010005a980a3a"
+      },
+      "prefab": {
+        "path": ".skill-tree/artifacts/catalog-pets-r001/unity/Assets/Resources/Pets/dog.prefab",
+        "sha256": "2c305bce7e8ddd0c417d89b57001cf202768469c0e7bed5d9fc453e176ef6680"
+      },
+      "preview": {
+        "path": ".skill-tree/artifacts/catalog-pets-r001/previews/dog.mp4",
+        "sha256": "2590fc351273f37b59f61a4f4126d9fd0bee9d53d7aa4e158d8157e85d4733cd"
+      },
+      "unity_model": {
+        "path": ".skill-tree/artifacts/catalog-pets-r001/unity/Assets/Pets/dog.fbx",
+        "sha256": "6849a4cfe8f6eec1b10c3f9076c29841843a819ce633a24094808f32b3a9a157"
+      }
+    }
+  ],
+  "native_playmode_result": {
+    "passed": 2,
+    "report": {
+      "path": ".skill-tree/artifacts/catalog-pets-r001/evidence/playmode-urp.xml",
+      "sha256": "2c9595ce6baba167fcd234082d3b081caf4d7cefe0050eeeb3a99570b47b5e94"
+    }
+  },
+  "owner_decision": {
+    "entries": {
+      "base.reference-led-cat@r017": "accepted",
+      "base.reference-led-dog@r017": "accepted"
+    },
+    "kind": "explicit-chat-approval",
+    "quote": "Утверждаю кота и собаку r017 для каталога."
+  },
+  "profile": "profile.creature-catalog-unity-pc@r001",
+  "review_packet": {
+    "path": ".skill-tree/artifacts/catalog-pets-r001/review-packet.json",
+    "sha256": "4719b2f1bb0ee0fcca5f93e314b53792a1701e1b12768d2deece0cec41b0535f"
+  },
+  "rights": {
+    "raw_distribution": "unknown",
+    "team_transfer": "unknown"
+  },
+  "run_id": "WR-d4e3f8f1-a6d7-4e3e-baf6-e0de6b0cd3a4",
+  "schema": 1,
+  "scope": "Project-local catalog reuse for the recorded Unity Editor URP PC profile.",
+  "search_results": {
+    "base.reference-led-cat@r017": "use",
+    "base.reference-led-dog@r017": "use"
+  },
+  "status": "accepted",
+  "task_id": "T-fc3d6c8e-fffb-49d8-b71b-d617c01eac94"
+}
