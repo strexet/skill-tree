@@ -50,3 +50,66 @@ test('installed controller starts and resumes the same worktree with a canonical
  run(process.execPath,[path.join(working,'.skill-tree/installation/manager.js'),'--refresh-profile']);
  const after=JSON.parse(fs.readFileSync(path.join(root,'.skill-tree/documents/future.json')));assert.deepEqual(after,before);
 });
+
+test('installed implementation operations select scoped commits and local controller defaults', t => {
+ const base=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-local-git-policy-'));
+ t.after(()=>fs.rmSync(base,{recursive:true,force:true}));
+ const root=path.join(base,'queue');
+ fs.mkdirSync(root);
+ const git=(...args)=>run('git',['-C',root,...args]).trim();
+ git('init','-b','launch');
+ git('config','user.name','Fixture');
+ git('config','user.email','fixture@example.invalid');
+ write(root,'package.json',{scripts:{test:'node --test'}});
+ write(root,'source.py','value = 1\n');
+ write(root,'.skill-tree/documents/future.md','# Future Work\n\n## Pending Task Format\n\n## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n');
+ git('add','.');
+ git('commit','-m','Local Git policy fixture');
+ const launch=git('rev-parse','HEAD');
+ git('config','commit.gpgSign','false');
+ const names=['skill-tree-implement-next-future-task','skill-tree-work-through-next','skill-tree-implement-all'];
+ run(process.execPath,[cli,'--target',root,'--only','codex','--flavor','general','--skills',...names]);
+ let step=0;
+ function command(index,action,payload=null,extra=[]) {
+  const helper=path.join(root,'.agents/skills',names[index],'scripts/workflow-state.py');
+  const argv=[helper,action,root,...extra];
+  if(payload){
+   const input=path.join(base,`request-${step++}.json`);
+   fs.writeFileSync(input,JSON.stringify(payload));
+   argv.push('--input',input);
+  }
+  return JSON.parse(run('python3',argv));
+ }
+ function task(title) {
+  const item=command(0,'intake',{title,description:'Verify the installed operation.',expected_behavior:'Preserve the selected scope.'});
+  const goal='Preserve the selected scope.';
+  const check={id:'scope',recipe_id:'static-inspection',criteria:[goal],sources:['source.py'],parameters:{},assertion:goal,timing:'immediate'};
+  const body='Goal:\n- '+goal+'\n\nTouch:\n- source.py\n\nValidation:\n```json\n'+JSON.stringify({checks:[check]})+'\n```\n\nAcceptance:\n- '+goal+'\n';
+  return command(0,'process',{selectors:[item.id],dispositions:{[item.id]:{status:'promoted',reason:'The disposable Git fixture establishes readiness.'}},
+   tasks:[{title,body,parent_pending_ids:[item.id]}]}).created_ids[0];
+ }
+ const leaf=task('Standalone commit task'), next=task('Reviewed next task'), all=task('Reviewed all task');
+ command(0,'workspace-setup',{});
+ function skillText(index) {
+  return fs.readFileSync(path.join(root,'.agents/skills',names[index],'SKILL.md'),'utf8');
+ }
+ assert.match(skillText(0),/implementation_operation: "implement-next"/);
+ assert.match(skillText(1),/implementation_operation: "work-through-next"/);
+ assert.match(skillText(1),/merge-reviewed/);
+ assert.match(skillText(2),/implementation_operation: "implement-all"/);
+ assert.match(skillText(2),/merge locally into the recorded launch branch/);
+
+ const review=command(1,'start',{implementation_operation:'work-through-next'},['--standalone','--id',next]);
+ const merge=command(2,'start',{implementation_operation:'implement-all',snapshot_ids:[all]},['--standalone','--mode','all']);
+ assert.equal(review.workspace.base_commit,launch);
+ assert.equal(merge.workspace.base_commit,launch);
+ assert.equal(review.reviewed_local_delivery.launch.ref,'refs/heads/launch');
+ assert.equal(review.reviewed_local_delivery.merge_at_finish,false);
+ assert.equal(merge.reviewed_local_delivery.merge_at_finish,true);
+ assert.notEqual(merge.workspace.branch,review.workspace.branch);
+ command(0,'begin',{task_id:leaf,implementation_operation:'implement-next'},['--standalone']);
+ write(root,'source.py','value = 2\n');
+ const sealed=command(0,'implemented',{task_id:leaf,changed_files:['source.py']},['--standalone']);
+ assert.equal(sealed.git_review_identity.head,launch);
+ assert.equal(git('rev-parse','HEAD'),launch);
+});

@@ -39,7 +39,11 @@ Advance returns implement or validate. Awaiting-validation units keep the specif
 Finish preserves implementation acceptance independently of delivery. Offer local result, PR review/fix, or PR review/fix with an explicit merge target. No offer starts publication. A recorded full-path owner instruction continues through the bundled [PR review cycle](pr-review-cycle.md) without repeated authorization questions. PR readiness, merge confirmation and publication blockers remain separate persisted outcomes.
 
 
-## Authorized local integration
+## Reviewed controller delivery
+
+Each accepted task has one scoped commit. The final controller frame reviews the complete committed diff against the recorded launch tip. Fix commits preserve accepted task history. Implement All performs the reviewed local merge. Work Through Next keeps the reviewed branch available and merges on explicit owner request.
+
+## Previously recorded local integration
 
 A recorded local-merge order completes implementation first and leaves delivery pending. The immutable implementation receipt freezes the reviewed committed source and current acceptance. The selected run owns one canonical target branch, a prepared pair of Git parents and the expected source tree. A local-result order without merge authority retains the ordinary implementation handoff.
 

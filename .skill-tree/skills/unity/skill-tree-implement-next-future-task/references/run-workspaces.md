@@ -8,7 +8,7 @@ Machine-local absolute checkout locators reside in the shared Git directory as `
 
 ## Start and resume
 
-`start --mode next` freezes one selected prioritized root and required dependency closure. `start --mode all` freezes the full initial prioritized snapshot or an explicit `snapshot_ids` group, together with required dependencies. One branch/worktree serves the entire admitted scope, including fixes and review iterations. A new run can coexist with unfinished runs; the new run defaults to the current remote `develop`, never the old run branch or dirty changes. The owner can specify `base_branch`, working `branch`, `branch_prefix` and machine-local `worktree`. The default branch prefix is `codex/`; explicit host/project prefixes override the default. Remote/base access failures and absent `develop` stop before source edits. An explicitly authorized local-only base records `local_base` and the owner rationale; local-only base use supplies no remote/publication authorization.
+`start --mode next` freezes one selected prioritized root and required dependency closure. `start --mode all` freezes the full initial prioritized snapshot or an explicit `snapshot_ids` group, together with required dependencies. One branch/worktree serves the entire admitted scope, including fixes and review iterations. A new run can coexist with unfinished runs. New standalone Work Through Next and Implement All runs capture the checked-out local launch branch and tip before reserving the run worktree. Pass `--standalone` and the corresponding `implementation_operation` value `work-through-next` or `implement-all` to `start`. The captured local tip includes local commits and excludes working-tree edits. Existing recorded operations and explicitly requested remote delivery retain the recorded base and publication routing. The owner can specify `base_branch`, working `branch`, `branch_prefix` and machine-local `worktree`. The default branch prefix is `codex/`; explicit host/project prefixes override the default. Remote/base access failures and absent `develop` stop before source edits. An explicitly authorized local-only base records `local_base` and the owner rationale; local-only base use supplies no remote/publication authorization.
 
 `runs` and `index` expose the registry without selecting an implementation. Resume commands accept `--run-id`; calls from a recorded worktree can resolve the unique matching run. Ambiguous canonical-checkout commands require an explicit run. Resume verifies the actual worktree, branch, repository, remote and unfinished Git operations. Dirty owned work remains progress to inspect and checkpoint; dirty publication preflight stops until scoped changes are committed safely. Different identities never trigger a silent restart.
 
@@ -36,23 +36,26 @@ Canonical mutations produce immutable per-run semantic events under `.skill-tree
 
 ## Completion and handoff
 
-`finish` preserves implementation acceptance and the run checkpoint. With no publication instruction, delivery ends as `local-result` and offers local result, PR review/fix, or PR review/fix with merge into an explicit target. An offer grants no permission. A recorded full-path instruction keeps delivery open as implementation completed, then PR/review in progress, PR ready or merged. Publication blockers preserve implementation completion. Resume reconciles existing PRs, operation keys and merged status before another write. Never announce the full order complete while a promised PR or merge remains unfulfilled.
+`finish` preserves implementation acceptance and the run checkpoint. For runs with recorded `reviewed_local_delivery`, use `controller-review` with the exact run ID after all scoped task commits pass. Review the whole committed diff against the returned base, using the returned identity and the exact controller decision-frame scope. Resolve findings, make scoped fix commits, revalidate affected checks and review the new head. Pass the current clean controller decision frame ID as `review_id` to `finish`.
+
+Implement All merges locally into the exact recorded launch branch after current full-run review. Work Through Next retains a review-ready branch by default. To merge at launch, record `delivery_authorization` with `pr: false`, `merge: true` and the explicit owner instruction. To merge after review, run `merge-reviewed` with the exact run ID and `owner_instruction`. The local merge uses the recorded launch checkout and exact reviewed head. Moved refs or overlapping local edits preserve the reviewed branch and block integration. Runs without `reviewed_local_delivery` use the recorded finish route. Explicit remote orders continue through the PR review cycle. A recorded full-path instruction keeps delivery open as implementation completed, then PR/review in progress, PR ready or merged. Publication blockers preserve implementation completion. Resume reconciles existing PRs, operation keys and merged status before another write. Never announce the full order complete while a promised PR or merge remains unfulfilled.
 
 ```sh
 python3 scripts/workflow-state.py workspace-setup <canonical-root> --input <setup.json>
-python3 scripts/workflow-state.py start <canonical-root> --mode next --id T-<uuid> --input <workspace.json>
-python3 scripts/workflow-state.py start <canonical-root> --mode all --input <workspace.json>
+python3 scripts/workflow-state.py start <launch-worktree> --standalone --mode next --id T-<uuid> --input <workspace.json>
+python3 scripts/workflow-state.py start <launch-worktree> --standalone --mode all --input <workspace.json>
 python3 scripts/workflow-state.py advance <worktree> --run-id WR-<uuid>
 python3 scripts/workflow-state.py export-run <worktree> --run-id WR-<uuid>
 ```
 
-Setup JSON is empty for a new registry. Adoption JSON specifies `adopt_run_id`, `base_branch`, `branch`, `worktree` and any explicit local-base rationale. Start JSON supports `remote`, `base_branch`, `branch`, `branch_prefix`, `worktree`, `limits` and `delivery_authorization`. Optional `snapshot_ids` selects a nonempty unique list of exact prioritized `T-` roots for mode all. Omission selects the full initial prioritized queue. Selected roots retain queue priority and document tie order; required dependencies join admission without adding unrelated roots. Invalid, duplicate, blocked or non-prioritized selections fail before claims or workspace creation. Mode next rejects `snapshot_ids`. Resume preserves every recorded ID, scope, counter, budget and stop condition. Fixture qualification covers local Git and controlled providers; live Git hosting and actual runtime isolation require matching evidence.
+Setup JSON is empty for a new registry. Adoption JSON specifies `adopt_run_id`, `base_branch`, `branch`, `worktree` and any explicit local-base rationale. Start JSON supports `remote`, `base_branch`, `branch`, `branch_prefix`, `worktree`, `limits` and `delivery_authorization`. Use `implementation_operation` with `work-through-next` for mode next and `implement-all` for mode all in the standalone commands above. Optional `snapshot_ids` selects a nonempty unique list of exact prioritized `T-` roots for mode all. Omission selects the full initial prioritized queue. Selected roots retain queue priority and document tie order; required dependencies join admission without adding unrelated roots. Invalid, duplicate, blocked or non-prioritized selections fail before claims or workspace creation. Mode next rejects `snapshot_ids`. Resume preserves every recorded ID, scope, counter, budget and stop condition. Fixture qualification covers local Git and controlled providers; live Git hosting and actual runtime isolation require matching evidence.
 
 For an owner request such as “Implement All for these two tasks”, `workspace.json` supplies the selected identities:
 
 ```json
 {
-  "base_branch": "develop",
+  "implementation_operation": "implement-all",
+  "expected_source_hash": "<inspected canonical future.md SHA-256>",
   "snapshot_ids": [
     "T-11111111-1111-4111-8111-111111111111",
     "T-22222222-2222-4222-8222-222222222222"
@@ -60,4 +63,4 @@ For an owner request such as “Implement All for these two tasks”, `workspace
 }
 ```
 
-Replace the example identities with existing Ready task IDs, then use the mode-all start command. Later queue additions remain outside the frozen snapshot unless scoped processing admits required descendants. A root group supplies execution scope; `validation_group_id` supplies validation batching and never selects extra roots.
+Replace the example identities with existing Ready task IDs and supply the SHA-256 of the inspected canonical queue. Run the mode-all command from the worktree on the branch selected to receive the reviewed merge. Later queue additions remain outside the frozen snapshot unless scoped processing admits required descendants. A root group supplies execution scope; `validation_group_id` supplies validation batching and never selects extra roots.

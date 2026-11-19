@@ -892,6 +892,24 @@ def start(store,mode,selector=None,limits=None,workspace=None):
             store.guard(options['expected_source_hash'])
     if {'topic', 'intake_batch_ids', 'group'} & options.keys():
         raise WorkflowError('Resolve group filters before start and pass the exact snapshot IDs and source hash')
+    operation=options.get('implementation_operation')
+    review_policy=None
+    if operation is not None:
+        if dispatch or not store.neutral or store.run_id or operation!={'next':'work-through-next','all':'implement-all'}.get(mode):
+            raise WorkflowError('New controller Git policy requires the matching standalone operation and mode')
+        authorization=options.get('delivery_authorization',{})
+        if not isinstance(authorization,dict) or any(
+                key in authorization and type(authorization[key]) is not bool for key in ('pr','merge')):
+            raise WorkflowError('Controller Git delivery authorization requires explicit Boolean delivery flags')
+        if authorization.get('pr') is not True:
+            launch=workspaces.checked_out_branch(store.source_root)
+            launch_branch=launch['ref'].removeprefix('refs/heads/')
+            if authorization.get('target_branch',launch_branch)!=launch_branch:
+                raise WorkflowError('Reviewed local delivery targets the exact checked-out launch branch')
+            instruction=authorization.get('owner_instruction')
+            if mode=='next' and authorization.get('merge') is True and (not isinstance(instruction,str) or not instruction.strip()):
+                raise WorkflowError('Work Through Next merge requires the explicit launch order')
+            review_policy={'launch':launch,'merge_at_finish':authorization.get('merge',mode=='all')}
     expected_hash = options.get('expected_source_hash')
     if 'expected_source_hash' in options:
         if not isinstance(expected_hash, str) or not re.fullmatch('[a-f0-9]{64}', expected_hash):
@@ -908,12 +926,19 @@ def start(store,mode,selector=None,limits=None,workspace=None):
         store.guard(expected_hash)
         registry=state.get('run_registry')
         if not registry and state['active_run'] is not None: raise WorkflowError('Active run exists; resume the recorded run')
-        if not registry and workspaces.common_dir(store.root):raise WorkflowError('Git controllers require workspace-setup before start')
+        if not registry and (operation or workspaces.common_dir(store.root)):
+            raise WorkflowError('Git controllers require workspace-setup before start')
         tasks,chosen,snapshot=_start_selection(store,mode,selector,options,text)
         run={'id':identity('WR'),'mode':mode,'snapshot':snapshot,'root_task_id':chosen['id'],'current_task_id':chosen['id'],'phase':'implement','required_ids':[chosen['id']],'deferred_ids':[],'pending_ids':[],'processing_results':[],'completed_ids':[],'limits':limits or {},'partial_work':[],'stop_reason':None,'next_action':'Implement selected task','started_at':now()}
         for tid in dependency_scope(tasks,run):clarification_admission(store,tid)
         run['admission']=admission;run['admitted_task_ids']=sorted(dependency_scope(tasks,run));run['required_ids']=list(run['admitted_task_ids']);run['admitted_groups']=admitted_groups(tasks,run)
         if registry:
+            if operation:
+                run['implementation_operation']=operation
+            if review_policy:
+                if workspaces.checked_out_branch(store.source_root)!=review_policy['launch']:
+                    raise WorkflowError('The launch checkout changed before run reservation')
+                run['reviewed_local_delivery']=review_policy
             done={o['task_id'] for o in store.outcomes() if o['disposition']=='completed'}
             conflicts={tid:registry['claims'][tid] for tid in run['admitted_task_ids'] if tid not in done and tid in registry['claims']}
             if conflicts:raise WorkflowError('Required task claims conflict: '+dump(conflicts))
@@ -1065,15 +1090,79 @@ def checkpoint(store,payload):
             budget['used_seconds']=used
         run.update({k:v for k,v in payload.items() if k not in {'validation_consumed','task_budget_used_seconds'}});validate_run(run);store.save(text,state);return run
 
+def verified_implementation_review(store, review_id, identity, scope):
+    helper=owned_module('skill_tree_decision_orchestration',Path(__file__).with_name('decision-orchestration.py'))
+    try:
+        review=helper.read(store,review_id)
+        helper.fresh_plan(store,review)
+        helper.clear_decision(store,review)
+    except helper.OrchestrationError as error:
+        raise WorkflowError(str(error)) from error
+    if (review['phase']!='ready' or review['identity']!=identity
+            or any(review['context'].get(key)!=value for key,value in scope.items())
+            or review['execution_snapshot']!=orchestration_execution_snapshot(store)
+            or not review['checks']['passed'] or review['review']['findings']):
+        raise WorkflowError('A current clean implementation review must cover the exact scoped Git identity')
+    return review
+
+
+def complete_task_commit(store, text, state, task, payload, request_hash, check_inputs):
+    entry=state['task_progress'].get(task['id'],{})
+    baseline=entry.get('task_git_baseline')
+    if baseline is None:
+        return None
+    if 'commits' in payload:
+        raise WorkflowError('Scoped task completion records the actual Git commit, without caller-supplied refs')
+    candidate=entry.get('task_git_candidate')
+    if not candidate or not valid_id(payload.get('review_id'),'DO'):
+        raise WorkflowError('Scoped task completion requires a sealed change set and current review ID')
+    review_identity=workspaces.task_review_identity(baseline,candidate,task['body'])
+    frame=verified_implementation_review(store,payload['review_id'],review_identity,
+        {'kind':'task','task_ids':[task['id']]})
+    attempt=entry.get('task_git_attempt')
+    workspaces.require_committed_check_inputs(store.source_root,candidate['paths'],check_inputs)
+    if attempt is None:
+        actual=workspaces.task_commit_candidate(store.source_root,baseline,candidate['paths'])
+        if actual!=candidate:
+            raise WorkflowError('The scoped task candidate changed after review')
+        commit=workspaces.create_task_commit(store.source_root,baseline,candidate,task['id'],task['title'])
+        attempt={'commit':commit,'request_sha256':request_hash,'review_id':payload['review_id'],
+                 'review_hash':frame.get('orchestration_hash'),'tree':candidate['tree'],
+                 'parent':baseline['head'],'ref':baseline['ref'],'checkout':baseline['checkout'],
+                 'paths':candidate['paths']}
+        entry['task_git_attempt']=attempt
+        store.save(text,state)
+    elif (attempt['request_sha256']!=request_hash or attempt['review_hash']!=frame.get('orchestration_hash')
+            or attempt['tree']!=candidate['tree']):
+        raise WorkflowError('Recover the same scoped task commit and review request')
+    workspaces.apply_task_commit(store.source_root,baseline,candidate,attempt['commit'])
+    return deepcopy(attempt)
+
+
 def complete(store,payload):
+    payload=deepcopy(payload)
+    request_hash=digest(dump(payload).encode())
     if payload.get('disposition','completed')=='completed':prepare_hook_admission(store,scope=payload.get('task_id'))
     with store.lock():
-        store.guard(payload.get('expected_source_hash'));text=store.text();tasks=parse(text);state=store.load(text);task=resolve(tasks,[payload['task_id']],'Prioritized Next Changes')[0]
+        text=store.text();tasks=parse(text);state=store.load(text)
+        outcomes=store.outcomes()
+        original=next((row for row in outcomes if row['task_id']==payload['task_id'] and row.get('task_git_commit')),None)
+        if original:
+            receipt=original['task_git_commit']
+            checkout=workspaces.checked_out_branch(store.source_root)
+            if (receipt['request_sha256']!=request_hash or checkout['checkout']!=receipt['checkout']
+                    or checkout['ref']!=receipt['ref'] or original['run_id']!=(state['active_run'] or {}).get('id')):
+                raise WorkflowError('The original scoped task completion belongs to a different request or checkout')
+            if workspaces.local_git(store.source_root,'merge-base','--is-ancestor',
+                    receipt['commit'],checkout['head'],accepted=(0,1)).returncode:
+                raise WorkflowError('The checked-out branch no longer contains the recorded task commit')
+            return original
+        store.guard(payload.get('expected_source_hash'));task=resolve(tasks,[payload['task_id']],'Prioritized Next Changes')[0]
         disposition=payload.get('disposition','completed')
         if disposition!='completed':hook_pending_admission(store,scope=task['id'])
         clarification_admission(store,task['id'],hook_gate=disposition=='completed')
         assert_scope(store,state,tasks,task['id'])
-        outcomes=store.outcomes();done={o['task_id'] for o in outcomes if o['disposition']=='completed'}
+        done={o['task_id'] for o in outcomes if o['disposition']=='completed'}
         if task['id'] in {o['task_id'] for o in outcomes}:raise WorkflowError('Task already has terminal outcome')
         disposition=payload.get('disposition','completed')
         if disposition not in TERMINAL:raise WorkflowError('Unsupported terminal disposition')
@@ -1108,6 +1197,17 @@ def complete(store,payload):
         task_context={'semantic_fingerprint':clarification_fingerprints(clarification_baselines([task]))[task['id']],'content_fingerprint':digest(task['body'].encode())}
         record={'task_context':task_context,'run_id':state['active_run']['id'] if state['active_run'] else None,'validation_group_id':task.get('validation_group_id'),'boundary_validation':task.get('boundary_validation','not-required'),'validation_plan':check_specs(task),'validation_signature':task_signature(task),'check_results':validation_records,'depends_on':task['depends_on'],'id':identity('O'),'task_id':task['id'],'title':task['title'],'root_task_id':task['root_task_id'],'related_task_id':task['related_task_id'],'parent_pending_ids':task['parent_pending_ids'],'disposition':disposition,'outcome':payload['outcome'],'acceptance':payload.get('acceptance',[]),'limitations':payload.get('limitations',[]),'followup_ids':payload.get('followup_ids',[]),'source_fingerprints':payload.get('source_fingerprints',{}),'commits':payload.get('commits',[]),'evidence':[evidence_pointer(store,e) for e in payload.get('evidence',[])],'recorded_at':now()}
         record.update(grouping_fields(task))
+        if disposition=='completed':
+            check_inputs=set(payload['source_fingerprints'])
+            if state['task_progress'].get(task['id'],{}).get('task_git_baseline'):
+                for item in validation_records:
+                    check_inputs.update(item['check']['sources'])
+                    check_inputs.update(recipe_for(store,item['check'])[0].get('input_paths',[]))
+            git_receipt=complete_task_commit(store,text,state,task,payload,request_hash,sorted(check_inputs))
+            if git_receipt:
+                record.update(commits=[git_receipt['commit']],task_git_commit=git_receipt)
+        elif state['task_progress'].get(task['id'],{}).get('task_git_attempt'):
+            raise WorkflowError('Recover the prepared task commit before a terminal disposition')
         ledger=''.join(json.dumps(o,ensure_ascii=False,sort_keys=True)+'\n' for o in outcomes+[record])
         if state['active_run']:
             run=state['active_run'];run.setdefault('completion_refs',{})[task['id']]=record['id'];run['completed_ids'].append(task['id']) if disposition=='completed' else None
@@ -1651,8 +1751,159 @@ def local_delivery_action(store, action, payload):
         return store.load()['active_run']['delivery']
 
 
-def finish(store):
+def require_reviewed_controller_inputs(store, run):
+    required=set(run['snapshot']+run['required_ids'])
+    sources=set()
+    for outcome in store.outcomes():
+        if outcome['task_id'] not in required or outcome['disposition']!='completed':
+            continue
+        sources.update(outcome['source_fingerprints'])
+        for check in outcome.get('validation_plan',[]):
+            sources.update(check['sources'])
+            sources.update(recipe_for(store,check)[0].get('input_paths',[]))
+    workspaces.require_committed_check_inputs(store.source_root,[],sorted(sources))
+
+
+def reviewed_controller_candidate(store, run):
+    if not run or not run.get('reviewed_local_delivery'):
+        raise WorkflowError('Select an exact controller with reviewed local delivery')
+    source=workspaces.local_source_identity(store,run)
+    require_reviewed_controller_inputs(store,run)
+    launch_head=run['reviewed_local_delivery']['launch']['head']
+    workspaces.local_merge_base(store,run,source,launch_head)
+    identity={'head':source['source_head'],'base_oid':launch_head,
+              'source_digest':digest(source['source_tree'].encode())}
+    scope={'kind':'controller','run_id':run['id'],'task_ids':run['admitted_task_ids']}
+    return {'identity':identity,'source':source,'review_scope':scope,
+            'target_ref':run['reviewed_local_delivery']['launch']['ref']}
+
+
+def controller_review_identity(store):
+    state=store.load()
+    run=state['active_run']
+    if not run or not run.get('reviewed_local_delivery') or run['delivery']['implementation']=='completed':
+        raise WorkflowError('A controller with unfinished reviewed local delivery is required')
+    _implementation_finish_checks(store,state,run,store.text())
+    return reviewed_controller_candidate(store,run)
+
+
+def freeze_reviewed_controller(store, payload):
+    inspected=store.load()['active_run']
+    if inspected['delivery']['implementation']!='completed':
+        prepare_hook_admission(store,chain_ids=inspected.get('hook_chains',[]))
+    with store.lock():
+        text=store.text();state=store.load(text);run=state['active_run']
+        delivery=run['delivery']
+        if delivery['implementation']=='completed':
+            if payload.get('review_id') and payload['review_id']!=delivery['reviewed_source']['review_id']:
+                raise WorkflowError('The controller review receipt is already frozen')
+            return run
+        _implementation_finish_checks(store,state,run,text)
+        hook_admission(store,chain_ids=run.get('hook_chains',[]))
+        if not valid_id(payload.get('review_id'),'DO'):
+            raise WorkflowError('Controller completion requires the current full-run review ID')
+        reviewed=reviewed_controller_candidate(store,run)
+        frame=verified_implementation_review(store,payload['review_id'],reviewed['identity'],reviewed['review_scope'])
+        completed={row['task_id']:row for row in store.outcomes() if row.get('run_id')==run['id']}
+        for tid in run['completed_ids']:
+            commit=completed.get(tid,{}).get('task_git_commit',{}).get('commit')
+            if not commit or workspaces.local_git(store.source_root,'merge-base','--is-ancestor',
+                    commit,reviewed['identity']['head'],accepted=(0,1)).returncode:
+                raise WorkflowError('The reviewed run must include the accepted commit for '+tid)
+        merge_expected=run['reviewed_local_delivery']['merge_at_finish']
+        delivery.update(implementation='completed',status='reviewed-local-pending' if merge_expected else 'review-ready',
+            order_completed=not merge_expected,
+            reviewed_source={**reviewed,'review_id':payload['review_id'],'review_hash':frame['orchestration_hash']})
+        run.update(phase='completed',finished_at=now(),next_action='Merge the reviewed run locally' if merge_expected else None)
+        original=dump(run)
+        delivery['reviewed_run_receipt_sha256']=digest(original.encode())
+        store.save(text,state,{_delivery_receipt_path(run):original})
+        return run
+
+
+def merge_reviewed_controller(store, payload=None):
+    payload=payload or {}
+    if not valid_id(store.run_id,'WR') or set(payload)-{'owner_instruction'}:
+        raise WorkflowError('Reviewed local merge requires the exact --run-id and optional owner instruction')
+    run=store.load()['active_run']
+    policy=run.get('reviewed_local_delivery') if run else None
+    if not policy:
+        raise WorkflowError('The selected run has no reviewed local delivery policy')
+    instruction=payload.get('owner_instruction')
+    if instruction is not None and (not isinstance(instruction,str) or not instruction.strip()):
+        raise WorkflowError('The local merge owner instruction must be nonempty text')
+    ref=policy['launch']['ref']
+    delivery=run['delivery']
+    if (not delivery.get('reviewed_merge') and delivery.get('reviewed_source')
+            and delivery.get('publication')=='not-requested'):
+        attempt=delivery.get('reviewed_merge_attempt')
+        if not attempt or workspaces.reviewed_launch_target(store,run)[1]==attempt['target_head']:
+            prepare_hook_admission(store,chain_ids=run.get('hook_chains',[]))
+    with workspaces.publication_lock(store.root,'local',ref.removeprefix('refs/heads/')), store.lock():
+        text=store.text();state=store.load(text);run=state['active_run']
+        delivery=run['delivery']
+        if delivery.get('reviewed_merge'):
+            return run
+        if delivery.get('publication')!='not-requested':
+            raise WorkflowError('The selected run has a separate recorded remote delivery')
+        if not policy['merge_at_finish'] and not (instruction or delivery.get('reviewed_merge_owner_instruction')):
+            raise WorkflowError('Work Through Next requires an explicit owner request to merge the reviewed branch')
+        reviewed=delivery.get('reviewed_source')
+        if not reviewed or delivery['implementation']!='completed':
+            raise WorkflowError('Finish the current full-run review before local merge')
+        original=store.owned(_delivery_receipt_path(run))
+        if (not original.is_file() or file_hash(original)!=delivery.get('reviewed_run_receipt_sha256')
+                or json.loads(original.read_text())['delivery']['reviewed_source']!=reviewed):
+            raise WorkflowError('The original reviewed local delivery receipt changed')
+        source=reviewed['source']
+        if ref!=reviewed['target_ref']:
+            raise WorkflowError('The recorded reviewed launch branch changed')
+        target,head=workspaces.reviewed_launch_target(store,run)
+        attempt=delivery.get('reviewed_merge_attempt')
+        if attempt and (any(attempt.get(key)!=value for key,value in source.items())
+                or attempt.get('target_ref')!=ref or attempt.get('target_head')!=policy['launch']['head']):
+            raise WorkflowError('The original prepared merge differs from the frozen review')
+        if not attempt or head==attempt['target_head']:
+            _implementation_finish_checks(store,state,run,text)
+            require_reviewed_controller_inputs(store,run)
+            if workspaces.local_source_identity(store,run)!=source:
+                raise WorkflowError('The reviewed source head or tree changed')
+            hook_admission(store,chain_ids=run.get('hook_chains',[]))
+            frame=verified_implementation_review(store,reviewed['review_id'],reviewed['identity'],reviewed['review_scope'])
+            if frame['orchestration_hash']!=reviewed['review_hash']:
+                raise WorkflowError('The original full-run review acceptance changed')
+        if not attempt:
+            workspaces.local_merge_base(store,run,source,head)
+            incoming=sorted(workspaces.local_incoming(target,head,source['source_head']))
+            dirt=workspaces.local_worktree_dirt(target,allow_staged=True)
+            workspaces.local_preflight_collisions(target,incoming,dirt)
+            attempt={**source,'target_ref':ref,'target_head':head,'incoming':incoming,'allow_unrelated_staged':True}
+            delivery.update(status='reviewed-local-pending',order_completed=False,reviewed_merge_attempt=attempt)
+            if instruction:
+                delivery['reviewed_merge_owner_instruction']=instruction
+            run['next_action']='Complete the exact prepared local merge'
+            store.save(text,state)
+        if head==attempt['target_head']:
+            workspaces.run_local_merge(target,store.source_root,attempt)
+            _,head=workspaces.reviewed_launch_target(store,run)
+        merged=workspaces.local_merge_receipt(target,attempt,head)
+        workspaces.reconcile_reviewed_merge_index(target,attempt,merged)
+        delivery.update(status='merged',order_completed=True,reviewed_merge=merged)
+        run.update(next_action=None,stop_reason=None)
+        store.save(text,state,{_delivery_receipt_path(run,'-reviewed-merge'):dump({
+            'run_id':run['id'],'review':reviewed,'merge':merged,'target_ref':ref})})
+        return run
+
+
+def finish(store,payload=None):
     inspected = store.load().get('active_run')
+    if inspected and inspected.get('reviewed_local_delivery') and not inspected.get('maintenance'):
+        if not valid_id(store.run_id,'WR'):
+            raise WorkflowError('Reviewed controller completion requires the exact --run-id')
+        reviewed=freeze_reviewed_controller(store,payload or {})
+        if reviewed['reviewed_local_delivery']['merge_at_finish']:
+            return merge_reviewed_controller(store)
+        return reviewed
     if inspected and workspaces.local_merge_order(inspected) and not inspected.get('maintenance'):
         workspaces.local_git_environment()
         if inspected['delivery']['implementation'] == 'completed':
@@ -2280,6 +2531,10 @@ def assert_scope(store,state,tasks,tid):
             task=validation_task(store,tid) if state['task_progress'].get(tid,{}).get('revalidation') else resolve(tasks,[tid],'Prioritized Next Changes')[0]
             if any(recipe_for(store,check)[0]['lane'] not in {'static','unit'} for check in check_specs(task)):raise WorkflowError('Maintenance focus refuses product checks')
     assert_admission(store,state,tid)
+    progress=state['task_progress'].get(tid,{})
+    baseline=progress.get('task_git_baseline')
+    if baseline is not None:
+        workspaces.require_task_checkout(store.source_root,baseline,progress.get('task_git_attempt',{}).get('commit'))
 
 def begin_task(store,payload):
     clarification_admission(store,payload['task_id'])
@@ -2295,9 +2550,21 @@ def begin_task(store,payload):
         if state.get('run_registry') and state['active_run']:
             for dep in task['depends_on']:
                 if not completed_dependency_integrated(store,state,dep):raise WorkflowError('Completed dependency requires reviewed source integration into the selected worktree: '+dep)
+        operation=payload.get('implementation_operation')
+        if operation is not None and operation!='implement-next':
+            raise WorkflowError('Select the exact standalone task implementation operation')
+        run=state['active_run']
+        scoped_commit=bool(run and run.get('implementation_operation')) or (not run and operation=='implement-next')
+        previous=state['task_progress'].get(task['id'])
         entry=state['task_progress'].setdefault(task['id'],{'stage':'implementing','checks':{},'admission':admission,'partial_work':[]})
         if entry['stage']=='blocked':raise WorkflowError('Task progress is blocked; explicitly resolve the recorded stop')
         entry['admission']=admission
+        if scoped_commit:
+            assert_scope(store,state,parse(text),task['id'])
+            if previous is None:
+                entry['task_git_baseline']=workspaces.task_commit_baseline(store.source_root)
+            elif 'task_git_baseline' not in previous:
+                raise WorkflowError('Resume the existing task under its original completion policy')
         if state['active_run']:entry['run_id']=state['active_run']['id']
         result={'task_id':task['id'],'phase':'validate' if entry['stage']=='awaiting-validation' else 'implement','checks':check_specs(task)}
         store.save(text,state);return result
@@ -2309,8 +2576,17 @@ def mark_implemented(store,payload):
         entry=state['task_progress'].get(task['id'])
         if not entry or entry['stage']=='blocked':raise WorkflowError('Begin or resume implementation before marking the unit implemented')
         assert_scope(store,state,parse(text),task['id'])
-        entry['stage']='awaiting-validation';entry['definition']=task_signature(task);entry['partial_work']=payload.get('changed_files',[])
-        store.save(text,state);return {'task_id':task['id'],'phase':'validate','checks':check_specs(task)}
+        paths=payload.get('changed_files',[])
+        result={'task_id':task['id'],'phase':'validate','checks':check_specs(task)}
+        baseline=entry.get('task_git_baseline')
+        if baseline is not None:
+            if entry.get('task_git_attempt'):
+                raise WorkflowError('Recover the original prepared task commit before changing the candidate')
+            candidate=workspaces.task_commit_candidate(store.source_root,baseline,paths)
+            entry['task_git_candidate']=candidate
+            result['git_review_identity']=workspaces.task_review_identity(baseline,candidate,task['body'])
+        entry['stage']='awaiting-validation';entry['definition']=task_signature(task);entry['partial_work']=paths
+        store.save(text,state);return result
 
 def pending_check_attempt(slot):
     attempt=slot.get('attempt')
@@ -4135,13 +4411,14 @@ def clarification_mutate(store,command,payload):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
-    parser.add_argument('--standalone',action='store_true',help='Use the canonical queue without attaching to an existing controller for intake, process or start.')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser.add_argument('--standalone',action='store_true',help='Use the canonical queue and selected checkout without attaching to a registered controller.')
     args=parser.parse_args(argv)
     try:
         cmd=args.command
-        if args.standalone and (cmd not in {'intake','process','start'} or args.run_id):
-            raise WorkflowError('Standalone routing requires intake, process or start without an existing run ID')
+        if args.standalone and (cmd not in {'intake','process','start','begin','implemented','prepare-check',
+                'record-check','reconcile-check','resume-task','complete'} or args.run_id):
+            raise WorkflowError('Standalone routing requires a scoped standalone command without a run ID')
         store=Store(args.root,args.run_id,allow_unselected=args.standalone or cmd in {'index','runs','manifest','start','workspace-setup','recover-locator'},route_queue=cmd!='recover-locator',neutral=args.standalone);payload=json.loads(args.input.read_text()) if args.input else {}
         if args.expected_source_hash:payload['expected_source_hash']=args.expected_source_hash
         if cmd in {'intake','process','start'} and 'director_dispatch' in payload:
@@ -4228,7 +4505,9 @@ def main(argv=None):
         elif cmd=='advance':result=advance(store)
         elif cmd=='checkpoint':result=checkpoint(store,payload)
         elif cmd=='complete':result=complete(store,payload)
-        elif cmd=='finish':result=finish(store)
+        elif cmd=='controller-review':result=controller_review_identity(store)
+        elif cmd=='merge-reviewed':result=merge_reviewed_controller(store,payload)
+        elif cmd=='finish':result=finish(store,payload)
         elif cmd=='audit':result=audit(store,payload)
         elif cmd=='history':result=history(store,args.id,args.component)
         elif cmd=='cycle':result=record_cycle(store)
