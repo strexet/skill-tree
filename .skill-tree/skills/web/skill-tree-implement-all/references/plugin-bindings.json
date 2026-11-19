@@ -2836,7 +2836,7 @@
   "configuration_digest": "ea848ac9e2f5717503d211fcca3f7acfe62b1b4d0453a44a23f0b90527f45187",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "6f711874551f15b609e89566ee9c0bf76f39f914fb7cfd7e7988fd38534e2b8a",
+  "identity": "090285d10071fcac442d914a52dfb4e3cb275de8e640fe08fb5743c862fc5304",
   "operation": "skill-tree-implement-all",
   "operations": {
     "skill-tree-3d": {
@@ -2925,7 +2925,7 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "a9ada86dd2b5bd094aa5f41c1e8c3845b3b1e93ae44704104e198885eabf492e",
+    "SKILL.md": "8aa149464cc24cb6b8d4894a57d7edba1bb3679d6b24e27ecffc6a30799a28ac",
     "agents/openai.yaml": "2d4a8d52b557c9473ba1f73e7a144169fdfeba4f207335b9341a9a1b127ea516",
     "references/decision-governance.md": "52f8dc84c7cae4b9aa3aaa010d3ffb605ab79f5d75aaa36b9370d51e49305222",
     "references/development-practices.md": "467f46fe631af23c9b3c6dadcbeb6d4c20f311601e2e2f419f16ffc0a534b72e",

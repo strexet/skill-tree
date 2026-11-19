@@ -5552,7 +5552,7 @@
     ".skill-tree/scripts/validate-skill-repository.py": "5cd81850dfa3f52ca92abf69f5110c497491e9c07b0f039451a9df7a2b3b8faa",
     ".skill-tree/src/init-rules/skill-tree-skills.md": "a8bc216000c37023d8ef275eee211bf1060292b460e288558c54f8f8dca068fc",
     ".skill-tree/templates/invariants.json": "ee0c2c5445e7408cc15fd4aed231ff7d0c38a07d063061f75bfeea3da8971903",
-    ".skill-tree/templates/operations.json": "ef47d4bdf203a93ec2df885b86b1a36250c9ccb86a1dee73098af9c6e6635250"
+    ".skill-tree/templates/operations.json": "8918866c44e376e7d38a5a636ad60103b5e3370bdc56d45659d2bc56832d0894"
   },
   "state": ".skill-tree/documents/future.json",
   "validation_commands": [
