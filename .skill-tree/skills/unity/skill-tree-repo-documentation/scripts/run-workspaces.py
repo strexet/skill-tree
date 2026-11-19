@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Git workspaces, canonical queue routing and compatible multi-run metadata."""
+from collections import deque
 from contextlib import contextmanager
 from copy import deepcopy
 import hashlib
@@ -13,6 +14,7 @@ import stat
 import subprocess
 import tempfile
 from threading import Timer
+import unicodedata
 import uuid
 
 class RunError(ValueError):
@@ -474,16 +476,90 @@ def task_index_selection(root, paths, index=None):
     return hashlib.sha256(entries).hexdigest()
 
 
+def validation_input_paths(root, source, directory_entry):
+    relative = Path(source)
+    error = 'Task validation inputs must resolve inside the selected worktree'
+    if relative.is_absolute() or '..' in relative.parts:
+        raise RunError(error)
+    paths = {relative.as_posix()}
+    remaining = deque(relative.parts)
+    parent = root
+    hops = 0
+    # A later change to any link in the chain can change the validated bytes.
+    while remaining:
+        name = remaining.popleft()
+        if name == '..':
+            if parent == root:
+                raise RunError(error)
+            parent = parent.parent
+            continue
+        entry = directory_entry(parent, name)
+        if not entry.is_symlink():
+            parent = entry
+            continue
+        paths.add(entry.relative_to(root).as_posix())
+        target = entry.readlink()
+        hops += 1
+        if hops > 40:
+            raise RunError('Task validation input has too many symbolic links')
+        if target.is_absolute():
+            if not target.is_relative_to(root):
+                raise RunError(error)
+            target = target.relative_to(root)
+            parent = root
+        remaining.extendleft(reversed(target.parts))
+    paths.add(parent.relative_to(root).as_posix())
+    return paths
+
+
 def require_committed_check_inputs(root, owned, sources):
     if not sources:
         return
-    hidden=local_git(root,'ls-files','-v','-z','--',*sources).stdout.split(b'\0')
-    if any(entry and (entry[:1].islower() or entry.startswith(b'S ')) for entry in hidden):
+    root = root.resolve()
+    ignore_case = local_git_bool(root, 'core.ignoreCase')
+    precompose = local_git_bool(root, 'core.precomposeUnicode')
+
+    def git_spelling(path):
+        return unicodedata.normalize('NFC', path) if precompose else path
+
+    def match_key(path):
+        path = git_spelling(path)
+        return path.casefold() if ignore_case else path
+
+    directories = {}
+
+    def directory_entry(parent, name):
+        entry = parent / name
+        if not (ignore_case or precompose) or not os.path.lexists(entry):
+            return entry
+        if parent not in directories:
+            directories[parent] = set(os.listdir(parent))
+        names = directories[parent]
+        if name not in names:
+            info = entry.lstat()
+            for actual in sorted(names):
+                if match_key(actual) == match_key(name) and os.path.samestat((parent / actual).lstat(), info):
+                    return parent / actual
+        return entry
+
+    aliases = set()
+    for source in sources:
+        aliases.update(validation_input_paths(root, source, directory_entry))
+    scope = {match_key(path) for path in aliases}
+
+    def overlaps(path):
+        path = match_key(path)
+        return '.' in scope or any(local_overlap(path, source) for source in scope)
+
+    indexed = local_git(root, 'ls-files', '-v', '-z').stdout.split(b'\0')
+    hidden = (entry[2:].decode('utf-8') for entry in indexed if entry[:1].islower() or entry.startswith(b'S '))
+    if any(overlaps(path) for path in hidden):
         raise RunError('Task validation inputs must be visible in the checked-out Git index')
-    dirty=set(task_commit_baseline(root)['dirty'])
-    dirty.update(local_git_paths(root,'ls-files','--others','--ignored','--exclude-standard','-z','--',*sources))
+    dirty = set(task_commit_baseline(root)['dirty'])
+    pathspecs = sorted({git_spelling(path) for path in aliases})
+    dirty.update(local_git_paths(root, 'ls-files', '--others', '--ignored', '--exclude-standard', '-z', '--', *pathspecs))
     for path in sorted(dirty):
-        if path not in owned and any(local_overlap(path,source) or source=='.' for source in sources):
+        if path not in owned and overlaps(path):
             raise RunError('The scoped candidate excludes a changed validation input: '+repr(path))
 
 
@@ -736,16 +812,20 @@ def reconcile_reviewed_merge_index(root, attempt, merge):
             hooks.mkdir()
             no_hooks=f'core.hooksPath={hooks}'
             probe=temporary/'probe'
-            local_git(root,'-c',no_hooks,'read-tree',attempt['target_head'],index=probe)
-            previous=task_index_selection(root,paths,probe)
-            local_git(root,'-c',no_hooks,'add','-f','-A','--',*paths,index=probe)
-            tree=local_git(root,'-c',no_hooks,'write-tree',index=probe).stdout.decode().strip()
-            if tree!=merge['tree']:
-                raise RunError('The incoming worktree files differ from the exact prepared merge tree')
+            local_git(root,'-c',no_hooks,'read-tree',merge['commit'],index=probe)
             expected=task_index_selection(root,paths,probe)
             observed=task_index_selection(root,paths)
             if observed==expected:
                 return
+            tracked=set(local_git(root,'ls-files','-z','--',*paths,index=probe).stdout.decode().split('\0')[:-1])
+            live=[path for path in paths if path in tracked or os.path.lexists(root/path)]
+            if live:
+                local_git(root,'-c',no_hooks,'add','-f','-A','--',*live,index=probe)
+            tree=local_git(root,'-c',no_hooks,'write-tree',index=probe).stdout.decode().strip()
+            if tree!=merge['tree']:
+                raise RunError('The incoming worktree files differ from the exact prepared merge tree')
+            local_git(root,'-c',no_hooks,'read-tree',attempt['target_head'],index=probe)
+            previous=task_index_selection(root,paths,probe)
             if observed!=previous:
                 raise RunError('Preserve the changed incoming index entries before reconciling local merge')
             updated=temporary/'index'

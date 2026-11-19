@@ -234,6 +234,8 @@ class LocalDeliveryTests(unittest.TestCase):
     def test_policy_reviewed_merge_repairs_owned_index_after_lost_acknowledgement(self):
         self.start_reviewed_controller('next')
         self.accept_scoped_source(self.tid)
+        self.git(self.source,'rm','local-tip.txt')
+        self.git(self.source,'commit','-m','Reviewed removal')
         self.finish_reviewed_fixture()
         index=ws.task_index_path(self.launch)
         original=ws.os.replace
@@ -250,11 +252,15 @@ class LocalDeliveryTests(unittest.TestCase):
         self.assertIn('source.py',self.git(self.launch,'status','--porcelain'))
         (self.launch/'added-after-merge.txt').write_text('Keep the staged user changes.\n')
         self.git(self.launch,'add','added-after-merge.txt')
+        later=self.source/'source.py'
+        later.write_text('Independent new source work.\n')
         result=wf.merge_reviewed_controller(self.selected)
+        self.assertEqual(later.read_text(),'Independent new source work.\n')
         self.assertEqual(result['delivery']['reviewed_merge']['commit'],merged_head)
         self.assertEqual(self.git(self.launch,'rev-parse','HEAD'),merged_head)
         self.assertEqual(self.git(self.launch,'diff','--cached','--name-only'),'added-after-merge.txt')
         self.assertEqual(self.git(self.launch,'diff','--name-only','--','source.py'),'')
+        self.assertFalse((self.launch/'local-tip.txt').exists())
 
     def test_policy_late_merge_rejects_changed_review_and_moved_target(self):
         self.start_reviewed_controller('next')
@@ -327,6 +333,33 @@ class LocalDeliveryTests(unittest.TestCase):
         self.assertEqual(merged['delivery']['status'],'merged')
         self.assertEqual(self.git(self.launch,'status','--porcelain'),'')
         self.assertEqual(self.git(self.launch,'show','HEAD:later-ignored.txt'),'Tracked accepted data.')
+
+    def test_policy_review_ready_uses_original_base_after_launch_branch_advances(self):
+        self.start_reviewed_controller('next')
+        self.accept_scoped_source(self.tid)
+        self.git(self.launch,'commit','--allow-empty','-m','Independent target change')
+        advanced=self.git(self.launch,'rev-parse','HEAD')
+        wf.advance(self.selected)
+        self.assertEqual(wf.controller_review_identity(self.selected)['identity']['base_oid'],self.start_head)
+        result=self.finish_reviewed_fixture()
+        self.assertEqual(result['delivery']['status'],'review-ready')
+        with patch.object(wf,'verified_implementation_review',return_value={'orchestration_hash':'a'*64}):
+            with self.assertRaisesRegex(ws.RunError,'target moved'):
+                wf.merge_reviewed_controller(self.selected,{'owner_instruction':'Merge the reviewed run locally.'})
+        self.assertEqual(self.git(self.launch,'rev-parse','HEAD'),advanced)
+
+    def test_policy_merge_reconciles_reviewed_executable_mode_with_filemode_disabled(self):
+        self.start_reviewed_controller('next')
+        self.accept_scoped_source(self.tid)
+        self.git(self.source,'config','core.fileMode','false')
+        self.git(self.source,'update-index','--chmod=+x','source.py')
+        self.git(self.source,'commit','-m','Reviewed executable mode')
+        self.finish_reviewed_fixture()
+        with patch.object(wf,'verified_implementation_review',return_value={'orchestration_hash':'a'*64}):
+            result=wf.merge_reviewed_controller(self.selected,{'owner_instruction':'Merge the reviewed run locally.'})
+        self.assertEqual(result['delivery']['status'],'merged')
+        self.assertEqual(self.git(self.launch,'status','--porcelain'),'')
+        self.assertTrue(self.git(self.launch,'ls-tree','HEAD','source.py').startswith('100755 '))
 
     def copy_source_generation(self):
         target = self.root / '.skill-tree'

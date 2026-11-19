@@ -1769,9 +1769,9 @@ def reviewed_controller_candidate(store, run):
         raise WorkflowError('Select an exact controller with reviewed local delivery')
     source=workspaces.local_source_identity(store,run)
     require_reviewed_controller_inputs(store,run)
-    _,target_head=workspaces.reviewed_launch_target(store,run)
-    workspaces.local_merge_base(store,run,source,target_head)
-    identity={'head':source['source_head'],'base_oid':target_head,
+    launch_head=run['reviewed_local_delivery']['launch']['head']
+    workspaces.local_merge_base(store,run,source,launch_head)
+    identity={'head':source['source_head'],'base_oid':launch_head,
               'source_digest':digest(source['source_tree'].encode())}
     scope={'kind':'controller','run_id':run['id'],'task_ids':run['admitted_task_ids']}
     return {'identity':identity,'source':source,'review_scope':scope,
@@ -1855,14 +1855,19 @@ def merge_reviewed_controller(store, payload=None):
         if (not original.is_file() or file_hash(original)!=delivery.get('reviewed_run_receipt_sha256')
                 or json.loads(original.read_text())['delivery']['reviewed_source']!=reviewed):
             raise WorkflowError('The original reviewed local delivery receipt changed')
-        _implementation_finish_checks(store,state,run,text)
-        source=workspaces.local_source_identity(store,run)
-        require_reviewed_controller_inputs(store,run)
-        if source!=reviewed['source'] or ref!=reviewed['target_ref']:
-            raise WorkflowError('The reviewed source head, tree or launch branch changed')
+        source=reviewed['source']
+        if ref!=reviewed['target_ref']:
+            raise WorkflowError('The recorded reviewed launch branch changed')
         target,head=workspaces.reviewed_launch_target(store,run)
         attempt=delivery.get('reviewed_merge_attempt')
+        if attempt and (any(attempt.get(key)!=value for key,value in source.items())
+                or attempt.get('target_ref')!=ref or attempt.get('target_head')!=policy['launch']['head']):
+            raise WorkflowError('The original prepared merge differs from the frozen review')
         if not attempt or head==attempt['target_head']:
+            _implementation_finish_checks(store,state,run,text)
+            require_reviewed_controller_inputs(store,run)
+            if workspaces.local_source_identity(store,run)!=source:
+                raise WorkflowError('The reviewed source head or tree changed')
             hook_admission(store,chain_ids=run.get('hook_chains',[]))
             frame=verified_implementation_review(store,reviewed['review_id'],reviewed['identity'],reviewed['review_scope'])
             if frame['orchestration_hash']!=reviewed['review_hash']:

@@ -2836,7 +2836,7 @@
   "configuration_digest": "ea848ac9e2f5717503d211fcca3f7acfe62b1b4d0453a44a23f0b90527f45187",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "20a9e01ef94f721211c9327af365578af0b1c8d54c2c1a573a34b4ef0dfa3308",
+  "identity": "e60908e956d57a3223b98ed73456c39c43c671ea4b16f37906c58393275c120d",
   "operation": "skill-tree-full-cycle",
   "operations": {
     "skill-tree-3d": {
@@ -2930,7 +2930,7 @@
     "references/decision-governance.md": "52f8dc84c7cae4b9aa3aaa010d3ffb605ab79f5d75aaa36b9370d51e49305222",
     "references/development-practices.md": "467f46fe631af23c9b3c6dadcbeb6d4c20f311601e2e2f419f16ffc0a534b72e",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
-    "references/full-cycle.md": "63c41460a188691c7c63740834664b02bfadba99395a0cada189956d1d798ca8",
+    "references/full-cycle.md": "d8d73bac4991f342a2e96cec3fcacd03f197b8c51c5e52d1f2acabfc77712267",
     "references/future-workflow.md": "3a6bc83660773c23af11cf00eacb90ed618db701d464fd7fcd304d5d90fca50b",
     "references/history-retention.md": "27ccf1029d9d65454f3d18dc05a0f72b57ce96417196a82fc2ad268cfffb7bb6",
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
@@ -2940,7 +2940,7 @@
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/pr-review-cycle.md": "c63c901451e6d3effd33284cff2f7347fff73e832677541d148dfec9fd4414c5",
     "references/project-profile.md": "15f369ebfe1872146e44e5333e1f8639cc03ba039e9e5c973ca8963cb2ac8ccf",
-    "references/run-workspaces.md": "a43476da2e1d4e0a9dfefff13fb3a37b307562864274e29d5e54744292d8a01d",
+    "references/run-workspaces.md": "7ea6acb5d639d20c0e0ad519bb74b89c3f15dca247d0cfcea55299f8265bb200",
     "references/ugui-testing.md": "873c236f793ff3c9ece8f0d0346c5c48513e8220406fce216751571c58b79073",
     "references/unity-development.md": "f65dc5e0e69df84d3204fe70339a7dfa53fcd0d57a2b97f8e57d34a399e5f640",
     "references/unity-safety.md": "ff6e0063e3a26f60d8655a08beb33ef19ffa2f27fce9c5efd573480b1b81e6ac",
@@ -2962,11 +2962,11 @@
     "scripts/plugin-runtime.js": "62caaa416cb4f375fef45edb71c1cbe3b2f9c0acb734a95e0b9099470cf6c8a5",
     "scripts/plugin-sources.js": "13d853f9e64dec84cf92f4026ac71e4384e186cd96200543e400a852a46e4693",
     "scripts/pr-review-state.py": "74adda3783c9c2832bca3f51998b7a589c7ff066f50bac358c20d9930dbb2a04",
-    "scripts/run-workspaces.py": "af824e02637abdcd33b05cb27cfc481dc925464db2cc870d31743cbe81ec3fca",
+    "scripts/run-workspaces.py": "a89ab104bad9bf8c1bd90dc597ab6d14f075d4fe8e2c59cd1dd1d84726656d6f",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     "scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
-    "scripts/workflow-state.py": "13a8be1e24af0d84a643f5288e75f63cdb54e39f7a5ad9c6f986b1c238d81ae8"
+    "scripts/workflow-state.py": "15cf9fa69d588f3f633f6db13d81b9a2e455e1431ca26a126ea5b39bedcc1a7a"
   },
   "packages": {},
   "parameter_defaults": {},

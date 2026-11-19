@@ -2,6 +2,7 @@ import importlib.util
 import json
 from pathlib import Path
 import tempfile
+import unicodedata
 import unittest
 from unittest.mock import patch
 
@@ -114,7 +115,56 @@ class WorkflowStateTests(unittest.TestCase):
             wf.begin_task(self.store,{'task_id':task['id'],'implementation_operation':'implement-next'})
         self.assertEqual(git('branch','--show-current'),'different-branch')
 
-    def git_task_fixture(self, dirty_source=False):
+    def assert_validation_alias_rejected(self, alias, stored_input='other.txt'):
+        git,task=self.git_task_fixture(validation_alias=alias,stored_input=stored_input)
+        parent=git('rev-parse','HEAD')
+        (self.root/stored_input).write_text('Dirty bytes passed to the required check.\n')
+        payload=self.checked_git_completion(task,real_review=True)
+        with self.assertRaisesRegex(wf.workspaces.RunError,'changed validation input'):
+            wf.complete(self.store,payload)
+        self.assertEqual(git('rev-parse','HEAD'),parent)
+
+    def test_scoped_task_commit_rejects_a_lexical_validation_alias(self):
+        self.assert_validation_alias_rejected('./other.txt')
+
+    def test_scoped_task_commit_rejects_a_symlink_validation_alias(self):
+        self.assert_validation_alias_rejected('validation-input.cs')
+
+    def test_scoped_task_commit_rejects_a_case_variant_validation_alias(self):
+        probe=self.root/'case-probe'
+        probe.touch()
+        try:
+            if not (self.root/'CASE-PROBE').exists():
+                self.skipTest('The worktree filesystem is case sensitive')
+        finally:
+            probe.unlink()
+        self.assert_validation_alias_rejected('Other.txt')
+
+    def test_scoped_task_commit_rejects_a_unicode_validation_alias(self):
+        stored_input='café.txt'
+        alias=unicodedata.normalize('NFD',stored_input)
+        probe=self.root/stored_input
+        probe.touch()
+        try:
+            if not (self.root/alias).exists():
+                self.skipTest('The worktree filesystem distinguishes Unicode normalization forms')
+        finally:
+            probe.unlink()
+        self.assert_validation_alias_rejected(alias,stored_input=stored_input)
+
+    def test_scoped_task_commit_rejects_a_hidden_intermediate_validation_link(self):
+        git,task=self.git_task_fixture(validation_alias='validation-chain.cs')
+        parent=git('rev-parse','HEAD')
+        git('update-index','--assume-unchanged','intermediate.cs')
+        middle=self.root/'intermediate.cs'
+        middle.unlink()
+        middle.symlink_to('alternate.txt')
+        payload=self.checked_git_completion(task,real_review=True)
+        with self.assertRaisesRegex(wf.workspaces.RunError,'visible in the checked-out Git index'):
+            wf.complete(self.store,payload)
+        self.assertEqual(git('rev-parse','HEAD'),parent)
+
+    def git_task_fixture(self, dirty_source=False, validation_alias=None, stored_input='other.txt'):
         import subprocess
         def git(*args):
             result=subprocess.run(['git','-C',str(self.root),*args],check=True,capture_output=True,text=True)
@@ -123,10 +173,23 @@ class WorkflowStateTests(unittest.TestCase):
         git('config','user.name','Scoped Commit Fixture')
         git('config','user.email','fixture@example.invalid')
         git('config','commit.gpgSign','false')
-        (self.root/'other.txt').write_text('owner baseline\n')
-        git('add','source.cs','other.txt')
+        (self.root/stored_input).write_text('owner baseline\n')
+        git('add','source.cs',stored_input)
+        if validation_alias=='validation-input.cs':
+            (self.root/validation_alias).symlink_to(stored_input)
+            git('add',validation_alias)
+        if validation_alias=='validation-chain.cs':
+            (self.root/'alternate.txt').write_text('Another committed input.\n')
+            (self.root/'intermediate.cs').symlink_to(stored_input)
+            (self.root/validation_alias).symlink_to('intermediate.cs')
+            git('add',validation_alias,'intermediate.cs','alternate.txt')
         git('commit','-m','Initial fixture')
-        task=self.main('Scoped commit task')
+        if validation_alias:
+            title='Scoped commit task'
+            body=self.body().replace('"sources": ["source.cs"]','"sources": '+json.dumps(['source.cs',validation_alias]))
+            task=self.promote(self.pending(title),title,body=body)
+        else:
+            task=self.main('Scoped commit task')
         if dirty_source:
             (self.root/'source.cs').write_text('Unrelated source edit.\n')
         wf.begin_task(self.store,{'task_id':task['id'],'implementation_operation':'implement-next'})
