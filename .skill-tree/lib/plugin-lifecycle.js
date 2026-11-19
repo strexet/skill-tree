@@ -11,7 +11,12 @@ function stoppedHandoff(root){
  if(core.hasActiveOperation(root))registry.fail('plugin-active','Active invocations must reach a stopped cleanup/handoff before plugin mutation');
  if(core.queueRoot(root)!==fs.realpathSync(root)){
   const state=core.workflowState(root),runs=state?(state.run_registry?Object.values(state.run_registry.runs):[state.active_run]):[];
-  const terminal=run=>run?.delivery?.implementation==='completed'&&(run.delivery.status==='merged'||run.delivery.status==='local-result'&&!run.delivery.authorization?.merge&&!run.delivery.authorization?.pr||run.delivery.status==='pr-ready'&&!run.delivery.authorization?.merge);
+  const terminal=run=>{
+   const delivery=run?.delivery;
+   if(delivery?.implementation!=='completed')return false;
+   if(run.reviewed_local_delivery&&delivery.publication==='not-requested')return delivery.order_completed===true&&['review-ready','merged'].includes(delivery.status);
+   return delivery.status==='merged'||delivery.status==='local-result'&&!delivery.authorization?.merge&&!delivery.authorization?.pr||delivery.status==='pr-ready'&&!delivery.authorization?.merge;
+  };
   if(runs.some(run=>run&&!terminal(run)&&!run.stop_reason))registry.fail('plugin-active','Linked installation requires an explicit canonical stopped handoff before plugin mutation');
  }
 }

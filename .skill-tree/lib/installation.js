@@ -123,6 +123,9 @@ function workflowState(root){
 function unfinishedRun(run){
  if(!run)return false;
  const delivery=run.delivery||{},authorization=delivery.authorization||{};
+ if(run.reviewed_local_delivery&&delivery.publication==='not-requested'){
+  return !(delivery.implementation==='completed'&&delivery.order_completed===true&&['review-ready','merged'].includes(delivery.status));
+ }
  if(authorization.pr===false&&authorization.merge===true){
   const {merge,target_admission:target,validation}=delivery.local_integration||{};
   const gitObject=value=>typeof value==='string'&&/^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(value);

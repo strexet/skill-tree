@@ -18,4 +18,4 @@ Inspect affected canonical contracts, callers, generated resources, installer an
 
 ## Verification
 
-Run synchronization checks, strict repository validation, behavioral Python/Node tests and installer dry runs. Tests verify selection boundaries, evidence requirements, state recovery, dependency handling, retention and portable installation. Tests avoid mirroring prose. Local commits require developer authorization and scoped staging. No publishing, pushing, tags or license changes are implied.
+Run synchronization checks, strict repository validation, behavioral Python/Node tests and installer dry runs. Tests verify selection boundaries, evidence requirements, state recovery, dependency handling, retention and portable installation. Tests avoid mirroring prose. Implementation operations commit accepted tasks with scoped staging and preserve unrelated work. The controller records local delivery separately from remote publication. No publishing, pushing, tags or license changes are implied.
