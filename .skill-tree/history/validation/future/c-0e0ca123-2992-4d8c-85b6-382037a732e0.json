@@ -1,0 +1,22 @@
+{
+  "task_id": "T-7eafba33-9f62-4772-845b-fe60b6e1f9e5",
+  "check_id": "canonical-worktree-refresh",
+  "attempt_id": "C-0e0ca123-2992-4d8c-85b6-382037a732e0",
+  "command": [
+    "python3",
+    "-B",
+    ".skill-tree/tests/test-run-workspaces.py",
+    "RunWorkspaceTests.test_linked_refresh_rejects_canonical_loss_and_source_drift"
+  ],
+  "result": "red",
+  "counts": {
+    "expected": 1,
+    "discovered": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0
+  },
+  "returncode": 1,
+  "log": ".skill-tree/artifacts/validation/future/c-0e0ca123-2992-4d8c-85b6-382037a732e0.txt",
+  "log_sha256": "8ed0e14d9521d045cef0b2d7ab4f3c324d939d5d4ebd3fc3d9106cd6b945fee2"
+}

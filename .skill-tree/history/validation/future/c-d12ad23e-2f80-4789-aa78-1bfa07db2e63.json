@@ -1,0 +1,21 @@
+{
+  "task_id": "T-7eafba33-9f62-4772-845b-fe60b6e1f9e5",
+  "check_id": "canonical-worktree-refresh",
+  "attempt_id": "C-d12ad23e-2f80-4789-aa78-1bfa07db2e63",
+  "command": [
+    "python3",
+    "-B",
+    ".skill-tree/tests/test-run-workspaces.py"
+  ],
+  "result": "pass",
+  "counts": {
+    "expected": 36,
+    "discovered": 36,
+    "passed": 36,
+    "failed": 0,
+    "skipped": 0
+  },
+  "returncode": 0,
+  "log": ".skill-tree/artifacts/validation/future/c-d12ad23e-2f80-4789-aa78-1bfa07db2e63.txt",
+  "log_sha256": "a65fbf0a13833a3165c0ad7ac4976b03b4334e2e2068dbc1d49789f1afce86e8"
+}

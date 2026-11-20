@@ -177,6 +177,43 @@ class RunWorkspaceTests(unittest.TestCase):
     def test_queue_copy_edits_never_become_authority(self):
         tid=self.task();run=self.start(tid);path=self.location(run);(path/'.skill-tree/documents/future.md').write_text('Invalid independent queue')
         self.assertEqual(wf.next_task(wf.Store(path))['task_id'],tid);self.assertIn(tid,wf.Store(path).text())
+
+    def test_linked_refresh_rejects_canonical_loss_and_source_drift(self):
+        run = self.start(self.task())
+        linked = self.location(run)
+        queue_copy = linked/'.skill-tree/documents/future.md'
+        queue_copy_bytes = queue_copy.read_bytes()
+        canonical = self.store.future.read_bytes()
+        checkpoint = self.store.state.read_bytes()
+        manifest = self.store.base/'skill-tree.json'
+        navigation = manifest.read_bytes()
+
+        def refresh(*options):
+            result = subprocess.run([sys.executable, '-B', str(CORE/'common/scripts/workflow-state.py'),
+                                     'refresh', str(linked), '--run-id', run['id'], *options],
+                                    capture_output=True, text=True, timeout=20)
+            return result.returncode, json.loads(result.stdout)
+
+        self.store.future.write_bytes(queue_copy_bytes)
+        status, response = refresh()
+        self.assertEqual(status, 2, response)
+        self.assertIn('.skill-tree/documents/future.md', response['error'])
+        self.assertEqual(self.store.future.read_bytes(), queue_copy_bytes)
+        self.assertEqual(self.store.state.read_bytes(), checkpoint)
+        self.assertEqual(manifest.read_bytes(), navigation)
+
+        self.store.future.write_bytes(canonical)
+        inspected = wf.file_hash(self.store.future)
+        changed = canonical.replace(b'Fixed task headers.', b'Current task headers.')
+        self.assertNotEqual(changed, canonical)
+        self.store.future.write_bytes(changed)
+        status, response = refresh('--expected-source-hash', inspected)
+        self.assertEqual(status, 2, response)
+        self.assertIn('changed', response['error'].lower())
+        self.assertEqual(self.store.future.read_bytes(), changed)
+        self.assertEqual(self.store.state.read_bytes(), checkpoint)
+        self.assertEqual(manifest.read_bytes(), navigation)
+        self.assertEqual(queue_copy.read_bytes(), queue_copy_bytes)
     def test_task_claim_blocks_standalone_mutation_from_another_run(self):
         a=self.task('First');b=self.task('Second');first=self.start(a);second=self.start(b)
         with self.assertRaisesRegex(wf.WorkflowError,'claimed'):wf.begin_task(wf.Store(self.location(second)),{'task_id':a})
