@@ -1,0 +1,87 @@
+{
+  "checks": [
+    {
+      "evidence": "The source metadata, changelog and 97 representative profiles report 0.6.0. The documented catalog matches 22 shared operations and nine Director operations.",
+      "id": "source-version-and-catalog",
+      "result": "pass"
+    },
+    {
+      "evidence": "Markdown navigation and release-sensitive behavior were compared against the operation declarations, production adapters and 3D evidence contracts. The independent scope covered local links in 33 repository documents.",
+      "id": "source-backed-document-review",
+      "result": "pass"
+    },
+    {
+      "evidence": "The repository-documentation validator and scoped document-rule checks reported no errors.",
+      "id": "document-validators",
+      "result": "pass"
+    }
+  ],
+  "coverage_gaps": [
+    "The audit covers release documentation and packaged source. Live Blender and Unity execution and native host discovery remain outside this audit."
+  ],
+  "findings": [
+    {
+      "id": "release-catalog-coverage",
+      "observation": "The project overview and feature catalog omitted shipped Full Cycle, Game Design and focused 3D operations.",
+      "status": "resolved"
+    },
+    {
+      "id": "release-narrative-flavor-coverage",
+      "observation": "The Narrative guide omitted the Director flavor.",
+      "status": "resolved"
+    },
+    {
+      "id": "release-director-source-baseline",
+      "observation": "The Director guide described an obsolete local ArtWorkshop baseline. The current guide points to shipped 3D source and keeps adapter qualification explicit.",
+      "status": "resolved"
+    },
+    {
+      "id": "release-runtime-qualification-wording",
+      "observation": "The 3D guide and quality audit blurred profile discovery, fixture coverage and native evidence.",
+      "status": "resolved"
+    }
+  ],
+  "id": "A-7c69734d-4254-4a4b-99df-78f2c127fee8",
+  "recorded_at": "2026-11-20T09:09:51.102120+00:00",
+  "scope": "Skill Tree 0.6.0 release documentation",
+  "source_fingerprints": {
+    ".skill-tree/common/scripts/3d-workshop.py": "6cef226a82b646e11de36d018b5df18fd291d52b36d306a146719b74fb09ecad",
+    ".skill-tree/common/scripts/director-plan-adapters.py": "5beaf73d5e1835b54bc3fe49ed67fa138ec3c3f060984ab1b0a9a43fd3849de5",
+    ".skill-tree/common/scripts/director-plans.py": "b28d8e4326dda6c390586759e36750c74cb909169ff244ecfe7af1e359bfb863",
+    ".skill-tree/config/flavors.json": "6d2458aad763f05f680924d630e43fbb41badbdf1a431efc34d32be371fa67a8",
+    ".skill-tree/documents/build-and-release.md": "7f37c7cb78d41db085836cd04314d962db921fad17f083b3be9473933e9f6c2e",
+    ".skill-tree/documents/director-workflow.md": "777412b69797bb578827c6fb732781b35fa969a40b02d0d3095e8333b497b92e",
+    ".skill-tree/documents/features.md": "58472aebc277c8e260aa188eecd64330cc0704e698ef8c2438050f4bab3c2958",
+    ".skill-tree/documents/narrative-workflow.md": "be4e652e01e385ef673eb344837324367bf8138934bb50118805a912032c34a5",
+    ".skill-tree/documents/project.md": "165ab24f21c9fe63831d602362e12f2de31dfdf8d8a2456d75d8d4780de738f9",
+    ".skill-tree/documents/skill-quality-audit.md": "7848088544478d4d81c4f29879685329efde251e7a7e572b1918d1fcba36fa77",
+    ".skill-tree/documents/skill-tree-3d-guide.md": "e2d14113046c6b50aca2d471cdaf9e31abc8ca53200b764b9e4da1494ac8892b",
+    ".skill-tree/domains/director/capabilities.json": "8cc57eb2504e2fa8cfa270d5181074fca7d5ae020a8f34608dfa6e98f018c4ca",
+    ".skill-tree/lib/composer.js": "fb26f8f539ac3a2ef1461675bc9a4326b48dbdc7c4f454c03f43586255d8a6b2",
+    ".skill-tree/templates/operations.json": "2ed14469e2281c9a91222f856f41f0036b2b8f0c7a878fbdeadc2fd1d0fc173e",
+    ".skill-tree/tests/test-3d-operation-installation.js": "fcc875413f30275bf95b3966eaba8d2a569865fec44a402257261065ac8cbd76",
+    "README.md": "bc1449a93264623967fb7dc0d3911508c5c264f361f963a14251976fdb5caf87",
+    "changelog.md": "250ad4c2923f698b222d8b6f360f0ca096de6aa10c897c4f06a28c4a64cc2ed6",
+    "package.json": "c1a22cd63cb7769afd0f37e201e57b7b938ce8f4f4f1f8bba093491a1eb94a6a"
+  },
+  "sources": [
+    "README.md",
+    "changelog.md",
+    "package.json",
+    ".skill-tree/config/flavors.json",
+    ".skill-tree/templates/operations.json",
+    ".skill-tree/lib/composer.js",
+    ".skill-tree/documents/build-and-release.md",
+    ".skill-tree/documents/features.md",
+    ".skill-tree/documents/project.md",
+    ".skill-tree/documents/narrative-workflow.md",
+    ".skill-tree/documents/director-workflow.md",
+    ".skill-tree/documents/skill-tree-3d-guide.md",
+    ".skill-tree/documents/skill-quality-audit.md",
+    ".skill-tree/domains/director/capabilities.json",
+    ".skill-tree/common/scripts/director-plan-adapters.py",
+    ".skill-tree/common/scripts/director-plans.py",
+    ".skill-tree/common/scripts/3d-workshop.py",
+    ".skill-tree/tests/test-3d-operation-installation.js"
+  ]
+}

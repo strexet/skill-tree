@@ -1,0 +1,72 @@
+{
+  "lane": "static",
+  "reviewer": "/root/game_design_collection_reader",
+  "source_sha256": {
+    "game-design-patterns.md": "fc79285537c68a2d5e3bd1d31f548069010d49f01fca1f1133d12b9596bb4668",
+    "game-design-mechanics.md": "a7ec439676b910c35bda57716d8439c0c45bf666efb7dbc5353c6e1f21badf86"
+  },
+  "coverage": {
+    "Continuous control": 2,
+    "Timed execution": 2,
+    "Discrete decisions": 2,
+    "Simultaneous play": 2,
+    "Asynchronous play": 2,
+    "Autonomous systems": 2
+  },
+  "source_ids": [
+    "car-racing@1",
+    "lunar-lander@1",
+    "mania-hold@1",
+    "osu-slider@1",
+    "fide-standard@1",
+    "catan-base-2020@1",
+    "diplomacy-orders@1",
+    "frozen-synapse@1",
+    "lichess-correspondence@1",
+    "trackmania-ghost@1",
+    "factorio-belt-signal@1",
+    "openttd-load-orders@1"
+  ],
+  "pattern_ids": [
+    "analog-course-correction",
+    "thrust-and-attitude",
+    "timed-hold-release",
+    "follow-timed-path",
+    "alternating-legal-action",
+    "supply-before-spend",
+    "sealed-joint-resolution",
+    "preview-then-commit",
+    "delayed-turn-handoff",
+    "recorded-run-reference",
+    "arrival-pulse",
+    "occupancy-level",
+    "conditioned-departure"
+  ],
+  "source_sample": [
+    "Farama Car Racing Action Space and Lunar Lander Arguments and Notes",
+    "osu!mania Gameplay and Judgement, osu! slider checkpoints",
+    "FIDE Articles 1 and 3 and CATAN English base rules",
+    "Renegade Diplomacy Order Writing and Mode 7 Frozen Synapse preview",
+    "Lichess correspondence time and return to active games, Trackmania leaderboard ghosts with active Club Access",
+    "Factorio circuit Transport belts and OpenTTD Full load"
+  ],
+  "repeat": {
+    "source": "factorio-belt-signal@1",
+    "observed_rows": "Matching public Transport belts mode rows at both inspections.",
+    "arrival_tick": {
+      "pulse": "active",
+      "occupancy": "active"
+    },
+    "next_tick_while_present": {
+      "pulse": "absent",
+      "occupancy": "active"
+    },
+    "disposition": "Reject merge; retain two patterns under one source revision with zero duplicates."
+  },
+  "review_notes": [
+    "The exact Lunar Lander Notes locator and implementation caveat resolve the review finding.",
+    "Long note is source terminology; charge remains an alias collision distinguished by trigger and resource state.",
+    "Known gaps include assisted control, haptic timing cues, irregular decisions, live co-op, shared asynchronous contributions and unattended recovery.",
+    "The sample uses original descriptions and links, with behavior supported by documentation. Runtime evidence and broad coverage claims remain open."
+  ]
+}

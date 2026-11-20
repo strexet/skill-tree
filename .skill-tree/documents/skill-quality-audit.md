@@ -26,6 +26,14 @@ The [observation record](../history/validation/next-version/agent-conformance-li
 
 The host does not expose an exact inherited model identifier. Qualification covers the observed Codex configuration and recorded package contexts. Universal model adherence, other host configurations and native provider discovery remain unqualified.
 
+## Game Design authoring pilot
+
+Three independent Codex contexts ran the installed Game Design, Mechanics and Balance entrypoints in separate general-flavor projects. The operators produced a premise with two playable directions, a deck-free workshop and partial inventory, and a provisional Balance study. The inventory retained the unexamined placement. The clip description left the effective baseline and cause open.
+
+Three further contexts used a fourth installation to carry one scoped rule through a brief, placement and study. The Mechanics operator pinned pattern relevance and exclusions. The Balance operator applied one fixture decision from the exact reviewed base. A separate invocation repeated the decision and produced the same tuning and study bytes. The linked artifacts preserved the rejected candidate and earlier checks. An independent reviewer reconstructed the effective value, affected checks and the difference between turn cost, a timed trigger and active-time drain.
+
+The [authoring observation record](../history/validation/game-design-pilot/authoring-observations.json) identifies the observed operators, input and output digests, owned profiles and installed package fingerprints. The raw briefs and artifacts reside in the disposable projects. Observations cover explicit installed entrypoint invocations under the inherited Codex configuration. Native discovery, Unity behavior, real participant response and creative acceptance have separate evidence requirements.
+
 ## Instruction assessment
 
 Installed entrypoints contain approximately 154–315 whitespace-delimited words before conditional reference loading. Complete package Markdown contains approximately 2,306–9,497 words per operation in the initial measured snapshot. The counts establish no actual context, latency or token-cost result. Standalone resources intentionally duplicate shared contracts.
@@ -34,6 +42,6 @@ The [Agent Skills specification](https://agentskills.io/specification) and [Open
 
 ## Evidence limits
 
-Source fixtures and temporary installations cover all three flavors. The eight actual-agent cases use the general flavor. No Unity Editor, browser product, hosted deployment, physical device or live PR publication occurs. Provider-matrix declarations receive structural validation; current native support across every provider remains separate qualification.
+The original repair fixtures and temporary installations cover general, web and unity. The 3D installation fixture covers general, web, unity and director. The eight original actual-agent cases and the Game Design authoring pilot use the general flavor. No Unity Editor, browser product, hosted deployment, physical device or live PR publication occurs. Provider-matrix declarations receive structural validation; current native support across every provider remains separate qualification.
 
 Expected defect reproductions establish useful Red evidence; final regression passes and actual-agent observations remain distinct records. Historical findings and terminal outcomes retain original verdicts and timestamps.

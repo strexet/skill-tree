@@ -18,7 +18,7 @@ Execute the same dependency cycle for remaining snapshot roots by current priori
 
 An explicitly launched/resumed controller automatically selects the recommended eligible next unit after targeted processing through advance/next. Report the scoped prioritized units and the chosen ID/reason; no routine next-action question interrupts the authorized root/snapshot cycle. Required closure/snapshot boundaries, deferred findings and task-specific execution policy remain binding. Missing material decisions require questions; unsafe isolation, mandatory failures without a repair path and the repeated-unchanged-failure circuit breaker stop execution.
 
-Standalone Process Pending prints the global prioritized list and a developer-choice handoff with one recommended action last. A stored active checkpoint alone never activates the automatic path. Flow completion reports deferred choices and starts no additional root/snapshot. Follow the processing-result contract in future-workflow.md.
+Standalone Process Pending prints the global prioritized list and follows the [processing-result contract](future-workflow.md#processing-result-and-next-action) for the next action. A stored active checkpoint alone never activates the automatic path. Flow completion reports deferred choices and starts no additional root or snapshot. Use the [visible owner handoff contract](decision-governance.md#visible-owner-handoff) for controller stops that need owner input.
 
 ## Boundaries
 
@@ -39,7 +39,11 @@ Advance returns implement or validate. Awaiting-validation units keep the specif
 Finish preserves implementation acceptance independently of delivery. Offer local result, PR review/fix, or PR review/fix with an explicit merge target. No offer starts publication. A recorded full-path owner instruction continues through the bundled [PR review cycle](pr-review-cycle.md) without repeated authorization questions. PR readiness, merge confirmation and publication blockers remain separate persisted outcomes.
 
 
-## Authorized local integration
+## Reviewed controller delivery
+
+Each accepted task has one scoped commit. The final controller frame reviews the complete committed diff against the recorded launch tip. Fix commits preserve accepted task history. Implement All performs the reviewed local merge. Work Through Next keeps the reviewed branch available and merges on explicit owner request.
+
+## Previously recorded local integration
 
 A recorded local-merge order completes implementation first and leaves delivery pending. The immutable implementation receipt freezes the reviewed committed source and current acceptance. The selected run owns one canonical target branch, a prepared pair of Git parents and the expected source tree. A local-result order without merge authority retains the ordinary implementation handoff.
 

@@ -134,6 +134,233 @@ class LocalDeliveryTests(unittest.TestCase):
         self.implementation = wf.finish(self.selected) if finish else None
         return self.implementation
 
+    def start_reviewed_controller(self, mode, *, merges=False, remote=False, deps=False):
+        launch=self.base/'launch'
+        self.git(self.root,'worktree','add',launch,'release/example')
+        (launch/'local-tip.txt').write_text('local-only start branch commit\n')
+        self.git(launch,'add','local-tip.txt')
+        self.git(launch,'commit','-m','Unpushed launch tip')
+        self.start_head=self.git(launch,'rev-parse','HEAD')
+        self.launch=launch
+        self.remote_before=self.git(self.remote,'show-ref')
+        self.dependency=self.task('Required source unit') if deps else None
+        self.tid=self.task('Selected local delivery',deps=[self.dependency] if deps else [])
+        operation='implement-all' if mode=='all' else 'work-through-next'
+        order={'implementation_operation':operation}
+        if merges:
+            order['delivery_authorization']={'pr':False,'merge':True,'target_branch':'release/example',
+                'owner_instruction':'Merge after this local review.'}
+        if remote:
+            order['delivery_authorization']={'pr':True,'merge':True,'target_branch':'develop'}
+        self.run=wf.start(wf.Store(launch,allow_unselected=True,neutral=True),mode,
+            self.tid if mode=='next' else None,workspace=order)
+        self.source=self.location(self.run)
+        self.selected=wf.Store(self.source,self.run['id'])
+        return self.run
+
+    def accept_scoped_source(self,task_id):
+        criterion='Preserve scoped source behavior.'
+        store=self.selected
+        wf.begin_task(store,{'task_id':task_id})
+        relative='consumer.py' if self.dependency and task_id==self.tid else 'source.py'
+        path=self.source/relative
+        baseline=path.read_text() if path.exists() else ''
+        path.write_text(baseline+'# '+task_id+'\n')
+        info=wf.mark_implemented(store,{'task_id':task_id,'changed_files':[relative]})
+        (self.source/'report.json').write_text('{}')
+        attempt=wf.prepare_check(store,{'task_id':task_id,'check_id':'behavior'})
+        wf.record_check(store,{'task_id':task_id,'check_id':'behavior','attempt_id':attempt['attempt_id'],
+            'result':'pass','classification':'executed-control','actual_lane':'static',
+            'environment_identity':attempt['environment_identity'],
+            'assertions':[{'assertion':criterion,'result':'pass'}],
+            'cleanup':'No product process was launched.','evidence':['report.json']})
+        task_review=wf.identity('DO')
+        expected=info['git_review_identity']
+        with patch.object(wf,'verified_implementation_review',return_value={'orchestration_hash':'b'*64}) as check:
+            result=wf.complete(store,{'task_id':task_id,'review_id':task_review,
+                'outcome':'Accepted scoped fixture source.','source_fingerprints':wf.fingerprints(store,['source.py',relative]),
+                'acceptance':[{'criterion':criterion,'result':'pass','evidence':['report.json']}]})
+        check.assert_called_once_with(store,task_review,expected,{'kind':'task','task_ids':[task_id]})
+        return result
+
+    def finish_reviewed_fixture(self):
+        wf.advance(self.selected)
+        preview=wf.controller_review_identity(self.selected)
+        review_id=wf.identity('DO')
+        with patch.object(wf,'verified_implementation_review',return_value={'orchestration_hash':'a'*64}) as check:
+            result=wf.finish(self.selected,{'review_id':review_id})
+        expected=(self.selected,review_id,preview['identity'],
+            {'kind':'controller','run_id':self.run['id'],'task_ids':self.run['admitted_task_ids']})
+        self.assertEqual(check.call_args_list,[unittest.mock.call(*expected)]*
+            (2 if self.run['reviewed_local_delivery']['merge_at_finish'] else 1))
+        return result
+
+    def test_policy_work_through_next_reviews_then_merges_on_exact_later_request(self):
+        self.start_reviewed_controller('next')
+        self.assertEqual(self.run['workspace']['base_commit'],self.start_head)
+        self.assertEqual(self.run['workspace']['base_branch'],'release/example')
+        self.assertEqual(self.git(self.root,'branch','--show-current'),'main')
+        task=self.accept_scoped_source(self.tid)
+        self.assertEqual(len(task['commits']),1)
+        result=self.finish_reviewed_fixture()
+        self.assertEqual(result['delivery']['status'],'review-ready')
+        self.assertEqual(self.git(self.launch,'rev-parse','HEAD'),self.start_head)
+        self.assertTrue(ws.delivery_finished(result))
+        own=self.launch/'target-dirt.txt'
+        own.write_text('staged target work\n')
+        self.git(self.launch,'add','target-dirt.txt')
+        own.write_text('unstaged target work\n')
+        before=self.git(self.launch,'diff','--cached','--','target-dirt.txt')
+        with patch.object(wf,'verified_implementation_review',return_value={'orchestration_hash':'a'*64}):
+            merged=wf.merge_reviewed_controller(self.selected,{'owner_instruction':'Merge the reviewed run locally.'})
+        self.assertEqual(merged['delivery']['status'],'merged')
+        self.assertEqual(self.git(self.launch,'show','-s','--format=%P','HEAD').split(),
+            [self.start_head,task['commits'][0]])
+        self.assertEqual(self.git(self.launch,'diff','--cached','--','target-dirt.txt'),before)
+        self.assertEqual(own.read_text(),'unstaged target work\n')
+        self.assertEqual(self.git(self.remote,'show-ref'),self.remote_before)
+
+    def test_policy_implement_all_merges_only_the_reviewed_scope_by_default(self):
+        self.start_reviewed_controller('all',deps=True)
+        first=self.accept_scoped_source(self.dependency)
+        accepted=self.accept_scoped_source(self.tid)
+        result=self.finish_reviewed_fixture()
+        self.assertEqual(result['delivery']['status'],'merged')
+        self.assertEqual(self.git(self.launch,'show','-s','--format=%P','HEAD').split(),
+            [self.start_head,accepted['commits'][0]])
+        self.assertEqual(self.git(self.source,'rev-parse','HEAD^'),first['commits'][0])
+        self.assertEqual(self.git(self.remote,'show-ref'),self.remote_before)
+
+    def test_policy_reviewed_merge_repairs_owned_index_after_lost_acknowledgement(self):
+        self.start_reviewed_controller('next')
+        self.accept_scoped_source(self.tid)
+        self.git(self.source,'rm','local-tip.txt')
+        self.git(self.source,'commit','-m','Reviewed removal')
+        self.finish_reviewed_fixture()
+        index=ws.task_index_path(self.launch)
+        original=ws.os.replace
+        def fail_index_move(source, target):
+            if Path(target)==index:
+                raise OSError('Fixture lost target index acknowledgement')
+            return original(source,target)
+        with patch.object(wf,'verified_implementation_review',return_value={'orchestration_hash':'a'*64}):
+            with patch.object(ws.os,'replace',side_effect=fail_index_move):
+                with self.assertRaisesRegex(OSError,'lost target index'):
+                    wf.merge_reviewed_controller(self.selected,{'owner_instruction':'Merge the reviewed run locally.'})
+        merged_head=self.git(self.launch,'rev-parse','HEAD')
+        self.assertNotEqual(merged_head,self.start_head)
+        self.assertIn('source.py',self.git(self.launch,'status','--porcelain'))
+        (self.launch/'added-after-merge.txt').write_text('Keep the staged user changes.\n')
+        self.git(self.launch,'add','added-after-merge.txt')
+        later=self.source/'source.py'
+        later.write_text('Independent new source work.\n')
+        result=wf.merge_reviewed_controller(self.selected)
+        self.assertEqual(later.read_text(),'Independent new source work.\n')
+        self.assertEqual(result['delivery']['reviewed_merge']['commit'],merged_head)
+        self.assertEqual(self.git(self.launch,'rev-parse','HEAD'),merged_head)
+        self.assertEqual(self.git(self.launch,'diff','--cached','--name-only'),'added-after-merge.txt')
+        self.assertEqual(self.git(self.launch,'diff','--name-only','--','source.py'),'')
+        self.assertFalse((self.launch/'local-tip.txt').exists())
+
+    def test_policy_late_merge_rejects_changed_review_and_moved_target(self):
+        self.start_reviewed_controller('next')
+        self.accept_scoped_source(self.tid)
+        self.finish_reviewed_fixture()
+        order={'owner_instruction':'Merge the reviewed run locally.'}
+        with patch.object(wf,'verified_implementation_review',return_value={'orchestration_hash':'c'*64}):
+            with self.assertRaisesRegex(wf.WorkflowError,'review acceptance changed'):
+                wf.merge_reviewed_controller(self.selected,order)
+        self.assertEqual(self.git(self.launch,'rev-parse','HEAD'),self.start_head)
+        self.git(self.launch,'commit','--allow-empty','-m','Target advanced')
+        advanced=self.git(self.launch,'rev-parse','HEAD')
+        with patch.object(wf,'verified_implementation_review',return_value={'orchestration_hash':'a'*64}):
+            with self.assertRaisesRegex(ws.RunError,'target moved'):
+                wf.merge_reviewed_controller(self.selected,order)
+        self.assertEqual(self.git(self.launch,'rev-parse','HEAD'),advanced)
+        self.assertEqual(self.selected.load()['active_run']['delivery']['status'],'review-ready')
+
+    def test_policy_optional_merge_at_launch_and_explicit_remote_delivery(self):
+        self.start_reviewed_controller('next',merges=True)
+        self.accept_scoped_source(self.tid)
+        result=self.finish_reviewed_fixture()
+        self.assertEqual(result['delivery']['status'],'merged')
+        self.assertEqual(self.git(self.remote,'show-ref'),self.remote_before)
+
+    def test_policy_explicit_remote_order_retains_separate_publication(self):
+        run=self.start_reviewed_controller('next',remote=True)
+        self.assertNotIn('reviewed_local_delivery',run)
+        self.assertEqual(run['workspace']['base_branch'],'develop')
+        self.accept_scoped_source(self.tid)
+        self.assertEqual(wf.finish(self.selected)['delivery']['status'],'implementation-completed')
+        self.assertEqual(self.git(self.launch,'rev-parse','HEAD'),self.start_head)
+        self.assertEqual(self.git(self.remote,'show-ref'),self.remote_before)
+
+    def test_policy_review_ready_requires_hook_preflight_outside_writer(self):
+        self.start_reviewed_controller('next')
+        self.accept_scoped_source(self.tid)
+        chain=wf.identity('HC')
+        with self.selected.lock():
+            text=self.selected.text()
+            state=self.selected.load(text)
+            state['active_run']['hook_chains']=[chain]
+            self.selected.save(text,state)
+        observed=[]
+        def prepare(store,scope=None,chain_ids=None):
+            if chain_ids:
+                self.assertFalse(getattr(store,'_writer_active',False))
+                observed.append(('prepare',chain_ids))
+        def guard(store,scope=None,chain_ids=None,**options):
+            if chain_ids:
+                self.assertTrue(store._writer_active)
+                self.assertEqual(observed[-1],('prepare',[chain]))
+                observed.append(('guard',chain_ids))
+        with patch.object(wf,'prepare_hook_admission',side_effect=prepare), patch.object(wf,'hook_admission',side_effect=guard):
+            result=self.finish_reviewed_fixture()
+        self.assertEqual(result['delivery']['status'],'review-ready')
+        self.assertEqual(observed,[('prepare',[chain]),('guard',[chain])])
+
+    def test_policy_merge_accepts_a_tracked_file_with_a_new_ignore_rule(self):
+        self.start_reviewed_controller('next')
+        self.accept_scoped_source(self.tid)
+        (self.source/'later-ignored.txt').write_text('Tracked accepted data.\n')
+        self.git(self.source,'add','later-ignored.txt')
+        (self.source/'.gitignore').write_text('later-ignored.txt\n')
+        self.git(self.source,'add','.gitignore')
+        self.git(self.source,'commit','-m','Scoped final review correction')
+        self.finish_reviewed_fixture()
+        with patch.object(wf,'verified_implementation_review',return_value={'orchestration_hash':'a'*64}):
+            merged=wf.merge_reviewed_controller(self.selected,{'owner_instruction':'Merge the reviewed run locally.'})
+        self.assertEqual(merged['delivery']['status'],'merged')
+        self.assertEqual(self.git(self.launch,'status','--porcelain'),'')
+        self.assertEqual(self.git(self.launch,'show','HEAD:later-ignored.txt'),'Tracked accepted data.')
+
+    def test_policy_review_ready_uses_original_base_after_launch_branch_advances(self):
+        self.start_reviewed_controller('next')
+        self.accept_scoped_source(self.tid)
+        self.git(self.launch,'commit','--allow-empty','-m','Independent target change')
+        advanced=self.git(self.launch,'rev-parse','HEAD')
+        wf.advance(self.selected)
+        self.assertEqual(wf.controller_review_identity(self.selected)['identity']['base_oid'],self.start_head)
+        result=self.finish_reviewed_fixture()
+        self.assertEqual(result['delivery']['status'],'review-ready')
+        with patch.object(wf,'verified_implementation_review',return_value={'orchestration_hash':'a'*64}):
+            with self.assertRaisesRegex(ws.RunError,'target moved'):
+                wf.merge_reviewed_controller(self.selected,{'owner_instruction':'Merge the reviewed run locally.'})
+        self.assertEqual(self.git(self.launch,'rev-parse','HEAD'),advanced)
+
+    def test_policy_merge_reconciles_reviewed_executable_mode_with_filemode_disabled(self):
+        self.start_reviewed_controller('next')
+        self.accept_scoped_source(self.tid)
+        self.git(self.source,'config','core.fileMode','false')
+        self.git(self.source,'update-index','--chmod=+x','source.py')
+        self.git(self.source,'commit','-m','Reviewed executable mode')
+        self.finish_reviewed_fixture()
+        with patch.object(wf,'verified_implementation_review',return_value={'orchestration_hash':'a'*64}):
+            result=wf.merge_reviewed_controller(self.selected,{'owner_instruction':'Merge the reviewed run locally.'})
+        self.assertEqual(result['delivery']['status'],'merged')
+        self.assertEqual(self.git(self.launch,'status','--porcelain'),'')
+        self.assertTrue(self.git(self.launch,'ls-tree','HEAD','source.py').startswith('100755 '))
+
     def copy_source_generation(self):
         target = self.root / '.skill-tree'
         for directory in ('common', 'domains', 'templates', 'config', 'lib', 'src', 'bin',

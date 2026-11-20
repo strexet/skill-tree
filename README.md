@@ -1,6 +1,6 @@
 # Skill Tree
 
-Skill Tree provides portable operations for repository documentation, intake, research, implementation, resumable orchestration, narrative development and plugin management. One project-scoped installation selects general, web, unity or director. Common contracts and concrete project capabilities compose into standalone packages with stable `skill-tree-*` names.
+Skill Tree provides portable operations for repository documentation, intake, research, implementation, resumable orchestration, game design, narrative development, 3D asset production and plugin management. One project-scoped installation selects general, web, unity or director. Common contracts and concrete project capabilities compose into standalone packages with stable `skill-tree-*` names.
 
 [Installation](.skill-tree/documents/install.md) · [Validation](.skill-tree/common/references/validation-policy.md) · [Workflow](.skill-tree/common/references/future-workflow.md) · [Metadata](.skill-tree/common/references/workflow-metadata.md) · [Source manifest](.skill-tree/skill-tree.json) · [Conformance audit](.skill-tree/documents/workflow-redesign-conformance.md)
 
@@ -19,11 +19,15 @@ Invoke `skill-tree-plugins` to browse known sources, inspect installed packages 
 
 Target documentation and task progress reside in `.skill-tree/documents/`. Schema 2 retains standalone single-run checkpoints; explicit workspace setup creates a schema-3 registry for isolated controllers sharing one canonical queue. Structured outcomes and bounded audit/run evidence reside in `.skill-tree/history/`. Focused Red/Green feedback remains immediate; compatible additional boundary checks can share a scoped group. Completion requires current passed check receipts.
 
-Standalone Process Pending reports the prioritized list and waits for developer selection, with one recommendation last. Explicit Work Through Next and Implement All controllers continue through eligible required work inside the recorded scope. A checkpoint, profile or installed flavor supplies no independent execution, continuation, commit or publication permission.
+Standalone Process Pending reports the prioritized list and waits when the developer has not selected a follow-on operation. The [owner handoff contract](.skill-tree/common/references/decision-governance.md#visible-owner-handoff) governs how operations present stops, questions and recommendations in the ordinary reply. Explicit Work Through Next and Implement All controllers continue through eligible required work inside the recorded scope. A checkpoint, profile or installed flavor supplies no independent execution, continuation, commit or publication permission.
+
+Invoke `skill-tree-full-cycle` to deliver one task or an explicit group from Pending through research and scoped implementation to one reviewed PR merged into `develop`. Required stops preserve the original batch, run and publication scope for resumption. [Full-cycle contract](.skill-tree/common/references/full-cycle.md)
 
 `skill-tree-clarify-tasks` supports explicit task and group interviews through source research and guarded revisions. Manual sessions use owner answers and confirmation. Auto sessions use recorded agent decisions under a bounded owner grant. Session records preserve the selected scope across interruption. Current semantic confirmation completes clarification. Implementation requires a separate instruction. The [clarification contract](.skill-tree/documents/task-clarification-contract.md) defines task holds and confirmation freshness.
 
 `skill-tree-narative` guides narrative game projects through creative questions, draft development, continuity and gameplay review, and explicit author acceptance. The [narrative workflow](.skill-tree/documents/narrative-workflow.md) describes the project store and the playable example.
+
+The game design operations cover [design and the GDD](.skill-tree/common/references/game-design-gdd.md), [mechanics](.skill-tree/common/references/game-design-mechanics.md) and [balance](.skill-tree/common/references/game-design-balance-study.md). The [3D guide](.skill-tree/documents/skill-tree-3d-guide.md) covers reference preparation, Blender, texturing, motion and Unity integration.
 
 The director flavor coordinates registered folders and repositories from one Codex conversation. The [Director workflow](.skill-tree/documents/director-workflow.md) describes assignment routing, owner decisions, diagnostics and controlled installation.
 

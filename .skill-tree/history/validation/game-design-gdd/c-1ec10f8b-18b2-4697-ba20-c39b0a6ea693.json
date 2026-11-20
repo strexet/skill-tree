@@ -1,0 +1,26 @@
+{
+  "lane": "static",
+  "general_installation": "f19fa7d394def951f85b70bae377368d52689eec2255f3da03d1e4997d20d42c",
+  "resource_count": 27,
+  "independent_reader": {
+    "context": "/root/game_design_gdd_reader",
+    "reference": "Observed read-only Codex collaboration response on final pinned trial documents."
+  },
+  "document_pins": {
+    "design/brief.md": "3a798acd109d56fed8849fd9812fdb362964baf6c552388402d2b2616c640056",
+    "design/rules/steering-assist.md": "a50d357cbff418a726b60a12b6b14b5f2047dd995057c47f151ec9b57f99dd7c",
+    "design/vessel-tuning.md": "64f9fdc66c7debf4874ea649274599e4494d3698f4305babd7a48f68d6c6ec7a",
+    "design/rules/dock-preview.md": "daaf8f284daa59915afa7e7af20b674bba48a3b7af3648d98601440970f9c9e0",
+    "design/rules/shore-charge.md": "2fe17414a4cf9dd9fa942a2e5c7f2f34171d2738037bfffe1029cdba9bb93aaa"
+  },
+  "unchanged_adjacent_rules": {
+    "dock-preview.md": "daaf8f284daa59915afa7e7af20b674bba48a3b7af3648d98601440970f9c9e0",
+    "shore-charge.md": "2fe17414a4cf9dd9fa942a2e5c7f2f34171d2738037bfffe1029cdba9bb93aaa"
+  },
+  "observations": [
+    "The brief supplied the premise, audience, time and input constraints, repeated route choices, steering mechanics, assumptions, a feasible comparison with ordinary drag and a shared paper observation.",
+    "The reader predicted assist and cue on at 100 and 299 active milliseconds and off at 300 and after a 299 to 301 update. Renewed steering at 80 ends assist. A pause at 100 leaves 200 active milliseconds. Twice gameplay scale reaches the boundary after 150 unpaused real milliseconds.",
+    "The discrete preview returned the same preview on replay in one turn. The unattended rule applied the eight-unit cap to a resume from five units after four whole real minutes. Adjacent rule and tuning pins stayed fixed.",
+    "The handoffs name the exact rule and tuning revisions and the scene and parameter questions. The general installation contains one standalone operation with verified local package files."
+  ]
+}

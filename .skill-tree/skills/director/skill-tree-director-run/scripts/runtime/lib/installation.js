@@ -4,6 +4,8 @@ const c=require('./composer.js');
 const development=require('./development-policies.js');
 const BEGIN='<!-- BEGIN skill-tree-skills -->',END='<!-- END skill-tree-skills -->';
 const INSTALL='.skill-tree/installation',PROFILE=INSTALL+'/profile.json';
+const AGENTS_PATH='AGENTS.md',REGENERATE_AGENTS=Symbol('regenerate-agents');
+const isCodexBridge=record=>Array.isArray(record?.providers)&&record.providers.includes('codex');
 const TASK_GROUPING_SOURCE='common/scripts/workflow-state.py';
 const TASK_GROUPING_BUNDLE=INSTALL+'/source/'+TASK_GROUPING_SOURCE;
 const TASK_GROUPING_HELPER='scripts/workflow-state.py';
@@ -19,30 +21,61 @@ function compositionIdentity(profile){
  return c.hash(c.json({flavor:profile.flavor,environment_id:profile.environment_id,source_digests:profile.source_digests,output_digests:outputs}));
 }
 const treeHash=(root,rel,includeCaches=false)=>{const files=filesAt(root,rel,includeCaches);return files===null?null:c.hash(c.json(files));};
+function hasRetainedCore(root){
+ return [INSTALL+'/manager.js',INSTALL+'/source'].some(relative=>fs.existsSync(c.safe(root,relative)));
+}
+function missingReceipt(root){
+ const recovery=hasRetainedCore(root)
+  ? 'Restore the matching ownership receipt for the retained maintenance bundle and run the owned manager --verify.'
+  : 'Install Skill Tree with an explicit --flavor if this is a new target.';
+ return Error('Missing ownership receipt: '+PROFILE+'. '+recovery);
+}
 function receipt(root,required=false,allowForeign=false){
  const p=c.readJson(root,PROFILE,null);
- if(!p){if(required)throw Error('Missing ownership receipt; install with an explicit --flavor');return null;}
+ if(!p){if(required)throw missingReceipt(root);return null;}
  if(p.format!=='skill-tree-profile'||p.schema!==1||typeof p.project_root!=='string'||!allowForeign&&p.project_root!==fs.realpathSync(root)||!p.destinations||!p.bundle_digests)throw Error('Unsupported or foreign ownership receipt; use the manual update checklist');
  return p;
 }
-function verifyOwned(root,p,includeBundle=true){
+function verifyOwned(root,p,includeBundle=true,operation){
  if(p.identity!==compositionIdentity(p))throw Error('Composition receipt identity mismatch');
  for(const [rel,record] of Object.entries(p.destinations)){
   if(!/^skill-tree-[a-z0-9-]+$/.test(record.name)||path.basename(rel)!==record.name)throw Error('Invalid owned destination');
-  if(c.json(filesAt(root,rel))!==c.json(record.files))throw Error('Unowned or locally modified package conflicts: '+rel);
+  const actual=filesAt(root,rel);
+  if(c.json(actual)!==c.json(record.files)){
+   const missing=actual&&Object.keys(record.files).find(file=>!Object.hasOwn(actual,file));
+   const location=missing?rel+'/'+missing:rel;
+   throw Error('Unowned or locally modified package conflicts: '+location+'. Restore the matching owned package before retrying.');
+  }
  }
  if(includeBundle){
-  for(const [rel,hash] of Object.entries(p.bundle_digests))if(c.hash(c.read(root,rel)||'')!==hash)throw Error('Modified maintenance bundle: '+rel);
+  for(const [rel,hash] of Object.entries(p.bundle_digests)){
+   const content=c.read(root,rel);
+   if(content===null)throw Error('Missing maintenance bundle file: '+rel+'. Restore the missing file from the matching maintenance generation.');
+   if(c.hash(content)!==hash)throw Error('Modified maintenance bundle: '+rel);
+  }
   const actual=filesAt(root,INSTALL+'/source');
   const expected=Object.fromEntries(Object.entries(p.bundle_digests).filter(([rel])=>rel.startsWith(INSTALL+'/source/')).map(([rel,hash])=>[rel.slice((INSTALL+'/source/').length),hash]));
   if(c.json(actual)!==c.json(expected))throw Error('Unowned or missing maintenance source inventory');
  }
- for(const [rel,record] of Object.entries(p.bridges||{})){const current=c.read(root,rel)||'',block=bridgeBlock(current);if(!block||c.hash(block)!==record.hash)throw Error('Modified or missing owned bridge: '+rel);}
+ for(const [rel,record] of Object.entries(p.bridges||{})){
+  const current=c.read(root,rel);
+  const missingAgents=current===null&&rel===AGENTS_PATH&&isCodexBridge(record);
+  if(missingAgents&&operation===REGENERATE_AGENTS)continue;
+  const block=bridgeBlock(current||'');
+  if(!block||c.hash(block)!==record.hash){
+   const recovery=missingAgents?' To preview a fresh managed file, run node .skill-tree/installation/manager.js --regenerate-agents --dry-run.':'';
+   throw Error('Modified or missing owned bridge: '+rel+'. Restore the registered instruction file from a verified matching copy before retrying.'+recovery);
+  }
+ }
 }
 function bridgeBlock(text){
  const a=text.indexOf(BEGIN),b=text.indexOf(END);if(a<0&&b<0)return null;
  if(a<0||b<a||text.indexOf(BEGIN,a+BEGIN.length)>=0||text.indexOf(END,b+END.length)>=0)throw Error('Ambiguous bridge markers');
  return text.slice(a,b+END.length);
+}
+function renderBridge(source,flavor,profile){
+ const policyInstructions=development.instructions(profile);
+ return BEGIN+'\n'+c.read(source,'src/init-rules/skill-tree-skills.md').trim()+'\nFlavor: '+flavor+'. Profile: `.skill-tree/installation/profile.json`.\n'+(policyInstructions?'\n'+policyInstructions+'\n':'')+END;
 }
 function queueRoot(root){
  const result=require('node:child_process').spawnSync('git',['-C',root,'rev-parse','--git-common-dir'],{encoding:'utf8',timeout:5000});
@@ -123,6 +156,9 @@ function workflowState(root){
 function unfinishedRun(run){
  if(!run)return false;
  const delivery=run.delivery||{},authorization=delivery.authorization||{};
+ if(run.reviewed_local_delivery&&delivery.publication==='not-requested'){
+  return !(delivery.implementation==='completed'&&delivery.order_completed===true&&['review-ready','merged'].includes(delivery.status));
+ }
  if(authorization.pr===false&&authorization.merge===true){
   const {merge,target_admission:target,validation}=delivery.local_integration||{};
   const gitObject=value=>typeof value==='string'&&/^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(value);
@@ -325,6 +361,7 @@ function plan(root,source,flavor,selections,options={}){
  const profileBefore=treeHash(root,PROFILE);const old=receipt(root);if(old)verifyOwned(root,old);
  const workflowBefore=treeHash(root,WORKFLOW);
  if(!old&&fs.existsSync(c.safe(root,INSTALL))){
+  if(hasRetainedCore(root))throw missingReceipt(root);
   const {REGISTRY,PACKAGES,NOOP_REQUESTS,verifyInstalled}=require('./plugin-registry.js');
   const {backups,last}=transactionPaths('plugins');
   // Owned plugin state survives removal of the independent core generation.
@@ -353,8 +390,7 @@ function plan(root,source,flavor,selections,options={}){
  for(const rel of new Set([...(options.bridges||[]),...Object.keys(old?.bridges||{})])){
   const current=c.read(root,rel)||'',existing=bridgeBlock(current);bridgeBefore[rel]=treeHash(root,rel);
   if(existing&&!old?.bridges[rel])throw Error('Unowned bridge conflict: '+rel);
-  const policyInstructions=development.instructions(profile);
-  const block=BEGIN+'\n'+c.read(source,'src/init-rules/skill-tree-skills.md').trim()+'\nFlavor: '+flavor+'. Profile: `.skill-tree/installation/profile.json`.\n'+(policyInstructions?'\n'+policyInstructions+'\n':'')+END;
+  const block=renderBridge(source,flavor,profile);
   changes[rel]=existing?current.replace(existing,block):current+(current.endsWith('\n')?'\n':'\n\n')+block+'\n';
   bridges[rel]={hash:c.hash(block),providers:[...new Set([...(old?.bridges[rel]?.providers||[]),...(options.bridges?.includes(rel)&&options.provider?[options.provider]:[])])].sort()};
  }
@@ -389,10 +425,10 @@ function plan(root,source,flavor,selections,options={}){
  }).map(([rel])=>rel);
  return {profile:next,changes,delta,old,expected};
 }
-function verify(root,source,allowForeign=false){
+function verify(root,source,allowForeign=false,operation){
  if(fs.existsSync(c.safe(root,transactionPaths().journal)))throw Error('Core installation recovery is required before profile verification');
  if(fs.existsSync(c.safe(root,transactionPaths('plugins').journal)))throw Error('Plugin installation recovery is required before profile verification');
- const p=receipt(root,true,allowForeign);verifyOwned(root,p);const bundleSource=c.safe(root,INSTALL+'/source');
+ const p=receipt(root,true,allowForeign);verifyOwned(root,p,true,operation);const bundleSource=c.safe(root,INSTALL+'/source');
  const now=c.resolveProfile(bundleSource,root,p.flavor);
  for(const field of ['source_version','inputs','inventory','facts','recipes','gaps','environment_id','execution_bindings','worktree_environment','plugins','development_policies'])if(c.json(now[field])!==c.json(p[field]))throw Error('Profile refresh-required or resolved profile mismatch: node .skill-tree/installation/manager.js --refresh-profile');
  if(p.identity!==compositionIdentity(p))throw Error('Composition receipt identity mismatch');
@@ -406,6 +442,52 @@ function verify(root,source,allowForeign=false){
  const grouping=verifyTaskGroupingProof(p,groupingFileReader(root));
  if(!grouping)requireGroupedQueueCompatibility(root,p);
  return p;
+}
+function regenerateAgents(root,source,dryRun=false){
+ const target=()=>c.safe(root,AGENTS_PATH);
+ const existsError=()=>Error('AGENTS.md already exists; regenerate-agents requires an absent path');
+ function inspect(){
+  if(fs.existsSync(target()))throw existsError();
+  if(hasActiveOperation(root))throw Error('Active controller must reach a stopped cleanup/handoff before regenerating AGENTS.md');
+  const p=verify(root,source,false,REGENERATE_AGENTS),record=p.bridges?.[AGENTS_PATH];
+  if(!isCodexBridge(record))throw Error('No owned Codex bridge is registered for AGENTS.md');
+  if(['core','plugins'].some(channel=>fs.existsSync(c.safe(root,transactionPaths(channel).stage))))
+   throw Error('Retained installation staging requires explicit recovery before regenerating AGENTS.md');
+  const block=renderBridge(c.safe(root,INSTALL+'/source'),p.flavor,p);
+  if(c.hash(block)!==record.hash)throw Error('Installed rules no longer match the registered AGENTS.md block; restore the matching instruction file');
+  return { block, hash:record.hash };
+ }
+ if(dryRun){
+  const owner=queueRoot(root);
+  if([root,owner].some(location=>fs.existsSync(c.safe(location,INSTALL+'/.install-lock')))||fs.existsSync(c.safe(owner,'.skill-tree/.writer-lock')))
+   throw Error('Installation or workflow lock exists; reach a cleanup/handoff before regenerating AGENTS.md');
+  const {hash}=inspect();
+  return {action:'dry-run',changed:[AGENTS_PATH],bridge_sha256:hash};
+ }
+ receipt(root,true);
+ return locked(root,()=>{
+  const before=treeHash(root,PROFILE),{block,hash}=inspect();
+  const staging=fs.mkdtempSync(c.safe(root,'.skill-tree-agents-recovery-'));
+  try{
+   const staged=path.join(staging,AGENTS_PATH);
+   const content=Buffer.from(block+'\n','utf8');
+   const fd=fs.openSync(staged,'wx+');
+   try{
+    fs.writeFileSync(fd,content);
+    if(inspect().hash!==hash||treeHash(root,PROFILE)!==before)throw Error('Ownership receipt changed during AGENTS.md staging');
+    const original=fs.fstatSync(fd),actual=Buffer.alloc(content.length);
+    if(original.size!==content.length||fs.readSync(fd,actual,0,actual.length,0)!==actual.length||!actual.equals(content))
+     throw Error('Staged AGENTS.md bytes changed before publication');
+    const current=fs.lstatSync(staged);
+    if(!current.isFile()||current.nlink!==1||current.dev!==original.dev||current.ino!==original.ino)
+     throw Error('Staged AGENTS.md file identity changed before publication');
+    // A link publishes verified bytes only while the destination is absent.
+    try{fs.linkSync(staged,target());}catch(error){if(error.code==='EEXIST')throw existsError();throw error;}
+   }finally{fs.closeSync(fd);}
+  }finally{fs.rmSync(staging,{recursive:true,force:true});}
+  verify(root,source);
+  return {action:'regenerated',changed:[AGENTS_PATH],bridge_sha256:hash};
+ },{recoverPending:false,recoverPluginPending:false});
 }
 function install(root,source,flavor,selections,options={}){
  if(options.dryRun){const result=plan(root,source,flavor,selections,options);return {profile:result.profile,delta:result.delta,action:'dry-run'};}
@@ -513,9 +595,10 @@ function localMain(root,source,args){
  try{
   if(['lock-api','unlock-api'].includes(args[0])){console.log(c.json(require('./api-contract-locks.js').runCommand(root,source,args[0],args.slice(1))));return 0;}
   if(args.includes('--list-plugins'))return require('./plugins.js').listMain(root,args,{source});
-  if(args.some(a=>!['--refresh-profile','--dry-run','--verify','--recover','--rollback','--rebind'].includes(a)))throw Error('Usage: manager.js --refresh-profile [--dry-run] | --verify | --recover | --rollback | --rebind | lock-api <target> [--file <path>] [--baseline <ref>] | unlock-api <target|--all>');
+  if(args.some(a=>!['--refresh-profile','--regenerate-agents','--dry-run','--verify','--recover','--rollback','--rebind'].includes(a)))throw Error('Usage: manager.js --refresh-profile [--dry-run] | --regenerate-agents [--dry-run] | --verify | --recover | --rollback | --rebind | lock-api <target> [--file <path>] [--baseline <ref>] | unlock-api <target|--all>');
   const operations=args.filter(a=>a!=='--dry-run');
-  if(operations.length!==1||args.filter(a=>a==='--dry-run').length>1||args.includes('--dry-run')&&operations[0]!=='--refresh-profile')throw Error('Select exactly one manager operation; --dry-run applies only to --refresh-profile');
+  if(operations.length!==1||args.filter(a=>a==='--dry-run').length>1||args.includes('--dry-run')&&!['--refresh-profile','--regenerate-agents'].includes(operations[0]))throw Error('Select exactly one manager operation; --dry-run applies only to --refresh-profile or --regenerate-agents');
+  if(args.includes('--regenerate-agents')){console.log(c.json(regenerateAgents(root,source,args.includes('--dry-run'))));return 0;}
   if(args.includes('--rebind')){console.log(c.json(rebind(root,source)));return 0;}
   if(args.includes('--rollback')){console.log(c.json(rollback(root)));return 0;}
   if(args.includes('--recover')){locked(root,()=>{});console.log('Installation recovery complete');return 0;}

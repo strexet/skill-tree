@@ -7,7 +7,7 @@ for(const flavor of ['general','web','unity'])test(`installed ${flavor} PR/contr
  run('git',['init','-b','feature/example',root]);
  write(root,'package.json',{scripts:{test:'node --test'}});
  if(flavor==='unity'){write(root,'ProjectSettings/ProjectVersion.txt','m_EditorVersion: 6000.3.27f2');write(root,'Packages/manifest.json',{dependencies:{'com.unity.test-framework':'1.6.0'}});write(root,'Packages/packages-lock.json',{dependencies:{'com.unity.test-framework':{version:'1.6.0'}}});}
- const names=['skill-tree-pr-review-cycle','skill-tree-work-through-next','skill-tree-implement-all'];
+ const names=['skill-tree-pr-review-cycle','skill-tree-work-through-next','skill-tree-implement-all','skill-tree-full-cycle'];
  run(process.execPath,[cli,'--target',root,'--only','codex','--flavor',flavor,'--skills',...names]);
  run(process.execPath,[cli,'--target',root,'--only','codex','--flavor',flavor,'--skills',...names,'--verify']);
  const profile=JSON.parse(fs.readFileSync(path.join(root,'.skill-tree/installation/profile.json')));assert.equal(profile.flavor,flavor);assert.equal(profile.worktree_environment.schema,1);
@@ -18,6 +18,14 @@ for(const flavor of ['general','web','unity'])test(`installed ${flavor} PR/contr
   const helper=path.join(isolated,'scripts/pr-review-state.py');const result=JSON.parse(run('python3',[helper,'parameters',root,'--input',request],{cwd:os.tmpdir()}));
   assert.equal(result.source_branch,'Feature/Case');assert.equal(result.target_branch,'release/example');assert.equal(result.merge,true);
   assert.ok(fs.existsSync(path.join(isolated,'scripts/run-workspaces.py')));assert.match(fs.readFileSync(path.join(isolated,'references/project-profile.md'),'utf8'),new RegExp('Flavor: '+flavor));
+  if(name==='skill-tree-full-cycle'){
+   const contract=fs.readFileSync(path.join(isolated,'references/full-cycle.md'),'utf8');
+   for(const match of contract.matchAll(/\]\(([^)#]+)(?:#[^)]+)?\)/g)){
+    assert.ok(fs.existsSync(path.join(isolated,'references',match[1])),match[1]);
+   }
+   run('python3',[path.join(isolated,'scripts/workflow-state.py'),'--help'],{cwd:os.tmpdir()});
+   assert.ok(fs.existsSync(path.join(isolated,'scripts/validate-future-document.py')));
+  }
  }
  const manager=path.join(root,'.skill-tree/installation/manager.js');
  run(process.execPath,[manager,'--refresh-profile'],{cwd:os.tmpdir()});run(process.execPath,[manager,'--verify'],{cwd:os.tmpdir()});

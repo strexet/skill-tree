@@ -1,0 +1,79 @@
+{
+  "attempt": "C-c65a4c28-f81b-4221-9353-521ee1041143",
+  "check": "installed-guidance",
+  "observations": {
+    "command": [
+      "node",
+      "--test",
+      ".skill-tree/tests/test-composer.js"
+    ],
+    "counts": {
+      "discovered": 30,
+      "expected": 30,
+      "failed": 0,
+      "passed": 30,
+      "skipped": 0
+    },
+    "exit_status": 0,
+    "initial_control": {
+      "observed": "Both focused cases detected the missing shared and Unity guidance.",
+      "test_titles": [
+        "feature folder guidance is reachable from normal composed entry points",
+        "Unity feature folder examples resolve the README and catalog paths"
+      ]
+    },
+    "passed_subtests": [
+      "source recipe identities survive composition and retain freshness and collision checks",
+      "target role cannot inject source recipes",
+      "composition is deterministic, standalone and has the complete authored operation set for every flavor",
+      "static capability inputs detect additions, unsupported versions and conflicting locks",
+      "missing foundation is a persisted capability gap while installation remains composable",
+      "resource collisions reject undeclared replacements and slot overrides preserve mandatory invariants",
+      "adding test assemblies changes the inventory without executing project code",
+      "Unity capability composition gates panel, input and performance fixtures before emission",
+      "Web browser component runners retain browser effects and exact pinned conditional resources",
+      "non-JavaScript Web roots use declared static recipes without importing executable configuration",
+      "irrelevant input formatting can refresh environment identity without changing package bytes",
+      "every flavor audit retains common metadata and prose validation without source dependencies",
+      "declared versions never masquerade as resolved capabilities",
+      "explicit recipe formats reject unknown lanes and unresolved command parameters",
+      "Unity required UTF flags require resolution evidence and track reload settings",
+      "input fingerprints hash raw bytes even for an opaque dependency lock",
+      "resolved UTF 1.6.0 supports the pinned Unity 6000.0 target without accepting unresolved or future versions",
+      "Unity BOM-prefixed JSON remains static input with unchanged raw-byte fingerprints",
+      "narrative topic navigation and every craft card resolve in all profiles",
+      "narrative composition rejects a missing topic referenced by the router",
+      "Game Design packages its authoring references in every flavor",
+      "Game Design composition rejects unbundled authoring references",
+      "Balance packages its authoring references in every flavor",
+      "Balance composition rejects unbundled authoring references",
+      "Mechanics packages its authoring references in every flavor",
+      "Mechanics composition rejects unbundled authoring references",
+      "Director selects the scoped additional operations and packages the exact runtime for each",
+      "Director profile discovers a shared Unity checkout without asserting runtime qualification",
+      "feature folder guidance is reachable from normal composed entry points",
+      "Unity feature folder examples resolve the README and catalog paths"
+    ]
+  },
+  "recipe": {
+    "argv": [
+      "node",
+      "--test",
+      ".skill-tree/tests/test-composer.js"
+    ],
+    "input_paths": [
+      ".skill-tree/config/repository.json"
+    ],
+    "lane": "unit",
+    "qualification": "owner-declared static recipe; runner unqualified"
+  },
+  "sources": {
+    ".skill-tree/common/references/development-practices.md": "352a45b093f2c53b7b08aef045a098880af74c6add6fb79f95017a52fd0e0780",
+    ".skill-tree/common/references/documentation-output-contract.md": "2aca95b856ba3813171cc64c80f9f1d88cbfa9788703df7cd4497032adbfbfab",
+    ".skill-tree/config/flavors.json": "309bdbf204c51c5d14515f7aa776cf23c7ff7ea9c3833b9951e1016bc3630d18",
+    ".skill-tree/config/resource-map.json": "2f7187031191de2bfafca1d5c2c4807f991f4edffc95642b106d0a64a38d0529",
+    ".skill-tree/domains/unity/development.md": "49110c691d4493cd21e8c3ceb682053e3f975016be9879cd10836d9f4feaf371",
+    ".skill-tree/templates/operations.json": "2ed14469e2281c9a91222f856f41f0036b2b8f0c7a878fbdeadc2fd1d0fc173e",
+    ".skill-tree/tests/test-composer.js": "14ad46c116bdd8a325e02e0f8efa7ea70d2ef5300ebf904c73deb99f7987f158"
+  }
+}

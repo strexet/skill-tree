@@ -5,7 +5,7 @@ const os = require('node:os');
 const path = require('node:path');
 const source = path.resolve(__dirname, '..');
 const c = require('../lib/composer.js');
-const expectedOperations = ['skill-tree-add-pending-task','skill-tree-clarify-tasks','skill-tree-create-documents-snapshot','skill-tree-implement-all','skill-tree-implement-next-future-task','skill-tree-narative','skill-tree-plugins','skill-tree-pr-review-cycle','skill-tree-process-future-pending','skill-tree-repo-documentation','skill-tree-repo-documentation-audit','skill-tree-work-through-next'];
+const expectedOperations = ['skill-tree-3d','skill-tree-3d-blender','skill-tree-3d-motion','skill-tree-3d-references','skill-tree-3d-texture','skill-tree-3d-unity','skill-tree-add-pending-task','skill-tree-clarify-tasks','skill-tree-create-documents-snapshot','skill-tree-full-cycle','skill-tree-game-design','skill-tree-game-design-balance','skill-tree-game-design-mechanics','skill-tree-implement-all','skill-tree-implement-next-future-task','skill-tree-narative','skill-tree-plugins','skill-tree-pr-review-cycle','skill-tree-process-future-pending','skill-tree-repo-documentation','skill-tree-repo-documentation-audit','skill-tree-work-through-next'];
 function fixture(t) { const root=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-compose-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));return root; }
 function write(root,rel,data) { const p=path.join(root,rel);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,typeof data==='string'?data:JSON.stringify(data)); }
 test('source recipe identities survive composition and retain freshness and collision checks',t=>{
@@ -157,6 +157,68 @@ test('narrative composition rejects a missing topic referenced by the router', t
     /Missing composed link: .*narrative-claims\.md/);
 });
 
+const gameDesignPackages = [
+  ['Game Design', 'skill-tree-game-design', [
+    ['game-design-gdd.md', 'game-design-disciplines.md', 'game-design-records.md'],
+    ['game-design-gdd.md', 'game-design-records.md'],
+    ['game-design-gdd.md', 'game-design-playtest.md', 'narrative-human-playtest.md'],
+  ]],
+  ['Balance', 'skill-tree-game-design-balance', [
+    ['game-design-balance-study.md', 'game-design-balance-methods.md', 'game-design-disciplines.md', 'game-design-records.md'],
+    ['game-design-balance-study.md', 'game-design-records.md'],
+    ['game-design-balance-study.md', 'game-design-playtest.md', 'narrative-human-playtest.md'],
+  ]],
+  ['Mechanics', 'skill-tree-game-design-mechanics', [
+    ['game-design-mechanics.md', 'game-design-patterns.md'],
+    ['game-design-mechanics.md', 'game-design-atlas.md', 'game-design-records.md'],
+    ['game-design-mechanics.md', 'game-design-disciplines.md', 'game-design-records.md'],
+  ]],
+];
+
+for (const [label, operation, chains] of gameDesignPackages) {
+  const entryReference = chains[0][0];
+  const unavailableResources = new Set(chains.map(chain => chain.at(-1)));
+  test(label + ' packages its authoring references in every flavor', t => {
+    for (const flavor of ['general', 'web', 'unity', 'director']) {
+      const root = fixture(t);
+      if (flavor === 'unity') {
+        write(root, 'ProjectSettings/ProjectVersion.txt', 'm_EditorVersion: 6000.0.83f1');
+        write(root, 'Packages/manifest.json', {dependencies: {}});
+      }
+      const profile = c.resolveProfile(source, root, flavor);
+      const files = c.compose(source, profile, [operation]).packages[operation];
+      assert.ok(files['SKILL.md'].includes('](references/' + entryReference + ')'));
+      for (const chain of chains) {
+        for (const [index, name] of chain.entries()) {
+          const reference = files['references/' + name];
+          assert.equal(reference, c.read(source, 'common/references/' + name));
+          if (index > 0) {
+            assert.ok(files['references/' + chain[index - 1]].includes('](' + name + ')'));
+          }
+        }
+      }
+    }
+  });
+
+  test(label + ' composition rejects unbundled authoring references', t => {
+    const sourceCopy = fixture(t);
+    for (const dir of ['common', 'domains', 'templates', 'config', 'lib', 'src']) {
+      fs.cpSync(path.join(source, dir), path.join(sourceCopy, dir), {recursive: true});
+    }
+    const resourceMap = JSON.parse(fs.readFileSync(path.join(sourceCopy, 'config/resource-map.json'), 'utf8'));
+    for (const dependency of unavailableResources) {
+      const original = resourceMap[operation].references[dependency];
+      assert.ok(original);
+      delete resourceMap[operation].references[dependency];
+      write(sourceCopy, 'config/resource-map.json', resourceMap);
+      const profile = c.resolveProfile(sourceCopy, fixture(t), 'general');
+      assert.throws(() => c.compose(sourceCopy, profile, [operation]), error =>
+        error.message.startsWith('Missing composed link: ') && error.message.endsWith(dependency));
+      resourceMap[operation].references[dependency] = original;
+    }
+  });
+}
+
 test('Director selects the scoped additional operations and packages the exact runtime for each', t => {
   const root = fixture(t);
   const names = ['setup', 'intake', 'plan', 'run', 'decide', 'status', 'review', 'audit', 'install']
@@ -193,4 +255,79 @@ test('Director profile discovers a shared Unity checkout without asserting runti
   assert.equal(profile.recipes['unity-editmode'].utf_version, '1.6.0');
   assert.match(profile.recipes['unity-playmode'].qualification, /isolated fixture required/);
   assert.equal(c.resolveProfile(source, root, 'general').recipes['unity-editmode'], undefined);
+});
+
+test('feature folder guidance is reachable from normal composed entry points', t => {
+  const root = fixture(t);
+  write(root, 'ProjectSettings/ProjectVersion.txt', 'm_EditorVersion: 6000.0.83f1');
+  write(root, 'Packages/manifest.json', {dependencies: {}});
+
+  const resolveLink = (files, from, destination) => {
+    assert.ok(files[from].includes('](' + destination + ')'), from + ' links to ' + destination);
+    const resolved = path.posix.join(path.posix.dirname(from), destination.split('#')[0]);
+    assert.ok(files[resolved], resolved + ' is shipped in the package');
+    return files[resolved];
+  };
+
+  for (const flavor of ['general', 'web', 'unity', 'director']) {
+    const operation = flavor === 'director' ? 'skill-tree-director-setup' : 'skill-tree-implement-next-future-task';
+    const profile = c.resolveProfile(source, root, flavor);
+    const files = c.compose(source, profile, [operation]).packages[operation];
+    if (flavor === 'director') resolveLink(files, 'SKILL.md', 'references/director-workflow.md');
+    const shared = flavor === 'director'
+      ? resolveLink(files, 'references/director-workflow.md', 'development-practices.md#organize-files-by-feature')
+      : resolveLink(files, 'SKILL.md', 'references/development-practices.md');
+    assert.match(shared, /## Organize files by feature/);
+    assert.match(shared, /app\/orders\/page\.tsx/);
+    assert.match(shared, /src\/shared\/format\/format-date\.ts/);
+    assert.doesNotMatch(shared, /src\/shared\/format\/(?:README\.md|catalog\.json)/);
+    assert.ok(!shared.includes('Goblin.prefab'));
+    if (flavor === 'unity') {
+      const unity = resolveLink(files, 'SKILL.md', 'references/unity-development.md');
+      assert.match(unity, /Assets\/Features\/Goblin\/Prefabs\/Goblin\.prefab/);
+    } else {
+      assert.equal(files['references/unity-development.md'], undefined);
+    }
+  }
+});
+
+test('Unity feature folder examples resolve the README and catalog paths', t => {
+  const root = fixture(t);
+  write(root, 'ProjectSettings/ProjectVersion.txt', 'm_EditorVersion: 6000.0.83f1');
+  write(root, 'Packages/manifest.json', {dependencies: {}});
+  const operation = 'skill-tree-implement-next-future-task';
+  const profile = c.resolveProfile(source, root, 'unity');
+  const doc = c.compose(source, profile, [operation]).packages[operation]['references/unity-development.md'];
+  const section = doc.split('## Organize feature assets\n')[1]?.split('\n## ')[0];
+  assert.ok(section, 'The Unity package includes the feature asset examples');
+  const example = new Map([...section.matchAll(/\x60\x60\x60(text|markdown|json)\n([\s\S]*?)\n\x60\x60\x60/g)]
+    .map(([, format, text]) => [format, text]));
+  assert.deepEqual([...example.keys()], ['text', 'markdown', 'json']);
+  const paths = new Set(example.get('text').split('\n').filter(Boolean));
+  const feature = 'Assets/Features/Goblin';
+  const prefab = feature + '/Prefabs/Goblin.prefab';
+  const readme = feature + '/README.md';
+  const catalog = feature + '/catalog.json';
+  assert.ok(paths.has(readme));
+  const markdown = example.get('markdown');
+  const links = new Map([...markdown.matchAll(/^\[([^\]]+)\]: (\S+)$/gm)]
+    .map(([, name, target]) => [name, target]));
+  const destinations = [...markdown.matchAll(/\]\[([^\]]+)\]/g)].map(([, name]) => {
+    assert.ok(links.has(name), 'README defines ' + name);
+    return path.posix.join(path.posix.dirname(readme), links.get(name));
+  });
+  assert.deepEqual(destinations.sort(), [prefab, catalog].sort());
+  assert.ok(destinations.every(target => paths.has(target)));
+
+  const entries = JSON.parse(example.get('json')).entries;
+  assert.deepEqual(entries.map(entry => entry.path).sort(), [prefab, feature + '/Scripts/GoblinBehaviour.cs'].sort());
+  const targetExists = value => !path.posix.isAbsolute(value) &&
+    path.posix.normalize(value) === value && paths.has(value);
+  for (const entry of entries) {
+    assert.ok(entry.purpose.trim() && targetExists(entry.path));
+  }
+  const behavior = entries.find(entry => entry.extends);
+  assert.equal(behavior.extends.type, 'EnemyBehaviour');
+  assert.ok(targetExists(behavior.extends.path));
+  assert.ok(!targetExists(behavior.extends.path.replace('EnemyBehaviour.cs', 'OldEnemyBehaviour.cs')));
 });

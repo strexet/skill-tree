@@ -1,6 +1,6 @@
 # Build and Release
 
-The source package is private and declares version 0.5.0. `package.json` and `.skill-tree/config/flavors.json` carry matching release versions. The composer records the source release in installed profiles. The [changelog](../../changelog.md) records release changes.
+The source package is private and declares version 0.6.0. `package.json` and `.skill-tree/config/flavors.json` carry matching release versions. The composer records the source release in representative packages. An installed project profile records the release activated by the owned installer for that project. The [changelog](../../changelog.md) records release changes.
 
 `python3 .skill-tree/scripts/sync-skill-references.py` regenerates representative packages from canonical inputs. The [testing policy](testing.md) owns local qualification boundaries. [Installation](install.md) owns project-scoped installation and local-manager commands.
 

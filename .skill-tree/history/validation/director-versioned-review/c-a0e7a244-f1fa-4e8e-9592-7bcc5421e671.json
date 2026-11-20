@@ -1,0 +1,26 @@
+{
+  "verdict": "pass",
+  "reviewers": [
+    "/root/director_versioned_review_resolver",
+    "/root/director_versioned_review_reader_b"
+  ],
+  "cases": {
+    "A": "Narrative owns source-pin mismatch N@3 against N@4. Required current route open; exact unaffected N@4 sibling keeps eligibility.",
+    "B": "3D owns stale M@2 predecessor against accepted M@3. Recheck selected candidate and affected dependents. Earlier exact Gate fixture still covers independent scope. Missing Pan is supplementary.",
+    "C": "Unity owns first wrong effective override at Gate step 2, expected normal binding. Steps 0 and 1 reached, 3 unreached. Matching producer/import stays eligible. Device log unavailable in separate lane.",
+    "D": "Matching technical lane retains scope. Need actual first-time uncoached participant for experience. Author owns the consequential tone choice. Proxy remains supplementary."
+  },
+  "identity": "Both reviewers matched current installed package and code identity and independently agree: same exact bytes count once, different current attempt preserves earlier record, changed bytes under same identity hold current verification. Expired or unsupported data leaves coverage open.",
+  "scope": "Static review completes the authored manual route and preserves existing private and guarded archive handling.",
+  "task_id": "T-7d9cf74c-04d8-4a54-800e-7cc5e42c5d90",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/references/director-workflow.md": "aa03d2d640c28e68b69f7c9564adc2177e8b6ec56f5cea95c53fcd6d68b56156",
+    ".skill-tree/documents/director-workflow.md": "721384c561b7d3f89a23b4925743259217683b6a5c9e506728865d914ca16db2",
+    ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+  },
+  "input_sha256": {
+    "paper-cases.md": "d06a536d754934723013986f211fb233efd743231355d48dd6d9a0c2bad58f2a",
+    "trial/.skill-tree/installation/profile.json": "0237003611e13c7f833615d85acbd58a1ddad4fab6780d551f827877dbbaa85e"
+  }
+}

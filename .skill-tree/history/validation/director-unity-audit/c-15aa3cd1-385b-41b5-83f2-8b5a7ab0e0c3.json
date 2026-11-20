@@ -1,0 +1,12 @@
+{
+  "task_id": "T-221e5960-08b7-49cb-b403-875742ecac02",
+  "check_id": "behavior",
+  "attempt_id": "C-15aa3cd1-385b-41b5-83f2-8b5a7ab0e0c3",
+  "fixture_lane": "unit",
+  "returncode": 1,
+  "discovered": 1,
+  "result": "red",
+  "log": ".skill-tree/artifacts/validation/director-unity-audit/c-15aa3cd1-385b-41b5-83f2-8b5a7ab0e0c3.txt",
+  "log_sha256": "8f633feaf9063344226d9f5a07ad4189b7b47fac32e3a8100c7082d6c48480b6",
+  "diagnosis": "The prior audit refused the optional selected receipt input."
+}

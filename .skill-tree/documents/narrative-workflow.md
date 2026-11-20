@@ -1,6 +1,6 @@
 # Narrative Projects
 
-`skill-tree-narative` supports game worldbuilding, character and quest development, narrative review and canon management. The operation is available with general, web and Unity project profiles. A narrative project can work in Markdown from a text editor or Obsidian. The profile retains the existing runtime and validation rules for the game.
+`skill-tree-narative` supports game worldbuilding, character and quest development, narrative review and canon management. The operation is available with general, web, unity and director project profiles. A narrative project can work in Markdown from a text editor or Obsidian. The profile retains the existing runtime and validation rules for the game.
 
 ## First session
 

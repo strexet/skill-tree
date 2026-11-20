@@ -1,0 +1,60 @@
+{
+  "attempt": "C-2f628e2b-bffe-43e3-8729-9b5e957b197c",
+  "check": "feature-examples",
+  "observations": {
+    "catalog_entries": [
+      "Assets/Features/Goblin/Prefabs/Goblin.prefab",
+      "Assets/Features/Goblin/Scripts/GoblinBehaviour.cs"
+    ],
+    "catalog_path_base": "Unity project root",
+    "entry_points": {
+      "director": "Director Setup reaches Development Practices through Director Workflow.",
+      "general_web_unity": "Implement Next links to Development Practices."
+    },
+    "modeled_ownership": [
+      "Goblin dedicated model, textures, materials, scripts, controller, clips, prefab and UI.",
+      "Shield recharge script group without an added index.",
+      "Inventory-owned presenter and layout with an item slot shared with the equipment screen."
+    ],
+    "readme_link_base": "Assets/Features/Goblin",
+    "readme_link_targets": {
+      "goblin-catalog": "Assets/Features/Goblin/catalog.json",
+      "goblin-prefab": "Assets/Features/Goblin/Prefabs/Goblin.prefab"
+    },
+    "scope": "Static inspection of the published examples and active source contracts.",
+    "shared_type": "Assets/Scripts/Enemies/EnemyBehaviour.cs",
+    "simple_folder_control": {
+      "path": "src/shared/format/format-date.ts",
+      "requires_additional_documentation": false
+    },
+    "specialist_owners": {
+      "3d": "ArtWorkshop Workflow uses the workshop catalog and leaves guide files outside sealed manifest inventories.",
+      "game_design": "Game Design Records retains the brief, rules, atlas and study authorities by stable record and revision.",
+      "logs": "Development Practices defers private journals and exports to the verified local Logs contract.",
+      "narrative": "Narrative Workflow retains typed Markdown/JSON record pairs and selected snapshot pins."
+    },
+    "stale_path_control": {
+      "path": "Assets/Scripts/Enemies/OldEnemyBehaviour.cs",
+      "resolves": false
+    },
+    "unity_reference_links": [
+      "https://docs.unity3d.com/6000.0/Documentation/Manual/AssetMetadata.html",
+      "https://docs.unity3d.com/6000.0/Documentation/Manual/assembly-definitions-intro.html",
+      "https://docs.unity3d.com/6000.0/Documentation/Manual/class-TextAsset.html",
+      "https://docs.unity3d.com/6000.0/Documentation/Manual/SpecialFolders.html"
+    ]
+  },
+  "recipe": {
+    "assertion_contract": "explicit source and artifact assertions",
+    "input_paths": [],
+    "lane": "static"
+  },
+  "sources": {
+    ".skill-tree/common/references/development-practices.md": "352a45b093f2c53b7b08aef045a098880af74c6add6fb79f95017a52fd0e0780",
+    ".skill-tree/common/references/documentation-output-contract.md": "2aca95b856ba3813171cc64c80f9f1d88cbfa9788703df7cd4497032adbfbfab",
+    ".skill-tree/config/flavors.json": "309bdbf204c51c5d14515f7aa776cf23c7ff7ea9c3833b9951e1016bc3630d18",
+    ".skill-tree/config/resource-map.json": "2f7187031191de2bfafca1d5c2c4807f991f4edffc95642b106d0a64a38d0529",
+    ".skill-tree/domains/unity/development.md": "49110c691d4493cd21e8c3ceb682053e3f975016be9879cd10836d9f4feaf371",
+    ".skill-tree/templates/operations.json": "2ed14469e2281c9a91222f856f41f0036b2b8f0c7a878fbdeadc2fd1d0fc173e"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "counts": {
+    "node_counts": {
+      "cancelled": 0,
+      "fail": 0,
+      "pass": 398,
+      "skipped": 0,
+      "tests": 398
+    },
+    "provider_dry_runs": [
+      "claude-code",
+      "codex",
+      "gemini-cli",
+      "cursor",
+      "windsurf",
+      "cline",
+      "github-copilot",
+      "opencode",
+      "roo",
+      "kilo",
+      "continue",
+      "kiro-cli",
+      "qwen-code",
+      "goose",
+      "amp"
+    ],
+    "python_recipe": "Python unittest suite with the same module discovery, run in bounded file workers",
+    "python_tests": 807
+  },
+  "limitations": [
+    "Documentation and temporary composition cases establish source and package behavior. Unity Editor and a consuming-project migration were outside the task scope."
+  ],
+  "node_execution_note": "The default Node suite encountered a fixture subprocess time limit. The same case passed in isolation. The full test set ran with three test workers to reduce parallel load.",
+  "passed": [
+    "npm run sync:check",
+    "npm run validate",
+    "Python unittest suite with the same module discovery, run in bounded file workers",
+    "node --test --test-concurrency=3 .skill-tree/tests/test-*.js",
+    "node .skill-tree/bin/install.js --list",
+    "node .skill-tree/bin/install.js --dry-run --all --target <temporary-project-root> --flavor general",
+    "git diff --check"
+  ],
+  "run_id": "WR-76e3d1c1-d9f0-409a-8f75-64960250331f",
+  "source_digest": "75909d56dc794778509be7dac4a6f73c7b1b96af2caace77a5decb15ca3b5a76",
+  "task_id": "T-89e082ec-0590-4966-bf55-1cd146f949cf"
+}

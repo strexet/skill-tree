@@ -1,0 +1,31 @@
+{
+  "assertions": [
+    "The shared rule, documentation ownership, ordinary web example and Director area example route through existing packages.",
+    "The Unity model includes Goblin-specific assets, shared gameplay and UI dependencies, portable README and catalog links, and placement constraints.",
+    "Narrative, ArtWorkshop, Game Design and the local Logs contract retain their existing record and evidence ownership.",
+    "Generated resource copies match authored source. Binding manifest changes update only affected owned resource hashes and derived identity.",
+    "The source navigation manifest changes only the seven reviewed reference digests. No task file, installation receipt or plugin configuration enters the intended commit."
+  ],
+  "coverage": {
+    "authored-or-source-manifest": 9,
+    "generated-binding-hash-updates": 82,
+    "generated-reference-copies": 108
+  },
+  "findings": [],
+  "identity": {
+    "base_oid": "b772549210b0e9dd5705ea80a04c63b564c1547f",
+    "head": "b772549210b0e9dd5705ea80a04c63b564c1547f",
+    "source_digest": "75909d56dc794778509be7dac4a6f73c7b1b96af2caace77a5decb15ca3b5a76"
+  },
+  "review_id": "R-270665e6-d9ab-4ddf-bde9-a1b5186b95ba",
+  "task_check_evidence": {
+    "feature-examples": {
+      "path": ".skill-tree/history/validation/feature-folder-guidance/feature-examples.json",
+      "sha256": "013be335b987fba81afc03c4b5a0810cf301cd80610feeea9b01534ed002fc5a"
+    },
+    "installed-guidance": {
+      "path": ".skill-tree/history/validation/feature-folder-guidance/installed-guidance.json",
+      "sha256": "f69d7cf54469a6aeff4de44ab5d6a333adb5d1e69059705f799d0042b3474a2f"
+    }
+  }
+}

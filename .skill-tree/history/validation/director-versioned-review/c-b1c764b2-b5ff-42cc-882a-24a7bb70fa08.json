@@ -1,0 +1,77 @@
+{
+  "task_id": "T-7d9cf74c-04d8-4a54-800e-7cc5e42c5d90",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/references/director-workflow.md": "efe27621b1e49205f05a4623e477215ce01a27b792a142056cca2fb563c816e3",
+    ".skill-tree/documents/director-workflow.md": "ba0d903fa7c9b25324ecf6fb834951162754d5ec464351cf365cf22dce9b135f",
+    ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+  },
+  "previous_fingerprints": {
+    ".skill-tree/common/references/director-workflow.md": "aa03d2d640c28e68b69f7c9564adc2177e8b6ec56f5cea95c53fcd6d68b56156",
+    ".skill-tree/documents/director-workflow.md": "721384c561b7d3f89a23b4925743259217683b6a5c9e506728865d914ca16db2",
+    ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+  },
+  "exact_additions": {
+    ".skill-tree/common/references/director-workflow.md": [
+      "",
+      "## Present a playable decision after repair",
+      "",
+      "Route an accepted-rule discrepancy to the area that owns the first mismatching fact, rule, cue, asset or runtime binding. After repair pin current revisions and rerun the affected checks and one independent control. Retain the technical lane, actual result and uncovered cases.",
+      "",
+      "Use the selected supported build or scene and exact entry state for a human observation. Record the first uncoached choice and any later facilitation. Separate an unclear goal, missed route and failed control by evidence. Present the author with the playable entry point, observed result, remaining scope and one precise decision. Technical results establish observable behavior in the recorded lane. Creative acceptance requires the actual author response on the current presented revision. Reopen the affected criterion when a new technical or usability finding changes the basis.",
+      "",
+      "## Measure comparable design work",
+      "",
+      "Freeze the decision and eligible population before counting. Keep stable request, revision, handoff, evidence and attempt identities. Compare equivalent scope, clock and source availability. Count identical delivery once. Preserve new attempts under the original request and report excluded and unmeasured cases with reasons. An empty eligible denominator yields no estimate.",
+      "",
+      "| Decision | Calculation and evidence |",
+      "| --- | --- |",
+      "| Is the GDD sufficient for independent predictions? | Accepted rule revisions with both normal and boundary outcomes predicted correctly by an independent reader divided by sampled accepted rule revisions with both known expected outcomes. Cite the accepted rule and independent check. Report missing expected outcomes separately from absent predictions against a known oracle. |",
+      "| Are the recommendations applicable? | Applicable recommendations divided by independently judged original slots within a frozen K and held-out request scope. Count identical delivery once. Count the first occurrence of a repeated suggestion and keep the original later rank as a repeat. Report no-fit, empty and unjudged results separately. Cite the ranked suggestion and independent judgement. |",
+      "| Did the atlas find affected placements? | Known affected placements omitted from the report divided by the confirmed affected set in the audited scope. Pair the exact placement record and independent audit. Keep suspected links and unexamined regions separate. |",
+      "| Does impact review reopen too much? | Confirmed unnecessary rechecks divided by all distinct proposed rechecks in the selected scope. Cite each proposed recheck and the independent verdict for the same dependency. Report unresolved verdicts alongside the count. |",
+      "| Can a Balance result be reproduced? | Studies reproduced within the declared tolerance by an independent reviewer divided by reviewed studies with sufficient matching inputs. Record the study version, selected comparison, units, assumptions and separate count of insufficient inputs. Retain retries as attempts within the study and pin the comparison evidence. |",
+      "| How well did the tuning forecast match? | Measured change minus the change predicted before observation for the same parameter, conditions, units and clock. Record matched denominators when applicable, effective setting, direction and any adverse outcome separately. Use the study and matching evidence record. An unmeasured forecast stays unscored. |",
+      "| How long until usable evidence? | Median elapsed UTC time from input readiness to first adequate evidence for comparable completed requests with both timestamps. Record incomplete work or missing timestamps, environment and author waits, wrong routes and insufficient data from the request and evidence receipts. |",
+      "| How often does a handoff return? | Distinct reviewed handoffs returned at least once for a confirmed description fault divided by all distinct reviewed handoffs in the named cohort. Keep reasons such as an unavailable environment, authorization wait or other return separate. Use the reviewed handoff and return receipts. Retain actual revisions and later attempts. |",
+      "",
+      "Store compact local inputs and evidence IDs so a second reader can recompute each measure. Standalone documents may use local project identities without a Director run. Follow [compact evidence retention](history-retention.md) for locators, gaps and original outcomes."
+    ],
+    ".skill-tree/documents/director-workflow.md": [
+      "## Review repair and prepare human acceptance",
+      "",
+      "Find the first divergence from an accepted fact, gameplay rule, visible asset or effective binding. Return the exact discrepancy to the area responsible for the first mismatch. Current technical recheck records the selected target, new producer and consumer revisions, affected cases, observed input and result, unchanged control and remaining coverage. Preserve earlier evidence and the missing steps that require a fresh attempt.",
+      "",
+      "Use the existing human observation procedure to present the supported build, scene entry, starting state, control and clock. Record the participant's first choice before intervention, stated expectation and relevant cue. Record the time and content of coaching and label the later observation. A known-route execution can establish reachability. Unaided discovery needs the selected relevant participant observation.",
+      "",
+      "| Observation | First check to distinguish the cause |",
+      "| --- | --- |",
+      "| The participant reports an unclear goal | Compare intended fact, delivered wording and the visible or audible cue before attributing meaning to Narrative, UI or integration. |",
+      "| The goal is clear and the route was missed | Inspect the first choice and camera or affordance cue. Use a known-route control to distinguish discoverability from blocked traversal. |",
+      "| The participant intended and tried an action that had no effect | Inspect ordinary input, current binding, guard and first state writer under the selected build conditions. |",
+      "",
+      "Return the playable entry point, current revisions, observed behavior, affected and unobserved scope, and one precise creative decision. Only the actual author's scoped response records creative acceptance. A technical pass can make the presentation eligible. Reopen the specific claim when a new technical or usability finding changes the evidence or the scope presented to the author.",
+      ""
+    ]
+  },
+  "observation": {
+    "verdict": "pass",
+    "reviewer": "/root/director_versioned_review_reader_b",
+    "source_fingerprints": {
+      ".skill-tree/common/references/director-workflow.md": "efe27621b1e49205f05a4623e477215ce01a27b792a142056cca2fb563c816e3",
+      ".skill-tree/documents/director-workflow.md": "ba0d903fa7c9b25324ecf6fb834951162754d5ec464351cf365cf22dce9b135f",
+      ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+    },
+    "observation": "Additional human and local metrics sections only. All four original cases preserve their supported next owner, affected and independent coverage, duplicate/replay identity and static human scope. All 63 installed file hashes verified."
+  },
+  "previous_reviewers": [
+    "/root/director_versioned_review_resolver",
+    "/root/director_versioned_review_reader_b"
+  ],
+  "retained_cases": {
+    "A": "Narrative owns source-pin mismatch N@3 against N@4. Required current route open; exact unaffected N@4 sibling keeps eligibility.",
+    "B": "3D owns stale M@2 predecessor against accepted M@3. Recheck selected candidate and affected dependents. Earlier exact Gate fixture still covers independent scope. Missing Pan is supplementary.",
+    "C": "Unity owns first wrong effective override at Gate step 2, expected normal binding. Steps 0 and 1 reached, 3 unreached. Matching producer/import stays eligible. Device log unavailable in separate lane.",
+    "D": "Matching technical lane retains scope. Need actual first-time uncoached participant for experience. Author owns the consequential tone choice. Proxy remains supplementary."
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "verdict": "pass",
+  "reviewers": [
+    "/root/director_design_routing_resolver"
+  ],
+  "installed_contract_sha256": "82ce1c5e7c1fb64b2849bbabd933651ffcff7f9b57d333edc4e4360e17a24d5e",
+  "cases": {
+    "playable": "Director owns the scoped objective and freeze. Narrative supplies accepted work, continuity, actor access and scene facts. Game Design supplies audience, repeated activity and exact switch behavior. Only an authorized assumption-labeled workshop can start before required facts are accepted. Approved exact effects and disjoint claims permit 3D and proxy overlap, with manual presentation confined to the agreed handoff. Unity still owes a matching consumer observation on the selected imported art, rule and start. The preliminary proxy pass leaves the production milestone open.",
+    "document": "Game Design owns the scoped rule and observable result. Keep the material design decision with the owner. A Director child result or direct authoring document is sufficient for the selected destination. Only an adopted exact production change requiring child work reaches Core with source pins, deliverable, owner and check."
+  },
+  "limits": "Owned package source and three exact entry links confirm routing. The independent paper trial establishes the instructions and result boundaries. Native Unity and ArtWorkshop adapter execution remain open.",
+  "task_id": "T-921b33a8-518e-4111-aa1e-a9cd33e3f2d5",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/references/director-workflow.md": "82ce1c5e7c1fb64b2849bbabd933651ffcff7f9b57d333edc4e4360e17a24d5e",
+    ".skill-tree/documents/director-workflow.md": "b298408a4b568fa50fc96f092db064560e28127d80eefff37027fa93d6869a7d",
+    ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+  },
+  "input_sha256": {
+    "paper-inputs.md": "c326540d8b60244029c98508b5cba37e26459e0b6d712f52bbc3c7710f648afa",
+    "trial/.skill-tree/installation/profile.json": "fe5c056ae8a6cad1ddb7c560c17d35243623e94724a0679757fbcc3a1e515873"
+  }
+}

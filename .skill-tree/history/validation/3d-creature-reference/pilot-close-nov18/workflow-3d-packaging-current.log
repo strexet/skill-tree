@@ -1,0 +1,15 @@
+TAP version 13
+# Subtest: the scoped 3D operation installs and verifies without its source in every flavor
+ok 1 - the scoped 3D operation installs and verifies without its source in every flavor
+  ---
+  duration_ms: 14181.216292
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 14308.036625

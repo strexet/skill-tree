@@ -35,8 +35,70 @@ class ManifestValidationTests(unittest.TestCase):
     def test_source_hash_and_index_mismatches_are_detected(self):
         state=json.loads(self.store.state.read_text());state['source_hash']='old';state['tasks']=[{'id':'fake'}];self.store.state.write_text(wf.dump(state))
         self.assert_error('source hash is stale');self.assert_error('index differs')
+    def test_malformed_registry_yields_diagnostic_without_writes(self):
+        state = json.loads(self.store.state.read_bytes())
+        state.update(schema=3, run_registry=['damaged'])
+        draft = wf.dump(state)
+        self.store.state.write_text(draft)
+        self.assert_error('Unsupported run registry')
+        with self.assertRaisesRegex(wf.WorkflowError, 'Invalid run registry in .skill-tree/documents/future.json'):
+            self.store.verify_future_integrity()
+        self.assertEqual(self.store.state.read_text(), draft)
     def test_changed_canonical_source_requires_explicit_manifest_refresh(self):
         path=self.store.base/'documents/technical.md';path.write_text('Changed architecture.\n');self.assert_error('Stale manifest source digest');self.refresh();self.assertTrue(validator.validate(self.root)['ok'])
+
+    def test_missing_references_distinguish_restore_regenerate_and_optional(self):
+        authored = self.store.base/'documents/technical.md'
+        original = authored.read_bytes()
+        authored.unlink()
+        result = validator.validate(self.root)
+        errors = [error for error in result['errors'] if '/technical.md' in error]
+        self.assertEqual(len(errors), 1, result)
+        self.assertIn('Missing manifest file: .skill-tree/documents/technical.md. Restore', errors[0])
+        self.assertFalse(authored.exists())
+        authored.write_bytes(original)
+
+        navigation = self.store.base/'skill-tree.json'
+        original = navigation.read_bytes()
+        navigation.unlink()
+        self.assert_error('Regenerate the navigation manifest')
+        self.assertFalse(navigation.exists())
+        navigation.write_bytes(original)
+
+        audit_path = '.skill-tree/history/audits/a-fixture.json'
+        self.mutate_manifest(lambda data: data['audit_scopes'].append({'path':audit_path}))
+        self.assert_error('Missing manifest file: '+audit_path+'. Restore the recorded audit')
+        self.assertFalse((self.root/audit_path).exists())
+        navigation.write_bytes(original)
+        self.assertFalse((self.store.base/'history/task-outcomes.jsonl').exists())
+        self.assertTrue(validator.validate(self.root)['ok'])
+
+        for path in [self.store.future, self.store.state]:
+            with self.subTest(future_file=path.name):
+                saved = path.read_bytes()
+                path.unlink()
+                try:
+                    result = validator.validate(self.root)
+                finally:
+                    path.write_bytes(saved)
+                self.assertEqual(len(result['errors']), 1, result)
+                self.assertIn(path.relative_to(self.store.root).as_posix(), result['errors'][0])
+                self.assertIn('Restore the matching Future', result['errors'][0])
+
+        package = self.root/'.agents/skills/skill-tree-fixture'
+        package.mkdir(parents=True)
+        entry = package/'SKILL.md'
+        entry.write_text('Fixture skill.\n')
+        self.refresh()
+        entry.unlink()
+        result = validator.validate(self.root)
+        self.assertTrue(any('Restore the matching owned package' in error for error in result['errors']))
+        self.assertFalse(any('refresh the manifest' in error.lower() for error in result['errors']))
+        self.assertFalse(entry.exists())
+        (self.store.base/'documents/unindexed.md').write_text('Unindexed document.\n')
+        mixed = validator.validate(self.root)
+        self.assertTrue(any('Restore missing declared files before refreshing' in error for error in mixed['errors']))
+        self.assertFalse(any('Refresh the manifest after' in error for error in mixed['errors']))
     def test_invalid_manifest_schema_paths_and_digest_coverage_are_detected(self):
         self.mutate_manifest(lambda data:data.update({'role':'unsupported','files':None}));self.assert_error('Unsupported manifest role')
         (self.store.base/'skill-tree.json').unlink();self.refresh()

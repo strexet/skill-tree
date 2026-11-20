@@ -63,6 +63,27 @@ def _receipt(store, identity, key):
     return path, value
 
 
+def _intent(store, identity, key):
+    path = f'{PARENT_INTENTS}/{key}.json'
+    value, digest = _read(store, path)
+    if value is not None:
+        _require(isinstance(value, dict) and value.get('schema') == 1 and value.get('dispatch_key') == key
+                 and value.get('identity') == identity and _sha(value.get('semantic_sha256'))
+                 and _sha(value.get('plan_sha256')), 'Invalid retained Director dispatch intent')
+    return path, value, digest
+
+
+def conflicting_plan_claim(parent, child, operation, candidate):
+    """Read the existing dispatch claim without reconciling any historical effect."""
+    identity, key = envelope(operation, candidate)
+    _, receipt = _receipt(child, identity, key)
+    _, intent, _ = _intent(parent, identity, key)
+    for kind, claim in (('child-receipt', receipt), ('parent-intent', intent)):
+        if claim is not None and claim['plan_sha256'] != candidate['plan_sha256']:
+            return {'dispatch_key': key, 'claimed_plan_sha256': claim['plan_sha256'], 'claim_kind': kind}
+    return None
+
+
 def canonical_owner(store, queue_id):
     _require(store.neutral and store.source_root == store.root and not store.run_id and not store.selected_run_id,
              'Directed dispatch requires the exact canonical child root without implicit run selection')
@@ -176,13 +197,11 @@ def retain_intent(store, operation, request, *, start_context=None):
     dispatch = ChildDispatch(operation, request, start_context)
     _require(store.source_root == store.root and store.neutral and store.run_id is None,
              'Director intent requires the exact parent metadata writer')
-    relative = f'{PARENT_INTENTS}/{dispatch.key}.json'
     operation_owner = {'kind': 'director-dispatch-intent', 'dispatch_key': dispatch.key}
     with store.lock(local_delivery=operation_owner):
-        current, baseline = _read(store, relative)
+        relative, current, baseline = _intent(store, dispatch.identity, dispatch.key)
         if current is not None:
-            _require(current.get('identity') == dispatch.identity and current.get('semantic_sha256') == dispatch.semantic_sha256
-                     and current.get('plan_sha256') == dispatch.plan_sha256,
+            _require(current['semantic_sha256'] == dispatch.semantic_sha256 and current['plan_sha256'] == dispatch.plan_sha256,
                      'Director intent already belongs to a different semantic request')
             return current
         store.expect_unchanged(relative, baseline)
