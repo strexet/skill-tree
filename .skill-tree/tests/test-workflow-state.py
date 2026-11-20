@@ -1,6 +1,8 @@
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 import unicodedata
 import unittest
@@ -371,6 +373,124 @@ class WorkflowStateTests(unittest.TestCase):
         self.pending('Unrelated work');self.assertEqual(self.store.load()['active_run']['limits']['retry_used'],1)
         with self.assertRaises(wf.WorkflowError):wf.checkpoint(self.store,{'validation_consumed':{'retry_used':0}})
         with self.assertRaises(wf.WorkflowError):wf.start(self.store,'next')
+
+    def future_command(self, command, *options):
+        result = subprocess.run([sys.executable, '-B', str(ROOT/'common/scripts/workflow-state.py'),
+                                 command, str(self.root), *options], capture_output=True, text=True, timeout=20)
+        return result.returncode, json.loads(result.stdout)
+
+    def test_future_refresh_preserves_surviving_files_after_loss(self):
+        empty_queue = self.store.future.read_bytes()
+        self.complete(self.main('Completed control'))
+        self.pending('Retained input')
+        ledger = self.store.base/'history/task-outcomes.jsonl'
+        manifest = self.store.base/'skill-tree.json'
+        protected = (self.store.future, self.store.state, ledger, manifest)
+        original = {path: path.read_bytes() for path in protected}
+        for file, replacement in ((self.store.future, None), (self.store.state, None), (ledger, None),
+                                  (self.store.future, empty_queue), (ledger, b'')):
+            with self.subTest(file=file.name, absent=replacement is None):
+                if replacement is None:
+                    file.unlink()
+                else:
+                    file.write_bytes(replacement)
+                surviving = {path: path.read_bytes() for path in protected if path.exists()}
+                for command, options in (('refresh', ()), ('manifest', ('--apply',))):
+                    status, response = self.future_command(command, *options)
+                    self.assertEqual(status, 2, response)
+                    self.assertIn(file.relative_to(self.store.root).as_posix(), response['error'])
+                    self.assertIn('restore', response['error'].lower())
+                    self.assertEqual(surviving, {path: path.read_bytes() for path in protected if path.exists()})
+            for protected_file, content in original.items():
+                protected_file.write_bytes(content)
+
+    def test_future_refresh_accepts_initialization_and_legitimate_emptying(self):
+        status, state = self.future_command('refresh')
+        self.assertEqual(status, 0, state)
+        self.assertEqual(state['tasks'], [])
+        last_task = self.main()
+        self.complete(last_task)
+        checkpoint = self.store.state.read_bytes()
+        ledger = self.store.base/'history/task-outcomes.jsonl'
+        outcomes = ledger.read_bytes()
+        status, state = self.future_command('refresh')
+        self.assertEqual(status, 0, state)
+        self.assertEqual(state['tasks'], [])
+        self.assertEqual(self.store.state.read_bytes(), checkpoint)
+        self.assertEqual(ledger.read_bytes(), outcomes)
+
+    def test_future_loss_reports_the_queue_before_checkpoint_progress(self):
+        empty_queue = self.store.future.read_bytes()
+        task = self.main()
+        wf.start(self.store, 'next', task['id'])
+        wf.begin_task(self.store, {'task_id': task['id']})
+        self.assertIn(task['id'], self.store.load()['task_progress'])
+        prior_hash = wf.file_hash(self.store.future)
+        for replacement in (empty_queue, b'', None):
+            with self.subTest(replacement=replacement):
+                if replacement is None:
+                    self.store.future.unlink()
+                else:
+                    self.store.future.write_bytes(replacement)
+                before = {path: path.read_bytes() for path in self.root.rglob('*') if path.is_file()}
+                for options in ((), ('--expected-source-hash', prior_hash)):
+                    status, response = self.future_command('refresh', *options)
+                    self.assertEqual(status, 2, response)
+                    self.assertIn(wf.FUTURE_QUEUE, response['error'])
+                    self.assertIn('restore the matching queue', response['error'].lower())
+                result = subprocess.run([sys.executable, '-B', str(ROOT/'common/scripts/validate-repository-documentation.py'),
+                                         str(self.root)], capture_output=True, text=True, timeout=20)
+                diagnostics = json.loads(result.stdout)
+                self.assertEqual(result.returncode, 1, diagnostics)
+                self.assertTrue(any(wf.FUTURE_QUEUE in issue and 'restore the matching' in issue.lower()
+                                    for issue in diagnostics['errors']), diagnostics)
+                self.assertEqual(before, {path: path.read_bytes() for path in self.root.rglob('*') if path.is_file()})
+
+    def test_future_refresh_uses_legacy_terminal_reference_for_expected_history(self):
+        task = self.main()
+        wf.start(self.store, 'next', task['id'])
+        self.complete(task)
+        summary = wf.finish(self.store)
+        self.assertEqual(summary['completed_ids'], [task['id']])
+        old = json.loads(self.store.state.read_bytes())
+        self.assertEqual(old['schema'], 2)
+        self.assertIsNone(old['active_run'])
+        old.pop('outcome_history_recorded')
+        checkpoint = wf.dump(old)
+        self.store.state.write_text(checkpoint)
+        ledger = self.store.base/'history/task-outcomes.jsonl'
+        ledger.unlink()
+        manifest = self.store.base/'skill-tree.json'
+        navigation = manifest.read_bytes()
+        status, response = self.future_command('refresh')
+        self.assertEqual(status, 2, response)
+        self.assertIn('.skill-tree/history/task-outcomes.jsonl', response['error'])
+        self.assertEqual(self.store.state.read_text(), checkpoint)
+        self.assertEqual(manifest.read_bytes(), navigation)
+        self.assertFalse(ledger.exists())
+
+    def test_future_refresh_protects_unwritten_inputs_at_commit(self):
+        self.pending()
+        checkpoint = self.store.state.read_bytes()
+        manifest = self.store.base/'skill-tree.json'
+        navigation = manifest.read_bytes()
+        ledger = self.store.base/'history/task-outcomes.jsonl'
+        with self.store.lock():
+            text = self.store.text()
+            state = self.store.load(text)
+            original_commit = self.store.commit
+
+            def insert_unrelated_input(writes):
+                ledger.parent.mkdir(parents=True, exist_ok=True)
+                ledger.write_text('Developer outcome history.\n')
+                original_commit(writes)
+
+            with patch.object(self.store, 'commit', side_effect=insert_unrelated_input):
+                with self.assertRaisesRegex(wf.WorkflowError, 'Future input changed.*task-outcomes.jsonl'):
+                    self.store.save(text, state)
+        self.assertEqual(self.store.state.read_bytes(), checkpoint)
+        self.assertEqual(manifest.read_bytes(), navigation)
+        self.assertEqual(ledger.read_text(), 'Developer outcome history.\n')
     def test_recorded_deadline_is_evidence_not_authorization_gate(self):
         main=self.main();wf.start(self.store,'next',limits={'deadline':'2000-01-01T00:00:00+00:00'})
         self.assertEqual(wf.next_task(self.store)['task_id'],main['id'])

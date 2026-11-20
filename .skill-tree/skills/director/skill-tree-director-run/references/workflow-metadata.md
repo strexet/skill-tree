@@ -78,6 +78,10 @@ The repository documentation validator reads persisted manifests and indexes wit
 
 Target manifests catalog repository-local installed Skill Tree packages, including provider-specific entrypoints, without consulting the source repository. Explicit manifest/queue refresh updates derived navigation while preserving active_run.
 
+Refresh checks the persisted Future files before writing a replacement index or navigation manifest. A retained checkpoint, named state entry in the manifest, canonical run locator or workflow history establishes prior initialization. Missing expected queue or checkpoint bytes require restoration of the matching file. Refresh also stops when valid Markdown loses all previously indexed tasks without a guarded task transition. Explicit initialization and completion of the last task remain valid.
+
+The optional `outcome_history_recorded` field in either supported checkpoint schema records the presence of outcome history. Retained run and terminal receipt completion references also establish expected history for older checkpoints. Missing or empty expected outcome history stops a refresh. The writer rechecks the queue, checkpoint, outcome ledger, manifest and consulted terminal receipts before replacement. Read-only queries remain available when surviving data permits inspection.
+
 ## Validation progress interface
 
 Queue/index schemas 2 and 3 store `task_progress` independently of the selected controller checkpoint. Optional header fields are `validation_group_id: VG-<uuid>` and `boundary_validation: not-required|group-end|before-dependent-work`. The [validation policy](validation-policy.md) defines check ownership and timing. Minimal tasks require Goal, Touch, Validation and Acceptance; additional sections contain substantive constraints only. Validation contains one fenced JSON checks object with stable IDs and criterion mapping.

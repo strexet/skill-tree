@@ -3100,7 +3100,7 @@
   "configuration_digest": "1d4ded90f74588a33443cca0a2da314364e2a91faff9e7955ed7ac521848e0ff",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "3f1171ebd31d499b9071a73d77bccc81f6a6cc608cb1c95fa0d554ac3a1dd5b8",
+  "identity": "efbfa4cf1b865e2e98f7c39b971d36223bcf2a177f8b79549dc903f84e125a90",
   "operation": "skill-tree-3d-texture",
   "operations": {
     "skill-tree-3d": {
@@ -3215,7 +3215,7 @@
     "references/project-profile.md": "09fdc4d2afc54362ca1381cef5ced1492f6b13e40002875dc47683568e74f70c",
     "references/run-workspaces.md": "7ea6acb5d639d20c0e0ad519bb74b89c3f15dca247d0cfcea55299f8265bb200",
     "references/validation-policy.md": "2bb1e9675fe3bc08cbcb9aa4b9534368416faba7ffaaf6b5aaff417456f434d3",
-    "references/workflow-metadata.md": "1c5a849c2a68d75998cd23b122e257890d8e3629b24366af0e740ccf1e816d47",
+    "references/workflow-metadata.md": "70ba35018051edb4b5a170e7115984bc73ae6c1021ca2ad971f2699192e0e927",
     "scripts/3d-review/evidence.py": "5ac272ec3fc1b80efb6ad033b51247c2281271ed4689b9ac1df493f855f988d9",
     "scripts/3d-review/review.py": "1038e615a9671a368387dc37462d44fee96207ca3d80f3f73807ea77102114e8",
     "scripts/3d-review/visual.py": "03495e7240539b83ad853f6bf1d971b7352ef4c7ba5994df0206f989cdc6d3c7",
@@ -3238,7 +3238,7 @@
     "scripts/run-workspaces.py": "a89ab104bad9bf8c1bd90dc597ab6d14f075d4fe8e2c59cd1dd1d84726656d6f",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "15cf9fa69d588f3f633f6db13d81b9a2e455e1431ca26a126ea5b39bedcc1a7a"
+    "scripts/workflow-state.py": "00721b87acb418382cd1f93238e290bcacd3f4a2d3abf33479f42a2e5611b750"
   },
   "packages": {},
   "parameter_defaults": {},

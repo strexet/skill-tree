@@ -30,6 +30,11 @@ TOPIC_PATTERN = re.compile(r'[a-z][a-z0-9]*(?:-[a-z0-9]+)*')
 RELATIONS = {'main', 'blocker', 'subtask', 'followup'}
 TERMINAL = {'completed', 'cancelled', 'superseded', 'merged'}
 FORMAT = 'skill-tree-future'
+FUTURE_QUEUE = '.skill-tree/documents/future.md'
+FUTURE_STATE = '.skill-tree/documents/future.json'
+OUTCOME_LEDGER = '.skill-tree/history/task-outcomes.jsonl'
+NAVIGATION = '.skill-tree/skill-tree.json'
+FUTURE_INPUTS = (FUTURE_QUEUE, FUTURE_STATE, OUTCOME_LEDGER, NAVIGATION)
 
 def owned_module(name,path):
     path=Path(path)
@@ -308,6 +313,7 @@ class Store:
             self.recover()
             mutable=[self.future,self.state,self.base/'skill-tree.json',self.base/'history/task-outcomes.jsonl',*list((self.base/'history').rglob('*.json')),*list((self.base/'clarifications').glob('*.json')),*list((self.base/'decisions').glob('*.json')),*list((self.base/'invocations').glob('*.json'))]
             self._write_hashes={p.relative_to(self.root).as_posix():file_hash(p) for p in mutable}
+            self._future_receipts=set()
             self._writer_active=True;self._hook_active_admissions=[];self._hook_business_committed=False
             yield
         finally:
@@ -342,6 +348,10 @@ class Store:
         navigation_followup=set(writes)=={'.skill-tree/skill-tree.json'} and getattr(self,'_hook_business_committed',False)
         for admission in admissions:
             _hook_admission(self,admission['scope'],admission['chain_ids'],register=False,navigation_followup=navigation_followup)
+        if getattr(self, '_writer_active', False) and any(relative in writes for relative in FUTURE_INPUTS):
+            for relative in (*FUTURE_INPUTS, *sorted(self._future_receipts)):
+                if relative not in writes and file_hash(self.owned(relative)) != self._write_hashes[relative]:
+                    raise WorkflowError('Future input changed during the operation: '+relative+'; reread current state before retrying')
         record={'format':'skill-tree-transaction','writes':[]}
         if getattr(self, '_local_delivery', None) is not None:
             record['local_delivery'] = self._local_delivery
@@ -361,10 +371,75 @@ class Store:
         if file_hash(path)!=expected_hash:raise WorkflowError('Metadata changed before expectation registration')
         self._write_hashes[relative]=expected_hash
 
+    def future_initialized(self):
+        ledger = self.owned(OUTCOME_LEDGER)
+        if self.state.exists() or (ledger.is_file() and ledger.stat().st_size):
+            return True
+        navigation = self.owned(NAVIGATION)
+        if navigation.is_file():
+            recorded = json.loads(navigation.read_text())
+            if isinstance(recorded, dict) and recorded.get('state') == FUTURE_STATE:
+                return True
+        locator = workspaces.runtime(self.root)
+        if locator and Path(locator['canonical_root']).resolve() == self.root:
+            return True
+        return any(self.owned('.skill-tree/history/runs').glob('run-*.json'))
+
     def text(self):
-        self.owned('.skill-tree/documents/future.md')
-        if not self.future.is_file(): raise WorkflowError('Missing .skill-tree/documents/future.md; run explicit documentation setup')
+        self.owned(FUTURE_QUEUE)
+        if not self.future.is_file():
+            instruction = ('restore the matching queue file before retrying' if self.future_initialized()
+                           else 'run explicit documentation setup')
+            raise WorkflowError('Missing '+FUTURE_QUEUE+'; '+instruction)
         return self.future.read_text()
+
+    def verify_future_integrity(self):
+        """Check persisted inputs before accepting a rewritten index or manifest."""
+        if not self.future.is_file() and self.future_initialized():
+            self.text()
+        checkpoint = self.owned(FUTURE_STATE)
+        if not checkpoint.is_file() and self.future_initialized():
+            raise WorkflowError('Missing '+FUTURE_STATE+'; restore the matching checkpoint before retrying')
+        ledger = self.owned(OUTCOME_LEDGER)
+        history_present = ledger.is_file() and bool(ledger.read_bytes().strip())
+        if not checkpoint.is_file():
+            return history_present
+        old = json.loads(checkpoint.read_text())
+        if not isinstance(old, dict):
+            raise WorkflowError('Invalid '+FUTURE_STATE+'; restore the matching checkpoint before retrying')
+        text = self.text()
+        if old.get('tasks') and old.get('source_hash') != digest(text.encode()) and (not text.strip() or not parse(text)):
+            raise WorkflowError('Unexpectedly empty '+FUTURE_QUEUE+'; restore the matching queue file before retrying')
+        if not history_present:
+            registry = old.get('run_registry') or {}
+            if not isinstance(registry, dict) or not isinstance(registry.get('runs', {}), dict):
+                raise WorkflowError('Invalid run registry in '+FUTURE_STATE+'; restore the matching checkpoint before retrying')
+            runs = list(registry.get('runs', {}).values())
+            if old.get('active_run'):
+                runs.append(old['active_run'])
+            if any(not isinstance(run, dict) for run in runs):
+                raise WorkflowError('Invalid run records in '+FUTURE_STATE+'; restore the matching checkpoint before retrying')
+            expected = old.get('outcome_history_recorded') is True or any(
+                run.get('completed_ids') or run.get('completion_refs') for run in runs)
+            if expected or self.terminal_outcomes_expected():
+                raise WorkflowError('Missing or empty '+OUTCOME_LEDGER+'; restore the matching outcome history before retrying')
+        return history_present
+
+    def terminal_outcomes_expected(self):
+        for receipt in sorted(self.owned('.skill-tree/history/runs').glob('run-*.json')):
+            relative = receipt.relative_to(self.root).as_posix()
+            content = self.owned(relative).read_bytes()
+            if getattr(self, '_writer_active', False):
+                self.expect_unchanged(relative, digest(content))
+                self._future_receipts.add(relative)
+            run = json.loads(content)
+            if not isinstance(run, dict):
+                continue
+            rid = run.get('id')
+            if (valid_id(rid, 'WR') and receipt.name == 'run-'+rid.lower()+'.json'
+                    and run.get('phase') == 'completed' and (run.get('completed_ids') or run.get('completion_refs'))):
+                return True
+        return False
     def load(self,text=None):
         text=self.text() if text is None else text
         value={'format':FORMAT,'source_hash':digest(text.encode()),'schema':2,'tasks':index(text),'active_run':None,'task_progress':{}}
@@ -379,6 +454,7 @@ class Store:
             if run is not None:
                 validate_run(run)
             value['active_run']=run
+            if old.get('outcome_history_recorded') is True:value['outcome_history_recorded']=True
             if 'run_registry' in old:value['run_registry']=old['run_registry']
             if self.neutral:
                 if 'run_registry' in value:workspaces.validate_registry(value['run_registry'])
@@ -388,13 +464,16 @@ class Store:
             validate_progress(value,parse(text),{record['task_id'] for record in self.outcomes() if record['disposition']=='completed'})
         return value
     def outcomes(self):
-        path=self.base/'history/task-outcomes.jsonl'
+        path=self.owned(OUTCOME_LEDGER)
         if not path.exists(): return []
         try: return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
         except json.JSONDecodeError as exc: raise WorkflowError('Corrupt task outcome ledger') from exc
     def save(self,text,state,extras=None,*,update_navigation=True):
+        history_present=self.verify_future_integrity()
         state['source_hash']=digest(text.encode());state['tasks']=index(text)
         writes=dict(extras or {})
+        if history_present or writes.get(OUTCOME_LEDGER,'').strip():
+            state['outcome_history_recorded']=True
         if text!=self.text(): writes['.skill-tree/documents/future.md']=text
         persisted=workspaces.persist(self,state)
         self.record_run_event(text,persisted,writes)
@@ -4454,10 +4533,16 @@ def main(argv=None):
         elif cmd=='manifest':
             store=Store(args.root,args.run_id,allow_unselected=True,route_queue=False)
             if args.apply:
-                with store.lock():result=manifest(store);store.commit({'.skill-tree/skill-tree.json':dump(result)})
+                with store.lock():
+                    store.verify_future_integrity()
+                    result=manifest(store)
+                    store.commit({NAVIGATION:dump(result)})
             else:result=manifest(store)
         elif cmd=='refresh':
-            with store.lock():text=store.text();result=store.load(text);store.save(text,result)
+            with store.lock():
+                store.verify_future_integrity()
+                store.guard(payload.get('expected_source_hash'))
+                text=store.text();result=store.load(text);store.save(text,result)
         elif cmd=='index':result=store.load()
         elif cmd=='read':result=resolve(parse(store.text()),[args.id])[0]
         elif cmd=='select':

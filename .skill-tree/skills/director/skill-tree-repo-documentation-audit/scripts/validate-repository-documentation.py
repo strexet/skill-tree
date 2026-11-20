@@ -12,10 +12,14 @@ REQUIRED=['project.md','technical.md','features.md','future.md','rules.md','repo
 def load(name):
     path=Path(__file__).with_name(name+'.py');spec=importlib.util.spec_from_file_location(name.replace('-','_'),path);module=importlib.util.module_from_spec(spec);sys.modules[spec.name]=module;spec.loader.exec_module(module);return module
 
-def validate_manifest(root):
+def validate_manifest(root, *, reported_missing=None):
     """Read persisted metadata directly; never refresh or replace a checkpoint."""
     root=root.resolve();errors=[];warnings=[];wf=load('workflow-state')
+    reported_missing=set() if reported_missing is None else reported_missing
     manifest_path=root/'.skill-tree/skill-tree.json'
+    if not manifest_path.exists():
+        reported_missing.add('.skill-tree/skill-tree.json')
+        return {'ok':False,'errors':['Missing .skill-tree/skill-tree.json. Regenerate the navigation manifest with workflow-state.py manifest <project-root> --apply after verifying the Future files.'],'warnings':[]}
     try:data=json.loads(manifest_path.read_text())
     except (OSError,ValueError) as exc:return {'ok':False,'errors':['Invalid manifest JSON: '+str(exc)],'warnings':[]}
     if not isinstance(data,dict):return {'ok':False,'errors':['Manifest requires an object'],'warnings':[]}
@@ -32,9 +36,24 @@ def validate_manifest(root):
         if not isinstance(value,str) or not value or Path(value).is_absolute() or re.match(r'^[A-Za-z]:',value) or '..' in Path(value).parts or '\\' in value:
             errors.append('Invalid repository-relative path: '+label);return None
         target=root/value
-        if must_exist and not target.is_file():errors.append('Missing manifest file: '+value)
+        if must_exist and not target.is_file() and value not in reported_missing:
+            reported_missing.add(value)
+            if value == wf.FUTURE_STATE:
+                recovery = 'Restore the matching Future checkpoint before refreshing.'
+            elif value == wf.FUTURE_QUEUE:
+                recovery = 'Restore the matching Future queue before refreshing.'
+            elif label == 'audit_scopes':
+                recovery = 'Restore the recorded audit receipt or run a new authorized audit.'
+            elif label.startswith('catalog') and data['role'] == 'source':
+                recovery = 'Regenerate representative packages with python3 .skill-tree/scripts/sync-skill-references.py from verified sources.'
+            elif label.startswith('catalog'):
+                recovery = 'Restore the matching owned package from a verified installation generation.'
+            else:
+                recovery = 'Restore the declared file from a matching source revision or backup.'
+            errors.append('Missing manifest file: '+value+'. '+recovery)
         return target
     seen=set();canonical=set()
+    stale_sections=[]
     for item in data['files']:
         if not isinstance(item,dict) or item.get('role') not in {'canonical','generated-index-and-active-state'} or item.get('owner')!='skill-tree':
             errors.append('Invalid manifest file entry');continue
@@ -45,7 +64,8 @@ def validate_manifest(root):
         if item['role']=='canonical':canonical.add(path)
     if set(data['source_digests'])!=canonical:errors.append('Manifest source digests do not cover canonical files')
     owned_documents={p.relative_to(root).as_posix() for p in (root/'.skill-tree/documents').rglob('*') if p.is_file() and not p.is_symlink() and '__pycache__' not in p.parts and p.name!='.DS_Store'}
-    if not owned_documents.issubset(seen):errors.append('Owned documentation coverage is stale; refresh the manifest')
+    if not owned_documents.issubset(seen):
+        stale_sections.append('Owned documentation coverage')
     for path,expected in data['source_digests'].items():
         target=portable(path,'source_digests')
         if not isinstance(expected,str) or not re.fullmatch(r'[a-f0-9]{64}',expected):errors.append('Invalid source digest: '+path)
@@ -79,13 +99,15 @@ def validate_manifest(root):
         if entrypoint not in skill['resources']:errors.append('Skill resources omit entrypoint: '+entrypoint)
     if data['role']=='target':
         actual=wf.installed_catalog(root)
-        if entries!={item['entrypoint'] for item in actual}:errors.append('Installed skill catalog is stale; refresh the manifest')
+        if entries!={item['entrypoint'] for item in actual} and not entries & reported_missing:
+            stale_sections.append('Installed skill catalog')
         expected_resources={item['entrypoint']:item['resources'] for item in actual}
         for skill in data['catalog']:
             if isinstance(skill,dict) and skill.get('entrypoint') in expected_resources and skill.get('resources')!=expected_resources[skill['entrypoint']]:errors.append('Installed skill resources are stale: '+skill['entrypoint'])
     else:
         actual={p.relative_to(root).as_posix() for p in (root/'.skill-tree/skills').glob('*/*/SKILL.md')}
-        if entries!=actual:errors.append('Source skill catalog is stale; refresh the manifest')
+        if entries!=actual and not entries & reported_missing:
+            stale_sections.append('Source skill catalog')
     for audit in data['audit_scopes']:
         if not isinstance(audit,dict):errors.append('Invalid audit navigation entry')
         else:portable(audit.get('path'),'audit_scopes')
@@ -93,19 +115,29 @@ def validate_manifest(root):
     if latest is not None:
         if not isinstance(latest,dict) or latest not in data['audit_scopes']:errors.append('Latest audit must match an audit navigation entry')
         elif not latest.get('fresh'):warnings.append('Latest recorded audit is stale; historical verdicts remain unchanged')
-    if data.get('queue')=='.skill-tree/documents/future.md':
+    recovery = ('Restore missing declared files before refreshing the manifest.' if reported_missing
+                else 'Refresh the manifest after verifying the declared files.')
+    errors.extend(section+' is stale. '+recovery for section in stale_sections)
+    if data.get('queue')==wf.FUTURE_QUEUE and not {wf.FUTURE_QUEUE, wf.FUTURE_STATE} & reported_missing:
         try:
-            store=wf.Store(root,allow_unselected=True);text=store.text();tasks=wf.parse(text)
+            store=wf.Store(root,allow_unselected=True)
+            text=store.text()
             state=json.loads(store.state.read_text())
             if not isinstance(state,dict) or state.get('format')!=wf.FORMAT or state.get('schema') not in {2,3} or 'active_run' not in state:raise wf.WorkflowError('Unsupported checkpoint schema')
             if state['schema']==3 and not state.get('run_registry'):raise wf.WorkflowError('Schema 3 requires a run registry')
             if state.get('source_hash')!=wf.digest(text.encode()):errors.append('Queue index source hash is stale')
-            if state.get('tasks')!=wf.index(text):errors.append('Queue index differs from task definitions')
+            if text.strip() and state.get('tasks')!=wf.index(text):errors.append('Queue index differs from task definitions')
+            registry=state.get('run_registry')
+            if registry:
+                if not isinstance(registry,dict) or not isinstance(registry.get('runs'),dict) or any(
+                        not isinstance(run,dict) for run in registry['runs'].values()):
+                    raise wf.WorkflowError('Unsupported run registry; explicit recovery required')
+                wf.workspaces.validate_registry(registry)
+            store.verify_future_integrity()
+            tasks=wf.parse(text)
             completed={o['task_id'] for o in store.outcomes() if o.get('disposition')=='completed'}
             wf.validate_dependencies(tasks,completed)
             wf.validate_progress(state,tasks,completed)
-            registry=state.get('run_registry')
-            if registry:wf.workspaces.validate_registry(registry)
             runs=list(registry['runs'].values()) if registry else [state['active_run']]
             for run in [r for r in runs if r is not None]:
                 wf.validate_run(run)
@@ -120,11 +152,12 @@ def validate_manifest(root):
 
 def validate(root,strict=False):
     errors=[];warnings=[];docs=root/'.skill-tree/documents'
+    reported_missing=set()
+    result=validate_manifest(root,reported_missing=reported_missing);errors+=result['errors'];warnings+=result['warnings']
     for rel in ['README.md','AGENTS.md','.skill-tree/skill-tree.json','.skill-tree/documents/future.json']+['.skill-tree/documents/'+name for name in REQUIRED]:
-        if not (root/rel).is_file():errors.append('Missing '+rel)
+        if rel not in reported_missing and not (root/rel).is_file():errors.append('Missing '+rel)
     if (docs/'future.md').exists():
         result=load('validate-future-document').validate(docs/'future.md',strict);errors+=result['errors']
-    result=validate_manifest(root);errors+=result['errors'];warnings+=result['warnings']
     if strict:
         rules=load('validate-document-rules')
         for path in sorted(docs.rglob('*.md')):
