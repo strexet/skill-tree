@@ -268,7 +268,7 @@ def _setup_git_root(path):
     return Path(os.fsdecode(result.stdout).strip()) if not result.returncode else None
 
 
-def _setup_source(request, flavor):
+def _setup_source(request, flavor, snapshot=None):
     _object(request, {'checkout', 'revision'})
     root = _root(request['checkout'])
     role, _ = _read(root, '.skill-tree/config/repository.json')
@@ -318,8 +318,45 @@ def _setup_source(request, flavor):
     _require(current.returncode == 0 and current.stdout.splitlines() == [tree.get(path) for path in paths],
              'The package source contains inputs outside the exact selected commit')
     _require(commit == WS.local_git_text(root, 'rev-parse', 'HEAD'), 'The package source moved during preview')
-    return {'checkout':str(root), 'revision':revision, 'commit':commit, 'input_sha256':_digest(files),
-            'installer_sha256':WF.file_hash(installer)}
+    installer_blob = WS.local_git(root, 'cat-file', 'blob', tree['.skill-tree/bin/install.js']).stdout
+    proof = {'checkout':str(root), 'revision':revision, 'commit':commit, 'input_sha256':_digest(files),
+             'installer_sha256':hashlib.sha256(installer_blob).hexdigest()}
+    if snapshot is not None:
+        for name, expected in {**files, 'bin/install.js':proof['installer_sha256']}.items():
+            _require(isinstance(expected, str), 'The package source changed during snapshot')
+            content = _safe_path(root, '.skill-tree/'+name).read_bytes()
+            _require(hashlib.sha256(content).hexdigest() == expected, 'The package source changed during snapshot')
+            destination = snapshot/name
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_bytes(content)
+        copied = subprocess.run(WS.local_git_args(root, 'hash-object', '--no-filters', '--stdin-paths'),
+                                input='\n'.join(str(snapshot/name.removeprefix('.skill-tree/')) for name in paths)+'\n',
+                                capture_output=True, text=True, timeout=30)
+        _require(copied.returncode == 0 and copied.stdout.splitlines() == [tree[path] for path in paths],
+                 'The package snapshot differs from the exact selected commit')
+    return proof
+
+
+def _setup_checkout_proof(path):
+    _require(not (path/'.git').is_symlink(), 'Symlink in Git setup identity')
+    if not (path/'.git').exists():
+        return None
+    _require(_setup_git_root(path) == path, 'Git checkout identity changed during setup')
+    common = WS.common_dir(path)
+    state = common.stat()
+    ref = WS.local_git(path, 'symbolic-ref', '--quiet', 'HEAD', accepted=(0, 1))
+    head = WS.local_git(path, 'rev-parse', '--verify', 'HEAD', accepted=(0, 128))
+    return {'common':str(common), 'device':state.st_dev, 'inode':state.st_ino,
+            'head':head.stdout.decode().strip(), 'ref':ref.stdout.decode().strip()}
+
+
+def _setup_file_proofs(root):
+    proofs = {}
+    for relative in SETUP_FILES:
+        path = _safe_path(root, relative)
+        _require(not path.exists() or path.is_file(), f'Conflicting setup destination: {relative}')
+        proofs[relative] = WF.file_hash(path)
+    return proofs
 
 
 def _setup_project(path, kind, flavor, source, *, checkout_required=False):
@@ -335,10 +372,11 @@ def _setup_project(path, kind, flavor, source, *, checkout_required=False):
     _require(not checkout_required or git_root == path, 'An existing separate area requires an exact Git checkout')
     _require(git_root in (None, path), 'Select the exact coordinator checkout or a new destination')
     locator = WS.runtime_file(path) if git_root else None
-    proof = None
+    proof, owner, locator_sha = None, None, None
     if locator and (locator.exists() or locator.is_symlink()):
         queue_id, repo_id, owner = _inspect_owner(path)
         root = Path(owner['root'])
+        locator_sha = WF.file_hash(locator)
     else:
         state, _ = _read(path, '.skill-tree/documents/future.json')
         _require(state is None or isinstance(state, dict) and state.get('schema') != 3 and not state.get('run_registry'),
@@ -351,6 +389,10 @@ def _setup_project(path, kind, flavor, source, *, checkout_required=False):
         if not git_root:
             actions.append('initialize-git')
         else:
+            worktrees = WS.local_git(path, 'worktree', 'list', '--porcelain', '-z').stdout
+            first_entry = worktrees.split(b'\0', 1)[0]
+            _require(first_entry == b'worktree ' + os.fsencode(path),
+                     'Select the primary Git checkout before initializing the canonical Core queue')
             repo_id = WS.repo_id(path)
         actions.append('register-core-queue')
     missing = []
@@ -372,9 +414,14 @@ def _setup_project(path, kind, flavor, source, *, checkout_required=False):
         _require(not _safe_path(root, '.skill-tree/installation/source').exists(),
                  'Restore the existing owned installation receipt before setup')
         actions.append('install-skill-tree')
+    checkout_proof = _setup_checkout_proof(path)
     return {'queue_root':str(root), 'queue_id':queue_id, 'repo_id':repo_id, 'flavor':flavor,
             'source':source, 'profile_proof':proof, 'required_files':list(SETUP_FILES), 'missing_files':missing,
-            'queue_sha256':WF.file_hash(root/'.skill-tree/documents/future.md'), 'prerequisites':actions}
+            'queue_sha256':WF.file_hash(root/'.skill-tree/documents/future.md'), 'prerequisites':actions,
+            'file_proofs':_setup_file_proofs(root), 'checkout_proof':checkout_proof,
+            'canonical_checkout_proof':checkout_proof if root == path else _setup_checkout_proof(root),
+            'queue_owner_proof':owner, 'queue_locator_sha256':locator_sha,
+            'queue_root_proof':_setup_target(str(root), 'existing')[1] if root.exists() else None}
 
 
 def _guided_setup_preview(root, request):
@@ -415,6 +462,8 @@ def _guided_setup_preview(root, request):
                  'An alongside destination must be outside the coordinator root')
         scope = _scope(project.get('scope', '.'))
         if topology == 'shared':
+            _require(root == Path(parent['queue_root']),
+                     'Select the canonical coordinator checkout for shared folders')
             _require(path != root and path.is_relative_to(root) and 'scope' not in project,
                      'A shared folder must be an exact scope inside the coordinator')
             _require(not {'source', 'flavor'}.intersection(request_area), 'Shared areas inherit the coordinator package source and flavor')
@@ -430,6 +479,10 @@ def _guided_setup_preview(root, request):
             flavor = request_area['flavor']
             prepared = _setup_project(path, kind, flavor, _setup_source(request_area['source'], flavor),
                                       checkout_required=kind == 'existing')
+            owner = _setup_location_key(Path(prepared['queue_root']))
+            _require(not root_key.is_relative_to(owner)
+                     and not _setup_location_key(Path(parent['queue_root'])).is_relative_to(owner),
+                     'A separate area requires a canonical checkout outside the coordinator queue')
             if kind == 'existing':
                 _area_path(Path(prepared['queue_root']), str(scope))
         if role == 'source-maintenance':
@@ -447,8 +500,13 @@ def _guided_setup_preview(root, request):
     project_roots = {root_key, _setup_location_key(Path(parent['queue_root']))}
     project_roots.update(_setup_location_key(Path(area['queue_root'])) for area in areas.values()
                          if area['topology'] == 'separate')
+    separate_checkouts = {_setup_location_key(Path(area[key])) for area in areas.values()
+                          if area['topology'] == 'separate' for key in ('path', 'queue_root')}
     for area in areas.values():
         path = _setup_location_key(Path(area['path']))
+        if area['topology'] == 'shared':
+            _require(not any(path.is_relative_to(checkout) for checkout in separate_checkouts),
+                     'A shared folder cannot belong to a planned separate checkout')
         for project_root in project_roots:
             if path != project_root and path.is_relative_to(project_root):
                 first = path.relative_to(project_root).parts[0]
@@ -460,6 +518,11 @@ def _guided_setup_preview(root, request):
         if queue:
             _require(queue_roots.setdefault(queue, item['queue_root']) == item['queue_root'],
                      'An existing queue cannot have multiple local writers')
+    installations = {}
+    for item in (parent, *(area for area in areas.values() if area['topology'] == 'separate')):
+        selected = (item['flavor'], item['source'])
+        _require(installations.setdefault(item['queue_root'], selected) == selected,
+                 'Conflicting installations at the same canonical project')
     report = {'schema':1, 'operation':'guided-setup-preview', 'director_id':request['director_id'],
               'workspace':{**parent, 'kind':workspace['kind'], 'path':str(root), 'destination_proof':root_proof},
               'areas':areas}
@@ -927,7 +990,7 @@ def _run_helper(director, command, payload):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=sorted({'setup-preview', 'setup-apply', 'rebind-preview', 'rebind', 'status', 'dispatch-intent'} | OBJECTIVE_COMMANDS | PLAN_COMMANDS | RUN_COMMANDS))
+    parser.add_argument('command', choices=sorted({'setup-preview', 'setup-apply', 'setup-bootstrap', 'rebind-preview', 'rebind', 'status', 'dispatch-intent'} | OBJECTIVE_COMMANDS | PLAN_COMMANDS | RUN_COMMANDS))
     parser.add_argument('root', type=Path)
     parser.add_argument('--input', type=Path)
     args = parser.parse_args(argv)
@@ -936,6 +999,13 @@ def main(argv=None):
         if args.command == 'setup-preview' and isinstance(payload, dict) and 'workspace' in payload:
             print(WF.dump(_guided_setup_preview(args.root, payload)), end='')
             return 0
+        if args.command == 'setup-bootstrap':
+            from types import SimpleNamespace
+            helper = WF.owned_module('director_bootstrap', Path(__file__).with_name('director-bootstrap.py'))
+            helper.D = SimpleNamespace(**globals())
+            result = helper.bootstrap(args.root, payload)
+            print(WF.dump(result), end='')
+            return 0 if result['status'] == 'prepared' else 2
         director = DirectorRegistry(args.root)
         if args.command in OBJECTIVE_COMMANDS:
             _require(args.input is not None, '--input is required for Director objective operations')

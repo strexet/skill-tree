@@ -175,6 +175,47 @@ class DirectorAreaBindingTests(unittest.TestCase):
         self.assertNotIn('.skill-tree', before)
         self.assertEqual((self.parent/'areas/story/owner.txt').read_text(), 'Keep existing work.\n')
 
+    def test_guided_preview_rejects_shared_scope_inside_a_planned_read_only_repository(self):
+        request = self.guided_request()
+        separate = self.guided_area('product', 'inside', 'areas/product')
+        shared = self.guided_area('notes', 'inside', 'areas/product/notes', 'shared')
+        for area in (separate, shared):
+            area['allowed_effects'] = ['status']
+        request['areas'].extend([separate, shared])
+        result = self.guided_cli(self.parent, request)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn('shared folder cannot belong to a planned separate checkout', result.stdout)
+        self.assertFalse((self.parent/'areas').exists())
+
+    def test_installed_guided_preview_rejects_a_coordinator_alias_as_a_separate_area(self):
+        request = self.guided_request()
+        coordinator = self.base/'coordinator'
+        self.init_repo(coordinator, 'coordinator')
+        request['workspace']['kind'] = 'existing'
+        alias = self.base/'coordinator-alias'
+        self.git(coordinator, 'worktree', 'add', '-b', 'alias', str(alias))
+        request['areas'].append({
+            'id':'alias', 'role':'art', 'capabilities':['review-source'], 'allowed_effects':['status'],
+            'flavor':'director', 'source':request['workspace']['source'],
+            'project':{'kind':'existing', 'topology':'separate', 'path':str(alias), 'scope':'art'},
+        })
+        tools = self.base/'tools'
+        tools.mkdir()
+        subprocess.run(['node', str(CORE/'bin/install.js'), '--target', str(tools), '--flavor', 'director',
+                        '--only', 'codex', '--skills', 'skill-tree-director-setup'],
+                       capture_output=True, text=True, timeout=45, check=True)
+        entry = tools/'.agents/skills/skill-tree-director-setup/scripts/director-entry.py'
+        reply = self.guided_cli(coordinator, request, entry=entry)
+        self.assertEqual(reply.returncode, 2, reply.stdout + reply.stderr)
+        self.assertIn('separate area requires a canonical checkout outside the coordinator queue', reply.stdout)
+        WS.runtime_file(coordinator).unlink()
+        (coordinator/'.skill-tree/documents/future.json').unlink()
+        (coordinator/'.skill-tree/skill-tree.json').unlink()
+        first_setup = self.guided_cli(coordinator, request, entry=entry)
+        self.assertEqual(first_setup.returncode, 2, first_setup.stdout + first_setup.stderr)
+        self.assertIn('Select the primary Git checkout before initializing the canonical Core queue', first_setup.stdout)
+        self.assertFalse(WS.runtime_file(coordinator).exists())
+
     def test_guided_preview_preserves_existing_folder_and_rejects_symlink(self):
         request = self.guided_request()
         request['workspace']['kind'] = 'existing'
