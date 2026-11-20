@@ -1,3 +1,4 @@
+import hashlib
 import importlib.util
 import json
 from copy import deepcopy
@@ -238,5 +239,79 @@ class ReviewCycleTests(unittest.TestCase):
             with self.assertRaises(pr.ReviewError):provider.ensure('feature/example','develop','Title','Body')
             result=provider.ensure('feature/example','develop','Title','Body')
         self.assertEqual(result['number'],3);self.assertEqual(len(writes),1)
+
+class ProviderCleanupTests(unittest.TestCase):
+    def test_cleanup_follows_exact_provider_merge_to_the_live_target(self):
+        self.check_provider_cleanup(carry_after_local_review=False)
+
+    def test_cleanup_follows_provider_delivery_after_reviewed_local_handoff(self):
+        self.check_provider_cleanup(carry_after_local_review=True)
+
+    def check_provider_cleanup(self, *, carry_after_local_review):
+        spec = importlib.util.spec_from_file_location('provider_delivery_fixture', CORE/'tests/test-local-delivery.py')
+        fixture = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(fixture)
+        local = fixture.LocalDeliveryTests()
+        self.addCleanup(local.doCleanups)
+        local.setUp()
+        if carry_after_local_review:
+            run = local.start_reviewed_controller('next')
+            local.accept_scoped_source(local.tid, commit_evidence=True)
+            local.finish_reviewed_fixture()
+        else:
+            task_id = local.task('Deliver through the provider')
+            run = local.start(task_id, delivery_authorization={'pr':True,'merge':True})
+            local.source = local.location(run)
+            local.selected = fixture.wf.Store(local.source, run['id'])
+            (local.source/'source.py').write_text('value = 2\n')
+            local.accept_source(task_id)
+            local.git(local.source, 'add', 'source.py', 'report.json')
+            local.git(local.source, 'commit', '-m', 'Provider source result')
+            fixture.wf.advance(local.selected)
+            fixture.wf.finish(local.selected)
+
+        target = local.base/'target'
+        local.git(local.root, 'worktree', 'add', target, 'develop')
+        (target/'source.py').write_bytes((local.source/'source.py').read_bytes())
+        local.git(target, 'commit', '-am', 'Squashed provider result')
+        merge = local.git(target, 'rev-parse', 'HEAD')
+        source_head = local.git(local.source, 'rev-parse', 'HEAD')
+        snapshot = {
+            'repo_id':run['workspace']['repo_id'], 'remote':'origin',
+            'remote_id':hashlib.sha256(str(local.remote).encode()).hexdigest(),
+            'source_branch':run['workspace']['branch'], 'target_branch':'develop',
+            'head':source_head, 'base_oid':run['workspace']['base_commit'], 'changed_files':['source.py'],
+            'same_repository':True, 'pr':{'id':'PR_fixture','number':1,'url':'https://example.invalid/pr/1'},
+            'state':'OPEN',
+        }
+        request = local.base/'publication.json'
+
+        def observe(command, **changes):
+            request.write_text(json.dumps({'snapshot':{**snapshot, **changes}, 'merge':True}))
+            result = subprocess.run(['python3',str(CORE/'common/scripts/pr-review-state.py'),
+                command,str(local.root),'--input',str(request)],capture_output=True,text=True,timeout=30)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            return json.loads(result.stdout)
+
+        observe('init')
+        deferred = observe('observe', state='MERGED', merge_commit=merge)
+        self.assertEqual(deferred['status'], 'merged')
+        self.assertEqual(deferred['worktree_cleanup']['status'], 'deferred')
+        self.assertTrue(local.source.exists())
+        local.git(target, 'push', 'origin', 'develop')
+        unverified = observe('observe', state='MERGED', merge_commit=merge, same_repository=False)
+        self.assertEqual(unverified['worktree_cleanup']['status'], 'deferred')
+        self.assertTrue(local.source.exists())
+        request.write_text(json.dumps({'key':'fixture-metadata-only', 'request':{'description':'Retain operation receipt'}}))
+        metadata_only = subprocess.run(['python3',str(CORE/'common/scripts/pr-review-state.py'),
+            'operation',str(local.root),'--input',str(request),'--publication-id',unverified['publication_id']],
+            capture_output=True,text=True,timeout=30)
+        self.assertEqual(metadata_only.returncode, 0, metadata_only.stdout + metadata_only.stderr)
+        self.assertNotIn('worktree_cleanup', json.loads(metadata_only.stdout))
+        removed = observe('observe', state='MERGED', merge_commit=merge)
+        self.assertEqual(removed['worktree_cleanup']['status'], 'removed')
+        self.assertFalse(local.source.exists())
+        self.assertEqual(local.git(local.root, 'rev-parse', run['workspace']['branch']), source_head)
+        self.assertTrue(target.exists())
 
 if __name__=='__main__':unittest.main()

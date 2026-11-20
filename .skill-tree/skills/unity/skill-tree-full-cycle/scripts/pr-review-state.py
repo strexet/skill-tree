@@ -209,7 +209,9 @@ def reconcile(record,snapshot,*,retarget=None):
     if snapshot.get('state')=='MERGED':
         if not record.get('pr') or not record['pr'].get('id'):raise ReviewError('Merged status requires the existing provider PR identity')
         if not snapshot.get('merge_commit'):raise ReviewError('Merged provider result lacks merge commit evidence')
-        record['status']='merged';record['merge_commit']=snapshot['merge_commit'];return record
+        record['status']='merged';record['merge_commit']=snapshot['merge_commit']
+        record['same_repository'] = snapshot.get('same_repository') is True
+        return record
     if changed:
         record.pop('review',None)
         record['status']='pr-review-in-progress'
@@ -691,7 +693,7 @@ class GitHub:
             return matches[0]
         return self.gh('api','--method','POST',endpoint,'-f','body='+body+'\n\n'+marker)
     def snapshot(self,number,context,policy):
-        raw=self.gh('pr','view',number,'--repo',self.repository,'--json','id,number,url,state,headRefOid,headRefName,baseRefOid,baseRefName,mergeable,reviewDecision,mergeCommit,statusCheckRollup,changedFiles')
+        raw=self.gh('pr','view',number,'--repo',self.repository,'--json','id,number,url,state,headRefOid,headRefName,baseRefOid,baseRefName,mergeable,reviewDecision,mergeCommit,statusCheckRollup,changedFiles,isCrossRepository')
         if raw['headRefName']!=context['source_branch'] or raw['baseRefName']!=context['target_branch']:
             raise ReviewError('Provider PR branch identity differs from preflight')
         endpoint='repos/'+self.repository
@@ -717,7 +719,7 @@ class GitHub:
         for check in raw.get('statusCheckRollup') or []:
             name=check.get('name') or check.get('context');status=check.get('conclusion') or check.get('state') or check.get('status') or 'UNKNOWN'
             checks.append({'name':name,'status':'success' if status=='SUCCESS' else status.lower(),'required':name in required})
-        return {**context,'head':raw['headRefOid'],'base_oid':raw['baseRefOid'],'candidate_objects_required':True,'changed_files':[f['filename'] for f in files],'pr':{'id':raw['id'],'number':raw['number'],'url':raw['url']},'state':raw['state'],'merge_commit':(raw.get('mergeCommit') or {}).get('oid'),'mergeable':raw['mergeable'],'reviews':reviews,'comments':comments+inline,'threads':threads,'checks':checks,'checks_known':policy.get('checks_known') is True,'required_checks_missing':sorted(required-{c['name'] for c in checks}),'approvals_known':policy.get('approvals_known') is True,'approvals_required':policy.get('approvals_required',True),'approved':raw.get('reviewDecision')=='APPROVED'}
+        return {**context,'head':raw['headRefOid'],'base_oid':raw['baseRefOid'],'candidate_objects_required':True,'changed_files':[f['filename'] for f in files],'pr':{'id':raw['id'],'number':raw['number'],'url':raw['url']},'state':raw['state'],'merge_commit':(raw.get('mergeCommit') or {}).get('oid'),'mergeable':raw['mergeable'],'reviews':reviews,'comments':comments+inline,'threads':threads,'checks':checks,'checks_known':policy.get('checks_known') is True,'required_checks_missing':sorted(required-{c['name'] for c in checks}),'approvals_known':policy.get('approvals_known') is True,'approvals_required':policy.get('approvals_required',True),'approved':raw.get('reviewDecision')=='APPROVED','same_repository':raw.get('isCrossRepository') is False}
     def merge(self,number,head,method):
         if method not in {'merge','squash','rebase'}:raise ReviewError('Repository-approved merge method required')
         return self.gh('api','--method','PUT','repos/'+self.repository+'/pulls/'+str(number)+'/merge','-f','sha='+head,'-f','merge_method='+method)
@@ -820,6 +822,9 @@ def main(argv=None):
                             run['delivery']['order_completed']=result['status']=='merged' or result['status']=='pr-ready' and not result['authorization'].get('merge')
                             run['delivery']['pr']=result.get('pr');run['delivery']['merge_commit']=result.get('merge_commit')
                             store.save(store.text(),state)
+                            if (args.command in {'init','observe'} and snapshot.get('state')=='MERGED'
+                                    and result['status']=='merged'):
+                                result['worktree_cleanup'] = wf.cleanup_after_merge(store, state, run)
             result={'publication_id':key,**result}
         print(json.dumps(result,indent=2,ensure_ascii=False));return 0
     except (ReviewError,ws.RunError,OSError,ValueError,KeyError,subprocess.TimeoutExpired) as exc:
