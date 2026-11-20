@@ -256,3 +256,78 @@ test('Director profile discovers a shared Unity checkout without asserting runti
   assert.match(profile.recipes['unity-playmode'].qualification, /isolated fixture required/);
   assert.equal(c.resolveProfile(source, root, 'general').recipes['unity-editmode'], undefined);
 });
+
+test('feature folder guidance is reachable from normal composed entry points', t => {
+  const root = fixture(t);
+  write(root, 'ProjectSettings/ProjectVersion.txt', 'm_EditorVersion: 6000.0.83f1');
+  write(root, 'Packages/manifest.json', {dependencies: {}});
+
+  const resolveLink = (files, from, destination) => {
+    assert.ok(files[from].includes('](' + destination + ')'), from + ' links to ' + destination);
+    const resolved = path.posix.join(path.posix.dirname(from), destination.split('#')[0]);
+    assert.ok(files[resolved], resolved + ' is shipped in the package');
+    return files[resolved];
+  };
+
+  for (const flavor of ['general', 'web', 'unity', 'director']) {
+    const operation = flavor === 'director' ? 'skill-tree-director-setup' : 'skill-tree-implement-next-future-task';
+    const profile = c.resolveProfile(source, root, flavor);
+    const files = c.compose(source, profile, [operation]).packages[operation];
+    if (flavor === 'director') resolveLink(files, 'SKILL.md', 'references/director-workflow.md');
+    const shared = flavor === 'director'
+      ? resolveLink(files, 'references/director-workflow.md', 'development-practices.md#organize-files-by-feature')
+      : resolveLink(files, 'SKILL.md', 'references/development-practices.md');
+    assert.match(shared, /## Organize files by feature/);
+    assert.match(shared, /app\/orders\/page\.tsx/);
+    assert.match(shared, /src\/shared\/format\/format-date\.ts/);
+    assert.doesNotMatch(shared, /src\/shared\/format\/(?:README\.md|catalog\.json)/);
+    assert.ok(!shared.includes('Goblin.prefab'));
+    if (flavor === 'unity') {
+      const unity = resolveLink(files, 'SKILL.md', 'references/unity-development.md');
+      assert.match(unity, /Assets\/Features\/Goblin\/Prefabs\/Goblin\.prefab/);
+    } else {
+      assert.equal(files['references/unity-development.md'], undefined);
+    }
+  }
+});
+
+test('Unity feature folder examples resolve the README and catalog paths', t => {
+  const root = fixture(t);
+  write(root, 'ProjectSettings/ProjectVersion.txt', 'm_EditorVersion: 6000.0.83f1');
+  write(root, 'Packages/manifest.json', {dependencies: {}});
+  const operation = 'skill-tree-implement-next-future-task';
+  const profile = c.resolveProfile(source, root, 'unity');
+  const doc = c.compose(source, profile, [operation]).packages[operation]['references/unity-development.md'];
+  const section = doc.split('## Organize feature assets\n')[1]?.split('\n## ')[0];
+  assert.ok(section, 'The Unity package includes the feature asset examples');
+  const example = new Map([...section.matchAll(/\x60\x60\x60(text|markdown|json)\n([\s\S]*?)\n\x60\x60\x60/g)]
+    .map(([, format, text]) => [format, text]));
+  assert.deepEqual([...example.keys()], ['text', 'markdown', 'json']);
+  const paths = new Set(example.get('text').split('\n').filter(Boolean));
+  const feature = 'Assets/Features/Goblin';
+  const prefab = feature + '/Prefabs/Goblin.prefab';
+  const readme = feature + '/README.md';
+  const catalog = feature + '/catalog.json';
+  assert.ok(paths.has(readme));
+  const markdown = example.get('markdown');
+  const links = new Map([...markdown.matchAll(/^\[([^\]]+)\]: (\S+)$/gm)]
+    .map(([, name, target]) => [name, target]));
+  const destinations = [...markdown.matchAll(/\]\[([^\]]+)\]/g)].map(([, name]) => {
+    assert.ok(links.has(name), 'README defines ' + name);
+    return path.posix.join(path.posix.dirname(readme), links.get(name));
+  });
+  assert.deepEqual(destinations.sort(), [prefab, catalog].sort());
+  assert.ok(destinations.every(target => paths.has(target)));
+
+  const entries = JSON.parse(example.get('json')).entries;
+  assert.deepEqual(entries.map(entry => entry.path).sort(), [prefab, feature + '/Scripts/GoblinBehaviour.cs'].sort());
+  const targetExists = value => !path.posix.isAbsolute(value) &&
+    path.posix.normalize(value) === value && paths.has(value);
+  for (const entry of entries) {
+    assert.ok(entry.purpose.trim() && targetExists(entry.path));
+  }
+  const behavior = entries.find(entry => entry.extends);
+  assert.equal(behavior.extends.type, 'EnemyBehaviour');
+  assert.ok(targetExists(behavior.extends.path));
+  assert.ok(!targetExists(behavior.extends.path.replace('EnemyBehaviour.cs', 'OldEnemyBehaviour.cs')));
+});

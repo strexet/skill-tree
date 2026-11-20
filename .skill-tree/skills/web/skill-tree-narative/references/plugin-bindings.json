@@ -3100,7 +3100,7 @@
   "configuration_digest": "1d4ded90f74588a33443cca0a2da314364e2a91faff9e7955ed7ac521848e0ff",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "b425e10ada650988a9e75208ff9c83a46a7a76de7a94b37df295c5be1d5200d3",
+  "identity": "088abc1785b60cab5859f85d6e7a0ad1aa948c6afbb94818d0889cdaf0aacd2a",
   "operation": "skill-tree-narative",
   "operations": {
     "skill-tree-3d": {
@@ -3265,7 +3265,7 @@
     "references/narrative-unity-qualification.md": "070b8ff509ba4cf3a480406bed6b9ecbe0c8cc38a7eb85941779e76bdd618f19",
     "references/narrative-visual-reference-review.md": "689cf38e6a12f22e5049188b3667879a101a324ff9829dc1d2d2b6916f9951a0",
     "references/narrative-work-manifest.md": "8ebb5307073e2a0acf23f31525113484ad042af6a0a8bdf58a99cc8ac9ddb2a8",
-    "references/narrative-workflow.md": "b681124f1c3654dfd3e03a6ee69e98c96fcb630e428eb86659db353c0f80a4f0",
+    "references/narrative-workflow.md": "dc50150fd1dbf7b3f491988fcbd18697fed1c38a3a9254bdd56fa7840bee0d30",
     "references/narrative-world-consequences.md": "4bc622b5153a8f1578d98278dd2f9c85efa81f6b16cf42a943658e764ae9f0b3",
     "references/narrative-world-laws.md": "9a8bfb2c7bf880477108e1470713647b2b030ebe213af184ad3ee50e9b3ffd1a",
     "references/narrative-world-transitions.md": "aa323d03e2c4635972632c58f350fa785c34a8fc812776ccec5fe895dab15209",
