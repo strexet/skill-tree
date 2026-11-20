@@ -304,8 +304,176 @@ def create_reserved(store, run, path):
     data = runtime(store.root)
     data['worktrees'][run['id']] = str(path); atomic(runtime_file(store.root), data)
     git(store.root, 'worktree', 'add', '-b', run['workspace']['branch'], path, run['workspace']['base_commit'])
+    registration = linked_registration(store.root, path)
+    owner = {'run_id': run['id'], 'queue_id': data['queue_id'], 'registration': registration.name,
+             'token': str(uuid.uuid4())}
+    atomic(registration/'skill-tree-owner.json', owner)
+    run['workspace']['cleanup_owner'] = owner
     run['workspace_state'] = 'ready'
     store.source_root = path
+
+
+def linked_registration(root, path):
+    common = common_dir(root)
+    if not common or common_dir(path) != common:
+        raise RunError('The registered source belongs to a different Git repository')
+    location = Path(local_git_text(path, 'rev-parse', '--absolute-git-dir'))
+    if location.is_symlink() or location.parent != common/'worktrees' or location.parent.is_symlink():
+        raise RunError('The source is not an ordinary linked Git worktree')
+    return location
+
+
+def cleanup_quarantine(root, attempt):
+    attempt_id = attempt['id']
+    if not re.fullmatch(r'[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}', attempt_id):
+        raise RunError('The original cleanup attempt identity is invalid')
+    directory = common_dir(root)/('skill-tree-cleanup-'+attempt_id)
+    if directory.is_symlink():
+        raise RunError('The original cleanup directory is ambiguous')
+    return directory/'checkout'
+
+
+def cleanup_checkout(root, registry, run, original):
+    locator = runtime(root)
+    workspace = run['workspace']
+    owner = workspace.get('cleanup_owner')
+    if not isinstance(owner, dict) or owner.get('run_id') != run['id'] or owner.get('queue_id') != registry['queue_id']:
+        raise RunError('The worktree has no current controller creation proof')
+    if run.get('workspace_recoveries') or run.get('workspace_state') != 'ready':
+        raise RunError('A recovered or unfinished worktree requires separate ownership inspection')
+    if not locator or locator['queue_id'] != registry['queue_id'] or run['id'] not in locator['worktrees']:
+        raise RunError('The exact controller worktree locator is unavailable')
+    name = owner.get('registration')
+    if not isinstance(name, str) or name in {'', '.', '..'} or Path(name).name != name:
+        raise RunError('The Git administrative identity is invalid')
+    origin = Path(locator['worktrees'][run['id']])
+    if not origin.is_absolute() or root.is_relative_to(origin):
+        raise RunError('The worktree locator is ambiguous or contains the canonical checkout')
+    registration = common_dir(root)/'worktrees'/name
+    if original and original['locator_sha256'] != hashlib.sha256(os.fsencode(origin)).hexdigest():
+        raise RunError('The original worktree locator changed after removal preparation')
+    records = local_git(root, 'worktree', 'list', '--porcelain', '-z').stdout.split(b'\0\0')
+    registrations = {}
+    for record in records:
+        row, *fields = record.split(b'\0')
+        if row.startswith(b'worktree '):
+            registered = Path(os.fsdecode(row[len(b'worktree '):])).resolve()
+            if registered in registrations:
+                raise RunError('Git reports an ambiguous worktree registration')
+            registrations[registered] = fields
+    quarantine = cleanup_quarantine(root, original) if original else None
+    if quarantine and quarantine.is_symlink():
+        raise RunError('The staged worktree path is ambiguous')
+    registration_absent = not registration.exists() and not registration.is_symlink()
+    if original and original.get('staged') and registration_absent and not quarantine.exists() and quarantine not in registrations:
+        # A newly created directory at the original path does not belong to the removed registration.
+        return None
+    if origin.resolve() != origin:
+        raise RunError('The original worktree location changed')
+    path = quarantine if quarantine and (quarantine.exists() or quarantine in registrations) else origin
+    if not path.exists() and registration_absent and path not in registrations:
+        if original:
+            return None
+        raise RunError('The selected worktree disappeared before a cleanup attempt was prepared')
+    if any(other != path and other.is_relative_to(path) for other in registrations):
+        raise RunError('The selected path contains another Git worktree')
+    if any(rid != run['id'] and Path(other).resolve().is_relative_to(path)
+           for rid, other in locator['worktrees'].items()):
+        raise RunError('Another controller locates a worktree at or below the selected path')
+    if path not in registrations or not path.is_dir() or linked_registration(root, path) != registration:
+        raise RunError('The locator and original Git worktree registration no longer match')
+    marker = registration/'skill-tree-owner.json'
+    if marker.is_symlink() or not marker.is_file() or json.loads(marker.read_text()) != owner:
+        raise RunError('The original Git worktree ownership marker is unavailable or changed')
+    if any(field == b'locked' or field.startswith(b'locked ') for field in registrations[path]):
+        raise RunError('The selected Git worktree is locked')
+    if Path.cwd().resolve().is_relative_to(path):
+        raise RunError('Retry cleanup from outside the selected worktree')
+    return path
+
+
+def cleanup_source_guard(path, source_ref, source_head):
+    current = checked_out_branch(path)
+    if (current['ref'], current['head']) != (source_ref, source_head):
+        raise RunError('The worktree branch or head changed after delivery')
+    admin = task_index_path(path).parent
+    if any(admin.rglob('*.lock')) or (admin/'sequencer').exists():
+        raise RunError('The selected worktree has a Git lock or an unfinished sequencer operation')
+    config = admin/'config.worktree'
+    if config.is_symlink() or config.exists() and (not config.is_file() or config.stat().st_size):
+        raise RunError('The selected worktree has local Git configuration')
+    if local_git(path, 'for-each-ref', 'refs/worktree/', 'refs/bisect/', 'refs/rewritten/').stdout:
+        raise RunError('The selected worktree has private Git references')
+    recovery_heads = set(local_git_text(path, 'reflog', 'show', '--format=%H', 'HEAD').splitlines())
+    for ref in ('ORIG_HEAD', 'AUTO_MERGE', 'MERGE_AUTOSTASH'):
+        if (admin/ref).exists():
+            recovery_heads.add(local_git_text(path, 'rev-parse', '--verify', ref))
+    if any(local_git(path, 'merge-base', '--is-ancestor', head, source_head, accepted=(0, 1, 128)).returncode
+           for head in recovery_heads - {source_head}):
+        raise RunError('The selected worktree has recovery objects outside the delivered source history')
+    if local_worktree_dirt(path, allow_staged=True):
+        raise RunError('The selected worktree contains local, untracked or ignored content')
+    # A checkout index can consider same-size, timestamp-preserving writes clean.
+    with tempfile.TemporaryDirectory(prefix='skill-tree-cleanup-index-') as temporary:
+        index = Path(temporary)/'index'
+        local_git(path, 'read-tree', source_head, index=index)
+        if local_git(path, '-c', 'core.filemode=true', 'status', '--porcelain', '-z',
+                '--ignore-submodules=none', '--untracked-files=all', '--ignored=matching', index=index).stdout:
+            raise RunError('The selected worktree contains local, untracked or ignored content')
+
+
+def remove_controller_worktree(root, path):
+    local_git(root, 'worktree', 'remove', '--', path)
+
+
+def stage_controller_worktree(root, origin, attempt):
+    quarantine = cleanup_quarantine(root, attempt)
+    if origin != quarantine:
+        quarantine.parent.mkdir(mode=0o700, exist_ok=True)
+        if quarantine.parent.stat().st_mode & 0o077:
+            raise RunError('The worktree cleanup directory is accessible to other users')
+        local_git(root, 'worktree', 'move', '--', origin, quarantine)
+    return quarantine
+
+
+def restore_staged_worktree(root, registry, run, attempt):
+    path = cleanup_checkout(root, registry, run, attempt)
+    if path != cleanup_quarantine(root, attempt):
+        return
+    origin = Path(runtime(root)['worktrees'][run['id']])
+    if origin.exists() or origin.is_symlink():
+        raise RunError('The original worktree path is occupied')
+    local_git(root, 'worktree', 'move', '--', path, origin)
+
+
+def cleanup_target_head(root, target_ref, remote=None, remote_id=None):
+    if remote is None:
+        return local_git_text(root, 'rev-parse', '--verify', target_ref+'^{commit}')
+    if remote not in git(root, 'remote').splitlines() or remote.startswith('-'):
+        raise RunError('The recorded publication remote is unavailable')
+    url = git(root, 'remote', 'get-url', remote)
+    if hashlib.sha256(url.encode()).hexdigest() != remote_id:
+        raise RunError('The recorded publication remote identity changed')
+    environment = {**os.environ, 'GIT_TERMINAL_PROMPT':'0', 'GCM_INTERACTIVE':'never'}
+    arguments = local_git_args(root, 'ls-remote', '--exit-code', '--refs', '--', remote, target_ref)
+    result = subprocess.run(arguments, capture_output=True, env=environment, stdin=subprocess.DEVNULL, timeout=8)
+    fields = result.stdout.split()
+    if result.returncode or len(fields) != 2 or fields[1] != target_ref.encode():
+        raise RunError('The live publication target could not be verified')
+    return fields[0].decode('ascii')
+
+
+def committed_file_hash(root, head, relative):
+    if (not isinstance(head, str) or not re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', head)
+            or not isinstance(relative, str) or Path(relative).is_absolute()
+            or any(part in {'', '.', '..'} for part in relative.split('/')) or '\0' in relative):
+        return None
+    entry = local_git(root, 'ls-tree', '-z', head, '--', relative, accepted=(0, 128))
+    details, separator, name = entry.stdout.partition(b'\t')
+    if not separator or name != os.fsencode(relative)+b'\0' or not details.startswith((b'100644 blob ', b'100755 blob ')):
+        return None
+    blob = details.split()[-1].decode('ascii')
+    return hashlib.sha256(local_git(root, 'cat-file', 'blob', blob).stdout).hexdigest()
 
 
 def inspect_directed_reservation(store, run, requested=None):

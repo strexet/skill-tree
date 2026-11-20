@@ -1735,6 +1735,11 @@ def local_delivery_action(store, action, payload):
         delivery = run['delivery']
         if workspaces.delivery_finished(run):
             if action == 'complete':
+                with store.lock():
+                    state = store.load()
+                    run = state['active_run']
+                    cleanup_after_merge(store, state, run)
+                    delivery = run['delivery']
                 return delivery
             raise WorkflowError('The selected local delivery is already completed')
         before = file_hash(store.state)
@@ -1827,7 +1832,208 @@ def local_delivery_action(store, action, payload):
                         raise WorkflowError('A retained stopped admission changed before local completion')
 
         _delivery_save(store, run['id'], before, owner, update, extras, guard=guard)
+        if action == 'complete':
+            with store.lock():
+                state = store.load()
+                run = state['active_run']
+                cleanup_after_merge(store, state, run)
+                return run['delivery']
         return store.load()['active_run']['delivery']
+
+
+def cleanup_delivery_scope(store, run):
+    delivery = run['delivery']
+    workspace = run['workspace']
+    if (run['phase'] != 'completed' or delivery['status'] != 'merged'
+            or delivery['implementation'] != 'completed' or delivery.get('order_completed') is not True
+            or not workspaces.delivery_finished(run)):
+        raise WorkflowError('Worktree cleanup requires confirmed completed merge delivery')
+    if workspace['repo_id'] != workspaces.repo_id(store.root):
+        raise WorkflowError('The recorded repository identity changed')
+    remote = {}
+    publication = delivery.get('publication')
+    if publication and publication != 'not-requested':
+        if not re.fullmatch(r'\.skill-tree/history/publications/pub-[a-f0-9]{32}\.json', publication):
+            raise WorkflowError('The recorded publication receipt is unavailable')
+        record = json.loads(store.owned(publication).read_text())
+        scope = record['identity']
+        authorization = record.get('authorization', {})
+        has_launch_identity = run.get('reviewed_local_delivery') and workspace['remote'] is None
+        remote_matches = (scope['remote'], scope['remote_id']) == (workspace['remote'], workspace.get('remote_id'))
+        if (record.get('status') != 'merged' or not record.get('pr', {}).get('id')
+                or record['pr'] != delivery.get('pr') or record.get('merge_commit') != delivery.get('merge_commit')
+                or record.get('same_repository') is not True or scope['repo_id'] != workspace['repo_id']
+                or scope['source_branch'] != workspace['branch']
+                or authorization.get('origin') != 'owner' or authorization.get('pr') is not True
+                or authorization.get('target_branch') != scope['target_branch']
+                or not (remote_matches or has_launch_identity)):
+            raise WorkflowError('The confirmed provider merge does not bind the exact controller source and repository')
+        source_head, merge_commit = scope['head'], record['merge_commit']
+        target_ref = 'refs/heads/'+workspaces.branch(store.root, scope['target_branch'])
+        remote = {'remote':scope['remote'], 'remote_id':scope['remote_id'], 'publication':publication,
+                  'pr_id':record['pr']['id']}
+    elif 'reviewed_merge' in delivery:
+        source = delivery['reviewed_source']
+        target_ref = run['reviewed_local_delivery']['launch']['ref']
+        source_head, merge_commit = source['source']['source_head'], delivery['reviewed_merge']['commit']
+        record = json.loads(store.owned(_delivery_receipt_path(run, '-reviewed-merge')).read_text())
+        if record != {'run_id':run['id'], 'review':source, 'merge':delivery['reviewed_merge'], 'target_ref':target_ref}:
+            raise WorkflowError('The original reviewed merge receipt changed')
+    else:
+        _delivery_original(store, run)
+        integration = delivery['local_integration']
+        target_ref = integration['preparation']['target_ref']
+        source_head, merge_commit = integration['preparation']['source_head'], integration['merge']['commit']
+    source_ref = 'refs/heads/'+workspaces.branch(store.root, workspace['branch'])
+    if (not target_ref.startswith('refs/heads/') or source_ref == target_ref
+            or any(not re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', value) for value in (source_head, merge_commit))):
+        raise WorkflowError('The original delivery source, merge or target identity is invalid')
+    workspaces.branch(store.root, target_ref.removeprefix('refs/heads/'))
+    return dict(source_head=source_head, source_ref=source_ref, merge_commit=merge_commit, target_ref=target_ref, **remote)
+
+
+def cleanup_evidence_records(value):
+    if isinstance(value, dict):
+        if 'path' in value and 'sha256' in value:
+            yield value
+        for item in value.values():
+            yield from cleanup_evidence_records(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from cleanup_evidence_records(item)
+
+
+def cleanup_source_evidence(store, run, source_head):
+    outcomes = [row for row in store.outcomes() if row.get('run_id') == run['id']]
+    if {row['task_id']:row['id'] for row in outcomes} != run.get('completion_refs', {}):
+        raise WorkflowError('The controller completion evidence ledger is unavailable or changed')
+    for row in outcomes:
+        commit = row.get('task_git_commit', {}).get('commit')
+        if commit and workspaces.local_git(store.root, 'merge-base', '--is-ancestor',
+                commit, source_head, accepted=(0, 1, 128)).returncode:
+            raise WorkflowError('The delivered source no longer contains a recorded task commit')
+    evidence = list(cleanup_evidence_records([outcomes, run.get('revalidated_checks', {}),
+                                             run.get('revalidation_source_reviews', {})]))
+    for relative, expected in {(item['path'], item['sha256']) for item in evidence if item.get('available', True)}:
+        if not expected or workspaces.committed_file_hash(store.root, source_head, relative) != expected:
+            raise WorkflowError('Required evidence is unavailable at the recorded source commit: '+str(relative))
+
+
+def cleanup_target_guard(store, scope):
+    tip = workspaces.cleanup_target_head(store.root, scope['target_ref'], scope.get('remote'), scope.get('remote_id'))
+    if tip != scope['merge_commit'] and workspaces.local_git(
+            store.root, 'merge-base', '--is-ancestor', scope['merge_commit'], tip, accepted=(0, 1, 128)).returncode:
+        raise WorkflowError('The current target does not verifiably contain the recorded merge commit')
+
+
+def cleanup_hook_guard(store, run, scope):
+    references = set(run.get('hook_chains', []))
+    publication = scope.get('publication')
+    if publication:
+        references.update(json.loads(store.owned(publication).read_text()).get('hook_chains', []))
+    helper = hook_helper()
+    for pending in helper.pending_scan(store):
+        chain = helper.read(store, pending['chain_id'])
+        context = chain['context']
+        if (chain['id'] in references or context.get('run_id') == run['id']
+                or scope.get('pr_id') and context.get('publication_id') == Path(publication).stem.removeprefix('pub-')):
+            raise WorkflowError('The selected controller still has a pending hook actor')
+
+
+def cleanup_after_merge(store, state, run, *, locked_scope=None):
+    """Apply cleanup inside the original delivery locks or an exact-run retry."""
+    delivery = run['delivery']
+    record = delivery.get('worktree_cleanup', {})
+    if record.get('status') == 'removed':
+        return record
+    original = record.get('attempt')
+
+    def persist(status, reason=None):
+        result = {'status':status, **({'attempt':original} if original else {}), **({'reason':reason} if reason else {})}
+        if delivery.get('worktree_cleanup') != result:
+            delivery['worktree_cleanup'] = result
+            state['run_registry']['runs'][run['id']] = run
+            store.save(store.text(), state, update_navigation=False)
+        return result
+
+    try:
+        scope = cleanup_delivery_scope(store, run)
+        if locked_scope is not None and locked_scope != scope:
+            raise WorkflowError('The delivery target changed before cleanup obtained its locks')
+        registry = state['run_registry']
+        if (run.get('maintenance') or run.get('stop_reason') or run['id'] in registry['claims'].values()
+                or any(owner.get('run_id') == run['id'] for owner in registry['resources'].values())):
+            raise WorkflowError('The selected controller still owns active work or resources')
+        cleanup_hook_guard(store, run, scope)
+        if original and original['scope'] != scope:
+            raise WorkflowError('The confirmed delivery changed after removal preparation')
+        path = workspaces.cleanup_checkout(store.root, registry, run, original)
+        if path is None:
+            return persist('removed')
+        workspaces.cleanup_source_guard(path, scope['source_ref'], scope['source_head'])
+        cleanup_target_guard(store, scope)
+        cleanup_source_evidence(store, run, scope['source_head'])
+    except (ValueError, OSError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
+        reason = str(error) if isinstance(error, (WorkflowError, workspaces.RunError)) else 'Cleanup prerequisites could not be verified'
+        if original:
+            reason += '. Inspect the original or staged checkout in Git worktree list'
+        return persist('deferred', reason)
+
+    if not original:
+        original = {'id':str(uuid.uuid4()), 'scope':scope, 'locator_sha256':digest(os.fsencode(path))}
+    persist('prepared')
+    try:
+        if workspaces.cleanup_checkout(store.root, registry, run, original) != path:
+            raise WorkflowError('The original worktree changed after removal preparation')
+        staged = workspaces.stage_controller_worktree(store.root, path, original)
+        if workspaces.cleanup_checkout(store.root, registry, run, original) != staged:
+            raise WorkflowError('The staged checkout differs from the original worktree')
+    except (ValueError, OSError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
+        reason = str(error) if isinstance(error, (WorkflowError, workspaces.RunError)) else 'Staging requires recovery'
+        return persist('deferred', reason + '. Inspect the original or staged checkout in Git worktree list')
+    original = {**original, 'staged':True}
+    persist('prepared')
+    try:
+        if cleanup_delivery_scope(store, run) != scope:
+            raise WorkflowError('The confirmed delivery changed during cleanup')
+        cleanup_target_guard(store, scope)
+        workspaces.cleanup_source_guard(staged, scope['source_ref'], scope['source_head'])
+        workspaces.remove_controller_worktree(store.root, staged)
+        if workspaces.cleanup_checkout(store.root, registry, run, original) is not None:
+            raise WorkflowError('Git did not confirm removal of the original worktree')
+    except (ValueError, OSError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
+        reason = str(error) if isinstance(error, (WorkflowError, workspaces.RunError)) else 'Git removal requires reconciliation'
+        try:
+            workspaces.restore_staged_worktree(store.root, registry, run, original)
+        except (ValueError, OSError, KeyError, TypeError, subprocess.TimeoutExpired):
+            reason += '; inspect the original or staged checkout in Git worktree list'
+        return persist('deferred', reason)
+    try:
+        staged.parent.rmdir()
+    except OSError:
+        pass
+    return persist('removed')
+
+
+def cleanup_controller_worktree(store):
+    if not valid_id(store.run_id, 'WR'):
+        raise WorkflowError('Worktree cleanup requires the exact --run-id from the canonical checkout')
+    run = store.load()['active_run']
+    if not run or run.get('delivery', {}).get('status') != 'merged':
+        raise WorkflowError('Select a controller with confirmed merge delivery')
+    previous = run['delivery'].get('worktree_cleanup', {})
+    if previous.get('status') == 'removed':
+        return previous
+    try:
+        scope = cleanup_delivery_scope(store, run)
+    except (ValueError, OSError, KeyError, TypeError, subprocess.TimeoutExpired):
+        # The locked path records the bounded prerequisite without touching Git.
+        scope = {}
+    remote = scope.get('remote', 'local') if scope else 'local'
+    target = scope['target_ref'].removeprefix('refs/heads/') if scope else run['id']
+    with workspaces.publication_lock(store.root, remote, target), store.lock():
+        state = store.load()
+        return cleanup_after_merge(store, state, state['active_run'], locked_scope=scope)
 
 
 def require_reviewed_controller_inputs(store, run):
@@ -1922,6 +2128,7 @@ def merge_reviewed_controller(store, payload=None):
         text=store.text();state=store.load(text);run=state['active_run']
         delivery=run['delivery']
         if delivery.get('reviewed_merge'):
+            cleanup_after_merge(store, state, run)
             return run
         if delivery.get('publication')!='not-requested':
             raise WorkflowError('The selected run has a separate recorded remote delivery')
@@ -1971,6 +2178,7 @@ def merge_reviewed_controller(store, payload=None):
         run.update(next_action=None,stop_reason=None)
         store.save(text,state,{_delivery_receipt_path(run,'-reviewed-merge'):dump({
             'run_id':run['id'],'review':reviewed,'merge':merged,'target_ref':ref})})
+        cleanup_after_merge(store, state, run)
         return run
 
 
@@ -2124,22 +2332,40 @@ def evidence_pointer(store,reference,required=False):
 
 def history(store,task_id=None,component=None):
     result=[]
+    registry = json.loads(store.state.read_text()).get('run_registry', {}).get('runs', {}) if store.state.is_file() else {}
     for outcome in store.outcomes():
         if task_id and outcome['task_id']!=task_id:continue
         if component and normalized(component) not in normalized(outcome['title']+' '+outcome['outcome']+' '+' '.join(outcome.get('source_fingerprints',{}))):continue
         view=deepcopy(outcome)
         proof_store=store
+        committed = None
         if outcome.get('run_id'):
             proof_store=deepcopy(store);locator=workspaces.runtime(store.root)
             location=locator['worktrees'].get(outcome['run_id']) if locator else None
             proof_store.source_root=Path(location) if location else store.root/'.skill-tree/unavailable-run-evidence'
-        for check in view.get('acceptance',[]):check['evidence']=[evidence_pointer(proof_store,e) for e in check.get('evidence',[])]
-        view['evidence']=[evidence_pointer(proof_store,e) for e in view.get('evidence',[])]
+            cleanup = registry.get(outcome['run_id'], {}).get('delivery', {}).get('worktree_cleanup', {})
+            if cleanup.get('status') == 'removed' or not proof_store.source_root.exists():
+                committed = cleanup.get('attempt', {}).get('scope', {}).get('source_head')
+
+        def history_fingerprint(relative):
+            if committed:
+                return workspaces.committed_file_hash(store.root, committed, relative)
+            return fingerprints(proof_store, [relative])[relative]
+
+        def history_evidence(reference):
+            if not committed:
+                return evidence_pointer(proof_store, reference)
+            available = bool(reference.get('sha256')) and history_fingerprint(reference['path']) == reference['sha256']
+            return {**reference, 'available':available, **({'git_commit':committed} if available else {})}
+
+        for check in view.get('acceptance',[]):check['evidence']=[history_evidence(e) for e in check.get('evidence',[])]
+        view['evidence']=[history_evidence(e) for e in view.get('evidence',[])]
         for item in view.get('check_results',[]):
             for key in ['result','red']:
                 if key in item:
-                    proof=item[key];proof['evidence']=[evidence_pointer(proof_store,ref) for ref in proof.get('evidence',[])]
-                    proof['source_fingerprints_match']=fingerprints(proof_store,list(proof.get('sources',{})))==proof.get('sources',{})
+                    proof=item[key];proof['evidence']=[history_evidence(ref) for ref in proof.get('evidence',[])]
+                    proof['source_fingerprints_match']=all(history_fingerprint(path)==expected
+                        for path, expected in proof.get('sources', {}).items())
         result.append(view)
     return result
 
@@ -4490,7 +4716,7 @@ def clarification_mutate(store,command,payload):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     parser.add_argument('--standalone',action='store_true',help='Use the canonical queue and selected checkout without attaching to a registered controller.')
     args=parser.parse_args(argv)
     try:
@@ -4592,6 +4818,7 @@ def main(argv=None):
         elif cmd=='complete':result=complete(store,payload)
         elif cmd=='controller-review':result=controller_review_identity(store)
         elif cmd=='merge-reviewed':result=merge_reviewed_controller(store,payload)
+        elif cmd=='cleanup-worktree':result=cleanup_controller_worktree(store)
         elif cmd=='finish':result=finish(store,payload)
         elif cmd=='audit':result=audit(store,payload)
         elif cmd=='history':result=history(store,args.id,args.component)
