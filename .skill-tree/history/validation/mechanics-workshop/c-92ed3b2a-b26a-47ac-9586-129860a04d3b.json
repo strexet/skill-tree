@@ -1,0 +1,24 @@
+{
+  "reviewer": "/root/game_design_workshop_reader",
+  "lane": "static",
+  "pins": {
+    "design/two-rules.md": "b0fef38fca2bd049f416dd36fa9c2173430a8c0d4bb22a7c653ff645252efc43",
+    ".agents/skills/skill-tree-game-design-mechanics/references/game-design-mechanics.md": "4351fd08570ab4dfb4f585bdc45d6cba70677f21c4823c7e7cb77365e969d2fa"
+  },
+  "baseline": "Two labeled forks and one-press route choice without a purchased clue.",
+  "candidate": "Spend one reserve token to reveal an accessible fact before the route choice or carry the token.",
+  "cases": {
+    "confirmed": "Stationary landing after lookout supports an accessible persistent text cue and is eligible for strict comparison.",
+    "false": "Exact landing lacks the required cue. Decline the combination, retain the baseline and reconsider when direct cue support is verified.",
+    "unknown": "Conditional fit only. Inspect cue persistence with a paper board and one-press choice."
+  },
+  "unsuitable": "The narrow crossing precedes the lookout and prevents stopping.",
+  "proposed_check": "Compare a fixed paper route approach with and without one accessible cue and removable token. Record fact use, deliberate token saving, one-press action and cue persistence.",
+  "rejection": "Cue, author condition, access or meaningful choice fails. Reconsider on a verified change to the affected condition.",
+  "handoff": [
+    "Route rules owner receives both exact rule references.",
+    "Landing owner receives the exact placement context and cue and input check."
+  ],
+  "cost": "One paper cue and test observation. Spending consumes the option to use the token at the next marker.",
+  "limitation": "Independent document and paper-state inspection. Participant observations remain planned."
+}

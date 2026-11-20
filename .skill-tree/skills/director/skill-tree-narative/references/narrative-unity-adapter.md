@@ -11,3 +11,7 @@ Choose one writer for every state key. Ink owns exact authored dialogue, flow-lo
 - Obtain the exact editor, packages, host event contract and target save system before an actual Unity implementation.
 
 The fixture is declarative and proposes a host ownership split. Standalone Ink test results establish behavior of the standalone pilot.
+
+When a host result differs from the accepted rule, compare the exact adapter, rule and placement pins, configured source and applied overrides. Record each candidate writer in order, the ordinary choice or action, acknowledgement and initial and final state. Report the first divergent write or missing acknowledgement and the subsequent unexecuted assertions. Pin save versions and selected host bindings. A proposed design change uses the design owner's decision. A competing writer or stale import binding returns to Unity.
+
+A project-owned episode check drives the same input, adapter request, acknowledgement and authoritative write used in the selected scene. For an expected one-time effect, record the occurrence key and count before input, after first success and after the replay or restored checkpoint. Record the first violated prerequisite or wrong writer and report later unexecuted checks. A passing declared Narrative trace supplies the expected route and state pins for the selected check.

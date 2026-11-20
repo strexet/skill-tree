@@ -1,0 +1,15 @@
+{
+  "lane": "static",
+  "revalidation": "The checked reference body and trial inputs match prior reviewed bytes. Only separately packaged atlas, design routing and playtest links were appended.",
+  "independent_reader": "/root/game_design_balance_methods_reader",
+  "pins": {
+    ".agents/skills/skill-tree-game-design-balance/references/game-design-balance-methods.md": "22544cebf9a6001faf5ed54b19523542fb02b725ca97b6ad52e331d8d44d1e8d",
+    "design/method-cases.md": "cef771132b148bb07d8fc5faadb7bcf2a44ece85547b5b8244dbee9883e25d99"
+  },
+  "method_rows": 14,
+  "timing": "Active elapsed 79, 80, 81 ms gives pass, pass, fail. Wall clock with the suspension excludes all three.",
+  "chance": "Median four eligible attempts. Failure tail after ten is 10.73741824 percent, and zero under the tenth-attempt guarantee. Elapsed time requires measured eligible cadence.",
+  "patch": "Novice 50 to 45 percent, experienced 80 to 78.75 percent. Raw eligible 62 to 72 percent. Baseline mix yields 58.5 percent. Counting ineligible sessions incorrectly yields 60 percent.",
+  "progression": "Compare novice, stockpiled, returning and legacy-save starts, milestones and available choices. Check save migration, cap, entitlement and one grant on replay.",
+  "missing_evidence": "Device and selected-build input sampling and update order, comparable exposure and match side, clustered uncertainty, selected-build save and grant traces, and participant observations for the experience claims."
+}

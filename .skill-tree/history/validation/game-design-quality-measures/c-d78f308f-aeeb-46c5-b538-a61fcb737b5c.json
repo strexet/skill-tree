@@ -1,0 +1,51 @@
+{
+  "task_id": "T-9168a5b7-e3ce-48f7-ad51-acd4e0995dfb",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/references/director-workflow.md": "87a41695a015e222e3991002e33c66b2284127e091ee61dd8c2b9e27f50cb716",
+    ".skill-tree/common/references/game-design-records.md": "3aee12c6dc4569807607cc9b52da1168a9457375aa034ed60399732e234c6c8b",
+    ".skill-tree/common/references/history-retention.md": "ff3fa8602fa29085b59f0aa5ae9f9da698bd5b5d5672235fe809018b18b4b801",
+    ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+  },
+  "previous_fingerprints": {
+    ".skill-tree/common/references/director-workflow.md": "efe27621b1e49205f05a4623e477215ce01a27b792a142056cca2fb563c816e3",
+    ".skill-tree/common/references/game-design-records.md": "3aee12c6dc4569807607cc9b52da1168a9457375aa034ed60399732e234c6c8b",
+    ".skill-tree/common/references/history-retention.md": "2656a0c502f9705c7cbfcdf1c760f2455362bb09e348f56d0580d0dee682dddb",
+    ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+  },
+  "exact_additions": {
+    ".skill-tree/common/references/director-workflow.md": [
+      "",
+      "## Compare ordinary and revised handoffs",
+      "",
+      "Freeze equivalent briefs, accepted facts, available inputs, controls, and exact ordinary and revised instruction revisions. Ask two independent reviewers to reconstruct expected and consumed revisions, coverage, earliest evidenced divergence and next owner. Record reviewer disagreement and unavailable evidence. An unavailable decisive input leaves causal attribution open. Record the missing evidence and the responsible owner.",
+      "",
+      "Check changed intent, effective configuration, available artifacts and author waits before assigning a recurring problem to a skill. A skill finding requires reproduction under a known instruction revision and an independently established outcome. Record adopt, revise or defer for the selected scope with residual uncertainty. Recheck the original case, an unaffected negative control and a comparable new request after an authorized fix."
+    ],
+    ".skill-tree/common/references/history-retention.md": [
+      "",
+      "Retain comparable handoff IDs, both instruction revisions, the discriminating evidence and controls, observed disagreements, and the scoped disposition. An unresolved source gap stays visible with the responsible owner. Keep the original failed or incomplete observation under the original revision when a later authorized fix produces a new attempt."
+    ]
+  },
+  "observation": {
+    "verdict": "pass",
+    "reviewer": "/root/design_quality_measures_resolver",
+    "source_fingerprints": {
+      ".skill-tree/common/references/director-workflow.md": "87a41695a015e222e3991002e33c66b2284127e091ee61dd8c2b9e27f50cb716",
+      ".skill-tree/common/references/game-design-records.md": "3aee12c6dc4569807607cc9b52da1168a9457375aa034ed60399732e234c6c8b",
+      ".skill-tree/common/references/history-retention.md": "ff3fa8602fa29085b59f0aa5ae9f9da698bd5b5d5672235fe809018b18b4b801",
+      ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+    },
+    "observation": "Current owned Director references match additive paired-comparison and retention wording only. Independent reviewer repeated every original measure and duplicate, missing and empty controls with unchanged denominators, UTC and authority scope."
+  },
+  "previous_reviewers": [
+    "/root/design_quality_measures_resolver"
+  ],
+  "retained_cases": {
+    "gdd": "2/3 accepted rules with both predictions correct and one missing oracle. Restoring known oracle but retaining absent response yields 2/4.",
+    "recommendations": "2/3 independently judged fixed-cutoff results plus one unjudged, one above cutoff and a no-fit request. Duplicating a suggestion yields 2/2 available judged slots without reranking.",
+    "coverage": "Missed confirmed placements 1/3, with suspected and unexamined scope separately retained. Confirmed unnecessary checks 1/4, with one unresolved order.",
+    "balance": "1/2 distinct reviewed studies with sufficient evidence. Retry remains under S1. Forecast error -3 percentage points for S1; removing observed change and originally unobserved S2 both remain unscored. Adverse result separately recorded.",
+    "director": "Median 20 UTC minutes from three completed requests with timestamps, 15 minutes from two when one timestamp is removed. Return rate 1/3 for confirmed description fault, unchanged by exact delivery and new retry. Empty reviewed cohort has no estimate."
+  }
+}

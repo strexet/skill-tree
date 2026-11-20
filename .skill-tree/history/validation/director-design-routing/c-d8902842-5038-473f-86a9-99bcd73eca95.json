@@ -1,0 +1,56 @@
+{
+  "task_id": "T-921b33a8-518e-4111-aa1e-a9cd33e3f2d5",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/references/director-workflow.md": "b796cf98d2db18307f9492405166465dd61a73eb13e16bf4f2c6b73f2bd42070",
+    ".skill-tree/documents/director-workflow.md": "aaf14e1a3cb6c7e1871dbec9d992169f0465136c5c3128033f7853c7e5c627a2",
+    ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+  },
+  "previous_fingerprints": {
+    ".skill-tree/common/references/director-workflow.md": "82ce1c5e7c1fb64b2849bbabd933651ffcff7f9b57d333edc4e4360e17a24d5e",
+    ".skill-tree/documents/director-workflow.md": "b298408a4b568fa50fc96f092db064560e28127d80eefff37027fa93d6869a7d",
+    ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+  },
+  "exact_additions": {
+    ".skill-tree/common/references/director-workflow.md": [
+      "",
+      "## Review the effect of a changed design input",
+      "",
+      "Compare exact previous and proposed or accepted revisions with the consumed fact, placement and effective event. A wording-only change or unrelated asset edit can preserve evidence when the consumed condition and scoped dependency remain current. Review a changed whole-document pin conservatively. A material accepted change names confirmed consumers, suspected dependencies, unexamined scope and one unaffected control. A mismatch against an accepted fact, rule, marker or runtime binding returns to the corresponding implementing owner for repair.",
+      "",
+      "Revise or decline an incompatible optional mechanic with the reason. Present an author decision for a consequential creative, cost or scope trade-off with options, affected evidence and a recommendation. Final review records current producer and consumer revisions, required rechecks and retained independent evidence. A later iteration uses a fresh assignment in the approved scope and preserves earlier decisions."
+    ],
+    ".skill-tree/documents/director-workflow.md": [
+      "## Review reciprocal impact after a design change",
+      "",
+      "Select the previous accepted revision and the proposed or newly accepted revision and identify the exact changed fact, rule, placement, asset binding or effective event. Read the consuming record before changing the scope. Record unchanged meaning, confirmed dependencies, suspected links and unexamined areas. Name an unaffected control with working source and evidence. Keep historical checks under the original pins and reopen the affected checks when the consumed condition changes. A changed whole-document pin keeps the existing conservative impact rule. A narrowly pinned unaffected condition can retain matching evidence after comparison.",
+      "",
+      "| Finding | Owner and disposition |",
+      "| --- | --- |",
+      "| Accepted canon changes a permitted action or route | Narrative identifies the accepted fact. Game Design and the affected Unity or 3D owner inspect the referenced event, binding and check. |",
+      "| A design rule changes a cue, geometry requirement or state transition | Game Design records the revised rule. Narrative reviews any changed meaning, and 3D or Unity checks the applicable cue or effective event. |",
+      "| A receiver differs from the accepted rule or artifact | The owner of the earliest mismatching source or binding repairs the implementation and rechecks the affected case. |",
+      "| An optional idea conflicts with applicable canon or design | The proposing and owning areas revise or decline with the exact constraint, rationale and reconsideration condition. |",
+      "",
+      "Use existing impact preview and a reviewed amendment for changes to frozen required pins. Source history or a proposal grants no new effect. Ask the author when resolving the finding changes experience or canon, trades material cost, or expands approved scope. Present the feasible options, affected owners and checks, and one recommendation. Final review records current producer and consumer revisions, expected and executed rechecks and remaining scope. A later approved iteration gets a new assignment and retains the previous review.",
+      ""
+    ]
+  },
+  "observation": {
+    "verdict": "pass",
+    "reviewer": "/root/director_design_routing_resolver",
+    "source_fingerprints": {
+      ".skill-tree/common/references/director-workflow.md": "b796cf98d2db18307f9492405166465dd61a73eb13e16bf4f2c6b73f2bd42070",
+      ".skill-tree/documents/director-workflow.md": "aaf14e1a3cb6c7e1871dbec9d992169f0465136c5c3128033f7853c7e5c627a2",
+      ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+    },
+    "observation": "Current verified intake, plan and review copies reach the original routes with byte-identical executable and capability files. Repeated P and D preserve scope, needed inputs, authorized disjoint execution, proxy hold, exact imported verification and Core boundary. Added reciprocal review applies solely to a changed design input."
+  },
+  "previous_reviewers": [
+    "/root/director_design_routing_resolver"
+  ],
+  "retained_cases": {
+    "playable": "Director owns the scoped objective and freeze. Narrative supplies accepted work, continuity, actor access and scene facts. Game Design supplies audience, repeated activity and exact switch behavior. Only an authorized assumption-labeled workshop can start before required facts are accepted. Approved exact effects and disjoint claims permit 3D and proxy overlap, with manual presentation confined to the agreed handoff. Unity still owes a matching consumer observation on the selected imported art, rule and start. The preliminary proxy pass leaves the production milestone open.",
+    "document": "Game Design owns the scoped rule and observable result. Keep the material design decision with the owner. A Director child result or direct authoring document is sufficient for the selected destination. Only an adopted exact production change requiring child work reaches Core with source pins, deliverable, owner and check."
+  }
+}

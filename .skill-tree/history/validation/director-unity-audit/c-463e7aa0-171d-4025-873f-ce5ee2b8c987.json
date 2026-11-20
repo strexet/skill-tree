@@ -1,0 +1,12 @@
+{
+  "task_id": "T-221e5960-08b7-49cb-b403-875742ecac02",
+  "check_id": "behavior",
+  "attempt_id": "C-463e7aa0-171d-4025-873f-ce5ee2b8c987",
+  "fixture_lane": "unit",
+  "returncode": 0,
+  "discovered": 8,
+  "result": "pass",
+  "log": ".skill-tree/artifacts/validation/director-unity-audit/c-463e7aa0-171d-4025-873f-ce5ee2b8c987.txt",
+  "log_sha256": "efa53583aa0f276a09b41556bb1a12cd898ddc1a79afba34c7214bcace44216c",
+  "diagnosis": "Ordinary installed audit and legacy read paths passed the disposable controls."
+}

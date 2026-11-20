@@ -1,0 +1,24 @@
+{
+  "verdict": "pass",
+  "reviewers": [
+    "/root/paired_director_handoff_resolver",
+    "/root/paired_director_handoff_reader_b"
+  ],
+  "cases": {
+    "complete": "Same R@5/S@2, I@2 and I@3, accepted threshold 750 active ms. The effective 450 ms selected instance override first diverges before the early effect; Unity config owner handles. Plain route is the independent control. Adopt precise locator fields and the comparison method for paper scope; no reproduced skill failure or live improvement claim.",
+    "incomplete": "Expected pins known. Actual selected scene and configuration are missing despite a latest-revision citation; first observable gap is consumer binding provenance. Unity supplies exact consumed revision, selected instance and effective source at onset, then Director re-reviews. Human goal note supplies intent only; actual cause and control coverage remain open. Defer attribution."
+  },
+  "post_fix": "After an authorized fix recheck the exact original target, unaffected negative control and new comparable request; retain attempts and any reviewer disagreement. Both reviewers agreed on the selected fixtures.",
+  "scope": "Exact three file pins, all current owned paths and temporary bundle verified; no product execution.",
+  "task_id": "T-e7d6ef05-e15f-4299-9e2e-d754ac33d4e7",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/references/director-workflow.md": "87a41695a015e222e3991002e33c66b2284127e091ee61dd8c2b9e27f50cb716",
+    ".skill-tree/common/references/history-retention.md": "ff3fa8602fa29085b59f0aa5ae9f9da698bd5b5d5672235fe809018b18b4b801",
+    ".skill-tree/documents/director-workflow.md": "397d580f54195923dd39cb105158516d540b0a4c5a04d87e8f970175c6852db2"
+  },
+  "input_sha256": {
+    "paper-cases.md": "05b0263ef5b117250edeec74320a34565f79fc9cc63fc34dbd6f650b5bfec63d",
+    "trial/.skill-tree/installation/profile.json": "3bdd7134b06c0f30ca3ecdea54776d04f156cdcd253424852b0db1e372fb4975"
+  }
+}

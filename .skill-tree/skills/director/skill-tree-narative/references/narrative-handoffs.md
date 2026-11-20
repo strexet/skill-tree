@@ -19,3 +19,16 @@ Use a handoff to resume exact work across authoring, independent review and acce
 4. Resume instruction with the exact required input. Recheck changed sources and affected findings before continuing. Preserve unrelated checks and decisions when support remains current.
 
 Draft completion and review completion retain the boundaries of the requested operation. Actual owner acceptance, runtime execution, queue mutation and source control each follow the corresponding authorization.
+
+## Hand accepted facts to Game Design
+
+Name the selected work and continuity, exact accepted record revision and snapshot or artifact digest, owner, affected event and proposed player interaction. Describe the gameplay consequence of each fact in the selected state. Keep a missing canon field as an explicit question for the Narrative owner and hold the affected decision when the missing field determines what the player can do.
+
+| Subject | Minimum facts and consequence |
+| --- | --- |
+| Character | Record the role in the work, relevant state, permitted abilities and limits. Identify what the player can request, observe or change in the selected event in the recorded state. |
+| Location | Record the location purpose, occupants, relevant routes and permitted objects. Identify where the player can act, which passages remain available and which object interactions can affect the event. |
+
+A Game Design proposal names the exact accepted facts the proposed interaction consumes, the visible player consequence and the changed route or state. Narrative can accept compatibility with a supporting fact, return the proposal for revision with the unresolved condition, or decline with the conflicting accepted fact and a reason. Compatibility review preserves the accepted revision. A proposed canon change uses the [guarded owner acceptance](narrative-canon-approval.md) procedure. Include the [selected visual references](narrative-visual-reference-review.md) as separate provenance, and give the recipient the [impact review](narrative-impact.md) with an affected route and an unaffected control.
+
+For a route replay handoff, include the accepted work, continuity, archive and record revisions and the [route producer evidence](narrative-route-checks.md). Verify the exact consumed model, state registry and case or trace pins against the plan. Confirm required normal and adverse case coverage before review. A draft or foreign-continuity capture can inform diagnosis. Production acceptance requires the matching accepted source. A declared-route result records the checked model trace. The consuming project verifies runtime separately.

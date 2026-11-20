@@ -1,0 +1,41 @@
+{
+  "verdict": "pass",
+  "reviewers": [
+    "/root/narrative_route_proof_resolver"
+  ],
+  "cases": {
+    "matched": "Exact accepted story archive and declared station read/skip actions match. Normal ridge-discover-lift passes all four steps. Adverse duplicate-receipt matches repeated-unique-effect at zero-based step 1 on incident_receipts. Step 2 end was unreached.",
+    "foreign": "All reported rows pass under continuity-other but the genuine accepted archive belongs to continuity-ridge. Ineligible source.",
+    "missing": "Current accepted source and one passing normal row. Mandatory duplicate-receipt case omitted and coverage remains open.",
+    "draft": "The local checker accepts the declared draft fixture and passes the rows. Draft source remains outside production acceptance."
+  },
+  "independent_replay": "Reran all four installed checker invocations with exit 0 and empty stderr. Every captured stdout matches byte-for-byte. Verified archive and exact record revision through installed narrative-state context. Required case bytes were frozen before calls.",
+  "limits": "Qualification covers declared traces and local package procedure. Unity consumer checks remain separate.",
+  "task_id": "T-133d89f0-429e-4939-befe-1ef970a65a0c",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/references/narrative-handoffs.md": "9fd4a296f3ad9582f8f812e6cf54e4bb47d5dcf48a8c2cde593230b96a775856",
+    ".skill-tree/common/references/narrative-route-checks.md": "a33eb0ec77bb19a58a3e7f0d237573c1e0cca784e58341713ce73d76d9e8c2b7",
+    ".skill-tree/common/references/narrative-route-contract.md": "b5725973befbe92462cbd95c51eb08c5144b95911456850688b3210cbbb03c27"
+  },
+  "input_sha256": {
+    "prepare-facts.py": "8f3fecedf2a89211646eaab3466ed76ba2917e38bbb265318aff29d421a1aaf4",
+    "trial/.skill-tree/installation/profile.json": "31198c6f024b92674afb2ab51425ece12857a50bc8b47b73fbce82b00695b709",
+    "trial/.agents/skills/skill-tree-narative/scripts/narrative-route-check.py": "88bdd66fbaa9829a7b69843f8004516de28bbb30340c380bc5a3be64c0faa01d",
+    "trial/.narrative/snapshots/3aaab768708679e5710acc1986ecb07bcfc69e551e530b7758a8c69d52a5b1b8.json": "528c46ba28120a7b8fcc4daaa8848c32353c87d60f56b0230a84b195a524affe",
+    "trial/captures/required-cases.json": "25704069e67e04fcfd38acec218a2dcd26e63e5e22e4576ad3e18b76ffeeae88",
+    "trial/captures/state-registry.example.json": "b976b5f960fa2b979cb9600b481c0f08ca677007a3413834af1258d301861f9c",
+    "trial/captures/matched-base.json": "ebb63f879b818c3eb90e8b6f9f0fa9debd55d85b7b71f0248721c71d9a3fade1",
+    "trial/captures/matched-cases.json": "54759869ae19866860b755196bac34dacba83836f1ac5370af8d9ac68c0a46d8",
+    "trial/captures/matched-captured.json": "6e63831a60acc6ddeed0f93f414cbc53b520d21739a7be8520bb6ace9a5d1d4d",
+    "trial/captures/foreign-base.json": "6ff9a647ad2a54b359301735d57b09924fc5ed827ec2581157835eac63d8b09e",
+    "trial/captures/foreign-cases.json": "c60ee44cd58a37ede899b73467b1bc2d276cb5e9389d5e325e7b3795f8f01bd7",
+    "trial/captures/foreign-captured.json": "6e63831a60acc6ddeed0f93f414cbc53b520d21739a7be8520bb6ace9a5d1d4d",
+    "trial/captures/missing-base.json": "ebb63f879b818c3eb90e8b6f9f0fa9debd55d85b7b71f0248721c71d9a3fade1",
+    "trial/captures/missing-cases.json": "bf4a5193572e9d36e5a171c81cbdb270a62e01c0e3acbc861e83e7d8c6a52cba",
+    "trial/captures/missing-captured.json": "1758d036ce05f2b60c2261b24345e26129302122c8aa5183fb58bd47bc63b231",
+    "trial/captures/draft-base.json": "67fe7079726a432ce25cbbe96a74a92c1cd960dbfeec89bfa540855a64f804e0",
+    "trial/captures/draft-cases.json": "b02ef7fda9af8d9bdc7c78f999f41795a5718d1ee2b414827ec3d03beb9c336e",
+    "trial/captures/draft-captured.json": "6e63831a60acc6ddeed0f93f414cbc53b520d21739a7be8520bb6ace9a5d1d4d"
+  }
+}

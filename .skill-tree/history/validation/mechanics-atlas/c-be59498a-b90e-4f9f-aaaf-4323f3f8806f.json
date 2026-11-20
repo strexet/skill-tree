@@ -1,0 +1,55 @@
+{
+  "lane": "static",
+  "revalidation": "The checked reference body and trial inputs match prior reviewed bytes. Only separately packaged atlas, design routing and playtest links were appended.",
+  "reviewer": "/root/game_design_atlas_reader",
+  "pins": {
+    "design/mechanics-atlas.md": "0987f7e9c9757ff5c2f806d53336eb48400ece1a7311871a9633980c42d3b41e",
+    "design/owner-decisions.md": "79665cb3c1e953be79dfef08b604be988ecf342e306c4d06af4176511d649599",
+    ".agents/skills/skill-tree-game-design-mechanics/references/game-design-atlas.md": "453a6d8ffd8f66a4233677c22dba3efae509e216a744050dcc316629cd934401"
+  },
+  "project_file_preservation": {
+    "design/mechanics-atlas.md": "0987f7e9c9757ff5c2f806d53336eb48400ece1a7311871a9633980c42d3b41e",
+    "design/owner-decisions.md": "79665cb3c1e953be79dfef08b604be988ecf342e306c4d06af4176511d649599",
+    "design/private/author-copy.md": "ffe0a5b93cbe29c24c6d81df986dec69fa3e1c2fff8865b46ca384372fd967bc"
+  },
+  "statuses": [
+    "north-gate accepted and confirmed in named fixture",
+    "practice-gate confirmed override activation with unknown intent",
+    "night-recovery accepted with confirmed source binding and unexamined runtime",
+    "cave-gate proposed and suspected",
+    "old-pier retired with history",
+    "market-gate declined with reason",
+    "Night Expedition beyond entrance unexamined"
+  ],
+  "behavior_change": {
+    "known": [
+      "E1 North Gate clamp",
+      "E3 recovery source and separate overnight check"
+    ],
+    "override": [
+      "E2 Practice exact effective-value control and exception owner"
+    ],
+    "uncertain": [
+      "Cave effective activation",
+      "unexamined night region"
+    ],
+    "control": "E4 cosmetic presentation"
+  },
+  "cosmetic_change": {
+    "reopen": [
+      "E4 presentation"
+    ],
+    "unchanged": [
+      "E1",
+      "E2",
+      "E3"
+    ],
+    "open_gaps": [
+      "Cave",
+      "overnight",
+      "unexamined region"
+    ]
+  },
+  "editorial_boundary": "Retiring one project placement preserves prior project evidence and the shared pattern. Shared promotion follows independently reviewed applicable provenance and permission.",
+  "limitation": "Read-only disposable manifest and fixture evidence. Full runtime outside the named fixture remains unexamined."
+}

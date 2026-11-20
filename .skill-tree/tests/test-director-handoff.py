@@ -276,6 +276,16 @@ class HandoffTests(unittest.TestCase):
         run_path.write_text(WF.dump({**record, 'phase': 'paused'}))
         child_run['stop_reason'] = 'Owner paused this affected fixture writer.'
         self.core.state.write_text(WF.dump(child_state))
+        for phase in ('prepared', 'invoking'):
+            pending = {**record, 'phase': 'paused', 'assignments': {'game': {'dispatches': {
+                'intake': {'status': phase},
+            }}}}
+            run_path.write_text(WF.dump(pending))
+            not_ready = self.handoffs.impact_preview(amendment)
+            self.assertEqual([item['reason'] for item in not_ready['blockers']], ['dispatch-awaits-reconciliation'])
+            with self.assertRaisesRegex(D.DirectorError, 'stopped handoff'):
+                self.apply('amend-apply', amendment, not_ready)
+        run_path.write_text(WF.dump({**record, 'phase': 'paused'}))
         ready = self.handoffs.impact_preview(amendment)
         self.assertEqual(ready['writer_observations'][0]['run_id'], self.proof['game']['run_id'])
         self.assertTrue(ready['writer_observations'][0]['stopped'])
