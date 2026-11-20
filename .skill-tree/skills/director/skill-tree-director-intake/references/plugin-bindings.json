@@ -3100,7 +3100,7 @@
   "configuration_digest": "1d4ded90f74588a33443cca0a2da314364e2a91faff9e7955ed7ac521848e0ff",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "ac10bc4944b6a5805ba8bf1f85e1eb320397a57c0b91445e0eba20d82dc58465",
+  "identity": "f195a9f521a754761ef192296d54180b1018cfc8a369943c803bb2bb32283a99",
   "operation": "skill-tree-director-intake",
   "operations": {
     "skill-tree-3d": {
@@ -3203,7 +3203,7 @@
     "references/decision-governance.md": "52f8dc84c7cae4b9aa3aaa010d3ffb605ab79f5d75aaa36b9370d51e49305222",
     "references/development-practices.md": "352a45b093f2c53b7b08aef045a098880af74c6add6fb79f95017a52fd0e0780",
     "references/director-capabilities.json": "8cc57eb2504e2fa8cfa270d5181074fca7d5ae020a8f34608dfa6e98f018c4ca",
-    "references/director-workflow.md": "289dbef17b8a48cf201b78b87a39f7e50a1c594fdebfd9129a50e0e15f8f24b5",
+    "references/director-workflow.md": "7d4d599106b372263d29bacf4cf84c6fe04a5ac081cd23795ac39713fd6055fd",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/future-workflow.md": "3a6bc83660773c23af11cf00eacb90ed618db701d464fd7fcd304d5d90fca50b",
     "references/history-retention.md": "ff3fa8602fa29085b59f0aa5ae9f9da698bd5b5d5672235fe809018b18b4b801",
@@ -3235,7 +3235,7 @@
     "scripts/runtime/common/scripts/director-plans.py": "b28d8e4326dda6c390586759e36750c74cb909169ff244ecfe7af1e359bfb863",
     "scripts/runtime/common/scripts/director-questions.py": "db9a54c1824c7fc9ec1f11d5fd51ac4bfe49cf1805b9a12eb3ead1a83d323761",
     "scripts/runtime/common/scripts/director-run.py": "a97cc1dc92e89f3747b336a733b52a45d7af804a09314e8cffda64f63882bc84",
-    "scripts/runtime/common/scripts/director-state.py": "07dc505df5c65c0902a9f148ef63b09266918bfbc942f08863398aa431525ba6",
+    "scripts/runtime/common/scripts/director-state.py": "0af0ae4cad6f6c7a7fa70cb50179c2e335aabea491212aad01f72cd68e1252c0",
     "scripts/runtime/common/scripts/narrative-state.py": "ad6618d06fc1b2cac79694a64ff5733bdd03a330e0714851e04e185d108c1388",
     "scripts/runtime/common/scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",
     "scripts/runtime/common/scripts/plugin-processing.py": "4f4418c8e67a723a2cdd53b43246cb4507f0419bd7ca76b901334e78bb1406ec",

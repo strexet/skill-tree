@@ -10,6 +10,14 @@ Use the shared root profile for areas in the same repository. External areas ret
 
 Read the [capability pins](director-capabilities.json). Accepted Narrative snapshots and representative fixture adapters retain separate identities. Unintegrated ArtWorkshop and logs adapters remain visible prerequisites. A source or fixture observation does not admit an unverified adapter.
 
+## Preview first-time setup
+
+Use `setup-preview <absolute-director-root> --input <request.json>` with a `workspace` object to review first-time setup. The request contains a portable `director_id`, a workspace `kind` of `new` or `existing`, an explicitly selected `source`, and the selected `areas`. A source names an absolute local Skill Tree source `checkout` and a local `revision`. The source checkout must already match the selected revision and contain the exact committed package inputs. The coordinator selects the Director flavor.
+
+Each area declares an `id`, `role`, `capabilities`, `allowed_effects` and a `project` object. Select one existing `source-maintenance` area. The project declares `kind`, `topology` and `path`. A new project uses `placement` of `inside` or `alongside` with a relative path, or `custom` with an absolute path. An existing project uses an absolute path. An existing separate repository can include a relative `scope`. A separate repository requires an explicit `flavor` and `source` at the area level. A `shared` folder inherits the coordinator queue, package source and flavor. A `separate` repository owns an independent queue even when the checkout is nested under the coordinator.
+
+The local review record freezes paths, scoped effects, canonical ownership proofs, package inputs, required files and setup prerequisites in `preview_sha256`. Destination overlap checks account for case and Unicode aliases. Setup preview performs read-only discovery. The ordinary registration request with prepared areas continues through the separate `setup-preview` and `setup-apply` registration flow.
+
 Use exact queue, task and run identities. Keep a durable child attempt and original workspace when asking the owner. Verify the matching guarded answer before explicit continuation. Delivery requires separate authority.
 
 Audit reads exact retained receipts. Inspect `director_timeline` for parent dispatch, recovery and decision stages. Inspect `child_status` for current holds and open checks, and `child_timeline` for exact checkpoint and check events. Follow portable event references in the owning queue. Missing events and legacy time coverage remain explicit. Private inputs and error text remain in the owning context.

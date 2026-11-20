@@ -1,0 +1,17 @@
+{
+  "baseline-directed-start": "The previously reproduced independent directed-start failure is outside the guided setup preview acceptance.",
+  "installation-end.log": {
+    "log_sha256": "a7ebcb9b210b9a43a8261968fd68121929273b3741dac043161206058eacb5ab",
+    "status": "pass"
+  },
+  "red-baseline": "The three guided fixtures reached observable missing guide behavior before the implementation.",
+  "strict-validation-context": "Disposable final source snapshot with the derived source navigation manifest.",
+  "sync-end.log": {
+    "log_sha256": "dec4be8196c288cd34fd4c3380bb4fcbbaeaa0f1df6160b5e9ec1542a4ba93f8",
+    "status": "pass"
+  },
+  "validate-end.log": {
+    "log_sha256": "fd45fed7d53921dfdf1291bcec3d55fda17ca615d8dbb3c5b1ade6921045ed31",
+    "status": "pass"
+  }
+}
