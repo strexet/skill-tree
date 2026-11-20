@@ -2,6 +2,8 @@
 
 Use readable entries in the consuming project's existing brief, rule documents, atlas, tuning table and evidence reports. A new project can begin with `design/game-brief.md`, `design/rules/`, `design/mechanics-atlas.md` and `design/studies/`. Keep project-specific descriptions, assets, scenes, save states and study inputs in the consuming project. The shared mechanics collection owns reusable patterns and sourced editorial records.
 
+Point feature documentation to the owning brief, rule, atlas placement or balance study using the existing record ID and revision. Keep design dependencies and tuning authority in the linked records.
+
 ## Identity and ownership
 
 Give each record a stable ID within the named project or shared collection and a revision for the content under review. Include the type, owner and locator. A reference such as `paper-race/boost-reserve@2` identifies one rule revision. A second project can use the same local ID under a distinct scope. An unqualified local ID resolves only within an explicitly identified project.

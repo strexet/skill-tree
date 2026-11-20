@@ -6,6 +6,8 @@ Resolve the exact workshop, subject, requested stage and optional Unity target b
 
 Ask one to three questions when the answer changes the next operation. Include a recommendation, alternatives and the concrete cost or behavior difference. Continue authorized reversible work while a consequential answer is pending. A missing native capability leaves compatible portable drafting available. Record the exact missing Blender or Unity prerequisite for native claims.
 
+Organize editable source by workshop asset or deliverable within the established workshop layout. Use `contracts/workshop.json` to find the asset, selected revision and declared dependencies. A local guide can point to the catalog entry and the starting source when the purpose or usage needs explanation. Keep guide files outside sealed delivery bundles. The delivery manifest owns the exact delivered inventory and checksums.
+
 ## Role routing
 
 - For orchestration, project setup or asset and recipe curation, read [workshop roles](3d-workshop-roles.md).
