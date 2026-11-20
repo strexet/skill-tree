@@ -419,6 +419,33 @@ class WorkflowStateTests(unittest.TestCase):
         self.assertEqual(self.store.state.read_bytes(), checkpoint)
         self.assertEqual(ledger.read_bytes(), outcomes)
 
+    def test_future_loss_reports_the_queue_before_checkpoint_progress(self):
+        empty_queue = self.store.future.read_bytes()
+        task = self.main()
+        wf.start(self.store, 'next', task['id'])
+        wf.begin_task(self.store, {'task_id': task['id']})
+        self.assertIn(task['id'], self.store.load()['task_progress'])
+        prior_hash = wf.file_hash(self.store.future)
+        for replacement in (empty_queue, b'', None):
+            with self.subTest(replacement=replacement):
+                if replacement is None:
+                    self.store.future.unlink()
+                else:
+                    self.store.future.write_bytes(replacement)
+                before = {path: path.read_bytes() for path in self.root.rglob('*') if path.is_file()}
+                for options in ((), ('--expected-source-hash', prior_hash)):
+                    status, response = self.future_command('refresh', *options)
+                    self.assertEqual(status, 2, response)
+                    self.assertIn(wf.FUTURE_QUEUE, response['error'])
+                    self.assertIn('restore the matching queue', response['error'].lower())
+                result = subprocess.run([sys.executable, '-B', str(ROOT/'common/scripts/validate-repository-documentation.py'),
+                                         str(self.root)], capture_output=True, text=True, timeout=20)
+                diagnostics = json.loads(result.stdout)
+                self.assertEqual(result.returncode, 1, diagnostics)
+                self.assertTrue(any(wf.FUTURE_QUEUE in issue and 'restore the matching' in issue.lower()
+                                    for issue in diagnostics['errors']), diagnostics)
+                self.assertEqual(before, {path: path.read_bytes() for path in self.root.rglob('*') if path.is_file()})
+
     def test_future_refresh_uses_legacy_terminal_reference_for_expected_history(self):
         task = self.main()
         wf.start(self.store, 'next', task['id'])

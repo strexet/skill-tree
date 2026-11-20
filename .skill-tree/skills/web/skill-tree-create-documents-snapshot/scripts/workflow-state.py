@@ -408,7 +408,7 @@ class Store:
         if not isinstance(old, dict):
             raise WorkflowError('Invalid '+FUTURE_STATE+'; restore the matching checkpoint before retrying')
         text = self.text()
-        if old.get('tasks') and old.get('source_hash') != digest(text.encode()) and not parse(text):
+        if old.get('tasks') and old.get('source_hash') != digest(text.encode()) and (not text.strip() or not parse(text)):
             raise WorkflowError('Unexpectedly empty '+FUTURE_QUEUE+'; restore the matching queue file before retrying')
         if not history_present:
             registry = old.get('run_registry') or {}
@@ -4540,6 +4540,7 @@ def main(argv=None):
             else:result=manifest(store)
         elif cmd=='refresh':
             with store.lock():
+                store.verify_future_integrity()
                 store.guard(payload.get('expected_source_hash'))
                 text=store.text();result=store.load(text);store.save(text,result)
         elif cmd=='index':result=store.load()

@@ -121,21 +121,23 @@ def validate_manifest(root, *, reported_missing=None):
     if data.get('queue')==wf.FUTURE_QUEUE and not {wf.FUTURE_QUEUE, wf.FUTURE_STATE} & reported_missing:
         try:
             store=wf.Store(root,allow_unselected=True)
-            text=store.text();tasks=wf.parse(text)
+            text=store.text()
             state=json.loads(store.state.read_text())
             if not isinstance(state,dict) or state.get('format')!=wf.FORMAT or state.get('schema') not in {2,3} or 'active_run' not in state:raise wf.WorkflowError('Unsupported checkpoint schema')
             if state['schema']==3 and not state.get('run_registry'):raise wf.WorkflowError('Schema 3 requires a run registry')
             if state.get('source_hash')!=wf.digest(text.encode()):errors.append('Queue index source hash is stale')
-            if state.get('tasks')!=wf.index(text):errors.append('Queue index differs from task definitions')
-            completed={o['task_id'] for o in store.outcomes() if o.get('disposition')=='completed'}
-            wf.validate_dependencies(tasks,completed)
-            wf.validate_progress(state,tasks,completed)
+            if text.strip() and state.get('tasks')!=wf.index(text):errors.append('Queue index differs from task definitions')
             registry=state.get('run_registry')
             if registry:
                 if not isinstance(registry,dict) or not isinstance(registry.get('runs'),dict) or any(
                         not isinstance(run,dict) for run in registry['runs'].values()):
                     raise wf.WorkflowError('Unsupported run registry; explicit recovery required')
                 wf.workspaces.validate_registry(registry)
+            store.verify_future_integrity()
+            tasks=wf.parse(text)
+            completed={o['task_id'] for o in store.outcomes() if o.get('disposition')=='completed'}
+            wf.validate_dependencies(tasks,completed)
+            wf.validate_progress(state,tasks,completed)
             runs=list(registry['runs'].values()) if registry else [state['active_run']]
             for run in [r for r in runs if r is not None]:
                 wf.validate_run(run)
@@ -145,7 +147,6 @@ def validate_manifest(root, *, reported_missing=None):
                 if not set(run['completed_ids']).issubset(completed):errors.append('Active checkpoint completion IDs lack recorded outcomes')
                 for field in ['root_task_id','current_task_id']:
                     if run[field] is not None and run[field] not in open_ids|completed:errors.append('Active checkpoint has an unknown task pointer: '+field)
-            store.verify_future_integrity()
         except (OSError,ValueError,KeyError,TypeError) as exc:errors.append('Invalid queue/checkpoint: '+str(exc))
     return {'ok':not errors,'errors':errors,'warnings':warnings}
 
