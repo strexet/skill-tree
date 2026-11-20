@@ -71,10 +71,14 @@ class PendingPriorityTests(unittest.TestCase):
         self.assertEqual(self.intake()['priority'], -9)
 
     def test_terminal_history_does_not_supply_open_priority(self):
+        with self.store.lock():
+            self.store.save(self.store.text(), self.store.load())
         history = self.store.base/'history/task-outcomes.jsonl'
         history.parent.mkdir(parents=True)
-        history.write_text(json.dumps({'id':wf.identity('O'),'task_id':wf.identity('T'),'disposition':'completed','priority':9999})+'\n')
+        recorded = json.dumps({'id':wf.identity('O'),'task_id':wf.identity('T'),'disposition':'completed','priority':9999})+'\n'
+        history.write_text(recorded)
         self.assertEqual(self.intake()['priority'], 101)
+        self.assertEqual(history.read_text(), recorded)
 
     def test_numeric_owner_priorities_override_defect_and_low_defaults(self):
         for number in [0, -20, 25, 1234]:
