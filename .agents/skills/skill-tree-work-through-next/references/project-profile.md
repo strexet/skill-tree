@@ -13,8 +13,53 @@ Flavor: general. Static compatibility only; execution remains unqualified.
     "ui": []
   },
   "gaps": [],
-  "instruction_profile_id": "6829d9d8c3ccc5eeeb45d98a5885da819252e286d9919ec0d6202346b0cf8081",
+  "instruction_profile_id": "f0c23f15fcd34ee7db8daf1c3e565cc5723bf565e18232c7596151e68dbd7407",
   "recipes": {
+    "director-blender-observed": {
+      "argv": [
+        "python3",
+        ".skill-tree/tests/fixtures/director/verify-lantern-art.py",
+        "{project_root}"
+      ],
+      "input_paths": [
+        ".skill-tree/validation-recipes.json",
+        ".skill-tree/tests/fixtures/director/lantern-fixture.json",
+        ".skill-tree/tests/fixtures/director/produce-lantern-blender.py",
+        ".skill-tree/tests/fixtures/director/run-lantern-blender.py",
+        ".skill-tree/tests/fixtures/director/verify-lantern-art.py"
+      ],
+      "lane": "native",
+      "qualification": "owner-declared static recipe; runner unqualified"
+    },
+    "director-codex-observed": {
+      "argv": [
+        "python3",
+        ".skill-tree/tests/fixtures/director/verify-codex-host.py",
+        "{project_root}"
+      ],
+      "input_paths": [
+        ".skill-tree/validation-recipes.json",
+        ".skill-tree/tests/fixtures/director/verify-codex-host.py"
+      ],
+      "lane": "native",
+      "qualification": "owner-declared static recipe; runner unqualified"
+    },
+    "narrative-ink-replay": {
+      "argv": [
+        "bash",
+        ".skill-tree/examples/narrative/run-paths.sh"
+      ],
+      "input_paths": [
+        ".skill-tree/config/repository.json",
+        ".skill-tree/examples/narrative/run-paths.sh",
+        ".skill-tree/examples/narrative/quest.ink",
+        ".skill-tree/examples/narrative/route-traces.json",
+        ".skill-tree/examples/narrative/runtime-check/program.cs",
+        ".skill-tree/examples/narrative/runtime-check/runtime-check.csproj"
+      ],
+      "lane": "integration",
+      "qualification": "owner-declared static recipe; runner unqualified"
+    },
     "pending-boundary-installation": {
       "argv": [
         "node",
@@ -116,7 +161,7 @@ Flavor: general. Static compatibility only; execution remains unqualified.
       "lane": "static"
     }
   },
-  "source_version": "0.4.0",
+  "source_version": "0.6.0",
   "worktree_environment": {
     "exclusive_resources": [],
     "isolated_directories": [],
