@@ -26,6 +26,7 @@ function safe(root,rel) {
 function read(root,rel) { const p=safe(root,rel);return fs.existsSync(p)?fs.readFileSync(p,'utf8'):null; }
 const inputDigest=(root,rel)=>{const file=safe(root,rel);return fs.existsSync(file)?hash(fs.readFileSync(file)):null;};
 const readJson=(root,rel,fallback={})=>{const data=read(root,rel);return data===null?fallback:JSON.parse(data.replace(/^\uFEFF/,''));};
+const requiredJson=(source,relative)=>JSON.parse(readResource(source,relative,relative).replace(/^\uFEFF/,''));
 function inventory(root,rules) {
  const out=[];
  function walk(rel) {
@@ -43,10 +44,10 @@ function inventory(root,rules) {
  return [...new Set(out)].sort();
 }
 function flavorNames(source) {
- return Object.keys(readJson(source,'config/flavors.json').flavors||{});
+ return Object.keys(requiredJson(source,'config/flavors.json').flavors||{});
 }
 function operationNames(source,flavor) {
- const registry=readJson(source,'config/flavors.json'),operations=readJson(source,'templates/operations.json');
+ const registry=requiredJson(source,'config/flavors.json'),operations=requiredJson(source,'templates/operations.json');
  if(!Object.hasOwn(registry.flavors,flavor))throw Error('Unknown flavor: '+flavor);
  const recipe=registry.flavors[flavor];
  if(registry.core_operations===undefined&&!Object.hasOwn(registry.flavors,'director'))return Object.keys(operations).sort();
@@ -58,7 +59,7 @@ function operationNames(source,flavor) {
 }
 function resolveProfile(source,root,flavor,options={}) {
  root=fs.realpathSync(root);
- const registry=readJson(source,'config/flavors.json'),rules=readJson(source,'config/capabilities.json');
+ const registry=requiredJson(source,'config/flavors.json'),rules=requiredJson(source,'config/capabilities.json');
  if(!Object.hasOwn(registry.flavors,flavor))throw Error('Unknown flavor: '+flavor);
  const pluginRegistry=fs.existsSync(safe(source,'lib/plugin-registry.js'));
  const pluginComposition=read(source,'lib/plugin-composition.js');
@@ -128,7 +129,7 @@ function resolveProfile(source,root,flavor,options={}) {
  const unresolved=Object.entries(facts.packages).filter(([,value])=>value.state==='ambiguous').map(([name])=>name);
  if(unresolved.length)gaps.push({key:'unresolved-package-versions',packages:unresolved,reason:'Dependency declarations lack resolved version evidence; version-specific resources are unavailable until supported lock evidence is supplied.'});
  if(flavor==='director'){
-  const director=readJson(source,'domains/director/capabilities.json');
+  const director=requiredJson(source,'domains/director/capabilities.json');
   const narrative=director.narrative;
   if(director.schema!==1||!narrative||inputDigest(source,narrative.source)!==narrative.sha256)throw Error('Director Narrative source pin changed');
   facts.director={narrative:{status:narrative.status,sha256:narrative.sha256},
@@ -150,7 +151,7 @@ function resolveProfile(source,root,flavor,options={}) {
  inputs[development.CONFIG]=development_policies.input_digest;
  const environment={flavor,inputs,facts,recipes,execution_bindings,worktree_environment,development_policies};
  if(pluginComposition){
-  const pluginInputs=plugins.resolveInputs(root,readJson(source,'templates/operations.json'),hash(pluginComposition));
+  const pluginInputs=plugins.resolveInputs(root,requiredJson(source,'templates/operations.json'),hash(pluginComposition));
   for(const record of Object.values(pluginInputs.packages))for(const relative of Object.keys(record.files))inputs[record.destination+'/'+relative]=inputDigest(root,record.destination+'/'+relative);
   environment.plugins=pluginInputs;
  }
@@ -177,7 +178,7 @@ function sourceInputs(source) {
   function walk(rel){for(const e of fs.readdirSync(safe(source,rel),{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){if(e.name==='__pycache__')continue;const p=path.posix.join(rel,e.name);if(e.isDirectory())walk(p);else result[p]=hash(fs.readFileSync(safe(source,p)));}}
   walk(dir);
  }
- const resourceMap=readJson(source,'config/resource-map.json');
+ const resourceMap=requiredJson(source,'config/resource-map.json');
  for(const resources of Object.values(resourceMap))for(const group of Object.values(resources))for(const rel of Object.values(group)){
   if(rel.startsWith('tests/fixtures/director/'))result[rel]=hash(fs.readFileSync(safe(source,rel)));
  }
@@ -193,18 +194,26 @@ function matches(profile,predicate){
  if('equals' in predicate)return value===predicate.equals;
  throw Error('Unsupported capability predicate');
 }
+function readResource(source,input,destination) {
+ const content=read(source,input);
+ if(content===null){
+  if(input===destination)throw Error('Missing composition input: '+input+'. Restore the matching source file before composing.');
+  throw Error('Missing composition resource: '+destination+'. Restore the referenced source file: '+input);
+ }
+ return content;
+}
 function compose(source,profile,selected=null) {
- const registry=readJson(source,'config/flavors.json'),recipe=registry.flavors[profile.flavor];if(!recipe)throw Error('Unknown flavor');
- const operations=readJson(source,'templates/operations.json'),mapping=readJson(source,'config/resource-map.json'),mandatory=readJson(source,'templates/invariants.json'),domain=readJson(source,recipe.sections),packages={};
+ const registry=requiredJson(source,'config/flavors.json'),recipe=registry.flavors[profile.flavor];if(!recipe)throw Error('Unknown flavor');
+ const operations=requiredJson(source,'templates/operations.json'),mapping=requiredJson(source,'config/resource-map.json'),mandatory=requiredJson(source,'templates/invariants.json'),domain=requiredJson(source,recipe.sections),packages={};
  const available=operationNames(source,profile.flavor),names=selected||available;
  for(const name of names){const op=operations[name];if(!available.includes(name))throw Error('Operation unavailable for flavor '+profile.flavor+': '+name);
   let sections=mergeSections(mergeSections(mandatory,op.sections),domain,recipe.replaceable_slots||[]);
   const active=(recipe.conditional_resources||[]).filter(item=>matches(profile,item.when));
   sections=mergeSections(sections,active.map((item,index)=>({id:'capability-'+index,text:item.instruction})));
-  let files={};for(const [group,resources] of Object.entries(mapping[name]))for(const [dest,src] of Object.entries(resources))files[group+'/'+dest]=read(source,src);
-  const domainFiles={};for(const [dest,src] of Object.entries(recipe.resources))domainFiles[dest]=read(source,src);
+  let files={};for(const [group,resources] of Object.entries(mapping[name]))for(const [dest,src] of Object.entries(resources))files[group+'/'+dest]=readResource(source,src,group+'/'+dest);
+  const domainFiles={};for(const [dest,src] of Object.entries(recipe.resources))domainFiles[dest]=readResource(source,src,dest);
   files=mergeResources(files,domainFiles,recipe.replacements||{});
-  for(const item of active){const extra={};for(const [dest,src] of Object.entries(item.resources))extra[dest]=read(source,src);files=mergeResources(files,extra,item.replacements||{});}
+  for(const item of active){const extra={};for(const [dest,src] of Object.entries(item.resources))extra[dest]=readResource(source,src,dest);files=mergeResources(files,extra,item.replacements||{});}
   files['references/project-profile.md']='# Concrete Project Profile\n\nFlavor: '+profile.flavor+'. Static compatibility only; execution remains unqualified.\n\n```json\n'+json({source_version:profile.source_version,instruction_profile_id:hash(json({flavor:profile.flavor,facts:profile.facts,recipes:profile.recipes,gaps:profile.gaps})),facts:profile.facts,recipes:profile.recipes,gaps:profile.gaps,worktree_environment:profile.worktree_environment})+'```\n';
   const policyInstructions=development.instructions(profile,name);
   files['SKILL.md']='---\nname: '+name+'\ndescription: '+JSON.stringify('['+profile.flavor+'] '+op.description)+'\nlicense: MIT\n---\n\n# '+op.title+'\n\nFlavor: '+profile.flavor+'. Read the [concrete project profile](references/project-profile.md).\n\n'+sections.map(s=>s.text).join('\n\n')+'\n'+(policyInstructions?'\n'+policyInstructions:'');

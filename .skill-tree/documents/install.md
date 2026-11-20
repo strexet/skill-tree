@@ -32,6 +32,22 @@ The local manager accepts exactly one operation. `--dry-run` applies only to `--
 
 For a clean clone with a retained schema-3 queue, explicit `workflow-state.py recover-locator <project> --input <recovery.json>` restores the machine-local locator. The request contains the exact `queue_id` and a `worktrees` object covering every unfinished run. Completed delivery mappings can be omitted; historical checkpoints and terminal outcomes remain unchanged. A linked controller worktree retains the canonical queue owner.
 
+## Missing referenced files
+
+Report the missing path, the operation that stopped and the applicable recovery in the command result and owner handoff. Installation verification covers owned installation resources. Use the read-only documentation validator to inspect referenced workflow files before refreshing navigation.
+
+| Reference | Detection and recovery |
+| --- | --- |
+| Authored document or composition input | The manifest validator or composer identifies the missing file. Restore the matching authored version from a trusted revision or backup. |
+| Representative generated package or navigation manifest | The sync check or manifest validator identifies the missing output. Regenerate packages from verified authored sources with the sync command. Regenerate navigation with `workflow-state.py manifest <project-root> --apply` after Future integrity passes. |
+| Future queue, checkpoint or expected outcome ledger | The guarded workflow writer stops before replacement. Restore the matching authoritative files before refreshing. |
+| Installed package, maintenance bundle or registered instruction file | The installer identifies the conflicting owned path. Restore matching bytes from a verified generation and run the owned manager with `--verify`. |
+| Installation receipt with a surviving core bundle | Restore the matching `.skill-tree/installation/profile.json` before verification. Fresh installation refuses the surviving bundle without ownership evidence. |
+| Machine-local run locator or selected worktree | Use the exact queue and run identity with `recover-locator` or `recover-workspace` after inspecting the original workspace and preserved changes. |
+| Required validation evidence | The history view marks missing evidence unavailable. A current acceptance check requires restored matching evidence or another authorized execution. Historical verdicts remain recorded. |
+
+Optional history locations without retained references can be absent. An interrupted, hash-bound installation uses the owned manager with `--recover`. Restore verified original data for missing authoritative workflow files.
+
 Source-role recipes in `.skill-tree/config/repository.json` feed installed composition with stable recipe IDs and declaration fingerprints. Target recipes reside in `.skill-tree/validation-recipes.json`. Duplicate IDs across package scripts or declarations reject composition.
 
 The installed receipt and concrete project profile expose the built-in `static-inspection` recipe when the project leaves the ID undeclared. The built-in recipe uses the static lane with explicit source and artifact assertions, an empty input-path list and no command vector. An explicit recipe with the same ID takes precedence. Older owned profiles verify against the installed bundle, and the workflow helper resolves the same fallback. An update from current source adds the discovery entry.

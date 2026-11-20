@@ -131,6 +131,67 @@ test("verify mode detects installed skill", () => {
   assert.equal(result.status, 0, result.stderr);
 });
 
+test("reported missing installation inputs have usable recovery guidance", () => {
+  const target = tmpdir();
+  const args = ["--only", "codex", "--target", target, "--with-init", "--skills", "skill-tree-process-future-pending"];
+  try {
+    const installed = run(args);
+    assert.equal(installed.status, 0, installed.stdout + installed.stderr);
+    const cases = [
+      [".skill-tree/installation/profile.json", /restore the matching ownership receipt/i],
+      [".agents/skills/skill-tree-process-future-pending/SKILL.md", /restore the matching owned package/i],
+      [".skill-tree/installation/source/src/init-rules/skill-tree-skills.md", /restore the missing file from the matching maintenance generation/i],
+      ["AGENTS.md", /restore the registered instruction file/i],
+    ];
+    for (const [relative, guidance] of cases) {
+      const file = path.join(target, relative);
+      const saved = fs.readFileSync(file);
+      fs.unlinkSync(file);
+      try {
+        for (const mode of ["--verify", "--dry-run"]) {
+          const result = run([...args, mode]);
+          const output = result.stdout + result.stderr;
+          assert.notEqual(result.status, 0, output);
+          assert.ok(output.includes(relative), output);
+          assert.match(output, guidance);
+          assert.equal(fs.existsSync(file), false);
+        }
+      } finally {
+        fs.writeFileSync(file, saved);
+      }
+    }
+    assert.equal(run([...args, "--verify"]).status, 0);
+  } finally {
+    fs.rmSync(target, { recursive: true, force: true });
+  }
+});
+
+test("composition names the missing authored resource behind a declared output", () => {
+  const source = tmpdir();
+  try {
+    for (const directory of ["config", "templates", "domains", "common"]) {
+      fs.cpSync(path.join(root, directory), path.join(source, directory), { recursive: true });
+    }
+    const relative = "common/references/snapshot-rules.md";
+    const input = path.join(source, relative);
+    const bytes = fs.readFileSync(input);
+    fs.unlinkSync(input);
+    const composer = require("../lib/composer.js");
+    const profile = { flavor: "general", facts: {}, recipes: {}, gaps: [] };
+    assert.throws(() => composer.compose(source, profile, ["skill-tree-create-documents-snapshot"]), {
+      message: /Restore the referenced source file: common\/references\/snapshot-rules\.md/,
+    });
+    assert.equal(fs.existsSync(input), false);
+    fs.writeFileSync(input, bytes);
+    fs.unlinkSync(path.join(source, "config/resource-map.json"));
+    assert.throws(() => composer.compose(source, profile, ["skill-tree-create-documents-snapshot"]), {
+      message: /Missing composition input: config\/resource-map\.json\. Restore the matching source file/,
+    });
+  } finally {
+    fs.rmSync(source, { recursive: true, force: true });
+  }
+});
+
 test("uninstall removes selected skill only", () => {
   const target = tmpdir();
   let result = run(["--only", "codex", "--project", "--target", target, "--copy"]);

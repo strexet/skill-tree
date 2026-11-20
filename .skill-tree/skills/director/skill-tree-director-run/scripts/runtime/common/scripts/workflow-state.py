@@ -412,9 +412,13 @@ class Store:
             raise WorkflowError('Unexpectedly empty '+FUTURE_QUEUE+'; restore the matching queue file before retrying')
         if not history_present:
             registry = old.get('run_registry') or {}
+            if not isinstance(registry, dict) or not isinstance(registry.get('runs', {}), dict):
+                raise WorkflowError('Invalid run registry in '+FUTURE_STATE+'; restore the matching checkpoint before retrying')
             runs = list(registry.get('runs', {}).values())
             if old.get('active_run'):
                 runs.append(old['active_run'])
+            if any(not isinstance(run, dict) for run in runs):
+                raise WorkflowError('Invalid run records in '+FUTURE_STATE+'; restore the matching checkpoint before retrying')
             expected = old.get('outcome_history_recorded') is True or any(
                 run.get('completed_ids') or run.get('completion_refs') for run in runs)
             if expected or self.terminal_outcomes_expected():

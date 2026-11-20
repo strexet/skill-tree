@@ -1,0 +1,22 @@
+{
+  "task_id": "T-43aeeb45-2075-4fab-8ccd-11a530e0555a",
+  "check_id": "declared-file-diagnostics",
+  "attempt_id": "C-a3b4dca1-77d4-4da8-b95a-2071e1e0804d",
+  "command": [
+    "python3",
+    "-B",
+    ".skill-tree/tests/test-manifest-validation.py",
+    "ManifestValidationTests.test_missing_references_distinguish_restore_regenerate_and_optional"
+  ],
+  "result": "red",
+  "counts": {
+    "expected": 1,
+    "discovered": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0
+  },
+  "returncode": 1,
+  "log": ".skill-tree/artifacts/validation/diagnostics/c-a3b4dca1-77d4-4da8-b95a-2071e1e0804d.txt",
+  "log_sha256": "8ec0903db8f88aa6704135409a95c9e4bd4fd081d31dcf154729ee7af7453447"
+}

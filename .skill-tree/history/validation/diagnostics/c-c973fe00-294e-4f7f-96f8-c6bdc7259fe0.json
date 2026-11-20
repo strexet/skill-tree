@@ -1,0 +1,19 @@
+{
+  "task_id": "T-43aeeb45-2075-4fab-8ccd-11a530e0555a",
+  "check_id": "owned-recovery-guidance",
+  "attempt_id": "C-c973fe00-294e-4f7f-96f8-c6bdc7259fe0",
+  "command": [
+    "node"
+  ],
+  "result": "pass",
+  "counts": {
+    "expected": 20,
+    "discovered": 20,
+    "passed": 20,
+    "failed": 0,
+    "skipped": 0
+  },
+  "returncode": 0,
+  "log": ".skill-tree/artifacts/validation/diagnostics/c-c973fe00-294e-4f7f-96f8-c6bdc7259fe0.txt",
+  "log_sha256": "401b427ffd447e0c939e0daf59aab1b27cecffabb9ed1600b4c8e81fea9904df"
+}

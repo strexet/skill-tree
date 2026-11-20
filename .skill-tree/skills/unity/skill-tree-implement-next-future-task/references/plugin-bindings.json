@@ -2836,7 +2836,7 @@
   "configuration_digest": "ea848ac9e2f5717503d211fcca3f7acfe62b1b4d0453a44a23f0b90527f45187",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "7615864f116f509dfd8a43055b31e82813d2145c3b61d3d4d783f98a4a56c300",
+  "identity": "dc6a3a4e9f47a97decbb60a379c5fbc0f56f6d3c5108f5467ad09477782db8bf",
   "operation": "skill-tree-implement-next-future-task",
   "operations": {
     "skill-tree-3d": {
@@ -2960,7 +2960,7 @@
     "scripts/select-prioritized-task.py": "93f12ac5a333fb072bf8d9d849d08e3b422af856d582d492902647efe35c896f",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "725c9ad331e0ece0e85ceef7cd5ffbc8f5188646d0edd58c28f17d24878074d0"
+    "scripts/workflow-state.py": "8aed927bffd14225b0e5b5deb45d9fccd0659061e6a83bc74956a34def2ca4ce"
   },
   "packages": {},
   "parameter_defaults": {},

@@ -19,9 +19,18 @@ function compositionIdentity(profile){
  return c.hash(c.json({flavor:profile.flavor,environment_id:profile.environment_id,source_digests:profile.source_digests,output_digests:outputs}));
 }
 const treeHash=(root,rel,includeCaches=false)=>{const files=filesAt(root,rel,includeCaches);return files===null?null:c.hash(c.json(files));};
+function hasRetainedCore(root){
+ return [INSTALL+'/manager.js',INSTALL+'/source'].some(relative=>fs.existsSync(c.safe(root,relative)));
+}
+function missingReceipt(root){
+ const recovery=hasRetainedCore(root)
+  ? 'Restore the matching ownership receipt for the retained maintenance bundle and run the owned manager --verify.'
+  : 'Install Skill Tree with an explicit --flavor if this is a new target.';
+ return Error('Missing ownership receipt: '+PROFILE+'. '+recovery);
+}
 function receipt(root,required=false,allowForeign=false){
  const p=c.readJson(root,PROFILE,null);
- if(!p){if(required)throw Error('Missing ownership receipt; install with an explicit --flavor');return null;}
+ if(!p){if(required)throw missingReceipt(root);return null;}
  if(p.format!=='skill-tree-profile'||p.schema!==1||typeof p.project_root!=='string'||!allowForeign&&p.project_root!==fs.realpathSync(root)||!p.destinations||!p.bundle_digests)throw Error('Unsupported or foreign ownership receipt; use the manual update checklist');
  return p;
 }
@@ -29,15 +38,29 @@ function verifyOwned(root,p,includeBundle=true){
  if(p.identity!==compositionIdentity(p))throw Error('Composition receipt identity mismatch');
  for(const [rel,record] of Object.entries(p.destinations)){
   if(!/^skill-tree-[a-z0-9-]+$/.test(record.name)||path.basename(rel)!==record.name)throw Error('Invalid owned destination');
-  if(c.json(filesAt(root,rel))!==c.json(record.files))throw Error('Unowned or locally modified package conflicts: '+rel);
+  const actual=filesAt(root,rel);
+  if(c.json(actual)!==c.json(record.files)){
+   const missing=actual&&Object.keys(record.files).find(file=>!Object.hasOwn(actual,file));
+   const location=missing?rel+'/'+missing:rel;
+   throw Error('Unowned or locally modified package conflicts: '+location+'. Restore the matching owned package before retrying.');
+  }
  }
  if(includeBundle){
-  for(const [rel,hash] of Object.entries(p.bundle_digests))if(c.hash(c.read(root,rel)||'')!==hash)throw Error('Modified maintenance bundle: '+rel);
+  for(const [rel,hash] of Object.entries(p.bundle_digests)){
+   const content=c.read(root,rel);
+   if(content===null)throw Error('Missing maintenance bundle file: '+rel+'. Restore the missing file from the matching maintenance generation.');
+   if(c.hash(content)!==hash)throw Error('Modified maintenance bundle: '+rel);
+  }
   const actual=filesAt(root,INSTALL+'/source');
   const expected=Object.fromEntries(Object.entries(p.bundle_digests).filter(([rel])=>rel.startsWith(INSTALL+'/source/')).map(([rel,hash])=>[rel.slice((INSTALL+'/source/').length),hash]));
   if(c.json(actual)!==c.json(expected))throw Error('Unowned or missing maintenance source inventory');
  }
- for(const [rel,record] of Object.entries(p.bridges||{})){const current=c.read(root,rel)||'',block=bridgeBlock(current);if(!block||c.hash(block)!==record.hash)throw Error('Modified or missing owned bridge: '+rel);}
+ for(const [rel,record] of Object.entries(p.bridges||{})){
+  const current=c.read(root,rel);
+  const block=bridgeBlock(current||'');
+  if(!block||c.hash(block)!==record.hash)
+   throw Error('Modified or missing owned bridge: '+rel+'. Restore the registered instruction file from a verified matching copy before retrying.');
+ }
 }
 function bridgeBlock(text){
  const a=text.indexOf(BEGIN),b=text.indexOf(END);if(a<0&&b<0)return null;
@@ -328,6 +351,7 @@ function plan(root,source,flavor,selections,options={}){
  const profileBefore=treeHash(root,PROFILE);const old=receipt(root);if(old)verifyOwned(root,old);
  const workflowBefore=treeHash(root,WORKFLOW);
  if(!old&&fs.existsSync(c.safe(root,INSTALL))){
+  if(hasRetainedCore(root))throw missingReceipt(root);
   const {REGISTRY,PACKAGES,NOOP_REQUESTS,verifyInstalled}=require('./plugin-registry.js');
   const {backups,last}=transactionPaths('plugins');
   // Owned plugin state survives removal of the independent core generation.
