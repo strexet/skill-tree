@@ -1,0 +1,21 @@
+{
+  "task_id": "T-9e26eb5b-11ff-4640-9cb6-bc5cbba86138",
+  "check_id": "owned-agents-regeneration",
+  "attempt_id": "C-a0d1cd26-15a1-4071-bdde-57ec1f585428",
+  "command": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-installer.js"
+  ],
+  "result": "pass",
+  "counts": {
+    "expected": 21,
+    "discovered": 21,
+    "passed": 21,
+    "failed": 0,
+    "skipped": 0
+  },
+  "returncode": 0,
+  "log": ".skill-tree/artifacts/validation/agents/c-a0d1cd26-15a1-4071-bdde-57ec1f585428.txt",
+  "log_sha256": "9c420f5e49a8047395edf411c8059723beebdc44fe70aedc9b3b5b8e278f7376"
+}

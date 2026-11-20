@@ -2836,7 +2836,7 @@
   "configuration_digest": "ea848ac9e2f5717503d211fcca3f7acfe62b1b4d0453a44a23f0b90527f45187",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "ce21e69e7986540bb21f0ed68aa7a5ec8852d36599fe2a7e859c22ca699ddc58",
+  "identity": "be8ce458dd81907b3e5d1b4b6bdb59ef4d95325f6ec4a678c746d65fdd12848a",
   "operation": "skill-tree-director-status",
   "operations": {
     "skill-tree-3d": {
@@ -2975,7 +2975,7 @@
     "scripts/runtime/lib/composer.js": "fb26f8f539ac3a2ef1461675bc9a4326b48dbdc7c4f454c03f43586255d8a6b2",
     "scripts/runtime/lib/development-policies.js": "9d3036e0dd2b2aaf070f3ec92f9e1d6d6830fe35cd8ebb1a78135c3ad792a2fd",
     "scripts/runtime/lib/execution-bindings.js": "4087f0855eac260dc7ec4008be24015b3645ac7f53e11b3f7f7eccab5434a852",
-    "scripts/runtime/lib/installation.js": "3c1b17cfbdfbc2594f62201dcece77880c66b534d03a91f3152a73c96633ad4e",
+    "scripts/runtime/lib/installation.js": "60783620224d6a973ee4deac83e98c4a9e98840712954741f4594e4a347b4573",
     "scripts/runtime/lib/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
     "scripts/runtime/lib/plugin-composition.js": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b",
     "scripts/runtime/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",

@@ -1,4 +1,5 @@
 const assert = require("node:assert/strict");
+const { createHash } = require("node:crypto");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
@@ -121,6 +122,178 @@ test("bridge uninstall preserves surrounding content", () => {
   const text = fs.readFileSync(path.join(target, "AGENTS.md"), "utf8");
   assert.ok(text.includes("# Existing"));
   assert.equal(text.includes("BEGIN skill-tree-skills"), false);
+});
+
+test("owned manager regenerates only a missing registered AGENTS.md", () => {
+  const target = fs.realpathSync(tmpdir());
+  const name = "skill-tree-implement-all";
+  const bridge = path.join(target, "AGENTS.md");
+  const state = path.join(target, ".skill-tree/documents/future.json");
+  const owned = path.join(target, ".agents/skills", name, "SKILL.md");
+  const local = (...args) => spawnSync(process.execPath, [path.join(target, ".skill-tree/installation/manager.js"), ...args],
+    { cwd: target, encoding: "utf8", timeout: 15000 });
+  const workflow = (...args) => spawnSync("python3", ["-B", path.join(target, ".agents/skills", name, "scripts/workflow-state.py"), ...args],
+    { cwd: target, encoding: "utf8", timeout: 15000 });
+  const output = result => result.stdout + result.stderr;
+  function inventory(directory = target, relative = "", result = {}) {
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      const key = relative + entry.name;
+      if (key === "AGENTS.md") continue;
+      const full = path.join(directory, entry.name);
+      if (entry.isDirectory()) {
+        result[key] = "directory";
+        inventory(full, key + "/", result);
+      } else {
+        result[key] = createHash("sha256").update(fs.readFileSync(full)).digest("hex");
+      }
+    }
+    return result;
+  }
+  try {
+    fs.writeFileSync(bridge, "# Repository-specific rules\n\nDeliberately discarded instructions.\n");
+    let result = run(["--only", "codex", "--target", target, "--with-init", "--skills", name]);
+    assert.equal(result.status, 0, output(result));
+    const original = fs.readFileSync(bridge, "utf8");
+    const begin = original.indexOf("<!-- BEGIN skill-tree-skills -->");
+    assert(begin >= 0);
+    const generated = original.slice(begin);
+    assert.equal(spawnSync("git", ["init", "--quiet", target]).status, 0);
+    fs.mkdirSync(path.dirname(state), {recursive:true});
+    fs.writeFileSync(path.join(path.dirname(state), "future.md"),
+      "# Future Work\n\n## Pending Task Format\n\n## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n");
+    const request = path.join(target, "request.json");
+    fs.writeFileSync(request, JSON.stringify({title:"Retain work",description:"Preserve pending work.",
+      expected_behavior:"The fixture queue keeps the original task."}));
+    result = workflow("intake", target, "--input", request);
+    assert.equal(result.status, 0, output(result));
+    result = workflow("workspace-setup", target);
+    assert.equal(result.status, 0, output(result));
+    const exactState = fs.readFileSync(state);
+    const stored = JSON.parse(exactState);
+    assert.equal(stored.schema, 3);
+    assert.equal(stored.tasks.length, 1);
+    const history = path.join(target, ".skill-tree/history");
+    fs.mkdirSync(history, {recursive:true});
+    fs.writeFileSync(path.join(history, "retained.json"), '{"status":"historical"}\n');
+    fs.mkdirSync(path.join(target, "work/empty"), {recursive:true});
+    fs.writeFileSync(path.join(target, "work/unrelated.txt"), "Owner file.\n");
+    const before = inventory();
+
+    fs.unlinkSync(bridge);
+    result = local("--verify");
+    assert.notEqual(result.status, 0, output(result));
+    assert.match(output(result), /Modified or missing owned bridge: AGENTS.md/);
+    result = local("--regenerate-agents", "--dry-run");
+    assert.equal(result.status, 0, output(result));
+    assert.deepEqual(JSON.parse(result.stdout).changed, ["AGENTS.md"]);
+    assert.equal(fs.existsSync(bridge), false);
+    assert.deepEqual(inventory(), before);
+
+    const installedBytes = fs.readFileSync(owned);
+    fs.appendFileSync(owned, "\nCompeting package edit.\n");
+    result = local("--regenerate-agents");
+    assert.notEqual(result.status, 0, output(result));
+    assert.match(output(result), /locally modified package/);
+    assert.equal(fs.existsSync(bridge), false);
+    fs.unlinkSync(owned);
+    result = local("--regenerate-agents", "--dry-run");
+    assert.notEqual(result.status, 0, output(result));
+    assert.match(output(result), /skill-tree-implement-all\/SKILL\.md/);
+    fs.writeFileSync(owned, installedBytes);
+
+    const receipt = path.join(target, ".skill-tree/installation/profile.json");
+    const installedProfile = fs.readFileSync(receipt);
+    const unregistered = JSON.parse(installedProfile);
+    delete unregistered.bridges["AGENTS.md"];
+    fs.writeFileSync(receipt, JSON.stringify(unregistered));
+    result = local("--regenerate-agents", "--dry-run");
+    assert.notEqual(result.status, 0, output(result));
+    assert.match(output(result), /No owned Codex bridge is registered/);
+    fs.writeFileSync(receipt, installedProfile);
+
+    const rid = "WR-cedae5ca-1e04-49df-b652-c86d5ef427bc";
+    stored.run_registry.runs[rid] = {id:rid, phase:"implement"};
+    fs.writeFileSync(state, JSON.stringify(stored));
+    result = local("--regenerate-agents", "--dry-run");
+    assert.notEqual(result.status, 0, output(result));
+    assert.match(output(result), /Active controller/);
+    assert.equal(fs.existsSync(bridge), false);
+    fs.writeFileSync(state, exactState);
+
+    const journal = path.join(target, ".skill-tree/installation/.journal.json");
+    fs.writeFileSync(journal, '{"schema":1,"entries":[]}\n');
+    result = local("--regenerate-agents");
+    assert.notEqual(result.status, 0, output(result));
+    assert.match(output(result), /recovery is required/i);
+    assert.equal(fs.readFileSync(journal, "utf8"), '{"schema":1,"entries":[]}\n');
+    assert.equal(fs.existsSync(bridge), false);
+    fs.unlinkSync(journal);
+
+    const fault = path.join(target, "stage-fault.cjs");
+    fs.writeFileSync(fault, `
+      const fs = require("node:fs");
+      const open = fs.openSync;
+      const writeFile = fs.writeFileSync;
+      let staged, descriptor;
+      fs.openSync = function(file, ...args) {
+        const fd = open(file, ...args);
+        if (typeof file === "string" && file.includes(".skill-tree-agents-recovery-") && file.endsWith("AGENTS.md")) {
+          staged = file;
+          descriptor = fd;
+        }
+        return fd;
+      };
+      fs.writeFileSync = function(file, ...args) {
+        writeFile(file, ...args);
+        if (file !== descriptor || !staged) return;
+        if (process.env.SKILL_TREE_TEST_STAGE_REPLACEMENT) {
+          fs.unlinkSync(staged);
+          fs.symlinkSync(process.env.SKILL_TREE_TEST_STAGE_REPLACEMENT, staged);
+        } else writeFile(staged, "Damaged staged file.\\n");
+      };
+    `);
+    const regenerateWithFault = (env = process.env) => spawnSync(process.execPath,
+      ["--require", fault, path.join(target, ".skill-tree/installation/manager.js"), "--regenerate-agents"],
+      { cwd: target, encoding: "utf8", timeout: 15000, env });
+    result = regenerateWithFault();
+    assert.notEqual(result.status, 0, output(result));
+    assert.match(output(result), /Staged AGENTS.md bytes changed before publication/);
+    assert.equal(fs.existsSync(bridge), false);
+    if (process.platform !== "win32") {
+      const sameBytes = path.join(target, "work", "matching-content.txt");
+      fs.writeFileSync(sameBytes, generated);
+      result = regenerateWithFault({ ...process.env, SKILL_TREE_TEST_STAGE_REPLACEMENT: sameBytes });
+      assert.notEqual(result.status, 0, output(result));
+      assert.match(output(result), /Staged AGENTS.md file identity changed before publication/);
+      assert.equal(fs.existsSync(bridge), false);
+      assert.equal(fs.statSync(sameBytes).nlink, 1);
+      assert.equal(fs.readFileSync(sameBytes, "utf8"), generated);
+      fs.unlinkSync(sameBytes);
+    }
+    fs.unlinkSync(fault);
+    assert.deepEqual(inventory(), before);
+
+    if (process.platform !== "win32") {
+      fs.symlinkSync("unavailable-file.md", bridge);
+      result = local("--regenerate-agents");
+      assert.notEqual(result.status, 0, output(result));
+      assert.equal(fs.readlinkSync(bridge), "unavailable-file.md");
+      fs.unlinkSync(bridge);
+    }
+    result = local("--regenerate-agents");
+    assert.equal(result.status, 0, output(result));
+    assert.equal(fs.readFileSync(bridge, "utf8"), generated);
+    assert.deepEqual(inventory(), before);
+    assert.equal(local("--verify").status, 0);
+
+    fs.writeFileSync(bridge, "New owner instructions.\n");
+    result = local("--regenerate-agents");
+    assert.notEqual(result.status, 0, output(result));
+    assert.match(output(result), /AGENTS.md already exists/);
+    assert.equal(fs.readFileSync(bridge, "utf8"), "New owner instructions.\n");
+  } finally {
+    fs.rmSync(target, {recursive:true,force:true});
+  }
 });
 
 test("verify mode detects installed skill", () => {
