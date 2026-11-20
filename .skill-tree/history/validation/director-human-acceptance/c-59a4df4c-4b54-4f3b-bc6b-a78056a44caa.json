@@ -1,0 +1,24 @@
+{
+  "verdict": "pass",
+  "reviewers": [
+    "/root/director_human_acceptance_resolver"
+  ],
+  "cases": {
+    "A": "Unity owns exact first binding mismatch R1 versus accepted R@2. Recheck ordinary eligible actor/input on repaired selected build and pin current producer/consumer revisions, first guard/writer and result. Sibling K remains unchanged; only paper repair expectations.",
+    "B": "Unclear goal requires Game Design triage with accepted Narrative intent, delivered line, visible cue and operator conditions. Assign only first supported mismatch to its owner. Rehearsal establishes scoped route availability, and no uncoached comprehension conclusion.",
+    "C": "B@8/E unaided fallback choice is one discoverability miss with goal understood. Facilitator-pointed repeat supports coached reachability only. Fresh neutral entry and same camera with a known-route control can distinguish cue finding. The author chooses exact persistent optional cue or a more visible revision after matched presentation."
+  },
+  "scope": "Exact four checked source pins and owned Director trial verified, unchanged Narrative protocol reused. No actual participant session, Unity run or creative owner response supplied.",
+  "task_id": "T-678c21fc-b436-4840-a3ea-e68d7dfa319e",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/references/director-workflow.md": "34471284b51d98a30f23ea0c530720b9bea816e4699d404dbe66206dd1a38175",
+    ".skill-tree/common/references/narrative-human-playtest.md": "f6894df614f45fbdc059147ab2100d9abed8cbb9dcd37ddbc5d02f0fd4b31238",
+    ".skill-tree/documents/director-workflow.md": "ba0d903fa7c9b25324ecf6fb834951162754d5ec464351cf365cf22dce9b135f",
+    ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+  },
+  "input_sha256": {
+    "observations.md": "940b4139164e288e005a923c1377bcfa23c4f4dbfd0d24b9e2b18e73e4b72ef2",
+    "trial/.skill-tree/installation/profile.json": "f6af86301e2ec4f820f32bd3b6b7cb05863d9c8514fe225a2e4a24839c84df1e"
+  }
+}

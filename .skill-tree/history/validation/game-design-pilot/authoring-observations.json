@@ -1,0 +1,217 @@
+{
+  "schema": 1,
+  "static_recipe_lane": "static",
+  "task_id": "T-0e264174-6a6d-4e38-abcc-9a5150b0918b",
+  "review_base_head": "451b2a6bdf47c2ffcf43125ce44fb7c69f61b18d",
+  "host": "Observed isolated Codex collaboration. Explicit package-local entrypoint invocations use the inherited model configuration.",
+  "source_fingerprints": {
+    ".skill-tree/common/references/game-design-gdd.md": "b33102a28f1ca07b6e210b555e79de35b05c26031442046e7a4ce4f83ab2ece2",
+    ".skill-tree/common/references/game-design-mechanics.md": "d9657c2ae70ad41ea2c8125da44494672f4a0be7c7dfd0cd2711c8774bc18ed6",
+    ".skill-tree/common/references/game-design-balance-study.md": "8d28a473095d5ec4e457c5ea0bb61adaf43c0be8c2f0dbb9eb8aaf93b65cdc77",
+    ".skill-tree/common/references/game-design-records.md": "3aee12c6dc4569807607cc9b52da1168a9457375aa034ed60399732e234c6c8b",
+    ".skill-tree/common/references/game-design-atlas.md": "453a6d8ffd8f66a4233677c22dba3efae509e216a744050dcc316629cd934401"
+  },
+  "installations": {
+    "gdd": {
+      "profile": "ba21aed4c7b44eaeb1bd2560ceb87559247cf30ce8e4cbc0a0f679f93b49cc68",
+      "provider": "codex",
+      "flavor": "general",
+      "inputs": {
+        "inputs/brief.md": "e1521fc5f0a2b999329784209322231a59d294e21877a85f2a39da6aec869cba"
+      },
+      "packages": {
+        ".agents/skills/skill-tree-game-design": {
+          "manifest_sha256": "3f8d1e820a3eebf1ed437b597a59bb1bc7673e4ad26003ca751fe2af8d00f96c",
+          "files": 30,
+          "skill_sha256": "25d3c369c5f6f9fbd38f80e7cdad08729cb3b39ec199448684b527a5fb829d81"
+        }
+      }
+    },
+    "mechanics": {
+      "profile": "f0a9b9dae1e4b9626a5384eaa8a5fc5c5d3cfde0e49b3858619a5ba72dd5fe63",
+      "provider": "codex",
+      "flavor": "general",
+      "inputs": {
+        "inputs/a-configuration.md": "010d5695942aa332f7ce1265125e846a26bebdfe8275ba697af793cdec181a7a",
+        "inputs/brief.md": "832ed461c92bb57e6cfe8dae2e920693ad4269c2842bab6d375dbb7a799e04bd"
+      },
+      "packages": {
+        ".agents/skills/skill-tree-game-design-mechanics": {
+          "manifest_sha256": "553fbc65dba07c46822c82b73913c0febdfc926786ec70e4be881ce6523d287c",
+          "files": 30,
+          "skill_sha256": "cb2b11ed07e4fd9592000019b944205ef6dfdc42c6f65beb08bc11fd321b0062"
+        }
+      }
+    },
+    "balance": {
+      "profile": "49127da5ff670d4d9259d9cfb96d9e9c6e60330399b29f10f33689f26e3a5457",
+      "provider": "codex",
+      "flavor": "general",
+      "inputs": {
+        "inputs/brief.md": "648c13c1986c7aafabbfa29bc915d40eb8d54ee0c0a6f44d0ec9c96ca9420e3b"
+      },
+      "packages": {
+        ".agents/skills/skill-tree-game-design-balance": {
+          "manifest_sha256": "3e8e9a77b28efd0f75963031232f33883f2a6289b9f7512d67d7fb696bb4f936",
+          "files": 31,
+          "skill_sha256": "b961cc4bc0a962a07f0aa1eb2ac2afc0c659f13969e79f841997b913465cae17"
+        }
+      }
+    },
+    "linked": {
+      "profile": "0a87857b88d05494be2d4d791625a2c01783b692f5e29b0c243370ee6672f903",
+      "provider": "codex",
+      "flavor": "general",
+      "inputs": {
+        "inputs/balance.md": "c8f9d5e57fab5a6e2fbc9274e74e901af022140351f943ca368b47016a5627fb",
+        "inputs/gdd.md": "4eb359966089ae74315852f21effa1855f6e6041140101589d00684a7d2b5e0e",
+        "inputs/mechanics.md": "64b944a93e71551e50ff0b4369afaa44fcedef41a24ecbb588bce62b4d4f1595"
+      },
+      "packages": {
+        ".agents/skills/skill-tree-game-design": {
+          "manifest_sha256": "3f8d1e820a3eebf1ed437b597a59bb1bc7673e4ad26003ca751fe2af8d00f96c",
+          "files": 30,
+          "skill_sha256": "25d3c369c5f6f9fbd38f80e7cdad08729cb3b39ec199448684b527a5fb829d81"
+        },
+        ".agents/skills/skill-tree-game-design-balance": {
+          "manifest_sha256": "3e8e9a77b28efd0f75963031232f33883f2a6289b9f7512d67d7fb696bb4f936",
+          "files": 31,
+          "skill_sha256": "b961cc4bc0a962a07f0aa1eb2ac2afc0c659f13969e79f841997b913465cae17"
+        },
+        ".agents/skills/skill-tree-game-design-mechanics": {
+          "manifest_sha256": "553fbc65dba07c46822c82b73913c0febdfc926786ec70e4be881ce6523d287c",
+          "files": 30,
+          "skill_sha256": "cb2b11ed07e4fd9592000019b944205ef6dfdc42c6f65beb08bc11fd321b0062"
+        }
+      }
+    }
+  },
+  "actual_authoring_invocations": [
+    {
+      "trial": "gdd",
+      "stage": "direct-gdd",
+      "actor": "/root/design_pilot_gdd",
+      "profile": "ba21aed4c7b44eaeb1bd2560ceb87559247cf30ce8e4cbc0a0f679f93b49cc68",
+      "inputs": {
+        "inputs/brief.md": "e1521fc5f0a2b999329784209322231a59d294e21877a85f2a39da6aec869cba"
+      },
+      "artifacts": {
+        "design/direct-result.md": "18b86d530f7bbe05bb1fc77dd73946d59902852ba4471074cf235870324ff7c7"
+      }
+    },
+    {
+      "trial": "mechanics",
+      "stage": "direct-mechanics",
+      "actor": "/root/design_pilot_mechanics",
+      "profile": "f0a9b9dae1e4b9626a5384eaa8a5fc5c5d3cfde0e49b3858619a5ba72dd5fe63",
+      "inputs": {
+        "inputs/a-configuration.md": "010d5695942aa332f7ce1265125e846a26bebdfe8275ba697af793cdec181a7a",
+        "inputs/brief.md": "832ed461c92bb57e6cfe8dae2e920693ad4269c2842bab6d375dbb7a799e04bd"
+      },
+      "artifacts": {
+        "design/direct-result.md": "397e6b21e570cbe983d44bccaad99f3d7535b8c5459d71323159ac6f9386c442"
+      }
+    },
+    {
+      "trial": "balance",
+      "stage": "direct-balance",
+      "actor": "/root/design_pilot_balance",
+      "profile": "49127da5ff670d4d9259d9cfb96d9e9c6e60330399b29f10f33689f26e3a5457",
+      "inputs": {
+        "inputs/brief.md": "648c13c1986c7aafabbfa29bc915d40eb8d54ee0c0a6f44d0ec9c96ca9420e3b"
+      },
+      "artifacts": {
+        "design/direct-result.md": "3f28b6226a3e67d4e26a4c6c02b057133c47c3a812e536cdc6549a2f284ca755"
+      }
+    },
+    {
+      "trial": "linked",
+      "stage": "linked-gdd",
+      "actor": "/root/design_pilot_linked_gdd",
+      "profile": "0a87857b88d05494be2d4d791625a2c01783b692f5e29b0c243370ee6672f903",
+      "inputs": {
+        "inputs/balance.md": "c8f9d5e57fab5a6e2fbc9274e74e901af022140351f943ca368b47016a5627fb",
+        "inputs/gdd.md": "4eb359966089ae74315852f21effa1855f6e6041140101589d00684a7d2b5e0e",
+        "inputs/mechanics.md": "64b944a93e71551e50ff0b4369afaa44fcedef41a24ecbb588bce62b4d4f1595"
+      },
+      "artifacts": {
+        "design/linked-rule.md": "7477583291c787cd70505324adca32b9d1e4496d0d2ac4cef07638a9d05a5345"
+      }
+    },
+    {
+      "trial": "linked",
+      "stage": "linked-mechanics",
+      "actor": "/root/design_pilot_linked_mechanics",
+      "profile": "0a87857b88d05494be2d4d791625a2c01783b692f5e29b0c243370ee6672f903",
+      "inputs": {
+        "inputs/balance.md": "c8f9d5e57fab5a6e2fbc9274e74e901af022140351f943ca368b47016a5627fb",
+        "inputs/gdd.md": "4eb359966089ae74315852f21effa1855f6e6041140101589d00684a7d2b5e0e",
+        "inputs/mechanics.md": "64b944a93e71551e50ff0b4369afaa44fcedef41a24ecbb588bce62b4d4f1595"
+      },
+      "artifacts": {
+        "design/linked-rule.md": "7477583291c787cd70505324adca32b9d1e4496d0d2ac4cef07638a9d05a5345",
+        "design/linked-placement.md": "fe37baba497f16085636e1deac6f87d5406f067155d3d4707627b0dda7bfa0b9"
+      }
+    },
+    {
+      "trial": "linked",
+      "stage": "linked-balance-first",
+      "actor": "/root/design_pilot_linked_balance",
+      "profile": "0a87857b88d05494be2d4d791625a2c01783b692f5e29b0c243370ee6672f903",
+      "inputs": {
+        "inputs/balance.md": "c8f9d5e57fab5a6e2fbc9274e74e901af022140351f943ca368b47016a5627fb",
+        "inputs/gdd.md": "4eb359966089ae74315852f21effa1855f6e6041140101589d00684a7d2b5e0e",
+        "inputs/mechanics.md": "64b944a93e71551e50ff0b4369afaa44fcedef41a24ecbb588bce62b4d4f1595"
+      },
+      "artifacts": {
+        "design/linked-rule.md": "7477583291c787cd70505324adca32b9d1e4496d0d2ac4cef07638a9d05a5345",
+        "design/linked-placement.md": "fe37baba497f16085636e1deac6f87d5406f067155d3d4707627b0dda7bfa0b9",
+        "design/linked-study.md": "1272548488254651edb80d1d2b22e02cfad22771e60b215c068b9768c9da7e09",
+        "design/linked-tuning.md": "1ad9621bca0e59655a9fe3194a4fc5e4c15337ba9abf403ecfa693e3bf5de1a8"
+      }
+    },
+    {
+      "trial": "linked",
+      "stage": "linked-balance-replay",
+      "actor": "/root/design_pilot_linked_balance",
+      "profile": "0a87857b88d05494be2d4d791625a2c01783b692f5e29b0c243370ee6672f903",
+      "inputs": {
+        "inputs/balance.md": "c8f9d5e57fab5a6e2fbc9274e74e901af022140351f943ca368b47016a5627fb",
+        "inputs/gdd.md": "4eb359966089ae74315852f21effa1855f6e6041140101589d00684a7d2b5e0e",
+        "inputs/mechanics.md": "64b944a93e71551e50ff0b4369afaa44fcedef41a24ecbb588bce62b4d4f1595"
+      },
+      "artifacts": {
+        "design/linked-rule.md": "7477583291c787cd70505324adca32b9d1e4496d0d2ac4cef07638a9d05a5345",
+        "design/linked-placement.md": "fe37baba497f16085636e1deac6f87d5406f067155d3d4707627b0dda7bfa0b9",
+        "design/linked-study.md": "1272548488254651edb80d1d2b22e02cfad22771e60b215c068b9768c9da7e09",
+        "design/linked-tuning.md": "1ad9621bca0e59655a9fe3194a4fc5e4c15337ba9abf403ecfa693e3bf5de1a8"
+      }
+    }
+  ],
+  "independent_direct_review": {
+    "reviewer": "/root/design_pilot_reviewer",
+    "verdict": "pass",
+    "checks": {
+      "gdd": "Two genuinely different playable choices. Shape matching by local flap discovery preserves learned information; arrow configuration commits to a route and resets on a loop. Age and localization stay open. One-fork prototype isolates recognition.",
+      "mechanics": "A one-charge single-signal check stays feasible. Coarse age and grouped OR are distinct. Zero-stock mandatory gate deadlocks. A-7's award-time cap applies only in paper scope. B stays unexamined.",
+      "balance": "Effective baseline and clip cause remain unknown. 120 ms is a provisional inclusive early input interpretation. Deliberate input and unaided exposure form the minimum comparison before separate boundary probes."
+    },
+    "evidence": "Independent reviewer recomputed all three input and output digests and matched profile identities to the verified installation record.",
+    "minor_limits": "The first GDD probe checks the flap direction only; the simple rollback cost is implied. Balance lists threshold probes alongside the initial causal comparison but states the distinct minimum."
+  },
+  "independent_linked_review": {
+    "reviewer": "/root/design_pilot_reviewer",
+    "verdict": "pass",
+    "provenance": "First and replay receipts match the current owned profile, all three immutable input digests and all four linked artifact digests. Exact rule and Mechanics collection pins were independently rehashed.",
+    "pattern_and_placement": "The bounded-stock vocabulary is adjacent to the prepaid reserve. The full pattern, paid reveal and movement boost do not match. Timed hold release is an exact generic analogy for the conditional variant. The two-turn placement preserves the existing debit; the zero-loss late control makes a second shield immaterial to score.",
+    "reconstruction": "The reviewer independently computed all 24 cost/action/order cases and four decimal drain controls. Cost 2 and cost 3 both attain loss 2 and consume two or three units. Cost 1 attains loss 0 and erases the allocation tradeoff. Active-time debit uses reserve per counted second and the separate timed trigger uses a discrete successful payment.",
+    "decision": "Exact fixture decision pilot/D1 adopts the one-unit cost as pilot/V1@2 from pilot/V1@1 for pilot/P-crossing@1. The three-unit proposal is retained as rejected. Exactly two revision rows and one applied resulting decision exist, and replay yields identical resulting bytes.",
+    "affected_checks": "Retain the two prior planned checks and reopen allocation and display, zero and one reserve boundaries and matched uncoached choice. Effective device clock, writer, input access, cue response and creative outcome remain open.",
+    "limits": "Paper and actual authoring output only. The reviewer verifies identical resulting bytes and records. Transient writes, product runtime and human response remain outside the observed scope."
+  },
+  "evidence_limits": [
+    "Papers and study documents are actual agent-produced artifacts on temporary inputs, with source and mock decision assertions only.",
+    "The raw requests, project artifacts and host trial records live outside the Skill Tree checkout.",
+    "Native auto-discovery, Editor behavior, human response and creative acceptance remain open."
+  ]
+}

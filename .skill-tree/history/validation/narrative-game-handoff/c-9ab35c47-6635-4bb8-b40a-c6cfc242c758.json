@@ -1,0 +1,31 @@
+{
+  "verdict": "pass",
+  "reviewers": [
+    "/root/narrative_game_handoff_resolver"
+  ],
+  "source_receipts": {
+    "skill": "59364a2c2e9f0f9d888418ca8a3908669ece941e5557d85c7669d90963ef916f",
+    "handoff": "f5e08c884303e27da1821643b742105008c9a06301380e6dc75146319868b028",
+    "impact": "ced37fbada13808982a66d7c951bb0fccee460971eeff942a8d7853404a294bb",
+    "visual": "689cf38e6a12f22e5049188b3667879a101a324ff9829dc1d2d2b6916f9951a0"
+  },
+  "cases": {
+    "character": "W/C/S#H@2 is the off-duty attendant. A courier can get directions to the announced public path. H has no storage authority. E-lift leaves the acting person and conditions open for Narrative.",
+    "location": "W/C/S#L@3 serves public courier exchange and optional visitor. Hall and counter permit handover. Bell summons counter assistance. Sealed storage excludes visitors.",
+    "visual": "Supplied V@1 retains exact locator and unknown reuse authority. The scarf is visual direction. Staff and depicted light power stay excluded.",
+    "compatibility": "Decline E-storage-bell on both accepted restrictions. Check denied entrance after ringing as affected. Public counter handover proceeds separately as independent control."
+  },
+  "qualification": "Installed topic routing reaches local handoff, impact, precise canon approval and visual provenance. Paper only.",
+  "task_id": "T-b54ce9aa-958f-4902-84b1-b468fffd0e44",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/references/narrative-handoffs.md": "f5e08c884303e27da1821643b742105008c9a06301380e6dc75146319868b028",
+    ".skill-tree/common/references/narrative-impact.md": "ced37fbada13808982a66d7c951bb0fccee460971eeff942a8d7853404a294bb",
+    ".skill-tree/common/references/narrative-visual-reference-review.md": "689cf38e6a12f22e5049188b3667879a101a324ff9829dc1d2d2b6916f9951a0",
+    ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+  },
+  "input_sha256": {
+    "paper-inputs.md": "605a5a219e475f060a4208d90c9439d4182314cdbd748f87224b0c676a8976c1",
+    "trial/.skill-tree/installation/profile.json": "1e287d0aa54777a976aa581c1498194eafd916d4f4499c58b62336d99276e886"
+  }
+}

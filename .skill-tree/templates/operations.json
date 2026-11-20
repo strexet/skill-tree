@@ -59,6 +59,66 @@
       }
     ]
   },
+  "skill-tree-game-design": {
+    "title": "Skill-Tree: Game Design",
+    "description": "Develop a concise game brief or revise a specific game design rule, with alternatives, concrete behavior and a proportionate prototype question.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read repository rules, the [Game Design brief and rule contract](references/game-design-gdd.md), and the [shared record contract](references/game-design-records.md). Use a premise, a selected rule or a design complaint to identify the intended experience, the activity or process, and an observable design question. Inspect existing project records and preserve the parameter authority. Draft the requested brief or scoped rule revision. Record assumptions, a normal and boundary case, and the placement or tuning question when applicable. A direct request can finish with a project document.\n\nGenerated prose follows [document rules](references/document-rules.md). Source and sibling dependencies stay outside the standalone operation."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "The decision frame uses the exact authoring request or selected document scope. Draft alternatives, author approval, implementation and runtime validation require matching authorization. The frame creates no Future task or implementation run."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md) and local ordered manifest before routing. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Configured matching occurrences use scripts/workflow-state.py hook-start and hook-next at the actual before, during, after or registered named boundary. Follow the guarded prepare/invoke/record/accept sequence with an actual isolated host actor; scripts/plugin-hooks.js supplies owned preparation and private delivery data rather than native execution. Incorporate contributions through the ordinary authorized core workflow before the next occurrence. Returned results and completed chains never replace final current core acceptance or checks. Reconcile original pending attempts before retry or cancellation; source/configuration/context/policy drift retains prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
+      }
+    ]
+  },
+  "skill-tree-game-design-balance": {
+    "title": "Skill-Tree: Balance",
+    "description": "Build a reproducible game balance comparison or measurement plan from a rule, clip or configuration extract.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read repository rules, the [Balance study contract](references/game-design-balance-study.md) and the [shared record contract](references/game-design-records.md). Identify the outcome, measure, unit, clock, exposure, baseline, one candidate and guardrail. Inspect the authority and effective configuration for the selected scope. Choose a method suited to the decision and available evidence. Return a reproducible study or a measurement plan with the proposed decision, affected placements and next owner.\n\nGenerated prose follows [document rules](references/document-rules.md). Numerical proposals require adoption by the rule owner before updating approved values."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "The decision frame uses the exact selected study or bounded input. The authoring request supplies no authority for project runtime, configuration changes or approval of proposed values."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md) and local ordered manifest before routing. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Configured matching occurrences use scripts/workflow-state.py hook-start and hook-next at the actual before, during, after or registered named boundary. Follow the guarded prepare/invoke/record/accept sequence with an actual isolated host actor; scripts/plugin-hooks.js supplies owned preparation and private delivery data rather than native execution. Incorporate contributions through the ordinary authorized core workflow before the next occurrence. Returned results and completed chains never replace final current core acceptance or checks. Reconcile original pending attempts before retry or cancellation; source/configuration/context/policy drift retains prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
+      }
+    ]
+  },
+  "skill-tree-game-design-mechanics": {
+    "title": "Skill-Tree: Mechanics",
+    "description": "Find reusable game mechanics by intent, rule details or localized aliases. Return source-backed matches and author scoped pattern or source records.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Read repository rules, the [Mechanics lookup and source contract](references/game-design-mechanics.md), the [local seed collection](references/game-design-patterns.md), and the [shared record contract](references/game-design-records.md). Translate a name or plain-language problem into trigger, state change, control, clock and context. Inspect permitted local sources, distinguish aliases from different rules, and explain coverage gaps. Return scoped pattern references, applicability, evidence and exclusions. Capture reusable records with provenance and reuse terms. Keep project-only sources in the authorized project.\n\nGenerated prose follows [document rules](references/document-rules.md). The standalone lookup uses available local records."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "The decision frame uses the exact lookup, card or source scope. An accepted description grants no project implementation, import, redistribution or publication authority."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md) and local ordered manifest before routing. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Configured matching occurrences use scripts/workflow-state.py hook-start and hook-next at the actual before, during, after or registered named boundary. Follow the guarded prepare/invoke/record/accept sequence with an actual isolated host actor; scripts/plugin-hooks.js supplies owned preparation and private delivery data rather than native execution. Incorporate contributions through the ordinary authorized core workflow before the next occurrence. Returned results and completed chains never replace final current core acceptance or checks. Reconcile original pending attempts before retry or cancellation; source/configuration/context/policy drift retains prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
+      }
+    ]
+  },
   "skill-tree-implement-all": {
     "title": "Skill-Tree: Implement All",
     "description": "Implement all prioritized tasks or an explicitly selected group with required dependencies and resumable checkpoints; defer new nonblocking work.",
@@ -339,7 +399,7 @@
     "sections": [
       {
         "id": "operation",
-        "text": "Use scripts/director-entry.py audit with the exact Director run and selected child identities. Inspect retained canonical receipts and explicitly reviewed existing exports. Audit creates no export, task or installation. Read the [Director contract](references/director-workflow.md)."
+        "text": "Use scripts/director-entry.py audit with the exact Director run and selected child identities. Inspect retained canonical receipts and explicitly reviewed existing exports. Audit creates no export, task or installation. Read the [Director contract](references/director-workflow.md). Follow the [selected Unity summary contract](references/director-workflow.md#audit-a-selected-unity-summary) to inspect a recorded engine capture."
       }
     ]
   },

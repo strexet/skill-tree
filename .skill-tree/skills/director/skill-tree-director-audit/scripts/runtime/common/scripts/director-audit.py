@@ -38,6 +38,8 @@ CHECK_LANES = {'static', 'unit', 'integration', 'browser', 'server', 'unity-edit
                'visual', 'player', 'device', 'native'}
 TIMING_FIELDS = ('active_controller_seconds', 'tool_wall_seconds', 'prerequisite_wait_seconds')
 COUNTS = ('expected', 'discovered', 'passed', 'failed', 'skipped')
+UNITY_SEVERITIES = ('warning', 'error', 'exception', 'assertion', 'info')
+EXPECTED_DIAGNOSTIC_FIELDS = ('case_id', 'severity', 'signature_sha256', 'expectation_sha256')
 
 
 def _load_director():
@@ -159,6 +161,152 @@ def _check_diagnostics(record):
     if evidence:
         details['recorded_evidence_sha256'] = evidence
     return details
+
+
+def _expected_diagnostic_key(item):
+    return tuple(item.get(field) for field in EXPECTED_DIAGNOSTIC_FIELDS)
+
+
+def _unity_selection(selection):
+    reviewed = selection.get('unity_receipt')
+    if reviewed is None:
+        return None
+    D._object(reviewed, {'attempt_id', 'path', 'sha256', 'required_cases', 'capture_identity'},
+              {'expected_diagnostics'})
+    identity = reviewed['capture_identity']
+    D._object(identity, {'kind', 'sha256'})
+    cases = reviewed['required_cases']
+    D._require(D.WF.valid_id(reviewed['attempt_id'], 'C') and D._sha(reviewed['sha256'])
+               and identity['kind'] in ('editor-session', 'player-build') and D._sha(identity['sha256'])
+               and isinstance(cases, list) and 0 < len(cases) <= 256
+               and all(isinstance(case, str) and re.fullmatch(r'[a-z][a-z0-9-]{0,63}', case) for case in cases)
+               and len(cases) == len(set(cases)), 'Select an exact Unity evidence pointer and reviewed case ids')
+    D._scope(reviewed['path'])
+    diagnostics = reviewed.get('expected_diagnostics', [])
+    D._require(isinstance(diagnostics, list) and len(diagnostics) <= 128, 'Select bounded reviewed Unity expectations')
+    for item in diagnostics:
+        D._object(item, set(EXPECTED_DIAGNOSTIC_FIELDS))
+        D._require(item['case_id'] in cases and item['severity'] in UNITY_SEVERITIES
+                   and D._sha(item['signature_sha256']) and D._sha(item['expectation_sha256']),
+                   'Select an exact reviewed Unity expectation for a required case')
+    D._require(len({_expected_diagnostic_key(item) for item in diagnostics}) == len(diagnostics),
+               'Select distinct reviewed Unity expectations')
+    return reviewed
+
+
+def _unity_capture(summary, attempt, record):
+    capture = summary.get('capture')
+    if not isinstance(capture, dict) or capture.get('available') is not True:
+        return None, 'unity-capture-unavailable'
+    start, end = (_time(capture.get(field)) for field in ('start_utc', 'end_utc'))
+    if capture.get('complete') is not True or not start or not end or start >= end:
+        return None, 'unity-capture-incomplete'
+    prepared, recorded = _time(attempt.get('prepared_at')), _time(record.get('recorded_at'))
+    if not prepared or not recorded or not prepared <= start < end <= recorded:
+        return None, 'unity-capture-outside-attempt'
+    if not D._sha(capture.get('sha256')):
+        return None, 'unity-capture-unverified'
+    return {'available': True, 'complete': True, 'start_utc': start, 'end_utc': end, 'sha256': capture['sha256']}, None
+
+
+def _unique_object(pairs):
+    result = dict(pairs)
+    if len(result) != len(pairs):
+        raise ValueError('Unity receipt contains duplicate JSON keys')
+    return result
+
+
+def _unity_receipt(worktree, reviewed, scope, record, attempt):
+    pointer = {'path': reviewed['path'], 'sha256': reviewed['sha256'], 'available': True}
+    evidence = record.get('evidence', [])
+    if (worktree is None or attempt.get('attempt_id') != scope['attempt_id']
+            or record.get('classification') != 'executed-control'
+            or record.get('result') not in ('pass', 'fail')
+            or not any(all(item.get(key) == value for key, value in pointer.items()) for item in evidence)):
+        return None, 'unity-receipt-unavailable'
+    try:
+        path = D._safe_path(worktree, reviewed['path'])
+        if not path.is_file():
+            return None, 'unity-receipt-unavailable'
+        limit = 256 * 1024
+        with path.open('rb') as stream:
+            content = stream.read(limit + 1)
+        if not 0 < len(content) <= limit or D.WF.digest(content) != reviewed['sha256']:
+            return None, 'unity-receipt-unavailable'
+        summary = json.loads(content, object_pairs_hook=_unique_object)
+    except (OSError, TypeError, ValueError, RecursionError):
+        return None, 'unity-receipt-unavailable'
+    if not isinstance(summary, dict) or type(summary.get('schema')) is not int or summary['schema'] != 1:
+        return None, 'unity-receipt-unsupported'
+    expected = {key: scope[key] for key in ('assignment_id', 'run_id', 'attempt_id')}
+    expected.update(lane=record.get('actual_lane'), environment_identity=record.get('environment_identity'),
+                    capture_identity=reviewed['capture_identity'])
+    if (expected['lane'] not in CHECK_LANES or not D._sha(expected['environment_identity'])
+            or any(summary.get(key) != value for key, value in expected.items())):
+        return None, 'unity-receipt-foreign'
+    capture, gap = _unity_capture(summary, attempt, record)
+    if gap:
+        return None, gap
+    returned, groups = summary.get('cases'), summary.get('message_groups')
+    if (not isinstance(returned, dict) or len(returned) > 256 or not isinstance(groups, list) or len(groups) > 128
+            or any(not isinstance(case, str) or not re.fullmatch(r'[a-z][a-z0-9-]{0,63}', case)
+                   or result not in ('pass', 'fail', 'skipped', 'unreached') for case, result in returned.items())):
+        return None, 'unity-receipt-unsupported'
+    required = set(reviewed['required_cases'])
+    projected = {case: {'functional': returned.get(case, 'missing'),
+                        'verdict': 'eligible' if returned.get(case) == 'pass' else 'open'}
+                 for case in sorted(required)}
+    gaps = [{'reason': 'unity-required-case-unavailable', 'case_id': case}
+            for case in sorted(required) if returned.get(case) in (None, 'skipped', 'unreached')]
+    observations = {}
+    expectations = {_expected_diagnostic_key(item) for item in reviewed.get('expected_diagnostics', [])}
+    uncertain = set()
+    for group in groups:
+        if not isinstance(group, dict):
+            return None, 'unity-receipt-unsupported'
+        case, signature, severity, classification, count = (
+            group.get(key) for key in ('case_id', 'signature_sha256', 'severity', 'classification', 'count'))
+        if (not D._sha(signature) or severity not in UNITY_SEVERITIES
+                or classification not in ('fresh', 'expected', 'prior-session', 'out-of-window')
+                or type(count) is not int or not 0 < count <= 1000000
+                or (case is not None and (not isinstance(case, str) or case not in returned and case not in required))):
+            return None, 'unity-receipt-unsupported'
+        if case is not None and case not in required:
+            continue
+        key = D._digest([scope['queue_id'], scope['run_id'], scope['assignment_id'], scope['attempt_id'],
+                         case, classification, severity, signature])
+        if key in observations:
+            return None, 'unity-receipt-unsupported'
+        projected_group = {'id': key, 'signature_sha256': signature, 'severity': severity,
+                           'classification': classification, 'count': count}
+        if case in required:
+            projected_group['case_id'] = case
+        if classification == 'expected':
+            if (returned.get(case) in ('pass', 'fail') and D._sha(group.get('expectation_sha256'))
+                    and _expected_diagnostic_key(group) in expectations):
+                projected_group['expectation_sha256'] = group['expectation_sha256']
+            else:
+                gap = {'reason': 'unity-expected-diagnostic-unverified'}
+                if case in required:
+                    gap['case_id'] = case
+                gaps.append(gap)
+                uncertain.update(required if case is None else (case,))
+                projected_group['classification'] = 'expected-unverified'
+        elif classification == 'fresh':
+            if case is None:
+                gaps.append({'reason': 'unity-message-case-unavailable'})
+                uncertain.update(required)
+            elif severity in ('error', 'exception', 'assertion'):
+                projected[case].update(verdict='held', next_owner='unity')
+            elif projected[case]['verdict'] == 'eligible':
+                projected[case]['verdict'] = 'review'
+        observations[key] = projected_group
+    for case in uncertain:
+        if projected[case]['verdict'] != 'held':
+            projected[case]['verdict'] = 'open'
+    return {'evidence_sha256': reviewed['sha256'], 'lane': expected['lane'],
+            'environment_identity': expected['environment_identity'], 'capture_identity': expected['capture_identity'],
+            'capture': capture, 'cases': projected, 'message_groups': list(observations.values()), 'gaps': gaps}, None
 
 
 def _progress_slots(event, task_ids):
@@ -368,7 +516,8 @@ class DirectorAudit:
         self.plans = D._plan_helper(registry)
 
     def _audit_selection(self, selection, assignments, director, registry, bindings):
-        D._object(selection, {'assignment_id', 'run_id'}, {'event_ids', 'journal_export_sha256'})
+        D._object(selection, {'assignment_id', 'run_id'}, {'event_ids', 'journal_export_sha256', 'unity_receipt'})
+        unity_selection = _unity_selection(selection)
         name, run_id = selection['assignment_id'], selection['run_id']
         D._require(D._token(name) and name in assignments and name in director['assignments']
                    and D.WF.valid_id(run_id, 'WR'), 'Select an exact admitted Director assignment and child run')
@@ -419,6 +568,7 @@ class DirectorAudit:
         observations, findings, timeline = [], {}, []
         duplicate_receipts = set()
         terminal_ids = set()
+        unity_attempts = []
         for event, source in events:
             before = _checkpoint(event.get('checkpoint_before'), task_ids)
             after = _checkpoint(event.get('checkpoint_after'), task_ids)
@@ -435,6 +585,8 @@ class DirectorAudit:
                 duplicate_receipts.add(identity)
                 evidence = {**base, **source, 'task_id': task_id, 'check_id': check_id, 'attempt_id': attempt_id,
                             'record_sha256': D._digest(record)}
+                if unity_selection and attempt_id == unity_selection['attempt_id']:
+                    unity_attempts.append((evidence, record, attempt))
                 if check_id == CHECK and not checked_generation:
                     verified = _generation(worktree)
                     checked_generation = True
@@ -469,6 +621,20 @@ class DirectorAudit:
                                 'status': 'completed' if retained['disposition'] == 'completed' else 'closed'}
                     observations.append({**terminal, 'classification': 'outcome'})
                     timeline.append({**terminal, 'event': 'outcome-recorded'})
+        if unity_selection:
+            if len(unity_attempts) != 1:
+                reason = 'unity-attempt-unavailable' if not unity_attempts else 'unity-attempt-ambiguous'
+                gaps.append({**base, 'attempt_id': unity_selection['attempt_id'], 'reason': reason})
+            else:
+                evidence, record, attempt = unity_attempts[0]
+                receipt, reason = _unity_receipt(worktree, unity_selection, evidence, record, attempt)
+                identifiers = {key: evidence[key] for key in ('task_id', 'check_id', 'attempt_id', 'record_sha256')}
+                if reason:
+                    gaps.append({**base, **identifiers, 'reason': reason})
+                else:
+                    gaps.extend({**base, **identifiers, **gap} for gap in receipt.pop('gaps'))
+                    status['unity_receipt'] = {**identifiers, **receipt,
+                                               'functional_counts': _check_diagnostics(record).get('counts')}
         for question_id, question in sorted(state['questions'].items()):
             if question.get('child_run_id') == run_id and question.get('phase') == 'waiting':
                 hold = run.get('director_question_hold') or {}

@@ -1,0 +1,16 @@
+{
+  "lane": "static",
+  "installation": "10c7397d83559bf57e726e2a9d7a43f47bb1d208135510e03b1f6758ae849706",
+  "package_pins": {
+    "references/game-design-mechanics.md": "a7ec439676b910c35bda57716d8439c0c45bf666efb7dbc5353c6e1f21badf86",
+    "references/game-design-patterns.md": "fc79285537c68a2d5e3bd1d31f548069010d49f01fca1f1133d12b9596bb4668"
+  },
+  "independent_context": "/root/game_design_mechanics_reader",
+  "observations": [
+    "Spanish reserva limitada resolves to bounded-reserve@1 with a stock ceiling, capacity after spending and original-seed@1 provenance.",
+    "English charge resolves to two candidate behaviors. A bounded resource stock follows a grant or spend event. Hold to boost drains a reserve on the active play clock.",
+    "Hold to boost supplies a partial match for a continuous speed increase. Mandatory verified haptics remain an explicit evidence gap, leaving zero verified matches for all required facets.",
+    "A resource cost followed by a decision-relevant clue resolves to spend-to-reveal@1. A bounded stock supplies resource context. A draft preview lacks a paid reveal. The additional catalog entries leave the five verified scope results current.",
+    "The mock private edition has a local locator and project-only annotation permission. The shared package inventory excludes the file and the evidence record omits the private text."
+  ]
+}

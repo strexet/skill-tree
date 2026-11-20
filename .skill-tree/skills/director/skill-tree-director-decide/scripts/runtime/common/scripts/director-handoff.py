@@ -112,6 +112,26 @@ class DirectorHandoffs:
             if observation['kind'] == 'director-handoff-amendment' and observation[endpoint] == selector:
                 yield observation
 
+    def _amendment_chain(self, selector, *, endpoint='previous'):
+        opposite = 'next' if endpoint == 'previous' else 'previous'
+        while True:
+            amendments = list(self._amendments(selector, endpoint=endpoint))
+            D._require(len(amendments) <= 1, 'Frozen plan has conflicting approved amendment receipts')
+            if not amendments:
+                return
+            amendment = amendments[0]
+            yield amendment
+            selector = amendment[opposite]
+
+    def superseded_assignments(self, selector):
+        """Find the first approved amendment affecting each prior assignment."""
+        superseded = {}
+        for amendment in self._amendment_chain(selector):
+            for name in amendment['affected']:
+                superseded.setdefault(name, {'previous': amendment['previous'], 'next': amendment['next'],
+                                             'amendment': amendment['preview_sha256']})
+        return superseded
+
     def _check_record(self, links, link_id, assignment, selector, registry, bindings):
         if link_id is None:
             return None
@@ -247,7 +267,7 @@ class DirectorHandoffs:
         affected = _reverse(left, right, direct)
         blockers = [{'reason': 'previous-plan-already-amended', 'archive_id': amendment['preview_sha256']}
                     for amendment in self._amendments(request['previous'])]
-        observations, writer_blockers = self._writers(left, right, affected, registry, bindings, request['previous']['plan_sha256'])
+        observations, writer_blockers = self._writers(left, right, affected, registry, bindings, request)
         blockers.extend(writer_blockers)
         blockers.extend(_replacements(left, right, direct))
         changes = []
@@ -262,21 +282,48 @@ class DirectorHandoffs:
                   'writer_observations': observations, 'blockers': blockers}
         return {**result, 'preview_sha256': D._digest(result)}
 
-    def _writers(self, left, right, affected, registry, bindings, plan_sha):
+    def _dispatch_blockers(self, child, spec, director_id, plan_sha):
+        task = spec['child'].get('task_id', '')
+        effects = set(spec.get('effects', ()))
+        intake = not task and 'intake' in effects
+        process = (task.startswith('P-') or intake) and 'process' in effects
+        start = (task.startswith('T-') or process) and 'launch' in effects and spec['workspace'] == 'recorded-worktree'
+        if not (intake or process or start):
+            return []
+        helper = D.WF.director_dispatch_helper()
+        envelope = {'schema': 1, 'director_id': director_id, 'assignment_id': spec['id'],
+                    'queue_id': spec['area']['queue_id'], 'plan_sha256': plan_sha}
+        blockers = []
+        for operation, reachable in (('intake', intake), ('process', process), ('start', start)):
+            if reachable:
+                claim = helper.conflicting_plan_claim(self.store, child, operation, envelope)
+                if claim:
+                    blockers.append({'assignment_id': spec['id'], 'operation': operation,
+                                     'queue_id': envelope['queue_id'], 'reason': 'dispatch-identity-already-claimed',
+                                     **claim})
+        return blockers
+
+    def _writers(self, left, right, affected, registry, bindings, request):
         targets = {}
         blockers = []
+        previous = request['previous']
+        inherited = set(affected)
+        affected_by_plan = {previous['plan_sha256']: inherited}
+        for amendment in self._amendment_chain(previous, endpoint='next'):
+            inherited = inherited.intersection(amendment['unaffected'])
+            if not inherited:
+                break
+            affected_by_plan[amendment['previous']['plan_sha256']] = inherited
         directory = D._safe_path(self.root, RUNS)
         for path in sorted(directory.glob('dr-*.json')):
             record, _ = D._read(self.root, f'{RUNS}/{path.name}')
-            if record['plan_sha256'] != plan_sha:
-                continue
-            for name in sorted(set(affected) & record['assignments'].keys()):
+            for name in sorted(affected_by_plan.get(record['plan_sha256'], set()) & record['assignments'].keys()):
                 state = record['assignments'][name]
                 if not state.get('completed') and record['phase'] not in {'paused', 'cancelled'}:
                     blockers.append({'assignment_id': name, 'reason': 'director-writer-requires-pause',
                                      'director_run_id': record['director_run_id']})
                 for operation, launch in sorted(state['dispatches'].items()):
-                    if launch.get('status') == 'prepared':
+                    if launch.get('status') in {'prepared', 'invoking'}:
                         blockers.append({'assignment_id': name, 'reason': 'dispatch-awaits-reconciliation',
                                          'operation': operation, 'director_run_id': record['director_run_id']})
                     if operation == 'start' and launch.get('status') == 'recorded':
@@ -291,12 +338,19 @@ class DirectorHandoffs:
             for area_id, task_ids in sorted(by_area.items()):
                 try:
                     root = O._child_root(registry, bindings, area_id)
-                    child = D.WF.Store(root, route_queue=False, neutral=True).load()
+                    child_store = D.WF.Store(root, route_queue=False, neutral=True)
+                    child = child_store.load()
                     claims = ['.skill-tree/.transaction.json', '.skill-tree/installation/.install-lock']
                     if root != self.root or not getattr(self.store, '_writer_active', False):
                         claims.append('.skill-tree/.writer-lock')
                     if any(D._safe_path(root, path).exists() for path in claims):
                         blockers.append({'assignment_id': name, 'area_id': area_id, 'reason': 'child-writer-in-progress'})
+                    next_spec = right.get(name)
+                    if next_spec and next_spec['area']['id'] == area_id:
+                        D._require(child['run_registry']['queue_id'] == next_spec['area']['queue_id'],
+                                   'Replacement child queue changed')
+                        blockers.extend(self._dispatch_blockers(child_store, next_spec, registry['director_id'],
+                                                                request['next']['plan_sha256']))
                     runs = child['run_registry']['runs']
                     launched = targets.get((name, area_id), set())
                     for unknown in sorted(launched - runs.keys()):

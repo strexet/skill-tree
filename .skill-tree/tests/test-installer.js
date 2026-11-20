@@ -5,6 +5,7 @@ const os = require("node:os");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 const test = require("node:test");
+const { filesAt } = require("../lib/installation.js");
 
 const root = path.resolve(__dirname, "..");
 const cli = path.join(root, "bin", "install.js");
@@ -446,4 +447,109 @@ test("explicit local source accepts the reorganized repository root", () => {
 });
 test('root shell launcher exposes the composed logical catalog and PowerShell points to the owned entrypoint',()=>{
  const result=spawnSync('sh',[path.join(root,'../install.sh'),'--list'],{encoding:'utf8',timeout:10000});assert.equal(result.status,0,result.stderr);assert.match(result.stdout,/Flavors: general, web, unity/);assert.match(result.stdout,/skill-tree-work-through-next/);assert.match(fs.readFileSync(path.join(root,'../install.ps1'),'utf8'),/\.skill-tree\/bin\/install\.js/);
+});
+
+for (const flavor of ["general", "web", "unity", "director"]) {
+  test(`${flavor} standalone game design installs reproduce the reviewed packages and preserve project records`, t => {
+    const names = ["skill-tree-game-design", "skill-tree-game-design-mechanics", "skill-tree-game-design-balance"];
+    const designRecords = new Map([
+      ["design/approved-values.md", "# Approved values\n\nRule R1 uses value 2 in the reviewed placement.\n"],
+      ["design/mechanics-atlas.md", "# Mechanics atlas\n\nThe known placement uses R1.\n"],
+      [".skill-tree/documents/future.md", fs.readFileSync(path.join(root, "tests/fixtures/future/valid.md"), "utf8")],
+    ]);
+
+    for (const name of names) {
+      const target = tmpdir();
+      t.after(() => fs.rmSync(target, { recursive: true, force: true }));
+      const projectFiles = new Map(designRecords);
+      if (flavor === "unity") {
+        projectFiles.set("ProjectSettings/ProjectVersion.txt", "m_EditorVersion: 6000.0.83f1\n");
+        projectFiles.set("Packages/manifest.json", JSON.stringify({
+          dependencies: {"com.unity.test-framework": "1.4.6", "com.unity.ugui": "2.0.0"},
+        }));
+        projectFiles.set("Packages/packages-lock.json", JSON.stringify({
+          dependencies: {"com.unity.test-framework": {version: "1.4.6"}, "com.unity.ugui": {version: "2.0.0"}},
+        }));
+        projectFiles.set("Assets/Tests/EditMode/Tests.asmdef",
+          JSON.stringify({name: "Tests", optionalUnityReferences: ["TestAssemblies"]}));
+      } else {
+        projectFiles.set("package.json", JSON.stringify({scripts: {test: "node --test"}}));
+      }
+      for (const [file, value] of projectFiles) {
+        fs.mkdirSync(path.dirname(path.join(target, file)), { recursive: true });
+        fs.writeFileSync(path.join(target, file), value);
+      }
+      const git = spawnSync("git", ["-C", target, "init", "-q"], {encoding: "utf8"});
+      assert.equal(git.status, 0, git.stderr);
+      const setup = spawnSync("python3", [path.join(root, "common/scripts/workflow-state.py"), "workspace-setup", target],
+        {encoding: "utf8"});
+      assert.equal(setup.status, 0, setup.stderr + setup.stdout);
+      const queueFile = ".skill-tree/documents/future.json";
+      const records = new Map([...projectFiles, [queueFile, fs.readFileSync(path.join(target, queueFile), "utf8")]]);
+      const state = JSON.parse(records.get(queueFile));
+      assert.equal(state.schema, 3);
+      assert.ok(state.tasks.length);
+      const args = ["--flavor", flavor, "--only", "codex", "--project", "--target", target, "--copy", "--skills", name];
+      const dry = run(["--dry-run", ...args]);
+      assert.equal(dry.status, 0, dry.stderr);
+      assert.match(dry.stdout, /dry-run/);
+      assert.equal(fs.existsSync(path.join(target, ".agents", "skills")), false);
+
+      const installed = run(args);
+      assert.equal(installed.status, 0, installed.stderr);
+      const skills = path.join(target, ".agents", "skills");
+      assert.deepEqual(fs.readdirSync(skills), [name]);
+      const relative = ".agents/skills/" + name;
+      const installedFiles = filesAt(target, relative);
+      const profile = JSON.parse(fs.readFileSync(path.join(target, ".skill-tree/installation/profile.json"), "utf8"));
+      assert.equal(profile.flavor, flavor);
+      assert.deepEqual(Object.keys(profile.destinations), [relative]);
+      assert.deepEqual(profile.destinations[relative].files, installedFiles);
+      const before = {...installedFiles};
+      const expected = filesAt(root, `skills/${flavor}/${name}`);
+      // The installer creates the target-specific profile and ordered plugin manifest.
+      delete before["references/project-profile.md"];
+      delete before["references/plugin-bindings.json"];
+      delete expected["references/project-profile.md"];
+      delete expected["references/plugin-bindings.json"];
+      assert.deepEqual(before, expected);
+
+      const repeat = run(args);
+      assert.equal(repeat.status, 0, repeat.stderr);
+      assert.match(repeat.stdout, /current|no-op/);
+      const verified = run(["--verify", ...args]);
+      assert.equal(verified.status, 0, verified.stderr);
+      assert.deepEqual(filesAt(target, relative), installedFiles);
+      for (const [file, original] of records) {
+        assert.equal(fs.readFileSync(path.join(target, file), "utf8"), original, file);
+      }
+    }
+  });
+}
+
+test("installer rejects an unavailable nested game-design reference without writing", t => {
+  const directory = tmpdir();
+  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const source = path.join(directory, "source");
+  const target = path.join(directory, "target");
+  fs.mkdirSync(source);
+  fs.mkdirSync(target);
+  fs.writeFileSync(path.join(target, "unchanged.txt"), "Preserve target bytes.\n");
+  for (const name of ["common", "domains", "templates", "config", "lib", "src"]) {
+    fs.cpSync(path.join(root, name), path.join(source, name), {recursive: true});
+  }
+  const map = path.join(source, "config/resource-map.json");
+  const resourceMap = JSON.parse(fs.readFileSync(map, "utf8"));
+  delete resourceMap["skill-tree-game-design"].references["narrative-human-playtest.md"];
+  fs.writeFileSync(map, JSON.stringify(resourceMap));
+  const before = filesAt(directory, "target");
+  const result = run(["--source", source, "--only", "codex", "--project", "--target", target,
+    "--copy", "--skills", "skill-tree-game-design"]);
+  assert.notEqual(result.status, 0, result.stdout);
+  const [refusal] = JSON.parse(result.stdout);
+  assert.equal(refusal.provider, "codex");
+  assert.equal(refusal.ok, false);
+  assert.match(refusal.error, /Missing composed link: .*game-design-playtest\.md.*narrative-human-playtest\.md/);
+  assert.deepEqual(filesAt(directory, "target"), before);
+  assert.equal(fs.existsSync(path.join(target, ".skill-tree/installation/profile.json")), false);
 });

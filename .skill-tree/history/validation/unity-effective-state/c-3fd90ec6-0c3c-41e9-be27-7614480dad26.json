@@ -1,0 +1,24 @@
+{
+  "verdict": "pass",
+  "reviewers": [
+    "/root/unity_effective_state_resolver"
+  ],
+  "cases": {
+    "override": "R@4/P@2 needs 750 active ms. Settings and Variant W supply 750, the scene instance override sets 450. This explains the serialized divergence only. Pin mode, actual clock scale and pause and test input and runtime assignment in authorized PlayMode. Unity owns discrepancy; Game Design owns proposed adoption.",
+    "writer": "v2 count 0. Interact and valid Host ack for K writes 0 to 1. A second transient writer first violates the rule before render at 1 to 2. Replay remains unreached. Unity checks the actual binding, writer order and game clock.",
+    "migration": "Check a copied v2 true with known occurrence mapped to v3 and zero extra replay grant. Separate deterministic migration/EditMode from the current reimported ordinary input and PlayMode receiver check. Editor, build, scene and device remain explicit unobserved context."
+  },
+  "installed": "Exact package-local Unity development, adapter and qualification digests match the owned profile, reviewed source proof and reachable skill links.",
+  "lane_limit": "No runtime, build or participant observation.",
+  "task_id": "T-039db45e-9242-4f28-82eb-06209a90fa6f",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/references/narrative-unity-adapter.md": "8b0d0c87edd43f3613a3c3c3abaf2841c6895c5e2bca3a38c66ea431ccc7c6f3",
+    ".skill-tree/common/references/narrative-unity-qualification.md": "29c62ce0207279be3e652624c099a4122787c3c604515e8f980a6184da9a6842",
+    ".skill-tree/domains/unity/development.md": "a38e60c5f3834da7ca9d39c934e0d07fb29eb116260acf4eb3a84176331f445c"
+  },
+  "input_sha256": {
+    "paper-cases.md": "cfc1fb9f0a687fa8b0d634629de54026c586e20fce78758367bcb9680454de5e",
+    "trial/.skill-tree/installation/profile.json": "536f7ad29cfa6ee31b4bea5812856eb454a0c61a0d76c00331610063fc1e5b7d"
+  }
+}

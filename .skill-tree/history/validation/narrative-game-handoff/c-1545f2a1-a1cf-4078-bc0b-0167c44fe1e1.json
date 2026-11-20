@@ -1,0 +1,43 @@
+{
+  "task_id": "T-b54ce9aa-958f-4902-84b1-b468fffd0e44",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/references/narrative-handoffs.md": "9fd4a296f3ad9582f8f812e6cf54e4bb47d5dcf48a8c2cde593230b96a775856",
+    ".skill-tree/common/references/narrative-impact.md": "ced37fbada13808982a66d7c951bb0fccee460971eeff942a8d7853404a294bb",
+    ".skill-tree/common/references/narrative-visual-reference-review.md": "689cf38e6a12f22e5049188b3667879a101a324ff9829dc1d2d2b6916f9951a0",
+    ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+  },
+  "previous_fingerprints": {
+    ".skill-tree/common/references/narrative-handoffs.md": "f5e08c884303e27da1821643b742105008c9a06301380e6dc75146319868b028",
+    ".skill-tree/common/references/narrative-impact.md": "ced37fbada13808982a66d7c951bb0fccee460971eeff942a8d7853404a294bb",
+    ".skill-tree/common/references/narrative-visual-reference-review.md": "689cf38e6a12f22e5049188b3667879a101a324ff9829dc1d2d2b6916f9951a0",
+    ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+  },
+  "exact_additions": {
+    ".skill-tree/common/references/narrative-handoffs.md": [
+      "",
+      "For a route replay handoff, include the accepted work, continuity, archive and record revisions and the [route producer evidence](narrative-route-checks.md). Verify the exact consumed model, state registry and case or trace pins against the plan. Confirm required normal and adverse case coverage before review. A draft or foreign-continuity capture can inform diagnosis. Production acceptance requires the matching accepted source. A declared-route result records the checked model trace. The consuming project verifies runtime separately."
+    ]
+  },
+  "observation": {
+    "verdict": "pass",
+    "reviewer": "/root/narrative_game_handoff_resolver",
+    "source_fingerprints": {
+      ".skill-tree/common/references/narrative-handoffs.md": "9fd4a296f3ad9582f8f812e6cf54e4bb47d5dcf48a8c2cde593230b96a775856",
+      ".skill-tree/common/references/narrative-impact.md": "ced37fbada13808982a66d7c951bb0fccee460971eeff942a8d7853404a294bb",
+      ".skill-tree/common/references/narrative-visual-reference-review.md": "689cf38e6a12f22e5049188b3667879a101a324ff9829dc1d2d2b6916f9951a0",
+      ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+    },
+    "current_owned_identity": "dab1037d4dc705efa9a5daa59fb5ee464e04657d830bcb1b173c2ceb174f9b28",
+    "observation": "Verified current 96 owned inventory hashes and all local links. Exact additive replay-specific note preserves public path and counter choices, unresolved lift, visual exclusions, incompatibility and independent control."
+  },
+  "previous_reviewers": [
+    "/root/narrative_game_handoff_resolver"
+  ],
+  "retained_cases": {
+    "character": "W/C/S#H@2 is the off-duty attendant. A courier can get directions to the announced public path. H has no storage authority. E-lift leaves the acting person and conditions open for Narrative.",
+    "location": "W/C/S#L@3 serves public courier exchange and optional visitor. Hall and counter permit handover. Bell summons counter assistance. Sealed storage excludes visitors.",
+    "visual": "Supplied V@1 retains exact locator and unknown reuse authority. The scarf is visual direction. Staff and depicted light power stay excluded.",
+    "compatibility": "Decline E-storage-bell on both accepted restrictions. Check denied entrance after ringing as affected. Public counter handover proceeds separately as independent control."
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "verdict": "pass",
+  "reviewers": [
+    "/root/art_gameplay_cues_resolver"
+  ],
+  "case_fixture_sha256": "378111bb4798763a7f232d58c67acac5d7c725196f7bc1196f77266f4aa33ec6",
+  "cases": {
+    "stale": "Exact M@2, fixed evaluated view, visibility at contact and measured 0.80 m. Candidate consumes M@1. Preserve unsealed original diagnostic and revisit the first affected source, retaining unrelated seals.",
+    "supplementary": "The known fixed-view fixture claim is scoped and qualified. An optional sweep time overrun supplies no extra view. Frozen diagnostic shots remain required where declared.",
+    "receiver": "Accepted source and seal agree. Parent scale override moves the effective marker to 1.60 m. Route to Unity on exact scene, instance and import while retaining the matching material result."
+  },
+  "observations": "Both installed 3D entrypoints and all three current reference digests match the owned source. Stage inspection binds input, attempt and candidate; stage-check verifies package inventory, hash and completion marker. Existing focused stage suite passed 30. Native receiver import remains unobserved.",
+  "task_id": "T-0fa52f17-9d44-49fb-96d6-7f50bfabf73e",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/references/3d-authoring-roles.md": "9983b41a3b78f7a359cf10572ba42a30bae63629661f7ee13c5a471d572306f9",
+    ".skill-tree/common/references/3d-stages.md": "67b77d81119767a7a848795563b2d2cf29d0c06db98e39411917700c2feafb35",
+    ".skill-tree/common/references/3d-unity-roles.md": "a2dfd76eab6f4d4565007cfcdc6009b4aa3583642cede908d12f6c7cbf04fd75"
+  },
+  "input_sha256": {
+    "fixture-cases.md": "378111bb4798763a7f232d58c67acac5d7c725196f7bc1196f77266f4aa33ec6",
+    "trial/.skill-tree/installation/profile.json": "26608371464a54348d85d645608b29c496540e4d9939bcfbb44c2efbe40f0c28",
+    "stages-tests.log": "94dd0bfc5e421d92ffafdbbf66905c0a536b0d17e6061d5fedb53c57059f6305"
+  }
+}
