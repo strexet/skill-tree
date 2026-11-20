@@ -329,7 +329,7 @@
     "sections": [
       {
         "id": "operation",
-        "text": "Read the [Director contract](references/director-workflow.md). Use scripts/director-entry.py setup-preview with the guided workspace request to review the initial workspace, exact area placements, selected sources and missing prerequisites. For prepared area registration, use setup-preview to inspect stable area, queue, profile and scope ownership and apply the identical reviewed registration with setup-apply only on explicit selection. Use rebind-preview and rebind for a moved exact canonical path. Keep installation and runtime admission separate."
+        "text": "Read the [Director contract](references/director-workflow.md). Use scripts/director-entry.py setup-preview with the guided workspace request to review the initial workspace, exact area placements, selected sources and missing prerequisites. On explicit approval of that preview, run scripts/director-entry.py setup-bootstrap with the same root and JSON containing request (the original guided request) and expected_preview_sha256 (the reviewed digest). A deferred result names the prerequisite and completed steps. Reuse the exact input to retry. For prepared area registration, use setup-preview to inspect stable area, queue, profile and scope ownership and apply the identical reviewed registration with setup-apply only on explicit selection. Use rebind-preview and rebind for a moved exact canonical path. Keep installation and runtime admission separate."
       }
     ]
   },
