@@ -1,0 +1,44 @@
+{
+  "task_id": "T-039db45e-9242-4f28-82eb-06209a90fa6f",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/references/narrative-unity-adapter.md": "8b0d0c87edd43f3613a3c3c3abaf2841c6895c5e2bca3a38c66ea431ccc7c6f3",
+    ".skill-tree/common/references/narrative-unity-qualification.md": "29c62ce0207279be3e652624c099a4122787c3c604515e8f980a6184da9a6842",
+    ".skill-tree/domains/unity/development.md": "6c14117e919fea145c6e7072f445e538cb036cb0da12bddc5e02c43c08d4bff8"
+  },
+  "previous_fingerprints": {
+    ".skill-tree/common/references/narrative-unity-adapter.md": "8b0d0c87edd43f3613a3c3c3abaf2841c6895c5e2bca3a38c66ea431ccc7c6f3",
+    ".skill-tree/common/references/narrative-unity-qualification.md": "29c62ce0207279be3e652624c099a4122787c3c604515e8f980a6184da9a6842",
+    ".skill-tree/domains/unity/development.md": "a38e60c5f3834da7ca9d39c934e0d07fb29eb116260acf4eb3a84176331f445c"
+  },
+  "exact_additions": {
+    ".skill-tree/domains/unity/development.md": [
+      "",
+      "## Summarize engine messages for one attempt",
+      "",
+      "Select the exact project and Editor session or Player build, actual lane and attempt. Record capture source digest and availability, start and end boundaries and whether the producing context observed the entire window. Keep required cases and reached steps identifiable. Report expected, discovered, passed, failed and skipped NUnit counts independently of engine message groups.",
+      "",
+      "Group fresh relevant messages by a stable digest of the locally normalized signature and severity. Record the count and the affected case or step when known. Keep expected diagnostics separate with the required expectation and matching case. Keep historical or out-of-window messages separate with an exclusion reason. If relevance or occurrence cannot be tied to the selected scope, record a gap for the affected claim. Preserve raw messages and stack traces in the owning project.",
+      "",
+      "A missing source, missing page, truncated tail, unknown capture format or foreign session leaves engine health unknown. A complete, available and empty relevant window supports a clean verdict for the selected scope only. A relevant fresh exception holds the covered criterion and can coexist with passing functional counts. Keep the verification lane and original tested condition in the report."
+    ]
+  },
+  "observation": {
+    "verdict": "pass",
+    "reviewer": "/root/unity_effective_state_resolver",
+    "source_fingerprints": {
+      ".skill-tree/common/references/narrative-unity-adapter.md": "8b0d0c87edd43f3613a3c3c3abaf2841c6895c5e2bca3a38c66ea431ccc7c6f3",
+      ".skill-tree/common/references/narrative-unity-qualification.md": "29c62ce0207279be3e652624c099a4122787c3c604515e8f980a6184da9a6842",
+      ".skill-tree/domains/unity/development.md": "6c14117e919fea145c6e7072f445e538cb036cb0da12bddc5e02c43c08d4bff8"
+    },
+    "observation": "Exact Engine Messages chapter is additive. Both original Narrative proof files and all paper interpretations match: 450/750 serialized versus active time, first K duplicate 1\u21922, v2\u2192v3 copied save migration separate from live reimport binding. Exact observed host remains unavailable."
+  },
+  "previous_reviewers": [
+    "/root/unity_effective_state_resolver"
+  ],
+  "retained_cases": {
+    "override": "R@4/P@2 needs 750 active ms. Settings and Variant W supply 750, the scene instance override sets 450. This explains the serialized divergence only. Pin mode, actual clock scale and pause and test input and runtime assignment in authorized PlayMode. Unity owns discrepancy; Game Design owns proposed adoption.",
+    "writer": "v2 count 0. Interact and valid Host ack for K writes 0 to 1. A second transient writer first violates the rule before render at 1 to 2. Replay remains unreached. Unity checks the actual binding, writer order and game clock.",
+    "migration": "Check a copied v2 true with known occurrence mapped to v3 and zero extra replay grant. Separate deterministic migration/EditMode from the current reimported ordinary input and PlayMode receiver check. Editor, build, scene and device remain explicit unobserved context."
+  }
+}

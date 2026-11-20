@@ -1,0 +1,155 @@
+{
+  "classification": "repository qualification",
+  "scope": "current reviewed source and isolated temporary installation",
+  "sources": {
+    ".skill-tree/config/flavors.json": "309bdbf204c51c5d14515f7aa776cf23c7ff7ea9c3833b9951e1016bc3630d18",
+    ".skill-tree/config/resource-map.json": "2f7187031191de2bfafca1d5c2c4807f991f4edffc95642b106d0a64a38d0529",
+    ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d",
+    ".skill-tree/tests/test-composer.js": "c74c7fdf806d9e59bc430ca624d829914daa62e6b29d14b01eb83e2cc44afa98",
+    ".skill-tree/tests/test-director-installation.js": "3721c721ae9323093ed3c2c674c3937800cbf64e5bc73afede1062f3c75cadef",
+    ".skill-tree/tests/test-installer.js": "c36461052f9db0c5ee9b68de099a29ce9b6203653c85c4d8a44db66bdfa1b89a"
+  },
+  "flavors": {
+    "general": {
+      "operations": 22,
+      "dry_run_preserved_bytes": {
+        "design/accepted-values.md": "b11212d3d3423b1c5d7457bc0a6153f9d6a6ede9d3fa7aa41e0d99d42af6119a"
+      }
+    },
+    "web": {
+      "operations": 22,
+      "dry_run_preserved_bytes": {
+        "design/accepted-values.md": "b11212d3d3423b1c5d7457bc0a6153f9d6a6ede9d3fa7aa41e0d99d42af6119a"
+      }
+    },
+    "unity": {
+      "operations": 22,
+      "dry_run_preserved_bytes": {
+        "design/accepted-values.md": "b11212d3d3423b1c5d7457bc0a6153f9d6a6ede9d3fa7aa41e0d99d42af6119a",
+        "ProjectSettings/ProjectVersion.txt": "aaca540088eb8edb92a63b8bcb2544b649d53bc652fa46d57ac4a1c9936ea06f",
+        "Packages/manifest.json": "6121fb9da71e3430413f00e63e2748c5ee8d2e69049c3963bc448cac6880a404"
+      }
+    },
+    "director": {
+      "operations": 31,
+      "dry_run_preserved_bytes": {
+        "design/accepted-values.md": "b11212d3d3423b1c5d7457bc0a6153f9d6a6ede9d3fa7aa41e0d99d42af6119a"
+      }
+    }
+  },
+  "logs": {
+    "python": {
+      "label": "python",
+      "command": [
+        "npm",
+        "run",
+        "test:py"
+      ],
+      "returncode": 0,
+      "started_utc": "2026-11-19T17:42:05.230303+00:00",
+      "ended_utc": "2026-11-19T18:21:18.754773+00:00",
+      "log_sha256": "55eddc191ac7e95bee046731a0b1f428481d3b9cb1b18a91d59375ff5f9b1fef",
+      "tail": [
+        "test_scoped_task_commit_sealing_does_not_execute_a_git_hook (test_workflow_state.WorkflowStateTests.test_scoped_task_commit_sealing_does_not_execute_a_git_hook) ... ok",
+        "test_selected_task_budget_requires_rationale (test_workflow_state.WorkflowStateTests.test_selected_task_budget_requires_rationale) ... ok",
+        "test_split_and_merge_provenance (test_workflow_state.WorkflowStateTests.test_split_and_merge_provenance) ... ok",
+        "test_split_forward_dependency_resolves_keys_atomically_and_orders_execution (test_workflow_state.WorkflowStateTests.test_split_forward_dependency_resolves_keys_atomically_and_orders_execution) ... ok",
+        "test_stale_check_inspection_uses_the_cli_without_writes (test_workflow_state.WorkflowStateTests.test_stale_check_inspection_uses_the_cli_without_writes) ... ok",
+        "test_stale_unbound_attempt_rejects_retroactive_binding_and_cleanup (test_workflow_state.WorkflowStateTests.test_stale_unbound_attempt_rejects_retroactive_binding_and_cleanup) ... ok",
+        "test_targeted_processing_never_consumes_unselected_work (test_workflow_state.WorkflowStateTests.test_targeted_processing_never_consumes_unselected_work) ... ok",
+        "test_unresolved_finding_protects_old_audit_until_scoped_resolution (test_workflow_state.WorkflowStateTests.test_unresolved_finding_protects_old_audit_until_scoped_resolution) ... ok",
+        "test_writer_lock_rejects_second_controller (test_workflow_state.WorkflowStateTests.test_writer_lock_rejects_second_controller) ... ok",
+        "",
+        "----------------------------------------------------------------------",
+        "Ran 795 tests in 2351.998s",
+        "",
+        "OK (skipped=3)"
+      ],
+      "path": ".skill-tree/artifacts/validation/game-design-package/complete-python.txt"
+    },
+    "node": {
+      "label": "node",
+      "command": [
+        "npm",
+        "run",
+        "test:node"
+      ],
+      "returncode": 0,
+      "started_utc": "2026-11-19T17:43:58.088062+00:00",
+      "ended_utc": "2026-11-19T17:48:23.170877+00:00",
+      "log_sha256": "91856bfc764bc48f5995d7c35a4f3ea7284ddf981870cd8b8ceb4dd9f1625bfd",
+      "tail": [
+        "# Subtest: installed implementation operations select scoped commits and local controller defaults",
+        "ok 393 - installed implementation operations select scoped commits and local controller defaults",
+        "  ---",
+        "  duration_ms: 8104.02375",
+        "  ...",
+        "1..393",
+        "# tests 393",
+        "# suites 0",
+        "# pass 393",
+        "# fail 0",
+        "# cancelled 0",
+        "# skipped 0",
+        "# todo 0",
+        "# duration_ms 264842.912458"
+      ],
+      "path": ".skill-tree/artifacts/validation/game-design-package/complete-node.txt"
+    },
+    "sync-check": {
+      "sha256": "bf54bfb2d28668ed5d6804c17991f3e824627d1aaa6c628beb48fd3809efddf2",
+      "bytes": 127,
+      "path": ".skill-tree/artifacts/validation/game-design-package/sync-check.log"
+    },
+    "strict-validation": {
+      "sha256": "8525dcfe9f8c6ded27bf4b0070e096c60b322aa6bf95a24fa2471f6366600437",
+      "bytes": 128,
+      "path": ".skill-tree/artifacts/validation/game-design-package/strict-validation.log"
+    },
+    "diff-check": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "path": ".skill-tree/artifacts/validation/game-design-package/diff-check.log"
+    },
+    "listed-general": {
+      "sha256": "3136b174678c8000c930e66a96381087c9edb7c75e5fb9f08e89dc20f46f37a5",
+      "bytes": 1801,
+      "path": ".skill-tree/artifacts/validation/game-design-package/listed-general.log"
+    },
+    "listed-web": {
+      "sha256": "3136b174678c8000c930e66a96381087c9edb7c75e5fb9f08e89dc20f46f37a5",
+      "bytes": 1801,
+      "path": ".skill-tree/artifacts/validation/game-design-package/listed-web.log"
+    },
+    "listed-unity": {
+      "sha256": "3136b174678c8000c930e66a96381087c9edb7c75e5fb9f08e89dc20f46f37a5",
+      "bytes": 1801,
+      "path": ".skill-tree/artifacts/validation/game-design-package/listed-unity.log"
+    },
+    "listed-director": {
+      "sha256": "876f868fafdb2b7b9574e91b58d9a4a6444d862106078a7c4aab47823c68659d",
+      "bytes": 2038,
+      "path": ".skill-tree/artifacts/validation/game-design-package/listed-director.log"
+    },
+    "dry-general": {
+      "sha256": "c2b42c2f5f5937dc503c62e1d69acab1b9551913f7b07b5f976516cf26d06220",
+      "bytes": 354376,
+      "path": ".skill-tree/artifacts/validation/game-design-package/dry-general.log"
+    },
+    "dry-web": {
+      "sha256": "2fe1e867e079a52b32752a5d2966b630464d7489d6f63feca6b7ae5d934c5804",
+      "bytes": 357211,
+      "path": ".skill-tree/artifacts/validation/game-design-package/dry-web.log"
+    },
+    "dry-unity": {
+      "sha256": "828a77605d999fa9639eb3ac13967b57d43971407bcf0023872706bedddc393e",
+      "bytes": 363781,
+      "path": ".skill-tree/artifacts/validation/game-design-package/dry-unity.log"
+    },
+    "dry-director": {
+      "sha256": "4378af7c339af2106946891c79d31145c456fc0fc3fbde9cf18fd0482f52e0c2",
+      "bytes": 414583,
+      "path": ".skill-tree/artifacts/validation/game-design-package/dry-director.log"
+    }
+  }
+}

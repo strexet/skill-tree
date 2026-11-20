@@ -5,7 +5,7 @@ const os = require('node:os');
 const path = require('node:path');
 const source = path.resolve(__dirname, '..');
 const c = require('../lib/composer.js');
-const expectedOperations = ['skill-tree-3d','skill-tree-3d-blender','skill-tree-3d-motion','skill-tree-3d-references','skill-tree-3d-texture','skill-tree-3d-unity','skill-tree-add-pending-task','skill-tree-clarify-tasks','skill-tree-create-documents-snapshot','skill-tree-full-cycle','skill-tree-implement-all','skill-tree-implement-next-future-task','skill-tree-narative','skill-tree-plugins','skill-tree-pr-review-cycle','skill-tree-process-future-pending','skill-tree-repo-documentation','skill-tree-repo-documentation-audit','skill-tree-work-through-next'];
+const expectedOperations = ['skill-tree-3d','skill-tree-3d-blender','skill-tree-3d-motion','skill-tree-3d-references','skill-tree-3d-texture','skill-tree-3d-unity','skill-tree-add-pending-task','skill-tree-clarify-tasks','skill-tree-create-documents-snapshot','skill-tree-full-cycle','skill-tree-game-design','skill-tree-game-design-balance','skill-tree-game-design-mechanics','skill-tree-implement-all','skill-tree-implement-next-future-task','skill-tree-narative','skill-tree-plugins','skill-tree-pr-review-cycle','skill-tree-process-future-pending','skill-tree-repo-documentation','skill-tree-repo-documentation-audit','skill-tree-work-through-next'];
 function fixture(t) { const root=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-compose-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));return root; }
 function write(root,rel,data) { const p=path.join(root,rel);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,typeof data==='string'?data:JSON.stringify(data)); }
 test('source recipe identities survive composition and retain freshness and collision checks',t=>{
@@ -156,6 +156,68 @@ test('narrative composition rejects a missing topic referenced by the router', t
   assert.throws(() => c.compose(sourceCopy, profile, ['skill-tree-narative']),
     /Missing composed link: .*narrative-claims\.md/);
 });
+
+const gameDesignPackages = [
+  ['Game Design', 'skill-tree-game-design', [
+    ['game-design-gdd.md', 'game-design-disciplines.md', 'game-design-records.md'],
+    ['game-design-gdd.md', 'game-design-records.md'],
+    ['game-design-gdd.md', 'game-design-playtest.md', 'narrative-human-playtest.md'],
+  ]],
+  ['Balance', 'skill-tree-game-design-balance', [
+    ['game-design-balance-study.md', 'game-design-balance-methods.md', 'game-design-disciplines.md', 'game-design-records.md'],
+    ['game-design-balance-study.md', 'game-design-records.md'],
+    ['game-design-balance-study.md', 'game-design-playtest.md', 'narrative-human-playtest.md'],
+  ]],
+  ['Mechanics', 'skill-tree-game-design-mechanics', [
+    ['game-design-mechanics.md', 'game-design-patterns.md'],
+    ['game-design-mechanics.md', 'game-design-atlas.md', 'game-design-records.md'],
+    ['game-design-mechanics.md', 'game-design-disciplines.md', 'game-design-records.md'],
+  ]],
+];
+
+for (const [label, operation, chains] of gameDesignPackages) {
+  const entryReference = chains[0][0];
+  const unavailableResources = new Set(chains.map(chain => chain.at(-1)));
+  test(label + ' packages its authoring references in every flavor', t => {
+    for (const flavor of ['general', 'web', 'unity', 'director']) {
+      const root = fixture(t);
+      if (flavor === 'unity') {
+        write(root, 'ProjectSettings/ProjectVersion.txt', 'm_EditorVersion: 6000.0.83f1');
+        write(root, 'Packages/manifest.json', {dependencies: {}});
+      }
+      const profile = c.resolveProfile(source, root, flavor);
+      const files = c.compose(source, profile, [operation]).packages[operation];
+      assert.ok(files['SKILL.md'].includes('](references/' + entryReference + ')'));
+      for (const chain of chains) {
+        for (const [index, name] of chain.entries()) {
+          const reference = files['references/' + name];
+          assert.equal(reference, c.read(source, 'common/references/' + name));
+          if (index > 0) {
+            assert.ok(files['references/' + chain[index - 1]].includes('](' + name + ')'));
+          }
+        }
+      }
+    }
+  });
+
+  test(label + ' composition rejects unbundled authoring references', t => {
+    const sourceCopy = fixture(t);
+    for (const dir of ['common', 'domains', 'templates', 'config', 'lib', 'src']) {
+      fs.cpSync(path.join(source, dir), path.join(sourceCopy, dir), {recursive: true});
+    }
+    const resourceMap = JSON.parse(fs.readFileSync(path.join(sourceCopy, 'config/resource-map.json'), 'utf8'));
+    for (const dependency of unavailableResources) {
+      const original = resourceMap[operation].references[dependency];
+      assert.ok(original);
+      delete resourceMap[operation].references[dependency];
+      write(sourceCopy, 'config/resource-map.json', resourceMap);
+      const profile = c.resolveProfile(sourceCopy, fixture(t), 'general');
+      assert.throws(() => c.compose(sourceCopy, profile, [operation]), error =>
+        error.message.startsWith('Missing composed link: ') && error.message.endsWith(dependency));
+      resourceMap[operation].references[dependency] = original;
+    }
+  });
+}
 
 test('Director selects the scoped additional operations and packages the exact runtime for each', t => {
   const root = fixture(t);

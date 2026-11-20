@@ -4,6 +4,8 @@ from datetime import datetime, timedelta, timezone
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
+import sys
 import unittest
 from unittest.mock import patch
 
@@ -304,6 +306,171 @@ class DirectorRunAuditTests(unittest.TestCase):
             self.read()
         self.assertEqual(lock.read_text(), 'Fixture concurrent writer.\n')
 
+
+    def record_engine_summary(self, *, raw_transform=None, expected_diagnostics=None, **changes):
+        attempt = WF.prepare_check(self.store, {'task_id': self.task, 'check_id': PRODUCT_CHECK})
+        attempt_id = attempt['attempt_id']
+        relative = f'.skill-tree/artifacts/director/{attempt_id.lower()}-engine.json'
+        path = self.worktree / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        capture_identity = {'kind': 'editor-session', 'sha256': WF.digest(b'fixture editor session')}
+        summary = {'schema': 1, 'run_id': self.run_id, 'assignment_id': 'snapshot-check',
+                   'attempt_id': attempt_id, 'lane': 'unit', 'environment_identity': attempt['environment_identity'],
+                   'capture_identity': capture_identity,
+                   'capture': {'available': True, 'complete': True, 'start_utc': attempt['prepared_at'],
+                               'end_utc': datetime.now(timezone.utc).isoformat(), 'sha256': WF.digest(b'fixture raw log')},
+                   'cases': {'alpha': 'pass', 'beta': 'pass', 'gamma': 'pass'}, 'message_groups': [],
+                   'private': PRIVATE}
+        modified = changes.pop('capture', {})
+        summary['capture'].update(modified)
+        summary.update(changes)
+        content = WF.dump(summary)
+        path.write_text(raw_transform(content) if raw_transform else content)
+        counts = {'expected': 3, 'discovered': 3, 'passed': 3, 'failed': 0, 'skipped': 0}
+        WF.record_check(self.store, {'task_id': self.task, 'check_id': PRODUCT_CHECK, 'attempt_id': attempt_id,
+            'classification': 'executed-control', 'result': 'pass', 'actual_lane': 'unit',
+            'environment_identity': attempt['environment_identity'], 'cleanup': 'Disposable portable audit fixture.',
+            'evidence': [relative], 'counts': counts})
+        selection = self.request['selections'][0]
+        request = {**self.request, 'selections': [{**selection, 'unity_receipt': {'attempt_id': attempt_id,
+            'path': relative, 'sha256': WF.file_hash(path), 'required_cases': ['alpha', 'beta', 'gamma'],
+            'capture_identity': capture_identity}}]}
+        if expected_diagnostics is not None:
+            request['selections'][0]['unity_receipt']['expected_diagnostics'] = expected_diagnostics
+        return request, path, counts
+
+    def install_engine_audit(self):
+        result = subprocess.run(['node', str(HERE.parent / 'bin/install.js'), '--target', str(self.fixture.parent),
+                                 '--only', 'codex', '--flavor', 'director', '--skills', 'skill-tree-director-audit'],
+                                capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def read_engine_cli(self, request):
+        path = self.fixture.base / 'selected-engine-review.json'
+        path.write_text(WF.dump(request))
+        entry = self.fixture.parent / '.agents/skills/skill-tree-director-audit/scripts/director-entry.py'
+        result = subprocess.run([sys.executable, '-B', str(entry), 'audit', str(self.fixture.parent), '--input', str(path)],
+                                capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return json.loads(result.stdout)
+
+    def test_selected_engine_receipt_holds_only_affected_case_and_replays(self):
+        expectation = {'case_id': 'beta', 'signature_sha256': WF.digest(b'fresh-signature'),
+                       'severity': 'exception', 'expectation_sha256': WF.digest(b'reviewed expected diagnostic')}
+        groups = [{'case_id': 'beta', 'signature_sha256': WF.digest(b'fresh-signature'),
+                   'severity': 'exception', 'classification': 'fresh', 'count': 100, 'raw_text': PRIVATE},
+                  {'case_id': 'gamma', 'signature_sha256': WF.digest(b'historical-signature'),
+                   'severity': 'warning', 'classification': 'prior-session', 'count': 2, 'raw_text': PRIVATE},
+                  {**expectation, 'classification': 'expected', 'count': 1, 'raw_text': PRIVATE}]
+        mixed, _, counts = self.record_engine_summary(message_groups=groups, expected_diagnostics=[expectation])
+        clean, _, _ = self.record_engine_summary()
+        self.install_engine_audit()
+        before = [self.files(root) for root in (self.fixture.parent, self.fixture.root, self.worktree)]
+        report = self.read_engine_cli(mixed)
+        self.assertEqual(report, self.read_engine_cli(mixed))
+        self.assertEqual(report, self.read(mixed))
+        self.assertEqual([self.files(root) for root in (self.fixture.parent, self.fixture.root, self.worktree)], before)
+        self.assertNotIn(PRIVATE, WF.dump(report))
+        self.assertNotIn(str(self.fixture.base), WF.dump(report))
+        details = report['child_status'][0]['unity_receipt']
+        self.assertEqual(details['functional_counts'], counts)
+        self.assertEqual({case: result['verdict'] for case, result in details['cases'].items()},
+                         {'alpha': 'eligible', 'beta': 'held', 'gamma': 'eligible'})
+        self.assertEqual(details['cases']['beta']['next_owner'], 'unity')
+        self.assertEqual([(item['classification'], item['count']) for item in details['message_groups']],
+                         [('fresh', 100), ('prior-session', 2), ('expected', 1)])
+        self.assertEqual(len({item['id'] for item in details['message_groups']}), 3)
+        self.assertEqual(details['message_groups'][2]['expectation_sha256'], expectation['expectation_sha256'])
+        self.assertFalse(any(row['reason'] == 'unity-expected-diagnostic-unverified' for row in report['coverage_gaps']))
+        control = self.read(clean)['child_status'][0]['unity_receipt']
+        self.assertEqual({row['verdict'] for row in control['cases'].values()}, {'eligible'})
+        self.assertEqual(control['lane'], 'unit')
+        self.assertEqual(control['message_groups'], [])
+        self.assertNotIn('unity_receipt', self.read()['child_status'][0])
+
+    def test_selected_engine_receipt_requires_expected_diagnostic_evidence(self):
+        message = {'signature_sha256': WF.digest(b'unverified expectation'), 'severity': 'exception',
+                   'classification': 'expected', 'count': 1}
+        request, _, _ = self.record_engine_summary(message_groups=[message])
+        reply = self.read(request)
+        self.assertIn('unity-expected-diagnostic-unverified', {row['reason'] for row in reply['coverage_gaps']})
+        self.assertEqual({case['verdict'] for case in reply['child_status'][0]['unity_receipt']['cases'].values()},
+                         {'open'})
+        expectation = {key: message[key] for key in ('signature_sha256', 'severity')}
+        expectation.update(case_id='beta', expectation_sha256=WF.digest(b'approved expectation'))
+        expected = {**message, **expectation}
+        fresh = {**message, 'case_id': 'beta', 'classification': 'fresh'}
+
+        def dispositions(groups, **changes):
+            request, _, _ = self.record_engine_summary(message_groups=groups, expected_diagnostics=[expectation],
+                                                       **changes)
+            report = self.read(request)
+            details = report['child_status'][0]['unity_receipt']
+            verdicts = {name: case['verdict'] for name, case in details['cases'].items()}
+            gaps = {item.get('case_id') for item in report['coverage_gaps']
+                    if item['reason'] == 'unity-expected-diagnostic-unverified'}
+            return verdicts, gaps
+
+        self.assertEqual(dispositions([expected]), (dict.fromkeys(('alpha', 'beta', 'gamma'), 'eligible'), set()))
+        for invalid in (WF.digest(b'other expectation'), [expectation['expectation_sha256']]):
+            self.assertEqual(dispositions([{**expected, 'expectation_sha256': invalid}]),
+                             ({'alpha': 'eligible', 'beta': 'open', 'gamma': 'eligible'}, {'beta'}))
+        self.assertEqual(dispositions([{**expected, 'case_id': 'gamma'}]),
+                         ({'alpha': 'eligible', 'beta': 'eligible', 'gamma': 'open'}, {'gamma'}))
+        self.assertEqual(dispositions([expected], cases={'alpha': 'pass', 'beta': 'unreached', 'gamma': 'pass'}),
+                         ({'alpha': 'eligible', 'beta': 'open', 'gamma': 'eligible'}, {'beta'}))
+        for messages in ([message, fresh], [fresh, message]):
+            self.assertEqual(dispositions(messages), ({'alpha': 'open', 'beta': 'held', 'gamma': 'open'}, {None}))
+
+    def test_selected_engine_receipt_reports_bounded_coverage_gaps(self):
+        missing, _, _ = self.record_engine_summary(cases={'alpha': 'pass', 'gamma': 'pass'})
+        partial = self.read(missing)
+        self.assertIn(('unity-required-case-unavailable', 'beta'),
+                      {(row['reason'], row.get('case_id')) for row in partial['coverage_gaps']})
+        scopes = [({'capture': {'complete': False}}, 'unity-capture-incomplete'),
+                  ({'capture': {'start_utc': '2026-01-01T10:00:00Z', 'end_utc': '2026-01-01T10:01:00Z'}},
+                   'unity-capture-outside-attempt'),
+                  ({'schema': 2}, 'unity-receipt-unsupported'),
+                  ({'run_id': WF.identity('WR')}, 'unity-receipt-foreign'),
+                  ({'capture_identity': {'kind': 'editor-session', 'sha256': WF.digest(b'other session')}},
+                   'unity-receipt-foreign')]
+        for changes, reason in scopes:
+            with self.subTest(reason=reason):
+                request, _, _ = self.record_engine_summary(**changes)
+                result = self.read(request)
+                self.assertIn(reason, {row['reason'] for row in result['coverage_gaps']})
+                self.assertNotIn(PRIVATE, WF.dump(result))
+        invalid_bytes = [
+            lambda content: content.replace('"alpha": "pass"', '"alpha": "fail", "alpha": "pass"'),
+            lambda content: content + ' ' * (256 * 1024),
+        ]
+        for transform in invalid_bytes:
+            invalid, _, _ = self.record_engine_summary(raw_transform=transform)
+            reply = self.read(invalid)
+            self.assertIn('unity-receipt-unavailable', {row['reason'] for row in reply['coverage_gaps']})
+            self.assertNotIn('unity_receipt', reply['child_status'][0])
+        request, path, _ = self.record_engine_summary()
+        other = path.with_name('other-receipt.json')
+        other.write_bytes(path.read_bytes())
+        wrong_pointer = deepcopy(request)
+        wrong_pointer['selections'][0]['unity_receipt']['path'] = str(other.relative_to(self.worktree))
+        path.write_text(path.read_text() + '\n')
+        for selected in (wrong_pointer, request):
+            reply = self.read(selected)
+            self.assertIn('unity-receipt-unavailable', {row['reason'] for row in reply['coverage_gaps']})
+            self.assertNotIn(PRIVATE, WF.dump(reply))
+        absent = deepcopy(request)
+        absent['selections'][0]['unity_receipt']['attempt_id'] = WF.identity('C')
+        self.assertIn('unity-attempt-unavailable', {row['reason'] for row in self.read(absent)['coverage_gaps']})
+        path.unlink()
+        self.assertIn('unity-receipt-unavailable', {row['reason'] for row in self.read(request)['coverage_gaps']})
+        case = {'signature_sha256': WF.digest(b'unattributed failure'), 'severity': 'exception',
+                'classification': 'fresh', 'count': 1}
+        unbound, _, _ = self.record_engine_summary(message_groups=[case])
+        result = self.read(unbound)
+        self.assertIn('unity-message-case-unavailable', {row['reason'] for row in result['coverage_gaps']})
+        self.assertEqual({value['verdict'] for value in result['child_status'][0]['unity_receipt']['cases'].values()},
+                         {'open'})
 
 if __name__ == '__main__':
     unittest.main()

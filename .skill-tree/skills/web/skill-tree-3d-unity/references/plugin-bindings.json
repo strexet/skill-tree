@@ -574,6 +574,96 @@
       },
       {
         "anchor": "before",
+        "operation": "skill-tree-game-design",
+        "phrase": "before skill-tree-game-design"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-game-design",
+        "phrase": "before skill-tree: game design"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-game-design",
+        "phrase": "during skill-tree-game-design"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-game-design",
+        "phrase": "during skill-tree: game design"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-game-design",
+        "phrase": "after skill-tree-game-design"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-game-design",
+        "phrase": "after skill-tree: game design"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-game-design-balance",
+        "phrase": "before skill-tree-game-design-balance"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-game-design-balance",
+        "phrase": "before skill-tree: balance"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-game-design-balance",
+        "phrase": "during skill-tree-game-design-balance"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-game-design-balance",
+        "phrase": "during skill-tree: balance"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-game-design-balance",
+        "phrase": "after skill-tree-game-design-balance"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-game-design-balance",
+        "phrase": "after skill-tree: balance"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-game-design-mechanics",
+        "phrase": "before skill-tree-game-design-mechanics"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-game-design-mechanics",
+        "phrase": "before skill-tree: mechanics"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-game-design-mechanics",
+        "phrase": "during skill-tree-game-design-mechanics"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-game-design-mechanics",
+        "phrase": "during skill-tree: mechanics"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-game-design-mechanics",
+        "phrase": "after skill-tree-game-design-mechanics"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-game-design-mechanics",
+        "phrase": "after skill-tree: mechanics"
+      },
+      {
+        "anchor": "before",
         "operation": "skill-tree-implement-all",
         "phrase": "before skill-tree-implement-all"
       },
@@ -918,7 +1008,7 @@
         "phrase": "after-validation skill-tree-repo-documentation-audit"
       }
     ],
-    "digest": "ec98c07134188057d3f07ea01042c374be1d3b9d7d7402fff15086a457ef72a2",
+    "digest": "7ad40c3e9ca39efed322d353f5b4a0cf3a77caefc4e1621d20ecea9513741339",
     "entries": [
       {
         "anchor": "before",
@@ -2005,6 +2095,177 @@
       },
       {
         "anchor": "before",
+        "boundary_id": "skill-tree-game-design:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-game-design:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-game-design:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-game-design-balance:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design-balance",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-game-design-balance:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design-balance",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-game-design-balance:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design-balance",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-game-design-mechanics:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design-mechanics",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-game-design-mechanics:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design-mechanics",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-game-design-mechanics:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design-mechanics",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
         "boundary_id": "skill-tree-implement-all:before",
         "context_kinds": [
           "request",
@@ -2822,6 +3083,9 @@
       "skill-tree-director-setup",
       "skill-tree-director-status",
       "skill-tree-full-cycle",
+      "skill-tree-game-design",
+      "skill-tree-game-design-balance",
+      "skill-tree-game-design-mechanics",
       "skill-tree-implement-all",
       "skill-tree-implement-next-future-task",
       "skill-tree-narative",
@@ -2833,10 +3097,10 @@
       "skill-tree-work-through-next"
     ]
   },
-  "configuration_digest": "ea848ac9e2f5717503d211fcca3f7acfe62b1b4d0453a44a23f0b90527f45187",
+  "configuration_digest": "1d4ded90f74588a33443cca0a2da314364e2a91faff9e7955ed7ac521848e0ff",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "a14d69bd0ecea6c20f51d988133d26e41c0f7f4fde0969a8473f3be01a44bd14",
+  "identity": "31093d60f68957b89b166a5f61e200cdefe4c6a0e42849a1733ed73430a59085",
   "operation": "skill-tree-3d-unity",
   "operations": {
     "skill-tree-3d": {
@@ -2896,6 +3160,15 @@
     "skill-tree-full-cycle": {
       "title": "Skill-Tree: Full Cycle"
     },
+    "skill-tree-game-design": {
+      "title": "Skill-Tree: Game Design"
+    },
+    "skill-tree-game-design-balance": {
+      "title": "Skill-Tree: Balance"
+    },
+    "skill-tree-game-design-mechanics": {
+      "title": "Skill-Tree: Mechanics"
+    },
     "skill-tree-implement-all": {
       "title": "Skill-Tree: Implement All"
     },
@@ -2927,9 +3200,9 @@
   "owned_resources": {
     "SKILL.md": "7bfe60864e7999422cb4b4f0143765ac7817bf9cc372dba2a1b5b2b549349d09",
     "agents/openai.yaml": "e99d5750e343a6b0de0edaeab08a49050e62ff4d9a8869b87fa52e94f5121273",
-    "references/3d-authoring-roles.md": "04c2f2b6bf78408f7fa029e9ac9137fa72a98c09d7a772baae6ee65ae5f92051",
-    "references/3d-stages.md": "61137321d19c01d4e848000553222bd5b7da336d5ab1b1d1ceeed84a1a9e9eb7",
-    "references/3d-unity-roles.md": "474bc107b8c74d33ecd035e1a21b1c0ade4f953ad2659d18e1270740d6f52559",
+    "references/3d-authoring-roles.md": "9983b41a3b78f7a359cf10572ba42a30bae63629661f7ee13c5a471d572306f9",
+    "references/3d-stages.md": "67b77d81119767a7a848795563b2d2cf29d0c06db98e39411917700c2feafb35",
+    "references/3d-unity-roles.md": "a2dfd76eab6f4d4565007cfcdc6009b4aa3583642cede908d12f6c7cbf04fd75",
     "references/3d-workflow.md": "04f4a3dca5abc63e016b916541c787006478ad9b883c56d53811addeccdea6db",
     "references/3d-workshop-roles.md": "ed3cd2f786a61bb9a76ff4dfa2141ded4d43852c11ab8dfe6d11afe95bb8c8af",
     "references/decision-governance.md": "52f8dc84c7cae4b9aa3aaa010d3ffb605ab79f5d75aaa36b9370d51e49305222",

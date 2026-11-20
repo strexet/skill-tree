@@ -574,6 +574,96 @@
       },
       {
         "anchor": "before",
+        "operation": "skill-tree-game-design",
+        "phrase": "before skill-tree-game-design"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-game-design",
+        "phrase": "before skill-tree: game design"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-game-design",
+        "phrase": "during skill-tree-game-design"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-game-design",
+        "phrase": "during skill-tree: game design"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-game-design",
+        "phrase": "after skill-tree-game-design"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-game-design",
+        "phrase": "after skill-tree: game design"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-game-design-balance",
+        "phrase": "before skill-tree-game-design-balance"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-game-design-balance",
+        "phrase": "before skill-tree: balance"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-game-design-balance",
+        "phrase": "during skill-tree-game-design-balance"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-game-design-balance",
+        "phrase": "during skill-tree: balance"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-game-design-balance",
+        "phrase": "after skill-tree-game-design-balance"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-game-design-balance",
+        "phrase": "after skill-tree: balance"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-game-design-mechanics",
+        "phrase": "before skill-tree-game-design-mechanics"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-game-design-mechanics",
+        "phrase": "before skill-tree: mechanics"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-game-design-mechanics",
+        "phrase": "during skill-tree-game-design-mechanics"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-game-design-mechanics",
+        "phrase": "during skill-tree: mechanics"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-game-design-mechanics",
+        "phrase": "after skill-tree-game-design-mechanics"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-game-design-mechanics",
+        "phrase": "after skill-tree: mechanics"
+      },
+      {
+        "anchor": "before",
         "operation": "skill-tree-implement-all",
         "phrase": "before skill-tree-implement-all"
       },
@@ -918,7 +1008,7 @@
         "phrase": "after-validation skill-tree-repo-documentation-audit"
       }
     ],
-    "digest": "ec98c07134188057d3f07ea01042c374be1d3b9d7d7402fff15086a457ef72a2",
+    "digest": "7ad40c3e9ca39efed322d353f5b4a0cf3a77caefc4e1621d20ecea9513741339",
     "entries": [
       {
         "anchor": "before",
@@ -2005,6 +2095,177 @@
       },
       {
         "anchor": "before",
+        "boundary_id": "skill-tree-game-design:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-game-design:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-game-design:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-game-design-balance:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design-balance",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-game-design-balance:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design-balance",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-game-design-balance:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design-balance",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-game-design-mechanics:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design-mechanics",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-game-design-mechanics:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design-mechanics",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-game-design-mechanics:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design-mechanics",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
         "boundary_id": "skill-tree-implement-all:before",
         "context_kinds": [
           "request",
@@ -2822,6 +3083,9 @@
       "skill-tree-director-setup",
       "skill-tree-director-status",
       "skill-tree-full-cycle",
+      "skill-tree-game-design",
+      "skill-tree-game-design-balance",
+      "skill-tree-game-design-mechanics",
       "skill-tree-implement-all",
       "skill-tree-implement-next-future-task",
       "skill-tree-narative",
@@ -2833,10 +3097,10 @@
       "skill-tree-work-through-next"
     ]
   },
-  "configuration_digest": "ea848ac9e2f5717503d211fcca3f7acfe62b1b4d0453a44a23f0b90527f45187",
+  "configuration_digest": "1d4ded90f74588a33443cca0a2da314364e2a91faff9e7955ed7ac521848e0ff",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "78fdb6a4b2a0b37e6af6b7ee7d78dd8b36b67d56b06e597fc720da03bbb23c0b",
+  "identity": "0112522badc0843033c70f37d004a459f68904cde6b79c59f3a3de5d75f2fa44",
   "operation": "skill-tree-director-audit",
   "operations": {
     "skill-tree-3d": {
@@ -2896,6 +3160,15 @@
     "skill-tree-full-cycle": {
       "title": "Skill-Tree: Full Cycle"
     },
+    "skill-tree-game-design": {
+      "title": "Skill-Tree: Game Design"
+    },
+    "skill-tree-game-design-balance": {
+      "title": "Skill-Tree: Balance"
+    },
+    "skill-tree-game-design-mechanics": {
+      "title": "Skill-Tree: Mechanics"
+    },
     "skill-tree-implement-all": {
       "title": "Skill-Tree: Implement All"
     },
@@ -2925,15 +3198,15 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "284f78bb02ae3c33352bd11f97f971427edcf55e57cf03c15c2f2f794c1a14f7",
+    "SKILL.md": "ce6ca927c056ce103085ccc3370154c0c42077cb2e75a892ed9f23ee0053ac5e",
     "agents/openai.yaml": "8a366400c980d7f4bc6ab27694b7dbb1d957283f2dcfdd835c4530f3a40b8a81",
     "references/decision-governance.md": "52f8dc84c7cae4b9aa3aaa010d3ffb605ab79f5d75aaa36b9370d51e49305222",
     "references/development-practices.md": "467f46fe631af23c9b3c6dadcbeb6d4c20f311601e2e2f419f16ffc0a534b72e",
     "references/director-capabilities.json": "8cc57eb2504e2fa8cfa270d5181074fca7d5ae020a8f34608dfa6e98f018c4ca",
-    "references/director-workflow.md": "d6e79264a8e6d8d79d224a6b134f6d9bd64e40e856d32d70be7dd8f91cf08fbf",
+    "references/director-workflow.md": "5e38eeac44348fb66d25805b98d46b9c09fe5230643c4b2ae56c796ae39eb87e",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/future-workflow.md": "3a6bc83660773c23af11cf00eacb90ed618db701d464fd7fcd304d5d90fca50b",
-    "references/history-retention.md": "27ccf1029d9d65454f3d18dc05a0f72b57ce96417196a82fc2ad268cfffb7bb6",
+    "references/history-retention.md": "ff3fa8602fa29085b59f0aa5ae9f9da698bd5b5d5672235fe809018b18b4b801",
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
     "references/orchestration.md": "ba28f6d4cf9f1cd5a02cd3b70492caa76c4349aa6cdcb26c8ff5405c7d8376cb",
     "references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
@@ -2955,14 +3228,14 @@
     "scripts/plugin-sources.js": "13d853f9e64dec84cf92f4026ac71e4384e186cd96200543e400a852a46e4693",
     "scripts/runtime/common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/runtime/common/scripts/decision-orchestration.py": "d2c5ac475033ae06321fc7917ddf96232a0e442bef7c5db537891e12164fd404",
-    "scripts/runtime/common/scripts/director-audit.py": "72be9cbe9502f6c95ac506527342eed0ab5194dac511fcedf592c2f71c032bb8",
-    "scripts/runtime/common/scripts/director-dispatch.py": "e7f0b8514c5facbe99dbf1d7ffd8cd1b24de55e6dc1ecd704473e17ab7ceba9a",
-    "scripts/runtime/common/scripts/director-handoff.py": "9faeea72c0da426ac4ffbacf90b1aeb00fd61622d287cbd6bab7edf1c806f595",
+    "scripts/runtime/common/scripts/director-audit.py": "b0bfedc67c5fcd6297f60c2946b7a2b45bbde8c6632e8ea9f313275f2fdab8df",
+    "scripts/runtime/common/scripts/director-dispatch.py": "0afae9cb9144a0e21cb52964b4f81f448733eccebceb10a391e31c791465c84a",
+    "scripts/runtime/common/scripts/director-handoff.py": "19a5ffc7f21d1199954e4953b6d9e704c880cb69d533004ae2c918ba6eb2116b",
     "scripts/runtime/common/scripts/director-objectives.py": "18a0e664d1eb9074983a22abf27ecb4076d2bd1b3d24ed6cac5ace41f459f373",
     "scripts/runtime/common/scripts/director-plan-adapters.py": "5beaf73d5e1835b54bc3fe49ed67fa138ec3c3f060984ab1b0a9a43fd3849de5",
     "scripts/runtime/common/scripts/director-plans.py": "b28d8e4326dda6c390586759e36750c74cb909169ff244ecfe7af1e359bfb863",
     "scripts/runtime/common/scripts/director-questions.py": "db9a54c1824c7fc9ec1f11d5fd51ac4bfe49cf1805b9a12eb3ead1a83d323761",
-    "scripts/runtime/common/scripts/director-run.py": "39df8b55c1fd9df31e4291c3479e18f0771f6643d13c263c62c40500dca9251b",
+    "scripts/runtime/common/scripts/director-run.py": "a97cc1dc92e89f3747b336a733b52a45d7af804a09314e8cffda64f63882bc84",
     "scripts/runtime/common/scripts/director-source-repair.py": "82a7d3a88565d45c33fe56fe940a28b6a34d533dafed3672d825ea2f400221ca",
     "scripts/runtime/common/scripts/director-state.py": "07dc505df5c65c0902a9f148ef63b09266918bfbc942f08863398aa431525ba6",
     "scripts/runtime/common/scripts/narrative-state.py": "ad6618d06fc1b2cac79694a64ff5733bdd03a330e0714851e04e185d108c1388",

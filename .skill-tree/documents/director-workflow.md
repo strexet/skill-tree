@@ -32,6 +32,23 @@ A source pin identifies the owning area, record or artifact, accepted revision, 
 
 The completed-work index separates owner acceptance, current source, evidence availability, consumer verification, integration and delivery. Status projects recorded objective and child health. Plan projects impacted pins and proposes exact amendments. A changed source opens affected recorded consumers and preserves historical and independent evidence. An approved amendment binds the frozen next revision after affected writers reconcile.
 
+## Route a design or production order
+
+Start intake with the requested result, owner and observable end condition. A short brief or rule revision, mechanics inventory or placement, balance study, and asset-only request each use a scoped owner result. A standalone Game Design, Mechanics or Balance request can use the matching direct operation and end with a project document. A deliverable already inside a Director objective uses a scoped assignment and matching child result. An asset-only request has the agreed producer and applicable preview or import criterion for the stated delivery.
+
+A playable character or location is a production milestone with the following required handoffs.
+
+| Area | Accepted input and check |
+| --- | --- |
+| Narrative | Pin the work and continuity with the selected character role or location purpose, permitted interactions, relevant routes or scene facts and outstanding questions. Request only the facts the planned interaction consumes. |
+| Game Design | Pin the audience, repeated player activity, core mechanics and observable interaction from input to consequence. Record choices still open and any assumptions used in a workshop. |
+| 3D | Pin the selected art brief and the gameplay-relevant visibility, scale, attachment or collision requirements, with a matching review. The producer may present the approved handoff manually while the ArtWorkshop adapter is unavailable. |
+| Unity | Pin the selected imported artifact and actual rule or setting. Check the observable interaction under the recorded starting state. Record whether a preliminary proxy or the replacement asset supplied the observed behavior. |
+
+Request the missing story facts from Narrative and the missing gameplay question from Game Design before freezing affected production assignments. A separately scoped workshop can start on labeled assumptions and return choices for acceptance. Production freezes exact accepted input, write scope, effect, check and dependencies. After plan approval and exact execution selection, start independent art and preliminary gameplay work in parallel when the recorded resource and write scopes permit. A proxy supports the preliminary criterion only. Milestone review requires the applicable Unity consumer check on the selected imported revision and all required accepted evidence.
+
+Return to the Core queue only when the owner adopts a production change that requires child work. The bounded intake supplies the exact deliverable, accountable area, expected check and selected source pins. The normal authorization to intake, process or start applies to each effect. Keep unresolved comparisons or an author's creative question in the objective and review scope.
+
 ## Keep objective and completion records
 
 Use `objective-preview` with the stable objective ID, owner reference, original intent and acceptance criteria. An existing objective requires the current revision digest. `objective-apply` binds the reviewed preview and records the exact next revision. A matching retry returns the original receipt. `objective-read` can select the current objective or a retained revision. The parent workspace owns the objective journal and the existing recovery transaction.
@@ -72,6 +89,38 @@ Review reports producer acceptance, consumer evidence, integration and delivery 
 
 `impact-preview` compares consecutive frozen revisions of the same plan and reports affected and independent assignments. `amend-apply` verifies the preview digest and reconciles affected writers before applying the approved amendment. Affected prior evidence becomes superseded in current review. Unchanged assignments can reuse matching evidence across the accepted amendment. Original archives retain historical proof.
 
+Run status identifies the accepted amendment, both plan revisions and the withheld action for each affected assignment. Fresh intake, processing and launch require the current run digest and current eligibility under the Director writer lock. Prepared and invoking effects hold amendments that affect the active assignment, including assignments inherited from an earlier revision. A current supersession denial records one event for the same request. A stale fresh request leaves the journal intact. Exact child receipt replay and reconciliation preserve the original result.
+
+An affected new assignment cannot reuse a reachable dispatch identity claimed by a different plan. `impact-preview` reports `dispatch-identity-already-claimed` with the target queue, assignment, operation and earlier plan digest. Give the fresh effect a new assignment ID and review the revised plan. Keep an existing ID for evidence and status when the new assignment has no conflicting reachable effect. The provisional replacement gate still requires the verified final pin and matching check.
+
+## Review reciprocal impact after a design change
+
+Select the previous accepted revision and the proposed or newly accepted revision and identify the exact changed fact, rule, placement, asset binding or effective event. Read the consuming record before changing the scope. Record unchanged meaning, confirmed dependencies, suspected links and unexamined areas. Name an unaffected control with working source and evidence. Keep historical checks under the original pins and reopen the affected checks when the consumed condition changes. A changed whole-document pin keeps the existing conservative impact rule. A narrowly pinned unaffected condition can retain matching evidence after comparison.
+
+| Finding | Owner and disposition |
+| --- | --- |
+| Accepted canon changes a permitted action or route | Narrative identifies the accepted fact. Game Design and the affected Unity or 3D owner inspect the referenced event, binding and check. |
+| A design rule changes a cue, geometry requirement or state transition | Game Design records the revised rule. Narrative reviews any changed meaning, and 3D or Unity checks the applicable cue or effective event. |
+| A receiver differs from the accepted rule or artifact | The owner of the earliest mismatching source or binding repairs the implementation and rechecks the affected case. |
+| An optional idea conflicts with applicable canon or design | The proposing and owning areas revise or decline with the exact constraint, rationale and reconsideration condition. |
+
+Use existing impact preview and a reviewed amendment for changes to frozen required pins. Source history or a proposal grants no new effect. Ask the author when resolving the finding changes experience or canon, trades material cost, or expands approved scope. Present the feasible options, affected owners and checks, and one recommendation. Final review records current producer and consumer revisions, expected and executed rechecks and remaining scope. A later approved iteration gets a new assignment and retains the previous review.
+
+## Review selected branch reports
+
+Select the exact plan revision, assignment, criterion, producer and consumer revisions, attempt, actual environment and read-only artifact references. Verify the supported report format, required inputs and digests. Compare the required case set with the cases reached and reported. Keep supplementary observations in the report with separate coverage. Record the expected and observed result, earliest established divergence, missing and unreached steps, next owner and the evidence needed. Leave current verification open when the selected revision, format or evidence is unavailable.
+
+| Selected finding | Next owner and action |
+| --- | --- |
+| A route passes on foreign canon or a replaced accepted Narrative source | Narrative resolves the selected work and accepted source, then replays affected routes on that input. |
+| An accepted ArtWorkshop stage used a replaced predecessor | The 3D stage owner reconciles the earliest stale input and rechecks affected candidates. |
+| A current imported asset has a wrong effective value, writer or runtime binding | Unity inspects the selected object, actual environment and first differing input or write. |
+| A gameplay rule or tuning change requires a design decision | Game Design and the designated rule owner compare scoped alternatives. |
+| The result raises a question about comprehension, response or enjoyment | The observation owner proposes a suitable human attempt. An author decision covers the selected creative result. |
+| The required target or evidence is unavailable | The responsible area supplies the named prerequisite. The report records an open verification rather than a measured discrepancy. |
+
+An exact redelivery keeps one observation. A new attempt adds a separate result with the same criterion where applicable. Conflicting bytes under one identity, expired evidence and unsupported formats leave current verification open while original observations remain visible. Keep an unaffected sibling eligible when the criterion and consumed sources still match. Apply an accepted review or scope change through the existing guarded procedures and retain original source and plan references.
+
 ## Workspace selection and packaging
 
 Director coordination runs from the registered parent root. Serial work can use an existing clean or disjoint checkout. A scoped candidate can use an isolated artifact directory. A Git child controller can use the recorded worktree. An independent clone or runtime can supply required tool or writer isolation. Source checkout isolation and runtime isolation require separate evidence. Unity uses one named verified Editor, an exact project, independent caches, saves and outputs, and appropriate resource claims. Preserve existing child edits and locks.
@@ -81,6 +130,8 @@ The Director flavor contains setup, intake, plan, run, decide, status, review, a
 ## Audit selected runs
 
 Use `audit` with an exact `director_run_id` and a `selections` list. Each selection names the registered `assignment_id` and canonical child `run_id`. Add exact `event_ids` to narrow the reviewed events. An optional `journal_export_sha256` reads an existing portable export from the recorded worktree. The audit creates no export or queue entry. Run status includes normalized Director dispatch state and verified owner waits.
+
+Add `unity_receipt` to select one reviewed Unity summary from a recorded Core attempt. The [installed Audit reference](../common/references/director-workflow.md#audit-a-selected-unity-summary) defines the selection, versioned summary, minimal clean case and required evidence for excluding an expected diagnostic.
 
 Start diagnosis with `director_timeline` for the parent dispatch, recovery, question and lifecycle stages. An empty `selections` list inspects the parent alone. Use `child_status` for the current checkpoint, unresolved check attempts and coverage, and `child_timeline` for checkpoint transitions, prepared and recorded checks and final outcomes. Event references carry the owning queue, exact identity, sequence and repository-relative path. Check records retain the recorded lane, timing, diagnostic fingerprint and evidence hashes when present. Known holds distinguish profile refresh, Director questions, repeated unchanged failures and host-policy rejection. Private error text, question content and local paths remain in the owning context.
 
@@ -127,6 +178,28 @@ The selected result can bind a child run, accepted artifact, scoped recorded com
 Use `milestone-preview` to select an exact frozen plan and retained story, art and game evidence. Select public evidence when relevant. An accepted Narrative pin can establish story evidence. Art and game require matching checked child results or accepted adoptions. The required check covers the owning area and any linked artifacts belong to the assignment write scope. Supply the reviewed cross-area handoff when the plan contains required edges. A required provisional asset holds final acceptance until verified replacement.
 
 Use `milestone-apply` with the reviewed digest and exact owner authority to retain a reproducible slice. `milestone-read` reports archived evidence, current objective revision, current role evidence, missing inputs and applicable handoff status. An approved amendment affecting a required role holds the superseded milestone while preserving historical evidence. Current approval and release qualification remain separate. Release requires explicit delivery authority.
+
+## Review repair and prepare human acceptance
+
+Find the first divergence from an accepted fact, gameplay rule, visible asset or effective binding. Return the exact discrepancy to the area responsible for the first mismatch. Current technical recheck records the selected target, new producer and consumer revisions, affected cases, observed input and result, unchanged control and remaining coverage. Preserve earlier evidence and the missing steps that require a fresh attempt.
+
+Use the existing human observation procedure to present the supported build, scene entry, starting state, control and clock. Record the participant's first choice before intervention, stated expectation and relevant cue. Record the time and content of coaching and label the later observation. A known-route execution can establish reachability. Unaided discovery needs the selected relevant participant observation.
+
+| Observation | First check to distinguish the cause |
+| --- | --- |
+| The participant reports an unclear goal | Compare intended fact, delivered wording and the visible or audible cue before attributing meaning to Narrative, UI or integration. |
+| The goal is clear and the route was missed | Inspect the first choice and camera or affordance cue. Use a known-route control to distinguish discoverability from blocked traversal. |
+| The participant intended and tried an action that had no effect | Inspect ordinary input, current binding, guard and first state writer under the selected build conditions. |
+
+Return the playable entry point, current revisions, observed behavior, affected and unobserved scope, and one precise creative decision. Only the actual author's scoped response records creative acceptance. A technical pass can make the presentation eligible. Reopen the specific claim when a new technical or usability finding changes the evidence or the scope presented to the author.
+
+## Locate the first divergence in comparable handoffs
+
+Choose an ordinary and revised handoff under equivalent request, authorized scope, accepted facts and deliverable. Freeze both instruction revisions, actual available inputs, expected and consumed source pins and independent outcome criteria. Record differing conditions as comparison limits. Give the same compact records and controls to two separate reviewers. Ask each reviewer to reconstruct pins, coverage, earliest known discrepancy and next owner without the other review.
+
+Compare owner, affected step, missing evidence and unaffected control. Preserve disagreement and the evidence that could resolve the disagreement. Trace accepted intent, selected configuration and bindings, available evidence and owner waits before assigning an instruction or product cause. Missing decisive input leaves causal attribution open. A skill-level finding requires reproduction on the identified instruction revision and an independent outcome for the same conditions.
+
+Record adopt, revise or defer for an exact selected scope, known risk and residual uncertainty. An authorized fix rechecks the original case, an unaffected negative control and a new comparable request. A paper reconstruction qualifies the review procedure. Live comparative effectiveness requires matched project requests and reported actual results.
 
 ## Operator selections after the pilot
 

@@ -1,0 +1,41 @@
+{
+  "task_id": "T-6f8fb95e-c7c4-47b5-b678-072dac01b34f",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/references/unity-safety.md": "c4a96cdb4bc35a98fcab8ba6bf9c983252cd73d1cefaa439669cedcbed357df0",
+    ".skill-tree/domains/unity/development.md": "137ffcd141716dee0f930bf783cff989bfb1cd2048752ad763d0d6a32ba7af04"
+  },
+  "previous_fingerprints": {
+    ".skill-tree/common/references/unity-safety.md": "c4a96cdb4bc35a98fcab8ba6bf9c983252cd73d1cefaa439669cedcbed357df0",
+    ".skill-tree/domains/unity/development.md": "6c14117e919fea145c6e7072f445e538cb036cb0da12bddc5e02c43c08d4bff8"
+  },
+  "exact_additions": {
+    ".skill-tree/domains/unity/development.md": [
+      "",
+      "## Specify a project-owned interaction regression",
+      "",
+      "Pin the target revision, admitted scene and test assembly, accepted Narrative and Game Design records, selected rule and placement, exact adapter and effective bindings. Specify relevant initial state and save variants. Drive the ordinary player action through the same input and event path the fixture covers. Record the visible cue, action availability, acknowledged transition and before-and-after state from the named writer. Pin any supported replay or save restore and the exact before-and-after count for each one-time effect.",
+      "",
+      "Run a normal control, one isolated prerequisite substitution and one separately isolated writer substitution. Each substitution identifies the first changed step, expected result, actual result and later assertions left unexecuted. Restore both accepted behaviors and exercise the combined normal route and replay with an unaffected control. Distinguish the deliberately substituted fixture from an observed defect in the selected product.",
+      "",
+      "Use the authorized named PlayMode recipe, exact case IDs and expected discovery. Retain NUnit results, relevant engine capture, run and test identity, save and service isolation and cleanup. Report uncovered device, Player and human observations under the appropriate lane. Native execution requires an authorized target, a matching Editor or build, usable inputs and an isolated project fixture."
+    ]
+  },
+  "observation": {
+    "verdict": "pass",
+    "reviewer": "/root/unity_engine_messages_resolver",
+    "source_fingerprints": {
+      ".skill-tree/common/references/unity-safety.md": "c4a96cdb4bc35a98fcab8ba6bf9c983252cd73d1cefaa439669cedcbed357df0",
+      ".skill-tree/domains/unity/development.md": "137ffcd141716dee0f930bf783cff989bfb1cd2048752ad763d0d6a32ba7af04"
+    },
+    "observation": "Exact regression appendix only. Current owned package and development/safety pins verified; independent observer regenerated all seven captures and portable result byte-identically and rechecked known held/review/clean/unknown scopes and privacy."
+  },
+  "previous_reviewers": [
+    "/root/unity_engine_messages_resolver"
+  ],
+  "retained_cases": {
+    "fresh": "100 matching Beta exceptions in a complete selected window produce one signature and count 100; only Beta is held, Alpha and Gamma remain clean in scope.",
+    "exclusions": "The declared Gamma adverse case matches source, severity and signature. Prior session E0 warning remains excluded with reason. Fresh Alpha warning instead enters review. A complete empty relevant capture stays clean under the same lane.",
+    "coverage": "Truncation, foreign environment and unavailable capture all stay unknown while preserving independent expected/discovered/passed/failed/skipped counts 3/3/3/0/0."
+  }
+}

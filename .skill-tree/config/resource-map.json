@@ -983,6 +983,103 @@
       "validate-future-document.py": "common/scripts/validate-future-document.py"
     }
   },
+  "skill-tree-game-design": {
+    "references": {
+      "decision-governance.md": "common/references/decision-governance.md",
+      "document-rules.md": "common/references/document-rules.md",
+      "game-design-disciplines.md": "common/references/game-design-disciplines.md",
+      "game-design-gdd.md": "common/references/game-design-gdd.md",
+      "game-design-playtest.md": "common/references/game-design-playtest.md",
+      "game-design-records.md": "common/references/game-design-records.md",
+      "installation-profile.md": "common/references/installation-profile.md",
+      "narrative-human-playtest.md": "common/references/narrative-human-playtest.md",
+      "plugin-invocation.md": "common/references/plugin-invocation.md",
+      "validation-policy.md": "common/references/validation-policy.md"
+    },
+    "scripts": {
+      "decision-governance.py": "common/scripts/decision-governance.py",
+      "decision-orchestration.py": "common/scripts/decision-orchestration.py",
+      "director-dispatch.py": "common/scripts/director-dispatch.py",
+      "plugin-bindings.js": "lib/plugin-bindings.js",
+      "plugin-composition.js": "lib/plugin-composition.js",
+      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
+      "plugin-invocation.py": "common/scripts/plugin-invocation.py",
+      "plugin-parameters.js": "lib/plugin-parameters.js",
+      "plugin-processing.py": "common/scripts/plugin-processing.py",
+      "plugin-registry.js": "lib/plugin-registry.js",
+      "plugin-runtime.js": "lib/plugin-runtime.js",
+      "plugin-sources.js": "lib/plugin-sources.js",
+      "run-workspaces.py": "common/scripts/run-workspaces.py",
+      "task-grouping-migration.py": "common/scripts/task-grouping-migration.py",
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
+  },
+  "skill-tree-game-design-balance": {
+    "references": {
+      "decision-governance.md": "common/references/decision-governance.md",
+      "document-rules.md": "common/references/document-rules.md",
+      "game-design-balance-methods.md": "common/references/game-design-balance-methods.md",
+      "game-design-balance-study.md": "common/references/game-design-balance-study.md",
+      "game-design-disciplines.md": "common/references/game-design-disciplines.md",
+      "game-design-playtest.md": "common/references/game-design-playtest.md",
+      "game-design-records.md": "common/references/game-design-records.md",
+      "installation-profile.md": "common/references/installation-profile.md",
+      "narrative-human-playtest.md": "common/references/narrative-human-playtest.md",
+      "plugin-invocation.md": "common/references/plugin-invocation.md",
+      "validation-policy.md": "common/references/validation-policy.md"
+    },
+    "scripts": {
+      "decision-governance.py": "common/scripts/decision-governance.py",
+      "decision-orchestration.py": "common/scripts/decision-orchestration.py",
+      "director-dispatch.py": "common/scripts/director-dispatch.py",
+      "plugin-bindings.js": "lib/plugin-bindings.js",
+      "plugin-composition.js": "lib/plugin-composition.js",
+      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
+      "plugin-invocation.py": "common/scripts/plugin-invocation.py",
+      "plugin-parameters.js": "lib/plugin-parameters.js",
+      "plugin-processing.py": "common/scripts/plugin-processing.py",
+      "plugin-registry.js": "lib/plugin-registry.js",
+      "plugin-runtime.js": "lib/plugin-runtime.js",
+      "plugin-sources.js": "lib/plugin-sources.js",
+      "run-workspaces.py": "common/scripts/run-workspaces.py",
+      "task-grouping-migration.py": "common/scripts/task-grouping-migration.py",
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
+  },
+  "skill-tree-game-design-mechanics": {
+    "references": {
+      "decision-governance.md": "common/references/decision-governance.md",
+      "document-rules.md": "common/references/document-rules.md",
+      "game-design-atlas.md": "common/references/game-design-atlas.md",
+      "game-design-disciplines.md": "common/references/game-design-disciplines.md",
+      "game-design-mechanics.md": "common/references/game-design-mechanics.md",
+      "game-design-patterns.md": "common/references/game-design-patterns.md",
+      "game-design-records.md": "common/references/game-design-records.md",
+      "installation-profile.md": "common/references/installation-profile.md",
+      "plugin-invocation.md": "common/references/plugin-invocation.md",
+      "validation-policy.md": "common/references/validation-policy.md"
+    },
+    "scripts": {
+      "decision-governance.py": "common/scripts/decision-governance.py",
+      "decision-orchestration.py": "common/scripts/decision-orchestration.py",
+      "director-dispatch.py": "common/scripts/director-dispatch.py",
+      "plugin-bindings.js": "lib/plugin-bindings.js",
+      "plugin-composition.js": "lib/plugin-composition.js",
+      "plugin-hooks.js": "common/scripts/plugin-hooks.js",
+      "plugin-invocation.py": "common/scripts/plugin-invocation.py",
+      "plugin-parameters.js": "lib/plugin-parameters.js",
+      "plugin-processing.py": "common/scripts/plugin-processing.py",
+      "plugin-registry.js": "lib/plugin-registry.js",
+      "plugin-runtime.js": "lib/plugin-runtime.js",
+      "plugin-sources.js": "lib/plugin-sources.js",
+      "run-workspaces.py": "common/scripts/run-workspaces.py",
+      "task-grouping-migration.py": "common/scripts/task-grouping-migration.py",
+      "validate-document-rules.py": "common/scripts/validate-document-rules.py",
+      "workflow-state.py": "common/scripts/workflow-state.py"
+    }
+  },
   "skill-tree-implement-all": {
     "references": {
       "decision-governance.md": "common/references/decision-governance.md",

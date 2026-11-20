@@ -19,3 +19,11 @@ The checker reads JSON and evaluates declared actions, predicates, assignments a
 Inspect route and step IDs in diagnostic output. `unavailable-state` means a guard or required output lacks a value. `unavailable-action` means the action is missing from the observed available set. `offered-mismatch` compares the actual and expected offered sets. `state-mismatch` identifies a conflicting final value. `missing-exit` flags a non-playable stop. `visit-limit` and `repeated-unique-effect` distinguish excess revisits from repeated grants.
 
 The checker preserves inputs and reports `declared-traces-only`. Engine behavior, narrative interpretation, complete graph reachability and canon authority remain separate claims.
+
+## Prepare the producer replay record
+
+Freeze the required case and trace IDs from the accepted plan before execution. Label normal cases and expected adverse controls. Record the exact work and continuity, accepted snapshot and applicable record revisions. Verify the accepted archive through the owning Narrative project and compare the work and continuity against the selected request. Retain any draft or foreign source identity with the narrower evidence boundary.
+
+Record the checker version or content digest, attempt, invocation, environment, exit and exact retained output digest. Pin the bytes actually read for the base contract or model, the state registry and the traces or corpus wrapper. A case override also needs the exact case and selected model bytes. The checker reports declared-trace outcomes. The producer record supplies the input provenance and accepted-source verification.
+
+Compare the returned case and trace IDs against the frozen required set. Name missing, unreached, unexpected or duplicate IDs as applicable. For each row retain the expected and observed diagnostic, the first known divergent step and later steps left unexecuted. An expected adverse diagnostic must match the planned code and applicable step. A missing required case holds coverage even when every returned row passed. Keep a separate consumer check for any Unity behavior.

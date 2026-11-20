@@ -1,0 +1,33 @@
+{
+  "independent_reader": "/root/game_design_playtest_reader",
+  "fixture_sha256": "1e3633cc38223d2637c68cb6abf5f4b51b50e7e4d10d421ed66479e86b9e964d",
+  "unaided": {
+    "successful": 0,
+    "eligible": 1,
+    "coached_exclusions": 1
+  },
+  "observation": "At 13 active seconds U independently picked the fallback route within the 20-second window and identified the stated goal after choice. U's report of seeing no marker remains distinct from the action.",
+  "exclusions": "C heard the route cue at 5 seconds before committing and took the prompted turn at 9. C's post-coaching action is excluded. M predicts 4 seconds when the cue is assumed legible and T rehearses reachability. Neither supplies an unaided participant measure.",
+  "hypotheses": "The missed-cue report supports investigating visibility. An unrecognized affordance or deliberate fallback remains possible. The current case weakens goal misunderstanding for U only.",
+  "follow_up": "UI owns a fresh neutral C2/S first-choice observation with the same camera, locale and assistance off. Record cue timing, first choice, intervention and open responses about intent and cue; stop at first commitment, intervention or 20 active seconds. A matched prior-cue baseline remains necessary for comparative lift.",
+  "limits": "No real participant, selected-build observation, alternative locale or device evidence, owner-approved adoption threshold, or creative acceptance. The redacted fixture establishes interpretation procedure only.",
+  "lane": "static",
+  "verified_owned_standalone_packages": {
+    "gdd": {
+      "profile": "ba21aed4c7b44eaeb1bd2560ceb87559247cf30ce8e4cbc0a0f679f93b49cc68",
+      "references": {
+        "game-design-gdd.md": "b33102a28f1ca07b6e210b555e79de35b05c26031442046e7a4ce4f83ab2ece2",
+        "game-design-playtest.md": "f305aba94b011959e204cdc52a398ac9d16a7ec07e35ac5313ae2697667efe80",
+        "narrative-human-playtest.md": "f6894df614f45fbdc059147ab2100d9abed8cbb9dcd37ddbc5d02f0fd4b31238"
+      }
+    },
+    "balance": {
+      "profile": "49127da5ff670d4d9259d9cfb96d9e9c6e60330399b29f10f33689f26e3a5457",
+      "references": {
+        "game-design-balance-study.md": "8d28a473095d5ec4e457c5ea0bb61adaf43c0be8c2f0dbb9eb8aaf93b65cdc77",
+        "game-design-playtest.md": "f305aba94b011959e204cdc52a398ac9d16a7ec07e35ac5313ae2697667efe80",
+        "narrative-human-playtest.md": "f6894df614f45fbdc059147ab2100d9abed8cbb9dcd37ddbc5d02f0fd4b31238"
+      }
+    }
+  }
+}
