@@ -1,0 +1,72 @@
+{
+  "task_id": "T-678c21fc-b436-4840-a3ea-e68d7dfa319e",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/references/director-workflow.md": "87a41695a015e222e3991002e33c66b2284127e091ee61dd8c2b9e27f50cb716",
+    ".skill-tree/common/references/narrative-human-playtest.md": "f6894df614f45fbdc059147ab2100d9abed8cbb9dcd37ddbc5d02f0fd4b31238",
+    ".skill-tree/documents/director-workflow.md": "397d580f54195923dd39cb105158516d540b0a4c5a04d87e8f970175c6852db2",
+    ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+  },
+  "previous_fingerprints": {
+    ".skill-tree/common/references/director-workflow.md": "34471284b51d98a30f23ea0c530720b9bea816e4699d404dbe66206dd1a38175",
+    ".skill-tree/common/references/narrative-human-playtest.md": "f6894df614f45fbdc059147ab2100d9abed8cbb9dcd37ddbc5d02f0fd4b31238",
+    ".skill-tree/documents/director-workflow.md": "ba0d903fa7c9b25324ecf6fb834951162754d5ec464351cf365cf22dce9b135f",
+    ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+  },
+  "exact_additions": {
+    ".skill-tree/common/references/director-workflow.md": [
+      "",
+      "## Measure comparable design work",
+      "",
+      "Freeze the decision and eligible population before counting. Keep stable request, revision, handoff, evidence and attempt identities. Compare equivalent scope, clock and source availability. Count identical delivery once. Preserve new attempts under the original request and report excluded and unmeasured cases with reasons. An empty eligible denominator yields no estimate.",
+      "",
+      "| Decision | Calculation and evidence |",
+      "| --- | --- |",
+      "| Is the GDD sufficient for independent predictions? | Accepted rule revisions with both normal and boundary outcomes predicted correctly by an independent reader divided by sampled accepted rule revisions with both known expected outcomes. Cite the accepted rule and independent check. Report missing expected outcomes separately from absent predictions against a known oracle. |",
+      "| Are the recommendations applicable? | Applicable recommendations divided by independently judged original slots within a frozen K and held-out request scope. Count identical delivery once. Count the first occurrence of a repeated suggestion and keep the original later rank as a repeat. Report no-fit, empty and unjudged results separately. Cite the ranked suggestion and independent judgement. |",
+      "| Did the atlas find affected placements? | Known affected placements omitted from the report divided by the confirmed affected set in the audited scope. Pair the exact placement record and independent audit. Keep suspected links and unexamined regions separate. |",
+      "| Does impact review reopen too much? | Confirmed unnecessary rechecks divided by all distinct proposed rechecks in the selected scope. Cite each proposed recheck and the independent verdict for the same dependency. Report unresolved verdicts alongside the count. |",
+      "| Can a Balance result be reproduced? | Studies reproduced within the declared tolerance by an independent reviewer divided by reviewed studies with sufficient matching inputs. Record the study version, selected comparison, units, assumptions and separate count of insufficient inputs. Retain retries as attempts within the study and pin the comparison evidence. |",
+      "| How well did the tuning forecast match? | Measured change minus the change predicted before observation for the same parameter, conditions, units and clock. Record matched denominators when applicable, effective setting, direction and any adverse outcome separately. Use the study and matching evidence record. An unmeasured forecast stays unscored. |",
+      "| How long until usable evidence? | Median elapsed UTC time from input readiness to first adequate evidence for comparable completed requests with both timestamps. Record incomplete work or missing timestamps, environment and author waits, wrong routes and insufficient data from the request and evidence receipts. |",
+      "| How often does a handoff return? | Distinct reviewed handoffs returned at least once for a confirmed description fault divided by all distinct reviewed handoffs in the named cohort. Keep reasons such as an unavailable environment, authorization wait or other return separate. Use the reviewed handoff and return receipts. Retain actual revisions and later attempts. |",
+      "",
+      "Store compact local inputs and evidence IDs so a second reader can recompute each measure. Standalone documents may use local project identities without a Director run. Follow [compact evidence retention](history-retention.md) for locators, gaps and original outcomes.",
+      "",
+      "## Compare ordinary and revised handoffs",
+      "",
+      "Freeze equivalent briefs, accepted facts, available inputs, controls, and exact ordinary and revised instruction revisions. Ask two independent reviewers to reconstruct expected and consumed revisions, coverage, earliest evidenced divergence and next owner. Record reviewer disagreement and unavailable evidence. An unavailable decisive input leaves causal attribution open. Record the missing evidence and the responsible owner.",
+      "",
+      "Check changed intent, effective configuration, available artifacts and author waits before assigning a recurring problem to a skill. A skill finding requires reproduction under a known instruction revision and an independently established outcome. Record adopt, revise or defer for the selected scope with residual uncertainty. Recheck the original case, an unaffected negative control and a comparable new request after an authorized fix."
+    ],
+    ".skill-tree/documents/director-workflow.md": [
+      "## Locate the first divergence in comparable handoffs",
+      "",
+      "Choose an ordinary and revised handoff under equivalent request, authorized scope, accepted facts and deliverable. Freeze both instruction revisions, actual available inputs, expected and consumed source pins and independent outcome criteria. Record differing conditions as comparison limits. Give the same compact records and controls to two separate reviewers. Ask each reviewer to reconstruct pins, coverage, earliest known discrepancy and next owner without the other review.",
+      "",
+      "Compare owner, affected step, missing evidence and unaffected control. Preserve disagreement and the evidence that could resolve the disagreement. Trace accepted intent, selected configuration and bindings, available evidence and owner waits before assigning an instruction or product cause. Missing decisive input leaves causal attribution open. A skill-level finding requires reproduction on the identified instruction revision and an independent outcome for the same conditions.",
+      "",
+      "Record adopt, revise or defer for an exact selected scope, known risk and residual uncertainty. An authorized fix rechecks the original case, an unaffected negative control and a new comparable request. A paper reconstruction qualifies the review procedure. Live comparative effectiveness requires matched project requests and reported actual results.",
+      ""
+    ]
+  },
+  "observation": {
+    "verdict": "pass",
+    "reviewer": "/root/director_human_acceptance_resolver",
+    "source_fingerprints": {
+      ".skill-tree/common/references/director-workflow.md": "87a41695a015e222e3991002e33c66b2284127e091ee61dd8c2b9e27f50cb716",
+      ".skill-tree/common/references/narrative-human-playtest.md": "f6894df614f45fbdc059147ab2100d9abed8cbb9dcd37ddbc5d02f0fd4b31238",
+      ".skill-tree/documents/director-workflow.md": "397d580f54195923dd39cb105158516d540b0a4c5a04d87e8f970175c6852db2",
+      ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+    },
+    "observation": "Verified original A, B and C against exact final Director contracts and installed owned reference. Additions preserve technical remediation, human observation, and author choice as independent dispositions. The rehearsed or coached actions do not fill uncoached coverage, and the author decision remains open."
+  },
+  "previous_reviewers": [
+    "/root/director_human_acceptance_resolver"
+  ],
+  "retained_cases": {
+    "A": "Unity owns exact first binding mismatch R1 versus accepted R@2. Recheck ordinary eligible actor/input on repaired selected build and pin current producer/consumer revisions, first guard/writer and result. Sibling K remains unchanged; only paper repair expectations.",
+    "B": "Unclear goal requires Game Design triage with accepted Narrative intent, delivered line, visible cue and operator conditions. Assign only first supported mismatch to its owner. Rehearsal establishes scoped route availability, and no uncoached comprehension conclusion.",
+    "C": "B@8/E unaided fallback choice is one discoverability miss with goal understood. Facilitator-pointed repeat supports coached reachability only. Fresh neutral entry and same camera with a known-route control can distinguish cue finding. The author chooses exact persistent optional cue or a more visible revision after matched presentation."
+  }
+}

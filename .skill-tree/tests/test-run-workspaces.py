@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -50,6 +51,28 @@ class RunWorkspaceTests(unittest.TestCase):
         with self.assertRaisesRegex(ws.RunError,'Multiple runs'):wf.Store(self.root).load()
         self.assertEqual(wf.Store(self.root,first['id']).load()['active_run']['id'],first['id'])
         self.assertEqual(wf.Store(self.location(second)).load()['active_run']['id'],second['id'])
+    def test_standalone_capture_and_processing_preserve_an_existing_controller(self):
+        new_root=self.task('Explicit next root')
+        existing=self.start(self.task('Existing controller root'))
+
+        def standalone(command,payload,*options):
+            request=self.base/'standalone.json'
+            request.write_text(json.dumps(payload))
+            result=subprocess.check_output([sys.executable,str(CORE/'common/scripts/workflow-state.py'),
+                command,str(self.root),'--standalone','--input',str(request),*options],text=True)
+            return json.loads(result)
+
+        request={'title':'Separate request','description':'Inspect existing behavior.',
+                 'expected_behavior':'Record existing behavior.'}
+        batch=standalone('intake',{'items':[request],'intake_batch_id':wf.identity('IB'),
+                                   'expected_source_hash':wf.file_hash(self.store.future)})
+        pending=batch['items'][0]['id']
+        processed=standalone('process',{'selectors':[pending],'expected_source_hash':wf.file_hash(self.store.future),
+            'dispositions':{pending:{'status':'resolved','reason':'The requested behavior is already present.'}}})
+        self.assertEqual(processed['selected_ids'],[pending])
+        started=standalone('start',{'expected_source_hash':wf.file_hash(self.store.future)},'--id',new_root)
+        self.assertEqual(started['snapshot'],[new_root])
+        self.assertEqual(wf.Store(self.root,existing['id']).load()['active_run'],existing)
     def test_overlapping_claims_and_dependency_claims_are_atomic(self):
         shared=self.task('Shared');a=self.task('First',[shared]);b=self.task('Second',[shared]);first=self.start(a);before=self.store.state.read_bytes()
         with self.assertRaisesRegex(wf.WorkflowError,'claims conflict'):self.start(b)
@@ -154,6 +177,43 @@ class RunWorkspaceTests(unittest.TestCase):
     def test_queue_copy_edits_never_become_authority(self):
         tid=self.task();run=self.start(tid);path=self.location(run);(path/'.skill-tree/documents/future.md').write_text('Invalid independent queue')
         self.assertEqual(wf.next_task(wf.Store(path))['task_id'],tid);self.assertIn(tid,wf.Store(path).text())
+
+    def test_linked_refresh_rejects_canonical_loss_and_source_drift(self):
+        run = self.start(self.task())
+        linked = self.location(run)
+        queue_copy = linked/'.skill-tree/documents/future.md'
+        queue_copy_bytes = queue_copy.read_bytes()
+        canonical = self.store.future.read_bytes()
+        checkpoint = self.store.state.read_bytes()
+        manifest = self.store.base/'skill-tree.json'
+        navigation = manifest.read_bytes()
+
+        def refresh(*options):
+            result = subprocess.run([sys.executable, '-B', str(CORE/'common/scripts/workflow-state.py'),
+                                     'refresh', str(linked), '--run-id', run['id'], *options],
+                                    capture_output=True, text=True, timeout=20)
+            return result.returncode, json.loads(result.stdout)
+
+        self.store.future.write_bytes(queue_copy_bytes)
+        status, response = refresh()
+        self.assertEqual(status, 2, response)
+        self.assertIn('.skill-tree/documents/future.md', response['error'])
+        self.assertEqual(self.store.future.read_bytes(), queue_copy_bytes)
+        self.assertEqual(self.store.state.read_bytes(), checkpoint)
+        self.assertEqual(manifest.read_bytes(), navigation)
+
+        self.store.future.write_bytes(canonical)
+        inspected = wf.file_hash(self.store.future)
+        changed = canonical.replace(b'Fixed task headers.', b'Current task headers.')
+        self.assertNotEqual(changed, canonical)
+        self.store.future.write_bytes(changed)
+        status, response = refresh('--expected-source-hash', inspected)
+        self.assertEqual(status, 2, response)
+        self.assertIn('changed', response['error'].lower())
+        self.assertEqual(self.store.future.read_bytes(), changed)
+        self.assertEqual(self.store.state.read_bytes(), checkpoint)
+        self.assertEqual(manifest.read_bytes(), navigation)
+        self.assertEqual(queue_copy.read_bytes(), queue_copy_bytes)
     def test_task_claim_blocks_standalone_mutation_from_another_run(self):
         a=self.task('First');b=self.task('Second');first=self.start(a);second=self.start(b)
         with self.assertRaisesRegex(wf.WorkflowError,'claimed'):wf.begin_task(wf.Store(self.location(second)),{'task_id':a})

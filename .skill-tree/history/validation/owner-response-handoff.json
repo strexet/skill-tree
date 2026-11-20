@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "task_id": "T-478dc723-ce53-4ddf-bf50-03c17904fdc7",
+  "lane": "static",
+  "assertion": "Inspect authored and composed owner handoffs, verify representative decision and wait scenarios, and confirm synchronized portable installation.",
+  "result": "pass",
+  "composed_operations": {
+    "director": 27,
+    "general": 18,
+    "unity": 18,
+    "web": 18
+  },
+  "checks": [
+    "All 81 composed entry points link to the identical bundled visible owner handoff contract.",
+    "All four standalone Process Pending packages use the ordinary reply, retain scope and require an actual decision when an explicit follow-on instruction is absent.",
+    "Source sync, strict repository validation, Git diff checks, installer list and general installer dry run passed."
+  ],
+  "scenario_review": [
+    "Independent cat and dog approvals identify the exact r017 revisions, compare accept and revise, mark one recommendation per decision and ask separately at the end of the reply.",
+    "An external validation wait names the live operation and what follows, with an explicit statement that the owner has no action.",
+    "An uncertain publication result identifies the original operation, preserved work, available observations and the exact receipt or status needed before a retry."
+  ],
+  "review": "Independent source review identified two wording issues. The final source limits recommendations to real choices and retains the explicit boundary against execution or commit authorization from a handoff alone.",
+  "limitation": "Scenario samples exercise the generated instructions in an isolated review. Samples supply no owner decision or external execution result."
+}

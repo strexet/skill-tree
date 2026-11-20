@@ -76,13 +76,15 @@ def _question_event(run, event, assignment_id, question, **fields):
 
 
 class DirectorRun:
-    def __init__(self, registry, frozen_plan, check_area, current_plan=None, verify_pin=None):
+    def __init__(self, registry, frozen_plan, check_area, current_plan=None, verify_pin=None,
+                 superseded_assignments=None):
         self.registry = registry
         self.store = registry.store
         self.frozen_plan = frozen_plan
         self.check_area = check_area
         self.current_plan = current_plan or (lambda plan: None)
         self.verify_pin = verify_pin or (lambda pin: False)
+        self.superseded_assignments = superseded_assignments or (lambda selector: {})
 
     def _load(self, run_id):
         relative = run_path(run_id)
@@ -174,8 +176,12 @@ class DirectorRun:
             values[key] = item
         return result
 
-    def _view(self, state, sha, plan):
+    def _superseded(self, state):
+        return self.superseded_assignments({**_object_identity(state), 'plan_sha256': state['plan_sha256']})
+
+    def _view(self, state, sha, plan, *, check_supersession=True):
         status = {}
+        superseded = self._superseded(state) if check_supersession else {}
         for spec in plan['assignments']:
             name = spec['id']
             if name not in state['assignments']:
@@ -204,6 +210,9 @@ class DirectorRun:
                             'next': effect if state['phase'] == 'running' and not (waits or deps or current['blocker']
                                                                                 or current.get('completed')
                                                                                 or (effect == 'start' and resource_waits)) else None}
+            if name in superseded:
+                status[name]['supersession'] = {**superseded[name], 'withheld_effect': status[name]['next']}
+                status[name]['next'] = None
         return {'director_run_id': state['director_run_id'], 'plan_sha256': state['plan_sha256'], 'phase': state['phase'],
                 'run_sha256': sha, 'assignments': status}
 
@@ -307,10 +316,25 @@ class DirectorRun:
             D._require(not candidate['depends_on'], 'Child start requires separate review of dependencies outside the exact assignment')
         return requested, {'mode': 'next', 'selector': child_id, 'limits': None}
 
+    def _reject_superseded(self, relative, state, sha, effect):
+        name = effect['assignment_id']
+        supersession = self._superseded(state).get(name)
+        if supersession is None:
+            return
+        denial = {'assignment_id': name, 'operation': effect['operation'], 'reason': 'guard-rejected',
+                  'superseded_by': supersession['amendment'], 'request_sha256': effect['sha256']}
+        if not any(event['event'] == 'dispatch-failed' and all(event.get(key) == value for key, value in denial.items())
+                   for event in state.get('timeline', [])):
+            _event(state, 'dispatch-failed', **denial)
+            self._write(relative, state, sha)
+        raise D.DirectorError(f"Assignment {name} was superseded by accepted plan revision "
+                              f"{supersession['next']['plan_revision']}; fresh child effects are held")
+
     def dispatch(self, payload):
         D._object(payload, GUARD | {'assignment_id', 'operation', 'request'})
         operation = payload['operation']
         D._require(operation in EFFECTS, 'Director run dispatch does not grant the requested effect')
+        D._require(isinstance(payload['request'], dict), 'Director dispatch requires an exact effect request')
         run_id, name = payload['director_run_id'], payload['assignment_id']
         rel, before, sha = self._load(run_id)
         spec = self._assignment(before, name)
@@ -329,22 +353,25 @@ class DirectorRun:
             return {'status': 'replayed', 'result': observed['observed_result'], 'run_sha256': sha}
         D._require(before['phase'] == 'running' and EFFECTS[operation] in before['authority'][name],
                    'Director run lacks current exact execution authority for this effect')
-        if operation == 'start' and observed['receipt'] is None:
-            self._check_resources(spec, child)
-        eligible = self._view(before, sha, self._plan_for(before))['assignments'][name]
-        D._require(eligible['next'] == operation, 'The assignment is not eligible for this exact effect')
-        request, start = self._dispatch_request(operation, payload['request'], spec, before['assignments'][name], child,
-                                                observed['receipt'] is not None, before['process_spec_sha256'].get(name))
-        request = {**request, 'director_dispatch': envelope}
         effect_sha = D._digest({key: value for key, value in payload['request'].items() if key != 'expected_source_hash'})
         effect = {'kind': 'director-run-dispatch', 'run_id': run_id, 'assignment_id': name,
                   'operation': operation, 'sha256': effect_sha}
-        directed = helper.ChildDispatch(operation, request, start)
         with self.store.lock(local_delivery=effect):
             rel, current, current_sha = self._load(run_id)
             _same_guard(current_sha, sha)
             if existing is None:
                 _same_guard(current_sha, payload['expected_run_sha256'])
+            if not recovering:
+                self._reject_superseded(rel, current, current_sha, effect)
+                if operation == 'start':
+                    self._check_resources(spec, child)
+            eligible = self._view(current, current_sha, self._plan_for(current), check_supersession=False)['assignments'][name]
+            D._require(eligible['next'] == operation, 'The assignment is not eligible for this exact effect')
+            request, start = self._dispatch_request(operation, payload['request'], spec, current['assignments'][name],
+                                                    child, recovering, current['process_spec_sha256'].get(name))
+            request = {**request, 'director_dispatch': envelope}
+            directed = helper.ChildDispatch(operation, request, start)
+            if existing is None:
                 current['assignments'][name]['dispatches'][operation] = {'status': 'prepared', 'request_sha256': effect_sha,
                                                                         'semantic_sha256': directed.semantic_sha256,
                                                                         'failure_key': None, 'failures': 0}
@@ -360,6 +387,7 @@ class DirectorRun:
         if not recovering:
             with self.store.lock(local_delivery=effect):
                 rel, current, current_sha = self._load(run_id)
+                self._reject_superseded(rel, current, current_sha, effect)
                 D._require(current['phase'] == 'running', 'Paused or cancelled Director run cannot dispatch a new effect')
                 pending = current['assignments'][name]['dispatches'][operation]
                 D._require(pending['semantic_sha256'] == directed.semantic_sha256, 'The prepared effect changed')
@@ -665,6 +693,8 @@ class DirectorRun:
 def run(registry, planner, command, payload):
     """Production bindings reuse registered plan and canonical owner sources."""
     source_adapter = D.WF.owned_module('director_plan_runtime', Path(__file__).with_name('director-plan-adapters.py'))
+    handoff_adapter = D.WF.owned_module('director_handoff_runtime', Path(__file__).with_name('director-handoff.py'))
+    handoffs = handoff_adapter.DirectorHandoffs(registry, planner)
     def registered():
         current_registry, bindings, _ = registry._load()
         return current_registry, bindings, source_adapter.PlanSources(D, planner.O, planner.C, current_registry, bindings)
@@ -697,7 +727,7 @@ def run(registry, planner, command, payload):
         observed = sources.pin(area, {key: value for key, value in pin.items() if key != 'status'})
         return observed == {'status': 'verified', **expected}
 
-    engine = DirectorRun(registry, planner.frozen, check_area, check_current, verify_pin)
+    engine = DirectorRun(registry, planner.frozen, check_area, check_current, verify_pin, handoffs.superseded_assignments)
     methods = {'run-start': engine.start, 'run-status': engine.status, 'run-dispatch': engine.dispatch,
                'run-complete-assignment': engine.complete_assignment,
                'decide-open': engine.open_question, 'decide-answer': engine.answer}

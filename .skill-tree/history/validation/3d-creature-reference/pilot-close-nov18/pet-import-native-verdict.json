@@ -1,0 +1,42 @@
+{
+  "control": "import",
+  "coverage": {
+    "saved_editmode_and_playmode": true
+  },
+  "models": {
+    "cat": {
+      "clips": [
+        "Gallop",
+        "Idle",
+        "Trot",
+        "Turn",
+        "Walk"
+      ],
+      "forced_reimports": 2,
+      "model_sha256": "364cb8f7c0a8ecfc6732ff0ed070da1cbaedb8af1c876be0bd3bba9f2c72f5e4",
+      "prefab_sha256": "79ac0ee915210a7f4cab599f96edb45e1c576ee79d59ab841c3a7667c4492d3d",
+      "skinned_lods": [
+        0,
+        1
+      ]
+    },
+    "dog": {
+      "clips": [
+        "Gallop",
+        "Idle",
+        "Trot",
+        "Turn",
+        "Walk"
+      ],
+      "forced_reimports": 2,
+      "model_sha256": "6849a4cfe8f6eec1b10c3f9076c29841843a819ce633a24094808f32b3a9a157",
+      "prefab_sha256": "2c305bce7e8ddd0c417d89b57001cf202768469c0e7bed5d9fc453e176ef6680",
+      "skinned_lods": [
+        0,
+        1
+      ]
+    }
+  },
+  "schema": 1,
+  "status": "passed"
+}

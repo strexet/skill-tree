@@ -4,6 +4,7 @@ from copy import deepcopy
 from pathlib import Path
 import subprocess
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -26,6 +27,13 @@ class ReviewCycleTests(unittest.TestCase):
     def test_owner_merge_forms(self):
         for instruction in ['ПР с мерджем','with merge','merge=true','затем смержи в develop','затем смерджи в develop','затем смржи в develop','затем вмержи в develop','then merge into develop']:
             with self.subTest(instruction=instruction):self.assertTrue(pr.parameters('feature/example',{'instruction':instruction})['merge'])
+    def test_full_cycle_forwards_the_original_owner_instruction_to_the_pr_gate(self):
+        result=pr.parameters('feature/example',{
+            'instruction':'проведи задачу по полному циклу skill-tree',
+            'instruction_origin':'owner','target_branch':'develop','merge':True,
+        })
+        self.assertTrue(result['authorization']['merge'])
+        self.assertEqual(result['authorization']['target_branch'],'develop')
     def test_literal_examples_and_non_owner_booleans_never_authorize_merge(self):
         for instruction in ['Create a PR. The documentation example is `merge=true`.',
                             'Create a PR. Example: ``merge=true``.',
@@ -80,6 +88,28 @@ class ReviewCycleTests(unittest.TestCase):
     def test_ready_requires_a_real_provider_pr_identity(self):
         self.snapshot.pop('pr');record=pr.new_record(self.snapshot,self.params);reviewed=pr.reviewed(record,self.snapshot,self.review())
         with self.assertRaisesRegex(pr.ReviewError,'provider PR identity'):pr.ready(reviewed,self.snapshot)
+    def test_composed_pr_helper_does_not_treat_full_cycle_bindings_as_review_bindings(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            wrapper=root/'full-cycle'
+            manifests=wrapper/'references';manifests.mkdir(parents=True)
+            (manifests/'plugin-bindings.json').write_text(json.dumps({
+                'operation':'skill-tree-full-cycle','definitions':[{'id':'wrapper-before'}],
+            }))
+            store=SimpleNamespace(source_root=root)
+            with patch.object(pr,'__file__',str(wrapper/'scripts/pr-review-state.py')):
+                self.assertIsNone(pr.review_requirement_plan(store,self.snapshot))
+                with self.assertRaisesRegex(pr.ReviewError,'must own the PR review operation'):
+                    pr.review_requirement_plan(store,self.snapshot,package_root=wrapper)
+                registry=root/'.skill-tree/installation/plugins.json'
+                registry.parent.mkdir(parents=True)
+                binding={'operation':pr.REVIEW_OPERATION,'enabled':False,'plugin_id':'reviewer'}
+                registry.write_text(json.dumps({'bindings':[binding]}))
+                self.assertIsNone(pr.review_requirement_plan(store,self.snapshot))
+                binding['enabled']=True
+                registry.write_text(json.dumps({'bindings':[binding]}))
+                with self.assertRaisesRegex(pr.ReviewError,'explicitly trusted composed operation package'):
+                    pr.review_requirement_plan(store,self.snapshot)
     def test_current_clean_review_stops_at_pr_ready_without_merge(self):
         ready=self.ready();self.assertEqual(ready['status'],'pr-ready');self.assertFalse(ready['review']['independent_approval'])
         with self.assertRaisesRegex(pr.ReviewError,'Merge lacks'):pr.merge_gate(ready,self.snapshot)

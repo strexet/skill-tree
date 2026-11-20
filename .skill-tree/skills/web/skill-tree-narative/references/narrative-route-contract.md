@@ -17,3 +17,9 @@ An optional predicate contains exactly one form. A leaf has `key`, `op` and `val
 Use declared Boolean, enum or bounded integer values. Explicit `false` differs from an absent key. A missing key needed by a predicate produces unavailable state. A key omitted from all assertions can remain outside the observed scope. Trace expected state names exactly the values under test, and a contradictory expected value produces a failing route result.
 
 Begin with the `route-contract.example.json` sample. The sample records the log discovery and the lift. Add a separate trace that skips the relay log and selects the cooler to compare exposure and ending state without revising the earlier trace. The log may affect Ilya's line without changing the available selector actions. A scene omitted from a route is neither shown nor interpreted by implication.
+
+## Pin an accepted replay
+
+Use the exact accepted work, continuity and snapshot digest in the production route contract. Record the selected accepted record IDs, revisions and archive locator in the producer handoff. The source field identifies the claimed archive. The reviewer resolves the accepted archive and compares the consumed fact and revision before accepting the replay.
+
+Retain reproducible pins for the selected base model, resolved registry and case or trace bytes. A corpus wrapper can override a model for an adverse fixture. Record the override and expected outcomes per case. Freeze the required case and trace IDs in the reviewed plan and compare the observed set with that plan.

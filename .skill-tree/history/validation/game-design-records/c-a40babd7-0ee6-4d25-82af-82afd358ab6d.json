@@ -1,0 +1,94 @@
+{
+  "source": {
+    ".skill-tree/common/references/game-design-records.md": "48a4a00e7e86fc92f9df6dfd8cad1532aec6d40ea8fa7f47797325e19704f92a"
+  },
+  "lane": "static",
+  "record_trace": [
+    {
+      "ref": "shared/source@1",
+      "locator": "shared/design/retained/source-1.md",
+      "sha256": "ced8968a5e8ca8094051773376e4bbe075f2041eb2f40e8ed9edce9833d41213"
+    },
+    {
+      "ref": "shared/reserve@1",
+      "locator": "shared/design/retained/reserve-1.md",
+      "sha256": "fdcd1b7bab124f9afa785887aebb0765f69696392b5f7bdadce72b76f0093fe9"
+    },
+    {
+      "ref": "curve-test/boost@1",
+      "locator": "curve-test/design/retained/boost-1.md",
+      "sha256": "f99f7e6b5e135717613b501e0bd1159f8f0bc88c48b7439b9f2fdfbb3df24a64"
+    },
+    {
+      "ref": "curve-test/curve-entry@1",
+      "locator": "curve-test/design/retained/curve-entry-1.md",
+      "sha256": "646abd0a19fd6a4e7c988fbc78f4bfd6e355b0e2cdf5b14c1ed658c65206c71d"
+    },
+    {
+      "ref": "curve-test/drain-study@1",
+      "locator": "curve-test/design/retained/drain-study-1.md",
+      "sha256": "45e4074e7a5d9a09a558e5b4d9d8399353ab479d8e163874af47b77ed868c77c"
+    },
+    {
+      "ref": "curve-test/hold-calculation@1",
+      "locator": "curve-test/design/retained/hold-calculation-1.md",
+      "sha256": "d8055772b836a1e1ce538afec1f09805004ff03c606786526786dfa4fee47996"
+    },
+    {
+      "ref": "curve-test/release-playtest@1",
+      "locator": "curve-test/design/retained/release-playtest-1.md",
+      "sha256": "dc42213e701f89194fa21a2d4f780d03b965ce0d6c4e4503fa013be92572469e"
+    },
+    {
+      "ref": "curve-test/tuning@1",
+      "locator": "curve-test/design/retained/tuning-1.md",
+      "sha256": "90ac38c838938b7db1426dbd2cc6bc7e0f2b941a227d7d083e3a8b07c1f3820f"
+    },
+    {
+      "ref": "curve-test/tuning@2",
+      "locator": "curve-test/design/retained/tuning-2.md",
+      "sha256": "7104eff3cd06c3917e16024f6f49e32af0776392a1e7447df6f10589f1e70f6c"
+    },
+    {
+      "ref": "curve-test/boost@2",
+      "locator": "curve-test/design/retained/boost-2.md",
+      "sha256": "82a22679bc2ca4abf69a8c7e10dc6abc535c2fa1746ec2db1eaa31eeeb6aa343"
+    },
+    {
+      "ref": "curve-test/curve-entry@2",
+      "locator": "curve-test/design/retained/curve-entry-2.md",
+      "sha256": "68c1d73de3b6364ac77bf6f589a6e78178ea4cf4b31b744adc0f2ac38ee8d47d"
+    },
+    {
+      "ref": "curve-test/intro@1",
+      "locator": "curve-test/design/retained/intro-1.md",
+      "sha256": "7d016b288b09930519c2b294789d8d29f72959b8984531ebd9c88bfa3ff7234a"
+    },
+    {
+      "ref": "turn-test/boost@1",
+      "locator": "turn-test/design/retained/boost-1.md",
+      "sha256": "3a615246ac8b3fe3a5bd2d268c4f664dbd66f66c6c46e4a9cbc8b6a2cd9b912e"
+    },
+    {
+      "ref": "curve-test/increase-drain-four@1",
+      "locator": "curve-test/design/retained/increase-drain-four-1.md",
+      "sha256": "4ae90e93f17348a079899257769e1b5362c51e5202e83700bd44b17aded56e4c"
+    },
+    {
+      "ref": "curve-test/increase-drain-six@1",
+      "locator": "curve-test/design/retained/increase-drain-six-1.md",
+      "sha256": "5dd2086a3e9e628d08601359d9043b9be5597c8ac364d8c96cc9b8683e124c0f"
+    },
+    {
+      "ref": "curve-test/increase-drain-three@1",
+      "locator": "curve-test/design/retained/increase-drain-three-1.md",
+      "sha256": "83782457b39a2f6e314139c542ba43256a6b504383d53e601358c4b305c39a18"
+    }
+  ],
+  "observations": [
+    "Scoped paths and retained content digests resolved the exact source, pattern, rule, placement, study and check; a duplicate local rule ID resolved independently in a second scope.",
+    "The active-hold calculation reproduced two seconds at two units per second and one second at four units per second. The unexecuted playtest contained target conditions and an expectation.",
+    "The traced fixture decision created one authoritative tuning revision for the accepted proposal and retained a separate rejection. The repeat read resolved the applied proposal at the current tuning revision without a second write.",
+    "A competing proposal from the same base remained available for reconciliation. The affected placement moved to review and the historical check still resolved to its original rule and environment."
+  ]
+}

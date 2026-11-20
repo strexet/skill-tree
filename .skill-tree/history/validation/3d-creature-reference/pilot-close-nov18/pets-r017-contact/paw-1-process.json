@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "lock_absent": true,
+  "pid": 62732,
+  "process_group_absent": true,
+  "schema": 1,
+  "started_unix_ns": 1795003037370854000,
+  "timeout_seconds": 300
+}

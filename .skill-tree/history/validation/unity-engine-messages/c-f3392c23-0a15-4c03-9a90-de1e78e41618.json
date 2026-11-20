@@ -1,0 +1,24 @@
+{
+  "verdict": "pass",
+  "reviewers": [
+    "/root/unity_engine_messages_resolver"
+  ],
+  "cases": {
+    "fresh": "100 matching Beta exceptions in a complete selected window produce one signature and count 100; only Beta is held, Alpha and Gamma remain clean in scope.",
+    "exclusions": "The declared Gamma adverse case matches source, severity and signature. Prior session E0 warning remains excluded with reason. Fresh Alpha warning instead enters review. A complete empty relevant capture stays clean under the same lane.",
+    "coverage": "Truncation, foreign environment and unavailable capture all stay unknown while preserving independent expected/discovered/passed/failed/skipped counts 3/3/3/0/0."
+  },
+  "privacy": "Independent reader recomputed all digests and group counts and verified installed sources. Raw text, paths and local signature codes were absent from the projection. Disposable and static only.",
+  "task_id": "T-6f8fb95e-c7c4-47b5-b678-072dac01b34f",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/references/unity-safety.md": "c4a96cdb4bc35a98fcab8ba6bf9c983252cd73d1cefaa439669cedcbed357df0",
+    ".skill-tree/domains/unity/development.md": "6c14117e919fea145c6e7072f445e538cb036cb0da12bddc5e02c43c08d4bff8"
+  },
+  "input_sha256": {
+    "disposable-captures.md": "b13b565dc659d341e88c41a531b15e9343c5764f895c9011cb4b6fbacb65634d",
+    "check-capture-controls.py": "a5b80526f55702c8b1bd668ff9fb60d0c5ecef4034b30498b071f321181e0472",
+    "captures/portable.json": "bf2efd0ad37d43e43c80dc26e121df2e72dbf1c9c6de790f15ef0a8f03404203",
+    "trial/.skill-tree/installation/profile.json": "46aa4d053039f464abbc339faf75555cae7795ce7a7fb7077839c2ead8750036"
+  }
+}

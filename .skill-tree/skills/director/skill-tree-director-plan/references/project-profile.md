@@ -53,7 +53,7 @@ Flavor: director. Static compatibility only; execution remains unqualified.
       "lane": "static"
     }
   },
-  "source_version": "0.5.0",
+  "source_version": "0.6.0",
   "worktree_environment": {
     "exclusive_resources": [],
     "isolated_directories": [],

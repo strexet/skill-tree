@@ -1,0 +1,1280 @@
+{
+  "comparison_budget": {
+    "maximum_ground_mm": 2.0,
+    "maximum_slide_mm": 3.5,
+    "maximum_step_mm": 2.0,
+    "minimum_ground_mm": -3.0
+  },
+  "expected": 48,
+  "gait_scope": "Walk and Trot for criterion acceptance. Gallop is additional diagnostic evidence.",
+  "inputs": {
+    "CatalogPawPlantTests.cs": {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/catalog-paw-plant-tests.cs",
+      "sha256": "1c75569a86fa48203e76c062640ff8070f5beaa2e4b341853bee7776c7d6903e"
+    },
+    "evaluate-paws.py": {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/evaluate-paws.py",
+      "sha256": "479abad870190eac48fdc40f0b6d6c853a7e5d9da7ec3f100c2ba16395cbda8e"
+    },
+    "identity-process.json": {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/identity-process.json",
+      "sha256": "4ba547fbfd2366c756011f7a67c2bdbc4056417cfb5cf8d0de57d7619ea33d2c"
+    },
+    "isolation-verified.json": {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/isolation-verified.json",
+      "sha256": "6cfbe6f76c48029864d60e8b899004d5d7ebb02221926645358f7b64576ba621"
+    },
+    "paw-1-context.txt": {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/paw-1-context.txt",
+      "sha256": "ff13368f7878e4cd432ade48d819ff5c97f48026b6c7063bc3b5707b307aae61"
+    },
+    "paw-1-native.json": {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/paw-1-native.json",
+      "sha256": "79c0283ff624f4a3a27bae22284fcfaa4ba5b9e1199383e8a893b432a8d1ea34"
+    },
+    "paw-1-private.xml": {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/paw-1-private.xml",
+      "sha256": "4087d56b733f711b0a3cf07394fea7c5c29e14d6f5fecfd9c32322e8c8b6881a"
+    },
+    "paw-1-process.json": {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/paw-1-process.json",
+      "sha256": "3f4000bfaec8c8640ad9e9df18527d94add4f66188b3b4d69df3e2aaec79270e"
+    },
+    "paw-1-samples.csv": {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/paw-1-samples.csv",
+      "sha256": "48c030fd7d8304e07f5e64af16b7e8598fe45ddd663f975bbc7d3f0ca647b527"
+    },
+    "paw-1.log": {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/paw-1.log",
+      "sha256": "a0b3e5e310eb2dc7716b8341d5dc7a62d23d8248e3c18f9619ea75170d29a895"
+    },
+    "paw-1.xml": {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/paw-1.xml",
+      "sha256": "4087d56b733f711b0a3cf07394fea7c5c29e14d6f5fecfd9c32322e8c8b6881a"
+    },
+    "paw-request.json": {
+      "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/paw-request.json",
+      "sha256": "b13a747cbad37ad24b8047d13bb93173e3465834f1bcdbb174788a612843e7b5"
+    }
+  },
+  "max_required_height_mm": 1.88056508,
+  "max_required_slide_mm": 1.3675223259785063,
+  "measurements": [
+    {
+      "gait": "Walk",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.959666155,
+          "adjacent_step_mm": 0.10874237124363857,
+          "highest_sole_mm": 0.959666155,
+          "lowest_sole_mm": -0.0335909863,
+          "sample_count": 81,
+          "slide_mm": 0.729194600442127,
+          "start_frame": 1
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.959666155,
+      "max_slide_mm": 0.729194600442127,
+      "max_sole_mm": 0.959666155,
+      "max_step_mm": 0.10874237124363857,
+      "min_sole_mm": -0.0335909863,
+      "original_budget_pass": true,
+      "paw": "LF",
+      "species": "cat"
+    },
+    {
+      "gait": "Walk",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.9606862,
+          "adjacent_step_mm": 0.10589768432619252,
+          "highest_sole_mm": 0.9606862,
+          "lowest_sole_mm": -0.0335746627,
+          "sample_count": 81,
+          "slide_mm": 0.7276884729252266,
+          "start_frame": 65
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.9606862,
+      "max_slide_mm": 0.7276884729252266,
+      "max_sole_mm": 0.9606862,
+      "max_step_mm": 0.10589768432619252,
+      "min_sole_mm": -0.0335746627,
+      "original_budget_pass": true,
+      "paw": "RF",
+      "species": "cat"
+    },
+    {
+      "gait": "Walk",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.0254777569,
+          "adjacent_step_mm": 0.07766914645347132,
+          "highest_sole_mm": 0.0254777569,
+          "lowest_sole_mm": -0.00322291066,
+          "sample_count": 71,
+          "slide_mm": 0.716000228560307,
+          "start_frame": 97
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.0254777569,
+      "max_slide_mm": 0.716000228560307,
+      "max_sole_mm": 0.0254777569,
+      "max_step_mm": 0.07766914645347132,
+      "min_sole_mm": -0.00322291066,
+      "original_budget_pass": true,
+      "paw": "LH",
+      "species": "cat"
+    },
+    {
+      "gait": "Walk",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.0253737926,
+          "adjacent_step_mm": 0.07734731080399602,
+          "highest_sole_mm": 0.0253737926,
+          "lowest_sole_mm": -0.003221485,
+          "sample_count": 71,
+          "slide_mm": 0.7166400081379817,
+          "start_frame": 33
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.0253737926,
+      "max_slide_mm": 0.7166400081379817,
+      "max_sole_mm": 0.0253737926,
+      "max_step_mm": 0.07734731080399602,
+      "min_sole_mm": -0.003221485,
+      "original_budget_pass": true,
+      "paw": "RH",
+      "species": "cat"
+    },
+    {
+      "gait": "Walk",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 1.88056508,
+          "adjacent_step_mm": 0.13403754162009926,
+          "highest_sole_mm": 1.88056508,
+          "lowest_sole_mm": 0.051776613,
+          "sample_count": 81,
+          "slide_mm": 0.8971616482458795,
+          "start_frame": 1
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 9,
+      "max_height_mm": 1.88056508,
+      "max_slide_mm": 0.8971616482458795,
+      "max_sole_mm": 1.88056508,
+      "max_step_mm": 0.13403754162009926,
+      "min_sole_mm": 0.051776613,
+      "original_budget_pass": true,
+      "paw": "LF",
+      "species": "cat"
+    },
+    {
+      "gait": "Walk",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 1.45212328,
+          "adjacent_step_mm": 0.11315327267495476,
+          "highest_sole_mm": 1.45212328,
+          "lowest_sole_mm": -0.000106716854,
+          "sample_count": 81,
+          "slide_mm": 0.7521610300507748,
+          "start_frame": 65
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 12,
+      "max_height_mm": 1.45212328,
+      "max_slide_mm": 0.7521610300507748,
+      "max_sole_mm": 1.45212328,
+      "max_step_mm": 0.11315327267495476,
+      "min_sole_mm": -0.000106716854,
+      "original_budget_pass": true,
+      "paw": "RF",
+      "species": "cat"
+    },
+    {
+      "gait": "Walk",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.0579211337,
+          "adjacent_step_mm": 0.09470422068107945,
+          "highest_sole_mm": 0.0579211337,
+          "lowest_sole_mm": -0.00469025872,
+          "sample_count": 71,
+          "slide_mm": 0.9035378846196956,
+          "start_frame": 97
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 21,
+      "max_height_mm": 0.0579211337,
+      "max_slide_mm": 0.9035378846196956,
+      "max_sole_mm": 0.0579211337,
+      "max_step_mm": 0.09470422068107945,
+      "min_sole_mm": -0.00469025872,
+      "original_budget_pass": true,
+      "paw": "LH",
+      "species": "cat"
+    },
+    {
+      "gait": "Walk",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.2321623,
+          "adjacent_step_mm": 0.0914487667346564,
+          "highest_sole_mm": 0.2321623,
+          "lowest_sole_mm": -0.00755735346,
+          "sample_count": 71,
+          "slide_mm": 0.8636201025664086,
+          "start_frame": 33
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 20,
+      "max_height_mm": 0.2321623,
+      "max_slide_mm": 0.8636201025664086,
+      "max_sole_mm": 0.2321623,
+      "max_step_mm": 0.0914487667346564,
+      "min_sole_mm": -0.00755735346,
+      "original_budget_pass": true,
+      "paw": "RH",
+      "species": "cat"
+    },
+    {
+      "gait": "Trot",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.394178438,
+          "adjacent_step_mm": 0.205502808504629,
+          "highest_sole_mm": 0.394178438,
+          "lowest_sole_mm": -0.128209824,
+          "sample_count": 35,
+          "slide_mm": 0.8578080529149238,
+          "start_frame": 4
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.394178438,
+      "max_slide_mm": 0.8578080529149238,
+      "max_sole_mm": 0.394178438,
+      "max_step_mm": 0.205502808504629,
+      "min_sole_mm": -0.128209824,
+      "original_budget_pass": true,
+      "paw": "LF",
+      "species": "cat"
+    },
+    {
+      "gait": "Trot",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.393055438,
+          "adjacent_step_mm": 0.20500050028535813,
+          "highest_sole_mm": 0.393055438,
+          "lowest_sole_mm": -0.130523666,
+          "sample_count": 35,
+          "slide_mm": 0.8574542651340087,
+          "start_frame": 46
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.393055438,
+      "max_slide_mm": 0.8574542651340087,
+      "max_sole_mm": 0.393055438,
+      "max_step_mm": 0.20500050028535813,
+      "min_sole_mm": -0.130523666,
+      "original_budget_pass": true,
+      "paw": "RF",
+      "species": "cat"
+    },
+    {
+      "gait": "Trot",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.030609982799999998,
+          "adjacent_step_mm": 0.1940059563853643,
+          "highest_sole_mm": 0.030609982799999998,
+          "lowest_sole_mm": -0.003584365,
+          "sample_count": 33,
+          "slide_mm": 0.8096857149599818,
+          "start_frame": 46
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.030609982799999998,
+      "max_slide_mm": 0.8096857149599818,
+      "max_sole_mm": 0.030609982799999998,
+      "max_step_mm": 0.1940059563853643,
+      "min_sole_mm": -0.003584365,
+      "original_budget_pass": true,
+      "paw": "LH",
+      "species": "cat"
+    },
+    {
+      "gait": "Trot",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.0286410468,
+          "adjacent_step_mm": 0.19463362506620088,
+          "highest_sole_mm": 0.0286410468,
+          "lowest_sole_mm": -0.0034760476,
+          "sample_count": 33,
+          "slide_mm": 0.8093062082275148,
+          "start_frame": 4
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.0286410468,
+      "max_slide_mm": 0.8093062082275148,
+      "max_sole_mm": 0.0286410468,
+      "max_step_mm": 0.19463362506620088,
+      "min_sole_mm": -0.0034760476,
+      "original_budget_pass": true,
+      "paw": "RH",
+      "species": "cat"
+    },
+    {
+      "gait": "Trot",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.5809031,
+          "adjacent_step_mm": 0.24946872484388954,
+          "highest_sole_mm": 0.5809031,
+          "lowest_sole_mm": -0.0226918219,
+          "sample_count": 35,
+          "slide_mm": 1.1196366687178954,
+          "start_frame": 4
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 9,
+      "max_height_mm": 0.5809031,
+      "max_slide_mm": 1.1196366687178954,
+      "max_sole_mm": 0.5809031,
+      "max_step_mm": 0.24946872484388954,
+      "min_sole_mm": -0.0226918219,
+      "original_budget_pass": true,
+      "paw": "LF",
+      "species": "cat"
+    },
+    {
+      "gait": "Trot",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.43100546500000003,
+          "adjacent_step_mm": 0.21346704669080194,
+          "highest_sole_mm": 0.43100546500000003,
+          "lowest_sole_mm": -0.08731717389999999,
+          "sample_count": 35,
+          "slide_mm": 0.9335632427038308,
+          "start_frame": 46
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 12,
+      "max_height_mm": 0.43100546500000003,
+      "max_slide_mm": 0.9335632427038308,
+      "max_sole_mm": 0.43100546500000003,
+      "max_step_mm": 0.21346704669080194,
+      "min_sole_mm": -0.08731717389999999,
+      "original_budget_pass": true,
+      "paw": "RF",
+      "species": "cat"
+    },
+    {
+      "gait": "Trot",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.059459594899999996,
+          "adjacent_step_mm": 0.23397097161983912,
+          "highest_sole_mm": 0.059459594899999996,
+          "lowest_sole_mm": -0.0064500695799999995,
+          "sample_count": 33,
+          "slide_mm": 1.0161028875102072,
+          "start_frame": 46
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 21,
+      "max_height_mm": 0.059459594899999996,
+      "max_slide_mm": 1.0161028875102072,
+      "max_sole_mm": 0.059459594899999996,
+      "max_step_mm": 0.23397097161983912,
+      "min_sole_mm": -0.0064500695799999995,
+      "original_budget_pass": true,
+      "paw": "LH",
+      "species": "cat"
+    },
+    {
+      "gait": "Trot",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.24535635000000003,
+          "adjacent_step_mm": 0.22393290178087932,
+          "highest_sole_mm": 0.24535635000000003,
+          "lowest_sole_mm": -0.007797608,
+          "sample_count": 33,
+          "slide_mm": 0.9679500062503319,
+          "start_frame": 4
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 20,
+      "max_height_mm": 0.24535635000000003,
+      "max_slide_mm": 0.9679500062503319,
+      "max_sole_mm": 0.24535635000000003,
+      "max_step_mm": 0.22393290178087932,
+      "min_sole_mm": -0.007797608,
+      "original_budget_pass": true,
+      "paw": "RH",
+      "species": "cat"
+    },
+    {
+      "gait": "Gallop",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 1.085379,
+          "adjacent_step_mm": 0.2760649146448784,
+          "highest_sole_mm": 1.085379,
+          "lowest_sole_mm": 0.461130345,
+          "sample_count": 12,
+          "slide_mm": 0.724764186254146,
+          "start_frame": 29
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 1.085379,
+      "max_slide_mm": 0.724764186254146,
+      "max_sole_mm": 1.085379,
+      "max_step_mm": 0.2760649146448784,
+      "min_sole_mm": 0.461130345,
+      "original_budget_pass": true,
+      "paw": "LF",
+      "species": "cat"
+    },
+    {
+      "gait": "Gallop",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 1.05244294,
+          "adjacent_step_mm": 0.28849514172821694,
+          "highest_sole_mm": 1.05244294,
+          "lowest_sole_mm": 0.46065717500000003,
+          "sample_count": 12,
+          "slide_mm": 0.6625222396389787,
+          "start_frame": 37
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 1.05244294,
+      "max_slide_mm": 0.6625222396389787,
+      "max_sole_mm": 1.05244294,
+      "max_step_mm": 0.28849514172821694,
+      "min_sole_mm": 0.46065717500000003,
+      "original_budget_pass": true,
+      "paw": "RF",
+      "species": "cat"
+    },
+    {
+      "gait": "Gallop",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.5969724,
+          "adjacent_step_mm": 0.23731947180962742,
+          "highest_sole_mm": 0.5969724,
+          "lowest_sole_mm": 0.452041859,
+          "sample_count": 13,
+          "slide_mm": 0.6561702060441446,
+          "start_frame": 1
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.5969724,
+      "max_slide_mm": 0.6561702060441446,
+      "max_sole_mm": 0.5969724,
+      "max_step_mm": 0.23731947180962742,
+      "min_sole_mm": 0.452041859,
+      "original_budget_pass": true,
+      "paw": "LH",
+      "species": "cat"
+    },
+    {
+      "gait": "Gallop",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.6001281,
+          "adjacent_step_mm": 0.2449718147224501,
+          "highest_sole_mm": 0.6001281,
+          "lowest_sole_mm": 0.451909262,
+          "sample_count": 13,
+          "slide_mm": 0.6220447864027951,
+          "start_frame": 4
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.6001281,
+      "max_slide_mm": 0.6220447864027951,
+      "max_sole_mm": 0.6001281,
+      "max_step_mm": 0.2449718147224501,
+      "min_sole_mm": 0.451909262,
+      "original_budget_pass": true,
+      "paw": "RH",
+      "species": "cat"
+    },
+    {
+      "gait": "Gallop",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 1.05150661,
+          "adjacent_step_mm": 0.41602607448412976,
+          "highest_sole_mm": 1.05150661,
+          "lowest_sole_mm": 0.5459625,
+          "sample_count": 12,
+          "slide_mm": 1.0707392768550665,
+          "start_frame": 29
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 9,
+      "max_height_mm": 1.05150661,
+      "max_slide_mm": 1.0707392768550665,
+      "max_sole_mm": 1.05150661,
+      "max_step_mm": 0.41602607448412976,
+      "min_sole_mm": 0.5459625,
+      "original_budget_pass": true,
+      "paw": "LF",
+      "species": "cat"
+    },
+    {
+      "gait": "Gallop",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 1.042816,
+          "adjacent_step_mm": 0.35219023012641654,
+          "highest_sole_mm": 1.042816,
+          "lowest_sole_mm": 0.5139275,
+          "sample_count": 12,
+          "slide_mm": 0.8262844231118114,
+          "start_frame": 37
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 12,
+      "max_height_mm": 1.042816,
+      "max_slide_mm": 0.8262844231118114,
+      "max_sole_mm": 1.042816,
+      "max_step_mm": 0.35219023012641654,
+      "min_sole_mm": 0.5139275,
+      "original_budget_pass": true,
+      "paw": "RF",
+      "species": "cat"
+    },
+    {
+      "gait": "Gallop",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.6061908,
+          "adjacent_step_mm": 0.31224827439525155,
+          "highest_sole_mm": 0.6061908,
+          "lowest_sole_mm": 0.4671684,
+          "sample_count": 13,
+          "slide_mm": 0.853996848958358,
+          "start_frame": 1
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 21,
+      "max_height_mm": 0.6061908,
+      "max_slide_mm": 0.853996848958358,
+      "max_sole_mm": 0.6061908,
+      "max_step_mm": 0.31224827439525155,
+      "min_sole_mm": 0.4671684,
+      "original_budget_pass": true,
+      "paw": "LH",
+      "species": "cat"
+    },
+    {
+      "gait": "Gallop",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.8705940999999999,
+          "adjacent_step_mm": 0.33232753251026154,
+          "highest_sole_mm": 0.8705940999999999,
+          "lowest_sole_mm": 0.450275576,
+          "sample_count": 13,
+          "slide_mm": 0.8592687232158511,
+          "start_frame": 4
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 20,
+      "max_height_mm": 0.8705940999999999,
+      "max_slide_mm": 0.8592687232158511,
+      "max_sole_mm": 0.8705940999999999,
+      "max_step_mm": 0.33232753251026154,
+      "min_sole_mm": 0.450275576,
+      "original_budget_pass": true,
+      "paw": "RH",
+      "species": "cat"
+    },
+    {
+      "gait": "Walk",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.0314107929,
+          "adjacent_step_mm": 0.0495260598428696,
+          "highest_sole_mm": 0.0314107929,
+          "lowest_sole_mm": -0.00314174531,
+          "sample_count": 99,
+          "slide_mm": 0.9363909274127853,
+          "start_frame": 1
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.0314107929,
+      "max_slide_mm": 0.9363909274127853,
+      "max_sole_mm": 0.0314107929,
+      "max_step_mm": 0.0495260598428696,
+      "min_sole_mm": -0.00314174531,
+      "original_budget_pass": true,
+      "paw": "LF",
+      "species": "dog"
+    },
+    {
+      "gait": "Walk",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.0252285172,
+          "adjacent_step_mm": 0.050618897656912416,
+          "highest_sole_mm": 0.0252285172,
+          "lowest_sole_mm": -0.019112212599999998,
+          "sample_count": 99,
+          "slide_mm": 0.9524170949709354,
+          "start_frame": 81
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.0252285172,
+      "max_slide_mm": 0.9524170949709354,
+      "max_sole_mm": 0.0252285172,
+      "max_step_mm": 0.050618897656912416,
+      "min_sole_mm": -0.019112212599999998,
+      "original_budget_pass": true,
+      "paw": "RF",
+      "species": "dog"
+    },
+    {
+      "gait": "Walk",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.031977168,
+          "adjacent_step_mm": 0.0681860978224279,
+          "highest_sole_mm": 0.031977168,
+          "lowest_sole_mm": -0.0120727082,
+          "sample_count": 87,
+          "slide_mm": 1.0436716707602531,
+          "start_frame": 137
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.031977168,
+      "max_slide_mm": 1.0436716707602531,
+      "max_sole_mm": 0.031977168,
+      "max_step_mm": 0.0681860978224279,
+      "min_sole_mm": -0.0120727082,
+      "original_budget_pass": true,
+      "paw": "LH",
+      "species": "dog"
+    },
+    {
+      "gait": "Walk",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.07918963,
+          "adjacent_step_mm": 0.06742107340891661,
+          "highest_sole_mm": 0.0143884045,
+          "lowest_sole_mm": -0.07918963,
+          "sample_count": 87,
+          "slide_mm": 1.029184572111364,
+          "start_frame": 57
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.07918963,
+      "max_slide_mm": 1.029184572111364,
+      "max_sole_mm": 0.0143884045,
+      "max_step_mm": 0.06742107340891661,
+      "min_sole_mm": -0.07918963,
+      "original_budget_pass": true,
+      "paw": "RH",
+      "species": "dog"
+    },
+    {
+      "gait": "Walk",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.170521031,
+          "adjacent_step_mm": 0.05962947862426992,
+          "highest_sole_mm": 0.0314107929,
+          "lowest_sole_mm": -0.170521031,
+          "sample_count": 99,
+          "slide_mm": 1.1436015783480065,
+          "start_frame": 1
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 20,
+      "max_height_mm": 0.170521031,
+      "max_slide_mm": 1.1436015783480065,
+      "max_sole_mm": 0.0314107929,
+      "max_step_mm": 0.05962947862426992,
+      "min_sole_mm": -0.170521031,
+      "original_budget_pass": true,
+      "paw": "LF",
+      "species": "dog"
+    },
+    {
+      "gait": "Walk",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.64674957,
+          "adjacent_step_mm": 0.06573989751283701,
+          "highest_sole_mm": 0.64674957,
+          "lowest_sole_mm": 0.02731871,
+          "sample_count": 99,
+          "slide_mm": 1.2649853567109908,
+          "start_frame": 81
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 15,
+      "max_height_mm": 0.64674957,
+      "max_slide_mm": 1.2649853567109908,
+      "max_sole_mm": 0.64674957,
+      "max_step_mm": 0.06573989751283701,
+      "min_sole_mm": 0.02731871,
+      "original_budget_pass": true,
+      "paw": "RF",
+      "species": "dog"
+    },
+    {
+      "gait": "Walk",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.23772916800000002,
+          "adjacent_step_mm": 0.07189715882591774,
+          "highest_sole_mm": 0.23772916800000002,
+          "lowest_sole_mm": -0.0393509872,
+          "sample_count": 87,
+          "slide_mm": 1.1867904948736696,
+          "start_frame": 137
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 19,
+      "max_height_mm": 0.23772916800000002,
+      "max_slide_mm": 1.1867904948736696,
+      "max_sole_mm": 0.23772916800000002,
+      "max_step_mm": 0.07189715882591774,
+      "min_sole_mm": -0.0393509872,
+      "original_budget_pass": true,
+      "paw": "LH",
+      "species": "dog"
+    },
+    {
+      "gait": "Walk",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.211715349,
+          "adjacent_step_mm": 0.08598308341354347,
+          "highest_sole_mm": 0.211715349,
+          "lowest_sole_mm": -0.0055630029999999995,
+          "sample_count": 87,
+          "slide_mm": 1.3675223259785063,
+          "start_frame": 57
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 22,
+      "max_height_mm": 0.211715349,
+      "max_slide_mm": 1.3675223259785063,
+      "max_sole_mm": 0.211715349,
+      "max_step_mm": 0.08598308341354347,
+      "min_sole_mm": -0.0055630029999999995,
+      "original_budget_pass": true,
+      "paw": "RH",
+      "species": "dog"
+    },
+    {
+      "gait": "Trot",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.0314811077,
+          "adjacent_step_mm": 0.1005944436253189,
+          "highest_sole_mm": 0.0314811077,
+          "lowest_sole_mm": -0.0021418613900000003,
+          "sample_count": 49,
+          "slide_mm": 0.9415757983080094,
+          "start_frame": 2
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.0314811077,
+      "max_slide_mm": 0.9415757983080094,
+      "max_sole_mm": 0.0314811077,
+      "max_step_mm": 0.1005944436253189,
+      "min_sole_mm": -0.0021418613900000003,
+      "original_budget_pass": true,
+      "paw": "LF",
+      "species": "dog"
+    },
+    {
+      "gait": "Trot",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.0278811331,
+          "adjacent_step_mm": 0.10429289207689434,
+          "highest_sole_mm": 0.0278811331,
+          "lowest_sole_mm": -0.02713509,
+          "sample_count": 49,
+          "slide_mm": 0.9565360194707301,
+          "start_frame": 54
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.0278811331,
+      "max_slide_mm": 0.9565360194707301,
+      "max_sole_mm": 0.0278811331,
+      "max_step_mm": 0.10429289207689434,
+      "min_sole_mm": -0.02713509,
+      "original_budget_pass": true,
+      "paw": "RF",
+      "species": "dog"
+    },
+    {
+      "gait": "Trot",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.0321760053,
+          "adjacent_step_mm": 0.14784183224601763,
+          "highest_sole_mm": 0.0321760053,
+          "lowest_sole_mm": -0.010978805199999999,
+          "sample_count": 40,
+          "slide_mm": 1.0373982524376892,
+          "start_frame": 55
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.0321760053,
+      "max_slide_mm": 1.0373982524376892,
+      "max_sole_mm": 0.0321760053,
+      "max_step_mm": 0.14784183224601763,
+      "min_sole_mm": -0.010978805199999999,
+      "original_budget_pass": true,
+      "paw": "LH",
+      "species": "dog"
+    },
+    {
+      "gait": "Trot",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.08453216,
+          "adjacent_step_mm": 0.14681117863299714,
+          "highest_sole_mm": 0.009790450000000001,
+          "lowest_sole_mm": -0.08453216,
+          "sample_count": 40,
+          "slide_mm": 1.0233975755795606,
+          "start_frame": 3
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.08453216,
+      "max_slide_mm": 1.0233975755795606,
+      "max_sole_mm": 0.009790450000000001,
+      "max_step_mm": 0.14681117863299714,
+      "min_sole_mm": -0.08453216,
+      "original_budget_pass": true,
+      "paw": "RH",
+      "species": "dog"
+    },
+    {
+      "gait": "Trot",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.166412967,
+          "adjacent_step_mm": 0.11611974564253189,
+          "highest_sole_mm": 0.0314811077,
+          "lowest_sole_mm": -0.166412967,
+          "sample_count": 49,
+          "slide_mm": 1.1498303147751494,
+          "start_frame": 2
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 20,
+      "max_height_mm": 0.166412967,
+      "max_slide_mm": 1.1498303147751494,
+      "max_sole_mm": 0.0314811077,
+      "max_step_mm": 0.11611974564253189,
+      "min_sole_mm": -0.166412967,
+      "original_budget_pass": true,
+      "paw": "LF",
+      "species": "dog"
+    },
+    {
+      "gait": "Trot",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.6349387,
+          "adjacent_step_mm": 0.1329677540759488,
+          "highest_sole_mm": 0.6349387,
+          "lowest_sole_mm": 0.0293549638,
+          "sample_count": 49,
+          "slide_mm": 1.2738410157005444,
+          "start_frame": 54
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 15,
+      "max_height_mm": 0.6349387,
+      "max_slide_mm": 1.2738410157005444,
+      "max_sole_mm": 0.6349387,
+      "max_step_mm": 0.1329677540759488,
+      "min_sole_mm": 0.0293549638,
+      "original_budget_pass": true,
+      "paw": "RF",
+      "species": "dog"
+    },
+    {
+      "gait": "Trot",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.23258500699999998,
+          "adjacent_step_mm": 0.15765275620937202,
+          "highest_sole_mm": 0.23258500699999998,
+          "lowest_sole_mm": -0.0328652641,
+          "sample_count": 40,
+          "slide_mm": 1.1818675736551585,
+          "start_frame": 55
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 19,
+      "max_height_mm": 0.23258500699999998,
+      "max_slide_mm": 1.1818675736551585,
+      "max_sole_mm": 0.23258500699999998,
+      "max_step_mm": 0.15765275620937202,
+      "min_sole_mm": -0.0328652641,
+      "original_budget_pass": true,
+      "paw": "LH",
+      "species": "dog"
+    },
+    {
+      "gait": "Trot",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.211486229,
+          "adjacent_step_mm": 0.18361385365393318,
+          "highest_sole_mm": 0.211486229,
+          "lowest_sole_mm": -0.00307264963,
+          "sample_count": 40,
+          "slide_mm": 1.3588528840179803,
+          "start_frame": 3
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 22,
+      "max_height_mm": 0.211486229,
+      "max_slide_mm": 1.3588528840179803,
+      "max_sole_mm": 0.211486229,
+      "max_step_mm": 0.18361385365393318,
+      "min_sole_mm": -0.00307264963,
+      "original_budget_pass": true,
+      "paw": "RH",
+      "species": "dog"
+    },
+    {
+      "gait": "Gallop",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.7731654330000001,
+          "adjacent_step_mm": 0.29747475139243235,
+          "highest_sole_mm": 0.7731654330000001,
+          "lowest_sole_mm": 0.0370992057,
+          "sample_count": 13,
+          "slide_mm": 1.3804799407003499,
+          "start_frame": 1
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.7731654330000001,
+      "max_slide_mm": 1.3804799407003499,
+      "max_sole_mm": 0.7731654330000001,
+      "max_step_mm": 0.29747475139243235,
+      "min_sole_mm": 0.0370992057,
+      "original_budget_pass": true,
+      "paw": "LF",
+      "species": "dog"
+    },
+    {
+      "gait": "Gallop",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.758288254,
+          "adjacent_step_mm": 0.2906421439711817,
+          "highest_sole_mm": 0.758288254,
+          "lowest_sole_mm": 0.033842265100000005,
+          "sample_count": 13,
+          "slide_mm": 1.3029268261735465,
+          "start_frame": 5
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.758288254,
+      "max_slide_mm": 1.3029268261735465,
+      "max_sole_mm": 0.758288254,
+      "max_step_mm": 0.2906421439711817,
+      "min_sole_mm": 0.033842265100000005,
+      "original_budget_pass": true,
+      "paw": "RF",
+      "species": "dog"
+    },
+    {
+      "gait": "Gallop",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.730349333,
+          "adjacent_step_mm": 0.5822031658802914,
+          "highest_sole_mm": 0.730349333,
+          "lowest_sole_mm": 0.0206155637,
+          "sample_count": 12,
+          "slide_mm": 2.4837254358169294,
+          "start_frame": 36
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.730349333,
+      "max_slide_mm": 2.4837254358169294,
+      "max_sole_mm": 0.730349333,
+      "max_step_mm": 0.5822031658802914,
+      "min_sole_mm": 0.0206155637,
+      "original_budget_pass": true,
+      "paw": "LH",
+      "species": "dog"
+    },
+    {
+      "gait": "Gallop",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.7646989540000001,
+          "adjacent_step_mm": 0.5908141335758885,
+          "highest_sole_mm": 0.7646989540000001,
+          "lowest_sole_mm": 0.0199975566,
+          "sample_count": 11,
+          "slide_mm": 2.117732245852879,
+          "start_frame": 31
+        }
+      ],
+      "lod": 0,
+      "mapped_pad_points": 65,
+      "max_height_mm": 0.7646989540000001,
+      "max_slide_mm": 2.117732245852879,
+      "max_sole_mm": 0.7646989540000001,
+      "max_step_mm": 0.5908141335758885,
+      "min_sole_mm": 0.0199975566,
+      "original_budget_pass": true,
+      "paw": "RH",
+      "species": "dog"
+    },
+    {
+      "gait": "Gallop",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 0.7743910540000001,
+          "adjacent_step_mm": 0.3210444275859349,
+          "highest_sole_mm": 0.7743910540000001,
+          "lowest_sole_mm": -0.07952421,
+          "sample_count": 13,
+          "slide_mm": 1.6095901188585295,
+          "start_frame": 1
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 20,
+      "max_height_mm": 0.7743910540000001,
+      "max_slide_mm": 1.6095901188585295,
+      "max_sole_mm": 0.7743910540000001,
+      "max_step_mm": 0.3210444275859349,
+      "min_sole_mm": -0.07952421,
+      "original_budget_pass": true,
+      "paw": "LF",
+      "species": "dog"
+    },
+    {
+      "gait": "Gallop",
+      "gallopreview_budget_pass": false,
+      "intervals": [
+        {
+          "absolute_height_mm": 2.37054867,
+          "adjacent_step_mm": 0.3761182324748603,
+          "highest_sole_mm": 2.37054867,
+          "lowest_sole_mm": 0.0476930545,
+          "sample_count": 13,
+          "slide_mm": 1.705844413545667,
+          "start_frame": 5
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 15,
+      "max_height_mm": 2.37054867,
+      "max_slide_mm": 1.705844413545667,
+      "max_sole_mm": 2.37054867,
+      "max_step_mm": 0.3761182324748603,
+      "min_sole_mm": 0.0476930545,
+      "original_budget_pass": true,
+      "paw": "RF",
+      "species": "dog"
+    },
+    {
+      "gait": "Gallop",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 1.16799143,
+          "adjacent_step_mm": 0.5780780137859842,
+          "highest_sole_mm": 1.16799143,
+          "lowest_sole_mm": 0.0218737969,
+          "sample_count": 12,
+          "slide_mm": 2.5894800704313194,
+          "start_frame": 36
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 19,
+      "max_height_mm": 1.16799143,
+      "max_slide_mm": 2.5894800704313194,
+      "max_sole_mm": 1.16799143,
+      "max_step_mm": 0.5780780137859842,
+      "min_sole_mm": 0.0218737969,
+      "original_budget_pass": true,
+      "paw": "LH",
+      "species": "dog"
+    },
+    {
+      "gait": "Gallop",
+      "gallopreview_budget_pass": true,
+      "intervals": [
+        {
+          "absolute_height_mm": 1.49024208,
+          "adjacent_step_mm": 0.7129944142777933,
+          "highest_sole_mm": 1.49024208,
+          "lowest_sole_mm": 0.0254060851,
+          "sample_count": 11,
+          "slide_mm": 2.521888488060706,
+          "start_frame": 31
+        }
+      ],
+      "lod": 1,
+      "mapped_pad_points": 22,
+      "max_height_mm": 1.49024208,
+      "max_slide_mm": 2.521888488060706,
+      "max_sole_mm": 1.49024208,
+      "max_step_mm": 0.7129944142777933,
+      "min_sole_mm": 0.0254060851,
+      "original_budget_pass": true,
+      "paw": "RH",
+      "species": "dog"
+    }
+  ],
+  "native_samples": 4736,
+  "required_budget": {
+    "maximum_absolute_paw_height_mm": 25,
+    "maximum_slide_mm": 35,
+    "minimum_support_samples": 3,
+    "model": {
+      "path": ".skill-tree/examples/3d/recipes/character/creatures/harness/specimens/quadrupeds.json",
+      "sha256": "26cb30a5bda31efb6263dc9cd0205243c9da249a71cab03f635772ca245834fb"
+    }
+  },
+  "required_cases_outside_comparison_budget": 0,
+  "required_paw_lod_cases": 32,
+  "schema": 1,
+  "status": "passed",
+  "task_id": "T-fc3d6c8e-fffb-49d8-b71b-d617c01eac94",
+  "world_space_method": "Track the actual residual-corrected skinned surface on the exact Generic prefab, with externally prescribed constant stride travel. Archetype phase and support masks are pinned from GallopReview."
+}

@@ -25,6 +25,8 @@ Run the bundled `scripts/narrative-state.py` against the selected project root. 
 4. Store drafts as Markdown and JSON pairs under `.narrative/records/`. Keep stable typed IDs such as `character-mara` independent of titles and display names. Each sidecar declares `id`, `kind` and `depends_on`. Store only normative links in `depends_on`. Record mentions and provenance separately.
 5. Record source origin and the author's intended use for external references. Mark an unconfirmed claim, inferred visual trait or conflicting testimony as such. Preserve the original or a stable locator within the authorized scope. Keep artistic method references outside canon.
 
+Link from a quest or narrative project guide to the applicable work context and typed records under `.narrative/records/`. Keep the Markdown and JSON pair together. Use stable record IDs and the selected snapshot for canon and dependency discovery.
+
 ## Interview and develop
 
 Resolve questions that primary sources or existing decisions can answer. Ask one to three high-impact questions per round when a creative choice affects the result. Identify the decision, offer distinct options with consequences, and recommend one against the author's stated goal. Record the answer and the authorized scope. Continue reversible work on unaffected material and label speculative options. Hold the portion that depends on an unanswered decision.

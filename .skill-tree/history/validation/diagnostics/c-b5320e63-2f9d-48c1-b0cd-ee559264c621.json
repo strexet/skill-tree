@@ -1,0 +1,21 @@
+{
+  "task_id": "T-43aeeb45-2075-4fab-8ccd-11a530e0555a",
+  "check_id": "owned-recovery-guidance",
+  "attempt_id": "C-b5320e63-2f9d-48c1-b0cd-ee559264c621",
+  "command": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-installer.js"
+  ],
+  "result": "pass",
+  "counts": {
+    "expected": 20,
+    "discovered": 20,
+    "passed": 20,
+    "failed": 0,
+    "skipped": 0
+  },
+  "returncode": 0,
+  "log": ".skill-tree/artifacts/validation/diagnostics/c-b5320e63-2f9d-48c1-b0cd-ee559264c621.txt",
+  "log_sha256": "056f38c1ab5c8ccf2f41d9a1f353f27f3e1da1d2a8eee1116e161fea421602ca"
+}

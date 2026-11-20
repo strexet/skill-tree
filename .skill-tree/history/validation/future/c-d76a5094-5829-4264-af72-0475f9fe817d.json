@@ -1,0 +1,21 @@
+{
+  "task_id": "T-7eafba33-9f62-4772-845b-fe60b6e1f9e5",
+  "check_id": "future-refresh-guard",
+  "attempt_id": "C-d76a5094-5829-4264-af72-0475f9fe817d",
+  "command": [
+    "python3",
+    "-B",
+    ".skill-tree/tests/test-workflow-state.py"
+  ],
+  "result": "pass",
+  "counts": {
+    "expected": 65,
+    "discovered": 65,
+    "passed": 65,
+    "failed": 0,
+    "skipped": 0
+  },
+  "returncode": 0,
+  "log": ".skill-tree/artifacts/validation/future/c-d76a5094-5829-4264-af72-0475f9fe817d.txt",
+  "log_sha256": "57eefed40fa8105e396d55ef4116ae6b35cef2b32cf8d0210d34f05d8dd492f6"
+}

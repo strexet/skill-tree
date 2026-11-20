@@ -1,0 +1,22 @@
+{
+  "task_id": "T-9e26eb5b-11ff-4640-9cb6-bc5cbba86138",
+  "check_id": "owned-agents-regeneration",
+  "attempt_id": "C-1e6b5827-97f0-41cc-a4e6-94115bd66220",
+  "command": [
+    "node",
+    "--test",
+    "--test-name-pattern=owned manager regenerates only a missing registered AGENTS.md",
+    ".skill-tree/tests/test-installer.js"
+  ],
+  "result": "red",
+  "counts": {
+    "expected": 1,
+    "discovered": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0
+  },
+  "returncode": 1,
+  "log": ".skill-tree/artifacts/validation/agents/c-1e6b5827-97f0-41cc-a4e6-94115bd66220.txt",
+  "log_sha256": "10ece9f1c3f03f5292085b053576708405ea4836f47b11ca8f7584a3663c6fab"
+}

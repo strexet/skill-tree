@@ -1,7 +1,10 @@
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
+import unicodedata
 import unittest
 from unittest.mock import patch
 
@@ -33,6 +36,239 @@ class WorkflowStateTests(unittest.TestCase):
         wf.record_check(self.store,{'task_id':task['id'],'check_id':'behavior','attempt_id':attempt['attempt_id'],'result':'pass','classification':'executed-control','actual_lane':'static','environment_identity':attempt['environment_identity'],'assertions':[{'assertion':'Preserve isolated state.','result':'pass'}],'cleanup':'No product process was launched.','evidence':['test-report.json']})
         wf.mark_implemented(self.store,{'task_id':task['id']})
         return wf.complete(self.store,{'task_id':task['id'],'outcome':'The scoped behavior preserves isolated state.','acceptance':[{'criterion':'Preserve isolated state.','result':'pass','evidence':['test-report.json']}],'source_fingerprints':wf.fingerprints(self.store,['source.cs'])})
+    def test_scoped_task_commit_excludes_staged_and_other_worktree_changes(self):
+        git, task = self.git_task_fixture()
+        (self.root/'other.txt').write_text('staged owner edit\n')
+        git('add', 'other.txt')
+        (self.root/'side.txt').write_text('untracked owner edit\n')
+        before = git('rev-parse', 'HEAD')
+        payload = self.checked_git_completion(task,real_review=True)
+        result = wf.complete(self.store, payload)
+        commit, = result['commits']
+        self.assertEqual(git('rev-parse', 'HEAD'), commit)
+        self.assertEqual(git('rev-parse', 'HEAD^'), before)
+        self.assertEqual(git('diff-tree', '--no-commit-id', '--name-only', '-r', commit), 'source.cs')
+        self.assertEqual(git('diff', '--cached', '--name-only'), 'other.txt')
+        self.assertEqual((self.root/'side.txt').read_text(), 'untracked owner edit\n')
+        self.assertEqual(wf.complete(self.store, payload)['id'], result['id'])
+        self.assertEqual(git('rev-list', '--count', before+'..HEAD'), '1')
+
+    def test_scoped_task_commit_recovers_git_success_without_outcome(self):
+        git, task = self.git_task_fixture()
+        payload = self.checked_git_completion(task)
+        original = self.store.save
+        def fail_outcome(text, state, *args, **kwargs):
+            if len(args) and '.skill-tree/history/task-outcomes.jsonl' in args[0]:
+                raise OSError('Fixture simulates lost final metadata write')
+            return original(text, state, *args, **kwargs)
+        with patch.object(self.store, 'save', side_effect=fail_outcome), self.assertRaisesRegex(OSError, 'lost final'):
+            wf.complete(self.store, payload)
+        first = git('rev-parse', 'HEAD')
+        self.assertTrue(wf.resolve(wf.parse(self.store.text()), [task['id']]))
+        (self.root/'other.txt').write_text('post-commit owner edit\n')
+        git('add', 'other.txt')
+        self.assertEqual(wf.complete(self.store, payload)['commits'], [first])
+        self.assertEqual(git('rev-parse', 'HEAD'), first)
+        self.assertEqual(git('diff', '--cached', '--name-only'), 'other.txt')
+
+    def test_scoped_task_commit_rejects_owned_dirty_overlap_before_write(self):
+        git, task = self.git_task_fixture(dirty_source=True)
+        before = git('rev-parse', 'HEAD')
+        (self.root/'source.cs').write_text('Mixed owner and implementation content.\n')
+        with self.assertRaisesRegex(wf.workspaces.RunError, 'overlap'):
+            wf.mark_implemented(self.store, {'task_id':task['id'],'changed_files':['source.cs']})
+        self.assertEqual(git('rev-parse', 'HEAD'), before)
+
+    def test_scoped_task_commit_rejects_an_uncommitted_required_source(self):
+        git, task = self.git_task_fixture()
+        payload = self.checked_git_completion(task)
+        parent = git('rev-parse','HEAD')
+        (self.root/'other.txt').write_text('Uncommitted validation input.\n')
+        payload['source_fingerprints'].update(wf.fingerprints(self.store,['other.txt']))
+        with self.assertRaisesRegex(wf.workspaces.RunError,'changed validation input'):
+            wf.complete(self.store,payload)
+        self.assertEqual(git('rev-parse','HEAD'),parent)
+
+    def test_scoped_task_commit_rejects_an_ignored_required_source(self):
+        git,task=self.git_task_fixture()
+        payload=self.checked_git_completion(task)
+        parent=git('rev-parse','HEAD')
+        (self.root/'.git/info/exclude').write_text('ignored-input.txt\n')
+        (self.root/'ignored-input.txt').write_text('Ignored local validation input.\n')
+        payload['source_fingerprints'].update(wf.fingerprints(self.store,['ignored-input.txt']))
+        with self.assertRaisesRegex(wf.workspaces.RunError,'changed validation input'):
+            wf.complete(self.store,payload)
+        self.assertEqual(git('rev-parse','HEAD'),parent)
+
+    def test_scoped_task_commit_sealing_does_not_execute_a_git_hook(self):
+        git, task = self.git_task_fixture()
+        hook=self.root/'.git/hooks/post-index-change'
+        hook.write_text('#!/bin/sh\nprintf hook-fired > hook-observation\n')
+        hook.chmod(0o700)
+        (self.root/'source.cs').write_text('Reviewed replacement.\n')
+        with self.assertRaisesRegex(wf.workspaces.RunError,'executable Git hook'):
+            wf.mark_implemented(self.store,{'task_id':task['id'],'changed_files':['source.cs']})
+        self.assertFalse((self.root/'hook-observation').exists())
+
+    def test_scoped_task_commit_cannot_resume_on_another_checkout_branch(self):
+        git,task=self.git_task_fixture()
+        git('switch','-c','different-branch')
+        with self.assertRaisesRegex(wf.workspaces.RunError,'checkout, branch or original head changed'):
+            wf.begin_task(self.store,{'task_id':task['id'],'implementation_operation':'implement-next'})
+        self.assertEqual(git('branch','--show-current'),'different-branch')
+
+    def assert_validation_alias_rejected(self, alias, stored_input='other.txt'):
+        git,task=self.git_task_fixture(validation_alias=alias,stored_input=stored_input)
+        parent=git('rev-parse','HEAD')
+        (self.root/stored_input).write_text('Dirty bytes passed to the required check.\n')
+        payload=self.checked_git_completion(task,real_review=True)
+        with self.assertRaisesRegex(wf.workspaces.RunError,'changed validation input'):
+            wf.complete(self.store,payload)
+        self.assertEqual(git('rev-parse','HEAD'),parent)
+
+    def test_scoped_task_commit_rejects_a_lexical_validation_alias(self):
+        self.assert_validation_alias_rejected('./other.txt')
+
+    def test_scoped_task_commit_rejects_a_symlink_validation_alias(self):
+        self.assert_validation_alias_rejected('validation-input.cs')
+
+    def test_scoped_task_commit_rejects_a_case_variant_validation_alias(self):
+        probe=self.root/'case-probe'
+        probe.touch()
+        try:
+            if not (self.root/'CASE-PROBE').exists():
+                self.skipTest('The worktree filesystem is case sensitive')
+        finally:
+            probe.unlink()
+        self.assert_validation_alias_rejected('Other.txt')
+
+    def test_scoped_task_commit_rejects_a_unicode_validation_alias(self):
+        stored_input='café.txt'
+        alias=unicodedata.normalize('NFD',stored_input)
+        probe=self.root/stored_input
+        probe.touch()
+        try:
+            if not (self.root/alias).exists():
+                self.skipTest('The worktree filesystem distinguishes Unicode normalization forms')
+        finally:
+            probe.unlink()
+        self.assert_validation_alias_rejected(alias,stored_input=stored_input)
+
+    def test_scoped_task_commit_rejects_a_hidden_intermediate_validation_link(self):
+        git,task=self.git_task_fixture(validation_alias='validation-chain.cs')
+        parent=git('rev-parse','HEAD')
+        git('update-index','--assume-unchanged','intermediate.cs')
+        middle=self.root/'intermediate.cs'
+        middle.unlink()
+        middle.symlink_to('alternate.txt')
+        payload=self.checked_git_completion(task,real_review=True)
+        with self.assertRaisesRegex(wf.workspaces.RunError,'visible in the checked-out Git index'):
+            wf.complete(self.store,payload)
+        self.assertEqual(git('rev-parse','HEAD'),parent)
+
+    def git_task_fixture(self, dirty_source=False, validation_alias=None, stored_input='other.txt'):
+        import subprocess
+        def git(*args):
+            result=subprocess.run(['git','-C',str(self.root),*args],check=True,capture_output=True,text=True)
+            return result.stdout.strip()
+        git('init','-b','main')
+        git('config','user.name','Scoped Commit Fixture')
+        git('config','user.email','fixture@example.invalid')
+        git('config','commit.gpgSign','false')
+        (self.root/stored_input).write_text('owner baseline\n')
+        git('add','source.cs',stored_input)
+        if validation_alias=='validation-input.cs':
+            (self.root/validation_alias).symlink_to(stored_input)
+            git('add',validation_alias)
+        if validation_alias=='validation-chain.cs':
+            (self.root/'alternate.txt').write_text('Another committed input.\n')
+            (self.root/'intermediate.cs').symlink_to(stored_input)
+            (self.root/validation_alias).symlink_to('intermediate.cs')
+            git('add',validation_alias,'intermediate.cs','alternate.txt')
+        git('commit','-m','Initial fixture')
+        if validation_alias:
+            title='Scoped commit task'
+            body=self.body().replace('"sources": ["source.cs"]','"sources": '+json.dumps(['source.cs',validation_alias]))
+            task=self.promote(self.pending(title),title,body=body)
+        else:
+            task=self.main('Scoped commit task')
+        if dirty_source:
+            (self.root/'source.cs').write_text('Unrelated source edit.\n')
+        wf.begin_task(self.store,{'task_id':task['id'],'implementation_operation':'implement-next'})
+        return git, task
+
+    def checked_git_completion(self,task,*,real_review=False):
+        (self.root/'source.cs').write_text('Accepted task implementation.\n')
+        info=wf.mark_implemented(self.store,{'task_id':task['id'],'changed_files':['source.cs']})
+        attempt=wf.prepare_check(self.store,{'task_id':task['id'],'check_id':'behavior'})
+        wf.record_check(self.store,{'task_id':task['id'],'check_id':'behavior','attempt_id':attempt['attempt_id'],
+            'result':'pass','classification':'executed-control','actual_lane':'static',
+            'environment_identity':attempt['environment_identity'],
+            'assertions':[{'assertion':'Preserve isolated state.','result':'pass'}],
+            'cleanup':'No product process was launched.','evidence':['test-report.json']})
+        if real_review:
+            review_id=self.git_task_review(task,info['git_review_identity'])
+        else:
+            review_id=wf.identity('DO')
+            review={'orchestration_hash':'a'*64}
+            patcher=patch.object(wf,'verified_implementation_review',return_value=review)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        return {'task_id':task['id'],'outcome':'The scoped behavior preserves isolated state.',
+            'acceptance':[{'criterion':'Preserve isolated state.','result':'pass','evidence':['test-report.json']}],
+            'source_fingerprints':wf.fingerprints(self.store,['source.cs']),'review_id':review_id}
+
+    def git_task_review(self,task,identity):
+        store=self.store
+        source=wf.file_hash(store.future)
+        actor={'id':'fixture-owner','context_id':'fixture-owner-context'}
+        context={'kind':'task','id':'fixture-task-scope','task_ids':[task['id']],
+            'semantic_fingerprint':wf.digest(task['body'].encode()),'content_fingerprint':wf.digest(task['body'].encode())}
+        authority={'id':'fixture-grant','revision':1,'context_id':context['id'],
+            'allowed_kinds':['specification-acceptance'],'constraints':['Synthetic local Git qualification only.'],
+            'evidence':{'kind':'owner-message','reference':'Scripted test owner grant.'}}
+        frame=wf.orchestration_action(store,'orchestration-start',{'request_id':'fixture-scope-'+task['id'],
+            'context':context,'authority':authority,'executor':{'id':'fixture-executor','context_id':'fixture-executor-context'},
+            'mode':'manual','capabilities':{'independent_actors':False},'expected_source_hash':source})
+        def op(command,**payload):
+            nonlocal frame
+            frame=wf.orchestration_action(store,'orchestration-'+command,{'orchestration_id':frame['id'],
+                'expected_source_hash':source,'expected_orchestration_hash':frame['orchestration_hash'],
+                'expected_orchestration_revision':frame['revision'],**payload})
+            return frame
+        def next_action():
+            return wf.orchestration_action(store,'orchestration-next',{'orchestration_id':frame['id']})
+        op('research',reference='Inspected the disposable Git fixture.')
+        op('plan',plan_digest=wf.digest(b'fixture git plan'),required_checks=['behavior'],reference='Accept the scoped fixture tree.')
+        op('question',purpose='plan',question={'id':'fixture-plan','kind':'specification-acceptance','significance':'routine',
+            'text':'Accept the scoped fixture plan?','options':[{'id':'accept','text':'Accept the plan.'},{'id':'revise','text':'Revise the plan.'}],
+            'recommendation':'accept'})
+        pending=next_action()
+        op('prepare-actor',input_digest=pending['input_digest'],expected_decision_hash=pending['decision_hash'],actor=actor)
+        waiting=next_action()
+        op('record-actor',attempt_id=waiting['attempt_id'],input_digest=waiting['input_digest'],
+            expected_decision_hash=waiting['decision_hash'],result={'status':'answered','answer':'accept','rationale':'The scripted fixture plan is accepted.'},
+            evidence={'kind':'submitted-answer','reference':'Scripted fixture answer.','actor_id':actor['id'],'actor_context_id':actor['context_id']})
+        decision=op('accept-decision')
+        op('accept-plan',decision_receipt=decision['acceptance'])
+        op('implement',identity=identity,reference='Sealed the exact Git candidate.')
+        op('checks',identity=identity,results=[{'id':'behavior','status':'passed','reference':'test-report.json'}])
+        op('review',identity=identity,review_id='fixture-git-candidate',findings=[],reference='Inspected the disposable scoped candidate.')
+        return frame['id']
+
+    def test_scoped_task_commit_rejects_a_ready_review_after_task_revision(self):
+        git,task=self.git_task_fixture()
+        payload=self.checked_git_completion(task,real_review=True)
+        original=git('rev-parse','HEAD')
+        text=self.store.text()
+        body=wf.resolve(wf.parse(text),[task['id']])[0]['body']
+        changed=body.replace('Goal:\n- Preserve isolated state.', 'Goal:\n- Preserve updated isolated state.',1)
+        with self.store.lock():
+            self.store.save(text.replace(body,changed,1),self.store.load(text))
+        with self.assertRaisesRegex(wf.WorkflowError,'current clean implementation review'):
+            wf.complete(self.store,payload)
+        self.assertEqual(git('rev-parse','HEAD'),original)
+
     def test_intake_priority_ids_and_minimal_index(self):
         a=self.pending('Normal');b=self.pending('Low',low_priority=True)
         self.assertEqual((a['priority'],b['priority']),(100,25));self.assertTrue(wf.valid_id(a['id'],'P'))
@@ -137,6 +373,124 @@ class WorkflowStateTests(unittest.TestCase):
         self.pending('Unrelated work');self.assertEqual(self.store.load()['active_run']['limits']['retry_used'],1)
         with self.assertRaises(wf.WorkflowError):wf.checkpoint(self.store,{'validation_consumed':{'retry_used':0}})
         with self.assertRaises(wf.WorkflowError):wf.start(self.store,'next')
+
+    def future_command(self, command, *options):
+        result = subprocess.run([sys.executable, '-B', str(ROOT/'common/scripts/workflow-state.py'),
+                                 command, str(self.root), *options], capture_output=True, text=True, timeout=20)
+        return result.returncode, json.loads(result.stdout)
+
+    def test_future_refresh_preserves_surviving_files_after_loss(self):
+        empty_queue = self.store.future.read_bytes()
+        self.complete(self.main('Completed control'))
+        self.pending('Retained input')
+        ledger = self.store.base/'history/task-outcomes.jsonl'
+        manifest = self.store.base/'skill-tree.json'
+        protected = (self.store.future, self.store.state, ledger, manifest)
+        original = {path: path.read_bytes() for path in protected}
+        for file, replacement in ((self.store.future, None), (self.store.state, None), (ledger, None),
+                                  (self.store.future, empty_queue), (ledger, b'')):
+            with self.subTest(file=file.name, absent=replacement is None):
+                if replacement is None:
+                    file.unlink()
+                else:
+                    file.write_bytes(replacement)
+                surviving = {path: path.read_bytes() for path in protected if path.exists()}
+                for command, options in (('refresh', ()), ('manifest', ('--apply',))):
+                    status, response = self.future_command(command, *options)
+                    self.assertEqual(status, 2, response)
+                    self.assertIn(file.relative_to(self.store.root).as_posix(), response['error'])
+                    self.assertIn('restore', response['error'].lower())
+                    self.assertEqual(surviving, {path: path.read_bytes() for path in protected if path.exists()})
+            for protected_file, content in original.items():
+                protected_file.write_bytes(content)
+
+    def test_future_refresh_accepts_initialization_and_legitimate_emptying(self):
+        status, state = self.future_command('refresh')
+        self.assertEqual(status, 0, state)
+        self.assertEqual(state['tasks'], [])
+        last_task = self.main()
+        self.complete(last_task)
+        checkpoint = self.store.state.read_bytes()
+        ledger = self.store.base/'history/task-outcomes.jsonl'
+        outcomes = ledger.read_bytes()
+        status, state = self.future_command('refresh')
+        self.assertEqual(status, 0, state)
+        self.assertEqual(state['tasks'], [])
+        self.assertEqual(self.store.state.read_bytes(), checkpoint)
+        self.assertEqual(ledger.read_bytes(), outcomes)
+
+    def test_future_loss_reports_the_queue_before_checkpoint_progress(self):
+        empty_queue = self.store.future.read_bytes()
+        task = self.main()
+        wf.start(self.store, 'next', task['id'])
+        wf.begin_task(self.store, {'task_id': task['id']})
+        self.assertIn(task['id'], self.store.load()['task_progress'])
+        prior_hash = wf.file_hash(self.store.future)
+        for replacement in (empty_queue, b'', None):
+            with self.subTest(replacement=replacement):
+                if replacement is None:
+                    self.store.future.unlink()
+                else:
+                    self.store.future.write_bytes(replacement)
+                before = {path: path.read_bytes() for path in self.root.rglob('*') if path.is_file()}
+                for options in ((), ('--expected-source-hash', prior_hash)):
+                    status, response = self.future_command('refresh', *options)
+                    self.assertEqual(status, 2, response)
+                    self.assertIn(wf.FUTURE_QUEUE, response['error'])
+                    self.assertIn('restore the matching queue', response['error'].lower())
+                result = subprocess.run([sys.executable, '-B', str(ROOT/'common/scripts/validate-repository-documentation.py'),
+                                         str(self.root)], capture_output=True, text=True, timeout=20)
+                diagnostics = json.loads(result.stdout)
+                self.assertEqual(result.returncode, 1, diagnostics)
+                self.assertTrue(any(wf.FUTURE_QUEUE in issue and 'restore the matching' in issue.lower()
+                                    for issue in diagnostics['errors']), diagnostics)
+                self.assertEqual(before, {path: path.read_bytes() for path in self.root.rglob('*') if path.is_file()})
+
+    def test_future_refresh_uses_legacy_terminal_reference_for_expected_history(self):
+        task = self.main()
+        wf.start(self.store, 'next', task['id'])
+        self.complete(task)
+        summary = wf.finish(self.store)
+        self.assertEqual(summary['completed_ids'], [task['id']])
+        old = json.loads(self.store.state.read_bytes())
+        self.assertEqual(old['schema'], 2)
+        self.assertIsNone(old['active_run'])
+        old.pop('outcome_history_recorded')
+        checkpoint = wf.dump(old)
+        self.store.state.write_text(checkpoint)
+        ledger = self.store.base/'history/task-outcomes.jsonl'
+        ledger.unlink()
+        manifest = self.store.base/'skill-tree.json'
+        navigation = manifest.read_bytes()
+        status, response = self.future_command('refresh')
+        self.assertEqual(status, 2, response)
+        self.assertIn('.skill-tree/history/task-outcomes.jsonl', response['error'])
+        self.assertEqual(self.store.state.read_text(), checkpoint)
+        self.assertEqual(manifest.read_bytes(), navigation)
+        self.assertFalse(ledger.exists())
+
+    def test_future_refresh_protects_unwritten_inputs_at_commit(self):
+        self.pending()
+        checkpoint = self.store.state.read_bytes()
+        manifest = self.store.base/'skill-tree.json'
+        navigation = manifest.read_bytes()
+        ledger = self.store.base/'history/task-outcomes.jsonl'
+        with self.store.lock():
+            text = self.store.text()
+            state = self.store.load(text)
+            original_commit = self.store.commit
+
+            def insert_unrelated_input(writes):
+                ledger.parent.mkdir(parents=True, exist_ok=True)
+                ledger.write_text('Developer outcome history.\n')
+                original_commit(writes)
+
+            with patch.object(self.store, 'commit', side_effect=insert_unrelated_input):
+                with self.assertRaisesRegex(wf.WorkflowError, 'Future input changed.*task-outcomes.jsonl'):
+                    self.store.save(text, state)
+        self.assertEqual(self.store.state.read_bytes(), checkpoint)
+        self.assertEqual(manifest.read_bytes(), navigation)
+        self.assertEqual(ledger.read_text(), 'Developer outcome history.\n')
     def test_recorded_deadline_is_evidence_not_authorization_gate(self):
         main=self.main();wf.start(self.store,'next',limits={'deadline':'2000-01-01T00:00:00+00:00'})
         self.assertEqual(wf.next_task(self.store)['task_id'],main['id'])

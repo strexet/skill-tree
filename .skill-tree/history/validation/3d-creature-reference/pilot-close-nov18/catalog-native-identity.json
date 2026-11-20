@@ -1,0 +1,29 @@
+{
+  "archive_role": "The import and base playback verdicts are the saved exact r017 native observations. The current native run supplies the additional paw contact proof.",
+  "canonical_owner_receipt_sha256": "94d2fa7d514a394986696e860c95da5b7281e1d3408e20d23da5c038839faff3",
+  "captured_contact": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-contact/placement-reconciliation.json",
+    "sha256": "88217113f903aede643a8dc34bd4844797e937bf2a5850b3d4bd8db735a8c304"
+  },
+  "catalog_packages_lock_sha256": "fa6fa86b86788ff51cfb416c605a959747c67d60f71b3a390f2d6f57c251ae8f",
+  "editor_sha256": "0f26afd3390d7f1d4c7d637d09fecf51ef592b6bc84f9fa87da9e6746d071739",
+  "fixture_identity_sha256": "6379197f32f69b68adc02c206ec7f26759441bd973cfb4063d6ecd6f4987a550",
+  "local_owner_receipt": {
+    "path": ".skill-tree/history/validation/3d-creature-reference/pilot-close-nov18/pets-r017-owner-acceptance.json",
+    "sha256": "94d2fa7d514a394986696e860c95da5b7281e1d3408e20d23da5c038839faff3"
+  },
+  "native_source_protection": {
+    "fixture_settings_sha256": "0f4c599f30bcf3785e86a4be811047840994723efcad7a3de4cb55665a5295e8",
+    "protected_reports": 6,
+    "protected_source_files": 97,
+    "runtime_verified": true,
+    "schema": 1,
+    "status": "passed"
+  },
+  "private_app_data_archived": true,
+  "process_and_lock_absent": true,
+  "producer": "Owned isolated Unity 6000.3.27f2 Play Mode run",
+  "runtime_identity_sha256": "18c58276f6f9b4d75382c606e9807e6bc594bf8384367bf1b841855dce25e1a1",
+  "schema": 1,
+  "status": "passed"
+}

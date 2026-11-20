@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Git workspaces, canonical queue routing and compatible multi-run metadata."""
+from collections import deque
 from contextlib import contextmanager
 from copy import deepcopy
 import hashlib
@@ -13,6 +14,7 @@ import stat
 import subprocess
 import tempfile
 from threading import Timer
+import unicodedata
 import uuid
 
 class RunError(ValueError):
@@ -22,6 +24,9 @@ TERMINAL = {'local-result', 'merged'}
 
 def delivery_finished(run):
     delivery=run.get('delivery',{})
+    if run.get('reviewed_local_delivery') and delivery.get('publication')=='not-requested':
+        return (delivery.get('implementation')=='completed'
+                and delivery.get('order_completed') is True and delivery.get('status') in {'review-ready','merged'})
     if local_merge_order(run):
         integration = delivery.get('local_integration')
         if not isinstance(integration, dict):
@@ -217,9 +222,10 @@ def ensure_workspace(store, run, allow_dirty=True):
         raise RunError('Worktree repository identity conflict')
     if git(path, 'symbolic-ref', '--quiet', '--short', 'HEAD') != spec['branch']:
         raise RunError('Worktree branch identity conflict')
-    actual_remote=git(store.root, 'remote', 'get-url', spec['remote'])
-    if hashlib.sha256(actual_remote.encode()).hexdigest() != spec.get('remote_id',hashlib.sha256(spec.get('remote_url','').encode()).hexdigest()):
-        raise RunError('Remote identity changed; explicit recovery required')
+    if not run.get('reviewed_local_delivery'):
+        actual_remote=git(store.root, 'remote', 'get-url', spec['remote'])
+        if hashlib.sha256(actual_remote.encode()).hexdigest() != spec.get('remote_id',hashlib.sha256(spec.get('remote_url','').encode()).hexdigest()):
+            raise RunError('Remote identity changed; explicit recovery required')
     unfinished(path)
     if not allow_dirty and git(path, 'status', '--porcelain'):
         raise RunError('Dirty worktree; preserve changes and checkpoint before publication')
@@ -243,7 +249,17 @@ def branch(root, name):
     git(root, 'check-ref-format', '--branch', name)
     return name
 
-def workspace_identity(store, rid, payload, existing=False):
+def workspace_identity(store, rid, payload, existing=False, launch=None):
+    if launch is not None:
+        base = launch['ref'].removeprefix('refs/heads/')
+        if payload.get('base_branch', base) != base:
+            raise RunError('Reviewed local delivery starts from the checked-out launch branch')
+        working = branch(store.root, payload.get('branch', payload.get('branch_prefix', 'codex/')+rid.lower()))
+        if working == base:
+            raise RunError('The run branch must differ from the checked-out launch branch')
+        return {'repo_id':repo_id(store.root),'remote':None,'remote_id':None,'base_branch':base,
+                'base_commit':launch['head'],'branch':working,'worktree_id':rid,'local_base':True}
+
     remote = payload.get('remote', 'origin'); base = branch(store.root, payload.get('base_branch', 'develop'))
     if remote.startswith('-') or remote not in git(store.root, 'remote').splitlines():
         raise RunError('Unknown remote')
@@ -272,7 +288,8 @@ def workspace_identity(store, rid, payload, existing=False):
 
 def provision(store, run, payload):
     """Reserve claims first; interrupted provisioning retains the same run ID."""
-    spec = workspace_identity(store, run['id'], payload)
+    policy = run.get('reviewed_local_delivery')
+    spec = workspace_identity(store, run['id'], payload, launch=policy['launch'] if policy else None)
     common = common_dir(store.root)
     path = Path(payload.get('worktree', str(common/'skill-tree-worktrees'/run['id'].lower()))).resolve()
     if path.exists():
@@ -371,7 +388,7 @@ def publication_lock(root, remote, target):
 
 def local_merge_order(run):
     authorization = run.get('delivery', {}).get('authorization', {})
-    return authorization.get('pr') is False and authorization.get('merge') is True
+    return not run.get('reviewed_local_delivery') and authorization.get('pr') is False and authorization.get('merge') is True
 
 
 def local_merge_target(root, run):
@@ -422,6 +439,247 @@ def local_overlap(left, right):
     return left == right or left.startswith(right + '/') or right.startswith(left + '/')
 
 
+def checked_out_branch(root):
+    unfinished(root)
+    if Path(local_git_text(root, 'rev-parse', '--show-toplevel')).resolve() != root:
+        raise RunError('Select the exact Git worktree root')
+    ref = local_git(root, 'symbolic-ref', '--quiet', '--no-recurse', 'HEAD', accepted=(0, 1)).stdout.decode().strip()
+    if not ref.startswith('refs/heads/'):
+        raise RunError('Select a checked-out local branch')
+    if local_git(root, 'symbolic-ref', '--quiet', ref, accepted=(0, 1)).returncode == 0:
+        raise RunError('The selected task requires a direct Git branch ref')
+    head = local_git_text(root, 'rev-parse', '--verify', ref + '^{commit}')
+    gitdir = Path(local_git_text(root, 'rev-parse', '--absolute-git-dir'))
+    checkout = hashlib.sha256(gitdir.resolve().relative_to(common_dir(root)).as_posix().encode()).hexdigest()
+    return {'ref': ref, 'head': head, 'checkout': checkout}
+
+
+def task_commit_baseline(root):
+    identity = checked_out_branch(root)
+    dirt = set()
+    for args in (('diff', '--cached', '--name-only', '--no-renames', '-z', '--'),
+                 ('diff', '--name-only', '--no-renames', '-z', '--'),
+                 ('ls-files', '--others', '--exclude-standard', '-z')):
+        dirt.update(local_git_paths(root, *args))
+    return {**identity, 'dirty': sorted(dirt)}
+
+
+def task_index_path(root):
+    index = Path(local_git_text(root, 'rev-parse', '--path-format=absolute', '--git-path', 'index'))
+    if index.is_symlink() or not index.is_file():
+        raise RunError('Scoped task commit requires an ordinary Git index')
+    return index
+
+
+def task_index_selection(root, paths, index=None):
+    entries = local_git(root, 'ls-files', '--stage', '-z', '--', *paths, index=index).stdout
+    return hashlib.sha256(entries).hexdigest()
+
+
+def validation_input_paths(root, source, directory_entry):
+    relative = Path(source)
+    error = 'Task validation inputs must resolve inside the selected worktree'
+    if relative.is_absolute() or '..' in relative.parts:
+        raise RunError(error)
+    paths = {relative.as_posix()}
+    remaining = deque(relative.parts)
+    parent = root
+    hops = 0
+    # A later change to any link in the chain can change the validated bytes.
+    while remaining:
+        name = remaining.popleft()
+        if name == '..':
+            if parent == root:
+                raise RunError(error)
+            parent = parent.parent
+            continue
+        entry = directory_entry(parent, name)
+        if not entry.is_symlink():
+            parent = entry
+            continue
+        paths.add(entry.relative_to(root).as_posix())
+        target = entry.readlink()
+        hops += 1
+        if hops > 40:
+            raise RunError('Task validation input has too many symbolic links')
+        if target.is_absolute():
+            if not target.is_relative_to(root):
+                raise RunError(error)
+            target = target.relative_to(root)
+            parent = root
+        remaining.extendleft(reversed(target.parts))
+    paths.add(parent.relative_to(root).as_posix())
+    return paths
+
+
+def require_committed_check_inputs(root, owned, sources):
+    if not sources:
+        return
+    root = root.resolve()
+    ignore_case = local_git_bool(root, 'core.ignoreCase')
+    precompose = local_git_bool(root, 'core.precomposeUnicode')
+
+    def git_spelling(path):
+        return unicodedata.normalize('NFC', path) if precompose else path
+
+    def match_key(path):
+        path = git_spelling(path)
+        return path.casefold() if ignore_case else path
+
+    directories = {}
+
+    def directory_entry(parent, name):
+        entry = parent / name
+        if not (ignore_case or precompose) or not os.path.lexists(entry):
+            return entry
+        if parent not in directories:
+            directories[parent] = set(os.listdir(parent))
+        names = directories[parent]
+        if name not in names:
+            info = entry.lstat()
+            for actual in sorted(names):
+                if match_key(actual) == match_key(name) and os.path.samestat((parent / actual).lstat(), info):
+                    return parent / actual
+        return entry
+
+    aliases = set()
+    for source in sources:
+        aliases.update(validation_input_paths(root, source, directory_entry))
+    scope = {match_key(path) for path in aliases}
+
+    def overlaps(path):
+        path = match_key(path)
+        return '.' in scope or any(local_overlap(path, source) for source in scope)
+
+    indexed = local_git(root, 'ls-files', '-v', '-z').stdout.split(b'\0')
+    hidden = (entry[2:].decode('utf-8') for entry in indexed if entry[:1].islower() or entry.startswith(b'S '))
+    if any(overlaps(path) for path in hidden):
+        raise RunError('Task validation inputs must be visible in the checked-out Git index')
+    dirty = set(task_commit_baseline(root)['dirty'])
+    pathspecs = sorted({git_spelling(path) for path in aliases})
+    dirty.update(local_git_paths(root, 'ls-files', '--others', '--ignored', '--exclude-standard', '-z', '--', *pathspecs))
+    for path in sorted(dirty):
+        if path not in owned and overlaps(path):
+            raise RunError('The scoped candidate excludes a changed validation input: '+repr(path))
+
+
+def require_task_checkout(root, baseline, recovery_head=None):
+    identity=checked_out_branch(root)
+    if (identity['ref']!=baseline['ref'] or identity['checkout']!=baseline['checkout']
+            or identity['head'] not in {baseline['head'],recovery_head}):
+        raise RunError('The scoped task checkout, branch or original head changed')
+
+
+def task_commit_candidate(root, baseline, paths, *, recovery_head=None):
+    require_task_checkout(root,baseline,recovery_head)
+    if not isinstance(paths, list) or not paths or not all(isinstance(path,str) and path for path in paths) or len(set(paths)) != len(paths):
+        raise RunError('A scoped task commit requires distinct owned file paths')
+    for path in paths:
+        relative = Path(path)
+        if (relative.is_absolute() or relative.as_posix() != path or '..' in relative.parts
+                or not relative.parts or relative.parts[0] == '.git' or '\0' in path
+                or any((root / parent).is_symlink() for parent in relative.parents)
+                or (root / relative).is_dir()):
+            raise RunError('A scoped task commit requires exact repository-relative file paths')
+        if any(local_overlap(path, previous) for previous in baseline['dirty']):
+            raise RunError('Owned task files overlap changes present before implementation: ' + repr(path))
+    hidden = local_git(root, 'ls-files', '-v', '-z', '--', *paths).stdout.split(b'\0')
+    if any(entry and (entry[:1].islower() or entry.startswith(b'S ')) for entry in hidden):
+        raise RunError('Scoped task files must be visible in the checked-out Git index')
+    paths = sorted(paths)
+    parent = baseline['head']
+    local_git_policy(root, merge=False, signed=True)
+    with tempfile.TemporaryDirectory(prefix='skill-tree-task-index-', dir=task_index_path(root).parent) as temporary:
+        index = Path(temporary) / 'index'
+        hooks=Path(temporary)/'hooks'
+        hooks.mkdir()
+        no_hooks=f'core.hooksPath={hooks}'
+        local_git(root, '-c', no_hooks, 'read-tree', parent, index=index)
+        before = task_index_selection(root, paths, index)
+        local_git(root, '-c', no_hooks, 'add', '-A', '--', *paths, index=index)
+        after = task_index_selection(root, paths, index)
+        delta = local_git(root, 'diff', '--cached', '--name-only', '--no-renames', '-z', parent, '--', index=index).stdout
+        actual = set(delta.decode().split('\0')[:-1])
+        if not actual or not actual.issubset(paths):
+            raise RunError('The task needs an actual file-scoped change set')
+        tree = local_git(root, '-c', no_hooks, 'write-tree', index=index).stdout.decode().strip()
+    current = task_index_selection(root, paths)
+    if current != before and (not recovery_head or current != after):
+        raise RunError('Staged changes overlap owned task files')
+    return {'paths': paths, 'tree': tree, 'index_before': before, 'index_after': after}
+
+
+def task_review_identity(baseline, candidate, task_content):
+    head = baseline['head']
+    return {'head': head, 'base_oid': head,
+            'source_digest': hashlib.sha256((candidate['tree']+'\n'+task_content).encode()).hexdigest()}
+
+
+def create_task_commit(root, baseline, candidate, task_id, title):
+    signing=local_git_policy(root, merge=False, signed=True)
+    message = f'{title}\n\nSkill-Tree-Task: {task_id}'
+    return local_git_text(root, 'commit-tree', candidate['tree'], signing, '-p', baseline['head'], '-m', message)
+
+
+@contextmanager
+def prepare_ref_update(root, source_head, commit, hooks):
+    args = local_git_args(root, '-c', f'core.hooksPath={hooks}', 'update-ref', '-m', 'Skill Tree task commit', '--stdin')
+    with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                          stderr=subprocess.DEVNULL, text=True) as process:
+        timer = Timer(45, process.terminate)
+        timer.daemon = True
+        timer.start()
+        try:
+            process.stdin.write(f'start\nupdate HEAD {commit} {source_head}\nprepare\n')
+            process.stdin.flush()
+            if process.stdout.readline() != 'start: ok\n' or process.stdout.readline() != 'prepare: ok\n':
+                raise RunError('The scoped Git task ref could not be locked')
+            yield process
+        finally:
+            timer.cancel()
+            if not process.stdin.closed:
+                process.stdin.close()
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.terminate()
+                process.wait(timeout=5)
+
+
+def apply_task_commit(root, baseline, candidate, commit):
+    index_path = task_index_path(root)
+    with local_git_lock(index_path.with_name(index_path.name + '.lock')):
+        signing=local_git_policy(root, merge=False, signed=True)
+        observed = task_commit_candidate(root, baseline, candidate['paths'], recovery_head=commit)
+        if observed != candidate:
+            raise RunError('The task source changed after scoped review')
+        head = checked_out_branch(root)['head']
+        parents = local_git_text(root, 'show', '-s', '--format=%P', commit)
+        tree = local_git_text(root, 'rev-parse', commit + '^{tree}')
+        if parents != baseline['head'] or tree != candidate['tree']:
+            raise RunError('Prepared task commit has a different parent or scoped tree')
+        if head!=commit and signing=='-S':
+            header=local_git(root,'cat-file','commit',commit).stdout.split(b"\n\n",1)[0]
+            if not any(line.startswith((b'gpgsig ',b'gpgsig-sha256 ')) for line in header.splitlines()):
+                raise RunError('The original prepared commit lacks the signature required by the current Git policy')
+        with tempfile.TemporaryDirectory(prefix='skill-tree-task-index-', dir=index_path.parent) as temporary:
+            index = Path(temporary) / 'index'
+            hooks=Path(temporary)/'hooks'
+            hooks.mkdir()
+            shutil.copy2(index_path, index)
+            local_git(root, '-c', f'core.hooksPath={hooks}', 'reset', '-q', commit, '--', *candidate['paths'], index=index)
+            if task_index_selection(root, candidate['paths'], index) != candidate['index_after']:
+                raise RunError('The prepared task index differs from the reviewed tree')
+            if head != commit:
+                with prepare_ref_update(root, baseline['head'], commit, hooks) as process:
+                    if checked_out_branch(root)['ref'] != baseline['ref']:
+                        raise RunError('The exact Git task branch changed before commit')
+                    output, _ = process.communicate('commit\n', timeout=45)
+                    if process.returncode or output != 'commit: ok\n':
+                        raise RunError('Recover the original prepared task commit before retry')
+            os.replace(index, index_path)
+
+
 def local_source_identity(store, run):
     local_git_environment()
     ensure_workspace(store, run)
@@ -451,14 +709,29 @@ def local_target_head(store, run):
     return ref, head
 
 
-def local_worktree_dirt(root):
+def reviewed_launch_target(store, run):
+    launch = run['reviewed_local_delivery']['launch']
+    raw = local_git(store.root, 'worktree', 'list', '--porcelain', '-z').stdout.decode()
+    for record in raw.split('\0\0'):
+        first, *fields = record.split('\0')
+        if first.startswith('worktree ') and 'branch ' + launch['ref'] in fields:
+            target = Path(first.removeprefix('worktree ')).resolve()
+            if target != store.source_root and common_dir(target) == common_dir(store.root):
+                actual = checked_out_branch(target)
+                if (actual['ref'], actual['checkout']) == (launch['ref'], launch['checkout']):
+                    return target, actual['head']
+    raise RunError('The recorded launch branch must be checked out in its original Git worktree')
+
+
+def local_worktree_dirt(root, *, allow_staged=False):
     staged = local_git_paths(root, 'diff', '--cached', '--name-only', '--no-renames', '-z', '--')
     hidden = local_git(root, 'ls-files', '-v', '-z').stdout.split(b'\0')
-    if staged or any(item and (item[:1].islower() or item.startswith(b'S ')) for item in hidden):
-        raise RunError('Local integration requires a clean, fully visible Git index')
+    if (staged and not allow_staged) or any(
+            item and (item[:1].islower() or item.startswith(b'S ')) for item in hidden):
+        raise RunError('Local integration requires a fully visible Git index and an unambiguous incoming scope')
     changed = local_git_paths(root, 'diff', '--name-only', '--no-renames', '-z', '--')
     others = local_git_paths(root, 'ls-files', '--others', '--exclude-standard', '-z')
-    return changed | others
+    return staged | changed | others
 
 
 def local_unchanged_file(root, relative):
@@ -523,15 +796,62 @@ def local_merge_receipt(root, preparation, current_head):
     return {'commit': current_head, 'parents': parents, 'tree': tree}
 
 
-def local_git_policy(root):
-    for key in ('commit.gpgSign', 'merge.verifySignatures'):
-        result = local_git(root, 'config', '--type=bool', '--get', key, accepted=(0, 1))
-        if result.returncode == 0 and result.stdout.strip() != b'false':
-            raise RunError('Local merge requires separate handling of the enabled Git signing policy: ' + key)
-    target = local_git_text(root, 'symbolic-ref', '--short', 'HEAD')
-    options = local_git(root, 'config', '--get-all', 'branch.' + target + '.mergeOptions', accepted=(0, 1))
-    if options.stdout.strip():
-        raise RunError('Local merge is blocked by branch-specific Git merge options')
+def reconcile_reviewed_merge_index(root, attempt, merge):
+    paths=attempt['incoming']
+    if not paths:
+        return
+    index_path=task_index_path(root)
+    head_path=Path(local_git_text(root,'rev-parse','--path-format=absolute','--git-path','HEAD'))
+    with local_git_lock(index_path.with_name(index_path.name+'.lock')), local_git_lock(head_path.with_name(head_path.name+'.lock')):
+        identity=checked_out_branch(root)
+        if identity['ref']!=attempt['target_ref'] or identity['head']!=merge['commit']:
+            raise RunError('The exact merged target changed before index reconciliation')
+        with tempfile.TemporaryDirectory(prefix='skill-tree-merge-index-',dir=index_path.parent) as work:
+            temporary=Path(work)
+            hooks=temporary/'hooks'
+            hooks.mkdir()
+            no_hooks=f'core.hooksPath={hooks}'
+            probe=temporary/'probe'
+            local_git(root,'-c',no_hooks,'read-tree',merge['commit'],index=probe)
+            expected=task_index_selection(root,paths,probe)
+            observed=task_index_selection(root,paths)
+            if observed==expected:
+                return
+            tracked=set(local_git(root,'ls-files','-z','--',*paths,index=probe).stdout.decode().split('\0')[:-1])
+            live=[path for path in paths if path in tracked or os.path.lexists(root/path)]
+            if live:
+                local_git(root,'-c',no_hooks,'add','-f','-A','--',*live,index=probe)
+            tree=local_git(root,'-c',no_hooks,'write-tree',index=probe).stdout.decode().strip()
+            if tree!=merge['tree']:
+                raise RunError('The incoming worktree files differ from the exact prepared merge tree')
+            local_git(root,'-c',no_hooks,'read-tree',attempt['target_head'],index=probe)
+            previous=task_index_selection(root,paths,probe)
+            if observed!=previous:
+                raise RunError('Preserve the changed incoming index entries before reconciling local merge')
+            updated=temporary/'index'
+            shutil.copy2(index_path,updated)
+            local_git(root,'-c',no_hooks,'reset','-q',merge['commit'],'--',*paths,index=updated)
+            if task_index_selection(root,paths,updated)!=expected or checked_out_branch(root)!=identity:
+                raise RunError('The exact merged target changed before index reconciliation')
+            os.replace(updated,index_path)
+
+
+def local_git_bool(root, key):
+    result=local_git(root,'config','--type=bool','--get',key,accepted=(0,1))
+    return result.returncode==0 and result.stdout.strip()==b'true'
+
+
+def local_git_policy(root, *, merge=True, signed=False):
+    sign_commit=local_git_bool(root,'commit.gpgSign')
+    if sign_commit and not signed:
+        raise RunError('Local Git delivery requires handling of the enabled signing policy: commit.gpgSign')
+    if merge:
+        if local_git_bool(root,'merge.verifySignatures') and not signed:
+            raise RunError('Local Git delivery requires handling of the enabled signing policy: merge.verifySignatures')
+        target = local_git_text(root, 'symbolic-ref', '--short', 'HEAD')
+        options = local_git(root, 'config', '--get-all', 'branch.' + target + '.mergeOptions', accepted=(0, 1))
+        if options.stdout.strip():
+            raise RunError('Local merge is blocked by branch-specific Git merge options')
     configured = local_git(root, 'config', '--path', '--get', 'core.hooksPath', accepted=(0, 1))
     if configured.returncode == 0:
         value = configured.stdout.decode('utf-8').rstrip('\n')
@@ -540,11 +860,13 @@ def local_git_policy(root):
         hooks = root / value
     else:
         hooks = Path(local_git_text(root, 'rev-parse', '--path-format=absolute', '--git-path', 'hooks'))
-    for name in ('pre-merge-commit', 'prepare-commit-msg', 'commit-msg', 'post-commit',
-                 'post-merge', 'reference-transaction', 'post-index-change'):
+    names = ('prepare-commit-msg', 'commit-msg', 'post-commit', 'reference-transaction', 'post-index-change')
+    names += ('pre-merge-commit', 'post-merge') if merge else ('pre-commit',)
+    for name in names:
         location = hooks / name
         if location.is_file() and os.access(location, os.X_OK):
-            raise RunError('Local merge is blocked by an executable Git hook: ' + name)
+            raise RunError('Local Git delivery is blocked by an executable Git hook: ' + name)
+    return '-S' if sign_commit else '--no-gpg-sign'
 
 
 @contextmanager
@@ -595,7 +917,9 @@ def local_ref_transaction(root, hooks, source_ref, source_head, target_ref, targ
 def run_local_merge(root, source_root, preparation):
     source_ref, source_head = preparation['source_ref'], preparation['source_head']
     target_ref, target_head = preparation['target_ref'], preparation['target_head']
-    local_git_policy(root)
+    reviewed=preparation.get('allow_unrelated_staged',False)
+    policy_options={'signed':True} if reviewed else {}
+    local_git_policy(root,**policy_options)
     if any(Path(local_git_text(path, 'rev-parse', '--show-toplevel')).resolve() != path
            for path in (root, source_root)):
         raise RunError('Protected local merge requires the recorded source and target Git worktrees')
@@ -611,15 +935,27 @@ def run_local_merge(root, source_root, preparation):
                 or local_git_text(root, 'rev-parse', '--verify', target_ref) != target_head):
             raise RunError('The exact prepared target branch or head changed before integration')
         unfinished(root)
-        local_git_policy(root)
-        dirt = {path for path in local_worktree_dirt(root) if not local_unchanged_file(root, path)}
+        signing=local_git_policy(root,**policy_options)
+        if reviewed and local_git_bool(root,'merge.verifySignatures'):
+            trust=local_git(root,'config','--get','gpg.minTrustLevel',accepted=(0,1))
+            # Native Git merge requires marginal trust when no override is configured.
+            defaults=('-c','gpg.minTrustLevel=marginal') if trust.returncode else ()
+            local_git(root,*defaults,'verify-commit',source_head)
+            signature=local_git_text(root,*defaults,'show','-s','--format=%G?',source_head)
+            if signature not in {'G','U'}:
+                raise RunError('The reviewed merge source does not have a current valid Git signature')
+        allow_staged = preparation.get('allow_unrelated_staged', False)
+        dirt = {path for path in local_worktree_dirt(root, allow_staged=allow_staged)
+                if not local_unchanged_file(root, path)}
+        if allow_staged:
+            dirt.update(local_git_paths(root, 'diff', '--cached', '--name-only', '--no-renames', '-z', '--'))
         local_preflight_collisions(root, preparation['incoming'], dirt)
         with tempfile.TemporaryDirectory(prefix='skill-tree-local-merge-', dir=index_path.parent) as workspace:
             hooks = Path(workspace) / 'hooks'
             hooks.mkdir()
             index = Path(workspace) / 'index'
             shutil.copy2(index_path, index)
-            merge = local_git_text(root, 'commit-tree', preparation['source_tree'], '--no-gpg-sign',
+            merge = local_git_text(root, 'commit-tree', preparation['source_tree'], signing,
                                    '-p', target_head, '-p', source_head, '-m', f'Merge {source_ref} into {target_ref}')
             # Run the ref transaction from the distinct source worktree so Git
             # does not try to acquire the canonical worktree's protected HEAD lock.

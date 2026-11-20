@@ -1,0 +1,23 @@
+{
+  "verdict": "pass",
+  "reviewers": [
+    "/root/director_reciprocal_impact_resolver"
+  ],
+  "cases": {
+    "wording": "Unconsumed label changes only. Compare exact received route, interaction, event and marker; retained narrow-scope route result is the independent control. A changed whole-document pin keeps conservative review. Existing intent supplies the outcome.",
+    "accepted": "The adopted hand-to-belt marker and revised normal-gate timing are separate. 3D verifies the source marker, design verifies timing, Mechanics traces placement. Unity repairs the stale active hand binding and rechecks the exact imported belt and event. Training is suspected, far exit unexamined, and no-lift is the independent control. Only a material cost, scope or intent tradeoff now requires an author decision.",
+    "optional": "Decline the unadopted conflicting action with the accepted scene fact. A compatible visible action remains a proposal. An author decision is needed for consequential added cost or scope or a change to accepted canon or experience."
+  },
+  "installed": "Three exact current package-local Director links, owner verifier and byte-identical reviewed runtime guard. Guarded amendment and precise current source verification remain authoritative. The three paper inputs establish expected routing only.",
+  "task_id": "T-b53a4143-20c6-412e-bbc0-62351a19195e",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/references/director-workflow.md": "b796cf98d2db18307f9492405166465dd61a73eb13e16bf4f2c6b73f2bd42070",
+    ".skill-tree/documents/director-workflow.md": "aaf14e1a3cb6c7e1871dbec9d992169f0465136c5c3128033f7853c7e5c627a2",
+    ".skill-tree/templates/operations.json": "d5a2143cc57a73aa89e16f0d81bac289e8447119c7c1800a975bed95690f5c0d"
+  },
+  "input_sha256": {
+    "paper-cases.md": "f155c4aaec666c63fa78672be5cf1e8fe35342150e68bd1ed4f4fc18c3160587",
+    "trial/.skill-tree/installation/profile.json": "d915211daa42304dfc52361e22e32f7eceb6524dd3f93d35306a0eece145dc79"
+  }
+}

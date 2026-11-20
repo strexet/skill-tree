@@ -28,9 +28,37 @@ node .skill-tree/installation/manager.js --rebind
 
 Refresh is static, offline and explicit. Relevant input/inventory changes require refresh; unsupported compatibility requires a scoped bundle/source update. Queue/checkpoint identities and acceptance obligations survive refresh. Rollback restores one retained package/receipt generation for the current project root; project dependencies remain unchanged and freshness still requires verification. Pending core or plugin journals block verification and rollback until explicit recovery. Failed/interrupted replacement retains recoverable staging/journal evidence. Lock removal requires verified owner PID/host; stale locks are never removed automatically.
 
-The local manager accepts exactly one operation. `--dry-run` applies only to `--refresh-profile`; unsupported combinations reject before writes. A relocated owned installation uses explicit `--rebind` after review. Rebinding verifies existing package/bundle bytes, composition and current inputs before changing the receipt root. The retained package generation remains available at the rebound root. Unknown ownership, local edits and pending installation transactions remain blockers. Rebinding never launches a workflow helper.
+The local manager accepts exactly one operation. `--dry-run` applies to `--refresh-profile` and `--regenerate-agents`. Unsupported combinations reject before writes. A relocated owned installation uses explicit `--rebind` after review. Rebinding verifies existing package/bundle bytes, composition and current inputs before changing the receipt root. The retained package generation remains available at the rebound root. Unknown ownership, local edits and pending installation transactions remain blockers. Rebinding never launches a workflow helper.
+
+### Regenerate a missing AGENTS.md
+
+Use the owned manager after the root `AGENTS.md` disappears or after the repository owner removes the file intentionally. The receipt must register the root file as a Codex bridge. The preview checks the installed bundle, package hashes, current profile, and stopped handoff boundary. A clean preview lists `AGENTS.md` as the only change.
+
+```sh
+node .skill-tree/installation/manager.js --regenerate-agents --dry-run
+node .skill-tree/installation/manager.js --regenerate-agents
+node .skill-tree/installation/manager.js --verify
+```
+
+The recovered file contains the registered Skill Tree instructions and development policies from the installed generation. Recover earlier repository-specific instructions from a trusted copy when needed. An existing file, a symlink, another ownership conflict, or an unfinished installation transaction blocks regeneration. Regeneration preserves the queue, checkpoints, history, profile, selected skill packages, retained installation backups and other project files.
 
 For a clean clone with a retained schema-3 queue, explicit `workflow-state.py recover-locator <project> --input <recovery.json>` restores the machine-local locator. The request contains the exact `queue_id` and a `worktrees` object covering every unfinished run. Completed delivery mappings can be omitted; historical checkpoints and terminal outcomes remain unchanged. A linked controller worktree retains the canonical queue owner.
+
+## Missing referenced files
+
+Report the missing path, the operation that stopped and the applicable recovery in the command result and owner handoff. Installation verification covers owned installation resources. Use the read-only documentation validator to inspect referenced workflow files before refreshing navigation.
+
+| Reference | Detection and recovery |
+| --- | --- |
+| Authored document or composition input | The manifest validator or composer identifies the missing file. Restore the matching authored version from a trusted revision or backup. |
+| Representative generated package or navigation manifest | The sync check or manifest validator identifies the missing output. Regenerate packages from verified authored sources with the sync command. Regenerate navigation with `workflow-state.py manifest <project-root> --apply` after Future integrity passes. |
+| Future queue, checkpoint or expected outcome ledger | The guarded workflow writer stops before replacement. Restore the matching authoritative files before refreshing. |
+| Installed package, maintenance bundle or registered instruction file | The installer identifies the conflicting owned path. Restore matching bytes from a verified generation and run the owned manager with `--verify`. Use `--regenerate-agents --dry-run` for a missing registered root Codex bridge. |
+| Installation receipt with a surviving core bundle | Restore the matching `.skill-tree/installation/profile.json` before verification. Fresh installation refuses the surviving bundle without ownership evidence. |
+| Machine-local run locator or selected worktree | Use the exact queue and run identity with `recover-locator` or `recover-workspace` after inspecting the original workspace and preserved changes. |
+| Required validation evidence | The history view marks missing evidence unavailable. A current acceptance check requires restored matching evidence or another authorized execution. Historical verdicts remain recorded. |
+
+Optional history locations without retained references can be absent. An interrupted, hash-bound installation uses the owned manager with `--recover`. Restore verified original data for missing authoritative workflow files.
 
 Source-role recipes in `.skill-tree/config/repository.json` feed installed composition with stable recipe IDs and declaration fingerprints. Target recipes reside in `.skill-tree/validation-recipes.json`. Duplicate IDs across package scripts or declarations reject composition.
 

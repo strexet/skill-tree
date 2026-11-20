@@ -1,0 +1,23 @@
+{
+  "verdict": "pass",
+  "reviewers": [
+    "/root/unity_interaction_regression_resolver"
+  ],
+  "cases": {
+    "prerequisite": "After Approach, the approved case shows closed instead of open. First divergence is cue/action availability. Interact, request, acknowledge, state write, presentation and replay are unexecuted.",
+    "writer": "Prerequisite restores and ordinary input reaches the correct acknowledgement. The extra pre-render writer changes K count from 1 to 2; first divergence is the writer sequence and count. Presentation and replay are unexecuted under stop-at-divergence.",
+    "restored": "New/closed remains zero, normal approved is 0 to 1 to 1, copied restored save is 1 to 1. The independent plaque control adds zero grants and no occurrence."
+  },
+  "required_native": "Exact selected revision and scene, consuming owner and test assembly, accepted source/adapter/configuration pins, ordinary input and isolated save, pinned recipe/lane/Editor or build, case discovery, NUnit result, scoped message capture, cleanup. Source and package checks only.",
+  "task_id": "T-7f27d6d2-ef53-43e0-8b1b-95760cf0a24e",
+  "lane": "static",
+  "source_fingerprints": {
+    ".skill-tree/common/references/narrative-unity-adapter.md": "ea3c8a09b4ca511cbdbd4fe9a3ed32b576740c712c2dd8a8e3aecc5bd68ad6ff",
+    ".skill-tree/common/references/narrative-unity-qualification.md": "070b8ff509ba4cf3a480406bed6b9ecbe0c8cc38a7eb85941779e76bdd618f19",
+    ".skill-tree/domains/unity/development.md": "137ffcd141716dee0f930bf783cff989bfb1cd2048752ad763d0d6a32ba7af04"
+  },
+  "input_sha256": {
+    "abstract-cases.json": "72cb68936a1078e8dddb0e354ec1915e6a3ca20f57244b1512cda84e08c66cae",
+    "trial/.skill-tree/installation/profile.json": "1d2ed209a6f666c5fe1440dc6578b5779beae274e6f5180759786bb4e44d90d8"
+  }
+}

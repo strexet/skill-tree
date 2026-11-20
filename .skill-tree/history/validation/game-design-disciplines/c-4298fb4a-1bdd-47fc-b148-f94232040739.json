@@ -1,0 +1,78 @@
+{
+  "answer_key": "/root/game_design_disciplines_key",
+  "installed_trial": "/root/disciplines_installed_trial",
+  "prompt_sha256": "c9fcb0a46f34a5249fccef632b8104127c2cd8ba39edbe565390350eb085a69a",
+  "resolved_markdown_link_and_fragment_instances": 46,
+  "scope": "Static paper authoring. Exact translated cues, gameplay generator, device and participant traces and cohort records remain unmeasured. C also transferred to a one-way branch that strands a legal key holder.",
+  "cases": {
+    "A": {
+      "match": true,
+      "lead": "Game Design",
+      "evidence": "Per-role ferry knowledge and decisions, departure block on absence, refreshed sign on return and one consumption. Solo crossing or forced operator falsifies co-op. Actual participation needs both players."
+    },
+    "B": {
+      "match": true,
+      "lead": "Game Design",
+      "evidence": "Both exact translated clues must precede commitment. A six-order enumeration yields one solution with both and three with the first alone. Exact locale strings and fresh reader remain open."
+    },
+    "C": {
+      "match": true,
+      "lead": "Game Design",
+      "evidence": "State-reachability from start with door disabled, then from key pickup to opening. Key behind door or stranded key holder fails. Check actual implementation as a per-output guard, with held-out layouts as supplemental cases."
+    },
+    "D": {
+      "match": true,
+      "lead": "Game Design",
+      "evidence": "One instruction at a safe practice pad, then normal ramp and retry. Same camera and approach can show cue later than last safe action, landing beyond clearance, or missing retry."
+    },
+    "E": {
+      "match": true,
+      "lead": "Balance",
+      "evidence": "Two matched assist settings and effective controller timestamps before, at and after pause, update and threshold. Recognized event missing at writer and misread cue require distinct controls. Both routes stay attainable."
+    },
+    "F": {
+      "match": true,
+      "lead": "Mechanics",
+      "evidence": "Two inventory rows with passive trigger, clock, cap authority and coverage. Complete source reported for first scene, no bytes supplied to confirm. Inspect second writer/config/persistence; equal names alone are candidates."
+    },
+    "G": {
+      "match": true,
+      "lead": "Balance",
+      "evidence": "Successes and eligible encounters by side, initiative and pre-change experience plus raw totals, exposure and clustered uncertainty. Compare matched strata with common weights; changing mix can reverse reported aggregate."
+    },
+    "H": {
+      "match": true,
+      "lead": "Mechanics",
+      "evidence": "Retain established feasible baseline. Compare capped resource plus explicit affordable reveal before two viable routes using matched visibility and stock. No fit when cost or fact is imperceptible or arrives after commitment."
+    }
+  },
+  "lane": "static",
+  "revalidation": "The checked router, actual trials, project inputs and shared records are identical. The new GDD playtest link is additive.",
+  "verified_owned_standalone_packages": {
+    "gdd": {
+      "SKILL.md": "25d3c369c5f6f9fbd38f80e7cdad08729cb3b39ec199448684b527a5fb829d81",
+      "game-design-gdd.md": "b33102a28f1ca07b6e210b555e79de35b05c26031442046e7a4ce4f83ab2ece2",
+      "game-design-disciplines.md": "32e10ab3012d47f34302e79a7fa25ff3f1811b88b87b4b834e8fe6ea2c5f6a1b",
+      "game-design-records.md": "3aee12c6dc4569807607cc9b52da1168a9457375aa034ed60399732e234c6c8b"
+    },
+    "mechanics": {
+      "SKILL.md": "cb2b11ed07e4fd9592000019b944205ef6dfdc42c6f65beb08bc11fd321b0062",
+      "game-design-mechanics.md": "d9657c2ae70ad41ea2c8125da44494672f4a0be7c7dfd0cd2711c8774bc18ed6",
+      "game-design-disciplines.md": "32e10ab3012d47f34302e79a7fa25ff3f1811b88b87b4b834e8fe6ea2c5f6a1b",
+      "game-design-records.md": "3aee12c6dc4569807607cc9b52da1168a9457375aa034ed60399732e234c6c8b"
+    },
+    "balance": {
+      "SKILL.md": "b961cc4bc0a962a07f0aa1eb2ac2afc0c659f13969e79f841997b913465cae17",
+      "game-design-balance-study.md": "8d28a473095d5ec4e457c5ea0bb61adaf43c0be8c2f0dbb9eb8aaf93b65cdc77",
+      "game-design-balance-methods.md": "22544cebf9a6001faf5ed54b19523542fb02b725ca97b6ad52e331d8d44d1e8d",
+      "game-design-disciplines.md": "32e10ab3012d47f34302e79a7fa25ff3f1811b88b87b4b834e8fe6ea2c5f6a1b",
+      "game-design-records.md": "3aee12c6dc4569807607cc9b52da1168a9457375aa034ed60399732e234c6c8b"
+    }
+  },
+  "research_sha256": "a394c77175d4e182f8cdbb7926091f66d7574bba486b9c292aae4c4e298c3354",
+  "coverage": {
+    "direct_requests": 8,
+    "design_exercises": 30,
+    "balance_families": 14
+  }
+}
