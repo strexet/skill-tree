@@ -4,6 +4,7 @@ const path=require('node:path');
 const crypto=require('node:crypto');
 const bindings=require('./execution-bindings.js');
 const plugins=require('./plugin-composition.js');
+const development=require('./development-policies.js');
 const hash=value=>crypto.createHash('sha256').update(value).digest('hex');
 function stable(value) {
  if(Buffer.isBuffer(value))return value;
@@ -25,6 +26,7 @@ function safe(root,rel) {
 function read(root,rel) { const p=safe(root,rel);return fs.existsSync(p)?fs.readFileSync(p,'utf8'):null; }
 const inputDigest=(root,rel)=>{const file=safe(root,rel);return fs.existsSync(file)?hash(fs.readFileSync(file)):null;};
 const readJson=(root,rel,fallback={})=>{const data=read(root,rel);return data===null?fallback:JSON.parse(data.replace(/^\uFEFF/,''));};
+const requiredJson=(source,relative)=>JSON.parse(readResource(source,relative,relative).replace(/^\uFEFF/,''));
 function inventory(root,rules) {
  const out=[];
  function walk(rel) {
@@ -41,10 +43,24 @@ function inventory(root,rules) {
  for(const name of rules.names)if(fs.existsSync(safe(root,name)))out.push(name);
  return [...new Set(out)].sort();
 }
-function resolveProfile(source,root,flavor) {
+function flavorNames(source) {
+ return Object.keys(requiredJson(source,'config/flavors.json').flavors||{});
+}
+function operationNames(source,flavor) {
+ const registry=requiredJson(source,'config/flavors.json'),operations=requiredJson(source,'templates/operations.json');
+ if(!Object.hasOwn(registry.flavors,flavor))throw Error('Unknown flavor: '+flavor);
+ const recipe=registry.flavors[flavor];
+ if(registry.core_operations===undefined&&!Object.hasOwn(registry.flavors,'director'))return Object.keys(operations).sort();
+ const core=registry.core_operations,extra=recipe.operations||[];
+ if(!Array.isArray(core)||!Array.isArray(extra))throw Error('Invalid operation membership: '+flavor);
+ const names=[...core,...extra];
+ if(new Set(names).size!==names.length||names.some(name=>typeof name!=='string'||!Object.hasOwn(operations,name)))throw Error('Invalid operation membership: '+flavor);
+ return names.sort();
+}
+function resolveProfile(source,root,flavor,options={}) {
  root=fs.realpathSync(root);
- const registry=readJson(source,'config/flavors.json'),rules=readJson(source,'config/capabilities.json');
- if(!registry.flavors[flavor])throw Error('Unknown flavor: '+flavor);
+ const registry=requiredJson(source,'config/flavors.json'),rules=requiredJson(source,'config/capabilities.json');
+ if(!Object.hasOwn(registry.flavors,flavor))throw Error('Unknown flavor: '+flavor);
  const pluginRegistry=fs.existsSync(safe(source,'lib/plugin-registry.js'));
  const pluginComposition=read(source,'lib/plugin-composition.js');
  const fixed=['package.json','package-lock.json','npm-shrinkwrap.json','yarn.lock','pnpm-lock.yaml','bun.lock','bun.lockb','.nvmrc','.node-version','pyproject.toml','pytest.ini','Cargo.toml','ProjectSettings/ProjectVersion.txt','ProjectSettings/EditorSettings.asset','ProjectSettings/ProjectSettings.asset','Packages/manifest.json','Packages/packages-lock.json','.skill-tree/validation-recipes.json','.skill-tree/worktree-profile.json'];
@@ -71,7 +87,8 @@ function resolveProfile(source,root,flavor) {
   const lane=/playwright|cypress|--browser\b/.test(command)||/browser|e2e/.test(name)?'browser':/test:(api|integration)/.test(name)?'integration':/^(dev|start|preview)$/.test(name)?'server':name==='build'?'build':/lint|typecheck|check/.test(name)?'static':'unit';
   recipes['script-'+name.replace(/:/g,'-')]={lane,argv:[manager,'run',name],command_digest:hash(command),input_paths:['package.json',...locks,...discovered.filter(p=>/config|policy/.test(p))],qualification:'static-recipe; runner unqualified'};
  }
- if(flavor==='unity'){
+ const unityLayout=flavor==='unity'||(flavor==='director'&&inputs['ProjectSettings/ProjectVersion.txt']!==null);
+ if(unityLayout){
   const version=read(root,'ProjectSettings/ProjectVersion.txt')?.match(/m_EditorVersion:\s*(\S+)/)?.[1];
   if(!version)throw Error('Unity root requires ProjectSettings/ProjectVersion.txt');
   if(!rules.unity.editor_patterns.some(p=>new RegExp(p).test(version)))throw Error('Unsupported Unity version: '+version);
@@ -111,6 +128,14 @@ function resolveProfile(source,root,flavor) {
  if(staticInspection&&!Object.hasOwn(recipes,'static-inspection'))recipes['static-inspection']=staticInspection;
  const unresolved=Object.entries(facts.packages).filter(([,value])=>value.state==='ambiguous').map(([name])=>name);
  if(unresolved.length)gaps.push({key:'unresolved-package-versions',packages:unresolved,reason:'Dependency declarations lack resolved version evidence; version-specific resources are unavailable until supported lock evidence is supplied.'});
+ if(flavor==='director'){
+  const director=requiredJson(source,'domains/director/capabilities.json');
+  const narrative=director.narrative;
+  if(director.schema!==1||!narrative||inputDigest(source,narrative.source)!==narrative.sha256)throw Error('Director Narrative source pin changed');
+  facts.director={narrative:{status:narrative.status,sha256:narrative.sha256},
+   artworkshop:director.artworkshop,logs:director.logs,
+   unity:{status:unityLayout&&recipes['unity-editmode']?'recipe-discovered':'unavailable'}};
+ }
  facts.capabilities={};
  for(const [id,rule] of Object.entries(registry.flavors[flavor].capabilities||{})){
   const pkg=facts.packages[rule.package],state=!pkg?'absent':pkg.state!=='known'?'ambiguous':new RegExp(rule.version_pattern).test(pkg.version)?'known':'unsupported';
@@ -121,9 +146,12 @@ function resolveProfile(source,root,flavor) {
  if(worktree_environment.schema!==1)throw Error('Unsupported worktree environment declaration');
  for(const key of ['required_files','isolated_directories'])for(const rel of worktree_environment[key]||[])safe(root,rel);
  if((worktree_environment.exclusive_resources||[]).some(key=>typeof key!=='string'||!key))throw Error('Explicit runtime resource identities required');
- const environment={flavor,inputs,facts,recipes,execution_bindings,worktree_environment};
+ const policy=Object.hasOwn(options,'developmentPolicy')?options.developmentPolicy:read(root,development.CONFIG);
+ const development_policies=development.effective(policy);
+ inputs[development.CONFIG]=development_policies.input_digest;
+ const environment={flavor,inputs,facts,recipes,execution_bindings,worktree_environment,development_policies};
  if(pluginComposition){
-  const pluginInputs=plugins.resolveInputs(root,readJson(source,'templates/operations.json'),hash(pluginComposition));
+  const pluginInputs=plugins.resolveInputs(root,requiredJson(source,'templates/operations.json'),hash(pluginComposition));
   for(const record of Object.values(pluginInputs.packages))for(const relative of Object.keys(record.files))inputs[record.destination+'/'+relative]=inputDigest(root,record.destination+'/'+relative);
   environment.plugins=pluginInputs;
  }
@@ -149,7 +177,12 @@ function sourceInputs(source) {
  for(const dir of ['common','domains','templates','config','lib','src']) {
   function walk(rel){for(const e of fs.readdirSync(safe(source,rel),{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){if(e.name==='__pycache__')continue;const p=path.posix.join(rel,e.name);if(e.isDirectory())walk(p);else result[p]=hash(fs.readFileSync(safe(source,p)));}}
   walk(dir);
- }return result;
+ }
+ const resourceMap=requiredJson(source,'config/resource-map.json');
+ for(const resources of Object.values(resourceMap))for(const group of Object.values(resources))for(const rel of Object.values(group)){
+  if(rel.startsWith('tests/fixtures/director/'))result[rel]=hash(fs.readFileSync(safe(source,rel)));
+ }
+ return result;
 }
 function matches(profile,predicate){
  if(predicate.all)return predicate.all.every(p=>matches(profile,p));
@@ -161,20 +194,29 @@ function matches(profile,predicate){
  if('equals' in predicate)return value===predicate.equals;
  throw Error('Unsupported capability predicate');
 }
+function readResource(source,input,destination) {
+ const content=read(source,input);
+ if(content===null){
+  if(input===destination)throw Error('Missing composition input: '+input+'. Restore the matching source file before composing.');
+  throw Error('Missing composition resource: '+destination+'. Restore the referenced source file: '+input);
+ }
+ return content;
+}
 function compose(source,profile,selected=null) {
- const registry=readJson(source,'config/flavors.json'),recipe=registry.flavors[profile.flavor];if(!recipe)throw Error('Unknown flavor');
- const operations=readJson(source,'templates/operations.json'),mapping=readJson(source,'config/resource-map.json'),mandatory=readJson(source,'templates/invariants.json'),domain=readJson(source,recipe.sections),packages={};
- const names=selected||Object.keys(operations).sort();
- for(const name of names){const op=operations[name];if(!op)throw Error('Unknown operation: '+name);
+ const registry=requiredJson(source,'config/flavors.json'),recipe=registry.flavors[profile.flavor];if(!recipe)throw Error('Unknown flavor');
+ const operations=requiredJson(source,'templates/operations.json'),mapping=requiredJson(source,'config/resource-map.json'),mandatory=requiredJson(source,'templates/invariants.json'),domain=requiredJson(source,recipe.sections),packages={};
+ const available=operationNames(source,profile.flavor),names=selected||available;
+ for(const name of names){const op=operations[name];if(!available.includes(name))throw Error('Operation unavailable for flavor '+profile.flavor+': '+name);
   let sections=mergeSections(mergeSections(mandatory,op.sections),domain,recipe.replaceable_slots||[]);
   const active=(recipe.conditional_resources||[]).filter(item=>matches(profile,item.when));
   sections=mergeSections(sections,active.map((item,index)=>({id:'capability-'+index,text:item.instruction})));
-  let files={};for(const [group,resources] of Object.entries(mapping[name]))for(const [dest,src] of Object.entries(resources))files[group+'/'+dest]=read(source,src);
-  const domainFiles={};for(const [dest,src] of Object.entries(recipe.resources))domainFiles[dest]=read(source,src);
+  let files={};for(const [group,resources] of Object.entries(mapping[name]))for(const [dest,src] of Object.entries(resources))files[group+'/'+dest]=readResource(source,src,group+'/'+dest);
+  const domainFiles={};for(const [dest,src] of Object.entries(recipe.resources))domainFiles[dest]=readResource(source,src,dest);
   files=mergeResources(files,domainFiles,recipe.replacements||{});
-  for(const item of active){const extra={};for(const [dest,src] of Object.entries(item.resources))extra[dest]=read(source,src);files=mergeResources(files,extra,item.replacements||{});}
+  for(const item of active){const extra={};for(const [dest,src] of Object.entries(item.resources))extra[dest]=readResource(source,src,dest);files=mergeResources(files,extra,item.replacements||{});}
   files['references/project-profile.md']='# Concrete Project Profile\n\nFlavor: '+profile.flavor+'. Static compatibility only; execution remains unqualified.\n\n```json\n'+json({source_version:profile.source_version,instruction_profile_id:hash(json({flavor:profile.flavor,facts:profile.facts,recipes:profile.recipes,gaps:profile.gaps})),facts:profile.facts,recipes:profile.recipes,gaps:profile.gaps,worktree_environment:profile.worktree_environment})+'```\n';
-  files['SKILL.md']='---\nname: '+name+'\ndescription: '+JSON.stringify('['+profile.flavor+'] '+op.description)+'\nlicense: MIT\n---\n\n# '+op.title+'\n\nFlavor: '+profile.flavor+'. Read the [concrete project profile](references/project-profile.md).\n\n'+sections.map(s=>s.text).join('\n\n')+'\n';
+  const policyInstructions=development.instructions(profile,name);
+  files['SKILL.md']='---\nname: '+name+'\ndescription: '+JSON.stringify('['+profile.flavor+'] '+op.description)+'\nlicense: MIT\n---\n\n# '+op.title+'\n\nFlavor: '+profile.flavor+'. Read the [concrete project profile](references/project-profile.md).\n\n'+sections.map(s=>s.text).join('\n\n')+'\n'+(policyInstructions?'\n'+policyInstructions:'');
   files['agents/openai.yaml']='interface:\n  display_name: '+JSON.stringify(op.title+' ('+profile.flavor+')')+'\n  short_description: '+JSON.stringify(profile.flavor+' Skill Tree workflow')+'\n';
   if(profile.plugins){const contribution=plugins.composeOperation(source,profile,name,files);files=mergeResources(files,contribution.files);}
   for(const [rel,content] of Object.entries(files)){if(typeof content!=='string'&&!Buffer.isBuffer(content))throw Error('Missing composition resource: '+rel);safe(source,rel);}
@@ -191,4 +233,4 @@ function compose(source,profile,selected=null) {
  for(const [name,files] of Object.entries(packages))output_digests[name]=Object.fromEntries(Object.entries(files).map(([rel,content])=>[rel,hash(content)]));
  return {packages,source_digests,output_digests,identity:hash(json({flavor:profile.flavor,environment_id:profile.environment_id,source_digests,output_digests}))};
 }
-module.exports={hash,json,safe,read,readJson,inventory,resolveProfile,mergeSections,mergeResources,sourceInputs,matches,compose};
+module.exports={hash,json,safe,read,readJson,inventory,resolveProfile,mergeSections,mergeResources,sourceInputs,matches,compose,flavorNames,operationNames};

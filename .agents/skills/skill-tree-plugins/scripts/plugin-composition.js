@@ -24,7 +24,7 @@ function specs(operations){
 function createCatalog(operations,version=VERSION){
  const declared=specs(operations),boundaries={},named=[],aliases=[];
  for(const operation of Object.keys(declared)){
-  for(const phase of phases)boundaries[operation+':'+phase]={operation,version,context_kinds:kinds,handler:request=>guardBoundary(request.package_root,request,operation,phase)};
+  for(const phase of phases)boundaries[operation+':'+phase]={operation,version,context_kinds:kinds,handler:(request,manifestDigest)=>guardBoundary(request.package_root,request,operation,phase,manifestDigest)};
   const locations={...(namedDefaults[operation]||{})},extra=declared[operation].plugin_anchors||{};
   if(!object(extra))fail('composition-anchor','Owned named anchors require a name-to-phase map');
   for(const [name,phase]of Object.entries(extra)){if(!registry.validId(name)||!phases.includes(phase)||phases.includes(name)||own(locations,name)&&locations[name]!==phase)fail('composition-anchor','A named anchor must map to an unchanged actual owned phase');locations[name]=phase;}
@@ -182,18 +182,27 @@ if operation=='skill-tree-implement-next-future-task' and phase=='during':
   if context.get(key)!=frame['context'].get(key):raise ValueError('The draft-plan frame belongs to another selected task scope or context')
  proof.update(orchestration_id=identity,orchestration_hash=frame['orchestration_hash'],plan_digest=frame['plan']['digest'])
 finish(proof)`;
-function guardBoundary(packageRoot,request,operation,phase,processingReadiness=false){
+function guardBoundary(packageRoot,request,operation,phase,manifestDigest,processingReadiness=false){
  if(typeof request.project_root!=='string'||!fs.existsSync(request.project_root)||!fs.statSync(request.project_root).isDirectory())fail('composition-context','An explicit existing execution project root is required');
  const context=bindings.validateContext(request.context),needsWorkflow=['pending','task','task-group','controller'].includes(context.kind)||operation===processOperation||operation===implementOperation||operation==='skill-tree-pr-review-cycle'&&own(context,'publication_id');
  if(!needsWorkflow)return {kind:'task-free',context_kind:context.kind};
  const helper=registry.safe(packageRoot,'scripts/workflow-state.py');
  if(!fs.existsSync(helper))fail('composition-context','The local owned workflow helper closure is missing');
- const cachePrefix=path.join(os.tmpdir(),'skill-tree-owned-source-'+crypto.randomUUID());
- if(fs.existsSync(cachePrefix))fail('composition-context','A fresh nonexistent bytecode lookup prefix is required');
  const ownedRequest={...request,operation,phase,context,package_root:packageRoot,processing_readiness:processingReadiness};
- const run=spawnSync('python3',['-I','-B','-c',guardProgram,helper,cachePrefix],{
-  input:JSON.stringify(ownedRequest),encoding:'utf8',timeout:10000,maxBuffer:1024*1024
- });
+ const input=JSON.stringify(ownedRequest);
+ const checkScope=()=>{
+  const cachePrefix=path.join(os.tmpdir(),'skill-tree-owned-source-'+crypto.randomUUID());
+  if(fs.existsSync(cachePrefix))fail('composition-context','A fresh nonexistent bytecode lookup prefix is required');
+  return spawnSync('python3',['-I','-B','-c',guardProgram,helper,cachePrefix],{
+   input,encoding:'utf8',timeout:10000,maxBuffer:1024*1024
+  });
+ };
+ let run=checkScope();
+ // The bridge allows one fresh scope check before actor invocation.
+ if(run.error?.code==='ETIMEDOUT'){
+  if(verifiedManifest(packageRoot).manifest_digest!==manifestDigest)fail('composition-context','The owned scope manifest changed during the timed-out check');
+  run=checkScope();
+ }
  if(run.error||run.status!==0)fail('composition-context','The actual selected operation context guard failed: '+(run.stderr||run.stdout||run.error?.message||'The owned helper is unavailable').trim().split('\n').at(-1));
  return JSON.parse(run.stdout);
 }
@@ -208,7 +217,7 @@ function prepareMetadata(packageRoot,payload,readiness){
   if(typeof id!=='string'||!id.trim()||typeof mandate!=='string'||!/^[a-f0-9]{64}$/.test(mandate))fail('composition-context','An editorial recheck requires the exact owned mandate identity');
   const [held]=installationPrerequisites(packageRoot,request.project_root,verified);
   if(held)fail(held.code,held.reason);
-  recheckGuard=guardBoundary(packageRoot,{...request,event:{...request.event,boundary_id:location.boundary_id}},processOperation,'after',readiness);
+  recheckGuard=guardBoundary(packageRoot,{...request,event:{...request.event,boundary_id:location.boundary_id}},processOperation,'after',verified.manifest_digest,readiness);
   if(!object(recheckGuard.processing_recheck))fail('composition-context','The actual clarification must authorize the editorial recheck');
  }
  const eligibilityContext=readiness?recheckGuard?.processing_recheck?.selection_context??request.context:request.context;
@@ -218,7 +227,7 @@ function prepareMetadata(packageRoot,payload,readiness){
  if(location.status!=='resolved'){prerequisites.push({code:'unresolved-anchor',reason:location.reason});return {...base,status:'prerequisite'};}
  if(!recheckGuard&&(!configured||!selected.bindings.length&&!selected.unresolved.length))return {...base,status:'noop'};
  if(!readiness&&manifest.operation==='skill-tree-pr-review-cycle'&&selected.bindings.some(row=>own(manifest.packages[row.plugin_id].adaptation||{},'invocation_policy'))&&!own(selected.context,'publication_id'))fail('composition-context','The policy-bound review invocation requires the actual owned publication identity');
- const proof=recheckGuard||(readiness?null:catalog.boundaries[location.boundary_id].handler({...request,package_root:packageRoot}));
+ const proof=recheckGuard||(readiness?null:catalog.boundaries[location.boundary_id].handler({...request,package_root:packageRoot},verified.manifest_digest));
  for(const item of selected.unresolved)prerequisites.push({code:'incompatible-binding',binding_id:item.id,reason:item.reason});
  if(!recheckGuard)prerequisites.push(...installationPrerequisites(packageRoot,request.project_root,verified));
  const available=request.capabilities||[];

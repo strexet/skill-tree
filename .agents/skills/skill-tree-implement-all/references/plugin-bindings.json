@@ -4,6 +4,186 @@
     "aliases": [
       {
         "anchor": "before",
+        "operation": "skill-tree-3d",
+        "phrase": "before skill-tree-3d"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d",
+        "phrase": "before skill tree 3d"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d",
+        "phrase": "during skill-tree-3d"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d",
+        "phrase": "during skill tree 3d"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d",
+        "phrase": "after skill-tree-3d"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d",
+        "phrase": "after skill tree 3d"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-blender",
+        "phrase": "before skill-tree-3d-blender"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-blender",
+        "phrase": "before skill tree 3d blender geometry"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-blender",
+        "phrase": "during skill-tree-3d-blender"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-blender",
+        "phrase": "during skill tree 3d blender geometry"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-blender",
+        "phrase": "after skill-tree-3d-blender"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-blender",
+        "phrase": "after skill tree 3d blender geometry"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-motion",
+        "phrase": "before skill-tree-3d-motion"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-motion",
+        "phrase": "before skill tree 3d motion"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-motion",
+        "phrase": "during skill-tree-3d-motion"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-motion",
+        "phrase": "during skill tree 3d motion"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-motion",
+        "phrase": "after skill-tree-3d-motion"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-motion",
+        "phrase": "after skill tree 3d motion"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-references",
+        "phrase": "before skill-tree-3d-references"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-references",
+        "phrase": "before skill tree 3d references"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-references",
+        "phrase": "during skill-tree-3d-references"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-references",
+        "phrase": "during skill tree 3d references"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-references",
+        "phrase": "after skill-tree-3d-references"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-references",
+        "phrase": "after skill tree 3d references"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-texture",
+        "phrase": "before skill-tree-3d-texture"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-texture",
+        "phrase": "before skill tree 3d textures"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-texture",
+        "phrase": "during skill-tree-3d-texture"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-texture",
+        "phrase": "during skill tree 3d textures"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-texture",
+        "phrase": "after skill-tree-3d-texture"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-texture",
+        "phrase": "after skill tree 3d textures"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-unity",
+        "phrase": "before skill-tree-3d-unity"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-3d-unity",
+        "phrase": "before skill tree 3d unity integration"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-unity",
+        "phrase": "during skill-tree-3d-unity"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-3d-unity",
+        "phrase": "during skill tree 3d unity integration"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-unity",
+        "phrase": "after skill-tree-3d-unity"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-3d-unity",
+        "phrase": "after skill tree 3d unity integration"
+      },
+      {
+        "anchor": "before",
         "operation": "skill-tree-add-pending-task",
         "phrase": "before skill-tree-add-pending-task"
       },
@@ -94,6 +274,396 @@
       },
       {
         "anchor": "before",
+        "operation": "skill-tree-director-audit",
+        "phrase": "before skill-tree-director-audit"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-director-audit",
+        "phrase": "before skill-tree director: audit"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-director-audit",
+        "phrase": "during skill-tree-director-audit"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-director-audit",
+        "phrase": "during skill-tree director: audit"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-director-audit",
+        "phrase": "after skill-tree-director-audit"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-director-audit",
+        "phrase": "after skill-tree director: audit"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-director-decide",
+        "phrase": "before skill-tree-director-decide"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-director-decide",
+        "phrase": "before skill-tree director: decide"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-director-decide",
+        "phrase": "during skill-tree-director-decide"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-director-decide",
+        "phrase": "during skill-tree director: decide"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-director-decide",
+        "phrase": "after skill-tree-director-decide"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-director-decide",
+        "phrase": "after skill-tree director: decide"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-director-install",
+        "phrase": "before skill-tree-director-install"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-director-install",
+        "phrase": "before skill-tree director: install"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-director-install",
+        "phrase": "during skill-tree-director-install"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-director-install",
+        "phrase": "during skill-tree director: install"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-director-install",
+        "phrase": "after skill-tree-director-install"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-director-install",
+        "phrase": "after skill-tree director: install"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-director-intake",
+        "phrase": "before skill-tree-director-intake"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-director-intake",
+        "phrase": "before skill-tree director: intake"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-director-intake",
+        "phrase": "during skill-tree-director-intake"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-director-intake",
+        "phrase": "during skill-tree director: intake"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-director-intake",
+        "phrase": "after skill-tree-director-intake"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-director-intake",
+        "phrase": "after skill-tree director: intake"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-director-plan",
+        "phrase": "before skill-tree-director-plan"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-director-plan",
+        "phrase": "before skill-tree director: plan"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-director-plan",
+        "phrase": "during skill-tree-director-plan"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-director-plan",
+        "phrase": "during skill-tree director: plan"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-director-plan",
+        "phrase": "after skill-tree-director-plan"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-director-plan",
+        "phrase": "after skill-tree director: plan"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-director-review",
+        "phrase": "before skill-tree-director-review"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-director-review",
+        "phrase": "before skill-tree director: review"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-director-review",
+        "phrase": "during skill-tree-director-review"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-director-review",
+        "phrase": "during skill-tree director: review"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-director-review",
+        "phrase": "after skill-tree-director-review"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-director-review",
+        "phrase": "after skill-tree director: review"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-director-run",
+        "phrase": "before skill-tree-director-run"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-director-run",
+        "phrase": "before skill-tree director: run"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-director-run",
+        "phrase": "during skill-tree-director-run"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-director-run",
+        "phrase": "during skill-tree director: run"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-director-run",
+        "phrase": "after skill-tree-director-run"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-director-run",
+        "phrase": "after skill-tree director: run"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-director-setup",
+        "phrase": "before skill-tree-director-setup"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-director-setup",
+        "phrase": "before skill-tree director: setup"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-director-setup",
+        "phrase": "during skill-tree-director-setup"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-director-setup",
+        "phrase": "during skill-tree director: setup"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-director-setup",
+        "phrase": "after skill-tree-director-setup"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-director-setup",
+        "phrase": "after skill-tree director: setup"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-director-status",
+        "phrase": "before skill-tree-director-status"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-director-status",
+        "phrase": "before skill-tree director: status"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-director-status",
+        "phrase": "during skill-tree-director-status"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-director-status",
+        "phrase": "during skill-tree director: status"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-director-status",
+        "phrase": "after skill-tree-director-status"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-director-status",
+        "phrase": "after skill-tree director: status"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-full-cycle",
+        "phrase": "before skill-tree-full-cycle"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-full-cycle",
+        "phrase": "before skill-tree: full cycle"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-full-cycle",
+        "phrase": "during skill-tree-full-cycle"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-full-cycle",
+        "phrase": "during skill-tree: full cycle"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-full-cycle",
+        "phrase": "after skill-tree-full-cycle"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-full-cycle",
+        "phrase": "after skill-tree: full cycle"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-game-design",
+        "phrase": "before skill-tree-game-design"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-game-design",
+        "phrase": "before skill-tree: game design"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-game-design",
+        "phrase": "during skill-tree-game-design"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-game-design",
+        "phrase": "during skill-tree: game design"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-game-design",
+        "phrase": "after skill-tree-game-design"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-game-design",
+        "phrase": "after skill-tree: game design"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-game-design-balance",
+        "phrase": "before skill-tree-game-design-balance"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-game-design-balance",
+        "phrase": "before skill-tree: balance"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-game-design-balance",
+        "phrase": "during skill-tree-game-design-balance"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-game-design-balance",
+        "phrase": "during skill-tree: balance"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-game-design-balance",
+        "phrase": "after skill-tree-game-design-balance"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-game-design-balance",
+        "phrase": "after skill-tree: balance"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-game-design-mechanics",
+        "phrase": "before skill-tree-game-design-mechanics"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-game-design-mechanics",
+        "phrase": "before skill-tree: mechanics"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-game-design-mechanics",
+        "phrase": "during skill-tree-game-design-mechanics"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-game-design-mechanics",
+        "phrase": "during skill-tree: mechanics"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-game-design-mechanics",
+        "phrase": "after skill-tree-game-design-mechanics"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-game-design-mechanics",
+        "phrase": "after skill-tree: mechanics"
+      },
+      {
+        "anchor": "before",
         "operation": "skill-tree-implement-all",
         "phrase": "before skill-tree-implement-all"
       },
@@ -151,6 +721,36 @@
         "anchor": "after",
         "operation": "skill-tree-implement-next-future-task",
         "phrase": "after skill-tree: implement next task"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-narative",
+        "phrase": "before skill-tree-narative"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-narative",
+        "phrase": "before skill tree narrative"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-narative",
+        "phrase": "during skill-tree-narative"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-narative",
+        "phrase": "during skill tree narrative"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-narative",
+        "phrase": "after skill-tree-narative"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-narative",
+        "phrase": "after skill tree narrative"
       },
       {
         "anchor": "before",
@@ -408,8 +1008,350 @@
         "phrase": "after-validation skill-tree-repo-documentation-audit"
       }
     ],
-    "digest": "95cc897faf918f84fa8ad17124b3318044f4d35f62fc39b3931e6c2fcca8e947",
+    "digest": "7ad40c3e9ca39efed322d353f5b4a0cf3a77caefc4e1621d20ecea9513741339",
     "entries": [
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-3d:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-3d:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-3d:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-3d-blender:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-blender",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-3d-blender:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-blender",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-3d-blender:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-blender",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-3d-motion:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-motion",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-3d-motion:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-motion",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-3d-motion:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-motion",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-3d-references:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-references",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-3d-references:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-references",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-3d-references:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-references",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-3d-texture:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-texture",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-3d-texture:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-texture",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-3d-texture:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-texture",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-3d-unity:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-unity",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-3d-unity:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-unity",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-3d-unity:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-3d-unity",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
       {
         "anchor": "before",
         "boundary_id": "skill-tree-add-pending-task:before",
@@ -427,7 +1369,7 @@
         ],
         "operation": "skill-tree-add-pending-task",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -446,7 +1388,7 @@
         ],
         "operation": "skill-tree-add-pending-task",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -465,7 +1407,7 @@
         ],
         "operation": "skill-tree-add-pending-task",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -484,7 +1426,7 @@
         ],
         "operation": "skill-tree-clarify-tasks",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -503,7 +1445,7 @@
         ],
         "operation": "skill-tree-clarify-tasks",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -522,7 +1464,7 @@
         ],
         "operation": "skill-tree-clarify-tasks",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -541,7 +1483,7 @@
         ],
         "operation": "skill-tree-create-documents-snapshot",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -560,7 +1502,7 @@
         ],
         "operation": "skill-tree-create-documents-snapshot",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -579,7 +1521,748 @@
         ],
         "operation": "skill-tree-create-documents-snapshot",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-director-audit:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-audit",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-director-audit:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-audit",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-director-audit:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-audit",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-director-decide:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-decide",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-director-decide:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-decide",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-director-decide:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-decide",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-director-install:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-install",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-director-install:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-install",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-director-install:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-install",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-director-intake:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-intake",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-director-intake:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-intake",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-director-intake:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-intake",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-director-plan:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-plan",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-director-plan:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-plan",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-director-plan:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-plan",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-director-review:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-review",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-director-review:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-review",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-director-review:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-review",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-director-run:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-run",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-director-run:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-run",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-director-run:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-run",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-director-setup:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-setup",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-director-setup:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-setup",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-director-setup:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-setup",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-director-status:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-status",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-director-status:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-status",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-director-status:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-director-status",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-full-cycle:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-full-cycle",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-full-cycle:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-full-cycle",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-full-cycle:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-full-cycle",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-game-design:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-game-design:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-game-design:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-game-design-balance:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design-balance",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-game-design-balance:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design-balance",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-game-design-balance:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design-balance",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-game-design-mechanics:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design-mechanics",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-game-design-mechanics:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design-mechanics",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-game-design-mechanics:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-game-design-mechanics",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -598,7 +2281,7 @@
         ],
         "operation": "skill-tree-implement-all",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -617,7 +2300,7 @@
         ],
         "operation": "skill-tree-implement-all",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -636,7 +2319,7 @@
         ],
         "operation": "skill-tree-implement-all",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -655,7 +2338,7 @@
         ],
         "operation": "skill-tree-implement-next-future-task",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -674,7 +2357,7 @@
         ],
         "operation": "skill-tree-implement-next-future-task",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -693,7 +2376,64 @@
         ],
         "operation": "skill-tree-implement-next-future-task",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-narative:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-narative",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-narative:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-narative",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-narative:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-narative",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -712,7 +2452,7 @@
         ],
         "operation": "skill-tree-plugins",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -731,7 +2471,7 @@
         ],
         "operation": "skill-tree-plugins",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -750,7 +2490,7 @@
         ],
         "operation": "skill-tree-plugins",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -769,7 +2509,7 @@
         ],
         "operation": "skill-tree-pr-review-cycle",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -788,7 +2528,7 @@
         ],
         "operation": "skill-tree-pr-review-cycle",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -807,7 +2547,7 @@
         ],
         "operation": "skill-tree-pr-review-cycle",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -826,7 +2566,7 @@
         ],
         "operation": "skill-tree-process-future-pending",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -845,7 +2585,7 @@
         ],
         "operation": "skill-tree-process-future-pending",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -864,7 +2604,7 @@
         ],
         "operation": "skill-tree-process-future-pending",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -883,7 +2623,7 @@
         ],
         "operation": "skill-tree-repo-documentation",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -902,7 +2642,7 @@
         ],
         "operation": "skill-tree-repo-documentation",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -921,7 +2661,7 @@
         ],
         "operation": "skill-tree-repo-documentation",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -940,7 +2680,7 @@
         ],
         "operation": "skill-tree-repo-documentation-audit",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -959,7 +2699,7 @@
         ],
         "operation": "skill-tree-repo-documentation-audit",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -978,7 +2718,7 @@
         ],
         "operation": "skill-tree-repo-documentation-audit",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before",
@@ -997,7 +2737,7 @@
         ],
         "operation": "skill-tree-work-through-next",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "during",
@@ -1016,7 +2756,7 @@
         ],
         "operation": "skill-tree-work-through-next",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after",
@@ -1035,7 +2775,7 @@
         ],
         "operation": "skill-tree-work-through-next",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-research",
@@ -1054,7 +2794,7 @@
         ],
         "operation": "skill-tree-implement-next-future-task",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after-draft-plan",
@@ -1073,7 +2813,7 @@
         ],
         "operation": "skill-tree-implement-next-future-task",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-task-completion",
@@ -1092,7 +2832,7 @@
         ],
         "operation": "skill-tree-implement-next-future-task",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-review",
@@ -1111,7 +2851,7 @@
         ],
         "operation": "skill-tree-pr-review-cycle",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after-core-inspection",
@@ -1130,7 +2870,7 @@
         ],
         "operation": "skill-tree-pr-review-cycle",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-pr-ready",
@@ -1149,7 +2889,7 @@
         ],
         "operation": "skill-tree-pr-review-cycle",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-research",
@@ -1168,7 +2908,7 @@
         ],
         "operation": "skill-tree-process-future-pending",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-task-formulation",
@@ -1187,7 +2927,7 @@
         ],
         "operation": "skill-tree-process-future-pending",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after-task-creation",
@@ -1206,7 +2946,7 @@
         ],
         "operation": "skill-tree-process-future-pending",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-research",
@@ -1225,7 +2965,7 @@
         ],
         "operation": "skill-tree-repo-documentation",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-formulation",
@@ -1244,7 +2984,7 @@
         ],
         "operation": "skill-tree-repo-documentation",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after-validation",
@@ -1263,7 +3003,7 @@
         ],
         "operation": "skill-tree-repo-documentation",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-research",
@@ -1282,7 +3022,7 @@
         ],
         "operation": "skill-tree-repo-documentation-audit",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "before-formulation",
@@ -1301,7 +3041,7 @@
         ],
         "operation": "skill-tree-repo-documentation-audit",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
       {
         "anchor": "after-validation",
@@ -1320,15 +3060,35 @@
         ],
         "operation": "skill-tree-repo-documentation-audit",
         "status": "resolved",
-        "version": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8"
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       }
     ],
     "operations": [
+      "skill-tree-3d",
+      "skill-tree-3d-blender",
+      "skill-tree-3d-motion",
+      "skill-tree-3d-references",
+      "skill-tree-3d-texture",
+      "skill-tree-3d-unity",
       "skill-tree-add-pending-task",
       "skill-tree-clarify-tasks",
       "skill-tree-create-documents-snapshot",
+      "skill-tree-director-audit",
+      "skill-tree-director-decide",
+      "skill-tree-director-install",
+      "skill-tree-director-intake",
+      "skill-tree-director-plan",
+      "skill-tree-director-review",
+      "skill-tree-director-run",
+      "skill-tree-director-setup",
+      "skill-tree-director-status",
+      "skill-tree-full-cycle",
+      "skill-tree-game-design",
+      "skill-tree-game-design-balance",
+      "skill-tree-game-design-mechanics",
       "skill-tree-implement-all",
       "skill-tree-implement-next-future-task",
+      "skill-tree-narative",
       "skill-tree-plugins",
       "skill-tree-pr-review-cycle",
       "skill-tree-process-future-pending",
@@ -1337,12 +3097,30 @@
       "skill-tree-work-through-next"
     ]
   },
-  "configuration_digest": "90933e866bbf725ee70ef7b18ae91d1d862e6d7179225d2d75196370e13a7962",
+  "configuration_digest": "1d4ded90f74588a33443cca0a2da314364e2a91faff9e7955ed7ac521848e0ff",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "afbb48a54cdf6ba1b87594ba0e288eab334a08fc4564b5c68ce5e42922a0e051",
+  "identity": "7c3a93dddf0f632a8d5dcbe33e5557413e8b140eed13ed93ffd197124b5ecbeb",
   "operation": "skill-tree-implement-all",
   "operations": {
+    "skill-tree-3d": {
+      "title": "Skill Tree 3D"
+    },
+    "skill-tree-3d-blender": {
+      "title": "Skill Tree 3D Blender Geometry"
+    },
+    "skill-tree-3d-motion": {
+      "title": "Skill Tree 3D Motion"
+    },
+    "skill-tree-3d-references": {
+      "title": "Skill Tree 3D References"
+    },
+    "skill-tree-3d-texture": {
+      "title": "Skill Tree 3D Textures"
+    },
+    "skill-tree-3d-unity": {
+      "title": "Skill Tree 3D Unity Integration"
+    },
     "skill-tree-add-pending-task": {
       "title": "Skill-Tree: Add Pending Task"
     },
@@ -1352,11 +3130,53 @@
     "skill-tree-create-documents-snapshot": {
       "title": "Skill-Tree: Create Snapshot"
     },
+    "skill-tree-director-audit": {
+      "title": "Skill-Tree Director: Audit"
+    },
+    "skill-tree-director-decide": {
+      "title": "Skill-Tree Director: Decide"
+    },
+    "skill-tree-director-install": {
+      "title": "Skill-Tree Director: Install"
+    },
+    "skill-tree-director-intake": {
+      "title": "Skill-Tree Director: Intake"
+    },
+    "skill-tree-director-plan": {
+      "title": "Skill-Tree Director: Plan"
+    },
+    "skill-tree-director-review": {
+      "title": "Skill-Tree Director: Review"
+    },
+    "skill-tree-director-run": {
+      "title": "Skill-Tree Director: Run"
+    },
+    "skill-tree-director-setup": {
+      "title": "Skill-Tree Director: Setup"
+    },
+    "skill-tree-director-status": {
+      "title": "Skill-Tree Director: Status"
+    },
+    "skill-tree-full-cycle": {
+      "title": "Skill-Tree: Full Cycle"
+    },
+    "skill-tree-game-design": {
+      "title": "Skill-Tree: Game Design"
+    },
+    "skill-tree-game-design-balance": {
+      "title": "Skill-Tree: Balance"
+    },
+    "skill-tree-game-design-mechanics": {
+      "title": "Skill-Tree: Mechanics"
+    },
     "skill-tree-implement-all": {
       "title": "Skill-Tree: Implement All"
     },
     "skill-tree-implement-next-future-task": {
       "title": "Skill-Tree: Implement Next Task"
+    },
+    "skill-tree-narative": {
+      "title": "Skill Tree Narrative"
     },
     "skill-tree-plugins": {
       "title": "Skill-Tree: Manage Plugins"
@@ -1378,27 +3198,30 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "04050af1e52563a53394466d570b37ff346a49834880a3344555e8f446549a56",
+    "SKILL.md": "52e8225b990082efde92b8613ba69a4cab90214af3f534479c213453445d413d",
     "agents/openai.yaml": "94d21f410be9cd71792ae9f402addb25e57c9b8068e11a2b4e57bc833890cbc5",
-    "references/decision-governance.md": "390934d262f20952edb78a59b52f3e64567b830e1723f5bde8716e193722ff2b",
-    "references/development-practices.md": "47402db618635e221d3e3944cb0f2dc88238e278a6e2c49f49491ce98e24fc14",
+    "references/decision-governance.md": "52f8dc84c7cae4b9aa3aaa010d3ffb605ab79f5d75aaa36b9370d51e49305222",
+    "references/development-practices.md": "352a45b093f2c53b7b08aef045a098880af74c6add6fb79f95017a52fd0e0780",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
-    "references/future-workflow.md": "2d45a2bb87717f382a0a03f54fe9f8f5dfe2f4fc6d063616b974bfe9e4df3cd8",
-    "references/history-retention.md": "e34302d1665162c5c94bd1adea7cbdf32a36325bb4a6db1eafab24fc236c3585",
+    "references/future-workflow.md": "3a6bc83660773c23af11cf00eacb90ed618db701d464fd7fcd304d5d90fca50b",
+    "references/history-retention.md": "ff3fa8602fa29085b59f0aa5ae9f9da698bd5b5d5672235fe809018b18b4b801",
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
-    "references/orchestration.md": "20343c1398f712fdb67da4dae67e3c5860a7fc43989185281198aa67d31c0aae",
-    "references/pending-task-format.md": "6c0a90ea992f2c19a26e4f95fc4e45b7ff89d25c0cc8e2c49c11cfa8bad2d8ba",
-    "references/pending-task-intake.md": "d0b5d2d1421c65b3d553a8c1618b64a4ce42aeb31d968778c1e049035672995d",
+    "references/orchestration.md": "ba28f6d4cf9f1cd5a02cd3b70492caa76c4349aa6cdcb26c8ff5405c7d8376cb",
+    "references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
+    "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/pr-review-cycle.md": "c63c901451e6d3effd33284cff2f7347fff73e832677541d148dfec9fd4414c5",
-    "references/project-profile.md": "c852f4073f7e9a485c718c6ca32af059c92c746ad1b0b0d74fdef2220666997a",
-    "references/run-workspaces.md": "d9a97bc8ee56ef0aa6f254075df08e2946fdc61c578328a52f6991dbd723468c",
-    "references/validation-policy.md": "4b0370124139f3203f944e84f9c3768d5d1f9a693ee26bb70260425a3add42b6",
-    "references/workflow-metadata.md": "0b4635c90c434e691d0cd2fafc2f4950a663eae912f55a4f003ca7ea3486f011",
+    "references/project-profile.md": "e38f24da4430a5be127320f094dcad1044ff12ca7926150c5730fbec4589770b",
+    "references/run-workspaces.md": "7ea6acb5d639d20c0e0ad519bb74b89c3f15dca247d0cfcea55299f8265bb200",
+    "references/validation-policy.md": "2bb1e9675fe3bc08cbcb9aa4b9534368416faba7ffaaf6b5aaff417456f434d3",
+    "references/workflow-metadata.md": "70ba35018051edb4b5a170e7115984bc73ae6c1021ca2ad971f2699192e0e927",
+    "scripts/api-contract-locks.js": "eaac3e411ab7ddea36cedb4c48f0a0d0c5e737509466f0f86587df51a34fe594",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "d2c5ac475033ae06321fc7917ddf96232a0e442bef7c5db537891e12164fd404",
+    "scripts/development-policies.js": "9d3036e0dd2b2aaf070f3ec92f9e1d6d6830fe35cd8ebb1a78135c3ad792a2fd",
+    "scripts/director-dispatch.py": "0afae9cb9144a0e21cb52964b4f81f448733eccebceb10a391e31c791465c84a",
     "scripts/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
-    "scripts/plugin-composition.js": "9e60e64db453aabe93a5eddcdf557169618d1da56a6e0f14c92eda8ba329bef8",
+    "scripts/plugin-composition.js": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b",
     "scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",
     "scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",
     "scripts/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
@@ -1406,10 +3229,11 @@
     "scripts/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
     "scripts/plugin-runtime.js": "62caaa416cb4f375fef45edb71c1cbe3b2f9c0acb734a95e0b9099470cf6c8a5",
     "scripts/plugin-sources.js": "13d853f9e64dec84cf92f4026ac71e4384e186cd96200543e400a852a46e4693",
-    "scripts/pr-review-state.py": "99f7e6082d128ca24fd5d778cdc716d7a5b85dec41c19b97481e2f80b364839b",
-    "scripts/run-workspaces.py": "b7f0987bc4f9d8bd17a53d5cc11995d5d418eee741040435e3e1d6eae13e4f0b",
+    "scripts/pr-review-state.py": "74adda3783c9c2832bca3f51998b7a589c7ff066f50bac358c20d9930dbb2a04",
+    "scripts/run-workspaces.py": "a89ab104bad9bf8c1bd90dc597ab6d14f075d4fe8e2c59cd1dd1d84726656d6f",
+    "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "1957375646b85a90be8279fc46648c98b951d59d4d7798465f307ba82d813913"
+    "scripts/workflow-state.py": "00721b87acb418382cd1f93238e290bcacd3f4a2d3abf33479f42a2e5611b750"
   },
   "packages": {},
   "parameter_defaults": {},
