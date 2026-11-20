@@ -1,6 +1,6 @@
 ---
 name: skill-tree-director-setup
-description: "[director] Register exact Director areas and inspect guarded canonical path rebinds."
+description: "[director] Preview first-time Director setup, register exact prepared areas and inspect guarded rebinds."
 license: MIT
 ---
 
@@ -14,6 +14,6 @@ Follow the [visible owner handoff contract](references/decision-governance.md#vi
 
 Read [core decision governance](references/decision-governance.md) before operation work. Newly qualified operation routing defaults to Auto; an explicit Manual selection and every frozen existing mode remain binding. Use research, plan, current plan review/acceptance, authorized operation execution, required checks, complete review, finding resolution, fixes and re-review within the requested operation scope. A clean review creates no fix. Core governance grants no additional implementation, task-selection, installation or publication authority. Auto sends in-scope decisions to a separate resolver, significant decisions to an independent critic and substantive disagreement to an arbiter. Actual native host creation/execution occurs outside metadata writer locks; use the bundled workflow helper orchestration commands to freeze role inputs and record actual producer evidence. Missing capability remains a prerequisite, never a silent Manual fallback. Manual awaits actual owner inputs. Missing owner intent and out-of-authority requests return to the owner in both modes. Repeated unchanged failures/disputes retain progress and produce one concrete owner question. Agent agreement supplies no actual check result or external approval.
 
-Use scripts/director-entry.py setup-preview to inspect stable area, queue, profile and scope ownership. Apply the identical reviewed request with setup-apply only on explicit selection. Use rebind-preview and rebind for a moved exact canonical path. Keep installation and runtime admission separate. Read the [Director contract](references/director-workflow.md).
+Read the [Director contract](references/director-workflow.md). Use scripts/director-entry.py setup-preview with the guided workspace request to review the initial workspace, exact area placements, selected sources and missing prerequisites. For prepared area registration, use setup-preview to inspect stable area, queue, profile and scope ownership and apply the identical reviewed registration with setup-apply only on explicit selection. Use rebind-preview and rebind for a moved exact canonical path. Keep installation and runtime admission separate.
 
 Use the current canonical owner and owned profile for each bound area. A shared Unity root exposes scoped static recipes only. Install and audit remain separately scoped. Preserve exact Director decisions, child authority and independent runtime receipts.

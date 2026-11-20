@@ -13,6 +13,7 @@ import re
 import shutil
 import subprocess
 import sys
+import unicodedata
 
 
 RUN_COMMANDS = {'run-start', 'run-status', 'run-dispatch', 'run-pause', 'run-resume', 'run-cancel',
@@ -29,6 +30,11 @@ READ_EFFECTS = {'status', 'preview', 'audit', 'review'}
 WRITE_EFFECTS = {'intake', 'process', 'launch', 'adopt', 'install', 'commit', 'publish', 'schedule'}
 TOKEN = re.compile(r'[a-z][a-z0-9]*(?:-[a-z0-9]+)*\Z')
 SHA256 = re.compile(r'[a-f0-9]{64}\Z')
+SETUP_FILES = tuple('.skill-tree/documents/'+name for name in (
+    'project.md', 'technical.md', 'features.md', 'future.md', 'rules.md',
+    'repository-map.md', 'build-and-release.md', 'testing.md', 'dependencies.md',
+)) + ('.skill-tree/documents/future.json', '.skill-tree/skill-tree.json', '.skill-tree/installation/profile.json')
+SETUP_COMPOSER_DIRS = {'common', 'domains', 'templates', 'config', 'lib', 'src'}
 
 
 class DirectorError(ValueError):
@@ -220,18 +226,244 @@ def _area(request):
     }, owner
 
 
-def _validate_scopes(areas, queues):
-    records = list(areas.values())
-    _require(sum(area['role'] == 'source-maintenance' for area in records) == 1,
+def _validate_scope_paths(areas, observed):
+    _require(sum(area['role'] == 'source-maintenance' for area in areas) == 1,
              'Register one canonical Skill Tree source-maintenance area')
-    observed = [(area, Path(queues[area['queue_id']]['root']) / _scope(area['scope']))
-                for area in records if area['queue_id'] in queues]
     for index, (first, a) in enumerate(observed):
         for second, b in observed[index + 1:]:
             both_write = bool(WRITE_EFFECTS.intersection(first['allowed_effects'])
                               and WRITE_EFFECTS.intersection(second['allowed_effects']))
             _require(a != b and not (both_write and (a.is_relative_to(b) or b.is_relative_to(a))),
                      f'Areas have overlapping scopes: {first["id"]}, {second["id"]}')
+
+
+def _validate_scopes(areas, queues):
+    _validate_scope_paths(areas.values(), [(area, Path(queues[area['queue_id']]['root']) / _scope(area['scope']))
+                                         for area in areas.values() if area['queue_id'] in queues])
+
+
+def _setup_location_key(path):
+    return Path(*(unicodedata.normalize('NFD', part.casefold()) for part in path.parts))
+
+
+def _setup_target(value, kind):
+    _require(kind in ('new', 'existing') and isinstance(value, str) and '\x00' not in value,
+             'Setup requires an explicit existing or new local destination')
+    path = Path(value)
+    _require(path.is_absolute() and not {'..', '.git'}.intersection(_setup_location_key(path).parts),
+             'Setup requires an absolute destination outside Git administration')
+    _require(not any(part.is_symlink() for part in (path, *path.parents)), 'Symlink in Director setup destination')
+    anchor = next(part for part in (path, *path.parents) if part.exists())
+    _require(anchor.is_dir(), 'A Director setup destination requires a directory parent')
+    if kind == 'existing':
+        _require(path.is_dir(), 'Select an existing project directory')
+    else:
+        _require(not path.exists() or not any(path.iterdir()), 'A new project destination must be empty or absent')
+    state = anchor.stat()
+    return path, {'exists': path.exists(), 'anchor': str(anchor), 'device': state.st_dev, 'inode': state.st_ino}
+
+
+def _setup_git_root(path):
+    result = WS.local_git(path, 'rev-parse', '--show-toplevel', accepted=(0, 128))
+    return Path(os.fsdecode(result.stdout).strip()) if not result.returncode else None
+
+
+def _setup_source(request, flavor):
+    _object(request, {'checkout', 'revision'})
+    root = _root(request['checkout'])
+    role, _ = _read(root, '.skill-tree/config/repository.json')
+    versions, _ = _read(root, '.skill-tree/config/flavors.json')
+    _require(_setup_git_root(root) == root and isinstance(role, dict) and role.get('role') == 'source',
+             'Select an exact local Skill Tree package source checkout')
+    _require(_token(flavor) and isinstance(versions, dict) and flavor in versions.get('flavors', {}),
+             'The selected flavor is unavailable from the package source')
+    revision = request['revision']
+    _require(isinstance(revision, str) and revision and '\x00' not in revision,
+             'Select an exact local package source revision')
+    commit = WS.local_git_text(root, 'rev-parse', '--verify', '--end-of-options', revision+'^{commit}')
+    _require(commit == WS.local_git_text(root, 'rev-parse', 'HEAD'),
+             'The package source checkout must already be at the selected revision')
+
+    # Use the reviewed composer inventory, which includes ignored inputs read by installation.
+    composer = Path(__file__).resolve().parents[2] / 'lib/composer.js'
+    _require(composer.is_file() and not composer.is_symlink(), 'The reviewed package source inspector is unavailable')
+    command = ('const [module,root]=process.argv.slice(1);'
+               'process.stdout.write(JSON.stringify(require(module).sourceInputs(root)));')
+    environment = {key: value for key, value in os.environ.items() if key not in {'NODE_OPTIONS', 'NODE_PATH'}}
+    scan = subprocess.run(['node', '-e', command, str(composer), str(root/'.skill-tree')],
+                          capture_output=True, text=True, timeout=30, env=environment)
+    _require(scan.returncode == 0, 'The selected package source inventory is unavailable')
+    files = json.loads(scan.stdout)
+    installer = _safe_path(root, '.skill-tree/bin/install.js')
+    _require(installer.is_file(), 'The selected package source installer is unavailable')
+    paths = ['.skill-tree/'+name for name in files] + ['.skill-tree/bin/install.js']
+    _require(all('\n' not in path and '\r' not in path for path in paths),
+             'The package source contains an unsupported path')
+    entries = WS.local_git(root, 'ls-tree', '-rz', '--full-tree', commit, '--', '.skill-tree').stdout
+    tree = {}
+    committed_inputs = set()
+    for entry in entries.split(b'\0'):
+        if entry:
+            metadata, name = entry.split(b'\t', 1)
+            mode, kind, oid = metadata.split()
+            name = os.fsdecode(name)
+            parts = PurePosixPath(name).parts
+            if parts[1] in SETUP_COMPOSER_DIRS and '__pycache__' not in parts:
+                committed_inputs.add(name)
+            if kind == b'blob' and mode in (b'100644', b'100755'):
+                tree[name] = oid.decode('ascii')
+    _require(committed_inputs.issubset(paths), 'The package source is missing committed composer inputs')
+    current = subprocess.run(WS.local_git_args(root, 'hash-object', '--no-filters', '--stdin-paths'),
+                             input='\n'.join(paths)+'\n', capture_output=True, text=True, timeout=30)
+    _require(current.returncode == 0 and current.stdout.splitlines() == [tree.get(path) for path in paths],
+             'The package source contains inputs outside the exact selected commit')
+    _require(commit == WS.local_git_text(root, 'rev-parse', 'HEAD'), 'The package source moved during preview')
+    return {'checkout':str(root), 'revision':revision, 'commit':commit, 'input_sha256':_digest(files),
+            'installer_sha256':WF.file_hash(installer)}
+
+
+def _setup_project(path, kind, flavor, source, *, checkout_required=False):
+    actions = ['create-directory'] if not path.exists() else []
+    root, queue_id, repo_id = path, None, None
+    marker = path/'.git'
+    _require(not marker.is_symlink(), 'Restore the existing Git checkout identity before setup')
+    git_root = _setup_git_root(path) if kind == 'existing' else None
+    _require(not marker.exists() or git_root == path, 'Restore the existing Git checkout identity before setup')
+    if kind == 'existing' and not git_root:
+        bare = WS.local_git(path, 'rev-parse', '--is-bare-repository', accepted=(0, 128))
+        _require(bare.stdout.strip() != b'true', 'Director setup requires a worktree for an existing bare Git repository')
+    _require(not checkout_required or git_root == path, 'An existing separate area requires an exact Git checkout')
+    _require(git_root in (None, path), 'Select the exact coordinator checkout or a new destination')
+    locator = WS.runtime_file(path) if git_root else None
+    proof = None
+    if locator and (locator.exists() or locator.is_symlink()):
+        queue_id, repo_id, owner = _inspect_owner(path)
+        root = Path(owner['root'])
+    else:
+        state, _ = _read(path, '.skill-tree/documents/future.json')
+        _require(state is None or isinstance(state, dict) and state.get('schema') != 3 and not state.get('run_registry'),
+                 'Restore the existing canonical queue locator before setup')
+        if path.is_dir():
+            store = WF.Store(path, route_queue=False, neutral=True)
+            store.verify_future_integrity()
+            if state is not None:
+                _require(store.load()['active_run'] is None, 'Adopt the existing Core checkpoint before setup')
+        if not git_root:
+            actions.append('initialize-git')
+        else:
+            repo_id = WS.repo_id(path)
+        actions.append('register-core-queue')
+    missing = []
+    for relative in SETUP_FILES:
+        destination = _safe_path(root, relative)
+        if not destination.exists():
+            missing.append(relative)
+        else:
+            _require(destination.is_file(), f'Conflicting setup destination: {relative}')
+    if any(relative.endswith('.md') or relative == '.skill-tree/skill-tree.json' for relative in missing):
+        actions.append('initialize-missing-documents')
+    profile, _ = _read(root, '.skill-tree/installation/profile.json')
+    if profile is not None:
+        proof = _inspect_profile(root)
+        _require(proof['flavor'] == flavor, 'The existing installed flavor differs from the selected flavor')
+        if _digest(profile['source_digests']) != source['input_sha256']:
+            actions.append('refresh-owned-installation')
+    else:
+        _require(not _safe_path(root, '.skill-tree/installation/source').exists(),
+                 'Restore the existing owned installation receipt before setup')
+        actions.append('install-skill-tree')
+    return {'queue_root':str(root), 'queue_id':queue_id, 'repo_id':repo_id, 'flavor':flavor,
+            'source':source, 'profile_proof':proof, 'required_files':list(SETUP_FILES), 'missing_files':missing,
+            'queue_sha256':WF.file_hash(root/'.skill-tree/documents/future.md'), 'prerequisites':actions}
+
+
+def _guided_setup_preview(root, request):
+    _object(request, {'director_id', 'workspace', 'areas'})
+    _require(_token(request['director_id']) and isinstance(request['areas'], list) and request['areas'],
+             'Guided Director setup requires an exact Director and selected areas')
+    workspace = request['workspace']
+    _object(workspace, {'kind', 'source'})
+    root, root_proof = _setup_target(str(root), workspace['kind'])
+    root_key = _setup_location_key(root)
+    _require(_read(root, REGISTRY)[0] is None, 'An existing Director registry uses the ordinary area registration flow')
+    _require(_read(root, BINDINGS)[0] is None, 'Reconcile existing local Director bindings before setup')
+    source = _setup_source(workspace['source'], 'director')
+    parent = _setup_project(root, workspace['kind'], 'director', source)
+    areas, observed = {}, []
+    for request_area in request['areas']:
+        _object(request_area, {'id', 'role', 'capabilities', 'allowed_effects', 'project'}, {'flavor', 'source'})
+        area_id, role = request_area['id'], request_area['role']
+        _require(_token(area_id) and _token(role) and area_id not in areas, 'Area IDs and roles require distinct portable identities')
+        effects = _tokens(request_area['allowed_effects'], 'Area effects')
+        _require(set(effects) <= READ_EFFECTS | WRITE_EFFECTS, 'Unsupported area effect')
+        project = request_area['project']
+        _object(project, {'kind', 'topology', 'path'}, {'placement', 'scope'})
+        kind, topology = project['kind'], project['topology']
+        _require(topology in ('shared', 'separate'), 'Select shared folder or separate repository topology')
+        if kind == 'new':
+            _object(project, {'kind', 'topology', 'path', 'placement'})
+            placement = project['placement']
+            _require(placement in ('inside', 'alongside', 'custom'), 'Select inside, alongside or custom placement')
+            value = project['path'] if placement == 'custom' else str(
+                (root if placement == 'inside' else root.parent) / _scope(project['path']))
+        else:
+            _object(project, {'kind', 'topology', 'path'}, {'scope'})
+            placement, value = 'existing', project['path']
+        path, proof = _setup_target(value, kind)
+        path_key = _setup_location_key(path)
+        _require(placement != 'alongside' or not path_key.is_relative_to(root_key),
+                 'An alongside destination must be outside the coordinator root')
+        scope = _scope(project.get('scope', '.'))
+        if topology == 'shared':
+            _require(path != root and path.is_relative_to(root) and 'scope' not in project,
+                     'A shared folder must be an exact scope inside the coordinator')
+            _require(not {'source', 'flavor'}.intersection(request_area), 'Shared areas inherit the coordinator package source and flavor')
+            existing_git = _setup_git_root(Path(proof['anchor']))
+            _require(not existing_git or existing_git == root or not existing_git.is_relative_to(root),
+                     'The shared folder belongs to a separate checkout')
+            scope = path.relative_to(root)
+            prepared = {**parent, 'required_files':[], 'missing_files':[],
+                        'prerequisites':['create-directory'] if not proof['exists'] else []}
+        else:
+            _require(not root_key.is_relative_to(path_key), 'A separate area cannot contain the coordinator root')
+            _require({'flavor', 'source'} <= set(request_area), 'A separate area needs a selected flavor and package source')
+            flavor = request_area['flavor']
+            prepared = _setup_project(path, kind, flavor, _setup_source(request_area['source'], flavor),
+                                      checkout_required=kind == 'existing')
+            if kind == 'existing':
+                _area_path(Path(prepared['queue_root']), str(scope))
+        if role == 'source-maintenance':
+            source_record, _ = _read(Path(prepared['queue_root']), '.skill-tree/config/repository.json')
+            _require(kind == 'existing' and topology == 'separate' and isinstance(source_record, dict)
+                     and source_record.get('role') == 'source',
+                     'Select an existing canonical Skill Tree source-maintenance area')
+        area = {**prepared, 'id':area_id, 'role':role, 'kind':kind, 'path':str(path), 'topology':topology,
+                'placement':placement, 'scope':str(scope), 'destination_proof':proof,
+                'capabilities':_tokens(request_area['capabilities'], 'Area capabilities'),
+                'interface':{'kind':'skill-tree', 'version':1}, 'allowed_effects':effects}
+        areas[area_id] = area
+        observed.append((area, _setup_location_key(Path(area['queue_root']) / scope)))
+    _validate_scope_paths(areas.values(), observed)
+    project_roots = {root_key, _setup_location_key(Path(parent['queue_root']))}
+    project_roots.update(_setup_location_key(Path(area['queue_root'])) for area in areas.values()
+                         if area['topology'] == 'separate')
+    for area in areas.values():
+        path = _setup_location_key(Path(area['path']))
+        for project_root in project_roots:
+            if path != project_root and path.is_relative_to(project_root):
+                first = path.relative_to(project_root).parts[0]
+                _require(first not in ('.skill-tree', '.agents', 'agents.md'),
+                         'An area destination overlaps an owned setup path')
+    queue_roots = {}
+    for item in (parent, *areas.values()):
+        queue = item['queue_id']
+        if queue:
+            _require(queue_roots.setdefault(queue, item['queue_root']) == item['queue_root'],
+                     'An existing queue cannot have multiple local writers')
+    report = {'schema':1, 'operation':'guided-setup-preview', 'director_id':request['director_id'],
+              'workspace':{**parent, 'kind':workspace['kind'], 'path':str(root), 'destination_proof':root_proof},
+              'areas':areas}
+    return {**report, 'preview_sha256':_digest(report)}
 
 
 class DirectorStore(WF.Store):
@@ -700,8 +932,11 @@ def main(argv=None):
     parser.add_argument('--input', type=Path)
     args = parser.parse_args(argv)
     try:
-        director = DirectorRegistry(args.root)
         payload = json.loads(args.input.read_text()) if args.input else None
+        if args.command == 'setup-preview' and isinstance(payload, dict) and 'workspace' in payload:
+            print(WF.dump(_guided_setup_preview(args.root, payload)), end='')
+            return 0
+        director = DirectorRegistry(args.root)
         if args.command in OBJECTIVE_COMMANDS:
             _require(args.input is not None, '--input is required for Director objective operations')
             result = _objective_helper().run(director, args.command, payload)

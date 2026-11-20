@@ -12,6 +12,8 @@ Each child receipt links the Director objective and assignment to exact area, qu
 
 ## Register areas
 
+For first-time setup, use the [guided setup preview](../common/references/director-workflow.md#preview-first-time-setup) to review the coordinator, exact project placements, package sources and prerequisites. The registration commands below consume prepared areas.
+
 Use `python3 .skill-tree/common/scripts/director-state.py setup-preview <director-root> --input <request.json>` from the source checkout. The request identifies `director_id` and exact `areas`. Each area supplies a stable `id`, `role`, canonical `checkout` path, relative `scope`, capability tokens, an interface declaration `{"kind":"skill-tree","version":1}` and allowed effects. Optional expected queue and repository IDs restrict a binding to previously reviewed identities. Register one `source-maintenance` area backed by a canonical Skill Tree source. Separate repositories use existing verified Skill Tree profiles and registered Core queue identities. Shared folder scopes use the same canonical owner.
 
 Use `setup-apply` with the reviewed `expected_preview_sha256` and identical area request. The parent stores `.skill-tree/director/registry.json` and local `.skill-tree/artifacts/director/local-bindings.json` through one guarded writer. The selected child checkouts and Core queues receive no writes. Linked checkout input resolves to the canonical queue owner. Duplicate queue writers, an overlapping writable scope, symlinks and stale probes stop application.
