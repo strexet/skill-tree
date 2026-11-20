@@ -440,6 +440,75 @@ class Bootstrap:
         return self.report('prepared')
 
 
+def read_journal(root, expected):
+    journal, _ = D._read(root, JOURNAL)
+    if journal is None:
+        return None
+    D._require(isinstance(journal, dict), 'Invalid bootstrap journal')
+    integrity = journal.pop('integrity_sha256', None)
+    plan = journal.get('plan')
+    D._require(integrity == D._digest(journal) and journal.get('schema') == 1
+               and journal.get('root') == safe_directory(root)
+               and isinstance(plan, dict) and plan.get('preview_sha256') == expected
+               and D._digest({key: value for key, value in plan.items() if key != 'preview_sha256'}) == expected,
+               'Bootstrap journal conflicts with the exact approved preview or directory')
+    return journal
+
+
+def registration_inputs(root, director_id, expected):
+    D._require(D._sha(expected), 'Select the exact prepared bootstrap preview SHA-256')
+    journal = read_journal(root, expected)
+    D._require(journal is not None and journal['plan']['director_id'] == director_id,
+               'An exact prepared Director bootstrap is required')
+    plan = journal['plan']
+    profiles, owners = {}, {}
+
+    def destination(item):
+        path = Path(item['path'])
+        step = journal['units'].get(item['path'], {})
+        confirm_anchor(item['destination_proof'])
+        actual = safe_directory(path)
+        D._require(actual is not None and actual == step.get('destination'),
+                   f'Prepared setup destination is missing or moved: {path}')
+        return path, step
+
+    def project(item):
+        path, step = destination(item)
+        stages = set(step['completed'])
+        D._require('pending' not in step and ({'directory', 'git', 'installation', 'documents',
+                   'core', 'manifest'} <= stages or {'directory', 'canonical-project'} <= stages),
+                   f'Director bootstrap is incomplete: {path}')
+        proof = step['proof']
+        canonical = Path(item['queue_root'])
+        if item['queue_root_proof']:
+            confirm_anchor(item['queue_root_proof'])
+        queue, repository, owner = D._inspect_owner(path)
+        recorded = proof['owner']
+        D._require((queue, repository, owner) == (recorded['queue_id'], recorded['repo_id'], recorded['proof'])
+                   and owner['root'] == str(canonical), f'Prepared canonical queue identity changed: {path}')
+        if queue not in profiles:
+            profiles[queue] = D._inspect_profile(canonical)
+        profile = profiles[queue]
+        D._require(profile.get('sha256') == proof['files'][PROFILE] and profile.get('flavor') == item['flavor'],
+                   f'Prepared installed profile changed: {path}')
+        owners[queue] = owner
+        return path, queue, repository
+
+    workspace = project(plan['workspace'])
+    declared = []
+    for area in plan['areas'].values():
+        if area['topology'] == 'shared':
+            path, _ = destination(area)
+            checkout, queue, repository = workspace
+            D._require(str(D._area_path(Path(owners[queue]['root']), area['scope'])) == str(path),
+                       'Prepared shared scope differs from the approved path')
+        else:
+            checkout, queue, repository = project(area)
+        declared.append({**{key: area[key] for key in D.AREA_FIELDS}, 'checkout': str(checkout),
+                         'expected_queue_id': queue, 'expected_repo_id': repository})
+    return {'director_id': director_id, 'areas': declared}, profiles, owners
+
+
 def bootstrap(root, payload):
     D._require(root.is_absolute() and '..' not in root.parts, 'Select the exact absolute setup destination')
     D._object(payload, {'request', 'expected_preview_sha256'})
@@ -454,16 +523,10 @@ def bootstrap(root, payload):
         D._require(plan['preview_sha256'] == expected, 'Approved setup preview changed; review the current preview')
         original = make_directory(root, plan['workspace']['destination_proof'], created)
     with lock(root):
-        journal, _ = D._read(root, JOURNAL)
+        journal = read_journal(root, expected)
         if journal is not None:
-            D._require(isinstance(journal, dict), 'Invalid bootstrap journal')
-            integrity = journal.pop('integrity_sha256', None)
-            retained = journal.get('plan')
-            D._require(integrity == D._digest(journal) and journal.get('schema') == 1
-                       and journal.get('root') == original and journal.get('request_sha256') == request
-                       and isinstance(retained, dict) and retained.get('preview_sha256') == expected
-                       and D._digest({key: value for key, value in retained.items() if key != 'preview_sha256'}) == expected,
-                       'Bootstrap journal conflicts with the exact approved request or directory')
+            D._require(journal.get('request_sha256') == request,
+                       'Bootstrap journal conflicts with the exact approved request')
         else:
             if plan is None:
                 plan = D._guided_setup_preview(root, payload['request'])

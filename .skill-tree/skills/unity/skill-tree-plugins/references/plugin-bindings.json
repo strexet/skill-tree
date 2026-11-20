@@ -3100,7 +3100,7 @@
   "configuration_digest": "1d4ded90f74588a33443cca0a2da314364e2a91faff9e7955ed7ac521848e0ff",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "55b800841f6259762f4b1668a198b70099dbf394236a5fccaef72e2a88be43a7",
+  "identity": "f797af3cc810ea868b8a9d6f9b3232aea2d147a447e932c72d2928cfb9dd61fb",
   "operation": "skill-tree-plugins",
   "operations": {
     "skill-tree-3d": {
@@ -3210,7 +3210,7 @@
     "references/validation-policy.md": "2bb1e9675fe3bc08cbcb9aa4b9534368416faba7ffaaf6b5aaff417456f434d3",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "d2c5ac475033ae06321fc7917ddf96232a0e442bef7c5db537891e12164fd404",
-    "scripts/director-dispatch.py": "0afae9cb9144a0e21cb52964b4f81f448733eccebceb10a391e31c791465c84a",
+    "scripts/director-dispatch.py": "d95dd5e83d517612da7d2ba863bbe2f897acb0fe2dcc86b73b35847c1a10290f",
     "scripts/inspect-unity-repository.py": "794230aca0f338a9d5a6ce7dd62df2016c9d13fb9622174429f9188225fb78e9",
     "scripts/package.json": "8005a3491db7d92f36ac66369861589f9c47123d3a7c71e643fc2c06168cd45a",
     "scripts/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
