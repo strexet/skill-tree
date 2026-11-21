@@ -3100,7 +3100,7 @@
   "configuration_digest": "1d4ded90f74588a33443cca0a2da314364e2a91faff9e7955ed7ac521848e0ff",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "17a10dbb7ed03c6eeb71c6b24d7476777c54a464518ca23be1bde4276d70cd33",
+  "identity": "a1f0d4607733d58951ee140f13141ff5c3778a346bbc8b85437318102b478b23",
   "operation": "skill-tree-pr-review-cycle",
   "operations": {
     "skill-tree-3d": {
@@ -3215,7 +3215,7 @@
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "d2c5ac475033ae06321fc7917ddf96232a0e442bef7c5db537891e12164fd404",
     "scripts/development-policies.js": "9d3036e0dd2b2aaf070f3ec92f9e1d6d6830fe35cd8ebb1a78135c3ad792a2fd",
-    "scripts/director-dispatch.py": "0afae9cb9144a0e21cb52964b4f81f448733eccebceb10a391e31c791465c84a",
+    "scripts/director-dispatch.py": "d95dd5e83d517612da7d2ba863bbe2f897acb0fe2dcc86b73b35847c1a10290f",
     "scripts/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
     "scripts/plugin-composition.js": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b",
     "scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",

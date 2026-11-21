@@ -3100,7 +3100,7 @@
   "configuration_digest": "1d4ded90f74588a33443cca0a2da314364e2a91faff9e7955ed7ac521848e0ff",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "1430de7be7086d0d22dc118ae6ebcd031e329478ba6390c6c7b34623026bbf40",
+  "identity": "cc05826e4243bcfa3138809bda7bc76b9e644c200dc7e26586fbf2d1adbcabbb",
   "operation": "skill-tree-narative",
   "operations": {
     "skill-tree-3d": {
@@ -3281,7 +3281,7 @@
     "references/workflow-metadata.md": "70ba35018051edb4b5a170e7115984bc73ae6c1021ca2ad971f2699192e0e927",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "d2c5ac475033ae06321fc7917ddf96232a0e442bef7c5db537891e12164fd404",
-    "scripts/director-dispatch.py": "0afae9cb9144a0e21cb52964b4f81f448733eccebceb10a391e31c791465c84a",
+    "scripts/director-dispatch.py": "d95dd5e83d517612da7d2ba863bbe2f897acb0fe2dcc86b73b35847c1a10290f",
     "scripts/inspect-unity-repository.py": "794230aca0f338a9d5a6ce7dd62df2016c9d13fb9622174429f9188225fb78e9",
     "scripts/narrative-route-check.py": "88bdd66fbaa9829a7b69843f8004516de28bbb30340c380bc5a3be64c0faa01d",
     "scripts/narrative-state.py": "ad6618d06fc1b2cac79694a64ff5733bdd03a330e0714851e04e185d108c1388",

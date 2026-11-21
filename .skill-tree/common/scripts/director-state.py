@@ -644,7 +644,17 @@ class DirectorRegistry:
         return public, registry, {**bindings, 'queues': queues}, expected
 
     def _plan(self, payload, rebind):
-        public, registry, bindings, expected = self._rebind_plan(payload) if rebind else self._setup_plan(payload)
+        if not rebind and isinstance(payload, dict) and 'prepared_preview_sha256' in payload:
+            _object(payload, {'director_id', 'prepared_preview_sha256'})
+            prepared = payload['prepared_preview_sha256']
+            request, profiles, owners = _bootstrap_helper().registration_inputs(self.root, payload['director_id'], prepared)
+            public, registry, bindings, expected = self._setup_plan(request)
+            _require(all(proof == profiles.get(queue) and bindings['queues'][queue] == owners[queue]
+                         for queue, proof in public['profile_proofs'].items()),
+                     'Prepared queue or installation changed during registration')
+            public['prepared_preview_sha256'] = prepared
+        else:
+            public, registry, bindings, expected = self._rebind_plan(payload) if rebind else self._setup_plan(payload)
         preview = {**public, 'preview_sha256': _digest({'report': public, 'bindings': bindings, 'baseline': expected})}
         return preview, registry, bindings, expected
 
@@ -668,6 +678,45 @@ class DirectorRegistry:
                 self.store.commit(changes)
             return {**preview, 'changed_files': sorted(changes)}
 
+
+    def setup_status(self, payload):
+        _object(payload, {'director_id', 'prepared_preview_sha256'}, {'routing'})
+        prepared = payload['prepared_preview_sha256']
+        request, profiles, owners = _bootstrap_helper().registration_inputs(self.root, payload['director_id'], prepared)
+        registry, bindings, _ = self._load()
+        bound = registry is not None and bindings is not None and registry['director_id'] == payload['director_id']
+        areas = {}
+        for item in request['areas']:
+            area, owner = _area(item)
+            queue = area['queue_id']
+            _require(owner == owners[queue] and _inspect_profile(Path(owner['root'])) == profiles[queue],
+                     'Prepared queue or installation changed during status inspection')
+            recorded = (registry or {}).get('areas', {}).get(area['id'])
+            registration = 'unregistered'
+            if recorded is not None:
+                matches = bound and recorded == area and bindings['queues'].get(queue) == owner
+                registration = 'registered' if matches else 'stale'
+            areas[area['id']] = {**area, 'profile': profiles[queue], 'preparation': 'prepared',
+                                 'registration': registration, 'routing': {'status': 'unverified', 'receipts': []}}
+        routing = payload.get('routing', [])
+        _require(isinstance(routing, list), 'Routing status requires exact run and assignment selections')
+        seen = set()
+        for selection in routing:
+            _object(selection, {'director_run_id', 'assignment_id'})
+            _require(WF.valid_id(selection['director_run_id'], 'DR') and _token(selection['assignment_id']),
+                     'Routing status requires an exact Director run and assignment')
+            key = (selection['director_run_id'], selection['assignment_id'])
+            _require(key not in seen, 'Routing status selections require distinct assignments')
+            seen.add(key)
+            observed = _run_helper(self, 'verify-intake', selection)
+            area = areas.get(observed['area_id'])
+            _require(area and area['registration'] == 'registered'
+                     and (area['queue_id'], area['repo_id'], area['scope']) == (observed['queue_id'], observed['repo_id'], observed['scope']),
+                     'The observed route is outside the currently registered prepared area')
+            area['routing']['receipts'].append(observed)
+            if observed['status'] == 'verified':
+                area['routing']['status'] = 'verified'
+        return {'director_id': payload['director_id'], 'prepared_preview_sha256': prepared, 'areas': areas}
 
     def retain_dispatch_intent(self, payload):
         _object(payload, {'operation', 'request'}, {'start'})
@@ -977,6 +1026,13 @@ def _plan_helper(director):
     return adapters.DirectorPlans(director, objectives.D, objectives, compiler)
 
 
+def _bootstrap_helper():
+    from types import SimpleNamespace
+    helper = WF.owned_module('director_bootstrap', Path(__file__).with_name('director-bootstrap.py'))
+    helper.D = SimpleNamespace(**globals())
+    return helper
+
+
 def _run_helper(director, command, payload):
     from types import SimpleNamespace
     path = Path(__file__)
@@ -990,7 +1046,7 @@ def _run_helper(director, command, payload):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=sorted({'setup-preview', 'setup-apply', 'setup-bootstrap', 'rebind-preview', 'rebind', 'status', 'dispatch-intent'} | OBJECTIVE_COMMANDS | PLAN_COMMANDS | RUN_COMMANDS))
+    parser.add_argument('command', choices=sorted({'setup-preview', 'setup-apply', 'setup-bootstrap', 'setup-status', 'rebind-preview', 'rebind', 'status', 'dispatch-intent'} | OBJECTIVE_COMMANDS | PLAN_COMMANDS | RUN_COMMANDS))
     parser.add_argument('root', type=Path)
     parser.add_argument('--input', type=Path)
     args = parser.parse_args(argv)
@@ -1000,10 +1056,7 @@ def main(argv=None):
             print(WF.dump(_guided_setup_preview(args.root, payload)), end='')
             return 0
         if args.command == 'setup-bootstrap':
-            from types import SimpleNamespace
-            helper = WF.owned_module('director_bootstrap', Path(__file__).with_name('director-bootstrap.py'))
-            helper.D = SimpleNamespace(**globals())
-            result = helper.bootstrap(args.root, payload)
+            result = _bootstrap_helper().bootstrap(args.root, payload)
             print(WF.dump(result), end='')
             return 0 if result['status'] == 'prepared' else 2
         director = DirectorRegistry(args.root)
@@ -1019,6 +1072,8 @@ def main(argv=None):
         elif args.command == 'dispatch-intent':
             _require(args.input is not None, '--input is required for Director dispatch intent')
             result = director.retain_dispatch_intent(payload)
+        elif args.command == 'setup-status':
+            result = director.setup_status(payload)
         elif args.command == 'status':
             if isinstance(payload, dict) and 'plan_context' in payload:
                 selector = payload.pop('plan_context')
