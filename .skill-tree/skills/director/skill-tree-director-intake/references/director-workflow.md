@@ -30,6 +30,12 @@ Run the installed Setup operation `setup-preview` with `director_id` and `prepar
 
 Use `setup-status` with `director_id` and `prepared_preview_sha256` to inspect preparation, registration and routing verification for each area. For routing evidence, supply `routing` as a list of objects with `director_run_id` and `assignment_id`. The installed Setup operation projects a verified route after the authorized `run-dispatch` intake returns a matching canonical child receipt. The status read performs no intake. Retry dispatch with the original request to reconcile the original receipt.
 
+## Look up project context
+
+Request `plan-context` with an exact plan selector and `assignment_id`. Give the worker `context_search.request` with the assignment brief when the worker needs related project sources. Add a literal-term `query` to the request and call `scripts/director-entry.py context-search <director-root> --input <request.json>`.
+
+The lookup reads committed scopes under a registered read-only effect for the selected assignment and predecessor assignments. The lookup also covers exact verified fixture files pinned by the selected chain. Hits give the area, Git commit, source path, line and SHA-256. Use the pin review path when a discovered source becomes a required input.
+
 Use exact queue, task and run identities. Keep a durable child attempt and original workspace when asking the owner. Verify the matching guarded answer before explicit continuation. Delivery requires separate authority.
 
 Audit reads exact retained receipts. Inspect `director_timeline` for parent dispatch, recovery and decision stages. Inspect `child_status` for current holds and open checks, and `child_timeline` for exact checkpoint and check events. Follow portable event references in the owning queue. Missing events and legacy time coverage remain explicit. Private inputs and error text remain in the owning context.
