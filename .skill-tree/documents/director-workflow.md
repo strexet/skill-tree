@@ -61,6 +61,14 @@ Use `plan-preview` with exact plan and objective revisions and the selected assi
 
 Use `plan-freeze` with the same request and the reviewed `expected_preview_sha256`. The objective journal retains the frozen plan and digest. A repeated exact request preserves one plan version. `plan-context` and `plan-impact` read the frozen revision. Request `plan_context` inside status to include pinned sources and use `plan-impact` to inspect recorded consumers for an exact changed source. Representative fixture artifacts can support fixture planning. Real ArtWorkshop qualification requires verified source and runtime evidence for the selected area.
 
+### Look up project context for one assignment
+
+Pass `assignment_id` with the exact objective ID, plan ID and plan revision to `plan-context`. The returned `context_search.request` carries the frozen plan digest. Add a literal-term `query` and an optional `limit` to that request, then call `context-search` on the Director root. Use project terms or identifiers such as `cave-lantern-carry belt`.
+
+The lookup searches areas owned by the selected assignment and dependency assignments at the recorded Git commits. Each searched area requires a registered read-only effect. A verified Narrative or Art fixture pin with a path permits lookup of the exact file. For a pin queue without an unambiguous frozen commit, the lookup uses the observed local HEAD and checks the file against the recorded SHA-256 before returning context. Each hit supplies the area, repository identity, path, commit, SHA-256 and nearby source lines. Check the per-source status for unavailable material. Narrow the query if Git output exceeds the byte limit. Treat matches as research evidence and use the normal source-pin review to adopt a required input.
+
+For a standalone checkout, run `python3 .skill-tree/common/scripts/context-search.py search <checkout> --commit <full-commit-id> --scope <repository-relative-path> --query '<terms>'` from the Skill Tree source. Git reads locally available objects with protocol access disabled.
+
 ## Effects and decisions
 
 Owner design approval accepts a plan revision. Execution selection authorizes specific child effects on that revision. Delivery retains independent authority. Read-only status, plan preview and audit supply no task execution. A current confirmed plan can authorize exact child intake, processing and launch when current profiles, IDs, scope, dependencies and resource claims match. Installation, commit, publication, scheduling and wider rollout require applicable authority. Standalone Process Pending preserves the normal next-action handoff. Child controllers preserve original admission and claims.
