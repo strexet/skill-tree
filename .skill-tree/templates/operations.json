@@ -359,7 +359,7 @@
     "sections": [
       {
         "id": "operation",
-        "text": "Use scripts/director-entry.py run-start and run-dispatch with current plan, explicit effects and exact canonical scope. Observe status before another effect. Continue a started child through the matching installed controller and current authorization. In Codex, use an available independent collaboration worker with exact task, run, checkout, source pins and stop conditions. Route structured child questions to Director. Use run-pause, run-resume and run-cancel for that same selected run. Protect pending attempts and partial work. Release or replay never grants child or delivery authority. Read the [Director contract](references/director-workflow.md)."
+        "text": "Use scripts/director-entry.py run-start and run-dispatch with current plan, explicit effects and exact canonical scope. Observe status before another effect. Continue a started child through the matching installed controller and current authorization. In Codex, use an available independent collaboration worker with exact task, run, checkout, source pins and stop conditions. When a worker needs related project sources, read plan-context with the exact assignment_id and pass the returned context_search.request with the brief. Route structured child questions to Director. Use run-pause, run-resume and run-cancel for that same selected run. Protect pending attempts and partial work. Release or replay never grants child or delivery authority. Read the [Director contract](references/director-workflow.md)."
       }
     ]
   },

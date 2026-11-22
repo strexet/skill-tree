@@ -111,11 +111,13 @@ class DirectorPlansTests(unittest.TestCase):
         return {item.relative_to(root).as_posix(): item.read_bytes()
                 for item in root.rglob('*') if item.is_file()}
 
-    def cli(self, command, payload, *, exit_code=0):
+    def cli(self, command, payload, *, exit_code=0, packaged=False):
         path = self.base / f'{command}-request.json'
         path.write_text(json.dumps(payload))
         helper = 'director-handoff.py' if command in {'impact-preview', 'amend-apply'} else 'director-state.py'
-        process = subprocess.run([sys.executable, '-B', str(CORE / 'common/scripts' / helper),
+        entry = (CORE / 'skills/director/skill-tree-director-plan/scripts/director-entry.py'
+                 if packaged else CORE / 'common/scripts' / helper)
+        process = subprocess.run([sys.executable, '-B', str(entry),
                                   command, str(self.parent), '--input', str(path)], capture_output=True,
                                  text=True, timeout=40)
         self.assertEqual(process.returncode, exit_code, process.stdout + process.stderr)
@@ -316,6 +318,90 @@ class DirectorPlansTests(unittest.TestCase):
                      'intent': {**self.intent['intent'], 'description': 'Prepare the belt variant.'}})
         self.assertEqual(self.plans.context(self.selector()), context)
         self.assertFalse(self.plans.preview(self.request)['objective_current'])
+
+    def test_assignment_context_finds_the_committed_belt_handoff(self):
+        accepted = self.manifest['story']['changed']
+        outside = self.child / 'archive'
+        outside.mkdir()
+        (outside / 'notes.md').write_text('Old cave-lantern-carry belt notes.\n')
+        F.git(self.child, 'add', 'archive')
+        F.git(self.child, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
+              '-c', 'commit.gpgsign=false', 'commit', '-m', 'Add an out-of-scope record')
+        commit = F.git(self.child, 'rev-parse', 'HEAD')
+        request = deepcopy(self.request)
+        art = next(row for row in request['assignments'] if row['id'] == 'create-lantern')
+        art['pins'] = [self.fixture_pin('story', 'fixture-narrative', self.manifest['story']['id'], accepted)]
+        preview = self.cli('plan-preview', request)
+        self.cli('plan-freeze', {**request, 'expected_preview_sha256': preview['preview_sha256']})
+
+        selector = {**self.selector(), 'assignment_id': 'verify-lantern'}
+        context = self.cli('plan-context', selector)
+        self.assertEqual(context, self.cli('status', {'plan_context': selector})['plan_context'])
+        scope = context['context_search']
+        self.assertEqual({(row['path'], row['commit']) for row in scope['sources']},
+                         {('art', commit), ('game', commit), ('art/lantern.json', commit),
+                          ('story/carry-belt.json', commit)})
+
+        # A later commit changes the same path. The exact earlier source remains reproducible.
+        (self.child / accepted['path']).write_text('Changed working source, cave-lantern-carry belt.\n')
+        F.git(self.child, 'add', accepted['path'])
+        F.git(self.child, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
+              '-c', 'commit.gpgsign=false', 'commit', '-m', 'Change the source after freezing')
+        F.git(self.child, 'config', 'grep.column', 'true')
+        before = self.files(self.parent), self.files(self.child)
+        lookup = {**scope['request'], 'query': 'cave-lantern-carry belt'}
+        result = self.cli('context-search', lookup)
+        self.assertEqual(self.cli('context-search', lookup, packaged=True), result)
+        match = result['matches'][0]
+        self.assertEqual((match['path'], match['commit'], match['sha256'], match['area_id']),
+                         (accepted['path'], commit, accepted['sha256'], 'story'))
+        self.assertNotIn('\x00', match['excerpt'])
+        self.assertIn({'line': 4, 'text': '  "attachment": "belt"'}, match['context'])
+        self.assertEqual(match['pins'][0]['revision'], 'r002')
+        self.assertNotIn('story/carry-hand.json', [row['path'] for row in result['matches']])
+        self.assertNotIn('archive/notes.md', [row['path'] for row in result['matches']])
+        self.assertNotIn(str(self.base), json.dumps(result))
+        self.assertFalse(self.cli('context-search', {**lookup, 'expected_plan_sha256': '0' * 64}, exit_code=2)['ok'])
+        self.assertFalse(self.cli('context-search', {**lookup, 'scope': '.'}, exit_code=2)['ok'])
+        self.assertEqual((self.files(self.parent), self.files(self.child)), before)
+
+    def test_context_search_checks_a_pin_in_a_separate_queue(self):
+        remote = {**self.area('remote-story', 'story', 'narrative', ['fixture-canon']),
+                  'checkout': str(self.maintenance)}
+        write_only = {**self.area('remote-art', 'art', 'art', ['fixture-artifact']),
+                      'checkout': str(self.maintenance), 'allowed_effects': ['intake']}
+        setup = {'director_id': 'lantern-fixture', 'areas': [remote, write_only]}
+        self.director.apply({**setup, 'expected_preview_sha256': self.director.preview(setup)['preview_sha256']})
+        accepted = self.manifest['story']['changed']
+        request = deepcopy(self.request)
+        art = next(row for row in request['assignments'] if row['id'] == 'create-lantern')
+        art['pins'] = [self.fixture_pin('remote-story', 'fixture-narrative', self.manifest['story']['id'], accepted),
+                       {**self.art_pin, 'area_id': 'remote-art'}]
+        preview = self.cli('plan-preview', request)
+        self.cli('plan-freeze', {**request, 'expected_preview_sha256': preview['preview_sha256']})
+        selector = {**self.selector(), 'assignment_id': 'verify-lantern'}
+        scope = self.cli('plan-context', selector)['context_search']
+        remote_source = next(source for source in scope['sources'] if source['area']['id'] == 'remote-story')
+        self.assertIsNone(remote_source['commit'])
+
+        lookup = {**scope['request'], 'query': 'cave-lantern-carry belt'}
+        result = self.cli('context-search', lookup)
+        match = next(row for row in result['matches'] if row['area_id'] == 'remote-story')
+        self.assertEqual((match['commit'], match['sha256']),
+                         (F.git(self.maintenance, 'rev-parse', 'HEAD'), accepted['sha256']))
+        denied = next(row for row in result['sources'] if row['area_id'] == 'remote-art')
+        self.assertEqual((denied['status'], denied['reason']),
+                         ('unavailable', 'The registered area permits no read-only effects'))
+        self.assertNotIn('remote-art', [row['area_id'] for row in result['matches']])
+        (self.maintenance / accepted['path']).write_text('Different cave-lantern-carry belt source.\n')
+        F.git(self.maintenance, 'add', accepted['path'])
+        F.git(self.maintenance, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
+              '-c', 'commit.gpgsign=false', 'commit', '-m', 'Change the separately bound pin')
+        after = self.cli('context-search', lookup)
+        self.assertNotIn('remote-story', [row['area_id'] for row in after['matches']])
+        statuses = {row['area_id']: row['status'] for row in after['sources']}
+        self.assertEqual(statuses, {'art': 'searched', 'game': 'searched', 'remote-story': 'unavailable',
+                                    'remote-art': 'unavailable'})
 
     def test_rejects_wrong_capability_required_pins_task_body_and_cycles(self):
         before = (self.files(self.parent), self.files(self.child))
