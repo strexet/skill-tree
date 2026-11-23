@@ -12,7 +12,7 @@ DeepSeek Harness (`dsh`) discovers repository skills in `.agents/skills` and `.d
 
 For a DeepSeek model in another client, install skills for `codex`, `claude-code` or `opencode`, then configure the model in that client. [Codex integration](https://api-docs.deepseek.com/quick_start/agent_integrations/codex/) · [Claude Code integration](https://api-docs.deepseek.com/quick_start/agent_integrations/claude_code/) · [OpenCode integration](https://api-docs.deepseek.com/quick_start/agent_integrations/opencode/)
 
-OpenCode loads the root instruction block from `AGENTS.md`. GitHub Copilot CLI detection recognizes `copilot`. Cursor Agent detection recognizes its standalone executable and the standard `agent` link to `cursor-agent`. [OpenCode instructions](https://opencode.ai/docs/instructions/) · [GitHub Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli/automate-copilot-cli/run-cli-programmatically) · [Cursor CLI](https://cursor.com/docs/cli/overview)
+OpenCode loads the root instruction block from `AGENTS.md`. GitHub Copilot CLI detection recognizes `copilot`. Cursor Agent detection recognizes the standalone executable and the standard `agent` link to `cursor-agent`. [OpenCode instructions](https://opencode.ai/docs/instructions/) · [GitHub Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli/automate-copilot-cli/run-cli-programmatically) · [Cursor CLI](https://cursor.com/docs/cli/overview)
 
 ## External plugin qualification
 

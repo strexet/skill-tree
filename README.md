@@ -1,10 +1,10 @@
 # Skill Tree
 
-Skill Tree provides portable operations for repository documentation, intake, research, implementation, resumable orchestration, narrative development and plugin management. One project-scoped installation selects general, web, unity or director. Common contracts and concrete project capabilities compose into standalone packages with stable `skill-tree-*` names.
+Skill Tree provides portable operations for repository documentation, intake, research, implementation, resumable orchestration, narrative development and plugin management. The default installation creates a Director workspace. Each registered project can use a general, web or Unity profile. Common contracts and concrete project capabilities compose into standalone packages with stable `skill-tree-*` names.
 
 [Installation](.skill-tree/documents/install.md) · [Validation](.skill-tree/common/references/validation-policy.md) · [Workflow](.skill-tree/common/references/future-workflow.md) · [Metadata](.skill-tree/common/references/workflow-metadata.md) · [Source manifest](.skill-tree/skill-tree.json) · [Conformance audit](.skill-tree/documents/workflow-redesign-conformance.md)
 
-Open a terminal in the workspace you want Director to coordinate. Run the launcher from the downloaded Skill Tree checkout. For example, select Codex with:
+Open a terminal in the workspace for Director. Run the launcher from the downloaded Skill Tree checkout. For example, select Codex with:
 
 ```sh
 /path/to/skill-tree/install.sh --only codex
