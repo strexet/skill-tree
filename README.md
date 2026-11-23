@@ -32,7 +32,7 @@ Invoke `skill-tree-full-cycle` to deliver one task or an explicit group from Pen
 
 `skill-tree-narative` guides narrative game projects through creative questions, draft development, continuity and gameplay review, and explicit author acceptance. The [narrative workflow](.skill-tree/documents/narrative-workflow.md) describes the project store and the playable example.
 
-The director flavor coordinates registered folders and repositories from one Codex conversation. The [Director workflow](.skill-tree/documents/director-workflow.md) describes assignment routing, owner decisions, diagnostics and controlled installation.
+Director coordinates registered folders and repositories from the selected client. The compatibility guide records which client operations have been exercised. [Client compatibility](.skill-tree/documents/agent-compatibility.md) The [Director workflow](.skill-tree/documents/director-workflow.md) describes assignment routing, owner decisions, diagnostics and controlled installation.
 
 Source fixtures qualify deterministic helper/composer/installer behavior. Unity, browser, hosted/provider, device and actual agent-behavior qualification remain separate evidence boundaries. [Manual target update](.skill-tree/documents/manual-target-update.md) preserves the existing repository's identities and history without an automatic converter.
 
