@@ -27,8 +27,22 @@ class HostGit(unittest.TestCase):
                                              accepted=(1,)).returncode, 1)
                 self.assertEqual(os.environ['GIT_CONFIG_COUNT'], '2')
 
+    def test_null_devices_stay_in_the_environment_of_the_local_git_process(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            subprocess.run(['git', 'init', '-q', str(root)], check=True)
+            with patch.dict(os.environ, {'GIT_CONFIG_GLOBAL': os.devnull, 'GIT_CONFIG_SYSTEM': os.devnull}), \
+                    patch.object(subprocess, 'run', wraps=subprocess.run) as runner:
+                self.assertEqual(ws.local_git_text(root, 'rev-parse', '--show-toplevel'), str(root))
+                child = runner.call_args.kwargs['env']
+                self.assertEqual(child['GIT_CONFIG_GLOBAL'], os.devnull)
+                self.assertEqual(child['GIT_CONFIG_SYSTEM'], os.devnull)
+
     def test_rejects_repository_index_execution_and_malformed_overrides(self):
         for values, message in [
+            ({'GIT_CONFIG_GLOBAL': 'another.gitconfig'}, 'GIT_CONFIG_GLOBAL'),
+            ({'GIT_CONFIG_SYSTEM': os.devnull + '.config'}, 'GIT_CONFIG_SYSTEM'),
+            ({'GIT_CONFIG': os.devnull}, 'GIT_CONFIG'),
             ({'GIT_DIR': 'other'}, 'GIT_DIR'), ({'GIT_INDEX_FILE': 'other'}, 'GIT_INDEX_FILE'),
             ({'GIT_CONFIG_COUNT': '1', 'GIT_CONFIG_KEY_0': 'core.hooksPath', 'GIT_CONFIG_VALUE_0': 'unused'}, 'index 0'),
             ({'GIT_CONFIG_COUNT': '1'}, 'index 0'), ({'GIT_CONFIG_COUNT': '-1'}, 'count'),

@@ -122,3 +122,34 @@ test('stale preview and unauthorized mixed recovery preserve the original target
   assert.notEqual(core.receipt(f.target, true).identity, existing);
   assert.equal(fs.existsSync(path.join(f.target, journal)), false);
 });
+
+test('canary Git preserves null-device config isolation and rejects other config paths', t => {
+  const f = fixture(t);
+  const nullDevice = process.platform === 'win32' ? 'nul' : require('node:os').devNull;
+  const keys = ['GIT_CONFIG_GLOBAL','GIT_CONFIG_SYSTEM'];
+  const initial = new Map(keys.map(key => [key, process.env[key]]));
+  const childSettings = [];
+  t.mock.method(childProcess, 'spawnSync', (program, args, opts) => {
+    if (program === 'git' && args.includes('--no-replace-objects')) {
+      childSettings.push(keys.map(key => opts.env[key]));
+    }
+    return spawnSync(program,args,opts);
+  });
+  try {
+    for (const key of keys) process.env[key] = nullDevice;
+    const preview = () => canary.preview(f.target,f.source,f.candidate,f.scope,f.candidate.candidate_sha256);
+    assert.ok(preview().preview_sha256);
+    assert.ok(childSettings.length);
+    for (const settings of childSettings) assert.deepEqual(settings,[nullDevice,nullDevice]);
+    for (const key of keys) {
+      process.env[key] = nullDevice + '.other';
+      assert.throws(preview,new RegExp(key));
+      process.env[key] = nullDevice;
+    }
+  } finally {
+    for (const [key,value] of initial) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  }
+});
