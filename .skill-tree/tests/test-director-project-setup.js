@@ -12,7 +12,7 @@ test('installed Setup registers existing, default and custom projects with selec
   const base = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'director-project-choice-')));
   t.after(() => fs.rmSync(base,{recursive:true,force:true}));
   const root = path.join(base,'workspace'), seed = path.join(base,'seed'), home = path.join(root,'.skill-tree-director');
-  const env = {...process.env,GIT_CONFIG_GLOBAL:path.join(base,'gitconfig'), GIT_TERMINAL_PROMPT:'0'};
+  const env = {...process.env, GIT_TERMINAL_PROMPT:'0'};
   function run(command,args,cwd=base) {
     const result = spawnSync(command,args,{cwd,env,encoding:'utf8',timeout:180000});
     assert.equal(result.status,0,result.stdout+result.stderr);
