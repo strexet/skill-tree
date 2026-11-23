@@ -369,7 +369,7 @@ console.log(JSON.stringify({source_inventory_sha256:c.hash(c.json(inputs)), sour
         D._object(payload, {'repair_id', 'pending_id', 'task_id', 'run_id', 'outcome_id', 'composition_target',
                             'flavor', 'provider', 'owner', 'review_ref'})
         case, root = self._authorized(payload, 'freeze-candidate')
-        D._require(D._token(payload['review_ref']) and payload['provider'] == 'codex', 'Candidate requires exact owner review and Codex packaging')
+        D._require(D._token(payload['review_ref']) and D._token(payload['provider']), 'Candidate requires exact owner review and a selected host')
         intake, processed, launched = (self._observed(case, root, operation)['observed_result']
                                        for operation in ('intake', 'process', 'start'))
         task_id = payload['task_id']
@@ -411,6 +411,14 @@ console.log(JSON.stringify({source_inventory_sha256:c.hash(c.json(inputs)), sour
                                self._resource_check(row, worktree, spec, source_path, digest, red=red))
         target = D._root(payload['composition_target'])
         D._require(target != root and target != worktree, 'Select a separate reviewed package composition target')
+        verified_profile = D._inspect_profile(target)
+        receipt, receipt_sha = D._read(target, '.skill-tree/installation/profile.json')
+        D._require(verified_profile['kind'] == 'owned-profile' and verified_profile['sha256'] == receipt_sha
+                   and receipt['flavor'] == payload['flavor'] and payload['provider'] != 'generic'
+                   and any(record['name'] == finding['scope']['operation']
+                           and payload['provider'] in record.get('providers', [record['provider']])
+                           for record in receipt['destinations'].values()),
+                   'Candidate requires a verified composition target owned by the selected host')
         packages = self._package_pins(worktree, target, payload['flavor'], base_oid, finding['scope']['operation'],
                                       'scripts/create-documentation-snapshot.py' if snapshot else spec['resource'], source_path)
         source_inventory = packages.pop('source_inventory_sha256')

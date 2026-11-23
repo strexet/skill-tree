@@ -161,7 +161,7 @@ The shared-folder topology uses one canonical queue for distinct scopes. The ext
 
 ## Verify the repaired generation on one target
 
-The source candidate retains the accepted prior failure, reviewed repair, exact source inventory and exact composed output inventory. Select one stopped Codex installation on a disposable linked worktree, the original queue, task and run, a current owner authority reference, and any product paths whose bytes require preservation. Keep the candidate source snapshot immutable. The source candidate alone grants no installation authority.
+The source candidate retains the accepted prior failure, reviewed repair, exact source inventory and exact composed output inventory. Select one stopped installation on a disposable linked worktree and the receipt owner of the operation, the original queue, task and run, a current owner authority reference, and any product paths whose bytes require preservation. Keep the candidate source snapshot immutable. The source candidate alone grants no installation authority.
 
 Use `python3 scripts/director-entry.py preview --input <request.json>` to inspect the exact previous and planned profiles. The request holds the exact local target and candidate source, the reviewed candidate, the candidate digest and the selected scope. Preview performs no writes. Retain the returned portable preview and exact digest.
 

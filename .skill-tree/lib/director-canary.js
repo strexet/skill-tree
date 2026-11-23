@@ -60,11 +60,28 @@ function sha(root, relative) {
 }
 
 function git(root, ...args) {
+  const env = {...process.env};
   const config = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR', 'GIT_OBJECT_DIRECTORY',
-    'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_NAMESPACE', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG_COUNT'];
-  requireCanary(!config.some(key => own(process.env, key)), 'Use the recorded Git environment without overrides');
+    'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_NAMESPACE', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG',
+    'GIT_CONFIG_GLOBAL', 'GIT_CONFIG_SYSTEM'];
+  const blocked = config.find(key => own(env, key));
+  requireCanary(!blocked, 'Clear the inherited Git override ' + blocked + ' for the canary');
+  const count = env.GIT_CONFIG_COUNT ?? '0';
+  requireCanary(/^(0|[1-9][0-9]{0,2})$/.test(count), 'Invalid inherited Git configuration count');
+  delete env.GIT_CONFIG_COUNT;
+  for (let index = 0; index < Number(count); index++) {
+    const key = 'GIT_CONFIG_KEY_' + index;
+    const value = 'GIT_CONFIG_VALUE_' + index;
+    const presentation = /^color\.(ui|branch|diff|status)$/i.test(env[key] || '');
+    const remote = /^(credential\.https?:\/\/[^\s]+\.(helper|useHttpPath)|http\.https?:\/\/[^\s]+\.(proactiveAuth|followRedirects|extraHeader))$/i.test(env[key] || '');
+    requireCanary(own(env, value) && (presentation || remote), 'Unsupported inherited Git setting at index ' + index);
+    delete env[key];
+    delete env[value];
+  }
+  requireCanary(!Object.keys(env).some(key => /^GIT_CONFIG_(KEY|VALUE)_/.test(key)),
+    'Unexpected inherited Git configuration entries outside GIT_CONFIG_COUNT');
   const result = childProcess.spawnSync('git', ['--no-replace-objects', '--no-optional-locks', '-C', root,
-    '-c', 'core.fsmonitor=false', ...args], {encoding: 'utf8', timeout: 5000});
+    '-c', 'core.fsmonitor=false', ...args], {env, encoding: 'utf8', timeout: 5000});
   requireCanary(result.status === 0, 'The exact canary Git workspace is unavailable');
   return result.stdout.trim();
 }
@@ -78,11 +95,11 @@ function readCandidate(value, expected, source) {
   const sourceDigest = seal(c.sourceInputs(source));
   requireCanary(value.source?.source_inventory_sha256 === sourceDigest &&
     value.source.revision === 'source-inventory:' + sourceDigest, 'The candidate source inventory changed');
-  requireCanary(value.packages?.provider === 'codex' && token(value.packages.flavor) &&
+  requireCanary(token(value.packages?.provider) && value.packages.provider !== 'generic' && token(value.packages.flavor) &&
     hash(value.packages.environment_id) && hash(value.review.before_sha256) && hash(value.review.after_sha256) &&
     value.review.before_sha256 !== value.review.after_sha256 &&
     value.packages.output_digests?.[SNAPSHOT]?.[SNAPSHOT_HELPER] === value.review.after_sha256,
-  'The candidate requires a reviewed Codex composition');
+  'The candidate requires a reviewed composition for the selected host');
   requireCanary(Object.entries(SCENARIO).every(([key, item]) => value.scenario?.[key] === item) &&
     hash(value.scenario.input_sha256), 'The exact original canary scenario is unavailable');
   for (const [role, result] of [['original', 'fail'], ['repaired', 'pass']]) {
@@ -101,8 +118,8 @@ function readCandidate(value, expected, source) {
 function targetState(root, scope) {
   object(scope, ['queue_id', 'run_id', 'task_id', 'flavor', 'provider', 'authority_ref', 'preserve_paths']);
   requireCanary(identity(scope.queue_id, 'Q') && identity(scope.run_id, 'WR') &&
-    identity(scope.task_id, 'T') && scope.provider === 'codex' && token(scope.flavor) &&
-    token(scope.authority_ref), 'Select exact scoped canary authority, child run and Codex profile');
+    identity(scope.task_id, 'T') && token(scope.provider) && scope.provider !== 'generic' && token(scope.flavor) &&
+    token(scope.authority_ref), 'Select exact scoped canary authority, child run and host profile');
   requireCanary(git(root, 'rev-parse', '--show-toplevel') === root, 'Select the exact canary checkout');
   const common = fs.realpathSync(path.resolve(root, git(root, 'rev-parse', '--git-common-dir')));
   const locatorFile = c.safe(common, 'skill-tree-runtime.json');
@@ -146,18 +163,13 @@ function preserve(root, owner, paths) {
 
 function profileProof(root, scope) {
   const profile = core.verify(root, c.safe(root, BUNDLE));
-  const matrix = c.readJson(c.safe(root, BUNDLE), 'config/providers.json');
-  const codex = matrix.providers.find(provider => provider.id === scope.provider);
-  requireCanary(profile.flavor === scope.flavor && codex,
-    'The selected target flavor or provider differs from the owned profile');
-  const selections = Object.entries(profile.destinations).map(([rel, record]) => {
-    const owners = record.providers || [record.provider];
-    requireCanary(owners.length === 1 && owners[0] === scope.provider &&
-      rel === path.posix.join(codex.projectPath, record.name), 'Mixed or unselected provider ownership');
-    return {rel, name: record.name, provider: scope.provider};
-  });
-  requireCanary(selections.some(item => item.name === SNAPSHOT), 'Canary requires the exact owned snapshot operation');
-  return {profile, selections};
+  requireCanary(profile.flavor === scope.flavor, 'The selected flavor differs from the owned profile');
+  // core.verify checked every provider ID, destination, composed package and content hash.
+  const selections = Object.entries(profile.destinations).flatMap(([rel, record]) =>
+    (record.providers || [record.provider]).map(provider => ({rel, name: record.name, provider})));
+  const snapshot = selections.find(item => item.provider === scope.provider && item.name === SNAPSHOT);
+  requireCanary(snapshot, 'The selected host does not own the operation required for canary replay');
+  return {profile, selections, snapshot};
 }
 
 function frozenGeneration(profile) {
@@ -196,8 +208,8 @@ function preview(root, source, candidate, scope, expectedCandidate) {
   stopped(root, run);
   requireCanary(pinned.packages.flavor === scope.flavor && pinned.packages.provider === scope.provider,
     'Candidate composition does not match the selected flavor and provider');
-  const {profile, selections} = profileProof(root, scope);
-  const snapshot = Object.values(profile.destinations).find(record => record.name === SNAPSHOT);
+  const {profile, selections, snapshot: selected} = profileProof(root, scope);
+  const snapshot = profile.destinations[selected.rel];
   requireCanary(run.admission?.identity === profile.identity && sha(root, README) === pinned.scenario.input_sha256 &&
     snapshot?.files?.[SNAPSHOT_HELPER] === pinned.review.before_sha256,
     'Current previous generation or same-scenario input is unavailable');
@@ -207,6 +219,10 @@ function preview(root, source, candidate, scope, expectedCandidate) {
     generation.environment_id === pinned.packages.environment_id &&
     same(generation.output_digests, pinned.packages.output_digests), 'Exact candidate output generation differs');
   requireCanary(dry.delta.length && dry.delta.includes(PROFILE), 'Exact candidate is already installed or would have no effect');
+  for (const relative of scope.preserve_paths || []) {
+    requireCanary(!Object.keys(profile.destinations).some(dest => relative === dest || relative.startsWith(dest + '/')),
+      'Preservation paths cannot select an owned installation destination');
+  }
   const business = preserve(root, owner, scope.preserve_paths);
   requireCanary(!dry.delta.some(relative => own(business.target, relative) ||
     [FUTURE, '.skill-tree/history', '.skill-tree/director', '.skill-tree/invocations'].includes(relative)),
@@ -223,6 +239,8 @@ function preview(root, source, candidate, scope, expectedCandidate) {
   const report = {
     schema: 1, kind: 'director-canary-preview', candidate_sha256: expectedCandidate, scenario_sha256: seal(pinned.scenario),
     target_sha256: seal({root, owner, locator_sha256}), scope, workspace: run.workspace,
+    host_destinations: Object.fromEntries(Object.entries(profile.destinations).map(([rel, row]) =>
+      [rel, row.providers || [row.provider]])),
     original_run: run, before_profile_sha256: sha(root, PROFILE), generation,
     independent_state_sha256: independentState(state, scope.run_id),
     run_event_sequence: state.run_registry.event_sequences?.[scope.run_id] || 0,
@@ -384,7 +402,8 @@ function replay(root, source, candidate, view, expected) {
   stopped(root, current.run);
   requireCanary(seal(pinned.scenario) === view.scenario_sha256 && sha(root, README) === pinned.scenario.input_sha256,
     'The exact original scenario input changed');
-  const entry = Object.entries(profile.destinations).find(([, record]) => record.name === SNAPSHOT);
+  const entry = Object.entries(profile.destinations).find(([, record]) =>
+    record.name === SNAPSHOT && (record.providers || [record.provider]).includes(view.scope.provider));
   const helper = entry[0] + '/' + SNAPSHOT_HELPER;
   requireCanary(sha(root, helper) === pinned.packages.output_digests[SNAPSHOT][SNAPSHOT_HELPER],
     'The installed candidate helper bytes changed');

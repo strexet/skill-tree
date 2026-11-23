@@ -441,23 +441,30 @@ def _parent_assignment_status(state):
             'blocked': bool(state.get('blocker')), 'completed': bool(state.get('completed'))}
 
 
-def _generation(worktree):
-    if worktree is None:
+def _snapshot_input(sources):
+    suffix = '/' + SNAPSHOT + '/' + RESOURCE
+    candidates = [path for path in sources if path.endswith(suffix)]
+    return candidates[0] if len(candidates) == 1 else None
+
+
+def _generation(worktree, installed=INSTALLED):
+    if worktree is None or not installed:
         return None
     try:
         observed = D._inspect_profile(worktree)
         profile, digest = _json(worktree, PROFILE)
         D._require(observed['kind'] == 'owned-profile' and observed['sha256'] == digest
                    and profile['identity'] == observed['identity'], 'No exact verified installed generation')
-        package = profile['destinations'][DESTINATION]
+        destination = installed.removesuffix('/' + RESOURCE)
+        package = profile['destinations'][destination]
         source = profile['source_digests'][SOURCE.removeprefix('.skill-tree/')]
         artifact = package['files'][RESOURCE]
         bundle_path = '.skill-tree/installation/source/' + SOURCE.removeprefix('.skill-tree/')
-        D._require('codex' in package.get('providers', [package['provider']]) and package['name'] == SNAPSHOT
+        D._require(package.get('providers', [package['provider']]) and package['name'] == SNAPSHOT
                    and D._sha(source) and D._sha(artifact) and D._sha(package['identity'])
                    and profile['bundle_digests'][bundle_path] == source
                    and D.WF.file_hash(D._safe_path(worktree, bundle_path)) == source
-                   and D.WF.file_hash(D._safe_path(worktree, INSTALLED)) == artifact
+                   and D.WF.file_hash(D._safe_path(worktree, installed)) == artifact
                    and profile['recipes'][RECIPE]['lane'] == 'unit', 'Profile lacks the exact checked helper and recipe')
     except (KeyError, TypeError, OSError, ValueError, subprocess.TimeoutExpired):
         return None
@@ -479,7 +486,7 @@ def _source_check(check_id, record, attempt, checks, worktree, verified):
         return False
     matched = (attempt.get('attempt_id') == record['attempt_id'] and attempt.get('key') == record['key']
             and attempt.get('recipe', {}).get('lane') == 'unit' and attempt.get('sources') == record['sources']
-            and record['sources'].get(INSTALLED) == generation['installed_sha256'] and proof == OBSERVED_RESULT
+            and record['sources'].get(_snapshot_input(record['sources'])) == generation['installed_sha256'] and proof == OBSERVED_RESULT
             and pointer.get('available') is True and digest == pointer.get('sha256'))
     return {'result_path': RESULT, 'result_sha256': digest} if matched else None
 
@@ -623,7 +630,7 @@ class DirectorAudit:
                   'observed_events': len(events), 'last_recorded_sequence': last_sequence,
                   'undated_events': sum('event_recorded_at' not in source for _, source in events)}
         verified = None
-        checked_generation = False
+        generations = {}
         observations, findings, timeline = [], {}, []
         duplicate_receipts = set()
         terminal_ids = set()
@@ -646,9 +653,12 @@ class DirectorAudit:
                             'record_sha256': D._digest(record)}
                 if unity_selection and attempt_id == unity_selection['attempt_id']:
                     unity_attempts.append((evidence, record, attempt))
-                if check_id == CHECK and not checked_generation:
-                    verified = _generation(worktree)
-                    checked_generation = True
+                verified = None
+                if check_id == CHECK:
+                    installed = _snapshot_input(record['sources'])
+                    if installed not in generations:
+                        generations[installed] = _generation(worktree, installed)
+                    verified = generations[installed]
                 proof = _source_check(check_id, record, attempt, checks.get(task_id, {}), worktree, verified)
                 diagnostics = _check_diagnostics(record)
                 diagnostic = None if proof else _diagnostic_finding(

@@ -16,8 +16,8 @@ function usage() {
 
 Options:
   --all                         Select all non-soft matrix providers
-  --only <provider-id>          Select provider id from .skill-tree/config/providers.json (repeatable)
-  --agent <upstream-profile>    Explicit upstream skills CLI profile passthrough (repeatable)
+  --only <provider-id>          Select a client shown by --list (repeatable, exclusive with --all)
+  --agent <upstream-profile>    Unsupported upstream passthrough. Use --only <provider-id>
   --skills <names...>           Select one or more skills
   --flavor ${flavors}    Select the project workflow flavor\n  --global                      Unsupported for project specialization
   --project                     Install to project path (default)
@@ -139,6 +139,8 @@ function parseArgs(argv) {
     else if (token === "--help" || token === "-h") args.help = true;
     else throw new Error(`unknown option: ${token}`);
   }
+  if (args.all && args.only.length) throw new Error("--all and --only are mutually exclusive. Repeat --only to select several clients.");
+  if (args.agent.length) throw new Error("--agent passthrough is unsupported. Use --list and --only <provider-id>.");
   if (args.global && args.project) throw new Error("--global and --project are mutually exclusive");
   if (args.copy && args.symlink) throw new Error("--copy and --symlink are mutually exclusive");
   if (args.uninstall && args.verify) throw new Error("--uninstall and --verify are mutually exclusive");
@@ -168,7 +170,13 @@ function which(command, env = process.env) {
     if (!entry) continue;
     for (const ext of extensions) {
       const candidate = path.join(entry, command + ext);
-      if (fs.existsSync(candidate)) return candidate;
+      try {
+        if (!fs.statSync(candidate).isFile()) continue;
+        fs.accessSync(candidate, fs.constants.X_OK);
+        return candidate;
+      } catch {
+        // Keep searching PATH when the entry is absent or cannot be executed.
+      }
     }
   }
   return null;
@@ -191,7 +199,13 @@ function jetbrainsPluginDirs(home = os.homedir()) {
 }
 
 function detectProbe(probe, env = process.env, home = os.homedir()) {
-  if (probe.kind === "command") return Boolean(which(probe.value, env));
+  if (probe.kind === "command") {
+    const command = which(probe.value, env);
+    if (!command || !probe.executableName) return Boolean(command);
+    // Cursor's standalone installer links the generic "agent" name to cursor-agent.
+    const executable = path.basename(fs.realpathSync(command)).toLowerCase().replace(/\.(cmd|exe|bat)$/, "");
+    return executable === probe.executableName;
+  }
   if (probe.kind === "environment") return Boolean(env[probe.value]);
   if (probe.kind === "directory") return fs.existsSync(expandHome(probe.value));
   if (probe.kind === "file") return fs.existsSync(expandHome(probe.value));
@@ -229,13 +243,13 @@ function detectProvider(provider, env = process.env) {
 
 function selectedProviders(args, matrix) {
   const providers = matrix.providers;
-  const byId = new Map(providers.map((provider) => [provider.id, provider]));
+  const byId = new Map(providers.flatMap(provider => [provider.id, ...(provider.aliases || [])].map(id => [id, provider])));
   const selected = [];
   if (args.all) {
     selected.push(...providers.filter((provider) => !provider.soft && provider.tier !== 3));
   } else if (args.only.length) {
     for (const id of args.only) {
-      if (!byId.has(id)) throw new Error(`unknown provider id: ${id}`);
+      if (!byId.has(id)) throw new Error(`unknown provider id: ${id}. Use --list and select a client with --only.`);
       selected.push(byId.get(id));
     }
   } else {
@@ -288,7 +302,10 @@ function installBase(provider, args) {
 function printList(matrix, source, flavor) {
   const flavors = flavorNames(source);
   console.log("Flavors: " + flavors.join(", ") + "\nProviders:");
-  for (const provider of matrix.providers) console.log(`${provider.id}\t${provider.label}\ttier=${provider.tier}\tsoft=${provider.soft}`);
+  for (const provider of matrix.providers) {
+    const aliases = provider.aliases ? "\taliases=" + provider.aliases.join(",") : "";
+    console.log(`${provider.id}\t${provider.label}\ttier=${provider.tier}\tsoft=${provider.soft}${aliases}`);
+  }
   console.log("\nLogical operations:");
   for (const skill of [...new Set((flavor ? [flavor] : flavors).flatMap(name => listSkills(source, name)))].sort()) console.log(skill);
 }

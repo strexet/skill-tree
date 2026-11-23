@@ -6,6 +6,14 @@ Local project-scoped copy installation supports matrix destinations. Soft provid
 
 Eight independent Codex scenario observations cover English/Russian intake, clarification, standalone processing, selected-group continuation, paused status inspection, merge examples, unrelated requests and snapshots. The [observation record](../history/validation/next-version/agent-conformance-live.json) binds actual agent identities, inherited model configuration, request/package fingerprints, artifact assertions and semantic review. The host does not expose an exact inherited model ID. Native discovery across every provider, live publication and universal model adherence remain unqualified.
 
+## Choosing a client for DeepSeek
+
+DeepSeek Harness (`dsh`) discovers repository skills in `.agents/skills` and `.dsh/skills`. Select `--only dsh` for the shared project skill location. The installation receipt records `dsh`. A filesystem discovery check can verify that a package loads. Live delegation, model access and hosted actions require qualification in the selected client. [DeepSeek Harness skill discovery](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/subsystems/skills.md)
+
+For a DeepSeek model in another client, install skills for `codex`, `claude-code` or `opencode`, then configure the model in that client. [Codex integration](https://api-docs.deepseek.com/quick_start/agent_integrations/codex/) · [Claude Code integration](https://api-docs.deepseek.com/quick_start/agent_integrations/claude_code/) · [OpenCode integration](https://api-docs.deepseek.com/quick_start/agent_integrations/opencode/)
+
+OpenCode loads the root instruction block from `AGENTS.md`. GitHub Copilot CLI detection recognizes `copilot`. Cursor Agent detection recognizes its standalone executable and the standard `agent` link to `cursor-agent`. [OpenCode instructions](https://opencode.ai/docs/instructions/) · [GitHub Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli/automate-copilot-cli/run-cli-programmatically) · [Cursor CLI](https://cursor.com/docs/cli/overview)
+
 ## External plugin qualification
 
 Core provider detection, destinations, optional bridges and project-copy installation retain the existing provider matrix and evidence above. External skill invocation is a separate surface. The [market study](plugin-market-research.md) and [dated map](../history/research/plugin-market-map.json) record source facts for 38 candidates; no candidate invocation or target-workflow comparison belongs to the market research.

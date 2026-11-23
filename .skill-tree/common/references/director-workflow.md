@@ -38,7 +38,7 @@ For a minimal clean case the review selects `"required_cases": ["carry"]` and th
 
 A group classified as `expected` also supplies `expectation_sha256`. Only a reached case and an exact match to the reviewed expectation in the selection support exclusion. A missing or mismatched expectation leaves that case open. Missing attribution leaves the selected cases open. An already established fresh error, exception or assertion still holds the affected case. The owning project retains source expectations and raw engine text. Read the case verdicts and retained Core counts in `child_status[].unity_receipt` and gaps in `coverage_gaps`.
 
-Repair routes one reviewed failure to the source maintenance area and records the exact tested candidate. Use the install operation as `python3 scripts/director-entry.py preview --input <request.json>` with one approved target. Activation verifies the candidate. Explicit same-run admission precedes replay of the original scenario.
+Repair routes one reviewed failure to the source maintenance area and records the exact tested candidate. Use the install operation as `python3 scripts/director-entry.py preview --input <request.json>` with one approved target. Preview resolves the selected host against the verified installation and lists all affected destinations and co-owners. Activation verifies the candidate. Explicit same-run admission precedes replay of the original scenario.
 
 Review also adopts existing child evidence and retains exact product milestones. A milestone records accepted story, art and game evidence and selected public results. Review current coverage before requesting separate release authority.
 
