@@ -512,6 +512,17 @@ async function main(argv = process.argv.slice(2), {promptFactory} = {}) {
     if (args.global || args.symlink || args.agent.length || !isLocalSource(args.source)) {
       throw Error("Project specialization supports local project-scoped copy installation; global, symlink and uncomposed upstream paths are unsupported. Use --target <project> --flavor <project flavor> --copy.");
     }
+    const dedicatedDirector = !args.flavor && !args.skills.length && !args.project &&
+      !args.verify && !args.uninstall && !args.configurePlugins && !args.plugins && !args.withInit;
+    if (dedicatedDirector) {
+      const { installDirector } = require("../lib/director-workspace.js");
+      const providers = selectedProviders(args, matrix);
+      if (!providers.length) throw Error("Choose your host with --only <provider-id>. See --list for available hosts.");
+      const workspace = path.resolve(args.target || process.cwd());
+      const result = installDirector(workspace, sourceRoot(args), providers, {dryRun: args.dryRun});
+      console.log(result);
+      return 0;
+    }
     if (!args.target) throw Error("Select the covered project explicitly with --target <repository>");
     const target = fs.realpathSync(path.resolve(args.target));
     args.target = target;

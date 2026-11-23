@@ -100,7 +100,7 @@ def canonical(root):
         raise RunError('Select the exact repository/worktree root')
     return owner
 
-def setup(store, payload):
+def setup(store, payload, *, bootstrap_id=None, expected_state_sha256=None, expected_queue_sha256=None, update_navigation=True):
     """Explicit schema-2 extension; preserve the complete single-run record."""
     if not common_dir(store.root):raise RunError('Workspace setup requires a Git repository')
     if store.root != store.source_root:
@@ -108,6 +108,12 @@ def setup(store, payload):
     with store.lock():
         text = store.text()
         raw=json.loads(store.state.read_text()) if store.state.exists() else {}
+        if bootstrap_id is not None:
+            actual = hashlib.sha256(store.state.read_bytes()).hexdigest() if store.state.exists() else None
+            locator = runtime_file(store.root)
+            if (actual != expected_state_sha256 or hashlib.sha256(store.future.read_bytes()).hexdigest() != expected_queue_sha256
+                    or raw.get('run_registry') or locator.exists() or locator.is_symlink()):
+                raise RunError('Core queue or state changed before the approved bootstrap')
         if raw.get('run_registry'):
             if payload.get('confirm_queue_id')!=raw['run_registry']['queue_id']:raise RunError('Run registry exists; use resume or explicit locator recovery')
             raw['schema']=3;store.commit({'.skill-tree/documents/future.json':json.dumps(raw,indent=2,sort_keys=True)+'\n'});return raw['run_registry']
@@ -115,13 +121,13 @@ def setup(store, payload):
         old = deepcopy(state['active_run'])
         if old and payload.get('adopt_run_id') != old['id']:
             raise RunError('Existing checkpoint requires explicit adopt_run_id and workspace identity')
-        registry = {'schema': 1, 'queue_id': 'Q-'+str(uuid.uuid4()), 'runs': {}, 'claims': {}, 'resources': {}}
+        registry = {'schema': 1, 'queue_id': bootstrap_id or 'Q-'+str(uuid.uuid4()), 'runs': {}, 'claims': {}, 'resources': {}}
         if old:
             registry['runs'][old['id']] = old
             old['workspace'] = workspace_identity(store, old['id'], payload, existing=True)
             old['delivery'] = {'implementation': 'in-progress', 'publication': 'not-requested', 'status': 'implementation-in-progress', 'authorization': {}}
         state['active_run'] = None; state['run_registry'] = registry
-        store.save(text, state)
+        store.save(text, state, update_navigation=update_navigation)
         locator = {'schema': 1, 'queue_id': registry['queue_id'], 'canonical_root': str(store.root), 'worktrees': {}}
         if old:
             locator['worktrees'][old['id']] = str(Path(payload['worktree']).resolve())
@@ -336,10 +342,15 @@ def inspect_directed_reservation(store, run, requested=None):
                           or local_git_text(path, 'symbolic-ref', '--quiet', '--short', 'HEAD') != spec['branch']):
         raise RunError('Reserved Director worktree has a conflicting ownership or branch')
 
-def recover_locator(store, payload):
+def recover_locator(store, payload, *, bootstrap_state_sha256=None):
     """Explicitly repair local paths only; never rewrite portable checkpoints."""
     with store.lock():
-        state = json.loads(store.state.read_text()); registry = state.get('run_registry'); validate_registry(registry)
+        content = store.state.read_bytes()
+        if bootstrap_state_sha256 is not None:
+            locator = runtime_file(store.root)
+            if hashlib.sha256(content).hexdigest() != bootstrap_state_sha256 or locator.exists() or locator.is_symlink():
+                raise RunError('Core state or locator changed before bootstrap recovery')
+        state = json.loads(content); registry = state.get('run_registry'); validate_registry(registry)
         if payload.get('queue_id') != registry['queue_id']:
             raise RunError('Recovery requires the exact queue ID')
         mapping = payload.get('worktrees', {})

@@ -325,11 +325,11 @@
   },
   "skill-tree-director-setup": {
     "title": "Skill-Tree Director: Setup",
-    "description": "Register exact Director areas and inspect guarded canonical path rebinds.",
+    "description": "Preview first-time Director setup, register exact prepared areas and inspect guarded rebinds.",
     "sections": [
       {
         "id": "operation",
-        "text": "Use scripts/director-entry.py setup-preview to inspect stable area, queue, profile and scope ownership. Apply the identical reviewed request with setup-apply only on explicit selection. Use rebind-preview and rebind for a moved exact canonical path. Keep installation and runtime admission separate. Read the [Director contract](references/director-workflow.md)."
+        "text": "Read the [Director contract](references/director-workflow.md). Use scripts/director-entry.py setup-preview with the guided workspace request to review the initial workspace, exact area placements, selected sources and missing prerequisites. On explicit approval of that preview, run scripts/director-entry.py setup-bootstrap with the same root and JSON containing request (the original guided request) and expected_preview_sha256 (the reviewed digest). A deferred result names the prerequisite and completed steps. Reuse the exact input to retry. Use setup-preview with director_id and prepared_preview_sha256 to inspect exact prepared area registration. Use setup-apply with the same request and approved registration preview digest. Use setup-status to inspect preparation, registration and routing evidence for selected runs and assignments. Use rebind-preview and rebind for a moved exact canonical path. Keep installation and runtime admission separate."
       }
     ]
   },

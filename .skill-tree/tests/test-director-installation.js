@@ -237,3 +237,171 @@ test('an owned upgrade preserves plugin bytes, queue and the stopped schema-3 ru
   for (const [relative, bytes] of Object.entries(preserved)) assert.deepEqual(read(project, relative), bytes, relative);
   assert.equal(installation.treeHash(project, plugins.PACKAGES), pluginBytes);
 });
+
+test('guided bootstrap applies only the reviewed projects and resumes a partial setup', t => {
+  const { directory, project: tools, unrelated: source } = fixture(t);
+  fs.mkdirSync(path.join(source, '.skill-tree'));
+  for (const relative of ['bin', 'common', 'config', 'domains', 'lib', 'src', 'templates', 'tests/fixtures/director']) {
+    fs.cpSync(path.join(SOURCE, relative), path.join(source, '.skill-tree', relative), {
+      recursive: true, filter: file => path.basename(file) !== '__pycache__',
+    });
+  }
+  const commit = (project, message) => git(project, '-c', 'user.name=Director Fixture',
+    '-c', 'user.email=director-fixture@example.invalid', 'commit', '-m', message);
+  git(source, 'init', '-b', 'develop');
+  git(source, 'add', '.skill-tree');
+  commit(source, 'Pin the local setup source');
+  const approvedSource = { checkout: source, revision: git(source, 'rev-parse', 'HEAD').trim() };
+  pass(cli(tools, 'director', ['--skills', 'skill-tree-director-setup']));
+  const entry = path.join(tools, AGENTS, 'skill-tree-director-setup/scripts/director-entry.py');
+
+  const existing = path.join(directory, 'existing');
+  fs.mkdirSync(existing);
+  git(existing, 'init', '-b', 'develop');
+  write(existing, QUEUE, '# Future Work\n\n## Pending Task Format\n\n## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n');
+  write(existing, 'unrelated.txt', 'Already committed\n');
+  write(existing, '.skill-tree/documents/project.md', '# Established project\n');
+  git(existing, 'add', '.');
+  commit(existing, 'Original project work');
+  git(existing, 'remote', 'add', 'origin', path.join(directory, 'unused-remote.git'));
+  pass(cli(existing, 'general'));
+  const task = coreTask(existing);
+  const queue = core(existing, 'workspace-setup', {}).queue_id;
+  const run = core(existing, 'start', {
+    local_base: true, local_base_authorization: 'Disposable local fixture.', base_branch: 'develop',
+    branch: 'codex/retained-bootstrap-fixture', worktree: path.join(directory, 'active-worktree'),
+  }, ['--id', task]);
+  core(existing, 'checkpoint', { phase: 'blocked', stop_reason: 'Fixture waiting for the owner.' }, ['--run-id', run.id]);
+  write(existing, 'unrelated.txt', 'Staged work\n');
+  git(existing, 'add', 'unrelated.txt');
+  write(existing, 'unrelated.txt', MARKER);
+
+  const preserve = [QUEUE, STATE, PROFILE, '.skill-tree/skill-tree.json', '.skill-tree/documents/project.md', 'unrelated.txt'];
+  const previous = preserve.map(relative => read(existing, relative));
+  const ref = git(existing, 'symbolic-ref', 'HEAD');
+  const head = git(existing, 'rev-parse', 'HEAD');
+  const staged = git(existing, 'diff', '--cached', '--binary');
+  const root = path.join(directory, 'director');
+  const web = path.join(root, 'areas', 'web');
+  const shared = path.join(root, 'story', 'chapters');
+  const alias = path.join(directory, 'linked-existing');
+  git(existing, 'worktree', 'add', '-b', 'linked-existing', alias);
+  fs.mkdirSync(path.join(existing, 'notes'));
+  const area = (id, role, project, flavor) => ({
+    id, role, capabilities: ['review-source'], allowed_effects: ['status'], project,
+    ...(flavor ? { source: approvedSource, flavor } : {}),
+  });
+  const request = {
+    director_id: 'bootstrap-fixture',
+    workspace: { kind: 'new', source: approvedSource },
+    areas: [
+      area('maintenance', 'source-maintenance', { kind: 'existing', topology: 'separate', path: source }, 'general'),
+      area('web', 'web', { kind: 'new', topology: 'separate', placement: 'inside', path: 'areas/web' }, 'web'),
+      area('story', 'narrative', { kind: 'new', topology: 'shared', placement: 'inside', path: 'story/chapters' }),
+      area('existing', 'product', { kind: 'existing', topology: 'separate', path: existing }, 'general'),
+      area('alias', 'notes', { kind: 'existing', topology: 'separate', path: alias, scope: 'notes' }, 'general'),
+    ],
+  };
+  function invoke(operation, value) {
+    const input = write(directory, 'guided-request.json', JSON.stringify(value));
+    return spawn(PYTHON, ['-B', entry, operation, root, '--input', input], { timeout: 90000 });
+  }
+
+  const sourceQueue = '# Retained source queue\r\n\r\n## Pending Task Format\r\n\r\n## Pending Queue\r\n\r\n## Prioritized Next Changes\r\n\r\n## Backlog\r\n';
+  write(source, QUEUE, sourceQueue);
+  const conflictPath = `${AGENTS}/skill-tree-work-through-next/SKILL.md`;
+  write(source, conflictPath, '# Existing unrelated operation\n');
+  const preview = JSON.parse(pass(invoke('setup-preview', request)));
+  const input = { request, expected_preview_sha256: preview.preview_sha256 };
+  assert.equal(invoke('setup-bootstrap', { ...input, expected_preview_sha256: 'a'.repeat(64) }).status, 2);
+  assert.equal(fs.existsSync(root), false);
+  fs.appendFileSync(path.join(existing, '.skill-tree/documents/project.md'), 'Changed after approval.\n');
+  const stale = invoke('setup-bootstrap', input);
+  assert.equal(stale.status, 2);
+  assert.match(stale.stdout, /Approved setup preview changed/);
+  assert.equal(fs.existsSync(root), false);
+  fs.writeFileSync(path.join(existing, '.skill-tree/documents/project.md'), previous[4]);
+
+  const partial = invoke('setup-bootstrap', input);
+  assert.equal(partial.status, 2, partial.stdout + partial.stderr);
+  const deferred = JSON.parse(partial.stdout);
+  assert.equal(deferred.status, 'deferred', partial.stdout);
+  assert.match(deferred.error, /Unowned destination conflict/);
+  assert.ok(deferred.completed[root].includes('core'));
+  assert.deepEqual(preserve.map(relative => read(existing, relative)), previous);
+  const coordinator = installedClosure(root, CLOSURE);
+  const retainedState = read(root, STATE);
+  const retainedHead = git(root, 'rev-parse', 'HEAD');
+  assert.equal(read(source, conflictPath).toString(), '# Existing unrelated operation\n');
+  fs.rmSync(path.dirname(path.join(source, conflictPath)), { recursive: true });
+
+  const transaction = '.skill-tree/.transaction.json';
+  const foreign = JSON.stringify({ format: 'skill-tree-transaction', writes: [
+    { path: QUEUE, expected_hash: sha(previous[0]), content: previous[0].toString() + '\nChanged by a different owner.\n' },
+  ] });
+  write(existing, transaction, foreign);
+  const retained = invoke('setup-bootstrap', input);
+  assert.equal(retained.status, 2);
+  assert.match(retained.stdout, /Reconcile the existing Core transaction before bootstrap/);
+  assert.deepEqual(read(existing, QUEUE), previous[0]);
+  assert.equal(read(existing, transaction).toString(), foreign);
+  fs.unlinkSync(path.join(existing, transaction));
+
+  git(existing, 'switch', '-c', 'other-existing-branch');
+  const switched = invoke('setup-bootstrap', input);
+  assert.equal(switched.status, 2);
+  assert.match(switched.stdout, /setup file identity changed/);
+  git(existing, 'switch', 'develop');
+
+  const sharedParent = path.dirname(shared);
+  fs.mkdirSync(sharedParent);
+  git(sharedParent, 'init', '-b', 'unrelated');
+  const nested = invoke('setup-bootstrap', input);
+  assert.equal(nested.status, 2);
+  assert.match(nested.stdout, /Approved shared area has a different Git owner/);
+  assert.equal(fs.existsSync(shared), false);
+  fs.rmSync(sharedParent, { recursive: true });
+
+  const result = JSON.parse(pass(invoke('setup-bootstrap', input)));
+  assert.equal(result.status, 'prepared');
+  assert.deepEqual(read(root, STATE), retainedState);
+  assert.equal(git(root, 'rev-parse', 'HEAD'), retainedHead);
+  assert.deepEqual(json(root, PROFILE), coordinator);
+  assert.equal(result.projects[existing].queue.queue_id, queue);
+  assert.equal(result.projects[alias].queue.queue_id, queue);
+  assert.equal(result.areas.story.queue.queue_id, result.projects[root].queue.queue_id);
+  assert.notEqual(result.projects[web].queue.queue_id, result.projects[root].queue.queue_id);
+  assert.equal(git(shared, 'rev-parse', '--show-toplevel').trim(), root);
+  assert.equal(fs.existsSync(path.join(shared, STATE)), false);
+  assert.equal(fs.existsSync(path.join(root, '.skill-tree/director/registry.json')), false);
+  assert.equal(installedClosure(web, CORE).flavor, 'web');
+  assert.equal(installedClosure(source, CORE).flavor, 'general');
+  assert.equal(read(source, QUEUE).toString(), sourceQueue);
+  assert.deepEqual(preserve.map(relative => read(existing, relative)), previous);
+  assert.equal(git(existing, 'symbolic-ref', 'HEAD'), ref);
+  assert.equal(git(existing, 'rev-parse', 'HEAD'), head);
+  assert.equal(git(existing, 'diff', '--cached', '--binary'), staged);
+
+  const journal = '.skill-tree/artifacts/director/setup-bootstrap.json';
+  const retainedJournal = read(root, journal);
+  assert.deepEqual(JSON.parse(pass(invoke('setup-bootstrap', input))), result);
+  assert.deepEqual(read(root, journal), retainedJournal);
+  const sourceInput = '.skill-tree/templates/operations.json';
+  const sourceBytes = read(source, sourceInput);
+  fs.appendFileSync(path.join(source, sourceInput), '\n');
+  const drift = invoke('setup-bootstrap', input);
+  assert.equal(drift.status, 2);
+  assert.match(drift.stdout, /outside the exact selected commit/);
+  write(source, sourceInput, sourceBytes);
+  fs.renameSync(web, web + '-moved');
+  fs.symlinkSync(web + '-moved', web, 'dir');
+  const moved = invoke('setup-bootstrap', input);
+  assert.equal(moved.status, 2);
+  assert.match(moved.stdout, /Symlink in approved setup destination/);
+  fs.unlinkSync(web);
+  fs.renameSync(web + '-moved', web);
+  fs.appendFileSync(path.join(root, '.skill-tree/documents/project.md'), 'New project work.\n');
+  const changed = invoke('setup-bootstrap', input);
+  assert.equal(changed.status, 2);
+  assert.match(changed.stdout, /setup file identity changed/);
+});

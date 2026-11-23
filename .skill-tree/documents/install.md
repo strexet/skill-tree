@@ -1,6 +1,6 @@
 # Installation
 
-Local installation requires Node.js 18 or later. Workflow helpers require Python 3.9 or later and the standard library. One explicitly selected project root receives one flavor and project-scoped copy packages.
+Local installation requires Node.js 18 or later. Workflow helpers require Python 3.9 or later and the standard library. Run the launcher in the workspace or pass `--target <workspace>`. The default installation creates a ready Director under `.skill-tree-director/` with its own Git owner, Core queue and installation receipt. The selected host discovers a single `skill-tree-director` entry in the workspace. Run it to select an existing project, create a project, or continue later.
 
 ```sh
 node .skill-tree/bin/install.js --list
@@ -9,13 +9,13 @@ node .skill-tree/bin/install.js --target <project-root> --only codex --flavor un
 node .skill-tree/bin/install.js --target <project-root> --only codex --verify
 ```
 
-Fresh noninteractive installation requires `--flavor general|web|unity|director`; interactive installation asks once. `--yes` never chooses a flavor. Repeat installation retains the receipt flavor; explicit switches regenerate all owned packages in the scope. `--skills` selects logical operations. `--all` selects non-soft provider-matrix entries; soft providers require explicit selection. Generic provider target denotes the covered root and explicit discovery destination. Global, symlink and uncomposed upstream specialization fail before writes.
+Individual project installation accepts an explicit `--flavor general|web|unity|director`. Repeat installation retains the receipt flavor; explicit switches regenerate all owned packages in the scope. `--skills` selects logical operations. `--all` selects non-soft provider-matrix entries; soft providers require explicit selection. Generic provider target denotes the covered root and explicit discovery destination. Global, symlink and uncomposed upstream specialization fail before writes.
 
 Choose a client with `--only <provider-id>`. Repeat the flag to select multiple clients. `--list` shows canonical IDs and supported aliases. Standalone GitHub Copilot (`copilot`) and Cursor Agent (`cursor-agent`, or its `agent` executable link) participate in automatic detection. Use `--only dsh` for DeepSeek Harness. The aliases `deepseek` and `deepseek-harness` select the same client, recorded as `dsh` in the receipt. DeepSeek models in Codex, Claude Code and OpenCode use the installation selection of the client that runs the model. [Client compatibility](agent-compatibility.md)
 
 OpenCode reads project-wide instructions from root `AGENTS.md` when `--with-init` is selected. An upgrade migrates a previously managed block from `.opencode/AGENTS.md` and retains surrounding project instructions. OpenCode and Codex can share the managed root block and their installed skill folders.
 
-Install the director flavor at the coordinating project root. Child projects retain the flavor appropriate for each registered area. The [Director workflow](director-workflow.md) describes scope registration and verification.
+Install a dedicated coordinator with `node .skill-tree/bin/install.js --target <workspace> --only codex`. A project can share the workspace folder or use its own folder. Child projects retain the flavor appropriate for each registered area. The [Director workflow](director-workflow.md) describes scope registration and verification.
 
 Dry-run reports facts, gaps, exact changed destinations and ownership conflicts without writes. Matching installations are verified no-ops. `--force` cannot adopt unowned content or discard local modifications. A stopped cleanup/handoff checkpoint precedes replacement during a controller. Optional `--with-init` inserts a receipt-owned bridge while preserving surrounding instructions. Scoped `--uninstall` removes only matching owned packages; `--with-init` removes the bridge when no packages remain.
 

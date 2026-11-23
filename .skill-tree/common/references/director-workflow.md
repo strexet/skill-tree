@@ -2,13 +2,37 @@
 
 Director coordinates exact assignments across registered Skill Tree areas from Codex. Each child keeps ownership of the canonical queue, child work, acceptance and delivery.
 
-Run the installed `scripts/director-entry.py` with an operation, exact Director project root and `--input <request.json>`. Setup registers exact canonical areas and readies explicit rebinds. Intake owns versioned objectives. Plan owns reviewed immutable scope. Run and decide require current separate authority. Status projects read-only state. Review verifies independent producer and consumer evidence with review-preview. Use review-apply for the exact accepted review, review-read for a retained record, impact-preview for two exact revisions and amend-apply for the reviewed scope change.
+Run the installed `scripts/director-entry.py` with an operation, exact Director project root and `--input <request.json>`. Setup prepares the approved coordinator and projects, registers exact canonical areas and readies explicit rebinds. Intake owns versioned objectives. Plan owns reviewed immutable scope. Run and decide require current separate authority. Status projects read-only state. Review verifies independent producer and consumer evidence with review-preview. Use review-apply for the exact accepted review, review-read for a retained record, impact-preview for two exact revisions and amend-apply for the reviewed scope change.
 
 Apply the [shared feature folder guidance](development-practices.md#organize-files-by-feature) within the responsible area. For example, the Director registry identifies the game area at `areas/game/` by role, scope and capabilities. The child repository map directs developers to `areas/game/src/profile/` and a local README when the profile feature needs further explanation. Keep feature dependencies with the child or shared owner. The Director registry owns area boundaries and routing.
 
 Use the shared root profile for areas in the same repository. External areas retain the selected verified profile for each area. A recognized shared Unity root supplies static recipes from the exact supported Editor and resolved Test Framework. A matching native check and exclusive runtime resources remain required for execution.
 
 Read the [capability pins](director-capabilities.json). Accepted Narrative snapshots and representative fixture adapters retain separate identities. Unintegrated ArtWorkshop and logs adapters remain visible prerequisites. A source or fixture observation does not admit an unverified adapter.
+
+## Open the installed workspace
+
+Open the selected workspace and invoke `skill-tree-director`. Offer an existing project, a new project or continuation later. Use the installed Setup entry with `project-menu` to read the choices. For `project-preview` and `project-setup`, pass the Director directory and `--input` with a JSON file. For example, `{"kind":"new","name":"example"}` places the project in the workspace's `example/` folder. Supply `path` for a different location. For an existing project supply `{"kind":"existing","name":"site","path":"/absolute/path"}`. Show the proposed path, profile and hosts before applying the user's choice. The registration reports the verified child queue and source maintenance branch. Repeating the same choice verifies the recorded project.
+
+## Preview first-time setup
+
+Use `setup-preview <absolute-director-root> --input <request.json>` with a `workspace` object to review first-time setup. The request contains a portable `director_id`, a workspace `kind` of `new` or `existing`, an explicitly selected `source`, and the selected `areas`. A source names an absolute local Skill Tree source `checkout` and a local `revision`. The source checkout must already match the selected revision and contain the exact committed package inputs. The coordinator selects the Director flavor.
+
+Each area declares an `id`, `role`, `capabilities`, `allowed_effects` and a `project` object. Select one existing `source-maintenance` area. The project declares `kind`, `topology` and `path`. A new project uses `placement` of `inside` or `alongside` with a relative path, or `custom` with an absolute path. An existing project uses an absolute path. An existing separate repository can include a relative `scope`. A separate repository requires an explicit `flavor` and `source` at the area level. A `shared` folder inherits the coordinator queue, package source and flavor. A `separate` repository owns an independent queue even when the checkout is nested under the coordinator.
+
+The local review record freezes paths, scoped effects, canonical ownership proofs, package inputs, required files and setup prerequisites in `preview_sha256`. Destination overlap checks account for case and Unicode aliases. Setup preview performs read-only discovery.
+
+### Prepare the approved workspace
+
+After approval, run `setup-bootstrap <absolute-director-root> --input <apply.json>` from the installed Setup operation. The apply JSON contains `request` with the original guided request and `expected_preview_sha256` with the approved digest. A shared folder uses the canonical coordinator checkout. A new Git root starts on `develop` with an empty initial commit. Bootstrap preserves existing Git refs and Core state. Profile changes that would alter an unfinished run defer until that run finishes.
+
+A `prepared` result reports the observed queue and installation identities for the coordinator and selected areas. A `deferred` result identifies the current prerequisite and the recorded completed stages. Retry with the exact approved input after resolving the prerequisite. If preparation stopped before recording a newly created coordinator directory, review a fresh preview of the empty destination. The local setup journal under `.skill-tree/artifacts/director/` keeps the original destination and intended effects so a retry can verify completed work. Use the approved preparation digest to register the exact prepared set.
+
+### Register the prepared areas
+
+Run the installed Setup operation `setup-preview` with `director_id` and `prepared_preview_sha256`. The preparation digest comes from the `prepared` result. Review the exact current scope, queue and installation. Run `setup-apply` with the same fields and the registration preview's `expected_preview_sha256` after approval.
+
+Use `setup-status` with `director_id` and `prepared_preview_sha256` to inspect preparation, registration and routing verification for each area. For routing evidence, supply `routing` as a list of objects with `director_run_id` and `assignment_id`. The installed Setup operation projects a verified route after the authorized `run-dispatch` intake returns a matching canonical child receipt. The status read performs no intake. Retry dispatch with the original request to reconcile the original receipt.
 
 ## Look up project context
 

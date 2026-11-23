@@ -4,13 +4,18 @@ Skill Tree provides portable operations for repository documentation, intake, re
 
 [Installation](.skill-tree/documents/install.md) · [Validation](.skill-tree/common/references/validation-policy.md) · [Workflow](.skill-tree/common/references/future-workflow.md) · [Metadata](.skill-tree/common/references/workflow-metadata.md) · [Source manifest](.skill-tree/skill-tree.json) · [Conformance audit](.skill-tree/documents/workflow-redesign-conformance.md)
 
+Open a terminal in the workspace you want Director to coordinate. Run the launcher from the downloaded Skill Tree checkout. For example, select Codex with:
+
 ```sh
-node .skill-tree/bin/install.js --list
-node .skill-tree/bin/install.js --target <project-root> --only codex --flavor general --copy --dry-run
-npm run sync:check
-npm run validate
-npm run test:py
-npm run test:node
+/path/to/skill-tree/install.sh --only codex
+```
+
+On Windows, run `C:\path\to\skill-tree\install.ps1 --only codex` in PowerShell. Use `--target <workspace>` to choose another workspace and `--dry-run` for a preview. The installer creates `.skill-tree-director/` and prints the installed host action. Invoke `skill-tree-director` from the workspace to connect an existing project, create one in a named subfolder or another directory, or continue later.
+
+For a direct individual profile:
+
+```sh
+node .skill-tree/bin/install.js --target <project-root> --only codex --flavor web --copy
 ```
 
 Project-scoped copy installation includes owned receipts and a self-contained local profile manager. Static discovery never starts an Editor, server, browser or test suite. Missing test infrastructure remains a deduplicated setup finding. Installation and documentation initialization are separate operations; unknown or modified packages conflict even with `--force`.

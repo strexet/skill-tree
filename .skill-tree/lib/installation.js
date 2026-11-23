@@ -349,7 +349,7 @@ function locked(root,action,{recoverPending=true,recoverPluginPending=true,onPen
 }
 function bundle(source,flavor){
  const files={};for(const rel of Object.keys(c.sourceInputs(source))){
-  if(rel.startsWith('domains/')&&!rel.startsWith('domains/'+flavor+'/'))continue;
+  if(flavor!=='director'&&rel.startsWith('domains/')&&!rel.startsWith('domains/'+flavor+'/'))continue;
   if(rel==='config/repository.json')continue;
   files['source/'+rel]=c.read(source,rel);
  }
