@@ -854,6 +854,7 @@
       "runtime/common/scripts/decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "runtime/common/scripts/director-dispatch.py": "common/scripts/director-dispatch.py",
       "runtime/common/scripts/director-handoff.py": "common/scripts/director-handoff.py",
+      "runtime/common/scripts/director-maintenance.py": "common/scripts/director-maintenance.py",
       "runtime/common/scripts/director-objectives.py": "common/scripts/director-objectives.py",
       "runtime/common/scripts/context-search.py": "common/scripts/context-search.py",
       "runtime/common/scripts/director-plan-adapters.py": "common/scripts/director-plan-adapters.py",
