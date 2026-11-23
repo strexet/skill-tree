@@ -874,6 +874,128 @@ def _processing_proposal(store,payload,text,state,assigned,pr):
             focus['admitted_task_ids']=sorted(focused);focus['required_ids']=sorted(focused)
     return text,receipt
 
+FORCE_PROCESS_READS = {'force-process-preview', 'force-process-verify'}
+
+
+def force_process_input(path, label):
+    if path is None:
+        raise WorkflowError('Force Process requires '+label)
+    content = path.read_bytes()
+    try:
+        value = json.loads(content)
+    except (ValueError, UnicodeError) as exc:
+        raise WorkflowError('Invalid Force Process JSON: '+label) from exc
+    if not isinstance(value, dict):
+        raise WorkflowError('Force Process requires a JSON object: '+label)
+    return value, digest(content)
+
+
+def force_process_snapshot(store):
+    """Read one consistent Markdown/index pair without refreshing or locking."""
+    source_bytes = store.owned(FUTURE_QUEUE).read_bytes()
+    text = source_bytes.decode('utf-8').replace('\r\n', '\n').replace('\r', '\n')
+    index_bytes = store.owned('.skill-tree/documents/future.json').read_bytes()
+    snapshot = {'source_hash': digest(source_bytes), 'index_hash': digest(index_bytes)}
+    persisted = json.loads(index_bytes)
+    if (not isinstance(persisted, dict) or persisted.get('source_hash') != digest(text.encode())
+            or persisted.get('tasks') != index(text)):
+        raise WorkflowError('Canonical Future and index differ; inspect the current queue before continuing')
+    return text, snapshot
+
+
+def force_process_contract(task):
+    # The parser body contains the rendered heading and YAML. Compare that
+    # metadata structurally and fingerprint only the proposed task content.
+    content = task['body'].partition('\n```\n')[2].strip()
+    metadata = {key: value for key, value in task.items() if key not in {'body', 'line', 'start', 'end'}}
+    return {'metadata': metadata, 'content_sha256': digest(content.encode())}
+
+
+def force_process_preview(store, proposal, proposal_hash, text, snapshot):
+    selectors = proposal.get('selectors')
+    if (not isinstance(selectors, list) or not selectors or
+            any(not valid_id(value, 'P') for value in selectors) or len(set(selectors)) != len(selectors)):
+        raise WorkflowError('Force Process Preview requires distinct exact Pending IDs')
+    if set(proposal) & {'topic', 'intake_batch_ids', 'group', 'director_dispatch'}:
+        raise WorkflowError('Force Process Preview requires an ordinary standalone proposal')
+    if proposal.get('expected_source_hash') != snapshot['source_hash']:
+        raise WorkflowError('Force Process proposal does not match the current canonical queue hash')
+    specs = proposal.get('tasks', [])
+    if not isinstance(specs, list) or any(not isinstance(spec, dict) for spec in specs):
+        raise WorkflowError('Processing tasks require a list of objects')
+    planned = [spec.get('reuse_id') or identity('T') for spec in specs]
+    projected, receipt = _processing_proposal(store, proposal, text, store.load(text), planned, identity('PR'))
+    before = {row['id']: force_process_contract(row) for row in parse(text)}
+    after = {row['id']: force_process_contract(row) for row in parse(projected)}
+    # Force all receipt-owned rows into the projection even if their text
+    # is unchanged. Also cover affected parents outside the selected rows.
+    scoped = set(selectors + receipt['created_ids'] + receipt['reused_ids'])
+    scoped.update(task_id for task_id in before.keys() | after.keys() if before.get(task_id) != after.get(task_id))
+    return {'format': 'skill-tree-force-process-preview', 'schema': 1, 'proposal_sha256': proposal_hash,
+            'canonical_queue': str(store.future), **snapshot, 'core_only': True, 'provisional_receipt': receipt,
+            'changes': {task_id: after.get(task_id) for task_id in sorted(scoped)}}
+
+
+def force_process_verify(store, proposal, proposal_hash, preview, preview_hash, receipt, receipt_hash, text, snapshot):
+    if (preview.get('format') != 'skill-tree-force-process-preview' or preview.get('schema') != 1
+            or preview.get('proposal_sha256') != proposal_hash or preview.get('canonical_queue') != str(store.future)
+            or preview.get('source_hash') != proposal.get('expected_source_hash')):
+        raise WorkflowError('Force Process Preview does not match the proposal and canonical queue')
+    expected = preview['provisional_receipt']
+    changes = preview['changes']
+    if (not isinstance(expected, dict) or not isinstance(changes, dict) or
+            set(proposal['selectors']) != set(expected['selected_ids']) or
+            proposal['dispositions'] != expected['dispositions'] or
+            not set(expected['selected_ids'] + expected['created_ids'] + expected['reused_ids']) <= changes.keys()):
+        raise WorkflowError('Force Process Preview does not cover the complete proposal')
+    processing_id = receipt.get('id')
+    created = receipt.get('created_ids')
+    if (not valid_id(processing_id, 'PR') or not isinstance(created, list)
+            or len(created) != len(expected['created_ids']) or any(not valid_id(value, 'T') for value in created)
+            or len(set(created)) != len(created) or set(created) & (changes.keys() - set(expected['created_ids']))):
+        raise WorkflowError('Force Process receipt has incompatible processing or task identities')
+    ids = {**dict(zip(expected['created_ids'], created)), expected['id']: processing_id}
+    remap = lambda task_id: ids.get(task_id, task_id)
+    projected_receipt = {**expected, 'id': processing_id, 'created_ids': created,
+                         'task_keys': {key: remap(value) for key, value in expected['task_keys'].items()}}
+    if any(receipt.get(key) != value for key, value in projected_receipt.items()):
+        raise WorkflowError('Force Process receipt does not match the Preview projection')
+    if receipt.get('clarification_sessions') or receipt.get('reopened_clarification_sessions'):
+        raise WorkflowError('Receipt has plugin-derived clarification sessions; verify the recorded holds through Process Pending')
+    current = {row['id']: force_process_contract(row) for row in parse(text)}
+    for task_id, contract in changes.items():
+        observed_id = remap(task_id)
+        contract = deepcopy(contract)
+        if contract is not None:
+            metadata = contract['metadata']
+            for field in ('id', 'processing_run_id', 'root_task_id', 'related_task_id'):
+                metadata[field] = remap(metadata[field])
+            metadata['depends_on'] = [remap(value) for value in metadata['depends_on']]
+        if current.get(observed_id) != contract:
+            raise WorkflowError('Force Process scoped result differs from the Preview: '+observed_id)
+    return {'status': 'verified', 'canonical_queue': str(store.future), **snapshot,
+            'proposal_sha256': proposal_hash, 'preview_sha256': preview_hash, 'receipt_sha256': receipt_hash,
+            'processing_id': processing_id, 'selected_ids': receipt['selected_ids'], 'created_ids': created,
+            'reused_ids': receipt['reused_ids'], 'processing_id_observed_in_tasks': bool(created or receipt['reused_ids'])}
+
+
+def force_process_evidence(store, command, proposal_path, preview_path, receipt_path, expected_preview_hash=None):
+    proposal, proposal_hash = force_process_input(proposal_path, 'the original proposal')
+    text, snapshot = force_process_snapshot(store)
+    if command == 'force-process-preview':
+        result = force_process_preview(store, proposal, proposal_hash, text, snapshot)
+    else:
+        preview, preview_hash = force_process_input(preview_path, 'the retained Preview')
+        if expected_preview_hash != preview_hash:
+            raise WorkflowError('Force Process Verify requires the matching reviewed Preview SHA-256')
+        receipt, receipt_hash = force_process_input(receipt_path, 'the original Processing receipt')
+        result = force_process_verify(store, proposal, proposal_hash, preview, preview_hash, receipt, receipt_hash, text, snapshot)
+    if (file_hash(store.future) != snapshot['source_hash'] or file_hash(store.state) != snapshot['index_hash']):
+        raise WorkflowError('Canonical Future changed during Force Process evidence inspection')
+    return result
+
+
+
 def group_selection(store, payload):
     """Resolve an explicit group from one read of the canonical queue."""
     queues = {'pending': 'Pending Queue', 'prioritized': 'Prioritized Next Changes'}
@@ -1022,7 +1144,9 @@ def start(store,mode,selector=None,limits=None,workspace=None):
             conflicts={tid:registry['claims'][tid] for tid in run['admitted_task_ids'] if tid not in done and tid in registry['claims']}
             if conflicts:raise WorkflowError('Required task claims conflict: '+dump(conflicts))
             path=workspaces.provision(store,run,options)
-            if dispatch:run['dispatch_workspace_sha256']=digest(str(path).encode())
+            if dispatch:
+                run['dispatch_workspace_sha256']=digest(str(path).encode())
+                run['workspace']['dispatch_owner_token']=str(uuid.uuid4())
             registry['runs'][run['id']]=run;store.selected_run_id=run['id'];store.run_id=run['id']
         validate_run(run);state['active_run']=run
         store.save(text,state,dispatch.extras(store,run) if dispatch else None)
@@ -1268,6 +1392,8 @@ def complete(store,payload):
             for check in checks:
                 if not isinstance(check['evidence'],list):raise WorkflowError('Acceptance evidence requires repository-relative file references')
                 check['evidence']=[evidence_pointer(store,ref,required=True) for ref in check['evidence']]
+            checks_by_criterion = {check['criterion']: check for check in checks}
+            payload['acceptance'] = [checks_by_criterion[criterion] for criterion in expected]
         validation_records=validate_task_checks(store,task['id'],state) if disposition=='completed' else []
         if disposition=='completed':
             for accepted in payload['acceptance']:
@@ -2670,6 +2796,70 @@ def check_snapshot(store,task,check,state):
     key=digest(dump({'check':executable,'recipe':recipe,'sources':sources,'environment':environment,'group':group_fingerprint(store,task,state)}).encode())
     return {'key':key,'definition':task_signature(task),'sources':sources,'environment_identity':environment,'recipe':recipe}
 
+def completed_task_body(store, record):
+    # The outcome and applied completion event jointly identify the removed specification.
+    run_id, task_id, outcome_id = record.get('run_id'), record['task_id'], record['id']
+    if not valid_id(run_id, 'WR') or not valid_id(outcome_id, 'O'):
+        return None
+
+    registry = store.load().get('run_registry', {})
+    run = registry.get('runs', {}).get(run_id, {})
+    if run.get('completion_refs', {}).get(task_id) != outcome_id:
+        return None
+
+    last_sequence = registry.get('event_sequences', {}).get(run_id)
+    if type(last_sequence) is not int or last_sequence < 1:
+        return None
+    applied = set(registry.get('applied_events', []))
+    history = store.owned('.skill-tree/history')
+    events = history / 'run-events'
+    directory = events / run_id.lower()
+    if any(path.is_symlink() for path in (history, events, directory)):
+        return None
+
+    recovered = None
+    for path in directory.glob('e-*.json'):
+        event_id = 'E-' + path.stem[2:]
+        if event_id not in applied or not valid_id(event_id, 'E'):
+            continue
+        if path.is_symlink() or not path.is_file():
+            return None
+        try:
+            content = path.read_bytes()
+            event = json.loads(content)
+        except (OSError, ValueError):
+            return None
+        if not isinstance(event, dict) or not isinstance(event.get('outcomes'), list):
+            return None
+        matching = [outcome for outcome in event['outcomes']
+                    if isinstance(outcome, dict) and outcome.get('id') == outcome_id]
+        if not matching:
+            continue
+        sequence = event.get('sequence')
+        if (recovered is not None or matching != [record]
+                or event.get('schema') != 1 or event.get('id') != event_id
+                or event.get('queue_id') != registry['queue_id'] or event.get('run_id') != run_id
+                or type(sequence) is not int or not 1 <= sequence <= last_sequence
+                or not isinstance(event.get('changes'), list)):
+            return None
+        changes = [change for change in event['changes']
+                   if isinstance(change, dict) and change.get('task_id') == task_id]
+        if len(changes) != 1 or 'after' not in changes[0] or changes[0]['after'] is not None:
+            return None
+        before = changes[0].get('before')
+        if not isinstance(before, dict) or before.get('queue') != 'Prioritized Next Changes':
+            return None
+        body = before.get('body')
+        if not isinstance(body, str) or digest(body.encode()) != record.get('task_context', {}).get('content_fingerprint'):
+            return None
+        if getattr(store, '_writer_active', False):
+            relative = path.relative_to(store.root).as_posix()
+            store.expect_unchanged(relative, digest(content))
+            store._future_receipts.add(relative)
+        recovered = body
+    return recovered
+
+
 def validation_task(store,tid):
     matches=[task for task in parse(store.text()) if task['id']==tid and task['queue']=='Prioritized Next Changes']
     if matches:return matches[0]
@@ -2679,8 +2869,16 @@ def validation_task(store,tid):
     criteria=[entry['criterion'] for entry in record['acceptance']]
     body='Goal:\n- Revalidate the recorded completed contract.\n\nTouch:\n- Recorded relevant source and test inputs.\n\nValidation:\n```json\n'+dump({'checks':record['validation_plan']})+'```\n\nAcceptance:\n'+'\n'.join('- '+criterion for criterion in criteria)+'\n'
     task={'id':tid,'body':body,'title':record['title'],'validation_group_id':record.get('validation_group_id'),'boundary_validation':record.get('boundary_validation','not-required'),'completed_contract':True}
-    if task_signature(task)!=record['validation_signature']:raise WorkflowError('Completed validation contract does not match the recorded signature')
-    return task
+    if task_signature(task) == record['validation_signature']:
+        return task
+    original_body = completed_task_body(store, record)
+    if original_body is not None:
+        original = dict(task, body=original_body)
+        if (set(acceptance_criteria(original)) == set(criteria)
+                and check_specs(original) == record['validation_plan']
+                and task_signature(original) == record['validation_signature']):
+            return original
+    raise WorkflowError('Completed validation contract does not match the recorded signature')
 
 def stale_completed_checks(store,state,task_ids=None):
     run=state['active_run'];outcomes={record['task_id']:record for record in store.outcomes() if record['disposition']=='completed'};stale=[]
@@ -4716,11 +4914,22 @@ def clarification_mutate(store,command,payload):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     parser.add_argument('--standalone',action='store_true',help='Use the canonical queue and selected checkout without attaching to a registered controller.')
+    parser.add_argument('--preview',type=Path,help='Retained Force Process Preview JSON')
+    parser.add_argument('--receipt',type=Path,help='Original Process Pending receipt JSON')
+    parser.add_argument('--expected-preview-sha256',help='SHA-256 of the Preview accepted during plan review')
     args=parser.parse_args(argv)
     try:
         cmd=args.command
+        if cmd != 'force-process-verify' and (args.preview or args.receipt or args.expected_preview_sha256):
+            raise WorkflowError('Only Force Process Verify accepts a Preview and receipt input')
+        if cmd in FORCE_PROCESS_READS:
+            if args.apply or args.run_id or args.standalone or args.id or args.names is not None or args.expected_source_hash:
+                raise WorkflowError('Force Process evidence inspection uses the selected proposal without mutation or controller flags')
+            store = Store(args.root, allow_unselected=True, neutral=True)
+            print(dump(force_process_evidence(store, cmd, args.input, args.preview, args.receipt, args.expected_preview_sha256)), end='')
+            return 0
         if args.standalone and (cmd not in {'intake','process','start','begin','implemented','prepare-check',
                 'record-check','reconcile-check','resume-task','complete'} or args.run_id):
             raise WorkflowError('Standalone routing requires a scoped standalone command without a run ID')

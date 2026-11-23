@@ -1,0 +1,930 @@
+[
+  {
+    "width": 360,
+    "scale": 100,
+    "theme": "gryphy-light",
+    "external": [],
+    "jsErrors": [],
+    "targets": [
+      {
+        "label": "Personal Notes",
+        "focus": "personal-notes",
+        "hash": "",
+        "heading": {
+          "top": 90.5625,
+          "bottom": 120.578125,
+          "left": 39.59375,
+          "right": 320.40625
+        },
+        "headerBottom": 57,
+        "pTop": 134.171875,
+        "pVisible": 216.875,
+        "paragraph": "Browser Notes stay on this device and are excl",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Habitica credentials",
+        "focus": "habitica-credentials",
+        "hash": "",
+        "heading": {
+          "top": 160.359375,
+          "bottom": 190.375,
+          "left": 39.59375,
+          "right": 320.40625
+        },
+        "headerBottom": 57,
+        "pTop": 203.96875,
+        "pVisible": 108.4375,
+        "paragraph": "Credentials are used to load your Habitica dat",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Private sync",
+        "focus": "private-sync",
+        "hash": "",
+        "heading": {
+          "top": 543.640625,
+          "bottom": 573.65625,
+          "left": 39.59375,
+          "right": 320.40625
+        },
+        "headerBottom": 57,
+        "pTop": 587.25,
+        "pVisible": 173.5,
+        "paragraph": "Private device sync stores encrypted data. Sha",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Return to reading",
+        "focus": "optional-cloud-workspace",
+        "hash": "",
+        "heading": {
+          "top": 90.21875,
+          "bottom": 120.234375,
+          "left": 39.59375,
+          "right": 320.40625
+        },
+        "headerBottom": 57,
+        "pTop": 133.828125,
+        "pVisible": 195.1875,
+        "paragraph": "Cloud task storage requires its own explicit c",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      }
+    ],
+    "pickerRight": 324.203125,
+    "entry": {
+      "appbar": [
+        0,
+        57
+      ],
+      "links": [
+        [
+          150.28125,
+          194.28125
+        ],
+        [
+          150.28125,
+          194.28125
+        ],
+        [
+          198.28125,
+          242.28125
+        ]
+      ],
+      "appearance": [
+        250.28125,
+        294.28125
+      ],
+      "viewportWidth": 360,
+      "docWidth": 360
+    }
+  },
+  {
+    "width": 360,
+    "scale": 100,
+    "theme": "obsidian-glow",
+    "external": [],
+    "jsErrors": [],
+    "targets": [
+      {
+        "label": "Personal Notes",
+        "focus": "personal-notes",
+        "hash": "",
+        "heading": {
+          "top": 90.5625,
+          "bottom": 120.578125,
+          "left": 39.59375,
+          "right": 320.40625
+        },
+        "headerBottom": 57,
+        "pTop": 134.171875,
+        "pVisible": 216.875,
+        "paragraph": "Browser Notes stay on this device and are excl",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Habitica credentials",
+        "focus": "habitica-credentials",
+        "hash": "",
+        "heading": {
+          "top": 160.359375,
+          "bottom": 190.375,
+          "left": 39.59375,
+          "right": 320.40625
+        },
+        "headerBottom": 57,
+        "pTop": 203.96875,
+        "pVisible": 108.4375,
+        "paragraph": "Credentials are used to load your Habitica dat",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Private sync",
+        "focus": "private-sync",
+        "hash": "",
+        "heading": {
+          "top": 543.640625,
+          "bottom": 573.65625,
+          "left": 39.59375,
+          "right": 320.40625
+        },
+        "headerBottom": 57,
+        "pTop": 587.25,
+        "pVisible": 173.5,
+        "paragraph": "Private device sync stores encrypted data. Sha",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Return to reading",
+        "focus": "optional-cloud-workspace",
+        "hash": "",
+        "heading": {
+          "top": 90.21875,
+          "bottom": 120.234375,
+          "left": 39.59375,
+          "right": 320.40625
+        },
+        "headerBottom": 57,
+        "pTop": 133.828125,
+        "pVisible": 195.1875,
+        "paragraph": "Cloud task storage requires its own explicit c",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      }
+    ],
+    "pickerRight": 324.203125,
+    "entry": {
+      "appbar": [
+        0,
+        57
+      ],
+      "links": [
+        [
+          150.28125,
+          194.28125
+        ],
+        [
+          150.28125,
+          194.28125
+        ],
+        [
+          198.28125,
+          242.28125
+        ]
+      ],
+      "appearance": [
+        250.28125,
+        294.28125
+      ],
+      "viewportWidth": 360,
+      "docWidth": 360
+    }
+  },
+  {
+    "width": 360,
+    "scale": 200,
+    "theme": "gryphy-light",
+    "external": [],
+    "jsErrors": [],
+    "targets": [
+      {
+        "label": "Personal Notes",
+        "focus": "personal-notes",
+        "hash": "",
+        "heading": {
+          "top": 181.125,
+          "bottom": 301.21875,
+          "left": 55.59375,
+          "right": 304.40625
+        },
+        "headerBottom": 113,
+        "pTop": 328.40625,
+        "pVisible": 471.59375,
+        "paragraph": "Browser Notes stay on this device and are excl",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Habitica credentials",
+        "focus": "habitica-credentials",
+        "hash": "",
+        "heading": {
+          "top": 181.109375,
+          "bottom": 301.203125,
+          "left": 55.59375,
+          "right": 304.40625
+        },
+        "headerBottom": 113,
+        "pTop": 328.390625,
+        "pVisible": 471.609375,
+        "paragraph": "Credentials are used to load your Habitica dat",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Private sync",
+        "focus": "private-sync",
+        "hash": "",
+        "heading": {
+          "top": 181.28125,
+          "bottom": 241.328125,
+          "left": 55.59375,
+          "right": 304.40625
+        },
+        "headerBottom": 113,
+        "pTop": 268.515625,
+        "pVisible": 531.484375,
+        "paragraph": "Private device sync stores encrypted data. Sha",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Return to reading",
+        "focus": "optional-cloud-workspace",
+        "hash": "",
+        "heading": {
+          "top": 181.625,
+          "bottom": 361.765625,
+          "left": 55.59375,
+          "right": 304.40625
+        },
+        "headerBottom": 113,
+        "pTop": 388.953125,
+        "pVisible": 411.046875,
+        "paragraph": "Cloud task storage requires its own explicit c",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      }
+    ],
+    "pickerRight": 316.203125,
+    "entry": {
+      "appbar": [
+        0,
+        113
+      ],
+      "links": [
+        [
+          353.171875,
+          403.203125
+        ],
+        [
+          411.203125,
+          501.265625
+        ],
+        [
+          509.265625,
+          559.296875
+        ]
+      ],
+      "appearance": [
+        575.296875,
+        678.359375
+      ],
+      "viewportWidth": 360,
+      "docWidth": 360
+    }
+  },
+  {
+    "width": 360,
+    "scale": 200,
+    "theme": "obsidian-glow",
+    "external": [],
+    "jsErrors": [],
+    "targets": [
+      {
+        "label": "Personal Notes",
+        "focus": "personal-notes",
+        "hash": "",
+        "heading": {
+          "top": 181.125,
+          "bottom": 301.21875,
+          "left": 55.59375,
+          "right": 304.40625
+        },
+        "headerBottom": 113,
+        "pTop": 328.40625,
+        "pVisible": 471.59375,
+        "paragraph": "Browser Notes stay on this device and are excl",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Habitica credentials",
+        "focus": "habitica-credentials",
+        "hash": "",
+        "heading": {
+          "top": 181.109375,
+          "bottom": 301.203125,
+          "left": 55.59375,
+          "right": 304.40625
+        },
+        "headerBottom": 113,
+        "pTop": 328.390625,
+        "pVisible": 471.609375,
+        "paragraph": "Credentials are used to load your Habitica dat",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Private sync",
+        "focus": "private-sync",
+        "hash": "",
+        "heading": {
+          "top": 181.28125,
+          "bottom": 241.328125,
+          "left": 55.59375,
+          "right": 304.40625
+        },
+        "headerBottom": 113,
+        "pTop": 268.515625,
+        "pVisible": 531.484375,
+        "paragraph": "Private device sync stores encrypted data. Sha",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Return to reading",
+        "focus": "optional-cloud-workspace",
+        "hash": "",
+        "heading": {
+          "top": 181.625,
+          "bottom": 361.765625,
+          "left": 55.59375,
+          "right": 304.40625
+        },
+        "headerBottom": 113,
+        "pTop": 388.953125,
+        "pVisible": 411.046875,
+        "paragraph": "Cloud task storage requires its own explicit c",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      }
+    ],
+    "pickerRight": 316.203125,
+    "entry": {
+      "appbar": [
+        0,
+        113
+      ],
+      "links": [
+        [
+          353.171875,
+          403.203125
+        ],
+        [
+          411.203125,
+          501.265625
+        ],
+        [
+          509.265625,
+          559.296875
+        ]
+      ],
+      "appearance": [
+        575.296875,
+        678.359375
+      ],
+      "viewportWidth": 360,
+      "docWidth": 360
+    }
+  },
+  {
+    "width": 1280,
+    "scale": 100,
+    "theme": "gryphy-light",
+    "external": [],
+    "jsErrors": [],
+    "targets": [
+      {
+        "label": "Personal Notes",
+        "focus": "personal-notes",
+        "hash": "",
+        "heading": {
+          "top": 91.09375,
+          "bottom": 121.109375,
+          "left": 385.890625,
+          "right": 612.609375
+        },
+        "headerBottom": 57,
+        "pTop": 134.703125,
+        "pVisible": 281.9375,
+        "paragraph": "Browser Notes stay on this device and are excl",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Habitica credentials",
+        "focus": "habitica-credentials",
+        "hash": "",
+        "heading": {
+          "top": 597,
+          "bottom": 627.015625,
+          "left": 385.890625,
+          "right": 612.609375
+        },
+        "headerBottom": 57,
+        "pTop": 640.609375,
+        "pVisible": 151.8125,
+        "paragraph": "Credentials are used to load your Habitica dat",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Private sync",
+        "focus": "private-sync",
+        "hash": "",
+        "heading": {
+          "top": 597,
+          "bottom": 627.015625,
+          "left": 948.890625,
+          "right": 1175.609375
+        },
+        "headerBottom": 57,
+        "pTop": 640.609375,
+        "pVisible": 195.1875,
+        "paragraph": "Private device sync stores encrypted data. Sha",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Return to reading",
+        "focus": "optional-cloud-workspace",
+        "hash": "",
+        "heading": {
+          "top": 91.09375,
+          "bottom": 151.125,
+          "left": 104.390625,
+          "right": 331.109375
+        },
+        "headerBottom": 57,
+        "pTop": 164.71875,
+        "pVisible": 238.5625,
+        "paragraph": "Cloud task storage requires its own explicit c",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      }
+    ],
+    "pickerRight": 381.40625,
+    "entry": {
+      "appbar": [
+        0,
+        57
+      ],
+      "links": [
+        [
+          191.328125,
+          235.328125
+        ],
+        [
+          191.328125,
+          235.328125
+        ],
+        [
+          191.328125,
+          235.328125
+        ]
+      ],
+      "appearance": [
+        251.328125,
+        295.328125
+      ],
+      "viewportWidth": 1280,
+      "docWidth": 1280
+    }
+  },
+  {
+    "width": 1280,
+    "scale": 100,
+    "theme": "obsidian-glow",
+    "external": [],
+    "jsErrors": [],
+    "targets": [
+      {
+        "label": "Personal Notes",
+        "focus": "personal-notes",
+        "hash": "",
+        "heading": {
+          "top": 91.09375,
+          "bottom": 121.109375,
+          "left": 385.890625,
+          "right": 612.609375
+        },
+        "headerBottom": 57,
+        "pTop": 134.703125,
+        "pVisible": 281.9375,
+        "paragraph": "Browser Notes stay on this device and are excl",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Habitica credentials",
+        "focus": "habitica-credentials",
+        "hash": "",
+        "heading": {
+          "top": 597,
+          "bottom": 627.015625,
+          "left": 385.890625,
+          "right": 612.609375
+        },
+        "headerBottom": 57,
+        "pTop": 640.609375,
+        "pVisible": 151.8125,
+        "paragraph": "Credentials are used to load your Habitica dat",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Private sync",
+        "focus": "private-sync",
+        "hash": "",
+        "heading": {
+          "top": 597,
+          "bottom": 627.015625,
+          "left": 948.890625,
+          "right": 1175.609375
+        },
+        "headerBottom": 57,
+        "pTop": 640.609375,
+        "pVisible": 195.1875,
+        "paragraph": "Private device sync stores encrypted data. Sha",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Return to reading",
+        "focus": "optional-cloud-workspace",
+        "hash": "",
+        "heading": {
+          "top": 91.09375,
+          "bottom": 151.125,
+          "left": 104.390625,
+          "right": 331.109375
+        },
+        "headerBottom": 57,
+        "pTop": 164.71875,
+        "pVisible": 238.5625,
+        "paragraph": "Cloud task storage requires its own explicit c",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      }
+    ],
+    "pickerRight": 381.40625,
+    "entry": {
+      "appbar": [
+        0,
+        57
+      ],
+      "links": [
+        [
+          191.328125,
+          235.328125
+        ],
+        [
+          191.328125,
+          235.328125
+        ],
+        [
+          191.328125,
+          235.328125
+        ]
+      ],
+      "appearance": [
+        251.328125,
+        295.328125
+      ],
+      "viewportWidth": 1280,
+      "docWidth": 1280
+    }
+  },
+  {
+    "width": 1280,
+    "scale": 200,
+    "theme": "gryphy-light",
+    "external": [],
+    "jsErrors": [],
+    "targets": [
+      {
+        "label": "Personal Notes",
+        "focus": "personal-notes",
+        "hash": "",
+        "heading": {
+          "top": 181.8125,
+          "bottom": 241.859375,
+          "left": 166.796875,
+          "right": 1113.203125
+        },
+        "headerBottom": 113,
+        "pTop": 269.046875,
+        "pVisible": 260.34375,
+        "paragraph": "Browser Notes stay on this device and are excl",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Habitica credentials",
+        "focus": "habitica-credentials",
+        "hash": "",
+        "heading": {
+          "top": 181.328125,
+          "bottom": 241.375,
+          "left": 166.796875,
+          "right": 1113.203125
+        },
+        "headerBottom": 113,
+        "pTop": 268.5625,
+        "pVisible": 173.5625,
+        "paragraph": "Credentials are used to load your Habitica dat",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Private sync",
+        "focus": "private-sync",
+        "hash": "",
+        "heading": {
+          "top": 512.71875,
+          "bottom": 572.765625,
+          "left": 166.796875,
+          "right": 1113.203125
+        },
+        "headerBottom": 113,
+        "pTop": 599.953125,
+        "pVisible": 173.5625,
+        "paragraph": "Private device sync stores encrypted data. Sha",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Return to reading",
+        "focus": "optional-cloud-workspace",
+        "hash": "",
+        "heading": {
+          "top": 181.15625,
+          "bottom": 241.203125,
+          "left": 166.796875,
+          "right": 1113.203125
+        },
+        "headerBottom": 113,
+        "pTop": 268.390625,
+        "pVisible": 216.953125,
+        "paragraph": "Cloud task storage requires its own explicit c",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      }
+    ],
+    "pickerRight": 699.859375,
+    "entry": {
+      "appbar": [
+        0,
+        113
+      ],
+      "links": [
+        [
+          381.671875,
+          439.703125
+        ],
+        [
+          381.671875,
+          439.703125
+        ],
+        [
+          381.671875,
+          439.703125
+        ]
+      ],
+      "appearance": [
+        471.703125,
+        535.421875
+      ],
+      "viewportWidth": 1280,
+      "docWidth": 1280
+    }
+  },
+  {
+    "width": 1280,
+    "scale": 200,
+    "theme": "obsidian-glow",
+    "external": [],
+    "jsErrors": [],
+    "targets": [
+      {
+        "label": "Personal Notes",
+        "focus": "personal-notes",
+        "hash": "",
+        "heading": {
+          "top": 181.8125,
+          "bottom": 241.859375,
+          "left": 166.796875,
+          "right": 1113.203125
+        },
+        "headerBottom": 113,
+        "pTop": 269.046875,
+        "pVisible": 260.34375,
+        "paragraph": "Browser Notes stay on this device and are excl",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Habitica credentials",
+        "focus": "habitica-credentials",
+        "hash": "",
+        "heading": {
+          "top": 181.328125,
+          "bottom": 241.375,
+          "left": 166.796875,
+          "right": 1113.203125
+        },
+        "headerBottom": 113,
+        "pTop": 268.5625,
+        "pVisible": 173.5625,
+        "paragraph": "Credentials are used to load your Habitica dat",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Private sync",
+        "focus": "private-sync",
+        "hash": "",
+        "heading": {
+          "top": 512.71875,
+          "bottom": 572.765625,
+          "left": 166.796875,
+          "right": 1113.203125
+        },
+        "headerBottom": 113,
+        "pTop": 599.953125,
+        "pVisible": 173.5625,
+        "paragraph": "Private device sync stores encrypted data. Sha",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Return to reading",
+        "focus": "optional-cloud-workspace",
+        "hash": "",
+        "heading": {
+          "top": 181.15625,
+          "bottom": 241.203125,
+          "left": 166.796875,
+          "right": 1113.203125
+        },
+        "headerBottom": 113,
+        "pTop": 268.390625,
+        "pVisible": 216.953125,
+        "paragraph": "Cloud task storage requires its own explicit c",
+        "outline": [
+          "solid",
+          "3px"
+        ],
+        "overflow": 0
+      }
+    ],
+    "pickerRight": 699.859375,
+    "entry": {
+      "appbar": [
+        0,
+        113
+      ],
+      "links": [
+        [
+          381.671875,
+          439.703125
+        ],
+        [
+          381.671875,
+          439.703125
+        ],
+        [
+          381.671875,
+          439.703125
+        ]
+      ],
+      "appearance": [
+        471.703125,
+        535.421875
+      ],
+      "viewportWidth": 1280,
+      "docWidth": 1280
+    }
+  }
+]

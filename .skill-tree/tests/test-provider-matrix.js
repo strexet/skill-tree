@@ -39,7 +39,7 @@ test("soft providers excluded from --all selection", () => {
   assert.ok(selected.every((provider) => !provider.soft));
 });
 
-test("known Tier 2 passthrough examples present or supported by --agent", () => {
+test("explicit Tier 2 client profiles have registered provider entries", () => {
   const examples = ["antigravity", "augment", "bob", "crush", "devin", "droid", "forgecode", "iflow-cli", "rovodev", "tabnine-cli", "trae"];
   const profiles = new Set(matrix.providers.map((provider) => provider.skillsProfile));
   for (const profile of examples) {

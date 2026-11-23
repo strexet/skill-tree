@@ -159,7 +159,19 @@ test('installed release version matches the bundled source and forged receipt ve
 test('force never adopts an unowned package',t=>{const root=setup(t),dest=path.join(root,'.agents/skills/skill-tree-add-pending-task');fs.mkdirSync(dest,{recursive:true});fs.writeFileSync(path.join(dest,'private.txt'),'preserve');const r=run(root,['--force','--skills','skill-tree-add-pending-task']);assert.notEqual(r.status,0);assert.equal(fs.readFileSync(path.join(dest,'private.txt'),'utf8'),'preserve');});
 test('verify rejects a false-positive entrypoint and locally modified packages survive force/uninstall',t=>{const root=setup(t);assert.equal(run(root).status,0);const file=path.join(root,'.agents/skills/skill-tree-add-pending-task/SKILL.md');fs.writeFileSync(file,'unrelated');for(const op of ['--verify','--force','--uninstall'])assert.notEqual(run(root,[op]).status,0);assert.equal(fs.readFileSync(file,'utf8'),'unrelated');});
 test('maintenance refresh works without source access and detects newly added tools',t=>{const root=setup(t);assert.equal(run(root).status,0);const manager=path.join(root,'.skill-tree/installation/manager.js');fs.writeFileSync(path.join(root,'package.json'),JSON.stringify({scripts:{test:'node --test'}}));assert.notEqual(run(root,['--verify']).status,0);const r=spawnSync(process.execPath,[manager,'--refresh-profile'],{cwd:os.tmpdir(),encoding:'utf8',timeout:15000});assert.equal(r.status,0,r.stdout+r.stderr);assert.equal(run(root,['--verify']).status,0);const profile=JSON.parse(fs.readFileSync(path.join(root,'.skill-tree/installation/profile.json')));assert.ok(profile.recipes['script-test']);assert.equal(profile.gaps.length,0);});
-test('noninteractive missing flavor, global, symlink and upstream specialization fail without writes',t=>{const root=setup(t);for(const args of [['--only','codex','--target',root,'--yes'],['--global'],['--symlink'],['--agent','qwen-code']]){const r=args[0]==='--only'?spawnSync(process.execPath,[cli,...args],{encoding:'utf8'}):run(root,args);assert.notEqual(r.status,0);}assert.equal(fs.existsSync(path.join(root,'.skill-tree')),false);});
+test('fresh noninteractive installs preview Director and raw profile installation requires a flavor', t => {
+ const root=setup(t);
+ const args=['--only','codex','--target',root,'--yes'];
+ const preview=spawnSync(process.execPath,[cli,...args,'--dry-run'],{encoding:'utf8'});
+ assert.equal(preview.status,0,preview.stderr);
+ assert.match(preview.stdout,/Director preview/);
+ const direct=spawnSync(process.execPath,[cli,...args,'--project'],{encoding:'utf8'});
+ assert.notEqual(direct.status,0);
+ assert.match(direct.stderr,/requires --flavor/);
+ for(const options of [['--global'],['--symlink'],['--agent','qwen-code']]) assert.notEqual(run(root,options).status,0);
+ assert.equal(fs.existsSync(path.join(root,'.skill-tree')),false);
+ assert.equal(fs.existsSync(path.join(root,'.skill-tree-director')),false);
+});
 test('owned no-op is verified; dry-run reports conflicts without writes',t=>{const root=setup(t);assert.equal(run(root).status,0);const profile=path.join(root,'.skill-tree/installation/profile.json'),before=fs.readFileSync(profile,'utf8');assert.match(run(root).stdout,/current|no-op/);assert.equal(fs.readFileSync(profile,'utf8'),before);fs.writeFileSync(path.join(root,'.agents/skills/skill-tree-add-pending-task/extra.txt'),'local');const r=run(root,['--dry-run','--force']);assert.notEqual(r.status,0);assert.equal(fs.readFileSync(profile,'utf8'),before);});
 test('interrupted replacement rolls forward from the journal and preserves unrelated content',t=>{
  const root=setup(t),manager=require('../lib/installation.js');assert.equal(run(root).status,0);

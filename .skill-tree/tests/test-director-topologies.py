@@ -6,6 +6,7 @@ from hashlib import sha256
 import json
 import os
 from pathlib import Path
+from shutil import copytree, ignore_patterns
 import subprocess
 import sys
 import tempfile
@@ -223,6 +224,109 @@ class DirectorTopologyTests(unittest.TestCase):
         frozen = self.director('plan-freeze', {**plan, 'expected_preview_sha256': review['preview_sha256']})
         return {**selection, 'plan_sha256': frozen['plan_sha256']}
 
+    def test_prepared_registration_and_intake_verify_the_original_canonical_route(self):
+        tools = self.parent
+        source = self.base/'package-source'
+        source.mkdir()
+        self.git(source, 'init', '-b', 'develop')
+        for relative in ('bin', 'common', 'config', 'domains', 'lib', 'src', 'templates', 'tests/fixtures/director'):
+            copytree(SOURCE/relative, source/'.skill-tree'/relative, ignore=ignore_patterns('__pycache__'))
+        self.git(source, 'add', '.skill-tree')
+        self.git(source, '-c', 'user.name=Director Fixture', '-c', 'user.email=fixture@example.invalid',
+                 'commit', '-m', 'Pin the disposable Director source')
+        pin = {'checkout': str(source), 'revision': self.git(source, 'rev-parse', 'HEAD').strip()}
+        coordinator = self.base/'guided-parent'
+        def area(name, role, project, flavor=None, effects=()):
+            return {'id': name, 'role': role, 'capabilities': ['core-task'], 'allowed_effects': ['status', *effects],
+                    'project': project, **({'flavor': flavor, 'source': pin} if flavor else {})}
+        plan = {'director_id': CURRENT_DIRECTOR, 'workspace': {'kind': 'new', 'source': pin}, 'areas': [
+            area('maintenance', 'source-maintenance', {'kind': 'existing', 'topology': 'separate', 'path': str(source)}, 'general'),
+            area('game', 'unity', {'kind': 'existing', 'topology': 'separate', 'path': str(self.external), 'scope': 'game'}, 'unity', ('launch',)),
+            area('story', 'narrative', {'kind': 'new', 'topology': 'shared', 'placement': 'inside', 'path': 'story'},
+                 effects=('intake',)),
+            area('art', 'art', {'kind': 'new', 'topology': 'shared', 'placement': 'inside', 'path': 'art'}),
+        ]}
+        entry = tools/AGENTS/'skill-tree-director-setup/scripts/director-entry.py'
+        preview = self.invoke(entry, coordinator, 'setup-preview', plan, [], None)
+        prepared = self.invoke(entry, coordinator, 'setup-bootstrap',
+                               {'request': plan, 'expected_preview_sha256': preview['preview_sha256']}, [], None)
+        self.assertEqual(prepared['status'], 'prepared')
+        self.parent = coordinator
+        handoff = {'director_id': CURRENT_DIRECTOR, 'prepared_preview_sha256': preview['preview_sha256']}
+        setup = self.director('setup-status', handoff)['areas']
+        self.assertEqual({(item['preparation'], item['registration'], item['routing']['status']) for item in setup.values()},
+                         {('prepared', 'unregistered', 'unverified')})
+        review = self.director('setup-preview', handoff)
+        registration = {**handoff, 'expected_preview_sha256': review['preview_sha256']}
+        self.assertEqual(set(review['added_areas']), set(setup))
+        self.assertEqual(review['registry']['areas']['game']['queue_id'], self.external_queue)
+        self.assertEqual(review['registry']['areas']['story']['queue_id'], prepared['areas']['story']['queue']['queue_id'])
+        profile = self.external/PROFILE
+        original_profile = profile.read_bytes()
+        profile.write_bytes(original_profile + b'\n')
+        self.director('setup-apply', registration, error='Prepared installed profile changed')
+        self.assertFalse((self.parent/REGISTRY).exists())
+        profile.write_bytes(original_profile)
+        registered = self.director('setup-apply', registration)
+        self.assertEqual(registered['registry'], review['registry'])
+        setup = self.director('setup-status', handoff)['areas']
+        self.assertEqual({(item['registration'], item['routing']['status']) for item in setup.values()},
+                         {('registered', 'unverified')})
+
+        plan = self.freeze(self.child_task())
+        run_id = identity('DR')
+        owner = {'actor': 'fixture-owner', 'reference': 'guided-intake-approval', 'kind': 'owner-message'}
+        run = self.director('run-start', {**plan, 'director_run_id': run_id, 'assignment_ids': ['story-followup'],
+                                         'owner': owner, 'authority': {'story-followup': ['intake']}, 'approved_defaults': []})
+        selected = {'director_run_id': run_id, 'assignment_id': 'story-followup'}
+        projection = {**handoff, 'routing': [selected]}
+        self.assertEqual(self.director('setup-status', projection)['areas']['story']['routing']['status'], 'unverified')
+        dispatch = {**selected, 'operation': 'intake', 'expected_run_sha256': run['run_sha256'],
+                    'request': {'expected_source_hash': sha((self.parent/QUEUE).read_bytes())}}
+        unselected = (self.external/QUEUE, self.external/STATE, source/QUEUE, source/STATE)
+        before, coordinator_before = snapshot(*unselected), snapshot(self.parent/QUEUE, self.parent/STATE)
+        bindings_path = self.parent/BINDINGS
+        original = bindings_path.read_bytes()
+        changed = json.loads(original)
+        shared_queue = setup['story']['queue_id']
+        changed['queues'][shared_queue]['root'] = str(self.external)
+        bindings_path.write_text(json.dumps(changed))
+        self.assertEqual(self.director('setup-status', handoff)['areas']['story']['registration'], 'stale')
+        self.director('run-dispatch', dispatch, error='canonical|binding|qualification')
+        self.assertEqual(snapshot(*unselected), before)
+        self.assertEqual(snapshot(self.parent/QUEUE, self.parent/STATE), coordinator_before)
+        bindings_path.write_bytes(original)
+
+        directed = self.director('run-dispatch', dispatch)
+        pending = directed['result']['id']
+        envelope = {'schema': 1, 'director_id': CURRENT_DIRECTOR, 'queue_id': shared_queue,
+                    'assignment_id': 'story-followup', 'plan_sha256': plan['plan_sha256']}
+        child = self.core(self.parent, 'director-dispatch-read', {'operation': 'intake', 'director_dispatch': envelope})
+        self.assertEqual(child['receipt']['result']['id'], pending)
+        areas = self.director('setup-status', projection)['areas']
+        proof = areas['story']['routing']
+        self.assertEqual(proof['status'], 'verified')
+        self.assertEqual(proof['receipts'][0]['receipt_sha256'], child['receipt']['receipt_sha256'])
+        self.assertEqual(proof['receipts'][0]['queue_id'], shared_queue)
+        self.assertEqual(proof['receipts'][0]['area_id'], 'story')
+        self.assertEqual(areas['art']['routing']['status'], 'unverified')
+        self.assertEqual(areas['game']['routing']['status'], 'unverified')
+        after = snapshot(self.parent/QUEUE, self.parent/STATE)
+        self.assertEqual((self.parent/QUEUE).read_text().count(pending), 1)
+        repeated = self.director('run-dispatch', dispatch)
+        self.assertEqual((repeated['status'], repeated['result']['id']), ('replayed', pending))
+        self.assertEqual(snapshot(self.parent/QUEUE, self.parent/STATE), after)
+        self.assertEqual(snapshot(*unselected), before)
+
+        receipt_file = self.parent/'.skill-tree/history/director-dispatch'/f"{child['dispatch_key']}.json"
+        retained = receipt_file.read_bytes()
+        receipt_file.unlink()
+        self.director('setup-status', projection, error='Original canonical intake receipt is unavailable')
+        self.director('run-dispatch', dispatch, error='Original directed child result became unavailable')
+        self.assertEqual(snapshot(self.parent/QUEUE, self.parent/STATE), after)
+        self.assertEqual(snapshot(*unselected), before)
+        receipt_file.write_bytes(retained)
+
     def test_cross_area_manual_wait_preserves_same_external_run_and_allows_shared_sibling(self):
         game_task = self.child_task()
         self.register()
@@ -234,13 +338,17 @@ class DirectorTopologyTests(unittest.TestCase):
                                              'owner': owner, 'authority': {'game-run': ['launch'], 'story-followup': ['intake']},
                                              'approved_defaults': []})
         worktree = self.base / 'game-worktree'
-        launch = self.director('run-dispatch', {**key, 'expected_run_sha256': parent['run_sha256'],
-                                               'assignment_id': 'game-run', 'operation': 'start', 'request': {
-                                                   'expected_source_hash': sha((self.external / QUEUE).read_bytes()),
-                                                   'local_base': True, 'local_base_authorization': 'Disposable local fixture.',
-                                                   'base_branch': 'develop', 'branch': 'codex/topology-game', 'worktree': str(worktree),
-                                               }})
+        start = {**key, 'expected_run_sha256': parent['run_sha256'], 'assignment_id': 'game-run', 'operation': 'start',
+                 'request': {'expected_source_hash': sha((self.external/QUEUE).read_bytes()),
+                             'local_base': True, 'local_base_authorization': 'Disposable local fixture.',
+                             'base_branch': 'develop', 'branch': 'codex/topology-game', 'worktree': str(worktree)}}
+        launch = self.director('run-dispatch', start)
         external_run = launch['result']['id']
+        marker = Path(self.git(worktree, 'rev-parse', '--absolute-git-dir').strip())/'skill-tree-owner.json'
+        marker_bytes = marker.read_bytes()
+        marker.write_text(json.dumps({**json.loads(marker_bytes), 'token': str(uuid4())}))
+        self.director('run-dispatch', start, error='Original Director run reservation is unavailable or changed')
+        marker.write_bytes(marker_bytes)
         selector = ('--run-id', external_run)
         self.core(self.external, 'checkpoint', {'phase': 'refresh-profile', 'stop_reason': 'Prepare owned worktree profile.'}, *selector)
         self.install(worktree, 'unity', WRITER)

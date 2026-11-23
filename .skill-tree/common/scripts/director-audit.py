@@ -56,6 +56,8 @@ O = D._objective_helper()
 
 def source_finding_digest(finding):
     fields = ('classification', 'component', 'symptom', 'conditions', 'generation')
+    if finding.get('reproduction', {}).get('kind') == 'director-resource-check':
+        fields += ('scope', 'expected', 'reproduction')
     return D._digest({field: finding[field] for field in fields})
 
 
@@ -439,23 +441,30 @@ def _parent_assignment_status(state):
             'blocked': bool(state.get('blocker')), 'completed': bool(state.get('completed'))}
 
 
-def _generation(worktree):
-    if worktree is None:
+def _snapshot_input(sources):
+    suffix = '/' + SNAPSHOT + '/' + RESOURCE
+    candidates = [path for path in sources if path.endswith(suffix)]
+    return candidates[0] if len(candidates) == 1 else None
+
+
+def _generation(worktree, installed=INSTALLED):
+    if worktree is None or not installed:
         return None
     try:
         observed = D._inspect_profile(worktree)
         profile, digest = _json(worktree, PROFILE)
         D._require(observed['kind'] == 'owned-profile' and observed['sha256'] == digest
                    and profile['identity'] == observed['identity'], 'No exact verified installed generation')
-        package = profile['destinations'][DESTINATION]
+        destination = installed.removesuffix('/' + RESOURCE)
+        package = profile['destinations'][destination]
         source = profile['source_digests'][SOURCE.removeprefix('.skill-tree/')]
         artifact = package['files'][RESOURCE]
         bundle_path = '.skill-tree/installation/source/' + SOURCE.removeprefix('.skill-tree/')
-        D._require('codex' in package.get('providers', [package['provider']]) and package['name'] == SNAPSHOT
+        D._require(package.get('providers', [package['provider']]) and package['name'] == SNAPSHOT
                    and D._sha(source) and D._sha(artifact) and D._sha(package['identity'])
                    and profile['bundle_digests'][bundle_path] == source
                    and D.WF.file_hash(D._safe_path(worktree, bundle_path)) == source
-                   and D.WF.file_hash(D._safe_path(worktree, INSTALLED)) == artifact
+                   and D.WF.file_hash(D._safe_path(worktree, installed)) == artifact
                    and profile['recipes'][RECIPE]['lane'] == 'unit', 'Profile lacks the exact checked helper and recipe')
     except (KeyError, TypeError, OSError, ValueError, subprocess.TimeoutExpired):
         return None
@@ -467,7 +476,7 @@ def _source_check(check_id, record, attempt, checks, worktree, verified):
     if (check_id != CHECK or record.get('result') != 'fail' or record.get('classification') != 'executed-control'
             or record.get('actual_lane') != 'unit' or record.get('failure_signature') != SIGNATURE):
         return False
-    if verified is None or checks.get(check_id) != RECIPE:
+    if verified is None or (checks.get(check_id) or {}).get('recipe_id') != RECIPE:
         return False
     generation, _ = verified
     pointer = next((item for item in record.get('evidence', []) if item.get('path') == RESULT), {})
@@ -477,7 +486,7 @@ def _source_check(check_id, record, attempt, checks, worktree, verified):
         return False
     matched = (attempt.get('attempt_id') == record['attempt_id'] and attempt.get('key') == record['key']
             and attempt.get('recipe', {}).get('lane') == 'unit' and attempt.get('sources') == record['sources']
-            and record['sources'].get(INSTALLED) == generation['installed_sha256'] and proof == OBSERVED_RESULT
+            and record['sources'].get(_snapshot_input(record['sources'])) == generation['installed_sha256'] and proof == OBSERVED_RESULT
             and pointer.get('available') is True and digest == pointer.get('sha256'))
     return {'result_path': RESULT, 'result_sha256': digest} if matched else None
 
@@ -494,6 +503,70 @@ def _finding(generation):
         'scope': {'source_path': SOURCE, 'operation': SNAPSHOT}, 'evidence': [],
     }
     return {**finding, 'finding_sha256': source_finding_digest(finding)}
+
+
+def _diagnostic_finding(worktree, queue, check_id, check, record, attempt):
+    """Attribute a structured expected/observed result to one verified packaged resource."""
+    recipe = (check or {}).get('recipe_id')
+    if (worktree is None or not recipe or record.get('classification') != 'executed-control'
+            or record.get('result') != 'fail' or record.get('failure_category') != 'expected-behavior'
+            or record.get('actual_lane') != 'unit' or not isinstance(attempt, dict)
+            or attempt.get('attempt_id') != record.get('attempt_id') or attempt.get('key') != record.get('key')
+            or attempt.get('sources') != record.get('sources') or attempt.get('recipe', {}).get('lane') != 'unit'):
+        return None
+    result_path = f'.skill-tree/artifacts/director/{check_id}.json'
+    refs = [ref for ref in record['evidence'] if ref.get('available') and ref.get('path') == result_path]
+    if len(refs) != 1:
+        return None
+    try:
+        proof, result_hash = _json(worktree, result_path, limit=65536)
+        D._object(proof, {'schema', 'kind', 'assertion_id', 'installed_path', 'expected', 'observed'})
+        expected, observed = proof['expected'], proof['observed']
+        D._require(proof['schema'] == 1 and proof['kind'] == 'director-resource-check'
+                   and proof['assertion_id'] == check_id and all(D._token(v) and len(v) <= 96 for v in (expected, observed))
+                   and expected != observed and refs[0]['sha256'] == result_hash, 'Inconclusive resource result')
+        installed = D._scope(proof['installed_path']).as_posix()
+        profile_state = D._inspect_profile(worktree)
+        profile, profile_hash = _json(worktree, PROFILE)
+        D._require(profile_state['kind'] == 'owned-profile' and profile_state['sha256'] == profile_hash
+                   and profile['recipes'][recipe]['lane'] == 'unit', 'Unverified diagnostic profile')
+        matches = [(rel, pkg) for rel, pkg in profile['destinations'].items() if installed.startswith(rel + '/')]
+        D._require(len(matches) == 1, 'Unowned diagnostic resource')
+        dest, package = matches[0]
+        resource = installed[len(dest) + 1:]
+        group, name = resource.split('/', 1)
+        mapping, mapping_hash = _json(worktree, '.skill-tree/installation/source/config/resource-map.json')
+        D._require(profile['source_digests']['config/resource-map.json'] == mapping_hash, 'Resource map changed')
+        source = mapping[package['name']][group][name]
+        D._scope(source)
+        generation = package['files'][resource]
+        D._require(D._sha(generation) and record['sources'][installed] == profile['source_digests'][source] == generation
+                   and D.WF.file_hash(D._safe_path(worktree, installed)) == generation, 'Resource generation changed')
+        fixtures = {path: digest for path, digest in record['sources'].items() if path != installed}
+        D._require(all(D._scope(path) and D._sha(digest) for path, digest in fixtures.items()), 'Invalid fixture')
+        executed_recipe = attempt['recipe']
+        recipe_inputs = {path: D.WF.file_hash(D._safe_path(worktree, path)) for path in executed_recipe.get('input_paths', [])}
+        D._require(all(D._sha(value) for value in recipe_inputs.values())
+                   and D._digest({'recipe': executed_recipe, 'inputs': recipe_inputs})
+                   == attempt['environment_identity'] == record['environment_identity'],
+                   'The original recipe inputs changed after the executed check')
+        recipe_hash = D._portable_recipe(worktree, queue, executed_recipe, installed, '.skill-tree/' + source)
+        params = {}
+        for key, value in check['parameters'].items():
+            D._require(isinstance(value, str) and (value in record['sources'] or D._token(value))
+                       and key not in {'project_root', 'execution_checkout', 'queue_root'}, 'Unsupported reproduction input')
+            params[key] = '.skill-tree/' + source if value == installed else value
+        finding = {'schema': 1, 'classification': 'source-defect', 'component': package['name'], 'symptom': observed,
+                   'conditions': {'recipe_id': recipe, 'lane': 'unit', 'assertion_id': check_id},
+                   'generation': {'source_sha256': generation, 'installed_sha256': generation}, 'expected': expected,
+                   'observed': observed, 'scope': {'source_path': '.skill-tree/' + source, 'operation': package['name']},
+                   'reproduction': {'kind': 'director-resource-check', 'resource': resource, 'fixtures': fixtures, 'parameters': params, 'recipe_sha256': recipe_hash},
+                   'evidence': []}
+        return {**finding, 'finding_sha256': source_finding_digest(finding)}, {
+            'result_path': result_path, 'result_sha256': result_hash, 'profile_sha256': profile_hash,
+            'package_sha256': package['identity']}
+    except (OSError, KeyError, TypeError, ValueError, subprocess.TimeoutExpired):
+        return None
 
 
 def _classification(area, record, check_id):
@@ -544,11 +617,11 @@ class DirectorAudit:
         task_ids = set(run['admitted_task_ids'])
         queue_tasks = {task['id']: task for task in D.WF.parse(store.text()) if task['id'] in task_ids}
         outcomes = {item['id']: item for item in store.outcomes() if item.get('run_id') == run_id and item.get('task_id') in task_ids}
-        checks = {task_id: {check['id']: check['recipe_id'] for check in D.WF.check_specs(task)}
+        checks = {task_id: {check['id']: check for check in D.WF.check_specs(task)}
                   for task_id, task in queue_tasks.items()}
         for outcome in outcomes.values():
             if outcome.get('disposition') == 'completed' and outcome.get('validation_plan'):
-                checks.setdefault(outcome['task_id'], {check['id']: check['recipe_id'] for check in outcome['validation_plan']})
+                checks.setdefault(outcome['task_id'], {check['id']: check for check in outcome['validation_plan']})
         events, missing = _events(root, worktree, selection, area['queue_id'], run_id, run_registry)
         base = {'area_id': area['id'], 'queue_id': area['queue_id'], 'run_id': run_id, 'assignment_id': name,
                 'start_receipt_sha256': start['receipt_sha256']}
@@ -564,7 +637,7 @@ class DirectorAudit:
                   'observed_events': len(events), 'last_recorded_sequence': last_sequence,
                   'undated_events': sum('event_recorded_at' not in source for _, source in events)}
         verified = None
-        checked_generation = False
+        generations = {}
         observations, findings, timeline = [], {}, []
         duplicate_receipts = set()
         terminal_ids = set()
@@ -587,14 +660,23 @@ class DirectorAudit:
                             'record_sha256': D._digest(record)}
                 if unity_selection and attempt_id == unity_selection['attempt_id']:
                     unity_attempts.append((evidence, record, attempt))
-                if check_id == CHECK and not checked_generation:
-                    verified = _generation(worktree)
-                    checked_generation = True
+                verified = None
+                if check_id == CHECK:
+                    installed = _snapshot_input(record['sources'])
+                    if installed not in generations:
+                        generations[installed] = _generation(worktree, installed)
+                    verified = generations[installed]
                 proof = _source_check(check_id, record, attempt, checks.get(task_id, {}), worktree, verified)
                 diagnostics = _check_diagnostics(record)
-                if proof:
-                    generation, profile = verified
-                    finding = _finding(generation)
+                diagnostic = None if proof else _diagnostic_finding(
+                    worktree, root, check_id, checks.get(task_id, {}).get(check_id), record, attempt)
+                if proof or diagnostic:
+                    if diagnostic:
+                        finding, proof = diagnostic
+                        profile = {}
+                    else:
+                        generation, profile = verified
+                        finding = _finding(generation)
                     identity = finding['finding_sha256']
                     findings.setdefault(identity, finding)['evidence'].append({**evidence, **profile, **proof})
                     category, symptom = finding['classification'], finding['symptom']

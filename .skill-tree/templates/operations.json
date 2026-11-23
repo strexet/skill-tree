@@ -39,6 +39,26 @@
       }
     ]
   },
+  "skill-tree-force-process": {
+    "title": "Skill-Tree: Force Process Pending",
+    "description": "Research complex Pending work deeply when explicitly requested, establish runnable scope and preserve verifiable outcome evidence.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Use Force Process for an explicitly requested deep Pending pass. Read the [Force Process contract](references/force-process.md), [ordinary workflow](references/future-workflow.md) and [metadata](references/workflow-metadata.md). Freeze the exact selected Pending identities. Research material unknowns, establish runnable first work and record observable acceptance. Preview the exact proposal with the read-only Force Process command. Use the guarded ordinary Process Pending write path. Verify the resulting queue against the retained Preview and original receipt or reconcile interrupted acknowledgment from recorded evidence. Follow the ordinary next-action handoff after processing."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "Before promotion, use the exact selected Pending identities and current bounded authority. Standalone processing ends with the resulting scope and evidence. Implementation requires the explicit selection or existing controller authorization required by ordinary processing."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Inspect the owned Force Process binding manifest before proceeding. Surface enabled Force Process bindings as an unsupported prerequisite. Use the [plugin invocation contract](references/plugin-invocation.md) for the actual ordinary Process Pending boundaries. Route configured matching hooks through the verified owned ordinary operation and keep current typed clarification holds. Core-only projects can use the canonical helper bundled with Force Process."
+      }
+    ]
+  },
   "skill-tree-full-cycle": {
     "title": "Skill-Tree: Full Cycle",
     "description": "Deliver an explicitly requested task or task group through Pending, research, scoped implementation, one PR review-and-fix cycle and merge to develop.",
@@ -325,11 +345,11 @@
   },
   "skill-tree-director-setup": {
     "title": "Skill-Tree Director: Setup",
-    "description": "Register exact Director areas and inspect guarded canonical path rebinds.",
+    "description": "Preview first-time Director setup, register exact prepared areas and inspect guarded rebinds.",
     "sections": [
       {
         "id": "operation",
-        "text": "Use scripts/director-entry.py setup-preview to inspect stable area, queue, profile and scope ownership. Apply the identical reviewed request with setup-apply only on explicit selection. Use rebind-preview and rebind for a moved exact canonical path. Keep installation and runtime admission separate. Read the [Director contract](references/director-workflow.md)."
+        "text": "Read the [Director contract](references/director-workflow.md). Use scripts/director-entry.py setup-preview with the guided workspace request to review the initial workspace, exact area placements, selected sources and missing prerequisites. On explicit approval of that preview, run scripts/director-entry.py setup-bootstrap with the same root and JSON containing request (the original guided request) and expected_preview_sha256 (the reviewed digest). A deferred result names the prerequisite and completed steps. Reuse the exact input to retry. Use setup-preview with director_id and prepared_preview_sha256 to inspect exact prepared area registration. Use setup-apply with the same request and approved registration preview digest. Use setup-status to inspect preparation, registration and routing evidence for selected runs and assignments. Use rebind-preview and rebind for a moved exact canonical path. Keep installation and runtime admission separate."
       }
     ]
   },
@@ -359,7 +379,7 @@
     "sections": [
       {
         "id": "operation",
-        "text": "Use scripts/director-entry.py run-start and run-dispatch with current plan, explicit effects and exact canonical scope. Observe status before another effect. Continue a started child through the matching installed controller and current authorization. In Codex, use an available independent collaboration worker with exact task, run, checkout, source pins and stop conditions. Route structured child questions to Director. Use run-pause, run-resume and run-cancel for that same selected run. Protect pending attempts and partial work. Release or replay never grants child or delivery authority. Read the [Director contract](references/director-workflow.md)."
+        "text": "Use scripts/director-entry.py run-start and run-dispatch with current plan, explicit effects and exact canonical scope. Observe status before another effect. Continue a started child through the matching installed controller and current authorization. In Codex, use an available independent collaboration worker with exact task, run, checkout, source pins and stop conditions. When a worker needs related project sources, read plan-context with the exact assignment_id and pass the returned context_search.request with the brief. Route structured child questions to Director. Use run-pause, run-resume and run-cancel for that same selected run. Protect pending attempts and partial work. Release or replay never grants child or delivery authority. Read the [Director contract](references/director-workflow.md)."
       }
     ]
   },
