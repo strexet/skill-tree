@@ -519,7 +519,7 @@ async function main(argv = process.argv.slice(2), {promptFactory} = {}) {
     const directorRuntime = require("../lib/director-workspace.js");
     const rawFlavor = namedDirector && !args.project && fs.existsSync(workspace)
       ? directorRuntime.directFlavor(workspace) : null;
-    const legacy = rawFlavor === "director" && !fs.existsSync(path.join(workspace, ".skill-tree-director/workspace.json"));
+    const legacy = rawFlavor === "director" && !directorRuntime.workspaceDescriptor(workspace);
     if (legacy && !args.target) args.target = workspace;
     if (namedDirector && rawOptions && !args.project && rawFlavor && rawFlavor !== "director") {
       throw Error("This project already owns a " + rawFlavor + " profile. Install Director without --skills or --with-init to keep both profiles, or select --project for a direct profile change.");

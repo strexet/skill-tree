@@ -21,6 +21,8 @@ RUN_COMMANDS = {'run-start', 'run-status', 'run-dispatch', 'run-pause', 'run-res
 RUN_PATH = re.compile(r'\.skill-tree/director/runs/dr-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}\.json\Z')
 REGISTRY = '.skill-tree/director/registry.json'
 BINDINGS = '.skill-tree/artifacts/director/local-bindings.json'
+DIRECTOR_HOME = Path('.skill-tree/.director')
+LEGACY_DIRECTOR_HOME = Path('.skill-tree-director')
 OBJECTIVE_PATH = re.compile(r'\.skill-tree/director/objectives/ob-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}\.json\Z')
 DISPATCH_INTENT_PATH = re.compile(r'\.skill-tree/director/dispatch-intents/[a-f0-9]{64}\.json\Z')
 PLAN_COMMANDS = {'plan-preview', 'plan-freeze', 'plan-context', 'plan-impact', 'context-search'}
@@ -260,20 +262,29 @@ def _area(request):
     }, owner
 
 
+def director_workspace(root):
+    if root.name == DIRECTOR_HOME.name and root.parent.name == DIRECTOR_HOME.parent.name:
+        return root.parent.parent
+    if root.name == LEGACY_DIRECTOR_HOME.name:
+        return root.parent
+    return None
+
+
 def _validate_scope_paths(areas, observed, service=None):
     _require(sum(area['role'] == 'source-maintenance' for area in areas) == 1,
              'Register one canonical Skill Tree source-maintenance area')
+    workspace = director_workspace(service) if service and (service / 'workspace.json').is_file() else None
     for index, (first, a) in enumerate(observed):
         for second, b in observed[index + 1:]:
             both_write = bool(WRITE_EFFECTS.intersection(first['allowed_effects'])
                               and WRITE_EFFECTS.intersection(second['allowed_effects']))
-            if service and service.name == '.skill-tree-director' and (service / 'workspace.json').is_file():
+            if workspace is not None:
                 # A colocated product may contain independent registered Git roots.
                 # Write-path admission excludes those roots from the parent's scope.
                 if (first['queue_id'] != second['queue_id'] and first['repo_id'] != second['repo_id']
                         and first['scope'] == second['scope'] == '.'
-                        and (a == service.parent and b != a and b.is_relative_to(a)
-                             or b == service.parent and a != b and a.is_relative_to(b))):
+                        and (a == workspace and b != a and b.is_relative_to(a)
+                             or b == workspace and a != b and a.is_relative_to(b))):
                     continue
             _require(a != b and not (both_write and (a.is_relative_to(b) or b.is_relative_to(a))),
                      f'Areas have overlapping scopes: {first["id"]}, {second["id"]}')
@@ -785,14 +796,21 @@ class DirectorRegistry:
     def status(self, payload=None):
         """Project current areas and explicit assignment references without taking any writer lock."""
         payload = {} if payload is None else payload
-        _object(payload, set(), {'assignments', 'project_work'})
+        _object(payload, set(), {'assignments', 'project_work', 'area_ids'})
         requests = payload.get('assignments', [])
         _require(isinstance(requests, list), 'Assignments require an exact list')
         registry, bindings, _ = self._load()
         _require(registry is not None, 'Register Director areas before requesting status')
-        owners = (bindings or {}).get('queues', {})
-        queues = {queue_id: _status_queue(queue_id, binding) for queue_id, binding in owners.items()}
         areas = registry['areas']
+        owners = (bindings or {}).get('queues', {})
+        if 'area_ids' in payload:
+            scope = _tokens(payload['area_ids'], 'Status area IDs')
+            _require(all(name in areas and 'status' in areas[name]['allowed_effects'] for name in scope),
+                     'Select exact status-enabled areas')
+            areas = {name: areas[name] for name in scope}
+            queue_ids = {area['queue_id'] for area in areas.values()}
+            owners = {queue_id: binding for queue_id, binding in owners.items() if queue_id in queue_ids}
+        queues = {queue_id: _status_queue(queue_id, binding) for queue_id, binding in owners.items()}
         result_areas = [_status_area(area, queues.get(area['queue_id']))
                         for area in sorted(areas.values(), key=lambda entry: entry['id'])]
         area_states = {entry['id']: entry for entry in result_areas}
@@ -838,7 +856,7 @@ class DirectorRegistry:
         return {
             'schema': 1, 'director_id': registry['director_id'], 'registry_revision': registry['revision'],
             'areas': result_areas, 'assignments': projections, 'resource_holders': resources,
-            'project_work': self._project_work(registry, queues, payload.get('project_work')),
+            'project_work': self._project_work({**registry, 'areas':areas}, queues, payload.get('project_work')),
             'available_independent': [entry['id'] for entry in projections
                                       if entry['state'] == 'ready' and not entry['prerequisites']],
         }
@@ -872,6 +890,12 @@ class DirectorRegistry:
             else:
                 selected = sorted(runs.values(), key=lambda item: (item.get('started_at', ''), item['id']),
                                   reverse=True)[:20]
+                tasks = queue['state'].get('tasks', [])
+                row['tasks'] = [
+                    {key: task[key] for key in ('id', 'title', 'queue', 'status', 'priority', 'depends_on')}
+                    for task in tasks[:50]
+                ]
+                row['total_tasks'] = len(tasks)
             for run in selected:
                 owned_dispatch = bool(run.get('dispatch_workspace_sha256') or
                                       (run.get('workspace') or {}).get('dispatch_owner_token'))
@@ -1029,7 +1053,7 @@ class DirectorRegistry:
 
 def _dirty_paths(root):
     raw = WS.local_git(root, 'status', '--porcelain=v1', '-z', '--no-renames', '--untracked-files=all').stdout
-    return sorted({item[3:].decode('utf-8') for item in raw.split(b'\0') if item})
+    return sorted({item[3:].decode('utf-8').removesuffix('/') for item in raw.split(b'\0') if item})
 
 
 def _overlap(first, second):

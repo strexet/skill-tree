@@ -2,4 +2,4 @@ Skill Tree navigation resides in .skill-tree/skill-tree.json. Applicable reposit
 
 When no owner action is required and useful eligible work follows, offer one recommended next action with exact scope. A short direct reply may select the one action explicitly offered for continuation. Required answers, Manual acceptance and additional authorizations still require explicit owner input.
 
-In a registered shared folder, open the `skill-tree-director` workspace menu for ordinary task, status and audit requests. Preview the receiving project, queue and task scope before queue effects. Use direct Core routing when the owner explicitly selects the direct project operation.
+In a registered shared folder with `.skill-tree/.director`, open the `skill-tree-director` workspace menu before selecting a project operation. Preview the receiving project, queue and task scope before queue effects. Use direct Core routing when the owner explicitly selects the direct project operation.

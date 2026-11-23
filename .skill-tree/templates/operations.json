@@ -5,7 +5,7 @@
     "sections": [
       {
         "id": "shared-workspace-routing",
-        "text": "In a registered shared root with .skill-tree-director, use the root skill-tree-director menu and project-route before touching a queue. Show the selected project, exact queue and task scope. Use Core with --direct-project only when the owner explicitly selects direct project work."
+        "text": "In a registered shared root with .skill-tree/.director, use the workspace Director menu and project-route before touching a queue. Show the selected project, exact queue and task scope. Use Core with --direct-project only when the owner explicitly selects direct project work."
       },
       {
         "id": "operation",
@@ -129,7 +129,7 @@
     "sections": [
       {
         "id": "shared-workspace-routing",
-        "text": "In a registered shared root with .skill-tree-director, use the root skill-tree-director menu and project-route before touching a queue. Show the selected project, exact queue and task scope. Use Core with --direct-project only when the owner explicitly selects direct project work."
+        "text": "In a registered shared root with .skill-tree/.director, use the workspace Director menu and project-route before touching a queue. Show the selected project, exact queue and task scope. Use Core with --direct-project only when the owner explicitly selects direct project work."
       },
       {
         "id": "operation",
@@ -153,7 +153,7 @@
     "sections": [
       {
         "id": "shared-workspace-routing",
-        "text": "In a registered shared root with .skill-tree-director, use the root skill-tree-director menu and project-route before touching a queue. Show the selected project, exact queue and task scope. Use Core with --direct-project only when the owner explicitly selects direct project work."
+        "text": "In a registered shared root with .skill-tree/.director, use the workspace Director menu and project-route before touching a queue. Show the selected project, exact queue and task scope. Use Core with --direct-project only when the owner explicitly selects direct project work."
       },
       {
         "id": "operation",
@@ -177,7 +177,7 @@
     "sections": [
       {
         "id": "shared-workspace-routing",
-        "text": "In a registered shared root with .skill-tree-director, use the root skill-tree-director menu and project-route before touching a queue. Show the selected project, exact queue and task scope. Use Core with --direct-project only when the owner explicitly selects direct project work."
+        "text": "In a registered shared root with .skill-tree/.director, use the workspace Director menu and project-route before touching a queue. Show the selected project, exact queue and task scope. Use Core with --direct-project only when the owner explicitly selects direct project work."
       },
       {
         "id": "operation",
@@ -241,7 +241,7 @@
     "sections": [
       {
         "id": "shared-workspace-routing",
-        "text": "In a registered shared root with .skill-tree-director, use the root skill-tree-director menu and project-route before touching a queue. Show the selected project, exact queue and task scope. Use Core with --direct-project only when the owner explicitly selects direct project work."
+        "text": "In a registered shared root with .skill-tree/.director, use the workspace Director menu and project-route before touching a queue. Show the selected project, exact queue and task scope. Use Core with --direct-project only when the owner explicitly selects direct project work."
       },
       {
         "id": "operation",
@@ -349,7 +349,7 @@
     "sections": [
       {
         "id": "operation",
-        "text": "Read the [Director contract](references/director-workflow.md). Use scripts/director-entry.py setup-preview with the guided workspace request to review the initial workspace, exact area placements, selected sources and missing prerequisites. On explicit approval of that preview, run scripts/director-entry.py setup-bootstrap with the same root and JSON containing request (the original guided request) and expected_preview_sha256 (the reviewed digest). A deferred result names the prerequisite and completed steps. Reuse the exact input to retry. Use setup-preview with director_id and prepared_preview_sha256 to inspect exact prepared area registration. Use setup-apply with the same request and approved registration preview digest. Use setup-status to inspect preparation, registration and routing evidence for selected runs and assignments. Use rebind-preview and rebind for a moved exact canonical path. Keep installation and runtime admission separate. In the dedicated workspace, use project-menu for current registered projects and actions. Use project-route to preview the receiving queue, task selection and route without changing either queue."
+        "text": "Read the [Director contract](references/director-workflow.md). Use scripts/director-entry.py setup-preview with the guided workspace request to review the initial workspace, exact area placements, selected sources and missing prerequisites. On explicit approval of that preview, run scripts/director-entry.py setup-bootstrap with the same root and JSON containing request (the original guided request) and expected_preview_sha256 (the reviewed digest). A deferred result names the prerequisite and completed steps. Reuse the exact input to retry. Use setup-preview with director_id and prepared_preview_sha256 to inspect exact prepared area registration. Use setup-apply with the same request and approved registration preview digest. Use setup-status to inspect preparation, registration and routing evidence for selected runs and assignments. Use rebind-preview and rebind for a moved exact canonical path. Keep installation and runtime admission separate. In the dedicated workspace, use project-menu for current registered projects and actions. Use project-route to preview the receiving project, operation and scope. Discovery lists the registered Director and Core operations."
       }
     ]
   },
@@ -399,7 +399,7 @@
     "sections": [
       {
         "id": "operation",
-        "text": "Use scripts/director-entry.py status and plan-context with exact read-only selectors. Report prerequisites, dirty scope, resource conflicts, link availability and unsupported coverage. Read run-status for the exact Director run. Status never continues or repairs work. Read the [Director contract](references/director-workflow.md). The project_work view shows queue-level run and outcome identities. Use project_work with area_id and optional exact run_id to focus on one whole project. Show whether each run has verified Director assignment coverage and offer adopt-preview when a completed direct run is eligible for an exact adoption check."
+        "text": "Use scripts/director-entry.py status and plan-context with exact read-only selectors. Report prerequisites, dirty scope, resource conflicts, link availability and unsupported coverage. Read run-status for the exact Director run. Status never continues or repairs work. Read the [Director contract](references/director-workflow.md). The project_work view shows a bounded task list, total task count, and queue-level run and outcome identities. Use project_work with area_id and optional exact run_id to focus on one whole project. Show whether each run has verified Director assignment coverage and offer adopt-preview when a completed direct run is eligible for an exact adoption check."
       }
     ]
   },
@@ -419,7 +419,7 @@
     "sections": [
       {
         "id": "operation",
-        "text": "Use scripts/director-entry.py audit with the exact Director run and selected child identities. Inspect retained canonical receipts and explicitly reviewed existing exports. Audit creates no export, task or installation. Read the [Director contract](references/director-workflow.md). Follow the [selected Unity summary contract](references/director-workflow.md#audit-a-selected-unity-summary) to inspect a recorded engine capture. For a registered whole project, use diagnose with area_id, run_id and attempt_id to inspect one canonical check. Show coverage gaps, retain the observed failure category and present any verified read-only source repair proposal. Arbitrary logs require a separate reviewed adapter."
+        "text": "Use scripts/director-entry.py workspace-audit for an ordinary audit. Show registered subprojects, request read-only child audits and report the actual outcomes and per-project gaps. Use audit with the exact Director run and selected child identities for a run-specific audit. Inspect retained canonical receipts and explicitly reviewed existing exports. Audit creates no export, task or installation. Read the [Director contract](references/director-workflow.md). Follow the [selected Unity summary contract](references/director-workflow.md#audit-a-selected-unity-summary) to inspect a recorded engine capture. For a registered whole project, use diagnose with area_id, run_id and attempt_id to inspect one canonical check. Show coverage gaps, retain the observed failure category and present any verified read-only source repair proposal. Arbitrary logs require a separate reviewed adapter."
       }
     ]
   },

@@ -3100,7 +3100,7 @@
   "configuration_digest": "1d4ded90f74588a33443cca0a2da314364e2a91faff9e7955ed7ac521848e0ff",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "9b9798de985ce7f4023eadddbdffa2cc48cfe5de50d4caad5d94c2744cb452c8",
+  "identity": "4ba9f881428522f80f96e72a28fe83a3713eeef98bef33a8b22957d94524a456",
   "operation": "skill-tree-implement-next-future-task",
   "operations": {
     "skill-tree-3d": {
@@ -3198,7 +3198,7 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "8edc1df1c1447d34d3346e0e235fe0f252c85c74d99cadaaea9faa7f24b335f9",
+    "SKILL.md": "33769eac563c82635e66705e2a5a355b334473c32268d700e9c3ef33b1a5b338",
     "agents/openai.yaml": "54f2ca57647dadda1176102aebcbb3850dea38c06c6ac46fbdc311d4832fd0fc",
     "references/decision-governance.md": "52f8dc84c7cae4b9aa3aaa010d3ffb605ab79f5d75aaa36b9370d51e49305222",
     "references/development-practices.md": "352a45b093f2c53b7b08aef045a098880af74c6add6fb79f95017a52fd0e0780",
@@ -3230,7 +3230,7 @@
     "scripts/select-prioritized-task.py": "93f12ac5a333fb072bf8d9d849d08e3b422af856d582d492902647efe35c896f",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "b568183d17db0596c23cb348deebfc5121948f7a408ff4ec35965f888a55b8e2"
+    "scripts/workflow-state.py": "e4b861f716012cc1616180d4153714a147bb233808fc759ca281c2583b1a613f"
   },
   "packages": {},
   "parameter_defaults": {},

@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 def descriptor(root):
-    D._require(root.is_dir() and root.name == '.skill-tree-director', 'Open the installed .skill-tree-director workspace')
+    D._require(root.is_dir() and D.director_workspace(root) is not None, 'Open the installed Director service workspace')
     data, _ = D._read(root, 'workspace.json')
     profile, _ = D._read(root, '.skill-tree/installation/profile.json')
     D._require(isinstance(data, dict) and data.get('schema') == 1 and data.get('kind') == 'director-workspace'
@@ -18,6 +18,10 @@ def descriptor(root):
               for host in record.get('providers', [record.get('provider')])}
     D._require(isinstance(hosts, list) and hosts and len(set(hosts)) == len(hosts) and set(hosts) == actual,
                'Director hosts differ from the installed Setup receipt')
+    entries = [path + '/scripts/director-entry.py' for path, record in profile['destinations'].items()
+               if record['name'] == 'skill-tree-director-setup'
+               and hosts[0] in record.get('providers', [record.get('provider')])]
+    D._require(entries == [data.get('setup_entry')], 'Workspace Setup entry differs from the owned host destination')
     return data, profile
 
 
@@ -44,12 +48,13 @@ def locations(root, request):
     D._require(supplied is None or isinstance(supplied, str) and supplied and '\x00' not in supplied,
                'Select a project directory')
     D._require(kind == 'new' or supplied, 'Select the existing project directory')
-    path = Path(supplied) if supplied else root.parent/name
+    workspace = D.director_workspace(root)
+    path = Path(supplied) if supplied else workspace/name
     if not path.is_absolute():
-        path = root.parent/path
+        path = workspace/path
     D._require(not {'..', '.git'}.intersection(path.parts) and not any(p.is_symlink() for p in (path, *path.parents)),
                'Select a canonical project directory outside Git administration')
-    D._require(not path.is_relative_to(root) and (not root.is_relative_to(path) or path == root.parent),
+    D._require(not path.is_relative_to(root) and (not root.is_relative_to(path) or path == workspace),
                'Select a project outside Director storage or select the workspace itself')
     flavor = request.get('flavor', flavor_for(path))
     D._require(flavor in ('general', 'web', 'unity'), 'Choose general, web or unity for the working project')
@@ -102,19 +107,19 @@ def registration_area(name, role, path, effects):
             'allowed_effects':effects, 'interface':{'kind':'skill-tree','version':1}}
 
 
-def storage_location(workspace):
+def storage_location(workspace, home=None):
     product = D._setup_git_root(workspace)
     if product is None:
         return None
-    relative = (workspace / '.skill-tree-director').relative_to(product).as_posix()
+    relative = (workspace / (home or D.DIRECTOR_HOME)).relative_to(product).as_posix()
     D._require('\r' not in relative and '\n' not in relative, 'Unsupported Git path for Director storage')
     tracked = D.WS.local_git(product, 'ls-files', '-z', '--', relative)
     D._require(not tracked.stdout, 'Director storage overlaps tracked product files')
     return product, relative
 
 
-def protect_storage(workspace, *, apply=True):
-    location = storage_location(workspace)
+def protect_storage(workspace, *, apply=True, home=None):
+    location = storage_location(workspace, home)
     if location is None:
         return
     product, relative = location
@@ -175,7 +180,7 @@ def shared_routing(checkout):
         helper = D._safe_path(checkout, relative)
         package = profile['destinations'][relative.removesuffix('/scripts/workflow-state.py')]
         if (not helper.is_file() or D.WF.file_hash(helper) != package['files'].get('scripts/workflow-state.py')
-                or b'\nSHARED_WORKSPACE_ROUTING = 1\n' not in helper.read_bytes()):
+                or b'\nSHARED_WORKSPACE_ROUTING = 2\n' not in helper.read_bytes()):
             return 'upgrade-project-installation'
     return 'guarded' if locations else 'upgrade-project-installation'
 
@@ -185,6 +190,8 @@ def projects(root):
     if not registry:
         return []
     O = D._objective_helper()
+    workspace = D.director_workspace(root)
+    workspace_owner = D.WS.canonical(workspace) if D._setup_git_root(workspace) == workspace else workspace
     products = []
     for area in sorted(registry['areas'].values(), key=lambda item: item['id']):
         if area['role'] == 'source-maintenance' or area['scope'] != '.':
@@ -194,64 +201,14 @@ def projects(root):
         try:
             checkout = O._child_root(registry, bindings, area['id'])
             item['checkout'] = str(checkout)
-            if checkout == root.parent:
-                item['core_routing'] = shared_routing(checkout)
+            if checkout == workspace_owner:
+                if checkout != workspace:
+                    item['workspace_checkout'] = str(workspace)
+                item['core_routing'] = shared_routing(workspace)
         except (ValueError, OSError):
             item['state'] = 'unavailable'
         products.append(item)
     return products
-
-
-def route(root, products, request):
-    D._object(request, {'operation'}, {'project_id', 'route', 'task_ids'})
-    operation, mode = request['operation'], request.get('route', 'director')
-    queues = {'intake':None, 'process':'Pending Queue', 'implement-next':'Prioritized Next Changes',
-              'implement-all':'Prioritized Next Changes'}
-    D._require(isinstance(operation, str) and operation in queues and mode in ('director', 'direct'),
-               'Select intake, process, implement-next or implement-all and a supported route')
-    if 'project_id' in request:
-        candidates = [item for item in products if item['id'] == request['project_id']]
-    else:
-        candidates = [item for item in products if item.get('checkout') == str(root.parent)] or products
-    D._require(len(candidates) == 1 and candidates[0]['state'] == 'available',
-               'Select an exact available project from project-menu')
-    project = candidates[0]
-    queue = queues[operation]
-    summary = {'route':mode, 'project':project, 'operation':operation, 'queue':queue or 'Pending Queue'}
-    if 'preview' not in project['allowed_effects']:
-        return {**summary, 'status':'prerequisite', 'task_ids':[], 'limitations':['project-preview-not-authorized']}
-    store = D.WF.Store(Path(project['checkout']), route_queue=False, neutral=True)
-    text = store.text()
-    all_tasks = D.WF.parse(text)
-    tasks = [task for task in all_tasks if task['queue'] == queue]
-    requested = request.get('task_ids')
-    if requested is not None:
-        D._require(queue is not None and isinstance(requested, list) and requested
-                   and all(isinstance(item, str) for item in requested) and len(set(requested)) == len(requested),
-                   'Select distinct exact task identities for this operation')
-        D._require(set(requested) <= {task['id'] for task in tasks}, 'A selected task is outside the receiving queue')
-        tasks = [task for task in tasks if task['id'] in requested]
-    if operation == 'implement-next':
-        D._require(requested is None or len(requested) == 1, 'Implement Next selects one exact task')
-        tasks = sorted(tasks, key=lambda task: -task['priority'])[:1]
-    if operation.startswith('implement-'):
-        tasks = sorted(tasks, key=lambda task: -task['priority'])
-    limitations = []
-    if project.get('core_routing') == 'upgrade-project-installation':
-        limitations.append('upgrade-co-located-project-installation-through-project-setup')
-    if mode == 'director':
-        required_effect = {'intake':'intake', 'process':'process'}.get(operation, 'launch')
-        if required_effect not in project['allowed_effects']:
-            limitations.append(f'director-{required_effect}-not-authorized')
-        if operation != 'intake':
-            limitations.append('director-dispatch-requires-one-exact-task-per-assignment')
-    task_ids = [task['id'] for task in tasks]
-    required = D.WF.dependency_scope(all_tasks, {'snapshot':task_ids}) if operation.startswith('implement-') else set()
-    return {**summary, 'status':'preview', 'queue_sha256':D.WF.digest(text.encode()),
-            'task_ids':task_ids, 'required_dependency_ids':sorted(required - set(task_ids)),
-            'tasks':[{'id':task['id'], 'status':task['status'], 'depends_on':task['depends_on']} for task in tasks],
-            'limitations':limitations}
-
 
 
 def run(raw_root, command, request):
@@ -261,12 +218,18 @@ def run(raw_root, command, request):
         protect_storage(D._root(str(root)), apply=command == 'project-storage-prepare')
         return {'status':'ready'}
     settings, pkg = descriptor(root)
+    workspace = D.director_workspace(root)
     hosts = settings['providers']
     if command in ('project-menu', 'project-route'):
         products = projects(root)
         if command == 'project-route':
-            return route(root, products, request)
-        return {'director':str(root), 'workspace':str(root.parent), 'providers':hosts, 'projects':products,
+            current = D._inspect_profile(root)
+            receipt, digest = D._read(root, '.skill-tree/installation/profile.json')
+            D._require(current['kind'] == 'owned-profile' and current['sha256'] == digest and receipt == pkg,
+                       'Director routing profile changed during preview')
+            routing = D.WF.owned_module('director_workspace_routing', Path(__file__).with_name('director-project-routing.py'))
+            return routing.preview(D, root, workspace, settings, pkg, products, request)
+        return {'director':str(root), 'workspace':str(workspace), 'providers':hosts, 'projects':products,
                 'choices':['intake','status','audit','setup'] if products else ['existing','new','later']}
     B = D._bootstrap_helper()
     if command == 'project-init':
@@ -274,7 +237,7 @@ def run(raw_root, command, request):
             if not D.WS.runtime_file(root) or not D.WS.runtime_file(root).is_file() or not (root/'.git').is_dir():
                 ensure_project(root, root, 'existing', 'director', 'coordinator', hosts, pkg, B)
             D._inspect_owner(root)
-            protect_storage(root.parent)
+            protect_storage(workspace, home=root.relative_to(workspace))
         return {'status':'ready', 'director':str(root), 'providers':hosts}
     D._require(isinstance(request, dict), 'Supply a project choice using --input')
     name, path, flavor = locations(root, request)
@@ -310,8 +273,8 @@ def run(raw_root, command, request):
             baseline = D._setup_file_proofs(path)
             if not B.installation(path, installed, source_bundle, baseline, apply=False):
                 B.installation(path, installed, source_bundle, baseline, apply=True)
-        if path == root.parent:
-            protect_storage(path)
+        if path == workspace:
+            protect_storage(path, home=root.relative_to(path))
         child = registration_area(name, flavor, path, ['status','preview','audit','review','intake','process','launch'])
         canonical_source = registration_area('skill-tree-source', 'source-maintenance', source['checkout'],
                                             ['status','preview','audit','review','intake','process','launch'])

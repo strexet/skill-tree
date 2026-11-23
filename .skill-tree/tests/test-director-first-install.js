@@ -19,7 +19,7 @@ for (const webFirst of [true, false]) {
   test('Director and web have independent profiles with ' + (webFirst ? 'web' : 'Director') + ' installed first', t => {
     const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'director-first-')));
     t.after(() => fs.rmSync(root, {recursive:true, force:true}));
-    const home = path.join(root, '.skill-tree-director');
+    const home = path.join(root, '.skill-tree/.director');
     const read = (base, name) => fs.readFileSync(path.join(base, name), 'utf8');
     run('git', ['init', '-q', '-b', 'main', root], root);
     fs.writeFileSync(path.join(root,'index.html'), '<!DOCTYPE html>');
@@ -37,12 +37,13 @@ for (const webFirst of [true, false]) {
     const stdout = process.platform === 'win32' ? launch(...choice) : run('sh',[path.join(source, 'install.sh'),'--only','codex',...choice], root);
     assert.match(stdout,/Connect an existing project, create a new project, or continue later/);
     assert.equal(stdout.split('\n').length < 12, true);
+    assert.equal(fs.existsSync(path.join(root, '.skill-tree-director')), false);
     const excluded = read(root,'.git/info/exclude');
     assert.match(excluded,/^# Existing local comment without a trailing newline\r?\n/);
     assert.equal(read(root,'.gitignore'),'*.local\n');
-    assert.doesNotMatch(run('git',['status','--short','--untracked-files=all'],root),/\?\? \.skill-tree-director/);
+    assert.doesNotMatch(run('git',['status','--short','--untracked-files=all'],root),/\?\? \.skill-tree\/\.director/);
     run('git',['add','-A'],root);
-    assert.doesNotMatch(run('git',['ls-files'],root),/\.skill-tree-director/);
+    assert.doesNotMatch(run('git',['ls-files'],root),/\.skill-tree\/\.director/);
     launch('--flavor','director');
     assert.equal(read(root,'.git/info/exclude'),excluded);
     const director = JSON.parse(read(home, receipt));
@@ -71,7 +72,7 @@ for (const webFirst of [true, false]) {
       fs.writeFileSync(launcher,Buffer.concat([legacy,Buffer.from('Owner edit\n')]));
       assert.throws(() => launch('--flavor','director'),/launcher conflicts/);
       assert.match(fs.readFileSync(launcher,'utf8'),/Owner edit/);
-      fs.writeFileSync(launcher,legacy);
+      fs.writeFileSync(launcher,expected);
       launch('--flavor','director');
       assert.deepEqual(fs.readFileSync(launcher),expected);
     }
@@ -95,7 +96,7 @@ test('a nested new workspace can be previewed and created with the public launch
   assert.match(launch(['--dry-run']),/Director preview/);
   assert.deepEqual(fs.readdirSync(base),[]);
   assert.match(launch([]),/Director ready/);
-  assert.equal(JSON.parse(fs.readFileSync(path.join(root,'.skill-tree-director',receipt))).flavor,'director');
+  assert.equal(JSON.parse(fs.readFileSync(path.join(root,'.skill-tree/.director',receipt))).flavor,'director');
 });
 
 test('explicit low-level installation and repeated legacy Director verification keep the original owner', t => {
@@ -108,13 +109,13 @@ test('explicit low-level installation and repeated legacy Director verification 
   assert.equal(profile.flavor,'director');
   run(process.execPath,[...args,'--verify'],root);
   run(process.execPath,args,root);
-  assert.equal(fs.existsSync(path.join(root,'.skill-tree-director')),false);
+  assert.equal(fs.existsSync(path.join(root,'.skill-tree/.director')),false);
 });
 
 test('scoped Director uninstall preserves shared discovery, the remaining host and the service queue', t => {
   const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'director-host-removal-')));
   t.after(() => fs.rmSync(root,{recursive:true,force:true}));
-  const home = path.join(root,'.skill-tree-director');
+  const home = path.join(root,'.skill-tree/.director');
   const cli = path.join(source,'.skill-tree/bin/install.js');
   const launch = (...flags) => run(process.execPath,[cli,'--target',root,'--flavor','director',...flags],root);
   const read = (dir, name) => fs.readFileSync(path.join(dir,name),'utf8');
@@ -122,14 +123,19 @@ test('scoped Director uninstall preserves shared discovery, the remaining host a
   const menu = () => JSON.parse(run('python3',['-B',path.join(home,config().setup_entry),'project-menu',home],root));
   const shared = path.join(root,'.agents/skills/skill-tree-director/SKILL.md');
   const separate = path.join(root,'.claude/skills/skill-tree-director/SKILL.md');
+  const routingBlock = '<!-- BEGIN skill-tree-director-routing -->';
   run(process.execPath,[cli,'--target',root,'--only','codex','--flavor','web'],root);
   const original = read(root,receipt);
+  const originalAgents = fs.existsSync(path.join(root,'AGENTS.md')) ? read(root,'AGENTS.md') : null;
+  fs.writeFileSync(path.join(root, 'CLAUDE.md'), '');
   const wrongOwner = spawnSync(process.execPath,[cli,'--target',root,'--project','--only','codex',
     '--flavor','director','--uninstall'],{encoding:'utf8'});
   assert.notEqual(wrongOwner.status,0);
   assert.match(wrongOwner.stderr,/no ownership/);
   assert.equal(read(root,receipt),original);
   launch('--only','codex','--only','dsh','--only','claude-code');
+  assert.ok(read(root,'AGENTS.md').includes(routingBlock));
+  assert.ok(read(root,'CLAUDE.md').includes(routingBlock));
   const initial = config();
   const queue = read(home,'.skill-tree/documents/future.json');
   const sourceStore = path.join(home,'sources','local-work');
@@ -140,18 +146,22 @@ test('scoped Director uninstall preserves shared discovery, the remaining host a
   launch('--only','codex','--uninstall');
   assert.deepEqual(config().providers,['dsh','claude-code']);
   assert.equal(fs.existsSync(shared),true);
+  assert.ok(read(root,'AGENTS.md').includes(routingBlock));
   assert.deepEqual(menu().providers,config().providers);
   assert.match(launch('--only','codex','--uninstall'),/already absent/);
   launch('--only','dsh','--uninstall');
   assert.deepEqual(config().providers,['claude-code']);
   assert.equal(fs.existsSync(shared),false);
+  assert.equal(fs.existsSync(path.join(root,'AGENTS.md')) ? read(root,'AGENTS.md') : null, originalAgents);
   assert.equal(fs.existsSync(separate),true);
+  assert.ok(read(root,'CLAUDE.md').includes(routingBlock));
   assert.deepEqual(menu().providers,['claude-code']);
   assert.match(launch('--only','claude-code','--verify'),/Director verified/);
   launch('--only','claude-code','--uninstall');
   assert.deepEqual(config().providers,[]);
   assert.equal(config().setup_entry,null);
   assert.equal(fs.existsSync(separate),false);
+  assert.equal(read(root,'CLAUDE.md'), '');
   assert.match(launch('--only','claude-code','--uninstall'),/already absent/);
   assert.equal(read(sourceStore,'draft.md'),'retained work');
   assert.equal(read(home,'.skill-tree/documents/future.json'),queue);
@@ -171,12 +181,12 @@ test('linked product worktree excludes the service through the shared Git direct
   const launch = () => run(process.execPath,[path.join(source,'.skill-tree/bin/install.js'),'--only','codex',
     '--target',linked,'--flavor','director'],linked);
   launch();
-  const service = '.skill-tree-director';
-  assert.match(run('git',['check-ignore',service+'/'],linked),/skill-tree-director/);
-  assert.doesNotMatch(run('git',['status','--short','--untracked-files=all'],linked),/\?\? \.skill-tree-director/);
+  const service = '.skill-tree/.director';
+  assert.match(run('git',['check-ignore',service+'/'],linked),/skill-tree\/\.director/);
+  assert.doesNotMatch(run('git',['status','--short','--untracked-files=all'],linked),/\?\? \.skill-tree\/\.director/);
   run('git',['add','-f',service],linked);
   const index = run('git',['ls-files','-s'],linked);
-  assert.match(index,/\.skill-tree-director/);
+  assert.match(index,/\.skill-tree\/\.director/);
   assert.throws(launch,/overlaps tracked product files/);
   assert.equal(run('git',['ls-files','-s'],linked),index);
 });
@@ -187,11 +197,11 @@ test('higher-priority product Git rules block setup before creating service stor
   run('git',['init','-q','-b','main',root],root);
   const exclude=path.join(root,'.git/info/exclude'),ignore=path.join(root,'.gitignore');
   const original=fs.readFileSync(exclude);
-  fs.writeFileSync(ignore,'!/.skill-tree-director/\n');
+  fs.writeFileSync(ignore,'!/.skill-tree/.director/\n');
   const install=()=>run(process.execPath,[path.join(source,'.skill-tree/bin/install.js'),'--only','codex',
     '--target',root,'--flavor','director'],root);
   assert.throws(install,/Product Git ignore rules expose Director storage/);
   assert.deepEqual(fs.readFileSync(exclude),original);
-  assert.equal(fs.readFileSync(ignore,'utf8'),'!/.skill-tree-director/\n');
-  assert.equal(fs.existsSync(path.join(root,'.skill-tree-director')),false);
+  assert.equal(fs.readFileSync(ignore,'utf8'),'!/.skill-tree/.director/\n');
+  assert.equal(fs.existsSync(path.join(root,'.skill-tree/.director')),false);
 });
