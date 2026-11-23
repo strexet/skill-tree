@@ -45,7 +45,7 @@
     "sections": [
       {
         "id": "operation",
-        "text": "Use Force Process for an explicitly requested deep Pending pass. Read the [Force Process contract](references/force-process.md), [ordinary workflow](references/future-workflow.md) and [metadata](references/workflow-metadata.md). Freeze the exact selected Pending identities. Research material unknowns, establish runnable first work and record observable acceptance. Use the guarded ordinary Process Pending write path. Verify the result or reconcile interrupted acknowledgment from recorded evidence. Follow the ordinary next-action handoff after processing."
+        "text": "Use Force Process for an explicitly requested deep Pending pass. Read the [Force Process contract](references/force-process.md), [ordinary workflow](references/future-workflow.md) and [metadata](references/workflow-metadata.md). Freeze the exact selected Pending identities. Research material unknowns, establish runnable first work and record observable acceptance. Preview the exact proposal with the read-only Force Process command. Use the guarded ordinary Process Pending write path. Verify the resulting queue against the retained Preview and original receipt or reconcile interrupted acknowledgment from recorded evidence. Follow the ordinary next-action handoff after processing."
       },
       {
         "id": "decision-scope",

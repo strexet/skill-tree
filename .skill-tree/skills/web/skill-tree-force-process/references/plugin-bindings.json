@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "43199181058dc881f406674ac2a31b8047401f86cf96560c5985221569748ac7",
+  "identity": "53028fc1be1f5db849a92b0a0a32438478e8f85ce6c0d562b4d8af7b5f0b20d8",
   "operation": "skill-tree-force-process",
   "operations": {
     "skill-tree-3d": {
@@ -3289,11 +3289,11 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "c2d30d05f8d14c1280c8e7608b11b98ebf1c5737ce850792ba5a6fb0500c5b43",
+    "SKILL.md": "1db3f805a96a71102efa95b94d83f7c58db78b1c813538db02484d14c5788571",
     "agents/openai.yaml": "2c4663e28286a7c0413849481d3eaf3059029c6c3598a967c29cf18c17d2326e",
     "references/decision-governance.md": "68506301b32a58cbbcfc03fdeb62fed6875694f1f9b724749c7f79c26da0de80",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
-    "references/force-process.md": "e8af620e44c3db6655dc6e390659e2f9dbadf2c83a20d312948c7c7012ec07d5",
+    "references/force-process.md": "271c570df092e8289e58b193a6a117e464dcecf56d2870e0fdc3c72f008ed602",
     "references/future-workflow.md": "3a6bc83660773c23af11cf00eacb90ed618db701d464fd7fcd304d5d90fca50b",
     "references/history-retention.md": "ff3fa8602fa29085b59f0aa5ae9f9da698bd5b5d5672235fe809018b18b4b801",
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
@@ -3321,7 +3321,7 @@
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     "scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
-    "scripts/workflow-state.py": "f5b48a76e94c61a52a7530805e7423faf9ecc2c2dc56562033b475a6499b299d"
+    "scripts/workflow-state.py": "009c3f7aceb6f63172a4a3082c232e86e01d2ec0e9564bb055bdb6561be5901c"
   },
   "packages": {},
   "parameter_defaults": {},
