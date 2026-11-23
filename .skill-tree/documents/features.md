@@ -1,11 +1,12 @@
 # Current Features
 
-All four flavors expose the 22 shared operations below. The director flavor adds nine operations for cross-project coordination.
+All four flavors expose the 23 shared operations below. The director flavor adds nine operations for cross-project coordination.
 
 | Operation | Current responsibility |
 | --- | --- |
 | `skill-tree-add-pending-task` | Capture understood intent with identity, semantic classification and numeric priority. |
 | `skill-tree-process-future-pending` | Research selected Pending work and record scoped dispositions and dependencies. |
+| `skill-tree-force-process` | Research complex Pending work, define runnable first stages and verify scoped processing evidence. |
 | `skill-tree-clarify-tasks` | Refine exact tasks through researched question rounds, guarded revisions and current acceptance by the owner in Manual or a delegated agent in Auto. |
 | `skill-tree-implement-next-future-task` | Implement an exact or highest-priority eligible Prioritized task with acceptance evidence. |
 | `skill-tree-work-through-next` | Orchestrate one root and required dependencies through a retained checkpoint. |
