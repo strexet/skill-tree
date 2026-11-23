@@ -58,9 +58,8 @@ class SourceRepairControls(unittest.TestCase):
         self.repository(self.source, source=True)
         self.repository(self.product, source=False)
         self.install_old(self.product)
-        self.source_store = WF.Store(self.source, neutral=True)
+        self.prepare_source()
         self.product_store = WF.Store(self.product, neutral=True)
-        self.source_queue = WS.setup(self.source_store, {})['queue_id']
         self.product_queue = WS.setup(self.product_store, {})['queue_id']
         self.registry = D.DirectorRegistry(self.parent)
         declaration = {'director_id': 'repair-fixture', 'areas': [
@@ -70,6 +69,10 @@ class SourceRepairControls(unittest.TestCase):
         self.registry.apply({**declaration, 'expected_preview_sha256': self.registry.preview(declaration)['preview_sha256']})
         self.audit = AUDIT.DirectorAudit(self.registry)
         self.repair = REPAIR.DirectorSourceRepair(self.registry, self.audit)
+
+    def prepare_source(self):
+        self.source_store = WF.Store(self.source, neutral=True)
+        self.source_queue = WS.setup(self.source_store, {})['queue_id']
 
     def file(self, root, relative, data):
         path = root / relative

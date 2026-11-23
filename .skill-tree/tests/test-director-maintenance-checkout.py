@@ -1,7 +1,7 @@
 """Check Director maintenance ownership and publication ancestry against a local Git upstream."""
 import hashlib
 import importlib.util
-import json
+import os
 from pathlib import Path
 import subprocess
 import tempfile
@@ -109,6 +109,63 @@ class MaintenanceCheckoutTests(unittest.TestCase):
         self.assertEqual((project / 'README.md').read_bytes(), content)
         self.assertEqual(self.git(Path(second['project_checkout']), 'rev-parse', 'HEAD'), second['base_commit'])
         self.assertEqual(self.git(self.seed, 'rev-parse', 'HEAD'), first['base_commit'])
+
+    def test_host_settings_are_validated_and_only_passed_to_upstream_transport(self):
+        environment = {key: value for key, value in os.environ.items() if not key.startswith('GIT_CONFIG_')}
+        environment.update(GIT_CONFIG_COUNT='1', GIT_CONFIG_KEY_0='credential.https://github.com.useHttpPath',
+                           GIT_CONFIG_VALUE_0='true')
+        process = subprocess.run
+        seen = []
+        def observe(command, **kwargs):
+            if 'core.hooksPath=' + os.devnull in command and (command[-1] == 'HEAD' or 'clone' in command):
+                child = kwargs.get('env', os.environ)
+                seen.append(('clone' in command, 'GIT_CONFIG_COUNT' in child))
+            return process(command, **kwargs)
+        with patch.dict(os.environ, environment, clear=True), patch.object(subprocess, 'run', side_effect=observe):
+            result = maintenance.prepare(self.service, 'tool')
+            self.assertEqual(maintenance.inspect(self.service, 'tool'), result)
+        self.assertIn((True, True), seen)
+        self.assertIn((False, False), seen)
+        self.assertNotIn((False, True), seen)
+        environment.update(GIT_CONFIG_KEY_0='core.hooksPath', GIT_CONFIG_VALUE_0=str(self.root / 'foreign'))
+        with patch.dict(os.environ, environment, clear=True):
+            with self.assertRaisesRegex(ValueError, 'Unsupported inherited Git setting'):
+                maintenance.inspect(self.service, 'tool')
+            with self.assertRaisesRegex(ValueError, 'Unsupported inherited Git setting'):
+                maintenance.prepare(self.service, 'new-project')
+            with self.assertRaisesRegex(ValueError, 'Unsupported inherited Git setting'):
+                maintenance.integrate(self.service, 'tool', expected_head='1'*40, candidate_commit='2'*40,
+                                      reviewed_paths={'README.md': '0'*64},
+                                      owner={'actor':'owner','kind':'owner-message','reference':'approved'})
+        self.assertFalse((self.service/'sources/projects/new-project').exists())
+
+    def test_global_rewrite_and_distinct_push_endpoint_are_rejected(self):
+        config_home = self.root / 'user-settings'
+        config = config_home / 'git/config'
+        config.parent.mkdir(parents=True)
+        alternate = (self.root / 'other').as_uri()
+        subprocess.run(['git', 'config', '--file', str(config), 'url.' + alternate + '.insteadOf', self.seed.as_uri()],
+                       check=True, capture_output=True)
+        with patch.dict(os.environ, {'XDG_CONFIG_HOME': str(config_home)}):
+            with self.assertRaisesRegex(ValueError, 'effective upstream'):
+                maintenance.prepare(self.service, 'game')
+        self.assertFalse((self.service/'sources/skill-tree').exists())
+        subprocess.run(['git','config','--file', str(config),'--unset-all','url.' + alternate + '.insteadOf'],check=True)
+        subprocess.run(['git','config','--file', str(config),'url.' + alternate + '.pushInsteadOf',self.seed.as_uri()],check=True)
+        with patch.dict(os.environ, {'XDG_CONFIG_HOME': str(config_home)}):
+            with self.assertRaisesRegex(ValueError, 'effective upstream'):
+                maintenance.prepare(self.service, 'game')
+        self.assertFalse((self.service/'sources/skill-tree').exists())
+        result = maintenance.prepare(self.service, 'game')
+        checkout = Path(result['checkout'])
+        with patch.dict(os.environ, {'XDG_CONFIG_HOME': str(config_home)}):
+            with self.assertRaisesRegex(ValueError, 'effective upstream'):
+                maintenance.inspect(self.service, 'game')
+            with self.assertRaisesRegex(ValueError, 'effective upstream'):
+                maintenance.prepare(self.service, 'another')
+        self.git(checkout, 'remote', 'set-url', '--push', 'upstream', alternate)
+        with self.assertRaisesRegex(ValueError, 'effective upstream'):
+            maintenance.inspect(self.service, 'game')
 
     def test_retry_after_reserved_branch_recovers_the_original_worktree(self):
         original = maintenance.git

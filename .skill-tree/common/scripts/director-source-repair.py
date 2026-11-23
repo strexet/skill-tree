@@ -321,6 +321,9 @@ class DirectorSourceRepair:
         if maintenance:
             D._require(work['base_branch'] == maintenance['branch'] and work.get('local_base') is True,
                        'Use the registered local project maintenance branch as the source base')
+            remote = _load_module('director-maintenance').inspect(self.registry.root, maintenance['project_id'])['remote']
+            D._require(work.get('remote', remote) == remote, 'Use the registered upstream remote for this project source repair')
+            work = {**work, 'remote': remote}
         return self._deliver(case, root, 'start', {**work, 'expected_source_hash': payload['expected_source_hash']},
                              {'mode': 'next', 'selector': task, 'limits': None})
 

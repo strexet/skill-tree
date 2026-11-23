@@ -40,9 +40,17 @@ def writer(path):
 
 def git(root, *args):
     """Git output and failure text are bounded to avoid exposing transport credentials."""
-    command = D.WS.local_git_args(root, '-c', 'core.hooksPath=' + os.devnull, *args)
+    environment = D.WS.local_git_environment()
+    transport = args[0] in ('clone', 'fetch')
+    if transport:
+        # An explicitly selected upstream may use the host's validated, URL-scoped credentials.
+        environment = os.environ.copy()
+    # The canonical URL already names the repository endpoint. Keep the HTTP
+    # request on that endpoint even if unrelated host defaults allow redirects.
+    http = ('-c', 'http.followRedirects=false', '-c', 'http.' + UPSTREAM + '.followRedirects=false') if transport else ()
+    command = D.WS.local_git_args(root, '-c', 'core.hooksPath=' + os.devnull, *http, *args)
     try:
-        result = subprocess.run(command, capture_output=True, text=True, timeout=240 if args[0] in ('clone','fetch') else 45)
+        result = subprocess.run(command, env=environment, capture_output=True, text=True, timeout=240 if transport else 45)
     except subprocess.TimeoutExpired as error:
         raise ValueError('The maintenance Git operation timed out: ' + args[0]) from error
     if result.returncode:
@@ -71,7 +79,14 @@ def owned(root):
                and git(root, 'rev-parse', 'HEAD') == state.get('revision')
                and git(root, 'config', '--local', '--get-all', 'remote.' + REMOTE + '.url') == UPSTREAM,
                'The registered maintenance checkout or upstream changed')
+    verify_endpoints(root)
     return state
+
+
+def verify_endpoints(repository, *options):
+    for mode in ((), ('--push',)):
+        effective = git(repository, *options, 'remote', 'get-url', '--all', *mode, REMOTE).splitlines()
+        D._require(effective == [UPSTREAM], 'The effective upstream URL differs from the registered Skill Tree repository')
 
 
 def qualify(root, state):
@@ -122,10 +137,18 @@ catch { manager.refresh(root, source); manager.verify(root, source); }
 
 def provision(root):
     if not root.exists():
+        effective = git(root.parent, 'ls-remote', '--get-url', '--', UPSTREAM)
+        D._require(effective == UPSTREAM, 'The effective upstream URL differs from the canonical Skill Tree repository')
         with tempfile.TemporaryDirectory(prefix='.maintenance-', dir=root.parent) as directory:
+            # Resolve the push endpoint in a fresh local repository before any
+            # transfer. Git applies pushInsteadOf independently of fetch rewrites.
+            probe = Path(directory) / 'probe.git'
+            git(root.parent, 'init', '--bare', '--template=', str(probe))
+            verify_endpoints(probe, '-c', 'remote.' + REMOTE + '.url=' + UPSTREAM)
             staged = Path(directory) / 'clone'
             git(root.parent, 'clone', '--no-local', '--no-tags', '--single-branch', '--branch', BASE,
                 '--origin', REMOTE, '--', UPSTREAM, str(staged))
+            verify_endpoints(staged)
             state = {'schema': 1, 'upstream': UPSTREAM, 'checkout': str(root),
                      'revision': git(staged, 'rev-parse', 'HEAD'), 'projects': {}}
             D.WS.atomic(staged / '.git' / MARKER, state)
@@ -220,6 +243,7 @@ def integrate(director_root, project_id, *, expected_head, candidate_commit, rev
         D._require(isinstance(oid, str) and re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', oid),
                    'Select exact full Git object IDs for the original branch and reviewed source commit')
     root, project = paths(director_root, project_id)
+    D.WS.local_git_environment()
     with writer(root.parent / '.maintenance.lock'):
         scope = inspect(director_root, project_id)
         checked_paths(root, expected_head, candidate_commit, reviewed_paths)

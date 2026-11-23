@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import subprocess
 import unittest
+from unittest.mock import patch
 
 fixture = Path(__file__).with_name('test-director-source-repair.py')
 spec = importlib.util.spec_from_file_location('fixture', fixture)
@@ -29,6 +30,26 @@ class WrongCount(f.SourceRepairControls):
         self.git(root, '-c', 'user.name=Director Fixture', '-c', 'user.email=fixture@example.invalid',
                  'commit', '-m', 'Record the fixture version for this check')
 
+    def prepare_source(self):
+        # A local transport stands in for GitHub; queue, registry, evidence,
+        # branch resolution, candidate archive and Git integration run normally.
+        upstream = self.source
+        maintenance = f.load('director-maintenance')
+        maintenance.UPSTREAM = upstream.as_uri()
+        real_load = f.REPAIR._load_module
+        def load(name):
+            return maintenance if name == 'director-maintenance' else real_load(name)
+        substitute = patch.object(f.REPAIR, '_load_module', side_effect=load)
+        substitute.start()
+        self.addCleanup(substitute.stop)
+        self.project_source = maintenance.prepare(self.parent, 'project')
+        self.sibling_source = maintenance.prepare(self.parent, 'sibling')
+        self.source = Path(self.project_source['checkout'])
+        self.source_store = f.WF.Store(self.source, neutral=True)
+        self.source_queue = self.project_source['queue_id']
+        self.git(self.source, 'config', 'user.name', 'Fixture')
+        self.git(self.source, 'config', 'user.email', 'fixture@example.invalid')
+
     def observe(self, worktree, subject, attempt, relative):
         result = subprocess.run(attempt['recipe']['argv'], cwd=worktree, capture_output=True, text=True, check=True)
         count, = [row for row in result.stdout.splitlines() if row.startswith('included: ')]
@@ -46,6 +67,11 @@ class WrongCount(f.SourceRepairControls):
     def test_wrong_count_from_installed_run_routes_rechecks_and_freezes(self):
         request = self.observed_finding()
         preview = self.repair.preview(request)
+        binding = preview['plan']['maintenance']
+        self.assertEqual(binding['project_id'], 'project')
+        self.assertEqual(binding['branch'], self.project_source['branch'])
+        self.assertEqual(binding['product_queue_id'], self.product_queue)
+        self.assertEqual(binding['source_queue_id'], self.source_queue)
         source = preview['plan']['finding']['scope']['source_path']
         self.assertEqual(source, f.REPAIR.SOURCE)
         self.assertEqual(preview['plan']['finding']['symptom'], 'zero-documents')
@@ -75,7 +101,7 @@ class WrongCount(f.SourceRepairControls):
         action = {'repair_id': repair_id, 'owner': f.OWNER}
         task, = self.repair.process({**action, 'pending_id': pending,
             'expected_source_hash': f.WF.file_hash(self.source_store.future)})['result']['created_ids']
-        work = self.workspace('fix-count')
+        work = {**self.workspace('fix-count'), 'base_branch': binding['branch']}
         run = self.repair.start({**action, 'task_id': task, 'workspace': work,
             'expected_source_hash': f.WF.file_hash(self.source_store.future)})['result']
         store = f.WF.Store(self.source, run_id=run['id'])
@@ -102,6 +128,26 @@ class WrongCount(f.SourceRepairControls):
         self.assertEqual(candidate['review']['after_sha256'], f.WF.file_hash(subject))
         self.assertEqual(self.repair.candidate_apply({'request': candidate_request,
                          'expected_candidate_sha256': candidate['candidate_sha256']}), candidate)
+
+        selected_tree = Path(self.project_source['project_checkout'])
+        sibling = Path(self.sibling_source['project_checkout'])
+        before = self.git(selected_tree, 'rev-parse', 'HEAD')
+        sibling_before = self.git(sibling, 'rev-parse', 'HEAD')
+        product_before = self.git(self.product, 'status', '--porcelain'), self.git(self.product, 'rev-parse', 'HEAD')
+        handoff = {**action, 'candidate_sha256': candidate['candidate_sha256']}
+        with self.assertRaisesRegex(ValueError, 'Authorize integration'):
+            self.repair.run('repair-integrate', {**handoff, 'owner': {**f.OWNER, 'actor': 'another-owner'}})
+        self.assertEqual(self.git(selected_tree, 'rev-parse', 'HEAD'), before)
+        receipt = self.repair.run('repair-integrate', handoff)
+        self.assertTrue(receipt['applied'])
+        self.assertEqual(receipt['commit'], self.git(selected_tree, 'rev-parse', 'HEAD'))
+        self.assertEqual(receipt['base_commit'], before)
+        self.assertEqual(self.git(selected_tree, 'diff', '--name-only', before, 'HEAD'), source)
+        self.assertEqual((selected_tree / source).read_bytes(), subject.read_bytes())
+        self.assertEqual(self.repair.run('repair-integrate', handoff), receipt)
+        self.assertEqual(self.git(sibling, 'rev-parse', 'HEAD'), sibling_before)
+        self.assertIn(self.defect, (sibling / source).read_bytes())
+        self.assertEqual((self.git(self.product, 'status', '--porcelain'), self.git(self.product, 'rev-parse', 'HEAD')), product_before)
 
 
 def load_tests(loader, tests, pattern):
