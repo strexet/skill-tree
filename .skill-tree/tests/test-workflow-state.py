@@ -316,6 +316,125 @@ class WorkflowStateTests(unittest.TestCase):
         a=self.pending();before=self.store.future.read_bytes()
         with self.assertRaises(wf.WorkflowError):wf.process(self.store,{'selectors':[a['id'],'Missing task'],'dispositions':{}})
         self.assertEqual(before,self.store.future.read_bytes())
+    def test_force_process_cli_verifies_twice_using_the_linked_develop_queue(self):
+        chosen = self.pending('Chosen')
+        kept = self.pending('Kept')
+        other = self.pending('Unrelated')
+
+        def git(*args):
+            subprocess.run(['git', *args], cwd=self.root, check=True, capture_output=True)
+
+        git('init', '-b', 'main')
+        git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.com',
+            'commit', '--allow-empty', '-m', 'Create canonical queue fixture')
+        wf.workspaces.setup(self.store, {})
+        linked = self.root/'linked'
+        git('worktree', 'add', '-b', 'develop', str(linked))
+        stale_copy = linked/'.skill-tree/documents/future.md'
+        stale_copy.parent.mkdir(parents=True)
+        stale_copy.write_text('Noncanonical queue copy.\n')
+        self.store.future.write_bytes(self.store.future.read_bytes().replace(b'\n', b'\r\n'))
+        proposal_file = self.root/'proposal.json'
+        preview_file = self.root/'preview.json'
+        receipt_file = self.root/'receipt.json'
+        proposal = {'selectors':[chosen['id'], kept['id']],
+                    'expected_source_hash':wf.file_hash(self.store.future),
+                    'dispositions':{chosen['id']:{'status':'promoted','reason':'Start useful work.'},
+                                    kept['id']:{'status':'retained','reason':'An owner choice is pending.'}},
+                    'tasks':[self.spec(chosen, 'Prepare the example', 'example', ['@inputs']),
+                             self.spec(chosen, 'Identify the inputs', 'inputs')]}
+        proposal_file.write_text(json.dumps(proposal))
+        def queue_bytes():
+            return self.store.future.read_bytes(), self.store.state.read_bytes(), stale_copy.read_bytes()
+
+        def command(name, *args, expected=0):
+            result = subprocess.run([sys.executable, str(ROOT/'skills/general/skill-tree-force-process/scripts/workflow-state.py'),
+                name, str(linked), '--input', str(proposal_file), *args], check=False, capture_output=True, text=True)
+            self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
+            return result.stdout
+
+        before = queue_bytes()
+        preview_file.write_text(command('force-process-preview'))
+        self.assertEqual(queue_bytes(), before)
+        preview = json.loads(preview_file.read_text())
+        self.assertEqual(preview['canonical_queue'], str(self.store.future))
+        self.assertEqual(preview['source_hash'], wf.digest(before[0]))
+        self.assertNotIn(other['id'], preview['changes'])
+        receipt_file.write_text(command('process', '--standalone'))
+        receipt = json.loads(receipt_file.read_text())
+        self.store.future.write_bytes(self.store.future.read_bytes().replace(b'\n', b'\r\n'))
+        post = queue_bytes()
+        self.assertNotEqual(post[:2], before[:2])
+        self.assertEqual(post[2], before[2])
+        preview_hash = wf.file_hash(preview_file)
+        flags = ('--preview', str(preview_file), '--receipt', str(receipt_file),
+                 '--expected-preview-sha256', preview_hash)
+        first = command('force-process-verify', *flags)
+        self.assertEqual(queue_bytes(), post)
+        self.assertEqual(command('force-process-verify', *flags), first)
+        self.assertEqual(queue_bytes(), post)
+        verified = json.loads(first)
+        self.assertEqual(verified['processing_id'], receipt['id'])
+        self.assertEqual(verified['receipt_sha256'], wf.file_hash(receipt_file))
+        self.assertTrue(verified['processing_id_observed_in_tasks'])
+        self.assertIn(kept['id'], {row['id'] for row in wf.parse(self.store.text())})
+        self.assertIn(other['id'], {row['id'] for row in wf.parse(self.store.text())})
+
+        original = receipt_file.read_bytes()
+        receipt_file.write_text(json.dumps({**receipt, 'id':wf.identity('PR')}))
+        self.assertIn('scoped result differs', command('force-process-verify', *flags, expected=2))
+        self.assertEqual(queue_bytes(), post)
+        receipt_file.write_bytes(original)
+        receipt_file.write_text(json.dumps({**receipt, 'clarification_sessions':{receipt['created_ids'][0]:'CL-fixture'}}))
+        self.assertIn('plugin-derived clarification', command('force-process-verify', *flags, expected=2))
+        self.assertEqual(queue_bytes(), post)
+        receipt_file.write_bytes(original)
+        proposal_file.write_text(json.dumps(proposal, indent=2))
+        self.assertIn('does not match the proposal', command('force-process-verify', *flags, expected=2))
+        self.assertEqual(queue_bytes(), post)
+        proposal_file.write_text(json.dumps(proposal))
+
+        text = self.store.text()
+        with self.store.lock():
+            self.store.save(text.replace('Goal:\n- Preserve isolated state.',
+                                         'Goal:\n- Preserve changed isolated state.', 1), self.store.load(text))
+        drift = queue_bytes()
+        self.assertIn('scoped result differs', command('force-process-verify', *flags, expected=2))
+        self.assertEqual(queue_bytes(), drift)
+        live = {row['id']: row for row in wf.parse(self.store.text())}
+        for provisional, actual in zip(preview['provisional_receipt']['created_ids'], receipt['created_ids']):
+            preview['changes'][provisional]['content_sha256'] = wf.force_process_contract(live[actual])['content_sha256']
+        preview_file.write_text(json.dumps(preview))
+        self.assertIn('matching reviewed Preview SHA-256', command('force-process-verify', *flags, expected=2))
+        self.assertEqual(queue_bytes(), drift)
+        self.assertIn('canonical queue hash', command('force-process-preview', expected=2))
+        self.assertEqual(queue_bytes(), drift)
+
+    def test_force_process_verify_checks_reused_tasks_and_resolved_items(self):
+        existing = self.main('Existing route')
+        reused = self.pending('Reuse the route')
+        resolved = self.pending('Resolve a duplicate')
+        proposal_file = self.root/'proposal.json'
+        preview_file = self.root/'preview.json'
+        receipt_file = self.root/'receipt.json'
+        proposal = {'selectors':[reused['id'], resolved['id']],
+                    'expected_source_hash':wf.file_hash(self.store.future),
+                    'dispositions':{reused['id']:{'status':'promoted','reason':'Reuse the existing route.'},
+                                    resolved['id']:{'status':'resolved','reason':'No implementation is required.'}},
+                    'tasks':[{'key':'existing-route','reuse_id':existing['id'],
+                              'parent_pending_ids':[reused['id']]}]}
+        proposal_file.write_text(json.dumps(proposal))
+        preview = wf.force_process_evidence(self.store, 'force-process-preview', proposal_file, None, None)
+        self.assertEqual(preview['provisional_receipt']['created_ids'], [])
+        self.assertIsNone(preview['changes'][resolved['id']])
+        preview_file.write_text(json.dumps(preview))
+        receipt = wf.process(self.store, proposal)
+        receipt_file.write_text(json.dumps(receipt))
+        verified = wf.force_process_evidence(self.store, 'force-process-verify', proposal_file, preview_file, receipt_file,
+                                           wf.file_hash(preview_file))
+        self.assertEqual(verified['reused_ids'], [existing['id']])
+        self.assertTrue(verified['processing_id_observed_in_tasks'])
+
     def test_split_and_merge_provenance(self):
         a=self.pending('Split');receipt=wf.process(self.store,{'selectors':[a['id']],'dispositions':{a['id']:{'status':'promoted','reason':'Two bounded units.'}},'tasks':[{'title':title,'body':self.body(),'parent_pending_ids':[a['id']]} for title in ['Unit A','Unit B']]})
         self.assertEqual(len(receipt['created_ids']),2)

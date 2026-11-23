@@ -6044,7 +6044,7 @@
     ".skill-tree/common/references/director-workflow.md": "c659120787d0f2dcad75196151c30371046d0256b1bd8700de817b7accebc99e",
     ".skill-tree/common/references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     ".skill-tree/common/references/documentation-output-contract.md": "2aca95b856ba3813171cc64c80f9f1d88cbfa9788703df7cd4497032adbfbfab",
-    ".skill-tree/common/references/force-process.md": "e8af620e44c3db6655dc6e390659e2f9dbadf2c83a20d312948c7c7012ec07d5",
+    ".skill-tree/common/references/force-process.md": "271c570df092e8289e58b193a6a117e464dcecf56d2870e0fdc3c72f008ed602",
     ".skill-tree/common/references/full-cycle.md": "d8d73bac4991f342a2e96cec3fcacd03f197b8c51c5e52d1f2acabfc77712267",
     ".skill-tree/common/references/future-workflow.md": "3a6bc83660773c23af11cf00eacb90ed618db701d464fd7fcd304d5d90fca50b",
     ".skill-tree/common/references/game-design-atlas.md": "453a6d8ffd8f66a4233677c22dba3efae509e216a744050dcc316629cd934401",
@@ -6175,7 +6175,7 @@
     ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     ".skill-tree/common/scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
     ".skill-tree/common/scripts/validate-repository-documentation.py": "99a7cf90c80f2e6fa5c2b2641e63de281076ec952b74b20807ade38576f10fb4",
-    ".skill-tree/common/scripts/workflow-state.py": "f5b48a76e94c61a52a7530805e7423faf9ecc2c2dc56562033b475a6499b299d",
+    ".skill-tree/common/scripts/workflow-state.py": "009c3f7aceb6f63172a4a3082c232e86e01d2ec0e9564bb055bdb6561be5901c",
     ".skill-tree/config/capabilities.json": "7213710d95b954beb121c20e177edec9c7deab27f509154b8fb61f3c03f01a04",
     ".skill-tree/config/flavors.json": "be32fe57a28c65242076655e593d2e8bb84a78d80e0eefe226f303c409cb0a9a",
     ".skill-tree/config/plugin-catalog-eligibility.json": "92a81b29135aaf8deb94c86f56481dfaa5fe9b543ab461c492aceab56efe1042",
@@ -6253,7 +6253,7 @@
     ".skill-tree/scripts/validate-skill-repository.py": "5cd81850dfa3f52ca92abf69f5110c497491e9c07b0f039451a9df7a2b3b8faa",
     ".skill-tree/src/init-rules/skill-tree-skills.md": "2c68aa5bde8a1a4d7cc6630ff670843fc190b58eff729c7d66573fc955b117d2",
     ".skill-tree/templates/invariants.json": "ee0c2c5445e7408cc15fd4aed231ff7d0c38a07d063061f75bfeea3da8971903",
-    ".skill-tree/templates/operations.json": "3bfc7a1f8e97c493da00740db1cd0fddd8909816118cac1d42a5872c264e7a16"
+    ".skill-tree/templates/operations.json": "ce820ceb8f9e6b4746647df17e6e462fffc93405cd9ffc35def6c0799a3def6e"
   },
   "state": ".skill-tree/documents/future.json",
   "validation_commands": [
