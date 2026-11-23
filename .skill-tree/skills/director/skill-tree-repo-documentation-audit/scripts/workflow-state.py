@@ -4491,29 +4491,40 @@ def clarification_mutate(store,command,payload):
         return clarification_write(store,record,writes)
 
 
-SHARED_WORKSPACE_ROUTING = 1
+SHARED_WORKSPACE_ROUTING = 2
 
 
 def guard_shared_project(store):
     """Require an explicit direct route within a registered shared workspace."""
-    if store.source_root != store.root:
+    homes = [store.source_root / '.skill-tree/.director', store.source_root / '.skill-tree-director']
+    retained = []
+    for home in homes:
+        if home.is_symlink() or home.parent.is_symlink():
+            raise WorkflowError('Resolve the unsafe shared Director storage path before selecting a queue')
+        marker = home / '.director-relocation.json'
+        if marker.exists() or marker.is_symlink():
+            raise WorkflowError('Finish the retained Director storage migration before selecting a queue')
+        descriptor = home / 'workspace.json'
+        if descriptor.is_symlink():
+            raise WorkflowError('Resolve the unsafe shared Director workspace descriptor')
+        if descriptor.is_file() or binding_path(home, '.skill-tree/director/registry.json').is_file():
+            retained.append(home)
+    if not retained:
         return
-    home = store.root / '.skill-tree-director'
+    if len(retained) != 1:
+        raise WorkflowError('Resolve conflicting shared Director storage locations before selecting a queue')
+    home, = retained
     descriptor = home / 'workspace.json'
-    if home.is_symlink() or descriptor.is_symlink() or not descriptor.is_file():
-        return
-    workspace = json.loads(descriptor.read_bytes())
-    if (not isinstance(workspace, dict) or workspace.get('schema') != 1
-            or workspace.get('kind') != 'director-workspace' or not workspace.get('providers')):
+    workspace = json.loads(descriptor.read_bytes()) if descriptor.is_file() else None
+    valid_descriptor = (isinstance(workspace, dict) and workspace.get('schema') == 1
+                        and workspace.get('kind') == 'director-workspace' and isinstance(workspace.get('providers'), list))
+    if valid_descriptor and not workspace['providers']:
         return
 
     def read(relative):
         path = binding_path(home, relative)
         return json.loads(path.read_bytes()) if path.is_file() else {}
 
-    profile = read('.skill-tree/installation/profile.json')
-    if profile.get('flavor') != 'director' or profile.get('project_root') != str(home):
-        return
     registry = read('.skill-tree/director/registry.json')
     if not registry:
         return
@@ -4524,6 +4535,11 @@ def guard_shared_project(store):
              if area['role'] != 'source-maintenance' and area['scope'] == '.'
              and bindings['queues'].get(area['queue_id'], {}).get('root') == str(store.root)]
     if areas:
+        if not valid_descriptor:
+            raise WorkflowError('Repair the registered shared Director descriptor or explicitly select --direct-project')
+        profile = read('.skill-tree/installation/profile.json')
+        if profile.get('flavor') != 'director' or profile.get('project_root') != str(home):
+            raise WorkflowError('Repair the registered shared Director profile or explicitly select --direct-project')
         choices = ', '.join(f"{area['id']} ({area['queue_id']})" for area in sorted(areas, key=lambda item: item['id']))
         raise WorkflowError(
             f'Director owns the default route for this shared folder: {choices}. '

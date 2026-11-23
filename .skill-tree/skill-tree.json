@@ -548,6 +548,7 @@
         ".skill-tree/skills/director/skill-tree-director-audit/scripts/runtime/common/scripts/director-run.py",
         ".skill-tree/skills/director/skill-tree-director-audit/scripts/runtime/common/scripts/director-source-repair.py",
         ".skill-tree/skills/director/skill-tree-director-audit/scripts/runtime/common/scripts/director-state.py",
+        ".skill-tree/skills/director/skill-tree-director-audit/scripts/runtime/common/scripts/director-workspace-audit.py",
         ".skill-tree/skills/director/skill-tree-director-audit/scripts/runtime/common/scripts/narrative-state.py",
         ".skill-tree/skills/director/skill-tree-director-audit/scripts/runtime/common/scripts/plugin-invocation.py",
         ".skill-tree/skills/director/skill-tree-director-audit/scripts/runtime/common/scripts/plugin-processing.py",
@@ -555,6 +556,8 @@
         ".skill-tree/skills/director/skill-tree-director-audit/scripts/runtime/common/scripts/run-workspaces.py",
         ".skill-tree/skills/director/skill-tree-director-audit/scripts/runtime/common/scripts/task-grouping-migration.py",
         ".skill-tree/skills/director/skill-tree-director-audit/scripts/runtime/common/scripts/validate-document-rules.py",
+        ".skill-tree/skills/director/skill-tree-director-audit/scripts/runtime/common/scripts/validate-future-document.py",
+        ".skill-tree/skills/director/skill-tree-director-audit/scripts/runtime/common/scripts/validate-repository-documentation.py",
         ".skill-tree/skills/director/skill-tree-director-audit/scripts/runtime/common/scripts/workflow-state.py",
         ".skill-tree/skills/director/skill-tree-director-audit/scripts/runtime/lib/api-contract-locks.js",
         ".skill-tree/skills/director/skill-tree-director-audit/scripts/runtime/lib/composer.js",
@@ -1032,6 +1035,7 @@
         ".skill-tree/skills/director/skill-tree-director-setup/scripts/runtime/common/scripts/director-objectives.py",
         ".skill-tree/skills/director/skill-tree-director-setup/scripts/runtime/common/scripts/director-plan-adapters.py",
         ".skill-tree/skills/director/skill-tree-director-setup/scripts/runtime/common/scripts/director-plans.py",
+        ".skill-tree/skills/director/skill-tree-director-setup/scripts/runtime/common/scripts/director-project-routing.py",
         ".skill-tree/skills/director/skill-tree-director-setup/scripts/runtime/common/scripts/director-project-setup.py",
         ".skill-tree/skills/director/skill-tree-director-setup/scripts/runtime/common/scripts/director-questions.py",
         ".skill-tree/skills/director/skill-tree-director-setup/scripts/runtime/common/scripts/director-run.py",
@@ -5504,6 +5508,11 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/common/scripts/director-project-routing.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/common/scripts/director-project-setup.py",
       "role": "canonical"
     },
@@ -5525,6 +5534,16 @@
     {
       "owner": "skill-tree",
       "path": ".skill-tree/common/scripts/director-state.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/scripts/director-workspace-audit.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/scripts/director-workspace-migration.py",
       "role": "canonical"
     },
     {
@@ -5640,6 +5659,11 @@
     {
       "owner": "skill-tree",
       "path": ".skill-tree/lib/director-canary.js",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/lib/director-routing-bridge.js",
       "role": "canonical"
     },
     {
@@ -5878,7 +5902,7 @@
   "role": "source",
   "source_digests": {
     ".skill-tree/bin/compose.js": "a76cc67f569a0eed011baff1fa3f0a75354263af8ab67493a09005a399f134b4",
-    ".skill-tree/bin/install.js": "1ac9e06b828cbca58f28bc8f14035efb3db9a8d86165260c57ea57908238b4e0",
+    ".skill-tree/bin/install.js": "18c6a274e7d44670f191d10b9338904343db299903b57e941ea25a90aa19e652",
     ".skill-tree/common/references/3d-authoring-roles.md": "9983b41a3b78f7a359cf10572ba42a30bae63629661f7ee13c5a471d572306f9",
     ".skill-tree/common/references/3d-stages.md": "67b77d81119767a7a848795563b2d2cf29d0c06db98e39411917700c2feafb35",
     ".skill-tree/common/references/3d-unity-roles.md": "a2dfd76eab6f4d4565007cfcdc6009b4aa3583642cede908d12f6c7cbf04fd75",
@@ -5886,7 +5910,7 @@
     ".skill-tree/common/references/3d-workshop-roles.md": "ed3cd2f786a61bb9a76ff4dfa2141ded4d43852c11ab8dfe6d11afe95bb8c8af",
     ".skill-tree/common/references/decision-governance.md": "52f8dc84c7cae4b9aa3aaa010d3ffb605ab79f5d75aaa36b9370d51e49305222",
     ".skill-tree/common/references/development-practices.md": "352a45b093f2c53b7b08aef045a098880af74c6add6fb79f95017a52fd0e0780",
-    ".skill-tree/common/references/director-workflow.md": "d1b6706fffa0a45f59684610cc95c5b699e94b38d6647c6092bf5d713912185f",
+    ".skill-tree/common/references/director-workflow.md": "d9445bd199356a9c3d3b7f983c548e0a7665d85a1521146717b6c37f5568668d",
     ".skill-tree/common/references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     ".skill-tree/common/references/documentation-output-contract.md": "2aca95b856ba3813171cc64c80f9f1d88cbfa9788703df7cd4497032adbfbfab",
     ".skill-tree/common/references/full-cycle.md": "d8d73bac4991f342a2e96cec3fcacd03f197b8c51c5e52d1f2acabfc77712267",
@@ -5992,7 +6016,7 @@
     ".skill-tree/common/scripts/create-documentation-snapshot.py": "612aea11e766621747490ddeb13dd24e980cdd30c499d0756635b1c3cce1df93",
     ".skill-tree/common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     ".skill-tree/common/scripts/decision-orchestration.py": "d2c5ac475033ae06321fc7917ddf96232a0e442bef7c5db537891e12164fd404",
-    ".skill-tree/common/scripts/director-audit.py": "21be5b05ea950de66f88f06a8230797365c5f6c326e15f61cfffa449123c4f89",
+    ".skill-tree/common/scripts/director-audit.py": "8983bcc2064442b228e0ff9ea98746dc79b16e83a82dd4027004d91c939e0344",
     ".skill-tree/common/scripts/director-bootstrap.py": "09ab7416f7bd49080ccf20c8dde24acc12c2e64ec39b00ada6389a9cd8ec634e",
     ".skill-tree/common/scripts/director-dispatch.py": "c5ac59987c3bab6b8e98e66620a1fe5767d0808d81d47294cb209b5d0da5f9e4",
     ".skill-tree/common/scripts/director-entry.py": "3e5d323676571842ed0cf88d08957a29f766406523888ebfb833ef03ba03327d",
@@ -6000,13 +6024,16 @@
     ".skill-tree/common/scripts/director-handoff.py": "19a5ffc7f21d1199954e4953b6d9e704c880cb69d533004ae2c918ba6eb2116b",
     ".skill-tree/common/scripts/director-maintenance.py": "a4c508a8c97b1efc146b0724723aaf11978ab0ae36e3e4cbb51d6753011a5c9a",
     ".skill-tree/common/scripts/director-objectives.py": "18a0e664d1eb9074983a22abf27ecb4076d2bd1b3d24ed6cac5ace41f459f373",
-    ".skill-tree/common/scripts/director-plan-adapters.py": "1cf6604fc604ce3408c3003348c8c17bde37bf7ebaffab87acb9912702925d04",
+    ".skill-tree/common/scripts/director-plan-adapters.py": "d8185d6af19635c5279080f02c2dbc253aeb722e1f87d7137132c817f52d0a2f",
     ".skill-tree/common/scripts/director-plans.py": "b28d8e4326dda6c390586759e36750c74cb909169ff244ecfe7af1e359bfb863",
-    ".skill-tree/common/scripts/director-project-setup.py": "ba20be607288a43afe1d16b21ca87e84af860a376ca26bb6629ba3d1cbffe423",
+    ".skill-tree/common/scripts/director-project-routing.py": "5934e65746c4c55bdf143ce709e94d4a12ad03fe41cd4201087ecc0f944d722f",
+    ".skill-tree/common/scripts/director-project-setup.py": "a225a0b9d0948f3df8e5b9576bff76d63c76d7b4c26be19e0203ebebefaf948a",
     ".skill-tree/common/scripts/director-questions.py": "60d18e3d18eff83b680dcb454a87d24db4c027a9e90065d1f0d2dfb6bcc2ad6c",
     ".skill-tree/common/scripts/director-run.py": "d5f86a084f3ff2e18185f08ca6e47ff111e781aedf6d8c7da8eb7bbec879c600",
     ".skill-tree/common/scripts/director-source-repair.py": "d9f53a58cd06cd837d7758d118a029cc5db15a36c5574d02bb91bf873b208d35",
-    ".skill-tree/common/scripts/director-state.py": "d84c89bd7b40cc161b3d009b4e3824abcff06d20f5632a96ef66f7bc5824c045",
+    ".skill-tree/common/scripts/director-state.py": "10f8945428fb93a751c8e9660908625b4234ffbb19e88beb1291e9037c09d7f2",
+    ".skill-tree/common/scripts/director-workspace-audit.py": "0e44fa17efe543e98f2f729e721488d9449b1cd65964c313572e4156d05f7ba2",
+    ".skill-tree/common/scripts/director-workspace-migration.py": "62f69b6e0d9850fa0a9b7d9952e6f93f5263534a8fd124fc5c7d30712ea0a54b",
     ".skill-tree/common/scripts/inspect-unity-repository.py": "794230aca0f338a9d5a6ce7dd62df2016c9d13fb9622174429f9188225fb78e9",
     ".skill-tree/common/scripts/narrative-route-check.py": "88bdd66fbaa9829a7b69843f8004516de28bbb30340c380bc5a3be64c0faa01d",
     ".skill-tree/common/scripts/narrative-state.py": "ad6618d06fc1b2cac79694a64ff5733bdd03a330e0714851e04e185d108c1388",
@@ -6021,7 +6048,7 @@
     ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     ".skill-tree/common/scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
     ".skill-tree/common/scripts/validate-repository-documentation.py": "99a7cf90c80f2e6fa5c2b2641e63de281076ec952b74b20807ade38576f10fb4",
-    ".skill-tree/common/scripts/workflow-state.py": "b568183d17db0596c23cb348deebfc5121948f7a408ff4ec35965f888a55b8e2",
+    ".skill-tree/common/scripts/workflow-state.py": "e4b861f716012cc1616180d4153714a147bb233808fc759ca281c2583b1a613f",
     ".skill-tree/config/capabilities.json": "7213710d95b954beb121c20e177edec9c7deab27f509154b8fb61f3c03f01a04",
     ".skill-tree/config/flavors.json": "309bdbf204c51c5d14515f7aa776cf23c7ff7ea9c3833b9951e1016bc3630d18",
     ".skill-tree/config/plugin-catalog-eligibility.json": "92a81b29135aaf8deb94c86f56481dfaa5fe9b543ab461c492aceab56efe1042",
@@ -6031,7 +6058,7 @@
     ".skill-tree/config/plugins/task-interview.json": "77b654102b28e33161c4cce8e1aec76c33ece2a93468203e5a2b5c9affc0a8a1",
     ".skill-tree/config/providers.json": "a436dd2deb2a81dbf8ed2817754697921233c41de76e393a841166765a16e32b",
     ".skill-tree/config/repository.json": "c9c8106a799778fae6fedbca29ea9aa12a14acad7c6d8072988aca08988f8297",
-    ".skill-tree/config/resource-map.json": "937060f94938e72096a71c00bbf78e9efa320a2dc6185af49be894ac3197e6d6",
+    ".skill-tree/config/resource-map.json": "3659cefcdfb0cde412890b4126fd7ca9089e17c7295b9abaeed6148b22f3d3ef",
     ".skill-tree/documents/agent-compatibility.md": "e7b051efe37f0e528ff82db666e60ee6b05bb214dabbdc73e1eaac85daa8b5d6",
     ".skill-tree/documents/build-and-release.md": "ef1216f1e0e058d288afb40d76d3826047fff1a9f15d70350ebc5fae9901130c",
     ".skill-tree/documents/dependencies.md": "e524d1d314d8c443e000260860e71fca6db4bd6938e86cb7443379a6fb2db4f3",
@@ -6039,7 +6066,7 @@
     ".skill-tree/documents/features.md": "68cdf4d566c8601951d55f7a9d91218ad7b08335dee37f84228ff152821ff011",
     ".skill-tree/documents/future.md": "05a1f55b7a7202ce1a56bb01919c016110a355ca8de0fe746183d6e62853e634",
     ".skill-tree/documents/implementation-plan.md": "4a5f573aed129e25d7596c82168778a378fac6a90c5762b98a6646c537bba02e",
-    ".skill-tree/documents/install.md": "00907acd3bf63d66a4c1baca9251f04e035bf507871faedf4218f9685eb37482",
+    ".skill-tree/documents/install.md": "6a540a775c42a9d677e08059dbf1c0bd13f9b1d252ff94c87120bb4a3af2af73",
     ".skill-tree/documents/installation-architecture.md": "fd548f5be2a74fbfdb416a748e62869771d80f04acb47b246d4488effe083eea",
     ".skill-tree/documents/manual-target-update.md": "d519eb7d0b4593bb820a5a79fa4025c3a663439baf3f018638da8069f03ffa2a",
     ".skill-tree/documents/narrative-workflow.md": "568eafbf201349ac24dc6836a4c2c9dea0fa82370f0bd4d6d67cf502117ab5fa",
@@ -6080,7 +6107,8 @@
     ".skill-tree/lib/composer.js": "fb26f8f539ac3a2ef1461675bc9a4326b48dbdc7c4f454c03f43586255d8a6b2",
     ".skill-tree/lib/development-policies.js": "9d3036e0dd2b2aaf070f3ec92f9e1d6d6830fe35cd8ebb1a78135c3ad792a2fd",
     ".skill-tree/lib/director-canary.js": "addb0a0e3fbc5d976a6e374a2814dbeb66d9763f4186d0dec1d276dc1a0c0b9b",
-    ".skill-tree/lib/director-workspace.js": "61d34e5fe7ee079035af1122fba8958a00a30fff59182e84c6259e5e635deceb",
+    ".skill-tree/lib/director-routing-bridge.js": "a04ea873881fcb9b6e04c598f3fbcb0e25c5039af483bdd85055f33521b5d370",
+    ".skill-tree/lib/director-workspace.js": "6a46c05a3024b2c8339bc812794a531eb0c040da976d0e82eb9e9d23d419dfeb",
     ".skill-tree/lib/execution-bindings.js": "4087f0855eac260dc7ec4008be24015b3645ac7f53e11b3f7f7eccab5434a852",
     ".skill-tree/lib/installation.js": "e220ab9b093ab426e59478c81188fa86a0cca0416d434a2d59e72f2a017fc221",
     ".skill-tree/lib/plugin-acquisition.js": "2958d2d00fbbcd7b0876a790c87374eb91bb072bde34878554b13258b5411aab",
@@ -6098,9 +6126,9 @@
     ".skill-tree/scripts/run-tests.py": "00c61ad36efcc208865692e5822f38dd4bbbc036d058bc7e55bc81c3851b711e",
     ".skill-tree/scripts/sync-skill-references.py": "eafdc147fd80e69bbf7dfa3ecb3cb0004890dc02ebd5af07286228017298a9f4",
     ".skill-tree/scripts/validate-skill-repository.py": "5cd81850dfa3f52ca92abf69f5110c497491e9c07b0f039451a9df7a2b3b8faa",
-    ".skill-tree/src/init-rules/skill-tree-skills.md": "23db99b8b1622408551c7cd537b37524335ef9b2e011d0f30a1201a7024dc56c",
+    ".skill-tree/src/init-rules/skill-tree-skills.md": "b7429e83339e52cc5d6c5b5accd48b298f08098d9e1b55af74cedcfadc61607f",
     ".skill-tree/templates/invariants.json": "ee0c2c5445e7408cc15fd4aed231ff7d0c38a07d063061f75bfeea3da8971903",
-    ".skill-tree/templates/operations.json": "ebe1cfa0a6d09059f0e04fb9ea5e911081beea1921becf938c61f23fcddb19fd"
+    ".skill-tree/templates/operations.json": "d730885adb0ac32e54f0e03fb75a9ca1bba8230b2869cd8e44acc2f7d6945566"
   },
   "state": ".skill-tree/documents/future.json",
   "validation_commands": [

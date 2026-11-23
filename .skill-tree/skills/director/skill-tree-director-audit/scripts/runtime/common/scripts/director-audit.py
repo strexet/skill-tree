@@ -878,14 +878,21 @@ class DirectorAudit:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('audit', 'diagnose'))
+    parser.add_argument('command', choices=('audit', 'workspace-audit', 'diagnose'))
     parser.add_argument('root', type=Path)
-    parser.add_argument('--input', required=True, type=Path)
+    parser.add_argument('--input', type=Path)
     args = parser.parse_args()
     try:
-        request = json.loads(args.input.read_text())
-        audit = DirectorAudit(D.DirectorRegistry(args.root))
-        report = audit.diagnose(request) if args.command == 'diagnose' else audit.read(request)
+        request = json.loads(args.input.read_text()) if args.input else None
+        registry = D.DirectorRegistry(args.root)
+        if args.command == 'workspace-audit' or (args.command == 'audit' and args.input is None):
+            D._require(args.input is None or isinstance(request, dict), 'Workspace audit selection requires an object')
+            workspace = D.WF.owned_module('director_workspace_audit', HERE / 'director-workspace-audit.py')
+            report = workspace.WorkspaceAudit(D, O, registry, _quiet).read(request)
+        else:
+            D._require(args.input is not None, '--input is required to diagnose a project check')
+            audit = DirectorAudit(registry)
+            report = audit.diagnose(request) if args.command == 'diagnose' else audit.read(request)
     except (KeyError, TypeError, AttributeError, OSError, subprocess.TimeoutExpired):
         parser.exit(2, 'Exact selected audit metadata is unavailable or malformed.\n')
     except ValueError as error:
