@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from pathlib import Path
 import re
 
 
@@ -97,12 +98,39 @@ def canonical_owner(store, queue_id):
     return registry
 
 
+def matches_start_workspace(store, run, receipt):
+    original = receipt['result'].get('workspace')
+    current = run.get('workspace')
+    if current == original:
+        return current is not None
+    if (not isinstance(original, dict) or not isinstance(current, dict)
+            or 'cleanup_owner' in original or run.get('workspace_state') != 'ready'
+            or {key: value for key, value in current.items() if key != 'cleanup_owner'} != original):
+        return False
+    # The reservation exists before Git creates the administrative ownership marker.
+    owner = current.get('cleanup_owner')
+    locator = wf.workspaces.runtime(store.root)
+    checkout = (locator or {}).get('worktrees', {}).get(run['id'])
+    if (not isinstance(owner, dict) or not checkout or owner.get('run_id') != run['id']
+            or owner.get('queue_id') != receipt['identity']['queue_id']):
+        return False
+    cleanup = run.get('delivery', {}).get('worktree_cleanup', {})
+    if cleanup.get('status') == 'removed':
+        attempt = cleanup.get('attempt')
+        return (isinstance(attempt, dict) and attempt.get('scope') == wf.cleanup_delivery_scope(store, run)
+                and wf.workspaces.cleanup_checkout(store.root, {'queue_id': locator['queue_id']}, run, attempt) is None)
+    registration = wf.workspaces.linked_registration(store.root, Path(checkout))
+    marker = registration/'skill-tree-owner.json'
+    return (owner.get('registration') == registration.name and marker.is_file() and not marker.is_symlink()
+            and json.loads(marker.read_bytes()) == owner)
+
+
 def reconcile(store, receipt):
     if receipt['identity']['operation'] != 'start':
         return receipt['result']
     registry = canonical_owner(store, receipt['identity']['queue_id'])
     run = registry['runs'].get(receipt['result']['id'])
-    _require(run is not None and run.get('workspace') == receipt['result'].get('workspace'),
+    _require(run is not None and matches_start_workspace(store, run, receipt),
              'Original Director run reservation is unavailable or changed')
     wf.workspaces.inspect_directed_reservation(store, run)
     return run
