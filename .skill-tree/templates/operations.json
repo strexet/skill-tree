@@ -39,6 +39,26 @@
       }
     ]
   },
+  "skill-tree-force-process": {
+    "title": "Skill-Tree: Force Process Pending",
+    "description": "Research complex Pending work deeply when explicitly requested, establish runnable scope and preserve verifiable outcome evidence.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Use Force Process for an explicitly requested deep Pending pass. Read the [Force Process contract](references/force-process.md), [ordinary workflow](references/future-workflow.md) and [metadata](references/workflow-metadata.md). Freeze the exact selected Pending identities. Research material unknowns, establish runnable first work and record observable acceptance. Use the guarded ordinary Process Pending write path. Verify the result or reconcile interrupted acknowledgment from recorded evidence. Follow the ordinary next-action handoff after processing."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "Before promotion, use the exact selected Pending identities and current bounded authority. Standalone processing ends with the resulting scope and evidence. Implementation requires the explicit selection or existing controller authorization required by ordinary processing."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Inspect the owned Force Process binding manifest before proceeding. Surface enabled Force Process bindings as an unsupported prerequisite. Use the [plugin invocation contract](references/plugin-invocation.md) for the actual ordinary Process Pending boundaries. Route configured matching hooks through the verified owned ordinary operation and keep current typed clarification holds. Core-only projects can use the canonical helper bundled with Force Process."
+      }
+    ]
+  },
   "skill-tree-full-cycle": {
     "title": "Skill-Tree: Full Cycle",
     "description": "Deliver an explicitly requested task or task group through Pending, research, scoped implementation, one PR review-and-fix cycle and merge to develop.",

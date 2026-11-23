@@ -544,6 +544,36 @@
       },
       {
         "anchor": "before",
+        "operation": "skill-tree-force-process",
+        "phrase": "before skill-tree-force-process"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-force-process",
+        "phrase": "before skill-tree: force process pending"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-force-process",
+        "phrase": "during skill-tree-force-process"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-force-process",
+        "phrase": "during skill-tree: force process pending"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-force-process",
+        "phrase": "after skill-tree-force-process"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-force-process",
+        "phrase": "after skill-tree: force process pending"
+      },
+      {
+        "anchor": "before",
         "operation": "skill-tree-full-cycle",
         "phrase": "before skill-tree-full-cycle"
       },
@@ -1008,7 +1038,7 @@
         "phrase": "after-validation skill-tree-repo-documentation-audit"
       }
     ],
-    "digest": "7ad40c3e9ca39efed322d353f5b4a0cf3a77caefc4e1621d20ecea9513741339",
+    "digest": "63f44efc380d05942783b6229588c775c8545a9013a6a19450c73406f4bb2894",
     "entries": [
       {
         "anchor": "before",
@@ -2033,6 +2063,63 @@
           "review"
         ],
         "operation": "skill-tree-director-status",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-force-process:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-force-process",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-force-process:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-force-process",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-force-process:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-force-process",
         "status": "resolved",
         "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
@@ -3082,6 +3169,7 @@
       "skill-tree-director-run",
       "skill-tree-director-setup",
       "skill-tree-director-status",
+      "skill-tree-force-process",
       "skill-tree-full-cycle",
       "skill-tree-game-design",
       "skill-tree-game-design-balance",
@@ -3097,10 +3185,10 @@
       "skill-tree-work-through-next"
     ]
   },
-  "configuration_digest": "1d4ded90f74588a33443cca0a2da314364e2a91faff9e7955ed7ac521848e0ff",
+  "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "6bfbcb003d67d8e91a20435a85d8645e4f2289d0e4ca49d0cb0d76f1b60f8429",
+  "identity": "8de75efc9aa26437bcd06514edbe959967a4b1b0457443833a2a5bfede34ac71",
   "operation": "skill-tree-game-design-mechanics",
   "operations": {
     "skill-tree-3d": {
@@ -3156,6 +3244,9 @@
     },
     "skill-tree-director-status": {
       "title": "Skill-Tree Director: Status"
+    },
+    "skill-tree-force-process": {
+      "title": "Skill-Tree: Force Process Pending"
     },
     "skill-tree-full-cycle": {
       "title": "Skill-Tree: Full Cycle"
