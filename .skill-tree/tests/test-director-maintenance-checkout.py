@@ -1,4 +1,5 @@
 """Check Director maintenance ownership and publication ancestry against a local Git upstream."""
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -68,6 +69,46 @@ class MaintenanceCheckoutTests(unittest.TestCase):
         self.assertEqual((first / 'README.md').read_text(), 'Local repair\n')
         self.assertEqual(maintenance.inspect(self.service, 'game-one'), one)
         self.assertEqual(self.git(self.seed, 'branch', '--format=%(refname:short)'), 'develop')
+
+    def test_new_upstream_commit_only_changes_the_next_project_base(self):
+        first = maintenance.prepare(self.service, 'one')
+        (self.seed / 'README.md').write_text('Upstream revision two')
+        self.git(self.seed, 'add', 'README.md')
+        self.commit(self.seed)
+        second = maintenance.prepare(self.service, 'two')
+        self.assertNotEqual(first['base_commit'], second['base_commit'])
+        self.assertEqual(second['base_commit'], self.git(self.seed, 'rev-parse', 'HEAD'))
+        self.assertEqual(maintenance.inspect(self.service, 'one'), first)
+        self.assertEqual(maintenance.prepare(self.service, 'one'), first)
+
+    def test_reviewed_transient_commit_lands_only_in_selected_project_branch(self):
+        first = maintenance.prepare(self.service, 'game-one')
+        second = maintenance.prepare(self.service, 'game-two')
+        checkout, project = Path(first['checkout']), Path(first['project_checkout'])
+        worker = self.root / 'worker'
+        self.git(checkout, 'worktree', 'add', '-b', 'temporary-fix', str(worker), first['branch'])
+        content = b'Approved source repair\n'
+        (worker / 'README.md').write_bytes(content)
+        self.git(worker, 'add', 'README.md')
+        self.commit(worker)
+        fix = self.git(worker, 'rev-parse', 'HEAD')
+        arguments = {'expected_head': first['base_commit'], 'candidate_commit': fix,
+                     'reviewed_paths': {'README.md': hashlib.sha256(content).hexdigest()},
+                     'owner': {'actor':'owner', 'reference':'approved-correction', 'kind':'owner-message'}}
+        for paths in ({'README.md':'1'*64}, {'unexpected': None}):
+            with self.assertRaises(ValueError):
+                maintenance.integrate(self.service, 'game-one', **{**arguments, 'reviewed_paths': paths})
+        (project / 'unrelated-local-file').touch()
+        with self.assertRaisesRegex(ValueError, 'local edits'):
+            maintenance.integrate(self.service, 'game-one', **arguments)
+        (project / 'unrelated-local-file').unlink()
+        receipt = maintenance.integrate(self.service, 'game-one', **arguments)
+        self.assertTrue(receipt['applied'])
+        self.assertEqual(receipt, maintenance.integrate(self.service, 'game-one', **arguments))
+        self.assertEqual(self.git(project, 'rev-parse', 'HEAD'), fix)
+        self.assertEqual((project / 'README.md').read_bytes(), content)
+        self.assertEqual(self.git(Path(second['project_checkout']), 'rev-parse', 'HEAD'), second['base_commit'])
+        self.assertEqual(self.git(self.seed, 'rev-parse', 'HEAD'), first['base_commit'])
 
     def test_retry_after_reserved_branch_recovers_the_original_worktree(self):
         original = maintenance.git

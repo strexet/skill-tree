@@ -1,16 +1,18 @@
 """Prepare the Director's independent source repository and persistent project branches."""
 from contextlib import contextmanager
+import hashlib
 import importlib.util
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 
 
 spec = importlib.util.spec_from_file_location('maintenance_director', Path(__file__).with_name('director-state.py'))
 D = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(D)
+exec(compile(Path(spec.origin).read_bytes(), spec.origin, 'exec'), D.__dict__)
 UPSTREAM = 'https://github.com/strexet/skill-tree.git'
 REMOTE = 'upstream'
 BASE = 'develop'
@@ -150,7 +152,7 @@ def inspect(director_root, project_id):
     queue, _, _ = D._inspect_owner(root)
     D._require(queue == state.get('queue_id'), 'The maintenance queue identity changed')
     return {'checkout': str(root), 'revision': git(root, 'rev-parse', 'HEAD'), 'project_checkout': str(project),
-            'branch': branch, 'remote': REMOTE, 'base_branch': BASE, 'base_commit': base, 'queue_id': queue}
+            'branch': branch, 'remote': REMOTE, 'base_branch': BASE, 'base_commit': record['base_commit'], 'queue_id': queue}
 
 
 def prepare(director_root, project_id):
@@ -187,3 +189,70 @@ def prepare(director_root, project_id):
             record['ready'] = True
             D.WS.atomic(root / '.git' / MARKER, state)
         return result
+
+
+def checked_paths(root, before, after, reviewed):
+    changed = D.WS.local_git(root, 'diff', '--no-renames', '--name-only', '-z', before, after, '--').stdout
+    names = {os.fsdecode(name) for name in changed.split(b'\0') if name}
+    D._require(isinstance(reviewed, dict) and names and names == set(reviewed),
+               'The source commit changes paths outside the exact reviewed correction')
+    # Do not integrate an unreviewed intermediate tree by merging its descendant.
+    ancestry = git(root, 'rev-list', '--parents', '-1', after).split()
+    D._require(ancestry == [after, before], 'Select one reviewed source commit directly based on the project head')
+    for name, expected in reviewed.items():
+        D._require(str(D._scope(name)) == name and name != '.', 'Select an exact repository-relative source file')
+        entry = D.WS.local_git(root, 'ls-tree', '-z', after, '--', name).stdout
+        if expected is None:
+            D._require(not entry, 'The reviewed removal is still present in the source commit')
+            continue
+        D._require(D._sha(expected) and entry.startswith((b'100644 blob ', b'100755 blob ')),
+                   'The correction requires the reviewed ordinary file and SHA-256')
+        content = D.WS.local_git(root, 'cat-file', 'blob', after + ':' + name).stdout
+        D._require(hashlib.sha256(content).hexdigest() == expected, 'The source commit differs from its reviewed bytes')
+
+
+def integrate(director_root, project_id, *, expected_head, candidate_commit, reviewed_paths, owner):
+    """Land one approved source correction in the persistent project branch without publishing."""
+    D._object(owner, {'actor', 'kind', 'reference'})
+    D._require(D._token(owner['actor']) and D._token(owner['reference']), 'Select the exact local integration authority')
+    D.WF.clarification_evidence({'kind': owner['kind'], 'reference': owner['reference']})
+    for oid in (expected_head, candidate_commit):
+        D._require(isinstance(oid, str) and re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', oid),
+                   'Select exact full Git object IDs for the original branch and reviewed source commit')
+    root, project = paths(director_root, project_id)
+    with writer(root.parent / '.maintenance.lock'):
+        scope = inspect(director_root, project_id)
+        checked_paths(root, expected_head, candidate_commit, reviewed_paths)
+        state = owned(root)
+        record = state['projects'][project_id]
+        receipts = record.setdefault('integrations', {})
+        request = {'branch': scope['branch'], 'base_commit': expected_head, 'commit': candidate_commit,
+                   'reviewed_paths': reviewed_paths, 'owner': owner}
+        digest = D._digest(request)
+        retained = receipts.get(candidate_commit)
+        if retained:
+            D._require(retained['request_sha256'] == digest, 'The original source integration scope or authority differs')
+            if retained['applied']:
+                git(project, 'merge-base', '--is-ancestor', candidate_commit, 'HEAD')
+                return retained
+        current = git(project, 'rev-parse', 'HEAD')
+        if current != candidate_commit:
+            D._require(current == expected_head, 'The project branch moved after source review')
+            D.WS.unfinished(project)
+            D._require(not git(project, 'status', '--porcelain=v1', '--untracked-files=all'),
+                       'The project source worktree has local edits; preserve them before integrating the correction')
+        else:
+            D._require(retained, 'The project branch changed outside the reviewed integration')
+        if retained is None:
+            retained = {'request_sha256': digest, **request, 'applied': False}
+            receipts[candidate_commit] = retained
+            D.WS.atomic(root / '.git' / MARKER, state)
+        if current != candidate_commit:
+            git(project, '-c', 'merge.autoStash=false', 'merge', '--ff-only', '--no-autostash',
+                '--no-overwrite-ignore', '--', candidate_commit)
+        D._require(git(project, 'rev-parse', 'HEAD') == candidate_commit
+                   and git(project, 'symbolic-ref', '--short', 'HEAD') == scope['branch'],
+                   'Recheck the project branch before completing the source integration')
+        retained['applied'] = True
+        D.WS.atomic(root / '.git' / MARKER, state)
+        return retained
