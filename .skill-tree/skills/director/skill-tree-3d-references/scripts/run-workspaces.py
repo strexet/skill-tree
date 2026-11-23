@@ -416,8 +416,10 @@ def local_merge_target(root, run):
 def local_git_environment():
     overrides = {'GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR', 'GIT_OBJECT_DIRECTORY',
                  'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_NAMESPACE', 'GIT_CONFIG_PARAMETERS',
-                 'GIT_CONFIG', 'GIT_CONFIG_GLOBAL', 'GIT_CONFIG_SYSTEM'}
-    blocked = sorted(overrides.intersection(os.environ))
+                 'GIT_CONFIG'}
+    config_files = ('GIT_CONFIG_GLOBAL', 'GIT_CONFIG_SYSTEM')
+    blocked = sorted(overrides.intersection(os.environ) |
+                     {key for key in config_files if key in os.environ and os.environ[key] != os.devnull})
     if blocked:
         raise RunError('Local delivery requires the recorded Git environment without repository or index overrides. '
                        'Clear the inherited setting ' + blocked[0])

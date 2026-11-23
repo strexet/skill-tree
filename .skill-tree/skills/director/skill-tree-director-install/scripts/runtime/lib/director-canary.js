@@ -2,6 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const os = require('node:os');
 const childProcess = require('node:child_process');
 const c = require('./composer.js');
 const core = require('./installation.js');
@@ -62,9 +63,11 @@ function sha(root, relative) {
 function git(root, ...args) {
   const env = {...process.env};
   const config = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR', 'GIT_OBJECT_DIRECTORY',
-    'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_NAMESPACE', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG',
-    'GIT_CONFIG_GLOBAL', 'GIT_CONFIG_SYSTEM'];
-  const blocked = config.find(key => own(env, key));
+    'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_NAMESPACE', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG'];
+  // Match Python os.devnull, including Git's 'nul' spelling on Windows.
+  const nullDevice = process.platform === 'win32' ? 'nul' : os.devNull;
+  const blocked = config.find(key => own(env, key)) || ['GIT_CONFIG_GLOBAL', 'GIT_CONFIG_SYSTEM']
+    .find(key => own(env, key) && env[key] !== nullDevice);
   requireCanary(!blocked, 'Clear the inherited Git override ' + blocked + ' for the canary');
   const count = env.GIT_CONFIG_COUNT ?? '0';
   requireCanary(/^(0|[1-9][0-9]{0,2})$/.test(count), 'Invalid inherited Git configuration count');
