@@ -59,7 +59,17 @@ function checkLauncher(workspace, provider, expected) {
   return file;
 }
 
-function installDirector(workspace, source, providers, {dryRun = false} = {}) {
+function servicePath(workspace) {
+  return ownedPath(workspacePath(workspace), directorFolder);
+}
+
+function directFlavor(workspace) {
+  const file = path.join(workspace, manager.PROFILE);
+  if (!fs.existsSync(file)) return null;
+  return composer.readJson(workspace, manager.PROFILE)?.flavor || null;
+}
+
+function installDirector(workspace, source, providers, {dryRun = false, verify = false} = {}) {
   const canonical = workspacePath(workspace);
   const home = ownedPath(canonical, directorFolder);
   const reference = path.join(home, "workspace.json");
@@ -69,6 +79,8 @@ function installDirector(workspace, source, providers, {dryRun = false} = {}) {
     throw Error("Unrecognized Director workspace descriptor: " + reference);
   }
   if (!previous && fs.existsSync(home) && fs.readdirSync(home).length) throw Error("Existing Director directory needs inspection: " + home);
+  if (verify && !previous) throw Error("Dedicated Director installation is missing: " + home);
+  if (verify && providers.some(host => !previous.providers.includes(host.id))) throw Error("Selected host is missing from the Director workspace");
   const matrix = composer.readJson(source, "config/providers.json").providers;
   const selected = [...new Set([...(previous?.providers || []), ...providers.map(provider => provider.id)])].map(id => {
     const item = matrix.find(provider => provider.id === id);
@@ -84,6 +96,16 @@ function installDirector(workspace, source, providers, {dryRun = false} = {}) {
     return {file: checkLauncher(canonical, host, content), content};
   });
   const message = `Director ${dryRun ? "preview" : "ready"} at ${home}\nOpen ${canonical} in ${selected.map(item => item.label).join(", ")} and invoke skill-tree-director.\nConnect an existing project, create a new project, or continue later.`;
+  if (verify) {
+    const receipt = manager.verify(home, path.join(home, ".skill-tree/installation/source"));
+    if (receipt.flavor !== "director" || previous.setup_entry !== setup ||
+        !selections.every(({name, provider, rel}) => {
+          const item = receipt.destinations[rel];
+          return item?.name === name && (item.providers || [item.provider]).includes(provider);
+        })) throw Error("Dedicated Director receipt does not match its workspace descriptor");
+    if (entries.some(({file}) => !fs.existsSync(file))) throw Error("An installed Director launcher is missing");
+    return "Director verified at " + home;
+  }
   if (dryRun) {
     if (fs.existsSync(home)) manager.install(home, source, "director", selections, {dryRun: true});
     return message;
@@ -126,4 +148,4 @@ function installDirector(workspace, source, providers, {dryRun = false} = {}) {
   return message;
 }
 
-module.exports = {installDirector};
+module.exports = {installDirector, servicePath, directFlavor};

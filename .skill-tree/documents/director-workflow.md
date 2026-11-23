@@ -157,7 +157,7 @@ Use `repair-candidate-preview` and `repair-candidate-apply` to retain reviewed s
 
 ## Install the Director flavor
 
-Use `node .skill-tree/bin/install.js --list --flavor director` to inspect operation membership. Use an explicit target and `--dry-run --all --flavor director` to preview project scope. An owned installation or flavor change requires a stopped checkpoint and current target verification. Verify the installed target through the project-owned installation manager.
+Use `node .skill-tree/bin/install.js --list --flavor director` to inspect operation membership. Use an explicit workspace target and `--dry-run --all --flavor director` to preview the dedicated coordinator. Run `--flavor director --verify` on that workspace to verify its coordinator and host launchers. For a direct low-level profile, pass `--project --flavor director` at the exact target. An existing direct Director receipt remains usable at its original root. An owned installation or flavor change requires a stopped checkpoint and current target verification. Verify the installed target through the project-owned installation manager.
 
 The shared-folder topology uses one canonical queue for distinct scopes. The external topology uses the verified profile of the registered external project. A moved external checkout requires Core locator reconciliation, owned profile rebind and guarded Director rebind. A plan with changed execution inputs requires current admission before another effect.
 

@@ -28,8 +28,10 @@ for (const webFirst of [true, false]) {
     if (webFirst) web();
     const before = webFirst && read(root, receipt);
     assert.match(launch('--dry-run'), /Director preview/);
+    assert.match(launch('--flavor','director','--dry-run'), /Director preview/);
     assert.equal(fs.existsSync(home),false);
-    const stdout = process.platform === 'win32' ? launch() : run('sh',[path.join(source, 'install.sh'),'--only','codex'], root);
+    const choice = webFirst ? ['--flavor','director'] : [];
+    const stdout = process.platform === 'win32' ? launch(...choice) : run('sh',[path.join(source, 'install.sh'),'--only','codex',...choice], root);
     assert.match(stdout,/Connect an existing project, create a new project, or continue later/);
     assert.equal(stdout.split('\n').length < 12, true);
     const director = JSON.parse(read(home, receipt));
@@ -50,6 +52,14 @@ for (const webFirst of [true, false]) {
     assert.doesNotMatch(read(root,'.agents/skills/skill-tree-add-pending-task/SKILL.md'), /Flavor: director/);
     run(process.execPath,[path.join(root,'.skill-tree/installation/manager.js'),'--verify'],root);
     run(process.execPath,[path.join(home,'.skill-tree/installation/manager.js'),'--verify'],root);
+    assert.match(launch('--flavor','director','--verify'),/Director verified/);
+    const launcher = path.join(root,'.agents/skills/skill-tree-director/SKILL.md');
+    fs.unlinkSync(launcher);
+    const missing = spawnSync(process.execPath,[path.join(source,'.skill-tree/bin/install.js'),'--target',root,
+      '--flavor','director','--verify'],{encoding:'utf8',timeout:30000});
+    assert.notEqual(missing.status,0);
+    assert.match(missing.stderr,/launcher/i);
+    assert.equal(fs.existsSync(launcher),false);
   });
 }
 
@@ -57,7 +67,7 @@ test('a nested new workspace can be previewed and created with the public launch
   const base = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'director-new-location-')));
   t.after(() => fs.rmSync(base, {recursive:true, force:true}));
   const root = path.join(base, 'new-parent', 'new-workspace');
-  const args = ['--target',root,'--only','codex'];
+  const args = ['--target',root,'--only','codex','--flavor','director'];
   const launch = extra => process.platform === 'win32'
     ? run('powershell',['-NoProfile','-File',path.join(source,'install.ps1'),...args,...extra],base)
     : run('sh',[path.join(source,'install.sh'),...args,...extra],base);
@@ -65,4 +75,17 @@ test('a nested new workspace can be previewed and created with the public launch
   assert.deepEqual(fs.readdirSync(base),[]);
   assert.match(launch([]),/Director ready/);
   assert.equal(JSON.parse(fs.readFileSync(path.join(root,'.skill-tree-director',receipt))).flavor,'director');
+});
+
+test('explicit low-level installation and repeated legacy Director verification keep the original owner', t => {
+  const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'director-raw-profile-')));
+  t.after(() => fs.rmSync(root,{recursive:true, force:true}));
+  const args = [path.join(source,'.skill-tree/bin/install.js'),'--only','codex','--target',root,'--flavor','director'];
+  run(process.execPath,[...args,'--project'],root);
+  const profile = JSON.parse(fs.readFileSync(path.join(root,receipt)));
+  assert.equal(profile.project_root,root);
+  assert.equal(profile.flavor,'director');
+  run(process.execPath,[...args,'--verify'],root);
+  run(process.execPath,args,root);
+  assert.equal(fs.existsSync(path.join(root,'.skill-tree-director')),false);
 });

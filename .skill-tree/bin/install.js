@@ -20,7 +20,7 @@ Options:
   --agent <upstream-profile>    Unsupported upstream passthrough. Use --only <provider-id>
   --skills <names...>           Select one or more skills
   --flavor ${flavors}    Select the project workflow flavor\n  --global                      Unsupported for project specialization
-  --project                     Install to project path (default)
+  --project                     Select direct profile installation at the target (including raw Director)
   --target <path>               Project root or explicit generic destination
   --source <path>               Explicit local Skill Tree source repository
   --copy                        Copy skill folders
@@ -512,15 +512,27 @@ async function main(argv = process.argv.slice(2), {promptFactory} = {}) {
     if (args.global || args.symlink || args.agent.length || !isLocalSource(args.source)) {
       throw Error("Project specialization supports local project-scoped copy installation; global, symlink and uncomposed upstream paths are unsupported. Use --target <project> --flavor <project flavor> --copy.");
     }
-    const dedicatedDirector = !args.flavor && !args.skills.length && !args.project &&
-      !args.verify && !args.uninstall && !args.configurePlugins && !args.plugins && !args.withInit;
-    if (dedicatedDirector) {
-      const { installDirector } = require("../lib/director-workspace.js");
-      const providers = selectedProviders(args, matrix);
-      if (!providers.length) throw Error("Choose your host with --only <provider-id>. See --list for available hosts.");
-      const workspace = path.resolve(args.target || process.cwd());
-      const result = installDirector(workspace, sourceRoot(args), providers, {dryRun: args.dryRun});
-      console.log(result);
+    const workspace = path.resolve(args.target || process.cwd());
+    const namedDirector = args.flavor === "director";
+    const profileOperation = args.uninstall || args.configurePlugins || args.plugins !== null;
+    const rawOptions = args.skills.length > 0 || args.project || args.withInit;
+    const directorRuntime = require("../lib/director-workspace.js");
+    const rawFlavor = namedDirector && !args.project && fs.existsSync(workspace)
+      ? directorRuntime.directFlavor(workspace) : null;
+    const legacy = rawFlavor === "director" && !fs.existsSync(path.join(workspace, ".skill-tree-director/workspace.json"));
+    if (legacy && !args.target) args.target = workspace;
+    if (namedDirector && rawOptions && !args.project && rawFlavor && rawFlavor !== "director") {
+      throw Error("This project already owns a " + rawFlavor + " profile. Install Director without --skills or --with-init to keep both profiles, or select --project for a direct profile change.");
+    }
+    if (namedDirector && !legacy && !rawOptions && profileOperation) {
+      const service = directorRuntime.servicePath(workspace);
+      if (!fs.existsSync(path.join(service, "workspace.json"))) throw Error("A dedicated Director installation is required for this operation");
+      args.target = service;
+    } else if (!rawOptions && !profileOperation &&
+        ((!args.flavor && !args.verify) || (namedDirector && !legacy))) {
+      const providers = args.verify && !args.only.length && !args.all ? [] : selectedProviders(args, matrix);
+      if (!args.verify && !providers.length) throw Error("Choose your host with --only <provider-id>. See --list for available hosts.");
+      console.log(directorRuntime.installDirector(workspace, sourceRoot(args), providers, {dryRun: args.dryRun, verify: args.verify}));
       return 0;
     }
     if (!args.target) throw Error("Select the covered project explicitly with --target <repository>");
