@@ -310,8 +310,24 @@ def create_reserved(store, run, path):
     data = runtime(store.root)
     data['worktrees'][run['id']] = str(path); atomic(runtime_file(store.root), data)
     git(store.root, 'worktree', 'add', '-b', run['workspace']['branch'], path, run['workspace']['base_commit'])
+    if run.get('dispatch_workspace_sha256'):
+        registration = linked_registration(store.root, path)
+        owner = {'run_id': run['id'], 'queue_id': data['queue_id'], 'registration': registration.name,
+                 'token': str(uuid.uuid4())}
+        atomic(registration/'skill-tree-owner.json', owner)
+        run['workspace']['cleanup_owner'] = owner
     run['workspace_state'] = 'ready'
     store.source_root = path
+
+
+def linked_registration(root, path):
+    common = common_dir(root)
+    if not common or common_dir(path) != common:
+        raise RunError('The registered source belongs to a different Git repository')
+    location = Path(local_git_text(path, 'rev-parse', '--absolute-git-dir'))
+    if location.is_symlink() or location.parent != common/'worktrees' or location.parent.is_symlink():
+        raise RunError('The source is not an ordinary linked Git worktree')
+    return location
 
 
 def inspect_directed_reservation(store, run, requested=None):

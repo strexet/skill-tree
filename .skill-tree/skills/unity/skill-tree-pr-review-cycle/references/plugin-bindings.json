@@ -3100,7 +3100,7 @@
   "configuration_digest": "1d4ded90f74588a33443cca0a2da314364e2a91faff9e7955ed7ac521848e0ff",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "2d0bfc9f712fd20dc4ac9c2934e2ddfbf6d2103e7702bc77e3477ef7fc87684a",
+  "identity": "219293fcede9e0396dbcc38565aac12a64f977714ab65f9fd30e674123bd7b47",
   "operation": "skill-tree-pr-review-cycle",
   "operations": {
     "skill-tree-3d": {
@@ -3229,7 +3229,7 @@
     "scripts/plugin-runtime.js": "62caaa416cb4f375fef45edb71c1cbe3b2f9c0acb734a95e0b9099470cf6c8a5",
     "scripts/plugin-sources.js": "13d853f9e64dec84cf92f4026ac71e4384e186cd96200543e400a852a46e4693",
     "scripts/pr-review-state.py": "0eda9145d5623dcdb272a55e79785b97cb34a70963e837a96294915792683a9b",
-    "scripts/run-workspaces.py": "1dd333770e5d11018f54ab4d7b20dfd8722e6679d9dc90407b3e317ab7e77dd9",
+    "scripts/run-workspaces.py": "0ca573f5a11b64f4131e5fff5cf41da75891a5d3f193d205ca4c985f0457c31f",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     "scripts/workflow-state.py": "00721b87acb418382cd1f93238e290bcacd3f4a2d3abf33479f42a2e5611b750"
