@@ -3100,7 +3100,7 @@
   "configuration_digest": "1d4ded90f74588a33443cca0a2da314364e2a91faff9e7955ed7ac521848e0ff",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "e9b7a5bbee2dcd55b7515be81cac0ce115a08862c519c8f84015f6953df58246",
+  "identity": "1a825bbf26b902fb6c96ec42fd5041667500e6013a46ca5958d215088487d1fc",
   "operation": "skill-tree-game-design",
   "operations": {
     "skill-tree-3d": {
@@ -3198,7 +3198,7 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "23ee557ad32d2345a5887ab5a3f4e300931e82e2454a7c46a586832c00f78fa1",
+    "SKILL.md": "705a4349e0b4c2b5f610552d4888799b01bf5a7bf55c153b5679772d8efcf92b",
     "agents/openai.yaml": "c2a91526a35fc064a0d7336c625b4148a720b0ac35b4a9584d3e88111936c144",
     "references/decision-governance.md": "52f8dc84c7cae4b9aa3aaa010d3ffb605ab79f5d75aaa36b9370d51e49305222",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
@@ -3211,7 +3211,7 @@
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/project-profile.md": "a2fa0f0f6f445c854f8f32d06653fbb641742811766f8258b58823684d7e1144",
     "references/validation-policy.md": "2bb1e9675fe3bc08cbcb9aa4b9534368416faba7ffaaf6b5aaff417456f434d3",
-    "references/web-development.md": "a8e55f4d58ad64056707801a3c31aa56eb884755fd12ef08c341680d73645bc9",
+    "references/web-development.md": "cf65aa6fb17e41e1ea660dbc1dfb80b508318bcb719eb1d2ca95ce356161034c",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "d2c5ac475033ae06321fc7917ddf96232a0e442bef7c5db537891e12164fd404",
     "scripts/director-dispatch.py": "c5ac59987c3bab6b8e98e66620a1fe5767d0808d81d47294cb209b5d0da5f9e4",

@@ -1,0 +1,564 @@
+{
+  "fixtureBase": "51ac91982f61b5bde7cebc26629c2e2e621a4a24",
+  "consumerPatchSha256": "df1e5b697d59429209c2b1e56b3fb52b3b531a5821fc7f1d568356c6385b2360",
+  "bootManifestSha256": "465b624b6dbd062f90cf5d62a98a4391dd4d492e00697899589c00a7a0ac2530",
+  "appCssSha256": "a3fccfa5e6a5347fa747bb0dddc80cbcb787609547b397ea6cd7f13da22fc877",
+  "focusModuleSha256": "0824e037ac175f0cd9fad9e3a72bc009433e189691431697a224b0ab34c81df1",
+  "browser": "157.0.8103.79",
+  "playwright": "1.64.0-alpha-1789764292000",
+  "frameworkSDK": "8.0.125",
+  "runnerSha256": "e6dfec31629e10129d6d02139264d555fb0d9a2d9762e37e1248949fc0370c4a",
+  "limits": "Chromium desktop emulation at CSS viewports; no physical device or screen reader. Contrast samples computed text color against actual raster backgrounds at selected control labels; this is not a whole-page accessibility audit.",
+  "geometry": "Viewport height 900 CSS px. Entry is prior to any scripted navigation. ParagraphVisibleFraction intersects the first paragraph after the focused heading with the unobstructed viewport below the fixed toolbar, divided by its full box height. RoomBelowParagraphStart is remaining viewport distance from its top; it may include subsequent content.",
+  "matrix": {
+    "cells": 8,
+    "passed": 8,
+    "failed": 0
+  },
+  "checks": [
+    {
+      "scheme": "gryphy-light",
+      "viewportWidth": 360,
+      "baseTextPx": 16,
+      "checksPassed": 19,
+      "failed": [],
+      "jumpCount": 3,
+      "jumpsPassing": 3,
+      "returnPassing": true,
+      "selectionPersists": true,
+      "externalAttemptCount": 0,
+      "httpErrors": [],
+      "entry": {
+        "scrollY": 0,
+        "title": {
+          "label": "Data handling",
+          "top": 110.09375,
+          "bottom": 142.28125,
+          "fullyVisible": true
+        },
+        "links": [
+          {
+            "label": "Personal Notes",
+            "top": 150.28125,
+            "bottom": 194.28125,
+            "fullyVisible": true
+          },
+          {
+            "label": "Habitica credentials",
+            "top": 150.28125,
+            "bottom": 194.28125,
+            "fullyVisible": true
+          },
+          {
+            "label": "Private sync",
+            "top": 198.28125,
+            "bottom": 242.28125,
+            "fullyVisible": true
+          }
+        ]
+      },
+      "afterPersonalNotes": {
+        "heading": "Personal Notes",
+        "focused": true,
+        "activeId": "personal-notes",
+        "focusVisible": true,
+        "headingTop": 90.562,
+        "toolbarBottom": 57,
+        "paragraphTop": 134.172,
+        "paragraphHeight": 216.875,
+        "paragraphVisiblePx": 216.875,
+        "paragraphVisibleFraction": 1,
+        "roomBelowParagraphStart": 765.828
+      },
+      "afterReturn": {
+        "heading": "Optional cloud workspace",
+        "focused": true,
+        "activeId": "optional-cloud-workspace",
+        "focusVisible": true,
+        "headingTop": 90.219,
+        "toolbarBottom": 57,
+        "paragraphTop": 133.828,
+        "paragraphHeight": 195.188,
+        "paragraphVisiblePx": 195.188,
+        "paragraphVisibleFraction": 1,
+        "roomBelowParagraphStart": 766.172
+      }
+    },
+    {
+      "scheme": "gryphy-light",
+      "viewportWidth": 360,
+      "baseTextPx": 32,
+      "checksPassed": 19,
+      "failed": [],
+      "jumpCount": 3,
+      "jumpsPassing": 3,
+      "returnPassing": true,
+      "selectionPersists": true,
+      "externalAttemptCount": 0,
+      "httpErrors": [],
+      "entry": {
+        "scrollY": 0,
+        "title": {
+          "label": "Data handling",
+          "top": 208.390625,
+          "bottom": 337.171875,
+          "fullyVisible": true
+        },
+        "links": [
+          {
+            "label": "Personal Notes",
+            "top": 353.171875,
+            "bottom": 403.203125,
+            "fullyVisible": true
+          },
+          {
+            "label": "Habitica credentials",
+            "top": 411.203125,
+            "bottom": 501.265625,
+            "fullyVisible": true
+          },
+          {
+            "label": "Private sync",
+            "top": 509.265625,
+            "bottom": 559.296875,
+            "fullyVisible": true
+          }
+        ]
+      },
+      "afterPersonalNotes": {
+        "heading": "Personal Notes",
+        "focused": true,
+        "activeId": "personal-notes",
+        "focusVisible": true,
+        "headingTop": 181.125,
+        "toolbarBottom": 113,
+        "paragraphTop": 328.406,
+        "paragraphHeight": 1041.375,
+        "paragraphVisiblePx": 571.594,
+        "paragraphVisibleFraction": 0.549,
+        "roomBelowParagraphStart": 571.594
+      },
+      "afterReturn": {
+        "heading": "Optional cloud workspace",
+        "focused": true,
+        "activeId": "optional-cloud-workspace",
+        "focusVisible": true,
+        "headingTop": 181.625,
+        "toolbarBottom": 113,
+        "paragraphTop": 388.953,
+        "paragraphHeight": 954.594,
+        "paragraphVisiblePx": 511.047,
+        "paragraphVisibleFraction": 0.535,
+        "roomBelowParagraphStart": 511.047
+      }
+    },
+    {
+      "scheme": "gryphy-light",
+      "viewportWidth": 1280,
+      "baseTextPx": 16,
+      "checksPassed": 19,
+      "failed": [],
+      "jumpCount": 3,
+      "jumpsPassing": 3,
+      "returnPassing": true,
+      "selectionPersists": true,
+      "externalAttemptCount": 0,
+      "httpErrors": [],
+      "entry": {
+        "scrollY": 0,
+        "title": {
+          "label": "Data handling",
+          "top": 135.296875,
+          "bottom": 175.328125,
+          "fullyVisible": true
+        },
+        "links": [
+          {
+            "label": "Personal Notes",
+            "top": 191.328125,
+            "bottom": 235.328125,
+            "fullyVisible": true
+          },
+          {
+            "label": "Habitica credentials",
+            "top": 191.328125,
+            "bottom": 235.328125,
+            "fullyVisible": true
+          },
+          {
+            "label": "Private sync",
+            "top": 191.328125,
+            "bottom": 235.328125,
+            "fullyVisible": true
+          }
+        ]
+      },
+      "afterPersonalNotes": {
+        "heading": "Personal Notes",
+        "focused": true,
+        "activeId": "personal-notes",
+        "focusVisible": true,
+        "headingTop": 91.094,
+        "toolbarBottom": 57,
+        "paragraphTop": 134.703,
+        "paragraphHeight": 281.938,
+        "paragraphVisiblePx": 281.938,
+        "paragraphVisibleFraction": 1,
+        "roomBelowParagraphStart": 765.297
+      },
+      "afterReturn": {
+        "heading": "Optional cloud workspace",
+        "focused": true,
+        "activeId": "optional-cloud-workspace",
+        "focusVisible": true,
+        "headingTop": 91.094,
+        "toolbarBottom": 57,
+        "paragraphTop": 164.719,
+        "paragraphHeight": 238.562,
+        "paragraphVisiblePx": 238.562,
+        "paragraphVisibleFraction": 1,
+        "roomBelowParagraphStart": 735.281
+      }
+    },
+    {
+      "scheme": "gryphy-light",
+      "viewportWidth": 1280,
+      "baseTextPx": 32,
+      "checksPassed": 19,
+      "failed": [],
+      "jumpCount": 3,
+      "jumpsPassing": 3,
+      "returnPassing": true,
+      "selectionPersists": true,
+      "externalAttemptCount": 0,
+      "httpErrors": [],
+      "entry": {
+        "scrollY": 0,
+        "title": {
+          "label": "Data handling",
+          "top": 269.59375,
+          "bottom": 349.671875,
+          "fullyVisible": true
+        },
+        "links": [
+          {
+            "label": "Personal Notes",
+            "top": 381.671875,
+            "bottom": 439.703125,
+            "fullyVisible": true
+          },
+          {
+            "label": "Habitica credentials",
+            "top": 381.671875,
+            "bottom": 439.703125,
+            "fullyVisible": true
+          },
+          {
+            "label": "Private sync",
+            "top": 381.671875,
+            "bottom": 439.703125,
+            "fullyVisible": true
+          }
+        ]
+      },
+      "afterPersonalNotes": {
+        "heading": "Personal Notes",
+        "focused": true,
+        "activeId": "personal-notes",
+        "focusVisible": true,
+        "headingTop": 181.812,
+        "toolbarBottom": 113,
+        "paragraphTop": 269.047,
+        "paragraphHeight": 260.344,
+        "paragraphVisiblePx": 260.344,
+        "paragraphVisibleFraction": 1,
+        "roomBelowParagraphStart": 630.953
+      },
+      "afterReturn": {
+        "heading": "Optional cloud workspace",
+        "focused": true,
+        "activeId": "optional-cloud-workspace",
+        "focusVisible": true,
+        "headingTop": 181.156,
+        "toolbarBottom": 113,
+        "paragraphTop": 268.391,
+        "paragraphHeight": 216.953,
+        "paragraphVisiblePx": 216.953,
+        "paragraphVisibleFraction": 1,
+        "roomBelowParagraphStart": 631.609
+      }
+    },
+    {
+      "scheme": "obsidian-glow",
+      "viewportWidth": 360,
+      "baseTextPx": 16,
+      "checksPassed": 19,
+      "failed": [],
+      "jumpCount": 3,
+      "jumpsPassing": 3,
+      "returnPassing": true,
+      "selectionPersists": true,
+      "externalAttemptCount": 0,
+      "httpErrors": [],
+      "entry": {
+        "scrollY": 0,
+        "title": {
+          "label": "Data handling",
+          "top": 110.09375,
+          "bottom": 142.28125,
+          "fullyVisible": true
+        },
+        "links": [
+          {
+            "label": "Personal Notes",
+            "top": 150.28125,
+            "bottom": 194.28125,
+            "fullyVisible": true
+          },
+          {
+            "label": "Habitica credentials",
+            "top": 150.28125,
+            "bottom": 194.28125,
+            "fullyVisible": true
+          },
+          {
+            "label": "Private sync",
+            "top": 198.28125,
+            "bottom": 242.28125,
+            "fullyVisible": true
+          }
+        ]
+      },
+      "afterPersonalNotes": {
+        "heading": "Personal Notes",
+        "focused": true,
+        "activeId": "personal-notes",
+        "focusVisible": true,
+        "headingTop": 90.562,
+        "toolbarBottom": 57,
+        "paragraphTop": 134.172,
+        "paragraphHeight": 216.875,
+        "paragraphVisiblePx": 216.875,
+        "paragraphVisibleFraction": 1,
+        "roomBelowParagraphStart": 765.828
+      },
+      "afterReturn": {
+        "heading": "Optional cloud workspace",
+        "focused": true,
+        "activeId": "optional-cloud-workspace",
+        "focusVisible": true,
+        "headingTop": 90.219,
+        "toolbarBottom": 57,
+        "paragraphTop": 133.828,
+        "paragraphHeight": 195.188,
+        "paragraphVisiblePx": 195.188,
+        "paragraphVisibleFraction": 1,
+        "roomBelowParagraphStart": 766.172
+      }
+    },
+    {
+      "scheme": "obsidian-glow",
+      "viewportWidth": 360,
+      "baseTextPx": 32,
+      "checksPassed": 19,
+      "failed": [],
+      "jumpCount": 3,
+      "jumpsPassing": 3,
+      "returnPassing": true,
+      "selectionPersists": true,
+      "externalAttemptCount": 0,
+      "httpErrors": [],
+      "entry": {
+        "scrollY": 0,
+        "title": {
+          "label": "Data handling",
+          "top": 208.390625,
+          "bottom": 337.171875,
+          "fullyVisible": true
+        },
+        "links": [
+          {
+            "label": "Personal Notes",
+            "top": 353.171875,
+            "bottom": 403.203125,
+            "fullyVisible": true
+          },
+          {
+            "label": "Habitica credentials",
+            "top": 411.203125,
+            "bottom": 501.265625,
+            "fullyVisible": true
+          },
+          {
+            "label": "Private sync",
+            "top": 509.265625,
+            "bottom": 559.296875,
+            "fullyVisible": true
+          }
+        ]
+      },
+      "afterPersonalNotes": {
+        "heading": "Personal Notes",
+        "focused": true,
+        "activeId": "personal-notes",
+        "focusVisible": true,
+        "headingTop": 181.125,
+        "toolbarBottom": 113,
+        "paragraphTop": 328.406,
+        "paragraphHeight": 1041.375,
+        "paragraphVisiblePx": 571.594,
+        "paragraphVisibleFraction": 0.549,
+        "roomBelowParagraphStart": 571.594
+      },
+      "afterReturn": {
+        "heading": "Optional cloud workspace",
+        "focused": true,
+        "activeId": "optional-cloud-workspace",
+        "focusVisible": true,
+        "headingTop": 181.625,
+        "toolbarBottom": 113,
+        "paragraphTop": 388.953,
+        "paragraphHeight": 954.594,
+        "paragraphVisiblePx": 511.047,
+        "paragraphVisibleFraction": 0.535,
+        "roomBelowParagraphStart": 511.047
+      }
+    },
+    {
+      "scheme": "obsidian-glow",
+      "viewportWidth": 1280,
+      "baseTextPx": 16,
+      "checksPassed": 19,
+      "failed": [],
+      "jumpCount": 3,
+      "jumpsPassing": 3,
+      "returnPassing": true,
+      "selectionPersists": true,
+      "externalAttemptCount": 0,
+      "httpErrors": [],
+      "entry": {
+        "scrollY": 0,
+        "title": {
+          "label": "Data handling",
+          "top": 135.296875,
+          "bottom": 175.328125,
+          "fullyVisible": true
+        },
+        "links": [
+          {
+            "label": "Personal Notes",
+            "top": 191.328125,
+            "bottom": 235.328125,
+            "fullyVisible": true
+          },
+          {
+            "label": "Habitica credentials",
+            "top": 191.328125,
+            "bottom": 235.328125,
+            "fullyVisible": true
+          },
+          {
+            "label": "Private sync",
+            "top": 191.328125,
+            "bottom": 235.328125,
+            "fullyVisible": true
+          }
+        ]
+      },
+      "afterPersonalNotes": {
+        "heading": "Personal Notes",
+        "focused": true,
+        "activeId": "personal-notes",
+        "focusVisible": true,
+        "headingTop": 91.094,
+        "toolbarBottom": 57,
+        "paragraphTop": 134.703,
+        "paragraphHeight": 281.938,
+        "paragraphVisiblePx": 281.938,
+        "paragraphVisibleFraction": 1,
+        "roomBelowParagraphStart": 765.297
+      },
+      "afterReturn": {
+        "heading": "Optional cloud workspace",
+        "focused": true,
+        "activeId": "optional-cloud-workspace",
+        "focusVisible": true,
+        "headingTop": 91.094,
+        "toolbarBottom": 57,
+        "paragraphTop": 164.719,
+        "paragraphHeight": 238.562,
+        "paragraphVisiblePx": 238.562,
+        "paragraphVisibleFraction": 1,
+        "roomBelowParagraphStart": 735.281
+      }
+    },
+    {
+      "scheme": "obsidian-glow",
+      "viewportWidth": 1280,
+      "baseTextPx": 32,
+      "checksPassed": 19,
+      "failed": [],
+      "jumpCount": 3,
+      "jumpsPassing": 3,
+      "returnPassing": true,
+      "selectionPersists": true,
+      "externalAttemptCount": 0,
+      "httpErrors": [],
+      "entry": {
+        "scrollY": 0,
+        "title": {
+          "label": "Data handling",
+          "top": 269.59375,
+          "bottom": 349.671875,
+          "fullyVisible": true
+        },
+        "links": [
+          {
+            "label": "Personal Notes",
+            "top": 381.671875,
+            "bottom": 439.703125,
+            "fullyVisible": true
+          },
+          {
+            "label": "Habitica credentials",
+            "top": 381.671875,
+            "bottom": 439.703125,
+            "fullyVisible": true
+          },
+          {
+            "label": "Private sync",
+            "top": 381.671875,
+            "bottom": 439.703125,
+            "fullyVisible": true
+          }
+        ]
+      },
+      "afterPersonalNotes": {
+        "heading": "Personal Notes",
+        "focused": true,
+        "activeId": "personal-notes",
+        "focusVisible": true,
+        "headingTop": 181.812,
+        "toolbarBottom": 113,
+        "paragraphTop": 269.047,
+        "paragraphHeight": 260.344,
+        "paragraphVisiblePx": 260.344,
+        "paragraphVisibleFraction": 1,
+        "roomBelowParagraphStart": 630.953
+      },
+      "afterReturn": {
+        "heading": "Optional cloud workspace",
+        "focused": true,
+        "activeId": "optional-cloud-workspace",
+        "focusVisible": true,
+        "headingTop": 181.156,
+        "toolbarBottom": 113,
+        "paragraphTop": 268.391,
+        "paragraphHeight": 216.953,
+        "paragraphVisiblePx": 216.953,
+        "paragraphVisibleFraction": 1,
+        "roomBelowParagraphStart": 631.609
+      }
+    }
+  ]
+}

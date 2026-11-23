@@ -3100,7 +3100,7 @@
   "configuration_digest": "1d4ded90f74588a33443cca0a2da314364e2a91faff9e7955ed7ac521848e0ff",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "aa0281eeb78a2919a11832307631b546a1c51daf1171e63613694d6633fb57ab",
+  "identity": "804859720905bac9af982005900d1d9c37083d3c85aa184dac29a5be6f1417a0",
   "operation": "skill-tree-3d",
   "operations": {
     "skill-tree-3d": {
@@ -3198,7 +3198,7 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "f036b404e10b027a16d3d5cea8daa9aa457523bc82f71794a48fba08f0c5fdc3",
+    "SKILL.md": "4bb68310816ff1dc3b2bd458de4617c4191c970f21d3e792771d854fd0dd87fc",
     "agents/openai.yaml": "913ec9239a95745a188a461a1764b533697f63b0b649a57b6826e2736c85f71b",
     "references/3d-authoring-roles.md": "9983b41a3b78f7a359cf10572ba42a30bae63629661f7ee13c5a471d572306f9",
     "references/3d-stages.md": "67b77d81119767a7a848795563b2d2cf29d0c06db98e39411917700c2feafb35",
@@ -3215,7 +3215,7 @@
     "references/project-profile.md": "a2fa0f0f6f445c854f8f32d06653fbb641742811766f8258b58823684d7e1144",
     "references/run-workspaces.md": "7ea6acb5d639d20c0e0ad519bb74b89c3f15dca247d0cfcea55299f8265bb200",
     "references/validation-policy.md": "2bb1e9675fe3bc08cbcb9aa4b9534368416faba7ffaaf6b5aaff417456f434d3",
-    "references/web-development.md": "a8e55f4d58ad64056707801a3c31aa56eb884755fd12ef08c341680d73645bc9",
+    "references/web-development.md": "cf65aa6fb17e41e1ea660dbc1dfb80b508318bcb719eb1d2ca95ce356161034c",
     "references/workflow-metadata.md": "70ba35018051edb4b5a170e7115984bc73ae6c1021ca2ad971f2699192e0e927",
     "scripts/3d-neutral-symmetry.py": "110ddf58e7847e0ac56d10e0a2fcfc6baf81ee2bca3155548356f96411b1565f",
     "scripts/3d-review/evidence.py": "5ac272ec3fc1b80efb6ad033b51247c2281271ed4689b9ac1df493f855f988d9",

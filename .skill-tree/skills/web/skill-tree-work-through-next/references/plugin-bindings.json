@@ -3100,7 +3100,7 @@
   "configuration_digest": "1d4ded90f74588a33443cca0a2da314364e2a91faff9e7955ed7ac521848e0ff",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "7e011e88796bd3af8e9a8a8f048094208b31ce23f31fa79a77d970df62d889d5",
+  "identity": "28ad199d96ede981f003c9468792bf56c3850cf8eb4f8d5b8719eeda108209a6",
   "operation": "skill-tree-work-through-next",
   "operations": {
     "skill-tree-3d": {
@@ -3198,7 +3198,7 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "f4f949943f7ba317e5cf48e1007c05c34a21573ce5035ae1b378f5745acc5218",
+    "SKILL.md": "860aa5784c0d7f1136d73a0a65d33859c08a83a281ad7556abb236e6bc52965f",
     "agents/openai.yaml": "b5575ab3a7a3fa376a0351d4ac7e0b671c033a6f79fbcd7f69903389378ca8e8",
     "references/decision-governance.md": "52f8dc84c7cae4b9aa3aaa010d3ffb605ab79f5d75aaa36b9370d51e49305222",
     "references/development-practices.md": "352a45b093f2c53b7b08aef045a098880af74c6add6fb79f95017a52fd0e0780",
@@ -3214,7 +3214,7 @@
     "references/project-profile.md": "a2fa0f0f6f445c854f8f32d06653fbb641742811766f8258b58823684d7e1144",
     "references/run-workspaces.md": "7ea6acb5d639d20c0e0ad519bb74b89c3f15dca247d0cfcea55299f8265bb200",
     "references/validation-policy.md": "2bb1e9675fe3bc08cbcb9aa4b9534368416faba7ffaaf6b5aaff417456f434d3",
-    "references/web-development.md": "a8e55f4d58ad64056707801a3c31aa56eb884755fd12ef08c341680d73645bc9",
+    "references/web-development.md": "cf65aa6fb17e41e1ea660dbc1dfb80b508318bcb719eb1d2ca95ce356161034c",
     "references/workflow-metadata.md": "70ba35018051edb4b5a170e7115984bc73ae6c1021ca2ad971f2699192e0e927",
     "scripts/api-contract-locks.js": "eaac3e411ab7ddea36cedb4c48f0a0d0c5e737509466f0f86587df51a34fe594",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
