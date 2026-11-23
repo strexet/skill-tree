@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "c842efb19827fca61038dac76fe99b14dcf37a2f68771fa5ac2cfd79fbe8eb55",
+  "identity": "159ff0a4e86e255dd052be85bb20cc7fb5edec2b980d6fe2d4a4781b22b575f4",
   "operation": "skill-tree-implement-all",
   "operations": {
     "skill-tree-3d": {
@@ -3302,7 +3302,7 @@
     "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/pr-review-cycle.md": "5a74a2cd4f43d1613606cf64976ffc8c7dd9cd736dd4c7ae5eca5f0bc2c3021b",
-    "references/project-profile.md": "225c079a87a5d1fe55e7c38d4c3dd36425d55b0cdf2a2e2ae27945bb0d3b9b4b",
+    "references/project-profile.md": "90c6b18d354a3d6731af5f12b7ecfe166e053474232c5fa9a7807113f850ceaa",
     "references/run-workspaces.md": "7aecf10beac0440aba77c5960862f8660fc75741385a892ea40c072bf39198cf",
     "references/validation-policy.md": "2bb1e9675fe3bc08cbcb9aa4b9534368416faba7ffaaf6b5aaff417456f434d3",
     "references/workflow-metadata.md": "0ad2ee19e9392f252d537e4543e235586eb634b15536ffec17bfd1c36dc4fee0",

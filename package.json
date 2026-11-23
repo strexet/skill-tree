@@ -1,6 +1,6 @@
 {
   "name": "skill-tree-skills",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Project-scoped Skill Tree flavors for general, web, Unity and Director workflows with owned installation and resumable validation.",
   "license": "MIT",
   "private": true,

@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "17d05844ee5193c34df569c040b7ba52001c9a336705e5ee00a1b3749b81ad1d",
+  "identity": "60d6e8c605919c75eb97e36ce33e954361ac1e8ba423952f38215d090b2f9558",
   "operation": "skill-tree-repo-documentation-audit",
   "operations": {
     "skill-tree-3d": {
@@ -3299,7 +3299,7 @@
     "references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
     "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
-    "references/project-profile.md": "bc28ef55f4c0a3831f0ed71c707285859047614797fa432b458a80ed7b7549b0",
+    "references/project-profile.md": "33bad6fa1ccdc217283051d64eb9bb8022ec73cf06da284042e2f2d6d8a2a8df",
     "references/repository-discovery-checklist.md": "a112230c076fea515c437e3e7407c575ee6690d772eaa28e68f80c720c7a621c",
     "references/run-workspaces.md": "7aecf10beac0440aba77c5960862f8660fc75741385a892ea40c072bf39198cf",
     "references/validation-policy.md": "2bb1e9675fe3bc08cbcb9aa4b9534368416faba7ffaaf6b5aaff417456f434d3",

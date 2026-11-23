@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "79050763257e27626f6cfb255f37c8639fc429db4e1b4fee8c4f254a4dce3297",
+  "identity": "34f5b18cdbe9305b6d3a668da7695601609ec6dda56129a69898095c52d3abb7",
   "operation": "skill-tree-plugins",
   "operations": {
     "skill-tree-3d": {
@@ -3294,7 +3294,7 @@
     "references/decision-governance.md": "68506301b32a58cbbcfc03fdeb62fed6875694f1f9b724749c7f79c26da0de80",
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
-    "references/project-profile.md": "c35d0470702b1542021676968e27cb87492bd8436930ee9c19cb8d2396778926",
+    "references/project-profile.md": "081fb25f60ff169f53fb5536494022e0e99937314e45db52162ce87a3ec1101f",
     "references/validation-policy.md": "2bb1e9675fe3bc08cbcb9aa4b9534368416faba7ffaaf6b5aaff417456f434d3",
     "references/web-development.md": "cf65aa6fb17e41e1ea660dbc1dfb80b508318bcb719eb1d2ca95ce356161034c",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",

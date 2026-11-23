@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.7.0 (2026-11-23)
+
+### Added
+
+- The default installer creates a dedicated Director workspace. Guided setup previews the selected clients and registers existing or new projects with verified profiles and separate maintenance branches. Scoped client removal preserves the other installed clients and workspace state.
+- Director searches committed text within the areas and revisions pinned by a plan assignment. Results include the Git commit, path, line, content hash and matching excerpt.
+- Force Process researches complex Pending requests and specifies the first runnable work. Read-only Preview and Verify commands check the proposed and recorded queue effects against the exact selection.
+
+### Changed
+
+- Web guidance covers component selection at first use and checks the changed journey in the running browser, including focus, keyboard access, visible outcomes, contrast and narrow viewports.
+- New local development follows an exact Pending selection through Process Pending and Work Through Next. Existing Ready tasks and retained runs keep their selected implementation or resume path.
+
+### Fixed
+
+- Director verifies linked-worktree ownership during recovery, pins diagnostic repairs to the executed recipe and integrates approved changes only into the registered project branch. PR checks verify fork and branch identity.
+- Completed dependencies preserve their acceptance order and recover retained acceptance contracts before a dependent task starts.
+
 ## 0.6.0 (2026-11-20)
 
 ### Added

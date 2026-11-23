@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "72e016428bbc84d070f925cd130cf4f5fa2ad6c0891eb05d7370e17c2d7f07d0",
+  "identity": "45cc07e1423930cb06dd2991eb185f6c61989d3df9e974a591b45a330c88df82",
   "operation": "skill-tree-pr-review-cycle",
   "operations": {
     "skill-tree-3d": {
@@ -3297,7 +3297,7 @@
     "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/pr-review-cycle.md": "5a74a2cd4f43d1613606cf64976ffc8c7dd9cd736dd4c7ae5eca5f0bc2c3021b",
-    "references/project-profile.md": "c35d0470702b1542021676968e27cb87492bd8436930ee9c19cb8d2396778926",
+    "references/project-profile.md": "081fb25f60ff169f53fb5536494022e0e99937314e45db52162ce87a3ec1101f",
     "references/run-workspaces.md": "7aecf10beac0440aba77c5960862f8660fc75741385a892ea40c072bf39198cf",
     "references/validation-policy.md": "2bb1e9675fe3bc08cbcb9aa4b9534368416faba7ffaaf6b5aaff417456f434d3",
     "references/web-development.md": "cf65aa6fb17e41e1ea660dbc1dfb80b508318bcb719eb1d2ca95ce356161034c",
