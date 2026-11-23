@@ -550,6 +550,9 @@ async function main(argv = process.argv.slice(2), {promptFactory} = {}) {
     const composer = require(path.join(source, "lib/composer.js"));
     const flavors = flavorNames(source);
     const prior = manager.receipt(target);
+    if (args.uninstall && namedDirector && prior && prior.flavor !== "director") {
+      throw Error("The selected direct profile is " + prior.flavor + ". Director has no ownership to uninstall at this target.");
+    }
     const interactive = !args.nonInteractive && (Boolean(promptFactory) || Boolean(process.stdin.isTTY && process.stdout.isTTY));
     if (args.configurePlugins && !args.dryRun && !interactive) {
       throw Error("--configure-plugins requires an interactive terminal. Use --plugins with --confirm-plugins for noninteractive setup.");

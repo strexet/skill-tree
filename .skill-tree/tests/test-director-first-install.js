@@ -103,6 +103,11 @@ test('scoped Director uninstall preserves shared discovery, the remaining host a
   const separate = path.join(root,'.claude/skills/skill-tree-director/SKILL.md');
   run(process.execPath,[cli,'--target',root,'--only','codex','--flavor','web'],root);
   const original = read(root,receipt);
+  const wrongOwner = spawnSync(process.execPath,[cli,'--target',root,'--project','--only','codex',
+    '--flavor','director','--uninstall'],{encoding:'utf8'});
+  assert.notEqual(wrongOwner.status,0);
+  assert.match(wrongOwner.stderr,/no ownership/);
+  assert.equal(read(root,receipt),original);
   launch('--only','codex','--only','dsh','--only','claude-code');
   const initial = config();
   const queue = read(home,'.skill-tree/documents/future.json');
