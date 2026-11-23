@@ -49,9 +49,10 @@ function ownedPath(workspace, relative) {
   return target;
 }
 
-function checkLauncher(workspace, provider, expected) {
+function checkLauncher(workspace, provider, expected, removing = false) {
   const folder = ownedPath(workspace, relativePackage(provider, launcher));
   const file = path.join(folder, "SKILL.md");
+  if (removing && fs.existsSync(folder) && !fs.readdirSync(folder).length) return file;
   if (fs.existsSync(folder) && (!fs.existsSync(file) || fs.lstatSync(file).isSymbolicLink() ||
       fs.readFileSync(file, "utf8") !== expected || fs.readdirSync(folder).length !== 1)) {
     throw Error("Director launcher conflicts with an existing package: " + folder);
@@ -69,17 +70,52 @@ function directFlavor(workspace) {
   return composer.readJson(workspace, manager.PROFILE)?.flavor || null;
 }
 
-function installDirector(workspace, source, providers, {dryRun = false, verify = false} = {}) {
-  const canonical = workspacePath(workspace);
-  const home = ownedPath(canonical, directorFolder);
+function readDescriptor(home) {
   const reference = path.join(home, "workspace.json");
   if (fs.existsSync(reference) && fs.lstatSync(reference).isSymbolicLink()) throw Error("Select an owned Director workspace descriptor");
   const previous = fs.existsSync(reference) ? composer.readJson(home, "workspace.json") : null;
   if (previous && (previous.schema !== 1 || previous.kind !== "director-workspace" || !Array.isArray(previous.providers))) {
     throw Error("Unrecognized Director workspace descriptor: " + reference);
   }
-  if (!previous && fs.existsSync(home) && fs.readdirSync(home).length) throw Error("Existing Director directory needs inspection: " + home);
+  if (!previous && fs.existsSync(home) && fs.readdirSync(home).some(name => name !== ".setup-lock")) throw Error("Existing Director directory needs inspection: " + home);
+  return previous;
+}
+
+function writeDescriptor(home, descriptor) {
+  const scratch = fs.mkdtempSync(path.join(home, ".descriptor-"));
+  try {
+    const file = path.join(scratch, "workspace.json");
+    fs.writeFileSync(file, JSON.stringify(descriptor, null, 2) + "\n");
+    fs.renameSync(file, path.join(home, "workspace.json"));
+  } finally { fs.rmSync(scratch, {recursive:true, force:true}); }
+}
+
+function setupLock(home, previous, operation) {
+  const lock = path.join(home, ".setup-lock");
+  let fd;
+  try {
+    fd = fs.openSync(lock, "wx");
+  } catch (error) {
+    if (error.code === "EEXIST") throw Error("Another Director installation owns " + lock + ". If it was interrupted, inspect the workspace and remove the abandoned lock before retrying.");
+    throw error;
+  }
+  fs.writeFileSync(fd, String(process.pid) + "\n");
+  try {
+    const current = readDescriptor(home);
+    if (composer.json(current) !== composer.json(previous)) throw Error("Director host selection changed; retry the request");
+    return operation();
+  } finally {
+    fs.closeSync(fd);
+    fs.unlinkSync(lock);
+  }
+}
+
+function installDirector(workspace, source, providers, {dryRun = false, verify = false} = {}) {
+  const canonical = workspacePath(workspace);
+  const home = ownedPath(canonical, directorFolder);
+  const previous = readDescriptor(home);
   if (verify && !previous) throw Error("Dedicated Director installation is missing: " + home);
+  if (verify && !previous.providers.length) throw Error("No Director hosts are installed in this workspace");
   if (verify && providers.some(host => !previous.providers.includes(host.id))) throw Error("Selected host is missing from the Director workspace");
   const matrix = composer.readJson(source, "config/providers.json").providers;
   const selected = [...new Set([...(previous?.providers || []), ...providers.map(provider => provider.id)])].map(id => {
@@ -112,27 +148,12 @@ function installDirector(workspace, source, providers, {dryRun = false, verify =
   }
   fs.mkdirSync(home, {recursive: true});
   if (fs.realpathSync(home) !== home) throw Error("Director workspace changed during creation");
-  const lock = path.join(home, ".setup-lock");
-  let fd;
-  try {
-    fd = fs.openSync(lock, "wx");
-  } catch (error) {
-    if (error.code === "EEXIST") throw Error("Another Director installation owns " + lock + ". If it was interrupted, inspect the workspace and remove the abandoned lock before retrying.");
-    throw error;
-  }
-  fs.writeFileSync(fd, String(process.pid) + "\n");
-  try {
-    // The descriptor identifies a partially prepared workspace on a safe retry.
-    if (!previous) fs.writeFileSync(reference, JSON.stringify(descriptor, null, 2) + "\n", {flag: "wx"});
+  setupLock(home, previous, () => {
+    // Retain the approved selection for a safe retry of a partial first setup.
+    if (!previous) writeDescriptor(home, descriptor);
     manager.install(home, source, "director", selections);
     manager.verify(home, source);
-    if (previous) {
-      const scratch = fs.mkdtempSync(path.join(home, ".descriptor-"));
-      try {
-        fs.writeFileSync(path.join(scratch, "workspace.json"), JSON.stringify(descriptor, null, 2) + "\n");
-        fs.renameSync(path.join(scratch, "workspace.json"), reference);
-      } finally { fs.rmSync(scratch, {recursive:true, force:true}); }
-    }
+    if (previous) writeDescriptor(home, descriptor);
     const init = spawnSync(process.env.PYTHON || "python3", ["-B", path.join(home, setup), "project-init", home],
       {encoding:"utf8", timeout:120000});
     if (init.error || init.status !== 0) throw Error(init.error?.message || init.stdout || init.stderr);
@@ -141,11 +162,55 @@ function installDirector(workspace, source, providers, {dryRun = false, verify =
       fs.mkdirSync(path.dirname(file), {recursive:true});
       fs.writeFileSync(file, content, {flag:"wx"});
     }
-  } finally {
-    fs.closeSync(fd);
-    fs.unlinkSync(lock);
-  }
+  });
   return message;
 }
 
-module.exports = {installDirector, servicePath, directFlavor};
+function removeDirector(workspace, source, providers, {dryRun = false} = {}) {
+  const canonical = workspacePath(workspace);
+  const home = servicePath(canonical);
+  const previous = readDescriptor(home);
+  if (!previous) throw Error("Dedicated Director installation is missing: " + home);
+  const requested = new Set(providers.map(provider => provider.id));
+  const matrix = composer.readJson(source, "config/providers.json").providers;
+  const installed = previous.providers.map(id => {
+    const host = matrix.find(item => item.id === id);
+    if (!host) throw Error("Recorded Director host is unavailable: " + id);
+    return host;
+  });
+  const removed = installed.filter(host => requested.has(host.id));
+  if (!removed.length) return "Selected Director hosts are already absent at " + home;
+  const remaining = installed.filter(host => !requested.has(host.id));
+  const shared = new Set(remaining.map(host => relativePackage(host, launcher)));
+  const setupEntry = host => relativePackage(host, "skill-tree-director-setup") + "/scripts/director-entry.py";
+  const descriptor = {...previous, providers:remaining.map(host => host.id), setup_entry:remaining.length ? setupEntry(remaining[0]) : null};
+  const execute = () => {
+    const receipt = manager.receipt(home, true);
+    if (receipt.flavor !== "director") throw Error("Director workspace has a different profile");
+    const selections = [];
+    for (const [rel, record] of Object.entries(receipt.destinations)) {
+      for (const provider of record.providers || [record.provider]) {
+        if (requested.has(provider)) selections.push({rel, name:record.name, provider});
+      }
+    }
+    const launchers = new Set(removed.filter(host => !shared.has(relativePackage(host, launcher))).map(host => {
+      const content = launcherText(path.posix.join(directorFolder, setupEntry(host)));
+      return checkLauncher(canonical,host,content,true);
+    }));
+    if (selections.length) manager.uninstall(home, selections, {dryRun, recoverPluginPending:false});
+    if (!dryRun) {
+      for (const file of launchers) {
+        if (fs.existsSync(file)) fs.unlinkSync(file);
+        const directory = path.dirname(file);
+        if (fs.existsSync(directory) && !fs.readdirSync(directory).length) fs.rmdirSync(directory);
+      }
+      writeDescriptor(home,descriptor);
+    }
+  };
+  if (dryRun) execute();
+  else setupLock(home, previous, execute);
+  const hosts = remaining.length ? remaining.map(host => host.id).join(", ") : "none";
+  return `Director host removal${dryRun ? " preview" : " complete"} at ${home}. Remaining hosts: ${hosts}.`;
+}
+
+module.exports = {installDirector, removeDirector, servicePath, directFlavor};

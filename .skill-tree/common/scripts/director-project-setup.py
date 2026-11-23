@@ -122,9 +122,8 @@ def run(raw_root, command, request):
         D._setup_target(str(path), request['kind'])
     def verify_choice(prior):
         stable = ('project_id', 'checkout', 'flavor', 'kind')
-        D._require(all(prior.get(key) == plan[key] for key in stable)
-                   and set(prior.get('providers', ())) <= set(hosts),
-                   'The project ID is already bound to another project or host selection')
+        D._require(all(prior.get(key) == plan[key] for key in stable),
+                   'The project ID is already bound to another project')
     if previous:
         verify_choice(previous)
     if command == 'project-preview':

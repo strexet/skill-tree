@@ -524,6 +524,12 @@ async function main(argv = process.argv.slice(2), {promptFactory} = {}) {
     if (namedDirector && rawOptions && !args.project && rawFlavor && rawFlavor !== "director") {
       throw Error("This project already owns a " + rawFlavor + " profile. Install Director without --skills or --with-init to keep both profiles, or select --project for a direct profile change.");
     }
+    if (namedDirector && !legacy && !rawOptions && args.uninstall) {
+      const providers = selectedProviders(args, matrix);
+      if (!providers.length) throw Error("Select the Director hosts to remove with --only <provider-id> or --all");
+      console.log(directorRuntime.removeDirector(workspace, sourceRoot(args), providers, {dryRun: args.dryRun}));
+      return 0;
+    }
     if (namedDirector && !legacy && !rawOptions && profileOperation) {
       const service = directorRuntime.servicePath(workspace);
       if (!fs.existsSync(path.join(service, "workspace.json"))) throw Error("A dedicated Director installation is required for this operation");
