@@ -21,9 +21,13 @@ class WorkflowStateTests(unittest.TestCase):
         (self.root/'test-report.json').write_text('{"fixture":"behavioral-simulation"}')
     def pending(self,title='Main feature',**kwargs):
         return wf.intake(self.store,{'title':title,'description':'Implement the scoped behavior.','expected_behavior':'The selected behavior preserves isolated state.',**kwargs})
-    def body(self):
-        check={'id':'behavior','recipe_id':'static-inspection','criteria':['Preserve isolated state.'],'sources':['source.cs'],'parameters':{},'assertion':'Preserve isolated state.','timing':'immediate'}
-        return 'Goal:\n- Preserve isolated state.\n\nTouch:\n- source.cs\n\nValidation:\n```json\n'+json.dumps({'checks':[check]})+'\n```\n\nAcceptance:\n- Preserve isolated state.\n'
+    def body(self, criteria=('Preserve isolated state.',)):
+        check={'id':'behavior','recipe_id':'static-inspection','criteria':list(criteria),'sources':['source.cs'],'parameters':{},'assertion':'Preserve isolated state.','timing':'immediate'}
+        return ('Goal:\n- Preserve isolated state.\n\nTouch:\n- source.cs\n\nValidation:\n```json\n'
+                + json.dumps({'checks':[check]}) + '\n```\n\nAcceptance:\n'
+                + ''.join('- '+criterion+'\n' for criterion in criteria))
+    def multi_criterion_body(self):
+        return self.body(('Preserve isolated state.', 'Preserve the recorded evidence.'))
     def promote(self,pending,title=None,**kwargs):
         spec={'title':title or pending['title'],'body':self.body(),'parent_pending_ids':[pending['id']],**kwargs}
         receipt=wf.process(self.store,{'selectors':[pending['id']],'dispositions':{pending['id']:{'status':'promoted','reason':'Research confirms scoped readiness.'}},'tasks':[spec]})
@@ -52,6 +56,29 @@ class WorkflowStateTests(unittest.TestCase):
         self.assertEqual((self.root/'side.txt').read_text(), 'untracked owner edit\n')
         self.assertEqual(wf.complete(self.store, payload)['id'], result['id'])
         self.assertEqual(git('rev-list', '--count', before+'..HEAD'), '1')
+
+    def test_permuted_completion_stores_specification_order_and_preserves_scoped_replay(self):
+        git, task = self.git_task_fixture(body=self.multi_criterion_body())
+        payload = self.checked_git_completion(task, real_review=True)
+        expected = wf.acceptance_criteria(task)
+        (self.root/'second-report.json').write_text('Supplemental evidence for the second criterion.\n')
+        payload['acceptance'][1]['evidence'].append('second-report.json')
+        payload['acceptance'].reverse()
+        repeated = {**payload, 'acceptance': [payload['acceptance'][0]] * 2}
+        with self.assertRaisesRegex(wf.WorkflowError, 'cover exactly'):
+            wf.complete(self.store, repeated)
+        outcome = wf.complete(self.store, payload)
+
+        self.assertEqual([entry['criterion'] for entry in outcome['acceptance']], expected)
+        self.assertEqual([item['path'] for item in outcome['acceptance'][0]['evidence']], ['test-report.json'])
+        self.assertEqual([item['path'] for item in outcome['acceptance'][1]['evidence']],
+                         ['test-report.json', 'second-report.json'])
+        self.assertEqual(wf.task_signature(wf.validation_task(self.store, task['id'])), wf.task_signature(task))
+        self.assertEqual(wf.complete(self.store, payload), outcome)
+        different_request = {**payload, 'acceptance': list(reversed(payload['acceptance']))}
+        with self.assertRaisesRegex(wf.WorkflowError, 'different request'):
+            wf.complete(self.store, different_request)
+        self.assertEqual(git('rev-parse', 'HEAD'), outcome['commits'][0])
 
     def test_scoped_task_commit_recovers_git_success_without_outcome(self):
         git, task = self.git_task_fixture()
@@ -166,7 +193,7 @@ class WorkflowStateTests(unittest.TestCase):
             wf.complete(self.store,payload)
         self.assertEqual(git('rev-parse','HEAD'),parent)
 
-    def git_task_fixture(self, dirty_source=False, validation_alias=None, stored_input='other.txt'):
+    def git_task_fixture(self, dirty_source=False, validation_alias=None, stored_input='other.txt', body=None):
         import subprocess
         def git(*args):
             result=subprocess.run(['git','-C',str(self.root),*args],check=True,capture_output=True,text=True)
@@ -189,6 +216,9 @@ class WorkflowStateTests(unittest.TestCase):
         if validation_alias:
             title='Scoped commit task'
             body=self.body().replace('"sources": ["source.cs"]','"sources": '+json.dumps(['source.cs',validation_alias]))
+            task=self.promote(self.pending(title),title,body=body)
+        elif body is not None:
+            title='Scoped commit task'
             task=self.promote(self.pending(title),title,body=body)
         else:
             task=self.main('Scoped commit task')
@@ -215,7 +245,8 @@ class WorkflowStateTests(unittest.TestCase):
             patcher.start()
             self.addCleanup(patcher.stop)
         return {'task_id':task['id'],'outcome':'The scoped behavior preserves isolated state.',
-            'acceptance':[{'criterion':'Preserve isolated state.','result':'pass','evidence':['test-report.json']}],
+            'acceptance':[{'criterion':criterion,'result':'pass','evidence':['test-report.json']}
+                          for criterion in wf.acceptance_criteria(task)],
             'source_fingerprints':wf.fingerprints(self.store,['source.cs']),'review_id':review_id}
 
     def git_task_review(self,task,identity):
@@ -538,6 +569,130 @@ class WorkflowStateTests(unittest.TestCase):
         for payload in [ {'task_id':task['id'],'outcome':'Behavior delivered.','acceptance':[]}, {'task_id':task['id'],'outcome':'Behavior delivered.','acceptance':[{'criterion':'Different criterion','result':'pass','evidence':['report']}],'source_fingerprints':wf.fingerprints(self.store,['source.cs'])}, {'task_id':task['id'],'outcome':'Behavior delivered.','acceptance':[{'criterion':'Preserve isolated state.','result':'pass','evidence':['report']}],'source_fingerprints':{'source.cs':'stale'}} ]:
             with self.assertRaises(wf.WorkflowError):wf.complete(self.store,payload)
         self.assertEqual(self.store.outcomes(),[]);self.assertIn(task['id'],self.store.text())
+
+    def completed_acceptance_fixture(self, *, legacy=True):
+        def git(*args):
+            subprocess.run(['git', '-C', str(self.root), *args], check=True, capture_output=True)
+
+        git('init', '-b', 'main')
+        git('config', 'user.name', 'Completed Contract Fixture')
+        git('config', 'user.email', 'fixture@example.invalid')
+        git('config', 'commit.gpgSign', 'false')
+        git('add', 'source.cs', '.skill-tree/config/repository.json', 'test-report.json')
+        git('commit', '-m', 'Initial fixture')
+        git('remote', 'add', 'origin', str(self.root))
+        wf.workspaces.setup(self.store, {})
+        title = 'Registered acceptance contract'
+        task = self.promote(self.pending(title), title, body=self.multi_criterion_body())
+        run = wf.start(self.store, 'next', task['id'], workspace={
+            'base_branch': 'main', 'local_base': True, 'local_base_authorization': 'Temporary local fixture.'})
+        store = wf.Store(self.root, run['id'])
+        wf.begin_task(store, {'task_id': task['id']})
+        attempt = wf.prepare_check(store, {'task_id': task['id'], 'check_id': 'behavior'})
+        wf.record_check(store, {'task_id': task['id'], 'check_id': 'behavior', 'attempt_id': attempt['attempt_id'],
+            'result': 'pass', 'classification': 'executed-control', 'actual_lane': 'static',
+            'environment_identity': attempt['environment_identity'],
+            'assertions': [{'assertion': 'Preserve isolated state.', 'result': 'pass'}],
+            'cleanup': 'No product process was launched.', 'evidence': ['test-report.json']})
+        wf.mark_implemented(store, {'task_id': task['id']})
+        outcome = wf.complete(store, {'task_id': task['id'], 'outcome': 'The scoped contract is accepted.',
+            'acceptance': [{'criterion': criterion, 'result': 'pass', 'evidence': ['test-report.json']}
+                           for criterion in wf.acceptance_criteria(task)],
+            'source_fingerprints': wf.fingerprints(store, ['source.cs'])})
+        directory = store.base/'history/run-events'/run['id'].lower()
+        path, = (path for path in directory.glob('*.json')
+                 if outcome in json.loads(path.read_text())['outcomes'])
+        ledger = store.owned(wf.OUTCOME_LEDGER)
+        if legacy:
+            # Emulate the former writer without changing the original task body or signature.
+            outcome['acceptance'].reverse()
+            ledger.write_text(json.dumps(outcome, ensure_ascii=False, sort_keys=True)+'\n')
+            event = json.loads(path.read_text())
+            event['outcomes'] = [outcome]
+            path.write_text(wf.dump(event))
+        return store, task, ledger, path
+
+    def test_legacy_completed_contract_recovers_applied_event_without_rewriting_history(self):
+        store, task, ledger, event = self.completed_acceptance_fixture()
+        original = {path: path.read_bytes() for path in (ledger, event)}
+        restored = wf.validation_task(store, task['id'])
+        self.assertEqual(wf.acceptance_criteria(restored), wf.acceptance_criteria(task))
+        self.assertEqual(wf.task_signature(restored), wf.task_signature(task))
+        self.assertEqual(wf.advance(store)['phase'], 'deferred-processing')
+        finished = wf.finish(store)
+        self.assertEqual(finished['id'], store.run_id)
+        self.assertEqual(finished['phase'], 'completed')
+        self.assertEqual({path: path.read_bytes() for path in original}, original)
+
+    def test_correctly_ordered_completed_contract_does_not_require_event_history(self):
+        store, task, ledger, event = self.completed_acceptance_fixture(legacy=False)
+        event.unlink()
+        original = ledger.read_bytes()
+        self.assertEqual(wf.task_signature(wf.validation_task(store, task['id'])), wf.task_signature(task))
+        self.assertEqual(wf.finish(store)['phase'], 'completed')
+        self.assertEqual(ledger.read_bytes(), original)
+
+    def test_legacy_completed_contract_rejects_missing_or_conflicting_event_evidence(self):
+        store, task, ledger, event = self.completed_acceptance_fixture()
+        event_bytes, state_bytes, ledger_bytes = (path.read_bytes() for path in (event, store.state, ledger))
+        for problem in ('missing', 'symlinked', 'foreign-run', 'foreign-queue', 'unapplied', 'corrupt',
+                        'different-outcome', 'duplicate', 'same-signature-tampering'):
+            with self.subTest(problem=problem):
+                candidate = json.loads(event_bytes)
+                state = json.loads(state_bytes)
+                registry = state['run_registry']
+                duplicate = None
+                symlink_target = None
+                if problem == 'foreign-run':
+                    candidate['run_id'] = wf.identity('WR')
+                elif problem == 'foreign-queue':
+                    candidate['queue_id'] = wf.identity('Q')
+                elif problem == 'unapplied':
+                    registry['applied_events'].remove(candidate['id'])
+                elif problem == 'different-outcome':
+                    candidate['outcomes'][0]['outcome'] = 'A different event outcome.'
+                elif problem == 'duplicate':
+                    copied = {**candidate, 'id': wf.identity('E'),
+                              'sequence': registry['event_sequences'][store.run_id] + 1}
+                    duplicate = event.with_name(copied['id'].lower() + '.json')
+                    duplicate.write_text(wf.dump(copied))
+                    registry['applied_events'].append(copied['id'])
+                    registry['event_sequences'][store.run_id] = copied['sequence']
+                elif problem == 'same-signature-tampering':
+                    change, = candidate['changes']
+                    body = change['before']['body'].replace('Goal:\n- Preserve isolated state.',
+                                                            'Goal:\n- Preserve the recorded state.')
+                    self.assertNotEqual(body, change['before']['body'])
+                    self.assertEqual(wf.task_signature({**task, 'body': body}), wf.task_signature(task))
+                    change['before']['body'] = body
+                store.state.write_text(wf.dump(state))
+                if problem == 'missing':
+                    event.unlink()
+                elif problem == 'symlinked':
+                    symlink_target = event.with_suffix('.fixture')
+                    event.rename(symlink_target)
+                    event.symlink_to(symlink_target.name)
+                elif problem == 'corrupt':
+                    event.write_text('{')
+                else:
+                    event.write_text(wf.dump(candidate))
+                try:
+                    before = {path: path.read_bytes() for path in (ledger, store.state)}
+                    event_before = {path.name: path.read_bytes() for path in event.parent.glob('*.json')}
+                    with self.assertRaises(wf.WorkflowError):
+                        wf.advance(store)
+                    self.assertEqual({path: path.read_bytes() for path in before}, before)
+                    self.assertEqual({path.name: path.read_bytes() for path in event.parent.glob('*.json')},
+                                     event_before)
+                finally:
+                    if symlink_target is not None:
+                        event.unlink()
+                        symlink_target.unlink()
+                    event.write_bytes(event_bytes)
+                    store.state.write_bytes(state_bytes)
+                    if duplicate is not None:
+                        duplicate.unlink()
+        self.assertEqual(ledger.read_bytes(), ledger_bytes)
     def test_audit_freshness_and_scoped_retention_pins(self):
         records=[]
         for i in range(10):records.append(wf.audit(self.store,{'scope':'source','sources':['source.cs'],'findings':[],'checks':[],'coverage_gaps':['Runtime unverified.']}))

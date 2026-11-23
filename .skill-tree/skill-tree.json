@@ -94,7 +94,7 @@
       "scope": "Development defaults integrated with Director"
     },
     {
-      "fresh": true,
+      "fresh": false,
       "id": "A-7c69734d-4254-4a4b-99df-78f2c127fee8",
       "path": ".skill-tree/history/audits/audit-a-7c69734d-4254-4a4b-99df-78f2c127fee8.json",
       "recorded_at": "2026-11-20T09:09:51.102120+00:00",
@@ -1031,6 +1031,7 @@
         ".skill-tree/skills/director/skill-tree-director-setup/scripts/runtime/common/scripts/context-search.py",
         ".skill-tree/skills/director/skill-tree-director-setup/scripts/runtime/common/scripts/decision-governance.py",
         ".skill-tree/skills/director/skill-tree-director-setup/scripts/runtime/common/scripts/decision-orchestration.py",
+        ".skill-tree/skills/director/skill-tree-director-setup/scripts/runtime/common/scripts/director-bootstrap.py",
         ".skill-tree/skills/director/skill-tree-director-setup/scripts/runtime/common/scripts/director-dispatch.py",
         ".skill-tree/skills/director/skill-tree-director-setup/scripts/runtime/common/scripts/director-handoff.py",
         ".skill-tree/skills/director/skill-tree-director-setup/scripts/runtime/common/scripts/director-objectives.py",
@@ -5437,6 +5438,11 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/common/scripts/context-search.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/common/scripts/create-documentation-snapshot.py",
       "role": "canonical"
     },
@@ -5453,6 +5459,11 @@
     {
       "owner": "skill-tree",
       "path": ".skill-tree/common/scripts/director-audit.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/scripts/director-bootstrap.py",
       "role": "canonical"
     },
     {
@@ -5478,11 +5489,6 @@
     {
       "owner": "skill-tree",
       "path": ".skill-tree/common/scripts/director-objectives.py",
-      "role": "canonical"
-    },
-    {
-      "owner": "skill-tree",
-      "path": ".skill-tree/common/scripts/context-search.py",
       "role": "canonical"
     },
     {
@@ -5843,7 +5849,7 @@
     "task_outcomes": ".skill-tree/history/task-outcomes.jsonl"
   },
   "latest_audit": {
-    "fresh": true,
+    "fresh": false,
     "id": "A-7c69734d-4254-4a4b-99df-78f2c127fee8",
     "path": ".skill-tree/history/audits/audit-a-7c69734d-4254-4a4b-99df-78f2c127fee8.json",
     "recorded_at": "2026-11-20T09:09:51.102120+00:00",
@@ -5867,7 +5873,7 @@
     ".skill-tree/common/references/3d-unity-roles.md": "a2dfd76eab6f4d4565007cfcdc6009b4aa3583642cede908d12f6c7cbf04fd75",
     ".skill-tree/common/references/3d-workflow.md": "f4735efd5e40c11e5a9ace610468f7a3e158b26fca752f99cd2f8ac4394a6e77",
     ".skill-tree/common/references/3d-workshop-roles.md": "ed3cd2f786a61bb9a76ff4dfa2141ded4d43852c11ab8dfe6d11afe95bb8c8af",
-    ".skill-tree/common/references/decision-governance.md": "52f8dc84c7cae4b9aa3aaa010d3ffb605ab79f5d75aaa36b9370d51e49305222",
+    ".skill-tree/common/references/decision-governance.md": "68506301b32a58cbbcfc03fdeb62fed6875694f1f9b724749c7f79c26da0de80",
     ".skill-tree/common/references/development-practices.md": "352a45b093f2c53b7b08aef045a098880af74c6add6fb79f95017a52fd0e0780",
     ".skill-tree/common/references/director-workflow.md": "c659120787d0f2dcad75196151c30371046d0256b1bd8700de817b7accebc99e",
     ".skill-tree/common/references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
@@ -5960,7 +5966,7 @@
     ".skill-tree/common/references/snapshot-rules.md": "18142120546fcd532e496fbd14aefbe449fa63da40cbcca577db249b91dcd30e",
     ".skill-tree/common/references/unity-safety.md": "c4a96cdb4bc35a98fcab8ba6bf9c983252cd73d1cefaa439669cedcbed357df0",
     ".skill-tree/common/references/validation-policy.md": "2bb1e9675fe3bc08cbcb9aa4b9534368416faba7ffaaf6b5aaff417456f434d3",
-    ".skill-tree/common/references/workflow-metadata.md": "70ba35018051edb4b5a170e7115984bc73ae6c1021ca2ad971f2699192e0e927",
+    ".skill-tree/common/references/workflow-metadata.md": "0ad2ee19e9392f252d537e4543e235586eb634b15536ffec17bfd1c36dc4fee0",
     ".skill-tree/common/scripts/3d-neutral-symmetry.py": "110ddf58e7847e0ac56d10e0a2fcfc6baf81ee2bca3155548356f96411b1565f",
     ".skill-tree/common/scripts/3d-review/evidence.py": "5ac272ec3fc1b80efb6ad033b51247c2281271ed4689b9ac1df493f855f988d9",
     ".skill-tree/common/scripts/3d-review/review.py": "1038e615a9671a368387dc37462d44fee96207ca3d80f3f73807ea77102114e8",
@@ -5976,6 +5982,7 @@
     ".skill-tree/common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     ".skill-tree/common/scripts/decision-orchestration.py": "d2c5ac475033ae06321fc7917ddf96232a0e442bef7c5db537891e12164fd404",
     ".skill-tree/common/scripts/director-audit.py": "b0bfedc67c5fcd6297f60c2946b7a2b45bbde8c6632e8ea9f313275f2fdab8df",
+    ".skill-tree/common/scripts/director-bootstrap.py": "bea120b90ceff336c93f5a5f17a608089fa75c7fb6a27f9f17568a1e358bac28",
     ".skill-tree/common/scripts/director-dispatch.py": "d95dd5e83d517612da7d2ba863bbe2f897acb0fe2dcc86b73b35847c1a10290f",
     ".skill-tree/common/scripts/director-entry.py": "3e5d323676571842ed0cf88d08957a29f766406523888ebfb833ef03ba03327d",
     ".skill-tree/common/scripts/director-evidence.py": "68cf03f01bc05a1482f8829afdb3b0c97a32605975797715e09e4497334292d8",
@@ -6001,7 +6008,7 @@
     ".skill-tree/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     ".skill-tree/common/scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
     ".skill-tree/common/scripts/validate-repository-documentation.py": "99a7cf90c80f2e6fa5c2b2641e63de281076ec952b74b20807ade38576f10fb4",
-    ".skill-tree/common/scripts/workflow-state.py": "c46026f300f657ab57d20c44583494ed04838d7b70f194ef2077629ee437f1e5",
+    ".skill-tree/common/scripts/workflow-state.py": "f5b48a76e94c61a52a7530805e7423faf9ecc2c2dc56562033b475a6499b299d",
     ".skill-tree/config/capabilities.json": "7213710d95b954beb121c20e177edec9c7deab27f509154b8fb61f3c03f01a04",
     ".skill-tree/config/flavors.json": "6d2458aad763f05f680924d630e43fbb41badbdf1a431efc34d32be371fa67a8",
     ".skill-tree/config/plugin-catalog-eligibility.json": "92a81b29135aaf8deb94c86f56481dfaa5fe9b543ab461c492aceab56efe1042",
@@ -6077,7 +6084,7 @@
     ".skill-tree/scripts/run-tests.py": "00c61ad36efcc208865692e5822f38dd4bbbc036d058bc7e55bc81c3851b711e",
     ".skill-tree/scripts/sync-skill-references.py": "eafdc147fd80e69bbf7dfa3ecb3cb0004890dc02ebd5af07286228017298a9f4",
     ".skill-tree/scripts/validate-skill-repository.py": "5cd81850dfa3f52ca92abf69f5110c497491e9c07b0f039451a9df7a2b3b8faa",
-    ".skill-tree/src/init-rules/skill-tree-skills.md": "a8bc216000c37023d8ef275eee211bf1060292b460e288558c54f8f8dca068fc",
+    ".skill-tree/src/init-rules/skill-tree-skills.md": "2c68aa5bde8a1a4d7cc6630ff670843fc190b58eff729c7d66573fc955b117d2",
     ".skill-tree/templates/invariants.json": "ee0c2c5445e7408cc15fd4aed231ff7d0c38a07d063061f75bfeea3da8971903",
     ".skill-tree/templates/operations.json": "09dd086c90fb2a3f8971adc43971162f143ab78105a8c444a0819ab24234bbab"
   },

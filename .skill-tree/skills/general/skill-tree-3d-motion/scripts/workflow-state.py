@@ -1268,6 +1268,8 @@ def complete(store,payload):
             for check in checks:
                 if not isinstance(check['evidence'],list):raise WorkflowError('Acceptance evidence requires repository-relative file references')
                 check['evidence']=[evidence_pointer(store,ref,required=True) for ref in check['evidence']]
+            checks_by_criterion = {check['criterion']: check for check in checks}
+            payload['acceptance'] = [checks_by_criterion[criterion] for criterion in expected]
         validation_records=validate_task_checks(store,task['id'],state) if disposition=='completed' else []
         if disposition=='completed':
             for accepted in payload['acceptance']:
@@ -2670,6 +2672,70 @@ def check_snapshot(store,task,check,state):
     key=digest(dump({'check':executable,'recipe':recipe,'sources':sources,'environment':environment,'group':group_fingerprint(store,task,state)}).encode())
     return {'key':key,'definition':task_signature(task),'sources':sources,'environment_identity':environment,'recipe':recipe}
 
+def completed_task_body(store, record):
+    # The outcome and applied completion event jointly identify the removed specification.
+    run_id, task_id, outcome_id = record.get('run_id'), record['task_id'], record['id']
+    if not valid_id(run_id, 'WR') or not valid_id(outcome_id, 'O'):
+        return None
+
+    registry = store.load().get('run_registry', {})
+    run = registry.get('runs', {}).get(run_id, {})
+    if run.get('completion_refs', {}).get(task_id) != outcome_id:
+        return None
+
+    last_sequence = registry.get('event_sequences', {}).get(run_id)
+    if type(last_sequence) is not int or last_sequence < 1:
+        return None
+    applied = set(registry.get('applied_events', []))
+    history = store.owned('.skill-tree/history')
+    events = history / 'run-events'
+    directory = events / run_id.lower()
+    if any(path.is_symlink() for path in (history, events, directory)):
+        return None
+
+    recovered = None
+    for path in directory.glob('e-*.json'):
+        event_id = 'E-' + path.stem[2:]
+        if event_id not in applied or not valid_id(event_id, 'E'):
+            continue
+        if path.is_symlink() or not path.is_file():
+            return None
+        try:
+            content = path.read_bytes()
+            event = json.loads(content)
+        except (OSError, ValueError):
+            return None
+        if not isinstance(event, dict) or not isinstance(event.get('outcomes'), list):
+            return None
+        matching = [outcome for outcome in event['outcomes']
+                    if isinstance(outcome, dict) and outcome.get('id') == outcome_id]
+        if not matching:
+            continue
+        sequence = event.get('sequence')
+        if (recovered is not None or matching != [record]
+                or event.get('schema') != 1 or event.get('id') != event_id
+                or event.get('queue_id') != registry['queue_id'] or event.get('run_id') != run_id
+                or type(sequence) is not int or not 1 <= sequence <= last_sequence
+                or not isinstance(event.get('changes'), list)):
+            return None
+        changes = [change for change in event['changes']
+                   if isinstance(change, dict) and change.get('task_id') == task_id]
+        if len(changes) != 1 or 'after' not in changes[0] or changes[0]['after'] is not None:
+            return None
+        before = changes[0].get('before')
+        if not isinstance(before, dict) or before.get('queue') != 'Prioritized Next Changes':
+            return None
+        body = before.get('body')
+        if not isinstance(body, str) or digest(body.encode()) != record.get('task_context', {}).get('content_fingerprint'):
+            return None
+        if getattr(store, '_writer_active', False):
+            relative = path.relative_to(store.root).as_posix()
+            store.expect_unchanged(relative, digest(content))
+            store._future_receipts.add(relative)
+        recovered = body
+    return recovered
+
+
 def validation_task(store,tid):
     matches=[task for task in parse(store.text()) if task['id']==tid and task['queue']=='Prioritized Next Changes']
     if matches:return matches[0]
@@ -2679,8 +2745,16 @@ def validation_task(store,tid):
     criteria=[entry['criterion'] for entry in record['acceptance']]
     body='Goal:\n- Revalidate the recorded completed contract.\n\nTouch:\n- Recorded relevant source and test inputs.\n\nValidation:\n```json\n'+dump({'checks':record['validation_plan']})+'```\n\nAcceptance:\n'+'\n'.join('- '+criterion for criterion in criteria)+'\n'
     task={'id':tid,'body':body,'title':record['title'],'validation_group_id':record.get('validation_group_id'),'boundary_validation':record.get('boundary_validation','not-required'),'completed_contract':True}
-    if task_signature(task)!=record['validation_signature']:raise WorkflowError('Completed validation contract does not match the recorded signature')
-    return task
+    if task_signature(task) == record['validation_signature']:
+        return task
+    original_body = completed_task_body(store, record)
+    if original_body is not None:
+        original = dict(task, body=original_body)
+        if (set(acceptance_criteria(original)) == set(criteria)
+                and check_specs(original) == record['validation_plan']
+                and task_signature(original) == record['validation_signature']):
+            return original
+    raise WorkflowError('Completed validation contract does not match the recorded signature')
 
 def stale_completed_checks(store,state,task_ids=None):
     run=state['active_run'];outcomes={record['task_id']:record for record in store.outcomes() if record['disposition']=='completed'};stale=[]
