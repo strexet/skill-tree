@@ -3100,7 +3100,7 @@
   "configuration_digest": "1d4ded90f74588a33443cca0a2da314364e2a91faff9e7955ed7ac521848e0ff",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "ca9d924a3793f5e82250b191cd92f10f856fa26af391a2012589059dfd23fd24",
+  "identity": "8e99b317d15d9d537c1446d710ac0f39db80630637dcfa12b3715efd334a87b4",
   "operation": "skill-tree-repo-documentation",
   "operations": {
     "skill-tree-3d": {
@@ -3198,7 +3198,7 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "07cd7f1e521a682861243857a95f34c23e572273def7af6312d2153c84e9e12f",
+    "SKILL.md": "9142bc812329ba934c7a267326191d87f4becde4298b7e83961819fd83f7640b",
     "agents/openai.yaml": "db26fd1ed65f841df1ae73c78181b9eca294a69ec8bdf41a7e4cb0e4ec7e345c",
     "references/decision-governance.md": "52f8dc84c7cae4b9aa3aaa010d3ffb605ab79f5d75aaa36b9370d51e49305222",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
@@ -3212,7 +3212,7 @@
     "references/repository-discovery-checklist.md": "a112230c076fea515c437e3e7407c575ee6690d772eaa28e68f80c720c7a621c",
     "references/run-workspaces.md": "7ea6acb5d639d20c0e0ad519bb74b89c3f15dca247d0cfcea55299f8265bb200",
     "references/validation-policy.md": "2bb1e9675fe3bc08cbcb9aa4b9534368416faba7ffaaf6b5aaff417456f434d3",
-    "references/web-development.md": "a8e55f4d58ad64056707801a3c31aa56eb884755fd12ef08c341680d73645bc9",
+    "references/web-development.md": "c0efa57d9cf5f2a4618c5e5f0e008c0bb7f597efccfa56e93324d30fb7b141a8",
     "references/workflow-metadata.md": "70ba35018051edb4b5a170e7115984bc73ae6c1021ca2ad971f2699192e0e927",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "d2c5ac475033ae06321fc7917ddf96232a0e442bef7c5db537891e12164fd404",

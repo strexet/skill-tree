@@ -1,0 +1,7 @@
+{
+  "match": true,
+  "paragraphs": 16,
+  "headings": 9,
+  "source": "git HEAD to worktree, verbatim text and original order",
+  "content_sha256": "5273c4adbf0c451f8a2b4947c617f61a07eaa10fe3ec959c4cf967e621c12e4e"
+}

@@ -1,0 +1,212 @@
+[
+  {
+    "theme": "gryphy-light",
+    "selector": ".privacy-reader nav a",
+    "ratio": 14.72,
+    "fg": [
+      45,
+      32,
+      64
+    ],
+    "samples": [
+      14.721048508991057,
+      14.721048508991057,
+      14.721048508991057
+    ]
+  },
+  {
+    "theme": "gryphy-light",
+    "selector": ".privacy-appearance button",
+    "ratio": 6.01,
+    "fg": [
+      115,
+      52,
+      189
+    ],
+    "samples": [
+      6.012859697663671,
+      6.012859697663671,
+      6.012859697663671
+    ]
+  },
+  {
+    "theme": "gryphy-light",
+    "selector": ".color-scheme-select-row > span",
+    "ratio": 6.23,
+    "fg": [
+      103,
+      90,
+      116
+    ],
+    "samples": [
+      6.226852370619424,
+      6.226852370619424,
+      6.226852370619424
+    ]
+  },
+  {
+    "theme": "gryphy-light",
+    "selector": ".color-scheme-select-row select",
+    "ratio": 14.81,
+    "fg": [
+      45,
+      32,
+      64
+    ],
+    "samples": [
+      14.811041288758036,
+      14.811041288758036,
+      14.811041288758036
+    ]
+  },
+  {
+    "theme": "gryphy-light",
+    "selector": ".privacy-return",
+    "ratio": 14.72,
+    "fg": [
+      45,
+      32,
+      64
+    ],
+    "samples": [
+      14.721048508991057,
+      14.721048508991057,
+      14.721048508991057
+    ]
+  },
+  {
+    "theme": "gryphy-light",
+    "selector": "#personal-notes",
+    "ratio": 14.81,
+    "fg": [
+      45,
+      32,
+      64
+    ],
+    "samples": [
+      14.811041288758036,
+      14.811041288758036,
+      14.811041288758036
+    ]
+  },
+  {
+    "theme": "gryphy-light",
+    "selector": "#personal-notes + p",
+    "ratio": 6.26,
+    "fg": [
+      103,
+      90,
+      116
+    ],
+    "samples": [
+      6.264918392458045,
+      6.264918392458045,
+      6.264918392458045
+    ]
+  },
+  {
+    "theme": "obsidian-glow",
+    "selector": ".privacy-reader nav a",
+    "ratio": 15.34,
+    "fg": [
+      231,
+      236,
+      246
+    ],
+    "samples": [
+      15.342901503439785,
+      15.35847044164118,
+      15.748951395611169
+    ]
+  },
+  {
+    "theme": "obsidian-glow",
+    "selector": ".privacy-appearance button",
+    "ratio": 5.59,
+    "fg": [
+      127,
+      168,
+      255
+    ],
+    "samples": [
+      5.587120578720057,
+      5.587120578720057,
+      5.6009573796657035
+    ]
+  },
+  {
+    "theme": "obsidian-glow",
+    "selector": ".color-scheme-select-row > span",
+    "ratio": 7.09,
+    "fg": [
+      152,
+      162,
+      184
+    ],
+    "samples": [
+      7.09326848431351,
+      7.100466253174466,
+      7.2809918365459705
+    ]
+  },
+  {
+    "theme": "obsidian-glow",
+    "selector": ".color-scheme-select-row select",
+    "ratio": 15.89,
+    "fg": [
+      231,
+      236,
+      246
+    ],
+    "samples": [
+      15.889576972567337,
+      15.889576972567337,
+      15.889576972567337
+    ]
+  },
+  {
+    "theme": "obsidian-glow",
+    "selector": ".privacy-return",
+    "ratio": 15.34,
+    "fg": [
+      231,
+      236,
+      246
+    ],
+    "samples": [
+      15.342901503439785,
+      15.4549307101815,
+      15.763037102522993
+    ]
+  },
+  {
+    "theme": "obsidian-glow",
+    "selector": "#personal-notes",
+    "ratio": 15.49,
+    "fg": [
+      231,
+      236,
+      246
+    ],
+    "samples": [
+      15.494645112996535,
+      16.262560005030405,
+      16.05113595271071
+    ]
+  },
+  {
+    "theme": "obsidian-glow",
+    "selector": "#personal-notes + p",
+    "ratio": 7.21,
+    "fg": [
+      152,
+      162,
+      184
+    ],
+    "samples": [
+      7.21397782654508,
+      7.508242886513262,
+      7.395837959099299
+    ]
+  }
+]

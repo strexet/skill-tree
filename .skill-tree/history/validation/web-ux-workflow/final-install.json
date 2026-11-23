@@ -1,0 +1,56 @@
+{
+  "profile": "web",
+  "provider": "codex",
+  "web_reference_sha256": "c0efa57d9cf5f2a4618c5e5f0e008c0bb7f597efccfa56e93324d30fb7b141a8",
+  "cases": {
+    "first-ever": {
+      "dry_run": {
+        "action": "dry-run",
+        "profile_identity": "b09b0ca0d378f6d19c10e30294d7c3f28d5548078469a920ab87827b602cc408"
+      },
+      "apply": {
+        "action": "installed",
+        "profile_identity": "b09b0ca0d378f6d19c10e30294d7c3f28d5548078469a920ab87827b602cc408"
+      },
+      "verify": {
+        "action": "verified",
+        "profile_identity": "b09b0ca0d378f6d19c10e30294d7c3f28d5548078469a920ab87827b602cc408"
+      },
+      "owned_manager_verify": "passed",
+      "matching_web_packages": 23,
+      "project_docs_created": false
+    },
+    "clean-real-project": {
+      "dry_run": {
+        "action": "dry-run",
+        "profile_identity": "e4c10a54ccf8ef287f43cc9749b6a96a49ab1f64f955d8a49d90d91eb28def27"
+      },
+      "apply": {
+        "action": "installed",
+        "profile_identity": "e4c10a54ccf8ef287f43cc9749b6a96a49ab1f64f955d8a49d90d91eb28def27"
+      },
+      "verify": {
+        "action": "verified",
+        "profile_identity": "e4c10a54ccf8ef287f43cc9749b6a96a49ab1f64f955d8a49d90d91eb28def27"
+      },
+      "owned_manager_verify": "passed",
+      "matching_web_packages": 23
+    },
+    "in-place-upgrade": {
+      "dry_run": {
+        "action": "dry-run",
+        "profile_identity": "e4c10a54ccf8ef287f43cc9749b6a96a49ab1f64f955d8a49d90d91eb28def27"
+      },
+      "apply": {
+        "action": "installed",
+        "profile_identity": "e4c10a54ccf8ef287f43cc9749b6a96a49ab1f64f955d8a49d90d91eb28def27"
+      },
+      "verify": {
+        "action": "verified",
+        "profile_identity": "e4c10a54ccf8ef287f43cc9749b6a96a49ab1f64f955d8a49d90d91eb28def27"
+      },
+      "owned_manager_verify": "passed",
+      "matching_web_packages": 23
+    }
+  }
+}
