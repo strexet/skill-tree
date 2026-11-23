@@ -25,6 +25,8 @@ Use the stopping condition to make the handoff actionable:
 
 A short direct owner reply such as `continue`, `продолжай`, `поехали`, `давай` or `дальше` selects the single next action explicitly offered for a short reply in the preceding applicable handoff in the same conversation. Recheck the proposed scope, authorization and prerequisites before proceeding. Ask for the exact choice if the offer is ambiguous, conflicts with a later instruction or no longer applies. A short continuation reply supplies routine selection or resumption only. Ask for required facts, decisions, Manual acceptance and any additional permissions explicitly. Earlier explicit commit, publication or merge authorization remains scoped to the recorded operation.
 
+When a completed operation leads to new local repository development, offer the next action through the local task workflow. Capture the new request through Add Pending, pass the exact captured P-ID to Process Pending, and pass the resulting T-ID to Work Through Next after the owner selects implementation. A short confirmation of a direct development offer still requires the same task workflow. Start source changes and specialist implementation after admission. An intake-only or processing-only request stops at the requested stage. Use the exact selected task or retained run for existing work. Leave unrelated Ready tasks outside the new scope.
+
 While owner input is pending, continue independent authorized work when possible and keep the blocked work separate. Preserve the current checkpoint and existing continuation and approval rules. When the owner already supplied the exact choice or authorization, proceed within the authorized scope.
 
 ## Actual actor handoff

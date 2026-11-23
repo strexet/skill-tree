@@ -3100,7 +3100,7 @@
   "configuration_digest": "1d4ded90f74588a33443cca0a2da314364e2a91faff9e7955ed7ac521848e0ff",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "7527f7ed7948b5fe337d49150475e9380e3496a7d8bbf6330c5e3aa4d918b386",
+  "identity": "e20982bc6b6b4044b35c56115ae707e961d8347f1c465cc336defbe8d362abe1",
   "operation": "skill-tree-director-audit",
   "operations": {
     "skill-tree-3d": {
@@ -3200,7 +3200,7 @@
   "owned_resources": {
     "SKILL.md": "ce6ca927c056ce103085ccc3370154c0c42077cb2e75a892ed9f23ee0053ac5e",
     "agents/openai.yaml": "8a366400c980d7f4bc6ab27694b7dbb1d957283f2dcfdd835c4530f3a40b8a81",
-    "references/decision-governance.md": "52f8dc84c7cae4b9aa3aaa010d3ffb605ab79f5d75aaa36b9370d51e49305222",
+    "references/decision-governance.md": "68506301b32a58cbbcfc03fdeb62fed6875694f1f9b724749c7f79c26da0de80",
     "references/development-practices.md": "352a45b093f2c53b7b08aef045a098880af74c6add6fb79f95017a52fd0e0780",
     "references/director-capabilities.json": "8cc57eb2504e2fa8cfa270d5181074fca7d5ae020a8f34608dfa6e98f018c4ca",
     "references/director-workflow.md": "c659120787d0f2dcad75196151c30371046d0256b1bd8700de817b7accebc99e",
