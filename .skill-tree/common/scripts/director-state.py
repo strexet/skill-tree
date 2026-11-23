@@ -483,6 +483,8 @@ def _guided_setup_preview(root, request):
                       for host in record.get('providers', [record.get('provider')])}
     providers = _tokens(workspace.get('providers', sorted(observed_hosts) or ['codex']), 'Setup hosts')
     matrix, _ = _read(Path(source['checkout']), '.skill-tree/config/providers.json')
+    _require(isinstance(matrix, dict) and isinstance(matrix.get('providers'), list),
+             'The selected package source must include a provider matrix')
     _require(providers and set(providers) <= {host['id'] for host in matrix['providers']}, 'Choose supported Setup hosts')
     parent['providers'] = providers
     areas, observed = {}, []

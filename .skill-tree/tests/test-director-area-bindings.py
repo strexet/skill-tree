@@ -78,6 +78,8 @@ class DirectorAreaBindingTests(unittest.TestCase):
         (core / 'config/flavors.json').write_text(json.dumps({'flavors':{
             name:{} for name in ('director', 'general', 'unity', 'web')}}))
         (core / 'config/resource-map.json').write_text('{}')
+        (core / 'config/providers.json').write_text(json.dumps({'providers': [
+            {'id': 'codex', 'projectPath': '.agents/skills'}, {'id': 'claude-code', 'projectPath': '.claude/skills'}]}))
         self.git(self.repo, 'add', '.skill-tree/config', *['.skill-tree/'+name for name in
             ('common', 'domains', 'templates', 'lib', 'src', 'bin')])
         self.git(self.repo, '-c', 'user.name=Director Fixture', '-c', 'user.email=fixture@example.invalid',
