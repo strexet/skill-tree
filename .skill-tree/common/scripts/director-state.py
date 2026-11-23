@@ -79,14 +79,22 @@ def _portable_recipe(root, queue, recipe, resource, source_path):
                 return label + '/' + (source_path if relative == resource else relative)
         return source_path if value == resource else value
 
+    # Installed profiles include the declaring registry as their first input.
+    # The Core environment receipt proves the exact registry bytes; the portable
+    # comparison covers the selected recipe and its actual supporting files.
+    names = list(recipe.get('input_paths', []))
+    portable = dict(recipe)
+    if (portable.get('qualification') == 'owner-declared static recipe; runner unqualified' and names
+            and names[0] in {'.skill-tree/config/repository.json', '.skill-tree/validation-recipes.json'}):
+        names.pop(0)
+        portable.pop('qualification')
     inputs = {}
-    for relative in recipe.get('input_paths', []):
+    for relative in names:
         path = _safe_path(root, relative)
         _require(path.is_file(), 'Missing reproduction recipe input')
         # The repaired resource itself has separate before/after generation proofs.
         inputs[operand(relative)] = '{checked-resource}' if relative == resource else WF.file_hash(path)
-    portable = {**recipe, 'argv': [operand(arg) for arg in recipe['argv']],
-                'input_paths': [operand(path) for path in recipe.get('input_paths', [])]}
+    portable.update(argv=[operand(arg) for arg in recipe['argv']], input_paths=[operand(path) for path in names])
     return _digest({'recipe': portable, 'inputs': inputs})
 
 
