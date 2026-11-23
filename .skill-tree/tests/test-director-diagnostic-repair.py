@@ -1,5 +1,6 @@
 """Exercise a second installed source failure from audit through a reviewed correction."""
 import importlib.util
+import json
 from pathlib import Path
 import subprocess
 import unittest
@@ -15,6 +16,18 @@ class WrongCount(f.SourceRepairControls):
     assertion = 'The snapshot reports one selected document.'
     defect = b'print("included: 0")'
     repaired = b'print(f"included: {len(report)}")'
+
+    def repository(self, root, *, source):
+        super().repository(root, source=source)
+        name = '.skill-tree/config/repository.json' if source else '.skill-tree/validation-recipes.json'
+        path = root / name
+        config = json.loads(path.read_text())
+        config['recipes'][f.REPAIR.RECIPE]['input_paths'] = ['expected-count.txt']
+        self.file(root, 'expected-count.txt', 'one document')
+        path.write_text(json.dumps(config))
+        self.git(root, 'add', name, 'expected-count.txt')
+        self.git(root, '-c', 'user.name=Director Fixture', '-c', 'user.email=fixture@example.invalid',
+                 'commit', '-m', 'Record the fixture version for this check')
 
     def observe(self, worktree, subject, attempt, relative):
         result = subprocess.run(attempt['recipe']['argv'], cwd=worktree, capture_output=True, text=True, check=True)
@@ -43,6 +56,18 @@ class WrongCount(f.SourceRepairControls):
         evidence.write_bytes(original.replace(b'zero-documents', b'two-documents'))
         self.assertEqual(self.audit.read(request['audit'])['findings'], [])
         evidence.write_bytes(original)
+        fixture_input = self.target / 'expected-count.txt'
+        fixture_input.write_text('revised input')
+        self.assertEqual(self.audit.read(request['audit'])['findings'], [])
+        fixture_input.write_text('one document')
+        recipe_file = self.source / '.skill-tree/config/repository.json'
+        original_config = recipe_file.read_bytes()
+        changed = json.loads(original_config)
+        changed['recipes'][f.REPAIR.RECIPE]['argv'].append('--help')
+        recipe_file.write_text(json.dumps(changed))
+        with self.assertRaisesRegex(ValueError, 'reproduction recipe differs'):
+            self.repair.preview(request)
+        recipe_file.write_bytes(original_config)
         repair_id = preview['repair_id']
         approval = {'request': request, 'repair_id': repair_id, 'owner': f.OWNER, 'authorized_effects': sorted(f.REPAIR.EFFECTS),
                     'expected_preview_sha256': preview['preview_sha256']}

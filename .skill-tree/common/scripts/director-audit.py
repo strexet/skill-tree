@@ -505,7 +505,7 @@ def _finding(generation):
     return {**finding, 'finding_sha256': source_finding_digest(finding)}
 
 
-def _diagnostic_finding(worktree, check_id, check, record, attempt):
+def _diagnostic_finding(worktree, queue, check_id, check, record, attempt):
     """Attribute a structured expected/observed result to one verified packaged resource."""
     recipe = (check or {}).get('recipe_id')
     if (worktree is None or not recipe or record.get('classification') != 'executed-control'
@@ -544,6 +544,13 @@ def _diagnostic_finding(worktree, check_id, check, record, attempt):
                    and D.WF.file_hash(D._safe_path(worktree, installed)) == generation, 'Resource generation changed')
         fixtures = {path: digest for path, digest in record['sources'].items() if path != installed}
         D._require(all(D._scope(path) and D._sha(digest) for path, digest in fixtures.items()), 'Invalid fixture')
+        executed_recipe = attempt['recipe']
+        recipe_inputs = {path: D.WF.file_hash(D._safe_path(worktree, path)) for path in executed_recipe.get('input_paths', [])}
+        D._require(all(D._sha(value) for value in recipe_inputs.values())
+                   and D._digest({'recipe': executed_recipe, 'inputs': recipe_inputs})
+                   == attempt['environment_identity'] == record['environment_identity'],
+                   'The original recipe inputs changed after the executed check')
+        recipe_hash = D._portable_recipe(worktree, queue, executed_recipe, installed, '.skill-tree/' + source)
         params = {}
         for key, value in check['parameters'].items():
             D._require(isinstance(value, str) and (value in record['sources'] or D._token(value))
@@ -553,7 +560,7 @@ def _diagnostic_finding(worktree, check_id, check, record, attempt):
                    'conditions': {'recipe_id': recipe, 'lane': 'unit', 'assertion_id': check_id},
                    'generation': {'source_sha256': generation, 'installed_sha256': generation}, 'expected': expected,
                    'observed': observed, 'scope': {'source_path': '.skill-tree/' + source, 'operation': package['name']},
-                   'reproduction': {'kind': 'director-resource-check', 'resource': resource, 'fixtures': fixtures, 'parameters': params},
+                   'reproduction': {'kind': 'director-resource-check', 'resource': resource, 'fixtures': fixtures, 'parameters': params, 'recipe_sha256': recipe_hash},
                    'evidence': []}
         return {**finding, 'finding_sha256': source_finding_digest(finding)}, {
             'result_path': result_path, 'result_sha256': result_hash, 'profile_sha256': profile_hash,
@@ -662,7 +669,7 @@ class DirectorAudit:
                 proof = _source_check(check_id, record, attempt, checks.get(task_id, {}), worktree, verified)
                 diagnostics = _check_diagnostics(record)
                 diagnostic = None if proof else _diagnostic_finding(
-                    worktree, check_id, checks.get(task_id, {}).get(check_id), record, attempt)
+                    worktree, root, check_id, checks.get(task_id, {}).get(check_id), record, attempt)
                 if proof or diagnostic:
                     if diagnostic:
                         finding, proof = diagnostic

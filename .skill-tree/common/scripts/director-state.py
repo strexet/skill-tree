@@ -64,6 +64,32 @@ def _digest(value):
     return hashlib.sha256(WF.dump(value).encode()).hexdigest()
 
 
+def _portable_recipe(root, queue, recipe, resource, source_path):
+    """Fingerprint an executed recipe, replacing only verified path relocations."""
+    _require(recipe.get('lane') == 'unit' and isinstance(recipe.get('argv'), list)
+             and recipe['argv'] and not recipe.get('execution_binding'), 'Unsupported source reproduction recipe')
+
+    def operand(value):
+        _require(isinstance(value, str), 'Invalid recipe operand')
+        for directory, label in ((root, '{project_root}'), (queue, '{queue_root}')):
+            if value == str(directory):
+                return label
+            if value.startswith(str(directory) + '/'):
+                relative = value[len(str(directory)) + 1:]
+                return label + '/' + (source_path if relative == resource else relative)
+        return source_path if value == resource else value
+
+    inputs = {}
+    for relative in recipe.get('input_paths', []):
+        path = _safe_path(root, relative)
+        _require(path.is_file(), 'Missing reproduction recipe input')
+        # The repaired resource itself has separate before/after generation proofs.
+        inputs[operand(relative)] = '{checked-resource}' if relative == resource else WF.file_hash(path)
+    portable = {**recipe, 'argv': [operand(arg) for arg in recipe['argv']],
+                'input_paths': [operand(path) for path in recipe.get('input_paths', [])]}
+    return _digest({'recipe': portable, 'inputs': inputs})
+
+
 def _sha(value):
     return isinstance(value, str) and SHA256.fullmatch(value) is not None
 

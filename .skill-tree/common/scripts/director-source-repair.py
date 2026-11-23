@@ -103,7 +103,8 @@ def _repair_scenario(finding):
     return {'id': 'director-resource-check', **conditions,
             'assertion': f"The {conditions['assertion_id']} control reports {finding['expected']}.",
             'expected': finding['expected'], 'observed': finding['observed'],
-            'resource': reproduction['resource'], 'fixtures': reproduction['fixtures'], 'parameters': reproduction['parameters']}
+            'resource': reproduction['resource'], 'fixtures': reproduction['fixtures'], 'parameters': reproduction['parameters'],
+            'recipe_sha256': reproduction['recipe_sha256']}
 
 
 def _case_check(plan):
@@ -192,7 +193,8 @@ class DirectorSourceRepair:
         plan = {'schema': 1, 'director_id': director, 'source': area, 'finding': finding, 'scenario': spec}
         if diagnostic:
             recipe, _ = D.WF.recipe_for(D.WF.Store(root, neutral=True), _case_check(plan))
-            D._require(recipe['lane'] == spec['lane'], 'Maintenance reproduction recipe differs')
+            D._require(D._portable_recipe(root, root, recipe, source_path, source_path) == spec['recipe_sha256'],
+                       'Maintenance reproduction recipe differs from the executed product check')
         if maintenance:
             plan['maintenance'] = maintenance
         result = {'repair_id': _repair_id(plan), 'plan': plan, 'audit_sha256': audit['audit_sha256'],
@@ -416,6 +418,13 @@ console.log(JSON.stringify({source_inventory_sha256:c.hash(c.json(inputs)), sour
                    and checks[0]['check']['recipe_id'] == spec['recipe_id'] and checks[0]['check']['assertion'] == spec['assertion']
                    and isinstance(checks[0].get('red'), dict) and checks[0]['red']['definition'] == checks[0]['result']['definition'],
                    'Canonical outcome does not bind the same original assertion and check')
+        if not snapshot:
+            store = D.WF.Store(root, run_id=run['id'])
+            store.load()
+            recipe, environment = D.WF.recipe_for(store, checks[0]['check'])
+            D._require(D._portable_recipe(worktree, root, recipe, source_path, source_path) == spec['recipe_sha256']
+                       and checks[0]['red']['environment_identity'] == checks[0]['result']['environment_identity'] == environment,
+                       'Reviewed source checks must execute the original portable recipe')
         verified = {}
         for label, row, digest, red in [('original', checks[0]['red'], before, True), ('repaired', checks[0]['result'], after, False)]:
             verified[label] = (self._observed_check(row, worktree, digest, red=red) if snapshot else
