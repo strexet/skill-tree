@@ -78,13 +78,16 @@ def runtime(root):
         raise RunError('Unsupported machine-local run locator; explicit recovery required')
     return data
 
-def atomic(path, data):
+def atomic(path, data, *, exclusive=False):
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, name = tempfile.mkstemp(prefix='skill-tree-', dir=path.parent)
     try:
         with os.fdopen(fd, 'w') as stream:
             json.dump(data, stream, indent=2, sort_keys=True); stream.write('\n'); stream.flush(); os.fsync(stream.fileno())
-        os.replace(name, path)
+        if exclusive:
+            os.link(name, path)
+        else:
+            os.replace(name, path)
     finally:
         Path(name).unlink(missing_ok=True)
 
@@ -311,11 +314,7 @@ def create_reserved(store, run, path):
     data['worktrees'][run['id']] = str(path); atomic(runtime_file(store.root), data)
     git(store.root, 'worktree', 'add', '-b', run['workspace']['branch'], path, run['workspace']['base_commit'])
     if run.get('dispatch_workspace_sha256'):
-        registration = linked_registration(store.root, path)
-        owner = {'run_id': run['id'], 'queue_id': data['queue_id'], 'registration': registration.name,
-                 'token': str(uuid.uuid4())}
-        atomic(registration/'skill-tree-owner.json', owner)
-        run['workspace']['cleanup_owner'] = owner
+        run['workspace']['cleanup_owner'] = directed_owner(store.root, path, run, data['queue_id'], created=True)
     run['workspace_state'] = 'ready'
     store.source_root = path
 
@@ -327,7 +326,42 @@ def linked_registration(root, path):
     location = Path(local_git_text(path, 'rev-parse', '--absolute-git-dir'))
     if location.is_symlink() or location.parent != common/'worktrees' or location.parent.is_symlink():
         raise RunError('The source is not an ordinary linked Git worktree')
+    backlink = location/'gitdir'
+    if (not backlink.is_file() or backlink.is_symlink() or not (path/'.git').is_file() or (path/'.git').is_symlink()
+            or (location/backlink.read_text().rstrip('\n')).resolve() != path/'.git'):
+        raise RunError('The linked Git registration does not point back to the exact worktree')
     return location
+
+
+def directed_owner(root, path, run, queue_id, *, created=False):
+    """Bind only a checkout just created here or an already authenticated registration."""
+    registration = linked_registration(root, path)
+    spec = run['workspace']
+    retained = spec.get('cleanup_owner')
+    token = spec.get('dispatch_owner_token')
+    if retained is not None:
+        if not isinstance(retained, dict) or not retained.get('token'):
+            raise RunError('Invalid recorded Director workspace ownership')
+        token = token or retained['token']
+    if not token and not created:
+        raise RunError('Existing Director worktree lacks a verifiable ownership token; preserve it for explicit repair')
+    owner = {'run_id': run['id'], 'queue_id': queue_id, 'registration': registration.name,
+             'token': token or str(uuid.uuid4())}
+    if retained is not None and retained != owner:
+        raise RunError('Recorded Director owner conflicts with the linked worktree registration')
+    marker = registration/'skill-tree-owner.json'
+    if created:
+        try:
+            atomic(marker, owner, exclusive=True)
+        except FileExistsError:
+            pass  # Validate the existing marker without replacing its bytes.
+    try:
+        matches = marker.is_file() and not marker.is_symlink() and json.loads(marker.read_bytes()) == owner
+    except (OSError, ValueError):
+        matches = False
+    if not matches:
+        raise RunError('Director workspace ownership marker is missing or conflicting; preserve the worktree for explicit repair')
+    return owner
 
 
 def inspect_directed_reservation(store, run, requested=None):
@@ -338,6 +372,9 @@ def inspect_directed_reservation(store, run, requested=None):
     if run.get('workspace_state') != 'reserved':
         view = deepcopy(store)
         ensure_workspace(view, run)
+        if ((run['workspace'].get('cleanup_owner') or run['workspace'].get('dispatch_owner_token'))
+                and hashlib.sha256(str(view.source_root).encode()).hexdigest() != expected):
+            raise RunError('Director reservation requires the original exact worktree path')
         if local_git_text(view.source_root, 'rev-parse', '--show-toplevel') != str(view.source_root):
             raise RunError('Recorded Director worktree is not the exact Git checkout root')
         return
@@ -357,6 +394,8 @@ def inspect_directed_reservation(store, run, requested=None):
                           or local_git_text(path, 'rev-parse', '--show-toplevel') != str(path)
                           or local_git_text(path, 'symbolic-ref', '--quiet', '--short', 'HEAD') != spec['branch']):
         raise RunError('Reserved Director worktree has a conflicting ownership or branch')
+    if path.exists() and spec.get('dispatch_owner_token'):
+        directed_owner(store.root, path, run, locator['queue_id'])
 
 def recover_locator(store, payload, *, bootstrap_state_sha256=None):
     """Explicitly repair local paths only; never rewrite portable checkpoints."""
@@ -1077,18 +1116,28 @@ def recover_workspace(store,payload):
         requested=payload.get('worktree') or data['worktrees'].get(rid)
         if not requested:raise RunError('Recovery requires the recorded or explicitly relocated worktree path')
         path=Path(requested).resolve()
-        if run.get('workspace_state')=='reserved':inspect_directed_reservation(store,run,path)
-        if path.exists():
+        reserved = run.get('workspace_state') == 'reserved'
+        directed = run.get('dispatch_workspace_sha256')
+        owned = directed and (reserved or spec.get('dispatch_owner_token') or spec.get('cleanup_owner'))
+        if owned and hashlib.sha256(str(path).encode()).hexdigest() != directed:
+            raise RunError('Director reservation requires the original exact worktree path')
+        if reserved:inspect_directed_reservation(store,run,path)
+        created = not path.exists()
+        if not created:
             if common_dir(path)!=common_dir(store.root) or git(path,'symbolic-ref','--short','HEAD')!=spec['branch']:
                 raise RunError('Recovery never switches a conflicting worktree branch')
         else:
             # Prune never runs automatically; stale Git registrations require an explicit Git repair.
             refs=git(store.root,'for-each-ref','--format=%(refname)','refs/heads/'+spec['branch']).splitlines()
             if 'refs/heads/'+spec['branch'] in refs:
+                if directed and reserved:
+                    raise RunError('Reserved Director branch has no verifiable worktree registration; preserve it for explicit repair')
                 git(store.root,'worktree','add',path,spec['branch'])
             else:
                 if run.get('workspace_state')!='reserved':raise RunError('Recorded source branch is missing; recover commits/dirty work before reconstruction')
                 git(store.root,'worktree','add','-b',spec['branch'],path,spec['base_commit'])
+        if owned:
+            spec['cleanup_owner'] = directed_owner(store.root, path, run, data['queue_id'], created=created)
         data['worktrees'][rid]=str(path);atomic(runtime_file(store.root),data)
         run['workspace_state']='ready';run.setdefault('workspace_recoveries',[]).append({'resolution':payload['resolution'],'branch':spec['branch']})
         ensure_workspace(store,run);store.save(text,state);return run

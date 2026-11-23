@@ -1022,7 +1022,9 @@ def start(store,mode,selector=None,limits=None,workspace=None):
             conflicts={tid:registry['claims'][tid] for tid in run['admitted_task_ids'] if tid not in done and tid in registry['claims']}
             if conflicts:raise WorkflowError('Required task claims conflict: '+dump(conflicts))
             path=workspaces.provision(store,run,options)
-            if dispatch:run['dispatch_workspace_sha256']=digest(str(path).encode())
+            if dispatch:
+                run['dispatch_workspace_sha256']=digest(str(path).encode())
+                run['workspace']['dispatch_owner_token']=str(uuid.uuid4())
             registry['runs'][run['id']]=run;store.selected_run_id=run['id'];store.run_id=run['id']
         validate_run(run);state['active_run']=run
         store.save(text,state,dispatch.extras(store,run) if dispatch else None)
