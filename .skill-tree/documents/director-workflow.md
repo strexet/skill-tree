@@ -12,6 +12,8 @@ Each child receipt links the Director objective and assignment to exact area, qu
 
 ## Register areas
 
+For first-time setup, review the coordinator, project placements, package sources and prerequisites through the [guided setup preview](../common/references/director-workflow.md#preview-first-time-setup). Once approved, [prepare the workspace](../common/references/director-workflow.md#prepare-the-approved-workspace) with `setup-bootstrap`. Use the [prepared-area registration and status flow](../common/references/director-workflow.md#register-the-prepared-areas) for the exact prepared set. The explicit area registration commands below remain available.
+
 Use `python3 .skill-tree/common/scripts/director-state.py setup-preview <director-root> --input <request.json>` from the source checkout. The request identifies `director_id` and exact `areas`. Each area supplies a stable `id`, `role`, canonical `checkout` path, relative `scope`, capability tokens, an interface declaration `{"kind":"skill-tree","version":1}` and allowed effects. Optional expected queue and repository IDs restrict a binding to previously reviewed identities. Register one `source-maintenance` area backed by a canonical Skill Tree source. Separate repositories use existing verified Skill Tree profiles and registered Core queue identities. Shared folder scopes use the same canonical owner.
 
 Use `setup-apply` with the reviewed `expected_preview_sha256` and identical area request. The parent stores `.skill-tree/director/registry.json` and local `.skill-tree/artifacts/director/local-bindings.json` through one guarded writer. The selected child checkouts and Core queues receive no writes. Linked checkout input resolves to the canonical queue owner. Duplicate queue writers, an overlapping writable scope, symlinks and stale probes stop application.
@@ -155,13 +157,13 @@ Use `repair-candidate-preview` and `repair-candidate-apply` to retain reviewed s
 
 ## Install the Director flavor
 
-Use `node .skill-tree/bin/install.js --list --flavor director` to inspect operation membership. Use an explicit target and `--dry-run --all --flavor director` to preview project scope. An owned installation or flavor change requires a stopped checkpoint and current target verification. Verify the installed target through the project-owned installation manager.
+Use `node .skill-tree/bin/install.js --list --flavor director` to inspect operation membership. Use an explicit workspace target and `--dry-run --all --flavor director` to preview the dedicated coordinator. Run `--flavor director --verify` on that workspace to verify the coordinator and host launchers. For a direct low-level profile, pass `--project --flavor director` at the exact target. An existing direct Director receipt remains usable at the original installation root. Use `--flavor director --only <host> --uninstall` at the workspace to remove the selected host launcher and package ownership. Remaining hosts retain access from the workspace. After the last host is removed, reinstall a host to resume the retained coordinator, projects and source work. An owned installation or flavor change requires a stopped checkpoint and current target verification. Verify the installed target through the project-owned installation manager.
 
 The shared-folder topology uses one canonical queue for distinct scopes. The external topology uses the verified profile of the registered external project. A moved external checkout requires Core locator reconciliation, owned profile rebind and guarded Director rebind. A plan with changed execution inputs requires current admission before another effect.
 
 ## Verify the repaired generation on one target
 
-The source candidate retains the accepted prior failure, reviewed repair, exact source inventory and exact composed output inventory. Select one stopped Codex installation on a disposable linked worktree, the original queue, task and run, a current owner authority reference, and any product paths whose bytes require preservation. Keep the candidate source snapshot immutable. The source candidate alone grants no installation authority.
+The source candidate retains the accepted prior failure, reviewed repair, exact source inventory and exact composed output inventory. Select one stopped installation on a disposable linked worktree and the receipt owner of the operation, the original queue, task and run, a current owner authority reference, and any product paths whose bytes require preservation. Keep the candidate source snapshot immutable. The source candidate alone grants no installation authority.
 
 Use `python3 scripts/director-entry.py preview --input <request.json>` to inspect the exact previous and planned profiles. The request holds the exact local target and candidate source, the reviewed candidate, the candidate digest and the selected scope. Preview performs no writes. Retain the returned portable preview and exact digest.
 

@@ -214,9 +214,111 @@ class DispatchTests(unittest.TestCase):
                     WS.recover_workspace(WF.Store(self.root, observed['id']), {'resolution': 'Controlled fixture', 'worktree': str(self.base / 'wrong')})
                 ready = WS.recover_workspace(WF.Store(self.root, observed['id']), {'resolution': 'Controlled fixture', 'worktree': request['worktree']})
                 self.assertEqual(ready['id'], observed['id'])
+                marker = WS.linked_registration(self.root, Path(request['worktree']))/'skill-tree-owner.json'
+                self.assertEqual(json.loads(marker.read_bytes()), ready['workspace']['cleanup_owner'])
+                self.assertEqual(ready['workspace']['cleanup_owner']['token'], observed['workspace']['dispatch_owner_token'])
                 self.assertEqual(self.observe('start')['observed_result']['workspace_state'], 'ready')
                 self.assertEqual(WF.start(self.child(), 'next', task, workspace=request)['id'], observed['id'])
                 self.assertEqual((self.root / 'source.txt').read_text(), 'Preserve unrelated bytes.\n')
+
+    def test_interruption_after_git_before_marker_does_not_claim_existing_work(self):
+        task = self.task()
+        request = self.start_request()
+        path = Path(request['worktree'])
+        with patch.object(WS, 'directed_owner', side_effect=RuntimeError('Lost before marker')):
+            with self.assertRaisesRegex(RuntimeError, 'Lost before marker'):
+                WF.start(self.child(), 'next', task, workspace=request)
+        marker = WS.linked_registration(self.root, path)/'skill-tree-owner.json'
+        state = self.child().load()['run_registry']
+        rid = next(iter(state['runs']))
+        frozen = self.child().state.read_bytes()
+        (path/'keep.txt').write_text('Local work')
+        for contents in (None, '{"token": "different"}'):
+            with self.subTest(contents=contents):
+                if contents is not None:
+                    marker.write_text(contents)
+                with self.assertRaisesRegex(WS.RunError, 'ownership marker'):
+                    self.observe('start')
+                with self.assertRaisesRegex(WS.RunError, 'ownership marker'):
+                    WS.recover_workspace(WF.Store(self.root, rid), {'resolution': 'Investigate interrupted Git add'})
+                self.assertEqual(self.child().state.read_bytes(), frozen)
+                self.assertEqual(marker.read_text() if marker.exists() else None, contents)
+                self.assertEqual((path/'keep.txt').read_text(), 'Local work')
+
+    def test_ready_directed_checkout_recreation_keeps_original_owner_and_refuses_conflicts(self):
+        WS.git(self.root, 'config', 'worktree.useRelativePaths', 'true')
+        task = self.task()
+        request = self.start_request()
+        run = WF.start(self.child(), 'next', task, workspace=request)
+        path = Path(request['worktree'])
+        marker = WS.linked_registration(self.root, path)/'skill-tree-owner.json'
+        owner = run['workspace']['cleanup_owner']
+        frozen = self.child().state.read_bytes()
+        marker.unlink()
+        for tamper in ('absent', 'changed', 'symlink'):
+            with self.subTest(tamper=tamper):
+                if tamper == 'changed':
+                    marker.write_text(json.dumps(owner | {'token': 'other'}))
+                if tamper == 'symlink':
+                    marker.unlink()
+                    target = self.base/'foreign-marker'
+                    target.write_text(json.dumps(owner))
+                    marker.symlink_to(target)
+                with self.assertRaisesRegex(WF.WorkflowError, 'Original Director run reservation'):
+                    self.observe('start')
+                with self.assertRaisesRegex(WS.RunError, 'ownership marker'):
+                    WS.recover_workspace(WF.Store(self.root, run['id']), {'resolution': 'Verify existing registration'})
+                self.assertEqual(frozen, self.child().state.read_bytes())
+                if tamper == 'absent':
+                    self.assertFalse(marker.exists())
+                elif tamper == 'changed':
+                    self.assertEqual(json.loads(marker.read_bytes())['token'], 'other')
+                else:
+                    self.assertTrue(marker.is_symlink())
+        with self.assertRaisesRegex(WS.RunError, 'original exact worktree path'):
+            WS.recover_workspace(WF.Store(self.root, run['id']), {'worktree': str(self.base/'other'), 'resolution': 'Recover'})
+        WS.git(self.root, 'worktree', 'remove', path)
+        recovered = WS.recover_workspace(WF.Store(self.root, run['id']), {'resolution': 'Recreate the removed clean checkout'})
+        self.assertEqual(recovered['workspace']['cleanup_owner'], owner)
+        self.assertEqual(json.loads(marker.read_bytes()), owner)
+        self.assertEqual(self.observe('start')['observed_result']['id'], run['id'])
+
+    def test_already_ready_legacy_reservations_keep_their_original_ownership_checks(self):
+        task = self.task()
+        request = self.start_request()
+        run = WF.start(self.child(), 'next', task, workspace=request)
+        child = self.child()
+        registry = json.loads(child.state.read_bytes())
+        current = registry['run_registry']['runs'][run['id']]['workspace']
+        owner = current.pop('cleanup_owner')
+        child.state.write_text(WF.dump(registry))
+        with self.assertRaisesRegex(WF.WorkflowError, 'Original Director run reservation'):
+            self.observe('start')
+
+        # Reproduce serialized reservations from before tokens were frozen at start.
+        receipt_path = next(path for path in (self.root/DISPATCH.CHILD_RECEIPTS).glob('*.json')
+                            if json.loads(path.read_bytes())['identity']['operation'] == 'start')
+        receipt = json.loads(receipt_path.read_bytes())
+        receipt['result']['workspace'].pop('dispatch_owner_token')
+        receipt.pop('receipt_sha256')
+        receipt['receipt_sha256'] = DISPATCH._digest(receipt)
+        receipt_path.write_text(WF.dump(receipt))
+        current.pop('dispatch_owner_token')
+        current['cleanup_owner'] = owner
+        child.state.write_text(WF.dump(registry))
+        self.assertEqual(self.observe('start')['observed_result']['workspace']['cleanup_owner'], owner)
+
+        marker = WS.linked_registration(self.root, Path(request['worktree']))/'skill-tree-owner.json'
+        marker.unlink()
+        with self.assertRaisesRegex(WF.WorkflowError, 'Original Director run reservation'):
+            self.observe('start')
+        current.pop('cleanup_owner')
+        child.state.write_text(WF.dump(registry))
+        self.assertEqual(self.observe('start')['observed_result']['workspace_state'], 'ready')
+        recovered = WS.recover_workspace(WF.Store(self.root, run['id']), {'resolution': 'Verify legacy workspace'})
+        self.assertNotIn('cleanup_owner', recovered['workspace'])
+        self.assertFalse(marker.exists())
+        self.assertEqual(WF.start(self.child(), 'next', task, workspace=request)['id'], run['id'])
 
 
 if __name__ == '__main__':

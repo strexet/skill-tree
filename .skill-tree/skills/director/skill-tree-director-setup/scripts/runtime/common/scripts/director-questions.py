@@ -64,7 +64,7 @@ def _selected(store, context):
     registry = state.get('run_registry')
     run = state['active_run']
     require(registry is not None and registry['queue_id'] == identity['queue_id'] and run
-            and run['workspace'] == start['result']['workspace'], 'Original child run identity changed')
+            and dispatch.matches_start_workspace(store, run, start), 'Original child run identity changed')
     wf.workspaces.ensure_workspace(store, run)
     return dispatch, text, state, run
 

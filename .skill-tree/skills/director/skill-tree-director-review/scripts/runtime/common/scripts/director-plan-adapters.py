@@ -206,7 +206,17 @@ class PlanSources:
             else:
                 area = self.registry['areas'][item['area']['id']]
                 for relative in item['write_paths']:
-                    self.D._safe_path(self.area_root(area), relative)
+                    target = self.D._safe_path(self.area_root(area), relative)
+                    if director_root.name == '.skill-tree-director' and self.area_root(area) == director_root.parent:
+                        protected = [director_root]
+                        for other in self.registry['areas'].values():
+                            if other['queue_id'] != area['queue_id']:
+                                nested = self.root(other)
+                                if nested and nested.is_relative_to(self.area_root(area)):
+                                    protected.append(nested)
+                        self.D._require(not any(target.is_relative_to(child) or child.is_relative_to(target)
+                                                for child in protected),
+                                        'Working project write scope overlaps an independently owned Director area')
 
 
 class DirectorPlans:
