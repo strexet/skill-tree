@@ -22,12 +22,17 @@ The retained application patch only contains the consumer's product source chang
 
 ## Verifying the acceptance checks
 
-The [initial independent run](independent.json) records the 152 assertions exercised during the agent trial. The [review replay](review-replay.json) records the checks from the current observer. A passing result requires a visible title and three visible shortcuts on entry, an explicit return control, and visible paragraph text beginning below the toolbar after Personal Notes and Return. A missing or unreadable chooser contrast sample fails the cell. The measured reading-space values remain observations.
+The [initial independent run](independent.json) records the 152 assertions exercised during the agent trial. The [review replay](review-replay.json) records the checks from the current observer. A passing result requires a visible title and three visible shortcuts on entry, an explicit return control, and visible paragraph text beginning below the toolbar after Personal Notes and Return. The entry check includes ancestor opacity because a transparent link can still receive keyboard and pointer input. The measured reading-space values remain observations.
+
+Contrast samples require painted text. The sampler supports RGB text with alpha on an opaque control hierarchy. Group opacity below 1 composites the whole subtree separately and requires a different measurement. An unavailable sample fails the corresponding contrast check.
 
 For a negative control, copy the published `site/wwwroot` to a separate directory, append one rule set from the table to the copied `css/app.css`, and run the server and observer against the copy. Each modified fixture should exit with status 1 and identify the affected checks. The original published tree supplies the passing control.
 
 | Control | CSS appended to the copied stylesheet | Expected failed checks |
 | --- | --- | --- |
 | Missing return control | `.privacy-return { display: none !important; }` | Explicit return and readable return section |
+| Transparent navigation with reachable links | `.privacy-reader .settings-section-nav { opacity: 0 !important; }` | Visible entry shortcuts and sampled control contrast |
 | Shortcuts and paragraph starts outside the viewport | `.privacy-reader .settings-section-nav { margin-block-start: 110vh !important; } .privacy-reader h2:is(#optional-cloud-workspace,#personal-notes) + p { margin-block-start: 120vh !important; }` | Visible entry shortcuts and both readable paragraph starts |
 | Chooser color outside the observer's RGB sampler | `.privacy-appearance select { color: color(display-p3 .4 .4 .4) !important; -webkit-text-fill-color: color(display-p3 .4 .4 .4) !important; }` | Chooser text contrast |
+| Fully transparent native chooser | `.privacy-appearance select { opacity: 0 !important; }` | Chooser text contrast |
+| Chooser inside a partially transparent group | `.privacy-appearance .color-scheme-panel { opacity: .5 !important; }` | Chooser text contrast |

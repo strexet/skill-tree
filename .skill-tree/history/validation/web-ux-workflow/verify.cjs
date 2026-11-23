@@ -123,15 +123,28 @@ async function contrast(locator) {
   // Hiding only text fill for the screenshot preserves every box and background paint operation.
   await locator.scrollIntoViewIfNeeded();
   const paint = await locator.evaluate(el=>{
+    function canSampleLabel(owner) {
+      if (!owner.checkVisibility({opacityProperty: true, visibilityProperty: true})) return false;
+      // The sampler blends text alpha against a captured background. CSS group opacity
+      // composites the whole subtree separately, which needs a different color model.
+      for (let ancestor = owner; ancestor; ancestor = ancestor.parentElement) {
+        if (Number(getComputedStyle(ancestor).opacity) !== 1) return false;
+      }
+      return true;
+    }
     const range=document.createRange(),walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);
     let node;
     while(node=walker.nextNode()) {
       if(!node.textContent.trim()||node.parentElement.closest('option,svg,[aria-hidden=true]'))continue;
       range.selectNodeContents(node);
       const rr=[...range.getClientRects()].find(r=>r.width>2&&r.height>2);
-      if(rr){const er=el.getBoundingClientRect(),s=getComputedStyle(node.parentElement);return {x:rr.x-er.x,y:rr.y-er.y,w:rr.width,h:rr.height,color:s.webkitTextFillColor||s.color,size:parseFloat(s.fontSize),weight:parseInt(s.fontWeight)||400};}
+      if(rr){
+        if(!canSampleLabel(node.parentElement)) return null;
+        const er=el.getBoundingClientRect(),s=getComputedStyle(node.parentElement);return {x:rr.x-er.x,y:rr.y-er.y,w:rr.width,h:rr.height,color:s.webkitTextFillColor||s.color,size:parseFloat(s.fontSize),weight:parseInt(s.fontWeight)||400};
+      }
     }
     if(el.tagName==='SELECT'){
+      if(!canSampleLabel(el)) return null;
       const r=el.getBoundingClientRect(),s=getComputedStyle(el);
       return {x:parseFloat(s.paddingLeft)+2,y:r.height*.25,w:Math.max(1,r.width-40),h:r.height*.5,color:s.webkitTextFillColor||s.color,size:parseFloat(s.fontSize),weight:parseInt(s.fontWeight)||400};
     }
@@ -216,8 +229,9 @@ async function entryView(page, main, nav) {
     const rect = element.getBoundingClientRect();
     const header = document.querySelector('.topbar')?.getBoundingClientRect().bottom || 0;
     const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    const painted = element.checkVisibility({opacityProperty: true, visibilityProperty: true});
     return {label: element.textContent.trim(), top: rect.top, bottom: rect.bottom,
-      fullyVisible: rect.top >= header && rect.bottom <= innerHeight && rect.left >= 0 &&
+      fullyVisible: painted && rect.top >= header && rect.bottom <= innerHeight && rect.left >= 0 &&
         rect.right <= innerWidth && element.contains(hit)};
   });
   const links = [];

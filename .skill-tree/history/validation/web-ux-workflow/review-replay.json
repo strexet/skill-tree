@@ -1,7 +1,7 @@
 {
   "fixtureBase": "51ac91982f61b5bde7cebc26629c2e2e621a4a24",
   "consumerPatchSha256": "df1e5b697d59429209c2b1e56b3fb52b3b531a5821fc7f1d568356c6385b2360",
-  "observerSha256": "33b5ff558463b5f330ca4ac2865001ff01bbe906225f9a8ef10a2fc39dce78e4",
+  "observerSha256": "88e7be39444389849c8d16af4cdc0a187bccf410bcb5f0f81cdb0f5bec066e6f",
   "initialObserverSha256": "e6dfec31629e10129d6d02139264d555fb0d9a2d9762e37e1248949fc0370c4a",
   "browser": "157.0.8103.79",
   "playwright": "1.64.0-alpha-1789764292000",
@@ -172,6 +172,94 @@
       "failuresInEveryReviewedCell": [
         "chooserTextContrast"
       ]
+    },
+    {
+      "fixture": "transparent-chooser",
+      "appendedCss": "\n.privacy-appearance select { opacity: 0 !important; }\n",
+      "cssSha256": "3f475185889872a8ea2cdb27dc9f9077e07691851382660757617c62ddbd75fc",
+      "initialObserver": {
+        "cells": 8,
+        "passed": 8,
+        "failed": 0,
+        "assertionsPassed": 152
+      },
+      "reviewedObserver": {
+        "cells": 8,
+        "passed": 0,
+        "failed": 8,
+        "assertionsPassed": 168
+      },
+      "failuresInEveryReviewedCell": [
+        "chooserTextContrast"
+      ],
+      "initialReportedChooserContrastRange": [
+        14.721,
+        16.077
+      ],
+      "reviewedUnavailableChooserSamples": 8
+    },
+    {
+      "fixture": "translucent-chooser-group",
+      "appendedCss": "\n.privacy-appearance .color-scheme-panel { opacity: .5 !important; }\n",
+      "cssSha256": "fe5d6a5e4b2b88c5f141a0eeed85286b7a0daad058ba58cceedf51ec9dcb23cb",
+      "initialObserver": {
+        "cells": 8,
+        "passed": 8,
+        "failed": 0,
+        "assertionsPassed": 152
+      },
+      "reviewedObserver": {
+        "cells": 8,
+        "passed": 0,
+        "failed": 8,
+        "assertionsPassed": 168
+      },
+      "failuresInEveryReviewedCell": [
+        "chooserTextContrast"
+      ],
+      "initialReportedChooserContrastRange": [
+        14.721,
+        15.939
+      ],
+      "reviewedUnavailableChooserSamples": 8
+    },
+    {
+      "fixture": "transparent-nav",
+      "appendedCss": "\n.privacy-reader .settings-section-nav { opacity: 0 !important; }\n",
+      "cssSha256": "29ab663f5353f454ada98de7aa33f418596f98935984424566f5581694be5016",
+      "initialObserver": {
+        "cells": 8,
+        "passed": 8,
+        "failed": 0,
+        "assertionsPassed": 152
+      },
+      "reviewedObserver": {
+        "cells": 8,
+        "passed": 0,
+        "failed": 8,
+        "assertionsPassed": 160
+      },
+      "failuresInEveryReviewedCell": [
+        "sampledControlContrast",
+        "visibleEntryShortcuts"
+      ],
+      "reviewedVisibleEntryLinksPerCell": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "beforePaintCheck": {
+        "observerSha256": "33b5ff558463b5f330ca4ac2865001ff01bbe906225f9a8ef10a2fc39dce78e4",
+        "cells": 8,
+        "passed": 8,
+        "failed": 0,
+        "assertionsPassed": 176
+      }
     }
   ]
 }
