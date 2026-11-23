@@ -83,9 +83,9 @@ def owned(root):
     return state
 
 
-def verify_endpoints(repository, *options):
+def verify_endpoints(repository):
     for mode in ((), ('--push',)):
-        effective = git(repository, *options, 'remote', 'get-url', '--all', *mode, REMOTE).splitlines()
+        effective = git(repository, 'remote', 'get-url', '--all', *mode, REMOTE).splitlines()
         D._require(effective == [UPSTREAM], 'The effective upstream URL differs from the registered Skill Tree repository')
 
 
@@ -144,7 +144,8 @@ def provision(root):
             # transfer. Git applies pushInsteadOf independently of fetch rewrites.
             probe = Path(directory) / 'probe.git'
             git(root.parent, 'init', '--bare', '--template=', str(probe))
-            verify_endpoints(probe, '-c', 'remote.' + REMOTE + '.url=' + UPSTREAM)
+            git(probe, 'remote', 'add', REMOTE, UPSTREAM)
+            verify_endpoints(probe)
             staged = Path(directory) / 'clone'
             git(root.parent, 'clone', '--no-local', '--no-tags', '--single-branch', '--branch', BASE,
                 '--origin', REMOTE, '--', UPSTREAM, str(staged))
