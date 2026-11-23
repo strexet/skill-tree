@@ -1,4 +1,4 @@
-"""Route one reviewed snapshot finding through the existing Core source workflow."""
+"""Route verified Director findings through the approved Core source workflow."""
 from __future__ import annotations
 
 import argparse
@@ -85,7 +85,8 @@ def _archive(kind, digest):
 
 def _repair_id(plan):
     return D._digest({'director_id': plan['director_id'], 'source': plan['source'],
-                      'finding_sha256': plan['finding']['finding_sha256'], 'scenario': plan['scenario']})
+                      'finding_sha256': plan['finding']['finding_sha256'], 'scenario': plan['scenario'],
+                      **({'maintenance': plan['maintenance']} if 'maintenance' in plan else {})})
 
 
 def _check():
@@ -93,10 +94,30 @@ def _check():
             'parameters': {}, 'assertion': ASSERTION, 'timing': 'immediate', 'test_first': True}
 
 
-def _task_body(finding_sha):
-    return (f'Goal:\n- Preserve the Markdown extension in the exact snapshot dry-run report.\n\n'
-            f'Touch:\n- {SOURCE}\n\nSource:\n- The original sanitized Director finding is `{finding_sha}`.\n\n'
-            f'Validation:\n```json\n{json.dumps({"checks": [_check()]}, sort_keys=True)}\n```\n\nAcceptance:\n- {ASSERTION}\n')
+def _repair_scenario(finding):
+    reproduction = finding.get('reproduction', {})
+    if reproduction.get('kind') != 'director-resource-check':
+        return scenario()
+    conditions = finding['conditions']
+    return {'id': 'director-resource-check', **conditions,
+            'assertion': f"The {conditions['assertion_id']} control reports {finding['expected']}.",
+            'expected': finding['expected'], 'observed': finding['observed'],
+            'resource': reproduction['resource'], 'fixtures': reproduction['fixtures'], 'parameters': reproduction['parameters']}
+
+
+def _case_check(plan):
+    spec = plan['scenario']
+    if spec['id'] == SCENARIO:
+        return _check()
+    return {'id': spec['assertion_id'], 'recipe_id': spec['recipe_id'], 'assertion': spec['assertion'],
+            'sources': [plan['finding']['scope']['source_path'], *spec['fixtures']], 'parameters': spec['parameters'],
+            'criteria': [spec['assertion']], 'timing': 'immediate', 'test_first': True}
+
+
+def _case_title(plan):
+    if plan['scenario']['id'] == SCENARIO:
+        return TITLE
+    return 'Correct ' + plan['finding']['component'] + ' result for ' + plan['scenario']['assertion_id']
 
 
 class DirectorSourceRepair:
@@ -106,17 +127,34 @@ class DirectorSourceRepair:
         self.dispatch = D.WF.director_dispatch_helper()
         self.objectives = D._objective_helper()
 
-    def _area(self):
+    def _area(self, source_path):
         registry, bindings, _ = self.registry._load()
         D._require(registry is not None, 'Register the exact Director source-maintenance area')
         areas = [item for item in registry['areas'].values() if item['role'] == 'source-maintenance']
         D._require(len(areas) == 1, 'Register precisely one canonical source-maintenance area')
         area = areas[0]
         D._require({'intake', 'process', 'launch'} <= set(area['allowed_effects'])
-                   and D._scope(SOURCE).is_relative_to(D._scope(area['scope'])),
+                   and D._scope(source_path).is_relative_to(D._scope(area['scope'])),
                    'The source-maintenance area lacks the exact authorized repair scope')
         root = self.objectives._child_root(registry, bindings, area['id'])
         return registry['director_id'], self.objectives._area_identity(area), root
+
+    def _maintenance(self, finding, root):
+        """A guided installation binds the failing product area to its own source branch."""
+        canonical = self.registry.root / 'sources/skill-tree'
+        if root != canonical:
+            return None
+        areas = {row['area_id'] for row in finding['evidence']}
+        D._require(len(areas) == 1, 'Select evidence from one registered project for the repair')
+        project = areas.pop()
+        registry, bindings, _ = self.registry._load()
+        area = registry['areas'][project]
+        checkout = self.objectives._child_root(registry, bindings, project)
+        D._require(area['role'] != 'source-maintenance' and checkout != root, 'Select a product maintenance branch')
+        maintained = _load_module('director-maintenance').inspect(self.registry.root, project)
+        D._require(Path(maintained['checkout']) == root, 'The project maintenance checkout changed')
+        return {'project_id': project, 'branch': maintained['branch'], 'base_commit': maintained['base_commit'],
+                'product_queue_id': area['queue_id'], 'source_queue_id': maintained['queue_id']}
 
     def preview(self, request):
         D._object(request, {'audit', 'finding_sha256'})
@@ -126,15 +164,29 @@ class DirectorSourceRepair:
         D._require(len(matches) == 1, 'Current audit does not contain one exact source-ready finding')
         finding = matches[0]
         pattern = (finding.get('classification'), finding.get('component'), finding.get('symptom'))
-        D._require(pattern == ('source-defect', 'documentation-snapshot', 'markdown-extension-omitted')
-                   and finding.get('scope') == {'source_path': SOURCE, 'operation': OPERATION}
-                   and finding.get('conditions') == {'recipe_id': RECIPE, 'lane': 'unit', 'assertion_id': CHECK}
-                   and finding.get('evidence'), 'Selected audit evidence does not qualify for this bounded source repair')
-        director, area, root = self._area()
-        source = D._safe_path(root, SOURCE)
+        snapshot = (pattern == ('source-defect', 'documentation-snapshot', 'markdown-extension-omitted')
+                    and finding.get('scope') == {'source_path': SOURCE, 'operation': OPERATION}
+                    and finding.get('conditions') == {'recipe_id': RECIPE, 'lane': 'unit', 'assertion_id': CHECK})
+        diagnostic = (finding.get('classification') == 'source-defect'
+                      and finding.get('reproduction', {}).get('kind') == 'director-resource-check')
+        D._require((snapshot or diagnostic) and finding.get('evidence'),
+                   'Selected audit evidence does not qualify for this bounded source repair')
+        source_path = finding['scope']['source_path']
+        director, area, root = self._area(source_path)
+        source = D._safe_path(root, source_path)
         D._require(D.WF.file_hash(source) == finding['generation']['source_sha256']
-                   and source.read_bytes().count(DEFECT) == 1, 'The exact controlled source generation changed')
-        plan = {'schema': 1, 'director_id': director, 'source': area, 'finding': finding, 'scenario': scenario()}
+                   and (not snapshot or source.read_bytes().count(DEFECT) == 1), 'The exact controlled source generation changed')
+        spec = _repair_scenario(finding)
+        if diagnostic:
+            for path, digest in spec['fixtures'].items():
+                D._require(D.WF.file_hash(D._safe_path(root, path)) == digest, 'Reproduction input differs in maintenance source')
+        plan = {'schema': 1, 'director_id': director, 'source': area, 'finding': finding, 'scenario': spec}
+        if diagnostic:
+            recipe, _ = D.WF.recipe_for(D.WF.Store(root, neutral=True), _case_check(plan))
+            D._require(recipe['lane'] == spec['lane'], 'Maintenance reproduction recipe differs')
+        maintenance = self._maintenance(finding, root)
+        if maintenance:
+            plan['maintenance'] = maintenance
         result = {'repair_id': _repair_id(plan), 'plan': plan, 'audit_sha256': audit['audit_sha256'],
                   'audit_run_sha256': audit['director_status']['run_sha256'],
                   'queue_sha256': D.WF.file_hash(root / '.skill-tree/documents/future.md'), 'effects': sorted(EFFECTS)}
@@ -145,11 +197,13 @@ class DirectorSourceRepair:
         D._require(receipt and receipt['repair_id'] == repair_id and _repair_id(receipt['preview']['plan']) == repair_id
                    and D._digest({key: value for key, value in receipt.items() if key != 'receipt_sha256'}) == receipt['receipt_sha256'],
                    'The exact owner-approved repair intake is unavailable or changed')
-        director, area, root = self._area()
         plan = receipt['preview']['plan']
+        source_path = plan['finding']['scope']['source_path']
+        director, area, root = self._area(source_path)
+        D._require(plan.get('maintenance') == self._maintenance(plan['finding'], root), 'Maintenance branch binding changed')
         D._require(plan['director_id'] == director and plan['source'] == area,
                    'Registered source authority changed after repair approval')
-        D._require(D.WF.file_hash(root / SOURCE) == plan['finding']['generation']['source_sha256'],
+        D._require(D.WF.file_hash(D._safe_path(root, source_path)) == plan['finding']['generation']['source_sha256'],
                    'The protected original source generation changed')
         return receipt, root
 
@@ -192,7 +246,9 @@ class DirectorSourceRepair:
         with self.store.lock(local_delivery=owner_key):
             case, baseline = D._read(self.registry.root, relative)
             if case is None:
-                director, area, root = self._area()
+                D._require(preview is not None, 'Original source repair preview unavailable')
+                source_path = preview['plan']['finding']['scope']['source_path']
+                director, area, root = self._area(source_path)
                 audited_run = payload['request']['audit']['director_run_id']
                 run_path = '.skill-tree/director/runs/' + audited_run.lower() + '.json'
                 D._require(preview is not None and preview['repair_id'] == repair_id
@@ -200,7 +256,7 @@ class DirectorSourceRepair:
                            and preview['plan']['director_id'] == director and preview['plan']['source'] == area
                            and preview['audit_run_sha256'] == D.WF.file_hash(D._safe_path(self.registry.root, run_path))
                            and preview['queue_sha256'] == D.WF.file_hash(root / '.skill-tree/documents/future.md')
-                           and preview['plan']['finding']['generation']['source_sha256'] == D.WF.file_hash(root / SOURCE),
+                           and preview['plan']['finding']['generation']['source_sha256'] == D.WF.file_hash(D._safe_path(root, source_path)),
                            'Source repair preview or queue changed before owner selection')
                 case = {'schema': 1, 'repair_id': repair_id, 'preview': preview, 'owner': owner, 'effects': effects,
                         'request_sha256': owner_key['request_sha256'], 'recorded_at': D.WF.now()}
@@ -210,11 +266,12 @@ class DirectorSourceRepair:
             else:
                 D._require(case['request_sha256'] == owner_key['request_sha256'], 'Original source repair approval differs')
         case, root = self._load(repair_id)
-        finding = case['preview']['plan']['finding']['finding_sha256']
+        plan = case['preview']['plan']
+        finding = plan['finding']['finding_sha256']
+        assertion = plan['scenario']['assertion']
         return self._deliver(case, root, 'intake', {'expected_source_hash': case['preview']['queue_sha256'],
-            'title': TITLE, 'description': f'The original Director source finding is `{finding}`. {ASSERTION}',
-            'expected_behavior': 'Repeat the exact one-file dry-run without writing an archive.',
-            'classification': {'kind': 'defect', 'reason': 'The controlled report omits an existing Markdown extension.'}})
+            'title': _case_title(plan), 'description': f'The original Director source finding is `{finding}`. {assertion}',
+            'expected_behavior': assertion, 'classification': {'kind': 'defect', 'reason': 'Verified installed resource failed the recorded control.'}})
 
     def _authorized(self, payload, flag):
         case, root = self._load(payload['repair_id'])
@@ -229,10 +286,15 @@ class DirectorSourceRepair:
         result = self._observed(case, root, 'intake')['observed_result']
         pending = payload['pending_id']
         D._require(result is not None and result['id'] == pending, 'Process only the exact chosen repair Pending ID')
-        finding = case['preview']['plan']['finding']['finding_sha256']
+        plan = case['preview']['plan']
+        finding = plan['finding']['finding_sha256']
+        check = _case_check(plan)
+        body = (f"Goal:\n- {check['assertion']}\n\nTouch:\n- {plan['finding']['scope']['source_path']}\n\n"
+                f"Source:\n- Director finding `{finding}`.\n\nValidation:\n```json\n"
+                + json.dumps({'checks': [check]}, sort_keys=True) + f"\n```\n\nAcceptance:\n- {check['assertion']}\n")
         return self._deliver(case, root, 'process', {'expected_source_hash': payload['expected_source_hash'],
             'selectors': [pending], 'dispositions': {pending: {'status': 'promoted', 'reason': 'The observed fixture bounds the source repair.'}},
-            'tasks': [{'title': TITLE, 'body': _task_body(finding), 'parent_pending_ids': [pending]}]})
+            'tasks': [{'title': _case_title(plan), 'body': body, 'parent_pending_ids': [pending]}]})
 
     def start(self, payload):
         D._object(payload, {'repair_id', 'task_id', 'expected_source_hash', 'owner', 'workspace'})
@@ -242,10 +304,14 @@ class DirectorSourceRepair:
         D._require(result is not None and result['created_ids'] == [task], 'Launch only the exact processed repair T')
         work = payload['workspace']
         D._object(work, {'base_branch', 'branch', 'worktree'}, {'local_base', 'local_base_authorization', 'remote'})
+        maintenance = case['preview']['plan'].get('maintenance')
+        if maintenance:
+            D._require(work['base_branch'] == maintenance['branch'] and work.get('local_base') is True,
+                       'Use the registered local project maintenance branch as the source base')
         return self._deliver(case, root, 'start', {**work, 'expected_source_hash': payload['expected_source_hash']},
                              {'mode': 'next', 'selector': task, 'limits': None})
 
-    def _package_pins(self, worktree, target, flavor, base_oid):
+    def _package_pins(self, worktree, target, flavor, base_oid, operation, helper, source_path):
         composer = Path(__file__).resolve().parents[2] / 'lib/composer.js'
         code = """
 const [file,source,target,flavor] = process.argv.slice(1);
@@ -262,8 +328,7 @@ console.log(JSON.stringify({source_inventory_sha256:c.hash(c.json(inputs)), sour
         prior = set(D.WS.local_git(worktree, 'ls-tree', '-r', '-z', '--name-only', base_oid, '--', '.skill-tree').stdout.split(b'\0'))
         D._require(all(('.skill-tree/' + path).encode() in prior for path in value.pop('source_paths')),
                    'Candidate package inventory contains an unreviewed new source input')
-        helper = 'scripts/create-documentation-snapshot.py'
-        D._require(value['output_digests'][OPERATION][helper] == D.WF.file_hash(worktree / SOURCE),
+        D._require(value['output_digests'][operation][helper] == D.WF.file_hash(worktree / source_path),
                    'Composed repair helper does not match source')
         return value
 
@@ -279,6 +344,24 @@ console.log(JSON.stringify({source_inventory_sha256:c.hash(c.json(inputs)), sour
         D._require(sha == ref['sha256'] and proof == observation(source_sha, not red),
                    'Observed CLI check evidence is missing, changed or from another scenario')
         return {'result': 'fail' if red else 'pass', 'scenario_sha256': D._digest(scenario()),
+                'record_sha256': D._digest(row), 'attempt_id': row['attempt_id'],
+                'evidence': {key: ref[key] for key in ('path', 'sha256')}}
+
+    def _resource_check(self, row, worktree, spec, source_path, digest, *, red):
+        result = 'red' if red else 'pass'
+        D._require(row and row['result'] == result and row['actual_lane'] == spec['lane']
+                   and row['classification'] == 'executed-control' and len(row['evidence']) == 1
+                   and row['sources'] == {source_path: digest, **spec['fixtures']}
+                   and row['counts'] == {'expected': 1, 'discovered': 1, 'passed': int(not red), 'failed': int(red), 'skipped': 0}
+                   and (not red or row.get('failure_category') == 'expected-behavior'),
+                   'Candidate requires matching executed resource checks')
+        ref = row['evidence'][0]
+        proof, sha = D._read(worktree, ref['path'])
+        D._require(ref.get('available') and sha == ref['sha256'] and proof == {
+            'schema': 1, 'kind': 'director-resource-check', 'assertion_id': spec['assertion_id'],
+            'installed_path': source_path, 'expected': spec['expected'], 'observed': spec['observed'] if red else spec['expected']},
+            'Resource evidence is missing, changed or from another scenario')
+        return {'result': 'fail' if red else 'pass', 'scenario_sha256': D._digest(spec),
                 'record_sha256': D._digest(row), 'attempt_id': row['attempt_id'],
                 'evidence': {key: ref[key] for key in ('path', 'sha256')}}
 
@@ -304,34 +387,40 @@ console.log(JSON.stringify({source_inventory_sha256:c.hash(c.json(inputs)), sour
         finding = case['preview']['plan']['finding']
         base_oid = run['workspace']['base_commit']
         D._require(re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', base_oid) is not None, 'Candidate requires exact source baseline identity')
-        old = D.WS.local_git(worktree, 'show', base_oid + ':' + SOURCE).stdout
+        source_path = finding['scope']['source_path']
+        spec = case['preview']['plan']['scenario']
+        snapshot = spec['id'] == SCENARIO
+        old = D.WS.local_git(worktree, 'show', base_oid + ':' + source_path).stdout
         before = D.WF.digest(old)
-        current = D._safe_path(worktree, SOURCE).read_bytes()
+        current = D._safe_path(worktree, source_path).read_bytes()
         after = D.WF.digest(current)
         rows = D.WS.local_git(worktree, 'diff', '--numstat', '-z', '--no-renames', '--no-ext-diff', base_oid, '--').stdout.split(b'\0')[:-1]
         changed = [row.split(b'\t', 2)[2] for row in rows]
-        D._require(before == finding['generation']['source_sha256'] and old.count(DEFECT) == 1
-                   and current == old.replace(DEFECT, REPAIRED) and changed == [SOURCE.encode()]
-                   and (worktree / 'README.md').read_bytes() == INPUT,
+        D._require(before == finding['generation']['source_sha256'] and before != after and changed == [source_path.encode()]
+                   and (not snapshot or old.count(DEFECT) == 1 and current == old.replace(DEFECT, REPAIRED)
+                        and (worktree / 'README.md').read_bytes() == INPUT),
                    'Candidate contains changes outside the exact reviewed repair')
         checks = outcome['check_results']
-        D._require(len(checks) == 1 and checks[0]['check']['id'] == CHECK and checks[0]['check']['recipe_id'] == RECIPE
-                   and checks[0]['check']['assertion'] == ASSERTION and isinstance(checks[0].get('red'), dict)
-                   and checks[0]['red']['definition'] == checks[0]['result']['definition'],
+        D._require(len(checks) == 1 and checks[0]['check']['id'] == spec['assertion_id']
+                   and checks[0]['check']['recipe_id'] == spec['recipe_id'] and checks[0]['check']['assertion'] == spec['assertion']
+                   and isinstance(checks[0].get('red'), dict) and checks[0]['red']['definition'] == checks[0]['result']['definition'],
                    'Canonical outcome does not bind the same original assertion and check')
-        verified = {'original': self._observed_check(checks[0]['red'], worktree, before, red=True),
-                    'repaired': self._observed_check(checks[0]['result'], worktree, after, red=False)}
+        verified = {}
+        for label, row, digest, red in [('original', checks[0]['red'], before, True), ('repaired', checks[0]['result'], after, False)]:
+            verified[label] = (self._observed_check(row, worktree, digest, red=red) if snapshot else
+                               self._resource_check(row, worktree, spec, source_path, digest, red=red))
         target = D._root(payload['composition_target'])
         D._require(target != root and target != worktree, 'Select a separate reviewed package composition target')
-        packages = self._package_pins(worktree, target, payload['flavor'], base_oid)
+        packages = self._package_pins(worktree, target, payload['flavor'], base_oid, finding['scope']['operation'],
+                                      'scripts/create-documentation-snapshot.py' if snapshot else spec['resource'], source_path)
         source_inventory = packages.pop('source_inventory_sha256')
         plan = case['preview']['plan']
         body = {'schema': 1, 'kind': 'director-source-repair-candidate', 'finding_sha256': finding['finding_sha256'],
                 'route': {'area_id': plan['source']['id'], 'queue_id': plan['source']['queue_id'], 'pending_id': payload['pending_id'],
                           'processing_run_id': processed['id'], **selected},
                 'owner': payload['owner'], 'source': {'revision': 'source-inventory:' + source_inventory, 'source_inventory_sha256': source_inventory},
-                'packages': {'flavor': payload['flavor'], 'provider': payload['provider'], **packages}, 'scenario': scenario(), 'checks': verified,
-                'review': {'reference': payload['review_ref'], 'source_path': SOURCE, 'source_base_commit': base_oid,
+                'packages': {'flavor': payload['flavor'], 'provider': payload['provider'], **packages}, 'scenario': spec, 'checks': verified,
+                'review': {'reference': payload['review_ref'], 'source_path': source_path, 'source_base_commit': base_oid,
                            'before_sha256': before, 'after_sha256': after, 'outcome_sha256': D._digest(outcome),
                            'original_audit_evidence': finding['evidence']}}
         return {**body, 'candidate_sha256': D._digest(body)}

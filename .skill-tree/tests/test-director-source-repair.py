@@ -35,6 +35,10 @@ def recipe(relative):
 
 
 class SourceRepairControls(unittest.TestCase):
+    check_id = REPAIR.CHECK
+    assertion = REPAIR.ASSERTION
+    defect, repaired = REPAIR.DEFECT, REPAIR.REPAIRED
+
     def setUp(self):
         retained = os.environ.get('DIRECTOR_SOURCE_REPAIR_FIXTURE')
         if retained:
@@ -86,8 +90,8 @@ class SourceRepairControls(unittest.TestCase):
                                                                        'recipes': {REPAIR.RECIPE: recipe(REPAIR.SOURCE)}}))
             helper = root / REPAIR.SOURCE
             current = helper.read_bytes()
-            self.assertEqual(current.count(REPAIR.REPAIRED), 1)
-            helper.write_bytes(current.replace(REPAIR.REPAIRED, REPAIR.DEFECT))
+            self.assertEqual(current.count(self.repaired), 1)
+            helper.write_bytes(current.replace(self.repaired, self.defect))
         else:
             self.file(root, '.skill-tree/validation-recipes.json', WF.dump({'schema': 1, 'recipes': {REPAIR.RECIPE: recipe(AUDIT.INSTALLED)}}))
         self.file(root, 'README.md', REPAIR.INPUT)
@@ -115,10 +119,10 @@ require(lib).install(root, source, 'director', names.map(name=>({name, rel: '.ag
                 'local_base': True, 'local_base_authorization': 'Disposable local fixture.'}
 
     def task(self, store, title, sources):
-        pending = WF.intake(store, {'title': title, 'description': REPAIR.ASSERTION, 'expected_behavior': REPAIR.ASSERTION})
-        check = {**REPAIR._check(), 'sources': sources}
-        body = (f'Goal:\n- {REPAIR.ASSERTION}\n\nTouch:\n- README.md\n\nValidation:\n```json\n'
-                f'{json.dumps({"checks": [check]})}\n```\n\nAcceptance:\n- {REPAIR.ASSERTION}\n')
+        pending = WF.intake(store, {'title': title, 'description': self.assertion, 'expected_behavior': self.assertion})
+        check = {**REPAIR._check(), 'sources': sources, 'id': self.check_id, 'criteria': [self.assertion], 'assertion': self.assertion}
+        body = (f'Goal:\n- {self.assertion}\n\nTouch:\n- README.md\n\nValidation:\n```json\n'
+                f'{json.dumps({"checks": [check]})}\n```\n\nAcceptance:\n- {self.assertion}\n')
         task_id = WF.process(store, {'selectors': [pending['id']], 'dispositions': {pending['id']: {
             'status': 'promoted', 'reason': 'The exact snapshot behavior has a fixed scope.'}},
             'tasks': [{'title': title, 'body': body, 'parent_pending_ids': [pending['id']]}]})['created_ids'][0]
@@ -130,14 +134,14 @@ require(lib).install(root, source, 'director', names.map(name=>({name, rel: '.ag
         objective_id, plan_id, director_run = (WF.identity(prefix) for prefix in ('OB', 'PL', 'DR'))
         intent = {'objective_id': objective_id, 'expected_current_sha256': None, 'intent': {'owner_ref': OWNER['actor'],
             'title': 'Confirm installed snapshot check', 'description': 'Read one selected dry-run result.',
-            'acceptance': [{'id': 'snapshot', 'criterion': REPAIR.ASSERTION}]}}
+            'acceptance': [{'id': 'snapshot', 'criterion': self.assertion}]}}
         accepted = planner.ledger.apply({**intent, 'expected_preview_sha256': planner.ledger.preview(intent)['preview_sha256']})['current']
         plan = {'objective_id': objective_id, 'objective_revision': accepted['revision'], 'objective_sha256': accepted['sha256'],
                 'plan_id': plan_id, 'plan_revision': 1, 'assignments': [{
                     'id': 'snapshot-check', 'area_id': 'project', 'role': 'game', 'capability': 'core-task', 'workspace': 'recorded-worktree',
-                    'write_paths': ['README.md'], 'resources': [], 'pins': [], 'depends_on': [], 'effects': ['launch'], 'check': REPAIR.CHECK,
+                    'write_paths': ['README.md'], 'resources': [], 'pins': [], 'depends_on': [], 'effects': ['launch'], 'check': self.check_id,
                     'child': {'task_id': task['id'], 'body_sha256': WF.digest(task['body'].encode())},
-                    'expected_result': REPAIR.ASSERTION, 'authority_ref': OWNER['actor'], 'stop_rules': ['Preserve the original result.'],
+                    'expected_result': self.assertion, 'authority_ref': OWNER['actor'], 'stop_rules': ['Preserve the original result.'],
                 }]}
         frozen = planner.freeze({**plan, 'expected_preview_sha256': planner.preview(plan)['preview_sha256']})
         selector = {key: plan[key] for key in ('objective_id', 'plan_id', 'plan_revision')}
@@ -155,11 +159,9 @@ require(lib).install(root, source, 'director', names.map(name=>({name, rel: '.ag
         WF.resume_admission(store)
         WF.checkpoint(store, {'phase': 'implement', 'stop_reason': None})
         WF.begin_task(store, {'task_id': task['id']})
-        attempt = WF.prepare_check(store, {'task_id': task['id'], 'check_id': REPAIR.CHECK})
-        original = REPAIR.observe_snapshot(worktree / AUDIT.INSTALLED, worktree, argv=attempt['recipe']['argv'])
-        self.assertEqual(original['observed'], 'markdown-extension-omitted')
-        self.file(worktree, AUDIT.RESULT, WF.dump({key: original[key] for key in AUDIT.OBSERVED_RESULT}))
-        failed = self.record(store, task['id'], 'fail', AUDIT.RESULT, attempt)
+        attempt = WF.prepare_check(store, {'task_id': task['id'], 'check_id': self.check_id})
+        relative = self.original_result(worktree, attempt)
+        failed = self.record(store, task['id'], 'fail', relative, attempt)
         WS.ensure_workspace(store, launched)
         WF.checkpoint(store, {'phase': 'refresh-profile', 'stop_reason': 'Wait for the exact separately authorized repair canary.',
                               'next_action': 'Re-admit the same run only after the approved candidate installation.'})
@@ -175,10 +177,16 @@ require(lib).install(root, source, 'director', names.map(name=>({name, rel: '.ag
         fields = {'counts': {'expected': 1, 'discovered': 1, 'passed': int(verdict == 'pass'),
                              'failed': int(verdict != 'pass'), 'skipped': 0},
                   'failure_signature': AUDIT.SIGNATURE, 'failure_category': 'expected-behavior'}
-        return WF.record_check(store, {'task_id': task_id, 'check_id': REPAIR.CHECK, 'attempt_id': attempt['attempt_id'],
+        return WF.record_check(store, {'task_id': task_id, 'check_id': self.check_id, 'attempt_id': attempt['attempt_id'],
             'classification': 'executed-control', 'result': verdict, 'actual_lane': 'unit',
             'environment_identity': attempt['environment_identity'], 'cleanup': 'The dry-run wrote no archive.',
             'evidence': [relative], **fields})
+
+    def original_result(self, worktree, attempt):
+        original = REPAIR.observe_snapshot(worktree / AUDIT.INSTALLED, worktree, argv=attempt['recipe']['argv'])
+        self.assertEqual(original['observed'], 'markdown-extension-omitted')
+        self.file(worktree, AUDIT.RESULT, WF.dump({key: original[key] for key in AUDIT.OBSERVED_RESULT}))
+        return AUDIT.RESULT
 
     def test_audited_installed_failure_routes_one_repair_and_freezes_exact_candidate(self):
         request = self.observed_finding()

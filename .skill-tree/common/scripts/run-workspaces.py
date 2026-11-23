@@ -404,19 +404,40 @@ def local_merge_target(root, run):
 
 def local_git_environment():
     overrides = {'GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR', 'GIT_OBJECT_DIRECTORY',
-                 'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_NAMESPACE', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG_COUNT'}
-    if overrides.intersection(os.environ):
-        raise RunError('Local delivery requires the recorded Git environment without repository or index overrides')
+                 'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_NAMESPACE', 'GIT_CONFIG_PARAMETERS',
+                 'GIT_CONFIG', 'GIT_CONFIG_GLOBAL', 'GIT_CONFIG_SYSTEM'}
+    blocked = sorted(overrides.intersection(os.environ))
+    if blocked:
+        raise RunError('Local delivery requires the recorded Git environment without repository or index overrides. '
+                       'Clear the inherited setting ' + blocked[0])
+    env = os.environ.copy()
+    count = env.pop('GIT_CONFIG_COUNT', '0')
+    if not re.fullmatch(r'0|[1-9][0-9]{0,2}', count):
+        raise RunError('Invalid inherited Git configuration count')
+    # Desktop clients may install URL-scoped authentication or display settings.
+    # Local inspection and ref updates never need their values.
+    for index in range(int(count)):
+        key = env.pop(f'GIT_CONFIG_KEY_{index}', '').lower()
+        value = env.pop(f'GIT_CONFIG_VALUE_{index}', None)
+        presentation = re.fullmatch(r'color\.(?:ui|branch|diff|status)', key)
+        remote_only = re.fullmatch(r'(?:credential\.https?://[^\s]+\.(?:helper|usehttppath)|'
+                                   r'http\.https?://[^\s]+\.(?:proactiveauth|followredirects|extraheader))', key)
+        if value is None or not (presentation or remote_only):
+            raise RunError(f'Unsupported inherited Git setting at index {index}. Clear it for local delivery.')
+    if any(key.startswith(('GIT_CONFIG_KEY_', 'GIT_CONFIG_VALUE_')) for key in env):
+        raise RunError('Unexpected inherited Git configuration entries outside GIT_CONFIG_COUNT')
+    return env
 
 
 def local_git_args(root, *args):
-    local_git_environment()
     return ['git', '--no-replace-objects', '--no-optional-locks', '--literal-pathspecs', '-C', str(root),
             '-c', 'core.fsmonitor=false', '-c', 'diff.autoRefreshIndex=false', *map(str, args)]
 
 
 def local_git(root, *args, accepted=(0,), index=None):
-    environment = None if index is None else {**os.environ, 'GIT_INDEX_FILE': str(index)}
+    environment = local_git_environment()
+    if index is not None:
+        environment['GIT_INDEX_FILE'] = str(index)
     result = subprocess.run(local_git_args(root, *args), env=environment, capture_output=True, timeout=45)
     if result.returncode not in accepted:
         raise RunError('Local Git operation failed: ' + str(args[0]))
@@ -624,7 +645,7 @@ def create_task_commit(root, baseline, candidate, task_id, title):
 @contextmanager
 def prepare_ref_update(root, source_head, commit, hooks):
     args = local_git_args(root, '-c', f'core.hooksPath={hooks}', 'update-ref', '-m', 'Skill Tree task commit', '--stdin')
-    with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+    with subprocess.Popen(args, env=local_git_environment(), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                           stderr=subprocess.DEVNULL, text=True) as process:
         timer = Timer(45, process.terminate)
         timer.daemon = True
@@ -886,7 +907,7 @@ def local_git_lock(path):
 def local_ref_transaction(root, hooks, source_ref, source_head, target_ref, target_head, merge):
     args = local_git_args(root, '-c', f'core.hooksPath={hooks}', 'update-ref', '-m',
                           'Skill Tree local merge', '--stdin')
-    with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+    with subprocess.Popen(args, env=local_git_environment(), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                           stderr=subprocess.DEVNULL, text=True) as process:
         timer = Timer(45, process.terminate)
         timer.daemon = True

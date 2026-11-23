@@ -92,3 +92,15 @@ Store compact local inputs and evidence IDs so a second reader can recompute eac
 Freeze equivalent briefs, accepted facts, available inputs, controls, and exact ordinary and revised instruction revisions. Ask two independent reviewers to reconstruct expected and consumed revisions, coverage, earliest evidenced divergence and next owner. Record reviewer disagreement and unavailable evidence. An unavailable decisive input leaves causal attribution open. Record the missing evidence and the responsible owner.
 
 Check changed intent, effective configuration, available artifacts and author waits before assigning a recurring problem to a skill. A skill finding requires reproduction under a known instruction revision and an independently established outcome. Record adopt, revise or defer for the selected scope with residual uncertainty. Recheck the original case, an unaffected negative control and a comparable new request after an authorized fix.
+
+### Attribute an installed resource failure
+
+An executed unit check can report a verified Skill Tree resource defect. Record the installed resource and relevant fixture paths as check sources. Write the observed result to `.skill-tree/artifacts/director/<check-id>.json` and include that file in the failed check evidence. For example, a control that actually inspected a selected document count can emit:
+
+```json
+{"schema":1,"kind":"director-resource-check","assertion_id":"snapshot-count-matches-selection","installed_path":".agents/skills/skill-tree-create-documents-snapshot/scripts/create-documentation-snapshot.py","expected":"one-document","observed":"zero-documents"}
+```
+
+Use the actual installed path for the selected host. The unit check owns the meaning of the expected and observed tokens. The audit verifies the result digest against its Core receipt, maps the exact packaged bytes to their source using the verified installation resource map and retains portable input fingerprints. A missing receipt or an ambiguous mapping leaves the failure available for investigation. Repair preview also requires the registered maintenance checkout to contain the same source and fixture bytes and a resolvable unit recipe. An owner can select the resulting proposal and explicitly authorize intake, processing and launch on the project's source branch.
+
+During source repair, repeat the same check with the reviewed source path in `installed_path`, record a red result and a passing result in distinct evidence files, and select a review reference to freeze the candidate. The checked source diff, composed operation resource, original finding and both observations bind the candidate. The built-in snapshot canary remains available for its documented scenario.
