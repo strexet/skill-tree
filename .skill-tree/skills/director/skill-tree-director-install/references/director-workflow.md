@@ -10,9 +10,19 @@ Use the shared root profile for areas in the same repository. External areas ret
 
 Read the [capability pins](director-capabilities.json). Accepted Narrative snapshots and representative fixture adapters retain separate identities. Unintegrated ArtWorkshop and logs adapters remain visible prerequisites. A source or fixture observation does not admit an unverified adapter.
 
+## Shared workspace entry
+
+Run the local `skill-tree-director` launcher. The menu offers project registration before setup and objective intake, status, audit and setup once projects are registered. The service directory is excluded from ordinary product Git staging through a local Git rule. Existing product rules retain priority.
+
+For a task request, run `project-route` through the installed Director Setup entry with `operation` set to `intake`, `process`, `implement-next` or `implement-all`. Pass an exact `project_id` when selection is ambiguous. Optional `task_ids` limits the inspected selection to exact IDs. Show the returned project, queue, task scope and limitations before effects. The preview does not launch work. Director dispatch binds one exact task to each authorized frozen assignment. An explicitly chosen direct route uses `route: "direct"` for the preview and `--direct-project` for the Core entry.
+
+Director status lists whole-project runs by canonical queue, including direct project runs and standalone outcomes. Supply `project_work` with `area_id` and optional `run_id` for a focused view. A verified Director start links to the audit selector. A completed direct run can be considered through `adopt-preview` with an exact frozen assignment and outcome.
+
+Run `diagnose` through the installed Director Audit entry with `area_id`, `run_id` and `attempt_id`. Diagnosis runs on request and reads the selected canonical check evidence. Coverage gaps identify unavailable results or source proofs. Arbitrary project logs require a reviewed adapter. When a structured reproduced failure matches the installed and maintenance generations and the recipe, Director shows a read-only source repair proposal. Source changes and publication follow the existing explicit authorization workflow.
+
 ## Open the installed workspace
 
-Open the selected workspace and invoke `skill-tree-director`. Offer an existing project, a new project or continuation later. Use the installed Setup entry with `project-menu` to read the choices. For `project-preview` and `project-setup`, pass the Director directory and `--input` with a JSON file. For example, `{"kind":"new","name":"example"}` places the project in the workspace's `example/` folder. Supply `path` for a different location. For an existing project supply `{"kind":"existing","name":"site","path":"/absolute/path"}`. Show the proposed path, profile and hosts before applying the user's choice. The registration reports the verified child queue and source maintenance branch. Repeating the same choice verifies the recorded project.
+Open the selected workspace and invoke `skill-tree-director`. Use the installed Setup entry with `project-menu` to read the current choices. For `project-preview` and `project-setup`, pass the Director directory and `--input` with a JSON file. For example, `{"kind":"new","name":"example"}` places the project in the workspace's `example/` folder. Supply `path` for a different location. For an existing project supply `{"kind":"existing","name":"site","path":"/absolute/path"}`. Show the proposed path, profile and hosts before applying the user's choice. The registration reports the verified child queue and source maintenance branch. Repeat the original project choice to verify the registration and refresh the owned project packages if the menu reports a Core routing upgrade.
 
 ## Preview first-time setup
 

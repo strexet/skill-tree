@@ -13,7 +13,7 @@ function relativePackage(provider, name) {
   return path.posix.join(provider.id === "generic" ? "." : provider.projectPath, name);
 }
 
-function launcherText(location) {
+function legacyLauncherText(location) {
   return [
     "---", "name: skill-tree-director",
     "description: Open Director Setup to connect an existing project, create a new project, or inspect the coordinator.",
@@ -24,6 +24,23 @@ function launcherText(location) {
     "Run the following read-only command with the request. Show the proposed path, profile and hosts. Once the user chooses the project, run project-setup with the same input.",
     "", "```sh", `python3 "${location}" project-preview .skill-tree-director --input <request.json>`, "```", "",
     "To check the available actions, run project-menu in place of project-preview and omit --input.", ""
+  ].join("\n");
+}
+
+function launcherText(location) {
+  return [
+    "---", "name: skill-tree-director",
+    "description: Route shared-workspace task intake, processing, implementation, status and audit through Director. Connect or manage projects.",
+    "---", "", "# Skill Tree Director", "",
+    "Open the current workspace menu before choosing an action.", "", "```sh",
+    `python3 "${location}" project-menu .skill-tree-director`, "```", "",
+    "For registered projects offer objective intake, status, audit or project setup. Use the corresponding installed Director skill under the service directory. For a new workspace offer existing project, new project or later.",
+    "For ordinary task intake, processing or implementation use project-route with a JSON object containing operation (intake, process, implement-next or implement-all) and optional project_id and task_ids.",
+    "Show the receiving project, queue and task scope from the preview. If the Core route requires an upgrade, use project-setup with the original registration choice and the authorized installation handoff.",
+    "Use the existing objective, plan and assignment route. A Director dispatch takes one exact task per assignment. Surface any unsupported grouped launch before acting.",
+    "When the owner explicitly selects direct Core work, preview with route set to direct, show the same scope and invoke the Core CLI with --direct-project.",
+    "For project setup, use project-preview with kind (existing or new), name, optional path and flavor. On selection use project-setup with the same request.",
+    ""
   ].join("\n");
 }
 
@@ -49,12 +66,12 @@ function ownedPath(workspace, relative) {
   return target;
 }
 
-function checkLauncher(workspace, provider, expected, removing = false) {
+function checkLauncher(workspace, provider, expected, legacy, removing = false) {
   const folder = ownedPath(workspace, relativePackage(provider, launcher));
   const file = path.join(folder, "SKILL.md");
   if (removing && fs.existsSync(folder) && !fs.readdirSync(folder).length) return file;
-  if (fs.existsSync(folder) && (!fs.existsSync(file) || fs.lstatSync(file).isSymbolicLink() ||
-      fs.readFileSync(file, "utf8") !== expected || fs.readdirSync(folder).length !== 1)) {
+  if (fs.existsSync(folder) && (!fs.existsSync(file) || !fs.lstatSync(file).isFile() ||
+      ![expected, legacy].includes(fs.readFileSync(file, "utf8")) || fs.readdirSync(folder).length !== 1)) {
     throw Error("Director launcher conflicts with an existing package: " + folder);
   }
   return file;
@@ -128,10 +145,18 @@ function installDirector(workspace, source, providers, {dryRun = false, verify =
   const setup = relativePackage(selected[0], "skill-tree-director-setup") + "/scripts/director-entry.py";
   const descriptor = {schema: 1, kind: "director-workspace", providers: selected.map(host => host.id), setup_entry: setup};
   const entries = selected.map(host => {
-    const content = launcherText(path.posix.join(directorFolder, relativePackage(host, "skill-tree-director-setup"), "scripts/director-entry.py"));
-    return {file: checkLauncher(canonical, host, content), content};
+    const location = path.posix.join(directorFolder, relativePackage(host, "skill-tree-director-setup"), "scripts/director-entry.py");
+    const content = launcherText(location);
+    const legacy = previous ? legacyLauncherText(location) : undefined;
+    return {file: checkLauncher(canonical, host, content, legacy), content, legacy, host};
   });
   const message = `Director ${dryRun ? "preview" : "ready"} at ${home}\nOpen ${canonical} in ${selected.map(item => item.label).join(", ")} and invoke skill-tree-director.\nConnect an existing project, create a new project, or continue later.`;
+  function storage(mode) {
+    const result = spawnSync(process.env.PYTHON || "python3",
+      ["-B", path.join(__dirname, "../common/scripts/director-state.py"), mode, canonical],
+      {encoding:"utf8", timeout:120000});
+    if (result.error || result.status !== 0) throw Error(result.error?.message || result.stdout || result.stderr);
+  }
   if (verify) {
     const receipt = manager.verify(home, path.join(home, ".skill-tree/installation/source"));
     if (receipt.flavor !== "director" || previous.setup_entry !== setup ||
@@ -139,13 +164,19 @@ function installDirector(workspace, source, providers, {dryRun = false, verify =
           const item = receipt.destinations[rel];
           return item?.name === name && (item.providers || [item.provider]).includes(provider);
         })) throw Error("Dedicated Director receipt does not match its workspace descriptor");
-    if (entries.some(({file}) => !fs.existsSync(file))) throw Error("An installed Director launcher is missing");
+    if (entries.some(({file, content}) => !fs.existsSync(file) || fs.readFileSync(file, "utf8") !== content)) {
+      throw Error("An installed Director launcher is missing or needs a workspace update");
+    }
+    storage("project-storage-verify");
     return "Director verified at " + home;
   }
   if (dryRun) {
     if (fs.existsSync(home)) manager.install(home, source, "director", selections, {dryRun: true});
     return message;
   }
+  fs.mkdirSync(canonical, {recursive:true});
+  if (fs.realpathSync(canonical) !== canonical) throw Error("Director workspace changed during creation");
+  storage("project-storage-prepare");
   fs.mkdirSync(home, {recursive: true});
   if (fs.realpathSync(home) !== home) throw Error("Director workspace changed during creation");
   setupLock(home, previous, () => {
@@ -157,10 +188,24 @@ function installDirector(workspace, source, providers, {dryRun = false, verify =
     const init = spawnSync(process.env.PYTHON || "python3", ["-B", path.join(home, setup), "project-init", home],
       {encoding:"utf8", timeout:120000});
     if (init.error || init.status !== 0) throw Error(init.error?.message || init.stdout || init.stderr);
-    for (const {file, content} of entries) {
-      if (fs.existsSync(file)) continue;
-      fs.mkdirSync(path.dirname(file), {recursive:true});
-      fs.writeFileSync(file, content, {flag:"wx"});
+    for (const {file, content, legacy, host} of entries) {
+      checkLauncher(canonical, host, content, legacy);
+      const folder = path.dirname(file);
+      if (!fs.existsSync(file)) {
+        fs.mkdirSync(folder, {recursive:true});
+        fs.writeFileSync(file, content, {flag:"wx"});
+        continue;
+      }
+      if (fs.readFileSync(file, "utf8") === content) continue;
+      const scratch = fs.mkdtempSync(path.join(path.dirname(folder), ".skill-tree-launcher-"));
+      try {
+        const staged = path.join(scratch, "SKILL.md");
+        fs.writeFileSync(staged, content, {flag:"wx"});
+        checkLauncher(canonical, host, content, legacy);
+        fs.renameSync(staged, file);
+      } finally {
+        fs.rmSync(scratch, {recursive:true, force:true});
+      }
     }
   });
   return message;
@@ -194,8 +239,8 @@ function removeDirector(workspace, source, providers, {dryRun = false} = {}) {
       }
     }
     const launchers = new Set(removed.filter(host => !shared.has(relativePackage(host, launcher))).map(host => {
-      const content = launcherText(path.posix.join(directorFolder, setupEntry(host)));
-      return checkLauncher(canonical,host,content,true);
+      const location = path.posix.join(directorFolder, setupEntry(host));
+      return checkLauncher(canonical,host,launcherText(location),legacyLauncherText(location),true);
     }));
     if (selections.length) manager.uninstall(home, selections, {dryRun, recoverPluginPending:false});
     if (!dryRun) {

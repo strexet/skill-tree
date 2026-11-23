@@ -47,7 +47,12 @@ test('installed Setup registers existing, default and custom projects with selec
     '--target',root,'--source',composed]);
   install('codex');
   const app=path.join(home,data(home,'workspace.json').setup_entry),input=path.join(base,'request.json');
-  const invoke=(cmd,payload)=>{fs.writeFileSync(input,JSON.stringify(payload));return JSON.parse(run('python3',['-B',app,cmd,home,'--input',input]));};
+  const invoke=(cmd,payload)=>{
+    const args=['-B',app,cmd,home];
+    if(payload){fs.writeFileSync(input,JSON.stringify(payload));args.push('--input',input);}
+    return JSON.parse(run('python3',args));
+  };
+  assert.deepEqual(invoke('project-menu').choices,['existing','new','later']);
   const custom=path.join(base,'custom-location');
   for (const [choice,target,flavor] of [
     [{kind:'existing',name:'site',path:root},root,'web'],
@@ -57,6 +62,44 @@ test('installed Setup registers existing, default and custom projects with selec
     const result=invoke('project-setup',choice);
     assert.equal(result.status,'registered');assert.equal(result.checkout,target);assert.equal(result.flavor,flavor);
     if (choice.name === 'site') {
+      const menu=invoke('project-menu');
+      assert.deepEqual(menu.choices,['intake','status','audit','setup']);
+      assert.deepEqual(menu.projects.map(project=>project.id),['site']);
+      assert.equal(menu.projects[0].queue_id,result.queue_id);
+      assert.equal(menu.projects[0].core_routing,'guarded');
+      const route=invoke('project-route',{operation:'implement-all'});
+      assert.deepEqual(route.project,menu.projects[0]);
+      assert.equal(route.route,'director');
+      assert.deepEqual(route.task_ids,[]);
+      assert.equal(invoke('project-route',{operation:'implement-all',route:'direct'}).route,'direct');
+      const future='.skill-tree/documents/future.md';
+      const childBefore=fs.readFileSync(path.join(root,future),'utf8');
+      const directorBefore=fs.readFileSync(path.join(home,future),'utf8');
+      const skill=path.join(root,'.agents/skills/skill-tree-add-pending-task/scripts/workflow-state.py');
+      const intake={title:'Check the site',description:'Check the site.',expected_behavior:'Show the site.'};
+      fs.writeFileSync(input,JSON.stringify(intake));
+      const args=['-B',skill,'intake',root,'--standalone','--input',input];
+      const guarded=spawnSync('python3',args,{cwd:root,env,encoding:'utf8'});
+      assert.notEqual(guarded.status,0);
+      assert.match(guarded.stdout+guarded.stderr,/project-route/);
+      assert.equal(fs.readFileSync(path.join(root,future),'utf8'),childBefore);
+      assert.equal(fs.readFileSync(path.join(home,future),'utf8'),directorBefore);
+      const added=JSON.parse(run('python3',[...args,'--direct-project'],root));
+      const pending=invoke('project-route',{operation:'process',task_ids:[added.id]});
+      assert.deepEqual(pending.task_ids,[added.id]);
+      assert.equal(pending.project.queue_id,result.queue_id);
+      const registryPath=path.join(home,'.skill-tree/director/registry.json');
+      const current=fs.readFileSync(registryPath);
+      const restricted=JSON.parse(current);
+      restricted.areas.site.allowed_effects=['status'];
+      fs.writeFileSync(registryPath, JSON.stringify(restricted));
+      const unavailable=invoke('project-route',{operation:'process'});
+      assert.equal(unavailable.status,'prerequisite');
+      assert.deepEqual(unavailable.task_ids,[]);
+      assert.equal(unavailable.queue_sha256,undefined);
+      fs.writeFileSync(registryPath,current);
+      assert.notEqual(fs.readFileSync(path.join(root,future),'utf8'),childBefore);
+      assert.equal(fs.readFileSync(path.join(home,future),'utf8'),directorBefore);
       const existingProfile = data(target,'.skill-tree/installation/profile.json');
       assert.equal(existingProfile.destinations['.claude/skills/skill-tree-add-pending-task'],undefined);
       install('claude-code');

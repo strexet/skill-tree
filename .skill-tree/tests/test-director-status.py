@@ -149,6 +149,36 @@ class DirectorStatusTests(unittest.TestCase):
         self.assertEqual(status['available_independent'], [])
         self.assertEqual((self.snapshot(self.repo), self.snapshot(worktree), self.snapshot(external)), before)
 
+    def test_direct_project_run_keeps_queue_run_and_task_identity(self):
+        task = self.task(self.repo, 'Inspect the whole project')
+        run = self.run_fixture(self.repo, task, self.base / 'direct-worktree')
+        whole = self.area('project', 'general', self.repo, '.')
+        source = self.base / 'maintenance-source'
+        self.init_repo(source)
+        maintenance = self.area('maintenance', 'source-maintenance', source, '.skill-tree')
+        self.register({**self.request, 'areas': [whole, maintenance]})
+        before = self.snapshot(self.parent), self.snapshot(self.repo)
+        view = self.director.status()['project_work']
+        self.assertEqual(len(view), 1)
+        self.assertEqual(view[0]['queue_id'], self.queue)
+        self.assertEqual(view[0]['area_ids'], ['project'])
+        direct = view[0]['runs'][0]
+        self.assertEqual((direct['run_id'], direct['task_ids']), (run['id'], [task]))
+        self.assertEqual(direct['route'], 'direct-project')
+        self.assertEqual(direct['audit_coverage'], 'outside-director-assignment')
+        self.assertEqual(self.director.status({'project_work':{'area_id':'project', 'run_id':run['id']}})['project_work'][0]['runs'], view[0]['runs'])
+        self.assertEqual((self.snapshot(self.parent), self.snapshot(self.repo)), before)
+
+    def test_standalone_outcome_retains_task_and_outcome_without_a_run(self):
+        task_id, outcome_id = WF.identity('T'), WF.identity('O')
+        area = {'id':'site', 'queue_id':self.queue, 'scope':'.', 'role':'web', 'allowed_effects':['status']}
+        queue = {'status':'ready', 'state':{'run_registry':{'runs':{}}},
+                 'outcomes':{task_id:{'task_id':task_id, 'id':outcome_id, 'disposition':'completed', 'run_id':None}}}
+        row, = self.director._project_work({'areas':{'site':area}}, {self.queue:queue}, None)
+        self.assertEqual(row['runs'], [])
+        self.assertEqual(row['standalone_outcomes'], [{'task_id':task_id, 'outcome_id':outcome_id, 'run_id':None,
+            'disposition':'completed', 'route':'direct-project', 'audit_coverage':'outside-director-assignment'}])
+
     def test_status_distinguishes_unbound_unavailable_and_mismatched(self):
         self.register()
         bindings = self.parent / DIRECTOR.BINDINGS
