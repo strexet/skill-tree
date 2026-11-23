@@ -8,10 +8,11 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import tempfile
 
 
 COMMANDS = {'repair-preview', 'repair-intake', 'repair-process', 'repair-start',
-            'repair-candidate-preview', 'repair-candidate-apply', 'repair-candidate-read'}
+            'repair-candidate-preview', 'repair-candidate-apply', 'repair-candidate-read', 'repair-integrate'}
 ARCHIVE = '.skill-tree/director/source-repairs/'
 SOURCE = '.skill-tree/common/scripts/create-documentation-snapshot.py'
 OPERATION = 'skill-tree-create-documents-snapshot'
@@ -23,7 +24,7 @@ INPUT = b'# Director snapshot canary\n\nThis document is the selected Markdown i
 STAMP = '2000-01-01-00-00'
 TITLE = 'Preserve Markdown extensions in snapshot dry-run reports'
 OWNER_FIELDS = {'actor', 'kind', 'reference'}
-EFFECTS = {'intake', 'process', 'launch', 'freeze-candidate'}
+EFFECTS = {'intake', 'process', 'launch', 'freeze-candidate', 'integrate'}
 DEFECT = b'''print(f"- {item.removesuffix('.md')}")'''
 REPAIRED = b'print(f"- {item}")'
 
@@ -156,6 +157,12 @@ class DirectorSourceRepair:
         return {'project_id': project, 'branch': maintained['branch'], 'base_commit': maintained['base_commit'],
                 'product_queue_id': area['queue_id'], 'source_queue_id': maintained['queue_id']}
 
+    def _source_tree(self, root, maintenance):
+        if not maintenance:
+            return root
+        maintained = _load_module('director-maintenance').inspect(self.registry.root, maintenance['project_id'])
+        return Path(maintained['project_checkout'])
+
     def preview(self, request):
         D._object(request, {'audit', 'finding_sha256'})
         D._require(D._sha(request['finding_sha256']), 'Select an exact sanitized audit finding')
@@ -173,18 +180,19 @@ class DirectorSourceRepair:
                    'Selected audit evidence does not qualify for this bounded source repair')
         source_path = finding['scope']['source_path']
         director, area, root = self._area(source_path)
-        source = D._safe_path(root, source_path)
+        maintenance = self._maintenance(finding, root)
+        tree = self._source_tree(root, maintenance)
+        source = D._safe_path(tree, source_path)
         D._require(D.WF.file_hash(source) == finding['generation']['source_sha256']
                    and (not snapshot or source.read_bytes().count(DEFECT) == 1), 'The exact controlled source generation changed')
         spec = _repair_scenario(finding)
         if diagnostic:
             for path, digest in spec['fixtures'].items():
-                D._require(D.WF.file_hash(D._safe_path(root, path)) == digest, 'Reproduction input differs in maintenance source')
+                D._require(D.WF.file_hash(D._safe_path(tree, path)) == digest, 'Reproduction input differs in maintenance source')
         plan = {'schema': 1, 'director_id': director, 'source': area, 'finding': finding, 'scenario': spec}
         if diagnostic:
             recipe, _ = D.WF.recipe_for(D.WF.Store(root, neutral=True), _case_check(plan))
             D._require(recipe['lane'] == spec['lane'], 'Maintenance reproduction recipe differs')
-        maintenance = self._maintenance(finding, root)
         if maintenance:
             plan['maintenance'] = maintenance
         result = {'repair_id': _repair_id(plan), 'plan': plan, 'audit_sha256': audit['audit_sha256'],
@@ -192,7 +200,7 @@ class DirectorSourceRepair:
                   'queue_sha256': D.WF.file_hash(root / '.skill-tree/documents/future.md'), 'effects': sorted(EFFECTS)}
         return {**result, 'preview_sha256': D._digest(result)}
 
-    def _load(self, repair_id):
+    def _load(self, repair_id, *, verify_original=True):
         receipt, _ = D._read(self.registry.root, _archive('repair', repair_id))
         D._require(receipt and receipt['repair_id'] == repair_id and _repair_id(receipt['preview']['plan']) == repair_id
                    and D._digest({key: value for key, value in receipt.items() if key != 'receipt_sha256'}) == receipt['receipt_sha256'],
@@ -203,8 +211,10 @@ class DirectorSourceRepair:
         D._require(plan.get('maintenance') == self._maintenance(plan['finding'], root), 'Maintenance branch binding changed')
         D._require(plan['director_id'] == director and plan['source'] == area,
                    'Registered source authority changed after repair approval')
-        D._require(D.WF.file_hash(D._safe_path(root, source_path)) == plan['finding']['generation']['source_sha256'],
-                   'The protected original source generation changed')
+        if verify_original:
+            tree = self._source_tree(root, plan.get('maintenance'))
+            D._require(D.WF.file_hash(D._safe_path(tree, source_path)) == plan['finding']['generation']['source_sha256'],
+                       'The protected original source generation changed')
         return receipt, root
 
     def _envelope(self, case):
@@ -249,6 +259,7 @@ class DirectorSourceRepair:
                 D._require(preview is not None, 'Original source repair preview unavailable')
                 source_path = preview['plan']['finding']['scope']['source_path']
                 director, area, root = self._area(source_path)
+                tree = self._source_tree(root, preview['plan'].get('maintenance'))
                 audited_run = payload['request']['audit']['director_run_id']
                 run_path = '.skill-tree/director/runs/' + audited_run.lower() + '.json'
                 D._require(preview is not None and preview['repair_id'] == repair_id
@@ -256,7 +267,7 @@ class DirectorSourceRepair:
                            and preview['plan']['director_id'] == director and preview['plan']['source'] == area
                            and preview['audit_run_sha256'] == D.WF.file_hash(D._safe_path(self.registry.root, run_path))
                            and preview['queue_sha256'] == D.WF.file_hash(root / '.skill-tree/documents/future.md')
-                           and preview['plan']['finding']['generation']['source_sha256'] == D.WF.file_hash(D._safe_path(root, source_path)),
+                           and preview['plan']['finding']['generation']['source_sha256'] == D.WF.file_hash(D._safe_path(tree, source_path)),
                            'Source repair preview or queue changed before owner selection')
                 case = {'schema': 1, 'repair_id': repair_id, 'preview': preview, 'owner': owner, 'effects': effects,
                         'request_sha256': owner_key['request_sha256'], 'recorded_at': D.WF.now()}
@@ -461,10 +472,53 @@ console.log(JSON.stringify({source_inventory_sha256:c.hash(c.json(inputs)), sour
                    'Exact frozen source repair candidate is unavailable or changed')
         return record
 
+    def integrate(self, payload):
+        D._object(payload, {'candidate_sha256', 'repair_id', 'owner'})
+        owner = _owner(payload['owner'])
+        case, root = self._load(payload['repair_id'], verify_original=False)
+        plan = case['preview']['plan']
+        D._require('integrate' in case['effects'] and owner['actor'] == case['owner']['actor'] and plan.get('maintenance'),
+                   'Authorize integration on the exact project maintenance branch')
+        candidate = self.candidate_read({'candidate_sha256': payload['candidate_sha256']})
+        finding, review = plan['finding'], candidate['review']
+        D._require(candidate['finding_sha256'] == finding['finding_sha256']
+                   and candidate['route']['queue_id'] == plan['source']['queue_id']
+                   and candidate['owner']['actor'] == owner['actor'], 'Candidate belongs to another source repair')
+        dispatched = self._observed(case, root, 'start')['observed_result']
+        D._require(dispatched and dispatched['id'] == candidate['route']['run_id'], 'Candidate has a different repair run')
+        source_path = finding['scope']['source_path']
+        base = review['source_base_commit']
+        D._require(source_path == review['source_path'] and base == dispatched['workspace']['base_commit']
+                   and dispatched['workspace']['base_branch'] == plan['maintenance']['branch'],
+                   'Reviewed source repair base changed')
+        ref = 'refs/skill-tree/director/candidates/' + candidate['candidate_sha256']
+        if D.WS.local_git(root, 'show-ref', '--verify', '--quiet', ref, accepted=(0, 1)).returncode:
+            tree = self.objectives._read_run_root(root, dispatched)
+            D._require(tree is not None and D.WF.file_hash(D._safe_path(tree, source_path)) == review['after_sha256'],
+                       'Recover the verified candidate bytes before integration')
+            entry = D.WS.local_git(root, 'ls-tree', '-z', base, '--', source_path).stdout
+            mode = entry.split(b' ', 1)[0].decode()
+            D._require(mode in {'100644', '100755'}, 'Candidate requires an existing regular source file')
+            blob = D.WS.local_git_text(tree, 'hash-object', '-w', '--no-filters', '--', source_path)
+            D._require(D.WF.digest(D.WS.local_git(root, 'cat-file', 'blob', blob).stdout) == review['after_sha256'],
+                       'Reviewed source bytes changed during integration')
+            with tempfile.TemporaryDirectory() as directory:
+                index = Path(directory) / 'index'
+                D.WS.local_git(root, 'read-tree', base, index=index)
+                D.WS.local_git(root, 'update-index', '--cacheinfo', mode, blob, source_path, index=index)
+                proposed = D.WS.local_git(root, 'write-tree', index=index).stdout.decode().strip()
+            oid = D.WS.local_git_text(root, 'commit-tree', proposed, '-p', base, '-m', _case_title(plan),
+                                      '-m', 'Skill-Tree-Candidate: ' + candidate['candidate_sha256'])
+            # A concurrent retry may have already reserved the same reviewed tree.
+            D.WS.local_git(root, 'update-ref', ref, oid, '', accepted=(0, 128))
+        commit = D.WS.local_git_text(root, 'rev-parse', '--verify', ref + '^{commit}')
+        return _load_module('director-maintenance').integrate(self.registry.root, plan['maintenance']['project_id'],
+                   expected_head=base, candidate_commit=commit, reviewed_paths={source_path: review['after_sha256']}, owner=owner)
+
     def run(self, command, payload):
         return {'repair-preview': self.preview, 'repair-intake': self.intake, 'repair-process': self.process,
                 'repair-start': self.start, 'repair-candidate-preview': self.candidate_preview,
-                'repair-candidate-apply': self.candidate_apply, 'repair-candidate-read': self.candidate_read}[command](payload)
+                'repair-candidate-apply': self.candidate_apply, 'repair-candidate-read': self.candidate_read, 'repair-integrate': self.integrate}[command](payload)
 
 
 def main():
