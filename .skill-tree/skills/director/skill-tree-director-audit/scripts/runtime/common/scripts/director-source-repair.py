@@ -170,7 +170,14 @@ class DirectorSourceRepair:
         audit = self.audit.read(request['audit'])
         matches = [item for item in audit['findings'] if item.get('finding_sha256') == request['finding_sha256']]
         D._require(len(matches) == 1, 'Current audit does not contain one exact source-ready finding')
-        finding = matches[0]
+        plan, root = self.proposal(matches[0])
+        result = {'repair_id': _repair_id(plan), 'plan': plan, 'audit_sha256': audit['audit_sha256'],
+                  'audit_run_sha256': audit['director_status']['run_sha256'],
+                  'queue_sha256': D.WF.file_hash(root / '.skill-tree/documents/future.md'), 'effects': sorted(EFFECTS)}
+        return {**result, 'preview_sha256': D._digest(result)}
+
+    def proposal(self, finding):
+        """Verify the same current maintenance source for an audit or a diagnostic finding."""
         pattern = (finding.get('classification'), finding.get('component'), finding.get('symptom'))
         snapshot = (pattern == ('source-defect', 'documentation-snapshot', 'markdown-extension-omitted')
                     and finding.get('scope') == {'source_path': SOURCE, 'operation': OPERATION}
@@ -197,10 +204,7 @@ class DirectorSourceRepair:
                        'Maintenance reproduction recipe differs from the executed product check')
         if maintenance:
             plan['maintenance'] = maintenance
-        result = {'repair_id': _repair_id(plan), 'plan': plan, 'audit_sha256': audit['audit_sha256'],
-                  'audit_run_sha256': audit['director_status']['run_sha256'],
-                  'queue_sha256': D.WF.file_hash(root / '.skill-tree/documents/future.md'), 'effects': sorted(EFFECTS)}
-        return {**result, 'preview_sha256': D._digest(result)}
+        return plan, root
 
     def _load(self, repair_id, *, verify_original=True):
         receipt, _ = D._read(self.registry.root, _archive('repair', repair_id))

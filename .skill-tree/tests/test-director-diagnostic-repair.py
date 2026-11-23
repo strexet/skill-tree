@@ -64,8 +64,72 @@ class WrongCount(f.SourceRepairControls):
         self.assertEqual(self.observe(worktree, f.AUDIT.INSTALLED, attempt, relative), 'zero-documents')
         return relative
 
+    def test_diagnose_exact_direct_project_check(self):
+        task = self.task(self.product_store, 'Inspect direct installed report', [f.AUDIT.INSTALLED, 'README.md'])
+        work = self.workspace('direct-project-report')
+        launched = f.WF.start(self.product_store, 'next', task['id'], workspace=work)
+        store = f.WF.Store(self.product, run_id=launched['id'])
+        f.WF.checkpoint(store, {'phase':'refresh-profile', 'stop_reason':'Prepare the fixture installation.'})
+        tree = Path(work['worktree'])
+        self.install_old(tree)
+        f.WF.resume_admission(store)
+        f.WF.checkpoint(store, {'phase':'implement', 'stop_reason':None})
+        f.WF.begin_task(store, {'task_id':task['id']})
+        attempt = f.WF.prepare_check(store, {'task_id':task['id'], 'check_id':self.check_id})
+        relative = self.original_result(tree, attempt)
+        failed = self.record(store, task['id'], 'fail', relative, attempt)
+        selector = {'area_id':'project', 'run_id':launched['id'], 'attempt_id':failed['attempt_id']}
+        before = (self.product_store.state.read_bytes(), self.source_store.state.read_bytes(),
+                  self.product_store.future.read_bytes(), self.source_store.future.read_bytes())
+        with patch.object(f.AUDIT.D.WF, 'owned_module', wraps=f.AUDIT.D.WF.owned_module) as modules:
+            def load(name, path):
+                return f.REPAIR if name == 'director_project_diagnosis_repair' else modules._mock_wraps(name, path)
+            modules.side_effect = load
+            report = self.audit.diagnose(selector)
+            self.assertEqual(report['selection'], {**selector, 'queue_id':self.product_queue})
+            self.assertEqual(report['observations'][0]['classification'], 'source-defect')
+            self.assertEqual(report['repair_proposal']['source_path'], f.REPAIR.SOURCE)
+            self.assertEqual(report['repair_proposal']['status'], 'proposal')
+            self.assertEqual(report['repair_proposal']['maintenance']['branch'], self.project_source['branch'])
+            self.assertEqual(report['coverage']['arbitrary_logs'], 'unsupported')
+            self.assertEqual((self.product_store.state.read_bytes(), self.source_store.state.read_bytes(),
+                              self.product_store.future.read_bytes(), self.source_store.future.read_bytes()), before)
+            artifact = tree / relative
+            artifact.write_bytes(artifact.read_bytes().replace(b'zero-documents', b'two-documents'))
+            stale = self.audit.diagnose(selector)
+            self.assertEqual(stale['observations'][0]['classification'], 'unclassified-failure')
+            self.assertIsNone(stale['repair_proposal'])
+            artifact.write_text(json.dumps({'kind':'product-check-result'}))
+            replaced = self.audit.diagnose(selector)
+            self.assertEqual(replaced['observations'][0]['classification'], 'unclassified-failure')
+            artifact.unlink()
+            missing = self.audit.diagnose(selector)
+            self.assertEqual(missing['observations'][0]['classification'], 'unclassified-failure')
+
+            ordinary_attempt = f.WF.prepare_check(store, {'task_id':task['id'], 'check_id':self.check_id})
+            artifact = tree / self.original_result(tree, ordinary_attempt)
+            artifact.write_text(json.dumps({'kind':'product-check-result'}))
+            product_check = self.record(store, task['id'], 'fail', relative, ordinary_attempt)
+            ordinary = self.audit.diagnose({**selector, 'attempt_id':product_check['attempt_id']})
+            self.assertEqual(ordinary['observations'][0]['classification'], 'product')
+            self.assertIsNone(ordinary['repair_proposal'])
+            no_check = self.audit.diagnose({**selector, 'attempt_id':f.WF.identity('C')})
+            self.assertEqual(no_check['coverage_gaps'][-1]['reason'], 'check-result-unavailable')
+
     def test_wrong_count_from_installed_run_routes_rechecks_and_freezes(self):
         request = self.observed_finding()
+        director_run = request['audit']['director_run_id']
+        selector = request['audit']['selections'][0]
+        view = {'project_work':{'area_id':'project', 'run_id':selector['run_id']}}
+        row = self.registry.status(view)['project_work'][0]['runs'][0]
+        self.assertEqual(row['audit_coverage'], 'director-assignment')
+        self.assertEqual(row['audit'], {**selector, 'director_run_id':director_run})
+        parent = self.parent / f'.skill-tree/director/runs/{director_run.lower()}.json'
+        original = parent.read_bytes()
+        parent.write_text(json.dumps({**json.loads(original), 'phase':'rejected-fixture-state'}))
+        self.assertEqual(self.registry.status(view)['project_work'][0]['runs'][0]['audit_coverage'],
+                         'director-start-unverified')
+        parent.write_bytes(original)
         preview = self.repair.preview(request)
         binding = preview['plan']['maintenance']
         self.assertEqual(binding['project_id'], 'project')
@@ -151,7 +215,8 @@ class WrongCount(f.SourceRepairControls):
 
 
 def load_tests(loader, tests, pattern):
-    return unittest.TestSuite([WrongCount('test_wrong_count_from_installed_run_routes_rechecks_and_freezes'),
+    return unittest.TestSuite([WrongCount('test_diagnose_exact_direct_project_check'),
+        WrongCount('test_wrong_count_from_installed_run_routes_rechecks_and_freezes'),
         f.SourceRepairControls('test_audited_installed_failure_routes_one_repair_and_freezes_exact_candidate')])
 
 
