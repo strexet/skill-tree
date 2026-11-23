@@ -28,10 +28,24 @@ test('installed Setup registers existing, default and custom projects with selec
   fs.writeFileSync(path.join(seed,'.skill-tree/config/repository.json'),'{"role":"source"}');
   fs.writeFileSync(path.join(seed,'.skill-tree/documents/future.md'),'# Future Work\n\n## Pending Task Format\n\n## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n');
   commit(seed);
-  git(base,'config','--file',env.GIT_CONFIG_GLOBAL,'url.'+pathToFileURL(seed).href+'.insteadOf','https://github.com/strexet/skill-tree.git');
+  // Compose the test installation from a private package source pinned to the
+  // fixture. Production verifies the effective upstream URL before acquisition.
+  const composed = path.join(base, 'fixture-source', '.skill-tree');
+  fs.mkdirSync(composed, {recursive:true});
+  for (const name of ['common','config','domains','lib','src','templates','tests/fixtures/director']) {
+    fs.cpSync(path.join(__dirname, '..', name), path.join(composed, name), {recursive:true});
+  }
+  const maintenance = path.join(composed, 'common/scripts/director-maintenance.py');
+  const original = fs.readFileSync(maintenance, 'utf8');
+  const fixture = original.replace("UPSTREAM = 'https://github.com/strexet/skill-tree.git'",
+    "UPSTREAM = '" + pathToFileURL(seed).href + "'");
+  assert.notEqual(fixture, original);
+  fs.writeFileSync(maintenance, fixture);
   init(root,'main');fs.writeFileSync(path.join(root,'index.html'),'<!DOCTYPE html>');commit(root);
   const head=git(root,'rev-parse','HEAD');
-  run(process.execPath,[path.join(__dirname,'../bin/install.js'),'--only','codex','--only','claude-code','--target',root]);
+  const install = host => run(process.execPath,[path.join(__dirname,'../bin/install.js'),'--only',host,
+    '--target',root,'--source',composed]);
+  install('codex');
   const app=path.join(home,data(home,'workspace.json').setup_entry),input=path.join(base,'request.json');
   const invoke=(cmd,payload)=>{fs.writeFileSync(input,JSON.stringify(payload));return JSON.parse(run('python3',['-B',app,cmd,home,'--input',input]));};
   const custom=path.join(base,'custom-location');
@@ -42,6 +56,15 @@ test('installed Setup registers existing, default and custom projects with selec
     assert.equal(invoke('project-preview',choice).checkout,target);
     const result=invoke('project-setup',choice);
     assert.equal(result.status,'registered');assert.equal(result.checkout,target);assert.equal(result.flavor,flavor);
+    if (choice.name === 'site') {
+      const existingProfile = data(target,'.skill-tree/installation/profile.json');
+      assert.equal(existingProfile.destinations['.claude/skills/skill-tree-add-pending-task'],undefined);
+      install('claude-code');
+      assert.deepEqual(invoke('project-preview',choice).providers,['codex','claude-code']);
+      const extended = invoke('project-setup',choice);
+      assert.equal(extended.queue_id,result.queue_id);
+      assert.deepEqual(extended.providers,['codex','claude-code']);
+    }
     const installed=data(target,'.skill-tree/installation/profile.json');
     for(const [dest,host] of [['.agents/skills','codex'],['.claude/skills','claude-code']]) {
       assert.ok(installed.destinations[dest+'/skill-tree-add-pending-task'].providers.includes(host));

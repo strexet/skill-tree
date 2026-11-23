@@ -27,8 +27,30 @@ function launcherText(location) {
   ].join("\n");
 }
 
+function workspacePath(location) {
+  let anchor = path.resolve(location);
+  const missing = [];
+  while (!fs.lstatSync(anchor, {throwIfNoEntry:false})) {
+    missing.unshift(path.basename(anchor));
+    anchor = path.dirname(anchor);
+  }
+  if (!fs.statSync(anchor).isDirectory()) throw Error("Select a workspace directory");
+  return path.join(fs.realpathSync(anchor), ...missing);
+}
+
+function ownedPath(workspace, relative) {
+  if (fs.existsSync(workspace)) return composer.safe(workspace, relative);
+  // With no directory to inspect, validate lexical containment without creating it.
+  const target = path.resolve(workspace, relative);
+  const child = path.relative(workspace, target);
+  if (!child || child === ".." || child.startsWith(".." + path.sep) || path.isAbsolute(child)) {
+    throw Error("Director destination must be inside the workspace");
+  }
+  return target;
+}
+
 function checkLauncher(workspace, provider, expected) {
-  const folder = composer.safe(workspace, relativePackage(provider, launcher));
+  const folder = ownedPath(workspace, relativePackage(provider, launcher));
   const file = path.join(folder, "SKILL.md");
   if (fs.existsSync(folder) && (!fs.existsSync(file) || fs.lstatSync(file).isSymbolicLink() ||
       fs.readFileSync(file, "utf8") !== expected || fs.readdirSync(folder).length !== 1)) {
@@ -38,10 +60,8 @@ function checkLauncher(workspace, provider, expected) {
 }
 
 function installDirector(workspace, source, providers, {dryRun = false} = {}) {
-  const parent = path.resolve(workspace);
-  if (fs.existsSync(parent) && !fs.statSync(parent).isDirectory()) throw Error("Select a workspace directory");
-  const canonical = fs.existsSync(parent) ? fs.realpathSync(parent) : parent;
-  const home = composer.safe(canonical, directorFolder);
+  const canonical = workspacePath(workspace);
+  const home = ownedPath(canonical, directorFolder);
   const reference = path.join(home, "workspace.json");
   if (fs.existsSync(reference) && fs.lstatSync(reference).isSymbolicLink()) throw Error("Select an owned Director workspace descriptor");
   const previous = fs.existsSync(reference) ? composer.readJson(home, "workspace.json") : null;
@@ -69,6 +89,7 @@ function installDirector(workspace, source, providers, {dryRun = false} = {}) {
     return message;
   }
   fs.mkdirSync(home, {recursive: true});
+  if (fs.realpathSync(home) !== home) throw Error("Director workspace changed during creation");
   const lock = path.join(home, ".setup-lock");
   let fd;
   try {

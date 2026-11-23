@@ -52,3 +52,17 @@ for (const webFirst of [true, false]) {
     run(process.execPath,[path.join(home,'.skill-tree/installation/manager.js'),'--verify'],root);
   });
 }
+
+test('a nested new workspace can be previewed and created with the public launcher', t => {
+  const base = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'director-new-location-')));
+  t.after(() => fs.rmSync(base, {recursive:true, force:true}));
+  const root = path.join(base, 'new-parent', 'new-workspace');
+  const args = ['--target',root,'--only','codex'];
+  const launch = extra => process.platform === 'win32'
+    ? run('powershell',['-NoProfile','-File',path.join(source,'install.ps1'),...args,...extra],base)
+    : run('sh',[path.join(source,'install.sh'),...args,...extra],base);
+  assert.match(launch(['--dry-run']),/Director preview/);
+  assert.deepEqual(fs.readdirSync(base),[]);
+  assert.match(launch([]),/Director ready/);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(root,'.skill-tree-director',receipt))).flavor,'director');
+});

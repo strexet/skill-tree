@@ -120,14 +120,19 @@ def run(raw_root, command, request):
     prep = f'.skill-tree/artifacts/director/project-preparation/{name}.json'
     if not previous and D._read(root, prep)[0] is None:
         D._setup_target(str(path), request['kind'])
+    def verify_choice(prior):
+        stable = ('project_id', 'checkout', 'flavor', 'kind')
+        D._require(all(prior.get(key) == plan[key] for key in stable)
+                   and set(prior.get('providers', ())) <= set(hosts),
+                   'The project ID is already bound to another project or host selection')
     if previous:
-        D._require(all(previous.get(key) == value for key, value in plan.items()), 'The project ID is already bound to another project')
+        verify_choice(previous)
     if command == 'project-preview':
         return {**plan, 'status':'preview'}
     with B.lock(root):
         previous, _ = D._read(root, record)
         if previous:
-            D._require(all(previous.get(key) == value for key, value in plan.items()), 'The project ID is already in use')
+            verify_choice(previous)
         maintenance = D.WF.owned_module('director_maintenance', Path(__file__).with_name('director-maintenance.py'))
         source = maintenance.prepare(root, name)
         if not previous:
@@ -135,6 +140,13 @@ def run(raw_root, command, request):
         else:
             D._require(D._inspect_owner(path)[0] == previous.get('queue_id') and D._inspect_profile(path)['flavor'] == flavor,
                        'Registered project identity changed')
+            # Reuse the verified project and add newly chosen host destinations in
+            # one owned installation transaction. Existing host packages stay owned.
+            installed = {'flavor':flavor, 'providers':hosts}
+            source_bundle = root / '.skill-tree/installation/source'
+            baseline = D._setup_file_proofs(path)
+            if not B.installation(path, installed, source_bundle, baseline, apply=False):
+                B.installation(path, installed, source_bundle, baseline, apply=True)
         child = registration_area(name, flavor, path, ['status','preview','audit','review','intake','process','launch'])
         canonical_source = registration_area('skill-tree-source', 'source-maintenance', source['checkout'],
                                             ['status','preview','audit','review','intake','process','launch'])
