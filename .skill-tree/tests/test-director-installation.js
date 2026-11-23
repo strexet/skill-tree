@@ -70,7 +70,7 @@ function fixture(t) {
 }
 
 function cli(project, flavor, extra = []) {
-  return spawn(process.execPath, [CLI, '--target', project, '--only', 'codex', '--flavor', flavor, ...extra]);
+  return spawn(process.execPath, [CLI, '--project', '--target', project, '--only', 'codex', '--flavor', flavor, ...extra]);
 }
 
 function installedClosure(project, names) {

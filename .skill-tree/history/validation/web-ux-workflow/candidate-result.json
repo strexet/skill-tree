@@ -1,0 +1,53 @@
+{
+  "provider": "codex",
+  "flavor": "web",
+  "develop_base": "6638200f1f1446455004a1392a3d39860cdcf787",
+  "web_reference_sha256": "cf65aa6fb17e41e1ea660dbc1dfb80b508318bcb719eb1d2ca95ce356161034c",
+  "entry_point_source_sha256": "daa270e33665f463eceb2414b54ffae08afabe092cd7f8e61c9fb076f91044c9",
+  "cases": {
+    "first-install": {
+      "dry_run": "dry-run",
+      "dry_run_target_files_unchanged": true,
+      "apply": "installed",
+      "installer_verification": "verified",
+      "owned_manager_verification": "passed",
+      "matching_entry_points": 22,
+      "matching_references": 22,
+      "preserved_files": [
+        "index.html",
+        "package.json"
+      ],
+      "installer_created_project_catalog": false
+    },
+    "existing-project": {
+      "dry_run": "dry-run",
+      "dry_run_target_files_unchanged": true,
+      "apply": "installed",
+      "installer_verification": "verified",
+      "owned_manager_verification": "passed",
+      "matching_entry_points": 22,
+      "matching_references": 22,
+      "preserved_files": [
+        "index.html",
+        "package.json",
+        "docs/ui-patterns.md",
+        ".skill-tree/documents/future.md",
+        ".skill-tree/documents/future.json"
+      ],
+      "prior_profile_reference_sha256": "a8e55f4d58ad64056707801a3c31aa56eb884755fd12ef08c341680d73645bc9",
+      "existing_pending_task_count": 1
+    }
+  },
+  "greenfield_planning_probe": {
+    "request": "Plan how a reading-room visitor can mark a page as read and see whether the mark was saved. Keep the project small.",
+    "fixture": "Single static HTML page with a heading and no app catalog, related control, or implemented example.",
+    "independent_agent_observation": "The agent identified the missing local example, selected a native button and visible status, and planned to confirm only a successful browser-storage write.",
+    "planned_browser_checks": [
+      "Activate the action by keyboard and inspect the visible status.",
+      "Reload in the same profile and inspect persistence.",
+      "Simulate storage failure and try again.",
+      "Review desktop and narrow enlarged-text views."
+    ],
+    "execution": "Planning only."
+  }
+}

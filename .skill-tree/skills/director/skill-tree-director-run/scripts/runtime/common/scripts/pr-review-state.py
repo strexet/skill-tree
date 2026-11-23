@@ -138,6 +138,35 @@ def parameters(current_branch, payload):
     result['authorization']={'pr':payload.get('instruction_origin','owner')=='owner','merge':bool(positive),'origin':payload.get('instruction_origin','owner'),'instruction_digest':digest(text),'target_branch':result['target_branch']}
     return result
 
+def github_remote(url):
+    match = re.fullmatch(r'(?:https://|ssh://git@|git@)([\w.-]+)[/:]([\w.-]+/[\w.-]+?)(?:\.git)?', url)
+    if not match:
+        raise ReviewError('Select a credential-free GitHub remote with an exact owner/repository')
+    return match[1].lower(), match[2].lower()
+
+
+def publication_repositories(root, payload, base_url, remote):
+    if not {'head_remote', 'head_repository', 'base_repository'}.intersection(payload):
+        return {}
+    head_remote = payload.get('head_remote', remote)
+    if head_remote not in ws.git(root, 'remote').splitlines():
+        raise ReviewError('Unknown source-branch push remote')
+    destinations = ws.git(root, 'remote', 'get-url', '--push', '--all', head_remote).splitlines()
+    if len(destinations) != 1:
+        raise ReviewError('Select one push destination for the publication head')
+    base_host, base = github_remote(base_url)
+    head_host, head = github_remote(destinations[0])
+    expected_head, expected_base = payload.get('head_repository', head), payload.get('base_repository', base)
+    if (head_host != base_host or not isinstance(expected_head, str) or expected_head.lower() != head
+            or not isinstance(expected_base, str) or expected_base.lower() != base):
+        raise ReviewError('Selected publication repositories differ from the configured Git remotes')
+    return {'base_repository': base, 'head_repository': head, 'head_remote': head_remote}
+
+
+def repository_scope(snapshot):
+    return {key: snapshot[key] for key in ('base_repository', 'head_repository', 'head_remote') if key in snapshot}
+
+
 def preflight(root,payload):
     root=Path(root).resolve();ws.unfinished(root)
     current=ws.git(root,'symbolic-ref','--quiet','--short','HEAD')
@@ -148,15 +177,16 @@ def preflight(root,payload):
     if remote not in ws.git(root,'remote').splitlines():raise ReviewError('Unknown remote')
     url=ws.git(root,'remote','get-url',remote)
     if re.search(r'://[^/@]+:[^/@]+@',url) or '?' in url:raise ReviewError('Remote credentials cannot enter publication metadata')
+    repositories = publication_repositories(root, payload, url, remote)
     ws.git(root,'fetch','--no-tags',remote)
     target=ws.branch(root,params['target_branch']);ws.branch(root,params['source_branch'])
     base=ws.git(root,'rev-parse','--verify','refs/remotes/'+remote+'/'+target+'^{commit}')
     head=ws.git(root,'rev-parse','HEAD');changed=ws.git(root,'diff','--name-only',base+'...'+head).splitlines()
     if not changed:raise ReviewError('No changes relative to the current target branch')
-    return {**params,'repo_id':ws.repo_id(root),'remote':remote,'remote_id':hashlib.sha256(url.encode()).hexdigest(),'head':head,'base_oid':base,'changed_files':changed,'candidate_objects_required':True}
+    return {**params,**repositories,'repo_id':ws.repo_id(root),'remote':remote,'remote_id':hashlib.sha256(url.encode()).hexdigest(),'head':head,'base_oid':base,'changed_files':changed,'candidate_objects_required':True}
 
 def identity(snapshot):
-    return {**{key:snapshot[key] for key in ['repo_id','remote','source_branch','target_branch','head','base_oid']},'remote_id':snapshot.get('remote_id')}
+    return {**repository_scope(snapshot),**{key:snapshot[key] for key in ['repo_id','remote','source_branch','target_branch','head','base_oid']},'remote_id':snapshot.get('remote_id')}
 
 def review_key(snapshot):
     return digest({key:snapshot.get(key) for key in ['head','base_oid','target_branch','changed_files','candidate_objects_required','threads','reviews','comments','checks','checks_known','required_checks_missing','approvals_known','approvals_required','approved']})
@@ -164,6 +194,7 @@ def review_key(snapshot):
 def decision_context(snapshot,purpose='finding-resolution'):
     if not isinstance(purpose,str) or not re.fullmatch(r'[a-z][a-z0-9-]*',purpose):raise ReviewError('Review decision requires an exact bounded purpose')
     scope={key:snapshot.get(key) for key in ['repo_id','remote','remote_id','source_branch','target_branch','head','base_oid']}
+    scope.update(repository_scope(snapshot))
     semantic=digest({'scope':scope,'review_key':review_key(snapshot),'purpose':purpose})
     return {'kind':'review','id':'review:'+digest(scope),'head':snapshot.get('head'),'base_oid':snapshot.get('base_oid'),'target_branch':snapshot.get('target_branch'),'purpose':purpose,'semantic_fingerprint':semantic,'content_fingerprint':digest(snapshot)}
 
@@ -180,7 +211,7 @@ def decision_acceptance(store,record,snapshot,reference,expected):
 
 def reconcile(record,snapshot,*,retarget=None):
     record=deepcopy(record)
-    for key in ['repo_id','remote','remote_id','source_branch']:
+    for key in ['repo_id','remote','remote_id','source_branch','base_repository','head_repository','head_remote']:
         if record['identity'].get(key)!=snapshot.get(key):raise ReviewError('Publication repository/source identity conflict')
     previous_target=record['identity']['target_branch']
     target_changed=previous_target!=snapshot['target_branch']
@@ -391,6 +422,7 @@ def review_phase_guard(store,context,phase):
     if phase not in {'before','during','after'}:raise ReviewError('The review phase is unavailable')
     if any(record.get('identity',{}).get(key)!=context.get(key) for key in ['head','base_oid','target_branch']):raise ReviewError('The plugin review belongs to another publication head/base/target')
     scope={name:record['identity'].get(name) for name in ['repo_id','remote','remote_id','source_branch','target_branch']}
+    scope.update(repository_scope(record['identity']))
     if context.get('id')!='review-hook:'+digest(scope) or context.get('semantic_fingerprint')!=digest({'scope':scope,'review_key':record.get('snapshot_key')}):raise ReviewError('The review context differs from the actual publication review identity')
     key=record.get('snapshot_key');core=record.get('review') if phase=='after' else record.get('inspection') or record.get('review') if phase=='during' else None
     if phase in {'during','after'} and (not core or core.get('key')!=key):raise ReviewError('The configured review phase requires current full core review or inspection')
@@ -554,6 +586,7 @@ def _review_requirement_admission(store,record,snapshot):
 
 def hook_context(snapshot,publication_id=None):
     scope={key:snapshot.get(key) for key in ['repo_id','remote','remote_id','source_branch','target_branch']}
+    scope.update(repository_scope(snapshot))
     value={'kind':'review','id':'review-hook:'+digest(scope),'head':snapshot.get('head'),'base_oid':snapshot.get('base_oid'),'target_branch':snapshot.get('target_branch'),'semantic_fingerprint':digest({'scope':scope,'review_key':review_key(snapshot)}),'content_fingerprint':digest(snapshot)}
     if publication_id:value['publication_id']=publication_id
     return value
@@ -660,9 +693,20 @@ def merge_gate(record,snapshot,*,store=None):
 
 class GitHub:
     """Authorized gh fallback; connectors can supply the same normalized snapshots."""
-    def __init__(self,root,repository):
-        if not re.fullmatch(r'[\w.-]+/[\w.-]+',repository):raise ReviewError('Explicit GitHub owner/repository required')
-        self.root=Path(root);self.repository=repository
+    def __init__(self, root, repository, head_repository=None):
+        self.root = Path(root)
+        for name in (repository, head_repository or repository):
+            if not isinstance(name, str) or not re.fullmatch(r'[\w.-]+/[\w.-]+', name):
+                raise ReviewError('Explicit GitHub owner/repository required')
+        self.repository = repository.lower()
+        self.head_repository = (head_repository or repository).lower()
+        self.explicit_head = head_repository is not None
+
+    @classmethod
+    def from_preflight(cls, root, checked):
+        if not checked.get('base_repository') or not checked.get('head_repository'):
+            raise ReviewError('Select the reviewed base and head remotes in publication preflight')
+        return cls(root, checked['base_repository'], checked['head_repository'])
     def gh(self,*args):
         if '--paginate' in args and '--slurp' not in args:args=(*args,'--slurp')
         result=subprocess.run(['gh',*map(str,args)],cwd=self.root,capture_output=True,text=True,timeout=45)
@@ -670,19 +714,44 @@ class GitHub:
         data=json.loads(result.stdout) if result.stdout.strip() else None
         if '--slurp' in args and data and isinstance(data[0],list):return [item for page in data for item in page]
         return data
-    def find(self,source,target,expected_head=None):
-        prs=self.gh('api','--method','GET','repos/'+self.repository+'/pulls','-f','state=all','-f','head='+self.repository.split('/')[0]+':'+source,'-f','base='+target,'--paginate')
-        matches=[p for p in prs if p['head']['ref']==source and p['base']['ref']==target and p['head']['repo']['full_name']==self.repository]
-        opened=[p for p in matches if p['state']=='open'];merged=[p for p in matches if p.get('merged_at') and expected_head and p['head'].get('sha')==expected_head]
-        if len(opened)>1:raise ReviewError('Multiple matching open PRs require explicit selection')
-        return (opened or sorted(merged,key=lambda p:p['merged_at'],reverse=True) or [None])[0]
-    def ensure(self,source,target,title,body,draft=False,expected_head=None):
-        existing=self.find(source,target,expected_head)
+    def _matches(self, pull, source, target):
+        head, base = pull.get('head') or {}, pull.get('base') or {}
+        head_repo = (head.get('repo') or {}).get('full_name', '').lower()
+        base_repo = (base.get('repo') or {}).get('full_name', '').lower()
+        return (head_repo == self.head_repository and head.get('ref') == source and base.get('ref') == target
+                and (base_repo == self.repository or (not self.explicit_head and not base_repo)))
+
+    def find(self, source, target, expected_head=None):
+        owner = self.head_repository.split('/')[0]
+        prs = self.gh('api', '--method', 'GET', 'repos/' + self.repository + '/pulls',
+                      '-f', 'state=all', '-f', 'head=' + owner + ':' + source, '-f', 'base=' + target, '--paginate')
+        matches = [pull for pull in prs if self._matches(pull, source, target)]
+        opened = [pull for pull in matches if pull['state'] == 'open']
+        if len(opened) > 1:
+            raise ReviewError('Multiple matching open PRs require explicit selection')
+        if opened and expected_head and opened[0]['head'].get('sha') != expected_head:
+            raise ReviewError('The open PR head differs from the selected publication commit')
+        merged = [pull for pull in matches if pull.get('merged_at') and expected_head and pull['head'].get('sha') == expected_head]
+        return (opened or sorted(merged, key=lambda pull:pull['merged_at'], reverse=True) or [None])[0]
+
+    def ensure(self, source, target, title, body, draft=False, expected_head=None):
+        existing = self.find(source, target, expected_head)
+        endpoint = 'repos/' + self.repository + '/pulls'
         if existing:
-            if existing.get('merged_at'):return existing
-            return self.gh('api','--method','PATCH','repos/'+self.repository+'/pulls/'+str(existing['number']),'-f','title='+title,'-f','body='+body)
-        # Lost-response recovery queries the exact source/base before another creation.
-        return self.gh('api','--method','POST','repos/'+self.repository+'/pulls','-f','head='+source,'-f','base='+target,'-f','title='+title,'-f','body='+body,'-F','draft='+str(draft).lower())
+            if existing.get('merged_at'):
+                return existing
+            result = self.gh('api', '--method', 'PATCH', endpoint + '/' + str(existing['number']),
+                             '-f', 'title=' + title, '-f', 'body=' + body)
+        else:
+            owner, name = self.head_repository.split('/')
+            foreign = self.head_repository != self.repository
+            label = owner + ':' + source if foreign else source
+            extra = ('-f', 'head_repo=' + name) if foreign and owner == self.repository.split('/')[0] else ()
+            result = self.gh('api', '--method', 'POST', endpoint, '-f', 'head=' + label, *extra, '-f', 'base=' + target,
+                             '-f', 'title=' + title, '-f', 'body=' + body, '-F', 'draft=' + str(draft).lower())
+        if not self._matches(result, source, target) or (expected_head and result['head'].get('sha') != expected_head):
+            raise ReviewError('Provider returned a different PR repository, ref or source commit')
+        return result
     def comment(self,number,key,body):
         marker='<!-- skill-tree:'+key+' -->';endpoint='repos/'+self.repository+'/issues/'+str(number)+'/comments'
         comments=self.gh('api','--method','GET',endpoint,'--paginate')
@@ -693,9 +762,17 @@ class GitHub:
             return matches[0]
         return self.gh('api','--method','POST',endpoint,'-f','body='+body+'\n\n'+marker)
     def snapshot(self,number,context,policy):
-        raw=self.gh('pr','view',number,'--repo',self.repository,'--json','id,number,url,state,headRefOid,headRefName,baseRefOid,baseRefName,mergeable,reviewDecision,mergeCommit,statusCheckRollup,changedFiles,isCrossRepository')
+        raw=self.gh('pr','view',number,'--repo',self.repository,'--json','id,number,url,state,headRefOid,headRefName,baseRefOid,baseRefName,mergeable,reviewDecision,mergeCommit,statusCheckRollup,changedFiles,isCrossRepository,headRepository,headRepositoryOwner')
         if raw['headRefName']!=context['source_branch'] or raw['baseRefName']!=context['target_branch']:
             raise ReviewError('Provider PR branch identity differs from preflight')
+        observed_owner = (raw.get('headRepositoryOwner') or {}).get('login', '')
+        observed_repo = (raw.get('headRepository') or {}).get('name', '')
+        observed = (observed_owner + '/' + observed_repo).lower()
+        if (context.get('base_repository', self.repository) != self.repository
+                or context.get('head_repository', self.head_repository) != self.head_repository
+                or ((self.explicit_head or observed != '/') and observed != self.head_repository)
+                or (self.explicit_head and (raw['headRefOid'] != context['head'] or raw['baseRefOid'] != context['base_oid']))):
+            raise ReviewError('Provider PR source repository or selected commit identity differs from preflight')
         endpoint='repos/'+self.repository
         files=self.gh('api','--method','GET',endpoint+'/pulls/'+str(number)+'/files','--paginate')
         if len(files)!=raw['changedFiles']:raise ReviewError('Provider full-diff file inventory is incomplete')
@@ -765,7 +842,7 @@ def main(argv=None):
         else:
             # Metadata-only commands never send provider requests. The agent supplies inspected snapshots.
             canonical=ws.canonical(root);snapshot=payload.get('snapshot',{})
-            key=args.publication_id or digest({k:snapshot[k] for k in ['repo_id','remote','source_branch','target_branch']})[:32]
+            key=args.publication_id or digest({**repository_scope(snapshot), **{k:snapshot[k] for k in ['repo_id','remote','source_branch','target_branch']}})[:32]
             if not re.fullmatch(r'[a-f0-9]{32}',key):raise ReviewError('Invalid publication ID')
             wf=owned_module('pr_workflow',Path(__file__).with_name('workflow-state.py'))
             store=wf.Store(root,allow_unselected=True)

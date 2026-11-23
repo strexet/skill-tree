@@ -1,0 +1,58 @@
+{
+  "profile": "web",
+  "provider": "codex",
+  "web_reference_sha256": "05143051971802756eb52a678fdb0afb4f3a462f281b2c2c7dbe9d9602e13fe5",
+  "cases": {
+    "clean-real-project": {
+      "dry_run": {
+        "action": "dry-run",
+        "profile_identity": "dd3473c07d83df793225422e55eef28ff53ff054b6f1792a9d47acce599d5045"
+      },
+      "apply": {
+        "action": "installed",
+        "profile_identity": "dd3473c07d83df793225422e55eef28ff53ff054b6f1792a9d47acce599d5045"
+      },
+      "verify": {
+        "action": "verified",
+        "profile_identity": "dd3473c07d83df793225422e55eef28ff53ff054b6f1792a9d47acce599d5045"
+      },
+      "owned_manager_verify": "passed",
+      "matching_web_packages": 23
+    },
+    "first-ever": {
+      "dry_run": {
+        "action": "dry-run",
+        "profile_identity": "6845e264d88053065b7b85e1377258e5208a1d336a1591399e0de7c34be93433"
+      },
+      "apply": {
+        "action": "installed",
+        "profile_identity": "6845e264d88053065b7b85e1377258e5208a1d336a1591399e0de7c34be93433"
+      },
+      "verify": {
+        "action": "verified",
+        "profile_identity": "6845e264d88053065b7b85e1377258e5208a1d336a1591399e0de7c34be93433"
+      },
+      "owned_manager_verify": "passed",
+      "matching_web_packages": 23,
+      "project_docs_created": false
+    },
+    "in-place-upgrade": {
+      "dry_run": {
+        "action": "dry-run",
+        "profile_identity": "dd3473c07d83df793225422e55eef28ff53ff054b6f1792a9d47acce599d5045"
+      },
+      "apply": {
+        "action": "installed",
+        "profile_identity": "dd3473c07d83df793225422e55eef28ff53ff054b6f1792a9d47acce599d5045"
+      },
+      "verify": {
+        "action": "verified",
+        "profile_identity": "dd3473c07d83df793225422e55eef28ff53ff054b6f1792a9d47acce599d5045"
+      },
+      "owned_manager_verify": "passed",
+      "matching_web_packages": 23
+    }
+  },
+  "consumer_base_commit": "51ac91982f61b5bde7cebc26629c2e2e621a4a24",
+  "pre_task_reference_observation": "Before editing, the independent consumer identified the Color Schemes entry in the local UX/UI manifest, inspected SignIn, Dashboard and Settings, and chose Compact=true and PresetsOnly=true for signed-out readers."
+}

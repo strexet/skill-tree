@@ -10,6 +10,10 @@ Use the shared root profile for areas in the same repository. External areas ret
 
 Read the [capability pins](director-capabilities.json). Accepted Narrative snapshots and representative fixture adapters retain separate identities. Unintegrated ArtWorkshop and logs adapters remain visible prerequisites. A source or fixture observation does not admit an unverified adapter.
 
+## Open the installed workspace
+
+Open the selected workspace and invoke `skill-tree-director`. Offer an existing project, a new project or continuation later. Use the installed Setup entry with `project-menu` to read the choices. For `project-preview` and `project-setup`, pass the Director directory and `--input` with a JSON file. For example, `{"kind":"new","name":"example"}` places the project in the workspace's `example/` folder. Supply `path` for a different location. For an existing project supply `{"kind":"existing","name":"site","path":"/absolute/path"}`. Show the proposed path, profile and hosts before applying the user's choice. The registration reports the verified child queue and source maintenance branch. Repeating the same choice verifies the recorded project.
+
 ## Preview first-time setup
 
 Use `setup-preview <absolute-director-root> --input <request.json>` with a `workspace` object to review first-time setup. The request contains a portable `director_id`, a workspace `kind` of `new` or `existing`, an explicitly selected `source`, and the selected `areas`. A source names an absolute local Skill Tree source `checkout` and a local `revision`. The source checkout must already match the selected revision and contain the exact committed package inputs. The coordinator selects the Director flavor.
@@ -58,7 +62,7 @@ For a minimal clean case the review selects `"required_cases": ["carry"]` and th
 
 A group classified as `expected` also supplies `expectation_sha256`. Only a reached case and an exact match to the reviewed expectation in the selection support exclusion. A missing or mismatched expectation leaves that case open. Missing attribution leaves the selected cases open. An already established fresh error, exception or assertion still holds the affected case. The owning project retains source expectations and raw engine text. Read the case verdicts and retained Core counts in `child_status[].unity_receipt` and gaps in `coverage_gaps`.
 
-Repair routes one reviewed failure to the source maintenance area and records the exact tested candidate. Use the install operation as `python3 scripts/director-entry.py preview --input <request.json>` with one approved target. Activation verifies the candidate. Explicit same-run admission precedes replay of the original scenario.
+Repair routes one reviewed failure to the source maintenance area and records the exact tested candidate. Use the install operation as `python3 scripts/director-entry.py preview --input <request.json>` with one approved target. Preview resolves the selected host against the verified installation and lists all affected destinations and co-owners. Activation verifies the candidate. Explicit same-run admission precedes replay of the original scenario.
 
 Review also adopts existing child evidence and retains exact product milestones. A milestone records accepted story, art and game evidence and selected public results. Review current coverage before requesting separate release authority.
 
@@ -112,3 +116,17 @@ Store compact local inputs and evidence IDs so a second reader can recompute eac
 Freeze equivalent briefs, accepted facts, available inputs, controls, and exact ordinary and revised instruction revisions. Ask two independent reviewers to reconstruct expected and consumed revisions, coverage, earliest evidenced divergence and next owner. Record reviewer disagreement and unavailable evidence. An unavailable decisive input leaves causal attribution open. Record the missing evidence and the responsible owner.
 
 Check changed intent, effective configuration, available artifacts and author waits before assigning a recurring problem to a skill. A skill finding requires reproduction under a known instruction revision and an independently established outcome. Record adopt, revise or defer for the selected scope with residual uncertainty. Recheck the original case, an unaffected negative control and a comparable new request after an authorized fix.
+
+### Attribute an installed resource failure
+
+An executed unit check can report a verified Skill Tree resource defect. Record the installed resource and relevant fixture paths as check sources. Write the observed result to `.skill-tree/artifacts/director/<check-id>.json` and include that file in the failed check evidence. For example, a control that actually inspected a selected document count can emit:
+
+```json
+{"schema":1,"kind":"director-resource-check","assertion_id":"snapshot-count-matches-selection","installed_path":".agents/skills/skill-tree-create-documents-snapshot/scripts/create-documentation-snapshot.py","expected":"one-document","observed":"zero-documents"}
+```
+
+Use the actual installed path for the selected host. The unit check owns the meaning of the expected and observed tokens. The audit verifies the result digest against the Core receipt, maps the exact packaged bytes to the canonical source file using the verified installation resource map and retains portable input fingerprints. A missing receipt or an ambiguous mapping leaves the failure available for investigation. Repair preview also requires the registered maintenance checkout to contain the same source and fixture bytes and a resolvable unit recipe. An owner can select the resulting proposal and explicitly authorize intake, processing and launch on the project's source branch.
+
+During source repair, repeat the same check with the reviewed source path in `installed_path`, record a red result and a passing result in distinct evidence files, and select a review reference to freeze the candidate. The checked source diff, composed operation resource, original finding and both observations bind the candidate. The built-in snapshot canary remains available for the documented snapshot scenario.
+
+For a guided project whose original repair approval includes `integrate`, run `repair-integrate` with the exact `repair_id`, `candidate_sha256` and owner reference. The integration command commits the frozen source change on the recorded Git base and fast-forwards the matching project maintenance branch. The product repository and the queues stay independent. Use the project's maintenance checkout for the subsequent authorized PR to the upstream repository.

@@ -1,0 +1,145 @@
+diff --git a/src/Habitica.WebApp/Pages/PrivacyPage.razor b/src/Habitica.WebApp/Pages/PrivacyPage.razor
+index 41077db..30b34b9 100644
+--- a/src/Habitica.WebApp/Pages/PrivacyPage.razor
++++ b/src/Habitica.WebApp/Pages/PrivacyPage.razor
+@@ -1,23 +1,40 @@
+ @page "/privacy"
++@inject IJSRuntime JsRuntime
+ 
+ <PageTitle>Privacy</PageTitle>
+ 
+-<div class="settings-shell">
++<div class="settings-shell privacy-reader">
+     <section class="card-surface settings-card">
+         <p class="section-label">Privacy</p>
+         <h1>Data handling</h1>
++        <nav class="settings-section-nav" aria-label="Privacy sections">
++            <a href="/privacy#personal-notes" @onclick="() => ReadSectionAsync(_notes)" @onclick:preventDefault>Personal Notes</a>
++            <a href="/privacy#habitica-credentials" @onclick="() => ReadSectionAsync(_credentials)" @onclick:preventDefault>Habitica credentials</a>
++            <a href="/privacy#private-sync" @onclick="() => ReadSectionAsync(_sync)" @onclick:preventDefault>Private sync</a>
++        </nav>
++        <div class="privacy-appearance">
++            <button class="secondary-action-button" type="button" aria-expanded="@(_appearanceOpen ? "true" : "false")"
++                    aria-controls="reading-appearance" @onclick="() => _appearanceOpen = !_appearanceOpen">Reading appearance</button>
++            <div id="reading-appearance" hidden="@(!_appearanceOpen)">
++                @if (_appearanceOpen)
++                {
++                    <ColorSchemePanel Compact="true" PresetsOnly="true" />
++                    <a class="privacy-return" href="/privacy#optional-cloud-workspace" @onclick="() => ReadSectionAsync(_firstSection)" @onclick:preventDefault>Return to reading</a>
++                }
++            </div>
++        </div>
+         <p class="panel-copy">
+             By default, Habitica credentials stay in this browser and are sent only to Habitica. Optional ChatGPT linking, cloud Notes or cloud workspace access requires separate consent to encrypted credential storage on the Companion integration server. Exports, private device sync, and shared party sync do not include your API token.
+         </p>
+ 
+         <div class="settings-grid">
+             <MudPaper Class="card-surface action-card" Elevation="0">
+-                <h2>Optional cloud workspace</h2>
++                <h2 id="optional-cloud-workspace" tabindex="-1" @ref="_firstSection">Optional cloud workspace</h2>
+                 <p>Cloud task storage requires its own explicit consent, independently of ChatGPT. The workspace server can read task names, notes, categories, projects, goals, saved views, completion history and commands. Enabling it also requires encrypted credential storage on the integration server. Private device sync retains its separate encrypted boundary.</p>
+                 <p>Workspace task and command history remains until explicit workspace deletion. Disconnect revokes workspace sessions and pauses background execution while retaining that history. Delete cloud workspace removes cloud tasks and command history; it does not delete local browser copies, integration credentials, or Habitica records. Delete integration profile separately removes stored credentials. Background execution requires separate opt-in. Unaccepted command previews contain readable task fields, expire after ten minutes and are removed by bounded server cleanup. Accepted preview-to-command bindings remain with command history. Scheduler interruptions and hosting backups can delay physical removal. Local workspace backups are readable and contain no credentials.</p>
+             </MudPaper>
+             <MudPaper Class="card-surface action-card" Elevation="0">
+-                <h2>Personal Notes</h2>
++                <h2 id="personal-notes" tabindex="-1" @ref="_notes">Personal Notes</h2>
+                 <p>Browser Notes stay on this device and are excluded from private device sync and ordinary task backups. Markdown exports contain readable private text. Cloud Notes requires separate consent to server-readable titles, Markdown, up to sixteen prior versions and encrypted Habitica credential storage. Connected agents need separate Notes permissions. No conversation text is saved automatically.</p>
+                 <p>Cloud notes and trash remain until explicit permanent deletion. Purging a note removes its current text and retained versions from active service tables while keeping content-free identity and receipt hashes. Disconnecting Notes blocks Notes sessions and agent access while retaining content. Integration disconnect also blocks Notes; deleting the integration profile deletes cloud Notes. Provider backups have their own recovery lifecycle. Browser copies and downloaded files remain separate.</p>
+                 <p>Unaccepted agent Notes previews expire after ten minutes; bounded scheduled cleanup removes their text. Acceptance scrubs the preview body and retains content-free receipt metadata. Sign-out forgets tab connection credentials. Browser drafts are volatile and clear on account switch or sign-out.</p>
+@@ -39,7 +56,7 @@
+             </MudPaper>
+ 
+             <MudPaper Class="card-surface action-card" Elevation="0">
+-                <h2>Habitica credentials</h2>
++                <h2 id="habitica-credentials" tabindex="-1" @ref="_credentials">Habitica credentials</h2>
+                 <p>Credentials are used to load your Habitica data and protect private device sync. They are not included in exports. Party sync uses a local party claim, so the API token is not sent to Cloudflare party-sync endpoints.</p>
+             </MudPaper>
+ 
+@@ -49,9 +66,21 @@
+             </MudPaper>
+ 
+             <MudPaper Class="card-surface action-card" Elevation="0">
+-                <h2>Private sync</h2>
++                <h2 id="private-sync" tabindex="-1" @ref="_sync">Private sync</h2>
+                 <p>Private device sync stores encrypted data. Shared party sync stores party CRON history, derived party state, roles, settings, and kick records. Local party claims are token-private but trust-based. Hosting providers may process request details such as IP address and timestamps for security.</p>
+             </MudPaper>
+         </div>
+     </section>
+ </div>
++
++@code {
++    private bool _appearanceOpen;
++    private ElementReference _firstSection, _notes, _credentials, _sync;
++
++    private async Task ReadSectionAsync(ElementReference heading)
++    {
++        await heading.FocusAsync(preventScroll: true);
++        await using var module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/field-focus.js");
++        await module.InvokeVoidAsync("revealFocusedElement", heading, "start");
++    }
++}
+diff --git a/src/Habitica.WebApp/wwwroot/css/app.css b/src/Habitica.WebApp/wwwroot/css/app.css
+index 663adf5..889f5fd 100644
+--- a/src/Habitica.WebApp/wwwroot/css/app.css
++++ b/src/Habitica.WebApp/wwwroot/css/app.css
+@@ -4642,13 +4642,13 @@ code {
+ @media (max-width: 960px) {
+     .landing-shell { grid-template-columns: minmax(0, 1fr); }
+ }
+-.sign-in-theme-strip,
+-.sign-in-theme-strip .color-scheme-panel,
+-.sign-in-theme-strip .color-scheme-select-row { min-width: 0; max-width: 100%; }
+-.sign-in-theme-strip .color-scheme-bar,
+-.sign-in-theme-strip .color-scheme-select-row,
+-.sign-in-theme-strip .color-scheme-preview { flex-wrap: wrap; }
+-.sign-in-theme-strip .color-scheme-select-row .app-input { min-width: 0; max-width: 100%; }
++:is(.sign-in-theme-strip, .privacy-appearance),
++:is(.sign-in-theme-strip, .privacy-appearance) .color-scheme-panel,
++:is(.sign-in-theme-strip, .privacy-appearance) .color-scheme-select-row { min-width: 0; max-width: 100%; }
++:is(.sign-in-theme-strip, .privacy-appearance) .color-scheme-bar,
++:is(.sign-in-theme-strip, .privacy-appearance) .color-scheme-select-row,
++:is(.sign-in-theme-strip, .privacy-appearance) .color-scheme-preview { flex-wrap: wrap; }
++:is(.sign-in-theme-strip, .privacy-appearance) .color-scheme-select-row .app-input { min-width: 0; max-width: 100%; }
+ .task-card .task-title,
+ .task-card .task-notes,
+ .task-card .task-action-note { color: var(--task-readable-ink, var(--ink)); }
+@@ -5035,6 +5035,24 @@ select:disabled,
+ .notes-panel .notes-review .notes-button { padding-inline: .25rem; }
+ .notes-editor .notes-button { padding-inline: .5rem; }
+ 
++.privacy-reader .action-card { align-content: start; }
++.privacy-reader h2[id] { scroll-margin-block-start: max(calc(var(--mud-appbar-height) + 1rem), 5rem); }
++.privacy-reader :is(h2[id], a, button, select):focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
++.privacy-reader .settings-section-nav a, .privacy-return { color: var(--ink); text-decoration: underline; }
++.privacy-return { display: inline-flex; align-items: center; min-height: 44px; }
++.privacy-appearance > button { white-space: normal; min-height: 44px; }
++.privacy-appearance #reading-appearance:not([hidden]) { display: grid; justify-items: start; gap: .5rem; margin-top: .5rem; }
++.privacy-appearance #reading-appearance { grid-template-columns: minmax(0, 1fr); }
++
++@media (max-width: 640px) {
++    .privacy-reader .settings-card,
++    .privacy-reader .action-card { padding: clamp(8px, 3vw, 16px); }
++    .privacy-reader .settings-card { gap: .5rem; }
++    .privacy-reader .settings-card > h1 { margin: 0; font-size: 1.75rem; line-height: 1.15; }
++    .privacy-reader .settings-section-nav { gap: .25rem; }
++    .privacy-reader .settings-section-nav a { padding: .125rem .25rem; }
++}
++
+ /* Settings section anchors retain native keyboard navigation and fixed-header clearance. */
+ .settings-section-nav { display: flex; flex-wrap: wrap; gap: .5rem; }
+ .settings-section-nav a { display: inline-flex; align-items: center; min-block-size: 44px; padding: .25rem .5rem; border: 1px solid var(--card-border); border-radius: .5rem; }
+diff --git a/src/Habitica.WebApp/wwwroot/js/field-focus.js b/src/Habitica.WebApp/wwwroot/js/field-focus.js
+index faf2347..86a6c2a 100644
+--- a/src/Habitica.WebApp/wwwroot/js/field-focus.js
++++ b/src/Habitica.WebApp/wwwroot/js/field-focus.js
+@@ -1,8 +1,8 @@
+ // Let validation reflow finish before revealing the control that already owns
+ // focus. Never pull the viewport back after the user moves to another control.
+-export async function revealFocusedElement(element) {
++export async function revealFocusedElement(element, block = 'center') {
+   if (!element?.isConnected) return;
+   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+   if (!element.isConnected || element.matches(':disabled') || document.activeElement !== element) return;
+-  element.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' });
++  element.scrollIntoView({ block, inline: 'nearest', behavior: 'instant' });
+ }

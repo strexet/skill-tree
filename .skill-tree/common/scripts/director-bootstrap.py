@@ -1,6 +1,5 @@
 """Prepare the exact destinations approved by guided Director setup."""
 from contextlib import contextmanager
-import fcntl
 import hashlib
 import json
 import os
@@ -69,6 +68,20 @@ def make_directory(path, proof, created, save=lambda: None):
 
 @contextmanager
 def lock(root):
+    if os.name == 'nt':
+        import msvcrt
+        # Windows cannot open directories for flock. Serialize operations on the
+        # same canonical destination through a per-user, kernel-released byte lock.
+        key = hashlib.sha256(os.path.normcase(str(root.resolve())).encode()).hexdigest()
+        with (Path(tempfile.gettempdir()) / ('skill-tree-director-' + key + '.lock')).open('a+b') as handle:
+            if handle.tell() == 0:
+                handle.write(b'0')
+                handle.flush()
+            handle.seek(0)
+            msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+            yield
+        return
+    import fcntl
     flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
     fd = os.open(root, flags)
     try:
@@ -160,14 +173,18 @@ def initialize_git(root, marker, checkout):
 INSTALL = r"""
 const fs = require('node:fs');
 const path = require('node:path');
-const [library, source, root, flavor, before, state, mode] = process.argv.slice(1);
+const [library, source, root, flavor, before, state, mode, hostIds] = process.argv.slice(1);
 const manager = require(path.join(library, 'installation.js'));
 const composer = require(path.join(library, 'composer.js'));
-const provider = composer.readJson(source, 'config/providers.json').providers.find(item => item.id === 'codex');
+const matrix = composer.readJson(source, 'config/providers.json').providers;
 try {
-  if (provider?.projectPath !== '.agents/skills') throw Error('Selected source has an unsupported Codex destination');
   const names = composer.operationNames(source, flavor);
-  const selections = names.map(name => ({name, provider: 'codex', rel: path.posix.join(provider.projectPath, name)}));
+  const selections = JSON.parse(hostIds).flatMap(id => {
+    const provider = matrix.find(host => host.id === id);
+    if (!provider) throw Error('Unknown selected host: ' + id);
+    const base = id === 'generic' ? '.' : provider.projectPath;
+    return names.map(name => ({name, provider: id, rel: path.posix.join(base, name)}));
+  });
   function digest(relative) {
     const file = path.join(root, relative);
     return fs.existsSync(file) ? composer.hash(fs.readFileSync(file)) : '';
@@ -187,11 +204,15 @@ try {
     });
   }
   const receipt = manager.verify(root, source);
+  const inputs = composer.sourceInputs(source);
+  const recorded = {...receipt.source_digests};
+  // The verified coordinator bundle omits the authoring repository's role marker.
+  if (!Object.hasOwn(inputs, 'config/repository.json')) delete recorded['config/repository.json'];
   const current = receipt.flavor === flavor &&
-    composer.json(receipt.source_digests) === composer.json(composer.sourceInputs(source)) &&
-    selections.every(({rel, name}) => {
+    composer.json(recorded) === composer.json(inputs) &&
+    selections.every(({rel, name, provider}) => {
       const record = receipt.destinations[rel];
-      return record?.name === name && (record.providers || [record.provider]).includes('codex');
+      return record?.name === name && (record.providers || [record.provider]).includes(provider);
     });
   process.exitCode = current ? 0 : 3;
 } catch (error) {
@@ -206,7 +227,7 @@ def installation(root, item, source, baseline, *, apply):
     env = {key: value for key, value in os.environ.items() if key not in {'NODE_OPTIONS', 'NODE_PATH'}}
     result = subprocess.run(
         ['node', '-e', INSTALL, str(library), str(source), str(root), item['flavor'],
-         baseline[PROFILE] or '', baseline[STATE] or '', 'install' if apply else 'verify'],
+         baseline[PROFILE] or '', baseline[STATE] or '', 'install' if apply else 'verify', json.dumps(item.get('providers', ['codex']))],
         capture_output=True, text=True, timeout=120, env=env)
     if apply:
         D._require(result.returncode == 0, result.stderr.strip() or 'Selected installed package failed verification')

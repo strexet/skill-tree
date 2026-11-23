@@ -101,28 +101,30 @@ def canonical_owner(store, queue_id):
 def matches_start_workspace(store, run, receipt):
     original = receipt['result'].get('workspace')
     current = run.get('workspace')
-    if current == original:
-        return current is not None
-    if (not isinstance(original, dict) or not isinstance(current, dict)
-            or 'cleanup_owner' in original or run.get('workspace_state') != 'ready'
-            or {key: value for key, value in current.items() if key != 'cleanup_owner'} != original):
+    if not isinstance(original, dict) or not isinstance(current, dict):
         return False
-    # The reservation exists before Git creates the administrative ownership marker.
     owner = current.get('cleanup_owner')
+    if current != original and ('cleanup_owner' in original or not owner
+                                or {key: value for key, value in current.items() if key != 'cleanup_owner'} != original):
+        return False
+    if run.get('dispatch_workspace_sha256') != receipt['result'].get('dispatch_workspace_sha256'):
+        return False
+    if not owner:
+        return run.get('workspace_state') == 'reserved' or 'dispatch_owner_token' not in original
     locator = wf.workspaces.runtime(store.root)
     checkout = (locator or {}).get('worktrees', {}).get(run['id'])
-    if (not isinstance(owner, dict) or not checkout or owner.get('run_id') != run['id']
-            or owner.get('queue_id') != receipt['identity']['queue_id']):
+    if not checkout or run.get('workspace_state') != 'ready':
         return False
-    cleanup = run.get('delivery', {}).get('worktree_cleanup', {})
-    if cleanup.get('status') == 'removed':
-        attempt = cleanup.get('attempt')
-        return (isinstance(attempt, dict) and attempt.get('scope') == wf.cleanup_delivery_scope(store, run)
-                and wf.workspaces.cleanup_checkout(store.root, {'queue_id': locator['queue_id']}, run, attempt) is None)
-    registration = wf.workspaces.linked_registration(store.root, Path(checkout))
-    marker = registration/'skill-tree-owner.json'
-    return (owner.get('registration') == registration.name and marker.is_file() and not marker.is_symlink()
-            and json.loads(marker.read_bytes()) == owner)
+    try:
+        cleanup = run.get('delivery', {}).get('worktree_cleanup', {})
+        if cleanup.get('status') == 'removed':
+            attempt = cleanup.get('attempt')
+            return (isinstance(attempt, dict) and attempt.get('scope') == wf.cleanup_delivery_scope(store, run)
+                    and wf.workspaces.cleanup_checkout(store.root, {'queue_id': locator['queue_id']}, run, attempt) is None)
+        wf.workspaces.directed_owner(store.root, Path(checkout), run, receipt['identity']['queue_id'])
+    except (wf.workspaces.RunError, OSError, ValueError):
+        return False
+    return True
 
 
 def reconcile(store, receipt):

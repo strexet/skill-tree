@@ -1,0 +1,125 @@
+[
+  {
+    "width": 360,
+    "scale": 100,
+    "theme": "gryphy-light",
+    "external": [],
+    "jsErrors": [],
+    "targets": [
+      {
+        "label": "Personal Notes",
+        "focus": "",
+        "hash": "#personal-notes",
+        "heading": {
+          "top": 90.234375,
+          "bottom": 120.25,
+          "left": 54.78125,
+          "right": 305.21875
+        },
+        "headerBottom": 57,
+        "pTop": 133.84375,
+        "pVisible": 260.25,
+        "paragraph": "Browser Notes stay on this device and are excl",
+        "outline": [
+          "none",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Habitica credentials",
+        "focus": "",
+        "hash": "#habitica-credentials",
+        "heading": {
+          "top": 90.4375,
+          "bottom": 120.453125,
+          "left": 54.78125,
+          "right": 305.21875
+        },
+        "headerBottom": 57,
+        "pTop": 134.046875,
+        "pVisible": 130.125,
+        "paragraph": "Credentials are used to load your Habitica dat",
+        "outline": [
+          "none",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Private sync",
+        "focus": "",
+        "hash": "#private-sync",
+        "heading": {
+          "top": 528.46875,
+          "bottom": 558.484375,
+          "left": 54.78125,
+          "right": 305.21875
+        },
+        "headerBottom": 57,
+        "pTop": 572.078125,
+        "pVisible": 173.5,
+        "paragraph": "Private device sync stores encrypted data. Sha",
+        "outline": [
+          "none",
+          "3px"
+        ],
+        "overflow": 0
+      },
+      {
+        "label": "Return to reading",
+        "focus": "",
+        "hash": "#optional-cloud-workspace",
+        "heading": {
+          "top": 90.859375,
+          "bottom": 150.890625,
+          "left": 54.78125,
+          "right": 305.21875
+        },
+        "headerBottom": 57,
+        "pTop": 164.484375,
+        "pVisible": 216.875,
+        "paragraph": "Cloud task storage requires its own explicit c",
+        "outline": [
+          "none",
+          "3px"
+        ],
+        "overflow": 0
+      }
+    ],
+    "entry": {
+      "appbar": [
+        0,
+        57
+      ],
+      "links": [
+        [
+          181.71875,
+          225.71875
+        ],
+        [
+          181.71875,
+          225.71875
+        ],
+        [
+          233.71875,
+          277.71875
+        ]
+      ],
+      "appearance": [
+        293.71875,
+        337.71875
+      ],
+      "viewportWidth": 360,
+      "docWidth": 360
+    }
+  },
+  {
+    "width": 360,
+    "scale": 100,
+    "theme": "obsidian-glow",
+    "external": [],
+    "jsErrors": [],
+    "targets": []
+  }
+]

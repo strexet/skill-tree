@@ -64,6 +64,40 @@ def _digest(value):
     return hashlib.sha256(WF.dump(value).encode()).hexdigest()
 
 
+def _portable_recipe(root, queue, recipe, resource, source_path):
+    """Fingerprint an executed recipe, replacing only verified path relocations."""
+    _require(recipe.get('lane') == 'unit' and isinstance(recipe.get('argv'), list)
+             and recipe['argv'] and not recipe.get('execution_binding'), 'Unsupported source reproduction recipe')
+
+    def operand(value):
+        _require(isinstance(value, str), 'Invalid recipe operand')
+        for directory, label in ((root, '{project_root}'), (queue, '{queue_root}')):
+            if value == str(directory):
+                return label
+            if value.startswith(str(directory) + '/'):
+                relative = value[len(str(directory)) + 1:]
+                return label + '/' + (source_path if relative == resource else relative)
+        return source_path if value == resource else value
+
+    # Installed profiles include the declaring registry as their first input.
+    # The Core environment receipt proves the exact registry bytes; the portable
+    # comparison covers the selected recipe and its actual supporting files.
+    names = list(recipe.get('input_paths', []))
+    portable = dict(recipe)
+    if (portable.get('qualification') == 'owner-declared static recipe; runner unqualified' and names
+            and names[0] in {'.skill-tree/config/repository.json', '.skill-tree/validation-recipes.json'}):
+        names.pop(0)
+        portable.pop('qualification')
+    inputs = {}
+    for relative in names:
+        path = _safe_path(root, relative)
+        _require(path.is_file(), 'Missing reproduction recipe input')
+        # The repaired resource itself has separate before/after generation proofs.
+        inputs[operand(relative)] = '{checked-resource}' if relative == resource else WF.file_hash(path)
+    portable.update(argv=[operand(arg) for arg in recipe['argv']], input_paths=[operand(path) for path in names])
+    return _digest({'recipe': portable, 'inputs': inputs})
+
+
 def _sha(value):
     return isinstance(value, str) and SHA256.fullmatch(value) is not None
 
@@ -226,20 +260,28 @@ def _area(request):
     }, owner
 
 
-def _validate_scope_paths(areas, observed):
+def _validate_scope_paths(areas, observed, service=None):
     _require(sum(area['role'] == 'source-maintenance' for area in areas) == 1,
              'Register one canonical Skill Tree source-maintenance area')
     for index, (first, a) in enumerate(observed):
         for second, b in observed[index + 1:]:
             both_write = bool(WRITE_EFFECTS.intersection(first['allowed_effects'])
                               and WRITE_EFFECTS.intersection(second['allowed_effects']))
+            if service and service.name == '.skill-tree-director' and (service / 'workspace.json').is_file():
+                # A colocated product may contain independent registered Git roots.
+                # Write-path admission excludes those roots from the parent's scope.
+                if (first['queue_id'] != second['queue_id'] and first['repo_id'] != second['repo_id']
+                        and first['scope'] == second['scope'] == '.'
+                        and (a == service.parent and b != a and b.is_relative_to(a)
+                             or b == service.parent and a != b and a.is_relative_to(b))):
+                    continue
             _require(a != b and not (both_write and (a.is_relative_to(b) or b.is_relative_to(a))),
                      f'Areas have overlapping scopes: {first["id"]}, {second["id"]}')
 
 
-def _validate_scopes(areas, queues):
+def _validate_scopes(areas, queues, service=None):
     _validate_scope_paths(areas.values(), [(area, Path(queues[area['queue_id']]['root']) / _scope(area['scope']))
-                                         for area in areas.values() if area['queue_id'] in queues])
+                                         for area in areas.values() if area['queue_id'] in queues], service)
 
 
 def _setup_location_key(path):
@@ -429,13 +471,22 @@ def _guided_setup_preview(root, request):
     _require(_token(request['director_id']) and isinstance(request['areas'], list) and request['areas'],
              'Guided Director setup requires an exact Director and selected areas')
     workspace = request['workspace']
-    _object(workspace, {'kind', 'source'})
+    _object(workspace, {'kind', 'source'}, {'providers'})
     root, root_proof = _setup_target(str(root), workspace['kind'])
     root_key = _setup_location_key(root)
     _require(_read(root, REGISTRY)[0] is None, 'An existing Director registry uses the ordinary area registration flow')
     _require(_read(root, BINDINGS)[0] is None, 'Reconcile existing local Director bindings before setup')
     source = _setup_source(workspace['source'], 'director')
     parent = _setup_project(root, workspace['kind'], 'director', source)
+    prior, _ = _read(root, '.skill-tree/installation/profile.json')
+    observed_hosts = {host for record in (prior or {}).get('destinations', {}).values()
+                      for host in record.get('providers', [record.get('provider')])}
+    providers = _tokens(workspace.get('providers', sorted(observed_hosts) or ['codex']), 'Setup hosts')
+    matrix, _ = _read(Path(source['checkout']), '.skill-tree/config/providers.json')
+    _require(isinstance(matrix, dict) and isinstance(matrix.get('providers'), list),
+             'The selected package source must include a provider matrix')
+    _require(providers and set(providers) <= {host['id'] for host in matrix['providers']}, 'Choose supported Setup hosts')
+    parent['providers'] = providers
     areas, observed = {}, []
     for request_area in request['areas']:
         _object(request_area, {'id', 'role', 'capabilities', 'allowed_effects', 'project'}, {'flavor', 'source'})
@@ -490,7 +541,7 @@ def _guided_setup_preview(root, request):
             _require(kind == 'existing' and topology == 'separate' and isinstance(source_record, dict)
                      and source_record.get('role') == 'source',
                      'Select an existing canonical Skill Tree source-maintenance area')
-        area = {**prepared, 'id':area_id, 'role':role, 'kind':kind, 'path':str(path), 'topology':topology,
+        area = {**prepared, 'providers':providers, 'id':area_id, 'role':role, 'kind':kind, 'path':str(path), 'topology':topology,
                 'placement':placement, 'scope':str(scope), 'destination_proof':proof,
                 'capabilities':_tokens(request_area['capabilities'], 'Area capabilities'),
                 'interface':{'kind':'skill-tree', 'version':1}, 'allowed_effects':effects}
@@ -601,7 +652,7 @@ class DirectorRegistry:
             queues[queue_id] = owner
             if queue_id not in profile_proofs:
                 profile_proofs[queue_id] = _inspect_profile(Path(owner['root']))
-        _validate_scopes(areas, queues)
+        _validate_scopes(areas, queues, self.root)
         next_registry = {**registry, 'revision': registry['revision'] + bool(added), 'areas': areas}
         next_bindings = {**bindings, 'queues': queues}
         public = {'schema': 1, 'operation': 'setup', 'registry': next_registry,
@@ -636,7 +687,7 @@ class DirectorRegistry:
         _require(all(existing_id == queue_id or value['git_common_dir'] != owner['git_common_dir']
                      for existing_id, value in queues.items()), 'One Git common directory cannot own two queue identities')
         queues[queue_id] = owner
-        _validate_scopes(registry['areas'], queues)
+        _validate_scopes(registry['areas'], queues, self.root)
         profile_proof = _inspect_profile(Path(owner['root']))
         public = {'schema': 1, 'operation': 'rebind', 'director_id': registry['director_id'], 'queue_id': queue_id,
                   'areas': sorted(sibling['id'] for sibling in area_siblings), 'changed': previous != owner,
@@ -1046,12 +1097,19 @@ def _run_helper(director, command, payload):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=sorted({'setup-preview', 'setup-apply', 'setup-bootstrap', 'setup-status', 'rebind-preview', 'rebind', 'status', 'dispatch-intent'} | OBJECTIVE_COMMANDS | PLAN_COMMANDS | RUN_COMMANDS))
+    parser.add_argument('command', choices=sorted({'project-menu', 'project-init', 'project-preview', 'project-setup', 'setup-preview', 'setup-apply', 'setup-bootstrap', 'setup-status', 'rebind-preview', 'rebind', 'status', 'dispatch-intent'} | OBJECTIVE_COMMANDS | PLAN_COMMANDS | RUN_COMMANDS))
     parser.add_argument('root', type=Path)
     parser.add_argument('--input', type=Path)
     args = parser.parse_args(argv)
     try:
         payload = json.loads(args.input.read_text()) if args.input else None
+        if args.command.startswith('project-'):
+            from types import SimpleNamespace
+            app = WF.owned_module('director_project_setup', Path(__file__).with_name('director-project-setup.py'))
+            app.D = SimpleNamespace(**globals())
+            result = app.run(args.root, args.command, payload)
+            print(WF.dump(result), end='')
+            return 0
         if args.command == 'setup-preview' and isinstance(payload, dict) and 'workspace' in payload:
             print(WF.dump(_guided_setup_preview(args.root, payload)), end='')
             return 0
