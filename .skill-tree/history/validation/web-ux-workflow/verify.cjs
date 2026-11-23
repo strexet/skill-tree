@@ -240,13 +240,17 @@ async function readingRoom(heading) {
     }
     if (!para) return {heading: el.textContent.trim(), focused: el === document.activeElement, paragraph: null};
     const r = para.getBoundingClientRect();
-    const px = Math.max(0, Math.min(innerHeight, r.bottom) - Math.max(header, r.top));
+    const visible = para.checkVisibility({opacityProperty: true, visibilityProperty: true});
+    const px = visible ? Math.max(0, Math.min(innerHeight, r.bottom) - Math.max(header, r.top)) : 0;
     return {heading: el.textContent.trim(), focused: el === document.activeElement, activeId: document.activeElement.id,
       focusVisible: el.matches(':focus-visible'), headingTop: el.getBoundingClientRect().top,
       toolbarBottom: header, paragraphTop: r.top, paragraphHeight: r.height, paragraphVisiblePx: px,
       paragraphVisibleFraction: r.height ? px / r.height : null,
       roomBelowParagraphStart: Math.max(0, innerHeight - Math.max(header, r.top))};
   });
+}
+function showsParagraphStart(room) {
+  return room && room.paragraphVisiblePx > 0 && room.paragraphTop >= room.toolbarBottom - 1;
 }
 async function cell(browser,id,width,textScale) {
   const row={id,width,textScale,checks:{},diagnostics:{},failed:[]},check=(key,ok,details)=>{row.checks[key]={pass:Boolean(ok),details};if(!ok)row.failed.push(key);};
@@ -275,7 +279,10 @@ async function cell(browser,id,width,textScale) {
     const navs=main.getByRole('navigation',{name:/.+/});
     let nav;
     for(const n of await navs.all())if(await n.isVisible()&&await buttonOrLink(n,/Personal Notes/i).count()){nav=n;break;}
-    row.diagnostics.entryView=await entryView(page,main,nav);
+    const entry = await entryView(page,main,nav);
+    row.diagnostics.entryView = entry;
+    check('visibleEntryShortcuts', entry.title.fullyVisible && entry.links.length === targets.length &&
+      entry.links.every(link => link.fullyVisible), entry);
     const orderCorrect=nav && await nav.evaluate((n,title)=>{const h=[...document.querySelectorAll('main h2')].find(e=>e.textContent.trim()===title);return h&&Boolean(n.compareDocumentPosition(h)&Node.DOCUMENT_POSITION_FOLLOWING)},groups[0].heading);
     check('namedNavigationBeforeSections',Boolean(nav&&orderCorrect));
     const controls=[];
@@ -296,6 +303,7 @@ async function cell(browser,id,width,textScale) {
       if(label==='Personal Notes') row.diagnostics.notesRoom=await readingRoom(heading);
       controls.push([label,item]);
     }
+    check('personalNotesReadable', showsParagraphStart(row.diagnostics.notesRoom), row.diagnostics.notesRoom);
     const toggle=await firstVisible(main.getByRole('button',{name:/Reading appearance/i}).or(main.locator('summary').filter({hasText:/Reading appearance/i})));
     check('startsCollapsed',toggle&&await stateOf(toggle)===false);
     if(screenshotDir && id==='gryphy-light' && width===360 && textScale===100){
@@ -305,7 +313,8 @@ async function cell(browser,id,width,textScale) {
     if(toggle)controls.push(['Reading appearance',toggle]);
     row.diagnostics.controlContrast={};
     for(const [label,item] of controls)row.diagnostics.controlContrast[label]=await contrast(item);
-    if(controls.length)check('sampledControlContrast',Object.values(row.diagnostics.controlContrast).every(s=>s && s.minimum>=s.threshold),row.diagnostics.controlContrast);
+    check('sampledControlContrast',controls.length===targets.length+1 &&
+      Object.values(row.diagnostics.controlContrast).every(s=>s && s.minimum>=s.threshold),row.diagnostics.controlContrast);
     if(toggle){
       const access=await tabTo(page,toggle);
       const before=await focusEvidence(toggle);
@@ -317,7 +326,9 @@ async function cell(browser,id,width,textScale) {
       const authoring=await main.locator('input[type=color],textarea,input[type=text],button,[role=button],a').evaluateAll(items=>items.filter(e=>e.checkVisibility({contentVisibilityAuto:true})&&e.getClientRects().length && (!e.closest('details') || e.closest('details').open)).filter(e=>e.matches('input[type=color],textarea,input[type=text]')||/\b(custom|import|export|random|editor|paste)\b/i.test((e.getAttribute('aria-label')||'')+' '+e.textContent)).map(e=>e.tagName+' '+e.textContent.trim().slice(0,60)));
       check('noCustomEditor',authoring.length===0,authoring);
       const pick=await firstVisible(main.getByRole('combobox').or(main.getByRole('listbox')).or(main.getByRole('radio')).or(main.getByRole('button',{name:/Gryphy|Obsidian Glow/i})));
-      if(pick){const s=await contrast(pick);row.diagnostics.chooserContrast=s;if(s)check('chooserTextContrast',s.minimum>=s.threshold,s);}
+      const chooserContrast = pick ? await contrast(pick) : null;
+      row.diagnostics.chooserContrast = chooserContrast;
+      check('chooserTextContrast', chooserContrast && chooserContrast.minimum >= chooserContrast.threshold, chooserContrast);
       if(screenshotDir && id==='obsidian-glow' && width===1280 && textScale===200){
         await toggle.evaluate(e=>e.scrollIntoView({block:'center'}));await page.screenshot({path:path.join(screenshotDir,'dark-desktop-enlarged.png')});
       }
@@ -351,11 +362,14 @@ async function cell(browser,id,width,textScale) {
         row.diagnostics.returnRoom=await readingRoom(firstSection);
         check('explicitReturnToFirstSection',fromTop.reached&&via.reached&&readableFocus(focus.last),
           {fromTop,via,focus,appearanceClosed:await stateOf(toggle)===false});
-      }else{row.diagnostics.explicitReturn='No explicit Return to reading control; disclosure close is measured separately.';}
+      }else{
+        check('explicitReturnToFirstSection', false, 'Return to reading control unavailable');
+      }
     }else{
-      for(const key of ['openWithKeyboard','noCustomEditor','selectBuiltInInPlace','closeAndReturnFocus','reloadPersistsSelection'])check(key,false,'Reading appearance unavailable');
+      for(const key of ['openWithKeyboard','openRouteReflow','noCustomEditor','chooserTextContrast','selectBuiltInInPlace','closeAndReturnFocus','reloadPersistsSelection','explicitReturnToFirstSection'])check(key,false,'Reading appearance unavailable');
       if(screenshotDir && id==='obsidian-glow' && width===1280 && textScale===200)await page.screenshot({path:path.join(screenshotDir,'dark-desktop-enlarged.png')});
     }
+    check('returnSectionReadable', showsParagraphStart(row.diagnostics.returnRoom), row.diagnostics.returnRoom);
     check('blazorHealthy',!pageErrors.length&&!await page.locator('#blazor-error-ui').isVisible(),pageErrors);
   }catch(e){check('runnerCompleted',false,shortError(e));}
   finally{

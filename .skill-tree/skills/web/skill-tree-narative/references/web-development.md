@@ -4,9 +4,9 @@ Use the admitted framework/runtime, package manager, concrete test/server/build 
 
 ## Component selection before a UI change
 
-Identify the user's action and expected result. Locate the component catalog, design system or examples listed in the project's UI guidance. Search by user intent and inspect a working call site. When a component has several modes, confirm the relevant properties, visible controls and behavior for the same user role. Record the selected mode and example in the task plan before editing.
+Identify the user's action and expected result. Locate the component catalog, design system or examples listed in the project's UI guidance. Search by user intent. If a reusable component fits the task, inspect a working call site or story. For a component with several modes, confirm the relevant properties, visible controls and behavior for the same user role. Record the selected mode and verified example in the task plan.
 
-If the project has no catalog or the catalog has no matching entry, search the affected route, adjacent screens and shared components. If an entry has drifted, use the current call site and tests to verify the choice. Reuse the matching component or compose existing parts for a demonstrated gap. Keep reusable discoveries in the project's existing index. A small Markdown file alongside the project's UI documentation is sufficient when repeated or ambiguous choices justify an index. The target project owns the entries and implementation.
+If the project has no catalog or the catalog has no matching entry, search the affected route, adjacent screens and shared components. If an entry has drifted, use the current call site and tests to verify the choice. If the search finds no suitable implementation or example, record the gap and build the smallest task-local solution using project components, native controls or the project's existing UI dependencies. Keep reusable discoveries in the project's existing index. A small Markdown file alongside the project's UI documentation is sufficient when repeated or ambiguous choices justify an index. The target project owns the entries and implementation.
 
 Use one row per meaningful mode. Replace the illustrative path with a working project link.
 
