@@ -1,0 +1,21 @@
+{
+  "attempt_id": "C-8577791d-6b1a-452c-87cd-37030ec7315b",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-director-area-bindings.py"
+  ],
+  "counts": {
+    "discovered": 13,
+    "expected": 13,
+    "failed": 0,
+    "passed": 13,
+    "skipped": 0
+  },
+  "log_sha256": "747cd965dbd1453e866320bc67eb91e0521e3310f01b215764dd89b0c7c5efb6",
+  "sources": {
+    ".skill-tree/common/scripts/director-entry.py": "3e5d323676571842ed0cf88d08957a29f766406523888ebfb833ef03ba03327d",
+    ".skill-tree/common/scripts/director-state.py": "561c24f8b558091a8ca0b2982d58a3af4faa015f0b3d5daa4a44c996e7f59bf0",
+    ".skill-tree/templates/operations.json": "76f8a49d191daa68da6d4fe8a732f38f047c095663a50ceb2f3c13f8f539a802",
+    ".skill-tree/tests/test-director-area-bindings.py": "a38a2e274b200db827e1ae56f8deb898f809312fd9a8f23d4af5932b32eb3a8b"
+  }
+}

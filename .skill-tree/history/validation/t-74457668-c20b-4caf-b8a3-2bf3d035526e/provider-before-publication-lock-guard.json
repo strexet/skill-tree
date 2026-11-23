@@ -1,0 +1,12 @@
+{
+  "check": "provider-worktree-cleanup",
+  "assertion": "Controlled provider and Git fixtures passed before tightening automatic cleanup publication locking.",
+  "counts": {
+    "expected": 34,
+    "discovered": 34,
+    "passed": 34,
+    "failed": 0,
+    "skipped": 0
+  },
+  "log_sha256": "934d92b45664e5d94a5176b91b5ea55c181250a199da01c64b8fbc01243ddbd8"
+}

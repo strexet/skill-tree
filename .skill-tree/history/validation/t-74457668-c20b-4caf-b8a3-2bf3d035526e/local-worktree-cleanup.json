@@ -1,0 +1,22 @@
+{
+  "attempt_id": "C-9641c22a-68fc-4631-bbbb-15e43cdf544f",
+  "check": "local-worktree-cleanup",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-local-delivery.py"
+  ],
+  "counts": {
+    "discovered": 47,
+    "expected": 47,
+    "failed": 0,
+    "passed": 47,
+    "skipped": 0
+  },
+  "log_sha256": "a4db35b6902df22eab11c54c33d555f6ef5feb16b229c463e5fd3c0405cb42ce",
+  "source_fingerprints": {
+    ".skill-tree/common/scripts/run-workspaces.py": "87d6ae51b6dc7a18115a0fc9c58f758f91c4e86de31f07378f4b43101079153f",
+    ".skill-tree/common/scripts/workflow-state.py": "c46026f300f657ab57d20c44583494ed04838d7b70f194ef2077629ee437f1e5",
+    ".skill-tree/tests/test-local-delivery.py": "56cbd2023a7bc981494ce379b1928241f5c4605419a15363b56d71a4a3dad31e",
+    ".skill-tree/tests/test-run-workspaces.py": "55f8925b142bc792a95d33b6f676c911d86a2bdd585cb84da2265830f0f8f9c4"
+  }
+}

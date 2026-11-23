@@ -1,0 +1,22 @@
+{
+  "attempt_id": "C-8177dffb-d5ea-485f-8bb6-2c3891ab03e0",
+  "check": "provider-worktree-cleanup",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-pr-review-cycle.py"
+  ],
+  "counts": {
+    "discovered": 34,
+    "expected": 34,
+    "failed": 0,
+    "passed": 34,
+    "skipped": 0
+  },
+  "log_sha256": "c155eb2c0a347f6b0dcd36ae9020591a32bbd55b227197b212075e14b5b3fea3",
+  "source_fingerprints": {
+    ".skill-tree/common/scripts/pr-review-state.py": "54429877844b84ac067ed0a865205753dee7ca321c772796823bd9bedae1463d",
+    ".skill-tree/common/scripts/run-workspaces.py": "87d6ae51b6dc7a18115a0fc9c58f758f91c4e86de31f07378f4b43101079153f",
+    ".skill-tree/common/scripts/workflow-state.py": "c46026f300f657ab57d20c44583494ed04838d7b70f194ef2077629ee437f1e5",
+    ".skill-tree/tests/test-pr-review-cycle.py": "e477061df7548f37a7b9b1b9a839446ab4b1b25213d7a85653f0785c9c3a655b"
+  }
+}

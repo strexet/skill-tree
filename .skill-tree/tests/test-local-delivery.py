@@ -158,7 +158,7 @@ class LocalDeliveryTests(unittest.TestCase):
         self.selected=wf.Store(self.source,self.run['id'])
         return self.run
 
-    def accept_scoped_source(self,task_id):
+    def accept_scoped_source(self,task_id, *, commit_evidence=False):
         criterion='Preserve scoped source behavior.'
         store=self.selected
         wf.begin_task(store,{'task_id':task_id})
@@ -166,8 +166,9 @@ class LocalDeliveryTests(unittest.TestCase):
         path=self.source/relative
         baseline=path.read_text() if path.exists() else ''
         path.write_text(baseline+'# '+task_id+'\n')
-        info=wf.mark_implemented(store,{'task_id':task_id,'changed_files':[relative]})
         (self.source/'report.json').write_text('{}')
+        paths = [relative, 'report.json'] if commit_evidence else [relative]
+        info=wf.mark_implemented(store,{'task_id':task_id,'changed_files':paths})
         attempt=wf.prepare_check(store,{'task_id':task_id,'check_id':'behavior'})
         wf.record_check(store,{'task_id':task_id,'check_id':'behavior','attempt_id':attempt['attempt_id'],
             'result':'pass','classification':'executed-control','actual_lane':'static',
@@ -194,6 +195,125 @@ class LocalDeliveryTests(unittest.TestCase):
         self.assertEqual(check.call_args_list,[unittest.mock.call(*expected)]*
             (2 if self.run['reviewed_local_delivery']['merge_at_finish'] else 1))
         return result
+
+    def test_cleanup_removes_only_owned_clean_worktree_and_preserves_evidence(self):
+        self.start_reviewed_controller('all')
+        outcome = self.accept_scoped_source(self.tid, commit_evidence=True)
+        result = self.finish_reviewed_fixture()
+        self.assertEqual(result['delivery']['status'], 'merged')
+        self.assertEqual(result['delivery']['worktree_cleanup']['status'], 'removed')
+        self.assertFalse(self.source.exists())
+        self.assertTrue(self.launch.is_dir())
+        self.assertEqual(self.git(self.root, 'rev-parse', self.run['workspace']['branch']), outcome['commits'][0])
+        history, = wf.history(wf.Store(self.root), self.tid)
+        self.assertTrue(history['acceptance'][0]['evidence'][0]['available'])
+        retry = wf.cleanup_controller_worktree(wf.Store(self.root, self.run['id']))
+        self.assertEqual(retry, result['delivery']['worktree_cleanup'])
+
+    def test_cleanup_defers_for_ignored_data_and_reconciles_a_lost_removal_response(self):
+        self.start_reviewed_controller('all')
+        self.accept_scoped_source(self.tid, commit_evidence=True)
+        exclude = Path(self.git(self.root, 'rev-parse', '--path-format=absolute', '--git-path', 'info/exclude'))
+        with exclude.open('a') as rules:
+            rules.write('\nlocal-recovery.dat\n')
+        protected = self.source / 'local-recovery.dat'
+        protected.write_text('private fixture')
+        result = self.finish_reviewed_fixture()
+        self.assertEqual(result['delivery']['status'], 'merged')
+        self.assertEqual(result['delivery']['worktree_cleanup']['status'], 'deferred')
+        self.assertEqual(protected.read_text(), 'private fixture')
+        protected.unlink()
+        run_store = wf.Store(self.root, self.run['id'])
+        remove = ws.remove_controller_worktree
+
+        def lose_response(root, path):
+            remove(root, path)
+            self.source.mkdir()
+            (self.source/'new-owner.dat').write_text('New content at the old path')
+            raise subprocess.TimeoutExpired('git worktree remove', 45)
+
+        with patch.object(ws, 'remove_controller_worktree', side_effect=lose_response):
+            first = wf.cleanup_controller_worktree(run_store)
+        self.assertTrue((self.source/'new-owner.dat').is_file())
+        self.assertEqual(first['status'], 'deferred')
+        retry = wf.cleanup_controller_worktree(run_store)
+        self.assertEqual(retry['status'], 'removed')
+        self.assertEqual(retry['attempt'], first['attempt'])
+        self.assertTrue((self.source/'new-owner.dat').is_file())
+        self.assertEqual(run_store.load()['active_run']['delivery']['status'], 'merged')
+
+    def test_cleanup_preserves_files_created_after_preparation(self):
+        self.start_reviewed_controller('all')
+        self.accept_scoped_source(self.tid, commit_evidence=True)
+        exclude = Path(self.git(self.root, 'rev-parse', '--path-format=absolute', '--git-path', 'info/exclude'))
+        with exclude.open('a') as rules:
+            rules.write('\nraced.dat\n')
+        stage = ws.stage_controller_worktree
+
+        def add_ignored_file(root, path, attempt):
+            (path/'raced.dat').write_text('Local evidence created after preflight')
+            return stage(root, path, attempt)
+
+        with patch.object(ws, 'stage_controller_worktree', side_effect=add_ignored_file):
+            result = self.finish_reviewed_fixture()
+        self.assertEqual(result['delivery']['worktree_cleanup']['status'], 'deferred')
+        self.assertEqual((self.source/'raced.dat').read_text(), 'Local evidence created after preflight')
+
+    def test_cleanup_defers_when_the_target_changes_during_preparation(self):
+        self.start_reviewed_controller('all')
+        self.accept_scoped_source(self.tid, commit_evidence=True)
+        stage = ws.stage_controller_worktree
+
+        def move_target(root, path, attempt):
+            self.git(root, 'update-ref', 'refs/heads/release/example', self.start_head)
+            return stage(root, path, attempt)
+
+        with patch.object(ws, 'stage_controller_worktree', side_effect=move_target):
+            result = self.finish_reviewed_fixture()
+        self.assertEqual(result['delivery']['status'], 'merged')
+        self.assertEqual(result['delivery']['worktree_cleanup']['status'], 'deferred')
+        self.assertIn('current target', result['delivery']['worktree_cleanup']['reason'])
+        self.assertTrue(self.source.is_dir())
+
+    def test_cleanup_retains_locked_worktree_until_exact_retry(self):
+        self.start_reviewed_controller('all')
+        self.accept_scoped_source(self.tid, commit_evidence=True)
+        self.git(self.root, 'worktree', 'lock', self.source)
+        result = self.finish_reviewed_fixture()
+        self.assertIn('locked', result['delivery']['worktree_cleanup']['reason'])
+        self.assertTrue(self.source.is_dir())
+        self.git(self.root, 'worktree', 'unlock', self.source)
+        self.assertEqual(wf.cleanup_controller_worktree(wf.Store(self.root, self.run['id']))['status'], 'removed')
+
+    def test_cleanup_detects_timestamp_preserving_local_modifications(self):
+        self.start_reviewed_controller('all')
+        self.accept_scoped_source(self.tid, commit_evidence=True)
+        self.git(self.root, 'config', 'core.trustctime', 'false')
+        path = self.source/'local-tip.txt'
+        current = path.stat()
+        os.utime(path, ns=(current.st_atime_ns, current.st_mtime_ns - 2_000_000_000))
+        self.git(self.source, 'update-index', '--really-refresh')
+        original = path.stat()
+        modified = b'x' * original.st_size
+        path.write_bytes(modified)
+        os.utime(path, ns=(original.st_atime_ns, original.st_mtime_ns))
+        self.assertEqual(self.git(self.source, 'status', '--porcelain'), '')
+        result = self.finish_reviewed_fixture()
+        self.assertEqual(result['delivery']['worktree_cleanup']['status'], 'deferred')
+        self.assertEqual(path.read_bytes(), modified)
+
+    def test_cleanup_retains_worktree_git_configuration_and_references(self):
+        self.start_reviewed_controller('all')
+        self.accept_scoped_source(self.tid, commit_evidence=True)
+        self.git(self.root, 'config', 'extensions.worktreeConfig', 'true')
+        self.git(self.source, 'config', '--worktree', 'user.name', 'Local fixture name')
+        self.git(self.source, 'update-ref', 'refs/worktree/recovery', 'HEAD')
+        result = self.finish_reviewed_fixture()
+        self.assertIn('local Git configuration', result['delivery']['worktree_cleanup']['reason'])
+        self.git(self.source, 'config', '--worktree', '--unset', 'user.name')
+        retry = wf.cleanup_controller_worktree(wf.Store(self.root, self.run['id']))
+        self.assertIn('private Git references', retry['reason'])
+        self.assertTrue(self.source.is_dir())
 
     def test_policy_work_through_next_reviews_then_merges_on_exact_later_request(self):
         self.start_reviewed_controller('next')
@@ -836,6 +956,8 @@ class LocalDeliveryTests(unittest.TestCase):
         self.assertEqual(delivery['publication'], 'not-requested')
         self.assertEqual(delivery['local_integration']['merge']['commit'], commit)
         self.assertTrue(ws.delivery_finished(self.registry_run()))
+        self.assertEqual(delivery['worktree_cleanup']['status'], 'removed')
+        self.assertFalse(self.source.exists())
         self.assertEqual(self.action('complete')['local_integration'], delivery['local_integration'])
 
     def test_canonical_queue_drift_after_merge_preserves_other_run_and_blocks_completion(self):

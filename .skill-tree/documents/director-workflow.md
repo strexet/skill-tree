@@ -12,6 +12,8 @@ Each child receipt links the Director objective and assignment to exact area, qu
 
 ## Register areas
 
+For first-time setup, review the coordinator, project placements, package sources and prerequisites through the [guided setup preview](../common/references/director-workflow.md#preview-first-time-setup). Once approved, [prepare the workspace](../common/references/director-workflow.md#prepare-the-approved-workspace) with `setup-bootstrap`. Use the [prepared-area registration and status flow](../common/references/director-workflow.md#register-the-prepared-areas) for the exact prepared set. The explicit area registration commands below remain available.
+
 Use `python3 .skill-tree/common/scripts/director-state.py setup-preview <director-root> --input <request.json>` from the source checkout. The request identifies `director_id` and exact `areas`. Each area supplies a stable `id`, `role`, canonical `checkout` path, relative `scope`, capability tokens, an interface declaration `{"kind":"skill-tree","version":1}` and allowed effects. Optional expected queue and repository IDs restrict a binding to previously reviewed identities. Register one `source-maintenance` area backed by a canonical Skill Tree source. Separate repositories use existing verified Skill Tree profiles and registered Core queue identities. Shared folder scopes use the same canonical owner.
 
 Use `setup-apply` with the reviewed `expected_preview_sha256` and identical area request. The parent stores `.skill-tree/director/registry.json` and local `.skill-tree/artifacts/director/local-bindings.json` through one guarded writer. The selected child checkouts and Core queues receive no writes. Linked checkout input resolves to the canonical queue owner. Duplicate queue writers, an overlapping writable scope, symlinks and stale probes stop application.
@@ -60,6 +62,14 @@ Use `objective-preview` with the stable objective ID, owner reference, original 
 Use `plan-preview` with exact plan and objective revisions and the selected assignments. The preview validates declared effect scopes, canonical area ownership, current qualified capabilities, exact child task or bounded intake and source pins. The preview returns a digest, portable assignment scope, a scoped worker brief and unverified coverage. A required missing pin, ambiguous area, dependency cycle or unsafe overlap stops preview before any write.
 
 Use `plan-freeze` with the same request and the reviewed `expected_preview_sha256`. The objective journal retains the frozen plan and digest. A repeated exact request preserves one plan version. `plan-context` and `plan-impact` read the frozen revision. Request `plan_context` inside status to include pinned sources and use `plan-impact` to inspect recorded consumers for an exact changed source. Representative fixture artifacts can support fixture planning. Real ArtWorkshop qualification requires verified source and runtime evidence for the selected area.
+
+### Look up project context for one assignment
+
+Pass `assignment_id` with the exact objective ID, plan ID and plan revision to `plan-context`. The returned `context_search.request` carries the frozen plan digest. Add a literal-term `query` and an optional `limit` to that request, then call `context-search` on the Director root. Use project terms or identifiers such as `cave-lantern-carry belt`.
+
+The lookup searches areas owned by the selected assignment and dependency assignments at the recorded Git commits. Each searched area requires a registered read-only effect. A verified Narrative or Art fixture pin with a path permits lookup of the exact file. For a pin queue without an unambiguous frozen commit, the lookup uses the observed local HEAD and checks the file against the recorded SHA-256 before returning context. Each hit supplies the area, repository identity, path, commit, SHA-256 and nearby source lines. Check the per-source status for unavailable material. Narrow the query if Git output exceeds the byte limit. Treat matches as research evidence and use the normal source-pin review to adopt a required input.
+
+For a standalone checkout, run `python3 .skill-tree/common/scripts/context-search.py search <checkout> --commit <full-commit-id> --scope <repository-relative-path> --query '<terms>'` from the Skill Tree source. Git reads locally available objects with protocol access disabled.
 
 ## Effects and decisions
 
@@ -147,13 +157,13 @@ Use `repair-candidate-preview` and `repair-candidate-apply` to retain reviewed s
 
 ## Install the Director flavor
 
-Use `node .skill-tree/bin/install.js --list --flavor director` to inspect operation membership. Use an explicit target and `--dry-run --all --flavor director` to preview project scope. An owned installation or flavor change requires a stopped checkpoint and current target verification. Verify the installed target through the project-owned installation manager.
+Use `node .skill-tree/bin/install.js --list --flavor director` to inspect operation membership. Use an explicit workspace target and `--dry-run --all --flavor director` to preview the dedicated coordinator. Run `--flavor director --verify` on that workspace to verify the coordinator and host launchers. For a direct low-level profile, pass `--project --flavor director` at the exact target. An existing direct Director receipt remains usable at the original installation root. Use `--flavor director --only <host> --uninstall` at the workspace to remove the selected host launcher and package ownership. Remaining hosts retain access from the workspace. After the last host is removed, reinstall a host to resume the retained coordinator, projects and source work. An owned installation or flavor change requires a stopped checkpoint and current target verification. Verify the installed target through the project-owned installation manager.
 
 The shared-folder topology uses one canonical queue for distinct scopes. The external topology uses the verified profile of the registered external project. A moved external checkout requires Core locator reconciliation, owned profile rebind and guarded Director rebind. A plan with changed execution inputs requires current admission before another effect.
 
 ## Verify the repaired generation on one target
 
-The source candidate retains the accepted prior failure, reviewed repair, exact source inventory and exact composed output inventory. Select one stopped Codex installation on a disposable linked worktree, the original queue, task and run, a current owner authority reference, and any product paths whose bytes require preservation. Keep the candidate source snapshot immutable. The source candidate alone grants no installation authority.
+The source candidate retains the accepted prior failure, reviewed repair, exact source inventory and exact composed output inventory. Select one stopped installation on a disposable linked worktree and the receipt owner of the operation, the original queue, task and run, a current owner authority reference, and any product paths whose bytes require preservation. Keep the candidate source snapshot immutable. The source candidate alone grants no installation authority.
 
 Use `python3 scripts/director-entry.py preview --input <request.json>` to inspect the exact previous and planned profiles. The request holds the exact local target and candidate source, the reviewed candidate, the candidate digest and the selected scope. Preview performs no writes. Retain the returned portable preview and exact digest.
 

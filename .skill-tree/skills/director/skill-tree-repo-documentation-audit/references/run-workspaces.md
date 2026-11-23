@@ -40,6 +40,16 @@ Canonical mutations produce immutable per-run semantic events under `.skill-tree
 
 Implement All merges locally into the exact recorded launch branch after current full-run review. Work Through Next retains a review-ready branch by default. To merge at launch, record `delivery_authorization` with `pr: false`, `merge: true` and the explicit owner instruction. To merge after review, run `merge-reviewed` with the exact run ID and `owner_instruction`. The local merge uses the recorded launch checkout and exact reviewed head. Moved refs or overlapping local edits preserve the reviewed branch and block integration. Runs without `reviewed_local_delivery` use the recorded finish route. Explicit remote orders continue through the PR review cycle. A recorded full-path instruction keeps delivery open as implementation completed, then PR/review in progress, PR ready or merged. Publication blockers preserve implementation completion. Resume reconciles existing PRs, operation keys and merged status before another write. Never announce the full order complete while a promised PR or merge remains unfulfilled.
 
+## Post-merge worktree cleanup
+
+Verified local and controller-linked provider delivery evaluate cleanup after saving the merge result. New controller provisioning records a creation token in the linked Git administrative directory and the run checkpoint. Cleanup requires the matching token, run locator, source branch and head, and current target reachability. Existing or recovered worktrees without qualifying creation evidence are retained.
+
+Cleanup retains check and acceptance artifacts verified at the source commit. Historical queries expose the matching `git_commit` for artifacts after cleanup. Git references and canonical outcome and run records remain available.
+
+The controller records the original cleanup attempt, moves the checkout to a private temporary Git worktree path, and rechecks the delivery target, identity and untracked, ignored and tracked content. A clean checkout is removed with ordinary Git worktree removal. A failed safety check restores the original location when available. A conflicting original location preserves the staged worktree for inspection in `git worktree list`.
+
+The delivery record exposes `worktree_cleanup` with `removed` or `deferred` status and a reason for deferral. A prepared attempt remains recoverable after interruption. From the canonical checkout, run `workflow-state.py cleanup-worktree <canonical-root> --run-id WR-<uuid>` to reconcile or retry the exact attempt.
+
 ```sh
 python3 scripts/workflow-state.py workspace-setup <canonical-root> --input <setup.json>
 python3 scripts/workflow-state.py start <launch-worktree> --standalone --mode next --id T-<uuid> --input <workspace.json>

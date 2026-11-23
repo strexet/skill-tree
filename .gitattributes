@@ -1,2 +1,5 @@
 # Verbatim test-runner evidence retains indented blank lines from TAP diagnostics.
 /.skill-tree/history/validation/**/*.txt whitespace=-blank-at-eol
+# Unified diffs preserve a space for empty context lines, including the final source line.
+/.skill-tree/history/validation/web-ux-workflow/consumer.patch whitespace=-blank-at-eol
+/.skill-tree/history/validation/web-ux-workflow/project-catalog.patch whitespace=-blank-at-eol,-blank-at-eof

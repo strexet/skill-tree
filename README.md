@@ -1,16 +1,21 @@
 # Skill Tree
 
-Skill Tree provides portable operations for repository documentation, intake, research, implementation, resumable orchestration, game design, narrative development, 3D asset production and plugin management. One project-scoped installation selects general, web, unity or director. Common contracts and concrete project capabilities compose into standalone packages with stable `skill-tree-*` names.
+Skill Tree provides portable operations for repository documentation, intake, research, implementation, resumable orchestration, game design, narrative development, 3D asset production and plugin management. The default installation creates a Director workspace. Each registered project can use a general, web or Unity profile. Common contracts and concrete project capabilities compose into standalone packages with stable `skill-tree-*` names.
 
 [Installation](.skill-tree/documents/install.md) · [Validation](.skill-tree/common/references/validation-policy.md) · [Workflow](.skill-tree/common/references/future-workflow.md) · [Metadata](.skill-tree/common/references/workflow-metadata.md) · [Source manifest](.skill-tree/skill-tree.json) · [Conformance audit](.skill-tree/documents/workflow-redesign-conformance.md)
 
+Open a terminal in the workspace for Director. Run the launcher from the downloaded Skill Tree checkout. For example, select Codex with:
+
 ```sh
-node .skill-tree/bin/install.js --list
-node .skill-tree/bin/install.js --target <project-root> --only codex --flavor general --copy --dry-run
-npm run sync:check
-npm run validate
-npm run test:py
-npm run test:node
+/path/to/skill-tree/install.sh --only codex
+```
+
+On Windows, run `C:\path\to\skill-tree\install.ps1 --only codex` in PowerShell. Use `--target <workspace>` to choose another workspace and `--dry-run` for a preview. The installer creates `.skill-tree-director/` and prints the installed host action. Invoke `skill-tree-director` from the workspace to connect an existing project, create one in a named subfolder or another directory, or continue later.
+
+For a direct individual profile:
+
+```sh
+node .skill-tree/bin/install.js --target <project-root> --only codex --flavor web --copy
 ```
 
 Project-scoped copy installation includes owned receipts and a self-contained local profile manager. Static discovery never starts an Editor, server, browser or test suite. Missing test infrastructure remains a deduplicated setup finding. Installation and documentation initialization are separate operations; unknown or modified packages conflict even with `--force`.
@@ -29,7 +34,7 @@ Invoke `skill-tree-full-cycle` to deliver one task or an explicit group from Pen
 
 The game design operations cover [design and the GDD](.skill-tree/common/references/game-design-gdd.md), [mechanics](.skill-tree/common/references/game-design-mechanics.md) and [balance](.skill-tree/common/references/game-design-balance-study.md). The [3D guide](.skill-tree/documents/skill-tree-3d-guide.md) covers reference preparation, Blender, texturing, motion and Unity integration.
 
-The director flavor coordinates registered folders and repositories from one Codex conversation. The [Director workflow](.skill-tree/documents/director-workflow.md) describes assignment routing, owner decisions, diagnostics and controlled installation.
+Director coordinates registered folders and repositories from the selected client. The compatibility guide records which client operations have been exercised. [Client compatibility](.skill-tree/documents/agent-compatibility.md) The [Director workflow](.skill-tree/documents/director-workflow.md) describes assignment routing, owner decisions, diagnostics and controlled installation.
 
 Source fixtures qualify deterministic helper/composer/installer behavior. Unity, browser, hosted/provider, device and actual agent-behavior qualification remain separate evidence boundaries. [Manual target update](.skill-tree/documents/manual-target-update.md) preserves the existing repository's identities and history without an automatic converter.
 

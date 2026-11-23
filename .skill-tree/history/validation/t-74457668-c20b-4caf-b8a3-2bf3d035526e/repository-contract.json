@@ -1,0 +1,39 @@
+{
+  "diff-whitespace": {
+    "result": "pass"
+  },
+  "installer-dry-run": {
+    "context": "Temporary empty project with no writes observed.",
+    "log_sha256": "55831d3043f31158384ed4f0ec7a8b41de5bf3609012ab30ccc7f36dcc87da32"
+  },
+  "node-failed-case-recheck": {
+    "discovered": 2,
+    "failed": 0,
+    "log_sha256": "7c166b7ad581f367da36e2adaf9971f3e1afff4c90bd75bc0628c67d1bdecb10",
+    "passed": 2
+  },
+  "node-suite": {
+    "discovered": 398,
+    "failed": 2,
+    "failed_cases": [
+      "unity standalone game design installs reproduce the reviewed packages and preserve project records",
+      "composition installation list and dry-run never execute an upstream helper or mutate plugin configuration"
+    ],
+    "log_sha256": "5780d33b059c15b0b99499bdfe2839c7e35e8c7adb19ee667c0ca202e9dfaf3d",
+    "passed": 396
+  },
+  "source-sync": {
+    "log_sha256": "dec4be8196c288cd34fd4c3380bb4fcbbaeaa0f1df6160b5e9ec1542a4ba93f8"
+  },
+  "strict-repository-validation": {
+    "context": "Exact final source overlay in a disposable repository snapshot with a regenerated navigation manifest.",
+    "log_sha256": "fd45fed7d53921dfdf1291bcec3d55fda17ca615d8dbb3c5b1ade6921045ed31"
+  },
+  "test-first-observation": {
+    "local": "Two cleanup fixtures reached merge and observed missing cleanup state.",
+    "provider": "One provider fixture reached confirmed merge and observed missing cleanup state."
+  },
+  "workspace-registry-unit-tests": {
+    "log_sha256": "48753f31f16f52d3d68b6a1216bc12fc1c2aa71d1c6b7a225beec426d3b65525"
+  }
+}

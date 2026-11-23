@@ -349,7 +349,7 @@ function locked(root,action,{recoverPending=true,recoverPluginPending=true,onPen
 }
 function bundle(source,flavor){
  const files={};for(const rel of Object.keys(c.sourceInputs(source))){
-  if(rel.startsWith('domains/')&&!rel.startsWith('domains/'+flavor+'/'))continue;
+  if(flavor!=='director'&&rel.startsWith('domains/')&&!rel.startsWith('domains/'+flavor+'/'))continue;
   if(rel==='config/repository.json')continue;
   files['source/'+rel]=c.read(source,rel);
  }
@@ -387,12 +387,34 @@ function plan(root,source,flavor,selections,options={}){
   changes[item.rel]=files;destinations[item.rel]={provider:owned?.provider||item.provider,providers:[...new Set([...(owned?owners(owned):[]),...item.providers])].sort(),name:item.name,flavor,files:built.output_digests[item.name],identity:c.hash(c.json(built.output_digests[item.name]))};
  }
  const bridges={...(old?.bridges||{})},bridgeBefore={};
- for(const rel of new Set([...(options.bridges||[]),...Object.keys(old?.bridges||{})])){
+ const selectedBridges=new Set(options.bridges||[]);
+ const legacyOpenCode='.opencode/AGENTS.md';
+ const legacyOwners=old?.bridges?.[legacyOpenCode]?.providers||[];
+ const openCode=c.readJson(source,'config/providers.json').providers.find(provider=>provider.id==='opencode');
+ const migrateOpenCode=legacyOwners.includes('opencode')&&openCode?.bridgePath===AGENTS_PATH;
+ if(migrateOpenCode){
+  selectedBridges.delete(legacyOpenCode);
+  const remaining=legacyOwners.filter(owner=>owner!=='opencode');
+  if(remaining.length)bridges[legacyOpenCode]={...bridges[legacyOpenCode],providers:remaining};
+  else{
+   const current=c.read(root,legacyOpenCode),owned=bridgeBlock(current);
+   bridgeBefore[legacyOpenCode]=treeHash(root,legacyOpenCode);
+   const surrounding=current.replace(owned,'');
+   changes[legacyOpenCode]=current==='\n\n'+owned+'\n'?null:surrounding;
+   delete bridges[legacyOpenCode];
+  }
+ }
+ const bridgePaths=new Set([...selectedBridges,...Object.keys(bridges)]);
+ if(migrateOpenCode)bridgePaths.add(AGENTS_PATH);
+ for(const rel of bridgePaths){
   const current=c.read(root,rel)||'',existing=bridgeBlock(current);bridgeBefore[rel]=treeHash(root,rel);
   if(existing&&!old?.bridges[rel])throw Error('Unowned bridge conflict: '+rel);
   const block=renderBridge(source,flavor,profile);
   changes[rel]=existing?current.replace(existing,block):current+(current.endsWith('\n')?'\n':'\n\n')+block+'\n';
-  bridges[rel]={hash:c.hash(block),providers:[...new Set([...(old?.bridges[rel]?.providers||[]),...(options.bridges?.includes(rel)&&options.provider?[options.provider]:[])])].sort()};
+  const providers=new Set(bridges[rel]?.providers||[]);
+  if(selectedBridges.has(rel)&&options.provider)providers.add(options.provider);
+  if(migrateOpenCode&&rel===AGENTS_PATH)providers.add('opencode');
+  bridges[rel]={hash:c.hash(block),providers:[...providers].sort()};
  }
  const maintenance=bundle(source,flavor),bundle_digests={};
  for(const [rel,content] of Object.entries(maintenance)){const dest=INSTALL+'/'+rel;if(fs.existsSync(c.safe(root,dest))&&!old?.bundle_digests[dest])throw Error('Unowned maintenance file conflict: '+dest);changes[dest]=content;bundle_digests[dest]=c.hash(content);}

@@ -1,0 +1,265 @@
+{
+  "fixtureBase": "51ac91982f61b5bde7cebc26629c2e2e621a4a24",
+  "consumerPatchSha256": "df1e5b697d59429209c2b1e56b3fb52b3b531a5821fc7f1d568356c6385b2360",
+  "observerSha256": "88e7be39444389849c8d16af4cdc0a187bccf410bcb5f0f81cdb0f5bec066e6f",
+  "initialObserverSha256": "e6dfec31629e10129d6d02139264d555fb0d9a2d9762e37e1248949fc0370c4a",
+  "browser": "157.0.8103.79",
+  "playwright": "1.64.0-alpha-1789764292000",
+  "dotnetSdk": "8.0.125",
+  "servedFiles": {
+    "_framework/blazor.boot.json": "844d5be25b53b5bd5748f3c5a66f0c06e5d646d6121c1d636ef13214c148e9d1",
+    "css/app.css": "a3fccfa5e6a5347fa747bb0dddc80cbcb787609547b397ea6cd7f13da22fc877",
+    "js/field-focus.js": "0824e037ac175f0cd9fad9e3a72bc009433e189691431697a224b0ab34c81df1"
+  },
+  "unmodified": {
+    "summary": {
+      "cells": 8,
+      "passed": 8,
+      "failed": 0,
+      "assertionsPassed": 176
+    },
+    "cases": [
+      {
+        "scheme": "gryphy-light",
+        "viewportWidth": 360,
+        "rootTextPx": 16,
+        "assertionsPassed": 22,
+        "visibleEntryLinks": 3,
+        "personalNotesParagraphVisiblePx": 216.875,
+        "returnParagraphVisiblePx": 195.188,
+        "chooserContrastMinimum": 14.811,
+        "chooserContrastThreshold": 4.5
+      },
+      {
+        "scheme": "gryphy-light",
+        "viewportWidth": 360,
+        "rootTextPx": 32,
+        "assertionsPassed": 22,
+        "visibleEntryLinks": 3,
+        "personalNotesParagraphVisiblePx": 571.594,
+        "returnParagraphVisiblePx": 511.047,
+        "chooserContrastMinimum": 14.811,
+        "chooserContrastThreshold": 3
+      },
+      {
+        "scheme": "gryphy-light",
+        "viewportWidth": 1280,
+        "rootTextPx": 16,
+        "assertionsPassed": 22,
+        "visibleEntryLinks": 3,
+        "personalNotesParagraphVisiblePx": 281.938,
+        "returnParagraphVisiblePx": 238.562,
+        "chooserContrastMinimum": 14.811,
+        "chooserContrastThreshold": 4.5
+      },
+      {
+        "scheme": "gryphy-light",
+        "viewportWidth": 1280,
+        "rootTextPx": 32,
+        "assertionsPassed": 22,
+        "visibleEntryLinks": 3,
+        "personalNotesParagraphVisiblePx": 260.344,
+        "returnParagraphVisiblePx": 216.953,
+        "chooserContrastMinimum": 14.811,
+        "chooserContrastThreshold": 3
+      },
+      {
+        "scheme": "obsidian-glow",
+        "viewportWidth": 360,
+        "rootTextPx": 16,
+        "assertionsPassed": 22,
+        "visibleEntryLinks": 3,
+        "personalNotesParagraphVisiblePx": 216.875,
+        "returnParagraphVisiblePx": 195.188,
+        "chooserContrastMinimum": 15.89,
+        "chooserContrastThreshold": 4.5
+      },
+      {
+        "scheme": "obsidian-glow",
+        "viewportWidth": 360,
+        "rootTextPx": 32,
+        "assertionsPassed": 22,
+        "visibleEntryLinks": 3,
+        "personalNotesParagraphVisiblePx": 571.594,
+        "returnParagraphVisiblePx": 511.047,
+        "chooserContrastMinimum": 15.89,
+        "chooserContrastThreshold": 3
+      },
+      {
+        "scheme": "obsidian-glow",
+        "viewportWidth": 1280,
+        "rootTextPx": 16,
+        "assertionsPassed": 22,
+        "visibleEntryLinks": 3,
+        "personalNotesParagraphVisiblePx": 281.938,
+        "returnParagraphVisiblePx": 238.562,
+        "chooserContrastMinimum": 15.89,
+        "chooserContrastThreshold": 4.5
+      },
+      {
+        "scheme": "obsidian-glow",
+        "viewportWidth": 1280,
+        "rootTextPx": 32,
+        "assertionsPassed": 22,
+        "visibleEntryLinks": 3,
+        "personalNotesParagraphVisiblePx": 260.344,
+        "returnParagraphVisiblePx": 216.953,
+        "chooserContrastMinimum": 15.89,
+        "chooserContrastThreshold": 3
+      }
+    ]
+  },
+  "negativeControls": [
+    {
+      "fixture": "no-return",
+      "appendedCss": "\n.privacy-return { display:none !important; }\n",
+      "cssSha256": "04a7c98bc95c392857ed15603a87ea1cc3818c9953e497ffaee1865094cd65a2",
+      "initialObserver": {
+        "cells": 8,
+        "passed": 8,
+        "failed": 0,
+        "assertionsPassed": 144
+      },
+      "reviewedObserver": {
+        "cells": 8,
+        "passed": 0,
+        "failed": 8,
+        "assertionsPassed": 160
+      },
+      "failuresInEveryReviewedCell": [
+        "explicitReturnToFirstSection",
+        "returnSectionReadable"
+      ]
+    },
+    {
+      "fixture": "no-reading",
+      "appendedCss": "\n.privacy-reader .settings-section-nav { margin-block-start: 110vh !important; } .privacy-reader h2:is(#optional-cloud-workspace,#personal-notes) + p { margin-block-start: 120vh !important; }\n",
+      "cssSha256": "095b14a52323dae7ba8abc06be19cba96040b004b887560424fb327c5f669a8f",
+      "initialObserver": {
+        "cells": 8,
+        "passed": 8,
+        "failed": 0,
+        "assertionsPassed": 152
+      },
+      "reviewedObserver": {
+        "cells": 8,
+        "passed": 0,
+        "failed": 8,
+        "assertionsPassed": 152
+      },
+      "failuresInEveryReviewedCell": [
+        "personalNotesReadable",
+        "returnSectionReadable",
+        "visibleEntryShortcuts"
+      ]
+    },
+    {
+      "fixture": "no-contrast",
+      "appendedCss": "\n.privacy-appearance select {color:color(display-p3 .4 .4 .4) !important; -webkit-text-fill-color:color(display-p3 .4 .4 .4) !important;}\n",
+      "cssSha256": "512d7262b8552a37689c1ffe40235683cbb49135f24ce64a3d6894abbae6921f",
+      "initialObserver": {
+        "cells": 8,
+        "passed": 8,
+        "failed": 0,
+        "assertionsPassed": 144
+      },
+      "reviewedObserver": {
+        "cells": 8,
+        "passed": 0,
+        "failed": 8,
+        "assertionsPassed": 168
+      },
+      "failuresInEveryReviewedCell": [
+        "chooserTextContrast"
+      ]
+    },
+    {
+      "fixture": "transparent-chooser",
+      "appendedCss": "\n.privacy-appearance select { opacity: 0 !important; }\n",
+      "cssSha256": "3f475185889872a8ea2cdb27dc9f9077e07691851382660757617c62ddbd75fc",
+      "initialObserver": {
+        "cells": 8,
+        "passed": 8,
+        "failed": 0,
+        "assertionsPassed": 152
+      },
+      "reviewedObserver": {
+        "cells": 8,
+        "passed": 0,
+        "failed": 8,
+        "assertionsPassed": 168
+      },
+      "failuresInEveryReviewedCell": [
+        "chooserTextContrast"
+      ],
+      "initialReportedChooserContrastRange": [
+        14.721,
+        16.077
+      ],
+      "reviewedUnavailableChooserSamples": 8
+    },
+    {
+      "fixture": "translucent-chooser-group",
+      "appendedCss": "\n.privacy-appearance .color-scheme-panel { opacity: .5 !important; }\n",
+      "cssSha256": "fe5d6a5e4b2b88c5f141a0eeed85286b7a0daad058ba58cceedf51ec9dcb23cb",
+      "initialObserver": {
+        "cells": 8,
+        "passed": 8,
+        "failed": 0,
+        "assertionsPassed": 152
+      },
+      "reviewedObserver": {
+        "cells": 8,
+        "passed": 0,
+        "failed": 8,
+        "assertionsPassed": 168
+      },
+      "failuresInEveryReviewedCell": [
+        "chooserTextContrast"
+      ],
+      "initialReportedChooserContrastRange": [
+        14.721,
+        15.939
+      ],
+      "reviewedUnavailableChooserSamples": 8
+    },
+    {
+      "fixture": "transparent-nav",
+      "appendedCss": "\n.privacy-reader .settings-section-nav { opacity: 0 !important; }\n",
+      "cssSha256": "29ab663f5353f454ada98de7aa33f418596f98935984424566f5581694be5016",
+      "initialObserver": {
+        "cells": 8,
+        "passed": 8,
+        "failed": 0,
+        "assertionsPassed": 152
+      },
+      "reviewedObserver": {
+        "cells": 8,
+        "passed": 0,
+        "failed": 8,
+        "assertionsPassed": 160
+      },
+      "failuresInEveryReviewedCell": [
+        "sampledControlContrast",
+        "visibleEntryShortcuts"
+      ],
+      "reviewedVisibleEntryLinksPerCell": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "beforePaintCheck": {
+        "observerSha256": "33b5ff558463b5f330ca4ac2865001ff01bbe906225f9a8ef10a2fc39dce78e4",
+        "cells": 8,
+        "passed": 8,
+        "failed": 0,
+        "assertionsPassed": 176
+      }
+    }
+  ]
+}
