@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "9de470e46460b32644f2fb729d9babda531a5377472b104a683d38c22bae53a4",
+  "identity": "397e10c3d943c5bd304487a8e12054b1d5bb32d1face781f60097af32c9b9ecd",
   "operation": "skill-tree-3d-unity",
   "operations": {
     "skill-tree-3d": {
@@ -3296,7 +3296,7 @@
     "references/3d-unity-roles.md": "a2dfd76eab6f4d4565007cfcdc6009b4aa3583642cede908d12f6c7cbf04fd75",
     "references/3d-workflow.md": "f4735efd5e40c11e5a9ace610468f7a3e158b26fca752f99cd2f8ac4394a6e77",
     "references/3d-workshop-roles.md": "ed3cd2f786a61bb9a76ff4dfa2141ded4d43852c11ab8dfe6d11afe95bb8c8af",
-    "references/decision-governance.md": "68506301b32a58cbbcfc03fdeb62fed6875694f1f9b724749c7f79c26da0de80",
+    "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/future-workflow.md": "3a6bc83660773c23af11cf00eacb90ed618db701d464fd7fcd304d5d90fca50b",
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",

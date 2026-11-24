@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "b828c478eebdd23742964029b0d7e017839a6e3c4967388ca7f5522cda8e1c23",
+  "identity": "02407396c28d29f8461bd593d07114473958084848f5dbf53604cfdc60e42912",
   "operation": "skill-tree-repo-documentation-audit",
   "operations": {
     "skill-tree-3d": {
@@ -3291,7 +3291,7 @@
   "owned_resources": {
     "SKILL.md": "0766db76758a30c385547c1d5ec0b8c180a46fbc57924efca4bcc1691ee30e16",
     "agents/openai.yaml": "29784697a7e809dd3031d2eef0c0fc20c1f4a1e07fa843810f9c5fd8c892e54c",
-    "references/decision-governance.md": "68506301b32a58cbbcfc03fdeb62fed6875694f1f9b724749c7f79c26da0de80",
+    "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/documentation-output-contract.md": "2aca95b856ba3813171cc64c80f9f1d88cbfa9788703df7cd4497032adbfbfab",
     "references/history-retention.md": "ff3fa8602fa29085b59f0aa5ae9f9da698bd5b5d5672235fe809018b18b4b801",

@@ -1,0 +1,335 @@
+{
+  "task_id": "T-8d096ab8-9e5d-4f2d-a931-f2eb8766a4e7",
+  "base": "bcf662c73ed74ed0782cbba186b7b9337ffd85bb",
+  "static_composition": {
+    "paths_and_digests": {
+      ".skill-tree/src/init-rules/skill-tree-skills.md": "602dee0d8859904922a76a338e3452a1dc86e597dba0d00b006bf31ff9e795c6",
+      ".skill-tree/common/references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
+      ".skill-tree/common/references/future-workflow.md": "3a6bc83660773c23af11cf00eacb90ed618db701d464fd7fcd304d5d90fca50b"
+    },
+    "composed_entrypoint": "AGENTS.md",
+    "observations": [
+      "The candidate installs the exact shared bridge and decision-governance reference in the disposable Codex project.",
+      "The bridge calls for a visible message before the first task-specific tool call, with the goal, stages, expected result and known approval boundary.",
+      "The bridge directs immediate authorized continuation and direct answers for simple requests. The existing owner handoff remains in force."
+    ]
+  },
+  "observed_host": {
+    "cli_version": "codex-cli 0.171.0-alpha.13",
+    "configured_model": "gpt-6.2-sol",
+    "configuration": "Bundled desktop CLI, normal user configuration, fresh ephemeral turns in separate read-only disposable project directories. Fixture differences between generations are confined to AGENTS.md.",
+    "order_rule": "Compare visible agent_message item.completed with the first task-specific item.started. Preserve the JSONL line numbers. The capture omits reasoning, raw tool output, and unrelated startup notices.",
+    "scope": "The processing scenario exercises selected-card research and plan preparation. The approval scenario stops after preparing a draft and asking for approval. All cases use disposable fixture inputs.",
+    "limitations": [
+      "All baseline samples also passed ordering. Existing host instructions can also produce the expected behavior. These observations do not establish causality or behavior across other hosts.",
+      "The shared bridge is the candidate instruction exercised by the chat fixtures. Reference composition is verified by the static installation check."
+    ],
+    "samples": {
+      "before-process": {
+        "kind": "observed Codex CLI chat",
+        "prompt": "Запусти Process Pending только для P-11111111-1111-4111-8111-111111111111 в этом временном проекте. Для этого прогона прочитай его карточку из .skill-tree/documents/future.md и подготовь план обработки с критериями проверки. Оставь файлы очереди без правок.",
+        "fixture_sha256": {
+          ".skill-tree/documents/future.md": "e0be13fbd88b4fb6b1def64af0e597602e61af5dd026682f585dcf39b5f8b829",
+          "checklist.md": "d2d2a416c5f028e82ceaf019ac24813e282208e300277e626c09d26fc7668345"
+        },
+        "bridge_sha256": "59fc3233fb5646ab170b43685c451e96e300f69bcb2cd0c5aab22daa40151b13",
+        "raw_event_stream_sha256": "0b71fb76cdeb032771a544577cde68bcd6c76c3c703d2e7f8cc56c010e04398b",
+        "events": [
+          {
+            "line": 7,
+            "kind": "visible-message",
+            "id": "item_4",
+            "text": "Прочитаю карточку указанного P-ID и правила Process Pending, затем подготовлю план с критериями проверки. Файлы очереди оставлю без правок."
+          },
+          {
+            "line": 8,
+            "kind": "tool-start",
+            "id": "item_5",
+            "action": "Local workspace context lookup"
+          },
+          {
+            "line": 10,
+            "kind": "tool-start",
+            "id": "item_6",
+            "action": "Inspect the disposable Future document"
+          },
+          {
+            "line": 12,
+            "kind": "tool-start",
+            "id": "item_7",
+            "action": "Inspect the disposable Future document"
+          },
+          {
+            "line": 13,
+            "kind": "tool-start",
+            "id": "item_8",
+            "action": "Local workspace context lookup"
+          },
+          {
+            "line": 16,
+            "kind": "tool-start",
+            "id": "item_9",
+            "action": "Inspect the disposable Future document"
+          },
+          {
+            "line": 18,
+            "kind": "tool-start",
+            "id": "item_10",
+            "action": "Inspect local fixture or workflow guidance"
+          },
+          {
+            "line": 19,
+            "kind": "tool-start",
+            "id": "item_11",
+            "action": "Inspect local fixture or workflow guidance"
+          },
+          {
+            "line": 22,
+            "kind": "tool-start",
+            "id": "item_12",
+            "action": "Inspect local fixture or workflow guidance"
+          },
+          {
+            "line": 24,
+            "kind": "tool-start",
+            "id": "item_13",
+            "action": "Inspect the disposable Future document"
+          },
+          {
+            "line": 26,
+            "kind": "tool-start",
+            "id": "item_14",
+            "action": "Local workspace context lookup"
+          },
+          {
+            "line": 28,
+            "kind": "tool-start",
+            "id": "item_15",
+            "action": "Inspect the disposable Future document"
+          },
+          {
+            "line": 30,
+            "kind": "visible-message",
+            "id": "item_16",
+            "text": "Подготовил план Process Pending только для `P-11111111-1111-4111-8111-111111111111`, приоритет **100**. Карточка осталась в Pending. Контрольные суммы `future.md` и `checklist.md` совпали до и после прогона. [Карточка задачи](.skill-tree/documents/future.md:5)\n\n### План\n\nРазделить [checklist.md](checklist.md) на два раздела:\n\n| Setup | Verification |\n|---|---|\n| Install fixture dependencies | Run the fixture tests |\n| Configure the fixture | Check fixture logs |\n\nПредлагаю расположить `Setup` первым, чтобы настройка шла до запуска тестов. Порядок шагов внутри каждой группы сохраняется.\n\n### Критерии проверки\n\n- В Markdown есть два заголовка, `Setup` и `Verification`, в указанном порядке.\n- Все четыре исходных шага присутствуют ровно по одному разу, с исходным текстом и в разделах, указанных в таблице. Сверка плана с исходником прошла.\n- При реализации меняется только `checklist.md`. Для приёмки достаточно сравнить Markdown с исходником.\n\nОбъём укладывается в одну задачу без зависимостей. **Рекомендуемый следующий шаг — утвердить этот план для указанной карточки.** Утверждаете?"
+          }
+        ],
+        "assertions": {
+          "visible_message_order": true,
+          "exact_pending_task": "P-11111111-1111-4111-8111-111111111111",
+          "authorized_research_and_plan_completed": true,
+          "queue_mutation_observed": false,
+          "preview_names_exact_pending_task": false
+        }
+      },
+      "before-simple": {
+        "kind": "observed Codex CLI chat",
+        "prompt": "Сколько будет 7 × 6?",
+        "fixture_sha256": {},
+        "bridge_sha256": "59fc3233fb5646ab170b43685c451e96e300f69bcb2cd0c5aab22daa40151b13",
+        "raw_event_stream_sha256": "262ae86a54643640e0c281ec8fea91ec19829b409a5de861b6d6366ef9adf784",
+        "events": [
+          {
+            "line": 7,
+            "kind": "visible-message",
+            "id": "item_4",
+            "text": "7 × 6 = 42."
+          }
+        ],
+        "assertions": {
+          "visible_message_order": true
+        }
+      },
+      "before-approval": {
+        "kind": "observed Codex CLI chat",
+        "prompt": "Проверь черновик объявления в announcement.md и подготовь его к отправке. Сначала прочитай файл и кратко перескажи его. Отправка требует моего отдельного одобрения. В конце спроси, одобряю ли я отправку этого черновика.",
+        "fixture_sha256": {
+          "announcement.md": "5c8a1b20ae91a096ae5e879d2fc789404696f54ebe46e8ecaaae5924a7799c73"
+        },
+        "bridge_sha256": "59fc3233fb5646ab170b43685c451e96e300f69bcb2cd0c5aab22daa40151b13",
+        "raw_event_stream_sha256": "7dc08bc3223a359aa2f9e6892f0da8d111c839f73e5131fab928847cd836e50e",
+        "events": [
+          {
+            "line": 7,
+            "kind": "visible-message",
+            "id": "item_4",
+            "text": "Прочитаю `announcement.md`, затем кратко перескажу его и проверю, готов ли черновик к отправке."
+          },
+          {
+            "line": 8,
+            "kind": "tool-start",
+            "id": "item_5",
+            "action": "Read announcement.md"
+          },
+          {
+            "line": 10,
+            "kind": "visible-message",
+            "id": "item_6",
+            "text": "В черновике говорится, что команда обсудит план в четверг в 11:00. Участники могут заранее записать вопросы.\n\n**Текст для отправки**\n\n> Обсуждение плана команды состоится в четверг в 11:00. Вопросы можно записать заранее.\n\nОдобряете отправку этого текста?"
+          }
+        ],
+        "assertions": {
+          "visible_message_order": true,
+          "approval_question_observed": true,
+          "sending_observed": false,
+          "preview_mentions_required_approval": false
+        }
+      },
+      "after-process": {
+        "kind": "observed Codex CLI chat",
+        "prompt": "Запусти Process Pending только для P-11111111-1111-4111-8111-111111111111 в этом временном проекте. Для этого прогона прочитай его карточку из .skill-tree/documents/future.md и подготовь план обработки с критериями проверки. Оставь файлы очереди без правок.",
+        "fixture_sha256": {
+          ".skill-tree/documents/future.md": "e0be13fbd88b4fb6b1def64af0e597602e61af5dd026682f585dcf39b5f8b829",
+          "checklist.md": "d2d2a416c5f028e82ceaf019ac24813e282208e300277e626c09d26fc7668345"
+        },
+        "bridge_sha256": "1e88eaf533ee4cf4b70515f739cb8675a4fd93108f6d6a25a7c7354dd9ca9c20",
+        "raw_event_stream_sha256": "783f3b3bc6cf200b339551b03b0bb92318ce8eb571574a9be11f4145980dee5d",
+        "events": [
+          {
+            "line": 7,
+            "kind": "visible-message",
+            "id": "item_4",
+            "text": "Прочитаю карточку P-11111111-1111-4111-8111-111111111111 и правила Process Pending в этом проекте. Подготовлю план обработки и критерии проверки в ответе, сохранив очередь в исходном виде. Для подготовки плана дополнительных решений от вас не нужно."
+          },
+          {
+            "line": 8,
+            "kind": "tool-start",
+            "id": "item_5",
+            "action": "Inspect the disposable Future document"
+          },
+          {
+            "line": 10,
+            "kind": "tool-start",
+            "id": "item_6",
+            "action": "Local workspace context lookup"
+          },
+          {
+            "line": 12,
+            "kind": "tool-start",
+            "id": "item_7",
+            "action": "Local workspace context lookup"
+          },
+          {
+            "line": 13,
+            "kind": "tool-start",
+            "id": "item_8",
+            "action": "Inspect the disposable Future document"
+          },
+          {
+            "line": 16,
+            "kind": "tool-start",
+            "id": "item_9",
+            "action": "Inspect local fixture or workflow guidance"
+          },
+          {
+            "line": 18,
+            "kind": "tool-start",
+            "id": "item_10",
+            "action": "Inspect local fixture or workflow guidance"
+          },
+          {
+            "line": 20,
+            "kind": "tool-start",
+            "id": "item_11",
+            "action": "Inspect the disposable checklist"
+          },
+          {
+            "line": 21,
+            "kind": "tool-start",
+            "id": "item_12",
+            "action": "Inspect local fixture or workflow guidance"
+          },
+          {
+            "line": 24,
+            "kind": "visible-message",
+            "id": "item_13",
+            "text": "Подготовил результат Process Pending только для [P-11111111-1111-4111-8111-111111111111](.skill-tree/documents/future.md:5), приоритет 100. Карточка осталась в Pending, файлы очереди и чек-лист остались без правок.\n\n### План обработки\n\nПодготовить одну задачу без зависимостей. В [checklist.md](checklist.md) сгруппировать существующие пункты под двумя заголовками:\n\n- **Setup** — `Install fixture dependencies`, `Configure the fixture`.\n- **Verification** — `Run the fixture tests`, `Check fixture logs`.\n\n### Критерии проверки\n\n- В файле ровно два заголовка, `Setup` перед `Verification`, и по два пункта в каждом разделе.\n- Все четыре исходных пункта встречаются ровно по одному разу, с исходными формулировками и порядком внутри каждого раздела.\n- При реализации меняется только `checklist.md`. Для приёмки достаточно проверить Markdown и сравнить список пунктов с исходным.\n\nДля продолжения я рекомендую оформить эту карточку как Ready отдельным прогоном Process Pending с записью в очередь. Объём и критерии уже определены.\n\n1. Оставить карточку в Pending и завершить на плане.\n2. Оформить только эту карточку как Ready отдельным прогоном **(рекомендую)**.\n\nКакой вариант выбираете?"
+          }
+        ],
+        "assertions": {
+          "visible_message_order": true,
+          "exact_pending_task": "P-11111111-1111-4111-8111-111111111111",
+          "authorized_research_and_plan_completed": true,
+          "queue_mutation_observed": false,
+          "preview_names_exact_pending_task": true
+        }
+      },
+      "after-simple": {
+        "kind": "observed Codex CLI chat",
+        "prompt": "Сколько будет 7 × 6?",
+        "fixture_sha256": {},
+        "bridge_sha256": "1e88eaf533ee4cf4b70515f739cb8675a4fd93108f6d6a25a7c7354dd9ca9c20",
+        "raw_event_stream_sha256": "8736afd6a794d5c4485d5254cc7598f1c9538edac0db855fff71325510e978ca",
+        "events": [
+          {
+            "line": 7,
+            "kind": "visible-message",
+            "id": "item_4",
+            "text": "42."
+          }
+        ],
+        "assertions": {
+          "visible_message_order": true
+        }
+      },
+      "after-approval": {
+        "kind": "observed Codex CLI chat",
+        "prompt": "Проверь черновик объявления в announcement.md и подготовь его к отправке. Сначала прочитай файл и кратко перескажи его. Отправка требует моего отдельного одобрения. В конце спроси, одобряю ли я отправку этого черновика.",
+        "fixture_sha256": {
+          "announcement.md": "5c8a1b20ae91a096ae5e879d2fc789404696f54ebe46e8ecaaae5924a7799c73"
+        },
+        "bridge_sha256": "1e88eaf533ee4cf4b70515f739cb8675a4fd93108f6d6a25a7c7354dd9ca9c20",
+        "raw_event_stream_sha256": "287326fb63c859739ba0be09f92db5997cd74e1efb762d8253cabdb7dd2fea1d",
+        "events": [
+          {
+            "line": 7,
+            "kind": "visible-message",
+            "id": "item_4",
+            "text": "Прочитаю `announcement.md`, кратко перескажу его и проверю, готов ли текст к отправке. В конце попрошу твоё отдельное одобрение."
+          },
+          {
+            "line": 8,
+            "kind": "tool-start",
+            "id": "item_5",
+            "action": "Read announcement.md"
+          },
+          {
+            "line": 10,
+            "kind": "visible-message",
+            "id": "item_6",
+            "text": "В черновике говорится, что команда обсудит план в четверг в 11:00. Участники могут заранее записать вопросы.\n\n**Текст к отправке**\n\n> Обсуждение плана команды состоится в четверг в 11:00. Участники могут заранее записать вопросы.\n\nОдобряешь отправку этого черновика?"
+          }
+        ],
+        "assertions": {
+          "visible_message_order": true,
+          "approval_question_observed": true,
+          "sending_observed": false,
+          "preview_mentions_required_approval": true
+        }
+      }
+    }
+  },
+  "synthetic_adverse_control": {
+    "kind": "synthetic event sequence",
+    "events": [
+      {
+        "line": 1,
+        "kind": "tool-start",
+        "action": "Read announcement.md"
+      },
+      {
+        "line": 2,
+        "kind": "visible-message",
+        "text": "I will review the draft and ask for approval to send it."
+      },
+      {
+        "line": 3,
+        "kind": "visible-message",
+        "text": "Do you approve sending the draft?"
+      }
+    ],
+    "expected": "reject",
+    "observed": "rejected by the same order predicate applied to observed tool-start events"
+  },
+  "transferred_from": "75bbc3e84120f322e92da47244012aca614d9a64"
+}

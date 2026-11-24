@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "7ed97c077a64c2b8f39dc8f6524e2d75c835007174706b33d53b3f42a9f5a34c",
+  "identity": "3b17ff03059caf1f026d53a2e20af9817c1226a1bb1df55fc44b4f12d00c5cbb",
   "operation": "skill-tree-game-design-balance",
   "operations": {
     "skill-tree-3d": {
@@ -3291,7 +3291,7 @@
   "owned_resources": {
     "SKILL.md": "1c687093b1b4171a0bea51eb0b570753708cf427b5aa43ffb069bfd9c00fb28f",
     "agents/openai.yaml": "d33aac59902b39b3d9371b03af92aa40cb4c6d03ca061287632784e981846dba",
-    "references/decision-governance.md": "68506301b32a58cbbcfc03fdeb62fed6875694f1f9b724749c7f79c26da0de80",
+    "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/game-design-balance-methods.md": "22544cebf9a6001faf5ed54b19523542fb02b725ca97b6ad52e331d8d44d1e8d",
     "references/game-design-balance-study.md": "8d28a473095d5ec4e457c5ea0bb61adaf43c0be8c2f0dbb9eb8aaf93b65cdc77",

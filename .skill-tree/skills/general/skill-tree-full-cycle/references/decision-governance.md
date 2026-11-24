@@ -10,6 +10,12 @@ The DG ledger owns question, authority, actual origin, original attempts and cur
 
 ## Visible owner handoff
 
+For a substantial workflow, the opening preview is a visible progress message. Send the preview before the first task-specific tool call and proceed with the already authorized steps. Use the existing handoff at any required decision or approval boundary.
+
+- Explicitly scoped processing can open with “I’ll research the selected Pending item, define its acceptance checks and return the prioritized task. I’ll stop after processing for your next selection.” Then begin the authorized processing.
+- A simple question about a workflow rule can receive the direct answer in the first reply.
+- A workflow with an approval boundary can open with “I’ll review the draft and summarize the changes. Once the draft is ready, I’ll ask you to approve publication.” Do the authorized review, then ask about the exact draft before publication.
+
 When execution stops, waits or finishes, state what is complete, what remains, why progress stopped and who owns the next step. When owner input is required, end the ordinary reply with a clearly labeled request. Name the exact action or question and state what happens after the answer or action. Put each currently answerable independent question on a separate line. Defer dependent questions until the necessary facts are available. Include the complete request in the reply without a separate question popup, selection card or modal. Mandatory host authorization controls remain binding.
 
 For each decision with multiple viable options, list all viable options and explain the relevant consequences and tradeoffs. Evaluate the options against the current goal, constraints and evidence. Mark one option inline as recommended in the reply language, with `(рекомендую)` in Russian. After the list, explain why the recommended option fits best and disclose any uncertainty or assumption that could change the recommendation. End with the direct question. The recommendation grants no approval.

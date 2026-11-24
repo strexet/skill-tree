@@ -6081,7 +6081,7 @@
     ".skill-tree/common/references/3d-unity-roles.md": "a2dfd76eab6f4d4565007cfcdc6009b4aa3583642cede908d12f6c7cbf04fd75",
     ".skill-tree/common/references/3d-workflow.md": "f4735efd5e40c11e5a9ace610468f7a3e158b26fca752f99cd2f8ac4394a6e77",
     ".skill-tree/common/references/3d-workshop-roles.md": "ed3cd2f786a61bb9a76ff4dfa2141ded4d43852c11ab8dfe6d11afe95bb8c8af",
-    ".skill-tree/common/references/decision-governance.md": "68506301b32a58cbbcfc03fdeb62fed6875694f1f9b724749c7f79c26da0de80",
+    ".skill-tree/common/references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     ".skill-tree/common/references/development-practices.md": "352a45b093f2c53b7b08aef045a098880af74c6add6fb79f95017a52fd0e0780",
     ".skill-tree/common/references/director-workflow.md": "d9445bd199356a9c3d3b7f983c548e0a7665d85a1521146717b6c37f5568668d",
     ".skill-tree/common/references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
@@ -6300,7 +6300,7 @@
     ".skill-tree/scripts/run-tests.py": "00c61ad36efcc208865692e5822f38dd4bbbc036d058bc7e55bc81c3851b711e",
     ".skill-tree/scripts/sync-skill-references.py": "eafdc147fd80e69bbf7dfa3ecb3cb0004890dc02ebd5af07286228017298a9f4",
     ".skill-tree/scripts/validate-skill-repository.py": "5cd81850dfa3f52ca92abf69f5110c497491e9c07b0f039451a9df7a2b3b8faa",
-    ".skill-tree/src/init-rules/skill-tree-skills.md": "e2bf606eb37d5f6ec41c443cff5c8212839da036f6ab68aa3759400da1fa9c6a",
+    ".skill-tree/src/init-rules/skill-tree-skills.md": "602dee0d8859904922a76a338e3452a1dc86e597dba0d00b006bf31ff9e795c6",
     ".skill-tree/templates/invariants.json": "ee0c2c5445e7408cc15fd4aed231ff7d0c38a07d063061f75bfeea3da8971903",
     ".skill-tree/templates/operations.json": "dfcc3985ac3f0dc0ae0fbb54fca1e54e08f2edbd6bab7825ab50359154698cc8"
   },

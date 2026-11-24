@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "5c21ec85d72fc227280032604293678ab3e75a66896b444ba51a5ed24609b8e4",
+  "identity": "9ace4e474508812b9f4fcf12fabe00df8aeaa083fde8929fc4d78e0d48389ef1",
   "operation": "skill-tree-game-design-mechanics",
   "operations": {
     "skill-tree-3d": {
@@ -3291,7 +3291,7 @@
   "owned_resources": {
     "SKILL.md": "11f8cb9428b66e720fdf4808879178bb90442116ce36afef6a21d77c61ab9a9e",
     "agents/openai.yaml": "b6c99258cdfa573134eb1858e269a4587eab0f41fa965d8eb53a6c732012d7de",
-    "references/decision-governance.md": "68506301b32a58cbbcfc03fdeb62fed6875694f1f9b724749c7f79c26da0de80",
+    "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/game-design-atlas.md": "453a6d8ffd8f66a4233677c22dba3efae509e216a744050dcc316629cd934401",
     "references/game-design-disciplines.md": "32e10ab3012d47f34302e79a7fa25ff3f1811b88b87b4b834e8fe6ea2c5f6a1b",

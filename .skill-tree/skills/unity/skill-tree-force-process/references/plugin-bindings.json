@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "e7c090561cf566c2d30122b3e83026ef4d588688b833f32d27b0f545e5039b84",
+  "identity": "ba8ac6fe50b4ce02630400954faedacac9b7d4e890a6734110f75221cf0cc8e3",
   "operation": "skill-tree-force-process",
   "operations": {
     "skill-tree-3d": {
@@ -3291,7 +3291,7 @@
   "owned_resources": {
     "SKILL.md": "f55a93e1a2a8651d19988a8ba2db05be4e49194aefbc2a88a64c99cf73a3c390",
     "agents/openai.yaml": "9e170bbfe0b19a429f39182a7b1f5c284fb2401c5a5e5ec2158dfe1f47b6b797",
-    "references/decision-governance.md": "68506301b32a58cbbcfc03fdeb62fed6875694f1f9b724749c7f79c26da0de80",
+    "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/force-process.md": "271c570df092e8289e58b193a6a117e464dcecf56d2870e0fdc3c72f008ed602",
     "references/future-workflow.md": "3a6bc83660773c23af11cf00eacb90ed618db701d464fd7fcd304d5d90fca50b",
