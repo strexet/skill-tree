@@ -4913,19 +4913,76 @@ def clarification_mutate(store,command,payload):
         return clarification_write(store,record,writes)
 
 
+SHARED_WORKSPACE_ROUTING = 2
+
+
+def guard_shared_project(store):
+    """Require an explicit direct route within a registered shared workspace."""
+    homes = [store.source_root / '.skill-tree/.director', store.source_root / '.skill-tree-director']
+    retained = []
+    for home in homes:
+        if home.is_symlink() or home.parent.is_symlink():
+            raise WorkflowError('Resolve the unsafe shared Director storage path before selecting a queue')
+        marker = home / '.director-relocation.json'
+        if marker.exists() or marker.is_symlink():
+            raise WorkflowError('Finish the retained Director storage migration before selecting a queue')
+        descriptor = home / 'workspace.json'
+        if descriptor.is_symlink():
+            raise WorkflowError('Resolve the unsafe shared Director workspace descriptor')
+        if descriptor.is_file() or binding_path(home, '.skill-tree/director/registry.json').is_file():
+            retained.append(home)
+    if not retained:
+        return
+    if len(retained) != 1:
+        raise WorkflowError('Resolve conflicting shared Director storage locations before selecting a queue')
+    home, = retained
+    descriptor = home / 'workspace.json'
+    workspace = json.loads(descriptor.read_bytes()) if descriptor.is_file() else None
+    valid_descriptor = (isinstance(workspace, dict) and workspace.get('schema') == 1
+                        and workspace.get('kind') == 'director-workspace' and isinstance(workspace.get('providers'), list))
+    if valid_descriptor and not workspace['providers']:
+        return
+
+    def read(relative):
+        path = binding_path(home, relative)
+        return json.loads(path.read_bytes()) if path.is_file() else {}
+
+    registry = read('.skill-tree/director/registry.json')
+    if not registry:
+        return
+    bindings = read('.skill-tree/artifacts/director/local-bindings.json')
+    if registry.get('director_id') != bindings.get('director_id'):
+        raise WorkflowError('Restore the shared Director project binding or explicitly select --direct-project')
+    areas = [area for area in registry['areas'].values()
+             if area['role'] != 'source-maintenance' and area['scope'] == '.'
+             and bindings['queues'].get(area['queue_id'], {}).get('root') == str(store.root)]
+    if areas:
+        if not valid_descriptor:
+            raise WorkflowError('Repair the registered shared Director descriptor or explicitly select --direct-project')
+        profile = read('.skill-tree/installation/profile.json')
+        if profile.get('flavor') != 'director' or profile.get('project_root') != str(home):
+            raise WorkflowError('Repair the registered shared Director profile or explicitly select --direct-project')
+        choices = ', '.join(f"{area['id']} ({area['queue_id']})" for area in sorted(areas, key=lambda item: item['id']))
+        raise WorkflowError(
+            f'Director owns the default route for this shared folder: {choices}. '
+            'Invoke skill-tree-director and preview project-route for the selected operation. '
+            'Use --direct-project only for an explicitly requested direct Core operation.')
+
+
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     parser.add_argument('--standalone',action='store_true',help='Use the canonical queue and selected checkout without attaching to a registered controller.')
     parser.add_argument('--preview',type=Path,help='Retained Force Process Preview JSON')
     parser.add_argument('--receipt',type=Path,help='Original Process Pending receipt JSON')
     parser.add_argument('--expected-preview-sha256',help='SHA-256 of the Preview accepted during plan review')
+    parser.add_argument('--direct-project',action='store_true',help='Use the product queue when the owner explicitly selects direct Core routing.')
     args=parser.parse_args(argv)
     try:
         cmd=args.command
         if cmd != 'force-process-verify' and (args.preview or args.receipt or args.expected_preview_sha256):
             raise WorkflowError('Only Force Process Verify accepts a Preview and receipt input')
         if cmd in FORCE_PROCESS_READS:
-            if args.apply or args.run_id or args.standalone or args.id or args.names is not None or args.expected_source_hash:
+            if args.apply or args.run_id or args.standalone or args.direct_project or args.id or args.names is not None or args.expected_source_hash:
                 raise WorkflowError('Force Process evidence inspection uses the selected proposal without mutation or controller flags')
             store = Store(args.root, allow_unselected=True, neutral=True)
             print(dump(force_process_evidence(store, cmd, args.input, args.preview, args.receipt, args.expected_preview_sha256)), end='')
@@ -4939,6 +4996,14 @@ def main(argv=None):
             if args.run_id or args.names is not None or args.apply or (args.id and cmd!='start'):
                 raise WorkflowError('Directed dispatch cannot infer a child or select another run')
             store=Store(args.root,allow_unselected=True,neutral=True)
+        routed_commands={'intake','process','start','begin'}
+        if args.direct_project and cmd not in routed_commands:
+            raise WorkflowError('Direct project routing applies to intake, process, start or begin')
+        directed_request=cmd in {'intake','process','start'} and 'director_dispatch' in payload
+        if args.direct_project and directed_request:
+            raise WorkflowError('Direct project routing conflicts with a Director dispatch envelope')
+        if cmd in routed_commands and not args.direct_project and not directed_request:
+            guard_shared_project(store)
         if cmd in {'director-dispatch-read','director-dispatch'}:
             if args.run_id or args.id or args.names is not None or args.apply:
                 raise WorkflowError('Director dispatch requires exact canonical child input')
