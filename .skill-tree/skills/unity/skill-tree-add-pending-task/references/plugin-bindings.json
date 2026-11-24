@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "68afea5bfab812170eda5e59e1560dda784a0b00ff729ae2e11437f802287867",
+  "identity": "072efa63ef99b434b6bf0f07b819ed20cd6895eb7451243000403250b8cea129",
   "operation": "skill-tree-add-pending-task",
   "operations": {
     "skill-tree-3d": {
@@ -3289,7 +3289,7 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "09c83d1e14273609bc45367efd8cc0abb5f94a8a8b559452e75ed4fdb924c805",
+    "SKILL.md": "980bfe63d56d012aca978862fee42801761c0d2fa4c7aec29440628e7b4c2506",
     "agents/openai.yaml": "daa7d7bef4a89a1102fc39f767666c4643b97ebec0eaa102860a1b7e3324f8aa",
     "references/decision-governance.md": "68506301b32a58cbbcfc03fdeb62fed6875694f1f9b724749c7f79c26da0de80",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
@@ -3320,7 +3320,7 @@
     "scripts/run-workspaces.py": "9fc1f5c40b71161e45f6008b9a29fb5e39bcbe571fcc0b0bd79f83c439b1a15b",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "9e1008a7b9524e684725a1aed43651b9120a2a3a71044aa997eb2fe6e6050547"
+    "scripts/workflow-state.py": "53ed2e95fa4795d0eb82d53181729b2df583f4fe50be37b5d4380d069a527199"
   },
   "packages": {},
   "parameter_defaults": {},

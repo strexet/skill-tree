@@ -20,8 +20,8 @@ class MaintenanceCheckoutTests(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name).resolve()
-        self.service = self.root / '.skill-tree-director'
-        self.service.mkdir()
+        self.service = self.root / '.skill-tree/.director'
+        self.service.mkdir(parents=True)
         self.seed = self.root / 'trusted'
         self.seed.mkdir()
         self.git(self.seed, 'init', '-b', 'develop')

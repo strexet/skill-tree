@@ -21,6 +21,8 @@ RUN_COMMANDS = {'run-start', 'run-status', 'run-dispatch', 'run-pause', 'run-res
 RUN_PATH = re.compile(r'\.skill-tree/director/runs/dr-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}\.json\Z')
 REGISTRY = '.skill-tree/director/registry.json'
 BINDINGS = '.skill-tree/artifacts/director/local-bindings.json'
+DIRECTOR_HOME = Path('.skill-tree/.director')
+LEGACY_DIRECTOR_HOME = Path('.skill-tree-director')
 OBJECTIVE_PATH = re.compile(r'\.skill-tree/director/objectives/ob-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}\.json\Z')
 DISPATCH_INTENT_PATH = re.compile(r'\.skill-tree/director/dispatch-intents/[a-f0-9]{64}\.json\Z')
 PLAN_COMMANDS = {'plan-preview', 'plan-freeze', 'plan-context', 'plan-impact', 'context-search'}
@@ -260,20 +262,29 @@ def _area(request):
     }, owner
 
 
+def director_workspace(root):
+    if root.name == DIRECTOR_HOME.name and root.parent.name == DIRECTOR_HOME.parent.name:
+        return root.parent.parent
+    if root.name == LEGACY_DIRECTOR_HOME.name:
+        return root.parent
+    return None
+
+
 def _validate_scope_paths(areas, observed, service=None):
     _require(sum(area['role'] == 'source-maintenance' for area in areas) == 1,
              'Register one canonical Skill Tree source-maintenance area')
+    workspace = director_workspace(service) if service and (service / 'workspace.json').is_file() else None
     for index, (first, a) in enumerate(observed):
         for second, b in observed[index + 1:]:
             both_write = bool(WRITE_EFFECTS.intersection(first['allowed_effects'])
                               and WRITE_EFFECTS.intersection(second['allowed_effects']))
-            if service and service.name == '.skill-tree-director' and (service / 'workspace.json').is_file():
+            if workspace is not None:
                 # A colocated product may contain independent registered Git roots.
                 # Write-path admission excludes those roots from the parent's scope.
                 if (first['queue_id'] != second['queue_id'] and first['repo_id'] != second['repo_id']
                         and first['scope'] == second['scope'] == '.'
-                        and (a == service.parent and b != a and b.is_relative_to(a)
-                             or b == service.parent and a != b and a.is_relative_to(b))):
+                        and (a == workspace and b != a and b.is_relative_to(a)
+                             or b == workspace and a != b and a.is_relative_to(b))):
                     continue
             _require(a != b and not (both_write and (a.is_relative_to(b) or b.is_relative_to(a))),
                      f'Areas have overlapping scopes: {first["id"]}, {second["id"]}')
@@ -785,14 +796,21 @@ class DirectorRegistry:
     def status(self, payload=None):
         """Project current areas and explicit assignment references without taking any writer lock."""
         payload = {} if payload is None else payload
-        _object(payload, set(), {'assignments'})
+        _object(payload, set(), {'assignments', 'project_work', 'area_ids'})
         requests = payload.get('assignments', [])
         _require(isinstance(requests, list), 'Assignments require an exact list')
         registry, bindings, _ = self._load()
         _require(registry is not None, 'Register Director areas before requesting status')
-        owners = (bindings or {}).get('queues', {})
-        queues = {queue_id: _status_queue(queue_id, binding) for queue_id, binding in owners.items()}
         areas = registry['areas']
+        owners = (bindings or {}).get('queues', {})
+        if 'area_ids' in payload:
+            scope = _tokens(payload['area_ids'], 'Status area IDs')
+            _require(all(name in areas and 'status' in areas[name]['allowed_effects'] for name in scope),
+                     'Select exact status-enabled areas')
+            areas = {name: areas[name] for name in scope}
+            queue_ids = {area['queue_id'] for area in areas.values()}
+            owners = {queue_id: binding for queue_id, binding in owners.items() if queue_id in queue_ids}
+        queues = {queue_id: _status_queue(queue_id, binding) for queue_id, binding in owners.items()}
         result_areas = [_status_area(area, queues.get(area['queue_id']))
                         for area in sorted(areas.values(), key=lambda entry: entry['id'])]
         area_states = {entry['id']: entry for entry in result_areas}
@@ -838,9 +856,119 @@ class DirectorRegistry:
         return {
             'schema': 1, 'director_id': registry['director_id'], 'registry_revision': registry['revision'],
             'areas': result_areas, 'assignments': projections, 'resource_holders': resources,
+            'project_work': self._project_work({**registry, 'areas':areas}, queues, payload.get('project_work')),
             'available_independent': [entry['id'] for entry in projections
                                       if entry['state'] == 'ready' and not entry['prerequisites']],
         }
+
+    def _project_work(self, registry, queues, selection):
+        whole = {area['id']: area for area in registry['areas'].values()
+                 if area['scope'] == '.' and area['role'] != 'source-maintenance'
+                 and 'status' in area['allowed_effects']}
+        selected_run = None
+        if selection is not None:
+            _object(selection, {'area_id'}, {'run_id'})
+            _require(_token(selection['area_id']) and selection['area_id'] in whole,
+                     'Select an exact status-enabled whole project')
+            selected_run = selection.get('run_id')
+            _require(selected_run is None or WF.valid_id(selected_run, 'WR'), 'Select an exact project run')
+            whole = {selection['area_id']: whole[selection['area_id']]}
+        projected, directed = [], {}
+        for queue_id in sorted({area['queue_id'] for area in whole.values()}):
+            queue = queues.get(queue_id, {'status':'unbound'})
+            area_ids = sorted(key for key, area in whole.items() if area['queue_id'] == queue_id)
+            row = {'queue_id':queue_id, 'area_ids':area_ids, 'state':queue['status'],
+                   'runs':[], 'standalone_outcomes':[]}
+            projected.append(row)
+            if queue['status'] != 'ready':
+                continue
+            runs = queue['state']['run_registry']['runs']
+            row['total_runs'] = len(runs)
+            if selected_run:
+                _require(selected_run in runs, 'The selected run is outside the project queue')
+                selected = [runs[selected_run]]
+            else:
+                selected = sorted(runs.values(), key=lambda item: (item.get('started_at', ''), item['id']),
+                                  reverse=True)[:20]
+                tasks = queue['state'].get('tasks', [])
+                row['tasks'] = [
+                    {key: task[key] for key in ('id', 'title', 'queue', 'status', 'priority', 'depends_on')}
+                    for task in tasks[:50]
+                ]
+                row['total_tasks'] = len(tasks)
+            for run in selected:
+                owned_dispatch = bool(run.get('dispatch_workspace_sha256') or
+                                      (run.get('workspace') or {}).get('dispatch_owner_token'))
+                outcomes = [{'task_id':task, 'outcome_id':receipt['id'], 'disposition':receipt['disposition']}
+                            for task, receipt in sorted(queue['outcomes'].items())
+                            if receipt.get('run_id') == run['id']
+                            and run.get('completion_refs', {}).get(task) == receipt['id']]
+                entry = {'run_id':run['id'], 'phase':run['phase'], 'task_ids':run['admitted_task_ids'],
+                         'route':'director-dispatch' if owned_dispatch else 'direct-project',
+                         'audit_coverage':'director-start-unverified' if owned_dispatch else 'outside-director-assignment',
+                         'outcomes':outcomes}
+                if owned_dispatch:
+                    directed[(queue_id, run['id'])] = (queue['root'], run, entry)
+                elif any(item['disposition'] == 'completed' for item in outcomes):
+                    entry['adoption'] = {'command':'adopt-preview', 'requires':'exact-frozen-assignment-and-outcome'}
+                row['runs'].append(entry)
+            if selected_run is None:
+                standalone = [
+                    {'task_id':record['task_id'], 'outcome_id':record['id'], 'run_id':None,
+                     'disposition':record['disposition'], 'route':'direct-project',
+                     'audit_coverage':'outside-director-assignment'}
+                    for record in list(queue['outcomes'].values())[::-1] if record.get('run_id') is None
+                ]
+                row['standalone_outcomes'] = standalone[:20]
+                row['total_standalone_outcomes'] = len(standalone)
+        if directed:
+            self._project_start_links(registry, directed)
+        return projected
+
+    def _project_start_links(self, registry, directed):
+        plans = _plan_helper(self)
+        dispatch = WF.director_dispatch_helper()
+        directory = '.skill-tree/director/runs'
+        run_ids = {run_id for _, run_id in directed}
+        unavailable = (ValueError, OSError, KeyError, TypeError, AttributeError, subprocess.TimeoutExpired)
+        for path in sorted(_safe_path(self.root, directory).glob('dr-*.json')):
+            try:
+                parent, _ = _read(self.root, f'{directory}/{path.name}')
+                parent_id = parent['director_run_id']
+                if (parent['schema'] != 1 or not WF.valid_id(parent_id, 'DR') or path.stem != parent_id.lower()
+                        or parent['director_id'] != registry['director_id']
+                        or parent['phase'] not in {'running', 'paused', 'cancelled'}):
+                    continue
+                matching = [(name, start) for name, state in parent['assignments'].items()
+                            if (start := state['dispatches'].get('start', {})).get('status') == 'recorded'
+                            and start.get('result', {}).get('id') in run_ids]
+                if not matching:
+                    continue
+                plan, sha = plans.frozen({key:parent[key] for key in ('objective_id', 'plan_id', 'plan_revision')})
+                if sha != parent['plan_sha256']:
+                    continue
+                specs = {spec['id']:spec for spec in plan['assignments']}
+            except unavailable:
+                continue
+            for name, start in matching:
+                try:
+                    spec = specs[name]['area']
+                    queue_id = spec['queue_id']
+                    candidate = directed.get((queue_id, start['result']['id']))
+                    area = registry['areas'].get(spec['id'])
+                    if (not candidate or not area or 'audit' not in area['allowed_effects']
+                            or any(area[key] != spec[key] for key in ('queue_id','repo_id','scope'))):
+                        continue
+                    root, child, entry = candidate
+                    envelope = {'schema':1, 'director_id':parent['director_id'], 'queue_id':queue_id,
+                                'assignment_id':name, 'plan_sha256':sha}
+                    store = WF.Store(root, route_queue=False, neutral=True)
+                    observed = dispatch.observe(store, {'operation':'start', 'director_dispatch':envelope})
+                    if observed['observed_result'] == child and observed['receipt']['receipt_sha256'] == start['receipt_sha256']:
+                        entry.update(audit_coverage='director-assignment',
+                                     audit={'director_run_id':parent_id, 'assignment_id':name, 'run_id':child['id']})
+                except unavailable:
+                    continue
 
     def _status_assignment(self, area, area_status, queue, resources, request):
         source = area_status['source']
@@ -925,7 +1053,7 @@ class DirectorRegistry:
 
 def _dirty_paths(root):
     raw = WS.local_git(root, 'status', '--porcelain=v1', '-z', '--no-renames', '--untracked-files=all').stdout
-    return sorted({item[3:].decode('utf-8') for item in raw.split(b'\0') if item})
+    return sorted({item[3:].decode('utf-8').removesuffix('/') for item in raw.split(b'\0') if item})
 
 
 def _overlap(first, second):
@@ -1097,7 +1225,7 @@ def _run_helper(director, command, payload):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=sorted({'project-menu', 'project-init', 'project-preview', 'project-setup', 'setup-preview', 'setup-apply', 'setup-bootstrap', 'setup-status', 'rebind-preview', 'rebind', 'status', 'dispatch-intent'} | OBJECTIVE_COMMANDS | PLAN_COMMANDS | RUN_COMMANDS))
+    parser.add_argument('command', choices=sorted({'project-menu', 'project-route', 'project-storage-prepare', 'project-storage-verify', 'project-init', 'project-preview', 'project-setup', 'setup-preview', 'setup-apply', 'setup-bootstrap', 'setup-status', 'rebind-preview', 'rebind', 'status', 'dispatch-intent'} | OBJECTIVE_COMMANDS | PLAN_COMMANDS | RUN_COMMANDS))
     parser.add_argument('root', type=Path)
     parser.add_argument('--input', type=Path)
     args = parser.parse_args(argv)

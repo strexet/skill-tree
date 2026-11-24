@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "fb484672d7fe633101f69c3b6e372a8d7e89a543c2a0624d55b524dd974361e6",
+  "identity": "6f1b47c173061e2bc52d801ec4758f1cb33c96debedb9fb240b4ed76624089c8",
   "operation": "skill-tree-3d-texture",
   "operations": {
     "skill-tree-3d": {
@@ -3330,7 +3330,7 @@
     "scripts/run-workspaces.py": "9fc1f5c40b71161e45f6008b9a29fb5e39bcbe571fcc0b0bd79f83c439b1a15b",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "9e1008a7b9524e684725a1aed43651b9120a2a3a71044aa997eb2fe6e6050547"
+    "scripts/workflow-state.py": "53ed2e95fa4795d0eb82d53181729b2df583f4fe50be37b5d4380d069a527199"
   },
   "packages": {},
   "parameter_defaults": {},

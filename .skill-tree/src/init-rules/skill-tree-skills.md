@@ -3,3 +3,5 @@ Skill Tree navigation resides in .skill-tree/skill-tree.json. Applicable reposit
 For new local repository development, capture a Pending task, process the exact P-ID, and start Work Through Next on the resulting T-ID when the owner has selected implementation. Apply the same route to newly authorized work after a finished workflow. Use specialist skills inside the admitted task. Intake-only requests stop at Pending. An existing Ready task or retained run follows the selected implementation or resume operation.
 
 When no owner action is required and useful eligible work follows, offer one recommended next action with exact scope. A short direct reply may select the one action explicitly offered for continuation. Required answers, Manual acceptance and additional authorizations still require explicit owner input.
+
+In a registered shared folder with `.skill-tree/.director`, open the `skill-tree-director` workspace menu before selecting a project operation. Preview the receiving project, queue and task scope before queue effects. Use direct Core routing when the owner explicitly selects the direct project operation.
