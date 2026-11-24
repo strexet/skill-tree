@@ -10,7 +10,7 @@ Open a terminal in the workspace for Director. Run the launcher from the downloa
 /path/to/skill-tree/install.sh --only codex
 ```
 
-On Windows, run `C:\path\to\skill-tree\install.ps1 --only codex` in PowerShell. Use `--target <workspace>` to choose another workspace and `--dry-run` for a preview. The installer creates `.skill-tree-director/` and prints the installed host action. Invoke `skill-tree-director` from the workspace to connect an existing project, create one in a named subfolder or another directory, or continue later.
+On Windows, run `C:\path\to\skill-tree\install.ps1 --only codex` in PowerShell. Use `--target <workspace>` to choose another workspace and `--dry-run` for a preview. The installer creates `.skill-tree/.director/` and prints the installed host action. Invoke `skill-tree-director` from the workspace to connect an existing project, create one in a named subfolder or another directory, or continue later.
 
 For a direct individual profile:
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.1 (2026-11-24)
+
+### Fixed
+
+- Dedicated Director workspaces use `.skill-tree/.director`. The installer migrates verified legacy workspaces and preserves project queues, Git identities and linked worktree changes.
+- Shared project requests select Director by default. Status and audit keep the selected scope, and queue effects follow the selected Director assignment. The owner can explicitly select direct Core routing.
+- Workspace audit describes registered subprojects and requests an independent documentation check from each available authorized subproject. Director reports results and coverage gaps. Existing run audits retain exact selectors.
+- Project status includes queue tasks. Director diagnoses one selected check using the retained evidence and identifies scoped maintenance work for an installed workflow failure.
+
 ## 0.7.0 (2026-11-23)
 
 ### Added

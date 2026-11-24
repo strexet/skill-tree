@@ -207,7 +207,7 @@ class PlanSources:
                 area = self.registry['areas'][item['area']['id']]
                 for relative in item['write_paths']:
                     target = self.D._safe_path(self.area_root(area), relative)
-                    if director_root.name == '.skill-tree-director' and self.area_root(area) == director_root.parent:
+                    if self.area_root(area) == self.D.director_workspace(director_root):
                         protected = [director_root]
                         for other in self.registry['areas'].values():
                             if other['queue_id'] != area['queue_id']:

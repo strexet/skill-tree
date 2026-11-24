@@ -569,6 +569,23 @@ def _diagnostic_finding(worktree, queue, check_id, check, record, attempt):
         return None
 
 
+def _resource_evidence_needs_proof(worktree, check_id, record):
+    path = f'.skill-tree/artifacts/director/{check_id}.json'
+    refs = [ref for ref in record.get('evidence', []) if ref.get('path') == path]
+    if not refs:
+        return False
+    if worktree is None or len(refs) != 1:
+        return True
+    try:
+        proof, digest = _json(worktree, path, limit=65536)
+    except (OSError, ValueError):
+        return True
+    if digest != refs[0].get('sha256') or not refs[0].get('available'):
+        return True
+    return (isinstance(proof, dict) and proof.get('kind') == 'director-resource-check'
+            and proof.get('assertion_id') == check_id)
+
+
 def _classification(area, record, check_id):
     category = record.get('classification')
     if category in RUNTIME:
@@ -613,6 +630,31 @@ class DirectorAudit:
         observed = D.WF.director_dispatch_helper().observe(store, {'operation': 'start', 'director_dispatch': envelope})
         D._require(observed['receipt'] is not None and observed['receipt']['receipt_sha256'] == start['receipt_sha256']
                    and observed['observed_result'] == run, 'The canonical child start receipt differs from the Director record')
+        base = {'area_id':area['id'], 'queue_id':area['queue_id'], 'run_id':run_id,
+                'assignment_id':name, 'start_receipt_sha256':start['receipt_sha256']}
+        findings, observations, gaps, status, timeline = self._observe_run(
+            selection, area, root, store, child, run, base, unity_selection=unity_selection)
+        task_ids = set(run['admitted_task_ids'])
+        for question_id, question in sorted(state['questions'].items()):
+            if question.get('child_run_id') == run_id and question.get('phase') == 'waiting':
+                hold = run.get('director_question_hold') or {}
+                valid = D.WF.valid_id(question_id, 'DQ') and D.WF.valid_id(question['attempt_id'], 'DA')
+                D._require(valid and question['task_id'] in task_ids and question['start_receipt_sha256'] == start['receipt_sha256'],
+                           'Recorded owner wait is outside the selected child scope')
+                expected = {'director_run_id': director['director_run_id'], 'question_id': question_id,
+                            'attempt_id': question['attempt_id'], 'question_sha256': question['question_sha256']}
+                if any(hold.get(key) != value for key, value in expected.items()):
+                    gaps.append({**base, 'question_id': question_id, 'reason': 'owner-wait-hold-mismatch'})
+                else:
+                    observations.append({**base, 'question_id': question_id, 'attempt_id': question['attempt_id'],
+                                         'classification': 'owner-wait', 'task_id': question['task_id']})
+        _quiet(root)
+        D._require(queue_before == D.WF.file_hash(store.state), 'Canonical child queue changed during audit')
+        return findings, observations, gaps, status, timeline
+
+    def _observe_run(self, selection, area, root, store, child, run, base, *, unity_selection=None, attempt_filter=None):
+        run_id = run['id']
+        run_registry = child['run_registry']
         worktree = O._read_run_root(root, run)
         task_ids = set(run['admitted_task_ids'])
         queue_tasks = {task['id']: task for task in D.WF.parse(store.text()) if task['id'] in task_ids}
@@ -623,8 +665,6 @@ class DirectorAudit:
             if outcome.get('disposition') == 'completed' and outcome.get('validation_plan'):
                 checks.setdefault(outcome['task_id'], {check['id']: check for check in outcome['validation_plan']})
         events, missing = _events(root, worktree, selection, area['queue_id'], run_id, run_registry)
-        base = {'area_id': area['id'], 'queue_id': area['queue_id'], 'run_id': run_id, 'assignment_id': name,
-                'start_receipt_sha256': start['receipt_sha256']}
         gaps = [{**base, 'event_id': event_id, 'reason': 'native-event-unavailable'} for event_id in missing]
         if not events:
             gaps.append({**base, 'reason': 'run-events-unavailable'})
@@ -653,6 +693,8 @@ class DirectorAudit:
                 if attempt and attempt['attempt_id'] != (previous.get('attempt') or {}).get('attempt_id'):
                     timeline.append({**base, **source, 'event': 'check-prepared', **_check_attempt(task_id, check_id, attempt)})
             for task_id, check_id, attempt_id, record, attempt in _progress_checks(slots):
+                if attempt_filter is not None and attempt_id != attempt_filter:
+                    continue
                 identity = (task_id, check_id, attempt_id)
                 D._require(identity not in duplicate_receipts, 'The same check receipt first appears in two scoped events')
                 duplicate_receipts.add(identity)
@@ -682,6 +724,14 @@ class DirectorAudit:
                     category, symptom = finding['classification'], finding['symptom']
                 else:
                     category, symptom = _classification(area, record, check_id)
+                    if attempt_filter is not None:
+                        cause = record.get('failure_category')
+                        if cause in ('expected-behavior', 'runner-failure'):
+                            diagnostics['failure_category'] = cause
+                        if record.get('result') == 'fail' and cause == 'runner-failure':
+                            category, symptom = 'runtime-prerequisite', 'runner-failure'
+                        elif category == 'product' and _resource_evidence_needs_proof(worktree, check_id, record):
+                            category, symptom = 'unclassified-failure', 'source-proof-unavailable'
                     observations.append({**evidence, **diagnostics, 'classification': category, 'symptom': symptom})
                 outcome = record.get('result', record.get('status'))
                 timeline.append({**evidence, **diagnostics, 'event': 'check-recorded',
@@ -717,22 +767,61 @@ class DirectorAudit:
                     gaps.extend({**base, **identifiers, **gap} for gap in receipt.pop('gaps'))
                     status['unity_receipt'] = {**identifiers, **receipt,
                                                'functional_counts': _check_diagnostics(record).get('counts')}
-        for question_id, question in sorted(state['questions'].items()):
-            if question.get('child_run_id') == run_id and question.get('phase') == 'waiting':
-                hold = run.get('director_question_hold') or {}
-                valid = D.WF.valid_id(question_id, 'DQ') and D.WF.valid_id(question['attempt_id'], 'DA')
-                D._require(valid and question['task_id'] in task_ids and question['start_receipt_sha256'] == start['receipt_sha256'],
-                           'Recorded owner wait is outside the selected child scope')
-                expected = {'director_run_id': director['director_run_id'], 'question_id': question_id,
-                            'attempt_id': question['attempt_id'], 'question_sha256': question['question_sha256']}
-                if any(hold.get(key) != value for key, value in expected.items()):
-                    gaps.append({**base, 'question_id': question_id, 'reason': 'owner-wait-hold-mismatch'})
-                else:
-                    observations.append({**base, 'question_id': question_id, 'attempt_id': question['attempt_id'],
-                                         'classification': 'owner-wait', 'task_id': question['task_id']})
-        _quiet(root)
-        D._require(queue_before == D.WF.file_hash(store.state), 'Canonical child queue changed during audit')
         return findings, observations, gaps, status, timeline
+
+    def diagnose(self, request):
+        """Read one project check without claiming a Director assignment."""
+        D._object(request, {'area_id', 'run_id', 'attempt_id'})
+        D._require(D._token(request['area_id']) and D.WF.valid_id(request['run_id'], 'WR')
+                   and D.WF.valid_id(request['attempt_id'], 'C'), 'Select one exact project run and check attempt')
+        _quiet(self.root)
+        registry, bindings, basis = self.registry._load()
+        area = registry['areas'].get(request['area_id']) if registry else None
+        D._require(area and area['scope'] == '.' and area['role'] != 'source-maintenance'
+                   and 'audit' in area['allowed_effects'], 'Select an exact audit-enabled whole project')
+        root = O._child_root(registry, bindings, area['id'])
+        _quiet(root)
+        store = D.WF.Store(root, route_queue=False, neutral=True)
+        queue_before = (D.WF.file_hash(store.state), D.WF.file_hash(store.future))
+        child = store.load()
+        run = child['run_registry']['runs'].get(request['run_id'])
+        D._require(run is not None, 'The selected run is outside the project queue')
+        base = {'area_id':area['id'], 'queue_id':area['queue_id'], 'run_id':run['id']}
+        attempt_id = request['attempt_id']
+        findings, _, gaps, _, timeline = self._observe_run(
+            {}, area, root, store, child, run, base, attempt_filter=attempt_id)
+        selected = [entry for entry in timeline if entry['event'] == 'check-recorded' and entry['attempt_id'] == attempt_id]
+        D._require(len(selected) <= 1, 'The selected diagnostic attempt is ambiguous')
+        if not selected:
+            gaps.append({**base, 'attempt_id':attempt_id, 'reason':'check-result-unavailable'})
+        if selected and selected[0]['symptom'] == 'source-proof-unavailable':
+            gaps.append({**base, 'attempt_id':attempt_id, 'reason':'source-proof-unavailable'})
+        proposal = None
+        if findings:
+            finding, = findings.values()
+            repair = D.WF.owned_module('director_project_diagnosis_repair', HERE / 'director-source-repair.py')
+            try:
+                plan, _ = repair.DirectorSourceRepair(self.registry, self).proposal(finding)
+            except (ValueError, OSError, KeyError, TypeError, subprocess.TimeoutExpired):
+                gaps.append({**base, 'attempt_id':attempt_id, 'reason':'source-proposal-prerequisite-unavailable'})
+            else:
+                proposal = {'status':'proposal', 'source_path':finding['scope']['source_path'],
+                            'source_sha256':finding['generation']['source_sha256'],
+                            'finding_sha256':finding['finding_sha256'], 'source_area':plan['source'],
+                            'scenario':plan['scenario'],
+                            'next_action':'Review the proposal and explicitly authorize a scoped task in the stated source queue.'}
+                if 'maintenance' in plan:
+                    proposal['maintenance'] = plan['maintenance']
+        _quiet(root)
+        _quiet(self.root)
+        D._require(queue_before == (D.WF.file_hash(store.state), D.WF.file_hash(store.future))
+                   and all(digest == D.WF.file_hash(D._safe_path(self.root, path)) for path, digest in basis.items()),
+                   'Project evidence scope changed during diagnosis')
+        return {'schema':1, 'selection':{**base, 'attempt_id':attempt_id},
+                'coverage':{'run_events':'canonical', 'validation':'selected-check-receipt',
+                            'arbitrary_logs':'unsupported', 'trigger':'explicit-request'},
+                'observations':selected, 'findings':list(findings.values()), 'coverage_gaps':gaps,
+                'repair_proposal':proposal}
 
     def read(self, request):
         D._object(request, {'director_run_id', 'selections'})
@@ -789,13 +878,21 @@ class DirectorAudit:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('audit',))
+    parser.add_argument('command', choices=('audit', 'workspace-audit', 'diagnose'))
     parser.add_argument('root', type=Path)
-    parser.add_argument('--input', required=True, type=Path)
+    parser.add_argument('--input', type=Path)
     args = parser.parse_args()
     try:
-        request = json.loads(args.input.read_text())
-        report = DirectorAudit(D.DirectorRegistry(args.root)).read(request)
+        request = json.loads(args.input.read_text()) if args.input else None
+        registry = D.DirectorRegistry(args.root)
+        if args.command == 'workspace-audit' or (args.command == 'audit' and args.input is None):
+            D._require(args.input is None or isinstance(request, dict), 'Workspace audit selection requires an object')
+            workspace = D.WF.owned_module('director_workspace_audit', HERE / 'director-workspace-audit.py')
+            report = workspace.WorkspaceAudit(D, O, registry, _quiet).read(request)
+        else:
+            D._require(args.input is not None, '--input is required to diagnose a project check')
+            audit = DirectorAudit(registry)
+            report = audit.diagnose(request) if args.command == 'diagnose' else audit.read(request)
     except (KeyError, TypeError, AttributeError, OSError, subprocess.TimeoutExpired):
         parser.exit(2, 'Exact selected audit metadata is unavailable or malformed.\n')
     except ValueError as error:

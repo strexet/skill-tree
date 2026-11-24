@@ -1,6 +1,8 @@
 # Installation
 
-Local installation requires Node.js 18 or later. Workflow helpers require Python 3.9 or later and the standard library. Run the launcher in the workspace or pass `--target <workspace>`. The default installation creates a ready Director under `.skill-tree-director/` with an independent Git repository, Core queue and installation receipt. The selected host discovers a single `skill-tree-director` entry in the workspace. Invoke `skill-tree-director` to select an existing project, create a project, or continue later.
+Local installation requires Node.js 18 or later. Workflow helpers require Python 3.9 or later and the standard library. Run the launcher in the workspace or pass `--target <workspace>`. The default installation creates a ready Director under `.skill-tree/.director/` with an independent Git repository, Core queue and installation receipt. The selected host discovers a single `skill-tree-director` entry in the workspace. Invoke `skill-tree-director` to select an existing project, create a project, or continue later.
+
+A dedicated Director upgrade recognizes registered workspaces created under `.skill-tree-director/`. Preview the installer against the original workspace with `--dry-run`, then apply the same Director installation to move the owned storage. Follow any reported prerequisite for a conflicting destination or unfinished operation. The migration preserves the recorded product and Director queue identities.
 
 ```sh
 node .skill-tree/bin/install.js --list
