@@ -9,6 +9,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import tempfile
 import uuid
 
 def owned_module(name,path):
@@ -239,8 +240,13 @@ def reconcile(record,snapshot,*,retarget=None):
         record['status']='blocked';record['blocked_reason']='The selected PR is closed without merge';return record
     if snapshot.get('state')=='MERGED':
         if not record.get('pr') or not record['pr'].get('id'):raise ReviewError('Merged status requires the existing provider PR identity')
-        if not snapshot.get('merge_commit'):raise ReviewError('Merged provider result lacks merge commit evidence')
-        record['status']='merged';record['merge_commit']=snapshot['merge_commit']
+        integration = snapshot.get('merge_commit')
+        if not isinstance(integration, str) or not re.fullmatch(r'(?:[a-f0-9]{40}|[a-f0-9]{64})', integration):
+            raise ReviewError('Merged provider result lacks merge commit evidence')
+        if target_changed or record.get('merge_commit') != integration:
+            record.pop('local_target_sync', None)
+        record['status'] = 'merged'
+        record['merge_commit'] = integration
         record['same_repository'] = snapshot.get('same_repository') is True
         return record
     if changed:
@@ -771,7 +777,8 @@ class GitHub:
         if (context.get('base_repository', self.repository) != self.repository
                 or context.get('head_repository', self.head_repository) != self.head_repository
                 or ((self.explicit_head or observed != '/') and observed != self.head_repository)
-                or (self.explicit_head and (raw['headRefOid'] != context['head'] or raw['baseRefOid'] != context['base_oid']))):
+                or (self.explicit_head and (raw['headRefOid'] != context['head']
+                    or raw['state'] != 'MERGED' and raw['baseRefOid'] != context['base_oid']))):
             raise ReviewError('Provider PR source repository or selected commit identity differs from preflight')
         endpoint='repos/'+self.repository
         files=self.gh('api','--method','GET',endpoint+'/pulls/'+str(number)+'/files','--paginate')
@@ -816,19 +823,117 @@ def operation(record,key,request,result=None):
     if result is not None:slot.update({'state':'confirmed','result':result})
     return record
 
-def local_fast_forward(root,target,remote):
-    # Never switch another worktree or overwrite divergence/dirty changes.
-    rows=ws.git(root,'worktree','list','--porcelain').split('\n\n')
-    occupied=any('branch refs/heads/'+target in row for row in rows)
-    if occupied:return {'updated':False,'reason':'Target branch belongs to an existing worktree'}
-    ws.git(root,'fetch','--no-tags',remote)
-    ref='refs/heads/'+target;remote_ref='refs/remotes/'+remote+'/'+target
-    try:old=ws.git(root,'rev-parse','--verify',ref)
+def registered_target(root, ref):
+    worktrees = ws.local_git(root, 'worktree', 'list', '--porcelain', '-z').stdout.decode()
+    matches = []
+    for entry in worktrees.split('\0\0'):
+        location, *fields = entry.split('\0')
+        if 'branch ' + ref in fields:
+            if not location.startswith('worktree ') or any(field.startswith(('locked', 'prunable')) for field in fields):
+                raise ReviewError('The target worktree is locked or unavailable')
+            matches.append(Path(location.removeprefix('worktree ')).resolve())
+    if len(matches) > 1:
+        raise ReviewError('Multiple worktrees have the target checked out')
+    return matches[0] if matches else None
+
+
+def fast_forward_checked_out_target(root, worktree, checkout, tracking, remote_head):
+    # The protected ref update needs a different Git HEAD from the target.
+    preparation = {
+        'source_ref': tracking, 'source_head': remote_head,
+        'target_ref': checkout['ref'], 'target_head': checkout['head'],
+        'incoming': ws.local_incoming(worktree, checkout['head'], remote_head),
+        'allow_unrelated_staged': True,
+    }
+    if root != worktree:
+        ws.run_local_merge(worktree, root, preparation, fast_forward=True)
+        return
+    with tempfile.TemporaryDirectory(prefix='skill-tree-pr-target-') as temporary:
+        writer = Path(temporary).resolve() / 'ref-writer'
+        ws.local_git(root, 'worktree', 'add', '--detach', '--no-checkout', '--', writer, remote_head)
+        initialized = False
+        try:
+            ws.local_git(writer, 'read-tree', '--reset', '-u', remote_head)
+            initialized = True
+            ws.run_local_merge(worktree, writer, preparation, fast_forward=True)
+        finally:
+            # The incomplete checkout exists only inside private scratch space.
+            options = () if initialized else ('--force',)
+            ws.local_git(root, 'worktree', 'remove', *options, '--', writer)
+
+
+def fast_forward_local_target(root, ref, local_head, tracking, remote_head):
+    worktree = registered_target(root, ref)
+    if worktree is not None:
+        checkout = ws.checked_out_branch(worktree)
+        if (checkout['ref'], checkout['head']) != (ref, local_head) or ws.common_dir(worktree) != ws.common_dir(root):
+            raise ReviewError('The exact target worktree changed during synchronization')
+        fast_forward_checked_out_target(root, worktree, checkout, tracking, remote_head)
+        return
+    # Git refuses a local fetch into a branch checked out in any worktree.
+    # A non-forced exact refspec also protects any intervening local commits.
+    ws.local_git_policy(root, merge=False, signed=True)
+    try:
+        ws.local_git(root, 'fetch', '--no-tags', '--no-recurse-submodules', '--no-write-fetch-head',
+                     '--refmap=', '--', '.', remote_head + ':' + ref)
     except ws.RunError:
-        ws.git(root,'branch',target,remote_ref);return {'updated':True}
-    ws.git(root,'merge-base','--is-ancestor',old,remote_ref)
-    new=ws.git(root,'rev-parse',remote_ref)
-    ws.git(root,'update-ref',ref,new,old);return {'updated':True,'commit':new}
+        if registered_target(root, ref) is not None:
+            raise ReviewError('The target was checked out during synchronization') from None
+        raise
+
+
+
+def synchronize_local_target(root, record):
+    scope = record['identity']
+    target = scope['target_branch']
+    remote = scope['remote']
+    integration = record['merge_commit']
+    receipt = {'status': 'pending', 'target_branch': target, 'remote': remote, 'merge_commit': integration}
+    try:
+        if remote not in ws.local_git_text(root, 'remote').splitlines():
+            raise ReviewError('The publication remote is unavailable')
+        url = ws.local_git_text(root, 'remote', 'get-url', '--', remote)
+        if hashlib.sha256(url.encode()).hexdigest() != scope['remote_id'] or ws.repo_id(root) != scope['repo_id']:
+            raise ReviewError('The publication repository or remote identity changed')
+
+        ref = 'refs/heads/' + target
+        tracking = 'refs/remotes/' + remote + '/' + target
+        for name in (ref, tracking):
+            ws.local_git(root, 'check-ref-format', name)
+            if ws.local_git(root, 'symbolic-ref', '--quiet', '--no-recurse', name, accepted=(0, 1)).returncode == 0:
+                raise ReviewError('The exact target or tracking ref is symbolic')
+        ws.git(root, 'fetch', '--no-tags', '--no-recurse-submodules', '--no-write-fetch-head', '--refmap=', '--',
+               remote, '+' + ref + ':' + tracking)
+        remote_head = ws.local_git_text(root, 'rev-parse', '--verify', tracking + '^{commit}')
+        receipt['remote_head'] = remote_head
+        if ws.local_git(root, 'merge-base', '--is-ancestor', integration, remote_head, accepted=(0, 1, 128)).returncode:
+            raise ReviewError('The fetched target does not contain the confirmed PR integration commit')
+
+        present = ws.local_git(root, 'show-ref', '--verify', '--quiet', ref, accepted=(0, 1)).returncode == 0
+        local_head = ws.local_git_text(root, 'rev-parse', '--verify', ref + '^{commit}') if present else None
+        receipt['local_head'] = local_head
+        if local_head and ws.local_git(root, 'merge-base', '--is-ancestor', remote_head, local_head, accepted=(0, 1)).returncode == 0:
+            receipt['status'] = 'synchronized'
+            return receipt
+        if local_head and ws.local_git(root, 'merge-base', '--is-ancestor', local_head, remote_head, accepted=(0, 1)).returncode:
+            raise ReviewError('Local and remote targets diverged and require a reviewed local integration')
+
+        fast_forward_local_target(root, ref, local_head, tracking, remote_head)
+        receipt['local_head'] = ws.local_git_text(root, 'rev-parse', '--verify', ref + '^{commit}')
+        if ws.local_git(root, 'merge-base', '--is-ancestor', remote_head, receipt['local_head'], accepted=(0, 1)).returncode:
+            raise ReviewError('Verify that the local target contains the fetched target after updating')
+        receipt['status'] = 'synchronized'
+    except (ReviewError, ws.RunError) as error:
+        receipt['reason'] = str(error)
+    except (OSError, UnicodeError, subprocess.TimeoutExpired):
+        receipt['reason'] = 'The local target Git operation was unavailable or timed out'
+    return receipt
+
+
+def publication_complete(record):
+    if record['status'] == 'merged':
+        return record.get('local_target_sync', {}).get('status') == 'synchronized'
+    return record['status'] == 'pr-ready' and not record['authorization'].get('merge')
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
@@ -869,6 +974,8 @@ def main(argv=None):
                         retarget=bool(record and record['identity']['target_branch']!=snapshot['target_branch'])
                         result=reconcile(record,snapshot,retarget=params if args.publication_id else None) if record else new_record(snapshot,params)
                         result['publication_id']=key
+                        if not record and snapshot.get('state') in {'MERGED', 'CLOSED'}:
+                            result = reconcile(result, snapshot)
                         if prepared_review and 'review_requirements' not in result:result['review_requirements']=_frozen_review_requirements(store,prepared_review)
                         if record and not retarget and params['merge_explicit']:
                             result.setdefault('authorization_history',[]).append(deepcopy(result['authorization']))
@@ -887,6 +994,16 @@ def main(argv=None):
                             if not payload.get('reason'):raise ReviewError('Publication block requires the actual prerequisite or failure')
                             result=deepcopy(record);result['status']='blocked';result['blocked_reason']=payload['reason']
                         else:result=operation(record,payload['key'],payload['request'],payload.get('result'))
+                observed_integration = (args.command in {'init', 'observe', 'review', 'inspection', 'ready', 'merge-gate'}
+                                        and snapshot.get('state') == 'MERGED' and result['status'] == 'merged')
+                if observed_integration:
+                    result['local_target_sync'] = synchronize_local_target(root, result)
+                if 'local_target_sync' in result:
+                    result['order_completed'] = publication_complete(result)
+                with store.lock():
+                    current_hash = hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None
+                    if current_hash != carrier_hash:
+                        raise ReviewError('The inspected publication carrier changed before recording the result')
                     if prepared_review:wf._hook_watch_guard(prepared_review['watch'],prepared_review['package_root'])
                     store.commit({relative:json.dumps(result,sort_keys=True,indent=2)+'\n'})
                     if store.state.exists():
@@ -895,13 +1012,22 @@ def main(argv=None):
                         if len(matches)>1:raise ReviewError('Publication run identity is ambiguous')
                         if matches:
                             run=matches[0];run.setdefault('delivery',{})['publication']=relative
-                            run['delivery']['status']=result['status'];run['delivery']['authorization']=result['authorization']
-                            run['delivery']['order_completed']=result['status']=='merged' or result['status']=='pr-ready' and not result['authorization'].get('merge')
+                            delivery = run['delivery']
+                            delivery['status'] = result['status']
+                            delivery['authorization'] = result['authorization']
+                            if 'local_target_sync' in result:
+                                delivery['local_target_sync'] = result['local_target_sync']
+                                if result['status'] == 'merged' and not result['order_completed']:
+                                    delivery['status'] = 'local-target-sync-pending'
+                            if result['status'] != 'merged' or 'local_target_sync' in result:
+                                delivery['order_completed'] = publication_complete(result)
                             run['delivery']['pr']=result.get('pr');run['delivery']['merge_commit']=result.get('merge_commit')
                             store.save(store.text(),state)
-                            if (args.command in {'init','observe'} and snapshot.get('state')=='MERGED'
-                                    and result['status']=='merged'):
-                                result['worktree_cleanup'] = wf.cleanup_after_merge(store, state, run)
+                            if observed_integration:
+                                if result['order_completed']:
+                                    result['worktree_cleanup'] = wf.cleanup_after_merge(store, state, run)
+                                else:
+                                    result['worktree_cleanup'] = {'status': 'deferred', 'reason': result['local_target_sync']['reason']}
             result={'publication_id':key,**result}
         print(json.dumps(result,indent=2,ensure_ascii=False));return 0
     except (ReviewError,ws.RunError,OSError,ValueError,KeyError,subprocess.TimeoutExpired) as exc:

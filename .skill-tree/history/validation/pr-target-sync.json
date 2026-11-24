@@ -1,0 +1,49 @@
+{
+  "task_id": "T-09842a56-ea81-4a54-9792-36d8785469ca",
+  "regression_before_fix": {
+    "case": "ProviderCleanupTests.test_cleanup_follows_exact_provider_merge_to_the_live_target",
+    "result": "Failed at the expected assertion because local_target_sync was absent."
+  },
+  "results": {
+    "fixtures": [
+      {
+        "argv": [
+          "python3",
+          "-B",
+          ".skill-tree/tests/test-pr-review-cycle.py"
+        ],
+        "exit_code": 0,
+        "output": "........................................\n----------------------------------------------------------------------\nRan 40 tests in 36.994s\n\nOK\n"
+      }
+    ],
+    "generated": [
+      {
+        "argv": [
+          "npm",
+          "run",
+          "sync:check"
+        ],
+        "exit_code": 0,
+        "output": "\n> skill-tree-skills@0.7.1 sync:check\n> python3 .skill-tree/scripts/sync-skill-references.py --check\n\nskill references current\n"
+      },
+      {
+        "argv": [
+          "npm",
+          "run",
+          "validate"
+        ],
+        "exit_code": 0,
+        "output": "\n> skill-tree-skills@0.7.1 validate\n> python3 .skill-tree/scripts/validate-skill-repository.py --strict\n\nskill repository valid\n"
+      },
+      {
+        "argv": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exit_code": 0,
+        "output": ""
+      }
+    ]
+  }
+}

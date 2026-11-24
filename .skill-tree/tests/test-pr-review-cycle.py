@@ -240,6 +240,128 @@ class ReviewCycleTests(unittest.TestCase):
             result=provider.ensure('feature/example','develop','Title','Body')
         self.assertEqual(result['number'],3);self.assertEqual(len(writes),1)
 
+class LocalTargetSyncTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        base = Path(temporary.name)
+        self.root, self.remote = base / 'product', base / 'origin.git'
+        self.git(base, 'init', '--bare', str(self.remote))
+        self.git(base, 'init', '-b', 'feature/fix', str(self.root))
+        self.git(self.root, 'config', 'user.name', 'Fixture')
+        self.git(self.root, 'config', 'user.email', 'fixture@example.invalid')
+        self.git(self.root, 'remote', 'add', 'origin', str(self.remote))
+        self.commit('initial', {'product.py': 'old', 'local.txt': 'clean'})
+        self.old = self.git(self.root, 'rev-parse', 'HEAD')
+        self.commit('provider rewrote the PR into a new target commit', {'product.py': 'fixed'})
+        self.integrated = self.git(self.root, 'rev-parse', 'HEAD')
+        self.commit('later target update', {'later.txt': 'another PR'})
+        self.remote_head = self.git(self.root, 'rev-parse', 'HEAD')
+        self.git(self.root, 'push', 'origin', 'HEAD:refs/heads/release/main')
+        self.git(self.root, 'reset', '--hard', self.old)
+        self.commit('original PR branch', {'product.py': 'fixed'})
+        self.source = self.git(self.root, 'rev-parse', 'HEAD')
+        self.snapshot = {
+            'repo_id': pr.ws.repo_id(self.root), 'remote': 'origin',
+            'remote_id': hashlib.sha256(str(self.remote).encode()).hexdigest(),
+            'source_branch': 'feature/fix', 'target_branch': 'release/main',
+            'head': self.source, 'base_oid': self.old, 'state': 'MERGED',
+            'merge_commit': self.integrated, 'pr': {'id': 'PR_fixture', 'number': 21},
+            'same_repository': False,
+        }
+        self.request = base / 'request.json'
+
+    def git(self, root, *args):
+        return subprocess.check_output(['git', '-C', str(root), *args], stderr=subprocess.PIPE, text=True).strip()
+
+    def commit(self, message, files):
+        for name, contents in files.items():
+            (self.root / name).write_text(contents)
+        self.git(self.root, 'add', *files)
+        self.git(self.root, 'commit', '-m', message)
+
+    def invoke(self, command, **changes):
+        request = {'snapshot': {**self.snapshot, **changes}, 'target_branch': 'release/main'}
+        self.request.write_text(json.dumps(request))
+        result = subprocess.run(
+            ['python3', str(CORE/'common/scripts/pr-review-state.py'), command, str(self.root), '--input', str(self.request)],
+            capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        return json.loads(result.stdout)
+
+    def test_fresh_external_integration_creates_exact_target_and_retries_idempotently(self):
+        first = self.invoke('init')
+        self.assertEqual(first['local_target_sync']['status'], 'synchronized')
+        self.assertTrue(first['order_completed'])
+        self.assertEqual(first['local_target_sync']['local_head'], self.remote_head)
+        self.assertEqual(self.git(self.root, 'rev-parse', 'release/main'), self.remote_head)
+        self.assertEqual(self.git(self.root, 'rev-parse', 'HEAD'), self.source)
+        self.assertEqual(self.invoke('observe')['local_target_sync'], first['local_target_sync'])
+
+    def test_checked_out_target_preserves_disjoint_staged_and_unstaged_edits(self):
+        self.git(self.root, 'switch', '-c', 'release/main', self.old)
+        (self.root / 'local.txt').write_text('staged')
+        self.git(self.root, 'add', 'local.txt')
+        (self.root / 'local.txt').write_text('unstaged')
+        (self.root / 'scratch').write_text('untracked')
+        before = self.git(self.root, 'status', '--porcelain', '--', 'local.txt', 'scratch')
+        self.assertTrue(self.invoke('init')['order_completed'])
+        self.assertEqual(self.git(self.root, 'rev-parse', 'HEAD'), self.remote_head)
+        self.assertEqual(self.git(self.root, 'status', '--porcelain', '--', 'local.txt', 'scratch'), before)
+        self.assertEqual(self.git(self.root, 'show', ':local.txt'), 'staged')
+        self.assertEqual((self.root / 'local.txt').read_text(), 'unstaged')
+        self.assertEqual((self.root / 'scratch').read_text(), 'untracked')
+
+    def test_unoccupied_behind_target_updates_and_ahead_target_preserves_local_commits(self):
+        self.git(self.root, 'branch', 'release/main', self.old)
+        self.assertTrue(self.invoke('init')['order_completed'])
+        self.assertEqual(self.git(self.root, 'rev-parse', 'release/main'), self.remote_head)
+        self.git(self.root, 'switch', 'release/main')
+        self.commit('local-only change', {'local.txt': 'local'})
+        ahead = self.git(self.root, 'rev-parse', 'HEAD')
+        result = self.invoke('observe')
+        self.assertTrue(result['order_completed'])
+        self.assertEqual(result['local_target_sync']['local_head'], ahead)
+        self.assertEqual(self.git(self.root, 'rev-parse', 'HEAD'), ahead)
+
+    def test_concurrent_checkout_of_unoccupied_target_stops_without_touching_index(self):
+        self.git(self.root, 'branch', 'release/main', self.old)
+        original = pr.ws.local_git
+        def check_out_before_reservation(root, *args, **kwargs):
+            if args[:1] == ('fetch',) and '.' in args:
+                self.git(self.root, 'switch', 'release/main')
+            return original(root, *args, **kwargs)
+        publication = {'identity': pr.identity(self.snapshot), 'merge_commit': self.integrated}
+        with patch.object(pr.ws, 'local_git', side_effect=check_out_before_reservation):
+            result = pr.synchronize_local_target(self.root, publication)
+        self.assertEqual(result['status'], 'pending')
+        self.assertEqual(self.git(self.root, 'rev-parse', 'HEAD'), self.old)
+        self.assertEqual(self.git(self.root, 'status', '--porcelain'), '')
+        self.assertEqual((self.root / 'product.py').read_text(), 'old')
+
+    def test_collision_remains_pending_and_same_publication_can_retry(self):
+        self.git(self.root, 'switch', '-c', 'release/main', self.old)
+        (self.root / 'product.py').write_text('local change')
+        pending = self.invoke('init')
+        self.assertFalse(pending['order_completed'])
+        self.assertIn('collision', pending['local_target_sync']['reason'])
+        self.assertEqual(self.git(self.root, 'rev-parse', 'HEAD'), self.old)
+        self.assertEqual((self.root / 'product.py').read_text(), 'local change')
+        self.git(self.root, 'restore', 'product.py')
+        self.assertTrue(self.invoke('observe')['order_completed'])
+
+    def test_divergence_keeps_local_commit_and_closed_pr_does_not_sync(self):
+        self.git(self.root, 'branch', 'release/main', self.source)
+        self.invoke('init', state='OPEN')
+        closed = self.invoke('observe', state='CLOSED')
+        self.assertNotIn('local_target_sync', closed)
+        self.assertEqual(self.git(self.root, 'rev-parse', 'release/main'), self.source)
+        result = self.invoke('observe')
+        self.assertFalse(result['order_completed'])
+        self.assertIn('diverged', result['local_target_sync']['reason'])
+        self.assertEqual(self.git(self.root, 'rev-parse', 'release/main'), self.source)
+
+
 class ProviderCleanupTests(unittest.TestCase):
     def test_cleanup_follows_exact_provider_merge_to_the_live_target(self):
         self.check_provider_cleanup(carry_after_local_review=False)
@@ -296,6 +418,11 @@ class ProviderCleanupTests(unittest.TestCase):
         observe('init')
         deferred = observe('observe', state='MERGED', merge_commit=merge)
         self.assertEqual(deferred['status'], 'merged')
+        self.assertEqual(deferred['local_target_sync']['status'], 'pending')
+        pending_run = fixture.wf.Store(local.source, run['id']).load()['active_run']
+        self.assertEqual(pending_run['delivery']['status'], 'local-target-sync-pending')
+        self.assertFalse(pending_run['delivery']['order_completed'])
+        self.assertFalse(fixture.wf.workspaces.delivery_finished(pending_run))
         self.assertEqual(deferred['worktree_cleanup']['status'], 'deferred')
         self.assertTrue(local.source.exists())
         local.git(target, 'push', 'origin', 'develop')
@@ -309,6 +436,8 @@ class ProviderCleanupTests(unittest.TestCase):
         self.assertEqual(metadata_only.returncode, 0, metadata_only.stdout + metadata_only.stderr)
         self.assertNotIn('worktree_cleanup', json.loads(metadata_only.stdout))
         removed = observe('observe', state='MERGED', merge_commit=merge)
+        self.assertEqual(removed['local_target_sync']['status'], 'synchronized')
+        self.assertEqual(removed['local_target_sync']['local_head'], merge)
         self.assertEqual(removed['worktree_cleanup']['status'], 'removed')
         self.assertFalse(local.source.exists())
         self.assertEqual(local.git(local.root, 'rev-parse', run['workspace']['branch']), source_head)
