@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.2 (2026-11-24)
+
+### Changed
+
+- Substantial Skill Tree workflows start with a brief progress message that names the scope, expected result and any known approval boundary before the first task-specific tool call.
+
+### Fixed
+
+- PR closeout verifies and synchronizes the exact local target after confirmed integration by merge, squash or rebase. Unsafe local updates leave a retryable blocker and keep the delivery open.
+
 ## 0.7.1 (2026-11-24)
 
 ### Fixed

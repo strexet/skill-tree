@@ -1155,7 +1155,7 @@ def local_ref_transaction(root, hooks, source_ref, source_head, target_ref, targ
                 process.wait(timeout=5)
 
 
-def run_local_merge(root, source_root, preparation):
+def run_local_merge(root, source_root, preparation, *, fast_forward=False):
     source_ref, source_head = preparation['source_ref'], preparation['source_head']
     target_ref, target_head = preparation['target_ref'], preparation['target_head']
     reviewed=preparation.get('allow_unrelated_staged',False)
@@ -1196,8 +1196,9 @@ def run_local_merge(root, source_root, preparation):
             hooks.mkdir()
             index = Path(workspace) / 'index'
             shutil.copy2(index_path, index)
-            merge = local_git_text(root, 'commit-tree', preparation['source_tree'], signing,
-                                   '-p', target_head, '-p', source_head, '-m', f'Merge {source_ref} into {target_ref}')
+            merge = source_head if fast_forward else local_git_text(
+                root, 'commit-tree', preparation['source_tree'], signing, '-p', target_head,
+                '-p', source_head, '-m', f'Merge {source_ref} into {target_ref}')
             # Run the ref transaction from the distinct source worktree so Git
             # does not try to acquire the canonical worktree's protected HEAD lock.
             with local_ref_transaction(source_root, hooks, source_ref, source_head, target_ref, target_head, merge) as process:
