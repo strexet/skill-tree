@@ -10,6 +10,12 @@ The DG ledger owns question, authority, actual origin, original attempts and cur
 
 ## Visible owner handoff
 
+For a substantial workflow, the opening preview is a visible progress message. Send the preview before the first task-specific tool call and proceed with the already authorized steps. Use the existing handoff at any required decision or approval boundary.
+
+- Explicitly scoped processing can open with “I’ll research the selected Pending item, define its acceptance checks and return the prioritized task. I’ll stop after processing for your next selection.” Then begin the authorized processing.
+- A simple question about a workflow rule can receive the direct answer in the first reply.
+- A workflow with an approval boundary can open with “I’ll review the draft and summarize the changes. Once the draft is ready, I’ll ask you to approve publication.” Do the authorized review, then ask about the exact draft before publication.
+
 When execution stops, waits or finishes, state what is complete, what remains, why progress stopped and who owns the next step. When owner input is required, end the ordinary reply with a clearly labeled request. Name the exact action or question and state what happens after the answer or action. Put each currently answerable independent question on a separate line. Defer dependent questions until the necessary facts are available. Include the complete request in the reply without a separate question popup, selection card or modal. Mandatory host authorization controls remain binding.
 
 For each decision with multiple viable options, list all viable options and explain the relevant consequences and tradeoffs. Evaluate the options against the current goal, constraints and evidence. Mark one option inline as recommended in the reply language, with `(рекомендую)` in Russian. After the list, explain why the recommended option fits best and disclose any uncertainty or assumption that could change the recommendation. End with the direct question. The recommendation grants no approval.
@@ -24,6 +30,8 @@ Use the stopping condition to make the handoff actionable:
 - Explicit pause, external wait or completion: state the continuation trigger and who owns the next step. When no owner action is required and eligible follow-on work would advance the owner's goal, name one recommended action with exact scope in the ordinary reply. Make the offer optional and state how a short reply selects the proposed step. When progress depends on an external trigger, state the required condition. When the work is complete and there is no useful next action, state that the work is complete.
 
 A short direct owner reply such as `continue`, `продолжай`, `поехали`, `давай` or `дальше` selects the single next action explicitly offered for a short reply in the preceding applicable handoff in the same conversation. Recheck the proposed scope, authorization and prerequisites before proceeding. Ask for the exact choice if the offer is ambiguous, conflicts with a later instruction or no longer applies. A short continuation reply supplies routine selection or resumption only. Ask for required facts, decisions, Manual acceptance and any additional permissions explicitly. Earlier explicit commit, publication or merge authorization remains scoped to the recorded operation.
+
+When a completed operation leads to new local repository development, offer the next action through the local task workflow. Capture the new request through Add Pending, pass the exact captured P-ID to Process Pending, and pass the resulting T-ID to Work Through Next after the owner selects implementation. A short confirmation of a direct development offer still requires the same task workflow. Start source changes and specialist implementation after admission. An intake-only or processing-only request stops at the requested stage. Use the exact selected task or retained run for existing work. Leave unrelated Ready tasks outside the new scope.
 
 While owner input is pending, continue independent authorized work when possible and keep the blocked work separate. Preserve the current checkpoint and existing continuation and approval rules. When the owner already supplied the exact choice or authorization, proceed within the authorized scope.
 

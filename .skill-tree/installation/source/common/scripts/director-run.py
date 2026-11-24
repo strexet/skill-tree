@@ -221,6 +221,31 @@ class DirectorRun:
         _, state, sha = self._load(payload['director_run_id'])
         return self._view(state, sha, self._plan_for(state))
 
+    def verify_intake(self, payload):
+        D._object(payload, {'director_run_id', 'assignment_id'})
+        _, state, _ = self._load(payload['director_run_id'])
+        name = payload['assignment_id']
+        spec = self._assignment(state, name)
+        root = self.check_area(spec)
+        selected = spec['area']
+        result = {**payload, 'area_id': selected['id'], 'repo_id': selected['repo_id'],
+                  'scope': selected['scope'], 'queue_id': selected['queue_id'], 'status': 'unverified'}
+        recorded = state['assignments'][name]['dispatches'].get('intake')
+        if not recorded or recorded['status'] != 'recorded':
+            return result
+        D._require('intake' in state['authority'][name] and 'intake' in spec['effects'],
+                   'Original Director intake lacks exact authorization')
+        child = D.WF.Store(root, neutral=True)
+        observed = D.WF.director_dispatch_helper().observe(
+            child, {'operation': 'intake', 'director_dispatch': self._envelope(state, spec)})
+        receipt = observed['receipt']
+        D._require(receipt and receipt['receipt_sha256'] == recorded['receipt_sha256']
+                   and receipt['semantic_sha256'] == recorded['semantic_sha256']
+                   and observed['observed_result']['id'] == recorded['result']['id'],
+                   'Original canonical intake receipt is unavailable or changed')
+        return {**result, 'status': 'verified', 'plan_sha256': state['plan_sha256'],
+                'pending_id': recorded['result']['id'], 'receipt_sha256': receipt['receipt_sha256']}
+
     def lifecycle(self, command, payload):
         D._object(payload, GUARD)
         target = {'run-pause': 'paused', 'run-resume': 'running', 'run-cancel': 'cancelled'}[command]
@@ -728,7 +753,7 @@ def run(registry, planner, command, payload):
         return observed == {'status': 'verified', **expected}
 
     engine = DirectorRun(registry, planner.frozen, check_area, check_current, verify_pin, handoffs.superseded_assignments)
-    methods = {'run-start': engine.start, 'run-status': engine.status, 'run-dispatch': engine.dispatch,
+    methods = {'run-start': engine.start, 'run-status': engine.status, 'run-dispatch': engine.dispatch, 'verify-intake': engine.verify_intake,
                'run-complete-assignment': engine.complete_assignment,
                'decide-open': engine.open_question, 'decide-answer': engine.answer}
     return methods[command](payload) if command in methods else engine.lifecycle(command, payload)

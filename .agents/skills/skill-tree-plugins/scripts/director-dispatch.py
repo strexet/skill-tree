@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from pathlib import Path
 import re
 
 
@@ -97,12 +98,41 @@ def canonical_owner(store, queue_id):
     return registry
 
 
+def matches_start_workspace(store, run, receipt):
+    original = receipt['result'].get('workspace')
+    current = run.get('workspace')
+    if not isinstance(original, dict) or not isinstance(current, dict):
+        return False
+    owner = current.get('cleanup_owner')
+    if current != original and ('cleanup_owner' in original or not owner
+                                or {key: value for key, value in current.items() if key != 'cleanup_owner'} != original):
+        return False
+    if run.get('dispatch_workspace_sha256') != receipt['result'].get('dispatch_workspace_sha256'):
+        return False
+    if not owner:
+        return run.get('workspace_state') == 'reserved' or 'dispatch_owner_token' not in original
+    locator = wf.workspaces.runtime(store.root)
+    checkout = (locator or {}).get('worktrees', {}).get(run['id'])
+    if not checkout or run.get('workspace_state') != 'ready':
+        return False
+    try:
+        cleanup = run.get('delivery', {}).get('worktree_cleanup', {})
+        if cleanup.get('status') == 'removed':
+            attempt = cleanup.get('attempt')
+            return (isinstance(attempt, dict) and attempt.get('scope') == wf.cleanup_delivery_scope(store, run)
+                    and wf.workspaces.cleanup_checkout(store.root, {'queue_id': locator['queue_id']}, run, attempt) is None)
+        wf.workspaces.directed_owner(store.root, Path(checkout), run, receipt['identity']['queue_id'])
+    except (wf.workspaces.RunError, OSError, ValueError):
+        return False
+    return True
+
+
 def reconcile(store, receipt):
     if receipt['identity']['operation'] != 'start':
         return receipt['result']
     registry = canonical_owner(store, receipt['identity']['queue_id'])
     run = registry['runs'].get(receipt['result']['id'])
-    _require(run is not None and run.get('workspace') == receipt['result'].get('workspace'),
+    _require(run is not None and matches_start_workspace(store, run, receipt),
              'Original Director run reservation is unavailable or changed')
     wf.workspaces.inspect_directed_reservation(store, run)
     return run

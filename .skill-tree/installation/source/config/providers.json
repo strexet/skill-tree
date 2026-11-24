@@ -4,6 +4,7 @@
   "tier1Required": [
     "claude-code",
     "codex",
+    "dsh",
     "gemini-cli",
     "cursor",
     "windsurf",
@@ -53,6 +54,21 @@
       "notes": "OpenAI direct docs also list user-scope skills under ~/.agents/skills; this path follows current upstream skills CLI profile."
     },
     {
+      "id": "dsh",
+      "label": "DeepSeek Harness",
+      "aliases": ["deepseek", "deepseek-harness"],
+      "tier": 1,
+      "skillsProfile": "dsh",
+      "detect": [{ "kind": "command", "value": "dsh" }],
+      "soft": false,
+      "projectPath": ".agents/skills",
+      "globalPath": "~/.dsh/skills",
+      "initBridge": "agents",
+      "bridgePath": "AGENTS.md",
+      "officialDocs": ["https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/subsystems/skills.md"],
+      "notes": "Installs for the DeepSeek Harness client. For a DeepSeek model in another client, select that client."
+    },
+    {
       "id": "gemini-cli",
       "label": "Gemini CLI",
       "tier": 1,
@@ -73,6 +89,8 @@
       "skillsProfile": "cursor",
       "detect": [
         { "kind": "command", "value": "cursor" },
+        { "kind": "command", "value": "cursor-agent" },
+        { "kind": "command", "value": "agent", "executableName": "cursor-agent" },
         { "kind": "mac-application", "value": "/Applications/Cursor.app" },
         { "kind": "vscode-extension", "value": "anysphere.cursor" }
       ],
@@ -121,7 +139,7 @@
       "label": "GitHub Copilot",
       "tier": 1,
       "skillsProfile": "github-copilot",
-      "detect": [{ "kind": "vscode-extension", "value": "github.copilot-chat" }],
+      "detect": [{ "kind": "command", "value": "copilot" }, { "kind": "vscode-extension", "value": "github.copilot-chat" }],
       "soft": false,
       "projectPath": ".agents/skills",
       "globalPath": "~/.copilot/skills",
@@ -140,7 +158,7 @@
       "projectPath": ".agents/skills",
       "globalPath": "~/.config/opencode/skills",
       "initBridge": "opencode",
-      "bridgePath": ".opencode/AGENTS.md",
+      "bridgePath": "AGENTS.md",
       "officialDocs": ["https://opencode.ai/docs/skills/"],
       "notes": "Uses portable skill folders."
     },

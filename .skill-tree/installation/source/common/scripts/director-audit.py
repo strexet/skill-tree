@@ -56,6 +56,8 @@ O = D._objective_helper()
 
 def source_finding_digest(finding):
     fields = ('classification', 'component', 'symptom', 'conditions', 'generation')
+    if finding.get('reproduction', {}).get('kind') == 'director-resource-check':
+        fields += ('scope', 'expected', 'reproduction')
     return D._digest({field: finding[field] for field in fields})
 
 
@@ -439,23 +441,30 @@ def _parent_assignment_status(state):
             'blocked': bool(state.get('blocker')), 'completed': bool(state.get('completed'))}
 
 
-def _generation(worktree):
-    if worktree is None:
+def _snapshot_input(sources):
+    suffix = '/' + SNAPSHOT + '/' + RESOURCE
+    candidates = [path for path in sources if path.endswith(suffix)]
+    return candidates[0] if len(candidates) == 1 else None
+
+
+def _generation(worktree, installed=INSTALLED):
+    if worktree is None or not installed:
         return None
     try:
         observed = D._inspect_profile(worktree)
         profile, digest = _json(worktree, PROFILE)
         D._require(observed['kind'] == 'owned-profile' and observed['sha256'] == digest
                    and profile['identity'] == observed['identity'], 'No exact verified installed generation')
-        package = profile['destinations'][DESTINATION]
+        destination = installed.removesuffix('/' + RESOURCE)
+        package = profile['destinations'][destination]
         source = profile['source_digests'][SOURCE.removeprefix('.skill-tree/')]
         artifact = package['files'][RESOURCE]
         bundle_path = '.skill-tree/installation/source/' + SOURCE.removeprefix('.skill-tree/')
-        D._require('codex' in package.get('providers', [package['provider']]) and package['name'] == SNAPSHOT
+        D._require(package.get('providers', [package['provider']]) and package['name'] == SNAPSHOT
                    and D._sha(source) and D._sha(artifact) and D._sha(package['identity'])
                    and profile['bundle_digests'][bundle_path] == source
                    and D.WF.file_hash(D._safe_path(worktree, bundle_path)) == source
-                   and D.WF.file_hash(D._safe_path(worktree, INSTALLED)) == artifact
+                   and D.WF.file_hash(D._safe_path(worktree, installed)) == artifact
                    and profile['recipes'][RECIPE]['lane'] == 'unit', 'Profile lacks the exact checked helper and recipe')
     except (KeyError, TypeError, OSError, ValueError, subprocess.TimeoutExpired):
         return None
@@ -467,7 +476,7 @@ def _source_check(check_id, record, attempt, checks, worktree, verified):
     if (check_id != CHECK or record.get('result') != 'fail' or record.get('classification') != 'executed-control'
             or record.get('actual_lane') != 'unit' or record.get('failure_signature') != SIGNATURE):
         return False
-    if verified is None or checks.get(check_id) != RECIPE:
+    if verified is None or (checks.get(check_id) or {}).get('recipe_id') != RECIPE:
         return False
     generation, _ = verified
     pointer = next((item for item in record.get('evidence', []) if item.get('path') == RESULT), {})
@@ -477,7 +486,7 @@ def _source_check(check_id, record, attempt, checks, worktree, verified):
         return False
     matched = (attempt.get('attempt_id') == record['attempt_id'] and attempt.get('key') == record['key']
             and attempt.get('recipe', {}).get('lane') == 'unit' and attempt.get('sources') == record['sources']
-            and record['sources'].get(INSTALLED) == generation['installed_sha256'] and proof == OBSERVED_RESULT
+            and record['sources'].get(_snapshot_input(record['sources'])) == generation['installed_sha256'] and proof == OBSERVED_RESULT
             and pointer.get('available') is True and digest == pointer.get('sha256'))
     return {'result_path': RESULT, 'result_sha256': digest} if matched else None
 
@@ -494,6 +503,87 @@ def _finding(generation):
         'scope': {'source_path': SOURCE, 'operation': SNAPSHOT}, 'evidence': [],
     }
     return {**finding, 'finding_sha256': source_finding_digest(finding)}
+
+
+def _diagnostic_finding(worktree, queue, check_id, check, record, attempt):
+    """Attribute a structured expected/observed result to one verified packaged resource."""
+    recipe = (check or {}).get('recipe_id')
+    if (worktree is None or not recipe or record.get('classification') != 'executed-control'
+            or record.get('result') != 'fail' or record.get('failure_category') != 'expected-behavior'
+            or record.get('actual_lane') != 'unit' or not isinstance(attempt, dict)
+            or attempt.get('attempt_id') != record.get('attempt_id') or attempt.get('key') != record.get('key')
+            or attempt.get('sources') != record.get('sources') or attempt.get('recipe', {}).get('lane') != 'unit'):
+        return None
+    result_path = f'.skill-tree/artifacts/director/{check_id}.json'
+    refs = [ref for ref in record['evidence'] if ref.get('available') and ref.get('path') == result_path]
+    if len(refs) != 1:
+        return None
+    try:
+        proof, result_hash = _json(worktree, result_path, limit=65536)
+        D._object(proof, {'schema', 'kind', 'assertion_id', 'installed_path', 'expected', 'observed'})
+        expected, observed = proof['expected'], proof['observed']
+        D._require(proof['schema'] == 1 and proof['kind'] == 'director-resource-check'
+                   and proof['assertion_id'] == check_id and all(D._token(v) and len(v) <= 96 for v in (expected, observed))
+                   and expected != observed and refs[0]['sha256'] == result_hash, 'Inconclusive resource result')
+        installed = D._scope(proof['installed_path']).as_posix()
+        profile_state = D._inspect_profile(worktree)
+        profile, profile_hash = _json(worktree, PROFILE)
+        D._require(profile_state['kind'] == 'owned-profile' and profile_state['sha256'] == profile_hash
+                   and profile['recipes'][recipe]['lane'] == 'unit', 'Unverified diagnostic profile')
+        matches = [(rel, pkg) for rel, pkg in profile['destinations'].items() if installed.startswith(rel + '/')]
+        D._require(len(matches) == 1, 'Unowned diagnostic resource')
+        dest, package = matches[0]
+        resource = installed[len(dest) + 1:]
+        group, name = resource.split('/', 1)
+        mapping, mapping_hash = _json(worktree, '.skill-tree/installation/source/config/resource-map.json')
+        D._require(profile['source_digests']['config/resource-map.json'] == mapping_hash, 'Resource map changed')
+        source = mapping[package['name']][group][name]
+        D._scope(source)
+        generation = package['files'][resource]
+        D._require(D._sha(generation) and record['sources'][installed] == profile['source_digests'][source] == generation
+                   and D.WF.file_hash(D._safe_path(worktree, installed)) == generation, 'Resource generation changed')
+        fixtures = {path: digest for path, digest in record['sources'].items() if path != installed}
+        D._require(all(D._scope(path) and D._sha(digest) for path, digest in fixtures.items()), 'Invalid fixture')
+        executed_recipe = attempt['recipe']
+        recipe_inputs = {path: D.WF.file_hash(D._safe_path(worktree, path)) for path in executed_recipe.get('input_paths', [])}
+        D._require(all(D._sha(value) for value in recipe_inputs.values())
+                   and D._digest({'recipe': executed_recipe, 'inputs': recipe_inputs})
+                   == attempt['environment_identity'] == record['environment_identity'],
+                   'The original recipe inputs changed after the executed check')
+        recipe_hash = D._portable_recipe(worktree, queue, executed_recipe, installed, '.skill-tree/' + source)
+        params = {}
+        for key, value in check['parameters'].items():
+            D._require(isinstance(value, str) and (value in record['sources'] or D._token(value))
+                       and key not in {'project_root', 'execution_checkout', 'queue_root'}, 'Unsupported reproduction input')
+            params[key] = '.skill-tree/' + source if value == installed else value
+        finding = {'schema': 1, 'classification': 'source-defect', 'component': package['name'], 'symptom': observed,
+                   'conditions': {'recipe_id': recipe, 'lane': 'unit', 'assertion_id': check_id},
+                   'generation': {'source_sha256': generation, 'installed_sha256': generation}, 'expected': expected,
+                   'observed': observed, 'scope': {'source_path': '.skill-tree/' + source, 'operation': package['name']},
+                   'reproduction': {'kind': 'director-resource-check', 'resource': resource, 'fixtures': fixtures, 'parameters': params, 'recipe_sha256': recipe_hash},
+                   'evidence': []}
+        return {**finding, 'finding_sha256': source_finding_digest(finding)}, {
+            'result_path': result_path, 'result_sha256': result_hash, 'profile_sha256': profile_hash,
+            'package_sha256': package['identity']}
+    except (OSError, KeyError, TypeError, ValueError, subprocess.TimeoutExpired):
+        return None
+
+
+def _resource_evidence_needs_proof(worktree, check_id, record):
+    path = f'.skill-tree/artifacts/director/{check_id}.json'
+    refs = [ref for ref in record.get('evidence', []) if ref.get('path') == path]
+    if not refs:
+        return False
+    if worktree is None or len(refs) != 1:
+        return True
+    try:
+        proof, digest = _json(worktree, path, limit=65536)
+    except (OSError, ValueError):
+        return True
+    if digest != refs[0].get('sha256') or not refs[0].get('available'):
+        return True
+    return (isinstance(proof, dict) and proof.get('kind') == 'director-resource-check'
+            and proof.get('assertion_id') == check_id)
 
 
 def _classification(area, record, check_id):
@@ -540,18 +630,41 @@ class DirectorAudit:
         observed = D.WF.director_dispatch_helper().observe(store, {'operation': 'start', 'director_dispatch': envelope})
         D._require(observed['receipt'] is not None and observed['receipt']['receipt_sha256'] == start['receipt_sha256']
                    and observed['observed_result'] == run, 'The canonical child start receipt differs from the Director record')
+        base = {'area_id':area['id'], 'queue_id':area['queue_id'], 'run_id':run_id,
+                'assignment_id':name, 'start_receipt_sha256':start['receipt_sha256']}
+        findings, observations, gaps, status, timeline = self._observe_run(
+            selection, area, root, store, child, run, base, unity_selection=unity_selection)
+        task_ids = set(run['admitted_task_ids'])
+        for question_id, question in sorted(state['questions'].items()):
+            if question.get('child_run_id') == run_id and question.get('phase') == 'waiting':
+                hold = run.get('director_question_hold') or {}
+                valid = D.WF.valid_id(question_id, 'DQ') and D.WF.valid_id(question['attempt_id'], 'DA')
+                D._require(valid and question['task_id'] in task_ids and question['start_receipt_sha256'] == start['receipt_sha256'],
+                           'Recorded owner wait is outside the selected child scope')
+                expected = {'director_run_id': director['director_run_id'], 'question_id': question_id,
+                            'attempt_id': question['attempt_id'], 'question_sha256': question['question_sha256']}
+                if any(hold.get(key) != value for key, value in expected.items()):
+                    gaps.append({**base, 'question_id': question_id, 'reason': 'owner-wait-hold-mismatch'})
+                else:
+                    observations.append({**base, 'question_id': question_id, 'attempt_id': question['attempt_id'],
+                                         'classification': 'owner-wait', 'task_id': question['task_id']})
+        _quiet(root)
+        D._require(queue_before == D.WF.file_hash(store.state), 'Canonical child queue changed during audit')
+        return findings, observations, gaps, status, timeline
+
+    def _observe_run(self, selection, area, root, store, child, run, base, *, unity_selection=None, attempt_filter=None):
+        run_id = run['id']
+        run_registry = child['run_registry']
         worktree = O._read_run_root(root, run)
         task_ids = set(run['admitted_task_ids'])
         queue_tasks = {task['id']: task for task in D.WF.parse(store.text()) if task['id'] in task_ids}
         outcomes = {item['id']: item for item in store.outcomes() if item.get('run_id') == run_id and item.get('task_id') in task_ids}
-        checks = {task_id: {check['id']: check['recipe_id'] for check in D.WF.check_specs(task)}
+        checks = {task_id: {check['id']: check for check in D.WF.check_specs(task)}
                   for task_id, task in queue_tasks.items()}
         for outcome in outcomes.values():
             if outcome.get('disposition') == 'completed' and outcome.get('validation_plan'):
-                checks.setdefault(outcome['task_id'], {check['id']: check['recipe_id'] for check in outcome['validation_plan']})
+                checks.setdefault(outcome['task_id'], {check['id']: check for check in outcome['validation_plan']})
         events, missing = _events(root, worktree, selection, area['queue_id'], run_id, run_registry)
-        base = {'area_id': area['id'], 'queue_id': area['queue_id'], 'run_id': run_id, 'assignment_id': name,
-                'start_receipt_sha256': start['receipt_sha256']}
         gaps = [{**base, 'event_id': event_id, 'reason': 'native-event-unavailable'} for event_id in missing]
         if not events:
             gaps.append({**base, 'reason': 'run-events-unavailable'})
@@ -564,7 +677,7 @@ class DirectorAudit:
                   'observed_events': len(events), 'last_recorded_sequence': last_sequence,
                   'undated_events': sum('event_recorded_at' not in source for _, source in events)}
         verified = None
-        checked_generation = False
+        generations = {}
         observations, findings, timeline = [], {}, []
         duplicate_receipts = set()
         terminal_ids = set()
@@ -580,6 +693,8 @@ class DirectorAudit:
                 if attempt and attempt['attempt_id'] != (previous.get('attempt') or {}).get('attempt_id'):
                     timeline.append({**base, **source, 'event': 'check-prepared', **_check_attempt(task_id, check_id, attempt)})
             for task_id, check_id, attempt_id, record, attempt in _progress_checks(slots):
+                if attempt_filter is not None and attempt_id != attempt_filter:
+                    continue
                 identity = (task_id, check_id, attempt_id)
                 D._require(identity not in duplicate_receipts, 'The same check receipt first appears in two scoped events')
                 duplicate_receipts.add(identity)
@@ -587,19 +702,36 @@ class DirectorAudit:
                             'record_sha256': D._digest(record)}
                 if unity_selection and attempt_id == unity_selection['attempt_id']:
                     unity_attempts.append((evidence, record, attempt))
-                if check_id == CHECK and not checked_generation:
-                    verified = _generation(worktree)
-                    checked_generation = True
+                verified = None
+                if check_id == CHECK:
+                    installed = _snapshot_input(record['sources'])
+                    if installed not in generations:
+                        generations[installed] = _generation(worktree, installed)
+                    verified = generations[installed]
                 proof = _source_check(check_id, record, attempt, checks.get(task_id, {}), worktree, verified)
                 diagnostics = _check_diagnostics(record)
-                if proof:
-                    generation, profile = verified
-                    finding = _finding(generation)
+                diagnostic = None if proof else _diagnostic_finding(
+                    worktree, root, check_id, checks.get(task_id, {}).get(check_id), record, attempt)
+                if proof or diagnostic:
+                    if diagnostic:
+                        finding, proof = diagnostic
+                        profile = {}
+                    else:
+                        generation, profile = verified
+                        finding = _finding(generation)
                     identity = finding['finding_sha256']
                     findings.setdefault(identity, finding)['evidence'].append({**evidence, **profile, **proof})
                     category, symptom = finding['classification'], finding['symptom']
                 else:
                     category, symptom = _classification(area, record, check_id)
+                    if attempt_filter is not None:
+                        cause = record.get('failure_category')
+                        if cause in ('expected-behavior', 'runner-failure'):
+                            diagnostics['failure_category'] = cause
+                        if record.get('result') == 'fail' and cause == 'runner-failure':
+                            category, symptom = 'runtime-prerequisite', 'runner-failure'
+                        elif category == 'product' and _resource_evidence_needs_proof(worktree, check_id, record):
+                            category, symptom = 'unclassified-failure', 'source-proof-unavailable'
                     observations.append({**evidence, **diagnostics, 'classification': category, 'symptom': symptom})
                 outcome = record.get('result', record.get('status'))
                 timeline.append({**evidence, **diagnostics, 'event': 'check-recorded',
@@ -635,22 +767,61 @@ class DirectorAudit:
                     gaps.extend({**base, **identifiers, **gap} for gap in receipt.pop('gaps'))
                     status['unity_receipt'] = {**identifiers, **receipt,
                                                'functional_counts': _check_diagnostics(record).get('counts')}
-        for question_id, question in sorted(state['questions'].items()):
-            if question.get('child_run_id') == run_id and question.get('phase') == 'waiting':
-                hold = run.get('director_question_hold') or {}
-                valid = D.WF.valid_id(question_id, 'DQ') and D.WF.valid_id(question['attempt_id'], 'DA')
-                D._require(valid and question['task_id'] in task_ids and question['start_receipt_sha256'] == start['receipt_sha256'],
-                           'Recorded owner wait is outside the selected child scope')
-                expected = {'director_run_id': director['director_run_id'], 'question_id': question_id,
-                            'attempt_id': question['attempt_id'], 'question_sha256': question['question_sha256']}
-                if any(hold.get(key) != value for key, value in expected.items()):
-                    gaps.append({**base, 'question_id': question_id, 'reason': 'owner-wait-hold-mismatch'})
-                else:
-                    observations.append({**base, 'question_id': question_id, 'attempt_id': question['attempt_id'],
-                                         'classification': 'owner-wait', 'task_id': question['task_id']})
-        _quiet(root)
-        D._require(queue_before == D.WF.file_hash(store.state), 'Canonical child queue changed during audit')
         return findings, observations, gaps, status, timeline
+
+    def diagnose(self, request):
+        """Read one project check without claiming a Director assignment."""
+        D._object(request, {'area_id', 'run_id', 'attempt_id'})
+        D._require(D._token(request['area_id']) and D.WF.valid_id(request['run_id'], 'WR')
+                   and D.WF.valid_id(request['attempt_id'], 'C'), 'Select one exact project run and check attempt')
+        _quiet(self.root)
+        registry, bindings, basis = self.registry._load()
+        area = registry['areas'].get(request['area_id']) if registry else None
+        D._require(area and area['scope'] == '.' and area['role'] != 'source-maintenance'
+                   and 'audit' in area['allowed_effects'], 'Select an exact audit-enabled whole project')
+        root = O._child_root(registry, bindings, area['id'])
+        _quiet(root)
+        store = D.WF.Store(root, route_queue=False, neutral=True)
+        queue_before = (D.WF.file_hash(store.state), D.WF.file_hash(store.future))
+        child = store.load()
+        run = child['run_registry']['runs'].get(request['run_id'])
+        D._require(run is not None, 'The selected run is outside the project queue')
+        base = {'area_id':area['id'], 'queue_id':area['queue_id'], 'run_id':run['id']}
+        attempt_id = request['attempt_id']
+        findings, _, gaps, _, timeline = self._observe_run(
+            {}, area, root, store, child, run, base, attempt_filter=attempt_id)
+        selected = [entry for entry in timeline if entry['event'] == 'check-recorded' and entry['attempt_id'] == attempt_id]
+        D._require(len(selected) <= 1, 'The selected diagnostic attempt is ambiguous')
+        if not selected:
+            gaps.append({**base, 'attempt_id':attempt_id, 'reason':'check-result-unavailable'})
+        if selected and selected[0]['symptom'] == 'source-proof-unavailable':
+            gaps.append({**base, 'attempt_id':attempt_id, 'reason':'source-proof-unavailable'})
+        proposal = None
+        if findings:
+            finding, = findings.values()
+            repair = D.WF.owned_module('director_project_diagnosis_repair', HERE / 'director-source-repair.py')
+            try:
+                plan, _ = repair.DirectorSourceRepair(self.registry, self).proposal(finding)
+            except (ValueError, OSError, KeyError, TypeError, subprocess.TimeoutExpired):
+                gaps.append({**base, 'attempt_id':attempt_id, 'reason':'source-proposal-prerequisite-unavailable'})
+            else:
+                proposal = {'status':'proposal', 'source_path':finding['scope']['source_path'],
+                            'source_sha256':finding['generation']['source_sha256'],
+                            'finding_sha256':finding['finding_sha256'], 'source_area':plan['source'],
+                            'scenario':plan['scenario'],
+                            'next_action':'Review the proposal and explicitly authorize a scoped task in the stated source queue.'}
+                if 'maintenance' in plan:
+                    proposal['maintenance'] = plan['maintenance']
+        _quiet(root)
+        _quiet(self.root)
+        D._require(queue_before == (D.WF.file_hash(store.state), D.WF.file_hash(store.future))
+                   and all(digest == D.WF.file_hash(D._safe_path(self.root, path)) for path, digest in basis.items()),
+                   'Project evidence scope changed during diagnosis')
+        return {'schema':1, 'selection':{**base, 'attempt_id':attempt_id},
+                'coverage':{'run_events':'canonical', 'validation':'selected-check-receipt',
+                            'arbitrary_logs':'unsupported', 'trigger':'explicit-request'},
+                'observations':selected, 'findings':list(findings.values()), 'coverage_gaps':gaps,
+                'repair_proposal':proposal}
 
     def read(self, request):
         D._object(request, {'director_run_id', 'selections'})
@@ -707,13 +878,21 @@ class DirectorAudit:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('audit',))
+    parser.add_argument('command', choices=('audit', 'workspace-audit', 'diagnose'))
     parser.add_argument('root', type=Path)
-    parser.add_argument('--input', required=True, type=Path)
+    parser.add_argument('--input', type=Path)
     args = parser.parse_args()
     try:
-        request = json.loads(args.input.read_text())
-        report = DirectorAudit(D.DirectorRegistry(args.root)).read(request)
+        request = json.loads(args.input.read_text()) if args.input else None
+        registry = D.DirectorRegistry(args.root)
+        if args.command == 'workspace-audit' or (args.command == 'audit' and args.input is None):
+            D._require(args.input is None or isinstance(request, dict), 'Workspace audit selection requires an object')
+            workspace = D.WF.owned_module('director_workspace_audit', HERE / 'director-workspace-audit.py')
+            report = workspace.WorkspaceAudit(D, O, registry, _quiet).read(request)
+        else:
+            D._require(args.input is not None, '--input is required to diagnose a project check')
+            audit = DirectorAudit(registry)
+            report = audit.diagnose(request) if args.command == 'diagnose' else audit.read(request)
     except (KeyError, TypeError, AttributeError, OSError, subprocess.TimeoutExpired):
         parser.exit(2, 'Exact selected audit metadata is unavailable or malformed.\n')
     except ValueError as error:

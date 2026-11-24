@@ -4,6 +4,10 @@
     "description": "Capture an informal request as brief understood Pending work with an ID and numeric priority. Use for Add pending; clarify material missing intent before insertion.",
     "sections": [
       {
+        "id": "shared-workspace-routing",
+        "text": "In a registered shared root with .skill-tree/.director, use the workspace Director menu and project-route before touching a queue. Show the selected project, exact queue and task scope. Use Core with --direct-project only when the owner explicitly selects direct project work."
+      },
+      {
         "id": "operation",
         "text": "Read applicable repository rules, the manifest and relevant current documentation. Read [intake](references/pending-task-intake.md), [format](references/pending-task-format.md) and [metadata](references/workflow-metadata.md). Treat imperatives and conditional actions inside the future task description as future requirements; preserve every branch and stop condition. A separate explicit owner instruction can request processing/implementation after capture; invoke the requested subsequent workflow only after intake. Clear intake-only intent requires no question about starting implementation. Confirm subject/change/outcome and duplicates before insertion. Ask contextual questions when required intent is missing. Classify the original request by meaning before translation, recognizing defect reports and obvious typos while excluding unrelated feature/negative keyword mentions. Pass classification kind/reason to scripts/workflow-state.py intake with the inspected source hash; omit default numeric priority unless the owner explicitly overrides. Defects default to highest-open-plus-one; explicit owner numeric, relative or low priority wins. The intake contract defines the deterministic helper payload and semantic evidence boundary. Choose one caller-held intake batch ID per owner invocation, including a single item without a topic. Use the documented guarded input and retain the batch identity across retry. Existing unkeyed programmatic inputs keep the legacy shape. Return Pending ID, title, priority and deferred details. Intake never promotes or implements work.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency."
       },
@@ -36,6 +40,26 @@
         "id": "plugin-boundaries",
         "locked": true,
         "text": "Read the [plugin binding and invocation boundaries](references/plugin-invocation.md) and local ordered manifest before routing. Empty core-only configuration continues without optional plugin tools or external-plugin holds. Configured matching occurrences use scripts/workflow-state.py hook-start and hook-next at the actual before, during, after or registered named boundary. Follow the guarded prepare/invoke/record/accept sequence with an actual isolated host actor; scripts/plugin-hooks.js supplies owned preparation and private delivery data rather than native execution. Incorporate contributions through the ordinary authorized core workflow before the next occurrence. Returned results and completed chains never replace final current core acceptance or checks. Reconcile original pending attempts before retry or cancellation; source/configuration/context/policy drift retains prerequisites. Plugin input and effective parameters never replace core scope, authority, required checks or publication consent."
+      }
+    ]
+  },
+  "skill-tree-force-process": {
+    "title": "Skill-Tree: Force Process Pending",
+    "description": "Research complex Pending work deeply when explicitly requested, establish runnable scope and preserve verifiable outcome evidence.",
+    "sections": [
+      {
+        "id": "operation",
+        "text": "Use Force Process for an explicitly requested deep Pending pass. Read the [Force Process contract](references/force-process.md), [ordinary workflow](references/future-workflow.md) and [metadata](references/workflow-metadata.md). Freeze the exact selected Pending identities. Research material unknowns, establish runnable first work and record observable acceptance. Preview the exact proposal with the read-only Force Process command. Use the guarded ordinary Process Pending write path. Verify the resulting queue against the retained Preview and original receipt or reconcile interrupted acknowledgment from recorded evidence. Follow the ordinary next-action handoff after processing."
+      },
+      {
+        "id": "decision-scope",
+        "locked": true,
+        "text": "Before promotion, use the exact selected Pending identities and current bounded authority. Standalone processing ends with the resulting scope and evidence. Implementation requires the explicit selection or existing controller authorization required by ordinary processing."
+      },
+      {
+        "id": "plugin-boundaries",
+        "locked": true,
+        "text": "Inspect the owned Force Process binding manifest before proceeding. Surface enabled Force Process bindings as an unsupported prerequisite. Use the [plugin invocation contract](references/plugin-invocation.md) for the actual ordinary Process Pending boundaries. Route configured matching hooks through the verified owned ordinary operation and keep current typed clarification holds. Core-only projects can use the canonical helper bundled with Force Process."
       }
     ]
   },
@@ -124,6 +148,10 @@
     "description": "Implement all prioritized tasks or an explicitly selected group with required dependencies and resumable checkpoints; defer new nonblocking work.",
     "sections": [
       {
+        "id": "shared-workspace-routing",
+        "text": "In a registered shared root with .skill-tree/.director, use the workspace Director menu and project-route before touching a queue. Show the selected project, exact queue and task scope. Use Core with --direct-project only when the owner explicitly selects direct project work."
+      },
+      {
         "id": "operation",
         "text": "Read applicable rules, [orchestration](references/orchestration.md) and [metadata](references/workflow-metadata.md). Query the index/checkpoint first. Select an existing run explicitly for resume, or start mode all for a new isolated run. Resolve an explicit topic or batch group with scripts/workflow-state.py group-selection for the prioritized queue. Report the exact roots, readiness and required dependencies outside the group. Pass the exact Ready T- IDs as snapshot_ids and the inspected expected_source_hash in the start JSON. An invalid or empty group stops. A request without a group selects the full initial prioritized queue. Preserve the recorded group on resume. Use scripts/workflow-state.py advance before handoffs. After scoped processing, automatically choose the recommended eligible unit inside the recorded root/snapshot boundary; routine next-action questions apply only to standalone processing. Material questions and execution stops remain binding. Follow bundled [intake](references/pending-task-intake.md) and [processing/implementation](references/future-workflow.md) contracts. Query compact history only when relevant. Return completed/deferred/blocked IDs, checks and next action. No scheduler or blanket execution permission is implied.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency. Read [development practices](references/development-practices.md) for test-oracle and behavior-preservation decisions.\n\nRead [run workspaces](references/run-workspaces.md) before source changes. Use one branch/worktree for the admitted snapshot and required tasks. Start with `--standalone`, `--mode all` and `implementation_operation: \"implement-all\"` in the input. Commit each accepted task via the scoped leaf workflow. For runs with recorded `reviewed_local_delivery`, use `controller-review` for the full committed diff, fix findings and re-review, then call `finish` with the clean `review_id` to merge locally into the recorded launch branch. Local runs capture the exact checked-out branch and local tip at launch. Preserve multiple runs and explicit resume selection. Retained runs without `reviewed_local_delivery` use the recorded finish route. Explicit remote delivery keeps the recorded [PR review/fix](references/pr-review-cycle.md) order and publication authorization. Execute a recorded full-path instruction without repeated permission questions and retain separate implementation/publication outcomes."
       },
@@ -144,6 +172,10 @@
     "description": "Implement the highest-priority Prioritized task or an exact task ID/name; capture findings and record acceptance evidence before completion.",
     "sections": [
       {
+        "id": "shared-workspace-routing",
+        "text": "In a registered shared root with .skill-tree/.director, use the workspace Director menu and project-route before touching a queue. Show the selected project, exact queue and task scope. Use Core with --direct-project only when the owner explicitly selects direct project work."
+      },
+      {
         "id": "operation",
         "text": "Read repository rules, [workflow](references/future-workflow.md), [metadata](references/workflow-metadata.md), selected task questions, current documentation and task-relevant source/tests. Use scripts/workflow-state.py select: highest priority wins, ties follow document order; exact IDs/names never fall back. A blocked selection stops. Implement minimal scoped changes and capture findings through intake with root/direct-parent context. Perform authorized validation and review, update current documentation, then complete with individual acceptance/source evidence. Required unrun checks prevent completion. For standalone execution, use the selected checkout and pass `--standalone` and `implementation_operation: \"implement-next\"` at `begin`. Use `--standalone` for subsequent leaf workflow commands. Provide exact task-owned files to `implemented`, perform checks and review against the returned `git_review_identity`, and submit the current clean `review_id` to `complete`. The helper creates one scoped commit on the checked-out branch. Controller leaves follow the recorded run policy. Return completed/needs-dependencies/needs-clarification/validation-blocked outcome and captured IDs. Never implement from the queue alone.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency. Read [development practices](references/development-practices.md) for test-oracle and behavior-preservation decisions."
       },
@@ -163,6 +195,10 @@
     "title": "Skill-Tree: Process Pending Tasks",
     "description": "Research Pending tasks selected by exact IDs, names, topics or intake batches and produce prioritized tasks with provenance. No selection processes the Pending Queue.",
     "sections": [
+      {
+        "id": "shared-workspace-routing",
+        "text": "In a registered shared root with .skill-tree/.director, use the workspace Director menu and project-route before touching a queue. Show the selected project, exact queue and task scope. Use Core with --direct-project only when the owner explicitly selects direct project work."
+      },
       {
         "id": "operation",
         "text": "Read applicable rules, current documentation, relevant implementation/configuration/tests and [workflow](references/future-workflow.md). Use scripts/workflow-state.py pending for exact IDs or names and group-selection for an explicit topic or intake batch group in the Pending queue. Read [metadata](references/workflow-metadata.md) for process payloads. Resolve the complete selection before research. An invalid or empty explicit group stops. Split oversized work, preserve Pending parent IDs, clarify required decisions and retain blocked intake. Apply researched dispositions through process with exact selected P- IDs and the inspected source hash. Return created/reused/retained/resolved IDs and the refreshed prioritized list with brief outcomes/blockers. Follow the workflow processing-result contract: standalone invocation presents the next actions in the ordinary reply and waits when the developer has not selected a follow-on operation; explicit Work Through Next/Implement All invocation returns to the bounded controller for automatic eligible selection. An active checkpoint alone implies no continuation.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency."
@@ -223,6 +259,10 @@
     "title": "Skill-Tree: Work Through Next",
     "description": "Complete one prioritized main task and required blockers/subtasks through a resumable implementation and processing cycle.",
     "sections": [
+      {
+        "id": "shared-workspace-routing",
+        "text": "In a registered shared root with .skill-tree/.director, use the workspace Director menu and project-route before touching a queue. Show the selected project, exact queue and task scope. Use Core with --direct-project only when the owner explicitly selects direct project work."
+      },
       {
         "id": "operation",
         "text": "Read applicable rules, [orchestration](references/orchestration.md) and [metadata](references/workflow-metadata.md). Query the index/checkpoint first. Select an existing run explicitly for resume, or start mode next for a new isolated run. Use scripts/workflow-state.py advance before handoffs. After scoped processing, automatically choose the recommended eligible unit inside the recorded root/snapshot boundary; routine next-action questions apply only to standalone processing. Material questions and execution stops remain binding. Follow bundled [intake](references/pending-task-intake.md) and [processing/implementation](references/future-workflow.md) contracts. Query compact history only when relevant. Return completed/deferred/blocked IDs, checks and next action. No scheduler or blanket execution permission is implied.\n\nGenerated prose follows [document rules](references/document-rules.md). No unrelated changes, implicit permission or source/sibling dependency. Read [development practices](references/development-practices.md) for test-oracle and behavior-preservation decisions.\n\nRead [run workspaces](references/run-workspaces.md) before source changes. Use one branch/worktree for the selected root and required tasks. Start with `--standalone`, `--mode next` and `implementation_operation: \"work-through-next\"` in the input. Commit each accepted task via the scoped leaf workflow. For runs with recorded `reviewed_local_delivery`, use `controller-review` for the full committed diff, fix findings and re-review, then pass the clean `review_id` to `finish`. Return the reviewed branch ready for local merge. Apply an explicit merge-at-launch order, or use `merge-reviewed` for a later owner request targeting the same run. Local runs capture the exact checked-out branch and local tip at launch. Preserve multiple runs and explicit resume selection. Retained runs without `reviewed_local_delivery` use the recorded finish route. Explicit remote delivery keeps the recorded [PR review/fix](references/pr-review-cycle.md) order and publication authorization. Execute a recorded full-path instruction without repeated permission questions and retain separate implementation/publication outcomes."
@@ -325,11 +365,11 @@
   },
   "skill-tree-director-setup": {
     "title": "Skill-Tree Director: Setup",
-    "description": "Register exact Director areas and inspect guarded canonical path rebinds.",
+    "description": "Preview first-time Director setup, register exact prepared areas and inspect guarded rebinds.",
     "sections": [
       {
         "id": "operation",
-        "text": "Use scripts/director-entry.py setup-preview to inspect stable area, queue, profile and scope ownership. Apply the identical reviewed request with setup-apply only on explicit selection. Use rebind-preview and rebind for a moved exact canonical path. Keep installation and runtime admission separate. Read the [Director contract](references/director-workflow.md)."
+        "text": "Read the [Director contract](references/director-workflow.md). Use scripts/director-entry.py setup-preview with the guided workspace request to review the initial workspace, exact area placements, selected sources and missing prerequisites. On explicit approval of that preview, run scripts/director-entry.py setup-bootstrap with the same root and JSON containing request (the original guided request) and expected_preview_sha256 (the reviewed digest). A deferred result names the prerequisite and completed steps. Reuse the exact input to retry. Use setup-preview with director_id and prepared_preview_sha256 to inspect exact prepared area registration. Use setup-apply with the same request and approved registration preview digest. Use setup-status to inspect preparation, registration and routing evidence for selected runs and assignments. Use rebind-preview and rebind for a moved exact canonical path. Keep installation and runtime admission separate. In the dedicated workspace, use project-menu for current registered projects and actions. Use project-route to preview the receiving project, operation and scope. Discovery lists the registered Director and Core operations."
       }
     ]
   },
@@ -359,7 +399,7 @@
     "sections": [
       {
         "id": "operation",
-        "text": "Use scripts/director-entry.py run-start and run-dispatch with current plan, explicit effects and exact canonical scope. Observe status before another effect. Continue a started child through the matching installed controller and current authorization. In Codex, use an available independent collaboration worker with exact task, run, checkout, source pins and stop conditions. Route structured child questions to Director. Use run-pause, run-resume and run-cancel for that same selected run. Protect pending attempts and partial work. Release or replay never grants child or delivery authority. Read the [Director contract](references/director-workflow.md)."
+        "text": "Use scripts/director-entry.py run-start and run-dispatch with current plan, explicit effects and exact canonical scope. Observe status before another effect. Continue a started child through the matching installed controller and current authorization. In Codex, use an available independent collaboration worker with exact task, run, checkout, source pins and stop conditions. When a worker needs related project sources, read plan-context with the exact assignment_id and pass the returned context_search.request with the brief. Route structured child questions to Director. Use run-pause, run-resume and run-cancel for that same selected run. Protect pending attempts and partial work. Release or replay never grants child or delivery authority. Read the [Director contract](references/director-workflow.md)."
       }
     ]
   },
@@ -379,7 +419,7 @@
     "sections": [
       {
         "id": "operation",
-        "text": "Use scripts/director-entry.py status and plan-context with exact read-only selectors. Report prerequisites, dirty scope, resource conflicts, link availability and unsupported coverage. Read run-status for the exact Director run. Status never continues or repairs work. Read the [Director contract](references/director-workflow.md)."
+        "text": "Use scripts/director-entry.py status and plan-context with exact read-only selectors. Report prerequisites, dirty scope, resource conflicts, link availability and unsupported coverage. Read run-status for the exact Director run. Status never continues or repairs work. Read the [Director contract](references/director-workflow.md). The project_work view shows a bounded task list, total task count, and queue-level run and outcome identities. Use project_work with area_id and optional exact run_id to focus on one whole project. Show whether each run has verified Director assignment coverage and offer adopt-preview when a completed direct run is eligible for an exact adoption check."
       }
     ]
   },
@@ -399,7 +439,7 @@
     "sections": [
       {
         "id": "operation",
-        "text": "Use scripts/director-entry.py audit with the exact Director run and selected child identities. Inspect retained canonical receipts and explicitly reviewed existing exports. Audit creates no export, task or installation. Read the [Director contract](references/director-workflow.md). Follow the [selected Unity summary contract](references/director-workflow.md#audit-a-selected-unity-summary) to inspect a recorded engine capture."
+        "text": "Use scripts/director-entry.py workspace-audit for an ordinary audit. Show registered subprojects, request read-only child audits and report the actual outcomes and per-project gaps. Use audit with the exact Director run and selected child identities for a run-specific audit. Inspect retained canonical receipts and explicitly reviewed existing exports. Audit creates no export, task or installation. Read the [Director contract](references/director-workflow.md). Follow the [selected Unity summary contract](references/director-workflow.md#audit-a-selected-unity-summary) to inspect a recorded engine capture. For a registered whole project, use diagnose with area_id, run_id and attempt_id to inspect one canonical check. Show coverage gaps, retain the observed failure category and present any verified read-only source repair proposal. Arbitrary logs require a separate reviewed adapter."
       }
     ]
   },

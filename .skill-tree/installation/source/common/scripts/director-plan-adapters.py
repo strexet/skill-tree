@@ -6,8 +6,9 @@ from pathlib import Path, PurePosixPath
 import subprocess
 
 
-COMMANDS = {'plan-preview', 'plan-freeze', 'plan-context', 'plan-impact'}
 PLAN_SELECTOR = {'objective_id', 'plan_id', 'plan_revision'}
+CONTEXT_SELECTOR = PLAN_SELECTOR | {'assignment_id'}
+AREA_IDENTITY = ('id', 'repo_id', 'queue_id', 'scope')
 FIXTURE = 'tests/fixtures/director'
 NARRATIVE = 'narrative-state.py'
 NARRATIVE_SHA = 'ad6618d06fc1b2cac79694a64ff5733bdd03a330e0714851e04e185d108c1388'
@@ -205,7 +206,17 @@ class PlanSources:
             else:
                 area = self.registry['areas'][item['area']['id']]
                 for relative in item['write_paths']:
-                    self.D._safe_path(self.area_root(area), relative)
+                    target = self.D._safe_path(self.area_root(area), relative)
+                    if self.area_root(area) == self.D.director_workspace(director_root):
+                        protected = [director_root]
+                        for other in self.registry['areas'].values():
+                            if other['queue_id'] != area['queue_id']:
+                                nested = self.root(other)
+                                if nested and nested.is_relative_to(self.area_root(area)):
+                                    protected.append(nested)
+                        self.D._require(not any(target.is_relative_to(child) or child.is_relative_to(target)
+                                                for child in protected),
+                                        'Working project write scope overlaps an independently owned Director area')
 
 
 class DirectorPlans:
@@ -281,9 +292,101 @@ class DirectorPlans:
         return plan, pin['plan_sha256']
 
     def context(self, selector):
-        plan, sha = self.frozen(selector)
-        return {'plan_id': plan['plan_id'], 'plan_revision': plan['plan_revision'], 'plan_sha256': sha,
-                **self.C.context(plan)}
+        self.D._object(selector, PLAN_SELECTOR, {'assignment_id'})
+        plan, sha = self.frozen({key: selector[key] for key in PLAN_SELECTOR})
+        context = {'plan_id': plan['plan_id'], 'plan_revision': plan['plan_revision'], 'plan_sha256': sha,
+                   **self.C.context(plan)}
+        if 'assignment_id' in selector:
+            assignments = self.context_assignments(plan, selector['assignment_id'])
+            context['assignments'] = [row for row in context['assignments'] if row['id'] in assignments]
+            registry, _, _ = self.registry._load()
+            context['context_search'] = {
+                'request': {**selector, 'expected_plan_sha256': sha},
+                'sources': self.context_sources(assignments, registry['areas']),
+            }
+        return context
+
+    def context_assignments(self, plan, selected):
+        self.D._require(isinstance(selected, str), 'Context search requires one exact assignment ID')
+        assignments = {row['id']: row for row in plan['assignments']}
+        self.D._require(selected in assignments, 'Assignment is outside the frozen plan')
+        pending = {selected}
+        result = {}
+        while pending:
+            key = pending.pop()
+            assignment = assignments[key]
+            result[key] = assignment
+            pending.update(set(assignment['depends_on']) - result.keys())
+        return result
+
+    def context_sources(self, assignments, registry_areas):
+        sources = {}
+        commits = {}
+        for assignment in assignments.values():
+            area = assignment['area']
+            commit = area['qualification']['head']
+            identity = {key: area[key] for key in AREA_IDENTITY}
+            commits.setdefault(area['queue_id'], set()).add(commit)
+            sources[('area', area['id'], commit)] = {'area': identity, 'commit': commit, 'path': area['scope']}
+        for assignment in assignments.values():
+            for pin in assignment['pins']:
+                if pin['status'] != 'verified' or pin['adapter'] not in {'fixture-narrative', 'fixture-artworkshop'}:
+                    continue
+                area = registry_areas.get(pin['area_id'])
+                path = pin.get('path')
+                if area is None or path is None or not PurePosixPath(path).is_relative_to(area['scope']):
+                    continue
+                identity = {key: area[key] for key in AREA_IDENTITY}
+                candidates = commits.get(area['queue_id'], set())
+                commit = next(iter(candidates)) if len(candidates) == 1 else None
+                sources[('pin', area['id'], path, pin['record_id'], pin['revision'], pin['sha256'])] = {
+                    'area': identity, 'commit': commit, 'path': path,
+                    'pin': {key: pin[key] for key in ('record_id', 'revision', 'sha256')},
+                }
+        return [sources[key] for key in sorted(sources)]
+
+    def context_search(self, payload):
+        self.D._object(payload, CONTEXT_SELECTOR | {'expected_plan_sha256', 'query'}, {'limit'})
+        scope = self.context({key: payload[key] for key in CONTEXT_SELECTOR})['context_search']
+        self.D._require(scope['request']['expected_plan_sha256'] == payload['expected_plan_sha256'],
+                        'Context search requires the exact frozen plan digest')
+        backend = self.D.WF.owned_module('context_search', Path(__file__).with_name('context-search.py'))
+        limit = payload.get('limit', backend.DEFAULT_LIMIT)
+        terms = backend.query_terms(payload['query'], limit)
+        registry, bindings, _ = self.registry._load()
+        matches = {}
+        coverage = []
+        for source in scope['sources']:
+            area = source['area']
+            entry = {'area_id': area['id'], 'path': source['path'], 'commit': source['commit']}
+            coverage.append(entry)
+            try:
+                current = registry['areas'].get(area['id'])
+                self.D._require(current and all(current[key] == area[key] for key in AREA_IDENTITY),
+                                'The search area no longer matches its registered identity')
+                self.D._require(self.D.READ_EFFECTS.intersection(current['allowed_effects']),
+                                'The registered area permits no read-only effects')
+                root = self.O._child_root(registry, bindings, area['id'])
+                commit = source['commit'] or self.D.WS.local_git_text(root, 'rev-parse', '--verify', 'HEAD^{commit}')
+                entry['commit'] = commit
+                pin = source.get('pin')
+                found = backend.search(self.D.WS.local_git_args, root, commit, source['path'], terms, limit,
+                                       expected_sha256=pin['sha256'] if pin else None)
+                entry['status'] = 'searched'
+            except ValueError as error:
+                entry.update(status='unavailable', reason=str(error))
+                continue
+            except (OSError, subprocess.TimeoutExpired):
+                entry.update(status='unavailable', reason='The local Git source could not be read')
+                continue
+            for match in found:
+                key = (area['id'], commit, match['path'])
+                result = matches.setdefault(key, {**match, 'area_id': area['id'], 'repo_id': area['repo_id']})
+                if pin and pin not in result.setdefault('pins', []):
+                    result['pins'].append(pin)
+        ranked = sorted(matches.values(), key=lambda item: (-len(item['matched_terms']),
+                        not item.get('pins'), item['path'], item['area_id'], item['commit']))
+        return {**scope['request'], 'sources': coverage, 'matches': ranked[:limit]}
 
     def impact(self, payload):
         self.D._object(payload, PLAN_SELECTOR | {'changed'})
@@ -293,5 +396,5 @@ class DirectorPlans:
 
     def run(self, command, payload):
         operations = {'plan-preview': self.preview, 'plan-freeze': self.freeze,
-                      'plan-context': self.context, 'plan-impact': self.impact}
+                      'plan-context': self.context, 'plan-impact': self.impact, 'context-search': self.context_search}
         return operations[command](payload)
