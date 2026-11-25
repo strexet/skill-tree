@@ -1,10 +1,6 @@
 """Public project choices for an installed, dedicated Director workspace."""
 import os
-import re
-import stat
-import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 
@@ -116,59 +112,14 @@ def storage_location(workspace, home=None):
         return None
     relative = (workspace / (home or D.DIRECTOR_HOME)).relative_to(product).as_posix()
     D._require('\r' not in relative and '\n' not in relative, 'Unsupported Git path for Director storage')
-    tracked = D.WS.local_git(product, 'ls-files', '-z', '--', relative)
-    D._require(not tracked.stdout, 'Director storage overlaps tracked product files')
     return product, relative
 
 
 def protect_storage(workspace, *, apply=True, home=None):
     location = storage_location(workspace, home)
-    if location is None:
-        return
-    product, relative = location
-    common = D.WS.common_dir(product)
-    exclude = Path(D.WS.local_git_text(product, 'rev-parse', '--path-format=absolute', '--git-path', 'info/exclude'))
-    D._require(exclude == common / 'info/exclude' and not exclude.is_symlink()
-               and not exclude.parent.is_symlink(), 'Select the ordinary Git local exclude file')
-    command = D.WS.local_git_args(product, 'check-ignore', '-q', '--no-index', '--', './' + relative + '/')
-    command.remove('--literal-pathspecs')  # check-ignore treats the operand as a pathname.
-    def ignored():
-        result = subprocess.run(command, env=D.WS.local_git_environment(), capture_output=True, timeout=45)
-        D._require(result.returncode in (0, 1), 'Could not verify the Director storage exclusion')
-        return result.returncode == 0
-
-    def replace(content, mode):
-        with tempfile.NamedTemporaryFile(dir=exclude.parent, delete=False) as handle:
-            staged = Path(handle.name)
-            try:
-                handle.write(content)
-                handle.flush()
-                os.chmod(staged, mode)
-                os.replace(staged, exclude)
-            finally:
-                staged.unlink(missing_ok=True)
-
-    if not apply:
-        D._require(ignored(), 'Director storage needs a local Git exclusion. Reapply the Director installation.')
-        return
-    exclude.parent.mkdir(exist_ok=True)
-    with D.WS.local_git_lock(exclude.with_name('exclude.skill-tree.lock')):
-        if ignored():
-            return
-        present = exclude.exists()
-        D._require(not exclude.is_symlink() and (not present or exclude.is_file()), 'Unsafe Git local exclude file')
-        original = exclude.read_bytes() if present else b''
-        mode = stat.S_IMODE(exclude.stat().st_mode) if present else 0o644
-        separator = b'\n' if original and not original.endswith(b'\n') else b''
-        escaped = re.sub(r'([\\*?\[\] ])', r'\\\1', relative)
-        replace(original + separator + os.fsencode('/' + escaped + '/\n'), mode)
-        if not ignored():
-            if present:
-                replace(original, mode)
-            else:
-                exclude.unlink()
-            raise ValueError('Product Git ignore rules expose Director storage. Keep the service directory ignored.')
-
+    if location is not None:
+        product, relative = location
+        D._bootstrap_helper().protect_git_storage(product, (relative + '/',), apply=apply)
 
 
 def shared_routing(checkout):
@@ -298,6 +249,8 @@ def run(raw_root, command, request):
                        'Director coordinator ownership changed before setup')
             if 'owner' not in owner or has_interrupted_coordinator_preparation(root, B, owner):
                 ensure_project(root, root, 'existing', 'director', 'coordinator', hosts, pkg, B)
+            else:
+                B.protect_coordinator_storage(root)
             D._inspect_owner(root)
             protect_storage(workspace, home=root.relative_to(workspace))
         return {'status':'ready', 'director':str(root), 'providers':hosts}
@@ -321,6 +274,7 @@ def run(raw_root, command, request):
         D._require(descriptor(root) == (settings, pkg), 'Director workspace descriptor changed during setup')
         D._require(require_coordinator(root, pkg) == owner, 'Director coordinator ownership changed before setup')
         require_prepared_coordinator(root, settings, B, owner)
+        B.protect_coordinator_storage(root)
         previous, _ = D._read(root, record)
         if previous:
             verify_choice(previous)

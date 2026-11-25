@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "398ad09c5cbf95ad7f6f61f88fb36750d24940af99ceaceba3df8b0a9391da72",
+  "identity": "0549b5d2f8a8421b3d519fd0ae1e1a6e82140890f14eea6c3a97698f6953b7a2",
   "operation": "skill-tree-director-intake",
   "operations": {
     "skill-tree-3d": {
@@ -3294,7 +3294,7 @@
     "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     "references/development-practices.md": "352a45b093f2c53b7b08aef045a098880af74c6add6fb79f95017a52fd0e0780",
     "references/director-capabilities.json": "8fcc314f88b5b818220d13a54e86550319712f752a0fd4fcaf9ebab4921051fb",
-    "references/director-workflow.md": "4b8bfd85fe4c82c47cde5bcb1dc183b7559302dbfa38b292d01ba0abcdb0cbb1",
+    "references/director-workflow.md": "d2d015211741fb74a278d59d0f037ce4382a77b52f9da89ac79b01b5ad6bd935",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/future-workflow.md": "3a6bc83660773c23af11cf00eacb90ed618db701d464fd7fcd304d5d90fca50b",
     "references/history-retention.md": "ff3fa8602fa29085b59f0aa5ae9f9da698bd5b5d5672235fe809018b18b4b801",
@@ -3327,7 +3327,7 @@
     "scripts/runtime/common/scripts/director-plans.py": "b28d8e4326dda6c390586759e36750c74cb909169ff244ecfe7af1e359bfb863",
     "scripts/runtime/common/scripts/director-questions.py": "60d18e3d18eff83b680dcb454a87d24db4c027a9e90065d1f0d2dfb6bcc2ad6c",
     "scripts/runtime/common/scripts/director-run.py": "d64270ca291a6e8a607ad42676c6d65287852f7a39e091efadc05eda11cee7f0",
-    "scripts/runtime/common/scripts/director-state.py": "554bceadfe62afb18b7f2773d9dd20b80febdfee448b679e9d348a0727a39884",
+    "scripts/runtime/common/scripts/director-state.py": "99c87a73eaf15a9f0a1a31bf0b9a32d49aa7149e18d9a066e4aeba45a2add766",
     "scripts/runtime/common/scripts/narrative-state.py": "ad6618d06fc1b2cac79694a64ff5733bdd03a330e0714851e04e185d108c1388",
     "scripts/runtime/common/scripts/parallel-preview.py": "5425da8665a31cfc681853cf5e5579d2a75295a08ee74399da717f803cf441bc",
     "scripts/runtime/common/scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",

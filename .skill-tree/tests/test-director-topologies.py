@@ -485,6 +485,44 @@ class DirectorTopologyTests(unittest.TestCase):
         self.assertEqual(snapshot(*unselected), before)
         receipt_file.write_bytes(retained)
 
+        linked = self.base/'linked-guided'
+        self.git(tools, 'worktree', 'add', '-b', 'linked-guided', linked, 'HEAD')
+        linked_plan = {'director_id':'linked-bootstrap', 'workspace':{'kind':'existing', 'source':pin}, 'areas':[
+            area('maintenance', 'source-maintenance',
+                 {'kind':'existing', 'topology':'separate', 'path':str(source)}, 'general'),
+        ]}
+        linked_preview = self.invoke(entry, linked, 'setup-preview', linked_plan, [], None)
+        linked_prep = self.invoke(entry, linked, 'setup-bootstrap',
+                                  {'request':linked_plan, 'expected_preview_sha256':linked_preview['preview_sha256']},
+                                  [], None)
+        self.assertEqual(linked_prep['status'], 'prepared')
+        self.assertIn(BINDINGS, self.git(linked, 'check-ignore', '--no-index', '--', BINDINGS))
+        linked_handoff = {'director_id':'linked-bootstrap', 'prepared_preview_sha256':linked_preview['preview_sha256']}
+        linked_review = self.invoke(entry, linked, 'setup-preview', linked_handoff, [], None)
+        apply_linked = {**linked_handoff, 'expected_preview_sha256':linked_review['preview_sha256']}
+        owner_exclude = tools/'.git/info/exclude'
+        saved_exclude = owner_exclude.read_bytes()
+        negate = write(linked, '.gitignore', '!/'+BINDINGS+'\n')
+        transaction = write(linked, '.skill-tree/.transaction.json', json.dumps({
+            'format':'skill-tree-transaction',
+            'writes':[{'path':BINDINGS, 'expected_hash':None, 'content':'{"fixture":"retained binding"}\n'}],
+        }))
+        retained_transaction = transaction.read_bytes()
+        try:
+            self.invoke(entry, linked, 'setup-apply', apply_linked, [], 'needs a local Git exclusion')
+            self.assertFalse((linked/REGISTRY).exists())
+            self.assertFalse((linked/BINDINGS).exists())
+            self.assertEqual(owner_exclude.read_bytes(), saved_exclude)
+            self.assertEqual(transaction.read_bytes(), retained_transaction)
+        finally:
+            negate.unlink()
+            transaction.unlink()
+        linked_registered = self.invoke(entry, linked, 'setup-apply', apply_linked, [], None)
+        self.assertEqual(linked_registered['registry'], linked_review['registry'])
+        self.assertTrue((linked/REGISTRY).is_file())
+        self.assertTrue((linked/BINDINGS).is_file())
+        self.assertFalse((tools/REGISTRY).exists())
+
     def test_cross_area_manual_wait_preserves_same_external_run_and_allows_shared_sibling(self):
         game_task = self.child_task()
         self.register()

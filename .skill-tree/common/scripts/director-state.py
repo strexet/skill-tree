@@ -874,11 +874,24 @@ class DirectorRegistry:
     def preview(self, payload, *, rebind=False):
         return self._plan(payload, rebind)[0]
 
+    def _verify_dedicated_storage(self):
+        if director_workspace(self.root) is None:
+            return
+        setup = _project_setup_helper()
+        _, profile = setup.descriptor(self.root)
+        _inspect_setup_owner(self.root, profile.get('project_root'))
+        _bootstrap_helper().protect_coordinator_storage(self.root, apply=False)
+
     def apply(self, payload, *, rebind=False):
         _require(isinstance(payload, dict) and _sha(payload.get('expected_preview_sha256')),
                  'Apply requires the reviewed preview SHA-256')
         review_sha = payload['expected_preview_sha256']
         request = {key: value for key, value in payload.items() if key != 'expected_preview_sha256'}
+        self._verify_dedicated_storage()
+        if (not rebind and 'prepared_preview_sha256' in request
+                and _safe_path(self.root, '.skill-tree/.transaction.json').exists()):
+            _bootstrap_helper().registration_inputs(self.root, request.get('director_id'),
+                                                    request['prepared_preview_sha256'])
         with self.store.lock():
             preview, registry, bindings, expected = self._plan(request, rebind)
             _require(preview['preview_sha256'] == review_sha, 'Director registry or canonical binding changed since preview')
@@ -888,6 +901,7 @@ class DirectorRegistry:
             changes = {path: value for path, value in writes.items()
                        if hashlib.sha256(value.encode()).hexdigest() != expected[path]}
             if changes:
+                self._verify_dedicated_storage()
                 self.store.commit(changes)
             return {**preview, 'changed_files': sorted(changes)}
 
@@ -1363,6 +1377,13 @@ def _bootstrap_helper():
     return helper
 
 
+def _project_setup_helper():
+    from types import SimpleNamespace
+    helper = WF.owned_module('director_project_setup', Path(__file__).with_name('director-project-setup.py'))
+    helper.D = SimpleNamespace(**globals())
+    return helper
+
+
 def _run_helper(director, command, payload):
     from types import SimpleNamespace
     path = Path(__file__)
@@ -1405,10 +1426,7 @@ def _claude_guard_profile(service):
     workspace = director_workspace(service)
     _require(workspace is not None and _safe_path(workspace, service.relative_to(workspace).as_posix()) == service,
              'Use the owned installed Director workspace for the Claude Code guard')
-    from types import SimpleNamespace
-    application = WF.owned_module('director_project_setup', Path(__file__).with_name('director-project-setup.py'))
-    application.D = SimpleNamespace(**globals())
-    descriptor, profile = application.descriptor(service)
+    descriptor, profile = _project_setup_helper().descriptor(service)
     _require('claude-code' in descriptor['providers'], 'Install the Claude Code host in this Director workspace first')
     setups = [path for path, row in profile['destinations'].items()
               if row['name'] == 'skill-tree-director-setup'
@@ -1646,10 +1664,7 @@ def main(argv=None):
         _require(args.project_id is None and args.guard_binding is None, 'Use project-id and guard-binding only for the Claude Code guard')
         payload = json.loads(args.input.read_text()) if args.input else None
         if args.command.startswith('project-'):
-            from types import SimpleNamespace
-            app = WF.owned_module('director_project_setup', Path(__file__).with_name('director-project-setup.py'))
-            app.D = SimpleNamespace(**globals())
-            result = app.run(args.root, args.command, payload)
+            result = _project_setup_helper().run(args.root, args.command, payload)
             print(WF.dump(result), end='')
             return 0
         if args.command == 'setup-preview' and isinstance(payload, dict) and 'workspace' in payload:

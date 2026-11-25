@@ -361,7 +361,38 @@ test('installed Setup registers existing, default and custom projects with selec
   run('python3',['-B',path.join(__dirname,'../common/scripts/workflow-state.py'),'workspace-setup',seed]);
   const declaration = {director_id:'linked-workspace-director',areas};
   const approved = linkedCall('setup-preview', declaration);
-  linkedCall('setup-apply',{...declaration,expected_preview_sha256:approved.preview_sha256});
+  const registerLinked = {...declaration,expected_preview_sha256:approved.preview_sha256};
+  const localBinding = '.skill-tree/artifacts/director/local-bindings.json';
+  const linkedIgnore = path.join(linkedHome, '.gitignore');
+  const linkedExclude = path.join(linkedHome, '.git/info/exclude');
+  const savedRules = fs.readFileSync(linkedExclude);
+  fs.writeFileSync(linkedIgnore, '!/'+localBinding+'\n', {flag:'wx'});
+  try {
+    fs.writeFileSync(input, JSON.stringify(registerLinked));
+    const rejected = spawnSync('python3',['-B',linkedEntry,'setup-apply',linkedHome,'--input',input],
+      {cwd:linked,env,encoding:'utf8',timeout:120000});
+    assert.equal(rejected.status,2,rejected.stdout+rejected.stderr);
+    assert.match(rejected.stdout+rejected.stderr,/needs a local Git exclusion/);
+    assert.equal(fs.existsSync(path.join(linkedHome,localBinding)),false);
+    assert.equal(fs.existsSync(path.join(linkedHome,'.skill-tree/director/registry.json')),false);
+    assert.deepEqual(fs.readFileSync(linkedExclude),savedRules);
+    const descriptorPath = path.join(linkedHome, 'workspace.json');
+    const savedDescriptor = fs.readFileSync(descriptorPath);
+    fs.unlinkSync(descriptorPath);
+    try {
+      const missing = spawnSync('python3',['-B',linkedEntry,'setup-apply',linkedHome,'--input',input],
+        {cwd:linked,env,encoding:'utf8',timeout:120000});
+      assert.equal(missing.status,2,missing.stdout+missing.stderr);
+      assert.match(missing.stdout+missing.stderr,/Director workspace installation is unavailable/);
+      assert.equal(fs.existsSync(path.join(linkedHome,localBinding)),false);
+      assert.equal(fs.existsSync(path.join(linkedHome,'.skill-tree/director/registry.json')),false);
+    } finally {
+      fs.writeFileSync(descriptorPath,savedDescriptor);
+    }
+  } finally {
+    fs.unlinkSync(linkedIgnore);
+  }
+  linkedCall('setup-apply',registerLinked);
   const linkedRoute = linkedCall('project-route',{operation:'intake'});
   assert.equal(linkedRoute.project.workspace_checkout, linked);
   assert.equal(linkedRoute.project.checkout, root);
@@ -373,4 +404,83 @@ test('installed Setup registers existing, default and custom projects with selec
   assert.notEqual(linkedGuard.status,0);
   assert.match(linkedGuard.stdout+linkedGuard.stderr,/Director owns the default route/);
   assert.deepEqual(data(root,'.skill-tree/documents/future.json'), futureBefore);
+});
+
+test('dedicated coordinator protects machine-local paths and preserves portable Git inputs', t => {
+  const base = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'director-coordinator-ignore-')));
+  t.after(() => fs.rmSync(base, {recursive:true, force:true}));
+  const workspace = path.join(base, 'workspace');
+  fs.mkdirSync(workspace);
+  const env = {...Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_'))),
+    GIT_TERMINAL_PROMPT:'0', GIT_CONFIG_NOSYSTEM:'1', GIT_CONFIG_GLOBAL:os.devNull};
+  function run(command, args, cwd=base, expected=0) {
+    const result = spawnSync(command, args, {cwd, env, encoding:'utf8', timeout:120000});
+    assert.equal(result.status, expected, result.stdout + result.stderr);
+    return result.stdout;
+  }
+  const git = (cwd, ...args) => run('git', args, cwd);
+  git(workspace, 'init', '-q', '-b', 'develop');
+  run(process.execPath, [path.join(__dirname, '../bin/install.js'), '--only', 'codex', '--target', workspace]);
+  const root = path.join(workspace, '.skill-tree/.director');
+  const setup = path.join(root, JSON.parse(fs.readFileSync(path.join(root, 'workspace.json'))).setup_entry);
+  const contents = [
+    'sources/skill-tree/fixture-source.txt',
+    'sources/projects/fixture-project/fixture-source.txt',
+    '.skill-tree/artifacts/director/local-bindings.json',
+  ];
+  function write(relative, value) {
+    const absolute = path.join(root, relative);
+    fs.mkdirSync(path.dirname(absolute), {recursive:true});
+    fs.writeFileSync(absolute, value);
+    return absolute;
+  }
+  for (const relative of contents) write(relative, 'Local fixture\n');
+  const portable = '.skill-tree/director/registry.json';
+  const sibling = 'sources/portable-note.txt';
+  write(portable, '{}\n');
+  write(sibling, 'Portable source note\n');
+  const staging = git(root, 'add', '--all', '--dry-run');
+  for (const relative of contents) {
+    assert.equal(staging.includes(relative), false, 'Coordinator Git staging exposes a machine-local path: ' + relative);
+  }
+  assert.ok(staging.includes(portable));
+  assert.ok(staging.includes(sibling));
+
+  const exclude = path.join(root, '.git/info/exclude');
+  fs.chmodSync(exclude, 0o640);
+  const excludeMode = fs.statSync(exclude).mode;
+  fs.appendFileSync(exclude, '# Fixture rule\n*.fixture-local\n');
+  const original = fs.readFileSync(exclude);
+  const command = ['-B', setup, 'project-init', root];
+  run('python3', command);
+  assert.deepEqual(fs.readFileSync(exclude), original);
+
+  git(root, 'add', '-f', '--', contents[0]);
+  const index = git(root, 'ls-files', '--stage', '--', contents[0]);
+  const blocked = spawnSync('python3', command, {cwd:base, env, encoding:'utf8', timeout:120000});
+  assert.equal(blocked.status, 2, blocked.stdout + blocked.stderr);
+  assert.match(blocked.stdout + blocked.stderr, /tracked.*(Git|coordinator)/i);
+  assert.deepEqual(fs.readFileSync(exclude), original);
+  assert.equal(git(root, 'ls-files', '--stage', '--', contents[0]), index);
+
+  git(root, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
+    'commit', '-qm', 'Record fixture tracked local conflict');
+  git(root, 'rm', '--cached', '--', contents[0]);
+  const stagedRemoval = git(root, 'diff', '--cached', '--name-status');
+  const retained = spawnSync('python3', command, {cwd:base, env, encoding:'utf8', timeout:120000});
+  assert.equal(retained.status, 2, retained.stdout + retained.stderr);
+  assert.match(retained.stdout + retained.stderr, /tracked.*(Git|coordinator)/i);
+  assert.equal(git(root, 'diff', '--cached', '--name-status'), stagedRemoval);
+  assert.deepEqual(fs.readFileSync(exclude), original);
+  git(root, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
+    'commit', '-qm', 'Remove fixture tracked local conflict');
+  const broadRules = fs.readFileSync(exclude, 'utf8').split('\n')
+    .filter(line => line !== '/sources/skill-tree/').join('\n');
+  fs.writeFileSync(exclude, broadRules);
+  write('.gitignore', '!/sources/skill-tree/\n');
+  const refused = spawnSync('python3', command, {cwd:base, env, encoding:'utf8', timeout:120000});
+  assert.equal(refused.status, 2, refused.stdout + refused.stderr);
+  assert.match(refused.stdout + refused.stderr, /ignore rules.*expose/i);
+  assert.equal(fs.readFileSync(exclude, 'utf8'), broadRules);
+  assert.equal(fs.statSync(exclude).mode, excludeMode);
 });

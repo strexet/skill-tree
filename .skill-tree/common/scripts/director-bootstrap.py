@@ -4,6 +4,9 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
+import stat
+import unicodedata
 import subprocess
 import tempfile
 import uuid
@@ -142,6 +145,101 @@ def expected_project(item):
 
 def approved_project(item, actual, expected):
     D._require(actual == expected, f'Approved Git, Core or setup file identity changed: {item["path"]}')
+
+
+COORDINATOR_LOCAL_STORAGE = (
+    'sources/skill-tree/',
+    'sources/projects/',
+    '.skill-tree/artifacts/director/local-bindings.json',
+)
+
+
+def protect_git_storage(root, rules, *, apply=True, coordinator=False):
+    common = D.WS.common_dir(root)
+    D._require(common is not None and D._setup_git_root(root) == root,
+               'Select the exact Git checkout for Director storage protection')
+    exclude = Path(D.WS.local_git_text(root, 'rev-parse', '--path-format=absolute', '--git-path', 'info/exclude'))
+    D._require(exclude == common / 'info/exclude' and not exclude.parent.is_symlink(),
+               'Select the ordinary Git local exclude file')
+    for relative in rules:
+        D._scope(relative.removesuffix('/'))
+        D._require('\r' not in relative and '\n' not in relative, 'Unsupported Git path for Director storage')
+
+    def current():
+        present = os.path.lexists(exclude)
+        D._require(not exclude.is_symlink() and (not present or exclude.is_file()), 'Unsafe Git local exclude file')
+        return (exclude.read_bytes(), stat.S_IMODE(exclude.stat().st_mode)) if present else (None, 0o644)
+
+    def require_untracked():
+        raw = D.WS.local_git(root, 'ls-files', '-z').stdout
+        head = D.WS.local_git(root, 'rev-parse', '--verify', '--quiet', 'HEAD', accepted=(0, 1))
+        if not head.returncode:
+            raw += D.WS.local_git(root, 'ls-tree', '-r', '-z', '--name-only', 'HEAD').stdout
+        fold_case = D.WS.local_git_bool(root, 'core.ignoreCase')
+        precompose = D.WS.local_git_bool(root, 'core.precomposeUnicode')
+
+        def normalized(relative):
+            if precompose:
+                relative = unicodedata.normalize('NFC', relative)
+            return relative.casefold() if fold_case else relative
+
+        selected = tuple(normalized(relative.removesuffix('/')) for relative in rules)
+        tracked = (normalized(path) for path in os.fsdecode(raw).split('\0')[:-1])
+        conflict = any(D.WS.local_overlap(path, relative) for path in tracked for relative in selected)
+        message = ('Machine-local Director storage overlaps tracked coordinator Git paths' if coordinator
+                   else 'Director storage overlaps tracked product files')
+        D._require(not conflict, message)
+
+    def missing():
+        return [relative for relative in rules if D.WS.local_git(
+            root, 'check-ignore', '-q', '--no-index', '--', './' + relative,
+            accepted=(0, 1), literal_pathspecs=False).returncode]
+
+    def replace(content, mode):
+        staged = None
+        try:
+            with tempfile.NamedTemporaryFile(dir=exclude.parent, delete=False) as handle:
+                staged = Path(handle.name)
+                handle.write(content)
+            os.chmod(staged, mode)
+            os.replace(staged, exclude)
+        finally:
+            if staged is not None:
+                staged.unlink(missing_ok=True)
+
+    current()
+    require_untracked()
+    if not apply:
+        D._require(not missing(), 'Director storage needs a local Git exclusion. Reapply the Director installation.')
+        return
+    exclude.parent.mkdir(exist_ok=True)
+    with D.WS.local_git_lock(exclude.with_name('exclude.skill-tree.lock')):
+        original, mode = current()
+        require_untracked()
+        needed = missing()
+        if not needed:
+            return
+        raw = original or b''
+        separator = b'\n' if raw and not raw.endswith(b'\n') else b''
+        addition = b''.join(os.fsencode('/' + re.sub(r'([\\*?\[\] ])', r'\\\1', path) + '\n') for path in needed)
+        candidate = raw + separator + addition
+        replace(candidate, mode)
+        try:
+            require_untracked()
+            message = ('Coordinator Git ignore rules expose Director storage' if coordinator
+                       else 'Product Git ignore rules expose Director storage')
+            D._require(not missing(), message)
+        except (ValueError, OSError, subprocess.TimeoutExpired):
+            D._require(current() == (candidate, mode), 'The Git local exclude file changed during storage verification')
+            if original is None:
+                exclude.unlink()
+            else:
+                replace(original, mode)
+            raise
+
+
+def protect_coordinator_storage(root, *, apply=True):
+    protect_git_storage(root, COORDINATOR_LOCAL_STORAGE, apply=apply, coordinator=True)
 
 
 def git_input(root, *args, content):
@@ -312,6 +410,10 @@ class Bootstrap:
         approved_project(item, project_proof(item), proof)
         D._require(installation(root, item, source, proof['files'], apply=False),
                    f'Owned installation no longer matches the selected source and flavor: {root}')
+        checkout = Path(item['path'])
+        if checkout == self.root and item['flavor'] == 'director':
+            approved_project(item, project_proof(item), proof)
+            protect_coordinator_storage(checkout)
         self.verified.add(item['path'])
         return proof
 
@@ -516,6 +618,7 @@ def registration_inputs(root, director_id, expected):
         return path, queue, repository
 
     workspace = project(plan['workspace'])
+    protect_coordinator_storage(workspace[0], apply=False)
     declared = []
     for area in plan['areas'].values():
         if area['topology'] == 'shared':
