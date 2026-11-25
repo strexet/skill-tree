@@ -1,0 +1,21 @@
+{
+  "check_id": "scoped-regression",
+  "attempt_id": "C-1737d43d-8582-4db7-9b77-d5e6374da905",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-director-topologies.py",
+    "-v"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "counts": {
+    "expected": 10,
+    "discovered": 10,
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0
+  },
+  "observed_output": "test_cross_area_manual_wait_preserves_same_external_run_and_allows_shared_sibling (__main__.DirectorTopologyTests.test_cross_area_manual_wait_preserves_same_external_run_and_allows_shared_sibling) ... ok\ntest_directed_batch_preserves_canonical_metadata_edges_and_receipts (__main__.DirectorTopologyTests.test_directed_batch_preserves_canonical_metadata_edges_and_receipts) ... ok\ntest_managed_implement_all_keeps_full_snapshot_and_dispatches_compatible_work (__main__.DirectorTopologyTests.test_managed_implement_all_keeps_full_snapshot_and_dispatches_compatible_work) ... ok\ntest_managed_implement_all_resumes_after_verified_incorporation (__main__.DirectorTopologyTests.test_managed_implement_all_resumes_after_verified_incorporation) ... ok\ntest_moved_director_setup_stops_before_child_effects_and_reuses_identity (__main__.DirectorTopologyTests.test_moved_director_setup_stops_before_child_effects_and_reuses_identity) ... ok\ntest_owned_shared_root_and_external_rebind_keep_exact_writers (__main__.DirectorTopologyTests.test_owned_shared_root_and_external_rebind_keep_exact_writers) ... ok\ntest_prepared_registration_and_intake_verify_the_original_canonical_route (__main__.DirectorTopologyTests.test_prepared_registration_and_intake_verify_the_original_canonical_route) ... ok\ntest_supervised_heartbeat_progress_and_submission_survive_contention (__main__.DirectorTopologyTests.test_supervised_heartbeat_progress_and_submission_survive_contention) ... ok\ntest_supervised_nested_stall_preserves_sibling_and_fences_replacement (__main__.DirectorTopologyTests.test_supervised_nested_stall_preserves_sibling_and_fences_replacement) ... ok\ntest_supervised_pickup_timeout_recovers_unbound_supervisor_and_worker (__main__.DirectorTopologyTests.test_supervised_pickup_timeout_recovers_unbound_supervisor_and_worker) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 717.749s\n\nOK\n",
+  "timeout": false,
+  "elapsed_seconds": 720.86
+}

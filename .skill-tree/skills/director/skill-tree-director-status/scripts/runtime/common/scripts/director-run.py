@@ -112,7 +112,9 @@ def _host_owner(evidence):
 
 
 def _body(work):
-    return {'title': work['title'], 'description': work['description'],
+    if 'items' in work:
+        return {'intake_batch_id': work['intake_batch_id'], 'items': [_body(item) for item in work['items']]}
+    return {**{key: value for key, value in work.items() if key != 'acceptance'},
             'expected_behavior': '\n'.join(work['acceptance'])}
 
 
@@ -134,6 +136,11 @@ def _deadline(value):
     D._require(when.tzinfo is not None and when.utcoffset().total_seconds() == 0,
                'Director question requires a UTC deadline')
     return when
+
+
+def _batch_run_complete(state):
+    return all(item.get('completed', {}).get('kind') == 'canonical-queue-receipts'
+               for item in state['assignments'].values())
 
 
 def _event(run, event, **fields):
@@ -241,6 +248,9 @@ class DirectorRun:
             authority[name] = D._tokens(payload['authority'][name], 'Director run effects')
             D._require(set(authority[name]) <= set(assignments[name]['effects']).intersection(EFFECTS.values()),
                        'Director launch authority exceeds the selected assignment scope')
+            if 'items' in assignments[name]['child']:
+                D._require('intake' in authority[name],
+                           'Batch processing requires the authorized original batch intake')
         defaults = self._defaults(payload['approved_defaults'], chosen, assignments)
         process_specs = payload.get('process_spec_sha256', {})
         D._require(isinstance(process_specs, dict) and set(process_specs) == {name for name in chosen if 'process' in authority[name]}
@@ -1013,8 +1023,14 @@ class DirectorRun:
                    and receipt['semantic_sha256'] == recorded['semantic_sha256']
                    and observed['observed_result']['id'] == recorded['result']['id'],
                    'Original canonical intake receipt is unavailable or changed')
+        if 'items' in spec['child']:
+            ids = [item['id'] for item in receipt['result']['items']]
+            D._require(ids == recorded['result']['pending_ids'], 'Original canonical intake batch membership changed')
+            provenance = {'intake_batch_id': recorded['result']['id'], 'pending_ids': ids}
+        else:
+            provenance = {'pending_id': recorded['result']['id']}
         return {**result, 'status': 'verified', 'plan_sha256': state['plan_sha256'],
-                'pending_id': recorded['result']['id'], 'receipt_sha256': receipt['receipt_sha256']}
+                **provenance, 'receipt_sha256': receipt['receipt_sha256']}
 
     def lifecycle(self, command, payload):
         D._object(payload, GUARD)
@@ -1027,11 +1043,15 @@ class DirectorRun:
                        'Director run is not in a resumable phase')
             plan = self._plan_for(state)
             if target == 'running':
-                self.current_plan(plan)
+                if _batch_run_complete(state):
+                    target = 'completed'
+                else:
+                    self.current_plan(plan)
             if state['phase'] == target:
                 return self._view(state, sha, plan)
             state['phase'] = target
-            event = {'run-pause': 'run-paused', 'run-resume': 'run-resumed', 'run-cancel': 'run-cancelled'}[command]
+            event = {'paused': 'run-paused', 'running': 'run-resumed', 'cancelled': 'run-cancelled',
+                     'completed': 'batch-run-completed'}[target]
             _event(state, event, phase=target)
             return self._view(state, self._write(relative, state, sha), plan)
 
@@ -1056,15 +1076,18 @@ class DirectorRun:
     def _child_task(self, spec, record, operation):
         if operation == 'intake':
             return None
+        D._require('items' not in spec['child'], 'Batch queue effects do not select a single launch task')
         pinned = spec['child'].get('task_id', '')
         if operation == 'process':
             return pinned if pinned.startswith('P-') else record['dispatches']['intake']['result']['id']
         return pinned if pinned.startswith('T-') else record['dispatches']['process']['result']['created_ids'][0]
 
-    def _scope_processed_task(self, item, spec, expected):
-        D._object(item, {'title', 'body', 'parent_pending_ids'}, {'priority'})
-        D._require(D._digest({key: item[key] for key in item if key != 'parent_pending_ids'}) == expected,
-                   'The promoted child specification differs from the owner-approved body')
+    def _scope_processed_task(self, item, spec, *, expected=None, batch=False):
+        optional = {'priority', 'key', 'depends_on'} if batch else {'priority'}
+        D._object(item, {'title', 'body', 'parent_pending_ids'}, optional)
+        if not batch:
+            D._require(D._digest({key: item[key] for key in item if key != 'parent_pending_ids'}) == expected,
+                       'The promoted child specification differs from the owner-approved body')
         body = item['body']
         D._require(isinstance(body, str), 'The approved task specification requires a text body')
         allowed = [D._scope(spec['area']['scope']) / D._scope(path) for path in spec['write_paths']]
@@ -1080,13 +1103,53 @@ class DirectorRun:
             within(D._scope(path)) or D._scope(path) in pinned for check in checks for path in check['sources']),
                    'Promoted task checks a source outside the frozen assignment scope')
 
+    def _batch_process_request(self, request, spec, record, approved):
+        D._object(request, {'expected_source_hash', 'selectors', 'dispositions', 'tasks'})
+        original = record['dispatches']['intake']
+        ids = original['result']['pending_ids']
+        dispositions, tasks = request['dispositions'], request['tasks']
+        D._require(request['selectors'] == ids and isinstance(dispositions, dict) and set(dispositions) == set(ids)
+                   and all(isinstance(item, dict) and item.get('status') == 'promoted' for item in dispositions.values())
+                   and isinstance(tasks, list) and tasks, 'Director processing requires the exact recorded batch membership')
+        by_id = dict(zip(ids, (item['key'] for item in spec['child']['items'])))
+        projected = []
+        for item in tasks:
+            self._scope_processed_task(item, spec, batch=True)
+            parents = item['parent_pending_ids']
+            D._require(isinstance(parents, list) and parents and all(isinstance(part, str) and part in by_id
+                       for part in parents) and len(set(parents)) == len(parents),
+                       'Director processing requires exact recorded batch origins')
+            projected.append({**item, 'parent_pending_ids': [by_id[part] for part in parents]})
+        authorization = {'selectors': list(by_id.values()),
+                         'dispositions': {by_id[part]: value for part, value in dispositions.items()},
+                         'tasks': projected}
+        D._require(D._digest(authorization) == approved, 'Director processing differs from the owner-approved batch')
+        return {**request, 'director_batch_intake_sha256': original['receipt_sha256']}, None
+
+    def _batch_dispatched_result(self, operation, request, result, receipt):
+        if operation == 'intake':
+            D._require(result['id'] == request['intake_batch_id'], 'Canonical intake batch identity changed')
+            pending_ids = [item['id'] for item in result['items']]
+            fingerprints = receipt.get('pending_definition_sha256s')
+            D._require(isinstance(fingerprints, dict) and set(fingerprints) == set(pending_ids)
+                       and all(D._sha(value) for value in fingerprints.values()),
+                       'Canonical intake batch lacks original Pending definition evidence')
+            return {'pending_ids': pending_ids, 'task_sha256s': fingerprints}
+        D._require(result['selected_ids'] == request['selectors'] and not result['reused_ids']
+                   and len(result['created_ids']) == len(request['tasks']) and result['dispositions'] == request['dispositions'],
+                   'Canonical batch processing acknowledgement has unexpected scope')
+        return {'pending_ids': result['selected_ids']}
+
     def _dispatch_request(self, operation, requested, spec, record, child, original_exists, process_sha, *, managed=False):
         D._require(isinstance(requested, dict) and D._sha(requested.get('expected_source_hash')), 'Dispatch requires the inspected child queue digest')
-        child_id = self._child_task(spec, record, operation)
         if operation == 'intake':
             D._object(requested, {'expected_source_hash'})
             D._require('task_id' not in spec['child'], 'The frozen assignment already owns an existing child task')
             return {**requested, **_body(spec['child'])}, None
+        if 'items' in spec['child']:
+            D._require(operation == 'process', 'Batch queue effects require separate implementation authority')
+            return self._batch_process_request(requested, spec, record, process_sha)
+        child_id = self._child_task(spec, record, operation)
         candidate = next((task for task in D.WF.parse(child.text()) if task['id'] == child_id), None)
         if not original_exists:
             D._require(candidate is not None, 'The exact selected child task is unavailable')
@@ -1106,7 +1169,7 @@ class DirectorRun:
             item = requested['tasks'][0]
             D._require(isinstance(item, dict) and item.get('parent_pending_ids') == [child_id],
                        'Director process cannot expand assignment scope')
-            self._scope_processed_task(item, spec, process_sha)
+            self._scope_processed_task(item, spec, expected=process_sha)
             return requested, None
         D._require(spec['workspace'] == 'recorded-worktree' and set(requested) <= START_OPTIONS,
                    'Directed start requires the planned owned worktree and bounded launch options')
@@ -1194,6 +1257,8 @@ class DirectorRun:
                 request = {**request, 'implementation_operation': 'work-through-next'}
             request = {**request, 'director_dispatch': envelope}
             directed = helper.ChildDispatch(operation, request, start)
+            if not recovering:
+                directed.verify_batch_intake(child)
             if existing is None:
                 current['assignments'][name]['dispatches'][operation] = {'status': 'prepared', 'request_sha256': effect_sha,
                                                                         'semantic_sha256': directed.semantic_sha256,
@@ -1239,7 +1304,10 @@ class DirectorRun:
             result_ids = {key: result[key] for key in ('id', 'created_ids', 'workspace_state') if key in result}
             if operation == 'start' and D.WF.workspaces.initial_profile_pending(result):
                 result_ids['initial_profile_required'] = True
-            if operation in {'intake', 'process'}:
+            batch = 'items' in spec['child']
+            if batch:
+                result_ids.update(self._batch_dispatched_result(operation, request, result, observed['receipt']))
+            elif operation in {'intake', 'process'}:
                 created = result['id'] if operation == 'intake' else result['created_ids'][0]
                 current_child = D.WF.Store(child.root, neutral=True)
                 task = next((candidate for candidate in D.WF.parse(current_child.text()) if candidate['id'] == created), None)
@@ -1261,7 +1329,13 @@ class DirectorRun:
             if pending['status'] != 'recorded':
                 receipt = observed['receipt']['receipt_sha256']
                 pending.update(status='recorded', receipt_sha256=receipt, result=result_ids)
-                if operation == 'intake':
+                if batch:
+                    child_ids = {'pending_ids': result_ids['pending_ids']}
+                    if operation == 'intake':
+                        child_ids['intake_batch_id'] = result['id']
+                    else:
+                        child_ids.update(processing_run_id=result['id'], task_ids=result['created_ids'])
+                elif operation == 'intake':
                     child_ids = {'pending_id': result['id']}
                 elif operation == 'process':
                     child_ids = {'pending_id': request['selectors'][0], 'processing_run_id': result['id'],
@@ -1270,6 +1344,17 @@ class DirectorRun:
                     child_ids = {'task_id': start['selector'], 'child_run_id': result['id']}
                 _event(current, 'dispatch-recorded', assignment_id=name, operation=operation, receipt_sha256=receipt,
                        stage='recover-child-receipt' if recovering else 'acknowledge-child', **child_ids)
+                if batch:
+                    assignment = current['assignments'][name]
+                    allowed = current['authority'][name]
+                    receipts = {key: assignment['dispatches'][key]['receipt_sha256'] for key in allowed
+                                if assignment['dispatches'].get(key, {}).get('status') == 'recorded'}
+                    if set(receipts) == set(allowed):
+                        assignment['completed'] = {'kind': 'canonical-queue-receipts', **child_ids, 'receipts': receipts}
+                        _event(current, 'batch-queue-effects-completed', assignment_id=name, **child_ids)
+                        if current['phase'] == 'running' and _batch_run_complete(current):
+                            current['phase'] = 'completed'
+                            _event(current, 'batch-run-completed', phase='completed')
                 current_sha = self._write(rel, current, current_sha)
             return {'status': 'recorded', 'result': result, 'run_sha256': current_sha}
 
@@ -1280,6 +1365,8 @@ class DirectorRun:
         _same_guard(sha, payload['expected_run_sha256'])
         spec = self._assignment(state, name)
         assignment = state['assignments'][name]
+        D._require('items' not in spec['child'],
+                   'Batch queue effects cannot represent a terminal child run')
         D._require(state['phase'] == 'running' and not any(q['phase'] != 'delivered' for q in assignment['questions'].values()),
                    'Resolve the assignment before recording completion')
         D._require(D.WF.valid_id(payload['outcome_id'], 'O'), 'Completion requires an exact child outcome ID')

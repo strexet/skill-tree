@@ -129,7 +129,11 @@ def task_preview(D, summary, request, operation, mode):
                    and all(isinstance(item, str) for item in requested) and len(set(requested)) == len(requested),
                    'Select distinct exact task identities for this operation')
         D._require(set(requested) <= {task['id'] for task in tasks}, 'A selected task is outside the receiving queue')
-        tasks = [task for task in tasks if task['id'] in requested]
+        if operation == 'process' and mode == 'director':
+            by_id = {task['id']: task for task in tasks}
+            tasks = [by_id[task_id] for task_id in requested]
+        else:
+            tasks = [task for task in tasks if task['id'] in requested]
     if operation == 'implement-next':
         D._require(requested is None or len(requested) == 1, 'Implement Next selects one exact task')
         tasks = sorted(tasks, key=lambda task: -task['priority'])[:1]
@@ -143,13 +147,18 @@ def task_preview(D, summary, request, operation, mode):
             limitations.append(f'director-{required_effect}-not-authorized')
         if operation == 'implement-all':
             limitations.append('director-managed-implement-all-requires-frozen-assignments')
+        elif operation == 'process' and len(tasks) > 1:
+            limitations.append('director-batch-processing-requires-frozen-intake-receipt')
         elif operation != 'intake':
             limitations.append('director-dispatch-requires-one-exact-task-per-assignment')
     task_ids = [task['id'] for task in tasks]
     required = D.WF.dependency_scope(all_tasks, {'snapshot':task_ids}) if operation.startswith('implement-') else set()
+    fields = ['id', 'title', 'status', 'priority', 'depends_on']
+    if operation == 'process':
+        fields.extend(['topic', 'intake_batch_ids', 'pending_depends_on'])
     return {**summary, 'status':'preview', 'queue_sha256':D.WF.digest(text.encode()),
             'task_ids':task_ids, 'required_dependency_ids':sorted(required - set(task_ids)),
-            'tasks':[{key: task[key] for key in ('id', 'title', 'status', 'priority', 'depends_on')} for task in tasks],
+            'tasks':[{key: task[key] for key in fields if key in task} for task in tasks],
             'limitations':limitations}
 
 

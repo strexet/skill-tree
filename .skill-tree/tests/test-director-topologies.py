@@ -15,6 +15,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 from uuid import uuid4
@@ -522,6 +523,211 @@ class DirectorTopologyTests(unittest.TestCase):
         self.assertTrue((linked/REGISTRY).is_file())
         self.assertTrue((linked/BINDINGS).is_file())
         self.assertFalse((tools/REGISTRY).exists())
+
+    def test_directed_batch_preserves_canonical_metadata_edges_and_receipts(self):
+        story = self.declaration['areas'][0]
+        story['allowed_effects'].append('process')
+        self.register()
+        batch_id = identity('IB')
+        batch_items = [
+            {'key':'consumer', 'title':'Investigate story consumer', 'description':'Review the selected story input.',
+             'acceptance':['Preserve the scoped behavior.'], 'priority':495, 'topic':'mvp-five'},
+            {'key':'storage', 'title':'Investigate story storage', 'description':'Review the selected storage input.',
+             'acceptance':['Preserve the scoped behavior.'], 'priority':245, 'topic':'mvp-zero',
+             'pending_depends_on':['@adapter']},
+            {'key':'adapter', 'title':'Investigate story adapter', 'description':'Review the selected adapter input.',
+             'acceptance':['Preserve the scoped behavior.'], 'priority':175, 'topic':'mvp-two'},
+        ]
+        assignment = {'id':'story-batch', 'area_id':'story', 'role':'narrative', 'workspace':'existing-checkout',
+                      'capability':'core-task', 'write_paths':['source.txt'], 'resources':[], 'pins':[],
+                      'depends_on':[], 'expected_result':'Retain directed story scope.', 'check':'scope-check',
+                      'authority_ref':'fixture-owner', 'effects':['intake','process'],
+                      'stop_rules':['Stop for input outside the recorded scope.'],
+                      'child':{'intake_batch_id':batch_id,'items':batch_items}}
+        selected = self.freeze(None, assignments=[assignment])
+        other = self.core(self.parent, 'intake', {
+            'title':'Keep unrelated input', 'description':'Retain the unselected work.',
+            'expected_behavior':'Keep the unselected work unchanged.',
+        })
+        legacy_scope = {'schema':1,'director_id':CURRENT_DIRECTOR,'assignment_id':'relative-batch-fixture',
+                        'queue_id':self.shared_queue,'plan_sha256':selected['plan_sha256']}
+        relative_batch = self.core(self.parent,'director-dispatch',{'operation':'intake','request':{
+            'director_dispatch':legacy_scope, 'expected_source_hash':sha((self.parent/QUEUE).read_bytes()),
+            'intake_batch_id':identity('IB'), 'items':[{
+                'title':'Keep the relative request', 'description':'Preserve unselected work.',
+                'expected_behavior':'Preserve the unselected request.',
+                'relative_priority':{'task_id':other['id'],'direction':'above'},
+            }],
+        }})
+        self.assertEqual(relative_batch['items'][0]['priority'],other['priority']+1)
+        goal = 'Preserve the scoped behavior.'
+        source = 'story/source.txt'
+        check = {'id':'scope-check','recipe_id':'static-inspection','criteria':[goal],
+                 'sources':[source],'parameters':{},'assertion':goal,'timing':'immediate'}
+        body = ('Goal:\n- ' + goal + '\n\nTouch:\n- ' + source + '\n\nValidation:\n```json\n'
+                + json.dumps({'checks':[check]}) + '\n```\n\nAcceptance:\n- ' + goal + '\n')
+        keys = [item['key'] for item in batch_items]
+        disposition = {'status':'promoted','reason':'Research confirms the scoped implementation.'}
+        approved = {
+            'selectors':keys, 'dispositions':{key:disposition for key in keys},
+            'tasks':[
+                {'key':'consumer-task','title':'Implement story consumer','body':body,'parent_pending_ids':['consumer'],
+                 'depends_on':['@storage-task']},
+                {'key':'storage-task','title':'Implement story storage','body':body,'parent_pending_ids':['storage']},
+                {'key':'adapter-task','title':'Implement story adapter','body':body,'parent_pending_ids':['adapter']},
+            ],
+        }
+        approved_sha = sha((json.dumps(approved, ensure_ascii=False, indent=2, sort_keys=True)+'\n').encode())
+        run_ref = {'director_run_id':identity('DR')}
+        run = self.director('run-start', {**selected, **run_ref, 'assignment_ids':[assignment['id']],
+            'owner':{'actor':'fixture-owner','reference':'fixture-batch','kind':'owner-message'},
+            'authority':{assignment['id']:['intake','process']},'approved_defaults':[],
+            'process_spec_sha256':{assignment['id']:approved_sha}})
+        queue_path, state_path = self.parent/QUEUE, self.parent/STATE
+        request = {**run_ref, 'assignment_id':assignment['id'], 'operation':'intake',
+                   'expected_run_sha256':run['run_sha256'],
+                   'request':{'expected_source_hash':sha(queue_path.read_bytes())}}
+        self.director('run-dispatch', {**request, 'request':{**request['request'], 'items':list(reversed(batch_items))}},
+                      error='Unexpected')
+        parent_entry = self.parent/AGENTS/'skill-tree-director-run/scripts/runtime/common/scripts/director-state.py'
+        fault = '''
+import json
+from pathlib import Path
+import runpy
+import sys
+
+director = runpy.run_path(sys.argv[1])
+load = director['WF'].owned_module
+payload = json.loads(Path(sys.argv[-1]).read_text())
+stage = sys.argv[2]
+
+def with_interruption(name, path):
+    helper = load(name, path)
+    if name == 'director_run' and stage == 'lost-ack':
+        original = helper.DirectorRun._write
+
+        def write(self, relative, state, expected_sha):
+            if any(row['event'] == 'dispatch-recorded' and row.get('operation') == payload['operation']
+                   for row in state['timeline']):
+                raise OSError('Injected loss after canonical acknowledgement')
+            return original(self, relative, state, expected_sha)
+
+        helper.DirectorRun._write = write
+    if name == 'director_run' and stage == 'pause':
+        original = helper.DirectorRun._batch_dispatched_result
+
+        def pause(self, *args):
+            result = original(self, *args)
+            run_id = payload['director_run_id']
+            _, _, current_sha = self._load(run_id)
+            self.lifecycle('run-pause', {'director_run_id':run_id,'expected_run_sha256':current_sha})
+            return result
+
+        helper.DirectorRun._batch_dispatched_result = pause
+    return helper
+
+director['WF'].owned_module = with_interruption
+raise SystemExit(director['main'](sys.argv[3:]))
+'''
+        scope = {'schema':1,'director_id':CURRENT_DIRECTOR,'assignment_id':assignment['id'],
+                 'queue_id':self.shared_queue,'plan_sha256':selected['plan_sha256']}
+        intake_input = write(self.base,'lost-batch-intake-ack.json',json.dumps(request))
+        self.command(sys.executable,'-B','-c',fault,parent_entry,'lost-ack','run-dispatch',self.parent,'--input',intake_input,
+                     error='Injected loss after canonical acknowledgement')
+        original_intake = self.core(self.parent,'director-dispatch-read',{'operation':'intake','director_dispatch':scope})
+        canonical_text = queue_path.read_text()
+        altered_text = canonical_text.replace('Review the selected story input.', 'Owner revised the selected story input.')
+        self.assertNotEqual(altered_text,canonical_text)
+        queue_path.write_text(altered_text)
+        intake = self.director('run-dispatch', request)
+        self.assertEqual(intake['result'],original_intake['observed_result'])
+        self.assertEqual(intake['result']['id'],batch_id)
+        self.assertEqual(set(original_intake['receipt']['pending_definition_sha256s']),
+                         {item['id'] for item in intake['result']['items']})
+        items = intake['result']['items']
+        self.assertEqual([(item['priority'],item['topic'],item['intake_batch_ids']) for item in items],
+                         [(495,'mvp-five',[batch_id]),(245,'mvp-zero',[batch_id]),(175,'mvp-two',[batch_id])])
+        pending_ids = [item['id'] for item in items]
+        self.assertNotIn('pending_depends_on',items[0])
+        self.assertEqual(items[1]['pending_depends_on'],[pending_ids[2]])
+        runtime = self.parent/AGENTS/'skill-tree-director-setup/scripts/runtime/common/scripts'
+        director = SimpleNamespace(**runpy.run_path(str(runtime/'director-state.py')))
+        routing = runpy.run_path(str(runtime/'director-project-routing.py'))
+        project = {'checkout':str(self.parent),'allowed_effects':['preview','process']}
+        route = routing['task_preview'](director,{'project':project},{'task_ids':pending_ids},'process','director')
+        self.assertEqual(route['task_ids'],pending_ids)
+        self.assertIn('director-batch-processing-requires-frozen-intake-receipt',route['limitations'])
+        self.assertEqual(route['tasks'][1]['pending_depends_on'],[pending_ids[2]])
+        before = snapshot(queue_path,state_path)
+        replay = self.director('run-dispatch', request)
+        self.assertEqual((replay['status'],replay['result']),('replayed',intake['result']))
+        self.assertEqual(snapshot(queue_path,state_path),before)
+
+        mapped = dict(zip(keys,pending_ids))
+        proposal = {
+            'expected_source_hash':sha(queue_path.read_bytes()),
+            'selectors':pending_ids, 'dispositions':{mapped[key]:entry for key,entry in approved['dispositions'].items()},
+            'tasks':[{**item, 'parent_pending_ids':[mapped[key] for key in item['parent_pending_ids']]}
+                     for item in approved['tasks']],
+        }
+        process = {**request,'operation':'process','expected_run_sha256':intake['run_sha256'],'request':proposal}
+        self.director('run-dispatch',process,error='exact staged Pending batch definition changed')
+        self.assertEqual(snapshot(queue_path,state_path),before)
+        queue_path.write_text(canonical_text)
+        proposal['expected_source_hash'] = sha(queue_path.read_bytes())
+        before = snapshot(queue_path,state_path)
+        for wrong_ids in ([pending_ids[0]], [*pending_ids,other['id']], list(reversed(pending_ids))):
+            self.director('run-dispatch', {**process,'request':{**proposal,'selectors':wrong_ids}}, error='exact recorded batch')
+        intake_receipt = self.parent/'.skill-tree/history/director-dispatch'/f"{original_intake['dispatch_key']}.json"
+        retained_intake = intake_receipt.read_bytes()
+        intake_receipt.unlink()
+        try:
+            self.director('run-dispatch',process,error='Original canonical intake batch receipt is unavailable')
+            self.assertEqual(snapshot(queue_path,state_path),before)
+        finally:
+            intake_receipt.write_bytes(retained_intake)
+        changed = [{**proposal['tasks'][0],'depends_on':['@foreign']}, *proposal['tasks'][1:]]
+        self.director('run-dispatch', {**process,'request':{**proposal,'tasks':changed}}, error='owner-approved batch')
+        self.assertEqual(snapshot(queue_path,state_path),before)
+
+        process_input = write(self.base,'lost-batch-process-ack.json',json.dumps(process))
+        self.command(sys.executable,'-B','-c',fault,parent_entry,'lost-ack','run-dispatch',self.parent,'--input',process_input,
+                     error='Injected loss after canonical acknowledgement')
+        published = snapshot(queue_path,state_path)
+        self.assertNotEqual(published,before)
+        original = self.core(self.parent,'director-dispatch-read',{'operation':'process','director_dispatch':scope})
+        confirmed = json.loads(self.command(sys.executable,'-B','-c',fault,parent_entry,'pause',
+            'run-dispatch',self.parent,'--input',process_input))
+        self.assertEqual(confirmed['result'],original['observed_result'])
+        paused = self.director('run-status',run_ref)
+        self.assertEqual(paused['phase'],'paused')
+        resumed = self.director('run-resume',{**run_ref,'expected_run_sha256':paused['run_sha256']})
+        self.assertEqual(resumed['phase'],'completed')
+        consumer_id, storage_id, adapter_id = confirmed['result']['created_ids']
+        consumer = self.core(self.parent,'read',None,'--id',consumer_id)
+        storage = self.core(self.parent,'read',None,'--id',storage_id)
+        adapter = self.core(self.parent,'read',None,'--id',adapter_id)
+        self.assertEqual(consumer['depends_on'],[storage_id])
+        self.assertEqual(storage['depends_on'],[adapter_id])
+        self.assertEqual(adapter['depends_on'],[])
+        self.assertEqual([(task['priority'],task['topic'],task['intake_batch_ids']) for task in (consumer,storage,adapter)],
+                         [(495,'mvp-five',[batch_id]),(245,'mvp-zero',[batch_id]),(175,'mvp-two',[batch_id])])
+        self.assertEqual(self.core(self.parent,'read',None,'--id',other['id'])['id'],other['id'])
+        self.assertEqual(self.director('run-dispatch',process)['result'],confirmed['result'])
+        self.assertEqual(self.director('run-dispatch',request)['result'],intake['result'])
+        self.assertEqual(snapshot(queue_path,state_path),published)
+        run_status = self.director('run-status',run_ref)
+        self.assertEqual(run_status['phase'],'completed')
+        status = run_status['assignments'][assignment['id']]
+        self.assertEqual(status['completed']['kind'],'canonical-queue-receipts')
+        self.assertEqual(status['completed']['receipts']['process'],original['receipt']['receipt_sha256'])
+        self.assertEqual(status['dispatches']['process']['result']['created_ids'],[consumer_id,storage_id,adapter_id])
+        self.assertIsNone(status['next'])
+        self.director('run-complete-assignment',{**run_ref,'assignment_id':assignment['id'],
+            'expected_run_sha256':resumed['run_sha256'],'outcome_id':identity('O')},
+            error='cannot represent a terminal child run')
+        self.assertFalse(read_json(state_path)['run_registry']['runs'])
+
 
     def test_cross_area_manual_wait_preserves_same_external_run_and_allows_shared_sibling(self):
         game_task = self.child_task()

@@ -767,7 +767,7 @@ def intake(store,payload):
             validate_intake_receipt(receipt,batch_id)
             extras={rel:dump(receipt)}
         result=receipt if batched else created[0]
-        if dispatch:extras.update(dispatch.extras(store,result))
+        if dispatch:extras.update(dispatch.extras(store,result,intake_text=text))
         store.save(text,state,extras)
         return result
 
