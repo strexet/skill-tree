@@ -1,0 +1,151 @@
+{
+  "actual": {
+    "allocation": {
+      "reason": "observational",
+      "status": "not-applicable"
+    },
+    "arms": {
+      "baseline": {
+        "pooled": {
+          "eligible": 20,
+          "events": 11,
+          "rate": 0.55,
+          "wilson_95": [
+            0.34208534245034233,
+            0.7418021417443759
+          ]
+        },
+        "segments": {
+          "experienced": {
+            "eligible": 10,
+            "events": 9,
+            "rate": 0.9,
+            "wilson_95": [
+              0.5958499732047615,
+              0.9821237869049271
+            ]
+          },
+          "novice": {
+            "eligible": 10,
+            "events": 2,
+            "rate": 0.2,
+            "wilson_95": [
+              0.05668215145437519,
+              0.5098375284633583
+            ]
+          }
+        },
+        "standardized_rate": 0.55
+      },
+      "candidate": {
+        "pooled": {
+          "eligible": 30,
+          "events": 17,
+          "rate": 0.5666666666666667,
+          "wilson_95": [
+            0.3919730700081361,
+            0.7262251442353347
+          ]
+        },
+        "segments": {
+          "experienced": {
+            "eligible": 20,
+            "events": 16,
+            "rate": 0.8,
+            "wilson_95": [
+              0.5839825677481064,
+              0.919342337420202
+            ]
+          },
+          "novice": {
+            "eligible": 10,
+            "events": 1,
+            "rate": 0.1,
+            "wilson_95": [
+              0.017876213095072896,
+              0.4041500267952385
+            ]
+          }
+        },
+        "standardized_rate": 0.45
+      }
+    },
+    "builds": {
+      "baseline": "fixture-build-a",
+      "candidate": "fixture-build-b"
+    },
+    "canonical_event_sha256": "ab2d7c7eef90aea2a6b9116c7ca3f29a10af51816ff82c0c24d4e6a6036fb59d",
+    "eligibility": "included exposure for the pinned build and rule with a known pre-exposure segment",
+    "excluded": {},
+    "input_event_count": 78,
+    "metric": "at least one recorded launch use after exposure and before the end of observation",
+    "observation_window": {
+      "complete": true,
+      "end_tick": 10,
+      "start_tick": 0
+    },
+    "rule": "fixture-controls/adopt-launch@1",
+    "standard_weights": {
+      "experienced": 0.5,
+      "novice": 0.5
+    },
+    "study": "fixture-launch-control-adoption@1",
+    "time_unit": "fixture tick",
+    "uncertainty": "Descriptive Wilson 95 percent intervals for raw binomial proportions",
+    "unit": "one eligible exposed synthetic player per study"
+  },
+  "analyzer": "synthetic-exposure-cohort@1",
+  "artifact_sha256": "c0bc7be4f96a05239c7d04652e8505e88d01fade9177132dc75476c8e785d01a",
+  "environment": {
+    "lane": "unit",
+    "python": "3.11.5"
+  },
+  "expected": {
+    "baseline": {
+      "pooled": {
+        "eligible": 20,
+        "events": 11
+      },
+      "segments": {
+        "experienced": {
+          "eligible": 10,
+          "events": 9
+        },
+        "novice": {
+          "eligible": 10,
+          "events": 2
+        }
+      },
+      "standardized_rate": 0.55
+    },
+    "candidate": {
+      "pooled": {
+        "eligible": 30,
+        "events": 17
+      },
+      "segments": {
+        "experienced": {
+          "eligible": 20,
+          "events": 16
+        },
+        "novice": {
+          "eligible": 10,
+          "events": 1
+        }
+      },
+      "standardized_rate": 0.45
+    }
+  },
+  "omissions": [
+    "Live event access",
+    "Causal or production inference",
+    "Player identity data"
+  ],
+  "source_kind": "synthetic observations",
+  "source_sha256": {
+    "cohort.py": "93d2d636d4674c2108e21f8ec21d61beb28234ced8e764d188792c5896052ced",
+    "events.jsonl": "cc5b5092257510b3fcdebf13fe1414009ce6c7d5ac9a8ccc1591510e14207306",
+    "oracle.json": "ce2fe04d52dcfcc53b0762ed7e38baf76cef36c00ac8df1d1241665fd9b30735",
+    "study.json": "067b8cabc3ca56404d5fbcd5cad0c83dd859bbb5c2027a0547f7d6b99286804d"
+  }
+}

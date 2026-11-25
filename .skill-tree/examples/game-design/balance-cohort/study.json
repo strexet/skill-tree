@@ -1,0 +1,15 @@
+{
+  "study": "fixture-launch-control-adoption@1",
+  "rule": "fixture-controls/adopt-launch@1",
+  "builds": {
+    "baseline": "fixture-build-a",
+    "candidate": "fixture-build-b"
+  },
+  "design": "observational",
+  "window": {"start_tick": 0, "end_tick": 10, "complete": true},
+  "unit": "one eligible exposed synthetic player per study",
+  "segments": ["novice", "experienced"],
+  "metric": "at least one recorded launch use after exposure and before the end of observation",
+  "eligibility": "included exposure for the pinned build and rule with a known pre-exposure segment",
+  "time_unit": "fixture tick"
+}
