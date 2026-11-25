@@ -141,7 +141,9 @@ def task_preview(D, summary, request, operation, mode):
     if mode == 'director':
         if required_effect not in project['allowed_effects']:
             limitations.append(f'director-{required_effect}-not-authorized')
-        if operation != 'intake':
+        if operation == 'implement-all':
+            limitations.append('director-managed-implement-all-requires-frozen-assignments')
+        elif operation != 'intake':
             limitations.append('director-dispatch-requires-one-exact-task-per-assignment')
     task_ids = [task['id'] for task in tasks]
     required = D.WF.dependency_scope(all_tasks, {'snapshot':task_ids}) if operation.startswith('implement-') else set()
@@ -165,7 +167,9 @@ def preview(D, root, workspace, settings, profile, products, request):
         if mode == 'director':
             skill = 'skill-tree-director-intake' if op == 'intake' else 'skill-tree-director-run'
             summary['entry'] = package_entry(D, root, settings, profile, skill)
-            summary['command'] = 'objective-preview' if op == 'intake' else 'run-dispatch'
+            summary['command'] = {'intake': 'objective-preview', 'implement-all': 'run-start'}.get(op, 'run-dispatch')
+            if op == 'implement-all':
+                summary['advance_command'] = 'run-advance-all'
         return task_preview(D, summary, request, op, mode)
     D._require('task_ids' not in request, 'Task identity selections belong to an exact queue operation')
 

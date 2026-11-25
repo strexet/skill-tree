@@ -131,7 +131,7 @@ def named_resources(root):
     return resources
 
 
-def describe(store, task, outputs, resources):
+def describe(store, task, outputs, resources, declared_resources=()):
     result = {
         'id': task['id'], 'title': task['title'], 'priority': task['priority'],
         'status': task['status'], 'dependencies': task['depends_on'],
@@ -159,6 +159,7 @@ def describe(store, task, outputs, resources):
         result['checks'], result['check_inputs'], result['exclusive_resources'] = validation_scope(
             store, task, resources
         )
+        result['exclusive_resources'] = sorted(set(result['exclusive_resources']).union(declared_resources))
     except (ValueError, OSError) as error:
         result['reasons'].append({'kind': 'unverified-checks', 'detail': str(error)})
     return result
@@ -233,7 +234,8 @@ def snapshot(store):
     }
 
 
-def preview(store, workers, selectors=()):
+def preview(store, workers, selectors=(), *, declared_resources=None):
+    declared_resources = declared_resources or {}
     before = snapshot(store)
     store.verify_future_integrity()
     text = store.text()
@@ -270,14 +272,14 @@ def preview(store, workers, selectors=()):
                 pending_holds.setdefault(parent, []).append(task['id'])
     active = {}
     for task_id in sorted(claims):
-        scope = describe(store, by_id[task_id], outputs, resources) if task_id in by_id else None
+        scope = describe(store, by_id[task_id], outputs, resources, declared_resources.get(task_id, ())) if task_id in by_id else None
         if scope:
             dependency_holds(store, scope, completed, progress, claims)
         active[task_id] = scope
     has_clarifications = any((store.base / 'clarifications').glob('*.json'))
     selected, deferred = [], []
     for task in candidates:
-        item = describe(store, task, outputs, resources)
+        item = describe(store, task, outputs, resources, declared_resources.get(task['id'], ()))
         reasons = item['reasons']
         task_id = item['id']
         if item['status'] != 'Ready':

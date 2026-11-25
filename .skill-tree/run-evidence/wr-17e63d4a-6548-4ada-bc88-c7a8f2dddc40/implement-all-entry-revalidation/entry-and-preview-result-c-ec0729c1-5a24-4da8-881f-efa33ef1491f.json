@@ -1,0 +1,20 @@
+{
+  "check_id": "entry-and-preview",
+  "attempt_id": "C-ec0729c1-5a24-4da8-881f-efa33ef1491f",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-parallel-preview.py"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "counts": {
+    "expected": 9,
+    "discovered": 9,
+    "passed": 9,
+    "failed": 0,
+    "skipped": 0
+  },
+  "observed_output": ".........\n----------------------------------------------------------------------\nRan 9 tests in 5.649s\n\nOK\n",
+  "timeout": false,
+  "elapsed_seconds": 7.326
+}

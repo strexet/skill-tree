@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "dc7c64ba50d692a27f7c630631015b09c249690dd04ea9a9d8306c4b4206cb66",
+  "identity": "a3b468037c8768459cdff0d778b4f8f10cf6765fe94514ac8826273f612e7ba8",
   "operation": "skill-tree-repo-documentation-audit",
   "operations": {
     "skill-tree-3d": {
@@ -3323,7 +3323,7 @@
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     "scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
     "scripts/validate-repository-documentation.py": "99a7cf90c80f2e6fa5c2b2641e63de281076ec952b74b20807ade38576f10fb4",
-    "scripts/workflow-state.py": "c8663dd300a5e1ba7742c3290aac27b2a67d7c232f174d9b369b17daf9b41407"
+    "scripts/workflow-state.py": "c7357fd219a912692db28fbc9cbaa6a1fee9fc71b93691ea4dc08a20e65128f1"
   },
   "packages": {},
   "parameter_defaults": {},

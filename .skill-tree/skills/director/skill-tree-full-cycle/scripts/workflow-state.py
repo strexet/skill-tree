@@ -1085,7 +1085,7 @@ def _start_selection(store,mode,selector,workspace,text=None):
     if mode=='all' and selector:raise WorkflowError('Implement All uses the initial prioritized snapshot')
     return tasks,chosen,snapshot
 
-def start(store,mode,selector=None,limits=None,workspace=None,*,reviewed_directed=False):
+def start(store,mode,selector=None,limits=None,workspace=None,*,reviewed_directed=False,managed_queue_guard=None):
     dispatch,options=child_dispatch('start',workspace or {},start_context={'mode':mode,'selector':selector,'limits':limits})
     if dispatch:
         with store.lock():
@@ -1109,6 +1109,9 @@ def start(store,mode,selector=None,limits=None,workspace=None,*,reviewed_directe
             raise WorkflowError('Controller Git delivery authorization requires explicit Boolean delivery flags')
         if authorization.get('pr') is not True:
             launch=workspaces.checked_out_branch(store.source_root)
+            if 'managed_expected_launch' in options and (
+                    not reviewed_directed or options['managed_expected_launch']!=launch):
+                raise WorkflowError('The managed child target changed since the approved launch was prepared')
             launch_branch=launch['ref'].removeprefix('refs/heads/')
             if directed_local and options.get('base_branch') != launch_branch:
                 raise WorkflowError('Supervised child delivery requires the exact checked-out local base branch')
@@ -1130,6 +1133,11 @@ def start(store,mode,selector=None,limits=None,workspace=None,*,reviewed_directe
         if dispatch:
             replay=dispatch.observed(store)
             if replay is not None:return replay
+        if managed_queue_guard is not None:
+            snapshots={'queue_sha256':file_hash(store.future),'state_sha256':file_hash(store.state),
+                       'outcomes_sha256':file_hash(store.owned(OUTCOME_LEDGER))}
+            if not reviewed_directed or not dispatch or snapshots!=managed_queue_guard:
+                raise WorkflowError('Managed batch eligibility changed before canonical child admission')
         text=store.text();state=store.load(text)
         store.guard(expected_hash)
         registry=state.get('run_registry')

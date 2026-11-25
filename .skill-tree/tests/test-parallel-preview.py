@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import runpy
 from pathlib import Path
 import subprocess
 import sys
@@ -150,6 +151,20 @@ class ParallelReadyPreviewTests(unittest.TestCase):
                     'paths': ['prerequisite.py', 'prerequisite.py'],
                 })
 
+    def test_director_declared_resources_bound_batch_without_losing_other_candidates(self):
+        first = self.task('Resource owner', 300, ['first.py'])
+        second = self.task('Resource peer', 250, ['second.py'])
+        third = self.task('Separate resource', 100, ['third.py'])
+        module = runpy.run_path(str(HELPER))
+        store = module['workflow'].Store(self.root, allow_unselected=True, neutral=True)
+        before = self.state_bytes()
+        result = module['preview'](store, 2, [first, second, third],
+                                   declared_resources={first: ['one-editor'], second: ['one-editor']})
+        self.assertEqual(result['selected_ids'], [first, third])
+        self.assertEqual(result['deferred'][0]['reasons'],
+                         [{'kind': 'exclusive-resource', 'task_id': first, 'resource': 'one-editor'}])
+        self.assertEqual(self.state_bytes(), before)
+
     def test_required_pending_child_holds_ready_root(self):
         root = self.task('Main task', 100, ['fixture.py'])
         pending = workflow.intake(self.store, {
@@ -206,6 +221,9 @@ class ParallelReadyPreviewTests(unittest.TestCase):
         operation = (skill / 'SKILL.md').read_text()
         self.assertIn('An ordinary Implement All invocation starts execution for the full initial prioritized queue.', operation)
         self.assertIn('An explicit Ready preview request runs the read-only preview.', operation)
+        self.assertIn('For a Director-managed operation', operation)
+        self.assertIn('Use `run-advance-all` to launch eligible assignments', operation)
+        self.assertIn('For a standalone operation or an explicitly selected direct project route', operation)
         self.assertIn('references/parallel-preview.md', operation)
         self.assertIn('workflow-state.py group-selection', operation)
         before = self.state_bytes()

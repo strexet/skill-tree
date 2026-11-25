@@ -1,0 +1,20 @@
+{
+  "check_id": "director-preview-scope",
+  "attempt_id": "C-12c850d7-2f0f-479e-82f6-4bc283555106",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-parallel-preview.py"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "counts": {
+    "expected": 9,
+    "discovered": 9,
+    "passed": 9,
+    "failed": 0,
+    "skipped": 0
+  },
+  "observed_output": ".........\n----------------------------------------------------------------------\nRan 9 tests in 5.722s\n\nOK\n",
+  "timeout": false,
+  "elapsed_seconds": 8.985
+}

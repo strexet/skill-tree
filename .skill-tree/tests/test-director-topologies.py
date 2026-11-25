@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 from hashlib import sha256
 import json
 import os
+import runpy
 from pathlib import Path
 from shutil import copytree, ignore_patterns
 import signal
@@ -14,6 +15,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from uuid import uuid4
 
 
@@ -192,7 +194,7 @@ class DirectorTopologyTests(unittest.TestCase):
         self.assertEqual(read_json(self.parent / BINDINGS)['queues'][self.external_queue]['root'], str(moved))
         self.assertEqual({area['id']: area for area in self.director('status')['areas']}['game']['dirty_paths'], ['game/source.txt'])
 
-    def child_task(self, root=None, paths=('game/source.txt',), title='Check game input'):
+    def child_task(self, root=None, paths=('game/source.txt',), title='Check game input', dependencies=()):
         root = root or self.external
         goal = 'Verify the admitted input.'
         note = self.core(root, 'intake', {'title': title, 'description': goal, 'expected_behavior': goal})
@@ -203,7 +205,8 @@ class DirectorTopologyTests(unittest.TestCase):
                 json.dumps({'checks': [check]}) + '\n```\n\nAcceptance:\n- ' + goal + '\n')
         result = self.core(root, 'process', {
             'selectors': [note['id']], 'dispositions': {note['id']: {'status': 'promoted', 'reason': 'The fixture supplies the scope.'}},
-            'tasks': [{'title': title, 'body': body, 'parent_pending_ids': [note['id']]}],
+            'tasks': [{'title': title, 'body': body, 'parent_pending_ids': [note['id']],
+                       'depends_on': list(dependencies)}],
         })
         task = result['created_ids'][0]
         body = self.core(root, 'read', None, '--id', task)['body']
@@ -404,6 +407,138 @@ class DirectorTopologyTests(unittest.TestCase):
         self.assertIsNone(restored['stop_reason'])
         self.assertEqual(work.read_text(), 'Partial work survives the Director hold.\n')
         self.assertEqual(set(read_json(self.external / STATE)['run_registry']['runs']), {external_run})
+
+    def test_managed_implement_all_keeps_full_snapshot_and_dispatches_compatible_work(self):
+        self.register()
+        assignments = []
+        definitions = [
+            ('source-first', 'source.txt', []),
+            ('resource-first', 'resource.txt', []),
+            ('source-later', 'source.txt', ['source-first']),
+        ]
+        for name, relative, depends_on in definitions:
+            child = self.child_task(self.external, ['game/' + relative], f'Check {name} input')
+            assignments.append({
+                'id': name, 'role': 'unity', 'area_id': 'game', 'workspace': 'recorded-worktree',
+                'child': child, 'capability': 'core-task', 'write_paths': [relative], 'resources': [],
+                'pins': [], 'depends_on': depends_on, 'expected_result': 'The registered path stays in scope.',
+                'check': 'scope-check', 'authority_ref': 'fixture-owner', 'effects': ['launch'],
+                'stop_rules': ['Keep the recorded project scope.'],
+            })
+        selected = self.freeze(None, assignments=assignments)
+        key = {'director_run_id': identity('DR')}
+        launch_inputs = {**selected, **key, 'assignment_ids': [row['id'] for row in assignments],
+            'owner': {'actor': 'fixture-owner', 'reference': 'fixture-batches', 'kind': 'owner-message'},
+            'authority': {row['id']: ['launch'] for row in assignments}, 'approved_defaults': [],
+            'implement_all': {'expected_source_hash': sha((self.external / QUEUE).read_bytes()), 'workers': 2}}
+        run = self.director('run-start', launch_inputs)
+        self.assertEqual(set(run['implement_all']['snapshot_ids']),
+                         {row['child']['task_id'] for row in assignments})
+
+        later = self.child_task(self.external, ['game/resource.txt'], 'Check later unrelated input')
+        self.assertEqual(self.director('run-start', launch_inputs)['run_sha256'], run['run_sha256'])
+        first = self.director('run-advance-all', {**key, 'expected_run_sha256': run['run_sha256']}, family='run')
+        self.assertEqual({entry['assignment_id'] for entry in first['launches']},
+                         {'source-first', 'resource-first'})
+        self.assertEqual(first['phase'], 'running')
+        second = self.director('run-advance-all', {**key, 'expected_run_sha256': first['run_sha256']}, family='run')
+        self.assertEqual(second['launches'], [])
+        self.assertNotIn(later['task_id'], second['implement_all']['snapshot_ids'])
+        self.assertIn(assignments[-1]['child']['task_id'], second['implement_all']['remaining_ids'])
+        original = next(entry for entry in first['launches'] if entry['assignment_id'] == 'source-first')
+        replay = self.director('run-dispatch', {**key, 'expected_run_sha256': second['run_sha256'],
+            'assignment_id': 'source-first', 'operation': 'start',
+            'request': {'expected_source_hash': sha((self.external / QUEUE).read_bytes()), 'base_branch': 'develop',
+                        'local_base': True, 'local_base_authorization': 'fixture-batches'}})
+        self.assertEqual(replay['status'], 'replayed')
+        self.assertEqual(replay['result']['id'], original['result']['id'])
+
+        self.git(self.external, '-c', 'user.name=Director Fixture', '-c', 'user.email=fixture@example.invalid',
+                 'commit', '--allow-empty', '-m', 'Advance outside the managed run')
+        drift = self.director('run-advance-all', {**key, 'expected_run_sha256': second['run_sha256']}, family='run')
+        self.assertEqual(drift['launches'], [])
+        self.assertIn('outside the checked Implement All child receipts', drift['implement_all']['gate'])
+        self.assertEqual(drift['implement_all']['remaining_ids'], second['implement_all']['remaining_ids'])
+
+    def commit_and_incorporate_managed_fixture(self, key, launch, task_id, relative):
+        root = self.parent
+        run_id = launch['result']['id']
+        common = Path(self.git(root, 'rev-parse', '--git-common-dir').strip())
+        if not common.is_absolute():
+            common = root / common
+        workspace = Path(read_json(common / 'skill-tree-runtime.json')['worktrees'][run_id])
+        wf = runpy.run_path(str(SOURCE / 'common/scripts/workflow-state.py'))['main'].__globals__
+        store = wf['Store'](workspace, run_id)
+        self.assertEqual(wf['advance'](store)['task_id'], task_id)
+        wf['begin_task'](store, {'task_id': task_id})
+        content = f'Accepted {task_id} in the managed fixture.\n'
+        write(workspace, relative, content)
+        proof = f'.skill-tree/run-evidence/{run_id.lower()}/fixture.txt'
+        write(workspace, proof, (workspace / relative).read_text())
+        self.assertEqual((workspace / proof).read_text(), content)
+        wf['mark_implemented'](store, {'task_id': task_id, 'changed_files': [relative, proof]})
+        check = wf['prepare_check'](store, {'task_id': task_id, 'check_id': 'scope-check'})
+        wf['record_check'](store, {'task_id': task_id, 'check_id': 'scope-check', 'attempt_id': check['attempt_id'],
+            'result': 'pass', 'classification': 'executed-control', 'actual_lane': check['recipe']['lane'],
+            'environment_identity': check['environment_identity'], 'cleanup': 'The local fixture file was read.',
+            'evidence': [proof], 'assertions': [{'assertion': check['assertion'], 'result': 'pass'}]})
+        # Isolate review policy for the regression. All Core receipts, commits and Git merges are real fixture effects.
+        review = identity('DO')
+        with patch.dict(wf, {'verified_implementation_review': lambda *args: {'orchestration_hash': 'a' * 64}}):
+            outcome = wf['complete'](store, {'task_id': task_id, 'review_id': review,
+                'outcome': 'The fixture source contains the accepted change.',
+                'source_fingerprints': wf['fingerprints'](store, [relative]),
+                'acceptance': [{'criterion': check['assertion'], 'result': 'pass', 'evidence': [proof]}]})
+            wf['advance'](store)
+            wf['finish'](store, {'review_id': review})
+            status = self.director('run-status', key)
+            self.director('run-complete-assignment', {**key, 'expected_run_sha256': status['run_sha256'],
+                'assignment_id': launch['assignment_id'], 'outcome_id': outcome['id']})
+            waiting = self.director('run-status', key)
+            before_merge = self.director('run-advance-all', {**key, 'expected_run_sha256': waiting['run_sha256']}, family='run')
+            self.assertEqual((before_merge['phase'], before_merge['launches']), ('running', []))
+            self.assertIn(task_id, before_merge['implement_all']['remaining_ids'])
+            merged = wf['merge_reviewed_controller'](store, {'owner_instruction': 'Integrate the checked disposable fixture branch.'})
+        self.assertEqual(merged['delivery']['status'], 'merged')
+        self.assertEqual((root / relative).read_text(), content)
+        return self.director('run-status', key)
+
+    def test_managed_implement_all_resumes_after_verified_incorporation(self):
+        self.declaration['areas'][0]['allowed_effects'].append('launch')
+        self.git(self.parent, 'config', 'user.name', 'Director Fixture')
+        self.git(self.parent, 'config', 'user.email', 'fixture@example.invalid')
+        write(self.parent, 'story/consumer.txt', 'Original consumer input.\n')
+        self.git(self.parent, 'add', '--', 'story/consumer.txt')
+        self.git(self.parent, 'commit', '-m', 'Add the managed consumer fixture')
+        self.register()
+        first = self.child_task(self.parent, ['story/source.txt'], 'Check managed producer')
+        second = self.child_task(self.parent, ['story/consumer.txt'], 'Check managed consumer', [first['task_id']])
+        assignments = []
+        for name, child, file, depends_on in [
+            ('producer', first, 'source.txt', []),
+            ('consumer', second, 'consumer.txt', ['producer']),
+        ]:
+            assignments.append({'id': name, 'role': 'narrative', 'area_id': 'story',
+                'workspace': 'recorded-worktree', 'child': child, 'capability': 'core-task',
+                'write_paths': [file], 'depends_on': depends_on, 'resources': [], 'pins': [],
+                'expected_result': 'The checked target contains the approved change.', 'check': 'scope-check',
+                'authority_ref': 'fixture-owner', 'effects': ['launch'], 'stop_rules': ['Preserve the approved scope.']})
+        selected = self.freeze(None, assignments=assignments)
+        key = {'director_run_id': identity('DR')}
+        run = self.director('run-start', {**selected, **key, 'assignment_ids': ['producer', 'consumer'],
+            'owner': {'actor': 'fixture-owner', 'reference': 'fixture-managed-integration', 'kind': 'owner-message'},
+            'authority': {'producer': ['launch'], 'consumer': ['launch']}, 'approved_defaults': [],
+            'implement_all': {'expected_source_hash': sha((self.parent / QUEUE).read_bytes()), 'workers': 1}})
+        wave = self.director('run-advance-all', {**key, 'expected_run_sha256': run['run_sha256']}, family='run')
+        self.assertEqual([row['assignment_id'] for row in wave['launches']], ['producer'])
+        status = self.commit_and_incorporate_managed_fixture(key, wave['launches'][0], first['task_id'], 'story/source.txt')
+        wave = self.director('run-advance-all', {**key, 'expected_run_sha256': status['run_sha256']}, family='run')
+        self.assertEqual([row['assignment_id'] for row in wave['launches']], ['consumer'])
+        status = self.commit_and_incorporate_managed_fixture(key, wave['launches'][0], second['task_id'], 'story/consumer.txt')
+        final = self.director('run-advance-all', {**key, 'expected_run_sha256': status['run_sha256']}, family='run')
+        self.assertEqual(final['phase'], 'completed')
+        self.assertEqual(final['implement_all']['remaining_ids'], [])
+        self.assertEqual(final['launches'], [])
 
     def supervised_launches(self):
         self.declaration['areas'][0]['allowed_effects'].append('launch')

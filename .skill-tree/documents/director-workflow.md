@@ -97,6 +97,16 @@ Probe `director-dispatch-read` in the selected canonical child checkout before a
 
 `decide-open` records one question for the exact running child task and worktree after verifying child Core support for the hold. A verified approved default delivers the pinned fact. A material question names the addressed owner, distinct options, recommendation, affected areas, blocked action and UTC deadline. The original child checkpoint remains held while independent assignments can advance. `decide-answer` requires the original question, attempt, queue and run with current owner evidence. An accepted answer restores the original child checkpoint. Explicit child continuation uses the existing controller admission. An absent response keeps the hold. Identical delivery can be observed again without a second child effect.
 
+### Run managed Implement All
+
+Use the managed project route to identify the canonical queue and initial prioritized scope. Freeze an approved Director plan with one exact assignment per unfinished required task. Retain the Core dependency edges. Add deterministic sequencing edges for overlapping writes in dependency order, using the prioritized order for ties.
+
+Pass `implement_all` to `run-start` with the inspected `expected_source_hash` and positive `workers` limit. An explicit `snapshot_ids` list restricts the roots. The launch also records the original checked-out target branch and head.
+
+Call `run-advance-all` with the exact Director run ID and current run digest. Execute each returned child in the recorded worktree and record the current reviewed child outcome before integration. Incorporate reviewed results through the existing local delivery commands. Use the checked current-target candidate path for a moved base. Call `run-advance-all` again after accepting and incorporating child results or resolving a recorded hold. After a lost batch response, read `run-status` for the exact recorded assignment. Use `run-dispatch` with that assignment and the original start request to recover the same child run and worktree. Check the existing worker and child progress before handing the recovered checkout to an actor.
+
+The controller schedules unfinished admitted tasks and preserves concrete task and integration holds. A run completes after every assignment has a checked delivery on the original target. Later unrelated tasks require a new invocation.
+
 ### Supervise workers on one host
 
 For an explicitly selected disposable pilot, pass `supervision` to `run-start` with the local `host`, `progress_timeout_seconds` and `heartbeat_timeout_seconds`. Start each exact product assignment using `run-dispatch` with an explicit local base. The child is a reviewed Work Through Next run. Separate owner authority governs delivery of the reviewed child result.

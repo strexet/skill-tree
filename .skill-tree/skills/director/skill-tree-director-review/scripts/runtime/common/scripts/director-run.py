@@ -13,7 +13,7 @@ import sys
 
 DIRECTORY = '.skill-tree/director/runs/'
 COMMANDS = {'run-start', 'run-status', 'run-dispatch', 'run-pause', 'run-resume', 'run-cancel',
-            'run-complete-assignment', 'run-supervise', 'decide-open', 'decide-answer'}
+            'run-complete-assignment', 'run-supervise', 'run-advance-all', 'decide-open', 'decide-answer'}
 EFFECTS = {'intake': 'intake', 'process': 'process', 'start': 'launch'}
 SELECTOR = {'objective_id', 'plan_id', 'plan_revision'}
 GUARD = {'director_run_id', 'expected_run_sha256'}
@@ -151,6 +151,10 @@ def _question_event(run, event, assignment_id, question, **fields):
     _event(run, event, assignment_id=assignment_id, **identity, **fields)
 
 
+class ResourceUnavailable(ValueError):
+    """A pre-dispatch check found a held resource."""
+
+
 class DirectorRun:
     def __init__(self, registry, frozen_plan, check_area, current_plan=None, verify_pin=None,
                  superseded_assignments=None):
@@ -192,7 +196,7 @@ class DirectorRun:
 
     def start(self, payload):
         D._object(payload, SELECTOR | {'director_run_id', 'plan_sha256', 'assignment_ids', 'owner', 'authority',
-                                      'approved_defaults'}, {'process_spec_sha256', 'supervision'})
+                                      'approved_defaults'}, {'process_spec_sha256', 'supervision', 'implement_all'})
         owner = _host_owner(payload['owner'])
         supervision = payload.get('supervision')
         if 'supervision' in payload:
@@ -219,9 +223,14 @@ class DirectorRun:
                    and all(D._sha(digest) for digest in process_specs.values()),
                    'Each authorized process effect requires one exact owner-approved task specification digest')
         operation = {'kind': 'director-run-start', 'run_id': payload['director_run_id'], 'sha256': D._digest(payload)}
+        old, old_sha = D._read(self.registry.root, relative)
+        if old is not None:
+            D._require(old['start_sha256'] == operation['sha256'], 'Director run already owns a different launch')
+            return self._view(old, old_sha, plan)
         self.current_plan(plan)
         for name in chosen:
             self.check_area(assignments[name])
+        managed = self._freeze_managed_scope(payload['implement_all'], assignments, chosen, authority) if 'implement_all' in payload else None
         with self.store.lock(local_delivery=operation):
             old, old_sha = D._read(self.registry.root, relative)
             if old is not None:
@@ -240,10 +249,236 @@ class DirectorRun:
                      'process_spec_sha256': process_specs,
                      'assignments': {aid: {'dispatches': {}, 'questions': {}, 'blocker': None} for aid in chosen},
                      'start_sha256': operation['sha256']}
+            if managed is not None:
+                state['implement_all'] = managed
             if supervision:
                 state['supervision'] = {**supervision, 'units': {}, 'requests': {}}
             _event(state, 'run-started', phase=state['phase'])
             return self._view(state, self._write(relative, state, None), plan)
+
+    def _freeze_managed_scope(self, options, assignments, chosen, authority):
+        D._object(options, {'expected_source_hash', 'workers'}, {'snapshot_ids'})
+        workers = options['workers']
+        D._require(type(workers) is int and workers > 0 and D._sha(options['expected_source_hash']),
+                   'Implement All requires a positive worker limit and the inspected queue digest')
+        selected = {key: assignments[key] for key in chosen}
+        owners = {self.check_area(spec) for spec in selected.values()}
+        D._require(len(owners) == 1 and len({spec['area']['queue_id'] for spec in selected.values()}) == 1,
+                   'Managed Implement All requires one canonical project queue')
+        root = owners.pop()
+        child = D.WF.Store(root, neutral=True)
+        text = child.text()
+        D._require(D.WF.digest(text.encode()) == options['expected_source_hash'],
+                   'The inspected Implement All queue has changed')
+        prioritized = {task['id']: task for task in D.WF.parse(text) if task['queue'] == 'Prioritized Next Changes'}
+        roots = options.get('snapshot_ids', list(prioritized))
+        D._require(isinstance(roots, list) and roots and all(isinstance(tid, str) for tid in roots)
+                   and len(set(roots)) == len(roots) and set(roots) <= prioritized.keys(),
+                   'Implement All roots must be exact prioritized tasks')
+        roots = sorted(roots, key=lambda tid: (-prioritized[tid]['priority'], prioritized[tid]['line']))
+        closure = D.WF.dependency_scope(prioritized.values(), {'snapshot': roots})
+        task_assignments = {spec['child'].get('task_id'): key for key, spec in selected.items()}
+        D._require(len(task_assignments) == len(selected) and set(task_assignments) == closure & prioritized.keys(),
+                   'The frozen Director assignment set differs from the required Implement All tasks')
+        previous = {outcome['task_id']: outcome for outcome in child.outcomes() if outcome['disposition'] == 'completed'}
+        D._require(closure - prioritized.keys() <= previous.keys(),
+                   'Implement All has dependencies without canonical completion evidence')
+        for task_id, key in task_assignments.items():
+            task, spec = prioritized[task_id], selected[key]
+            needs = {task_assignments[tid] for tid in task['depends_on'] if tid in task_assignments}
+            D._require(needs <= set(spec['depends_on']) and authority[key] == ['launch']
+                       and spec['workspace'] == 'recorded-worktree'
+                       and spec['child']['body_sha256'] == D.WF.digest(task['body'].encode()),
+                       'A managed assignment must authorize the exact task and preserve the Core dependency edges')
+        target = D.WS.checked_out_branch(root)
+        D._require(all(spec['area']['qualification']['head'] == target['head'] for spec in selected.values()),
+                   'The original managed target moved after plan qualification')
+        return {'snapshot_ids': roots, 'required_ids': sorted(closure), 'task_assignments': task_assignments,
+                'target': target, 'workers': workers,
+                'remaining_ids': sorted(task_assignments), 'frontier': {}}
+
+    def _managed_incorporation(self, state, root):
+        managed = state['implement_all']
+        original = managed['target']
+        current = D.WS.checked_out_branch(root)
+        D._require((current['ref'], current['checkout']) == (original['ref'], original['checkout']),
+                   'The managed Implement All target checkout or branch changed')
+        child = D.WF.Store(root, neutral=True)
+        runs = child.load()['run_registry']['runs']
+        outcomes = {record['id']: record for record in child.outcomes()}
+        steps = {}
+        for name, entry in state['assignments'].items():
+            accepted = entry.get('completed')
+            if not accepted:
+                continue
+            result = runs.get(accepted['child_run_id'], {})
+            if result.get('delivery', {}).get('status') != 'merged':
+                continue
+            outcome = outcomes.get(accepted['outcome_id'])
+            D._require(outcome and D._digest(outcome) == accepted['outcome_sha256']
+                       and outcome['task_id'] == accepted['task_id'] and outcome['run_id'] == result['id']
+                       and result.get('completion_refs', {}).get(accepted['task_id']) == outcome['id'],
+                       'The exact accepted child outcome has changed')
+            scope = D.WF.cleanup_delivery_scope(child, result)
+            commit = scope['merge_commit']
+            parents = D.WS.local_git_text(root, 'show', '-s', '--format=%P', commit).split()
+            D._require(scope['target_ref'] == original['ref'] and len(parents) == 2
+                       and parents[1] == scope['source_head'] and commit not in steps,
+                       'Managed integration does not match an original checked child result')
+            steps[commit] = (parents[0], name)
+        integrated = set()
+        cursor = current['head']
+        while cursor != original['head']:
+            D._require(cursor in steps, 'Target advanced outside the checked Implement All child receipts')
+            cursor, name = steps[cursor]
+            integrated.add(name)
+        D._require(len(integrated) == len(steps), 'A checked managed child is outside the current target history')
+        return current['head'], integrated, child, runs
+
+    def _area_for_run(self, state, spec):
+        if 'implement_all' not in state:
+            return self.check_area(spec)
+        return self.check_area(spec, approved_head=lambda root: self._managed_incorporation(state, root)[0])
+
+    @staticmethod
+    def _managed_assignment_paths(spec, child, task):
+        owned = [Path(spec['area']['scope']) / relative for relative in spec['write_paths']]
+        if task is not None:
+            preview = D.WF.owned_module('director_ready_preview', Path(__file__).with_name('parallel-preview.py'))
+            declared = [Path(relative) for relative in preview.touch_paths(child.source_root, task)]
+            D._require(all(any(relative.is_relative_to(scope) for scope in owned) for relative in declared)
+                       and all(any(scope.is_relative_to(relative) for relative in declared) for scope in owned),
+                       'Managed task Touch differs from the frozen assignment write scope: ' + task['id'])
+        return owned
+
+    def _advance_managed_frontier(self, state, plan, *, resource_holds=None):
+        resource_holds = resource_holds or {}
+        managed = state['implement_all']
+        specs = {spec['id']: spec for spec in plan['assignments'] if spec['id'] in state['assignments']}
+        root = self._area_for_run(state, next(iter(specs.values())))
+        child = D.WF.Store(root, neutral=True)
+        preview = D.WF.owned_module('director_ready_preview', Path(__file__).with_name('parallel-preview.py'))
+        snapshot = preview.snapshot(child)
+        _, integrated, _, child_runs = self._managed_incorporation(state, root)
+        remaining = [tid for tid, name in managed['task_assignments'].items() if name not in integrated]
+        status = self._view(state, '', plan)['assignments']
+        holds, candidates, retry, occupied = {}, [], [], 0
+        for task_id in remaining:
+            name = managed['task_assignments'][task_id]
+            assignment = status[name]
+            launch = assignment['dispatches'].get('start')
+            if launch:
+                if launch['status'] == 'recorded':
+                    run = child_runs.get(launch['result']['id'], {})
+                    local_wait = assignment['waiting'] or run.get('phase') in {'blocked', 'paused', 'waiting'}
+                    live = any(unit['assignment_id'] == name and self._current_attempt(unit)['status'] in SUPERVISED_LIVE
+                               for unit in state.get('supervision', {}).get('units', {}).values())
+                    if not assignment.get('completed') and (live or not local_wait):
+                        occupied += 1
+                    holds[task_id] = 'awaiting-checked-incorporation' if assignment.get('completed') else 'child-held' if local_wait else 'child-running'
+                else:
+                    occupied += 1
+                    if assignment['next'] == 'start':
+                        retry.append(name)
+                    else:
+                        holds[task_id] = 'original-dispatch-unresolved'
+                continue
+            if assignment['next'] != 'start':
+                holds[task_id] = {'reason': 'director-hold', 'dependencies': assignment['dependencies'],
+                                  'resources': assignment['resource_waits'], 'blocker': assignment['blocker']}
+            elif set(specs[name]['depends_on']) - integrated:
+                holds[task_id] = 'predecessor-incorporation-required'
+            elif task_id in resource_holds:
+                holds[task_id] = resource_holds[task_id]
+            else:
+                candidates.append(task_id)
+        free = managed['workers'] - occupied
+        ready = []
+        if candidates and free > 0:
+            available = {task['id']: task for task in D.WF.parse(child.text()) if task['queue'] == 'Prioritized Next Changes'}
+            for missing in set(candidates) - available.keys():
+                holds[missing] = 'original-task-unavailable'
+            candidates = [tid for tid in candidates if tid in available]
+            if candidates:
+                for tid in candidates:
+                    name = managed['task_assignments'][tid]
+                    try:
+                        self._managed_assignment_paths(specs[name], child, available[tid])
+                        self._check_resources(specs[name], child)
+                    except (ValueError, OSError) as error:
+                        holds[tid] = str(error)
+                admissible = [tid for tid in candidates if tid not in holds]
+                if admissible:
+                    declared = {tid: specs[name]['resources'] for tid, name in managed['task_assignments'].items()}
+                    planned = preview.preview(child, free, admissible, declared_resources=declared)
+                    ready = [managed['task_assignments'][tid] for tid in planned['selected_ids']]
+                    D._require(planned['snapshot'] == snapshot, 'Managed batch inputs changed during selection')
+                    holds.update({row['id']: row['reasons'] for row in planned['deferred']})
+        elif candidates:
+            holds.update({task_id: 'worker-limit' for task_id in candidates})
+        D._require(preview.snapshot(child) == snapshot, 'Managed batch inputs changed during selection')
+        guard = {key: snapshot[key] for key in ('queue_sha256', 'state_sha256', 'outcomes_sha256')}
+        return remaining, holds, retry + ready, guard
+
+    def advance_all(self, payload):
+        D._object(payload, GUARD)
+        run_id = payload['director_run_id']
+        relative, state, sha = self._load(run_id)
+        _same_guard(sha, payload['expected_run_sha256'])
+        D._require('implement_all' in state and state['phase'] in {'running', 'completed'},
+                   'Select the current running managed Implement All controller')
+        plan = self._plan_for(state)
+        launches, resource_holds = [], {}
+        remaining = state['implement_all']['remaining_ids']
+        holds = state['implement_all']['frontier']
+        gate = None
+        try:
+            self.current_plan(plan)
+            remaining, holds, eligible, guard = self._advance_managed_frontier(state, plan)
+            attempted = set()
+            while eligible:
+                name = next((candidate for candidate in eligible if candidate not in attempted), None)
+                if name is None:
+                    break
+                attempted.add(name)
+                target = state['implement_all']['target']['ref'].removeprefix('refs/heads/')
+                request = {'expected_source_hash': guard['queue_sha256'], 'base_branch': target,
+                           'local_base': True, 'local_base_authorization': state['owner']['reference']}
+                try:
+                    launch = self.dispatch({'director_run_id': run_id, 'expected_run_sha256': sha,
+                                            'assignment_id': name, 'operation': 'start', 'request': request},
+                                           managed_guard=guard)
+                except ResourceUnavailable as error:
+                    task_id = next(tid for tid, assignment in state['implement_all']['task_assignments'].items()
+                                   if assignment == name)
+                    resource_holds[task_id] = str(error)
+                else:
+                    launches.append({'assignment_id': name, **launch})
+                    sha = launch['run_sha256']
+                relative, state, sha = self._load(run_id)
+                remaining, holds, eligible, guard = self._advance_managed_frontier(
+                    state, plan, resource_holds=resource_holds)
+            for task_id, reason in resource_holds.items():
+                holds.setdefault(task_id, reason)
+        except RECOVERABLE_EFFECT_ERRORS as error:
+            # Dispatch retains any prepared effect separately. A later advance reads that original effect.
+            relative, current, current_sha = self._load(run_id)
+            if current['phase'] != 'running':
+                raise
+            state, sha = current, current_sha
+            gate = str(error)
+        with self.store.lock(local_delivery={'kind': 'director-implement-all-advance', 'run_id': run_id}):
+            relative, state, current_sha = self._load(run_id)
+            _same_guard(current_sha, sha)
+            frontier = state['implement_all']
+            updated = {'remaining_ids': remaining, 'frontier': holds, 'gate': gate}
+            if any(frontier.get(key) != value for key, value in updated.items()):
+                frontier.update(updated)
+                if gate is None and not remaining:
+                    state['phase'] = 'completed'
+                _event(state, 'implement-all-frontier', remaining_ids=remaining, gate=gate)
+                sha = self._write(relative, state, current_sha)
+        return {**self._view(state, sha, plan), 'launches': launches}
 
     def _defaults(self, source, chosen, assignments):
         D._require(isinstance(source, list), 'Approved defaults require exact source pin references')
@@ -301,6 +536,8 @@ class DirectorRun:
                   'run_sha256': sha, 'assignments': status}
         if 'supervision' in state:
             result['supervision'] = self._supervision_view(state)
+        if 'implement_all' in state:
+            result['implement_all'] = deepcopy(state['implement_all'])
         return result
 
     def status(self, payload):
@@ -349,7 +586,7 @@ class DirectorRun:
         D._require('launch' in state['authority'][name] and start.get('status') == 'recorded'
                    and start['result']['id'] == child_run_id and self._child_task(spec, current, 'start') == task_id,
                    'Supervision requires the exact recorded ordinary child start and task')
-        root = self.check_area(spec)
+        root = self._area_for_run(state, spec)
         child = D.WF.Store(root, neutral=True)
         receipt, run = self._supervised_start_receipt(child, self._envelope(state, spec))
         receipt = receipt or {}; run = run or {}
@@ -358,12 +595,21 @@ class DirectorRun:
                    and run.get('reviewed_local_delivery', {}).get('merge_at_finish') is False
                    and run.get('phase') not in {'completed', 'paused', 'cancelled', 'blocked'}
                    and run.get('delivery', {}).get('publication') == 'not-requested'
-                   and run.get('admitted_task_ids') == [task_id] and run.get('root_task_id') == task_id,
+                   and set(run.get('admitted_task_ids', [])) >= {task_id} and run.get('root_task_id') == task_id,
                    'Supervision requires the exact eligible local child controller and admitted task')
         scoped = D.WF.Store(root, run_id=child_run_id)
         child_state = scoped.load()
         tasks = D.WF.parse(scoped.text())
         task = D.WF.resolve(tasks, [task_id], 'Prioritized Next Changes')[0]
+        admitted = set(run['admitted_task_ids'])
+        if 'implement_all' in state:
+            expected = D.WF.dependency_scope(tasks, {'snapshot': [task_id]})
+            D._require(admitted == expected and expected <= set(state['implement_all']['required_ids'])
+                       and all(D.WF.completed_dependency_integrated(scoped, child_state, dependency)
+                               for dependency in admitted - {task_id}),
+                       'A supervised child may retain only verified historical prerequisites')
+        else:
+            D._require(admitted == {task_id}, 'A supervised assignment requires one exact admitted task')
         D._require(task['id'] == task_id and task['status'] == 'Ready', 'Supervision requires the exact Ready child task')
         frozen_task = (spec['child']['body_sha256'] if spec['child'].get('task_id') == task_id
                        else current['dispatches']['process']['result']['task_sha256'])
@@ -669,7 +915,7 @@ class DirectorRun:
         _, state, _ = self._load(payload['director_run_id'])
         name = payload['assignment_id']
         spec = self._assignment(state, name)
-        root = self.check_area(spec)
+        root = self._area_for_run(state, spec)
         selected = spec['area']
         result = {**payload, 'area_id': selected['id'], 'repo_id': selected['repo_id'],
                   'scope': selected['scope'], 'queue_id': selected['queue_id'], 'status': 'unverified'}
@@ -696,7 +942,7 @@ class DirectorRun:
         with self.store.lock(local_delivery=owner):
             relative, state, sha = self._load(payload['director_run_id'])
             _same_guard(sha, payload['expected_run_sha256'])
-            D._require(state['phase'] != 'cancelled' and (target != 'running' or state['phase'] == 'paused'),
+            D._require(state['phase'] not in {'completed', 'cancelled'} and (target != 'running' or state['phase'] == 'paused'),
                        'Director run is not in a resumable phase')
             plan = self._plan_for(state)
             if target == 'running':
@@ -723,7 +969,8 @@ class DirectorRun:
             claims = state.get('run_registry', {}).get('resources', {})
             conflicts = {key for key in requested.intersection(claims) if not
                          (owner_run_id is not None and root == child.root and claims[key]['run_id'] == owner_run_id)}
-            D._require(not conflicts, 'A requested exclusive child resource is already claimed')
+            if conflicts:
+                raise ResourceUnavailable('A requested exclusive child resource is already claimed: '+', '.join(sorted(conflicts)))
 
     def _child_task(self, spec, record, operation):
         if operation == 'intake':
@@ -752,7 +999,7 @@ class DirectorRun:
             within(D._scope(path)) or D._scope(path) in pinned for check in checks for path in check['sources']),
                    'Promoted task checks a source outside the frozen assignment scope')
 
-    def _dispatch_request(self, operation, requested, spec, record, child, original_exists, process_sha):
+    def _dispatch_request(self, operation, requested, spec, record, child, original_exists, process_sha, *, managed=False):
         D._require(isinstance(requested, dict) and D._sha(requested.get('expected_source_hash')), 'Dispatch requires the inspected child queue digest')
         child_id = self._child_task(spec, record, operation)
         if operation == 'intake':
@@ -783,7 +1030,15 @@ class DirectorRun:
         D._require(spec['workspace'] == 'recorded-worktree' and set(requested) <= START_OPTIONS,
                    'Directed start requires the planned owned worktree and bounded launch options')
         if candidate is not None:
-            D._require(not candidate['depends_on'], 'Child start requires separate review of dependencies outside the exact assignment')
+            if managed:
+                self._managed_assignment_paths(spec, child, candidate)
+                outcomes = {entry['task_id']: entry for entry in child.outcomes() if entry['disposition'] == 'completed'}
+                for dependency in candidate['depends_on']:
+                    proof = outcomes.get(dependency, {}).get('source_fingerprints')
+                    D._require(proof and D.WF.fingerprints(child, proof) == proof,
+                               'Managed child prerequisite evidence is unavailable or stale: ' + dependency)
+            else:
+                D._require(not candidate['depends_on'], 'Child start requires separate review of dependencies outside the exact assignment')
         return requested, {'mode': 'next', 'selector': child_id, 'limits': None}
 
     def _reject_superseded(self, relative, state, sha, effect):
@@ -800,7 +1055,8 @@ class DirectorRun:
         raise D.DirectorError(f"Assignment {name} was superseded by accepted plan revision "
                               f"{supersession['next']['plan_revision']}; fresh child effects are held")
 
-    def dispatch(self, payload):
+    def dispatch(self, payload, *, managed_guard=None):
+        managed = managed_guard is not None
         D._object(payload, GUARD | {'assignment_id', 'operation', 'request'})
         operation = payload['operation']
         D._require(operation in EFFECTS, 'Director run dispatch does not grant the requested effect')
@@ -808,7 +1064,7 @@ class DirectorRun:
         run_id, name = payload['director_run_id'], payload['assignment_id']
         rel, before, sha = self._load(run_id)
         spec = self._assignment(before, name)
-        child = D.WF.Store(self.check_area(spec), neutral=True)
+        child = D.WF.Store(self._area_for_run(before, spec), neutral=True)
         helper = D.WF.director_dispatch_helper()
         existing = before['assignments'][name]['dispatches'].get(operation)
         envelope = self._envelope(before, spec)
@@ -821,6 +1077,7 @@ class DirectorRun:
                                                                 if key != 'expected_source_hash'}),
                        'Director dispatch request differs from the original')
             return {'status': 'replayed', 'result': observed['observed_result'], 'run_sha256': sha}
+        D._require('implement_all' not in before or managed, 'Advance the managed Implement All run for fresh dispatch')
         D._require(before['phase'] == 'running' and EFFECTS[operation] in before['authority'][name],
                    'Director run lacks current exact execution authority for this effect')
         effect_sha = D._digest({key: value for key, value in payload['request'].items() if key != 'expected_source_hash'})
@@ -838,8 +1095,17 @@ class DirectorRun:
             eligible = self._view(current, current_sha, self._plan_for(current), check_supersession=False)['assignments'][name]
             D._require(eligible['next'] == operation, 'The assignment is not eligible for this exact effect')
             request, start = self._dispatch_request(operation, payload['request'], spec, current['assignments'][name],
-                                                    child, recovering, current['process_spec_sha256'].get(name))
-            reviewed_directed = operation == 'start' and 'supervision' in current
+                                                    child, recovering, current['process_spec_sha256'].get(name),
+                                                    managed=managed)
+            if managed:
+                head, integrated, _, _ = self._managed_incorporation(current, child.root)
+                D._require(set(spec['depends_on']) <= integrated,
+                           'Managed child prerequisites require checked incorporation')
+                expected_launch = {**current['implement_all']['target'], 'head': head}
+                if existing is not None:
+                    expected_launch = existing['managed_expected_launch']
+                request = {**request, 'managed_expected_launch': expected_launch}
+            reviewed_directed = operation == 'start' and ('supervision' in current or managed)
             if reviewed_directed:
                 D._require(request.get('local_base') is True and _supervision_text(request.get('base_branch'))
                            and _supervision_text(request.get('local_base_authorization')),
@@ -851,6 +1117,8 @@ class DirectorRun:
                 current['assignments'][name]['dispatches'][operation] = {'status': 'prepared', 'request_sha256': effect_sha,
                                                                         'semantic_sha256': directed.semantic_sha256,
                                                                         'failure_key': None, 'failures': 0}
+                if managed:
+                    current['assignments'][name]['dispatches'][operation]['managed_expected_launch'] = expected_launch
                 _event(current, 'dispatch-prepared', assignment_id=name, operation=operation)
                 self._write(rel, current, current_sha)
             else:
@@ -876,7 +1144,8 @@ class DirectorRun:
             if recovering:
                 D._require(observed['receipt']['semantic_sha256'] == directed.semantic_sha256, 'The recorded child dispatch differs from the authorized request')
             elif reviewed_directed:
-                D.WF.start(child, start['mode'], start['selector'], start['limits'], request, reviewed_directed=True)
+                D.WF.start(child, start['mode'], start['selector'], start['limits'], request,
+                           reviewed_directed=True, managed_queue_guard=managed_guard)
             else:
                 helper.apply(child, {'operation': operation, 'request': request,
                                      **({'start': start} if start is not None else {})})
@@ -931,7 +1200,7 @@ class DirectorRun:
         D._require(state['phase'] == 'running' and not any(q['phase'] != 'delivered' for q in assignment['questions'].values()),
                    'Resolve the assignment before recording completion')
         D._require(D.WF.valid_id(payload['outcome_id'], 'O'), 'Completion requires an exact child outcome ID')
-        root = self.check_area(spec)
+        root = self._area_for_run(state, spec)
         child = D.WF.Store(root, neutral=True)
         observed = D.WF.director_dispatch_helper().observe(child, {'operation': 'start', 'director_dispatch': self._envelope(state, spec)})
         recorded = assignment['dispatches'].get('start', {})
@@ -953,6 +1222,17 @@ class DirectorRun:
         D._require(all(D.WF.evidence_pointer(evidence_store, item)['available'] for item in check[0]['evidence'])
                    and check[0].get('sources') and D.WF.fingerprints(evidence_store, list(check[0]['sources'])) == check[0]['sources'],
                    'The matching child check evidence is no longer current')
+        if 'implement_all' in state:
+            reviewed = actual['delivery'].get('reviewed_source')
+            D._require(reviewed, 'Managed assignment requires the exact reviewed child source')
+            owned = self._managed_assignment_paths(spec, child, None)
+            changed = D.WS.local_incoming(root, actual['workspace']['base_commit'], reviewed['source']['source_head'])
+            evidence_root = Path('.skill-tree/run-evidence') / actual['id'].lower()
+            evidence = {item['path'] for item in D.WF.cleanup_evidence_records(matches[0])
+                        if Path(item['path']).is_relative_to(evidence_root)}
+            D._require(changed and all(path in evidence or any(Path(path).is_relative_to(scope) for scope in owned)
+                                      for path in changed),
+                       'The reviewed child commit writes outside the frozen assignment scope')
         completed = {'outcome_id': payload['outcome_id'], 'task_id': task_id, 'child_run_id': actual['id'],
                      'outcome_sha256': D._digest(matches[0]), 'check_key': check[0]['key']}
         with self.store.lock(local_delivery={'kind': 'director-run-assignment-complete', 'sha256': D._digest(payload)}):
@@ -1050,7 +1330,7 @@ class DirectorRun:
         run_id, name, qid = (payload[key] for key in ('director_run_id', 'assignment_id', 'question_id'))
         rel, state, sha = self._load(run_id)
         spec = self._assignment(state, name)
-        root = self.check_area(spec)
+        root = self._area_for_run(state, spec)
         D._require(state['phase'] == 'running' and state['owner']['actor'] == question['recipient'],
                    'A running Director session requires the original owner recipient')
         known_areas = {item['area']['id'] for item in self._plan_for(state)['assignments'] if item['id'] in state['assignments']}
@@ -1122,7 +1402,7 @@ class DirectorRun:
         run_id, name, qid = (payload[key] for key in ('director_run_id', 'assignment_id', 'question_id'))
         _, state, sha = self._load(run_id)
         spec = self._assignment(state, name)
-        root = self.check_area(spec)
+        root = self._area_for_run(state, spec)
         owner = _host_owner(payload['owner'])
         question = state['assignments'][name]['questions'].get(qid)
         D._require(question is not None and all(question[key] == payload[key] for key in
@@ -1195,19 +1475,26 @@ def run(registry, planner, command, payload):
         current = {'revision': plan['objective']['objective_revision'], 'sha256': plan['objective']['objective_sha256']}
         D._require(ledger['current'] == current, 'The frozen Director objective is no longer current')
 
-    def check_area(assignment):
+    def check_area(assignment, *, approved_head=None):
         areas, bindings, sources = registered()
         identity = assignment['area']
         area = areas['areas'].get(identity['id'])
         D._require(area and all(area.get(key) == identity[key] for key in ('id', 'scope', 'repo_id', 'queue_id')),
                    'The planned Director area identity changed')
-        D._require(sources.qualify(area, assignment['capability']) == identity['qualification'],
+        root = planner.O._child_root(areas, bindings, area['id'])
+        if approved_head is None:
+            qualification = sources.qualify(area, assignment['capability'])
+        else:
+            current = approved_head(root)
+            D._require(D.WS.checked_out_branch(root)['head'] == current, 'Managed target changed after incorporation inspection')
+            qualification = sources.qualify(area, assignment['capability'], qualified_head=identity['qualification']['head'])
+        D._require(qualification == identity['qualification'],
                    'The planned child source, profile or capability qualification changed')
         D._require(set(assignment['effects']) <= set(area['allowed_effects']), 'Registered area effect authority changed')
         for pin in assignment['pins']:
             if pin['strength'] != 'optional':
                 D._require(verify_pin(pin), 'A required Director source pin is no longer current')
-        return planner.O._child_root(areas, bindings, area['id'])
+        return root
 
     def verify_pin(pin):
         areas, _, sources = registered()
@@ -1221,5 +1508,6 @@ def run(registry, planner, command, payload):
     engine = DirectorRun(registry, planner.frozen, check_area, check_current, verify_pin, handoffs.superseded_assignments)
     methods = {'run-start': engine.start, 'run-status': engine.status, 'run-dispatch': engine.dispatch, 'verify-intake': engine.verify_intake,
                'run-complete-assignment': engine.complete_assignment, 'run-supervise': engine.supervise,
+               'run-advance-all': engine.advance_all,
                'decide-open': engine.open_question, 'decide-answer': engine.answer}
     return methods[command](payload) if command in methods else engine.lifecycle(command, payload)

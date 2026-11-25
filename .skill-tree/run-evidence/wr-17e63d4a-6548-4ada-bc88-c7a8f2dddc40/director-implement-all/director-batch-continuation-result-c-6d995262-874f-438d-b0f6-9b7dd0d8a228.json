@@ -1,0 +1,20 @@
+{
+  "check_id": "director-batch-continuation",
+  "attempt_id": "C-6d995262-874f-438d-b0f6-9b7dd0d8a228",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-director-topologies.py"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "counts": {
+    "expected": 7,
+    "discovered": 7,
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0
+  },
+  "observed_output": ".......\n----------------------------------------------------------------------\nRan 7 tests in 470.551s\n\nOK\n",
+  "timeout": false,
+  "elapsed_seconds": 473.47
+}

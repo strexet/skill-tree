@@ -1,0 +1,189 @@
+{
+  "observation": "Actual Codex collaboration workers changed both disposable child checkouts, and an independent Codex reviewer inspected each change. Controlled fixture-owner input accepted the fixture plans. The installed Director and local Core kept exact dispatch, review, scoped commit, checked integration and cleanup receipts.",
+  "scope": "One worker slot and two waves in a disposable managed local checkout. The consumer required the producer result.",
+  "director_record_sha256": "f562eb05a456cdd70ba90a490d5bdf96d1854f75e88e8558c605589d657f592f",
+  "timeline": [
+    {
+      "event": "run-started",
+      "phase": "running",
+      "recorded_at": "2026-11-25T18:10:00.071736+00:00",
+      "sequence": 1
+    },
+    {
+      "assignment_id": "producer",
+      "event": "dispatch-prepared",
+      "operation": "start",
+      "recorded_at": "2026-11-25T18:10:04.457433+00:00",
+      "sequence": 2
+    },
+    {
+      "assignment_id": "producer",
+      "event": "dispatch-invoking",
+      "operation": "start",
+      "recorded_at": "2026-11-25T18:10:04.462120+00:00",
+      "sequence": 3
+    },
+    {
+      "assignment_id": "producer",
+      "child_run_id": "WR-4c8f7e34-08c0-4501-9082-4f41e7ce7b64",
+      "event": "dispatch-recorded",
+      "operation": "start",
+      "receipt_sha256": "2fdf3883753240b89f2518ea381f83fa1386d5b86e682343c0a574074999495a",
+      "recorded_at": "2026-11-25T18:10:06.464439+00:00",
+      "sequence": 4,
+      "stage": "acknowledge-child",
+      "task_id": "T-b7e78b40-b087-41fd-8ea3-99de5f6dd950"
+    },
+    {
+      "event": "implement-all-frontier",
+      "gate": null,
+      "recorded_at": "2026-11-25T18:10:08.440175+00:00",
+      "remaining_ids": [
+        "T-72985b41-7f6f-45f7-8991-ab437b9e6c75",
+        "T-b7e78b40-b087-41fd-8ea3-99de5f6dd950"
+      ],
+      "sequence": 5
+    },
+    {
+      "assignment_id": "producer",
+      "child_run_id": "WR-4c8f7e34-08c0-4501-9082-4f41e7ce7b64",
+      "event": "assignment-completed",
+      "outcome_id": "O-12d28ecc-03f7-436f-b780-baef0f4161f5",
+      "recorded_at": "2026-11-25T18:11:53.849486+00:00",
+      "sequence": 6,
+      "task_id": "T-b7e78b40-b087-41fd-8ea3-99de5f6dd950"
+    },
+    {
+      "event": "implement-all-frontier",
+      "gate": null,
+      "recorded_at": "2026-11-25T18:11:56.324618+00:00",
+      "remaining_ids": [
+        "T-72985b41-7f6f-45f7-8991-ab437b9e6c75",
+        "T-b7e78b40-b087-41fd-8ea3-99de5f6dd950"
+      ],
+      "sequence": 7
+    },
+    {
+      "assignment_id": "consumer",
+      "event": "dispatch-prepared",
+      "operation": "start",
+      "recorded_at": "2026-11-25T18:12:17.297032+00:00",
+      "sequence": 8
+    },
+    {
+      "assignment_id": "consumer",
+      "event": "dispatch-invoking",
+      "operation": "start",
+      "recorded_at": "2026-11-25T18:12:17.306133+00:00",
+      "sequence": 9
+    },
+    {
+      "assignment_id": "consumer",
+      "child_run_id": "WR-571770e6-605a-4ca5-abe6-2dd713ded790",
+      "event": "dispatch-recorded",
+      "operation": "start",
+      "receipt_sha256": "00ab2f93d081fc772984117ca683654d0a2f8bb4277147cf171f398e64c1c627",
+      "recorded_at": "2026-11-25T18:12:19.414435+00:00",
+      "sequence": 10,
+      "stage": "acknowledge-child",
+      "task_id": "T-72985b41-7f6f-45f7-8991-ab437b9e6c75"
+    },
+    {
+      "event": "implement-all-frontier",
+      "gate": null,
+      "recorded_at": "2026-11-25T18:12:21.533194+00:00",
+      "remaining_ids": [
+        "T-72985b41-7f6f-45f7-8991-ab437b9e6c75"
+      ],
+      "sequence": 11
+    },
+    {
+      "assignment_id": "consumer",
+      "child_run_id": "WR-571770e6-605a-4ca5-abe6-2dd713ded790",
+      "event": "assignment-completed",
+      "outcome_id": "O-e88fe626-5dee-4022-8a43-1f1fac3b5d80",
+      "recorded_at": "2026-11-25T18:13:52.863946+00:00",
+      "sequence": 12,
+      "task_id": "T-72985b41-7f6f-45f7-8991-ab437b9e6c75"
+    },
+    {
+      "event": "implement-all-frontier",
+      "gate": null,
+      "recorded_at": "2026-11-25T18:13:55.474152+00:00",
+      "remaining_ids": [
+        "T-72985b41-7f6f-45f7-8991-ab437b9e6c75"
+      ],
+      "sequence": 13
+    },
+    {
+      "event": "implement-all-frontier",
+      "gate": null,
+      "recorded_at": "2026-11-25T18:14:14.882107+00:00",
+      "remaining_ids": [],
+      "sequence": 14
+    }
+  ],
+  "assignments": {
+    "producer": {
+      "task_id": "T-b7e78b40-b087-41fd-8ea3-99de5f6dd950",
+      "relative_path": "story/source.txt",
+      "expected_content": "Native managed producer output.\n"
+    },
+    "consumer": {
+      "task_id": "T-72985b41-7f6f-45f7-8991-ab437b9e6c75",
+      "relative_path": "story/consumer.txt",
+      "expected_content": "Native managed consumer output.\n"
+    }
+  },
+  "integrated": [
+    {
+      "assignment_id": "producer",
+      "task_id": "T-b7e78b40-b087-41fd-8ea3-99de5f6dd950",
+      "child_run_id": "WR-4c8f7e34-08c0-4501-9082-4f41e7ce7b64",
+      "worker": "/root/director_critic",
+      "reviewer": "/root/director_resolver",
+      "director_dispatch_receipt": "2fdf3883753240b89f2518ea381f83fa1386d5b86e682343c0a574074999495a",
+      "outcome_id": "O-12d28ecc-03f7-436f-b780-baef0f4161f5",
+      "task_commit": "edb17fc48d0d64f8f56b7f2ec781cba95e127c30",
+      "task_review": "DO-c65e4abe-5993-57f1-9d51-6cc8fa462a83",
+      "controller_review": "DO-a0ad4a1a-9107-542d-a24a-459818bef954",
+      "merge_commit": "64a7ef1934b7b84b4fd91125f984ebe989b22532",
+      "cleanup": "removed",
+      "merge_parents": [
+        "619427865e4c292cf86ae67db94cb6ebf562227c",
+        "edb17fc48d0d64f8f56b7f2ec781cba95e127c30"
+      ],
+      "output_sha256": "81241d966dcda8b132d10b44e08e876f98416df50777e109df2adcb33d3adf41",
+      "core_outcome_sha256": "686b642196b293ac7f570db8818d5b6c5de55f85a3bbed0fbfdb793c50bb0ea1"
+    },
+    {
+      "assignment_id": "consumer",
+      "task_id": "T-72985b41-7f6f-45f7-8991-ab437b9e6c75",
+      "child_run_id": "WR-571770e6-605a-4ca5-abe6-2dd713ded790",
+      "worker": "/root/entry_resolver",
+      "reviewer": "/root/director_resolver",
+      "director_dispatch_receipt": "00ab2f93d081fc772984117ca683654d0a2f8bb4277147cf171f398e64c1c627",
+      "outcome_id": "O-e88fe626-5dee-4022-8a43-1f1fac3b5d80",
+      "task_commit": "83ce00c9a86041b65e4c46b0776d8d44b8521d1d",
+      "task_review": "DO-2e351fe2-0021-5226-9146-bc06f88740d1",
+      "controller_review": "DO-58bfacfc-21c9-55e0-8c90-c3ad83bfa18a",
+      "merge_commit": "163b991d2a441cc252c361153dac78e3e1ba87b2",
+      "cleanup": "removed",
+      "merge_parents": [
+        "64a7ef1934b7b84b4fd91125f984ebe989b22532",
+        "83ce00c9a86041b65e4c46b0776d8d44b8521d1d"
+      ],
+      "output_sha256": "554b8d58655d418f65da452e2dc1057795b16ef42fe3ba89910978cc23a69811",
+      "core_outcome_sha256": "b175207dbb60e13ae41de9fb1b69c162a3ccd474d64e8446b35c245fcf28616e"
+    }
+  ],
+  "initial_head": "619427865e4c292cf86ae67db94cb6ebf562227c",
+  "key": {
+    "director_run_id": "DR-7d977908-1983-4d73-8d43-6c0dfc472a5c"
+  },
+  "final": {
+    "phase": "completed",
+    "remaining_ids": [],
+    "target_head": "163b991d2a441cc252c361153dac78e3e1ba87b2"
+  }
+}
