@@ -5,8 +5,10 @@ import argparse
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
 import re
+import stat
 import subprocess
 import sys
 import tempfile
@@ -837,6 +839,178 @@ def registered_target(root, ref):
     return matches[0] if matches else None
 
 
+def _profile_path(root, relative):
+    path = Path(relative)
+    if (path.is_absolute() or path.as_posix() != relative or not path.parts
+            or '..' in path.parts or '\\' in relative or '\0' in relative):
+        raise ValueError('An owned profile input requires an exact repository-relative path')
+    full = root / path
+    if full.resolve() != full:
+        raise ValueError('Owned profile inputs cannot follow symbolic links')
+    return full
+
+
+def _profile_input(root, relative):
+    full = _profile_path(root, relative)
+    try:
+        descriptor = os.open(full, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    except FileNotFoundError:
+        return None
+    with os.fdopen(descriptor, 'rb') as source:
+        if not stat.S_ISREG(os.fstat(source.fileno()).st_mode):
+            raise ValueError('Owned profile inputs require regular files')
+        return source.read()
+
+
+def _profile_discovery_paths(root, rules):
+    names = set(rules['names'])
+    extensions = set(rules['extensions'])
+    excluded = {'node_modules', '.git', 'Library', 'Temp', 'artifacts', 'installation'}
+    found = {name for name in names if _profile_path(root, name).exists()}
+    for relative in rules['roots']:
+        start = _profile_path(root, relative)
+        if not start.exists():
+            continue
+        if not start.is_dir():
+            raise ValueError('Profile inventory roots require directories')
+        for directory, directories, files in os.walk(start, followlinks=False):
+            directories[:] = [name for name in directories if name not in excluded]
+            for name in directories + files:
+                path = Path(directory) / name
+                if path.is_symlink() and name not in excluded:
+                    raise ValueError('The profile inventory contains a symbolic link')
+            for name in files:
+                if name not in excluded and (name in names or Path(name).suffix in extensions):
+                    found.add((Path(directory) / name).relative_to(root).as_posix())
+    return found
+
+
+def _owned_profile_files_match(root, relative, files):
+    destination = _profile_path(root, relative)
+    if not destination.is_dir() or not isinstance(files, dict) or not files:
+        return False
+    actual = set()
+    for directory, directories, names in os.walk(destination, followlinks=False):
+        parent = Path(directory)
+        prefix = parent.relative_to(destination).as_posix()
+        if prefix != 'plugins' and not prefix.startswith('plugins/'):
+            directories[:] = [name for name in directories if name != '__pycache__']
+            names = [name for name in names if name != '__pycache__']
+        if any((parent / name).is_symlink() for name in directories):
+            return False
+        for name in names:
+            actual.add((parent / name).relative_to(destination).as_posix())
+    if actual != files.keys():
+        return False
+    for name, expected in files.items():
+        source = _profile_input(root, relative + '/' + name)
+        if source is None or hashlib.sha256(source).hexdigest() != expected:
+            return False
+    return True
+
+
+def _owned_profile_destinations_match(root, destinations):
+    if not isinstance(destinations, dict) or not destinations:
+        return False
+    for relative, record in destinations.items():
+        files = record.get('files') if isinstance(record, dict) else None
+        name = record.get('name', '') if isinstance(record, dict) else ''
+        if (not isinstance(name, str) or not re.fullmatch(r'skill-tree-[a-z0-9-]+', name)
+                or Path(relative).name != name or not _owned_profile_files_match(root, relative, files)):
+            return False
+    return True
+
+
+def _owned_profile_bridges_match(root, bridges):
+    if not isinstance(bridges, dict):
+        return False
+    begin = '<!-- BEGIN skill-tree-skills -->'
+    end = '<!-- END skill-tree-skills -->'
+    for relative, record in bridges.items():
+        raw = _profile_input(root, relative)
+        if raw is None or not isinstance(record, dict):
+            return False
+        contents = raw.decode('utf-8', errors='replace')
+        start = contents.find(begin)
+        stop = contents.find(end)
+        if (start < 0 or stop < start or contents.find(begin, start + len(begin)) >= 0
+                or contents.find(end, stop + len(end)) >= 0):
+            return False
+        block = contents[start:stop + len(end)]
+        if hashlib.sha256(block.encode('utf-8')).hexdigest() != record.get('hash'):
+            return False
+    return True
+
+
+def canonical_profile_prerequisite(root):
+    """Report owned discovery input drift without executing target code."""
+    root = Path(root).resolve()
+    profile_path = '.skill-tree/installation/profile.json'
+    manager_path = '.skill-tree/installation/manager.js'
+    bundle_source = '.skill-tree/installation/source'
+    capability_path = bundle_source + '/config/capabilities.json'
+    try:
+        raw = _profile_input(root, profile_path)
+        if raw is None:
+            return None
+        profile = json.loads(raw)
+        if (not isinstance(profile, dict) or profile.get('format') != 'skill-tree-profile'
+                or profile.get('schema') != 1 or profile.get('project_root') != str(root)
+                or not isinstance(profile.get('inputs'), dict)
+                or not isinstance(profile.get('bundle_digests'), dict)):
+            return None
+        bundle = profile['bundle_digests']
+        if manager_path not in bundle or capability_path not in bundle:
+            return None
+        prefix = bundle_source + '/'
+        bundle_files = {relative[len(prefix):]: expected for relative, expected in bundle.items()
+                        if relative.startswith(prefix)}
+        if not _owned_profile_files_match(root, bundle_source, bundle_files):
+            return None
+        for relative in bundle.keys() - {prefix + name for name in bundle_files}:
+            source = _profile_input(root, relative)
+            if source is None or hashlib.sha256(source).hexdigest() != bundle[relative]:
+                return None
+        capabilities = json.loads(_profile_input(root, capability_path))
+        discovered = _profile_discovery_paths(root, capabilities['inventory'])
+        inputs = profile['inputs']
+        changed = []
+        for relative in inputs.keys() | discovered:
+            expected = inputs.get(relative)
+            if expected is not None and (not isinstance(expected, str) or not re.fullmatch('[a-f0-9]{64}', expected)):
+                return None
+            source = _profile_input(root, relative)
+            actual = hashlib.sha256(source).hexdigest() if source is not None else None
+            if actual != expected:
+                changed.append(relative)
+        if (not changed or not _owned_profile_destinations_match(root, profile.get('destinations'))
+                or not _owned_profile_bridges_match(root, profile.get('bridges', {}))
+                or _profile_input(root, profile_path) != raw):
+            return None
+        return {'code': 'profile-refresh-required', 'changed_inputs': sorted(changed),
+                'profile_sha256': hashlib.sha256(raw).hexdigest(),
+                'recovery_argv': ['node', manager_path, '--refresh-profile']}
+    except (OSError, TypeError, KeyError, ValueError, subprocess.TimeoutExpired):
+        return None
+
+
+def synchronized_profile_prerequisite(root, ref, expected_head):
+    try:
+        target = registered_target(root, ref)
+        if target is None or ws.common_dir(target) != ws.common_dir(root):
+            return None
+        checkout = ws.checked_out_branch(target)
+        if (checkout['ref'], checkout['head']) != (ref, expected_head):
+            return None
+        prerequisite = canonical_profile_prerequisite(target)
+        if prerequisite and ws.checked_out_branch(target) == checkout:
+            return {**prerequisite, 'target_ref': ref, 'target_head': expected_head,
+                    'target_checkout': checkout['checkout']}
+    except (OSError, ValueError, subprocess.TimeoutExpired):
+        return None
+    return None
+
+
 def fast_forward_checked_out_target(root, worktree, checkout, tracking, remote_head):
     # The protected ref update needs a different Git HEAD from the target.
     preparation = {
@@ -912,17 +1086,17 @@ def synchronize_local_target(root, record):
         present = ws.local_git(root, 'show-ref', '--verify', '--quiet', ref, accepted=(0, 1)).returncode == 0
         local_head = ws.local_git_text(root, 'rev-parse', '--verify', ref + '^{commit}') if present else None
         receipt['local_head'] = local_head
-        if local_head and ws.local_git(root, 'merge-base', '--is-ancestor', remote_head, local_head, accepted=(0, 1)).returncode == 0:
-            receipt['status'] = 'synchronized'
-            return receipt
-        if local_head and ws.local_git(root, 'merge-base', '--is-ancestor', local_head, remote_head, accepted=(0, 1)).returncode:
-            raise ReviewError('Local and remote targets diverged and require a reviewed local integration')
-
-        fast_forward_local_target(root, ref, local_head, tracking, remote_head)
-        receipt['local_head'] = ws.local_git_text(root, 'rev-parse', '--verify', ref + '^{commit}')
-        if ws.local_git(root, 'merge-base', '--is-ancestor', remote_head, receipt['local_head'], accepted=(0, 1)).returncode:
-            raise ReviewError('Verify that the local target contains the fetched target after updating')
+        if not local_head or ws.local_git(root, 'merge-base', '--is-ancestor', remote_head, local_head, accepted=(0, 1)).returncode:
+            if local_head and ws.local_git(root, 'merge-base', '--is-ancestor', local_head, remote_head, accepted=(0, 1)).returncode:
+                raise ReviewError('Local and remote targets diverged and require a reviewed local integration')
+            fast_forward_local_target(root, ref, local_head, tracking, remote_head)
+            receipt['local_head'] = ws.local_git_text(root, 'rev-parse', '--verify', ref + '^{commit}')
+            if ws.local_git(root, 'merge-base', '--is-ancestor', remote_head, receipt['local_head'], accepted=(0, 1)).returncode:
+                raise ReviewError('Verify that the local target contains the fetched target after updating')
         receipt['status'] = 'synchronized'
+        prerequisite = synchronized_profile_prerequisite(root, ref, receipt['local_head'])
+        if prerequisite:
+            receipt['profile_prerequisite'] = prerequisite
     except (ReviewError, ws.RunError) as error:
         receipt['reason'] = str(error)
     except (OSError, UnicodeError, subprocess.TimeoutExpired):

@@ -205,6 +205,14 @@ def _inspect_owner(checkout):
     }
 
 
+def _profile_refresh_prerequisite(root):
+    try:
+        helper = WF.owned_module('director_profile_diagnostic', Path(__file__).with_name('pr-review-state.py'))
+        return helper.canonical_profile_prerequisite(root)
+    except (OSError, ValueError):
+        return None
+
+
 def _inspect_profile(root):
     relative = '.skill-tree/installation/profile.json'
     receipt, digest = _read(root, relative)

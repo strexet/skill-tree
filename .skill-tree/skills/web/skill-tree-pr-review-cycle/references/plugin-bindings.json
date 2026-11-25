@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "d16c09ff46fed3bac39438eba5aa7d646041460a3d8c18cd22735145a6456b71",
+  "identity": "c90db515236d478518ede2584fc0689ccbea2da712e5d2895b2cd3e46f09deeb",
   "operation": "skill-tree-pr-review-cycle",
   "operations": {
     "skill-tree-3d": {
@@ -3296,7 +3296,7 @@
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
     "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
-    "references/pr-review-cycle.md": "e115cb5b5f1407e6d9a8e34ba0c0b43f06be2414fcec935eb5ce7f8ab1bb6c9e",
+    "references/pr-review-cycle.md": "4332a2ec86a115e18c6c173ccefc155454579936b48c16705bd1c183a8a2fc18",
     "references/project-profile.md": "75da46ecf2c034d0211e2b1dcfcb3d70dfd1550cabd8138974fefde74eb8758e",
     "references/run-workspaces.md": "af5c2890d7b44a1ec6e08030e4c78a21ebc7c8db10636c72e4b721f3d6876cc3",
     "references/validation-policy.md": "d5d014a906a2d9c76db8066310b7c1a81f7403ce0c25435a431af327ebe8c818",
@@ -3316,7 +3316,7 @@
     "scripts/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
     "scripts/plugin-runtime.js": "62caaa416cb4f375fef45edb71c1cbe3b2f9c0acb734a95e0b9099470cf6c8a5",
     "scripts/plugin-sources.js": "13d853f9e64dec84cf92f4026ac71e4384e186cd96200543e400a852a46e4693",
-    "scripts/pr-review-state.py": "e30582c8fae2918e3dc794c5eb348660ebfa935ed5feeef2ca69afc5690a6d42",
+    "scripts/pr-review-state.py": "427cf06c947614937c3cbdc563bd8ea638285ed76d388c568247f915eccb497d",
     "scripts/run-workspaces.py": "03af423f89940b7b04937b5ff36ead631047f97931b8a4f0082c130e667af13a",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",

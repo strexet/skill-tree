@@ -217,9 +217,15 @@ def preview(D, root, workspace, settings, profile, products, request):
         return {**summary, 'execution':'project-skill', 'status':'prerequisite', 'child_skill':None,
                 'limitations':['project-preview-not-authorized']}
     package = child_skill(D, project, operation)
-    if mode == 'direct':
-        return {**summary, 'execution':'direct-project', 'status':'preview' if package else 'prerequisite',
-                'child_skill':package, 'limitations':[] if package else ['project-skill-unavailable']}
-    return {**summary, 'execution':'project-skill', 'status':'preview' if package else 'prerequisite',
-            'child_skill':package,
-            'limitations':['requires-exact-child-scope-and-effect-authorization'] if package else ['project-skill-unavailable']}
+    execution = 'direct-project' if mode == 'direct' else 'project-skill'
+    if package:
+        limitations = [] if mode == 'direct' else ['requires-exact-child-scope-and-effect-authorization']
+        return {**summary, 'execution': execution, 'status': 'preview', 'child_skill': package,
+                'limitations': limitations}
+    checkout = Path(project.get('workspace_checkout', project['checkout']))
+    prerequisite = D._profile_refresh_prerequisite(checkout)
+    if prerequisite:
+        return {**summary, 'execution': execution, 'status': 'prerequisite', 'child_skill': None,
+                'limitations': [prerequisite['code']], 'profile_prerequisite': prerequisite}
+    return {**summary, 'execution': execution, 'status': 'prerequisite', 'child_skill': None,
+            'limitations': ['project-skill-unavailable']}

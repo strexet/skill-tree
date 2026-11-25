@@ -1,5 +1,9 @@
 # PR Review Cycle
 
+## Owned profile prerequisites after target synchronization
+
+After provider-confirmed integration and exact local synchronization, inspect discovery inputs in the checked-out owned profile of the target. A `profile_prerequisite` records changed inputs and the supported refresh command for that target. The synchronization receipt remains valid. Profile refresh and controller re-admission follow the owned installation workflow and explicit scope.
+
 ## Invocation and authorization
 
 The operation completes the selected source branch through PR creation, review, fixes and repeated review. `source_branch` defaults to the current branch of the selected repository/run/worktree. `target_branch` defaults to `develop`; the PR base and merge destination always use the same target. `merge` defaults to `false`. Controller `base_branch` supplies the initial implementation ancestry and remains independent of both publication parameters. A missing target requires an owner decision; another branch never replaces the target silently.

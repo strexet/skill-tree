@@ -1,6 +1,7 @@
 import hashlib
 import importlib.util
 import json
+import os
 from copy import deepcopy
 from pathlib import Path
 import subprocess
@@ -297,6 +298,87 @@ class LocalTargetSyncTests(unittest.TestCase):
         self.assertEqual(self.git(self.root, 'rev-parse', 'release/main'), self.remote_head)
         self.assertEqual(self.git(self.root, 'rev-parse', 'HEAD'), self.source)
         self.assertEqual(self.invoke('observe')['local_target_sync'], first['local_target_sync'])
+
+    def test_synchronized_target_reports_stale_discovery_input_without_refresh(self):
+        self.git(self.root, 'switch', '--detach', self.remote_head)
+        self.commit('Add discovery inputs on the merged target', {
+            'package.json': '{"name":"profile-fixture"}\n', 'playwright.config.ts': 'export default {};\n'})
+        self.remote_head = self.git(self.root, 'rev-parse', 'HEAD')
+        self.git(self.root, 'push', 'origin', 'HEAD:refs/heads/release/main')
+        self.git(self.root, 'switch', '-c', 'release/main', self.old)
+        subprocess.run(['node', str(CORE / 'bin/install.js'), '--target', str(self.root),
+                        '--only', 'codex', '--flavor', 'general', '--skills', 'skill-tree-pr-review-cycle',
+                        '--with-init'],
+                       check=True, capture_output=True, text=True, timeout=30)
+        profile = self.root / '.skill-tree/installation/profile.json'
+        before = profile.read_bytes()
+        self.assertIsNone(json.loads(before)['inputs']['package.json'])
+        self.assertNotIn('playwright.config.ts', json.loads(before)['inputs'])
+        director = pr.owned_module('profile_fixture_director', CORE / 'common/scripts/director-state.py')
+        routes = pr.owned_module('profile_fixture_routes', CORE / 'common/scripts/director-project-routing.py')
+        checkout = self.root.resolve()
+        project = {'id': 'fixture', 'checkout': str(checkout), 'workspace_checkout': str(checkout),
+                   'state': 'available', 'allowed_effects': ['preview']}
+        selection = {'operation': 'skill-tree-pr-review-cycle', 'project_id': 'fixture'}
+        current = routes.preview(director, checkout, checkout, {}, {}, [project], selection)
+        self.assertEqual(current['status'], 'preview')
+        self.assertTrue(current['child_skill'])
+        self.assertNotIn('profile_prerequisite', current)
+        record = self.invoke('init')
+        sync = record['local_target_sync']
+        self.assertTrue(record['order_completed'])
+        self.assertEqual((record['status'], sync['status']), ('merged', 'synchronized'))
+        diagnostic = sync.get('profile_prerequisite')
+        self.assertIsNotNone(diagnostic, 'Expected a profile-refresh-required prerequisite')
+        self.assertEqual(diagnostic['code'], 'profile-refresh-required')
+        self.assertEqual(diagnostic['changed_inputs'], ['package.json', 'playwright.config.ts'])
+        self.assertEqual(diagnostic['target_head'], self.remote_head)
+        self.assertEqual(diagnostic['target_ref'], 'refs/heads/release/main')
+        self.assertEqual(diagnostic['recovery_argv'],
+                         ['node', '.skill-tree/installation/manager.js', '--refresh-profile'])
+        self.assertEqual(profile.read_bytes(), before)
+        self.assertEqual(self.invoke('observe')['local_target_sync'], sync)
+        stale = routes.preview(director, checkout, checkout, {}, {}, [project], selection)
+        self.assertEqual(stale['status'], 'prerequisite')
+        self.assertEqual(stale['limitations'], ['profile-refresh-required'])
+        self.assertEqual(stale['profile_prerequisite']['changed_inputs'], ['package.json', 'playwright.config.ts'])
+        self.assertIsNone(stale['child_skill'])
+
+        pinned = Path(current['child_skill'])
+        pinned_before = pinned.read_bytes()
+        pinned.write_bytes(pinned_before + b'\nAltered fixture package.\n')
+        damaged = self.invoke('observe')
+        self.assertTrue(damaged['order_completed'])
+        self.assertNotIn('profile_prerequisite', damaged['local_target_sync'])
+        self.assertEqual(routes.preview(director, checkout, checkout, {}, {}, [project], selection)['limitations'],
+                         ['project-skill-unavailable'])
+        pinned.write_bytes(pinned_before)
+
+        bridge = checkout / 'AGENTS.md'
+        bridge_before = bridge.read_bytes()
+        bridge.write_bytes(b'# Local instructions\n\n' + bridge_before)
+        self.assertEqual(self.invoke('observe')['local_target_sync'], sync)
+        bridge.write_bytes(bridge_before.replace(b'Flavor: general', b'Flavor: damaged'))
+        damaged_bridge = self.invoke('observe')
+        self.assertTrue(damaged_bridge['order_completed'])
+        self.assertNotIn('profile_prerequisite', damaged_bridge['local_target_sync'])
+        self.assertEqual(routes.preview(director, checkout, checkout, {}, {}, [project], selection)['limitations'],
+                         ['project-skill-unavailable'])
+        bridge.write_bytes(bridge_before)
+
+        unowned = profile.parent / 'source' / 'unowned.txt'
+        unowned.write_text('Unexpected maintenance source.\n')
+        damaged_bundle = self.invoke('observe')
+        self.assertTrue(damaged_bundle['order_completed'])
+        self.assertNotIn('profile_prerequisite', damaged_bundle['local_target_sync'])
+        self.assertEqual(routes.preview(director, checkout, checkout, {}, {}, [project], selection)['limitations'],
+                         ['project-skill-unavailable'])
+
+    def test_profile_input_rejects_named_pipe(self):
+        relative = 'pipe.json'
+        os.mkfifo(self.root / relative)
+        with self.assertRaisesRegex(ValueError, 'regular files'):
+            pr._profile_input(self.root.resolve(), relative)
 
     def test_checked_out_target_preserves_disjoint_staged_and_unstaged_edits(self):
         self.git(self.root, 'switch', '-c', 'release/main', self.old)
