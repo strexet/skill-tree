@@ -20,6 +20,9 @@ import uuid
 class RunError(ValueError):
     pass
 
+class LocalRefRejected(RunError):
+    """The protected ref gate rejected the write before touching the target checkout."""
+
 TERMINAL = {'local-result', 'merged'}
 
 def delivery_finished(run):
@@ -1103,6 +1106,72 @@ def local_merge_receipt(root, preparation, current_head):
     return {'commit': current_head, 'parents': parents, 'tree': tree}
 
 
+def current_target_merge_tree(root, target_head, source_head):
+    result = local_git(root, 'merge-tree', '--write-tree', '--name-only', '--no-messages', '-z',
+                       target_head, source_head, accepted=(0, 1))
+    tree, *paths = result.stdout.decode('utf-8').split('\0')
+    if not re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', tree):
+        raise RunError('Git could not prepare an unambiguous current-target merge tree')
+    paths = sorted({worker_path(path) for path in paths if path})
+    if bool(paths) != bool(result.returncode):
+        raise RunError('Git did not identify the exact conflicting paths')
+    return tree, paths
+
+
+def current_target_area(root, attempt):
+    return common_dir(root)/('skill-tree-integration-'+attempt['id'].lower())/'checkout'
+
+
+def current_target_checkout(root, attempt, *, create=False):
+    area = current_target_area(root, attempt)
+    if area.is_symlink() or area.parent.is_symlink():
+        raise RunError('The current-target worktree path is ambiguous')
+    if create and not area.exists():
+        area.parent.mkdir(mode=0o700, exist_ok=True)
+        if area.parent.stat().st_mode & 0o077:
+            raise RunError('The integration checkout directory is accessible to other users')
+        local_git_policy(root, merge=False, signed=True)
+        with tempfile.TemporaryDirectory(dir=area.parent, prefix='hooks-') as hooks:
+            local_git(root, '-c', f'core.hooksPath={hooks}', 'worktree', 'add', '-b',
+                      attempt['candidate_ref'].removeprefix('refs/heads/'), area, attempt['draft_head'])
+    linked_registration(root, area)
+    actual = checked_out_branch(area)
+    if actual['ref'] != attempt['candidate_ref'] or (attempt.get('checkout') and actual['checkout'] != attempt['checkout']):
+        raise RunError('The exact current-target integration checkout changed')
+    return area, actual
+
+
+def current_target_commit(root, attempt, tree):
+    signing = local_git_policy(root, merge=False, signed=True)
+    return local_git_text(root, 'commit-tree', tree, signing, '-p', attempt['target_head'],
+                          '-p', attempt['source']['source_head'], '-m', 'Skill Tree integration '+attempt['id'])
+
+
+def current_target_dirt(area):
+    dirty = local_worktree_dirt(area, allow_staged=True)
+    staged = local_git_paths(area,'diff','--cached','--name-only','--no-renames','-z','--')
+    return staged | {path for path in dirty if not local_unchanged_file(area,path)}
+
+
+def apply_current_target_candidate(area, attempt, candidate):
+    index = task_index_path(area)
+    with local_git_lock(index.with_name(index.name+'.lock')):
+        actual = checked_out_branch(area)
+        if (actual['checkout'] != attempt['checkout'] or actual['ref'] != attempt['candidate_ref']
+                or actual['head'] not in {candidate['commit'], attempt['draft_head']}
+                or local_git(area,'diff','--cached','--quiet',candidate['commit'],'--',accepted=(0,1)).returncode
+                or any(not local_unchanged_file(area,path) for path in
+                       local_git_paths(area,'diff','--name-only','--no-renames','-z','--'))
+                or local_git_paths(area, 'ls-files', '--others', '--exclude-standard', '-z')):
+            raise RunError('The current-target candidate changed before sealing')
+        if actual['head'] != candidate['commit']:
+            with tempfile.TemporaryDirectory(dir=index.parent, prefix='integration-seal-') as hooks:
+                with prepare_ref_update(area, actual['head'], candidate['commit'], hooks) as process:
+                    output, _ = process.communicate('commit\n', timeout=45)
+                    if process.returncode or output != 'commit: ok\n':
+                        raise RunError('Recover the exact prepared integration candidate before retry')
+
+
 def reconcile_reviewed_merge_index(root, attempt, merge):
     paths=attempt['incoming']
     if not paths:
@@ -1190,7 +1259,7 @@ def local_git_lock(path):
 
 
 @contextmanager
-def local_ref_transaction(root, hooks, source_ref, source_head, target_ref, target_head, merge):
+def local_ref_transaction(root, hooks, source_ref, source_head, target_ref, target_head, merge, verify_refs=()):
     args = local_git_args(root, '-c', f'core.hooksPath={hooks}', 'update-ref', '-m',
                           'Skill Tree local merge', '--stdin')
     with subprocess.Popen(args, env=local_git_environment(), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
@@ -1199,13 +1268,14 @@ def local_ref_transaction(root, hooks, source_ref, source_head, target_ref, targ
         timer.daemon = True
         timer.start()
         try:
+            extra = ''.join(f'option no-deref\nverify {ref} {head}\n' for ref, head in verify_refs)
             commands = ('start\noption no-deref\n'
-                        f'verify {source_ref} {source_head}\noption no-deref\n'
+                        f'verify {source_ref} {source_head}\n{extra}option no-deref\n'
                         f'update {target_ref} {merge} {target_head}\nprepare\n')
             process.stdin.write(commands)
             process.stdin.flush()
             if process.stdout.readline() != 'start: ok\n' or process.stdout.readline() != 'prepare: ok\n':
-                raise RunError('The exact local source or target ref could not be locked for integration')
+                raise LocalRefRejected('The exact local source or target ref could not be locked for integration')
         finally:
             timer.cancel()
         try:
@@ -1240,7 +1310,7 @@ def run_local_merge(root, source_root, preparation, *, fast_forward=False):
     with local_git_lock(index_path.with_suffix('.lock')), local_git_lock(head_path.with_suffix('.lock')):
         if (local_git_text(root, 'symbolic-ref', '--no-recurse', 'HEAD') != target_ref
                 or local_git_text(root, 'rev-parse', '--verify', target_ref) != target_head):
-            raise RunError('The exact prepared target branch or head changed before integration')
+            raise LocalRefRejected('The exact prepared target branch or head changed before integration')
         unfinished(root)
         signing=local_git_policy(root,**policy_options)
         if reviewed and local_git_bool(root,'merge.verifySignatures'):
@@ -1267,9 +1337,10 @@ def run_local_merge(root, source_root, preparation, *, fast_forward=False):
                 '-p', source_head, '-m', f'Merge {source_ref} into {target_ref}')
             # Run the ref transaction from the distinct source worktree so Git
             # does not try to acquire the canonical worktree's protected HEAD lock.
-            with local_ref_transaction(source_root, hooks, source_ref, source_head, target_ref, target_head, merge) as process:
+            verify_refs = preparation.get('verify_refs', ())
+            with local_ref_transaction(source_root, hooks, source_ref, source_head, target_ref, target_head, merge, verify_refs) as process:
                 if any(local_git(root, 'symbolic-ref', '--quiet', '--no-recurse', ref, accepted=(0, 1)).returncode == 0
-                       for ref in (source_ref, target_ref)):
+                       for ref in (source_ref, target_ref, *(ref for ref, _ in verify_refs))):
                     raise RunError('Protected local merge requires direct prepared Git branch refs')
                 checkout = ('--work-tree', root, '-c', f'core.hooksPath={hooks}', 'read-tree', '-u', '-m')
                 local_git(root, *checkout, '-n', target_head, merge, index=index)

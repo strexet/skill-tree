@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "6f41fb476340486881c87662de03d50b83cbe674ec3e120c68ac4ea380b0eaeb",
+  "identity": "31cfb444c0c4788009bbbf985a615383c92e6cce05ce247d59246623f04f3ddf",
   "operation": "skill-tree-process-future-pending",
   "operations": {
     "skill-tree-3d": {
@@ -3300,7 +3300,7 @@
     "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/project-profile.md": "225c079a87a5d1fe55e7c38d4c3dd36425d55b0cdf2a2e2ae27945bb0d3b9b4b",
-    "references/run-workspaces.md": "7aecf10beac0440aba77c5960862f8660fc75741385a892ea40c072bf39198cf",
+    "references/run-workspaces.md": "af5c2890d7b44a1ec6e08030e4c78a21ebc7c8db10636c72e4b721f3d6876cc3",
     "references/validation-policy.md": "d5d014a906a2d9c76db8066310b7c1a81f7403ce0c25435a431af327ebe8c818",
     "references/workflow-metadata.md": "27d44025f5cc3c11a81a8d544ce8d15444746527b0452e11591d1ff43e0aa80a",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
@@ -3315,11 +3315,11 @@
     "scripts/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
     "scripts/plugin-runtime.js": "62caaa416cb4f375fef45edb71c1cbe3b2f9c0acb734a95e0b9099470cf6c8a5",
     "scripts/plugin-sources.js": "13d853f9e64dec84cf92f4026ac71e4384e186cd96200543e400a852a46e4693",
-    "scripts/run-workspaces.py": "57e24aec20d19b59dbf86d3da8e1ae04d96ab7332f2ec89a821a7074849e6f49",
+    "scripts/run-workspaces.py": "03af423f89940b7b04937b5ff36ead631047f97931b8a4f0082c130e667af13a",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     "scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
-    "scripts/workflow-state.py": "364eefbd288d802871d26ea655ee741f1729e7d9b58b5f8f71973bb9fe2b6b04"
+    "scripts/workflow-state.py": "68828c6db1364502f3f40f1a65536a6e3cf9ed0e1560e0a7aeb33801482c116b"
   },
   "packages": {},
   "parameter_defaults": {},
