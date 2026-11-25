@@ -544,6 +544,36 @@
       },
       {
         "anchor": "before",
+        "operation": "skill-tree-force-process",
+        "phrase": "before skill-tree-force-process"
+      },
+      {
+        "anchor": "before",
+        "operation": "skill-tree-force-process",
+        "phrase": "before skill-tree: force process pending"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-force-process",
+        "phrase": "during skill-tree-force-process"
+      },
+      {
+        "anchor": "during",
+        "operation": "skill-tree-force-process",
+        "phrase": "during skill-tree: force process pending"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-force-process",
+        "phrase": "after skill-tree-force-process"
+      },
+      {
+        "anchor": "after",
+        "operation": "skill-tree-force-process",
+        "phrase": "after skill-tree: force process pending"
+      },
+      {
+        "anchor": "before",
         "operation": "skill-tree-full-cycle",
         "phrase": "before skill-tree-full-cycle"
       },
@@ -1008,7 +1038,7 @@
         "phrase": "after-validation skill-tree-repo-documentation-audit"
       }
     ],
-    "digest": "7ad40c3e9ca39efed322d353f5b4a0cf3a77caefc4e1621d20ecea9513741339",
+    "digest": "63f44efc380d05942783b6229588c775c8545a9013a6a19450c73406f4bb2894",
     "entries": [
       {
         "anchor": "before",
@@ -2033,6 +2063,63 @@
           "review"
         ],
         "operation": "skill-tree-director-status",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "before",
+        "boundary_id": "skill-tree-force-process:before",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-force-process",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "during",
+        "boundary_id": "skill-tree-force-process:during",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-force-process",
+        "status": "resolved",
+        "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
+      },
+      {
+        "anchor": "after",
+        "boundary_id": "skill-tree-force-process:after",
+        "context_kinds": [
+          "request",
+          "project",
+          "document",
+          "snapshot",
+          "management",
+          "controller",
+          "pending",
+          "task",
+          "task-group",
+          "review"
+        ],
+        "operation": "skill-tree-force-process",
         "status": "resolved",
         "version": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b"
       },
@@ -3082,6 +3169,7 @@
       "skill-tree-director-run",
       "skill-tree-director-setup",
       "skill-tree-director-status",
+      "skill-tree-force-process",
       "skill-tree-full-cycle",
       "skill-tree-game-design",
       "skill-tree-game-design-balance",
@@ -3097,10 +3185,10 @@
       "skill-tree-work-through-next"
     ]
   },
-  "configuration_digest": "1d4ded90f74588a33443cca0a2da314364e2a91faff9e7955ed7ac521848e0ff",
+  "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "64118eaa2377aff499e56996693f781773d3d68d6465f33cb038bf94dde34662",
+  "identity": "3abf8abeaebb4799296188603512e790b3ac22138f6bf5af0f873ff317d4ac23",
   "operation": "skill-tree-repo-documentation",
   "operations": {
     "skill-tree-3d": {
@@ -3157,6 +3245,9 @@
     "skill-tree-director-status": {
       "title": "Skill-Tree Director: Status"
     },
+    "skill-tree-force-process": {
+      "title": "Skill-Tree: Force Process Pending"
+    },
     "skill-tree-full-cycle": {
       "title": "Skill-Tree: Full Cycle"
     },
@@ -3200,7 +3291,7 @@
   "owned_resources": {
     "SKILL.md": "502e787fafb4c9863be8353ee120262f86240f86d91245f9d35f07ee2b6f5fbf",
     "agents/openai.yaml": "679ced07cd7f50d60f2a0bae1c4bb30d1856453142f93068e5571aaab20c5406",
-    "references/decision-governance.md": "52f8dc84c7cae4b9aa3aaa010d3ffb605ab79f5d75aaa36b9370d51e49305222",
+    "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/documentation-output-contract.md": "2aca95b856ba3813171cc64c80f9f1d88cbfa9788703df7cd4497032adbfbfab",
     "references/history-retention.md": "ff3fa8602fa29085b59f0aa5ae9f9da698bd5b5d5672235fe809018b18b4b801",
@@ -3208,14 +3299,14 @@
     "references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
     "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
-    "references/project-profile.md": "e38f24da4430a5be127320f094dcad1044ff12ca7926150c5730fbec4589770b",
+    "references/project-profile.md": "0e145cea435d28425eba26e356357e2dd896d03ef48b13f20206558605a9c39c",
     "references/repository-discovery-checklist.md": "a112230c076fea515c437e3e7407c575ee6690d772eaa28e68f80c720c7a621c",
-    "references/run-workspaces.md": "7ea6acb5d639d20c0e0ad519bb74b89c3f15dca247d0cfcea55299f8265bb200",
+    "references/run-workspaces.md": "7aecf10beac0440aba77c5960862f8660fc75741385a892ea40c072bf39198cf",
     "references/validation-policy.md": "2bb1e9675fe3bc08cbcb9aa4b9534368416faba7ffaaf6b5aaff417456f434d3",
-    "references/workflow-metadata.md": "70ba35018051edb4b5a170e7115984bc73ae6c1021ca2ad971f2699192e0e927",
+    "references/workflow-metadata.md": "0ad2ee19e9392f252d537e4543e235586eb634b15536ffec17bfd1c36dc4fee0",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "d2c5ac475033ae06321fc7917ddf96232a0e442bef7c5db537891e12164fd404",
-    "scripts/director-dispatch.py": "0afae9cb9144a0e21cb52964b4f81f448733eccebceb10a391e31c791465c84a",
+    "scripts/director-dispatch.py": "1b1533bca022ef7f03e24d9becd212f87dac2923de53cae1b3cf7d5a16837d0e",
     "scripts/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
     "scripts/plugin-composition.js": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b",
     "scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",
@@ -3225,12 +3316,12 @@
     "scripts/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
     "scripts/plugin-runtime.js": "62caaa416cb4f375fef45edb71c1cbe3b2f9c0acb734a95e0b9099470cf6c8a5",
     "scripts/plugin-sources.js": "13d853f9e64dec84cf92f4026ac71e4384e186cd96200543e400a852a46e4693",
-    "scripts/run-workspaces.py": "a89ab104bad9bf8c1bd90dc597ab6d14f075d4fe8e2c59cd1dd1d84726656d6f",
+    "scripts/run-workspaces.py": "6e6d601b16ffae381b89247d624ee391623b83759b82983a7f30a70bc8955a82",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     "scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
     "scripts/validate-repository-documentation.py": "99a7cf90c80f2e6fa5c2b2641e63de281076ec952b74b20807ade38576f10fb4",
-    "scripts/workflow-state.py": "00721b87acb418382cd1f93238e290bcacd3f4a2d3abf33479f42a2e5611b750"
+    "scripts/workflow-state.py": "53ed2e95fa4795d0eb82d53181729b2df583f4fe50be37b5d4380d069a527199"
   },
   "packages": {},
   "parameter_defaults": {},

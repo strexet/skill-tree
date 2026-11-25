@@ -874,6 +874,128 @@ def _processing_proposal(store,payload,text,state,assigned,pr):
             focus['admitted_task_ids']=sorted(focused);focus['required_ids']=sorted(focused)
     return text,receipt
 
+FORCE_PROCESS_READS = {'force-process-preview', 'force-process-verify'}
+
+
+def force_process_input(path, label):
+    if path is None:
+        raise WorkflowError('Force Process requires '+label)
+    content = path.read_bytes()
+    try:
+        value = json.loads(content)
+    except (ValueError, UnicodeError) as exc:
+        raise WorkflowError('Invalid Force Process JSON: '+label) from exc
+    if not isinstance(value, dict):
+        raise WorkflowError('Force Process requires a JSON object: '+label)
+    return value, digest(content)
+
+
+def force_process_snapshot(store):
+    """Read one consistent Markdown/index pair without refreshing or locking."""
+    source_bytes = store.owned(FUTURE_QUEUE).read_bytes()
+    text = source_bytes.decode('utf-8').replace('\r\n', '\n').replace('\r', '\n')
+    index_bytes = store.owned('.skill-tree/documents/future.json').read_bytes()
+    snapshot = {'source_hash': digest(source_bytes), 'index_hash': digest(index_bytes)}
+    persisted = json.loads(index_bytes)
+    if (not isinstance(persisted, dict) or persisted.get('source_hash') != digest(text.encode())
+            or persisted.get('tasks') != index(text)):
+        raise WorkflowError('Canonical Future and index differ; inspect the current queue before continuing')
+    return text, snapshot
+
+
+def force_process_contract(task):
+    # The parser body contains the rendered heading and YAML. Compare that
+    # metadata structurally and fingerprint only the proposed task content.
+    content = task['body'].partition('\n```\n')[2].strip()
+    metadata = {key: value for key, value in task.items() if key not in {'body', 'line', 'start', 'end'}}
+    return {'metadata': metadata, 'content_sha256': digest(content.encode())}
+
+
+def force_process_preview(store, proposal, proposal_hash, text, snapshot):
+    selectors = proposal.get('selectors')
+    if (not isinstance(selectors, list) or not selectors or
+            any(not valid_id(value, 'P') for value in selectors) or len(set(selectors)) != len(selectors)):
+        raise WorkflowError('Force Process Preview requires distinct exact Pending IDs')
+    if set(proposal) & {'topic', 'intake_batch_ids', 'group', 'director_dispatch'}:
+        raise WorkflowError('Force Process Preview requires an ordinary standalone proposal')
+    if proposal.get('expected_source_hash') != snapshot['source_hash']:
+        raise WorkflowError('Force Process proposal does not match the current canonical queue hash')
+    specs = proposal.get('tasks', [])
+    if not isinstance(specs, list) or any(not isinstance(spec, dict) for spec in specs):
+        raise WorkflowError('Processing tasks require a list of objects')
+    planned = [spec.get('reuse_id') or identity('T') for spec in specs]
+    projected, receipt = _processing_proposal(store, proposal, text, store.load(text), planned, identity('PR'))
+    before = {row['id']: force_process_contract(row) for row in parse(text)}
+    after = {row['id']: force_process_contract(row) for row in parse(projected)}
+    # Force all receipt-owned rows into the projection even if their text
+    # is unchanged. Also cover affected parents outside the selected rows.
+    scoped = set(selectors + receipt['created_ids'] + receipt['reused_ids'])
+    scoped.update(task_id for task_id in before.keys() | after.keys() if before.get(task_id) != after.get(task_id))
+    return {'format': 'skill-tree-force-process-preview', 'schema': 1, 'proposal_sha256': proposal_hash,
+            'canonical_queue': str(store.future), **snapshot, 'core_only': True, 'provisional_receipt': receipt,
+            'changes': {task_id: after.get(task_id) for task_id in sorted(scoped)}}
+
+
+def force_process_verify(store, proposal, proposal_hash, preview, preview_hash, receipt, receipt_hash, text, snapshot):
+    if (preview.get('format') != 'skill-tree-force-process-preview' or preview.get('schema') != 1
+            or preview.get('proposal_sha256') != proposal_hash or preview.get('canonical_queue') != str(store.future)
+            or preview.get('source_hash') != proposal.get('expected_source_hash')):
+        raise WorkflowError('Force Process Preview does not match the proposal and canonical queue')
+    expected = preview['provisional_receipt']
+    changes = preview['changes']
+    if (not isinstance(expected, dict) or not isinstance(changes, dict) or
+            set(proposal['selectors']) != set(expected['selected_ids']) or
+            proposal['dispositions'] != expected['dispositions'] or
+            not set(expected['selected_ids'] + expected['created_ids'] + expected['reused_ids']) <= changes.keys()):
+        raise WorkflowError('Force Process Preview does not cover the complete proposal')
+    processing_id = receipt.get('id')
+    created = receipt.get('created_ids')
+    if (not valid_id(processing_id, 'PR') or not isinstance(created, list)
+            or len(created) != len(expected['created_ids']) or any(not valid_id(value, 'T') for value in created)
+            or len(set(created)) != len(created) or set(created) & (changes.keys() - set(expected['created_ids']))):
+        raise WorkflowError('Force Process receipt has incompatible processing or task identities')
+    ids = {**dict(zip(expected['created_ids'], created)), expected['id']: processing_id}
+    remap = lambda task_id: ids.get(task_id, task_id)
+    projected_receipt = {**expected, 'id': processing_id, 'created_ids': created,
+                         'task_keys': {key: remap(value) for key, value in expected['task_keys'].items()}}
+    if any(receipt.get(key) != value for key, value in projected_receipt.items()):
+        raise WorkflowError('Force Process receipt does not match the Preview projection')
+    if receipt.get('clarification_sessions') or receipt.get('reopened_clarification_sessions'):
+        raise WorkflowError('Receipt has plugin-derived clarification sessions; verify the recorded holds through Process Pending')
+    current = {row['id']: force_process_contract(row) for row in parse(text)}
+    for task_id, contract in changes.items():
+        observed_id = remap(task_id)
+        contract = deepcopy(contract)
+        if contract is not None:
+            metadata = contract['metadata']
+            for field in ('id', 'processing_run_id', 'root_task_id', 'related_task_id'):
+                metadata[field] = remap(metadata[field])
+            metadata['depends_on'] = [remap(value) for value in metadata['depends_on']]
+        if current.get(observed_id) != contract:
+            raise WorkflowError('Force Process scoped result differs from the Preview: '+observed_id)
+    return {'status': 'verified', 'canonical_queue': str(store.future), **snapshot,
+            'proposal_sha256': proposal_hash, 'preview_sha256': preview_hash, 'receipt_sha256': receipt_hash,
+            'processing_id': processing_id, 'selected_ids': receipt['selected_ids'], 'created_ids': created,
+            'reused_ids': receipt['reused_ids'], 'processing_id_observed_in_tasks': bool(created or receipt['reused_ids'])}
+
+
+def force_process_evidence(store, command, proposal_path, preview_path, receipt_path, expected_preview_hash=None):
+    proposal, proposal_hash = force_process_input(proposal_path, 'the original proposal')
+    text, snapshot = force_process_snapshot(store)
+    if command == 'force-process-preview':
+        result = force_process_preview(store, proposal, proposal_hash, text, snapshot)
+    else:
+        preview, preview_hash = force_process_input(preview_path, 'the retained Preview')
+        if expected_preview_hash != preview_hash:
+            raise WorkflowError('Force Process Verify requires the matching reviewed Preview SHA-256')
+        receipt, receipt_hash = force_process_input(receipt_path, 'the original Processing receipt')
+        result = force_process_verify(store, proposal, proposal_hash, preview, preview_hash, receipt, receipt_hash, text, snapshot)
+    if (file_hash(store.future) != snapshot['source_hash'] or file_hash(store.state) != snapshot['index_hash']):
+        raise WorkflowError('Canonical Future changed during Force Process evidence inspection')
+    return result
+
+
+
 def group_selection(store, payload):
     """Resolve an explicit group from one read of the canonical queue."""
     queues = {'pending': 'Pending Queue', 'prioritized': 'Prioritized Next Changes'}
@@ -1022,7 +1144,9 @@ def start(store,mode,selector=None,limits=None,workspace=None):
             conflicts={tid:registry['claims'][tid] for tid in run['admitted_task_ids'] if tid not in done and tid in registry['claims']}
             if conflicts:raise WorkflowError('Required task claims conflict: '+dump(conflicts))
             path=workspaces.provision(store,run,options)
-            if dispatch:run['dispatch_workspace_sha256']=digest(str(path).encode())
+            if dispatch:
+                run['dispatch_workspace_sha256']=digest(str(path).encode())
+                run['workspace']['dispatch_owner_token']=str(uuid.uuid4())
             registry['runs'][run['id']]=run;store.selected_run_id=run['id'];store.run_id=run['id']
         validate_run(run);state['active_run']=run
         store.save(text,state,dispatch.extras(store,run) if dispatch else None)
@@ -1268,6 +1392,8 @@ def complete(store,payload):
             for check in checks:
                 if not isinstance(check['evidence'],list):raise WorkflowError('Acceptance evidence requires repository-relative file references')
                 check['evidence']=[evidence_pointer(store,ref,required=True) for ref in check['evidence']]
+            checks_by_criterion = {check['criterion']: check for check in checks}
+            payload['acceptance'] = [checks_by_criterion[criterion] for criterion in expected]
         validation_records=validate_task_checks(store,task['id'],state) if disposition=='completed' else []
         if disposition=='completed':
             for accepted in payload['acceptance']:
@@ -1735,6 +1861,11 @@ def local_delivery_action(store, action, payload):
         delivery = run['delivery']
         if workspaces.delivery_finished(run):
             if action == 'complete':
+                with store.lock():
+                    state = store.load()
+                    run = state['active_run']
+                    cleanup_after_merge(store, state, run)
+                    delivery = run['delivery']
                 return delivery
             raise WorkflowError('The selected local delivery is already completed')
         before = file_hash(store.state)
@@ -1827,7 +1958,208 @@ def local_delivery_action(store, action, payload):
                         raise WorkflowError('A retained stopped admission changed before local completion')
 
         _delivery_save(store, run['id'], before, owner, update, extras, guard=guard)
+        if action == 'complete':
+            with store.lock():
+                state = store.load()
+                run = state['active_run']
+                cleanup_after_merge(store, state, run)
+                return run['delivery']
         return store.load()['active_run']['delivery']
+
+
+def cleanup_delivery_scope(store, run):
+    delivery = run['delivery']
+    workspace = run['workspace']
+    if (run['phase'] != 'completed' or delivery['status'] != 'merged'
+            or delivery['implementation'] != 'completed' or delivery.get('order_completed') is not True
+            or not workspaces.delivery_finished(run)):
+        raise WorkflowError('Worktree cleanup requires confirmed completed merge delivery')
+    if workspace['repo_id'] != workspaces.repo_id(store.root):
+        raise WorkflowError('The recorded repository identity changed')
+    remote = {}
+    publication = delivery.get('publication')
+    if publication and publication != 'not-requested':
+        if not re.fullmatch(r'\.skill-tree/history/publications/pub-[a-f0-9]{32}\.json', publication):
+            raise WorkflowError('The recorded publication receipt is unavailable')
+        record = json.loads(store.owned(publication).read_text())
+        scope = record['identity']
+        authorization = record.get('authorization', {})
+        has_launch_identity = run.get('reviewed_local_delivery') and workspace['remote'] is None
+        remote_matches = (scope['remote'], scope['remote_id']) == (workspace['remote'], workspace.get('remote_id'))
+        if (record.get('status') != 'merged' or not record.get('pr', {}).get('id')
+                or record['pr'] != delivery.get('pr') or record.get('merge_commit') != delivery.get('merge_commit')
+                or record.get('same_repository') is not True or scope['repo_id'] != workspace['repo_id']
+                or scope['source_branch'] != workspace['branch']
+                or authorization.get('origin') != 'owner' or authorization.get('pr') is not True
+                or authorization.get('target_branch') != scope['target_branch']
+                or not (remote_matches or has_launch_identity)):
+            raise WorkflowError('The confirmed provider merge does not bind the exact controller source and repository')
+        source_head, merge_commit = scope['head'], record['merge_commit']
+        target_ref = 'refs/heads/'+workspaces.branch(store.root, scope['target_branch'])
+        remote = {'remote':scope['remote'], 'remote_id':scope['remote_id'], 'publication':publication,
+                  'pr_id':record['pr']['id']}
+    elif 'reviewed_merge' in delivery:
+        source = delivery['reviewed_source']
+        target_ref = run['reviewed_local_delivery']['launch']['ref']
+        source_head, merge_commit = source['source']['source_head'], delivery['reviewed_merge']['commit']
+        record = json.loads(store.owned(_delivery_receipt_path(run, '-reviewed-merge')).read_text())
+        if record != {'run_id':run['id'], 'review':source, 'merge':delivery['reviewed_merge'], 'target_ref':target_ref}:
+            raise WorkflowError('The original reviewed merge receipt changed')
+    else:
+        _delivery_original(store, run)
+        integration = delivery['local_integration']
+        target_ref = integration['preparation']['target_ref']
+        source_head, merge_commit = integration['preparation']['source_head'], integration['merge']['commit']
+    source_ref = 'refs/heads/'+workspaces.branch(store.root, workspace['branch'])
+    if (not target_ref.startswith('refs/heads/') or source_ref == target_ref
+            or any(not re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', value) for value in (source_head, merge_commit))):
+        raise WorkflowError('The original delivery source, merge or target identity is invalid')
+    workspaces.branch(store.root, target_ref.removeprefix('refs/heads/'))
+    return dict(source_head=source_head, source_ref=source_ref, merge_commit=merge_commit, target_ref=target_ref, **remote)
+
+
+def cleanup_evidence_records(value):
+    if isinstance(value, dict):
+        if 'path' in value and 'sha256' in value:
+            yield value
+        for item in value.values():
+            yield from cleanup_evidence_records(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from cleanup_evidence_records(item)
+
+
+def cleanup_source_evidence(store, run, source_head):
+    outcomes = [row for row in store.outcomes() if row.get('run_id') == run['id']]
+    if {row['task_id']:row['id'] for row in outcomes} != run.get('completion_refs', {}):
+        raise WorkflowError('The controller completion evidence ledger is unavailable or changed')
+    for row in outcomes:
+        commit = row.get('task_git_commit', {}).get('commit')
+        if commit and workspaces.local_git(store.root, 'merge-base', '--is-ancestor',
+                commit, source_head, accepted=(0, 1, 128)).returncode:
+            raise WorkflowError('The delivered source no longer contains a recorded task commit')
+    evidence = list(cleanup_evidence_records([outcomes, run.get('revalidated_checks', {}),
+                                             run.get('revalidation_source_reviews', {})]))
+    for relative, expected in {(item['path'], item['sha256']) for item in evidence if item.get('available', True)}:
+        if not expected or workspaces.committed_file_hash(store.root, source_head, relative) != expected:
+            raise WorkflowError('Required evidence is unavailable at the recorded source commit: '+str(relative))
+
+
+def cleanup_target_guard(store, scope):
+    tip = workspaces.cleanup_target_head(store.root, scope['target_ref'], scope.get('remote'), scope.get('remote_id'))
+    if tip != scope['merge_commit'] and workspaces.local_git(
+            store.root, 'merge-base', '--is-ancestor', scope['merge_commit'], tip, accepted=(0, 1, 128)).returncode:
+        raise WorkflowError('The current target does not verifiably contain the recorded merge commit')
+
+
+def cleanup_hook_guard(store, run, scope):
+    references = set(run.get('hook_chains', []))
+    publication = scope.get('publication')
+    if publication:
+        references.update(json.loads(store.owned(publication).read_text()).get('hook_chains', []))
+    helper = hook_helper()
+    for pending in helper.pending_scan(store):
+        chain = helper.read(store, pending['chain_id'])
+        context = chain['context']
+        if (chain['id'] in references or context.get('run_id') == run['id']
+                or scope.get('pr_id') and context.get('publication_id') == Path(publication).stem.removeprefix('pub-')):
+            raise WorkflowError('The selected controller still has a pending hook actor')
+
+
+def cleanup_after_merge(store, state, run, *, locked_scope=None):
+    """Apply cleanup inside the original delivery locks or an exact-run retry."""
+    delivery = run['delivery']
+    record = delivery.get('worktree_cleanup', {})
+    if record.get('status') == 'removed':
+        return record
+    original = record.get('attempt')
+
+    def persist(status, reason=None):
+        result = {'status':status, **({'attempt':original} if original else {}), **({'reason':reason} if reason else {})}
+        if delivery.get('worktree_cleanup') != result:
+            delivery['worktree_cleanup'] = result
+            state['run_registry']['runs'][run['id']] = run
+            store.save(store.text(), state, update_navigation=False)
+        return result
+
+    try:
+        scope = cleanup_delivery_scope(store, run)
+        if locked_scope is not None and locked_scope != scope:
+            raise WorkflowError('The delivery target changed before cleanup obtained its locks')
+        registry = state['run_registry']
+        if (run.get('maintenance') or run.get('stop_reason') or run['id'] in registry['claims'].values()
+                or any(owner.get('run_id') == run['id'] for owner in registry['resources'].values())):
+            raise WorkflowError('The selected controller still owns active work or resources')
+        cleanup_hook_guard(store, run, scope)
+        if original and original['scope'] != scope:
+            raise WorkflowError('The confirmed delivery changed after removal preparation')
+        path = workspaces.cleanup_checkout(store.root, registry, run, original)
+        if path is None:
+            return persist('removed')
+        workspaces.cleanup_source_guard(path, scope['source_ref'], scope['source_head'])
+        cleanup_target_guard(store, scope)
+        cleanup_source_evidence(store, run, scope['source_head'])
+    except (ValueError, OSError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
+        reason = str(error) if isinstance(error, (WorkflowError, workspaces.RunError)) else 'Cleanup prerequisites could not be verified'
+        if original:
+            reason += '. Inspect the original or staged checkout in Git worktree list'
+        return persist('deferred', reason)
+
+    if not original:
+        original = {'id':str(uuid.uuid4()), 'scope':scope, 'locator_sha256':digest(os.fsencode(path))}
+    persist('prepared')
+    try:
+        if workspaces.cleanup_checkout(store.root, registry, run, original) != path:
+            raise WorkflowError('The original worktree changed after removal preparation')
+        staged = workspaces.stage_controller_worktree(store.root, path, original)
+        if workspaces.cleanup_checkout(store.root, registry, run, original) != staged:
+            raise WorkflowError('The staged checkout differs from the original worktree')
+    except (ValueError, OSError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
+        reason = str(error) if isinstance(error, (WorkflowError, workspaces.RunError)) else 'Staging requires recovery'
+        return persist('deferred', reason + '. Inspect the original or staged checkout in Git worktree list')
+    original = {**original, 'staged':True}
+    persist('prepared')
+    try:
+        if cleanup_delivery_scope(store, run) != scope:
+            raise WorkflowError('The confirmed delivery changed during cleanup')
+        cleanup_target_guard(store, scope)
+        workspaces.cleanup_source_guard(staged, scope['source_ref'], scope['source_head'])
+        workspaces.remove_controller_worktree(store.root, staged)
+        if workspaces.cleanup_checkout(store.root, registry, run, original) is not None:
+            raise WorkflowError('Git did not confirm removal of the original worktree')
+    except (ValueError, OSError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
+        reason = str(error) if isinstance(error, (WorkflowError, workspaces.RunError)) else 'Git removal requires reconciliation'
+        try:
+            workspaces.restore_staged_worktree(store.root, registry, run, original)
+        except (ValueError, OSError, KeyError, TypeError, subprocess.TimeoutExpired):
+            reason += '; inspect the original or staged checkout in Git worktree list'
+        return persist('deferred', reason)
+    try:
+        staged.parent.rmdir()
+    except OSError:
+        pass
+    return persist('removed')
+
+
+def cleanup_controller_worktree(store):
+    if not valid_id(store.run_id, 'WR'):
+        raise WorkflowError('Worktree cleanup requires the exact --run-id from the canonical checkout')
+    run = store.load()['active_run']
+    if not run or run.get('delivery', {}).get('status') != 'merged':
+        raise WorkflowError('Select a controller with confirmed merge delivery')
+    previous = run['delivery'].get('worktree_cleanup', {})
+    if previous.get('status') == 'removed':
+        return previous
+    try:
+        scope = cleanup_delivery_scope(store, run)
+    except (ValueError, OSError, KeyError, TypeError, subprocess.TimeoutExpired):
+        # The locked path records the bounded prerequisite without touching Git.
+        scope = {}
+    remote = scope.get('remote', 'local') if scope else 'local'
+    target = scope['target_ref'].removeprefix('refs/heads/') if scope else run['id']
+    with workspaces.publication_lock(store.root, remote, target), store.lock():
+        state = store.load()
+        return cleanup_after_merge(store, state, state['active_run'], locked_scope=scope)
 
 
 def require_reviewed_controller_inputs(store, run):
@@ -1922,6 +2254,7 @@ def merge_reviewed_controller(store, payload=None):
         text=store.text();state=store.load(text);run=state['active_run']
         delivery=run['delivery']
         if delivery.get('reviewed_merge'):
+            cleanup_after_merge(store, state, run)
             return run
         if delivery.get('publication')!='not-requested':
             raise WorkflowError('The selected run has a separate recorded remote delivery')
@@ -1971,6 +2304,7 @@ def merge_reviewed_controller(store, payload=None):
         run.update(next_action=None,stop_reason=None)
         store.save(text,state,{_delivery_receipt_path(run,'-reviewed-merge'):dump({
             'run_id':run['id'],'review':reviewed,'merge':merged,'target_ref':ref})})
+        cleanup_after_merge(store, state, run)
         return run
 
 
@@ -2124,22 +2458,40 @@ def evidence_pointer(store,reference,required=False):
 
 def history(store,task_id=None,component=None):
     result=[]
+    registry = json.loads(store.state.read_text()).get('run_registry', {}).get('runs', {}) if store.state.is_file() else {}
     for outcome in store.outcomes():
         if task_id and outcome['task_id']!=task_id:continue
         if component and normalized(component) not in normalized(outcome['title']+' '+outcome['outcome']+' '+' '.join(outcome.get('source_fingerprints',{}))):continue
         view=deepcopy(outcome)
         proof_store=store
+        committed = None
         if outcome.get('run_id'):
             proof_store=deepcopy(store);locator=workspaces.runtime(store.root)
             location=locator['worktrees'].get(outcome['run_id']) if locator else None
             proof_store.source_root=Path(location) if location else store.root/'.skill-tree/unavailable-run-evidence'
-        for check in view.get('acceptance',[]):check['evidence']=[evidence_pointer(proof_store,e) for e in check.get('evidence',[])]
-        view['evidence']=[evidence_pointer(proof_store,e) for e in view.get('evidence',[])]
+            cleanup = registry.get(outcome['run_id'], {}).get('delivery', {}).get('worktree_cleanup', {})
+            if cleanup.get('status') == 'removed' or not proof_store.source_root.exists():
+                committed = cleanup.get('attempt', {}).get('scope', {}).get('source_head')
+
+        def history_fingerprint(relative):
+            if committed:
+                return workspaces.committed_file_hash(store.root, committed, relative)
+            return fingerprints(proof_store, [relative])[relative]
+
+        def history_evidence(reference):
+            if not committed:
+                return evidence_pointer(proof_store, reference)
+            available = bool(reference.get('sha256')) and history_fingerprint(reference['path']) == reference['sha256']
+            return {**reference, 'available':available, **({'git_commit':committed} if available else {})}
+
+        for check in view.get('acceptance',[]):check['evidence']=[history_evidence(e) for e in check.get('evidence',[])]
+        view['evidence']=[history_evidence(e) for e in view.get('evidence',[])]
         for item in view.get('check_results',[]):
             for key in ['result','red']:
                 if key in item:
-                    proof=item[key];proof['evidence']=[evidence_pointer(proof_store,ref) for ref in proof.get('evidence',[])]
-                    proof['source_fingerprints_match']=fingerprints(proof_store,list(proof.get('sources',{})))==proof.get('sources',{})
+                    proof=item[key];proof['evidence']=[history_evidence(ref) for ref in proof.get('evidence',[])]
+                    proof['source_fingerprints_match']=all(history_fingerprint(path)==expected
+                        for path, expected in proof.get('sources', {}).items())
         result.append(view)
     return result
 
@@ -2444,6 +2796,70 @@ def check_snapshot(store,task,check,state):
     key=digest(dump({'check':executable,'recipe':recipe,'sources':sources,'environment':environment,'group':group_fingerprint(store,task,state)}).encode())
     return {'key':key,'definition':task_signature(task),'sources':sources,'environment_identity':environment,'recipe':recipe}
 
+def completed_task_body(store, record):
+    # The outcome and applied completion event jointly identify the removed specification.
+    run_id, task_id, outcome_id = record.get('run_id'), record['task_id'], record['id']
+    if not valid_id(run_id, 'WR') or not valid_id(outcome_id, 'O'):
+        return None
+
+    registry = store.load().get('run_registry', {})
+    run = registry.get('runs', {}).get(run_id, {})
+    if run.get('completion_refs', {}).get(task_id) != outcome_id:
+        return None
+
+    last_sequence = registry.get('event_sequences', {}).get(run_id)
+    if type(last_sequence) is not int or last_sequence < 1:
+        return None
+    applied = set(registry.get('applied_events', []))
+    history = store.owned('.skill-tree/history')
+    events = history / 'run-events'
+    directory = events / run_id.lower()
+    if any(path.is_symlink() for path in (history, events, directory)):
+        return None
+
+    recovered = None
+    for path in directory.glob('e-*.json'):
+        event_id = 'E-' + path.stem[2:]
+        if event_id not in applied or not valid_id(event_id, 'E'):
+            continue
+        if path.is_symlink() or not path.is_file():
+            return None
+        try:
+            content = path.read_bytes()
+            event = json.loads(content)
+        except (OSError, ValueError):
+            return None
+        if not isinstance(event, dict) or not isinstance(event.get('outcomes'), list):
+            return None
+        matching = [outcome for outcome in event['outcomes']
+                    if isinstance(outcome, dict) and outcome.get('id') == outcome_id]
+        if not matching:
+            continue
+        sequence = event.get('sequence')
+        if (recovered is not None or matching != [record]
+                or event.get('schema') != 1 or event.get('id') != event_id
+                or event.get('queue_id') != registry['queue_id'] or event.get('run_id') != run_id
+                or type(sequence) is not int or not 1 <= sequence <= last_sequence
+                or not isinstance(event.get('changes'), list)):
+            return None
+        changes = [change for change in event['changes']
+                   if isinstance(change, dict) and change.get('task_id') == task_id]
+        if len(changes) != 1 or 'after' not in changes[0] or changes[0]['after'] is not None:
+            return None
+        before = changes[0].get('before')
+        if not isinstance(before, dict) or before.get('queue') != 'Prioritized Next Changes':
+            return None
+        body = before.get('body')
+        if not isinstance(body, str) or digest(body.encode()) != record.get('task_context', {}).get('content_fingerprint'):
+            return None
+        if getattr(store, '_writer_active', False):
+            relative = path.relative_to(store.root).as_posix()
+            store.expect_unchanged(relative, digest(content))
+            store._future_receipts.add(relative)
+        recovered = body
+    return recovered
+
+
 def validation_task(store,tid):
     matches=[task for task in parse(store.text()) if task['id']==tid and task['queue']=='Prioritized Next Changes']
     if matches:return matches[0]
@@ -2453,8 +2869,16 @@ def validation_task(store,tid):
     criteria=[entry['criterion'] for entry in record['acceptance']]
     body='Goal:\n- Revalidate the recorded completed contract.\n\nTouch:\n- Recorded relevant source and test inputs.\n\nValidation:\n```json\n'+dump({'checks':record['validation_plan']})+'```\n\nAcceptance:\n'+'\n'.join('- '+criterion for criterion in criteria)+'\n'
     task={'id':tid,'body':body,'title':record['title'],'validation_group_id':record.get('validation_group_id'),'boundary_validation':record.get('boundary_validation','not-required'),'completed_contract':True}
-    if task_signature(task)!=record['validation_signature']:raise WorkflowError('Completed validation contract does not match the recorded signature')
-    return task
+    if task_signature(task) == record['validation_signature']:
+        return task
+    original_body = completed_task_body(store, record)
+    if original_body is not None:
+        original = dict(task, body=original_body)
+        if (set(acceptance_criteria(original)) == set(criteria)
+                and check_specs(original) == record['validation_plan']
+                and task_signature(original) == record['validation_signature']):
+            return original
+    raise WorkflowError('Completed validation contract does not match the recorded signature')
 
 def stale_completed_checks(store,state,task_ids=None):
     run=state['active_run'];outcomes={record['task_id']:record for record in store.outcomes() if record['disposition']=='completed'};stale=[]
@@ -4489,12 +4913,80 @@ def clarification_mutate(store,command,payload):
         return clarification_write(store,record,writes)
 
 
+SHARED_WORKSPACE_ROUTING = 2
+
+
+def guard_shared_project(store):
+    """Require an explicit direct route within a registered shared workspace."""
+    homes = [store.source_root / '.skill-tree/.director', store.source_root / '.skill-tree-director']
+    retained = []
+    for home in homes:
+        if home.is_symlink() or home.parent.is_symlink():
+            raise WorkflowError('Resolve the unsafe shared Director storage path before selecting a queue')
+        marker = home / '.director-relocation.json'
+        if marker.exists() or marker.is_symlink():
+            raise WorkflowError('Finish the retained Director storage migration before selecting a queue')
+        descriptor = home / 'workspace.json'
+        if descriptor.is_symlink():
+            raise WorkflowError('Resolve the unsafe shared Director workspace descriptor')
+        if descriptor.is_file() or binding_path(home, '.skill-tree/director/registry.json').is_file():
+            retained.append(home)
+    if not retained:
+        return
+    if len(retained) != 1:
+        raise WorkflowError('Resolve conflicting shared Director storage locations before selecting a queue')
+    home, = retained
+    descriptor = home / 'workspace.json'
+    workspace = json.loads(descriptor.read_bytes()) if descriptor.is_file() else None
+    valid_descriptor = (isinstance(workspace, dict) and workspace.get('schema') == 1
+                        and workspace.get('kind') == 'director-workspace' and isinstance(workspace.get('providers'), list))
+    if valid_descriptor and not workspace['providers']:
+        return
+
+    def read(relative):
+        path = binding_path(home, relative)
+        return json.loads(path.read_bytes()) if path.is_file() else {}
+
+    registry = read('.skill-tree/director/registry.json')
+    if not registry:
+        return
+    bindings = read('.skill-tree/artifacts/director/local-bindings.json')
+    if registry.get('director_id') != bindings.get('director_id'):
+        raise WorkflowError('Restore the shared Director project binding or explicitly select --direct-project')
+    areas = [area for area in registry['areas'].values()
+             if area['role'] != 'source-maintenance' and area['scope'] == '.'
+             and bindings['queues'].get(area['queue_id'], {}).get('root') == str(store.root)]
+    if areas:
+        if not valid_descriptor:
+            raise WorkflowError('Repair the registered shared Director descriptor or explicitly select --direct-project')
+        profile = read('.skill-tree/installation/profile.json')
+        if profile.get('flavor') != 'director' or profile.get('project_root') != str(home):
+            raise WorkflowError('Repair the registered shared Director profile or explicitly select --direct-project')
+        choices = ', '.join(f"{area['id']} ({area['queue_id']})" for area in sorted(areas, key=lambda item: item['id']))
+        raise WorkflowError(
+            f'Director owns the default route for this shared folder: {choices}. '
+            'Invoke skill-tree-director and preview project-route for the selected operation. '
+            'Use --direct-project only for an explicitly requested direct Core operation.')
+
+
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     parser.add_argument('--standalone',action='store_true',help='Use the canonical queue and selected checkout without attaching to a registered controller.')
+    parser.add_argument('--preview',type=Path,help='Retained Force Process Preview JSON')
+    parser.add_argument('--receipt',type=Path,help='Original Process Pending receipt JSON')
+    parser.add_argument('--expected-preview-sha256',help='SHA-256 of the Preview accepted during plan review')
+    parser.add_argument('--direct-project',action='store_true',help='Use the product queue when the owner explicitly selects direct Core routing.')
     args=parser.parse_args(argv)
     try:
         cmd=args.command
+        if cmd != 'force-process-verify' and (args.preview or args.receipt or args.expected_preview_sha256):
+            raise WorkflowError('Only Force Process Verify accepts a Preview and receipt input')
+        if cmd in FORCE_PROCESS_READS:
+            if args.apply or args.run_id or args.standalone or args.direct_project or args.id or args.names is not None or args.expected_source_hash:
+                raise WorkflowError('Force Process evidence inspection uses the selected proposal without mutation or controller flags')
+            store = Store(args.root, allow_unselected=True, neutral=True)
+            print(dump(force_process_evidence(store, cmd, args.input, args.preview, args.receipt, args.expected_preview_sha256)), end='')
+            return 0
         if args.standalone and (cmd not in {'intake','process','start','begin','implemented','prepare-check',
                 'record-check','reconcile-check','resume-task','complete'} or args.run_id):
             raise WorkflowError('Standalone routing requires a scoped standalone command without a run ID')
@@ -4504,6 +4996,14 @@ def main(argv=None):
             if args.run_id or args.names is not None or args.apply or (args.id and cmd!='start'):
                 raise WorkflowError('Directed dispatch cannot infer a child or select another run')
             store=Store(args.root,allow_unselected=True,neutral=True)
+        routed_commands={'intake','process','start','begin'}
+        if args.direct_project and cmd not in routed_commands:
+            raise WorkflowError('Direct project routing applies to intake, process, start or begin')
+        directed_request=cmd in {'intake','process','start'} and 'director_dispatch' in payload
+        if args.direct_project and directed_request:
+            raise WorkflowError('Direct project routing conflicts with a Director dispatch envelope')
+        if cmd in routed_commands and not args.direct_project and not directed_request:
+            guard_shared_project(store)
         if cmd in {'director-dispatch-read','director-dispatch'}:
             if args.run_id or args.id or args.names is not None or args.apply:
                 raise WorkflowError('Director dispatch requires exact canonical child input')
@@ -4592,6 +5092,7 @@ def main(argv=None):
         elif cmd=='complete':result=complete(store,payload)
         elif cmd=='controller-review':result=controller_review_identity(store)
         elif cmd=='merge-reviewed':result=merge_reviewed_controller(store,payload)
+        elif cmd=='cleanup-worktree':result=cleanup_controller_worktree(store)
         elif cmd=='finish':result=finish(store,payload)
         elif cmd=='audit':result=audit(store,payload)
         elif cmd=='history':result=history(store,args.id,args.component)

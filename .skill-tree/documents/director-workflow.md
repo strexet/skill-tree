@@ -10,6 +10,12 @@ A shared repository can own several folder areas under one canonical Future queu
 
 Each child receipt links the Director objective and assignment to exact area, queue, P, T and WR identities as applicable, the operation attempt and the immutable resulting artifact or outcome. The child queue owns child Pending, Prioritized and historical state. Parent objectives retain acceptance criteria and links to child work. A Director ledger records a local state change before a child effect and reconciles the effect through an exact canonical child receipt. Each writer owns a separate transaction independently.
 
+## Use a shared workspace
+
+The dedicated service lives under `.skill-tree/.director`. Use the [shared workspace entry](../common/references/director-workflow.md#shared-workspace-entry) to inspect the registered projects and preview the receiving project before applying an operation. The [installation guide](install.md) describes upgrading a legacy workspace.
+
+An ordinary workspace audit requests a separate documentation audit from each available authorized subproject. The workspace audit report includes verified results and coverage gaps for the registered scope.
+
 ## Register areas
 
 For first-time setup, review the coordinator, project placements, package sources and prerequisites through the [guided setup preview](../common/references/director-workflow.md#preview-first-time-setup). Once approved, [prepare the workspace](../common/references/director-workflow.md#prepare-the-approved-workspace) with `setup-bootstrap`. Use the [prepared-area registration and status flow](../common/references/director-workflow.md#register-the-prepared-areas) for the exact prepared set. The explicit area registration commands below remain available.

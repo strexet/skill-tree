@@ -104,7 +104,7 @@ Flavor: unity. Static compatibility only; execution remains unqualified.
       "utf_version": "1.4.6"
     }
   },
-  "source_version": "0.6.0",
+  "source_version": "0.7.2",
   "worktree_environment": {
     "exclusive_resources": [],
     "isolated_directories": [],

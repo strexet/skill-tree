@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.7.2 (2026-11-24)
+
+### Changed
+
+- Substantial Skill Tree workflows start with a brief progress message that names the scope, expected result and any known approval boundary before the first task-specific tool call.
+
+### Fixed
+
+- PR closeout verifies and synchronizes the exact local target after confirmed integration by merge, squash or rebase. Unsafe local updates leave a retryable blocker and keep the delivery open.
+
+## 0.7.1 (2026-11-24)
+
+### Fixed
+
+- Dedicated Director workspaces use `.skill-tree/.director`. The installer migrates verified legacy workspaces and preserves project queues, Git identities and linked worktree changes.
+- Shared project requests select Director by default. Status and audit keep the selected scope, and queue effects follow the selected Director assignment. The owner can explicitly select direct Core routing.
+- Workspace audit describes registered subprojects and requests an independent documentation check from each available authorized subproject. Director reports results and coverage gaps. Existing run audits retain exact selectors.
+- Project status includes queue tasks. Director diagnoses one selected check using the retained evidence and identifies scoped maintenance work for an installed workflow failure.
+
+## 0.7.0 (2026-11-23)
+
+### Added
+
+- The default installer creates a dedicated Director workspace. Guided setup previews the selected clients and registers existing or new projects with verified profiles and separate maintenance branches. Scoped client removal preserves the other installed clients and workspace state.
+- Director searches committed text within the areas and revisions pinned by a plan assignment. Results include the Git commit, path, line, content hash and matching excerpt.
+- Force Process researches complex Pending requests and specifies the first runnable work. Read-only Preview and Verify commands check the proposed and recorded queue effects against the exact selection.
+
+### Changed
+
+- Web guidance covers component selection at first use and checks the changed journey in the running browser, including focus, keyboard access, visible outcomes, contrast and narrow viewports.
+- New local development follows an exact Pending selection through Process Pending and Work Through Next. Existing Ready tasks and retained runs keep their selected implementation or resume path.
+
+### Fixed
+
+- Director verifies linked-worktree ownership during recovery, pins diagnostic repairs to the executed recipe and integrates approved changes only into the registered project branch. PR checks verify fork and branch identity.
+- Completed dependencies preserve their acceptance order and recover retained acceptance contracts before a dependent task starts.
+
 ## 0.6.0 (2026-11-20)
 
 ### Added
