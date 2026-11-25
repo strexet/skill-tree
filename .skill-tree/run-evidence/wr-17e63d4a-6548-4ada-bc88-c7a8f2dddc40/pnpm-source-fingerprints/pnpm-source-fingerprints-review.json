@@ -1,0 +1,23 @@
+{
+  "source_head": "cc0e9493c958074e981f04b3fd65313b337727e2",
+  "source_diff_sha256": "da8f51317c9b2ce0741656da04e4d5a75833e22d239f353d33ca1025b852ce02",
+  "independent_reviewer": "/root/director_critic",
+  "reviewed_paths": [
+    ".skill-tree/common/scripts/workflow-state.py",
+    ".skill-tree/common/scripts/run-workspaces.py",
+    ".skill-tree/common/references/validation-policy.md",
+    ".skill-tree/common/references/workflow-metadata.md",
+    ".skill-tree/tests/test-workflow-state.py",
+    ".skill-tree/skill-tree.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "review_evidence": "Independent review required positive membership and owned profile proof. The reviewed source checks the registered generated Web profile and exact materialized workspace membership. Literal Git exclusions apply only to ignored untracked inputs.",
+  "verified_behaviors": [
+    "Native pnpm 11.25.0 materialized an ordinary workspace link. Reviewed source fingerprints remained equal, the exact local task commit included only the authorized file, and controller input review passed. The regression suite preserves strict handling of explicit, versioned, aliased and other ignored inputs."
+  ],
+  "required_evidence": {
+    "scoped-regression": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/pnpm-source-fingerprints/scoped-regression-result-c-b550ad0a-7579-4d6c-8dff-abe7f2ef7246.json",
+    "native-pnpm": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/pnpm-source-fingerprints/native-pnpm-source-and-completion.json"
+  }
+}

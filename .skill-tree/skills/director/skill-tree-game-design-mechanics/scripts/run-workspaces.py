@@ -816,16 +816,21 @@ def local_git_environment():
     return env
 
 
-def local_git_args(root, *args):
-    return ['git', '--no-replace-objects', '--no-optional-locks', '--literal-pathspecs', '-C', str(root),
+def local_git_args(root, *args, literal_pathspecs=True):
+    pathspec_mode = ['--literal-pathspecs'] if literal_pathspecs else []
+    return ['git', '--no-replace-objects', '--no-optional-locks', *pathspec_mode, '-C', str(root),
             '-c', 'core.fsmonitor=false', '-c', 'diff.autoRefreshIndex=false', *map(str, args)]
 
 
-def local_git(root, *args, accepted=(0,), index=None):
+def local_git(root, *args, accepted=(0,), index=None, literal_pathspecs=True):
     environment = local_git_environment()
     if index is not None:
         environment['GIT_INDEX_FILE'] = str(index)
-    result = subprocess.run(local_git_args(root, *args), env=environment, capture_output=True, timeout=45)
+    if not literal_pathspecs:
+        for name in ('LITERAL', 'GLOB', 'NOGLOB', 'ICASE'):
+            environment.pop('GIT_' + name + '_PATHSPECS', None)
+    result = subprocess.run(local_git_args(root, *args, literal_pathspecs=literal_pathspecs),
+                            env=environment, capture_output=True, timeout=45)
     if result.returncode not in accepted:
         raise RunError('Local Git operation failed: ' + str(args[0]))
     return result
@@ -835,8 +840,8 @@ def local_git_text(root, *args):
     return local_git(root, *args).stdout.decode('utf-8').strip()
 
 
-def local_git_paths(root, *args):
-    raw = local_git(root, *args).stdout
+def local_git_paths(root, *args, literal_pathspecs=True):
+    raw = local_git(root, *args, literal_pathspecs=literal_pathspecs).stdout
     try:
         return set(raw.decode('utf-8').split('\0')[:-1])
     except UnicodeError as exc:
@@ -845,6 +850,30 @@ def local_git_paths(root, *args):
 
 def local_overlap(left, right):
     return left == right or left.startswith(right + '/') or right.startswith(left + '/')
+
+
+def ignored_unversioned_directories(root):
+    versioned = None
+
+    def whole_directory(path):
+        nonlocal versioned
+        relative = path.relative_to(root).as_posix()
+        checkout = local_git(path, 'rev-parse', '--show-toplevel', accepted=(0, 128))
+        if checkout.returncode or Path(os.fsdecode(checkout.stdout).rstrip('\n')).resolve() != root:
+            return False
+        ignored = local_git_paths(root, 'ls-files', '--others', '--ignored', '--exclude-standard',
+                                  '--directory', '-z', '--', relative)
+        if relative + '/' not in ignored:
+            return False
+        if versioned is None:
+            indexed = local_git_paths(root, 'ls-files', '-z')
+            head = local_git(root, 'rev-parse', '--verify', '--quiet', 'HEAD', accepted=(0, 1))
+            committed = local_git_paths(root, 'ls-tree', '-r', '--name-only', '-z', 'HEAD') if not head.returncode else set()
+            versioned = {unicodedata.normalize('NFC', item).casefold() for item in indexed | committed}
+        key = unicodedata.normalize('NFC', relative).casefold()
+        return not any(local_overlap(key, item) for item in versioned)
+
+    return whole_directory
 
 
 def worker_path(value):
@@ -986,7 +1015,7 @@ def validation_input_paths(root, source, directory_entry):
     return paths
 
 
-def require_committed_check_inputs(root, owned, sources):
+def require_committed_check_inputs(root, owned, sources, *, ignored_directories=()):
     if not sources:
         return
     root = root.resolve()
@@ -1031,7 +1060,15 @@ def require_committed_check_inputs(root, owned, sources):
         raise RunError('Task validation inputs must be visible in the checked-out Git index')
     dirty = set(task_commit_baseline(root)['dirty'])
     pathspecs = sorted({git_spelling(path) for path in aliases})
-    dirty.update(local_git_paths(root, 'ls-files', '--others', '--ignored', '--exclude-standard', '-z', '--', *pathspecs))
+    exclusions = []
+    for path in sorted(ignored_directories):
+        key = match_key(path)
+        if not any(source == key or source.startswith(key + '/') for source in scope):
+            exclusions.append(':(exclude,literal)' + git_spelling(path))
+    if exclusions:
+        pathspecs = [':(literal)' + path for path in pathspecs] + exclusions
+    dirty.update(local_git_paths(root, 'ls-files', '--others', '--ignored', '--exclude-standard',
+                                 '-z', '--', *pathspecs, literal_pathspecs=not exclusions))
     for path in sorted(dirty):
         if path not in owned and overlaps(path):
             raise RunError('The scoped candidate excludes a changed validation input: '+repr(path))

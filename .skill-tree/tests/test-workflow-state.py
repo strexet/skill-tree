@@ -300,6 +300,154 @@ class WorkflowStateTests(unittest.TestCase):
             wf.complete(self.store,payload)
         self.assertEqual(git('rev-parse','HEAD'),original)
 
+    def pnpm_fingerprint_fixture(self):
+        root = self.store.source_root
+        def git(*args):
+            result = subprocess.run(['git','-C',str(root),*args],capture_output=True,text=True,timeout=15)
+            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+            return result.stdout.strip()
+        git('init','-q','-b','main')
+        git('config','user.name','Fixture')
+        git('config','user.email','fixture@example.invalid')
+        git('config','commit.gpgSign','false')
+        (root/'.gitignore').write_text('node_modules/\n.agents/\n.skill-tree/installation/\n')
+        (root/'package.json').write_text('{"name":"pnpm-fingerprint-fixture","private":true,"packageManager":"pnpm@11.25.0"}\n')
+        (root/'pnpm-workspace.yaml').write_text('packages:\n  - "packages/*"\n')
+        (root/'pnpm-lock.yaml').write_text("lockfileVersion: '9.0'\nimporters: {}\n")
+        app = root/'packages/app'
+        library = root/'packages/library'
+        for package in (app,library):
+            package.mkdir(parents=True)
+            (package/'package.json').write_text(json.dumps({'name':'fixture-'+package.name,'version':'1.0.0'})+'\n')
+            (package/'source.js').write_text('export const fixture = 1;\n')
+        git('add','.')
+        git('commit','-qm','Initial reviewed pnpm fixture')
+        install = subprocess.run(['node',str(ROOT/'bin/install.js'),'--target',str(root),'--only','codex',
+            '--project','--flavor','web','--skills','skill-tree-work-through-next'],capture_output=True,text=True,timeout=30)
+        self.assertEqual(install.returncode,0,install.stdout+install.stderr)
+        return root, app, library, git
+
+    def materialize_pnpm_fixture_store(self,root,*packages):
+        (root/'node_modules/.pnpm').mkdir(parents=True)
+        projects={str(package):{'name':'fixture-'+package.name} for package in packages}
+        (root/'node_modules/.pnpm-workspace-state-v1.json').write_text(json.dumps({'projects':projects}))
+
+    def test_web_pnpm_source_fingerprints_ignore_generated_dependency_links(self):
+        root, app, library, _ = self.pnpm_fingerprint_fixture()
+        sources = ['packages','package.json','pnpm-workspace.yaml','pnpm-lock.yaml']
+        before = wf.fingerprints(self.store,sources)
+        self.materialize_pnpm_fixture_store(root,app,library)
+        dependencies = app/'node_modules'
+        dependencies.mkdir()
+        (dependencies/'fixture-library').symlink_to(library,target_is_directory=True)
+        try:
+            after = wf.fingerprints(self.store,sources)
+        except wf.WorkflowError as error:
+            self.fail(str(error))
+        self.assertEqual(after,before)
+        (root/'pnpm-workspace.yaml').write_text('packages:\n  - "packages/library"\n')
+        updated = wf.fingerprints(self.store,sources)
+        self.assertEqual(updated['packages'],before['packages'])
+        self.assertNotEqual(updated['pnpm-workspace.yaml'],before['pnpm-workspace.yaml'])
+        (root/'pnpm-lock.yaml').write_text("lockfileVersion: '9.0'\nimporters: {}\n# exact fixture change\n")
+        self.assertNotEqual(wf.fingerprints(self.store,sources)['pnpm-lock.yaml'],before['pnpm-lock.yaml'])
+        (app/'package.json').write_text('{"name":"fixture-app","version":"1.0.1"}\n')
+        self.assertNotEqual(wf.fingerprints(self.store,sources)['packages'],before['packages'])
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.binding_snapshot(root,['packages'])
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages/app/node_modules'])
+        (app/'package.json').write_text('{"name":"different-project","version":"1.0.0"}\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+
+    def test_pnpm_source_fingerprints_preserve_reviewed_aliases_and_tracked_inputs(self):
+        root, app, library, git = self.pnpm_fingerprint_fixture()
+        dependencies = app/'node_modules'
+        dependencies.mkdir()
+        (dependencies/'fixture-library').symlink_to(library,target_is_directory=True)
+        self.materialize_pnpm_fixture_store(root,app,library)
+        baseline = wf.fingerprints(self.store,['packages'])
+        unauthorized = app/'unreviewed.js'
+        unauthorized.symlink_to(library/'source.js')
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+        unauthorized.unlink()
+        self.assertEqual(wf.fingerprints(self.store,['packages']),baseline)
+        notice = dependencies/'reviewed-source.txt'
+        notice.write_text('A tracked source remains reviewed.\n')
+        relative = notice.relative_to(root).as_posix()
+        git('add','--force','--',relative)
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+        git('commit','-qm','Retain a source in a generated-looking folder')
+        git('rm','--cached','--',relative)
+        self.assertTrue(notice.is_file())
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+
+    def test_web_pnpm_pruning_does_not_accept_a_dependency_directory_alias(self):
+        root, app, library, _ = self.pnpm_fingerprint_fixture()
+        self.materialize_pnpm_fixture_store(root,app,library)
+        (app/'node_modules').symlink_to(library,target_is_directory=True)
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+        (app/'node_modules').unlink()
+        unverified = root/'packages/notes/node_modules'
+        unverified.mkdir(parents=True)
+        (unverified.parent/'package.json').write_text('{"name":"excluded-fixture","version":"1.0.0"}')
+        (unverified/'unreviewed.js').symlink_to(library/'source.js')
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+
+    def test_web_pnpm_pruning_requires_owned_profile_files(self):
+        root, app, library, _ = self.pnpm_fingerprint_fixture()
+        self.materialize_pnpm_fixture_store(root,app,library)
+        dependencies = app/'node_modules'
+        dependencies.mkdir()
+        (dependencies/'fixture-library').symlink_to(library,target_is_directory=True)
+        profile=json.loads((root/'.skill-tree/installation/profile.json').read_text())
+        destination=next(iter(profile['destinations']))
+        proof=root/destination/'references/project-profile.md'
+        self.assertTrue(proof.is_file())
+        proof.write_text(proof.read_text()+'\nUnowned change to the generated profile.\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+
+    def test_web_pnpm_scoped_completion_and_controller_review_accept_materialized_inputs(self):
+        root, app, library, git = self.pnpm_fingerprint_fixture()
+        body = self.body().replace('"sources": ["source.cs"]', '"sources": ["source.cs", "packages"]')
+        task = self.promote(self.pending('Scoped Web commit'),'Scoped Web commit',body=body)
+        wf.begin_task(self.store,{'task_id':task['id'],'implementation_operation':'implement-next'})
+        payload = self.checked_git_completion(task,real_review=True)
+        payload['source_fingerprints'].update(wf.fingerprints(self.store,['packages']))
+        self.materialize_pnpm_fixture_store(root,app,library)
+        dependencies = app/'node_modules'
+        dependencies.mkdir()
+        link = dependencies/'fixture-library'
+        link.symlink_to(library,target_is_directory=True)
+        ignored_source = app/'ignored-note.txt'
+        with (root/'.git/info/exclude').open('a') as ignore:
+            ignore.write('ignored-note.txt\n')
+        ignored_source.write_text('Other ignored inputs still need review.\n')
+        with self.assertRaisesRegex(wf.workspaces.RunError,'ignored-note.txt'):
+            wf.require_committed_source_inputs(self.store,['source.cs'],['packages'])
+        ignored_source.unlink()
+        explicit = dependencies/'review-input.txt'
+        explicit.write_text('Selected input remains subject to Git review.\n')
+        link.unlink()
+        alias = root/'validation-alias.txt'
+        alias.symlink_to(explicit.relative_to(root))
+        with self.assertRaisesRegex(wf.workspaces.RunError,'node_modules/review-input.txt'):
+            wf.require_committed_source_inputs(self.store,['validation-alias.txt'],['packages','validation-alias.txt'])
+        alias.unlink()
+        link.symlink_to(library,target_is_directory=True)
+        completed = wf.complete(self.store,payload)
+        self.assertEqual(completed['commits'],[git('rev-parse','HEAD')])
+        self.assertEqual(git('diff-tree','--no-commit-id','--name-only','-r','HEAD'),'source.cs')
+        wf.require_reviewed_controller_inputs(self.store,{'snapshot':[task['id']],'required_ids':[]})
+        self.assertTrue(link.is_symlink())
+
     def test_intake_priority_ids_and_minimal_index(self):
         a=self.pending('Normal');b=self.pending('Low',low_priority=True)
         self.assertEqual((a['priority'],b['priority']),(100,25));self.assertTrue(wf.valid_id(a['id'],'P'))

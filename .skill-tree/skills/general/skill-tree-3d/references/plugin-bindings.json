@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "1a1b1f69c7aab9f4918baa591e4723d341478ccad1d0a6a451c8d643e5526ad0",
+  "identity": "d90f8db470192db5bcfb204ae667d49ca5434cda20a0b5a3535799dfc863c8d8",
   "operation": "skill-tree-3d",
   "operations": {
     "skill-tree-3d": {
@@ -3305,8 +3305,8 @@
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/project-profile.md": "82492b7e3c8a8ec8df6bb3581b727e081ddac6f5adeb1a25bb2d945571b9441c",
     "references/run-workspaces.md": "52b62e7c9d44fe79184fd498aaeb2ed985b2d15a6639b959542132cb8ee77260",
-    "references/validation-policy.md": "d5d014a906a2d9c76db8066310b7c1a81f7403ce0c25435a431af327ebe8c818",
-    "references/workflow-metadata.md": "27d44025f5cc3c11a81a8d544ce8d15444746527b0452e11591d1ff43e0aa80a",
+    "references/validation-policy.md": "e4572bf636e414adba2c65f85f5618837affc1bc8f39ba2e998299e940a4164c",
+    "references/workflow-metadata.md": "95bf1e490a3e7f3ce17b5cc54a39c2dc4f40bfa651425ec30041010326f89eb7",
     "scripts/3d-neutral-symmetry.py": "110ddf58e7847e0ac56d10e0a2fcfc6baf81ee2bca3155548356f96411b1565f",
     "scripts/3d-review/evidence.py": "5ac272ec3fc1b80efb6ad033b51247c2281271ed4689b9ac1df493f855f988d9",
     "scripts/3d-review/review.py": "1038e615a9671a368387dc37462d44fee96207ca3d80f3f73807ea77102114e8",
@@ -3328,10 +3328,10 @@
     "scripts/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
     "scripts/plugin-runtime.js": "62caaa416cb4f375fef45edb71c1cbe3b2f9c0acb734a95e0b9099470cf6c8a5",
     "scripts/plugin-sources.js": "13d853f9e64dec84cf92f4026ac71e4384e186cd96200543e400a852a46e4693",
-    "scripts/run-workspaces.py": "c26b9e33fb35f5afdc27b2acbc76cfc574ab61889dbdf526314ad34f05356ee2",
+    "scripts/run-workspaces.py": "c5d6fd8923ec9f51c5eb030cac234c0691beea8411b84c07942ea2f8ec7bff93",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "da31f394646e0f1b5358148c8fd956a13565534280401949947e0d971ac7eec6"
+    "scripts/workflow-state.py": "5d993b546a543fe14d55f75eeffcf6f5e3ff03c8b7c856d5e4d0e7ff56851968"
   },
   "packages": {},
   "parameter_defaults": {},

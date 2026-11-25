@@ -1,0 +1,28 @@
+{
+  "pnpm_version": "11.25.0",
+  "recipe": [
+    "pnpm",
+    "install",
+    "--offline",
+    "--ignore-scripts",
+    "--ignore-pnpmfile",
+    "--config.manage-package-manager-versions=false",
+    "--frozen-lockfile"
+  ],
+  "qualification": "Disposable isolated native pnpm workspace with workspace-only dependencies and no project scripts",
+  "output": "Scope: all 3 workspace projects\n\u2713 Lockfile passes supply-chain policies (verified 3s ago)\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 416ms using pnpm v11.25.0",
+  "fingerprints": {
+    "source.cs": "5de3a5dd2edeec9ceed4495a311f10000a4167cef7b14732bb2645d390d6eee6",
+    "packages": "532ec28d245a3a348105f1203d168ba08b0838e3776e0f091d260cef1054d642",
+    "pnpm-lock.yaml": "44004541eff357b12ceaa35eba0117aa6b1afaf8322ba9ffb2ed0fd72d2bf0e1",
+    "package.json": "2b8b6707c7a0120dbefc090626fa11d26490cf28c9ee971a5c7a1fc95320916f",
+    "pnpm-workspace.yaml": "0fb360452b0231d114d0b0ad6cc76bb48fe528382f55827cf93739bf64ec79e1"
+  },
+  "generated_link": "packages/app/node_modules/fixture-library",
+  "link_target": "../../library",
+  "scoped_completion_commit": "ef3495cb72107c9501d2afbdffdd6eecc1de097a",
+  "committed_paths": [
+    "source.cs"
+  ],
+  "controller_source_input_review": "passed"
+}

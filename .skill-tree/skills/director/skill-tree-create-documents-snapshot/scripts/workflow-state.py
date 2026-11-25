@@ -1368,7 +1368,7 @@ def complete_task_commit(store, text, state, task, payload, request_hash, check_
     frame=verified_implementation_review(store,payload['review_id'],review_identity,
         {'kind':'task','task_ids':[task['id']]})
     attempt=entry.get('task_git_attempt')
-    workspaces.require_committed_check_inputs(store.source_root,candidate['paths'],check_inputs)
+    require_committed_source_inputs(store,candidate['paths'],check_inputs)
     if attempt is None:
         actual=workspaces.task_commit_candidate(store.source_root,baseline,candidate['paths'])
         if actual!=candidate:
@@ -2218,7 +2218,7 @@ def require_reviewed_controller_inputs(store, run):
         for check in outcome.get('validation_plan',[]):
             sources.update(check['sources'])
             sources.update(recipe_for(store,check)[0].get('input_paths',[]))
-    workspaces.require_committed_check_inputs(store.source_root,[],sorted(sources))
+    require_committed_source_inputs(store,[],sorted(sources))
 
 
 def reviewed_controller_candidate(store, run):
@@ -2842,13 +2842,111 @@ def record_cycle(store):
             run['phase']='blocked';run['stop_reason']='Completed cycle without task/dependency progress';run['next_action']='Resolve recorded blocker before resumption'
         run['cycle_signature']=signature;store.save(text,state);return run
 
+def owned_web_pnpm_profile(root):
+    try:
+        path=binding_path(root,'.skill-tree/installation/profile.json')
+        if not path.is_file():
+            return False
+        profile=json.loads(path.read_text())
+        if (profile.get('format')!='skill-tree-profile' or profile.get('schema')!=1
+                or profile.get('project_root')!=str(root) or profile.get('flavor')!='web'
+                or profile.get('facts',{}).get('package_manager')!='pnpm'):
+            return False
+        manager='.skill-tree/installation/manager.js'
+        manager_path=binding_path(root,manager)
+        expected=profile['bundle_digests'][manager]
+        if (not manager_path.is_file() or not re.fullmatch('[0-9a-f]{64}',expected)
+                or file_hash(manager_path)!=expected):
+            return False
+        relative='references/project-profile.md'
+        for destination,record in profile['destinations'].items():
+            if record.get('flavor')!='web' or relative not in record.get('files',{}):
+                continue
+            artifact=binding_path(root,destination+'/'+relative)
+            if not artifact.is_file():
+                continue
+            reference=artifact.read_bytes()
+            if digest(reference)!=record['files'][relative]:
+                continue
+            _,marker,facts=reference.decode().partition('\n```json\n')
+            if marker and json.loads(facts.partition('\n```')[0]).get('facts')==profile['facts']:
+                return True
+    except (AttributeError,KeyError,OSError,TypeError,ValueError):
+        pass
+    return False
+
+
+def pnpm_source_pruner(root):
+    try:
+        if not binding_path(root,'node_modules/.pnpm').is_dir() or not owned_web_pnpm_profile(root):
+            return None
+    except WorkflowError:
+        return None
+    projects={}
+    try:
+        if binding_path(root,'pnpm-workspace.yaml').is_file():
+            workspace=binding_path(root,'node_modules/.pnpm-workspace-state-v1.json')
+            if workspace.is_file():
+                state=json.loads(workspace.read_text())['projects']
+                if isinstance(state,dict):
+                    projects=state
+    except (KeyError,OSError,TypeError,ValueError):
+        pass
+    verify_ignored=workspaces.ignored_unversioned_directories(root)
+
+    def generated(child):
+        if child.name!='node_modules' or not stat.S_ISDIR(child.lstat().st_mode):
+            return False
+        try:
+            manifest=child.parent/'package.json'
+            if manifest.is_symlink() or not manifest.is_file():
+                return False
+            package=json.loads(manifest.read_text())
+            manager=package.get('packageManager')
+            if manager is not None and (not isinstance(manager,str) or not manager.startswith('pnpm@')):
+                return False
+            if child.parent!=root:
+                name=package.get('name')
+                project=projects.get(str(child.parent))
+                if not isinstance(name,str) or not name or not isinstance(project,dict) or project.get('name')!=name:
+                    return False
+        except (AttributeError,OSError,ValueError):
+            return False
+        try:
+            return verify_ignored(child)
+        except workspaces.RunError:
+            return False
+
+    return generated
+
+
 def fingerprints(store,paths):
     result={}
+    generated=pnpm_source_pruner(store.source_root)
     for rel in paths:
         path=store.source_root/rel
         if Path(rel).is_absolute() or '..' in Path(rel).parts or not path.resolve().is_relative_to(store.source_root):raise WorkflowError('Source fingerprint requires repository-relative path')
-        result[rel]=binding_snapshot(store.source_root,[rel]) if path.is_dir() else file_hash(path)
+        prune=generated if 'node_modules' not in Path(rel).parts else None
+        result[rel]=binding_snapshot(store.source_root,[rel],prune_directory=prune) if path.is_dir() else file_hash(path)
     return result
+
+
+def require_committed_source_inputs(store,owned,sources):
+    generated=pnpm_source_pruner(store.source_root)
+    excluded=set()
+    if generated:
+        def collect(child):
+            if generated(child):
+                excluded.add(child.relative_to(store.source_root).as_posix())
+                return True
+            return False
+        for relative in sources:
+            parts=Path(relative).parts
+            if (parts and not Path(relative).is_absolute() and '..' not in parts
+                    and 'node_modules' not in parts and (store.source_root/relative).is_dir()):
+                for _ in binding_sources(store.source_root,[relative],prune_directory=collect):
+                    pass
+    workspaces.require_committed_check_inputs(store.source_root,owned,sources,ignored_directories=excluded)
 
 def audit(store,payload):
     with store.lock():
@@ -3174,21 +3272,28 @@ def binding_path(root,relative):
         if current.is_symlink():raise WorkflowError('Binding symlink is unsupported: '+relative)
     return current
 
-def binding_snapshot(root,paths,excluded=None,allow_empty=False):
+def binding_sources(root,paths,excluded=None,allow_empty=False,*,prune_directory=None):
     if not isinstance(paths,list) or (not paths and not allow_empty):raise WorkflowError('Binding requires source paths')
     excluded=excluded or []
     if not isinstance(excluded,list):raise WorkflowError('Binding exclusions require relative paths')
     for relative in excluded:binding_path(root,relative)
-    files={}
     def visit(relative):
         if any(relative==prefix or relative.startswith(prefix+'/') for prefix in excluded):return
         path=binding_path(root,relative)
         if path.is_dir():
             for child in sorted(path.iterdir()):
-                if child.name not in {'.git','__pycache__','.DS_Store'}:visit(relative+'/'+child.name)
-        elif path.is_file():files[relative]=file_hash(path)
+                if child.name in {'.git','__pycache__','.DS_Store'}:
+                    continue
+                if prune_directory is None or not prune_directory(child):
+                    yield from visit(relative+'/'+child.name)
+        elif path.is_file():yield relative,path
         else:raise WorkflowError('Missing or unsupported binding source: '+relative)
-    for relative in paths:visit(relative)
+    for relative in paths:yield from visit(relative)
+
+
+def binding_snapshot(root,paths,excluded=None,allow_empty=False,*,prune_directory=None):
+    files={relative:file_hash(path) for relative,path in
+           binding_sources(root,paths,excluded,allow_empty,prune_directory=prune_directory)}
     return digest(''.join(name+'\0'+files[name]+'\n' for name in sorted(files)).encode())
 
 def binding_context(store,recipe,allow_blocked=False):

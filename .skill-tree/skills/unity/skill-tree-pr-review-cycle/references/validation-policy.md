@@ -1,5 +1,7 @@
 # Validation Policy
 
+Web source directory checks can include packages with materialized pnpm dependencies. With matching owned Web pnpm profile files and the ordinary pnpm store, source traversal skips wholly Git-ignored, unversioned `node_modules` directories in the selected checkout. Nested packages require the same package name and path in pnpm's materialized workspace state. Recorded pnpm membership identifies existing generated files while edits to the workspace declaration, package manifests and lockfiles remain visible to review. Explicitly named dependency inputs and other symlinks retain the normal source checks.
+
 ## Check ownership
 
 The task Validation section owns required check IDs, criterion mapping and task parameters. A fenced JSON object contains `checks`, with entries containing `id`, `recipe_id`, `criteria`, `sources`, `parameters` and `timing`. Timing is `immediate`, `group-end` or `before-dependent-work`. The profile owns concrete recipes and environment facts. Task headers own optional `validation_group_id` and `boundary_validation`; group membership never expands controller scope.
