@@ -40,6 +40,14 @@ Canonical mutations produce immutable per-run semantic events under `.skill-tree
 
 Implement All merges locally into the exact recorded launch branch after current full-run review. Work Through Next retains a review-ready branch by default. To merge at launch, record `delivery_authorization` with `pr: false`, `merge: true` and the explicit owner instruction. To merge after review, run `merge-reviewed` with the exact run ID and `owner_instruction`. The local merge uses the recorded launch checkout and exact reviewed head. Moved refs or overlapping local edits preserve the reviewed branch and block integration. Runs without `reviewed_local_delivery` use the recorded finish route. Explicit remote orders continue through the PR review cycle. A recorded full-path instruction keeps delivery open as implementation completed, then PR/review in progress, PR ready or merged. Publication blockers preserve implementation completion. Resume reconciles existing PRs, operation keys and merged status before another write. Never announce the full order complete while a promised PR or merge remains unfulfilled.
 
+## Current-target integration
+
+For an explicitly authorized local integration after the target advances, use `current-target-prepare` with the exact run ID, current target head and integration owner. The original reviewed result remains available. A separate integration worktree records the current target as the first parent and the original reviewed source as the second parent. Resolve only identified generated outputs by regenerating the combined source. An authored conflict holds delivery with the exact paths.
+
+Use `current-target-seal` for the exact attempt. The seal regenerates the declared owned package files from the combined source. Use `current-target-checks` to execute the affected supported Core recipes and inspect the receipts. Obtain an independent review of the sealed tree on the current target. Use `current-target-merge` with the exact attempt, integration owner and review receipt. The local ref guard verifies the prepared target before updating the branch. An already confirmed update returns the original result on exact retry.
+
+Use the exact `review_reference` for each executed check in the independent review. A rerun produces a new execution identity and requires current review evidence.
+
 ## Post-merge worktree cleanup
 
 Verified local and controller-linked provider delivery evaluate cleanup after saving the merge result. New controller provisioning records a creation token in the linked Git administrative directory and the run checkpoint. Cleanup requires the matching token, run locator, source branch and head, and current target reachability. Existing or recovered worktrees without qualifying creation evidence are retained.

@@ -1,6 +1,7 @@
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -14,9 +15,10 @@ class ValidationProgressTests(unittest.TestCase):
         self.store.future.write_text('# Future Work\n\n## Pending Task Format\n\n## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n')
         config=self.store.base/'config';config.mkdir(exist_ok=True);(config/'repository.json').write_text(json.dumps({'schema':1,'role':'source'}))
         (self.root/'source.py').write_text('value = 1\n');(self.root/'report.json').write_text('{"assertion":"value is preserved"}')
-    def task(self,title='Feature',group=None,deps=(),timing='immediate'):
+    def task(self,title='Feature',group=None,deps=(),timing='immediate',fresh_review=False):
         p=wf.intake(self.store,{'title':title,'description':'Implement scoped behavior.','expected_behavior':'Preserve the observable value.'})
         check={'id':'behavior','recipe_id':'static-inspection','criteria':['Preserve the value.'],'sources':['source.py'],'parameters':{},'assertion':'The value remains observable.','timing':timing}
+        if fresh_review:check['fresh_review']=True
         body='Goal:\n- Preserve the value.\n\nTouch:\n- source.py\n\nValidation:\n```json\n'+json.dumps({'checks':[check]})+'\n```\n\nAcceptance:\n- Preserve the value.\n'
         r=wf.process(self.store,{'selectors':[p['id']],'dispositions':{p['id']:{'status':'promoted','reason':'Source research confirms the observable contract.'}},'tasks':[{'title':title,'body':body,'parent_pending_ids':[p['id']],'depends_on':list(deps),'validation_group_id':group,'boundary_validation':'group-end' if group else 'not-required'}]})
         return r['created_ids'][0]
@@ -25,6 +27,195 @@ class ValidationProgressTests(unittest.TestCase):
     def passed(self,tid):
         attempt=wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'})
         return wf.record_check(self.store,{'task_id':tid,'check_id':'behavior','attempt_id':attempt['attempt_id'],'result':'pass','actual_lane':'static','environment_identity':attempt['environment_identity'],'classification':'executed-control','assertions':[{'assertion':'The value remains observable.','result':'pass'}],'evidence':['report.json'],'cleanup':'No product process was launched.'})
+
+    def git(self,*args,cwd=None):
+        return subprocess.check_output(['git',*args],cwd=cwd or self.root,text=True,stderr=subprocess.STDOUT).strip()
+
+    def review_candidate(self,tid,controller=False):
+        self.git('init','-q','-b','develop')
+        self.git('config','user.name','Fixture editor')
+        self.git('config','user.email','fixture@example.invalid')
+        self.git('config','commit.gpgSign','false')
+        self.git('add','.')
+        self.git('commit','-qm','Fixture baseline')
+        if controller:
+            wf.workspaces.setup(self.store,{})
+            scope=wf.Store(self.root,allow_unselected=True,neutral=True)
+            run=wf.start(scope,'next',tid,workspace={'implementation_operation':'work-through-next'})
+            source=Path(wf.workspaces.runtime(self.root)['worktrees'][run['id']])
+            self.store=wf.Store(source,run['id'])
+            wf.begin_task(self.store,{'task_id':tid})
+        else:
+            wf.begin_task(self.store,{'task_id':tid,'implementation_operation':'implement-next'})
+        (self.store.source_root/'source.py').write_text('value = 2\n')
+        marked=wf.mark_implemented(self.store,{'task_id':tid,'changed_files':['source.py']})
+        return marked['git_review_identity'],self.passed(tid)
+
+    def review_change(self,frame,command,store=None,**payload):
+        return wf.orchestration_action(store or self.store,'orchestration-'+command,{
+            'orchestration_id':frame['id'],'expected_orchestration_hash':frame['orchestration_hash'],
+            'expected_orchestration_revision':frame['revision'],'expected_source_hash':wf.file_hash(self.store.future),**payload})
+
+    def review_frame(self,scope,identity):
+        fingerprint=wf.digest(wf.dump(scope).encode())
+        context={**scope,'id':'review-fixture-'+fingerprint,'semantic_fingerprint':fingerprint,
+                 'content_fingerprint':fingerprint}
+        actor={'id':'fixture-owner','context_id':'fixture-owner-context'}
+        frame=wf.orchestration_action(self.store,'orchestration-start',{
+            'request_id':wf.identity('fixture'),'context':context,'mode':'manual','executor':{'id':'fixture-executor','context_id':'fixture-executor-context'},
+            'authority':{'id':'fixture-authorization','revision':1,'context_id':context['id'],
+                         'allowed_kinds':['specification-acceptance'],'constraints':['Only synthetic fixture decisions.'],
+                         'evidence':{'kind':'owner-message','reference':'Synthetic fixture authority.'}},
+            'expected_source_hash':wf.file_hash(self.store.future)})
+        frame=self.review_change(frame,'research',reference='Fixture scope inspected.')
+        frame=self.review_change(frame,'plan',plan_digest=fingerprint,required_checks=['behavior'],reference='Fixture review plan.')
+        frame=self.review_change(frame,'question',purpose='plan',question={
+            'id':'fixture','kind':'specification-acceptance','text':'Accept the fixture plan?',
+            'options':[{'id':'accept','text':'Accept.'},{'id':'revise','text':'Revise.'}],'recommendation':'accept'})
+        def action(frame):
+            return wf.orchestration_action(self.store,'orchestration-next',{'orchestration_id':frame['id']})
+        next_step=action(frame)
+        frame=self.review_change(frame,'prepare-actor',actor=actor,input_digest=next_step['input_digest'],expected_decision_hash=next_step['decision_hash'])
+        next_step=action(frame)
+        frame=self.review_change(frame,'record-actor',attempt_id=frame['prepared_actor']['attempt_id'],
+            input_digest=next_step['input_digest'],expected_decision_hash=next_step['decision_hash'],
+            result={'status':'answered','answer':'accept','rationale':'The synthetic plan matches the fixture.'},
+            evidence={'kind':'submitted-answer','reference':'Fixture answer.','actor_id':actor['id'],'actor_context_id':actor['context_id']})
+        frame=self.review_change(frame,'accept-decision')
+        frame=self.review_change(frame,'accept-plan',decision_receipt=frame['acceptance'])
+        return self.review_change(frame,'implement',identity=identity,reference='Current Git fixture candidate.')
+
+    def test_review_incorporates_actual_check_only_and_revalidates_artifacts_before_review(self):
+        tid=self.task();identity,receipt=self.review_candidate(tid)
+        frame=self.review_frame({'kind':'task','task_ids':[tid]},identity)
+        candidates=wf.orchestration_action(self.store,'orchestration-check-evidence',{'orchestration_id':frame['id']})
+        self.assertEqual(candidates['identity'],identity)
+        offer=candidates['checks'][0]
+        self.assertEqual(offer['attempt_id'],receipt['attempt_id'])
+        self.assertEqual(offer['status'],'reusable')
+        request={key:offer[key] for key in ('id','task_id','check_id','attempt_id')}
+        with self.assertRaisesRegex(wf.WorkflowError,'verified receipt'):
+            self.review_change(frame,'checks',identity=identity,results=[{'id':'behavior','status':'passed','reference':'core-check:invented'}])
+        with self.assertRaisesRegex(wf.WorkflowError,'identity changed'):
+            self.review_change(frame,'checks',identity=identity,reused_checks=[{**request,'attempt_id':wf.identity('C')}])
+        adopted=self.review_change(frame,'checks',identity=identity,reused_checks=[request])
+        self.assertEqual(adopted['phase'],'review')
+        self.assertEqual(adopted['checks']['results'][0]['core_check']['receipt_sha256'],offer['receipt_sha256'])
+        report=self.root/'report.json';original_report=report.read_bytes();report.write_text('Changed result.')
+        acceptance={'identity':identity,'review_id':'reviewer-proof','findings':[],'reference':'Independent fixture review.'}
+        with self.assertRaisesRegex(wf.WorkflowError,'evidence missing or mismatched'):
+            self.review_change(adopted,'review',**acceptance)
+        report.write_bytes(original_report)
+        task_source=self.root/'source.py';task_source.write_text('value = 3\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'sealed task candidate'):
+            self.review_change(adopted,'review',**acceptance)
+        task_source.write_text('value = 2\n')
+        self.assertEqual(self.review_change(adopted,'review',**acceptance)['phase'],'ready')
+
+    def test_review_declines_fresh_pending_or_changed_environment_checks(self):
+        tid=self.task();identity,receipt=self.review_candidate(tid)
+        scope={'kind':'task','task_ids':[tid]}
+        frame=self.review_frame({**scope,'fresh_check_ids':['behavior']},identity)
+        request={'id':'behavior','task_id':tid,'check_id':'behavior','attempt_id':receipt['attempt_id']}
+        with self.assertRaisesRegex(wf.WorkflowError,'fresh execution'):
+            self.review_change(frame,'checks',identity=identity,reused_checks=[request])
+        config=self.store.base/'config/repository.json';original=config.read_bytes()
+        config.write_text(json.dumps({'schema':1,'role':'source','recipes':{
+            'static-inspection':{'lane':'static','input_paths':[],'assertion_contract':'Changed fixture contract.'}}}))
+        rows=wf.review_check_evidence(self.store,identity,scope)
+        self.assertEqual(rows[0]['status'],'rerun-required')
+        self.assertIn('environment changed',rows[0]['reason'])
+        config.write_bytes(original)
+        wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'})
+        rows=wf.review_check_evidence(self.store,identity,scope)
+        self.assertIn('pending',rows[0]['reason'])
+
+    def test_fresh_review_contract_excludes_a_passing_task_receipt(self):
+        tid=self.task(fresh_review=True);identity,_=self.review_candidate(tid)
+        rows=wf.review_check_evidence(self.store,identity,{'kind':'task','task_ids':[tid]})
+        self.assertEqual(rows[0]['status'],'rerun-required')
+        self.assertIn('requires fresh review',rows[0]['reason'])
+
+    def test_task_completion_recovers_prepared_commit_with_reused_review_evidence(self):
+        tid=self.task();identity,receipt=self.review_candidate(tid)
+        frame=self.review_frame({'kind':'task','task_ids':[tid]},identity)
+        request={'id':'behavior','task_id':tid,'check_id':'behavior','attempt_id':receipt['attempt_id']}
+        frame=self.review_change(frame,'checks',identity=identity,reused_checks=[request])
+        frame=self.review_change(frame,'review',identity=identity,review_id='fixture-review',findings=[],reference='Independent fixture review.')
+        completion={'task_id':tid,'review_id':frame['id'],'outcome':'The observable value remains preserved.',
+                    'acceptance':[{'criterion':'Preserve the value.','result':'pass','evidence':['report.json']}],
+                    'source_fingerprints':wf.fingerprints(self.store,['source.py'])}
+        apply_commit=wf.workspaces.apply_task_commit
+        def interrupt_after_commit(*args):
+            apply_commit(*args)
+            raise RuntimeError('Interrupted before recording completion')
+        with patch.object(wf.workspaces,'apply_task_commit',interrupt_after_commit):
+            with self.assertRaisesRegex(RuntimeError,'Interrupted before recording completion'):
+                wf.complete(self.store,completion)
+        head=self.git('rev-parse','HEAD')
+        self.assertNotEqual(head,identity['head'])
+        self.assertEqual(self.store.load()['task_progress'][tid]['task_git_attempt']['commit'],head)
+        self.assertEqual(wf.complete(self.store,completion)['task_git_commit']['commit'],head)
+
+    def controller_with_accepted_leaf(self):
+        tid=self.task();identity,receipt=self.review_candidate(tid,controller=True)
+        neutral=wf.Store(self.store.source_root,allow_unselected=True,neutral=True)
+        task_review=self.review_frame({'kind':'task','task_ids':[tid]},identity)
+        request={'id':'behavior','task_id':tid,'check_id':'behavior','attempt_id':receipt['attempt_id']}
+        task_review=self.review_change(task_review,'checks',store=neutral,identity=identity,reused_checks=[request])
+        task_review=self.review_change(task_review,'review',identity=identity,review_id='fixture-task-review',findings=[],reference='Independent fixture review.')
+        wf.complete(self.store,{'task_id':tid,'review_id':task_review['id'],'outcome':'The observable value remains preserved.',
+            'acceptance':[{'criterion':'Preserve the value.','result':'pass','evidence':['report.json']}],
+            'source_fingerprints':wf.fingerprints(self.store,['source.py'])})
+        return neutral,receipt,request
+
+    def test_controller_offer_reuses_accepted_leaf_receipt_only_on_current_target(self):
+        neutral,receipt,request=self.controller_with_accepted_leaf()
+        controller=wf.controller_review_identity(self.store)
+        self.assertEqual(controller['check_evidence'][0]['attempt_id'],receipt['attempt_id'])
+        run_id=controller['review_scope']['run_id']
+        before=wf.file_hash(self.store.state)
+        timeline=wf.orchestration_action(neutral,'orchestration-timeline',{'run_ids':[run_id]})
+        self.assertEqual(wf.file_hash(self.store.state),before)
+        self.assertEqual(timeline['orchestrations'],[])
+        run_timing=timeline['runs'][0];check_time=run_timing['check_intervals'][0]
+        self.assertEqual((run_timing['run_id'],check_time['attempt_id'],check_time['status']),
+                         (run_id,receipt['attempt_id'],'pass'))
+        self.assertIsNotNone(check_time['seconds'])
+        self.assertIsNone(run_timing['delivery_interval']['seconds'])
+        with self.assertRaisesRegex(wf.WorkflowError,'distinct exact run ids'):
+            wf.orchestration_action(self.store,'orchestration-timeline',{'run_ids':[run_id,run_id]})
+        frame=self.review_frame(controller['review_scope'],controller['identity'])
+        frame=self.review_change(frame,'checks',store=neutral,identity=controller['identity'],reused_checks=[request])
+        self.assertEqual(frame['phase'],'review')
+        self.git('commit','--quiet','--allow-empty','-m','Move fixture target')
+        moved=wf.controller_review_identity(self.store)
+        self.assertEqual(moved['identity'],controller['identity'])
+        self.assertEqual(moved['check_evidence'],[])
+        self.assertIn('source and target base',moved['check_evidence_unavailable'])
+        with self.assertRaisesRegex(wf.WorkflowError,'source and target base'):
+            self.review_change(frame,'review',identity=frame['identity'],review_id='fixture-controller-review',findings=[],reference='Independent fixture review.')
+
+    def test_run_timeline_waits_for_verified_merge_before_recording_delivery_duration(self):
+        neutral,_,request=self.controller_with_accepted_leaf()
+        controller=wf.controller_review_identity(self.store)
+        identity=controller['identity'];run_id=controller['review_scope']['run_id']
+        frame=self.review_frame(controller['review_scope'],identity)
+        frame=self.review_change(frame,'checks',store=neutral,identity=identity,reused_checks=[request])
+        frame=self.review_change(frame,'review',store=neutral,identity=identity,review_id='fixture-controller-review',
+                                 findings=[],reference='Independent fixture review.')
+        frozen=wf.freeze_reviewed_controller(self.store,{'review_id':frame['id']})
+        def delivery_timing():
+            return wf.orchestration_action(neutral,'orchestration-timeline',{'run_ids':[run_id]})['runs'][0]['delivery_interval']
+        self.assertEqual(delivery_timing()['started_at'],frozen['finished_at'])
+        self.assertIsNone(delivery_timing()['seconds'])
+        merged=wf.merge_reviewed_controller(self.store,{'owner_instruction':'Merge the isolated fixture locally.'})
+        self.assertEqual(self.git('rev-parse','HEAD'),merged['delivery']['reviewed_merge']['commit'])
+        observed=delivery_timing()
+        self.assertEqual(observed['status'],'merged')
+        self.assertEqual(observed['review_id'],frame['id'])
+        self.assertTrue(wf.valid_id(observed['verified_delivery_event_id'],'E'))
+        self.assertIsNotNone(observed['seconds'])
     def test_standalone_progress_survives_refresh_and_never_reimplements(self):
         tid=self.task();self.progress(tid)
         with self.store.lock():self.store.save(self.store.text(),self.store.load())

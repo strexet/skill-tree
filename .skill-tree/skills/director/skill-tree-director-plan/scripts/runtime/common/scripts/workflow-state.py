@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import socket
 import stat
 import subprocess
@@ -1084,7 +1085,7 @@ def _start_selection(store,mode,selector,workspace,text=None):
     if mode=='all' and selector:raise WorkflowError('Implement All uses the initial prioritized snapshot')
     return tasks,chosen,snapshot
 
-def start(store,mode,selector=None,limits=None,workspace=None):
+def start(store,mode,selector=None,limits=None,workspace=None,*,reviewed_directed=False):
     dispatch,options=child_dispatch('start',workspace or {},start_context={'mode':mode,'selector':selector,'limits':limits})
     if dispatch:
         with store.lock():
@@ -1095,8 +1096,12 @@ def start(store,mode,selector=None,limits=None,workspace=None):
         raise WorkflowError('Resolve group filters before start and pass the exact snapshot IDs and source hash')
     operation=options.get('implementation_operation')
     review_policy=None
+    directed_local = (reviewed_directed and dispatch and mode == 'next' and operation == 'work-through-next'
+                      and options.get('local_base') is True and 'delivery_authorization' not in options)
+    if reviewed_directed and not directed_local:
+        raise WorkflowError('A supervised child requires the exact directed local work-through-next route')
     if operation is not None:
-        if dispatch or not store.neutral or store.run_id or operation!={'next':'work-through-next','all':'implement-all'}.get(mode):
+        if (dispatch and not directed_local) or not store.neutral or store.run_id or operation!={'next':'work-through-next','all':'implement-all'}.get(mode):
             raise WorkflowError('New controller Git policy requires the matching standalone operation and mode')
         authorization=options.get('delivery_authorization',{})
         if not isinstance(authorization,dict) or any(
@@ -1105,6 +1110,8 @@ def start(store,mode,selector=None,limits=None,workspace=None):
         if authorization.get('pr') is not True:
             launch=workspaces.checked_out_branch(store.source_root)
             launch_branch=launch['ref'].removeprefix('refs/heads/')
+            if directed_local and options.get('base_branch') != launch_branch:
+                raise WorkflowError('Supervised child delivery requires the exact checked-out local base branch')
             if authorization.get('target_branch',launch_branch)!=launch_branch:
                 raise WorkflowError('Reviewed local delivery targets the exact checked-out launch branch')
             instruction=authorization.get('owner_instruction')
@@ -1306,6 +1313,7 @@ def verified_implementation_review(store, review_id, identity, scope):
             or review['execution_snapshot']!=orchestration_execution_snapshot(store)
             or not review['checks']['passed'] or review['review']['findings']):
         raise WorkflowError('A current clean implementation review must cover the exact scoped Git identity')
+    guard_reused_review_checks(store,review)
     return review
 
 
@@ -1429,6 +1437,7 @@ LOCAL_DELIVERY_COMMANDS = {
         ('validate', 'validate-target'), ('complete', 'complete'),
     )
 }
+CURRENT_TARGET_COMMANDS={'current-target-'+operation for operation in ('prepare','seal','checks','merge')}
 
 
 def _delivery_receipt_path(run, suffix=''):
@@ -2195,7 +2204,12 @@ def controller_review_identity(store):
     if not run or not run.get('reviewed_local_delivery') or run['delivery']['implementation']=='completed':
         raise WorkflowError('A controller with unfinished reviewed local delivery is required')
     _implementation_finish_checks(store,state,run,store.text())
-    return reviewed_controller_candidate(store,run)
+    candidate=reviewed_controller_candidate(store,run)
+    try:
+        candidate['check_evidence']=review_check_evidence(store,candidate['identity'],candidate['review_scope'],state)
+    except (WorkflowError,workspaces.RunError) as error:
+        candidate.update(check_evidence=[],check_evidence_unavailable=str(error))
+    return candidate
 
 
 def freeze_reviewed_controller(store, payload):
@@ -2256,6 +2270,8 @@ def merge_reviewed_controller(store, payload=None):
         if delivery.get('reviewed_merge'):
             cleanup_after_merge(store, state, run)
             return run
+        if delivery.get('current_target_attempts'):
+            raise WorkflowError('Resume the recorded current-target integration attempt')
         if delivery.get('publication')!='not-requested':
             raise WorkflowError('The selected run has a separate recorded remote delivery')
         if not policy['merge_at_finish'] and not (instruction or delivery.get('reviewed_merge_owner_instruction')):
@@ -2271,6 +2287,7 @@ def merge_reviewed_controller(store, payload=None):
         if ref!=reviewed['target_ref']:
             raise WorkflowError('The recorded reviewed launch branch changed')
         target,head=workspaces.reviewed_launch_target(store,run)
+        guard_current_target_owner(state,ref,head)
         attempt=delivery.get('reviewed_merge_attempt')
         if attempt and (any(attempt.get(key)!=value for key,value in source.items())
                 or attempt.get('target_ref')!=ref or attempt.get('target_head')!=policy['launch']['head']):
@@ -2306,6 +2323,366 @@ def merge_reviewed_controller(store, payload=None):
             'run_id':run['id'],'review':reviewed,'merge':merged,'target_ref':ref})})
         cleanup_after_merge(store, state, run)
         return run
+
+
+def current_target_contracts(store,state,run,target_head):
+    """Cover the submitted contracts and verified peers newly present in this target."""
+    launch=run['reviewed_local_delivery']['launch']
+    peers=state['run_registry']['runs']
+    contracts={}
+    for outcome in store.outcomes():
+        rid=outcome.get('run_id');tid=outcome['task_id'];peer=peers.get(rid,{})
+        source=outcome.get('task_git_commit') or {};commit=source.get('commit')
+        if (not commit or outcome['disposition']!='completed'
+                or peer.get('completion_refs',{}).get(tid)!=outcome['id']):continue
+        if rid!=run['id']:
+            if (peer.get('reviewed_local_delivery',{}).get('launch')!=launch
+                    or peer.get('delivery',{}).get('status')!='merged'
+                    or workspaces.local_git(store.root,'merge-base','--is-ancestor',commit,launch['head'],accepted=(0,1)).returncode==0
+                    or workspaces.local_git(store.root,'merge-base','--is-ancestor',commit,target_head,accepted=(0,1)).returncode):continue
+        for check in outcome.get('validation_plan',[]):contracts[tid+'/'+check['id']]=check
+    if not contracts:raise WorkflowError('No accepted scoped validation contracts are available for current-target delivery')
+    return contracts
+
+
+def current_target_preview(attempt,run,area=None):
+    result=deepcopy(attempt)
+    if area:result['worktree']=str(area)
+    if attempt.get('candidate'):
+        candidate=attempt['candidate']
+        result.update(identity={'head':candidate['commit'],'base_oid':attempt['target_head'],
+                                'source_digest':digest(candidate['tree'].encode())},
+                      review_scope={'kind':'controller','run_id':run['id'],'task_ids':run['admitted_task_ids'],
+                                    'current_target_attempt_id':attempt['id']},
+                      required_check_ids=sorted(attempt['contracts']))
+    return result
+
+
+def current_target_generated_path(path):
+    return re.fullmatch(r'\.skill-tree/skills/(?:director|general|unity|web)/skill-tree-[a-z0-9-]+/.+',path) is not None
+
+
+def guard_current_target_owner(state,target_ref,head,current_id=None):
+    for run in state.get('run_registry',{}).get('runs',{}).values():
+        for attempt in run.get('delivery',{}).get('current_target_attempts',{}).values():
+            if (attempt['id']!=current_id and attempt['target_ref']==target_ref
+                    and attempt['status'] not in {'conflicted','merged','stale'}
+                    and (attempt['target_head']==head or attempt['status']=='applying')):
+                raise WorkflowError('The target already has an active integration owner: '+attempt['integrator_id'])
+
+
+def current_target_outputs(area,paths):
+    if not paths:return
+    composer='.skill-tree/bin/compose.js'
+    if not (area/composer).is_file() or not workspaces.committed_file_hash(area,workspaces.checked_out_branch(area)['head'],composer):
+        raise WorkflowError('The combined candidate lacks its tracked package composer')
+    result=subprocess.run(['node',composer],cwd=area,capture_output=True,timeout=120)
+    if result.returncode:raise WorkflowError('Package regeneration failed in the isolated integration checkout')
+    try:outputs=json.loads(result.stdout)
+    except ValueError as error:raise WorkflowError('The combined package composer returned invalid outputs') from error
+    if not isinstance(outputs,dict) or any(not isinstance(outputs.get(path.removeprefix('.skill-tree/')),str) for path in paths):
+        raise WorkflowError('Generated paths must be actual outputs of the combined package composer')
+    for relative in paths:
+        path=area/relative
+        if path.resolve()!=path or (path.exists() and not path.is_file()):
+            raise WorkflowError('A generated output is not a regular owned file: '+relative)
+        path.parent.mkdir(parents=True,exist_ok=True)
+        path.write_text(outputs[relative.removeprefix('.skill-tree/')])
+    workspaces.local_git(area,'add','--',*paths)
+
+
+def current_target_check_inputs(store,attempt):
+    result={};executables={}
+    candidate=attempt['candidate']
+    runner_env=workspaces.local_git_environment()
+    search_path=os.pathsep.join(str(store.source_root / entry) for entry in os.get_exec_path(runner_env))
+    relevant={key:value for key,value in runner_env.items() if key in {'PATH','CI','LANG','TZ'}
+              or key.startswith(('LC_','PYTHON','NODE','JAVA','SKILL_TREE_'))}
+    for cid,check in attempt['contracts'].items():
+        recipe,environment=recipe_for(store,check)
+        argv=recipe.get('argv')
+        if recipe['lane'] not in {'static','unit','integration'} or recipe.get('execution_binding') or not argv:
+            raise WorkflowError('Fresh current-target check requires an owned local runnable recipe: '+cid)
+        runner=argv[0]
+        if os.path.dirname(runner) and not os.path.isabs(runner):
+            runner=str(store.source_root / runner)
+        command=shutil.which(runner,path=search_path)
+        inputs=fingerprints(store,check['sources']+recipe.get('input_paths',[]))
+        if not command or any(value is None for value in inputs.values()):
+            raise WorkflowError('Current-target runner or exact check input is unavailable: '+cid)
+        executable=str(Path(command).resolve())
+        if executable not in executables:executables[executable]=file_hash(Path(executable))
+        result[cid]={'argv':list(argv),'lane':recipe['lane'],'environment':environment,
+                     'executable':executable,'executable_sha256':executables[executable],
+                     'runner_environment_sha256':digest(dump(relevant).encode()),
+                     'inputs':inputs,'candidate':candidate,'check_sha256':digest(dump(check).encode())}
+    return result
+
+
+def current_target_checked_evidence(store,attempt,inputs):
+    checks=attempt.get('checks',{})
+    for cid,current in inputs.items():
+        check=checks.get(cid,{})
+        ref=check.get('artifact',{})
+        if (check.get('exit_code')!=0 or check.get('qualified') is not True or check.get('inputs')!=current
+                or not ref.get('path') or file_hash(store.owned(ref['path']))!=ref.get('sha256')):
+            raise WorkflowError('Fresh executed current-target evidence is missing, failed or changed: '+cid)
+    return checks
+
+
+def current_target_check_counts(lane,report):
+    if lane=='static':return None
+    python=re.findall(r'(?m)^Ran (\d+) tests? in .*$',report)
+    if len(python)==1 and re.search(r'(?m)^OK\s*$',report):return int(python[0])
+    tap={name:int(value) for name,value in re.findall(r'(?m)^# (tests|pass|fail|skipped|todo) (\d+)\s*$',report)}
+    if (set(tap)=={'tests','pass','fail','skipped','todo'} and tap['tests']==tap['pass']
+            and all(tap[name]==0 for name in ('fail','skipped','todo'))):return tap['tests']
+    return 0
+
+
+def current_target_state(store,policy):
+    text=store.text();state=store.load(text);run=state['active_run'];delivery=run['delivery']
+    if run.get('reviewed_local_delivery')!=policy:
+        raise WorkflowError('The original local delivery authorization changed')
+    reviewed=delivery.get('reviewed_source');original=store.owned(_delivery_receipt_path(run))
+    if (delivery.get('publication')!='not-requested' or not reviewed or reviewed['target_ref']!=policy['launch']['ref']
+            or original.is_symlink() or file_hash(original)!=delivery.get('reviewed_run_receipt_sha256')
+            or not original.is_file() or json.loads(original.read_text())['delivery']['reviewed_source']!=reviewed):
+        raise WorkflowError('Current-target delivery requires the original immutable local review receipt')
+    target,head=workspaces.reviewed_launch_target(store,run)
+    return text,state,run,delivery,reviewed,target,head
+
+
+def current_target_run_checks(store,policy,aid,actor):
+    # The publication lock remains held. The queue writer is available to unrelated work during execution.
+    with store.lock():
+        _,_,run,delivery,_,_,head=current_target_state(store,policy)
+        attempt=delivery.get('current_target_attempts',{}).get(aid) if valid_id(aid,'MI') else None
+        if not attempt or attempt['integrator_id']!=actor:
+            raise WorkflowError('Use the original current-target attempt and owning integrator identity')
+        if attempt['status'] not in {'sealed','checked'}:raise WorkflowError('Seal the current-target candidate before running checks')
+        if head!=attempt['target_head'] or workspaces.local_source_identity(store,run)!=attempt['source']:
+            raise WorkflowError('The current-target candidate source or target has moved')
+        area,actual=workspaces.current_target_checkout(store.root,attempt)
+        if actual['head']!=attempt['candidate']['commit'] or workspaces.current_target_dirt(area):
+            raise WorkflowError('The exact sealed current-target candidate must remain clean')
+        proof_store=_hook_source_store(store,area)
+        inputs=current_target_check_inputs(proof_store,attempt)
+    checks={};writes={}
+    for cid,current in inputs.items():
+        argv=[current['executable'],*current['argv'][1:]]
+        started_at=now();failure=None
+        try:
+            result=subprocess.run(argv,cwd=area,capture_output=True,timeout=180,
+                                  env={**workspaces.local_git_environment(),'PYTHONDONTWRITEBYTECODE':'1'})
+            exit_code=result.returncode;stdout=result.stdout;stderr=result.stderr
+        except subprocess.TimeoutExpired as error:
+            exit_code=None;stdout=error.stdout or b'';stderr=error.stderr or b'';failure='timeout'
+        except OSError:
+            exit_code=None;stdout=b'';stderr=b'';failure='runner-unavailable'
+        report=(stdout+b'\n'+stderr).decode('utf-8',errors='replace')
+        count=current_target_check_counts(current['lane'],report)
+        execution_id=identity('C')
+        path=_delivery_receipt_path(run,'-'+aid.lower()+'-'+execution_id.lower())
+        execution={'id':cid,'execution_id':execution_id,'inputs':current,'exit_code':exit_code,
+                   'qualified':exit_code==0 and (count is None or count>0),'discovered':count,'output':report,
+                   'started_at':started_at,'finished_at':now(),'failure':failure}
+        writes[path]=dump(execution)
+        checks[cid]={key:value for key,value in execution.items() if key!='output'}
+        checksum=digest(writes[path].encode())
+        checks[cid].update(artifact={'path':path,'sha256':checksum},
+                           review_reference='current-target-check:'+execution_id+':'+checksum)
+    with store.lock():
+        text,state,run,delivery,_,_,current_head=current_target_state(store,policy)
+        retained=delivery.get('current_target_attempts',{}).get(aid)
+        if (retained!=attempt or current_head!=head or workspaces.checked_out_branch(area)!=actual
+                or workspaces.local_source_identity(store,run)!=attempt['source']
+                or workspaces.current_target_dirt(area) or current_target_check_inputs(proof_store,attempt)!=inputs):
+            raise WorkflowError('The current-target checkout, target or check inputs changed during validation')
+        retained.update(status='checked' if all(check['qualified'] for check in checks.values()) else 'sealed',checks=checks)
+        store.save(text,state,writes)
+        return current_target_preview(retained,run,area)
+
+
+def current_target_delivery(store,command,payload):
+    action=command.removeprefix('current-target-')
+    keys={'prepare':{'integrator_id','owner_instruction','expected_target_head','generated_paths'},
+          'seal':{'integrator_id','attempt_id'},'checks':{'integrator_id','attempt_id'},
+          'merge':{'integrator_id','attempt_id','review_id'}}
+    actor=payload.get('integrator_id')
+    if (not valid_id(store.run_id,'WR') or set(payload)-keys[action]
+            or not isinstance(actor,str) or not actor.strip()):
+        raise WorkflowError('Current-target delivery requires an exact run and integrator identity')
+    run=store.load()['active_run']
+    policy=run.get('reviewed_local_delivery') if run else None
+    if not policy:raise WorkflowError('Current-target delivery requires original reviewed local delivery')
+    target_ref=policy['launch']['ref']
+    lock_target=target_ref.removeprefix('refs/heads/')
+    if action=='checks':
+        with workspaces.publication_lock(store.root,'local',lock_target):
+            return current_target_run_checks(store,policy,payload.get('attempt_id'),actor)
+    if action=='merge':
+        prior=run['delivery'].get('current_target_attempts',{}).get(payload.get('attempt_id'),{})
+        if (prior.get('integrator_id')==actor and prior.get('status')!='merged'
+                and workspaces.reviewed_launch_target(store,run)[1]==prior.get('target_head')):
+            prepare_hook_admission(store,chain_ids=run.get('hook_chains',[]))
+    with workspaces.publication_lock(store.root,'local',lock_target),store.lock():
+        text,state,run,delivery,reviewed,target,head=current_target_state(store,policy)
+        attempts=delivery.setdefault('current_target_attempts',{})
+        if action=='prepare':
+            instruction=payload.get('owner_instruction')
+            if not isinstance(instruction,str) or not instruction.strip() or payload.get('expected_target_head')!=head:
+                raise WorkflowError('Current-target preparation requires explicit owner authorization and the current expected target head')
+            generated=workspaces.worker_paths(payload.get('generated_paths',[]))
+            if any(not current_target_generated_path(path) for path in generated):
+                raise WorkflowError('Only exact known Skill Tree package outputs may be regenerated')
+            old_base=policy['launch']['head']
+            target_delta=workspaces.local_incoming(target,old_base,head)
+            source_delta=workspaces.local_incoming(target,old_base,reviewed['source']['source_head'])
+            generated=sorted(set(generated)|{path for path in target_delta&source_delta if current_target_generated_path(path)})
+            request={'integrator_id':actor,'owner_instruction':instruction,'target_ref':target_ref,'target_head':head,
+                     'source':reviewed['source'],'generated_paths':generated}
+            aid='MI-'+str(uuid.uuid5(uuid.NAMESPACE_URL,run['id']+'/'+digest(dump(request).encode())))
+            attempt=attempts.get(aid)
+            if attempt and attempt['status']!='reserved':
+                area=workspaces.current_target_area(store.root,attempt) if attempt.get('checkout') else None
+                return current_target_preview(attempt,run,area)
+            if delivery.get('reviewed_merge') or delivery.get('reviewed_merge_attempt'):
+                raise WorkflowError('Recover the existing reviewed merge before any current-target preparation')
+            if (head==policy['launch']['head'] or workspaces.local_source_identity(store,run)!=reviewed['source']
+                    or workspaces.local_git(target,'merge-base','--is-ancestor',policy['launch']['head'],head,accepted=(0,1)).returncode
+                    or workspaces.local_git(target,'merge-base','--is-ancestor',reviewed['source']['source_head'],head,accepted=(0,1)).returncode==0):
+                raise WorkflowError('Current-target delivery requires an advanced descendant with the original incoming source')
+            guard_current_target_owner(state,target_ref,head,aid)
+            if not attempt:
+                tree,conflicts=workspaces.current_target_merge_tree(target,head,reviewed['source']['source_head'])
+                authored=sorted(set(conflicts)-set(generated))
+                attempt={**request,'id':aid,'status':'conflicted' if authored else 'reserved',
+                         'conflicting_paths':authored,'generated_conflicts':sorted(set(conflicts)&set(generated)),
+                         'candidate_ref':'refs/heads/skill-tree-integration/'+aid.lower()}
+                if not authored:
+                    attempt['contracts']=current_target_contracts(store,state,run,head)
+                    attempt['draft_head']=workspaces.current_target_commit(target,attempt,tree)
+                attempts[aid]=attempt
+                store.save(text,state)
+            if attempt['status']=='conflicted':return current_target_preview(attempt,run)
+            area,actual=workspaces.current_target_checkout(store.root,attempt,create=True)
+            if actual['head']!=attempt['draft_head'] or workspaces.current_target_dirt(area):
+                raise WorkflowError('The prepared integration worktree differs from its original clean draft')
+            attempt.update(status='staged',checkout=actual['checkout'])
+            store.save(text,state)
+            return current_target_preview(attempt,run,area)
+
+        aid=payload.get('attempt_id');attempt=attempts.get(aid) if valid_id(aid,'MI') else None
+        if not attempt or attempt['integrator_id']!=actor:
+            raise WorkflowError('Use the original current-target attempt and owning integrator identity')
+        if attempt['status']=='merged':
+            if action!='merge' or payload.get('review_id')!=attempt['review']['id']:
+                raise WorkflowError('Only the original current-target merge request can be replayed')
+            archived=store.owned(_delivery_receipt_path(run,'-'+aid.lower()))
+            if (not archived.is_file() or archived.is_symlink() or json.loads(archived.read_text())!=attempt
+                    or workspaces.local_git(target,'merge-base','--is-ancestor',attempt['merge']['commit'],head,accepted=(0,1)).returncode):
+                raise WorkflowError('The original integration receipt or merged target ancestry changed')
+            return current_target_preview(attempt,run)
+        area,actual=workspaces.current_target_checkout(store.root,attempt)
+        candidate=attempt.get('candidate')
+        recovering=action=='merge' and attempt['status']=='applying' and candidate is not None
+        if head!=attempt['target_head'] and not recovering:
+            raise WorkflowError('The current-target candidate is stale because the target moved')
+        if (not recovering or head==attempt['target_head']) and workspaces.local_source_identity(store,run)!=attempt['source']:
+            raise WorkflowError('The original reviewed source ref, checkout or tree changed')
+        if action=='seal':
+            if attempt['status']=='staged':
+                if actual['head']!=attempt['draft_head'] or workspaces.current_target_dirt(area):
+                    raise WorkflowError('The isolated draft has unclaimed changes before regeneration')
+                attempt['status']='regenerating'
+                store.save(text,state)
+            if attempt['status']=='regenerating':
+                if (actual['head']!=attempt['draft_head']
+                        or workspaces.current_target_dirt(area)-set(attempt['generated_paths'])):
+                    raise WorkflowError('The interrupted regeneration checkpoint has unrelated changes')
+                current_target_outputs(area,attempt['generated_paths'])
+                tree=workspaces.local_git_text(area,'write-tree')
+                touched=workspaces.local_git_paths(area,'diff','--cached','--name-only','--no-renames','-z','--')
+                if (touched-set(attempt['generated_paths']) or set(attempt['generated_conflicts'])-touched):
+                    raise WorkflowError('Regeneration failed to resolve the exact generated conflict paths')
+                candidate={'commit':attempt['draft_head'] if not touched else workspaces.current_target_commit(area,attempt,tree),'tree':tree}
+                attempt.update(status='sealing',candidate=candidate)
+                store.save(text,state)
+            if attempt['status']=='sealing':
+                workspaces.apply_current_target_candidate(area,attempt,candidate)
+                attempt['status']='sealed'
+                store.save(text,state)
+            if attempt['status'] not in {'sealed','checked'}:raise WorkflowError('The current-target candidate cannot be sealed in this phase')
+            if (workspaces.checked_out_branch(area)['head']!=attempt['candidate']['commit']
+                    or workspaces.current_target_dirt(area)):
+                raise WorkflowError('The exact sealed current-target candidate must remain clean')
+            return current_target_preview(attempt,run,area)
+
+        if not candidate or actual['head']!=candidate['commit'] or workspaces.current_target_dirt(area):
+            raise WorkflowError('The exact sealed current-target candidate must remain clean')
+        proof_store=_hook_source_store(store,area)
+        receipt={'target_head':attempt['target_head'],'source_head':attempt['source']['source_head'],'source_tree':candidate['tree']}
+        verified_candidate=workspaces.local_merge_receipt(area,receipt,candidate['commit'])
+        preview=current_target_preview(attempt,run)
+        review_id=payload.get('review_id')
+        if not valid_id(review_id,'DO') or review_id==reviewed['review_id']:
+            raise WorkflowError('An independent current-target review of the exact candidate is required')
+        if recovering and attempt['review']['id']!=review_id:
+            raise WorkflowError('Recover the exact prepared current-target review before retry')
+        applied=False
+        if recovering and head!=attempt['target_head']:
+            applied=not workspaces.local_git(target,'merge-base','--is-ancestor',candidate['commit'],head,
+                                             accepted=(0,1)).returncode
+            if not applied:
+                advanced=not workspaces.local_git(target,'merge-base','--is-ancestor',attempt['target_head'],head,
+                                                  accepted=(0,1)).returncode
+                source_present=not workspaces.local_git(target,'merge-base','--is-ancestor',
+                    attempt['source']['source_head'],head,accepted=(0,1)).returncode
+                if advanced and not source_present:
+                    attempt['status']='stale'
+                    store.save(text,state)
+                    raise WorkflowError('The current-target candidate is stale because the target advanced without it')
+                raise WorkflowError('The interrupted candidate could not be reconciled with the current target ancestry')
+        if not applied:
+            hook_admission(store,chain_ids=run.get('hook_chains',[]))
+            checks=current_target_checked_evidence(store,attempt,current_target_check_inputs(proof_store,attempt))
+            frame=verified_implementation_review(proof_store,review_id,preview['identity'],preview['review_scope'])
+            review_results={row['id']:(row['status'],row['reference']) for row in frame['checks']['results']}
+            if (set(frame['plan']['required_checks'])!=set(checks)
+                    or review_results!={cid:('passed',check['review_reference']) for cid,check in checks.items()}):
+                raise WorkflowError('The current-target review must cover every exact executed check receipt')
+            review={'id':review_id,'hash':frame['orchestration_hash'],'checks_sha256':digest(dump(checks).encode())}
+            if attempt['status']=='applying' and attempt['review']!=review:
+                raise WorkflowError('Recover the exact prepared current-target review before retry')
+            attempt.update(status='applying',review=review)
+            store.save(text,state)
+            incoming=sorted(workspaces.local_incoming(target,attempt['target_head'],candidate['commit']))
+            prepared={'source_ref':attempt['candidate_ref'],'source_head':candidate['commit'],'source_tree':candidate['tree'],
+                      'target_ref':target_ref,'target_head':head,'incoming':incoming,'allow_unrelated_staged':True,
+                      'verify_refs':[(attempt['source']['source_ref'],attempt['source']['source_head'])]}
+            try:
+                workspaces.run_local_merge(target,area,prepared,fast_forward=True)
+            except workspaces.LocalRefRejected:
+                try:current_head=workspaces.reviewed_launch_target(store,run)[1]
+                except workspaces.RunError:current_head=None
+                attempt['status']='stale' if current_head!=attempt['target_head'] else 'checked'
+                store.save(text,state)
+                raise
+        _,head=workspaces.reviewed_launch_target(store,run)
+        if head==candidate['commit']:
+            incoming=sorted(workspaces.local_incoming(target,attempt['target_head'],candidate['commit']))
+            workspaces.reconcile_reviewed_merge_index(target,{**receipt,'target_ref':target_ref,'incoming':incoming},verified_candidate)
+        elif not applied or workspaces.local_git(target,'merge-base','--is-ancestor',candidate['commit'],head,
+                                                 accepted=(0,1)).returncode:
+            raise WorkflowError('The exact sealed target merge could not be verified')
+        attempt.update(status='merged',merge=verified_candidate)
+        delivery.update(status='merged',order_completed=True,reviewed_merge=verified_candidate)
+        run.update(next_action=None,stop_reason=None)
+        store.save(text,state,{_delivery_receipt_path(run,'-reviewed-merge'):dump({
+            'run_id':run['id'],'review':reviewed,'merge':verified_candidate,'target_ref':target_ref}),
+            _delivery_receipt_path(run,'-'+aid.lower()):dump(attempt)})
+        return current_target_preview(attempt,run,area)
 
 
 def finish(store,payload=None):
@@ -2588,6 +2965,7 @@ def check_specs(task):
         for rel in check['sources']:
             if not isinstance(rel,str) or Path(rel).is_absolute() or '..' in Path(rel).parts or '\\' in rel:raise WorkflowError('Check source requires a repository-relative path')
         if not isinstance(check.get('parameters'),dict) or not isinstance(check.get('assertion'),str) or not check['assertion'].strip():raise WorkflowError('Check requires parameters and a concrete assertion')
+        if 'fresh_review' in check and type(check['fresh_review']) is not bool:raise WorkflowError('Check fresh_review requires an explicit Boolean')
         if check.get('timing') not in {'immediate','group-end','before-dependent-work'}:raise WorkflowError('Check requires immediate or explicit boundary timing')
         if check['timing']!='immediate' and task.get('boundary_validation','not-required')=='not-required':raise WorkflowError('Boundary check requires task boundary classification')
     if covered!=set(criteria):raise WorkflowError('Every acceptance criterion requires a mapped check')
@@ -3392,6 +3770,134 @@ def validate_task_checks(store,tid,state=None,check_id=None):
         records.append({'check':check,'result':record,**({'red':entry['checks'][check['id']]['red']} if 'red' in entry['checks'][check['id']] else {})})
     return records
 
+def review_check_evidence(store,identity,scope,state=None):
+    """Resolve current Core check receipts for one sealed review identity."""
+    state=store.load() if state is None else state
+    kind=scope.get('kind');ids=scope.get('task_ids',[])
+    if store.neutral and state.get('run_registry'):
+        run_id=scope.get('run_id') if kind=='controller' else None
+        if kind=='task' and len(ids)==1:
+            run_id=state['task_progress'].get(ids[0],{}).get('run_id')
+        if run_id:
+            scoped=Store(store.source_root,run_id)
+            state=scoped.load()
+            if scoped.source_root!=store.source_root:
+                raise WorkflowError('Core check reuse must use the exact registered run worktree')
+            store=scoped
+    tasks=parse(store.text())
+    if kind=='task' and len(ids)==1:
+        tid=ids[0];task=resolve(tasks,[tid],'Prioritized Next Changes')[0]
+        assert_scope(store,state,tasks,tid)
+        entry=state['task_progress'].get(tid,{})
+        baseline=entry.get('task_git_baseline');candidate=entry.get('task_git_candidate')
+        recovery_head=(entry.get('task_git_attempt') or {}).get('commit')
+        if (not baseline or not candidate or entry.get('stage')!='awaiting-validation'
+                or workspaces.task_review_identity(baseline,candidate,task['body'])!=identity
+                or workspaces.task_commit_candidate(store.source_root,baseline,candidate['paths'],
+                                                       recovery_head=recovery_head)!=candidate):
+            raise WorkflowError('Check reuse requires the current sealed task candidate')
+        contracts=[(task,{})]
+    elif kind=='controller':
+        run=state['active_run']
+        if not run or scope.get('run_id')!=run['id'] or ids!=run['admitted_task_ids']:
+            raise WorkflowError('Check reuse requires the exact admitted controller scope')
+        enforce_limits(run);assert_admission(store,state)
+        current=reviewed_controller_candidate(store,run)
+        if current['identity']!=identity or workspaces.reviewed_launch_target(store,run)[1]!=identity['base_oid']:
+            raise WorkflowError('Check reuse requires the current controller source and target base')
+        outcomes={item['task_id']:item for item in store.outcomes() if item['disposition']=='completed'}
+        contracts=[]
+        for tid in ids:
+            outcome=outcomes.get(tid)
+            if not outcome:continue
+            task=validation_task(store,tid)
+            commit=outcome.get('task_git_commit',{}).get('commit')
+            if (outcome.get('run_id')!=run['id'] or run.get('completion_refs',{}).get(tid)!=outcome['id']
+                    or not commit or workspaces.local_git(store.source_root,'merge-base','--is-ancestor',
+                                                           commit,identity['head'],accepted=(0,1)).returncode):
+                contracts.append((task,{}))
+                continue
+            results=run.get('revalidated_checks',{}).get(tid,outcome.get('check_results',[]))
+            contracts.append((task,{row['check']['id']:row['result'] for row in results}))
+    else:
+        raise WorkflowError('Only exact task and controller reviews can reuse Core check evidence')
+    entries=[];counts={}
+    for task,completed in contracts:
+        tid=task['id'];entry=state['task_progress'].get(tid,{})
+        for check in check_specs(task):
+            cid=check['id'];counts[cid]=counts.get(cid,0)+1
+            evidence={'task_id':tid,'check_id':cid,'status':'rerun-required'}
+            slot=entry.get('checks',{}).get(cid,{})
+            result=slot.get('result') if kind=='task' else completed.get(cid)
+            try:
+                if check.get('fresh_review'):raise WorkflowError('Check policy requires fresh review execution')
+                if entry.get('revalidation') or pending_check_attempt(slot):
+                    raise WorkflowError('A current check attempt or revalidation is pending')
+                if (not result or result.get('result')!='pass' or result.get('classification')!='executed-control'
+                        or result.get('reused_from') or not result.get('evidence') or not valid_id(result.get('attempt_id'),'C')):
+                    raise WorkflowError('No directly executed passing Core check receipt')
+                if kind=='task' and slot.get('receipts',{}).get(result['attempt_id'])!=result:
+                    raise WorkflowError('The passing receipt is missing from its original check attempt')
+                sessions=entry.get('execution_sessions',result.get('execution_sessions',{}))
+                context={**state,'task_progress':{**state['task_progress'],tid:{**entry,
+                           'execution_sessions':deepcopy(sessions)}}}
+                snapshot=check_snapshot(store,task,check,context)
+                if (any(result.get(key)!=snapshot[key] for key in ('key','definition','sources','environment_identity'))
+                        or result.get('actual_lane')!=snapshot['recipe']['lane']):
+                    raise WorkflowError('Check source, assertion, recipe or environment changed')
+                for ref in result['evidence']:
+                    if not ref.get('available') or not ref.get('sha256'):
+                        raise WorkflowError('Check artifact has no verified identity')
+                    evidence_pointer(store,ref,required=True)
+                evidence.update(status='reusable',attempt_id=result['attempt_id'],key=result['key'],
+                                receipt_sha256=digest(dump(result).encode()),evidence=deepcopy(result['evidence']))
+            except (WorkflowError,OSError,KeyError) as error:
+                evidence['reason']=str(error)
+            entries.append(evidence)
+    for row in entries:
+        cid=row['check_id']
+        row['id']=cid if counts[cid]==1 else row['task_id']+'/'+cid
+    return entries
+
+def orchestration_check_evidence(store,frame):
+    if frame['phase'] not in {'checks','review','re-review','resolution','ready'} or not frame.get('identity'):
+        raise WorkflowError('Check reuse requires a sealed review candidate')
+    required=frame['plan']['required_checks'];fresh=frame['context'].get('fresh_check_ids',[])
+    if not isinstance(fresh,list) or any(not isinstance(item,str) or item not in required for item in fresh):
+        raise WorkflowError('Fresh check policy requires exact review check IDs')
+    rows=review_check_evidence(store,frame['identity'],frame['context'])
+    by_id={row['id']:row for row in rows}
+    offers=[]
+    for check_id in required:
+        row=by_id.get(check_id,{'id':check_id,'status':'rerun-required','reason':'No unambiguous current Core check'})
+        if check_id in fresh:
+            row={'id':check_id,'status':'rerun-required','reason':'Review policy requires fresh execution'}
+        offers.append(row)
+    return {'identity':frame['identity'],'checks':offers}
+
+def incorporate_review_checks(store,frame,requests):
+    if not requests:return []
+    offers={row['id']:row for row in orchestration_check_evidence(store,frame)['checks']}
+    verified=[]
+    fields=('id','task_id','check_id','attempt_id')
+    for request in requests:
+        if not isinstance(request,dict) or set(request)!=set(fields) or any(not isinstance(request[key],str) for key in fields):
+            raise WorkflowError('Check reuse requires exact review, task, check and attempt identities')
+        row=offers.get(request['id'],{})
+        if row.get('status')!='reusable' or any(request[key]!=row.get(key) for key in fields):
+            raise WorkflowError('Current Core check is ineligible for reuse: '+request['id']+'; '+row.get('reason','receipt identity changed'))
+        proof={key:row[key] for key in ('task_id','check_id','attempt_id','key','receipt_sha256')}
+        verified.append({'id':row['id'],'status':'passed','reference':'core-check:'+row['attempt_id'],'core_check':proof})
+    return verified
+
+def guard_reused_review_checks(store,frame):
+    rows=[row for row in (frame.get('checks') or {}).get('results',[])
+          if 'core_check' in row or row.get('reference','').startswith('core-check:')]
+    requests=[{'id':row['id'],**{key:row.get('core_check',{}).get(key)
+               for key in ('task_id','check_id','attempt_id')}} for row in rows]
+    if rows and incorporate_review_checks(store,frame,requests)!=rows:
+        raise WorkflowError('The incorporated Core review check receipts changed')
+
 def resume_task(store,payload):
     if not isinstance(payload.get('resolution'),str) or not payload['resolution'].strip():raise WorkflowError('Explicit resumption requires the resolved condition and evidence')
     store.load();admitted=admit_profile(store)
@@ -3476,6 +3982,84 @@ def run_event_recorded_at(event):
     if recorded.utcoffset()!=timedelta(0):
         raise WorkflowError('Run event recording time requires a valid UTC timestamp')
     return recorded.isoformat()
+
+
+def timeline_interval(started_at,finished_at):
+    def timestamp(value):
+        try:return run_event_recorded_at({'recorded_at':value})
+        except WorkflowError:return None
+    started_at=timestamp(started_at);finished_at=timestamp(finished_at)
+    seconds=None
+    if started_at and finished_at:
+        elapsed=(datetime.fromisoformat(finished_at)-datetime.fromisoformat(started_at)).total_seconds()
+        if elapsed>=0:seconds=elapsed
+    return {'started_at':started_at,'finished_at':finished_at,'seconds':seconds}
+
+
+def run_timing_timeline(store,run_ids):
+    state=_hook_source_store(store,store.source_root).load()
+    registry=state.get('run_registry',{});runs=dict(registry.get('runs',{}))
+    if state['active_run']:runs[state['active_run']['id']]=state['active_run']
+    applied=set(registry.get('applied_events',[]));outcomes=store.outcomes()
+    result=[]
+    for rid in run_ids:
+        run=runs.get(rid);relative=_delivery_receipt_path({'id':rid})
+        if not run and store.owned(relative).is_file():
+            archive=store.owned(relative)
+            if archive.is_symlink():raise WorkflowError('Run timing requires owned archive metadata')
+            run=json.loads(archive.read_text());validate_run(run)
+        if not run or run['id']!=rid:raise WorkflowError('Unknown exact run ID: '+rid)
+        directory=store.owned('.skill-tree/history/run-events/'+rid.lower())
+        if any(path.is_symlink() for path in (directory,directory.parent,directory.parent.parent)):
+            raise WorkflowError('Run timing requires owned event metadata')
+        last_sequence=registry.get('event_sequences',{}).get(rid,0)
+        events=[]
+        for path in directory.glob('e-*.json'):
+            eid='E-'+path.stem[2:]
+            if eid not in applied:continue
+            if path.is_symlink():raise WorkflowError('Run timing requires owned event metadata')
+            event=json.loads(path.read_text());sequence=event.get('sequence')
+            if (event.get('id')!=eid or event.get('queue_id')!=registry.get('queue_id') or event.get('run_id')!=rid
+                    or type(sequence) is not int or not 1<=sequence<=last_sequence):
+                raise WorkflowError('Run timing event differs from its applied identity')
+            events.append(event)
+        attempts={};merged_event=None
+        def slot(tid,cid,attempt_id):
+            return attempts.setdefault((tid,cid,attempt_id),{})
+        for event in sorted(events,key=lambda item:item['sequence']):
+            before=(event.get('checkpoint_before') or {}).get('delivery',{})
+            after=(event.get('checkpoint_after') or {}).get('delivery',{})
+            if merged_event is None and before.get('status')!='merged' and after.get('status')=='merged':
+                merged_event=event
+            for change in event.get('progress_changes',[]):
+                tid=change['task_id']
+                for cid,check in (change.get('after') or {}).get('checks',{}).items():
+                    attempt=check.get('attempt') or {}
+                    if valid_id(attempt.get('attempt_id'),'C'):
+                        slot(tid,cid,attempt['attempt_id'])['prepared_at']=attempt.get('prepared_at')
+                    for aid,record in check.get('receipts',{}).items():
+                        if valid_id(aid,'C'):slot(tid,cid,aid)['receipt']=record
+        for outcome in outcomes:
+            tid=outcome['task_id']
+            if outcome.get('run_id')!=rid or run.get('completion_refs',{}).get(tid)!=outcome['id']:continue
+            for row in outcome.get('check_results',[]):
+                record=row['result'];aid=record.get('attempt_id')
+                if valid_id(aid,'C') and not record.get('reused_from'):
+                    slot(tid,row['check']['id'],aid).setdefault('receipt',record)
+        check_intervals=[]
+        for (tid,cid,aid),value in sorted(attempts.items()):
+            receipt=value.get('receipt',{})
+            check_intervals.append({'task_id':tid,'check_id':cid,'attempt_id':aid,
+                'status':receipt.get('result',receipt.get('status','pending')),
+                'classification':receipt.get('classification'),'observed_timing':receipt.get('timing',{}),
+                **timeline_interval(value.get('prepared_at'),receipt.get('recorded_at'))})
+        delivery=run.get('delivery',{});review=delivery.get('reviewed_source') or {}
+        result.append({'run_id':rid,'check_intervals':check_intervals,'delivery_interval':{
+            'status':delivery.get('status'),'review_id':review.get('review_id'),
+            'verified_delivery_event_id':merged_event['id'] if merged_event else None,
+            **timeline_interval(run.get('finished_at') if review else None,
+                                (merged_event or {}).get('recorded_at'))}})
+    return result
 
 
 def replay_events(store,payload):
@@ -4277,7 +4861,7 @@ def _hook_admission(store,scope=None,chain_ids=None,*,register=True,navigation_f
 CLARIFICATION_STATES={'researching','awaiting-answers','revising','awaiting-confirmation','complete','blocked','cancelled'}
 CLARIFICATION_FIELDS={'title','goal','scope','exclusions','dependencies','acceptance','validation','required_plugin_policy','content'}
 DECISION_COMMANDS={'decision-start','decision-read','decision-prepare','decision-record','decision-reconcile','decision-switch','decision-accept','decision-resume'}
-ORCHESTRATION_COMMANDS={'orchestration-'+command for command in ['start','read','next','question','prepare-actor','record-actor','reconcile-actor','switch-mode','accept-decision','research','plan','accept-plan','implement','checks','review','resolve','fix','resume','observe-failure']}
+ORCHESTRATION_COMMANDS={'orchestration-'+command for command in ['start','read','next','timeline','check-evidence','question','prepare-actor','record-actor','reconcile-actor','switch-mode','accept-decision','research','plan','accept-plan','implement','checks','review','resolve','fix','resume','observe-failure']}
 
 def orchestration_execution_snapshot(store):
     scripts=Path(__file__).parent;references=scripts.parent/'references'
@@ -4290,6 +4874,19 @@ def orchestration_execution_snapshot(store):
 def orchestration_action(store,command,payload):
     helper=owned_module('skill_tree_decision_orchestration',Path(__file__).with_name('decision-orchestration.py'))
     try:
+        if command=='orchestration-timeline':
+            kinds={'orchestration_ids':'DO','run_ids':'WR'}
+            if not payload or set(payload)-kinds.keys():raise WorkflowError('Timeline requires exact orchestration or run IDs')
+            for key,ids in payload.items():
+                if (not isinstance(ids,list) or not ids or any(not valid_id(item,kinds[key]) for item in ids)
+                        or len(set(ids))!=len(ids)):
+                    raise WorkflowError('Timeline requires distinct exact '+key.replace('_',' '))
+            if 'orchestration_ids' in payload:
+                result=helper.timing_timeline(store,payload['orchestration_ids'])
+            else:
+                result={'orchestrations':[],'actor_overlaps':[]}
+            if 'run_ids' in payload:result['runs']=run_timing_timeline(store,payload['run_ids'])
+            return result
         if command=='orchestration-read':return helper.read(store,payload.get('orchestration_id'))
         frame=None if command=='orchestration-start' else helper.read(store,payload.get('orchestration_id'))
         current_snapshot=orchestration_execution_snapshot(store)
@@ -4328,8 +4925,21 @@ def orchestration_action(store,command,payload):
                 if command=='orchestration-switch-mode' and payload.get('mode')!=mode:raise WorkflowError('Change the parent clarification mode through the guarded session')
         if command=='orchestration-next':
             scope_guard();return helper.next_action(store,payload['orchestration_id'])
+        if command=='orchestration-check-evidence':
+            if set(payload)!={'orchestration_id'}:raise WorkflowError('Check evidence requires one exact orchestration ID')
+            scope_guard();return orchestration_check_evidence(store,frame)
         if command=='orchestration-switch-mode':clarification_evidence(payload.get('evidence'))
+        reuse_requests=[];ordinary_results=[]
+        if command=='orchestration-checks':
+            reuse_requests=payload.pop('reused_checks',[])
+            ordinary_results=payload.get('results',[])
+            if not isinstance(reuse_requests,list) or not isinstance(ordinary_results,list):
+                raise WorkflowError('Review checks require lists of executed results and exact reuse requests')
+            if any(isinstance(row,dict) and ('core_check' in row or str(row.get('reference','')).startswith('core-check:'))
+                   for row in ordinary_results):
+                raise WorkflowError('Core check evidence must be incorporated from a verified receipt')
         class BoundStore:
+            verified_reuse=None
             def __getattr__(self,key):return getattr(store,key)
             def guard(self):
                 if store.future.exists():
@@ -4338,6 +4948,14 @@ def orchestration_action(store,command,payload):
                 elif payload.get('expected_source_hash') is not None:raise WorkflowError('Orchestration queue context changed; reread before mutation')
                 if not cleanup and orchestration_execution_snapshot(store)!=current_snapshot:raise WorkflowError('Core execution inputs changed during the metadata operation')
                 scope_guard()
+                if reuse_requests:
+                    current=incorporate_review_checks(store,frame,reuse_requests)
+                    if self.verified_reuse is None:
+                        self.verified_reuse=current
+                        payload['results']=ordinary_results+current
+                    elif self.verified_reuse!=current:
+                        raise WorkflowError('Core check evidence changed during review incorporation')
+                if command=='orchestration-review':guard_reused_review_checks(store,frame)
             @contextmanager
             def lock(self):
                 with store.lock():self.guard();yield
@@ -4969,8 +5587,175 @@ def guard_shared_project(store):
             'Use --direct-project only for an explicitly requested direct Core operation.')
 
 
+def worker_handoff(store, payload):
+    if not valid_id(store.run_id, 'WR') or not isinstance(payload, dict):
+        raise WorkflowError('Worker handoff requires an exact controller run ID')
+    action = payload.get('action')
+    fields = {
+        'status': {'action'},
+        'assign': {'action', 'slot', 'generation', 'worker_id', 'task_id', 'base', 'worktree', 'paths', 'shared_inputs'},
+        'record': {'action', 'slot', 'generation', 'worker_id', 'head', 'checks'},
+    }
+    if not isinstance(action, str) or set(payload) != fields.get(action):
+        raise WorkflowError('Worker handoff requires an exact status, assign or record payload')
+    caller = store.source_root
+    relative = '.skill-tree/history/worker-handoffs/' + store.run_id.lower() + '.json'
+    path = store.owned(relative)
+
+    def load_receipts():
+        if path.is_symlink() or path.parent.is_symlink():
+            raise WorkflowError('Worker handoff evidence requires an ordinary owned path')
+        if not path.exists():
+            return {'schema': 1, 'run_id': store.run_id, 'slots': {}}
+        record = json.loads(path.read_text())
+        if (not isinstance(record, dict) or record.get('schema') != 1 or record.get('run_id') != store.run_id
+                or not isinstance(record.get('slots'), dict)):
+            raise WorkflowError('Worker handoff evidence does not match the selected controller')
+        return record
+
+    if action == 'status':
+        store.load()
+        return load_receipts()
+
+    slot, generation, actor = (payload[key] for key in ('slot', 'generation', 'worker_id'))
+    if (type(slot) is not int or slot not in {1, 2} or type(generation) is not int or generation < 1
+            or not isinstance(actor, str) or not actor.strip() or actor != actor.strip()):
+        raise WorkflowError('Worker handoff requires slot 1 or 2, generation and exact worker identity')
+    request = digest(dump(payload).encode())
+    locator = workspaces.runtime(store.root)
+    if not locator or locator['worktrees'].get(store.run_id) != str(caller):
+        raise WorkflowError('Only the registered coordinator worktree can record worker handoffs')
+    with store.lock():
+        state = store.load()
+        run = state['active_run']
+        workspaces.ensure_workspace(store, run)
+        if caller != store.source_root:
+            raise WorkflowError('Only the registered coordinator worktree can record worker handoffs')
+        ledger = load_receipts()
+        assignments = ledger['slots'].setdefault(str(slot), [])
+        current = assignments[-1] if assignments else None
+        if current and current['generation'] == generation:
+            existing = current if action == 'assign' else current.get('result')
+            if existing and existing['request_sha256'] == request:
+                return existing
+            if existing:
+                raise WorkflowError('Worker handoff retry differs from the recorded request')
+        if run['phase'] == 'completed' or run.get('stop_reason'):
+            raise WorkflowError('Worker handoff requires an open admitted controller')
+        if action == 'assign':
+            result = assign_worker(store, state, payload, ledger, current, request)
+            assignments.append(result)
+        else:
+            if not current or current['generation'] != generation or current['worker_id'] != actor:
+                raise WorkflowError('Worker result does not match the current assignment generation and identity')
+            result = record_worker(store, state, payload, current, request)
+            current['result'] = result
+        store.commit({relative: dump(ledger)})
+        return result
+
+
+def retired_worker_scope(store, state, assignment, head):
+    run = state['active_run']
+    task_id = assignment['task_id']
+    outcome_id = run.get('completion_refs', {}).get(task_id)
+    if (not assignment.get('result') or task_id not in run.get('completed_ids', []) or not outcome_id
+            or state['task_progress'].get(task_id, {}).get('revalidation')):
+        return False
+    outcomes = [row for row in store.outcomes() if (row.get('id'), row.get('task_id'), row.get('run_id'), row.get('disposition'))
+                == (outcome_id, task_id, run['id'], 'completed')]
+    if len(outcomes) != 1:
+        return False
+    body = completed_task_body(store, outcomes[0])
+    commit = (outcomes[0].get('task_git_commit') or {}).get('commit', '')
+    return bool(body and digest(body.strip().encode()) == assignment['definition']
+                and re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', commit)
+                and workspaces.local_git(store.source_root, 'merge-base', '--is-ancestor',
+                                         commit, head, accepted=(0, 1, 128)).returncode == 0)
+
+
+def assign_worker(store, state, payload, ledger, current, request):
+    if payload['generation'] != (current['generation'] + 1 if current else 1):
+        raise WorkflowError('Worker assignment requires the next generation for its slot')
+    if not valid_id(payload['task_id'], 'T'):
+        raise WorkflowError('Worker assignment requires the exact Ready task ID')
+    tasks = parse(store.text())
+    task = resolve(tasks, [payload['task_id']], 'Prioritized Next Changes')[0]
+    if task['id'] != payload['task_id'] or task['status'] != 'Ready':
+        raise WorkflowError('Worker assignment requires the exact Ready task ID')
+    assert_scope(store, state, tasks, task['id'])
+    paths = workspaces.worker_paths(payload['paths'])
+    inputs = workspaces.worker_paths(payload['shared_inputs'])
+    touch = [line[2:].strip().strip('`') for line in section_body(task['body'], 'Touch').splitlines()
+             if line.startswith('- ')]
+    if not paths or any(not any(path == scope or path.startswith(scope + '/') for scope in touch) for path in paths):
+        raise WorkflowError('Worker assignment exceeds the task Touch scope')
+    if any(workspaces.local_overlap(path, shared) for path in paths for shared in inputs):
+        raise WorkflowError('Worker writes overlap shared validation inputs')
+    root, checkout = workspaces.worker_checkout(store.source_root, payload['worktree'])
+    base = payload['base']
+    if base != workspaces.worker_head(store.source_root) or base != workspaces.worker_head(root):
+        raise WorkflowError('Worker assignment source base differs from the current coordinator or worker head')
+    workspaces.require_clean_worker(root)
+    for slot, attempts in ledger['slots'].items():
+        if slot == str(payload['slot']) or not attempts:
+            continue
+        other = attempts[-1]
+        if retired_worker_scope(store, state, other, base):
+            continue
+        if other['worker_id'] == payload['worker_id'] or other['checkout'] == checkout:
+            raise WorkflowError('Worker slots require distinct actors and checkouts')
+        for left, right in ((paths, other['paths']), (paths, other['shared_inputs']), (inputs, other['paths'])):
+            if any(workspaces.local_overlap(a.casefold(), b.casefold()) for a in left for b in right):
+                raise WorkflowError('Worker assignment overlaps another write scope or shared validation input')
+    shared = fingerprints(store, inputs)
+    worker = Store(root, route_queue=False)
+    if None in shared.values() or fingerprints(worker, inputs) != shared:
+        raise WorkflowError('Worker shared validation inputs differ from the coordinator')
+    return {'request_sha256': request, 'recorded_at': now(), 'slot': payload['slot'],
+            'generation': payload['generation'], 'worker_id': payload['worker_id'], 'task_id': task['id'],
+            'definition': digest(task['body'].strip().encode()), 'base': base, 'worktree': str(root), 'checkout': checkout,
+            'paths': paths, 'shared_inputs': shared}
+
+
+def record_worker(store, state, payload, assignment, request):
+    tasks = parse(store.text())
+    task = resolve(tasks, [assignment['task_id']], 'Prioritized Next Changes')[0]
+    assert_scope(store, state, tasks, task['id'])
+    if task['status'] != 'Ready' or digest(task['body'].strip().encode()) != assignment['definition']:
+        raise WorkflowError('Worker assignment task contract changed')
+    root, checkout = workspaces.worker_checkout(store.source_root, assignment['worktree'])
+    if checkout != assignment['checkout']:
+        raise WorkflowError('Worker checkout identity changed')
+    worker = Store(root, route_queue=False)
+    shared = assignment['shared_inputs']
+    if fingerprints(store, shared) != shared or fingerprints(worker, shared) != shared:
+        raise WorkflowError('Worker shared validation inputs drifted')
+    checks = payload['checks']
+    if not isinstance(checks, list) or not checks:
+        raise WorkflowError('Worker result requires check artifacts')
+    known = {check['id'] for check in check_specs(task)}
+    evidence = []
+    for outcome in checks:
+        if (not isinstance(outcome, dict) or set(outcome) != {'id', 'result', 'path', 'sha256'}
+                or not isinstance(outcome['id'], str) or not isinstance(outcome['result'], str)
+                or outcome['id'] not in known or outcome['result'] not in {'pass', 'fail', 'unavailable'}
+                or not isinstance(outcome['sha256'], str) or not re.fullmatch('[a-f0-9]{64}', outcome['sha256'])):
+            raise WorkflowError('Worker evidence requires a task check ID, reported result and exact artifact digest')
+        path = workspaces.worker_path(outcome['path'])
+        artifact = root / path
+        if artifact.resolve() != artifact or not artifact.is_file() or file_hash(artifact) != outcome['sha256']:
+            raise WorkflowError('Worker check artifact is missing, aliased or changed')
+        evidence.append(deepcopy(outcome))
+    candidate = workspaces.worker_candidate(root, assignment['base'], payload['head'],
+                                            assignment['paths'], [check['path'] for check in evidence])
+    return {'request_sha256': request, 'recorded_at': now(), 'slot': assignment['slot'],
+            'generation': assignment['generation'], 'worker_id': assignment['worker_id'],
+            'task_id': assignment['task_id'], 'base': assignment['base'], 'candidate': candidate,
+            'checks': evidence, 'shared_inputs': shared}
+
+
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|CURRENT_TARGET_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','worker-handoff','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     parser.add_argument('--standalone',action='store_true',help='Use the canonical queue and selected checkout without attaching to a registered controller.')
     parser.add_argument('--preview',type=Path,help='Retained Force Process Preview JSON')
     parser.add_argument('--receipt',type=Path,help='Original Process Pending receipt JSON')
@@ -5012,6 +5797,8 @@ def main(argv=None):
             result=helper.observe(store,payload) if cmd=='director-dispatch-read' else helper.apply(store,payload)
         elif cmd in LOCAL_DELIVERY_COMMANDS:
             result=local_delivery_action(store,LOCAL_DELIVERY_COMMANDS[cmd],payload)
+        elif cmd in CURRENT_TARGET_COMMANDS:
+            result=current_target_delivery(store,cmd,payload)
         elif cmd in HOOK_COMMANDS:
             store=Store(args.root,allow_unselected=True,neutral=True)
             if args.id:payload['chain_id']=args.id
@@ -5081,6 +5868,7 @@ def main(argv=None):
         elif cmd=='recover-locator':result=workspaces.recover_locator(store,payload)
         elif cmd=='recover-workspace':result=workspaces.recover_workspace(store,payload)
         elif cmd=='resource':result=workspaces.resource(store,payload)
+        elif cmd=='worker-handoff':result=worker_handoff(store,payload)
         elif cmd=='environment':result=workspaces.environment(store,payload)
         elif cmd=='export-run':result=export_run(store)
         elif cmd=='replay-events':result=replay_events(store,payload)

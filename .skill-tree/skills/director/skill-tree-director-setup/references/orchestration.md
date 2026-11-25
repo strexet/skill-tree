@@ -34,6 +34,12 @@ Start pins the current profile and freezes required task/group scope. Resume re-
 
 Advance returns implement or validate. Awaiting-validation units keep the specification and never re-enter implementation. Compatible eligible members of the same declared group can proceed only inside admitted scope; immediate checks and verified consumers force earlier validation. Unrelated initial roots never bypass an unresolved selected root. Finish requires completed required tasks and current acceptance; no pending or failed check can disappear into a terminal outcome.
 
+### Retain worker evidence across tasks
+
+Worker assignment reserves write paths and shared validation inputs within the admitted controller. When the same controller completes the worker's task, a matching completion outcome, applied event and accepted commit in the current coordinator history retire that attempt's scope. The handoff receipt stays available for audit. A missing completion proof, pending revalidation or unavailable commit keeps the scope reserved.
+
+An opted-in Director pilot can supervise a bounded pair of scoped product workers before Core reviews the assembled changes and records the task outcome. Director verifies the exact Core outcome. The checked local merge records the actual target commit separately.
+
 ## Publication handoff
 
 Finish preserves implementation acceptance independently of delivery. Offer local result, PR review/fix, or PR review/fix with an explicit merge target. No offer starts publication. A recorded full-path owner instruction continues through the bundled [PR review cycle](pr-review-cycle.md) without repeated authorization questions. PR readiness, merge confirmation and publication blockers remain separate persisted outcomes.
