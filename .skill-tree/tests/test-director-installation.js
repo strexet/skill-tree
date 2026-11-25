@@ -157,6 +157,65 @@ test('Director lists the exact closure, dry-run is byte-neutral, and the owned p
   assert.equal(fs.existsSync(path.join(project, '.skill-tree/director')), false);
 });
 
+test('dedicated launcher guides fresh implementation and upgrades owned prior text', t => {
+  const {project} = fixture(t);
+  const instructions = 'AGENTS.md';
+  const launcher = AGENTS + '/skill-tree-director/SKILL.md';
+  const hooks = '.claude/settings.json';
+  const prefix = 'Owner rules\r\nKeep the local conventions.\n';
+  const suffix = '\nOwner notes after routing.\n';
+  write(project, instructions, prefix);
+  fs.chmodSync(path.join(project, instructions), 0o664);
+  write(project, hooks, '{"hooks":{"PreToolUse":[]}}\n');
+  const install = (...extra) => {
+    const previousUmask = process.umask(0o022);
+    try {
+      return spawn(process.execPath, [CLI, '--target', project, '--only', 'codex', '--flavor', 'director', ...extra]);
+    } finally {
+      process.umask(previousUmask);
+    }
+  };
+  pass(cli(project, 'general'));
+  const coreProfile = read(project, PROFILE);
+  assert.deepEqual(JSON.parse(coreProfile).bridges, {});
+  pass(install());
+  const guided = read(project, launcher).toString('utf8');
+  assert.match(guided, /Full Cycle.*skill-tree-full-cycle.*before creating a branch or editing product files/,
+    'The fresh Director launcher must route implementation through Full Cycle before product writes');
+  assert.match(guided, /exact task and isolated worktree/);
+  assert.match(guided, /publication and merge authorization/);
+  const bridge = read(project, instructions).toString('utf8') + suffix;
+  assert.ok(bridge.startsWith(prefix));
+  assert.match(bridge, /skill-tree-full-cycle/);
+
+  const withoutGuidance = text => text.split('\n').filter(line =>
+    !line.startsWith('For fresh managed implementation, preview Full Cycle')
+    && !line.startsWith('For queue-only intake, use')
+    && !line.startsWith('Begin scoped source edits after Core')).join('\n');
+  const oldLauncher = withoutGuidance(guided);
+  const oldBridge = withoutGuidance(bridge);
+  write(project, launcher, oldLauncher);
+  write(project, instructions, oldBridge);
+  pass(install('--dry-run'));
+  assert.equal(read(project, instructions).toString('utf8'), oldBridge);
+  assert.equal(read(project, launcher).toString('utf8'), oldLauncher);
+  pass(install());
+  assert.equal(read(project, instructions).toString('utf8'), bridge);
+  assert.equal(read(project, launcher).toString('utf8'), guided);
+  assert.equal(fs.statSync(path.join(project, instructions)).mode & 0o777, 0o664);
+  assert.equal(read(project, hooks).toString('utf8'), '{"hooks":{"PreToolUse":[]}}\n');
+  assert.deepEqual(read(project, PROFILE), coreProfile);
+  pass(install('--verify'));
+
+  const editedBridge = bridge.replace('use the Skill Tree Director first.', 'use the owner-edited routing block.');
+  assert.notEqual(editedBridge, bridge);
+  write(project, instructions, editedBridge);
+  const blocked = install();
+  assert.notEqual(blocked.status, 0);
+  assert.match(blocked.stdout + blocked.stderr, /Director routing instructions conflict/);
+  assert.equal(read(project, instructions).toString('utf8'), editedBridge);
+});
+
 test('an owned upgrade preserves plugin bytes, queue and the stopped schema-3 run', async t => {
   const { directory, project } = fixture(t);
   git(project, 'init', '-b', 'develop');

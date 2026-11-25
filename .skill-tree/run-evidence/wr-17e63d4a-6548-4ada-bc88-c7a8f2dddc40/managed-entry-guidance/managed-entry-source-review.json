@@ -1,0 +1,23 @@
+{
+  "source_head": "780bc6bf683c2837dbd2629fd2696bfd094d2d5f",
+  "source_diff_sha256": "918db699826de56a7919338683d64193131cb9a3ec41df91ea7f21a50941c879",
+  "independent_reviewer": "/root/director_critic",
+  "reviewed_paths": [
+    ".skill-tree/lib/director-workspace.js",
+    ".skill-tree/lib/director-routing-bridge.js",
+    ".skill-tree/documents/director-workflow.md",
+    ".skill-tree/tests/test-director-installation.js",
+    ".skill-tree/tests/test-director-project-setup.js",
+    ".skill-tree/skill-tree.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "review_evidence": "Observed independent source review approving exact Full Cycle route guidance, owned launcher generations, byte-preserving bridge replacement and file mode preservation. The existing legacy workspace migration suite passed one installed fixture.",
+  "verified_behaviors": [
+    "Fresh managed implementation uses the exact installed Full Cycle preview and remains subject to separate publication authority. Owned legacy guidance upgrades preserve surrounding bytes, permission mode, hooks and product opt-out."
+  ],
+  "required_evidence": {
+    "generated-guidance": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/managed-entry-guidance/generated-guidance-result-c-fc62a8cd-1b09-43ea-ad44-8e93936deb90.json",
+    "actual-project-route": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/managed-entry-guidance/actual-project-route-result-c-097311ce-abe0-4e7e-acf3-12fef42fde21.json"
+  }
+}

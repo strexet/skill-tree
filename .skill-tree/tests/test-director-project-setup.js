@@ -128,6 +128,14 @@ test('installed Setup registers existing, default and custom projects with selec
         }
       }
       assert.equal(invoke('project-route',{operation:'unregistered-operation'}).status, 'unsupported');
+      const beforeFullCycle = fs.readFileSync(path.join(root,'.skill-tree/documents/future.md'));
+      const fullCycle = invoke('project-route',{operation:'skill-tree-full-cycle',project_id:'site'});
+      assert.equal(fullCycle.status, 'preview');
+      assert.equal(fullCycle.execution, 'project-skill');
+      assert.equal(fullCycle.child_skill, path.join(root,'.agents/skills/skill-tree-full-cycle/SKILL.md'));
+      assert.deepEqual(fs.readFileSync(path.join(root,'.skill-tree/documents/future.md')), beforeFullCycle);
+      assert.equal(git(root,'rev-parse','HEAD'),head);
+      assert.equal(invoke('project-route',{operation:'intake',project_id:'site'}).project.id, 'site');
       assert.equal(invoke('project-route',{operation:'project-read'}).project.id, 'site');
       assert.equal(invoke('project-route',{operation:'registration'}).command, 'project-preview');
       const skillReceipt = path.join(root,'.skill-tree/installation/profile.json');

@@ -6,7 +6,12 @@ const composer = require("./composer.js");
 
 const BEGIN = "<!-- BEGIN skill-tree-director-routing -->";
 const END = "<!-- END skill-tree-director-routing -->";
-const block = [
+const workflowGuidance = [
+  'For fresh managed implementation, preview Full Cycle through `project-route` with `"operation": "skill-tree-full-cycle"` before creating a branch or editing product files.',
+  "For queue-only intake, use `intake`. For inspection, use `project-read`. For existing prioritized work, route the exact task or approved group through the requested implementation operation.",
+  "Begin scoped source edits after Core admits the exact task and isolated worktree. Follow the owner's separate publication and merge authorization."
+];
+const previousBlock = [
   BEGIN,
   "For requests about a project in this workspace, use the Skill Tree Director first.",
   "Read `.skill-tree/.director/workspace.json` and invoke the installed Setup entry named in `setup_entry`. Run `project-route` before opening a product queue, reading project files, or choosing a child skill. Use `project-menu` to discover projects and available setup actions.",
@@ -19,22 +24,21 @@ const block = [
   "Use direct Core only when the owner explicitly requests it. Pass `route: \"direct\"` to preview that choice and use `--direct-project` for direct queue writes. The route preview grants no effect permissions.",
   END
 ].join("\n");
+const block = previousBlock.slice(0, -END.length) + workflowGuidance.join("\n") + "\n" + END;
 
 function blockBounds(bytes) {
-  const content = bytes.toString("utf8");
-  const start = content.indexOf(BEGIN);
-  const end = content.indexOf(END);
+  const start = bytes.indexOf(BEGIN);
+  const end = bytes.indexOf(END);
   if (start < 0 && end < 0) return null;
-  if (start < 0 || end < start || content.indexOf(BEGIN, start + BEGIN.length) >= 0 ||
-      content.indexOf(END, end + END.length) >= 0 || content.slice(start, end + END.length) !== block) {
+  const limit = end + Buffer.byteLength(END);
+  const ownedBlock = bytes.subarray(start, limit).toString("utf8");
+  if (start < 0 || end < start || bytes.indexOf(BEGIN, start + Buffer.byteLength(BEGIN)) >= 0 ||
+      bytes.indexOf(END, limit) >= 0 || ![block, previousBlock].includes(ownedBlock)) {
     throw Error("Director routing instructions conflict with the installed block");
   }
-  const suffix = end + END.length;
-  const offset = Buffer.byteLength(content.slice(0, start));
-  const limit = Buffer.byteLength(content.slice(0, suffix));
-  const head = bytes.subarray(Math.max(0, offset - 2), offset).equals(Buffer.from("\n\n")) ? offset - 2 : offset;
+  const head = bytes.subarray(Math.max(0, start - 2), start).equals(Buffer.from("\n\n")) ? start - 2 : start;
   const tail = bytes[limit] === 10 ? limit + 1 : limit;
-  return {head, tail, hadFile: head !== offset};
+  return {start, limit, head, tail, hadFile: head !== start, previous: ownedBlock === previousBlock};
 }
 
 function read(file) {
@@ -63,6 +67,12 @@ function plan(workspace, previous, selected, {verify = false} = {}) {
         const separator = before === null ? "" : "\n\n";
         const content = Buffer.concat([before || Buffer.alloc(0), Buffer.from(separator + block + "\n")]);
         changes.push({file, before, content});
+      } else if (existing.previous) {
+        if (verify) throw Error("Director routing instructions need a workspace update: " + relative);
+        const content = Buffer.concat([
+          before.subarray(0, existing.start), Buffer.from(block), before.subarray(existing.limit)
+        ]);
+        changes.push({file, before, content});
       }
     } else if (existing) {
       const content = Buffer.concat([before.subarray(0, existing.head), before.subarray(existing.tail)]);
@@ -90,7 +100,9 @@ function apply(changes) {
     const stage = fs.mkdtempSync(path.join(path.dirname(file), ".director-routing-"));
     try {
       const staged = path.join(stage, "instructions");
-      fs.writeFileSync(staged, content, {mode:fs.statSync(file).mode & 0o777});
+      const mode = fs.statSync(file).mode & 0o7777;
+      fs.writeFileSync(staged, content, {mode});
+      fs.chmodSync(staged, mode);
       if (!read(file)?.equals(before)) throw Error("Director routing instructions changed during setup: " + file);
       fs.renameSync(staged, file);
     } finally {
@@ -99,4 +111,4 @@ function apply(changes) {
   }
 }
 
-module.exports = {plan, apply};
+module.exports = {plan, apply, workflowGuidance};

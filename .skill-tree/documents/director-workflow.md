@@ -79,6 +79,8 @@ For a standalone checkout, run `python3 .skill-tree/common/scripts/context-searc
 
 ## Effects and decisions
 
+For fresh managed implementation, preview the Full Cycle project route with the exact `skill-tree-full-cycle` operation before creating a branch or changing product files. Show the selected project, canonical queue and proposed scope. Use `project-read` for inspection, `intake` for queue-only capture and the requested exact implementation operation for existing prioritized work. Begin source edits in the isolated worktree after Core admits the selected task. Follow separate owner authorization for publication and merge.
+
 Owner design approval accepts a plan revision. Execution selection authorizes specific child effects on that revision. Delivery retains independent authority. Read-only status, plan preview and audit supply no task execution. A current confirmed plan can authorize exact child intake, processing and launch when current profiles, IDs, scope, dependencies and resource claims match. Installation, commit, publication, scheduling and wider rollout require applicable authority. Standalone Process Pending preserves the normal next-action handoff. Child controllers preserve original admission and claims.
 
 Before a child mutation, Director records intent with stable Director, assignment, operation and destination identities, a semantic payload digest and current-state guards. The child effect and receipt share the child transaction. Identical replay recovers original P, T or WR identity. A different payload under the same key conflicts. A lost response requires exact reconciliation, including Git workspace creation when applicable. Incomplete provenance holds the ambiguous effect for review.
