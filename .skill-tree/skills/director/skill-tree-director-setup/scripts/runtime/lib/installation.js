@@ -554,6 +554,89 @@ function uninstall(root,selections,options={}){
 }
 function refresh(root,source,dryRun=false){const p=receipt(root,true);return install(root,source,p.flavor,Object.entries(p.destinations).map(([rel,d])=>({rel,provider:d.provider,name:d.name})),{dryRun,bridges:Object.keys(p.bridges||{}),recoverPluginPending:false});}
 
+function initialWorktreeProfile(root, request, mode) {
+ if (!['install','verify','replay'].includes(mode) || typeof request.worktree !== 'string' || !path.isAbsolute(request.worktree)) {
+  throw Error('Select the exact run worktree profile action');
+ }
+ const target = fs.realpathSync(request.worktree);
+ const source = c.safe(root,INSTALL+'/source');
+ const {execFileSync} = require('node:child_process');
+ const git = (checkout,...args) => execFileSync('git',
+  ['--no-replace-objects','--no-optional-locks','-C',checkout,'-c','core.fsmonitor=false',...args],
+  {encoding:'utf8',stdio:['ignore','pipe','ignore'],timeout:5000}).trim();
+ const same = (left,right) => c.json(left) === c.json(right);
+ function verifyReservation() {
+  const state = c.read(root,WORKFLOW);
+  if (state === null || c.hash(state) !== request.state_sha256 || target !== request.worktree || target === root) {
+   throw Error('The original profile handoff or exact checkout changed');
+  }
+  const registry = JSON.parse(state).run_registry;
+  const run = registry?.runs?.[request.run_id];
+  const hold = run?.initial_profile;
+  const expectedStatus = mode === 'replay' ? 'admitted' : 'pending';
+  if (registry?.queue_id !== request.queue_id || run?.workspace_state !== 'ready' || hold?.status !== expectedStatus ||
+      (mode !== 'replay' && (run.phase !== 'refresh-profile' || run.stop_reason !== 'Initial worktree profile requires verified admission')) ||
+      hold.worktree_path_sha256 !== c.hash(target) ||
+      !same(Object.keys(registry.claims).filter(id=>registry.claims[id]===run.id).sort(),hold.claimed_task_ids)) {
+   throw Error('The reserved run, initial profile hold or original claims changed');
+  }
+  const common = path.resolve(root,git(root,'rev-parse','--git-common-dir'));
+  const locator = fs.readFileSync(path.join(common,'skill-tree-runtime.json'));
+  const local = JSON.parse(locator);
+  const registration = git(target,'rev-parse','--absolute-git-dir');
+  if (c.hash(locator) !== request.locator_sha256 || local.queue_id !== request.queue_id ||
+      local.canonical_root !== root || local.worktrees?.[run.id] !== target ||
+      git(target,'rev-parse','--show-toplevel') !== target ||
+      registration !== path.join(common,'worktrees',request.registration) ||
+      git(target,'symbolic-ref','--short','HEAD') !== run.workspace.branch ||
+      git(target,'rev-parse','--verify','HEAD') !== run.workspace.base_commit ||
+      !same(run.workspace.cleanup_owner??null,request.owner)) {
+   throw Error('The checkout or Git registration no longer matches the exact recorded worktree');
+  }
+  if (request.owner) {
+   const owner = c.readJson(registration,'skill-tree-owner.json');
+   if (!same(owner,request.owner)) throw Error('Restore the original worktree ownership record');
+  }
+  const profile = c.read(root,PROFILE);
+  if (profile === null || c.hash(profile) !== hold.source_profile_sha256 || c.hash(profile) !== request.source_profile_sha256) {
+   throw Error('Restore the original verified canonical profile before worktree setup');
+  }
+  const verified = verify(root,source);
+  if (mode !== 'replay' && (verified.identity !== run.admission.identity || verified.flavor !== run.admission.flavor)) {
+   throw Error('The canonical installation differs from the original run admission');
+  }
+  return verified;
+ }
+ const original = verifyReservation();
+ const scope = profile => Object.fromEntries(Object.entries(profile.destinations)
+  .map(([relative,row])=>[relative,{name:row.name,providers:[...owners(row)].sort()}]));
+ const expected = scope(original);
+ const validate = candidate => {
+  if (candidate.flavor !== original.flavor || !same(candidate.bundle_digests,original.bundle_digests) ||
+      !same(scope(candidate),expected)) throw Error('Worktree profile requires the original owned flavor, source generation and provider destinations');
+  if (!same(candidate.plugins,original.plugins)) {
+   throw Error('Restore the original configured plugin generation in the exact worktree through the owned plugin setup path');
+  }
+ };
+ if (mode === 'install' && c.read(target,PROFILE) === null) {
+  const selections = Object.entries(expected).flatMap(([rel,row])=>row.providers.map(provider=>({rel,provider,name:row.name})));
+  install(target,source,original.flavor,selections,{recoverPending:false,recoverPluginPending:false,
+   guardPlan(planned){
+    verifyReservation();
+    validate(planned.profile);
+    if (Object.keys(planned.changes).some(relative=>!relative.startsWith(INSTALL+'/') && !Object.hasOwn(expected,relative))) {
+     throw Error('Initial profile setup cannot change product files, bridges or workflow metadata');
+    }
+   }});
+ }
+ const candidate = verify(target,source);
+ validate(candidate);
+ const response = {profile_sha256:c.hash(c.read(target,PROFILE)),
+  admission:{identity:candidate.identity,environment_id:candidate.environment_id,flavor:candidate.flavor}};
+ verifyReservation();
+ return response;
+}
+
 function packageMetadataAtDelivery(root, request){
  const {execFileSync}=require('node:child_process');
  function git(...args){
@@ -740,4 +823,4 @@ function localMain(root,source,args){
   const result=refresh(root,source,args.includes('--dry-run'));console.log(c.json({action:result.action,changed:result.delta,facts:result.profile.facts,gaps:result.profile.gaps}));return 0;
  }catch(error){console.error(error.message);return 2;}
 }
-module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,readHookRecords,pendingHookOperation,stoppedWorkflow,plan,install,verify,verifyTaskGroupingProfile,uninstall,refresh,maintainDeliveredProfile,rollback,rebind,localMain,updateDevelopmentPolicy};
+module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,readHookRecords,pendingHookOperation,stoppedWorkflow,plan,install,initialWorktreeProfile,verify,verifyTaskGroupingProfile,uninstall,refresh,maintainDeliveredProfile,rollback,rebind,localMain,updateDevelopmentPolicy};

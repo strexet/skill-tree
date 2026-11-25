@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "d04a11d41befc55c6fe58b560db070c658d19c678083380cdd4e6fb30c430721",
+  "identity": "566d460e4ad865d1de16df919060da97a31aba2482d0019d1f33bf651bc1ed99",
   "operation": "skill-tree-repo-documentation",
   "operations": {
     "skill-tree-3d": {
@@ -3301,7 +3301,7 @@
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/project-profile.md": "af84614ccf2aea888e0f3a0fa09264eb282e05c934c79a431d53407e61290fd6",
     "references/repository-discovery-checklist.md": "a112230c076fea515c437e3e7407c575ee6690d772eaa28e68f80c720c7a621c",
-    "references/run-workspaces.md": "af5c2890d7b44a1ec6e08030e4c78a21ebc7c8db10636c72e4b721f3d6876cc3",
+    "references/run-workspaces.md": "1c9fbf5dd2bf86878fa4fee5829be3638373a011f3fcb052ad673fa73da25601",
     "references/ugui-testing.md": "873c236f793ff3c9ece8f0d0346c5c48513e8220406fce216751571c58b79073",
     "references/unity-development.md": "49110c691d4493cd21e8c3ceb682053e3f975016be9879cd10836d9f4feaf371",
     "references/unity-safety.md": "c4a96cdb4bc35a98fcab8ba6bf9c983252cd73d1cefaa439669cedcbed357df0",
@@ -3309,7 +3309,7 @@
     "references/workflow-metadata.md": "27d44025f5cc3c11a81a8d544ce8d15444746527b0452e11591d1ff43e0aa80a",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "dd1b6fb5dfb56b93ad531abf87f4f713b5934156133007bb4014b56ec9f285e5",
-    "scripts/director-dispatch.py": "1b1533bca022ef7f03e24d9becd212f87dac2923de53cae1b3cf7d5a16837d0e",
+    "scripts/director-dispatch.py": "c01d99b3a0ff28fedaa6d0fafbc66b762a28730fb35f5a5a11acc008734307e5",
     "scripts/inspect-unity-repository.py": "794230aca0f338a9d5a6ce7dd62df2016c9d13fb9622174429f9188225fb78e9",
     "scripts/package.json": "8005a3491db7d92f36ac66369861589f9c47123d3a7c71e643fc2c06168cd45a",
     "scripts/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
@@ -3321,12 +3321,12 @@
     "scripts/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
     "scripts/plugin-runtime.js": "62caaa416cb4f375fef45edb71c1cbe3b2f9c0acb734a95e0b9099470cf6c8a5",
     "scripts/plugin-sources.js": "13d853f9e64dec84cf92f4026ac71e4384e186cd96200543e400a852a46e4693",
-    "scripts/run-workspaces.py": "03af423f89940b7b04937b5ff36ead631047f97931b8a4f0082c130e667af13a",
+    "scripts/run-workspaces.py": "c0d142031f3516aa42b415eb9b78b7082bc2051dfba6720b7932ce5a18fc094d",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     "scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
     "scripts/validate-repository-documentation.py": "99a7cf90c80f2e6fa5c2b2641e63de281076ec952b74b20807ade38576f10fb4",
-    "scripts/workflow-state.py": "c7357fd219a912692db28fbc9cbaa6a1fee9fc71b93691ea4dc08a20e65128f1"
+    "scripts/workflow-state.py": "da31f394646e0f1b5358148c8fd956a13565534280401949947e0d971ac7eec6"
   },
   "packages": {},
   "parameter_defaults": {},

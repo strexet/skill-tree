@@ -363,10 +363,10 @@ class DirectorTopologyTests(unittest.TestCase):
         self.director('run-dispatch', start, error='Original Director run reservation is unavailable or changed')
         marker.write_bytes(marker_bytes)
         selector = ('--run-id', external_run)
-        self.core(self.external, 'checkpoint', {'phase': 'refresh-profile', 'stop_reason': 'Prepare owned worktree profile.'}, *selector)
-        self.install(worktree, 'unity', WRITER)
-        self.core(worktree, 'admit', None, *selector)
-        self.core(worktree, 'checkpoint', {'phase': 'implement', 'stop_reason': None}, *selector)
+        handoff = launch['result']['profile_handoff']
+        self.assertEqual(handoff['run_id'], external_run)
+        self.assertEqual(self.director('run-status',key)['assignments']['game-run']['profile_handoff'],handoff)
+        self.assertEqual(json.loads(self.command(*handoff['argv']))['status'],'admitted')
         work = write(worktree, 'game/source.txt', 'Partial work survives the Director hold.\n')
         parent = self.director('run-status', key)
         receipt = parent['assignments']['game-run']['dispatches']['start']['receipt_sha256']
@@ -470,7 +470,10 @@ class DirectorTopologyTests(unittest.TestCase):
         workspace = Path(read_json(common / 'skill-tree-runtime.json')['worktrees'][run_id])
         wf = runpy.run_path(str(SOURCE / 'common/scripts/workflow-state.py'))['main'].__globals__
         store = wf['Store'](workspace, run_id)
-        self.assertEqual(wf['advance'](store)['task_id'], task_id)
+        selection = wf['advance'](store)
+        self.assertEqual(selection['task_id'], task_id)
+        if selection.get('profile_handoff'):
+            self.assertEqual(wf['prepare_worktree_profile'](store)['status'],'admitted')
         wf['begin_task'](store, {'task_id': task_id})
         content = f'Accepted {task_id} in the managed fixture.\n'
         write(workspace, relative, content)
@@ -589,11 +592,18 @@ class DirectorTopologyTests(unittest.TestCase):
             launch = self.director('run-dispatch', dispatch)['result']
             self.assertRegex(launch['id'], r'^WR-')
             self.assertEqual(Path(self.git(coordinator, 'rev-parse', '--show-toplevel').strip()), coordinator)
-            selector = ('--run-id', launch['id'])
-            self.core(root, 'checkpoint', {'phase': 'refresh-profile', 'stop_reason': 'Prepare fixture worktree.'}, *selector)
-            self.install(coordinator, 'unity' if root == self.external else 'director', WRITER)
-            launches[name] = ({'assignment_id': name, 'child_run_id': launch['id'],
-                               'task_id': assignment['child']['task_id']}, coordinator, resources)
+            scope = {'assignment_id':name,'child_run_id':launch['id'],'task_id':assignment['child']['task_id']}
+            handoff = launch['profile_handoff']
+            inspected = self.director('run-status',self.supervised_key)
+            self.assertEqual(inspected['assignments'][name]['profile_handoff'],handoff)
+            if name == 'game':
+                held = self.supervision_request('assign',**scope,role='supervisor',
+                    unit_id='profile-held',generation=1,actor_id='fixture-profile-hold')
+                self.director('run-supervise',held,family='run',error='initial child worktree profile')
+            receipt = read_json(root / '.skill-tree/installation/profile.json')
+            operations = sorted({item['name'] for item in receipt['destinations'].values()})
+            self.install(coordinator, receipt['flavor'], *operations)
+            launches[name] = (scope,coordinator,resources)
         for scope, coordinator, _ in launches.values():
             selector = ('--run-id', scope['child_run_id'])
             self.core(coordinator, 'admit', None, *selector)

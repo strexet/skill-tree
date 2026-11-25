@@ -36,6 +36,161 @@ class RunWorkspaceTests(unittest.TestCase):
     def start(self,tid,**options):
         return wf.start(wf.Store(self.root,allow_unselected=True),'next',tid,workspace=options)
     def location(self,run):return Path(ws.runtime(self.root)['worktrees'][run['id']])
+    def installed_web_profile_fixture(self, interrupt=False, legacy=False):
+        self.call(self.root, 'rm', '.skill-tree/config/repository.json')
+        (self.root/'package.json').write_text('{"name":"web-profile-fixture","type":"module"}\n')
+        (self.root/'.gitignore').write_text('.skill-tree/installation/\n.agents/\n.env.fixture\n')
+        self.call(self.root, 'add', '--', 'package.json', '.gitignore')
+        self.call(self.root, 'commit', '-m', 'Use an ignored project installation')
+        (self.root/'.env.fixture').write_text('FIXTURE_ONLY=unchanged\n')
+        command = ['node', str(CORE/'bin/install.js'), '--target', str(self.root), '--only', 'codex',
+                   '--project', '--flavor', 'web', '--skills', 'skill-tree-work-through-next']
+        if legacy:
+            fallback = self.base/'retained-profile-source'
+            for name in ('common','config','domains','lib','src','templates','tests/fixtures/director'):
+                shutil.copytree(CORE/name,fallback/name)
+            manager = fallback/'lib/installation.js'
+            script = manager.read_text()
+            start = script.index('function initialWorktreeProfile(')
+            end = script.index('function packageMetadataAtDelivery(',start)
+            manager.write_text((script[:start]+script[end:]).replace('install,initialWorktreeProfile,verify','install,verify'))
+            command.extend(('--source',str(fallback)))
+        result = subprocess.run(command, capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+        profile = self.root/'.skill-tree/installation/profile.json'
+        before_profile = profile.read_bytes()
+        self.call(self.root, 'check-ignore', profile.relative_to(self.root))
+        task = self.task('Prepare exact linked profile')
+        branch = self.call(self.root, 'symbolic-ref', '--short', 'HEAD')
+        path = self.base/'profile-target'
+        start = lambda: wf.start(wf.Store(self.root, neutral=True), 'next', task,
+                                 workspace={'implementation_operation':'work-through-next','worktree':str(path)})
+        if legacy:
+            before = self.store.state.read_bytes()
+            with self.assertRaisesRegex(ws.RunError,'Update the verified canonical installation'):
+                start()
+            self.assertEqual(self.store.state.read_bytes(),before)
+            self.assertEqual(ws.runtime(self.root)['worktrees'],{})
+            self.assertFalse(path.exists())
+            self.assertEqual(profile.read_bytes(),before_profile)
+            return
+        if interrupt:
+            actual_git = ws.git
+            def fail_git(root, *args):
+                if args[:2] == ('worktree','add'):
+                    raise ws.RunError('fixture Git creation interrupted')
+                return actual_git(root, *args)
+            with patch.object(ws,'git',side_effect=fail_git):
+                with self.assertRaisesRegex(ws.RunError,'fixture Git creation interrupted'):
+                    start()
+            state = self.store.load()
+            self.assertEqual(len(state['run_registry']['runs']),1)
+            run = state['active_run']
+            self.assertEqual(run['workspace_state'],'reserved')
+            self.assertEqual(run['phase'],'refresh-profile')
+            self.assertEqual(state['run_registry']['claims'],{task:run['id']})
+            selected = wf.Store(self.root,run['id'])
+            with self.assertRaisesRegex(ws.RunError,'original exact worktree'):
+                ws.recover_workspace(selected,{'worktree':str(self.base/'wrong-profile-target'),'resolution':'Fixture checks rejected path.'})
+            ws.recover_workspace(selected,{'resolution':'Recover exact interrupted Git operation.'})
+            handoff = wf.advance(selected)['profile_handoff']
+            run = {**selected.load()['active_run'],'profile_handoff':handoff}
+        else:
+            run = start()
+            handoff = run.get('profile_handoff')
+        self.assertIsNotNone(handoff, 'New Web worktrees with ignored profiles must expose the guarded profile setup handoff')
+        self.assertEqual(handoff['run_id'], run['id'])
+        self.assertEqual(handoff['worktree'], str(path))
+        self.assertEqual(handoff['queue_id'], ws.runtime(self.root)['queue_id'])
+        self.assertIn('prepare-worktree-profile', handoff['argv'])
+        self.assertFalse((path/'.skill-tree/installation/profile.json').exists())
+        return run, task, path, profile, before_profile, branch
+
+    def test_new_web_worktree_reaches_owned_profile_admission(self):
+        run, task, path, canonical_profile, original, canonical_branch = self.installed_web_profile_fixture()
+        selected = wf.Store(path,run['id'])
+        self.assertEqual(selected.load()['active_run']['phase'], 'refresh-profile')
+        with self.assertRaisesRegex(wf.WorkflowError, 'profile|stopped'):
+            wf.begin_task(selected, {'task_id':task})
+        with self.assertRaisesRegex(wf.WorkflowError, 'profile'):
+            wf.checkpoint(selected,{'phase':'implement','stop_reason':None})
+        with self.assertRaisesRegex(wf.WorkflowError, 'profile'):
+            wf.resume_admission(selected)
+        with self.assertRaisesRegex(wf.WorkflowError, 'profile'):
+            wf.focus_maintenance(selected,{'task_id':task,'instruction':'Fixture cannot bypass the initial hold.'})
+        command = run['profile_handoff']['argv']
+        prepared = subprocess.run(command,capture_output=True,text=True,timeout=60)
+        self.assertEqual(prepared.returncode,0,prepared.stdout+prepared.stderr)
+        result = json.loads(prepared.stdout)
+        self.assertEqual(result['run_id'],run['id'])
+        self.assertEqual(result['status'],'admitted')
+        replay = subprocess.run(command,capture_output=True,text=True,timeout=60)
+        self.assertEqual(replay.returncode,0,replay.stdout+replay.stderr)
+        self.assertEqual(json.loads(replay.stdout),result)
+        operation = path/'.agents/skills/skill-tree-work-through-next/SKILL.md'
+        original_skill = operation.read_bytes()
+        try:
+            operation.write_bytes(original_skill+b'\nEdited outside the receipt.\n')
+            with self.assertRaisesRegex(wf.WorkflowError,'Unowned or locally modified'):
+                wf.prepare_worktree_profile(selected)
+        finally:
+            operation.write_bytes(original_skill)
+        state = selected.load()
+        self.assertEqual(state['active_run']['phase'],'implement')
+        self.assertIsNone(state['active_run']['stop_reason'])
+        self.assertEqual(state['run_registry']['claims'],{task:run['id']})
+        self.assertFalse((path/'.env.fixture').exists())
+        self.assertEqual(canonical_profile.read_bytes(),original)
+        self.assertEqual(self.call(self.root,'symbolic-ref','--short','HEAD'),canonical_branch)
+        self.assertEqual(wf.begin_task(selected,{'task_id':task})['phase'],'implement')
+
+    def test_rejected_and_interrupted_profile_setup_keep_the_exact_run(self):
+        run, task, path, canonical_profile, original, canonical_branch = self.installed_web_profile_fixture()
+        store = wf.Store(path,run['id'])
+        unexpected = path/'.agents/skills/skill-tree-work-through-next/owner.txt'
+        unexpected.parent.mkdir(parents=True)
+        unexpected.write_text('Existing owner file.\n')
+        before = self.store.state.read_bytes()
+        try:
+            canonical_profile.write_bytes(original+b'\n')
+            with self.assertRaisesRegex(wf.WorkflowError, 'original canonical profile'):
+                wf.prepare_worktree_profile(store)
+            self.assertEqual(self.store.state.read_bytes(),before)
+        finally:
+            canonical_profile.write_bytes(original)
+        with self.assertRaisesRegex(wf.WorkflowError, 'Unowned|profile|conflict'):
+            wf.prepare_worktree_profile(store)
+        self.assertEqual(self.store.state.read_bytes(),before)
+        self.assertEqual(unexpected.read_text(),'Existing owner file.\n')
+        self.assertEqual(list(ws.runtime(self.root)['worktrees']),[run['id']])
+        unexpected.unlink()
+        unexpected.parent.rmdir()
+        with patch.object(wf,'resume_admission',side_effect=wf.WorkflowError('fixture acknowledgement lost')):
+            with self.assertRaisesRegex(wf.WorkflowError,'fixture acknowledgement lost'):
+                wf.prepare_worktree_profile(store)
+        self.assertTrue((path/'.skill-tree/installation/profile.json').is_file())
+        self.assertEqual(self.store.state.read_bytes(),before)
+        self.assertEqual(wf.prepare_worktree_profile(store)['status'],'admitted')
+        state=store.load()
+        self.assertEqual(state['run_registry']['claims'],{task:run['id']})
+        self.assertEqual(list(ws.runtime(self.root)['worktrees']),[run['id']])
+        self.assertEqual(state['active_run']['workspace']['cleanup_owner'],run['workspace']['cleanup_owner'])
+        self.assertEqual(canonical_profile.read_bytes(),original)
+        self.assertEqual(self.call(self.root,'symbolic-ref','--short','HEAD'),canonical_branch)
+
+    def test_legacy_installer_update_is_required_before_reservation(self):
+        self.installed_web_profile_fixture(legacy=True)
+
+    def test_initial_profile_handoff_survives_git_reservation_recovery(self):
+        run, task, path, canonical_profile, original, canonical_branch = self.installed_web_profile_fixture(interrupt=True)
+        selected = wf.Store(path, run['id'])
+        self.assertEqual(wf.prepare_worktree_profile(selected)['status'],'admitted')
+        state = selected.load()
+        self.assertEqual(state['run_registry']['claims'],{task:run['id']})
+        self.assertEqual(list(ws.runtime(self.root)['worktrees']),[run['id']])
+        self.assertEqual(canonical_profile.read_bytes(),original)
+        self.assertEqual(self.call(self.root,'symbolic-ref','--short','HEAD'),canonical_branch)
+
     def test_two_worker_handoffs_preserve_scope_evidence_and_controller_state(self):
         (self.root/'second.py').write_text('value = 1\n')
         (self.root/'shared.txt').write_text('shared input\n')

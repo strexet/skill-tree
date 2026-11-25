@@ -540,6 +540,17 @@ def validate_run(run):
     if not isinstance(run['phase'],str) or (run['stop_reason'] is not None and not isinstance(run['stop_reason'],str)):raise WorkflowError('Corrupt checkpoint phase/reason')
     for key in ['partial_work','history_refs']:
         if key in run and (not isinstance(run[key],list) or any(not isinstance(v,str) for v in run[key])):raise WorkflowError('Corrupt checkpoint references')
+    if 'initial_profile' in run:
+        initial = run['initial_profile']
+        if (not isinstance(initial,dict) or initial.get('status') not in {'pending','admitted'}
+                or any(not isinstance(initial.get(key),str) or not re.fullmatch('[a-f0-9]{64}',initial[key])
+                       for key in ('source_profile_sha256','worktree_path_sha256'))
+                or not isinstance(initial.get('claimed_task_ids'),list)
+                or any(not valid_id(tid,'T') or tid not in run['admitted_task_ids'] for tid in initial['claimed_task_ids'])):
+            raise WorkflowError('Corrupt initial worktree profile reservation')
+        if initial['status']=='admitted' and (not isinstance(initial.get('profile_sha256'),str)
+                or not re.fullmatch('[a-f0-9]{64}',initial['profile_sha256'])):
+            raise WorkflowError('Corrupt initial worktree profile receipt')
     focus=run.get('maintenance')
     if focus is not None:
         if not isinstance(focus,dict) or not valid_id(focus.get('id'),'MF') or not run.get('stop_reason') or focus.get('execution_restriction')!='static-unit-only' or not focus.get('instruction') or not isinstance(focus.get('admission'),dict):raise WorkflowError('Corrupt maintenance scope')
@@ -1159,6 +1170,7 @@ def start(store,mode,selector=None,limits=None,workspace=None,*,reviewed_directe
             conflicts={tid:registry['claims'][tid] for tid in run['admitted_task_ids'] if tid not in done and tid in registry['claims']}
             if conflicts:raise WorkflowError('Required task claims conflict: '+dump(conflicts))
             path=workspaces.provision(store,run,options)
+            workspaces.reserve_initial_profile(store,run,path,done)
             if dispatch:
                 run['dispatch_workspace_sha256']=digest(str(path).encode())
                 run['workspace']['dispatch_owner_token']=str(uuid.uuid4())
@@ -1168,7 +1180,8 @@ def start(store,mode,selector=None,limits=None,workspace=None,*,reviewed_directe
         if registry:
             # A failed Git operation leaves the reserved run and claims for explicit recovery.
             workspaces.create_reserved(store,run,path);store.save(text,state)
-        return run
+        handoff = initial_profile_handoff(store,run)
+        return {**run,'profile_handoff':handoff} if handoff else run
 
 def enforce_limits(run):
     if run.get('stop_reason'):raise WorkflowError('Run stopped: '+str(run['stop_reason'])+'; resolve the recorded condition before explicit checkpoint resumption')
@@ -1180,10 +1193,14 @@ def execution_run(run):
 
 def focus_maintenance(store,payload):
     """Bound explicitly requested non-product work while preserving a stopped controller."""
+    if workspaces.initial_profile_pending(store.load()['active_run']):
+        raise WorkflowError('Complete the initial worktree profile before maintenance focus')
     admission=admit_profile(store)
     if not payload.get('instruction'):raise WorkflowError('Maintenance focus requires the explicit owner instruction')
     with store.lock():
         text=store.text();state=store.load(text);run=state['active_run'];tasks=parse(text)
+        if workspaces.initial_profile_pending(run):
+            raise WorkflowError('Complete the initial worktree profile before maintenance focus')
         if not run or not run.get('stop_reason'):raise WorkflowError('Maintenance focus requires a preserved stopped controller')
         if run.get('maintenance'):raise WorkflowError('Resume the existing maintenance focus')
         selected=resolve(tasks,[payload['task_id']],'Prioritized Next Changes')[0]
@@ -1198,6 +1215,13 @@ def focus_maintenance(store,payload):
 def next_task(store):
     state=store.load();run=state['active_run']
     if not run:raise WorkflowError('No active run')
+    if workspaces.initial_profile_pending(run):
+        handoff = initial_profile_handoff(store,run)
+        if handoff is None:
+            raise WorkflowError('Recover the original reserved Git worktree before initial profile setup')
+        workspaces.initial_profile_context(store,state,store.source_root)
+        return {'phase':'refresh-profile','root_task_id':run['root_task_id'],'task_id':run['current_task_id'],
+                'profile_handoff':handoff}
     workspaces.ensure_workspace(store,run)
     enforce_limits(execution_run(run));assert_admission(store,state)
     if run.get('maintenance'):
@@ -1279,7 +1303,9 @@ def advance(store):
         result=next_task(store);text=store.text();state=store.load(text);run=state['active_run']
         run=execution_run(run)
         run['admitted_groups']=admitted_groups(parse(text),run)
-        run['phase']=result['phase'];run['current_task_id']=result.get('task_id');run['root_task_id']=result.get('root_task_id',run['root_task_id']);run['next_action']=result['phase']
+        run['phase']=result['phase'];run['current_task_id']=result.get('task_id');run['root_task_id']=result.get('root_task_id',run['root_task_id'])
+        if not result.get('profile_handoff'):
+            run['next_action']=result['phase']
         if result.get('task_id') and result['task_id'] not in run['required_ids']:run['required_ids'].append(result['task_id'])
         if result.get('completed_contract') and 'source_review' not in result:
             tid=result['task_id'];entry=state['task_progress'].get(tid)
@@ -1293,6 +1319,9 @@ def checkpoint(store,payload):
     with store.lock():
         text=store.text();state=store.load(text);run=state['active_run']
         if not run:raise WorkflowError('No active run')
+        if workspaces.initial_profile_pending(run) and any(
+                key in payload and payload[key]!=run.get(key) for key in ('phase','stop_reason')):
+            raise WorkflowError('Complete the verified initial worktree profile before changing the checkpoint phase or stop')
         if run.get('director_question_hold') and any(key in payload and payload[key]!=run.get(key) for key in ('phase','stop_reason','next_action')):
             raise WorkflowError('A Director question holds this checkpoint; use the exact Director answer handoff')
         consumed=payload.get('validation_consumed',{})
@@ -3002,12 +3031,115 @@ def admit_profile(store):
     value=json.loads(path.read_text())
     return {'identity':value['identity'],'environment_id':value['environment_id'],'flavor':value['flavor']}
 
-def resume_admission(store):
-    store.load()
+def initial_profile_handoff(store, run):
+    if not workspaces.initial_profile_pending(run) or run.get('workspace_state') != 'ready':
+        return None
+    locator = workspaces.runtime(store.root)
+    path = locator['worktrees'][run['id']]
+    return {'run_id': run['id'], 'queue_id': locator['queue_id'], 'worktree': path,
+            'argv': [sys.executable, '-B', str(Path(__file__).resolve()), 'prepare-worktree-profile', path, '--run-id', run['id']]}
+
+
+def initial_profile_installer(store, request, mode):
+    """Use canonical installer code for both install and read-only receipt checks."""
+    path = binding_path(store.root, workspaces.PROFILE_FILE)
+    raw = path.read_bytes()
+    if digest(raw) != request['source_profile_sha256']:
+        raise WorkflowError('Restore the original canonical profile generation before worktree setup')
+    owned = json.loads(raw)['bundle_digests']
+    module_relative = '.skill-tree/installation/source/lib/installation.js'
+    if module_relative not in owned or any(
+            not rel.startswith('.skill-tree/installation/') or file_hash(binding_path(store.root, rel)) != checksum
+            for rel,checksum in owned.items()):
+        raise WorkflowError('Repair the verified canonical profile bundle before worktree setup')
+    module = binding_path(store.root, module_relative)
+    program = r"""const fs = require('node:fs');
+const manager = require(process.argv[1]);
+try {
+  const request = JSON.parse(fs.readFileSync(0, 'utf8'));
+  const result = manager.initialWorktreeProfile(process.argv[2], request, process.argv[3]);
+  process.stdout.write(JSON.stringify(result));
+} catch (error) {
+  process.stderr.write(error.message);
+  process.exitCode = 2;
+}
+"""
+    environment = workspaces.local_git_environment()
+    for name in ('NODE_OPTIONS', 'NODE_PATH'):
+        environment.pop(name, None)
+    try:
+        process = subprocess.run(['node', '-e', program, str(module), str(store.root), mode],
+                                 input=dump(request), capture_output=True, text=True, timeout=40,
+                                 env=environment)
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise WorkflowError('Initial profile setup did not finish. Inspect the retained installation journal before retrying the same run') from error
+    if process.returncode:
+        raise WorkflowError(process.stderr.strip() or 'The verified canonical installer could not complete the worktree profile handoff')
+    return json.loads(process.stdout)
+
+
+def recorded_initial_admission(store, state, caller, expected=None):
+    run = state['active_run']
+    request = workspaces.initial_profile_context(store,state,caller,replay=True)
+    receipt = initial_profile_installer(store,request,'replay')
+    original = {'admission':run['admission'],'profile_sha256':run['initial_profile']['profile_sha256']}
+    if receipt != original or (expected is not None and receipt != expected):
+        raise WorkflowError('The recorded initial admission does not match the installed receipt')
+    return receipt['admission']
+
+
+def prepare_worktree_profile(store):
+    caller = store.source_root
+    state = store.load()
+    run = state['active_run']
+    if run and run.get('initial_profile',{}).get('status') == 'admitted':
+        admitted = recorded_initial_admission(store,state,caller)
+    else:
+        request = workspaces.initial_profile_context(store,state,caller)
+        installed = initial_profile_installer(store,request,'install')
+        admitted = resume_admission(store,expected_initial=installed)
+    return {'status':'admitted','run_id':run['id'],'worktree':str(store.source_root),'admission':admitted}
+
+
+def finalize_initial_profile(store, caller, expected):
+    with store.lock():
+        text = store.text()
+        state = store.load(text)
+        run = state['active_run']
+        if run and run.get('initial_profile',{}).get('status')=='admitted':
+            return recorded_initial_admission(store,state,caller,expected)
+        request = workspaces.initial_profile_context(store, state, caller)
+        receipt = initial_profile_installer(store, request, 'verify')
+        if expected is not None and receipt != expected:
+            raise WorkflowError('The verified worktree profile differs from the just-installed receipt')
+        if file_hash(store.state) != request['state_sha256']:
+            raise WorkflowError('The original profile handoff changed during final admission')
+        admitted = receipt['admission']
+        run['admission'] = admitted
+        run['initial_profile'].update(status='admitted', profile_sha256=receipt['profile_sha256'])
+        run.update(phase='implement', stop_reason=None, next_action='Implement selected task')
+        store.save(text,state)
+        return admitted
+
+
+def resume_admission(store, *, expected_initial=None):
+    caller = store.source_root
+    state = store.load()
+    if workspaces.initial_profile_pending(state['active_run']):
+        return finalize_initial_profile(store,caller,expected_initial)
+    if expected_initial is not None:
+        run = state['active_run']
+        if run and run.get('initial_profile',{}).get('status')=='admitted':
+            return recorded_initial_admission(store,state,caller,expected_initial)
+        raise WorkflowError('The original initial worktree profile handoff is no longer pending')
+    selected = (state['active_run'] or {}).get('id')
     admitted=admit_profile(store)
     with store.lock():
         text=store.text();state=store.load(text);run=state['active_run']
-        if not run:raise WorkflowError('No active run')
+        if not run or run['id'] != selected:
+            raise WorkflowError('Select the exact original active run before admission')
+        if workspaces.initial_profile_pending(run):
+            raise WorkflowError('Complete the verified initial worktree profile before ordinary admission')
         target=execution_run(run);target['admission']=admitted
         if target is run and run.pop('profile_refresh_required',False) and run['stop_reason']=='Installation profile changed; re-admit before continuation':run['stop_reason']=None
         store.save(text,state);return admitted
@@ -3394,6 +3526,8 @@ def get_check(store,state,payload):
     return task,matches[0]
 
 def assert_admission(store,state,tid=None):
+    if workspaces.initial_profile_pending(state.get('active_run')):
+        raise WorkflowError('Complete the verified initial worktree profile before implementation')
     profile_path=store.source_root/'.skill-tree/installation/profile.json'
     if not profile_path.is_file():
         local=store.source_root/'.skill-tree/config/repository.json'
@@ -3908,9 +4042,13 @@ def guard_reused_review_checks(store,frame):
 
 def resume_task(store,payload):
     if not isinstance(payload.get('resolution'),str) or not payload['resolution'].strip():raise WorkflowError('Explicit resumption requires the resolved condition and evidence')
-    store.load();admitted=admit_profile(store)
+    if workspaces.initial_profile_pending(store.load()['active_run']):
+        raise WorkflowError('Complete the verified initial worktree profile before resuming a task')
+    admitted=admit_profile(store)
     with store.lock():
         text=store.text();state=store.load(text);entry=state['task_progress'].get(payload['task_id'])
+        if workspaces.initial_profile_pending(state['active_run']):
+            raise WorkflowError('Complete the verified initial worktree profile before resuming a task')
         if not entry or entry['stage']!='blocked':raise WorkflowError('No blocked task progress to resume')
         run=execution_run(state['active_run']) if state['active_run'] else None
         if run and payload['task_id'] not in scope_ids(parse(text),run):raise WorkflowError('Blocked task is outside the active controller scope')
@@ -5763,7 +5901,7 @@ def record_worker(store, state, payload, assignment, request):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|CURRENT_TARGET_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','worker-handoff','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|CURRENT_TARGET_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','prepare-worktree-profile','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','worker-handoff','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     parser.add_argument('--standalone',action='store_true',help='Use the canonical queue and selected checkout without attaching to a registered controller.')
     parser.add_argument('--preview',type=Path,help='Retained Force Process Preview JSON')
     parser.add_argument('--receipt',type=Path,help='Original Process Pending receipt JSON')
@@ -5868,6 +6006,7 @@ def main(argv=None):
         elif cmd=='reconcile-check':result=reconcile_check(store,payload)
         elif cmd=='reuse-check':result=reuse_check(store,payload)
         elif cmd=='admit':result=resume_admission(store)
+        elif cmd=='prepare-worktree-profile':result=prepare_worktree_profile(store)
         elif cmd=='focus-maintenance':result=focus_maintenance(store,payload)
         elif cmd=='resume-task':result=resume_task(store,payload)
         elif cmd=='accept-revalidation':result=accept_revalidation(store,payload)

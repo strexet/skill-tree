@@ -502,7 +502,7 @@ class DirectorRun:
                     state['phase'] = 'completed'
                 _event(state, 'implement-all-frontier', remaining_ids=remaining, gate=gate)
                 sha = self._write(relative, state, current_sha)
-        return {**self._view(state, sha, plan), 'launches': launches}
+        return {**self._profile_setup_view(state, self._view(state, sha, plan), plan), 'launches': launches}
 
     def _defaults(self, source, chosen, assignments):
         D._require(isinstance(source, list), 'Approved defaults require exact source pin references')
@@ -564,10 +564,34 @@ class DirectorRun:
             result['implement_all'] = deepcopy(state['implement_all'])
         return result
 
+    def _profile_setup_view(self, state, view, plan):
+        for spec in plan['assignments']:
+            assignment = view['assignments'].get(spec['id'])
+            if not assignment or assignment.get('completed'):
+                continue
+            start = assignment['dispatches'].get('start', {})
+            if not start.get('result', {}).get('initial_profile_required'):
+                continue
+            try:
+                child = D.WF.Store(self._area_for_run(state, spec), neutral=True)
+                receipt, run = self._supervised_start_receipt(child, self._envelope(state, spec))
+                D._require(receipt and receipt['receipt_sha256'] == start['receipt_sha256'],
+                           'Original directed child start requires reconciliation')
+            except RECOVERABLE_EFFECT_ERRORS as error:
+                assignment['profile_setup_prerequisite'] = str(error)
+                continue
+            if D.WF.workspaces.initial_profile_pending(run):
+                if 'profile_handoff' in run:
+                    assignment['profile_handoff'] = run['profile_handoff']
+                else:
+                    assignment['profile_setup_prerequisite'] = 'Recover the original child Git workspace before profile setup'
+        return view
+
     def status(self, payload):
         D._object(payload, {'director_run_id'})
         _, state, sha = self._load(payload['director_run_id'])
-        return self._view(state, sha, self._plan_for(state))
+        plan = self._plan_for(state)
+        return self._profile_setup_view(state, self._view(state, sha, plan), plan)
 
     def _supervise_now(self):
         return datetime.now(timezone.utc)
@@ -614,6 +638,8 @@ class DirectorRun:
         child = D.WF.Store(root, neutral=True)
         receipt, run = self._supervised_start_receipt(child, self._envelope(state, spec))
         receipt = receipt or {}; run = run or {}
+        D._require(not D.WF.workspaces.initial_profile_pending(run),
+                   'Prepare the exact initial child worktree profile before assigning a worker')
         D._require(receipt.get('receipt_sha256') == start['receipt_sha256'] and run.get('id') == child_run_id
                    and run.get('workspace_state') == 'ready' and run.get('implementation_operation') == 'work-through-next'
                    and run.get('reviewed_local_delivery', {}).get('merge_at_finish') is False
@@ -1211,6 +1237,8 @@ class DirectorRun:
             stage = 'reconcile-child-task'
             result = observed['observed_result']
             result_ids = {key: result[key] for key in ('id', 'created_ids', 'workspace_state') if key in result}
+            if operation == 'start' and D.WF.workspaces.initial_profile_pending(result):
+                result_ids['initial_profile_required'] = True
             if operation in {'intake', 'process'}:
                 created = result['id'] if operation == 'intake' else result['created_ids'][0]
                 current_child = D.WF.Store(child.root, neutral=True)

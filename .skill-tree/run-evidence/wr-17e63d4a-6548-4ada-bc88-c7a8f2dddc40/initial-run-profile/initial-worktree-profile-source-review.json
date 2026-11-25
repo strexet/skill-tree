@@ -1,0 +1,25 @@
+{
+  "source_head": "c21b14d0e1da65c3173981761a4112a045de88c1",
+  "source_diff_sha256": "bf330799cf9d1ef8cb49ca3772af77bce37350dffef9307310540f31c5b76cae",
+  "independent_reviewer": "/root/director_critic",
+  "reviewed_paths": [
+    ".skill-tree/common/scripts/workflow-state.py",
+    ".skill-tree/common/scripts/run-workspaces.py",
+    ".skill-tree/lib/installation.js",
+    ".skill-tree/common/references/run-workspaces.md",
+    ".skill-tree/tests/test-run-workspaces.py",
+    ".skill-tree/common/scripts/director-dispatch.py",
+    ".skill-tree/common/scripts/director-run.py",
+    ".skill-tree/tests/test-director-topologies.py",
+    ".skill-tree/skill-tree.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "review_evidence": "Observed independent source review of the durable reservation hold, installer transaction and canonical admission locks, verified source and target profile receipts, and recovery coverage across Core and Director. The existing installed Node workspace suite passed all five controls. Three targeted managed and supervised Director topology cases and all 12 dispatch receipt tests passed.",
+  "verified_behaviors": [
+    "The exact linked Git worktree receives the verified installed Web profile without a manual package copy. A rejected activation, interrupted Git setup and lost acknowledgements retain the original reservation, claims, canonical profile and project credentials."
+  ],
+  "required_evidence": {
+    "scoped-regression": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/initial-run-profile/scoped-regression-result-c-dfa7df1b-a784-4a6b-ac94-0cdc7ebf56f0.json"
+  }
+}

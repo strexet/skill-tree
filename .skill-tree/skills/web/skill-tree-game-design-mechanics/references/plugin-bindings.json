@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "7e3c2fa18803881bba7289bf3cb99282e7550c88b63c77d4f83c5479c9a91a18",
+  "identity": "6a775813c457c32c2261601ddc0fea5063c67f2a99ced2ac0000fe8231a229a0",
   "operation": "skill-tree-game-design-mechanics",
   "operations": {
     "skill-tree-3d": {
@@ -3305,7 +3305,7 @@
     "references/web-development.md": "cf65aa6fb17e41e1ea660dbc1dfb80b508318bcb719eb1d2ca95ce356161034c",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "dd1b6fb5dfb56b93ad531abf87f4f713b5934156133007bb4014b56ec9f285e5",
-    "scripts/director-dispatch.py": "1b1533bca022ef7f03e24d9becd212f87dac2923de53cae1b3cf7d5a16837d0e",
+    "scripts/director-dispatch.py": "c01d99b3a0ff28fedaa6d0fafbc66b762a28730fb35f5a5a11acc008734307e5",
     "scripts/package.json": "8005a3491db7d92f36ac66369861589f9c47123d3a7c71e643fc2c06168cd45a",
     "scripts/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
     "scripts/plugin-composition.js": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b",
@@ -3316,10 +3316,10 @@
     "scripts/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
     "scripts/plugin-runtime.js": "62caaa416cb4f375fef45edb71c1cbe3b2f9c0acb734a95e0b9099470cf6c8a5",
     "scripts/plugin-sources.js": "13d853f9e64dec84cf92f4026ac71e4384e186cd96200543e400a852a46e4693",
-    "scripts/run-workspaces.py": "03af423f89940b7b04937b5ff36ead631047f97931b8a4f0082c130e667af13a",
+    "scripts/run-workspaces.py": "c0d142031f3516aa42b415eb9b78b7082bc2051dfba6720b7932ce5a18fc094d",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "c7357fd219a912692db28fbc9cbaa6a1fee9fc71b93691ea4dc08a20e65128f1"
+    "scripts/workflow-state.py": "da31f394646e0f1b5358148c8fd956a13565534280401949947e0d971ac7eec6"
   },
   "packages": {},
   "parameter_defaults": {},

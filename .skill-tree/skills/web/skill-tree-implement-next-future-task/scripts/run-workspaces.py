@@ -312,6 +312,74 @@ def provision(store, run, payload):
     run['workspace_state'] = 'reserved'
     return path
 
+INITIAL_PROFILE_STOP = 'Initial worktree profile requires verified admission'
+PROFILE_FILE = '.skill-tree/installation/profile.json'
+
+
+def initial_profile_pending(run):
+    return bool(run and run.get('initial_profile', {}).get('status') == 'pending')
+
+
+def reserve_initial_profile(store, run, path, done):
+    """Bind the setup to the verified canonical generation before writing Git."""
+    if run['admission']['identity'] == 'repository-local':
+        return
+    profile = store.root/PROFILE_FILE
+    if not profile.is_file() or profile.is_symlink():
+        raise RunError('Restore the verified canonical profile before reserving a worktree')
+    content = profile.read_bytes()
+    receipt = json.loads(content)
+    if (receipt.get('identity') != run['admission']['identity']
+            or receipt.get('project_root') != str(store.root)):
+        raise RunError('The canonical profile differs from the admitted source generation')
+    manager_relative = '.skill-tree/installation/source/lib/installation.js'
+    manager = store.root/manager_relative
+    installed = manager.read_bytes() if manager.is_file() and not manager.is_symlink() else b''
+    exports = installed.partition(b'module.exports=')[2]
+    if (not re.search(rb'\binitialWorktreeProfile\b',exports)
+            or hashlib.sha256(installed).hexdigest() != receipt.get('bundle_digests',{}).get(manager_relative)):
+        raise RunError('Update the verified canonical installation from current source before reserving an initial worktree profile')
+    run['initial_profile'] = {
+        'status': 'pending', 'source_profile_sha256': hashlib.sha256(content).hexdigest(),
+        'worktree_path_sha256': hashlib.sha256(str(path).encode()).hexdigest(),
+        'claimed_task_ids': sorted(set(run['admitted_task_ids']) - done),
+    }
+    run.update(phase='refresh-profile', stop_reason=INITIAL_PROFILE_STOP,
+               next_action='Prepare the owned worktree profile with prepare-worktree-profile')
+
+
+def initial_profile_context(store, state, caller, *, replay=False):
+    run = state.get('active_run') or {}
+    expected_status = 'admitted' if replay else 'pending'
+    if run.get('initial_profile',{}).get('status') != expected_status or run.get('workspace_state') != 'ready':
+        raise RunError('Select the retained initial profile and exact registered worktree')
+    if not replay and (run['phase'] != 'refresh-profile' or run.get('stop_reason') != INITIAL_PROFILE_STOP):
+        raise RunError('Restore the original stopped initial-profile handoff before setup')
+    ensure_workspace(store, run)
+    target = store.source_root
+    if caller not in (store.root, target):
+        raise RunError('Select the canonical checkout or the exact reserved worktree for profile setup')
+    if (hashlib.sha256(str(target).encode()).hexdigest() != run['initial_profile']['worktree_path_sha256']
+            or local_git_text(target, 'rev-parse', '--verify', 'HEAD') != run['workspace']['base_commit']):
+        raise RunError('Initial profile setup requires the original exact worktree and Git base')
+    registration = linked_registration(store.root, target)
+    owner = run['workspace'].get('cleanup_owner')
+    if owner:
+        directed_owner(store.root, target, run, state['run_registry']['queue_id'])
+    elif not run.get('workspace_recoveries'):
+        raise RunError('Initial profile setup requires the owned or explicitly recovered linked checkout')
+    claimed = sorted(tid for tid, rid in state['run_registry']['claims'].items() if rid == run['id'])
+    if claimed != run['initial_profile']['claimed_task_ids']:
+        raise RunError('Initial profile setup requires the original reserved task claims')
+    return {
+        'run_id': run['id'], 'queue_id': state['run_registry']['queue_id'], 'worktree': str(target),
+        'locator_sha256': hashlib.sha256(runtime_file(store.root).read_bytes()).hexdigest(),
+        'state_sha256': hashlib.sha256(store.state.read_bytes()).hexdigest(),
+        'registration': registration.name, 'owner': owner,
+        'source_profile_sha256': run['initial_profile']['source_profile_sha256'],
+    }
+
+
 def create_reserved(store, run, path):
     data = runtime(store.root)
     data['worktrees'][run['id']] = str(path); atomic(runtime_file(store.root), data)
@@ -1406,6 +1474,9 @@ def recover_workspace(store,payload):
         requested=payload.get('worktree') or data['worktrees'].get(rid)
         if not requested:raise RunError('Recovery requires the recorded or explicitly relocated worktree path')
         path=Path(requested).resolve()
+        if (initial_profile_pending(run)
+                and hashlib.sha256(str(path).encode()).hexdigest() != run['initial_profile']['worktree_path_sha256']):
+            raise RunError('Initial profile recovery requires the original exact worktree path')
         reserved = run.get('workspace_state') == 'reserved'
         directed = run.get('dispatch_workspace_sha256')
         owned = directed and (reserved or spec.get('dispatch_owner_token') or spec.get('cleanup_owner'))

@@ -135,7 +135,8 @@ def reconcile(store, receipt):
     _require(run is not None and matches_start_workspace(store, run, receipt),
              'Original Director run reservation is unavailable or changed')
     wf.workspaces.inspect_directed_reservation(store, run)
-    return run
+    handoff = wf.initial_profile_handoff(store, run)
+    return {**run, 'profile_handoff': handoff} if handoff else run
 
 
 class ChildDispatch:
