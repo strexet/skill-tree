@@ -1,0 +1,113 @@
+{
+  "artifacts_sha256": {
+    "baseline.json": "c16a5c768056cf405d0e204c0023a337dbe9ebcea5eee6671fe9c658713f800f",
+    "cases.json": "2fb67eda64492f28e242a8de76ffaa3a3a8de1222c640bf9a79bd09cb8922690",
+    "rubric.json": "b632c67e4bb3fea744ad42d9804102a729d6d182b1253a4db22ae3b2b2282261",
+    "scoring.json": "1db5b0fcdb43f5f2aaf41911c2017cf9f53e40b78a29f8bb7c90781e33b5aa67"
+  },
+  "dispositions": {
+    "catalog-curation": {
+      "decision": "defer",
+      "reason": "Mechanics distinguishes aliases and pins evidence. Recurring project maintenance or exchange demand remains unverified.",
+      "sources": [
+        "catalog-source-pin",
+        "catalog-alias-collision"
+      ]
+    },
+    "economy": {
+      "decision": "defer",
+      "reason": "Balance covers the normal resource trace and the unresolved migration policy. A recurring economy deliverable with an approved save transition remains unverified.",
+      "sources": [
+        "economy-flow",
+        "economy-existing-save"
+      ]
+    },
+    "game-feel": {
+      "decision": "defer",
+      "reason": "Game Design separates device timing from perceived delay. The fixture has no repeated device feedback evidence or verified specialist owner.",
+      "sources": [
+        "feel-trace",
+        "feel-pause"
+      ]
+    },
+    "level-design": {
+      "decision": "defer",
+      "reason": "Game Design covers spatial clearance and unaided discovery. No recurrent verified blockout handoff was identified in the inspected example records.",
+      "sources": [
+        "level-blockout",
+        "level-unaided"
+      ]
+    },
+    "player-research": {
+      "decision": "defer",
+      "reason": "Game Design and Balance separate participant consent and eligibility from interpretation. Accessible evidence supplies no repeated participant recruitment or research handoff.",
+      "sources": [
+        "research-first-choice",
+        "research-mixed-exposure"
+      ]
+    }
+  },
+  "environment": {
+    "host": "Codex collaboration on a local disposable general project",
+    "os": "Darwin",
+    "package_sha256": {
+      "skill-tree-game-design": "25d3c369c5f6f9fbd38f80e7cdad08729cb3b39ec199448684b527a5fb829d81",
+      "skill-tree-game-design-balance": "b961cc4bc0a962a07f0aa1eb2ac2afc0c659f13969e79f841997b913465cae17",
+      "skill-tree-game-design-mechanics": "cb2b11ed07e4fd9592000019b944205ef6dfdc42c6f65beb08bc11fd321b0062"
+    },
+    "profile_identity": "e40db97f273a4d2e925b18dd2dbf7b8097a647a26dd37be67fdc9c418b4dddba",
+    "python": "3.11.5"
+  },
+  "method": {
+    "budget_words_per_case": 150,
+    "expected_assertions": 20,
+    "expected_case_count": 10,
+    "focused_variant": "No rubric gap justified a matched variant.",
+    "independent_scorer": "/root/director",
+    "model_configuration": "Both actors used the inherited Codex collaboration configuration. Exact token usage was unavailable.",
+    "observed_case_count": 10,
+    "passing_assertions": 20,
+    "producer": "/root/balance"
+  },
+  "omissions": [
+    "Real participant, product runtime and private project data were outside this disposable evaluation.",
+    "The accessible archive contains fixture and authoring evidence. Project recurrence and owner demand remain unverified."
+  ],
+  "schema": 1,
+  "source_base": "02afcd2c512971e202c308ec7ab131e06eb9dad7",
+  "source_inventory": [
+    {
+      "path": ".skill-tree/history/validation/game-design-pilot/authoring-observations.json",
+      "sha256": "30f0ee450671b531e99ae63954a762641968959b6e33ef51e6c119800da1de03"
+    },
+    {
+      "path": ".skill-tree/common/references/game-design-disciplines.md",
+      "sha256": "32e10ab3012d47f34302e79a7fa25ff3f1811b88b87b4b834e8fe6ea2c5f6a1b"
+    },
+    {
+      "path": ".skill-tree/common/references/game-design-records.md",
+      "sha256": "ee0c46efe3f88d4e4d68859c0e5e94dc26a453f36575dcfc5830f96f863990c3"
+    },
+    {
+      "path": ".skill-tree/common/references/game-design-balance-study.md",
+      "sha256": "8d28a473095d5ec4e457c5ea0bb61adaf43c0be8c2f0dbb9eb8aaf93b65cdc77"
+    },
+    {
+      "path": ".skill-tree/common/references/game-design-playtest.md",
+      "sha256": "f305aba94b011959e204cdc52a398ac9d16a7ec07e35ac5313ae2697667efe80"
+    },
+    {
+      "path": ".skill-tree/common/references/game-design-mechanics.md",
+      "sha256": "d9657c2ae70ad41ea2c8125da44494672f4a0be7c7dfd0cd2711c8774bc18ed6"
+    },
+    {
+      "path": ".skill-tree/common/references/game-design-atlas.md",
+      "sha256": "453a6d8ffd8f66a4233677c22dba3efae509e216a744050dcc316629cd934401"
+    },
+    {
+      "path": ".skill-tree/examples/narrative/route-cases.md",
+      "sha256": "18e9ddb900b07a4a6c52eb1df79dd1c303508b7e1a377e4ddd17aed90b1c7539"
+    }
+  ],
+  "task_id": "T-f47fec49-8ed9-4bef-b85f-6969a3664161"
+}

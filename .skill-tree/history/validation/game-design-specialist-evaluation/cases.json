@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "fixture": "Public synthetic design requests",
+  "output_budget_words_per_case": 150,
+  "cases": [
+    {
+      "id": "level-blockout",
+      "discipline": "level-design",
+      "kind": "representative",
+      "skill": "skill-tree-game-design",
+      "prompt": "Sketch a learnable route for a carrying puzzle. The player starts west, sees a locked east gate, and must collect a lantern from a north alcove and use it on a pedestal by the gate. Walking while carrying needs 1.2 m clear width. An optional south bypass has a 1.0 m pinch point and no pedestal. Keep the current lantern rule and give a blockout, one normal route and a cheap verification."
+    },
+    {
+      "id": "level-unaided",
+      "discipline": "level-design",
+      "kind": "boundary",
+      "skill": "skill-tree-game-design",
+      "prompt": "Design a check for whether fresh players find the north route. The normal entry camera faces east, the only required landmark is north, and both routes are reachable. Earlier walkthroughs used a facilitator hint or began after the first junction. Use an ordinary entry and ask whether to change the view or marker, without changing the rule."
+    },
+    {
+      "id": "economy-flow",
+      "discipline": "economy",
+      "kind": "representative",
+      "skill": "skill-tree-game-design-balance",
+      "prompt": "Compare an unlock costing 12 coins now with a proposal costing 9 coins. A new player starts at 3 coins, earns exactly 3 coins per successful match and pays no other costs before the unlock. The cap is 15 coins. The progression owner will decide based on completed matches and the risk of skipping the tutorial unlock. Give a reproducible comparison and a stop condition."
+    },
+    {
+      "id": "economy-existing-save",
+      "discipline": "economy",
+      "kind": "boundary",
+      "skill": "skill-tree-game-design-balance",
+      "prompt": "Propose a safe observation plan for lowering a bank cap from 100 to 60. Existing save revision 3 can hold 80 coins; the proposal has not chosen whether to grandfather or truncate. Reload and repeated migration are possible. The owner has authorized comparison only. Explain what to trace, the missing decision, and what would falsify a choice."
+    },
+    {
+      "id": "feel-trace",
+      "discipline": "game-feel",
+      "kind": "representative",
+      "skill": "skill-tree-game-design",
+      "prompt": "A dodge in build F3 permits input until 100 ms after a light cue. One recorded device trace has cue=0 ms, input=72 ms, state confirmation=90 ms, sound=155 ms and recovery=430 ms. The same player says the move feels late. Compare feedback delay and window recognition with one cheap controlled trial and keep device observations separate."
+    },
+    {
+      "id": "feel-pause",
+      "discipline": "game-feel",
+      "kind": "boundary",
+      "skill": "skill-tree-game-design",
+      "prompt": "A dodge complaint occurs after pause. The capture shows a cue, pause toggle, a press visible on video, resume and a dodge animation, but firmware and the input queue were not logged. The intended rule uses active play time and paused presses do not queue. Give two competing explanations, a baseline and a paired control that can distinguish them."
+    },
+    {
+      "id": "research-first-choice",
+      "discipline": "player-research",
+      "kind": "representative",
+      "skill": "skill-tree-game-design",
+      "prompt": "Draft a participant observation protocol for a new inventory icon. The design owner wants to know whether first-time players equip an item without help. Both variants start with the same item visible. The session is local and there is no existing consent or observation record. Specify neutral instructions, first uncoached action, when to intervene and who reviews the result."
+    },
+    {
+      "id": "research-mixed-exposure",
+      "discipline": "player-research",
+      "kind": "boundary",
+      "skill": "skill-tree-game-design-balance",
+      "prompt": "Assess two tutorial cohorts before changing a cue. Baseline has 4 correct first choices from 8 fresh eligible players and 2 coached rehearsals. Candidate has 5 correct first choices from 7 fresh eligible players, 4 coached rehearsals and 1 fresh player without an opportunity. Build and assignment were not randomized and the candidate mixes input devices. Report denominators, exclusions and the next useful control."
+    },
+    {
+      "id": "catalog-source-pin",
+      "discipline": "catalog-curation",
+      "kind": "representative",
+      "skill": "skill-tree-game-design-mechanics",
+      "prompt": "A designer asks for reusable tactical overwatch. Local permitted synthetic records are pattern-overwatch r1: choose a facing, arm reaction, trigger on enemy movement, active tactical turn, evidence trace-O; and pattern-warning-cone r2: display threat area, no reaction, evidence trace-W. Recommend a suitable and unsuitable placement, preserve exact revision and evidence, and explain the difference."
+    },
+    {
+      "id": "catalog-alias-collision",
+      "discipline": "catalog-curation",
+      "kind": "boundary",
+      "skill": "skill-tree-game-design-mechanics",
+      "prompt": "Resolve the request add charge. Two local records use charge: pattern-windup r3 holds input to increase damage until release; pattern-resource-charge r1 stores one use after a refill event. The tutorial has a held attack and the shop uses refills, but neither placement has an approved revision pin. Return the two relevant records and the smallest check needed before linking either placement."
+    }
+  ]
+}
