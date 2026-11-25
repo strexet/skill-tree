@@ -57,8 +57,9 @@ def delivery_finished(run):
                 and isinstance(evidence[0].get('path'), str) and sha256(evidence[0].get('sha256')))
     return delivery.get('status') in TERMINAL or (delivery.get('status')=='pr-ready' and not delivery.get('authorization',{}).get('merge'))
 
-def git(root, *args):
-    result = subprocess.run(['git', '-C', str(root), *map(str, args)], capture_output=True, text=True, timeout=45)
+def git(root, *args, git_options=()):
+    result = subprocess.run(['git', '-C', str(root), *map(str, git_options), *map(str, args)],
+                            capture_output=True, text=True, timeout=45)
     if result.returncode:
         # Remote errors can contain credentials. Keep diagnostics deliberately bounded.
         raise RunError('Git operation failed: ' + ' '.join(str(a) for a in args[:2]))
@@ -822,14 +823,14 @@ def local_git_args(root, *args, literal_pathspecs=True):
             '-c', 'core.fsmonitor=false', '-c', 'diff.autoRefreshIndex=false', *map(str, args)]
 
 
-def local_git(root, *args, accepted=(0,), index=None, literal_pathspecs=True):
+def local_git(root, *args, accepted=(0,), index=None, literal_pathspecs=True, git_options=()):
     environment = local_git_environment()
     if index is not None:
         environment['GIT_INDEX_FILE'] = str(index)
     if not literal_pathspecs:
         for name in ('LITERAL', 'GLOB', 'NOGLOB', 'ICASE'):
             environment.pop('GIT_' + name + '_PATHSPECS', None)
-    result = subprocess.run(local_git_args(root, *args, literal_pathspecs=literal_pathspecs),
+    result = subprocess.run(local_git_args(root, *git_options, *args, literal_pathspecs=literal_pathspecs),
                             env=environment, capture_output=True, timeout=45)
     if result.returncode not in accepted:
         raise RunError('Local Git operation failed: ' + str(args[0]))
@@ -1418,7 +1419,7 @@ def local_git_bool(root, key):
     return result.returncode==0 and result.stdout.strip()==b'true'
 
 
-def local_git_policy(root, *, merge=True, signed=False):
+def local_git_policy(root, *, merge=True, signed=False, fast_forward=False):
     sign_commit=local_git_bool(root,'commit.gpgSign')
     if sign_commit and not signed:
         raise RunError('Local Git delivery requires handling of the enabled signing policy: commit.gpgSign')
@@ -1429,6 +1430,15 @@ def local_git_policy(root, *, merge=True, signed=False):
         options = local_git(root, 'config', '--get-all', 'branch.' + target + '.mergeOptions', accepted=(0, 1))
         if options.stdout.strip():
             raise RunError('Local merge is blocked by branch-specific Git merge options')
+    names = ('reference-transaction', 'post-index-change')
+    if not fast_forward:
+        names = ('prepare-commit-msg', 'commit-msg', 'post-commit') + names
+        names += ('pre-merge-commit', 'post-merge') if merge else ('pre-commit',)
+    require_local_git_hooks(root, names)
+    return '-S' if sign_commit else '--no-gpg-sign'
+
+
+def require_local_git_hooks(root, names):
     configured = local_git(root, 'config', '--path', '--get', 'core.hooksPath', accepted=(0, 1))
     if configured.returncode == 0:
         value = configured.stdout.decode('utf-8').rstrip('\n')
@@ -1437,13 +1447,10 @@ def local_git_policy(root, *, merge=True, signed=False):
         hooks = root / value
     else:
         hooks = Path(local_git_text(root, 'rev-parse', '--path-format=absolute', '--git-path', 'hooks'))
-    names = ('prepare-commit-msg', 'commit-msg', 'post-commit', 'reference-transaction', 'post-index-change')
-    names += ('pre-merge-commit', 'post-merge') if merge else ('pre-commit',)
     for name in names:
         location = hooks / name
         if location.is_file() and os.access(location, os.X_OK):
             raise RunError('Local Git delivery is blocked by an executable Git hook: ' + name)
-    return '-S' if sign_commit else '--no-gpg-sign'
 
 
 @contextmanager
@@ -1497,6 +1504,8 @@ def run_local_merge(root, source_root, preparation, *, fast_forward=False):
     target_ref, target_head = preparation['target_ref'], preparation['target_head']
     reviewed=preparation.get('allow_unrelated_staged',False)
     policy_options={'signed':True} if reviewed else {}
+    if fast_forward:
+        policy_options['fast_forward']=True
     local_git_policy(root,**policy_options)
     if any(Path(local_git_text(path, 'rev-parse', '--show-toplevel')).resolve() != path
            for path in (root, source_root)):

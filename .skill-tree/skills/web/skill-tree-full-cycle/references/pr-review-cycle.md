@@ -61,6 +61,8 @@ After any successful PR integration, obtain the provider-confirmed `MERGED` stat
 
 The integration observation fetches the exact target on the recorded remote and verifies that fetched history contains the provider integration commit. The helper creates a missing local target or safely fast-forwards a behind local target, including an exact checked-out worktree with compatible edits. A local target that already contains the fetched history stays at the current local commit. Divergence, conflicting edits or unavailable verification evidence leave a retryable `local_target_sync` result with the exact target and blocker. Re-observe the same provider PR after resolving the blocker.
 
+The tracking-ref fetch and the exact, non-forced local fetch for an unchecked target check executable reference-transaction hooks before using a private empty hook directory. Both fetches disable automatic maintenance. A checked-out target uses the protected ref and index update with the applicable hook, signing and dirty-path checks. The private ref writer uses an empty hook directory for setup and cleanup.
+
 Report the provider integration and local synchronization separately. Complete the delivery and apply the [controller worktree cleanup policy](run-workspaces.md#post-merge-worktree-cleanup) only after verified local synchronization. Cleanup also requires positive same-repository source evidence and a bounded live Git read of the recorded remote target.
 
 ## Metadata and examples

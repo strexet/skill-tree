@@ -1025,18 +1025,32 @@ def fast_forward_checked_out_target(root, worktree, checkout, tracking, remote_h
     if root != worktree:
         ws.run_local_merge(worktree, root, preparation, fast_forward=True)
         return
+    ws.local_git_policy(worktree, signed=True, fast_forward=True)
     with tempfile.TemporaryDirectory(prefix='skill-tree-pr-target-') as temporary:
-        writer = Path(temporary).resolve() / 'ref-writer'
-        ws.local_git(root, 'worktree', 'add', '--detach', '--no-checkout', '--', writer, remote_head)
+        scratch = Path(temporary).resolve()
+        writer = scratch / 'ref-writer'
+        hooks = scratch / 'hooks'
+        hooks.mkdir()
+        no_hooks = ('-c', f'core.hooksPath={hooks}')
+        ws.local_git(root, *no_hooks, 'worktree', 'add', '--detach', '--no-checkout', '--', writer, remote_head)
         initialized = False
         try:
-            ws.local_git(writer, 'read-tree', '--reset', '-u', remote_head)
+            ws.local_git(writer, *no_hooks, 'read-tree', '--reset', '-u', remote_head)
             initialized = True
             ws.run_local_merge(worktree, writer, preparation, fast_forward=True)
         finally:
             # The incomplete checkout exists only inside private scratch space.
             options = () if initialized else ('--force',)
-            ws.local_git(root, 'worktree', 'remove', *options, '--', writer)
+            ws.local_git(root, *no_hooks, 'worktree', 'remove', *options, '--', writer)
+
+
+def fetch_synchronization_ref(root, remote, refspec):
+    ws.require_local_git_hooks(root, ('reference-transaction',))
+    fetch = ws.local_git if remote == '.' else ws.git
+    with tempfile.TemporaryDirectory(prefix='skill-tree-fetch-hooks-') as hooks:
+        fetch(root, 'fetch', '--no-tags', '--no-recurse-submodules', '--no-write-fetch-head',
+              '--no-auto-maintenance', '--refmap=', '--', remote, refspec,
+              git_options=('-c', f'core.hooksPath={hooks}'))
 
 
 def fast_forward_local_target(root, ref, local_head, tracking, remote_head):
@@ -1049,10 +1063,8 @@ def fast_forward_local_target(root, ref, local_head, tracking, remote_head):
         return
     # Git refuses a local fetch into a branch checked out in any worktree.
     # A non-forced exact refspec also protects any intervening local commits.
-    ws.local_git_policy(root, merge=False, signed=True)
     try:
-        ws.local_git(root, 'fetch', '--no-tags', '--no-recurse-submodules', '--no-write-fetch-head',
-                     '--refmap=', '--', '.', remote_head + ':' + ref)
+        fetch_synchronization_ref(root, '.', remote_head + ':' + ref)
     except ws.RunError:
         if registered_target(root, ref) is not None:
             raise ReviewError('The target was checked out during synchronization') from None
@@ -1079,8 +1091,7 @@ def synchronize_local_target(root, record):
             ws.local_git(root, 'check-ref-format', name)
             if ws.local_git(root, 'symbolic-ref', '--quiet', '--no-recurse', name, accepted=(0, 1)).returncode == 0:
                 raise ReviewError('The exact target or tracking ref is symbolic')
-        ws.git(root, 'fetch', '--no-tags', '--no-recurse-submodules', '--no-write-fetch-head', '--refmap=', '--',
-               remote, '+' + ref + ':' + tracking)
+        fetch_synchronization_ref(root, remote, '+' + ref + ':' + tracking)
         remote_head = ws.local_git_text(root, 'rev-parse', '--verify', tracking + '^{commit}')
         receipt['remote_head'] = remote_head
         if ws.local_git(root, 'merge-base', '--is-ancestor', integration, remote_head, accepted=(0, 1, 128)).returncode:

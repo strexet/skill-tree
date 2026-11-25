@@ -1,0 +1,20 @@
+{
+  "check_id": "scoped-regression",
+  "attempt_id": "C-e8b56999-5567-47f9-87f6-ffca69de13fc",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-local-delivery.py"
+  ],
+  "exit_code": -15,
+  "result": "fail",
+  "counts": {
+    "expected": 1,
+    "discovered": 0,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0
+  },
+  "observed_output": "...............................E............EE.....E",
+  "timeout": true,
+  "elapsed_seconds": 542.904
+}

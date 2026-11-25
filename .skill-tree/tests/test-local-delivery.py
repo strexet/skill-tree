@@ -3,6 +3,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import shlex
 import shutil
 import subprocess
 import unittest
@@ -84,10 +85,9 @@ class LocalDeliveryTests(unittest.TestCase):
             retained = self.start(retained_task, base_branch='main', local_base=True,
                                   local_base_authorization='Synthetic retained fixture local main base.')
             retained_store = wf.Store(self.location(retained))
+            if ws.initial_profile_pending(retained):
+                wf.prepare_worktree_profile(retained_store)
             wf.checkpoint(retained_store, {'phase': 'blocked', 'stop_reason': 'Independent retained prerequisite'})
-            if baseline_target:
-                self.install_target(root=self.location(retained))
-                wf.resume_admission(retained_store)
             # Exercise retention of stopped run content and working copy.
             (self.location(retained) / 'source.py').write_text('value = 9\n')
         task_id = self.task('Deliver selected implementation')
@@ -108,10 +108,8 @@ class LocalDeliveryTests(unittest.TestCase):
         self.selected = wf.Store(self.source, self.run['id'])
         if owned_dirty:
             shutil.rmtree((self.source / OWNED_FILE).parent)
-            wf.checkpoint(self.selected, {'phase': 'blocked', 'stop_reason': 'Fixture owned installation handoff'})
-            self.install_target(root=self.source)
-            wf.resume_admission(self.selected)
-            wf.checkpoint(self.selected, {'phase': 'implement', 'stop_reason': None})
+        if ws.initial_profile_pending(self.run):
+            wf.prepare_worktree_profile(self.selected)
         (self.source / 'source.py').write_text('value = 2\n')
         if real_installer:
             (self.source / GENERATION).write_text('merged generation\n')
@@ -898,6 +896,135 @@ class LocalDeliveryTests(unittest.TestCase):
         self.assertEqual(self.git(self.root, 'for-each-ref', 'refs/stash'), '')
         self.assertEqual((self.root / OWNED_FILE).read_bytes(), owned)
         self.assert_pending()
+
+    def synchronization_fixture(self,*,checked_out=False):
+        delivery=wf.owned_module('fixture_fast_forward',CORE/'common/scripts/pr-review-state.py')
+        target='main' if checked_out else 'develop'
+        if checked_out:
+            destination=self.base/'sync-source'
+            self.git(self.root,'worktree','add','--detach','--',destination,'HEAD')
+        else:
+            destination=self.root
+        target_ref='refs/heads/'+target
+        before=self.git(self.root,'rev-parse',target_ref)
+        (destination/'source.py').write_text('value = 2\n')
+        self.git(destination,'commit','-am','Fixture target update')
+        tip=self.git(destination,'rev-parse','HEAD')
+        if checked_out:
+            self.git(self.root,'worktree','remove','--',destination)
+        tracking='refs/remotes/origin/'+target
+        self.git(self.root,'update-ref',tracking,tip)
+        return delivery,target_ref,before,tracking,tip
+
+    def install_delivery_fixture_hook(self,name):
+        marker=self.base/(name+'-executed')
+        hook=self.root/'.git/hooks'/name
+        hook.write_text('#!/bin/sh\nprintf invoked > '+shlex.quote(str(marker))+'\n')
+        hook.chmod(0o700)
+        return marker
+
+    def test_unchecked_fast_forward_accepts_dormant_commit_hook(self):
+        delivery,target,before,tracking,tip=self.synchronization_fixture()
+        marker=self.install_delivery_fixture_hook('pre-commit')
+        owner=self.root/'local-only.txt'
+        owner.write_text('staged owner content\n')
+        self.git(self.root,'add',owner.name)
+        owner.write_text('working owner content\n')
+        status=self.git(self.root,'status','--short')
+        current=self.git(self.root,'rev-parse','HEAD')
+        try:
+            delivery.fast_forward_local_target(self.root,target,before,tracking,tip)
+        except delivery.ws.RunError as error:
+            self.fail(str(error))
+        self.assertEqual(self.git(self.root,'rev-parse',target),tip)
+        self.assertEqual(self.git(self.root,'rev-parse','HEAD'),current)
+        self.assertEqual(self.git(self.root,'status','--short'),status)
+        self.assertFalse(marker.exists())
+
+    def test_unchecked_fast_forward_reports_reference_hook_without_running_it(self):
+        delivery,target,before,tracking,tip=self.synchronization_fixture()
+        marker=self.install_delivery_fixture_hook('reference-transaction')
+        with self.assertRaisesRegex(delivery.ws.RunError,'executable Git hook: reference-transaction'):
+            delivery.fast_forward_local_target(self.root,target,before,tracking,tip)
+        self.assertEqual(self.git(self.root,'rev-parse',target),before)
+        self.assertFalse(marker.exists())
+
+    def test_synchronization_preflights_reference_hook_before_remote_tracking_update(self):
+        delivery,target,before,tracking,tip=self.synchronization_fixture()
+        self.git(self.root,'push','origin',tip+':'+target)
+        self.git(self.root,'update-ref',tracking,before)
+        marker=self.install_delivery_fixture_hook('reference-transaction')
+        url=self.git(self.root,'remote','get-url','origin')
+        record={'identity':{'target_branch':'develop','remote':'origin','remote_id':wf.digest(url.encode()),
+                            'repo_id':delivery.ws.repo_id(self.root)},'merge_commit':tip}
+        blocked=delivery.synchronize_local_target(self.root,record)
+        self.assertEqual(blocked['status'],'pending')
+        self.assertIn('executable Git hook: reference-transaction',blocked['reason'])
+        self.assertEqual(self.git(self.root,'rev-parse',tracking),before)
+        self.assertEqual(self.git(self.root,'rev-parse',target),before)
+        self.assertFalse(marker.exists())
+        hook=self.root/'.git/hooks/reference-transaction'
+        hook.unlink()
+        guard=delivery.ws.require_local_git_hooks
+        def install_after_preflight(root,names):
+            guard(root,names)
+            self.install_delivery_fixture_hook('reference-transaction')
+        with patch.object(delivery.ws,'require_local_git_hooks',side_effect=install_after_preflight):
+            interrupted=delivery.synchronize_local_target(self.root,record)
+        self.assertEqual(interrupted['status'],'pending')
+        self.assertIn('executable Git hook: reference-transaction',interrupted['reason'])
+        self.assertEqual(self.git(self.root,'rev-parse',tracking),tip)
+        self.assertEqual(self.git(self.root,'rev-parse',target),before)
+        self.assertFalse(marker.exists())
+        hook.unlink()
+        retried=delivery.synchronize_local_target(self.root,record)
+        self.assertEqual(retried['status'],'synchronized')
+        self.assertEqual(retried['local_head'],tip)
+        self.assertEqual(self.git(self.root,'rev-parse',tracking),tip)
+        self.assertFalse(marker.exists())
+
+    def test_unchecked_fast_forward_isolates_hooks_created_after_preflight(self):
+        delivery,target,before,tracking,tip=self.synchronization_fixture()
+        marker=self.base/'reference-transaction-executed'
+        guard=delivery.ws.require_local_git_hooks
+        def install_after_preflight(root,names):
+            guard(root,names)
+            self.install_delivery_fixture_hook('reference-transaction')
+        with patch.object(delivery.ws,'require_local_git_hooks',side_effect=install_after_preflight):
+            delivery.fast_forward_local_target(self.root,target,before,tracking,tip)
+        self.assertEqual(self.git(self.root,'rev-parse',target),tip)
+        self.assertFalse(marker.exists())
+
+    def test_checked_target_preflights_index_hook_before_private_writer_setup(self):
+        delivery,target,before,tracking,tip=self.synchronization_fixture(checked_out=True)
+        marker=self.install_delivery_fixture_hook('post-index-change')
+        registrations=self.git(self.root,'worktree','list','--porcelain')
+        with self.assertRaisesRegex(delivery.ws.RunError,'executable Git hook: post-index-change'):
+            delivery.fast_forward_local_target(self.root,target,before,tracking,tip)
+        self.assertEqual(self.git(self.root,'rev-parse',target),before)
+        self.assertEqual(self.git(self.root,'worktree','list','--porcelain'),registrations)
+        self.assertFalse(marker.exists())
+
+    def test_checked_target_preserves_incoming_collision_and_unrelated_dirt(self):
+        delivery,target,before,tracking,tip=self.synchronization_fixture(checked_out=True)
+        owner=self.root/'local-only.txt'
+        owner.write_text('staged owner content\n')
+        self.git(self.root,'add',owner.name)
+        owner.write_text('working owner content\n')
+        incoming=self.root/'source.py'
+        incoming.write_text('incoming collision\n')
+        with self.assertRaisesRegex(delivery.ws.RunError,'overlap|collision'):
+            delivery.fast_forward_local_target(self.root,target,before,tracking,tip)
+        self.assertEqual(self.git(self.root,'rev-parse',target),before)
+        self.assertEqual(incoming.read_text(),'incoming collision\n')
+        self.git(self.root,'restore','--',incoming.name)
+        dormant=self.install_delivery_fixture_hook('post-merge')
+        delivery.fast_forward_local_target(self.root,target,before,tracking,tip)
+        self.assertEqual(self.git(self.root,'rev-parse',target),tip)
+        self.assertEqual(incoming.read_text(),'value = 2\n')
+        self.assertEqual(owner.read_text(),'working owner content\n')
+        self.assertEqual(self.git(self.root,'show',':'+owner.name),'staged owner content')
+        self.assertFalse(dormant.exists())
 
     def test_executable_git_hook_is_reported_without_running_it(self):
         self.run_local()
