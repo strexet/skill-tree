@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "c677a12fbd139ba6cf6009a7b3f3f0d0fb47f29107fff747438dea50c83d2cd9",
+  "identity": "7fc2e04fa719f01feba880a639c3a8edfd1d63ceeb2baaa9028af12ee0e1cadb",
   "operation": "skill-tree-full-cycle",
   "operations": {
     "skill-tree-3d": {
@@ -3304,7 +3304,7 @@
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/pr-review-cycle.md": "e7e6f25aebca99a32eec78573e4bf4acdd180ee082ff7499f9ab5fc78bc65678",
     "references/project-profile.md": "82492b7e3c8a8ec8df6bb3581b727e081ddac6f5adeb1a25bb2d945571b9441c",
-    "references/run-workspaces.md": "1c9fbf5dd2bf86878fa4fee5829be3638373a011f3fcb052ad673fa73da25601",
+    "references/run-workspaces.md": "52b62e7c9d44fe79184fd498aaeb2ed985b2d15a6639b959542132cb8ee77260",
     "references/validation-policy.md": "d5d014a906a2d9c76db8066310b7c1a81f7403ce0c25435a431af327ebe8c818",
     "references/workflow-metadata.md": "27d44025f5cc3c11a81a8d544ce8d15444746527b0452e11591d1ff43e0aa80a",
     "scripts/api-contract-locks.js": "eaac3e411ab7ddea36cedb4c48f0a0d0c5e737509466f0f86587df51a34fe594",
@@ -3323,7 +3323,7 @@
     "scripts/plugin-runtime.js": "62caaa416cb4f375fef45edb71c1cbe3b2f9c0acb734a95e0b9099470cf6c8a5",
     "scripts/plugin-sources.js": "13d853f9e64dec84cf92f4026ac71e4384e186cd96200543e400a852a46e4693",
     "scripts/pr-review-state.py": "01ec580029c65fe8aeac7dc7b6546d3fee48aea9ac958e8f9ea1eb9c74016ada",
-    "scripts/run-workspaces.py": "c0d142031f3516aa42b415eb9b78b7082bc2051dfba6720b7932ce5a18fc094d",
+    "scripts/run-workspaces.py": "c26b9e33fb35f5afdc27b2acbc76cfc574ab61889dbdf526314ad34f05356ee2",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     "scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",

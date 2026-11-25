@@ -36,7 +36,7 @@ class RunWorkspaceTests(unittest.TestCase):
     def start(self,tid,**options):
         return wf.start(wf.Store(self.root,allow_unselected=True),'next',tid,workspace=options)
     def location(self,run):return Path(ws.runtime(self.root)['worktrees'][run['id']])
-    def installed_web_profile_fixture(self, interrupt=False, legacy=False):
+    def installed_web_profile_fixture(self, interrupt=False, legacy=False, location='explicit'):
         self.call(self.root, 'rm', '.skill-tree/config/repository.json')
         (self.root/'package.json').write_text('{"name":"web-profile-fixture","type":"module"}\n')
         (self.root/'.gitignore').write_text('.skill-tree/installation/\n.agents/\n.env.fixture\n')
@@ -62,9 +62,19 @@ class RunWorkspaceTests(unittest.TestCase):
         self.call(self.root, 'check-ignore', profile.relative_to(self.root))
         task = self.task('Prepare exact linked profile')
         branch = self.call(self.root, 'symbolic-ref', '--short', 'HEAD')
-        path = self.base/'profile-target'
-        start = lambda: wf.start(wf.Store(self.root, neutral=True), 'next', task,
-                                 workspace={'implementation_operation':'work-through-next','worktree':str(path)})
+        path = ws.common_dir(self.root)/'explicit-web' if location=='administrative' else self.base/'profile-target'
+        options = {'implementation_operation':'work-through-next'}
+        if location not in {'default','aliased-default'}:
+            options['worktree']=str(path)
+        start = lambda: wf.start(wf.Store(self.root, neutral=True), 'next', task, workspace=options)
+        if location=='aliased-default':
+            before = self.store.state.read_bytes()
+            (self.base/'.skill-tree-worktrees').symlink_to(ws.common_dir(self.root),target_is_directory=True)
+            with self.assertRaisesRegex(ws.RunError,'outside the canonical checkout and Git administrative storage'):
+                start()
+            self.assertEqual(self.store.state.read_bytes(),before)
+            self.assertEqual(ws.runtime(self.root)['worktrees'],{})
+            return
         if legacy:
             before = self.store.state.read_bytes()
             with self.assertRaisesRegex(ws.RunError,'Update the verified canonical installation'):
@@ -80,7 +90,9 @@ class RunWorkspaceTests(unittest.TestCase):
                 if args[:2] == ('worktree','add'):
                     raise ws.RunError('fixture Git creation interrupted')
                 return actual_git(root, *args)
-            with patch.object(ws,'git',side_effect=fail_git):
+            cut = (patch.object(ws,'create_reserved',side_effect=ws.RunError('fixture Git creation interrupted'))
+                   if interrupt in {'before-locator','lost-locator'} else patch.object(ws,'git',side_effect=fail_git))
+            with cut:
                 with self.assertRaisesRegex(ws.RunError,'fixture Git creation interrupted'):
                     start()
             state = self.store.load()
@@ -92,12 +104,28 @@ class RunWorkspaceTests(unittest.TestCase):
             selected = wf.Store(self.root,run['id'])
             with self.assertRaisesRegex(ws.RunError,'original exact worktree'):
                 ws.recover_workspace(selected,{'worktree':str(self.base/'wrong-profile-target'),'resolution':'Fixture checks rejected path.'})
+            if interrupt in {'before-locator','lost-locator'}:
+                local = ws.runtime(self.root)
+                self.assertNotIn(run['id'],local['worktrees'])
+                self.assertIn(run['id'],local['pending_worktrees'])
+                if interrupt=='lost-locator':
+                    staged = local['pending_worktrees'][run['id']]
+                    ws.runtime_file(self.root).unlink()
+                    recovery = wf.Store(self.root,route_queue=False,neutral=True)
+                    with self.assertRaisesRegex(ws.RunError,'original exact reserved worktree'):
+                        ws.recover_locator(recovery,{'queue_id':local['queue_id'],
+                            'worktrees':{run['id']:str(self.base/'wrong-replacement-locator')}})
+                    ws.recover_locator(recovery,{'queue_id':local['queue_id'],'worktrees':{run['id']:staged}})
+                    self.assertEqual(ws.runtime(self.root)['pending_worktrees'],{run['id']:staged})
             ws.recover_workspace(selected,{'resolution':'Recover exact interrupted Git operation.'})
+            path = self.location(run)
             handoff = wf.advance(selected)['profile_handoff']
             run = {**selected.load()['active_run'],'profile_handoff':handoff}
         else:
             run = start()
             handoff = run.get('profile_handoff')
+            if location=='default':
+                path = self.location(run)
         self.assertIsNotNone(handoff, 'New Web worktrees with ignored profiles must expose the guarded profile setup handoff')
         self.assertEqual(handoff['run_id'], run['id'])
         self.assertEqual(handoff['worktree'], str(path))
@@ -189,6 +217,97 @@ class RunWorkspaceTests(unittest.TestCase):
         self.assertEqual(state['run_registry']['claims'],{task:run['id']})
         self.assertEqual(list(ws.runtime(self.root)['worktrees']),[run['id']])
         self.assertEqual(canonical_profile.read_bytes(),original)
+        self.assertEqual(self.call(self.root,'symbolic-ref','--short','HEAD'),canonical_branch)
+
+    def test_web_default_worktree_and_runtime_use_a_sibling_checkout(self):
+        run, task, path, _, _, canonical_branch = self.installed_web_profile_fixture(location='default')
+        common = ws.common_dir(self.root)
+        self.assertFalse(path.is_relative_to(common), 'The default Web worktree must be outside Git administrative storage')
+        self.assertFalse(path.is_relative_to(self.root))
+        self.assertEqual(path,self.location(run))
+        self.assertEqual(self.call(path,'symbolic-ref','--short','HEAD'),run['workspace']['branch'])
+        self.assertEqual(self.call(self.root,'symbolic-ref','--short','HEAD'),canonical_branch)
+        view = ws.environment(wf.Store(self.root,run['id']),{'runtime':True})
+        self.assertEqual(view['project_root'],str(path))
+        self.assertFalse(view['runtime_qualified'])
+        other = self.task('Another isolated Web root')
+        with self.assertRaisesRegex(ws.RunError,'overlaps another retained run worktree'):
+            wf.start(wf.Store(self.root,neutral=True),'next',other,workspace={
+                'implementation_operation':'work-through-next','worktree':str(path/'unadmitted-nested')})
+        self.assertEqual(list(ws.runtime(self.root)['worktrees']),[run['id']])
+
+    def test_default_web_worktree_rejects_an_alias_into_git_storage(self):
+        self.installed_web_profile_fixture(location='aliased-default')
+
+    def test_explicit_web_worktree_in_git_requires_an_outside_runtime_path(self):
+        run, task, path, _, _, canonical_branch = self.installed_web_profile_fixture(location='administrative')
+        self.assertEqual(path,ws.common_dir(self.root)/'explicit-web')
+        self.assertEqual(self.call(path,'symbolic-ref','--short','HEAD'),run['workspace']['branch'])
+        store = wf.Store(self.root,run['id'])
+        view = ws.environment(store)
+        self.assertEqual(view['project_root'],str(path))
+        self.assertIn(str(path),view['web_runtime_path']['prerequisite'])
+        request = self.base/'web-runtime-request.json'
+        request.write_text('{"runtime":true}')
+        command = [sys.executable,'-B',str(CORE/'common/scripts/workflow-state.py'),'environment',str(self.root),
+                   '--run-id',run['id'],'--input',str(request)]
+        probe = subprocess.run(command,capture_output=True,text=True,timeout=15)
+        self.assertNotEqual(probe.returncode,0)
+        self.assertIn('outside Git administrative storage',probe.stdout+probe.stderr)
+        self.assertIn(str(path),probe.stdout+probe.stderr)
+        self.assertEqual(self.location(run),path)
+        self.assertEqual(self.call(self.root,'symbolic-ref','--short','HEAD'),canonical_branch)
+
+    def test_pending_web_reservations_reject_case_aliases(self):
+        case_probe = self.base/'CaseProbe'
+        case_probe.mkdir()
+        alternative = self.base/'caseprobe'
+        if not alternative.is_dir() or not alternative.samefile(case_probe):
+            return  # Distinct spellings are safe on a case-sensitive filesystem.
+        self.installed_web_profile_fixture(location='default')
+        first = self.task('Retain first Web destination')
+        second = self.task('Reject case-alias Web destination')
+        reserved = self.base/'ReservedWeb'
+        def launch(tid,path):
+            return wf.start(wf.Store(self.root,neutral=True),'next',tid,workspace={
+                'implementation_operation':'work-through-next','worktree':str(path)})
+        with patch.object(ws,'create_reserved',side_effect=ws.RunError('fixture before Git creation')):
+            with self.assertRaisesRegex(ws.RunError,'fixture before Git creation'):
+                launch(first,reserved)
+        with self.assertRaisesRegex(ws.RunError,'overlaps another retained run worktree'):
+            launch(second,self.base/'reservedweb'/'child')
+        state = wf.Store(self.root,neutral=True).load()
+        active = state['run_registry']['claims'][first]
+        self.assertNotIn(second,state['run_registry']['claims'])
+        self.assertEqual(ws.runtime(self.root)['pending_worktrees'],{active:str(reserved)})
+        self.assertFalse(reserved.exists())
+
+    def test_default_web_reservation_recovers_before_locator_write(self):
+        run, task, path, _, _, canonical_branch = self.installed_web_profile_fixture(interrupt='before-locator',location='default')
+        self.assertFalse(path.is_relative_to(ws.common_dir(self.root)))
+        self.assertEqual(list(ws.runtime(self.root)['worktrees']),[run['id']])
+        state = wf.Store(path,run['id']).load()
+        self.assertEqual(state['run_registry']['claims'],{task:run['id']})
+        self.assertEqual(self.call(self.root,'symbolic-ref','--short','HEAD'),canonical_branch)
+
+    def test_explicit_web_reservation_recovers_before_locator_write(self):
+        run, task, path, _, _, canonical_branch = self.installed_web_profile_fixture(interrupt='before-locator')
+        self.assertEqual(path,self.base/'profile-target')
+        self.assertEqual(list(ws.runtime(self.root)['worktrees']),[run['id']])
+        self.assertEqual(wf.Store(path,run['id']).load()['run_registry']['claims'],{task:run['id']})
+        self.assertEqual(self.call(self.root,'symbolic-ref','--short','HEAD'),canonical_branch)
+
+    def test_explicit_web_reservation_restores_a_lost_local_locator(self):
+        run, task, path, _, _, canonical_branch = self.installed_web_profile_fixture(interrupt='lost-locator')
+        self.assertEqual(path,self.base/'profile-target')
+        self.assertEqual(wf.Store(path,run['id']).load()['run_registry']['claims'],{task:run['id']})
+        self.assertEqual(self.call(self.root,'symbolic-ref','--short','HEAD'),canonical_branch)
+
+    def test_default_web_reservation_recovers_after_locator_write(self):
+        run, task, path, _, _, canonical_branch = self.installed_web_profile_fixture(interrupt=True,location='default')
+        self.assertFalse(path.is_relative_to(ws.common_dir(self.root)))
+        self.assertEqual(list(ws.runtime(self.root)['worktrees']),[run['id']])
+        self.assertEqual(wf.Store(path,run['id']).load()['run_registry']['claims'],{task:run['id']})
         self.assertEqual(self.call(self.root,'symbolic-ref','--short','HEAD'),canonical_branch)
 
     def test_two_worker_handoffs_preserve_scope_evidence_and_controller_state(self):

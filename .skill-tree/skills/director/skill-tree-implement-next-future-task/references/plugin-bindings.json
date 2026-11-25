@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "bd43e8c2026a731be0bda88834cf536a733aec32ff63a3e70175ef8a7d952b28",
+  "identity": "07f99afb840fad1852ffabc2befefaf5e66d70766cee84bc0710f1e313748e59",
   "operation": "skill-tree-implement-next-future-task",
   "operations": {
     "skill-tree-3d": {
@@ -3301,7 +3301,7 @@
     "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/project-profile.md": "232c01c9ce6554545653d3c4b0b515e3c180f9361bb85c6206d372209cac5bba",
-    "references/run-workspaces.md": "1c9fbf5dd2bf86878fa4fee5829be3638373a011f3fcb052ad673fa73da25601",
+    "references/run-workspaces.md": "52b62e7c9d44fe79184fd498aaeb2ed985b2d15a6639b959542132cb8ee77260",
     "references/validation-policy.md": "d5d014a906a2d9c76db8066310b7c1a81f7403ce0c25435a431af327ebe8c818",
     "references/workflow-metadata.md": "27d44025f5cc3c11a81a8d544ce8d15444746527b0452e11591d1ff43e0aa80a",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
@@ -3317,7 +3317,7 @@
     "scripts/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
     "scripts/plugin-runtime.js": "62caaa416cb4f375fef45edb71c1cbe3b2f9c0acb734a95e0b9099470cf6c8a5",
     "scripts/plugin-sources.js": "13d853f9e64dec84cf92f4026ac71e4384e186cd96200543e400a852a46e4693",
-    "scripts/run-workspaces.py": "c0d142031f3516aa42b415eb9b78b7082bc2051dfba6720b7932ce5a18fc094d",
+    "scripts/run-workspaces.py": "c26b9e33fb35f5afdc27b2acbc76cfc574ab61889dbdf526314ad34f05356ee2",
     "scripts/select-prioritized-task.py": "93f12ac5a333fb072bf8d9d849d08e3b422af856d582d492902647efe35c896f",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",

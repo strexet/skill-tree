@@ -77,7 +77,10 @@ def runtime(root):
     if not path or not path.exists():
         return None
     data = json.loads(path.read_text())
-    if data.get('schema') != 1 or not isinstance(data.get('worktrees'), dict):
+    pending = data.get('pending_worktrees', {})
+    if (data.get('schema') != 1 or not isinstance(data.get('worktrees'), dict)
+            or not isinstance(pending,dict) or any(not re.fullmatch(r'WR-[a-f0-9-]{36}',rid)
+                or not isinstance(path,str) or not Path(path).is_absolute() for rid,path in pending.items())):
         raise RunError('Unsupported machine-local run locator; explicit recovery required')
     return data
 
@@ -298,12 +301,90 @@ def workspace_identity(store, rid, payload, existing=False, launch=None):
             raise RunError('Adopted workspace lacks the declared base')
     return {'repo_id': repo_id(store.root), 'remote': remote, 'remote_id': hashlib.sha256(url.encode()).hexdigest(), 'base_branch': base, 'base_commit': commit, 'branch': working, 'worktree_id': rid, 'local_base': bool(payload.get('local_base')), **({'local_base_authorization':payload['local_base_authorization']} if payload.get('local_base') else {})}
 
+def within_directory(path, directory):
+    if path.is_relative_to(directory):
+        return True
+    if not directory.exists():
+        return False
+    identity = directory.stat()
+    return any(parent.exists() and os.path.samestat(parent.stat(),identity) for parent in (path,*path.parents))
+
+
+def default_web_checkout(root, common, queue_id, run_id):
+    location = root.parent/'.skill-tree-worktrees'/queue_id.lower()/run_id.lower()
+    resolved = location.resolve()
+    if resolved != location or within_directory(resolved,root) or within_directory(resolved,common):
+        raise RunError('The default Web worktree requires an unaliased path outside the canonical checkout and Git administrative storage')
+    return resolved
+
+
+def accepts_case_aliases(directory):
+    device = directory.stat().st_dev
+    for ancestor in (directory,*directory.parents):
+        if ancestor.stat().st_dev != device:
+            break
+        if not ancestor.name or ancestor.name.swapcase() == ancestor.name:
+            continue
+        try:
+            return ancestor.samefile(ancestor.with_name(ancestor.name.swapcase()))
+        except FileNotFoundError:
+            return False
+    return False
+
+
+def worktree_paths_overlap(left, right):
+    if within_directory(left,right) or within_directory(right,left):
+        return True
+    # A new directory has no inode to compare. Detect case aliases on the
+    # containing filesystem before accepting distinct unresolved spellings.
+    def normalized(path):
+        return tuple(unicodedata.normalize('NFD',part.casefold()) for part in path.parts)
+    left_key, right_key = normalized(left), normalized(right)
+    if left_key[:len(right_key)] != right_key and right_key[:len(left_key)] != left_key:
+        return False
+    left_parent = next(parent for parent in (left,*left.parents) if parent.is_dir())
+    right_parent = next(parent for parent in (right,*right.parents) if parent.is_dir())
+    return (left_parent.stat().st_dev == right_parent.stat().st_dev
+            and accepts_case_aliases(left_parent) and accepts_case_aliases(right_parent))
+
+
+def guard_web_destination(data, recorded, run_id, path):
+    for rid, location in {**data.get('pending_worktrees',{}),**data['worktrees']}.items():
+        if rid==run_id or rid not in recorded or delivery_finished(recorded[rid]):
+            continue
+        other = Path(location).resolve()
+        if worktree_paths_overlap(path,other):
+            raise RunError('The selected Web path overlaps another retained run worktree: '+str(other))
+
+
+def retain_web_destination(store, run, path):
+    data = runtime(store.root)
+    recorded = json.loads(store.state.read_bytes())['run_registry']['runs']
+    guard_web_destination(data,recorded,run['id'],path)
+    data.setdefault('pending_worktrees',{})[run['id']] = str(path)
+    atomic(runtime_file(store.root),data)
+
+
+def activate_worktree_locator(root, data, run_id, path):
+    pending = data.get('pending_worktrees',{})
+    if run_id in pending and pending[run_id] != str(path):
+        raise RunError('Recovery requires the original exact worktree path')
+    data['worktrees'][run_id] = str(path)
+    pending.pop(run_id,None)
+    if not pending:
+        data.pop('pending_worktrees',None)
+    atomic(runtime_file(root),data)
+
+
 def provision(store, run, payload):
     """Reserve claims first; interrupted provisioning retains the same run ID."""
     policy = run.get('reviewed_local_delivery')
     spec = workspace_identity(store, run['id'], payload, launch=policy['launch'] if policy else None)
     common = common_dir(store.root)
-    path = Path(payload.get('worktree', str(common/'skill-tree-worktrees'/run['id'].lower()))).resolve()
+    if 'worktree' not in payload and run['admission']['flavor']=='web':
+        path = default_web_checkout(store.root,common,runtime(store.root)['queue_id'],run['id'])
+    else:
+        path = Path(payload.get('worktree', str(common/'skill-tree-worktrees'/run['id'].lower()))).resolve()
     if path.exists():
         raise RunError('Worktree destination exists; explicit recovery required')
     if git(store.root,'for-each-ref','--format=%(refname)','refs/heads/'+spec['branch']):raise RunError('Working branch already exists; select the retained run or explicit recovery')
@@ -346,6 +427,8 @@ def reserve_initial_profile(store, run, path, done):
     }
     run.update(phase='refresh-profile', stop_reason=INITIAL_PROFILE_STOP,
                next_action='Prepare the owned worktree profile with prepare-worktree-profile')
+    if run['admission']['flavor']=='web':
+        retain_web_destination(store,run,path)
 
 
 def initial_profile_context(store, state, caller, *, replay=False):
@@ -381,8 +464,10 @@ def initial_profile_context(store, state, caller, *, replay=False):
 
 
 def create_reserved(store, run, path):
+    if run['admission']['flavor']=='web' and path.resolve()!=path:
+        raise RunError('The original Web worktree path changed before Git creation')
     data = runtime(store.root)
-    data['worktrees'][run['id']] = str(path); atomic(runtime_file(store.root), data)
+    activate_worktree_locator(store.root,data,run['id'],path)
     git(store.root, 'worktree', 'add', '-b', run['workspace']['branch'], path, run['workspace']['base_commit'])
     run['workspace']['cleanup_owner'] = directed_owner(store.root, path, run, data['queue_id'], created=True)
     run['workspace_state'] = 'ready'
@@ -635,11 +720,22 @@ def recover_locator(store, payload, *, bootstrap_state_sha256=None):
         required={rid for rid,run in registry['runs'].items() if not delivery_finished(run)}
         if not isinstance(mapping,dict) or not required.issubset(mapping) or set(mapping)-set(registry['runs']):
             raise RunError('Recovery requires every unfinished retained run locator and rejects unknown run IDs')
+        restored, pending = {}, {}
         for rid, value in mapping.items():
             path = Path(value).resolve(); run = registry['runs'][rid]
+            if run.get('workspace_state')=='reserved' and initial_profile_pending(run) and run['admission']['flavor']=='web':
+                if hashlib.sha256(str(path).encode()).hexdigest() != run['initial_profile']['worktree_path_sha256']:
+                    raise RunError('Web locator recovery requires the original exact reserved worktree path')
+                if not path.exists():
+                    pending[rid] = str(path)
+                    continue
             if common_dir(path) != common_dir(store.root) or git(path, 'symbolic-ref', '--short', 'HEAD') != run['workspace']['branch']:
                 raise RunError('Recovery workspace identity mismatch')
-        atomic(runtime_file(store.root), {'schema': 1, 'queue_id': registry['queue_id'], 'canonical_root': str(store.root), 'worktrees': mapping})
+            restored[rid] = value
+        data = {'schema':1,'queue_id':registry['queue_id'],'canonical_root':str(store.root),'worktrees':restored}
+        if pending:
+            data['pending_worktrees']=pending
+        atomic(runtime_file(store.root),data)
         return {'recovered': registry['queue_id']}
 
 def resource(store, payload):
@@ -1432,9 +1528,10 @@ def run_local_merge(root, source_root, preparation, *, fast_forward=False):
 
 def environment(store, payload=None):
     """Inspect prerequisites without reading secret contents or launching processes."""
-    payload = payload or {}; root = store.source_root
+    payload = payload or {}
     state = store.load(); run = state['active_run']; registry = state.get('run_registry')
     if run:ensure_workspace(store,run)
+    root = store.source_root
     profile_path=root/'.skill-tree/installation/profile.json'
     profile=json.loads(profile_path.read_text()) if profile_path.exists() else {'flavor':run.get('admission',{}).get('flavor','general') if run else 'general','facts':{}}
     declaration=root/'.skill-tree/worktree-profile.json'
@@ -1444,6 +1541,17 @@ def environment(store, payload=None):
     if policy.get('schema')!=1:raise RunError('Unsupported worktree environment profile')
     flavor=profile['flavor'];defaults={'general':['build','dist','.cache'],'web':['node_modules','dist','build','.next','.cache'],'unity':['Library','Temp','Logs','obj','Builds']}
     layout=('unity' if profile.get('facts',{}).get('editor') else 'general') if flavor=='director' else flavor
+    web_runtime_path = None
+    if layout=='web':
+        common = common_dir(root)
+        storage = None if common is None else next((directory for directory in (
+            common, Path(local_git_text(root,'rev-parse','--absolute-git-dir')).resolve())
+            if within_directory(root,directory)),None)
+        prerequisite = (f'Web runtime requires a checkout outside Git administrative storage. '
+                        f'Selected checkout {root} lies inside {storage}.' if storage else None)
+        web_runtime_path = {'checkout':str(root),'prerequisite':prerequisite}
+        if prerequisite and payload.get('runtime'):
+            raise RunError(prerequisite)
     missing=[]
     for rel in policy.get('required_files',[]):
         path=Path(rel)
@@ -1462,7 +1570,10 @@ def environment(store, payload=None):
         claim=registry['resources'].get(key) if registry else None
         if not claim or not run or claim['run_id']!=run['id']:raise RunError('Runtime prerequisite requires exclusive resource: '+key)
     if missing:raise RunError('Missing environment prerequisites: '+', '.join(missing))
-    return {'flavor':flavor,'project_root':str(root),'isolated_directories':directories,'required_files':policy.get('required_files',[]),'exclusive_resources':required_resources,'editor_version':profile.get('facts',{}).get('editor'),'secrets_read':False,'runtime_qualified':False}
+    result = {'flavor':flavor,'project_root':str(root),'isolated_directories':directories,'required_files':policy.get('required_files',[]),'exclusive_resources':required_resources,'editor_version':profile.get('facts',{}).get('editor'),'secrets_read':False,'runtime_qualified':False}
+    if web_runtime_path is not None:
+        result['web_runtime_path'] = web_runtime_path
+    return result
 
 def recover_workspace(store,payload):
     if not payload.get('resolution'):
@@ -1471,13 +1582,21 @@ def recover_workspace(store,payload):
         text=store.text();state=store.load(text);run=state['active_run']
         if not run or not run.get('workspace'):raise RunError('Select the retained run before workspace recovery')
         data=runtime(store.root);rid=run['id'];spec=run['workspace']
-        requested=payload.get('worktree') or data['worktrees'].get(rid)
+        reserved = run.get('workspace_state') == 'reserved'
+        pending = data.get('pending_worktrees',{}).get(rid) if reserved else None
+        requested=payload.get('worktree') or data['worktrees'].get(rid) or pending
         if not requested:raise RunError('Recovery requires the recorded or explicitly relocated worktree path')
         path=Path(requested).resolve()
+        if pending is not None and pending != str(path):
+            raise RunError('Recovery requires the original exact worktree path')
         if (initial_profile_pending(run)
                 and hashlib.sha256(str(path).encode()).hexdigest() != run['initial_profile']['worktree_path_sha256']):
             raise RunError('Initial profile recovery requires the original exact worktree path')
-        reserved = run.get('workspace_state') == 'reserved'
+        if reserved and run['admission']['flavor']=='web':
+            guard_web_destination(data,state['run_registry']['runs'],rid,path)
+            tip = git(store.root,'for-each-ref','--format=%(objectname)','refs/heads/'+spec['branch'])
+            if tip and tip != spec['base_commit']:
+                raise RunError('The reserved Web branch no longer points to the original Git base')
         directed = run.get('dispatch_workspace_sha256')
         owned = directed and (reserved or spec.get('dispatch_owner_token') or spec.get('cleanup_owner'))
         if owned and hashlib.sha256(str(path).encode()).hexdigest() != directed:
@@ -1499,7 +1618,7 @@ def recover_workspace(store,payload):
                 git(store.root,'worktree','add','-b',spec['branch'],path,spec['base_commit'])
         if owned:
             spec['cleanup_owner'] = directed_owner(store.root, path, run, data['queue_id'], created=created)
-        data['worktrees'][rid]=str(path);atomic(runtime_file(store.root),data)
+        activate_worktree_locator(store.root,data,rid,path)
         run['workspace_state']='ready';run.setdefault('workspace_recoveries',[]).append({'resolution':payload['resolution'],'branch':spec['branch']})
         ensure_workspace(store,run);store.save(text,state);return run
 

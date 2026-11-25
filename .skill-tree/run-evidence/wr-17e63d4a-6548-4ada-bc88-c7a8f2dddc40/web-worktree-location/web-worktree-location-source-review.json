@@ -1,0 +1,21 @@
+{
+  "source_head": "6e6f68e6a8b9c377271728f30655fc4c3c69b8d9",
+  "source_diff_sha256": "2b433de3bd22c2d73e2f88cbb7d0eec4ec85ba14dd7445579974c03154e80faa",
+  "independent_reviewer": "/root/director_critic",
+  "reviewed_paths": [
+    ".skill-tree/common/scripts/run-workspaces.py",
+    ".skill-tree/common/references/run-workspaces.md",
+    ".skill-tree/domains/web/development.md",
+    ".skill-tree/tests/test-run-workspaces.py",
+    ".skill-tree/skill-tree.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "review_evidence": "Observed independent source review of the durable reservation hold, installer transaction and canonical admission locks, verified source and target profile receipts, and recovery coverage across Core and Director. The existing installed Node workspace suite passed all five controls.",
+  "verified_behaviors": [
+    "A new Web worktree uses a sibling checkout, preserves explicit legacy locations for static work, reports the exact runtime path prerequisite, and recovers the original reserved destination and claims across both locator interruption windows."
+  ],
+  "required_evidence": {
+    "scoped-regression": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/web-worktree-location/scoped-regression-result-c-f74ff369-cc94-4eec-a053-3615493379b4.json"
+  }
+}
