@@ -1,12 +1,15 @@
 """Exercise both isolated Director topologies through installed operation entry points."""
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from hashlib import sha256
 import json
 import os
 from pathlib import Path
 from shutil import copytree, ignore_patterns
+import signal
+import socket
 import subprocess
 import sys
 import tempfile
@@ -94,6 +97,8 @@ class DirectorTopologyTests(unittest.TestCase):
               '## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n')
         for area in areas:
             write(root, area + '/source.txt', f'Original isolated {area} input.\n')
+        if 'game' in areas:
+            write(root, 'game/resource.txt', 'Another fixture input using the same exclusive resource.\n')
         if root == self.parent:
             write(root, '.skill-tree/config/repository.json', '{"schema":1,"role":"source"}\n')
         # Static Unity recipe discovery in the parent and external child uses no Editor.
@@ -187,22 +192,24 @@ class DirectorTopologyTests(unittest.TestCase):
         self.assertEqual(read_json(self.parent / BINDINGS)['queues'][self.external_queue]['root'], str(moved))
         self.assertEqual({area['id']: area for area in self.director('status')['areas']}['game']['dirty_paths'], ['game/source.txt'])
 
-    def child_task(self):
-        goal = 'Verify the admitted external input.'
-        note = self.core(self.external, 'intake', {'title': 'Check game input', 'description': goal, 'expected_behavior': goal})
+    def child_task(self, root=None, paths=('game/source.txt',), title='Check game input'):
+        root = root or self.external
+        goal = 'Verify the admitted input.'
+        note = self.core(root, 'intake', {'title': title, 'description': goal, 'expected_behavior': goal})
         check = {'id': 'scope-check', 'recipe_id': 'static-inspection', 'criteria': [goal],
-                 'sources': ['game/source.txt'], 'parameters': {}, 'assertion': goal, 'timing': 'immediate'}
-        body = ('Goal:\n- ' + goal + '\n\nTouch:\n- game/source.txt\n\nValidation:\n```json\n' +
+                 'sources': list(paths), 'parameters': {}, 'assertion': goal, 'timing': 'immediate'}
+        touch = '\n'.join('- ' + path for path in paths)
+        body = ('Goal:\n- ' + goal + '\n\nTouch:\n' + touch + '\n\nValidation:\n```json\n' +
                 json.dumps({'checks': [check]}) + '\n```\n\nAcceptance:\n- ' + goal + '\n')
-        result = self.core(self.external, 'process', {
+        result = self.core(root, 'process', {
             'selectors': [note['id']], 'dispositions': {note['id']: {'status': 'promoted', 'reason': 'The fixture supplies the scope.'}},
-            'tasks': [{'title': 'Check game input', 'body': body, 'parent_pending_ids': [note['id']]}],
+            'tasks': [{'title': title, 'body': body, 'parent_pending_ids': [note['id']]}],
         })
         task = result['created_ids'][0]
-        body = self.core(self.external, 'read', None, '--id', task)['body']
+        body = self.core(root, 'read', None, '--id', task)['body']
         return {'task_id': task, 'body_sha256': sha(body.encode())}
 
-    def freeze(self, game_task):
+    def freeze(self, game_task, *, assignments=None):
         intent = {'objective_id': identity('OB'), 'expected_current_sha256': None, 'intent': {
             'owner_ref': 'fixture-owner', 'title': 'Check linked areas', 'description': 'Retain the external checkpoint.',
             'acceptance': [{'id': 'existing-run', 'criterion': 'Resume the same worktree.'}],
@@ -213,13 +220,15 @@ class DirectorTopologyTests(unittest.TestCase):
         common = {'capability': 'core-task', 'write_paths': ['source.txt'], 'resources': [], 'pins': [], 'depends_on': [],
                   'expected_result': 'The registered path stays in scope.', 'check': 'scope-check', 'authority_ref': 'fixture-owner',
                   'stop_rules': ['Wait for the exact selected owner answer.']}
-        plan = {**selection, 'objective_revision': approved['revision'], 'objective_sha256': approved['sha256'], 'assignments': [
+        default_assignments = [
             {**common, 'id': 'game-run', 'role': 'unity', 'area_id': 'game', 'workspace': 'recorded-worktree',
              'child': game_task, 'effects': ['launch']},
             {**common, 'id': 'story-followup', 'role': 'narrative', 'area_id': 'story', 'workspace': 'existing-checkout',
              'child': {'title': 'Review story input', 'description': 'Identify the independent source.',
                        'acceptance': ['Keep the game checkpoint waiting.']}, 'effects': ['intake']},
-        ]}
+        ]
+        plan = {**selection, 'objective_revision': approved['revision'], 'objective_sha256': approved['sha256'],
+                'assignments': default_assignments if assignments is None else assignments}
         review = self.director('plan-preview', plan)
         frozen = self.director('plan-freeze', {**plan, 'expected_preview_sha256': review['preview_sha256']})
         return {**selection, 'plan_sha256': frozen['plan_sha256']}
@@ -395,6 +404,262 @@ class DirectorTopologyTests(unittest.TestCase):
         self.assertIsNone(restored['stop_reason'])
         self.assertEqual(work.read_text(), 'Partial work survives the Director hold.\n')
         self.assertEqual(set(read_json(self.external / STATE)['run_registry']['runs']), {external_run})
+
+    def supervised_launches(self):
+        self.declaration['areas'][0]['allowed_effects'].append('launch')
+        self.declaration['areas'][1]['allowed_effects'].append('launch')
+        self.register()
+        specs = [
+            ('game', 'unity', self.external, ['fixture-editor'], []),
+            ('story', 'narrative', self.parent, [], []),
+            ('art', 'art', self.parent, [], []),
+            ('story-followup', 'narrative', self.parent, [], ['story']),
+        ]
+        assignments = []
+        for name, role, root, resources, depends_on in specs:
+            area = 'story' if name == 'story-followup' else name
+            files = ['source.txt', 'resource.txt'] if name == 'game' else ['source.txt']
+            task = self.child_task(root, [area + '/' + path for path in files], f'Check {name} input')
+            assignments.append({'id': name, 'role': role, 'area_id': area, 'workspace': 'recorded-worktree',
+                                'child': task, 'capability': 'core-task', 'write_paths': files,
+                                'resources': resources, 'pins': [], 'depends_on': depends_on,
+                                'expected_result': 'The registered path stays in scope.', 'check': 'scope-check',
+                                'authority_ref': 'fixture-owner', 'effects': ['launch'],
+                                'stop_rules': ['Keep the recorded project scope.']})
+        selected = self.freeze(None, assignments=assignments)
+        self.supervised_key = {'director_run_id': identity('DR')}
+        self.director('run-start', {**selected, **self.supervised_key,
+            'assignment_ids': [assignment['id'] for assignment in assignments],
+            'owner': {'actor': 'fixture-owner', 'reference': 'fixture-supervision', 'kind': 'owner-message'},
+            'authority': {assignment['id']: ['launch'] for assignment in assignments}, 'approved_defaults': [],
+            'supervision': {'host': socket.gethostname(), 'progress_timeout_seconds': 10,
+                            'heartbeat_timeout_seconds': 8},
+        })
+        launches = {}
+        for (name, _, root, resources, _), assignment in zip(specs, assignments):
+            inspected = self.director('run-status', self.supervised_key)
+            coordinator = self.base / (name + '-coordinator')
+            dispatch = {**self.supervised_key, 'expected_run_sha256': inspected['run_sha256'],
+                        'assignment_id': name, 'operation': 'start',
+                        'request': {'expected_source_hash': sha((root / QUEUE).read_bytes()), 'local_base': True,
+                                    'local_base_authorization': 'Disposable supervised topology fixture.',
+                                    'base_branch': 'develop', 'branch': 'codex/topology-' + name,
+                                    'worktree': str(coordinator)}}
+            if name == 'story-followup':
+                self.assertEqual(inspected['assignments'][name]['dependencies'], ['story'])
+                self.assertFalse(self.director('run-dispatch', dispatch, error=r'(?i)not eligible')['ok'])
+                self.assertFalse(coordinator.exists())
+                continue
+            launch = self.director('run-dispatch', dispatch)['result']
+            self.assertRegex(launch['id'], r'^WR-')
+            self.assertEqual(Path(self.git(coordinator, 'rev-parse', '--show-toplevel').strip()), coordinator)
+            selector = ('--run-id', launch['id'])
+            self.core(root, 'checkpoint', {'phase': 'refresh-profile', 'stop_reason': 'Prepare fixture worktree.'}, *selector)
+            self.install(coordinator, 'unity' if root == self.external else 'director', WRITER)
+            launches[name] = ({'assignment_id': name, 'child_run_id': launch['id'],
+                               'task_id': assignment['child']['task_id']}, coordinator, resources)
+        for scope, coordinator, _ in launches.values():
+            selector = ('--run-id', scope['child_run_id'])
+            self.core(coordinator, 'admit', None, *selector)
+            self.core(coordinator, 'checkpoint', {'phase': 'implement', 'stop_reason': None}, *selector)
+        self.supervised_time = datetime.now(timezone.utc)
+        return launches
+
+    def supervision_request(self, action, **fields):
+        observed = self.director('run-supervise', {**self.supervised_key, 'action': 'status'}, family='run')
+        return {**self.supervised_key, 'action': action, 'expected_run_sha256': observed['run_sha256'],
+                'request_id': identity('fixture-request'), **fields}
+
+    def run_supervision_at(self, payload, seconds):
+        # Inject only UTC time into the installed implementation. Process observations remain local and live.
+        clock = (self.supervised_time + timedelta(seconds=seconds)).isoformat()
+        path = write(self.base, identity('supervision') + '.json', json.dumps(payload))
+        entry = self.parent / AGENTS / 'skill-tree-director-run/scripts/runtime/common/scripts/director-state.py'
+        tick = '''from datetime import datetime
+import runpy
+import sys
+
+director = runpy.run_path(sys.argv[1])
+load = director['WF'].owned_module
+now = datetime.fromisoformat(sys.argv[2])
+
+def with_clock(name, path):
+    helper = load(name, path)
+    if name == 'director_run':
+        helper.DirectorRun._supervise_now = lambda self: now
+    return helper
+
+director['WF'].owned_module = with_clock
+raise SystemExit(director['main'](sys.argv[3:]))
+'''
+        result = subprocess.run([sys.executable, '-B', '-c', tick, str(entry), clock,
+                                 'run-supervise', str(self.parent), '--input', str(path)],
+                                cwd=self.base, env=GIT_ENV, capture_output=True, text=True, timeout=60)
+        try:
+            return result.returncode, json.loads(result.stdout or result.stderr)
+        except json.JSONDecodeError:
+            self.fail(result.stdout + result.stderr)
+
+    def supervise(self, action, seconds, *, error=None, **fields):
+        request = self.supervision_request(action, **fields)
+        status, response = self.run_supervision_at(request, seconds)
+        if error is None:
+            self.assertEqual(status, 0, response)
+        else:
+            self.assertEqual(status, 2, response)
+            self.assertRegex(response['error'], error)
+        return response
+
+    def supervised_writer(self, launch, name, **fields):
+        scope, coordinator, resources = launch
+        worktree = self.base / (name + '-worker')
+        base = self.git(coordinator, 'rev-parse', 'HEAD').strip()
+        self.git(coordinator, 'worktree', 'add', '--detach', worktree, base)
+        return {**scope, 'role': 'worker', 'unit_id': name, 'generation': 1, 'actor_id': name + '-actor',
+                'worktree': str(worktree), 'base': base, 'paths': [scope['assignment_id'] + '/source.txt'],
+                'resources': resources, **fields}
+
+    def fixture_process_group(self):
+        process = subprocess.Popen([sys.executable, '-B', '-c', 'import signal; signal.pause()'],
+                                   cwd=self.base, env=GIT_ENV, start_new_session=True)
+        self.addCleanup(self.stop_fixture_group, process)
+        self.assertEqual(os.getpgid(process.pid), process.pid)
+        return process, {'pid': process.pid, 'pgid': process.pid}
+
+    def stop_fixture_group(self, process):
+        if process.poll() is not None:
+            return
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        process.wait(timeout=5)
+
+    def supervised_candidate(self, worker):
+        root = Path(worker['worktree'])
+        path = worker['paths'][0]
+        content = f"Checked {worker['unit_id']} generation {worker['generation']}.\n"
+        write(root, path, content)
+        self.git(root, 'add', '--', path)
+        self.git(root, '-c', 'user.name=Director Fixture', '-c', 'user.email=fixture@example.invalid',
+                 'commit', '-m', 'Update admitted fixture source')
+        head = self.git(root, 'rev-parse', 'HEAD').strip()
+        checked = self.git(root, 'show', f'{head}:{path}')
+        self.assertEqual(checked, content)
+        artifact = '.skill-tree/artifacts/fixture-check.txt'
+        written = write(root, artifact, checked)
+        return {'head': head, 'checks': [{'id': 'scope-check', 'path': artifact, 'sha256': sha(written.read_bytes())}]}
+
+    def test_supervised_nested_stall_preserves_sibling_and_fences_replacement(self):
+        launches = self.supervised_launches()
+        original_targets = [self.git(root, 'rev-parse', 'develop') for root in (self.parent, self.external)]
+        parent = {'unit_id': 'game-parent', 'generation': 1, 'actor_id': 'game-parent-actor'}
+        self.supervise('assign', 0, **launches['game'][0], role='supervisor', **parent)
+        parent_process, parent_group = self.fixture_process_group()
+        self.supervise('pickup', 0, **parent, process=parent_group)
+        nested = [self.supervised_writer(launches['game'], name, parent_unit_id=parent['unit_id'], paths=[path])
+                  for name, path in [('game-first', 'game/source.txt'), ('game-contender', 'game/resource.txt')]]
+        requests = [self.supervision_request('assign', **worker) for worker in nested]
+        self.assertEqual(requests[0]['expected_run_sha256'], requests[1]['expected_run_sha256'])
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(pool.map(lambda request: self.run_supervision_at(request, 0), requests))
+        self.assertEqual(sorted(code for code, _ in results), [0, 2], results)
+        winner = next(index for index, (code, _) in enumerate(results) if code == 0)
+        self.assertRegex(results[1 - winner][1]['error'], r'Writer lock exists|run changed since inspection')
+        game = nested[winner]
+        other = nested[1 - winner]
+        self.supervise('assign', 0, **other, error=r'(?i)exclusive resource')
+        art = self.supervised_writer(launches['art'], 'art-competitor')
+        story = self.supervised_writer(launches['story'], 'story-independent')
+        self.supervise('assign', 0, **story, depends_on=[game['unit_id']], error=r'(?i)unresolved prerequisite')
+        self.supervise('assign', 0, **story)
+        self.supervise('assign', 0, **art, error=r'(?i)no free implementation slot')
+
+        def actor(worker):
+            return {field: worker[field] for field in ('unit_id', 'generation', 'actor_id')}
+
+        old_process, old_group = self.fixture_process_group()
+        sibling_process, sibling_group = self.fixture_process_group()
+        self.supervise('pickup', 1, **actor(game), process=old_group)
+        waiting = self.supervise('wait', 6, **parent, reason='nested-result', reference=game['unit_id'])['attempt']
+        self.assertEqual(waiting['wait']['reason'], 'nested-result')
+        self.supervise('heartbeat', 7, **actor(game))
+        self.supervise('heartbeat', 7, **parent)
+        self.supervise('pickup', 8, **actor(story), process=sibling_group)
+        beat = self.supervise('heartbeat', 10, **actor(game))['attempt']
+        self.supervise('heartbeat', 10, **parent)
+        self.assertGreater(beat['last_heartbeat_at'], beat['last_progress_at'])
+        swept = self.supervise('sweep', 12)
+        self.assertEqual(swept['stalled'], [game['unit_id']])
+        self.supervise('progress', 12, **parent, reference='fixture-observed-stalled-child')
+
+        # A made-for-test host observation never substitutes for actual local process cleanup.
+        stop = {'kind': 'host-stopped', 'host': socket.gethostname(), 'actor_id': game['actor_id'],
+                **old_group, 'reference': 'fixture-only-lifecycle-observation'}
+        self.supervise('recover', 12, **actor(game), stop_observation=stop, error=r'(?i)still exists')
+        self.assertIsNone(old_process.poll())
+        replaced_checkout = self.supervised_writer(launches['game'], 'game-replacement')
+        replacement = {**replaced_checkout, 'unit_id': game['unit_id'], 'generation': 2,
+                       'parent_unit_id': parent['unit_id'], 'paths': game['paths']}
+        self.supervise('assign', 12, **replacement, error=r'(?i)stopp|recover|generation')
+        stale = self.supervised_candidate(game)
+
+        sibling = self.supervised_candidate(story)
+        self.supervise('progress', 13, **actor(story), reference='fixture-candidate-advanced')
+        self.assertIsNone(sibling_process.poll())
+        self.stop_fixture_group(sibling_process)
+        submission = self.supervision_request('submit', **actor(story), result=sibling)
+        submitted_code, submitted = self.run_supervision_at(submission, 13)
+        self.assertEqual(submitted_code, 0, submitted)
+        self.assertEqual(submitted['attempt']['candidate']['head'], sibling['head'])
+        self.assertEqual(submitted['attempt']['candidate']['paths'], story['paths'])
+        self.supervise('assign', 13, **other, error=r'(?i)exclusive resource')
+
+        self.stop_fixture_group(old_process)
+        with self.assertRaises(ProcessLookupError):
+            os.killpg(old_group['pgid'], 0)
+        self.assertIsNone(parent_process.poll())
+        self.supervise('recover', 13, **actor(game), stop_observation={**stop, 'actor_id': story['actor_id']},
+                       error=r'(?i)host.stop|observation')
+        recovered = self.supervise('recover', 13, **actor(game), stop_observation=stop)
+        self.assertEqual(recovered['attempt']['status'], 'stopped')
+        self.supervise('submit', 13, **actor(game), result=stale, error=r'(?i)retired or stale')
+        self.supervise('assign', 14, **replacement)
+        self.supervise('submit', 14, **actor(game), result=stale, error=r'(?i)retired or stale')
+        duplicate_code, duplicate = self.run_supervision_at(submission, 14)
+        self.assertEqual(duplicate_code, 0, duplicate)
+        self.assertEqual(duplicate['status'], 'replayed')
+        self.assertEqual(duplicate['attempt']['receipt_sha256'], submitted['attempt']['receipt_sha256'])
+        changed_code, changed = self.run_supervision_at({**submission, 'result': stale}, 14)
+        self.assertEqual(changed_code, 2, changed)
+        self.assertRegex(changed['error'], r'(?i)request id was reused with different input')
+
+        new_process, new_group = self.fixture_process_group()
+        self.supervise('pickup', 14, **actor(replacement), process=new_group)
+        self.supervise('wait', 14, **parent, reason='nested-result', reference=replacement['unit_id'])
+        candidate = self.supervised_candidate(replacement)
+        self.supervise('progress', 15, **actor(replacement), reference='fixture-replacement-advanced')
+        self.supervise('heartbeat', 17, **parent)
+        self.supervise('heartbeat', 21, **actor(replacement))
+        parent_heartbeat = self.supervise('heartbeat', 22, **parent)['attempt']['last_heartbeat_at']
+        self.stop_fixture_group(new_process)
+        accepted = self.supervise('submit', 23, **actor(replacement), result=candidate)['attempt']
+        self.assertEqual(accepted['candidate']['head'], candidate['head'])
+        self.stop_fixture_group(parent_process)
+        finished_parent = self.supervise('submit', 24, **parent)['attempt']
+        self.assertEqual(finished_parent['status'], 'completed')
+        self.assertEqual(finished_parent['last_progress_at'], accepted['verified_at'])
+        self.assertEqual(finished_parent['last_heartbeat_at'], parent_heartbeat)
+        self.supervise('assign', 25, **art)
+        overlap = self.supervised_writer(launches['art'], 'art-overlap')
+        self.supervise('assign', 25, **overlap, error=r'(?i)overlapping supervised write scope')
+        view = self.director('run-supervise', {**self.supervised_key, 'action': 'status'}, family='run')
+        units = view['supervision']['units']
+        self.assertEqual(units[story['unit_id']]['attempts']['1']['receipt_sha256'], submitted['attempt']['receipt_sha256'])
+        self.assertEqual(units[game['unit_id']]['attempts']['1']['status'], 'stopped')
+        self.assertEqual(units[game['unit_id']]['attempts']['1']['stalled_reason'], 'progress-timeout')
+        self.assertEqual(units[game['unit_id']]['attempts']['2']['status'], 'completed')
+        self.assertEqual([self.git(root, 'rev-parse', 'develop') for root in (self.parent, self.external)], original_targets)
 
 
 if __name__ == '__main__':

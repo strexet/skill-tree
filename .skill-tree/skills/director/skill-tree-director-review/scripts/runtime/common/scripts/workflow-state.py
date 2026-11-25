@@ -1085,7 +1085,7 @@ def _start_selection(store,mode,selector,workspace,text=None):
     if mode=='all' and selector:raise WorkflowError('Implement All uses the initial prioritized snapshot')
     return tasks,chosen,snapshot
 
-def start(store,mode,selector=None,limits=None,workspace=None):
+def start(store,mode,selector=None,limits=None,workspace=None,*,reviewed_directed=False):
     dispatch,options=child_dispatch('start',workspace or {},start_context={'mode':mode,'selector':selector,'limits':limits})
     if dispatch:
         with store.lock():
@@ -1096,8 +1096,12 @@ def start(store,mode,selector=None,limits=None,workspace=None):
         raise WorkflowError('Resolve group filters before start and pass the exact snapshot IDs and source hash')
     operation=options.get('implementation_operation')
     review_policy=None
+    directed_local = (reviewed_directed and dispatch and mode == 'next' and operation == 'work-through-next'
+                      and options.get('local_base') is True and 'delivery_authorization' not in options)
+    if reviewed_directed and not directed_local:
+        raise WorkflowError('A supervised child requires the exact directed local work-through-next route')
     if operation is not None:
-        if dispatch or not store.neutral or store.run_id or operation!={'next':'work-through-next','all':'implement-all'}.get(mode):
+        if (dispatch and not directed_local) or not store.neutral or store.run_id or operation!={'next':'work-through-next','all':'implement-all'}.get(mode):
             raise WorkflowError('New controller Git policy requires the matching standalone operation and mode')
         authorization=options.get('delivery_authorization',{})
         if not isinstance(authorization,dict) or any(
@@ -1106,6 +1110,8 @@ def start(store,mode,selector=None,limits=None,workspace=None):
         if authorization.get('pr') is not True:
             launch=workspaces.checked_out_branch(store.source_root)
             launch_branch=launch['ref'].removeprefix('refs/heads/')
+            if directed_local and options.get('base_branch') != launch_branch:
+                raise WorkflowError('Supervised child delivery requires the exact checked-out local base branch')
             if authorization.get('target_branch',launch_branch)!=launch_branch:
                 raise WorkflowError('Reviewed local delivery targets the exact checked-out launch branch')
             instruction=authorization.get('owner_instruction')
@@ -5626,6 +5632,25 @@ def worker_handoff(store, payload):
         return result
 
 
+def retired_worker_scope(store, state, assignment, head):
+    run = state['active_run']
+    task_id = assignment['task_id']
+    outcome_id = run.get('completion_refs', {}).get(task_id)
+    if (not assignment.get('result') or task_id not in run.get('completed_ids', []) or not outcome_id
+            or state['task_progress'].get(task_id, {}).get('revalidation')):
+        return False
+    outcomes = [row for row in store.outcomes() if (row.get('id'), row.get('task_id'), row.get('run_id'), row.get('disposition'))
+                == (outcome_id, task_id, run['id'], 'completed')]
+    if len(outcomes) != 1:
+        return False
+    body = completed_task_body(store, outcomes[0])
+    commit = (outcomes[0].get('task_git_commit') or {}).get('commit', '')
+    return bool(body and digest(body.strip().encode()) == assignment['definition']
+                and re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', commit)
+                and workspaces.local_git(store.source_root, 'merge-base', '--is-ancestor',
+                                         commit, head, accepted=(0, 1, 128)).returncode == 0)
+
+
 def assign_worker(store, state, payload, ledger, current, request):
     if payload['generation'] != (current['generation'] + 1 if current else 1):
         raise WorkflowError('Worker assignment requires the next generation for its slot')
@@ -5653,6 +5678,8 @@ def assign_worker(store, state, payload, ledger, current, request):
         if slot == str(payload['slot']) or not attempts:
             continue
         other = attempts[-1]
+        if retired_worker_scope(store, state, other, base):
+            continue
         if other['worker_id'] == payload['worker_id'] or other['checkout'] == checkout:
             raise WorkflowError('Worker slots require distinct actors and checkouts')
         for left, right in ((paths, other['paths']), (paths, other['shared_inputs']), (inputs, other['paths'])):
