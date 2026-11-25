@@ -1347,6 +1347,7 @@
         ".skill-tree/skills/director/skill-tree-implement-all/references/history-retention.md",
         ".skill-tree/skills/director/skill-tree-implement-all/references/installation-profile.md",
         ".skill-tree/skills/director/skill-tree-implement-all/references/orchestration.md",
+        ".skill-tree/skills/director/skill-tree-implement-all/references/parallel-preview.md",
         ".skill-tree/skills/director/skill-tree-implement-all/references/pending-task-format.md",
         ".skill-tree/skills/director/skill-tree-implement-all/references/pending-task-intake.md",
         ".skill-tree/skills/director/skill-tree-implement-all/references/plugin-bindings.json",
@@ -1361,6 +1362,7 @@
         ".skill-tree/skills/director/skill-tree-implement-all/scripts/decision-orchestration.py",
         ".skill-tree/skills/director/skill-tree-implement-all/scripts/development-policies.js",
         ".skill-tree/skills/director/skill-tree-implement-all/scripts/director-dispatch.py",
+        ".skill-tree/skills/director/skill-tree-implement-all/scripts/parallel-preview.py",
         ".skill-tree/skills/director/skill-tree-implement-all/scripts/plugin-bindings.js",
         ".skill-tree/skills/director/skill-tree-implement-all/scripts/plugin-composition.js",
         ".skill-tree/skills/director/skill-tree-implement-all/scripts/plugin-hooks.js",
@@ -2357,6 +2359,7 @@
         ".skill-tree/skills/general/skill-tree-implement-all/references/history-retention.md",
         ".skill-tree/skills/general/skill-tree-implement-all/references/installation-profile.md",
         ".skill-tree/skills/general/skill-tree-implement-all/references/orchestration.md",
+        ".skill-tree/skills/general/skill-tree-implement-all/references/parallel-preview.md",
         ".skill-tree/skills/general/skill-tree-implement-all/references/pending-task-format.md",
         ".skill-tree/skills/general/skill-tree-implement-all/references/pending-task-intake.md",
         ".skill-tree/skills/general/skill-tree-implement-all/references/plugin-bindings.json",
@@ -2371,6 +2374,7 @@
         ".skill-tree/skills/general/skill-tree-implement-all/scripts/decision-orchestration.py",
         ".skill-tree/skills/general/skill-tree-implement-all/scripts/development-policies.js",
         ".skill-tree/skills/general/skill-tree-implement-all/scripts/director-dispatch.py",
+        ".skill-tree/skills/general/skill-tree-implement-all/scripts/parallel-preview.py",
         ".skill-tree/skills/general/skill-tree-implement-all/scripts/plugin-bindings.js",
         ".skill-tree/skills/general/skill-tree-implement-all/scripts/plugin-composition.js",
         ".skill-tree/skills/general/skill-tree-implement-all/scripts/plugin-hooks.js",
@@ -3423,6 +3427,7 @@
         ".skill-tree/skills/unity/skill-tree-implement-all/references/history-retention.md",
         ".skill-tree/skills/unity/skill-tree-implement-all/references/installation-profile.md",
         ".skill-tree/skills/unity/skill-tree-implement-all/references/orchestration.md",
+        ".skill-tree/skills/unity/skill-tree-implement-all/references/parallel-preview.md",
         ".skill-tree/skills/unity/skill-tree-implement-all/references/pending-task-format.md",
         ".skill-tree/skills/unity/skill-tree-implement-all/references/pending-task-intake.md",
         ".skill-tree/skills/unity/skill-tree-implement-all/references/plugin-bindings.json",
@@ -3441,6 +3446,7 @@
         ".skill-tree/skills/unity/skill-tree-implement-all/scripts/development-policies.js",
         ".skill-tree/skills/unity/skill-tree-implement-all/scripts/director-dispatch.py",
         ".skill-tree/skills/unity/skill-tree-implement-all/scripts/inspect-unity-repository.py",
+        ".skill-tree/skills/unity/skill-tree-implement-all/scripts/parallel-preview.py",
         ".skill-tree/skills/unity/skill-tree-implement-all/scripts/plugin-bindings.js",
         ".skill-tree/skills/unity/skill-tree-implement-all/scripts/plugin-composition.js",
         ".skill-tree/skills/unity/skill-tree-implement-all/scripts/plugin-hooks.js",
@@ -4483,6 +4489,7 @@
         ".skill-tree/skills/web/skill-tree-implement-all/references/history-retention.md",
         ".skill-tree/skills/web/skill-tree-implement-all/references/installation-profile.md",
         ".skill-tree/skills/web/skill-tree-implement-all/references/orchestration.md",
+        ".skill-tree/skills/web/skill-tree-implement-all/references/parallel-preview.md",
         ".skill-tree/skills/web/skill-tree-implement-all/references/pending-task-format.md",
         ".skill-tree/skills/web/skill-tree-implement-all/references/pending-task-intake.md",
         ".skill-tree/skills/web/skill-tree-implement-all/references/plugin-bindings.json",
@@ -4498,6 +4505,7 @@
         ".skill-tree/skills/web/skill-tree-implement-all/scripts/decision-orchestration.py",
         ".skill-tree/skills/web/skill-tree-implement-all/scripts/development-policies.js",
         ".skill-tree/skills/web/skill-tree-implement-all/scripts/director-dispatch.py",
+        ".skill-tree/skills/web/skill-tree-implement-all/scripts/parallel-preview.py",
         ".skill-tree/skills/web/skill-tree-implement-all/scripts/plugin-bindings.js",
         ".skill-tree/skills/web/skill-tree-implement-all/scripts/plugin-composition.js",
         ".skill-tree/skills/web/skill-tree-implement-all/scripts/plugin-hooks.js",
@@ -5511,6 +5519,11 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/common/references/parallel-preview.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/common/references/pending-task-format.md",
       "role": "canonical"
     },
@@ -5732,6 +5745,11 @@
     {
       "owner": "skill-tree",
       "path": ".skill-tree/common/scripts/narrative-state.py",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
+      "path": ".skill-tree/common/scripts/parallel-preview.py",
       "role": "canonical"
     },
     {
@@ -6166,6 +6184,7 @@
     ".skill-tree/common/references/narrative-world-laws.md": "9a8bfb2c7bf880477108e1470713647b2b030ebe213af184ad3ee50e9b3ffd1a",
     ".skill-tree/common/references/narrative-world-transitions.md": "aa323d03e2c4635972632c58f350fa785c34a8fc812776ccec5fe895dab15209",
     ".skill-tree/common/references/orchestration.md": "ba28f6d4cf9f1cd5a02cd3b70492caa76c4349aa6cdcb26c8ff5405c7d8376cb",
+    ".skill-tree/common/references/parallel-preview.md": "53a02651d9d076e6954dc84217daa989c3cccdb858d0aa05faa620dbcf429fba",
     ".skill-tree/common/references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
     ".skill-tree/common/references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
     ".skill-tree/common/references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
@@ -6211,6 +6230,7 @@
     ".skill-tree/common/scripts/inspect-unity-repository.py": "794230aca0f338a9d5a6ce7dd62df2016c9d13fb9622174429f9188225fb78e9",
     ".skill-tree/common/scripts/narrative-route-check.py": "88bdd66fbaa9829a7b69843f8004516de28bbb30340c380bc5a3be64c0faa01d",
     ".skill-tree/common/scripts/narrative-state.py": "ad6618d06fc1b2cac79694a64ff5733bdd03a330e0714851e04e185d108c1388",
+    ".skill-tree/common/scripts/parallel-preview.py": "8c69a30f31fbcc3f155c7a12cd08d721494b1732307bb3c06ae86ea9e0305343",
     ".skill-tree/common/scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",
     ".skill-tree/common/scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",
     ".skill-tree/common/scripts/plugin-manager.js": "7cf2b375d959be40b7bfbff038ae69d87440817b7af5c1d7a44f9ba95aefb337",
@@ -6232,7 +6252,7 @@
     ".skill-tree/config/plugins/task-interview.json": "77b654102b28e33161c4cce8e1aec76c33ece2a93468203e5a2b5c9affc0a8a1",
     ".skill-tree/config/providers.json": "a436dd2deb2a81dbf8ed2817754697921233c41de76e393a841166765a16e32b",
     ".skill-tree/config/repository.json": "c9c8106a799778fae6fedbca29ea9aa12a14acad7c6d8072988aca08988f8297",
-    ".skill-tree/config/resource-map.json": "d909e1c83f11bc90b08047ca776f74b0b4e832c0521e68bcb9dfc3b03e8b7d1d",
+    ".skill-tree/config/resource-map.json": "4255bbecc351dae88172636dd1a69b231592aac07c5d3ec2e87d1d8ece246ba9",
     ".skill-tree/documents/agent-compatibility.md": "e7b051efe37f0e528ff82db666e60ee6b05bb214dabbdc73e1eaac85daa8b5d6",
     ".skill-tree/documents/build-and-release.md": "48c11b6608256cb65f5f07ae20955808539c675441eb9fc69c9713fec725863a",
     ".skill-tree/documents/dependencies.md": "e524d1d314d8c443e000260860e71fca6db4bd6938e86cb7443379a6fb2db4f3",
@@ -6302,7 +6322,7 @@
     ".skill-tree/scripts/validate-skill-repository.py": "5cd81850dfa3f52ca92abf69f5110c497491e9c07b0f039451a9df7a2b3b8faa",
     ".skill-tree/src/init-rules/skill-tree-skills.md": "602dee0d8859904922a76a338e3452a1dc86e597dba0d00b006bf31ff9e795c6",
     ".skill-tree/templates/invariants.json": "ee0c2c5445e7408cc15fd4aed231ff7d0c38a07d063061f75bfeea3da8971903",
-    ".skill-tree/templates/operations.json": "dfcc3985ac3f0dc0ae0fbb54fca1e54e08f2edbd6bab7825ab50359154698cc8"
+    ".skill-tree/templates/operations.json": "06281e3240e5508ceec4185132ecb4a71c73e9da1b62511e285ff98d33313a29"
   },
   "state": ".skill-tree/documents/future.json",
   "validation_commands": [

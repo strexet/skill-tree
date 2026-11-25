@@ -145,11 +145,15 @@
   },
   "skill-tree-implement-all": {
     "title": "Skill-Tree: Implement All",
-    "description": "Implement all prioritized tasks or an explicitly selected group with required dependencies and resumable checkpoints; defer new nonblocking work.",
+    "description": "Preview compatible Ready work automatically, or implement prioritized tasks with required dependencies and resumable checkpoints.",
     "sections": [
       {
         "id": "shared-workspace-routing",
         "text": "In a registered shared root with .skill-tree/.director, use the workspace Director menu and project-route before touching a queue. Show the selected project, exact queue and task scope. Use Core with --direct-project only when the owner explicitly selects direct project work."
+      },
+      {
+        "id": "parallel-ready-preview",
+        "text": "For an automatic read-only parallel Ready preview, follow [parallel preview](references/parallel-preview.md) before any implementation steps. Use the current prioritized queue with no task selectors by default. In a registered workspace use the approved read-only project route. Report the selection, deferred reasons and combined checks, then end the preview."
       },
       {
         "id": "operation",

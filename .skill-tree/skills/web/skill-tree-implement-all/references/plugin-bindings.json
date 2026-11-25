@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "e395ca136ee009797be95a6f0b06a017bf20db74f90862cc96a41abeebefb3ac",
+  "identity": "e2c650003d7b6bbf5874b4059432c5897d4651bd01622904b19ba3f94c3e9d45",
   "operation": "skill-tree-implement-all",
   "operations": {
     "skill-tree-3d": {
@@ -3289,7 +3289,7 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "c1f188c5b9d173e3a072e19cf6bda7d414166e510d8a23816212671fdbf6b45a",
+    "SKILL.md": "330bd9d713831a3000dd8415bdd47186f0cbed134919a5b8a513ccd52f405ac0",
     "agents/openai.yaml": "2d4a8d52b557c9473ba1f73e7a144169fdfeba4f207335b9341a9a1b127ea516",
     "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     "references/development-practices.md": "352a45b093f2c53b7b08aef045a098880af74c6add6fb79f95017a52fd0e0780",
@@ -3298,6 +3298,7 @@
     "references/history-retention.md": "ff3fa8602fa29085b59f0aa5ae9f9da698bd5b5d5672235fe809018b18b4b801",
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
     "references/orchestration.md": "ba28f6d4cf9f1cd5a02cd3b70492caa76c4349aa6cdcb26c8ff5405c7d8376cb",
+    "references/parallel-preview.md": "53a02651d9d076e6954dc84217daa989c3cccdb858d0aa05faa620dbcf429fba",
     "references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
     "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
@@ -3312,6 +3313,7 @@
     "scripts/decision-orchestration.py": "d2c5ac475033ae06321fc7917ddf96232a0e442bef7c5db537891e12164fd404",
     "scripts/development-policies.js": "9d3036e0dd2b2aaf070f3ec92f9e1d6d6830fe35cd8ebb1a78135c3ad792a2fd",
     "scripts/director-dispatch.py": "1b1533bca022ef7f03e24d9becd212f87dac2923de53cae1b3cf7d5a16837d0e",
+    "scripts/parallel-preview.py": "8c69a30f31fbcc3f155c7a12cd08d721494b1732307bb3c06ae86ea9e0305343",
     "scripts/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
     "scripts/plugin-composition.js": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b",
     "scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",
