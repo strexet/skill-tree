@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "670501237e2500bf5c64c111582d2aab39c88a1f5b90745b424ea85cf752deba",
+  "identity": "ac403cbd0cc87deb8ae44e7ef89b38758b698266d0736a376c12714277ee9d46",
   "operation": "skill-tree-implement-all",
   "operations": {
     "skill-tree-3d": {
@@ -3289,7 +3289,7 @@
     }
   },
   "owned_resources": {
-    "SKILL.md": "330bd9d713831a3000dd8415bdd47186f0cbed134919a5b8a513ccd52f405ac0",
+    "SKILL.md": "97391cdc1633f2aed1f1b2f0c38d9bc70cc87ad3b5525052c2ca57b69dea5fc2",
     "agents/openai.yaml": "2d4a8d52b557c9473ba1f73e7a144169fdfeba4f207335b9341a9a1b127ea516",
     "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     "references/development-practices.md": "352a45b093f2c53b7b08aef045a098880af74c6add6fb79f95017a52fd0e0780",
@@ -3298,7 +3298,7 @@
     "references/history-retention.md": "ff3fa8602fa29085b59f0aa5ae9f9da698bd5b5d5672235fe809018b18b4b801",
     "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
     "references/orchestration.md": "ae5d072144a9a28f9d2e97e449ec99be7e05402b82f7e32b80761cfdddb5802e",
-    "references/parallel-preview.md": "53a02651d9d076e6954dc84217daa989c3cccdb858d0aa05faa620dbcf429fba",
+    "references/parallel-preview.md": "dfcff75024ccf4dffe4bf2b070881bd4c70036ce80a10d1207076f9940202ed4",
     "references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
     "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",

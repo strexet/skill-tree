@@ -204,6 +204,8 @@ class ParallelReadyPreviewTests(unittest.TestCase):
         ], text=True, capture_output=True, check=True, timeout=50)
         skill = self.root / '.agents/skills/skill-tree-implement-all'
         operation = (skill / 'SKILL.md').read_text()
+        self.assertIn('An ordinary Implement All invocation starts execution for the full initial prioritized queue.', operation)
+        self.assertIn('An explicit Ready preview request runs the read-only preview.', operation)
         self.assertIn('references/parallel-preview.md', operation)
         self.assertIn('workflow-state.py group-selection', operation)
         before = self.state_bytes()

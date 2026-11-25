@@ -6184,7 +6184,7 @@
     ".skill-tree/common/references/narrative-world-laws.md": "9a8bfb2c7bf880477108e1470713647b2b030ebe213af184ad3ee50e9b3ffd1a",
     ".skill-tree/common/references/narrative-world-transitions.md": "aa323d03e2c4635972632c58f350fa785c34a8fc812776ccec5fe895dab15209",
     ".skill-tree/common/references/orchestration.md": "ae5d072144a9a28f9d2e97e449ec99be7e05402b82f7e32b80761cfdddb5802e",
-    ".skill-tree/common/references/parallel-preview.md": "53a02651d9d076e6954dc84217daa989c3cccdb858d0aa05faa620dbcf429fba",
+    ".skill-tree/common/references/parallel-preview.md": "dfcff75024ccf4dffe4bf2b070881bd4c70036ce80a10d1207076f9940202ed4",
     ".skill-tree/common/references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
     ".skill-tree/common/references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
     ".skill-tree/common/references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
@@ -6322,7 +6322,7 @@
     ".skill-tree/scripts/validate-skill-repository.py": "5cd81850dfa3f52ca92abf69f5110c497491e9c07b0f039451a9df7a2b3b8faa",
     ".skill-tree/src/init-rules/skill-tree-skills.md": "602dee0d8859904922a76a338e3452a1dc86e597dba0d00b006bf31ff9e795c6",
     ".skill-tree/templates/invariants.json": "ee0c2c5445e7408cc15fd4aed231ff7d0c38a07d063061f75bfeea3da8971903",
-    ".skill-tree/templates/operations.json": "06281e3240e5508ceec4185132ecb4a71c73e9da1b62511e285ff98d33313a29"
+    ".skill-tree/templates/operations.json": "6c8594366a8d79943c9bb57072e131b9da3f3429192e8095cf9e62375878326d"
   },
   "state": ".skill-tree/documents/future.json",
   "validation_commands": [

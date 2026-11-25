@@ -1,6 +1,6 @@
 ---
 name: skill-tree-implement-all
-description: "[general] Preview compatible Ready work automatically, or implement prioritized tasks with required dependencies and resumable checkpoints."
+description: "[general] Implement the full initial prioritized queue or an explicitly selected group with required dependencies and resumable checkpoints. Use Ready preview for an explicit preview request."
 license: MIT
 ---
 
@@ -16,7 +16,7 @@ Read [core decision governance](references/decision-governance.md) before operat
 
 In a registered shared root with .skill-tree/.director, use the workspace Director menu and project-route before touching a queue. Show the selected project, exact queue and task scope. Use Core with --direct-project only when the owner explicitly selects direct project work.
 
-For an automatic read-only parallel Ready preview, follow [parallel preview](references/parallel-preview.md) before any implementation steps. Use the current prioritized queue with no task selectors by default. In a registered workspace use the approved read-only project route. Report the selection, deferred reasons and combined checks, then end the preview.
+An ordinary Implement All invocation starts execution for the full initial prioritized queue. Honor an explicit task group or resume selection. An explicit Ready preview request runs the read-only preview. Follow [parallel preview](references/parallel-preview.md), use the current prioritized queue with no task selectors by default, and use the approved read-only project route in a registered workspace. Report the selection, deferred reasons and combined checks, then end the requested preview.
 
 Read applicable rules, [orchestration](references/orchestration.md) and [metadata](references/workflow-metadata.md). Query the index/checkpoint first. Select an existing run explicitly for resume, or start mode all for a new isolated run. Resolve an explicit topic or batch group with scripts/workflow-state.py group-selection for the prioritized queue. Report the exact roots, readiness and required dependencies outside the group. Pass the exact Ready T- IDs as snapshot_ids and the inspected expected_source_hash in the start JSON. An invalid or empty group stops. A request without a group selects the full initial prioritized queue. Preserve the recorded group on resume. Use scripts/workflow-state.py advance before handoffs. After scoped processing, automatically choose the recommended eligible unit inside the recorded root/snapshot boundary; routine next-action questions apply only to standalone processing. Material questions and execution stops remain binding. Follow bundled [intake](references/pending-task-intake.md) and [processing/implementation](references/future-workflow.md) contracts. Query compact history only when relevant. Return completed/deferred/blocked IDs, checks and next action. No scheduler or blanket execution permission is implied.
 

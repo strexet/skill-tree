@@ -145,7 +145,7 @@
   },
   "skill-tree-implement-all": {
     "title": "Skill-Tree: Implement All",
-    "description": "Preview compatible Ready work automatically, or implement prioritized tasks with required dependencies and resumable checkpoints.",
+    "description": "Implement the full initial prioritized queue or an explicitly selected group with required dependencies and resumable checkpoints. Use Ready preview for an explicit preview request.",
     "sections": [
       {
         "id": "shared-workspace-routing",
@@ -153,7 +153,7 @@
       },
       {
         "id": "parallel-ready-preview",
-        "text": "For an automatic read-only parallel Ready preview, follow [parallel preview](references/parallel-preview.md) before any implementation steps. Use the current prioritized queue with no task selectors by default. In a registered workspace use the approved read-only project route. Report the selection, deferred reasons and combined checks, then end the preview."
+        "text": "An ordinary Implement All invocation starts execution for the full initial prioritized queue. Honor an explicit task group or resume selection. An explicit Ready preview request runs the read-only preview. Follow [parallel preview](references/parallel-preview.md), use the current prioritized queue with no task selectors by default, and use the approved read-only project route in a registered workspace. Report the selection, deferred reasons and combined checks, then end the requested preview."
       },
       {
         "id": "operation",

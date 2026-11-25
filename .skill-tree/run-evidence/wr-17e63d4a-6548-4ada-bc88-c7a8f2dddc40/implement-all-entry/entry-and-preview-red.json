@@ -1,0 +1,20 @@
+{
+  "check_id": "entry-and-preview",
+  "attempt_id": "C-90ef3041-3689-4049-b241-efc0dfaa5e82",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-parallel-preview.py"
+  ],
+  "exit_code": 1,
+  "result": "red",
+  "counts": {
+    "expected": 8,
+    "discovered": 8,
+    "passed": 7,
+    "failed": 1,
+    "skipped": 0
+  },
+  "observed_output": "..F.....\n======================================================================\nFAIL: test_installed_package_runs_without_selectors (__main__.ParallelReadyPreviewTests.test_installed_package_runs_without_selectors)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<run-worktree>/.skill-tree/tests/test-parallel-preview.py\", line 207, in test_installed_package_runs_without_selectors\n    self.assertIn('An ordinary Implement All invocation starts execution for the full initial prioritized queue.', operation)\n    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'An ordinary Implement All invocation starts execution for the full initial prioritized queue.'\n\n----------------------------------------------------------------------\nRan 8 tests in 4.708s\n\nFAILED (failures=1)",
+  "timeout": false,
+  "elapsed_seconds": 7.905
+}

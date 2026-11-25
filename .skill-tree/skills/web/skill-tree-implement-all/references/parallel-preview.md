@@ -1,6 +1,6 @@
 # Parallel Ready preview
 
-Ask for an automatic read-only parallel Ready preview in the current project. Use the bundled helper with the exact source checkout root. The helper resolves the canonical queue for a linked worktree.
+Use the read-only parallel Ready preview for an explicit preview request in the current project. Use the bundled helper with the exact source checkout root. The helper resolves the canonical queue for a linked worktree.
 
 ```sh
 python3 -B <skill-directory>/scripts/parallel-preview.py <project-root> --workers 2
