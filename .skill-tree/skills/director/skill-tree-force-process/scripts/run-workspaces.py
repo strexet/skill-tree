@@ -680,6 +680,72 @@ def local_overlap(left, right):
     return left == right or left.startswith(right + '/') or right.startswith(left + '/')
 
 
+def worker_path(value):
+    if (not isinstance(value, str) or not value or '\\' in value
+            or any(ord(char) < 32 for char in value)
+            or any(part.casefold() in {'', '.', '..', '.git'} for part in value.split('/'))):
+        raise RunError('Worker paths must be exact repository-relative paths')
+    return value
+
+
+def worker_paths(values):
+    if not isinstance(values, list):
+        raise RunError('Worker scope requires a list of paths')
+    paths = [worker_path(value) for value in values]
+    if len(set(paths)) != len(paths):
+        raise RunError('Worker paths must be distinct')
+    return sorted(paths)
+
+
+def worker_checkout(coordinator, supplied):
+    if not isinstance(supplied, str) or not supplied:
+        raise RunError('Worker scope requires an exact linked checkout')
+    path = Path(supplied)
+    if not path.is_absolute() or path.resolve() != path or path == coordinator:
+        raise RunError('Worker scope requires a distinct exact linked checkout')
+    root = Path(local_git_text(path, 'rev-parse', '--show-toplevel'))
+    common = common_dir(coordinator)
+    git_dir = Path(local_git_text(path, 'rev-parse', '--absolute-git-dir')).resolve()
+    if root != path or common is None or git_dir.parent != common / 'worktrees' or common_dir(path) != common:
+        raise RunError('Worker checkout must be an isolated worktree of the coordinator repository')
+    if str(path) in (runtime(coordinator) or {}).get('worktrees', {}).values():
+        raise RunError('A registered controller checkout cannot serve as a worker checkout')
+    unfinished(path)
+    identity = git_dir.stat()
+    checkout = hashlib.sha256(
+        f'{git_dir.relative_to(common).as_posix()}:{identity.st_dev}:{identity.st_ino}'.encode()
+    ).hexdigest()
+    return path, checkout
+
+
+def worker_head(root):
+    return local_git_text(root, 'rev-parse', '--verify', 'HEAD^{commit}')
+
+
+def require_clean_worker(root, artifacts=()):
+    entries = local_git(root, 'ls-files', '-v', '-z', '--').stdout.split(b'\0')
+    if any(entry and (entry[:1].islower() or entry.startswith(b'S ')) for entry in entries):
+        raise RunError('Worker checkout must have a fully visible Git index')
+    if local_git_paths(root, 'diff', 'HEAD', '--name-only', '--no-renames', '-z', '--'):
+        raise RunError('Worker checkout has uncommitted tracked changes')
+    if local_git_paths(root, 'ls-files', '--others', '--exclude-standard', '-z') - set(artifacts):
+        raise RunError('Worker checkout has unsubmitted untracked paths')
+
+
+def worker_candidate(root, base, head, allowed, artifacts):
+    if not isinstance(head, str) or head != worker_head(root):
+        raise RunError('Worker candidate must match the exact checked-out commit')
+    require_clean_worker(root, artifacts)
+    if head == base or local_git(root, 'merge-base', '--is-ancestor', base, head, accepted=(0, 1)).returncode:
+        raise RunError('Worker candidate must extend the recorded source base')
+    paths = sorted(local_git_paths(root, 'diff', '--name-only', '--no-renames', '-z', base, head, '--'))
+    if not paths or any(not any(path == scope or path.startswith(scope + '/') for scope in allowed)
+                        for path in worker_paths(paths)):
+        raise RunError('Worker candidate changed paths outside the assigned scope or has no changes')
+    tree = local_git_text(root, 'rev-parse', '--verify', head + '^{tree}')
+    return {'head': head, 'tree': tree, 'paths': paths}
+
+
 def checked_out_branch(root):
     unfinished(root)
     if Path(local_git_text(root, 'rev-parse', '--show-toplevel')).resolve() != root:

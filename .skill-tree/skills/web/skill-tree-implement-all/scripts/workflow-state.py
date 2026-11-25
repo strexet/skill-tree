@@ -4969,8 +4969,154 @@ def guard_shared_project(store):
             'Use --direct-project only for an explicitly requested direct Core operation.')
 
 
+def worker_handoff(store, payload):
+    if not valid_id(store.run_id, 'WR') or not isinstance(payload, dict):
+        raise WorkflowError('Worker handoff requires an exact controller run ID')
+    action = payload.get('action')
+    fields = {
+        'status': {'action'},
+        'assign': {'action', 'slot', 'generation', 'worker_id', 'task_id', 'base', 'worktree', 'paths', 'shared_inputs'},
+        'record': {'action', 'slot', 'generation', 'worker_id', 'head', 'checks'},
+    }
+    if not isinstance(action, str) or set(payload) != fields.get(action):
+        raise WorkflowError('Worker handoff requires an exact status, assign or record payload')
+    caller = store.source_root
+    relative = '.skill-tree/history/worker-handoffs/' + store.run_id.lower() + '.json'
+    path = store.owned(relative)
+
+    def load_receipts():
+        if path.is_symlink() or path.parent.is_symlink():
+            raise WorkflowError('Worker handoff evidence requires an ordinary owned path')
+        if not path.exists():
+            return {'schema': 1, 'run_id': store.run_id, 'slots': {}}
+        record = json.loads(path.read_text())
+        if (not isinstance(record, dict) or record.get('schema') != 1 or record.get('run_id') != store.run_id
+                or not isinstance(record.get('slots'), dict)):
+            raise WorkflowError('Worker handoff evidence does not match the selected controller')
+        return record
+
+    if action == 'status':
+        store.load()
+        return load_receipts()
+
+    slot, generation, actor = (payload[key] for key in ('slot', 'generation', 'worker_id'))
+    if (type(slot) is not int or slot not in {1, 2} or type(generation) is not int or generation < 1
+            or not isinstance(actor, str) or not actor.strip() or actor != actor.strip()):
+        raise WorkflowError('Worker handoff requires slot 1 or 2, generation and exact worker identity')
+    request = digest(dump(payload).encode())
+    locator = workspaces.runtime(store.root)
+    if not locator or locator['worktrees'].get(store.run_id) != str(caller):
+        raise WorkflowError('Only the registered coordinator worktree can record worker handoffs')
+    with store.lock():
+        state = store.load()
+        run = state['active_run']
+        workspaces.ensure_workspace(store, run)
+        if caller != store.source_root:
+            raise WorkflowError('Only the registered coordinator worktree can record worker handoffs')
+        ledger = load_receipts()
+        assignments = ledger['slots'].setdefault(str(slot), [])
+        current = assignments[-1] if assignments else None
+        if current and current['generation'] == generation:
+            existing = current if action == 'assign' else current.get('result')
+            if existing and existing['request_sha256'] == request:
+                return existing
+            if existing:
+                raise WorkflowError('Worker handoff retry differs from the recorded request')
+        if run['phase'] == 'completed' or run.get('stop_reason'):
+            raise WorkflowError('Worker handoff requires an open admitted controller')
+        if action == 'assign':
+            result = assign_worker(store, state, payload, ledger, current, request)
+            assignments.append(result)
+        else:
+            if not current or current['generation'] != generation or current['worker_id'] != actor:
+                raise WorkflowError('Worker result does not match the current assignment generation and identity')
+            result = record_worker(store, state, payload, current, request)
+            current['result'] = result
+        store.commit({relative: dump(ledger)})
+        return result
+
+
+def assign_worker(store, state, payload, ledger, current, request):
+    if payload['generation'] != (current['generation'] + 1 if current else 1):
+        raise WorkflowError('Worker assignment requires the next generation for its slot')
+    if not valid_id(payload['task_id'], 'T'):
+        raise WorkflowError('Worker assignment requires the exact Ready task ID')
+    tasks = parse(store.text())
+    task = resolve(tasks, [payload['task_id']], 'Prioritized Next Changes')[0]
+    if task['id'] != payload['task_id'] or task['status'] != 'Ready':
+        raise WorkflowError('Worker assignment requires the exact Ready task ID')
+    assert_scope(store, state, tasks, task['id'])
+    paths = workspaces.worker_paths(payload['paths'])
+    inputs = workspaces.worker_paths(payload['shared_inputs'])
+    touch = [line[2:].strip().strip('`') for line in section_body(task['body'], 'Touch').splitlines()
+             if line.startswith('- ')]
+    if not paths or any(not any(path == scope or path.startswith(scope + '/') for scope in touch) for path in paths):
+        raise WorkflowError('Worker assignment exceeds the task Touch scope')
+    if any(workspaces.local_overlap(path, shared) for path in paths for shared in inputs):
+        raise WorkflowError('Worker writes overlap shared validation inputs')
+    root, checkout = workspaces.worker_checkout(store.source_root, payload['worktree'])
+    base = payload['base']
+    if base != workspaces.worker_head(store.source_root) or base != workspaces.worker_head(root):
+        raise WorkflowError('Worker assignment source base differs from the current coordinator or worker head')
+    workspaces.require_clean_worker(root)
+    for slot, attempts in ledger['slots'].items():
+        if slot == str(payload['slot']) or not attempts:
+            continue
+        other = attempts[-1]
+        if other['worker_id'] == payload['worker_id'] or other['checkout'] == checkout:
+            raise WorkflowError('Worker slots require distinct actors and checkouts')
+        for left, right in ((paths, other['paths']), (paths, other['shared_inputs']), (inputs, other['paths'])):
+            if any(workspaces.local_overlap(a.casefold(), b.casefold()) for a in left for b in right):
+                raise WorkflowError('Worker assignment overlaps another write scope or shared validation input')
+    shared = fingerprints(store, inputs)
+    worker = Store(root, route_queue=False)
+    if None in shared.values() or fingerprints(worker, inputs) != shared:
+        raise WorkflowError('Worker shared validation inputs differ from the coordinator')
+    return {'request_sha256': request, 'recorded_at': now(), 'slot': payload['slot'],
+            'generation': payload['generation'], 'worker_id': payload['worker_id'], 'task_id': task['id'],
+            'definition': digest(task['body'].strip().encode()), 'base': base, 'worktree': str(root), 'checkout': checkout,
+            'paths': paths, 'shared_inputs': shared}
+
+
+def record_worker(store, state, payload, assignment, request):
+    tasks = parse(store.text())
+    task = resolve(tasks, [assignment['task_id']], 'Prioritized Next Changes')[0]
+    assert_scope(store, state, tasks, task['id'])
+    if task['status'] != 'Ready' or digest(task['body'].strip().encode()) != assignment['definition']:
+        raise WorkflowError('Worker assignment task contract changed')
+    root, checkout = workspaces.worker_checkout(store.source_root, assignment['worktree'])
+    if checkout != assignment['checkout']:
+        raise WorkflowError('Worker checkout identity changed')
+    worker = Store(root, route_queue=False)
+    shared = assignment['shared_inputs']
+    if fingerprints(store, shared) != shared or fingerprints(worker, shared) != shared:
+        raise WorkflowError('Worker shared validation inputs drifted')
+    checks = payload['checks']
+    if not isinstance(checks, list) or not checks:
+        raise WorkflowError('Worker result requires check artifacts')
+    known = {check['id'] for check in check_specs(task)}
+    evidence = []
+    for outcome in checks:
+        if (not isinstance(outcome, dict) or set(outcome) != {'id', 'result', 'path', 'sha256'}
+                or not isinstance(outcome['id'], str) or not isinstance(outcome['result'], str)
+                or outcome['id'] not in known or outcome['result'] not in {'pass', 'fail', 'unavailable'}
+                or not isinstance(outcome['sha256'], str) or not re.fullmatch('[a-f0-9]{64}', outcome['sha256'])):
+            raise WorkflowError('Worker evidence requires a task check ID, reported result and exact artifact digest')
+        path = workspaces.worker_path(outcome['path'])
+        artifact = root / path
+        if artifact.resolve() != artifact or not artifact.is_file() or file_hash(artifact) != outcome['sha256']:
+            raise WorkflowError('Worker check artifact is missing, aliased or changed')
+        evidence.append(deepcopy(outcome))
+    candidate = workspaces.worker_candidate(root, assignment['base'], payload['head'],
+                                            assignment['paths'], [check['path'] for check in evidence])
+    return {'request_sha256': request, 'recorded_at': now(), 'slot': assignment['slot'],
+            'generation': assignment['generation'], 'worker_id': assignment['worker_id'],
+            'task_id': assignment['task_id'], 'base': assignment['base'], 'candidate': candidate,
+            'checks': evidence, 'shared_inputs': shared}
+
+
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','worker-handoff','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     parser.add_argument('--standalone',action='store_true',help='Use the canonical queue and selected checkout without attaching to a registered controller.')
     parser.add_argument('--preview',type=Path,help='Retained Force Process Preview JSON')
     parser.add_argument('--receipt',type=Path,help='Original Process Pending receipt JSON')
@@ -5081,6 +5227,7 @@ def main(argv=None):
         elif cmd=='recover-locator':result=workspaces.recover_locator(store,payload)
         elif cmd=='recover-workspace':result=workspaces.recover_workspace(store,payload)
         elif cmd=='resource':result=workspaces.resource(store,payload)
+        elif cmd=='worker-handoff':result=worker_handoff(store,payload)
         elif cmd=='environment':result=workspaces.environment(store,payload)
         elif cmd=='export-run':result=export_run(store)
         elif cmd=='replay-events':result=replay_events(store,payload)
