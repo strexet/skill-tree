@@ -1,0 +1,18 @@
+{
+  "baseline": {
+    "pooled": {"events": 11, "eligible": 20},
+    "segments": {
+      "novice": {"events": 2, "eligible": 10},
+      "experienced": {"events": 9, "eligible": 10}
+    },
+    "standardized_rate": 0.55
+  },
+  "candidate": {
+    "pooled": {"events": 17, "eligible": 30},
+    "segments": {
+      "novice": {"events": 1, "eligible": 10},
+      "experienced": {"events": 16, "eligible": 20}
+    },
+    "standardized_rate": 0.45
+  }
+}

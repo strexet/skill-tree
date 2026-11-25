@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "1708105de47d3885fe2696fbb7746bc96456dd0b383ad2da791e722be91bfde2",
+  "identity": "9545a5931d757e4f957406785fe92fad4462244a1d337fa605108d0916b4d800",
   "operation": "skill-tree-director-audit",
   "operations": {
     "skill-tree-3d": {
@@ -3293,7 +3293,7 @@
     "agents/openai.yaml": "8a366400c980d7f4bc6ab27694b7dbb1d957283f2dcfdd835c4530f3a40b8a81",
     "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     "references/development-practices.md": "352a45b093f2c53b7b08aef045a098880af74c6add6fb79f95017a52fd0e0780",
-    "references/director-capabilities.json": "8cc57eb2504e2fa8cfa270d5181074fca7d5ae020a8f34608dfa6e98f018c4ca",
+    "references/director-capabilities.json": "8fcc314f88b5b818220d13a54e86550319712f752a0fd4fcaf9ebab4921051fb",
     "references/director-workflow.md": "d9445bd199356a9c3d3b7f983c548e0a7665d85a1521146717b6c37f5568668d",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/future-workflow.md": "3a6bc83660773c23af11cf00eacb90ed618db701d464fd7fcd304d5d90fca50b",
@@ -3325,7 +3325,7 @@
     "scripts/runtime/common/scripts/director-handoff.py": "19a5ffc7f21d1199954e4953b6d9e704c880cb69d533004ae2c918ba6eb2116b",
     "scripts/runtime/common/scripts/director-maintenance.py": "a4c508a8c97b1efc146b0724723aaf11978ab0ae36e3e4cbb51d6753011a5c9a",
     "scripts/runtime/common/scripts/director-objectives.py": "18a0e664d1eb9074983a22abf27ecb4076d2bd1b3d24ed6cac5ace41f459f373",
-    "scripts/runtime/common/scripts/director-plan-adapters.py": "d8185d6af19635c5279080f02c2dbc253aeb722e1f87d7137132c817f52d0a2f",
+    "scripts/runtime/common/scripts/director-plan-adapters.py": "f64a26f9908621d63fc9dccf1a0b1c4d529081a0e995f4c8068454ec9418b9fa",
     "scripts/runtime/common/scripts/director-plans.py": "b28d8e4326dda6c390586759e36750c74cb909169ff244ecfe7af1e359bfb863",
     "scripts/runtime/common/scripts/director-questions.py": "60d18e3d18eff83b680dcb454a87d24db4c027a9e90065d1f0d2dfb6bcc2ad6c",
     "scripts/runtime/common/scripts/director-run.py": "d5f86a084f3ff2e18185f08ca6e47ff111e781aedf6d8c7da8eb7bbec879c600",

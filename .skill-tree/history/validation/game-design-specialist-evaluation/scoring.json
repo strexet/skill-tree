@@ -1,0 +1,75 @@
+{
+  "actor": "/root/director",
+  "scored": [
+    {
+      "id": "level-blockout",
+      "assertions": [
+        {"result": "pass", "evidence": "Paragraphs 1–2 give the orientation and order: “west start → north alcove → pick up lantern → return through the 1.4 m path → use pedestal → pass gate.” The pedestal is beside the east gate."},
+        {"result": "pass", "evidence": "Paragraph 2 says “The south pinch fails the 1.2 m carrying minimum.” Paragraph 3 specifies dragging the 1.2 m template through the route and observing the gate in a paper walkthrough."}
+      ]
+    },
+    {
+      "id": "level-unaided",
+      "assertions": [
+        {"result": "pass", "evidence": "Paragraph 1 starts “before the first junction with the east-facing camera” with fresh participants and records “first cue noticed, first junction choice” before the 30-second help point."},
+        {"result": "pass", "evidence": "Paragraph 1 says “Earlier supported runs establish reachability only.” Paragraph 2 compares the current view with a view framing the north landmark while holding the marker constant."}
+      ]
+    },
+    {
+      "id": "economy-flow",
+      "assertions": [
+        {"result": "pass", "evidence": "Paragraph 1 derives the result from “min(15, 3 + 3n)” and the balances 3, 6, 9 and 12. The baseline unlock is match 3 and the proposal is match 2."},
+        {"result": "pass", "evidence": "Paragraph 2 leaves the decision with the progression owner and says “Stop adoption if a player can acquire or use the unlock before the required tutorial step,” including exactly 9 coins."}
+      ]
+    },
+    {
+      "id": "economy-existing-save",
+      "assertions": [
+        {"result": "pass", "evidence": "Paragraphs 1–2 start from save revision 3 at 80 coins. Grandfathering leaves “80 usable coins after migration and reload.” Truncation yields “one recorded change from 80 to 60 and unchanged 60 on replay.”"},
+        {"result": "pass", "evidence": "Paragraph 3 keeps the treatment of the 20 excess coins with the owner. Paragraph 2 names additional loss on replay, an over-cap grant and resurrected coins as direct falsifiers."}
+      ]
+    },
+    {
+      "id": "feel-trace",
+      "assertions": [
+        {"result": "pass", "evidence": "Paragraph 1 records “input 72, confirmation 90, sound 155, recovery 430” and calculates the margins separately, including input 28 ms before cutoff."},
+        {"result": "pass", "evidence": "Paragraph 2 holds build, device, cue, cutoff, recovery and input fixed and changes sound timing. Paragraph 1 says delayed acknowledgement and window uncertainty “are both plausible,” consistent with one trace."}
+      ]
+    },
+    {
+      "id": "feel-pause",
+      "assertions": [
+        {"result": "pass", "evidence": "Paragraph 1 distinguishes paused queue leakage from a fresh resume-edge input in the ordinary active-time handler. Paragraph 2 requests active and wall timestamps and native queue writes and reads, preserving the observed ambiguity."},
+        {"result": "pass", "evidence": "Paragraph 2 runs an unpaused equivalent active tick, paused press-and-release with untouched resume, then resume-edge press with no paused action. It assigns different observations to a pre-resume enqueue and a new post-resume edge."}
+      ]
+    },
+    {
+      "id": "research-first-choice",
+      "assertions": [
+        {"result": "pass", "evidence": "Paragraph 1 requires voluntary consent and recording approval. Paragraph 2 gives fresh participants the same visible item and state, uses “Get your character ready to use the item shown,” and forbids pointing, naming controls or demonstrating before first observation."},
+        {"result": "pass", "evidence": "Paragraphs 2–3 record the first uncoached action, close unaided observation at a time limit, opt-out or help request, and put explicitly eligible counts and icon selection before the design owner."}
+      ]
+    },
+    {
+      "id": "research-mixed-exposure",
+      "assertions": [
+        {"result": "pass", "evidence": "Paragraph 1 gives “Baseline: 4/8 correct” and “Candidate: 5/7 correct,” explicitly excluding the two and four coached rehearsals and the one candidate without an opportunity."},
+        {"result": "pass", "evidence": "Paragraph 1 leaves the cue effect unresolved because of sample size, nonrandom assignment, build differences and mixed devices. Paragraph 2 proposes same build and entry with cue-only variation and matching or randomization by device."}
+      ]
+    },
+    {
+      "id": "catalog-source-pin",
+      "assertions": [
+        {"result": "pass", "evidence": "Paragraph 1 names “pattern-overwatch@1, evidence trace-O.” Paragraph 2 separately identifies “pattern-warning-cone@2, evidence trace-W” as display-only."},
+        {"result": "pass", "evidence": "The tactical corridor allows facing and arming during the active tactical turn and an enemy-movement reaction. The always-visible tutorial preview is unsuitable where it cannot arm or react."}
+      ]
+    },
+    {
+      "id": "catalog-alias-collision",
+      "assertions": [
+        {"result": "pass", "evidence": "Paragraph 1 names pattern-windup@3 and pattern-resource-charge@1 and distinguishes a held input that resolves on release from a stored use granted at refill."},
+        {"result": "pass", "evidence": "Paragraph 2 checks hold lengths and effective release in the tutorial versus one refill and one eligible spend at the shop. It closes with “Both links remain conditional” pending exact source/build pins and owner confirmation."}
+      ]
+    }
+  ]
+}

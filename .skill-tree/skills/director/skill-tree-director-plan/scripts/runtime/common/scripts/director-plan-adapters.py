@@ -12,6 +12,9 @@ AREA_IDENTITY = ('id', 'repo_id', 'queue_id', 'scope')
 FIXTURE = 'tests/fixtures/director'
 NARRATIVE = 'narrative-state.py'
 NARRATIVE_SHA = 'ad6618d06fc1b2cac79694a64ff5733bdd03a330e0714851e04e185d108c1388'
+GDD_FIXTURE = 'fixture-gdd-evidence'
+GDD_RULE_PATH = 'design/accepted-rule.json'
+GDD_RULE_SHA = '09195c4ce430a8f3ffae915d38d4cb47103def46afd652f8057e0ecd144bc51f'
 
 
 class PlanSources:
@@ -183,8 +186,24 @@ class PlanSources:
             return {'status': 'changed'}
         return {'status': 'verified', 'revision': sha, 'sha256': sha}
 
+    def gdd_fixture_pin(self, area, pin):
+        if (area['scope'], area['role']) != ('design', 'game-design') or GDD_FIXTURE not in area['capabilities']:
+            return {'status': 'unsupported'}
+        if pin['record_id'] != 'lantern-release':
+            return {'status': 'missing'}
+        if ((pin['revision'], pin['sha256'], pin.get('path')) != ('r001', GDD_RULE_SHA, GDD_RULE_PATH)
+                or 'snapshot' in pin):
+            return {'status': 'changed'}
+        observed = self.D.WF.file_hash(self.D._safe_path(self.area_root(area), 'accepted-rule.json'))
+        if observed is None:
+            return {'status': 'missing'}
+        if observed != GDD_RULE_SHA:
+            return {'status': 'changed'}
+        return {'status': 'verified', 'revision': pin['revision'], 'sha256': observed}
+
     def pin(self, area, pin):
         adapter = {
+            GDD_FIXTURE: self.gdd_fixture_pin,
             'core-task': self.core_pin,
             'narrative-canon': self.narrative_pin,
             'fixture-narrative': self.fixture_pin,

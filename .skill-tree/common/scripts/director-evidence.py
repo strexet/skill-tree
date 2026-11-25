@@ -62,15 +62,19 @@ class DirectorEvidence:
                     return True
         return False
 
-    def _pins(self, assignment, areas, bindings):
+    def _pins(self, assignment, areas, bindings, check=None):
         adapter = D.WF.owned_module('director_evidence_sources', Path(__file__).with_name('director-plan-adapters.py'))
         sources = adapter.PlanSources(D, O, self.planner.C, areas, bindings)
         confirmed, missing = [], []
         for pin in assignment['pins']:
             info = sources.pin(areas['areas'][pin['area_id']], {name: value for name, value in pin.items() if name != 'status'})
             if info == {'status': 'verified', 'revision': pin['revision'], 'sha256': pin['sha256']}:
-                confirmed.append(pin)
-            elif pin['strength'] != 'optional':
+                if (check is None or pin['adapter'] != adapter.GDD_FIXTURE
+                        or self._check_gdd_fixture_input(assignment, check, pin['sha256'])):
+                    confirmed.append(pin)
+                    continue
+                info = {'status': 'consumer-input-mismatch'}
+            if pin['strength'] != 'optional':
                 missing.append({'record_id': pin['record_id'], 'status': info['status']})
         return confirmed, missing
 
@@ -78,6 +82,14 @@ class DirectorEvidence:
     def _check_covers_area(assignment, check):
         scope = D._scope(assignment['area']['scope'])
         return any(D._scope(path).is_relative_to(scope) for path in check['source_fingerprints'])
+
+    @staticmethod
+    def _check_gdd_fixture_input(assignment, check, sha256):
+        scope = D._scope(assignment['area']['scope'])
+        scoped_inputs = [digest for path, digest in check['source_fingerprints'].items()
+                         if D._scope(path).is_relative_to(scope)]
+        # A supplemental copy cannot stand in for the rule the check actually observes.
+        return scoped_inputs == [sha256]
 
     def _write_paths(self, assignment, paths):
         allowed = [D._scope(assignment['area']['scope']) / D._scope(value) for value in assignment['write_paths']]
@@ -164,7 +176,7 @@ class DirectorEvidence:
             D._require(observed['link_state'] == 'verified' and observed['source_freshness'] == 'current'
                        and observed['evidence_availability'] == 'available' and check['verdict'] == 'pass'
                        and check['source_freshness'] == 'current', 'Required current check or artifact evidence is unavailable')
-            confirmed, missing = self._pins(spec, areas, bindings)
+            confirmed, missing = self._pins(spec, areas, bindings, check)
             if missing:
                 barriers.append({'required_pins': missing})
             secondary = {'artifact': artifacts[0]} if artifacts else {}
@@ -219,7 +231,7 @@ class DirectorEvidence:
             artifacts = link['artifacts']
             D._require(not artifacts or self._write_paths(assignment, [D._scope(item['path']) for item in artifacts]),
                        'Artifact lies outside the exact approved assignment write paths')
-        _, missing = self._pins(assignment, areas, bindings)
+        _, missing = self._pins(assignment, areas, bindings, checks[0] if len(checks) == 1 else None)
         ready = (not missing and current['link_state'] == 'verified' and current['source_freshness'] == 'current'
                  and current['evidence_availability'] == 'available' and len(checks) == 1 and checks[0]['verdict'] == 'pass'
                  and checks[0].get('source_freshness') == 'current')

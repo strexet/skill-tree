@@ -1,0 +1,20 @@
+{
+  "source": "paper-race/grip-rule@2",
+  "affected": [
+    "paper-race/corner-grip-check@1",
+    "paper-race/dock-corner@1",
+    "paper-race/forest-corner@1"
+  ],
+  "unaffected_controls": [
+    "paper-race/legacy-corner@1",
+    "paper-race/legacy-grip-check@1"
+  ],
+  "unresolved": {
+    "paper-race/cycle-left@1": "hierarchy-cycle",
+    "paper-race/cycle-right@1": "hierarchy-cycle",
+    "paper-race/foreign-reference@1": "foreign-scope",
+    "paper-race/incorrect-relation@1": "wrong-record-type",
+    "paper-race/missing-reference@1": "missing-revision",
+    "paper-race/unused-similarity@1": "unknown-relation"
+  }
+}

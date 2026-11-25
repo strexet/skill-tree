@@ -5,6 +5,11 @@
     "source": "common/scripts/narrative-state.py",
     "sha256": "ad6618d06fc1b2cac79694a64ff5733bdd03a330e0714851e04e185d108c1388"
   },
+  "gdd_evidence": {
+    "status": "fixture-only",
+    "adapter": "fixture-gdd-evidence",
+    "reason": "The disposable accepted rule and matching consumer check qualify one fixed revision."
+  },
   "artworkshop": {
     "status": "unsupported",
     "observed_source_sha256": "6cef226a82b646e11de36d018b5df18fd291d52b36d306a146719b74fb09ecad",

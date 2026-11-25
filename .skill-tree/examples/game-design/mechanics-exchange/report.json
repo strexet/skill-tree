@@ -1,0 +1,98 @@
+{
+  "environment": {
+    "execution": "local-temporary-storage-standard-library",
+    "python": "3.11.5"
+  },
+  "expected": {
+    "historical_placement_pin": "paper-race-exchange/combined-boost@1",
+    "initial_pins": [
+      "paper-race-exchange/combined-boost@1",
+      "paper-race-exchange/editorial-fixture@1",
+      "paper-race-exchange/reveal-duplicate@1",
+      "skill-tree-mechanics/bounded-reserve@1",
+      "skill-tree-mechanics/hold-to-boost@1",
+      "skill-tree-mechanics/original-seed@1",
+      "skill-tree-mechanics/spend-to-reveal@1"
+    ],
+    "invalid_controls": [
+      "invalid-shape",
+      "invalid-revision",
+      "record-revision-conflict",
+      "batch-content-conflict",
+      "ambiguous-split",
+      "stale-active-version",
+      "failed-publish",
+      "source-authority-mismatch",
+      "redirect-cycle"
+    ],
+    "merge_redirect": "skill-tree-mechanics/spend-to-reveal@1",
+    "migration_vocabulary": [
+      "bounded reserve",
+      "sustained movement"
+    ],
+    "split_redirect": "skill-tree-mechanics/hold-to-boost@1"
+  },
+  "observed": {
+    "historical_placement_pin": "paper-race-exchange/combined-boost@1",
+    "initial_import": {
+      "active": "2835adf927d1b2c5001408c5143d2c964b1e79c53caa0244f3f32ec42b5c7397",
+      "batch_id": "seed-v1",
+      "status": "applied"
+    },
+    "initial_pins": [
+      "paper-race-exchange/combined-boost@1",
+      "paper-race-exchange/editorial-fixture@1",
+      "paper-race-exchange/reveal-duplicate@1",
+      "skill-tree-mechanics/bounded-reserve@1",
+      "skill-tree-mechanics/hold-to-boost@1",
+      "skill-tree-mechanics/original-seed@1",
+      "skill-tree-mechanics/spend-to-reveal@1"
+    ],
+    "initial_replay": {
+      "active": "2835adf927d1b2c5001408c5143d2c964b1e79c53caa0244f3f32ec42b5c7397",
+      "batch_id": "seed-v1",
+      "status": "replayed"
+    },
+    "invalid_controls": {
+      "ambiguous-split": "ambiguous-split: paper-race-exchange/combined-boost@1",
+      "batch-content-conflict": "batch-content-conflict",
+      "failed-publish": "Fixture interruption before active version switch",
+      "invalid-revision": "invalid-revision: paper-race-exchange/combined-boost@9",
+      "invalid-shape": "invalid-shape: records",
+      "record-revision-conflict": "record-revision-conflict: skill-tree-mechanics/original-seed@1",
+      "redirect-cycle": "redirect-cycle: editorial successors must be acyclic",
+      "source-authority-mismatch": "source-authority-mismatch: skill-tree-mechanics/bounded-reserve@1",
+      "stale-active-version": "stale-active-version"
+    },
+    "merge_redirect": "skill-tree-mechanics/spend-to-reveal@1",
+    "migrated_version": "bdd98f42728a8be6af98cd37b8a5806db525aae239d331f6fb918dbcbdf07c3e",
+    "migration_vocabulary": [
+      "bounded reserve",
+      "sustained movement"
+    ],
+    "restored_member_sha256": {
+      "catalog": "b84437094db51191ce23498e2959616e6c7d92f186e221f129f4e1ec09ad58e9",
+      "overlay": "1c70e5624b206d12401d4a3a196c2ce0e4bf38d3b536a3ee26a5399c992dfdea",
+      "vocabulary": "5ca3fd3ddf5e548af5b6073e0906aaf0862c55102a59ce24a321e768372b878b"
+    },
+    "rolled_back_version": "2835adf927d1b2c5001408c5143d2c964b1e79c53caa0244f3f32ec42b5c7397",
+    "split_redirect": "skill-tree-mechanics/hold-to-boost@1"
+  },
+  "omissions": [
+    "Canonical migration, external project access and concurrent writers are outside the fixture."
+  ],
+  "output_sha256": "29c6d11b65f519bcc840c5aec5ef5b1a11935cd6e26eb4f020f7186d0251992c",
+  "schema": 1,
+  "scope": "One disposable Markdown-backed catalog, vocabulary and project overlay",
+  "source_sha256": {
+    ".skill-tree/common/references/game-design-mechanics.md": "d9657c2ae70ad41ea2c8125da44494672f4a0be7c7dfd0cd2711c8774bc18ed6",
+    ".skill-tree/common/references/game-design-patterns.md": "fc79285537c68a2d5e3bd1d31f548069010d49f01fca1f1133d12b9596bb4668",
+    ".skill-tree/common/references/game-design-records.md": "ee0c46efe3f88d4e4d68859c0e5e94dc26a453f36575dcfc5830f96f863990c3",
+    ".skill-tree/examples/game-design/mechanics-exchange/README.md": "5149697e5405f854ef850594a930f5869b8b05f31f3d59c89bca6996f8456c6e",
+    ".skill-tree/examples/game-design/mechanics-exchange/catalog.py": "4e2457eb29979dadf55aade2006a11c0b046b66aa6f6edd5dfd8b43a8feb5c27",
+    ".skill-tree/examples/game-design/mechanics-exchange/editorial-fixture.md": "cfb820052859debc17f5c2cab1019f9f040207dc3824f84972dbbdedecf636f6",
+    ".skill-tree/examples/game-design/mechanics-exchange/expected.json": "62f143932f56254353bd2a22f311ec1a36c2e94319de95e66d133399c615fe87",
+    ".skill-tree/tests/test-mechanics-catalog-exchange.py": "454fdd4131450ee920f0296b95cf10e24dcf687f12e6d1df8961856ee4e87048"
+  },
+  "task_id": "T-07e60e24-7fe7-4acf-9a20-1d8308657df2"
+}

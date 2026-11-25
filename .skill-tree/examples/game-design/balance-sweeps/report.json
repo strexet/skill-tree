@@ -1,0 +1,378 @@
+{
+  "actual": {
+    "columns": [
+      "cost",
+      "recharge",
+      "policy",
+      "actions",
+      "end_energy",
+      "zero_after_actions"
+    ],
+    "grid": [
+      [
+        1,
+        0,
+        "spend-when-affordable@1",
+        2,
+        0,
+        1
+      ],
+      [
+        1,
+        0,
+        "keep-one-energy@1",
+        1,
+        1,
+        0
+      ],
+      [
+        1,
+        1,
+        "spend-when-affordable@1",
+        4,
+        2,
+        0
+      ],
+      [
+        1,
+        1,
+        "keep-one-energy@1",
+        4,
+        2,
+        0
+      ],
+      [
+        2,
+        0,
+        "spend-when-affordable@1",
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        0,
+        "keep-one-energy@1",
+        0,
+        2,
+        0
+      ],
+      [
+        2,
+        1,
+        "spend-when-affordable@1",
+        2,
+        2,
+        2
+      ],
+      [
+        2,
+        1,
+        "keep-one-energy@1",
+        2,
+        2,
+        0
+      ]
+    ],
+    "held_out": [
+      [
+        2,
+        1,
+        "spend-when-affordable@1",
+        2,
+        2,
+        2
+      ],
+      [
+        2,
+        1,
+        "keep-one-energy@1",
+        1,
+        4,
+        0
+      ]
+    ],
+    "held_out_traces": [
+      [
+        [
+          1,
+          2,
+          true,
+          true,
+          0,
+          1
+        ],
+        [
+          2,
+          1,
+          false,
+          false,
+          1,
+          2
+        ],
+        [
+          3,
+          2,
+          true,
+          true,
+          0,
+          1
+        ],
+        [
+          4,
+          1,
+          false,
+          false,
+          1,
+          2
+        ]
+      ],
+      [
+        [
+          1,
+          2,
+          true,
+          false,
+          2,
+          3
+        ],
+        [
+          2,
+          3,
+          false,
+          false,
+          3,
+          4
+        ],
+        [
+          3,
+          4,
+          true,
+          true,
+          2,
+          3
+        ],
+        [
+          4,
+          3,
+          false,
+          false,
+          3,
+          4
+        ]
+      ]
+    ],
+    "trace_columns": [
+      "tick",
+      "start_energy",
+      "opportunity",
+      "acted",
+      "after_action",
+      "after_recharge"
+    ]
+  },
+  "adverse_metric": "zero energy immediately after a successful action",
+  "artifact_sha256": "e9b821df09c73a10605df3187ec34e7993a27236332c230b662070884264be02",
+  "environment": {
+    "lane": "unit",
+    "python": "3.11.5"
+  },
+  "expected": {
+    "columns": [
+      "cost",
+      "recharge",
+      "policy",
+      "actions",
+      "end_energy",
+      "zero_after_actions"
+    ],
+    "grid": [
+      [
+        1,
+        0,
+        "spend-when-affordable@1",
+        2,
+        0,
+        1
+      ],
+      [
+        1,
+        0,
+        "keep-one-energy@1",
+        1,
+        1,
+        0
+      ],
+      [
+        1,
+        1,
+        "spend-when-affordable@1",
+        4,
+        2,
+        0
+      ],
+      [
+        1,
+        1,
+        "keep-one-energy@1",
+        4,
+        2,
+        0
+      ],
+      [
+        2,
+        0,
+        "spend-when-affordable@1",
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        0,
+        "keep-one-energy@1",
+        0,
+        2,
+        0
+      ],
+      [
+        2,
+        1,
+        "spend-when-affordable@1",
+        2,
+        2,
+        2
+      ],
+      [
+        2,
+        1,
+        "keep-one-energy@1",
+        2,
+        2,
+        0
+      ]
+    ],
+    "held_out": [
+      [
+        2,
+        1,
+        "spend-when-affordable@1",
+        2,
+        2,
+        2
+      ],
+      [
+        2,
+        1,
+        "keep-one-energy@1",
+        1,
+        4,
+        0
+      ]
+    ],
+    "held_out_traces": [
+      [
+        [
+          1,
+          2,
+          true,
+          true,
+          0,
+          1
+        ],
+        [
+          2,
+          1,
+          false,
+          false,
+          1,
+          2
+        ],
+        [
+          3,
+          2,
+          true,
+          true,
+          0,
+          1
+        ],
+        [
+          4,
+          1,
+          false,
+          false,
+          1,
+          2
+        ]
+      ],
+      [
+        [
+          1,
+          2,
+          true,
+          false,
+          2,
+          3
+        ],
+        [
+          2,
+          3,
+          false,
+          false,
+          3,
+          4
+        ],
+        [
+          3,
+          4,
+          true,
+          true,
+          2,
+          3
+        ],
+        [
+          4,
+          3,
+          false,
+          false,
+          3,
+          4
+        ]
+      ]
+    ],
+    "trace_columns": [
+      "tick",
+      "start_energy",
+      "opportunity",
+      "acted",
+      "after_action",
+      "after_recharge"
+    ]
+  },
+  "model": "energy-before-recharge@1",
+  "omissions": [
+    "Product configuration",
+    "Gameplay or human response evidence"
+  ],
+  "phase_order": [
+    "action opportunity",
+    "post-action sample",
+    "capped recharge"
+  ],
+  "policy_reserve_energy": {
+    "keep-one-energy@1": 1,
+    "spend-when-affordable@1": 0
+  },
+  "runner": "balance-parameter-sweep@1",
+  "source_sha256": {
+    "model.json": "ab39913a35e3529c906a0ece378407f784f5452e975490fe34dda60504ab1910",
+    "oracle.json": "4f84d772f33de82de41753108748ebc4e33eb9a0d6ced62bb5a3472b16f2b17f",
+    "sweep.py": "df25f2d3bf1371703860c86f0ded0e27c3eb32b0e5188fed91eab8208f014d62"
+  },
+  "study": "fixture-energy-tuning@1",
+  "units": {
+    "actions": "successful actions",
+    "clock": "tick",
+    "stock": "energy points"
+  }
+}

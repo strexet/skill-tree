@@ -1,0 +1,15 @@
+{
+  "study": "fixture-energy-tuning@1",
+  "model": "energy-before-recharge@1",
+  "initial_energy": 2,
+  "capacity": 4,
+  "ticks": 4,
+  "costs": [1, 2],
+  "recharges": [0, 1],
+  "policies": ["spend-when-affordable@1", "keep-one-energy@1"],
+  "holdout": {
+    "cost": 2,
+    "recharge": 1,
+    "opportunities": [1, 3]
+  }
+}
