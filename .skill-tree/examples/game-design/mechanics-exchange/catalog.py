@@ -8,6 +8,7 @@ import re
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
+ROOT = Path(__file__).resolve().parents[4]
 FIXTURE = Path(".skill-tree/examples/game-design/mechanics-exchange")
 MARKDOWN = Path(".skill-tree/common/references/game-design-patterns.md")
 EDITORIAL = FIXTURE / "editorial-fixture.md"
@@ -84,11 +85,15 @@ def extract_records(root, path, source, selected):
     return records
 
 
-def initial_batch(root):
+def authoritative_records(root):
     records = extract_records(root, MARKDOWN, "skill-tree-mechanics/original-seed@1", (RESERVE, BOOST, REVEAL))
     records += extract_records(root, EDITORIAL, "paper-race-exchange/editorial-fixture@1", (LEGACY, DUPLICATE))
+    return records
+
+
+def initial_batch(root):
     return {
-        "schema": 1, "batch_id": "seed-v1", "records": records, "redirects": [],
+        "schema": 1, "batch_id": "seed-v1", "records": authoritative_records(root), "redirects": [],
         "vocabulary": [{"term": "boost with reserve", "record_pin": LEGACY}],
         "overlay": {"project": "paper-race", "placements": [{"id": "bridge-boost", "record_pin": LEGACY}]},
     }
@@ -144,9 +149,31 @@ def require_pattern(records, pin):
         raise Conflict(f"invalid-revision: {pin}")
 
 
+def validate_redirect_graph(redirects):
+    """Require a finite acyclic graph across all recorded successor candidates."""
+    incoming = dict.fromkeys(redirects, 0)
+    for redirect in redirects.values():
+        for target in redirect["targets"]:
+            if target in incoming:
+                incoming[target] += 1
+    ready = [pin for pin, count in incoming.items() if count == 0]
+    visited = 0
+    while ready:
+        origin = ready.pop()
+        visited += 1
+        for target in redirects[origin]["targets"]:
+            if target in incoming:
+                incoming[target] -= 1
+                if incoming[target] == 0:
+                    ready.append(target)
+    if visited != len(redirects):
+        raise Conflict("redirect-cycle: editorial successors must be acyclic")
+
+
 def staged_catalog(current, batch, batch_hash):
     records = dict(current["records"])
     redirects = dict(current["redirects"])
+    authority = {record["pin"]: record for record in authoritative_records(ROOT)} if batch["records"] else {}
     for record in batch["records"]:
         pin = record["pin"]
         path = PurePosixPath(record["locator"]["path"])
@@ -156,6 +183,8 @@ def staged_catalog(current, batch, batch_hash):
             raise Conflict(f"invalid-revision: source locator for {pin}")
         if pin in records and records[pin] != record:
             raise Conflict(f"record-revision-conflict: {pin}")
+        if authority.get(pin) != record:
+            raise Conflict(f"source-authority-mismatch: {pin}")
         records[pin] = record
     for pin, record in records.items():
         source = records.get(record["source"])
@@ -178,6 +207,7 @@ def staged_catalog(current, batch, batch_hash):
             raise Conflict(f"invalid-redirect: {origin}")
         redirects[origin] = redirect
 
+    validate_redirect_graph(redirects)
     for row in batch["overlay"]["placements"] + batch["vocabulary"]:
         require_pattern(records, row["record_pin"])
     receipts = {**current["receipts"], batch["batch_id"]: batch_hash}
@@ -268,10 +298,20 @@ def rollback(store, *, expected_active, restore):
 
 def exercise(root, store):
     batch = initial_batch(root)
+    forged = dict(batch, records=[{**batch["records"][1], "body": "Unreviewed replacement",
+                                  "locator": {**batch["records"][1]["locator"], "sha256": "0" * 64}}])
+    try:
+        import_batch(store, forged, expected_active=None)
+    except Conflict as failure:
+        authority_failure = str(failure)
+    else:
+        raise AssertionError("Forged authority unexpectedly passed")
+    if active_version(store) is not None or (store / "versions").exists():
+        raise AssertionError("Rejecting forged authority must leave the store unpublished")
     initial = import_batch(store, batch, expected_active=None)
     before = active_version(store)
     replay = import_batch(store, batch, expected_active=None)
-    invalid = {}
+    invalid = {"source-authority-mismatch": authority_failure}
 
     def capture(name, attempt, expected, error=Conflict):
         try:
@@ -293,6 +333,12 @@ def exercise(root, store):
     ambiguous = migration_batch()
     ambiguous["redirects"][1]["decision"] = None
     capture("ambiguous-split", ambiguous, before)
+    cycle = migration_batch()
+    cycle["redirects"] = [
+        {"from": DUPLICATE, "kind": "merge", "targets": [REVEAL], "decision": None},
+        {"from": REVEAL, "kind": "merge", "targets": [DUPLICATE], "decision": None},
+    ]
+    capture("redirect-cycle", cycle, before)
     migration = migration_batch()
     capture("stale-active-version", migration, "0" * 64)
     original_replace = os.replace
@@ -340,4 +386,4 @@ def make_report(root):
 
 
 if __name__ == "__main__":
-    print(json.dumps(make_report(Path(__file__).resolve().parents[4]), indent=2, sort_keys=True))
+    print(json.dumps(make_report(ROOT), indent=2, sort_keys=True))

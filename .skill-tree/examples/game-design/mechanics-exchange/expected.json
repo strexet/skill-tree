@@ -22,6 +22,8 @@
     "batch-content-conflict",
     "ambiguous-split",
     "stale-active-version",
-    "failed-publish"
+    "failed-publish",
+    "source-authority-mismatch",
+    "redirect-cycle"
   ]
 }

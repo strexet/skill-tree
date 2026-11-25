@@ -62,6 +62,51 @@ class MechanicsExchangeTests(unittest.TestCase):
             MODULE.import_batch(self.store, bad_pin, expected_active=None)
         self.assertIsNone(MODULE.active_version(self.store))
 
+    def test_initial_import_rejects_forged_markdown_authority_without_publishing(self):
+        for corrupt_body, corrupt_pin in ((True, True), (True, False), (False, True)):
+            with self.subTest(body=corrupt_body, pin=corrupt_pin):
+                forged = deepcopy(self.batch)
+                if corrupt_body:
+                    forged["records"][1]["body"] = "Unreviewed replacement"
+                if corrupt_pin:
+                    forged["records"][1]["locator"]["sha256"] = "0" * 64
+                with self.assertRaisesRegex(MODULE.Conflict, "source-authority-mismatch"):
+                    MODULE.import_batch(self.store, forged, expected_active=None)
+                self.assertIsNone(MODULE.active_version(self.store))
+                self.assertFalse((self.store / "versions").exists())
+
+    def test_redirect_cycle_rejects_migration_with_unchanged_bytes(self):
+        active = self.seed()
+        before = self.snapshot(active)
+        active_pointer = (self.store / "active").read_bytes()
+        migration = MODULE.migration_batch()
+        first, second = "paper-race-exchange/reveal-duplicate@1", self.expected["merge_redirect"]
+        migration["redirects"] = [
+            {"from": first, "kind": "merge", "targets": [second], "decision": None},
+            {"from": second, "kind": "merge", "targets": [first], "decision": None},
+        ]
+        with self.assertRaisesRegex(MODULE.Conflict, "redirect-cycle"):
+            MODULE.import_batch(self.store, migration, expected_active=active)
+        self.assertEqual(self.snapshot(active), before)
+        self.assertEqual((self.store / "active").read_bytes(), active_pointer)
+        self.assertEqual(len(list((self.store / "versions").iterdir())), 1)
+
+    def test_redirect_cycle_includes_edges_accepted_by_earlier_batch(self):
+        initial = self.seed()
+        first = MODULE.migration_batch()
+        first["redirects"] = first["redirects"][:1]
+        current = MODULE.import_batch(self.store, first, expected_active=initial)["active"]
+        earlier = self.snapshot(current)
+        second = MODULE.migration_batch()
+        second["batch_id"] = "editorial-v3"
+        second["redirects"] = [{"from": first["redirects"][0]["targets"][0], "kind": "merge",
+                                "targets": [first["redirects"][0]["from"]], "decision": None}]
+        with self.assertRaisesRegex(MODULE.Conflict, "redirect-cycle"):
+            MODULE.import_batch(self.store, second, expected_active=current)
+        self.assertEqual(MODULE.active_version(self.store), current)
+        self.assertEqual(self.snapshot(current), earlier)
+        self.assertEqual(len(list((self.store / "versions").iterdir())), 2)
+
     def test_changed_bytes_under_exact_batch_or_record_identity_are_rejected(self):
         active = self.seed()
         old = self.snapshot(active)
