@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "5b7d72079ecd7f7351718e128d60516a0b7036bfbc8379963085ac7a58ef8044",
+  "identity": "7411e14c589d05f8f02fa72258e82cb283888adb8f330eee73885e2c928e11b0",
   "operation": "skill-tree-director-status",
   "operations": {
     "skill-tree-3d": {
@@ -3329,7 +3329,7 @@
     "scripts/runtime/common/scripts/director-run.py": "1a2af3a853bea5c24de33b0434c0dfa7f9efb4f9642f295626931f648cbbfaba",
     "scripts/runtime/common/scripts/director-state.py": "3c87ce2fc25510321cae92ddbdd850eb8caf833972b223e8187108d62cd4df71",
     "scripts/runtime/common/scripts/narrative-state.py": "ad6618d06fc1b2cac79694a64ff5733bdd03a330e0714851e04e185d108c1388",
-    "scripts/runtime/common/scripts/parallel-preview.py": "63e095ce7e7e42e2278432ea5a6f55eaac3f39886eb6b1175dc6e5f12d0b2480",
+    "scripts/runtime/common/scripts/parallel-preview.py": "5425da8665a31cfc681853cf5e5579d2a75295a08ee74399da717f803cf441bc",
     "scripts/runtime/common/scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",
     "scripts/runtime/common/scripts/plugin-processing.py": "4f4418c8e67a723a2cdd53b43246cb4507f0419bd7ca76b901334e78bb1406ec",
     "scripts/runtime/common/scripts/pr-review-state.py": "01ec580029c65fe8aeac7dc7b6546d3fee48aea9ac958e8f9ea1eb9c74016ada",

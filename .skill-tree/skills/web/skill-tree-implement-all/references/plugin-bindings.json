@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "95fb8589b09807ffc9a6f9dce89f8b9befd0cb3d3b52b79a2476b33e4c16106a",
+  "identity": "8b2a50532b6c1ffe7cc38899c7024c1193f6ecfdd505c7aa7c1dee8968991c18",
   "operation": "skill-tree-implement-all",
   "operations": {
     "skill-tree-3d": {
@@ -3298,7 +3298,7 @@
     "references/history-retention.md": "ff3fa8602fa29085b59f0aa5ae9f9da698bd5b5d5672235fe809018b18b4b801",
     "references/installation-profile.md": "7ed0e172c5d5b849105aa3bc6939a2bd1be014ea2ab91a83d53cab3ba4d398d9",
     "references/orchestration.md": "ae5d072144a9a28f9d2e97e449ec99be7e05402b82f7e32b80761cfdddb5802e",
-    "references/parallel-preview.md": "dfcff75024ccf4dffe4bf2b070881bd4c70036ce80a10d1207076f9940202ed4",
+    "references/parallel-preview.md": "e6c4a8d12d7b6cb5a1595c6da5955b7fa80779cef45e0fd0d64b2f339173b95b",
     "references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
     "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
@@ -3313,7 +3313,7 @@
     "scripts/decision-orchestration.py": "dd1b6fb5dfb56b93ad531abf87f4f713b5934156133007bb4014b56ec9f285e5",
     "scripts/development-policies.js": "9d3036e0dd2b2aaf070f3ec92f9e1d6d6830fe35cd8ebb1a78135c3ad792a2fd",
     "scripts/director-dispatch.py": "1b1533bca022ef7f03e24d9becd212f87dac2923de53cae1b3cf7d5a16837d0e",
-    "scripts/parallel-preview.py": "63e095ce7e7e42e2278432ea5a6f55eaac3f39886eb6b1175dc6e5f12d0b2480",
+    "scripts/parallel-preview.py": "5425da8665a31cfc681853cf5e5579d2a75295a08ee74399da717f803cf441bc",
     "scripts/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
     "scripts/plugin-composition.js": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b",
     "scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",

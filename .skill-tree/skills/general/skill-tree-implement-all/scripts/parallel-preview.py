@@ -29,6 +29,9 @@ COMPOSITION_INPUTS = (
     '.skill-tree/bin/compose.js', '.skill-tree/lib/composer.js',
     '.skill-tree/lib/installation.js', '.skill-tree/templates', '.skill-tree/config',
 )
+REVIEW_INPUTS = (RESOURCE_MAP, FLAVORS, '.skill-tree/installation/profile.json',
+                 '.skill-tree/config/repository.json', '.skill-tree/validation-recipes.json',
+                 '.skill-tree/worktree-profile.json')
 
 
 def normalized(path):
@@ -93,15 +96,16 @@ def generated_outputs(root):
     return outputs
 
 
-def validation_scope(store, task, resources):
+def validation_scope(store, task, resources, checked_recipes=None):
     checks, reads, exclusive = [], set(), set()
     for check in workflow.check_specs(task):
-        recipe, _ = workflow.recipe_for(store, check)
+        recipe = (workflow.recipe_for(store, check)[0] if checked_recipes is None
+                  else checked_recipes[check['id']])
         paths = check['sources'] + recipe.get('input_paths', [])
         reads.update(checked_path(store.source_root, path) for path in paths)
         lane = recipe['lane']
         check_resources = []
-        if lane in workflow.PRODUCT_LANES or recipe.get('execution_binding'):
+        if checked_recipes is None and (lane in workflow.PRODUCT_LANES or recipe.get('execution_binding')):
             if not resources:
                 raise ValueError('Check requires an explicit exclusive-resource policy: ' + check['id'])
             check_resources = sorted(set(resources))
@@ -131,7 +135,7 @@ def named_resources(root):
     return resources
 
 
-def describe(store, task, outputs, resources, declared_resources=()):
+def describe(store, task, outputs, resources, declared_resources=(), *, checked_recipes=None):
     result = {
         'id': task['id'], 'title': task['title'], 'priority': task['priority'],
         'status': task['status'], 'dependencies': task['depends_on'],
@@ -157,7 +161,7 @@ def describe(store, task, outputs, resources, declared_resources=()):
         result['reasons'].append({'kind': 'unknown-touch', 'detail': str(error)})
     try:
         result['checks'], result['check_inputs'], result['exclusive_resources'] = validation_scope(
-            store, task, resources
+            store, task, resources, checked_recipes
         )
         result['exclusive_resources'] = sorted(set(result['exclusive_resources']).union(declared_resources))
     except (ValueError, OSError) as error:
@@ -216,21 +220,145 @@ def dependency_holds(store, candidate, completed, progress, claims):
     return reasons
 
 
+def controller_review_tasks(state, completed, claims):
+    registry = state.get('run_registry') or {}
+    runs = registry.get('runs', {})
+    if not registry and state.get('active_run'):
+        legacy = state['active_run']
+        runs = {legacy['id']: legacy}
+    selected = {}
+    for run_id, run in runs.items():
+        finished = (workspaces.delivery_finished(run) if run.get('delivery')
+                    else run.get('phase') == 'completed')
+        recorded = set(run.get('completed_ids', []))
+        recorded.update(task_id for task_id, reference in run.get('completion_refs', {}).items()
+                        if completed.get(task_id, {}).get('id') == reference)
+        task_ids = sorted(task_id for task_id in recorded if not finished or claims.get(task_id) == run_id)
+        if task_ids:
+            selected[run_id] = (run, task_ids, finished)
+    return selected
+
+
+def controller_review_inputs(store, state, selected):
+    if not selected:
+        return {}, {}
+    registry = state.get('run_registry') or {}
+    applied = set(registry.get('applied_events', []))
+    locator = workspaces.runtime_file(store.root)
+    observed = {'locator': workflow.file_hash(locator) if locator else None, 'runs': {}}
+    checkouts = {}
+    for run_id, (run, _, _) in selected.items():
+        inputs = observed['runs'][run_id] = {}
+        try:
+            if not workflow.valid_id(run_id, 'WR'):
+                raise ValueError('Invalid completed controller identity')
+            events = workflow.binding_path(store.root, '.skill-tree/history/run-events/' + run_id.lower())
+            inputs['events'] = {
+                path.name: 'symlink' if path.is_symlink() else workflow.file_hash(path)
+                for path in sorted(events.glob('e-*.json')) if 'E-' + path.stem[2:] in applied
+            }
+            view = workflow.Store(store.root, allow_unselected=True, neutral=True)
+            workspaces.ensure_workspace(view, run)
+            checkout = workspaces.checked_out_branch(view.source_root)
+            inputs['checkout'] = checkout
+            inputs['path'] = str(view.source_root)
+            inputs['source'] = {path: workflow.file_hash(view.source_root / path) for path in REVIEW_INPUTS}
+            inputs['outputs'] = generated_outputs(view.source_root)
+            checkouts[run_id] = (view, checkout)
+        except (OSError, ValueError) as error:
+            inputs['error'] = str(error)
+    return observed, checkouts
+
+
+def completed_check_recipe(view, run, task, check, result):
+    recipe, environment = workflow.recipe_for(view, check)
+    sources = workflow.fingerprints(view, check['sources'])
+    if any(value is None for value in sources.values()):
+        raise ValueError('Completed validation source inputs are unavailable: ' + check['id'])
+    if recipe['lane'] in workflow.PRODUCT_LANES:
+        # Reconstruct the accepted check identity from its recorded session and artifacts.
+        session = result.get('execution_sessions', {}).get(environment)
+        if not session:
+            raise ValueError('The current recipe and inputs do not match completed validation session: ' + check['id'])
+        fields = ('tool_identity', 'fixture_identity', 'build_identity', 'save_service_isolation', 'editor_version')
+        identity = {field: session[field] for field in fields if field in session}
+        identity['evidence'] = [workflow.evidence_pointer(view, ref, required=True)
+                                for ref in session['identity_evidence']]
+        environment = workflow.digest(workflow.dump({'recipe_environment': environment, 'execution': identity}).encode())
+    executable = {name: check[name] for name in ('recipe_id', 'sources', 'parameters', 'assertion')}
+    key = workflow.digest(workflow.dump({'check': executable, 'recipe': recipe, 'sources': sources,
+        'environment': environment, 'group': workflow.group_fingerprint(view, task, {'active_run': run})}).encode())
+    if (key, workflow.task_signature(task)) != (result['key'], result['definition']):
+        raise ValueError('The current recipe and inputs do not match completed validation: ' + check['id'])
+    return recipe
+
+
+def completed_review_scope(store, run, outcome, view, checkout, outputs):
+    receipt = outcome.get('task_git_commit')
+    if not isinstance(receipt, dict):
+        raise ValueError('The completed outcome has no scoped Git receipt')
+    if (receipt.get('ref') != checkout['ref'] or receipt.get('checkout') != checkout['checkout']
+            or any(not isinstance(receipt.get(key), str)
+                   or not re.fullmatch(r'(?:[a-f0-9]{40}|[a-f0-9]{64})', receipt[key])
+                   for key in ('commit', 'parent', 'tree'))):
+        raise ValueError('The scoped Git receipt differs from the registered review checkout')
+    root = view.source_root
+    commit, parent = receipt['commit'], receipt['parent']
+    commit_identity = workspaces.local_git_text(root, 'show', '-s', '--format=%T%n%P', commit).split()
+    if (commit_identity != [receipt['tree'], parent]
+            or workspaces.local_git(root, 'merge-base', '--is-ancestor', commit, checkout['head'],
+                                    accepted=(0, 1, 128)).returncode):
+        raise ValueError('The registered review checkout does not contain the exact scoped Git commit')
+    actual = workspaces.local_git_paths(root, 'diff', '--name-only', '--no-renames', '-z', parent, commit, '--')
+    recorded = workspaces.worker_paths(receipt['paths'])
+    if not actual or not actual.issubset(recorded):
+        raise ValueError('Changed Git paths differ from the verified completion scope')
+    body = workflow.completed_task_body(store, outcome)
+    if body is None:
+        raise ValueError('The applied completion event does not verify the removed task definition')
+    task = {'id': outcome['task_id'], 'title': outcome['title'], 'priority': 0, 'status': 'Ready',
+            'body': body, 'depends_on': outcome['depends_on'], 'validation_group_id': outcome.get('validation_group_id'),
+            'boundary_validation': outcome.get('boundary_validation', 'not-required')}
+    checks = workflow.check_specs(task)
+    if (workflow.task_signature(task) != outcome.get('validation_signature')
+            or checks != outcome.get('validation_plan')):
+        raise ValueError('The removed task validation contract differs from the completed outcome')
+    results = outcome.get('check_results', [])
+    registered = {item['check']['id']: item for item in results}
+    if len(results) != len(checks) or registered.keys() != {check['id'] for check in checks}:
+        raise ValueError('The completed outcome lacks exact validation results for the review scope')
+    checked_recipes = {}
+    for check in checks:
+        item = registered[check['id']]
+        result = item['result']
+        if item['check'] != check or result['result'] != 'pass':
+            raise ValueError('The completed outcome lacks a matching passing validation result')
+        checked_recipes[check['id']] = completed_check_recipe(view, run, task, check, result)
+    scope = describe(view, task, outputs, (), checked_recipes=checked_recipes)
+    if scope['reasons']:
+        raise ValueError(scope['reasons'][0]['detail'])
+    scope['touch'] = sorted(set(scope['touch']) | {checked_path(root, path) for path in actual})
+    scope['check_inputs'] = sorted(set(scope['check_inputs']) | {
+        checked_path(root, path) for path in outcome['source_fingerprints']
+    })
+    scope['generated_consumers'] = {
+        source: sorted(consumers) for source, consumers in sorted(outputs.items())
+        if any(overlap(source, path) for path in scope['touch'])
+    }
+    return scope, task
+
+
 def snapshot(store):
     if any((store.base / name).exists() for name in ('.writer-lock', '.transaction.json')):
         raise ValueError('Queue writer or recovery in progress. Retry the preview after reconciliation.')
     root = store.source_root
-    source_inputs = (
-        RESOURCE_MAP, FLAVORS, '.skill-tree/installation/profile.json', '.skill-tree/config/repository.json',
-        '.skill-tree/worktree-profile.json',
-    )
     head = workspaces.git(root, 'rev-parse', 'HEAD') if workspaces.common_dir(root) else None
     return {
         'source_root': str(root), 'source_head': head, 'queue_root': str(store.root),
         'queue_sha256': workflow.file_hash(store.future), 'state_sha256': workflow.file_hash(store.state),
         'outcomes_sha256': workflow.file_hash(store.owned(workflow.OUTCOME_LEDGER)),
         'navigation_sha256': workflow.file_hash(store.owned(workflow.NAVIGATION)),
-        'source_inputs': {name: workflow.file_hash(root / name) for name in source_inputs},
+        'source_inputs': {name: workflow.file_hash(root / name) for name in REVIEW_INPUTS},
     }
 
 
@@ -265,6 +393,37 @@ def preview(store, workers, selectors=(), *, declared_resources=None):
             for task_id in legacy.get(field, []):
                 if task_id not in completed:
                     claims.setdefault(task_id, legacy['id'])
+    reviewing = controller_review_tasks(state, completed, claims)
+    review_inputs, review_checkouts = controller_review_inputs(store, state, reviewing)
+    review_scopes = []
+    review_checks = []
+    for run_id, (run, task_ids, finished) in reviewing.items():
+        for task_id in task_ids:
+            outcome = completed.get(task_id, {})
+            try:
+                if (task_id not in run.get('completed_ids', []) or task_id in by_id
+                        or outcome.get('run_id') != run_id or not outcome.get('id')
+                        or run.get('completion_refs', {}).get(task_id) != outcome['id']):
+                    raise ValueError('The owning run does not reference the exact completed task outcome')
+                if run_id not in review_checkouts:
+                    raise ValueError(review_inputs['runs'][run_id]['error'])
+                view, found_checkout = review_checkouts[run_id]
+                relevant = review_inputs['runs'][run_id]
+                peer_outputs = relevant['outputs']
+                combined_outputs = {path: outputs.get(path, set()) | peer_outputs.get(path, set())
+                                    for path in outputs.keys() | peer_outputs.keys()}
+                scope, task = completed_review_scope(store, run, outcome, view, found_checkout, combined_outputs)
+                review_checks.append((view, run, task, outcome['check_results']))
+                if claims.get(task_id) == run_id and task_id not in progress:
+                    del claims[task_id]
+                if not finished:
+                    review_scopes.append((run_id, task_id, scope, None))
+            except (KeyError, OSError, ValueError) as error:
+                if not finished:
+                    review_scopes.append((run_id, task_id, None, str(error)))
+    for _, _, scope, _ in review_scopes:
+        if scope is not None:
+            dependency_holds(store, scope, completed, progress, claims)
     pending_holds = {}
     for task in tasks:
         if task['queue'] == 'Pending Queue' and task['relation'] in {'blocker', 'subtask'}:
@@ -305,6 +464,12 @@ def preview(store, workers, selectors=(), *, declared_resources=None):
                 reasons.append({'kind': 'active-scope-unverified', 'task_id': active_id})
             else:
                 reasons.extend(conflicts(item, scope))
+        for review_run, review_task, scope, error in review_scopes:
+            if scope is None:
+                reasons.append({'kind': 'review-scope-unverified', 'task_id': review_task,
+                                'run_id': review_run, 'detail': error})
+            elif review_task != task_id:
+                reasons.extend({**reason, 'run_id': review_run} for reason in conflicts(item, scope))
         for other in selected:
             reasons.extend(conflicts(item, other))
         if not reasons and len(selected) == workers:
@@ -321,6 +486,14 @@ def preview(store, workers, selectors=(), *, declared_resources=None):
     regeneration = [item['id'] for item in selected if item['generated_consumers'] or any(
         overlap(path, common) for path in item['touch'] for common in COMPOSITION_INPUTS
     )] if (store.source_root / RESOURCE_MAP).is_file() else []
+    try:
+        for view, run, task, results in review_checks:
+            for item in results:
+                completed_check_recipe(view, run, task, item['check'], item['result'])
+    except (KeyError, OSError, ValueError) as error:
+        raise ValueError('Controller review validation inputs changed during preview. Retry.') from error
+    if controller_review_inputs(store, state, reviewing)[0] != review_inputs:
+        raise ValueError('Controller review proof changed during preview. Retry.')
     if snapshot(store) != before:
         raise ValueError('Queue or source planning inputs changed during preview. Retry.')
     return {

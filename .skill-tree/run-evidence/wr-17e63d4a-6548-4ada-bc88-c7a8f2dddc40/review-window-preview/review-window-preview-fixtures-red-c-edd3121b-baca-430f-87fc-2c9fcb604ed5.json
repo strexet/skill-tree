@@ -1,0 +1,21 @@
+{
+  "check_id": "review-window-preview-fixtures",
+  "attempt_id": "C-edd3121b-baca-430f-87fc-2c9fcb604ed5",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-parallel-preview.py",
+    "ParallelReadyPreviewTests.test_recovers_exact_review_scope_after_completion_and_claim_refresh"
+  ],
+  "exit_code": 1,
+  "result": "red",
+  "counts": {
+    "expected": 1,
+    "discovered": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0
+  },
+  "observed_output": "F\n======================================================================\nFAIL: test_recovers_exact_review_scope_after_completion_and_claim_refresh (__main__.ParallelReadyPreviewTests.test_recovers_exact_review_scope_after_completion_and_claim_refresh)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<run-worktree>/.skill-tree/tests/test-parallel-preview.py\", line 232, in test_recovers_exact_review_scope_after_completion_and_claim_refresh\n    expected_review_window(selection())\n  File \"<run-worktree>/.skill-tree/tests/test-parallel-preview.py\", line 220, in expected_review_window\n    self.assertIn(independent, result['selected_ids'],\nAssertionError: 'T-b3b406ed-b077-4fa3-963d-6d5a066c2eb7'\n\n----------------------------------------------------------------------\nRan 1 test in 7.566s\n\nFAILED (failures=1)",
+  "timeout": false,
+  "elapsed_seconds": 10.291
+}

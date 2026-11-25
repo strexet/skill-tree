@@ -1,4 +1,5 @@
 import importlib.util
+from datetime import datetime, timedelta, timezone
 import json
 import runpy
 from pathlib import Path
@@ -150,6 +151,196 @@ class ParallelReadyPreviewTests(unittest.TestCase):
                     'kind': 'write-input-overlap', 'task_id': dependent,
                     'paths': ['prerequisite.py', 'prerequisite.py'],
                 })
+
+    def test_recovers_exact_review_scope_after_completion_and_claim_refresh(self):
+        scope = '.skill-tree/common/scripts/sample.py'
+        generated = '.skill-tree/skills/general/sample/scripts/sample.py'
+        self.write_json(preview.RESOURCE_MAP, {'sample': {'scripts': {'sample.py': 'common/scripts/sample.py'}}})
+        self.write_json('.skill-tree/config/repository.json', {'schema': 1, 'role': 'source', 'recipes': {
+            'fixture-browser': {'lane': 'browser', 'argv': ['fixture-browser'], 'input_paths': ['prior.config']},
+        }})
+        self.write_json('.skill-tree/worktree-profile.json', {'schema': 1, 'exclusive_resources': ['browser:fixture']})
+        for relative in (scope, generated, 'shared-read.py', 'source-proof.json', 'prior.config', 'later.config'):
+            path = self.root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text('Fixture source baseline.\n')
+        def git(root, *args):
+            return subprocess.run(['git', '-C', str(root), *args], text=True, check=True, capture_output=True).stdout.strip()
+        git(self.root, 'init', '-b', 'main')
+        git(self.root, 'config', 'user.name', 'Review scope fixture')
+        git(self.root, 'config', 'user.email', 'fixture@example.invalid')
+        git(self.root, 'add', '.')
+        git(self.root, 'commit', '-m', 'Isolated review scope baseline')
+        self.store = workflow.Store(self.root, allow_unselected=True)
+        workflow.workspaces.setup(self.store, {})
+        finished = self.task('Accepted source', 200, [scope, 'only-declared.py'], reads=['shared-read.py'],
+                             recipe='fixture-browser')
+        independent = self.task('Independent Ready work', 190, ['independent.py'], reads=['unrelated-read.py'])
+        writing = self.task('Writes completed source', 180, [scope], reads=['unrelated-read.py'])
+        reading = self.task('Writes accepted check input', 170, ['shared-read.py'], reads=['unrelated-read.py'])
+        generated_write = self.task('Writes reviewed package output', 160, [generated], reads=['unrelated-read.py'])
+        recorded_write = self.task('Writes committed evidence', 150, ['source-proof.json'], reads=['unrelated-read.py'])
+        declared_write = self.task('Writes declared scope', 140, ['only-declared.py'], reads=['unrelated-read.py'])
+        recipe_write = self.task('Writes accepted recipe input', 135, ['prior.config'], reads=['unrelated-read.py'])
+        dependent = self.task('Needs completed source integration', 130, ['dependency.py'], reads=['unrelated-read.py'],
+                              dependencies=[finished])
+        runtime = self.task('Uses reserved browser', 120, ['runtime.py'], recipe='fixture-browser')
+        neutral_start = workflow.Store(self.root, allow_unselected=True, neutral=True)
+        run = workflow.start(neutral_start, 'all', workspace={'snapshot_ids': [finished],
+                    'base_branch': 'main', 'local_base': True,
+                    'local_base_authorization': 'The disposable test uses its local source baseline.',
+                    'implementation_operation': 'implement-all'})
+        worktree = Path(workflow.workspaces.runtime(self.root)['worktrees'][run['id']])
+        run_store = workflow.Store(worktree, run['id'])
+        workflow.begin_task(run_store, {'task_id': finished})
+        (worktree / scope).write_text('Verified scoped file.\n')
+        (worktree / 'source-proof.json').write_text('{"scope":"review window"}\n')
+        resource = workflow.workspaces.resource(run_store, {'resource': 'browser:fixture'})
+        session = {'project_root': str(worktree), 'authorization': 'A controlled disposable fixture.',
+                   'profile_id': 'fixture-browser', 'deadline_utc': (datetime.now(timezone.utc) + timedelta(minutes=5)).isoformat(),
+                   'cleanup_seconds': 30, 'tool_identity': {'fixture': 'browser'}, 'session_identity': 'test-session',
+                   'fixture_identity': 'preview-fixture', 'build_identity': 'preview-build',
+                   'identity_evidence': ['source-proof.json']}
+        attempt = workflow.prepare_check(run_store, {'task_id': finished, 'check_id': 'scoped-fixture', 'execution': session})
+        workflow.record_check(run_store, {'task_id': finished, 'check_id': 'scoped-fixture',
+            'attempt_id': attempt['attempt_id'], 'result': 'pass', 'classification': 'executed-control',
+            'actual_lane': 'browser', 'environment_identity': attempt['environment_identity'],
+            'counts': {'expected': 1, 'discovered': 1, 'passed': 1, 'failed': 0, 'skipped': 0},
+            'cleanup': 'The synthetic browser receipt exercises preview with a real resource claim.',
+            'evidence': ['source-proof.json']})
+        workflow.mark_implemented(run_store, {'task_id': finished, 'changed_files': [scope, 'source-proof.json']})
+        with patch.object(workflow, 'verified_implementation_review', return_value={'orchestration_hash': 'a'*64}):
+            outcome = workflow.complete(run_store, {'task_id': finished, 'review_id': workflow.identity('DO'),
+                'outcome': 'The verified fixture updated the scoped source.',
+                'acceptance': [{'criterion': CRITERION, 'result': 'pass', 'evidence': ['source-proof.json']}],
+                'source_fingerprints': workflow.fingerprints(run_store, [scope])})
+        self.assertEqual(outcome['task_git_commit']['commit'], git(worktree, 'rev-parse', 'HEAD'))
+
+        neutral = workflow.Store(self.root, allow_unselected=True, neutral=True)
+        def selection():
+            before = (neutral.future.read_bytes(), neutral.state.read_bytes(),
+                      neutral.owned(workflow.OUTCOME_LEDGER).read_bytes(), git(worktree, 'status', '--short'))
+            result = preview.preview(neutral, 12)
+            self.assertEqual(before, (neutral.future.read_bytes(), neutral.state.read_bytes(),
+                                     neutral.owned(workflow.OUTCOME_LEDGER).read_bytes(), git(worktree, 'status', '--short')))
+            return result
+
+        def expected_review_window(result):
+            self.assertIn(independent, result['selected_ids'],
+                          'Independent Ready work must survive the completed claim during review')
+            reasons = {item['id']: item['reasons'] for item in result['deferred']}
+            for candidate, relevant in ((writing, scope), (reading, 'shared-read.py'), (generated_write, generated),
+                                        (recorded_write, 'source-proof.json'), (declared_write, 'only-declared.py'),
+                                        (recipe_write, 'prior.config')):
+                self.assertTrue(any(relevant in row.get('paths', []) and row.get('task_id')==finished
+                                    for row in reasons[candidate]), reasons[candidate])
+            self.assertTrue(any(row['kind']=='active-resource-claim' and row['resource']=='browser:fixture'
+                                for row in reasons[runtime]), reasons[runtime])
+            self.assertIn('dependency-source-unverified', {row['kind'] for row in reasons[dependent]})
+
+        self.assertEqual(neutral.load()['run_registry']['claims'].get(finished), run['id'])
+        expected_review_window(selection())
+        workflow.checkpoint(run_store, {'phase':'resume-parent'})
+        self.assertNotIn(finished, neutral.load()['run_registry']['claims'])
+        expected_review_window(selection())
+        workflow.workspaces.resource(run_store, {'resource': 'browser:fixture', 'release': True, 'token': resource['token']})
+        released = selection()
+        self.assertIn(runtime, released['selected_ids'])
+        self.assertNotIn(writing, released['selected_ids'])
+        self.assertNotIn(recipe_write, released['selected_ids'])
+        policies = [root / '.skill-tree/worktree-profile.json' for root in (self.root, worktree)]
+        policy_bytes = [path.read_bytes() for path in policies]
+        try:
+            for path in policies:
+                path.unlink()
+            without_policy = selection()
+            self.assertIn(independent, without_policy['selected_ids'])
+            self.assertNotIn(writing, without_policy['selected_ids'])
+        finally:
+            for path, saved in zip(policies, policy_bytes):
+                path.write_bytes(saved)
+
+        config = worktree / '.skill-tree/config/repository.json'
+        config_bytes = config.read_bytes()
+        changed_recipe = json.loads(config_bytes)
+        changed_recipe['recipes']['fixture-browser']['input_paths'] = ['later.config']
+        config.write_text(json.dumps(changed_recipe))
+        try:
+            changed_scope = selection()
+            self.assertNotIn(recipe_write, changed_scope['selected_ids'])
+            self.assertTrue(any(row['kind']=='review-scope-unverified'
+                                and 'do not match completed validation' in row['detail']
+                                for item in changed_scope['deferred'] if item['id']==recipe_write
+                                for row in item['reasons']))
+        finally:
+            config.write_bytes(config_bytes)
+
+        events = neutral.owned('.skill-tree/history/run-events/' + run['id'].lower())
+        event = next(path for path in events.glob('e-*.json')
+                     if any(row['id'] == outcome['id'] for row in json.loads(path.read_text())['outcomes']))
+        event_bytes = event.read_bytes()
+        ref = outcome['task_git_commit']['ref']
+        commit = outcome['task_git_commit']['commit']
+        base = outcome['task_git_commit']['parent']
+        recipe_input = worktree / 'prior.config'
+        identity_artifact = worktree / 'source-proof.json'
+        input_bytes = recipe_input.read_bytes()
+        artifact_bytes = identity_artifact.read_bytes()
+        original_compare = preview.conflicts
+        for label, update, restore in (
+            ('applied event',
+             lambda: event.write_bytes(event_bytes + b'\n'),
+             lambda: event.write_bytes(event_bytes)),
+            ('peer branch',
+             lambda: git(self.root, 'update-ref', ref, base, commit),
+             lambda: git(self.root, 'update-ref', ref, commit, base)),
+            ('recipe input',
+             lambda: recipe_input.write_bytes(input_bytes + b'changed'),
+             lambda: recipe_input.write_bytes(input_bytes)),
+            ('validation identity artifact',
+             lambda: identity_artifact.write_bytes(artifact_bytes + b'changed'),
+             lambda: identity_artifact.write_bytes(artifact_bytes)),
+        ):
+            with self.subTest(proof=label):
+                changed = False
+                def mutate_after_projection(*args):
+                    nonlocal changed
+                    if not changed:
+                        update()
+                        changed = True
+                    return original_compare(*args)
+                try:
+                    with patch.object(preview, 'conflicts', side_effect=mutate_after_projection):
+                        with self.assertRaisesRegex(ValueError, '(?i)review.*changed|planning inputs changed'):
+                            preview.preview(neutral, 12)
+                finally:
+                    if changed:
+                        restore()
+
+        ledger = neutral.owned(workflow.OUTCOME_LEDGER)
+        original = ledger.read_bytes()
+        corrupted = {**outcome, 'task_git_commit': {**outcome['task_git_commit'], 'tree': 'a'*40}}
+        ledger.write_text(json.dumps(corrupted, sort_keys=True) + '\n')
+        try:
+            invalid = selection()
+            self.assertNotIn(independent, invalid['selected_ids'])
+            self.assertTrue(any(row['task_id']==finished and row['kind']=='review-scope-unverified'
+                                for row in next(item for item in invalid['deferred']
+                                                if item['id']==independent)['reasons']))
+        finally:
+            ledger.write_bytes(original)
+
+        workflow.workspaces.resource(run_store, {'resource': 'browser:fixture'})
+        workflow.advance(run_store)
+        with patch.object(workflow, 'verified_implementation_review', return_value={'orchestration_hash': 'b'*64}):
+            workflow.freeze_reviewed_controller(run_store, {'review_id': workflow.identity('DO')})
+        self.assertNotIn(writing, preview.preview(neutral, 1, [writing])['selected_ids'])
+        with patch.object(workflow, 'verified_implementation_review', return_value={'orchestration_hash': 'b'*64}):
+            merged = workflow.merge_reviewed_controller(run_store, {
+                'owner_instruction': 'Integrate the checked disposable source fixture.'})
+        self.assertEqual(merged['delivery']['status'], 'merged')
+        retired = preview.preview(neutral, 1, [writing])
+        self.assertEqual(retired['selected_ids'], [writing])
 
     def test_director_declared_resources_bound_batch_without_losing_other_candidates(self):
         first = self.task('Resource owner', 300, ['first.py'])
