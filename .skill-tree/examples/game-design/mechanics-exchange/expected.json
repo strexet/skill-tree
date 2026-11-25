@@ -1,0 +1,27 @@
+{
+  "initial_pins": [
+    "paper-race-exchange/combined-boost@1",
+    "paper-race-exchange/editorial-fixture@1",
+    "paper-race-exchange/reveal-duplicate@1",
+    "skill-tree-mechanics/bounded-reserve@1",
+    "skill-tree-mechanics/hold-to-boost@1",
+    "skill-tree-mechanics/original-seed@1",
+    "skill-tree-mechanics/spend-to-reveal@1"
+  ],
+  "merge_redirect": "skill-tree-mechanics/spend-to-reveal@1",
+  "split_redirect": "skill-tree-mechanics/hold-to-boost@1",
+  "historical_placement_pin": "paper-race-exchange/combined-boost@1",
+  "migration_vocabulary": [
+    "bounded reserve",
+    "sustained movement"
+  ],
+  "invalid_controls": [
+    "invalid-shape",
+    "invalid-revision",
+    "record-revision-conflict",
+    "batch-content-conflict",
+    "ambiguous-split",
+    "stale-active-version",
+    "failed-publish"
+  ]
+}
