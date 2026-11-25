@@ -2395,6 +2395,7 @@ def current_target_check_inputs(store,attempt):
     result={};executables={}
     candidate=attempt['candidate']
     runner_env=workspaces.local_git_environment()
+    search_path=os.pathsep.join(str(store.source_root / entry) for entry in os.get_exec_path(runner_env))
     relevant={key:value for key,value in runner_env.items() if key in {'PATH','CI','LANG','TZ'}
               or key.startswith(('LC_','PYTHON','NODE','JAVA','SKILL_TREE_'))}
     for cid,check in attempt['contracts'].items():
@@ -2402,7 +2403,11 @@ def current_target_check_inputs(store,attempt):
         argv=recipe.get('argv')
         if recipe['lane'] not in {'static','unit','integration'} or recipe.get('execution_binding') or not argv:
             raise WorkflowError('Fresh current-target check requires an owned local runnable recipe: '+cid)
-        command=shutil.which(argv[0]);inputs=fingerprints(store,check['sources']+recipe.get('input_paths',[]))
+        runner=argv[0]
+        if os.path.dirname(runner) and not os.path.isabs(runner):
+            runner=str(store.source_root / runner)
+        command=shutil.which(runner,path=search_path)
+        inputs=fingerprints(store,check['sources']+recipe.get('input_paths',[]))
         if not command or any(value is None for value in inputs.values()):
             raise WorkflowError('Current-target runner or exact check input is unavailable: '+cid)
         executable=str(Path(command).resolve())
@@ -2581,10 +2586,10 @@ def current_target_delivery(store,command,payload):
             return current_target_preview(attempt,run)
         area,actual=workspaces.current_target_checkout(store.root,attempt)
         candidate=attempt.get('candidate')
-        applied=action=='merge' and attempt['status']=='applying' and candidate and head==candidate['commit']
-        if head!=attempt['target_head'] and not applied:
+        recovering=action=='merge' and attempt['status']=='applying' and candidate is not None
+        if head!=attempt['target_head'] and not recovering:
             raise WorkflowError('The current-target candidate is stale because the target moved')
-        if not applied and workspaces.local_source_identity(store,run)!=attempt['source']:
+        if (not recovering or head==attempt['target_head']) and workspaces.local_source_identity(store,run)!=attempt['source']:
             raise WorkflowError('The original reviewed source ref, checkout or tree changed')
         if action=='seal':
             if attempt['status']=='staged':
@@ -2623,6 +2628,22 @@ def current_target_delivery(store,command,payload):
         review_id=payload.get('review_id')
         if not valid_id(review_id,'DO') or review_id==reviewed['review_id']:
             raise WorkflowError('An independent current-target review of the exact candidate is required')
+        if recovering and attempt['review']['id']!=review_id:
+            raise WorkflowError('Recover the exact prepared current-target review before retry')
+        applied=False
+        if recovering and head!=attempt['target_head']:
+            applied=not workspaces.local_git(target,'merge-base','--is-ancestor',candidate['commit'],head,
+                                             accepted=(0,1)).returncode
+            if not applied:
+                advanced=not workspaces.local_git(target,'merge-base','--is-ancestor',attempt['target_head'],head,
+                                                  accepted=(0,1)).returncode
+                source_present=not workspaces.local_git(target,'merge-base','--is-ancestor',
+                    attempt['source']['source_head'],head,accepted=(0,1)).returncode
+                if advanced and not source_present:
+                    attempt['status']='stale'
+                    store.save(text,state)
+                    raise WorkflowError('The current-target candidate is stale because the target advanced without it')
+                raise WorkflowError('The interrupted candidate could not be reconciled with the current target ancestry')
         if not applied:
             hook_admission(store,chain_ids=run.get('hook_chains',[]))
             checks=current_target_checked_evidence(store,attempt,current_target_check_inputs(proof_store,attempt))
@@ -2648,12 +2669,13 @@ def current_target_delivery(store,command,payload):
                 attempt['status']='stale' if current_head!=attempt['target_head'] else 'checked'
                 store.save(text,state)
                 raise
-        elif attempt['review']['id']!=review_id:
-            raise WorkflowError('Recover the exact prepared current-target review before retry')
         _,head=workspaces.reviewed_launch_target(store,run)
-        if head!=candidate['commit']:raise WorkflowError('The exact sealed target merge could not be verified')
-        incoming=sorted(workspaces.local_incoming(target,attempt['target_head'],candidate['commit']))
-        workspaces.reconcile_reviewed_merge_index(target,{**receipt,'target_ref':target_ref,'incoming':incoming},verified_candidate)
+        if head==candidate['commit']:
+            incoming=sorted(workspaces.local_incoming(target,attempt['target_head'],candidate['commit']))
+            workspaces.reconcile_reviewed_merge_index(target,{**receipt,'target_ref':target_ref,'incoming':incoming},verified_candidate)
+        elif not applied or workspaces.local_git(target,'merge-base','--is-ancestor',candidate['commit'],head,
+                                                 accepted=(0,1)).returncode:
+            raise WorkflowError('The exact sealed target merge could not be verified')
         attempt.update(status='merged',merge=verified_candidate)
         delivery.update(status='merged',order_completed=True,reviewed_merge=verified_candidate)
         run.update(next_action=None,stop_reason=None)

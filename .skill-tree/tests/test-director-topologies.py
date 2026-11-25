@@ -550,6 +550,33 @@ raise SystemExit(director['main'](sys.argv[3:]))
         written = write(root, artifact, checked)
         return {'head': head, 'checks': [{'id': 'scope-check', 'path': artifact, 'sha256': sha(written.read_bytes())}]}
 
+    def test_supervised_pickup_timeout_recovers_unbound_supervisor_and_worker(self):
+        launches = self.supervised_launches()
+        supervisor = {'unit_id': 'game-supervisor', 'generation': 1, 'actor_id': 'old-supervisor'}
+        worker = self.supervised_writer(launches['story'], 'unbound-worker')
+        actor = {key: worker[key] for key in ('unit_id', 'generation', 'actor_id')}
+        self.supervise('assign', 0, **launches['game'][0], role='supervisor', **supervisor)
+        self.supervise('assign', 0, **worker)
+        self.assertEqual(self.supervise('sweep', 10)['stalled'], sorted([actor['unit_id'], supervisor['unit_id']]))
+        process, group = self.fixture_process_group()
+        self.supervise('pickup', 10, **actor, process=group, error='Retired or stale')
+        for attempt in (supervisor, actor):
+            observed = {'kind': 'host-stopped-unbound', 'actor_id': attempt['actor_id'],
+                        'host': socket.gethostname(), 'reference': 'fixture attempt reconciled by host',
+                        'process_groups': []}
+            self.supervise('recover', 10, **attempt, stop_observation={**observed, 'actor_id': 'wrong'},
+                           error='exact stalled local host-stop observation')
+            if attempt == actor:
+                observed['process_groups'] = [group['pgid']]
+                self.supervise('recover', 10, **attempt, stop_observation=observed, error='still exists')
+                self.stop_fixture_group(process)
+            self.assertEqual(self.supervise('recover', 11, **attempt, stop_observation=observed)['status'], 'stopped')
+        replacement = self.supervised_writer(launches['story'], 'pickup-replacement', unit_id=actor['unit_id'], generation=2)
+        self.supervise('assign', 12, **replacement)
+        self.supervise('pickup', 12, **actor, process=group, error='Retired or stale')
+        self.supervise('assign', 12, **launches['game'][0], role='supervisor',
+                       **{**supervisor, 'generation': 2, 'actor_id': 'replacement-supervisor'})
+
     def test_supervised_nested_stall_preserves_sibling_and_fences_replacement(self):
         launches = self.supervised_launches()
         original_targets = [self.git(root, 'rev-parse', 'develop') for root in (self.parent, self.external)]

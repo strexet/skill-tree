@@ -402,13 +402,21 @@ class LocalDeliveryTests(unittest.TestCase):
         self.assertEqual(self.git(self.launch,'rev-parse','HEAD'),advanced)
         self.assertEqual(self.selected.load()['active_run']['delivery']['status'],'review-ready')
 
-    def prepare_two_current_target_sources(self):
+    def prepare_two_current_target_sources(self, *, relative_runner=False):
         output='.skill-tree/skills/general/skill-tree-fixture/references/plugin-bindings.json'
         self.launch=self.base/'launch'
         self.git(self.root,'worktree','add',self.launch,'release/example')
         config=self.launch/'.skill-tree/config/repository.json'
+        command = ['python3','test_combined.py']
+        inputs = ['test_combined.py', output]
+        if relative_runner:
+            runner = self.launch/'run-combined'
+            runner.write_text('#!/bin/sh\nexec python3 "$@"\n')
+            runner.chmod(0o755)
+            command[0] = './run-combined'
+            inputs.append('run-combined')
         config.write_text(json.dumps({'schema':1,'role':'source','recipes':{
-            'combined-unit':{'lane':'unit','argv':['python3','test_combined.py'],'input_paths':['test_combined.py',output]}}}))
+            'combined-unit':{'lane':'unit','argv':command,'input_paths':inputs}}}))
         (self.launch/'peer.py').write_text('peer = 1\n')
         (self.launch/output).parent.mkdir(parents=True)
         (self.launch/output).write_text('value = 1\npeer = 1\n')
@@ -445,7 +453,7 @@ class LocalDeliveryTests(unittest.TestCase):
         return wf.current_target_delivery(self.selected,'current-target-'+action,{'integrator_id':'fixture-integrator',**payload})
 
     def test_current_target_rebuilds_generated_conflict_runs_both_checks_and_reconciles_lost_ack(self):
-        output,advanced,original=self.prepare_two_current_target_sources()
+        output,advanced,original=self.prepare_two_current_target_sources(relative_runner=True)
         original_receipt=self.store.owned(wf._delivery_receipt_path(self.run));frozen=original_receipt.read_bytes()
         owner='Merge the second fixture on top of the first fixture result.'
         attempt=self.current_target('prepare',owner_instruction=owner,expected_target_head=advanced)
@@ -487,6 +495,7 @@ class LocalDeliveryTests(unittest.TestCase):
         with patch.object(wf.subprocess,'run',side_effect=independent_writer):
             checked=self.current_target('checks',attempt_id=aid)
         self.assertEqual(checked['status'],'checked')
+        self.assertTrue(all(row['inputs']['executable']==str(area/'run-combined') for row in checked['checks'].values()))
         evidence=self.store.owned(next(iter(checked['checks'].values()))['artifact']['path']);saved=evidence.read_bytes()
         evidence.write_text('arbitrary result reference')
         with self.assertRaisesRegex(wf.WorkflowError,'evidence is missing, failed or changed'):
@@ -512,9 +521,16 @@ class LocalDeliveryTests(unittest.TestCase):
             args=verify.call_args.args
             self.assertEqual(args[0].source_root,area)
             self.assertEqual(args[1:],(review_id,sealed['identity'],sealed['review_scope']))
+        self.git(self.launch,'commit','--allow-empty','-m','Advance the target after the applied review')
+        later=self.git(self.launch,'rev-parse','HEAD')
+        (self.launch/'peer.py').write_text('Local modification after the later commit.\n')
+        self.git(self.launch,'add','peer.py')
+        staged=self.git(self.launch,'diff','--cached')
         merged=self.current_target('merge',attempt_id=aid,review_id=review_id)
         self.assertEqual(merged['merge']['parents'],[advanced,original['source']['source_head']])
-        self.assertEqual(self.git(self.launch,'rev-parse','HEAD'),sealed['identity']['head'])
+        self.assertEqual(merged['merge']['commit'],sealed['identity']['head'])
+        self.assertEqual(self.git(self.launch,'rev-parse','HEAD'),later)
+        self.assertEqual(self.git(self.launch,'diff','--cached'),staged)
         self.assertEqual(self.current_target('merge',attempt_id=aid,review_id=review_id)['merge'],merged['merge'])
         self.assertEqual(original_receipt.read_bytes(),frozen)
         self.assertEqual(self.git(self.remote,'show-ref'),self.remote_before)
@@ -544,6 +560,35 @@ class LocalDeliveryTests(unittest.TestCase):
         replacement=self.current_target('prepare',owner_instruction=owner,expected_target_head=moved)
         self.assertNotEqual(replacement['id'],aid)
         self.assertEqual(self.git(self.launch,'rev-parse','HEAD'),moved)
+
+    def test_current_target_retires_interrupted_attempt_excluded_by_advanced_target(self):
+        _,advanced,_=self.prepare_two_current_target_sources()
+        owner='Integrate the exact fixture against the current local branch.'
+        attempt=self.current_target('prepare',owner_instruction=owner,expected_target_head=advanced)
+        aid=attempt['id'];sealed=self.current_target('seal',attempt_id=aid)
+        checked=self.current_target('checks',attempt_id=aid)
+        review={'orchestration_hash':'f'*64,'plan':{'required_checks':sealed['required_check_ids']},
+                'checks':{'results':[{'id':cid,'status':'passed','reference':check['review_reference']}
+                                    for cid,check in checked['checks'].items()]}}
+        review_id=wf.identity('DO')
+        with patch.object(wf,'verified_implementation_review',return_value=review):
+            with patch.object(ws,'run_local_merge',side_effect=OSError('Interrupted before applying')):
+                with self.assertRaisesRegex(OSError,'Interrupted before applying'):
+                    self.current_target('merge',attempt_id=aid,review_id=review_id)
+        self.assertEqual(self.git(self.launch,'rev-parse','HEAD'),advanced)
+        self.git(self.launch,'commit','--allow-empty','-m','Advance without the candidate')
+        later=self.git(self.launch,'rev-parse','HEAD')
+        with self.assertRaisesRegex(wf.WorkflowError,'exact prepared current-target review'):
+            self.current_target('merge',attempt_id=aid,review_id=wf.identity('DO'))
+        with self.assertRaisesRegex(wf.WorkflowError,'already has an active integration owner'):
+            self.current_target('prepare',owner_instruction=owner,expected_target_head=later)
+        with self.assertRaisesRegex(wf.WorkflowError,'target advanced without it'):
+            self.current_target('merge',attempt_id=aid,review_id=review_id)
+        stale=self.selected.load()['active_run']['delivery']['current_target_attempts'][aid]
+        self.assertEqual(stale['status'],'stale')
+        replacement=self.current_target('prepare',owner_instruction=owner,expected_target_head=later)
+        self.assertNotEqual(replacement['id'],aid)
+        self.assertEqual(self.git(self.launch,'rev-parse','HEAD'),later)
 
     def test_current_target_reports_authored_conflict_and_preserves_original_refs(self):
         self.start_reviewed_controller('next')

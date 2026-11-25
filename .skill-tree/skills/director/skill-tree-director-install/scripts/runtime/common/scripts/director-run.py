@@ -610,12 +610,25 @@ class DirectorRun:
         action = payload['action']; stamp = now.isoformat()
         if action == 'recover':
             observation = payload['stop_observation']; process = attempt.get('process')
-            D._object(observation, {'kind', 'host', 'actor_id', 'pid', 'pgid', 'reference'})
-            D._require(attempt['status'] == 'stalled' and process and observation['kind'] == 'host-stopped'
+            fields = {'kind', 'host', 'actor_id', 'reference'}
+            D._object(observation, fields | ({'pid', 'pgid'} if process else {'process_groups'}))
+            D._require(attempt['status'] == 'stalled'
                        and observation['host'] == policy['host'] and observation['actor_id'] == attempt['actor_id']
-                       and all(type(observation[key]) is int and observation[key] == process[key] for key in ('pid', 'pgid'))
                        and _supervision_text(observation['reference']), 'Recovery requires the exact stalled local host-stop observation')
-            D._require(_group_gone(process['pgid']), 'The original supervised process group still exists')
+            if process:
+                D._require(observation['kind'] == 'host-stopped'
+                           and all(type(observation[key]) is int and observation[key] == process[key]
+                                   for key in ('pid', 'pgid')),
+                           'Recovery requires the exact stalled local host-stop observation')
+                groups = [process['pgid']]
+            else:
+                groups = observation['process_groups']
+                D._require(attempt.get('stalled_reason') == 'pickup-timeout'
+                           and observation['kind'] == 'host-stopped-unbound' and isinstance(groups, list)
+                           and all(type(group) is int and 1 < group < 2**31 for group in groups)
+                           and len(set(groups)) == len(groups),
+                           'Recovery requires the local host observation for the unbound pickup timeout')
+            D._require(all(_group_gone(group) for group in groups), 'The original supervised process group still exists')
             attempt.update(status='stopped', stopped_at=stamp, stop_observation=deepcopy(observation), wait=None)
             return
         expected = 'assigned' if action == 'pickup' else 'running'
