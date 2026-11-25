@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "d61ae0519b0942c37a639ecd6ad99743fef5e442772803bcf1bd94654485a122",
+  "identity": "230bcd5f5aaf8b4c90c09328b581682d386c5041d51ba1a61c89804180c6a099",
   "operation": "skill-tree-narative",
   "operations": {
     "skill-tree-3d": {
@@ -3294,7 +3294,7 @@
     "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/future-workflow.md": "3a6bc83660773c23af11cf00eacb90ed618db701d464fd7fcd304d5d90fca50b",
-    "references/installation-profile.md": "2db96ac12e1036fbb8c51d2108e1a30cc0e97bc974469597b705185f97897310",
+    "references/installation-profile.md": "7ed0e172c5d5b849105aa3bc6939a2bd1be014ea2ab91a83d53cab3ba4d398d9",
     "references/narrative-canon-approval.md": "d36ed0534797cfbc8ab8d996093a48e82f26b05c6bdccbbde87cd9c34fd7a65b",
     "references/narrative-character-appearance.md": "4c0f460e36b59b0dc8e5c3e25f4c92d7c57402f9359301880a2c695a4aa34f15",
     "references/narrative-character-card.md": "324b75b03b26f45c7cfc9b4a6b2fb73c1bb824689034ef8ec2e7f9cae67de8bc",

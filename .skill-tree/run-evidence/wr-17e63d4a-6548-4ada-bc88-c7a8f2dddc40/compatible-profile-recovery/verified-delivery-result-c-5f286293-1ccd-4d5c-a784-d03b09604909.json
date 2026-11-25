@@ -1,0 +1,20 @@
+{
+  "check_id": "verified-delivery",
+  "attempt_id": "C-5f286293-1ccd-4d5c-a784-d03b09604909",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-pr-review-cycle.py"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "counts": {
+    "expected": 45,
+    "discovered": 45,
+    "passed": 45,
+    "failed": 0,
+    "skipped": 0
+  },
+  "observed_output": ".............................................\n----------------------------------------------------------------------\nRan 45 tests in 94.211s\n\nOK\n",
+  "timeout": false,
+  "elapsed_seconds": 96.981
+}

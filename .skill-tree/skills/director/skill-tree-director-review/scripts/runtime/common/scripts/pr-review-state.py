@@ -247,6 +247,9 @@ def reconcile(record,snapshot,*,retarget=None):
             raise ReviewError('Merged provider result lacks merge commit evidence')
         if target_changed or record.get('merge_commit') != integration:
             record.pop('local_target_sync', None)
+            maintenance = record.pop('profile_maintenance', None)
+            if maintenance:
+                record.setdefault('profile_maintenance_history', []).append(maintenance)
         record['status'] = 'merged'
         record['merge_commit'] = integration
         record['same_repository'] = snapshot.get('same_repository') is True
@@ -1093,6 +1096,12 @@ def synchronize_local_target(root, record):
             receipt['local_head'] = ws.local_git_text(root, 'rev-parse', '--verify', ref + '^{commit}')
             if ws.local_git(root, 'merge-base', '--is-ancestor', remote_head, receipt['local_head'], accepted=(0, 1)).returncode:
                 raise ReviewError('Verify that the local target contains the fetched target after updating')
+            if local_head:
+                receipt['previous_local_head'] = local_head
+        prior = record.get('local_target_sync', {})
+        if (prior.get('status') == 'synchronized' and prior.get('remote_head') == remote_head
+                and prior.get('local_head') == receipt['local_head'] and prior.get('previous_local_head')):
+            receipt.setdefault('previous_local_head', prior['previous_local_head'])
         receipt['status'] = 'synchronized'
         prerequisite = synchronized_profile_prerequisite(root, ref, receipt['local_head'])
         if prerequisite:
@@ -1104,6 +1113,175 @@ def synchronize_local_target(root, record):
     return receipt
 
 
+def _profile_maintenance_library():
+    # Resolve the executing generation without using product or target Git content as code.
+    script = Path(__file__).resolve()
+    core = script.parents[2]
+    if script.parent == core / 'common/scripts':
+        library = _profile_path(core, 'lib/installation.js')
+        if library.is_file():
+            return library
+    package = script.parent.parent
+    bundle = '.skill-tree/installation/source'
+    for actor_root in package.parents:
+        raw = _profile_input(actor_root, '.skill-tree/installation/profile.json')
+        if raw is None:
+            continue
+        profile = json.loads(raw)
+        destination = package.relative_to(actor_root).as_posix()
+        owned = profile.get('destinations', {}).get(destination, {}).get('files', {})
+        if (profile.get('project_root') != str(actor_root)
+                or owned.get('scripts/pr-review-state.py') != hashlib.sha256(script.read_bytes()).hexdigest()):
+            continue
+        prefix = bundle + '/'
+        files = {relative[len(prefix):]: expected for relative, expected in profile.get('bundle_digests', {}).items()
+                 if relative.startswith(prefix)}
+        if 'lib/installation.js' in files and _owned_profile_files_match(actor_root, bundle, files):
+            return _profile_path(actor_root, bundle + '/lib/installation.js')
+    raise ReviewError('The trusted acting installation library is unavailable')
+
+
+def _operate_delivery_profile(library, target, request):
+    script = """
+const [library,root]=process.argv.slice(1);
+try {
+  const request=JSON.parse(require('node:fs').readFileSync(0,'utf8'));
+  const result=require(library).maintainDeliveredProfile(root,request);
+  console.log(JSON.stringify(result));
+} catch (error) {
+  console.log(JSON.stringify({error:error.message}));
+  process.exitCode=2;
+}
+"""
+    environment = ws.local_git_environment()
+    environment.pop('NODE_OPTIONS', None)
+    environment.pop('NODE_PATH', None)
+    output = subprocess.run(['node', '-e', script, str(library), str(target)], cwd=library.parent,
+                            input=json.dumps(request), capture_output=True, text=True,
+                            env=environment, timeout=45)
+    try:
+        result = json.loads(output.stdout)
+    except ValueError as error:
+        raise ReviewError('The trusted profile maintenance operation returned no structured result') from error
+    if output.returncode:
+        raise ReviewError(result.get('error') or 'The trusted profile maintenance operation failed')
+    return result
+
+
+def restore_delivery_profile(root, store, key, authorization):
+    relative = '.skill-tree/history/publications/pub-' + key + '.json'
+    carrier = store.owned(relative)
+    original = carrier.read_bytes()
+    record = json.loads(original)
+    identity = record['identity']
+    with ws.publication_lock(root, identity['remote'], identity['target_branch']):
+        if carrier.read_bytes() != original:
+            raise ReviewError('The selected publication changed before profile maintenance')
+        sync = record.get('local_target_sync', {})
+        if (record.get('status') != 'merged' or sync.get('status') != 'synchronized'
+                or sync.get('merge_commit') != record.get('merge_commit')
+                or sync.get('target_branch') != identity['target_branch'] or sync.get('remote') != identity['remote']):
+            raise ReviewError('Profile maintenance requires an exact verified PR delivery')
+        ref = 'refs/heads/' + identity['target_branch']
+        tracking = 'refs/remotes/' + identity['remote'] + '/' + identity['target_branch']
+        head = sync['local_head']
+        previous = record.get('profile_maintenance')
+        if authorization is None and previous:
+            authorization = previous['authorization']
+        if not isinstance(authorization, dict):
+            raise ReviewError('Profile maintenance requires a bounded explicit owner instruction')
+        base = {'origin': 'owner', 'permission': 'refresh-compatible-profile', 'publication_id': key,
+                'repo_id': identity['repo_id'], 'merge_commit': record['merge_commit'],
+                'target_ref': ref, 'target_head': head}
+        if (authorization.keys() != base.keys() | {'target_checkout', 'profile_sha256'}
+                or any(authorization.get(name) != value for name, value in base.items())
+                or any(not isinstance(authorization.get(name), str)
+                       or not re.fullmatch('[a-f0-9]{64}', authorization[name])
+                       for name in ('target_checkout', 'profile_sha256'))):
+            raise ReviewError('Profile maintenance authorization differs from the exact verified delivery')
+        if previous and previous.get('authorization') != authorization:
+            record.setdefault('profile_maintenance_history', []).append(previous)
+            previous = None
+        if previous is None:
+            prerequisite = sync.get('profile_prerequisite', {})
+            if any(prerequisite.get(name) != authorization[name] for name in
+                   ('target_ref', 'target_head', 'target_checkout', 'profile_sha256')):
+                raise ReviewError('Profile maintenance requires the exact observed profile prerequisite')
+
+        maintenance = deepcopy(previous) if previous is not None else {'authorization': authorization}
+        record['profile_maintenance'] = maintenance
+        record['order_completed'] = publication_complete(record)
+        def save(*, final=False):
+            nonlocal original
+            with store.lock():
+                if carrier.read_bytes() != original:
+                    raise ReviewError('The publication carrier changed during profile maintenance')
+                rendered = json.dumps(record, sort_keys=True, indent=2) + '\n'
+                state = store.load() if final and store.state.is_file() and store.future.is_file() else None
+                runs = ((state or {}).get('run_registry') or {}).get('runs', {})
+                matching = [run for run in runs.values()
+                            if run.get('delivery', {}).get('publication') == relative
+                            and run.get('workspace', {}).get('branch') == identity['source_branch']]
+                if len(matching) > 1:
+                    raise ReviewError('The publication run identity changed before profile maintenance recording')
+                if matching:
+                    matching[0]['delivery'].update(local_target_sync=sync, profile_maintenance=maintenance)
+                    store.save(store.text(), state, extras={relative: rendered})
+                else:
+                    store.commit({relative: rendered})
+                original = rendered.encode()
+
+        try:
+            remote = ws.local_git_text(root, 'remote', 'get-url', '--', identity['remote'])
+            if (hashlib.sha256(remote.encode()).hexdigest() != identity['remote_id']
+                    or ws.repo_id(root) != identity['repo_id'] or head != sync['remote_head']
+                    or not sync.get('previous_local_head')):
+                raise ReviewError('Original synchronized target or pre-sync input provenance is unavailable')
+            target = registered_target(root, ref)
+            if target != ws.canonical(root) or ws.common_dir(target) != ws.common_dir(root):
+                raise ReviewError('Profile maintenance requires the recorded canonical checkout')
+            library = _profile_maintenance_library()
+            checkout = {'ref': ref, 'head': head, 'checkout': authorization['target_checkout']}
+            request = {**authorization, 'previous_local_head': sync['previous_local_head']}
+            profile_path = '.skill-tree/installation/profile.json'
+            with tempfile.TemporaryDirectory(prefix='skill-tree-profile-ref-') as hooks:
+                with ws.local_ref_transaction(target, hooks, tracking, head, ref, head, head):
+                    if ws.checked_out_branch(target) != checkout:
+                        raise ReviewError('The authorized target checkout changed before maintenance')
+                    raw = _profile_input(target, profile_path)
+                    actual = hashlib.sha256(raw).hexdigest() if raw else None
+                    plan = maintenance.get('plan')
+                    if plan is not None and actual == plan['after']['profile_sha256']:
+                        restored = _operate_delivery_profile(library, target, {**request, 'phase': 'verify', 'plan': plan})
+                        status = 'restored' if maintenance.get('status') == 'restored' else 'reconciled'
+                    else:
+                        if actual != authorization['profile_sha256']:
+                            raise ReviewError('The current profile differs from both exact maintenance generations')
+                        derived = _operate_delivery_profile(library, target, {**request, 'phase': 'prepare'})
+                        if plan is not None and derived['plan'] != plan:
+                            raise ReviewError('Retained profile maintenance intent differs from current evidence')
+                        plan = derived['plan']
+                        maintenance.update(status='prepared', plan=plan)
+                        maintenance.pop('reason', None)
+                        save()
+                        _operate_delivery_profile(library, target, {**request, 'phase': 'activate', 'plan': plan})
+                        restored = _operate_delivery_profile(library, target, {**request, 'phase': 'verify', 'plan': plan})
+                        status = 'restored'
+                    raw = _profile_input(target, profile_path)
+                    if (ws.checked_out_branch(target) != checkout or restored['profile'] != plan['after']
+                            or raw is None or hashlib.sha256(raw).hexdigest() != plan['after']['profile_sha256']):
+                        raise ReviewError('The exact target or anticipated installation changed before receipt recording')
+                    maintenance['status'] = status
+                    maintenance.pop('reason', None)
+                    sync.pop('profile_prerequisite', None)
+                    save(final=True)
+                    return record
+        except (ReviewError, ws.RunError, OSError, subprocess.TimeoutExpired) as error:
+            maintenance.update(status='retryable', reason=str(error))
+        save(final=True)
+        return record
+
+
 def publication_complete(record):
     if record['status'] == 'merged':
         return record.get('local_target_sync', {}).get('status') == 'synchronized'
@@ -1111,13 +1289,20 @@ def publication_complete(record):
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command',choices=['parameters','preflight','init','observe','review','ready','merge-gate','operation','block','hook-attach','inspection','review-reconcile','plugin-findings'])
+    parser.add_argument('command',choices=['parameters','preflight','init','observe','review','ready','merge-gate','operation','block','hook-attach','inspection','review-reconcile','plugin-findings','profile-maintenance'])
     parser.add_argument('root',type=Path);parser.add_argument('--input',type=Path,required=True);parser.add_argument('--publication-id')
     args=parser.parse_args(argv)
     try:
         payload=json.loads(args.input.read_text());root=args.root.resolve()
         if args.command=='parameters':result=parameters(payload.get('current_branch',ws.git(root,'symbolic-ref','--short','HEAD')),payload)
         elif args.command=='preflight':result=preflight(root,payload)
+        elif args.command=='profile-maintenance':
+            key = args.publication_id
+            if not key or not re.fullmatch(r'[a-f0-9]{32}', key):
+                raise ReviewError('Profile maintenance requires the existing exact publication ID')
+            wf = owned_module('pr_workflow', Path(__file__).with_name('workflow-state.py'))
+            result = restore_delivery_profile(root, wf.Store(root, allow_unselected=True), key,
+                                              payload.get('profile_authorization'))
         else:
             # Metadata-only commands never send provider requests. The agent supplies inspected snapshots.
             canonical=ws.canonical(root);snapshot=payload.get('snapshot',{})
@@ -1125,6 +1310,7 @@ def main(argv=None):
             if not re.fullmatch(r'[a-f0-9]{32}',key):raise ReviewError('Invalid publication ID')
             wf=owned_module('pr_workflow',Path(__file__).with_name('workflow-state.py'))
             store=wf.Store(root,allow_unselected=True)
+            cleanup_run_id = None
             with ws.publication_lock(root,snapshot.get('remote','origin'),snapshot.get('target_branch',key)):
                 carrier=canonical/('.skill-tree/history/publications/pub-'+key+'.json');carrier_hash=hashlib.sha256(carrier.read_bytes()).hexdigest() if carrier.exists() else None
                 original=json.loads(carrier.read_text()) if carrier.exists() else None
@@ -1174,6 +1360,14 @@ def main(argv=None):
                     result['local_target_sync'] = synchronize_local_target(root, result)
                 if 'local_target_sync' in result:
                     result['order_completed'] = publication_complete(result)
+                grant = payload.get('profile_authorization')
+                retained = result.get('profile_maintenance', {})
+                automatic_profile = (observed_integration and args.command in {'init', 'observe'}
+                                     and result['order_completed']
+                                     and (grant is not None or
+                                          (retained.get('status') in {'prepared', 'retryable'} and
+                                           retained.get('authorization', {}).get('target_head')
+                                           == result['local_target_sync']['local_head'])))
                 with store.lock():
                     current_hash = hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None
                     if current_hash != carrier_hash:
@@ -1191,6 +1385,10 @@ def main(argv=None):
                             delivery['authorization'] = result['authorization']
                             if 'local_target_sync' in result:
                                 delivery['local_target_sync'] = result['local_target_sync']
+                                if 'profile_maintenance' in result:
+                                    delivery['profile_maintenance'] = result['profile_maintenance']
+                                else:
+                                    delivery.pop('profile_maintenance', None)
                                 if result['status'] == 'merged' and not result['order_completed']:
                                     delivery['status'] = 'local-target-sync-pending'
                             if result['status'] != 'merged' or 'local_target_sync' in result:
@@ -1199,9 +1397,29 @@ def main(argv=None):
                             store.save(store.text(),state)
                             if observed_integration:
                                 if result['order_completed']:
-                                    result['worktree_cleanup'] = wf.cleanup_after_merge(store, state, run)
+                                    if automatic_profile:
+                                        cleanup_run_id = run['id']
+                                    else:
+                                        result['worktree_cleanup'] = wf.cleanup_after_merge(store, state, run)
                                 else:
                                     result['worktree_cleanup'] = {'status': 'deferred', 'reason': result['local_target_sync']['reason']}
+            if automatic_profile:
+                try:
+                    result = restore_delivery_profile(root, store, key, grant)
+                except (ReviewError, wf.WorkflowError, ws.RunError, OSError, subprocess.TimeoutExpired) as error:
+                    result['profile_maintenance_error'] = str(error)
+                if cleanup_run_id:
+                    try:
+                        with ws.publication_lock(root, snapshot['remote'], snapshot['target_branch']), store.lock():
+                            persisted = json.loads(path.read_text())
+                            state = store.load()
+                            run = state['run_registry']['runs'].get(cleanup_run_id)
+                            if (run is None or run['delivery'].get('publication') != relative
+                                    or persisted != {k: v for k, v in result.items() if k != 'profile_maintenance_error'}):
+                                raise ReviewError('The publication changed during profile maintenance')
+                            result['worktree_cleanup'] = wf.cleanup_after_merge(store, state, run)
+                    except (ReviewError, wf.WorkflowError, ws.RunError, OSError, subprocess.TimeoutExpired) as error:
+                        result['worktree_cleanup'] = {'status': 'deferred', 'reason': str(error)}
             result={'publication_id':key,**result}
         print(json.dumps(result,indent=2,ensure_ascii=False));return 0
     except (ReviewError,ws.RunError,OSError,ValueError,KeyError,subprocess.TimeoutExpired) as exc:

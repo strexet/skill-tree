@@ -1,0 +1,21 @@
+{
+  "check_id": "verified-delivery",
+  "attempt_id": "C-17f7d866-db37-4ffc-8549-e5ac1008c7b4",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-pr-review-cycle.py",
+    "LocalTargetSyncTests.test_verified_profile_maintenance_reconciles_without_reactivation"
+  ],
+  "exit_code": 1,
+  "result": "red",
+  "counts": {
+    "expected": 1,
+    "discovered": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0
+  },
+  "observed_output": "F\n======================================================================\nFAIL: test_verified_profile_maintenance_reconciles_without_reactivation (__main__.LocalTargetSyncTests.test_verified_profile_maintenance_reconciles_without_reactivation)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<run-worktree>/.skill-tree/tests/test-pr-review-cycle.py\", line 328, in test_verified_profile_maintenance_reconciles_without_reactivation\n    result = self.profile_maintenance(record, authorization)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<run-worktree>/.skill-tree/tests/test-pr-review-cycle.py\", line 323, in profile_maintenance\n    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)\nAssertionError: 2 != 0 : usage: pr-review-state.py [-h] --input INPUT [--publication-id PUBLICATION_ID]\n                          {parameters,preflight,init,observe,review,ready,merge-gate,operation,block,hook-attach,inspection,review-reconcile,plugin-findings}\n                          root\npr-review-state.py: error: argument command: invalid choice: 'profile-maintenance' (choose from 'parameters', 'preflight', 'init', 'observe', 'review', 'ready', 'merge-gate', 'operation', 'block', 'hook-attach', 'inspection', 'review-reconcile', 'plugin-findings')\n\n\n----------------------------------------------------------------------\nRan 1 test in 8.483s\n\nFAILED (failures=1)",
+  "timeout": false,
+  "elapsed_seconds": 11.256
+}

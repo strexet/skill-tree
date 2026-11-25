@@ -232,6 +232,59 @@ test('a concurrent edit during staging is preserved and activation refuses the c
  try{assert.throws(()=>manager.refresh(fs.realpathSync(root),path.resolve(__dirname,'..')),/changed|conflict|modified/);}finally{fs.writeFileSync=write;}
  assert.equal(fs.readFileSync(victim,'utf8'),'concurrent developer edit');
 });
+test('delivery profile classifies descriptive metadata and preserves material inputs for explicit recovery',t=>{
+ const root=fs.realpathSync(setup(t));
+ const installation=require('../lib/installation.js');
+ const plugins=require('../lib/plugin-registry.js');
+ const git=(...args)=>{
+  const run=spawnSync('git',['-C',root,...args],{encoding:'utf8',timeout:10000});
+  assert.equal(run.status,0,run.stderr);
+  return run.stdout.trim();
+ };
+ const write=(relative,value)=>{
+  const file=path.join(root,relative);
+  fs.mkdirSync(path.dirname(file),{recursive:true});
+  fs.writeFileSync(file,value);
+ };
+ git('init','-b','delivery');
+ git('config','user.name','Fixture');git('config','user.email','fixture@example.invalid');
+ write('package.json','{"name":"profile-fixture","description":"Before"}\n');
+ git('add','--','package.json');git('commit','-m','Prior package metadata');
+ const original=git('rev-parse','HEAD');
+ const installed=run(root,inspectionSelection);
+ assert.equal(installed.status,0,installed.stdout+installed.stderr);
+ const profile=path.join(root,'.skill-tree/installation/profile.json');
+ const before=fs.readFileSync(profile,'utf8');
+ const profileHash=require('node:crypto').createHash('sha256').update(before).digest('hex');
+ const base={phase:'prepare',target_ref:'refs/heads/delivery',previous_local_head:original,profile_sha256:profileHash};
+ const update=(metadata,additional)=>{
+  git('switch','--detach',original);
+  if(git('branch','--list','delivery'))git('branch','-D','delivery');
+  git('switch','-c','delivery',original);
+  write('package.json',JSON.stringify({name:'profile-fixture',description:'After',...metadata})+'\n');
+  const files=['package.json',...Object.keys(additional)];
+  for(const [relative,bytes] of Object.entries(additional))write(relative,bytes);
+  git('add','--',...files);git('commit','-m','Synchronized target');
+  return {...base,target_head:git('rev-parse','HEAD')};
+ };
+ const compatible=installation.maintainDeliveredProfile(root,update({keywords:['fixture']},{}));
+ assert.equal(compatible.status,'prepared');
+ assert.deepEqual(compatible.plan.changed_fields,['description','keywords']);
+ assert.equal(compatible.plan.before.profile_sha256,profileHash);
+ assert.notEqual(compatible.plan.after.environment_id,compatible.plan.before.environment_id);
+ for(const [metadata,differentInput] of [
+  [{scripts:{test:'node --test'}},{}],
+  [{dependencies:{fixture:'1.0.0'}},{}],
+  [{},{'package-lock.json':'{"lockfileVersion":3,"packages":{}}\n'}],
+  [{},{'playwright.config.ts':'export default {};\n'}],
+  [{},{'.skill-tree/validation-recipes.json':'{"schema":1,"recipes":{}}\n'}],
+  [{},{'.skill-tree/installation/plugins.json':JSON.stringify(plugins.emptyRegistry())+'\n'}],
+ ]){
+  const request=update(metadata,differentInput);
+  assert.throws(()=>installation.maintainDeliveredProfile(root,request),/material|unknown|unexplained/);
+  assert.equal(fs.readFileSync(profile,'utf8'),before);
+ }
+});
 test('a real controller re-admits after local refresh without resetting task progress',t=>{
  const root=setup(t);assert.equal(run(root).status,0);const docs=path.join(root,'.skill-tree/documents');fs.mkdirSync(docs);fs.copyFileSync(path.join(__dirname,'fixtures/future/valid.md'),path.join(docs,'future.md'));fs.writeFileSync(path.join(root,'source.cs'),'fixture');
  const helper=path.join(root,'.agents/skills/skill-tree-work-through-next/scripts/workflow-state.py');

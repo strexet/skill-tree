@@ -1,9 +1,12 @@
 import hashlib
 import importlib.util
+from contextlib import redirect_stdout
+import io
 import json
 import os
 from copy import deepcopy
 from pathlib import Path
+import shutil
 import subprocess
 import tempfile
 from types import SimpleNamespace
@@ -281,14 +284,163 @@ class LocalTargetSyncTests(unittest.TestCase):
         self.git(self.root, 'add', *files)
         self.git(self.root, 'commit', '-m', message)
 
-    def invoke(self, command, **changes):
+    def invoke(self, command, *, profile_authorization=None, **changes):
         request = {'snapshot': {**self.snapshot, **changes}, 'target_branch': 'release/main'}
+        if profile_authorization is not None:
+            request['profile_authorization'] = profile_authorization
         self.request.write_text(json.dumps(request))
         result = subprocess.run(
             ['python3', str(CORE/'common/scripts/pr-review-state.py'), command, str(self.root), '--input', str(self.request)],
             capture_output=True, text=True, timeout=30)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         return json.loads(result.stdout)
+
+    def profile_delivery(self, installer=CORE / 'bin/install.js'):
+        self.git(self.root, 'switch', '--detach', self.remote_head)
+        self.commit('Establish the owned input baseline', {
+            'package.json': '{"name":"profile-fixture","description":"Before"}\n'})
+        baseline = self.git(self.root, 'rev-parse', 'HEAD')
+        self.commit('Edit package description', {
+            'package.json': '{"name":"profile-fixture","description":"After"}\n'})
+        self.remote_head = self.git(self.root, 'rev-parse', 'HEAD')
+        self.git(self.root, 'push', 'origin', 'HEAD:refs/heads/release/main')
+        self.git(self.root, 'switch', '-c', 'release/main', baseline)
+        subprocess.run(['node', str(installer), '--target', str(self.root),
+                        '--only', 'codex', '--flavor', 'general', '--skills', 'skill-tree-pr-review-cycle'],
+                       check=True, capture_output=True, text=True, timeout=30)
+        profile = self.root / '.skill-tree/installation/profile.json'
+        before = profile.read_bytes()
+        record = self.invoke('init')
+        self.assertEqual(profile.read_bytes(), before)
+        prerequisite = record['local_target_sync']['profile_prerequisite']
+        authorization = {'origin': 'owner', 'permission': 'refresh-compatible-profile',
+                         'publication_id': record['publication_id'], 'repo_id': record['identity']['repo_id'],
+                         'merge_commit': record['merge_commit'],
+                         **{key: prerequisite[key] for key in
+                            ('target_ref', 'target_head', 'target_checkout', 'profile_sha256')}}
+        return record, profile, before, authorization
+
+    def profile_maintenance(self, record, authorization, *,
+                            helper=CORE / 'common/scripts/pr-review-state.py', expected_code=0):
+        self.request.write_text(json.dumps({'profile_authorization': authorization}))
+        result = subprocess.run(
+            ['python3', str(helper), 'profile-maintenance', str(self.root),
+             '--input', str(self.request), '--publication-id', record['publication_id']],
+            capture_output=True, text=True, timeout=40)
+        self.assertEqual(result.returncode, expected_code, result.stdout + result.stderr)
+        return json.loads(result.stdout)
+
+    def test_verified_profile_maintenance_reconciles_without_reactivation(self):
+        legacy = self.root.parent / 'previous-core'
+        for directory in ('bin', 'lib', 'common', 'config', 'templates', 'domains', 'src'):
+            shutil.copytree(CORE / directory, legacy / directory)
+        shutil.copytree(CORE / 'tests/fixtures/director', legacy / 'tests/fixtures/director')
+        library = legacy / 'lib/installation.js'
+        library.write_text(library.read_text().replace(',maintainDeliveredProfile,', ','))
+        record, profile, before, authorization = self.profile_delivery(legacy / 'bin/install.js')
+        original_source = json.loads(before)['source_digests']
+        self.assertNotEqual(original_source['lib/installation.js'],
+                            hashlib.sha256((CORE / 'lib/installation.js').read_bytes()).hexdigest())
+        ungranted = self.profile_maintenance(record, None, expected_code=2)
+        self.assertIn('explicit owner instruction', ungranted['error'])
+        self.assertEqual(profile.read_bytes(), before)
+        actor = self.root.parent / 'acting-core'
+        actor.mkdir()
+        subprocess.run(['node', str(CORE / 'bin/install.js'), '--target', str(actor), '--only', 'codex',
+                        '--flavor', 'general', '--skills', 'skill-tree-pr-review-cycle'],
+                       check=True, capture_output=True, text=True, timeout=30)
+        helper = actor / '.agents/skills/skill-tree-pr-review-cycle/scripts/pr-review-state.py'
+        result = self.profile_maintenance(record, authorization, helper=helper)
+        self.assertEqual(result['profile_maintenance']['status'], 'restored', result['profile_maintenance'])
+        self.assertTrue(result['order_completed'])
+        self.assertEqual(result['merge_commit'], record['merge_commit'])
+        self.assertEqual(result['local_target_sync']['local_head'], self.remote_head)
+        self.assertNotIn('profile_prerequisite', result['local_target_sync'])
+        after = profile.read_bytes()
+        self.assertNotEqual(after, before)
+        self.assertEqual(json.loads(after)['source_digests'], original_source)
+        self.assertEqual(result['profile_maintenance']['plan']['after']['profile_sha256'],
+                         hashlib.sha256(after).hexdigest())
+        carrier = (self.root / '.skill-tree/history/publications'
+                   / ('pub-' + record['publication_id'] + '.json'))
+        retained = json.loads(carrier.read_bytes())
+        retained['profile_maintenance']['status'] = 'prepared'
+        carrier.write_text(json.dumps(retained))
+        generation = profile.stat().st_ino
+        replay = self.profile_maintenance(record, None, helper=helper)
+        self.assertEqual(replay['profile_maintenance']['status'], 'reconciled')
+        self.assertEqual(profile.read_bytes(), after)
+        self.assertEqual(profile.stat().st_ino, generation)
+        self.assertEqual(self.invoke('observe')['profile_maintenance'], replay['profile_maintenance'])
+
+    def test_profile_maintenance_preserves_delivery_when_activation_is_blocked(self):
+        record, profile, before, authorization = self.profile_delivery()
+        branch_before = self.git(self.root, 'rev-parse', 'HEAD')
+        journal = profile.parent / '.journal.json'
+        journal.write_text('{"fixture":"interrupted"}')
+        blocked = self.profile_maintenance(record, authorization)
+        self.assertEqual(blocked['profile_maintenance']['status'], 'retryable')
+        self.assertIn('recovery', blocked['profile_maintenance']['reason'])
+        self.assertTrue(blocked['order_completed'])
+        self.assertEqual(profile.read_bytes(), before)
+        self.assertEqual(journal.read_text(), '{"fixture":"interrupted"}')
+        journal.unlink()
+
+        state = self.root / '.skill-tree/documents/future.json'
+        state.parent.mkdir(exist_ok=True)
+        original = {'format': 'skill-tree-future', 'schema': 2, 'tasks': [], 'task_progress': {},
+                    'active_run': {'id': 'unrelated-fixture', 'phase': 'blocked', 'stop_reason': 'Waiting'}}
+        state.write_text(json.dumps(original))
+        busy = self.profile_maintenance(record, authorization)
+        self.assertIn('Unfinished canonical work', busy['profile_maintenance']['reason'])
+        self.assertEqual(json.loads(state.read_bytes()), original)
+        self.assertEqual(profile.read_bytes(), before)
+        state.unlink()
+
+        self.commit('Target advances beyond the grant', {'later.txt': 'new contents'})
+        stale = self.profile_maintenance(record, authorization)
+        self.assertEqual(stale['profile_maintenance']['status'], 'retryable')
+        self.assertEqual(stale['local_target_sync']['local_head'], branch_before)
+        self.assertEqual(stale['merge_commit'], self.integrated)
+        self.assertTrue(stale['order_completed'])
+        self.assertEqual(profile.read_bytes(), before)
+
+    def test_observation_continues_profile_maintenance_with_exact_grant(self):
+        record, profile, before, authorization = self.profile_delivery()
+        ordinary = self.invoke('observe')
+        self.assertEqual(ordinary['local_target_sync'], record['local_target_sync'])
+        self.assertNotIn('profile_maintenance', ordinary)
+        self.assertEqual(profile.read_bytes(), before)
+
+        unrelated = {**authorization, 'merge_commit': 'a' * len(self.integrated)}
+        rejected = self.invoke('observe', profile_authorization=unrelated)
+        self.assertIn('differs from the exact verified delivery', rejected['profile_maintenance_error'])
+        self.assertTrue(rejected['order_completed'])
+        self.assertEqual(profile.read_bytes(), before)
+
+        self.request.write_text(json.dumps({'snapshot': self.snapshot, 'profile_authorization': authorization}))
+        restore = pr.restore_delivery_profile
+        def under_writer_contention(*args):
+            writer = self.root / '.skill-tree/.writer-lock'
+            writer.touch()
+            try:
+                return restore(*args)
+            finally:
+                writer.unlink()
+        output = io.StringIO()
+        with patch.object(pr, 'restore_delivery_profile', side_effect=under_writer_contention), redirect_stdout(output):
+            self.assertEqual(pr.main(['observe', str(self.root), '--input', str(self.request)]), 0)
+        contended = json.loads(output.getvalue())
+        self.assertTrue(contended['order_completed'])
+        self.assertIn('Writer lock exists', contended['profile_maintenance_error'])
+        self.assertEqual(profile.read_bytes(), before)
+
+        restored = self.invoke('observe', profile_authorization=authorization)
+        self.assertEqual(restored['profile_maintenance']['status'], 'restored',
+                         restored.get('profile_maintenance_error') or restored['profile_maintenance'])
+        self.assertEqual(restored['merge_commit'], record['merge_commit'])
+        self.assertNotIn('profile_prerequisite', restored['local_target_sync'])
+        self.assertNotEqual(profile.read_bytes(), before)
 
     def test_fresh_external_integration_creates_exact_target_and_retries_idempotently(self):
         first = self.invoke('init')

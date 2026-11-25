@@ -553,6 +553,117 @@ function uninstall(root,selections,options={}){
  return options.dryRun?action():locked(root,action,{recoverPluginPending:options.recoverPluginPending});
 }
 function refresh(root,source,dryRun=false){const p=receipt(root,true);return install(root,source,p.flavor,Object.entries(p.destinations).map(([rel,d])=>({rel,provider:d.provider,name:d.name})),{dryRun,bridges:Object.keys(p.bridges||{}),recoverPluginPending:false});}
+
+function packageMetadataAtDelivery(root, request){
+ const {execFileSync}=require('node:child_process');
+ function git(...args){
+  return execFileSync('git',['--no-replace-objects','--no-optional-locks','--literal-pathspecs',
+   '-C',root,'-c','core.fsmonitor=false',...args],{
+   encoding:'buffer',stdio:['ignore','pipe','ignore'],timeout:5000,
+   env:{...process.env,GIT_NO_LAZY_FETCH:'1'}
+  });
+ }
+ const {target_ref:ref,target_head:head,previous_local_head:previous}=request;
+ const commit=/^(?:[0-9a-f]{40}|[0-9a-f]{64})$/;
+ if(!commit.test(head)||!commit.test(previous)||head===previous||
+    git('symbolic-ref','--quiet','--no-recurse','HEAD').toString().trim()!==ref||
+    git('rev-parse','--verify','HEAD').toString().trim()!==head)
+  throw Error('Profile maintenance requires the exact synchronized target and original local commit');
+ git('merge-base','--is-ancestor',previous,head);
+ const entry=revision=>git('ls-tree',revision,'--','package.json').toString().trim();
+ const newEntry=entry(head),oldEntry=entry(previous),staged=git('ls-files','--stage','--','package.json').toString().trim();
+ const fileEntry=/^(100(?:644|755)) blob ([0-9a-f]{40}|[0-9a-f]{64})\tpackage\.json$/;
+ const current=fileEntry.exec(newEntry),before=fileEntry.exec(oldEntry);
+ if(!current||!before||current[1]!==before[1]||staged!==current[1]+' '+current[2]+' 0\tpackage.json')
+  throw Error('Compatibility requires a regular, unstaged package.json with the original mode');
+ const original=git('cat-file','blob',before[2]),synchronized=git('cat-file','blob',current[2]);
+ const packagePath=c.safe(root,'package.json');
+ const fd=fs.openSync(packagePath,fs.constants.O_RDONLY|fs.constants.O_NOFOLLOW|fs.constants.O_NONBLOCK);
+ try{
+  const stat=fs.fstatSync(fd);
+  if(!stat.isFile()||Boolean(stat.mode&0o100)!==(current[1]==='100755')||!fs.readFileSync(fd).equals(synchronized))
+   throw Error('Compatibility requires the exact committed package.json bytes and mode');
+ }finally{fs.closeSync(fd);}
+ const decode=value=>JSON.parse(value.toString('utf8').replace(/^\uFEFF/,''));
+ const oldPackage=decode(original),newPackage=decode(synchronized);
+ if(!oldPackage||typeof oldPackage!=='object'||Array.isArray(oldPackage)||
+    !newPackage||typeof newPackage!=='object'||Array.isArray(newPackage))
+  throw Error('Compatibility requires complete package metadata objects');
+ const metadata=new Set(['description','keywords']);
+ const fields=[...new Set([...Object.keys(oldPackage),...Object.keys(newPackage)])]
+  .sort().filter(key=>c.json(oldPackage[key])!==c.json(newPackage[key]));
+ if(!fields.length||fields.some(field=>!metadata.has(field)))
+  throw Error('The package change includes material or unexplained inputs');
+ return {before:c.hash(original),after:c.hash(synchronized),fields};
+}
+
+function requireUnaffectedProfileRuns(root){
+ const state=workflowState(root);
+ const runs=state?.run_registry ? Object.values(state.run_registry.runs) : [state?.active_run];
+ if(runs.some(unfinishedRun)||hasActiveOperation(root))
+  throw Error('Unfinished canonical work requires the explicit profile recovery path');
+}
+
+function deliveryProfilePlan(root, request, result){
+ const input=packageMetadataAtDelivery(root,request);
+ const {old,profile:after}=result;
+ const oldSha=c.hash(fs.readFileSync(c.safe(root,PROFILE)));
+ if(oldSha!==request.profile_sha256||old.inputs['package.json']!==input.before||
+    after.inputs['package.json']!==input.after)
+  throw Error('The owned profile inputs differ from the exact original and synchronized Git bytes');
+ const inputs={...after.inputs,'package.json':input.before};
+ if(c.json(inputs)!==c.json(old.inputs))
+  throw Error('Discovered profile inputs include material or unknown changes');
+ const comparison=profile=>{
+  const {inputs,environment_id,identity,destinations,...stable}=profile;
+  const owners=Object.fromEntries(Object.entries(destinations).map(([relative,record])=>{
+   const {files,identity,...ownership}=record;
+   return [relative,ownership];
+  }));
+  return {...stable,destinations:owners};
+ };
+ if(c.json(comparison(old))!==c.json(comparison(after)))
+  throw Error('Resolved profile facts, policy, source, bindings, or recipes changed');
+ const identity=(profile,profile_sha256)=>({profile_sha256,identity:profile.identity,environment_id:profile.environment_id});
+ return {before:identity(old,oldSha),after:identity(after,c.hash(result.changes[PROFILE])),
+  input:'package.json',changed_fields:input.fields};
+}
+
+function maintainDeliveredProfile(root,request){
+ const source=c.safe(root,INSTALL+'/source');
+ const options={recoverPending:false,recoverPluginPending:false};
+ if(request.phase==='verify'){
+  return locked(root,()=>{
+   packageMetadataAtDelivery(root,request);
+   const profile=verify(root,source);
+   const actual={profile_sha256:c.hash(fs.readFileSync(c.safe(root,PROFILE))),identity:profile.identity,environment_id:profile.environment_id};
+   if(c.json(actual)!==c.json(request.plan?.after))throw Error('The installed profile differs from the anticipated generation');
+   return {status:'current',profile:actual};
+  },options);
+ }
+ const p=receipt(root,true);
+ const selected=Object.entries(p.destinations).map(([rel,d])=>({rel,provider:d.provider,name:d.name}));
+ const installedOptions={...options,bridges:Object.keys(p.bridges||{})};
+ const guard=result=>{
+  requireUnaffectedProfileRuns(root);
+  return deliveryProfilePlan(root,request,result);
+ };
+ if(request.phase==='prepare'){
+  return locked(root,()=>{
+   requireUnaffectedProfileRuns(root);
+   return {status:'prepared',plan:guard(plan(root,source,p.flavor,selected,installedOptions))};
+  },options);
+ }
+ if(request.phase!=='activate'||!request.plan)throw Error('Profile maintenance requires an exact prepared generation');
+ const installed=install(root,source,p.flavor,selected,{
+  ...installedOptions,
+  guardPlan:result=>{
+   if(c.json(guard(result))!==c.json(request.plan))throw Error('Prepared profile changed before activation');
+  }
+ });
+ if(installed.action!=='installed')throw Error('The planned profile generation did not activate');
+ return {status:'installed'};
+}
 function updateDevelopmentPolicy(root,source,update) {
  const p=receipt(root,true);
  const selections=Object.entries(p.destinations).map(([rel,d])=>({rel,provider:d.provider,name:d.name}));
@@ -629,4 +740,4 @@ function localMain(root,source,args){
   const result=refresh(root,source,args.includes('--dry-run'));console.log(c.json({action:result.action,changed:result.delta,facts:result.profile.facts,gaps:result.profile.gaps}));return 0;
  }catch(error){console.error(error.message);return 2;}
 }
-module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,readHookRecords,pendingHookOperation,stoppedWorkflow,plan,install,verify,verifyTaskGroupingProfile,uninstall,refresh,rollback,rebind,localMain,updateDevelopmentPolicy};
+module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,readHookRecords,pendingHookOperation,stoppedWorkflow,plan,install,verify,verifyTaskGroupingProfile,uninstall,refresh,maintainDeliveredProfile,rollback,rebind,localMain,updateDevelopmentPolicy};

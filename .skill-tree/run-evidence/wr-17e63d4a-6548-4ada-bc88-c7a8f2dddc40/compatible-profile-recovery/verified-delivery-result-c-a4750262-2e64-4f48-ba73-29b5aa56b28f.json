@@ -1,0 +1,20 @@
+{
+  "check_id": "verified-delivery",
+  "attempt_id": "C-a4750262-2e64-4f48-ba73-29b5aa56b28f",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-pr-review-cycle.py"
+  ],
+  "exit_code": 1,
+  "result": "fail",
+  "counts": {
+    "expected": 45,
+    "discovered": 45,
+    "passed": 44,
+    "failed": 1,
+    "skipped": 0
+  },
+  "observed_output": ".......F.....................................\n======================================================================\nFAIL: test_profile_maintenance_preserves_delivery_when_activation_is_blocked (__main__.LocalTargetSyncTests.test_profile_maintenance_preserves_delivery_when_activation_is_blocked)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<run-worktree>/.skill-tree/tests/test-pr-review-cycle.py\", line 394, in test_profile_maintenance_preserves_delivery_when_activation_is_blocked\n    busy = self.profile_maintenance(record, authorization)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<run-worktree>/.skill-tree/tests/test-pr-review-cycle.py\", line 330, in profile_maintenance\n    self.assertEqual(result.returncode, expected_code, result.stdout + result.stderr)\nAssertionError: 2 != 0 : {\"ok\": false, \"error\": \"Missing .skill-tree/documents/future.md; restore the matching queue file before retrying\"}\n\n\n----------------------------------------------------------------------\nRan 45 tests in 91.574s\n\nFAILED (failures=1)\n",
+  "timeout": false,
+  "elapsed_seconds": 95.217
+}
