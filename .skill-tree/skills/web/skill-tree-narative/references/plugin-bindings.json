@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "784ce843f9fd188a1922b1f7cb61ad6c53ad9b10d28376bf45ab1885dabedb33",
+  "identity": "dc11124b2d7533a9a2d4f2c3d3c89cab9d3ed324ebe1633fe4d3662911123c4b",
   "operation": "skill-tree-narative",
   "operations": {
     "skill-tree-3d": {
@@ -3293,7 +3293,7 @@
     "agents/openai.yaml": "f6040df2489c1dfc181b93cde1e9036474550e81ed6faaeb6bca888337e9b9cb",
     "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
-    "references/future-workflow.md": "3a6bc83660773c23af11cf00eacb90ed618db701d464fd7fcd304d5d90fca50b",
+    "references/future-workflow.md": "ea2d77afaf0dbe92d8c3bacf983e8f26fe2233d84826ba8b539f92216b8d3d6c",
     "references/installation-profile.md": "50d7e922447a95e5ff9d5354c9e6fb0aa8f2a59b7e26d2a553da50ad4744e56b",
     "references/narrative-canon-approval.md": "d36ed0534797cfbc8ab8d996093a48e82f26b05c6bdccbbde87cd9c34fd7a65b",
     "references/narrative-character-appearance.md": "4c0f460e36b59b0dc8e5c3e25f4c92d7c57402f9359301880a2c695a4aa34f15",
@@ -3361,13 +3361,13 @@
     "references/narrative-world-laws.md": "9a8bfb2c7bf880477108e1470713647b2b030ebe213af184ad3ee50e9b3ffd1a",
     "references/narrative-world-transitions.md": "aa323d03e2c4635972632c58f350fa785c34a8fc812776ccec5fe895dab15209",
     "references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
-    "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",
+    "references/pending-task-intake.md": "c23e7fc58a44b58ab8e0b09ee0b15bd56fbdfd4fc275833c26fd4c8c2d0e4619",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/project-profile.md": "75da46ecf2c034d0211e2b1dcfcb3d70dfd1550cabd8138974fefde74eb8758e",
     "references/run-workspaces.md": "52b62e7c9d44fe79184fd498aaeb2ed985b2d15a6639b959542132cb8ee77260",
     "references/validation-policy.md": "e4572bf636e414adba2c65f85f5618837affc1bc8f39ba2e998299e940a4164c",
     "references/web-development.md": "67bb456b2322e102e84e198ba89468159f59d05d7bed2c996d4eb97db38b1d90",
-    "references/workflow-metadata.md": "95bf1e490a3e7f3ce17b5cc54a39c2dc4f40bfa651425ec30041010326f89eb7",
+    "references/workflow-metadata.md": "b85c895e9c2f90d743be5f810a5883cad3fb334097b7bf6b50e9b2b534ffe1a1",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "dd1b6fb5dfb56b93ad531abf87f4f713b5934156133007bb4014b56ec9f285e5",
     "scripts/director-dispatch.py": "c01d99b3a0ff28fedaa6d0fafbc66b762a28730fb35f5a5a11acc008734307e5",
@@ -3386,7 +3386,7 @@
     "scripts/run-workspaces.py": "a94307b11e741f2a99caadaf3a189adb077774390e64150ec5897b2102d1d898",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "5d993b546a543fe14d55f75eeffcf6f5e3ff03c8b7c856d5e4d0e7ff56851968"
+    "scripts/workflow-state.py": "19ce8b1c777f4c41fdf0021d182fec0df129ce03a51a092d61237bf9b6551cff"
   },
   "packages": {},
   "parameter_defaults": {},

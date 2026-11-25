@@ -32,6 +32,8 @@ Atomic transactions, source-hash guards and an exclusive writer lock protect mut
 
 ## Task grouping fields
 
+Pending headers can carry the optional `pending_depends_on` list of exact P-IDs. Pending task views and group previews report `outside_pending_dependencies` for open prerequisite IDs outside the inspected scope. The same views report missing promotion proof in `unresolved_pending_dependencies` and include exact non-completed T-IDs in `blocking_pending_promotions`. Intake receipts preserve the accepted Pending metadata. Processing resolves required T-IDs from complete promotion provenance.
+
 Canonical task headers can carry optional `topic` and `intake_batch_ids`. A topic is a lowercase kebab-case key. The batch list contains unique canonical `IB-<uuid>` identities and is nonempty when present. A Pending entry carries at most one original batch. Prioritized and Backlog entries can retain multiple batch identities. Absent fields on legacy entries remain absent in the derived index. The grouping fields do not change task identity, dependencies, priority, validation contracts or clarification semantics. Full queue guards still detect grouping edits.
 
 ## Selected grouping migration

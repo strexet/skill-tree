@@ -1,0 +1,22 @@
+{
+  "source_head": "5f5f7b60f711126477ec834b91b1d318b181d1a5",
+  "source_diff_sha256": "872ee1c97f0e87077a0a2cef36725e97541c90d6ae036073f5d3826ccf9a459e",
+  "independent_reviewer": "/root/director_critic",
+  "reviewed_paths": [
+    ".skill-tree/common/scripts/workflow-state.py",
+    ".skill-tree/common/references/pending-task-intake.md",
+    ".skill-tree/common/references/workflow-metadata.md",
+    ".skill-tree/common/references/future-workflow.md",
+    ".skill-tree/tests/test-workflow-state.py",
+    ".skill-tree/skill-tree.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "review_evidence": "The independent reviewer verified ordinary and grouped Pending blockers, exact selection boundaries, and inferred reuse edges after requested revisions. Final scoped source review was clean.",
+  "verified_behaviors": [
+    "An open prerequisite is outside a one-item Pending selection and inside a combined selection. Missing promotion and exact non-completed split members remain visible. The reused Ready task identity is inferred from Pending metadata."
+  ],
+  "required_evidence": {
+    "scoped-regression": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/pending-dependency-hints/scoped-regression-result-c-54b2a0ef-191b-4682-9fd9-48c03710ccb7.json"
+  }
+}

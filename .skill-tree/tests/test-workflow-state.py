@@ -448,6 +448,166 @@ class WorkflowStateTests(unittest.TestCase):
         wf.require_reviewed_controller_inputs(self.store,{'snapshot':[task['id']],'required_ids':[]})
         self.assertTrue(link.is_symlink())
 
+    def pending_hint_item(self, title, key, dependencies=()):
+        return {'title':title,'key':key,'description':'Preserve the reviewed workflow order.',
+                'expected_behavior':'Keep the required setup before dependent work.',
+                **({'pending_depends_on':list(dependencies)} if dependencies else {})}
+
+    def pending_hint_batch(self, items):
+        return {'intake_batch_id':wf.identity('IB'),'expected_source_hash':wf.file_hash(self.store.future),
+                'items':items}
+
+    def test_pending_batch_dependencies_become_ready_edges(self):
+        payload = self.pending_hint_batch([
+            {**self.pending_hint_item('Deploy consumer','consumer',['@storage']),'topic':'deploy-consumer'},
+            self.pending_hint_item('Prepare storage','storage'),
+        ])
+        intake = wf.intake(self.store,payload)
+        consumer, storage = intake['items']
+        if 'pending_depends_on' not in consumer:
+            self.fail('Stored Pending dependency hint is absent')
+        self.assertEqual(consumer['pending_depends_on'],[storage['id']])
+        self.assertEqual(consumer['depends_on'],[])
+        preview = wf.group_selection(self.store,{'queue':'pending','topic':'deploy-consumer'})
+        self.assertEqual(preview['outside_pending_dependencies'],[storage['id']])
+        self.assertEqual(preview['outside_dependencies'],[])
+        code, rows = self.future_command('pending','--id',consumer['id'])
+        self.assertEqual(code,0)
+        self.assertEqual(rows[0]['outside_pending_dependencies'],[storage['id']])
+        code, rows = self.future_command('pending','--names',consumer['id'],storage['id'])
+        self.assertEqual(code,0)
+        by_id = {row['id']:row for row in rows}
+        self.assertEqual(by_id[consumer['id']]['outside_pending_dependencies'],[])
+        prior = {path:path.read_bytes() for path in self.store.base.rglob('*') if path.is_file()}
+        blocked = {'selectors':[consumer['id'],storage['id']],
+                   'dispositions':{
+                       consumer['id']:{'status':'promoted','reason':'Prepare the consumer scope.'},
+                       storage['id']:{'status':'retained','reason':'Keep storage in Pending.'}},
+                   'tasks':[{'title':'Deliver consumer code','body':self.body(),
+                             'parent_pending_ids':[consumer['id']]}]}
+        with self.assertRaisesRegex(wf.WorkflowError,'Pending prerequisite'):
+            wf.process(self.store,blocked)
+        self.assertEqual(prior,{path:path.read_bytes() for path in self.store.base.rglob('*') if path.is_file()})
+
+        receipt = wf.process(self.store,{
+            'selectors':[consumer['id'],storage['id']],
+            'dispositions':{item['id']:{'status':'promoted','reason':'Confirmed implementation scope.'}
+                            for item in (consumer,storage)},
+            'tasks':[
+                {'key':'consumer','title':'Deliver consumer code','body':self.body(),'parent_pending_ids':[consumer['id']]},
+                {'key':'storage','title':'Implement storage setup','body':self.body(),'parent_pending_ids':[storage['id']]},
+            ]})
+        consumer_id = receipt['task_keys']['consumer']
+        storage_id = receipt['task_keys']['storage']
+        reader = wf.resolve(wf.parse(self.store.text()),[consumer_id])[0]
+        self.assertEqual(reader['depends_on'],[storage_id])
+        self.assertNotIn('pending_depends_on',reader)
+        self.assertEqual(wf.intake(self.store,payload),intake)
+        wf.start(self.store,'next',consumer_id)
+        self.assertEqual(wf.next_task(self.store)['task_id'],storage_id)
+
+    def test_pending_dependency_validation_is_atomic(self):
+        prior = {path:path.read_bytes() for path in self.store.base.rglob('*') if path.is_file()}
+        bad = [
+            [self.pending_hint_item('Unknown dependent','a',['@unset'])],
+            [self.pending_hint_item('Unknown direct dependency','a',[wf.identity('P')])],
+            [self.pending_hint_item('First duplicate','same'),self.pending_hint_item('Second duplicate','same')],
+            [self.pending_hint_item('First cycle','first',['@second']),
+             self.pending_hint_item('Second cycle','second',['@first'])],
+            [self.pending_hint_item('Self cycle','self',['@self'])],
+            [self.pending_hint_item('Duplicate dependency','a',['@b','@b']),
+             self.pending_hint_item('Single prerequisite','b')],
+        ]
+        for items in bad:
+            with self.subTest(items=items):
+                with self.assertRaises(wf.WorkflowError):
+                    wf.intake(self.store,self.pending_hint_batch(items))
+                self.assertEqual(prior,{path:path.read_bytes() for path in self.store.base.rglob('*') if path.is_file()})
+
+    def test_prior_promoted_pending_dependency_uses_completed_provenance(self):
+        prior = self.pending('Storage prerequisite')
+        payload = self.pending_hint_batch([self.pending_hint_item('Consumer intake','consumer',[prior['id']])])
+        consumer, = wf.intake(self.store,payload)['items']
+        accepted = self.promote(prior,'Storage implementation')
+        self.complete(accepted)
+        actual = self.promote(consumer,'Consumer implementation')
+        self.assertEqual(actual['depends_on'],[accepted['id']])
+
+    def test_group_preview_displays_missing_pending_promotion_evidence(self):
+        payload = self.pending_hint_batch([
+            {**self.pending_hint_item('Dependent request','followup',['@earlier']),'topic':'dependent'},
+            self.pending_hint_item('Prerequisite request','earlier'),
+        ])
+        consumer, prerequisite = wf.intake(self.store,payload)['items']
+        wf.process(self.store,{'selectors':[prerequisite['id']],
+            'dispositions':{prerequisite['id']:{'status':'resolved','reason':'Archive the earlier request.'}},'tasks':[]})
+        preview = wf.group_selection(self.store,{'queue':'pending','topic':'dependent'})
+        self.assertEqual(preview['outside_pending_dependencies'],[])
+        self.assertEqual(preview['unresolved_pending_dependencies'],[prerequisite['id']])
+        self.assertEqual(preview['ids'],[consumer['id']])
+        legacy = self.pending('Independent legacy request')
+        code, rows = self.future_command('pending','--names',consumer['id'],legacy['id'])
+        self.assertEqual(code,0)
+        by_id = {row['id']:row for row in rows}
+        self.assertEqual(by_id[consumer['id']]['unresolved_pending_dependencies'],[prerequisite['id']])
+        self.assertNotIn('unresolved_pending_dependencies',by_id[legacy['id']])
+        with self.assertRaisesRegex(wf.WorkflowError,'Pending prerequisite'):
+            self.promote(consumer,'Dependent implementation')
+
+
+    def pending_split_fixture(self):
+        payload = self.pending_hint_batch([
+            {**self.pending_hint_item('Split consumer request','consumer',['@split']),'topic':'split-consumer'},
+            self.pending_hint_item('Split prerequisite request','split'),
+        ])
+        consumer, split = wf.intake(self.store,payload)['items']
+        receipt = self.process_specs(split,[
+            self.spec(split,'Split task alpha','alpha'),
+            self.spec(split,'Split task beta','beta'),
+        ])
+        alpha, beta = wf.resolve(wf.parse(self.store.text()),
+                                 [receipt['task_keys']['alpha'],receipt['task_keys']['beta']])
+        self.complete(alpha)
+        return consumer, split, alpha, beta
+
+    def test_pending_prerequisite_preserves_all_split_members(self):
+        consumer, _, alpha, beta = self.pending_split_fixture()
+        actual = self.promote(consumer,'Split consumer implementation')
+        self.assertCountEqual(actual['depends_on'],[alpha['id'],beta['id']])
+
+    def test_pending_prerequisite_rejects_non_completed_split_member(self):
+        consumer, split, _, beta = self.pending_split_fixture()
+        wf.complete(self.store,{'task_id':beta['id'],'disposition':'cancelled',
+                                'outcome':'Withdraw the selected fixture scope.'})
+        preview = wf.group_selection(self.store,{'queue':'pending','topic':'split-consumer'})
+        self.assertEqual(preview['unresolved_pending_dependencies'],[split['id']])
+        self.assertEqual(preview['blocking_pending_promotions'],{split['id']:[beta['id']]})
+        code, rows = self.future_command('pending','--id',consumer['id'])
+        self.assertEqual(code,0)
+        self.assertEqual(rows[0]['blocking_pending_promotions'],{split['id']:[beta['id']]})
+        prior = {path:path.read_bytes() for path in self.store.base.rglob('*') if path.is_file()}
+        with self.assertRaisesRegex(wf.WorkflowError,'non-completed promotion members'):
+            self.promote(consumer,'Split consumer implementation')
+        self.assertEqual(prior,{path:path.read_bytes() for path in self.store.base.rglob('*') if path.is_file()})
+
+    def test_pending_prerequisite_binds_the_actual_reused_ready_task(self):
+        existing = self.main('Existing storage implementation')
+        consumer, prerequisite = wf.intake(self.store,self.pending_hint_batch([
+            self.pending_hint_item('Consumer request','consumer',['@storage']),
+            self.pending_hint_item('Storage reuse request','storage'),
+        ]))['items']
+        receipt = wf.process(self.store,{'selectors':[consumer['id'],prerequisite['id']],
+            'dispositions':{item['id']:{'status':'promoted','reason':'Confirm the reviewed scope.'}
+                            for item in (consumer,prerequisite)},
+            'tasks':[
+                {'key':'consumer','title':'Implement consumer reuse','body':self.body(),
+                 'parent_pending_ids':[consumer['id']]},
+                {'key':'storage','reuse_id':existing['id'],'parent_pending_ids':[prerequisite['id']]},
+            ]})
+        self.assertEqual(receipt['task_keys']['storage'],existing['id'])
+        task=wf.resolve(wf.parse(self.store.text()),[receipt['task_keys']['consumer']])[0]
+        self.assertEqual(task['depends_on'],[existing['id']])
+
     def test_intake_priority_ids_and_minimal_index(self):
         a=self.pending('Normal');b=self.pending('Low',low_priority=True)
         self.assertEqual((a['priority'],b['priority']),(100,25));self.assertTrue(wf.valid_id(a['id'],'P'))

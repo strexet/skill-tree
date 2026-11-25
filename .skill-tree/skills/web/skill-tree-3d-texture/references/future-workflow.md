@@ -8,6 +8,8 @@ Add Pending preserves imperatives and conditional branches in the future task de
 
 ## Process Pending
 
+Inspect `pending_depends_on` before choosing a processing scope. Include an open prerequisite only within an approved selection. Processing derives Ready dependency edges from all known promotion members. A dependent remains in Pending when a prerequisite lacks promotion evidence or a promoted member has a terminal outcome other than completion. A proposal that would publish a Ready task with an unresolved Pending prerequisite fails before queue or receipt changes.
+
 Resolve optional Pending IDs or exact normalized names before mutation; no input selects the Pending Queue. Absent/ambiguous selections stop without fallback. Read repository rules, document map, relevant current documentation, implementation, configuration, assets/data, tests and source history when needed. Never process from future.md alone.
 
 For an explicit topic or intake batch group, preview the Pending queue with `group-selection`. Report exact selected identities and freeze the inspected source hash. Pass the exact nonempty P- list to Processing as `selectors`. Stop on invalid, empty or stale selections and inspect the group again before any mutation.

@@ -26,7 +26,8 @@ SECTIONS = ['Goal', 'Touch', 'Validation', 'Acceptance']
 VALIDATION_FIELDS = ['validation_group_id','boundary_validation']
 TASK_GROUPING_COMPATIBILITY = 1
 GROUPING_FIELDS = ['topic','intake_batch_ids']
-OPTIONAL_FIELDS = VALIDATION_FIELDS + GROUPING_FIELDS
+PENDING_DEPENDENCY_FIELD = 'pending_depends_on'
+OPTIONAL_FIELDS = VALIDATION_FIELDS + GROUPING_FIELDS + [PENDING_DEPENDENCY_FIELD]
 TOPIC_PATTERN = re.compile(r'[a-z][a-z0-9]*(?:-[a-z0-9]+)*')
 RELATIONS = {'main', 'blocker', 'subtask', 'followup'}
 TERMINAL = {'completed', 'cancelled', 'superseded', 'merged'}
@@ -157,6 +158,12 @@ def validate_metadata(meta, queue):
     if meta.get('validation_group_id') is not None and not valid_id(meta['validation_group_id'],'VG'):raise WorkflowError('Invalid validation group identity')
     if meta.get('boundary_validation','not-required') not in {'not-required','group-end','before-dependent-work'}:raise WorkflowError('Invalid boundary validation classification')
     validate_grouping(meta,queue)
+    if PENDING_DEPENDENCY_FIELD in meta:
+        pending_ids = meta[PENDING_DEPENDENCY_FIELD]
+        if (queue!='Pending Queue' or not isinstance(pending_ids,list)
+                or any(not valid_id(value,'P') for value in pending_ids)
+                or len(set(pending_ids))!=len(pending_ids) or meta['id'] in pending_ids):
+            raise WorkflowError('Invalid Pending prerequisite identity list')
     if meta['id'] in meta['depends_on']:
         raise WorkflowError('A task cannot depend on the task identity')
 
@@ -242,17 +249,21 @@ def select(tasks, selector=None):
 
 def validate_dependencies(tasks, completed_ids=()):
     """Validate the open dependency graph without changing task state."""
-    open_tasks={t['id']:t for t in tasks if t['queue']=='Prioritized Next Changes'}
-    completed=set(completed_ids);visiting=set();visited=set()
+    graph={task['id']:task['depends_on'] for task in tasks if task['queue']=='Prioritized Next Changes'}
+    validate_dependency_graph(graph,set(completed_ids))
+
+
+def validate_dependency_graph(graph, resolved):
+    visiting=set();visited=set()
     def visit(task_id):
-        if task_id in completed:return
-        if task_id not in open_tasks:raise WorkflowError('Missing required dependency: '+task_id)
+        if task_id in resolved:return
+        if task_id not in graph:raise WorkflowError('Missing required dependency: '+task_id)
         if task_id in visiting:raise WorkflowError('Dependency cycle: '+task_id)
         if task_id in visited:return
         visiting.add(task_id)
-        for dependency in open_tasks[task_id]['depends_on']:visit(dependency)
+        for dependency in graph[task_id]:visit(dependency)
         visiting.remove(task_id);visited.add(task_id)
-    for task_id in open_tasks:visit(task_id)
+    for task_id in graph:visit(task_id)
 
 def render(title,meta,body):
     if not title.strip() or '\n' in title: raise WorkflowError('Task title requires one nonempty line')
@@ -573,7 +584,7 @@ def validate_intake_receipt(receipt,batch_id):
     if created.utcoffset()!=timedelta(0):raise WorkflowError('Intake receipt creation time requires UTC')
     ids=set()
     for item in receipt['items']:
-        if not isinstance(item,dict) or not set(item)<=set(FIELDS+GROUPING_FIELDS):
+        if not isinstance(item,dict) or not set(item)<=set(FIELDS+GROUPING_FIELDS+[PENDING_DEPENDENCY_FIELD]):
             raise WorkflowError('Invalid intake receipt item')
         validate_metadata(item,'Pending Queue')
         if item.get('intake_batch_ids')!=[batch_id] or item['id'] in ids:
@@ -590,7 +601,43 @@ def read_intake_receipt(store,batch_id):
     if not path.exists():return None
     return validate_intake_receipt(json.loads(path.read_text()),batch_id)
 
-def intake_item(text,state,payload,batch_id):
+def prepared_pending_items(tasks, items, *, batched):
+    identifiers=[identity('P') for _ in items]
+    pending={task['id']:task.get(PENDING_DEPENDENCY_FIELD,[]) for task in tasks if task['queue']=='Pending Queue'}
+    known=set(pending)|set(identifiers)
+    keys={}
+    for item,task_id in zip(items,identifiers):
+        if not batched or 'key' not in item:
+            continue
+        key=item['key']
+        if not isinstance(key,str) or not TOPIC_PATTERN.fullmatch(key) or key in keys:
+            raise WorkflowError('Batch intake item keys require distinct lowercase kebab-case keys')
+        keys[key]=task_id
+    accepted=[]
+    for item,task_id in zip(items,identifiers):
+        values=item.get(PENDING_DEPENDENCY_FIELD,[])
+        if not isinstance(values,list):
+            raise WorkflowError('Pending prerequisites require a list')
+        prerequisites=[]
+        for value in values:
+            if isinstance(value,str) and value.startswith('@'):
+                if value[1:] not in keys:
+                    raise WorkflowError('Unknown batch Pending prerequisite key: '+value)
+                value=keys[value[1:]]
+            if not valid_id(value,'P') or value not in known or value in prerequisites:
+                raise WorkflowError('Pending prerequisites require distinct current P-IDs or batch keys')
+            prerequisites.append(value)
+        pending[task_id]=prerequisites
+        normalized={**item}
+        if PENDING_DEPENDENCY_FIELD in item:
+            normalized[PENDING_DEPENDENCY_FIELD]=prerequisites
+        accepted.append((normalized,task_id))
+    external={dependency for values in pending.values() for dependency in values if dependency not in pending}
+    validate_dependency_graph(pending,external)
+    return accepted
+
+
+def intake_item(text,state,payload,batch_id,task_id):
     tasks=parse(text)
     if not isinstance(payload,dict) or not isinstance(payload.get('title'),str) or not payload['title'].strip():
         raise WorkflowError('Intake item requires a title')
@@ -623,7 +670,9 @@ def intake_item(text,state,payload,batch_id):
         priority=25 if payload.get('low_priority') else max((t['priority'] for t in tasks),default=100)+1
     if priority is None and related_priority is not None:priority=related_priority
     if priority is None: priority=25 if payload.get('low_priority') else 100
-    meta={'id':identity('P'),'priority':priority,'status':'Pending','parent_pending_ids':[],'processing_run_id':None,'root_task_id':root,'related_task_id':parent,'relation':relation,'depends_on':[]}
+    meta={'id':task_id,'priority':priority,'status':'Pending','parent_pending_ids':[],'processing_run_id':None,'root_task_id':root,'related_task_id':parent,'relation':relation,'depends_on':[]}
+    if payload.get(PENDING_DEPENDENCY_FIELD):
+        meta[PENDING_DEPENDENCY_FIELD]=payload[PENDING_DEPENDENCY_FIELD]
     if 'topic' in payload:meta['topic']=payload['topic']
     if batch_id is not None:meta['intake_batch_ids']=[batch_id]
     validate_metadata(meta,'Pending Queue')
@@ -709,8 +758,8 @@ def intake(store,payload):
         text=store.text()
         state=store.load(text)
         created=[]
-        for item in items:
-            text,meta=intake_item(text,state,item,batch_id)
+        for item,task_id in prepared_pending_items(parse(text),items,batched=batched):
+            text,meta=intake_item(text,state,item,batch_id,task_id)
             created.append(meta)
         extras={}
         if batch_id is not None:
@@ -790,6 +839,20 @@ def process(store,payload):
         return receipt
 
 
+def pending_promotion_proof(tasks, outcomes):
+    targets={}
+    declined={}
+    for task in tasks:
+        if task['queue']=='Prioritized Next Changes':
+            for pending_id in task['parent_pending_ids']:
+                targets.setdefault(pending_id,[]).append(task['id'])
+    for outcome in outcomes:
+        scope=targets if outcome.get('disposition')=='completed' else declined
+        for pending_id in outcome.get('parent_pending_ids',[]):
+            scope.setdefault(pending_id,[]).append(outcome['task_id'])
+    return targets,declined
+
+
 def _processing_proposal(store,payload,text,state,assigned,pr):
     """Build the same prospective output inside and outside the writer."""
     tasks=parse(text)
@@ -811,7 +874,18 @@ def _processing_proposal(store,payload,text,state,assigned,pr):
             if not isinstance(key,str) or not re.fullmatch(r'[a-z][a-z0-9-]*',key):raise WorkflowError('Task key requires lowercase kebab-case')
             if key in keys:raise WorkflowError('Duplicate task key: '+key)
             keys[key]=task_id
-    def dependencies(spec):
+    outcomes=store.outcomes()
+    provenance,declined=pending_promotion_proof(tasks,outcomes)
+    for spec,task_id in zip(specs,assigned):
+        pending_ids=spec.get('parent_pending_ids',[])
+        if not isinstance(pending_ids,list) or not pending_ids or any(not valid_id(value,'P') or value not in selected_ids for value in pending_ids):
+            raise WorkflowError('Produced task requires selected Pending provenance')
+        for pending_id in pending_ids:
+            provenance.setdefault(pending_id,[]).append(task_id)
+
+    active_pending={task['id'] for task in tasks if task['queue']=='Pending Queue'}
+
+    def dependencies(spec,sources):
         values=spec.get('depends_on',[])
         if not isinstance(values,list):raise WorkflowError('Task dependencies require a list')
         result=[]
@@ -822,7 +896,16 @@ def _processing_proposal(store,payload,text,state,assigned,pr):
             if not valid_id(value,'T'):raise WorkflowError('Dependency requires a T- ID or @task-key')
             if value in result:raise WorkflowError('Duplicate dependency: '+value)
             result.append(value)
-        return result
+        for source in sources:
+            for pending_id in source.get(PENDING_DEPENDENCY_FIELD,[]):
+                if pending_id in declined:
+                    raise WorkflowError('Pending prerequisite has non-completed promotion members: '
+                                        +pending_id+' ('+', '.join(sorted(set(declined[pending_id])))+')')
+                if (pending_id in active_pending and dispositions.get(pending_id,{}).get('status')!='promoted'
+                        or pending_id not in provenance):
+                    raise WorkflowError('Pending prerequisite requires guarded promotion: '+pending_id)
+                result.extend(provenance[pending_id])
+        return list(dict.fromkeys(result))
     produced=[];reused=[]; consumed=set();run=state['active_run']
     for spec,task_id in zip(specs,assigned):
         parents=spec.get('parent_pending_ids',[])
@@ -836,11 +919,11 @@ def _processing_proposal(store,payload,text,state,assigned,pr):
             reused_task=resolve(parse(text),[spec['reuse_id']],'Prioritized Next Changes')[0]
             if (reused_task['root_task_id'],reused_task['related_task_id'],reused_task['relation'])!=(root or reused_task['id'],parent,relation): raise WorkflowError('Reused task relationship conflicts')
             merged=list(dict.fromkeys(reused_task['parent_pending_ids']+parents))
-            deps=list(dict.fromkeys(reused_task['depends_on']+dependencies(spec)))
+            deps=list(dict.fromkeys(reused_task['depends_on']+dependencies(spec,sources)))
             text=rewrite_meta(text,reused_task['id'],{'parent_pending_ids':merged,'processing_run_id':pr,'depends_on':deps,**merged_grouping([reused_task]+sources)});reused.append(reused_task['id']); continue
         assert_prose(spec['title']+'\n'+spec['body'])
         priority=spec.get('priority',max(t['priority'] for t in sources))
-        meta={'id':task_id,'priority':priority,'status':'Ready','parent_pending_ids':parents,'processing_run_id':pr,'root_task_id':root or task_id,'related_task_id':parent,'relation':relation,'depends_on':dependencies(spec)}
+        meta={'id':task_id,'priority':priority,'status':'Ready','parent_pending_ids':parents,'processing_run_id':pr,'root_task_id':root or task_id,'related_task_id':parent,'relation':relation,'depends_on':dependencies(spec,sources)}
         meta.update({key:spec[key] for key in VALIDATION_FIELDS if spec.get(key) is not None})
         meta.update(merged_grouping(sources))
         validate_metadata(meta,'Prioritized Next Changes')
@@ -864,7 +947,7 @@ def _processing_proposal(store,payload,text,state,assigned,pr):
             key='required_ids' if child['relation'] in {'blocker','subtask'} else 'deferred_ids'
             if tid not in run[key]:run[key].append(tid)
     text=remove(text,{p for p in selected_ids if dispositions[p]['status']!='retained'})
-    completed={o['task_id'] for o in store.outcomes() if o.get('disposition')=='completed'}
+    completed={outcome['task_id'] for outcome in outcomes if outcome.get('disposition')=='completed'}
     validate_dependencies(parse(text),completed)
     receipt={'id':pr,'pending_contexts':{task['id']:{'semantic_fingerprint':digest(clarification_text_semantics(task['body']).encode()),'content_fingerprint':digest(task['body'].encode())} for task in selected},'selected_ids':[t['id'] for t in selected],'created_ids':produced,'reused_ids':reused,'task_keys':keys,'dispositions':dispositions}
     if run:
@@ -1008,6 +1091,50 @@ def force_process_evidence(store, command, proposal_path, preview_path, receipt_
 
 
 
+def pending_dependency_context(store, tasks):
+    pending = {task['id']: task.get(PENDING_DEPENDENCY_FIELD, [])
+               for task in tasks if task['queue'] == 'Pending Queue'}
+    promoted, declined = pending_promotion_proof(tasks, store.outcomes())
+    return pending, promoted, declined
+
+
+def pending_dependency_blockers(ids, selected_ids, pending, promoted, declined):
+    unresolved = set()
+    blocked = {}
+    visited = set(ids)
+    search = list(ids)
+    while search:
+        for prerequisite in pending[search.pop()]:
+            if prerequisite in pending:
+                if prerequisite not in visited:
+                    visited.add(prerequisite)
+                    search.append(prerequisite)
+            elif prerequisite in declined:
+                unresolved.add(prerequisite)
+                blocked[prerequisite] = sorted(set(declined[prerequisite]))
+            elif prerequisite not in promoted:
+                unresolved.add(prerequisite)
+    return {
+        'blocking_pending_promotions': blocked,
+        'outside_pending_dependencies': sorted(visited - selected_ids),
+        'unresolved_pending_dependencies': sorted(unresolved),
+    }
+
+
+def pending_task_view(store, selectors):
+    tasks = parse(store.text())
+    selected = resolve(tasks, selectors, 'Pending Queue')
+    if not any(task.get(PENDING_DEPENDENCY_FIELD) for task in selected):
+        return selected
+    pending, promoted, declined = pending_dependency_context(store, tasks)
+    selected_ids = {task['id'] for task in selected}
+    return [
+        {**task, **pending_dependency_blockers([task['id']], selected_ids, pending, promoted, declined)}
+        if task.get(PENDING_DEPENDENCY_FIELD) else task
+        for task in selected
+    ]
+
+
 def group_selection(store, payload):
     """Resolve an explicit group from one read of the canonical queue."""
     queues = {'pending': 'Pending Queue', 'prioritized': 'Prioritized Next Changes'}
@@ -1048,7 +1175,12 @@ def group_selection(store, payload):
                 raise WorkflowError('Selected task lacks original Pending provenance: '+task['id'])
     ids = [task['id'] for task in group]
     outside = dependency_scope(tasks, {'snapshot': ids}) - set(ids)
+    pending_blockers = {}
+    if payload['queue'] == 'pending' and any(task.get(PENDING_DEPENDENCY_FIELD) for task in group):
+        pending, promoted, declined = pending_dependency_context(store, tasks)
+        pending_blockers = pending_dependency_blockers(ids, set(ids), pending, promoted, declined)
     return {
+        **pending_blockers,
         'ids': ids,
         'tasks': group,
         'outside_dependencies': sorted(outside),
@@ -6085,7 +6217,7 @@ def main(argv=None):
         elif cmd=='read':result=resolve(parse(store.text()),[args.id])[0]
         elif cmd=='select':
             result=select(parse(store.text()),args.id);clarification_admission(store,result['id'])
-        elif cmd=='pending':result=resolve(parse(store.text()),args.names or ([args.id] if args.id else []),'Pending Queue')
+        elif cmd=='pending':result=pending_task_view(store,args.names or ([args.id] if args.id else []))
         elif cmd=='group-selection':
             if args.id is not None or args.names is not None or args.apply:
                 raise WorkflowError('Group selection accepts only a read-only group payload')
