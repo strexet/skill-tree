@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "5e4bf907eac2aa5d9603064f6eaf54fa538c81a69b0b0e4e12d98896cd45f794",
+  "identity": "a28fe0cb47efc9b0c6cb50a610252b93659f92fdeccbf7b29c59b3a1a8fee332",
   "operation": "skill-tree-director-run",
   "operations": {
     "skill-tree-3d": {
@@ -3298,7 +3298,7 @@
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/future-workflow.md": "3a6bc83660773c23af11cf00eacb90ed618db701d464fd7fcd304d5d90fca50b",
     "references/history-retention.md": "ff3fa8602fa29085b59f0aa5ae9f9da698bd5b5d5672235fe809018b18b4b801",
-    "references/installation-profile.md": "7ed0e172c5d5b849105aa3bc6939a2bd1be014ea2ab91a83d53cab3ba4d398d9",
+    "references/installation-profile.md": "50d7e922447a95e5ff9d5354c9e6fb0aa8f2a59b7e26d2a553da50ad4744e56b",
     "references/orchestration.md": "ae5d072144a9a28f9d2e97e449ec99be7e05402b82f7e32b80761cfdddb5802e",
     "references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
     "references/pending-task-intake.md": "5d84e779a479a1f174ae8aac791d69c0d196dae47f4fac7ca7e4f5467f49270d",

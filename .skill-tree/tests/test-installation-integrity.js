@@ -70,6 +70,116 @@ function copiedSource(t) {
  return legacySource;
 }
 
+const reviewOperation = 'skill-tree-pr-review-cycle';
+const commonJsScope = 'scripts/package.json';
+const esmProduct = '{"name":"esm-review-fixture","type":"module"}\n';
+
+function reviewModule(root, packageRoot) {
+ const packet = {
+  runtime_action: 'requirement-plan', project_root: root,
+  event: {id:'esm-module-fixture',operation:reviewOperation,anchor:'after'},
+  context: {kind:'review',id:'esm-review-fixture',head:'a'.repeat(40),base_oid:'b'.repeat(40),
+   target_branch:'main',semantic_fingerprint:'c'.repeat(64),content_fingerprint:'d'.repeat(64)},
+  capabilities: ['codex-source-backed-context'],
+  adapter: {provider:'codex',mechanism:'source-backed-context'},
+ };
+ return spawnSync(process.execPath,[path.join(packageRoot,'scripts/plugin-hooks.js'),'--input','-'],
+  {cwd:root,input:JSON.stringify(packet),encoding:'utf8',timeout:15000});
+}
+
+function assertReviewModule(root, packageRoot) {
+ const result = reviewModule(root,packageRoot);
+ assert.equal(result.status,0,'Installed PR review helpers must load within an ESM product: '+result.stderr);
+ assert.equal(JSON.parse(result.stdout).proof.proof_kind,'completed-readiness');
+}
+
+test('owned PR review CommonJS scripts load below ESM across provider layouts', t => {
+ const root = setup(t);
+ fs.writeFileSync(path.join(root,'package.json'),esmProduct);
+ fs.writeFileSync(path.join(root,'app.js'),'export const productModule = "esm";\n');
+ fs.writeFileSync(path.join(root,'AGENTS.md'),'Owner instructions.\n');
+ const {providers} = require('../config/providers.json');
+ const byLocation = new Map();
+ for (const host of providers) {
+  const location = host.id === 'generic' ? '' : host.projectPath;
+  if (!byLocation.has(location)) byLocation.set(location,host.id);
+ }
+ const hosts = [...byLocation.values()];
+ const cliArgs = ['--target',root,'--flavor','general','--skills',reviewOperation,
+  ...hosts.flatMap(host=>['--only',host])];
+ const install = spawnSync(process.execPath,[cli,...cliArgs],{encoding:'utf8',timeout:120000});
+ assert.equal(install.status,0,install.stdout.slice(-1200)+install.stderr);
+ const receipt = JSON.parse(fs.readFileSync(path.join(root,inspectionProfile)));
+ for (const location of byLocation.keys()) {
+  const relative = path.posix.join(location,reviewOperation);
+  const packageRoot = path.join(root,relative);
+  assertReviewModule(root,packageRoot);
+  const marker = fs.readFileSync(path.join(packageRoot,commonJsScope));
+  assert.deepEqual(JSON.parse(marker),{type:'commonjs'});
+  const expected = require('../lib/composer.js').hash(marker);
+  const manifest = JSON.parse(fs.readFileSync(path.join(packageRoot,'references/plugin-bindings.json')));
+  assert.equal(receipt.destinations[relative].files[commonJsScope],expected);
+  assert.equal(manifest.owned_resources[commonJsScope],expected);
+ }
+ const verify = spawnSync(process.execPath,[cli,...cliArgs,'--verify'],{encoding:'utf8',timeout:120000});
+ assert.equal(verify.status,0,verify.stdout.slice(-1200)+verify.stderr);
+ const standaloneRoot = setup(t);
+ fs.writeFileSync(path.join(standaloneRoot,'package.json'),esmProduct);
+ const copied = path.join(standaloneRoot,reviewOperation);
+ fs.cpSync(path.join(root,'.agents/skills',reviewOperation),copied,{recursive:true});
+ assertReviewModule(standaloneRoot,copied);
+ assert.equal(fs.readFileSync(path.join(root,'package.json'),'utf8'),esmProduct);
+ assert.equal(fs.readFileSync(path.join(root,'AGENTS.md'),'utf8'),'Owner instructions.\n');
+ const app = spawnSync(process.execPath,['--input-type=module','-e',
+  'import {productModule} from "./app.js"; process.stdout.write(productModule)'],{cwd:root,encoding:'utf8',timeout:15000});
+ assert.equal(app.status,0,app.stderr);
+ assert.equal(app.stdout,'esm');
+});
+
+test('the owned CommonJS marker follows upgrade, verification, rollback and uninstall', t => {
+ const root = setup(t);
+ const legacy = copiedSource(t);
+ const resourceMap = path.join(legacy,'config/resource-map.json');
+ const retainedMap = JSON.parse(fs.readFileSync(resourceMap));
+ delete retainedMap[reviewOperation].scripts['package.json'];
+ fs.writeFileSync(resourceMap,JSON.stringify(retainedMap));
+ fs.writeFileSync(path.join(root,'package.json'),esmProduct);
+ const selection = ['--skills',reviewOperation];
+ const previous = run(root,[...selection,'--source',legacy]);
+ assert.equal(previous.status,0,previous.stdout+previous.stderr);
+ const packageRoot = path.join(root,'.agents/skills',reviewOperation);
+ const marker = path.join(packageRoot,commonJsScope);
+ const manager = path.join(root,'.skill-tree/installation/manager.js');
+ const oldReceipt = fs.readFileSync(path.join(root,inspectionProfile));
+ assert.equal(fs.existsSync(marker),false);
+ const priorVerify = run(root,[...selection,'--verify']);
+ assert.equal(priorVerify.status,0,priorVerify.stdout+priorVerify.stderr);
+ const before = reviewModule(root,packageRoot);
+ assert.notEqual(before.status,0);
+ assert.match(before.stderr,/require is not defined/);
+ const installed = run(root,selection);
+ assert.equal(installed.status,0,installed.stdout+installed.stderr);
+ assertReviewModule(root,packageRoot);
+ const owned = fs.readFileSync(marker);
+ fs.writeFileSync(marker,'{"type":"module"}\n');
+ for (const option of ['--verify','--force','--uninstall']) {
+  const rejected=run(root,[...selection,option]);
+  assert.notEqual(rejected.status,0);
+  assert.equal(fs.readFileSync(marker,'utf8'),'{"type":"module"}\n');
+ }
+ fs.writeFileSync(marker,owned);
+ const rolled = spawnSync(process.execPath,[manager,'--rollback'],{encoding:'utf8',timeout:20000});
+ assert.equal(rolled.status,0,rolled.stdout+rolled.stderr);
+ assert.equal(fs.existsSync(marker),false);
+ assert.deepEqual(fs.readFileSync(path.join(root,inspectionProfile)),oldReceipt);
+ const upgraded = run(root,selection);
+ assert.equal(upgraded.status,0,upgraded.stdout+upgraded.stderr);
+ const removed = run(root,[...selection,'--uninstall']);
+ assert.equal(removed.status,0,removed.stdout+removed.stderr);
+ assert.equal(fs.existsSync(packageRoot),false);
+ assert.equal(fs.readFileSync(path.join(root,'package.json'),'utf8'),esmProduct);
+});
+
 test('external sources without membership exports still list, install and verify', t => {
  const root = setup(t);
  const legacySource = copiedSource(t);

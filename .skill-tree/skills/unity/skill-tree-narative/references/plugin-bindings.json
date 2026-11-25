@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "07943cc51cd5b2de2d5a27f5b4a82319c04b790de227980f4da0e4f377b092f0",
+  "identity": "6a4c5554ca57d82680133cf8f560cd44ea4ee3a600f40c4df44ebca1bee5d7e6",
   "operation": "skill-tree-narative",
   "operations": {
     "skill-tree-3d": {
@@ -3294,7 +3294,7 @@
     "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/future-workflow.md": "3a6bc83660773c23af11cf00eacb90ed618db701d464fd7fcd304d5d90fca50b",
-    "references/installation-profile.md": "7ed0e172c5d5b849105aa3bc6939a2bd1be014ea2ab91a83d53cab3ba4d398d9",
+    "references/installation-profile.md": "50d7e922447a95e5ff9d5354c9e6fb0aa8f2a59b7e26d2a553da50ad4744e56b",
     "references/narrative-canon-approval.md": "d36ed0534797cfbc8ab8d996093a48e82f26b05c6bdccbbde87cd9c34fd7a65b",
     "references/narrative-character-appearance.md": "4c0f460e36b59b0dc8e5c3e25f4c92d7c57402f9359301880a2c695a4aa34f15",
     "references/narrative-character-card.md": "324b75b03b26f45c7cfc9b4a6b2fb73c1bb824689034ef8ec2e7f9cae67de8bc",
@@ -3376,6 +3376,7 @@
     "scripts/inspect-unity-repository.py": "794230aca0f338a9d5a6ce7dd62df2016c9d13fb9622174429f9188225fb78e9",
     "scripts/narrative-route-check.py": "88bdd66fbaa9829a7b69843f8004516de28bbb30340c380bc5a3be64c0faa01d",
     "scripts/narrative-state.py": "ad6618d06fc1b2cac79694a64ff5733bdd03a330e0714851e04e185d108c1388",
+    "scripts/package.json": "8005a3491db7d92f36ac66369861589f9c47123d3a7c71e643fc2c06168cd45a",
     "scripts/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
     "scripts/plugin-composition.js": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b",
     "scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",
