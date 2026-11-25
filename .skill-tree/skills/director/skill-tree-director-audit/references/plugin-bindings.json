@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "7a5bc54718ba43ad24bfc0a9b1df0907cf62a716576a7ec70c830da2a7ba1b5b",
+  "identity": "01233660c9dbfbc66d53af54fb29152bc5b2137680b67b446aa161d9314178b6",
   "operation": "skill-tree-director-audit",
   "operations": {
     "skill-tree-3d": {
@@ -3330,7 +3330,7 @@
     "scripts/runtime/common/scripts/director-questions.py": "60d18e3d18eff83b680dcb454a87d24db4c027a9e90065d1f0d2dfb6bcc2ad6c",
     "scripts/runtime/common/scripts/director-run.py": "1a2af3a853bea5c24de33b0434c0dfa7f9efb4f9642f295626931f648cbbfaba",
     "scripts/runtime/common/scripts/director-source-repair.py": "d9f53a58cd06cd837d7758d118a029cc5db15a36c5574d02bb91bf873b208d35",
-    "scripts/runtime/common/scripts/director-state.py": "3c87ce2fc25510321cae92ddbdd850eb8caf833972b223e8187108d62cd4df71",
+    "scripts/runtime/common/scripts/director-state.py": "6359f0b9b6256af5dc8a86922ce8e73c29c33ada79ba5de855d34476460b0f9c",
     "scripts/runtime/common/scripts/director-workspace-audit.py": "0e44fa17efe543e98f2f729e721488d9449b1cd65964c313572e4156d05f7ba2",
     "scripts/runtime/common/scripts/narrative-state.py": "ad6618d06fc1b2cac79694a64ff5733bdd03a330e0714851e04e185d108c1388",
     "scripts/runtime/common/scripts/parallel-preview.py": "5425da8665a31cfc681853cf5e5579d2a75295a08ee74399da717f803cf441bc",

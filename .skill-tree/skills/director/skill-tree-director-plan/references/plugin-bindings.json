@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "77575d37de88031561efe4378e9710fe3a3da54a12ce71643e466ba0fd1a97f3",
+  "identity": "329862667f89a898e42acdb3215bf7c7195f30a7664b70ea1b60de7936b2377b",
   "operation": "skill-tree-director-plan",
   "operations": {
     "skill-tree-3d": {
@@ -3327,7 +3327,7 @@
     "scripts/runtime/common/scripts/director-plans.py": "b28d8e4326dda6c390586759e36750c74cb909169ff244ecfe7af1e359bfb863",
     "scripts/runtime/common/scripts/director-questions.py": "60d18e3d18eff83b680dcb454a87d24db4c027a9e90065d1f0d2dfb6bcc2ad6c",
     "scripts/runtime/common/scripts/director-run.py": "1a2af3a853bea5c24de33b0434c0dfa7f9efb4f9642f295626931f648cbbfaba",
-    "scripts/runtime/common/scripts/director-state.py": "3c87ce2fc25510321cae92ddbdd850eb8caf833972b223e8187108d62cd4df71",
+    "scripts/runtime/common/scripts/director-state.py": "6359f0b9b6256af5dc8a86922ce8e73c29c33ada79ba5de855d34476460b0f9c",
     "scripts/runtime/common/scripts/narrative-state.py": "ad6618d06fc1b2cac79694a64ff5733bdd03a330e0714851e04e185d108c1388",
     "scripts/runtime/common/scripts/parallel-preview.py": "5425da8665a31cfc681853cf5e5579d2a75295a08ee74399da717f803cf441bc",
     "scripts/runtime/common/scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",

@@ -1,0 +1,1928 @@
+{
+  "queue_id": "Q-f925e62e-09cd-4434-b2e4-7c7057c1e817",
+  "run_id": "WR-54f00f59-a462-4734-bec0-daa237ad9df3",
+  "task_id": "T-0718f407-a9a8-4164-9611-93996bb0997c",
+  "pending_id": "P-129b61fe-abc1-4437-a632-353ac8fb3317",
+  "read_route": "project-read",
+  "intake_route": "intake",
+  "pending_intake_state": true,
+  "native_version": "2.1.109 (Claude Code)",
+  "activation": "disposable owned settings overlay",
+  "canonical_change_denials": [
+    1,
+    2,
+    3,
+    4,
+    9,
+    10,
+    11
+  ],
+  "guarded_native_intake": {
+    "native_exit": 0,
+    "transport": "loopback deterministic SSE",
+    "transport_requests": [
+      {
+        "main_tools": false,
+        "offered_selected_tool": false,
+        "tool": null
+      },
+      {
+        "main_tools": true,
+        "offered_selected_tool": true,
+        "tool": "Bash"
+      },
+      {
+        "main_tools": true,
+        "offered_selected_tool": false,
+        "tool": null
+      }
+    ],
+    "records": [
+      {
+        "type": "system",
+        "subtype": "init",
+        "cwd": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/product",
+        "session_id": "12b4722c-cab5-4060-a0a0-86f25842ae79",
+        "tools": [
+          "Bash"
+        ],
+        "mcp_servers": [],
+        "model": "claude-sonnet-4-6",
+        "permissionMode": "dontAsk",
+        "slash_commands": [
+          "update-config",
+          "debug",
+          "simplify",
+          "batch",
+          "loop",
+          "claude-api",
+          "skill-tree-3d",
+          "skill-tree-3d-blender",
+          "skill-tree-3d-motion",
+          "skill-tree-3d-references",
+          "skill-tree-3d-texture",
+          "skill-tree-3d-unity",
+          "skill-tree-add-pending-task",
+          "skill-tree-clarify-tasks",
+          "skill-tree-create-documents-snapshot",
+          "skill-tree-director",
+          "skill-tree-force-process",
+          "skill-tree-full-cycle",
+          "skill-tree-game-design",
+          "skill-tree-game-design-balance",
+          "skill-tree-game-design-mechanics",
+          "skill-tree-implement-all",
+          "skill-tree-implement-next-future-task",
+          "skill-tree-narative",
+          "skill-tree-plugins",
+          "skill-tree-pr-review-cycle",
+          "skill-tree-process-future-pending",
+          "skill-tree-repo-documentation",
+          "skill-tree-repo-documentation-audit",
+          "skill-tree-work-through-next",
+          "compact",
+          "context",
+          "cost",
+          "heapdump",
+          "init",
+          "review",
+          "security-review",
+          "insights",
+          "team-onboarding"
+        ],
+        "apiKeySource": "ANTHROPIC_API_KEY",
+        "claude_code_version": "2.1.109",
+        "output_style": "default",
+        "agents": [
+          "general-purpose",
+          "statusline-setup",
+          "Explore",
+          "Plan"
+        ],
+        "skills": [
+          "update-config",
+          "debug",
+          "simplify",
+          "batch",
+          "loop",
+          "claude-api",
+          "skill-tree-3d",
+          "skill-tree-3d-blender",
+          "skill-tree-3d-motion",
+          "skill-tree-3d-references",
+          "skill-tree-3d-texture",
+          "skill-tree-3d-unity",
+          "skill-tree-add-pending-task",
+          "skill-tree-clarify-tasks",
+          "skill-tree-create-documents-snapshot",
+          "skill-tree-director",
+          "skill-tree-force-process",
+          "skill-tree-full-cycle",
+          "skill-tree-game-design",
+          "skill-tree-game-design-balance",
+          "skill-tree-game-design-mechanics",
+          "skill-tree-implement-all",
+          "skill-tree-implement-next-future-task",
+          "skill-tree-narative",
+          "skill-tree-plugins",
+          "skill-tree-pr-review-cycle",
+          "skill-tree-process-future-pending",
+          "skill-tree-repo-documentation",
+          "skill-tree-repo-documentation-audit",
+          "skill-tree-work-through-next"
+        ],
+        "plugins": [],
+        "uuid": "5fc33c68-f470-414b-a583-48ce27a78088",
+        "memory_paths": {
+          "auto": "/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/claude-fixture-config-brv44eq2/projects/-private-var-folders-m0-jn-q057x159dkrt-btt4v0y80000gn-T-skill-tree-native-managed-ze1mb3yu-product/memory/"
+        },
+        "fast_mode_state": "off"
+      },
+      {
+        "type": "assistant",
+        "message": {
+          "id": "msg_fixture_1",
+          "type": "message",
+          "role": "assistant",
+          "model": "claude-sonnet-4-6",
+          "content": [
+            {
+              "type": "tool_use",
+              "id": "toolu_fixture_0",
+              "name": "Bash",
+              "input": {
+                "command": "python3 -B /private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/product/.claude/skills/skill-tree-add-pending-task/scripts/workflow-state.py intake /private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/product --standalone --direct-project --input /private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/approved-native-intake.json",
+                "description": "Disposable fixture Git"
+              }
+            }
+          ],
+          "stop_reason": null,
+          "stop_sequence": null,
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 0
+          },
+          "context_management": null
+        },
+        "parent_tool_use_id": null,
+        "session_id": "12b4722c-cab5-4060-a0a0-86f25842ae79",
+        "uuid": "bb682822-f5b6-45bb-a446-be2495e61194"
+      },
+      {
+        "type": "system",
+        "subtype": "hook_started",
+        "hook_id": "1ca3b6ac-763d-4519-a750-fc7407201abb",
+        "hook_name": "PreToolUse:Bash",
+        "hook_event": "PreToolUse",
+        "uuid": "495a0232-ef9b-4726-9aca-a0feb44edc27",
+        "session_id": "12b4722c-cab5-4060-a0a0-86f25842ae79"
+      },
+      {
+        "type": "system",
+        "subtype": "hook_started",
+        "hook_id": "10781a4a-7c48-4822-bf6a-804ac594adee",
+        "hook_name": "PreToolUse:Bash",
+        "hook_event": "PreToolUse",
+        "uuid": "fbbb56ba-d649-4958-9cb2-a1c573ed74d3",
+        "session_id": "12b4722c-cab5-4060-a0a0-86f25842ae79"
+      },
+      {
+        "type": "system",
+        "subtype": "hook_response",
+        "hook_id": "1ca3b6ac-763d-4519-a750-fc7407201abb",
+        "hook_name": "PreToolUse:Bash",
+        "hook_event": "PreToolUse",
+        "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+        "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+        "stderr": "",
+        "exit_code": 0,
+        "outcome": "success",
+        "uuid": "6a472a92-147c-49d2-b41e-1d97a67c7c53",
+        "session_id": "12b4722c-cab5-4060-a0a0-86f25842ae79"
+      },
+      {
+        "type": "system",
+        "subtype": "hook_response",
+        "hook_id": "10781a4a-7c48-4822-bf6a-804ac594adee",
+        "hook_name": "PreToolUse:Bash",
+        "hook_event": "PreToolUse",
+        "output": "{}\n",
+        "stdout": "{}\n",
+        "stderr": "",
+        "exit_code": 0,
+        "outcome": "success",
+        "uuid": "fa8252ff-a8ee-49f2-81af-a0093683a255",
+        "session_id": "12b4722c-cab5-4060-a0a0-86f25842ae79"
+      },
+      {
+        "type": "user",
+        "message": {
+          "role": "user",
+          "content": [
+            {
+              "tool_use_id": "toolu_fixture_0",
+              "type": "tool_result",
+              "content": "{\n  \"depends_on\": [],\n  \"id\": \"P-ae478989-0f51-49ea-bf5a-505db021f120\",\n  \"parent_pending_ids\": [],\n  \"priority\": 100,\n  \"processing_run_id\": null,\n  \"related_task_id\": null,\n  \"relation\": \"main\",\n  \"root_task_id\": null,\n  \"status\": \"Pending\"\n}",
+              "is_error": false
+            }
+          ]
+        },
+        "parent_tool_use_id": null,
+        "session_id": "12b4722c-cab5-4060-a0a0-86f25842ae79",
+        "uuid": "15254549-dfa3-4731-ba20-d3e8f32f2b68",
+        "timestamp": "2026-11-25T20:30:43.013Z",
+        "tool_use_result": {
+          "stdout": "{\n  \"depends_on\": [],\n  \"id\": \"P-ae478989-0f51-49ea-bf5a-505db021f120\",\n  \"parent_pending_ids\": [],\n  \"priority\": 100,\n  \"processing_run_id\": null,\n  \"related_task_id\": null,\n  \"relation\": \"main\",\n  \"root_task_id\": null,\n  \"status\": \"Pending\"\n}",
+          "stderr": "",
+          "interrupted": false,
+          "isImage": false,
+          "noOutputExpected": false
+        }
+      },
+      {
+        "type": "assistant",
+        "message": {
+          "id": "msg_fixture_2",
+          "type": "message",
+          "role": "assistant",
+          "model": "claude-sonnet-4-6",
+          "content": [
+            {
+              "type": "text",
+              "text": "Fixture completed."
+            }
+          ],
+          "stop_reason": null,
+          "stop_sequence": null,
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 0
+          },
+          "context_management": null
+        },
+        "parent_tool_use_id": null,
+        "session_id": "12b4722c-cab5-4060-a0a0-86f25842ae79",
+        "uuid": "28f0729d-99c2-473c-a2b0-3fe9a81a3629"
+      },
+      {
+        "type": "result",
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 867,
+        "duration_api_ms": 31,
+        "num_turns": 2,
+        "result": "Fixture completed.",
+        "stop_reason": "end_turn",
+        "session_id": "12b4722c-cab5-4060-a0a0-86f25842ae79",
+        "total_cost_usd": 0.00038500000000000003,
+        "usage": {
+          "input_tokens": 20,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 18,
+          "server_tool_use": {
+            "web_search_requests": 0,
+            "web_fetch_requests": 0
+          },
+          "service_tier": "standard",
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 0,
+            "ephemeral_5m_input_tokens": 0
+          },
+          "inference_geo": "",
+          "iterations": [],
+          "speed": "standard"
+        },
+        "modelUsage": {
+          "claude-haiku-4-5-20251001": {
+            "inputTokens": 10,
+            "outputTokens": 9,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0,
+            "webSearchRequests": 0,
+            "costUSD": 5.5e-05,
+            "contextWindow": 200000,
+            "maxOutputTokens": 32000
+          },
+          "claude-sonnet-4-6": {
+            "inputTokens": 20,
+            "outputTokens": 18,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0,
+            "webSearchRequests": 0,
+            "costUSD": 0.00033,
+            "contextWindow": 200000,
+            "maxOutputTokens": 32000
+          }
+        },
+        "permission_denials": [],
+        "terminal_reason": "completed",
+        "fast_mode_state": "off",
+        "uuid": "612b1627-3815-4f34-acb5-4d5cd2103a0f"
+      }
+    ]
+  },
+  "runtime_sha256": "6359f0b9b6256af5dc8a86922ce8e73c29c33ada79ba5de855d34476460b0f9c",
+  "owner_settings_sha256": "4d82fe93e182eb25ef1f527ddbfdeefd3bd19981bd2827c5adc5403ac65d146e",
+  "owner_hooks": [
+    {
+      "tool": "Read",
+      "input": {
+        "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/product/source.py"
+      }
+    },
+    {
+      "tool": "Edit",
+      "input": {
+        "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/product/source.py",
+        "old_string": "value = 1",
+        "new_string": "value = 2",
+        "replace_all": false
+      }
+    },
+    {
+      "tool": "Write",
+      "input": {
+        "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/product/guard-refusal.txt",
+        "content": "native isolated fixture bytes\n"
+      }
+    },
+    {
+      "tool": "Bash",
+      "input": {
+        "command": "git branch denied-native-ref",
+        "description": "Disposable fixture Git"
+      }
+    },
+    {
+      "tool": "Bash",
+      "input": {
+        "command": "git -C /private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/product switch -c denied-native-switch",
+        "description": "Disposable fixture Git"
+      }
+    },
+    {
+      "tool": "Bash",
+      "input": {
+        "command": "git branch --show-current",
+        "description": "Disposable fixture Git"
+      }
+    },
+    {
+      "tool": "Read",
+      "input": {
+        "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/isolated/source.py"
+      }
+    },
+    {
+      "tool": "Edit",
+      "input": {
+        "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/isolated/source.py",
+        "old_string": "value = 1",
+        "new_string": "value = 2",
+        "replace_all": false
+      }
+    },
+    {
+      "tool": "Write",
+      "input": {
+        "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/isolated/created.txt",
+        "content": "native isolated fixture bytes\n"
+      }
+    },
+    {
+      "tool": "Write",
+      "input": {
+        "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/isolated/unguarded.txt",
+        "content": "native isolated fixture bytes\n"
+      }
+    },
+    {
+      "tool": "Write",
+      "input": {
+        "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/PRODUCT/guard-refusal-alias.txt",
+        "content": "native isolated fixture bytes\n"
+      }
+    },
+    {
+      "tool": "Bash",
+      "input": {
+        "command": "git -C /private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/PRODUCT branch denied-native-alias",
+        "description": "Disposable fixture Git"
+      }
+    },
+    {
+      "tool": "Bash",
+      "input": {
+        "command": "python3 -B /private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/product/.claude/skills/skill-tree-add-pending-task/scripts/workflow-state.py intake /private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/product --standalone --direct-project --input /private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/approved-native-intake.json",
+        "description": "Disposable fixture Git"
+      }
+    }
+  ],
+  "scope_proof": {
+    "approved_native_intake_created_pending": true,
+    "before_refs": "b17a778cd61cba00d16841a779b11d0189929def refs/heads/codex/wr-54f00f59-a462-4734-bec0-daa237ad9df3\nb17a778cd61cba00d16841a779b11d0189929def refs/heads/develop",
+    "after_refs": "b17a778cd61cba00d16841a779b11d0189929def refs/heads/codex/wr-54f00f59-a462-4734-bec0-daa237ad9df3\nb17a778cd61cba00d16841a779b11d0189929def refs/heads/develop",
+    "canonical_source_sha256": "585c93666fcb046b7b264d3fa73202aa2a38254ae82a4b3ba19e873c2d5a9886",
+    "isolated_source_sha256": "69ef4f409b530264b0da21ad4054978ada08895c93631a0da1957e2a10b592b5",
+    "queue_sha256_unchanged": "052f4b4c6bddce2f95e23b717845114c73e1df2c936e72516a7464f7f86d7ad7",
+    "core_bridge_opt_out_preserved": true
+  },
+  "temporary_claude_configuration_removed": true,
+  "supported_tools": [
+    "Write",
+    "Edit",
+    "Bash direct Git",
+    "Read (unchanged)"
+  ],
+  "outside_coverage": [
+    "arbitrary Bash and nested interpreters",
+    "terminal processes outside Claude Code",
+    "MCP and other mutation tools",
+    "other host versions"
+  ],
+  "native_exit": 0,
+  "transport": "loopback deterministic SSE",
+  "transport_requests": [
+    {
+      "main_tools": false,
+      "offered_selected_tool": false,
+      "tool": null
+    },
+    {
+      "main_tools": true,
+      "offered_selected_tool": true,
+      "tool": "Read"
+    },
+    {
+      "main_tools": true,
+      "offered_selected_tool": true,
+      "tool": "Edit"
+    },
+    {
+      "main_tools": true,
+      "offered_selected_tool": true,
+      "tool": "Write"
+    },
+    {
+      "main_tools": true,
+      "offered_selected_tool": true,
+      "tool": "Bash"
+    },
+    {
+      "main_tools": true,
+      "offered_selected_tool": true,
+      "tool": "Bash"
+    },
+    {
+      "main_tools": true,
+      "offered_selected_tool": true,
+      "tool": "Bash"
+    },
+    {
+      "main_tools": true,
+      "offered_selected_tool": true,
+      "tool": "Read"
+    },
+    {
+      "main_tools": true,
+      "offered_selected_tool": true,
+      "tool": "Edit"
+    },
+    {
+      "main_tools": true,
+      "offered_selected_tool": true,
+      "tool": "Write"
+    },
+    {
+      "main_tools": true,
+      "offered_selected_tool": true,
+      "tool": "Write"
+    },
+    {
+      "main_tools": true,
+      "offered_selected_tool": true,
+      "tool": "Write"
+    },
+    {
+      "main_tools": true,
+      "offered_selected_tool": true,
+      "tool": "Bash"
+    },
+    {
+      "main_tools": true,
+      "offered_selected_tool": false,
+      "tool": null
+    }
+  ],
+  "records": [
+    {
+      "type": "system",
+      "subtype": "init",
+      "cwd": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/product",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "tools": [
+        "Bash",
+        "Edit",
+        "Read",
+        "Write"
+      ],
+      "mcp_servers": [],
+      "model": "claude-sonnet-4-6",
+      "permissionMode": "dontAsk",
+      "slash_commands": [
+        "update-config",
+        "debug",
+        "simplify",
+        "batch",
+        "loop",
+        "claude-api",
+        "skill-tree-3d",
+        "skill-tree-3d-blender",
+        "skill-tree-3d-motion",
+        "skill-tree-3d-references",
+        "skill-tree-3d-texture",
+        "skill-tree-3d-unity",
+        "skill-tree-add-pending-task",
+        "skill-tree-clarify-tasks",
+        "skill-tree-create-documents-snapshot",
+        "skill-tree-director",
+        "skill-tree-force-process",
+        "skill-tree-full-cycle",
+        "skill-tree-game-design",
+        "skill-tree-game-design-balance",
+        "skill-tree-game-design-mechanics",
+        "skill-tree-implement-all",
+        "skill-tree-implement-next-future-task",
+        "skill-tree-narative",
+        "skill-tree-plugins",
+        "skill-tree-pr-review-cycle",
+        "skill-tree-process-future-pending",
+        "skill-tree-repo-documentation",
+        "skill-tree-repo-documentation-audit",
+        "skill-tree-work-through-next",
+        "compact",
+        "context",
+        "cost",
+        "heapdump",
+        "init",
+        "review",
+        "security-review",
+        "insights",
+        "team-onboarding"
+      ],
+      "apiKeySource": "ANTHROPIC_API_KEY",
+      "claude_code_version": "2.1.109",
+      "output_style": "default",
+      "agents": [
+        "general-purpose",
+        "statusline-setup",
+        "Explore",
+        "Plan"
+      ],
+      "skills": [
+        "update-config",
+        "debug",
+        "simplify",
+        "batch",
+        "loop",
+        "claude-api",
+        "skill-tree-3d",
+        "skill-tree-3d-blender",
+        "skill-tree-3d-motion",
+        "skill-tree-3d-references",
+        "skill-tree-3d-texture",
+        "skill-tree-3d-unity",
+        "skill-tree-add-pending-task",
+        "skill-tree-clarify-tasks",
+        "skill-tree-create-documents-snapshot",
+        "skill-tree-director",
+        "skill-tree-force-process",
+        "skill-tree-full-cycle",
+        "skill-tree-game-design",
+        "skill-tree-game-design-balance",
+        "skill-tree-game-design-mechanics",
+        "skill-tree-implement-all",
+        "skill-tree-implement-next-future-task",
+        "skill-tree-narative",
+        "skill-tree-plugins",
+        "skill-tree-pr-review-cycle",
+        "skill-tree-process-future-pending",
+        "skill-tree-repo-documentation",
+        "skill-tree-repo-documentation-audit",
+        "skill-tree-work-through-next",
+        "skill-tree-3d",
+        "skill-tree-3d-blender",
+        "skill-tree-3d-motion",
+        "skill-tree-3d-references",
+        "skill-tree-3d-texture",
+        "skill-tree-3d-unity",
+        "skill-tree-add-pending-task",
+        "skill-tree-clarify-tasks",
+        "skill-tree-create-documents-snapshot",
+        "skill-tree-force-process",
+        "skill-tree-full-cycle",
+        "skill-tree-game-design",
+        "skill-tree-game-design-balance",
+        "skill-tree-game-design-mechanics",
+        "skill-tree-implement-all",
+        "skill-tree-implement-next-future-task",
+        "skill-tree-narative",
+        "skill-tree-plugins",
+        "skill-tree-pr-review-cycle",
+        "skill-tree-process-future-pending",
+        "skill-tree-repo-documentation",
+        "skill-tree-repo-documentation-audit",
+        "skill-tree-work-through-next"
+      ],
+      "plugins": [],
+      "uuid": "41208c8a-14b8-49af-afec-f9b45eb4b4b0",
+      "memory_paths": {
+        "auto": "/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/claude-fixture-config-btbgf980/projects/-private-var-folders-m0-jn-q057x159dkrt-btt4v0y80000gn-T-skill-tree-native-managed-ze1mb3yu-product/memory/"
+      },
+      "fast_mode_state": "off"
+    },
+    {
+      "type": "assistant",
+      "message": {
+        "id": "msg_fixture_1",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-sonnet-4-6",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_fixture_0",
+            "name": "Read",
+            "input": {
+              "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/product/source.py"
+            }
+          }
+        ],
+        "stop_reason": null,
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 10,
+          "output_tokens": 0
+        },
+        "context_management": null
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "e7404698-2f2b-4116-8743-5f0f76dd1bf4"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "5da85ea3-9550-41d1-8945-92c1520b75b9",
+      "hook_name": "PreToolUse:Read",
+      "hook_event": "PreToolUse",
+      "uuid": "ee6d892d-a704-4e96-85fd-56c9852fcd8c",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "5da85ea3-9550-41d1-8945-92c1520b75b9",
+      "hook_name": "PreToolUse:Read",
+      "hook_event": "PreToolUse",
+      "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "b757aa46-36ba-478a-ab70-a2f56eeef150",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "user",
+      "message": {
+        "role": "user",
+        "content": [
+          {
+            "tool_use_id": "toolu_fixture_0",
+            "type": "tool_result",
+            "content": "1\tvalue = 1\n2\t"
+          }
+        ]
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "d1ca30c5-3c72-4918-a7cf-791c3fe7acb6",
+      "timestamp": "2026-11-25T20:29:51.318Z",
+      "tool_use_result": {
+        "type": "text",
+        "file": {
+          "filePath": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/product/source.py",
+          "content": "value = 1\n",
+          "numLines": 2,
+          "startLine": 1,
+          "totalLines": 2
+        }
+      }
+    },
+    {
+      "type": "assistant",
+      "message": {
+        "id": "msg_fixture_2",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-sonnet-4-6",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_fixture_1",
+            "name": "Edit",
+            "input": {
+              "replace_all": false,
+              "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/product/source.py",
+              "old_string": "value = 1",
+              "new_string": "value = 2"
+            }
+          }
+        ],
+        "stop_reason": null,
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 10,
+          "output_tokens": 0
+        },
+        "context_management": null
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "c198f0fd-ebfe-47fe-9e80-cac52b60349f"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "eda74b5f-0818-4da4-b9a0-1bd746852c58",
+      "hook_name": "PreToolUse:Edit",
+      "hook_event": "PreToolUse",
+      "uuid": "7d0f929b-4547-4a35-b811-8e911fcd2c24",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "1306bfe0-ded4-4732-a6a9-4747d70d8c61",
+      "hook_name": "PreToolUse:Edit",
+      "hook_event": "PreToolUse",
+      "uuid": "d48e1dfb-f0a8-41ef-bbe4-e1950e2d8b54",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "eda74b5f-0818-4da4-b9a0-1bd746852c58",
+      "hook_name": "PreToolUse:Edit",
+      "hook_event": "PreToolUse",
+      "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "7300d95f-6048-4ebe-9b81-1a879e7dadab",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "1306bfe0-ded4-4732-a6a9-4747d70d8c61",
+      "hook_name": "PreToolUse:Edit",
+      "hook_event": "PreToolUse",
+      "output": "{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"deny\",\n    \"permissionDecisionReason\": \"Skill Tree Director: Preview project-route and begin source edits in the admitted isolated worktree\"\n  }\n}\n",
+      "stdout": "{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"deny\",\n    \"permissionDecisionReason\": \"Skill Tree Director: Preview project-route and begin source edits in the admitted isolated worktree\"\n  }\n}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "dc88051e-ef16-400a-a3d5-3d643911aa6c",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "user",
+      "message": {
+        "role": "user",
+        "content": [
+          {
+            "type": "tool_result",
+            "content": "Skill Tree Director: Preview project-route and begin source edits in the admitted isolated worktree",
+            "is_error": true,
+            "tool_use_id": "toolu_fixture_1"
+          }
+        ]
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "9df369aa-0890-42ba-8991-029edd620d36",
+      "timestamp": "2026-11-25T20:29:51.693Z",
+      "tool_use_result": "Error: Skill Tree Director: Preview project-route and begin source edits in the admitted isolated worktree"
+    },
+    {
+      "type": "assistant",
+      "message": {
+        "id": "msg_fixture_3",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-sonnet-4-6",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_fixture_2",
+            "name": "Write",
+            "input": {
+              "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/product/guard-refusal.txt",
+              "content": "native isolated fixture bytes\n"
+            }
+          }
+        ],
+        "stop_reason": null,
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 10,
+          "output_tokens": 0
+        },
+        "context_management": null
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "22873483-0569-4c8a-bd19-784e6f79e9e7"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "7b1f3c72-17e2-4eee-a954-295083979389",
+      "hook_name": "PreToolUse:Write",
+      "hook_event": "PreToolUse",
+      "uuid": "f8bfd3c0-66eb-4923-b731-99afca9e8d2a",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "7e38393c-6618-4c12-accd-73f6d161d15c",
+      "hook_name": "PreToolUse:Write",
+      "hook_event": "PreToolUse",
+      "uuid": "831bdb45-dc49-4836-ab3b-f7035aa2fe00",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "7b1f3c72-17e2-4eee-a954-295083979389",
+      "hook_name": "PreToolUse:Write",
+      "hook_event": "PreToolUse",
+      "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "d62f7094-e209-4f44-9197-9488ae6de23f",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "7e38393c-6618-4c12-accd-73f6d161d15c",
+      "hook_name": "PreToolUse:Write",
+      "hook_event": "PreToolUse",
+      "output": "{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"deny\",\n    \"permissionDecisionReason\": \"Skill Tree Director: Preview project-route and begin source edits in the admitted isolated worktree\"\n  }\n}\n",
+      "stdout": "{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"deny\",\n    \"permissionDecisionReason\": \"Skill Tree Director: Preview project-route and begin source edits in the admitted isolated worktree\"\n  }\n}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "9d74b012-728b-421c-b2d3-c46e5232f7bd",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "user",
+      "message": {
+        "role": "user",
+        "content": [
+          {
+            "type": "tool_result",
+            "content": "Skill Tree Director: Preview project-route and begin source edits in the admitted isolated worktree",
+            "is_error": true,
+            "tool_use_id": "toolu_fixture_2"
+          }
+        ]
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "ea94fadc-5953-4196-b036-572134ff3d28",
+      "timestamp": "2026-11-25T20:29:52.037Z",
+      "tool_use_result": "Error: Skill Tree Director: Preview project-route and begin source edits in the admitted isolated worktree"
+    },
+    {
+      "type": "assistant",
+      "message": {
+        "id": "msg_fixture_4",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-sonnet-4-6",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_fixture_3",
+            "name": "Bash",
+            "input": {
+              "command": "git branch denied-native-ref",
+              "description": "Disposable fixture Git"
+            }
+          }
+        ],
+        "stop_reason": null,
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 10,
+          "output_tokens": 0
+        },
+        "context_management": null
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "acc303e7-404d-4e06-9c12-9c997587414d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "521269ce-60a1-4e85-836f-8c64125a2f49",
+      "hook_name": "PreToolUse:Bash",
+      "hook_event": "PreToolUse",
+      "uuid": "ce96e1e9-e36d-494f-b963-8c3defdf8a4d",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "85a3a194-6b08-4a3c-b390-003388dea353",
+      "hook_name": "PreToolUse:Bash",
+      "hook_event": "PreToolUse",
+      "uuid": "050f04c3-7546-42b9-9e8c-d3bc31d7e192",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "521269ce-60a1-4e85-836f-8c64125a2f49",
+      "hook_name": "PreToolUse:Bash",
+      "hook_event": "PreToolUse",
+      "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "808ccf7f-88ac-4892-b094-876e07f9ed6b",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "85a3a194-6b08-4a3c-b390-003388dea353",
+      "hook_name": "PreToolUse:Bash",
+      "hook_event": "PreToolUse",
+      "output": "{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"deny\",\n    \"permissionDecisionReason\": \"Skill Tree Director: Use the approved Core operation for Git mutations on a managed project\"\n  }\n}\n",
+      "stdout": "{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"deny\",\n    \"permissionDecisionReason\": \"Skill Tree Director: Use the approved Core operation for Git mutations on a managed project\"\n  }\n}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "ca0c0b87-6749-4f95-a43a-138cf8416bf0",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "user",
+      "message": {
+        "role": "user",
+        "content": [
+          {
+            "type": "tool_result",
+            "content": "Skill Tree Director: Use the approved Core operation for Git mutations on a managed project",
+            "is_error": true,
+            "tool_use_id": "toolu_fixture_3"
+          }
+        ]
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "972aab97-a0d4-4f39-9b3d-7054ab120388",
+      "timestamp": "2026-11-25T20:29:52.412Z",
+      "tool_use_result": "Error: Skill Tree Director: Use the approved Core operation for Git mutations on a managed project"
+    },
+    {
+      "type": "assistant",
+      "message": {
+        "id": "msg_fixture_5",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-sonnet-4-6",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_fixture_4",
+            "name": "Bash",
+            "input": {
+              "command": "git -C /private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/product switch -c denied-native-switch",
+              "description": "Disposable fixture Git"
+            }
+          }
+        ],
+        "stop_reason": null,
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 10,
+          "output_tokens": 0
+        },
+        "context_management": null
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "473d2307-2478-4152-b582-540d026176da"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "c078c812-f6ad-47fd-b503-e35545391737",
+      "hook_name": "PreToolUse:Bash",
+      "hook_event": "PreToolUse",
+      "uuid": "9e39d10d-6802-4994-91dc-dc2c4faf5d37",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "3201c299-6024-4f43-8031-6ae509663d06",
+      "hook_name": "PreToolUse:Bash",
+      "hook_event": "PreToolUse",
+      "uuid": "1a07ff2d-bdc4-4477-851d-714b5846bbe0",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "c078c812-f6ad-47fd-b503-e35545391737",
+      "hook_name": "PreToolUse:Bash",
+      "hook_event": "PreToolUse",
+      "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "0c4ee2f0-064c-44e3-bf31-d81fe6e59920",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "3201c299-6024-4f43-8031-6ae509663d06",
+      "hook_name": "PreToolUse:Bash",
+      "hook_event": "PreToolUse",
+      "output": "{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"deny\",\n    \"permissionDecisionReason\": \"Skill Tree Director: Use the approved Core operation for Git mutations on a managed project\"\n  }\n}\n",
+      "stdout": "{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"deny\",\n    \"permissionDecisionReason\": \"Skill Tree Director: Use the approved Core operation for Git mutations on a managed project\"\n  }\n}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "02f71fef-0373-4495-ad1d-0fdf9494da9c",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "user",
+      "message": {
+        "role": "user",
+        "content": [
+          {
+            "type": "tool_result",
+            "content": "Skill Tree Director: Use the approved Core operation for Git mutations on a managed project",
+            "is_error": true,
+            "tool_use_id": "toolu_fixture_4"
+          }
+        ]
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "ccad2f85-303d-4cb8-9fef-a31e841612fa",
+      "timestamp": "2026-11-25T20:29:52.778Z",
+      "tool_use_result": "Error: Skill Tree Director: Use the approved Core operation for Git mutations on a managed project"
+    },
+    {
+      "type": "assistant",
+      "message": {
+        "id": "msg_fixture_6",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-sonnet-4-6",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_fixture_5",
+            "name": "Bash",
+            "input": {
+              "command": "git branch --show-current",
+              "description": "Disposable fixture Git"
+            }
+          }
+        ],
+        "stop_reason": null,
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 10,
+          "output_tokens": 0
+        },
+        "context_management": null
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "91e4d1a6-036b-4019-b086-08ea2759dded"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "faf2c525-8b82-448b-9659-d11a74d39cbf",
+      "hook_name": "PreToolUse:Bash",
+      "hook_event": "PreToolUse",
+      "uuid": "844df4fc-a2f6-4978-93e4-41f7340d72f2",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "e165c458-4fd4-464f-bf44-0e169e60236c",
+      "hook_name": "PreToolUse:Bash",
+      "hook_event": "PreToolUse",
+      "uuid": "697361d8-994d-4d4a-a4d9-80bb696bbc51",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "faf2c525-8b82-448b-9659-d11a74d39cbf",
+      "hook_name": "PreToolUse:Bash",
+      "hook_event": "PreToolUse",
+      "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "8a9702ec-b4e0-4e16-9d06-2e60d4bec98f",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "e165c458-4fd4-464f-bf44-0e169e60236c",
+      "hook_name": "PreToolUse:Bash",
+      "hook_event": "PreToolUse",
+      "output": "{}\n",
+      "stdout": "{}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "2a97633b-523a-4a60-a7e9-e50d00fa19d5",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "user",
+      "message": {
+        "role": "user",
+        "content": [
+          {
+            "tool_use_id": "toolu_fixture_5",
+            "type": "tool_result",
+            "content": "develop",
+            "is_error": false
+          }
+        ]
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "5a64601c-a8ad-4801-b8a0-1fbfb90c5b52",
+      "timestamp": "2026-11-25T20:29:53.226Z",
+      "tool_use_result": {
+        "stdout": "develop",
+        "stderr": "",
+        "interrupted": false,
+        "isImage": false,
+        "noOutputExpected": false
+      }
+    },
+    {
+      "type": "assistant",
+      "message": {
+        "id": "msg_fixture_7",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-sonnet-4-6",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_fixture_6",
+            "name": "Read",
+            "input": {
+              "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/isolated/source.py"
+            }
+          }
+        ],
+        "stop_reason": null,
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 10,
+          "output_tokens": 0
+        },
+        "context_management": null
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "6cdfd4f9-ae83-4485-8b2c-c182fb4d0ae2"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "6b7ea429-72f1-4112-a6c7-09aab13de3b9",
+      "hook_name": "PreToolUse:Read",
+      "hook_event": "PreToolUse",
+      "uuid": "f56ea96c-92e6-4eb9-97c7-bad7b44fd74e",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "6b7ea429-72f1-4112-a6c7-09aab13de3b9",
+      "hook_name": "PreToolUse:Read",
+      "hook_event": "PreToolUse",
+      "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "b27b1570-62f3-472b-861b-23de088dd8bc",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "user",
+      "message": {
+        "role": "user",
+        "content": [
+          {
+            "tool_use_id": "toolu_fixture_6",
+            "type": "tool_result",
+            "content": "1\tvalue = 1\n2\t"
+          }
+        ]
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "c23fcaa4-7a15-40f5-a66e-4bbbab9f64a1",
+      "timestamp": "2026-11-25T20:29:53.268Z",
+      "tool_use_result": {
+        "type": "text",
+        "file": {
+          "filePath": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/isolated/source.py",
+          "content": "value = 1\n",
+          "numLines": 2,
+          "startLine": 1,
+          "totalLines": 2
+        }
+      }
+    },
+    {
+      "type": "assistant",
+      "message": {
+        "id": "msg_fixture_8",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-sonnet-4-6",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_fixture_7",
+            "name": "Edit",
+            "input": {
+              "replace_all": false,
+              "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/isolated/source.py",
+              "old_string": "value = 1",
+              "new_string": "value = 2"
+            }
+          }
+        ],
+        "stop_reason": null,
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 10,
+          "output_tokens": 0
+        },
+        "context_management": null
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "a70c3a2b-01c1-4416-bcd7-cda75cb72f49"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "9b911e85-c40a-4ad2-94a2-41925ab6ada1",
+      "hook_name": "PreToolUse:Edit",
+      "hook_event": "PreToolUse",
+      "uuid": "73997e74-addc-463e-aa32-9c98e94fde86",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "4424c0e9-3a22-4609-a7a9-ceb036d1aa9d",
+      "hook_name": "PreToolUse:Edit",
+      "hook_event": "PreToolUse",
+      "uuid": "71d646c0-1f90-40cb-94ac-5f392a7e592c",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "9b911e85-c40a-4ad2-94a2-41925ab6ada1",
+      "hook_name": "PreToolUse:Edit",
+      "hook_event": "PreToolUse",
+      "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "f7ea98f5-9ee0-4ca5-a603-0bb3f98f7031",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "4424c0e9-3a22-4609-a7a9-ceb036d1aa9d",
+      "hook_name": "PreToolUse:Edit",
+      "hook_event": "PreToolUse",
+      "output": "{}\n",
+      "stdout": "{}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "534b56ee-803f-4c38-a488-ba2ece9662c2",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "user",
+      "message": {
+        "role": "user",
+        "content": [
+          {
+            "tool_use_id": "toolu_fixture_7",
+            "type": "tool_result",
+            "content": "The file /private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/isolated/source.py has been updated successfully."
+          }
+        ]
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "1cd7409d-bd2c-4484-bdda-9a938eae1c92",
+      "timestamp": "2026-11-25T20:29:54.148Z",
+      "tool_use_result": {
+        "filePath": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/isolated/source.py",
+        "oldString": "value = 1",
+        "newString": "value = 2",
+        "originalFile": "value = 1\n",
+        "structuredPatch": [
+          {
+            "oldStart": 1,
+            "oldLines": 1,
+            "newStart": 1,
+            "newLines": 1,
+            "lines": [
+              "-value = 1",
+              "+value = 2"
+            ]
+          }
+        ],
+        "userModified": false,
+        "replaceAll": false
+      }
+    },
+    {
+      "type": "assistant",
+      "message": {
+        "id": "msg_fixture_9",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-sonnet-4-6",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_fixture_8",
+            "name": "Write",
+            "input": {
+              "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/isolated/created.txt",
+              "content": "native isolated fixture bytes\n"
+            }
+          }
+        ],
+        "stop_reason": null,
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 10,
+          "output_tokens": 0
+        },
+        "context_management": null
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "b6e2e7a9-2b16-40a1-92e9-4f004276d43b"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "3bb8a910-e452-4a43-b89f-d799e04875f3",
+      "hook_name": "PreToolUse:Write",
+      "hook_event": "PreToolUse",
+      "uuid": "ff9007f1-0c63-4740-8d7d-305057259af6",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "80dde7d1-6d6f-484d-b957-2cbf27aa798b",
+      "hook_name": "PreToolUse:Write",
+      "hook_event": "PreToolUse",
+      "uuid": "63e96f18-b1cc-4c01-8521-034590849d81",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "3bb8a910-e452-4a43-b89f-d799e04875f3",
+      "hook_name": "PreToolUse:Write",
+      "hook_event": "PreToolUse",
+      "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "f43a6c59-4758-4459-8184-da5d4c721cb9",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "80dde7d1-6d6f-484d-b957-2cbf27aa798b",
+      "hook_name": "PreToolUse:Write",
+      "hook_event": "PreToolUse",
+      "output": "{}\n",
+      "stdout": "{}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "98c75d98-791b-4034-a1da-dbfc91902546",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "user",
+      "message": {
+        "role": "user",
+        "content": [
+          {
+            "tool_use_id": "toolu_fixture_8",
+            "type": "tool_result",
+            "content": "File created successfully at: /private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/isolated/created.txt"
+          }
+        ]
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "5676ade9-58e1-44c3-bfec-4036661ecd01",
+      "timestamp": "2026-11-25T20:29:55.044Z",
+      "tool_use_result": {
+        "type": "create",
+        "filePath": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/isolated/created.txt",
+        "content": "native isolated fixture bytes\n",
+        "structuredPatch": [],
+        "originalFile": null
+      }
+    },
+    {
+      "type": "assistant",
+      "message": {
+        "id": "msg_fixture_10",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-sonnet-4-6",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_fixture_9",
+            "name": "Write",
+            "input": {
+              "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/isolated/unguarded.txt",
+              "content": "native isolated fixture bytes\n"
+            }
+          }
+        ],
+        "stop_reason": null,
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 10,
+          "output_tokens": 0
+        },
+        "context_management": null
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "55866c65-b92e-49cb-b10a-af43eddc5ef0"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "5dd09bc3-8f5f-4ece-b32e-91949e9ac4d6",
+      "hook_name": "PreToolUse:Write",
+      "hook_event": "PreToolUse",
+      "uuid": "e915f29c-d0c6-49b6-94a4-87aafb0e2994",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "79c52d37-bd31-4138-8554-36e51846ca94",
+      "hook_name": "PreToolUse:Write",
+      "hook_event": "PreToolUse",
+      "uuid": "e0714736-072f-4900-9a20-79d3d2c95c20",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "5dd09bc3-8f5f-4ece-b32e-91949e9ac4d6",
+      "hook_name": "PreToolUse:Write",
+      "hook_event": "PreToolUse",
+      "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "5ab8eec7-e83e-4863-a52a-56bad37dd68a",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "79c52d37-bd31-4138-8554-36e51846ca94",
+      "hook_name": "PreToolUse:Write",
+      "hook_event": "PreToolUse",
+      "output": "{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"deny\",\n    \"permissionDecisionReason\": \"Skill Tree Director: The destination is outside the active task Touch scope\"\n  }\n}\n",
+      "stdout": "{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"deny\",\n    \"permissionDecisionReason\": \"Skill Tree Director: The destination is outside the active task Touch scope\"\n  }\n}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "339c6343-bec0-4e75-bfd2-c5c0372ee254",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "user",
+      "message": {
+        "role": "user",
+        "content": [
+          {
+            "type": "tool_result",
+            "content": "Skill Tree Director: The destination is outside the active task Touch scope",
+            "is_error": true,
+            "tool_use_id": "toolu_fixture_9"
+          }
+        ]
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "5ae00212-31d6-4132-99a2-70ee4f640410",
+      "timestamp": "2026-11-25T20:29:55.560Z",
+      "tool_use_result": "Error: Skill Tree Director: The destination is outside the active task Touch scope"
+    },
+    {
+      "type": "assistant",
+      "message": {
+        "id": "msg_fixture_11",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-sonnet-4-6",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_fixture_10",
+            "name": "Write",
+            "input": {
+              "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/PRODUCT/guard-refusal-alias.txt",
+              "content": "native isolated fixture bytes\n"
+            }
+          }
+        ],
+        "stop_reason": null,
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 10,
+          "output_tokens": 0
+        },
+        "context_management": null
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "db3108a6-991e-4826-9981-08b61d39806a"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "88920fb6-6e29-4671-94d2-a2f0ada13f42",
+      "hook_name": "PreToolUse:Write",
+      "hook_event": "PreToolUse",
+      "uuid": "095771ea-a38d-4d2e-ab1e-54e5f84997ec",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "8765c207-db63-497a-bf36-32c3195a9116",
+      "hook_name": "PreToolUse:Write",
+      "hook_event": "PreToolUse",
+      "uuid": "ca447b5d-17be-4bd2-b302-4bff2c83ad0a",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "88920fb6-6e29-4671-94d2-a2f0ada13f42",
+      "hook_name": "PreToolUse:Write",
+      "hook_event": "PreToolUse",
+      "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "082b953f-36f5-48b7-9e1a-7a79c98bef33",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "8765c207-db63-497a-bf36-32c3195a9116",
+      "hook_name": "PreToolUse:Write",
+      "hook_event": "PreToolUse",
+      "output": "{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"deny\",\n    \"permissionDecisionReason\": \"Skill Tree Director: Preview project-route and begin source edits in the admitted isolated worktree\"\n  }\n}\n",
+      "stdout": "{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"deny\",\n    \"permissionDecisionReason\": \"Skill Tree Director: Preview project-route and begin source edits in the admitted isolated worktree\"\n  }\n}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "8ee92614-aa94-4e8c-a4b1-b3ae71afe3ec",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "user",
+      "message": {
+        "role": "user",
+        "content": [
+          {
+            "type": "tool_result",
+            "content": "Skill Tree Director: Preview project-route and begin source edits in the admitted isolated worktree",
+            "is_error": true,
+            "tool_use_id": "toolu_fixture_10"
+          }
+        ]
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "35b972b4-ddd1-4286-b0ae-a2c5cc669019",
+      "timestamp": "2026-11-25T20:29:55.930Z",
+      "tool_use_result": "Error: Skill Tree Director: Preview project-route and begin source edits in the admitted isolated worktree"
+    },
+    {
+      "type": "assistant",
+      "message": {
+        "id": "msg_fixture_12",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-sonnet-4-6",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_fixture_11",
+            "name": "Bash",
+            "input": {
+              "command": "git -C /private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/PRODUCT branch denied-native-alias",
+              "description": "Disposable fixture Git"
+            }
+          }
+        ],
+        "stop_reason": null,
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 10,
+          "output_tokens": 0
+        },
+        "context_management": null
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "65bdde91-7d29-4c5d-872a-f937340c404c"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "155cde74-6914-4165-803c-314e45ef7c44",
+      "hook_name": "PreToolUse:Bash",
+      "hook_event": "PreToolUse",
+      "uuid": "7d7efa1b-221d-42ab-ba88-342bcc7760c3",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "13a684e5-5bab-48e5-a408-4d18e884dc8c",
+      "hook_name": "PreToolUse:Bash",
+      "hook_event": "PreToolUse",
+      "uuid": "21b9aeb0-8829-4c0c-87b4-3932295d9cf1",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "155cde74-6914-4165-803c-314e45ef7c44",
+      "hook_name": "PreToolUse:Bash",
+      "hook_event": "PreToolUse",
+      "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "a2a45d51-c6b7-49dc-995b-d21ab7dcb412",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "13a684e5-5bab-48e5-a408-4d18e884dc8c",
+      "hook_name": "PreToolUse:Bash",
+      "hook_event": "PreToolUse",
+      "output": "{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"deny\",\n    \"permissionDecisionReason\": \"Skill Tree Director: Use the approved Core operation for Git mutations on a managed project\"\n  }\n}\n",
+      "stdout": "{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"deny\",\n    \"permissionDecisionReason\": \"Skill Tree Director: Use the approved Core operation for Git mutations on a managed project\"\n  }\n}\n",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "a74ae4e3-c6c8-4b97-9eed-b37b043a09ef",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d"
+    },
+    {
+      "type": "user",
+      "message": {
+        "role": "user",
+        "content": [
+          {
+            "type": "tool_result",
+            "content": "Skill Tree Director: Use the approved Core operation for Git mutations on a managed project",
+            "is_error": true,
+            "tool_use_id": "toolu_fixture_11"
+          }
+        ]
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "d5054006-e0ed-4189-a156-c1004060444f",
+      "timestamp": "2026-11-25T20:29:56.336Z",
+      "tool_use_result": "Error: Skill Tree Director: Use the approved Core operation for Git mutations on a managed project"
+    },
+    {
+      "type": "assistant",
+      "message": {
+        "id": "msg_fixture_13",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-sonnet-4-6",
+        "content": [
+          {
+            "type": "text",
+            "text": "Fixture completed."
+          }
+        ],
+        "stop_reason": null,
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 10,
+          "output_tokens": 0
+        },
+        "context_management": null
+      },
+      "parent_tool_use_id": null,
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "uuid": "5a5a8d34-485f-4c76-b873-63ee3cab9127"
+    },
+    {
+      "type": "result",
+      "subtype": "success",
+      "is_error": false,
+      "duration_ms": 5327,
+      "duration_api_ms": 78,
+      "num_turns": 13,
+      "result": "Fixture completed.",
+      "stop_reason": "end_turn",
+      "session_id": "2421d0b5-5620-46c8-81be-d9d9263f1b2d",
+      "total_cost_usd": 0.0021999999999999997,
+      "usage": {
+        "input_tokens": 130,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "output_tokens": 117,
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "",
+        "iterations": [],
+        "speed": "standard"
+      },
+      "modelUsage": {
+        "claude-haiku-4-5-20251001": {
+          "inputTokens": 10,
+          "outputTokens": 9,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 5.5e-05,
+          "contextWindow": 200000,
+          "maxOutputTokens": 32000
+        },
+        "claude-sonnet-4-6": {
+          "inputTokens": 130,
+          "outputTokens": 117,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.002145,
+          "contextWindow": 200000,
+          "maxOutputTokens": 32000
+        }
+      },
+      "permission_denials": [
+        {
+          "tool_name": "Edit",
+          "tool_use_id": "toolu_fixture_1",
+          "tool_input": {
+            "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/product/source.py",
+            "old_string": "value = 1",
+            "new_string": "value = 2",
+            "replace_all": false
+          }
+        },
+        {
+          "tool_name": "Write",
+          "tool_use_id": "toolu_fixture_2",
+          "tool_input": {
+            "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/product/guard-refusal.txt",
+            "content": "native isolated fixture bytes\n"
+          }
+        },
+        {
+          "tool_name": "Bash",
+          "tool_use_id": "toolu_fixture_3",
+          "tool_input": {
+            "command": "git branch denied-native-ref",
+            "description": "Disposable fixture Git"
+          }
+        },
+        {
+          "tool_name": "Bash",
+          "tool_use_id": "toolu_fixture_4",
+          "tool_input": {
+            "command": "git -C /private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/product switch -c denied-native-switch",
+            "description": "Disposable fixture Git"
+          }
+        },
+        {
+          "tool_name": "Write",
+          "tool_use_id": "toolu_fixture_9",
+          "tool_input": {
+            "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/isolated/unguarded.txt",
+            "content": "native isolated fixture bytes\n"
+          }
+        },
+        {
+          "tool_name": "Write",
+          "tool_use_id": "toolu_fixture_10",
+          "tool_input": {
+            "file_path": "/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/PRODUCT/guard-refusal-alias.txt",
+            "content": "native isolated fixture bytes\n"
+          }
+        },
+        {
+          "tool_name": "Bash",
+          "tool_use_id": "toolu_fixture_11",
+          "tool_input": {
+            "command": "git -C /private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/skill-tree-native-managed-ze1mb3yu/PRODUCT branch denied-native-alias",
+            "description": "Disposable fixture Git"
+          }
+        }
+      ],
+      "terminal_reason": "completed",
+      "fast_mode_state": "off",
+      "uuid": "6fc7a721-4bf8-49f0-b322-7aa919528c5f"
+    }
+  ],
+  "disposable_project_removed": true
+}

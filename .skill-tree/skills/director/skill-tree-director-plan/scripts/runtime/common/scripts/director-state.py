@@ -10,7 +10,10 @@ import json
 import os
 from pathlib import Path, PurePosixPath
 import re
+import shlex
 import shutil
+import signal
+import stat
 import subprocess
 import sys
 import unicodedata
@@ -1231,13 +1234,276 @@ def _run_helper(director, command, payload):
     return runner.run(director, _plan_helper(director), command, payload)
 
 
+# This is a local host guard for the qualified Claude Code tool interface.
+CLAUDE_GUARD_VERSION = '2.1.109 (Claude Code)'
+HOST_GIT_INSPECTION = {
+    'branch': {'--show-current', '--list', '-a', '--all', '-r', '--remotes', '--no-color', '-v', '-vv'},
+    'status': {'--short', '-s', '-b', '--branch', '--porcelain', '--porcelain=v1', '--porcelain=v2', '--no-renames'},
+    'rev-parse': {'HEAD', '--show-toplevel', '--git-common-dir', '--is-inside-work-tree', '--verify', '--short'},
+    'diff': {'--name-only', '--name-status', '--stat', '--check', '--cached', '--staged', '--no-ext-diff', 'HEAD'},
+    'log': {'--oneline', '--graph', '--decorate', '--no-decorate', '-1', 'HEAD'},
+    'show': {'--stat', '--name-only', '--name-status', '--oneline', '--no-patch', '-s', 'HEAD'},
+    'ls-files': {'--stage', '--modified', '--others', '--exclude-standard'},
+    'show-ref': {'--heads', '--tags', '--head'},
+}
+
+
+def _claude_guard_project(service, project_id):
+    _require(_token(project_id), 'Select the exact registered Director project ID')
+    registry, bindings, _ = DirectorRegistry(service)._load()
+    area = (registry or {}).get('areas', {}).get(project_id)
+    _require(isinstance(area, dict) and area.get('role') != 'source-maintenance' and area.get('scope') == '.',
+             'Register the selected Director product checkout before configuring the host guard')
+    binding = (bindings or {}).get('queues', {}).get(area['queue_id'])
+    _require(isinstance(binding, dict), 'Restore the registered project binding before retrying the host operation')
+    checkout = Path(binding['root'])
+    common = Path(binding['git_common_dir'])
+    return area, binding, checkout, common, _digest({'director_id':registry['director_id'], 'area':area, 'binding':binding})
+
+
+def _claude_guard_profile(service):
+    workspace = director_workspace(service)
+    _require(workspace is not None and _safe_path(workspace, service.relative_to(workspace).as_posix()) == service,
+             'Use the owned installed Director workspace for the Claude Code guard')
+    from types import SimpleNamespace
+    application = WF.owned_module('director_project_setup', Path(__file__).with_name('director-project-setup.py'))
+    application.D = SimpleNamespace(**globals())
+    descriptor, profile = application.descriptor(service)
+    _require('claude-code' in descriptor['providers'], 'Install the Claude Code host in this Director workspace first')
+    setups = [path for path, row in profile['destinations'].items()
+              if row['name'] == 'skill-tree-director-setup'
+              and 'claude-code' in row.get('providers', [row.get('provider')])]
+    _require(len(setups) == 1, 'The installed Claude Code Setup receipt must name one owned entry')
+    relative = setups[0] + '/scripts/director-entry.py'
+    entry = _safe_path(service, relative)
+    _require(entry.is_file() and WF.file_hash(entry) == profile['destinations'][setups[0]]['files'].get('scripts/director-entry.py'),
+             'Restore the owned Claude Code Director Setup entry before retrying')
+    return entry
+
+
+def _claude_guard_settings(service, project_id):
+    service = _root(str(service.absolute().resolve(strict=True)))
+    _require(hasattr(signal, 'SIGALRM') and hasattr(signal, 'setitimer'),
+             'The Claude Code write guard requires a supported POSIX signal timer')
+    entry = _claude_guard_profile(service)
+    area, binding, checkout, _, guard_binding = _claude_guard_project(service, project_id)
+    _require(_inspect_owner(checkout) == (area['queue_id'], area['repo_id'], binding),
+             'Restore the registered project checkout before configuring the host guard')
+    claude = shutil.which('claude')
+    _require(claude is not None, f'This guard requires qualified Claude Code {CLAUDE_GUARD_VERSION.split()[0]}')
+    result = subprocess.run([claude, '--version'], capture_output=True, text=True, timeout=10)
+    _require(result.returncode == 0 and result.stdout.strip() == CLAUDE_GUARD_VERSION,
+             f'This guard requires qualified Claude Code {CLAUDE_GUARD_VERSION.split()[0]}')
+    command = shlex.join([sys.executable, '-B', str(entry), 'claude-guard-pretool', str(service),
+                          '--project-id', project_id, '--guard-binding', guard_binding]) + ' || exit 2'
+    return {'host_version':CLAUDE_GUARD_VERSION, 'entry':str(entry), 'project_id':project_id,
+            'queue_id':area['queue_id'], 'settings':{'hooks':{'PreToolUse':[
+                {'matcher':'Write|Edit|Bash', 'hooks':[{'type':'command', 'command':command, 'timeout':25}]}
+            ]}}}
+
+
+def _claude_git_command(cwd, command):
+    """Recognize a direct Git command and resolve one literal working directory."""
+    _require(isinstance(command, str) and '\x00' not in command, 'Malformed Bash tool input')
+    lexer = shlex.shlex(command, posix=True, punctuation_chars=True)
+    lexer.whitespace_split = True
+    lexer.commenters = ''
+    executable = lexer.get_token()
+    if not executable or Path(executable).name != 'git':
+        return None
+    args = list(lexer)
+    _require(not any(char in command for char in '\r\n') and
+             not any(arg and all(char in '();<>|&' for char in arg) for arg in args),
+             'Use a literal standalone Git invocation or the authorized Core operation')
+    if args[:1] == ['-C']:
+        _require(len(args) >= 3 and args[1] and not any(char in args[1] for char in '$`*?[~'),
+                 'Use a literal Git -C working directory')
+        cwd = (cwd/args[1]).resolve(strict=True)
+        _require(cwd.is_dir(), 'Select an existing Git working directory')
+        args = args[2:]
+    if args in (['--version'], ['version']):
+        return cwd, True, False
+    _require(args and not args[0].startswith('-'), 'Unsupported direct Git repository selector or option')
+    operation, *options = args
+    inspection = HOST_GIT_INSPECTION.get(operation)
+    reads_only = inspection is not None and set(options) <= inspection
+    only_local_ref = operation == 'branch' and len(options) == 1 and re.fullmatch(r'[a-zA-Z0-9][a-zA-Z0-9._/-]*', options[0]) is not None
+    return cwd, reads_only, only_local_ref
+
+
+def _claude_guard_independent(service, checkout, nested):
+    relative = nested.relative_to(checkout).as_posix()
+    if (WS.local_git_text(checkout, 'ls-files', '--', relative)
+            or WS.local_git_text(checkout, 'ls-tree', 'HEAD', '--', relative)):
+        return False
+    registry, bindings, _ = DirectorRegistry(service)._load()
+    for area in registry['areas'].values():
+        owner = bindings['queues'].get(area['queue_id'], {})
+        if area['role'] != 'source-maintenance' and area['scope'] == '.' and owner.get('root') == str(nested):
+            return _inspect_owner(nested) == (area['queue_id'], area['repo_id'], owner)
+    return False
+
+
+def _claude_guard_contains(path, root):
+    if path.is_relative_to(root):
+        return True
+    identity = root.stat() if root.exists() else None
+    root_key = _setup_location_key(root)
+    for ancestor in (path, *path.parents):
+        try:
+            observed = ancestor.stat()
+        except FileNotFoundError:
+            if _setup_location_key(ancestor) == root_key:
+                return True
+        else:
+            if identity is not None and os.path.samestat(observed, identity):
+                return True
+    return False
+
+
+def _claude_guard_target(service, candidate, checkout, common, queue_id):
+    resolved = candidate.resolve()
+    locator_path = common/'skill-tree-runtime.json'
+    _require(locator_path.is_file() and not locator_path.is_symlink(),
+             'Restore the canonical project and worktree locator before retrying a mutation')
+    locator = json.loads(locator_path.read_bytes())
+    _require(isinstance(locator, dict) and locator.get('schema') == 1 and locator.get('canonical_root') == str(checkout)
+             and locator.get('queue_id') == queue_id and isinstance(locator.get('worktrees'), dict),
+             'The canonical project and worktree locator changed')
+    retained = [Path(value) for value in locator['worktrees'].values()]
+    _require(all(path.is_absolute() for path in retained), 'The retained worktree location is invalid')
+    probe = resolved
+    while not probe.is_dir() and probe != probe.parent:
+        probe = probe.parent
+    actual_git = WS.local_git(probe, 'rev-parse', '--show-toplevel', '--git-common-dir', accepted=(0, 128))
+    lines = actual_git.stdout.decode().splitlines() if actual_git.returncode == 0 else []
+    _require(actual_git.returncode != 0 or len(lines) == 2, 'Git checkout or common directory identity is ambiguous')
+    if lines and (probe/lines[1]).samefile(common):
+        return resolved, Path(lines[0]).resolve()
+    _require(not any(_claude_guard_contains(candidate, path) or _claude_guard_contains(resolved, path.resolve())
+                     for path in retained),
+             'Restore the retained worktree Git identity before retrying a mutation')
+    if lines and resolved == candidate:
+        independent = Path(lines[0]).resolve()
+        if (independent != checkout and independent.is_relative_to(checkout)
+                and _claude_guard_independent(service, checkout, independent)):
+            return None, None
+    if _claude_guard_contains(candidate, checkout) or _claude_guard_contains(resolved, checkout):
+        return resolved, checkout
+    return None, None
+
+
+def _claude_guard_task_path(checkout, linked, path, queue_id):
+    _require(path.is_relative_to(linked), 'Select a path inside the exact admitted worktree')
+    relative = WS.worker_path(path.relative_to(linked).as_posix())
+    _require(not relative.casefold().startswith(('.skill-tree/history/', '.skill-tree/artifacts/',
+                                     '.skill-tree/installation/', '.skill-tree/.director/'))
+             and relative.casefold() not in {'.skill-tree/documents/future.md', '.skill-tree/documents/future.json'},
+             'Use the owned Core command for workflow state and installation updates')
+    store = WF.Store(linked)
+    _require(store.root == checkout, 'The linked checkout no longer belongs to the registered queue')
+    text = store.text()
+    state_identity = WF.file_hash(store.state)
+    state = store.load(text)
+    registry = state.get('run_registry', {})
+    run = state.get('active_run')
+    _require(registry.get('queue_id') == queue_id and run and not WS.delivery_finished(run)
+             and run.get('workspace_state') == 'ready', 'The linked checkout requires a current Core admission')
+    WS.linked_registration(checkout, linked)
+    if run['workspace'].get('dispatch_owner_token'):
+        WS.directed_owner(checkout, linked, run, queue_id)
+    active = WF.execution_run(run)
+    task_id = active.get('current_task_id')
+    _require(active.get('phase') == 'implement' and not active.get('stop_reason') and task_id,
+             'The linked checkout requires an active implementing task')
+    progress = state['task_progress'].get(task_id, {})
+    _require(progress.get('stage') == 'implementing' and progress.get('run_id') == run['id']
+             and registry['claims'].get(task_id) == run['id'], 'Begin the exact claimed task before editing its worktree')
+    tasks = WF.parse(text)
+    task = WF.resolve(tasks, [task_id], 'Prioritized Next Changes')[0]
+    touch = [line[2:].strip().strip('`') for line in WF.section_body(task['body'], 'Touch').splitlines()
+             if line.startswith('- ')]
+    _require(any(relative == scope or relative.startswith(scope + '/') for scope in touch),
+             'The destination is outside the active task Touch scope')
+    WF.assert_scope(store, state, tasks, task_id)
+    _require(store.source_root == linked and WF.file_hash(store.state) == state_identity and store.text() == text,
+             'The task or worktree admission changed while evaluating the operation')
+
+
+def _claude_guard_pretool(service, project_id, guard_binding, event):
+    _require(isinstance(event, dict) and event.get('hook_event_name') == 'PreToolUse' and
+             isinstance(event.get('tool_input'), dict), 'Malformed Claude Code PreToolUse input')
+    tool = event.get('tool_name')
+    _require(isinstance(tool, str), 'Malformed Claude Code tool name')
+    if tool not in ('Write', 'Edit', 'Bash'):
+        return {}
+    if tool == 'Bash':
+        cwd = _root(event.get('cwd'))
+        git = _claude_git_command(cwd, event['tool_input'].get('command'))
+        if git is None or git[1]:
+            return {}
+        candidate = git[0]
+    else:
+        file = event['tool_input'].get('file_path')
+        _require(isinstance(file, str) and '\x00' not in file and Path(file).is_absolute(),
+                 'Use a literal absolute path for the native file operation')
+        candidate = Path(file)
+    entry = _claude_guard_profile(service)
+    _require(Path(__file__).resolve() == entry.parent/'runtime/common/scripts/director-state.py',
+             'The running host guard differs from the owned Claude Code Setup entry')
+    area, binding, checkout, common, current_binding = _claude_guard_project(service, project_id)
+    _require(guard_binding == current_binding, 'The registered project changed. Regenerate the Claude Code guard overlay')
+    path, git_root = _claude_guard_target(service, candidate, checkout, common, area['queue_id'])
+    if path is None:
+        _require(tool != 'Bash' or git[2], 'Use the approved Core operation for direct Git with ambiguous write effects')
+        return {}
+    _require(_inspect_owner(checkout) == (area['queue_id'], area['repo_id'], binding),
+             'Restore the registered canonical project identity before retrying')
+    _require(tool != 'Bash', 'Use the approved Core operation for Git mutations on a managed project')
+    _require(not git_root.samefile(checkout), 'Preview project-route and begin source edits in the admitted isolated worktree')
+    _require(path == candidate, 'Use the exact admitted worktree path without aliases or symlinks')
+    if path.exists():
+        info = path.lstat()
+        _require(stat.S_ISREG(info.st_mode) and info.st_nlink == 1,
+                 'Use an ordinary file without other filesystem links in the admitted worktree')
+    _claude_guard_task_path(checkout, git_root, path, area['queue_id'])
+    return {}
+
+
+def _claude_guard_timeout(_signum, _frame):
+    raise DirectorError('Managed host verification timed out before effects. Retry after checking the project binding')
+
+
+def _claude_guard_decision(service, project_id, guard_binding):
+    previous_handler = signal.signal(signal.SIGALRM, _claude_guard_timeout)
+    signal.setitimer(signal.ITIMER_REAL, 12)
+    try:
+        return _claude_guard_pretool(service, project_id, guard_binding, json.load(sys.stdin))
+    except (ValueError, OSError, TypeError, KeyError, RuntimeError, subprocess.TimeoutExpired) as error:
+        message = str(error) if isinstance(error, (DirectorError, WF.WorkflowError, WS.RunError)) else 'Restore the exact native tool input and managed project ownership'
+        return {'hookSpecificOutput':{'hookEventName':'PreToolUse','permissionDecision':'deny',
+                                     'permissionDecisionReason':'Skill Tree Director: ' + message}}
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        signal.signal(signal.SIGALRM, previous_handler)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=sorted({'project-menu', 'project-route', 'project-storage-prepare', 'project-storage-verify', 'project-init', 'project-preview', 'project-setup', 'setup-preview', 'setup-apply', 'setup-bootstrap', 'setup-status', 'rebind-preview', 'rebind', 'status', 'dispatch-intent'} | OBJECTIVE_COMMANDS | PLAN_COMMANDS | RUN_COMMANDS))
+    parser.add_argument('command', choices=sorted({'claude-guard-settings', 'claude-guard-pretool', 'project-menu', 'project-route', 'project-storage-prepare', 'project-storage-verify', 'project-init', 'project-preview', 'project-setup', 'setup-preview', 'setup-apply', 'setup-bootstrap', 'setup-status', 'rebind-preview', 'rebind', 'status', 'dispatch-intent'} | OBJECTIVE_COMMANDS | PLAN_COMMANDS | RUN_COMMANDS))
     parser.add_argument('root', type=Path)
     parser.add_argument('--input', type=Path)
+    parser.add_argument('--project-id')
+    parser.add_argument('--guard-binding')
     args = parser.parse_args(argv)
+    if args.command == 'claude-guard-pretool':
+        print(WF.dump(_claude_guard_decision(args.root, args.project_id, args.guard_binding)), end='')
+        return 0
     try:
+        if args.command == 'claude-guard-settings':
+            print(WF.dump(_claude_guard_settings(args.root, args.project_id)), end='')
+            return 0
+        _require(args.project_id is None and args.guard_binding is None, 'Use project-id and guard-binding only for the Claude Code guard')
         payload = json.loads(args.input.read_text()) if args.input else None
         if args.command.startswith('project-'):
             from types import SimpleNamespace

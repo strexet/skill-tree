@@ -26,6 +26,22 @@ Use `setup-apply` with the reviewed `expected_preview_sha256` and identical area
 
 Use `rebind-preview` with `director_id`, `area_id` and the exact available canonical checkout. Use `rebind` with the reviewed digest after verifying the same queue and repository identity. A moved checkout can require Core locator recovery first. Rebind updates the local queue binding for all registered areas on the same owner and leaves the portable declaration unchanged.
 
+## Opt in to the Claude Code write guard
+
+The guard covers one registered product checkout per session on the qualified Claude Code CLI 2.1.109. Open the Director workspace, verify the normal project route and use the owned Claude Code Setup entry to emit a separate settings file. Pass the exact project ID returned by `project-menu`. The guard leaves existing owner hooks and product bridge settings in place. Generate a new overlay after changing the project registration or the owned Setup location.
+
+```sh
+skill_tree_guard_dir=$(mktemp -d "${TMPDIR:-/tmp}/skill-tree-claude.XXXXXX") &&
+python3 -B .skill-tree/.director/.claude/skills/skill-tree-director-setup/scripts/director-entry.py \
+  claude-guard-settings .skill-tree/.director --project-id my-project > "$skill_tree_guard_dir/response.json" &&
+jq -e .settings "$skill_tree_guard_dir/response.json" > "$skill_tree_guard_dir/settings.json" &&
+claude --settings "$skill_tree_guard_dir/settings.json"
+```
+
+Apply the settings only to the intended session and project. Claude Code invokes the installed entry during `PreToolUse`. Keep custom hooks that rewrite the input of a guarded tool out of the qualified session. Read tools follow normal host permissions. The hook denies native `Write` and `Edit` to the registered canonical checkout. To edit in an isolated checkout, first begin the task through Core. The checkout, branch, queue claim and current task Touch scope have to match. The hook also rejects direct Git mutations through `Bash` against the managed canonical checkout and linked worktrees of the same repository. The hook accepts plain read forms such as `git status --short` and `git branch --show-current`. Git target selection supports a single literal `git -C <directory>`.
+
+Native qualification covers the listed Claude Code tools and direct Git commands on macOS. Shell wrappers, subprocesses, arbitrary Bash scripts, other hosts, MCP tools and hooks that transform the requested path are outside the tested boundary. Use the existing Core routes to create a worktree, add a task, synchronize verified delivery or carry out authorized maintenance. Core checks the scope and authorization of each operation. [Claude Code hooks reference](https://code.claude.com/docs/en/hooks)
+
 ## Inspect current status
 
 Use `status` with a Director root and an optional JSON request containing exact assignments to inspect. Each entry identifies an assignment and registered area. Entries can supply exact task and run IDs, proposed workspace kind, area-relative write paths and stable exclusive resource keys. An absent local binding remains visible as `unbound`. The status report distinguishes unavailable roots, mismatched queue or repository identity, scoped dirt, overlapping writes and conflicting runtime claims. A child run is visible through the exact registered queue and locator.
