@@ -1306,6 +1306,7 @@ def verified_implementation_review(store, review_id, identity, scope):
             or review['execution_snapshot']!=orchestration_execution_snapshot(store)
             or not review['checks']['passed'] or review['review']['findings']):
         raise WorkflowError('A current clean implementation review must cover the exact scoped Git identity')
+    guard_reused_review_checks(store,review)
     return review
 
 
@@ -2195,7 +2196,12 @@ def controller_review_identity(store):
     if not run or not run.get('reviewed_local_delivery') or run['delivery']['implementation']=='completed':
         raise WorkflowError('A controller with unfinished reviewed local delivery is required')
     _implementation_finish_checks(store,state,run,store.text())
-    return reviewed_controller_candidate(store,run)
+    candidate=reviewed_controller_candidate(store,run)
+    try:
+        candidate['check_evidence']=review_check_evidence(store,candidate['identity'],candidate['review_scope'],state)
+    except (WorkflowError,workspaces.RunError) as error:
+        candidate.update(check_evidence=[],check_evidence_unavailable=str(error))
+    return candidate
 
 
 def freeze_reviewed_controller(store, payload):
@@ -2588,6 +2594,7 @@ def check_specs(task):
         for rel in check['sources']:
             if not isinstance(rel,str) or Path(rel).is_absolute() or '..' in Path(rel).parts or '\\' in rel:raise WorkflowError('Check source requires a repository-relative path')
         if not isinstance(check.get('parameters'),dict) or not isinstance(check.get('assertion'),str) or not check['assertion'].strip():raise WorkflowError('Check requires parameters and a concrete assertion')
+        if 'fresh_review' in check and type(check['fresh_review']) is not bool:raise WorkflowError('Check fresh_review requires an explicit Boolean')
         if check.get('timing') not in {'immediate','group-end','before-dependent-work'}:raise WorkflowError('Check requires immediate or explicit boundary timing')
         if check['timing']!='immediate' and task.get('boundary_validation','not-required')=='not-required':raise WorkflowError('Boundary check requires task boundary classification')
     if covered!=set(criteria):raise WorkflowError('Every acceptance criterion requires a mapped check')
@@ -3392,6 +3399,134 @@ def validate_task_checks(store,tid,state=None,check_id=None):
         records.append({'check':check,'result':record,**({'red':entry['checks'][check['id']]['red']} if 'red' in entry['checks'][check['id']] else {})})
     return records
 
+def review_check_evidence(store,identity,scope,state=None):
+    """Resolve current Core check receipts for one sealed review identity."""
+    state=store.load() if state is None else state
+    kind=scope.get('kind');ids=scope.get('task_ids',[])
+    if store.neutral and state.get('run_registry'):
+        run_id=scope.get('run_id') if kind=='controller' else None
+        if kind=='task' and len(ids)==1:
+            run_id=state['task_progress'].get(ids[0],{}).get('run_id')
+        if run_id:
+            scoped=Store(store.source_root,run_id)
+            state=scoped.load()
+            if scoped.source_root!=store.source_root:
+                raise WorkflowError('Core check reuse must use the exact registered run worktree')
+            store=scoped
+    tasks=parse(store.text())
+    if kind=='task' and len(ids)==1:
+        tid=ids[0];task=resolve(tasks,[tid],'Prioritized Next Changes')[0]
+        assert_scope(store,state,tasks,tid)
+        entry=state['task_progress'].get(tid,{})
+        baseline=entry.get('task_git_baseline');candidate=entry.get('task_git_candidate')
+        recovery_head=(entry.get('task_git_attempt') or {}).get('commit')
+        if (not baseline or not candidate or entry.get('stage')!='awaiting-validation'
+                or workspaces.task_review_identity(baseline,candidate,task['body'])!=identity
+                or workspaces.task_commit_candidate(store.source_root,baseline,candidate['paths'],
+                                                       recovery_head=recovery_head)!=candidate):
+            raise WorkflowError('Check reuse requires the current sealed task candidate')
+        contracts=[(task,{})]
+    elif kind=='controller':
+        run=state['active_run']
+        if not run or scope.get('run_id')!=run['id'] or ids!=run['admitted_task_ids']:
+            raise WorkflowError('Check reuse requires the exact admitted controller scope')
+        enforce_limits(run);assert_admission(store,state)
+        current=reviewed_controller_candidate(store,run)
+        if current['identity']!=identity or workspaces.reviewed_launch_target(store,run)[1]!=identity['base_oid']:
+            raise WorkflowError('Check reuse requires the current controller source and target base')
+        outcomes={item['task_id']:item for item in store.outcomes() if item['disposition']=='completed'}
+        contracts=[]
+        for tid in ids:
+            outcome=outcomes.get(tid)
+            if not outcome:continue
+            task=validation_task(store,tid)
+            commit=outcome.get('task_git_commit',{}).get('commit')
+            if (outcome.get('run_id')!=run['id'] or run.get('completion_refs',{}).get(tid)!=outcome['id']
+                    or not commit or workspaces.local_git(store.source_root,'merge-base','--is-ancestor',
+                                                           commit,identity['head'],accepted=(0,1)).returncode):
+                contracts.append((task,{}))
+                continue
+            results=run.get('revalidated_checks',{}).get(tid,outcome.get('check_results',[]))
+            contracts.append((task,{row['check']['id']:row['result'] for row in results}))
+    else:
+        raise WorkflowError('Only exact task and controller reviews can reuse Core check evidence')
+    entries=[];counts={}
+    for task,completed in contracts:
+        tid=task['id'];entry=state['task_progress'].get(tid,{})
+        for check in check_specs(task):
+            cid=check['id'];counts[cid]=counts.get(cid,0)+1
+            evidence={'task_id':tid,'check_id':cid,'status':'rerun-required'}
+            slot=entry.get('checks',{}).get(cid,{})
+            result=slot.get('result') if kind=='task' else completed.get(cid)
+            try:
+                if check.get('fresh_review'):raise WorkflowError('Check policy requires fresh review execution')
+                if entry.get('revalidation') or pending_check_attempt(slot):
+                    raise WorkflowError('A current check attempt or revalidation is pending')
+                if (not result or result.get('result')!='pass' or result.get('classification')!='executed-control'
+                        or result.get('reused_from') or not result.get('evidence') or not valid_id(result.get('attempt_id'),'C')):
+                    raise WorkflowError('No directly executed passing Core check receipt')
+                if kind=='task' and slot.get('receipts',{}).get(result['attempt_id'])!=result:
+                    raise WorkflowError('The passing receipt is missing from its original check attempt')
+                sessions=entry.get('execution_sessions',result.get('execution_sessions',{}))
+                context={**state,'task_progress':{**state['task_progress'],tid:{**entry,
+                           'execution_sessions':deepcopy(sessions)}}}
+                snapshot=check_snapshot(store,task,check,context)
+                if (any(result.get(key)!=snapshot[key] for key in ('key','definition','sources','environment_identity'))
+                        or result.get('actual_lane')!=snapshot['recipe']['lane']):
+                    raise WorkflowError('Check source, assertion, recipe or environment changed')
+                for ref in result['evidence']:
+                    if not ref.get('available') or not ref.get('sha256'):
+                        raise WorkflowError('Check artifact has no verified identity')
+                    evidence_pointer(store,ref,required=True)
+                evidence.update(status='reusable',attempt_id=result['attempt_id'],key=result['key'],
+                                receipt_sha256=digest(dump(result).encode()),evidence=deepcopy(result['evidence']))
+            except (WorkflowError,OSError,KeyError) as error:
+                evidence['reason']=str(error)
+            entries.append(evidence)
+    for row in entries:
+        cid=row['check_id']
+        row['id']=cid if counts[cid]==1 else row['task_id']+'/'+cid
+    return entries
+
+def orchestration_check_evidence(store,frame):
+    if frame['phase'] not in {'checks','review','re-review','resolution','ready'} or not frame.get('identity'):
+        raise WorkflowError('Check reuse requires a sealed review candidate')
+    required=frame['plan']['required_checks'];fresh=frame['context'].get('fresh_check_ids',[])
+    if not isinstance(fresh,list) or any(not isinstance(item,str) or item not in required for item in fresh):
+        raise WorkflowError('Fresh check policy requires exact review check IDs')
+    rows=review_check_evidence(store,frame['identity'],frame['context'])
+    by_id={row['id']:row for row in rows}
+    offers=[]
+    for check_id in required:
+        row=by_id.get(check_id,{'id':check_id,'status':'rerun-required','reason':'No unambiguous current Core check'})
+        if check_id in fresh:
+            row={'id':check_id,'status':'rerun-required','reason':'Review policy requires fresh execution'}
+        offers.append(row)
+    return {'identity':frame['identity'],'checks':offers}
+
+def incorporate_review_checks(store,frame,requests):
+    if not requests:return []
+    offers={row['id']:row for row in orchestration_check_evidence(store,frame)['checks']}
+    verified=[]
+    fields=('id','task_id','check_id','attempt_id')
+    for request in requests:
+        if not isinstance(request,dict) or set(request)!=set(fields) or any(not isinstance(request[key],str) for key in fields):
+            raise WorkflowError('Check reuse requires exact review, task, check and attempt identities')
+        row=offers.get(request['id'],{})
+        if row.get('status')!='reusable' or any(request[key]!=row.get(key) for key in fields):
+            raise WorkflowError('Current Core check is ineligible for reuse: '+request['id']+'; '+row.get('reason','receipt identity changed'))
+        proof={key:row[key] for key in ('task_id','check_id','attempt_id','key','receipt_sha256')}
+        verified.append({'id':row['id'],'status':'passed','reference':'core-check:'+row['attempt_id'],'core_check':proof})
+    return verified
+
+def guard_reused_review_checks(store,frame):
+    rows=[row for row in (frame.get('checks') or {}).get('results',[])
+          if 'core_check' in row or row.get('reference','').startswith('core-check:')]
+    requests=[{'id':row['id'],**{key:row.get('core_check',{}).get(key)
+               for key in ('task_id','check_id','attempt_id')}} for row in rows]
+    if rows and incorporate_review_checks(store,frame,requests)!=rows:
+        raise WorkflowError('The incorporated Core review check receipts changed')
+
 def resume_task(store,payload):
     if not isinstance(payload.get('resolution'),str) or not payload['resolution'].strip():raise WorkflowError('Explicit resumption requires the resolved condition and evidence')
     store.load();admitted=admit_profile(store)
@@ -3476,6 +3611,84 @@ def run_event_recorded_at(event):
     if recorded.utcoffset()!=timedelta(0):
         raise WorkflowError('Run event recording time requires a valid UTC timestamp')
     return recorded.isoformat()
+
+
+def timeline_interval(started_at,finished_at):
+    def timestamp(value):
+        try:return run_event_recorded_at({'recorded_at':value})
+        except WorkflowError:return None
+    started_at=timestamp(started_at);finished_at=timestamp(finished_at)
+    seconds=None
+    if started_at and finished_at:
+        elapsed=(datetime.fromisoformat(finished_at)-datetime.fromisoformat(started_at)).total_seconds()
+        if elapsed>=0:seconds=elapsed
+    return {'started_at':started_at,'finished_at':finished_at,'seconds':seconds}
+
+
+def run_timing_timeline(store,run_ids):
+    state=_hook_source_store(store,store.source_root).load()
+    registry=state.get('run_registry',{});runs=dict(registry.get('runs',{}))
+    if state['active_run']:runs[state['active_run']['id']]=state['active_run']
+    applied=set(registry.get('applied_events',[]));outcomes=store.outcomes()
+    result=[]
+    for rid in run_ids:
+        run=runs.get(rid);relative=_delivery_receipt_path({'id':rid})
+        if not run and store.owned(relative).is_file():
+            archive=store.owned(relative)
+            if archive.is_symlink():raise WorkflowError('Run timing requires owned archive metadata')
+            run=json.loads(archive.read_text());validate_run(run)
+        if not run or run['id']!=rid:raise WorkflowError('Unknown exact run ID: '+rid)
+        directory=store.owned('.skill-tree/history/run-events/'+rid.lower())
+        if any(path.is_symlink() for path in (directory,directory.parent,directory.parent.parent)):
+            raise WorkflowError('Run timing requires owned event metadata')
+        last_sequence=registry.get('event_sequences',{}).get(rid,0)
+        events=[]
+        for path in directory.glob('e-*.json'):
+            eid='E-'+path.stem[2:]
+            if eid not in applied:continue
+            if path.is_symlink():raise WorkflowError('Run timing requires owned event metadata')
+            event=json.loads(path.read_text());sequence=event.get('sequence')
+            if (event.get('id')!=eid or event.get('queue_id')!=registry.get('queue_id') or event.get('run_id')!=rid
+                    or type(sequence) is not int or not 1<=sequence<=last_sequence):
+                raise WorkflowError('Run timing event differs from its applied identity')
+            events.append(event)
+        attempts={};merged_event=None
+        def slot(tid,cid,attempt_id):
+            return attempts.setdefault((tid,cid,attempt_id),{})
+        for event in sorted(events,key=lambda item:item['sequence']):
+            before=(event.get('checkpoint_before') or {}).get('delivery',{})
+            after=(event.get('checkpoint_after') or {}).get('delivery',{})
+            if merged_event is None and before.get('status')!='merged' and after.get('status')=='merged':
+                merged_event=event
+            for change in event.get('progress_changes',[]):
+                tid=change['task_id']
+                for cid,check in (change.get('after') or {}).get('checks',{}).items():
+                    attempt=check.get('attempt') or {}
+                    if valid_id(attempt.get('attempt_id'),'C'):
+                        slot(tid,cid,attempt['attempt_id'])['prepared_at']=attempt.get('prepared_at')
+                    for aid,record in check.get('receipts',{}).items():
+                        if valid_id(aid,'C'):slot(tid,cid,aid)['receipt']=record
+        for outcome in outcomes:
+            tid=outcome['task_id']
+            if outcome.get('run_id')!=rid or run.get('completion_refs',{}).get(tid)!=outcome['id']:continue
+            for row in outcome.get('check_results',[]):
+                record=row['result'];aid=record.get('attempt_id')
+                if valid_id(aid,'C') and not record.get('reused_from'):
+                    slot(tid,row['check']['id'],aid).setdefault('receipt',record)
+        check_intervals=[]
+        for (tid,cid,aid),value in sorted(attempts.items()):
+            receipt=value.get('receipt',{})
+            check_intervals.append({'task_id':tid,'check_id':cid,'attempt_id':aid,
+                'status':receipt.get('result',receipt.get('status','pending')),
+                'classification':receipt.get('classification'),'observed_timing':receipt.get('timing',{}),
+                **timeline_interval(value.get('prepared_at'),receipt.get('recorded_at'))})
+        delivery=run.get('delivery',{});review=delivery.get('reviewed_source') or {}
+        result.append({'run_id':rid,'check_intervals':check_intervals,'delivery_interval':{
+            'status':delivery.get('status'),'review_id':review.get('review_id'),
+            'verified_delivery_event_id':merged_event['id'] if merged_event else None,
+            **timeline_interval(run.get('finished_at') if review else None,
+                                (merged_event or {}).get('recorded_at'))}})
+    return result
 
 
 def replay_events(store,payload):
@@ -4277,7 +4490,7 @@ def _hook_admission(store,scope=None,chain_ids=None,*,register=True,navigation_f
 CLARIFICATION_STATES={'researching','awaiting-answers','revising','awaiting-confirmation','complete','blocked','cancelled'}
 CLARIFICATION_FIELDS={'title','goal','scope','exclusions','dependencies','acceptance','validation','required_plugin_policy','content'}
 DECISION_COMMANDS={'decision-start','decision-read','decision-prepare','decision-record','decision-reconcile','decision-switch','decision-accept','decision-resume'}
-ORCHESTRATION_COMMANDS={'orchestration-'+command for command in ['start','read','next','question','prepare-actor','record-actor','reconcile-actor','switch-mode','accept-decision','research','plan','accept-plan','implement','checks','review','resolve','fix','resume','observe-failure']}
+ORCHESTRATION_COMMANDS={'orchestration-'+command for command in ['start','read','next','timeline','check-evidence','question','prepare-actor','record-actor','reconcile-actor','switch-mode','accept-decision','research','plan','accept-plan','implement','checks','review','resolve','fix','resume','observe-failure']}
 
 def orchestration_execution_snapshot(store):
     scripts=Path(__file__).parent;references=scripts.parent/'references'
@@ -4290,6 +4503,19 @@ def orchestration_execution_snapshot(store):
 def orchestration_action(store,command,payload):
     helper=owned_module('skill_tree_decision_orchestration',Path(__file__).with_name('decision-orchestration.py'))
     try:
+        if command=='orchestration-timeline':
+            kinds={'orchestration_ids':'DO','run_ids':'WR'}
+            if not payload or set(payload)-kinds.keys():raise WorkflowError('Timeline requires exact orchestration or run IDs')
+            for key,ids in payload.items():
+                if (not isinstance(ids,list) or not ids or any(not valid_id(item,kinds[key]) for item in ids)
+                        or len(set(ids))!=len(ids)):
+                    raise WorkflowError('Timeline requires distinct exact '+key.replace('_',' '))
+            if 'orchestration_ids' in payload:
+                result=helper.timing_timeline(store,payload['orchestration_ids'])
+            else:
+                result={'orchestrations':[],'actor_overlaps':[]}
+            if 'run_ids' in payload:result['runs']=run_timing_timeline(store,payload['run_ids'])
+            return result
         if command=='orchestration-read':return helper.read(store,payload.get('orchestration_id'))
         frame=None if command=='orchestration-start' else helper.read(store,payload.get('orchestration_id'))
         current_snapshot=orchestration_execution_snapshot(store)
@@ -4328,8 +4554,21 @@ def orchestration_action(store,command,payload):
                 if command=='orchestration-switch-mode' and payload.get('mode')!=mode:raise WorkflowError('Change the parent clarification mode through the guarded session')
         if command=='orchestration-next':
             scope_guard();return helper.next_action(store,payload['orchestration_id'])
+        if command=='orchestration-check-evidence':
+            if set(payload)!={'orchestration_id'}:raise WorkflowError('Check evidence requires one exact orchestration ID')
+            scope_guard();return orchestration_check_evidence(store,frame)
         if command=='orchestration-switch-mode':clarification_evidence(payload.get('evidence'))
+        reuse_requests=[];ordinary_results=[]
+        if command=='orchestration-checks':
+            reuse_requests=payload.pop('reused_checks',[])
+            ordinary_results=payload.get('results',[])
+            if not isinstance(reuse_requests,list) or not isinstance(ordinary_results,list):
+                raise WorkflowError('Review checks require lists of executed results and exact reuse requests')
+            if any(isinstance(row,dict) and ('core_check' in row or str(row.get('reference','')).startswith('core-check:'))
+                   for row in ordinary_results):
+                raise WorkflowError('Core check evidence must be incorporated from a verified receipt')
         class BoundStore:
+            verified_reuse=None
             def __getattr__(self,key):return getattr(store,key)
             def guard(self):
                 if store.future.exists():
@@ -4338,6 +4577,14 @@ def orchestration_action(store,command,payload):
                 elif payload.get('expected_source_hash') is not None:raise WorkflowError('Orchestration queue context changed; reread before mutation')
                 if not cleanup and orchestration_execution_snapshot(store)!=current_snapshot:raise WorkflowError('Core execution inputs changed during the metadata operation')
                 scope_guard()
+                if reuse_requests:
+                    current=incorporate_review_checks(store,frame,reuse_requests)
+                    if self.verified_reuse is None:
+                        self.verified_reuse=current
+                        payload['results']=ordinary_results+current
+                    elif self.verified_reuse!=current:
+                        raise WorkflowError('Core check evidence changed during review incorporation')
+                if command=='orchestration-review':guard_reused_review_checks(store,frame)
             @contextmanager
             def lock(self):
                 with store.lock():self.guard();yield
