@@ -25,17 +25,113 @@ class RunWorkspaceTests(unittest.TestCase):
     def call(self,root,*args):
         result=subprocess.run(['git','-C',str(root),*map(str,args)],capture_output=True,text=True,timeout=20)
         self.assertEqual(result.returncode,0,result.stderr);return result.stdout.strip()
-    def task(self,title='Task',deps=(),topic=None,priority=100):
+    def task(self,title='Task',deps=(),topic=None,priority=100,touch='source.py'):
         store=wf.Store(self.root,allow_unselected=True)
         payload={'title':title,'description':'Preserve scoped source behavior.','expected_behavior':'Preserve scoped source behavior.','priority':priority}
         if topic is not None:
             payload.update(topic=topic,intake_batch_id=wf.identity('IB'),expected_source_hash=wf.file_hash(store.future))
         p=wf.intake(store,payload)
-        body='Goal:\n- Preserve scoped source behavior.\n\nTouch:\n- source.py\n\nValidation:\n```json\n'+json.dumps({'checks':[{'id':'behavior','recipe_id':'static-inspection','criteria':['Preserve scoped source behavior.'],'sources':['source.py'],'parameters':{},'assertion':'Preserve scoped source behavior.','timing':'immediate'}]})+'\n```\n\nAcceptance:\n- Preserve scoped source behavior.\n'
+        body='Goal:\n- Preserve scoped source behavior.\n\nTouch:\n- '+touch+'\n\nValidation:\n```json\n'+json.dumps({'checks':[{'id':'behavior','recipe_id':'static-inspection','criteria':['Preserve scoped source behavior.'],'sources':[touch],'parameters':{},'assertion':'Preserve scoped source behavior.','timing':'immediate'}]})+'\n```\n\nAcceptance:\n- Preserve scoped source behavior.\n'
         return wf.process(store,{'selectors':[p['id']],'dispositions':{p['id']:{'status':'promoted','reason':'The fixture establishes the required source boundary.'}},'tasks':[{'title':title,'body':body,'depends_on':list(deps),'parent_pending_ids':[p['id']]}]})['created_ids'][0]
     def start(self,tid,**options):
         return wf.start(wf.Store(self.root,allow_unselected=True),'next',tid,workspace=options)
     def location(self,run):return Path(ws.runtime(self.root)['worktrees'][run['id']])
+    def test_two_worker_handoffs_preserve_scope_evidence_and_controller_state(self):
+        (self.root/'second.py').write_text('value = 1\n')
+        (self.root/'shared.txt').write_text('shared input\n')
+        self.call(self.root,'add','second.py','shared.txt')
+        self.call(self.root,'commit','-m','Two worker sources')
+        self.call(self.root,'push','origin','HEAD:develop')
+        first=self.task('First worker source')
+        second=self.task('Second worker source',touch='second.py')
+        run=wf.start(wf.Store(self.root,allow_unselected=True),'all',workspace={'snapshot_ids':[first,second]})
+        coordinator=self.location(run)
+        store=lambda root=coordinator:wf.Store(root,run['id'])
+        base=self.call(coordinator,'rev-parse','HEAD')
+        left=self.base/'worker-left'
+        right=self.base/'worker-right'
+        for path in (left,right):
+            self.call(coordinator,'worktree','add','--detach',path,base)
+        queue_before=self.store.future.read_bytes()
+        state_before=self.store.state.read_bytes()
+
+        def assignment(slot, generation, path, task, source):
+            return {'action':'assign','slot':slot,'generation':generation,'worker_id':'worker-'+str(slot),
+                    'task_id':task,'worktree':str(path),'base':base,'paths':[source],'shared_inputs':['shared.txt']}
+        assign_left=assignment(1,1,left,first,'source.py')
+        assign_right=assignment(2,1,right,second,'second.py')
+        with patch.object(wf.Store,'recover',side_effect=AssertionError('Wrong caller reached the writer lock')):
+            with self.assertRaisesRegex(wf.WorkflowError,'coordinator worktree'):
+                wf.worker_handoff(store(left),assign_left)
+        with self.assertRaisesRegex(wf.WorkflowError,'source base'):
+            wf.worker_handoff(store(),{**assign_left,'base':'0'*40})
+        left_receipt=wf.worker_handoff(store(),assign_left)
+        self.assertEqual(wf.worker_handoff(store(),assign_left),left_receipt)
+        with self.assertRaisesRegex(wf.WorkflowError,'overlaps another write scope'):
+            wf.worker_handoff(store(),assignment(2,1,right,first,'source.py'))
+        wf.worker_handoff(store(),assign_right)
+
+        def candidate(slot, path, source):
+            (path/source).write_text('value = 2\n')
+            self.call(path,'add',source)
+            self.call(path,'commit','-m','Scoped worker candidate')
+            artifact=path/'check.txt'
+            artifact.write_text('Verified fixture behavior.\n')
+            return {'action':'record','slot':slot,'generation':1,'worker_id':'worker-'+str(slot),
+                    'head':self.call(path,'rev-parse','HEAD'),'checks':[
+                    {'id':'behavior','result':'pass','path':'check.txt','sha256':wf.file_hash(artifact)}]}
+
+        left_result=candidate(1,left,'source.py')
+        right_result=candidate(2,right,'second.py')
+        self.store.future.write_text(queue_before.decode().replace('Touch:\n- second.py','Touch:\n- other.py'))
+        with self.assertRaisesRegex(wf.WorkflowError,'assignment task contract changed'):
+            wf.worker_handoff(store(),right_result)
+        self.store.future.write_bytes(queue_before)
+        self.assertEqual(wf.worker_handoff(store(),left_result)['candidate']['paths'],['source.py'])
+        accepted=wf.worker_handoff(store(),{'action':'status'})
+        with self.assertRaisesRegex(ws.RunError,'checked-out commit'):
+            wf.worker_handoff(store(),{**right_result,'head':base})
+        with self.assertRaisesRegex(wf.WorkflowError,'artifact is missing, aliased or changed'):
+            wf.worker_handoff(store(),{**right_result,'checks':[{
+                **right_result['checks'][0],'sha256':'0'*64}]})
+        (coordinator/'shared.txt').write_text('changed input\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'shared validation inputs drifted'):
+            wf.worker_handoff(store(),right_result)
+        self.call(coordinator,'restore','shared.txt')
+        (right/'source.py').write_text('escaped scope\n')
+        self.call(right,'add','source.py')
+        self.call(right,'commit','-m','Outside worker scope')
+        with self.assertRaisesRegex(ws.RunError,'outside the assigned scope'):
+            wf.worker_handoff(store(),{**right_result,'head':self.call(right,'rev-parse','HEAD')})
+        self.call(right,'checkout','--detach',right_result['head'])
+        self.assertEqual(wf.worker_handoff(store(),{'action':'status'}),accepted)
+        result=wf.worker_handoff(store(),right_result)
+        self.assertEqual(wf.worker_handoff(store(),right_result),result)
+        with self.assertRaisesRegex(wf.WorkflowError,'retry differs'):
+            wf.worker_handoff(store(),{**right_result,'checks':[{
+                **right_result['checks'][0],'result':'fail'}]})
+        reread=wf.worker_handoff(store(self.root),{'action':'status'})
+        self.assertEqual(reread['slots']['1'][0]['result']['candidate']['head'],left_result['head'])
+        self.assertEqual(reread['slots']['2'][0]['result']['checks'],right_result['checks'])
+
+        replacement=self.base/'worker-replacement'
+        self.call(coordinator,'worktree','add','--detach',replacement,base)
+        wf.worker_handoff(store(),assignment(2,2,replacement,second,'second.py'))
+        with self.assertRaisesRegex(wf.WorkflowError,'current assignment generation'):
+            wf.worker_handoff(store(),right_result)
+        after=wf.worker_handoff(store(),{'action':'status'})
+        self.assertEqual(after['slots']['2'][0]['result'],result)
+        self.assertEqual(after['slots']['2'][1]['generation'],2)
+        self.assertEqual(self.store.future.read_bytes(),queue_before)
+        self.assertEqual(self.store.state.read_bytes(),state_before)
+        self.assertFalse(self.store.owned(wf.OUTCOME_LEDGER).exists())
+        self.assertEqual(self.call(coordinator,'rev-parse','HEAD'),base)
+
+    def test_worker_checkout_refuses_another_registered_controller(self):
+        first=self.start(self.task('First controller'))
+        second=self.start(self.task('Second controller'))
+        with self.assertRaisesRegex(ws.RunError,'registered controller checkout'):
+            ws.worker_checkout(self.location(first),str(self.location(second)))
     def test_default_workspace_uses_remote_develop_and_stable_run_branch(self):
         tid=self.task();run=self.start(tid);path=self.location(run)
         self.assertEqual(run['workspace']['base_branch'],'develop');self.assertTrue(run['workspace']['branch'].startswith('codex/wr-'));self.assertNotEqual(path,self.root)

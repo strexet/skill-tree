@@ -2,9 +2,11 @@
 import copy
 import hashlib
 import importlib.util
+import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 CORE=Path(__file__).resolve().parents[1]
 
@@ -40,10 +42,11 @@ class OrchestrationTests(unittest.TestCase):
     def prepare(self,frame,role=None,actor=None):
         action=self.action(frame);self.assertIn(action['action'],{'delegate','ask-owner'});role=role or action['role'];actor=actor or self.actor(role)
         return self.change(frame,'prepare-actor',actor=actor,input_digest=action['input_digest'],expected_decision_hash=action['decision_hash'],creation_evidence=None if role=='owner' else self.creation(actor))
-    def answer(self,frame,status='answered',answer='accept'):
+    def answer(self,frame,status='answered',answer='accept',host_timing=None):
         decision=dg.read(self.store,frame['question_decision_id']);attempt=decision['attempts'][decision['prepared_attempt_id']];actor=attempt['actor'];owner=attempt['role']=='owner';action=self.action(frame)
         evidence={'kind':'submitted-answer' if owner else 'delegated-agent','reference':'Synthetic fixture role result; never native qualification.','actor_id':actor['id'],'actor_context_id':actor['context_id']}
         if not owner:evidence.update(provider='unit-host',tool='unit-message',creation_reference='synthetic-created:'+actor['id'])
+        if host_timing is not None:evidence['host_timing']=host_timing
         return self.change(frame,'record-actor',attempt_id=attempt['id'],expected_decision_hash=decision['decision_hash'],input_digest=action['input_digest'],result={'status':status,'answer':answer,'rationale':'Synthetic bounded decision rationale.'},evidence=evidence)
     def decision(self,frame,purpose='decision',question=None,finding_id=None,answer='accept'):
         frame=self.change(frame,'question',question=question or self.question(),purpose=purpose,finding_id=finding_id);frame=self.prepare(frame);frame=self.answer(frame,answer=answer);return self.change(frame,'accept-decision')
@@ -56,7 +59,77 @@ class OrchestrationTests(unittest.TestCase):
     def snapshot(self):return {p.relative_to(self.root).as_posix():p.read_bytes() for p in self.root.rglob('*') if p.is_file() and '__pycache__' not in p.parts}
 
     def test_api_is_runnable(self):
-        for name in ['start','read','next_action','mutate']:self.assertTrue(callable(getattr(flow,name)))
+        for name in ['start','read','next_action','mutate','timing_timeline']:self.assertTrue(callable(getattr(flow,name)))
+
+    def test_timing_distinguishes_review_and_pending_actor_wait_from_host_work(self):
+        instants=[f'2026-11-25T12:00:{second:02d}+00:00' for second in range(20)]
+        with patch.object(flow,'recorded_at',side_effect=instants):
+            frame=self.reviewed([])
+        snapshot=self.snapshot()
+        timeline=flow.timing_timeline(self.store,[frame['id']])
+        self.assertEqual(snapshot,self.snapshot())
+        measured=timeline['orchestrations'][0]
+        self.assertEqual([event['recorded_at'] for event in frame['history']],instants[:11])
+        self.assertEqual(measured['critical_path']['elapsed_seconds'],10)
+        phases={row['phase']:row for row in measured['phase_intervals']}
+        self.assertEqual(phases['review']['elapsed_seconds'],1)
+        self.assertEqual(phases['ready']['status'],'unknown')
+        wait=measured['wait_intervals'][0]
+        self.assertEqual((wait['reason'],wait['elapsed_seconds'],wait['outcome']),('awaiting-actor',1,'answered'))
+        actor=measured['actor_intervals'][0]
+        self.assertIsNone(actor['observations'])
+        self.assertIsNone(actor['dispatch_to_pickup']['elapsed_seconds'])
+        self.assertIsNone(actor['pickup_to_finish']['elapsed_seconds'])
+        self.assertEqual(timeline['actor_overlaps'],[])
+
+    def test_legacy_history_and_backward_clock_read_without_invented_time(self):
+        frame=self.start()
+        del frame['history'][0]['recorded_at']
+        frame.pop('orchestration_hash')
+        frame['orchestration_hash']=flow.digest(frame)
+        flow.path(self.store,frame['id']).write_text(json.dumps(frame))
+        with patch.object(flow,'recorded_at',return_value='2026-11-25T12:00:02+00:00'):
+            frame=self.change(frame,'research',reference='Fixture research.')
+        with patch.object(flow,'recorded_at',return_value='2026-11-25T12:00:01+00:00'):
+            frame=self.change(frame,'plan',plan_digest=sha('fixture'),required_checks=['unit'],reference='Fixture plan.')
+        snapshot=self.snapshot()
+        phases=flow.timing_timeline(self.store,[frame['id']])['orchestrations'][0]['phase_intervals']
+        self.assertEqual(phases[0]['status'],'unknown')
+        self.assertIsNone(phases[0]['start_at'])
+        self.assertIsNone(phases[1]['elapsed_seconds'])
+        self.assertEqual(phases[1]['end_at'],'2026-11-25T12:00:01+00:00')
+        self.assertEqual(snapshot,self.snapshot())
+
+    def test_timing_overlap_uses_only_explicit_bound_host_observations_on_the_same_clock(self):
+        def attempt(number,clock,pickup,finish):
+            identity=f'timing-scope-{number}'
+            frame=self.start(request_id=identity,context={**self.context(),'id':identity},
+                             authority=self.authority(context_id=identity))
+            frame=self.change(frame,'question',question=self.question(),purpose='decision')
+            frame=self.prepare(frame,actor=self.actor(n=number))
+            timing={'clock_id':clock,'dispatched_at':'2026-11-25T12:00:00Z',
+                    'picked_up_at':f'2026-11-25T12:00:{pickup:02d}Z',
+                    'last_progress_at':f'2026-11-25T12:00:{pickup+1:02d}Z',
+                    'finished_at':f'2026-11-25T12:00:{finish:02d}Z'}
+            before=self.snapshot()
+            with self.assertRaisesRegex(flow.OrchestrationError,'ordered UTC timestamps'):
+                self.answer(frame,host_timing={**timing,'finished_at':'2026-11-25T11:59:59Z'})
+            self.assertEqual(before,self.snapshot())
+            return self.answer(frame,host_timing=timing)
+
+        first=attempt(1,'host-clock-one',2,9)
+        second=attempt(2,'host-clock-one',4,11)
+        third=attempt(3,'host-clock-two',6,14)
+        timing=flow.timing_timeline(self.store,[first['id'],second['id'],third['id']])
+        actors=[row['actor_intervals'][0] for row in timing['orchestrations']]
+        self.assertEqual(actors[0]['dispatch_to_pickup']['elapsed_seconds'],2)
+        self.assertEqual(actors[0]['pickup_to_finish']['elapsed_seconds'],7)
+        self.assertEqual(actors[0]['observations']['last_progress_at'],'2026-11-25T12:00:03+00:00')
+        self.assertEqual(actors[0]['observations']['reference'],'Synthetic fixture role result; never native qualification.')
+        self.assertEqual(len(timing['actor_overlaps']),1)
+        overlap=timing['actor_overlaps'][0]
+        self.assertEqual(overlap['attempt_ids'],[row['attempt_id'] for row in actors[:2]])
+        self.assertEqual(overlap['elapsed_seconds'],5)
 
     def test_new_frame_defaults_auto_and_never_bootstraps_queue(self):
         frame=self.start();self.assertEqual(frame['mode'],'auto');self.assertEqual(frame['phase'],'research');self.assertFalse((self.root/'.skill-tree/documents').exists());self.assertEqual(flow.read(self.store,frame['id']),frame)

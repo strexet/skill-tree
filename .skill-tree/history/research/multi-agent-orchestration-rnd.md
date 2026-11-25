@@ -221,6 +221,48 @@ The nested fault was run separately from the timing arms to keep the serial and 
 - Prefer two-worker dispatch for independent, worthwhile units and include host startup skew in the decision. Keep the current-target integration check and the consumer oracle. The native fixture also passed the planned 20% full-workload timing gate. Keep the two short Game tasks eligible for serial execution and test a representative project workload before enabling default fan-out.
 - The sandbox evidence bundle contains `native-agents-result.json`, per-trial `result.json` traces, sandbox Git repositories and refs, plus `nested/results.json` and the exact local-process reconciliation evidence. The fixture driver and worker control remain outside Skill Tree source.
 
+## Two Ready tasks in Skill Tree
+
+The next pilot used `T-868fb252-cb68-4dfd-b297-49ebbd91dd78` and `T-d476ee52-b10d-4679-87a9-ab3fabdb754e`. The exact Ready preview identified independent authored paths and nine common generated binding manifests. Both arms started from `7e3096f8a30fb84518a2c27b39176a3205f4430b`. The arms used separate disposable repositories with identical starting queues, two Codex actors and an integration owner who regenerated the shared outputs from the combined authored changes. The actor assignments were swapped between arms. Timing began at first reservation and ended when the integrated commit and tree were verified on the disposable target branch.
+
+| Measure | Serial | Parallel |
+| --- | ---: | ---: |
+| Time to verified local merge | 977.01 s | 1825.69 s |
+| Worker overlap | 0.00 s | 501.65 s |
+| Combined verification | 237.17 s | 462.95 s |
+| Authored Git conflicts | 0 | 0 |
+
+The parallel arm took 86.9% longer than the serial arm. Reviewers rejected the first parallel candidate after finding a legacy installation regression and a guided Director path that missed the new storage exclusions. Both fixes required new checks. A late submission from the first generation was rejected and the handoff ledger stayed unchanged. The serial arm included 24.3 s for recovery from a checkout-local navigation collision. Both final candidates passed the scoped suites, package synchronization, strict repository validation and independent review. The checked targets were `7ba1bee7960c108eea69dcb31da76bc6d6a355e1` and `446176fd1b5c9e792e9101369e1972083ad7c658` respectively.
+
+The paired results show no authored merge conflicts and substantial delivery time from verification and rework. Elapsed time includes the observed host, tool and reviewer delays. The sample contains one pair with warm actor contexts. Run traces, acceptance receipts and measurement are in `skill-tree-worker-handoff.Ax2JXg` under the local temporary directory.
+
+## Supervised Director and Core pilot
+
+The paired arms used the installed Director and Core entry points on one host. The Game and Story fixtures each had an exact Ready task, one writable tracked path and an executable source assertion. A Game coordinator dispatched a required native Codex subagent. The Story actor worked in a separate repository. Director persisted scoped worker receipts against exact launches. Core accepted both scoped commits and reused the matching executable evidence for the full controller review. Game used the checked current-target merge after an independent target advance. Story used the ordinary reviewed local merge. The executable check passed again on both final targets in each arm.
+
+| Measure | Serial | Parallel |
+| --- | ---: | ---: |
+| First Director dispatch through verification of both local merges | 1007.463 s | 431.654 s |
+| First worker reservation through verification of both local merges | 689.831 s | 267.254 s |
+| Native implementation overlap, pickup to verified handoff | 0.000 s | 3.674 s |
+| Native Game worker interval | 33.174 s | 11.513 s |
+| Native Story worker interval | 22.352 s | 12.199 s |
+| Verified local merges | 2 | 2 |
+
+The serial Game target was `cea3cf442db93458cc676956c1e38b0a4bcd793d`. The serial Story target was `77356d13a04b693a9114f451120b899f27738dfc`. The parallel Game target was `27cecf7e1c07084a1813c0e92ca2dd4e6aa5480b`. The parallel Story target was `17282519e13af0dc48451f63da52ff4a03eb4e7e`.
+
+The project implementations overlapped for less than four seconds. The larger elapsed difference includes concurrent Core admission and review steps, reused actor contexts and different observed host latency. The serial dispatch-to-merge interval also includes a test installation refresh after an installed topology control exposed a shared-queue writer-lock bug. Serial overlapped a separate repository test suite on the same host. The first-reservation interval excludes the installation refresh and includes the actual downstream waits. The paired arms provide observed timing on small disposable tasks. The separate stall control keeps the injected fault outside the timing comparison.
+
+### Native stall and recovery control
+
+The first fault setup used a 32 s pickup deadline. The parent missed the initial reservation window, and Director declined pickup. The driver stopped the unbound fixture process. A fresh disposable run used a 55 s progress deadline and a 14 s heartbeat deadline. A Game parent spawned a native child, recorded the nested wait and kept a heartbeat. The child produced one scoped commit and check artifact, then deliberately stopped progressing. Director classified the child as stalled about 55 s after verified progress, with a current heartbeat.
+
+The durable stall event was recorded 57.956 s after progress. The recorded heartbeat was 4.182 s old. The host interrupt reported the original child running and the subsequent host status showed an interruption. The bound local process group survived the interrupt. Director refused recovery while the group was still live. Independent Story submitted one passing scoped result 14.828 s after the stall while Game remained stalled. The coordinator signalled only the owned fixture process and verified group exit before recovery. Director rejected a late submission of the original valid Game candidate after reserving the replacement, with the original attempt unchanged.
+
+The first replacement committed the scoped edit but exceeded the heartbeat deadline after progress writes collided with parent heartbeat writes. The trace contains seven writer-lock refusals and two revision-conflict refusals for progress on generation 2. Director accepted no generation 2 result. After exact shutdown verification, the next supervisor used a seven-second heartbeat interval. Director verified the third Game worker generation 5.988 s after pickup and 315.316 s after the original stall. The result and passing check identify the new worktree and verified process-group exit.
+
+The third Game worker result exposed a separate supervisor closeout defect. Verification of the awaited child removed the wait exemption, exposing the expired supervisor progress deadline. The coordinator recovered the supervisor and completed a new supervisor attempt against the existing checked child receipt. The repair treats a verified nested receipt as meaningful supervisor progress and preserves the independent heartbeat deadline. The installed topology regression exercises closeout after the previous deadline and compares the current parent heartbeat with the original heartbeat receipt. The native timing arms and fault control ran before the closeout repair. The local test evidence covers the repair separately.
+
 ## Improvement sequence after the pilot
 
 1. **Scope preview first.** If H1 passes, expose a read-only independence preview for an exact Ready selection, reusing Core and Director identity and dependency checks. Keep classification reasons visible. Add fields only for observed misses. If H1 fails, focus on collecting reliable scope evidence and decomposition.
