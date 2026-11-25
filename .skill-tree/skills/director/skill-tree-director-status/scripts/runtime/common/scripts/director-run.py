@@ -1,6 +1,7 @@
 """Coordinate one explicitly authorized Director run and its Manual questions."""
 from __future__ import annotations
 
+from contextlib import ExitStack, contextmanager
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 import os
@@ -9,6 +10,7 @@ import re
 import socket
 from subprocess import TimeoutExpired
 import sys
+from time import monotonic, sleep
 
 
 DIRECTORY = '.skill-tree/director/runs/'
@@ -21,6 +23,9 @@ START_OPTIONS = {'expected_source_hash', 'base_branch', 'branch', 'worktree', 'r
                  'local_base_authorization', 'branch_prefix'}
 RECOVERABLE_EFFECT_ERRORS = (ValueError, OSError, TimeoutExpired)
 SUPERVISED_LIVE = {'assigned', 'running', 'stalled'}
+COHERENT_WORKER_ACTIONS = {'heartbeat', 'progress', 'submit'}
+SUPERVISION_LOCK_WAIT_SECONDS = 5
+SUPERVISION_FRONTIER_LIMIT = 16
 ATTEMPT_FIELDS = {'unit_id', 'generation', 'actor_id'}
 SUPERVISION_ACTIONS = {
     'assign': (ATTEMPT_FIELDS | {'assignment_id', 'role', 'child_run_id', 'task_id'},
@@ -188,11 +193,30 @@ class DirectorRun:
         D._require(selection in state['assignments'], 'Select one exact in-scope assignment')
         return next(item for item in plan['assignments'] if item['id'] == selection)
 
-    def _write(self, relative, state, sha):
+    def _write(self, relative, state, sha, *, retain_worker_frontier=False):
+        supervision = state.get('supervision')
+        if isinstance(supervision, dict) and not retain_worker_frontier:
+            supervision.pop('worker_frontier', None)
         self.store.expect_unchanged(relative, sha)
         content = D.WF.dump(state)
         self.store.commit({relative: content})
         return D.WF.digest(content.encode())
+
+    def _supervised_payload_digest(self, state):
+        policy = {key: value for key, value in state['supervision'].items() if key != 'worker_frontier'}
+        return D._digest({**state, 'supervision': policy})
+
+    def _supervised_worker_frontier(self, state, sha):
+        frontier = state['supervision'].get('worker_frontier')
+        if not isinstance(frontier, dict):
+            return []
+        digests = frontier.get('digests')
+        if (not isinstance(digests, list) or len(digests) > SUPERVISION_FRONTIER_LIMIT
+                or not all(D._sha(value) for value in digests)
+                or frontier.get('payload_sha256') != self._supervised_payload_digest(state)
+                or sha != D.WF.digest(D.WF.dump(state).encode())):
+            return []
+        return digests
 
     def start(self, payload):
         D._object(payload, SELECTOR | {'director_run_id', 'plan_sha256', 'assignment_ids', 'owner', 'authority',
@@ -794,6 +818,24 @@ class DirectorRun:
                 parent.update(last_progress_at=now,
                               progress_reference='Verified nested worker receipt '+attempt['receipt_sha256'])
 
+    @contextmanager
+    def _supervision_writer(self, owner, *, may_wait):
+        deadline = monotonic() + SUPERVISION_LOCK_WAIT_SECONDS
+        with ExitStack() as locks:
+            while True:
+                try:
+                    locks.enter_context(self.store.lock(local_delivery=owner))
+                    break
+                except D.WF.WorkflowError as error:
+                    remaining = deadline - monotonic()
+                    if (not may_wait or remaining <= 0 or not isinstance(error.__cause__, FileExistsError)
+                            or not str(error).startswith('Writer lock exists;')):
+                        raise
+                    sleep(min(0.05, remaining))
+                    if monotonic() >= deadline:
+                        raise
+            yield
+
     def supervise(self, payload):
         D._require(isinstance(payload, dict) and isinstance(payload.get('action'), str), 'Select a supervised run action')
         action = payload['action']
@@ -812,7 +854,8 @@ class DirectorRun:
                        'Supervision requires the exact unit, actor and positive generation')
         request = D._digest({key: value for key, value in payload.items() if key != 'expected_run_sha256'})
         owner = {'kind': 'director-run-supervision', 'request': request}
-        with self.store.lock(local_delivery=owner):
+        compatible = action in COHERENT_WORKER_ACTIONS
+        with self._supervision_writer(owner, may_wait=compatible):
             relative, state, sha = self._load(payload['director_run_id'])
             policy = state.get('supervision')
             D._require(policy and policy['host'] == socket.gethostname(), 'Supervision requires the original local host and opt-in run')
@@ -828,7 +871,11 @@ class DirectorRun:
                     D._require(prior and prior['current_generation'] == payload['generation'],
                                'Retired or stale supervised generation or actor')
                 return {**deepcopy(replay['result']), 'status': 'replayed', 'run_sha256': sha}
-            _same_guard(sha, payload['expected_run_sha256'])
+            expected = payload['expected_run_sha256']
+            frontier = self._supervised_worker_frontier(state, sha) if compatible else []
+            rebased = compatible and expected != sha and D._sha(expected) and expected in frontier
+            if not rebased:
+                _same_guard(sha, expected)
             now = self._supervise_now(); stamp = now.isoformat(); units = policy['units']
             if action == 'sweep':
                 stalled = []
@@ -845,14 +892,19 @@ class DirectorRun:
                     attempt = self._supervised_assign(state, policy, payload, stamp)
                 else:
                     attempt = self._current_attempt(prior)
-                    self._supervised_transition(state, policy, prior, attempt, payload, now)
+                    self._supervised_transition(state, policy, prior, attempt, payload, now, rebased=rebased)
                 _event(state, 'supervision-'+action, unit_id=attempt['unit_id'], generation=attempt['generation'],
                        actor_id=attempt['actor_id'], status=attempt['status'])
                 result = {'status': attempt['status'], 'attempt': deepcopy(attempt)}
             policy['requests'][payload['request_id']] = {'sha256': request, 'result': result}
-            return {**result, 'run_sha256': self._write(relative, state, sha)}
+            if compatible:
+                policy['worker_frontier'] = {
+                    'digests': [*frontier, sha][-SUPERVISION_FRONTIER_LIMIT:],
+                    'payload_sha256': self._supervised_payload_digest(state),
+                }
+            return {**result, 'run_sha256': self._write(relative, state, sha, retain_worker_frontier=compatible)}
 
-    def _supervised_transition(self, state, policy, unit, attempt, payload, now):
+    def _supervised_transition(self, state, policy, unit, attempt, payload, now, *, rebased=False):
         action = payload['action']; stamp = now.isoformat()
         if action == 'recover':
             observation = payload['stop_observation']; process = attempt.get('process')
@@ -884,7 +936,7 @@ class DirectorRun:
         D._require(launch == attempt['launch_receipt_sha256'] and D.WF.digest(task['body'].encode()) == attempt['task_sha256'],
                    'The exact supervised launch or Ready task definition changed')
         self._supervised_parent(policy['units'], unit['parent_unit_id'], unit['assignment_id'])
-        if unit['role'] == 'worker' and action in {'pickup', 'submit'}:
+        if unit['role'] == 'worker' and (action in {'pickup', 'submit'} or rebased):
             self._check_resources(spec, child, owner_run_id=unit['child_run_id'])
         if action == 'pickup':
             process = _supervision_process(payload['process'])
@@ -899,6 +951,9 @@ class DirectorRun:
                        'The original supervised process group identity changed')
             attempt['last_heartbeat_at'] = stamp
         elif action == 'progress':
+            if rebased:
+                D._require(_supervision_process({key: attempt['process'][key] for key in ('pid', 'pgid')}) == attempt['process'],
+                           'The original supervised process group identity changed')
             marker = self._supervised_marker(policy['units'], unit, attempt, child)
             D._require(_supervision_text(payload['reference']) and marker != attempt['progress_marker'],
                        'Supervised progress requires a changed native observation')

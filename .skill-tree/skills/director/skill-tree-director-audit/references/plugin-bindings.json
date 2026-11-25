@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "554b290a0fb71422478549de6d7e9063b3fc1c21ea92b2fbefb905c4e2b0c5bb",
+  "identity": "efc315dd1f01f19332416415d4dd01a17789629a3054a82ef7efc1f7d0989512",
   "operation": "skill-tree-director-audit",
   "operations": {
     "skill-tree-3d": {
@@ -3328,7 +3328,7 @@
     "scripts/runtime/common/scripts/director-plan-adapters.py": "1f78af0ae2187105d44ccc2487176548268357fa4a5916c496cb093899c4741d",
     "scripts/runtime/common/scripts/director-plans.py": "b28d8e4326dda6c390586759e36750c74cb909169ff244ecfe7af1e359bfb863",
     "scripts/runtime/common/scripts/director-questions.py": "60d18e3d18eff83b680dcb454a87d24db4c027a9e90065d1f0d2dfb6bcc2ad6c",
-    "scripts/runtime/common/scripts/director-run.py": "ecfc15d463bb38fecbeed286d525cce03fa504e501df645029e39c9ade5e3206",
+    "scripts/runtime/common/scripts/director-run.py": "1a2af3a853bea5c24de33b0434c0dfa7f9efb4f9642f295626931f648cbbfaba",
     "scripts/runtime/common/scripts/director-source-repair.py": "d9f53a58cd06cd837d7758d118a029cc5db15a36c5574d02bb91bf873b208d35",
     "scripts/runtime/common/scripts/director-state.py": "3c87ce2fc25510321cae92ddbdd850eb8caf833972b223e8187108d62cd4df71",
     "scripts/runtime/common/scripts/director-workspace-audit.py": "0e44fa17efe543e98f2f729e721488d9449b1cd65964c313572e4156d05f7ba2",

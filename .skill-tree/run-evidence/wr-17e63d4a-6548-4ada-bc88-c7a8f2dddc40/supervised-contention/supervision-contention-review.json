@@ -1,0 +1,22 @@
+{
+  "source_head": "3fcecb3bee7201271d810e26d2fcd272000d95f1",
+  "source_diff_sha256": "68658bc9afffaddb89cc251dea865fc28d40e569559ffa9dd8b5b3fdb7224119",
+  "independent_reviewer": "/root/director_critic",
+  "reviewed_paths": [
+    ".skill-tree/common/scripts/director-run.py",
+    ".skill-tree/documents/director-workflow.md",
+    ".skill-tree/tests/test-director-topologies.py",
+    ".skill-tree/history/research/multi-agent-orchestration-rnd.md",
+    ".skill-tree/skill-tree.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "review_evidence": "Observed independent review of current writer acquisition, payload-bound compatible run digests, actor and generation checks, and exact native Git candidates.",
+  "verified_behaviors": [
+    "The opt-in supervised caller preserves valid progress and checked results through observed writer contention while strict scope or incompatible ownership changes still reject. Native healthy and distinct checked recovery controls preserve process and source evidence."
+  ],
+  "required_evidence": {
+    "contention-and-recovery": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/supervised-contention/contention-and-recovery-result-c-5cb6aad4-f9d0-425b-af0d-31232c55e640.json",
+    "native-two-worker-control": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/supervised-contention/native-supervision-inspection.json"
+  }
+}

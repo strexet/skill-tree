@@ -14,6 +14,7 @@ import socket
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from unittest.mock import patch
 from uuid import uuid4
@@ -540,7 +541,7 @@ class DirectorTopologyTests(unittest.TestCase):
         self.assertEqual(final['implement_all']['remaining_ids'], [])
         self.assertEqual(final['launches'], [])
 
-    def supervised_launches(self):
+    def supervised_launches(self, *, progress_timeout=10, heartbeat_timeout=8):
         self.declaration['areas'][0]['allowed_effects'].append('launch')
         self.declaration['areas'][1]['allowed_effects'].append('launch')
         self.register()
@@ -567,8 +568,8 @@ class DirectorTopologyTests(unittest.TestCase):
             'assignment_ids': [assignment['id'] for assignment in assignments],
             'owner': {'actor': 'fixture-owner', 'reference': 'fixture-supervision', 'kind': 'owner-message'},
             'authority': {assignment['id']: ['launch'] for assignment in assignments}, 'approved_defaults': [],
-            'supervision': {'host': socket.gethostname(), 'progress_timeout_seconds': 10,
-                            'heartbeat_timeout_seconds': 8},
+            'supervision': {'host': socket.gethostname(), 'progress_timeout_seconds': progress_timeout,
+                            'heartbeat_timeout_seconds': heartbeat_timeout},
         })
         launches = {}
         for (name, _, root, resources, _), assignment in zip(specs, assignments):
@@ -605,18 +606,36 @@ class DirectorTopologyTests(unittest.TestCase):
         return {**self.supervised_key, 'action': action, 'expected_run_sha256': observed['run_sha256'],
                 'request_id': identity('fixture-request'), **fields}
 
-    def run_supervision_at(self, payload, seconds):
+    def run_supervision_at(self, payload, seconds, *, writer_collision=None):
         # Inject only UTC time into the installed implementation. Process observations remain local and live.
         clock = (self.supervised_time + timedelta(seconds=seconds)).isoformat()
         path = write(self.base, identity('supervision') + '.json', json.dumps(payload))
         entry = self.parent / AGENTS / 'skill-tree-director-run/scripts/runtime/common/scripts/director-state.py'
-        tick = '''from datetime import datetime
+        tick = '''from contextlib import ExitStack, contextmanager
+from datetime import datetime
+from pathlib import Path
 import runpy
 import sys
 
 director = runpy.run_path(sys.argv[1])
 load = director['WF'].owned_module
 now = datetime.fromisoformat(sys.argv[2])
+if sys.argv[3] != '-':
+    workflow = director['WF']
+    lock = workflow.Store.lock
+
+    @contextmanager
+    def observed_lock(store, **arguments):
+        with ExitStack() as writer:
+            try:
+                writer.enter_context(lock(store, **arguments))
+            except workflow.WorkflowError as error:
+                if isinstance(error.__cause__, FileExistsError) and str(error).startswith('Writer lock exists;'):
+                    Path(sys.argv[3]).touch()
+                raise
+            yield
+
+    workflow.Store.lock = observed_lock
 
 def with_clock(name, path):
     helper = load(name, path)
@@ -625,9 +644,10 @@ def with_clock(name, path):
     return helper
 
 director['WF'].owned_module = with_clock
-raise SystemExit(director['main'](sys.argv[3:]))
+raise SystemExit(director['main'](sys.argv[4:]))
 '''
         result = subprocess.run([sys.executable, '-B', '-c', tick, str(entry), clock,
+                                 str(writer_collision) if writer_collision else '-',
                                  'run-supervise', str(self.parent), '--input', str(path)],
                                 cwd=self.base, env=GIT_ENV, capture_output=True, text=True, timeout=60)
         try:
@@ -711,6 +731,83 @@ raise SystemExit(director['main'](sys.argv[3:]))
         self.supervise('pickup', 12, **actor, process=group, error='Retired or stale')
         self.supervise('assign', 12, **launches['game'][0], role='supervisor',
                        **{**supervisor, 'generation': 2, 'actor_id': 'replacement-supervisor'})
+
+    def test_supervised_heartbeat_progress_and_submission_survive_contention(self):
+        launches = self.supervised_launches()
+        parent = {'unit_id': 'game-parent', 'generation': 1, 'actor_id': 'game-parent-actor'}
+        worker = self.supervised_writer(launches['game'], 'game-worker', parent_unit_id=parent['unit_id'])
+        sibling = self.supervised_writer(launches['story'], 'story-worker')
+        def actor(item):
+            return {field: item[field] for field in ('unit_id', 'generation', 'actor_id')}
+
+        self.supervise('assign', 0, **launches['game'][0], role='supervisor', **parent)
+        parent_process, parent_group = self.fixture_process_group()
+        self.supervise('pickup', 0, **parent, process=parent_group)
+        self.supervise('assign', 0, **worker)
+        self.supervise('assign', 0, **sibling)
+        worker_process, worker_group = self.fixture_process_group()
+        sibling_process, sibling_group = self.fixture_process_group()
+        self.supervise('pickup', 1, **actor(worker), process=worker_group)
+        self.supervise('pickup', 1, **actor(sibling), process=sibling_group)
+        self.supervise('wait', 2, **parent, reason='nested-result', reference=worker['unit_id'])
+        self.supervised_candidate(worker)
+        result = self.supervised_candidate(sibling)
+        self.stop_fixture_group(sibling_process)
+
+        heartbeat = self.supervision_request('heartbeat', **parent)
+        progress = self.supervision_request('progress', **actor(worker), reference='observed-worktree-check')
+        submission = self.supervision_request('submit', **actor(sibling), result=result)
+        self.assertEqual(len({request['expected_run_sha256'] for request in (heartbeat, progress, submission)}), 1)
+        writer_lock = self.parent / '.skill-tree/.writer-lock'
+        collisions = [self.base / identity('observed-writer-collision') for _ in range(3)]
+        with ThreadPoolExecutor(max_workers=3) as pool:
+            writer_lock.touch(exist_ok=False)
+            try:
+                futures = [pool.submit(self.run_supervision_at, request, 3, writer_collision=collision)
+                           for request, collision in zip((heartbeat, progress, submission), collisions)]
+                deadline = time.monotonic() + 5
+                while not any(collision.exists() for collision in collisions) and time.monotonic() < deadline:
+                    time.sleep(0.01)
+            finally:
+                writer_lock.unlink()
+            results = [item.result() for item in futures]
+        self.assertTrue(any(collision.exists() for collision in collisions), results)
+        self.assertTrue(all(code == 0 for code, _ in results), results)
+        parent_attempt, worker_attempt, sibling_attempt = [out['attempt'] for _, out in results]
+        self.assertGreater(parent_attempt['last_heartbeat_at'], parent_attempt['last_progress_at'])
+        self.assertEqual(worker_attempt['progress_reference'], 'observed-worktree-check')
+        self.assertEqual(sibling_attempt['candidate']['head'], result['head'])
+        self.assertTrue(sibling_attempt['receipt_sha256'])
+
+        code, replayed = self.run_supervision_at(progress, 4)
+        self.assertEqual((code, replayed['status']), (0, 'replayed'))
+        self.assertEqual(replayed['attempt']['last_progress_at'], worker_attempt['last_progress_at'])
+        changed = {**progress, 'reference': 'changed-original-request'}
+        code, refused = self.run_supervision_at(changed, 4)
+        self.assertEqual(code, 2)
+        self.assertIn('request ID was reused', refused['error'])
+        unknown = self.supervision_request('heartbeat', **parent, expected_run_sha256='0' * 64)
+        code, refused = self.run_supervision_at(unknown, 4)
+        self.assertEqual(code, 2)
+        self.assertIn('run changed since inspection', refused['error'])
+
+        run_file = self.parent / '.skill-tree/director/runs' / (self.supervised_key['director_run_id'].lower() + '.json')
+        saved = run_file.read_bytes()
+        external = json.loads(saved)
+        external['timeline'].append({'event': 'fixture-unrelated-run-change'})
+        run_file.write_text(json.dumps(external, ensure_ascii=False, indent=2, sort_keys=True) + '\n')
+        try:
+            code, refused = self.run_supervision_at({**heartbeat, 'request_id': identity('outside-change')}, 4)
+            self.assertEqual(code, 2)
+            self.assertIn('run changed since inspection', refused['error'])
+        finally:
+            run_file.write_bytes(saved)
+
+        strict = self.supervision_request('sweep')
+        self.assertEqual(self.run_supervision_at(strict, 4)[0], 0)
+        self.assertEqual(self.run_supervision_at({**heartbeat, 'request_id': identity('stale-heartbeat')}, 5)[0], 2)
+        self.assertIsNone(parent_process.poll())
+        self.assertIsNone(worker_process.poll())
 
     def test_supervised_nested_stall_preserves_sibling_and_fences_replacement(self):
         launches = self.supervised_launches()
