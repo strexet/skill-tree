@@ -1,0 +1,11 @@
+{
+  "id": "lantern-release",
+  "revision": "r001",
+  "owner": "fixture-design",
+  "state": "accepted",
+  "rule": {
+    "trigger": "release-carry",
+    "normal": "place-lantern",
+    "boundary": "keep-lantern-when-placement-blocked"
+  }
+}

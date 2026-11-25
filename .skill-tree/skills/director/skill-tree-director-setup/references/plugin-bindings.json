@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "c7671e17f18b796e20887675a9b6597acf275717438f440eb41084918892fa17",
+  "identity": "af9c28c5cfed359602294c24ad7173bb494df73ced89f7da7211e4d6118e7a44",
   "operation": "skill-tree-director-setup",
   "operations": {
     "skill-tree-3d": {
@@ -3293,7 +3293,7 @@
     "agents/openai.yaml": "65f95e5a936a3cb77423a2bd863cb474a99a01e70a63c8d0015e6044ffdc6b91",
     "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     "references/development-practices.md": "352a45b093f2c53b7b08aef045a098880af74c6add6fb79f95017a52fd0e0780",
-    "references/director-capabilities.json": "8cc57eb2504e2fa8cfa270d5181074fca7d5ae020a8f34608dfa6e98f018c4ca",
+    "references/director-capabilities.json": "8fcc314f88b5b818220d13a54e86550319712f752a0fd4fcaf9ebab4921051fb",
     "references/director-workflow.md": "d9445bd199356a9c3d3b7f983c548e0a7665d85a1521146717b6c37f5568668d",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/future-workflow.md": "3a6bc83660773c23af11cf00eacb90ed618db701d464fd7fcd304d5d90fca50b",
@@ -3325,7 +3325,7 @@
     "scripts/runtime/common/scripts/director-handoff.py": "19a5ffc7f21d1199954e4953b6d9e704c880cb69d533004ae2c918ba6eb2116b",
     "scripts/runtime/common/scripts/director-maintenance.py": "a4c508a8c97b1efc146b0724723aaf11978ab0ae36e3e4cbb51d6753011a5c9a",
     "scripts/runtime/common/scripts/director-objectives.py": "18a0e664d1eb9074983a22abf27ecb4076d2bd1b3d24ed6cac5ace41f459f373",
-    "scripts/runtime/common/scripts/director-plan-adapters.py": "d8185d6af19635c5279080f02c2dbc253aeb722e1f87d7137132c817f52d0a2f",
+    "scripts/runtime/common/scripts/director-plan-adapters.py": "f64a26f9908621d63fc9dccf1a0b1c4d529081a0e995f4c8068454ec9418b9fa",
     "scripts/runtime/common/scripts/director-plans.py": "b28d8e4326dda6c390586759e36750c74cb909169ff244ecfe7af1e359bfb863",
     "scripts/runtime/common/scripts/director-project-routing.py": "5934e65746c4c55bdf143ce709e94d4a12ad03fe41cd4201087ecc0f944d722f",
     "scripts/runtime/common/scripts/director-project-setup.py": "a225a0b9d0948f3df8e5b9576bff76d63c76d7b4c26be19e0203ebebefaf948a",
