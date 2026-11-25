@@ -146,6 +146,151 @@ class DirectorTopologyTests(unittest.TestCase):
         self.assertEqual(emitted['registry'], preview['registry'])
         return preview
 
+    def test_moved_director_setup_stops_before_child_effects_and_reuses_identity(self):
+        seed=self.base/'move-maintenance-source'
+        seed.mkdir()
+        self.git(seed,'init','-b','develop')
+        write(seed,'.skill-tree/config/repository.json','{"role":"source"}\n')
+        write(seed,QUEUE,'# Future Work\n\n## Pending Task Format\n\n## Pending Queue\n'
+                         '\n## Prioritized Next Changes\n\n## Backlog\n')
+        self.git(seed,'add','.')
+        self.git(seed,'-c','user.name=Fixture','-c','user.email=fixture@example.invalid',
+                 'commit','-m','Initialize local maintenance fixture')
+        composed=self.base/'move-composer/.skill-tree'
+        for relative in ('common','config','domains','lib','src','templates','tests/fixtures/director'):
+            copytree(SOURCE/relative,composed/relative,ignore=ignore_patterns('__pycache__'))
+        maintenance=composed/'common/scripts/director-maintenance.py'
+        original=maintenance.read_text()
+        local=original.replace("UPSTREAM = 'https://github.com/strexet/skill-tree.git'",f'UPSTREAM = {seed.as_uri()!r}')
+        self.assertNotEqual(local,original)
+        maintenance.write_text(local)
+        shared=self.base/'coordinated-workspace'
+        shared.mkdir()
+        self.git(shared,'init','-b','develop')
+        self.command('node',SOURCE/'bin/install.js','--only','codex','--target',shared,'--source',composed)
+        root=shared/'.skill-tree/.director'
+        descriptor=read_json(root/'workspace.json')
+        locator='.git/skill-tree-runtime.json'
+        journal_path=root/'.skill-tree/artifacts/director/project-preparation/coordinator.json'
+        journal=read_json(journal_path)
+        step=journal['units'][str(root)]
+        manifest=root/'.skill-tree/skill-tree.json'
+        manifest.unlink()
+        step['completed']=[name for name in step['completed'] if name not in ('core','manifest')]
+        step['pending']='core'
+        step['proof']['owner']=None
+        step['proof']['files'][STATE]=journal['item']['file_proofs'][STATE]
+        step['proof']['files']['.skill-tree/skill-tree.json']=None
+        journal_path.write_text(json.dumps(journal))
+        pending_journal=journal_path.read_bytes()
+        pending=self.invoke(root/descriptor['setup_entry'],root,'project-setup',
+                            {'kind':'new','name':'isolated-new-project'},[],error='coordinator preparation')
+        self.assertEqual(pending['prerequisite']['kind'],'director-coordinator-preparation')
+        self.assertEqual(journal_path.read_bytes(),pending_journal)
+        self.assertFalse((root/'sources/skill-tree').exists())
+        self.assertFalse((shared/'isolated-new-project').exists())
+        step['queue_id']=identity('Q')
+        journal_path.write_text(json.dumps(journal))
+        try:
+            mismatch=self.invoke(root/descriptor['setup_entry'],root,'project-preview',
+                                  {'kind':'new','name':'isolated-new-project'},[],error='different Core queue')
+            self.assertNotIn('prerequisite',mismatch)
+        finally:
+            journal_path.write_bytes(pending_journal)
+        resumed=self.invoke(root/descriptor['setup_entry'],root,'project-init',None,[],error=None)
+        self.assertEqual(resumed['status'],'ready')
+        self.assertTrue(manifest.is_file())
+        completed=read_json(journal_path)['units'][str(root)]
+        self.assertIn('manifest',completed['completed'])
+        self.assertNotIn('pending',completed)
+        original_state=snapshot(root/QUEUE,root/STATE)
+        original_profile=read_json(root/PROFILE)
+        queue_id=read_json(root/locator)['queue_id']
+        original_head=self.git(root,'symbolic-ref','HEAD')
+        moved=self.base/'relocated-workspace'
+        shared.rename(moved)
+        root=moved/'.skill-tree/.director'
+        app=root/descriptor['setup_entry']
+        choice={'kind':'new','name':'isolated-new-project'}
+        request=write(self.base,'moved-project-choice.json',json.dumps(choice))
+        command=[sys.executable,'-B',str(app),'project-preview',str(root),'--input',str(request)]
+        preview=subprocess.run(command,cwd=self.base,env=GIT_ENV,capture_output=True,text=True,timeout=30)
+        if preview.returncode==0:
+            self.fail('Moved Director setup returned a project preview')
+        diagnosis=json.loads(preview.stdout)
+        self.assertIn('prerequisite',diagnosis,preview.stdout)
+        self.assertEqual(diagnosis['prerequisite']['kind'],'director-locator-moved')
+        self.assertEqual(diagnosis['prerequisite']['queue_id'],queue_id)
+        self.assertEqual(diagnosis['prerequisite']['root'],str(root))
+        self.assertEqual(diagnosis['prerequisite']['previous_root'],str(shared/'.skill-tree/.director'))
+        before=snapshot(root/QUEUE,root/STATE,root/PROFILE,root/locator)
+        result=self.invoke(app,root,'project-setup',choice,[],error='locator')
+        self.assertEqual(result['prerequisite']['kind'],'director-locator-moved')
+        self.assertFalse((moved/choice['name']).exists())
+        self.assertEqual(snapshot(root/QUEUE,root/STATE,root/PROFILE,root/locator),before)
+        self.assertFalse((root/'.skill-tree/artifacts/director/project-preparation'/f'{choice["name"]}.json').exists())
+
+        self.assertFalse((root/'sources/skill-tree').exists())
+        locator_path=root/locator
+        retained=locator_path.read_bytes()
+        wrong={**json.loads(retained),'queue_id':identity('Q')}
+        locator_path.write_text(json.dumps(wrong))
+        try:
+            mismatch=self.invoke(app,root,'project-setup',choice,[],error='identities differ')
+            self.assertFalse(mismatch['ok'])
+            self.assertNotIn('prerequisite',mismatch)
+            self.assertFalse((moved/choice['name']).exists())
+        finally:
+            locator_path.write_bytes(retained)
+        invalid={**json.loads(retained),'worktrees':{identity('WR'):'relative-checkout'}}
+        locator_path.write_text(json.dumps(invalid))
+        try:
+            malformed=self.invoke(app,root,'project-setup',choice,[],error='Invalid retained worktree paths')
+            self.assertNotIn('prerequisite',malformed)
+        finally:
+            locator_path.write_bytes(retained)
+
+        recover=diagnosis['prerequisite']
+        helper=app.parent/'runtime/common/scripts/workflow-state.py'
+        self.assertEqual(Path(recover['argv'][2]),helper)
+        self.invoke(helper,root,'recover-locator',{'queue_id':queue_id,'worktrees':{}},[],error=None)
+        receipt=self.invoke(app,root,'project-setup',choice,[],error='receipt')
+        self.assertEqual(receipt['prerequisite']['kind'],'director-profile-moved')
+        self.assertFalse((moved/choice['name']).exists())
+        profile_path=root/PROFILE
+        saved_profile=profile_path.read_bytes()
+        for former in ('', 'relative-coordinator', str(self.external)):
+            with self.subTest(former=former):
+                profile_path.write_text(json.dumps({**json.loads(saved_profile),'project_root':former}))
+                try:
+                    invalid=self.invoke(app,root,'project-setup',choice,[],error='former Director installation receipt')
+                    self.assertNotIn('prerequisite',invalid)
+                finally:
+                    profile_path.write_bytes(saved_profile)
+
+        self.command('node',root/MANAGER,'--rebind')
+        self.command('node',root/MANAGER,'--verify')
+        self.assertEqual(read_json(root/PROFILE)['identity'],original_profile['identity'])
+        self.assertEqual(read_json(root/locator)['queue_id'],queue_id)
+        self.assertEqual(snapshot(root/QUEUE,root/STATE),original_state)
+        self.assertEqual(self.git(root,'symbolic-ref','HEAD'),original_head)
+        rebound_locator=locator_path.read_bytes()
+        locator_path.unlink()
+        try:
+            missing=self.invoke(app,root,'project-init',None,[],error='locator')
+            self.assertNotIn('prerequisite',missing)
+            self.assertFalse(locator_path.exists())
+            self.assertEqual(snapshot(root/QUEUE,root/STATE),original_state)
+        finally:
+            locator_path.write_bytes(rebound_locator)
+        restored=self.invoke(app,root,'project-preview',choice,[],error=None)
+        self.assertEqual(restored['checkout'],str(moved/choice['name']))
+        self.assertEqual(restored['status'],'preview')
+        registered=self.invoke(app,root,'project-setup',choice,[],error=None)
+        self.assertEqual(registered['status'],'registered')
+        self.assertEqual(registered['checkout'],restored['checkout'])
+        self.assertEqual(read_json(root/REGISTRY)['areas'][choice['name']]['queue_id'],registered['queue_id'])
+
     def test_owned_shared_root_and_external_rebind_keep_exact_writers(self):
         tracked = (self.parent / QUEUE, self.parent / STATE, self.external / QUEUE, self.external / STATE)
         before = snapshot(*tracked)

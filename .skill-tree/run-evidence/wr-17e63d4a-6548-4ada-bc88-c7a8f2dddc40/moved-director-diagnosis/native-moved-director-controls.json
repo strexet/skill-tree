@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "python3",
+    "-B",
+    ".skill-tree/tests/test-director-topologies.py",
+    "-v",
+    "DirectorTopologyTests.test_moved_director_setup_stops_before_child_effects_and_reuses_identity"
+  ],
+  "observed": {
+    "passed": 1,
+    "failed": 0,
+    "wall_seconds": 53.069
+  },
+  "qualification": "Real installed Director and owned native recovery commands in a disposable Git workspace with local-only maintenance seed.",
+  "outcomes": [
+    "Verified moved locator blocked setup before cloning or child changes.",
+    "Invalid queue and worktree pointers, a mismatched pending journal and malformed or live former profile roots produced no recovery command.",
+    "Retained pending coordinator setup blocked project effects, then project-init completed the original Core and manifest journal.",
+    "Exact locator recovery followed by profile rebind retained queue, checkpoint, Git branch and profile identity.",
+    "Both preview and actual project registration succeeded on the recovered route."
+  ],
+  "source_sha256": {
+    ".skill-tree/common/scripts/director-state.py": "554bceadfe62afb18b7f2773d9dd20b80febdfee448b679e9d348a0727a39884",
+    ".skill-tree/common/scripts/director-project-setup.py": "01eff08688e1b7751bc1fcfa0301659f265328dae54d4376aa48f19064fd7c1d",
+    ".skill-tree/lib/installation.js": "4aa73114a28ec9dd9fb84573ddabe7b507d58c46769e271b081c35619f3cf85c",
+    ".skill-tree/tests/test-director-topologies.py": "5497d08428e97b6b0a9493b489b51fe40f2973676105f23a2f299d8593ae611a"
+  }
+}

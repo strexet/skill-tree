@@ -3,6 +3,7 @@ import os
 import re
 import stat
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -95,8 +96,10 @@ def ensure_project(root, path, kind, flavor, name, hosts, pkg, B):
         _, proof = D._setup_target(str(path), kind)
         # The independent coordinator can live inside an existing product checkout.
         # Its own Git identity is established before probing the canonical Core owner.
-        if name == 'coordinator' and not (path/'.git').exists():
-            B.initialize_git(path, D._digest(['director', str(root)]), None)
+        if name == 'coordinator':
+            checkout = D._setup_checkout_proof(path)
+            if checkout is None or not checkout['head']:
+                B.initialize_git(path, D._digest(['director', str(root)]), checkout)
         info = D._setup_project(path, kind, flavor, {'input_sha256': D._digest(pkg['source_digests'])})
         item = {**info, 'path':str(path), 'destination_proof':proof, 'providers':hosts}
     project_journal(B, root, path, item, hosts, source, record)
@@ -211,6 +214,63 @@ def projects(root):
     return products
 
 
+def require_coordinator(root, expected_profile, *, allow_uninitialized=False):
+    owner = D._inspect_setup_owner(root, expected_profile.get('project_root'), allow_uninitialized)
+    proof = D._inspect_profile(root, report_setup_prerequisites=True)
+    receipt, digest = D._read(root, '.skill-tree/installation/profile.json')
+    D._require(proof['kind'] == 'owned-profile' and proof['sha256'] == digest and receipt == expected_profile,
+               'Director coordinator profile changed during setup preflight')
+    return owner
+
+
+def has_interrupted_coordinator_preparation(root, B, coordinator):
+    relative = '.skill-tree/artifacts/director/project-preparation/coordinator.json'
+    journal, _ = D._read(root, relative)
+    if journal is None:
+        return False
+    D._require(isinstance(journal, dict) and journal.get('schema') == 1 and isinstance(journal.get('item'), dict)
+               and isinstance(journal.get('units'), dict), 'Inspect the retained coordinator setup journal')
+    item = journal['item']
+    path = item.get('path')
+    D._require(isinstance(path, str), 'Inspect the retained coordinator setup journal')
+    step = journal['units'].get(path, {})
+    D._require(isinstance(step, dict) and isinstance(step.get('completed'), list),
+               'Inspect the retained coordinator setup progress')
+    completed = step['completed']
+    stages = ['directory', 'git', 'installation', 'documents', 'core', 'manifest']
+    if completed == stages and not step.get('pending'):
+        return False
+    D._require(path == item.get('queue_root') == str(root)
+               and journal.get('root') == B.safe_directory(root)
+               and isinstance(journal.get('plan'), dict) and journal['plan'].get('preview_sha256') == D._digest(item)
+               and item.get('flavor') == 'director'
+               and ((completed == stages[:4] and step.get('pending') == 'core') or
+                    (completed == stages[:5] and step.get('pending') in (None, 'manifest'))),
+               'Reconcile the retained coordinator setup journal before retrying')
+    queue_id, repo_id, owner = coordinator['owner']
+    proof = step.get('proof')
+    D._require(isinstance(proof, dict) and proof.get('checkout') == D._setup_checkout_proof(root),
+               'The retained coordinator preparation belongs to a different Git checkout')
+    if step.get('pending') == 'core':
+        D._require(step.get('queue_id') == queue_id and proof.get('owner') is None,
+                   'The retained coordinator preparation belongs to a different Core queue')
+    else:
+        binding = {'queue_id': queue_id, 'repo_id': repo_id, 'proof': owner,
+                   'locator_sha256': coordinator['locator_sha256']}
+        D._require(proof.get('owner') == binding,
+                   'The retained coordinator preparation belongs to a different Core owner')
+    return True
+
+
+def require_prepared_coordinator(root, settings, B, owner):
+    if has_interrupted_coordinator_preparation(root, B, owner):
+        raise D.DirectorPrerequisite(
+            'Finish the retained Director coordinator preparation with project-init before project setup.',
+            'director-coordinator-preparation', root,
+            argv=[sys.executable, '-B', str(root / settings['setup_entry']), 'project-init', str(root)],
+        )
+
+
 def run(raw_root, command, request):
     root = Path(os.path.abspath(raw_root))
     D._require(not any(part.is_symlink() for part in (root, *root.parents)), 'Select the canonical Director workspace')
@@ -218,23 +278,25 @@ def run(raw_root, command, request):
         protect_storage(D._root(str(root)), apply=command == 'project-storage-prepare')
         return {'status':'ready'}
     settings, pkg = descriptor(root)
+    owner = require_coordinator(root, pkg, allow_uninitialized=command == 'project-init')
+    B = D._bootstrap_helper()
+    if command != 'project-init':
+        require_prepared_coordinator(root, settings, B, owner)
     workspace = D.director_workspace(root)
     hosts = settings['providers']
     if command in ('project-menu', 'project-route'):
         products = projects(root)
         if command == 'project-route':
-            current = D._inspect_profile(root)
-            receipt, digest = D._read(root, '.skill-tree/installation/profile.json')
-            D._require(current['kind'] == 'owned-profile' and current['sha256'] == digest and receipt == pkg,
-                       'Director routing profile changed during preview')
             routing = D.WF.owned_module('director_workspace_routing', Path(__file__).with_name('director-project-routing.py'))
             return routing.preview(D, root, workspace, settings, pkg, products, request)
         return {'director':str(root), 'workspace':str(workspace), 'providers':hosts, 'projects':products,
                 'choices':['intake','status','audit','setup'] if products else ['existing','new','later']}
-    B = D._bootstrap_helper()
     if command == 'project-init':
         with B.lock(root):
-            if not D.WS.runtime_file(root) or not D.WS.runtime_file(root).is_file() or not (root/'.git').is_dir():
+            D._require(descriptor(root) == (settings, pkg), 'Director workspace descriptor changed during setup')
+            D._require(require_coordinator(root, pkg, allow_uninitialized=True) == owner,
+                       'Director coordinator ownership changed before setup')
+            if 'owner' not in owner or has_interrupted_coordinator_preparation(root, B, owner):
                 ensure_project(root, root, 'existing', 'director', 'coordinator', hosts, pkg, B)
             D._inspect_owner(root)
             protect_storage(workspace, home=root.relative_to(workspace))
@@ -256,6 +318,9 @@ def run(raw_root, command, request):
     if command == 'project-preview':
         return {**plan, 'status':'preview'}
     with B.lock(root):
+        D._require(descriptor(root) == (settings, pkg), 'Director workspace descriptor changed during setup')
+        D._require(require_coordinator(root, pkg) == owner, 'Director coordinator ownership changed before setup')
+        require_prepared_coordinator(root, settings, B, owner)
         previous, _ = D._read(root, record)
         if previous:
             verify_choice(previous)

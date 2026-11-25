@@ -1,0 +1,21 @@
+{
+  "check_id": "scoped-regression",
+  "attempt_id": "C-909db5de-ac72-4c77-93be-2d446032556b",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-director-topologies.py",
+    "DirectorTopologyTests.test_moved_director_setup_stops_before_child_effects_and_reuses_identity"
+  ],
+  "exit_code": 1,
+  "result": "red",
+  "counts": {
+    "expected": 1,
+    "discovered": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0
+  },
+  "observed_output": "F\n======================================================================\nFAIL: test_moved_director_setup_stops_before_child_effects_and_reuses_identity (__main__.DirectorTopologyTests.test_moved_director_setup_stops_before_child_effects_and_reuses_identity)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<run-worktree>/.skill-tree/tests/test-director-topologies.py\", line 170, in test_moved_director_setup_stops_before_child_effects_and_reuses_identity\n    self.fail('Moved Director setup returned a project preview')\nAssertionError: Moved Director setup returned a project preview\n\n----------------------------------------------------------------------\nRan 1 test in 13.894s\n\nFAILED (failures=1)",
+  "timeout": false,
+  "elapsed_seconds": 15.486
+}

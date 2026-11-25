@@ -1,5 +1,7 @@
 # Director Workflow
 
+Project setup verifies the coordinator Git owner, Core locator and owned installation before preparing maintenance sources or changing a child. A moved coordinator reports the verified queue and the applicable recovery command. After a move, recover the matching locator before rebinding the installed profile. Pass the reported recovery input with `--input` and supply exact paths for any listed retained worktrees. Recovery preserves existing workflow receipts and installation evidence. Retry the original setup after both checks pass.
+
 Director coordinates exact assignments across registered Skill Tree areas from Codex. Each child keeps ownership of the canonical queue, child work, acceptance and delivery.
 
 Run the installed `scripts/director-entry.py` with an operation, exact Director project root and `--input <request.json>`. Setup prepares the approved coordinator and projects, registers exact canonical areas and readies explicit rebinds. Intake owns versioned objectives. Plan owns reviewed immutable scope. Run and decide require current separate authority. Status projects read-only state. Review verifies independent producer and consumer evidence with review-preview. Use review-apply for the exact accepted review, review-read for a retained record, impact-preview for two exact revisions and amend-apply for the reviewed scope change.

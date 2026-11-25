@@ -46,6 +46,12 @@ class DirectorError(ValueError):
     pass
 
 
+class DirectorPrerequisite(DirectorError):
+    def __init__(self, message, kind, root, **details):
+        super().__init__(message)
+        self.prerequisite = {'kind': kind, 'root': str(root), **details}
+
+
 def _core():
     path = Path(__file__).resolve().with_name('workflow-state.py')
     spec = importlib.util.spec_from_file_location('director_workflow', path)
@@ -188,16 +194,8 @@ def _inspect_owner(checkout):
     _require(WS.local_git_text(canonical, 'rev-parse', '--show-toplevel') == str(canonical),
              'The canonical locator must name an exact Git checkout root')
     locator = WS.runtime(checkout)
-    raw, _ = _read(canonical, '.skill-tree/documents/future.json')
-    _safe_path(canonical, '.skill-tree/documents/future.md')
-    _safe_path(canonical, '.skill-tree/history/task-outcomes.jsonl')
-    _require(isinstance(raw, dict) and raw.get('schema') == 3,
-             'A stable canonical queue ID requires a schema-3 Core queue')
-    state = WF.Store(canonical, route_queue=False, neutral=True).load()
-    _require(state['schema'] == 3 and state['active_run'] is None, 'Canonically inconsistent Core workspace registry')
+    state = _canonical_queue_state(canonical, locator)
     queue_id = state['run_registry']['queue_id']
-    _require(WF.valid_id(queue_id, 'Q') and locator.get('queue_id') == queue_id,
-             'Canonical queue and local locator identities differ')
     repo_id = WS.repo_id(canonical)
     root_stat = common.stat()
     return queue_id, repo_id, {
@@ -208,6 +206,127 @@ def _inspect_owner(checkout):
     }
 
 
+def _canonical_queue_state(canonical, locator):
+    raw, _ = _read(canonical, '.skill-tree/documents/future.json')
+    _safe_path(canonical, '.skill-tree/documents/future.md')
+    _safe_path(canonical, '.skill-tree/history/task-outcomes.jsonl')
+    _require(isinstance(raw, dict) and raw.get('schema') == 3,
+             'A stable canonical queue ID requires a schema-3 Core queue')
+    state = WF.Store(canonical, route_queue=False, neutral=True).load()
+    _require(state['schema'] == 3 and state['active_run'] is None, 'Canonically inconsistent Core workspace registry')
+    queue_id = state['run_registry']['queue_id']
+    _require(WF.valid_id(queue_id, 'Q') and locator.get('queue_id') == queue_id,
+             'Canonical queue and local locator identities differ')
+    return state
+
+
+def _absolute_checkout_path(value):
+    return (isinstance(value, str) and Path(value).is_absolute()
+            and '..' not in Path(value).parts and Path(value).as_posix() == value
+            and all(ord(character) >= 32 for character in value))
+
+
+def _unadmitted_core_state(state):
+    return state is None or (isinstance(state, dict) and state.get('format') == WF.FORMAT
+                             and state.get('schema') == 2 and state.get('active_run') is None
+                             and not state.get('run_registry') and not state.get('task_progress'))
+
+
+def _uninitialized_setup_proof(root):
+    builder = _bootstrap_helper()
+    journal_path = '.skill-tree/artifacts/director/project-preparation/coordinator.json'
+    state, state_sha = _read(root, builder.STATE)
+    journal, journal_sha = _read(root, journal_path)
+    transaction, _ = _read(root, builder.CORE_TRANSACTION)
+    _require(not any(_safe_path(root, path).exists() for path in (REGISTRY, BINDINGS, builder.JOURNAL, WF.OUTCOME_LEDGER)),
+             'Restore the retained Director coordinator locator before setup')
+    checkout = _setup_checkout_proof(root)
+    directory = builder.safe_directory(root)
+    if journal is None:
+        _require(_unadmitted_core_state(state) and transaction is None, 'Restore the retained Core locator before setup')
+    else:
+        _require(isinstance(journal, dict) and journal.get('schema') == 1 and journal.get('root') == directory
+                 and isinstance(journal.get('item'), dict) and isinstance(journal.get('plan'), dict)
+                 and isinstance(journal.get('units'), dict), 'Inspect the retained coordinator setup journal')
+        item = journal['item']
+        step = journal['units'].get(str(root), {})
+        _require(isinstance(step, dict) and isinstance(step.get('completed', []), list)
+                 and item.get('path') == item.get('queue_root') == str(root) and item.get('flavor') == 'director'
+                 and journal['plan'].get('preview_sha256') == _digest(item)
+                 and 'core' not in step.get('completed', []) and checkout is not None
+                 and checkout == item.get('checkout_proof') == item.get('canonical_checkout_proof'),
+                 'Restore the locator or reconcile the verified initial coordinator setup')
+        original_state = item.get('file_proofs', {}).get(builder.STATE)
+        state_changed = state_sha != original_state or not _unadmitted_core_state(state)
+        if state_changed or transaction is not None:
+            queue_id = step.get('queue_id')
+            _require(step.get('pending') == 'core' and WF.valid_id(queue_id, 'Q'),
+                     'Restore the retained Core locator before setup')
+            if state_changed:
+                registry = {'schema': 1, 'queue_id': queue_id, 'runs': {}, 'claims': {}, 'resources': {}}
+                store = WF.Store(root, route_queue=False, neutral=True)
+                _require(isinstance(state, dict) and state.get('schema') == 3 and state.get('active_run') is None
+                         and state.get('run_registry') == registry
+                         and state.get('source_hash') == WF.digest(store.text().encode()),
+                         'Restore the retained Core locator before setup')
+            if transaction is not None:
+                scope = {'operation': 'director-bootstrap', 'preview_sha256': _digest(item),
+                         'project': str(root), 'queue_id': queue_id}
+                _require(isinstance(transaction, dict) and transaction.get('local_delivery') == scope,
+                         'Reconcile the existing Core transaction before setup')
+    return {'directory': directory, 'checkout': checkout, 'state_sha256': state_sha, 'setup_sha256': journal_sha}
+
+
+def _inspect_setup_owner(root, profile_root, allow_uninitialized=False):
+    marker = root / '.git'
+    _require(not marker.is_symlink(), 'The Director coordinator Git directory uses a symbolic link')
+    if allow_uninitialized and not marker.exists():
+        return _uninitialized_setup_proof(root)
+    _require(marker.is_dir() and WS.common_dir(root) == marker
+             and WS.local_git_text(root, 'rev-parse', '--show-toplevel') == str(root),
+             'Select the exact Director coordinator Git checkout')
+    locator_file = WS.runtime_file(root)
+    _require(not locator_file.is_symlink(), 'The Director coordinator locator uses a symbolic link')
+    if allow_uninitialized and not locator_file.exists():
+        return _uninitialized_setup_proof(root)
+    _require(locator_file.is_file(), 'Restore the Director coordinator queue locator before project setup')
+    locator_sha = WF.file_hash(locator_file)
+    locator = WS.runtime(root)
+    previous = locator.get('canonical_root')
+    _require(_absolute_checkout_path(previous),
+             'The Director coordinator locator requires a canonical checkout path')
+    state = _canonical_queue_state(root, locator)
+    registry = state['run_registry']
+    worktrees = locator['worktrees']
+    pending = locator.get('pending_worktrees', {})
+    paths = worktrees | pending
+    _require(not worktrees.keys() & pending.keys() and paths.keys() <= registry['runs'].keys()
+             and all(_absolute_checkout_path(path) for path in paths.values())
+             and len(set(paths.values())) == len(paths),
+             'Invalid retained worktree paths in the Director coordinator locator')
+    _require(WF.file_hash(locator_file) == locator_sha, 'Director coordinator locator changed during verification')
+    if previous != str(root):
+        _require(not os.path.lexists(previous), 'The previous Director coordinator checkout is still available')
+        _require(profile_root == previous, 'The former Director paths in the locator and profile differ')
+        queue_id = registry['queue_id']
+        required = sorted(rid for rid, run in registry['runs'].items() if not WS.delivery_finished(run))
+        request = {'queue_id': queue_id}
+        if not required:
+            request['worktrees'] = {}
+        raise DirectorPrerequisite(
+            'The Director coordinator locator names the previous checkout. Recover the exact Core locator before project setup.',
+            'director-locator-moved', root, previous_root=previous, queue_id=queue_id, repo_id=WS.repo_id(root),
+            argv=[sys.executable, '-B', str(Path(WF.__file__)), 'recover-locator', str(root)],
+            input=request,
+            required_worktree_ids=required,
+        )
+    owner = _inspect_owner(root)
+    _require(owner[0] == registry['queue_id'] and owner[2]['root'] == str(root)
+             and WF.file_hash(locator_file) == locator_sha,
+             'The canonical owner differs from the exact Director coordinator')
+    return {'owner': owner, 'locator_sha256': locator_sha}
+
+
 def _profile_refresh_prerequisite(root):
     try:
         helper = WF.owned_module('director_profile_diagnostic', Path(__file__).with_name('pr-review-state.py'))
@@ -216,7 +335,7 @@ def _profile_refresh_prerequisite(root):
         return None
 
 
-def _inspect_profile(root):
+def _inspect_profile(root, *, report_setup_prerequisites=False):
     relative = '.skill-tree/installation/profile.json'
     receipt, digest = _read(root, relative)
     if receipt is None:
@@ -228,21 +347,42 @@ def _inspect_profile(root):
     _require(library.is_file() and not library.is_symlink(), 'The reviewed profile verifier is unavailable')
     script = r"""
 const {join} = require('node:path');
-const [library, root] = process.argv.slice(1);
+const [library, root, mode] = process.argv.slice(1);
 try {
   const core = require(library);
-  const receipt = core.verify(root, join(root, '.skill-tree/installation/source'));
-  process.stdout.write(JSON.stringify({identity: receipt.identity, flavor: receipt.flavor}));
+  const receipt = core.verify(root, join(root, '.skill-tree/installation/source'), mode === 'setup');
+  process.stdout.write(JSON.stringify({
+    identity: receipt.identity, flavor: receipt.flavor, project_root: receipt.project_root
+  }));
 } catch (error) {
+  if (mode === 'setup' && error.code === 'ST_PROFILE_REFRESH_REQUIRED') {
+    process.stdout.write(JSON.stringify({prerequisite: 'profile-refresh-required'}));
+  }
   process.exitCode = 2;
 }
 """
     environment = {key: value for key, value in os.environ.items() if key not in {'NODE_OPTIONS', 'NODE_PATH'}}
-    result = subprocess.run(['node', '-e', script, str(library), str(root)], capture_output=True,
+    mode = 'setup' if report_setup_prerequisites else 'strict'
+    result = subprocess.run(['node', '-e', script, str(library), str(root), mode], capture_output=True,
                             text=True, timeout=30, env=environment)
+    if result.returncode and report_setup_prerequisites and result.stdout:
+        reason = json.loads(result.stdout).get('prerequisite')
+        if reason == 'profile-refresh-required':
+            raise DirectorPrerequisite('The Director installation profile requires refreshed discovery inputs.',
+                                       reason, root)
     _require(result.returncode == 0, 'Area requires a current owned Skill Tree installation')
     _require(WF.file_hash(root / relative) == digest, 'Area profile changed during verification')
-    return {'kind': 'owned-profile', **json.loads(result.stdout), 'sha256': digest}
+    proof = json.loads(result.stdout)
+    previous = proof.pop('project_root')
+    if report_setup_prerequisites and previous != str(root):
+        _require(_absolute_checkout_path(previous) and not os.path.lexists(previous),
+                 'Verify the former Director installation receipt path before rebinding')
+        raise DirectorPrerequisite(
+            'The verified Director installation receipt names the previous checkout. Rebind the exact installed profile before project setup.',
+            'director-profile-moved', root, previous_root=previous, identity=proof['identity'], receipt_sha256=digest,
+            argv=['node', str(root / '.skill-tree/installation/manager.js'), '--rebind'],
+        )
+    return {'kind': 'owned-profile', **proof, 'sha256': digest}
 
 
 def _area(request):
@@ -1546,6 +1686,9 @@ def main(argv=None):
             rebind = args.command.startswith('rebind')
             method = director.preview if args.command.endswith('-preview') else director.apply
             result = method(payload, rebind=rebind)
+    except DirectorPrerequisite as error:
+        print(WF.dump({'ok': False, 'error': str(error), 'prerequisite': error.prerequisite}), end='')
+        return 2
     except (ValueError, OSError, subprocess.TimeoutExpired) as error:
         print(WF.dump({'ok': False, 'error': str(error)}), end='')
         return 2
