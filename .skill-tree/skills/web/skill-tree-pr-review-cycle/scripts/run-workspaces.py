@@ -1072,6 +1072,28 @@ def checked_out_branch(root):
     return {'ref': ref, 'head': head, 'checkout': checkout}
 
 
+def verified_pr_source_worktree(canonical_root, selected, source_branch, head):
+    local_git_environment()
+    if not isinstance(selected,str):
+        raise RunError('PR resume requires an exact source checkout path')
+    path = Path(selected)
+    common = common_dir(canonical_root)
+    if (not common or not path.is_absolute() or path.resolve() != path or not path.is_dir()
+            or common_dir(path) != common):
+        raise RunError('Select an exact source worktree in the original Git repository')
+    if path != canonical_root:
+        linked_registration(canonical_root,path)
+    identity = checked_out_branch(path)
+    if identity['ref'] != 'refs/heads/'+source_branch or identity['head'] != head:
+        raise RunError('Selected PR source worktree differs from the original branch or head')
+    entries = local_git(path,'ls-files','-v','-z','--').stdout.split(b'\0')
+    if any(entry[:1] == b'S' or entry[:1].islower() for entry in entries):
+        raise RunError('The selected PR source index must expose every tracked file')
+    if local_git(path,'status','--porcelain','-z').stdout:
+        raise RunError('The selected PR source worktree has uncommitted changes')
+    return path,identity
+
+
 def task_commit_baseline(root):
     identity = checked_out_branch(root)
     dirt = set()

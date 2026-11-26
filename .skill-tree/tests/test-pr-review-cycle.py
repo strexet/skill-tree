@@ -1,6 +1,6 @@
 import hashlib
 import importlib.util
-from contextlib import redirect_stdout
+from contextlib import contextmanager, redirect_stdout
 import io
 import json
 import os
@@ -329,6 +329,240 @@ class LocalTargetSyncTests(unittest.TestCase):
             capture_output=True, text=True, timeout=40)
         self.assertEqual(result.returncode, expected_code, result.stdout + result.stderr)
         return json.loads(result.stdout)
+
+    def test_existing_publication_resumes_from_exact_isolated_checkout(self):
+        snapshot = {**self.snapshot,'state':'OPEN','merge_commit':None,'changed_files':['product.py'],
+                    'pr':{**self.snapshot['pr'],'url':'https://example.invalid/fixture/repo/pull/21'},
+                    'checks':[{'name':'fixture-check','required':True,'status':'success'}],
+                    'checks_known':True,'required_checks_missing':[],
+                    'approvals_known':True,'approved':False,'approvals_required':True,
+                    'threads':[],'reviews':[],'comments':[]}
+        original = self.invoke('init',**{name:value for name,value in snapshot.items()
+                                         if self.snapshot.get(name) != value})
+        publication_id = original['publication_id']
+        carrier = self.root/'.skill-tree/history/publications'/f'pub-{publication_id}.json'
+        prior = pr.reviewed(original,snapshot,{
+            'head':snapshot['head'],'base_oid':snapshot['base_oid'],'target_branch':snapshot['target_branch'],
+            'files':snapshot['changed_files'],'context_inspected':True,'discussions_inspected':True,
+            'checks_inspected':True,'findings':[],'evidence':['Original complete fixture review.'],
+        })
+        carrier.write_text(json.dumps(prior,sort_keys=True)+chr(10))
+        self.git(self.root,'switch','-c','release/main',self.remote_head)
+        checkout = (self.root.parent/'isolated-pr-worktree').resolve()
+        self.git(self.root,'worktree','add',str(checkout),'feature/fix')
+        wf = pr.owned_module('pr_resume_fixture_workflow',CORE/'common/scripts/workflow-state.py')
+        docs = self.root/'.skill-tree/documents'
+        docs.mkdir(parents=True,exist_ok=True)
+        (docs/'future.md').write_text('# Future Work\n\n## Pending Task Format\n\nFixture.\n\n'
+                                      '## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n')
+        before = carrier.read_bytes()
+        local_ref = self.git(self.root,'symbolic-ref','HEAD')
+        bare_refs = self.git(self.remote,'show-ref')
+
+        def invoke(command='observe',selected=checkout,observed=snapshot,success=True,extras=None):
+            self.request.write_text(json.dumps({'snapshot':observed,'source_checkout':str(selected),**(extras or {})}))
+            result = subprocess.run(['python3','-B',str(CORE/'common/scripts/pr-review-state.py'),
+                                     command,str(self.root),'--input',str(self.request),
+                                     '--publication-id',publication_id],capture_output=True,text=True,timeout=35)
+            if success and result.returncode:
+                self.fail('Existing publication could not resume from the exact linked checkout. '+result.stdout+result.stderr)
+            if not success:
+                self.assertNotEqual(result.returncode,0,result.stdout+result.stderr)
+            return json.loads(result.stdout)
+
+        resumed = invoke()
+        if 'source_checkout' not in resumed:
+            self.fail('Existing publication could not resume from the exact linked checkout.')
+        self.assertEqual(resumed['source_checkout']['path'],str(checkout))
+        self.assertEqual(resumed['publication_id'],publication_id)
+        self.assertEqual(resumed['authorization'],original['authorization'])
+        self.assertEqual(resumed['identity'],original['identity'])
+        self.assertEqual(resumed['review'],prior['review'])
+        self.assertEqual(self.git(self.root,'symbolic-ref','HEAD'),local_ref)
+        self.assertEqual(self.git(self.remote,'show-ref'),bare_refs)
+        preflight = invoke(command='preflight')
+        self.assertEqual(preflight['publication_id'],publication_id)
+        self.assertEqual(preflight['source_checkout'],resumed['source_checkout'])
+        self.assertEqual(preflight['changed_files'],['product.py'])
+        after = carrier.read_bytes()
+        self.assertNotIn('source_checkout',json.loads(after))
+        self.assertEqual(invoke(),resumed)
+        self.assertEqual(carrier.read_bytes(),after)
+        self.git(self.root,'branch','fixture-base',self.old)
+        config = self.root/'.skill-tree/config'
+        config.mkdir()
+        (config/'repository.json').write_text(json.dumps({'schema':1,'role':'source'}))
+        queue = wf.Store(self.root,allow_unselected=True)
+        pending = wf.intake(queue,{'title':'Fixture retained work','description':'Preserve an unrelated run.',
+                                   'expected_behavior':'The retained run keeps the original publication.'})
+        body = ('Goal:\n- Preserve retained work.\n\nTouch:\n- product.py\n\nValidation:\n'
+                '```json\n'+json.dumps({'checks':[{
+                    'id':'fixture','recipe_id':'static-inspection','criteria':['Preserve retained work.'],
+                    'sources':['product.py'],'parameters':{},'assertion':'Retained work remains visible.',
+                    'timing':'immediate',
+                }]})+'\n```\n\nAcceptance:\n- Preserve retained work.\n')
+        task = wf.process(queue,{
+            'selectors':[pending['id']],
+            'dispositions':{pending['id']:{'status':'promoted','reason':'Keep the unrelated work.'}},
+            'tasks':[{'title':'Keep retained work','body':body,'parent_pending_ids':[pending['id']]}],
+        })['created_ids'][0]
+        with patch.object(wf.workspaces,'common_dir',return_value=None):
+            other = wf.start(queue,'next',task)
+        wf.workspaces.setup(queue,{
+            'adopt_run_id':other['id'],'worktree':str(checkout),'branch':'feature/fix',
+            'base_branch':'fixture-base','local_base':True,'local_base_authorization':'Fixture base selection.',
+        })
+        neutral = wf.Store(self.root,allow_unselected=True,neutral=True)
+        with neutral.lock():
+            state = neutral.load()
+            run = state['run_registry']['runs'][other['id']]
+            run['delivery']['publication'] = '.skill-tree/history/publications/pub-'+'1'*32+'.json'
+            neutral.save(neutral.text(),state)
+        unrelated_state = neutral.state.read_bytes()
+        self.assertEqual(invoke(),resumed)
+        self.assertEqual(neutral.state.read_bytes(),unrelated_state)
+        self.assertEqual(carrier.read_bytes(),after)
+        self.assertEqual(invoke(selected=self.root,success=False)['ok'],False)
+        decoy = (self.root.parent/'other-branch-same-commit').resolve()
+        self.git(self.root,'worktree','add','-b','fixture-decoy',str(decoy),self.source)
+        self.assertIn('original branch or head',invoke(selected=decoy,success=False)['error'])
+        unrelated = (self.root.parent/'unrelated-source').resolve()
+        self.git(self.root.parent,'init','-b','feature/fix',str(unrelated))
+        self.assertIn('original Git repository',invoke(selected=unrelated,success=False)['error'])
+        self.assertEqual(carrier.read_bytes(),after)
+        wrong_head = {**snapshot,'head':self.old}
+        self.assertIn('original open PR',invoke(observed=wrong_head,success=False)['error'])
+        wrong_base = {**snapshot,'base_oid':snapshot['head']}
+        self.assertIn('original open PR',invoke(observed=wrong_base,success=False)['error'])
+        wrong_pr = {**snapshot,'pr':{**snapshot['pr'],'id':'different-provider-pr'}}
+        self.assertIn('original open PR',invoke(observed=wrong_pr,success=False)['error'])
+        for field,value in [('number',999),('url','https://example.invalid/fixture/repo/pull/999')]:
+            with self.subTest(provider_identity=field):
+                alias = {**snapshot,'pr':{**snapshot['pr'],field:value}}
+                self.assertIn('original open PR',invoke(observed=alias,success=False)['error'])
+        saved = json.loads(after)
+        for invalid in ({'pr':None},{'pr':{'id':snapshot['pr']['id']}},
+                        {'publication_id':'f'*32}):
+            carrier.write_text(json.dumps({**saved,**invalid}))
+            self.assertIn('existing exact publication',invoke(command='preflight',success=False)['error'])
+        carrier.write_text(json.dumps({**saved,'status':'merged'}))
+        self.assertIn('ordinary delivery reconciliation',invoke(command='preflight',success=False)['error'])
+        carrier.write_bytes(after)
+        frozen = {
+            'operation_package':'.agents/skills/skill-tree-pr-review-cycle',
+            'configuration_digest':'a'*64,
+            'execution_snapshot':{'owned-profile':'b'*64},'phases':{'after':['independent-review']},
+        }
+        carrier.write_text(json.dumps({**saved,'review_requirements':frozen}))
+        retained = carrier.read_bytes()
+        self.assertTrue(invoke(command='preflight')['requires_frozen_review_generation'])
+        self.assertIn('cannot prove the frozen review package',invoke(success=False)['error'])
+        self.assertEqual(carrier.read_bytes(),retained)
+        self.assertIn('keeps the original package',
+                      invoke(success=False,extras={'package_root':str(checkout)})['error'])
+        self.assertIn('keeps the original package',
+                      invoke(success=False,extras={'run_overrides':{}})['error'])
+        with (self.root/'.git/info/exclude').open('a') as rules:
+            rules.write('\n.agents/\n.skill-tree/\n')
+        manifest = checkout/frozen['operation_package']/'references/plugin-bindings.json'
+        manifest.parent.mkdir(parents=True)
+        manifest.write_text(json.dumps({'operation':pr.REVIEW_OPERATION,'owned_resources':{}}))
+        profile = checkout/'.skill-tree/installation/profile.json'
+        profile.parent.mkdir(parents=True)
+        profile.write_text(json.dumps({'root_generation':'different checkout profile'}))
+        frozen['execution_snapshot']['operation-manifest'] = hashlib.sha256(manifest.read_bytes()).hexdigest()
+        carrier.write_text(json.dumps({**saved,'review_requirements':frozen}))
+        retained = carrier.read_bytes()
+        self.request.write_text(json.dumps({'snapshot':snapshot,'source_checkout':str(checkout)}))
+        output = io.StringIO()
+        with patch.object(pr,'review_requirement_plan',side_effect=AssertionError('An unverified package must not run')), redirect_stdout(output):
+            code = pr.main(['observe',str(self.root),'--input',str(self.request),'--publication-id',publication_id])
+        self.assertEqual(code,2)
+        self.assertIn('differs from the frozen review generation',json.loads(output.getvalue())['error'])
+        self.assertEqual(carrier.read_bytes(),retained)
+        self.assertEqual(invoke(command='review-reconcile',success=False)['ok'],False)
+        self.assertEqual(carrier.read_bytes(),retained)
+        profile.unlink()
+        manifest.unlink()
+        carrier.write_bytes(after)
+        registry = checkout/'.skill-tree/installation/plugins.json'
+        registry.write_text(json.dumps({'bindings':[{'operation':pr.REVIEW_OPERATION,'enabled':True}]}))
+        self.assertIn('requires an original frozen review plan',invoke(success=False)['error'])
+        self.assertEqual(carrier.read_bytes(),after)
+        registry.unlink()
+        wrong_files = {**snapshot,'changed_files':['different.py']}
+        self.assertIn('provider diff differs',invoke(observed=wrong_files,success=False)['error'])
+        untracked = checkout/'fixture-dirty.txt'
+        untracked.write_text('Maintain local owner state.')
+        self.assertIn('uncommitted changes',invoke(success=False)['error'])
+        self.assertEqual(untracked.read_text(),'Maintain local owner state.')
+        untracked.unlink()
+        product = checkout/'product.py'
+        baseline = product.read_bytes()
+        for flag in ('assume-unchanged','skip-worktree'):
+            with self.subTest(index_flag=flag):
+                self.git(checkout,'update-index','--'+flag,'product.py')
+                product.write_text('Hidden tracked fixture change.')
+                self.assertEqual(self.git(checkout,'status','--porcelain'),'')
+                self.assertIn('index must expose every tracked file',invoke(success=False)['error'])
+                self.git(checkout,'update-index','--no-'+flag,'product.py')
+                product.write_bytes(baseline)
+        self.assertEqual(carrier.read_bytes(),after)
+        blocked = invoke(command='merge-gate',success=False)
+        self.assertIn('explicit owner authorization',blocked['error'])
+        self.assertEqual(carrier.read_bytes(),after)
+        def local_invoke(observed):
+            self.request.write_text(json.dumps({'snapshot':observed,'source_checkout':str(checkout)}))
+            output = io.StringIO()
+            with patch.object(pr,'owned_module',return_value=wf), redirect_stdout(output):
+                code = pr.main(['observe',str(self.root),'--input',str(self.request),'--publication-id',publication_id])
+            return code,json.loads(output.getvalue())
+
+        changed_snapshot = {**snapshot,'comments':[{'body':'Current provider fixture evidence.'}]}
+        actual_lock = wf.Store.lock
+        writer_entries = 0
+        @contextmanager
+        def configure_during_final_writer(store,**options):
+            nonlocal writer_entries
+            writer_entries += 1
+            if writer_entries == 2:
+                registry.write_text(json.dumps({'bindings':[{'operation':pr.REVIEW_OPERATION,'enabled':True}]}))
+            with actual_lock(store,**options):
+                yield
+        with patch.object(wf.Store,'lock',configure_during_final_writer):
+            code,blocked = local_invoke(changed_snapshot)
+        self.assertEqual(code,2)
+        self.assertIn('requires an original frozen review plan',blocked['error'])
+        self.assertEqual(carrier.read_bytes(),after)
+        self.assertEqual(neutral.state.read_bytes(),unrelated_state)
+        registry.unlink()
+
+        with neutral.lock():
+            state = neutral.load()
+            state['run_registry']['runs'][other['id']]['delivery']['publication'] = carrier.relative_to(self.root).as_posix()
+            neutral.save(neutral.text(),state)
+        before_mirror = neutral.state.read_bytes()
+        navigation = neutral.base/'skill-tree.json'
+        before_navigation = navigation.read_bytes()
+        with patch.object(wf.Store,'save',side_effect=OSError('Fixture linked mirror write failed')):
+            code,failed = local_invoke(changed_snapshot)
+        self.assertEqual(code,2)
+        self.assertIn('Fixture linked mirror write failed',failed['error'])
+        self.assertEqual(carrier.read_bytes(),after)
+        self.assertEqual(neutral.state.read_bytes(),before_mirror)
+        code,updated = local_invoke(changed_snapshot)
+        self.assertEqual(code,0)
+        self.assertEqual(updated['snapshot_key'],pr.review_key(changed_snapshot))
+        self.assertEqual(neutral.load()['run_registry']['runs'][other['id']]['delivery']['pr'],snapshot['pr'])
+        self.assertEqual(navigation.read_bytes(),before_navigation)
+        after = carrier.read_bytes()
+        (checkout/'product.py').write_text('A different local source head.')
+        self.git(checkout,'add','product.py')
+        self.git(checkout,'-c','commit.gpgsign=false','commit','-m','Local source changed after review')
+        self.assertIn('original branch or head',invoke(success=False)['error'])
+        self.assertEqual(carrier.read_bytes(),after)
+        self.assertEqual(self.git(self.root,'symbolic-ref','HEAD'),local_ref)
+        self.assertEqual(self.git(self.remote,'show-ref'),bare_refs)
 
     def test_verified_profile_maintenance_reconciles_without_reactivation(self):
         legacy = self.root.parent / 'previous-core'
