@@ -43,6 +43,109 @@ test('installed controller starts and resumes the same worktree with a canonical
  assert.equal(admitted.status,'admitted');assert.equal(admitted.run_id,started.id);
  assert.equal(command('begin',working,{task_id:receipt.created_ids[0]}).phase,'implement');
  const raw=JSON.parse(fs.readFileSync(path.join(root,'.skill-tree/documents/future.json')));assert.equal(raw.active_run,null);assert.equal(raw.run_registry.claims[receipt.created_ids[0]],started.id);assert.equal(raw.run_registry.runs[started.id].workspace.branch,started.workspace.branch);
+ const profile=path.join(working,'.skill-tree/installation/profile.json');
+ const beforeRefresh=fs.readFileSync(profile);
+ const checkpointPath=path.join(root,'.skill-tree/documents/future.json');
+ command('checkpoint',working,{phase:'validate',stop_reason:'Installation profile changed; re-admit before continuation'},['--run-id',started.id]);
+ const checkpoint=JSON.parse(fs.readFileSync(checkpointPath));
+ checkpoint.run_registry.runs[started.id].profile_refresh_required=true;
+ fs.writeFileSync(checkpointPath,JSON.stringify(checkpoint));
+ const compatiblePackage={scripts:{test:'node --test'},description:'Compatible worktree metadata'};
+ write(working,'package.json',compatiblePackage);
+ const requestFile=path.join(base,'compatible-request.json');
+ fs.writeFileSync(requestFile,JSON.stringify({compatible_refresh:true}));
+ const interrupted = `
+import runpy
+import sys
+entry = runpy.run_path(sys.argv[1])
+workflow = entry['main'].__globals__
+original = workflow['owned_profile_installer']
+original_process = workflow['subprocess'].run
+stage = sys.argv[2]
+
+def publish_then_stop(argv, **kwargs):
+    if stage == 'journal' and argv[:2] == ['node', '-e'] and argv[-2:] == ['activate', 'compatible']:
+        patch = """
+const interruptedFs = require('node:fs');
+const writeOriginal = interruptedFs.writeFileSync;
+interruptedFs.writeFileSync = function(destination, ...args) {
+  const result = writeOriginal.call(this, destination, ...args);
+  if (String(destination).endsWith('/.skill-tree/installation/.journal.json')) {
+    throw Error('Injected interruption after sealed journal publication');
+  }
+  return result;
+};
+"""
+        argv = [*argv[:2], patch + argv[2], *argv[3:]]
+    return original_process(argv, **kwargs)
+
+def interrupt(store, request, mode, **kwargs):
+    result = original(store, request, mode, **kwargs)
+    if stage == 'ack' and mode == 'activate' and kwargs.get('compatible'):
+        raise workflow['WorkflowError']('Injected loss after owned profile activation')
+    return result
+
+workflow['subprocess'].run = publish_then_stop
+workflow['owned_profile_installer'] = interrupt
+raise SystemExit(entry['main'](sys.argv[3:]))
+`;
+ const selected=['admit',working,'--run-id',started.id,'--input',requestFile];
+ const torn=spawnSync('python3',['-B','-c',interrupted,helper,'journal',...selected],{encoding:'utf8',timeout:45000});
+ assert.equal(torn.status,2,torn.stdout+torn.stderr);
+ assert.match(torn.stdout+torn.stderr,/Injected interruption after sealed journal publication/);
+ assert.deepEqual(fs.readFileSync(profile),beforeRefresh);
+ const originalRun=JSON.parse(fs.readFileSync(checkpointPath)).run_registry.runs[started.id];
+ const prepared=originalRun.compatible_profile_refresh;
+ assert.equal(originalRun.admission.identity,checkpoint.run_registry.runs[started.id].admission.identity);
+ const receiptPath=path.join(working,'.skill-tree/artifacts/setup-operations',prepared.operation_id+'.json');
+ const beforeRecovery=fs.readFileSync(receiptPath);
+ const preparedCheckpoint=fs.readFileSync(checkpointPath);
+ const journalPath=path.join(working,'.skill-tree/installation/.journal.json');
+ const originalJournal=fs.readFileSync(journalPath);
+ assert.match(JSON.parse(beforeRecovery).activation_journal_sha256,/^[a-f0-9]{64}$/);
+ assert.equal(JSON.parse(beforeRecovery).status,'failed');
+ const otherJournal=Buffer.concat([originalJournal,Buffer.from('\n')]);
+ fs.writeFileSync(journalPath,otherJournal);
+ const changedJournal=spawnSync('python3',['-B',helper,...selected],{encoding:'utf8',timeout:45000});
+ assert.equal(changedJournal.status,2,changedJournal.stdout+changedJournal.stderr);
+ assert.match(changedJournal.stdout+changedJournal.stderr,/journal changed since the original attempt/);
+ assert.deepEqual(fs.readFileSync(journalPath),otherJournal);
+ assert.deepEqual(fs.readFileSync(receiptPath),beforeRecovery);
+ fs.writeFileSync(journalPath,originalJournal);
+ write(working,'package.json',{...compatiblePackage,description:'Changed after activation'});
+ const stale=spawnSync('python3',['-B',helper,...selected],{encoding:'utf8',timeout:45000});
+ assert.equal(stale.status,2,stale.stdout+stale.stderr);
+ assert.match(stale.stdout+stale.stderr,/compatible profile plan or package input changed/i);
+ assert.deepEqual(fs.readFileSync(checkpointPath),preparedCheckpoint);
+ assert.deepEqual(fs.readFileSync(receiptPath),beforeRecovery);
+ assert.deepEqual(fs.readFileSync(journalPath),originalJournal);
+ write(working,'package.json',compatiblePackage);
+ write(working,'config/browser-policy.json',{});
+ const changedDiscovery=spawnSync('python3',['-B',helper,...selected],{encoding:'utf8',timeout:45000});
+ assert.equal(changedDiscovery.status,2,changedDiscovery.stdout+changedDiscovery.stderr);
+ assert.match(changedDiscovery.stdout+changedDiscovery.stderr,/worktree discovery inputs or owned source changed/);
+ assert.deepEqual(fs.readFileSync(checkpointPath),preparedCheckpoint);
+ assert.deepEqual(fs.readFileSync(receiptPath),beforeRecovery);
+ assert.deepEqual(fs.readFileSync(journalPath),originalJournal);
+ fs.unlinkSync(path.join(working,'config/browser-policy.json'));
+ const lost=spawnSync('python3',['-B','-c',interrupted,helper,'ack',...selected],{encoding:'utf8',timeout:45000});
+ assert.equal(lost.status,2,lost.stdout+lost.stderr);
+ assert.match(lost.stdout+lost.stderr,/Injected loss after owned profile activation/);
+ assert.notDeepEqual(fs.readFileSync(profile),beforeRefresh);
+ assert.ok(!fs.existsSync(journalPath));
+ assert.deepEqual(fs.readFileSync(checkpointPath),preparedCheckpoint);
+ const installationReceipt=fs.readFileSync(receiptPath);
+ assert.equal(JSON.parse(installationReceipt).status,'completed');
+ const readmitted=command('admit',working,{compatible_refresh:true},['--run-id',started.id]);
+ assert.equal(readmitted.operation_id,prepared.operation_id);
+ assert.deepEqual(fs.readFileSync(receiptPath),installationReceipt);
+ const resumed=command('index',working).active_run;
+ assert.equal(resumed.current_task_id,receipt.created_ids[0]);
+ assert.equal(resumed.stop_reason,null);
+ assert.equal(resumed.profile_refresh_required,undefined);
+ assert.equal(resumed.compatible_profile_readmissions.length,1);
+ assert.deepEqual(command('admit',working,{compatible_refresh:true},['--run-id',started.id]),
+                  {...readmitted,replayed:true});
  write(working,'report.json',{queue:raw.run_registry.queue_id});const attempt=command('prepare-check',working,{task_id:receipt.created_ids[0],check_id:'behavior'});
  command('record-check',working,{task_id:receipt.created_ids[0],check_id:'behavior',attempt_id:attempt.attempt_id,result:'pass',classification:'executed-control',actual_lane:'static',environment_identity:attempt.environment_identity,assertions:[{assertion:goal,result:'pass'}],cleanup:'The fixture starts no product process.',evidence:['report.json']});
  command('implemented',working,{task_id:receipt.created_ids[0]});command('complete',working,{task_id:receipt.created_ids[0],outcome:goal,acceptance:[{criterion:goal,result:'pass',evidence:['report.json']}],source_fingerprints:attempt.sources});

@@ -4,6 +4,8 @@ from datetime import datetime, timezone
 from unittest.mock import patch
 import importlib.util
 from pathlib import Path
+import subprocess
+import sys
 import unittest
 
 
@@ -175,6 +177,64 @@ class RunDecisionTests(unittest.TestCase):
             self.ask()
         self.assertEqual(self.run.status({'director_run_id': self.parent_id}), parent)
         self.assertEqual(self.child_checkpoint(), original)
+
+    def test_shared_workflow_profile_preserves_directed_question_hold_and_release(self):
+        source = CORE.parent.parent
+        installed = subprocess.run(
+            ['node',str(source/'bin/install.js'),'--target',str(self.fixture.root),'--project',
+             '--flavor','general','--only','codex','--skills','skill-tree-work-through-next','--shared-runtime'],
+            capture_output=True,text=True,timeout=90)
+        self.assertEqual(installed.returncode,0,installed.stdout+installed.stderr)
+        self.start_child()
+        store = WF.Store(self.worktree,run_id=self.child_run)
+        self.assertEqual(WF.prepare_worktree_profile(store)['status'],'admitted')
+        self.assertEqual(WF.advance(store)['phase'],'implement')
+        self.assertEqual(DIRECTOR._project_setup_helper().shared_routing(self.worktree),'guarded')
+        wrapper = self.worktree/'.agents/skills/skill-tree-work-through-next/scripts/workflow-state.py'
+        body = store.source_root/'.skill-tree/installation/source/common/scripts/workflow-state.py'
+        before = self.child_checkpoint()
+        original_body = body.read_bytes()
+        try:
+            body.write_bytes(original_body+b'\n# edited shared runtime\n')
+            with self.assertRaisesRegex(ValueError,'Original child worktree requires the exact current Core'):
+                self.ask()
+            self.assertEqual(self.child_checkpoint(),before)
+        finally:
+            body.write_bytes(original_body)
+        question = self.ask()['question']
+        waiting = self.child_checkpoint()
+        self.assertIn('director_question_hold',waiting)
+        _, director, _ = self.run._load(self.parent_id)
+        context = self.run._question_context(director,self.plan['assignments'][0],question)
+        request = self.fixture.base/'inspect-shared-hold.json'
+        request.write_text(WF.dump(context))
+        check = """
+import importlib.util, json, runpy, sys
+from pathlib import Path
+from types import SimpleNamespace
+entry, questions, checkout, run_id, request = sys.argv[1:]
+spec = importlib.util.spec_from_file_location('child_question_check', questions)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+module.wf = SimpleNamespace(**runpy.run_path(entry))
+store = module.wf.Store(Path(checkout), run_id=run_id)
+module.handle(store, 'director-question-check', json.loads(Path(request).read_text()))
+"""
+        inspected = subprocess.run(
+            [sys.executable,'-B','-c',check,str(wrapper),str(CORE/'director-questions.py'),
+             str(self.worktree),self.child_run,str(request)],
+            capture_output=True,text=True,timeout=90)
+        self.assertEqual(inspected.returncode,0,inspected.stdout+inspected.stderr)
+        original_wrapper = wrapper.read_bytes()
+        try:
+            wrapper.write_bytes(original_wrapper+b'\n# edited workflow entrypoint\n')
+            with self.assertRaisesRegex(ValueError,'Original child worktree requires the exact current Core'):
+                self.run.answer(self.response(question))
+            self.assertEqual(self.child_checkpoint(),waiting)
+        finally:
+            wrapper.write_bytes(original_wrapper)
+        self.run.answer(self.response(question))
+        self.assertNotIn('director_question_hold',self.child_checkpoint())
 
     def test_changed_child_admission_never_releases_existing_hold(self):
         self.start_child()

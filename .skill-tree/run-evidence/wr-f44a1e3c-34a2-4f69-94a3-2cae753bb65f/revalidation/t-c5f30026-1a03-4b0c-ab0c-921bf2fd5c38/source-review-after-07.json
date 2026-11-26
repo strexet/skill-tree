@@ -1,0 +1,12 @@
+{
+  "checks_sha256": "3c6d22a9efc1e670bddbceaba2e288510e3d40491728d7e351273524c1039567",
+  "sources": {
+    ".skill-tree/common/references/director-workflow.md": "d573306865ad5cb84189f9ca410cfbbfb9f9cf0a63682b42917a3976af17b952",
+    ".skill-tree/common/scripts/workflow-state.py": "13b8932a763ece81905ad4dbd7cd73fe99f4f0d8370ca13c2da183239e262541",
+    ".skill-tree/skill-tree.json": "ad36d7a0f24f72e506ef629acf69f9225e732bc9463c4d01b2314aa899640a06"
+  },
+  "task_id": "T-c5f30026-1a03-4b0c-ab0c-921bf2fd5c38",
+  "reviewer": "/root/director_resolver",
+  "result": "clean",
+  "reference": "Independent source review confirmed that unpartitioned intake retains the exact legacy request hash input and receipt fields. The existing batch contract and current source manifest remain consistent. New receipt-only recovery applies only to exactly recorded partitioned effects and keeps canonical registered binding checks. Scoped diff check passed."
+}

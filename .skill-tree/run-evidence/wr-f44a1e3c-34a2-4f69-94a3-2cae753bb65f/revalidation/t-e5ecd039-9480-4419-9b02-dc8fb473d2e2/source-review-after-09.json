@@ -1,0 +1,15 @@
+{
+  "checks_sha256": "23901184c7aa4e8d48874762148f07b438fd2d0291cf48a91d1931494a9c5a18",
+  "sources": {
+    ".skill-tree/common/references/pr-review-cycle.md": "f696c00bef9253435cb6ee2f9710b4f7f7b0140da3dfc5756aed2968ec863b42",
+    ".skill-tree/skill-tree.json": "111dc3149b031b13b348cb097a235a1b568c3e7ccf887f38d662ce2939e2b3b7"
+  },
+  "task_id": "T-e5ecd039-9480-4419-9b02-dc8fb473d2e2",
+  "reviewer": "/root/director_resolver",
+  "status": "accepted",
+  "observations": [
+    "Independently verified exact PR contract and navigation source hashes, including manifest-pinned current contract, PR helper, Director routing and installer sources.",
+    "The current post-synchronization prerequisite remains tied to the native target, ref and head and preserves the delivery receipt. Current-profile routing and the stale-profile diagnostics retain their prior contract.",
+    "Current-shape PR controls include the native target and stale/current route assertions. The prepared recipe passed all 51 tests."
+  ]
+}

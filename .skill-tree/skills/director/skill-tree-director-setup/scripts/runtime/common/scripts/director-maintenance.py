@@ -4,7 +4,7 @@ import hashlib
 import importlib.util
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import re
 import subprocess
 import tempfile
@@ -17,6 +17,21 @@ UPSTREAM = 'https://github.com/strexet/skill-tree.git'
 REMOTE = 'upstream'
 BASE = 'develop'
 MARKER = 'skill-tree-director-maintenance.json'
+COMPACT_LAYOUT = 'source-only-v1'
+INSTALLED = '.skill-tree/installation'
+PROFILE = INSTALLED + '/profile.json'
+CODEX_PACKAGE = re.compile(r'\.agents/skills/skill-tree-[a-z0-9-]+\Z')
+BUNDLE_FILE = re.compile(r'\.skill-tree/installation/(?:[a-zA-Z0-9_.-]+/)*[a-zA-Z0-9_.-]+\Z')
+CLIENT_UNAVAILABLE = re.compile(
+    r"^fatal: unable to access '[^'\n]+': (?:Could not resolve host:|Failed to connect to |"
+    r"Connection timed out|Network is unreachable|Operation timed out)[^\n]*$"
+    r"|^ssh: (?:Could not resolve hostname |connect to host [^\n]+: Connection (?:refused|timed out))[^\n]*$",
+    re.MULTILINE,
+)
+
+
+class TransportUnavailable(ValueError):
+    """The selected upstream could not be reached."""
 
 
 @contextmanager
@@ -38,13 +53,17 @@ def writer(path):
         yield
 
 
-def git(root, *args):
+def git(root, *args, materialize=False):
     """Git output and failure text are bounded to avoid exposing transport credentials."""
     environment = D.WS.local_git_environment()
-    transport = args[0] in ('clone', 'fetch')
+    transport = args[0] in ('clone', 'fetch') or materialize
+    if materialize:
+        verify_materialization_remote(root)
     if transport:
         # An explicitly selected upstream may use the host's validated, URL-scoped credentials.
-        environment = os.environ.copy()
+        environment = {**os.environ, 'LC_ALL':'C'}
+    else:
+        environment.update(GIT_NO_LAZY_FETCH='1', GIT_ALLOW_PROTOCOL='')
     # The canonical URL already names the repository endpoint. Keep the HTTP
     # request on that endpoint even if unrelated host defaults allow redirects.
     http = ('-c', 'http.followRedirects=false', '-c', 'http.' + UPSTREAM + '.followRedirects=false') if transport else ()
@@ -52,9 +71,13 @@ def git(root, *args):
     try:
         result = subprocess.run(command, env=environment, capture_output=True, text=True, timeout=240 if transport else 45)
     except subprocess.TimeoutExpired as error:
-        raise ValueError('The maintenance Git operation timed out: ' + args[0]) from error
+        stderr = error.stderr.decode('utf-8',errors='replace') if isinstance(error.stderr,bytes) else error.stderr or ''
+        failure = TransportUnavailable if transport and CLIENT_UNAVAILABLE.search(stderr) else ValueError
+        raise failure('The maintenance Git operation timed out: ' + args[0]) from error
     if result.returncode:
-        raise ValueError('Maintenance Git operation failed: ' + args[0])
+        unavailable = transport and CLIENT_UNAVAILABLE.search(result.stderr)
+        failure = TransportUnavailable if unavailable else ValueError
+        raise failure('Maintenance Git operation failed: ' + args[0])
     return result.stdout.strip()
 
 
@@ -80,6 +103,11 @@ def owned(root):
                and git(root, 'config', '--local', '--get-all', 'remote.' + REMOTE + '.url') == UPSTREAM,
                'The registered maintenance checkout or upstream changed')
     verify_endpoints(root)
+    if 'checkout_layout' in state:
+        excluded = state.get('excluded_deployments')
+        D._require(state['checkout_layout'] == COMPACT_LAYOUT and excluded == deployment_paths(root),
+                   'The recorded deployment exclusions differ from the pinned source')
+        verify_compact_inventory(root, excluded)
     return state
 
 
@@ -87,6 +115,118 @@ def verify_endpoints(repository):
     for mode in ((), ('--push',)):
         effective = git(repository, 'remote', 'get-url', '--all', *mode, REMOTE).splitlines()
         D._require(effective == [UPSTREAM], 'The effective upstream URL differs from the registered Skill Tree repository')
+
+
+def verify_materialization_remote(root):
+    verify_endpoints(root)
+    partial = git(root, 'config', '--default', '', '--get', 'extensions.partialClone')
+    D._require(partial in ('', REMOTE), 'The maintenance checkout has a different partial-clone remote')
+    for remote in git(root, 'remote').splitlines():
+        promised = git(root, 'config', '--type=bool', '--default=false', '--get', 'remote.' + remote + '.promisor')
+        D._require(remote == REMOTE or promised == 'false', 'Another remote can supply maintenance objects')
+
+
+def tracked_digests(root, objects):
+    """Hash exact local Git blobs without fetching or exposing the contents."""
+    if not objects or sum(objects.values()) > 64 * 1024 * 1024:
+        return {}
+    environment = {**D.WS.local_git_environment(),'GIT_NO_LAZY_FETCH':'1','GIT_ALLOW_PROTOCOL':''}
+    try:
+        result = subprocess.run(D.WS.local_git_args(root,'cat-file','--batch'),
+            input=('\n'.join(objects)+'\n').encode('ascii'),env=environment,capture_output=True,timeout=45)
+    except subprocess.TimeoutExpired as error:
+        raise ValueError('The tracked deployment proof timed out') from error
+    if result.returncode:
+        return {}
+    position = 0
+    digests = {}
+    for oid,size in objects.items():
+        header = f'{oid} blob {size}\n'.encode('ascii')
+        if not result.stdout.startswith(header,position):
+            return {}
+        start = position + len(header)
+        end = start + size
+        if result.stdout[end:end+1] != b'\n':
+            return {}
+        digests[oid] = hashlib.sha256(result.stdout[start:end]).hexdigest()
+        position = end + 1
+    return digests
+
+
+def tracked_profile(root, *, materialize=False):
+    entry = git(root,'ls-tree','HEAD','--',PROFILE).split('\t',1)[0].split()
+    if not entry:
+        return None
+    message = 'The tracked installation profile is outside the compact source ownership contract'
+    D._require(len(entry) == 3 and entry[0] in ('100644','100755') and entry[1] == 'blob',message)
+    size = git(root,'cat-file','-s',entry[2],materialize=materialize)
+    D._require(size.isdigit() and 0 < int(size) <= 16*1024*1024,message)
+    try:
+        profile = json.loads(git(root,'show',entry[2]))
+    except json.JSONDecodeError as error:
+        raise ValueError(message) from error
+    D._require(isinstance(profile,dict) and profile.get('format') == 'skill-tree-profile'
+               and type(profile.get('schema')) is int and profile['schema'] == 1
+               and isinstance(profile.get('destinations'),dict) and isinstance(profile.get('bundle_digests'),dict)
+               and isinstance(profile.get('project_root'),str)
+               and (Path(profile['project_root']).is_absolute() or PureWindowsPath(profile['project_root']).is_absolute()),
+               message)
+    return profile
+
+
+def deployment_paths(root):
+    """Read the exact pinned install receipt to identify redundant provider packages."""
+    profile = tracked_profile(root)
+    if profile is None:
+        return []
+    destinations, bundles = profile['destinations'], profile['bundle_digests']
+    packages = {relative:record['files'] for relative, record in destinations.items()
+                if CODEX_PACKAGE.fullmatch(relative) and isinstance(record,dict)
+                and record.get('name') == relative.rsplit('/',1)[1] and record.get('provider') == 'codex'
+                and isinstance(record.get('files'),dict) and D._sha(record['files'].get('SKILL.md'))}
+    bundles = {relative:digest for relative,digest in bundles.items()
+               if relative != PROFILE and BUNDLE_FILE.fullmatch(relative)
+               and not {'.','..'}.intersection(relative.split('/')) and D._sha(digest)}
+    if not packages and not bundles:
+        return [PROFILE]
+    tree = {}
+    for row in git(root,'ls-tree','-r','-l','-z','HEAD','--',*packages,*bundles).split('\0'):
+        if row:
+            metadata, relative = row.split('\t',1)
+            mode, kind, oid, size = metadata.split()
+            tree[relative] = (oid,int(size)) if kind == 'blob' and mode in ('100644','100755') else None
+    digests = tracked_digests(root,dict(value for value in tree.values() if value is not None))
+    def matches(relative, expected):
+        item = tree.get(relative)
+        return item is not None and D._sha(expected) and digests.get(item[0]) == expected
+    excluded = [relative for relative,expected in bundles.items() if matches(relative,expected)]
+    for package, files in packages.items():
+        prefix = package + '/'
+        tracked = {name.removeprefix(prefix) for name in tree if name.startswith(prefix)}
+        if tracked == set(files) and all(matches(prefix+name,expected) for name,expected in files.items()):
+            excluded.append(package)
+    return [PROFILE, *sorted(excluded)]
+
+
+def verify_compact_inventory(root, excluded):
+    D._require(not D._safe_path(root, PROFILE).exists(), 'A live installation is present in the source-only checkout')
+    for relative in excluded:
+        D._require(not D._safe_path(root,relative).exists(),
+                   'A redundant installation is present in the source-only checkout')
+    for item in git(root,'ls-files','-v','-z','--').split('\0'):
+        if not item:
+            continue
+        flag, relative = item.split(' ',1)
+        expected = relative in excluded or any(relative.startswith(prefix+'/') for prefix in excluded
+                                                if CODEX_PACKAGE.fullmatch(prefix))
+        D._require((flag == 'S') == expected and not flag.islower(),
+                   'The maintenance checkout sparsity differs from the owned source inventory')
+
+
+def full_project_index(project):
+    entries = git(project,'ls-files','-v','-z','--').split('\0')
+    D._require(any(entries) and not any(entry[:1] == 'S' or entry[:1].islower() for entry in entries),
+               'The registered project source checkout requires a fully visible index')
 
 
 def qualify(root, state):
@@ -97,14 +237,20 @@ def qualify(root, state):
     state_path = '.skill-tree/documents/future.json'
     raw, _ = D._read(root, state_path)
     locator = D.WS.runtime_file(root)
+    compact = state.get('checkout_layout') == COMPACT_LAYOUT
+    if compact:
+        D._require(not git(root,'status','--porcelain','--untracked-files=no'),
+                   'Compact source qualification requires unchanged tracked source')
     if not locator.exists():
         if raw and raw.get('run_registry'):
             D.WS.recover_locator(store, {'queue_id': raw['run_registry']['queue_id']})
         else:
-            D.WS.setup(store, {})
+            D._require(not compact or not store.state.exists(),
+                       'The tracked source checkpoint requires compatible portable registration before compact setup')
+            D.WS.setup(store, {}, update_navigation=not compact)
     queue, _, _ = D._inspect_owner(root)
     receipt = D._safe_path(root, '.skill-tree/installation/profile.json')
-    if receipt.is_file():
+    if receipt.is_file() and not compact:
         library = Path(__file__).resolve().parents[2] / 'lib/installation.js'
         # A clean upstream release may carry another host's resolved profile. Rebind and
         # refresh only the byte-owned generation in this new, independently owned clone.
@@ -131,6 +277,9 @@ catch { manager.refresh(root, source); manager.verify(root, source); }
         result = subprocess.run(['node', '-e', js, str(library), str(root)], capture_output=True, timeout=120)
         D._require(result.returncode == 0, 'The byte-owned upstream installation could not be rebound and verified')
     D._inspect_profile(root)
+    if compact:
+        D._require(not git(root,'status','--porcelain','--untracked-files=no'),
+                   'Portable source changed during compact qualification')
     state['queue_id'] = queue
     D.WS.atomic(root / '.git' / MARKER, state)
 
@@ -147,11 +296,22 @@ def provision(root):
             git(probe, 'remote', 'add', REMOTE, UPSTREAM)
             verify_endpoints(probe)
             staged = Path(directory) / 'clone'
-            git(root.parent, 'clone', '--no-local', '--no-tags', '--single-branch', '--branch', BASE,
+            git(root.parent, 'clone', '--no-local', '--no-tags', '--no-checkout', '--filter=blob:none',
+                '--single-branch', '--branch', BASE,
                 '--origin', REMOTE, '--', UPSTREAM, str(staged))
             verify_endpoints(staged)
+            profile = tracked_profile(staged, materialize=True)
+            initial = ['!/'+PROFILE] if profile is not None else []
+            git(staged, 'sparse-checkout','set','--no-cone','/*',*initial, materialize=True)
+            git(staged, 'read-tree','-mu','HEAD', materialize=True)
+            excluded = deployment_paths(staged)
+            if len(excluded) > 1:
+                patterns = ['!/'+relative+('/' if CODEX_PACKAGE.fullmatch(relative) else '') for relative in excluded]
+                git(staged,'sparse-checkout','set','--no-cone','/*',*patterns,materialize=True)
+            verify_compact_inventory(staged, excluded)
             state = {'schema': 1, 'upstream': UPSTREAM, 'checkout': str(root),
-                     'revision': git(staged, 'rev-parse', 'HEAD'), 'projects': {}}
+                     'revision': git(staged, 'rev-parse', 'HEAD'), 'projects': {},
+                     'checkout_layout':COMPACT_LAYOUT,'excluded_deployments':excluded}
             D.WS.atomic(staged / '.git' / MARKER, state)
             staged.rename(root)
     state = owned(root)
@@ -170,6 +330,8 @@ def inspect(director_root, project_id):
                and git(project, 'rev-parse', '--show-toplevel') == str(project)
                and git(project, 'symbolic-ref', '--short', 'HEAD') == branch,
                'The registered project source branch or worktree changed')
+    if state.get('checkout_layout') == COMPACT_LAYOUT:
+        full_project_index(project)
     git(project, 'merge-base', '--is-ancestor', record['base_commit'], 'HEAD')
     base = git(root, 'rev-parse', '--verify', 'refs/remotes/' + REMOTE + '/' + BASE + '^{commit}')
     git(root, 'merge-base', '--is-ancestor', record['base_commit'], base)
@@ -185,14 +347,33 @@ def prepare(director_root, project_id):
     root.parent.mkdir(exist_ok=True)
     with writer(root.parent / '.maintenance.lock'):
         state = provision(root)
-        if project_id in state['projects'] and project.exists():
+        compact = state.get('checkout_layout') == COMPACT_LAYOUT
+        record = state['projects'].get(project_id)
+        retained = None
+        if record is not None and project.exists():
             # Check provenance before fetching or exposing an existing local branch.
-            inspect(director_root, project_id)
-        git(root, 'fetch', '--no-tags', REMOTE, 'refs/heads/' + BASE + ':refs/remotes/' + REMOTE + '/' + BASE)
+            retained = inspect(director_root, project_id)
+        target = 'refs/remotes/' + REMOTE + '/' + BASE
+        offline = (compact and retained is not None and record['ready']
+                   and not git(project,'status','--porcelain=v1','--untracked-files=all'))
+        if offline:
+            original_tip = git(root,'rev-parse',target)
+            original_head = git(project,'rev-parse','HEAD')
+        flags = ('--no-tags','--no-write-fetch-head') if compact else ('--no-tags',)
+        if compact:
+            verify_materialization_remote(root)
+        try:
+            git(root, 'fetch', *flags, REMOTE, 'refs/heads/' + BASE + ':' + target)
+        except TransportUnavailable:
+            if not offline:
+                raise
+            D._require(git(root,'rev-parse',target) == original_tip and git(project,'rev-parse','HEAD') == original_head
+                       and not git(project,'status','--porcelain=v1','--untracked-files=all')
+                       and inspect(director_root, project_id) == retained, 'Retained maintenance source changed during fetch')
+            return {**retained,'source_sync':'retained-local'}
         base = git(root, 'rev-parse', '--verify', 'refs/remotes/' + REMOTE + '/' + BASE + '^{commit}')
         branch = 'skill-tree/' + project_id
         ref = 'refs/heads/' + branch
-        record = state['projects'].get(project_id)
         exists = bool(git(root, 'for-each-ref', '--format=%(refname)', ref))
         if record is None:
             D._require(not project.exists() and not exists, 'Another checkout or branch occupies the project source destination')
@@ -207,7 +388,10 @@ def prepare(director_root, project_id):
             D._require(git(root, 'rev-parse', ref) == record['base_commit'],
                        'The reserved project branch changed before checkout')
             project.parent.mkdir(exist_ok=True)
-            git(root, 'worktree', 'add', '--', str(project), branch)
+            prefix = ('-c','core.sparseCheckout=false') if compact else ()
+            git(root, *prefix, 'worktree', 'add', '--', str(project), branch, materialize=compact)
+        if compact and not record['ready']:
+            git(project,'config','--worktree','core.sparseCheckout','false')
         result = inspect(director_root, project_id)
         if not record['ready']:
             record['ready'] = True

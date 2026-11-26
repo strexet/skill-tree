@@ -1,0 +1,99 @@
+Shard 1 (4 cases, exit 0)
+DirectorTopologyTests.test_compact_source_preserves_full_project_checkout_and_pr_preflight
+DirectorTopologyTests.test_directed_full_cycle_delivers_primary_and_retains_deferred_intake
+DirectorTopologyTests.test_cross_area_manual_wait_preserves_same_external_run_and_allows_shared_sibling
+DirectorTopologyTests.test_supervised_nested_stall_preserves_sibling_and_fences_replacement
+  {"compact_git_objects_bytes": 269632, "compact_worktree_bytes": 264345, "full_git_objects_bytes": 791750, "full_worktree_bytes": 527332}
+  ....
+  ----------------------------------------------------------------------
+  Ran 4 tests in 631.987s
+
+  OK
+
+Shard 2 (3 cases, exit 0)
+DirectorTopologyTests.test_maintenance_distinguishes_client_outages_from_remote_rejections
+DirectorTopologyTests.test_director_profile_refresh_requires_current_owner_approval_and_reconciles
+DirectorTopologyTests.test_managed_implement_all_keeps_full_snapshot_and_dispatches_compatible_work
+  ...
+  ----------------------------------------------------------------------
+  Ran 3 tests in 365.981s
+
+  OK
+
+Shard 3 (3 cases, exit 1)
+DirectorTopologyTests.test_moved_director_setup_stops_before_child_effects_and_reuses_identity
+DirectorTopologyTests.test_prepared_registration_and_intake_verify_the_original_canonical_route
+DirectorTopologyTests.test_managed_implement_all_resumes_after_verified_incorporation
+  EE.
+  ======================================================================
+  ERROR: test_moved_director_setup_stops_before_child_effects_and_reuses_identity (__main__.DirectorTopologyTests.test_moved_director_setup_stops_before_child_effects_and_reuses_identity)
+  ----------------------------------------------------------------------
+  Traceback (most recent call last):
+    File "/Users/petr/Projects/_skills/_my/skill-tree/.git/skill-tree-worktrees/wr-f44a1e3c-34a2-4f69-94a3-2cae753bb65f/.skill-tree/tests/test-director-topologies.py", line 419, in test_moved_director_setup_stops_before_child_effects_and_reuses_identity
+      self.command('node',SOURCE/'bin/install.js','--only','codex','--target',shared,'--source',composed)
+    File "/Users/petr/Projects/_skills/_my/skill-tree/.git/skill-tree-worktrees/wr-f44a1e3c-34a2-4f69-94a3-2cae753bb65f/.skill-tree/tests/test-director-topologies.py", line 128, in command
+      result = subprocess.run([str(arg) for arg in args], cwd=self.base, env=GIT_ENV,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 550, in run
+      stdout, stderr = process.communicate(input, timeout=timeout)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 1209, in communicate
+      stdout, stderr = self._communicate(input, endtime, timeout)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 2109, in _communicate
+      self._check_timeout(endtime, orig_timeout, stdout, stderr)
+    File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 1253, in _check_timeout
+      raise TimeoutExpired(
+  subprocess.TimeoutExpired: Command '['node', '/Users/petr/Projects/_skills/_my/skill-tree/.git/skill-tree-worktrees/wr-f44a1e3c-34a2-4f69-94a3-2cae753bb65f/.skill-tree/bin/install.js', '--only', 'codex', '--target', '/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/director-topology-controls-49yhmbha/coordinated-workspace', '--source', '/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/director-topology-controls-49yhmbha/move-composer/.skill-tree']' timed out after 60 seconds
+
+  ======================================================================
+  ERROR: test_prepared_registration_and_intake_verify_the_original_canonical_route (__main__.DirectorTopologyTests.test_prepared_registration_and_intake_verify_the_original_canonical_route)
+  ----------------------------------------------------------------------
+  Traceback (most recent call last):
+    File "/Users/petr/Projects/_skills/_my/skill-tree/.git/skill-tree-worktrees/wr-f44a1e3c-34a2-4f69-94a3-2cae753bb65f/.skill-tree/tests/test-director-topologies.py", line 1007, in test_prepared_registration_and_intake_verify_the_original_canonical_route
+      prepared = self.invoke(entry, coordinator, 'setup-bootstrap',
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/Users/petr/Projects/_skills/_my/skill-tree/.git/skill-tree-worktrees/wr-f44a1e3c-34a2-4f69-94a3-2cae753bb65f/.skill-tree/tests/test-director-topologies.py", line 374, in invoke
+      output = self.command(sys.executable, '-B', script, operation, root, *args, error=error)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/Users/petr/Projects/_skills/_my/skill-tree/.git/skill-tree-worktrees/wr-f44a1e3c-34a2-4f69-94a3-2cae753bb65f/.skill-tree/tests/test-director-topologies.py", line 128, in command
+      result = subprocess.run([str(arg) for arg in args], cwd=self.base, env=GIT_ENV,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 550, in run
+      stdout, stderr = process.communicate(input, timeout=timeout)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 1209, in communicate
+      stdout, stderr = self._communicate(input, endtime, timeout)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 2109, in _communicate
+      self._check_timeout(endtime, orig_timeout, stdout, stderr)
+    File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 1253, in _check_timeout
+      raise TimeoutExpired(
+  subprocess.TimeoutExpired: Command '['/Library/Frameworks/Python.framework/Versions/3.11/bin/python3', '-B', '/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/director-topology-controls-wogmmckq/parent/.agents/skills/skill-tree-director-setup/scripts/director-entry.py', 'setup-bootstrap', '/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/director-topology-controls-wogmmckq/guided-parent', '--input', '/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/director-topology-controls-wogmmckq/setup-bootstrap-input.json']' timed out after 60 seconds
+
+  ----------------------------------------------------------------------
+  Ran 3 tests in 487.289s
+
+  FAILED (errors=2)
+
+Shard 4 (3 cases, exit 0)
+DirectorTopologyTests.test_owned_shared_root_and_external_rebind_keep_exact_writers
+DirectorTopologyTests.test_directed_batch_preserves_canonical_metadata_edges_and_receipts
+DirectorTopologyTests.test_supervised_pickup_timeout_recovers_unbound_supervisor_and_worker
+  ...
+  ----------------------------------------------------------------------
+  Ran 3 tests in 460.133s
+
+  OK
+
+Shard 5 (1 cases, exit 0)
+DirectorTopologyTests.test_supervised_heartbeat_progress_and_submission_survive_contention
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 101.061s
+
+  OK
+
+Ran 14 tests in 734.171s
+
+FAILED

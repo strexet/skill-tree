@@ -1,0 +1,14 @@
+{
+  "task_id": "T-27ba5188-4b4e-4c4a-a58a-6537deace20e",
+  "sources": {
+    ".skill-tree/skill-tree.json": "5582847948e14026a7ae7a3d7e992d97dd71825dfa3df19bbde9474cd297241d"
+  },
+  "checks_sha256": "b33397b03bab60c0cf4c71539a3b381f6de7b23e6ed8cbdd604b887f8b9bc0b4",
+  "reviewer": "/root/director_resolver",
+  "status": "accepted",
+  "observations": [
+    "Independently verified the corrected runtime manifest and original PR contract document hashes and their exact current relevant source pins.",
+    "PR helper, shared installer, Director route and the defined PR and integrity tests are unchanged from the current qualified source. Historical outcome identities remain unchanged by the optional recovered-runner acknowledgement digest.",
+    "The existing current declared PR and integrity control receipts remain applicable."
+  ]
+}

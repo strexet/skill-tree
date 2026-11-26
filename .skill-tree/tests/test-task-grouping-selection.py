@@ -102,6 +102,10 @@ class TaskGroupingSelectionTests(unittest.TestCase):
         self.assertEqual([task['id'] for task in union['tasks']], union['ids'])
         self.assertEqual(union['source_hash'], wf.file_hash(self.store.future))
         self.assertEqual(union['outside_dependencies'], [])
+        compact = wf.group_selection(self.store, {**selection,'view':'compact'})
+        self.assertEqual(compact['ids'], union['ids'])
+        self.assertEqual(compact['canonical_queue'], str(self.store.future))
+        self.assertIsNone(compact['queue_id'])
         self.assertEqual(wf.group_selection(self.store, {**selection, 'topic': 'director'})['ids'], [second, first])
         self.assertEqual(wf.group_selection(self.store, {'queue': 'pending', 'topic': 'director'})['ids'],
                          [adjacent, second, first])
@@ -127,9 +131,67 @@ class TaskGroupingSelectionTests(unittest.TestCase):
         ]
         before = self.snapshot()
         for query in bad_selections:
-            with self.subTest(query=query), self.assertRaises(wf.WorkflowError):
-                wf.group_selection(self.store, {'queue': 'pending', **query})
+            with self.subTest(query=query):
+                with self.assertRaises(wf.WorkflowError) as detailed:
+                    wf.group_selection(self.store, {'queue': 'pending', **query})
+                with self.assertRaises(wf.WorkflowError) as compact:
+                    wf.group_selection(self.store, {'queue': 'pending', **query, 'view':'compact'})
+                self.assertEqual(str(compact.exception), str(detailed.exception))
+        with self.assertRaisesRegex(wf.WorkflowError, 'view requires detailed or compact'):
+            wf.group_selection(self.store, {'queue':'pending', 'topic':'director', 'view':True})
         self.assertEqual(self.snapshot(), before)
+
+    def test_compact_projection_preserves_canonical_selection_and_internal_edges(self):
+        subprocess.run(['git','init',str(self.root)], capture_output=True, check=True)
+        registry = wf.workspaces.setup(self.store, {})
+        intake = self.batch(
+            self.item('Primary fixture', topic='director', priority=130, key='main', pending_depends_on=['@setup']),
+            self.item('Fixture setup', topic='director', priority=120, key='setup', pending_depends_on=['@base']),
+            self.item('Outside foundation', topic='foundation', priority=110, key='base'),
+        )
+        batch_filter = {'intake_batch_ids':[intake['id']]}
+        pending_group = wf.group_selection(self.store, {'queue':'pending', **batch_filter})
+        pending_ids = pending_group['ids']
+        query = self.root/'compact-query.json'
+
+        def inspect(queue, pending=False):
+            selection = {'queue':queue, 'topic':'director', **batch_filter}
+            query.write_text(json.dumps({**selection,'view':'compact'}))
+            before = self.snapshot()
+            detailed = wf.group_selection(self.store, selection)
+            compact = wf.group_selection(self.store, {**selection,'view':'compact'})
+            cli = subprocess.run(
+                ['python3','-B',str(CORE/'common/scripts/workflow-state.py'),'group-selection',
+                 str(self.root),'--input',str(query)],capture_output=True,text=True,check=True,
+            )
+            self.assertEqual(json.loads(cli.stdout),compact)
+            self.assertEqual(compact['queue'],queue)
+            self.assertEqual(compact['canonical_queue'],str(self.store.future))
+            self.assertEqual(compact['queue_id'],registry['queue_id'])
+            for key in ('ids','outside_dependencies','source_hash'):
+                self.assertEqual(compact[key],detailed[key])
+            self.assertEqual(compact['source_hash'],wf.file_hash(self.store.future))
+            self.assertEqual(len(compact['tasks']),2)
+            primary,setup = compact['tasks']
+            for row, full in zip(compact['tasks'],detailed['tasks']):
+                self.assertEqual(set(row),{'id','title','priority','status','depends_on'})
+                self.assertEqual({key:row[key] for key in ('id','title','priority','status')},
+                                 {key:full[key] for key in ('id','title','priority','status')})
+                self.assertIn('body',full)
+            self.assertEqual(primary['depends_on'],[setup['id']])
+            self.assertEqual(setup['depends_on'],[])
+            if pending:
+                self.assertEqual(compact['ids'],pending_ids[:2])
+                self.assertEqual(compact['outside_pending_dependencies'],pending_ids[2:])
+                self.assertEqual(compact['outside_dependencies'],[])
+            else:
+                self.assertEqual(compact['outside_dependencies'],detailed['tasks'][1]['depends_on'])
+                self.assertEqual(len(compact['outside_dependencies']),1)
+            self.assertEqual(self.snapshot(),before)
+
+        inspect('pending', pending=True)
+        wf.process(self.store, self.payload(pending_group))
+        inspect('prioritized')
 
     def test_processing_requires_current_preview_and_promotes_only_the_exact_selection(self):
         batch = self.batch(self.item('First director task', topic='director'))
@@ -161,8 +223,9 @@ class TaskGroupingSelectionTests(unittest.TestCase):
         text = wf.rewrite_meta(self.store.text(), unrelated['id'], {'intake_batch_ids': [original['id']]})
         self.store.future.write_text(text)
         before = self.snapshot()
-        with self.assertRaisesRegex(wf.WorkflowError, 'original Pending provenance'):
-            wf.group_selection(self.store, {'queue': 'pending', 'intake_batch_ids': [original['id']]})
+        for view in ('detailed','compact'):
+            with self.assertRaisesRegex(wf.WorkflowError, 'original Pending provenance'):
+                wf.group_selection(self.store, {'queue':'pending','intake_batch_ids':[original['id']],'view':view})
         self.assertEqual(self.snapshot(), before)
 
     def test_recent_cli_lists_only_recorded_batches_by_utc_time(self):

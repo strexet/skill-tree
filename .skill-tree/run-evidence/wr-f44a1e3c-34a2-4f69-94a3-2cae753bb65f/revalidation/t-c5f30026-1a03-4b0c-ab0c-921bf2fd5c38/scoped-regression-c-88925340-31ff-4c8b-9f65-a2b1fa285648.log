@@ -1,0 +1,66 @@
+Shard 1 (2 cases, exit 0)
+DirectorTopologyTests.test_compact_source_preserves_full_project_checkout_and_pr_preflight
+DirectorTopologyTests.test_directed_batch_preserves_canonical_metadata_edges_and_receipts
+  {"compact_git_objects_bytes": 269588, "compact_worktree_bytes": 264345, "full_git_objects_bytes": 791706, "full_worktree_bytes": 527332}
+  ..
+  ----------------------------------------------------------------------
+  Ran 2 tests in 67.218s
+
+  OK
+
+Shard 2 (2 cases, exit 0)
+DirectorTopologyTests.test_maintenance_distinguishes_client_outages_from_remote_rejections
+DirectorTopologyTests.test_cross_area_manual_wait_preserves_same_external_run_and_allows_shared_sibling
+  ..
+  ----------------------------------------------------------------------
+  Ran 2 tests in 51.632s
+
+  OK
+
+Shard 3 (2 cases, exit 0)
+DirectorTopologyTests.test_moved_director_setup_stops_before_child_effects_and_reuses_identity
+DirectorTopologyTests.test_managed_implement_all_keeps_full_snapshot_and_dispatches_compatible_work
+  ..
+  ----------------------------------------------------------------------
+  Ran 2 tests in 134.674s
+
+  OK
+
+Shard 4 (2 cases, exit 0)
+DirectorTopologyTests.test_owned_shared_root_and_external_rebind_keep_exact_writers
+DirectorTopologyTests.test_managed_implement_all_resumes_after_verified_incorporation
+  ..
+  ----------------------------------------------------------------------
+  Ran 2 tests in 157.118s
+
+  OK
+
+Shard 5 (2 cases, exit 0)
+DirectorTopologyTests.test_directed_full_cycle_delivers_primary_and_retains_deferred_intake
+DirectorTopologyTests.test_supervised_pickup_timeout_recovers_unbound_supervisor_and_worker
+  ..
+  ----------------------------------------------------------------------
+  Ran 2 tests in 172.058s
+
+  OK
+
+Shard 6 (2 cases, exit 0)
+DirectorTopologyTests.test_prepared_registration_and_intake_verify_the_original_canonical_route
+DirectorTopologyTests.test_supervised_nested_stall_preserves_sibling_and_fences_replacement
+  ..
+  ----------------------------------------------------------------------
+  Ran 2 tests in 342.713s
+
+  OK
+
+Shard 7 (1 cases, exit 0)
+DirectorTopologyTests.test_supervised_heartbeat_progress_and_submission_survive_contention
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 94.249s
+
+  OK
+
+Ran 13 tests in 437.256s
+
+OK

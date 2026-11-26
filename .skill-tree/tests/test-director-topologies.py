@@ -4,11 +4,13 @@ from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from hashlib import sha256
+import importlib.util
 import json
 import os
 import runpy
 from pathlib import Path
 from shutil import copytree, ignore_patterns
+import random
 import signal
 import socket
 import subprocess
@@ -59,6 +61,47 @@ def snapshot(*paths):
     return tuple(path.read_bytes() if path.exists() else None for path in paths)
 
 
+DIRECTOR_BATCH_FAULT = '''
+import json
+from pathlib import Path
+import runpy
+import sys
+
+director = runpy.run_path(sys.argv[1])
+load = director['WF'].owned_module
+payload = json.loads(Path(sys.argv[-1]).read_text())
+stage = sys.argv[2]
+
+def with_interruption(name, path):
+    helper = load(name, path)
+    if name == 'director_run' and stage == 'lost-ack':
+        original = helper.DirectorRun._write
+
+        def write(self, relative, state, expected_sha):
+            if any(row['event'] == 'dispatch-recorded' and row.get('operation') == payload['operation']
+                   for row in state['timeline']):
+                raise OSError('Injected loss after canonical acknowledgement')
+            return original(self, relative, state, expected_sha)
+
+        helper.DirectorRun._write = write
+    if name == 'director_run' and stage == 'pause':
+        original = helper.DirectorRun._batch_dispatched_result
+
+        def pause(self, *args):
+            result = original(self, *args)
+            run_id = payload['director_run_id']
+            _, _, current_sha = self._load(run_id)
+            self.lifecycle('run-pause', {'director_run_id':run_id,'expected_run_sha256':current_sha})
+            return result
+
+        helper.DirectorRun._batch_dispatched_result = pause
+    return helper
+
+director['WF'].owned_module = with_interruption
+raise SystemExit(director['main'](sys.argv[3:]))
+'''
+
+
 class DirectorTopologyTests(unittest.TestCase):
     def setUp(self):
         scratch = tempfile.TemporaryDirectory(prefix='director-topology-controls-')
@@ -93,6 +136,211 @@ class DirectorTopologyTests(unittest.TestCase):
 
     def git(self, root, *args):
         return self.command('git', '-C', root, '-c', 'commit.gpgsign=false', '-c', f'core.hooksPath={os.devnull}', *args)
+
+    def test_compact_source_preserves_full_project_checkout_and_pr_preflight(self):
+        core = SOURCE/'common/scripts'
+        maintenance_spec = importlib.util.spec_from_file_location('compact_maintenance_fixture',core/'director-maintenance.py')
+        maintenance = importlib.util.module_from_spec(maintenance_spec)
+        maintenance_spec.loader.exec_module(maintenance)
+        seed = self.base/'compact-upstream'
+        seed.mkdir()
+        self.git(seed,'init','-q','-b','develop')
+        self.git(seed,'config','uploadpack.allowFilter','true')
+        self.git(seed,'config','uploadpack.allowAnySHA1InWant','true')
+        maintenance.UPSTREAM = seed.as_uri()
+        fixture_rng = random.Random(23)
+        write(seed,QUEUE,'# Future Work\n\n## Pending Task Format\n\n## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n')
+        write(seed,'.skill-tree/config/repository.json','{"schema":1,"role":"source"}\n')
+        maintenance.D.WS.setup(maintenance.D.WF.Store(seed),{},update_navigation=False)
+        portable = write(seed,'.skill-tree/skill-tree.json','{"fixture":"original navigation"}\n')
+        installed_name = '.agents/skills/skill-tree-work-through-next'
+        installed_skill = write(seed,installed_name+'/SKILL.md','# Fixture installed skill\n')
+        copied_runtime = installed_skill.parent/'copied-runtime.bin'
+        copied_runtime.write_bytes(fixture_rng.randbytes(256*1024))
+        edited_name = '.agents/skills/skill-tree-repo-documentation-audit'
+        edited_skill = write(seed,edited_name+'/SKILL.md','# Fixture modified package\n')
+        extra = write(seed,edited_name+'/local-change.md','An undeclared tracked note.\n')
+        shared_copy = write(seed,'.skill-tree/installation/source/common/scripts/example.py','value = 1\n')
+        local_notes = write(seed,'.skill-tree/installation/local-note.md','An undeclared installation note.\n')
+        custom = write(seed,'.agents/skills/local-design/SKILL.md','# Independently authored skill\n')
+        source = write(seed,'.skill-tree/common/scripts/example.py','value = 1\n')
+        history = write(seed,'.skill-tree/history/source-observation.json','{"scope":"source"}\n')
+        distribution = write(seed,'.skill-tree/skills/general/fixture/SKILL.md','# Standalone fixture\n')
+        profile = write(seed,PROFILE,json.dumps({'format':'skill-tree-profile','schema':1,
+            'project_root':'/foreign-installation',
+            'bundle_digests':{shared_copy.relative_to(seed).as_posix():sha(shared_copy.read_bytes())},
+            'destinations':{installed_name:{
+                'name':'skill-tree-work-through-next','provider':'codex','providers':['codex'],
+                'files':{'SKILL.md':sha(installed_skill.read_bytes()),'copied-runtime.bin':sha(copied_runtime.read_bytes())},
+            },edited_name:{
+                'name':'skill-tree-repo-documentation-audit','provider':'codex','providers':['codex'],
+                'files':{'SKILL.md':sha(edited_skill.read_bytes())},
+            }}}))
+        obsolete = seed/'obsolete-source-evidence.bin'
+        obsolete.write_bytes(fixture_rng.randbytes(512*1024))
+        def commit(root,message):
+            self.git(root,'add','.')
+            self.git(root,'-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-qm',message)
+            return self.git(root,'rev-parse','HEAD').strip()
+        commit(seed,'Fixture historic objects')
+        obsolete.unlink()
+        base = commit(seed,'Fixture current source')
+        baseline = self.base/'full-baseline'
+        self.git(self.base,'clone','--no-local','--single-branch','--branch','develop','--no-tags','--origin','upstream',
+                 seed.as_uri(),str(baseline))
+        baseline_project = self.base/'full-baseline-project'
+        self.git(baseline,'worktree','add','-b','skill-tree/compact','--',str(baseline_project),base)
+        owner = self.base/'compact-director'
+        owner.mkdir()
+        ready = maintenance.prepare(owner,'compact')
+        canonical = Path(ready['checkout'])
+        project = Path(ready['project_checkout'])
+        earlier = {'schema':1,'upstream':seed.as_uri(),'checkout':str(baseline),'revision':base,
+                   'projects':{},'queue_id':ready['queue_id']}
+        earlier_marker = write(baseline,'.git/'+maintenance.MARKER,json.dumps(earlier))
+        recorded_earlier = earlier_marker.read_bytes()
+        self.assertEqual(maintenance.provision(baseline),earlier)
+        self.assertEqual(earlier_marker.read_bytes(),recorded_earlier)
+        self.assertEqual((baseline/PROFILE).read_bytes(),profile.read_bytes())
+        self.assertEqual((ready['revision'],ready['base_commit']), (base,base))
+        self.assertFalse((canonical/PROFILE).exists())
+        self.assertFalse((canonical/installed_name).exists())
+        self.assertFalse((canonical/shared_copy.relative_to(seed)).exists())
+        self.assertEqual((project/PROFILE).read_bytes(),profile.read_bytes())
+        for file in (portable,custom,source,history,distribution,seed/STATE,edited_skill,extra,local_notes):
+            relative = file.relative_to(seed)
+            self.assertEqual((canonical/relative).read_bytes(),file.read_bytes())
+            self.assertEqual((project/relative).read_bytes(),file.read_bytes())
+        for checkout in (canonical,project):
+            self.assertEqual(self.git(checkout,'status','--porcelain'),'')
+        self.assertEqual(maintenance.D._inspect_profile(canonical),{'kind':'repository-local-source'})
+        self.assertEqual(ready['queue_id'],maintenance.D._inspect_owner(canonical)[0])
+        self.assertEqual(self.git(project,'config','--bool','--get','core.sparseCheckout').strip(),'false')
+        self.assertTrue(all(line.startswith('H ') for line in self.git(project,'ls-files','-v').splitlines()))
+        def tracked_bytes(*checkouts):
+            return sum((checkout/relative).stat().st_size for checkout in checkouts
+                       for relative in self.git(checkout,'ls-files','-z').split('\0')
+                       if (checkout/relative).is_file())
+        def git_bytes(checkout):
+            return sum(file.stat().st_size for file in (checkout/'.git/objects').rglob('*') if file.is_file())
+        measured = {'full_worktree_bytes':tracked_bytes(baseline,baseline_project),
+                    'compact_worktree_bytes':tracked_bytes(canonical,project),
+                    'full_git_objects_bytes':git_bytes(baseline),'compact_git_objects_bytes':git_bytes(canonical)}
+        print(json.dumps(measured,sort_keys=True))
+        self.assertLess(measured['compact_worktree_bytes'],measured['full_worktree_bytes'])
+        self.assertLess(measured['compact_git_objects_bytes'],measured['full_git_objects_bytes'])
+        candidate = self.base/'compact-candidate'
+        self.git(canonical,'worktree','add','-b','fixture-review','--',str(candidate),base)
+        corrected = write(candidate,source.relative_to(seed).as_posix(),'value = 2\n')
+        head = commit(candidate,'Reviewed fixture source correction')
+        applied = maintenance.integrate(owner,'compact',expected_head=base,candidate_commit=head,
+            reviewed_paths={source.relative_to(seed).as_posix():sha(corrected.read_bytes())},
+            owner={'actor':'fixture','kind':'owner-message','reference':'fixture-source-approval'})
+        self.assertTrue(applied['applied'])
+        self.assertEqual(self.git(project,'rev-parse','HEAD').strip(),head)
+        self.assertEqual((project/PROFILE).read_bytes(),profile.read_bytes())
+        review_spec = importlib.util.spec_from_file_location('compact_pr_fixture',core/'pr-review-state.py')
+        review = importlib.util.module_from_spec(review_spec)
+        review_spec.loader.exec_module(review)
+        snapshot_row = {'repo_id':review.ws.repo_id(project),'remote':'upstream',
+                        'remote_id':sha(seed.as_uri().encode()),'source_branch':ready['branch'],
+                        'target_branch':'develop','base_oid':base,'head':head,'state':'OPEN',
+                        'changed_files':[source.relative_to(seed).as_posix()],
+                        'pr':{'id':'PR_fixture','number':1,'url':'https://example.invalid/owner/fixture/pull/1'}}
+        publication_id = 'a'*32
+        record = review.new_record(snapshot_row,review.parameters(ready['branch'],{}))
+        record['publication_id'] = publication_id
+        write(canonical,f'.skill-tree/history/publications/pub-{publication_id}.json',json.dumps(record))
+        verified = review.existing_source_preflight(canonical,
+            {'source_checkout':str(project),'snapshot':snapshot_row},publication_id)
+        self.assertEqual(verified['source_checkout']['path'],str(project))
+        self.assertEqual(verified['changed_files'],snapshot_row['changed_files'])
+        marker = canonical/'.git'/maintenance.MARKER
+        recorded = marker.read_bytes()
+        forged = json.loads(recorded)
+        forged['excluded_deployments'].append(edited_name)
+        marker.write_text(json.dumps(forged))
+        try:
+            with self.assertRaisesRegex(ValueError,'exclusions differ from the pinned source'):
+                maintenance.inspect(owner,'compact')
+        finally:
+            marker.write_bytes(recorded)
+        actual_git = maintenance.git
+        def offline(root,*args,**options):
+            if args[0] == 'fetch':
+                raise maintenance.TransportUnavailable('fixture upstream unavailable')
+            return actual_git(root,*args,**options)
+        with patch.object(maintenance,'git',side_effect=offline):
+            retained = maintenance.prepare(owner,'compact')
+            self.assertEqual(retained['source_sync'],'retained-local')
+            dirty = write(project,'local-draft.txt','Preserve local work.\n')
+            try:
+                with self.assertRaises(maintenance.TransportUnavailable):
+                    maintenance.prepare(owner,'compact')
+                self.assertEqual(dirty.read_text(),'Preserve local work.\n')
+            finally:
+                dirty.unlink()
+            with self.assertRaises(maintenance.TransportUnavailable):
+                maintenance.prepare(owner,'new')
+        self.assertEqual(marker.read_bytes(),recorded)
+        self.assertFalse((owner/'sources/projects/new').exists())
+        self.git(seed,'config','uploadpack.allowFilter','false')
+        fallback_owner = self.base/'full-object-fallback-director'
+        fallback_owner.mkdir()
+        fallback = maintenance.prepare(fallback_owner,'compact')
+        self.assertEqual((fallback['revision'],fallback['base_commit']),(base,base))
+        self.assertFalse((Path(fallback['checkout'])/PROFILE).exists())
+        self.assertEqual((Path(fallback['project_checkout'])/PROFILE).read_bytes(),profile.read_bytes())
+        legacy_state = '{"schema":2,"tasks":[],"active_run":null}'
+        write(seed,STATE,legacy_state)
+        legacy = commit(seed,'Fixture checkpoint without portable registry')
+        legacy_owner = self.base/'legacy-checkpoint-director'
+        legacy_owner.mkdir()
+        with self.assertRaisesRegex(ValueError,'portable registration before compact setup'):
+            maintenance.prepare(legacy_owner,'old-source')
+        retained_root = legacy_owner/'sources/skill-tree'
+        self.assertEqual((retained_root/STATE).read_text(),legacy_state)
+        self.assertEqual((retained_root/'.skill-tree/skill-tree.json').read_bytes(),portable.read_bytes())
+        self.assertEqual(self.git(retained_root,'rev-parse','HEAD').strip(),legacy)
+        self.assertEqual(self.git(retained_root,'status','--porcelain'),'')
+        if os.name != 'nt':
+            profile.unlink()
+            profile.symlink_to('../config/repository.json')
+            commit(seed,'Fixture unowned symbolic install profile')
+            unsafe_owner = self.base/'unsafe-profile-director'
+            unsafe_owner.mkdir()
+            with self.assertRaisesRegex(ValueError,'outside the compact source ownership contract'):
+                maintenance.prepare(unsafe_owner,'compact')
+            self.assertFalse((unsafe_owner/'sources/skill-tree').exists())
+            profile.unlink()
+        write(seed,PROFILE,'{"format":"skill-tree-profile","schema":1,"project_root":"/fixture"}')
+        commit(seed,'Fixture malformed regular install profile')
+        malformed_owner = self.base/'malformed-profile-director'
+        malformed_owner.mkdir()
+        with self.assertRaisesRegex(ValueError,'outside the compact source ownership contract'):
+            maintenance.prepare(malformed_owner,'compact')
+        self.assertFalse((malformed_owner/'sources/skill-tree').exists())
+
+    def test_maintenance_distinguishes_client_outages_from_remote_rejections(self):
+        core = SOURCE/'common/scripts/director-maintenance.py'
+        spec = importlib.util.spec_from_file_location('maintenance_transport_fixture',core)
+        maintenance = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(maintenance)
+        unavailable = "fatal: unable to access 'https://example.invalid/project': Could not resolve host: example.invalid\n"
+        client = subprocess.CompletedProcess([],128,'',unavailable)
+        with patch.object(maintenance.subprocess,'run',return_value=client):
+            with self.assertRaises(maintenance.TransportUnavailable):
+                maintenance.git(self.parent,'fetch','upstream')
+        denied = subprocess.CompletedProcess([],128,'','remote: connection refused by repository policy\n')
+        with patch.object(maintenance.subprocess,'run',return_value=denied):
+            with self.assertRaises(ValueError) as raised:
+                maintenance.git(self.parent,'fetch','upstream')
+        self.assertNotIsInstance(raised.exception,maintenance.TransportUnavailable)
+        deadline = subprocess.TimeoutExpired(['git','fetch'],240,stderr=b'credential helper did not respond')
+        with patch.object(maintenance.subprocess,'run',side_effect=deadline):
+            with self.assertRaises(ValueError) as raised:
+                maintenance.git(self.parent,'fetch','upstream')
+        self.assertNotIsInstance(raised.exception,maintenance.TransportUnavailable)
 
     def git_project(self, root, areas):
         root.mkdir()
@@ -359,6 +607,355 @@ class DirectorTopologyTests(unittest.TestCase):
         body = self.core(root, 'read', None, '--id', task)['body']
         return {'task_id': task, 'body_sha256': sha(body.encode())}
 
+    def accept_full_cycle_fixture_review(self, wf, store, scope, candidate, check):
+        source = wf['file_hash'](store.future)
+        scope_hash = wf['digest'](wf['dump'](scope).encode())
+        context = {**scope,'id':'full-cycle-fixture-'+scope['kind'],
+                   'semantic_fingerprint':scope_hash,'content_fingerprint':scope_hash}
+        owner = {'id':'fixture-owner','context_id':'fixture-owner-context'}
+        frame = wf['orchestration_action'](store,'orchestration-start',{
+            'request_id':'full-cycle-fixture-'+scope['kind'],'context':context,
+            'authority':{'id':'fixture-grant','revision':1,'context_id':context['id'],
+                         'allowed_kinds':['specification-acceptance'],'constraints':['Disposable fixture delivery.'],
+                         'evidence':{'kind':'owner-message','reference':'Scripted fixture owner grant.'}},
+            'executor':{'id':'fixture-executor','context_id':'fixture-executor-context'},'mode':'manual',
+            'capabilities':{'independent_actors':False},'expected_source_hash':source})
+
+        def step(command, **payload):
+            nonlocal frame
+            frame = wf['orchestration_action'](store,'orchestration-'+command,{
+                'orchestration_id':frame['id'],'expected_source_hash':source,
+                'expected_orchestration_hash':frame['orchestration_hash'],
+                'expected_orchestration_revision':frame['revision'],**payload})
+            return frame
+
+        def inspect(command):
+            return wf['orchestration_action'](store,'orchestration-'+command,{'orchestration_id':frame['id']})
+
+        step('research',reference='Inspected the exact primary fixture candidate.')
+        step('plan',plan_digest=scope_hash,required_checks=[check],reference='Review the original fixture scope.')
+        step('question',purpose='plan',question={
+            'id':'fixture-plan','kind':'specification-acceptance','significance':'routine',
+            'text':'Accept the scoped fixture plan?','options':[{'id':'accept','text':'Accept the plan.'},
+                                                            {'id':'revise','text':'Revise the plan.'}],
+            'recommendation':'accept'})
+        pending = inspect('next')
+        step('prepare-actor',input_digest=pending['input_digest'],expected_decision_hash=pending['decision_hash'],actor=owner)
+        waiting = inspect('next')
+        step('record-actor',attempt_id=waiting['attempt_id'],input_digest=waiting['input_digest'],
+             expected_decision_hash=waiting['decision_hash'],
+             result={'status':'answered','answer':'accept','rationale':'The scripted primary scope is accepted.'},
+             evidence={'kind':'submitted-answer','reference':'Scripted fixture answer.',
+                       'actor_id':owner['id'],'actor_context_id':owner['context_id']})
+        accepted = step('accept-decision')
+        step('accept-plan',decision_receipt=accepted['acceptance'])
+        step('implement',identity=candidate,reference='Sealed the exact accepted primary Git candidate.')
+        evidence, = inspect('check-evidence')['checks']
+        self.assertEqual(evidence['status'],'reusable')
+        step('checks',identity=candidate,reused_checks=[{
+            key:evidence[key] for key in ('id','task_id','check_id','attempt_id')}])
+        step('review',identity=candidate,review_id='fixture-'+scope['kind'],findings=[],
+             reference='Inspected the disposable primary candidate and source evidence.')
+        return frame['id']
+
+    def test_directed_full_cycle_delivers_primary_and_retains_deferred_intake(self):
+        root = self.external
+        self.install(root, 'unity', WRITER, 'skill-tree-full-cycle')
+        self.git(root, 'config', 'user.name', 'Director Fixture')
+        self.git(root, 'config', 'user.email', 'fixture@example.invalid')
+        area = self.declaration['areas'][-1]
+        area['scope'] = '.'
+        area['allowed_effects'].extend(['preview', 'intake', 'process'])
+        self.register()
+        primary = {'key':'primary','title':'Change the selected game input',
+                   'description':'Deliver the selected input change.','acceptance':['Keep the approved game input.'],
+                   'topic':'primary-delivery','priority':125,'source':'The approved product request.'}
+        deferred = {'key':'follow-up','title':'Assess the deployment handoff',
+                    'description':'Assess deployment after operations supplies settings.',
+                    'acceptance':['Record the deployment inputs.'],'topic':'deferred-delivery','priority':300,
+                    'source':'The deferred operations request.','pending_depends_on':['@primary']}
+        child = {'intake_batch_id':identity('IB'),'items':[deferred,primary],
+                 'full_cycle_partition':{'primary':['primary'],'deferred':['follow-up']}}
+        runtime = self.parent/AGENTS/'skill-tree-director-setup/scripts/runtime/common/scripts'
+        director = SimpleNamespace(**runpy.run_path(str(runtime/'director-state.py')))
+        routing = runpy.run_path(str(runtime/'director-project-routing.py'))
+        verified = director._inspect_owner(root)
+        project = {'id':'game','checkout':str(root),'queue_id':verified[0],'state':'available',
+                   'allowed_effects':area['allowed_effects']}
+        before = snapshot(root/QUEUE,root/STATE,root/PROFILE)
+        route = routing['preview'](director,self.parent,self.parent,{}, {},[project],{
+            'project_id':'game','operation':'skill-tree-full-cycle','full_cycle':child})
+        self.assertEqual(route['status'],'preview')
+        self.assertEqual(route['full_cycle']['child'],child)
+        self.assertEqual(snapshot(root/QUEUE,root/STATE,root/PROFILE),before)
+        assignment = {'id':'approved-cycle','area_id':'game','role':'unity','workspace':'existing-checkout',
+                      'capability':'core-task','write_paths':['game/source.txt'],'resources':[],'pins':[],
+                      'depends_on':[],'expected_result':'Complete the primary fixture.','check':'scope-check',
+                      'authority_ref':'fixture-owner','effects':['intake','process'],
+                      'stop_rules':['Process only approved primary scope.'],'child':route['full_cycle']['child']}
+        selected = self.freeze(None,assignments=[assignment])
+        criterion = primary['acceptance'][0]
+        relative = 'game/source.txt'
+        check = {'id':'scope-check','recipe_id':'static-inspection','criteria':[criterion],
+                 'sources':[relative],'parameters':{},'assertion':criterion,'timing':'immediate'}
+        body = ('Goal:\n- ' + criterion + '\n\nTouch:\n- ' + relative + '\n\nValidation:\n```json\n'
+                + json.dumps({'checks':[check]}) + '\n```\n\nAcceptance:\n- ' + criterion + '\n')
+        disposition = {'status':'promoted','reason':'The primary fixture has exact reviewed scope.'}
+        task = {'key':'delivery','title':primary['title'],'body':body,'parent_pending_ids':['primary']}
+        proposal = {'selectors':['primary'],'dispositions':{'primary':disposition},'tasks':[task]}
+        approved = sha((json.dumps(proposal,ensure_ascii=False,indent=2,sort_keys=True)+'\n').encode())
+        run_ref = {'director_run_id':identity('DR')}
+        run = self.director('run-start',{**selected,**run_ref,'assignment_ids':[assignment['id']],
+            'owner':{'actor':'fixture-owner','reference':'approved-cycle','kind':'owner-message'},
+            'authority':{assignment['id']:['intake','process']},'approved_defaults':[],
+            'process_spec_sha256':{assignment['id']:approved}})
+        receive = {**run_ref,'assignment_id':assignment['id'],'operation':'intake',
+                   'expected_run_sha256':run['run_sha256'],'request':{'expected_source_hash':sha((root/QUEUE).read_bytes())}}
+        scope = {'schema':1,'director_id':CURRENT_DIRECTOR,'assignment_id':assignment['id'],
+                 'queue_id':self.external_queue,'plan_sha256':selected['plan_sha256']}
+        parent_entry = self.parent/AGENTS/'skill-tree-director-run/scripts/runtime/common/scripts/director-state.py'
+        intake_input = write(self.base,'partitioned-intake.json',json.dumps(receive))
+        self.command(sys.executable,'-B','-c',DIRECTOR_BATCH_FAULT,parent_entry,'lost-ack',
+                     'run-dispatch',self.parent,'--input',intake_input,
+                     error='Injected loss after canonical acknowledgement')
+        observed = self.core(root,'director-dispatch-read',{'operation':'intake','director_dispatch':scope})
+        intake = self.director('run-dispatch',receive)
+        self.assertEqual(intake['result'],observed['observed_result'])
+        partition = intake['result']['full_cycle_partition']
+        pending_result, = partition['primary']
+        pending_later, = partition['deferred']
+        self.assertEqual(self.director('run-dispatch',receive)['result'],intake['result'])
+        verified_intake = self.director('verify-intake',{**run_ref,'assignment_id':assignment['id']},family='run')
+        self.assertEqual(verified_intake['full_cycle_partition'],partition)
+        paused = self.director('run-pause',{**run_ref,'expected_run_sha256':intake['run_sha256']})
+        resumed = self.director('run-resume',{**run_ref,'expected_run_sha256':paused['run_sha256']})
+        request = {**receive,'operation':'process','expected_run_sha256':resumed['run_sha256'],'request':{
+            'expected_source_hash':sha((root/QUEUE).read_bytes()),'selectors':[pending_result],
+            'dispositions':{pending_result:disposition},'tasks':[{**task,'parent_pending_ids':[pending_result]}]}}
+        pending = self.core(root,'read',None,'--id',pending_later)['body']
+        self.director('run-dispatch',{**request,'request':{**request['request'],'selectors':[pending_later]}},
+                      error='exact recorded batch')
+        processed = self.director('run-dispatch',request)
+        self.assertEqual(self.director('run-dispatch',request)['result'],processed['result'])
+        handoff = self.director('verify-intake',{**run_ref,'assignment_id':assignment['id']},family='run')
+        self.assertEqual(handoff['full_cycle_partition'],partition)
+        self.assertEqual(handoff['full_cycle_primary']['task_ids'],processed['result']['created_ids'])
+        ready, = handoff['full_cycle_primary']['task_ids']
+        ready_row = self.core(root,'read',None,'--id',ready)
+        self.assertEqual((ready_row['topic'],ready_row['priority'],ready_row['parent_pending_ids']),
+                         ('primary-delivery',125,[pending_result]))
+        self.assertEqual(self.core(root,'read',None,'--id',pending_later)['body'],pending)
+        self.assertEqual(self.director('run-status',run_ref)['assignments'][assignment['id']]['completed']
+                         ['full_cycle_partition'],partition)
+
+        entry = root/AGENTS/'skill-tree-full-cycle/scripts/workflow-state.py'
+        launch = self.invoke(entry,root,'start',{'implementation_operation':'work-through-next',
+            'local_base':True,'local_base_authorization':'Use the disposable local fixture base.',
+            'base_branch':'develop','delivery_authorization':{
+                'merge':True,'owner_instruction':'Verify reviewed delivery in the disposable fixture.'}},
+            ['--standalone','--mode','next','--id',ready],None)
+        self.assertEqual(launch['snapshot'],[ready])
+        worktree = Path(launch['profile_handoff']['worktree'])
+        wf = runpy.run_path(str(entry))['main'].__globals__
+        store = wf['Store'](worktree,launch['id'])
+        wf['prepare_worktree_profile'](store)
+        wf['begin_task'](store,{'task_id':ready})
+        content = 'Accepted game input.\n'
+        write(worktree,relative,content)
+        proof = f".skill-tree/run-evidence/{launch['id'].lower()}/primary.txt"
+        write(worktree,proof,(worktree/relative).read_text())
+        candidate = wf['mark_implemented'](store,{'task_id':ready,'changed_files':[relative,proof]})
+        prepared = wf['prepare_check'](store,{'task_id':ready,'check_id':check['id']})
+        self.assertEqual((worktree/relative).read_text(),content)
+        wf['record_check'](store,{'task_id':ready,'check_id':check['id'],'attempt_id':prepared['attempt_id'],
+            'result':'pass','classification':'executed-control','actual_lane':prepared['recipe']['lane'],
+            'environment_identity':prepared['environment_identity'],'cleanup':'The disposable fixture file was read.',
+            'evidence':[proof],'assertions':[{'assertion':criterion,'result':'pass'}]})
+        review = self.accept_full_cycle_fixture_review(
+            wf,store,{'kind':'task','task_ids':[ready]},candidate['git_review_identity'],check['id'])
+        completed = wf['complete'](store,{'task_id':ready,'review_id':review,'outcome':'The selected game input changed.',
+            'source_fingerprints':wf['fingerprints'](store,[relative]),
+            'acceptance':[{'criterion':criterion,'result':'pass','evidence':[proof]}]})
+        wf['advance'](store)
+        controller = wf['controller_review_identity'](store)
+        controller_review = self.accept_full_cycle_fixture_review(
+            wf,store,controller['review_scope'],controller['identity'],check['id'])
+        delivered = wf['finish'](store,{'review_id':controller_review})
+        self.assertEqual(completed['parent_pending_ids'],[pending_result])
+        self.assertEqual(delivered['delivery']['status'],'merged')
+        self.assertEqual((root/relative).read_text(),content)
+        self.assertEqual(self.core(root,'read',None,'--id',pending_later)['body'],pending)
+        delivered_state = snapshot(root/QUEUE,root/STATE,root/PROFILE)
+        self.assertEqual(self.director('run-dispatch',receive)['result'],intake['result'])
+        self.assertEqual(self.director('run-dispatch',request)['result'],processed['result'])
+        self.assertEqual(self.director('verify-intake',{**run_ref,'assignment_id':assignment['id']},family='run'),
+                         handoff)
+        self.assertEqual(snapshot(root/QUEUE,root/STATE,root/PROFILE),delivered_state)
+        self.assertEqual(self.core(root,'read',None,'--id',pending_later)['status'],'Pending')
+
+    def test_director_profile_refresh_requires_current_owner_approval_and_reconciles(self):
+        root=self.external
+        area=self.declaration['areas'][-1]
+        area['scope']='.'
+        area['allowed_effects'].append('preview')
+        self.register()
+        task=self.child_task(root)
+        start=self.core(root,'start',{
+            'base_branch':'develop','local_base':True,
+            'local_base_authorization':'Select the disposable fixture branch.',
+        },'--id',task['task_id'])
+        run_id=start['id']
+        checkout=Path(start['profile_handoff']['worktree'])
+        self.core(root,'prepare-worktree-profile',None,'--run-id',run_id,target=checkout)
+        self.core(root,'checkpoint',{'phase':'blocked','stop_reason':'Wait for fixture acceptance'},
+                  '--run-id',run_id,target=checkout)
+        paths=[root/QUEUE,root/STATE,root/PROFILE,checkout/PROFILE,self.parent/REGISTRY,self.parent/BINDINGS]
+        prior=snapshot(*paths)
+        original_branch=self.git(root,'rev-parse','HEAD')
+        changed=write(root,'config/browser-policy.json','{}\n')
+        selector={'project_id':'game'}
+        preview=self.director('profile-refresh-preview',selector,family='setup')
+        self.assertEqual(preview['status'],'preview')
+        self.assertEqual(preview['checkout'],str(root))
+        self.assertEqual(preview['changed_inputs'],['config/browser-policy.json'])
+        self.assertEqual([run['run_id'] for run in preview['affected_runs']],[run_id])
+        runtime=self.parent/AGENTS/'skill-tree-director-setup/scripts/runtime/common/scripts'
+        director=SimpleNamespace(**runpy.run_path(str(runtime/'director-state.py')))
+        routing=runpy.run_path(str(runtime/'director-project-routing.py'))
+        project={'id':'game','checkout':str(root),'queue_id':self.external_queue,'state':'available',
+                 'allowed_effects':area['allowed_effects']}
+        routed=routing['preview'](director,self.parent,self.parent,{'providers':['codex']},read_json(self.parent/PROFILE),
+            [project],{**selector,'operation':'profile-refresh'})
+        self.assertEqual(routed['command'],'profile-refresh-preview')
+        self.assertEqual(routed['preview_sha256'],preview['preview_sha256'])
+        self.assertEqual(snapshot(*paths),prior)
+        request={**selector,'operation_id':identity('OP'),'expected_preview_sha256':preview['preview_sha256']}
+        self.director('profile-refresh-apply',request,family='setup',error='Unexpected Director input')
+        self.assertEqual(snapshot(*paths),prior)
+        request['approval']={'kind':'owner-message','reference':'Apply the reviewed exact fixture profile refresh.',
+                             'effect':'refresh-project-profile'}
+        self.assertNotIn('install',area['allowed_effects'])
+        self.director('profile-refresh-apply',{**request,'approval':{**request['approval'],'effect':'install'}},
+                      family='setup',error='must explicitly authorize')
+        token=self.core(root,'resource',{'resource':'original-editor'},'--run-id',run_id,target=checkout)
+        held=self.director('profile-refresh-preview',selector,family='setup')
+        self.assertEqual(held['status'],'prerequisite')
+        self.assertIn('original project runtime resource',held['reason'])
+        self.core(root,'resource',{'resource':'original-editor','release':True,'token':token['token']},
+                  '--run-id',run_id,target=checkout)
+        pending_core=write(root,'.skill-tree/.transaction.json','{}\n')
+        try:
+            held=self.director('profile-refresh-preview',selector,family='setup')
+            self.assertEqual(held['limitations'],['original-core-transaction-needs-reconciliation'])
+        finally:
+            pending_core.unlink()
+        changed.write_text('{}\n\n')
+        self.director('profile-refresh-apply',request,family='setup',error='changed since the approved preview')
+        changed.write_text('{}\n')
+        self.core(root,'checkpoint',{'phase':'blocked','stop_reason':'A changed fixture checkpoint'},
+                  '--run-id',run_id,target=checkout)
+        self.director('profile-refresh-apply',request,family='setup',error='changed since the approved preview')
+        (root/STATE).write_bytes(prior[1])
+        moved=self.base/'other-fixture-path'
+        root.rename(moved)
+        try:
+            self.director('profile-refresh-apply',request,family='setup',error='unavailable|No such file')
+        finally:
+            moved.rename(root)
+        self.assertEqual(snapshot(*paths),prior)
+        fault = '''
+import runpy
+import sys
+edge = sys.argv[1]
+entry = runpy.run_path(sys.argv[2])
+registry = entry['DirectorRegistry']
+original = registry._refresh_installer
+subprocess = entry['subprocess']
+run = subprocess.run
+
+def tear(argv, **options):
+    if argv[:2] == ['node', '-e'] and argv[-1] == 'apply':
+        prefix = """
+const journalFs = require('node:fs');
+const publish = journalFs.writeFileSync;
+journalFs.writeFileSync = (destination, ...options) => {
+  if (typeof destination === 'string' && destination.endsWith('/.skill-tree/installation/.journal.json')) {
+    throw Error('Injected interruption after sealing the activation');
+  }
+  publish(destination, ...options);
+};
+""" if edge == 'seal' else """
+const recoveryFs = require('node:fs');
+const rename = recoveryFs.renameSync;
+recoveryFs.renameSync = (from, to) => {
+  rename(from, to);
+  if (typeof from === 'string' && from.endsWith('/.skill-tree/documents/future.json') &&
+      to.includes('/.skill-tree/installation/.backups/')) {
+    throw Error('Injected interruption after the queue state backup');
+  }
+};
+"""
+        argv = [*argv[:2], prefix+argv[2], *argv[3:]]
+    return run(argv, **options)
+
+def interrupt(self, checkout, mode, plan, operation_id=None):
+    if mode == 'apply' and edge == 'parent':
+        raise ValueError('Injected interruption before the child installer')
+    effect = original(self, checkout, mode, plan, operation_id)
+    if mode == 'apply' and edge == 'ack':
+        raise ValueError('Injected loss after project profile activation')
+    return effect
+
+if edge in {'seal', 'backup'}:
+    subprocess.run = tear
+registry._refresh_installer = interrupt
+raise SystemExit(entry['main'](sys.argv[3:]))
+'''
+        entry=self.parent/AGENTS/'skill-tree-director-setup/scripts/runtime/common/scripts/director-state.py'
+        other={**request,'operation_id':identity('OP')}
+        other_payload=write(self.base,'refresh-before-child.json',json.dumps(other))
+        self.command(sys.executable,'-B','-c',fault,'parent',entry,'profile-refresh-apply',self.parent,
+                     '--input',other_payload,error='Injected interruption before the child installer')
+        self.assertEqual(snapshot(*paths),prior)
+        sealed={**request,'operation_id':identity('OP')}
+        sealed_payload=write(self.base,'refresh-with-unpublished-seal.json',json.dumps(sealed))
+        installer_receipts=root/'.skill-tree/artifacts/setup-operations'
+        sealed_receipt=installer_receipts/f"{sealed['operation_id']}.json"
+        self.command(sys.executable,'-B','-c',fault,'seal',entry,'profile-refresh-apply',self.parent,
+                     '--input',sealed_payload,error='Injected interruption after sealing the activation')
+        unconsumed=read_json(sealed_receipt)['activation_journal_sha256']
+        self.assertIsNotNone(unconsumed)
+        self.assertFalse((root/'.skill-tree/installation/.journal.json').exists())
+        self.assertEqual(snapshot(*paths),prior)
+        payload=write(self.base,'refresh-with-lost-answer.json',json.dumps(request))
+        self.command(sys.executable,'-B','-c',fault,'backup',entry,'profile-refresh-apply',self.parent,'--input',payload,
+                     error='Injected interruption after the queue state backup')
+        self.assertFalse((root/STATE).exists())
+        self.assertTrue((root/'.skill-tree/installation/.journal.json').is_file())
+        self.command(sys.executable,'-B','-c',fault,'ack',entry,'profile-refresh-apply',self.parent,'--input',payload,
+                     error='Injected loss after project profile activation')
+        installer_receipt=installer_receipts/f"{request['operation_id']}.json"
+        installed=installer_receipt.read_bytes()
+        self.assertNotEqual(read_json(installer_receipt)['activation_journal_sha256'],unconsumed)
+        self.assertNotEqual((root/PROFILE).read_bytes(),prior[2])
+        affected=read_json(root/STATE)['run_registry']['runs'][run_id]
+        self.assertTrue(affected['profile_refresh_required'])
+        self.assertEqual(affected['stop_reason'],'Wait for fixture acceptance')
+        self.assertEqual((checkout/PROFILE).read_bytes(),prior[3])
+        self.assertEqual(self.git(root,'rev-parse','HEAD'),original_branch)
+        refreshed=self.director('profile-refresh-apply',request,family='setup')
+        self.assertEqual((refreshed['status'],refreshed['operation_id']),('refreshed',request['operation_id']))
+        self.assertEqual(installer_receipt.read_bytes(),installed)
+        self.assertTrue(self.director('profile-refresh-apply',request,family='setup')['replayed'])
+        self.assertEqual(installer_receipt.read_bytes(),installed)
+        self.director('profile-refresh-apply',other,family='setup',error='reviewed project run identities changed')
+        self.assertFalse((installer_receipts/f"{other['operation_id']}.json").exists())
+        sealed_before=sealed_receipt.read_bytes()
+        self.director('profile-refresh-apply',sealed,family='setup',error='reviewed project run identities changed')
+        self.assertEqual(sealed_receipt.read_bytes(),sealed_before)
+        self.assertEqual(self.director('profile-refresh-preview',selector,family='setup')['status'],'current')
+        self.command('node',root/MANAGER,'--verify')
+
     def freeze(self, game_task, *, assignments=None):
         intent = {'objective_id': identity('OB'), 'expected_current_sha256': None, 'intent': {
             'owner_ref': 'fixture-owner', 'title': 'Check linked areas', 'description': 'Retain the external checkpoint.',
@@ -590,49 +1187,10 @@ class DirectorTopologyTests(unittest.TestCase):
         self.director('run-dispatch', {**request, 'request':{**request['request'], 'items':list(reversed(batch_items))}},
                       error='Unexpected')
         parent_entry = self.parent/AGENTS/'skill-tree-director-run/scripts/runtime/common/scripts/director-state.py'
-        fault = '''
-import json
-from pathlib import Path
-import runpy
-import sys
-
-director = runpy.run_path(sys.argv[1])
-load = director['WF'].owned_module
-payload = json.loads(Path(sys.argv[-1]).read_text())
-stage = sys.argv[2]
-
-def with_interruption(name, path):
-    helper = load(name, path)
-    if name == 'director_run' and stage == 'lost-ack':
-        original = helper.DirectorRun._write
-
-        def write(self, relative, state, expected_sha):
-            if any(row['event'] == 'dispatch-recorded' and row.get('operation') == payload['operation']
-                   for row in state['timeline']):
-                raise OSError('Injected loss after canonical acknowledgement')
-            return original(self, relative, state, expected_sha)
-
-        helper.DirectorRun._write = write
-    if name == 'director_run' and stage == 'pause':
-        original = helper.DirectorRun._batch_dispatched_result
-
-        def pause(self, *args):
-            result = original(self, *args)
-            run_id = payload['director_run_id']
-            _, _, current_sha = self._load(run_id)
-            self.lifecycle('run-pause', {'director_run_id':run_id,'expected_run_sha256':current_sha})
-            return result
-
-        helper.DirectorRun._batch_dispatched_result = pause
-    return helper
-
-director['WF'].owned_module = with_interruption
-raise SystemExit(director['main'](sys.argv[3:]))
-'''
         scope = {'schema':1,'director_id':CURRENT_DIRECTOR,'assignment_id':assignment['id'],
                  'queue_id':self.shared_queue,'plan_sha256':selected['plan_sha256']}
         intake_input = write(self.base,'lost-batch-intake-ack.json',json.dumps(request))
-        self.command(sys.executable,'-B','-c',fault,parent_entry,'lost-ack','run-dispatch',self.parent,'--input',intake_input,
+        self.command(sys.executable,'-B','-c',DIRECTOR_BATCH_FAULT,parent_entry,'lost-ack','run-dispatch',self.parent,'--input',intake_input,
                      error='Injected loss after canonical acknowledgement')
         original_intake = self.core(self.parent,'director-dispatch-read',{'operation':'intake','director_dispatch':scope})
         canonical_text = queue_path.read_text()
@@ -691,12 +1249,12 @@ raise SystemExit(director['main'](sys.argv[3:]))
         self.assertEqual(snapshot(queue_path,state_path),before)
 
         process_input = write(self.base,'lost-batch-process-ack.json',json.dumps(process))
-        self.command(sys.executable,'-B','-c',fault,parent_entry,'lost-ack','run-dispatch',self.parent,'--input',process_input,
+        self.command(sys.executable,'-B','-c',DIRECTOR_BATCH_FAULT,parent_entry,'lost-ack','run-dispatch',self.parent,'--input',process_input,
                      error='Injected loss after canonical acknowledgement')
         published = snapshot(queue_path,state_path)
         self.assertNotEqual(published,before)
         original = self.core(self.parent,'director-dispatch-read',{'operation':'process','director_dispatch':scope})
-        confirmed = json.loads(self.command(sys.executable,'-B','-c',fault,parent_entry,'pause',
+        confirmed = json.loads(self.command(sys.executable,'-B','-c',DIRECTOR_BATCH_FAULT,parent_entry,'pause',
             'run-dispatch',self.parent,'--input',process_input))
         self.assertEqual(confirmed['result'],original['observed_result'])
         paused = self.director('run-status',run_ref)

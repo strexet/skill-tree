@@ -11,6 +11,14 @@ Use the existing leaf contracts and helpers. The full cycle owns routing and the
 3. Use Process Pending with the exact outstanding Pending IDs from the intake receipt and the inspected queue hash. Research the current sources and record each disposition. Apply the researched result with `scripts/workflow-state.py process <canonical-root> --standalone --input <process.json>`. Retain the processing receipt, including the exact created or reused prioritized IDs, in the resumable handoff. A retained item or blocked prioritized item holds the group. Review explicit reuse of an existing task against the authorized scope before admission. Prioritized group search can help reconcile provenance, but a shared batch or topic alone cannot define the implementation scope.
 4. If a processing response is missing, reconcile the actual Pending rows, prioritized provenance and any retained processing receipts. Continue only when all original dispositions and exact output identities are established. A missing Pending row gives no proof of resolution. Avoid replaying processing for already promoted or resolved items. If research verifies that the entire request is already satisfied, report the recorded dispositions and close the delivery without creating an empty PR.
 
+### Continue a partitioned Director intake
+
+Use the registered project route for `skill-tree-full-cycle` with an exact `full_cycle` input containing `intake_batch_id`, ordered `items` and `full_cycle_partition`. The partition contains ordered `primary` and `deferred` lists of exact item keys. Each intake item appears once. A primary item requires closure within the approved scope before processing.
+
+Freeze the reviewed child in the Director plan and authorize the exact intake and primary process effects. The original canonical batch receipt records the ordered Pending IDs for both partitions. After the exact process acknowledgement, use `verify-intake` on the original assignment to recover the original partition and the verified `full_cycle_primary.task_ids`. Reuse the original IDs and receipts on retry or resume.
+
+Continue at implementation with only the exact prioritized IDs produced from the verified primary Pending IDs. The existing owner requirement applies to the selected implementation and delivery scope. Later work requires a separate authorized selection of the deferred Pending IDs.
+
 ## Implement the frozen group
 
 1. Use Work Through Next with the exact prioritized ID for a single root. For several roots, use Implement All with the exact `snapshot_ids` and inspected queue hash. The recorded snapshot contains only the approved roots and the controller admits the required dependency closure. Report out-of-group required dependencies and establish authority before work that would expand the request. Defer unrelated work and preserve any existing queue or run.
@@ -18,6 +26,8 @@ Use the existing leaf contracts and helpers. The full cycle owns routing and the
 3. Advance the admitted controller through every scoped root and required dependency. Use the normal leaf planning, checks, review and acceptance. Resolve required stops at the recorded checkpoint. Finish implementation only when the controller reports current acceptance for the entire admitted scope.
 
 ## Review and merge one PR
+
+Run `completion-prose-preview` on the draft outcome and limitations before an external scoped commit. Resolve the located prose errors before creating the commit. Confirm current acceptance and evidence through `complete`.
 
 1. Review the actual change set for the whole admitted scope and commit only scoped changes. Begin PR preflight only after implementation finishes. Bind the original direct owner grant to the exact source branch, remote and `develop` target. Pass the original owner instruction as `instruction` with `instruction_origin: "owner"`, `target_branch: "develop"` and `merge: true` to the PR helper when the original direct full-cycle order grants the full path. Preserve the matching normalized authorization in the run and on each resumed review command. Recover an existing matching publication or PR identity before any retry.
 2. Use the PR review cycle for the combined current diff and the current discussions, checks and approval policy. Resolve findings in the same branch, run the required checks and re-review the current head and base after fixes. Keep the PR scope and target stable. A clean review can reach readiness directly.

@@ -227,6 +227,168 @@ class ReviewCycleTests(unittest.TestCase):
         provider=pr.GitHub('/unused','owner/repo')
         with patch.object(provider,'gh',return_value={'merged':True,'sha':'merge-sha'}) as gh:provider.merge(1,'a'*40,'squash')
         args=gh.call_args.args;self.assertIn('sha='+'a'*40,args);self.assertNotIn('--admin',args)
+    def test_merge_adapter_retains_scoped_http_refusal(self):
+        provider = pr.GitHub('/unused','owner/repo')
+        refused = subprocess.CompletedProcess([],1,'','gh: Workflow update denied (HTTP 403)\n')
+        with patch.object(pr.subprocess,'run',return_value=refused) as call:
+            with self.assertRaises(pr.ReviewError) as raised:
+                provider.merge(1,'a'*40,'squash')
+        self.assertIn('sha='+'a'*40, call.call_args.args[0])
+        self.assertEqual(raised.exception.provider_refusal,{
+            'provider':'github','repository':'owner/repo','number':1,'head':'a'*40,
+            'http_status':403,'message':'Workflow update denied',
+        })
+        for stderr in ('transport unavailable','gh: upstream failure (HTTP 502)',
+                       'gh: authentication stderr\ngh: Workflow update denied (HTTP 403)',
+                       'gh: bearer some-private-token (HTTP 403)'):
+            transport = subprocess.CompletedProcess([],1,'',stderr)
+            with self.subTest(stderr=stderr), patch.object(pr.subprocess,'run',return_value=transport):
+                with self.assertRaises(pr.ReviewError) as missing:
+                    provider.merge(1,'a'*40,'squash')
+                self.assertFalse(hasattr(missing.exception,'provider_refusal'))
+
+    def test_workflow_denial_preview_survives_observed_base_drift_without_writes(self):
+        with tempfile.TemporaryDirectory(prefix='merge-denial-fixture-') as temporary:
+            root = Path(temporary).resolve()
+            def git(*args):
+                return pr.ws.local_git_text(root,*args)
+            def commit(message):
+                git('add','.')
+                git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','-c','commit.gpgsign=false',
+                    '-c',f'core.hooksPath={os.devnull}','commit','-qm',message)
+                return git('rev-parse','HEAD')
+            git('init','-q','-b','develop')
+            config = root/'.skill-tree/config/repository.json'
+            config.parent.mkdir(parents=True)
+            config.write_text('{"schema":1,"role":"source"}\n')
+            workflows = root/'.github/workflows'
+            workflows.mkdir(parents=True)
+            removed = workflows/'ci.yml'
+            removed.write_text('name: original\n')
+            old_base = commit('original base')
+            git('switch','-qc','feature/example')
+            removed.unlink()
+            (root/'source.py').write_text('value = 1\n')
+            head = commit('remove a source workflow')
+            git('switch','-q','develop')
+            (workflows/'target-only.yml').write_text('name: target change\n')
+            new_base = commit('advance target branch')
+            snapshot = {**self.snapshot,'base_oid':old_base,'head':head,'base_repository':'owner/repo',
+                        'changed_files':['.github/workflows/ci.yml','source.py']}
+            params = pr.parameters('feature/example',{'merge':True})
+            record = pr.reviewed(pr.new_record(snapshot,params),snapshot,
+                                 self.review(head=head,base_oid=old_base,files=snapshot['changed_files']))
+            publication_id = 'a'*32
+            path = root/'.skill-tree/history/publications'/('pub-'+publication_id+'.json')
+            path.parent.mkdir(parents=True)
+            path.write_text(json.dumps({**record,'publication_id':publication_id}))
+            request = root/'merge-denial-input.json'
+            current = {**snapshot,'base_oid':new_base}
+            def invoke(command, payload):
+                request.write_text(json.dumps(payload))
+                output = io.StringIO()
+                with redirect_stdout(output):
+                    status = pr.main([command,str(root),'--publication-id',publication_id,'--input',str(request)])
+                return status,json.loads(output.getvalue())
+            refusal = {'provider':'github','repository':'owner/repo','number':1,'head':head,
+                       'http_status':403,'message':'Workflow update denied',
+                       'target_branch':'develop','attempted_base_oid':old_base}
+            status, unchanged = invoke('merge-denial-preview',{'snapshot':snapshot,'provider_refusal':refusal})
+            self.assertEqual((status,unchanged['base_drift'],unchanged['prerequisite']), (0,'unchanged',None))
+            status, observed = invoke('observe',{'snapshot':current})
+            self.assertEqual(status,0,observed)
+            self.assertNotIn('review',observed)
+            self.assertEqual(observed['identity']['base_oid'],new_base)
+            self.assertEqual(observed['rounds'][-1]['target_branch'],'develop')
+            index = root/'.git/index'
+            preserved = (path.read_bytes(),index.read_bytes())
+            request_body = {'snapshot':current,'provider_refusal':refusal,
+                            'expected_publication_sha256':hashlib.sha256(preserved[0]).hexdigest()}
+            status, preview = invoke('merge-denial-preview',request_body)
+            self.assertEqual(status,0,preview)
+            self.assertEqual((preview['base_drift'],preview['reviewed_base_oid']), ('moved',old_base))
+            self.assertEqual(preview['workflow_diff'],{'status':'observed','paths':['.github/workflows/ci.yml']})
+            self.assertEqual(preview['prerequisite']['kind'],'review-refresh-required')
+            self.assertEqual(preview['provider_refusal'],refusal)
+            self.assertEqual(preview['credential_permissions'],'unknown')
+            self.assertEqual((preview['pr'],preview['authorization']),(record['pr'],record['authorization']))
+            missing = {**current,'base_oid':'f'*40}
+            status, unavailable = invoke('merge-denial-preview',{'snapshot':missing})
+            self.assertEqual(status,0,unavailable)
+            self.assertEqual(unavailable['workflow_diff'],{'status':'unavailable','paths':[]})
+            self.assertIsNone(unavailable['provider_refusal'])
+            newer_review = pr.reviewed(observed,current,
+                                       self.review(head=head,base_oid=new_base,files=current['changed_files']))
+            older_refusal = pr.merge_denial_preview(root,newer_review,{'snapshot':missing,'provider_refusal':refusal})
+            self.assertEqual((older_refusal['reviewed_base_oid'],older_refusal['provider_refusal']),
+                             (new_base,refusal))
+            for change in ({'id':'different-pr'},{'url':'https://example.invalid/foreign/1'},{'number':True}):
+                foreign = {**current,'pr':{**current['pr'],**change}}
+                status, denied = invoke('merge-denial-preview',{'snapshot':foreign})
+                self.assertEqual(status,2)
+                self.assertIn('original open provider PR',denied['error'])
+            self.assertEqual((path.read_bytes(),index.read_bytes()),preserved)
+            if hasattr(os,'mkfifo'):
+                path.unlink()
+                os.mkfifo(path)
+                status, denied = invoke('merge-denial-preview',{'snapshot':current})
+                self.assertEqual(status,2)
+                self.assertIn('require regular files',denied['error'])
+
+    def test_legacy_rounds_with_an_ambiguous_retarget_leave_base_drift_unknown(self):
+        reviewed = pr.reviewed(self.record,self.snapshot,self.review())
+        reviewed['rounds'][0].pop('target_branch')
+        retargeted = {**self.snapshot,'target_branch':'release/example','base_oid':'c'*40}
+        permission = pr.parameters('feature/example',{'target_branch':'release/example','merge':True})
+        retained = pr.reconcile(reviewed,retargeted,retarget=permission)
+        with patch.object(pr,'workflow_diff',return_value={'status':'observed','paths':['.github/workflows/ci.yml']}):
+            preview = pr.merge_denial_preview('/unused',retained,{'snapshot':retargeted})
+        self.assertEqual((preview['base_drift'],preview['reviewed_base_oid']), ('unknown',None))
+        self.assertIsNone(preview['prerequisite'])
+
+    def test_workflow_diff_refuses_nonexact_objects_and_multiple_merge_bases(self):
+        with tempfile.TemporaryDirectory(prefix='workflow-diff-fixture-') as directory:
+            root = Path(directory).resolve()
+            def git(*args):
+                return pr.ws.local_git_text(root,*args)
+            git('init','-q','-b','develop')
+            env = pr.ws.local_git_environment()
+            tree = subprocess.check_output(pr.ws.local_git_args(root,'mktree'),input=b'',env=env).decode().strip()
+            def commit(label, *parents):
+                parent_args = [part for parent in parents for part in ('-p',parent)]
+                return git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid',
+                           '-c','commit.gpgsign=false','commit-tree',tree,'-m',label,*parent_args)
+            initial = commit('first')
+            left, right = commit('left',initial), commit('right',initial)
+            first, second = commit('first merge',left,right), commit('second merge',right,left)
+            self.assertEqual(set(git('merge-base','--all',first,second).splitlines()),{left,right})
+            self.assertEqual(pr.workflow_diff(root,first,second),{'status':'unavailable','paths':[]})
+            self.assertEqual(pr.workflow_diff(root,left[:10],first),{'status':'unavailable','paths':[]})
+            github = root/'.github'
+            github.mkdir()
+            (github/'workflows').write_text('This is an ordinary file.\n')
+            git('add','.github/workflows')
+            flat = git('write-tree')
+            flat_commit = git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid',
+                              '-c','commit.gpgsign=false','commit-tree',flat,'-m','ordinary file','-p',initial)
+            self.assertEqual(pr.workflow_diff(root,initial,flat_commit),{'status':'observed','paths':[]})
+
+    def test_malformed_historical_review_base_reports_unknown(self):
+        reviewed = pr.reviewed(self.record,self.snapshot,self.review())
+        reviewed['rounds'][0]['base_oid'] = 'unknown'
+        current = {**self.snapshot,'base_oid':'c'*40}
+        observed = pr.reconcile(reviewed,current)
+        with patch.object(pr,'workflow_diff',return_value={'status':'observed','paths':['.github/workflows/ci.yml']}):
+            preview = pr.merge_denial_preview('/unused',observed,{'snapshot':current})
+        self.assertEqual((preview['base_drift'],preview['prerequisite']), ('unknown',None))
+        observed['identity'].update(base_oid='unknown',base_repository='owner/repo')
+        current['base_repository'] = 'owner/repo'
+        refusal = {'provider':'github','repository':'owner/repo','number':1,'head':current['head'],
+                   'http_status':403,'message':'Workflow update denied',
+                   'target_branch':current['target_branch'],'attempted_base_oid':'unknown'}
+        with self.assertRaisesRegex(pr.ReviewError,'original merge attempt scope'):
+            pr.merge_denial_preview('/unused',observed,{'snapshot':current,'provider_refusal':refusal})
+
     def test_provider_access_loss_is_a_failure_without_a_fake_result(self):
         provider=pr.GitHub('/unused','owner/repo')
         with patch.object(pr.subprocess,'run',return_value=subprocess.CompletedProcess([],1,'','private access error')):

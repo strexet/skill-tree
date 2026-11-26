@@ -20,7 +20,8 @@ import unicodedata
 
 
 RUN_COMMANDS = {'run-start', 'run-status', 'run-dispatch', 'run-pause', 'run-resume', 'run-cancel',
-                'run-complete-assignment', 'run-supervise', 'run-advance-all', 'decide-open', 'decide-answer'}
+                'run-complete-assignment', 'run-supervise', 'run-advance-all', 'verify-intake',
+                'decide-open', 'decide-answer'}
 RUN_PATH = re.compile(r'\.skill-tree/director/runs/dr-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}\.json\Z')
 REGISTRY = '.skill-tree/director/registry.json'
 BINDINGS = '.skill-tree/artifacts/director/local-bindings.json'
@@ -28,6 +29,8 @@ DIRECTOR_HOME = Path('.skill-tree/.director')
 LEGACY_DIRECTOR_HOME = Path('.skill-tree-director')
 OBJECTIVE_PATH = re.compile(r'\.skill-tree/director/objectives/ob-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}\.json\Z')
 DISPATCH_INTENT_PATH = re.compile(r'\.skill-tree/director/dispatch-intents/[a-f0-9]{64}\.json\Z')
+PROFILE_REFRESH_RECEIPT_PATH = re.compile(
+    r'\.skill-tree/artifacts/director/profile-refresh/op-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}\.json\Z')
 PLAN_COMMANDS = {'plan-preview', 'plan-freeze', 'plan-context', 'plan-impact', 'context-search'}
 OBJECTIVE_COMMANDS = {'objective-preview', 'objective-apply', 'objective-read', 'plan-pin', 'outcome-link'}
 AREA_FIELDS = {'id', 'role', 'scope', 'capabilities', 'interface', 'allowed_effects'}
@@ -180,8 +183,7 @@ def _area_path(root, scope):
     return path
 
 
-def _inspect_owner(checkout):
-    """Read the canonical owner through existing Git and queue identity guards."""
+def _inspect_git_owner(checkout):
     _require(WS.local_git_text(checkout, 'rev-parse', '--show-toplevel') == str(checkout),
              'Select the exact Git checkout root')
     locator_file = WS.runtime_file(checkout)
@@ -194,16 +196,21 @@ def _inspect_owner(checkout):
     _require(WS.local_git_text(canonical, 'rev-parse', '--show-toplevel') == str(canonical),
              'The canonical locator must name an exact Git checkout root')
     locator = WS.runtime(checkout)
-    state = _canonical_queue_state(canonical, locator)
-    queue_id = state['run_registry']['queue_id']
     repo_id = WS.repo_id(canonical)
     root_stat = common.stat()
-    return queue_id, repo_id, {
+    return locator, repo_id, {
         'root': str(canonical),
         'git_common_dir': str(common),
         'device': root_stat.st_dev,
         'inode': root_stat.st_ino,
     }
+
+
+def _inspect_owner(checkout):
+    """Read the canonical owner through existing Git and queue identity guards."""
+    locator,repo_id,owner = _inspect_git_owner(checkout)
+    state = _canonical_queue_state(Path(owner['root']),locator)
+    return state['run_registry']['queue_id'],repo_id,owner
 
 
 def _canonical_queue_state(canonical, locator):
@@ -749,12 +756,184 @@ class DirectorStore(WF.Store):
             _require(isinstance(transaction, dict) and isinstance(transaction.get('writes'), list)
                      and transaction['writes'] and all(isinstance(entry, dict) and isinstance(entry.get('path'), str)
                                                        and (entry['path'] in {REGISTRY, BINDINGS} or OBJECTIVE_PATH.fullmatch(entry['path'])
-                                                            or DISPATCH_INTENT_PATH.fullmatch(entry['path']) or RUN_PATH.fullmatch(entry['path']))
+                                                            or DISPATCH_INTENT_PATH.fullmatch(entry['path'])
+                                                            or RUN_PATH.fullmatch(entry['path'])
+                                                            or PROFILE_REFRESH_RECEIPT_PATH.fullmatch(entry['path']))
                                                        for entry in transaction['writes']),
                      'Recover the existing Core transaction before Director setup')
             for entry in transaction['writes']:
                 _safe_path(self.root, entry['path'])
         super().recover()
+
+
+PROFILE_REFRESH_PROGRAM = r"""const fs = require('node:fs');
+const path = require('node:path');
+const {execFileSync} = require('node:child_process');
+const [library, root, mode] = process.argv.slice(1);
+const core = require(library);
+const composer = require(path.join(path.dirname(library), 'composer.js'));
+const request = JSON.parse(fs.readFileSync(0, 'utf8'));
+const source = path.join(root, '.skill-tree/installation/source');
+const workflow = '.skill-tree/documents/future.json';
+const profilePath = '.skill-tree/installation/profile.json';
+
+function observed(directory, relative) {
+  const file = composer.safe(directory, relative);
+  return fs.existsSync(file) ? composer.hash(fs.readFileSync(file)) : null;
+}
+
+function gitAt(directory, ...argv) {
+  return execFileSync('git', ['--no-replace-objects', '--no-optional-locks', '-C', directory,
+    '-c', 'core.fsmonitor=false', ...argv], {
+    encoding:'utf8', stdio:['ignore','pipe','ignore'], timeout:5000,
+    env:{...process.env, GIT_NO_LAZY_FETCH:'1', GIT_ALLOW_PROTOCOL:''},
+  }).trim();
+}
+
+const git = (...args) => gitAt(root,...args);
+
+function currentCheckout() {
+  return {checkout:git('rev-parse','--show-toplevel'),ref:git('symbolic-ref','--quiet','HEAD'),
+          head:git('rev-parse','--verify','HEAD')};
+}
+
+function installOptions(plan) {
+  return {bridges:plan.bridges,recoverPluginPending:false,operationId:request.operation_id,
+          guardedActivationProof:request.proof_sha256};
+}
+
+function verifyInputs(plan) {
+  const proof = request.proof;
+  const current = currentCheckout();
+  const common = fs.realpathSync(git('rev-parse','--path-format=absolute','--git-common-dir'));
+  const native = fs.statSync(common,{bigint:true});
+  if (current.checkout !== root || composer.hash(root) !== proof.checkout_sha256 ||
+      current.ref !== proof.ref || current.head !== proof.head ||
+      composer.hash(common) !== proof.git_common.path_sha256 ||
+      String(native.dev) !== proof.git_common.device || String(native.ino) !== proof.git_common.inode ||
+      observed(root,'.skill-tree/documents/future.md') !== proof.queue_source_sha256 ||
+      observed(common,'skill-tree-runtime.json') !== proof.locator_sha256 ||
+      Object.entries(proof.director_files).some(([name, sha]) => observed(request.director, name) !== sha)) {
+    throw Error('The exact registered checkout or reviewed binding changed');
+  }
+  if (observed(root,'.skill-tree/.transaction.json') !== null) {
+    throw Error('Reconcile the original Core workflow transaction before project refresh');
+  }
+  const operation = plan && core.guardedInstallOperation(root,source,plan.flavor,plan.selections,installOptions(plan));
+  function matches(relative,before,after) {
+    const current = observed(root,relative);
+    return current === before || Boolean(operation && ((current === after && (operation.activated || operation.journal)) ||
+      (current === null && core.guardedMissingDestination(root,operation,relative,before,after))));
+  }
+  if (!matches(workflow,proof.state_sha256,plan?.after_state_sha256)) {
+    throw Error('The reviewed project run identities changed');
+  }
+  if (!matches(profilePath,proof.profile_sha256,plan?.after_profile_sha256)) {
+    throw Error('The reviewed owned installation generation changed');
+  }
+  if (plan && (composer.hash(composer.json(composer.sourceInputs(source))) !== plan.source_sha256 ||
+      composer.resolveProfile(source,root,plan.flavor).environment_id !== plan.environment_id)) {
+    throw Error('The reviewed discovery inputs or owned profile source changed');
+  }
+  if (plan && (Object.entries(proof.worker_files).some(([name, sha]) => observed(root, name) !== sha) ||
+      core.hasActiveOperation(root))) {
+    throw Error('An original project runtime or worker handoff requires reconciliation');
+  }
+  if (plan) {
+    const local = composer.readJson(common,'skill-tree-runtime.json');
+    for (const [runId, expected] of Object.entries(proof.worktrees)) {
+      const checkout = local.worktrees?.[runId];
+      const registration = path.join(common,'worktrees',expected.registration);
+      if (!checkout || fs.realpathSync(checkout) !== checkout || composer.hash(checkout) !== expected.path_sha256 ||
+          gitAt(checkout,'rev-parse','--show-toplevel') !== checkout ||
+          gitAt(checkout,'rev-parse','--absolute-git-dir') !== registration ||
+          gitAt(checkout,'symbolic-ref','--quiet','HEAD') !== expected.ref ||
+          gitAt(checkout,'rev-parse','--verify','HEAD') !== expected.head ||
+          observed(registration,'skill-tree-owner.json') !== expected.owner_sha256) {
+        throw Error('The original affected worktree changed before project refresh');
+      }
+    }
+  }
+  return operation;
+}
+
+function describe(result, selections, bridges, beforeState) {
+  const nextState = result.changes[workflow];
+  const affected = [];
+  if (nextState) {
+    const state = JSON.parse(nextState);
+    const runs = state.run_registry ? Object.values(state.run_registry.runs) : [state.active_run];
+    for (const run of runs) {
+      if (run?.profile_refresh_required) {
+        affected.push({run_id:run.id, current_task_id:run.current_task_id, phase:run.phase,
+          stop_reason:run.stop_reason, readmission_required:true});
+      }
+    }
+    affected.sort((a,b)=>a.run_id.localeCompare(b.run_id));
+  }
+  return {
+    flavor:result.profile.flavor, selections, bridges,
+    after_profile_sha256:composer.hash(result.changes[profilePath]),
+    after_state_sha256:nextState ? composer.hash(nextState) : beforeState,
+    source_sha256:composer.hash(composer.json(composer.sourceInputs(source))),
+    identity:result.profile.identity, environment_id:result.profile.environment_id, affected_runs:affected,
+    changed_inputs:[...new Set([...Object.keys(result.old.inputs),...Object.keys(result.profile.inputs)])]
+      .sort().filter(name=>result.old.inputs[name]!==result.profile.inputs[name]),
+  };
+}
+
+function currentPrepared() {
+  if (!verifyInputs(request.plan).activated) {
+    throw Error('The original guarded project refresh has no acknowledged activation');
+  }
+  const profile = core.verify(root,source);
+  if (profile.identity !== request.plan.identity || profile.environment_id !== request.plan.environment_id ||
+      observed(root,profilePath) !== request.plan.after_profile_sha256 ||
+      observed(root,workflow) !== request.plan.after_state_sha256) {
+    throw Error('The original anticipated project refresh is not installed');
+  }
+  return {profile,delta:[],action:'verified project profile refresh'};
+}
+
+try {
+  if (mode === 'preview') {
+    verifyInputs();
+    const current = core.receipt(root,true);
+    const selections = Object.entries(current.destinations)
+      .map(([rel,row])=>({rel,provider:row.provider,name:row.name}));
+    const bridges = Object.keys(current.bridges||{});
+    const plan = core.plan(root,source,current.flavor,selections,{bridges});
+    process.stdout.write(JSON.stringify(describe(plan,selections,bridges,request.proof.state_sha256)));
+  } else if (mode === 'verify') {
+    const result = core.locked(root,currentPrepared,{recoverPending:false,recoverPluginPending:false});
+    process.stdout.write(JSON.stringify({identity:result.profile.identity,profile_sha256:observed(root,profilePath)}));
+  } else if (mode === 'apply') {
+    const chosen = request.plan;
+    const result = core.install(root,source,chosen.flavor,chosen.selections,{
+      ...installOptions(chosen),
+      beforeActivationRecovery:()=>verifyInputs(chosen),
+      verifyActivationReplay:currentPrepared,
+      guardPlan(result) {
+        verifyInputs(chosen);
+        if (observed(root,profilePath) === chosen.after_profile_sha256) {
+          currentPrepared();
+          if (result.delta.length) throw Error('Unexpected changes after the original prepared refresh');
+          return;
+        }
+        const predicted=describe(result,chosen.selections,chosen.bridges,request.proof.state_sha256);
+        if (composer.json(predicted) !== composer.json(chosen)) throw Error('The reviewed project refresh changed');
+      },
+    });
+    process.stdout.write(JSON.stringify({operation_id:result.operation_id,identity:result.profile.identity,
+      profile_sha256:observed(root,profilePath)}));
+  } else {
+    throw Error('Unknown reviewed project refresh action');
+  }
+} catch(error) {
+  process.stderr.write(error.message);
+  process.exitCode=2;
+}
+"""
 
 
 class DirectorRegistry:
@@ -944,6 +1123,201 @@ class DirectorRegistry:
             if observed['status'] == 'verified':
                 area['routing']['status'] = 'verified'
         return {'director_id': payload['director_id'], 'prepared_preview_sha256': prepared, 'areas': areas}
+
+    def _refresh_project(self, project_id, *, receipt_recovery=False):
+        _require(_token(project_id), 'Select an exact registered project for profile refresh')
+        registry, bindings, hashes = self._load()
+        area = (registry or {}).get('areas', {}).get(project_id)
+        _require(isinstance(area,dict) and area.get('scope') == '.' and area.get('role') != 'source-maintenance'
+                 and isinstance(area.get('allowed_effects'),list) and 'preview' in area['allowed_effects'],
+                 'The registered project does not allow profile refresh preview')
+        if receipt_recovery:
+            # The sealed native journal can temporarily own a missing queue state file.
+            binding = (bindings or {}).get('queues',{}).get(area['queue_id'])
+            _require(binding is not None, 'Child area or local queue binding unavailable')
+            checkout = _root(binding['root'])
+            locator, repo_id, observed = _inspect_git_owner(checkout)
+            _require(observed == binding and (locator.get('queue_id'),repo_id) == (area['queue_id'],area['repo_id']),
+                     'Current child queue binding does not match the registered owner')
+        else:
+            checkout = _objective_helper()._child_root(registry, bindings, project_id)
+        _require(checkout != self.root, 'Use the coordinator maintenance route for the Director installation')
+        return checkout, area, hashes
+
+    def _refresh_installer(self, checkout, mode, prepared, operation_id=None):
+        library = Path(__file__).resolve().parents[2] / 'lib/installation.js'
+        _require(library.is_file() and not library.is_symlink(), 'The owned Director profile installer is unavailable')
+        payload = {'director':str(self.root),'proof':prepared['proof']}
+        if mode != 'preview':
+            payload.update(plan=prepared['plan'],proof_sha256=_digest(prepared),operation_id=operation_id)
+        environment = WS.local_git_environment()
+        for name in ('NODE_OPTIONS','NODE_PATH'):
+            environment.pop(name,None)
+        try:
+            result = subprocess.run(['node','-e',PROFILE_REFRESH_PROGRAM,str(library),str(checkout),mode],
+                                    input=WF.dump(payload),env=environment,text=True,capture_output=True,timeout=60)
+        except subprocess.TimeoutExpired as error:
+            raise ValueError('The original project profile refresh did not return before the installer deadline') from error
+        _require(result.returncode == 0, result.stderr.strip() or 'The owned project profile installer failed')
+        return json.loads(result.stdout)
+
+    def _refresh_runtime_proof(self, checkout, affected):
+        canonical = WF.Store(checkout,route_queue=False,neutral=True)
+        state = canonical.load()
+        registry = state['run_registry']
+        run_ids = {item['run_id'] for item in affected}
+        _require(run_ids <= registry['runs'].keys(), 'The affected project run identities changed')
+        _require(not any(claim['run_id'] in run_ids for claim in registry['resources'].values()),
+                 'Reconcile the original project runtime resource before profile refresh')
+        _require(not any(entry.get('run_id') in run_ids and entry.get('task_git_attempt')
+                         for entry in state['task_progress'].values()),
+                 'Reconcile the original scoped commit before profile refresh')
+        _require(not any(run.get('director_question_hold') or any(run.get('delivery',{}).get(name)
+                         for name in ('reviewed_merge_attempt','current_target_attempts','reviewed_source'))
+                         for run_id,run in registry['runs'].items() if run_id in run_ids),
+                 'Reconcile the original project controller handoff before profile refresh')
+        worker_files, worktrees = {}, {}
+        for run_id in sorted(run_ids):
+            relative = '.skill-tree/history/worker-handoffs/'+run_id.lower()+'.json'
+            path = _safe_path(checkout,relative)
+            original = WF.file_hash(path)
+            selected = WF.Store(checkout,run_id)
+            run_state = selected.load()
+            run = run_state['active_run']
+            _require(run.get('workspace_state')=='ready' and run['workspace'].get('cleanup_owner'),
+                     'Recover the original affected worktree before profile refresh')
+            WS.ensure_workspace(selected,run)
+            WS.directed_owner(checkout,selected.source_root,run,registry['queue_id'])
+            registration = WS.linked_registration(checkout,selected.source_root)
+            current = WS.checked_out_branch(selected.source_root)
+            if original is not None:
+                slots = WF.worker_handoff(selected,{'action':'status'})['slots']
+                _require(all(isinstance(slot,list) and (not slot or isinstance(slot[-1],dict)
+                             and WF.valid_id(slot[-1].get('task_id'),'T')
+                             and WF.retired_worker_scope(selected,run_state,slot[-1],current['head']))
+                             for slot in slots.values()),
+                         'Reconcile the original project worker handoff before profile refresh')
+            _require(WF.file_hash(path) == original, 'The original project worker handoff changed')
+            worker_files[relative] = original
+            worktrees[run_id] = {'path_sha256':WF.digest(str(selected.source_root).encode()),
+                                 'registration':registration.name,'head':current['head'],'ref':current['ref'],
+                                 'owner_sha256':WF.file_hash(registration/'skill-tree-owner.json')}
+        return {'worker_files':worker_files,'worktrees':worktrees}
+
+    def profile_refresh_preview(self, payload):
+        _object(payload, {'project_id'})
+        project_id = payload['project_id']
+        checkout, area, bindings = self._refresh_project(project_id)
+        identifiers = {key:area[key] for key in ('id','queue_id','repo_id')}
+        result = {'project_id':project_id,'checkout':str(checkout),'queue_id':area['queue_id']}
+        if _safe_path(checkout,'.skill-tree/.transaction.json').exists():
+            return {**result,'status':'prerequisite','limitations':['original-core-transaction-needs-reconciliation']}
+        prerequisite = _profile_refresh_prerequisite(checkout)
+        if not prerequisite:
+            try:
+                observed = _inspect_profile(checkout)
+            except (OSError,ValueError,subprocess.TimeoutExpired):
+                observed = {}
+            return {**result,'status':'current' if observed.get('kind')=='owned-profile' else 'prerequisite',
+                    'limitations':[] if observed.get('kind')=='owned-profile' else ['owned-profile-unavailable']}
+        profile, profile_sha = _read(checkout, '.skill-tree/installation/profile.json')
+        _require(profile_sha == prerequisite['profile_sha256'], 'The project profile changed during refresh preview')
+        locator = WS.runtime_file(checkout)
+        _, _, native = _inspect_git_owner(checkout)
+        checked = WS.checked_out_branch(checkout)
+        state_path = _safe_path(checkout,'.skill-tree/documents/future.json')
+        queue_path = _safe_path(checkout,'.skill-tree/documents/future.md')
+        proof = {'project':identifiers,'checkout_sha256':WF.digest(str(checkout).encode()),
+                 'git_common':{'path_sha256':WF.digest(native['git_common_dir'].encode()),
+                               'device':str(native['device']),'inode':str(native['inode'])},
+                 'profile_sha256':profile_sha,'director_files':bindings,'state_sha256':WF.file_hash(state_path),
+                 'queue_source_sha256':WF.file_hash(queue_path),'locator_sha256':WF.file_hash(locator),
+                 'ref':checked['ref'],'head':checked['head']}
+        prepared = {'proof':proof}
+        try:
+            prepared['plan'] = self._refresh_installer(checkout,'preview',prepared)
+        except ValueError as error:
+            if str(error).startswith('Active controller must checkpoint'):
+                return {**result,'status':'prerequisite','proof':proof,
+                        'limitations':['active-controller-requires-stopped-handoff']}
+            raise
+        changed_inputs = prepared['plan']['changed_inputs']
+        _require(changed_inputs == prerequisite['changed_inputs'],
+                 'The reviewed discovery inputs changed during profile refresh preview')
+        try:
+            proof.update(self._refresh_runtime_proof(checkout,prepared['plan']['affected_runs']))
+        except (OSError,ValueError,WS.RunError) as error:
+            return {**result,'status':'prerequisite','changed_inputs':changed_inputs,
+                    'affected_runs':prepared['plan']['affected_runs'],
+                    'limitations':['project-runtime-needs-reconciliation'],'reason':str(error)}
+        _require(self._refresh_project(project_id) == (checkout,area,bindings)
+                 and WF.file_hash(state_path) == proof['state_sha256']
+                 and WF.file_hash(queue_path) == proof['queue_source_sha256']
+                 and WF.file_hash(locator) == proof['locator_sha256']
+                 and _read(checkout,'.skill-tree/installation/profile.json')[1] == profile_sha
+                 and _profile_refresh_prerequisite(checkout) == prerequisite,
+                 'The registered project changed during refresh preview')
+        _require(prepared['plan']['after_profile_sha256'] != profile_sha,
+                 'The reviewed refresh must resolve the stale installation inputs')
+        return {**result,'status':'preview','prepared':prepared,'preview_sha256':_digest(prepared),
+                'profile_identity_before':profile['identity'],'changed_inputs':changed_inputs,
+                'affected_runs':prepared['plan']['affected_runs'],'limitations':[]}
+
+    def profile_refresh_apply(self, payload):
+        _object(payload, {'project_id','operation_id','expected_preview_sha256','approval'})
+        project_id, operation = payload['project_id'], payload['operation_id']
+        _require(WF.valid_id(operation,'OP') and _sha(payload['expected_preview_sha256']),
+                 'Select an exact project refresh operation and preview digest')
+        approval = payload['approval']
+        _object(approval,{'kind','reference','effect'})
+        _require(approval['effect']=='refresh-project-profile',
+                 'The owner approval must explicitly authorize the reviewed project profile refresh')
+        WF.clarification_evidence({key:approval[key] for key in ('kind','reference')})
+        relative = '.skill-tree/artifacts/director/profile-refresh/'+operation.lower()+'.json'
+        original, original_sha = _read(self.root,relative)
+        request_sha = _digest(payload)
+        if original is None:
+            checkout, area, bindings = self._refresh_project(project_id)
+            preview = self.profile_refresh_preview({'project_id':project_id})
+            _require(preview['status']=='preview' and preview['preview_sha256']==payload['expected_preview_sha256'],
+                     'The registered project refresh changed since the approved preview')
+            retained = {'schema':1,'status':'prepared','operation_id':operation,'request_sha256':request_sha,
+                        'approval':approval,'prepared':preview['prepared']}
+            with self.store.lock():
+                _require(self._refresh_project(project_id) == (checkout,area,bindings),
+                         'The registered project changed before refresh preparation')
+                self._verify_dedicated_storage()
+                self.store.expect_unchanged(relative,None)
+                self.store.commit({relative:WF.dump(retained)})
+            original, original_sha = _read(self.root,relative)
+        _require(isinstance(original,dict) and original.get('schema')==1 and original.get('operation_id')==operation
+                 and original.get('request_sha256')==request_sha and original.get('approval')==approval
+                 and original.get('status') in {'prepared','completed'}
+                 and _digest(original.get('prepared'))==payload['expected_preview_sha256'],
+                 'The profile refresh operation belongs to another approval or scope')
+        checkout, area, bindings = self._refresh_project(project_id,receipt_recovery=True)
+        prepared = original['prepared']
+        proof = prepared['proof']
+        _require(proof['project']=={key:area[key] for key in ('id','queue_id','repo_id')}
+                 and proof['checkout_sha256']==WF.digest(str(checkout).encode()) and proof['director_files']==bindings,
+                 'The original registered project checkout or scope changed')
+        wanted = {'identity':prepared['plan']['identity'],'profile_sha256':prepared['plan']['after_profile_sha256']}
+        if original['status']=='completed':
+            _require(original.get('result')==wanted and self._refresh_installer(checkout,'verify',prepared,operation)==wanted,
+                     'The acknowledged project profile refresh changed')
+            return {**wanted,'project_id':project_id,'operation_id':operation,'status':'refreshed','replayed':True}
+        applied = self._refresh_installer(checkout,'apply',prepared,operation)
+        _require(applied=={**wanted,'operation_id':operation}, 'The owned installer returned another profile generation')
+        with self.store.lock():
+            _require(self._refresh_project(project_id)==(checkout,area,bindings),
+                     'The registered project changed before refresh acknowledgement')
+            _require(self._refresh_installer(checkout,'verify',prepared,operation)==wanted,
+                     'The original refreshed project generation changed')
+            self._verify_dedicated_storage()
+            self.store.expect_unchanged(relative,original_sha)
+            self.store.commit({relative:WF.dump({**original,'status':'completed','result':wanted})})
+        return {**wanted,'project_id':project_id,'operation_id':operation,'status':'refreshed','replayed':False}
+
 
     def retain_dispatch_intent(self, payload):
         _object(payload, {'operation', 'request'}, {'start'})
@@ -1648,7 +2022,8 @@ def _claude_guard_decision(service, project_id, guard_binding):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=sorted({'claude-guard-settings', 'claude-guard-pretool', 'project-menu', 'project-route', 'project-storage-prepare', 'project-storage-verify', 'project-init', 'project-preview', 'project-setup', 'setup-preview', 'setup-apply', 'setup-bootstrap', 'setup-status', 'rebind-preview', 'rebind', 'status', 'dispatch-intent'} | OBJECTIVE_COMMANDS | PLAN_COMMANDS | RUN_COMMANDS))
+    parser.add_argument('command', choices=sorted({'claude-guard-settings', 'claude-guard-pretool', 'project-menu', 'project-route', 'project-storage-prepare', 'project-storage-verify', 'project-init', 'project-preview', 'project-setup', 'setup-preview', 'setup-apply', 'setup-bootstrap', 'setup-status', 'rebind-preview', 'rebind', 'status', 'dispatch-intent'} | OBJECTIVE_COMMANDS | PLAN_COMMANDS | RUN_COMMANDS
+        | {'profile-refresh-preview','profile-refresh-apply'}))
     parser.add_argument('root', type=Path)
     parser.add_argument('--input', type=Path)
     parser.add_argument('--project-id')
@@ -1684,6 +2059,10 @@ def main(argv=None):
         elif args.command in RUN_COMMANDS:
             _require(args.input is not None, '--input is required for Director run and decision operations')
             result = _run_helper(director, args.command, payload)
+        elif args.command == 'profile-refresh-preview':
+            result = director.profile_refresh_preview(payload)
+        elif args.command == 'profile-refresh-apply':
+            result = director.profile_refresh_apply(payload)
         elif args.command == 'dispatch-intent':
             _require(args.input is not None, '--input is required for Director dispatch intent')
             result = director.retain_dispatch_intent(payload)
@@ -1702,10 +2081,16 @@ def main(argv=None):
             method = director.preview if args.command.endswith('-preview') else director.apply
             result = method(payload, rebind=rebind)
     except DirectorPrerequisite as error:
-        print(WF.dump({'ok': False, 'error': str(error), 'prerequisite': error.prerequisite}), end='')
+        result = {'ok': False, 'error': str(error), 'prerequisite': error.prerequisite}
+        if hasattr(error, 'operation_id'):
+            result['operation_id'] = error.operation_id
+        print(WF.dump(result), end='')
         return 2
     except (ValueError, OSError, subprocess.TimeoutExpired) as error:
-        print(WF.dump({'ok': False, 'error': str(error)}), end='')
+        result = {'ok': False, 'error': str(error)}
+        if hasattr(error, 'operation_id'):
+            result['operation_id'] = error.operation_id
+        print(WF.dump(result), end='')
         return 2
     print(WF.dump(result), end='')
     return 0

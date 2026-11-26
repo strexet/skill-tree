@@ -103,7 +103,31 @@ test('installed Setup registers existing, default and custom projects with selec
     assert.equal(invoke('project-preview',choice).checkout,target);
     const result=invoke('project-setup',choice);
     assert.equal(result.status,'registered');assert.equal(result.checkout,target);assert.equal(result.flavor,flavor);
+    assert.match(result.operation_id,/^OP-[a-f0-9-]+$/);
+    const registration = path.join(home, '.skill-tree/artifacts/director/projects', choice.name + '.json');
+    const installedReceipt = path.join(home, '.skill-tree/artifacts/setup-operations', result.operation_id + '.json');
+    const registrationInode = fs.statSync(registration).ino;
+    const setupReceiptBytes = fs.readFileSync(installedReceipt);
+    const replay = invoke('project-setup', {...choice,operation_id:result.operation_id});
+    assert.equal(replay.queue_id,result.queue_id);
+    assert.equal(replay.replayed,true);
+    assert.equal(fs.statSync(registration).ino,registrationInode);
+    assert.deepEqual(fs.readFileSync(installedReceipt),setupReceiptBytes);
     if (choice.name === 'site') {
+      const replayRegistryPath = path.join(home,'.skill-tree/director/registry.json');
+      const registryBefore = fs.readFileSync(replayRegistryPath);
+      const changed = JSON.parse(registryBefore);
+      delete changed.areas.site;
+      const changedRegistry = JSON.stringify(changed);
+      fs.writeFileSync(replayRegistryPath,changedRegistry);
+      try {
+        assert.throws(() => invoke('project-setup',{...choice,operation_id:result.operation_id}),
+                      /Registered Director area or local binding changed/);
+        assert.equal(fs.readFileSync(replayRegistryPath,'utf8'),changedRegistry);
+        assert.deepEqual(fs.readFileSync(installedReceipt),setupReceiptBytes);
+      } finally {
+        fs.writeFileSync(replayRegistryPath,registryBefore);
+      }
       const menu=invoke('project-menu');
       assert.deepEqual(menu.choices,['intake','status','audit','setup']);
       assert.deepEqual(menu.projects.map(project=>project.id),['site']);
@@ -161,6 +185,9 @@ test('installed Setup registers existing, default and custom projects with selec
         fs.writeFileSync(childRoute.child_skill,edited);
         fs.writeFileSync(skillReceipt,JSON.stringify(receipt));
         assert.equal(invoke('project-route',{operation:childOperation}).status,'prerequisite');
+        const recommendation = invoke('project-route', {project_id:'site', request_text:'Implement the settings page'});
+        assert.equal(recommendation.candidate_operation, 'skill-tree-full-cycle');
+        assert.deepEqual(recommendation.limitations, ['project-skill-unavailable']);
       } finally {
         fs.writeFileSync(childRoute.child_skill,originalSkill);
         fs.writeFileSync(skillReceipt,originalProfile);
@@ -207,6 +234,92 @@ test('installed Setup registers existing, default and custom projects with selec
       assert.equal(pending.project.queue_id,result.queue_id);
       const registryPath=path.join(home,'.skill-tree/director/registry.json');
       const current=fs.readFileSync(registryPath);
+      const ready = 'T-12a45678-cdef-4aef-acda-0123456789ab';
+      const blocked = 'T-22a45678-cdef-4aef-acda-0123456789ab';
+      const missingTask = 'T-32a45678-cdef-4aef-acda-0123456789ab';
+      const checks = {checks:[{id:'fixture',recipe_id:'quality-node',parameters:{},sources:['index.html'],
+        criteria:['The site renders.'], assertion:'Open the site.', timing:'immediate'}]};
+      function task(id, state) {
+        return [
+          '### Fixture task ' + id, '', '```yaml', 'id: ' + id, 'priority: 100', 'status: ' + state,
+          'parent_pending_ids: ' + JSON.stringify([added.id]), 'processing_run_id: null', 'root_task_id: ' + id,
+          'related_task_id: null', 'relation: main', 'depends_on: []', '```', '', 'Goal:', 'Render the site.', '',
+          'Touch:', '- index.html', '', 'Validation:', '```json', JSON.stringify(checks), '```', '',
+          'Acceptance:', '- The site renders.', '',
+          ...(state === 'Ready' ? [] : ['[Unresolved - blocks implementation]', '']), '',
+        ].join('\n');
+      }
+      const futurePath = path.join(root,future);
+      const retained = fs.readFileSync(futurePath,'utf8');
+      fs.writeFileSync(futurePath,retained.replace('## Backlog',task(ready,'Ready') +
+        task(blocked,'Blocked pending answers') + '## Backlog'));
+      try {
+        const ownedState = [futurePath, path.join(root,'.skill-tree/documents/future.json'), queueLocator,
+          skillReceipt, registryPath, path.join(home,'.skill-tree/documents/future.json'),
+          path.join(home,'.skill-tree/artifacts/director/local-bindings.json'),
+          path.join(root,'.skill-tree/history/task-outcomes.jsonl')];
+        const bytes = file => fs.existsSync(file) ? fs.readFileSync(file) : null;
+        const before = ownedState.map(bytes);
+        function recommendation(request_text, project_id = 'site') {
+          const preview = invoke('project-route',{project_id,request_text});
+          for (const unavailable of ['command','entry','input','grant','authority','argv']) {
+            assert.equal(preview[unavailable],undefined,unavailable);
+          }
+          return preview;
+        }
+        const fresh = recommendation('Implement a new settings page');
+        assert.equal(fresh.status,'preview');
+        assert.equal(fresh.candidate_operation,'skill-tree-full-cycle');
+        assert.deepEqual(fresh.matched_intents,['fresh-implementation']);
+        assert.equal(fresh.confidence,'bounded-explicit-wording');
+        const existing = recommendation('Implement ready task ' + ready);
+        assert.equal(existing.status,'preview');
+        assert.equal(existing.candidate_operation,'skill-tree-work-through-next');
+        assert.deepEqual(existing.task_ids,[ready]);
+        assert.deepEqual(existing.limitations,[]);
+        const intakeOnly = recommendation('Add to Pending to check the settings page, no implementation');
+        assert.equal(intakeOnly.candidate_operation,'skill-tree-add-pending-task');
+        assert.equal(intakeOnly.status,'preview');
+        const pr = recommendation('Проверь PR #12');
+        assert.equal(pr.candidate_operation,'skill-tree-pr-review-cycle');
+        assert.equal(pr.status,'preview');
+        assert.equal(invoke('project-route',{operation:'review',project_id:'site'}).command,'review-preview');
+        const mixed = recommendation('Implement the settings page and add a Pending follow-up');
+        assert.equal(mixed.candidate_operation,null);
+        assert.deepEqual(mixed.limitations,['mixed-request-intent']);
+        assert.deepEqual(mixed.unresolved_choices.map(choice=>choice.operation),
+                         ['skill-tree-full-cycle','skill-tree-add-pending-task']);
+        const tentative = recommendation('Maybe implement the settings page?');
+        assert.equal(tentative.confidence,'unresolved');
+        assert.deepEqual(tentative.limitations,['uncertain-request-intent']);
+        assert.deepEqual(recommendation('Explain the queue').limitations,['unsupported-request-intent']);
+        assert.deepEqual(recommendation('Explain how to build the project.').limitations,['unsupported-request-intent']);
+        assert.deepEqual(recommendation('The previous agent tried to implement the page.').limitations,['unsupported-request-intent']);
+        assert.deepEqual(recommendation('Add to Pending and process it.').limitations,['mixed-request-intent']);
+        assert.deepEqual(recommendation('Add to Pending and implement all tasks.').limitations,['mixed-request-intent']);
+        assert.deepEqual(recommendation('Add to Pending and start implementation.').limitations,['mixed-request-intent']);
+        assert.deepEqual(recommendation('Implement the settings page, merge it.').limitations,['mixed-request-intent']);
+        assert.deepEqual(recommendation('Implement the page and fix the login screen.').limitations,['mixed-request-intent']);
+        assert.deepEqual(recommendation('Implement task ABC.').limitations,['select-one-exact-task']);
+        assert.deepEqual(recommendation('Implement T-zzzz.').limitations,['exact-task-id-required']);
+        assert.equal(recommendation('Please implement a release notes page.').candidate_operation,'skill-tree-full-cycle');
+        assert.equal(recommendation('Could you review the PR?').candidate_operation,'skill-tree-pr-review-cycle');
+        assert.deepEqual(recommendation('Implement all ready tasks.').limitations,['unsupported-request-intent']);
+        assert.deepEqual(recommendation('Review PR #12 and merge it').limitations,['mixed-request-intent']);
+        assert.deepEqual(recommendation('Implement ' + added.id).limitations,['prioritized-task-required']);
+        assert.deepEqual(recommendation('Implement ' + blocked).limitations,['task-clarification-required']);
+        assert.deepEqual(recommendation('Implement ' + missingTask).limitations,['task-outside-project-queue']);
+        assert.deepEqual(recommendation('Implement ' + ready + ' and ' + blocked).limitations,['select-one-exact-task']);
+        assert.deepEqual(recommendation('Implement the Ready task').limitations,['select-one-exact-task']);
+        assert.deepEqual(recommendation('Implement T-0123').limitations,['exact-task-id-required']);
+        assert.deepEqual(invoke('project-route',{request_text:'Implement the page'}).unresolved_choices,[{project_id:'site'}]);
+        assert.deepEqual(recommendation('Implement the page','different').limitations,['exact-registered-project-required']);
+        assert.throws(() => invoke('project-route',{operation:'intake',request_text:'Add to Pending'}),/Unexpected Director input/);
+        assert.deepEqual(ownedState.map(bytes),before);
+        assert.equal(git(root,'rev-parse','HEAD'),head);
+      } finally {
+        fs.writeFileSync(futurePath,retained);
+      }
       const restricted=JSON.parse(current);
       restricted.areas.site.allowed_effects=['status'];
       fs.writeFileSync(registryPath, JSON.stringify(restricted));
@@ -214,6 +327,9 @@ test('installed Setup registers existing, default and custom projects with selec
       assert.equal(unavailable.status,'prerequisite');
       assert.deepEqual(unavailable.task_ids,[]);
       assert.equal(unavailable.queue_sha256,undefined);
+      const denied = invoke('project-route',{project_id:'site',request_text:'Implement the page'});
+      assert.deepEqual(denied.limitations,['project-preview-not-authorized']);
+      assert.equal(denied.candidate_operation,null);
       fs.writeFileSync(registryPath,current);
       assert.notEqual(fs.readFileSync(path.join(root,future),'utf8'),childBefore);
       assert.equal(fs.readFileSync(path.join(home,future),'utf8'),directorBefore);

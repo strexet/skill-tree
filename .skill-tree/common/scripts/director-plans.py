@@ -116,7 +116,7 @@ def compile_pin(areas, value, resolve_pin):
 
 
 def compile_child_batch(child, effects):
-    fields(child, {'intake_batch_id', 'items'})
+    fields(child, {'intake_batch_id', 'items'}, {'full_cycle_partition'})
     require(task_id(child['intake_batch_id'], {'IB'}) and 'intake' in effects
             and set(effects) <= {'intake', 'process'}, 'Batch requires exact intake identity and bounded queue effects')
     items = child['items']
@@ -137,6 +137,19 @@ def compile_child_batch(child, effects):
     for item in items:
         distinct(item.get('pending_depends_on', []), 'batch Pending prerequisites',
                  lambda value: task_id(value, {'P'}) or isinstance(value, str) and value.startswith('@') and value[1:] in keys)
+    if 'full_cycle_partition' in child:
+        require('process' in effects, 'Full Cycle batch requires an exact process effect')
+        partition = child['full_cycle_partition']
+        fields(partition, {'primary', 'deferred'})
+        primary = set(distinct(partition['primary'], 'primary Full Cycle keys', token, at_least_one=True))
+        deferred = set(distinct(partition['deferred'], 'deferred Full Cycle keys', token, at_least_one=True))
+        require(not (primary & deferred) and primary | deferred == keys
+                and all(partition[role] == [item['key'] for item in items if item['key'] in part]
+                        for role, part in (('primary', primary), ('deferred', deferred))),
+                'Full Cycle partition must cover each original member once in intake order')
+        require(not any(ref.startswith('@') and ref[1:] in deferred for item in items if item['key'] in primary
+                        for ref in item.get('pending_depends_on', [])),
+                'Primary Full Cycle work cannot require a deferred intake item')
     return deepcopy(child)
 
 

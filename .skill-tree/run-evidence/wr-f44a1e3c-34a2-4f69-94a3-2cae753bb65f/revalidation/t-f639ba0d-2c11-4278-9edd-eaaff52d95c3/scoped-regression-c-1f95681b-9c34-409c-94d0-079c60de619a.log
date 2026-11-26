@@ -1,0 +1,29 @@
+Shard 1 (2 cases, exit 0)
+WorkspaceAuditTests.test_install_and_failed_recovery_are_readable_without_a_run
+WorkspaceAuditTests.test_default_and_selected_audits_use_distinct_installed_child_tools
+  ..
+  ----------------------------------------------------------------------
+  Ran 2 tests in 14.689s
+
+  OK
+
+Shard 2 (2 cases, exit 0)
+WorkspaceAuditTests.test_exact_recovery_replays_a_lost_receipt_without_consuming_a_new_journal
+WorkspaceAuditTests.test_denied_unavailable_and_narrow_areas_keep_their_boundaries
+  ..
+  ----------------------------------------------------------------------
+  Ran 2 tests in 7.511s
+
+  OK
+
+Shard 3 (1 cases, exit 0)
+WorkspaceAuditTests.test_install_replays_its_own_published_transaction
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 2.909s
+
+  OK
+
+Ran 5 tests in 14.902s
+
+OK
