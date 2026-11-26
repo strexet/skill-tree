@@ -5107,7 +5107,9 @@ def completed_contract_sha256(record):
                     for ref in receipt.get('evidence',[])
                 ]
                 if 'runner_result' in receipt:
-                    bound[kind]['runner_receipt_sha256']=digest(dump(receipt).encode())
+                    # Other lanes can carry task-wide execution paths that are remapped on restore.
+                    bound[kind]['runner_acknowledgement']={key:receipt.get(key) for key in
+                        ('runner_result','payload_hash','recorded_at')}
         checks.append(bound)
     identity['check_results'] = checks
     return digest(dump(identity).encode())
@@ -5589,9 +5591,15 @@ def local_check_result_available(store,slot,attempt_id):
     try:
         _,_,retained=retained_local_check_result(store,slot,attempt_id)
         return retained is not None and all(evidence_pointer(store,item,required=True)['available']
-                                            for item in retained['evidence'])
+                                            for item in retained['observation']['evidence'])
     except WorkflowError:
         return False
+
+
+def check_runner_observation(record):
+    fields=('result','classification','actual_lane','counts','assertions','failure_category','cleanup','timing',
+            'failure_signature','diagnostic_key','evidence')
+    return {key:record[key] for key in fields if key in record}
 
 
 def verify_recovered_check_replay(store,state,receipt,payload):
@@ -5599,6 +5607,7 @@ def verify_recovered_check_replay(store,state,receipt,payload):
     entry=state['task_progress'].get(tid,{})
     slot=entry.get('checks',{}).get(cid,{})
     record=slot.get('receipts',{}).get(attempt) if entry.get('run_id')==receipt['run_id'] else None
+    historical=False
     if record is None and not entry:
         runs=historical_runs(state.get('run_registry',{}))
         run_id=receipt['run_id']
@@ -5610,6 +5619,7 @@ def verify_recovered_check_replay(store,state,receipt,payload):
                 verify_completed_contract(store,outcome,runs)
                 record=next((check['result'] for check in outcome.get('check_results',[])
                              if check['check']['id']==cid and check['result']['attempt_id']==attempt),None)
+                historical=True
     pointer=record.get('runner_result') if isinstance(record,dict) else None
     if (not isinstance(pointer,dict) or record!=receipt.get('record') or pointer!=receipt.get('runner_result')
             or pointer.get('sha256')!=payload['result_sha256']
@@ -5618,6 +5628,12 @@ def verify_recovered_check_replay(store,state,receipt,payload):
             or record.get('environment_identity')!=receipt.get('environment_identity')
             or record.get('recorded_at')!=receipt.get('recorded_at')):
         raise WorkflowError('The recovered result archive differs from the canonical check receipt')
+    if historical:
+        original={'runner_results':{attempt:pointer['sha256']}}
+        relative,_,retained=retained_local_check_result(store,original,attempt)
+        if (relative!=pointer['path'] or record['payload_hash']!=digest(dump(retained['submission']).encode())
+                or check_runner_observation(record)!=retained['observation']):
+            raise WorkflowError('The completed acknowledgement differs from the original retained runner result')
 
 
 def reconcile_local_check_result(store,text,state,payload,origin,binding,attempt,slot,request_digest):
@@ -5662,7 +5678,7 @@ def reconcile_local_check_result(store,text,state,payload,origin,binding,attempt
             raise WorkflowError('The canonical runner result exceeds the receipt size limit')
         retained={'schema':1,'kind':'local-check-runner-result','origin':origin,
                   'runner_binding':binding,'submission':submission,'exit_code':exit_code,
-                  'evidence':checked['evidence'],'request_digest':request_digest,'retained_at':now()}
+                  'observation':check_runner_observation(checked),'request_digest':request_digest,'retained_at':now()}
         encoded=dump(retained)
         if len(encoded.encode())>65536:
             raise WorkflowError('The original runner result exceeds the receipt size limit')
@@ -5675,7 +5691,7 @@ def reconcile_local_check_result(store,text,state,payload,origin,binding,attempt
         raise WorkflowError('Select the exact retained runner result digest')
     require_departed_check_runner(group)
     record,_=record_check_result(store,state,retained['submission'],bound_runner=True)
-    if record['evidence']!=retained['evidence']:
+    if check_runner_observation(record)!=retained['observation']:
         raise WorkflowError('Original runner result evidence changed after retention')
     require_departed_check_runner(group)
     store.expect_unchanged(relative,sha)

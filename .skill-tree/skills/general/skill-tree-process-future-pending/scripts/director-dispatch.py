@@ -209,6 +209,23 @@ class ChildDispatch:
             _require(exact and not self.payload.get('delivery_authorization'),
                      'Directed start requires exact task scope and no automatic delivery authority')
 
+    def verify_unbound_intake(self, store):
+        text = store.text()
+        _require(wf.digest(text.encode()) == self.payload['expected_source_hash'],
+                 'Canonical child queue changed before batch processing')
+        selected = wf.resolve(wf.parse(text), self.payload['selectors'], 'Pending Queue')
+        for task in selected:
+            for batch_id in task.get('intake_batch_ids', []):
+                relative = wf.intake_receipt_path(batch_id)
+                checksum = wf.file_hash(store.owned(relative))
+                original = wf.read_intake_receipt(store, batch_id)
+                _require(original is not None and any(item['id'] == task['id'] for item in original['items']),
+                         'Original canonical intake batch receipt is unavailable or changed')
+                _require('full_cycle_partition' not in original,
+                         'Original canonical intake batch receipt requires exact Director partition authority')
+                store.expect_unchanged(relative, checksum)
+                store._future_receipts.add(relative)
+
     def verify_batch_intake(self, store):
         if self.identity['operation'] != 'process':
             return
@@ -216,6 +233,7 @@ class ChildDispatch:
         _, receipt = _receipt(store, identity, _digest(identity))
         partitioned = receipt is not None and 'full_cycle_partition' in receipt['result']
         if self.batch_intake_sha256 is None and not partitioned:
+            self.verify_unbound_intake(store)
             return
         _require(receipt and receipt['receipt_sha256'] == self.batch_intake_sha256
                  and receipt['plan_sha256'] == self.plan_sha256,

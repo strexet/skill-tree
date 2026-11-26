@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "5cc232c2fd355acedb13d2a48e227e37d8548beea04f9b12c83dab17d8428dc8",
+  "identity": "e5a46b988cd212b2f1b500a33405c31b767fc0b62087ad7714e19254a1732c82",
   "operation": "skill-tree-director-decide",
   "operations": {
     "skill-tree-3d": {
@@ -3320,7 +3320,7 @@
     "scripts/runtime/common/scripts/context-search.py": "6fd5830f2be9d707dab5347fdcf1c01be8716dc8ce5f183c3120e9af28e2f4f0",
     "scripts/runtime/common/scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/runtime/common/scripts/decision-orchestration.py": "dd1b6fb5dfb56b93ad531abf87f4f713b5934156133007bb4014b56ec9f285e5",
-    "scripts/runtime/common/scripts/director-dispatch.py": "5f5ca8060842d681c2644d8e89cdc2a233deed35b22423a369e5cff60bc03546",
+    "scripts/runtime/common/scripts/director-dispatch.py": "41438736aeed0da210bd7f65971193f25c84a68c2536be66f52b7f7cf3a040cf",
     "scripts/runtime/common/scripts/director-handoff.py": "19a5ffc7f21d1199954e4953b6d9e704c880cb69d533004ae2c918ba6eb2116b",
     "scripts/runtime/common/scripts/director-objectives.py": "18a0e664d1eb9074983a22abf27ecb4076d2bd1b3d24ed6cac5ace41f459f373",
     "scripts/runtime/common/scripts/director-plan-adapters.py": "1f78af0ae2187105d44ccc2487176548268357fa4a5916c496cb093899c4741d",
@@ -3336,7 +3336,7 @@
     "scripts/runtime/common/scripts/run-workspaces.py": "a706fedaca99a6231d753201cff28f5d5601292b048ceb0929dc8ae469eb302b",
     "scripts/runtime/common/scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/runtime/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/runtime/common/scripts/workflow-state.py": "602daac77d377e0b5852820f74fd320fc61956fbf95c2f77007a1f1c28dd39dd",
+    "scripts/runtime/common/scripts/workflow-state.py": "f2982fb012c5bb9648b6011273fd05943769120eafbbb472baa0be0d9b99cce4",
     "scripts/runtime/lib/api-contract-locks.js": "eaac3e411ab7ddea36cedb4c48f0a0d0c5e737509466f0f86587df51a34fe594",
     "scripts/runtime/lib/composer.js": "4f463c0b8a77a681de693a9016a91937f75616f3c2253ce747ba9f76914174b3",
     "scripts/runtime/lib/development-policies.js": "9d3036e0dd2b2aaf070f3ec92f9e1d6d6830fe35cd8ebb1a78135c3ad792a2fd",

@@ -243,6 +243,13 @@ sys.stdin.readline()
     def test_recovered_result_replay_uses_registered_completed_contract(self):
         tid=self.task()
         git_identity,_=self.review_candidate(tid,controller=True,record_result=False)
+        with self.store.lock():
+            text=self.store.text()
+            state=self.store.load(text)
+            state['task_progress'][tid]['execution_sessions']={
+                'separate-product-lane':{'project_root':str(self.store.source_root)},
+            }
+            self.store.save(text,state)
         process,identity,result,recovery,_=self.start_result_runner(tid,expected_value=2)
         process.stdin.write('exit\n')
         process.stdin.flush()
@@ -259,6 +266,13 @@ sys.stdin.readline()
             'source_fingerprints':wf.fingerprints(self.store,['source.py'])})
         self.assertNotIn(tid,self.store.load()['task_progress'])
         self.assertEqual(wf.reconcile_check(self.store,recovery),receipt)
+        portable=wf.workspaces.portable_envelope(outcome,self.store.source_root,self.store.root)
+        relocated_root=self.root/'relocated-fixture'
+        relocated=wf.workspaces.restore_envelope(portable,relocated_root,self.root)
+        recovered=relocated['check_results'][0]['result']
+        self.assertEqual(recovered['execution_sessions']['separate-product-lane']['project_root'],str(relocated_root))
+        self.assertEqual(wf.completed_contract_sha256(outcome),wf.completed_contract_sha256(relocated))
+        wf.verify_completed_contract(self.store,relocated)
         ledger=self.store.owned(wf.OUTCOME_LEDGER)
         ledger_bytes=ledger.read_bytes()
         archive=self.store.base/'history/check-reconciliations'/f"{identity['attempt_id'].lower()}.json"
@@ -272,6 +286,13 @@ sys.stdin.readline()
                                      'request_digest':wf.digest(wf.dump(conflicting).encode())}))
         with self.assertRaisesRegex(wf.WorkflowError,'registered completion proof'):
             wf.reconcile_check(self.store,conflicting)
+        changed=json.loads(json.dumps(outcome))
+        checked=changed['check_results'][0]['result']
+        checked['cleanup']='Substituted local operation cleanup.'
+        ledger.write_text(json.dumps(changed)+'\n')
+        archive.write_text(wf.dump({**receipt,'record':checked}))
+        with self.assertRaisesRegex(wf.WorkflowError,'differs from the original retained runner result'):
+            wf.reconcile_check(self.store,recovery)
         ledger.write_bytes(ledger_bytes)
         archive.write_bytes(archive_bytes)
         self.assertEqual(wf.reconcile_check(self.store,recovery),receipt)

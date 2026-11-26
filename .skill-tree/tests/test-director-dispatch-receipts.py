@@ -233,6 +233,17 @@ class DispatchTests(unittest.TestCase):
         unbound = self.process_request(primary)
         with self.assertRaisesRegex(WF.WorkflowError, 'Original canonical intake batch receipt'):
             WF.process(self.child(), unbound)
+        companion=self.root/DISPATCH.CHILD_RECEIPTS/(observed['receipt']['dispatch_key']+'.json')
+        companion_bytes=companion.read_bytes()
+        companion.unlink()
+        try:
+            self.assertEqual(WF.read_intake_receipt(self.child(),receipt['id']),receipt)
+            for member in (primary,follow_up):
+                with self.assertRaisesRegex(WF.WorkflowError,'exact Director partition authority'):
+                    WF.process(self.child(),self.process_request(member))
+            self.assertEqual((child.future.read_bytes(),child.state.read_bytes()),before)
+        finally:
+            companion.write_bytes(companion_bytes)
         guarded = {'director_batch_intake_sha256':observed['receipt']['receipt_sha256']}
         with self.assertRaisesRegex(WF.WorkflowError, 'selection differs'):
             WF.process(self.child(), {**self.process_request(follow_up), **guarded})
@@ -245,6 +256,10 @@ class DispatchTests(unittest.TestCase):
                           for pid in (follow_up,handoff)],
                          [('Pending',300,'later-work'),('Pending',250,'later-work')])
         self.assertEqual(tasks[handoff]['pending_depends_on'],[primary])
+        independent=self.process_request(follow_up)
+        independent.pop('director_dispatch')
+        independent['tasks'][0]['title']='Qualify the separately selected follow-up'
+        self.assertEqual(WF.process(self.child(),independent)['selected_ids'],[follow_up])
 
     def test_start_reconciles_original_reserved_and_built_workspace(self):
         for fail_after in (False, True):
