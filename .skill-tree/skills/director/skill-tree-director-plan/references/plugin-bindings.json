@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "1398c1cfc192a12cf4d38d6440fbf3e63fda199da771ea978516aa4d2fe73e22",
+  "identity": "005eaa5c9e11bba6c2403930391bc6a7cff18a7cd62c27037e256c16d7e6dfcb",
   "operation": "skill-tree-director-plan",
   "operations": {
     "skill-tree-3d": {
@@ -3303,7 +3303,7 @@
     "references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
     "references/pending-task-intake.md": "c23e7fc58a44b58ab8e0b09ee0b15bd56fbdfd4fc275833c26fd4c8c2d0e4619",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
-    "references/pr-review-cycle.md": "5bc55fbf5f4883e215fa229bc7531979ee522a40ddcfeb22d476eb6f7d7cd60f",
+    "references/pr-review-cycle.md": "f696c00bef9253435cb6ee2f9710b4f7f7b0140da3dfc5756aed2968ec863b42",
     "references/project-profile.md": "232c01c9ce6554545653d3c4b0b515e3c180f9361bb85c6206d372209cac5bba",
     "references/run-workspaces.md": "298f972fd4802b3bf95af3120a00904b999d23beb70ef7366ff3684945ee4cfd",
     "references/validation-policy.md": "a3413c285687d49f22aac9eb124cb7a64252200984b60b16de1d675d6cfe2472",
@@ -3332,7 +3332,7 @@
     "scripts/runtime/common/scripts/parallel-preview.py": "5425da8665a31cfc681853cf5e5579d2a75295a08ee74399da717f803cf441bc",
     "scripts/runtime/common/scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",
     "scripts/runtime/common/scripts/plugin-processing.py": "4f4418c8e67a723a2cdd53b43246cb4507f0419bd7ca76b901334e78bb1406ec",
-    "scripts/runtime/common/scripts/pr-review-state.py": "15a2bdff8dd6422f75f1f825486534e34e3a5877f75f2bd240dcf04e416d9224",
+    "scripts/runtime/common/scripts/pr-review-state.py": "00ce923f43c0465e7bebc9aa5cd1b6d49174920a705393f2317cc0f9ac33302e",
     "scripts/runtime/common/scripts/run-workspaces.py": "a706fedaca99a6231d753201cff28f5d5601292b048ceb0929dc8ae469eb302b",
     "scripts/runtime/common/scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/runtime/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
