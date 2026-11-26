@@ -5032,6 +5032,11 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/documents/early-review-policy-study.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/documents/features.md",
       "role": "canonical"
     },
@@ -6366,6 +6371,7 @@
     ".skill-tree/documents/build-and-release.md": "48c11b6608256cb65f5f07ae20955808539c675441eb9fc69c9713fec725863a",
     ".skill-tree/documents/dependencies.md": "e524d1d314d8c443e000260860e71fca6db4bd6938e86cb7443379a6fb2db4f3",
     ".skill-tree/documents/director-workflow.md": "25c8ad6dacce8ad03f4708d16e364b0f80a2ad4c53220471ffde196dd69cb09d",
+    ".skill-tree/documents/early-review-policy-study.md": "02484cd40cdd1463cb5a415f1bbcff0cee7536c62e9e40c559e472856fe900b8",
     ".skill-tree/documents/features.md": "0468d553ed51ac41d22f130b13f0085d332050db2874036ae2f417bf0333bb4d",
     ".skill-tree/documents/future.md": "05a1f55b7a7202ce1a56bb01919c016110a355ca8de0fe746183d6e62853e634",
     ".skill-tree/documents/implementation-plan.md": "4a5f573aed129e25d7596c82168778a378fac6a90c5762b98a6646c537bba02e",
