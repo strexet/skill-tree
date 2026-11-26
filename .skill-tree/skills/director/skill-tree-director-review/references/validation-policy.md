@@ -1,6 +1,6 @@
 # Validation Policy
 
-Web source directory checks can include packages with materialized pnpm dependencies. With matching owned Web pnpm profile files and the ordinary pnpm store, source traversal skips wholly Git-ignored, unversioned `node_modules` directories in the selected checkout. Nested packages require the same package name and path in pnpm's materialized workspace state. Recorded pnpm membership identifies existing generated files while edits to the workspace declaration, package manifests and lockfiles remain visible to review. Explicitly named dependency inputs and other symlinks retain the normal source checks.
+Web source directory checks can include packages with materialized pnpm dependencies. With matching owned Web pnpm profile files and the ordinary pnpm store, source traversal skips wholly Git-ignored, unversioned `node_modules` directories in the selected checkout. Nested packages require the same package name and path in pnpm's materialized workspace state and a match in the current workspace declaration. The source checker recognizes block lists of literal paths, simple wildcards and recursive directory wildcards. Unsupported declarations and explicitly named dependency inputs retain the normal source checks.
 
 ## Check ownership
 

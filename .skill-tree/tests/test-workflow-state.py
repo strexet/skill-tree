@@ -346,6 +346,15 @@ class WorkflowStateTests(unittest.TestCase):
             self.fail(str(error))
         self.assertEqual(after,before)
         (root/'pnpm-workspace.yaml').write_text('packages:\n  - "packages/library"\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+        (root/'pnpm-workspace.yaml').write_text('packages:\n  - "packages/**"\n  - "!packages/app"\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+        (root/'pnpm-workspace.yaml').write_text('packages: ["packages/*"]\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+        (root/'pnpm-workspace.yaml').write_text('packages:\n  - "packages/**"\n')
         updated = wf.fingerprints(self.store,sources)
         self.assertEqual(updated['packages'],before['packages'])
         self.assertNotEqual(updated['pnpm-workspace.yaml'],before['pnpm-workspace.yaml'])

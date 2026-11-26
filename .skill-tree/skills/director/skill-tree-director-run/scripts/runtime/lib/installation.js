@@ -5,6 +5,7 @@ const development=require('./development-policies.js');
 const BEGIN='<!-- BEGIN skill-tree-skills -->',END='<!-- END skill-tree-skills -->';
 const INSTALL='.skill-tree/installation',PROFILE=INSTALL+'/profile.json';
 const AGENTS_PATH='AGENTS.md',REGENERATE_AGENTS=Symbol('regenerate-agents');
+const INITIAL_WORKTREE_PROFILE=Symbol('initial-worktree-profile');
 const isCodexBridge=record=>Array.isArray(record?.providers)&&record.providers.includes('codex');
 const TASK_GROUPING_SOURCE='common/scripts/workflow-state.py';
 const TASK_GROUPING_BUNDLE=INSTALL+'/source/'+TASK_GROUPING_SOURCE;
@@ -372,7 +373,7 @@ function plan(root,source,flavor,selections,options={}){
    verifyInstalled(root);verifyPluginBackups(root);
   }
  }
- if(hasActiveOperation(root))throw Error('Active controller must checkpoint at a stopped cleanup/handoff point before installation or refresh');
+ if(!options[INITIAL_WORKTREE_PROFILE]&&hasActiveOperation(root))throw Error('Active controller must checkpoint at a stopped cleanup/handoff point before installation or refresh');
  const requested=[...selections];
  if(old)for(const [rel,record] of Object.entries(old.destinations))requested.push({rel,provider:record.provider,providers:owners(record),name:record.name});
  const merged={};for(const item of requested){if(!merged[item.rel])merged[item.rel]={...item,providers:[]};merged[item.rel].providers=[...new Set([...merged[item.rel].providers,...(item.providers||[item.provider])])].sort();}
@@ -610,6 +611,35 @@ function initialWorktreeProfile(root, request, mode) {
   return verified;
  }
  const original = verifyReservation();
+ function isolatedDestination() {
+  const common = path.resolve(root,git(root,'rev-parse','--git-common-dir'));
+  const locator = c.readJson(common,'skill-tree-runtime.json');
+  const native = git(root,'worktree','list','--porcelain','-z').split('\0')
+   .filter(field=>field.startsWith('worktree ')).map(field=>field.slice('worktree '.length));
+  const peers = native.filter(checkout=>checkout!==root&&checkout!==target);
+  for (const locations of [locator.worktrees,locator.pending_worktrees||{}]) {
+   peers.push(...Object.entries(locations).filter(([id])=>id!==request.run_id).map(([,checkout])=>checkout));
+  }
+  function contains(parent, child) {
+   // Fold path spellings conservatively because a worktree may use a
+   // case-insensitive filesystem even when the checkout paths are distinct strings.
+   const comparable = value => value.normalize('NFD').toLowerCase();
+   const relative = path.relative(comparable(parent),comparable(child));
+   return relative!=='..'&&!relative.startsWith('..'+path.sep)&&!path.isAbsolute(relative);
+  }
+  const ownedArea = path.join(common,'skill-tree-worktrees');
+  if (!native.includes(target) || contains(target,root)) return false;
+  if (contains(common,target)) {
+   if (!contains(ownedArea,target)||contains(target,ownedArea))return false;
+  } else if (contains(root,target)) {
+   return false;
+  }
+  return peers.every(checkout=>{
+   if(typeof checkout!=='string'||!path.isAbsolute(checkout))return false;
+   const actual = fs.existsSync(checkout)?fs.realpathSync(checkout):checkout;
+   return !contains(actual,target)&&!contains(target,actual);
+  });
+ }
  const scope = profile => Object.fromEntries(Object.entries(profile.destinations)
   .map(([relative,row])=>[relative,{name:row.name,providers:[...owners(row)].sort()}]));
  const expected = scope(original);
@@ -622,9 +652,11 @@ function initialWorktreeProfile(root, request, mode) {
  };
  if (mode === 'install' && c.read(target,PROFILE) === null) {
   const selections = Object.entries(expected).flatMap(([rel,row])=>row.providers.map(provider=>({rel,provider,name:row.name})));
-  install(target,source,original.flavor,selections,{recoverPending:false,recoverPluginPending:false,
+  const isolated = isolatedDestination();
+  install(target,source,original.flavor,selections,{[INITIAL_WORKTREE_PROFILE]:isolated,recoverPending:false,recoverPluginPending:false,
    guardPlan(planned){
     verifyReservation();
+    if (isolated && !isolatedDestination()) throw Error('The reserved profile destination now overlaps another checkout');
     validate(planned.profile);
     if (Object.keys(planned.changes).some(relative=>!relative.startsWith(INSTALL+'/') && !Object.hasOwn(expected,relative))) {
      throw Error('Initial profile setup cannot change product files, bridges or workflow metadata');

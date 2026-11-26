@@ -5,6 +5,8 @@ import argparse
 from contextlib import contextmanager
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
+from fnmatch import fnmatchcase
+from functools import lru_cache
 import hashlib
 import importlib.util
 import json
@@ -3289,6 +3291,62 @@ def owned_web_pnpm_profile(root):
     return False
 
 
+def pnpm_workspace_patterns(text):
+    """Recognize simple block-list workspace declarations without loading YAML code."""
+    lines = [line for line in text.splitlines() if line.strip() and not line.lstrip().startswith('#')]
+    if any('\t' in line for line in lines):
+        return ()
+    top = [(index, re.fullmatch(r'([a-zA-Z_][a-zA-Z0-9_-]*):.*', line))
+           for index, line in enumerate(lines) if not line.startswith(' ')]
+    if any(match is None for _, match in top):
+        return ()
+    starts = [index for index, match in top if match[1] == 'packages']
+    if len(starts) != 1 or not re.fullmatch(r'packages:[ ]*(?:#.*)?', lines[starts[0]]):
+        return ()
+    start = starts[0]
+    end = next((index for index, _ in top if index > start), len(lines))
+    patterns = []
+    for line in lines[start+1:end]:
+        match = re.fullmatch(
+            r"""[ ]+-[ ]+(?:"([!a-zA-Z0-9_./@*-]+)"|'([!a-zA-Z0-9_./@*-]+)'|([a-zA-Z0-9_./-][a-zA-Z0-9_./@*-]*))(?:[ ]+#.*)?[ ]*""",
+            line,
+        )
+        if not match:
+            return ()
+        if match[3] and re.fullmatch(r'(?:true|false|null|[-+]?[0-9][0-9._-]*)',match[3],re.I):
+            return ()
+        pattern = next(value for value in match.groups() if value is not None)
+        path = pattern.removeprefix('!').removeprefix('./')
+        parts = tuple(path.split('/'))
+        if any(part in {'','.', '..'} or ('**' in part and part != '**') for part in parts):
+            return ()
+        patterns.append((pattern.startswith('!'), parts))
+    return tuple(patterns)
+
+
+def pnpm_workspace_member(parts, patterns):
+    # Match each segment separately. A recursive wildcard can cross directories;
+    # a simple wildcard cannot. Unrecognized declarations supply no proof.
+    if any(part.startswith('.') for part in parts):
+        return False
+
+    @lru_cache(maxsize=None)
+    def matches(path, pattern):
+        if not pattern:
+            return not path
+        if pattern[0] == '**':
+            return any(matches(path[index:],pattern[1:]) for index in range(len(path)+1))
+        return bool(path and fnmatchcase(path[0],pattern[0]) and matches(path[1:],pattern[1:]))
+
+    admitted = False
+    for excluded, pattern in patterns:
+        if matches(parts,pattern):
+            if excluded:
+                return False
+            admitted = True
+    return admitted
+
+
 def pnpm_source_pruner(root):
     try:
         if not binding_path(root,'node_modules/.pnpm').is_dir() or not owned_web_pnpm_profile(root):
@@ -3296,8 +3354,11 @@ def pnpm_source_pruner(root):
     except WorkflowError:
         return None
     projects={}
+    patterns=()
     try:
-        if binding_path(root,'pnpm-workspace.yaml').is_file():
+        declaration=binding_path(root,'pnpm-workspace.yaml')
+        if declaration.is_file():
+            patterns=pnpm_workspace_patterns(declaration.read_text())
             workspace=binding_path(root,'node_modules/.pnpm-workspace-state-v1.json')
             if workspace.is_file():
                 state=json.loads(workspace.read_text())['projects']
@@ -3321,7 +3382,9 @@ def pnpm_source_pruner(root):
             if child.parent!=root:
                 name=package.get('name')
                 project=projects.get(str(child.parent))
-                if not isinstance(name,str) or not name or not isinstance(project,dict) or project.get('name')!=name:
+                parts = child.parent.relative_to(root).parts
+                if (not isinstance(name,str) or not name or not isinstance(project,dict)
+                        or project.get('name')!=name or not pnpm_workspace_member(parts, patterns)):
                     return False
         except (AttributeError,OSError,ValueError):
             return False

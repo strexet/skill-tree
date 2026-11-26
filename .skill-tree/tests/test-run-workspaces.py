@@ -36,7 +36,7 @@ class RunWorkspaceTests(unittest.TestCase):
     def start(self,tid,**options):
         return wf.start(wf.Store(self.root,allow_unselected=True),'next',tid,workspace=options)
     def location(self,run):return Path(ws.runtime(self.root)['worktrees'][run['id']])
-    def installed_web_profile_fixture(self, interrupt=False, legacy=False, location='explicit'):
+    def installed_web_profile_fixture(self, interrupt=False, legacy=False, location='explicit', flavor='web'):
         self.call(self.root, 'rm', '.skill-tree/config/repository.json')
         (self.root/'package.json').write_text('{"name":"web-profile-fixture","type":"module"}\n')
         (self.root/'.gitignore').write_text('.skill-tree/installation/\n.agents/\n.env.fixture\n')
@@ -44,7 +44,7 @@ class RunWorkspaceTests(unittest.TestCase):
         self.call(self.root, 'commit', '-m', 'Use an ignored project installation')
         (self.root/'.env.fixture').write_text('FIXTURE_ONLY=unchanged\n')
         command = ['node', str(CORE/'bin/install.js'), '--target', str(self.root), '--only', 'codex',
-                   '--project', '--flavor', 'web', '--skills', 'skill-tree-work-through-next']
+                   '--project', '--flavor', flavor, '--skills', 'skill-tree-work-through-next']
         if legacy:
             fallback = self.base/'retained-profile-source'
             for name in ('common','config','domains','lib','src','templates','tests/fixtures/director'):
@@ -171,6 +171,56 @@ class RunWorkspaceTests(unittest.TestCase):
         self.assertEqual(canonical_profile.read_bytes(),original)
         self.assertEqual(self.call(self.root,'symbolic-ref','--short','HEAD'),canonical_branch)
         self.assertEqual(wf.begin_task(selected,{'task_id':task})['phase'],'implement')
+
+    def test_initial_profile_admits_another_parked_worktree_while_a_run_executes(self):
+        first, first_task, first_path, canonical_profile, original, _ = self.installed_web_profile_fixture()
+        second_task = self.task('Prepare a second isolated profile')
+        second = wf.start(wf.Store(self.root, neutral=True), 'next', second_task, workspace={
+            'implementation_operation':'work-through-next',
+            'worktree':str(self.base/'second-profile-target'),
+        })
+        first_store = wf.Store(first_path, first['id'])
+        self.assertEqual(wf.prepare_worktree_profile(first_store)['status'], 'admitted')
+        self.assertEqual(wf.begin_task(first_store, {'task_id':first_task})['phase'], 'implement')
+        before = first_store.load()
+        second_path = self.location(second)
+        second_store = wf.Store(second_path, second['id'])
+        self.assertEqual(second_store.load()['active_run']['phase'], 'refresh-profile')
+        self.assertEqual(wf.prepare_worktree_profile(second_store)['status'], 'admitted')
+        after = second_store.load()
+        self.assertEqual(after['active_run']['phase'], 'implement')
+        self.assertEqual(after['run_registry']['runs'][first['id']], before['active_run'])
+        self.assertEqual(after['task_progress'][first_task], before['task_progress'][first_task])
+        self.assertEqual(after['run_registry']['claims'], {first_task:first['id'], second_task:second['id']})
+        self.assertEqual(canonical_profile.read_bytes(), original)
+        refresh = subprocess.run(['node', str(canonical_profile.with_name('manager.js')),
+                                  '--refresh-profile', '--dry-run'], capture_output=True, text=True, timeout=30)
+        self.assertNotEqual(refresh.returncode, 0)
+        self.assertIn('Active controller must checkpoint', refresh.stderr)
+        self.assertEqual(canonical_profile.read_bytes(), original)
+
+    def test_initial_profile_keeps_the_install_barrier_for_overlapping_general_worktrees(self):
+        first, first_task, first_path, canonical_profile, original, _ = self.installed_web_profile_fixture(flavor='general')
+        peer_registration = ws.linked_registration(self.root,first_path)
+        overlaps = [first_path/'nested-profile-target', peer_registration/'nested-profile-target']
+        siblings = []
+        for index, nested in enumerate(overlaps,1):
+            task_id = self.task('Preserve active sibling boundary '+str(index))
+            run = wf.start(wf.Store(self.root, neutral=True), 'next', task_id, workspace={
+                'implementation_operation':'work-through-next', 'worktree':str(nested),
+            })
+            siblings.append((nested,run['id']))
+        first_store = wf.Store(first_path, first['id'])
+        self.assertEqual(wf.prepare_worktree_profile(first_store)['status'], 'admitted')
+        self.assertEqual(wf.begin_task(first_store, {'task_id':first_task})['phase'], 'implement')
+        before = self.store.state.read_bytes()
+        for nested,run_id in siblings:
+            with self.subTest(checkout=nested.parent.name):
+                with self.assertRaisesRegex(wf.WorkflowError, 'Active controller must checkpoint'):
+                    wf.prepare_worktree_profile(wf.Store(nested, run_id))
+                self.assertFalse((nested/'.skill-tree/installation/profile.json').exists())
+        self.assertEqual(self.store.state.read_bytes(), before)
+        self.assertEqual(canonical_profile.read_bytes(), original)
 
     def test_rejected_and_interrupted_profile_setup_keep_the_exact_run(self):
         run, task, path, canonical_profile, original, canonical_branch = self.installed_web_profile_fixture()

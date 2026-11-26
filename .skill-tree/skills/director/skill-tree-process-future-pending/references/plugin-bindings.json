@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "cbf1f6312f2d725c3103b000f3c7b5ca67f68d2eb01907c23bf1621dd447ce14",
+  "identity": "239abd3b09111c230aa2145ac83ab43bc72e6a40cfc2b91de623d1fe5eebc6db",
   "operation": "skill-tree-process-future-pending",
   "operations": {
     "skill-tree-3d": {
@@ -3300,8 +3300,8 @@
     "references/pending-task-intake.md": "c23e7fc58a44b58ab8e0b09ee0b15bd56fbdfd4fc275833c26fd4c8c2d0e4619",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/project-profile.md": "232c01c9ce6554545653d3c4b0b515e3c180f9361bb85c6206d372209cac5bba",
-    "references/run-workspaces.md": "0286688e58f05847adeb73b9b3b3b290b8c856c9e82e3502e8c8b8a6076baa11",
-    "references/validation-policy.md": "e4572bf636e414adba2c65f85f5618837affc1bc8f39ba2e998299e940a4164c",
+    "references/run-workspaces.md": "ca62963a23d05b422713325b29f0229c0d7f5423e972cdc90751c85a46a8c9a7",
+    "references/validation-policy.md": "e17660b35a658f5fb595b6c151987dae993b264d21576d21160f79f9b195f20e",
     "references/workflow-metadata.md": "b85c895e9c2f90d743be5f810a5883cad3fb334097b7bf6b50e9b2b534ffe1a1",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "dd1b6fb5dfb56b93ad531abf87f4f713b5934156133007bb4014b56ec9f285e5",
@@ -3320,7 +3320,7 @@
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     "scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
-    "scripts/workflow-state.py": "3cecefe9b18a75b1749fd7d2f78f887fd2afb2541823f78cc7408be07abf7191"
+    "scripts/workflow-state.py": "d5ced6efe42feb81558f47c8c6feebdc114847f8eec907518e9ac6085d0db619"
   },
   "packages": {},
   "parameter_defaults": {},
