@@ -36,6 +36,8 @@ An owned static or unit runner can retain the finished result before leaving the
 
 ## Final run evidence
 
+A declared local delivery suite belongs to the PR final validation phase. Leaf task completion requires all mapped immediate and dependency-bound checks. Run focused regressions during review fixes. Bind final suite results to the reviewed candidate and preserve required provider checks at readiness and merge.
+
 Review can reuse an executed check receipt when the current check contract, relevant source and test inputs, recipe, execution environment and evidence remain verified for the exact review candidate. Reviewers retain independent responsibility for the candidate and current findings. An unavailable artifact, changed input, outstanding execution or a fresh-check requirement retains the corresponding validation obligation. After reuse becomes invalid, execute the required check and use a current review frame for the new evidence.
 
 Finish checks the current sources, recipe/environment, group contract and artifacts of required completed checks. Ordinary and maintenance finish also verify the recorded completion fingerprints for every required completed contract, including roots and dependencies. Changed evidence returns a validate handoff for the immutable completed contract. `prepare-check` and `record-check` perform the due verification; `accept-revalidation` retains the new receipts in the existing run and removes temporary revalidation progress. The queue and original terminal outcome remain unchanged. Revalidation never reimplements a completed unit or creates another task/dependency graph. A pending revalidation attempt prevents finish even when an earlier matching pass exists.

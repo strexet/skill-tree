@@ -8,6 +8,28 @@ When the owner expressly authorizes compatible profile maintenance for the selec
 
 The helper records the anticipated generation before activation and verifies the exact installed identity before finalizing the separate `profile_maintenance` receipt. Reinvoke the same command and publication ID to reconcile a retained attempt. A matching installed generation confirms the result without another activation. A moved target, unknown before state, changed execution input, unfinished workflow or interrupted installer stays retryable with the specific prerequisite. Provider integration and local synchronization remain recorded in the delivery receipt.
 
+## Focused review and final validation
+
+During review and fixes, run the smallest regression that addresses each finding. Use the full local suite for final qualification after the code review converges. Preserve the required provider checks, discussions, approvals and merge authorization throughout the cycle.
+
+Opt in on the initial `init` request with `"final_validation": {"path": "path/to/final-suite.json"}`. The selected file must be a regular file committed on the source candidate. The publication pins the exact file bytes, check IDs and argument vectors. The same declaration remains bound across candidate changes and retries. Existing publications without a declaration use the ordinary readiness flow.
+
+Example committed definition
+
+```json
+{
+  "checks": [
+    {"id": "unit-suite", "argv": ["npm", "test"]},
+    {"id": "browser-suite", "argv": ["npm", "run", "test:e2e"]}
+  ]
+}
+```
+
+- A complete code review with resolved findings opens final validation for the exact PR head, base and changed files. Run `final-validation` on the original publication with the current `snapshot` and `"final_validation": {"action": "prepare", "attempt_id": "final-1"}`. The returned declaration contains the commands. The selected checkout must expose the exact committed source.
+- Run each declared command from the verified checkout under the applicable local validation requirements. Write one JSON receipt per check under the returned `evidence_root`, using `<attempt_id>/<check_id>.json`. Keep the evidence directory ignored by Git. Each receipt contains the prepared `candidate`, `attempt_id`, `check_id` and exact `argv`, plus the observed integer `exit_code` and `output` string. Record the same attempt with `"action": "record"` and a `results` array in definition order. Each entry contains `id`, the observed integer `exit_code`, and `evidence` with the checkout-relative `path` and raw-file `sha256`. The helper prepares and verifies metadata. The executor owns actual command execution, time limits and cleanup.
+- Retry the same attempt ID to reconcile a lost response. A failed suite keeps readiness open. Fix the failure and verify the affected code with current review evidence when the candidate changes, then prepare a new attempt. An unchanged candidate can reuse a current passing attempt while every evidence file still matches.
+- After provider-only updates, refresh the provider snapshot and record an `inspection` covering current discussions and checks. The same code candidate keeps the local qualification evidence. `ready` and `merge-gate` verify the local pass and continue to apply the current provider checks and approval policy.
+
 ## Invocation and authorization
 
 The operation completes the selected source branch through PR creation, review, fixes and repeated review. `source_branch` defaults to the current branch of the selected repository/run/worktree. `target_branch` defaults to `develop`; the PR base and merge destination always use the same target. `merge` defaults to `false`. Controller `base_branch` supplies the initial implementation ancestry and remains independent of both publication parameters. A missing target requires an owner decision; another branch never replaces the target silently.

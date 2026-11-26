@@ -492,6 +492,177 @@ class LocalTargetSyncTests(unittest.TestCase):
         self.assertEqual(result.returncode, expected_code, result.stdout + result.stderr)
         return json.loads(result.stdout)
 
+    def setup_final_validation(self):
+        (self.root/'.git/info/exclude').write_text('.skill-tree/\n')
+        check = {'id': 'suite', 'argv': [
+            'python3', '-c',
+            "from pathlib import Path; v=Path('product.py').read_text(); print(v); raise SystemExit(v != 'ready')",
+        ]}
+        self.commit('Declare an owned final suite', {'final-suite.json': json.dumps({'checks': [check]})})
+        self.snapshot.update(state='OPEN', head=self.git(self.root, 'rev-parse', 'HEAD'),
+                             base_oid=self.remote_head, candidate_objects_required=True,
+                             pr={'id': 'PR_fixture', 'number': 21, 'url': 'https://example.invalid/pr/21'},
+                             checks=[{'name': 'CI', 'required': True, 'status': 'pending'}],
+                             checks_known=True, approvals_known=True, approvals_required=True, approved=False,
+                             threads=[], reviews=[], comments=[], mergeable='MERGEABLE')
+        self.refresh_final_snapshot()
+        self.final_command('init', final_validation={'path': 'final-suite.json'})
+        return check
+
+    def refresh_final_snapshot(self):
+        self.snapshot.update(head=self.git(self.root, 'rev-parse', 'HEAD'))
+        diff = self.snapshot['base_oid']+'...'+self.snapshot['head']
+        self.snapshot['changed_files'] = self.git(self.root, 'diff', '--name-only', diff).splitlines()
+
+    def final_command(self, command, *, error=None, **fields):
+        payload = {'snapshot': self.snapshot, 'target_branch': 'release/main',
+                   'instruction': 'Review and then merge into release/main', 'instruction_origin': 'owner', **fields}
+        self.request.write_text(json.dumps(payload))
+        process = subprocess.run(
+            ['python3', '-B', str(CORE/'common/scripts/pr-review-state.py'), command, str(self.root),
+             '--input', str(self.request)], capture_output=True, text=True, timeout=30)
+        self.assertEqual(process.returncode, 2 if error else 0, process.stdout+process.stderr)
+        result = json.loads(process.stdout)
+        if error:
+            self.assertIn(error, result['error'])
+        return result
+
+    def final_inspection(self, **details):
+        return {**{key: self.snapshot[key] for key in ('head', 'base_oid', 'target_branch')},
+                'files': self.snapshot['changed_files'], 'context_inspected': True,
+                'discussions_inspected': True, 'checks_inspected': True, **details}
+
+    def final_attempt(self, action, attempt, *, error=None, **fields):
+        return self.final_command('final-validation', error=error,
+                                  final_validation={'action': action, 'attempt_id': attempt, **fields})
+
+    def actual_final_result(self, check, attempt_id):
+        prepared = self.final_attempt('prepare', attempt_id)['final_validation']
+        attempt = prepared['attempts'][attempt_id]
+        observation = subprocess.run(check['argv'], cwd=self.root, check=False, stdout=subprocess.PIPE,
+                                     stderr=subprocess.STDOUT, timeout=10)
+        path = f"{prepared['evidence_root']}/{attempt_id}/{check['id']}.json"
+        artifact = self.root/path
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        raw = json.dumps({'attempt_id': attempt_id, 'candidate': attempt['candidate'],
+                          'check_id': check['id'], 'argv': check['argv'],
+                          'exit_code': observation.returncode, 'output': observation.stdout.decode()}).encode()
+        artifact.write_bytes(raw)
+        return [{'id': check['id'], 'exit_code': observation.returncode,
+                 'evidence': {'path': path, 'sha256': hashlib.sha256(raw).hexdigest()}}]
+
+    def test_declared_final_suite_follows_focused_fix_rounds_and_survives_provider_changes(self):
+        check = self.setup_final_validation()
+        finding = {'id': 'F1', 'path': 'product.py', 'line': 1, 'cause': 'fixture',
+                   'consequence': 'fixture misses two conditions', 'severity': 'medium'}
+        self.final_attempt('prepare', 'early', error='Complete the current code review')
+        for contents in ('partially fixed', 'ready'):
+            review = self.final_command('review', review=self.final_inspection(findings=[finding]))
+            self.assertEqual(review['final_validation']['phase'], 'code-review')
+            self.assertEqual(review['final_validation']['attempts'], {})
+            self.final_attempt('prepare', 'early', error='Complete the current code review')
+            self.commit('Apply targeted regression fix', {'product.py': contents})
+            self.refresh_final_snapshot()
+        fixed = {**finding, 'status': 'verified-fixed', 'verified_head': self.snapshot['head'],
+                 'verification_evidence': ['targeted-fixture-regression']}
+        current = self.final_command('review', review=self.final_inspection(findings=[fixed]))
+        self.assertEqual(current['final_validation']['phase'], 'final-validation')
+        self.final_command('ready', error='no verified passing final validation')
+        original = self.final_attempt('prepare', 'first')
+        self.assertEqual(original, self.final_attempt('prepare', 'first'))
+        self.final_attempt('prepare', 'second', error='Reconcile the original')
+        self.final_attempt('record', 'first', results=[], error='one result per declared check')
+        self.final_attempt('record', 'first', results=[{
+            'id': check['id'], 'exit_code': 0,
+            'evidence': {'path': 'product.py', 'sha256': hashlib.sha256(b'ready').hexdigest()},
+        }], error='exact attempt and check path')
+        result = self.actual_final_result(check, 'first')
+        self.assertEqual(result[0]['exit_code'], 0)
+        recorded = self.final_attempt('record', 'first', results=result)
+        self.assertEqual(recorded, self.final_attempt('record', 'first', results=result))
+        self.final_attempt('record', 'first', results=[{**result[0], 'exit_code': 1}],
+                           error='result replay conflicts')
+        self.final_command('ready', error='Required checks remain pending')
+        self.snapshot['checks'][0]['status'] = 'success'
+        self.final_command('ready', error='Inspect current provider')
+        self.final_command('inspection', inspection=self.final_inspection())
+        ready = self.final_command('ready')
+        self.assertEqual(ready['final_validation']['phase'], 'qualified')
+        self.assertEqual(len(ready['rounds']), 3)
+        self.final_attempt('prepare', 'again', error='pass remains available')
+        self.final_command('merge-gate', error='External approval requirements')
+        self.snapshot['approved'] = True
+        self.final_command('inspection', inspection=self.final_inspection())
+        self.final_command('merge-gate')
+        self.snapshot.pop('state')
+        self.final_command('inspection', inspection=self.final_inspection())
+        self.final_command('merge-gate', error='requires a confirmed open provider PR')
+        self.snapshot['state'] = 'OPEN'
+        self.snapshot['threads'] = [{'id': 'new', 'actionable': True, 'resolved': False}]
+        self.final_command('inspection', inspection=self.final_inspection())
+        self.final_command('merge-gate', error='discussions remain unresolved')
+        self.final_attempt('prepare', 'new', error='actionable discussions')
+        self.snapshot['threads'] = []
+        self.final_command('inspection', inspection=self.final_inspection())
+        (self.root/result[0]['evidence']['path']).write_text('changed')
+        self.final_command('merge-gate', error='no verified passing final validation')
+
+    def test_failed_suite_and_changed_candidate_require_current_review_and_new_attempt(self):
+        check = self.setup_final_validation()
+        self.final_command('review', review=self.final_inspection())
+        self.final_attempt('prepare', 'old')
+        result = self.actual_final_result(check, 'old')
+        self.assertNotEqual(result[0]['exit_code'], 0)
+        self.final_attempt('record', 'old', results=result)
+        self.final_command('ready', error='no verified passing final validation')
+        self.commit('Fix failure in final validation', {'product.py': 'ready'})
+        self.refresh_final_snapshot()
+        self.final_attempt('prepare', 'fixed', error='Complete the current code review')
+        self.final_command('review', review=self.final_inspection())
+        self.final_attempt('record', 'old', results=result, error='different candidate')
+        self.final_attempt('prepare', 'fixed')
+        ref = 'refs/remotes/origin/release/main'
+        self.git(self.root, 'update-ref', ref, self.integrated)
+        self.final_attempt('prepare', 'fixed', error='repository or base')
+        self.snapshot['base_oid'] = self.integrated
+        self.refresh_final_snapshot()
+        self.final_attempt('prepare', 'new-base', error='Complete the current code review')
+        self.final_command('review', review=self.final_inspection())
+        fresh = self.final_attempt('prepare', 'new-base')['final_validation']
+        stale_path = f"{fresh['evidence_root']}/new-base/{check['id']}.json"
+        stale_file = self.root/stale_path
+        stale_file.parent.mkdir(parents=True)
+        stale_file.write_bytes((self.root/result[0]['evidence']['path']).read_bytes())
+        self.final_attempt('record', 'new-base', results=[
+            {**result[0], 'evidence': {**result[0]['evidence'], 'path': stale_path}},
+        ], error='does not match the prepared command and result')
+        self.final_attempt('record', 'new-base', results=self.actual_final_result(check, 'new-base'))
+        self.snapshot['checks'][0]['status'] = 'success'
+        self.final_command('inspection', inspection=self.final_inspection())
+        self.final_command('ready')
+
+    def test_final_suite_refuses_changed_declaration_checkout_and_provider_identity(self):
+        self.setup_final_validation()
+        self.final_command('review', review=self.final_inspection())
+        self.git(self.root, 'update-index', '--assume-unchanged', 'product.py')
+        self.final_attempt('prepare', 'hidden', error='expose every tracked file')
+        self.git(self.root, 'update-index', '--no-assume-unchanged', 'product.py')
+        (self.root/'untracked.py').write_text('unexpected')
+        self.final_attempt('prepare', 'dirty', error='uncommitted changes')
+        (self.root/'untracked.py').unlink()
+        original_pr = dict(self.snapshot['pr'])
+        self.snapshot['pr']['number'] += 1
+        self.final_attempt('prepare', 'foreign', error='Existing PR identity conflict')
+        self.snapshot['pr'] = original_pr
+        self.commit('Attempt to replace the suite', {'final-suite.json': json.dumps({
+            'checks': [{'id': 'different', 'argv': ['true']}],
+        })})
+        self.refresh_final_snapshot()
+        self.final_command('init', final_validation={'path': 'final-suite.json'},
+                           error='already binds a different final validation declaration')
+        self.final_command('review', review=self.final_inspection())
+        self.final_attempt('prepare', 'changed-suite', error='original publication declaration')
+
     def test_existing_publication_resumes_from_exact_isolated_checkout(self):
         snapshot = {**self.snapshot,'state':'OPEN','merge_commit':None,'changed_files':['product.py'],
                     'pr':{**self.snapshot['pr'],'url':'https://example.invalid/fixture/repo/pull/21'},
