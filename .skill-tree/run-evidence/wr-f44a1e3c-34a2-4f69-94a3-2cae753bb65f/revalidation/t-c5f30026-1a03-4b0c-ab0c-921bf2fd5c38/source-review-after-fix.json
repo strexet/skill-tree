@@ -1,0 +1,16 @@
+{
+  "task_id": "T-c5f30026-1a03-4b0c-ab0c-921bf2fd5c38",
+  "sources": {
+    ".skill-tree/common/references/director-workflow.md": "d573306865ad5cb84189f9ca410cfbbfb9f9cf0a63682b42917a3976af17b952",
+    ".skill-tree/common/scripts/workflow-state.py": "f2982fb012c5bb9648b6011273fd05943769120eafbbb472baa0be0d9b99cce4",
+    ".skill-tree/skill-tree.json": "5582847948e14026a7ae7a3d7e992d97dd71825dfa3df19bbde9474cd297241d"
+  },
+  "checks_sha256": "fc49f4a5d3c0cb5a20f1bb1ef587316466d8d7c7284a06c1f936cc6f5d355a73",
+  "reviewer": "/root/director_resolver",
+  "status": "accepted",
+  "observations": [
+    "Independently verified the exact current Director reference, Core workflow and navigation manifest source bytes and generated Director runtime copies.",
+    "Canonical check IDs and keys reproduce the sealed current digest. The authoritative topology attempt records fourteen actual passing unit cases and no failures or skips, with exact retained evidence bytes.",
+    "Verified canonical Pending provenance, partition authority and standalone processing boundaries, retained acknowledgement and replay, and current source diff whitespace."
+  ]
+}
