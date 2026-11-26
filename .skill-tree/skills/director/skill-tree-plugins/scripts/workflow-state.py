@@ -354,6 +354,9 @@ class Store:
         for write in record['writes']:
             path=self.owned(write['path']);actual=file_hash(path);desired=digest(write['content'].encode())
             if actual not in {write['expected_hash'],desired}: raise WorkflowError('Interrupted transaction conflicts with source: '+write['path'])
+        owner = record.get('local_delivery') or {}
+        if owner.get('action') == 'partial-finish' and any(write['path'] == FUTURE_STATE for write in record['writes']):
+            partial_retire_locator(self,record)
         for write in record['writes']:
             self.replace(self.owned(write['path']),write['content'])
         journal.unlink()
@@ -473,7 +476,7 @@ class Store:
             if self.neutral:
                 if 'run_registry' in value:workspaces.validate_registry(value['run_registry'])
             else:value=workspaces.project(self,value)
-            for retained in value.get('run_registry',{}).get('runs',{}).values():validate_run(retained)
+            for retained in historical_runs(value.get('run_registry',{})).values():validate_run(retained)
             value['task_progress']=old.get('task_progress')
             validate_progress(value,parse(text),{record['task_id'] for record in self.outcomes() if record['disposition']=='completed'})
         return value
@@ -512,6 +515,7 @@ class Store:
         outcomes=[json.loads(line) for line in ledger.splitlines() if line.strip() and json.loads(line)['id'] not in prior_ids]
         prior=old.get('run_registry',{}).get('runs',{}).get(rid)
         current=registry['runs'].get(rid)
+        archived=registry.get('archived_runs',{}).get(rid)
         owned=set((prior or {}).get('admitted_task_ids',[]))|set((current or {}).get('admitted_task_ids',[]))
         progress_changes=[]
         for tid in sorted(owned):
@@ -521,6 +525,8 @@ class Store:
         sequence=state['run_registry'].setdefault('event_sequences',{}).get(rid,0)+1
         state['run_registry']['event_sequences'][rid]=sequence
         event={'sequence':sequence,'schema':1,'id':identity('E'),'queue_id':registry['queue_id'],'run_id':rid,'recorded_at':now(),'changes':changes,'progress_changes':progress_changes,'outcomes':outcomes,'checkpoint_before':prior,'checkpoint_after':current}
+        if archived and prior and current is None:
+            event['partial_finish_sha256']=archived['receipt_sha256']
         receipts=[]
         for batch in event_intake_origins(grouped+outcomes):
             rel=intake_receipt_path(batch)
@@ -3134,6 +3140,327 @@ def current_target_delivery(store,command,payload):
         return current_target_preview(attempt,run,area)
 
 
+def historical_runs(registry):
+    return {**{rid: value['checkpoint'] for rid, value in registry.get('archived_runs', {}).items()},
+            **registry.get('runs', {})}
+
+
+def partial_finish_receipt_path(run_id):
+    return '.skill-tree/history/runs/run-' + run_id.lower() + '-partial-finish.json'
+
+
+def partial_finished(store, registry):
+    entry = (registry or {}).get('archived_runs', {}).get(store.run_id)
+    if entry is None:
+        return None
+    relative = partial_finish_receipt_path(store.run_id)
+    path = store.owned(relative)
+    if not path.is_file() or path.is_symlink() or file_hash(path) != entry['receipt_sha256']:
+        raise WorkflowError('The original partial finish receipt is missing or changed')
+    result = json.loads(path.read_bytes())
+    if (result.get('run_id') != store.run_id or result.get('queue_id') != registry['queue_id']
+            or result.get('checkpoint') != entry['checkpoint']):
+        raise WorkflowError('The partial finish receipt differs from the historical run')
+    return result
+
+
+def partial_finish_outcomes(store, registry, run, checkout):
+    rid = run['id']
+    refs = run['completion_refs']
+    rows = {row['id']: row for row in store.outcomes() if row.get('run_id') == rid}
+    accepted = set(run['completed_ids'])
+    if not accepted or set(refs) != accepted:
+        raise WorkflowError('Partial finish requires exact accepted task outcome references')
+    outcomes = {}
+    for tid, oid in refs.items():
+        row = rows.get(oid, {})
+        if row.get('task_id') != tid or row.get('disposition') != 'completed':
+            raise WorkflowError('Partial finish requires the original accepted outcome for '+tid)
+        outcomes[oid] = row
+
+    verified = {}
+    directory = store.owned('.skill-tree/history/run-events/' + rid.lower())
+    event_ids = set(registry.get('applied_events', []))
+    for path in sorted(directory.glob('e-*.json')):
+        eid = 'E-' + path.stem[2:]
+        if eid not in event_ids:
+            continue
+        if path.is_symlink() or not path.is_file():
+            raise WorkflowError('Partial finish requires ordinary applied event files')
+        event = json.loads(path.read_bytes())
+        for row in event.get('outcomes', []):
+            oid = row.get('id')
+            if oid not in outcomes:
+                continue
+            if (oid in verified or row != outcomes[oid] or event.get('schema') != 1
+                    or event.get('id') != eid or event.get('run_id') != rid
+                    or event.get('queue_id') != registry['queue_id'] or type(event.get('sequence')) is not int
+                    or not 1 <= event['sequence'] <= registry.get('event_sequences', {}).get(rid, 0)):
+                raise WorkflowError('Partial finish found conflicting applied completion evidence')
+            verified[oid] = {'id': eid, 'sha256': file_hash(path)}
+            if getattr(store, '_writer_active', False):
+                store.expect_unchanged(path.relative_to(store.root).as_posix(), verified[oid]['sha256'])
+    if set(verified) != set(outcomes):
+        raise WorkflowError('Partial finish requires the applied event for every accepted outcome')
+
+    source = store.source_root
+    base = run['workspace']['base_commit']
+    commits = {}
+    for oid, row in outcomes.items():
+        receipt = row.get('task_git_commit') or {}
+        commit = receipt.get('commit')
+        if (not isinstance(commit, str) or not re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', commit)
+                or commit in commits or receipt.get('ref') != checkout['ref']
+                or receipt.get('checkout') != checkout['checkout']):
+            raise WorkflowError('Partial finish requires the original scoped Git commit for '+row['task_id'])
+        parents = workspaces.local_git_text(source, 'show', '-s', '--format=%P', commit).split()
+        tree = workspaces.local_git_text(source, 'rev-parse', '--verify', commit+'^{tree}')
+        if parents != [receipt.get('parent')] or tree != receipt.get('tree'):
+            raise WorkflowError('Partial finish commit parent or tree differs from the accepted receipt')
+        commits[commit] = {'task_id': row['task_id'], 'outcome_id': oid, 'commit': commit,
+                           'parent': parents[0], 'event': verified[oid]}
+
+    chain = []
+    by_parent = {row['parent']: row for row in commits.values()}
+    tip = base
+    while tip in by_parent:
+        row = by_parent.pop(tip)
+        chain.append(row)
+        tip = row['commit']
+    # A close-only receipt can preserve accepted evidence even if delivery needs
+    # a separate proven candidate for non-contiguous accepted commits.
+    accepted_tip = tip if len(chain) == len(commits) else None
+    if any(workspaces.local_git(source, 'merge-base', '--is-ancestor', commit, checkout['head'],
+                                accepted=(0, 1)).returncode for commit in commits):
+        raise WorkflowError('The selected worktree head does not contain all accepted commits')
+    by_task = {row['task_id']: row for row in commits.values()}
+    return [by_task[tid] for tid in run['completed_ids']], accepted_tip
+
+
+def partial_finish_source_changes(path):
+    dirty = sorted(workspaces.local_worktree_dirt(path, allow_staged=True))
+    index = workspaces.task_index_selection(path, [])
+    def diff_hash(*args):
+        return digest(workspaces.local_git(path, 'diff', '--no-ext-diff', '--no-textconv', '--binary', *args, '--').stdout)
+    def retained_path(relative):
+        entry = path / relative
+        if entry.is_symlink():
+            return {'symlink': os.readlink(entry)}
+        if not entry.exists():
+            return None
+        if not entry.is_file():
+            raise WorkflowError('Partial finish cannot prove unaccepted worktree path '+relative)
+        return {'sha256': file_hash(entry), 'mode': entry.stat().st_mode}
+    return {'paths': dirty, 'index': index, 'staged': diff_hash('--cached'), 'unstaged': diff_hash(),
+            'worktree': {p: retained_path(p) for p in dirty}}
+
+
+
+def partial_finish_evidence_fingerprints(store, run):
+    worker = '.skill-tree/history/worker-handoffs/' + run['id'].lower() + '.json'
+    chains = ['.skill-tree/invocations/'+cid.lower()+'.json' for cid in run.get('hook_chains', [])]
+    paths = [OUTCOME_LEDGER, worker, *chains]
+    result = {}
+    for relative in paths:
+        path = store.owned(relative)
+        if path.is_symlink() or relative in chains and not path.is_file():
+            raise WorkflowError('Partial finish requires ordinary original evidence files')
+        result[relative] = file_hash(path)
+    return result
+
+
+def partial_finish_observation(store, text, state):
+    rid = store.run_id
+    registry = state.get('run_registry') or {}
+    run = registry.get('runs', {}).get(rid)
+    if (not run or run['mode'] != 'all' or run.get('implementation_operation') != 'implement-all'
+            or run['phase'] != 'stopped' or not run.get('stop_reason') or run.get('maintenance')
+            or not run.get('workspace') or workspaces.initial_profile_pending(run)
+            or run.get('delivery', {}).get('implementation') != 'in-progress'):
+        raise WorkflowError('Partial finish requires the exact stopped, admitted Core Implement All run')
+    locator = workspaces.runtime(store.root)
+    if not locator or locator['queue_id'] != registry['queue_id']:
+        raise WorkflowError('Partial finish requires the canonical Git run locator')
+    live = locator['worktrees'].get(rid)
+    if (not live or rid in locator.get('unverified_worktrees', [])
+            or rid in locator.get('pending_worktrees', {}) or rid in locator.get('archived_worktrees', {})):
+        raise WorkflowError('Partial finish requires a verified live original worktree binding')
+    path = Path(live)
+    if path != path.resolve() or path == store.root:
+        raise WorkflowError('Partial finish requires an exact linked worktree')
+    registration = workspaces.linked_registration(store.root, path)
+    workspace = run['workspace']
+    owner = workspace.get('cleanup_owner')
+    if owner:
+        workspaces.directed_owner(store.root, path, run, registry['queue_id'])
+    move = workspaces.verified_move_chain(run, owner)
+    anchor = move['to_locator_sha256'] if move else workspaces.cleanup_origin_sha256(run)
+    if anchor is not None and anchor != workspaces.locator_path_sha256(path):
+        raise WorkflowError('Partial finish requires the exact verified original or relocated worktree')
+    if workspace['repo_id'] != workspaces.repo_id(store.root):
+        raise WorkflowError('Partial finish workspace repository changed')
+    checkout = workspaces.checked_out_branch(path)
+    if checkout['ref'] != 'refs/heads/'+workspace['branch']:
+        raise WorkflowError('Partial finish workspace branch changed')
+    workspaces.unfinished(path)
+    store.source_root = path
+    accepted, tip = partial_finish_outcomes(store, registry, run, checkout)
+    required = list(dict.fromkeys(run['snapshot']+run['required_ids']))
+    if set(run['completed_ids'])-set(required):
+        raise WorkflowError('Accepted outcomes exceed the frozen controller scope')
+    completed = {row['task_id'] for row in store.outcomes() if row['disposition'] == 'completed'}
+    remaining = [tid for tid in required if tid not in completed]
+    claims = sorted(tid for tid, owner in registry['claims'].items() if owner == rid)
+    if not remaining or set(remaining)-set(claims):
+        raise WorkflowError('Partial finish requires unfinished work claimed by the selected run')
+    tasks = {task['id']:task for task in parse(text)}
+    if any(tid not in tasks or tasks[tid]['queue'] != 'Prioritized Next Changes' for tid in claims):
+        raise WorkflowError('Partial finish cannot preserve unfinished queue identities')
+    progress = {tid: entry for tid, entry in state['task_progress'].items() if entry.get('run_id') == rid}
+    blockers = [{'kind': 'unowned-task-progress', 'task_id': tid} for tid in claims
+                if tid in state['task_progress'] and tid not in progress]
+    for tid, entry in progress.items():
+        if any(pending_check_attempt(slot) for slot in entry.get('checks', {}).values()):
+            blockers.append({'kind': 'original-check', 'task_id': tid})
+        if entry.get('task_git_attempt'):
+            blockers.append({'kind': 'original-scoped-commit', 'task_id': tid})
+    for attempt in hook_helper().pending_scan(store):
+        if attempt['chain_id'] in run.get('hook_chains', []):
+            blockers.append({'kind': 'original-hook', **attempt})
+    worker = store.owned('.skill-tree/history/worker-handoffs/'+rid.lower()+'.json')
+    if worker.is_symlink():
+        raise WorkflowError('Partial finish requires ordinary worker handoff evidence')
+    if worker.is_file():
+        ledger = json.loads(worker.read_bytes())
+        assignments = ledger.get('slots')
+        if ledger.get('schema') != 1 or ledger.get('run_id') != rid or not isinstance(assignments, dict):
+            raise WorkflowError('Partial finish requires exact original worker handoff evidence')
+        worker_state = {**state, 'active_run': run}
+        for slot in assignments.values():
+            if not isinstance(slot, list):
+                raise WorkflowError('Partial finish requires exact original worker assignments')
+            if slot and not retired_worker_scope(store, worker_state, slot[-1], checkout['head']):
+                blockers.append({'kind': 'original-worker', 'task_id': slot[-1]['task_id']})
+    for key, claim in sorted(registry['resources'].items()):
+        if claim['run_id'] == rid:
+            blockers.append({'kind': 'original-resource', 'resource': key})
+    if run.get('director_question_hold') or any(run.get('delivery', {}).get(name) for name in
+            ('reviewed_merge_attempt','current_target_attempts','reviewed_source')):
+        blockers.append({'kind': 'original-controller-handoff'})
+    changes = partial_finish_source_changes(path)
+    observation = {'run_id': rid, 'queue_id': registry['queue_id'], 'queue_sha256': digest(text.encode()),
+        'checkpoint_sha256': digest(dump(run).encode()), 'accepted': accepted,
+        'accepted_tip': tip, 'remaining_ids': remaining, 'claims': claims, 'blockers': blockers,
+        'source': {**checkout, 'registration': registration.name, 'location_sha256': digest(str(path).encode())},
+        'changes': changes, 'evidence_sha256': partial_finish_evidence_fingerprints(store, run),
+        'progress_sha256': digest(dump(progress).encode()), 'progress_ids': sorted(progress),
+        'requires_preservation': bool(progress or changes['paths'] or run.get('partial_work') or checkout['head'] != tip),
+        'delivery_status': run.get('delivery', {}).get('status')}
+    return observation, progress
+
+
+def partial_retire_locator(store, journal):
+    owner = journal['local_delivery']
+    rid = owner['run_id']
+    locator = workspaces.runtime(store.root)
+    receipts = [json.loads(write['content']) for write in journal['writes']
+                if write['path'] == partial_finish_receipt_path(rid)]
+    if (len(receipts) != 1 or not locator or locator['queue_id'] != receipts[0].get('queue_id')
+            or receipts[0].get('request_sha256') != owner['request_sha256']):
+        raise WorkflowError('Partial finish journal differs from the exact original worktree handoff')
+    source = receipts[0]['preview']['source']
+    if rid in locator.get('unverified_worktrees', []) or rid in locator.get('pending_worktrees', {}):
+        raise WorkflowError('The original partial finish binding is no longer verified')
+    retired = locator.setdefault('archived_worktrees', {})
+    if rid in retired:
+        binding = retired[rid]
+        if rid in locator['worktrees'] or binding.get('request_sha256') != owner['request_sha256']:
+            raise WorkflowError('The archived worktree binding differs from the original partial finish')
+        path = Path(binding['path'])
+    else:
+        location = locator['worktrees'].get(rid)
+        if not location:
+            raise WorkflowError('Recover the exact original worktree binding before partial finish')
+        path = Path(location)
+    if (digest(str(path).encode()) != source['location_sha256']
+            or workspaces.linked_registration(store.root, path).name != source['registration']
+            or workspaces.checked_out_branch(path) != {key:source[key] for key in ('checkout','ref','head')}):
+        raise WorkflowError('The original worktree changed before partial finish could be recorded')
+    receipt = receipts[0]
+    if receipt['checkpoint']['workspace'].get('cleanup_owner'):
+        workspaces.directed_owner(store.root, path, receipt['checkpoint'], receipt['queue_id'])
+    if (partial_finish_source_changes(path) != receipt['preview']['changes']
+            or partial_finish_evidence_fingerprints(store, receipt['checkpoint']) != receipt['preview']['evidence_sha256']):
+        raise WorkflowError('The original source or execution evidence changed during partial finish recovery')
+    directory = '.skill-tree/history/run-events/'+rid.lower()+'/'
+    if any(file_hash(store.owned(directory+row['event']['id'].lower()+'.json')) != row['event']['sha256']
+           for row in receipt['preview']['accepted']):
+        raise WorkflowError('An accepted event changed during partial finish recovery')
+    if rid not in retired:
+        retired[rid] = {'path': str(path), 'request_sha256': owner['request_sha256']}
+        del locator['worktrees'][rid]
+        workspaces.atomic(workspaces.runtime_file(store.root), locator)
+
+
+def partial_finish(store, command, payload):
+    workspaces.local_git_environment()
+    if not valid_id(store.run_id,'WR') or store.source_root != store.root:
+        raise WorkflowError('Partial finish requires the exact --run-id and canonical repository')
+    neutral = Store(store.root, neutral=True)
+    neutral.run_id = store.run_id
+    allowed = {'expected_preview_sha256', 'owner_instruction', 'preserve_unaccepted'}
+    if command == 'partial-finish-preview':
+        if payload:
+            raise WorkflowError('Partial finish preview accepts only the exact run ID')
+        text = neutral.text()
+        state = neutral.load(text)
+        original = partial_finished(neutral, state.get('run_registry'))
+        if original:
+            return original
+        preview, _ = partial_finish_observation(neutral, text, state)
+        return {'status': 'blocked' if preview['blockers'] else 'preview',
+                'preview_sha256': digest(dump(preview).encode()), 'preview': preview}
+    if (set(payload)-allowed or not isinstance(payload.get('expected_preview_sha256'), str)
+            or not isinstance(payload.get('owner_instruction'), str) or not payload['owner_instruction'].strip()
+            or type(payload.get('preserve_unaccepted', False)) is not bool):
+        raise WorkflowError('Partial finish requires the exact preview and explicit owner instruction')
+    request = digest(dump(payload).encode())
+    owner = {'action': 'partial-finish', 'run_id': store.run_id, 'request_sha256': request}
+    with neutral.lock(local_delivery=owner):
+        text = neutral.text()
+        state = neutral.load(text)
+        registry = state.get('run_registry') or {}
+        original = partial_finished(neutral, registry)
+        if original:
+            if original['request_sha256'] != request:
+                raise WorkflowError('Retry the original partial finish instruction and preview')
+            return original
+
+        preview, progress = partial_finish_observation(neutral, text, state)
+        preview_digest = digest(dump(preview).encode())
+        if preview_digest != payload['expected_preview_sha256']:
+            raise WorkflowError('Partial finish preview changed; inspect current state before confirming')
+        if preview['blockers']:
+            raise WorkflowError('Reconcile the original attempts and resource leases before partial finish')
+        if preview['requires_preservation'] and not payload.get('preserve_unaccepted'):
+            raise WorkflowError('Partial finish requires explicit preservation of unaccepted work in the original worktree')
+
+        rid = neutral.run_id
+        checkpoint = registry['runs'].pop(rid)
+        receipt = {'schema': 1, 'status': 'partially-completed', 'run_id': rid, 'id': rid,
+                   'queue_id': registry['queue_id'], 'finished_at': now(), 'request_sha256': request,
+                   'owner_instruction': payload['owner_instruction'], 'preview_sha256': preview_digest,
+                   'preview': preview, 'checkpoint': checkpoint, 'archived_progress': progress}
+        body = dump(receipt)
+        registry.setdefault('archived_runs', {})[rid] = {
+            'checkpoint': checkpoint, 'receipt_sha256': digest(body.encode()), 'status': 'partially-completed'}
+        for tid in progress:
+            del state['task_progress'][tid]
+        neutral.selected_run_id = rid
+        neutral.save(text, state, {partial_finish_receipt_path(rid): body})
+        return receipt
+
+
 def finish(store,payload=None):
     inspected = store.load().get('active_run')
     if inspected and inspected.get('reviewed_local_delivery') and not inspected.get('maintenance'):
@@ -3444,21 +3771,57 @@ def evidence_pointer(store,reference,required=False):
     if 'sha256' not in ref:ref['sha256']=actual
     return ref
 
+def attach_partial_history_checkout(store, registry, locator, rid):
+    archived = Store(store.root, neutral=True)
+    archived.run_id = rid
+    receipt = partial_finished(archived, registry)
+    if not receipt:
+        return False
+    source = receipt['preview']['source']
+    binding = (locator or {}).get('archived_worktrees', {}).get(rid)
+    if binding and binding.get('request_sha256') == receipt['request_sha256']:
+        candidates = [Path(binding['path'])]
+    else:
+        # Older locator recovery can drop advisory archive paths. The sealed
+        # checkout and native registration still prove the original location.
+        candidates = workspaces.registered_worktrees(store.root)
+    for path in candidates:
+        if not path.is_dir() or digest(str(path).encode()) != source['location_sha256']:
+            continue
+        try:
+            if (workspaces.linked_registration(store.root, path).name != source['registration']
+                    or workspaces.checked_out_branch(path) != {key:source[key] for key in ('checkout','ref','head')}):
+                continue
+            if receipt['checkpoint']['workspace'].get('cleanup_owner'):
+                workspaces.directed_owner(store.root, path, receipt['checkpoint'], receipt['queue_id'])
+        except workspaces.RunError:
+            continue
+        store.source_root = path
+        return True
+    return False
+
+
 def history(store,task_id=None,component=None):
     result=[]
-    registry = json.loads(store.state.read_text()).get('run_registry', {}).get('runs', {}) if store.state.is_file() else {}
+    state = json.loads(store.state.read_text()) if store.state.is_file() else {}
+    records = state.get('run_registry', {})
+    registry = historical_runs(records)
     for outcome in store.outcomes():
         if task_id and outcome['task_id']!=task_id:continue
         if component and normalized(component) not in normalized(outcome['title']+' '+outcome['outcome']+' '+' '.join(outcome.get('source_fingerprints',{}))):continue
         view=deepcopy(outcome)
         proof_store=store
         committed = None
+        archived_evidence = False
         if outcome.get('run_id'):
             proof_store=deepcopy(store);locator=workspaces.runtime(store.root)
             location=locator['worktrees'].get(outcome['run_id']) if locator else None
             proof_store.source_root=Path(location) if location else store.root/'.skill-tree/unavailable-run-evidence'
             cleanup = registry.get(outcome['run_id'], {}).get('delivery', {}).get('worktree_cleanup', {})
-            if cleanup.get('status') == 'removed' or not proof_store.source_root.exists():
+            if outcome['run_id'] in records.get('archived_runs', {}):
+                committed = (outcome.get('task_git_commit') or {}).get('commit')
+                archived_evidence = attach_partial_history_checkout(proof_store, records, locator, outcome['run_id'])
+            elif cleanup.get('status') == 'removed' or not proof_store.source_root.exists():
                 committed = cleanup.get('attempt', {}).get('scope', {}).get('source_head')
 
         def history_fingerprint(relative):
@@ -3469,7 +3832,10 @@ def history(store,task_id=None,component=None):
         def history_evidence(reference):
             if not committed:
                 return evidence_pointer(proof_store, reference)
-            available = bool(reference.get('sha256')) and history_fingerprint(reference['path']) == reference['sha256']
+            fingerprint = history_fingerprint(reference['path'])
+            available = bool(reference.get('sha256')) and fingerprint == reference['sha256']
+            if not available and archived_evidence and reference.get('sha256'):
+                return evidence_pointer(proof_store, reference)
             return {**reference, 'available':available, **({'git_commit':committed} if available else {})}
 
         for check in view.get('acceptance',[]):check['evidence']=[history_evidence(e) for e in check.get('evidence',[])]
@@ -3516,7 +3882,7 @@ def manifest(store):
 def prune(store,apply=False):
     config=manifest(store)['retention'];pinned=set(config.get('pins',[]));protected=set(pinned)
     if store.state.exists():
-        state=store.load();runs=list(state.get('run_registry',{}).get('runs',{}).values()) or [state['active_run']]
+        state=store.load();runs=list(historical_runs(state.get('run_registry',{})).values()) or [state['active_run']]
         for run in runs:
             if run:protected.update(run.get('history_refs',[]));protected.add(run['id'])
     if store.future.exists():
@@ -3721,7 +4087,7 @@ def resume_admission(store, *, expected_initial=None):
 def completed_dependency_order(store, outcomes, roots):
     if not roots:
         return []
-    runs = (store.load().get('run_registry') or {}).get('runs',{})
+    runs = historical_runs(store.load().get('run_registry') or {})
     order = []
     visiting = set()
     done = set()
@@ -3953,7 +4319,7 @@ def completed_task_body(store, record):
         return None
 
     registry = store.load().get('run_registry', {})
-    run = registry.get('runs', {}).get(run_id, {})
+    run = historical_runs(registry).get(run_id, {})
     if run.get('completion_refs', {}).get(task_id) != outcome_id:
         return None
 
@@ -4033,7 +4399,7 @@ def completed_contract_sha256(record):
 
 def verify_completed_contract(store,record,runs=None):
     if runs is None:
-        runs = (store.load().get('run_registry') or {}).get('runs',{})
+        runs = historical_runs(store.load().get('run_registry') or {})
     task_id = record['task_id']
     owner_id = record.get('run_id')
     owners = [run_id for run_id,run in runs.items() if task_id in run.get('completion_refs',{})]
@@ -4866,7 +5232,7 @@ def timeline_interval(started_at,finished_at):
 
 def run_timing_timeline(store,run_ids):
     state=_hook_source_store(store,store.source_root).load()
-    registry=state.get('run_registry',{});runs=dict(registry.get('runs',{}))
+    registry=state.get('run_registry',{});runs=historical_runs(registry)
     if state['active_run']:runs[state['active_run']['id']]=state['active_run']
     applied=set(registry.get('applied_events',[]));outcomes=store.outcomes()
     result=[]
@@ -4947,6 +5313,8 @@ def replay_events(store,payload):
                     existing=json.loads(extras[rel]) if rel in extras else read_intake_receipt(store,batch)
                     if existing!=validate_intake_receipt(value,batch):raise WorkflowError('Event intake receipt conflict: '+batch)
                 continue
+            if event.get('partial_finish_sha256') or event.get('run_id') in registry.get('archived_runs', {}):
+                raise WorkflowError('Partial finish events require the original canonical closeout and cannot reopen a run')
             locator=workspaces.runtime(store.root);run_path=locator['worktrees'].get(event['run_id']) if locator else None
             if not run_path:raise WorkflowError('Event replay requires an explicitly recovered run worktree locator')
             event=workspaces.restore_envelope(event,run_path,store.root,payload.get('local_paths',{}))
@@ -6623,7 +6991,7 @@ def record_worker(store, state, payload, assignment, request):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|CURRENT_TARGET_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','prepare-worktree-profile','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','worker-handoff','environment','validation-impact','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|CURRENT_TARGET_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'partial-finish-preview','partial-finish','refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','prepare-worktree-profile','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','worker-handoff','environment','validation-impact','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     parser.add_argument('--standalone',action='store_true',help='Use the canonical queue and selected checkout without attaching to a registered controller.')
     parser.add_argument('--preview',type=Path,help='Retained Force Process Preview JSON')
     parser.add_argument('--receipt',type=Path,help='Original Process Pending receipt JSON')
@@ -6754,6 +7122,7 @@ def main(argv=None):
         elif cmd=='controller-review':result=controller_review_identity(store)
         elif cmd=='merge-reviewed':result=merge_reviewed_controller(store,payload)
         elif cmd=='cleanup-worktree':result=cleanup_controller_worktree(store,payload)
+        elif cmd in {'partial-finish-preview','partial-finish'}:result=partial_finish(store,cmd,payload)
         elif cmd=='finish':result=finish(store,payload)
         elif cmd=='audit':result=audit(store,payload)
         elif cmd=='history':result=history(store,args.id,args.component)

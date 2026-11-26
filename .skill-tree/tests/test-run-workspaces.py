@@ -774,4 +774,149 @@ class RunWorkspaceTests(unittest.TestCase):
         run=self.start(self.task());other=self.task('Unrelated');wf.checkpoint(wf.Store(self.location(run)),{'partial_work':['source.py']})
         self.assertIn(other,{t['id'] for t in wf.parse(self.store.text())})
 
+    def partial_finish_fixture(self, accepted_count=20, total=35):
+        tasks = [self.task('Partial snapshot task '+str(i+1)) for i in range(total)]
+        run = wf.start(wf.Store(self.root, neutral=True), 'all', workspace={
+            'implementation_operation':'implement-all', 'snapshot_ids': tasks})
+        source = self.location(run)
+        selected = wf.Store(self.root, run['id'])
+        checkout = ws.checked_out_branch(source)
+        accepted_rows = []
+        with (ws.common_dir(self.root)/'info/exclude').open('a') as output:
+            output.write('\npartial-observation.log\n')
+        artifact = source/'partial-observation.log'
+        artifact.write_text('Original noncommitted check artifact.\n')
+        chosen = run['snapshot'][:accepted_count]
+        for seq, tid in enumerate(chosen, 1):
+            (source/'source.py').write_text('value = '+str(seq+1)+'\n')
+            self.call(source,'add','source.py')
+            self.call(source,'commit','-m','Accepted fixture task '+tid)
+            commit = self.call(source,'rev-parse','HEAD')
+            parent = self.call(source,'rev-parse','HEAD^')
+            tree = self.call(source,'rev-parse','HEAD^{tree}')
+            row = {'id':wf.identity('O'), 'run_id':run['id'], 'task_id':tid,
+                   'disposition':'completed', 'title':'Accepted fixture task',
+                   'evidence':[{'path':artifact.name,'sha256':wf.file_hash(artifact)}],
+                   'task_git_commit': {'commit':commit,'parent':parent,'tree':tree,
+                                       'checkout':checkout['checkout'],'ref':checkout['ref']}}
+            accepted_rows.append(row)
+            with selected.lock():
+                text = selected.text()
+                state = selected.load(text)
+                task, = wf.resolve(wf.parse(text), [tid], 'Prioritized Next Changes')
+                row['task_context'] = {'content_fingerprint':wf.digest(task['body'].encode())}
+                state['active_run']['completed_ids'].append(tid)
+                state['active_run'].setdefault('completion_refs', {})[tid] = row['id']
+                selected.save(wf.remove(text,{tid}),state,{wf.OUTCOME_LEDGER:''.join(wf.dump(item).replace('\n', '')+'\n' for item in accepted_rows)})
+        with selected.lock():
+            state = selected.load()
+            state['active_run'].update(phase='stopped',stop_reason='Owner paused the partial fixture.',
+                                       profile_refresh_required=True)
+            selected.save(selected.text(), state)
+        return selected, source, run['snapshot'][accepted_count:]
+
+    def test_partial_finish_keeps_twenty_outcomes_and_releases_only_selected_claims(self):
+        selected, source, remaining = self.partial_finish_fixture()
+        sibling_task = self.task('Sibling retained task')
+        sibling = self.start(sibling_task,worktree=str(self.base/'sibling'))
+        sibling_store = wf.Store(self.root,sibling['id'])
+        lease = ws.resource(sibling_store, {'resource':'memory:sibling'})
+        old_queue = selected.future.read_bytes()
+        old_ledger = selected.owned(wf.OUTCOME_LEDGER).read_bytes()
+        old_head = self.call(source, 'rev-parse', 'HEAD')
+        preview = wf.partial_finish(wf.Store(self.root, selected.run_id), 'partial-finish-preview', {})
+        self.assertEqual(preview['preview']['remaining_ids'], remaining)
+        self.assertEqual(len(preview['preview']['accepted']), 20)
+        self.assertFalse(preview['preview']['requires_preservation'])
+        request = {'expected_preview_sha256':preview['preview_sha256'],
+                   'owner_instruction':'Close the exact partial fixture.'}
+        closed = wf.partial_finish(wf.Store(self.root, selected.run_id), 'partial-finish', request)
+        self.assertEqual(closed['status'], 'partially-completed')
+        self.assertTrue(closed['checkpoint']['profile_refresh_required'])
+        self.assertEqual(closed, wf.partial_finish(wf.Store(self.root, selected.run_id), 'partial-finish', request))
+        with self.assertRaisesRegex(wf.WorkflowError,'original partial finish'):
+            wf.partial_finish(wf.Store(self.root, selected.run_id), 'partial-finish', {**request,'owner_instruction':'Changed request.'})
+        self.assertEqual(selected.future.read_bytes(), old_queue)
+        self.assertEqual(selected.owned(wf.OUTCOME_LEDGER).read_bytes(), old_ledger)
+        self.assertEqual(self.call(source, 'rev-parse', 'HEAD'), old_head)
+        registry = json.loads(selected.state.read_bytes())['run_registry']
+        self.assertEqual(registry['claims'], {sibling_task:sibling['id']})
+        self.assertEqual(registry['resources'], {'memory:sibling':lease})
+        self.assertIn(selected.run_id, registry['archived_runs'])
+        self.assertNotIn(selected.run_id, ws.runtime(self.root)['worktrees'])
+        locator = ws.runtime(self.root)
+        locator.pop('archived_worktrees')
+        ws.atomic(ws.runtime_file(self.root), locator)
+        first = closed['preview']['accepted'][0]['task_id']
+        self.assertTrue(wf.history(wf.Store(self.root, neutral=True), first)[0]['evidence'][0]['available'])
+        (source/'partial-observation.log').write_text('Changed fixture evidence.\n')
+        self.assertFalse(wf.history(wf.Store(self.root, neutral=True), first)[0]['evidence'][0]['available'])
+        with self.assertRaisesRegex(ws.RunError,'Unknown run ID|partially closed'):
+            selected.load()
+        fresh = self.start(remaining[0],worktree=str(self.base/'fresh'))
+        self.assertEqual(wf.Store(self.root,fresh['id']).load()['active_run']['id'],fresh['id'])
+
+    def test_partial_finish_retries_original_fenced_transaction_after_locator_retirement(self):
+        selected, source, _ = self.partial_finish_fixture(2, 3)
+        preview = wf.partial_finish(wf.Store(self.root, selected.run_id), 'partial-finish-preview', {})
+        request = {'expected_preview_sha256':preview['preview_sha256'],
+                   'owner_instruction':'Close after interrupted locator retirement.'}
+        retire = wf.partial_retire_locator
+        def lose_response(store, journal):
+            retire(store, journal)
+            raise OSError('Injected loss after archive locator transition')
+        with patch.object(wf,'partial_retire_locator',side_effect=lose_response):
+            with self.assertRaisesRegex(OSError,'Injected loss'):
+                wf.partial_finish(wf.Store(self.root, selected.run_id),'partial-finish',request)
+        self.assertNotIn(selected.run_id, ws.runtime(self.root)['worktrees'])
+        with self.assertRaisesRegex(wf.WorkflowError,'exact original local delivery'):
+            wf.checkpoint(selected, {'next_action':'Retained writer attempt'})
+        with self.assertRaisesRegex(wf.WorkflowError,'exact original local delivery'):
+            ws.recover_locator(wf.Store(self.root, neutral=True), {})
+        changed = source/'unaccepted-after-interruption.txt'
+        changed.write_text('Late bytes must leave the exact recovery held.\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'evidence changed'):
+            wf.partial_finish(wf.Store(self.root, selected.run_id),'partial-finish',request)
+        changed.unlink()
+        marker = ws.linked_registration(self.root,source)/'skill-tree-owner.json'
+        original_marker = marker.read_bytes()
+        marker.unlink()
+        with self.assertRaises(ws.RunError):
+            wf.partial_finish(wf.Store(self.root, selected.run_id),'partial-finish',request)
+        marker.write_bytes(original_marker)
+        result = wf.partial_finish(wf.Store(self.root, selected.run_id),'partial-finish',request)
+        self.assertEqual(result['status'],'partially-completed')
+        self.assertFalse((selected.base/'.transaction.json').exists())
+
+    def test_partial_finish_holds_scoped_lease_and_binds_unaccepted_changes(self):
+        selected, source, _ = self.partial_finish_fixture(2, 3)
+        key = 'memory:partial'
+        lease = ws.resource(selected, {'resource':key})
+        preview = wf.partial_finish(wf.Store(self.root, selected.run_id),'partial-finish-preview',{})
+        self.assertEqual(preview['status'],'blocked')
+        self.assertIn({'kind':'original-resource','resource':key},preview['preview']['blockers'])
+        ws.resource(selected, {'resource':key,'release':True,'token':lease['token']})
+        accepted = preview['preview']['accepted'][0]['task_id']
+        worker = self.root/'.skill-tree/history/worker-handoffs'/(selected.run_id.lower()+'.json')
+        worker.parent.mkdir(parents=True, exist_ok=True)
+        worker.write_text(wf.dump({'schema':1,'run_id':selected.run_id,'slots':{'1':[{'task_id':accepted}]}}))
+        preview = wf.partial_finish(wf.Store(self.root, selected.run_id),'partial-finish-preview',{})
+        self.assertIn({'kind':'original-worker','task_id':accepted},preview['preview']['blockers'])
+        worker.unlink()
+        unaccepted = source/'unfinished.txt'
+        unaccepted.write_text('Preserve original unfinished bytes.\n')
+        preview = wf.partial_finish(wf.Store(self.root, selected.run_id),'partial-finish-preview',{})
+        request = {'expected_preview_sha256':preview['preview_sha256'],
+                   'owner_instruction':'Close while preserving unaccepted work.'}
+        with self.assertRaisesRegex(wf.WorkflowError,'explicit preservation'):
+            wf.partial_finish(wf.Store(self.root, selected.run_id),'partial-finish',request)
+        unaccepted.write_text('Preserve changed unfinished bytes.\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'preview changed'):
+            wf.partial_finish(wf.Store(self.root, selected.run_id),'partial-finish',{**request,'preserve_unaccepted':True})
+        preview = wf.partial_finish(wf.Store(self.root, selected.run_id),'partial-finish-preview',{})
+        request['expected_preview_sha256'] = preview['preview_sha256']
+        wf.partial_finish(wf.Store(self.root, selected.run_id),'partial-finish',{**request,'preserve_unaccepted':True})
+        self.assertEqual(unaccepted.read_text(),'Preserve changed unfinished bytes.\n')
+
+
 if __name__=='__main__':unittest.main()
