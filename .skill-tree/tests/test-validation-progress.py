@@ -454,6 +454,127 @@ sys.stdin.readline()
         self.assertNotIn(str(source),json.dumps(current['compatible_profile_readmissions']))
         self.assertEqual(wf.compatible_profile_admission(selected),{**installed,'replayed':True})
 
+    def test_full_cycle_brief_projects_exact_checks_and_preserves_attempts(self):
+        cfg = self.store.base/'config/repository.json'
+        cfg.write_text(json.dumps({'schema':1,'role':'source','recipes':{
+            'point-unit':{'lane':'unit','argv':['runner','{project_root}','{selection}'],'input_paths':[]},
+            'scoped-browser':{'lane':'browser','argv':['browser','{project_root}'],'input_paths':[]},
+            'full-suite':{'lane':'unit','argv':['run-all'],'input_paths':[],
+                          'delivery_validation':{'path':'suite.json','check_id':'full'}},
+        }}))
+        (self.store.base/'worktree-profile.json').write_text(json.dumps(
+            {'schema':1,'exclusive_resources':['browser:test']}))
+        tid = self.task('Worker scope', group=wf.identity('VG'))
+        text = self.store.text()
+        original = wf.check_specs(wf.resolve(wf.parse(text),[tid])[0])
+        common = original[0]
+        checks = [
+            {**common,'id':'focused','recipe_id':'point-unit','parameters':{'selection':'one.spec'}},
+            {**common,'id':'manual'},
+            {**common,'id':'boundary','recipe_id':'scoped-browser','timing':'before-dependent-work'},
+            {**common,'id':'final','recipe_id':'full-suite'},
+            {**common,'id':'unavailable','recipe_id':'missing'},
+        ]
+        text = text.replace(json.dumps({'checks':original}),json.dumps({'checks':checks}))
+        with self.store.lock():
+            self.store.save(text,self.store.load())
+        wf.start(self.store,'next',tid)
+        state = self.store.load()
+        state['active_run']['delivery'] = {'authorization':{'pr':True}}
+        with self.store.lock():
+            self.store.save(text,state)
+        raw = self.store.state.read_bytes()
+        result = wf.next_task(self.store)
+        self.assertEqual(self.store.state.read_bytes(),raw)
+        brief = result['worker_brief']
+        self.assertEqual(brief['task_id'],tid)
+        self.assertEqual(brief['run_id'],state['active_run']['id'])
+        self.assertEqual(brief['checkout'],str(self.root.resolve()))
+        self.assertEqual(brief['runtime_resource_claims'],
+                         [{'resource':'browser:test','status':'unclaimed','holder_run_id':None}])
+        rows = {row['check_id']:row for row in brief['checks']}
+        self.assertEqual(rows['focused']['execution_owner'],'worker')
+        self.assertEqual(rows['focused']['argv'],['runner',str(self.root.resolve()),'one.spec'])
+        self.assertEqual(rows['focused']['evidence_owner'],'coordinator')
+        self.assertEqual(rows['focused']['receipt']['executed_pass_shape'],'counts')
+        self.assertEqual(rows['manual']['status'],'coordinator-check')
+        self.assertEqual(rows['boundary']['timing'],'before-dependent-work')
+        self.assertTrue(rows['boundary']['execution']['required'])
+        self.assertIn('session_identity',rows['boundary']['execution']['fields'])
+        self.assertEqual(rows['final']['status'],'delivery-validation-only')
+        self.assertNotIn('argv',rows['final'])
+        self.assertEqual(rows['unavailable']['status'],'prerequisite')
+        self.assertEqual(wf.advance(self.store)['worker_brief'],brief)
+        self.assertEqual(wf.begin_task(self.store,{'task_id':tid})['worker_brief'],brief)
+        self.assertEqual(wf.validation_preflight(self.store,{'task_id':tid,'check_id':'focused'})['receipt'],
+                         rows['focused']['receipt'])
+        self.assertEqual(wf.validation_preflight(self.store,{'task_id':tid,'check_id':'final'})['status'],
+                         'delivery-validation-only')
+        with self.assertRaisesRegex(wf.WorkflowError,'Source changed'):
+            wf.validation_preflight(self.store,{'task_id':tid,'check_id':'focused','expected_source_hash':'stale'})
+        with self.assertRaisesRegex(wf.DeliveryOnlyRecipe,'requires the declared PR final validation phase'):
+            wf.prepare_check(self.store,{'task_id':tid,'check_id':'final'})
+        self.assertFalse(self.store.load()['task_progress'][tid]['checks'])
+        attempt = wf.prepare_check(self.store,{'task_id':tid,'check_id':'focused'})
+        self.assertEqual(attempt['recipe']['argv'],rows['focused']['argv'])
+        resumed = wf.next_task(self.store)['worker_brief']['checks'][0]
+        self.assertEqual(resumed['status'],'pending-attempt')
+        self.assertEqual(resumed['attempt_id'],attempt['attempt_id'])
+        self.assertNotIn('argv',resumed)
+
+    def test_worker_brief_keeps_profile_recipe_drift_visible(self):
+        tid = self.task('Delivery scope',recipe='full-suite')
+        wf.start(self.store,'next',tid)
+        state = self.store.load()
+        path = self.root/'suite.json'
+        path.write_text('before')
+        profile_path = self.store.base/'installation/profile.json'
+        profile_path.parent.mkdir()
+        profile_path.write_text(json.dumps({
+            'recipes':{'full-suite':{'lane':'unit','argv':['run-all'],'input_paths':['suite.json'],
+                                     'delivery_validation':{'path':'suite.json','check_id':'full'}}},
+            'inputs':{'suite.json':wf.file_hash(path)},
+        }))
+        selected = wf.resolve(wf.parse(self.store.text()),[tid])[0]
+        prepared = wf.focused_worker_brief(self.store,state,selected,wf.check_specs(selected))
+        self.assertEqual(prepared['checks'][0]['status'],'delivery-validation-only')
+        path.write_text('after')
+        stale = wf.focused_worker_brief(self.store,state,selected,wf.check_specs(selected))
+        self.assertEqual(stale['checks'][0]['status'],'prerequisite')
+        self.assertIn('Profile refresh-required',stale['checks'][0]['prerequisite'])
+        self.assertNotIn('argv',stale['checks'][0])
+
+    def test_worker_brief_refuses_a_profile_changed_while_resolving_rows(self):
+        tid = self.task('One pinned profile',recipe='focused',independent_source='report.json')
+        wf.start(self.store,'next',tid)
+        state = self.store.load()
+        path = self.store.base/'installation/profile.json'
+        path.parent.mkdir()
+        profile = {'recipes':{'focused':{'lane':'unit','argv':['old-command'],'input_paths':[]}}}
+        path.write_text(json.dumps(profile))
+        selected = wf.resolve(wf.parse(self.store.text()),[tid])[0]
+        native_recipe = wf.recipe_for
+        def change_profile(*args, **kwargs):
+            resolved = native_recipe(*args, **kwargs)
+            profile['recipes']['focused']['argv'] = ['new-command']
+            path.write_text(json.dumps(profile))
+            return resolved
+        with patch.object(wf,'recipe_for',side_effect=change_profile):
+            with self.assertRaisesRegex(wf.WorkflowError,'Worker handoff inputs changed'):
+                wf.focused_worker_brief(self.store,state,selected,wf.check_specs(selected))
+
+    def test_independent_builtin_check_ignores_unrelated_declaration_drift(self):
+        tid = self.task('Independent inspection')
+        wf.start(self.store,'next',tid)
+        installed = self.store.base/'installation/profile.json'
+        installed.parent.mkdir()
+        installed.write_text(json.dumps({'identity':'repository-local','recipes':{}}))
+        self.store.base.joinpath('validation-recipes.json').write_text('temporarily invalid')
+        self.progress(tid)
+        result = wf.validation_preflight(self.store,{'task_id':tid,'check_id':'behavior'})
+        self.assertEqual(result['lane'],'static')
+        self.assertEqual(self.passed(tid)['result'],'pass')
+
     def test_lane_preflight_matches_browser_and_server_receipts(self):
         configuration = self.store.base/'config/repository.json'
         configuration.write_text(json.dumps({'schema':1,'role':'source','recipes':{

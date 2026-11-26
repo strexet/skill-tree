@@ -16,6 +16,14 @@ Establish intended behavior, relevant baseline and boundary/failure cases. Execu
 
 Focused behavioral checks remain immediate. Grouping delays only compatible additional integration, rendering or platform qualification. Dependencies retain verified completion semantics through the single `depends_on` graph. Check grouping feasibility before execution; validate upstream work early when a verified dependency requires the result.
 
+## Full Cycle worker briefs
+
+Give the executor the current `worker_brief` from the implementation handoff. The brief binds the selected run, task fingerprints, checkout and admitted profile. The coordinator prepares the exact attempt before the worker executes an entry marked `focused-command`. Compare the prepared argument vector and checkout with the brief. Return the check evidence to the coordinator for recording. A `pending-attempt` entry directs the coordinator to reconcile the original attempt before any new execution. The brief supplies no execution-session, resource or acceptance receipt.
+
+The coordinator owns checks deferred by timing, checks without an executable command and product lanes with execution-session and resource requirements. Keep required immediate and dependency-bound checks at the existing validation boundaries. Resolve a reported prerequisite before executing the affected check.
+
+A project recipe in `.skill-tree/validation-recipes.json` can declare `"delivery_validation": {"path": "final-suite.json", "check_id": "full-suite"}`. The tagged recipe uses the same literal `argv` as the named check in the declared PR suite. The owned profile fingerprints the suite file. Keep delivery-only recipes outside leaf Acceptance mappings. The leaf preflight reports the required phase and the leaf writer refuses preparation. Pass the linked path as the publication's final suite declaration and prepare the named suite through `final-validation` on the current reviewed PR candidate.
+
 ## Launch and evidence
 
 Select the smallest sufficient lane from the unverified assertion. Documentation and metadata use static/temporary-fixture checks. Pure logic uses focused unit checks. Rendering, input, accessibility, lifecycle, native and device assertions require the matching lane. A launch records exact task/check IDs, assertion, cheaper-evidence insufficiency, source/test/environment identity, authorization, hard deadline and cleanup reserve. Reuse compatible owned processes when scope permits; process availability never proves current acceptance.
