@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "8e4b1f1ebad66b0921a6634c787b2ec500340ecaa16e5805268eb08ed4e49949",
+  "identity": "25b496a260d5be8c8fe5971560c8a9de9fd0b658fe21e29355d4cf17c783a4e4",
   "operation": "skill-tree-create-documents-snapshot",
   "operations": {
     "skill-tree-3d": {
@@ -3293,7 +3293,7 @@
     "agents/openai.yaml": "870ad8c1d5c0644618f1b1082212c2a9c09dafcd58a21c532d876f723f7dd77a",
     "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
-    "references/installation-profile.md": "f8411ee15ea283b2d828ab862cbbe3f3807d7c72e458c8a122a9f84ebbe36a0a",
+    "references/installation-profile.md": "5a8ab3d1a37d094b679543ec3c32090a5102ef7fd5399ab1925cbfd4eb7bd235",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/project-profile.md": "75da46ecf2c034d0211e2b1dcfcb3d70dfd1550cabd8138974fefde74eb8758e",
     "references/snapshot-rules.md": "18142120546fcd532e496fbd14aefbe449fa63da40cbcca577db249b91dcd30e",
@@ -3316,7 +3316,7 @@
     "scripts/run-workspaces.py": "3e69242f598a35c31ad5d9bcf6ac8e3cb6a2ebe89857a961e0a01b92d2c477f2",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "8d2cd6acd0bc7e9926900eab74c4e7ac06dea3d60618adfd24dfc701b42ed67b"
+    "scripts/workflow-state.py": "a42b4cf4b39d82f3d28d9ae6fac4f3cf58d44176b87097f42009057813c9ee4c"
   },
   "packages": {},
   "parameter_defaults": {},

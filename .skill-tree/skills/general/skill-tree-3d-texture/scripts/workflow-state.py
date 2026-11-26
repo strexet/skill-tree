@@ -4782,7 +4782,7 @@ def compatible_admission_context(store,state,caller):
     }
 
 
-def compatible_baseline(store,state,context,expected_package_sha):
+def compatible_baseline(store,state,context,expected_package_sha,*,relative='package.json'):
     run=state['active_run']
     entry=state['task_progress'].get(run['current_task_id'],{})
     roots=[context['head'],entry.get('task_git_baseline',{}).get('head'),run['workspace']['base_commit']]
@@ -4791,11 +4791,154 @@ def compatible_baseline(store,state,context,expected_package_sha):
         if not re.fullmatch('[a-f0-9]{40}|[a-f0-9]{64}',revision):
             raise WorkflowError('Compatible refresh requires an exact Git metadata baseline')
         committed=subprocess.run(
-            workspaces.local_git_args(store.source_root,'show',revision+':package.json'),
+            workspaces.local_git_args(store.source_root,'show',revision+':'+relative),
             env=environment,capture_output=True,timeout=5)
         if not committed.returncode and digest(committed.stdout)==expected_package_sha:
             return revision
-    raise WorkflowError('Compatible refresh cannot verify the original admitted package metadata')
+    raise WorkflowError('Compatible refresh cannot verify the original admitted input: '+relative)
+
+
+PLAYWRIGHT_DISCOVERY = 'playwright.config.ts'
+
+
+def playwright_refresh_view(store, state, context):
+    caller=store.source_root
+    run=state['active_run']
+    task_id=run.get('current_task_id')
+    progress=state['task_progress'].get(task_id,{})
+    if (run['admission'].get('flavor')!='web' or run['phase']!='refresh-profile'
+            or not task_id or task_id not in run['admitted_task_ids'] or progress.get('run_id')!=run['id']
+            or progress.get('stage') not in {'implementing','awaiting-validation'}):
+        raise WorkflowError('Playwright refresh requires the exact stopped Web task and progress')
+    path=binding_path(caller,workspaces.PROFILE_FILE)
+    prior=path.read_bytes()
+    profile=json.loads(prior)
+    if (profile.get('identity')!=run['admission']['identity'] or profile.get('project_root')!=str(caller)
+            or not profile.get('inputs',{}).get(PLAYWRIGHT_DISCOVERY)):
+        raise WorkflowError('The original owned Web profile must bind Playwright discovery')
+    request={**context,'worktree':str(caller),'state_sha256':file_hash(store.state),'kind':'playwright-discovery',
+             'profile_sha256':digest(prior),'before_revision':compatible_baseline(
+                 store,state,context,profile['inputs'][PLAYWRIGHT_DISCOVERY],relative=PLAYWRIGHT_DISCOVERY)}
+    plan=owned_profile_installer(store,request,'preview',compatible=True)
+    affected=[]
+    outcomes={row['task_id']:row for row in store.outcomes() if row['disposition']=='completed'}
+    current={row['id']:row for row in parse(store.text())}
+    for selected in run['admitted_task_ids']:
+        if selected in current:
+            checks=check_specs(current[selected])
+        elif selected in outcomes:
+            checks=check_specs(validation_task(store,selected))
+        else:
+            continue
+        receipt=state['task_progress'].get(selected,{}).get('checks',{})
+        historical={row['check']['id']:row['result'] for row in outcomes.get(selected,{}).get('check_results',[])}
+        for check in checks:
+            recipe=profile.get('recipes',{}).get(check['recipe_id'],{})
+            if recipe.get('lane')=='browser' or PLAYWRIGHT_DISCOVERY in recipe.get('input_paths',[]):
+                previous=receipt.get(check['id'],{}).get('result',historical.get(check['id'],{}))
+                affected.append({'task_id':selected,'check_id':check['id'],'lane':recipe.get('lane'),
+                                 'completed_contract':selected in outcomes,'previous_attempt_id':previous.get('attempt_id')})
+    return {'kind':'playwright-discovery','task_id':task_id,'run_id':run['id'],'context':context,
+            'profile_sha256':request['profile_sha256'],'before_revision':request['before_revision'],
+            'queue_sha256':file_hash(store.future),'state_sha256':request['state_sha256'],
+            'plan':plan,'affected_checks':affected}
+
+
+def playwright_profile_admission(store,payload):
+    if not isinstance(payload,dict) or payload.get('action') not in {'preview','apply'}:
+        raise WorkflowError('Select Playwright preview or apply for the exact stopped Web run')
+    preview_only=payload['action']=='preview'
+    if preview_only:
+        if set(payload)!={'action'}:
+            raise WorkflowError('Playwright preview takes no approval or path overrides')
+    elif (set(payload)!={'action','expected_preview_sha256','owner_instruction'}
+          or not isinstance(payload['expected_preview_sha256'],str)
+          or not re.fullmatch(r'[a-f0-9]{64}',payload['expected_preview_sha256'])
+          or not isinstance(payload['owner_instruction'],str) or not payload['owner_instruction'].strip()):
+        raise WorkflowError('Material Playwright refresh requires exact preview digest and the owner authorization')
+    journal=store.owned('.skill-tree/.transaction.json')
+    if journal.exists() or journal.is_symlink():
+        raise WorkflowError('Reconcile the original Core workflow transaction before Playwright refresh')
+    caller=store.source_root
+    raw=(file_hash(store.future),file_hash(store.state),file_hash(store.owned(OUTCOME_LEDGER)))
+    state=store.load()
+    run=state['active_run']
+    if not run or store.run_id!=run['id'] or caller!=store.source_root or caller==store.root:
+        raise WorkflowError('Select the original linked worktree and exact run for Playwright refresh')
+    if not preview_only:
+        last=next((row for row in reversed(run.get('compatible_profile_readmissions',[]))
+                   if row.get('kind')=='playwright-discovery'
+                   and row.get('approval')=={key:payload[key] for key in ('owner_instruction','expected_preview_sha256')}),None)
+        if last and not run.get('compatible_profile_refresh'):
+            workspaces.ensure_workspace(store,run)
+            workspaces.directed_owner(store.root,caller,run,state['run_registry']['queue_id'])
+            if (digest(str(caller).encode())!=last['context']['worktree_path_sha256']
+                    or file_hash(binding_path(caller,PLAYWRIGHT_DISCOVERY))!=last['plan']['playwright_input']['after']
+                    or file_hash(caller/workspaces.PROFILE_FILE)!=last['plan']['after']['profile_sha256']
+                    or admit_profile(store)!=last['admission'] or run['admission']!=last['admission']):
+                raise WorkflowError('The acknowledged original Playwright admission differs from the current checkout')
+            return {'status':'admitted','run_id':run['id'],'task_id':last['task_id'],'operation_id':last['operation_id'],
+                    'admission':last['admission'],'affected_checks':last['affected_checks'],
+                    'stop_reason':run.get('stop_reason'),'replayed':True}
+    context=compatible_admission_context(store,state,caller)
+    retained=run.get('compatible_profile_refresh')
+    if retained:
+        if preview_only or retained.get('kind')!='playwright-discovery' or retained['context']!=context:
+            raise WorkflowError('Recover the original prepared worktree profile operation')
+        approval={key:payload[key] for key in ('owner_instruction','expected_preview_sha256')}
+        if approval!=retained['approval'] or file_hash(store.future)!=retained['queue_sha256']:
+            raise WorkflowError('Playwright activation requires the original exact owner approval and queue')
+    else:
+        preview=playwright_refresh_view(store,state,context)
+        if (raw!=(file_hash(store.future),file_hash(store.state),file_hash(store.owned(OUTCOME_LEDGER)))
+                or preview['profile_sha256']!=file_hash(caller/workspaces.PROFILE_FILE)
+                or preview['plan']['playwright_input']['after']!=file_hash(binding_path(caller,PLAYWRIGHT_DISCOVERY))):
+            raise WorkflowError('The selected run or discovery bytes changed during Playwright preview')
+        preview_sha=digest(dump(preview).encode())
+        if preview_only:
+            return {'status':'approval-required','preview_sha256':preview_sha,**preview}
+        if preview_sha!=payload['expected_preview_sha256']:
+            raise WorkflowError('Playwright preview changed before authorization')
+        retained={key:value for key,value in preview.items() if key not in ('state_sha256','run_id')}
+        retained.update(operation_id=identity('OP'),
+                        approval={key:payload[key] for key in ('owner_instruction','expected_preview_sha256')})
+        with store.lock():
+            text=store.text(); state=store.load(text);run=state['active_run']
+            if (raw!=(file_hash(store.future),file_hash(store.state),file_hash(store.owned(OUTCOME_LEDGER)))
+                    or compatible_admission_context(store,state,caller)!=context or run.get('compatible_profile_refresh')
+                    or file_hash(binding_path(caller,PLAYWRIGHT_DISCOVERY))!=retained['plan']['playwright_input']['after']):
+                raise WorkflowError('The original Playwright approval inputs changed before activation was prepared')
+            run['compatible_profile_refresh']=retained
+            store.save(text,state,update_navigation=False)
+    request={**context,**retained,'worktree':str(caller),'state_sha256':file_hash(store.state)}
+    result=owned_profile_installer(store,request,'activate',compatible=True)
+    if result.get('operation_id')!=retained['operation_id'] or result.get('profile')!=retained['plan']['after']:
+        raise WorkflowError('The original Playwright activation result could not be verified')
+    with store.lock():
+        text=store.text(); state=store.load(text); run=state['active_run']
+        if (compatible_admission_context(store,state,caller)!=context or run.get('compatible_profile_refresh')!=retained
+                or file_hash(store.future)!=retained['queue_sha256']):
+            raise WorkflowError('The original Web checkpoint changed before compatible admission')
+        observed=owned_profile_installer(store,{**request,'state_sha256':file_hash(store.state)},'verify',compatible=True)
+        if observed!=retained['plan']['after'] or file_hash(caller/workspaces.PROFILE_FILE)!=observed['profile_sha256']:
+            raise WorkflowError('Installed Playwright generation changed before admission')
+        admitted={key:observed[key] for key in ('identity','environment_id')}|{'flavor':'web'}
+        run['admission']=admitted
+        if run.get('delivery',{}).get('authorization',{}).get('pr') is True:
+            run['recipe_profile_sha256']=observed['profile_sha256']
+        run.pop('compatible_profile_refresh')
+        run.pop('profile_refresh_required',None)
+        progress=state['task_progress'][retained['task_id']]
+        profile_stop=run.get('stop_reason') in {None,'Installation profile changed; re-admit before continuation'}
+        if profile_stop:
+            phase='validate' if progress['stage']=='awaiting-validation' else 'implement'
+            run.update(phase=phase,stop_reason=None,next_action='Reconcile affected check evidence before acceptance')
+        run.setdefault('compatible_profile_readmissions',[]).append({**retained,'admission':admitted})
+        store.save(text,state,update_navigation=False)
+    return {'status':'admitted','run_id':run['id'],'task_id':retained['task_id'],'operation_id':retained['operation_id'],
+            'admission':admitted,'affected_checks':retained['affected_checks'],
+            'stop_reason':run.get('stop_reason'),'replayed':False}
+
 
 
 def compatible_profile_admission(store):
@@ -4806,7 +4949,10 @@ def compatible_profile_admission(store):
         run=state.get('active_run') or {}
         retained=run.get('compatible_profile_refresh')
         last=(run.get('compatible_profile_readmissions') or [None])[-1]
-        if (not retained and last and file_hash(path)==last['plan']['after']['profile_sha256']
+        if retained and retained.get('kind')=='playwright-discovery':
+            raise WorkflowError('Use the original exact Playwright approval to recover the retained refresh')
+        if (not retained and last and last.get('kind')!='playwright-discovery'
+                and file_hash(path)==last['plan']['after']['profile_sha256']
                 and file_hash(caller/'package.json')==last['plan']['package_input']['after']):
             workspaces.ensure_workspace(store,run)
             original=last['context']
@@ -5050,6 +5196,9 @@ def recipe_for(store,check,*,profile=None):
     recipe=recipes.get(check['recipe_id'])
     if recipe is None and check['recipe_id']=='static-inspection':recipe={'lane':'static','input_paths':[],'assertion_contract':'explicit source and artifact assertions'}
     if recipe is None:raise WorkflowError('Validation-blocked: recipe unavailable: '+check['recipe_id']+'; review the required plan after profile refresh')
+    if (profile.get('flavor')=='web' and recipe['lane']=='browser'
+            and PLAYWRIGHT_DISCOVERY in profile.get('inputs',{})):
+        recipe={**recipe,'input_paths':list(dict.fromkeys([*recipe.get('input_paths',[]),PLAYWRIGHT_DISCOVERY]))}
     inputs={}
     for rel in recipe.get('input_paths',[]):inputs.update(fingerprints(store,[rel]))
     if profile and any(profile.get('inputs',{}).get(rel)!=value for rel,value in inputs.items()):raise WorkflowError('Profile refresh-required: node .skill-tree/installation/manager.js --refresh-profile')
@@ -8786,7 +8935,11 @@ def main(argv=None):
         elif cmd=='reconcile-check':result=reconcile_check(store,payload)
         elif cmd=='reuse-check':result=reuse_check(store,payload)
         elif cmd=='admit':
-            if 'compatible_refresh' in payload:
+            if 'playwright_refresh' in payload:
+                if set(payload)!={'playwright_refresh'}:
+                    raise WorkflowError('Select one exact Playwright profile operation')
+                result=playwright_profile_admission(store,payload['playwright_refresh'])
+            elif 'compatible_refresh' in payload:
                 if set(payload)!={'compatible_refresh'} or payload['compatible_refresh'] is not True:
                     raise WorkflowError('Compatible admission accepts the exact compatible refresh selection')
                 result=compatible_profile_admission(store)

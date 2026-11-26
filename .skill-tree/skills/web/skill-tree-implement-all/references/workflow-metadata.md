@@ -136,6 +136,10 @@ Product lanes require an owned execution session even when no new process launch
 
 When completion fingerprints differ and accepted checks omit recorded paths, `next` and `advance` return a completed-contract validation handoff with an empty `checks` list and `source_review` claims. The claims contain `task_id`, the exact uncovered `sources` fingerprint map and `checks_sha256` for the accepted receipt set. Record the review as a JSON file containing the claims and any review details. A separate `accept-revalidation` call supplies `source_review` with the same `sources` and an `evidence` object containing the repository-relative `path` and inspected artifact `sha256`. Acceptance verifies the claims and hash against the same artifact bytes. The run retains the review separately from check results. Replacement check receipts clear the previous review and require current review coverage for remaining uncovered paths.
 
+The installed `admit` command accepts `{"playwright_refresh":{"action":"preview"}}` for one exact stopped Web run selected with `--run-id` from the registered worktree. The response includes the old and new Playwright input digests, affected check IDs and `preview_sha256`.
+
+Apply with `{"playwright_refresh":{"action":"apply","expected_preview_sha256":"<preview digest>","owner_instruction":"<direct owner approval>"}}`. Retry with the same authorization after an interrupted activation. The operation verifies the original stopped task and retains the normal revalidation frontier.
+
 ## Local delivery records
 
 A recorded `pr=false`, `merge=true`, `mode=local-merge` order creates a pending local delivery after implementation acceptance. The immutable finish record binds the reviewed source commit and tree, repository and execution worktree. The mutable delivery record retains prepared source and target refs, canonical preservation fingerprints, actual merge evidence, target profile admission and validation. A repeated finish supplies the same original completion.

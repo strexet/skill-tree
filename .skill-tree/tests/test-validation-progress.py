@@ -575,6 +575,54 @@ sys.stdin.readline()
         self.assertEqual(result['lane'],'static')
         self.assertEqual(self.passed(tid)['result'],'pass')
 
+    def test_changed_playwright_receipt_reopens_only_completed_browser_check(self):
+        primary = self.root / 'playwright.config.ts'
+        primary.write_text('export default { timeout: 1000 };\n')
+        (self.root / 'independent.py').write_text('value = 1\n')
+        task_id = self.task('Browser proof with independent check',recipe='fixture-browser',
+                            independent_source='independent.py')
+        current = self.store.future.read_text()
+        self.store.future.write_text(current.replace(
+            '"id": "independent", "recipe_id": "fixture-browser"',
+            '"id": "independent", "recipe_id": "static-inspection"'))
+        wf.start(self.store,'next',task_id)
+        path = self.store.base / 'installation/profile.json'
+        path.parent.mkdir()
+        profile = {'identity':'repository-local','flavor':'web','inputs':{'playwright.config.ts':wf.file_hash(primary)},
+                   'recipes':{'fixture-browser':{'lane':'browser','input_paths':[]}}}
+        path.write_text(json.dumps(profile))
+        self.progress(task_id)
+        execution = dict.fromkeys(wf.EXECUTION_FIELDS,'fixture')
+        execution.update(project_root=str(self.root),cleanup_seconds=5,identity_evidence=['report.json'],
+                         deadline_utc=(datetime.now(timezone.utc)+timedelta(seconds=60)).isoformat())
+        prepared = wf.prepare_check(self.store,{'task_id':task_id,'check_id':'behavior','execution':execution})
+        wf.record_check(self.store,{'task_id':task_id,'check_id':'behavior','attempt_id':prepared['attempt_id'],
+             'classification':'executed-control','result':'pass','actual_lane':'browser',
+             'environment_identity':prepared['environment_identity'],
+             'counts':{'expected':1,'discovered':1,'passed':1,'failed':0,'skipped':0},
+             'cleanup':'The simulated Browser runner exited.','evidence':['report.json']})
+        control=self.passed(task_id,'independent')
+        completed=wf.complete(self.store,{'task_id':task_id,'outcome':'The Browser and static checks passed.',
+                    'acceptance':[{'criterion':'Preserve the value.','result':'pass','evidence':['report.json']}],
+                    'source_fingerprints':wf.fingerprints(self.store,['source.py','independent.py'])})
+        original=wf.validation_task(self.store,task_id)
+        kept,due=wf.completed_revalidation_checks(self.store,self.store.load(),original,completed)
+        self.assertFalse(due)
+        self.assertEqual(set(kept),{'behavior','independent'})
+        primary.write_text('export default { timeout: 2000 };\n')
+        profile['inputs']['playwright.config.ts']=wf.file_hash(primary)
+        path.write_text(json.dumps(profile))
+        kept,due=wf.completed_revalidation_checks(self.store,self.store.load(),original,completed)
+        self.assertEqual(kept['independent']['result']['attempt_id'],control['attempt_id'])
+        self.assertEqual([row['id'] for row in due],['behavior'])
+        state=self.store.load()
+        execution['session_identity']='fresh-browser-fixture'
+        state['task_progress'][task_id]={'execution_sessions':{}}
+        _,environment=wf.recipe_for(self.store,due[0])
+        state['task_progress'][task_id]['execution_sessions'][environment]=execution
+        fresh=wf.check_snapshot(self.store,original,due[0],state)
+        self.assertNotEqual(fresh['environment_identity'],prepared['environment_identity'])
+
     def test_lane_preflight_matches_browser_and_server_receipts(self):
         configuration = self.store.base/'config/repository.json'
         configuration.write_text(json.dumps({'schema':1,'role':'source','recipes':{

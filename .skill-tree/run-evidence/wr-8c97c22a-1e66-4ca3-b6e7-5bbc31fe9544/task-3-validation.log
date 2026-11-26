@@ -1,0 +1,45 @@
+TAP version 13
+# Subtest: installed general Implement All freezes only the requested group through its standalone CLI
+ok 1 - installed general Implement All freezes only the requested group through its standalone CLI
+  ---
+  duration_ms: 5742.189292
+  ...
+# Subtest: installed web Implement All freezes only the requested group through its standalone CLI
+ok 2 - installed web Implement All freezes only the requested group through its standalone CLI
+  ---
+  duration_ms: 5315.5295
+  ...
+# Subtest: installed unity Implement All freezes only the requested group through its standalone CLI
+ok 3 - installed unity Implement All freezes only the requested group through its standalone CLI
+  ---
+  duration_ms: 5685.817042
+  ...
+# Subtest: installed controller starts and resumes the same worktree with a canonical queue and profile admission
+ok 4 - installed controller starts and resumes the same worktree with a canonical queue and profile admission
+  ---
+  duration_ms: 24187.43725
+  ...
+# Subtest: installed implementation operations select scoped commits and local controller defaults
+ok 5 - installed implementation operations select scoped commits and local controller defaults
+  ---
+  duration_ms: 7259.1335
+  ...
+# Subtest: installed Full Cycle hands off focused commands and admits the linked suite only in PR final validation
+ok 6 - installed Full Cycle hands off focused commands and admits the linked suite only in PR final validation
+  ---
+  duration_ms: 15808.408458
+  ...
+# Subtest: owned Web profile refresh binds exact Playwright drift to the same stopped run
+ok 7 - owned Web profile refresh binds exact Playwright drift to the same stopped run
+  ---
+  duration_ms: 26508.727541
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 90577.490417

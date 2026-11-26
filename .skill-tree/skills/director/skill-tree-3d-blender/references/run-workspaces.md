@@ -44,6 +44,12 @@ Canonical mutations produce immutable per-run semantic events under `.skill-tree
 
 `replay-events --input <envelope>` uses semantic compare-and-swap under the canonical lock. Replayed event IDs deduplicate application; matching after-state also deduplicates a lost response. Conflicting task, validation-progress or checkpoint changes stop atomically. Unrelated tasks and outcomes remain intact. A reviewer integrates the event envelope with the canonical owner; ordinary copying of queue/checkpoint files between branches is unsupported. Identical terminal evidence remains immutable. Unavailable worktree artifacts are reported honestly rather than treated as fresh evidence.
 
+## Playwright profile readmission
+
+Run the Playwright refresh against the original registered Web worktree at the selected task `refresh-profile` checkpoint. Review the changed file digest and affected check IDs. Apply using the exact preview digest and owner instruction. A lost activation acknowledgement resumes the same prepared operation.
+
+The operation preserves task progress, partial work, claims and existing check records. Affected Browser checks and completed prerequisites require current evidence before acceptance. Continue the same run through the ordinary controller handoff after admission.
+
 ## Completion and handoff
 
 `finish` preserves implementation acceptance and the run checkpoint. For runs with recorded `reviewed_local_delivery`, use `controller-review` with the exact run ID after all scoped task commits pass. Review the whole committed diff against the returned base, using the returned identity and the exact controller decision-frame scope. Resolve findings, make scoped fix commits, revalidate affected checks and review the new head. Pass the current clean controller decision frame ID as `review_id` to `finish`.

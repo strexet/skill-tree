@@ -362,3 +362,139 @@ test('installed Full Cycle hands off focused commands and admits the linked suit
  assert.deepEqual(ready.final_validation.checks,suite.checks);
  assert.equal(ready.final_validation.attempts.final.status,'prepared');
 });
+
+test('owned Web profile refresh binds exact Playwright drift to the same stopped run',t=>{
+ const base=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-playwright-readmit-'));
+ t.after(()=>fs.rmSync(base,{recursive:true,force:true}));
+ const root=path.join(base,'queue'),remote=path.join(base,'remote.git'),working=path.join(base,'working');
+ fs.mkdirSync(root);
+ const git=(...args)=>run('git',['-C',root,...args]);
+ git('init','-b','develop');git('config','user.name','Fixture');git('config','user.email','fixture@example.invalid');
+ const pkg={name:'playwright-readmit-fixture',scripts:{test:'node --test'}};
+ const initial='export default { use: { baseURL: "http://127.0.0.1:4000" } };\n';
+ const changed='export default { use: { baseURL: "http://127.0.0.1:4001" } };\n';
+ write(root,'package.json',pkg);
+ write(root,'playwright.config.ts',initial);
+ write(root,'source.txt','The recorded static behavior.\n');
+ write(root,'partial.txt','Original implementation input.\n');
+ write(root,'.skill-tree/validation-recipes.json',{schema:1,recipes:{
+  'fixture-browser':{lane:'browser',argv:['node','browser-fixture.js'],input_paths:[]}
+ }});
+ const future='.skill-tree/documents/future.md',state='.skill-tree/documents/future.json';
+ write(root,future,'# Future Work\n\n## Pending Task Format\n\n## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n');
+ git('add','.');git('commit','-m','Record tracked Playwright discovery inputs');
+ run('git',['init','--bare',remote]);git('remote','add','origin',remote);git('push','origin','develop');
+ const skill='skill-tree-work-through-next';
+ run(process.execPath,[cli,'--target',root,'--only','codex','--flavor','web','--skills',skill]);
+ const helper=path.join(root,'.agents/skills',skill,'scripts/workflow-state.py');
+ function invoke(operation,target,payload,options=[],fail){
+  const request=path.join(base,'request.json');
+  const args=[helper,operation,target,...options];
+  if(payload){fs.writeFileSync(request,JSON.stringify(payload));args.push('--input',request);}
+  const result=spawnSync('python3',args,{encoding:'utf8',timeout:55000});
+  if(fail){assert.equal(result.status,2,result.stdout+result.stderr);assert.match(result.stdout+result.stderr,fail);return;}
+  assert.equal(result.status,0,result.stdout+result.stderr);
+  return JSON.parse(result.stdout);
+ }
+ const pending=invoke('intake',root,{title:'Preserve selected Web progress',description:'Guard owned browser discovery.',
+  expected_behavior:'Resume the same Web run after exact configured approval.'});
+ const staticCriterion='The static input retains the observed behavior.',browserCriterion='Exercise the configured fixture.';
+ const checks=[
+  {id:'static',recipe_id:'static-inspection',assertion:staticCriterion,criteria:[staticCriterion],
+   sources:['source.txt'],parameters:{},timing:'immediate'},
+  {id:'browser',recipe_id:'fixture-browser',assertion:browserCriterion,criteria:[browserCriterion],
+   sources:['source.txt'],parameters:{},timing:'immediate'}
+ ];
+ const body='Goal:\n- Preserve selected Web progress.\n\nTouch:\n- partial.txt\n\nValidation:\n```json\n'+
+  JSON.stringify({checks})+'\n```\n\nAcceptance:\n- '+staticCriterion+'\n- '+browserCriterion+'\n';
+ const processed=invoke('process',root,{selectors:[pending.id],
+  dispositions:{[pending.id]:{status:'promoted',reason:'The controlled Web fixture supplies the required bounds.'}},
+  tasks:[{title:'Preserve selected Web progress',body,parent_pending_ids:[pending.id]}]});
+ const task_id=processed.created_ids[0];
+ invoke('workspace-setup',root,{});
+ const runReceipt=invoke('start',root,{worktree:working},['--id',task_id]);
+ const selected=['--run-id',runReceipt.id];
+ invoke('prepare-worktree-profile',working,null,selected);
+ invoke('begin',working,{task_id},selected);
+ const inspectBrowser=()=>invoke('validation-preflight',working,{task_id,check_id:'browser'},selected);
+ const oldBrowser=inspectBrowser();
+ write(working,'partial.txt','Unfinished selected task changes.\n');
+ write(working,'static.log','The exact source assertion passed.\n');
+ const attempt=invoke('prepare-check',working,{task_id,check_id:'static'},selected);
+ invoke('checkpoint',working,{phase:'refresh-profile',stop_reason:'Installation profile changed; re-admit before continuation'},selected);
+ write(working,'playwright.config.ts',changed);
+ const previewRequest={playwright_refresh:{action:'preview'}};
+ invoke('admit',working,previewRequest,selected,/original check attempt/);
+ invoke('record-check',working,{task_id,check_id:'static',attempt_id:attempt.attempt_id,result:'pass',
+  classification:'executed-control',actual_lane:'static',environment_identity:attempt.environment_identity,
+  cleanup:'The fixture started no runtime process.',assertions:[{assertion:staticCriterion,result:'pass'}],
+  evidence:['static.log']},selected);
+ const statePath=path.join(root,state),queuePath=path.join(root,future);
+ const beforeState=fs.readFileSync(statePath),beforeQueue=fs.readFileSync(queuePath);
+ const beforeProfile=fs.readFileSync(path.join(working,'.skill-tree/installation/profile.json'));
+ const preview=invoke('admit',working,previewRequest,selected);
+ assert.equal(preview.status,'approval-required');
+ assert.equal(preview.task_id,task_id);
+ assert.deepEqual(preview.affected_checks.map(row=>row.check_id),['browser']);
+ assert.notEqual(preview.plan.playwright_input.before,preview.plan.playwright_input.after);
+ assert.deepEqual(fs.readFileSync(statePath),beforeState);
+ assert.deepEqual(fs.readFileSync(queuePath),beforeQueue);
+ assert.deepEqual(fs.readFileSync(path.join(working,'.skill-tree/installation/profile.json')),beforeProfile);
+ const approval={action:'apply',expected_preview_sha256:preview.preview_sha256,
+  owner_instruction:'Fixture owner approves the exact Playwright discovery input for the original stopped run.'};
+ invoke('admit',working,{playwright_refresh:{...approval,expected_preview_sha256:'0'.repeat(64)}},selected,/preview changed/);
+ write(working,'package.json',{...pkg,description:'A separate discovered input changed.'});
+ invoke('admit',working,{playwright_refresh:approval},selected,/material or unknown changes/);
+ write(working,'package.json',pkg);
+ assert.deepEqual(fs.readFileSync(statePath),beforeState);
+ const requestFile=path.join(base,'approved-playwright.json');
+ fs.writeFileSync(requestFile,JSON.stringify({playwright_refresh:approval}));
+ const interrupt=`
+import runpy, sys
+entry=runpy.run_path(sys.argv[1])
+scope=entry['main'].__globals__
+original=scope['owned_profile_installer']
+def lose_ack(store, request, mode, **kwargs):
+    result=original(store, request, mode, **kwargs)
+    if mode=='activate' and request.get('kind')=='playwright-discovery':
+        raise scope['WorkflowError']('Injected loss after the exact Playwright activation')
+    return result
+scope['owned_profile_installer']=lose_ack
+raise SystemExit(entry['main'](sys.argv[2:]))
+`;
+ const lost=spawnSync('python3',['-B','-c',interrupt,helper,'admit',working,...selected,'--input',requestFile],
+  {encoding:'utf8',timeout:55000});
+ assert.equal(lost.status,2,lost.stdout+lost.stderr);
+ assert.match(lost.stdout+lost.stderr,/Injected loss after the exact Playwright activation/);
+ const retained=JSON.parse(fs.readFileSync(statePath)).run_registry.runs[runReceipt.id].compatible_profile_refresh;
+ assert.equal(retained.kind,'playwright-discovery');
+ invoke('admit',working,{compatible_refresh:true},selected,/original exact Playwright approval/);
+ const result=invoke('admit',working,{playwright_refresh:approval},selected);
+ assert.equal(result.operation_id,retained.operation_id);
+ assert.equal(result.run_id,runReceipt.id);
+ assert.equal(result.task_id,task_id);
+ assert.deepEqual(invoke('admit',working,{playwright_refresh:approval},selected),{...result,replayed:true});
+ assert.equal(fs.readFileSync(path.join(working,'partial.txt'),'utf8'),'Unfinished selected task changes.\n');
+ assert.deepEqual(fs.readFileSync(queuePath),beforeQueue);
+ const afterState=JSON.parse(fs.readFileSync(statePath)),originalState=JSON.parse(beforeState);
+ assert.deepEqual(afterState.run_registry.claims,originalState.run_registry.claims);
+ assert.deepEqual(afterState.task_progress,originalState.task_progress);
+ assert.equal(afterState.run_registry.runs[runReceipt.id].phase,'implement');
+ const currentBrowser=inspectBrowser();
+ assert.notEqual(currentBrowser.recipe_environment,oldBrowser.recipe_environment);
+ assert.equal(currentBrowser.execution.required,true);
+ run('git',['-C',working,'add','playwright.config.ts']);
+ run('git',['-C',working,'commit','-m','Record the approved fixture configuration']);
+ const separateStop='A separate owner decision is still pending';
+ invoke('checkpoint',working,{phase:'refresh-profile',stop_reason:separateStop,
+  next_action:'Resolve the separate requirement'},selected);
+ write(working,'playwright.config.ts',initial);
+ const later=invoke('admit',working,previewRequest,selected);
+ const retainedStop=invoke('admit',working,{playwright_refresh:{...approval,
+  expected_preview_sha256:later.preview_sha256}},selected);
+ assert.equal(retainedStop.stop_reason,separateStop);
+ const stopped=JSON.parse(fs.readFileSync(statePath)).run_registry.runs[runReceipt.id];
+ assert.equal(stopped.phase,'refresh-profile');
+ assert.equal(stopped.stop_reason,separateStop);
+ assert.equal(stopped.next_action,'Resolve the separate requirement');
+});
