@@ -1,0 +1,6 @@
+...............
+----------------------------------------------------------------------
+Ran 15 tests in 924.600s
+
+OK
+{"compact_git_objects_bytes": 269588, "compact_worktree_bytes": 264345, "full_git_objects_bytes": 791706, "full_worktree_bytes": 527332}
