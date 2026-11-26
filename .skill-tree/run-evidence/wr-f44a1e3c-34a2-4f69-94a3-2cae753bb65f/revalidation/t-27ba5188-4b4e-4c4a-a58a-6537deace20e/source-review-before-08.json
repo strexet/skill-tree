@@ -1,0 +1,11 @@
+{
+  "task_id": "T-27ba5188-4b4e-4c4a-a58a-6537deace20e",
+  "sources": {
+    ".skill-tree/skill-tree.json": "ad36d7a0f24f72e506ef629acf69f9225e732bc9463c4d01b2314aa899640a06"
+  },
+  "checks_sha256": "0fe1e6691b7f113c807c9ce93b60b36d8b3c2c68a8e558712a85da1f14a62b8a",
+  "reviewer": "/root/director_resolver",
+  "result": "clean",
+  "original_head": "3fcecb3bee7201271d810e26d2fcd272000d95f1",
+  "reference": "Independent review verified the exact owner grant, synchronized merge and target provenance, anticipated compatible generation, reconciliation and preservation of shared or standalone installation layout. All 232 current source manifest digests matched actual files. Scoped diff check passed."
+}
