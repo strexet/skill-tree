@@ -4,11 +4,13 @@ from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from hashlib import sha256
+import importlib.util
 import json
 import os
 import runpy
 from pathlib import Path
 from shutil import copytree, ignore_patterns
+import random
 import signal
 import socket
 import subprocess
@@ -93,6 +95,211 @@ class DirectorTopologyTests(unittest.TestCase):
 
     def git(self, root, *args):
         return self.command('git', '-C', root, '-c', 'commit.gpgsign=false', '-c', f'core.hooksPath={os.devnull}', *args)
+
+    def test_compact_source_preserves_full_project_checkout_and_pr_preflight(self):
+        core = SOURCE/'common/scripts'
+        maintenance_spec = importlib.util.spec_from_file_location('compact_maintenance_fixture',core/'director-maintenance.py')
+        maintenance = importlib.util.module_from_spec(maintenance_spec)
+        maintenance_spec.loader.exec_module(maintenance)
+        seed = self.base/'compact-upstream'
+        seed.mkdir()
+        self.git(seed,'init','-q','-b','develop')
+        self.git(seed,'config','uploadpack.allowFilter','true')
+        self.git(seed,'config','uploadpack.allowAnySHA1InWant','true')
+        maintenance.UPSTREAM = seed.as_uri()
+        fixture_rng = random.Random(23)
+        write(seed,QUEUE,'# Future Work\n\n## Pending Task Format\n\n## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n')
+        write(seed,'.skill-tree/config/repository.json','{"schema":1,"role":"source"}\n')
+        maintenance.D.WS.setup(maintenance.D.WF.Store(seed),{},update_navigation=False)
+        portable = write(seed,'.skill-tree/skill-tree.json','{"fixture":"original navigation"}\n')
+        installed_name = '.agents/skills/skill-tree-work-through-next'
+        installed_skill = write(seed,installed_name+'/SKILL.md','# Fixture installed skill\n')
+        copied_runtime = installed_skill.parent/'copied-runtime.bin'
+        copied_runtime.write_bytes(fixture_rng.randbytes(256*1024))
+        edited_name = '.agents/skills/skill-tree-repo-documentation-audit'
+        edited_skill = write(seed,edited_name+'/SKILL.md','# Fixture modified package\n')
+        extra = write(seed,edited_name+'/local-change.md','An undeclared tracked note.\n')
+        shared_copy = write(seed,'.skill-tree/installation/source/common/scripts/example.py','value = 1\n')
+        local_notes = write(seed,'.skill-tree/installation/local-note.md','An undeclared installation note.\n')
+        custom = write(seed,'.agents/skills/local-design/SKILL.md','# Independently authored skill\n')
+        source = write(seed,'.skill-tree/common/scripts/example.py','value = 1\n')
+        history = write(seed,'.skill-tree/history/source-observation.json','{"scope":"source"}\n')
+        distribution = write(seed,'.skill-tree/skills/general/fixture/SKILL.md','# Standalone fixture\n')
+        profile = write(seed,PROFILE,json.dumps({'format':'skill-tree-profile','schema':1,
+            'project_root':'/foreign-installation',
+            'bundle_digests':{shared_copy.relative_to(seed).as_posix():sha(shared_copy.read_bytes())},
+            'destinations':{installed_name:{
+                'name':'skill-tree-work-through-next','provider':'codex','providers':['codex'],
+                'files':{'SKILL.md':sha(installed_skill.read_bytes()),'copied-runtime.bin':sha(copied_runtime.read_bytes())},
+            },edited_name:{
+                'name':'skill-tree-repo-documentation-audit','provider':'codex','providers':['codex'],
+                'files':{'SKILL.md':sha(edited_skill.read_bytes())},
+            }}}))
+        obsolete = seed/'obsolete-source-evidence.bin'
+        obsolete.write_bytes(fixture_rng.randbytes(512*1024))
+        def commit(root,message):
+            self.git(root,'add','.')
+            self.git(root,'-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-qm',message)
+            return self.git(root,'rev-parse','HEAD').strip()
+        commit(seed,'Fixture historic objects')
+        obsolete.unlink()
+        base = commit(seed,'Fixture current source')
+        baseline = self.base/'full-baseline'
+        self.git(self.base,'clone','--no-local','--single-branch','--branch','develop','--no-tags','--origin','upstream',
+                 seed.as_uri(),str(baseline))
+        baseline_project = self.base/'full-baseline-project'
+        self.git(baseline,'worktree','add','-b','skill-tree/compact','--',str(baseline_project),base)
+        owner = self.base/'compact-director'
+        owner.mkdir()
+        ready = maintenance.prepare(owner,'compact')
+        canonical = Path(ready['checkout'])
+        project = Path(ready['project_checkout'])
+        earlier = {'schema':1,'upstream':seed.as_uri(),'checkout':str(baseline),'revision':base,
+                   'projects':{},'queue_id':ready['queue_id']}
+        earlier_marker = write(baseline,'.git/'+maintenance.MARKER,json.dumps(earlier))
+        recorded_earlier = earlier_marker.read_bytes()
+        self.assertEqual(maintenance.provision(baseline),earlier)
+        self.assertEqual(earlier_marker.read_bytes(),recorded_earlier)
+        self.assertEqual((baseline/PROFILE).read_bytes(),profile.read_bytes())
+        self.assertEqual((ready['revision'],ready['base_commit']), (base,base))
+        self.assertFalse((canonical/PROFILE).exists())
+        self.assertFalse((canonical/installed_name).exists())
+        self.assertFalse((canonical/shared_copy.relative_to(seed)).exists())
+        self.assertEqual((project/PROFILE).read_bytes(),profile.read_bytes())
+        for file in (portable,custom,source,history,distribution,seed/STATE,edited_skill,extra,local_notes):
+            relative = file.relative_to(seed)
+            self.assertEqual((canonical/relative).read_bytes(),file.read_bytes())
+            self.assertEqual((project/relative).read_bytes(),file.read_bytes())
+        for checkout in (canonical,project):
+            self.assertEqual(self.git(checkout,'status','--porcelain'),'')
+        self.assertEqual(maintenance.D._inspect_profile(canonical),{'kind':'repository-local-source'})
+        self.assertEqual(ready['queue_id'],maintenance.D._inspect_owner(canonical)[0])
+        self.assertEqual(self.git(project,'config','--bool','--get','core.sparseCheckout').strip(),'false')
+        self.assertTrue(all(line.startswith('H ') for line in self.git(project,'ls-files','-v').splitlines()))
+        def tracked_bytes(*checkouts):
+            return sum((checkout/relative).stat().st_size for checkout in checkouts
+                       for relative in self.git(checkout,'ls-files','-z').split('\0')
+                       if (checkout/relative).is_file())
+        def git_bytes(checkout):
+            return sum(file.stat().st_size for file in (checkout/'.git/objects').rglob('*') if file.is_file())
+        measured = {'full_worktree_bytes':tracked_bytes(baseline,baseline_project),
+                    'compact_worktree_bytes':tracked_bytes(canonical,project),
+                    'full_git_objects_bytes':git_bytes(baseline),'compact_git_objects_bytes':git_bytes(canonical)}
+        print(json.dumps(measured,sort_keys=True))
+        self.assertLess(measured['compact_worktree_bytes'],measured['full_worktree_bytes'])
+        self.assertLess(measured['compact_git_objects_bytes'],measured['full_git_objects_bytes'])
+        candidate = self.base/'compact-candidate'
+        self.git(canonical,'worktree','add','-b','fixture-review','--',str(candidate),base)
+        corrected = write(candidate,source.relative_to(seed).as_posix(),'value = 2\n')
+        head = commit(candidate,'Reviewed fixture source correction')
+        applied = maintenance.integrate(owner,'compact',expected_head=base,candidate_commit=head,
+            reviewed_paths={source.relative_to(seed).as_posix():sha(corrected.read_bytes())},
+            owner={'actor':'fixture','kind':'owner-message','reference':'fixture-source-approval'})
+        self.assertTrue(applied['applied'])
+        self.assertEqual(self.git(project,'rev-parse','HEAD').strip(),head)
+        self.assertEqual((project/PROFILE).read_bytes(),profile.read_bytes())
+        review_spec = importlib.util.spec_from_file_location('compact_pr_fixture',core/'pr-review-state.py')
+        review = importlib.util.module_from_spec(review_spec)
+        review_spec.loader.exec_module(review)
+        snapshot_row = {'repo_id':review.ws.repo_id(project),'remote':'upstream',
+                        'remote_id':sha(seed.as_uri().encode()),'source_branch':ready['branch'],
+                        'target_branch':'develop','base_oid':base,'head':head,'state':'OPEN',
+                        'changed_files':[source.relative_to(seed).as_posix()],
+                        'pr':{'id':'PR_fixture','number':1,'url':'https://example.invalid/owner/fixture/pull/1'}}
+        publication_id = 'a'*32
+        record = review.new_record(snapshot_row,review.parameters(ready['branch'],{}))
+        record['publication_id'] = publication_id
+        write(canonical,f'.skill-tree/history/publications/pub-{publication_id}.json',json.dumps(record))
+        verified = review.existing_source_preflight(canonical,
+            {'source_checkout':str(project),'snapshot':snapshot_row},publication_id)
+        self.assertEqual(verified['source_checkout']['path'],str(project))
+        self.assertEqual(verified['changed_files'],snapshot_row['changed_files'])
+        marker = canonical/'.git'/maintenance.MARKER
+        recorded = marker.read_bytes()
+        forged = json.loads(recorded)
+        forged['excluded_deployments'].append(edited_name)
+        marker.write_text(json.dumps(forged))
+        try:
+            with self.assertRaisesRegex(ValueError,'exclusions differ from the pinned source'):
+                maintenance.inspect(owner,'compact')
+        finally:
+            marker.write_bytes(recorded)
+        actual_git = maintenance.git
+        def offline(root,*args,**options):
+            if args[0] == 'fetch':
+                raise maintenance.TransportUnavailable('fixture upstream unavailable')
+            return actual_git(root,*args,**options)
+        with patch.object(maintenance,'git',side_effect=offline):
+            retained = maintenance.prepare(owner,'compact')
+            self.assertEqual(retained['source_sync'],'retained-local')
+            dirty = write(project,'local-draft.txt','Preserve local work.\n')
+            try:
+                with self.assertRaises(maintenance.TransportUnavailable):
+                    maintenance.prepare(owner,'compact')
+                self.assertEqual(dirty.read_text(),'Preserve local work.\n')
+            finally:
+                dirty.unlink()
+            with self.assertRaises(maintenance.TransportUnavailable):
+                maintenance.prepare(owner,'new')
+        self.assertEqual(marker.read_bytes(),recorded)
+        self.assertFalse((owner/'sources/projects/new').exists())
+        self.git(seed,'config','uploadpack.allowFilter','false')
+        fallback_owner = self.base/'full-object-fallback-director'
+        fallback_owner.mkdir()
+        fallback = maintenance.prepare(fallback_owner,'compact')
+        self.assertEqual((fallback['revision'],fallback['base_commit']),(base,base))
+        self.assertFalse((Path(fallback['checkout'])/PROFILE).exists())
+        self.assertEqual((Path(fallback['project_checkout'])/PROFILE).read_bytes(),profile.read_bytes())
+        legacy_state = '{"schema":2,"tasks":[],"active_run":null}'
+        write(seed,STATE,legacy_state)
+        legacy = commit(seed,'Fixture checkpoint without portable registry')
+        legacy_owner = self.base/'legacy-checkpoint-director'
+        legacy_owner.mkdir()
+        with self.assertRaisesRegex(ValueError,'portable registration before compact setup'):
+            maintenance.prepare(legacy_owner,'old-source')
+        retained_root = legacy_owner/'sources/skill-tree'
+        self.assertEqual((retained_root/STATE).read_text(),legacy_state)
+        self.assertEqual((retained_root/'.skill-tree/skill-tree.json').read_bytes(),portable.read_bytes())
+        self.assertEqual(self.git(retained_root,'rev-parse','HEAD').strip(),legacy)
+        self.assertEqual(self.git(retained_root,'status','--porcelain'),'')
+        if os.name != 'nt':
+            profile.unlink()
+            profile.symlink_to('../config/repository.json')
+            commit(seed,'Fixture unowned symbolic install profile')
+            unsafe_owner = self.base/'unsafe-profile-director'
+            unsafe_owner.mkdir()
+            with self.assertRaisesRegex(ValueError,'outside the compact source ownership contract'):
+                maintenance.prepare(unsafe_owner,'compact')
+            self.assertFalse((unsafe_owner/'sources/skill-tree').exists())
+            profile.unlink()
+        write(seed,PROFILE,'{"format":"skill-tree-profile","schema":1,"project_root":"/fixture"}')
+        commit(seed,'Fixture malformed regular install profile')
+        malformed_owner = self.base/'malformed-profile-director'
+        malformed_owner.mkdir()
+        with self.assertRaisesRegex(ValueError,'outside the compact source ownership contract'):
+            maintenance.prepare(malformed_owner,'compact')
+        self.assertFalse((malformed_owner/'sources/skill-tree').exists())
+
+    def test_maintenance_distinguishes_client_outages_from_remote_rejections(self):
+        core = SOURCE/'common/scripts/director-maintenance.py'
+        spec = importlib.util.spec_from_file_location('maintenance_transport_fixture',core)
+        maintenance = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(maintenance)
+        unavailable = "fatal: unable to access 'https://example.invalid/project': Could not resolve host: example.invalid\n"
+        client = subprocess.CompletedProcess([],128,'',unavailable)
+        with patch.object(maintenance.subprocess,'run',return_value=client):
+            with self.assertRaises(maintenance.TransportUnavailable):
+                maintenance.git(self.parent,'fetch','upstream')
+        denied = subprocess.CompletedProcess([],128,'','remote: connection refused by repository policy\n')
+        with patch.object(maintenance.subprocess,'run',return_value=denied):
+            with self.assertRaises(ValueError) as raised:
+                maintenance.git(self.parent,'fetch','upstream')
+        self.assertNotIsInstance(raised.exception,maintenance.TransportUnavailable)
+        deadline = subprocess.TimeoutExpired(['git','fetch'],240,stderr=b'credential helper did not respond')
+        with patch.object(maintenance.subprocess,'run',side_effect=deadline):
+            with self.assertRaises(ValueError) as raised:
+                maintenance.git(self.parent,'fetch','upstream')
+        self.assertNotIsInstance(raised.exception,maintenance.TransportUnavailable)
 
     def git_project(self, root, areas):
         root.mkdir()

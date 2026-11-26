@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "48c2863cfb321df394d941f38fe8353ad6895f6d1115225996694e92505d5864",
+  "identity": "bd6de5caeba10b7b4c614447d26e32312b8f3605693680a32e519a97a61b7792",
   "operation": "skill-tree-director-review",
   "operations": {
     "skill-tree-3d": {
@@ -3294,7 +3294,7 @@
     "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     "references/development-practices.md": "352a45b093f2c53b7b08aef045a098880af74c6add6fb79f95017a52fd0e0780",
     "references/director-capabilities.json": "8fcc314f88b5b818220d13a54e86550319712f752a0fd4fcaf9ebab4921051fb",
-    "references/director-workflow.md": "6f815f7fd719fc1bdb2a30057d3756157a51ebf97f08af505345acf425986b2b",
+    "references/director-workflow.md": "d573306865ad5cb84189f9ca410cfbbfb9f9cf0a63682b42917a3976af17b952",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/future-workflow.md": "ea2d77afaf0dbe92d8c3bacf983e8f26fe2233d84826ba8b539f92216b8d3d6c",
     "references/history-retention.md": "ff3fa8602fa29085b59f0aa5ae9f9da698bd5b5d5672235fe809018b18b4b801",

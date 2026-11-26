@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "9c3b7fe3e9e5144946f1b4e362272906f65222ce9bee3c09cd49e12c984f19f3",
+  "identity": "9851403555b121aa768a61e229579496c3ec2589715494dbb33ac6767f6dd032",
   "operation": "skill-tree-director-audit",
   "operations": {
     "skill-tree-3d": {
@@ -3294,7 +3294,7 @@
     "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     "references/development-practices.md": "352a45b093f2c53b7b08aef045a098880af74c6add6fb79f95017a52fd0e0780",
     "references/director-capabilities.json": "8fcc314f88b5b818220d13a54e86550319712f752a0fd4fcaf9ebab4921051fb",
-    "references/director-workflow.md": "6f815f7fd719fc1bdb2a30057d3756157a51ebf97f08af505345acf425986b2b",
+    "references/director-workflow.md": "d573306865ad5cb84189f9ca410cfbbfb9f9cf0a63682b42917a3976af17b952",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/future-workflow.md": "ea2d77afaf0dbe92d8c3bacf983e8f26fe2233d84826ba8b539f92216b8d3d6c",
     "references/history-retention.md": "ff3fa8602fa29085b59f0aa5ae9f9da698bd5b5d5672235fe809018b18b4b801",
@@ -3323,7 +3323,7 @@
     "scripts/runtime/common/scripts/director-audit.py": "3f807b557f08134ea26c86bf28ce0b238a8ae1b973624bcbd7da6b5f75906830",
     "scripts/runtime/common/scripts/director-dispatch.py": "bdc07c36c486cc96af681987831f36b04346f45084bd45ead1fdc40265a831f1",
     "scripts/runtime/common/scripts/director-handoff.py": "19a5ffc7f21d1199954e4953b6d9e704c880cb69d533004ae2c918ba6eb2116b",
-    "scripts/runtime/common/scripts/director-maintenance.py": "a4c508a8c97b1efc146b0724723aaf11978ab0ae36e3e4cbb51d6753011a5c9a",
+    "scripts/runtime/common/scripts/director-maintenance.py": "301b6a375921d2c18aa58b0534f96bf2a2b76285d955d6e8d8a054b75bff6f18",
     "scripts/runtime/common/scripts/director-objectives.py": "18a0e664d1eb9074983a22abf27ecb4076d2bd1b3d24ed6cac5ace41f459f373",
     "scripts/runtime/common/scripts/director-plan-adapters.py": "1f78af0ae2187105d44ccc2487176548268357fa4a5916c496cb093899c4741d",
     "scripts/runtime/common/scripts/director-plans.py": "679f7c7d9b87caade9a9d01f2dddf0dbc4703e1d49f1c183a7f83b6b48ec49c6",
