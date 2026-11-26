@@ -18,6 +18,7 @@
       "3d-stages.md": "common/references/3d-stages.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "plugin-bindings.js": "lib/plugin-bindings.js",
@@ -63,6 +64,7 @@
       "3d-stages.md": "common/references/3d-stages.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "plugin-bindings.js": "lib/plugin-bindings.js",
@@ -108,6 +110,7 @@
       "3d-stages.md": "common/references/3d-stages.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "plugin-bindings.js": "lib/plugin-bindings.js",
@@ -152,6 +155,7 @@
       "3d-stages.md": "common/references/3d-stages.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "plugin-bindings.js": "lib/plugin-bindings.js",
@@ -196,6 +200,7 @@
       "3d-stages.md": "common/references/3d-stages.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "plugin-bindings.js": "lib/plugin-bindings.js",
@@ -240,6 +245,7 @@
       "3d-stages.md": "common/references/3d-stages.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "plugin-bindings.js": "lib/plugin-bindings.js",
@@ -278,6 +284,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "director-dispatch.py": "common/scripts/director-dispatch.py",
@@ -312,6 +319,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "director-dispatch.py": "common/scripts/director-dispatch.py",
@@ -343,6 +351,7 @@
       "validation-policy.md": "common/references/validation-policy.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "create-documentation-snapshot.py": "common/scripts/create-documentation-snapshot.py",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
@@ -406,6 +415,7 @@
       "runtime/common/scripts/director-plans.py": "common/scripts/director-plans.py",
       "runtime/common/scripts/director-questions.py": "common/scripts/director-questions.py",
       "runtime/common/scripts/director-run.py": "common/scripts/director-run.py",
+      "runtime/common/scripts/parallel-preview.py": "common/scripts/parallel-preview.py",
       "runtime/common/scripts/director-source-repair.py": "common/scripts/director-source-repair.py",
       "runtime/common/scripts/director-state.py": "common/scripts/director-state.py",
       "runtime/common/scripts/narrative-state.py": "common/scripts/narrative-state.py",
@@ -472,6 +482,7 @@
       "runtime/common/scripts/director-plans.py": "common/scripts/director-plans.py",
       "runtime/common/scripts/director-questions.py": "common/scripts/director-questions.py",
       "runtime/common/scripts/director-run.py": "common/scripts/director-run.py",
+      "runtime/common/scripts/parallel-preview.py": "common/scripts/parallel-preview.py",
       "runtime/common/scripts/director-state.py": "common/scripts/director-state.py",
       "runtime/common/scripts/narrative-state.py": "common/scripts/narrative-state.py",
       "runtime/common/scripts/plugin-invocation.py": "common/scripts/plugin-invocation.py",
@@ -537,6 +548,7 @@
       "runtime/common/scripts/director-plans.py": "common/scripts/director-plans.py",
       "runtime/common/scripts/director-questions.py": "common/scripts/director-questions.py",
       "runtime/common/scripts/director-run.py": "common/scripts/director-run.py",
+      "runtime/common/scripts/parallel-preview.py": "common/scripts/parallel-preview.py",
       "runtime/common/scripts/director-state.py": "common/scripts/director-state.py",
       "runtime/common/scripts/narrative-state.py": "common/scripts/narrative-state.py",
       "runtime/common/scripts/plugin-invocation.py": "common/scripts/plugin-invocation.py",
@@ -603,6 +615,7 @@
       "runtime/common/scripts/director-plans.py": "common/scripts/director-plans.py",
       "runtime/common/scripts/director-questions.py": "common/scripts/director-questions.py",
       "runtime/common/scripts/director-run.py": "common/scripts/director-run.py",
+      "runtime/common/scripts/parallel-preview.py": "common/scripts/parallel-preview.py",
       "runtime/common/scripts/director-state.py": "common/scripts/director-state.py",
       "runtime/common/scripts/narrative-state.py": "common/scripts/narrative-state.py",
       "runtime/common/scripts/plugin-invocation.py": "common/scripts/plugin-invocation.py",
@@ -668,6 +681,7 @@
       "runtime/common/scripts/director-plans.py": "common/scripts/director-plans.py",
       "runtime/common/scripts/director-questions.py": "common/scripts/director-questions.py",
       "runtime/common/scripts/director-run.py": "common/scripts/director-run.py",
+      "runtime/common/scripts/parallel-preview.py": "common/scripts/parallel-preview.py",
       "runtime/common/scripts/director-state.py": "common/scripts/director-state.py",
       "runtime/common/scripts/narrative-state.py": "common/scripts/narrative-state.py",
       "runtime/common/scripts/plugin-invocation.py": "common/scripts/plugin-invocation.py",
@@ -734,6 +748,7 @@
       "runtime/common/scripts/director-plans.py": "common/scripts/director-plans.py",
       "runtime/common/scripts/director-questions.py": "common/scripts/director-questions.py",
       "runtime/common/scripts/director-run.py": "common/scripts/director-run.py",
+      "runtime/common/scripts/parallel-preview.py": "common/scripts/parallel-preview.py",
       "runtime/common/scripts/director-state.py": "common/scripts/director-state.py",
       "runtime/common/scripts/narrative-state.py": "common/scripts/narrative-state.py",
       "runtime/common/scripts/plugin-invocation.py": "common/scripts/plugin-invocation.py",
@@ -799,6 +814,7 @@
       "runtime/common/scripts/director-plans.py": "common/scripts/director-plans.py",
       "runtime/common/scripts/director-questions.py": "common/scripts/director-questions.py",
       "runtime/common/scripts/director-run.py": "common/scripts/director-run.py",
+      "runtime/common/scripts/parallel-preview.py": "common/scripts/parallel-preview.py",
       "runtime/common/scripts/director-state.py": "common/scripts/director-state.py",
       "runtime/common/scripts/narrative-state.py": "common/scripts/narrative-state.py",
       "runtime/common/scripts/plugin-invocation.py": "common/scripts/plugin-invocation.py",
@@ -868,6 +884,7 @@
       "runtime/common/scripts/director-plans.py": "common/scripts/director-plans.py",
       "runtime/common/scripts/director-questions.py": "common/scripts/director-questions.py",
       "runtime/common/scripts/director-run.py": "common/scripts/director-run.py",
+      "runtime/common/scripts/parallel-preview.py": "common/scripts/parallel-preview.py",
       "runtime/common/scripts/director-state.py": "common/scripts/director-state.py",
       "runtime/common/scripts/narrative-state.py": "common/scripts/narrative-state.py",
       "runtime/common/scripts/plugin-invocation.py": "common/scripts/plugin-invocation.py",
@@ -933,6 +950,7 @@
       "runtime/common/scripts/director-plans.py": "common/scripts/director-plans.py",
       "runtime/common/scripts/director-questions.py": "common/scripts/director-questions.py",
       "runtime/common/scripts/director-run.py": "common/scripts/director-run.py",
+      "runtime/common/scripts/parallel-preview.py": "common/scripts/parallel-preview.py",
       "runtime/common/scripts/director-state.py": "common/scripts/director-state.py",
       "runtime/common/scripts/narrative-state.py": "common/scripts/narrative-state.py",
       "runtime/common/scripts/plugin-invocation.py": "common/scripts/plugin-invocation.py",
@@ -975,6 +993,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "director-dispatch.py": "common/scripts/director-dispatch.py",
@@ -1013,6 +1032,7 @@
       "full-cycle.md": "common/references/full-cycle.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "director-dispatch.py": "common/scripts/director-dispatch.py",
@@ -1049,6 +1069,7 @@
       "validation-policy.md": "common/references/validation-policy.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "director-dispatch.py": "common/scripts/director-dispatch.py",
@@ -1082,6 +1103,7 @@
       "validation-policy.md": "common/references/validation-policy.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "director-dispatch.py": "common/scripts/director-dispatch.py",
@@ -1114,6 +1136,7 @@
       "validation-policy.md": "common/references/validation-policy.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "director-dispatch.py": "common/scripts/director-dispatch.py",
@@ -1141,6 +1164,7 @@
       "history-retention.md": "common/references/history-retention.md",
       "installation-profile.md": "common/references/installation-profile.md",
       "orchestration.md": "common/references/orchestration.md",
+      "parallel-preview.md": "common/references/parallel-preview.md",
       "pending-task-format.md": "common/references/pending-task-format.md",
       "pending-task-intake.md": "common/references/pending-task-intake.md",
       "plugin-invocation.md": "common/references/plugin-invocation.md",
@@ -1150,9 +1174,11 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "director-dispatch.py": "common/scripts/director-dispatch.py",
+      "parallel-preview.py": "common/scripts/parallel-preview.py",
       "plugin-bindings.js": "lib/plugin-bindings.js",
       "plugin-composition.js": "lib/plugin-composition.js",
       "plugin-hooks.js": "common/scripts/plugin-hooks.js",
@@ -1187,6 +1213,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "director-dispatch.py": "common/scripts/director-dispatch.py",
@@ -1285,6 +1312,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "director-dispatch.py": "common/scripts/director-dispatch.py",
@@ -1346,6 +1374,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "director-dispatch.py": "common/scripts/director-dispatch.py",
@@ -1382,6 +1411,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "director-dispatch.py": "common/scripts/director-dispatch.py",
@@ -1417,6 +1447,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "director-dispatch.py": "common/scripts/director-dispatch.py",
@@ -1453,6 +1484,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "director-dispatch.py": "common/scripts/director-dispatch.py",
@@ -1493,6 +1525,7 @@
       "workflow-metadata.md": "common/references/workflow-metadata.md"
     },
     "scripts": {
+      "package.json": "common/scripts/commonjs-package.json",
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "director-dispatch.py": "common/scripts/director-dispatch.py",

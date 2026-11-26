@@ -1,6 +1,7 @@
 """Core phases and host requests; the sibling DG ledger owns every decision answer."""
 from contextlib import contextmanager
 from copy import deepcopy
+from datetime import datetime, timezone
 import importlib.util
 import json
 from pathlib import Path
@@ -18,6 +19,7 @@ class OrchestrationError(ValueError):
 COMMANDS={'question','prepare-actor','record-actor','reconcile-actor','switch-mode','accept-decision','research','plan','accept-plan','implement','checks','review','resolve','fix','resume','observe-failure'}
 PHASES={'research','plan','plan-review','implement','checks','review','resolution','fix','re-review','ready'}
 DO=re.compile(r'^DO-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$')
+HOST_TIMESTAMPS=('dispatched_at','picked_up_at','last_progress_at','finished_at')
 
 
 def require(condition,message):
@@ -64,9 +66,128 @@ def read(store,orchestration_id):
     except dg.DecisionError as error:raise OrchestrationError(str(error)) from error
 
 
+def recorded_at():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _utc_instant(value):
+    if not isinstance(value,str):
+        return None
+    try:
+        instant=datetime.fromisoformat(value[:-1]+'+00:00' if value.endswith('Z') else value)
+    except ValueError:
+        return None
+    return instant if instant.utcoffset()==timezone.utc.utcoffset(None) else None
+
+
+def _host_observations(evidence,creation):
+    if not isinstance(evidence,dict) or 'host_timing' not in evidence:
+        return None
+    timing=evidence['host_timing']
+    require(creation is not None and isinstance(timing,dict) and text(timing.get('clock_id'))
+            and set(timing)<={'clock_id',*HOST_TIMESTAMPS} and len(timing)>1,
+            'Host timing requires a provenance-bound agent result, clock identity and explicit observations')
+    observed=[(name,_utc_instant(timing[name])) for name in HOST_TIMESTAMPS if name in timing]
+    instants=[instant for _,instant in observed]
+    require(all(value is not None for value in instants) and instants==sorted(instants),
+            'Host timing requires ordered UTC timestamps')
+    return {'clock_id':timing['clock_id'],'reference':evidence.get('reference'),
+            **{name:instant.isoformat() for name,instant in observed}}
+
+
+def _timed_interval(start,end):
+    begin,finish=_utc_instant(start),_utc_instant(end)
+    elapsed=(finish-begin).total_seconds() if begin is not None and finish is not None and finish>=begin else None
+    return {'start_at':start if begin is not None else None,'end_at':end if finish is not None else None,
+            'elapsed_seconds':elapsed,'status':'measured' if elapsed is not None else 'unknown'}
+
+
+def _phase_timing(frame):
+    history=frame['history']
+    transitions=[]
+    for event in history:
+        phase=event['phase']
+        if transitions and transitions[-1]['phase']==phase:
+            continue
+        if transitions:
+            active=transitions[-1]
+            active.update(_timed_interval(active['start_at'],event.get('recorded_at')))
+        transitions.append({'phase':phase,'start_sequence':event['sequence'],
+                            **_timed_interval(event.get('recorded_at'),None)})
+    finished=transitions[:-1]
+    complete=frame['phase']=='ready' and bool(finished) and all(row['status']=='measured' for row in finished)
+    if complete:
+        instants=[_utc_instant(event.get('recorded_at')) for event in history
+                  if event['sequence']<=transitions[-1]['start_sequence']]
+        complete=all(value is not None for value in instants) and instants==sorted(instants)
+    critical={'basis':'ordered phases in the selected orchestration',
+              'phases':[row['phase'] for row in transitions],
+              'elapsed_seconds':sum(row['elapsed_seconds'] for row in finished) if complete else None,
+              'status':'measured' if complete else 'unknown'}
+    return transitions,critical
+
+
+def _actor_timing(frame):
+    pending,closed={},{}
+    for event in frame['history']:
+        attempt=event.get('detail',{}).get('attempt_id')
+        if event['event']=='prepare-actor':
+            pending[attempt]=event
+        elif event['event'] in {'record-actor','reconcile-actor'}:
+            closed[attempt]=event
+    waits,actors=[],[]
+    for attempt,begin in pending.items():
+        request=frame['actor_requests'].get(attempt,{}).get('input',{})
+        end=closed.get(attempt,{})
+        result=end.get('detail',{})
+        identity={'attempt_id':attempt,'actor':deepcopy(request.get('actor')),
+                  'role':request.get('role'),'orchestration_id':frame['id']}
+        waits.append({**identity,'reason':'awaiting-owner' if request.get('role')=='owner' else 'awaiting-actor',
+                      'outcome':result.get('status'),
+                      **_timed_interval(begin.get('recorded_at'),end.get('recorded_at'))})
+        if request.get('role')=='owner':
+            continue
+        observation=result.get('host_timing') or {}
+        actors.append({**identity,'observations':deepcopy(observation) if observation else None,
+                       'dispatch_to_pickup':_timed_interval(observation.get('dispatched_at'),observation.get('picked_up_at')),
+                       'pickup_to_finish':_timed_interval(observation.get('picked_up_at'),observation.get('finished_at'))})
+    return waits,actors
+
+
+def timing_timeline(store,orchestration_ids):
+    """Inspect recorded timing without mutating frames or inferring actor execution."""
+    require(isinstance(orchestration_ids,(list,tuple)) and orchestration_ids
+            and all(isinstance(value,str) and DO.fullmatch(value) for value in orchestration_ids)
+            and len(set(orchestration_ids))==len(orchestration_ids),
+            'Timing requires distinct exact orchestration IDs')
+    frames=[]
+    for value in orchestration_ids:
+        frame=read(store,value)
+        phases,critical=_phase_timing(frame)
+        waits,actors=_actor_timing(frame)
+        frames.append({'orchestration_id':value,'phase':frame['phase'],'phase_intervals':phases,
+                       'wait_intervals':waits,'actor_intervals':actors,'critical_path':critical})
+    work=[row for frame in frames for row in frame['actor_intervals']
+          if row['actor'] and row['pickup_to_finish']['status']=='measured']
+    overlaps=[]
+    for index,left in enumerate(work):
+        for right in work[index+1:]:
+            clock=left['observations']['clock_id']
+            if right['observations']['clock_id']!=clock or left['actor']['context_id']==right['actor']['context_id']:
+                continue
+            windows=[row['pickup_to_finish'] for row in (left,right)]
+            start=max(_utc_instant(window['start_at']) for window in windows)
+            end=min(_utc_instant(window['end_at']) for window in windows)
+            if end>start:
+                overlaps.append({'attempt_ids':[left['attempt_id'],right['attempt_id']],
+                                 'actor_context_ids':[left['actor']['context_id'],right['actor']['context_id']],
+                                 'clock_id':clock,**_timed_interval(start.isoformat(),end.isoformat())})
+    return {'orchestrations':frames,'actor_overlaps':overlaps}
+
+
 def write(store,frame,event,detail=None,buffer=None):
     previous=frame.pop('orchestration_hash',None);frame['revision']+=1
-    frame['history'].append({'sequence':frame['revision'],'event':event,'phase':frame['phase'],'previous_frame_hash':previous,'detail':deepcopy(detail or {})})
+    frame['history'].append({'sequence':frame['revision'],'event':event,'phase':frame['phase'],'recorded_at':recorded_at(),'previous_frame_hash':previous,'detail':deepcopy(detail or {})})
     frame['orchestration_hash']=digest(frame);value=path(store,frame['id']);relative=value.relative_to(store.root).as_posix()
     if hasattr(store,'_write_hashes') and relative not in store._write_hashes:store._write_hashes[relative]=None
     writes=dict(buffer.writes) if buffer else {};writes[relative]=json.dumps(frame,ensure_ascii=False,sort_keys=True,indent=2)+'\n';store.commit(writes);return deepcopy(frame)
@@ -239,12 +360,13 @@ def record_actor(store,buffer,frame,payload):
     request=frame['actor_requests'].get(payload.get('attempt_id'));require(request is not None and payload.get('input_digest')==request['input_digest'],'Result does not match the sealed original actor input')
     evidence=payload.get('evidence');creation=request['creation_evidence']
     if creation is not None:require(isinstance(evidence,dict) and evidence.get('creation_reference')==creation['reference'] and evidence.get('provider')==creation['provider'] and text(evidence.get('tool')),'Result must reference the original actual host creation and observed message event')
+    timing=_host_observations(evidence,creation)
     updated=dg_change(buffer,decision,'record',{'attempt_id':payload['attempt_id'],'result':payload.get('result'),'evidence':evidence})
     if updated['decision_hash']==decision['decision_hash']:return None
     status=payload['result']['status']
     if status in {'unavailable','failed','cancelled'}:
         frame['prerequisites']=['The original '+updated['attempts'][payload['attempt_id']]['role']+' is '+status+'; explicitly restore capability or reconcile before retry.'];failure(frame,'actor-'+status,evidence['reference'])
-    return {'attempt_id':payload['attempt_id'],'status':status}
+    return {'attempt_id':payload['attempt_id'],'status':status,**({'host_timing':timing} if timing else {})}
 
 
 def mutate(store,command,payload):
@@ -258,7 +380,7 @@ def mutate(store,command,payload):
             elif command=='prepare-actor':detail=prepare_actor(store,buffer,frame,payload)
             elif command=='record-actor':detail=record_actor(store,buffer,frame,payload)
             elif command=='reconcile-actor':
-                decision=ledger(store,frame);require(decision is not None and payload.get('expected_decision_hash')==decision['decision_hash'],'Original DG bytes are required for reconciliation');dg_change(buffer,decision,'reconcile',{'attempt_id':payload.get('attempt_id'),'status':payload.get('status'),'evidence':payload.get('evidence')});frame['prerequisites']=[];detail={'attempt_id':payload.get('attempt_id')}
+                decision=ledger(store,frame);require(decision is not None and payload.get('expected_decision_hash')==decision['decision_hash'],'Original DG bytes are required for reconciliation');dg_change(buffer,decision,'reconcile',{'attempt_id':payload.get('attempt_id'),'status':payload.get('status'),'evidence':payload.get('evidence')});frame['prerequisites']=[];detail={'attempt_id':payload.get('attempt_id'),'status':payload.get('status')}
             elif command=='switch-mode':
                 no_pending(store,frame);mode=payload.get('mode');authority=dg.validate_authority(payload.get('authority',frame['authority']),frame['context'],mode)
                 if mode==frame['mode'] and authority==frame['authority']:return deepcopy(frame)

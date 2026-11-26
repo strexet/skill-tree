@@ -1,0 +1,22 @@
+{
+  "source_head": "680a7790d4f55c15f51c266392020a1629f824ab",
+  "source_diff_sha256": "ee0f27c4833705eda5884c642cca137f4f42c2a1f3cabe9a2c5b68fa2175921b",
+  "independent_reviewer": "/root/director_critic",
+  "reviewed_paths": [
+    ".skill-tree/common/scripts/pr-review-state.py",
+    ".skill-tree/common/scripts/director-state.py",
+    ".skill-tree/common/scripts/director-project-routing.py",
+    ".skill-tree/common/references/pr-review-cycle.md",
+    ".skill-tree/tests/test-pr-review-cycle.py",
+    ".skill-tree/skill-tree.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "review_evidence": "Observed independent Codex code review of target synchronization, the owned input diagnostic and Director routing.",
+  "verified_behaviors": [
+    "The exact target receives a read-only changed input prerequisite. Provider and synchronization receipts remain complete. A current profile keeps normal routing."
+  ],
+  "required_evidence": {
+    "scoped-regression": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/stale-profile-diagnostic/scoped-regression-result-c-768dfd73-da80-428f-bcca-f0ef44a2844d.json"
+  }
+}

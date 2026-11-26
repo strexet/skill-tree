@@ -34,7 +34,7 @@ Flavor: general. Static compatibility only; execution remains unqualified.
       "lane": "static"
     }
   },
-  "source_version": "0.7.2",
+  "source_version": "0.8.0",
   "worktree_environment": {
     "exclusive_resources": [],
     "isolated_directories": [],

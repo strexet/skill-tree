@@ -1,0 +1,23 @@
+{
+  "source_head": "bc9cf8f260f8a1bd3d00085292521db5e564fc86",
+  "source_diff_sha256": "3034230017266896fc3d4e474d0bb6c6386531c51ca9fe4404828c3dd66d31ec",
+  "independent_reviewer": "/root/director_critic",
+  "reviewed_paths": [
+    ".skill-tree/common/scripts/director-state.py",
+    ".skill-tree/common/scripts/director-project-setup.py",
+    ".skill-tree/lib/installation.js",
+    ".skill-tree/common/references/director-workflow.md",
+    ".skill-tree/tests/test-director-topologies.py",
+    ".skill-tree/skill-tree.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "review_evidence": "Independent review checked the exact installed coordinator Git owner, portable queue identity, receipt verification and pre-effect project gate. Recovery commands retain the workflow and profile identities.",
+  "verified_behaviors": [
+    "The installed Director setup refuses a moved coordinator before creating child or maintenance storage. Exact locator recovery followed by profile rebind preserves queue, checkpoint, branch and installed profile identity. Setup preview works again after recovery."
+  ],
+  "required_evidence": {
+    "scoped-regression": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/moved-director-diagnosis/scoped-regression-result-c-af479c3d-9f72-4887-82ce-7bac0a9a399c.json",
+    "native-director": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/moved-director-diagnosis/native-moved-director-controls.json"
+  }
+}

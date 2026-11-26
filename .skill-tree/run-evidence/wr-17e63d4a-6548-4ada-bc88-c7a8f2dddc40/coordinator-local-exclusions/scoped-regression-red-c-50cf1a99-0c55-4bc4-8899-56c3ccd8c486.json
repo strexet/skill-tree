@@ -1,0 +1,22 @@
+{
+  "check_id": "scoped-regression",
+  "attempt_id": "C-50cf1a99-0c55-4bc4-8899-56c3ccd8c486",
+  "command": [
+    "node",
+    "--test",
+    "--test-name-pattern=dedicated coordinator protects machine-local paths",
+    ".skill-tree/tests/test-director-project-setup.js"
+  ],
+  "exit_code": 1,
+  "result": "red",
+  "counts": {
+    "expected": 1,
+    "discovered": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0
+  },
+  "observed_output": "TAP version 13\n# Subtest: dedicated coordinator protects machine-local paths and preserves portable Git inputs\nnot ok 1 - dedicated coordinator protects machine-local paths and preserves portable Git inputs\n  ---\n  duration_ms: 13746.9815\n  location: '<run-worktree>/.skill-tree/tests/test-director-project-setup.js:378:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Coordinator Git staging exposes a machine-local path: sources/skill-tree/fixture-source.txt\n    \n    true !== false\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: false\n  actual: true\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (<run-worktree>/.skill-tree/tests/test-director-project-setup.js:413:12)\n    Test.runInAsyncScope (node:async_hooks:211:14)\n    Test.run (node:internal/test_runner/test:934:25)\n    Test.start (node:internal/test_runner/test:833:17)\n    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 0\n# fail 1\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 13818.54875",
+  "timeout": false,
+  "elapsed_seconds": 15.371
+}

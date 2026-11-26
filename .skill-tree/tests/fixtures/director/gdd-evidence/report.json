@@ -1,0 +1,95 @@
+{
+  "consumer": {
+    "area": "game",
+    "check": "inspect-design-rule",
+    "check_key": "868293309ca3683ea13dadcdda24fd8bc67ac5878274ec81d79582e960c153f8",
+    "evidence_sha256": "b74ba7c916312c94b14c1fe130369a63516245a914faf65c0abc86464bd8cc6c",
+    "outcome_sha256": "e17a730b9886bdc61de92716364ef8044b6123578e9e326d5ec7101c8cf13721",
+    "source": "game/observed-rule.json"
+  },
+  "controls": {
+    "ambiguous-same-area-inputs": {
+      "expected": "held",
+      "observed": "held"
+    },
+    "consumer-input-mismatch": {
+      "expected": "held",
+      "observed": "held"
+    },
+    "foreign-consumer-receipt": {
+      "expected": "held",
+      "observed": "held"
+    },
+    "stable-replay": {
+      "expected": "same-receipt",
+      "observed": "same-receipt"
+    },
+    "stale-consumer-input": {
+      "expected": "held",
+      "observed": "held"
+    },
+    "stale-producer": {
+      "expected": "held",
+      "observed": "held"
+    },
+    "unaffected-claim": {
+      "expected": "eligible",
+      "observed": "eligible"
+    },
+    "valid-match": {
+      "expected": "eligible",
+      "observed": "eligible"
+    },
+    "wrong-area_id": {
+      "expected": "unsupported",
+      "observed": "unsupported"
+    },
+    "wrong-revision": {
+      "expected": "changed",
+      "observed": "changed"
+    }
+  },
+  "environment": {
+    "git": "git version 2.54.0 (Apple Git-157)",
+    "node": "v22.12.0",
+    "python": "3.11.5",
+    "system": "Darwin"
+  },
+  "omissions": [
+    "Live GDD adoption and private source input remain outside the fixture."
+  ],
+  "prior_acceptance_sha256": "597522cda38cf7165b547fb32ce8585fe8bebeaed30a7776eba284ff4fdd6316",
+  "producer": {
+    "area": "fixture-design",
+    "queue": "Q-b553c2ad-2458-4a82-b152-e690174a8efe",
+    "record": "lantern-release",
+    "revision": "r001",
+    "sha256": "09195c4ce430a8f3ffae915d38d4cb47103def46afd652f8057e0ecd144bc51f"
+  },
+  "schema": 1,
+  "scope": "disposable-source-fixture",
+  "source_digests": {
+    "common/scripts/director-evidence.py": "10aa47af295a75cbd83e596e7181c38868e28e16fa27e77be5bbbad67ea4cd5e",
+    "common/scripts/director-plan-adapters.py": "1f78af0ae2187105d44ccc2487176548268357fa4a5916c496cb093899c4741d",
+    "domains/director/capabilities.json": "8fcc314f88b5b818220d13a54e86550319712f752a0fd4fcaf9ebab4921051fb",
+    "tests/fixtures/director/gdd-evidence/accepted-rule.json": "09195c4ce430a8f3ffae915d38d4cb47103def46afd652f8057e0ecd144bc51f",
+    "tests/test-director-gdd-evidence-fixture.py": "2161ed4bc9aa0a1bde7dd2ae561b10e58e7b81ee30a5ebcbcc58c901dad4b79c"
+  },
+  "source_feasibility": {
+    "artworkshop": {
+      "boundary": "Director currently verifies only the portable fixture artifact.",
+      "minimum_evidence": "An owned, reviewed stage export with accepted artifact revision and matching consumer check.",
+      "observed_source_sha256": "6cef226a82b646e11de36d018b5df18fd291d52b36d306a146719b74fb09ecad",
+      "reason": "A reviewed current installed ArtWorkshop adapter is required.",
+      "status": "unsupported"
+    },
+    "logs": {
+      "boundary": "The recorded source hash supplies feasibility context. No private entries were accessed.",
+      "minimum_evidence": "An authorized scoped journal snapshot with stable entry ownership and repeatable read evidence.",
+      "observed_source_sha256": "4dcae8ec5bc099a2c65f7b3d151e7b6e5d3b86401789611f587f18387e7a8480",
+      "reason": "A reviewed current installed logs adapter is required.",
+      "status": "unsupported"
+    }
+  },
+  "unaffected_acceptance_sha256": "3cde6b31bcd50668c094c0a05f04c83fc5d4c4aa4f9101fb74be0d0945cf3785"
+}

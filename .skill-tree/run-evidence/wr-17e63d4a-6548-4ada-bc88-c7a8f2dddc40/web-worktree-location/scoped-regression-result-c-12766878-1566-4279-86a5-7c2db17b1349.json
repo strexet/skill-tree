@@ -1,0 +1,20 @@
+{
+  "check_id": "scoped-regression",
+  "attempt_id": "C-12766878-1566-4279-86a5-7c2db17b1349",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-run-workspaces.py"
+  ],
+  "exit_code": 1,
+  "result": "fail",
+  "counts": {
+    "expected": 48,
+    "discovered": 48,
+    "passed": 46,
+    "failed": 2,
+    "skipped": 0
+  },
+  "observed_output": "...F.....F......................................\n======================================================================\nFAIL: test_default_web_reservation_recovers_before_locator_write (__main__.RunWorkspaceTests.test_default_web_reservation_recovers_before_locator_write)\n----------------------------------------------------------------------\nskill_tree_run_workspaces.RunError: Recovery requires the original exact reserved worktree path\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"<run-worktree>/.skill-tree/tests/test-run-workspaces.py\", line 252, in test_default_web_reservation_recovers_before_locator_write\n    run, task, path, _, _, canonical_branch = self.installed_web_profile_fixture(interrupt='before-locator',location='default')\n                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<run-worktree>/.skill-tree/tests/test-run-workspaces.py\", line 105, in installed_web_profile_fixture\n    with self.assertRaisesRegex(ws.RunError,'original exact worktree'):\nAssertionError: \"original exact worktree\" does not match \"Recovery requires the original exact reserved worktree path\"\n\n======================================================================\nFAIL: test_explicit_web_reservation_recovers_before_locator_write (__main__.RunWorkspaceTests.test_explicit_web_reservation_recovers_before_locator_write)\n----------------------------------------------------------------------\nskill_tree_run_workspaces.RunError: Recovery requires the original exact reserved worktree path\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"<run-worktree>/.skill-tree/tests/test-run-workspaces.py\", line 260, in test_explicit_web_reservation_recovers_before_locator_write\n    run, task, path, _, _, canonical_branch = self.installed_web_profile_fixture(interrupt='before-locator')\n                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<run-worktree>/.skill-tree/tests/test-run-workspaces.py\", line 105, in installed_web_profile_fixture\n    with self.assertRaisesRegex(ws.RunError,'original exact worktree'):\nAssertionError: \"original exact worktree\" does not match \"Recovery requires the original exact reserved worktree path\"\n\n----------------------------------------------------------------------\nRan 48 tests in 134.636s\n\nFAILED (failures=2)\n",
+  "timeout": false,
+  "elapsed_seconds": 137.936
+}

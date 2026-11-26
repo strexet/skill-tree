@@ -26,6 +26,22 @@ Use `setup-apply` with the reviewed `expected_preview_sha256` and identical area
 
 Use `rebind-preview` with `director_id`, `area_id` and the exact available canonical checkout. Use `rebind` with the reviewed digest after verifying the same queue and repository identity. A moved checkout can require Core locator recovery first. Rebind updates the local queue binding for all registered areas on the same owner and leaves the portable declaration unchanged.
 
+## Opt in to the Claude Code write guard
+
+The guard covers one registered product checkout per session on the qualified Claude Code CLI 2.1.109. Open the Director workspace, verify the normal project route and use the owned Claude Code Setup entry to emit a separate settings file. Pass the exact project ID returned by `project-menu`. The guard leaves existing owner hooks and product bridge settings in place. Generate a new overlay after changing the project registration or the owned Setup location.
+
+```sh
+skill_tree_guard_dir=$(mktemp -d "${TMPDIR:-/tmp}/skill-tree-claude.XXXXXX") &&
+python3 -B .skill-tree/.director/.claude/skills/skill-tree-director-setup/scripts/director-entry.py \
+  claude-guard-settings .skill-tree/.director --project-id my-project > "$skill_tree_guard_dir/response.json" &&
+jq -e .settings "$skill_tree_guard_dir/response.json" > "$skill_tree_guard_dir/settings.json" &&
+claude --settings "$skill_tree_guard_dir/settings.json"
+```
+
+Apply the settings only to the intended session and project. Claude Code invokes the installed entry during `PreToolUse`. Keep custom hooks that rewrite the input of a guarded tool out of the qualified session. Read tools follow normal host permissions. The hook denies native `Write` and `Edit` to the registered canonical checkout. To edit in an isolated checkout, first begin the task through Core. The checkout, branch, queue claim and current task Touch scope have to match. The hook also rejects direct Git mutations through `Bash` against the managed canonical checkout and linked worktrees of the same repository. The hook accepts plain read forms such as `git status --short` and `git branch --show-current`. Git target selection supports a single literal `git -C <directory>`.
+
+Native qualification covers the listed Claude Code tools and direct Git commands on macOS. Shell wrappers, subprocesses, arbitrary Bash scripts, other hosts, MCP tools and hooks that transform the requested path are outside the tested boundary. Use the existing Core routes to create a worktree, add a task, synchronize verified delivery or carry out authorized maintenance. Core checks the scope and authorization of each operation. [Claude Code hooks reference](https://code.claude.com/docs/en/hooks)
+
 ## Inspect current status
 
 Use `status` with a Director root and an optional JSON request containing exact assignments to inspect. Each entry identifies an assignment and registered area. Entries can supply exact task and run IDs, proposed workspace kind, area-relative write paths and stable exclusive resource keys. An absent local binding remains visible as `unbound`. The status report distinguishes unavailable roots, mismatched queue or repository identity, scoped dirt, overlapping writes and conflicting runtime claims. A child run is visible through the exact registered queue and locator.
@@ -79,6 +95,8 @@ For a standalone checkout, run `python3 .skill-tree/common/scripts/context-searc
 
 ## Effects and decisions
 
+For fresh managed implementation, preview the Full Cycle project route with the exact `skill-tree-full-cycle` operation before creating a branch or changing product files. Show the selected project, canonical queue and proposed scope. Use `project-read` for inspection, `intake` for queue-only capture and the requested exact implementation operation for existing prioritized work. Begin source edits in the isolated worktree after Core admits the selected task. Follow separate owner authorization for publication and merge.
+
 Owner design approval accepts a plan revision. Execution selection authorizes specific child effects on that revision. Delivery retains independent authority. Read-only status, plan preview and audit supply no task execution. A current confirmed plan can authorize exact child intake, processing and launch when current profiles, IDs, scope, dependencies and resource claims match. Installation, commit, publication, scheduling and wider rollout require applicable authority. Standalone Process Pending preserves the normal next-action handoff. Child controllers preserve original admission and claims.
 
 Before a child mutation, Director records intent with stable Director, assignment, operation and destination identities, a semantic payload digest and current-state guards. The child effect and receipt share the child transaction. Identical replay recovers original P, T or WR identity. A different payload under the same key conflicts. A lost response requires exact reconciliation, including Git workspace creation when applicable. Incomplete provenance holds the ambiguous effect for review.
@@ -96,6 +114,28 @@ Probe `director-dispatch-read` in the selected canonical child checkout before a
 `run-start` selects the exact objective and frozen plan digest, an explicit assignment set that includes required dependencies, current owner evidence and the authorized effect for each selected assignment. New intake uses the frozen assignment. Processing binds a separately reviewed exact task specification and rejects unplanned write paths and checks. `run-dispatch` uses the exact current run and child queue digests. The original canonical receipt reconciles a repeated request. `run-status` reads the Director run, waiting assignments, dependency and resource conflicts, and eligible next effects. `run-pause` stops new dispatch, `run-resume` rechecks the current plan, and `run-cancel` retains child checkpoints, receipts and edits.
 
 `decide-open` records one question for the exact running child task and worktree after verifying child Core support for the hold. A verified approved default delivers the pinned fact. A material question names the addressed owner, distinct options, recommendation, affected areas, blocked action and UTC deadline. The original child checkpoint remains held while independent assignments can advance. `decide-answer` requires the original question, attempt, queue and run with current owner evidence. An accepted answer restores the original child checkpoint. Explicit child continuation uses the existing controller admission. An absent response keeps the hold. Identical delivery can be observed again without a second child effect.
+
+### Run managed Implement All
+
+Use the managed project route to identify the canonical queue and initial prioritized scope. Freeze an approved Director plan with one exact assignment per unfinished required task. Retain the Core dependency edges. Add deterministic sequencing edges for overlapping writes in dependency order, using the prioritized order for ties.
+
+Pass `implement_all` to `run-start` with the inspected `expected_source_hash` and positive `workers` limit. An explicit `snapshot_ids` list restricts the roots. The launch also records the original checked-out target branch and head.
+
+Call `run-advance-all` with the exact Director run ID and current run digest. Execute each returned child in the recorded worktree and record the current reviewed child outcome before integration. Incorporate reviewed results through the existing local delivery commands. Use the checked current-target candidate path for a moved base. Call `run-advance-all` again after accepting and incorporating child results or resolving a recorded hold. After a lost batch response, read `run-status` for the exact recorded assignment. Use `run-dispatch` with that assignment and the original start request to recover the same child run and worktree. Check the existing worker and child progress before handing the recovered checkout to an actor.
+
+The controller schedules unfinished admitted tasks and preserves concrete task and integration holds. A run completes after every assignment has a checked delivery on the original target. Later unrelated tasks require a new invocation.
+
+### Supervise workers on one host
+
+For an explicitly selected disposable pilot, pass `supervision` to `run-start` with the local `host`, `progress_timeout_seconds` and `heartbeat_timeout_seconds`. Start each exact product assignment using `run-dispatch` with an explicit local base. The child is a reviewed Work Through Next run. Separate owner authority governs delivery of the reviewed child result.
+
+Use `run-supervise` with `action: status` to inspect the durable assignments and attempts. The coordinator can reserve two writing slots and one supervising parent. Reservations bind the recorded child launch, actor, generation, worktree, base, write scope, resources and prerequisites. Independent admitted work can continue while a parent waits for the nested result. Use the current run digest and a unique request ID for each mutation. Retain the original request and request ID when reconciling a lost response.
+
+Record pickup with the live local process group, then record heartbeat, meaningful progress or the reason for waiting. Use `sweep` to evaluate deadlines. A current heartbeat still permits a no-progress stall. Before replacing a bound attempt, record the exact host stop observation and verify that the bound process group has exited. For a pickup timeout before binding, the host adapter first fences the dispatch so the old actor cannot start, then supplies a `host-stopped-unbound` observation with the exact host, actor, evidence reference, and observed `process_groups`. An empty list requires positive host evidence that the actor started no process groups. The runtime checks that every reported group has exited. Keep the reservation if the host adapter cannot establish either condition. After recovery the worker can be reassigned with the next generation. The ledger retains each prior attempt and related evidence.
+
+Heartbeat, progress and submission requests can wait briefly for the local Director writer. Consecutive accepted worker updates retain a bounded set of prior run digests for concurrent requests. Director rechecks the current actor, generation, deadlines and required process, resource and result evidence before accepting a request against a retained digest. Other run mutations clear the retained digests. A repeated request returns the original receipt. Writer contention and replay add no heartbeat or progress evidence.
+
+For an actual exclusive tool call, acquire the normal Core resource token. Submit after the owned group exits. `submit` verifies the linked worktree, exact Git commit, allowed paths and check artifact. The project coordinator incorporates the scoped result and runs the required Core checks and review. Record Director assignment completion against the exact child outcome. For checked delivery, retain proof of the target ref and passing target checks.
 
 ## Review cross-area handoffs
 

@@ -1,5 +1,9 @@
 # Director Workflow
 
+Project setup verifies the coordinator Git owner, Core locator and owned installation before preparing maintenance sources or changing a child. A moved coordinator reports the verified queue and the applicable recovery command. After a move, recover the matching locator before rebinding the installed profile. Pass the reported recovery input with `--input` and supply exact paths for any listed retained worktrees. Recovery preserves existing workflow receipts and installation evidence. Retry the original setup after both checks pass.
+
+Coordinator setup protects machine-local maintenance checkouts in `sources/skill-tree/` and `sources/projects/`, plus `.skill-tree/artifacts/director/local-bindings.json`, through the coordinator Git local exclude file. The portable Director registry remains visible to Git. Tracked conflicts and higher-precedence ignore rules report the affected storage boundary.
+
 Director coordinates exact assignments across registered Skill Tree areas from Codex. Each child keeps ownership of the canonical queue, child work, acceptance and delivery.
 
 Run the installed `scripts/director-entry.py` with an operation, exact Director project root and `--input <request.json>`. Setup prepares the approved coordinator and projects, registers exact canonical areas and readies explicit rebinds. Intake owns versioned objectives. Plan owns reviewed immutable scope. Run and decide require current separate authority. Status projects read-only state. Review verifies independent producer and consumer evidence with review-preview. Use review-apply for the exact accepted review, review-read for a retained record, impact-preview for two exact revisions and amend-apply for the reviewed scope change.
@@ -10,13 +14,31 @@ Use the shared root profile for areas in the same repository. External areas ret
 
 Read the [capability pins](director-capabilities.json). Accepted Narrative snapshots and representative fixture adapters retain separate identities. Unintegrated ArtWorkshop and logs adapters remain visible prerequisites. A source or fixture observation does not admit an unverified adapter.
 
+## Run managed Implement All
+
+Use the managed project route to identify the canonical queue and initial prioritized scope. Freeze an approved Director plan with one exact assignment per unfinished required task. Retain the Core dependency edges. Add deterministic sequencing edges for overlapping writes in dependency order, using the prioritized order for ties.
+
+Pass `implement_all` to `run-start` with the inspected `expected_source_hash` and positive `workers` limit. An explicit `snapshot_ids` list restricts the roots. The launch also records the original checked-out target branch and head.
+
+Call `run-advance-all` with the exact Director run ID and current run digest. Execute each returned child in the recorded worktree and record the current reviewed child outcome before integration. Incorporate reviewed results through the existing local delivery commands. Use the checked current-target candidate path for a moved base. Call `run-advance-all` again after accepting and incorporating child results or resolving a recorded hold. After a lost batch response, read `run-status` for the exact recorded assignment. Use `run-dispatch` with that assignment and the original start request to recover the same child run and worktree. Check the existing worker and child progress before handing the recovered checkout to an actor.
+
+The controller schedules unfinished admitted tasks and preserves concrete task and integration holds. A run completes after every assignment has a checked delivery on the original target. Later unrelated tasks require a new invocation.
+
 ## Shared workspace entry
 
 Run the local `skill-tree-director` launcher. The menu offers project registration before setup and objective intake, status, audit and setup once projects are registered. The service directory is excluded from ordinary product Git staging through a local Git rule. Existing product rules retain priority.
 
 Run `project-route` through the installed Director Setup entry before a project operation. Set `operation` to a registered skill identifier or a workspace action. Common actions include `discovery`, `project-read`, `status`, `workspace-status`, `audit`, `diagnose`, `setup`, `intake`, `process`, `implement-next` and `implement-all`. Discovery shows the installed operation catalog and the registered projects. Use the returned Director entry, command and input, or the exact child skill. A child-skill preview exposes requirements for scoped delegation and grants no new effect.
 
-Pass an exact `project_id` when selection is ambiguous. Optional `task_ids` limits the inspected queue selection to exact IDs. Show the returned project, queue, dependencies and limitations before effects. Director dispatch binds one exact task to each authorized frozen assignment. An explicitly chosen direct route uses `route: "direct"` for the preview and `--direct-project` for direct Core queue effects. Pipe the JSON request into the entry with `--input /dev/stdin` to preview without changing project files.
+Pass an exact `project_id` when selection is ambiguous. Optional `task_ids` limits the inspected queue selection to exact IDs. Show the returned project, queue, dependencies and limitations before effects. Director implementation dispatch binds one exact task to each authorized frozen assignment. An explicitly chosen direct route uses `route: "direct"` for the preview and `--direct-project` for direct Core queue effects. Pipe the JSON request into the entry with `--input /dev/stdin` to preview without changing project files.
+
+### Bounded batch intake and processing
+
+A Director queue assignment can freeze `child.intake_batch_id` and ordered `child.items` with distinct `key` values. Each item carries a title, description and acceptance list. Optional Core metadata includes numeric priority, topic, source, context, priority rationale and Pending prerequisites. Use exact P-IDs or `@key` references for Pending prerequisites. Freeze intake and process authority for the assignment through `run-start`.
+
+For batch processing, compute `process_spec_sha256` from the complete Core processing proposal with the frozen intake item keys in `selectors`, disposition keys and `parent_pending_ids`. Omit `expected_source_hash` from the approved proposal. Keep new Ready task keys and `depends_on` values verbatim. Send the actual P-IDs from the canonical intake receipt to `run-dispatch`, in original batch order, with the inspected queue digest. Core validates the resulting dependency graph and derives exact T-ID edges from Pending provenance. The same dispatch can be repeated after acknowledgement loss with the original request.
+
+The Director records canonical intake and processing receipts as completion of the authorized queue effects. The processed Ready tasks require separate implementation authority. Existing child check requirements and any Core clarification holds remain visible on the resulting tasks.
 
 Director status reports the first 50 tasks, total task count, and whole-project runs for each canonical queue, including direct project runs and standalone outcomes. Supply `project_work` with `area_id` and optional `run_id` for a focused view. A verified Director start links to the audit selector. Use `adopt-preview` with an exact frozen assignment and outcome to inspect an eligible completed direct run.
 

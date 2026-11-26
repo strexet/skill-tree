@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "scope": "paper-race",
+  "records": [
+    {"pin": "paper-race/grip-rule@1", "kind": "rule", "evidence": "rules/grip.md#original"},
+    {"pin": "paper-race/grip-rule@2", "kind": "rule", "evidence": "rules/grip.md#revision-two"},
+    {"pin": "paper-race/forest-corner@1", "kind": "placement", "evidence": "atlas.md#forest-corner"},
+    {"pin": "paper-race/dock-corner@1", "kind": "placement", "evidence": "atlas.md#dock-corner"},
+    {"pin": "paper-race/legacy-corner@1", "kind": "placement", "evidence": "atlas.md#old-controller"},
+    {"pin": "paper-race/foreign-reference@1", "kind": "placement", "evidence": "atlas.md#foreign-reference"},
+    {"pin": "paper-race/missing-reference@1", "kind": "placement", "evidence": "atlas.md#missing-reference"},
+    {"pin": "paper-race/incorrect-relation@1", "kind": "placement", "evidence": "atlas.md#incorrect-relation"},
+    {"pin": "paper-race/unused-similarity@1", "kind": "placement", "evidence": "atlas.md#unused-similarity"},
+    {"pin": "paper-race/cycle-left@1", "kind": "placement", "evidence": "atlas.md#cycle-left"},
+    {"pin": "paper-race/cycle-right@1", "kind": "placement", "evidence": "atlas.md#cycle-right"},
+    {"pin": "paper-race/corner-grip-check@1", "kind": "check", "evidence": "checks/grip.md#corner-grip"},
+    {"pin": "paper-race/legacy-grip-check@1", "kind": "check", "evidence": "checks/grip.md#historical"}
+  ],
+  "edges": [
+    {"from": "paper-race/forest-corner@1", "type": "uses-rule", "to": "paper-race/grip-rule@2"},
+    {"from": "paper-race/dock-corner@1", "type": "extends-placement", "to": "paper-race/forest-corner@1"},
+    {"from": "paper-race/dock-corner@1", "type": "uses-rule", "to": "paper-race/grip-rule@2"},
+    {"from": "paper-race/corner-grip-check@1", "type": "validates-placement", "to": "paper-race/forest-corner@1"},
+    {"from": "paper-race/corner-grip-check@1", "type": "validates-placement", "to": "paper-race/dock-corner@1"},
+    {"from": "paper-race/legacy-corner@1", "type": "uses-rule", "to": "paper-race/grip-rule@1"},
+    {"from": "paper-race/legacy-grip-check@1", "type": "validates-placement", "to": "paper-race/legacy-corner@1"},
+    {"from": "paper-race/foreign-reference@1", "type": "uses-rule", "to": "foreign-race/grip-rule@2"},
+    {"from": "paper-race/missing-reference@1", "type": "uses-rule", "to": "paper-race/grip-rule@3"},
+    {"from": "paper-race/incorrect-relation@1", "type": "validates-placement", "to": "paper-race/grip-rule@2"},
+    {"from": "paper-race/unused-similarity@1", "type": "similar-to", "to": "paper-race/grip-rule@2"},
+    {"from": "paper-race/cycle-left@1", "type": "extends-placement", "to": "paper-race/cycle-right@1"},
+    {"from": "paper-race/cycle-right@1", "type": "extends-placement", "to": "paper-race/cycle-left@1"}
+  ]
+}

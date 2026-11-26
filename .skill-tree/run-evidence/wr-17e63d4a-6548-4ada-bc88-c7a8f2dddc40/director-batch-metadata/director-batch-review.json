@@ -1,0 +1,24 @@
+{
+  "source_head": "b3bc5c8e35e16284b1cfd7d7cd9c11a10462ab23",
+  "source_diff_sha256": "217aabab06e1363a9ef16340a9c11ddf112820f0609c7a2a576ccba197ce6f68",
+  "independent_reviewer": "/root/director_critic",
+  "reviewed_paths": [
+    ".skill-tree/common/scripts/director-run.py",
+    ".skill-tree/common/scripts/director-plans.py",
+    ".skill-tree/common/scripts/director-dispatch.py",
+    ".skill-tree/common/scripts/director-project-routing.py",
+    ".skill-tree/common/scripts/workflow-state.py",
+    ".skill-tree/common/references/director-workflow.md",
+    ".skill-tree/tests/test-director-topologies.py",
+    ".skill-tree/skill-tree.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "review_evidence": "Independent re-review verified the scoped batch authorization, canonical writer proofs, lifecycle concurrency, and precise child provenance after the review fixes.",
+  "verified_behaviors": [
+    "Exact plan batch identities, priorities and topics survive canonical processing. Explicit and derived DAG edges are distinct. A missing original intake acknowledgement blocks new processing. Lost acknowledgement replay retains the canonical batch and respects an interleaved owner pause."
+  ],
+  "required_evidence": {
+    "scoped-regression": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/director-batch-metadata/scoped-regression-result-c-1737d43d-8582-4db7-9b77-d5e6374da905.json"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "check_id": "core-full-snapshot",
+  "attempt_id": "C-249dafae-f254-4823-ba2d-f5db9afc83c4",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-workflow-state.py"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "counts": {
+    "expected": 73,
+    "discovered": 73,
+    "passed": 73,
+    "failed": 0,
+    "skipped": 0
+  },
+  "observed_output": ".........................................................................\n----------------------------------------------------------------------\nRan 73 tests in 81.832s\n\nOK\n",
+  "timeout": false,
+  "elapsed_seconds": 84.639
+}

@@ -1,0 +1,21 @@
+{
+  "check_id": "scoped-regression",
+  "attempt_id": "C-0ac7994c-6772-4506-9f01-0a2c9bfd3332",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-run-workspaces.py",
+    "RunWorkspaceTests.test_web_default_worktree_and_runtime_use_a_sibling_checkout"
+  ],
+  "exit_code": 1,
+  "result": "red",
+  "counts": {
+    "expected": 1,
+    "discovered": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0
+  },
+  "observed_output": "F\n======================================================================\nFAIL: test_web_default_worktree_and_runtime_use_a_sibling_checkout (__main__.RunWorkspaceTests.test_web_default_worktree_and_runtime_use_a_sibling_checkout)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<run-worktree>/.skill-tree/tests/test-run-workspaces.py\", line 207, in test_web_default_worktree_and_runtime_use_a_sibling_checkout\n    self.assertFalse(path.is_relative_to(common), 'The default Web worktree must be outside Git administrative storage')\nAssertionError: True is not false : The default Web worktree must be outside Git administrative storage\n\n----------------------------------------------------------------------\nRan 1 test in 2.906s\n\nFAILED (failures=1)",
+  "timeout": false,
+  "elapsed_seconds": 5.571
+}

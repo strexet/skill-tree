@@ -1,0 +1,34 @@
+{
+  "source_head": "bceabbce7218db403c470e71ad16f73ed7dc435f",
+  "source_diff_sha256": "ab8096b8ae18cc3001d2aac9026f384fc2a668f92ceb31eab6f40d7b4ffeb24a",
+  "independent_reviewer": "/root/director_resolver",
+  "reviewed_paths": [
+    ".skill-tree/common/references/director-workflow.md",
+    ".skill-tree/documents/director-workflow.md",
+    ".skill-tree/common/scripts/director-run.py",
+    ".skill-tree/common/scripts/director-state.py",
+    ".skill-tree/common/scripts/director-plan-adapters.py",
+    ".skill-tree/common/scripts/director-project-routing.py",
+    ".skill-tree/common/scripts/workflow-state.py",
+    ".skill-tree/common/scripts/parallel-preview.py",
+    ".skill-tree/config/resource-map.json",
+    ".skill-tree/templates/operations.json",
+    ".skill-tree/tests/test-director-topologies.py",
+    ".skill-tree/tests/test-parallel-preview.py",
+    ".skill-tree/skill-tree.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "review_evidence": "Observed Codex collaboration reviews of the exact managed route, snapshot, resources and delivery guard. Early findings were fixed and independently checked on the revised source.",
+  "verified_behaviors": [
+    "The installed managed route names the Director run and advance operations, with separate standalone and preview paths.",
+    "The candidate checks the original queue and target snapshot before admitting each exact child.",
+    "Late resource denial remains task-local and the same advance selects a replacement within the worker limit.",
+    "The current target accepts only the first-parent chain of exact checked child integrations from the enrolled run."
+  ],
+  "required_evidence": {
+    "director-batch-continuation": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/director-implement-all/director-batch-continuation-result-c-99e9de90-0f29-4290-95ff-0bcb35a70cf0.json",
+    "director-preview-scope": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/director-implement-all/director-preview-scope-result-c-78848870-a07a-485d-bfa7-07caa9b1ea67.json",
+    "observed-managed-all": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/director-implement-all/observed-managed-all-c-48df6af7-c8c5-4095-9d58-193a40a587ed.json"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "check_id": "scoped-regression",
+  "attempt_id": "C-f74ff369-cc94-4eec-a053-3615493379b4",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-run-workspaces.py"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "counts": {
+    "expected": 50,
+    "discovered": 50,
+    "passed": 50,
+    "failed": 0,
+    "skipped": 0
+  },
+  "observed_output": "..................................................\n----------------------------------------------------------------------\nRan 50 tests in 145.605s\n\nOK\n",
+  "timeout": false,
+  "elapsed_seconds": 148.85
+}

@@ -1,0 +1,22 @@
+{
+  "checks_sha256": "3b99c73ab3eb57f3ac6e4b871fc540f2457bc699fe2c6874238ce25185538731",
+  "sources": {
+    ".skill-tree/skill-tree.json": "76d43a7a54fcb999d2864cd102df854858433668be7d50eea1e7c91e5a13020a",
+    ".skill-tree/skills/director/skill-tree-implement-all/SKILL.md": "a56cda5e195b7008a70f1c36975c21589144da8e21f525170e8045a0020eb0b9",
+    ".skill-tree/skills/director/skill-tree-implement-all/references/parallel-preview.md": "dfcff75024ccf4dffe4bf2b070881bd4c70036ce80a10d1207076f9940202ed4",
+    ".skill-tree/skills/director/skill-tree-implement-all/references/plugin-bindings.json": "0b99e19d8f06797b92d45eebd0f8597f513154097d6efdf09c953495d80e1b19",
+    ".skill-tree/skills/general/skill-tree-implement-all/SKILL.md": "e7757390d45281f8775e9c38c10d64e9025e3aa46ea37a5bc7f16319e22f2f8c",
+    ".skill-tree/skills/general/skill-tree-implement-all/references/parallel-preview.md": "dfcff75024ccf4dffe4bf2b070881bd4c70036ce80a10d1207076f9940202ed4",
+    ".skill-tree/skills/general/skill-tree-implement-all/references/plugin-bindings.json": "f6bb524daac46e4660bc3cd959d8217b931a2d37f9aa009c795ff7bd0c3930ed",
+    ".skill-tree/skills/unity/skill-tree-implement-all/SKILL.md": "2d48d33d2fb3f93801ec20620e6e5894b4d9ad3c3da101f916f672fdc9918f17",
+    ".skill-tree/skills/unity/skill-tree-implement-all/references/parallel-preview.md": "dfcff75024ccf4dffe4bf2b070881bd4c70036ce80a10d1207076f9940202ed4",
+    ".skill-tree/skills/unity/skill-tree-implement-all/references/plugin-bindings.json": "e3d40195ae20b5809e599ee12aa86af8d110a621b21a48282e5313fdec310ba9",
+    ".skill-tree/skills/web/skill-tree-implement-all/SKILL.md": "291141c0afc7b0571e8d0323946f040ad954bc5246f8b638f2c471467d5f9da4",
+    ".skill-tree/skills/web/skill-tree-implement-all/references/parallel-preview.md": "dfcff75024ccf4dffe4bf2b070881bd4c70036ce80a10d1207076f9940202ed4",
+    ".skill-tree/skills/web/skill-tree-implement-all/references/plugin-bindings.json": "229e88f8eff2eeb26292336c0ce43787c2440e922f33843a6e6c291ad233d866"
+  },
+  "task_id": "T-b3fee109-a209-424e-b056-c090a4f381d9",
+  "reviewer": "/root/entry_resolver",
+  "base": "bceabbce7218db403c470e71ad16f73ed7dc435f",
+  "observation": "All generated Implement All packages keep full execution and explicit preview. Managed and standalone routes retain exact scope. Owned digests and canonical navigation match active files. No findings."
+}

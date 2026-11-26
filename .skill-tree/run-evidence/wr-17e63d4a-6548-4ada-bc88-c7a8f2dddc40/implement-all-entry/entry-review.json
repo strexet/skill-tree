@@ -1,0 +1,27 @@
+{
+  "source_head": "c8ed3b64340c8b7e5b154a924670a24aa61b503d",
+  "source_diff_sha256": "e2b5f4e0e7d4c1d32a42f159849c08309ff776bd1070d01001f783b013625b51",
+  "reviewer": "/root/entry_resolver",
+  "observed_result_reference": "Codex collaboration: independent entry-point review after collaboration.followup_task",
+  "reviewed_paths": [
+    ".skill-tree/templates/operations.json",
+    ".skill-tree/skill-tree.json",
+    ".skill-tree/common/references/parallel-preview.md",
+    ".skill-tree/tests/test-parallel-preview.py",
+    ".skill-tree/skills/director/skill-tree-implement-all/SKILL.md",
+    ".skill-tree/skills/director/skill-tree-implement-all/references/parallel-preview.md",
+    ".skill-tree/skills/director/skill-tree-implement-all/references/plugin-bindings.json",
+    ".skill-tree/skills/general/skill-tree-implement-all/SKILL.md",
+    ".skill-tree/skills/general/skill-tree-implement-all/references/parallel-preview.md",
+    ".skill-tree/skills/general/skill-tree-implement-all/references/plugin-bindings.json",
+    ".skill-tree/skills/unity/skill-tree-implement-all/SKILL.md",
+    ".skill-tree/skills/unity/skill-tree-implement-all/references/parallel-preview.md",
+    ".skill-tree/skills/unity/skill-tree-implement-all/references/plugin-bindings.json",
+    ".skill-tree/skills/web/skill-tree-implement-all/SKILL.md",
+    ".skill-tree/skills/web/skill-tree-implement-all/references/parallel-preview.md",
+    ".skill-tree/skills/web/skill-tree-implement-all/references/plugin-bindings.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "rationale": "Ordinary invocation has an explicit full-queue execution route. Group selection, explicit resume and the managed route remain available. The installed fixture verifies current operation text and read-only helper behavior."
+}

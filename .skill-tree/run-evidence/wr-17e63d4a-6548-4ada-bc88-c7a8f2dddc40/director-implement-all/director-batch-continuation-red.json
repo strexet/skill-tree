@@ -1,0 +1,21 @@
+{
+  "check_id": "director-batch-continuation",
+  "attempt_id": "C-58287f35-9e3d-44a2-b631-4455f6ec8efc",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-director-topologies.py",
+    "DirectorTopologyTests.test_managed_implement_all_keeps_full_snapshot_and_dispatches_compatible_work"
+  ],
+  "exit_code": 1,
+  "result": "red",
+  "counts": {
+    "expected": 1,
+    "discovered": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0
+  },
+  "observed_output": "F\n======================================================================\nFAIL: test_managed_implement_all_keeps_full_snapshot_and_dispatches_compatible_work (__main__.DirectorTopologyTests.test_managed_implement_all_keeps_full_snapshot_and_dispatches_compatible_work)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<run-worktree>/.skill-tree/tests/test-director-topologies.py\", line 431, in test_managed_implement_all_keeps_full_snapshot_and_dispatches_compatible_work\n    run = self.director('run-start', launch_inputs)\n  File \"<run-worktree>/.skill-tree/tests/test-director-topologies.py\", line 133, in director\n    return self.invoke(entry, self.parent, operation, payload, [], error)\n           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<run-worktree>/.skill-tree/tests/test-director-topologies.py\", line 122, in invoke\n    output = self.command(sys.executable, '-B', script, operation, root, *args, error=error)\n  File \"<run-worktree>/.skill-tree/tests/test-director-topologies.py\", line 84, in command\n    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 2 != 0 : {\n  \"error\": \"Unexpected Director input fields\",\n  \"ok\": false\n}\n\n\n----------------------------------------------------------------------\nRan 1 test in 16.450s\n\nFAILED (failures=1)",
+  "timeout": false,
+  "elapsed_seconds": 19.557
+}

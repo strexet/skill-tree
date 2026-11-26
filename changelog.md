@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.8.0 (2026-11-26)
+
+### Added
+
+- Director runs Implement All through the full initial Ready snapshot. Compatible dispatches run in waves, with priority and prerequisite ordering preserved across waves.
+- Director batch intake and scoped processing retain Pending dependencies, priorities and topics. Core resolves prerequisite edges through task promotion and completion.
+- Validation impact previews show affected completed contracts, check inputs and runtime resources before dispatch. Compatible static and unit checks can be grouped at a verified boundary.
+- An existing open PR can resume review from a verified linked checkout while retaining the publication identity and review requirements.
+
+### Changed
+
+- Compatible Director workers can run under one supervision plan. The controller retains child progress across concurrent heartbeats and reconciles current results before integration.
+- Bare Implement All starts execution. The compatible Ready preview remains available as an explicit read-only operation.
+- New Web runs use sibling checkouts outside Git administrative storage. A reserved checkout can prepare the existing owned profile while a separate run executes.
+- Game design fixture coverage includes Mechanics catalog exchange and dependency lookup, Balance sweeps and cohort analysis, and a Director handoff for accepted design rules.
+
+### Fixed
+
+- Worktree recovery preserves native ownership across verified moves and can reconcile separately confirmed external removal.
+- Local integration preserves checked-out Git state and reports exact policy and installation prerequisites. Confirmed PR synchronization can restore a compatible owned profile under the recorded grant.
+- Web source checks traverse a removed pnpm workspace package even when stale generated membership remains. Installed CommonJS helpers keep the correct module scope in ESM projects.
+- Director detects moved coordinator roots before child setup and excludes owned machine-local storage from staging. The optional Claude Code guard protects the canonical checkout from writes covered by a managed run.
+
 ## 0.7.2 (2026-11-24)
 
 ### Changed

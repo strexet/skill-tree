@@ -1,0 +1,33 @@
+{
+  "source_head": "3e68eb01f03486deaeb29501de21f55ce80273c6",
+  "source_diff_sha256": "cf7baff1545da869d50609329082fddaebf57896bb7215d100a4f52b87112bd7",
+  "independent_reviewer": "/root/director_critic",
+  "reviewed_paths": [
+    ".skill-tree/common/scripts/workflow-state.py",
+    ".skill-tree/common/scripts/run-workspaces.py",
+    ".skill-tree/common/references/run-workspaces.md",
+    ".skill-tree/tests/test-local-delivery.py",
+    ".skill-tree/tests/test-run-workspaces.py",
+    ".skill-tree/skill-tree.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "review_evidence": "Independent re-review verified exact native relocation, reservation origin, generic locator recovery, staged absence and reconstructed cleanup scope. The narrow final diagnostic review verified retained exact-path refusals. Companion fixtures restore the original reserved checkout and verify accepted dependency evidence.",
+  "verified_behaviors": [
+    "Ordinary Git relocation keeps the original admin identity and controller marker. Interrupted activation and generic locator recovery preserve the original path proof. Confirmed delivery is rechecked before acknowledgement of external removal or a lost native removal response."
+  ],
+  "required_evidence": {
+    "scoped-regression": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/worktree-relocation-cleanup/scoped-regression-result-c-d7d52e22-7685-4302-9184-c824510c7a7d.json"
+  },
+  "supplemental_validation": {
+    "director_dispatch_receipts": {
+      "passed": 12,
+      "total": 12
+    },
+    "run_workspaces": {
+      "passed": 50,
+      "total": 50,
+      "scope": "Disposable source mirror with the exact reviewed fixture updates."
+    }
+  }
+}

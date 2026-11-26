@@ -1,0 +1,35 @@
+{
+  "node_suite": {
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "attempt": "C-56daeaba-b547-425c-b362-8b3478190429",
+    "wall_seconds": 307.009
+  },
+  "guided_linked_registration": {
+    "passed": 1,
+    "failed": 0,
+    "wall_seconds": 146.776,
+    "test": "test_prepared_registration_and_intake_verify_the_original_canonical_route"
+  },
+  "prior_parent_storage_controls": {
+    "passed": 2,
+    "failed": 0,
+    "wall_seconds": 16.8903
+  },
+  "qualification": "Installed Director, ordinary Git staging, and prepared linked checkout in disposable local repositories.",
+  "outcomes": [
+    "Fresh coordinator exposes the portable registry and an unrelated sibling while excluding exactly the machine-local source paths and bindings.",
+    "A tracked entry and a staged removal in HEAD both block setup. Custom lower-precedence rollback preserves owner bytes and mode.",
+    "Direct registration with a negated exclusion or missing dedicated descriptor leaves registry and bindings absent. Restored setup can register.",
+    "Guided linked apply verifies the selected worktree and preserves a retained bindings transaction before replay when the selected worktree negates an exclusion.",
+    "Native APFS accepted same-file case aliases. Literal lower-case Git pathspec did not expose the indexed uppercase name, so case-aware configured comparisons inspect the full tracked summaries."
+  ],
+  "source_sha256": {
+    ".skill-tree/common/scripts/director-bootstrap.py": "ae0fcebd3123b60e394ed07564df5b8dc559b2de5cd00973e23949f06d1491c2",
+    ".skill-tree/common/scripts/director-project-setup.py": "a59c650560f6b7fee19b47292c26ab5fd4de2e16ba66c627e9a6e55162c92259",
+    ".skill-tree/common/scripts/director-state.py": "99c87a73eaf15a9f0a1a31bf0b9a32d49aa7149e18d9a066e4aeba45a2add766",
+    ".skill-tree/tests/test-director-project-setup.js": "fe4cc86a61dca889eb2226e9bc067c2d03c42486c1ac7e4d5e8664c2eeb16424",
+    ".skill-tree/tests/test-director-topologies.py": "3279a8c78e017f913b7ba9cf1adbec7501b168d483d24ff6b73867f9a64a63cd"
+  }
+}

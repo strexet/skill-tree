@@ -40,6 +40,8 @@ A defect report without an explicit owner priority receives the maximum current 
 
 ## Atomic grouped intake
 
+Use `pending_depends_on` for an understood prerequisite that still has a Pending identity. Pass exact current P-IDs, or give batch items distinct lowercase `key` values and reference any item as `@key`. The intake writer resolves batch references before insertion, validates the entire prospective graph, and retains the exact resolved P-IDs in the original receipt.
+
 The existing single-item payload retains the single-item response. Add Pending assigns one caller-held `intake_batch_id` in canonical `IB-<uuid>` form per owner invocation, including an invocation for a single item without a topic. Include the inspected queue source hash. An item can specify a `topic`. A multi-item request supplies `items`, the batch identity and the source guard in one envelope. Adjacent independent requests use separate identities. Existing unkeyed programmatic single-item requests retain the legacy shape.
 
 The canonical writer validates prospective items in request order. The queue, index and compact receipt commit together. The receipt records UTC creation, exact ordered Pending identities and the request SHA-256. The same batch identity and semantic payload returns the original result, including after promotion. A changed request conflicts. Replay can reconcile stale derived navigation without rewriting the controller.

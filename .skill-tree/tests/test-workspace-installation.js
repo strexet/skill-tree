@@ -38,9 +38,10 @@ test('installed controller starts and resumes the same worktree with a canonical
  const receipt=command('process',root,{selectors:[pending.id],dispositions:{[pending.id]:{status:'promoted',reason:'The controlled fixture supplies the isolated repository.'}},tasks:[{title:'Installed lifecycle fixture',body,parent_pending_ids:[pending.id]}]});
  command('workspace-setup',root,{});const working=path.join(base,'working');const started=command('start',root,{worktree:working},['--id',receipt.created_ids[0]]);
  assert.equal(command('index',working).active_run.id,started.id);assert.equal(command('read',working,null,['--id',receipt.created_ids[0]]).id,receipt.created_ids[0]);
- command('checkpoint',working,{phase:'refresh-profile',next_action:'Install the exact worktree flavor.'});
- run(process.execPath,[cli,'--target',working,'--only','codex','--flavor','general','--skills','skill-tree-work-through-next']);
- command('admit',working);command('checkpoint',working,{phase:'implement'});assert.equal(command('begin',working,{task_id:receipt.created_ids[0]}).phase,'implement');
+ const [program,...args]=started.profile_handoff.argv;
+ const admitted=JSON.parse(run(program,args));
+ assert.equal(admitted.status,'admitted');assert.equal(admitted.run_id,started.id);
+ assert.equal(command('begin',working,{task_id:receipt.created_ids[0]}).phase,'implement');
  const raw=JSON.parse(fs.readFileSync(path.join(root,'.skill-tree/documents/future.json')));assert.equal(raw.active_run,null);assert.equal(raw.run_registry.claims[receipt.created_ids[0]],started.id);assert.equal(raw.run_registry.runs[started.id].workspace.branch,started.workspace.branch);
  write(working,'report.json',{queue:raw.run_registry.queue_id});const attempt=command('prepare-check',working,{task_id:receipt.created_ids[0],check_id:'behavior'});
  command('record-check',working,{task_id:receipt.created_ids[0],check_id:'behavior',attempt_id:attempt.attempt_id,result:'pass',classification:'executed-control',actual_lane:'static',environment_identity:attempt.environment_identity,assertions:[{assertion:goal,result:'pass'}],cleanup:'The fixture starts no product process.',evidence:['report.json']});

@@ -18,15 +18,25 @@ class CompletedDependencyAdmissionTests(unittest.TestCase):
     location = fixtures.RunWorkspaceTests.location
     finish_run = fixtures.RunWorkspaceTests.finish_run
 
-    def dependency(self):
+    def dependency(self, completion_output=False):
         child = self.task('Completed prerequisite')
         first = self.start(child)
-        (self.location(first)/'source.py').write_text('value = 2\n')
-        self.finish_run(first)
+        first_path = self.location(first)
+        (first_path/'source.py').write_text('value = 2\n')
+        output = 'Recorded output not covered by the check.\n'
+        if completion_output:
+            first_store = wf.Store(first_path,first['id'])
+            (first_path/'output.txt').write_text(output)
+            self.complete_unit(first_store, child, ['source.py','output.txt'])
+            wf.finish(first_store)
+        else:
+            self.finish_run(first)
         parent = self.task('Current consumer', [child])
         second = self.start(parent)
         store = wf.Store(self.location(second))
         (store.source_root/'source.py').write_text('value = 3\n')
+        if completion_output:
+            (store.source_root/'output.txt').write_text(output)
         return child, parent, store
 
     def revalidate(self, store, child, accept=True):
@@ -104,25 +114,14 @@ class CompletedDependencyAdmissionTests(unittest.TestCase):
         self.assertEqual(handoff['pending_ids'], [pending['id']])
 
     def test_incomplete_source_coverage_never_establishes_integration(self):
-        child, parent, store = self.dependency()
+        child, parent, store = self.dependency(completion_output=True)
         self.revalidate(store, child)
-        self.add_completion_output(store, child)
         with self.assertRaisesRegex(wf.WorkflowError, 'does not cover'):
             wf.begin_task(store, {'task_id':parent})
 
-    def add_completion_output(self, store, child):
-        extra = store.source_root/'output.txt'
-        extra.write_text('Recorded output not covered by the check.\n')
-        # Model an original completion with an additional output fingerprint.
-        outcomes = store.outcomes()
-        record = next(o for o in outcomes if o['task_id']==child)
-        record['source_fingerprints'].update(wf.fingerprints(store, ['output.txt']))
-        (store.base/'history/task-outcomes.jsonl').write_text(''.join(json.dumps(o)+'\n' for o in outcomes))
-        return extra
-
     def test_source_review_supplements_accepted_checks_and_expires_on_drift(self):
-        child, parent, store = self.dependency()
-        extra = self.add_completion_output(store, child)
+        child, parent, store = self.dependency(completion_output=True)
+        extra = store.source_root/'output.txt'
         extra.write_text('Current reviewed output.\n')
         self.revalidate(store, child)
         cycle_before = wf.record_cycle(store)['cycle_signature']
@@ -189,8 +188,8 @@ class CompletedDependencyAdmissionTests(unittest.TestCase):
                 'evidence':{'path':report.name,'sha256':wf.file_hash(report)}}}
 
     def test_review_artifact_cannot_attest_to_a_different_source_revision(self):
-        child, parent, store = self.dependency()
-        output = self.add_completion_output(store, child)
+        child, parent, store = self.dependency(completion_output=True)
+        output = store.source_root/'output.txt'
         output.write_text('Reviewed revision.\n')
         self.revalidate(store, child)
         payload = self.source_review_payload(store, child)

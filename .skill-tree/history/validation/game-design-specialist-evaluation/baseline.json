@@ -1,0 +1,46 @@
+{
+  "actor": "/root/balance",
+  "source_scope": "Ten frozen synthetic prompts and selected portable packages in specialist-project",
+  "outputs": [
+    {
+      "id": "level-blockout",
+      "artifact_text": "From the west start, frame the locked east gate and north junction. Place the lantern in the north alcove and the pedestal beside the gate. Give the north route and pedestal approach 1.4 m of clear width through turns and doorways. Retain the south loop as an optional path with a 1.0 m pinch and no pedestal.\n\nNormal route: west start → north alcove → pick up lantern → return through the 1.4 m path → use pedestal → pass gate. Preserve the current lantern rule. The south pinch fails the 1.2 m carrying minimum.\n\nDrag a 1.2 m clearance template from pickup to pedestal through each turn. In a paper walkthrough, check that the north route passes, the south pinch fails while carrying, and pedestal use opens the gate."
+    },
+    {
+      "id": "level-unaided",
+      "artifact_text": "Use the ordinary start before the first junction with the east-facing camera, north landmark and both routes reachable. Invite fresh participants with consent to “Find a way through.” Match device and settings. Record first cue noticed, first junction choice, time to take the north route and stated expectation before a 30-second help point. Log later hints separately. Earlier supported runs establish reachability only.\n\nCompare current view with a view framing the north landmark on entry, holding the marker constant. Test view first because the current camera faces away. If players see the landmark yet head elsewhere, compare marker clarity on the original view with fresh participants. Ask the design owner to choose the smallest change that improves unaided north discovery with gate comprehension intact."
+    },
+    {
+      "id": "economy-flow",
+      "artifact_text": "Hold the starting balance, grant, cap and other costs fixed. Before purchase, balance after n successful matches is min(15, 3 + 3n). At matches 0–3 the balances are 3, 6, 9 and 12. The 12-coin baseline unlock is first affordable after match 3. The 9-coin proposal reaches the milestone after match 2. Both purchases leave zero coins at first affordability. The cap is reached after match 4 if the player waits.\n\nReplay an eligible new save at both thresholds with unlock and tutorial completion flags visible. Verify one grant per successful match. Stop adoption if a player can acquire or use the unlock before the required tutorial step, including at exactly 9 coins. The progression owner decides whether one match sooner is useful given that guardrail. These outcomes are modeled."
+    },
+    {
+      "id": "economy-existing-save",
+      "artifact_text": "Compare disposable copies of save revision 3 with balance 80 and old cap 100. Trace load, migration, effective cap, ledger balance, reload, repeated migration, attempted grant above 60, then spend below 60 and grant to saturation. Keep the original save as the control.\n\nGrandfathering predicts 80 usable coins after migration and reload. A quiet loss or a grant increasing an over-cap balance falsifies that policy. Truncation predicts one recorded change from 80 to 60 and unchanged 60 on replay. A second loss, resurrected coins or different results on successive reloads falsifies truncation. Include a save at exactly 60 as an unchanged boundary.\n\nThe owner must choose how to treat the existing 20 excess coins and confirm the grant rule for grandfathered balances. Hold adoption and production migration pending the choice."
+    },
+    {
+      "id": "feel-trace",
+      "artifact_text": "Build F3 trace in milliseconds: cue 0, input 72, confirmation 90, sound 155, recovery 430. Input arrived 28 ms before cutoff. Input-to-confirmation took 18 ms. Sound followed confirmation by 65 ms and input by 83 ms. The player reported late feel. Delayed acknowledgement and uncertainty about the valid window are both plausible.\n\nUse the same build, device, cue, 100 ms cutoff and recovery. Alternate current sound and sound aligned with confirmation while replaying the same valid input. Ask separately about perceived response and when the window seemed to close. Improved response with unchanged acceptance supports feedback delay. Persistent window uncertainty despite prompt acknowledgement justifies a cue-only check. Keep the device trace, player account and untested devices separate. The design owner reviews before tuning."
+    },
+    {
+      "id": "feel-pause",
+      "artifact_text": "A paused input may leak into the queue, or a fresh resume-edge input may reach the ordinary active-time handler. The animation leaves both explanations open.\n\nRecord build, device, active and wall timestamps, native press/release edges, pause/resume, queue writes and reads, acceptance guard and authoritative dodge. Baseline: without pausing, issue a legal press at the equivalent active tick and verify one dodge. Paired control: pause at that tick, press and release during pause, then resume with controls untouched. Expect no enqueue and no dodge. Repeat with the paused action removed and one new press after resume. Expect one dodge if the active window remains open. A pre-resume enqueue supports leakage. A new post-resume edge with a clean queue supports input resampling. Hold firmware attribution until device evidence is available."
+    },
+    {
+      "id": "research-first-choice",
+      "artifact_text": "Draft for local observation. Obtain voluntary consent, explain recording and allow withdrawal. Hold sessions until the owner approves the consent and observation procedure.\n\nAssign fresh participants one pinned icon variant with identical visible item, inventory state and device conditions. Say “Get your character ready to use the item shown.” Avoid pointing, naming the control or demonstrating. Start timing when inventory is usable. Record first uncoached action, whether it equips the item and any backtracking. At 30 seconds, on opt-out or on a request for help, close the unaided observation and log any intervention separately. Ask “What did you expect to happen?” and keep the response in the participant’s words.\n\nThe design owner reviews de-identified observations and eligible counts before selecting the icon. A facilitator handles consent and recording."
+    },
+    {
+      "id": "research-mixed-exposure",
+      "artifact_text": "Count one fresh participant’s first uncoached choice with a genuine opportunity. Baseline: 4/8 correct (50.0%), excluding two coached rehearsals. Candidate: 5/7 correct (71.4%), excluding four coached rehearsals and one fresh player without an opportunity. Retain exclusions with reasons. The descriptive difference is 21.4 percentage points. Small samples, nonrandom assignment, build differences and mixed candidate devices leave the cue effect unresolved.\n\nNext, run fresh first opportunities on the same build and entry state with only the cue varied. Match or randomize within device type. Keep eligibility and intervention rules identical and report device-specific counts and denominators. A candidate rise on one device only calls for a device-specific follow-up. The design owner reviews the matched observations before deciding."
+    },
+    {
+      "id": "catalog-source-pin",
+      "artifact_text": "Recommend synthetic local pattern-overwatch@1, evidence trace-O, for a tactical corridor where a defender can choose facing and arm during the active tactical turn. Expect a movement-triggered reaction when an enemy crosses the covered arc. Compare one legal crossing with an enemy staying still and check that arming and facing are observable.\n\nAn always-visible tutorial hazard preview is unsuitable for overwatch if the placement cannot arm or react. Synthetic local pattern-warning-cone@2, evidence trace-W, fits the display-only threat area. Overwatch arms a movement-triggered reaction. The warning cone exposes spatial information without a reaction. Both placements remain proposals pending the project owner’s exact rule pin and a placement check."
+    },
+    {
+      "id": "catalog-alias-collision",
+      "artifact_text": "Two distinct local records match “charge.” pattern-windup@3 increases damage during held input and resolves on release. It is a candidate for the tutorial held attack. pattern-resource-charge@1 grants one stored use at a refill event. It is a candidate for the shop.\n\nFor the tutorial, inspect the active rule and replay two hold lengths followed by release. Expect damage to vary at release. For the shop, inspect the effective refill and observe one refill followed by one eligible spend with no hold. Expect one stored-use grant and decrement. Record the observed trigger, state change and exact source/build pin with evidence. Ask the responsible owner to confirm the selected rule revision for each placement before linking either. Both links remain conditional."
+    }
+  ]
+}

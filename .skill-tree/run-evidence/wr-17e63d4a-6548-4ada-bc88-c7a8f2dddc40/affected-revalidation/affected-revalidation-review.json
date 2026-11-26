@@ -1,0 +1,22 @@
+{
+  "source_head": "ac0be5a81ae6ddfbe19678cba19f3bb3cd7cf2f0",
+  "source_diff_sha256": "a2826b9d8d7641db6205a969b72a5045786dd74c23002e410bf1787360c6f428",
+  "independent_reviewer": "/root/director_critic",
+  "reviewed_paths": [
+    ".skill-tree/common/scripts/workflow-state.py",
+    ".skill-tree/common/scripts/run-workspaces.py",
+    ".skill-tree/common/references/orchestration.md",
+    ".skill-tree/common/references/run-workspaces.md",
+    ".skill-tree/tests/test-validation-progress.py",
+    ".skill-tree/skill-tree.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "review_evidence": "Independent final source review of the selected completed-contract validation controls.",
+  "verified_behaviors": [
+    "The implementation handoff projects exact matched source and recipe inputs. A registered consumer waits for stale required evidence. Compatible declared checks share the same verified boundary and preserve unrelated current receipts."
+  ],
+  "required_evidence": {
+    "scoped-regression": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/affected-revalidation/scoped-regression-result-c-2be94df4-c495-4efc-8289-4b2dc0864c57.json"
+  }
+}

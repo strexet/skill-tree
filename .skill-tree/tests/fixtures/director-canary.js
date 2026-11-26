@@ -141,10 +141,11 @@ function fixture(t, providers = ['codex']) {
   tasks: [{title: 'Check snapshot member extension', body, parent_pending_ids: [pending]}]}).created_ids[0];
   const opened = workflow(owner, local, 'start', {local_base: true, local_base_authorization: 'Local fixture only.',
     base_branch: 'develop', branch: 'codex/canary-fixture', worktree: target}, '--id', task);
+  const admitted = JSON.parse(run(owner, opened.profile_handoff.argv));
+  assert.equal(admitted.status, 'admitted');
+  assert.equal(admitted.run_id, opened.id);
   workflow(owner, local, 'checkpoint', {phase: 'refresh-profile', stop_reason: 'Stopped for canary installation.',
     next_action: 'Verify the planned installation.'}, '--run-id', opened.id);
-  core.install(target, old, FLAVOR, selections);
-  workflow(target, local, 'admit', {}, '--run-id', opened.id);
   write(target, 'product.txt', 'Preserved product bytes.\n');
   write(owner, '.skill-tree/history/independent-acceptance.json', '{"fixture":"preserve"}\n');
   const scope = {queue_id: queue, run_id: opened.id, task_id: task, flavor: FLAVOR, provider: providers[0],

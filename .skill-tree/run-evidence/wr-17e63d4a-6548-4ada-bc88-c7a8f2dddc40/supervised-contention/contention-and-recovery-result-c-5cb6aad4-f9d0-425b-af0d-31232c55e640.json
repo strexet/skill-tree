@@ -1,0 +1,20 @@
+{
+  "check_id": "contention-and-recovery",
+  "attempt_id": "C-5cb6aad4-f9d0-425b-af0d-31232c55e640",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-director-topologies.py"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "counts": {
+    "expected": 8,
+    "discovered": 8,
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0
+  },
+  "observed_output": "........\n----------------------------------------------------------------------\nRan 8 tests in 493.036s\n\nOK\n",
+  "timeout": false,
+  "elapsed_seconds": 494.548
+}

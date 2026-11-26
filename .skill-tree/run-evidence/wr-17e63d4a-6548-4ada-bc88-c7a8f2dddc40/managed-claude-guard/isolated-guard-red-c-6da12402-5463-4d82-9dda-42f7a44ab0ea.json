@@ -1,0 +1,21 @@
+{
+  "check_id": "isolated-guard",
+  "attempt_id": "C-6da12402-5463-4d82-9dda-42f7a44ab0ea",
+  "command": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-director-project-setup.js"
+  ],
+  "exit_code": 1,
+  "result": "red",
+  "counts": {
+    "expected": 1,
+    "discovered": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0
+  },
+  "observed_output": "TAP version 13\n# Subtest: installed Setup registers existing, default and custom projects with selected hosts and preserves existing Git\nnot ok 1 - installed Setup registers existing, default and custom projects with selected hosts and preserves existing Git\n  ---\n  duration_ms: 37346.413417\n  location: '<run-worktree>/.skill-tree/tests/test-director-project-setup.js:11:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Installed Setup must return a qualified Claude Code guard overlay: usage: director-state.py [-h] [--input INPUT]\n                             {context-search,decide-answer,decide-open,dispatch-intent,objective-apply,objective-preview,objective-read,outcome-link,plan-context,plan-freeze,plan-impact,plan-pin,plan-preview,project-init,project-menu,project-preview,project-route,project-setup,project-storage-prepare,project-storage-verify,rebind,rebind-preview,run-advance-all,run-cancel,run-complete-assignment,run-dispatch,run-pause,run-resume,run-start,run-status,run-supervise,setup-apply,setup-bootstrap,setup-preview,setup-status,status}\n                             root\n    director-state.py: error: argument command: invalid choice: 'claude-guard-settings' (choose from 'context-search', 'decide-answer', 'decide-open', 'dispatch-intent', 'objective-apply', 'objective-preview', 'objective-read', 'outcome-link', 'plan-context', 'plan-freeze', 'plan-impact', 'plan-pin', 'plan-preview', 'project-init', 'project-menu', 'project-preview', 'project-route', 'project-setup', 'project-storage-prepare', 'project-storage-verify', 'rebind', 'rebind-preview', 'run-advance-all', 'run-cancel', 'run-complete-assignment', 'run-dispatch', 'run-pause', 'run-resume', 'run-start', 'run-status', 'run-supervise', 'setup-apply', 'setup-bootstrap', 'setup-preview', 'setup-status', 'status')\n    \n    \n    2 !== 0\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 0\n  actual: 2\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (<run-worktree>/.skill-tree/tests/test-director-project-setup.js:115:14)\n    Test.runInAsyncScope (node:async_hooks:211:14)\n    Test.run (node:internal/test_runner/test:934:25)\n    Test.start (node:internal/test_runner/test:833:17)\n    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 0\n# fail 1\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 37416.553458",
+  "timeout": false,
+  "elapsed_seconds": 40.183
+}

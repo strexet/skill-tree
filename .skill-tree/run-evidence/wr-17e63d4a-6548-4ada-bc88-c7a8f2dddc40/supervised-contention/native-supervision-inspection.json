@@ -1,0 +1,346 @@
+{
+  "healthy": {
+    "aligned_actions": [
+      {
+        "action": "progress",
+        "elapsed_seconds": 2.3000024165958166,
+        "exit": 0,
+        "request_id": "healthy-game-progress",
+        "result": "running",
+        "run_sha256": "b3f16bb8c83b9a46a49916a265fe4373b42c87472c31b5ee4f9f456d7d88d849",
+        "started_after_barrier_seconds": 0.018120000138878822,
+        "started_before_writer_release": true
+      },
+      {
+        "action": "submit",
+        "elapsed_seconds": 4.327565374784172,
+        "exit": 0,
+        "request_id": "healthy-story-submit",
+        "result": "completed",
+        "run_sha256": "b3f16bb8c83b9a46a49916a265fe4373b42c87472c31b5ee4f9f456d7d88d849",
+        "started_after_barrier_seconds": 0.046424041967839,
+        "started_before_writer_release": true
+      },
+      {
+        "action": "heartbeat",
+        "elapsed_seconds": 5.239001958165318,
+        "exit": 2,
+        "request_id": "healthy-parent-heartbeat",
+        "result": "Writer lock exists; verify owner PID/host before explicit lock removal",
+        "run_sha256": "b3f16bb8c83b9a46a49916a265fe4373b42c87472c31b5ee4f9f456d7d88d849",
+        "started_after_barrier_seconds": 0.010123083833605051,
+        "started_before_writer_release": true
+      },
+      {
+        "action": "heartbeat",
+        "elapsed_seconds": 2.0364928748458624,
+        "exit": 0,
+        "request_id": "healthy-parent-heartbeat",
+        "result": "running",
+        "run_sha256": "b3f16bb8c83b9a46a49916a265fe4373b42c87472c31b5ee4f9f456d7d88d849",
+        "started_after_barrier_seconds": 5.305822208989412,
+        "started_before_writer_release": false
+      }
+    ],
+    "attempts": {
+      "game": {
+        "actor_id": "/root/director_resolver/nested",
+        "assigned_at": "2026-11-25T19:20:03.977015+00:00",
+        "assignment_id": "game",
+        "checks": [
+          {
+            "id": "scope-check",
+            "path": ".skill-tree/artifacts/native-supervised-check.txt",
+            "sha256": "5f1f1f6d3fa7f569ffe28191989d239a47754d2f4af2f51377a25e28d1a077b5"
+          }
+        ],
+        "child_run_id": "WR-b8b39ff4-42c6-404e-a927-a065b6f4af19",
+        "generation": 1,
+        "last_heartbeat_at": "2026-11-25T19:20:36.744798+00:00",
+        "last_progress_at": "2026-11-25T19:20:30.008368+00:00",
+        "paths": [
+          "game/source.txt"
+        ],
+        "picked_up_at": "2026-11-25T19:20:06.635367+00:00",
+        "process": {
+          "birth": {
+            "clock": "darwin-proc-bsdinfo",
+            "microseconds": 175028,
+            "seconds": 1795634406
+          },
+          "pgid": 95210,
+          "pid": 95210,
+          "uid": 501
+        },
+        "receipt_sha256": "7a00ddba9270aa6c75c299e4bed2e0f7e83dba533045282c8b0e9ca548938828",
+        "status": "completed",
+        "task_id": "T-ecb3098f-ceb8-4e78-91c1-6f47a333219b",
+        "unit_id": "nested-game",
+        "verified_at": "2026-11-25T19:20:38.818280+00:00"
+      },
+      "parent": {
+        "actor_id": "/root/director_resolver",
+        "assigned_at": "2026-11-25T19:19:47.235710+00:00",
+        "assignment_id": "game",
+        "child_run_id": "WR-b8b39ff4-42c6-404e-a927-a065b6f4af19",
+        "generation": 1,
+        "last_heartbeat_at": "2026-11-25T19:20:40.659755+00:00",
+        "last_progress_at": "2026-11-25T19:20:38.818280+00:00",
+        "picked_up_at": "2026-11-25T19:19:49.173346+00:00",
+        "process": {
+          "birth": {
+            "clock": "darwin-proc-bsdinfo",
+            "microseconds": 729216,
+            "seconds": 1795634388
+          },
+          "pgid": 94236,
+          "pid": 94236,
+          "uid": 501
+        },
+        "receipt_sha256": "8b8886ad35ae668aa8c5e672657410fc798d69ab210a18f33eb8624bfadba33f",
+        "status": "completed",
+        "task_id": "T-ecb3098f-ceb8-4e78-91c1-6f47a333219b",
+        "unit_id": "nested-supervisor",
+        "verified_at": "2026-11-25T19:20:42.755212+00:00"
+      },
+      "story": {
+        "actor_id": "/root/entry_resolver",
+        "assigned_at": "2026-11-25T19:19:56.973224+00:00",
+        "assignment_id": "story",
+        "checks": [
+          {
+            "id": "scope-check",
+            "path": ".skill-tree/artifacts/native-supervised-check.txt",
+            "sha256": "e3c85be8a0528afb8ef060c98ee92cb9ac8bc6299c3fa027c38e3ede7fee16be"
+          }
+        ],
+        "child_run_id": "WR-fc1686b3-84d7-4a40-a057-8269da94d64c",
+        "generation": 1,
+        "last_heartbeat_at": "2026-11-25T19:20:25.909624+00:00",
+        "last_progress_at": "2026-11-25T19:19:59.619710+00:00",
+        "paths": [
+          "story/source.txt"
+        ],
+        "picked_up_at": "2026-11-25T19:19:59.619710+00:00",
+        "process": {
+          "birth": {
+            "clock": "darwin-proc-bsdinfo",
+            "microseconds": 145165,
+            "seconds": 1795634399
+          },
+          "pgid": 94625,
+          "pid": 94625,
+          "uid": 501
+        },
+        "receipt_sha256": "27db413c451becefdfab10622940c00979bf491b666d3607b117e679fc6fdd07",
+        "status": "completed",
+        "task_id": "T-b28ffc06-c2b7-4a43-9b3a-9bae9e0b5ab2",
+        "unit_id": "sibling-story",
+        "verified_at": "2026-11-25T19:20:31.696271+00:00"
+      }
+    },
+    "checked_merges": [
+      {
+        "arm": "healthy",
+        "assignment_to_verified_target_seconds": 136.58766436576843,
+        "checked_merge_duration_seconds": 17.05898420838639,
+        "child_run": "WR-b8b39ff4-42c6-404e-a927-a065b6f4af19",
+        "cleanup": {
+          "reason": "The selected worktree contains local, untracked or ignored content",
+          "status": "deferred"
+        },
+        "controller_review": "DO-5defbe22-1399-5a0f-b699-61414fb8b125",
+        "outcome": "O-a88522c9-d0b4-40f9-990d-f6de57e75454",
+        "reviewer": "/root/director_critic",
+        "selector": "game",
+        "source": "game/source.txt",
+        "target": "b17cb8a52a51c8bfd0d52d4c2b4c84bb0b108129",
+        "task": "T-ecb3098f-ceb8-4e78-91c1-6f47a333219b",
+        "task_commit": "00dfc317fe8c5182bc9199c49674022134e8b18a",
+        "worker": "/root/director_resolver/nested",
+        "worker_commit": "4be07924629b18d45e93e6b3ab51d8451c91c7f9",
+        "worker_receipt": "7a00ddba9270aa6c75c299e4bed2e0f7e83dba533045282c8b0e9ca548938828"
+      },
+      {
+        "arm": "healthy",
+        "assignment_to_verified_target_seconds": 167.54027819633484,
+        "checked_merge_duration_seconds": 23.673268124926835,
+        "child_run": "WR-fc1686b3-84d7-4a40-a057-8269da94d64c",
+        "cleanup": {
+          "reason": "The selected worktree contains local, untracked or ignored content",
+          "status": "deferred"
+        },
+        "controller_review": "DO-025894d4-fdc9-53ba-a125-3cb353ec8500",
+        "outcome": "O-6e4e23b6-05c8-4c0d-9d17-9bba2e2303a8",
+        "reviewer": "/root/director_critic",
+        "selector": "story",
+        "source": "story/source.txt",
+        "target": "7e339fa5f9f8bd539be9f8f7ab99ced5144ec355",
+        "task": "T-b28ffc06-c2b7-4a43-9b3a-9bae9e0b5ab2",
+        "task_commit": "5d2a17745d58582300c0af2b53f5d3bb78e3feb8",
+        "worker": "/root/entry_resolver",
+        "worker_commit": "be20463d5a865d25d44e674561167153f5c2817a",
+        "worker_receipt": "27db413c451becefdfab10622940c00979bf491b666d3607b117e679fc6fdd07"
+      }
+    ],
+    "run": "DR-def06115-c3cf-4d15-9aea-49300edca8c6",
+    "writer_held_seconds": 0.6206570421345532
+  },
+  "qualification": "Real Codex collaboration actors and local Git fixture checks and merges. Controlled fixture-owner approvals. The stall sibling supplied observed progress; the separate healthy sibling supplied a verified submission and checked merge.",
+  "stall": {
+    "checked_merge": {
+      "arm": "stall",
+      "assignment_to_verified_target_seconds": 275.26861691474915,
+      "checked_merge_duration_seconds": 16.743974749930203,
+      "child_run": "WR-ddf252b7-dcf9-450d-b418-64d7e1d74f79",
+      "cleanup": {
+        "reason": "The selected worktree contains local, untracked or ignored content",
+        "status": "deferred"
+      },
+      "controller_review": "DO-1e396c8d-bbb4-5776-97a1-9d96d6615024",
+      "outcome": "O-95441cab-5206-45c5-ac9e-d467ad32c6e6",
+      "reviewer": "/root/director_critic",
+      "selector": "game",
+      "source": "game/source.txt",
+      "target": "a9ae58324c50a29cce42eebb84d8856d6b2ccb38",
+      "task": "T-2a08b18e-9de5-48ed-b600-c44542c4ad6e",
+      "task_commit": "4a28aa17074f9677680c1e1dce6199ff5a5bf064",
+      "worker": "/root/director_resolver/nested",
+      "worker_commit": "629e3d30f2d74d1bd2b59490ebd1b5149b813071",
+      "worker_receipt": "c90582e91adb21ed27019d8f3ae4724579818d7d99b91cdc6f52ff9b7a70425e"
+    },
+    "detected_after_progress_seconds": 58.66469693183899,
+    "exact_stopped_group": {
+      "pgid": 79146,
+      "pid": 79146
+    },
+    "heartbeat_age_seconds": 3.833224058151245,
+    "heartbeat_deadline_seconds": 14,
+    "host_heartbeat_cadence_seconds": 7,
+    "host_interrupt_previous_status": "running",
+    "initial_stalled": {
+      "actor_id": "/root/director_resolver/nested",
+      "assigned_at": "2026-11-25T19:12:01.205559+00:00",
+      "assignment_id": "game",
+      "child_run_id": "WR-ddf252b7-dcf9-450d-b418-64d7e1d74f79",
+      "generation": 1,
+      "last_heartbeat_at": "2026-11-25T19:13:02.305692+00:00",
+      "last_progress_at": "2026-11-25T19:12:07.474219+00:00",
+      "paths": [
+        "game/source.txt"
+      ],
+      "picked_up_at": "2026-11-25T19:12:03.622072+00:00",
+      "process": {
+        "birth": {
+          "clock": "darwin-proc-bsdinfo",
+          "microseconds": 159666,
+          "seconds": 1795633923
+        },
+        "pgid": 79146,
+        "pid": 79146,
+        "uid": 501
+      },
+      "status": "stalled",
+      "task_id": "T-2a08b18e-9de5-48ed-b600-c44542c4ad6e",
+      "unit_id": "nested-game"
+    },
+    "late_generation_rejection": {
+      "error": "Retired or stale supervised generation or actor",
+      "ok": false
+    },
+    "live_group_recovery_refusal": {
+      "error": "The original supervised process group still exists",
+      "ok": false
+    },
+    "progress_deadline_seconds": 55,
+    "replacement": {
+      "actor_id": "/root/director_resolver/nested",
+      "assigned_at": "2026-11-25T19:15:10.551737+00:00",
+      "assignment_id": "game",
+      "checks": [
+        {
+          "id": "scope-check",
+          "path": ".skill-tree/artifacts/native-supervised-check.txt",
+          "sha256": "3905a34e16ed81181980c5d3bf632f0c647b7775067ccaf479fb4eb9a8d25527"
+        }
+      ],
+      "child_run_id": "WR-ddf252b7-dcf9-450d-b418-64d7e1d74f79",
+      "generation": 2,
+      "last_heartbeat_at": "2026-11-25T19:15:13.064779+00:00",
+      "last_progress_at": "2026-11-25T19:15:16.931874+00:00",
+      "paths": [
+        "game/source.txt"
+      ],
+      "picked_up_at": "2026-11-25T19:15:13.064779+00:00",
+      "process": {
+        "birth": {
+          "clock": "darwin-proc-bsdinfo",
+          "microseconds": 607137,
+          "seconds": 1795634112
+        },
+        "pgid": 86462,
+        "pid": 86462,
+        "uid": 501
+      },
+      "receipt_sha256": "c90582e91adb21ed27019d8f3ae4724579818d7d99b91cdc6f52ff9b7a70425e",
+      "status": "completed",
+      "task_id": "T-2a08b18e-9de5-48ed-b600-c44542c4ad6e",
+      "unit_id": "nested-game",
+      "verified_at": "2026-11-25T19:15:19.197465+00:00"
+    },
+    "run": "DR-733fbe7e-9538-4a1c-8d9a-e12269f94ad1",
+    "sibling_progress": {
+      "actor_id": "/root/entry_resolver",
+      "assigned_at": "2026-11-25T19:12:15.198018+00:00",
+      "assignment_id": "story",
+      "child_run_id": "WR-1da812c4-7b97-4c24-a886-6f026258eaf7",
+      "generation": 1,
+      "last_heartbeat_at": "2026-11-25T19:12:17.985222+00:00",
+      "last_progress_at": "2026-11-25T19:12:23.700044+00:00",
+      "paths": [
+        "story/source.txt"
+      ],
+      "picked_up_at": "2026-11-25T19:12:17.985222+00:00",
+      "process": {
+        "birth": {
+          "clock": "darwin-proc-bsdinfo",
+          "microseconds": 535847,
+          "seconds": 1795633937
+        },
+        "pgid": 80180,
+        "pid": 80180,
+        "uid": 501
+      },
+      "status": "running",
+      "task_id": "T-25e10608-3b96-4cfb-b5e0-b19f87d4a585",
+      "unit_id": "sibling-story"
+    },
+    "sibling_progress_after_original_progress_seconds": 16.225825,
+    "supervisor": {
+      "actor_id": "/root/director_resolver",
+      "assigned_at": "2026-11-25T19:11:46.870546+00:00",
+      "assignment_id": "game",
+      "child_run_id": "WR-ddf252b7-dcf9-450d-b418-64d7e1d74f79",
+      "generation": 1,
+      "last_heartbeat_at": "2026-11-25T19:15:21.058995+00:00",
+      "last_progress_at": "2026-11-25T19:15:19.197465+00:00",
+      "picked_up_at": "2026-11-25T19:11:48.687713+00:00",
+      "process": {
+        "birth": {
+          "clock": "darwin-proc-bsdinfo",
+          "microseconds": 244478,
+          "seconds": 1795633908
+        },
+        "pgid": 78600,
+        "pid": 78600,
+        "uid": 501
+      },
+      "receipt_sha256": "09f221811c1d3730c31adee2fc82aa18c32019a44248223d0a213a07fd63287e",
+      "status": "completed",
+      "task_id": "T-2a08b18e-9de5-48ed-b600-c44542c4ad6e",
+      "unit_id": "nested-supervisor",
+      "verified_at": "2026-11-25T19:15:23.216361+00:00"
+    },
+    "verified_replacement_after_detection_seconds": 133.058549
+  }
+}

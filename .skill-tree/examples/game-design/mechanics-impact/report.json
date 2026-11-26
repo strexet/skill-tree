@@ -1,0 +1,160 @@
+{
+  "environment": {
+    "execution": "local-standard-library",
+    "python": "3.11.5"
+  },
+  "expected": {
+    "affected": [
+      "paper-race/corner-grip-check@1",
+      "paper-race/dock-corner@1",
+      "paper-race/forest-corner@1"
+    ],
+    "source": "paper-race/grip-rule@2",
+    "unaffected_controls": [
+      "paper-race/legacy-corner@1",
+      "paper-race/legacy-grip-check@1"
+    ],
+    "unresolved": {
+      "paper-race/cycle-left@1": "hierarchy-cycle",
+      "paper-race/cycle-right@1": "hierarchy-cycle",
+      "paper-race/foreign-reference@1": "foreign-scope",
+      "paper-race/incorrect-relation@1": "wrong-record-type",
+      "paper-race/missing-reference@1": "missing-revision",
+      "paper-race/unused-similarity@1": "unknown-relation"
+    }
+  },
+  "observed": {
+    "affected": [
+      {
+        "direct_dependencies": [
+          {
+            "from": "paper-race/corner-grip-check@1",
+            "to": "paper-race/dock-corner@1",
+            "type": "validates-placement"
+          },
+          {
+            "from": "paper-race/corner-grip-check@1",
+            "to": "paper-race/forest-corner@1",
+            "type": "validates-placement"
+          }
+        ],
+        "evidence": "checks/grip.md#corner-grip",
+        "kind": "check",
+        "pin": "paper-race/corner-grip-check@1",
+        "trace": [
+          {
+            "from": "paper-race/dock-corner@1",
+            "to": "paper-race/grip-rule@2",
+            "type": "uses-rule"
+          },
+          {
+            "from": "paper-race/corner-grip-check@1",
+            "to": "paper-race/dock-corner@1",
+            "type": "validates-placement"
+          }
+        ]
+      },
+      {
+        "direct_dependencies": [
+          {
+            "from": "paper-race/dock-corner@1",
+            "to": "paper-race/forest-corner@1",
+            "type": "extends-placement"
+          },
+          {
+            "from": "paper-race/dock-corner@1",
+            "to": "paper-race/grip-rule@2",
+            "type": "uses-rule"
+          }
+        ],
+        "evidence": "atlas.md#dock-corner",
+        "kind": "placement",
+        "pin": "paper-race/dock-corner@1",
+        "trace": [
+          {
+            "from": "paper-race/dock-corner@1",
+            "to": "paper-race/grip-rule@2",
+            "type": "uses-rule"
+          }
+        ]
+      },
+      {
+        "direct_dependencies": [
+          {
+            "from": "paper-race/forest-corner@1",
+            "to": "paper-race/grip-rule@2",
+            "type": "uses-rule"
+          }
+        ],
+        "evidence": "atlas.md#forest-corner",
+        "kind": "placement",
+        "pin": "paper-race/forest-corner@1",
+        "trace": [
+          {
+            "from": "paper-race/forest-corner@1",
+            "to": "paper-race/grip-rule@2",
+            "type": "uses-rule"
+          }
+        ]
+      }
+    ],
+    "query_status": "verified",
+    "source": "paper-race/grip-rule@2",
+    "source_evidence": "rules/grip.md#revision-two",
+    "unresolved": [
+      {
+        "from": "paper-race/cycle-left@1",
+        "reason": "hierarchy-cycle",
+        "to": "paper-race/cycle-right@1",
+        "type": "extends-placement"
+      },
+      {
+        "from": "paper-race/cycle-right@1",
+        "reason": "hierarchy-cycle",
+        "to": "paper-race/cycle-left@1",
+        "type": "extends-placement"
+      },
+      {
+        "from": "paper-race/foreign-reference@1",
+        "reason": "foreign-scope",
+        "to": "foreign-race/grip-rule@2",
+        "type": "uses-rule"
+      },
+      {
+        "from": "paper-race/incorrect-relation@1",
+        "reason": "wrong-record-type",
+        "to": "paper-race/grip-rule@2",
+        "type": "validates-placement"
+      },
+      {
+        "from": "paper-race/missing-reference@1",
+        "reason": "missing-revision",
+        "to": "paper-race/grip-rule@3",
+        "type": "uses-rule"
+      },
+      {
+        "from": "paper-race/unused-similarity@1",
+        "reason": "unknown-relation",
+        "to": "paper-race/grip-rule@2",
+        "type": "similar-to"
+      }
+    ]
+  },
+  "omissions": [
+    "Evidence locators illustrate fixture record pins.",
+    "Catalog-wide lookup, real project inspection and similarity ranking are outside the fixture."
+  ],
+  "result_sha256": "c69e395cf31554012740c2c998a8dc69d7c2ce2be480d064999f9f1af8f8bb8f",
+  "schema": 1,
+  "scope": "One deterministic disposable atlas",
+  "source_sha256": {
+    ".skill-tree/common/references/game-design-atlas.md": "453a6d8ffd8f66a4233677c22dba3efae509e216a744050dcc316629cd934401",
+    ".skill-tree/common/references/game-design-records.md": "ee0c46efe3f88d4e4d68859c0e5e94dc26a453f36575dcfc5830f96f863990c3",
+    ".skill-tree/examples/game-design/mechanics-impact/README.md": "97d884312ab98046ac69788c7e023116a74e2955f6fa4a7d78f5d200924f98d2",
+    ".skill-tree/examples/game-design/mechanics-impact/atlas.json": "bc38cc1d2a767f120d36c21d004f1d8849e89f9a9710c7bdc61fe3f3b4c6a3fb",
+    ".skill-tree/examples/game-design/mechanics-impact/expected.json": "8eb962bfe4df9cd37a59ebab7bc78ea68e417cfb79db6c9d93b25081ab9be76d",
+    ".skill-tree/examples/game-design/mechanics-impact/query.py": "6ed6751a867ce86894cc31fa702d78cd130e5600759ef083be4430d8f1ac9cc0",
+    ".skill-tree/tests/test-mechanics-catalog-impact.py": "5cbb57ccda1564f8a8813150a1deb5981a28b43a579a7fd9da37c6195df5cdb1"
+  },
+  "task_id": "T-8a649e9a-6493-40ed-8d37-0c735aa2983c"
+}

@@ -1,0 +1,21 @@
+{
+  "source_head": "fbb1e06a48328fb5f774549365382ec80563d64c",
+  "source_diff_sha256": "9155bb24484ca07f909b49b47c12331e78364056a894f8dff1878c5573c481c7",
+  "independent_reviewer": "/root/director_critic",
+  "reviewed_paths": [
+    ".skill-tree/common/scripts/director-state.py",
+    ".skill-tree/documents/director-workflow.md",
+    ".skill-tree/tests/test-director-project-setup.js",
+    ".skill-tree/skill-tree.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "review_evidence": "Observed independent source review on the final guard, including exact installed and retained ownership, the bounded Git parser and decision deadline. Repository PR review integration and profile maintenance controls passed 45 tests.",
+  "verified_behaviors": [
+    "Claude Code 2.1.109 on macOS observes native deny before files and direct Git refs can change. Exact isolated task preflight permits the task paths, and the existing owner hook and explicit queue intake still run. Unsupported tools and shell entrypoints remain explicit."
+  ],
+  "required_evidence": {
+    "isolated-guard": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/managed-claude-guard/isolated-guard-result-c-e567fefa-e4d4-4d87-b75e-04b987326efe.json",
+    "managed-host-coverage": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/managed-claude-guard/native-registered-macos-claude-c-651ebcaf-db51-4d01-ba24-0a6f977513a6.json"
+  }
+}

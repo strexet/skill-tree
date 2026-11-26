@@ -1,0 +1,21 @@
+{
+  "check_id": "generated-guidance",
+  "attempt_id": "C-fc62a8cd-1b09-43ea-ad44-8e93936deb90",
+  "command": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-director-installation.js"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "counts": {
+    "expected": 4,
+    "discovered": 4,
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0
+  },
+  "observed_output": "TAP version 13\n# Subtest: Director lists the exact closure, dry-run is byte-neutral, and the owned package executes independently\nok 1 - Director lists the exact closure, dry-run is byte-neutral, and the owned package executes independently\n  ---\n  duration_ms: 7345.509917\n  ...\n# Subtest: dedicated launcher guides fresh implementation and upgrades owned prior text\nok 2 - dedicated launcher guides fresh implementation and upgrades owned prior text\n  ---\n  duration_ms: 21410.502291\n  ...\n# Subtest: an owned upgrade preserves plugin bytes, queue and the stopped schema-3 run\nok 3 - an owned upgrade preserves plugin bytes, queue and the stopped schema-3 run\n  ---\n  duration_ms: 29065.107167\n  ...\n# Subtest: guided bootstrap applies only the reviewed projects and resumes a partial setup\nok 4 - guided bootstrap applies only the reviewed projects and resumes a partial setup\n  ---\n  duration_ms: 103254.808084\n  ...\n1..4\n# tests 4\n# suites 0\n# pass 4\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 161212.21875\n",
+  "timeout": false,
+  "elapsed_seconds": 165.197
+}

@@ -1,0 +1,21 @@
+{
+  "check_id": "scoped-regression",
+  "attempt_id": "C-b11f7825-4005-404d-8b73-809e4a8d8712",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-pr-review-cycle.py",
+    "-v"
+  ],
+  "exit_code": 1,
+  "result": "fail",
+  "counts": {
+    "expected": 1,
+    "discovered": 0,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0
+  },
+  "observed_output": "Traceback (most recent call last):\n  File \"<run-worktree>/.skill-tree/tests/test-pr-review-cycle.py\", line 17, in <module>\n    spec=importlib.util.spec_from_file_location('pr_cycle',CORE/'common/scripts/pr-review-state.py');pr=importlib.util.module_from_spec(spec);spec.loader.exec_module(pr)\n                                                                                                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<frozen importlib._bootstrap_external>\", line 936, in exec_module\n  File \"<frozen importlib._bootstrap_external>\", line 1074, in get_code\n  File \"<frozen importlib._bootstrap_external>\", line 1004, in source_to_code\n  File \"<frozen importlib._bootstrap>\", line 241, in _call_with_frames_removed\n  File \"<run-worktree>/.skill-tree/common/scripts/pr-review-state.py\", line 1504\n    else:\n         ^\nIndentationError: unindent does not match any outer indentation level\n",
+  "timeout": false,
+  "elapsed_seconds": 1.975
+}

@@ -1,0 +1,20 @@
+{
+  "source_head": "1d3e5aabfb2fed255fcb60daa4d65235f8d6a656",
+  "source_diff_sha256": "180ebab1599dccfe9ad0d06d44b84bb909127c0aab425e9b476d91dd3e353c3a",
+  "independent_reviewer": "/root/director_critic",
+  "reviewed_paths": [
+    ".skill-tree/common/scripts/parallel-preview.py",
+    ".skill-tree/common/references/parallel-preview.md",
+    ".skill-tree/tests/test-parallel-preview.py",
+    ".skill-tree/skill-tree.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "review_evidence": "Observed independent source review of exact controller completion, scoped Git paths, recovered check proof, and the before and after source guard.",
+  "verified_behaviors": [
+    "Independent Ready work remains selectable during an unfinished controller review. Verified paths and live named claims keep exact conflicts. Pending merge and changed peer evidence retain guarded scope."
+  ],
+  "required_evidence": {
+    "review-window-preview-fixtures": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/review-window-preview/review-window-preview-fixtures-result-c-86bf3aec-af30-4e52-a477-73fdcc6066c2.json"
+  }
+}

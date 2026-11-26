@@ -1,0 +1,20 @@
+{
+  "check_id": "scoped-regression",
+  "attempt_id": "C-2cf1fae0-0372-452d-b646-9590434f0ccc",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-pr-review-cycle.py"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "counts": {
+    "expected": 42,
+    "discovered": 42,
+    "passed": 42,
+    "failed": 0,
+    "skipped": 0
+  },
+  "observed_output": "..........................................\n----------------------------------------------------------------------\nRan 42 tests in 53.355s\n\nOK\n",
+  "timeout": false,
+  "elapsed_seconds": 55.997
+}

@@ -1,0 +1,10 @@
+{
+  "case": "A byte-identical marker added outside the legacy ownership inventory is preserved and the current-source upgrade refuses the foreign file",
+  "operation": "skill-tree-pr-review-cycle",
+  "package_path": "scripts/package.json",
+  "upgrade_exit": 1,
+  "diagnostic": "Unowned or locally modified package conflicts",
+  "owner_marker_sha256": "8005a3491db7d92f36ac66369861589f9c47123d3a7c71e643fc2c06168cd45a",
+  "preserved_legacy_profile_sha256": "c1f02cc1d5ea8cac2193f6aaa2286a6b575b8ac9d1b9e93c293eee066384c939",
+  "fixture_removed": true
+}

@@ -41,7 +41,12 @@ test('installed Setup registers existing, default and custom projects with selec
     "UPSTREAM = '" + pathToFileURL(seed).href + "'");
   assert.notEqual(fixture, original);
   fs.writeFileSync(maintenance, fixture);
-  init(root,'main');fs.writeFileSync(path.join(root,'index.html'),'<!DOCTYPE html>');commit(root);
+  init(root,'main');
+  fs.writeFileSync(path.join(root,'index.html'),'<!DOCTYPE html>');
+  const overlapping = path.join(root,'nested-with-canonical-file');
+  fs.mkdirSync(overlapping);
+  fs.writeFileSync(path.join(overlapping,'canonical.txt'),'canonical fixture');
+  commit(root);
   const instructions = path.join(root, 'AGENTS.md');
   const customInstructions = Buffer.from('Project rules\r\nUse its own checked fixtures.');
   fs.writeFileSync(instructions, customInstructions);
@@ -54,6 +59,10 @@ test('installed Setup registers existing, default and custom projects with selec
   run(process.execPath,[path.join(__dirname,'../bin/install.js'),'--only','codex','--target',root,
     '--source',composed,'--project','--flavor','web']);
   install('codex');
+  const ownerSettings = path.join(root,'.claude/settings.json');
+  fs.mkdirSync(path.dirname(ownerSettings),{recursive:true});
+  const ownerBytes = Buffer.from('{"hooks":{"PreToolUse":[{"matcher":"Write","hooks":[{"type":"command","command":"true"}]}]}}\n');
+  fs.writeFileSync(ownerSettings,ownerBytes);
   assert.ok(fs.readFileSync(instructions).subarray(0, customInstructions.length).equals(customInstructions));
   assert.match(fs.readFileSync(instructions, 'utf8'), /project-route.*project-menu/);
   const app=path.join(home,data(home,'workspace.json').setup_entry),input=path.join(base,'request.json');
@@ -86,6 +95,7 @@ test('installed Setup registers existing, default and custom projects with selec
     fs.writeFileSync(descriptorPath,descriptorBytes);
   }
   const custom=path.join(base,'custom-location');
+  let guardPreTool;
   for (const [choice,target,flavor] of [
     [{kind:'existing',name:'site',path:root},root,'web'],
     [{kind:'new',name:'example'},path.join(root,'example'),'general'],
@@ -128,6 +138,14 @@ test('installed Setup registers existing, default and custom projects with selec
         }
       }
       assert.equal(invoke('project-route',{operation:'unregistered-operation'}).status, 'unsupported');
+      const beforeFullCycle = fs.readFileSync(path.join(root,'.skill-tree/documents/future.md'));
+      const fullCycle = invoke('project-route',{operation:'skill-tree-full-cycle',project_id:'site'});
+      assert.equal(fullCycle.status, 'preview');
+      assert.equal(fullCycle.execution, 'project-skill');
+      assert.equal(fullCycle.child_skill, path.join(root,'.agents/skills/skill-tree-full-cycle/SKILL.md'));
+      assert.deepEqual(fs.readFileSync(path.join(root,'.skill-tree/documents/future.md')), beforeFullCycle);
+      assert.equal(git(root,'rev-parse','HEAD'),head);
+      assert.equal(invoke('project-route',{operation:'intake',project_id:'site'}).project.id, 'site');
       assert.equal(invoke('project-route',{operation:'project-read'}).project.id, 'site');
       assert.equal(invoke('project-route',{operation:'registration'}).command, 'project-preview');
       const skillReceipt = path.join(root,'.skill-tree/installation/profile.json');
@@ -206,6 +224,102 @@ test('installed Setup registers existing, default and custom projects with selec
       const extended = invoke('project-setup',choice);
       assert.equal(extended.queue_id,result.queue_id);
       assert.deepEqual(extended.providers,['codex','claude-code']);
+      const versionBin = path.join(base,'controlled-version-bin');
+      fs.mkdirSync(versionBin);
+      const version = path.join(versionBin,'claude');
+      fs.writeFileSync(version,"#!/bin/sh\nprintf '%s\\n' '2.1.109 (Claude Code)'\n",{mode:0o755});
+      const installHosts = {...env,PATH:versionBin+path.delimiter+env.PATH};
+      const guardArgs = ['-B',path.relative(root,app),'claude-guard-settings',path.relative(root,home),'--project-id','site'];
+      const qualified = spawnSync('python3',guardArgs,{cwd:root,env:installHosts,encoding:'utf8'});
+      assert.equal(qualified.status,0,'Installed Setup must return a qualified Claude Code guard overlay: '+qualified.stdout+qualified.stderr);
+      const overlay = JSON.parse(qualified.stdout);
+      assert.ok(path.isAbsolute(overlay.entry));
+      const hook = overlay.settings.hooks.PreToolUse[0];
+      assert.equal(hook.matcher,'Write|Edit|Bash');
+      const preTool = (tool,tool_input,cwd=root,hookEnvironment=env) => {
+        const result = spawnSync('/bin/sh',['-c',hook.hooks[0].command],{cwd,env:hookEnvironment,encoding:'utf8',timeout:20000,
+          input:JSON.stringify({hook_event_name:'PreToolUse',tool_name:tool,cwd,tool_input})});
+        assert.equal(result.status,0,result.stdout+result.stderr);
+        return JSON.parse(result.stdout);
+      };
+      guardPreTool = preTool;
+      const verifyDeny = output => assert.equal(output.hookSpecificOutput.permissionDecision,'deny');
+      const canonicalSource = path.join(root,'index.html');
+      const slowGit = path.join(versionBin,'git');
+      fs.writeFileSync(slowGit,'#!/bin/sh\nexec /bin/sleep 60\n',{mode:0o755});
+      try {
+        const stalled = preTool('Write',{file_path:canonicalSource},root,installHosts);
+        verifyDeny(stalled);
+        assert.match(stalled.hookSpecificOutput.permissionDecisionReason,/timed out before effects/);
+      } finally {
+        fs.unlinkSync(slowGit);
+      }
+      const directorReceipt = path.join(home,'.skill-tree/installation/profile.json');
+      const receiptBytes = fs.readFileSync(directorReceipt);
+      try {
+        fs.unlinkSync(directorReceipt);
+        verifyDeny(preTool('Edit',{file_path:canonicalSource}));
+      } finally {
+        fs.writeFileSync(directorReceipt,receiptBytes);
+      }
+      verifyDeny(preTool('Write',{file_path:canonicalSource}));
+      const differentlySpelledRoot = path.join(path.dirname(root),path.basename(root).toUpperCase());
+      const differentSpelling = fs.statSync(differentlySpelledRoot,{throwIfNoEntry:false});
+      if (differentSpelling?.ino === fs.statSync(root).ino && differentSpelling.dev === fs.statSync(root).dev) {
+        verifyDeny(preTool('Write',{file_path:path.join(differentlySpelledRoot,'protected-case-alias.txt')},base));
+        verifyDeny(preTool('Bash',{command:'git -C '+JSON.stringify(differentlySpelledRoot)+' branch guarded-case-alias'},base));
+      }
+      verifyDeny(preTool('Edit',{file_path:canonicalSource}));
+      verifyDeny(preTool('Write',{}));
+      verifyDeny(preTool('Bash',{command:'git branch unadmitted'}));
+      verifyDeny(preTool('Bash',{command:'git -C '+JSON.stringify(root)+' switch -c unadmitted'},base));
+      verifyDeny(preTool('Bash',{command:'git --git-dir=.git update-ref refs/heads/unadmitted HEAD'}));
+      verifyDeny(preTool('Bash',{command:'git diff --output=index.html'}));
+      assert.deepEqual(preTool('Bash',{command:'git branch --show-current'}),{});
+      assert.deepEqual(preTool('Bash',{command:'git status --short'}),{});
+      assert.deepEqual(preTool('Write',{file_path:path.join(base,'unregistered.txt')}),{});
+      verifyDeny(preTool('Bash',{command:'git -C '+JSON.stringify(seed)+' diff --output='+JSON.stringify(canonicalSource)},base));
+      const nested = path.join(root,'independent-checkout');
+      init(nested,'main');
+      verifyDeny(preTool('Write',{file_path:path.join(nested,'unregistered.txt')}));
+      fs.rmSync(nested,{recursive:true});
+      git(overlapping,'init','-q','-b','main');
+      verifyDeny(preTool('Edit',{file_path:path.join(overlapping,'canonical.txt')}));
+      fs.rmSync(path.join(overlapping,'.git'),{recursive:true});
+      const outsideLinked = path.join(base,'retained-external-worktree');
+      fs.mkdirSync(outsideLinked);
+      const retainedLocator = JSON.parse(savedLocator);
+      retainedLocator.worktrees['WR-12345678-1234-1234-1234-1234567890ab'] = outsideLinked;
+      fs.writeFileSync(queueLocator,JSON.stringify(retainedLocator));
+      try {
+        verifyDeny(preTool('Write',{file_path:path.join(outsideLinked,'guarded.txt')},base));
+        fs.symlinkSync(path.join(base,'unregistered.txt'),path.join(outsideLinked,'outside-alias'));
+        verifyDeny(preTool('Edit',{file_path:path.join(outsideLinked,'outside-alias')},base));
+      } finally {
+        fs.writeFileSync(queueLocator,savedLocator);
+      }
+      const alias = path.join(base,'canonical-alias');
+      fs.symlinkSync(canonicalSource,alias);
+      verifyDeny(preTool('Edit',{file_path:alias}));
+      try {
+        fs.unlinkSync(queueLocator);
+        verifyDeny(preTool('Write',{file_path:canonicalSource}));
+        assert.deepEqual(preTool('Bash',{command:'git branch --show-current'}),{});
+      } finally {
+        fs.writeFileSync(queueLocator,savedLocator);
+      }
+      fs.writeFileSync(version,"#!/bin/sh\nprintf '%s\\n' '9.9.9 (Claude Code)'\n",{mode:0o755});
+      const unqualified = spawnSync('python3',guardArgs,{cwd:root,env:installHosts,encoding:'utf8'});
+      assert.notEqual(unqualified.status,0);
+      assert.match(unqualified.stdout+unqualified.stderr,/qualified Claude Code 2\.1\.109/i);
+      assert.equal(fs.readFileSync(canonicalSource,'utf8'),'<!DOCTYPE html>');
+      assert.equal(git(root,'branch','--list','unadmitted'),'');
+      assert.equal(git(root,'rev-parse','HEAD'),head);
+      assert.deepEqual(fs.readFileSync(ownerSettings),ownerBytes);
+      assert.deepEqual(data(root,'.skill-tree/installation/profile.json').bridges,{});
+    }
+    if (choice.name === 'example') {
+      assert.deepEqual(guardPreTool('Write',{file_path:path.join(target,'unrelated-to-site.txt')}),{});
     }
     const installed=data(target,'.skill-tree/installation/profile.json');
     for(const [dest,host] of [['.agents/skills','codex'],['.claude/skills','claude-code']]) {
@@ -247,7 +361,38 @@ test('installed Setup registers existing, default and custom projects with selec
   run('python3',['-B',path.join(__dirname,'../common/scripts/workflow-state.py'),'workspace-setup',seed]);
   const declaration = {director_id:'linked-workspace-director',areas};
   const approved = linkedCall('setup-preview', declaration);
-  linkedCall('setup-apply',{...declaration,expected_preview_sha256:approved.preview_sha256});
+  const registerLinked = {...declaration,expected_preview_sha256:approved.preview_sha256};
+  const localBinding = '.skill-tree/artifacts/director/local-bindings.json';
+  const linkedIgnore = path.join(linkedHome, '.gitignore');
+  const linkedExclude = path.join(linkedHome, '.git/info/exclude');
+  const savedRules = fs.readFileSync(linkedExclude);
+  fs.writeFileSync(linkedIgnore, '!/'+localBinding+'\n', {flag:'wx'});
+  try {
+    fs.writeFileSync(input, JSON.stringify(registerLinked));
+    const rejected = spawnSync('python3',['-B',linkedEntry,'setup-apply',linkedHome,'--input',input],
+      {cwd:linked,env,encoding:'utf8',timeout:120000});
+    assert.equal(rejected.status,2,rejected.stdout+rejected.stderr);
+    assert.match(rejected.stdout+rejected.stderr,/needs a local Git exclusion/);
+    assert.equal(fs.existsSync(path.join(linkedHome,localBinding)),false);
+    assert.equal(fs.existsSync(path.join(linkedHome,'.skill-tree/director/registry.json')),false);
+    assert.deepEqual(fs.readFileSync(linkedExclude),savedRules);
+    const descriptorPath = path.join(linkedHome, 'workspace.json');
+    const savedDescriptor = fs.readFileSync(descriptorPath);
+    fs.unlinkSync(descriptorPath);
+    try {
+      const missing = spawnSync('python3',['-B',linkedEntry,'setup-apply',linkedHome,'--input',input],
+        {cwd:linked,env,encoding:'utf8',timeout:120000});
+      assert.equal(missing.status,2,missing.stdout+missing.stderr);
+      assert.match(missing.stdout+missing.stderr,/Director workspace installation is unavailable/);
+      assert.equal(fs.existsSync(path.join(linkedHome,localBinding)),false);
+      assert.equal(fs.existsSync(path.join(linkedHome,'.skill-tree/director/registry.json')),false);
+    } finally {
+      fs.writeFileSync(descriptorPath,savedDescriptor);
+    }
+  } finally {
+    fs.unlinkSync(linkedIgnore);
+  }
+  linkedCall('setup-apply',registerLinked);
   const linkedRoute = linkedCall('project-route',{operation:'intake'});
   assert.equal(linkedRoute.project.workspace_checkout, linked);
   assert.equal(linkedRoute.project.checkout, root);
@@ -259,4 +404,83 @@ test('installed Setup registers existing, default and custom projects with selec
   assert.notEqual(linkedGuard.status,0);
   assert.match(linkedGuard.stdout+linkedGuard.stderr,/Director owns the default route/);
   assert.deepEqual(data(root,'.skill-tree/documents/future.json'), futureBefore);
+});
+
+test('dedicated coordinator protects machine-local paths and preserves portable Git inputs', t => {
+  const base = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'director-coordinator-ignore-')));
+  t.after(() => fs.rmSync(base, {recursive:true, force:true}));
+  const workspace = path.join(base, 'workspace');
+  fs.mkdirSync(workspace);
+  const env = {...Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_'))),
+    GIT_TERMINAL_PROMPT:'0', GIT_CONFIG_NOSYSTEM:'1', GIT_CONFIG_GLOBAL:os.devNull};
+  function run(command, args, cwd=base, expected=0) {
+    const result = spawnSync(command, args, {cwd, env, encoding:'utf8', timeout:120000});
+    assert.equal(result.status, expected, result.stdout + result.stderr);
+    return result.stdout;
+  }
+  const git = (cwd, ...args) => run('git', args, cwd);
+  git(workspace, 'init', '-q', '-b', 'develop');
+  run(process.execPath, [path.join(__dirname, '../bin/install.js'), '--only', 'codex', '--target', workspace]);
+  const root = path.join(workspace, '.skill-tree/.director');
+  const setup = path.join(root, JSON.parse(fs.readFileSync(path.join(root, 'workspace.json'))).setup_entry);
+  const contents = [
+    'sources/skill-tree/fixture-source.txt',
+    'sources/projects/fixture-project/fixture-source.txt',
+    '.skill-tree/artifacts/director/local-bindings.json',
+  ];
+  function write(relative, value) {
+    const absolute = path.join(root, relative);
+    fs.mkdirSync(path.dirname(absolute), {recursive:true});
+    fs.writeFileSync(absolute, value);
+    return absolute;
+  }
+  for (const relative of contents) write(relative, 'Local fixture\n');
+  const portable = '.skill-tree/director/registry.json';
+  const sibling = 'sources/portable-note.txt';
+  write(portable, '{}\n');
+  write(sibling, 'Portable source note\n');
+  const staging = git(root, 'add', '--all', '--dry-run');
+  for (const relative of contents) {
+    assert.equal(staging.includes(relative), false, 'Coordinator Git staging exposes a machine-local path: ' + relative);
+  }
+  assert.ok(staging.includes(portable));
+  assert.ok(staging.includes(sibling));
+
+  const exclude = path.join(root, '.git/info/exclude');
+  fs.chmodSync(exclude, 0o640);
+  const excludeMode = fs.statSync(exclude).mode;
+  fs.appendFileSync(exclude, '# Fixture rule\n*.fixture-local\n');
+  const original = fs.readFileSync(exclude);
+  const command = ['-B', setup, 'project-init', root];
+  run('python3', command);
+  assert.deepEqual(fs.readFileSync(exclude), original);
+
+  git(root, 'add', '-f', '--', contents[0]);
+  const index = git(root, 'ls-files', '--stage', '--', contents[0]);
+  const blocked = spawnSync('python3', command, {cwd:base, env, encoding:'utf8', timeout:120000});
+  assert.equal(blocked.status, 2, blocked.stdout + blocked.stderr);
+  assert.match(blocked.stdout + blocked.stderr, /tracked.*(Git|coordinator)/i);
+  assert.deepEqual(fs.readFileSync(exclude), original);
+  assert.equal(git(root, 'ls-files', '--stage', '--', contents[0]), index);
+
+  git(root, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
+    'commit', '-qm', 'Record fixture tracked local conflict');
+  git(root, 'rm', '--cached', '--', contents[0]);
+  const stagedRemoval = git(root, 'diff', '--cached', '--name-status');
+  const retained = spawnSync('python3', command, {cwd:base, env, encoding:'utf8', timeout:120000});
+  assert.equal(retained.status, 2, retained.stdout + retained.stderr);
+  assert.match(retained.stdout + retained.stderr, /tracked.*(Git|coordinator)/i);
+  assert.equal(git(root, 'diff', '--cached', '--name-status'), stagedRemoval);
+  assert.deepEqual(fs.readFileSync(exclude), original);
+  git(root, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
+    'commit', '-qm', 'Remove fixture tracked local conflict');
+  const broadRules = fs.readFileSync(exclude, 'utf8').split('\n')
+    .filter(line => line !== '/sources/skill-tree/').join('\n');
+  fs.writeFileSync(exclude, broadRules);
+  write('.gitignore', '!/sources/skill-tree/\n');
+  const refused = spawnSync('python3', command, {cwd:base, env, encoding:'utf8', timeout:120000});
+  assert.equal(refused.status, 2, refused.stdout + refused.stderr);
+  assert.match(refused.stdout + refused.stderr, /ignore rules.*expose/i);
+  assert.equal(fs.readFileSync(exclude, 'utf8'), broadRules);
+  assert.equal(fs.statSync(exclude).mode, excludeMode);
 });

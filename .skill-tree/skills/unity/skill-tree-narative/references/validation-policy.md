@@ -1,5 +1,7 @@
 # Validation Policy
 
+Web source directory checks can include packages with materialized pnpm dependencies. With matching owned Web pnpm profile files and the ordinary pnpm store, source traversal skips wholly Git-ignored, unversioned `node_modules` directories in the selected checkout. Nested packages require the same package name and path in pnpm's materialized workspace state and a match in the current workspace declaration. The source checker recognizes block lists of literal paths, simple wildcards and recursive directory wildcards. Unsupported declarations and explicitly named dependency inputs retain the normal source checks.
+
 ## Check ownership
 
 The task Validation section owns required check IDs, criterion mapping and task parameters. A fenced JSON object contains `checks`, with entries containing `id`, `recipe_id`, `criteria`, `sources`, `parameters` and `timing`. Timing is `immediate`, `group-end` or `before-dependent-work`. The profile owns concrete recipes and environment facts. Task headers own optional `validation_group_id` and `boundary_validation`; group membership never expands controller scope.
@@ -31,6 +33,8 @@ Source/check-set changes invalidate affected results. Unaffected passes remain a
 A pending attempt blocks acceptance even when an earlier result passes or the current task removes the check. For local runner recovery, bind the live original process group to the prepared attempt before drift. After cleanup, `reconcile-check` verifies current drift and absence of the bound group and records a cancellation receipt. Earlier results, recorded stops and admission remain separate. The workflow metadata contract defines the exact request and evidence fields.
 
 ## Final run evidence
+
+Review can reuse an executed check receipt when the current check contract, relevant source and test inputs, recipe, execution environment and evidence remain verified for the exact review candidate. Reviewers retain independent responsibility for the candidate and current findings. An unavailable artifact, changed input, outstanding execution or a fresh-check requirement retains the corresponding validation obligation. After reuse becomes invalid, execute the required check and use a current review frame for the new evidence.
 
 Finish checks the current sources, recipe/environment, group contract and artifacts of required completed checks. Ordinary and maintenance finish also verify the recorded completion fingerprints for every required completed contract, including roots and dependencies. Changed evidence returns a validate handoff for the immutable completed contract. `prepare-check` and `record-check` perform the due verification; `accept-revalidation` retains the new receipts in the existing run and removes temporary revalidation progress. The queue and original terminal outcome remain unchanged. Revalidation never reimplements a completed unit or creates another task/dependency graph. A pending revalidation attempt prevents finish even when an earlier matching pass exists.
 

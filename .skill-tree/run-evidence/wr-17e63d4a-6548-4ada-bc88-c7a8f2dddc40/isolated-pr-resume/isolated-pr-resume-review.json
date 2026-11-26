@@ -1,0 +1,22 @@
+{
+  "source_head": "d5700c572972d74bfb85c28efabf44337635b6ad",
+  "source_diff_sha256": "1b9a0af2b5bad2c3b7b95187fc8134d2460d5dac585bc09300b5a7fc7154f567",
+  "independent_reviewer": "/root/director_critic",
+  "reviewed_paths": [
+    ".skill-tree/common/scripts/pr-review-state.py",
+    ".skill-tree/common/scripts/run-workspaces.py",
+    ".skill-tree/common/references/pr-review-cycle.md",
+    ".skill-tree/tests/test-pr-review-cycle.py",
+    ".skill-tree/skill-tree.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "review_evidence": "Independent review checked the exact worktree, provider PR, complete diff, verified original package before runtime, and ordinary approval gates. The final review verified both unfrozen policy frontiers and one canonical transaction for the already linked run and carrier.",
+  "required_evidence": {
+    "scoped-regression": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/isolated-pr-resume/scoped-regression-result-c-1e030d1d-7345-4df1-8595-04f2c369030f.json"
+  },
+  "supplemental_review_plugin_controls": {
+    "passed": 4,
+    "total": 4
+  }
+}

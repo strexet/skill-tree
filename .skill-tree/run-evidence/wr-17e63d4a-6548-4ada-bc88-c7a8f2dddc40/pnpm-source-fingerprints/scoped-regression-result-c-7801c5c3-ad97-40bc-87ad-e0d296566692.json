@@ -1,0 +1,20 @@
+{
+  "check_id": "scoped-regression",
+  "attempt_id": "C-7801c5c3-ad97-40bc-87ad-e0d296566692",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-workflow-state.py"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "counts": {
+    "expected": 77,
+    "discovered": 77,
+    "passed": 77,
+    "failed": 0,
+    "skipped": 0
+  },
+  "observed_output": ".............................................................................\n----------------------------------------------------------------------\nRan 77 tests in 79.763s\n\nOK\n",
+  "timeout": false,
+  "elapsed_seconds": 82.862
+}

@@ -1,0 +1,22 @@
+{
+  "source_head": "b1ffde94999be0b1cc138915ee6155ae20418186",
+  "source_diff_sha256": "8445ea8a309682d207d56f4ea2da54e2be7a4d2931ad7f929f06be4efc3ba7c4",
+  "independent_reviewer": "/root/director_critic",
+  "reviewed_paths": [
+    ".skill-tree/config/resource-map.json",
+    ".skill-tree/common/references/installation-profile.md",
+    ".skill-tree/tests/test-installation-integrity.js",
+    ".skill-tree/skill-tree.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "review_evidence": "Observed independent review of the current resource map scope declarations, unchanged provider-neutral composer, current and legacy verification and ownership compatibility, and unchanged application or separately owned plugin scope.",
+  "verified_behaviors": [
+    "Installed PR review preparation loads its CommonJS dependencies in an ESM application across configured layouts. Copied packages continue to invoke their local helper. Marker ownership follows exact verification, upgrade, rollback and uninstall."
+  ],
+  "required_evidence": {
+    "scoped-regression": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/commonjs-module-boundary/scoped-regression-result-c-508de98c-ac96-4b84-8b07-a5e1b36c4fd0.json"
+  },
+  "additional_ownership_proof": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/commonjs-module-boundary/foreign-identical-module-marker.json",
+  "composition_review": "All 101 current generated marker files match canonical bytes and sealed ownership. The 13 tracked pre-existing marker files are unchanged and the 88 generated marker additions are included."
+}

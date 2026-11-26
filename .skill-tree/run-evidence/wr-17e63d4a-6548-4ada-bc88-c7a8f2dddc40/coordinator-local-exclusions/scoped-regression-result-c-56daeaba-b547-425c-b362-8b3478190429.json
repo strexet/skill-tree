@@ -1,0 +1,21 @@
+{
+  "check_id": "scoped-regression",
+  "attempt_id": "C-56daeaba-b547-425c-b362-8b3478190429",
+  "command": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-director-project-setup.js"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "counts": {
+    "expected": 2,
+    "discovered": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0
+  },
+  "observed_output": "TAP version 13\n# Subtest: installed Setup registers existing, default and custom projects with selected hosts and preserves existing Git\nok 1 - installed Setup registers existing, default and custom projects with selected hosts and preserves existing Git\n  ---\n  duration_ms: 277764.020584\n  ...\n# Subtest: dedicated coordinator protects machine-local paths and preserves portable Git inputs\nok 2 - dedicated coordinator protects machine-local paths and preserves portable Git inputs\n  ---\n  duration_ms: 26228.160792\n  ...\n1..2\n# tests 2\n# suites 0\n# pass 2\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 304062.579333\n",
+  "timeout": false,
+  "elapsed_seconds": 307.009
+}

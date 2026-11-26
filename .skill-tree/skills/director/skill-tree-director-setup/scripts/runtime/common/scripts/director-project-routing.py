@@ -129,7 +129,11 @@ def task_preview(D, summary, request, operation, mode):
                    and all(isinstance(item, str) for item in requested) and len(set(requested)) == len(requested),
                    'Select distinct exact task identities for this operation')
         D._require(set(requested) <= {task['id'] for task in tasks}, 'A selected task is outside the receiving queue')
-        tasks = [task for task in tasks if task['id'] in requested]
+        if operation == 'process' and mode == 'director':
+            by_id = {task['id']: task for task in tasks}
+            tasks = [by_id[task_id] for task_id in requested]
+        else:
+            tasks = [task for task in tasks if task['id'] in requested]
     if operation == 'implement-next':
         D._require(requested is None or len(requested) == 1, 'Implement Next selects one exact task')
         tasks = sorted(tasks, key=lambda task: -task['priority'])[:1]
@@ -141,13 +145,20 @@ def task_preview(D, summary, request, operation, mode):
     if mode == 'director':
         if required_effect not in project['allowed_effects']:
             limitations.append(f'director-{required_effect}-not-authorized')
-        if operation != 'intake':
+        if operation == 'implement-all':
+            limitations.append('director-managed-implement-all-requires-frozen-assignments')
+        elif operation == 'process' and len(tasks) > 1:
+            limitations.append('director-batch-processing-requires-frozen-intake-receipt')
+        elif operation != 'intake':
             limitations.append('director-dispatch-requires-one-exact-task-per-assignment')
     task_ids = [task['id'] for task in tasks]
     required = D.WF.dependency_scope(all_tasks, {'snapshot':task_ids}) if operation.startswith('implement-') else set()
+    fields = ['id', 'title', 'status', 'priority', 'depends_on']
+    if operation == 'process':
+        fields.extend(['topic', 'intake_batch_ids', 'pending_depends_on'])
     return {**summary, 'status':'preview', 'queue_sha256':D.WF.digest(text.encode()),
             'task_ids':task_ids, 'required_dependency_ids':sorted(required - set(task_ids)),
-            'tasks':[{key: task[key] for key in ('id', 'title', 'status', 'priority', 'depends_on')} for task in tasks],
+            'tasks':[{key: task[key] for key in fields if key in task} for task in tasks],
             'limitations':limitations}
 
 
@@ -165,7 +176,9 @@ def preview(D, root, workspace, settings, profile, products, request):
         if mode == 'director':
             skill = 'skill-tree-director-intake' if op == 'intake' else 'skill-tree-director-run'
             summary['entry'] = package_entry(D, root, settings, profile, skill)
-            summary['command'] = 'objective-preview' if op == 'intake' else 'run-dispatch'
+            summary['command'] = {'intake': 'objective-preview', 'implement-all': 'run-start'}.get(op, 'run-dispatch')
+            if op == 'implement-all':
+                summary['advance_command'] = 'run-advance-all'
         return task_preview(D, summary, request, op, mode)
     D._require('task_ids' not in request, 'Task identity selections belong to an exact queue operation')
 
@@ -213,9 +226,15 @@ def preview(D, root, workspace, settings, profile, products, request):
         return {**summary, 'execution':'project-skill', 'status':'prerequisite', 'child_skill':None,
                 'limitations':['project-preview-not-authorized']}
     package = child_skill(D, project, operation)
-    if mode == 'direct':
-        return {**summary, 'execution':'direct-project', 'status':'preview' if package else 'prerequisite',
-                'child_skill':package, 'limitations':[] if package else ['project-skill-unavailable']}
-    return {**summary, 'execution':'project-skill', 'status':'preview' if package else 'prerequisite',
-            'child_skill':package,
-            'limitations':['requires-exact-child-scope-and-effect-authorization'] if package else ['project-skill-unavailable']}
+    execution = 'direct-project' if mode == 'direct' else 'project-skill'
+    if package:
+        limitations = [] if mode == 'direct' else ['requires-exact-child-scope-and-effect-authorization']
+        return {**summary, 'execution': execution, 'status': 'preview', 'child_skill': package,
+                'limitations': limitations}
+    checkout = Path(project.get('workspace_checkout', project['checkout']))
+    prerequisite = D._profile_refresh_prerequisite(checkout)
+    if prerequisite:
+        return {**summary, 'execution': execution, 'status': 'prerequisite', 'child_skill': None,
+                'limitations': [prerequisite['code']], 'profile_prerequisite': prerequisite}
+    return {**summary, 'execution': execution, 'status': 'prerequisite', 'child_skill': None,
+            'limitations': ['project-skill-unavailable']}

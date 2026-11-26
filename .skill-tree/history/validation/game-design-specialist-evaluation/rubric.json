@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "scoring": "Each assertion is pass or fail based on a quoted fact or location in the actual output. Score equivalent behavior independently of specific phrasing.",
+  "expected": {
+    "level-blockout": [
+      "Names a spatial sequence from entrance through lantern and pedestal to gate, with distinct direction or landmarks.",
+      "Uses the 1.2 m clearance boundary to exclude the 1.0 m route while carrying and proposes a cheap observation."
+    ],
+    "level-unaided": [
+      "Starts fresh players at ordinary camera and entrance, reporting first route and cue before intervention.",
+      "Separates reachability or rehearsal from unaided discovery and proposes one cue or view comparison."
+    ],
+    "economy-flow": [
+      "Derives 3 successful matches for the baseline and 2 for the candidate from 3 coins and increments of 3.",
+      "Names the progression owner and a tutorial-order guardrail or condition that stops adoption."
+    ],
+    "economy-existing-save": [
+      "Provides an existing-save trace from 80 coins for both choices and a second load or migration control.",
+      "Keeps grandfathering versus truncation with the owner and names a falsifier such as duplicate loss or leaked value."
+    ],
+    "feel-trace": [
+      "Separates the valid 72 ms input and 90 ms state confirmation from 155 ms sound and 430 ms recovery.",
+      "Offers a one-variable control and avoids inferring the cause of perceived latency from one trace."
+    ],
+    "feel-pause": [
+      "Separates active-time clock, pause behavior and the ambiguity of the missing input queue or actual timebase.",
+      "Proposes a repeated paired trace with event ordering or queue observations capable of separating the hypotheses."
+    ],
+    "research-first-choice": [
+      "Requires consent and starts an ordinary fresh session with neutral instructions and no coaching before first choice.",
+      "Defines intervention handling, eligible observation and a concrete owner decision or comparison."
+    ],
+    "research-mixed-exposure": [
+      "Reports 4/8 and 5/7 fresh eligible counts while separately excluding coaching and absent opportunity.",
+      "Keeps causal attribution open because device, build or assignment differ and proposes a matched or randomized check."
+    ],
+    "catalog-source-pin": [
+      "Pins pattern-overwatch r1 to trace-O and distinguishes pattern-warning-cone r2 and trace-W.",
+      "Names a candidate and unsuitable placement based on reaction trigger and clock."
+    ],
+    "catalog-alias-collision": [
+      "Identifies both exact revisioned records and distinguishes hold/release from refill/spend.",
+      "Requires a placement-specific trigger or effective observation before approving either link."
+    ]
+  }
+}

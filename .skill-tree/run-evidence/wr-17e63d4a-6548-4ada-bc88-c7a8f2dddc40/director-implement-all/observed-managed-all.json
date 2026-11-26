@@ -1,0 +1,191 @@
+{
+  "observation": "Actual Codex collaboration workers changed the two disposable child checkouts. An independent Codex reviewer inspected each child. The controlled fixture-owner supplied plan acceptance. The installed Director and local Core recorded both real child starts, scoped commits, checked local integrations and child cleanup.",
+  "scope": "One worker slot and two waves. The consumer had a required producer dependency. The native fixture used the local Git target and issued no remote request.",
+  "director_record_sha256": "18d3cf4fd40c773a303002c1bdde4b5c770ef34fde5b08bde7c45e116693f7c5",
+  "timeline": [
+    {
+      "event": "run-started",
+      "phase": "running",
+      "recorded_at": "2026-11-25T17:53:06.774851+00:00",
+      "sequence": 1
+    },
+    {
+      "assignment_id": "producer",
+      "event": "dispatch-prepared",
+      "operation": "start",
+      "recorded_at": "2026-11-25T17:53:11.065108+00:00",
+      "sequence": 2
+    },
+    {
+      "assignment_id": "producer",
+      "event": "dispatch-invoking",
+      "operation": "start",
+      "recorded_at": "2026-11-25T17:53:11.069195+00:00",
+      "sequence": 3
+    },
+    {
+      "assignment_id": "producer",
+      "child_run_id": "WR-65eae198-6229-444e-b09b-6701b35d36ce",
+      "event": "dispatch-recorded",
+      "operation": "start",
+      "receipt_sha256": "97da1165b10bc80edc505226d20ff53b2e4de5e53f6671d3e294364cb9dfc163",
+      "recorded_at": "2026-11-25T17:53:13.130287+00:00",
+      "sequence": 4,
+      "stage": "acknowledge-child",
+      "task_id": "T-ccea6445-6009-4f3e-af45-96ced13656b7"
+    },
+    {
+      "event": "implement-all-frontier",
+      "gate": null,
+      "recorded_at": "2026-11-25T17:53:15.054634+00:00",
+      "remaining_ids": [
+        "T-647a27be-2c0e-4aec-906b-396a56ba025c",
+        "T-ccea6445-6009-4f3e-af45-96ced13656b7"
+      ],
+      "sequence": 5
+    },
+    {
+      "assignment_id": "producer",
+      "child_run_id": "WR-65eae198-6229-444e-b09b-6701b35d36ce",
+      "event": "assignment-completed",
+      "outcome_id": "O-93f97df1-9767-412e-adb5-41bddaaeecd2",
+      "recorded_at": "2026-11-25T17:54:32.000235+00:00",
+      "sequence": 6,
+      "task_id": "T-ccea6445-6009-4f3e-af45-96ced13656b7"
+    },
+    {
+      "event": "implement-all-frontier",
+      "gate": null,
+      "recorded_at": "2026-11-25T17:54:34.272101+00:00",
+      "remaining_ids": [
+        "T-647a27be-2c0e-4aec-906b-396a56ba025c",
+        "T-ccea6445-6009-4f3e-af45-96ced13656b7"
+      ],
+      "sequence": 7
+    },
+    {
+      "assignment_id": "consumer",
+      "event": "dispatch-prepared",
+      "operation": "start",
+      "recorded_at": "2026-11-25T17:54:55.193969+00:00",
+      "sequence": 8
+    },
+    {
+      "assignment_id": "consumer",
+      "event": "dispatch-invoking",
+      "operation": "start",
+      "recorded_at": "2026-11-25T17:54:55.202957+00:00",
+      "sequence": 9
+    },
+    {
+      "assignment_id": "consumer",
+      "child_run_id": "WR-4585774e-ec30-45c8-bcdc-a0ad7a5ec6d6",
+      "event": "dispatch-recorded",
+      "operation": "start",
+      "receipt_sha256": "9b7ea3d60068119f51e6fd43015881b623bf88edcb4f9f4b176e7ecdb1f5db33",
+      "recorded_at": "2026-11-25T17:54:57.353012+00:00",
+      "sequence": 10,
+      "stage": "acknowledge-child",
+      "task_id": "T-647a27be-2c0e-4aec-906b-396a56ba025c"
+    },
+    {
+      "event": "implement-all-frontier",
+      "gate": null,
+      "recorded_at": "2026-11-25T17:54:59.175655+00:00",
+      "remaining_ids": [
+        "T-647a27be-2c0e-4aec-906b-396a56ba025c"
+      ],
+      "sequence": 11
+    },
+    {
+      "assignment_id": "consumer",
+      "child_run_id": "WR-4585774e-ec30-45c8-bcdc-a0ad7a5ec6d6",
+      "event": "assignment-completed",
+      "outcome_id": "O-6253960f-6d69-4607-8c28-5c2f86ba3ae7",
+      "recorded_at": "2026-11-25T17:56:30.479662+00:00",
+      "sequence": 12,
+      "task_id": "T-647a27be-2c0e-4aec-906b-396a56ba025c"
+    },
+    {
+      "event": "implement-all-frontier",
+      "gate": null,
+      "recorded_at": "2026-11-25T17:56:32.947006+00:00",
+      "remaining_ids": [
+        "T-647a27be-2c0e-4aec-906b-396a56ba025c"
+      ],
+      "sequence": 13
+    },
+    {
+      "event": "implement-all-frontier",
+      "gate": null,
+      "recorded_at": "2026-11-25T17:56:52.343644+00:00",
+      "remaining_ids": [],
+      "sequence": 14
+    }
+  ],
+  "assignments": {
+    "producer": {
+      "task_id": "T-ccea6445-6009-4f3e-af45-96ced13656b7",
+      "relative_path": "story/source.txt",
+      "expected_content": "Native managed producer output.\n"
+    },
+    "consumer": {
+      "task_id": "T-647a27be-2c0e-4aec-906b-396a56ba025c",
+      "relative_path": "story/consumer.txt",
+      "expected_content": "Native managed consumer output.\n"
+    }
+  },
+  "integrated": [
+    {
+      "assignment_id": "producer",
+      "task_id": "T-ccea6445-6009-4f3e-af45-96ced13656b7",
+      "child_run_id": "WR-65eae198-6229-444e-b09b-6701b35d36ce",
+      "worker": "/root/director_resolver",
+      "reviewer": "/root/director_critic",
+      "director_dispatch_receipt": "97da1165b10bc80edc505226d20ff53b2e4de5e53f6671d3e294364cb9dfc163",
+      "outcome_id": "O-93f97df1-9767-412e-adb5-41bddaaeecd2",
+      "task_commit": "542098b958d0caa5a4709516a70d667acacdc93e",
+      "task_review": "DO-2517fb01-9ad3-5cbf-9812-e224ec3a84d3",
+      "controller_review": "DO-eeebad9b-d7a7-5116-8759-b5f4cfc98425",
+      "merge_commit": "e90039fcfa0791cf2e51f784fff867e1d43c4278",
+      "cleanup": "removed",
+      "merge_parents": [
+        "504e4db80b35ee835fa909a59d325980c8f99388",
+        "542098b958d0caa5a4709516a70d667acacdc93e"
+      ],
+      "output_sha256": "81241d966dcda8b132d10b44e08e876f98416df50777e109df2adcb33d3adf41",
+      "core_outcome_sha256": "9b444d0d60b0b45d83f12d256fd0e1d9228c231dfc22ab5348e05c571fd6ef20",
+      "core_reviewed_source": "542098b958d0caa5a4709516a70d667acacdc93e"
+    },
+    {
+      "assignment_id": "consumer",
+      "task_id": "T-647a27be-2c0e-4aec-906b-396a56ba025c",
+      "child_run_id": "WR-4585774e-ec30-45c8-bcdc-a0ad7a5ec6d6",
+      "worker": "/root/entry_resolver",
+      "reviewer": "/root/director_critic",
+      "director_dispatch_receipt": "9b7ea3d60068119f51e6fd43015881b623bf88edcb4f9f4b176e7ecdb1f5db33",
+      "outcome_id": "O-6253960f-6d69-4607-8c28-5c2f86ba3ae7",
+      "task_commit": "3b4713e6d94886e309b058c668fa300f8a690bd5",
+      "task_review": "DO-a91f4a98-5f9a-5cc7-8760-ff0e758fd0d8",
+      "controller_review": "DO-6b822824-1223-5d69-b270-ac89da26c8b9",
+      "merge_commit": "2e8935db1c4310cf4f779f8dda1063e5456a3c8a",
+      "cleanup": "removed",
+      "merge_parents": [
+        "e90039fcfa0791cf2e51f784fff867e1d43c4278",
+        "3b4713e6d94886e309b058c668fa300f8a690bd5"
+      ],
+      "output_sha256": "554b8d58655d418f65da452e2dc1057795b16ef42fe3ba89910978cc23a69811",
+      "core_outcome_sha256": "05d7d9df94af96c18cd7eadb80a5a94a03ff1cdf30e4bcb6d80e0690e5deaae4",
+      "core_reviewed_source": "3b4713e6d94886e309b058c668fa300f8a690bd5"
+    }
+  ],
+  "initial_head": "504e4db80b35ee835fa909a59d325980c8f99388",
+  "key": {
+    "director_run_id": "DR-8c316c9b-ea3f-408e-92ef-b4b1458f1ff8"
+  },
+  "final": {
+    "phase": "completed",
+    "remaining_ids": [],
+    "target_head": "2e8935db1c4310cf4f779f8dda1063e5456a3c8a"
+  }
+}

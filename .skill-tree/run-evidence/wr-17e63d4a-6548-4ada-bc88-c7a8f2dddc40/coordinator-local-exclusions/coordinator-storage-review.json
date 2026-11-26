@@ -1,0 +1,24 @@
+{
+  "source_head": "91bff7bfe09946112bc7baa0d79b55329befd6e9",
+  "source_diff_sha256": "00db4f952a24d39bb83532f5bfebdfd7db7a4f588e47fa4386d2dc679e9f66ae",
+  "independent_reviewer": "/root/director_critic",
+  "reviewed_paths": [
+    ".skill-tree/common/scripts/director-project-setup.py",
+    ".skill-tree/common/scripts/director-state.py",
+    ".skill-tree/common/scripts/director-bootstrap.py",
+    ".skill-tree/common/references/director-workflow.md",
+    ".skill-tree/tests/test-director-project-setup.js",
+    ".skill-tree/tests/test-director-topologies.py",
+    ".skill-tree/skill-tree.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "review_evidence": "Independent review verified the exact coordinator-only exclusions, parent product scope, guided bootstrap and direct registration checks. The changes preserve existing custom rules and block existing tracked conflicts.",
+  "verified_behaviors": [
+    "Ordinary Git staging in a freshly installed fixture includes the portable registry and unrelated sibling paths. The three machine-local locations stay excluded. A tracked conflict and higher-precedence negation preserve owner Git rules and staged bytes."
+  ],
+  "required_evidence": {
+    "scoped-regression": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/coordinator-local-exclusions/scoped-regression-result-c-56daeaba-b547-425c-b362-8b3478190429.json",
+    "native-storage": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/coordinator-local-exclusions/native-coordinator-exclusion-controls.json"
+  }
+}

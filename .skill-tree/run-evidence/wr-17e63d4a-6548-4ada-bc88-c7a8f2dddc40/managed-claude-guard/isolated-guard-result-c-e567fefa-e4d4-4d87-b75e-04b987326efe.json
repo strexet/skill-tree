@@ -1,0 +1,25 @@
+{
+  "task_id": "T-9e40ac59-3542-44ad-aade-7e79e57a0915",
+  "check_id": "isolated-guard",
+  "attempt_id": "C-e567fefa-e4d4-4d87-b75e-04b987326efe",
+  "argv": [
+    "node",
+    "--test",
+    ".skill-tree/tests/test-director-project-setup.js"
+  ],
+  "elapsed_seconds": 211.194,
+  "exit": 0,
+  "scope": "project",
+  "counts": {
+    "expected": 1,
+    "discovered": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0
+  },
+  "associated_checks": [
+    "isolated-guard",
+    "actual-project-route"
+  ],
+  "output": "TAP version 13\n# Subtest: installed Setup registers existing, default and custom projects with selected hosts and preserves existing Git\nok 1 - installed Setup registers existing, default and custom projects with selected hosts and preserves existing Git\n  ---\n  duration_ms: 211068.4885\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 211136.853833\n"
+}

@@ -1,0 +1,22 @@
+{
+  "source_head": "e08ca248c03fd496030e5debd9363c33874903ac",
+  "source_diff_sha256": "57a487e08200c12910571f8f2889d082bab24472670bb0fd36684a69a4f51c9c",
+  "independent_reviewer": "/root/director_critic",
+  "reviewed_paths": [
+    ".skill-tree/common/scripts/run-workspaces.py",
+    ".skill-tree/common/scripts/pr-review-state.py",
+    ".skill-tree/common/references/pr-review-cycle.md",
+    ".skill-tree/tests/test-local-delivery.py",
+    ".skill-tree/skill-tree.json"
+  ],
+  "result": "clean",
+  "findings": [],
+  "review_evidence": "Independent review verifies the initial tracking fetch and the local target update check executable reference hooks before mutation. Checked-out delivery retains protected branch, signature, index and collision checks. The private ref writer uses isolated hooks.",
+  "verified_behaviors": [
+    "The native local Git synchronization fixture advances an unchecked ref with an installed dormant pre-commit hook. An executable reference hook blocks the first tracking fetch without updating either ref. Checked targets preserve unaffected edits and reject relevant executable index hooks before private setup."
+  ],
+  "required_evidence": {
+    "scoped-regression": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/fast-forward-hook-policy/scoped-regression-result-c-e575d7ab-9821-46e7-a79c-3ef720b0c0be.json",
+    "native-git": ".skill-tree/run-evidence/wr-17e63d4a-6548-4ada-bc88-c7a8f2dddc40/fast-forward-hook-policy/native-git-hook-effects.json"
+  }
+}

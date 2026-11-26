@@ -1,0 +1,20 @@
+{
+  "check_id": "review-window-preview-fixtures",
+  "attempt_id": "C-86bf3aec-af30-4e52-a477-73fdcc6066c2",
+  "command": [
+    "python3",
+    ".skill-tree/tests/test-parallel-preview.py"
+  ],
+  "exit_code": 0,
+  "result": "pass",
+  "counts": {
+    "expected": 10,
+    "discovered": 10,
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0
+  },
+  "observed_output": "..........\n----------------------------------------------------------------------\nRan 10 tests in 29.394s\n\nOK\n",
+  "timeout": false,
+  "elapsed_seconds": 32.908
+}

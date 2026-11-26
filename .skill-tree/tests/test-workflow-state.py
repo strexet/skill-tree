@@ -300,6 +300,323 @@ class WorkflowStateTests(unittest.TestCase):
             wf.complete(self.store,payload)
         self.assertEqual(git('rev-parse','HEAD'),original)
 
+    def pnpm_fingerprint_fixture(self):
+        root = self.store.source_root
+        def git(*args):
+            result = subprocess.run(['git','-C',str(root),*args],capture_output=True,text=True,timeout=15)
+            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+            return result.stdout.strip()
+        git('init','-q','-b','main')
+        git('config','user.name','Fixture')
+        git('config','user.email','fixture@example.invalid')
+        git('config','commit.gpgSign','false')
+        (root/'.gitignore').write_text('node_modules/\n.agents/\n.skill-tree/installation/\n')
+        (root/'package.json').write_text('{"name":"pnpm-fingerprint-fixture","private":true,"packageManager":"pnpm@11.25.0"}\n')
+        (root/'pnpm-workspace.yaml').write_text('packages:\n  - "packages/*"\n')
+        (root/'pnpm-lock.yaml').write_text("lockfileVersion: '9.0'\nimporters: {}\n")
+        app = root/'packages/app'
+        library = root/'packages/library'
+        for package in (app,library):
+            package.mkdir(parents=True)
+            (package/'package.json').write_text(json.dumps({'name':'fixture-'+package.name,'version':'1.0.0'})+'\n')
+            (package/'source.js').write_text('export const fixture = 1;\n')
+        git('add','.')
+        git('commit','-qm','Initial reviewed pnpm fixture')
+        install = subprocess.run(['node',str(ROOT/'bin/install.js'),'--target',str(root),'--only','codex',
+            '--project','--flavor','web','--skills','skill-tree-work-through-next'],capture_output=True,text=True,timeout=30)
+        self.assertEqual(install.returncode,0,install.stdout+install.stderr)
+        return root, app, library, git
+
+    def materialize_pnpm_fixture_store(self,root,*packages):
+        (root/'node_modules/.pnpm').mkdir(parents=True)
+        projects={str(package):{'name':'fixture-'+package.name} for package in packages}
+        (root/'node_modules/.pnpm-workspace-state-v1.json').write_text(json.dumps({'projects':projects}))
+
+    def test_web_pnpm_source_fingerprints_ignore_generated_dependency_links(self):
+        root, app, library, _ = self.pnpm_fingerprint_fixture()
+        sources = ['packages','package.json','pnpm-workspace.yaml','pnpm-lock.yaml']
+        before = wf.fingerprints(self.store,sources)
+        self.materialize_pnpm_fixture_store(root,app,library)
+        dependencies = app/'node_modules'
+        dependencies.mkdir()
+        (dependencies/'fixture-library').symlink_to(library,target_is_directory=True)
+        try:
+            after = wf.fingerprints(self.store,sources)
+        except wf.WorkflowError as error:
+            self.fail(str(error))
+        self.assertEqual(after,before)
+        (root/'pnpm-workspace.yaml').write_text('packages:\n  - "packages/library"\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+        (root/'pnpm-workspace.yaml').write_text('packages:\n  - "packages/**"\n  - "!packages/app"\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+        (root/'pnpm-workspace.yaml').write_text('packages: ["packages/*"]\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+        (root/'pnpm-workspace.yaml').write_text('packages:\n  - "packages/**"\n')
+        updated = wf.fingerprints(self.store,sources)
+        self.assertEqual(updated['packages'],before['packages'])
+        self.assertNotEqual(updated['pnpm-workspace.yaml'],before['pnpm-workspace.yaml'])
+        (root/'pnpm-lock.yaml').write_text("lockfileVersion: '9.0'\nimporters: {}\n# exact fixture change\n")
+        self.assertNotEqual(wf.fingerprints(self.store,sources)['pnpm-lock.yaml'],before['pnpm-lock.yaml'])
+        (app/'package.json').write_text('{"name":"fixture-app","version":"1.0.1"}\n')
+        self.assertNotEqual(wf.fingerprints(self.store,sources)['packages'],before['packages'])
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.binding_snapshot(root,['packages'])
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages/app/node_modules'])
+        (app/'package.json').write_text('{"name":"different-project","version":"1.0.0"}\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+
+    def test_pnpm_source_fingerprints_preserve_reviewed_aliases_and_tracked_inputs(self):
+        root, app, library, git = self.pnpm_fingerprint_fixture()
+        dependencies = app/'node_modules'
+        dependencies.mkdir()
+        (dependencies/'fixture-library').symlink_to(library,target_is_directory=True)
+        self.materialize_pnpm_fixture_store(root,app,library)
+        baseline = wf.fingerprints(self.store,['packages'])
+        unauthorized = app/'unreviewed.js'
+        unauthorized.symlink_to(library/'source.js')
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+        unauthorized.unlink()
+        self.assertEqual(wf.fingerprints(self.store,['packages']),baseline)
+        notice = dependencies/'reviewed-source.txt'
+        notice.write_text('A tracked source remains reviewed.\n')
+        relative = notice.relative_to(root).as_posix()
+        git('add','--force','--',relative)
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+        git('commit','-qm','Retain a source in a generated-looking folder')
+        git('rm','--cached','--',relative)
+        self.assertTrue(notice.is_file())
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+
+    def test_web_pnpm_pruning_does_not_accept_a_dependency_directory_alias(self):
+        root, app, library, _ = self.pnpm_fingerprint_fixture()
+        self.materialize_pnpm_fixture_store(root,app,library)
+        (app/'node_modules').symlink_to(library,target_is_directory=True)
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+        (app/'node_modules').unlink()
+        unverified = root/'packages/notes/node_modules'
+        unverified.mkdir(parents=True)
+        (unverified.parent/'package.json').write_text('{"name":"excluded-fixture","version":"1.0.0"}')
+        (unverified/'unreviewed.js').symlink_to(library/'source.js')
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+
+    def test_web_pnpm_pruning_requires_owned_profile_files(self):
+        root, app, library, _ = self.pnpm_fingerprint_fixture()
+        self.materialize_pnpm_fixture_store(root,app,library)
+        dependencies = app/'node_modules'
+        dependencies.mkdir()
+        (dependencies/'fixture-library').symlink_to(library,target_is_directory=True)
+        profile=json.loads((root/'.skill-tree/installation/profile.json').read_text())
+        destination=next(iter(profile['destinations']))
+        proof=root/destination/'references/project-profile.md'
+        self.assertTrue(proof.is_file())
+        proof.write_text(proof.read_text()+'\nUnowned change to the generated profile.\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'Binding symlink is unsupported'):
+            wf.fingerprints(self.store,['packages'])
+
+    def test_web_pnpm_scoped_completion_and_controller_review_accept_materialized_inputs(self):
+        root, app, library, git = self.pnpm_fingerprint_fixture()
+        body = self.body().replace('"sources": ["source.cs"]', '"sources": ["source.cs", "packages"]')
+        task = self.promote(self.pending('Scoped Web commit'),'Scoped Web commit',body=body)
+        wf.begin_task(self.store,{'task_id':task['id'],'implementation_operation':'implement-next'})
+        payload = self.checked_git_completion(task,real_review=True)
+        payload['source_fingerprints'].update(wf.fingerprints(self.store,['packages']))
+        self.materialize_pnpm_fixture_store(root,app,library)
+        dependencies = app/'node_modules'
+        dependencies.mkdir()
+        link = dependencies/'fixture-library'
+        link.symlink_to(library,target_is_directory=True)
+        ignored_source = app/'ignored-note.txt'
+        with (root/'.git/info/exclude').open('a') as ignore:
+            ignore.write('ignored-note.txt\n')
+        ignored_source.write_text('Other ignored inputs still need review.\n')
+        with self.assertRaisesRegex(wf.workspaces.RunError,'ignored-note.txt'):
+            wf.require_committed_source_inputs(self.store,['source.cs'],['packages'])
+        ignored_source.unlink()
+        explicit = dependencies/'review-input.txt'
+        explicit.write_text('Selected input remains subject to Git review.\n')
+        link.unlink()
+        alias = root/'validation-alias.txt'
+        alias.symlink_to(explicit.relative_to(root))
+        with self.assertRaisesRegex(wf.workspaces.RunError,'node_modules/review-input.txt'):
+            wf.require_committed_source_inputs(self.store,['validation-alias.txt'],['packages','validation-alias.txt'])
+        alias.unlink()
+        link.symlink_to(library,target_is_directory=True)
+        completed = wf.complete(self.store,payload)
+        self.assertEqual(completed['commits'],[git('rev-parse','HEAD')])
+        self.assertEqual(git('diff-tree','--no-commit-id','--name-only','-r','HEAD'),'source.cs')
+        wf.require_reviewed_controller_inputs(self.store,{'snapshot':[task['id']],'required_ids':[]})
+        self.assertTrue(link.is_symlink())
+
+    def pending_hint_item(self, title, key, dependencies=()):
+        return {'title':title,'key':key,'description':'Preserve the reviewed workflow order.',
+                'expected_behavior':'Keep the required setup before dependent work.',
+                **({'pending_depends_on':list(dependencies)} if dependencies else {})}
+
+    def pending_hint_batch(self, items):
+        return {'intake_batch_id':wf.identity('IB'),'expected_source_hash':wf.file_hash(self.store.future),
+                'items':items}
+
+    def test_pending_batch_dependencies_become_ready_edges(self):
+        payload = self.pending_hint_batch([
+            {**self.pending_hint_item('Deploy consumer','consumer',['@storage']),'topic':'deploy-consumer'},
+            self.pending_hint_item('Prepare storage','storage'),
+        ])
+        intake = wf.intake(self.store,payload)
+        consumer, storage = intake['items']
+        if 'pending_depends_on' not in consumer:
+            self.fail('Stored Pending dependency hint is absent')
+        self.assertEqual(consumer['pending_depends_on'],[storage['id']])
+        self.assertEqual(consumer['depends_on'],[])
+        preview = wf.group_selection(self.store,{'queue':'pending','topic':'deploy-consumer'})
+        self.assertEqual(preview['outside_pending_dependencies'],[storage['id']])
+        self.assertEqual(preview['outside_dependencies'],[])
+        code, rows = self.future_command('pending','--id',consumer['id'])
+        self.assertEqual(code,0)
+        self.assertEqual(rows[0]['outside_pending_dependencies'],[storage['id']])
+        code, rows = self.future_command('pending','--names',consumer['id'],storage['id'])
+        self.assertEqual(code,0)
+        by_id = {row['id']:row for row in rows}
+        self.assertEqual(by_id[consumer['id']]['outside_pending_dependencies'],[])
+        prior = {path:path.read_bytes() for path in self.store.base.rglob('*') if path.is_file()}
+        blocked = {'selectors':[consumer['id'],storage['id']],
+                   'dispositions':{
+                       consumer['id']:{'status':'promoted','reason':'Prepare the consumer scope.'},
+                       storage['id']:{'status':'retained','reason':'Keep storage in Pending.'}},
+                   'tasks':[{'title':'Deliver consumer code','body':self.body(),
+                             'parent_pending_ids':[consumer['id']]}]}
+        with self.assertRaisesRegex(wf.WorkflowError,'Pending prerequisite'):
+            wf.process(self.store,blocked)
+        self.assertEqual(prior,{path:path.read_bytes() for path in self.store.base.rglob('*') if path.is_file()})
+
+        receipt = wf.process(self.store,{
+            'selectors':[consumer['id'],storage['id']],
+            'dispositions':{item['id']:{'status':'promoted','reason':'Confirmed implementation scope.'}
+                            for item in (consumer,storage)},
+            'tasks':[
+                {'key':'consumer','title':'Deliver consumer code','body':self.body(),'parent_pending_ids':[consumer['id']]},
+                {'key':'storage','title':'Implement storage setup','body':self.body(),'parent_pending_ids':[storage['id']]},
+            ]})
+        consumer_id = receipt['task_keys']['consumer']
+        storage_id = receipt['task_keys']['storage']
+        reader = wf.resolve(wf.parse(self.store.text()),[consumer_id])[0]
+        self.assertEqual(reader['depends_on'],[storage_id])
+        self.assertNotIn('pending_depends_on',reader)
+        self.assertEqual(wf.intake(self.store,payload),intake)
+        wf.start(self.store,'next',consumer_id)
+        self.assertEqual(wf.next_task(self.store)['task_id'],storage_id)
+
+    def test_pending_dependency_validation_is_atomic(self):
+        prior = {path:path.read_bytes() for path in self.store.base.rglob('*') if path.is_file()}
+        bad = [
+            [self.pending_hint_item('Unknown dependent','a',['@unset'])],
+            [self.pending_hint_item('Unknown direct dependency','a',[wf.identity('P')])],
+            [self.pending_hint_item('First duplicate','same'),self.pending_hint_item('Second duplicate','same')],
+            [self.pending_hint_item('First cycle','first',['@second']),
+             self.pending_hint_item('Second cycle','second',['@first'])],
+            [self.pending_hint_item('Self cycle','self',['@self'])],
+            [self.pending_hint_item('Duplicate dependency','a',['@b','@b']),
+             self.pending_hint_item('Single prerequisite','b')],
+        ]
+        for items in bad:
+            with self.subTest(items=items):
+                with self.assertRaises(wf.WorkflowError):
+                    wf.intake(self.store,self.pending_hint_batch(items))
+                self.assertEqual(prior,{path:path.read_bytes() for path in self.store.base.rglob('*') if path.is_file()})
+
+    def test_prior_promoted_pending_dependency_uses_completed_provenance(self):
+        prior = self.pending('Storage prerequisite')
+        payload = self.pending_hint_batch([self.pending_hint_item('Consumer intake','consumer',[prior['id']])])
+        consumer, = wf.intake(self.store,payload)['items']
+        accepted = self.promote(prior,'Storage implementation')
+        self.complete(accepted)
+        actual = self.promote(consumer,'Consumer implementation')
+        self.assertEqual(actual['depends_on'],[accepted['id']])
+
+    def test_group_preview_displays_missing_pending_promotion_evidence(self):
+        payload = self.pending_hint_batch([
+            {**self.pending_hint_item('Dependent request','followup',['@earlier']),'topic':'dependent'},
+            self.pending_hint_item('Prerequisite request','earlier'),
+        ])
+        consumer, prerequisite = wf.intake(self.store,payload)['items']
+        wf.process(self.store,{'selectors':[prerequisite['id']],
+            'dispositions':{prerequisite['id']:{'status':'resolved','reason':'Archive the earlier request.'}},'tasks':[]})
+        preview = wf.group_selection(self.store,{'queue':'pending','topic':'dependent'})
+        self.assertEqual(preview['outside_pending_dependencies'],[])
+        self.assertEqual(preview['unresolved_pending_dependencies'],[prerequisite['id']])
+        self.assertEqual(preview['ids'],[consumer['id']])
+        legacy = self.pending('Independent legacy request')
+        code, rows = self.future_command('pending','--names',consumer['id'],legacy['id'])
+        self.assertEqual(code,0)
+        by_id = {row['id']:row for row in rows}
+        self.assertEqual(by_id[consumer['id']]['unresolved_pending_dependencies'],[prerequisite['id']])
+        self.assertNotIn('unresolved_pending_dependencies',by_id[legacy['id']])
+        with self.assertRaisesRegex(wf.WorkflowError,'Pending prerequisite'):
+            self.promote(consumer,'Dependent implementation')
+
+
+    def pending_split_fixture(self):
+        payload = self.pending_hint_batch([
+            {**self.pending_hint_item('Split consumer request','consumer',['@split']),'topic':'split-consumer'},
+            self.pending_hint_item('Split prerequisite request','split'),
+        ])
+        consumer, split = wf.intake(self.store,payload)['items']
+        receipt = self.process_specs(split,[
+            self.spec(split,'Split task alpha','alpha'),
+            self.spec(split,'Split task beta','beta'),
+        ])
+        alpha, beta = wf.resolve(wf.parse(self.store.text()),
+                                 [receipt['task_keys']['alpha'],receipt['task_keys']['beta']])
+        self.complete(alpha)
+        return consumer, split, alpha, beta
+
+    def test_pending_prerequisite_preserves_all_split_members(self):
+        consumer, _, alpha, beta = self.pending_split_fixture()
+        actual = self.promote(consumer,'Split consumer implementation')
+        self.assertCountEqual(actual['depends_on'],[alpha['id'],beta['id']])
+
+    def test_pending_prerequisite_rejects_non_completed_split_member(self):
+        consumer, split, _, beta = self.pending_split_fixture()
+        wf.complete(self.store,{'task_id':beta['id'],'disposition':'cancelled',
+                                'outcome':'Withdraw the selected fixture scope.'})
+        preview = wf.group_selection(self.store,{'queue':'pending','topic':'split-consumer'})
+        self.assertEqual(preview['unresolved_pending_dependencies'],[split['id']])
+        self.assertEqual(preview['blocking_pending_promotions'],{split['id']:[beta['id']]})
+        code, rows = self.future_command('pending','--id',consumer['id'])
+        self.assertEqual(code,0)
+        self.assertEqual(rows[0]['blocking_pending_promotions'],{split['id']:[beta['id']]})
+        prior = {path:path.read_bytes() for path in self.store.base.rglob('*') if path.is_file()}
+        with self.assertRaisesRegex(wf.WorkflowError,'non-completed promotion members'):
+            self.promote(consumer,'Split consumer implementation')
+        self.assertEqual(prior,{path:path.read_bytes() for path in self.store.base.rglob('*') if path.is_file()})
+
+    def test_pending_prerequisite_binds_the_actual_reused_ready_task(self):
+        existing = self.main('Existing storage implementation')
+        consumer, prerequisite = wf.intake(self.store,self.pending_hint_batch([
+            self.pending_hint_item('Consumer request','consumer',['@storage']),
+            self.pending_hint_item('Storage reuse request','storage'),
+        ]))['items']
+        receipt = wf.process(self.store,{'selectors':[consumer['id'],prerequisite['id']],
+            'dispositions':{item['id']:{'status':'promoted','reason':'Confirm the reviewed scope.'}
+                            for item in (consumer,prerequisite)},
+            'tasks':[
+                {'key':'consumer','title':'Implement consumer reuse','body':self.body(),
+                 'parent_pending_ids':[consumer['id']]},
+                {'key':'storage','reuse_id':existing['id'],'parent_pending_ids':[prerequisite['id']]},
+            ]})
+        self.assertEqual(receipt['task_keys']['storage'],existing['id'])
+        task=wf.resolve(wf.parse(self.store.text()),[receipt['task_keys']['consumer']])[0]
+        self.assertEqual(task['depends_on'],[existing['id']])
+
     def test_intake_priority_ids_and_minimal_index(self):
         a=self.pending('Normal');b=self.pending('Low',low_priority=True)
         self.assertEqual((a['priority'],b['priority']),(100,25));self.assertTrue(wf.valid_id(a['id'],'P'))

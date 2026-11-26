@@ -157,6 +157,65 @@ test('Director lists the exact closure, dry-run is byte-neutral, and the owned p
   assert.equal(fs.existsSync(path.join(project, '.skill-tree/director')), false);
 });
 
+test('dedicated launcher guides fresh implementation and upgrades owned prior text', t => {
+  const {project} = fixture(t);
+  const instructions = 'AGENTS.md';
+  const launcher = AGENTS + '/skill-tree-director/SKILL.md';
+  const hooks = '.claude/settings.json';
+  const prefix = 'Owner rules\r\nKeep the local conventions.\n';
+  const suffix = '\nOwner notes after routing.\n';
+  write(project, instructions, prefix);
+  fs.chmodSync(path.join(project, instructions), 0o664);
+  write(project, hooks, '{"hooks":{"PreToolUse":[]}}\n');
+  const install = (...extra) => {
+    const previousUmask = process.umask(0o022);
+    try {
+      return spawn(process.execPath, [CLI, '--target', project, '--only', 'codex', '--flavor', 'director', ...extra]);
+    } finally {
+      process.umask(previousUmask);
+    }
+  };
+  pass(cli(project, 'general'));
+  const coreProfile = read(project, PROFILE);
+  assert.deepEqual(JSON.parse(coreProfile).bridges, {});
+  pass(install());
+  const guided = read(project, launcher).toString('utf8');
+  assert.match(guided, /Full Cycle.*skill-tree-full-cycle.*before creating a branch or editing product files/,
+    'The fresh Director launcher must route implementation through Full Cycle before product writes');
+  assert.match(guided, /exact task and isolated worktree/);
+  assert.match(guided, /publication and merge authorization/);
+  const bridge = read(project, instructions).toString('utf8') + suffix;
+  assert.ok(bridge.startsWith(prefix));
+  assert.match(bridge, /skill-tree-full-cycle/);
+
+  const withoutGuidance = text => text.split('\n').filter(line =>
+    !line.startsWith('For fresh managed implementation, preview Full Cycle')
+    && !line.startsWith('For queue-only intake, use')
+    && !line.startsWith('Begin scoped source edits after Core')).join('\n');
+  const oldLauncher = withoutGuidance(guided);
+  const oldBridge = withoutGuidance(bridge);
+  write(project, launcher, oldLauncher);
+  write(project, instructions, oldBridge);
+  pass(install('--dry-run'));
+  assert.equal(read(project, instructions).toString('utf8'), oldBridge);
+  assert.equal(read(project, launcher).toString('utf8'), oldLauncher);
+  pass(install());
+  assert.equal(read(project, instructions).toString('utf8'), bridge);
+  assert.equal(read(project, launcher).toString('utf8'), guided);
+  assert.equal(fs.statSync(path.join(project, instructions)).mode & 0o777, 0o664);
+  assert.equal(read(project, hooks).toString('utf8'), '{"hooks":{"PreToolUse":[]}}\n');
+  assert.deepEqual(read(project, PROFILE), coreProfile);
+  pass(install('--verify'));
+
+  const editedBridge = bridge.replace('use the Skill Tree Director first.', 'use the owner-edited routing block.');
+  assert.notEqual(editedBridge, bridge);
+  write(project, instructions, editedBridge);
+  const blocked = install();
+  assert.notEqual(blocked.status, 0);
+  assert.match(blocked.stdout + blocked.stderr, /Director routing instructions conflict/);
+  assert.equal(read(project, instructions).toString('utf8'), editedBridge);
+});
+
 test('an owned upgrade preserves plugin bytes, queue and the stopped schema-3 run', async t => {
   const { directory, project } = fixture(t);
   git(project, 'init', '-b', 'develop');
@@ -166,7 +225,27 @@ test('an owned upgrade preserves plugin bytes, queue and the stopped schema-3 ru
   git(project, '-c', 'user.name=Director Fixture', '-c', 'user.email=director-fixture@example.invalid', 'commit', '-m', 'Initial local fixture');
   git(project, 'remote', 'add', 'origin', path.join(directory, 'unused-remote.git'));
   pass(cli(project, 'general'));
-  installedClosure(project, CORE);
+  const initial = installedClosure(project, CORE);
+  const task = coreTask(project);
+  const registry = core(project, 'workspace-setup', {});
+  const worktree = path.join(directory, 'recorded-worktree');
+  const launched = core(project, 'start', {
+    local_base: true, local_base_authorization: 'Disposable local fixture.', base_branch: 'develop',
+    branch: 'codex/director-install-fixture', worktree,
+  }, ['--id', task]);
+  const [program, ...options] = launched.profile_handoff.argv;
+  const admitted = JSON.parse(pass(spawn(program, options)));
+  assert.equal(admitted.status, 'admitted');
+  assert.equal(admitted.run_id, launched.id);
+  const beforeRunning = read(project, STATE);
+  const blocked = cli(project, 'director');
+  assert.notEqual(blocked.status, 0);
+  assert.match(blocked.stderr + blocked.stdout, /stopped cleanup\/handoff/);
+  assert.deepEqual(read(project, STATE), beforeRunning);
+  assert.deepEqual(json(project, PROFILE), initial);
+  core(project, 'checkpoint', { phase: 'blocked', stop_reason: 'Waiting for the owner.', next_action: 'Reconcile the exact fixture.' },
+    ['--run-id', launched.id]);
+
   const source = write(directory, 'plugin/SKILL.md', '# Local instruction package\n');
   const ordered = ['first', 'second'].map((id, index) => ({
     id, plugin_id: 'local-review', operation: 'skill-tree-plugins', anchor: 'during', enabled: true,
@@ -180,22 +259,6 @@ test('an owned upgrade preserves plugin bytes, queue and the stopped schema-3 ru
   pass(spawn(process.execPath, [path.join(project, MANAGER), '--refresh-profile']));
   const original = installedClosure(project, CORE);
 
-  const task = coreTask(project);
-  const registry = core(project, 'workspace-setup', {});
-  const worktree = path.join(directory, 'recorded-worktree');
-  const launched = core(project, 'start', {
-    local_base: true, local_base_authorization: 'Disposable local fixture.', base_branch: 'develop',
-    branch: 'codex/director-install-fixture', worktree,
-  }, ['--id', task]);
-  const beforeRunning = read(project, STATE);
-  const blocked = cli(project, 'director');
-  assert.notEqual(blocked.status, 0);
-  assert.match(blocked.stderr + blocked.stdout, /stopped cleanup\/handoff/);
-  assert.deepEqual(read(project, STATE), beforeRunning);
-  assert.deepEqual(json(project, PROFILE), original);
-
-  core(project, 'checkpoint', { phase: 'blocked', stop_reason: 'Waiting for the owner.', next_action: 'Reconcile the exact fixture.' },
-    ['--run-id', launched.id]);
   write(project, HISTORY, 'Earlier task source review retained.\n');
   write(project, 'unrelated.txt', MARKER);
   write(worktree, 'local-unrelated.txt', 'Retain worktree-only dirty edits.\n');
@@ -271,6 +334,10 @@ test('guided bootstrap applies only the reviewed projects and resumes a partial 
     local_base: true, local_base_authorization: 'Disposable local fixture.', base_branch: 'develop',
     branch: 'codex/retained-bootstrap-fixture', worktree: path.join(directory, 'active-worktree'),
   }, ['--id', task]);
+  const [program, ...options] = run.profile_handoff.argv;
+  const admitted = JSON.parse(pass(spawn(program, options)));
+  assert.equal(admitted.status, 'admitted');
+  assert.equal(admitted.run_id, run.id);
   core(existing, 'checkpoint', { phase: 'blocked', stop_reason: 'Fixture waiting for the owner.' }, ['--run-id', run.id]);
   write(existing, 'unrelated.txt', 'Staged work\n');
   git(existing, 'add', 'unrelated.txt');
