@@ -66,6 +66,10 @@ The controller records the original cleanup attempt, moves the checkout to a pri
 
 The delivery record exposes `worktree_cleanup` with `removed` or `deferred` status and a reason for deferral. A prepared attempt remains recoverable after interruption. From the canonical checkout, run `workflow-state.py cleanup-worktree <canonical-root> --run-id WR-<uuid>` to reconcile or retry the exact attempt.
 
+A verified move keeps the native Git administrative registration, original controller marker and branch. Use `recover-workspace` for the exact run with the current moved directory and a recovery reference. Core retains the original owned location digest and the verified move before activating the locator. Retry an interrupted activation with the same moved directory. After a generic locator replacement, supply the exact previously verified directory as `previous_worktree` with the same moved directory to verify the relocation before cleanup.
+
+A prior external removal can be acknowledged through `cleanup-worktree` with `--run-id` and an input object containing `external_removal.worktree` and `external_removal.reference`. Core verifies actual worktree and administrative absence, the delivered source and target, and committed evidence. The receipt records `removal: "external"` alongside the original cleanup scope. Exact retries return the retained receipt.
+
 ```sh
 python3 scripts/workflow-state.py workspace-setup <canonical-root> --input <setup.json>
 python3 scripts/workflow-state.py start <launch-worktree> --standalone --mode next --id T-<uuid> --input <workspace.json>

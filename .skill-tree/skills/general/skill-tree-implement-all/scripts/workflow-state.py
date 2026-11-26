@@ -2479,16 +2479,35 @@ def cleanup_hook_guard(store, run, scope):
             raise WorkflowError('The selected controller still has a pending hook actor')
 
 
-def cleanup_after_merge(store, state, run, *, locked_scope=None):
+def cleanup_absence_delivery_guard(store,run,scope):
+    source_ref = scope['source_ref']
+    if (workspaces.local_git(store.root,'symbolic-ref','--quiet',source_ref,accepted=(0,1)).returncode == 0
+            or workspaces.local_git_text(store.root,'rev-parse','--verify',source_ref+'^{commit}') != scope['source_head']):
+        raise WorkflowError('The original worktree source branch or head changed after delivery')
+    cleanup_target_guard(store,scope)
+    cleanup_source_evidence(store,run,scope['source_head'])
+
+
+def replay_worktree_cleanup(record, external_removal):
+    if external_removal is not None:
+        request_sha = digest(dump(external_removal).encode())
+        if record.get('attempt',{}).get('external_removal',{}).get('request_sha256') != request_sha:
+            raise WorkflowError('External removal acknowledgement differs from the retained cleanup result')
+    return record
+
+
+def cleanup_after_merge(store, state, run, *, locked_scope=None, external_removal=None):
     """Apply cleanup inside the original delivery locks or an exact-run retry."""
     delivery = run['delivery']
     record = delivery.get('worktree_cleanup', {})
     if record.get('status') == 'removed':
-        return record
+        return replay_worktree_cleanup(record,external_removal)
     original = record.get('attempt')
 
-    def persist(status, reason=None):
+    def persist(status, reason=None, *, removal=None):
         result = {'status':status, **({'attempt':original} if original else {}), **({'reason':reason} if reason else {})}
+        if removal is not None:
+            result['removal'] = removal
         if delivery.get('worktree_cleanup') != result:
             delivery['worktree_cleanup'] = result
             state['run_registry']['runs'][run['id']] = run
@@ -2506,8 +2525,24 @@ def cleanup_after_merge(store, state, run, *, locked_scope=None):
         cleanup_hook_guard(store, run, scope)
         if original and original['scope'] != scope:
             raise WorkflowError('The confirmed delivery changed after removal preparation')
+        if external_removal is not None:
+            locator_sha = workspaces.verify_external_worktree_removal(store.root,registry,run,external_removal['worktree'],original)
+            if original and original['locator_sha256'] != locator_sha:
+                raise WorkflowError('External removal path differs from the original prepared cleanup')
+            cleanup_absence_delivery_guard(store,run,scope)
+            if workspaces.verify_external_worktree_removal(store.root,registry,run,external_removal['worktree'],original) != locator_sha:
+                raise WorkflowError('The original worktree location changed during external acknowledgement')
+            receipt = {'reference':external_removal['reference'],'request_sha256':digest(dump(external_removal).encode())}
+            original = {**(original or {'id':str(uuid.uuid4()),'scope':scope,'locator_sha256':locator_sha}),
+                        'external_removal':receipt}
+            return persist('removed',removal='external')
         path = workspaces.cleanup_checkout(store.root, registry, run, original)
         if path is None:
+            if not original or not original.get('staged'):
+                raise WorkflowError('External worktree removal requires a separate acknowledgement')
+            cleanup_absence_delivery_guard(store,run,scope)
+            if workspaces.cleanup_checkout(store.root,registry,run,original) is not None:
+                raise WorkflowError('The original staged worktree reappeared during cleanup reconciliation')
             return persist('removed')
         workspaces.cleanup_source_guard(path, scope['source_ref'], scope['source_head'])
         cleanup_target_guard(store, scope)
@@ -2554,7 +2589,15 @@ def cleanup_after_merge(store, state, run, *, locked_scope=None):
     return persist('removed')
 
 
-def cleanup_controller_worktree(store):
+def cleanup_controller_worktree(store,payload=None):
+    payload = {} if payload is None else payload
+    if not isinstance(payload,dict) or set(payload)-{'external_removal'}:
+        raise WorkflowError('Cleanup accepts only the scoped external removal acknowledgement')
+    external_removal = payload.get('external_removal')
+    if 'external_removal' in payload and (
+            not isinstance(external_removal,dict) or set(external_removal) != {'worktree','reference'}
+            or any(not isinstance(value,str) or not value.strip() for value in external_removal.values())):
+        raise WorkflowError('External removal acknowledgement requires the exact worktree and an evidence reference')
     if not valid_id(store.run_id, 'WR'):
         raise WorkflowError('Worktree cleanup requires the exact --run-id from the canonical checkout')
     run = store.load()['active_run']
@@ -2562,7 +2605,7 @@ def cleanup_controller_worktree(store):
         raise WorkflowError('Select a controller with confirmed merge delivery')
     previous = run['delivery'].get('worktree_cleanup', {})
     if previous.get('status') == 'removed':
-        return previous
+        return replay_worktree_cleanup(previous,external_removal)
     try:
         scope = cleanup_delivery_scope(store, run)
     except (ValueError, OSError, KeyError, TypeError, subprocess.TimeoutExpired):
@@ -2572,7 +2615,7 @@ def cleanup_controller_worktree(store):
     target = scope['target_ref'].removeprefix('refs/heads/') if scope else run['id']
     with workspaces.publication_lock(store.root, remote, target), store.lock():
         state = store.load()
-        return cleanup_after_merge(store, state, state['active_run'], locked_scope=scope)
+        return cleanup_after_merge(store, state, state['active_run'], locked_scope=scope,external_removal=external_removal)
 
 
 def require_reviewed_controller_inputs(store, run):
@@ -6647,7 +6690,7 @@ def main(argv=None):
         elif cmd=='complete':result=complete(store,payload)
         elif cmd=='controller-review':result=controller_review_identity(store)
         elif cmd=='merge-reviewed':result=merge_reviewed_controller(store,payload)
-        elif cmd=='cleanup-worktree':result=cleanup_controller_worktree(store)
+        elif cmd=='cleanup-worktree':result=cleanup_controller_worktree(store,payload)
         elif cmd=='finish':result=finish(store,payload)
         elif cmd=='audit':result=audit(store,payload)
         elif cmd=='history':result=history(store,args.id,args.component)

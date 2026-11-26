@@ -79,7 +79,10 @@ def runtime(root):
         return None
     data = json.loads(path.read_text())
     pending = data.get('pending_worktrees', {})
+    unverified = data.get('unverified_worktrees', [])
     if (data.get('schema') != 1 or not isinstance(data.get('worktrees'), dict)
+            or not isinstance(unverified,list) or any(not isinstance(rid,str) or rid not in data['worktrees'] for rid in unverified)
+            or len(set(unverified)) != len(unverified)
             or not isinstance(pending,dict) or any(not re.fullmatch(r'WR-[a-f0-9-]{36}',rid)
                 or not isinstance(path,str) or not Path(path).is_absolute() for rid,path in pending.items())):
         raise RunError('Unsupported machine-local run locator; explicit recovery required')
@@ -390,6 +393,7 @@ def provision(store, run, payload):
         raise RunError('Worktree destination exists; explicit recovery required')
     if git(store.root,'for-each-ref','--format=%(refname)','refs/heads/'+spec['branch']):raise RunError('Working branch already exists; select the retained run or explicit recovery')
     run['workspace'] = spec
+    run['cleanup_origin_sha256'] = locator_path_sha256(path)
     run['delivery'] = {'implementation': 'in-progress', 'publication': 'not-requested', 'status': 'implementation-in-progress', 'authorization': payload.get('delivery_authorization', {})}
     run['workspace_state'] = 'reserved'
     return path
@@ -499,25 +503,78 @@ def cleanup_quarantine(root, attempt):
     return directory/'checkout'
 
 
-def cleanup_checkout(root, registry, run, original):
+def locator_path_sha256(path):
+    return hashlib.sha256(os.fsencode(path)).hexdigest()
+
+
+def cleanup_worktree_owner(root, registry, run):
     locator = runtime(root)
     workspace = run['workspace']
     owner = workspace.get('cleanup_owner')
-    if not isinstance(owner, dict) or owner.get('run_id') != run['id'] or owner.get('queue_id') != registry['queue_id']:
+    if (not isinstance(owner,dict) or owner.get('run_id') != run['id']
+            or owner.get('queue_id') != registry['queue_id']
+            or not isinstance(owner.get('token'),str) or not owner['token']):
         raise RunError('The worktree has no current controller creation proof')
-    if run.get('workspace_recoveries') or run.get('workspace_state') != 'ready':
-        raise RunError('A recovered or unfinished worktree requires separate ownership inspection')
+    if run.get('workspace_state') != 'ready':
+        raise RunError('An unfinished worktree requires separate ownership inspection')
     if not locator or locator['queue_id'] != registry['queue_id'] or run['id'] not in locator['worktrees']:
         raise RunError('The exact controller worktree locator is unavailable')
     name = owner.get('registration')
-    if not isinstance(name, str) or name in {'', '.', '..'} or Path(name).name != name:
+    if not isinstance(name,str) or name in {'','.','..'} or Path(name).name != name:
         raise RunError('The Git administrative identity is invalid')
     origin = Path(locator['worktrees'][run['id']])
     if not origin.is_absolute() or root.is_relative_to(origin):
         raise RunError('The worktree locator is ambiguous or contains the canonical checkout')
-    registration = common_dir(root)/'worktrees'/name
-    if original and original['locator_sha256'] != hashlib.sha256(os.fsencode(origin)).hexdigest():
-        raise RunError('The original worktree locator changed after removal preparation')
+    return locator, owner, origin, common_dir(root)/'worktrees'/name
+
+
+def cleanup_origin_sha256(run):
+    candidates = [run.get('cleanup_origin_sha256'), run.get('dispatch_workspace_sha256'),
+                  (run.get('initial_profile') or {}).get('worktree_path_sha256')]
+    known = [value for value in candidates if value is not None]
+    if (any(not isinstance(value,str) or not re.fullmatch(r'[a-f0-9]{64}',value) for value in known)
+            or len(set(known)) > 1):
+        raise RunError('Conflicting original worktree location proofs')
+    return known[0] if known else None
+
+
+def verified_move_chain(run, owner):
+    anchor = cleanup_origin_sha256(run)
+    prior = None
+    for receipt in run.get('workspace_recoveries',[]):
+        if (not isinstance(receipt,dict) or receipt.get('kind') != 'verified-worktree-move'
+                or receipt.get('owner') != owner
+                or receipt.get('branch') != run['workspace']['branch']
+                or any(not isinstance(receipt.get(key),str) or not re.fullmatch(r'[a-f0-9]{64}',receipt[key])
+                       for key in ('from_locator_sha256','to_locator_sha256'))
+                or receipt['from_locator_sha256'] == receipt['to_locator_sha256']
+                or receipt['from_locator_sha256'] != (prior['to_locator_sha256'] if prior else anchor)):
+            raise RunError('A recovered worktree requires separate ownership inspection')
+        prior = receipt
+    return prior
+
+
+def path_absent(path):
+    try:
+        path.lstat()
+    except FileNotFoundError:
+        return True
+    return False
+
+
+def latest_verified_move(run):
+    history = run.get('workspace_recoveries',[])
+    last = history[-1] if history else None
+    return last if isinstance(last,dict) and last.get('kind') == 'verified-worktree-move' else None
+
+
+def pending_verified_move(run, locator):
+    last = latest_verified_move(run)
+    return bool(last and locator and last.get('from_locator_sha256') == locator_path_sha256(locator)
+                and last.get('to_locator_sha256') != last.get('from_locator_sha256'))
+
+
+def registered_worktrees(root):
     records = local_git(root, 'worktree', 'list', '--porcelain', '-z').stdout.split(b'\0\0')
     registrations = {}
     for record in records:
@@ -527,17 +584,34 @@ def cleanup_checkout(root, registry, run, original):
             if registered in registrations:
                 raise RunError('Git reports an ambiguous worktree registration')
             registrations[registered] = fields
+    return registrations
+
+
+def cleanup_checkout(root, registry, run, original):
+    locator, owner, origin, registration = cleanup_worktree_owner(root,registry,run)
+    move = verified_move_chain(run,owner)
+    current_path_sha = locator_path_sha256(origin)
+    anchor = move['to_locator_sha256'] if move else cleanup_origin_sha256(run)
+    if anchor is not None and anchor != current_path_sha:
+        raise RunError('Activate the exact verified worktree relocation before cleanup')
+    if anchor is None and run['id'] in locator.get('unverified_worktrees',[]):
+        raise RunError('The recovered legacy locator lacks original worktree location evidence')
+    if original and original['locator_sha256'] != current_path_sha:
+        raise RunError('The original worktree locator changed after removal preparation')
+    registrations = registered_worktrees(root)
     quarantine = cleanup_quarantine(root, original) if original else None
     if quarantine and quarantine.is_symlink():
         raise RunError('The staged worktree path is ambiguous')
-    registration_absent = not registration.exists() and not registration.is_symlink()
-    if original and original.get('staged') and registration_absent and not quarantine.exists() and quarantine not in registrations:
+    registration_absent = path_absent(registration)
+    if original and original.get('external_removal') and registration_absent and origin not in registrations:
+        return None
+    if original and original.get('staged') and registration_absent and path_absent(quarantine) and quarantine not in registrations:
         # A newly created directory at the original path does not belong to the removed registration.
         return None
     if origin.resolve() != origin:
         raise RunError('The original worktree location changed')
     path = quarantine if quarantine and (quarantine.exists() or quarantine in registrations) else origin
-    if not path.exists() and registration_absent and path not in registrations:
+    if path_absent(path) and registration_absent and path not in registrations:
         if original:
             return None
         raise RunError('The selected worktree disappeared before a cleanup attempt was prepared')
@@ -556,6 +630,22 @@ def cleanup_checkout(root, registry, run, original):
     if Path.cwd().resolve().is_relative_to(path):
         raise RunError('Retry cleanup from outside the selected worktree')
     return path
+
+
+def verify_external_worktree_removal(root, registry, run, requested, attempt):
+    _, owner, origin, registration = cleanup_worktree_owner(root,registry,run)
+    move = verified_move_chain(run,owner)
+    anchor = move['to_locator_sha256'] if move else cleanup_origin_sha256(run)
+    if anchor != locator_path_sha256(origin):
+        raise RunError('External acknowledgement requires verified original worktree location evidence')
+    if requested != str(origin) or origin.resolve() != origin:
+        raise RunError('External removal acknowledgement requires the original exact worktree location')
+    worktrees = registered_worktrees(root)
+    staged = cleanup_quarantine(root,attempt) if attempt else None
+    if (not path_absent(origin) or not path_absent(registration) or origin in worktrees
+            or staged and (not path_absent(staged) or staged in worktrees)):
+        raise RunError('The old worktree, staged checkout or Git registration is still present')
+    return locator_path_sha256(origin)
 
 
 def cleanup_source_guard(path, source_ref, source_head):
@@ -722,18 +812,42 @@ def recover_locator(store, payload, *, bootstrap_state_sha256=None):
         if not isinstance(mapping,dict) or not required.issubset(mapping) or set(mapping)-set(registry['runs']):
             raise RunError('Recovery requires every unfinished retained run locator and rejects unknown run IDs')
         restored, pending = {}, {}
+        unverified = []
+        try:
+            previous = runtime(store.root) or {}
+        except (OSError,ValueError):
+            previous = {}
+        previous_paths = previous.get('worktrees',{})
+        for rid, run in registry['runs'].items():
+            bound = previous_paths.get(rid)
+            if pending_verified_move(run,bound):
+                restored[rid] = bound
         for rid, value in mapping.items():
             path = Path(value).resolve(); run = registry['runs'][rid]
-            if run.get('workspace_state')=='reserved' and initial_profile_pending(run) and run['admission']['flavor']=='web':
-                if hashlib.sha256(str(path).encode()).hexdigest() != run['initial_profile']['worktree_path_sha256']:
-                    raise RunError('Web locator recovery requires the original exact reserved worktree path')
+            bound = previous_paths.get(rid)
+            move = latest_verified_move(run)
+            if pending_verified_move(run,bound) or move and not bound:
+                if locator_path_sha256(path) != move['from_locator_sha256']:
+                    raise RunError('Restore the previous locator before activating the exact recorded relocation')
+                restored[rid] = str(path)
+                continue
+            anchor = cleanup_origin_sha256(run)
+            if run.get('workspace_state') == 'reserved' and anchor is not None:
+                if locator_path_sha256(path) != anchor:
+                    raise RunError('Locator recovery requires the original exact reserved worktree path')
                 if not path.exists():
                     pending[rid] = str(path)
                     continue
             if common_dir(path) != common_dir(store.root) or git(path, 'symbolic-ref', '--short', 'HEAD') != run['workspace']['branch']:
                 raise RunError('Recovery workspace identity mismatch')
-            restored[rid] = value
+            restored[rid] = str(path)
+            if cleanup_origin_sha256(run) is None and (
+                    previous.get('worktrees',{}).get(rid) != str(path)
+                    or rid in previous.get('unverified_worktrees',[])):
+                unverified.append(rid)
         data = {'schema':1,'queue_id':registry['queue_id'],'canonical_root':str(store.root),'worktrees':restored}
+        if unverified:
+            data['unverified_worktrees'] = sorted(unverified)
         if pending:
             data['pending_worktrees']=pending
         atomic(runtime_file(store.root),data)
@@ -1629,6 +1743,75 @@ def environment(store, payload=None):
         result['web_runtime_path'] = web_runtime_path
     return result
 
+def native_move_matches(root,run,data,owner,registration,origin,path):
+    if runtime(root) != data:
+        raise RunError('Worktree locators changed during relocation')
+    if not path.is_dir() or path.resolve() != path or root.is_relative_to(path):
+        return False
+    retained = {**data.get('pending_worktrees',{}), **data['worktrees']}
+    if any(rid != run['id'] and worktree_paths_overlap(Path(other).resolve(),path) for rid,other in retained.items()):
+        raise RunError('Another controller locates a worktree overlapping the moved destination')
+    registered = registered_worktrees(root)
+    if path not in registered or origin != path and origin in registered:
+        return False
+    if linked_registration(root,path) != registration:
+        return False
+    if checked_out_branch(path)['ref'] != 'refs/heads/'+run['workspace']['branch']:
+        return False
+    return directed_owner(root,path,run,data['queue_id']) == owner
+
+
+def recover_verified_move(store, text, state, run, path, resolution, previous_worktree=None):
+    registry = state['run_registry']
+    try:
+        data, owner, locator, registration = cleanup_worktree_owner(store.root,registry,run)
+        prior = verified_move_chain(run,owner)
+    except RunError:
+        return False
+    anchor = cleanup_origin_sha256(run)
+    if anchor is None:
+        return False
+    locator_sha, target_sha = locator_path_sha256(locator),locator_path_sha256(path)
+    verified_sha = prior['to_locator_sha256'] if prior else anchor
+    pending = (prior and prior['from_locator_sha256'] == locator_sha
+               and prior['to_locator_sha256'] != locator_sha)
+    origin = locator
+    if pending:
+        if target_sha != verified_sha or previous_worktree is not None:
+            raise RunError('Recovery must activate the original recorded relocation destination')
+    elif locator_sha != verified_sha:
+        if not isinstance(previous_worktree,str) or path != locator:
+            raise RunError('The locally recovered worktree location requires the exact previously verified worktree path')
+        origin = Path(previous_worktree)
+        if (not origin.is_absolute() or origin.resolve() != origin
+                or locator_path_sha256(origin) != verified_sha):
+            raise RunError('The supplied previous worktree differs from the exact verified location')
+    elif previous_worktree is not None:
+        previous = Path(previous_worktree) if isinstance(previous_worktree,str) else None
+        if (not prior or path != locator or previous is None or not previous.is_absolute()
+                or previous.resolve() != previous or locator_path_sha256(previous) != prior['from_locator_sha256']):
+            raise RunError('Previous worktree evidence differs from the recorded relocation')
+    if path == origin and not prior:
+        return False
+    if path != origin and run.get('delivery',{}).get('worktree_cleanup',{}).get('attempt'):
+        raise RunError('Reconcile the original prepared cleanup before changing the worktree locator')
+    if run.get('dispatch_workspace_sha256') and run.get('delivery',{}).get('status') != 'merged':
+        return False
+    if not native_move_matches(store.root,run,data,owner,registration,origin,path):
+        return False
+    if path != origin and not pending:
+        receipt = {'kind':'verified-worktree-move','owner':owner,
+                   'from_locator_sha256':locator_path_sha256(origin),'to_locator_sha256':target_sha,
+                   'branch':run['workspace']['branch'],'resolution':resolution}
+        run.setdefault('workspace_recoveries',[]).append(receipt)
+        store.save(text,state,update_navigation=False)
+    if path != locator:
+        if not native_move_matches(store.root,run,data,owner,registration,origin,path):
+            raise RunError('The original native worktree or branch changed before locator activation')
+        activate_worktree_locator(store.root,data,run['id'],path)
+    ensure_workspace(store,run)
+    return True
+
 def recover_workspace(store,payload):
     if not payload.get('resolution'):
         raise RunError('Explicit recovery requires preserved-work evidence and the resolved condition')
@@ -1641,17 +1824,33 @@ def recover_workspace(store,payload):
         requested=payload.get('worktree') or data['worktrees'].get(rid) or pending
         if not requested:raise RunError('Recovery requires the recorded or explicitly relocated worktree path')
         path=Path(requested).resolve()
+        directed = run.get('dispatch_workspace_sha256')
         if pending is not None and pending != str(path):
             raise RunError('Recovery requires the original exact worktree path')
         if (initial_profile_pending(run)
                 and hashlib.sha256(str(path).encode()).hexdigest() != run['initial_profile']['worktree_path_sha256']):
             raise RunError('Initial profile recovery requires the original exact worktree path')
+        if reserved:
+            anchor = cleanup_origin_sha256(run)
+            if anchor is not None and locator_path_sha256(path) != anchor:
+                if directed:
+                    raise RunError('Director reservation requires the original exact worktree path')
+                raise RunError('Recovery requires the original exact reserved worktree path')
         if reserved and run['admission']['flavor']=='web':
             guard_web_destination(data,state['run_registry']['runs'],rid,path)
             tip = git(store.root,'for-each-ref','--format=%(objectname)','refs/heads/'+spec['branch'])
             if tip and tip != spec['base_commit']:
                 raise RunError('The reserved Web branch no longer points to the original Git base')
-        directed = run.get('dispatch_workspace_sha256')
+        relocation_pending = pending_verified_move(run,data['worktrees'].get(rid))
+        if relocation_pending and not payload.get('worktree'):
+            raise RunError('Recovery requires the exact recorded relocation destination')
+        if not reserved and payload.get('worktree') and recover_verified_move(
+                store,text,state,run,path,payload['resolution'],payload.get('previous_worktree')):
+            return run
+        if relocation_pending:
+            raise RunError('The original recorded relocation awaits the verified native worktree')
+        if 'previous_worktree' in payload:
+            raise RunError('Previous worktree evidence requires a verified existing native worktree move')
         owned = directed and (reserved or spec.get('dispatch_owner_token') or spec.get('cleanup_owner'))
         if owned and hashlib.sha256(str(path).encode()).hexdigest() != directed:
             raise RunError('Director reservation requires the original exact worktree path')

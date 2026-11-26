@@ -639,10 +639,16 @@ class RunWorkspaceTests(unittest.TestCase):
             self.assertEqual(json.loads(path.read_text())['recorded_at'],event['recorded_at'])
     def test_reserved_workspace_recovery_keeps_run_id_and_original_claims(self):
         tid=self.task()
+        reserved_path=self.base/'reserved-checkout'
         with patch.object(ws,'create_reserved',side_effect=ws.RunError('Synthetic interruption')):
-            with self.assertRaises(ws.RunError):self.start(tid)
-        store=wf.Store(self.root);run=store.load()['active_run'];recovered=ws.recover_workspace(store,{'worktree':str(self.base/'recovered'),'resolution':'The synthetic interruption leaves no source changes.'})
-        self.assertEqual(recovered['id'],run['id']);self.assertEqual(recovered['workspace_state'],'ready');self.assertEqual(wf.Store(self.base/'recovered').load()['run_registry']['claims'][tid],run['id'])
+            with self.assertRaises(ws.RunError):
+                self.start(tid,worktree=str(reserved_path))
+        store=wf.Store(self.root)
+        run=store.load()['active_run']
+        recovered=ws.recover_workspace(store,{'worktree':str(reserved_path),'resolution':'The synthetic interruption leaves no source changes.'})
+        self.assertEqual(recovered['id'],run['id'])
+        self.assertEqual(recovered['workspace_state'],'ready')
+        self.assertEqual(wf.Store(reserved_path).load()['run_registry']['claims'][tid],run['id'])
     def test_export_replay_is_idempotent_on_the_canonical_owner(self):
         run=self.start(self.task());store=wf.Store(self.location(run));wf.checkpoint(store,{'partial_work':['source.py']});export=wf.export_run(store)
         envelope=json.loads((store.source_root/export['path']).read_text())
@@ -698,7 +704,11 @@ class RunWorkspaceTests(unittest.TestCase):
         dependency=self.task('Dependency');first=self.start(dependency);(self.location(first)/'source.py').write_text('value = 2\n');self.finish_run(first)
         consumer=self.task('Consumer',[dependency]);second=self.start(consumer);store=wf.Store(self.location(second))
         with self.assertRaisesRegex(wf.WorkflowError,'source integration'):wf.begin_task(store,{'task_id':consumer})
-        (store.source_root/'source.py').write_text('value = 2\n');self.assertEqual(wf.begin_task(store,{'task_id':consumer})['phase'],'implement')
+        (store.source_root/'source.py').write_text('value = 2\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'source integration'):
+            wf.begin_task(store,{'task_id':consumer})
+        (store.source_root/'report.json').write_bytes((self.location(first)/'report.json').read_bytes())
+        self.assertEqual(wf.begin_task(store,{'task_id':consumer})['phase'],'implement')
     def test_portable_execution_path_references_require_explicit_recovery(self):
         original={'session':{'project_root':str(self.root/'src'),'external_root':'/external/fixture','remote_url':'git@fixture-local-alias:owner/repo.git'}}
         portable=ws.portable_envelope(original,self.root,self.base);self.assertNotIn('/external/fixture',json.dumps(portable));key=portable['local_path_references'][0];value_key=portable['local_value_references'][0];self.assertNotIn('fixture-local-alias',json.dumps(portable))

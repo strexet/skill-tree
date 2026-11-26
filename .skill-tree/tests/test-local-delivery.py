@@ -211,6 +211,151 @@ class LocalDeliveryTests(unittest.TestCase):
         retry = wf.cleanup_controller_worktree(wf.Store(self.root, self.run['id']))
         self.assertEqual(retry, result['delivery']['worktree_cleanup'])
 
+    def test_cleanup_accepts_verified_same_owner_git_move(self):
+        self.start_reviewed_controller('all')
+        outcome = self.accept_scoped_source(self.tid,commit_evidence=True)
+        original_owner = self.run['workspace']['cleanup_owner']
+        self.git(self.root,'worktree','lock',self.source)
+        closed = self.finish_reviewed_fixture()
+        self.assertEqual(closed['delivery']['worktree_cleanup']['status'],'deferred')
+        self.git(self.root,'worktree','unlock',self.source)
+        moved = self.base/'verified-worktree-move'
+        self.git(self.root,'worktree','move',self.source,moved)
+        canonical = wf.Store(self.root,self.run['id'])
+        request = {'worktree':str(moved),'resolution':'Verify the same native Git worktree relocation.'}
+        save = canonical.save
+
+        def persist_and_change_branch(*args, **kwargs):
+            save(*args, **kwargs)
+            self.git(moved,'switch','-c','fixture-conflicting-branch')
+
+        with patch.object(canonical,'save',side_effect=persist_and_change_branch):
+            with self.assertRaisesRegex(ws.RunError,'branch changed before locator activation'):
+                ws.recover_workspace(canonical,request)
+        self.git(moved,'switch',self.run['workspace']['branch'])
+        with self.assertRaisesRegex(ws.RunError,'exact recorded relocation destination'):
+            ws.recover_workspace(canonical,{'resolution':'Fixture retry without the moved directory.'})
+        with patch.object(ws,'activate_worktree_locator',side_effect=OSError('Fixture interruption before activation')):
+            with self.assertRaisesRegex(OSError,'before activation'):
+                ws.recover_workspace(canonical,request)
+        self.assertEqual(ws.runtime(self.root)['worktrees'][self.run['id']],str(self.source))
+        queue_id = ws.runtime(self.root)['queue_id']
+        projection = wf.Store(self.root,route_queue=False,allow_unselected=True,neutral=True)
+        ws.recover_locator(projection,{'queue_id':queue_id,'worktrees':{}})
+        self.assertEqual(ws.runtime(self.root)['worktrees'][self.run['id']],str(self.source))
+        with self.assertRaisesRegex(ws.RunError,'previous locator'):
+            ws.recover_locator(projection,{'queue_id':queue_id,'worktrees':{self.run['id']:str(moved)}})
+        ws.runtime_file(self.root).unlink()
+        with self.assertRaisesRegex(ws.RunError,'previous locator'):
+            ws.recover_locator(projection,{'queue_id':queue_id,'worktrees':{self.run['id']:str(moved)}})
+        ws.recover_locator(projection,{'queue_id':queue_id,'worktrees':{self.run['id']:str(self.source)}})
+        pending = canonical.load()['active_run']['workspace_recoveries']
+        self.assertEqual(len(pending),1)
+        held = wf.cleanup_controller_worktree(wf.Store(self.root,self.run['id']))
+        self.assertEqual(held['status'],'deferred')
+        moved_run = ws.recover_workspace(canonical,request)
+        self.assertEqual(moved_run['workspace_recoveries'],pending)
+        self.assertEqual(ws.recover_workspace(canonical,request)['workspace_recoveries'],pending)
+        dirty = moved/'retained-local.txt'
+        dirty.write_text('Preserve local work at the moved location.')
+        held = wf.cleanup_controller_worktree(wf.Store(self.root,self.run['id']))
+        self.assertEqual(held['status'],'deferred')
+        self.assertEqual(dirty.read_text(),'Preserve local work at the moved location.')
+        dirty.unlink()
+        cleanup = wf.cleanup_controller_worktree(wf.Store(self.root,self.run['id']))
+        if cleanup['status'] != 'removed':
+            self.fail('Verified same-owner move was deferred')
+        self.assertEqual(moved_run['workspace']['cleanup_owner'],original_owner)
+        self.assertEqual(moved_run['workspace_recoveries'][-1]['kind'],'verified-worktree-move')
+        self.assertFalse(self.source.exists())
+        self.assertFalse(moved.exists())
+        self.assertEqual(self.git(self.root,'rev-parse',self.run['workspace']['branch']),outcome['commits'][0])
+
+    def test_cleanup_acknowledges_verified_external_removal_without_deleting_files(self):
+        self.start_reviewed_controller('all')
+        outcome = self.accept_scoped_source(self.tid,commit_evidence=True)
+        self.git(self.root,'worktree','lock',self.source)
+        closed = self.finish_reviewed_fixture()
+        self.assertEqual(closed['delivery']['worktree_cleanup']['status'],'deferred')
+        self.git(self.root,'worktree','unlock',self.source)
+        run_id = self.run['id']
+        evidence = {'external_removal':{'worktree':str(self.source),
+                    'reference':'Fixture observed an ordinary external Git worktree removal.'}}
+        live = wf.cleanup_controller_worktree(wf.Store(self.root,run_id),evidence)
+        self.assertEqual(live['status'],'deferred')
+        self.assertTrue(self.source.is_dir())
+        self.git(self.root,'worktree','remove',self.source)
+        without = wf.cleanup_controller_worktree(wf.Store(self.root,run_id))
+        self.assertEqual(without['status'],'deferred')
+        ref = 'refs/heads/'+self.run['workspace']['branch']
+        head = outcome['commits'][0]
+        base = self.run['workspace']['base_commit']
+        self.git(self.root,'update-ref',ref,base,head)
+        stale = wf.cleanup_controller_worktree(wf.Store(self.root,run_id),evidence)
+        self.assertEqual(stale['status'],'deferred')
+        self.git(self.root,'update-ref',ref,head,base)
+        with patch.object(ws,'remove_controller_worktree',side_effect=AssertionError('Unexpected deletion')):
+            observed = wf.cleanup_controller_worktree(wf.Store(self.root,run_id),evidence)
+        self.assertEqual(observed['status'],'removed')
+        self.assertEqual(observed['removal'],'external')
+        self.assertEqual(wf.cleanup_controller_worktree(wf.Store(self.root,run_id),evidence),observed)
+        self.assertFalse(self.source.exists())
+
+
+    def test_cleanup_holds_a_locator_rebound_without_verified_relocation(self):
+        self.start_reviewed_controller('all')
+        self.accept_scoped_source(self.tid,commit_evidence=True)
+        self.git(self.root,'worktree','lock',self.source)
+        self.finish_reviewed_fixture()
+        self.git(self.root,'worktree','unlock',self.source)
+        moved = self.base/'unproved-rebound-worktree'
+        self.git(self.root,'worktree','move',self.source,moved)
+        registry = ws.runtime(self.root)
+        run_id = self.run['id']
+        projection = wf.Store(self.root,route_queue=False,allow_unselected=True,neutral=True)
+        ws.recover_locator(projection,{'queue_id':registry['queue_id'],'worktrees':{run_id:str(moved)}})
+        with patch.object(ws,'remove_controller_worktree',side_effect=AssertionError('Unexpected deletion')):
+            held = wf.cleanup_controller_worktree(wf.Store(self.root,run_id))
+        self.assertEqual(held['status'],'deferred')
+        self.assertIn('verified worktree relocation',held['reason'])
+        self.assertTrue(moved.is_dir())
+        scoped = wf.Store(self.root,run_id)
+        request = {'worktree':str(moved),'resolution':'Verify the actual prior native worktree.',
+                   'previous_worktree':str(self.source)}
+        with self.assertRaisesRegex(ws.RunError,'previous worktree differs'):
+            ws.recover_workspace(scoped,{**request,'previous_worktree':str(self.base/'another-checkout')})
+        verified = ws.recover_workspace(scoped,request)['workspace_recoveries']
+        replay = ws.recover_workspace(scoped,request)['workspace_recoveries']
+        self.assertEqual(replay,verified)
+        self.assertEqual(wf.cleanup_controller_worktree(wf.Store(self.root,run_id))['status'],'removed')
+
+    def test_cleanup_origin_pins_interrupted_ordinary_reservation(self):
+        requested = {}
+
+        def interrupt(store,run,path):
+            requested.update(run_id=run['id'],path=path)
+            raise OSError('Fixture interruption before Git worktree creation')
+
+        with patch.object(ws,'create_reserved',side_effect=interrupt):
+            with self.assertRaisesRegex(OSError,'before Git worktree creation'):
+                self.start_reviewed_controller('all')
+        run_id, original = requested['run_id'], requested['path']
+        wrong = self.base/'unapproved-reserved-path'
+        selected = wf.Store(self.root,run_id)
+        local = ws.runtime(self.root)
+        locator = ws.runtime_file(self.root)
+        before = locator.read_bytes()
+        with self.assertRaisesRegex(ws.RunError,'original exact reserved worktree path'):
+            ws.recover_workspace(selected,{'worktree':str(wrong),'resolution':'Fixture wrong path.'})
+        projection = wf.Store(self.root,route_queue=False,allow_unselected=True,neutral=True)
+        with self.assertRaisesRegex(ws.RunError,'original exact reserved worktree path'):
+            ws.recover_locator(projection,{'queue_id':local['queue_id'],'worktrees':{run_id:str(wrong)}})
+        self.assertEqual(locator.read_bytes(),before)
+        self.assertFalse(wrong.exists())
+        continued = ws.recover_workspace(selected,{'worktree':str(original),'resolution':'Restore exact reservation.'})
+        self.assertEqual(continued['workspace_state'],'ready')
+        self.assertTrue(original.is_dir())
+
     def test_cleanup_defers_for_ignored_data_and_reconciles_a_lost_removal_response(self):
         self.start_reviewed_controller('all')
         self.accept_scoped_source(self.tid, commit_evidence=True)
