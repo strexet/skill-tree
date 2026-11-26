@@ -1421,7 +1421,9 @@ class WorkflowStateTests(unittest.TestCase):
         attempt = wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'})
         request = self._check_request(task,attempt)
         process = self._owned_test_group(live=True)
-        binding = self._bind_test_runner(request,process)
+        # Legacy bindings contain only a group, host and observation time.
+        with patch.object(wf.sys, 'platform', 'freebsd'):
+            binding = self._bind_test_runner(request,process)
         other_live = self._owned_test_group(live=True)
         group = process.pid
         fresh = wf.reconcile_check(self.store,request)

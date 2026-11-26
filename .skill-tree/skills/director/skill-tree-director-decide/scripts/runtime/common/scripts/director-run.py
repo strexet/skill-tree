@@ -53,40 +53,10 @@ def _supervision_process(process):
     pid, pgid = process['pid'], process['pgid']
     D._require(type(pid) is int and type(pgid) is int and 1 < pid == pgid < 2**31
                and pid not in {os.getpid(), os.getpgrp()}, 'Supervision requires a distinct local process group leader')
-    if sys.platform == 'darwin':
-        import ctypes
-
-        class ProcBsdInfo(ctypes.Structure):
-            # macOS proc_info.h, PROC_PIDTBSDINFO. Retain the microsecond birth identity.
-            _fields_ = [('identity', ctypes.c_uint32 * 12), ('comm', ctypes.c_char * 16),
-                        ('name', ctypes.c_char * 32), ('group', ctypes.c_uint32 * 6),
-                        ('started_seconds', ctypes.c_uint64), ('started_microseconds', ctypes.c_uint64)]
-
-        info = ProcBsdInfo()
-        read_info = ctypes.CDLL('/usr/lib/libproc.dylib').proc_pidinfo
-        read_info.argtypes = (ctypes.c_int, ctypes.c_int, ctypes.c_uint64, ctypes.c_void_p, ctypes.c_int)
-        read_info.restype = ctypes.c_int
-        size = ctypes.sizeof(info)
-        observed = read_info(pid, 3, ctypes.c_uint64(0), ctypes.byref(info), size)
-        uid = info.identity[5]
-        D._require(observed == size and info.identity[3] == pid and info.group[1] == pgid
-                   and uid == os.getuid() and info.started_seconds,
-                   'The exact same-user local process group leader is unavailable')
-        birth = {'clock': 'darwin-proc-bsdinfo', 'seconds': info.started_seconds, 'microseconds': info.started_microseconds}
-    elif sys.platform.startswith('linux'):
-        directory = Path('/proc') / str(pid)
-        stat = directory / 'stat'
-        before = stat.read_text().rpartition(') ')[2].split()
-        uid = directory.stat().st_uid
-        after = stat.read_text().rpartition(') ')[2].split()
-        D._require(len(before) > 19 and len(after) > 19 and before[19] == after[19]
-                   and before[2] == after[2] == str(pgid) and uid == os.getuid(),
-                   'The exact same-user local process group leader is unavailable')
-        birth = {'clock': 'linux-proc-stat', 'boot_id': Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
-                 'ticks': int(after[19])}
-    else:
-        raise D.DirectorError('Exact local process identity is unavailable on this host')
-    return {'pid': pid, 'pgid': pgid, 'uid': uid, 'birth': birth}
+    try:
+        return D.WF.local_process_group_identity(pid, pgid)
+    except D.WF.WorkflowError as error:
+        raise D.DirectorError(str(error)) from error
 
 
 def _group_gone(pgid):

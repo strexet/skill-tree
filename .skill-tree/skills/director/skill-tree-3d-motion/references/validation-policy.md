@@ -32,6 +32,8 @@ Source/check-set changes invalidate affected results. Unaffected passes remain a
 
 A pending attempt blocks acceptance even when an earlier result passes or the current task removes the check. For local runner recovery, bind the live original process group to the prepared attempt before drift. After cleanup, `reconcile-check` verifies current drift and absence of the bound group and records a cancellation receipt. Earlier results, recorded stops and admission remain separate. The workflow metadata contract defines the exact request and evidence fields.
 
+An owned static or unit runner can retain the finished result before leaving the original native process group. After coordinator interruption, `reconcile-check` can recover the result using the exact receipt digest, the current check and evidence, and verified absence of the original group. Verified cleanup can close a native local attempt with an unavailable result so the current check can retry.
+
 ## Final run evidence
 
 Review can reuse an executed check receipt when the current check contract, relevant source and test inputs, recipe, execution environment and evidence remain verified for the exact review candidate. Reviewers retain independent responsibility for the candidate and current findings. An unavailable artifact, changed input, outstanding execution or a fresh-check requirement retains the corresponding validation obligation. After reuse becomes invalid, execute the required check and use a current review frame for the new evidence.

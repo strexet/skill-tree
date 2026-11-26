@@ -5106,6 +5106,8 @@ def completed_contract_sha256(record):
                     {'path':ref.get('path'),'sha256':ref.get('sha256')} if isinstance(ref,dict) else ref
                     for ref in receipt.get('evidence',[])
                 ]
+                if 'runner_result' in receipt:
+                    bound[kind]['runner_receipt_sha256']=digest(dump(receipt).encode())
         checks.append(bound)
     identity['check_results'] = checks
     return digest(dump(identity).encode())
@@ -5460,12 +5462,54 @@ def check_reconciliation_target(store,state,payload,run_id):
                   environment_identity=attempt['environment_identity'])
     return task,slot,attempt,origin
 
-def check_runner_group(value):
+def local_process_group_identity(pid, pgid):
+    """Read the live same-user leader's native process birth identity."""
+    def require_identity(condition, message):
+        if not condition:
+            raise WorkflowError(message)
+
+    if sys.platform == 'darwin':
+        import ctypes
+
+        class ProcBsdInfo(ctypes.Structure):
+            # macOS proc_info.h, PROC_PIDTBSDINFO. Retain the microsecond birth identity.
+            _fields_ = [('identity', ctypes.c_uint32 * 12), ('comm', ctypes.c_char * 16),
+                        ('name', ctypes.c_char * 32), ('group', ctypes.c_uint32 * 6),
+                        ('started_seconds', ctypes.c_uint64), ('started_microseconds', ctypes.c_uint64)]
+
+        info = ProcBsdInfo()
+        read_info = ctypes.CDLL('/usr/lib/libproc.dylib').proc_pidinfo
+        read_info.argtypes = (ctypes.c_int, ctypes.c_int, ctypes.c_uint64, ctypes.c_void_p, ctypes.c_int)
+        read_info.restype = ctypes.c_int
+        size = ctypes.sizeof(info)
+        observed = read_info(pid, 3, ctypes.c_uint64(0), ctypes.byref(info), size)
+        uid = info.identity[5]
+        require_identity(observed == size and info.identity[3] == pid and info.group[1] == pgid
+                   and uid == os.getuid() and info.started_seconds,
+                   'The exact same-user local process group leader is unavailable')
+        birth = {'clock': 'darwin-proc-bsdinfo', 'seconds': info.started_seconds, 'microseconds': info.started_microseconds}
+    elif sys.platform.startswith('linux'):
+        directory = Path('/proc') / str(pid)
+        stat = directory / 'stat'
+        before = stat.read_text().rpartition(') ')[2].split()
+        uid = directory.stat().st_uid
+        after = stat.read_text().rpartition(') ')[2].split()
+        require_identity(len(before) > 19 and len(after) > 19 and before[19] == after[19]
+                   and before[2] == after[2] == str(pgid) and uid == os.getuid(),
+                   'The exact same-user local process group leader is unavailable')
+        birth = {'clock': 'linux-proc-stat', 'boot_id': Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
+                 'ticks': int(after[19])}
+    else:
+        raise WorkflowError('Exact local process identity is unavailable on this host')
+    return {'pid': pid, 'pgid': pgid, 'uid': uid, 'birth': birth}
+
+
+def check_runner_group(value, *, allow_current=False):
     if type(value) is not int or not 1<value<=2**31-1:
         raise WorkflowError('Supply the original positive dedicated process group')
     if not all(hasattr(os,name) for name in ('getpgid','getpgrp','killpg','O_NOFOLLOW','O_DIRECTORY','O_NONBLOCK')):
         raise WorkflowError('Local POSIX process-group inspection is unavailable')
-    if value==os.getpgrp():
+    if not allow_current and value==os.getpgrp():
         raise WorkflowError('The workflow helper group cannot own the original runner')
     return value
 
@@ -5477,7 +5521,7 @@ def check_runner_timestamp(value):
         raise WorkflowError('Runner observation requires a timezone')
     return parsed
 
-def read_check_cleanup_artifact(root,relative):
+def read_check_artifact(root,relative,limit=65536):
     path=binding_path(root,relative)
     dir_flags=os.O_RDONLY|os.O_NOFOLLOW|os.O_DIRECTORY
     directory=os.open(root,dir_flags)
@@ -5489,8 +5533,8 @@ def read_check_cleanup_artifact(root,relative):
         fd=os.open(path.name,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK,dir_fd=directory)
         with os.fdopen(fd,'rb') as stream:
             if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
-                raise WorkflowError('Runner cleanup evidence requires an ordinary file')
-            return stream.read(65537)
+                raise WorkflowError('Runner evidence requires an ordinary file')
+            return stream.read(limit+1)
     finally:
         os.close(directory)
 
@@ -5498,7 +5542,7 @@ def check_cleanup_evidence(store,reference,origin,binding):
     if not isinstance(reference,dict) or set(reference)!={'path','sha256'} or not isinstance(reference['sha256'],str) or not re.fullmatch('[a-f0-9]{64}',reference['sha256']):
         raise WorkflowError('Supply the exact cleanup artifact path and SHA-256')
     try:
-        raw=read_check_cleanup_artifact(store.source_root,reference['path'])
+        raw=read_check_artifact(store.source_root,reference['path'])
         if len(raw)>65536 or digest(raw)!=reference['sha256']:
             raise WorkflowError('The original runner cleanup artifact changed')
         proof=json.loads(raw)
@@ -5514,10 +5558,137 @@ def check_cleanup_evidence(store,reference,origin,binding):
         raise WorkflowError('Cleanup observation must follow the original live runner binding')
     return {**reference,'observation':proof}
 
+def retained_local_check_result(store, slot, attempt_id):
+    relative='.skill-tree/history/check-runner-results/'+attempt_id.lower()+'.json'
+    expected=slot.get('runner_results',{}).get(attempt_id)
+    try:
+        raw=read_check_artifact(store.root,relative)
+        if len(raw)>65536:
+            raise WorkflowError('The original runner result exceeds the receipt size limit')
+        record=json.loads(raw)
+    except FileNotFoundError:
+        if expected is not None:
+            raise WorkflowError('The original runner result artifact is missing')
+        return relative,None,None
+    except (OSError,UnicodeError,json.JSONDecodeError,NotImplementedError) as error:
+        raise WorkflowError('The original runner result is unreadable') from error
+    sha=digest(raw)
+    if expected!=sha:
+        raise WorkflowError('The original runner result artifact changed')
+    if not isinstance(record,dict) or record.get('schema')!=1 or record.get('kind')!='local-check-runner-result':
+        raise WorkflowError('The original runner result has an invalid receipt')
+    return relative,sha,record
+
+def require_departed_check_runner(group):
+    try:os.killpg(group,0)
+    except ProcessLookupError:pass
+    except OSError as error:raise WorkflowError('The bound original runner group cleanup is uncertain') from error
+    else:raise WorkflowError('The bound original runner group remains live')
+
+def local_check_result_available(store,slot,attempt_id):
+    try:
+        _,_,retained=retained_local_check_result(store,slot,attempt_id)
+        return retained is not None and all(evidence_pointer(store,item,required=True)['available']
+                                            for item in retained['evidence'])
+    except WorkflowError:
+        return False
+
+
+def verify_recovered_check_replay(store,state,receipt,payload):
+    tid,cid,attempt=map(receipt.__getitem__,('task_id','check_id','attempt_id'))
+    entry=state['task_progress'].get(tid,{})
+    slot=entry.get('checks',{}).get(cid,{})
+    record=slot.get('receipts',{}).get(attempt) if entry.get('run_id')==receipt['run_id'] else None
+    if record is None and not entry:
+        runs=historical_runs(state.get('run_registry',{}))
+        run_id=receipt['run_id']
+        if tid in runs.get(run_id,{}).get('completed_contract_sha256s',{}):
+            outcomes=[outcome for outcome in store.outcomes() if outcome['task_id']==tid
+                      and outcome.get('run_id')==run_id and outcome['disposition']=='completed']
+            if len(outcomes)==1:
+                outcome=outcomes[0]
+                verify_completed_contract(store,outcome,runs)
+                record=next((check['result'] for check in outcome.get('check_results',[])
+                             if check['check']['id']==cid and check['result']['attempt_id']==attempt),None)
+    pointer=record.get('runner_result') if isinstance(record,dict) else None
+    if (not isinstance(pointer,dict) or record!=receipt.get('record') or pointer!=receipt.get('runner_result')
+            or pointer.get('sha256')!=payload['result_sha256']
+            or not (record.get('key')==receipt.get('expected_key')==payload['expected_key'])
+            or not (record.get('definition')==receipt.get('expected_definition')==payload['expected_definition'])
+            or record.get('environment_identity')!=receipt.get('environment_identity')
+            or record.get('recorded_at')!=receipt.get('recorded_at')):
+        raise WorkflowError('The recovered result archive differs from the canonical check receipt')
+
+
+def reconcile_local_check_result(store,text,state,payload,origin,binding,attempt,slot,request_digest):
+    action=payload['action']
+    if attempt['recipe']['lane'] not in {'static','unit'} or not binding.get('process_identity'):
+        raise WorkflowError('Result recovery requires an owned local static or unit recipe')
+    group=check_runner_group(binding['process_group'],allow_current=action=='retain-result')
+    relative,sha,retained=retained_local_check_result(store,slot,attempt['attempt_id'])
+    if retained is not None and (retained.get('origin')!=origin or retained.get('runner_binding')!=binding):
+        raise WorkflowError('The result does not identify the original bound runner and attempt')
+    if action=='retain-result':
+        if (not hasattr(os,'getsid') or os.getpgrp()!=group or os.getsid(0)!=binding.get('session')):
+            raise WorkflowError('Only the original bound runner group may retain its result')
+        try:
+            if os.getpgid(group)!=group or os.getsid(group)!=binding['session']:
+                raise WorkflowError('The original runner leader no longer owns the process group')
+            if local_process_group_identity(group,group)!=binding['process_identity']:
+                raise WorkflowError('The original runner leader birth identity changed')
+        except OSError as error:
+            raise WorkflowError('The original local runner group cannot be verified live') from error
+        if retained is not None:
+            if retained.get('request_digest')!=request_digest:
+                raise WorkflowError('Conflicting replay of the original runner result')
+            return {'path':relative,'sha256':sha}
+        result=payload['result']
+        exit_code=payload['exit_code']
+        if (not isinstance(result,dict) or result.get('result') not in ('pass','red','fail')
+                or result.get('classification')!='executed-control' or type(exit_code) is not int
+                or not 0<=exit_code<=255 or (exit_code==0)!=(result['result']=='pass')
+                or not isinstance(result.get('evidence'),list) or not result['evidence']):
+            raise WorkflowError('Retain one executed runner result with matching exit status and actual evidence')
+        if any(isinstance(item,dict) and 'sha256' in item and
+               (not isinstance(item['sha256'],str) or not re.fullmatch('[a-f0-9]{64}',item['sha256']))
+               for item in result['evidence']):
+            raise WorkflowError('Runner evidence requires an exact SHA-256 when a digest is supplied')
+        ids={key:origin[key] for key in ('task_id','check_id','attempt_id')}
+        if ids.keys() & result.keys():
+            raise WorkflowError('Runner result identity comes from the bound check attempt')
+        submission={**result,**ids}
+        checked,_=record_check_result(store,deepcopy(state),submission,bound_runner=True)
+        if len(dump(checked).encode())>256*1024:
+            raise WorkflowError('The canonical runner result exceeds the receipt size limit')
+        retained={'schema':1,'kind':'local-check-runner-result','origin':origin,
+                  'runner_binding':binding,'submission':submission,'exit_code':exit_code,
+                  'evidence':checked['evidence'],'request_digest':request_digest,'retained_at':now()}
+        encoded=dump(retained)
+        if len(encoded.encode())>65536:
+            raise WorkflowError('The original runner result exceeds the receipt size limit')
+        sha=digest(encoded.encode())
+        slot.setdefault('runner_results',{})[attempt['attempt_id']]=sha
+        store.expect_unchanged(relative,None)
+        store.save(text,state,{relative:encoded},update_navigation=False)
+        return {'path':relative,'sha256':sha}
+    if retained is None or payload['result_sha256']!=sha:
+        raise WorkflowError('Select the exact retained runner result digest')
+    require_departed_check_runner(group)
+    record,_=record_check_result(store,state,retained['submission'],bound_runner=True)
+    if record['evidence']!=retained['evidence']:
+        raise WorkflowError('Original runner result evidence changed after retention')
+    require_departed_check_runner(group)
+    store.expect_unchanged(relative,sha)
+    record['runner_result']={'path':relative,'sha256':sha}
+    return {**origin,'status':'recovered-result','runner_result':record['runner_result'],
+            'record':record,'request_digest':request_digest,'recorded_at':record['recorded_at']}
+
 def reconcile_check(store,payload):
     fields={'task_id','check_id','attempt_id','action'}
     action=payload.get('action') if isinstance(payload,dict) else None
     actions={'inspect':set(),'bind-runner':{'expected_key','expected_definition','process_group'},
+             'retain-result':{'expected_key','expected_definition','result','exit_code'},
+             'recover-result':{'expected_key','expected_definition','result_sha256'},
              'cancel':{'expected_key','expected_definition','observed','cleanup'}}
     if (not isinstance(action,str) or action not in actions or set(payload)!=fields|actions[action] or
             not valid_id(payload['task_id'],'T') or not valid_id(payload['attempt_id'],'C') or
@@ -5528,23 +5699,40 @@ def reconcile_check(store,payload):
         if run:workspaces.ensure_workspace(store,run)
         task,slot,attempt,origin=check_reconciliation_target(store,state,payload,run['id'] if run else None)
         observed,stale=check_drift(store,state,task,payload['check_id'],attempt)
-        return {**origin,'observed':observed,'stale':stale,
+        result={**origin,'observed':observed,'stale':stale,
                 'runner_binding':slot.get('runner_bindings',{}).get(attempt['attempt_id'])}
+        if attempt['attempt_id'] in slot.get('runner_results',{}):
+            try:
+                relative,sha,_=retained_local_check_result(store,slot,attempt['attempt_id'])
+                result['runner_result']={'path':relative,'sha256':sha}
+            except WorkflowError as error:
+                result['runner_result_error']=str(error)
+        return result
     with store.lock():
         text=store.text();state=store.load(text);run=state['active_run'];run_id=run['id'] if run else None
         if run:workspaces.ensure_workspace(store,run)
         reference='.skill-tree/history/check-reconciliations/'+payload['attempt_id'].lower()+'.json'
         archive=binding_path(store.root,reference)
         request_digest=digest(dump(payload).encode())
-        if action=='cancel' and archive.exists():
-            if not archive.is_file():raise WorkflowError('Original cancellation archive is invalid')
-            try:receipt=json.loads(archive.read_text())
+        terminal={'cancel':'cancelled-no-result','recover-result':'recovered-result'}
+        if action in terminal and archive.exists():
+            if not archive.is_file():raise WorkflowError('Original check reconciliation archive is invalid')
+            try:
+                if action=='recover-result':
+                    raw=read_check_artifact(store.root,reference,1024*1024)
+                    if len(raw)>1024*1024:
+                        raise WorkflowError('The recovered result archive exceeds the receipt size limit')
+                    receipt=json.loads(raw)
+                else:
+                    receipt=json.loads(archive.read_text())
             except (OSError,UnicodeError,json.JSONDecodeError) as error:
-                raise WorkflowError('Original cancellation archive is unreadable') from error
-            if (not isinstance(receipt,dict) or receipt.get('status')!='cancelled-no-result' or receipt.get('run_id')!=run_id or
+                raise WorkflowError('Original check reconciliation archive is unreadable') from error
+            if (not isinstance(receipt,dict) or receipt.get('status')!=terminal[action] or receipt.get('run_id')!=run_id or
                     any(receipt.get(key)!=payload[key] for key in ('task_id','check_id','attempt_id')) or
                     receipt.get('request_digest')!=request_digest):
                 raise WorkflowError('Conflicting replay of the original check reconciliation')
+            if action=='recover-result':
+                verify_recovered_check_replay(store,state,receipt,payload)
             return receipt
         task,slot,attempt,origin=check_reconciliation_target(store,state,payload,run_id)
         if any(payload[key]!=origin[key] for key in ('expected_key','expected_definition')):
@@ -5574,25 +5762,37 @@ def reconcile_check(store,payload):
                 os.killpg(group,0)
             except OSError as error:raise WorkflowError('The original local runner group cannot be verified live') from error
             binding={**origin,'host':host,'process_group':group,'bound_at':now()}
+            if hasattr(os,'getsid') and (sys.platform=='darwin' or sys.platform.startswith('linux')):
+                try:
+                    binding['session']=os.getsid(group)
+                    binding['process_identity']=local_process_group_identity(group,group)
+                except OSError as error:raise WorkflowError('The original runner session cannot be verified live') from error
             slot.setdefault('runner_bindings',{})[attempt['attempt_id']]=binding
             store.save(text,state,update_navigation=False)
             return binding
         if (not group_binding or any(group_binding.get(key)!=value for key,value in origin.items()) or
                 group_binding.get('host')!=socket.gethostname()):
             raise WorkflowError('The original attempt lacks a verified live runner binding on this host')
+        if action in {'retain-result','recover-result'}:
+            receipt=reconcile_local_check_result(store,text,state,payload,origin,group_binding,attempt,slot,request_digest)
+            if action=='recover-result':
+                store.expect_unchanged(reference,None)
+                store.save(text,state,{reference:dump(receipt)})
+            return receipt
         observed,stale=check_drift(store,state,task,payload['check_id'],attempt)
-        if not stale or observed!=payload['observed']:
-            raise WorkflowError('Reconciliation requires the exact current observation of source or check drift')
+        native_local=group_binding.get('process_identity') and recipe['lane'] in {'static','unit'}
+        if observed!=payload['observed'] or not (stale or native_local):
+            raise WorkflowError('Reconciliation requires the exact observation of drift or an unavailable local result')
         group=check_runner_group(group_binding['process_group'])
         cleanup=check_cleanup_evidence(store,payload['cleanup'],origin,group_binding)
-        if check_drift(store,state,task,payload['check_id'],attempt)!=(observed,True):
+        if check_drift(store,state,task,payload['check_id'],attempt)!=(observed,stale):
             raise WorkflowError('Source or check drift changed during cleanup verification')
-        try:os.killpg(group,0)
-        except ProcessLookupError:pass
-        except OSError as error:raise WorkflowError('The bound original runner group cleanup is uncertain') from error
-        else:raise WorkflowError('The bound original runner group remains live')
+        require_departed_check_runner(group)
+        if not stale and local_check_result_available(store,slot,attempt['attempt_id']):
+            raise WorkflowError('Recover the available original result through reconcile-check')
         receipt={**origin,'status':'cancelled-no-result','original_attempt':deepcopy(attempt),
                  'runner_binding':deepcopy(group_binding),'observed':observed,'cleanup':cleanup,
+                 'cancellation_reason':'source-or-check-drift' if stale else 'local-result-unavailable',
                  'request_digest':request_digest,'recorded_at':now()}
         slot.setdefault('receipts',{})[attempt['attempt_id']]=receipt
         store.expect_unchanged(reference,None)
@@ -5630,59 +5830,72 @@ def prepare_check(store,payload):
 
 def record_check(store,payload):
     with store.lock():
-        text=store.text();state=store.load(text);task,check=get_check(store,state,payload);entry=state['task_progress'].get(task['id'],{});slot=entry.get('checks',{}).get(check['id'],{});attempt=slot.get('attempt')
-        delivered=slot.get('receipts',{}).get(payload.get('attempt_id'))
-        if delivered:
-            if delivered.get('status')=='cancelled-no-result':raise WorkflowError('The original check attempt was cancelled without a result')
-            if delivered.get('payload_hash')!=digest(dump(payload).encode()):raise WorkflowError('Conflicting replay of the original check receipt')
-            return deepcopy(delivered)
-        if not attempt or attempt['attempt_id']!=payload.get('attempt_id'):raise WorkflowError('Recover the original prepared check attempt; never invent a receipt')
-        current=check_snapshot(store,task,check,state)
-        if current['key']!=attempt['key'] or current['definition']!=attempt['definition']:raise WorkflowError('Prepared check is stale; source/test/check-set changed')
-        classification=payload.get('classification')
-        if classification not in CHECK_CLASSIFICATIONS:raise WorkflowError('Check requires an operation classification')
-        result=payload.get('result')
-        if result not in CHECK_RESULTS:raise WorkflowError('Unsupported check result')
-        if result in {'pass','red'} and classification!='executed-control':raise WorkflowError('Only an executed control can establish evidence')
-        if payload.get('actual_lane')!=attempt['recipe']['lane'] or payload.get('environment_identity')!=attempt['environment_identity']:raise WorkflowError('Runner lane/environment does not match the prepared check')
-        if not isinstance(payload.get('cleanup'),str) or not payload['cleanup'].strip():raise WorkflowError('Record actual operation cleanup')
-        refs=payload.get('evidence',[])
-        if result in {'pass','red'} and not refs:raise WorkflowError('Executed evidence requires result artifacts')
-        evidence=[evidence_pointer(store,ref,required=True) for ref in refs]
-        lane=attempt['recipe']['lane']
-        if result in {'pass','red'}:
-            if lane in COUNTED_LANES:
-                counts=payload.get('counts',{})
-                if any(type(counts.get(key)) is not int or counts[key]<0 for key in COUNT_FIELDS):raise WorkflowError('Test runner requires actual nonnegative counts')
-                if counts['expected']<1 or counts['discovered']<counts['expected'] or counts['passed']+counts['failed']+counts['skipped']!=counts['discovered']:raise WorkflowError('Expected nonzero test discovery is missing')
-                if result=='pass' and (counts['failed'] or counts['skipped']):raise WorkflowError('Failed or skipped required tests cannot pass')
-                if result=='red' and (not counts['failed'] or counts['skipped'] or payload.get('failure_category')!='expected-behavior'):raise WorkflowError('Red requires the intended runnable behavioral failure')
-            else:
-                assertions=payload.get('assertions',[])
-                if not assertions or not any(a.get('assertion')==check['assertion'] for a in assertions) or any(a.get('result')!='pass' for a in assertions):raise WorkflowError('Static/visual checks require actual matching assertions')
-                if result=='red':raise WorkflowError('Static/visual observations cannot establish behavioral Red')
-        timings=payload.get('timing',{})
-        if not isinstance(timings,dict) or any(key not in {'active_controller_seconds','tool_wall_seconds','prerequisite_wait_seconds'} or type(value) not in {int,float} or value<0 for key,value in timings.items()):raise WorkflowError('Operation timings require separate nonnegative controller, tool and prerequisite observations')
-        record={key:deepcopy(payload[key]) for key in ['result','classification','actual_lane','counts','assertions','failure_category','cleanup','timing'] if key in payload}
-        record.update({key:attempt[key] for key in ['key','definition','sources','environment_identity','attempt_id']});record.update({'evidence':evidence,'recorded_at':now(),'execution_sessions':deepcopy(entry.get('execution_sessions',{}))})
-        if result=='red':slot['red']=record
-        slot['result']=record
-        record['payload_hash']=digest(dump(payload).encode());slot.setdefault('receipts',{})[attempt['attempt_id']]=record
-        if result=='fail' and classification=='executed-control':
-            signature=payload.get('failure_signature')
-            if not isinstance(signature,str) or not signature.strip():raise WorkflowError('Executed failure requires a stable failure signature')
-            observed=digest(dump({'failure':signature,'sources':attempt['sources'],'check':check['id'],'new_evidence':payload.get('new_evidence')}).encode())
-            prior=entry.get('unchanged_failure',{});count=prior.get('count',0)+1 if prior.get('signature')==observed else 1
-            entry['unchanged_failure']={'signature':observed,'count':count}
-            record['failure_signature']=signature;record['diagnostic_key']=observed
-            if count>=2:
-                entry['resume_stage']=entry['stage'];entry['stage']='blocked';entry['stop_reason']='Two unchanged executed failures'
-                if state['active_run']:execution_run(state['active_run']).update({'phase':'blocked','stop_task_id':task['id'],'stop_reason':entry['stop_reason'],'next_action':'Resolve the recorded failure before explicit resumption'})
-        elif result in {'pass','red'}:entry.pop('unchanged_failure',None)
-        if classification=='host-policy-rejection':
-            entry['resume_stage']=entry['stage'];entry['stage']='blocked';entry['stop_reason']='Host policy rejected the operation: '+payload.get('reason','missing execution scope')
-            if state['active_run']:execution_run(state['active_run']).update({'phase':'blocked','stop_task_id':task['id'],'stop_reason':entry['stop_reason'],'next_action':payload.get('next_action','Report the rejection and missing scope')})
-        store.save(text,state);return record
+        text=store.text()
+        state=store.load(text)
+        record,changed=record_check_result(store,state,payload)
+        if changed:
+            store.save(text,state)
+        return record
+
+
+def record_check_result(store,state,payload, *, bound_runner=False):
+    task,check=get_check(store,state,payload);entry=state['task_progress'].get(task['id'],{});slot=entry.get('checks',{}).get(check['id'],{});attempt=slot.get('attempt')
+    delivered=slot.get('receipts',{}).get(payload.get('attempt_id'))
+    if delivered:
+        if delivered.get('status')=='cancelled-no-result':raise WorkflowError('The original check attempt was cancelled without a result')
+        if delivered.get('payload_hash')!=digest(dump(payload).encode()):raise WorkflowError('Conflicting replay of the original check receipt')
+        return deepcopy(delivered),False
+    if not attempt or attempt['attempt_id']!=payload.get('attempt_id'):raise WorkflowError('Recover the original prepared check attempt; never invent a receipt')
+    binding=slot.get('runner_bindings',{}).get(attempt['attempt_id'],{})
+    if (binding.get('process_identity') and attempt['recipe']['lane'] in {'static','unit'}
+            and not attempt['recipe'].get('execution_binding') and not bound_runner):
+        raise WorkflowError('Recover the exact bound runner result through reconcile-check')
+    current=check_snapshot(store,task,check,state)
+    if current['key']!=attempt['key'] or current['definition']!=attempt['definition']:raise WorkflowError('Prepared check is stale; source/test/check-set changed')
+    classification=payload.get('classification')
+    if classification not in CHECK_CLASSIFICATIONS:raise WorkflowError('Check requires an operation classification')
+    result=payload.get('result')
+    if result not in CHECK_RESULTS:raise WorkflowError('Unsupported check result')
+    if result in {'pass','red'} and classification!='executed-control':raise WorkflowError('Only an executed control can establish evidence')
+    if payload.get('actual_lane')!=attempt['recipe']['lane'] or payload.get('environment_identity')!=attempt['environment_identity']:raise WorkflowError('Runner lane/environment does not match the prepared check')
+    if not isinstance(payload.get('cleanup'),str) or not payload['cleanup'].strip():raise WorkflowError('Record actual operation cleanup')
+    refs=payload.get('evidence',[])
+    if result in {'pass','red'} and not refs:raise WorkflowError('Executed evidence requires result artifacts')
+    evidence=[evidence_pointer(store,ref,required=True) for ref in refs]
+    lane=attempt['recipe']['lane']
+    if result in {'pass','red'}:
+        if lane in COUNTED_LANES:
+            counts=payload.get('counts',{})
+            if any(type(counts.get(key)) is not int or counts[key]<0 for key in COUNT_FIELDS):raise WorkflowError('Test runner requires actual nonnegative counts')
+            if counts['expected']<1 or counts['discovered']<counts['expected'] or counts['passed']+counts['failed']+counts['skipped']!=counts['discovered']:raise WorkflowError('Expected nonzero test discovery is missing')
+            if result=='pass' and (counts['failed'] or counts['skipped']):raise WorkflowError('Failed or skipped required tests cannot pass')
+            if result=='red' and (not counts['failed'] or counts['skipped'] or payload.get('failure_category')!='expected-behavior'):raise WorkflowError('Red requires the intended runnable behavioral failure')
+        else:
+            assertions=payload.get('assertions',[])
+            if not assertions or not any(a.get('assertion')==check['assertion'] for a in assertions) or any(a.get('result')!='pass' for a in assertions):raise WorkflowError('Static/visual checks require actual matching assertions')
+            if result=='red':raise WorkflowError('Static/visual observations cannot establish behavioral Red')
+    timings=payload.get('timing',{})
+    if not isinstance(timings,dict) or any(key not in {'active_controller_seconds','tool_wall_seconds','prerequisite_wait_seconds'} or type(value) not in {int,float} or value<0 for key,value in timings.items()):raise WorkflowError('Operation timings require separate nonnegative controller, tool and prerequisite observations')
+    record={key:deepcopy(payload[key]) for key in ['result','classification','actual_lane','counts','assertions','failure_category','cleanup','timing'] if key in payload}
+    record.update({key:attempt[key] for key in ['key','definition','sources','environment_identity','attempt_id']});record.update({'evidence':evidence,'recorded_at':now(),'execution_sessions':deepcopy(entry.get('execution_sessions',{}))})
+    if result=='red':slot['red']=record
+    slot['result']=record
+    record['payload_hash']=digest(dump(payload).encode());slot.setdefault('receipts',{})[attempt['attempt_id']]=record
+    if result=='fail' and classification=='executed-control':
+        signature=payload.get('failure_signature')
+        if not isinstance(signature,str) or not signature.strip():raise WorkflowError('Executed failure requires a stable failure signature')
+        observed=digest(dump({'failure':signature,'sources':attempt['sources'],'check':check['id'],'new_evidence':payload.get('new_evidence')}).encode())
+        prior=entry.get('unchanged_failure',{});count=prior.get('count',0)+1 if prior.get('signature')==observed else 1
+        entry['unchanged_failure']={'signature':observed,'count':count}
+        record['failure_signature']=signature;record['diagnostic_key']=observed
+        if count>=2:
+            entry['resume_stage']=entry['stage'];entry['stage']='blocked';entry['stop_reason']='Two unchanged executed failures'
+            if state['active_run']:execution_run(state['active_run']).update({'phase':'blocked','stop_task_id':task['id'],'stop_reason':entry['stop_reason'],'next_action':'Resolve the recorded failure before explicit resumption'})
+    elif result in {'pass','red'}:entry.pop('unchanged_failure',None)
+    if classification=='host-policy-rejection':
+        entry['resume_stage']=entry['stage'];entry['stage']='blocked';entry['stop_reason']='Host policy rejected the operation: '+payload.get('reason','missing execution scope')
+        if state['active_run']:execution_run(state['active_run']).update({'phase':'blocked','stop_task_id':task['id'],'stop_reason':entry['stop_reason'],'next_action':payload.get('next_action','Report the rejection and missing scope')})
+    return record,True
 
 def validate_task_checks(store,tid,state=None,check_id=None):
     state=state or store.load();task=validation_task(store,tid);entry=state['task_progress'].get(tid)
