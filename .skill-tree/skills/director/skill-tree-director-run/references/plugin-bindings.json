@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "15de9f4d5321fe22c693729eecefb405e8a48d0db74bbb4eab619da754b3d6bd",
+  "identity": "3cb23837995714ccf2d3e3bedc5df87f7281fe0416ec9552b483dde280922310",
   "operation": "skill-tree-director-run",
   "operations": {
     "skill-tree-3d": {
@@ -3336,7 +3336,7 @@
     "scripts/runtime/common/scripts/run-workspaces.py": "3e69242f598a35c31ad5d9bcf6ac8e3cb6a2ebe89857a961e0a01b92d2c477f2",
     "scripts/runtime/common/scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/runtime/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/runtime/common/scripts/workflow-state.py": "d7ccba8cfcd3066bb337df08aedeacc2137180268839043c06e6034bd0c2e517",
+    "scripts/runtime/common/scripts/workflow-state.py": "d0dccce70554b30af63b6f6025f50a993835465c2d439a25f3038472c867c2ce",
     "scripts/runtime/lib/api-contract-locks.js": "eaac3e411ab7ddea36cedb4c48f0a0d0c5e737509466f0f86587df51a34fe594",
     "scripts/runtime/lib/composer.js": "9d6223c4419ba3a41a2ee0a08d1d00c05483d82fc83576a6f591623f33b5ebfa",
     "scripts/runtime/lib/development-policies.js": "9d3036e0dd2b2aaf070f3ec92f9e1d6d6830fe35cd8ebb1a78135c3ad792a2fd",

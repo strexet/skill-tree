@@ -9129,8 +9129,8 @@ def worker_handoff(store, payload):
                                                     baseline['head'],head,accepted=(0,1,128)).returncode):
                         raise WorkflowError('Reconcile original leaf work before replacing its wave baseline')
                     updated=workspaces.task_commit_baseline(root)
-                    if any(updated[key]!=baseline[key] for key in ('ref','checkout')):
-                        raise WorkflowError('Select the original coordinator branch and checkout')
+                    if updated['head']!=head or any(updated[key]!=baseline[key] for key in ('ref','checkout')):
+                        raise WorkflowError('The inspected coordinator checkout or head changed during wave recovery')
                     if (workspaces.wave_worktree_blobs(root,paths)!=committed
                             or workspaces.local_git_paths(root,'diff','--cached','--name-only','-z',head,'--',*paths)):
                         raise WorkflowError('Reconcile changes on the original worker paths before replacing the baseline')
