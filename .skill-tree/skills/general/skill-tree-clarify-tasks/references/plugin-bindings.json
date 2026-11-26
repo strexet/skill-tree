@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "8981c75340d0f8bfa8a4afcbe71b44239a9f3722465c7f7f1b6e18e700d35f4d",
+  "identity": "76ba74f6b0619415cb8d0ca2316f95dbe01a17288d54f55425be75eee17d7514",
   "operation": "skill-tree-clarify-tasks",
   "operations": {
     "skill-tree-3d": {
@@ -3301,9 +3301,9 @@
     "references/pending-task-intake.md": "c23e7fc58a44b58ab8e0b09ee0b15bd56fbdfd4fc275833c26fd4c8c2d0e4619",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/project-profile.md": "82492b7e3c8a8ec8df6bb3581b727e081ddac6f5adeb1a25bb2d945571b9441c",
-    "references/run-workspaces.md": "ca62963a23d05b422713325b29f0229c0d7f5423e972cdc90751c85a46a8c9a7",
+    "references/run-workspaces.md": "298f972fd4802b3bf95af3120a00904b999d23beb70ef7366ff3684945ee4cfd",
     "references/validation-policy.md": "e17660b35a658f5fb595b6c151987dae993b264d21576d21160f79f9b195f20e",
-    "references/workflow-metadata.md": "b85c895e9c2f90d743be5f810a5883cad3fb334097b7bf6b50e9b2b534ffe1a1",
+    "references/workflow-metadata.md": "e706a20d247277722bed1c8cecbffd6f1ba5dfa6e1e1a88622bab5bdb4ac48a1",
     "scripts/api-contract-locks.js": "eaac3e411ab7ddea36cedb4c48f0a0d0c5e737509466f0f86587df51a34fe594",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "dd1b6fb5dfb56b93ad531abf87f4f713b5934156133007bb4014b56ec9f285e5",
@@ -3319,11 +3319,11 @@
     "scripts/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
     "scripts/plugin-runtime.js": "62caaa416cb4f375fef45edb71c1cbe3b2f9c0acb734a95e0b9099470cf6c8a5",
     "scripts/plugin-sources.js": "13d853f9e64dec84cf92f4026ac71e4384e186cd96200543e400a852a46e4693",
-    "scripts/run-workspaces.py": "bf12e433f9e3597f4667698c3c257fc84bf45a44e4dc4f3c7850c7a71bd0ad99",
+    "scripts/run-workspaces.py": "a706fedaca99a6231d753201cff28f5d5601292b048ceb0929dc8ae469eb302b",
     "scripts/select-prioritized-task.py": "93f12ac5a333fb072bf8d9d849d08e3b422af856d582d492902647efe35c896f",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "d5ced6efe42feb81558f47c8c6feebdc114847f8eec907518e9ac6085d0db619"
+    "scripts/workflow-state.py": "66d30a26c5749df8576781146b395806320d05d35674463f157a84b2f48acb9a"
   },
   "packages": {},
   "parameter_defaults": {},

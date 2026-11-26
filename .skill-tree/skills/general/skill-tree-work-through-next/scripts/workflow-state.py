@@ -354,6 +354,9 @@ class Store:
         for write in record['writes']:
             path=self.owned(write['path']);actual=file_hash(path);desired=digest(write['content'].encode())
             if actual not in {write['expected_hash'],desired}: raise WorkflowError('Interrupted transaction conflicts with source: '+write['path'])
+        owner = record.get('local_delivery') or {}
+        if owner.get('action') == 'partial-finish' and any(write['path'] == FUTURE_STATE for write in record['writes']):
+            partial_retire_locator(self,record)
         for write in record['writes']:
             self.replace(self.owned(write['path']),write['content'])
         journal.unlink()
@@ -473,7 +476,7 @@ class Store:
             if self.neutral:
                 if 'run_registry' in value:workspaces.validate_registry(value['run_registry'])
             else:value=workspaces.project(self,value)
-            for retained in value.get('run_registry',{}).get('runs',{}).values():validate_run(retained)
+            for retained in historical_runs(value.get('run_registry',{})).values():validate_run(retained)
             value['task_progress']=old.get('task_progress')
             validate_progress(value,parse(text),{record['task_id'] for record in self.outcomes() if record['disposition']=='completed'})
         return value
@@ -512,6 +515,7 @@ class Store:
         outcomes=[json.loads(line) for line in ledger.splitlines() if line.strip() and json.loads(line)['id'] not in prior_ids]
         prior=old.get('run_registry',{}).get('runs',{}).get(rid)
         current=registry['runs'].get(rid)
+        archived=registry.get('archived_runs',{}).get(rid)
         owned=set((prior or {}).get('admitted_task_ids',[]))|set((current or {}).get('admitted_task_ids',[]))
         progress_changes=[]
         for tid in sorted(owned):
@@ -521,6 +525,8 @@ class Store:
         sequence=state['run_registry'].setdefault('event_sequences',{}).get(rid,0)+1
         state['run_registry']['event_sequences'][rid]=sequence
         event={'sequence':sequence,'schema':1,'id':identity('E'),'queue_id':registry['queue_id'],'run_id':rid,'recorded_at':now(),'changes':changes,'progress_changes':progress_changes,'outcomes':outcomes,'checkpoint_before':prior,'checkpoint_after':current}
+        if archived and prior and current is None:
+            event['partial_finish_sha256']=archived['receipt_sha256']
         receipts=[]
         for batch in event_intake_origins(grouped+outcomes):
             rel=intake_receipt_path(batch)
@@ -2902,21 +2908,7 @@ def current_target_state(store,policy):
     return text,state,run,delivery,reviewed,target,head
 
 
-def current_target_run_checks(store,policy,aid,actor):
-    # The publication lock remains held. The queue writer is available to unrelated work during execution.
-    with store.lock():
-        _,_,run,delivery,_,_,head=current_target_state(store,policy)
-        attempt=delivery.get('current_target_attempts',{}).get(aid) if valid_id(aid,'MI') else None
-        if not attempt or attempt['integrator_id']!=actor:
-            raise WorkflowError('Use the original current-target attempt and owning integrator identity')
-        if attempt['status'] not in {'sealed','checked'}:raise WorkflowError('Seal the current-target candidate before running checks')
-        if head!=attempt['target_head'] or workspaces.local_source_identity(store,run)!=attempt['source']:
-            raise WorkflowError('The current-target candidate source or target has moved')
-        area,actual=workspaces.current_target_checkout(store.root,attempt)
-        if actual['head']!=attempt['candidate']['commit'] or workspaces.current_target_dirt(area):
-            raise WorkflowError('The exact sealed current-target candidate must remain clean')
-        proof_store=_hook_source_store(store,area)
-        inputs=current_target_check_inputs(proof_store,attempt)
+def run_reviewed_candidate_checks(run,key,area,inputs):
     checks={};writes={}
     for cid,current in inputs.items():
         argv=[current['executable'],*current['argv'][1:]]
@@ -2932,7 +2924,7 @@ def current_target_run_checks(store,policy,aid,actor):
         report=(stdout+b'\n'+stderr).decode('utf-8',errors='replace')
         count=current_target_check_counts(current['lane'],report)
         execution_id=identity('C')
-        path=_delivery_receipt_path(run,'-'+aid.lower()+'-'+execution_id.lower())
+        path=_delivery_receipt_path(run,'-'+key+'-'+execution_id.lower())
         execution={'id':cid,'execution_id':execution_id,'inputs':current,'exit_code':exit_code,
                    'qualified':exit_code==0 and (count is None or count>0),'discovered':count,'output':report,
                    'started_at':started_at,'finished_at':now(),'failure':failure}
@@ -2941,6 +2933,25 @@ def current_target_run_checks(store,policy,aid,actor):
         checksum=digest(writes[path].encode())
         checks[cid].update(artifact={'path':path,'sha256':checksum},
                            review_reference='current-target-check:'+execution_id+':'+checksum)
+    return checks,writes
+
+
+def current_target_run_checks(store,policy,aid,actor):
+    # The publication lock remains held. The queue writer is available to unrelated work during execution.
+    with store.lock():
+        _,_,run,delivery,_,_,head=current_target_state(store,policy)
+        attempt=delivery.get('current_target_attempts',{}).get(aid) if valid_id(aid,'MI') else None
+        if not attempt or attempt['integrator_id']!=actor:
+            raise WorkflowError('Use the original current-target attempt and owning integrator identity')
+        if attempt['status'] not in {'sealed','checked'}:raise WorkflowError('Seal the current-target candidate before running checks')
+        if head!=attempt['target_head'] or workspaces.local_source_identity(store,run)!=attempt['source']:
+            raise WorkflowError('The current-target candidate source or target has moved')
+        area,actual=workspaces.current_target_checkout(store.root,attempt)
+        if actual['head']!=attempt['candidate']['commit'] or workspaces.current_target_dirt(area):
+            raise WorkflowError('The exact sealed current-target candidate must remain clean')
+        proof_store=_hook_source_store(store,area)
+        inputs=current_target_check_inputs(proof_store,attempt)
+    checks,writes=run_reviewed_candidate_checks(run,aid.lower(),area,inputs)
     with store.lock():
         text,state,run,delivery,_,_,current_head=current_target_state(store,policy)
         retained=delivery.get('current_target_attempts',{}).get(aid)
@@ -3132,6 +3143,679 @@ def current_target_delivery(store,command,payload):
             'run_id':run['id'],'review':reviewed,'merge':verified_candidate,'target_ref':target_ref}),
             _delivery_receipt_path(run,'-'+aid.lower()):dump(attempt)})
         return current_target_preview(attempt,run,area)
+
+
+def historical_runs(registry):
+    return {**{rid: value['checkpoint'] for rid, value in registry.get('archived_runs', {}).items()},
+            **registry.get('runs', {})}
+
+
+def partial_finish_receipt_path(run_id):
+    return '.skill-tree/history/runs/run-' + run_id.lower() + '-partial-finish.json'
+
+
+def partial_finished(store, registry):
+    entry = (registry or {}).get('archived_runs', {}).get(store.run_id)
+    if entry is None:
+        return None
+    relative = partial_finish_receipt_path(store.run_id)
+    path = store.owned(relative)
+    if not path.is_file() or path.is_symlink() or file_hash(path) != entry['receipt_sha256']:
+        raise WorkflowError('The original partial finish receipt is missing or changed')
+    result = json.loads(path.read_bytes())
+    if (result.get('run_id') != store.run_id or result.get('queue_id') != registry['queue_id']
+            or result.get('checkpoint') != entry['checkpoint']):
+        raise WorkflowError('The partial finish receipt differs from the historical run')
+    return result
+
+
+def partial_finish_outcomes(store, registry, run, checkout):
+    rid = run['id']
+    refs = run['completion_refs']
+    rows = {row['id']: row for row in store.outcomes() if row.get('run_id') == rid}
+    accepted = set(run['completed_ids'])
+    if not accepted or set(refs) != accepted:
+        raise WorkflowError('Partial finish requires exact accepted task outcome references')
+    outcomes = {}
+    for tid, oid in refs.items():
+        row = rows.get(oid, {})
+        if row.get('task_id') != tid or row.get('disposition') != 'completed':
+            raise WorkflowError('Partial finish requires the original accepted outcome for '+tid)
+        outcomes[oid] = row
+
+    verified = {}
+    directory = store.owned('.skill-tree/history/run-events/' + rid.lower())
+    event_ids = set(registry.get('applied_events', []))
+    for path in sorted(directory.glob('e-*.json')):
+        eid = 'E-' + path.stem[2:]
+        if eid not in event_ids:
+            continue
+        if path.is_symlink() or not path.is_file():
+            raise WorkflowError('Partial finish requires ordinary applied event files')
+        event = json.loads(path.read_bytes())
+        for row in event.get('outcomes', []):
+            oid = row.get('id')
+            if oid not in outcomes:
+                continue
+            if (oid in verified or row != outcomes[oid] or event.get('schema') != 1
+                    or event.get('id') != eid or event.get('run_id') != rid
+                    or event.get('queue_id') != registry['queue_id'] or type(event.get('sequence')) is not int
+                    or not 1 <= event['sequence'] <= registry.get('event_sequences', {}).get(rid, 0)):
+                raise WorkflowError('Partial finish found conflicting applied completion evidence')
+            verified[oid] = {'id': eid, 'sha256': file_hash(path)}
+            if getattr(store, '_writer_active', False):
+                store.expect_unchanged(path.relative_to(store.root).as_posix(), verified[oid]['sha256'])
+    if set(verified) != set(outcomes):
+        raise WorkflowError('Partial finish requires the applied event for every accepted outcome')
+
+    source = store.source_root
+    base = run['workspace']['base_commit']
+    commits = {}
+    for oid, row in outcomes.items():
+        receipt = row.get('task_git_commit') or {}
+        commit = receipt.get('commit')
+        if (not isinstance(commit, str) or not re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', commit)
+                or commit in commits or receipt.get('ref') != checkout['ref']
+                or receipt.get('checkout') != checkout['checkout']):
+            raise WorkflowError('Partial finish requires the original scoped Git commit for '+row['task_id'])
+        parents = workspaces.local_git_text(source, 'show', '-s', '--format=%P', commit).split()
+        tree = workspaces.local_git_text(source, 'rev-parse', '--verify', commit+'^{tree}')
+        if parents != [receipt.get('parent')] or tree != receipt.get('tree'):
+            raise WorkflowError('Partial finish commit parent or tree differs from the accepted receipt')
+        commits[commit] = {'task_id': row['task_id'], 'outcome_id': oid, 'commit': commit,
+                           'parent': parents[0], 'event': verified[oid]}
+
+    chain = []
+    by_parent = {row['parent']: row for row in commits.values()}
+    tip = base
+    while tip in by_parent:
+        row = by_parent.pop(tip)
+        chain.append(row)
+        tip = row['commit']
+    # A close-only receipt can preserve accepted evidence even if delivery needs
+    # a separate proven candidate for non-contiguous accepted commits.
+    accepted_tip = tip if len(chain) == len(commits) else None
+    if any(workspaces.local_git(source, 'merge-base', '--is-ancestor', commit, checkout['head'],
+                                accepted=(0, 1)).returncode for commit in commits):
+        raise WorkflowError('The selected worktree head does not contain all accepted commits')
+    by_task = {row['task_id']: row for row in commits.values()}
+    return [by_task[tid] for tid in run['completed_ids']], accepted_tip
+
+
+def partial_finish_source_changes(path):
+    dirty = sorted(workspaces.local_worktree_dirt(path, allow_staged=True))
+    index = workspaces.task_index_selection(path, [])
+    def diff_hash(*args):
+        return digest(workspaces.local_git(path, 'diff', '--no-ext-diff', '--no-textconv', '--binary', *args, '--').stdout)
+    def retained_path(relative):
+        entry = path / relative
+        if entry.is_symlink():
+            return {'symlink': os.readlink(entry)}
+        if not entry.exists():
+            return None
+        if not entry.is_file():
+            raise WorkflowError('Partial finish cannot prove unaccepted worktree path '+relative)
+        return {'sha256': file_hash(entry), 'mode': entry.stat().st_mode}
+    return {'paths': dirty, 'index': index, 'staged': diff_hash('--cached'), 'unstaged': diff_hash(),
+            'worktree': {p: retained_path(p) for p in dirty}}
+
+
+
+def partial_finish_evidence_fingerprints(store, run):
+    worker = '.skill-tree/history/worker-handoffs/' + run['id'].lower() + '.json'
+    chains = ['.skill-tree/invocations/'+cid.lower()+'.json' for cid in run.get('hook_chains', [])]
+    paths = [OUTCOME_LEDGER, worker, *chains]
+    result = {}
+    for relative in paths:
+        path = store.owned(relative)
+        if path.is_symlink() or relative in chains and not path.is_file():
+            raise WorkflowError('Partial finish requires ordinary original evidence files')
+        result[relative] = file_hash(path)
+    return result
+
+
+def partial_finish_observation(store, text, state):
+    rid = store.run_id
+    registry = state.get('run_registry') or {}
+    run = registry.get('runs', {}).get(rid)
+    if (not run or run['mode'] != 'all' or run.get('implementation_operation') != 'implement-all'
+            or run['phase'] != 'stopped' or not run.get('stop_reason') or run.get('maintenance')
+            or not run.get('workspace') or workspaces.initial_profile_pending(run)
+            or run.get('delivery', {}).get('implementation') != 'in-progress'):
+        raise WorkflowError('Partial finish requires the exact stopped, admitted Core Implement All run')
+    locator = workspaces.runtime(store.root)
+    if not locator or locator['queue_id'] != registry['queue_id']:
+        raise WorkflowError('Partial finish requires the canonical Git run locator')
+    live = locator['worktrees'].get(rid)
+    if (not live or rid in locator.get('unverified_worktrees', [])
+            or rid in locator.get('pending_worktrees', {}) or rid in locator.get('archived_worktrees', {})):
+        raise WorkflowError('Partial finish requires a verified live original worktree binding')
+    path = Path(live)
+    if path != path.resolve() or path == store.root:
+        raise WorkflowError('Partial finish requires an exact linked worktree')
+    registration = workspaces.linked_registration(store.root, path)
+    workspace = run['workspace']
+    owner = workspace.get('cleanup_owner')
+    if owner:
+        workspaces.directed_owner(store.root, path, run, registry['queue_id'])
+    move = workspaces.verified_move_chain(run, owner)
+    anchor = move['to_locator_sha256'] if move else workspaces.cleanup_origin_sha256(run)
+    if anchor is not None and anchor != workspaces.locator_path_sha256(path):
+        raise WorkflowError('Partial finish requires the exact verified original or relocated worktree')
+    if workspace['repo_id'] != workspaces.repo_id(store.root):
+        raise WorkflowError('Partial finish workspace repository changed')
+    checkout = workspaces.checked_out_branch(path)
+    if checkout['ref'] != 'refs/heads/'+workspace['branch']:
+        raise WorkflowError('Partial finish workspace branch changed')
+    workspaces.unfinished(path)
+    store.source_root = path
+    accepted, tip = partial_finish_outcomes(store, registry, run, checkout)
+    required = list(dict.fromkeys(run['snapshot']+run['required_ids']))
+    if set(run['completed_ids'])-set(required):
+        raise WorkflowError('Accepted outcomes exceed the frozen controller scope')
+    completed = {row['task_id'] for row in store.outcomes() if row['disposition'] == 'completed'}
+    remaining = [tid for tid in required if tid not in completed]
+    claims = sorted(tid for tid, owner in registry['claims'].items() if owner == rid)
+    if not remaining or set(remaining)-set(claims):
+        raise WorkflowError('Partial finish requires unfinished work claimed by the selected run')
+    tasks = {task['id']:task for task in parse(text)}
+    if any(tid not in tasks or tasks[tid]['queue'] != 'Prioritized Next Changes' for tid in claims):
+        raise WorkflowError('Partial finish cannot preserve unfinished queue identities')
+    progress = {tid: entry for tid, entry in state['task_progress'].items() if entry.get('run_id') == rid}
+    blockers = [{'kind': 'unowned-task-progress', 'task_id': tid} for tid in claims
+                if tid in state['task_progress'] and tid not in progress]
+    for tid, entry in progress.items():
+        if any(pending_check_attempt(slot) for slot in entry.get('checks', {}).values()):
+            blockers.append({'kind': 'original-check', 'task_id': tid})
+        if entry.get('task_git_attempt'):
+            blockers.append({'kind': 'original-scoped-commit', 'task_id': tid})
+    for attempt in hook_helper().pending_scan(store):
+        if attempt['chain_id'] in run.get('hook_chains', []):
+            blockers.append({'kind': 'original-hook', **attempt})
+    worker = store.owned('.skill-tree/history/worker-handoffs/'+rid.lower()+'.json')
+    if worker.is_symlink():
+        raise WorkflowError('Partial finish requires ordinary worker handoff evidence')
+    if worker.is_file():
+        ledger = json.loads(worker.read_bytes())
+        assignments = ledger.get('slots')
+        if ledger.get('schema') != 1 or ledger.get('run_id') != rid or not isinstance(assignments, dict):
+            raise WorkflowError('Partial finish requires exact original worker handoff evidence')
+        worker_state = {**state, 'active_run': run}
+        for slot in assignments.values():
+            if not isinstance(slot, list):
+                raise WorkflowError('Partial finish requires exact original worker assignments')
+            if slot and not retired_worker_scope(store, worker_state, slot[-1], checkout['head']):
+                blockers.append({'kind': 'original-worker', 'task_id': slot[-1]['task_id']})
+    for key, claim in sorted(registry['resources'].items()):
+        if claim['run_id'] == rid:
+            blockers.append({'kind': 'original-resource', 'resource': key})
+    if run.get('director_question_hold') or any(run.get('delivery', {}).get(name) for name in
+            ('reviewed_merge_attempt','current_target_attempts','reviewed_source')):
+        blockers.append({'kind': 'original-controller-handoff'})
+    changes = partial_finish_source_changes(path)
+    observation = {'run_id': rid, 'queue_id': registry['queue_id'], 'queue_sha256': digest(text.encode()),
+        'checkpoint_sha256': digest(dump(run).encode()),
+        'snapshot': run['snapshot'], 'required_ids': run['required_ids'], 'accepted': accepted,
+        'accepted_tip': tip, 'remaining_ids': remaining, 'claims': claims, 'blockers': blockers,
+        'source': {**checkout, 'registration': registration.name, 'location_sha256': digest(str(path).encode())},
+        'changes': changes, 'evidence_sha256': partial_finish_evidence_fingerprints(store, run),
+        'progress_sha256': digest(dump(progress).encode()), 'progress_ids': sorted(progress),
+        'requires_preservation': bool(progress or changes['paths'] or run.get('partial_work') or checkout['head'] != tip),
+        'delivery_status': run.get('delivery', {}).get('status')}
+    return observation, progress
+
+
+def partial_retire_locator(store, journal):
+    owner = journal['local_delivery']
+    rid = owner['run_id']
+    locator = workspaces.runtime(store.root)
+    receipts = [json.loads(write['content']) for write in journal['writes']
+                if write['path'] == partial_finish_receipt_path(rid)]
+    if (len(receipts) != 1 or not locator or locator['queue_id'] != receipts[0].get('queue_id')
+            or receipts[0].get('request_sha256') != owner['request_sha256']):
+        raise WorkflowError('Partial finish journal differs from the exact original worktree handoff')
+    source = receipts[0]['preview']['source']
+    if rid in locator.get('unverified_worktrees', []) or rid in locator.get('pending_worktrees', {}):
+        raise WorkflowError('The original partial finish binding is no longer verified')
+    retired = locator.setdefault('archived_worktrees', {})
+    if rid in retired:
+        binding = retired[rid]
+        if rid in locator['worktrees'] or binding.get('request_sha256') != owner['request_sha256']:
+            raise WorkflowError('The archived worktree binding differs from the original partial finish')
+        path = Path(binding['path'])
+    else:
+        location = locator['worktrees'].get(rid)
+        if not location:
+            raise WorkflowError('Recover the exact original worktree binding before partial finish')
+        path = Path(location)
+    if (digest(str(path).encode()) != source['location_sha256']
+            or workspaces.linked_registration(store.root, path).name != source['registration']
+            or workspaces.checked_out_branch(path) != {key:source[key] for key in ('checkout','ref','head')}):
+        raise WorkflowError('The original worktree changed before partial finish could be recorded')
+    receipt = receipts[0]
+    if receipt['checkpoint']['workspace'].get('cleanup_owner'):
+        workspaces.directed_owner(store.root, path, receipt['checkpoint'], receipt['queue_id'])
+    if (partial_finish_source_changes(path) != receipt['preview']['changes']
+            or partial_finish_evidence_fingerprints(store, receipt['checkpoint']) != receipt['preview']['evidence_sha256']):
+        raise WorkflowError('The original source or execution evidence changed during partial finish recovery')
+    directory = '.skill-tree/history/run-events/'+rid.lower()+'/'
+    if any(file_hash(store.owned(directory+row['event']['id'].lower()+'.json')) != row['event']['sha256']
+           for row in receipt['preview']['accepted']):
+        raise WorkflowError('An accepted event changed during partial finish recovery')
+    if rid not in retired:
+        retired[rid] = {'path': str(path), 'request_sha256': owner['request_sha256']}
+        del locator['worktrees'][rid]
+        workspaces.atomic(workspaces.runtime_file(store.root), locator)
+
+
+def partial_finish(store, command, payload):
+    workspaces.local_git_environment()
+    if not valid_id(store.run_id,'WR') or store.source_root != store.root:
+        raise WorkflowError('Partial finish requires the exact --run-id and canonical repository')
+    neutral = Store(store.root, neutral=True)
+    neutral.run_id = store.run_id
+    allowed = {'expected_preview_sha256', 'owner_instruction', 'preserve_unaccepted'}
+    if command == 'partial-finish-preview':
+        if payload:
+            raise WorkflowError('Partial finish preview accepts only the exact run ID')
+        text = neutral.text()
+        state = neutral.load(text)
+        original = partial_finished(neutral, state.get('run_registry'))
+        if original:
+            return original
+        preview, _ = partial_finish_observation(neutral, text, state)
+        return {'status': 'blocked' if preview['blockers'] else 'preview',
+                'preview_sha256': digest(dump(preview).encode()), 'preview': preview}
+    if (set(payload)-allowed or not isinstance(payload.get('expected_preview_sha256'), str)
+            or not isinstance(payload.get('owner_instruction'), str) or not payload['owner_instruction'].strip()
+            or type(payload.get('preserve_unaccepted', False)) is not bool):
+        raise WorkflowError('Partial finish requires the exact preview and explicit owner instruction')
+    request = digest(dump(payload).encode())
+    owner = {'action': 'partial-finish', 'run_id': store.run_id, 'request_sha256': request}
+    with neutral.lock(local_delivery=owner):
+        text = neutral.text()
+        state = neutral.load(text)
+        registry = state.get('run_registry') or {}
+        original = partial_finished(neutral, registry)
+        if original:
+            if original['request_sha256'] != request:
+                raise WorkflowError('Retry the original partial finish instruction and preview')
+            return original
+
+        preview, progress = partial_finish_observation(neutral, text, state)
+        preview_digest = digest(dump(preview).encode())
+        if preview_digest != payload['expected_preview_sha256']:
+            raise WorkflowError('Partial finish preview changed; inspect current state before confirming')
+        if preview['blockers']:
+            raise WorkflowError('Reconcile the original attempts and resource leases before partial finish')
+        if preview['requires_preservation'] and not payload.get('preserve_unaccepted'):
+            raise WorkflowError('Partial finish requires explicit preservation of unaccepted work in the original worktree')
+
+        rid = neutral.run_id
+        checkpoint = registry['runs'].pop(rid)
+        receipt = {'schema': 1, 'status': 'partially-completed', 'run_id': rid, 'id': rid,
+                   'queue_id': registry['queue_id'], 'finished_at': now(), 'request_sha256': request,
+                   'owner_instruction': payload['owner_instruction'], 'preview_sha256': preview_digest,
+                   'preview': preview, 'checkpoint': checkpoint, 'archived_progress': progress}
+        body = dump(receipt)
+        registry.setdefault('archived_runs', {})[rid] = {
+            'checkpoint': checkpoint, 'receipt_sha256': digest(body.encode()), 'status': 'partially-completed'}
+        for tid in progress:
+            del state['task_progress'][tid]
+        neutral.selected_run_id = rid
+        neutral.save(text, state, {partial_finish_receipt_path(rid): body})
+        return receipt
+
+
+def partial_delivery_save(store, state, relative, record, extras=None):
+    archived = state['run_registry']['archived_runs'][record['run_id']]
+    records = archived.setdefault('delivery_records', {})
+    path = store.owned(relative)
+    writes = dict(extras or {})
+    if relative in records and path.is_file() and file_hash(path) == records[relative]:
+        previous = json.loads(path.read_bytes())
+        prior_request = previous.get('request_sha256')
+        if (previous['status'] == 'blocked' and prior_request and prior_request != record.get('request_sha256')):
+            archived_path = relative.removesuffix('.json') + '-blocked-' + prior_request + '.json'
+            writes[archived_path] = dump(previous)
+            records[archived_path] = digest(writes[archived_path].encode())
+    body = dump(record)
+    records[relative] = digest(body.encode())
+    store.save(store.text(), state, {**writes, relative:body}, update_navigation=False)
+
+
+def partial_delivery_check_attempt(store, closed, view):
+    _, _, contracts = partial_accepted_delivery_scope(store, closed)
+    if not contracts:
+        raise WorkflowError('No accepted runnable validation contract is available for the partial candidate')
+    prep = view['preparation']
+    return {'candidate':{'commit':prep['source_head'], 'tree':prep['source_tree']}, 'contracts':contracts}
+
+
+def partial_delivery_checks(store, payload, closed, target, target_identity, relative):
+    if not isinstance(payload.get('owner_instruction'), str) or not payload['owner_instruction'].strip():
+        raise WorkflowError('Partial delivery checks require the exact owner instruction')
+    owner = {'run_id':closed['run_id'],'action':'partial-delivery-checks','request_sha256':digest(dump(payload).encode())}
+    check_relative = relative.removesuffix('.json')+'-checks.json'
+    with workspaces.publication_lock(store.root,'local',target_identity['ref'].removeprefix('refs/heads/')):
+        with store.lock(local_delivery=owner):
+            state = store.load()
+            current_target, current = partial_delivery_target(store,payload)
+            if current_target != target or current != target_identity or partial_finished(store,state['run_registry']) != closed:
+                raise WorkflowError('The original partial delivery changed before checks')
+            previous = partial_delivery_record(store,relative,closed,current['ref'])
+            if previous and previous['status'] in {'prepared','merged','already-integrated'}:
+                raise WorkflowError('Reconcile the existing prepared or completed delivery before running replacement checks')
+            view, candidate = partial_delivery_observation(store,closed,payload,target,current)
+            if digest(dump(view).encode()) != payload.get('expected_preview_sha256') or view['status'] != 'review-required':
+                raise WorkflowError('Partial delivery checks require the exact review candidate preview')
+            proof = _hook_source_store(store,candidate)
+            attempt = partial_delivery_check_attempt(proof,closed,view)
+            base = {'schema':1,'id':closed['run_id'],'run_id':closed['run_id'],'preview':view}
+            try:
+                inputs = current_target_check_inputs(proof,attempt)
+            except WorkflowError as error:
+                result = {**base,'status':'blocked','reason':str(error)}
+                partial_delivery_save(store,state,check_relative,result)
+                return result
+        checks, writes = run_reviewed_candidate_checks(closed, 'partial', candidate, inputs)
+        with store.lock(local_delivery=owner):
+            state = store.load()
+            current_target, current = partial_delivery_target(store,payload)
+            observed, actual = partial_delivery_observation(store,closed,payload,current_target,current)
+            if (partial_finished(store,state['run_registry']) != closed or observed != view
+                    or actual != candidate or current_target_check_inputs(proof,attempt) != inputs):
+                raise WorkflowError('The partial candidate, target or check inputs changed during execution')
+            result = {**base,'status':'checked' if all(check['qualified'] for check in checks.values()) else 'blocked',
+                      'checks':checks}
+            partial_delivery_save(store,state,check_relative,result,writes)
+            return result
+
+
+def partial_delivery_target(store, payload):
+    branch = workspaces.branch(store.root, payload.get('target_branch'))
+    name = payload.get('target_worktree', str(store.root))
+    if not isinstance(name, str) or not name:
+        raise WorkflowError('Select the exact target worktree path')
+    path = Path(name)
+    if path != path.resolve() or workspaces.common_dir(path) != workspaces.common_dir(store.root):
+        raise WorkflowError('Select the exact target checkout in the original Git repository')
+    if path != store.root:
+        workspaces.linked_registration(store.root, path)
+    identity = workspaces.checked_out_branch(path)
+    if identity['ref'] != 'refs/heads/'+branch:
+        raise WorkflowError('The selected checkout does not have the exact authorized target branch')
+    return path, identity
+
+
+def partial_accepted_delivery_scope(store, closed):
+    tip = closed['preview']['accepted_tip']
+    if tip is None:
+        raise WorkflowError('The accepted commits do not form an exact contiguous range for delivery')
+    base = closed['checkpoint']['workspace']['base_commit']
+    commits = {entry['commit'] for entry in closed['preview']['accepted']}
+    history = set(workspaces.local_git_text(store.root,'rev-list',base+'..'+tip).splitlines())
+    if history != commits:
+        raise WorkflowError('The partial delivery range includes unaccepted or missing commits')
+    contracts = {}
+    outcomes = {row['id']:row for row in store.outcomes()}
+    for entry in closed['preview']['accepted']:
+        row = outcomes.get(entry['outcome_id'], {})
+        if (row.get('run_id') != closed['run_id'] or row.get('task_id') != entry['task_id']
+                or row.get('disposition') != 'completed'
+                or (row.get('task_git_commit') or {}).get('commit') != entry['commit']):
+            raise WorkflowError('The original accepted outcome changed before partial delivery')
+        relative = '.skill-tree/history/run-events/'+closed['run_id'].lower()+'/'+entry['event']['id'].lower()+'.json'
+        event_path = store.owned(relative)
+        if (event_path.is_symlink() or file_hash(event_path) != entry['event']['sha256']
+                or [value for value in json.loads(event_path.read_bytes()).get('outcomes', [])
+                    if value.get('id') == row['id']] != [row]):
+            raise WorkflowError('The original applied task evidence changed before partial delivery')
+        for check in row.get('validation_plan', []):
+            contracts[entry['task_id']+'/'+check['id']] = check
+    return base, tip, contracts
+
+
+def partial_review_candidate(store, payload, base, tip, target, target_identity):
+    name = payload.get('candidate_worktree')
+    if not isinstance(name, str) or not name:
+        raise WorkflowError('Select a clean exact candidate worktree for the accepted partial range')
+    candidate = Path(name)
+    if candidate != candidate.resolve() or candidate == target:
+        raise WorkflowError('The partial review requires a separate exact candidate worktree')
+    workspaces.linked_registration(store.root, candidate)
+    source = workspaces.checked_out_branch(candidate)
+    if workspaces.local_worktree_dirt(candidate, allow_staged=True):
+        raise WorkflowError('Uncommitted changes cannot enter the reviewed partial candidate')
+    head = source['head']
+    target_head = target_identity['head']
+    def ancestor(a, b):
+        return workspaces.local_git(candidate,'merge-base','--is-ancestor',a,b,accepted=(0,1)).returncode == 0
+    if not ancestor(base, target_head):
+        raise WorkflowError('The selected target does not contain the accepted range base')
+    if not ancestor(tip, head) or not ancestor(target_head, head):
+        raise WorkflowError('The reviewed candidate must contain the accepted tip and exact live target; prepare current-target integration')
+    if ancestor(target_head, tip):
+        foundation = tip
+    else:
+        # Only the ordinary, conflict-free Git integration can establish the
+        # foundation before any independently reviewed fix commits.
+        tree, conflicts = workspaces.current_target_merge_tree(candidate, target_head, tip)
+        if conflicts:
+            raise WorkflowError('The accepted range conflicts with the exact target: '+', '.join(conflicts))
+        first_parent = workspaces.local_git_text(candidate,'rev-list','--first-parent','--reverse',
+                                                 target_head+'..'+head).splitlines()
+        if not first_parent:
+            raise WorkflowError('The reviewed candidate lacks the exact current-target integration commit')
+        foundation = first_parent[0]
+        parents = workspaces.local_git_text(candidate,'show','-s','--format=%P',foundation).split()
+        if parents != [target_head,tip] or workspaces.local_git_text(candidate,'rev-parse',foundation+'^{tree}') != tree:
+            raise WorkflowError('The candidate foundation differs from the exact ordinary current-target merge tree')
+    fixes = workspaces.local_git_text(candidate,'rev-list','--reverse',foundation+'..'+head).splitlines()
+    paths = workspaces.local_incoming(candidate, base, tip)
+    previous = foundation
+    for fix in fixes:
+        parents = workspaces.local_git_text(candidate,'show','-s','--format=%P',fix).split()
+        if parents != [previous] or workspaces.local_incoming(candidate,previous,fix)-paths:
+            raise WorkflowError('Partial review fixes must stay in the accepted diff and introduce no unrelated history')
+        previous = fix
+    tree = workspaces.local_git_text(candidate,'rev-parse',head+'^{tree}')
+    identity = {'head':head,'base_oid':target_head,'source_digest':digest(tree.encode())}
+    checkpoint = {'source_ref':source['ref'],'source_head':head,'source_tree':tree,
+                  'target_ref':target_identity['ref'],'target_head':target_head,
+                  'incoming':sorted(workspaces.local_incoming(target,target_head,head)),
+                  'allow_unrelated_staged':True}
+    return candidate, identity, checkpoint
+
+
+def partial_delivery_observation(store, closed, payload, target, target_identity):
+    view = {'run_id':closed['run_id'], 'close_sha256':digest(dump(closed).encode()),
+            'target':target_identity,'target_location_sha256':digest(str(target).encode())}
+    try:
+        base, tip, contracts = partial_accepted_delivery_scope(store, closed)
+    except WorkflowError as error:
+        return {**view,'status':'blocked','reason':str(error)}, None
+    view.update(accepted_base=base,accepted_tip=tip)
+    contains = workspaces.local_git(target,'merge-base','--is-ancestor',tip,target_identity['head'],
+                                     accepted=(0,1)).returncode == 0
+    if contains:
+        return {**view,'status':'already-integrated'}, None
+    try:
+        candidate, identity, preparation = partial_review_candidate(store,payload,base,tip,target,target_identity)
+    except (WorkflowError, workspaces.RunError) as error:
+        return {**view,'status':'blocked','reason':str(error)}, None
+    scope = {'kind':'controller','run_id':closed['run_id'],
+             'task_ids':[row['task_id'] for row in closed['preview']['accepted']],
+             'partial_close_sha256':view['close_sha256'],'target_ref':target_identity['ref']}
+    return {**view,'status':'review-required','identity':identity,'review_scope':scope,
+            'required_checks':sorted(contracts),'preparation':preparation,
+            'candidate_location_sha256':digest(str(candidate).encode())}, candidate
+
+
+def partial_delivery_record(store, relative, closed, target_ref):
+    path = store.owned(relative)
+    if path.is_symlink():
+        raise WorkflowError('Partial delivery requires an ordinary owned record')
+    archived = (store.load().get('run_registry') or {}).get('archived_runs', {}).get(closed['run_id'], {})
+    expected = archived.get('delivery_records', {}).get(relative)
+    if not path.is_file():
+        if expected is not None:
+            raise WorkflowError('The canonical partial delivery record is missing; recover the original receipt')
+        return None
+    if expected is None or expected != file_hash(path):
+        raise WorkflowError('Partial delivery record differs from the canonical recorded result')
+    result = json.loads(path.read_bytes())
+    preview = result.get('preview', {})
+    if (result.get('schema') != 1 or result.get('run_id') != closed['run_id']
+            or preview.get('close_sha256') != digest(dump(closed).encode())
+            or preview.get('target', {}).get('ref') != target_ref):
+        raise WorkflowError('Partial delivery record differs from the original closure or target')
+    return result
+
+
+def partial_delivery(store, command, payload):
+    workspaces.local_git_environment()
+    if not valid_id(store.run_id,'WR') or store.source_root != store.root:
+        raise WorkflowError('Partial delivery requires the exact --run-id and canonical repository')
+    neutral = Store(store.root, neutral=True)
+    neutral.run_id = store.run_id
+    fields = {'target_branch', 'target_worktree', 'candidate_worktree'}
+    fields |= {'expected_preview_sha256', 'owner_instruction', 'review_id'} if command in {'partial-delivery','partial-delivery-checks'} else set()
+    if set(payload)-fields:
+        raise WorkflowError('Partial delivery requires the exact target and review scope')
+    state = neutral.load()
+    closed = partial_finished(neutral, state.get('run_registry'))
+    if not closed:
+        raise WorkflowError('Partial delivery requires an original partial-finish receipt')
+    target, target_identity = partial_delivery_target(neutral,payload)
+    relative = _delivery_receipt_path(closed, '-partial-delivery-' + digest(target_identity['ref'].encode())[:16])
+    if command == 'partial-delivery-preview':
+        record = partial_delivery_record(neutral, relative, closed, target_identity['ref'])
+        if record and record['status'] in {'prepared','merged','already-integrated'}:
+            return {'status':record['status'], 'attempt':record, 'target':target_identity}
+
+        view, _ = partial_delivery_observation(neutral,closed,payload,target,target_identity)
+        return {**view,'preview_sha256':digest(dump(view).encode())}
+    if command == 'partial-delivery-checks':
+        return partial_delivery_checks(neutral,payload,closed,target,target_identity,relative)
+
+    if (not isinstance(payload.get('owner_instruction'),str) or not payload['owner_instruction'].strip()
+            or not isinstance(payload.get('expected_preview_sha256'),str)):
+        raise WorkflowError('Partial delivery requires explicit owner authority and the exact preview')
+    request = digest(dump(payload).encode())
+    ref = target_identity['ref']
+    owner = {'run_id':closed['run_id'],'action':'partial-delivery','request_sha256':request}
+    with workspaces.publication_lock(store.root,'local',ref.removeprefix('refs/heads/')), neutral.lock(local_delivery=owner):
+        state = neutral.load()
+        if partial_finished(neutral,state['run_registry']) != closed:
+            raise WorkflowError('The original partial-finish receipt changed before delivery')
+        target, target_identity = partial_delivery_target(neutral,payload)
+        original = partial_delivery_record(neutral, relative, closed, ref)
+        if original and original['status'] in {'merged','already-integrated'}:
+            if original['request_sha256'] != request:
+                raise WorkflowError('Preserve the original completed partial delivery and its exact request')
+            if original['preview']['target']['checkout'] != target_identity['checkout']:
+                raise WorkflowError('The partial delivery target checkout changed')
+            expected_tip = (original.get('merge') or {}).get('commit', original['preview']['accepted_tip'])
+            if workspaces.local_git(target, 'merge-base', '--is-ancestor', expected_tip,
+                                    target_identity['head'], accepted=(0, 1)).returncode:
+                raise WorkflowError('The recorded partial delivery is no longer contained by the exact target')
+            return original
+        if original and original['status'] == 'prepared':
+            if original['request_sha256'] != request:
+                raise WorkflowError('Retry or reconcile the exact prepared partial merge before selecting a new delivery')
+            preparation = original['preview']['preparation']
+            if target_identity['checkout'] != original['preview']['target']['checkout']:
+                raise WorkflowError('The prepared partial delivery target checkout changed')
+            if target_identity['head'] != preparation['target_head']:
+                if workspaces.local_git(target,'merge-base','--is-ancestor',preparation['target_head'],
+                                        target_identity['head'],accepted=(0,1)).returncode:
+                    if workspaces.local_git(target,'merge-base','--is-ancestor',preparation['source_head'],
+                                            target_identity['head'],accepted=(0,1)).returncode == 0:
+                        raise WorkflowError('The target contains the source without the exact prepared merge proof')
+                    original.update(status='blocked',reason='The current target lacks both the prepared base and reviewed result; review the current target.')
+                    partial_delivery_save(neutral,state,relative,original)
+                    return original
+                history = workspaces.local_git_text(target,'rev-list','--first-parent','--reverse',
+                                                    preparation['target_head']+'..'+target_identity['head']).splitlines()
+                if not history:
+                    raise WorkflowError('The prepared partial merge result cannot be identified')
+                try:
+                    merged = workspaces.local_merge_receipt(target,preparation,history[0])
+                except workspaces.RunError:
+                    if workspaces.local_git(target,'merge-base','--is-ancestor',preparation['source_head'],
+                                            target_identity['head'],accepted=(0,1)).returncode == 0:
+                        raise WorkflowError('The target contains the source without the exact prepared merge proof')
+                    original.update(status='blocked',reason='The target advanced without the prepared partial result; review the current target.')
+                    partial_delivery_save(neutral,state,relative,original)
+                    return original
+                if history[0] == target_identity['head']:
+                    workspaces.reconcile_reviewed_merge_index(target,preparation,merged)
+                original.update(status='merged', merge=merged)
+                partial_delivery_save(neutral,state,relative,original)
+                return original
+
+        view,candidate = partial_delivery_observation(neutral,closed,payload,target,target_identity)
+        if digest(dump(view).encode()) != payload['expected_preview_sha256']:
+            if original and original['status'] == 'prepared':
+                original.update(status='blocked',reason='The candidate changed before the prepared merge reached Git.')
+                partial_delivery_save(neutral,state,relative,original)
+                return original
+            raise WorkflowError('Partial delivery preview changed; inspect the current target and candidate')
+        result = {'schema':1,'run_id':closed['run_id'],'id':closed['run_id'],'request_sha256':request,
+                  'owner_instruction':payload['owner_instruction'],'preview':view,'status':view['status']}
+        if view['status'] in {'already-integrated','blocked'}:
+            partial_delivery_save(neutral,state,relative,result)
+            return result
+        if not valid_id(payload.get('review_id'),'DO'):
+            result.update(status='blocked',reason='The accepted partial candidate requires a current clean review ID')
+            partial_delivery_save(neutral,state,relative,result)
+            return result
+        neutral.source_root = candidate
+        _delivery_install_barrier(target)
+        _delivery_install_barrier(candidate)
+        try:
+            frame = verified_implementation_review(neutral,payload['review_id'],view['identity'],view['review_scope'])
+            if set(frame['plan']['required_checks']) != set(view['required_checks']):
+                raise WorkflowError('The partial review must cover every exact required check in the delivery preview')
+            checked_path = relative.removesuffix('.json')+'-checks.json'
+            checked = partial_delivery_record(neutral,checked_path,closed,ref)
+            if not checked or checked['preview'] != view or checked['status'] != 'checked':
+                raise WorkflowError('Run the qualified partial-delivery checks on the exact reviewed candidate')
+            check_attempt = partial_delivery_check_attempt(neutral,closed,view)
+            inputs = current_target_check_inputs(neutral,check_attempt)
+            evidence = current_target_checked_evidence(neutral,checked,inputs)
+            references = {row['id']:(row['status'],row['reference']) for row in frame['checks']['results']}
+            if references != {cid:('passed',check['review_reference']) for cid,check in evidence.items()}:
+                raise WorkflowError('The partial review must cite the actual current execution receipts')
+        except WorkflowError as error:
+            if original and original['status'] == 'prepared':
+                raise
+            result.update(status='blocked',reason=str(error))
+            partial_delivery_save(neutral,state,relative,result)
+            return result
+        preparation = view['preparation']
+        if original and original['status'] == 'prepared' and original.get('review_hash') != frame['orchestration_hash']:
+            raise WorkflowError('The exact prepared partial review changed')
+        result.update(status='prepared',review_id=payload['review_id'],review_hash=frame['orchestration_hash'])
+        partial_delivery_save(neutral,state,relative,result)
+        try:
+            workspaces.run_local_merge(target,candidate,preparation)
+        except workspaces.RunError as error:
+            # An uncertain update retains the original preparation. For a
+            # proven unchanged target, make the failure available for replan.
+            _, observed_target = partial_delivery_target(neutral,payload)
+            if observed_target != target_identity:
+                raise
+            result.update(status='blocked',reason=str(error))
+            partial_delivery_save(neutral,state,relative,result)
+            return result
+        _, updated_target = partial_delivery_target(neutral,payload)
+        merged = workspaces.local_merge_receipt(target,preparation,updated_target['head'])
+        workspaces.reconcile_reviewed_merge_index(target,preparation,merged)
+        result.update(status='merged',merge=merged)
+        partial_delivery_save(neutral,state,relative,result)
+        return result
 
 
 def finish(store,payload=None):
@@ -3444,21 +4128,57 @@ def evidence_pointer(store,reference,required=False):
     if 'sha256' not in ref:ref['sha256']=actual
     return ref
 
+def attach_partial_history_checkout(store, registry, locator, rid):
+    archived = Store(store.root, neutral=True)
+    archived.run_id = rid
+    receipt = partial_finished(archived, registry)
+    if not receipt:
+        return False
+    source = receipt['preview']['source']
+    binding = (locator or {}).get('archived_worktrees', {}).get(rid)
+    if binding and binding.get('request_sha256') == receipt['request_sha256']:
+        candidates = [Path(binding['path'])]
+    else:
+        # Older locator recovery can drop advisory archive paths. The sealed
+        # checkout and native registration still prove the original location.
+        candidates = workspaces.registered_worktrees(store.root)
+    for path in candidates:
+        if not path.is_dir() or digest(str(path).encode()) != source['location_sha256']:
+            continue
+        try:
+            if (workspaces.linked_registration(store.root, path).name != source['registration']
+                    or workspaces.checked_out_branch(path) != {key:source[key] for key in ('checkout','ref','head')}):
+                continue
+            if receipt['checkpoint']['workspace'].get('cleanup_owner'):
+                workspaces.directed_owner(store.root, path, receipt['checkpoint'], receipt['queue_id'])
+        except workspaces.RunError:
+            continue
+        store.source_root = path
+        return True
+    return False
+
+
 def history(store,task_id=None,component=None):
     result=[]
-    registry = json.loads(store.state.read_text()).get('run_registry', {}).get('runs', {}) if store.state.is_file() else {}
+    state = json.loads(store.state.read_text()) if store.state.is_file() else {}
+    records = state.get('run_registry', {})
+    registry = historical_runs(records)
     for outcome in store.outcomes():
         if task_id and outcome['task_id']!=task_id:continue
         if component and normalized(component) not in normalized(outcome['title']+' '+outcome['outcome']+' '+' '.join(outcome.get('source_fingerprints',{}))):continue
         view=deepcopy(outcome)
         proof_store=store
         committed = None
+        archived_evidence = False
         if outcome.get('run_id'):
             proof_store=deepcopy(store);locator=workspaces.runtime(store.root)
             location=locator['worktrees'].get(outcome['run_id']) if locator else None
             proof_store.source_root=Path(location) if location else store.root/'.skill-tree/unavailable-run-evidence'
             cleanup = registry.get(outcome['run_id'], {}).get('delivery', {}).get('worktree_cleanup', {})
-            if cleanup.get('status') == 'removed' or not proof_store.source_root.exists():
+            if outcome['run_id'] in records.get('archived_runs', {}):
+                committed = (outcome.get('task_git_commit') or {}).get('commit')
+                archived_evidence = attach_partial_history_checkout(proof_store, records, locator, outcome['run_id'])
+            elif cleanup.get('status') == 'removed' or not proof_store.source_root.exists():
                 committed = cleanup.get('attempt', {}).get('scope', {}).get('source_head')
 
         def history_fingerprint(relative):
@@ -3469,7 +4189,10 @@ def history(store,task_id=None,component=None):
         def history_evidence(reference):
             if not committed:
                 return evidence_pointer(proof_store, reference)
-            available = bool(reference.get('sha256')) and history_fingerprint(reference['path']) == reference['sha256']
+            fingerprint = history_fingerprint(reference['path'])
+            available = bool(reference.get('sha256')) and fingerprint == reference['sha256']
+            if not available and archived_evidence and reference.get('sha256'):
+                return evidence_pointer(proof_store, reference)
             return {**reference, 'available':available, **({'git_commit':committed} if available else {})}
 
         for check in view.get('acceptance',[]):check['evidence']=[history_evidence(e) for e in check.get('evidence',[])]
@@ -3516,7 +4239,15 @@ def manifest(store):
 def prune(store,apply=False):
     config=manifest(store)['retention'];pinned=set(config.get('pins',[]));protected=set(pinned)
     if store.state.exists():
-        state=store.load();runs=list(state.get('run_registry',{}).get('runs',{}).values()) or [state['active_run']]
+        state=store.load();registry=state.get('run_registry',{})
+        runs=list(historical_runs(registry).values()) or [state['active_run']]
+        for archived in registry.get('archived_runs', {}).values():
+            for relative, expected in archived.get('delivery_records', {}).items():
+                protected.add(relative)
+                record = store.owned(relative)
+                if file_hash(record) == expected:
+                    protected.update(check['artifact']['path']
+                                     for check in json.loads(record.read_bytes()).get('checks', {}).values())
         for run in runs:
             if run:protected.update(run.get('history_refs',[]));protected.add(run['id'])
     if store.future.exists():
@@ -3721,7 +4452,7 @@ def resume_admission(store, *, expected_initial=None):
 def completed_dependency_order(store, outcomes, roots):
     if not roots:
         return []
-    runs = (store.load().get('run_registry') or {}).get('runs',{})
+    runs = historical_runs(store.load().get('run_registry') or {})
     order = []
     visiting = set()
     done = set()
@@ -3953,7 +4684,7 @@ def completed_task_body(store, record):
         return None
 
     registry = store.load().get('run_registry', {})
-    run = registry.get('runs', {}).get(run_id, {})
+    run = historical_runs(registry).get(run_id, {})
     if run.get('completion_refs', {}).get(task_id) != outcome_id:
         return None
 
@@ -4033,7 +4764,7 @@ def completed_contract_sha256(record):
 
 def verify_completed_contract(store,record,runs=None):
     if runs is None:
-        runs = (store.load().get('run_registry') or {}).get('runs',{})
+        runs = historical_runs(store.load().get('run_registry') or {})
     task_id = record['task_id']
     owner_id = record.get('run_id')
     owners = [run_id for run_id,run in runs.items() if task_id in run.get('completion_refs',{})]
@@ -4866,7 +5597,7 @@ def timeline_interval(started_at,finished_at):
 
 def run_timing_timeline(store,run_ids):
     state=_hook_source_store(store,store.source_root).load()
-    registry=state.get('run_registry',{});runs=dict(registry.get('runs',{}))
+    registry=state.get('run_registry',{});runs=historical_runs(registry)
     if state['active_run']:runs[state['active_run']['id']]=state['active_run']
     applied=set(registry.get('applied_events',[]));outcomes=store.outcomes()
     result=[]
@@ -4947,6 +5678,8 @@ def replay_events(store,payload):
                     existing=json.loads(extras[rel]) if rel in extras else read_intake_receipt(store,batch)
                     if existing!=validate_intake_receipt(value,batch):raise WorkflowError('Event intake receipt conflict: '+batch)
                 continue
+            if event.get('partial_finish_sha256') or event.get('run_id') in registry.get('archived_runs', {}):
+                raise WorkflowError('Partial finish events require the original canonical closeout and cannot reopen a run')
             locator=workspaces.runtime(store.root);run_path=locator['worktrees'].get(event['run_id']) if locator else None
             if not run_path:raise WorkflowError('Event replay requires an explicitly recovered run worktree locator')
             event=workspaces.restore_envelope(event,run_path,store.root,payload.get('local_paths',{}))
@@ -5907,7 +6640,17 @@ def decision_context_guard(store,context,allow_stale=False):
         state=Store(store.root,allow_unselected=True,route_queue=False,neutral=True).load()
         runs=dict(state.get('run_registry',{}).get('runs',{}))
         if state.get('active_run'):runs[state['active_run']['id']]=state['active_run']
-        run=runs.get(context.get('run_id'))
+        rid=context.get('run_id')
+        run=runs.get(rid)
+        if not run and rid in state.get('run_registry', {}).get('archived_runs', {}):
+            archived_store = Store(store.root, neutral=True)
+            archived_store.run_id = rid
+            closed = partial_finished(archived_store,state['run_registry'])
+            accepted = [row['task_id'] for row in closed['preview']['accepted']]
+            if (context.get('task_ids') != accepted or not context.get('target_ref', '').startswith('refs/heads/')
+                    or context.get('partial_close_sha256') != digest(dump(closed).encode())):
+                raise WorkflowError('Partial controller review requires the exact accepted scope and closeout receipt')
+            return
         if not run:raise WorkflowError('Controller decision identity is not a recorded run')
         if set(context.get('task_ids',[]))-set(run.get('admitted_task_ids',run.get('snapshot',[]))+run.get('required_ids',[])):raise WorkflowError('Decision scope exceeds the recorded controller scope')
     if context.get('session_id'):
@@ -6623,7 +7366,7 @@ def record_worker(store, state, payload, assignment, request):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|CURRENT_TARGET_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','prepare-worktree-profile','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','worker-handoff','environment','validation-impact','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|CURRENT_TARGET_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'partial-delivery-preview','partial-delivery','partial-delivery-checks','partial-finish-preview','partial-finish','refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','prepare-worktree-profile','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','worker-handoff','environment','validation-impact','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     parser.add_argument('--standalone',action='store_true',help='Use the canonical queue and selected checkout without attaching to a registered controller.')
     parser.add_argument('--preview',type=Path,help='Retained Force Process Preview JSON')
     parser.add_argument('--receipt',type=Path,help='Original Process Pending receipt JSON')
@@ -6754,6 +7497,8 @@ def main(argv=None):
         elif cmd=='controller-review':result=controller_review_identity(store)
         elif cmd=='merge-reviewed':result=merge_reviewed_controller(store,payload)
         elif cmd=='cleanup-worktree':result=cleanup_controller_worktree(store,payload)
+        elif cmd in {'partial-delivery-preview','partial-delivery','partial-delivery-checks'}:result=partial_delivery(store,cmd,payload)
+        elif cmd in {'partial-finish-preview','partial-finish'}:result=partial_finish(store,cmd,payload)
         elif cmd=='finish':result=finish(store,payload)
         elif cmd=='audit':result=audit(store,payload)
         elif cmd=='history':result=history(store,args.id,args.component)

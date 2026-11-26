@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "7cbae2ed847f25004f8d5a342148ef969546fb91f6dc2bde430a3f72b7064116",
+  "identity": "867ff392eaccb4a1cc01cea694cd79625c1aa152179441bf2f0f6789c079d439",
   "operation": "skill-tree-work-through-next",
   "operations": {
     "skill-tree-3d": {
@@ -3303,12 +3303,12 @@
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/pr-review-cycle.md": "5bc55fbf5f4883e215fa229bc7531979ee522a40ddcfeb22d476eb6f7d7cd60f",
     "references/project-profile.md": "af84614ccf2aea888e0f3a0fa09264eb282e05c934c79a431d53407e61290fd6",
-    "references/run-workspaces.md": "ca62963a23d05b422713325b29f0229c0d7f5423e972cdc90751c85a46a8c9a7",
+    "references/run-workspaces.md": "298f972fd4802b3bf95af3120a00904b999d23beb70ef7366ff3684945ee4cfd",
     "references/ugui-testing.md": "873c236f793ff3c9ece8f0d0346c5c48513e8220406fce216751571c58b79073",
     "references/unity-development.md": "49110c691d4493cd21e8c3ceb682053e3f975016be9879cd10836d9f4feaf371",
     "references/unity-safety.md": "c4a96cdb4bc35a98fcab8ba6bf9c983252cd73d1cefaa439669cedcbed357df0",
     "references/validation-policy.md": "e17660b35a658f5fb595b6c151987dae993b264d21576d21160f79f9b195f20e",
-    "references/workflow-metadata.md": "b85c895e9c2f90d743be5f810a5883cad3fb334097b7bf6b50e9b2b534ffe1a1",
+    "references/workflow-metadata.md": "e706a20d247277722bed1c8cecbffd6f1ba5dfa6e1e1a88622bab5bdb4ac48a1",
     "scripts/api-contract-locks.js": "eaac3e411ab7ddea36cedb4c48f0a0d0c5e737509466f0f86587df51a34fe594",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "dd1b6fb5dfb56b93ad531abf87f4f713b5934156133007bb4014b56ec9f285e5",
@@ -3326,10 +3326,10 @@
     "scripts/plugin-runtime.js": "62caaa416cb4f375fef45edb71c1cbe3b2f9c0acb734a95e0b9099470cf6c8a5",
     "scripts/plugin-sources.js": "13d853f9e64dec84cf92f4026ac71e4384e186cd96200543e400a852a46e4693",
     "scripts/pr-review-state.py": "15a2bdff8dd6422f75f1f825486534e34e3a5877f75f2bd240dcf04e416d9224",
-    "scripts/run-workspaces.py": "bf12e433f9e3597f4667698c3c257fc84bf45a44e4dc4f3c7850c7a71bd0ad99",
+    "scripts/run-workspaces.py": "a706fedaca99a6231d753201cff28f5d5601292b048ceb0929dc8ae469eb302b",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "d5ced6efe42feb81558f47c8c6feebdc114847f8eec907518e9ac6085d0db619"
+    "scripts/workflow-state.py": "66d30a26c5749df8576781146b395806320d05d35674463f157a84b2f48acb9a"
   },
   "packages": {},
   "parameter_defaults": {},

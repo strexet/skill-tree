@@ -181,6 +181,8 @@ DG mutation and the corresponding DO frame change share one recoverable transact
 `workspace-setup` explicitly enables the compatible run registry and optionally adopts an existing checkpoint. `runs` lists retained runs. `recover-locator` and `recover-workspace` preserve identities while resolving explicitly inspected machine-state gaps. `environment` inspects declared prerequisites without reading secrets or launching runtimes. `resource` owns exclusive runtime claims. `export-run` and `replay-events` transfer scoped semantic changes without replacing canonical queue files. The run workspace contract defines payloads and conflict behavior.
 
 
+Partial Implement All closeout uses `partial-finish-preview` and `partial-finish` with an exact run ID. The partial receipt, original checkpoint, outcome references and archived progress remain historical. The live registry excludes archived runs and releases the selected task claims through the canonical writer. The exact transaction owner fences older writers during locator retirement.
+
 ## Clarification payloads
 
 `clarify-start` accepts the exact `task_ids`, inspected `expected_source_hash` and optional `mode: explicit|required-interview`. The returned session includes `id`, integer `revision` and computed `session_hash`. `clarify-read --id CL-<uuid>` returns the current record without mutation. Every existing-session mutation supplies the following guard fields; placeholders represent exact inspected values.
