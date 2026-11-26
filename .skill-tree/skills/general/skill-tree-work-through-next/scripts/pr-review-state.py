@@ -53,6 +53,17 @@ except (ValueError,OSError) as error:
 class ReviewError(ValueError):
     pass
 
+class HandoffHold(ReviewError):
+    def __init__(self, publication_id, reason, message, **details):
+        super().__init__(message)
+        self.result = {'ok': False, 'status': 'held', 'publication_id': publication_id,
+                       'reason': reason, 'error': message, **details}
+
+
+class ProviderHandoffChanged(ReviewError):
+    pass
+
+
 def digest(value):
     return hashlib.sha256(json.dumps(value,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
 
@@ -488,22 +499,150 @@ def existing_source_preflight(root, payload, publication_id):
     wf=owned_module('pr_source_preflight_workflow',Path(__file__).with_name('workflow-state.py'))
     store=wf.Store(ws.canonical(root),allow_unselected=True,neutral=True)
     carrier=_review_path(store,publication_id)
-    if not carrier.is_file():
+    raw = _regular_input(carrier, 'Publication receipts', 16 * 1024 * 1024)
+    if raw is None:
         raise ReviewError('Select the existing exact publication and provider PR identity')
-    raw=carrier.read_bytes()
     record=json.loads(raw)
+    if not isinstance(record, dict) or record.get('publication_id') != publication_id:
+        raise ReviewError('Select the existing exact publication and provider PR identity')
     verified=existing_source_checkout(store,payload['source_checkout'],record,publication_id,payload.get('snapshot'))
     saved=record['identity']
     changed=existing_source_files(verified,saved)
     if payload.get('snapshot') is not None and set(payload['snapshot'].get('changed_files',[])) != set(changed):
         raise ReviewError('Current provider diff differs from the verified source checkout')
-    if (carrier.read_bytes() != raw or
-            existing_source_checkout(store,payload['source_checkout'],record,publication_id,payload.get('snapshot')) != verified):
+    if (existing_source_checkout(store,payload['source_checkout'],record,publication_id,payload.get('snapshot')) != verified
+            or _regular_input(carrier, 'Publication receipts', 16 * 1024 * 1024) != raw):
         raise ReviewError('The original publication checkout changed during preflight')
     return {**saved,'publication_id':publication_id,'pr':record['pr'],'status':record['status'],
             'authorization':record['authorization'],'source_checkout':verified,'changed_files':changed,
+            'publication_sha256':hashlib.sha256(raw).hexdigest(),
             'requires_frozen_review_generation':bool(record.get('review_requirements')),
             'candidate_objects_required':True}
+
+
+def handoff_provider_scope(checkout, checked):
+    url = ws.local_git_text(checkout, 'remote', 'get-url', '--', checked['remote'])
+    if hashlib.sha256(url.encode()).hexdigest() != checked['remote_id']:
+        raise ProviderHandoffChanged('The verified publication remote changed')
+    host, base = github_remote(url)
+    retained = repository_scope(checked)
+    if retained and (retained.get('base_repository') != base or not retained.get('head_repository')):
+        raise ProviderHandoffChanged('The retained GitHub repository scope is incomplete or changed')
+    return host, base, retained.get('head_repository', base), not retained
+
+
+def handoff_provider_policy(policy, host, base, target):
+    fields = {'host', 'repository', 'target_branch', 'reference',
+              'required_check_names', 'approvals_required'}
+    if (not isinstance(policy, dict) or set(policy) != fields
+            or (policy['host'], policy['repository'], policy['target_branch']) != (host, base, target)
+            or not isinstance(policy['reference'], str) or not policy['reference'].strip()
+            or type(policy['approvals_required']) is not bool):
+        raise ReviewError('Inspect the required checks and approvals for the exact GitHub repository and target')
+    names = policy['required_check_names']
+    if (not isinstance(names, list) or any(not isinstance(name, str) or not name.strip() for name in names)
+            or len(set(names)) != len(names)):
+        raise ReviewError('Inspect the complete required-check policy for the exact target')
+    return {'checks_known': True, 'approvals_known': True, 'required_check_names': names,
+            'approvals_required': policy['approvals_required']}
+
+
+def handoff_pending_operations(record):
+    pending = []
+    operations = record.get('operations')
+    if not isinstance(operations, dict):
+        raise ReviewError('The retained publication operation inventory is incomplete')
+    for key, operation in sorted(operations.items()):
+        if (not isinstance(key, str) or not key or not isinstance(operation, dict)
+                or not isinstance(operation.get('request_digest'), str)
+                or not re.fullmatch(r'[a-f0-9]{64}', operation['request_digest'])
+                or operation.get('state') not in {'prepared', 'confirmed'}
+                or (operation.get('result') is None) != (operation['state'] == 'prepared')):
+            raise ReviewError('The retained publication operation receipt requires reconciliation')
+        if operation['state'] == 'prepared':
+            pending.append({'key': key, 'request_digest': operation['request_digest']})
+    return pending
+
+
+def prepare_handoff(root, payload, publication_id):
+    required = {'source_checkout', 'head', 'base_oid'}
+    if (not required.issubset(payload) or set(payload) - required - {'provider_policy', 'expected_publication_sha256'}
+            or any(not isinstance(payload[key], str) or not re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', payload[key])
+                   for key in ('head', 'base_oid'))):
+        raise HandoffHold(publication_id, 'request-incomplete',
+                          'Supply the original source checkout, expected head and expected target base')
+    source = {'source_checkout': payload['source_checkout']}
+    try:
+        checked = existing_source_preflight(root, source, publication_id)
+        canonical = ws.canonical(root)
+        carrier = _review_path(SimpleNamespace(root=canonical), publication_id)
+        raw = _regular_input(carrier, 'Publication receipts', 16 * 1024 * 1024)
+        if raw is None or hashlib.sha256(raw).hexdigest() != checked['publication_sha256']:
+            raise ReviewError('The original publication record changed during preflight')
+        record = json.loads(raw)
+    except (OSError, ValueError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
+        raise HandoffHold(publication_id, 'publication-or-checkout-unavailable',
+                          'Select the exact existing publication and verified source checkout') from error
+    if (any(payload[key] != checked[key] for key in ('head', 'base_oid'))
+            or payload.get('expected_publication_sha256', checked['publication_sha256']) != checked['publication_sha256']):
+        raise HandoffHold(publication_id, 'publication-changed',
+                          'Reinspect the original publication head, target base or receipt')
+    authorization = checked['authorization']
+    if (not isinstance(authorization, dict) or authorization.get('origin') != 'owner'
+            or authorization.get('pr') is not True):
+        raise HandoffHold(publication_id, 'publication-authority-unavailable',
+                          'The original publication requires a retained direct owner grant')
+    try:
+        pending = handoff_pending_operations(record)
+    except ReviewError as error:
+        raise HandoffHold(publication_id, 'operation-reconciliation-required', str(error)) from error
+    if pending:
+        raise HandoffHold(publication_id, 'operation-reconciliation-required',
+                          'Reconcile the original operation against provider evidence before continuing',
+                          operations=pending,
+                          recovery={'command': 'operation', 'publication_id': publication_id})
+    checkout = Path(checked['source_checkout']['path'])
+    try:
+        host, base, head_repository, same_repository_required = handoff_provider_scope(checkout, checked)
+    except (OSError, ValueError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
+        raise HandoffHold(publication_id, 'provider-scope-unavailable',
+                          'Restore the GitHub repository scope bound to the original publication') from error
+    try:
+        policy = handoff_provider_policy(payload.get('provider_policy'), host, base, checked['target_branch'])
+    except ReviewError as error:
+        raise HandoffHold(publication_id, 'provider-policy-unavailable', str(error)) from error
+    context = identity(checked)
+    adapter_context = {**context, 'base_repository': base, 'head_repository': head_repository}
+    try:
+        provider = GitHub.from_preflight(checkout, adapter_context, host=host)
+        snapshot = provider.snapshot(checked['pr']['number'], adapter_context, policy,
+                                     expected_pr=checked['pr'], same_repository_required=same_repository_required)
+    except ProviderHandoffChanged as error:
+        raise HandoffHold(publication_id, 'provider-pr-changed', str(error)) from error
+    except (OSError, ValueError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
+        raise HandoffHold(publication_id, 'provider-inspection-unavailable',
+                          'Restore access to GitHub PR, discussion, review and check inspection') from error
+    for key in repository_scope(snapshot).keys() - repository_scope(checked).keys():
+        snapshot.pop(key)
+    if (identity(snapshot) != context or snapshot.get('pr') != checked['pr']
+            or snapshot.get('state') != 'OPEN' or sorted(snapshot['changed_files']) != sorted(checked['changed_files'])):
+        raise HandoffHold(publication_id, 'provider-pr-changed',
+                          'The current provider PR or complete file set differs from the original publication')
+    try:
+        final = existing_source_preflight(root, {**source, 'snapshot': snapshot}, publication_id)
+    except (OSError, ValueError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
+        raise HandoffHold(publication_id, 'publication-changed',
+                          'The original publication or source checkout changed during provider inspection') from error
+    if final != checked:
+        raise HandoffHold(publication_id, 'publication-changed',
+                          'The original publication or source checkout changed during provider inspection')
+    return {'status': 'handoff-prepared', 'publication_id': publication_id, 'pr': checked['pr'],
+            'head': checked['head'], 'base_oid': checked['base_oid'],
+            'publication_sha256': checked['publication_sha256'],
+            'provider_policy_reference': payload['provider_policy']['reference'],
+            'next': {'command': 'observe', 'root': str(canonical), 'publication_id': publication_id,
+                     'input': {**source, 'snapshot': snapshot,
+                               'expected_publication_sha256': checked['publication_sha256']}}}
 
 
 def review_phase_guard(store,context,phase):
@@ -1148,7 +1287,7 @@ def merge_denial_preview(root, record, payload):
 
 class GitHub:
     """Authorized gh fallback; connectors can supply the same normalized snapshots."""
-    def __init__(self, root, repository, head_repository=None):
+    def __init__(self, root, repository, head_repository=None, *, host=None):
         self.root = Path(root)
         for name in (repository, head_repository or repository):
             if not isinstance(name, str) or not re.fullmatch(r'[\w.-]+/[\w.-]+', name):
@@ -1156,13 +1295,18 @@ class GitHub:
         self.repository = repository.lower()
         self.head_repository = (head_repository or repository).lower()
         self.explicit_head = head_repository is not None
+        if host is not None and (not isinstance(host, str) or not re.fullmatch(r'[a-z0-9][a-z0-9.-]*', host)):
+            raise ReviewError('A verified GitHub hostname is required')
+        self.host = host
 
     @classmethod
-    def from_preflight(cls, root, checked):
+    def from_preflight(cls, root, checked, *, host=None):
         if not checked.get('base_repository') or not checked.get('head_repository'):
             raise ReviewError('Select the reviewed base and head remotes in publication preflight')
-        return cls(root, checked['base_repository'], checked['head_repository'])
+        return cls(root, checked['base_repository'], checked['head_repository'], host=host)
     def gh(self,*args):
+        if self.host and args[:1] == ('api',):
+            args = (*args, '--hostname', self.host)
         if '--paginate' in args and '--slurp' not in args:args=(*args,'--slurp')
         result=subprocess.run(['gh',*map(str,args)],cwd=self.root,capture_output=True,text=True,timeout=45)
         if result.returncode:
@@ -1223,8 +1367,36 @@ class GitHub:
             if matches[0]['body']!=body+'\n\n'+marker:raise ReviewError('Existing comment marker has different content; reconcile before a new operation')
             return matches[0]
         return self.gh('api','--method','POST',endpoint,'-f','body='+body+'\n\n'+marker)
-    def snapshot(self,number,context,policy):
-        raw=self.gh('pr','view',number,'--repo',self.repository,'--json','id,number,url,state,headRefOid,headRefName,baseRefOid,baseRefName,mergeable,reviewDecision,mergeCommit,statusCheckRollup,changedFiles,isCrossRepository,headRepository,headRepositoryOwner')
+    def pull_view(self, number):
+        repo = self.host + '/' + self.repository if self.host else self.repository
+        return self.gh('pr','view',number,'--repo',repo,'--json',
+                       'id,number,url,state,headRefOid,headRefName,baseRefOid,baseRefName,mergeable,reviewDecision,mergeCommit,statusCheckRollup,changedFiles,isCrossRepository,headRepository,headRepositoryOwner')
+
+    def require_handoff_pull(self, raw, context, expected_pr, same_repository_required):
+        if not isinstance(raw, dict):
+            raise ReviewError('Provider PR inspection is unavailable')
+        fields = {'headRefOid': 'head', 'baseRefOid': 'base_oid',
+                  'headRefName': 'source_branch', 'baseRefName': 'target_branch'}
+        identity_url = 'https://' + self.host + '/' + self.repository + '/pull/' + str(expected_pr['number'])
+        owner = raw.get('headRepositoryOwner')
+        repository = raw.get('headRepository')
+        if not isinstance(owner, dict) or not isinstance(repository, dict):
+            raise ReviewError('Provider head repository evidence is unavailable')
+        owner_name, repository_name = owner.get('login'), repository.get('name')
+        if not isinstance(owner_name, str) or not isinstance(repository_name, str):
+            raise ReviewError('Provider head repository evidence is unavailable')
+        head = (owner_name + '/' + repository_name).lower()
+        if ({key: raw.get(key) for key in ('id', 'number', 'url')} != expected_pr
+                or type(raw.get('number')) is not int or raw['url'].lower() != identity_url
+                or raw.get('state') != 'OPEN' or any(raw.get(key) != context[value] for key, value in fields.items())
+                or head != self.head_repository
+                or (same_repository_required and raw.get('isCrossRepository') is not False)):
+            raise ProviderHandoffChanged('The original open GitHub PR, repository, head or target base changed')
+
+    def snapshot(self,number,context,policy,*,expected_pr=None,same_repository_required=False):
+        raw=self.pull_view(number)
+        if expected_pr is not None:
+            self.require_handoff_pull(raw, context, expected_pr, same_repository_required)
         if raw['headRefName']!=context['source_branch'] or raw['baseRefName']!=context['target_branch']:
             raise ReviewError('Provider PR branch identity differs from preflight')
         observed_owner = (raw.get('headRepositoryOwner') or {}).get('login', '')
@@ -1238,26 +1410,52 @@ class GitHub:
             raise ReviewError('Provider PR source repository or selected commit identity differs from preflight')
         endpoint='repos/'+self.repository
         files=self.gh('api','--method','GET',endpoint+'/pulls/'+str(number)+'/files','--paginate')
-        if len(files)!=raw['changedFiles']:raise ReviewError('Provider full-diff file inventory is incomplete')
+        if (not isinstance(files, list) or any(not isinstance(row, dict) or not isinstance(row.get('filename'), str)
+                                                for row in files) or len(files)!=raw['changedFiles']):
+            raise ReviewError('Provider full-diff file inventory is incomplete')
         reviews=self.gh('api','--method','GET',endpoint+'/pulls/'+str(number)+'/reviews','--paginate')
         comments=self.gh('api','--method','GET',endpoint+'/issues/'+str(number)+'/comments','--paginate')
         inline=self.gh('api','--method','GET',endpoint+'/pulls/'+str(number)+'/comments','--paginate')
-        owner,name=self.repository.split('/');threads=[];cursor=None
+        if any(not isinstance(inventory, list) or any(not isinstance(row, dict) for row in inventory)
+               for inventory in (reviews, comments, inline)):
+            raise ReviewError('Provider review or comment inventory is incomplete')
+        owner,name=self.repository.split('/');threads=[];cursor=None;seen=set()
         query='query($owner:String!,$name:String!,$number:Int!,$cursor:String){repository(owner:$owner,name:$name){pullRequest(number:$number){reviewThreads(first:100,after:$cursor){nodes{id isResolved isOutdated path line} pageInfo{hasNextPage endCursor}}}}}'
+        if expected_pr is not None:
+            query=query.replace('{reviewThreads(', '{id reviewThreads(')
         while True:
             args=['api','graphql','-f','query='+query,'-f','owner='+owner,'-f','name='+name,'-F','number='+str(number)]
             if cursor:args+=['-f','cursor='+cursor]
             response=self.gh(*args)
-            if response.get('errors'):raise ReviewError('Provider discussion inventory is incomplete')
-            page=response['data']['repository']['pullRequest']['reviewThreads']
+            if not isinstance(response, dict) or response.get('errors'):
+                raise ReviewError('Provider discussion inventory is incomplete')
+            pull=response['data']['repository']['pullRequest']
+            if not isinstance(pull, dict):
+                raise ReviewError('Provider discussion inventory is incomplete')
+            if expected_pr is not None and pull.get('id')!=expected_pr['id']:
+                raise ProviderHandoffChanged('The provider discussion page identifies a different PR')
+            page=pull['reviewThreads']
             threads.extend({'id':t['id'],'resolved':t['isResolved'],'required':not t['isResolved'],'path':t['path'],'line':t['line'],'outdated':t['isOutdated']} for t in page['nodes'])
             if not page['pageInfo']['hasNextPage']:break
             new_cursor=page['pageInfo']['endCursor']
-            if not new_cursor or new_cursor==cursor:raise ReviewError('Provider discussion pagination did not advance')
+            if not isinstance(new_cursor, str) or not new_cursor or new_cursor in seen:
+                raise ReviewError('Provider discussion pagination did not advance')
+            seen.add(new_cursor)
             cursor=new_cursor
+        if expected_pr is not None:
+            raw = self.pull_view(number)
+            self.require_handoff_pull(raw, context, expected_pr, same_repository_required)
+            rollup = raw.get('statusCheckRollup')
+            if (not isinstance(rollup, list) or any(not isinstance(check, dict) for check in rollup)
+                    or 'reviewDecision' not in raw):
+                raise ReviewError('Provider check or approval inventory is unavailable')
+            if len(files)!=raw['changedFiles']:
+                raise ProviderHandoffChanged('The provider full-diff inventory changed during inspection')
         required=set(policy.get('required_check_names',[]));checks=[]
         for check in raw.get('statusCheckRollup') or []:
             name=check.get('name') or check.get('context');status=check.get('conclusion') or check.get('state') or check.get('status') or 'UNKNOWN'
+            if expected_pr is not None and (not isinstance(name, str) or not isinstance(status, str)):
+                raise ReviewError('Provider check identity or status is unavailable')
             checks.append({'name':name,'status':'success' if status=='SUCCESS' else status.lower(),'required':name in required})
         return {**context,'head':raw['headRefOid'],'base_oid':raw['baseRefOid'],'candidate_objects_required':True,'changed_files':[f['filename'] for f in files],'pr':{'id':raw['id'],'number':raw['number'],'url':raw['url']},'state':raw['state'],'merge_commit':(raw.get('mergeCommit') or {}).get('oid'),'mergeable':raw['mergeable'],'reviews':reviews,'comments':comments+inline,'threads':threads,'checks':checks,'checks_known':policy.get('checks_known') is True,'required_checks_missing':sorted(required-{c['name'] for c in checks}),'approvals_known':policy.get('approvals_known') is True,'approvals_required':policy.get('approvals_required',True),'approved':raw.get('reviewDecision')=='APPROVED','same_repository':raw.get('isCrossRepository') is False}
     def merge(self,number,head,method):
@@ -1764,10 +1962,10 @@ def publication_complete(record):
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command',choices=['parameters','preflight','init','observe','review','ready','merge-gate','merge-denial-preview','operation','block','hook-attach','inspection','review-reconcile','plugin-findings','profile-maintenance','final-validation'])
+    parser.add_argument('command',choices=['parameters','preflight','prepare-handoff','init','observe','review','ready','merge-gate','merge-denial-preview','operation','block','hook-attach','inspection','review-reconcile','plugin-findings','profile-maintenance','final-validation'])
     parser.add_argument('root',type=Path);parser.add_argument('--input',type=Path,required=True);parser.add_argument('--publication-id')
     args=parser.parse_args(argv)
-    if args.command == 'final-validation':
+    if args.command in {'final-validation', 'prepare-handoff'}:
         with offline_candidate_git():
             return dispatch(args)
     return dispatch(args)
@@ -1778,7 +1976,7 @@ def dispatch(args):
         payload=json.loads(args.input.read_text());root=args.root.resolve()
         if not isinstance(payload,dict):raise ReviewError('Publication requests require an object')
         explicit_source = 'source_checkout' in payload
-        if explicit_source and (not args.publication_id
+        if explicit_source and args.command != 'prepare-handoff' and (not args.publication_id
                 or args.command in {'parameters','profile-maintenance','init','operation','review-reconcile'}):
             raise ReviewError('A source checkout selection applies to an existing exact review publication')
         if explicit_source and {'package_root','run_overrides'} & payload.keys():
@@ -1786,6 +1984,8 @@ def dispatch(args):
         if args.command=='parameters':result=parameters(payload.get('current_branch',ws.git(root,'symbolic-ref','--short','HEAD')),payload)
         elif args.command=='preflight':
             result=existing_source_preflight(root,payload,args.publication_id) if explicit_source else preflight(root,payload)
+        elif args.command=='prepare-handoff':
+            result=prepare_handoff(root,payload,args.publication_id)
         elif args.command=='merge-denial-preview':
             carrier = _review_path(SimpleNamespace(root=ws.canonical(root)),args.publication_id)
             raw = _regular_input(carrier,'Publication receipts',16*1024*1024)
@@ -1821,6 +2021,11 @@ def dispatch(args):
             with ws.publication_lock(root,snapshot.get('remote','origin'),snapshot.get('target_branch',key)):
                 carrier=_review_path(store,key)
                 carrier_hash=hashlib.sha256(carrier.read_bytes()).hexdigest() if carrier.exists() else None
+                if args.command == 'observe' and explicit_source and 'expected_publication_sha256' in payload:
+                    expected = payload['expected_publication_sha256']
+                    if (not isinstance(expected, str) or not re.fullmatch(r'[a-f0-9]{64}', expected)
+                            or expected != carrier_hash):
+                        raise ReviewError('The publication changed after handoff preparation')
                 original=json.loads(carrier.read_text()) if carrier.exists() else None
                 if explicit_source:
                     source_checkout=existing_source_checkout(store,payload['source_checkout'],original,key,snapshot)
@@ -1963,6 +2168,8 @@ def dispatch(args):
             if explicit_source:
                 result['source_checkout']=source_checkout
         print(json.dumps(result,indent=2,ensure_ascii=False));return 0
+    except HandoffHold as exc:
+        print(json.dumps(exc.result,ensure_ascii=False));return 2
     except (ReviewError,ws.RunError,OSError,ValueError,KeyError,subprocess.TimeoutExpired) as exc:
         print(json.dumps({'ok':False,'error':str(exc)},ensure_ascii=False));return 2
 

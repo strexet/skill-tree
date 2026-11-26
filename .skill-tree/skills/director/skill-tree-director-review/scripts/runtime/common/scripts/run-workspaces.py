@@ -866,25 +866,35 @@ def recover_locator(store, payload, *, bootstrap_state_sha256=None):
         atomic(runtime_file(store.root),data)
         return {'recovered': registry['queue_id']}
 
+def change_resource(registry,run,payload,*,wave=None):
+    if not registry or not run:
+        raise RunError('A selected registered run is required')
+    key=payload.get('resource')
+    if not isinstance(key,str) or not re.fullmatch(r'[a-z0-9][a-z0-9:/._-]*',key):
+        raise RunError('Explicit stable resource identity required')
+    previous=registry['resources'].get(key)
+    if payload.get('release'):
+        if (not previous or previous['run_id']!=run['id'] or previous['token']!=payload.get('token')
+                or previous.get('wave')!=wave):
+            raise RunError('Resource release requires the owning run, token and exact wave scope')
+        del registry['resources'][key]
+        return {'released':key}
+    if previous:
+        raise RunError('Resource already claimed; inspect owner and cleanup before explicit release')
+    result={'run_id':run['id'],'token':str(uuid.uuid4()),'pid':os.getpid(),'host':socket.gethostname(),
+            'purpose':payload.get('purpose',key)}
+    if wave is not None:result['wave']=wave
+    registry['resources'][key]=result
+    return result
+
+
 def resource(store, payload):
     with store.lock():
-        text = store.text(); state = store.load(text); run = state['active_run']; registry = state.get('run_registry')
-        if not registry or not run:
-            raise RunError('A selected registered run is required')
-        key = payload.get('resource')
-        if not isinstance(key, str) or not re.fullmatch(r'[a-z0-9][a-z0-9:/._-]*', key):
-            raise RunError('Explicit stable resource identity required')
-        previous = registry['resources'].get(key)
-        if payload.get('release'):
-            if not previous or previous['run_id'] != run['id'] or previous['token'] != payload.get('token'):
-                raise RunError('Resource release requires the owning run and token')
-            del registry['resources'][key]; result = {'released': key}
-        else:
-            if previous:
-                raise RunError('Resource already claimed; inspect owner and cleanup before explicit release')
-            result = {'run_id': run['id'], 'token': str(uuid.uuid4()), 'pid': os.getpid(), 'host': socket.gethostname(), 'purpose': payload.get('purpose', key)}
-            registry['resources'][key] = result
-        store.save(text, state); return result
+        text=store.text()
+        state=store.load(text)
+        result=change_resource(state.get('run_registry'),state['active_run'],payload)
+        store.save(text,state)
+        return result
 
 @contextmanager
 def publication_lock(root, remote, target):
@@ -1068,6 +1078,70 @@ def worker_candidate(root, base, head, allowed, artifacts):
         raise RunError('Worker candidate changed paths outside the assigned scope or has no changes')
     tree = local_git_text(root, 'rev-parse', '--verify', head + '^{tree}')
     return {'head': head, 'tree': tree, 'paths': paths}
+
+
+def wave_blobs(root, head, paths):
+    if not paths:
+        return {}
+    entries={}
+    raw=local_git(root,'ls-tree','-rz',head,'--',*paths).stdout
+    for line in raw.split(b'\0')[:-1]:
+        metadata,path=line.split(b'\t',1)
+        mode,kind,object_id=metadata.decode().split()
+        path=path.decode()
+        if kind!='blob' or mode not in {'100644','100755'} or path not in paths:
+            raise RunError('Wave incorporation supports exact regular files only')
+        entries[path]=(mode,object_id)
+    return entries
+
+
+def wave_worktree_blobs(root, paths):
+    result={}
+    for relative in paths:
+        path=root / relative
+        if path.is_symlink() or any((root / parent).is_symlink() for parent in Path(relative).parents):
+            raise RunError('Wave path cannot use a symlink')
+        if not path.exists():
+            continue
+        if not path.is_file():
+            raise RunError('Wave incorporation requires regular files')
+        mode='100755' if path.stat().st_mode & stat.S_IXUSR else '100644'
+        result[relative]=(mode,local_git_text(root,'hash-object','--no-filters','--',relative))
+    return result
+
+
+def preflight_wave_candidate(root,baseline,base,candidate,*,recover=False):
+    local_git_policy(root,merge=False,signed=True)
+    require_task_checkout(root,baseline)
+    coordinator=baseline['head']
+    paths=worker_paths(candidate['paths'])
+    before=wave_blobs(root,base,paths)
+    after=wave_blobs(root,candidate['head'],paths)
+    if wave_blobs(root,coordinator,paths)!=before:
+        raise RunError('Coordinator changed a worker-owned or overlapping path before incorporation')
+    if local_git_paths(root,'diff','--cached','--name-only','--no-renames','-z',coordinator,'--',*paths):
+        raise RunError('Wave incorporation cannot replace staged edits')
+    current=wave_worktree_blobs(root,paths)
+    if current!=before and not (recover and current==after):
+        raise RunError('Wave incorporation cannot replace unrelated local edits')
+    return paths,before,after,current==after
+
+
+def apply_wave_candidate(root, baseline, base, candidate):
+    paths,before,after,applied=preflight_wave_candidate(root,baseline,base,candidate,recover=True)
+    if applied:
+        return
+    with tempfile.TemporaryDirectory(prefix='skill-tree-wave-') as temporary:
+        patch=Path(temporary)/'worker.patch'
+        patch.write_bytes(local_git(root,'diff','--binary','--no-renames','--no-ext-diff','--no-textconv',base,candidate['head'],'--',*paths).stdout)
+        local_git(root,'apply','--check','--whitespace=nowarn',str(patch))
+        require_task_checkout(root,baseline)
+        if wave_worktree_blobs(root,paths)!=before:
+            raise RunError('Checked wave inputs changed before writing')
+        local_git(root,'apply','--whitespace=nowarn',str(patch))
+    require_task_checkout(root,baseline)
+    if wave_worktree_blobs(root,paths)!=after:
+        raise RunError('Recover the exact wave incorporation before continuing')
 
 
 def checked_out_branch(root):

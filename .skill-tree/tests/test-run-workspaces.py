@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 import importlib.util
 import json
 from datetime import datetime, timedelta
@@ -6,6 +7,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import unittest
 from unittest.mock import patch
 
@@ -25,13 +27,13 @@ class RunWorkspaceTests(unittest.TestCase):
     def call(self,root,*args):
         result=subprocess.run(['git','-C',str(root),*map(str,args)],capture_output=True,text=True,timeout=20)
         self.assertEqual(result.returncode,0,result.stderr);return result.stdout.strip()
-    def task(self,title='Task',deps=(),topic=None,priority=100,touch='source.py'):
+    def task(self,title='Task',deps=(),topic=None,priority=100,touch='source.py',recipe_id='static-inspection'):
         store=wf.Store(self.root,allow_unselected=True)
         payload={'title':title,'description':'Preserve scoped source behavior.','expected_behavior':'Preserve scoped source behavior.','priority':priority}
         if topic is not None:
             payload.update(topic=topic,intake_batch_id=wf.identity('IB'),expected_source_hash=wf.file_hash(store.future))
         p=wf.intake(store,payload)
-        body='Goal:\n- Preserve scoped source behavior.\n\nTouch:\n- '+touch+'\n\nValidation:\n```json\n'+json.dumps({'checks':[{'id':'behavior','recipe_id':'static-inspection','criteria':['Preserve scoped source behavior.'],'sources':[touch],'parameters':{},'assertion':'Preserve scoped source behavior.','timing':'immediate'}]})+'\n```\n\nAcceptance:\n- Preserve scoped source behavior.\n'
+        body='Goal:\n- Preserve scoped source behavior.\n\nTouch:\n- '+touch+'\n\nValidation:\n```json\n'+json.dumps({'checks':[{'id':'behavior','recipe_id':recipe_id,'criteria':['Preserve scoped source behavior.'],'sources':[touch],'parameters':{},'assertion':'Preserve scoped source behavior.','timing':'immediate'}]})+'\n```\n\nAcceptance:\n- Preserve scoped source behavior.\n'
         return wf.process(store,{'selectors':[p['id']],'dispositions':{p['id']:{'status':'promoted','reason':'The fixture establishes the required source boundary.'}},'tasks':[{'title':title,'body':body,'depends_on':list(deps),'parent_pending_ids':[p['id']]}]})['created_ids'][0]
     def start(self,tid,**options):
         return wf.start(wf.Store(self.root,allow_unselected=True),'next',tid,workspace=options)
@@ -359,6 +361,236 @@ class RunWorkspaceTests(unittest.TestCase):
         self.assertEqual(list(ws.runtime(self.root)['worktrees']),[run['id']])
         self.assertEqual(wf.Store(path,run['id']).load()['run_registry']['claims'],{task:run['id']})
         self.assertEqual(self.call(self.root,'symbolic-ref','--short','HEAD'),canonical_branch)
+
+    def test_full_cycle_wave_runs_two_workers_and_recovers_incorporation(self):
+        for name in ('second.py','third.py'):
+            (self.root/name).write_text('value = 1\n')
+        self.call(self.root,'add','second.py','third.py')
+        self.call(self.root,'commit','-m','Create independent fixture sources')
+        self.call(self.root,'push','origin','HEAD:develop')
+        first=self.task('First Full Cycle worker',priority=110)
+        second=self.task('Second Full Cycle worker',priority=109,touch='second.py')
+        conflict=self.task('Overlapping Full Cycle worker',priority=108)
+        dependent=self.task('Dependent Full Cycle worker',priority=107,touch='third.py',deps=[first])
+        options={'snapshot_ids':[first,second,conflict,dependent],
+                 'expected_source_hash':wf.file_hash(self.store.future),
+                 'full_cycle_wave':{'slots':2},
+                 'delivery_authorization':{'pr':True,'merge':False,'target_branch':'develop',
+                                           'owner_instruction':'Fixture Full Cycle selects the exact group.'}}
+        run=wf.start(wf.Store(self.root,neutral=True),'all',workspace=options)
+        coordinator=self.location(run)
+        store=wf.Store(coordinator,run['id'])
+        base=self.call(coordinator,'rev-parse','HEAD')
+        view=wf.worker_handoff(store,{'action':'wave-preview'})
+        self.assertEqual([row['id'] for row in view['selected']],[first,second])
+        holds={row['task_id']:{reason['kind'] for reason in row['reasons']} for row in view['held']}
+        self.assertIn('write-overlap',holds[conflict])
+        self.assertIn('dependency-incomplete',holds[dependent])
+        self.assertEqual(wf.validation_task(store,dependent)['depends_on'],[first])
+        self.assertEqual(wf.validation_task(store,conflict)['depends_on'],[])
+        self.assertEqual(run['delivery']['publication'],'not-requested')
+
+        children=[]
+        begin=threading.Barrier(2,timeout=10)
+
+        def perform(slot):
+            worker, source=slot['checkout_path'],slot['paths'][0]
+            begin.wait()
+            (worker/source).write_text('value = 2\n')
+            self.call(worker,'add',source)
+            self.call(worker,'commit','-m','Scoped wave result')
+            begin.wait()
+            evidence=worker/'evidence.log'
+            evidence.write_text('Observed source behavior on the current worker.\n')
+            return self.call(worker,'rev-parse','HEAD'),wf.file_hash(evidence)
+
+        for candidate in view['selected']:
+            worker=Path(candidate['worktree'])
+            worker.parent.mkdir(parents=True,exist_ok=True)
+            self.call(coordinator,'worktree','add','--detach',worker,base)
+            actor='wave-actor-'+str(candidate['slot'])
+            assigned=wf.worker_handoff(store,{'action':'assign','task_id':candidate['id'],
+                'slot':candidate['slot'],'generation':candidate['generation'],'worker_id':actor,'base':base,
+                'worktree':str(worker),'paths':candidate['paths'],'shared_inputs':candidate['shared_inputs']})
+            self.assertNotIn(str(worker),json.dumps(assigned))
+            children.append({**candidate,'checkout_path':worker,'actor':actor})
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            results=list(pool.map(perform,children))
+        for child,(head,sha) in zip(children,results):
+            request={'action':'record','slot':child['slot'],'generation':child['generation'],'worker_id':child['actor'],
+                     'head':head,'checks':[{'id':'behavior','result':'pass','path':'evidence.log','sha256':sha}]}
+            child['result']=wf.worker_handoff(store,request)
+            self.assertEqual(child['result'],wf.worker_handoff(store,request))
+
+        self.assertEqual(wf.advance(store)['task_id'],first)
+        wf.begin_task(store,{'task_id':first})
+        left=children[0]
+        request={'action':'incorporate','slot':1,'generation':1,'worker_id':left['actor'],'expected_head':base,
+                 'result_sha256':wf.digest(wf.dump(left['result']).encode()),'review_id':wf.identity('DO')}
+        original=ws.apply_wave_candidate
+
+        def drop_after_apply(*args):
+            original(*args)
+            raise OSError('Fixture lost acknowledgement after applying the candidate')
+
+        with patch.object(wf,'verified_implementation_review') as reviewed:
+            coordinator_branch=self.call(coordinator,'symbolic-ref','--short','HEAD')
+            local_git=ws.local_git
+            def swap_branch(root,*args,**kwargs):
+                observed=local_git(root,*args,**kwargs)
+                if args[:2]==('apply','--check'):
+                    self.call(coordinator,'switch','-c','different-branch-same-sha')
+                return observed
+            with patch.object(ws,'local_git',side_effect=swap_branch):
+                with self.assertRaises(ws.RunError):
+                    wf.worker_handoff(store,request)
+            self.assertEqual((coordinator/'source.py').read_text(),'value = 1\n')
+            self.call(coordinator,'switch',coordinator_branch)
+            with patch.object(ws,'apply_wave_candidate',side_effect=drop_after_apply):
+                with self.assertRaisesRegex(OSError,'lost acknowledgement'):
+                    wf.worker_handoff(store,request)
+            self.assertEqual((coordinator/'source.py').read_text(),'value = 2\n')
+            self.assertEqual((coordinator/'second.py').read_text(),'value = 1\n')
+            receipt=wf.worker_handoff(store,request)
+            reviewed.assert_called_with(store,request['review_id'],
+                {'head':left['result']['candidate']['head'],'base_oid':base,
+                 'source_digest':wf.digest((left['result']['candidate']['tree']+'\n'+wf.validation_task(store,first)['body']).encode())},
+                {'kind':'task','task_ids':[first]})
+        self.assertEqual(receipt['incorporation_base'],base)
+        self.assertEqual(receipt['state'],'applied')
+        self.assertEqual(receipt,wf.worker_handoff(store,request))
+        artifact, = receipt['artifacts']
+        self.assertEqual(wf.file_hash(coordinator/artifact),receipt['artifacts'][artifact])
+        self.assertEqual(self.call(coordinator,'rev-parse','HEAD'),base)
+        self.assertEqual(store.load()['active_run']['snapshot'],options['snapshot_ids'])
+        with self.assertRaisesRegex(wf.WorkflowError,'exact wave check evidence'):
+            wf.mark_implemented(store,{'task_id':first,'changed_files':['source.py']})
+        (coordinator/'source.py').write_text('value = 3\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'exact reviewed wave changes'):
+            wf.mark_implemented(store,{'task_id':first,'changed_files':['source.py',artifact]})
+        (coordinator/'source.py').write_text('value = 2\n')
+        wf.mark_implemented(store,{'task_id':first,'changed_files':['source.py',artifact]})
+        attempt=wf.prepare_check(store,{'task_id':first,'check_id':'behavior'})
+        wf.record_check(store,{'task_id':first,'check_id':'behavior','attempt_id':attempt['attempt_id'],
+            'classification':'executed-control','actual_lane':'static','result':'pass',
+            'environment_identity':attempt['environment_identity'],'cleanup':'The disposable worker exited.',
+            'assertions':[{'assertion':'Preserve scoped source behavior.','result':'pass'}],
+            'evidence':[artifact]})
+        with patch.object(wf,'verified_implementation_review',return_value={'orchestration_hash':'fixture-reviewed'}):
+            outcome=wf.complete(store,{'task_id':first,'review_id':wf.identity('DO'),
+                'source_fingerprints':wf.fingerprints(store,['source.py']),'evidence':[artifact],
+                'acceptance':[{'criterion':'Preserve scoped source behavior.','result':'pass','evidence':[artifact]}],
+                'outcome':'The exact reviewed wave change passed the coordinator check.'})
+        self.assertEqual(outcome['wave_incorporation'],receipt)
+        next_view=wf.worker_handoff(store,{'action':'wave-preview'})
+        successor=next(row for row in next_view['selected'] if row['id']==conflict)
+        self.assertEqual((successor['slot'],successor['generation']),(1,2))
+        replacement=Path(successor['worktree'])
+        self.call(coordinator,'worktree','add','--detach',replacement,next_view['head'])
+        later=wf.worker_handoff(store,{'action':'assign','task_id':conflict,
+            'slot':1,'generation':2,'worker_id':'new-left-worker','base':next_view['head'],
+            'worktree':str(replacement),'paths':successor['paths'],'shared_inputs':successor['shared_inputs']})
+        self.assertEqual(later['related_code']['source.py'],wf.file_hash(coordinator/'source.py'))
+        self.assertEqual(wf.worker_handoff(store,request),receipt)
+        with self.assertRaisesRegex(wf.WorkflowError,'current generation'):
+            wf.worker_handoff(store,{**request,'review_id':wf.identity('DO')})
+
+        self.assertEqual(wf.advance(store)['task_id'],second)
+        wf.begin_task(store,{'task_id':second})
+        right=children[1]
+        integrate_right={'action':'incorporate','slot':2,'generation':1,'worker_id':right['actor'],
+            'expected_head':outcome['commits'][0],'result_sha256':wf.digest(wf.dump(right['result']).encode()),
+            'review_id':wf.identity('DO')}
+        with patch.object(wf,'verified_implementation_review'):
+            incorporated=wf.worker_handoff(store,integrate_right)
+        right_artifact,=incorporated['artifacts']
+        wf.mark_implemented(store,{'task_id':second,'changed_files':['second.py',right_artifact]})
+        attempt=wf.prepare_check(store,{'task_id':second,'check_id':'behavior'})
+        wf.record_check(store,{'task_id':second,'check_id':'behavior','attempt_id':attempt['attempt_id'],
+            'classification':'executed-control','actual_lane':'static','result':'pass',
+            'environment_identity':attempt['environment_identity'],'cleanup':'The disposable worker exited.',
+            'assertions':[{'assertion':'Preserve scoped source behavior.','result':'pass'}],
+            'evidence':[right_artifact]})
+        with patch.object(wf,'verified_implementation_review',return_value={'orchestration_hash':'fixture-reviewed'}):
+            successor=wf.complete(store,{'task_id':second,'review_id':wf.identity('DO'),
+                'source_fingerprints':wf.fingerprints(store,['second.py']),'evidence':[right_artifact],
+                'acceptance':[{'criterion':'Preserve scoped source behavior.','result':'pass','evidence':[right_artifact]}],
+                'outcome':'The second worker result passed on the same coordinator branch.'})
+        self.assertEqual(successor['run_id'],outcome['run_id'])
+        self.assertEqual(self.call(coordinator,'rev-parse','HEAD'),successor['commits'][0])
+        self.assertEqual(self.call(coordinator,'rev-parse','HEAD^'),outcome['commits'][0])
+        self.assertEqual(store.load()['active_run']['delivery']['authorization'],options['delivery_authorization'])
+
+    def test_wave_failed_worker_releases_exact_shared_resource_then_retries(self):
+        (self.root/'second.py').write_text('value = 1\n')
+        (self.root/'outside.py').write_text('value = 1\n')
+        (self.root/'.skill-tree/worktree-profile.json').write_text(json.dumps(
+            {'schema':1,'exclusive_resources':['browser:fixture']}))
+        (self.root/'.skill-tree/config/repository.json').write_text(json.dumps({'role':'source','schema':1,
+            'recipes':{'fixture-browser':{'lane':'browser','argv':['fixture-runner'],'input_paths':[]}}}))
+        self.call(self.root,'add','second.py','outside.py','.skill-tree/worktree-profile.json',
+                  '.skill-tree/config/repository.json')
+        self.call(self.root,'commit','-m','Declare controlled fixture resource')
+        self.call(self.root,'push','origin','HEAD:develop')
+        first=self.task('Resource wave worker',priority=110,recipe_id='fixture-browser')
+        second=self.task('Independent wave worker',touch='second.py')
+        outside=self.task('Separate registered run',touch='outside.py')
+        options={'snapshot_ids':[first,second],'expected_source_hash':wf.file_hash(self.store.future),
+                 'full_cycle_wave':{'slots':2},'delivery_authorization':{'pr':True,'merge':False,
+                    'target_branch':'develop','owner_instruction':'Run two isolated fixture tasks.'}}
+        run=wf.start(wf.Store(self.root,neutral=True),'all',workspace=options)
+        self.call(self.root,'switch','develop')
+        other=self.start(outside,branch='codex/separate-resource-check')
+        store=wf.Store(self.location(run),run['id'])
+        other_store=wf.Store(self.location(other),other['id'])
+        view=wf.worker_handoff(store,{'action':'wave-preview'})
+        row=next(c for c in view['selected'] if c['id']==first)
+        worker=Path(row['worktree'])
+        worker.parent.mkdir(parents=True,exist_ok=True)
+        self.call(store.source_root,'worktree','add','--detach',worker,view['head'])
+        actor='resource-worker'
+        assignment=wf.worker_handoff(store,{'action':'assign','task_id':first,'slot':1,'generation':1,
+            'worker_id':actor,'base':view['head'],'worktree':str(worker),'paths':row['paths'],'shared_inputs':row['shared_inputs']})
+        self.assertEqual(set(assignment['resources']),{'browser:fixture'})
+        with self.assertRaisesRegex(ws.RunError,'already claimed'):
+            ws.resource(other_store,{'resource':'browser:fixture'})
+        process=subprocess.Popen([sys.executable,'-c','import sys; sys.stdin.read()'],cwd=worker,
+                                 start_new_session=True,stdin=subprocess.PIPE)
+        def shutdown():
+            if process.poll() is None:
+                process.communicate(timeout=5)
+        self.addCleanup(shutdown)
+        wf.worker_handoff(store,{'action':'bind-worker','slot':1,'generation':1,'worker_id':actor,
+                                  'process_group':process.pid})
+        (worker/'source.py').write_text('value = 2\n')
+        self.call(worker,'add','source.py')
+        self.call(worker,'commit','-m','Retain the failed generation')
+        (worker/'failed.log').write_text('The disposable check failed.\n')
+        failed=wf.worker_handoff(store,{'action':'record','slot':1,'generation':1,'worker_id':actor,
+            'head':self.call(worker,'rev-parse','HEAD'),'checks':[{'id':'behavior','result':'fail',
+                'path':'failed.log','sha256':wf.file_hash(worker/'failed.log')}]})
+        result_sha256=wf.digest(wf.dump(failed).encode())
+        close={'action':'close-worker','slot':1,'generation':1,'worker_id':actor,
+               'result_sha256':result_sha256,'retry':True,
+               'cleanup_evidence':{'kind':'host-worker-terminated','worker_id':actor,'slot':1,'generation':1,
+                   'event':'Fixture host process group '+str(process.pid),
+                   'result_sha256':result_sha256}}
+        with self.assertRaisesRegex(wf.WorkflowError,'exact host termination'):
+            wf.worker_handoff(store,{**close,'cleanup_evidence':{**close['cleanup_evidence'],'worker_id':'different-host'}})
+        with self.assertRaisesRegex(wf.WorkflowError,'group remains live'):
+            wf.worker_handoff(store,close)
+        shutdown()
+        cleanup=wf.worker_handoff(store,close)
+        self.assertEqual(wf.worker_handoff(store,close),cleanup)
+        self.assertEqual(cleanup['released_resources'],['browser:fixture'])
+        lease=ws.resource(other_store,{'resource':'browser:fixture'})
+        occupied=wf.worker_handoff(store,{'action':'wave-preview'})
+        self.assertEqual([row['id'] for row in occupied['selected']],[second])
+        ws.resource(other_store,{'resource':'browser:fixture','release':True,'token':lease['token']})
+        retry=wf.worker_handoff(store,{'action':'wave-preview'})
+        first_again=next(c for c in retry['selected'] if c['id']==first)
+        self.assertEqual((first_again['slot'],first_again['generation']),(1,2))
+        self.assertEqual(wf.worker_handoff(store,{'action':'status'})['slots']['1'][0]['result'],failed)
 
     def test_two_worker_handoffs_preserve_scope_evidence_and_controller_state(self):
         (self.root/'second.py').write_text('value = 1\n')

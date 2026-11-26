@@ -1038,6 +1038,7 @@
       "decision-governance.py": "common/scripts/decision-governance.py",
       "decision-orchestration.py": "common/scripts/decision-orchestration.py",
       "director-dispatch.py": "common/scripts/director-dispatch.py",
+      "parallel-preview.py": "common/scripts/parallel-preview.py",
       "plugin-bindings.js": "lib/plugin-bindings.js",
       "plugin-composition.js": "lib/plugin-composition.js",
       "plugin-hooks.js": "common/scripts/plugin-hooks.js",

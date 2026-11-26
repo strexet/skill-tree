@@ -53,6 +53,16 @@ Review findings, checks and authorization stay in the original publication. The 
 
 For a project source repair in a contributor fork, set `remote` to the base remote (normally `upstream`), `head_remote` to the contributor's configured push remote, and `base_repository` to `strexet/skill-tree` in preflight. Select the project source branch and the intended upstream target. Preflight resolves both remotes, returns the exact repository pair and inspects the merge-base diff. Push the selected branch to the verified head remote under the original publication authorization. Use `GitHub.from_preflight(root, preflight)` for the fallback provider. The provider finds or resumes the selected fork branch against the upstream base, including when a different owner uses the same branch name. Keep the returned repository identities in publication snapshots.
 
+### Prepare the handoff for an existing open PR
+
+Run `scripts/pr-review-state.py prepare-handoff <canonical-root> --publication-id <id> --input <request.json>` after the existing-publication preflight. Pass the exact absolute `source_checkout`, expected `head` and `base_oid` from preflight. Pass `expected_publication_sha256` to reuse a specific inspected receipt. The helper selects the provider PR from the retained publication and uses the verified GitHub hostname and repository.
+
+Pass `provider_policy` from the current inspection of the target repository rules. Supply `host`, `repository`, `target_branch`, a `reference` to the rule inspection, the full `required_check_names` list and the observed Boolean `approvals_required`. Use an empty check list only when the inspected rules establish that there are no required checks. Incomplete repository policy or unavailable provider capabilities hold the handoff.
+
+The response includes `next` with the exact `observe` request and receipt hash. Use the returned snapshot to inspect the complete diff, current discussions and checks. `observe` checks the receipt again under the existing publication lock. Current `inspection`, `review`, `ready` and `merge-gate` continue with the evidence and authority required by each command.
+
+The handoff returns the original key and request digest for an unconfirmed operation. Inspect provider evidence for the actual effect and reconcile through `operation` with the original request. Confirm each push, comment or merge attempt using evidence of that specific effect. After reconciliation, prepare the same publication again. Continue a closed or merged PR through the existing delivery reconciliation.
+
 ## Create, review and fix
 
 Push the exact source branch without force. Create/update the PR with a description of the concrete problem, final behavior, material changes, executed validation and limitations. Refresh the description when scope changes. Draft PRs follow repository policy. Register PR identity immediately and use prepared operation keys before remote writes. A lost response triggers a provider read for the same branch pair/comment marker/commit/head before retry. A prepared record alone never proves success.

@@ -37,6 +37,179 @@ class TaskClarificationTests(unittest.TestCase):
         pending = wf.intake(self.store, {'title': title, 'description': 'Preserve bounded behavior.', 'expected_behavior': 'The selected behavior remains explicit.', 'priority': priority})
         return wf.process(self.store, {'selectors': [pending['id']], 'dispositions': {pending['id']: {'status': 'promoted', 'reason': 'Source research identifies bounded behavior.'}}, 'tasks': [{'title': title, 'body': self.body(), 'parent_pending_ids': [pending['id']]}]})['created_ids'][0]
 
+    def policy_body(self, rule='Only course administrators may remove or restore a membership.'):
+        allowed = 'An administrator can apply the transition.'
+        forbidden = 'A regular member cannot apply the transition.'
+        mapped = {
+            'allowed': {'check_id': 'behavior', 'criterion': allowed},
+            'forbidden': {'check_id': 'behavior', 'criterion': forbidden},
+        }
+        check = {
+            'id': 'behavior', 'recipe_id': 'static-inspection', 'criteria': [allowed, forbidden],
+            'sources': ['source.py'], 'parameters': {}, 'assertion': 'Verify both sides of the rule.',
+            'timing': 'immediate',
+        }
+        policy = {
+            'id': 'membership-control', 'rule': rule,
+            'transitions': {'remove': mapped, 'restore': mapped},
+            'evidence': {'kind': 'source', 'path': 'policy.md',
+                         'sha256': wf.file_hash(self.root / 'policy.md')},
+        }
+        body = self.body().split('Validation:', 1)[0]
+        plan = {'checks': [check], 'policy_invariants': [policy]}
+        return body + 'Validation:\n```json\n' + json.dumps(plan) + '\n```\n\nAcceptance:\n' + ''.join(
+            '- ' + criterion + '\n' for criterion in check['criteria'])
+
+    def policy_pending(self, name='Membership policy'):
+        return wf.intake(self.store, {'title': name, 'description': 'Audit the related transitions.',
+                                      'expected_behavior': 'Each transition follows one rule.'})['id']
+
+    def policy_process(self, pending, *, body=None, disposition='promoted', **spec):
+        task = {'title': 'Correct membership transitions', 'body': body,
+                'parent_pending_ids': [pending], **spec}
+        return wf.process(self.store, {'selectors': [pending],
+            'dispositions': {pending: {'status': disposition, 'reason': 'Determine the exact policy.',
+                                       'required_policy_invariants': ['membership-control']}},
+            'tasks': [task] if disposition == 'promoted' else []})
+
+    def test_explicit_policy_requirement_survives_unresolved_processing_and_reuse(self):
+        pending = self.policy_pending()
+        self.policy_process(pending, disposition='retained')
+        retained = wf.resolve(wf.parse(self.store.text()), [pending])[0]
+        self.assertEqual(retained['required_policy_invariants'], ['membership-control'])
+        self.assertIn('Processing blocker:', retained['body'])
+        before = self.snapshot()
+        with self.assertRaisesRegex(wf.WorkflowError, 'Keep Pending'):
+            self.policy_process(pending, reuse_id=self.a)
+        with self.assertRaisesRegex(wf.WorkflowError, 'must be retained'):
+            self.policy_process(pending, disposition='resolved')
+        self.assertEqual(self.snapshot(), before)
+        (self.root / 'policy.md').write_text('Only course administrators can change the membership.\n')
+        tid = self.policy_process(pending, body=self.policy_body())['created_ids'][0]
+        task = wf.validation_task(self.store, tid)
+        self.assertEqual(wf.policy_invariants(task)[0]['id'], 'membership-control')
+        self.assertFalse(wf.policy_invariants(wf.validation_task(self.store, self.a)))
+
+    def test_policy_rule_changes_check_keys_and_preserves_completed_contract(self):
+        source = self.root / 'policy.md'
+        source.write_text('Only course administrators can change the membership.\n')
+        tid = self.policy_process(self.policy_pending(), body=self.policy_body())['created_ids'][0]
+        task = wf.validation_task(self.store, tid)
+        check, = wf.check_specs(task)
+        state = self.store.load()
+        before = wf.check_snapshot(self.store, task, check, state)
+        baseline = task['body']
+        changed = {**task, 'body': baseline.replace('Only course administrators', 'Only course staff')}
+        self.assertNotEqual(before['definition'], wf.task_signature(changed))
+        self.assertNotEqual(before['key'], wf.check_snapshot(self.store, changed, check, state)['key'])
+        with self.assertRaisesRegex(wf.WorkflowError, 'revised invariant'):
+            wf.guard_policy_revision(task, changed)
+        with self.assertRaisesRegex(wf.WorkflowError, 'preserve required'):
+            wf.guard_policy_revision(task, {**task,'body':self.body()})
+        equivalent = {**task,'body':baseline.replace('Only course administrators', 'Only  course administrators')}
+        wf.guard_policy_revision(task, equivalent, editorial=True)
+        self.assertEqual(before['definition'], wf.task_signature(equivalent))
+        self.assertEqual(wf.begin_task(self.store, {'task_id': tid})['policy_invariants'], wf.policy_invariants(task))
+        attempt = wf.prepare_check(self.store, {'task_id': tid, 'check_id': check['id']})
+        (self.root / 'observed.txt').write_text('The allowed case passed and the forbidden case was refused.\n')
+        wf.record_check(self.store, {'task_id': tid, 'check_id': check['id'], 'attempt_id': attempt['attempt_id'],
+            'result': 'pass', 'classification': 'executed-control', 'actual_lane': 'static',
+            'environment_identity': attempt['environment_identity'],
+            'assertions': [{'assertion': check['assertion'], 'result': 'pass'}],
+            'cleanup': 'No runtime process remains.', 'evidence': ['observed.txt']})
+        wf.mark_implemented(self.store, {'task_id': tid})
+        outcome = wf.complete(self.store, {'task_id': tid, 'outcome': 'Both membership transitions follow the shared rule.',
+            'acceptance': [{'criterion': criterion, 'result': 'pass', 'evidence': ['observed.txt']}
+                           for criterion in check['criteria']],
+            'source_fingerprints': before['sources']})
+        self.assertIn('policy.md', before['sources'])
+        self.assertEqual(outcome['policy_invariants'], wf.policy_invariants(wf.validation_task(self.store, tid)))
+        tampered = {**outcome, 'policy_invariants': []}
+        self.assertNotEqual(wf.completed_contract_sha256(tampered), wf.completed_contract_sha256(outcome))
+        source.write_text('The old source rule was replaced.\n')
+        with self.assertRaisesRegex(wf.WorkflowError, 'source evidence is missing or changed'):
+            wf.check_snapshot(self.store, task, check, state)
+
+    def test_policy_rejects_a_case_outside_its_check(self):
+        (self.root / 'policy.md').write_text('Membership transitions share the same access rule.\n')
+        pending = self.policy_pending()
+        before = self.snapshot()
+        body = self.policy_body().replace('"check_id": "behavior"', '"check_id": "unrelated-check"', 1)
+        with self.assertRaisesRegex(wf.WorkflowError, 'exact criterion'):
+            self.policy_process(pending, body=body)
+        self.assertEqual(before, self.snapshot())
+
+    def test_owner_policy_evidence_covers_only_current_approved_pending(self):
+        first = self.policy_pending()
+        second = self.policy_pending('Another membership request')
+        for pending in (first, second):
+            self.policy_process(pending, disposition='retained')
+        current, = wf.pending_task_view(self.store, [first])
+        rule = 'Only course administrators may remove or restore a membership.'
+        (self.root / 'policy.md').write_text(rule)
+        actor = {'id': 'fixture-owner', 'context_id': 'fixture-owner-context'}
+        fingerprint = current['policy_semantic_fingerprint']
+        context = {
+            'id': 'pending-policy-fixture', 'kind': 'pending', 'pending_ids': [first],
+            'purpose': 'policy-invariant', 'policy_invariant_id': 'membership-control',
+            'semantic_fingerprint': fingerprint, 'content_fingerprint': wf.digest(current['body'].encode()),
+            'pending_policy_contexts': {first: fingerprint},
+        }
+        request = {
+            'request_id': 'fixture-policy-request', 'context': context, 'mode': 'manual',
+            'executor': {'id': 'fixture-executor', 'context_id': 'fixture-executor-context'},
+            'authority': {'id': 'fixture-grant', 'revision': 1, 'context_id': context['id'],
+                          'allowed_kinds': ['product'], 'constraints': ['The fixture policy only.'],
+                          'evidence': {'kind': 'submitted-answer', 'reference': 'Fixture authority.'}},
+            'question': {'id': 'policy-rule', 'text': 'Which fixture policy applies?', 'kind': 'product',
+                         'options': [{'id': 'restricted', 'text': rule}], 'recommendation': 'restricted'},
+            'expected_source_hash': self.source_hash(),
+        }
+        with self.assertRaisesRegex(wf.WorkflowError, 'current exact Pending policy scope'):
+            wf.decision_action(self.store, 'decision-start', {**request, 'context': {
+                **context, 'pending_policy_contexts': {first: 'a'*64}}})
+        record = wf.decision_action(self.store, 'decision-start', request)
+
+        def mutate(record, command, **payload):
+            return wf.decision_action(self.store, 'decision-'+command, {
+                'decision_id': record['id'], 'expected_decision_hash': record['decision_hash'],
+                'expected_decision_revision': record['revision'], 'expected_mode_epoch': record['mode_epoch'],
+                'expected_context_fingerprint': record['context']['content_fingerprint'],
+                'expected_source_hash': self.source_hash(), **payload})
+
+        record = mutate(record, 'prepare', role='owner', actor=actor)
+        record = mutate(record, 'record', attempt_id=record['prepared_attempt_id'],
+                        result={'status': 'answered', 'answer': 'restricted', 'rationale': 'Fixture selection.'},
+                        evidence={'kind': 'submitted-answer', 'reference': 'Fixture owner selected the rule.'})
+        record = mutate(record, 'accept')
+        fallback = {'kind': 'source', 'path': 'policy.md', 'sha256': wf.file_hash(self.root / 'policy.md')}
+        reference = {'kind': 'owner-decision', 'decision_id': record['id'],
+                     'acceptance_digest': record['acceptance']['digest']}
+        body = self.policy_body().replace(json.dumps(fallback), json.dumps(reference))
+        with self.assertRaisesRegex(wf.WorkflowError, 'Keep Pending'):
+            wf.process(self.store, {'selectors': [first, second],
+                'dispositions': {tid: {'status': 'promoted', 'reason': 'Determine both rules.'}
+                                 for tid in (first, second)},
+                'tasks': [{'title': 'Two affected transitions', 'body': body,
+                           'parent_pending_ids': [first, second]}]})
+        before = self.store.future.read_text()
+        for original, changed in (
+            ('Audit the related transitions.', 'Change the requested operation.'),
+            ('### Membership policy', '### Organization deletion policy'),
+        ):
+            with self.subTest(original=original):
+                updated = current['body'].replace(original, changed)
+                self.store.future.write_text(before.replace(current['body'], updated, 1))
+                try:
+                    with self.assertRaisesRegex(wf.WorkflowError, 'no longer matches Pending semantics'):
+                        self.policy_process(first, body=body)
+                finally:
+                    self.store.future.write_text(before)
+        tid = self.policy_process(first, body=body)['created_ids'][0]
+        self.assertEqual(wf.begin_task(self.store, {'task_id': tid})['policy_invariants'][0]['evidence'], reference)
+        with self.assertRaisesRegex(wf.WorkflowError, 'Keep Pending'):
+            self.policy_process(second, reuse_id=tid)
+
     def call(self, command, payload=None, ok=True):
         request = self.root / 'request.json'
         request.write_text(json.dumps(payload or {}))

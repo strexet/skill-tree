@@ -16,6 +16,14 @@ For an explicit topic or intake batch group, preview the Pending queue with `gro
 
 Verify scope, duplicates, existing behavior, dependencies, observable outcomes, failure paths and validation availability. Split excessive tasks into independently executable units; retain every originating Pending ID. Merge only compatible intent and relationship context. Clarify product choices with contextual options and recommendations. Missing mandatory context remains Pending with an explicit blocker. Promote researched work after essential intake intent is resolved. Record created, reused, retained and resolved identities. An enabled matching after-Processing obligation creates a visible blocked task through the shared clarification session. No implementation is implied.
 
+### Shared policy invariants
+
+When source research identifies a rule shared by several permission, removal or lifecycle transitions, declare the exact invariant names in `required_policy_invariants` on the Pending item or in the Process disposition. A retained disposition records the unresolved rule or decision as a blocker and preserves the declared invariant names. Ask the owner for an explicit product decision when the source leaves the rule unresolved. Processing verifies that promoted or explicitly reused contracts cover each required invariant for the original Pending ID.
+
+Add optional `policy_invariants` to the task Validation JSON. Each invariant has an `id`, a plain `rule`, `evidence` and `transitions`. Key each transition by a stable name. Each transition maps `allowed` and `forbidden` to distinct Acceptance criteria through objects with `check_id` and `criterion`. Several cases can use the same check when the mapped criteria cover both outcomes.
+
+Source evidence uses `kind: source`, a canonical repository-relative `path` and the file `sha256`. An unresolved owner rule uses a manual product decision with Pending context, purpose `policy-invariant`, an exact `policy_invariant_id`, and the rule as the accepted option text. Populate `pending_policy_contexts` with the selected Pending IDs and current `policy_semantic_fingerprint` values from the Pending read. Bind the accepted decision as `kind: owner-decision` using `decision_id` and `acceptance_digest`.
+
 ## Processing Result and Next Action
 
 After researched dispositions, read the refreshed index and report created/reused/retained/resolved IDs. Print the current Prioritized Next Changes in descending integer priority, preserving document order for ties. Each row includes ID, title, priority, a brief intended result and Ready/Blocked state; identify unmet dependencies and material decisions. Retained Pending blockers remain a separate concise summary. Empty or unchanged queues require explicit reporting, not invented implementation work.
