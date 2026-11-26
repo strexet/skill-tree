@@ -663,6 +663,170 @@ class LocalTargetSyncTests(unittest.TestCase):
         self.final_command('review', review=self.final_inspection())
         self.final_attempt('prepare', 'changed-suite', error='original publication declaration')
 
+    def test_prepare_handoff_reads_exact_existing_pr_and_keeps_operation_guards(self):
+        url = 'https://github.example/org/product.git'
+        self.git(self.root, 'remote', 'set-url', 'origin', url)
+        snapshot = {**self.snapshot, 'state': 'OPEN', 'merge_commit': None,
+                    'remote_id': hashlib.sha256(url.encode()).hexdigest(),
+                    'changed_files': ['product.py'],
+                    'pr': {'id': 'PR_fixture', 'number': 21, 'url': 'https://github.example/org/product/pull/21'}}
+        publication = self.invoke('init', **snapshot)
+        pid = publication['publication_id']
+        carrier = self.root/'.skill-tree/history/publications'/f'pub-{pid}.json'
+        self.git(self.root, 'switch', '-c', 'release/main', self.old)
+        checkout = (self.root.parent/'handoff-source').resolve()
+        self.git(self.root, 'worktree', 'add', str(checkout), 'feature/fix')
+        request = {'source_checkout': str(checkout), 'head': snapshot['head'], 'base_oid': snapshot['base_oid'],
+                   'provider_policy': {'host': 'github.example', 'repository': 'org/product',
+                                       'target_branch': 'release/main', 'required_check_names': ['tests'],
+                                       'approvals_required': True, 'reference': 'Inspected fixture target rules.'}}
+        calls_path = self.root.parent/'provider-calls'
+        fixture_path = self.root.parent/'provider-fixture.json'
+        binary = self.root.parent/'fixture-bin'
+        binary.mkdir()
+        gh = binary/'gh'
+        gh.write_text("""#!/usr/bin/env python3
+import json
+import os
+import sys
+from pathlib import Path
+
+args = sys.argv[1:]
+fixture = json.loads(Path(os.environ['HANDOFF_FIXTURE']).read_text())
+calls = Path(os.environ['HANDOFF_CALLS'])
+previous = [json.loads(line) for line in calls.read_text().splitlines()] if calls.exists() else []
+with calls.open('a') as stream:
+    stream.write(json.dumps(args) + chr(10))
+if args[:2] == ['pr', 'view']:
+    assert args[2:5] == ['21', '--repo', 'github.example/org/product']
+    index = sum(call[:2] == ['pr', 'view'] for call in previous)
+    raw = fixture['raw']
+    if index and fixture.get('carrier_race'):
+        carrier = Path(fixture['carrier_race'])
+        carrier.write_bytes(carrier.read_bytes() + bytes([10]))
+    print(json.dumps({**raw, **fixture.get('second_view', {})} if index else raw))
+elif args[:4] == ['api', '--method', 'GET', 'repos/org/product/pulls/21/files']:
+    print(json.dumps([[{'filename': 'product.py'}]]))
+elif args[:3] == ['api', '--method', 'GET']:
+    assert args[3] in {'repos/org/product/pulls/21/reviews', 'repos/org/product/issues/21/comments',
+                       'repos/org/product/pulls/21/comments'}
+    assert '--paginate' in args and '--slurp' in args
+    print(json.dumps([[{'id': args[3] + '/a'}], [{'id': args[3] + '/b'}]]))
+elif args[:2] == ['api', 'graphql']:
+    assert 'number=21' in args and 'name=product' in args and 'owner=org' in args
+    assert any('query=query(' in arg and 'id reviewThreads' in arg for arg in args)
+    next_page = 'cursor=next' not in args
+    page = {'nodes': [{'id': 'thread-a' if next_page else 'thread-b', 'path': 'product.py',
+                       'line': 1, 'isResolved': True, 'isOutdated': False}],
+            'pageInfo': {'hasNextPage': next_page, 'endCursor': 'next' if next_page else None}}
+    print(json.dumps({'data': {'repository': {'pullRequest': {
+        'id': fixture.get('thread_pr', 'PR_fixture'), 'reviewThreads': page}}}}))
+else:
+    raise AssertionError(args)
+if args[0] == 'api':
+    assert args[args.index('--hostname') + 1] == 'github.example'
+""")
+        gh.chmod(0o755)
+        raw = {**snapshot['pr'], 'state': 'OPEN', 'headRefOid': snapshot['head'],
+               'baseRefOid': snapshot['base_oid'], 'headRefName': 'feature/fix', 'baseRefName': 'release/main',
+               'mergeable': 'MERGEABLE', 'reviewDecision': 'REVIEW_REQUIRED', 'mergeCommit': None,
+               'statusCheckRollup': [{'name': 'tests', 'conclusion': 'SUCCESS'}], 'changedFiles': 1,
+               'isCrossRepository': False, 'headRepositoryOwner': {'login': 'org'},
+               'headRepository': {'name': 'product'}}
+        env = {**os.environ, 'PATH': str(binary)+os.pathsep+os.environ['PATH'],
+               'HANDOFF_FIXTURE': str(fixture_path), 'HANDOFF_CALLS': str(calls_path), 'GH_HOST': 'wrong.example'}
+
+        def run(command, body, code=0, publication_id=pid, **fixture):
+            calls_path.unlink(missing_ok=True)
+            fixture_path.write_text(json.dumps({'raw': raw, **fixture}))
+            self.request.write_text(json.dumps(body))
+            observed = subprocess.run(['python3', '-B', str(CORE/'common/scripts/pr-review-state.py'),
+                command, str(self.root), '--input', str(self.request), '--publication-id', publication_id],
+                env=env, capture_output=True, text=True, timeout=18)
+            self.assertEqual(observed.returncode, code, observed.stdout+observed.stderr)
+            return json.loads(observed.stdout)
+
+        before = carrier.read_bytes()
+        refs = self.git(self.root, 'show-ref')
+        original = run('prepare-handoff', request)
+        self.assertEqual(original, run('prepare-handoff', request))
+        self.assertEqual(original['pr'], snapshot['pr'])
+        self.assertEqual(original['publication_sha256'], hashlib.sha256(before).hexdigest())
+        self.assertEqual(original['next']['input']['expected_publication_sha256'], original['publication_sha256'])
+        observed = original['next']['input']['snapshot']
+        self.assertEqual(pr.identity(observed), publication['identity'])
+        self.assertEqual(len(observed['reviews']), 2)
+        self.assertEqual(len(observed['comments']), 4)
+        self.assertEqual([row['id'] for row in observed['threads']], ['thread-a', 'thread-b'])
+        self.assertTrue(observed['checks'][0]['required'])
+        self.assertFalse(observed['approved'])
+        self.assertEqual(carrier.read_bytes(), before)
+        self.assertEqual(self.git(self.root, 'show-ref'), refs)
+        self.assertNotIn('inspection', original['next']['input'])
+        for mutation in ({'id': 'PR_other'}, {'number': 22}, {'url': raw['url']+'-other'},
+                         {'headRefOid': '1'*40}, {'baseRefOid': '2'*40}, {'state': 'CLOSED'},
+                         {'isCrossRepository': True}):
+            with self.subTest(mutated_provider=mutation):
+                hold = run('prepare-handoff', request, 2, raw={**raw, **mutation})
+                self.assertEqual(hold['reason'], 'provider-pr-changed')
+                self.assertEqual(len(calls_path.read_text().splitlines()), 1)
+        for mutation in ({'headRefOid': '3'*40}, {'baseRefOid': '4'*40}):
+            held = run('prepare-handoff', request, 2, second_view=mutation)
+            self.assertEqual(held['reason'], 'provider-pr-changed')
+        self.assertEqual(run('prepare-handoff', request, 2, thread_pr='PR_other')['reason'], 'provider-pr-changed')
+        self.assertEqual(run('prepare-handoff', request, 2,
+                             second_view={'statusCheckRollup': None})['reason'], 'provider-inspection-unavailable')
+        self.assertEqual(run('prepare-handoff', request, 2, raw=None)['reason'], 'provider-inspection-unavailable')
+        self.assertEqual(run('prepare-handoff', request, 2, carrier_race=str(carrier))['reason'],
+                         'publication-changed')
+        self.assertEqual(carrier.read_bytes(), before + bytes([10]))
+        carrier.write_bytes(before)
+        for changes, reason in (
+            ({'provider_policy': None}, 'provider-policy-unavailable'),
+            ({'head': '5'*40}, 'publication-changed'),
+            ({'base_oid': '6'*40}, 'publication-changed'),
+            ({'source_checkout': str(self.root)}, 'publication-or-checkout-unavailable'),
+        ):
+            with self.subTest(changes=changes):
+                self.assertEqual(run('prepare-handoff', {**request, **changes}, 2)['reason'], reason)
+                self.assertFalse(calls_path.exists())
+        self.assertEqual(run('prepare-handoff', request, 2, publication_id='0'*32)['reason'],
+                         'publication-or-checkout-unavailable')
+        self.assertFalse(calls_path.exists())
+        carrier.write_text('[]')
+        self.assertEqual(run('prepare-handoff', request, 2)['reason'], 'publication-or-checkout-unavailable')
+        self.assertFalse(calls_path.exists())
+        carrier.write_bytes(before)
+
+        operation_request = {'action': 'push', 'expected_head': snapshot['head']}
+        operation_key = 'original-push'
+        operation = {'snapshot': snapshot, 'key': operation_key, 'request': operation_request}
+        run('operation', operation)
+        prepared = carrier.read_bytes()
+        held = run('prepare-handoff', request, 2)
+        self.assertEqual(held['reason'], 'operation-reconciliation-required')
+        self.assertEqual(held['operations'], [{'key': operation_key, 'request_digest': pr.digest(operation_request)}])
+        self.assertEqual(held['recovery'], {'command': 'operation', 'publication_id': pid})
+        self.assertFalse(calls_path.exists())
+        self.assertEqual(carrier.read_bytes(), prepared)
+        stale = run('observe', original['next']['input'], 2)
+        self.assertIn('publication changed after handoff preparation', stale['error'])
+        self.assertEqual(carrier.read_bytes(), prepared)
+        run('operation', {**operation, 'result': {'head': snapshot['head']}})
+        recovered = run('prepare-handoff', request)
+        self.assertEqual(recovered['pr'], original['pr'])
+        self.assertEqual(recovered['head'], original['head'])
+        self.assertEqual(recovered['base_oid'], original['base_oid'])
+        self.assertNotEqual(recovered['publication_sha256'], original['publication_sha256'])
+        seen = run('observe', recovered['next']['input'])
+        self.assertEqual(seen['pr'], snapshot['pr'])
+        self.assertEqual(seen['authorization'], publication['authorization'])
+        self.assertIn(operation_key, seen['operations'])
+        with self.assertRaisesRegex(pr.ReviewError, 'current target'):
+            ready = {'review': {'key': pr.review_key(observed)}}
+            pr.merge_gate({**seen, **ready}, observed)
+        self.assertEqual(self.git(self.root, 'show-ref'), refs)
+
     def test_existing_publication_resumes_from_exact_isolated_checkout(self):
         snapshot = {**self.snapshot,'state':'OPEN','merge_commit':None,'changed_files':['product.py'],
                     'pr':{**self.snapshot['pr'],'url':'https://example.invalid/fixture/repo/pull/21'},
