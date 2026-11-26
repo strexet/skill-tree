@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "29904031659513dec7de91790f94be78e834deb4fa7fb58af4345ed6a05eed9e",
+  "identity": "1300b45483bcbcc3e9d9bbfe0ad8f415af22f71821e769b1e19936db8c14a955",
   "operation": "skill-tree-repo-documentation",
   "operations": {
     "skill-tree-3d": {
@@ -3295,7 +3295,7 @@
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/documentation-output-contract.md": "2aca95b856ba3813171cc64c80f9f1d88cbfa9788703df7cd4497032adbfbfab",
     "references/history-retention.md": "ff3fa8602fa29085b59f0aa5ae9f9da698bd5b5d5672235fe809018b18b4b801",
-    "references/installation-profile.md": "50d7e922447a95e5ff9d5354c9e6fb0aa8f2a59b7e26d2a553da50ad4744e56b",
+    "references/installation-profile.md": "f256a1a05df9541680bea05170f517d24e8d50fb41dd4ce63be5cb24a665c85e",
     "references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
     "references/pending-task-intake.md": "c23e7fc58a44b58ab8e0b09ee0b15bd56fbdfd4fc275833c26fd4c8c2d0e4619",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
@@ -3323,7 +3323,7 @@
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     "scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
     "scripts/validate-repository-documentation.py": "99a7cf90c80f2e6fa5c2b2641e63de281076ec952b74b20807ade38576f10fb4",
-    "scripts/workflow-state.py": "247f5a8176727576650542e10e0dfac300f327e6fb5faae31c21b50ebc3d482b"
+    "scripts/workflow-state.py": "7e5cd927d1fb81b83c863f614530e86117fec6816ea46f4a339dc8d8049650a9"
   },
   "packages": {},
   "parameter_defaults": {},

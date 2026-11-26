@@ -202,10 +202,95 @@ function readResource(source,input,destination) {
  }
  return content;
 }
-function compose(source,profile,selected=null) {
+function sharedWorkflowEntrypoint(source,providerDigest) {
+ const markers=['TASK_GROUPING_COMPATIBILITY = 1','SHARED_WORKSPACE_ROUTING = 2']
+  .filter(marker=>String(source).split(/\r?\n/).includes(marker)).join('\n');
+ return `#!/usr/bin/env python3
+"""Execute the workflow implementation verified by this project's installation."""
+${markers}
+OWNED_WORKFLOW_SOURCE_SHA256 = '${hash(source)}'
+
+
+def _owned_workflow_source():
+    import hashlib
+    import json
+    import os
+    from pathlib import Path, PurePosixPath
+    import stat
+
+    entry = Path(__file__).absolute()
+    if any(part.is_symlink() for part in (entry, *entry.parents)):
+        raise RuntimeError('Owned workflow paths require ordinary files without symlinks')
+    package = entry.parent.parent
+    body_relative = '.skill-tree/installation/source/common/scripts/workflow-state.py'
+    providers_relative = '.skill-tree/installation/source/config/providers.json'
+    providers_digest = '${providerDigest}'
+
+    def read(root, relative):
+        file = root
+        for part in Path(relative).parts:
+            file = file / part
+            if file.is_symlink():
+                raise RuntimeError('Owned workflow paths require ordinary files without symlinks')
+        flags = os.O_RDONLY | getattr(os, 'O_NOFOLLOW', 0) | getattr(os, 'O_NONBLOCK', 0)
+        with os.fdopen(os.open(file, flags), 'rb') as stream:
+            limit = 16 * 1024 * 1024
+            if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+                raise RuntimeError('Owned workflow paths require ordinary files')
+            data = stream.read(limit + 1)
+            if len(data) > limit:
+                raise RuntimeError('Owned workflow file exceeds the verification limit')
+            return data
+
+    for root in package.parents:
+        try:
+            profile = json.loads(read(root, '.skill-tree/installation/profile.json'))
+        except FileNotFoundError:
+            continue
+        relative = package.relative_to(root).as_posix()
+        destination = profile.get('destinations', {}).get(relative)
+        if not destination:
+            continue
+        entry_hash = hashlib.sha256(read(root, entry.relative_to(root).as_posix())).hexdigest()
+        digest = OWNED_WORKFLOW_SOURCE_SHA256
+        if (profile.get('format') != 'skill-tree-profile' or profile.get('schema') != 1
+                or profile.get('project_root') != str(root) or profile.get('workflow_runtime') != 'owned-v1'
+                or profile.get('bundle_digests', {}).get(body_relative) != digest
+                or profile.get('source_digests', {}).get('common/scripts/workflow-state.py') != digest
+                or destination.get('files', {}).get('scripts/workflow-state.py') != entry_hash):
+            raise RuntimeError('The workflow entrypoint differs from its owned installation')
+        providers = read(root, providers_relative)
+        if hashlib.sha256(providers).hexdigest() != providers_digest:
+            raise RuntimeError('The workflow provider inventory differs from its verified generation')
+        paths = {item['id']: '' if item['id'] == 'generic' else item['projectPath']
+                 for item in json.loads(providers)['providers']}
+        owners = destination.get('providers', [destination.get('provider')])
+        if (destination.get('name') != package.name or not isinstance(owners, list)
+                or destination.get('provider') not in owners
+                or any(not isinstance(owner, str) or owner not in paths
+                       or PurePosixPath(paths[owner], package.name).as_posix() != relative for owner in owners)):
+            raise RuntimeError('The workflow entrypoint has a different provider owner')
+        try:
+            body = read(root, body_relative)
+        except FileNotFoundError:
+            break
+        if hashlib.sha256(body).hexdigest() == digest:
+            return body, root / body_relative
+        break
+    raise RuntimeError('The verified shared workflow implementation is unavailable or changed')
+
+
+_workflow_source, OWNED_WORKFLOW_SOURCE_PATH = _owned_workflow_source()
+exec(compile(_workflow_source, __file__, 'exec'))
+`;
+}
+function compose(source,profile,selected=null,{ownedWorkflow=false}={}) {
  const registry=requiredJson(source,'config/flavors.json'),recipe=registry.flavors[profile.flavor];if(!recipe)throw Error('Unknown flavor');
  const operations=requiredJson(source,'templates/operations.json'),mapping=requiredJson(source,'config/resource-map.json'),mandatory=requiredJson(source,'templates/invariants.json'),domain=requiredJson(source,recipe.sections),packages={};
  const available=operationNames(source,profile.flavor),names=selected||available;
+ const workflowBody=ownedWorkflow?read(source,'common/scripts/workflow-state.py'):null;
+ const workflowEntrypoint=workflowBody===null?null:
+  sharedWorkflowEntrypoint(workflowBody,hash(readResource(source,'config/providers.json','config/providers.json')));
  for(const name of names){const op=operations[name];if(!available.includes(name))throw Error('Operation unavailable for flavor '+profile.flavor+': '+name);
   let sections=mergeSections(mergeSections(mandatory,op.sections),domain,recipe.replaceable_slots||[]);
   const active=(recipe.conditional_resources||[]).filter(item=>matches(profile,item.when));
@@ -218,6 +303,8 @@ function compose(source,profile,selected=null) {
   const policyInstructions=development.instructions(profile,name);
   files['SKILL.md']='---\nname: '+name+'\ndescription: '+JSON.stringify('['+profile.flavor+'] '+op.description)+'\nlicense: MIT\n---\n\n# '+op.title+'\n\nFlavor: '+profile.flavor+'. Read the [concrete project profile](references/project-profile.md).\n\n'+sections.map(s=>s.text).join('\n\n')+'\n'+(policyInstructions?'\n'+policyInstructions:'');
   files['agents/openai.yaml']='interface:\n  display_name: '+JSON.stringify(op.title+' ('+profile.flavor+')')+'\n  short_description: '+JSON.stringify(profile.flavor+' Skill Tree workflow')+'\n';
+  if(workflowEntrypoint&&files['scripts/workflow-state.py']===workflowBody)
+   files['scripts/workflow-state.py']=workflowEntrypoint;
   if(profile.plugins){const contribution=plugins.composeOperation(source,profile,name,files);files=mergeResources(files,contribution.files);}
   for(const [rel,content] of Object.entries(files)){if(typeof content!=='string'&&!Buffer.isBuffer(content))throw Error('Missing composition resource: '+rel);safe(source,rel);}
   for(const [rel,content] of Object.entries(files).filter(([rel])=>rel.endsWith('.md')&&!rel.startsWith('plugins/'))){
@@ -233,4 +320,4 @@ function compose(source,profile,selected=null) {
  for(const [name,files] of Object.entries(packages))output_digests[name]=Object.fromEntries(Object.entries(files).map(([rel,content])=>[rel,hash(content)]));
  return {packages,source_digests,output_digests,identity:hash(json({flavor:profile.flavor,environment_id:profile.environment_id,source_digests,output_digests}))};
 }
-module.exports={hash,json,safe,read,readJson,inventory,resolveProfile,mergeSections,mergeResources,sourceInputs,matches,compose,flavorNames,operationNames};
+module.exports={hash,json,safe,read,readJson,inventory,resolveProfile,mergeSections,mergeResources,sourceInputs,matches,compose,flavorNames,operationNames,sharedWorkflowEntrypoint};

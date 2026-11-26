@@ -71,13 +71,15 @@ def _selected(store, context):
 
 def _verify_worktree_core(store):
     root = store.source_root
-    current = wf.file_hash(Path(wf.__file__))
+    entrypoint = Path(wf.__file__).absolute()
+    current = wf.file_hash(entrypoint)
+    current_body = getattr(wf, 'OWNED_WORKFLOW_SOURCE_SHA256', current)
     profile_path = wf.binding_path(root, PROFILE)
     error = 'Original child worktree requires the exact current Core workflow helper in every installed package'
 
-    def matches(relative):
+    def matches(relative, expected):
         path = wf.binding_path(root, relative)
-        return path.is_file() and wf.file_hash(path) == current
+        return path.is_file() and wf.file_hash(path) == expected
 
     discovered = set()
     for package in wf.installed_catalog(root):
@@ -86,19 +88,30 @@ def _verify_worktree_core(store):
             discovered.add(relative)
     if not profile_path.is_file():
         source = '.skill-tree/' + CORE_SOURCE
-        require(matches(source) and not discovered, error)
+        require(sha(current_body) and matches(source, current_body) and not discovered, error)
         wf.workspaces.local_git_text(root, 'ls-files', '--error-unmatch', '--', source)
         return
 
     profile = json.loads(profile_path.read_text())
-    require(profile.get('project_root') == str(root)
-            and profile.get('source_digests', {}).get(CORE_SOURCE) == current
-            and profile.get('bundle_digests', {}).get(CORE_BUNDLE) == current
-            and matches(CORE_BUNDLE), error)
+    layout = profile.get('workflow_runtime')
+    require(layout in (None, 'owned-v1') and sha(current_body) and profile.get('project_root') == str(root)
+            and profile.get('source_digests', {}).get(CORE_SOURCE) == current_body
+            and profile.get('bundle_digests', {}).get(CORE_BUNDLE) == current_body
+            and matches(CORE_BUNDLE, current_body), error)
     helpers = {destination + '/' + CORE_PACKAGE: record['files'][CORE_PACKAGE]
                for destination, record in profile.get('destinations', {}).items() if CORE_PACKAGE in record.get('files', {})}
-    require(helpers and discovered <= helpers.keys()
-            and all(expected == current and matches(relative) for relative, expected in helpers.items()), error)
+    require(helpers and discovered <= helpers.keys(), error)
+    if layout == 'owned-v1':
+        proof = profile.get('task_grouping', {})
+        require(proof.get('source_helper_sha256') == current_body and proof.get('package_helpers') == helpers
+                and all(sha(expected) and matches(relative, expected) for relative, expected in helpers.items()),
+                error)
+        if current != current_body:
+            require(entrypoint.is_relative_to(root) and helpers.get(entrypoint.relative_to(root).as_posix()) == current,
+                    error)
+    else:
+        require(all(expected == current_body and matches(relative, expected)
+                    for relative, expected in helpers.items()), error)
 
 
 def _basis(store, text, state, run, task_id):

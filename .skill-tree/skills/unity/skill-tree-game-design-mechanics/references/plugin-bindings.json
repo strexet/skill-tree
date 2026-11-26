@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "f3157d148d38b387f0c83a325a1f8375db5505cdbfd9fd91631354dd07d39a7a",
+  "identity": "2c21a3055814b24dc2ef5effe70f91f2152c5cee6f7a4f3187d86d087998870a",
   "operation": "skill-tree-game-design-mechanics",
   "operations": {
     "skill-tree-3d": {
@@ -3298,7 +3298,7 @@
     "references/game-design-mechanics.md": "d9657c2ae70ad41ea2c8125da44494672f4a0be7c7dfd0cd2711c8774bc18ed6",
     "references/game-design-patterns.md": "fc79285537c68a2d5e3bd1d31f548069010d49f01fca1f1133d12b9596bb4668",
     "references/game-design-records.md": "ee0c46efe3f88d4e4d68859c0e5e94dc26a453f36575dcfc5830f96f863990c3",
-    "references/installation-profile.md": "50d7e922447a95e5ff9d5354c9e6fb0aa8f2a59b7e26d2a553da50ad4744e56b",
+    "references/installation-profile.md": "f256a1a05df9541680bea05170f517d24e8d50fb41dd4ce63be5cb24a665c85e",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/project-profile.md": "af84614ccf2aea888e0f3a0fa09264eb282e05c934c79a431d53407e61290fd6",
     "references/ugui-testing.md": "873c236f793ff3c9ece8f0d0346c5c48513e8220406fce216751571c58b79073",
@@ -3322,7 +3322,7 @@
     "scripts/run-workspaces.py": "a706fedaca99a6231d753201cff28f5d5601292b048ceb0929dc8ae469eb302b",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "247f5a8176727576650542e10e0dfac300f327e6fb5faae31c21b50ebc3d482b"
+    "scripts/workflow-state.py": "7e5cd927d1fb81b83c863f614530e86117fec6816ea46f4a339dc8d8049650a9"
   },
   "packages": {},
   "parameter_defaults": {},

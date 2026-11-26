@@ -3,6 +3,122 @@ const cli=path.resolve(__dirname,'../bin/install.js');
 function setup(t){const root=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-owned-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));return root;}
 function run(root,extra=[],entry=cli){return spawnSync(process.execPath,[entry,'--target',root,'--only','codex','--flavor','general',...extra],{encoding:'utf8',timeout:15000});}
 
+test('opt-in workflow runtime measures both owned layouts and preserves standalone, verification and rollback', t => {
+ const root=fs.realpathSync(setup(t));
+ const portable=fs.realpathSync(setup(t));
+ const source=path.resolve(__dirname,'..');
+ const manager=require('../lib/installation.js');
+ const composer=require('../lib/composer.js');
+ const providers=composer.readJson(source,'config/providers.json').providers
+  .filter(provider=>['codex','claude-code'].includes(provider.id));
+ const skills=composer.operationNames(source,'general');
+ const selections=providers.flatMap(provider=>skills.map(name=>({
+  name,provider:provider.id,rel:provider.projectPath+'/'+name,
+ })));
+ const relative='.agents/skills/skill-tree-work-through-next';
+ const helper='scripts/workflow-state.py';
+ const canonical='../common/scripts/workflow-state.py';
+ const sourceBody=fs.readFileSync(path.join(__dirname,canonical));
+ const entry=path.join(root,relative,helper);
+ const execute=(args)=>spawnSync('python3',['-B',...args],{encoding:'utf8',timeout:30000});
+ const help=(file)=>execute([file,'--help']);
+ const proof=(profile)=>({
+  skills:Object.keys(profile.destinations).length,
+  package_files:Object.values(profile.destinations).reduce((count,row)=>count+Object.keys(row.files).length,0),
+  package_bytes:Object.entries(profile.destinations).reduce((bytes,[folder,row])=>bytes+
+   Object.keys(row.files).reduce((sum,file)=>sum+fs.statSync(path.join(root,folder,file)).size,0),0),
+  workflow_files:Object.values(profile.destinations).filter(row=>Object.hasOwn(row.files,helper)).length,
+  workflow_bytes:Object.entries(profile.destinations).filter(([,row])=>Object.hasOwn(row.files,helper))
+   .reduce((bytes,[folder])=>bytes+fs.statSync(path.join(root,folder,helper)).size,0),
+  bundle_bytes:Object.keys(profile.bundle_digests).reduce((bytes,file)=>bytes+fs.statSync(path.join(root,file)).size,0),
+  receipt_bytes:fs.statSync(path.join(root,manager.PROFILE)).size,
+ });
+ const installation=manager.install(root,source,'general',selections),baseline=installation.profile;
+ const full=proof(baseline);
+ assert.equal(baseline.workflow_runtime,undefined);
+ assert.deepEqual(fs.readFileSync(entry),sourceBody);
+ fs.cpSync(path.join(root,relative),path.join(portable,'skill-tree-work-through-next'),{recursive:true});
+ assert.equal(help(path.join(portable,'skill-tree-work-through-next',helper)).status,0);
+ assert.throws(()=>manager.install(root,source,'general',selections,
+  {sharedRuntime:true,operationId:installation.operation_id}),/different request/);
+ assert.deepEqual(fs.readFileSync(entry),sourceBody);
+ const setupId=()=> 'OP-'+require('node:crypto').randomUUID();
+ const sameLayout=setupId(), earlier=setupId();
+ for(const id of [sameLayout,earlier]){
+  assert.throws(()=>manager.install(root,source,'general',selections,{operationId:id,guardPlan(){
+   throw Error('fixture stopped before workflow activation');
+  }}),/fixture stopped before workflow activation/);
+ }
+ assert.equal(manager.install(root,source,'general',selections,{operationId:sameLayout}).operation_id,sameLayout);
+ const activated=spawnSync(process.execPath,[cli,'--target',root,'--project','--flavor','general','--only','codex',
+  '--skills','skill-tree-work-through-next','--shared-runtime'],{encoding:'utf8',timeout:120000});
+ assert.equal(activated.status,0,activated.stdout+activated.stderr);
+ assert.match(activated.stdout,/"workflow_runtime": "owned-v1"/);
+ const installed=manager.verify(root,source);
+ assert.equal(installed.workflow_runtime,'owned-v1');
+ assert.throws(()=>manager.install(root,source,'general',selections,{operationId:earlier}),/different workflow runtime layout/);
+ const shared=proof(installed);
+ assert.equal(shared.package_files,full.package_files);
+ assert.equal(shared.workflow_files,full.workflow_files);
+ assert.equal(shared.bundle_bytes,full.bundle_bytes);
+ assert.ok(shared.package_bytes<full.package_bytes);
+ assert.ok(shared.workflow_bytes<full.workflow_bytes/10);
+ console.log(JSON.stringify({flavor:'general',providers:providers.map(item=>item.id),standalone:full,owned:shared}));
+ for(const provider of providers){
+  const executable=path.join(root,provider.projectPath,'skill-tree-work-through-next',helper);
+  const subprocess=help(executable);
+  assert.equal(subprocess.status,0,subprocess.stdout+subprocess.stderr);
+ }
+ assert.equal(resolvedInspection(root).recipe.lane,'static');
+ const grouping=manager.verifyTaskGroupingProfile(root);
+ assert.equal(grouping.source_helper_sha256,composer.hash(sourceBody));
+ assert.equal(grouping.package_helpers[relative+'/'+helper],composer.hash(fs.readFileSync(entry)));
+ assert.notEqual(grouping.source_helper_sha256,grouping.package_helpers[relative+'/'+helper]);
+ assert.match(fs.readFileSync(entry,'utf8'),/^SHARED_WORKSPACE_ROUTING = 2$/m);
+ const body=path.join(root,'.skill-tree/installation/source/common/scripts/workflow-state.py');
+ const snapshot=(entrypoint)=>{
+  const command='import json,runpy,sys; w=runpy.run_path(sys.argv[1]); print(json.dumps(w["orchestration_execution_snapshot"](w["Store"](sys.argv[2]))))';
+  const result=execute(['-c',command,entrypoint,root]);
+  assert.equal(result.status,0,result.stdout+result.stderr);
+  return JSON.parse(result.stdout);
+ };
+ assert.deepEqual(snapshot(entry),snapshot(body));
+ const carrier=path.join(root,manager.PROFILE);
+ const originalProfile=fs.readFileSync(carrier),changed=JSON.parse(originalProfile);
+ changed.destinations[relative].provider='claude-code';
+ changed.destinations[relative].providers=['claude-code'];
+ fs.writeFileSync(carrier,JSON.stringify(changed));
+ let rejected=help(entry);
+ assert.notEqual(rejected.status,0);
+ assert.match(rejected.stderr,/different provider owner/);
+ fs.writeFileSync(carrier,originalProfile);
+ fs.writeFileSync(body,sourceBody.toString()+'\nraise RuntimeError("fixture executed edited implementation")\n');
+ rejected=help(entry);
+ assert.notEqual(rejected.status,0);
+ assert.match(rejected.stderr,/verified shared workflow implementation is unavailable or changed/);
+ fs.writeFileSync(body,sourceBody);
+ if(process.platform!=='win32'){
+  const alias=path.join(root,'workflow-alias.py');
+  fs.symlinkSync(entry,alias);
+  rejected=help(alias);
+  assert.notEqual(rejected.status,0);
+  assert.match(rejected.stderr,/without symlinks/);
+  fs.rmSync(alias);
+  fs.renameSync(body,body+'.saved');
+  fs.symlinkSync(body+'.saved',body);
+  rejected=help(entry);
+  assert.notEqual(rejected.status,0);
+  assert.match(rejected.stderr,/without symlinks/);
+  fs.unlinkSync(body);
+  fs.renameSync(body+'.saved',body);
+ }
+ assert.equal(manager.refresh(root,path.join(root,'.skill-tree/installation/source'),true).profile.workflow_runtime,'owned-v1');
+ manager.rollback(root);
+ assert.equal(manager.verify(root,source).workflow_runtime,undefined);
+ assert.deepEqual(fs.readFileSync(entry),sourceBody);
+ assert.equal(help(entry).status,0);
+});
+
 const inspectionOperation = 'skill-tree-work-through-next';
 const inspectionSelection = ['--skills', inspectionOperation];
 const inspectionPackage = path.join('.agents/skills', inspectionOperation);

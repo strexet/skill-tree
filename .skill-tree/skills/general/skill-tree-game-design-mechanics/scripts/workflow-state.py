@@ -6590,8 +6590,14 @@ def orchestration_execution_snapshot(store):
     paths={'common/scripts/'+name:scripts/name for name in ['workflow-state.py','decision-governance.py','decision-orchestration.py','run-workspaces.py','validate-document-rules.py']}
     paths.update({'common/references/'+name:references/name for name in ['decision-governance.md','validation-policy.md']})
     paths['owned-profile']=store.source_root/'.skill-tree/installation/profile.json'
+    body = globals().get('OWNED_WORKFLOW_SOURCE_PATH')
+    if body is not None:
+        paths['common/scripts/workflow-state.py'] = body
     if any(path.is_symlink() for path in paths.values()):raise WorkflowError('Execution snapshot cannot adopt symlinked core inputs')
-    return {key:file_hash(path) for key,path in paths.items()}
+    current = {key:file_hash(path) for key,path in paths.items()}
+    if body is not None and current['common/scripts/workflow-state.py'] != OWNED_WORKFLOW_SOURCE_SHA256:
+        raise WorkflowError('The verified shared workflow implementation changed during execution')
+    return current
 
 def orchestration_action(store,command,payload):
     helper=owned_module('skill_tree_decision_orchestration',Path(__file__).with_name('decision-orchestration.py'))

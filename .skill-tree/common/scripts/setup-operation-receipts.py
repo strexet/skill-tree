@@ -67,7 +67,7 @@ def receipt(D, root, operation_id, *, required=True):
     except (UnicodeError, ValueError) as error:
         raise D.DirectorError('The selected setup operation receipt is malformed') from error
     invalid = 'The selected setup operation receipt is malformed'
-    D._require(isinstance(data, dict) and FIELDS <= set(data) <= FIELDS | {'activation_journal_sha256'}
+    D._require(isinstance(data, dict) and FIELDS <= set(data) <= FIELDS | {'activation_journal_sha256','workflow_layout'}
                and type(data['schema']) is int
                and data['schema'] == 1 and data['operation_id'] == operation_id
                and data['kind'] in ('install', 'recover', 'director-init', 'director-setup')
@@ -80,6 +80,9 @@ def receipt(D, root, operation_id, *, required=True):
         activation = data['activation_journal_sha256']
         D._require(data['kind'] in ('install', 'recover') and (activation is None or
                    data['kind'] == 'install' and _hash(activation)), invalid)
+    if 'workflow_layout' in data:
+        D._require(data['kind'] == 'install'
+                   and (data['workflow_layout'] is None or type(data['workflow_layout']) is bool), invalid)
     expected = INSTALL_PROOF if data['kind'] in ('install', 'recover') else DIRECTOR_PROOF
     for key in ('before', 'observed'):
         proof = data[key]

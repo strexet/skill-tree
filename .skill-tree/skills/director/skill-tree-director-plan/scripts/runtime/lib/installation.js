@@ -112,14 +112,21 @@ function groupedTaskHeaders(root){
  }
  return false;
 }
+function usesSharedWorkflow(profile){
+ const layout=profile?.workflow_runtime;
+ if(layout!==undefined&&layout!=='owned-v1')throw Error('Unknown owned workflow runtime layout');
+ return layout==='owned-v1';
+}
 function taskGroupingProof(profile,readSource){
  const source=readSource();
  if(source===null||!taskGroupingMarker.test(String(source)))return undefined;
  const digest=c.hash(source);
  if(profile.source_digests[TASK_GROUPING_SOURCE]!==digest||profile.bundle_digests[TASK_GROUPING_BUNDLE]!==digest)return undefined;
+ const providers=profile.bundle_digests[INSTALL+'/source/config/providers.json'];
+ const helperDigest=usesSharedWorkflow(profile)?c.hash(c.sharedWorkflowEntrypoint(source,providers)):digest;
  const helpers=Object.entries(profile.destinations).filter(([,record])=>Object.hasOwn(record.files,TASK_GROUPING_HELPER));
- if(!helpers.length||helpers.some(([,record])=>record.files[TASK_GROUPING_HELPER]!==digest))return undefined;
- return {schema:1,source_helper_sha256:digest,package_helpers:Object.fromEntries(helpers.map(([rel])=>[rel+'/'+TASK_GROUPING_HELPER,digest]))};
+ if(!helpers.length||helpers.some(([,record])=>record.files[TASK_GROUPING_HELPER]!==helperDigest))return undefined;
+ return {schema:1,source_helper_sha256:digest,package_helpers:Object.fromEntries(helpers.map(([rel])=>[rel+'/'+TASK_GROUPING_HELPER,helperDigest]))};
 }
 function verifyTaskGroupingProof(profile,readFile){
  if(!profile||!Object.hasOwn(profile,'task_grouping'))return undefined;
@@ -390,21 +397,29 @@ function beginSetupOperation(root,setup){
  const id=setup.id??'OP-'+randomUUID();
  if(!setupOperationId.test(id))throw Error('Select an exact setup operation ID');
  const relative=SETUP_OPERATIONS+'/'+id+'.json';
- const request=c.hash(c.json({kind:setup.kind,scope:setup.scope()}));
+ const scope={kind:setup.kind,scope:setup.scope()};
+ const requestFor=layout=>c.hash(c.json(setup.kind==='install'?{...scope,workflow_layout:layout}:scope));
  const current=setupObservation(root);
  const retained=setupProofBytes(root,relative,4096);
  if(retained==='unavailable')throw Error('The selected setup operation receipt cannot be read');
  const previous=retained===null?null:JSON.parse(retained);
+ let layout=setup.sharedWorkflow??previous?.workflow_layout??null;
+ if(setup.kind==='install'&&setup.sharedWorkflow===undefined&&current.core_journal_sha256===null){
+  try{layout=usesSharedWorkflow(receipt(root));}catch{layout=null;}
+ }
  if(previous){
-  if(previous.schema!==1||previous.operation_id!==id||previous.kind!==setup.kind||previous.request_sha256!==request||
+  if(previous.schema!==1||previous.operation_id!==id||previous.kind!==setup.kind||
+     previous.request_sha256!==requestFor(previous.workflow_layout??null)||
      !['pending','failed','completed'].includes(previous.status)||
      !Number.isSafeInteger(previous.attempts)||previous.attempts<1)
    throw Error('Setup operation ID belongs to a different request');
+  if(setup.kind==='install'&&previous.workflow_layout!=null&&layout!==null&&previous.workflow_layout!==layout)
+   throw Error('Setup operation ID belongs to a different workflow runtime layout');
   if(previous.status==='completed'){
    if(Object.values(current).includes('unavailable')||c.json(current)!==c.json(previous.observed)||
       current.core_journal_sha256!==null||current.plugins_journal_sha256!==null)
     throw Error('The completed setup operation no longer covers the observed journal or profile');
-   return {id,replayed:true};
+   return {id,replayed:true,layout};
   }
   for(const channel of ['core','plugins']){
    const journal=channel+'_journal_sha256',last=channel+'_last_sha256';
@@ -419,12 +434,26 @@ function beginSetupOperation(root,setup){
   }
  }
  const timestamp=new Date().toISOString();
- const record={schema:1,operation_id:id,kind:setup.kind,request_sha256:request,
+ layout=previous?.workflow_layout??layout;
+ const record={schema:1,operation_id:id,kind:setup.kind,request_sha256:requestFor(layout),
   status:'pending',stage:'recover',started_at:previous?.started_at??timestamp,observed_at:timestamp,
   attempts:(previous?.attempts??0)+1,before:previous?.before??current,observed:current,
   activation_journal_sha256:previous?.activation_journal_sha256??null};
+ if(setup.kind==='install')record.workflow_layout=layout;
  writeSetupReceipt(root,relative,record,!previous);
- return {id,record,relative,frontier:current};
+ return {id,record,relative,frontier:current,requestFor};
+}
+function freezeSetupWorkflow(root,session,requested){
+ const layout=requested??usesSharedWorkflow(receipt(root));
+ if(!session)return layout;
+ if(session.record.workflow_layout===null){
+  session.record={...session.record,workflow_layout:layout,request_sha256:session.requestFor(layout),
+   stage:'install',observed_at:new Date().toISOString(),observed:setupObservation(root)};
+  writeSetupReceipt(root,session.relative,session.record,false);
+ }else if(session.record.workflow_layout!==layout){
+  throw Error('Setup operation ID belongs to a different workflow runtime layout');
+ }
+ return layout;
 }
 function sealSetupActivation(root,session,journalBytes){
  if(Buffer.byteLength(journalBytes)>16*1024*1024)throw Error('The installation activation journal exceeds the proof limit');
@@ -444,7 +473,7 @@ function locked(root,action,{recoverPending=true,recoverPluginPending=true,onPen
  try{fd=fs.openSync(lock,'wx',0o600);}catch{if(barrier){fs.closeSync(barrierFd);fs.unlinkSync(barrier);}throw Error('Installation lock exists; inspect PID/host before explicit removal');}
  try{fs.writeFileSync(fd,c.json({pid:process.pid,host:require('node:os').hostname()}));if(fs.existsSync(c.safe(owner,'.skill-tree/.writer-lock')))throw Error('Workflow writer lock exists; reach a cleanup/handoff boundary before installation');
   const session=setup?beginSetupOperation(root,setup):null;
-  if(session?.replayed)return {...setup.replay(),operation_id:session.id,replayed:true};
+  if(session?.replayed)return {...setup.replay(session.layout),operation_id:session.id,replayed:true};
   let stage='recover',value;
   try{
    if(session&&['core','plugins'].some(channel=>session.frontier[channel+'_journal_sha256']==='unavailable'))
@@ -504,7 +533,11 @@ function plan(root,source,flavor,selections,options={}){
  if(old)for(const [rel,record] of Object.entries(old.destinations))requested.push({rel,provider:record.provider,providers:owners(record),name:record.name});
  const merged={};for(const item of requested){if(!merged[item.rel])merged[item.rel]={...item,providers:[]};merged[item.rel].providers=[...new Set([...merged[item.rel].providers,...(item.providers||[item.provider])])].sort();}
  const unique=Object.values(merged),names=[...new Set(unique.map(s=>s.name))];
- const profile=c.resolveProfile(source,root,flavor,options),built=c.compose(source,profile,names),changes={},destinations={...(old?.destinations||{})};
+ const previousLayout=usesSharedWorkflow(old);
+ const ownedWorkflow=options.sharedRuntime??previousLayout;
+ if(typeof ownedWorkflow!=='boolean')throw Error('Select an explicit supported workflow runtime layout');
+ const profile=c.resolveProfile(source,root,flavor,options);
+ const built=c.compose(source,profile,names,{ownedWorkflow}),changes={},destinations={...(old?.destinations||{})};
  const policyBefore=treeHash(root,development.CONFIG);
  if(Object.hasOwn(options,'developmentPolicy'))changes[development.CONFIG]=options.developmentPolicy;
  for(const item of unique){
@@ -552,6 +585,7 @@ function plan(root,source,flavor,selections,options={}){
   source_digests=old.source_digests;
  }
  const next={...profile,source_digests,destinations,bridges,bundle_digests};
+ if(ownedWorkflow)next.workflow_runtime='owned-v1';
  const grouping=taskGroupingProof(next,()=>maintenance['source/'+TASK_GROUPING_SOURCE]??null);
  if(grouping)next.task_grouping=grouping;
  next.identity=compositionIdentity(next);
@@ -583,7 +617,8 @@ function verify(root,source,allowForeign=false,operation){
   throw Object.assign(Error('Profile refresh-required or resolved profile mismatch: node .skill-tree/installation/manager.js --refresh-profile'),{code:'ST_PROFILE_REFRESH_REQUIRED'});
  }
  if(p.identity!==compositionIdentity(p))throw Error('Composition receipt identity mismatch');
- const generated=c.compose(bundleSource,now,[...new Set(Object.values(p.destinations).map(record=>record.name))]);
+ const generated=c.compose(bundleSource,now,[...new Set(Object.values(p.destinations).map(record=>record.name))],
+  {ownedWorkflow:usesSharedWorkflow(p)});
  const providers=c.readJson(bundleSource,'config/providers.json').providers;
  for(const [rel,record] of Object.entries(p.destinations)){
   if(record.flavor!==p.flavor||record.identity!==c.hash(c.json(record.files))||c.json(generated.output_digests[record.name])!==c.json(record.files))throw Error('Package identity/flavor does not match deterministic composition: '+rel);
@@ -643,19 +678,22 @@ function regenerateAgents(root,source,dryRun=false){
 function install(root,source,flavor,selections,options={}){
  if(options.dryRun){const result=plan(root,source,flavor,selections,options);return {profile:result.profile,delta:result.delta,action:'dry-run'};}
  const setup={
-  kind:'install',id:options.operationId,
+  kind:'install',id:options.operationId,sharedWorkflow:options.sharedRuntime,
   scope:()=>({source:c.sourceInputs(source),flavor,selections,bridges:options.bridges??[],
+   shared_workflow:options.sharedRuntime??'preserve-installed-layout',
    development_policy:options.developmentPolicy??null,recover_pending:options.recoverPending!==false,
    recover_plugins:options.recoverPluginPending!==false}),
-  replay:()=>{
+  replay:sharedRuntime=>{
    if(options.guardPlan||options.updateDevelopmentPolicy)throw Error('Guarded installation replay requires a fresh operation');
-   const candidate=plan(root,source,flavor,selections,options);
+   const candidate=plan(root,source,flavor,selections,{...options,sharedRuntime});
    if(candidate.delta.length)throw Error('The previously verified setup generation changed');
    return {profile:verify(root,source),delta:[],action:'verified no-op current'};
   }
  };
  return locked(root,(session)=>{
-  const planned=options.updateDevelopmentPolicy?{...options,developmentPolicy:options.updateDevelopmentPolicy()}:options;
+  const sharedRuntime=freezeSetupWorkflow(root,session,options.sharedRuntime);
+  const planned={...options,sharedRuntime};
+  if(options.updateDevelopmentPolicy)planned.developmentPolicy=options.updateDevelopmentPolicy();
   const result=plan(root,source,flavor,selections,planned);
   options.guardPlan?.(result);
   transaction(root,result.changes,result.expected,()=>{
@@ -784,7 +822,8 @@ function initialWorktreeProfile(root, request, mode) {
  const expected = scope(original);
  const validate = candidate => {
   if (candidate.flavor !== original.flavor || !same(candidate.bundle_digests,original.bundle_digests) ||
-      !same(scope(candidate),expected)) throw Error('Worktree profile requires the original owned flavor, source generation and provider destinations');
+      !same(scope(candidate),expected) || usesSharedWorkflow(candidate)!==usesSharedWorkflow(original))
+   throw Error('Worktree profile requires the original owned flavor, source generation, runtime layout and provider destinations');
   if (!same(candidate.plugins,original.plugins)) {
    throw Error('Restore the original configured plugin generation in the exact worktree through the owned plugin setup path');
   }
@@ -792,7 +831,8 @@ function initialWorktreeProfile(root, request, mode) {
  if (mode === 'install' && c.read(target,PROFILE) === null) {
   const selections = Object.entries(expected).flatMap(([rel,row])=>row.providers.map(provider=>({rel,provider,name:row.name})));
   const isolated = isolatedDestination();
-  install(target,source,original.flavor,selections,{[INITIAL_WORKTREE_PROFILE]:isolated,recoverPending:false,recoverPluginPending:false,
+  install(target,source,original.flavor,selections,{[INITIAL_WORKTREE_PROFILE]:isolated,recoverPending:false,
+   recoverPluginPending:false,sharedRuntime:usesSharedWorkflow(original),
    guardPlan(planned){
     verifyReservation();
     if (isolated && !isolatedDestination()) throw Error('The reserved profile destination now overlaps another checkout');
