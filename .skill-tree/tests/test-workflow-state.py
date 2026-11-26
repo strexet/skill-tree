@@ -57,6 +57,69 @@ class WorkflowStateTests(unittest.TestCase):
         self.assertEqual(wf.complete(self.store, payload)['id'], result['id'])
         self.assertEqual(git('rev-list', '--count', before+'..HEAD'), '1')
 
+    def test_completion_prose_preview_precedes_one_external_scoped_commit(self):
+        task=self.main('Record external fixture completion')
+        def git(*arguments):
+            return subprocess.check_output(['git','-C',str(self.root),*arguments],text=True).strip()
+        git('init','-q','-b','develop')
+        git('config','user.name','Fixture editor')
+        git('config','user.email','fixture@example.invalid')
+        git('config','commit.gpgSign','false')
+        git('add','source.cs')
+        git('commit','-qm','Record external fixture baseline')
+        baseline=git('rev-parse','HEAD')
+        wf.begin_task(self.store,{'task_id':task['id']})
+        (self.root/'source.cs').write_text('Accepted external source.\n')
+        paths=[self.store.future,self.store.state,self.store.owned(wf.OUTCOME_LEDGER)]
+
+        def snapshot():
+            return tuple(path.read_bytes() if path.exists() else None for path in paths)
+
+        with tempfile.TemporaryDirectory() as scratch:
+            draft=Path(scratch)/'draft.json'
+            def preview(value):
+                draft.write_text(json.dumps(value))
+                result=subprocess.run([sys.executable,'-B',str(ROOT/'common/scripts/workflow-state.py'),
+                    'completion-prose-preview',str(self.root),'--input',str(draft)],
+                    capture_output=True,text=True,check=True)
+                return json.loads(result.stdout)
+            before=snapshot()
+            invalid={'outcome':'It preserves state.','limitations':['Local fixture coverage.','Это проверено.']}
+            rejected=preview(invalid)
+            self.assertFalse(rejected['valid'])
+            self.assertEqual([(row['field'],row.get('index'),row['rule']) for row in rejected['diagnostics']],
+                             [('outcome',None,'explicit-entity'),('limitations',1,'english-prose'),
+                              ('limitations',1,'english-prose')])
+            good={'outcome':'The external source preserves isolated state.','limitations':['Local fixture coverage.']}
+            self.assertEqual(preview(good),{'valid':True,'diagnostics':[]})
+            self.assertEqual(snapshot(),before)
+            self.assertEqual(git('rev-parse','HEAD'),baseline)
+            self.assertEqual(git('diff','--cached','--name-only'),'')
+        git('add','--','source.cs')
+        git('commit','-qm','Implement only the fixture source')
+        accepted_commit=git('rev-parse','HEAD')
+        attempt=wf.prepare_check(self.store,{'task_id':task['id'],'check_id':'behavior'})
+        wf.record_check(self.store,{'task_id':task['id'],'check_id':'behavior','attempt_id':attempt['attempt_id'],
+            'result':'pass','classification':'executed-control','actual_lane':'static',
+            'environment_identity':attempt['environment_identity'],
+            'assertions':[{'assertion':'Preserve isolated state.','result':'pass'}],
+            'cleanup':'The disposable fixture source was read.','evidence':['test-report.json']})
+        wf.mark_implemented(self.store,{'task_id':task['id']})
+        payload={**good,'task_id':task['id'],'commits':[accepted_commit],
+            'source_fingerprints':wf.fingerprints(self.store,['source.cs']),
+            'acceptance':[{'criterion':'Preserve isolated state.','result':'pass','evidence':['test-report.json']}]}
+        with self.assertRaisesRegex(wf.WorkflowError,'violates document rules'):
+            wf.complete(self.store,{**payload,**invalid})
+        with self.assertRaisesRegex(wf.WorkflowError,'source fingerprints do not match'):
+            wf.complete(self.store,{**payload,'source_fingerprints':{'source.cs':'0'*64}})
+        accepted=wf.complete(self.store,payload)
+        self.assertEqual(accepted['commits'],[accepted_commit])
+        with self.assertRaisesRegex(wf.WorkflowError,'Absent or ambiguous task selection'):
+            wf.complete(self.store,payload)
+        self.assertEqual(git('rev-parse','HEAD'),accepted_commit)
+        self.assertEqual(git('rev-list','--count',baseline+'..HEAD'),'1')
+        self.assertEqual([row['id'] for row in self.store.outcomes()],[accepted['id']])
+
     def test_permuted_completion_stores_specification_order_and_preserves_scoped_replay(self):
         git, task = self.git_task_fixture(body=self.multi_criterion_body())
         payload = self.checked_git_completion(task, real_review=True)

@@ -103,12 +103,42 @@ def file_hash(path):
 def dump(value):
     return json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True)+'\n'
 
-def assert_prose(text):
+def prose_diagnostics(text):
     path=Path(__file__).with_name('validate-document-rules.py')
     rules=owned_module('skill_tree_document_rules',path)
+    return rules.diagnostics(text)
+
+
+def assert_prose(text):
     if not isinstance(text,str):raise WorkflowError('Generated prose requires a string')
-    errors=rules.check_text(text)
+    errors=[item['message'] for item in prose_diagnostics(text) if item['severity']=='error']
     if errors:raise WorkflowError('Generated prose violates document rules: '+', '.join(errors))
+
+
+def completion_prose_preview(payload):
+    if not isinstance(payload,dict) or set(payload)-{'outcome','limitations'}:
+        raise WorkflowError('Completion prose preview accepts only outcome and limitations')
+    diagnostics=[]
+
+    def inspect(field,value,index=None):
+        location={'field':field,**({'index':index} if index is not None else {})}
+        if field=='outcome' and not value:
+            return [{**location,'rule':'required-outcome','severity':'error',
+                     'message':'Terminal outcome requires delivered behavior or reason'}]
+        if not isinstance(value,str):
+            return [{**location,'rule':'prose-type','severity':'error',
+                     'message':'Generated prose requires a string'}]
+        return [{**location,**item} for item in prose_diagnostics(value)]
+
+    diagnostics.extend(inspect('outcome',payload.get('outcome')))
+    limitations=payload.get('limitations',[])
+    if not isinstance(limitations,list):
+        diagnostics.append({'field':'limitations','rule':'limitations-type','severity':'error',
+                            'message':'Completion limitations require an ordered list'})
+    else:
+        for index,limitation in enumerate(limitations):
+            diagnostics.extend(inspect('limitations',limitation,index))
+    return {'valid':not any(item['severity']=='error' for item in diagnostics),'diagnostics':diagnostics}
 
 def grouping_fields(task):
     return {key:deepcopy(task[key]) for key in GROUPING_FIELDS if key in task}
@@ -7672,7 +7702,7 @@ def record_worker(store, state, payload, assignment, request):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|CURRENT_TARGET_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'partial-delivery-preview','partial-delivery','partial-delivery-checks','partial-finish-preview','partial-finish','refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','prepare-worktree-profile','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','worker-handoff','environment','validation-impact','validation-preflight','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|CURRENT_TARGET_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'partial-delivery-preview','partial-delivery','partial-delivery-checks','partial-finish-preview','partial-finish','refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','completion-prose-preview','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','prepare-worktree-profile','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','worker-handoff','environment','validation-impact','validation-preflight','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     parser.add_argument('--standalone',action='store_true',help='Use the canonical queue and selected checkout without attaching to a registered controller.')
     parser.add_argument('--preview',type=Path,help='Retained Force Process Preview JSON')
     parser.add_argument('--receipt',type=Path,help='Original Process Pending receipt JSON')
@@ -7688,6 +7718,12 @@ def main(argv=None):
                 raise WorkflowError('Force Process evidence inspection uses the selected proposal without mutation or controller flags')
             store = Store(args.root, allow_unselected=True, neutral=True)
             print(dump(force_process_evidence(store, cmd, args.input, args.preview, args.receipt, args.expected_preview_sha256)), end='')
+            return 0
+        if cmd=='completion-prose-preview':
+            if args.apply or args.id or args.names is not None or args.expected_source_hash or args.direct_project:
+                raise WorkflowError('Completion prose preview accepts only a read-only draft payload')
+            payload=json.loads(args.input.read_text()) if args.input else {}
+            print(dump(completion_prose_preview(payload)),end='')
             return 0
         if args.standalone and (cmd not in {'intake','process','start','begin','implemented','prepare-check',
                 'record-check','reconcile-check','resume-task','complete'} or args.run_id):

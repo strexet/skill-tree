@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "8e925c01bb12432b1969269d7ea9ea52df6d7a515c48e5737c2d001ee1f9d1de",
+  "identity": "c8f25d7b4dd2db564ed9b45e23c5cddb99d88ce50143f9747fef668e5fc0d19f",
   "operation": "skill-tree-3d",
   "operations": {
     "skill-tree-3d": {
@@ -3306,7 +3306,7 @@
     "references/project-profile.md": "232c01c9ce6554545653d3c4b0b515e3c180f9361bb85c6206d372209cac5bba",
     "references/run-workspaces.md": "298f972fd4802b3bf95af3120a00904b999d23beb70ef7366ff3684945ee4cfd",
     "references/validation-policy.md": "a3413c285687d49f22aac9eb124cb7a64252200984b60b16de1d675d6cfe2472",
-    "references/workflow-metadata.md": "367c94e3997a8c6a4a7f7ebf9dffce31fdb225b29ce20b72f44ccbcfab1e42c2",
+    "references/workflow-metadata.md": "aa199528abb478ef81b4655e7088c0eccfbe2c02c940f483554c102020d18154",
     "scripts/3d-neutral-symmetry.py": "110ddf58e7847e0ac56d10e0a2fcfc6baf81ee2bca3155548356f96411b1565f",
     "scripts/3d-review/evidence.py": "5ac272ec3fc1b80efb6ad033b51247c2281271ed4689b9ac1df493f855f988d9",
     "scripts/3d-review/review.py": "1038e615a9671a368387dc37462d44fee96207ca3d80f3f73807ea77102114e8",
@@ -3331,7 +3331,7 @@
     "scripts/run-workspaces.py": "a706fedaca99a6231d753201cff28f5d5601292b048ceb0929dc8ae469eb302b",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "c167078b28047b6805203282c56b53ba6badf907759bb171794fb837acf17ba8"
+    "scripts/workflow-state.py": "a5328f3a0bd6348593dddddae2e8063e809e68fd149be523c3d613fc45f97c0e"
   },
   "packages": {},
   "parameter_defaults": {},
