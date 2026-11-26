@@ -2,6 +2,52 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const core=path.resolve(__dirname,'..'),cli=path.join(core,'bin/install.js');
 function run(command,args,options={}){const r=spawnSync(command,args,{encoding:'utf8',timeout:30000,...options});assert.equal(r.status,0,r.stdout+r.stderr);return r.stdout;}
 function write(root,rel,value){const p=path.join(root,rel);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,typeof value==='string'?value:JSON.stringify(value));}
+test('installed run-check executes one owned recipe and replays the exact original receipt', t => {
+ const base=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-owned-check-'));
+ t.after(()=>fs.rmSync(base,{recursive:true,force:true}));
+ const root=path.join(base,'queue'),wt=path.join(base,'run');
+ fs.mkdirSync(root);
+ const git=(...args)=>run('git',['-C',root,...args]);
+ git('init','-b','develop');git('config','user.name','Fixture');git('config','user.email','fixture@example.invalid');
+ write(root,'package.json',{scripts:{test:'node --test'}});
+ write(root,'owned-test.cjs',"const test=require('node:test');\nconst fs=require('node:fs');\ntest('exact selected fixture',()=>fs.appendFileSync('invocations.log','run\\n'));\n");
+ write(root,'.skill-tree/validation-recipes.json',{schema:1,recipes:{'owned-fixture':{
+  lane:'unit',argv:['node','--test','owned-test.cjs'],input_paths:['owned-test.cjs']
+ }}});
+ write(root,'.skill-tree/documents/future.md','# Future Work\n\n## Pending Task Format\n\n## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n');
+ git('add','.');git('commit','-m','Exact installed runner fixture');
+ const operation='skill-tree-work-through-next';
+ run(process.execPath,[cli,'--target',root,'--flavor','general','--only','codex','--skills',operation]);
+ const standalone=path.join(base,'standalone');
+ fs.cpSync(path.join(root,'.agents/skills',operation),standalone,{recursive:true});
+ const helper=path.join(standalone,'scripts/workflow-state.py');let serial=0;
+ function command(action,checkout,payload,flags=[]){
+  const input=path.join(base,`request-${serial++}.json`);write(base,path.basename(input),payload);
+  return JSON.parse(run('python3',['-B',helper,action,checkout,'--input',input,...flags],{cwd:base}));
+ }
+ const pending=command('intake',root,{title:'Owned runner fixture',description:'Validate a scoped fixture.',expected_behavior:'Record one actual check.'});
+ const criterion='Record one actual check.';
+ const check={id:'behavior',recipe_id:'owned-fixture',criteria:[criterion],sources:['owned-test.cjs'],
+  parameters:{},assertion:criterion,timing:'immediate'};
+ const body='Goal:\n- '+criterion+'\n\nTouch:\n- owned-test.cjs\n\nValidation:\n```json\n'+
+  JSON.stringify({checks:[check]})+'\n```\n\nAcceptance:\n- '+criterion+'\n';
+ const task=command('process',root,{selectors:[pending.id],dispositions:{[pending.id]:{status:'promoted',reason:'The fixture supplies the owned recipe.'}},
+  tasks:[{title:'Owned runner fixture',body,parent_pending_ids:[pending.id]}]}).created_ids[0];
+ command('workspace-setup',root,{});
+ const started=command('start',root,{worktree:wt,implementation_operation:'work-through-next'},['--standalone','--id',task]);
+ const [program,...handoffArgs]=started.profile_handoff.argv;
+ assert.equal(JSON.parse(run(program,handoffArgs)).status,'admitted');
+ const selected=['--run-id',started.id];command('begin',wt,{task_id:task},selected);
+ const id={task_id:task,check_id:'behavior'};
+ const due=command('run-check',wt,{...id,action:'inspect'},selected);assert.equal(due.status,'due');
+ const request={...id,action:'run',authorization:'Run one disposable installed check.',deadline_utc:new Date(Date.now()+20000).toISOString(),cleanup_seconds:3};
+ const result=command('run-check',wt,request,selected);assert.equal(result.status,'recorded',JSON.stringify(result));
+ assert.deepEqual(result.record.counts,{expected:1,discovered:1,passed:1,failed:0,skipped:0});
+ const replay=command('run-check',wt,{...id,action:'reconcile',attempt_id:result.record.attempt_id},selected);
+ assert.equal(replay.replayed,true);assert.deepEqual(replay.record,result.record);
+ assert.equal(fs.readFileSync(path.join(wt,'invocations.log'),'utf8'),'run\n');
+});
+
 for(const flavor of ['general','web','unity'])test(`installed ${flavor} Implement All freezes only the requested group through its standalone CLI`,t=>{
  const base=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-group-installed-'));t.after(()=>fs.rmSync(base,{recursive:true,force:true}));
  const root=path.join(base,'queue'),remote=path.join(base,'remote.git');fs.mkdirSync(root);

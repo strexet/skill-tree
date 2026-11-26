@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "0e7bb536744d221982e2ccd1640e130487ed4cb5573c194946bfbbff0e5105e2",
+  "identity": "14a6e928b21d2f933d43e477cf4df8635018f20c24f5d4a05256048600b6ebff",
   "operation": "skill-tree-game-design",
   "operations": {
     "skill-tree-3d": {
@@ -3301,7 +3301,7 @@
     "references/narrative-human-playtest.md": "f6894df614f45fbdc059147ab2100d9abed8cbb9dcd37ddbc5d02f0fd4b31238",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/project-profile.md": "232c01c9ce6554545653d3c4b0b515e3c180f9361bb85c6206d372209cac5bba",
-    "references/validation-policy.md": "769b0aa3334ced0954b5957615d86451bd8004a235f74032c023dc89c488c246",
+    "references/validation-policy.md": "f1dc96d51ef6da6d66455702d2645cb94c17ff88951c6fa248b7625c42574fe5",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "dd1b6fb5dfb56b93ad531abf87f4f713b5934156133007bb4014b56ec9f285e5",
     "scripts/director-dispatch.py": "41438736aeed0da210bd7f65971193f25c84a68c2536be66f52b7f7cf3a040cf",
@@ -3318,7 +3318,7 @@
     "scripts/run-workspaces.py": "3e69242f598a35c31ad5d9bcf6ac8e3cb6a2ebe89857a961e0a01b92d2c477f2",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "a42b4cf4b39d82f3d28d9ae6fac4f3cf58d44176b87097f42009057813c9ee4c"
+    "scripts/workflow-state.py": "d7ccba8cfcd3066bb337df08aedeacc2137180268839043c06e6034bd0c2e517"
   },
   "packages": {},
   "parameter_defaults": {},

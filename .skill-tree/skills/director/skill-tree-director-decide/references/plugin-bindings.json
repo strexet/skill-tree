@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "49e708d0ee9fbc35c1edca6ef732de2bcbb0b1622bd707d813b66b51829a3c0f",
+  "identity": "684f325c619a24920905306c99591f998cbc7b7a80b3a9ade226d6003fb04ac0",
   "operation": "skill-tree-director-decide",
   "operations": {
     "skill-tree-3d": {
@@ -3306,8 +3306,8 @@
     "references/pr-review-cycle.md": "dec7a0339d4b0497c488ba48e54a4b22c715190ff7da77bde96444af84405120",
     "references/project-profile.md": "232c01c9ce6554545653d3c4b0b515e3c180f9361bb85c6206d372209cac5bba",
     "references/run-workspaces.md": "170251170232d01dee1cadbe9cb59f554d49c4e4cbcd490a6bc5d5a62f698292",
-    "references/validation-policy.md": "769b0aa3334ced0954b5957615d86451bd8004a235f74032c023dc89c488c246",
-    "references/workflow-metadata.md": "0cb56b110a36a4cbdf001f5900f3305a5481b1fcf3ef2199c9d096670fb92ce6",
+    "references/validation-policy.md": "f1dc96d51ef6da6d66455702d2645cb94c17ff88951c6fa248b7625c42574fe5",
+    "references/workflow-metadata.md": "aa46af6f08706399239af12c52c32f47c61a2a8eea5392e0ba54d5162a197126",
     "scripts/director-entry.py": "3e5d323676571842ed0cf88d08957a29f766406523888ebfb833ef03ba03327d",
     "scripts/package.json": "8005a3491db7d92f36ac66369861589f9c47123d3a7c71e643fc2c06168cd45a",
     "scripts/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
@@ -3336,7 +3336,7 @@
     "scripts/runtime/common/scripts/run-workspaces.py": "3e69242f598a35c31ad5d9bcf6ac8e3cb6a2ebe89857a961e0a01b92d2c477f2",
     "scripts/runtime/common/scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/runtime/common/scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/runtime/common/scripts/workflow-state.py": "a42b4cf4b39d82f3d28d9ae6fac4f3cf58d44176b87097f42009057813c9ee4c",
+    "scripts/runtime/common/scripts/workflow-state.py": "d7ccba8cfcd3066bb337df08aedeacc2137180268839043c06e6034bd0c2e517",
     "scripts/runtime/lib/api-contract-locks.js": "eaac3e411ab7ddea36cedb4c48f0a0d0c5e737509466f0f86587df51a34fe594",
     "scripts/runtime/lib/composer.js": "9d6223c4419ba3a41a2ee0a08d1d00c05483d82fc83576a6f591623f33b5ebfa",
     "scripts/runtime/lib/development-policies.js": "9d3036e0dd2b2aaf070f3ec92f9e1d6d6830fe35cd8ebb1a78135c3ad792a2fd",

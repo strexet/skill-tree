@@ -35,6 +35,8 @@ Record each checked worker commit and artifact using `record`. After observing h
 
 ## Review and merge one PR
 
+Run an exact eligible local task or completed-prerequisite check with installed `run-check` and the original run ID. The handoff names the due check and affected consumers. Reconcile the original attempt before retrying, and accept current completed-contract revalidation through the existing Core gate. Product and bound checks use the existing execution and evidence handoffs.
+
 Run `completion-prose-preview` on the draft outcome and limitations before an external scoped commit. Resolve the located prose errors before creating the commit. Confirm current acceptance and evidence through `complete`.
 
 1. Review the actual change set for the whole admitted scope and commit only scoped changes. Begin PR preflight only after implementation finishes. Bind the original direct owner grant to the exact source branch, remote and `develop` target. Pass the original owner instruction as `instruction` with `instruction_origin: "owner"`, `target_branch: "develop"` and `merge: true` to the PR helper when the original direct full-cycle order grants the full path. Preserve the matching normalized authorization in the run and on each resumed review command. Recover an existing matching publication or PR identity before any retry.

@@ -48,6 +48,8 @@ A pending attempt blocks acceptance even when an earlier result passes or the cu
 
 An owned static or unit runner can retain the finished result before leaving the original native process group. After coordinator interruption, `reconcile-check` can recover the result using the exact receipt digest, the current check and evidence, and verified absence of the original group. Verified cleanup can close a native local attempt with an unavailable result so the current check can retry.
 
+Use installed `run-check` for one current local static or unit check with a resolved argument vector and an explicit bounded execution request. Revalidation uses the same exact runner path and the existing `accept-revalidation` gate. Check results with missing test discovery, changed inputs or uncertain cleanup require the recorded prerequisite or reconciliation.
+
 ## Final run evidence
 
 A declared local delivery suite belongs to the PR final validation phase. Leaf task completion requires all mapped immediate and dependency-bound checks. Run focused regressions during review fixes. Bind final suite results to the reviewed candidate and preserve required provider checks at readiness and merge.
