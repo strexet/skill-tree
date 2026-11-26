@@ -1,5 +1,6 @@
 """Preview the exact workspace route before any product effects."""
 from pathlib import Path
+import re
 import subprocess
 
 
@@ -41,6 +42,34 @@ ALIASES = {
     'questions': 'skill-tree-director-decide',
     'installation': 'skill-tree-director-install',
 }
+
+REQUEST_ROUTES = {
+    'fresh-implementation': ('skill-tree-full-cycle', ('intake', 'process', 'launch')),
+    'existing-task': ('skill-tree-work-through-next', ('launch',)),
+    'pending-intake': ('skill-tree-add-pending-task', ('intake',)),
+    'pr-review': ('skill-tree-pr-review-cycle', ('review',)),
+}
+IMPLEMENT_REQUEST = re.compile(r'^(?:implement|fix|build|full cycle|реализу(?:й|ем|йте)|реализовать|'
+                               r'исправ(?:ь|им|ьте|ить)|полный цикл)\b')
+INTAKE_REQUEST = re.compile(r'^(?:add (?:to |a )?pending|capture (?:as )?pending|record (?:a )?pending|'
+                            r'добав(?:ь|им|ьте|ить)\b[^.!?\n]{0,40}\b(?:pending|отложенн\w*)|'
+                            r'только (?:в )?pending)\b')
+PR_REVIEW_REQUEST = re.compile(r'^(?:review (?:the |this |an? )?(?:pr|pull request)|pr review|'
+                               r'(?:проведи )?ревью (?:этот )?(?:pr|pull request|пул-реквест)|'
+                               r'(?:проверь|проверьте|проверить) (?:этот )?(?:pr|pull request|пул-реквест))\b')
+DEFERRED_IMPLEMENTATION = re.compile(r"(?:\b(?:without|no) implementation\b|"
+                                    r"\b(?:do not|don't) implement\b|\bне реализовывай\b|\bбез реализации\b)")
+UNCERTAIN_REQUEST = re.compile(r"\b(?:maybe|perhaps|should we|do not|don't|never|instead of|"
+                               r"возможно|может быть|не|вместо|если)\b")
+ADDITIONAL_EFFECT = re.compile(r'^(?:process|merge|publish|push|deploy|release|обработ(?:ай|аем|айте|ать)|мерж|'
+                               r'влей|влить|опубликуй|опубликовать|запушить|задеплоить|релиз)\b')
+UNSUPPORTED_IMPLEMENT = re.compile(r'^(?:implement (?:all|every)|start implementation|реализу(?:й|ем|йте) все|начн(?:и|ите) реализацию)\b')
+POLITE_QUESTION = re.compile(r'^(?:can you|could you|можешь|можете)\b')
+REQUEST_PREFIX = re.compile(r"^(?:(?:please|can you|could you|можешь|можете|let's|давай(?:те)?|пожалуйста)[, ]+)+")
+REQUEST_SEPARATORS = re.compile(r'[,.!?;\n]\s*|\b(?:and(?: then)?|then|also|и(?: затем)?|затем|а также)\s+')
+EXISTING_TASK = re.compile(r'^(?:(?:(?:the |an? |this |that )?(?:(?:existing|ready|prioritized|pending) )?task|next)\b|'
+                           r'(?:эту |готовую |существующую )?задачу\b)')
+TASK_REFERENCE = re.compile(r'(?<![\w-])[PT]-[\w-]+', re.IGNORECASE)
 
 
 def package_entry(D, root, settings, profile, skill):
@@ -162,7 +191,148 @@ def task_preview(D, summary, request, operation, mode):
             'limitations':limitations}
 
 
+def recommendation_choices(core, intents=()):
+    return [{'intent': intent, 'operation': operation}
+            for intent, (operation, _) in REQUEST_ROUTES.items()
+            if operation in core and (not intents or intent in intents)]
+
+
+def request_intents(text, ids):
+    original = text.casefold().strip()
+    normalized = REQUEST_PREFIX.sub('', original)
+    if INTAKE_REQUEST.match(normalized):
+        normalized = DEFERRED_IMPLEMENTATION.sub('', normalized)
+    clauses = [REQUEST_PREFIX.sub('', clause.strip()) for clause in REQUEST_SEPARATORS.split(normalized)
+               if clause.strip()]
+    intents = []
+    first_recognized = False
+    additional = False
+    for index, clause in enumerate(clauses):
+        unsupported = UNSUPPORTED_IMPLEMENT.match(clause)
+        implement = None if unsupported else IMPLEMENT_REQUEST.match(clause)
+        intent = None
+        if implement:
+            selects_task = EXISTING_TASK.match(clause[implement.end():].lstrip())
+            intent = 'existing-task' if ids or selects_task else 'fresh-implementation'
+        elif INTAKE_REQUEST.match(clause):
+            intent = 'pending-intake'
+        elif PR_REVIEW_REQUEST.match(clause):
+            intent = 'pr-review'
+        additional = additional or bool(unsupported or ADDITIONAL_EFFECT.match(clause))
+        if intent:
+            first_recognized = first_recognized or index == 0
+            intents.append(intent)
+    uncertain = ((normalized.endswith('?') and not POLITE_QUESTION.match(original))
+                 or bool(UNCERTAIN_REQUEST.search(normalized))
+                 or (bool(intents) and not first_recognized))
+    return list(dict.fromkeys(intents)), uncertain, additional or len(intents) > 1
+
+def request_queue_prerequisite(D, project, task_ids, intent):
+    """Check exact task identity and passive Core admission inputs."""
+    try:
+        store = D.WF.Store(Path(project['checkout']), route_queue=False, neutral=True)
+        text = store.text()
+        tasks = D.WF.parse(text)
+        by_id = {task['id']: task for task in tasks}
+        if any(task_id not in by_id for task_id in task_ids):
+            return 'task-outside-project-queue', {}
+        if intent != 'existing-task':
+            return None, {}
+        task_id = task_ids[0]
+        task = by_id[task_id]
+        if task['queue'] != 'Prioritized Next Changes':
+            return 'prioritized-task-required', {'task_status': task['status']}
+        state = store.load(text)
+        registry = state['run_registry']
+        D._require(registry['queue_id'] == project['queue_id'], 'Project queue changed during route preview')
+        completed = {outcome['task_id']: outcome for outcome in store.outcomes()
+                     if outcome['disposition'] == 'completed'}
+        required = D.WF.dependency_scope(tasks, {'snapshot': task_ids}) - completed.keys()
+        claims = registry['claims']
+        for required_id in sorted(required):
+            entry = by_id.get(required_id)
+            if entry is None or entry['queue'] != 'Prioritized Next Changes':
+                return 'required-task-unavailable', {'required_task_id': required_id}
+            if entry['status'] != 'Ready':
+                return 'task-clarification-required', {'required_task_id': required_id, 'task_status': entry['status']}
+            if required_id in claims:
+                return 'task-claimed', {'required_task_id': required_id, 'run_id': claims[required_id]}
+            try:
+                D.WF.clarification_admission(store, required_id, hook_gate=False)
+            except ValueError:
+                return 'task-clarification-required', {'required_task_id': required_id}
+        return None, {'task_status': task['status'], 'queue_sha256': D.WF.digest(text.encode())}
+    except (ValueError, OSError, KeyError, subprocess.TimeoutExpired):
+        return 'project-queue-unavailable', {}
+
+
+def recommend_request(D, workspace, products, core, request):
+    D._object(request, {'request_text'}, {'project_id'})
+    text = request['request_text']
+    D._require(isinstance(text, str) and 0 < len(text) <= 4000 and text.strip(),
+               'A route recommendation requires nonempty request text up to 4000 characters')
+    selected = request.get('project_id')
+    D._require(selected is None or D._token(selected), 'Select an exact project ID from project-menu')
+    ids = list(dict.fromkeys(TASK_REFERENCE.findall(text)))
+    intents, uncertain, additional = request_intents(text, ids)
+    summary = {'route': 'director', 'execution': 'route-recommendation', 'status': 'preview',
+               'matched_intents': intents, 'confidence': 'unresolved', 'candidate_operation': None,
+               'unresolved_choices': [], 'limitations': []}
+
+    def prerequisite(code, **details):
+        return {**summary, **details, 'status': 'prerequisite', 'limitations': [code]}
+
+    if selected is None or not any(project['id'] == selected for project in products):
+        return prerequisite('exact-registered-project-required',
+                            unresolved_choices=[{'project_id': project['id']} for project in products
+                                                if project['state'] == 'available'])
+    try:
+        project = project_for(D, workspace, products, selected)
+    except ValueError:
+        return prerequisite('registered-project-unavailable', project_id=selected)
+    summary['project'] = project
+    if 'preview' not in project['allowed_effects']:
+        return prerequisite('project-preview-not-authorized')
+    if len(intents) != 1 or uncertain or additional:
+        reason = ('mixed-request-intent' if len(intents) > 1 or (additional and intents)
+                  else 'uncertain-request-intent' if uncertain else 'unsupported-request-intent')
+        return {**summary, 'limitations': [reason], 'unresolved_choices': recommendation_choices(core, intents)}
+
+    intent = intents[0]
+    operation, effects = REQUEST_ROUTES[intent]
+    summary.update(candidate_operation=operation, confidence='bounded-explicit-wording')
+    if operation not in core:
+        return prerequisite('operation-is-outside-installed-catalog')
+    if denied := [effect for effect in effects if effect not in project['allowed_effects']]:
+        return prerequisite('project-operation-effects-unavailable', required_effects=denied)
+    if project.get('core_routing') == 'upgrade-project-installation':
+        return prerequisite('upgrade-co-located-project-installation-through-project-setup')
+    if not child_skill(D, project, operation):
+        diagnostic = D._profile_refresh_prerequisite(Path(project.get('workspace_checkout', project['checkout'])))
+        if diagnostic:
+            # A recommendation reports the prerequisite without returning an executor command.
+            profile = {key: diagnostic[key] for key in ('code', 'changed_inputs', 'profile_sha256')
+                       if key in diagnostic}
+            return prerequisite(diagnostic['code'], profile_prerequisite=profile)
+        return prerequisite('project-skill-unavailable')
+    if any(not (D.WF.valid_id(task_id, 'T') or D.WF.valid_id(task_id, 'P')) for task_id in ids):
+        return prerequisite('exact-task-id-required', unresolved_choices=[{'queue': 'Prioritized Next Changes'}])
+    if len(ids) > 1 or (intent == 'existing-task' and not ids):
+        return prerequisite('select-one-exact-task',
+                            unresolved_choices=[{'queue': 'Prioritized Next Changes'}])
+    if ids:
+        summary['task_ids'] = ids
+        code, details = request_queue_prerequisite(D, project, ids, intent)
+        if code:
+            return prerequisite(code, **details)
+        summary.update(details)
+    return summary
+
+
 def preview(D, root, workspace, settings, profile, products, request):
+    if isinstance(request, dict) and 'request_text' in request:
+        core, _ = installed_operations(D, root)
+        return recommend_request(D, workspace, products, core, request)
     D._object(request, {'operation'}, {'project_id', 'route', 'task_ids'})
     operation, mode = request['operation'], request.get('route', 'director')
     D._require(isinstance(operation, str) and mode in ('director', 'direct'), 'Select a known operation and route')

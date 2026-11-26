@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "7c3047e0f70350d816b5d12d6dc481ae10e9c29c189c4558e46542cbe1b84b98",
+  "identity": "adffa9cbbec7ae47e270b90a90f6e6124eaf774c4adf0221abfce89e1a73bcdf",
   "operation": "skill-tree-director-setup",
   "operations": {
     "skill-tree-3d": {
@@ -3327,7 +3327,7 @@
     "scripts/runtime/common/scripts/director-objectives.py": "18a0e664d1eb9074983a22abf27ecb4076d2bd1b3d24ed6cac5ace41f459f373",
     "scripts/runtime/common/scripts/director-plan-adapters.py": "1f78af0ae2187105d44ccc2487176548268357fa4a5916c496cb093899c4741d",
     "scripts/runtime/common/scripts/director-plans.py": "679f7c7d9b87caade9a9d01f2dddf0dbc4703e1d49f1c183a7f83b6b48ec49c6",
-    "scripts/runtime/common/scripts/director-project-routing.py": "d4007f0904ed0ccf54a44579b4ea3f424d65bb87b79661433464704bd4781a91",
+    "scripts/runtime/common/scripts/director-project-routing.py": "8902c631d5ddccfd2426e056b280a34cebf64accb906fe7780d1d1057850f7a7",
     "scripts/runtime/common/scripts/director-project-setup.py": "ed6f3f8a83c20218fccf2762fbba4e44a845f546ba1c4ed316da6069b76c4ce5",
     "scripts/runtime/common/scripts/director-questions.py": "f10e8d3fb1830bb5a3289148aa94067574e257676a77fc349eafa9a2f8696b34",
     "scripts/runtime/common/scripts/director-run.py": "a23748a4b50c9533d3ae9a85ece26e3601f22d8ca2fcd7aaee72dbec0c0eb4be",

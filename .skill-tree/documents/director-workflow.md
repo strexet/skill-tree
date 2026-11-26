@@ -16,6 +16,14 @@ The dedicated service lives under `.skill-tree/.director`. Use the [shared works
 
 An ordinary workspace audit requests a separate documentation audit from each available authorized subproject. The workspace audit report includes verified results and coverage gaps for the registered scope.
 
+### Preview a route from a request
+
+Send `request_text` and the exact registered `project_id` to the installed Setup entry's `project-route` command. For example, use `{"project_id":"site","request_text":"Implement the account settings page"}`. The request text accepts up to 4,000 characters.
+
+The preview recognizes explicit wording for fresh implementation, implementation of one existing prioritized task, Pending intake, and PR review. Existing work requires the exact T-ID in the receiving queue. Mixed and uncertain requests return choices for the owner to resolve. Missing projects, ineligible packages and unavailable queue work return the relevant prerequisite.
+
+The result gives matched intents, a candidate operation when available, a bounded confidence label, and any unresolved choices or prerequisites. The preview grants no effect. Select the exact operation and scope through the regular route before continuing.
+
 ## Register areas
 
 For first-time setup, review the coordinator, project placements, package sources and prerequisites through the [guided setup preview](../common/references/director-workflow.md#preview-first-time-setup). Once approved, [prepare the workspace](../common/references/director-workflow.md#prepare-the-approved-workspace) with `setup-bootstrap`. Use the [prepared-area registration and status flow](../common/references/director-workflow.md#register-the-prepared-areas) for the exact prepared set. The explicit area registration commands below remain available.
