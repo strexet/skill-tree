@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "df43980f37ce73b4dbd72d21296dd15a594005fef39a6dfd87f046d7c0a95b3f",
+  "identity": "405c0be5144696de7f66f3124483a8d7eb891b768b69b35bd6708735b94ad7aa",
   "operation": "skill-tree-game-design",
   "operations": {
     "skill-tree-3d": {
@@ -3304,7 +3304,7 @@
     "references/ugui-testing.md": "873c236f793ff3c9ece8f0d0346c5c48513e8220406fce216751571c58b79073",
     "references/unity-development.md": "49110c691d4493cd21e8c3ceb682053e3f975016be9879cd10836d9f4feaf371",
     "references/unity-safety.md": "c4a96cdb4bc35a98fcab8ba6bf9c983252cd73d1cefaa439669cedcbed357df0",
-    "references/validation-policy.md": "fb4f195d4a88a6614dbb4c3de8e241771a4bd673e2c7f6686877b948b18aa03d",
+    "references/validation-policy.md": "769b0aa3334ced0954b5957615d86451bd8004a235f74032c023dc89c488c246",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "dd1b6fb5dfb56b93ad531abf87f4f713b5934156133007bb4014b56ec9f285e5",
     "scripts/director-dispatch.py": "41438736aeed0da210bd7f65971193f25c84a68c2536be66f52b7f7cf3a040cf",
@@ -3315,14 +3315,14 @@
     "scripts/plugin-hooks.js": "dee31bf6df4e69991883baa5a36c2de3d57348d2e6493effc481d20858fee550",
     "scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",
     "scripts/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",
-    "scripts/plugin-processing.py": "4f4418c8e67a723a2cdd53b43246cb4507f0419bd7ca76b901334e78bb1406ec",
+    "scripts/plugin-processing.py": "71e6ee8f1c9b7015d031872bd6fc63a3875e41807bf81eb4133f2c69fe7f3ee4",
     "scripts/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
     "scripts/plugin-runtime.js": "62caaa416cb4f375fef45edb71c1cbe3b2f9c0acb734a95e0b9099470cf6c8a5",
     "scripts/plugin-sources.js": "13d853f9e64dec84cf92f4026ac71e4384e186cd96200543e400a852a46e4693",
     "scripts/run-workspaces.py": "a706fedaca99a6231d753201cff28f5d5601292b048ceb0929dc8ae469eb302b",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "3bad78ae6fa39d6ad4eac48d7dc8c7721c9a2314440f1783ff22ffbd61dfad45"
+    "scripts/workflow-state.py": "4ff9bc0d19476c437678e984b83e761cfb1443a2ca3793b6f5c46d80ab84de5a"
   },
   "packages": {},
   "parameter_defaults": {},

@@ -24,6 +24,12 @@ The coordinator owns checks deferred by timing, checks without an executable com
 
 A project recipe in `.skill-tree/validation-recipes.json` can declare `"delivery_validation": {"path": "final-suite.json", "check_id": "full-suite"}`. The tagged recipe uses the same literal `argv` as the named check in the declared PR suite. The owned profile fingerprints the suite file. Keep delivery-only recipes outside leaf Acceptance mappings. The leaf preflight reports the required phase and the leaf writer refuses preparation. Pass the linked path as the publication's final suite declaration and prepare the named suite through `final-validation` on the current reviewed PR candidate.
 
+## Shared policy evidence
+
+Implementation and current review handoffs include the shared invariants relevant to the selected task or check. Inspect both allowed and forbidden cases for each named transition against the stated rule. Relevant check keys bind the invariant, case mappings and source or owner evidence. A changed policy definition requires current evidence even when the check IDs stay the same.
+
+Task revisions preserve required invariant identities and mappings. A change to the rule requires current policy evidence and ordinary clarification before implementation continues. Editorial changes preserve the policy contract. Completion retains the rule, transition mappings and evidence with the accepted check results after removing the task from the queue.
+
 ## Launch and evidence
 
 Select the smallest sufficient lane from the unverified assertion. Documentation and metadata use static/temporary-fixture checks. Pure logic uses focused unit checks. Rendering, input, accessibility, lifecycle, native and device assertions require the matching lane. A launch records exact task/check IDs, assertion, cheaper-evidence insufficiency, source/test/environment identity, authorization, hard deadline and cleanup reserve. Reuse compatible owned processes when scope permits; process availability never proves current acceptance.

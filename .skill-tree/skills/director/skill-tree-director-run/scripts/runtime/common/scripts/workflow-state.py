@@ -29,7 +29,9 @@ VALIDATION_FIELDS = ['validation_group_id','boundary_validation']
 TASK_GROUPING_COMPATIBILITY = 1
 GROUPING_FIELDS = ['topic','intake_batch_ids']
 PENDING_DEPENDENCY_FIELD = 'pending_depends_on'
-OPTIONAL_FIELDS = VALIDATION_FIELDS + GROUPING_FIELDS + [PENDING_DEPENDENCY_FIELD]
+POLICY_REQUIREMENTS = 'required_policy_invariants'
+POLICY_INVARIANTS = 'policy_invariants'
+OPTIONAL_FIELDS = VALIDATION_FIELDS + GROUPING_FIELDS + [PENDING_DEPENDENCY_FIELD, POLICY_REQUIREMENTS]
 TOPIC_PATTERN = re.compile(r'[a-z][a-z0-9]*(?:-[a-z0-9]+)*')
 RELATIONS = {'main', 'blocker', 'subtask', 'followup'}
 TERMINAL = {'completed', 'cancelled', 'superseded', 'merged'}
@@ -196,6 +198,12 @@ def validate_metadata(meta, queue):
                 or any(not valid_id(value,'P') for value in pending_ids)
                 or len(set(pending_ids))!=len(pending_ids) or meta['id'] in pending_ids):
             raise WorkflowError('Invalid Pending prerequisite identity list')
+    if POLICY_REQUIREMENTS in meta:
+        policy_ids = meta[POLICY_REQUIREMENTS]
+        if queue != 'Pending Queue' or not isinstance(policy_ids,list) or not policy_ids or any(
+                not isinstance(value,str) or not TOPIC_PATTERN.fullmatch(value) for value in policy_ids
+        ) or len(policy_ids) != len(set(policy_ids)):
+            raise WorkflowError('Pending policy requirements need distinct named invariants')
     if meta['id'] in meta['depends_on']:
         raise WorkflowError('A task cannot depend on the task identity')
 
@@ -720,6 +728,7 @@ def intake_item(text,state,payload,batch_id,task_id):
     meta={'id':task_id,'priority':priority,'status':'Pending','parent_pending_ids':[],'processing_run_id':None,'root_task_id':root,'related_task_id':parent,'relation':relation,'depends_on':[]}
     if payload.get(PENDING_DEPENDENCY_FIELD):
         meta[PENDING_DEPENDENCY_FIELD]=payload[PENDING_DEPENDENCY_FIELD]
+    if POLICY_REQUIREMENTS in payload:meta[POLICY_REQUIREMENTS]=payload[POLICY_REQUIREMENTS]
     if 'topic' in payload:meta['topic']=payload['topic']
     if batch_id is not None:meta['intake_batch_ids']=[batch_id]
     validate_metadata(meta,'Pending Queue')
@@ -924,7 +933,19 @@ def _processing_proposal(store,payload,text,state,assigned,pr):
     for result in dispositions.values():
         if result.get('status') not in {'promoted','retained','resolved'} or not result.get('reason'): raise WorkflowError('Processing disposition requires status and reason')
     for result in dispositions.values():assert_prose(result['reason'])
-    due=[tid for tid,result in dispositions.items() if result.get('status') in {'promoted','resolved'}]
+    policy_requirements = {}
+    live_pending = {task['id']:task for task in tasks if task['queue']=='Pending Queue'}
+    for source in selected:
+        pending_id = source['id']
+        disposition = dispositions[pending_id]
+        declared = disposition.get(POLICY_REQUIREMENTS)
+        if declared is not None:
+            validate_metadata({**source,POLICY_REQUIREMENTS:declared},'Pending Queue')
+        required = sorted(set(source.get(POLICY_REQUIREMENTS,[])) | set(declared or []))
+        if required:
+            if disposition['status'] == 'resolved':
+                raise WorkflowError('Pending policy must be retained or mapped to a prioritized contract: '+pending_id)
+            policy_requirements[pending_id] = required
     specs=payload.get('tasks',[])
     if not isinstance(specs,list) or any(not isinstance(spec,dict) for spec in specs):raise WorkflowError('Processing tasks require a list of objects')
     # Allocate every identity before resolving forward references; no writes occur until validation succeeds.
@@ -992,8 +1013,28 @@ def _processing_proposal(store,payload,text,state,assigned,pr):
         if any(t['id'] not in parents and normalized(t['title'])==normalized(spec['title']) for t in parse(text)): raise WorkflowError('Duplicate produced title requires explicit reuse')
         text=insert(text,'Prioritized Next Changes',render(spec['title'],meta,spec['body']));produced.append(task_id)
     if {p for p in selected_ids if dispositions[p]['status']=='promoted'}!=consumed: raise WorkflowError('Promoted Pending task requires produced or reused task')
+    resulting = {task['id']:task for task in parse(text)}
+    policy_by_parent = {parent:{} for parent in consumed}
+    for task_id in dict.fromkeys(produced+reused):
+        task = resulting[task_id]
+        for invariant in policy_invariants(task):
+            owners=verify_policy_evidence(store,task,invariant,live_pending=live_pending)
+            matching=set(task['parent_pending_ids']) & consumed
+            if owners is not None:
+                matching &= owners
+            for parent in matching:
+                basis={key:invariant[key] for key in ('rule','evidence')}
+                known = policy_by_parent[parent].setdefault(invariant['id'],basis)
+                if known != basis:
+                    raise WorkflowError('Conflicting policy definitions for the same Pending origin: '+parent)
+    for pending_id in consumed:
+        missing = set(policy_requirements.get(pending_id,[])) - policy_by_parent[pending_id].keys()
+        if missing:
+            raise WorkflowError('Keep Pending until the owner or source resolves '+', '.join(sorted(missing))+': '+pending_id)
     for source in selected:
         if dispositions[source['id']]['status']=='retained':
+            if source['id'] in policy_requirements:
+                text=rewrite_meta(text,source['id'],{POLICY_REQUIREMENTS:policy_requirements[source['id']]})
             old=resolve(parse(text),[source['id']])[0]
             lines=text.splitlines(keepends=True)
             body=old['body'].rstrip()+'\n\nProcessing blocker:\n- '+dispositions[source['id']]['reason']+'\n\n'
@@ -1189,6 +1230,9 @@ def pending_dependency_blockers(ids, selected_ids, pending, promoted, declined):
 def pending_task_view(store, selectors):
     tasks = parse(store.text())
     selected = resolve(tasks, selectors, 'Pending Queue')
+    for task in selected:
+        if task.get(POLICY_REQUIREMENTS):
+            task['policy_semantic_fingerprint']=policy_pending_fingerprint(task)
     if not any(task.get(PENDING_DEPENDENCY_FIELD) for task in selected):
         return selected
     pending, promoted, declined = pending_dependency_context(store, tasks)
@@ -1539,6 +1583,8 @@ def next_task(store):
     clarification_admission(store,task['id'])
     result = {'phase':'validate' if stage=='awaiting-validation' else 'implement','root_task_id':root,
               'task_id':task['id'],'title':task['title'],'priority':task['priority'],'body':task['body'],'checks':check_specs(task)}
+    invariants=policy_invariants(task)
+    if invariants:result[POLICY_INVARIANTS]=invariants
     if result['phase'] == 'implement':
         if state['active_run'].get('delivery', {}).get('authorization', {}).get('pr') is True:
             result['worker_brief'] = focused_worker_brief(store, state, task, result['checks'])
@@ -1894,11 +1940,13 @@ def complete(store,payload):
         task_context={'semantic_fingerprint':clarification_fingerprints(clarification_baselines([task]))[task['id']],'content_fingerprint':digest(task['body'].encode())}
         record={'task_context':task_context,'run_id':state['active_run']['id'] if state['active_run'] else None,'validation_group_id':task.get('validation_group_id'),'boundary_validation':task.get('boundary_validation','not-required'),'validation_plan':check_specs(task),'validation_signature':task_signature(task),'check_results':validation_records,'depends_on':task['depends_on'],'id':identity('O'),'task_id':task['id'],'title':task['title'],'root_task_id':task['root_task_id'],'related_task_id':task['related_task_id'],'parent_pending_ids':task['parent_pending_ids'],'disposition':disposition,'outcome':payload['outcome'],'acceptance':payload.get('acceptance',[]),'limitations':payload.get('limitations',[]),'followup_ids':payload.get('followup_ids',[]),'source_fingerprints':payload.get('source_fingerprints',{}),'commits':payload.get('commits',[]),'evidence':[evidence_pointer(store,e) for e in payload.get('evidence',[])],'recorded_at':now()}
         record.update(grouping_fields(task))
+        invariants=policy_invariants(task)
+        if invariants:record[POLICY_INVARIANTS]=invariants
         if disposition=='completed':
             check_inputs=set(payload['source_fingerprints'])
             if state['task_progress'].get(task['id'],{}).get('task_git_baseline'):
                 for item in validation_records:
-                    check_inputs.update(item['check']['sources'])
+                    check_inputs.update(item['result']['sources'])
                     check_inputs.update(recipe_for(store,item['check'])[0].get('input_paths',[]))
             git_receipt=complete_task_commit(store,text,state,task,payload,request_hash,sorted(check_inputs))
             if git_receipt:
@@ -2707,6 +2755,9 @@ def require_reviewed_controller_inputs(store, run):
         if outcome['task_id'] not in required or outcome['disposition']!='completed':
             continue
         sources.update(outcome['source_fingerprints'])
+        for invariant in outcome.get(POLICY_INVARIANTS,[]):
+            if invariant['evidence']['kind']=='source':
+                sources.add(invariant['evidence']['path'])
         for check in outcome.get('validation_plan',[]):
             sources.update(check['sources'])
             sources.update(recipe_for(store,check)[0].get('input_paths',[]))
@@ -4360,11 +4411,117 @@ def section_body(body,name):
 def acceptance_criteria(task):
     return [line[2:].strip() for line in section_body(task['body'],'Acceptance').splitlines() if line.startswith('- ')]
 
-def check_specs(task, *, boundary_issues=None):
+def task_validation_plan(task):
     text=section_body(task['body'],'Validation');match=re.search(r'```json\n(.*?)\n```',text,re.S)
     if not match:raise WorkflowError('Validation requires a structured JSON checks object')
     try:plan=json.loads(match[1])
     except ValueError as exc:raise WorkflowError('Invalid validation check JSON') from exc
+    if not isinstance(plan,dict):raise WorkflowError('Validation requires a structured JSON checks object')
+    return plan
+
+
+def policy_invariants(task, *, plan=None, check_id=None):
+    plan=task_validation_plan(task) if plan is None else plan
+    if POLICY_INVARIANTS not in plan:
+        return []
+    invariants=plan[POLICY_INVARIANTS]
+    if not isinstance(invariants,list) or not invariants:
+        raise WorkflowError('Shared policy requires a nonempty list of invariant objects')
+    checks={row['id']:row['criteria'] for row in plan['checks']}
+    by_id={}
+    for invariant in invariants:
+        if not isinstance(invariant,dict) or set(invariant)!={'id','rule','transitions','evidence'}:
+            raise WorkflowError('Policy invariant requires an ID, rule, transitions and evidence')
+        key,rule,evidence,transitions=(invariant[name] for name in ('id','rule','evidence','transitions'))
+        if not isinstance(key,str) or not TOPIC_PATTERN.fullmatch(key) or key in by_id:
+            raise WorkflowError('Policy invariant IDs must be distinct stable names')
+        if not isinstance(rule,str) or not clarification_text_semantics(rule):
+            raise WorkflowError('Policy invariant requires a concrete rule')
+        if not isinstance(evidence,dict):
+            raise WorkflowError('Policy invariant requires exact source or owner evidence')
+        if evidence.get('kind')=='source' and set(evidence)=={'kind','path','sha256'}:
+            relative=evidence['path']
+            if (not isinstance(relative,str) or any(part in {'','.','..'} for part in relative.split('/'))
+                    or any(char in relative for char in ('\\',':','\0'))):
+                raise WorkflowError('Policy source evidence requires a canonical repository-relative path')
+            valid_evidence=isinstance(evidence['sha256'],str) and re.fullmatch(r'[a-f0-9]{64}',evidence['sha256'])
+        elif evidence.get('kind')=='owner-decision' and set(evidence)=={'kind','decision_id','acceptance_digest'}:
+            digest_value=evidence['acceptance_digest']
+            valid_evidence=valid_id(evidence['decision_id'],'DG') and isinstance(digest_value,str) and re.fullmatch(r'[a-f0-9]{64}',digest_value)
+        else:
+            valid_evidence=False
+        if not valid_evidence:
+            raise WorkflowError('Policy invariant requires exact source or owner evidence')
+        if not isinstance(transitions,dict) or not transitions:
+            raise WorkflowError('Policy invariant requires explicitly named transitions')
+        for name,cases in transitions.items():
+            if not TOPIC_PATTERN.fullmatch(name) or not isinstance(cases,dict) or set(cases)!={'allowed','forbidden'}:
+                raise WorkflowError('Every policy transition requires allowed and forbidden cases')
+            for case in cases.values():
+                if (not isinstance(case,dict) or set(case)!={'check_id','criterion'}
+                        or not isinstance(case['check_id'],str) or case['criterion'] not in checks.get(case['check_id'],[])):
+                    raise WorkflowError('Policy case must map to an exact criterion of its declared check')
+            if cases['allowed']['criterion']==cases['forbidden']['criterion']:
+                raise WorkflowError('Allowed and forbidden policy cases require distinct criteria')
+        by_id[key]={**invariant,'rule':clarification_text_semantics(rule)}
+    return [by_id[key] for key in sorted(by_id) if check_id is None or any(
+        case['check_id']==check_id for cases in by_id[key]['transitions'].values() for case in cases.values())]
+
+
+def policy_pending_fingerprint(task):
+    _,body=task['body'].split('```yaml\n',1)
+    _,body=body.split('\n```',1)
+    meaning={'title':clarification_text_semantics(task['title']),'body':clarification_text_semantics(body)}
+    return digest(dump(meaning).encode())
+
+
+def verify_policy_evidence(store,task,invariant,*,live_pending=None):
+    evidence = invariant['evidence']
+    if evidence['kind'] == 'source':
+        relative = evidence['path']
+        source = binding_path(store.source_root,relative)
+        if not source.is_file() or file_hash(source)!=evidence['sha256']:
+            raise WorkflowError('Policy source evidence is missing or changed: '+relative)
+        return
+    decisions = decision_helper()
+    reference={key:evidence[key] for key in ('decision_id','acceptance_digest')}
+    try:
+        decision = decisions.read(store,reference['decision_id'])
+        context = decision['context']
+        accepted = decisions.acceptance_reference(store,reference,{
+            'context':context,'mode':'manual','kind':'product',
+            'authority_digest':decision['authority_digest']})
+    except ValueError as error:
+        raise WorkflowError('A current owner product decision is required for '+invariant['id']) from error
+    rule, = [row['text'] for row in decision['question']['options'] if row['id']==accepted['answer']]
+    if (context.get('kind')!='pending' or context.get('purpose')!='policy-invariant'
+            or context.get('policy_invariant_id')!=invariant['id']
+            or not set(context['pending_ids']).issubset(task.get('parent_pending_ids',[]))
+            or clarification_text_semantics(rule)!=invariant['rule']
+            or not isinstance(context.get('pending_policy_contexts'),dict)
+            or set(context['pending_policy_contexts'])!=set(context['pending_ids'])
+            or accepted['origin'].get('kind') not in {'owner-message','submitted-answer'}):
+        raise WorkflowError('Owner policy decision does not match the invariant or its Pending provenance')
+    for pending_id,old in context['pending_policy_contexts'].items():
+        current=(live_pending or {}).get(pending_id)
+        if current and policy_pending_fingerprint(current)!=old:
+            raise WorkflowError('Owner policy decision no longer matches Pending semantics: '+pending_id)
+    return set(context['pending_ids'])
+
+
+def guard_policy_revision(before,after,*,editorial=False):
+    previous={item['id']:item for item in policy_invariants(before)}
+    current={item['id']:item for item in policy_invariants(after)}
+    for key,item in previous.items():
+        if key not in current:
+            raise WorkflowError('Task revision must preserve required policy invariant: '+key)
+        if current[key] != item and (editorial or current[key]['rule']!=item['rule']
+                                     and current[key]['evidence']==item['evidence']):
+            raise WorkflowError('Policy revision requires current evidence for the revised invariant: '+key)
+
+
+def check_specs(task, *, boundary_issues=None):
+    plan=task_validation_plan(task)
     checks=plan.get('checks')
     if not isinstance(checks,list) or not checks:raise WorkflowError('Validation requires nonempty checks')
     criteria=acceptance_criteria(task);covered=set();seen=set()
@@ -4389,6 +4546,7 @@ def check_specs(task, *, boundary_issues=None):
             boundary_issues.append({'check_id':check['id'],'field':'boundary_validation',
                                     'timing':check['timing'],'supported':['group-end','before-dependent-work']})
     if covered!=set(criteria):raise WorkflowError('Every acceptance criterion requires a mapped check')
+    policy_invariants(task,plan=plan)
     return checks
 
 def validate_progress(state,tasks,completed=()):
@@ -4755,7 +4913,10 @@ def admitted_groups(tasks,run,completed=()):
     return groups
 
 def task_signature(task):
-    return digest(dump({'checks':check_specs(task),'criteria':acceptance_criteria(task),'group':task.get('validation_group_id'),'boundary':task.get('boundary_validation','not-required')}).encode())
+    definition={'checks':check_specs(task),'criteria':acceptance_criteria(task),'group':task.get('validation_group_id'),'boundary':task.get('boundary_validation','not-required')}
+    invariants=policy_invariants(task)
+    if invariants:definition[POLICY_INVARIANTS]=invariants
+    return digest(dump(definition).encode())
 
 def binding_path(root,relative):
     if not isinstance(relative,str) or not relative or Path(relative).is_absolute() or '\\' in relative or any(part in {'','.','..'} for part in relative.split('/')):raise WorkflowError('Binding paths require canonical repository-relative paths')
@@ -5143,6 +5304,12 @@ def execution_session(store,recipe,environment,entry,provided=None,require_curre
 
 def check_snapshot(store,task,check,state,*,historical_sessions=None,profile=None):
     sources=fingerprints(store,check['sources'])
+    invariants=policy_invariants(task,check_id=check['id'])
+    for invariant in invariants:
+        verify_policy_evidence(store,task,invariant)
+        proof=invariant['evidence']
+        if proof['kind']=='source':
+            sources[proof['path']]=proof['sha256']
     if any(value is None for value in sources.values()):raise WorkflowError('Required check source/test input is unavailable')
     recipe,environment=recipe_for(store,check,profile=profile)
     if recipe['lane'] in {'unit','unity-editmode'} and check['timing']!='immediate':raise WorkflowError('Focused behavioral checks remain immediate')
@@ -5160,7 +5327,9 @@ def check_snapshot(store,task,check,state,*,historical_sessions=None,profile=Non
         identity['evidence']=[evidence_pointer(store,ref,required=True) for ref in session['identity_evidence']]
         environment=digest(dump({'recipe_environment':environment,'execution':identity}).encode())
     executable={key:check[key] for key in ['recipe_id','sources','parameters','assertion']}
-    key=digest(dump({'check':executable,'recipe':recipe,'sources':sources,'environment':environment,'group':group_fingerprint(store,task,state)}).encode())
+    identity={'check':executable,'recipe':recipe,'sources':sources,'environment':environment,'group':group_fingerprint(store,task,state)}
+    if invariants:identity[POLICY_INVARIANTS]=invariants
+    key=digest(dump(identity).encode())
     return {'key':key,'definition':task_signature(task),'sources':sources,'environment_identity':environment,'recipe':recipe}
 
 def completed_task_body(store, record):
@@ -5249,6 +5418,7 @@ def completed_contract_sha256(record):
                         ('runner_result','payload_hash','recorded_at')}
         checks.append(bound)
     identity['check_results'] = checks
+    if POLICY_INVARIANTS in record:identity[POLICY_INVARIANTS]=record[POLICY_INVARIANTS]
     return digest(dump(identity).encode())
 
 
@@ -5291,8 +5461,11 @@ def validation_task(store,tid):
     original_body = verify_completed_contract(store,record)
     if not record.get('validation_plan') or not record.get('validation_signature'):raise WorkflowError('Completed record lacks an immutable validation contract; manual review is required')
     criteria=[entry['criterion'] for entry in record['acceptance']]
-    body='Goal:\n- Revalidate the recorded completed contract.\n\nTouch:\n- Recorded relevant source and test inputs.\n\nValidation:\n```json\n'+dump({'checks':record['validation_plan']})+'```\n\nAcceptance:\n'+'\n'.join('- '+criterion for criterion in criteria)+'\n'
+    plan={'checks':record['validation_plan']}
+    if POLICY_INVARIANTS in record:plan[POLICY_INVARIANTS]=record[POLICY_INVARIANTS]
+    body='Goal:\n- Revalidate the recorded completed contract.\n\nTouch:\n- Recorded relevant source and test inputs.\n\nValidation:\n```json\n'+dump(plan)+'```\n\nAcceptance:\n'+'\n'.join('- '+criterion for criterion in criteria)+'\n'
     task={'id':tid,'body':body,'title':record['title'],'validation_group_id':record.get('validation_group_id'),'boundary_validation':record.get('boundary_validation','not-required'),'completed_contract':True}
+    if POLICY_INVARIANTS in record:task['parent_pending_ids']=record['parent_pending_ids']
     if task_signature(task) == record['validation_signature']:
         return task
     if original_body is None:
@@ -5301,6 +5474,7 @@ def validation_task(store,tid):
         original = dict(task, body=original_body)
         if (set(acceptance_criteria(original)) == set(criteria)
                 and check_specs(original) == record['validation_plan']
+                and policy_invariants(original)==record.get(POLICY_INVARIANTS,[])
                 and task_signature(original) == record['validation_signature']):
             return original
     raise WorkflowError('Completed validation contract does not match the recorded signature')
@@ -5511,6 +5685,8 @@ def begin_task(store,payload):
         scoped_commit=bool(run and run.get('implementation_operation')) or (not run and operation=='implement-next')
         previous=state['task_progress'].get(task['id'])
         checks=check_specs(task)
+        invariants=policy_invariants(task)
+        for invariant in invariants:verify_policy_evidence(store,task,invariant)
         brief=None
         if ((not previous or previous['stage']=='implementing') and run
                 and run.get('delivery', {}).get('authorization', {}).get('pr') is True):
@@ -5526,6 +5702,7 @@ def begin_task(store,payload):
                 raise WorkflowError('Resume the existing task under its original completion policy')
         if state['active_run']:entry['run_id']=state['active_run']['id']
         result={'task_id':task['id'],'phase':'validate' if entry['stage']=='awaiting-validation' else 'implement','checks':checks}
+        if invariants:result[POLICY_INVARIANTS]=invariants
         if brief is not None:
             result['worker_brief'] = brief
         store.save(text,state);return result
@@ -6139,6 +6316,8 @@ def review_check_evidence(store,identity,scope,state=None):
         for check in check_specs(task):
             cid=check['id'];counts[cid]=counts.get(cid,0)+1
             evidence={'task_id':tid,'check_id':cid,'status':'rerun-required'}
+            invariants=policy_invariants(task,check_id=cid)
+            if invariants:evidence[POLICY_INVARIANTS]=invariants
             slot=entry.get('checks',{}).get(cid,{})
             result=slot.get('result') if kind=='task' else completed.get(cid)
             try:
@@ -6183,7 +6362,8 @@ def orchestration_check_evidence(store,frame):
     for check_id in required:
         row=by_id.get(check_id,{'id':check_id,'status':'rerun-required','reason':'No unambiguous current Core check'})
         if check_id in fresh:
-            row={'id':check_id,'status':'rerun-required','reason':'Review policy requires fresh execution'}
+            row={key:row[key] for key in ('task_id','check_id',POLICY_INVARIANTS) if key in row}
+            row.update(id=check_id,status='rerun-required',reason='Review policy requires fresh execution')
         offers.append(row)
     return {'identity':frame['identity'],'checks':offers}
 
@@ -7392,6 +7572,11 @@ def decision_context_guard(store,context,allow_stale=False):
         selectors=context.get('pending_ids',[]) if kind=='pending' else context.get('task_ids',[])
         if not selectors:raise WorkflowError('Task and Pending decisions require actual selected identities')
         selected=resolve(parse(store.text()),selectors,'Pending Queue' if kind=='pending' else 'Prioritized Next Changes')
+        if kind=='pending' and context.get('purpose')=='policy-invariant':
+            key=context.get('policy_invariant_id')
+            if (not isinstance(key,str) or any(key not in task.get(POLICY_REQUIREMENTS,[]) for task in selected)
+                    or context.get('pending_policy_contexts')!={task['id']:policy_pending_fingerprint(task) for task in selected}):
+                raise WorkflowError('Owner policy decision requires the current exact Pending policy scope')
         if kind!='pending' and set(context.get('pending_ids',[]))-{pending for task in selected for pending in task['parent_pending_ids']}:raise WorkflowError('Decision Pending provenance differs from the selected tasks')
     if kind=='controller':
         if not store.future.is_file() or not store.state.is_file():raise WorkflowError('A controller decision requires an existing recorded run')
@@ -7776,6 +7961,10 @@ def clarification_revise(store,record,payload,base_text=None):
     tasks=parse(text)
     if [(t['id'],t['queue']) for t in before_tasks]!=[(t['id'],t['queue']) for t in tasks] or any(old['body']!=new['body'] for old,new in zip(before_tasks,tasks) if old['id'] not in seen):raise WorkflowError('Task revision changes unselected tasks or queue membership')
     validate_dependencies(tasks,{o['task_id'] for o in store.outcomes() if o['disposition']=='completed'})
+    for old,new in zip(before_tasks,tasks):
+        if old['id'] not in seen:continue
+        guard_policy_revision(old,new)
+        for invariant in policy_invariants(new):verify_policy_evidence(store,new,invariant)
     if record['mode']=='required-processing':
         application=processing_helper()
         for old,new in zip(before_tasks,tasks):

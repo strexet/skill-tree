@@ -1082,6 +1082,7 @@ def _protect_revision(before, after, record, editorial=False):
             and after['body'].count(marker) == 1 and after['body'].endswith('\n\n' + marker + '\n\n'),
             'Processing revisions preserve dependencies and the exact owned hold')
     previous, current = _task_sections(before['body']), _require_task_sections(after['body'])
+    wf.guard_policy_revision(before,after,editorial=editorial)
     protected = {'Constraints', 'Implementation constraints', 'Out of scope', 'Exclusions', 'Required plugin policy'}
     if editorial:
         protected.add('Validation')
