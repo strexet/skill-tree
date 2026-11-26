@@ -878,12 +878,18 @@ class DirectorAudit:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('audit', 'workspace-audit', 'diagnose'))
+    parser.add_argument('command', choices=('audit', 'workspace-audit', 'diagnose', 'operation-receipt'))
     parser.add_argument('root', type=Path)
     parser.add_argument('--input', type=Path)
     args = parser.parse_args()
     try:
         request = json.loads(args.input.read_text()) if args.input else None
+        if args.command == 'operation-receipt':
+            D._object(request, {'operation_id'})
+            operations = D.WF.owned_module('director_setup_operations', HERE / 'setup-operation-receipts.py')
+            report = operations.receipt(D, D._root(str(args.root.absolute())), request['operation_id'])
+            print(D.WF.dump(report), end='')
+            return
         registry = D.DirectorRegistry(args.root)
         if args.command == 'workspace-audit' or (args.command == 'audit' and args.input is None):
             D._require(args.input is None or isinstance(request, dict), 'Workspace audit selection requires an object')

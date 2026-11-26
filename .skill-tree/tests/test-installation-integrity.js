@@ -288,7 +288,10 @@ test('interrupted replacement rolls forward from the journal and preserves unrel
  fs.writeFileSync(path.join(root,'unrelated.txt'),'keep');
  const source=path.resolve(__dirname,'..'),name='skill-tree-add-pending-task';
  const original=fs.renameSync;
- fs.renameSync=()=>{throw Error('fixture interruption');};
+ fs.renameSync=(from,to)=>{
+  if(from.includes(path.sep+'.staging'+path.sep))throw Error('fixture interruption');
+  return original(from,to);
+ };
  try{assert.throws(()=>manager.install(fs.realpathSync(root),source,'general',[{rel:'.claude/skills/'+name,name,provider:'claude-code'}]),/fixture interruption/);}finally{fs.renameSync=original;}
  assert.ok(fs.existsSync(path.join(root,'.skill-tree/installation/.journal.json')));
  const entry=path.join(root,'.skill-tree/installation/manager.js'),before=manager.treeHash(root,'.skill-tree');

@@ -2,9 +2,11 @@
 import importlib.util
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 import unittest
+from uuid import uuid4
 
 
 HERE = Path(__file__).resolve().parent
@@ -45,6 +47,160 @@ class WorkspaceAuditTests(unittest.TestCase):
         result = self.audit(*args, **kwargs)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         return json.loads(result.stdout)
+
+    def operation_receipt(self, root, operation_id, entry=None):
+        payload = self.base/'setup-operation.json'
+        payload.write_text(json.dumps({'operation_id':operation_id}))
+        return subprocess.run(
+            [sys.executable, '-B', str(entry or CORE/'common/scripts/director-audit.py'),
+             'operation-receipt', str(root.resolve()), '--input', str(payload)],
+            capture_output=True, text=True, timeout=60)
+
+    def test_install_and_failed_recovery_are_readable_without_a_run(self):
+        root = self.base/'setup-only'
+        root.mkdir()
+        install = subprocess.run(
+            ['node', str(CORE/'bin/install.js'), '--target', str(root), '--flavor', 'director',
+             '--only', 'codex', '--skills', 'skill-tree-director-audit'],
+            capture_output=True, text=True, timeout=90)
+        self.assertEqual(install.returncode, 0, install.stdout+install.stderr)
+        rows, _ = json.JSONDecoder().raw_decode(install.stdout)
+        install_id = rows[0]['operation_id']
+        entry = root/'.agents/skills/skill-tree-director-audit/scripts/director-entry.py'
+        result = self.operation_receipt(root, install_id, entry)
+        self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+        completed = json.loads(result.stdout)
+        self.assertEqual((completed['kind'], completed['status']), ('install', 'completed'))
+        self.assertIsNone(completed['before']['profile_sha256'])
+        self.assertRegex(completed['observed']['profile_sha256'], r'^[a-f0-9]{64}$')
+        self.assertNotIn(str(root), result.stdout)
+        journal = root/'.skill-tree/installation/.journal.json'
+        secret = b'fixture-credential-at-private-runtime-path'
+        malformed = b'{"schema":99,"label":"'+secret+b'"}'
+        journal.write_bytes(malformed)
+        manager = root/'.skill-tree/installation/manager.js'
+        recovery = subprocess.run(['node', str(manager), '--recover'], capture_output=True, text=True, timeout=60)
+        self.assertEqual(recovery.returncode, 2, recovery.stdout+recovery.stderr)
+        recovery_id = re.search(r'Setup operation (OP-[a-f0-9-]+)', recovery.stderr)[1]
+        before = self.snapshot(root)
+        result = self.operation_receipt(root, recovery_id, entry)
+        self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+        failed = json.loads(result.stdout)
+        self.assertEqual((failed['kind'], failed['status'], failed['stage']), ('recover', 'failed', 'recover'))
+        self.assertEqual(failed['before']['core_journal_sha256'], failed['observed']['core_journal_sha256'])
+        self.assertNotIn(secret.decode(), result.stdout)
+        self.assertNotIn(str(root), result.stdout)
+        self.assertEqual(journal.read_bytes(), malformed)
+        self.assertFalse((root/'.skill-tree/documents/future.json').exists())
+        self.assertEqual(self.snapshot(root), before)
+        rejected = self.operation_receipt(root, '../foreign', entry)
+        self.assertNotEqual(rejected.returncode, 0)
+        self.assertEqual(self.snapshot(root), before)
+
+    def test_exact_recovery_replays_a_lost_receipt_without_consuming_a_new_journal(self):
+        root, _, _ = self.product('setup-replay', install=True)
+        operation_id = 'OP-'+str(uuid4())
+        script = r"""
+const fs = require('node:fs'), path = require('node:path');
+const [modulePath, root, id] = process.argv.slice(1);
+const core = require(modulePath), repo = path.dirname(modulePath) + '/..';
+const source = path.join(root, '.skill-tree/installation/source');
+const base = path.join(root, '.skill-tree/installation');
+const journal = path.join(base, '.journal.json');
+const relative = '.skill-tree/installation/.staging/0';
+const stage = path.join(root, relative);
+const operation = path.join(root, '.skill-tree/artifacts/setup-operations', id + '.json');
+fs.mkdirSync(path.dirname(stage), {recursive:true});
+fs.writeFileSync(stage, 'durable fixture');
+const dest = '.skill-tree/artifacts/recovery-effect';
+const entry = {dest, old:null, next:core.treeHash(root, relative), backup:'.skill-tree/installation/.backups/0', staged:relative};
+fs.writeFileSync(journal, require(path.join(repo, 'lib/composer.js')).json({schema:1, channel:'core', entries:[entry]}));
+const assert = require('node:assert/strict');
+const originalJournal = fs.readFileSync(journal);
+const oversized = Buffer.from(JSON.stringify({schema:1, channel:'plugins', entries:[],
+  padding:'x'.repeat(16*1024*1024)}));
+const pluginJournal = path.join(base, '.plugin-journal.json');
+fs.writeFileSync(pluginJournal, oversized);
+assert.equal(core.localMain(root, source, ['--recover']), 2);
+assert.deepEqual(fs.readFileSync(journal), originalJournal);
+assert.deepEqual(fs.readFileSync(pluginJournal), oversized);
+assert.equal(fs.existsSync(path.join(root, dest)), false);
+fs.unlinkSync(pluginJournal);
+const original = fs.renameSync;
+fs.renameSync = (from,to) => {
+  if (to === operation && JSON.parse(fs.readFileSync(from)).status === 'completed') {
+    throw Error('fixture lost receipt acknowledgement');
+  }
+  return original(from,to);
+};
+const recover = () => core.localMain(root, source, ['--recover', '--operation-id='+id]);
+try { assert.equal(recover(), 2); } finally { fs.renameSync = original; }
+assert.equal(JSON.parse(fs.readFileSync(operation)).status, 'pending');
+assert.equal(fs.existsSync(journal), false);
+const effect = path.join(root, dest);
+const last = path.join(base, '.last-transaction.json');
+const lastBytes = fs.readFileSync(last);
+const marker = fs.statSync(effect).ino;
+assert.equal(recover(), 0);
+assert.equal(recover(), 0);
+assert.equal(fs.statSync(effect).ino, marker);
+assert.deepEqual(fs.readFileSync(last), lastBytes);
+const foreign = Buffer.from('{"schema":88,"details":"private new journal"}');
+fs.writeFileSync(journal, foreign);
+const sealed = fs.readFileSync(operation);
+assert.equal(recover(), 2);
+assert.deepEqual(fs.readFileSync(journal), foreign);
+assert.deepEqual(fs.readFileSync(operation), sealed);
+"""
+        result = subprocess.run(
+            ['node', '-e', script, str(CORE/'lib/installation.js'), str(root.resolve()), operation_id],
+            capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+        replay = self.operation_receipt(root, operation_id)
+        self.assertEqual(replay.returncode, 0, replay.stdout+replay.stderr)
+        data = json.loads(replay.stdout)
+        self.assertEqual((data['status'], data['attempts']), ('completed', 2))
+        self.assertIsNotNone(data['before']['core_journal_sha256'])
+        self.assertIsNone(data['observed']['core_journal_sha256'])
+        self.assertNotIn('private new journal', replay.stdout)
+
+    def test_install_replays_its_own_published_transaction(self):
+        root = self.base/'interrupted-install'
+        root.mkdir()
+        operation_id = 'OP-'+str(uuid4())
+        script = r"""
+const assert = require('node:assert/strict');
+const fs = require('node:fs'), path = require('node:path');
+const [source, root, id] = process.argv.slice(1);
+const core = require(path.join(source, 'lib/installation.js'));
+const directory = '.agents/skills/skill-tree-repo-documentation-audit';
+const selected = [{rel:directory, provider:'codex', name:path.basename(directory)}];
+const install = () => core.install(root, source, 'general', selected, {operationId:id});
+const original = fs.renameSync;
+fs.renameSync = (from, to) => {
+  if (from.includes(path.sep+'.staging'+path.sep)) throw Error('fixture activation interrupted');
+  return original(from, to);
+};
+try { assert.throws(install, /fixture activation interrupted/); } finally { fs.renameSync = original; }
+const journal = path.join(root, '.skill-tree/installation/.journal.json');
+const carrier = path.join(root, '.skill-tree/artifacts/setup-operations', id+'.json');
+const partial = JSON.parse(fs.readFileSync(carrier));
+assert.equal(partial.status,'failed');
+assert.equal(partial.activation_journal_sha256,require('node:crypto').createHash('sha256').update(fs.readFileSync(journal)).digest('hex'));
+assert.equal(install().operation_id,id);
+assert.equal(fs.existsSync(journal),false);
+const complete = fs.readFileSync(carrier);
+assert.equal(install().replayed,true);
+assert.deepEqual(fs.readFileSync(carrier),complete);
+"""
+        result = subprocess.run(['node', '-e', script, str(CORE), str(root.resolve()), operation_id],
+                                capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+        result = self.operation_receipt(root, operation_id)
+        self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+        completed = json.loads(result.stdout)
+        self.assertEqual((completed['status'], completed['attempts']), ('completed', 2))
+        self.assertRegex(completed['activation_journal_sha256'], r'^[a-f0-9]{64}$')
 
     def test_default_and_selected_audits_use_distinct_installed_child_tools(self):
         first, first_queue, first_area = self.product('site', install=True)

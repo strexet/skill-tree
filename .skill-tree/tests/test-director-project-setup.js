@@ -103,7 +103,31 @@ test('installed Setup registers existing, default and custom projects with selec
     assert.equal(invoke('project-preview',choice).checkout,target);
     const result=invoke('project-setup',choice);
     assert.equal(result.status,'registered');assert.equal(result.checkout,target);assert.equal(result.flavor,flavor);
+    assert.match(result.operation_id,/^OP-[a-f0-9-]+$/);
+    const registration = path.join(home, '.skill-tree/artifacts/director/projects', choice.name + '.json');
+    const installedReceipt = path.join(home, '.skill-tree/artifacts/setup-operations', result.operation_id + '.json');
+    const registrationInode = fs.statSync(registration).ino;
+    const setupReceiptBytes = fs.readFileSync(installedReceipt);
+    const replay = invoke('project-setup', {...choice,operation_id:result.operation_id});
+    assert.equal(replay.queue_id,result.queue_id);
+    assert.equal(replay.replayed,true);
+    assert.equal(fs.statSync(registration).ino,registrationInode);
+    assert.deepEqual(fs.readFileSync(installedReceipt),setupReceiptBytes);
     if (choice.name === 'site') {
+      const replayRegistryPath = path.join(home,'.skill-tree/director/registry.json');
+      const registryBefore = fs.readFileSync(replayRegistryPath);
+      const changed = JSON.parse(registryBefore);
+      delete changed.areas.site;
+      const changedRegistry = JSON.stringify(changed);
+      fs.writeFileSync(replayRegistryPath,changedRegistry);
+      try {
+        assert.throws(() => invoke('project-setup',{...choice,operation_id:result.operation_id}),
+                      /Registered Director area or local binding changed/);
+        assert.equal(fs.readFileSync(replayRegistryPath,'utf8'),changedRegistry);
+        assert.deepEqual(fs.readFileSync(installedReceipt),setupReceiptBytes);
+      } finally {
+        fs.writeFileSync(replayRegistryPath,registryBefore);
+      }
       const menu=invoke('project-menu');
       assert.deepEqual(menu.choices,['intake','status','audit','setup']);
       assert.deepEqual(menu.projects.map(project=>project.id),['site']);

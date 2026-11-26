@@ -583,6 +583,7 @@ async function main(argv = process.argv.slice(2), {promptFactory} = {}) {
             bridges: args.withInit && provider.bridgePath ? [provider.bridgePath] : [], recoverPluginPending: false});
         }
         rows.push({provider: provider.id, ok: true, action: result.action, flavor, changed: result.delta,
+          operation_id: result.operation_id,
           profile_identity: result.profile.identity, environment_identity: result.profile.environment_id,
           input_fingerprints: result.profile.inputs,
           packages: Object.entries(result.profile.destinations).map(([destination, record]) => ({
@@ -591,7 +592,7 @@ async function main(argv = process.argv.slice(2), {promptFactory} = {}) {
           policy: "Immediate focused feedback; scoped additional boundary checks; no implicit product execution.",
           facts: result.profile.facts, gaps: result.profile.gaps});
       } catch (error) {
-        rows.push({provider: provider.id, ok: false, error: error.message});
+        rows.push({provider: provider.id, ok: false, error: error.message, operation_id: error.operation_id});
       }
     }
 

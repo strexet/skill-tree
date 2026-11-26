@@ -1,11 +1,14 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path');
+const {randomUUID}=require('node:crypto');
 const c=require('./composer.js');
 const development=require('./development-policies.js');
 const BEGIN='<!-- BEGIN skill-tree-skills -->',END='<!-- END skill-tree-skills -->';
 const INSTALL='.skill-tree/installation',PROFILE=INSTALL+'/profile.json';
 const AGENTS_PATH='AGENTS.md',REGENERATE_AGENTS=Symbol('regenerate-agents');
 const INITIAL_WORKTREE_PROFILE=Symbol('initial-worktree-profile');
+const SETUP_OPERATIONS='.skill-tree/artifacts/setup-operations';
+const setupOperationId=/^OP-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/;
 const isCodexBridge=record=>Array.isArray(record?.providers)&&record.providers.includes('codex');
 const TASK_GROUPING_SOURCE='common/scripts/workflow-state.py';
 const TASK_GROUPING_BUNDLE=INSTALL+'/source/'+TASK_GROUPING_SOURCE;
@@ -260,8 +263,17 @@ function verifyPluginBackups(root){
  }
  if(c.json(actual)!==c.json(expected.sort()))throw conflict();
 }
-function recover(root,channel='core'){
- const paths=transactionPaths(channel),journal=c.readJson(root,paths.journal,null);if(!journal)return;
+function recover(root,channel='core',observed){
+ const paths=transactionPaths(channel);
+ let journal;
+ if(observed===undefined)journal=c.readJson(root,paths.journal,null);
+ else{
+  const raw=setupProofBytes(root,paths.journal);
+  const current=raw===null?null:Buffer.isBuffer(raw)?c.hash(raw):'unavailable';
+  if(current==='unavailable'||current!==observed)throw Error('Cannot recover a journal without its exact sealed bytes');
+  if(raw!==null){journal=JSON.parse(raw.toString('utf8').replace(/^\uFEFF/,''));if(!journal)throw Error('Unsupported installation journal');}
+ }
+ if(!journal)return;
  const tree=rel=>treeHash(root,rel,channel==='plugins');
  if(journal.schema!==1||!Array.isArray(journal.entries)||Object.hasOwn(journal,'channel')&&journal.channel!==channel||channel==='plugins'&&journal.channel!=='plugins')throw Error('Unsupported installation journal');
  for(const e of journal.entries){
@@ -301,10 +313,11 @@ function recover(root,channel='core'){
  fs.unlinkSync(c.safe(root,paths.journal));
  // Backups retain one completed generation for explicit reviewed rollback.
 }
-function transaction(root,changes,expected={},beforeActivate=null,channel='core'){
+function transaction(root,changes,expected={},beforeActivate=null,channel='core',sealJournal){
  const {stage,backups,journal}=transactionPaths(channel);
  const plugin=channel==='plugins',tree=rel=>treeHash(root,rel,plugin);
  const staging=c.safe(root,stage),journalPath=c.safe(root,journal);
+ let sealed;
  if(fs.existsSync(staging)){
   if(plugin)throw Error('Plugin staging already exists; inspect the retained files before retrying');
   fs.rmSync(staging,{recursive:true});
@@ -323,29 +336,142 @@ function transaction(root,changes,expected={},beforeActivate=null,channel='core'
   if(beforeActivate)beforeActivate();
   if(!entries.length)return;
   if(plugin)verifyPluginBackups(root);
-  if(fs.existsSync(c.safe(root,backups)))fs.rmSync(c.safe(root,backups),{recursive:true});
   const metadata=plugin?{}:{project_root:fs.realpathSync(root)};
-  fs.writeFileSync(journalPath,c.json({schema:1,channel,entries,...metadata}));
+  const journalBytes=c.json({schema:1,channel,entries,...metadata});
+  if(sealJournal){sealJournal(journalBytes);sealed=c.hash(journalBytes);}
+  if(fs.existsSync(c.safe(root,backups)))fs.rmSync(c.safe(root,backups),{recursive:true});
+  fs.writeFileSync(journalPath,journalBytes);
  }finally{
   if(!fs.existsSync(journalPath))fs.rmSync(staging,{recursive:true,force:true});
  }
- recover(root,channel);
+ recover(root,channel,sealed);
 }
-function locked(root,action,{recoverPending=true,recoverPluginPending=true,onPending}={}){
+function setupProofBytes(root,relative,limit=16*1024*1024){
+ try{
+  const file=c.safe(root,relative);
+  const stat=fs.lstatSync(file,{throwIfNoEntry:false});
+  if(!stat)return null;
+  if(!stat.isFile()||stat.size>limit)return 'unavailable';
+  const fd=fs.openSync(file,fs.constants.O_RDONLY|fs.constants.O_NOFOLLOW|fs.constants.O_NONBLOCK);
+  try{
+   const actual=fs.fstatSync(fd);
+   if(!actual.isFile()||actual.dev!==stat.dev||actual.ino!==stat.ino||actual.size>limit)return 'unavailable';
+   const raw=Buffer.alloc(actual.size+1);
+   const size=fs.readSync(fd,raw,0,raw.length,0);
+   if(size!==actual.size||fs.fstatSync(fd).mtimeMs!==actual.mtimeMs)return 'unavailable';
+   return raw.subarray(0,size);
+  }finally{fs.closeSync(fd);}
+ }catch{return 'unavailable';}
+}
+function setupObservation(root){
+ const inputs={profile_sha256:PROFILE};
+ for(const channel of ['core','plugins']){
+  const {journal,last}=transactionPaths(channel);
+  inputs[channel+'_journal_sha256']=journal;
+  inputs[channel+'_last_sha256']=last;
+ }
+ return Object.fromEntries(Object.entries(inputs).map(([key,relative])=>{
+  const raw=setupProofBytes(root,relative);
+  return [key,Buffer.isBuffer(raw)?c.hash(raw):raw];
+ }));
+}
+function writeSetupReceipt(root,relative,record,exclusive){
+ const target=c.safe(root,relative);
+ fs.mkdirSync(path.dirname(target),{recursive:true});
+ const temporary=c.safe(root,SETUP_OPERATIONS+'/.pending-'+randomUUID());
+ try{
+  const fd=fs.openSync(temporary,'wx',0o600);
+  try{fs.writeFileSync(fd,c.json(record));fs.fsyncSync(fd);}finally{fs.closeSync(fd);}
+  if(exclusive)fs.linkSync(temporary,c.safe(root,relative));
+  else fs.renameSync(temporary,c.safe(root,relative));
+ }finally{fs.rmSync(temporary,{force:true});}
+}
+function beginSetupOperation(root,setup){
+ const id=setup.id??'OP-'+randomUUID();
+ if(!setupOperationId.test(id))throw Error('Select an exact setup operation ID');
+ const relative=SETUP_OPERATIONS+'/'+id+'.json';
+ const request=c.hash(c.json({kind:setup.kind,scope:setup.scope()}));
+ const current=setupObservation(root);
+ const retained=setupProofBytes(root,relative,4096);
+ if(retained==='unavailable')throw Error('The selected setup operation receipt cannot be read');
+ const previous=retained===null?null:JSON.parse(retained);
+ if(previous){
+  if(previous.schema!==1||previous.operation_id!==id||previous.kind!==setup.kind||previous.request_sha256!==request||
+     !['pending','failed','completed'].includes(previous.status)||
+     !Number.isSafeInteger(previous.attempts)||previous.attempts<1)
+   throw Error('Setup operation ID belongs to a different request');
+  if(previous.status==='completed'){
+   if(Object.values(current).includes('unavailable')||c.json(current)!==c.json(previous.observed)||
+      current.core_journal_sha256!==null||current.plugins_journal_sha256!==null)
+    throw Error('The completed setup operation no longer covers the observed journal or profile');
+   return {id,replayed:true};
+  }
+  for(const channel of ['core','plugins']){
+   const journal=channel+'_journal_sha256',last=channel+'_last_sha256';
+   const activation=channel==='core'?previous.activation_journal_sha256:null;
+   const expected=activation??previous.before?.[journal];
+   const consumed=typeof expected==='string'&&expected!=='unavailable'&&current[journal]===null&&
+     current[last]===expected&&previous.before[last]!==expected;
+   const unpublished=activation&&current[journal]===null&&current[last]===previous.observed[last]&&
+     current.profile_sha256===previous.observed.profile_sha256;
+   if(expected==='unavailable'||current[journal]!==expected&&!consumed&&!unpublished)
+    throw Error('Setup operation journal changed since the original attempt');
+  }
+ }
+ const timestamp=new Date().toISOString();
+ const record={schema:1,operation_id:id,kind:setup.kind,request_sha256:request,
+  status:'pending',stage:'recover',started_at:previous?.started_at??timestamp,observed_at:timestamp,
+  attempts:(previous?.attempts??0)+1,before:previous?.before??current,observed:current,
+  activation_journal_sha256:previous?.activation_journal_sha256??null};
+ writeSetupReceipt(root,relative,record,!previous);
+ return {id,record,relative,frontier:current};
+}
+function sealSetupActivation(root,session,journalBytes){
+ if(Buffer.byteLength(journalBytes)>16*1024*1024)throw Error('The installation activation journal exceeds the proof limit');
+ session.record={...session.record,stage:'install',activation_journal_sha256:c.hash(journalBytes),
+  observed_at:new Date().toISOString(),observed:setupObservation(root)};
+ writeSetupReceipt(root,session.relative,session.record,false);
+}
+function finishSetupOperation(root,session,status,stage){
+ if(!session)return;
+ writeSetupReceipt(root,session.relative,{...session.record,status,stage,
+  observed_at:new Date().toISOString(),observed:setupObservation(root)},false);
+}
+function locked(root,action,{recoverPending=true,recoverPluginPending=true,onPending,setup}={}){
  const owner=queueRoot(root),barrier=owner!==root?path.join(owner,INSTALL+'/.install-lock'):null;let barrierFd;
  if(barrier){fs.mkdirSync(path.dirname(barrier),{recursive:true});try{barrierFd=fs.openSync(barrier,'wx',0o600);fs.writeFileSync(barrierFd,c.json({pid:process.pid,host:require('node:os').hostname()}));}catch{throw Error('Canonical installation lock exists');}}
  const dir=c.safe(root,INSTALL);fs.mkdirSync(dir,{recursive:true});const lock=c.safe(root,INSTALL+'/.install-lock');let fd;
  try{fd=fs.openSync(lock,'wx',0o600);}catch{if(barrier){fs.closeSync(barrierFd);fs.unlinkSync(barrier);}throw Error('Installation lock exists; inspect PID/host before explicit removal');}
  try{fs.writeFileSync(fd,c.json({pid:process.pid,host:require('node:os').hostname()}));if(fs.existsSync(c.safe(owner,'.skill-tree/.writer-lock')))throw Error('Workflow writer lock exists; reach a cleanup/handoff boundary before installation');
-  const pluginPending=fs.existsSync(c.safe(root,transactionPaths('plugins').journal));
-  if(pluginPending&&!recoverPluginPending)throw Error('Plugin installation recovery is required; use the owned manager --recover');
-  const pending=pluginPending||fs.existsSync(c.safe(root,transactionPaths('core').journal));
-  if(pending&&!recoverPending){
-   if(typeof onPending==='function')return onPending();
-   throw Error('Owned installation recovery is required before this operation');
+  const session=setup?beginSetupOperation(root,setup):null;
+  if(session?.replayed)return {...setup.replay(),operation_id:session.id,replayed:true};
+  let stage='recover',value;
+  try{
+   if(session&&['core','plugins'].some(channel=>session.frontier[channel+'_journal_sha256']==='unavailable'))
+    throw Error('Cannot recover a journal without its exact sealed bytes');
+   const pluginPending=fs.existsSync(c.safe(root,transactionPaths('plugins').journal));
+   if(pluginPending&&!recoverPluginPending)throw Error('Plugin installation recovery is required; use the owned manager --recover');
+   const pending=pluginPending||fs.existsSync(c.safe(root,transactionPaths('core').journal));
+   if(pending&&!recoverPending){
+    if(typeof onPending==='function')return onPending();
+    throw Error('Owned installation recovery is required before this operation');
+   }
+   if(pending&&hasActiveOperation(root))throw Error('Active controller must reach a stopped cleanup/handoff before transaction recovery');
+   recover(root,'core',session?.frontier.core_journal_sha256);
+   recover(root,'plugins',session?.frontier.plugins_journal_sha256);
+   stage=setup?.kind==='install'?'install':'recover';
+   value=action(session);
+  }catch(error){
+   if(session){
+    error.operation_id=session.id;
+    try{finishSetupOperation(root,session,'failed',stage);}catch{error.operation_receipt_pending=true;}
+   }
+   throw error;
   }
-  if(pending&&hasActiveOperation(root))throw Error('Active controller must reach a stopped cleanup/handoff before transaction recovery');
-  recover(root);recover(root,'plugins');return action();
+  if(!session)return value;
+  try{finishSetupOperation(root,session,'completed','complete');}
+  catch(error){error.operation_id=session.id;throw error;}
+  return {...value,operation_id:session.id};
  }finally{fs.closeSync(fd);fs.unlinkSync(lock);if(barrier){fs.closeSync(barrierFd);fs.unlinkSync(barrier);}}
 }
 function bundle(source,flavor){
@@ -516,7 +642,19 @@ function regenerateAgents(root,source,dryRun=false){
 }
 function install(root,source,flavor,selections,options={}){
  if(options.dryRun){const result=plan(root,source,flavor,selections,options);return {profile:result.profile,delta:result.delta,action:'dry-run'};}
- return locked(root,()=>{
+ const setup={
+  kind:'install',id:options.operationId,
+  scope:()=>({source:c.sourceInputs(source),flavor,selections,bridges:options.bridges??[],
+   development_policy:options.developmentPolicy??null,recover_pending:options.recoverPending!==false,
+   recover_plugins:options.recoverPluginPending!==false}),
+  replay:()=>{
+   if(options.guardPlan||options.updateDevelopmentPolicy)throw Error('Guarded installation replay requires a fresh operation');
+   const candidate=plan(root,source,flavor,selections,options);
+   if(candidate.delta.length)throw Error('The previously verified setup generation changed');
+   return {profile:verify(root,source),delta:[],action:'verified no-op current'};
+  }
+ };
+ return locked(root,(session)=>{
   const planned=options.updateDevelopmentPolicy?{...options,developmentPolicy:options.updateDevelopmentPolicy()}:options;
   const result=plan(root,source,flavor,selections,planned);
   options.guardPlan?.(result);
@@ -524,13 +662,14 @@ function install(root,source,flavor,selections,options={}){
    const current=c.resolveProfile(source,root,flavor,planned);
    if(current.environment_id!==result.profile.environment_id)throw Error('Project inputs changed during profile staging; refresh from current inputs');
    options.guardPlan?.(result);
-  });
+  },'core',session?(journalBytes)=>sealSetupActivation(root,session,journalBytes):undefined);
   try{verify(root,source);}catch(error){
    if(result.delta.length){try{restoreGeneration(root);}catch(recovery){throw Error('Profile verification failed; preserved generation backups require conflict review: '+error.message+'; '+recovery.message);}}
    throw error;
   }
   return {profile:result.profile,delta:result.delta,action:result.delta.length?'installed':'verified no-op current'};
- },{recoverPending:options.recoverPending,recoverPluginPending:options.recoverPluginPending});
+ },{recoverPending:options.recoverPending,recoverPluginPending:options.recoverPluginPending,
+    setup:Object.hasOwn(options,INITIAL_WORKTREE_PROFILE)?undefined:setup});
 }
 function uninstall(root,selections,options={}){
  function action(){const p=receipt(root,true);verifyOwned(root,p);if(hasActiveOperation(root))throw Error('Active controller must stop before uninstall');const next=JSON.parse(c.json(p)),changes={},expected={};
@@ -845,16 +984,26 @@ function localMain(root,source,args){
  try{
   if(['lock-api','unlock-api'].includes(args[0])){console.log(c.json(require('./api-contract-locks.js').runCommand(root,source,args[0],args.slice(1))));return 0;}
   if(args.includes('--list-plugins'))return require('./plugins.js').listMain(root,args,{source});
-  if(args.some(a=>!['--refresh-profile','--regenerate-agents','--dry-run','--verify','--recover','--rollback','--rebind'].includes(a)))throw Error('Usage: manager.js --refresh-profile [--dry-run] | --regenerate-agents [--dry-run] | --verify | --recover | --rollback | --rebind | lock-api <target> [--file <path>] [--baseline <ref>] | unlock-api <target|--all>');
+  const ids=args.filter(arg=>arg.startsWith('--operation-id='));
+  if(ids.length){
+   if(ids.length!==1||!args.includes('--recover')||!setupOperationId.test(ids[0].slice('--operation-id='.length)))
+    throw Error('Select one exact --operation-id=OP-… for --recover');
+   args=args.filter(arg=>!arg.startsWith('--operation-id='));
+  }
+  if(args.some(a=>!['--refresh-profile','--regenerate-agents','--dry-run','--verify','--recover','--rollback','--rebind'].includes(a)))throw Error('Usage: manager.js --refresh-profile [--dry-run] | --regenerate-agents [--dry-run] | --verify | --recover [--operation-id=OP-…] | --rollback | --rebind | lock-api <target> [--file <path>] [--baseline <ref>] | unlock-api <target|--all>');
   const operations=args.filter(a=>a!=='--dry-run');
   if(operations.length!==1||args.filter(a=>a==='--dry-run').length>1||args.includes('--dry-run')&&!['--refresh-profile','--regenerate-agents'].includes(operations[0]))throw Error('Select exactly one manager operation; --dry-run applies only to --refresh-profile or --regenerate-agents');
   if(args.includes('--regenerate-agents')){console.log(c.json(regenerateAgents(root,source,args.includes('--dry-run'))));return 0;}
   if(args.includes('--rebind')){console.log(c.json(rebind(root,source)));return 0;}
   if(args.includes('--rollback')){console.log(c.json(rollback(root)));return 0;}
-  if(args.includes('--recover')){locked(root,()=>{});console.log('Installation recovery complete');return 0;}
+  if(args.includes('--recover')){
+   const result=locked(root,()=>({}),{setup:{kind:'recover',id:ids[0]?.slice('--operation-id='.length),
+    scope:()=>({channels:['core','plugins']}),replay:()=>({})}});
+   console.log('Installation recovery complete ('+result.operation_id+')');return 0;
+  }
   if(args.includes('--verify')){verify(root,source);console.log('Owned installation verified');return 0;}
   if(!args.includes('--refresh-profile'))throw Error('Use --refresh-profile or --verify');
-  const result=refresh(root,source,args.includes('--dry-run'));console.log(c.json({action:result.action,changed:result.delta,facts:result.profile.facts,gaps:result.profile.gaps}));return 0;
- }catch(error){console.error(error.message);return 2;}
+  const result=refresh(root,source,args.includes('--dry-run'));console.log(c.json({action:result.action,changed:result.delta,facts:result.profile.facts,gaps:result.profile.gaps,operation_id:result.operation_id}));return 0;
+ }catch(error){console.error(error.message);if(error.operation_id)console.error('Setup operation '+error.operation_id);return 2;}
 }
 module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,readHookRecords,pendingHookOperation,stoppedWorkflow,plan,install,initialWorktreeProfile,verify,verifyTaskGroupingProfile,uninstall,refresh,maintainDeliveredProfile,rollback,rebind,localMain,updateDevelopmentPolicy};

@@ -1702,10 +1702,16 @@ def main(argv=None):
             method = director.preview if args.command.endswith('-preview') else director.apply
             result = method(payload, rebind=rebind)
     except DirectorPrerequisite as error:
-        print(WF.dump({'ok': False, 'error': str(error), 'prerequisite': error.prerequisite}), end='')
+        result = {'ok': False, 'error': str(error), 'prerequisite': error.prerequisite}
+        if hasattr(error, 'operation_id'):
+            result['operation_id'] = error.operation_id
+        print(WF.dump(result), end='')
         return 2
     except (ValueError, OSError, subprocess.TimeoutExpired) as error:
-        print(WF.dump({'ok': False, 'error': str(error)}), end='')
+        result = {'ok': False, 'error': str(error)}
+        if hasattr(error, 'operation_id'):
+            result['operation_id'] = error.operation_id
+        print(WF.dump(result), end='')
         return 2
     print(WF.dump(result), end='')
     return 0
