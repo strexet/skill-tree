@@ -954,12 +954,15 @@ def _processing_proposal(store,payload,text,state,assigned,pr):
         run['processing_results'].append(receipt)
         if not run.get('stop_reason'):run['phase']='dependencies';run['next_action']='Select required task'
         allowed=set(run['admitted_task_ids']);introduced=set();updated=parse(text)
+        completion_records = {item['task_id']:item for item in outcomes if item['disposition']=='completed'}
         for tid in produced+reused:
             child=resolve(updated,[tid])[0]
             if child['relation'] in {'blocker','subtask'} and child['related_task_id'] in allowed:
-                introduced.update(dependency_scope(updated,{'snapshot':[tid]}))
+                introduced.update(verified_dependency_scope(store,updated,{'snapshot':[tid]},completion_records))
         if dependency_scope(updated,run)-allowed-introduced:raise WorkflowError('Processing cannot admit a dependency outside the captured required scope')
-        run['admitted_task_ids']=sorted(allowed|introduced);run['required_ids']=list(dict.fromkeys(run['required_ids']+sorted(introduced)));run['admitted_groups']=admitted_groups(updated,run)
+        run['admitted_task_ids']=sorted(allowed|introduced);run['required_ids']=list(dict.fromkeys(run['required_ids']+sorted(introduced)))
+        newly_required = [completion_records[tid] for tid in sorted((introduced-allowed) & completion_records.keys())]
+        run['admitted_groups']=admitted_groups(updated,run,newly_required)
         focus=run.get('maintenance')
         if focus:
             focused=dependency_scope(updated,focus)
@@ -1174,7 +1177,11 @@ def group_selection(store, payload):
             if batch_id in receipt_members and not origins.intersection(receipt_members[batch_id]):
                 raise WorkflowError('Selected task lacks original Pending provenance: '+task['id'])
     ids = [task['id'] for task in group]
-    outside = dependency_scope(tasks, {'snapshot': ids}) - set(ids)
+    if payload['queue']=='prioritized':
+        completed = {item['task_id']:item for item in store.outcomes() if item['disposition']=='completed'}
+        outside = verified_dependency_scope(store,tasks,{'snapshot':ids},completed) - set(ids)
+    else:
+        outside = dependency_scope(tasks,{'snapshot':ids}) - set(ids)
     pending_blockers = {}
     if payload['queue'] == 'pending' and any(task.get(PENDING_DEPENDENCY_FIELD) for task in group):
         pending, promoted, declined = pending_dependency_context(store, tasks)
@@ -1290,7 +1297,13 @@ def start(store,mode,selector=None,limits=None,workspace=None,*,reviewed_directe
         tasks,chosen,snapshot=_start_selection(store,mode,selector,options,text)
         run={'id':identity('WR'),'mode':mode,'snapshot':snapshot,'root_task_id':chosen['id'],'current_task_id':chosen['id'],'phase':'implement','required_ids':[chosen['id']],'deferred_ids':[],'pending_ids':[],'processing_results':[],'completed_ids':[],'limits':limits or {},'partial_work':[],'stop_reason':None,'next_action':'Implement selected task','started_at':now()}
         for tid in dependency_scope(tasks,run):clarification_admission(store,tid)
-        run['admission']=admission;run['admitted_task_ids']=sorted(dependency_scope(tasks,run));run['required_ids']=list(run['admitted_task_ids']);run['admitted_groups']=admitted_groups(tasks,run)
+        run['admission']=admission
+        completed = {item['task_id']:item for item in store.outcomes() if item['disposition']=='completed'}
+        # Normal Core controllers authorize the selected roots and immutable required history.
+        # Directed dispatch retains the scope already approved by the Director assignment.
+        scope = dependency_scope(tasks,run) if dispatch else verified_dependency_scope(store,tasks,run,completed)
+        run['admitted_task_ids']=sorted(scope);run['required_ids']=list(run['admitted_task_ids'])
+        run['admitted_groups']=admitted_groups(tasks,run,[completed[task_id] for task_id in sorted(scope & completed.keys())])
         if registry:
             if operation:
                 run['implementation_operation']=operation
@@ -1298,7 +1311,7 @@ def start(store,mode,selector=None,limits=None,workspace=None,*,reviewed_directe
                 if workspaces.checked_out_branch(store.source_root)!=review_policy['launch']:
                     raise WorkflowError('The launch checkout changed before run reservation')
                 run['reviewed_local_delivery']=review_policy
-            done={o['task_id'] for o in store.outcomes() if o['disposition']=='completed'}
+            done=completed.keys()
             conflicts={tid:registry['claims'][tid] for tid in run['admitted_task_ids'] if tid not in done and tid in registry['claims']}
             if conflicts:raise WorkflowError('Required task claims conflict: '+dump(conflicts))
             path=workspaces.provision(store,run,options)
@@ -1364,9 +1377,15 @@ def next_task(store):
     visiting=set();visited=set()
     def walk(tid):
         if tid in done:
+            if tid in visited:
+                return []
             if state.get('run_registry'):
-                gap=completed_source_gap(store,state,completed[tid])
-                if gap:return [{**gap,'priority':0,'completed_contract':True}]
+                gap = required_completed_gap(store,state,completed,[tid])
+                if gap:
+                    if gap['task_id'] not in run['admitted_task_ids'] or gap['task_id'] not in run['required_ids']:
+                        raise WorkflowError('Completed prerequisite requires current verification outside the frozen run scope: '+gap['task_id'])
+                    return [{**gap,'priority':0,'completed_contract':True}]
+            visited.add(tid)
             return []
         if tid in visiting:raise WorkflowError('Dependency cycle: '+tid)
         if tid not in by_id:raise WorkflowError('Missing task without completion evidence: '+tid)
@@ -1383,9 +1402,10 @@ def next_task(store):
     if root in done:
         remaining=[tid for tid in run['snapshot'] if tid not in done]
         if not remaining:
-            stale=stale_completed_checks(store,state)
-            gap=stale[0] if stale else first_completed_source_gap(store,state,completed)
-            if gap:return completed_revalidation_handoff(store,root,gap)
+            gap = first_completed_source_gap(store,state,completed)
+            if gap:
+                stale = stale_completed_checks(store,state)
+                return completed_revalidation_handoff(store,root,gap,state,completed,[item['task_id'] for item in stale])
             return {'phase':'deferred-processing','pending_ids':[t['id'] for t in tasks if t['queue']=='Pending Queue' and t['id'] in run['pending_ids'] and t['relation']=='followup']}
         # Current priorities decide remaining initial roots; absent entries never count as done.
         for tid in remaining:
@@ -1397,7 +1417,8 @@ def next_task(store):
     pending=[t['id'] for t in tasks if t['queue']=='Pending Queue' and t['root_task_id']==root and t['relation'] in {'blocker','subtask'}]
     if pending:return {'phase':'process-required','root_task_id':root,'pending_ids':pending}
     if task.get('completed_contract'):
-        return completed_revalidation_handoff(store,root,task)
+        return completed_revalidation_handoff(store,root,task,state,completed,
+                                              [item['task_id'] for item in candidates if item.get('completed_contract')])
     if task['status']!='Ready':
         session=processing_helper().session_for_task(store,task['id'])
         if session:raise WorkflowError('Selected required task has an open post-processing hold: '+session['id']+' — '+session['next_action'])
@@ -1416,17 +1437,225 @@ def next_task(store):
         consumers=any(task['id'] in candidate['depends_on'] for candidate in tasks if candidate['id'] in scope_ids(tasks,run))
         group=task.get('validation_group_id')
         if group and not early and not consumers:
-            eligible=[candidate for candidate in tasks if candidate['id'] in scope_ids(tasks,run) and candidate.get('validation_group_id')==group and candidate['queue']=='Prioritized Next Changes' and candidate['status']=='Ready' and state['task_progress'].get(candidate['id'],{}).get('stage') not in {'awaiting-validation','blocked'} and all(dep in done for dep in candidate['depends_on'])]
-            if eligible:task=max(eligible,key=lambda candidate:candidate['priority']);stage=state['task_progress'].get(task['id'],{}).get('stage')
+            scope = scope_ids(tasks,run)
+            eligible = []
+            for candidate in tasks:
+                if (candidate['id'] not in scope or candidate.get('validation_group_id') != group
+                        or candidate['queue'] != 'Prioritized Next Changes' or candidate['status'] != 'Ready'
+                        or state['task_progress'].get(candidate['id'],{}).get('stage') in {'awaiting-validation','blocked'}
+                        or any(dep not in done for dep in candidate['depends_on'])):
+                    continue
+                if state.get('run_registry'):
+                    try:
+                        if required_completed_gap(store,state,completed,candidate['depends_on']):
+                            continue
+                    except WorkflowError:
+                        # The optional group switch cannot interrupt validation of the original task.
+                        continue
+                eligible.append(candidate)
+            if eligible:
+                task = max(eligible,key=lambda candidate:candidate['priority'])
+                stage = state['task_progress'].get(task['id'],{}).get('stage')
     clarification_admission(store,task['id'])
-    return {'phase':'validate' if stage=='awaiting-validation' else 'implement','root_task_id':root,'task_id':task['id'],'title':task['title'],'priority':task['priority'],'body':task['body'],'checks':check_specs(task)}
+    result = {'phase':'validate' if stage=='awaiting-validation' else 'implement','root_task_id':root,
+              'task_id':task['id'],'title':task['title'],'priority':task['priority'],'body':task['body'],'checks':check_specs(task)}
+    if result['phase'] == 'implement':
+        paths = []
+        for line in section_body(task['body'],'Touch').splitlines():
+            if not line.startswith('- '):
+                continue
+            declared = line[2:].strip().strip('`')
+            if declared != '.':
+                try:
+                    declared = workspaces.worker_path(declared)
+                except workspaces.RunError:
+                    continue
+            paths.append(declared)
+        if paths:
+            result['validation_impact'] = validation_impact(store,{'paths':paths},state=state,tasks=tasks)
+    return result
 
-def completed_revalidation_handoff(store,root,gap):
-    task=validation_task(store,gap['task_id'])
-    handoff={'phase':'validate','task_id':task['id'],'root_task_id':root,'completed_contract':True,
-             'title':task['title'],'body':task['body'],'checks':check_specs(task)}
-    if 'source_review' in gap:handoff.update(checks=[],source_review=gap['source_review'])
+def validation_impact(store, payload, *, state=None, tasks=None):
+    """Report possible check invalidation within the selected run's exact scope."""
+    paths = payload.get('paths') if isinstance(payload, dict) and set(payload) == {'paths'} else None
+    if not isinstance(paths, list) or not paths or any(not isinstance(path, str) for path in paths):
+        raise WorkflowError('Validation impact requires explicit repository-relative paths')
+    paths = list(dict.fromkeys(paths))
+    for path in paths:
+        if path != '.':
+            workspaces.worker_path(path)
+    state = store.load() if state is None else state
+    controller = state.get('active_run')
+    if not controller:
+        raise WorkflowError('Select an exact run before planning validation impact')
+    run = execution_run(controller)
+    tasks = parse(store.text()) if tasks is None else tasks
+    admitted = scope_ids(tasks,run) | (set(run['admitted_task_ids']) & set(run['required_ids']))
+    open_tasks = {task['id']: task for task in tasks if task['id'] in admitted and task['queue']=='Prioritized Next Changes'}
+    outcomes = {item['task_id']:item for item in store.outcomes() if item['disposition']=='completed'}
+    done = {tid:outcomes[tid] for tid in admitted & outcomes.keys()}
+    consumers, prerequisites = {}, []
+    for task_id in open_tasks:
+        selection = {'snapshot':[task_id]}
+        try:
+            consumers[task_id] = verified_dependency_scope(store,tasks,selection,outcomes)
+        except WorkflowError as error:
+            consumers[task_id] = dependency_scope(tasks,selection)
+            prerequisites.append({'task_id':task_id,'reason':str(error)})
+    profile_path = store.source_root/'.skill-tree/installation/profile.json'
+    local_config = store.source_root/'.skill-tree/config/repository.json'
+    profile = json.loads(profile_path.read_text()) if profile_path.is_file() else {}
+    local = json.loads(local_config.read_text()) if local_config.is_file() else {}
+    recipes = profile.get('recipes',local.get('recipes',{}))
+
+    def matches(inputs):
+        return sorted({path for path in paths for source in inputs
+                       if source == '.' or path == '.' or workspaces.local_overlap(path,source)})
+
+    affected, uncovered = [], []
+    for tid in sorted(set(open_tasks) | set(done)):
+        old = done.get(tid,{})
+        active_task = open_tasks.get(tid)
+        checks = check_specs(active_task) if active_task else old.get('validation_plan',[])
+        seen_sources = set()
+        reported = {entry['check']['id']: entry['result'] for entry in old.get('check_results',[])}
+        for check in checks:
+            recipe = recipes.get(check['recipe_id'],{})
+            lane = recipe.get('lane','static' if check['recipe_id']=='static-inspection' else 'unavailable')
+            binding = profile.get('execution_bindings',{}).get(recipe.get('execution_binding'),{})
+            inputs = set(check['sources']) | set(recipe.get('input_paths',[]))
+            inputs.update(binding.get('source_paths',[]))
+            inputs.update(binding.get('queue_paths',[]))
+            inputs.update(binding[key] for key in ('locator','review_path') if key in binding)
+            seen_sources.update(check['sources'])
+            matched = matches(inputs)
+            if matched:
+                affected.append({
+                    'task_id':tid,'check_id':check['id'],'lane':lane,'matched_paths':matched,
+                    'requires_runtime_resources':bool(lane in PRODUCT_LANES or recipe.get('execution_binding')),
+                    'consumer_ids':sorted(other for other, closure in consumers.items() if other != tid and tid in closure),
+                    'last_observed_seconds':reported.get(check['id'],{}).get('timing',{}).get('tool_wall_seconds'),
+                })
+        unmatched = matches(old.get('source_fingerprints',{}).keys() - seen_sources)
+        if unmatched:
+            uncovered.append({'task_id':tid,'matched_paths':unmatched})
+    resources = []
+    if any(entry['requires_runtime_resources'] for entry in affected):
+        try:
+            environment = workspaces.environment(store)
+            resources = environment.get('runtime_resource_claims',[])
+            if environment.get('web_runtime_path',{}).get('prerequisite'):
+                prerequisites.append({'reason':environment['web_runtime_path']['prerequisite']})
+        except workspaces.RunError as error:
+            prerequisites.append({'reason':str(error)})
+    return {'paths':paths,'checks':affected,'source_review_candidates':uncovered,
+            'potential_check_count':len(affected),'runtime_resources':resources,'prerequisites':prerequisites}
+
+
+def retained_revalidation_check(store, state, task, check, entry, *, historical):
+    record = entry.get('result')
+    if not record or record.get('result') != 'pass':
+        return None
+    try:
+        sessions = record.get('execution_sessions',{}) if historical else None
+        observed = check_snapshot(store,task,check,state,historical_sessions=sessions)
+        if record['key'] != observed['key'] or record['definition'] != observed['definition']:
+            return None
+        for item in record['evidence']:
+            evidence_pointer(store,item,required=True)
+    except (WorkflowError,workspaces.RunError,KeyError):
+        return None
+    return record
+
+
+def completed_revalidation_checks(store, state, task, outcome):
+    task_id = task['id']
+    run = state['active_run']
+    progress = state['task_progress'].get(task_id)
+    retained = run.get('revalidated_checks',{}).get(task_id,outcome.get('check_results',[]))
+    retained = {entry['check']['id']:entry for entry in retained}
+    current, due = {}, []
+    for check in check_specs(task):
+        slot = progress['checks'].get(check['id'],{}) if progress else retained.get(check['id'],{})
+        historical = not progress or (check['id'] in progress.get('retained_result_attempt_ids',{})
+                     and progress['retained_result_attempt_ids'][check['id']] == slot.get('result',{}).get('attempt_id'))
+        if not pending_check_attempt(slot) and retained_revalidation_check(store,state,task,check,slot,historical=historical):
+            current[check['id']] = slot
+        else:
+            due.append(check)
+    return current,due
+
+
+def prepare_completed_revalidation(store,state,run,task,record):
+    checks, _ = completed_revalidation_checks(store,{**state,'active_run':run},task,record)
+    entry = {
+        'stage':'awaiting-validation','checks':deepcopy(checks),'revalidation':True,
+        'admission':run['admission'],'run_id':state['active_run']['id'],
+        'retained_result_attempt_ids':{key:slot['result']['attempt_id'] for key,slot in checks.items()},
+    }
+    state['task_progress'][task['id']] = entry
+    return entry
+
+
+def completed_revalidation_handoff(store,root,gap,state,completed,candidates):
+    task = validation_task(store,gap['task_id'])
+    task_id = task['id']
+    handoff = {'phase':'validate','task_id':task_id,'root_task_id':root,'completed_contract':True,
+               'title':task['title'],'body':task['body']}
+    if 'source_review' in gap:
+        return {**handoff,'checks':[],'source_review':gap['source_review']}
+    group = task.get('validation_group_id')
+    run = state['active_run']
+    if group and task_id not in run.get('admitted_groups',{}).get(group,[]):
+        raise WorkflowError('Completed prerequisite lacks an admitted historical validation group: '+task_id)
+    kept, due = completed_revalidation_checks(store,state,task,completed[task_id])
+    handoff['checks'] = due
+    handoff['retained_check_ids'] = list(kept)
+    if not group or not due:
+        return handoff
+    eligible = set(candidates) & set(run['admitted_task_ids']) & set(run['required_ids'])
+    eligible &= set(run.get('admitted_groups',{}).get(group,[]))
+    if not eligible - {task_id}:
+        return handoff
+
+    def share_key(member, check):
+        try:
+            recipe,_ = recipe_for(store,check)
+            if recipe['lane'] not in {'static','unit'} or recipe.get('execution_binding') or check.get('fresh_review'):
+                return None
+            return check_snapshot(store,member,check,state)['key']
+        except (WorkflowError,workspaces.RunError):
+            return None
+
+    leaders = {}
+    progress = state['task_progress'].get(task_id,{})
+    if progress.get('stage') == 'blocked':
+        return handoff
+    for check in due:
+        if pending_check_attempt(progress.get('checks',{}).get(check['id'],{})):
+            continue
+        key = share_key(task,check)
+        if key:
+            leaders.setdefault(key,check['id'])
+    peers = []
+    for tid in sorted(eligible - {task_id}):
+        progress = state['task_progress'].get(tid,{})
+        if progress.get('run_id') not in {None,run['id']} or progress.get('stage') == 'blocked':
+            continue
+        peer = validation_task(store,tid)
+        if peer.get('validation_group_id') != group:
+            continue
+        _, checks = completed_revalidation_checks(store,state,peer,completed[tid])
+        for check in checks:
+            if pending_check_attempt(progress.get('checks',{}).get(check['id'],{})):
+                continue
+            key = share_key(peer,check)
+            if key in leaders:
+                peers.append({'from_task_id':task_id,'from_check_id':leaders[key],'task_id':tid,'check_id':check['id']})
+    if peers:
+        handoff['revalidation_bundle'] = peers
     return handoff
+
 
 def advance(store):
     # Read-only selection prepares the exact initial and group-switched hook scopes.
@@ -1440,9 +1669,14 @@ def advance(store):
             run['next_action']=result['phase']
         if result.get('task_id') and result['task_id'] not in run['required_ids']:run['required_ids'].append(result['task_id'])
         if result.get('completed_contract') and 'source_review' not in result:
-            tid=result['task_id'];entry=state['task_progress'].get(tid)
-            if entry and entry.get('run_id') not in {None,state['active_run']['id']}:raise WorkflowError('Task validation progress belongs to another run')
-            if not entry:state['task_progress'][tid]={'stage':'awaiting-validation','checks':{},'revalidation':True,'admission':run['admission'],'run_id':state['active_run']['id']}
+            completed = {item['task_id']:item for item in store.outcomes() if item['disposition']=='completed'}
+            for tid in dict.fromkeys([result['task_id'], *(item['task_id'] for item in result.get('revalidation_bundle',[]))]):
+                entry = state['task_progress'].get(tid)
+                if entry and entry.get('run_id') not in {None,state['active_run']['id']}:
+                    raise WorkflowError('Task validation progress belongs to another run')
+                if not entry:
+                    task = validation_task(store,tid)
+                    prepare_completed_revalidation(store,state,run,task,completed[tid])
         store.save(text,state);return result
 
 def checkpoint(store,payload):
@@ -1554,9 +1788,8 @@ def complete(store,payload):
             if run:enforce_limits(execution_run(run))
             if task['status']!='Ready':raise WorkflowError('Blocked task cannot complete')
             if any(dep not in done for dep in task['depends_on']):raise WorkflowError('Required dependencies remain incomplete')
-            if run and state.get('run_registry'):
-                for dep in task['depends_on']:
-                    if not completed_dependency_integrated(store,state,dep):raise WorkflowError('Completed dependency requires reviewed source integration into the selected worktree: '+dep)
+            completed = {item['task_id']:item for item in outcomes if item['disposition']=='completed'}
+            require_completed_dependencies(store,state,completed,task['depends_on'])
             if any(t['queue']=='Pending Queue' and t['related_task_id']==task['id'] and t['relation'] in {'blocker','subtask'} for t in tasks):raise WorkflowError('Required Pending work remains unprocessed')
             checks=payload.get('acceptance',[])
             if not checks or any(not c.get('criterion') or not c.get('result') for c in checks):raise WorkflowError('Completion requires individual acceptance results')
@@ -1593,6 +1826,8 @@ def complete(store,payload):
         ledger=''.join(json.dumps(o,ensure_ascii=False,sort_keys=True)+'\n' for o in outcomes+[record])
         if state['active_run']:
             run=state['active_run'];run.setdefault('completion_refs',{})[task['id']]=record['id'];run['completed_ids'].append(task['id']) if disposition=='completed' else None
+            if disposition == 'completed' and state.get('run_registry'):
+                run.setdefault('completed_contract_sha256s',{})[task['id']] = completed_contract_sha256(record)
             target=execution_run(run)
             if target is not run and disposition=='completed':target['completed_ids'].append(task['id'])
             target['current_task_id']=None;target['phase']='resume-parent';target['next_action']='Select required task or finish root'
@@ -2893,23 +3128,26 @@ def _implementation_finish_checks(store, state, run, text):
     followups=[t for t in parse(text) if t['id'] in run['pending_ids'] and t['relation']=='followup']
     if any(t['id'] not in {p for r in run['processing_results'] for p in r['selected_ids']} for t in followups):raise WorkflowError('Nonblocking findings require one processing pass before finish')
     assert_admission(store,state)
-    stale=stale_completed_checks(store,state)
-    if stale:raise WorkflowError('Required completed check evidence is stale or unavailable: '+stale[0]['task_id']+'/'+stale[0]['check_id']+'; advance selects the preserved contract for revalidation')
     require_current_completed_sources(store,state,completed)
 
 
 def first_completed_source_gap(store,state,completed):
-    run=state['active_run']
-    for tid in dict.fromkeys(run['snapshot']+run['required_ids']):
-        if tid in completed:
-            gap=completed_source_gap(store,state,completed[tid])
-            if gap:return gap
-    return None
+    run = state['active_run']
+    roots = [tid for tid in dict.fromkeys(run['snapshot']+run['required_ids']) if tid in completed]
+    gap = required_completed_gap(store,state,completed,roots)
+    if gap and (gap['task_id'] not in run['admitted_task_ids'] or gap['task_id'] not in run['required_ids']):
+        raise WorkflowError('Completed prerequisite requires current verification outside the frozen run scope: '+gap['task_id'])
+    return gap
 
 
 def require_current_completed_sources(store,state,completed):
     gap=first_completed_source_gap(store,state,completed)
     if gap:
+        if gap.get('pending_revalidation'):
+            raise WorkflowError('Completed contract revalidation remains pending: '+gap['task_id'])
+        if 'check_id' in gap:
+            raise WorkflowError('Required completed check evidence is stale or unavailable: '
+                                +gap['task_id']+'/'+gap['check_id']+'; advance selects the preserved contract for revalidation')
         reason=('Completed contract revalidation does not cover recorded source fingerprints'
                 if 'source_review' in gap else 'Completed contract requires reviewed source integration')
         raise WorkflowError(reason+': '+gap['task_id']+'; advance selects the remaining revalidation')
@@ -3374,6 +3612,44 @@ def resume_admission(store, *, expected_initial=None):
         if target is run and run.pop('profile_refresh_required',False) and run['stop_reason']=='Installation profile changed; re-admit before continuation':run['stop_reason']=None
         store.save(text,state);return admitted
 
+def completed_dependency_order(store, outcomes, roots):
+    if not roots:
+        return []
+    runs = (store.load().get('run_registry') or {}).get('runs',{})
+    order = []
+    visiting = set()
+    done = set()
+
+    def visit(task_id):
+        if task_id in done:
+            return
+        if task_id in visiting:
+            raise WorkflowError('Completed dependency lineage contains a cycle: '+task_id)
+        record = outcomes.get(task_id)
+        if record is None:
+            raise WorkflowError('Completed dependency lineage lacks an accepted outcome: '+task_id)
+        verify_completed_contract(store,record,runs)
+        edges = record.get('depends_on', [] if not has_completed_check_contract(record) else None)
+        if (not isinstance(edges,list) or any(not valid_id(edge,'T') for edge in edges)
+                or len(set(edges)) != len(edges)):
+            raise WorkflowError('Completed dependency lineage lacks exact outcome edges: '+task_id)
+        visiting.add(task_id)
+        for edge in edges:
+            visit(edge)
+        visiting.remove(task_id)
+        done.add(task_id)
+        order.append(task_id)
+
+    for task_id in roots:
+        visit(task_id)
+    return order
+
+
+def verified_dependency_scope(store, tasks, run, completed):
+    scope = dependency_scope(tasks,run)
+    return scope | set(completed_dependency_order(store, completed, sorted(scope & completed.keys())))
+
+
 def dependency_scope(tasks,run):
     by_id={t['id']:t for t in tasks};result=set()
     def visit(tid):
@@ -3386,11 +3662,16 @@ def dependency_scope(tasks,run):
 def scope_ids(tasks,run):
     return dependency_scope(tasks,run) & set(run.get('admitted_task_ids',[]))
 
-def admitted_groups(tasks,run):
+def admitted_groups(tasks,run,completed=()):
     scope=scope_ids(tasks,run);groups=deepcopy(run.get('admitted_groups',{}))
     for task in tasks:
         group=task.get('validation_group_id')
         if task['id'] in scope and group and task['id'] not in groups.setdefault(group,[]):groups[group].append(task['id'])
+    for record in completed:
+        task_id, group = record['task_id'], record.get('validation_group_id')
+        if group and task_id in run['admitted_task_ids'] and task_id in run['required_ids']:
+            if task_id not in groups.setdefault(group,[]):
+                groups[group].append(task_id)
     return groups
 
 def task_signature(task):
@@ -3537,12 +3818,20 @@ def execution_session(store,recipe,environment,entry,provided=None,require_curre
     sessions[environment]=deepcopy(session)
     return session
 
-def check_snapshot(store,task,check,state):
+def check_snapshot(store,task,check,state,*,historical_sessions=None):
     sources=fingerprints(store,check['sources'])
     if any(value is None for value in sources.values()):raise WorkflowError('Required check source/test input is unavailable')
     recipe,environment=recipe_for(store,check)
     if recipe['lane'] in {'unit','unity-editmode'} and check['timing']!='immediate':raise WorkflowError('Focused behavioral checks remain immediate')
-    entry=state['task_progress'].get(task['id'],{});session=execution_session(store,recipe,environment,entry)
+    if historical_sessions is not None:
+        session = None
+        if recipe['lane'] in PRODUCT_LANES:
+            session = historical_sessions.get(environment) if isinstance(historical_sessions,dict) else None
+            if not isinstance(session,dict) or not isinstance(session.get('identity_evidence'),list):
+                raise WorkflowError('Completed product receipt lacks a matching historical execution session')
+    else:
+        entry = state['task_progress'].get(task['id'],{})
+        session = execution_session(store,recipe,environment,entry)
     if session:
         identity={key:session[key] for key in ['tool_identity','fixture_identity','build_identity','save_service_isolation','editor_version'] if key in session}
         identity['evidence']=[evidence_pointer(store,ref,required=True) for ref in session['identity_evidence']]
@@ -3615,18 +3904,72 @@ def completed_task_body(store, record):
     return recovered
 
 
+def completed_contract_sha256(record):
+    fields = ('task_id','id','run_id','depends_on','validation_signature','task_context','source_fingerprints')
+    identity = {key:record.get(key) for key in fields}
+    receipt_fields = ('attempt_id','key','definition','sources','environment_identity','result','actual_lane')
+    checks = []
+    for entry in record.get('check_results',[]):
+        bound = {'id':entry['check']['id']}
+        for kind in ('result','red'):
+            if kind in entry:
+                receipt = entry[kind]
+                # The check key binds recipe inputs and the accepted runtime session identity.
+                bound[kind] = {key:receipt.get(key) for key in receipt_fields}
+                bound[kind]['evidence'] = [
+                    {'path':ref.get('path'),'sha256':ref.get('sha256')} if isinstance(ref,dict) else ref
+                    for ref in receipt.get('evidence',[])
+                ]
+        checks.append(bound)
+    identity['check_results'] = checks
+    return digest(dump(identity).encode())
+
+
+def verify_completed_contract(store,record,runs=None):
+    if runs is None:
+        runs = (store.load().get('run_registry') or {}).get('runs',{})
+    task_id = record['task_id']
+    owner_id = record.get('run_id')
+    owners = [run_id for run_id,run in runs.items() if task_id in run.get('completion_refs',{})]
+    if not owners and owner_id not in runs:
+        return None
+    error = 'Completed contract differs from the registered completion proof: '+task_id
+    if owners != [owner_id] or runs[owner_id]['completion_refs'][task_id] != record['id']:
+        raise WorkflowError(error)
+    hashes = runs[owner_id].get('completed_contract_sha256s',{})
+    if task_id in hashes:
+        try:
+            observed = completed_contract_sha256(record)
+        except (KeyError,TypeError,AttributeError) as exc:
+            raise WorkflowError(error) from exc
+        if hashes[task_id] != observed:
+            raise WorkflowError(error)
+        return None
+    body = completed_task_body(store,record)
+    if body is None:
+        raise WorkflowError(error+'; original applied completion event is unavailable')
+    scope = '## Pending Task Format\n\n## Pending Queue\n\n## Prioritized Next Changes\n\n'
+    archived, = parse(scope+body.rstrip()+'\n\n## Backlog\n')
+    if (archived['id'] != task_id or archived['depends_on'] != record.get('depends_on')
+            or task_signature(archived) != record.get('validation_signature')):
+        raise WorkflowError(error)
+    return body
+
+
 def validation_task(store,tid):
     matches=[task for task in parse(store.text()) if task['id']==tid and task['queue']=='Prioritized Next Changes']
     if matches:return matches[0]
     record=next((item for item in store.outcomes() if item['task_id']==tid and item['disposition']=='completed'),None)
     if not record:raise WorkflowError('Missing task without a completed validation contract: '+tid)
+    original_body = verify_completed_contract(store,record)
     if not record.get('validation_plan') or not record.get('validation_signature'):raise WorkflowError('Completed record lacks an immutable validation contract; manual review is required')
     criteria=[entry['criterion'] for entry in record['acceptance']]
     body='Goal:\n- Revalidate the recorded completed contract.\n\nTouch:\n- Recorded relevant source and test inputs.\n\nValidation:\n```json\n'+dump({'checks':record['validation_plan']})+'```\n\nAcceptance:\n'+'\n'.join('- '+criterion for criterion in criteria)+'\n'
     task={'id':tid,'body':body,'title':record['title'],'validation_group_id':record.get('validation_group_id'),'boundary_validation':record.get('boundary_validation','not-required'),'completed_contract':True}
     if task_signature(task) == record['validation_signature']:
         return task
-    original_body = completed_task_body(store, record)
+    if original_body is None:
+        original_body = completed_task_body(store,record)
     if original_body is not None:
         original = dict(task, body=original_body)
         if (set(acceptance_criteria(original)) == set(criteria)
@@ -3635,24 +3978,25 @@ def validation_task(store,tid):
             return original
     raise WorkflowError('Completed validation contract does not match the recorded signature')
 
+def has_completed_check_contract(record):
+    return any(key in record for key in ('validation_plan','validation_signature','check_results'))
+
+
 def stale_completed_checks(store,state,task_ids=None):
-    run=state['active_run'];outcomes={record['task_id']:record for record in store.outcomes() if record['disposition']=='completed'};stale=[]
+    run=state['active_run'] or {};outcomes={record['task_id']:record for record in store.outcomes() if record['disposition']=='completed'};stale=[]
     for tid in dict.fromkeys(run['snapshot']+run['required_ids'] if task_ids is None else task_ids):
         if tid not in outcomes:continue
-        record=outcomes[tid];task=validation_task(store,tid)
-        if state['task_progress'].get(tid,{}).get('revalidation'):
-            stale.extend({'task_id':tid,'check_id':check['id']} for check in check_specs(task));continue
-        results=run.get('revalidated_checks',{}).get(tid,record.get('check_results',[]))
-        by_check={entry['check']['id']:entry['result'] for entry in results}
+        record = outcomes[tid]
+        if not has_completed_check_contract(record):
+            continue
+        task = validation_task(store,tid)
+        pending = state['task_progress'].get(tid,{}).get('revalidation')
+        results = run.get('revalidated_checks',{}).get(tid,record.get('check_results',[]))
+        by_check = {entry['check']['id']:entry for entry in results}
         for check in check_specs(task):
-            result=by_check.get(check['id'])
-            try:
-                if not result or result.get('result')!='pass':raise WorkflowError('Missing passed result')
-                context=deepcopy(state);context['task_progress'][tid]={'stage':'awaiting-validation','checks':{},'execution_sessions':result.get('execution_sessions',{})}
-                snapshot=check_snapshot(store,task,check,context)
-                if result['key']!=snapshot['key'] or result['definition']!=snapshot['definition']:raise WorkflowError('Changed relevant inputs')
-                for ref in result['evidence']:evidence_pointer(store,ref,required=True)
-            except (WorkflowError,KeyError):stale.append({'task_id':tid,'check_id':check['id']})
+            entry = by_check.get(check['id'],{})
+            if pending or not retained_revalidation_check(store,state,task,check,entry,historical=True):
+                stale.append({'task_id':tid,'check_id':check['id']})
     return stale
 
 def uncovered_completion_sources(store,tid,results):
@@ -3668,17 +4012,22 @@ def source_review_claims(tid,sources,results):
 def completed_source_gap(store,state,record):
     """Return the next validation requirement for a completed contract."""
     tid=record['task_id']
-    run=state['active_run']
-    if tid not in run['admitted_task_ids'] or tid not in run['required_ids']:raise WorkflowError('Completed dependency is outside the admitted controller scope')
+    run=state['active_run'] or {}
     gap={'task_id':tid}
-    if state['task_progress'].get(tid,{}).get('revalidation'):return gap
+    if state['task_progress'].get(tid,{}).get('revalidation'):
+        return {**gap,'pending_revalidation':True}
     expected=record.get('source_fingerprints',{})
     if not expected:raise WorkflowError('Completed dependency lacks source fingerprints; explicit source integration review is required: '+tid)
     current=fingerprints(store,list(expected))
     if any(value is None for value in current.values()):raise WorkflowError('Completed dependency source input is unavailable: '+tid)
-    if current==expected:return None
+    stale = stale_completed_checks(store,state,[tid]) if has_completed_check_contract(record) else []
+    if stale:
+        return stale[0]
+    if current==expected:
+        return None
     results=run.get('revalidated_checks',{}).get(tid)
-    if not results or stale_completed_checks(store,state,[tid]):return gap
+    if not results:
+        return gap
     covered={path:value for item in results for path,value in item['result']['sources'].items()}
     if any(covered[path]!=current[path] for path in current.keys() & covered.keys()):return gap
     uncovered={path:value for path,value in current.items() if path not in covered}
@@ -3689,11 +4038,30 @@ def completed_source_gap(store,state,record):
             return {**gap,'source_review':claims}
     return None
 
+def required_completed_gap(store,state,completed,roots):
+    for task_id in completed_dependency_order(store,completed,roots):
+        gap = completed_source_gap(store,state,completed[task_id])
+        if gap:
+            return gap
+    return None
+
+
+def require_completed_dependencies(store,state,completed,roots):
+    if not state.get('run_registry') or not roots:
+        return
+    context = {**state,'active_run':execution_run(state['active_run'] or {})}
+    gap = required_completed_gap(store,context,completed,roots)
+    if gap:
+        if 'source_review' in gap:
+            raise WorkflowError('Completed dependency revalidation does not cover recorded source fingerprints: '+gap['task_id'])
+        raise WorkflowError('Completed dependency requires reviewed source integration into the selected worktree: '+gap['task_id'])
+
+
 def completed_dependency_integrated(store,state,tid):
-    record=next((o for o in store.outcomes() if o['task_id']==tid and o['disposition']=='completed'),{'task_id':tid})
-    gap=completed_source_gap(store,{**state,'active_run':execution_run(state['active_run'])},record)
+    completed = {item['task_id']:item for item in store.outcomes() if item['disposition']=='completed'}
+    gap = required_completed_gap(store,{**state,'active_run':execution_run(state['active_run'] or {})},completed,[tid])
     if gap and 'source_review' in gap:
-        raise WorkflowError('Completed dependency revalidation does not cover recorded source fingerprints: '+tid)
+        raise WorkflowError('Completed dependency revalidation does not cover recorded source fingerprints: '+gap['task_id'])
     return gap is None
 
 def read_source_review(store,reference,claims):
@@ -3805,11 +4173,10 @@ def begin_task(store,payload):
         if task['status']!='Ready':raise WorkflowError('Selected task has blocking questions')
         clarification_admission(store,task['id'])
         if state['active_run']:assert_scope(store,state,parse(text),task['id'])
-        done={o['task_id'] for o in store.outcomes() if o['disposition']=='completed'}
-        if any(dep not in done for dep in task['depends_on']):raise WorkflowError('Verified dependencies remain incomplete')
-        if state.get('run_registry') and state['active_run']:
-            for dep in task['depends_on']:
-                if not completed_dependency_integrated(store,state,dep):raise WorkflowError('Completed dependency requires reviewed source integration into the selected worktree: '+dep)
+        completed = {item['task_id']:item for item in store.outcomes() if item['disposition']=='completed'}
+        if any(dep not in completed for dep in task['depends_on']):
+            raise WorkflowError('Verified dependencies remain incomplete')
+        require_completed_dependencies(store,state,completed,task['depends_on'])
         operation=payload.get('implementation_operation')
         if operation is not None and operation!='implement-next':
             raise WorkflowError('Select the exact standalone task implementation operation')
@@ -4050,7 +4417,9 @@ def prepare_check(store,payload):
     with store.lock():
         text=store.text();state=store.load(text);task,check=get_check(store,state,payload);entry=state['task_progress'].get(task['id'])
         if task.get('status')=='Blocked pending answers':processing_helper().guard_implementation_progress(store,task)
-        if task.get('completed_contract') and not entry:entry=state['task_progress'].setdefault(task['id'],{'stage':'awaiting-validation','checks':{},'revalidation':True,'admission':state['active_run']['admission'],'run_id':state['active_run']['id']})
+        if task.get('completed_contract') and not entry:
+            completed = next(item for item in store.outcomes() if item['task_id']==task['id'] and item['disposition']=='completed')
+            entry = prepare_completed_revalidation(store,state,execution_run(state['active_run']),task,completed)
         if not entry or entry['stage']=='blocked':raise WorkflowError('Begin implementation before check preparation')
         assert_scope(store,state,parse(text),task['id'])
         slot=entry['checks'].get(check['id'],{})
@@ -4142,7 +4511,9 @@ def validate_task_checks(store,tid,state=None,check_id=None):
         if check_id is not None and check['id']!=check_id:continue
         record=entry['checks'].get(check['id'],{}).get('result')
         if not record or record['result']!='pass':raise WorkflowError('Required check pending, failed or unavailable: '+check['id'])
-        current=check_snapshot(store,task,check,state)
+        historical = entry.get('revalidation') and entry.get('retained_result_attempt_ids',{}).get(check['id']) == record['attempt_id']
+        sessions = record.get('execution_sessions',{}) if historical else None
+        current=check_snapshot(store,task,check,state,historical_sessions=sessions)
         if record['key']!=current['key'] or record['definition']!=current['definition']:raise WorkflowError('Required check evidence is stale: '+check['id'])
         for ref in record['evidence']:
             if not ref.get('available') or file_hash(store.source_root/ref['path'])!=ref['sha256']:raise WorkflowError('Required result evidence is unavailable or changed: '+check['id'])
@@ -4287,8 +4658,13 @@ def resume_task(store,payload):
         if workspaces.initial_profile_pending(state['active_run']):
             raise WorkflowError('Complete the verified initial worktree profile before resuming a task')
         if not entry or entry['stage']!='blocked':raise WorkflowError('No blocked task progress to resume')
-        run=execution_run(state['active_run']) if state['active_run'] else None
-        if run and payload['task_id'] not in scope_ids(parse(text),run):raise WorkflowError('Blocked task is outside the active controller scope')
+        controller = state['active_run']
+        run = execution_run(controller) if controller else None
+        if run:
+            tid = payload['task_id']
+            revalidation = entry.get('revalidation') and tid in run['admitted_task_ids'] and tid in run['required_ids']
+            if entry.get('run_id') not in {None,controller['id']} or (tid not in scope_ids(parse(text),run) and not revalidation):
+                raise WorkflowError('Blocked task is outside the active controller scope')
         entry['stage']=entry.get('resume_stage','awaiting-validation');entry.setdefault('resolutions',[]).append(payload['resolution']);entry['admission']=admitted
         if state['active_run']:
             run['admission']=admitted
@@ -4303,7 +4679,10 @@ def reuse_check(store,payload):
         if not state['active_run'] or not source.get('validation_group_id') or source.get('validation_group_id')!=target.get('validation_group_id'):raise WorkflowError('Shared evidence requires an admitted compatible group')
         assert_scope(store,state,parse(text),target['id'])
         records=validate_task_checks(store,source['id'],state,source_check['id']);record=next(item['result'] for item in records if item['check']['id']==source_check['id'])
-        target_entry=state['task_progress'].get(target['id'],{});recipe,environment=recipe_for(store,target_check)
+        target_entry=state['task_progress'].get(target['id'],{})
+        if pending_check_attempt(target_entry.get('checks',{}).get(target_check['id'],{})):
+            raise WorkflowError('Reconcile the pending target check attempt before sharing evidence')
+        recipe,environment=recipe_for(store,target_check)
         source_session=state['task_progress'][source['id']].get('execution_sessions',{}).get(environment)
         if source_session:target_entry.setdefault('execution_sessions',{}).setdefault(environment,deepcopy(source_session))
         snapshot=check_snapshot(store,target,target_check,state)
@@ -6138,7 +6517,7 @@ def record_worker(store, state, payload, assignment, request):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|CURRENT_TARGET_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','prepare-worktree-profile','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','worker-handoff','environment','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|CURRENT_TARGET_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','prepare-worktree-profile','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','worker-handoff','environment','validation-impact','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     parser.add_argument('--standalone',action='store_true',help='Use the canonical queue and selected checkout without attaching to a registered controller.')
     parser.add_argument('--preview',type=Path,help='Retained Force Process Preview JSON')
     parser.add_argument('--receipt',type=Path,help='Original Process Pending receipt JSON')
@@ -6259,6 +6638,10 @@ def main(argv=None):
         elif cmd=='runs':result=store.load().get('run_registry',{})
         elif cmd=='start':result=start(store,args.mode,args.id,payload.get('limits'),payload)
         elif cmd=='next':result=next_task(store)
+        elif cmd=='validation-impact':
+            if args.id or args.names is not None or args.apply:
+                raise WorkflowError('Validation impact accepts a read-only proposed path payload')
+            result=validation_impact(store,payload)
         elif cmd=='advance':result=advance(store)
         elif cmd=='checkpoint':result=checkpoint(store,payload)
         elif cmd=='complete':result=complete(store,payload)

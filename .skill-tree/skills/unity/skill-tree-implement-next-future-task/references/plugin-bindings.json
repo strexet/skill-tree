@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "8d9efe5362d0d85b8afaeacb6d6c74bf49c19c2dccff8691d8380cdd08d0ec51",
+  "identity": "f8e226432b4fda0c25e63a1c0bab0fe44f075bd65ff6a064f414256e8bb09aec",
   "operation": "skill-tree-implement-next-future-task",
   "operations": {
     "skill-tree-3d": {
@@ -3301,7 +3301,7 @@
     "references/pending-task-intake.md": "c23e7fc58a44b58ab8e0b09ee0b15bd56fbdfd4fc275833c26fd4c8c2d0e4619",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/project-profile.md": "af84614ccf2aea888e0f3a0fa09264eb282e05c934c79a431d53407e61290fd6",
-    "references/run-workspaces.md": "52b62e7c9d44fe79184fd498aaeb2ed985b2d15a6639b959542132cb8ee77260",
+    "references/run-workspaces.md": "544687d2e69909075ad66fa858cd56af78af8887683289a5c26a2b9584b54b9b",
     "references/ugui-testing.md": "873c236f793ff3c9ece8f0d0346c5c48513e8220406fce216751571c58b79073",
     "references/unity-development.md": "49110c691d4493cd21e8c3ceb682053e3f975016be9879cd10836d9f4feaf371",
     "references/unity-safety.md": "c4a96cdb4bc35a98fcab8ba6bf9c983252cd73d1cefaa439669cedcbed357df0",
@@ -3321,11 +3321,11 @@
     "scripts/plugin-registry.js": "7aefa14eab27e35d9687842e1d2ed0b2b5fc52c8dad4ccb1c0c6fa71ecdf7005",
     "scripts/plugin-runtime.js": "62caaa416cb4f375fef45edb71c1cbe3b2f9c0acb734a95e0b9099470cf6c8a5",
     "scripts/plugin-sources.js": "13d853f9e64dec84cf92f4026ac71e4384e186cd96200543e400a852a46e4693",
-    "scripts/run-workspaces.py": "a94307b11e741f2a99caadaf3a189adb077774390e64150ec5897b2102d1d898",
+    "scripts/run-workspaces.py": "514df532d2f4c9014a5b3e484ace0fdcc916abe851f098877b25a6a6420670df",
     "scripts/select-prioritized-task.py": "93f12ac5a333fb072bf8d9d849d08e3b422af856d582d492902647efe35c896f",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "33eb612dc9142355c9bcc7ea7bcd675b1e10a5c5737145de44faa16cbdb66d80"
+    "scripts/workflow-state.py": "32fddb7ac04b169faadd93b81a0e07d248bd067260b69b0146646ead1b084031"
   },
   "packages": {},
   "parameter_defaults": {},

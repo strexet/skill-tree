@@ -1612,11 +1612,19 @@ def environment(store, payload=None):
     required_resources=list(policy.get('exclusive_resources',[]))
     if payload.get('runtime') and layout=='unity' and not required_resources:
         raise RunError('Unity runtime requires an explicit Editor/MCP/save/fixture resource policy')
-    for key in required_resources if payload.get('runtime') else []:
-        claim=registry['resources'].get(key) if registry else None
-        if not claim or not run or claim['run_id']!=run['id']:raise RunError('Runtime prerequisite requires exclusive resource: '+key)
+    claims = (registry or {}).get('resources',{})
+    resource_claims = []
+    for key in required_resources:
+        holder = claims.get(key,{}).get('run_id')
+        owned = bool(run and holder == run['id'])
+        resource_claims.append({'resource':key,'holder_run_id':holder,
+                                'status':'owned' if owned else 'occupied' if holder else 'unclaimed'})
+        if payload.get('runtime') and not owned:
+            raise RunError('Runtime prerequisite requires exclusive resource: '+key)
     if missing:raise RunError('Missing environment prerequisites: '+', '.join(missing))
     result = {'flavor':flavor,'project_root':str(root),'isolated_directories':directories,'required_files':policy.get('required_files',[]),'exclusive_resources':required_resources,'editor_version':profile.get('facts',{}).get('editor'),'secrets_read':False,'runtime_qualified':False}
+    if resource_claims:
+        result['runtime_resource_claims'] = resource_claims
     if web_runtime_path is not None:
         result['web_runtime_path'] = web_runtime_path
     return result

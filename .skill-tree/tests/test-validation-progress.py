@@ -15,18 +15,21 @@ class ValidationProgressTests(unittest.TestCase):
         self.store.future.write_text('# Future Work\n\n## Pending Task Format\n\n## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n')
         config=self.store.base/'config';config.mkdir(exist_ok=True);(config/'repository.json').write_text(json.dumps({'schema':1,'role':'source'}))
         (self.root/'source.py').write_text('value = 1\n');(self.root/'report.json').write_text('{"assertion":"value is preserved"}')
-    def task(self,title='Feature',group=None,deps=(),timing='immediate',fresh_review=False):
+    def task(self,title='Feature',group=None,deps=(),timing='immediate',fresh_review=False,recipe='static-inspection',independent_source=None):
         p=wf.intake(self.store,{'title':title,'description':'Implement scoped behavior.','expected_behavior':'Preserve the observable value.'})
-        check={'id':'behavior','recipe_id':'static-inspection','criteria':['Preserve the value.'],'sources':['source.py'],'parameters':{},'assertion':'The value remains observable.','timing':timing}
+        check={'id':'behavior','recipe_id':recipe,'criteria':['Preserve the value.'],'sources':['source.py'],'parameters':{},'assertion':'The value remains observable.','timing':timing}
         if fresh_review:check['fresh_review']=True
-        body='Goal:\n- Preserve the value.\n\nTouch:\n- source.py\n\nValidation:\n```json\n'+json.dumps({'checks':[check]})+'\n```\n\nAcceptance:\n- Preserve the value.\n'
+        checks = [check]
+        if independent_source:
+            checks.append({**check,'id':'independent','sources':[independent_source]})
+        body='Goal:\n- Preserve the value.\n\nTouch:\n- source.py\n\nValidation:\n```json\n'+json.dumps({'checks':checks})+'\n```\n\nAcceptance:\n- Preserve the value.\n'
         r=wf.process(self.store,{'selectors':[p['id']],'dispositions':{p['id']:{'status':'promoted','reason':'Source research confirms the observable contract.'}},'tasks':[{'title':title,'body':body,'parent_pending_ids':[p['id']],'depends_on':list(deps),'validation_group_id':group,'boundary_validation':'group-end' if group else 'not-required'}]})
         return r['created_ids'][0]
     def progress(self,tid):
         wf.begin_task(self.store,{'task_id':tid});wf.mark_implemented(self.store,{'task_id':tid,'changed_files':['source.py']})
-    def passed(self,tid):
-        attempt=wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'})
-        return wf.record_check(self.store,{'task_id':tid,'check_id':'behavior','attempt_id':attempt['attempt_id'],'result':'pass','actual_lane':'static','environment_identity':attempt['environment_identity'],'classification':'executed-control','assertions':[{'assertion':'The value remains observable.','result':'pass'}],'evidence':['report.json'],'cleanup':'No product process was launched.'})
+    def passed(self,tid,check_id='behavior'):
+        attempt=wf.prepare_check(self.store,{'task_id':tid,'check_id':check_id})
+        return wf.record_check(self.store,{'task_id':tid,'check_id':check_id,'attempt_id':attempt['attempt_id'],'result':'pass','actual_lane':'static','environment_identity':attempt['environment_identity'],'classification':'executed-control','assertions':[{'assertion':'The value remains observable.','result':'pass'}],'evidence':['report.json'],'cleanup':'No product process was launched.'})
 
     def git(self,*args,cwd=None):
         return subprocess.check_output(['git',*args],cwd=cwd or self.root,text=True,stderr=subprocess.STDOUT).strip()
@@ -216,6 +219,226 @@ class ValidationProgressTests(unittest.TestCase):
         self.assertEqual(observed['review_id'],frame['id'])
         self.assertTrue(wf.valid_id(observed['verified_delivery_event_id'],'E'))
         self.assertIsNotNone(observed['seconds'])
+    def test_revalidation_impact_reports_exact_affected_consumers(self):
+        (self.root/'shared').mkdir()
+        (self.root/'shared/config.txt').write_text('format-one\n')
+        (self.root/'unrelated.txt').write_text('independent data\n')
+        configuration = self.store.base/'config/repository.json'
+        configuration.write_text(json.dumps({'schema':1,'role':'source','recipes':{
+            'shared-static':{'lane':'static','input_paths':['shared/config.txt'],
+                             'assertion_contract':'Review declared source and configuration inputs.'},
+        }}))
+        producer = self.task('Shared configuration consumer',recipe='shared-static')
+        consumer = self.task('Dependent application',deps=[producer])
+        outside = self.task('Unselected application',recipe='shared-static')
+        wf.start(self.store,'next',consumer)
+        if not hasattr(wf,'validation_impact'):
+            self.fail('Affected revalidation preview is missing')
+        before = (self.store.future.read_bytes(),self.store.state.read_bytes())
+        affected = wf.validation_impact(self.store,{'paths':['shared/config.txt']})
+        self.assertEqual(affected['paths'],['shared/config.txt'])
+        self.assertEqual([(row['task_id'],row['check_id'],row['matched_paths'],row['consumer_ids'])
+                          for row in affected['checks']],
+                         [(producer,'behavior',['shared/config.txt'],[consumer])])
+        self.assertNotIn(outside,[row['task_id'] for row in affected['checks']])
+        self.assertEqual(wf.validation_impact(self.store,{'paths':['unrelated.txt']})['checks'],[])
+        request = self.root/'impact-request.json'
+        request.write_text(json.dumps({'paths':['shared/config.txt']}))
+        output = subprocess.check_output(
+            ['python3','-B',str(CORE/'common/scripts/workflow-state.py'),'validation-impact',str(self.root),
+             '--input',str(request)], text=True)
+        self.assertEqual(json.loads(output),affected)
+        self.assertEqual((self.store.future.read_bytes(),self.store.state.read_bytes()),before)
+
+    def test_final_revalidation_boundary_stages_exact_group_peers(self):
+        group = wf.identity('VG')
+        first = self.task('First shared contract',group=group)
+        second = self.task('Second shared contract',group=group)
+        wf.start(self.store,'all')
+        for _ in (first,second):
+            selected = wf.advance(self.store)['task_id']
+            self.progress(selected)
+            self.passed(selected)
+            wf.complete(self.store,{'task_id':selected,'outcome':'The scoped value remains visible.',
+                         'acceptance':[{'criterion':'Preserve the value.','result':'pass','evidence':['report.json']}],
+                         'source_fingerprints':wf.fingerprints(self.store,['source.py'])})
+        (self.root/'source.py').write_text('value = 3\n')
+        handoff = wf.advance(self.store)
+        lead = handoff['task_id']
+        peer = next(task for task in (first,second) if task != lead)
+        self.assertEqual(handoff['revalidation_bundle'],[
+            {'from_task_id':lead,'from_check_id':'behavior','task_id':peer,'check_id':'behavior'},
+        ])
+        check_pass = self.passed(lead)
+        self.assertEqual(wf.reuse_check(self.store,handoff['revalidation_bundle'][0])['attempt_id'],check_pass['attempt_id'])
+        for task in (lead,peer):
+            wf.accept_revalidation(self.store,{'task_id':task})
+        self.assertEqual(wf.next_task(self.store)['phase'],'deferred-processing')
+
+    def test_changed_recipe_input_holds_registered_consumer_until_current_verification(self):
+        configuration = self.store.base/'config/repository.json'
+        configuration.write_text(json.dumps({'schema':1,'role':'source','recipes':{
+            'shared-static':{'lane':'static','input_paths':['contract-config.txt'],
+                             'assertion_contract':'Review declared source and configuration inputs.'},
+        }}))
+        (self.root/'contract-config.txt').write_text('original configuration\n')
+        producer = self.task('Completed producer',recipe='shared-static')
+        self.progress(producer)
+        self.passed(producer)
+        wf.complete(self.store,{'task_id':producer,'outcome':'The scoped value remains visible.',
+                     'acceptance':[{'criterion':'Preserve the value.','result':'pass','evidence':['report.json']}],
+                     'source_fingerprints':wf.fingerprints(self.store,['source.py'])})
+        intermediate = self.task('Completed intermediary',deps=[producer])
+        self.progress(intermediate)
+        self.passed(intermediate)
+        wf.complete(self.store,{'task_id':intermediate,'outcome':'The scoped intermediate behavior remains visible.',
+                     'acceptance':[{'criterion':'Preserve the value.','result':'pass','evidence':['report.json']}],
+                     'source_fingerprints':wf.fingerprints(self.store,['source.py'])})
+        consumer = self.task('Ready consumer',deps=[intermediate])
+        self.git('init','-q','-b','develop')
+        self.git('config','user.name','Fixture editor')
+        self.git('config','user.email','fixture@example.invalid')
+        self.git('config','commit.gpgsign','false')
+        self.git('add','.')
+        self.git('commit','-qm','Canonical fixture baseline')
+        wf.workspaces.setup(self.store,{})
+        run = wf.start(wf.Store(self.root,allow_unselected=True,neutral=True),'next',consumer,
+                       workspace={'implementation_operation':'work-through-next'})
+        self.assertEqual(set(run['required_ids']),{producer,intermediate,consumer})
+        checkout = Path(wf.workspaces.runtime(self.root)['worktrees'][run['id']])
+        self.store = wf.Store(checkout,run['id'])
+        self.assertEqual(wf.next_task(self.store)['task_id'],consumer)
+        (checkout/'contract-config.txt').write_text('changed common configuration\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'dependency.*'+producer):
+            wf.begin_task(self.store,{'task_id':consumer})
+        state = self.store.load()
+        retained = {**state['active_run'], 'admitted_task_ids':[intermediate,consumer],
+                    'required_ids':[intermediate,consumer]}
+        outcomes = {item['task_id']:item for item in self.store.outcomes()}
+        with self.assertRaisesRegex(wf.WorkflowError,'outside the frozen run scope.*'+producer):
+            wf.first_completed_source_gap(self.store,{**state,'active_run':retained},outcomes)
+        self.assertEqual(wf.advance(self.store)['task_id'],producer)
+        for _ in range(2):
+            attempt = wf.prepare_check(self.store,{'task_id':producer,'check_id':'behavior'})
+            wf.record_check(self.store,{'task_id':producer,'check_id':'behavior','attempt_id':attempt['attempt_id'],
+                'result':'fail','classification':'executed-control','actual_lane':'static',
+                'environment_identity':attempt['environment_identity'],'failure_signature':'Fixture verification failed.',
+                'evidence':['report.json'],'cleanup':'The fixture starts no product process.'})
+        self.assertEqual(self.store.load()['task_progress'][producer]['stage'],'blocked')
+        resumed = wf.resume_task(self.store,{'task_id':producer,'resolution':'Corrected the fixture condition.'})
+        self.assertEqual(resumed['stage'],'awaiting-validation')
+        self.passed(producer)
+        wf.accept_revalidation(self.store,{'task_id':producer})
+        self.assertEqual(wf.next_task(self.store)['task_id'],consumer)
+        self.assertEqual(wf.begin_task(self.store,{'task_id':consumer})['phase'],'implement')
+
+    def test_revalidation_retains_current_check_receipt_for_independent_inputs(self):
+        (self.root/'independent.py').write_text('unrelated_value = 5\n')
+        task = self.task('Two independently validated inputs',independent_source='independent.py')
+        wf.start(self.store,'all')
+        self.progress(task)
+        self.passed(task)
+        retained = self.passed(task,check_id='independent')
+        wf.complete(self.store,{'task_id':task,'outcome':'The scoped value remains visible.',
+                     'acceptance':[{'criterion':'Preserve the value.','result':'pass','evidence':['report.json']}],
+                     'source_fingerprints':wf.fingerprints(self.store,['source.py','independent.py'])})
+        (self.root/'source.py').write_text('value = 3\n')
+        handoff = wf.next_task(self.store)
+        self.assertEqual([check['id'] for check in handoff['checks']],['behavior'])
+        self.assertEqual(handoff['retained_check_ids'],['independent'])
+        self.passed(task)
+        wf.accept_revalidation(self.store,{'task_id':task})
+        check = next(item for item in self.store.load()['active_run']['revalidated_checks'][task]
+                     if item['check']['id']=='independent')
+        self.assertEqual(check['result']['attempt_id'],retained['attempt_id'])
+
+    def test_validation_impact_keeps_real_runtime_resource_conflict_visible(self):
+        configuration = self.store.base/'config/repository.json'
+        configuration.write_text(json.dumps({'schema':1,'role':'source','recipes':{
+            'fixture-browser':{'lane':'browser','input_paths':['source.py'],'argv':['fixture-browser']},
+        }}))
+        (self.store.base/'worktree-profile.json').write_text(json.dumps({
+            'schema':1,'exclusive_resources':['browser:fixture'],
+        }))
+        actor = self.task('Resource owner')
+        candidate = self.task('Independent browser candidate',recipe='fixture-browser')
+        self.git('init','-q','-b','develop')
+        self.git('config','user.name','Fixture editor')
+        self.git('config','user.email','fixture@example.invalid')
+        self.git('config','commit.gpgsign','false')
+        self.git('add','.')
+        self.git('commit','-qm','Canonical fixture baseline')
+        wf.workspaces.setup(self.store,{})
+        owner = wf.Store(self.root,allow_unselected=True,neutral=True)
+        first = wf.start(owner,'next',actor,workspace={'implementation_operation':'work-through-next'})
+        wf.workspaces.resource(wf.Store(self.root,first['id']),{'resource':'browser:fixture'})
+        next_owner = wf.Store(self.root,allow_unselected=True,neutral=True)
+        second = wf.start(next_owner,'next',candidate,workspace={'implementation_operation':'work-through-next'})
+        scoped = wf.Store(self.root,second['id'])
+        view = wf.next_task(scoped)['validation_impact']
+        self.assertEqual(view['checks'][0]['lane'],'browser')
+        self.assertEqual(view['runtime_resources'],[
+            {'resource':'browser:fixture','holder_run_id':first['id'],'status':'occupied'},
+        ])
+        with self.assertRaisesRegex(wf.workspaces.RunError,'exclusive resource'):
+            wf.workspaces.environment(scoped,{'runtime':True})
+        task = wf.resolve(wf.parse(scoped.text()),[candidate])[0]
+        check = wf.check_specs(task)[0]
+        _, environment = wf.recipe_for(scoped,check)
+        artifact = wf.evidence_pointer(scoped,'report.json',required=True)
+        historical = {environment:{'tool_identity':'fixture-runner','fixture_identity':'fixture-case',
+                                   'build_identity':'fixture-package','identity_evidence':[artifact]}}
+        state = scoped.load()
+        accepted = wf.check_snapshot(scoped,task,check,state,historical_sessions=historical)
+        self.assertEqual(accepted['recipe']['lane'],'browser')
+        with self.assertRaisesRegex(wf.workspaces.RunError,'exclusive resource'):
+            wf.check_snapshot(scoped,task,check,state)
+        (scoped.source_root/'report.json').write_text('Changed artifact.\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'evidence'):
+            wf.check_snapshot(scoped,task,check,state,historical_sessions=historical)
+
+    def test_registered_completion_lineage_must_match_the_applied_event(self):
+        self.controller_with_accepted_leaf()
+        original, = self.store.outcomes()
+        task_id = original['task_id']
+        self.assertEqual(wf.completed_dependency_order(self.store,{task_id:original},[task_id]),[task_id])
+        ledger = self.store.owned(wf.OUTCOME_LEDGER)
+        altered = {**original,'depends_on':[wf.identity('T')]}
+        ledger.write_text(json.dumps(altered)+'\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'registered completion proof'):
+            wf.next_task(self.store)
+        with self.assertRaisesRegex(wf.WorkflowError,'registered completion proof'):
+            wf.prepare_check(self.store,{'task_id':task_id,'check_id':'behavior'})
+        with self.assertRaisesRegex(wf.WorkflowError,'registered completion proof'):
+            wf.accept_revalidation(self.store,{'task_id':task_id})
+
+        alternate = self.store.source_root/'alternate-report.json'
+        alternate.write_text('Replacement evidence.')
+        substituted = json.loads(json.dumps(original))
+        substituted['check_results'][0]['result']['evidence'] = [
+            wf.evidence_pointer(self.store,'alternate-report.json',required=True),
+        ]
+        ledger.write_text(json.dumps(substituted)+'\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'registered completion proof'):
+            wf.next_task(self.store)
+
+        ledger.write_text(json.dumps(original)+'\n')
+        state = self.store.load()
+        run_id = self.store.run_id
+        state['active_run'].pop('completed_contract_sha256s',None)
+        state['run_registry']['runs'][run_id].pop('completed_contract_sha256s',None)
+        with self.store.lock():
+            self.store.save(self.store.text(),state)
+        directory = self.store.base/'history/run-events'/run_id.lower()
+        event_path, = [file for file in directory.glob('e-*.json')
+                       if original in json.loads(file.read_text())['outcomes']]
+        event = json.loads(event_path.read_text())
+        event['outcomes'] = [altered if item==original else item for item in event['outcomes']]
+        event_path.write_text(wf.dump(event))
+        ledger.write_text(json.dumps(altered)+'\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'registered completion proof'):
+            wf.next_task(self.store)
+
     def test_standalone_progress_survives_refresh_and_never_reimplements(self):
         tid=self.task();self.progress(tid)
         with self.store.lock():self.store.save(self.store.text(),self.store.load())
