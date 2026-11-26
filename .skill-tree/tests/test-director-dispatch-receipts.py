@@ -188,6 +188,64 @@ class DispatchTests(unittest.TestCase):
         self.assertEqual(self.observe('intake')['status'], 'absent')
         self.assertEqual([row['id'] for row in self.child().load()['tasks']], [existing['id']])
 
+    def test_full_cycle_partition_is_frozen_in_the_canonical_intake_receipt(self):
+        child = self.child()
+        original = self.pending()
+        template = {key: original[key] for key in ('title', 'description', 'expected_behavior')}
+        items = [
+            {**template, 'key':'follow-up', 'title':'Check the deferred fixture', 'priority':300, 'topic':'later-work'},
+            {**template, 'key':'primary', 'title':'Change the selected fixture', 'priority':125, 'topic':'main-work'},
+            {**template, 'key':'handoff', 'title':'Record the deferred handoff', 'priority':250,
+             'topic':'later-work', 'pending_depends_on':['@primary']},
+        ]
+        partition = {'primary':['primary'], 'deferred':['follow-up','handoff']}
+        request = {'director_dispatch':self.area, 'expected_source_hash':original['expected_source_hash'],
+                   'intake_batch_id':WF.identity('IB'), 'items':items, 'full_cycle_partition':partition}
+        before = child.future.read_bytes(), child.state.read_bytes()
+        for invalid in ({'primary':['primary']}, {'primary':['primary'], 'deferred':['primary','follow-up','handoff']},
+                        {'primary':['foreign'], 'deferred':['follow-up','handoff']},
+                        {'primary':['primary'], 'deferred':['handoff','follow-up']}):
+            with self.subTest(partition=invalid):
+                with self.assertRaisesRegex(WF.WorkflowError, 'Full Cycle'):
+                    WF.intake(self.child(), {**request,'full_cycle_partition':invalid})
+                self.assertEqual((child.future.read_bytes(), child.state.read_bytes()), before)
+        converted = [items[0], {**items[1], 'pending_depends_on':['@follow-up']}, items[2]]
+        with self.assertRaisesRegex(WF.WorkflowError, 'cannot require a deferred intake'):
+            WF.intake(self.child(), {**request,'items':converted})
+        self.assertEqual((child.future.read_bytes(), child.state.read_bytes()), before)
+        saved = WF.Store.save
+
+        def interrupted(store, *args, **kwargs):
+            saved(store, *args, **kwargs)
+            raise RuntimeError('Lost after durable partitioned intake')
+
+        with patch.object(WF.Store, 'save', interrupted), self.assertRaisesRegex(RuntimeError, 'Lost after'):
+            WF.intake(self.child(), request)
+        observed = self.observe('intake')
+        receipt = observed['observed_result']
+        follow_up, primary, handoff = (item['id'] for item in receipt['items'])
+        self.assertEqual(receipt['full_cycle_partition'], {'primary':[primary], 'deferred':[follow_up,handoff]})
+        before = child.future.read_bytes(), child.state.read_bytes()
+        self.assertEqual(WF.intake(self.child(),request), receipt)
+        with self.assertRaisesRegex(WF.WorkflowError, 'different semantic request'):
+            WF.intake(self.child(), {key:value for key,value in request.items() if key != 'full_cycle_partition'})
+        self.assertEqual((child.future.read_bytes(), child.state.read_bytes()), before)
+        unbound = self.process_request(primary)
+        with self.assertRaisesRegex(WF.WorkflowError, 'Original canonical intake batch receipt'):
+            WF.process(self.child(), unbound)
+        guarded = {'director_batch_intake_sha256':observed['receipt']['receipt_sha256']}
+        with self.assertRaisesRegex(WF.WorkflowError, 'selection differs'):
+            WF.process(self.child(), {**self.process_request(follow_up), **guarded})
+        self.assertEqual((child.future.read_bytes(), child.state.read_bytes()), before)
+        done = WF.process(self.child(), {**unbound, **guarded})
+        self.assertEqual(done['selected_ids'],[primary])
+        self.assertEqual(WF.process(self.child(), {**unbound, **guarded}), done)
+        tasks = {item['id']:item for item in self.child().load()['tasks']}
+        self.assertEqual([(tasks[pid]['status'],tasks[pid]['priority'],tasks[pid]['topic'])
+                          for pid in (follow_up,handoff)],
+                         [('Pending',300,'later-work'),('Pending',250,'later-work')])
+        self.assertEqual(tasks[handoff]['pending_depends_on'],[primary])
+
     def test_start_reconciles_original_reserved_and_built_workspace(self):
         for fail_after in (False, True):
             with self.subTest(fail_after=fail_after):

@@ -11,6 +11,14 @@ Use the existing leaf contracts and helpers. The full cycle owns routing and the
 3. Use Process Pending with the exact outstanding Pending IDs from the intake receipt and the inspected queue hash. Research the current sources and record each disposition. Apply the researched result with `scripts/workflow-state.py process <canonical-root> --standalone --input <process.json>`. Retain the processing receipt, including the exact created or reused prioritized IDs, in the resumable handoff. A retained item or blocked prioritized item holds the group. Review explicit reuse of an existing task against the authorized scope before admission. Prioritized group search can help reconcile provenance, but a shared batch or topic alone cannot define the implementation scope.
 4. If a processing response is missing, reconcile the actual Pending rows, prioritized provenance and any retained processing receipts. Continue only when all original dispositions and exact output identities are established. A missing Pending row gives no proof of resolution. Avoid replaying processing for already promoted or resolved items. If research verifies that the entire request is already satisfied, report the recorded dispositions and close the delivery without creating an empty PR.
 
+### Continue a partitioned Director intake
+
+Use the registered project route for `skill-tree-full-cycle` with an exact `full_cycle` input containing `intake_batch_id`, ordered `items` and `full_cycle_partition`. The partition contains ordered `primary` and `deferred` lists of exact item keys. Each intake item appears once. A primary item requires closure within the approved scope before processing.
+
+Freeze the reviewed child in the Director plan and authorize the exact intake and primary process effects. The original canonical batch receipt records the ordered Pending IDs for both partitions. After the exact process acknowledgement, use `verify-intake` on the original assignment to recover the original partition and the verified `full_cycle_primary.task_ids`. Reuse the original IDs and receipts on retry or resume.
+
+Continue at implementation with only the exact prioritized IDs produced from the verified primary Pending IDs. The existing owner requirement applies to the selected implementation and delivery scope. Later work requires a separate authorized selection of the deferred Pending IDs.
+
 ## Implement the frozen group
 
 1. Use Work Through Next with the exact prioritized ID for a single root. For several roots, use Implement All with the exact `snapshot_ids` and inspected queue hash. The recorded snapshot contains only the approved roots and the controller admits the required dependency closure. Report out-of-group required dependencies and establish authority before work that would expand the request. Defer unrelated work and preserve any existing queue or run.

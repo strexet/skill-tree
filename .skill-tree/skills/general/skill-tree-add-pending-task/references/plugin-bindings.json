@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "d1b4c7588e7bb0d5612e7ffefbdf98cb28a0f714098ffa72f3830e64977ca6ac",
+  "identity": "7429dff7ea1c6b13eb2d93c8886831ed27eac9be67adc8995842f5baa2e4e66b",
   "operation": "skill-tree-add-pending-task",
   "operations": {
     "skill-tree-3d": {
@@ -3303,7 +3303,7 @@
     "references/workflow-metadata.md": "ecfc1114e415e3bff2d8c13aab94eb1d3d7f7e57ea19b7cd49f029067183cba2",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "dd1b6fb5dfb56b93ad531abf87f4f713b5934156133007bb4014b56ec9f285e5",
-    "scripts/director-dispatch.py": "bdc07c36c486cc96af681987831f36b04346f45084bd45ead1fdc40265a831f1",
+    "scripts/director-dispatch.py": "5f5ca8060842d681c2644d8e89cdc2a233deed35b22423a369e5cff60bc03546",
     "scripts/package.json": "8005a3491db7d92f36ac66369861589f9c47123d3a7c71e643fc2c06168cd45a",
     "scripts/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
     "scripts/plugin-composition.js": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b",
@@ -3317,7 +3317,7 @@
     "scripts/run-workspaces.py": "a706fedaca99a6231d753201cff28f5d5601292b048ceb0929dc8ae469eb302b",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "7e5cd927d1fb81b83c863f614530e86117fec6816ea46f4a339dc8d8049650a9"
+    "scripts/workflow-state.py": "13b8932a763ece81905ad4dbd7cd73fe99f4f0d8370ca13c2da183239e262541"
   },
   "packages": {},
   "parameter_defaults": {},

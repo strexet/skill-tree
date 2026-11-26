@@ -20,7 +20,8 @@ import unicodedata
 
 
 RUN_COMMANDS = {'run-start', 'run-status', 'run-dispatch', 'run-pause', 'run-resume', 'run-cancel',
-                'run-complete-assignment', 'run-supervise', 'run-advance-all', 'decide-open', 'decide-answer'}
+                'run-complete-assignment', 'run-supervise', 'run-advance-all', 'verify-intake',
+                'decide-open', 'decide-answer'}
 RUN_PATH = re.compile(r'\.skill-tree/director/runs/dr-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}\.json\Z')
 REGISTRY = '.skill-tree/director/registry.json'
 BINDINGS = '.skill-tree/artifacts/director/local-bindings.json'

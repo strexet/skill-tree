@@ -15,6 +15,38 @@ TOKEN = re.compile(r'[a-z][a-z0-9]*(?:-[a-z0-9]+)*\Z')
 SHA = re.compile(r'[a-f0-9]{64}\Z')
 
 
+def full_cycle_partition(members, value):
+    """Validate complete, disjoint partitions in original intake order."""
+    if (not isinstance(value, dict) or set(value) != {'primary', 'deferred'}
+            or any(not isinstance(ids, list) or not ids or any(not isinstance(item, str) for item in ids)
+                   for ids in value.values())
+            or any(not isinstance(item, str) for item in members)):
+        raise ValueError('Full Cycle requires explicit nonempty primary and deferred partitions')
+    primary, deferred = value['primary'], value['deferred']
+    primary_set, deferred_set = set(primary), set(deferred)
+    if (primary_set & deferred_set or primary_set | deferred_set != set(members)
+            or primary != [item for item in members if item in primary_set]
+            or deferred != [item for item in members if item in deferred_set]
+            or len(set(members)) != len(members)):
+        raise ValueError('Full Cycle partition must cover each original member once in intake order')
+    return value
+
+
+def full_cycle_intake_partition(items, value):
+    if any(not isinstance(item, dict) or not isinstance(item.get('key'), str)
+           or not TOKEN.fullmatch(item['key']) for item in items):
+        raise ValueError('Full Cycle partition requires distinct explicit intake item keys')
+    partition = full_cycle_partition([item['key'] for item in items], value)
+    deferred = {'@' + key for key in partition['deferred']}
+    for item in items:
+        prerequisites = item.get('pending_depends_on', [])
+        if not isinstance(prerequisites, list) or any(not isinstance(key, str) for key in prerequisites):
+            raise ValueError('Full Cycle Pending prerequisites require exact P identities or batch keys')
+        if item['key'] in partition['primary'] and deferred.intersection(prerequisites):
+            raise ValueError('Primary Full Cycle work cannot require a deferred intake item')
+    return partition
+
+
 def _require(condition, message):
     if not condition:
         raise wf.WorkflowError(message)
@@ -178,18 +210,24 @@ class ChildDispatch:
                      'Directed start requires exact task scope and no automatic delivery authority')
 
     def verify_batch_intake(self, store):
-        if self.batch_intake_sha256 is None:
+        if self.identity['operation'] != 'process':
             return
         identity = {**self.identity, 'operation': 'intake'}
         _, receipt = _receipt(store, identity, _digest(identity))
+        partitioned = receipt is not None and 'full_cycle_partition' in receipt['result']
+        if self.batch_intake_sha256 is None and not partitioned:
+            return
         _require(receipt and receipt['receipt_sha256'] == self.batch_intake_sha256
                  and receipt['plan_sha256'] == self.plan_sha256,
                  'Original canonical intake batch receipt is unavailable or changed')
         result = reconcile(store, receipt)
         defs = receipt.get('pending_definition_sha256s')
         ids = self.payload['selectors']
-        _require(wf.valid_id(result.get('id'), 'IB') and ids == [item['id'] for item in result['items']]
-                 and isinstance(defs, dict) and set(defs) == set(ids),
+        members = [item['id'] for item in result['items']]
+        partition = result.get('full_cycle_partition')
+        expected = full_cycle_partition(members, partition)['primary'] if partitioned else members
+        _require(wf.valid_id(result.get('id'), 'IB') and ids == expected
+                 and isinstance(defs, dict) and set(defs) == set(members),
                  'Batch process selection differs from the original canonical intake receipt')
         text = store.text()
         _require(wf.digest(text.encode()) == self.payload['expected_source_hash'],

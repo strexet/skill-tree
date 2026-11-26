@@ -61,6 +61,47 @@ def snapshot(*paths):
     return tuple(path.read_bytes() if path.exists() else None for path in paths)
 
 
+DIRECTOR_BATCH_FAULT = '''
+import json
+from pathlib import Path
+import runpy
+import sys
+
+director = runpy.run_path(sys.argv[1])
+load = director['WF'].owned_module
+payload = json.loads(Path(sys.argv[-1]).read_text())
+stage = sys.argv[2]
+
+def with_interruption(name, path):
+    helper = load(name, path)
+    if name == 'director_run' and stage == 'lost-ack':
+        original = helper.DirectorRun._write
+
+        def write(self, relative, state, expected_sha):
+            if any(row['event'] == 'dispatch-recorded' and row.get('operation') == payload['operation']
+                   for row in state['timeline']):
+                raise OSError('Injected loss after canonical acknowledgement')
+            return original(self, relative, state, expected_sha)
+
+        helper.DirectorRun._write = write
+    if name == 'director_run' and stage == 'pause':
+        original = helper.DirectorRun._batch_dispatched_result
+
+        def pause(self, *args):
+            result = original(self, *args)
+            run_id = payload['director_run_id']
+            _, _, current_sha = self._load(run_id)
+            self.lifecycle('run-pause', {'director_run_id':run_id,'expected_run_sha256':current_sha})
+            return result
+
+        helper.DirectorRun._batch_dispatched_result = pause
+    return helper
+
+director['WF'].owned_module = with_interruption
+raise SystemExit(director['main'](sys.argv[3:]))
+'''
+
+
 class DirectorTopologyTests(unittest.TestCase):
     def setUp(self):
         scratch = tempfile.TemporaryDirectory(prefix='director-topology-controls-')
@@ -566,6 +607,192 @@ class DirectorTopologyTests(unittest.TestCase):
         body = self.core(root, 'read', None, '--id', task)['body']
         return {'task_id': task, 'body_sha256': sha(body.encode())}
 
+    def accept_full_cycle_fixture_review(self, wf, store, scope, candidate, check):
+        source = wf['file_hash'](store.future)
+        scope_hash = wf['digest'](wf['dump'](scope).encode())
+        context = {**scope,'id':'full-cycle-fixture-'+scope['kind'],
+                   'semantic_fingerprint':scope_hash,'content_fingerprint':scope_hash}
+        owner = {'id':'fixture-owner','context_id':'fixture-owner-context'}
+        frame = wf['orchestration_action'](store,'orchestration-start',{
+            'request_id':'full-cycle-fixture-'+scope['kind'],'context':context,
+            'authority':{'id':'fixture-grant','revision':1,'context_id':context['id'],
+                         'allowed_kinds':['specification-acceptance'],'constraints':['Disposable fixture delivery.'],
+                         'evidence':{'kind':'owner-message','reference':'Scripted fixture owner grant.'}},
+            'executor':{'id':'fixture-executor','context_id':'fixture-executor-context'},'mode':'manual',
+            'capabilities':{'independent_actors':False},'expected_source_hash':source})
+
+        def step(command, **payload):
+            nonlocal frame
+            frame = wf['orchestration_action'](store,'orchestration-'+command,{
+                'orchestration_id':frame['id'],'expected_source_hash':source,
+                'expected_orchestration_hash':frame['orchestration_hash'],
+                'expected_orchestration_revision':frame['revision'],**payload})
+            return frame
+
+        def inspect(command):
+            return wf['orchestration_action'](store,'orchestration-'+command,{'orchestration_id':frame['id']})
+
+        step('research',reference='Inspected the exact primary fixture candidate.')
+        step('plan',plan_digest=scope_hash,required_checks=[check],reference='Review the original fixture scope.')
+        step('question',purpose='plan',question={
+            'id':'fixture-plan','kind':'specification-acceptance','significance':'routine',
+            'text':'Accept the scoped fixture plan?','options':[{'id':'accept','text':'Accept the plan.'},
+                                                            {'id':'revise','text':'Revise the plan.'}],
+            'recommendation':'accept'})
+        pending = inspect('next')
+        step('prepare-actor',input_digest=pending['input_digest'],expected_decision_hash=pending['decision_hash'],actor=owner)
+        waiting = inspect('next')
+        step('record-actor',attempt_id=waiting['attempt_id'],input_digest=waiting['input_digest'],
+             expected_decision_hash=waiting['decision_hash'],
+             result={'status':'answered','answer':'accept','rationale':'The scripted primary scope is accepted.'},
+             evidence={'kind':'submitted-answer','reference':'Scripted fixture answer.',
+                       'actor_id':owner['id'],'actor_context_id':owner['context_id']})
+        accepted = step('accept-decision')
+        step('accept-plan',decision_receipt=accepted['acceptance'])
+        step('implement',identity=candidate,reference='Sealed the exact accepted primary Git candidate.')
+        evidence, = inspect('check-evidence')['checks']
+        self.assertEqual(evidence['status'],'reusable')
+        step('checks',identity=candidate,reused_checks=[{
+            key:evidence[key] for key in ('id','task_id','check_id','attempt_id')}])
+        step('review',identity=candidate,review_id='fixture-'+scope['kind'],findings=[],
+             reference='Inspected the disposable primary candidate and source evidence.')
+        return frame['id']
+
+    def test_directed_full_cycle_delivers_primary_and_retains_deferred_intake(self):
+        root = self.external
+        self.install(root, 'unity', WRITER, 'skill-tree-full-cycle')
+        self.git(root, 'config', 'user.name', 'Director Fixture')
+        self.git(root, 'config', 'user.email', 'fixture@example.invalid')
+        area = self.declaration['areas'][-1]
+        area['scope'] = '.'
+        area['allowed_effects'].extend(['preview', 'intake', 'process'])
+        self.register()
+        primary = {'key':'primary','title':'Change the selected game input',
+                   'description':'Deliver the selected input change.','acceptance':['Keep the approved game input.'],
+                   'topic':'primary-delivery','priority':125,'source':'The approved product request.'}
+        deferred = {'key':'follow-up','title':'Assess the deployment handoff',
+                    'description':'Assess deployment after operations supplies settings.',
+                    'acceptance':['Record the deployment inputs.'],'topic':'deferred-delivery','priority':300,
+                    'source':'The deferred operations request.','pending_depends_on':['@primary']}
+        child = {'intake_batch_id':identity('IB'),'items':[deferred,primary],
+                 'full_cycle_partition':{'primary':['primary'],'deferred':['follow-up']}}
+        runtime = self.parent/AGENTS/'skill-tree-director-setup/scripts/runtime/common/scripts'
+        director = SimpleNamespace(**runpy.run_path(str(runtime/'director-state.py')))
+        routing = runpy.run_path(str(runtime/'director-project-routing.py'))
+        verified = director._inspect_owner(root)
+        project = {'id':'game','checkout':str(root),'queue_id':verified[0],'state':'available',
+                   'allowed_effects':area['allowed_effects']}
+        before = snapshot(root/QUEUE,root/STATE,root/PROFILE)
+        route = routing['preview'](director,self.parent,self.parent,{}, {},[project],{
+            'project_id':'game','operation':'skill-tree-full-cycle','full_cycle':child})
+        self.assertEqual(route['status'],'preview')
+        self.assertEqual(route['full_cycle']['child'],child)
+        self.assertEqual(snapshot(root/QUEUE,root/STATE,root/PROFILE),before)
+        assignment = {'id':'approved-cycle','area_id':'game','role':'unity','workspace':'existing-checkout',
+                      'capability':'core-task','write_paths':['game/source.txt'],'resources':[],'pins':[],
+                      'depends_on':[],'expected_result':'Complete the primary fixture.','check':'scope-check',
+                      'authority_ref':'fixture-owner','effects':['intake','process'],
+                      'stop_rules':['Process only approved primary scope.'],'child':route['full_cycle']['child']}
+        selected = self.freeze(None,assignments=[assignment])
+        criterion = primary['acceptance'][0]
+        relative = 'game/source.txt'
+        check = {'id':'scope-check','recipe_id':'static-inspection','criteria':[criterion],
+                 'sources':[relative],'parameters':{},'assertion':criterion,'timing':'immediate'}
+        body = ('Goal:\n- ' + criterion + '\n\nTouch:\n- ' + relative + '\n\nValidation:\n```json\n'
+                + json.dumps({'checks':[check]}) + '\n```\n\nAcceptance:\n- ' + criterion + '\n')
+        disposition = {'status':'promoted','reason':'The primary fixture has exact reviewed scope.'}
+        task = {'key':'delivery','title':primary['title'],'body':body,'parent_pending_ids':['primary']}
+        proposal = {'selectors':['primary'],'dispositions':{'primary':disposition},'tasks':[task]}
+        approved = sha((json.dumps(proposal,ensure_ascii=False,indent=2,sort_keys=True)+'\n').encode())
+        run_ref = {'director_run_id':identity('DR')}
+        run = self.director('run-start',{**selected,**run_ref,'assignment_ids':[assignment['id']],
+            'owner':{'actor':'fixture-owner','reference':'approved-cycle','kind':'owner-message'},
+            'authority':{assignment['id']:['intake','process']},'approved_defaults':[],
+            'process_spec_sha256':{assignment['id']:approved}})
+        receive = {**run_ref,'assignment_id':assignment['id'],'operation':'intake',
+                   'expected_run_sha256':run['run_sha256'],'request':{'expected_source_hash':sha((root/QUEUE).read_bytes())}}
+        scope = {'schema':1,'director_id':CURRENT_DIRECTOR,'assignment_id':assignment['id'],
+                 'queue_id':self.external_queue,'plan_sha256':selected['plan_sha256']}
+        parent_entry = self.parent/AGENTS/'skill-tree-director-run/scripts/runtime/common/scripts/director-state.py'
+        intake_input = write(self.base,'partitioned-intake.json',json.dumps(receive))
+        self.command(sys.executable,'-B','-c',DIRECTOR_BATCH_FAULT,parent_entry,'lost-ack',
+                     'run-dispatch',self.parent,'--input',intake_input,
+                     error='Injected loss after canonical acknowledgement')
+        observed = self.core(root,'director-dispatch-read',{'operation':'intake','director_dispatch':scope})
+        intake = self.director('run-dispatch',receive)
+        self.assertEqual(intake['result'],observed['observed_result'])
+        partition = intake['result']['full_cycle_partition']
+        pending_result, = partition['primary']
+        pending_later, = partition['deferred']
+        self.assertEqual(self.director('run-dispatch',receive)['result'],intake['result'])
+        verified_intake = self.director('verify-intake',{**run_ref,'assignment_id':assignment['id']},family='run')
+        self.assertEqual(verified_intake['full_cycle_partition'],partition)
+        paused = self.director('run-pause',{**run_ref,'expected_run_sha256':intake['run_sha256']})
+        resumed = self.director('run-resume',{**run_ref,'expected_run_sha256':paused['run_sha256']})
+        request = {**receive,'operation':'process','expected_run_sha256':resumed['run_sha256'],'request':{
+            'expected_source_hash':sha((root/QUEUE).read_bytes()),'selectors':[pending_result],
+            'dispositions':{pending_result:disposition},'tasks':[{**task,'parent_pending_ids':[pending_result]}]}}
+        pending = self.core(root,'read',None,'--id',pending_later)['body']
+        self.director('run-dispatch',{**request,'request':{**request['request'],'selectors':[pending_later]}},
+                      error='exact recorded batch')
+        processed = self.director('run-dispatch',request)
+        self.assertEqual(self.director('run-dispatch',request)['result'],processed['result'])
+        handoff = self.director('verify-intake',{**run_ref,'assignment_id':assignment['id']},family='run')
+        self.assertEqual(handoff['full_cycle_partition'],partition)
+        self.assertEqual(handoff['full_cycle_primary']['task_ids'],processed['result']['created_ids'])
+        ready, = handoff['full_cycle_primary']['task_ids']
+        ready_row = self.core(root,'read',None,'--id',ready)
+        self.assertEqual((ready_row['topic'],ready_row['priority'],ready_row['parent_pending_ids']),
+                         ('primary-delivery',125,[pending_result]))
+        self.assertEqual(self.core(root,'read',None,'--id',pending_later)['body'],pending)
+        self.assertEqual(self.director('run-status',run_ref)['assignments'][assignment['id']]['completed']
+                         ['full_cycle_partition'],partition)
+
+        entry = root/AGENTS/'skill-tree-full-cycle/scripts/workflow-state.py'
+        launch = self.invoke(entry,root,'start',{'implementation_operation':'work-through-next',
+            'local_base':True,'local_base_authorization':'Use the disposable local fixture base.',
+            'base_branch':'develop','delivery_authorization':{
+                'merge':True,'owner_instruction':'Verify reviewed delivery in the disposable fixture.'}},
+            ['--standalone','--mode','next','--id',ready],None)
+        self.assertEqual(launch['snapshot'],[ready])
+        worktree = Path(launch['profile_handoff']['worktree'])
+        wf = runpy.run_path(str(entry))['main'].__globals__
+        store = wf['Store'](worktree,launch['id'])
+        wf['prepare_worktree_profile'](store)
+        wf['begin_task'](store,{'task_id':ready})
+        content = 'Accepted game input.\n'
+        write(worktree,relative,content)
+        proof = f".skill-tree/run-evidence/{launch['id'].lower()}/primary.txt"
+        write(worktree,proof,(worktree/relative).read_text())
+        candidate = wf['mark_implemented'](store,{'task_id':ready,'changed_files':[relative,proof]})
+        prepared = wf['prepare_check'](store,{'task_id':ready,'check_id':check['id']})
+        self.assertEqual((worktree/relative).read_text(),content)
+        wf['record_check'](store,{'task_id':ready,'check_id':check['id'],'attempt_id':prepared['attempt_id'],
+            'result':'pass','classification':'executed-control','actual_lane':prepared['recipe']['lane'],
+            'environment_identity':prepared['environment_identity'],'cleanup':'The disposable fixture file was read.',
+            'evidence':[proof],'assertions':[{'assertion':criterion,'result':'pass'}]})
+        review = self.accept_full_cycle_fixture_review(
+            wf,store,{'kind':'task','task_ids':[ready]},candidate['git_review_identity'],check['id'])
+        completed = wf['complete'](store,{'task_id':ready,'review_id':review,'outcome':'The selected game input changed.',
+            'source_fingerprints':wf['fingerprints'](store,[relative]),
+            'acceptance':[{'criterion':criterion,'result':'pass','evidence':[proof]}]})
+        wf['advance'](store)
+        controller = wf['controller_review_identity'](store)
+        controller_review = self.accept_full_cycle_fixture_review(
+            wf,store,controller['review_scope'],controller['identity'],check['id'])
+        delivered = wf['finish'](store,{'review_id':controller_review})
+        self.assertEqual(completed['parent_pending_ids'],[pending_result])
+        self.assertEqual(delivered['delivery']['status'],'merged')
+        self.assertEqual((root/relative).read_text(),content)
+        self.assertEqual(self.core(root,'read',None,'--id',pending_later)['body'],pending)
+        delivered_state = snapshot(root/QUEUE,root/STATE,root/PROFILE)
+        self.assertEqual(self.director('run-dispatch',receive)['result'],intake['result'])
+        self.assertEqual(self.director('run-dispatch',request)['result'],processed['result'])
+        self.assertEqual(self.director('verify-intake',{**run_ref,'assignment_id':assignment['id']},family='run'),
+                         handoff)
+        self.assertEqual(snapshot(root/QUEUE,root/STATE,root/PROFILE),delivered_state)
+        self.assertEqual(self.core(root,'read',None,'--id',pending_later)['status'],'Pending')
+
     def freeze(self, game_task, *, assignments=None):
         intent = {'objective_id': identity('OB'), 'expected_current_sha256': None, 'intent': {
             'owner_ref': 'fixture-owner', 'title': 'Check linked areas', 'description': 'Retain the external checkpoint.',
@@ -797,49 +1024,10 @@ class DirectorTopologyTests(unittest.TestCase):
         self.director('run-dispatch', {**request, 'request':{**request['request'], 'items':list(reversed(batch_items))}},
                       error='Unexpected')
         parent_entry = self.parent/AGENTS/'skill-tree-director-run/scripts/runtime/common/scripts/director-state.py'
-        fault = '''
-import json
-from pathlib import Path
-import runpy
-import sys
-
-director = runpy.run_path(sys.argv[1])
-load = director['WF'].owned_module
-payload = json.loads(Path(sys.argv[-1]).read_text())
-stage = sys.argv[2]
-
-def with_interruption(name, path):
-    helper = load(name, path)
-    if name == 'director_run' and stage == 'lost-ack':
-        original = helper.DirectorRun._write
-
-        def write(self, relative, state, expected_sha):
-            if any(row['event'] == 'dispatch-recorded' and row.get('operation') == payload['operation']
-                   for row in state['timeline']):
-                raise OSError('Injected loss after canonical acknowledgement')
-            return original(self, relative, state, expected_sha)
-
-        helper.DirectorRun._write = write
-    if name == 'director_run' and stage == 'pause':
-        original = helper.DirectorRun._batch_dispatched_result
-
-        def pause(self, *args):
-            result = original(self, *args)
-            run_id = payload['director_run_id']
-            _, _, current_sha = self._load(run_id)
-            self.lifecycle('run-pause', {'director_run_id':run_id,'expected_run_sha256':current_sha})
-            return result
-
-        helper.DirectorRun._batch_dispatched_result = pause
-    return helper
-
-director['WF'].owned_module = with_interruption
-raise SystemExit(director['main'](sys.argv[3:]))
-'''
         scope = {'schema':1,'director_id':CURRENT_DIRECTOR,'assignment_id':assignment['id'],
                  'queue_id':self.shared_queue,'plan_sha256':selected['plan_sha256']}
         intake_input = write(self.base,'lost-batch-intake-ack.json',json.dumps(request))
-        self.command(sys.executable,'-B','-c',fault,parent_entry,'lost-ack','run-dispatch',self.parent,'--input',intake_input,
+        self.command(sys.executable,'-B','-c',DIRECTOR_BATCH_FAULT,parent_entry,'lost-ack','run-dispatch',self.parent,'--input',intake_input,
                      error='Injected loss after canonical acknowledgement')
         original_intake = self.core(self.parent,'director-dispatch-read',{'operation':'intake','director_dispatch':scope})
         canonical_text = queue_path.read_text()
@@ -898,12 +1086,12 @@ raise SystemExit(director['main'](sys.argv[3:]))
         self.assertEqual(snapshot(queue_path,state_path),before)
 
         process_input = write(self.base,'lost-batch-process-ack.json',json.dumps(process))
-        self.command(sys.executable,'-B','-c',fault,parent_entry,'lost-ack','run-dispatch',self.parent,'--input',process_input,
+        self.command(sys.executable,'-B','-c',DIRECTOR_BATCH_FAULT,parent_entry,'lost-ack','run-dispatch',self.parent,'--input',process_input,
                      error='Injected loss after canonical acknowledgement')
         published = snapshot(queue_path,state_path)
         self.assertNotEqual(published,before)
         original = self.core(self.parent,'director-dispatch-read',{'operation':'process','director_dispatch':scope})
-        confirmed = json.loads(self.command(sys.executable,'-B','-c',fault,parent_entry,'pause',
+        confirmed = json.loads(self.command(sys.executable,'-B','-c',DIRECTOR_BATCH_FAULT,parent_entry,'pause',
             'run-dispatch',self.parent,'--input',process_input))
         self.assertEqual(confirmed['result'],original['observed_result'])
         paused = self.director('run-status',run_ref)

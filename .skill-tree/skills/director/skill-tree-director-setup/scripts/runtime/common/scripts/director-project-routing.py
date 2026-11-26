@@ -333,11 +333,16 @@ def preview(D, root, workspace, settings, profile, products, request):
     if isinstance(request, dict) and 'request_text' in request:
         core, _ = installed_operations(D, root)
         return recommend_request(D, workspace, products, core, request)
-    D._object(request, {'operation'}, {'project_id', 'route', 'task_ids'})
+    D._object(request, {'operation'}, {'project_id', 'route', 'task_ids', 'full_cycle'})
     operation, mode = request['operation'], request.get('route', 'director')
     D._require(isinstance(operation, str) and mode in ('director', 'direct'), 'Select a known operation and route')
     core, director = installed_operations(D, root)
     chosen = request.get('project_id')
+    partitioned = 'full_cycle' in request
+    if partitioned:
+        D._require(operation == 'skill-tree-full-cycle' and mode == 'director' and D._token(chosen)
+                   and 'task_ids' not in request, 'A combined Full Cycle requires one exact registered project route')
+        D._object(request['full_cycle'], {'intake_batch_id', 'items', 'full_cycle_partition'})
     op = CORE_TASK_ROUTES.get(operation, operation)
     summary = {'route':mode, 'operation':operation}
     if op in TASK_ROUTES:
@@ -399,8 +404,18 @@ def preview(D, root, workspace, settings, profile, products, request):
     execution = 'direct-project' if mode == 'direct' else 'project-skill'
     if package:
         limitations = [] if mode == 'direct' else ['requires-exact-child-scope-and-effect-authorization']
-        return {**summary, 'execution': execution, 'status': 'preview', 'child_skill': package,
-                'limitations': limitations}
+        result = {**summary, 'execution': execution, 'status': 'preview', 'child_skill': package,
+                  'limitations': limitations}
+        if partitioned:
+            effects = REQUEST_ROUTES['fresh-implementation'][1]
+            missing = [effect for effect in effects if effect not in project['allowed_effects']]
+            if missing:
+                return {**result, 'status':'prerequisite', 'required_effects':missing,
+                        'limitations':['project-operation-effects-unavailable']}
+            compiler = D.WF.owned_module('director_full_cycle_plan', Path(__file__).with_name('director-plans.py'))
+            child = compiler.compile_child_batch(request['full_cycle'], ['intake', 'process'])
+            result['full_cycle'] = {'child':child, 'scope_sha256':D._digest(child)}
+        return result
     checkout = Path(project.get('workspace_checkout', project['checkout']))
     prerequisite = D._profile_refresh_prerequisite(checkout)
     if prerequisite:

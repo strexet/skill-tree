@@ -24,6 +24,12 @@ The preview recognizes explicit wording for fresh implementation, implementation
 
 The result gives matched intents, a candidate operation when available, a bounded confidence label, and any unresolved choices or prerequisites. The preview grants no effect. Select the exact operation and scope through the regular route before continuing.
 
+### Review primary delivery and deferred intake
+
+For a combined request, preview `operation: "skill-tree-full-cycle"` with the exact `project_id` and a `full_cycle` object. Supply the caller-held `intake_batch_id`, original ordered `items` and `full_cycle_partition`. Each partition has the original order and names explicit item keys. For intake items named `proxy` and `deployment-check`, the partition can contain `{"primary":["proxy"],"deferred":["deployment-check"]}`.
+
+Freeze the returned child selection before dispatch. The approved process proposal names only primary keys. After intake, the verified original receipt resolves both partitions to exact Pending IDs. The process request uses only the exact primary Pending IDs in the original order. Resume the ordinary Full Cycle from the exact prioritized IDs in the verified primary processing receipt. A later operation requires separate authority to process deferred work.
+
 ## Register areas
 
 For first-time setup, review the coordinator, project placements, package sources and prerequisites through the [guided setup preview](../common/references/director-workflow.md#preview-first-time-setup). Once approved, [prepare the workspace](../common/references/director-workflow.md#prepare-the-approved-workspace) with `setup-bootstrap`. Use the [prepared-area registration and status flow](../common/references/director-workflow.md#register-the-prepared-areas) for the exact prepared set. The explicit area registration commands below remain available.

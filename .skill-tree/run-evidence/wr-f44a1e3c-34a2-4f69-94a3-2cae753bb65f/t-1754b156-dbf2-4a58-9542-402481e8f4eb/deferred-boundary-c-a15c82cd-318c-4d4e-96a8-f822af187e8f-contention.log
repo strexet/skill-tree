@@ -1,0 +1,81 @@
+Shard 1 (2 cases, exit 0)
+DirectorTopologyTests.test_compact_source_preserves_full_project_checkout_and_pr_preflight
+DirectorTopologyTests.test_managed_implement_all_keeps_full_snapshot_and_dispatches_compatible_work
+  {"compact_git_objects_bytes": 269636, "compact_worktree_bytes": 264345, "full_git_objects_bytes": 791754, "full_worktree_bytes": 527332}
+  ..
+  ----------------------------------------------------------------------
+  Ran 2 tests in 100.675s
+
+  OK
+
+Shard 2 (2 cases, exit 0)
+DirectorTopologyTests.test_maintenance_distinguishes_client_outages_from_remote_rejections
+DirectorTopologyTests.test_managed_implement_all_resumes_after_verified_incorporation
+  ..
+  ----------------------------------------------------------------------
+  Ran 2 tests in 184.739s
+
+  OK
+
+Shard 3 (2 cases, exit 0)
+DirectorTopologyTests.test_moved_director_setup_stops_before_child_effects_and_reuses_identity
+DirectorTopologyTests.test_supervised_pickup_timeout_recovers_unbound_supervisor_and_worker
+  ..
+  ----------------------------------------------------------------------
+  Ran 2 tests in 209.527s
+
+  OK
+
+Shard 4 (2 cases, exit 1)
+DirectorTopologyTests.test_owned_shared_root_and_external_rebind_keep_exact_writers
+DirectorTopologyTests.test_supervised_heartbeat_progress_and_submission_survive_contention
+  .F
+  ======================================================================
+  FAIL: test_supervised_heartbeat_progress_and_submission_survive_contention (__main__.DirectorTopologyTests.test_supervised_heartbeat_progress_and_submission_survive_contention)
+  ----------------------------------------------------------------------
+  Traceback (most recent call last):
+    File "/Users/petr/Projects/_skills/_my/skill-tree/.git/skill-tree-worktrees/wr-f44a1e3c-34a2-4f69-94a3-2cae753bb65f/.skill-tree/tests/test-director-topologies.py", line 1569, in test_supervised_heartbeat_progress_and_submission_survive_contention
+      self.assertTrue(all(code == 0 for code, _ in results), results)
+  AssertionError: False is not true : [(2, {'error': 'Writer lock exists; verify owner PID/host before explicit lock removal', 'ok': False}), (0, {'attempt': {'actor_id': 'game-worker-actor', 'assigned_at': '2026-11-26T06:53:49.372755+00:00', 'assignment_id': 'game', 'assignment_sha256': '02a8f65d0d38b92a8bd96f7d249d365bc9aaa364e47ddff949fd3d8ef031eb1d', 'base': 'c46a19879e6a5480fef908979ec62596a03562af', 'checkout': '27ede37b963e821f4ade1c76653db6f36512a4f6f0957d942df34cec75fcf1c7', 'child_run_id': 'WR-7db02766-6389-4d60-9da7-98fb02dd5921', 'depends_on': [], 'generation': 1, 'last_heartbeat_at': '2026-11-26T06:53:50.372755+00:00', 'last_progress_at': '2026-11-26T06:53:52.372755+00:00', 'launch_receipt_sha256': '883c873677c184b8b98c477087c34b56063377b223bb4927f61bb37c217f6561', 'parent_unit_id': 'game-parent', 'paths': ['game/source.txt'], 'picked_up_at': '2026-11-26T06:53:50.372755+00:00', 'process': {'birth': {'clock': 'darwin-proc-bsdinfo', 'microseconds': 238052, 'seconds': 1795676048}, 'pgid': 36781, 'pid': 36781, 'uid': 501}, 'progress_marker': 'c7091de8600aa49e650a49231639a3337bb2530ae421d6fde4c78105fd3fc2cb', 'progress_reference': 'observed-worktree-check', 'repository': '/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/director-topology-controls-qkwo63gs/external/.git', 'resources': ['fixture-editor'], 'role': 'worker', 'shared_inputs': {'game/resource.txt': '83aec6e9b9b84ee43c5f3a763a3b88811ad6a7e99964e77144a5a87679da5c9e'}, 'status': 'running', 'task_id': 'T-3260ff94-6b58-453a-816e-7c04c75b3428', 'task_sha256': '68ef783b93383f32824d316dee6a3fdebd2b26ca88024ec6ccccc9d7392e18bc', 'unit_id': 'game-worker', 'wait': None, 'worktree': '/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/director-topology-controls-qkwo63gs/game-worker-worker'}, 'run_sha256': 'b6cf4918338471fa804269e7f5b638d2eed95ea9bd897ae9d4100e7fdafdb9d0', 'status': 'running'}), (0, {'attempt': {'actor_id': 'story-worker-actor', 'assigned_at': '2026-11-26T06:53:49.372755+00:00', 'assignment_id': 'story', 'assignment_sha256': 'c1f77250e92a71b47284e7a766b3a582e1bb3a90710db9d8f1c4b1e2e6ff931e', 'base': '8622bd6f98bca829aea4445665ed1617a31d9c86', 'candidate': {'head': '417ff771519df44fa2c78741c7b074f318301c1a', 'paths': ['story/source.txt'], 'tree': 'b75e553ac496525aa4594fcebdba8ee33ed02807'}, 'candidate_sha256': 'f238097e99ec899f551bd084630f5f2c51d1576a1e72a1d91fa0da813f63e650', 'checkout': '02fe3d949fea1bb0f62ea84962511728f1da9f2575a2ce07421cacc5c3e967f5', 'checks': [{'id': 'scope-check', 'path': '.skill-tree/artifacts/fixture-check.txt', 'sha256': '3c91b6bc7b42c35d570f16753e4563d5bdab4e27e39b41dc4f8d39e8654f45da'}], 'child_run_id': 'WR-095b4ab1-74ae-4613-b77a-59c2b1b88496', 'depends_on': [], 'generation': 1, 'last_heartbeat_at': '2026-11-26T06:53:50.372755+00:00', 'last_progress_at': '2026-11-26T06:53:50.372755+00:00', 'launch_receipt_sha256': 'a9a61b6c27158f11866759d5ed8275d88bac45b24494a6fdcb6e522a5161565b', 'parent_unit_id': None, 'paths': ['story/source.txt'], 'picked_up_at': '2026-11-26T06:53:50.372755+00:00', 'process': {'birth': {'clock': 'darwin-proc-bsdinfo', 'microseconds': 243177, 'seconds': 1795676048}, 'pgid': 36783, 'pid': 36783, 'uid': 501}, 'progress_marker': '94e06c1ab38f62d66a19ad98e70b649bc09a29fcf1e1b6780f836f008a9aba41', 'receipt_sha256': 'c24dce53db0a9324f20554c3604add5321b2c43d46224756fec9bf4294ae36ec', 'repository': '/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/director-topology-controls-qkwo63gs/parent/.git', 'resources': [], 'role': 'worker', 'shared_inputs': {}, 'status': 'completed', 'task_id': 'T-be5acce1-9f63-4059-b0e9-c3b4d7f32174', 'task_sha256': '3a35343bb2737435641cb9b99784ad3e230cdafce58d64a94de9324b3076830b', 'unit_id': 'story-worker', 'verified_at': '2026-11-26T06:53:52.372755+00:00', 'wait': None, 'worktree': '/private/var/folders/m0/jn_q057x159dkrt_btt4v0y80000gn/T/director-topology-controls-qkwo63gs/story-worker-worker'}, 'run_sha256': '3338b25843439314969158bdc897e5b67bafbe5ecf0704f5a5a67eefe45be319', 'status': 'completed'})]
+
+  ----------------------------------------------------------------------
+  Ran 2 tests in 163.499s
+
+  FAILED (failures=1)
+
+Shard 5 (2 cases, exit 0)
+DirectorTopologyTests.test_directed_full_cycle_delivers_primary_and_retains_deferred_intake
+DirectorTopologyTests.test_supervised_nested_stall_preserves_sibling_and_fences_replacement
+  ..
+  ----------------------------------------------------------------------
+  Ran 2 tests in 278.239s
+
+  OK
+
+Shard 6 (1 cases, exit 0)
+DirectorTopologyTests.test_prepared_registration_and_intake_verify_the_original_canonical_route
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 223.703s
+
+  OK
+
+Shard 7 (1 cases, exit 0)
+DirectorTopologyTests.test_directed_batch_preserves_canonical_metadata_edges_and_receipts
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 61.470s
+
+  OK
+
+Shard 8 (1 cases, exit 0)
+DirectorTopologyTests.test_cross_area_manual_wait_preserves_same_external_run_and_allows_shared_sibling
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 62.561s
+
+  OK
+
+Ran 13 tests in 278.530s
+
+FAILED

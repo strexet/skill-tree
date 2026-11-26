@@ -584,8 +584,9 @@ def intake_receipt_path(batch_id):
     return INTAKE_RECEIPTS+batch_id.lower()+'.json'
 
 def validate_intake_receipt(receipt,batch_id):
+    fields={'schema','id','created_at','request_sha256','items'}
     if (not isinstance(receipt,dict) or receipt.get('schema')!=1 or receipt.get('id')!=batch_id
-            or set(receipt)!={'schema','id','created_at','request_sha256','items'}
+            or not fields <= set(receipt) or set(receipt) - fields - {'full_cycle_partition'}
             or not isinstance(receipt.get('request_sha256'),str) or not re.fullmatch('[a-f0-9]{64}',receipt['request_sha256'])
             or not isinstance(receipt.get('items'),list) or not receipt['items']):
         raise WorkflowError('Invalid intake batch receipt')
@@ -600,6 +601,12 @@ def validate_intake_receipt(receipt,batch_id):
         if item.get('intake_batch_ids')!=[batch_id] or item['id'] in ids:
             raise WorkflowError('Invalid intake receipt membership')
         ids.add(item['id'])
+    if 'full_cycle_partition' in receipt:
+        try:
+            director_dispatch_helper().full_cycle_partition(
+                [item['id'] for item in receipt['items']], receipt['full_cycle_partition'])
+        except ValueError as error:
+            raise WorkflowError(str(error)) from error
     return receipt
 
 def read_intake_receipt(store,batch_id):
@@ -737,22 +744,34 @@ def intake(store,payload):
             replay=dispatch.observed(store)
             if replay is not None:return replay
         batched='items' in payload
-        if batched and set(payload)-{'items','intake_batch_id','expected_source_hash'}:
+        if batched and set(payload)-{'items','intake_batch_id','expected_source_hash','full_cycle_partition'}:
             raise WorkflowError('Batch input permits items, intake batch identity and source guard')
         items=payload['items'] if batched else [payload]
         if not isinstance(items,list) or not items or any(not isinstance(item,dict) for item in items):
             raise WorkflowError('Intake batch requires a nonempty list of items')
-        if batched and any(set(item)&{'items','intake_batch_id','intake_batch_ids','expected_source_hash'} for item in items):
+        if batched and any(set(item)&{'items','intake_batch_id','intake_batch_ids','expected_source_hash',
+                                     'full_cycle_partition'} for item in items):
             raise WorkflowError('The intake envelope owns batch identity and source guard')
         if not batched and 'intake_batch_ids' in payload:
             raise WorkflowError('Intake batch provenance is assigned by intake')
+        partition=None
+        if 'full_cycle_partition' in payload:
+            if not batched or not dispatch:
+                raise WorkflowError('Full Cycle partition requires one exact directed intake batch')
+            try:
+                partition=director_dispatch_helper().full_cycle_intake_partition(items,payload['full_cycle_partition'])
+            except ValueError as error:
+                raise WorkflowError(str(error)) from error
         batch_id=payload.get('intake_batch_id')
         if batched or 'intake_batch_id' in payload or 'topic' in payload:
             if not valid_id(batch_id,'IB'):raise WorkflowError('Grouped intake requires a caller-held IB identity')
         if batch_id is not None:
             rel=intake_receipt_path(batch_id)
-            request_sha=digest(dump({'batched':batched,'items':[{k:v for k,v in item.items()
-                if k not in {'expected_source_hash','intake_batch_id'}} for item in items]}).encode())
+            request={'batched':batched,'items':[{k:v for k,v in item.items()
+                if k not in {'expected_source_hash','intake_batch_id'}} for item in items]}
+            if partition:
+                request['full_cycle_partition']=partition
+            request_sha=digest(dump(request).encode())
             receipt=read_intake_receipt(store,batch_id)
             if receipt:
                 if receipt['request_sha256']!=request_sha:raise WorkflowError('Intake batch identity already belongs to a different request')
@@ -774,6 +793,9 @@ def intake(store,payload):
         extras={}
         if batch_id is not None:
             receipt={'schema':1,'id':batch_id,'created_at':now(),'request_sha256':request_sha,'items':created}
+            if partition:
+                ids={item['key']:meta['id'] for item,meta in zip(items,created)}
+                receipt['full_cycle_partition']={role:[ids[key] for key in keys] for role,keys in partition.items()}
             validate_intake_receipt(receipt,batch_id)
             extras={rel:dump(receipt)}
         result=receipt if batched else created[0]

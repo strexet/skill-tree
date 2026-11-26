@@ -113,7 +113,8 @@ def _host_owner(evidence):
 
 def _body(work):
     if 'items' in work:
-        return {'intake_batch_id': work['intake_batch_id'], 'items': [_body(item) for item in work['items']]}
+        return {'intake_batch_id': work['intake_batch_id'], 'items': [_body(item) for item in work['items']],
+                **({'full_cycle_partition': work['full_cycle_partition']} if 'full_cycle_partition' in work else {})}
     return {**{key: value for key, value in work.items() if key != 'acceptance'},
             'expected_behavior': '\n'.join(work['acceptance'])}
 
@@ -1005,12 +1006,14 @@ class DirectorRun:
         D._object(payload, {'director_run_id', 'assignment_id'})
         _, state, _ = self._load(payload['director_run_id'])
         name = payload['assignment_id']
-        spec = self._assignment(state, name)
-        root = self._area_for_run(state, spec)
+        recorded = state['assignments'].get(name, {}).get('dispatches', {}).get('intake')
+        historical = bool(recorded and recorded['status'] == 'recorded'
+                          and recorded['result'].get('full_cycle_partition'))
+        spec = self._assignment(state, name, check_current=not historical)
+        root = self.check_area(spec, receipt_only=True) if historical else self._area_for_run(state, spec)
         selected = spec['area']
         result = {**payload, 'area_id': selected['id'], 'repo_id': selected['repo_id'],
                   'scope': selected['scope'], 'queue_id': selected['queue_id'], 'status': 'unverified'}
-        recorded = state['assignments'][name]['dispatches'].get('intake')
         if not recorded or recorded['status'] != 'recorded':
             return result
         D._require('intake' in state['authority'][name] and 'intake' in spec['effects'],
@@ -1027,6 +1030,26 @@ class DirectorRun:
             ids = [item['id'] for item in receipt['result']['items']]
             D._require(ids == recorded['result']['pending_ids'], 'Original canonical intake batch membership changed')
             provenance = {'intake_batch_id': recorded['result']['id'], 'pending_ids': ids}
+            if 'full_cycle_partition' in spec['child']:
+                partition = receipt['result'].get('full_cycle_partition')
+                D._require(partition and partition == recorded['result'].get('full_cycle_partition'),
+                           'Original canonical Full Cycle partition changed')
+                provenance['full_cycle_partition'] = partition
+                processed = state['assignments'][name]['dispatches'].get('process')
+                if processed and processed['status'] == 'recorded':
+                    D._require('process' in state['authority'][name] and 'process' in spec['effects'],
+                               'Original primary process lacks exact authorization')
+                    acknowledged = D.WF.director_dispatch_helper().observe(
+                        child, {'operation':'process','director_dispatch':self._envelope(state,spec)})
+                    proof, decision = acknowledged['receipt'], acknowledged['observed_result']
+                    D._require(proof and proof['receipt_sha256'] == processed['receipt_sha256']
+                               and proof['semantic_sha256'] == processed['semantic_sha256']
+                               and decision['id'] == processed['result']['id']
+                               and decision['selected_ids'] == partition['primary']
+                               and decision['created_ids'] == processed['result']['created_ids'],
+                               'Original canonical primary processing receipt changed')
+                    provenance['full_cycle_primary'] = {'processing_run_id':decision['id'],
+                        'task_ids':decision['created_ids'],'receipt_sha256':proof['receipt_sha256']}
         else:
             provenance = {'pending_id': recorded['result']['id']}
         return {**result, 'status': 'verified', 'plan_sha256': state['plan_sha256'],
@@ -1106,12 +1129,21 @@ class DirectorRun:
     def _batch_process_request(self, request, spec, record, approved):
         D._object(request, {'expected_source_hash', 'selectors', 'dispositions', 'tasks'})
         original = record['dispatches']['intake']
-        ids = original['result']['pending_ids']
+        members = original['result']['pending_ids']
+        by_member = dict(zip(members, (item['key'] for item in spec['child']['items'])))
+        if 'full_cycle_partition' in spec['child']:
+            partition = D.WF.director_dispatch_helper().full_cycle_partition(
+                members, original['result'].get('full_cycle_partition'))
+            D._require({role:[by_member[item] for item in ids] for role, ids in partition.items()}
+                       == spec['child']['full_cycle_partition'], 'Original canonical Full Cycle partition changed')
+            ids = partition['primary']
+        else:
+            ids = members
         dispositions, tasks = request['dispositions'], request['tasks']
         D._require(request['selectors'] == ids and isinstance(dispositions, dict) and set(dispositions) == set(ids)
                    and all(isinstance(item, dict) and item.get('status') == 'promoted' for item in dispositions.values())
                    and isinstance(tasks, list) and tasks, 'Director processing requires the exact recorded batch membership')
-        by_id = dict(zip(ids, (item['key'] for item in spec['child']['items'])))
+        by_id = {item:by_member[item] for item in ids}
         projected = []
         for item in tasks:
             self._scope_processed_task(item, spec, batch=True)
@@ -1131,10 +1163,18 @@ class DirectorRun:
             D._require(result['id'] == request['intake_batch_id'], 'Canonical intake batch identity changed')
             pending_ids = [item['id'] for item in result['items']]
             fingerprints = receipt.get('pending_definition_sha256s')
-            D._require(isinstance(fingerprints, dict) and set(fingerprints) == set(pending_ids)
+            D._require(len(pending_ids) == len(request['items'])
+                       and isinstance(fingerprints, dict) and set(fingerprints) == set(pending_ids)
                        and all(D._sha(value) for value in fingerprints.values()),
                        'Canonical intake batch lacks original Pending definition evidence')
-            return {'pending_ids': pending_ids, 'task_sha256s': fingerprints}
+            recorded = {'pending_ids': pending_ids, 'task_sha256s': fingerprints}
+            if 'full_cycle_partition' in request:
+                by_key = dict(zip((item['key'] for item in request['items']), pending_ids))
+                planned = {role:[by_key[key] for key in keys] for role, keys in request['full_cycle_partition'].items()}
+                D._require(result.get('full_cycle_partition') == planned,
+                           'Canonical intake differs from the requested Full Cycle partition')
+                recorded['full_cycle_partition'] = planned
+            return recorded
         D._require(result['selected_ids'] == request['selectors'] and not result['reused_ids']
                    and len(result['created_ids']) == len(request['tasks']) and result['dispositions'] == request['dispositions'],
                    'Canonical batch processing acknowledgement has unexpected scope')
@@ -1207,10 +1247,16 @@ class DirectorRun:
         D._require(isinstance(payload['request'], dict), 'Director dispatch requires an exact effect request')
         run_id, name = payload['director_run_id'], payload['assignment_id']
         rel, before, sha = self._load(run_id)
-        spec = self._assignment(before, name)
-        child = D.WF.Store(self._area_for_run(before, spec), neutral=True)
+        dispatches = before['assignments'].get(name, {}).get('dispatches', {})
+        existing = dispatches.get(operation)
+        original = dispatches.get('intake', {})
+        historical = bool(operation in {'intake','process'} and existing and existing['status'] == 'recorded'
+                          and original.get('status') == 'recorded'
+                          and original['result'].get('full_cycle_partition'))
+        spec = self._assignment(before, name, check_current=not historical)
+        root = self.check_area(spec, receipt_only=True) if historical else self._area_for_run(before, spec)
+        child = D.WF.Store(root, neutral=True)
         helper = D.WF.director_dispatch_helper()
-        existing = before['assignments'][name]['dispatches'].get(operation)
         envelope = self._envelope(before, spec)
         observed = helper.observe(child, {'operation': operation, 'director_dispatch': envelope})
         recovering = observed['receipt'] is not None
@@ -1335,6 +1381,9 @@ class DirectorRun:
                         child_ids['intake_batch_id'] = result['id']
                     else:
                         child_ids.update(processing_run_id=result['id'], task_ids=result['created_ids'])
+                    partition = current['assignments'][name]['dispatches']['intake']['result'].get('full_cycle_partition')
+                    if partition:
+                        child_ids['full_cycle_partition'] = partition
                 elif operation == 'intake':
                     child_ids = {'pending_id': result['id']}
                 elif operation == 'process':
@@ -1645,13 +1694,16 @@ def run(registry, planner, command, payload):
         current = {'revision': plan['objective']['objective_revision'], 'sha256': plan['objective']['objective_sha256']}
         D._require(ledger['current'] == current, 'The frozen Director objective is no longer current')
 
-    def check_area(assignment, *, approved_head=None):
+    def check_area(assignment, *, approved_head=None, receipt_only=False):
         areas, bindings, sources = registered()
         identity = assignment['area']
         area = areas['areas'].get(identity['id'])
         D._require(area and all(area.get(key) == identity[key] for key in ('id', 'scope', 'repo_id', 'queue_id')),
                    'The planned Director area identity changed')
         root = planner.O._child_root(areas, bindings, area['id'])
+        if receipt_only:
+            # Receipt recovery verifies the original destination without requalifying fresh effects.
+            return root
         if approved_head is None:
             qualification = sources.qualify(area, assignment['capability'])
         else:
