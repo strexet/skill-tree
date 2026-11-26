@@ -227,8 +227,8 @@ class TaskClarificationTests(unittest.TestCase):
         wf.record_check(self.store, {'task_id': self.a, 'check_id': 'behavior', 'attempt_id': attempt['attempt_id'], 'result': 'pass', 'classification': 'executed-control', 'actual_lane': 'static', 'environment_identity': attempt['environment_identity'], 'assertions': [{'assertion': 'Preserve selected behavior.', 'result': 'pass'}], 'cleanup': 'No runtime process remains.', 'evidence': ['check-evidence.txt']})
         session = self.mutate('clarify-revise', session, tasks=[{'task_id': self.a, 'body': self.body('Preserve revised selected behavior.')}])
         task = wf.resolve(wf.parse(self.store.text()), [self.a])[0]
-        for field in wf.OPTIONAL_FIELDS:
-            self.assertEqual(task[field], before_task[field])
+        self.assertEqual({field: task[field] for field in wf.OPTIONAL_FIELDS if field in task},
+                         {field: before_task[field] for field in wf.OPTIONAL_FIELDS if field in before_task})
 
     def test_required_interview_cancellation_keeps_hold_without_global_block(self):
         session = self.start(mode='required-interview')
