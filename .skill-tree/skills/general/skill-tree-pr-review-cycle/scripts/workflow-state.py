@@ -169,7 +169,7 @@ def validate_metadata(meta, queue):
     if meta['id'] in meta['depends_on']:
         raise WorkflowError('A task cannot depend on the task identity')
 
-def parse(text):
+def parse(text, *, boundary_preflight=None):
     """Read fixed headers; task bodies remain outside the metadata index."""
     lines=text.splitlines(keepends=True); queue=None; found=[]; entries=[]; current=None; fenced=False
     for i,line in enumerate(lines):
@@ -220,7 +220,9 @@ def parse(text):
             for section in SECTIONS:
                 if not re.search(r'(?m)^'+re.escape(section)+r':\s*$',body):
                     raise WorkflowError(task['title']+': missing section '+section)
-            check_specs(task)
+            boundary_issues = (boundary_preflight[1] if boundary_preflight
+                               and boundary_preflight[0] == task['id'] else None)
+            check_specs(task,boundary_issues=boundary_issues)
             blocked='[Unresolved - blocks implementation]' in body or '[Unresolved — blocks implementation]' in body
             if blocked != (task['status']=='Blocked pending answers'):
                 raise WorkflowError('Blocking question and status disagree: '+task['title'])
@@ -4286,7 +4288,7 @@ def section_body(body,name):
 def acceptance_criteria(task):
     return [line[2:].strip() for line in section_body(task['body'],'Acceptance').splitlines() if line.startswith('- ')]
 
-def check_specs(task):
+def check_specs(task, *, boundary_issues=None):
     text=section_body(task['body'],'Validation');match=re.search(r'```json\n(.*?)\n```',text,re.S)
     if not match:raise WorkflowError('Validation requires a structured JSON checks object')
     try:plan=json.loads(match[1])
@@ -4309,7 +4311,11 @@ def check_specs(task):
         if not isinstance(check.get('parameters'),dict) or not isinstance(check.get('assertion'),str) or not check['assertion'].strip():raise WorkflowError('Check requires parameters and a concrete assertion')
         if 'fresh_review' in check and type(check['fresh_review']) is not bool:raise WorkflowError('Check fresh_review requires an explicit Boolean')
         if check.get('timing') not in {'immediate','group-end','before-dependent-work'}:raise WorkflowError('Check requires immediate or explicit boundary timing')
-        if check['timing']!='immediate' and task.get('boundary_validation','not-required')=='not-required':raise WorkflowError('Boundary check requires task boundary classification')
+        if check['timing'] != 'immediate' and task.get('boundary_validation','not-required') == 'not-required':
+            if boundary_issues is None:
+                raise WorkflowError('Boundary check requires task boundary classification')
+            boundary_issues.append({'check_id':check['id'],'field':'boundary_validation',
+                                    'timing':check['timing'],'supported':['group-end','before-dependent-work']})
     if covered!=set(criteria):raise WorkflowError('Every acceptance criterion requires a mapped check')
     return checks
 
@@ -4629,27 +4635,143 @@ def group_fingerprint(store,task,state):
     return digest(dump(definitions).encode())
 
 PRODUCT_LANES={'browser','server','unity-editmode','unity-playmode','visual','player','device','native'}
+COUNTED_LANES = {'unit','integration','browser','unity-editmode','unity-playmode'}
+COUNT_FIELDS = ('expected','discovered','passed','failed','skipped')
+EXECUTION_FIELDS = ('project_root','authorization','profile_id','deadline_utc','cleanup_seconds',
+                    'tool_identity','session_identity','fixture_identity','build_identity','identity_evidence')
+BOUND_EXECUTION_FIELDS = ('queue_root','binding_id','source_identity')
+BINDING_TOOL_FIELDS = ('cli_version','pipeline_version')
+UNITY_EXECUTION_FIELDS = ('editor_version','save_service_isolation')
+LAUNCH_FIELDS = ('assertion','cheaper_evidence_insufficient','authorization','deadline_utc','cleanup_seconds',
+                 'project_root','execution_profile')
+CHECK_CLASSIFICATIONS = ('executed-control','prerequisite-wait','transport-uncertainty','host-policy-rejection')
+CHECK_RESULTS = ('pass','fail','red','unavailable')
+CHECK_RESULT_FIELDS = ('task_id','check_id','attempt_id','classification','result',
+                       'actual_lane','environment_identity','cleanup')
+
+
+def validation_preflight(store,payload):
+    """Read the selected check requirements without preparing a check attempt."""
+    if (not isinstance(payload,dict)
+            or set(payload) - {'task_id','check_id','expected_source_hash'}
+            or not valid_id(payload.get('task_id'),'T')
+            or not isinstance(payload.get('check_id'),str)
+            or not re.fullmatch(r'[a-z][a-z0-9-]*',payload['check_id'])):
+        raise WorkflowError('Validation preflight requires an exact prioritized task and check ID')
+    source = store.owned(FUTURE_QUEUE)
+    if not source.is_file():
+        store.text()
+    inspected = source.read_bytes()
+    text = inspected.decode('utf-8').replace('\r\n','\n').replace('\r','\n')
+    source_hash = digest(inspected)
+    if 'expected_source_hash' in payload and payload['expected_source_hash'] != source_hash:
+        raise WorkflowError('Source changed since inspection; reread selected task')
+    task_id,check_id = payload['task_id'],payload['check_id']
+    boundary = []
+    tasks = parse(text,boundary_preflight=(task_id,boundary))
+    task = next((row for row in tasks if row['id']==task_id and row['queue']=='Prioritized Next Changes'),None)
+    if task is None:
+        raise WorkflowError('Validation preflight requires an exact prioritized task ID')
+    checks = check_specs(task,boundary_issues=[])
+    check = next((row for row in checks if row['id']==check_id),None)
+    if check is None:
+        raise WorkflowError('Validation preflight requires an exact check ID from the selected task')
+    baseline = clarification_baselines([task])
+    response = {'task_id':task_id,'check_id':check_id,'source_hash':source_hash,
+                'content_fingerprint':baseline[task_id]['content_hash'],
+                'semantic_fingerprint':clarification_fingerprints(baseline)[task_id],
+                'task_status':task['status'],'check':deepcopy(check),'missing_boundary_classification':boundary,
+                'status':'boundary-metadata-required' if boundary else 'requirements'}
+    state_path = store.owned(FUTURE_STATE)
+    checkpoint = state_path.read_bytes() if state_path.is_file() else None
+    state = workspaces.project(store,json.loads(checkpoint)) if checkpoint is not None else {}
+    run = state.get('active_run')
+    if store.run_id and (not run or run['id'] != store.run_id):
+        raise WorkflowError('The selected preflight run is unavailable')
+    if run:
+        if task_id not in scope_ids(tasks,execution_run(run)):
+            raise WorkflowError('Task is outside the admitted controller scope')
+        response['run_id'] = run['id']
+    try:
+        recipe,environment = recipe_for(store,check)
+        lane = recipe['lane']
+        if lane in {'unit','unity-editmode'} and check['timing'] != 'immediate':
+            raise WorkflowError('Focused behavioral checks remain immediate')
+    except WorkflowError as error:
+        if not boundary:
+            raise
+        response['recipe_prerequisite'] = str(error)
+    else:
+        runtime = lane in PRODUCT_LANES
+        execution_fields = list(EXECUTION_FIELDS) if runtime else []
+        binding = recipe.get('execution_context')
+        if runtime and binding:
+            execution_fields.extend(BOUND_EXECUTION_FIELDS)
+        if lane.startswith('unity-'):
+            execution_fields.extend(UNITY_EXECUTION_FIELDS)
+        counted = lane in COUNTED_LANES
+        response.update(recipe_id=check['recipe_id'],lane=lane,recipe_environment=environment)
+        response['execution'] = {
+            'required':runtime,'fields':execution_fields,
+            'tool_identity_fields':list(BINDING_TOOL_FIELDS) if runtime and binding else [],
+            'project_root':binding['execution_root'] if binding else str(store.source_root),
+            'requires_aware_deadline_and_positive_cleanup_reserve':runtime,
+            'identity_evidence_requires_repository_relative_paths':runtime,
+        }
+        response['launch'] = {'required':False,'fields_if_present':list(LAUNCH_FIELDS)}
+        results = [value for value in CHECK_RESULTS if counted or value != 'red']
+        response['receipt'] = {
+            'fields':list(CHECK_RESULT_FIELDS),'classification_values':list(CHECK_CLASSIFICATIONS),
+            'result_values':results,
+            'results_requiring_evidence_and_executed_control':['pass','red'] if counted else ['pass'],
+            'evidence_field':'evidence',
+            'evidence_reference':{'repository_relative_path_string':True,'object_required':['path'],
+                                  'object_optional':['sha256']},
+            'cleanup_requires_nonempty_text':True,
+            'executed_pass_shape':'counts' if counted else 'assertions',
+            'count_fields':list(COUNT_FIELDS) if counted else [],
+            'counts_must_be_nonnegative_integers':counted,
+            'minimum_expected_discovery':1 if counted else None,
+            'minimum_discovery_uses_expected_count':counted,
+            'discovered_must_equal_passed_failed_and_skipped':counted,
+            'pass_zero_count_fields':['failed','skipped'] if counted else [],
+            'assertion':None if counted else check['assertion'],
+            'assertions_all_passed':not counted,
+            'failure_signature_required_for_executed_fail':True,
+            'behavioral_red_allowed':counted,
+            'behavioral_red_requires_failed_and_no_skips':counted,
+            'behavioral_red_failure_category':'expected-behavior' if counted else None,
+        }
+        if recipe_for(store,check) != (recipe,environment):
+            raise WorkflowError('The selected validation recipe changed during preflight')
+    if source.read_bytes() != inspected:
+        raise WorkflowError('Source changed since inspection; reread selected task')
+    if (state_path.read_bytes() if state_path.is_file() else None) != checkpoint:
+        raise WorkflowError('The selected run changed during preflight')
+    return response
+
 
 def execution_session(store,recipe,environment,entry,provided=None,require_current=False):
     sessions=entry.setdefault('execution_sessions',{})
     session=provided or sessions.get(environment)
     if recipe['lane'] not in PRODUCT_LANES:return None
     if store.state.exists() and store.load().get('run_registry'):workspaces.environment(store,{'runtime':True})
-    fields=['project_root','authorization','profile_id','deadline_utc','cleanup_seconds','tool_identity','session_identity','fixture_identity','build_identity','identity_evidence']
-    if not isinstance(session,dict) or any(not session.get(key) for key in fields):raise WorkflowError('Product checks require an owned execution session with authorization, identity evidence, deadline and cleanup reserve')
+    if not isinstance(session,dict) or any(not session.get(key) for key in EXECUTION_FIELDS):raise WorkflowError('Product checks require an owned execution session with authorization, identity evidence, deadline and cleanup reserve')
     binding=binding_context(store,recipe)
     expected_root=Path(binding['execution_root']) if binding else store.source_root
     if Path(session['project_root']).resolve()!=expected_root:raise WorkflowError('Execution session checkout differs from the covered root')
     if binding:
-        if session.get('queue_root')!=str(store.root) or session.get('binding_id')!=binding['id'] or session.get('source_identity')!=binding['execution_digest']:raise WorkflowError('Execution session lacks the reviewed queue, binding or source identity')
+        expected=(str(store.root),binding['id'],binding['execution_digest'])
+        if tuple(session.get(key) for key in BOUND_EXECUTION_FIELDS)!=expected:raise WorkflowError('Execution session lacks the reviewed queue, binding or source identity')
         tools=session.get('tool_identity')
-        if not isinstance(tools,dict) or any(tools.get(key)!=binding['pins'][key] for key in ['cli_version','pipeline_version']):raise WorkflowError('Execution session toolchain differs from the binding pins')
+        if not isinstance(tools,dict) or any(tools.get(key)!=binding['pins'][key] for key in BINDING_TOOL_FIELDS):raise WorkflowError('Execution session toolchain differs from the binding pins')
     if type(session['cleanup_seconds']) not in {int,float} or session['cleanup_seconds']<=0:raise WorkflowError('Execution cleanup reserve must be positive')
     try:deadline=datetime.fromisoformat(session['deadline_utc'].replace('Z','+00:00'))
     except (ValueError,TypeError) as exc:raise WorkflowError('Execution deadline requires an aware timestamp') from exc
     if deadline.tzinfo is None or require_current and (deadline-datetime.now(timezone.utc)).total_seconds()<=session['cleanup_seconds']:raise WorkflowError('Execution deadline lacks a cleanup reserve')
     if recipe['lane'].startswith('unity-'):
-        if session.get('editor_version')!=recipe.get('editor_version') or not session.get('save_service_isolation'):raise WorkflowError('Unity session requires the pinned Editor and verified save/service isolation')
+        version,isolation = UNITY_EXECUTION_FIELDS
+        if session.get(version)!=recipe.get(version) or not session.get(isolation):raise WorkflowError('Unity session requires the pinned Editor and verified save/service isolation')
     if not isinstance(session['identity_evidence'],list):raise WorkflowError('Execution identity requires repository-relative evidence')
     for ref in session['identity_evidence']:evidence_pointer(store,ref,required=True)
     sessions[environment]=deepcopy(session)
@@ -5267,8 +5389,7 @@ def prepare_check(store,payload):
         snapshot=check_snapshot(store,task,check,state)
         launch=payload.get('launch')
         if launch:
-            required=['assertion','cheaper_evidence_insufficient','authorization','deadline_utc','cleanup_seconds','project_root','execution_profile']
-            if not isinstance(launch,dict) or any(not launch.get(key) for key in required):raise WorkflowError('Launch requires concrete assertion, rationale, authorization, exact checkout, deadline and cleanup profile')
+            if not isinstance(launch,dict) or any(not launch.get(key) for key in LAUNCH_FIELDS):raise WorkflowError('Launch requires concrete assertion, rationale, authorization, exact checkout, deadline and cleanup profile')
             if type(launch['cleanup_seconds']) not in {int,float} or launch['cleanup_seconds']<=0:raise WorkflowError('Launch cleanup reserve must be positive')
             if launch['cheaper_evidence_insufficient'].strip().casefold() in {'run everything to be safe','to be safe','routine checklist'}:raise WorkflowError('Launch requires an assertion-specific rationale')
             expected_root=Path(recipe['execution_context']['execution_root']) if recipe.get('execution_binding') else store.source_root
@@ -5292,9 +5413,9 @@ def record_check(store,payload):
         current=check_snapshot(store,task,check,state)
         if current['key']!=attempt['key'] or current['definition']!=attempt['definition']:raise WorkflowError('Prepared check is stale; source/test/check-set changed')
         classification=payload.get('classification')
-        if classification not in {'executed-control','prerequisite-wait','transport-uncertainty','host-policy-rejection'}:raise WorkflowError('Check requires an operation classification')
+        if classification not in CHECK_CLASSIFICATIONS:raise WorkflowError('Check requires an operation classification')
         result=payload.get('result')
-        if result not in {'pass','fail','red','unavailable'}:raise WorkflowError('Unsupported check result')
+        if result not in CHECK_RESULTS:raise WorkflowError('Unsupported check result')
         if result in {'pass','red'} and classification!='executed-control':raise WorkflowError('Only an executed control can establish evidence')
         if payload.get('actual_lane')!=attempt['recipe']['lane'] or payload.get('environment_identity')!=attempt['environment_identity']:raise WorkflowError('Runner lane/environment does not match the prepared check')
         if not isinstance(payload.get('cleanup'),str) or not payload['cleanup'].strip():raise WorkflowError('Record actual operation cleanup')
@@ -5303,9 +5424,9 @@ def record_check(store,payload):
         evidence=[evidence_pointer(store,ref,required=True) for ref in refs]
         lane=attempt['recipe']['lane']
         if result in {'pass','red'}:
-            if lane in {'unit','integration','browser','unity-editmode','unity-playmode'}:
+            if lane in COUNTED_LANES:
                 counts=payload.get('counts',{})
-                if any(type(counts.get(key)) is not int or counts[key]<0 for key in ['expected','discovered','passed','failed','skipped']):raise WorkflowError('Test runner requires actual nonnegative counts')
+                if any(type(counts.get(key)) is not int or counts[key]<0 for key in COUNT_FIELDS):raise WorkflowError('Test runner requires actual nonnegative counts')
                 if counts['expected']<1 or counts['discovered']<counts['expected'] or counts['passed']+counts['failed']+counts['skipped']!=counts['discovered']:raise WorkflowError('Expected nonzero test discovery is missing')
                 if result=='pass' and (counts['failed'] or counts['skipped']):raise WorkflowError('Failed or skipped required tests cannot pass')
                 if result=='red' and (not counts['failed'] or counts['skipped'] or payload.get('failure_category')!='expected-behavior'):raise WorkflowError('Red requires the intended runnable behavioral failure')
@@ -7366,7 +7487,7 @@ def record_worker(store, state, payload, assignment, request):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|CURRENT_TARGET_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'partial-delivery-preview','partial-delivery','partial-delivery-checks','partial-finish-preview','partial-finish','refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','prepare-worktree-profile','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','worker-handoff','environment','validation-impact','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|CURRENT_TARGET_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'partial-delivery-preview','partial-delivery','partial-delivery-checks','partial-finish-preview','partial-finish','refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','prepare-worktree-profile','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','worker-handoff','environment','validation-impact','validation-preflight','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     parser.add_argument('--standalone',action='store_true',help='Use the canonical queue and selected checkout without attaching to a registered controller.')
     parser.add_argument('--preview',type=Path,help='Retained Force Process Preview JSON')
     parser.add_argument('--receipt',type=Path,help='Original Process Pending receipt JSON')
@@ -7487,6 +7608,11 @@ def main(argv=None):
         elif cmd=='runs':result=store.load().get('run_registry',{})
         elif cmd=='start':result=start(store,args.mode,args.id,payload.get('limits'),payload)
         elif cmd=='next':result=next_task(store)
+        elif cmd=='validation-preflight':
+            if not isinstance(payload,dict) or args.names is not None or args.apply or (args.id and payload.get('task_id') and args.id != payload['task_id']):
+                raise WorkflowError('Validation preflight accepts one exact task and check')
+            if args.id:payload['task_id']=args.id
+            result=validation_preflight(store,payload)
         elif cmd=='validation-impact':
             if args.id or args.names is not None or args.apply:
                 raise WorkflowError('Validation impact accepts a read-only proposed path payload')

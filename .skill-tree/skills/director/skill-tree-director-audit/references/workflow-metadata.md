@@ -261,3 +261,7 @@ A `clarify-round` payload with an empty decision frontier records the clarity ru
 ```
 
 `clarify-confirm` supplies `task_ids` in the returned frozen order, the exact returned `semantic_fingerprints` mapping and actual owner `evidence` with the same evidence shape as an answer. The owner confirms the displayed current task summary after recheck; a prepared confirmation request supplies no approval. `clarify-resume` reconciles current source drift without selecting new tasks or resuming implementation. `clarify-cancel` requires a nonempty `reason`; a required-interview cancellation retains the unsatisfied admission hold. Repeated unchanged rounds persist a blocked state and concrete next action.
+
+## Validation evidence preflight
+
+Use the read-only `validation-preflight` command with an exact prioritized `task_id` and `check_id`. Use `--run-id` for an exact retained execution checkout and include `expected_source_hash` to require the queue revision already inspected. The result carries the current queue hash and task content and semantic fingerprints. A missing task-level boundary classification identifies the affected check and supported classifications without preparing an attempt.

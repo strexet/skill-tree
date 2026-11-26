@@ -1,4 +1,5 @@
 import importlib.util
+from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
 import subprocess
@@ -87,6 +88,145 @@ class ValidationProgressTests(unittest.TestCase):
         frame=self.review_change(frame,'accept-decision')
         frame=self.review_change(frame,'accept-plan',decision_receipt=frame['acceptance'])
         return self.review_change(frame,'implement',identity=identity,reference='Current Git fixture candidate.')
+
+    def test_lane_preflight_matches_browser_and_server_receipts(self):
+        configuration = self.store.base/'config/repository.json'
+        configuration.write_text(json.dumps({'schema':1,'role':'source','recipes':{
+            'fixture-'+lane:{'lane':lane,'input_paths':[]}
+            for lane in ('browser','server')
+        }}))
+        for lane in ('browser','server'):
+            with self.subTest(lane=lane):
+                counted = lane == 'browser'
+                tid = self.task('Review '+lane,recipe='fixture-'+lane)
+                request = {'task_id':tid,'check_id':'behavior',
+                           'expected_source_hash':wf.file_hash(self.store.future)}
+                payload = self.root/'validation-preflight.json'
+                payload.write_text(json.dumps(request))
+                before = self.store.state.read_bytes()
+                command = ['python3','-B',str(CORE/'common/scripts/workflow-state.py'),
+                           'validation-preflight',str(self.root),'--input',str(payload)]
+                outcome = subprocess.run(command,text=True,capture_output=True)
+                self.assertEqual(outcome.returncode,0,
+                                 'Selected lane evidence contract unavailable: '+outcome.stdout+outcome.stderr)
+                preview = json.loads(outcome.stdout)
+                self.assertEqual(preview['lane'],lane)
+                self.assertEqual(preview['source_hash'],request['expected_source_hash'])
+                self.assertEqual(preview['content_fingerprint'],wf.clarification_baselines(
+                    [wf.resolve(wf.parse(self.store.text()),[tid])[0]])[tid]['content_hash'])
+                self.assertEqual(preview['execution']['fields'],
+                    ['project_root','authorization','profile_id','deadline_utc','cleanup_seconds',
+                     'tool_identity','session_identity','fixture_identity','build_identity','identity_evidence'])
+                self.assertEqual(preview['receipt']['executed_pass_shape'],'counts' if counted else 'assertions')
+                self.assertEqual(preview['receipt']['behavioral_red_allowed'],counted)
+                self.assertEqual('red' in preview['receipt']['result_values'],counted)
+                self.assertEqual(preview['receipt']['results_requiring_evidence_and_executed_control'],
+                                 ['pass','red'] if counted else ['pass'])
+                self.assertEqual(preview['receipt']['evidence_reference']['object_optional'],['sha256'])
+                self.assertEqual(self.store.state.read_bytes(),before)
+                self.assertFalse((self.store.base/'.writer-lock').exists())
+
+                self.progress(tid)
+                execution = dict.fromkeys(preview['execution']['fields'],'fixture')
+                execution.update(project_root=str(self.root),cleanup_seconds=5,identity_evidence=['report.json'],
+                                 deadline_utc=(datetime.now(timezone.utc)+timedelta(seconds=60)).isoformat())
+                with self.assertRaisesRegex(wf.WorkflowError,'owned execution session'):
+                    wf.prepare_check(self.store,request)
+                attempt = wf.prepare_check(self.store,{**request,'execution':execution})
+                receipt = {'task_id':tid,'check_id':'behavior','attempt_id':attempt['attempt_id'],
+                           'actual_lane':lane,'environment_identity':attempt['environment_identity'],
+                           'classification':'executed-control','result':'pass','evidence':['report.json'],
+                           'cleanup':'The fixture starts no product processes.'}
+                invalid = ({'counts':dict.fromkeys(preview['receipt']['count_fields'],0)} if counted
+                           else {'assertions':[{'assertion':'Different assertion.','result':'pass'}]})
+                with self.assertRaisesRegex(wf.WorkflowError,'Expected nonzero test discovery' if counted
+                                            else 'matching assertions'):
+                    wf.record_check(self.store,{**receipt,**invalid})
+                valid = ({'counts':{'expected':1,'discovered':1,'passed':1,'failed':0,'skipped':0}} if counted
+                         else {'assertions':[{'assertion':preview['receipt']['assertion'],'result':'pass'}]})
+                with self.assertRaisesRegex(wf.WorkflowError,'Runner lane/environment'):
+                    wf.record_check(self.store,{**receipt,**valid,'environment_identity':'unrelated'})
+                if counted:
+                    skipped = {'expected':1,'discovered':1,'passed':0,'failed':0,'skipped':1}
+                    with self.assertRaisesRegex(wf.WorkflowError,'Failed or skipped required tests'):
+                        wf.record_check(self.store,{**receipt,'counts':skipped})
+                else:
+                    with self.assertRaisesRegex(wf.WorkflowError,'cannot establish behavioral Red'):
+                        wf.record_check(self.store,{**receipt,**valid,'result':'red'})
+                self.assertEqual(wf.record_check(self.store,{**receipt,**valid})['result'],'pass')
+
+    def test_preflight_resolves_only_the_exact_run_and_task(self):
+        admitted = self.task('Admitted')
+        other = self.task('Outside the snapshot')
+        self.git('init','-q','-b','develop')
+        self.git('config','user.name','Fixture editor')
+        self.git('config','user.email','fixture@example.invalid')
+        self.git('config','commit.gpgSign','false')
+        self.git('add','.')
+        self.git('commit','-qm','Fixture baseline')
+        wf.workspaces.setup(self.store,{})
+        scope = wf.Store(self.root,allow_unselected=True,neutral=True)
+        run = wf.start(scope,'next',admitted,workspace={'implementation_operation':'work-through-next'})
+        store = wf.Store(self.root,run['id'])
+        request = {'task_id':admitted,'check_id':'behavior'}
+        before = self.store.state.read_bytes()
+        preview = wf.validation_preflight(store,request)
+        self.assertEqual(preview['run_id'],run['id'])
+        self.assertNotEqual(preview['execution']['project_root'],str(self.root))
+        self.assertEqual(wf.validation_preflight(wf.Store(self.root),request),preview)
+        with self.assertRaisesRegex(wf.WorkflowError,'outside the admitted controller scope'):
+            wf.validation_preflight(wf.Store(self.root),{**request,'task_id':other})
+        with self.assertRaisesRegex(wf.WorkflowError,'exact check ID'):
+            wf.validation_preflight(store,{**request,'check_id':'missing'})
+        with self.assertRaisesRegex(wf.workspaces.RunError,'Unknown run ID'):
+            wf.validation_preflight(wf.Store(self.root,wf.identity('WR')),request)
+        self.assertEqual(self.store.state.read_bytes(),before)
+        scope = wf.Store(self.root,allow_unselected=True,neutral=True)
+        wf.start(scope,'next',other,workspace={'implementation_operation':'work-through-next'})
+        with self.assertRaisesRegex(wf.workspaces.RunError,'Multiple runs exist'):
+            wf.validation_preflight(wf.Store(self.root),request)
+        self.assertEqual(wf.validation_preflight(store,request),preview)
+
+    def test_boundary_preflight_names_required_metadata_and_retains_strict_writers(self):
+        group = wf.identity('VG')
+        configuration = self.store.base/'config/repository.json'
+        configuration.write_text(json.dumps({'schema':1,'role':'source','recipes':{
+            'fixture-browser':{'lane':'browser','input_paths':[]},
+        }}))
+        tid = self.task('Boundary candidate',group,timing='group-end',recipe='fixture-browser')
+        request = {'task_id':tid,'check_id':'behavior'}
+        good = wf.validation_preflight(self.store,request)
+        state = self.store.state.read_bytes()
+        original = self.store.future.read_bytes()
+        windows = original.replace(b'\n',b'\r\n')
+        self.store.future.write_bytes(windows)
+        crlf = wf.validation_preflight(self.store,{**request,'expected_source_hash':wf.file_hash(self.store.future)})
+        self.assertNotEqual(crlf['source_hash'],good['source_hash'])
+        self.assertEqual(crlf['semantic_fingerprint'],good['semantic_fingerprint'])
+        self.assertEqual(self.store.future.read_bytes(),windows)
+        source = original.replace(b'boundary_validation: group-end\n',b'',1)
+        self.assertNotEqual(source,original)
+        self.store.future.write_bytes(source)
+        with self.assertRaisesRegex(wf.WorkflowError,'Source changed'):
+            wf.validation_preflight(self.store,{**request,'expected_source_hash':good['source_hash']})
+        observed = wf.validation_preflight(self.store,request)
+        self.assertEqual(observed['status'],'boundary-metadata-required')
+        self.assertEqual(observed['lane'],'browser')
+        self.assertEqual(observed['receipt']['executed_pass_shape'],'counts')
+        self.assertNotEqual(observed['content_fingerprint'],good['content_fingerprint'])
+        self.assertNotEqual(observed['semantic_fingerprint'],good['semantic_fingerprint'])
+        self.assertEqual(observed['missing_boundary_classification'],[{
+            'check_id':'behavior','field':'boundary_validation','timing':'group-end',
+            'supported':['group-end','before-dependent-work'],
+        }])
+        with self.assertRaisesRegex(wf.WorkflowError,'Boundary check requires task boundary'):
+            wf.prepare_check(self.store,request)
+        self.assertEqual(self.store.future.read_bytes(),source)
+        self.assertEqual(self.store.state.read_bytes(),state)
+        bad_check = source.replace(b'"timing": "group-end"',b'"timing": "unsupported"',1)
+        self.store.future.write_bytes(bad_check)
+        with self.assertRaisesRegex(wf.WorkflowError,'explicit boundary timing'):
+            wf.validation_preflight(self.store,request)
 
     def test_review_incorporates_actual_check_only_and_revalidates_artifacts_before_review(self):
         tid=self.task();identity,receipt=self.review_candidate(tid)

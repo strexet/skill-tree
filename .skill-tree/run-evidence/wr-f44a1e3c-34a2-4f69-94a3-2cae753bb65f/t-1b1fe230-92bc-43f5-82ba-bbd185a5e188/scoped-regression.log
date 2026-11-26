@@ -1,0 +1,77 @@
+Shard 1 (6 cases, exit 0)
+ValidationProgressTests.test_lane_preflight_matches_browser_and_server_receipts
+ValidationProgressTests.test_task_completion_recovers_prepared_commit_with_reused_review_evidence
+ValidationProgressTests.test_revalidation_retains_current_check_receipt_for_independent_inputs
+ValidationProgressTests.test_all_batches_only_eligible_declared_group_members
+ValidationProgressTests.test_changed_group_check_set_invalidates_affected_shared_evidence
+ValidationProgressTests.test_direct_queue_edit_cannot_admit_a_new_required_task
+  ......
+  ----------------------------------------------------------------------
+  Ran 6 tests in 15.315s
+
+  OK
+
+Shard 2 (6 cases, exit 0)
+ValidationProgressTests.test_preflight_resolves_only_the_exact_run_and_task
+ValidationProgressTests.test_controller_offer_reuses_accepted_leaf_receipt_only_on_current_target
+ValidationProgressTests.test_validation_impact_keeps_real_runtime_resource_conflict_visible
+ValidationProgressTests.test_zero_discovery_and_wrong_lane_cannot_pass
+ValidationProgressTests.test_runtime_red_requires_behavioral_failure_and_nonzero_discovery
+ValidationProgressTests.test_missing_profile_blocks_implementation_but_leaves_intake_available
+  ......
+  ----------------------------------------------------------------------
+  Ran 6 tests in 26.004s
+
+  OK
+
+Shard 3 (5 cases, exit 0)
+ValidationProgressTests.test_boundary_preflight_names_required_metadata_and_retains_strict_writers
+ValidationProgressTests.test_run_timeline_waits_for_verified_merge_before_recording_delivery_duration
+ValidationProgressTests.test_registered_completion_lineage_must_match_the_applied_event
+ValidationProgressTests.test_unchanged_attempts_are_not_semantic_progress
+ValidationProgressTests.test_prepared_identity_blocks_changes_during_execution_and_launch_requires_a_deadline
+  .....
+  ----------------------------------------------------------------------
+  Ran 5 tests in 38.110s
+
+  OK
+
+Shard 4 (5 cases, exit 0)
+ValidationProgressTests.test_review_incorporates_actual_check_only_and_revalidates_artifacts_before_review
+ValidationProgressTests.test_revalidation_impact_reports_exact_affected_consumers
+ValidationProgressTests.test_standalone_progress_survives_refresh_and_never_reimplements
+ValidationProgressTests.test_mandatory_runtime_decision_without_check_mapping_is_rejected
+ValidationProgressTests.test_only_two_unchanged_executed_failures_trip_the_circuit_breaker
+  .....
+  ----------------------------------------------------------------------
+  Ran 5 tests in 11.024s
+
+  OK
+
+Shard 5 (5 cases, exit 0)
+ValidationProgressTests.test_review_declines_fresh_pending_or_changed_environment_checks
+ValidationProgressTests.test_final_revalidation_boundary_stages_exact_group_peers
+ValidationProgressTests.test_pending_stale_missing_and_changed_reports_cannot_complete
+ValidationProgressTests.test_shared_check_reuse_finalizes_group_once_and_retains_specification_until_verified
+ValidationProgressTests.test_completion_cannot_bypass_missing_progress_with_a_passing_payload
+  .....
+  ----------------------------------------------------------------------
+  Ran 5 tests in 9.478s
+
+  OK
+
+Shard 6 (5 cases, exit 0)
+ValidationProgressTests.test_fresh_review_contract_excludes_a_passing_task_receipt
+ValidationProgressTests.test_changed_recipe_input_holds_registered_consumer_until_current_verification
+ValidationProgressTests.test_group_batching_never_expands_next_scope_or_bypasses_verified_dependency
+ValidationProgressTests.test_group_dependency_forces_upstream_verification_before_downstream_implementation
+ValidationProgressTests.test_profile_admission_is_pinned_once_and_repeated_only_on_explicit_resume
+  .....
+  ----------------------------------------------------------------------
+  Ran 5 tests in 12.427s
+
+  OK
+
+Ran 32 tests in 38.399s
+
+OK
