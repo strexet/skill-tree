@@ -1203,9 +1203,12 @@ def pending_task_view(store, selectors):
 def group_selection(store, payload):
     """Resolve an explicit group from one read of the canonical queue."""
     queues = {'pending': 'Pending Queue', 'prioritized': 'Prioritized Next Changes'}
-    if (not isinstance(payload, dict) or set(payload)-{'queue', 'topic', 'intake_batch_ids'}
+    if (not isinstance(payload, dict) or set(payload)-{'queue', 'topic', 'intake_batch_ids', 'view'}
             or not isinstance(payload.get('queue'), str) or payload['queue'] not in queues):
         raise WorkflowError('Group selection requires pending or prioritized queue and explicit filters')
+    view = payload.get('view', 'detailed')
+    if view not in ('detailed', 'compact'):
+        raise WorkflowError('Group selection view requires detailed or compact')
     if not {'topic', 'intake_batch_ids'} & payload.keys():
         raise WorkflowError('Group selection requires an exact topic or explicit intake batch IDs')
     topic = payload.get('topic')
@@ -1224,7 +1227,8 @@ def group_selection(store, payload):
             raise WorkflowError('Unknown intake batch: '+batch_id)
         receipt_members[batch_id] = {item['id'] for item in receipt['items']}
     queue = store.owned('.skill-tree/documents/future.md').read_bytes()
-    tasks = parse(queue.decode('utf-8'))
+    text = queue.decode('utf-8')
+    tasks = parse(text)
     requested = set(batch_ids)
     group = sorted(
         (task for task in tasks if task['queue'] == queues[payload['queue']]
@@ -1239,21 +1243,35 @@ def group_selection(store, payload):
             if batch_id in receipt_members and not origins.intersection(receipt_members[batch_id]):
                 raise WorkflowError('Selected task lacks original Pending provenance: '+task['id'])
     ids = [task['id'] for task in group]
+    selected_ids = set(ids)
     if payload['queue']=='prioritized':
         completed = {item['task_id']:item for item in store.outcomes() if item['disposition']=='completed'}
-        outside = verified_dependency_scope(store,tasks,{'snapshot':ids},completed) - set(ids)
+        outside = verified_dependency_scope(store,tasks,{'snapshot':ids},completed) - selected_ids
     else:
-        outside = dependency_scope(tasks,{'snapshot':ids}) - set(ids)
+        outside = dependency_scope(tasks,{'snapshot':ids}) - selected_ids
     pending_blockers = {}
     if payload['queue'] == 'pending' and any(task.get(PENDING_DEPENDENCY_FIELD) for task in group):
         pending, promoted, declined = pending_dependency_context(store, tasks)
-        pending_blockers = pending_dependency_blockers(ids, set(ids), pending, promoted, declined)
-    return {
+        pending_blockers = pending_dependency_blockers(ids, selected_ids, pending, promoted, declined)
+    result = {
         **pending_blockers,
         'ids': ids,
         'tasks': group,
         'outside_dependencies': sorted(outside),
         'source_hash': digest(queue),
+    }
+    if view == 'detailed':
+        return result
+    owner = Store(store.root, route_queue=False, neutral=True)
+    registry = owner.load(text).get('run_registry', {})
+    dependency_field = PENDING_DEPENDENCY_FIELD if payload['queue'] == 'pending' else 'depends_on'
+    return {
+        **result, 'queue': payload['queue'], 'canonical_queue': str(owner.future), 'queue_id': registry.get('queue_id'),
+        'tasks': [
+            {**{key: task[key] for key in ('id', 'title', 'priority', 'status')},
+             'depends_on': [dependency for dependency in task.get(dependency_field, []) if dependency in selected_ids]}
+            for task in group
+        ],
     }
 
 

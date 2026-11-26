@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "6b5d6985fff744bd37deece538112aff750ecda1069e7d3d4aff02a2625753ac",
+  "identity": "dbbdea66d8867421b836db9a4b2a9a8e78a502583e3c1d1c1da458541b429f19",
   "operation": "skill-tree-clarify-tasks",
   "operations": {
     "skill-tree-3d": {
@@ -3306,7 +3306,7 @@
     "references/unity-development.md": "49110c691d4493cd21e8c3ceb682053e3f975016be9879cd10836d9f4feaf371",
     "references/unity-safety.md": "c4a96cdb4bc35a98fcab8ba6bf9c983252cd73d1cefaa439669cedcbed357df0",
     "references/validation-policy.md": "a3413c285687d49f22aac9eb124cb7a64252200984b60b16de1d675d6cfe2472",
-    "references/workflow-metadata.md": "aa199528abb478ef81b4655e7088c0eccfbe2c02c940f483554c102020d18154",
+    "references/workflow-metadata.md": "9bdb63c61a372585584cb90b244f46e8bd5b0f37a2cf03110884956fdb5426b1",
     "scripts/api-contract-locks.js": "eaac3e411ab7ddea36cedb4c48f0a0d0c5e737509466f0f86587df51a34fe594",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "dd1b6fb5dfb56b93ad531abf87f4f713b5934156133007bb4014b56ec9f285e5",
@@ -3327,7 +3327,7 @@
     "scripts/select-prioritized-task.py": "93f12ac5a333fb072bf8d9d849d08e3b422af856d582d492902647efe35c896f",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "a5328f3a0bd6348593dddddae2e8063e809e68fd149be523c3d613fc45f97c0e"
+    "scripts/workflow-state.py": "0229e37ca22e1f6e35cb24b566edfa1f4e8e4ce41d12a250c795ceb1386a5e1c"
   },
   "packages": {},
   "parameter_defaults": {},
