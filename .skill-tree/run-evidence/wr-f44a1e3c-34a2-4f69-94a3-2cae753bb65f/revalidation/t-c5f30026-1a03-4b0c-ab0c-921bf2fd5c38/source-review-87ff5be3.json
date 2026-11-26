@@ -1,0 +1,14 @@
+{
+  "checks_sha256": "0fd8726ca150af0265a90d5370614740b02d3599b586b9cf62f0c452236907c7",
+  "sources": {
+    ".skill-tree/common/references/director-workflow.md": "d573306865ad5cb84189f9ca410cfbbfb9f9cf0a63682b42917a3976af17b952",
+    ".skill-tree/common/scripts/workflow-state.py": "7e5cd927d1fb81b83c863f614530e86117fec6816ea46f4a339dc8d8049650a9",
+    ".skill-tree/skill-tree.json": "6cbadd599e3f67260aa0e9e95740dacca18d9af20b3c7738cc7838b528bd385d"
+  },
+  "task_id": "T-c5f30026-1a03-4b0c-ab0c-921bf2fd5c38",
+  "result": "clean",
+  "reviewer": "/root/director_resolver",
+  "original_head": "ac0be5a81ae6ddfbe19678cba19f3bb3cd7cf2f0",
+  "reviewed_head": "87ff5be3926602a15db2cc24368c15a6fdf41b42",
+  "reference": "Independent review verified intact directed batch documentation, exact atomic intake and processing replay, unchanged prior batch plan, dispatch and run sources, current exact Pending order and dependency metadata, and current manifest source digests. The changed dependency traversal only applies to active controllers. Scoped diff check passed."
+}
