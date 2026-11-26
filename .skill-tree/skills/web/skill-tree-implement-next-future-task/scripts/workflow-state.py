@@ -103,12 +103,42 @@ def file_hash(path):
 def dump(value):
     return json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True)+'\n'
 
-def assert_prose(text):
+def prose_diagnostics(text):
     path=Path(__file__).with_name('validate-document-rules.py')
     rules=owned_module('skill_tree_document_rules',path)
+    return rules.diagnostics(text)
+
+
+def assert_prose(text):
     if not isinstance(text,str):raise WorkflowError('Generated prose requires a string')
-    errors=rules.check_text(text)
+    errors=[item['message'] for item in prose_diagnostics(text) if item['severity']=='error']
     if errors:raise WorkflowError('Generated prose violates document rules: '+', '.join(errors))
+
+
+def completion_prose_preview(payload):
+    if not isinstance(payload,dict) or set(payload)-{'outcome','limitations'}:
+        raise WorkflowError('Completion prose preview accepts only outcome and limitations')
+    diagnostics=[]
+
+    def inspect(field,value,index=None):
+        location={'field':field,**({'index':index} if index is not None else {})}
+        if field=='outcome' and not value:
+            return [{**location,'rule':'required-outcome','severity':'error',
+                     'message':'Terminal outcome requires delivered behavior or reason'}]
+        if not isinstance(value,str):
+            return [{**location,'rule':'prose-type','severity':'error',
+                     'message':'Generated prose requires a string'}]
+        return [{**location,**item} for item in prose_diagnostics(value)]
+
+    diagnostics.extend(inspect('outcome',payload.get('outcome')))
+    limitations=payload.get('limitations',[])
+    if not isinstance(limitations,list):
+        diagnostics.append({'field':'limitations','rule':'limitations-type','severity':'error',
+                            'message':'Completion limitations require an ordered list'})
+    else:
+        for index,limitation in enumerate(limitations):
+            diagnostics.extend(inspect('limitations',limitation,index))
+    return {'valid':not any(item['severity']=='error' for item in diagnostics),'diagnostics':diagnostics}
 
 def grouping_fields(task):
     return {key:deepcopy(task[key]) for key in GROUPING_FIELDS if key in task}
@@ -169,7 +199,7 @@ def validate_metadata(meta, queue):
     if meta['id'] in meta['depends_on']:
         raise WorkflowError('A task cannot depend on the task identity')
 
-def parse(text):
+def parse(text, *, boundary_preflight=None):
     """Read fixed headers; task bodies remain outside the metadata index."""
     lines=text.splitlines(keepends=True); queue=None; found=[]; entries=[]; current=None; fenced=False
     for i,line in enumerate(lines):
@@ -220,7 +250,9 @@ def parse(text):
             for section in SECTIONS:
                 if not re.search(r'(?m)^'+re.escape(section)+r':\s*$',body):
                     raise WorkflowError(task['title']+': missing section '+section)
-            check_specs(task)
+            boundary_issues = (boundary_preflight[1] if boundary_preflight
+                               and boundary_preflight[0] == task['id'] else None)
+            check_specs(task,boundary_issues=boundary_issues)
             blocked='[Unresolved - blocks implementation]' in body or '[Unresolved — blocks implementation]' in body
             if blocked != (task['status']=='Blocked pending answers'):
                 raise WorkflowError('Blocking question and status disagree: '+task['title'])
@@ -354,6 +386,9 @@ class Store:
         for write in record['writes']:
             path=self.owned(write['path']);actual=file_hash(path);desired=digest(write['content'].encode())
             if actual not in {write['expected_hash'],desired}: raise WorkflowError('Interrupted transaction conflicts with source: '+write['path'])
+        owner = record.get('local_delivery') or {}
+        if owner.get('action') == 'partial-finish' and any(write['path'] == FUTURE_STATE for write in record['writes']):
+            partial_retire_locator(self,record)
         for write in record['writes']:
             self.replace(self.owned(write['path']),write['content'])
         journal.unlink()
@@ -473,7 +508,7 @@ class Store:
             if self.neutral:
                 if 'run_registry' in value:workspaces.validate_registry(value['run_registry'])
             else:value=workspaces.project(self,value)
-            for retained in value.get('run_registry',{}).get('runs',{}).values():validate_run(retained)
+            for retained in historical_runs(value.get('run_registry',{})).values():validate_run(retained)
             value['task_progress']=old.get('task_progress')
             validate_progress(value,parse(text),{record['task_id'] for record in self.outcomes() if record['disposition']=='completed'})
         return value
@@ -512,6 +547,7 @@ class Store:
         outcomes=[json.loads(line) for line in ledger.splitlines() if line.strip() and json.loads(line)['id'] not in prior_ids]
         prior=old.get('run_registry',{}).get('runs',{}).get(rid)
         current=registry['runs'].get(rid)
+        archived=registry.get('archived_runs',{}).get(rid)
         owned=set((prior or {}).get('admitted_task_ids',[]))|set((current or {}).get('admitted_task_ids',[]))
         progress_changes=[]
         for tid in sorted(owned):
@@ -521,6 +557,8 @@ class Store:
         sequence=state['run_registry'].setdefault('event_sequences',{}).get(rid,0)+1
         state['run_registry']['event_sequences'][rid]=sequence
         event={'sequence':sequence,'schema':1,'id':identity('E'),'queue_id':registry['queue_id'],'run_id':rid,'recorded_at':now(),'changes':changes,'progress_changes':progress_changes,'outcomes':outcomes,'checkpoint_before':prior,'checkpoint_after':current}
+        if archived and prior and current is None:
+            event['partial_finish_sha256']=archived['receipt_sha256']
         receipts=[]
         for batch in event_intake_origins(grouped+outcomes):
             rel=intake_receipt_path(batch)
@@ -576,8 +614,9 @@ def intake_receipt_path(batch_id):
     return INTAKE_RECEIPTS+batch_id.lower()+'.json'
 
 def validate_intake_receipt(receipt,batch_id):
+    fields={'schema','id','created_at','request_sha256','items'}
     if (not isinstance(receipt,dict) or receipt.get('schema')!=1 or receipt.get('id')!=batch_id
-            or set(receipt)!={'schema','id','created_at','request_sha256','items'}
+            or not fields <= set(receipt) or set(receipt) - fields - {'full_cycle_partition'}
             or not isinstance(receipt.get('request_sha256'),str) or not re.fullmatch('[a-f0-9]{64}',receipt['request_sha256'])
             or not isinstance(receipt.get('items'),list) or not receipt['items']):
         raise WorkflowError('Invalid intake batch receipt')
@@ -592,6 +631,12 @@ def validate_intake_receipt(receipt,batch_id):
         if item.get('intake_batch_ids')!=[batch_id] or item['id'] in ids:
             raise WorkflowError('Invalid intake receipt membership')
         ids.add(item['id'])
+    if 'full_cycle_partition' in receipt:
+        try:
+            director_dispatch_helper().full_cycle_partition(
+                [item['id'] for item in receipt['items']], receipt['full_cycle_partition'])
+        except ValueError as error:
+            raise WorkflowError(str(error)) from error
     return receipt
 
 def read_intake_receipt(store,batch_id):
@@ -729,22 +774,34 @@ def intake(store,payload):
             replay=dispatch.observed(store)
             if replay is not None:return replay
         batched='items' in payload
-        if batched and set(payload)-{'items','intake_batch_id','expected_source_hash'}:
+        if batched and set(payload)-{'items','intake_batch_id','expected_source_hash','full_cycle_partition'}:
             raise WorkflowError('Batch input permits items, intake batch identity and source guard')
         items=payload['items'] if batched else [payload]
         if not isinstance(items,list) or not items or any(not isinstance(item,dict) for item in items):
             raise WorkflowError('Intake batch requires a nonempty list of items')
-        if batched and any(set(item)&{'items','intake_batch_id','intake_batch_ids','expected_source_hash'} for item in items):
+        if batched and any(set(item)&{'items','intake_batch_id','intake_batch_ids','expected_source_hash',
+                                     'full_cycle_partition'} for item in items):
             raise WorkflowError('The intake envelope owns batch identity and source guard')
         if not batched and 'intake_batch_ids' in payload:
             raise WorkflowError('Intake batch provenance is assigned by intake')
+        partition=None
+        if 'full_cycle_partition' in payload:
+            if not batched or not dispatch:
+                raise WorkflowError('Full Cycle partition requires one exact directed intake batch')
+            try:
+                partition=director_dispatch_helper().full_cycle_intake_partition(items,payload['full_cycle_partition'])
+            except ValueError as error:
+                raise WorkflowError(str(error)) from error
         batch_id=payload.get('intake_batch_id')
         if batched or 'intake_batch_id' in payload or 'topic' in payload:
             if not valid_id(batch_id,'IB'):raise WorkflowError('Grouped intake requires a caller-held IB identity')
         if batch_id is not None:
             rel=intake_receipt_path(batch_id)
-            request_sha=digest(dump({'batched':batched,'items':[{k:v for k,v in item.items()
-                if k not in {'expected_source_hash','intake_batch_id'}} for item in items]}).encode())
+            request={'batched':batched,'items':[{k:v for k,v in item.items()
+                if k not in {'expected_source_hash','intake_batch_id'}} for item in items]}
+            if partition:
+                request['full_cycle_partition']=partition
+            request_sha=digest(dump(request).encode())
             receipt=read_intake_receipt(store,batch_id)
             if receipt:
                 if receipt['request_sha256']!=request_sha:raise WorkflowError('Intake batch identity already belongs to a different request')
@@ -766,6 +823,9 @@ def intake(store,payload):
         extras={}
         if batch_id is not None:
             receipt={'schema':1,'id':batch_id,'created_at':now(),'request_sha256':request_sha,'items':created}
+            if partition:
+                ids={item['key']:meta['id'] for item,meta in zip(items,created)}
+                receipt['full_cycle_partition']={role:[ids[key] for key in keys] for role,keys in partition.items()}
             validate_intake_receipt(receipt,batch_id)
             extras={rel:dump(receipt)}
         result=receipt if batched else created[0]
@@ -1143,9 +1203,12 @@ def pending_task_view(store, selectors):
 def group_selection(store, payload):
     """Resolve an explicit group from one read of the canonical queue."""
     queues = {'pending': 'Pending Queue', 'prioritized': 'Prioritized Next Changes'}
-    if (not isinstance(payload, dict) or set(payload)-{'queue', 'topic', 'intake_batch_ids'}
+    if (not isinstance(payload, dict) or set(payload)-{'queue', 'topic', 'intake_batch_ids', 'view'}
             or not isinstance(payload.get('queue'), str) or payload['queue'] not in queues):
         raise WorkflowError('Group selection requires pending or prioritized queue and explicit filters')
+    view = payload.get('view', 'detailed')
+    if view not in ('detailed', 'compact'):
+        raise WorkflowError('Group selection view requires detailed or compact')
     if not {'topic', 'intake_batch_ids'} & payload.keys():
         raise WorkflowError('Group selection requires an exact topic or explicit intake batch IDs')
     topic = payload.get('topic')
@@ -1164,7 +1227,8 @@ def group_selection(store, payload):
             raise WorkflowError('Unknown intake batch: '+batch_id)
         receipt_members[batch_id] = {item['id'] for item in receipt['items']}
     queue = store.owned('.skill-tree/documents/future.md').read_bytes()
-    tasks = parse(queue.decode('utf-8'))
+    text = queue.decode('utf-8')
+    tasks = parse(text)
     requested = set(batch_ids)
     group = sorted(
         (task for task in tasks if task['queue'] == queues[payload['queue']]
@@ -1179,21 +1243,35 @@ def group_selection(store, payload):
             if batch_id in receipt_members and not origins.intersection(receipt_members[batch_id]):
                 raise WorkflowError('Selected task lacks original Pending provenance: '+task['id'])
     ids = [task['id'] for task in group]
+    selected_ids = set(ids)
     if payload['queue']=='prioritized':
         completed = {item['task_id']:item for item in store.outcomes() if item['disposition']=='completed'}
-        outside = verified_dependency_scope(store,tasks,{'snapshot':ids},completed) - set(ids)
+        outside = verified_dependency_scope(store,tasks,{'snapshot':ids},completed) - selected_ids
     else:
-        outside = dependency_scope(tasks,{'snapshot':ids}) - set(ids)
+        outside = dependency_scope(tasks,{'snapshot':ids}) - selected_ids
     pending_blockers = {}
     if payload['queue'] == 'pending' and any(task.get(PENDING_DEPENDENCY_FIELD) for task in group):
         pending, promoted, declined = pending_dependency_context(store, tasks)
-        pending_blockers = pending_dependency_blockers(ids, set(ids), pending, promoted, declined)
-    return {
+        pending_blockers = pending_dependency_blockers(ids, selected_ids, pending, promoted, declined)
+    result = {
         **pending_blockers,
         'ids': ids,
         'tasks': group,
         'outside_dependencies': sorted(outside),
         'source_hash': digest(queue),
+    }
+    if view == 'detailed':
+        return result
+    owner = Store(store.root, route_queue=False, neutral=True)
+    registry = owner.load(text).get('run_registry', {})
+    dependency_field = PENDING_DEPENDENCY_FIELD if payload['queue'] == 'pending' else 'depends_on'
+    return {
+        **result, 'queue': payload['queue'], 'canonical_queue': str(owner.future), 'queue_id': registry.get('queue_id'),
+        'tasks': [
+            {**{key: task[key] for key in ('id', 'title', 'priority', 'status')},
+             'depends_on': [dependency for dependency in task.get(dependency_field, []) if dependency in selected_ids]}
+            for task in group
+        ],
     }
 
 
@@ -2902,21 +2980,7 @@ def current_target_state(store,policy):
     return text,state,run,delivery,reviewed,target,head
 
 
-def current_target_run_checks(store,policy,aid,actor):
-    # The publication lock remains held. The queue writer is available to unrelated work during execution.
-    with store.lock():
-        _,_,run,delivery,_,_,head=current_target_state(store,policy)
-        attempt=delivery.get('current_target_attempts',{}).get(aid) if valid_id(aid,'MI') else None
-        if not attempt or attempt['integrator_id']!=actor:
-            raise WorkflowError('Use the original current-target attempt and owning integrator identity')
-        if attempt['status'] not in {'sealed','checked'}:raise WorkflowError('Seal the current-target candidate before running checks')
-        if head!=attempt['target_head'] or workspaces.local_source_identity(store,run)!=attempt['source']:
-            raise WorkflowError('The current-target candidate source or target has moved')
-        area,actual=workspaces.current_target_checkout(store.root,attempt)
-        if actual['head']!=attempt['candidate']['commit'] or workspaces.current_target_dirt(area):
-            raise WorkflowError('The exact sealed current-target candidate must remain clean')
-        proof_store=_hook_source_store(store,area)
-        inputs=current_target_check_inputs(proof_store,attempt)
+def run_reviewed_candidate_checks(run,key,area,inputs):
     checks={};writes={}
     for cid,current in inputs.items():
         argv=[current['executable'],*current['argv'][1:]]
@@ -2932,7 +2996,7 @@ def current_target_run_checks(store,policy,aid,actor):
         report=(stdout+b'\n'+stderr).decode('utf-8',errors='replace')
         count=current_target_check_counts(current['lane'],report)
         execution_id=identity('C')
-        path=_delivery_receipt_path(run,'-'+aid.lower()+'-'+execution_id.lower())
+        path=_delivery_receipt_path(run,'-'+key+'-'+execution_id.lower())
         execution={'id':cid,'execution_id':execution_id,'inputs':current,'exit_code':exit_code,
                    'qualified':exit_code==0 and (count is None or count>0),'discovered':count,'output':report,
                    'started_at':started_at,'finished_at':now(),'failure':failure}
@@ -2941,6 +3005,25 @@ def current_target_run_checks(store,policy,aid,actor):
         checksum=digest(writes[path].encode())
         checks[cid].update(artifact={'path':path,'sha256':checksum},
                            review_reference='current-target-check:'+execution_id+':'+checksum)
+    return checks,writes
+
+
+def current_target_run_checks(store,policy,aid,actor):
+    # The publication lock remains held. The queue writer is available to unrelated work during execution.
+    with store.lock():
+        _,_,run,delivery,_,_,head=current_target_state(store,policy)
+        attempt=delivery.get('current_target_attempts',{}).get(aid) if valid_id(aid,'MI') else None
+        if not attempt or attempt['integrator_id']!=actor:
+            raise WorkflowError('Use the original current-target attempt and owning integrator identity')
+        if attempt['status'] not in {'sealed','checked'}:raise WorkflowError('Seal the current-target candidate before running checks')
+        if head!=attempt['target_head'] or workspaces.local_source_identity(store,run)!=attempt['source']:
+            raise WorkflowError('The current-target candidate source or target has moved')
+        area,actual=workspaces.current_target_checkout(store.root,attempt)
+        if actual['head']!=attempt['candidate']['commit'] or workspaces.current_target_dirt(area):
+            raise WorkflowError('The exact sealed current-target candidate must remain clean')
+        proof_store=_hook_source_store(store,area)
+        inputs=current_target_check_inputs(proof_store,attempt)
+    checks,writes=run_reviewed_candidate_checks(run,aid.lower(),area,inputs)
     with store.lock():
         text,state,run,delivery,_,_,current_head=current_target_state(store,policy)
         retained=delivery.get('current_target_attempts',{}).get(aid)
@@ -3132,6 +3215,679 @@ def current_target_delivery(store,command,payload):
             'run_id':run['id'],'review':reviewed,'merge':verified_candidate,'target_ref':target_ref}),
             _delivery_receipt_path(run,'-'+aid.lower()):dump(attempt)})
         return current_target_preview(attempt,run,area)
+
+
+def historical_runs(registry):
+    return {**{rid: value['checkpoint'] for rid, value in registry.get('archived_runs', {}).items()},
+            **registry.get('runs', {})}
+
+
+def partial_finish_receipt_path(run_id):
+    return '.skill-tree/history/runs/run-' + run_id.lower() + '-partial-finish.json'
+
+
+def partial_finished(store, registry):
+    entry = (registry or {}).get('archived_runs', {}).get(store.run_id)
+    if entry is None:
+        return None
+    relative = partial_finish_receipt_path(store.run_id)
+    path = store.owned(relative)
+    if not path.is_file() or path.is_symlink() or file_hash(path) != entry['receipt_sha256']:
+        raise WorkflowError('The original partial finish receipt is missing or changed')
+    result = json.loads(path.read_bytes())
+    if (result.get('run_id') != store.run_id or result.get('queue_id') != registry['queue_id']
+            or result.get('checkpoint') != entry['checkpoint']):
+        raise WorkflowError('The partial finish receipt differs from the historical run')
+    return result
+
+
+def partial_finish_outcomes(store, registry, run, checkout):
+    rid = run['id']
+    refs = run['completion_refs']
+    rows = {row['id']: row for row in store.outcomes() if row.get('run_id') == rid}
+    accepted = set(run['completed_ids'])
+    if not accepted or set(refs) != accepted:
+        raise WorkflowError('Partial finish requires exact accepted task outcome references')
+    outcomes = {}
+    for tid, oid in refs.items():
+        row = rows.get(oid, {})
+        if row.get('task_id') != tid or row.get('disposition') != 'completed':
+            raise WorkflowError('Partial finish requires the original accepted outcome for '+tid)
+        outcomes[oid] = row
+
+    verified = {}
+    directory = store.owned('.skill-tree/history/run-events/' + rid.lower())
+    event_ids = set(registry.get('applied_events', []))
+    for path in sorted(directory.glob('e-*.json')):
+        eid = 'E-' + path.stem[2:]
+        if eid not in event_ids:
+            continue
+        if path.is_symlink() or not path.is_file():
+            raise WorkflowError('Partial finish requires ordinary applied event files')
+        event = json.loads(path.read_bytes())
+        for row in event.get('outcomes', []):
+            oid = row.get('id')
+            if oid not in outcomes:
+                continue
+            if (oid in verified or row != outcomes[oid] or event.get('schema') != 1
+                    or event.get('id') != eid or event.get('run_id') != rid
+                    or event.get('queue_id') != registry['queue_id'] or type(event.get('sequence')) is not int
+                    or not 1 <= event['sequence'] <= registry.get('event_sequences', {}).get(rid, 0)):
+                raise WorkflowError('Partial finish found conflicting applied completion evidence')
+            verified[oid] = {'id': eid, 'sha256': file_hash(path)}
+            if getattr(store, '_writer_active', False):
+                store.expect_unchanged(path.relative_to(store.root).as_posix(), verified[oid]['sha256'])
+    if set(verified) != set(outcomes):
+        raise WorkflowError('Partial finish requires the applied event for every accepted outcome')
+
+    source = store.source_root
+    base = run['workspace']['base_commit']
+    commits = {}
+    for oid, row in outcomes.items():
+        receipt = row.get('task_git_commit') or {}
+        commit = receipt.get('commit')
+        if (not isinstance(commit, str) or not re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', commit)
+                or commit in commits or receipt.get('ref') != checkout['ref']
+                or receipt.get('checkout') != checkout['checkout']):
+            raise WorkflowError('Partial finish requires the original scoped Git commit for '+row['task_id'])
+        parents = workspaces.local_git_text(source, 'show', '-s', '--format=%P', commit).split()
+        tree = workspaces.local_git_text(source, 'rev-parse', '--verify', commit+'^{tree}')
+        if parents != [receipt.get('parent')] or tree != receipt.get('tree'):
+            raise WorkflowError('Partial finish commit parent or tree differs from the accepted receipt')
+        commits[commit] = {'task_id': row['task_id'], 'outcome_id': oid, 'commit': commit,
+                           'parent': parents[0], 'event': verified[oid]}
+
+    chain = []
+    by_parent = {row['parent']: row for row in commits.values()}
+    tip = base
+    while tip in by_parent:
+        row = by_parent.pop(tip)
+        chain.append(row)
+        tip = row['commit']
+    # A close-only receipt can preserve accepted evidence even if delivery needs
+    # a separate proven candidate for non-contiguous accepted commits.
+    accepted_tip = tip if len(chain) == len(commits) else None
+    if any(workspaces.local_git(source, 'merge-base', '--is-ancestor', commit, checkout['head'],
+                                accepted=(0, 1)).returncode for commit in commits):
+        raise WorkflowError('The selected worktree head does not contain all accepted commits')
+    by_task = {row['task_id']: row for row in commits.values()}
+    return [by_task[tid] for tid in run['completed_ids']], accepted_tip
+
+
+def partial_finish_source_changes(path):
+    dirty = sorted(workspaces.local_worktree_dirt(path, allow_staged=True))
+    index = workspaces.task_index_selection(path, [])
+    def diff_hash(*args):
+        return digest(workspaces.local_git(path, 'diff', '--no-ext-diff', '--no-textconv', '--binary', *args, '--').stdout)
+    def retained_path(relative):
+        entry = path / relative
+        if entry.is_symlink():
+            return {'symlink': os.readlink(entry)}
+        if not entry.exists():
+            return None
+        if not entry.is_file():
+            raise WorkflowError('Partial finish cannot prove unaccepted worktree path '+relative)
+        return {'sha256': file_hash(entry), 'mode': entry.stat().st_mode}
+    return {'paths': dirty, 'index': index, 'staged': diff_hash('--cached'), 'unstaged': diff_hash(),
+            'worktree': {p: retained_path(p) for p in dirty}}
+
+
+
+def partial_finish_evidence_fingerprints(store, run):
+    worker = '.skill-tree/history/worker-handoffs/' + run['id'].lower() + '.json'
+    chains = ['.skill-tree/invocations/'+cid.lower()+'.json' for cid in run.get('hook_chains', [])]
+    paths = [OUTCOME_LEDGER, worker, *chains]
+    result = {}
+    for relative in paths:
+        path = store.owned(relative)
+        if path.is_symlink() or relative in chains and not path.is_file():
+            raise WorkflowError('Partial finish requires ordinary original evidence files')
+        result[relative] = file_hash(path)
+    return result
+
+
+def partial_finish_observation(store, text, state):
+    rid = store.run_id
+    registry = state.get('run_registry') or {}
+    run = registry.get('runs', {}).get(rid)
+    if (not run or run['mode'] != 'all' or run.get('implementation_operation') != 'implement-all'
+            or run['phase'] != 'stopped' or not run.get('stop_reason') or run.get('maintenance')
+            or not run.get('workspace') or workspaces.initial_profile_pending(run)
+            or run.get('delivery', {}).get('implementation') != 'in-progress'):
+        raise WorkflowError('Partial finish requires the exact stopped, admitted Core Implement All run')
+    locator = workspaces.runtime(store.root)
+    if not locator or locator['queue_id'] != registry['queue_id']:
+        raise WorkflowError('Partial finish requires the canonical Git run locator')
+    live = locator['worktrees'].get(rid)
+    if (not live or rid in locator.get('unverified_worktrees', [])
+            or rid in locator.get('pending_worktrees', {}) or rid in locator.get('archived_worktrees', {})):
+        raise WorkflowError('Partial finish requires a verified live original worktree binding')
+    path = Path(live)
+    if path != path.resolve() or path == store.root:
+        raise WorkflowError('Partial finish requires an exact linked worktree')
+    registration = workspaces.linked_registration(store.root, path)
+    workspace = run['workspace']
+    owner = workspace.get('cleanup_owner')
+    if owner:
+        workspaces.directed_owner(store.root, path, run, registry['queue_id'])
+    move = workspaces.verified_move_chain(run, owner)
+    anchor = move['to_locator_sha256'] if move else workspaces.cleanup_origin_sha256(run)
+    if anchor is not None and anchor != workspaces.locator_path_sha256(path):
+        raise WorkflowError('Partial finish requires the exact verified original or relocated worktree')
+    if workspace['repo_id'] != workspaces.repo_id(store.root):
+        raise WorkflowError('Partial finish workspace repository changed')
+    checkout = workspaces.checked_out_branch(path)
+    if checkout['ref'] != 'refs/heads/'+workspace['branch']:
+        raise WorkflowError('Partial finish workspace branch changed')
+    workspaces.unfinished(path)
+    store.source_root = path
+    accepted, tip = partial_finish_outcomes(store, registry, run, checkout)
+    required = list(dict.fromkeys(run['snapshot']+run['required_ids']))
+    if set(run['completed_ids'])-set(required):
+        raise WorkflowError('Accepted outcomes exceed the frozen controller scope')
+    completed = {row['task_id'] for row in store.outcomes() if row['disposition'] == 'completed'}
+    remaining = [tid for tid in required if tid not in completed]
+    claims = sorted(tid for tid, owner in registry['claims'].items() if owner == rid)
+    if not remaining or set(remaining)-set(claims):
+        raise WorkflowError('Partial finish requires unfinished work claimed by the selected run')
+    tasks = {task['id']:task for task in parse(text)}
+    if any(tid not in tasks or tasks[tid]['queue'] != 'Prioritized Next Changes' for tid in claims):
+        raise WorkflowError('Partial finish cannot preserve unfinished queue identities')
+    progress = {tid: entry for tid, entry in state['task_progress'].items() if entry.get('run_id') == rid}
+    blockers = [{'kind': 'unowned-task-progress', 'task_id': tid} for tid in claims
+                if tid in state['task_progress'] and tid not in progress]
+    for tid, entry in progress.items():
+        if any(pending_check_attempt(slot) for slot in entry.get('checks', {}).values()):
+            blockers.append({'kind': 'original-check', 'task_id': tid})
+        if entry.get('task_git_attempt'):
+            blockers.append({'kind': 'original-scoped-commit', 'task_id': tid})
+    for attempt in hook_helper().pending_scan(store):
+        if attempt['chain_id'] in run.get('hook_chains', []):
+            blockers.append({'kind': 'original-hook', **attempt})
+    worker = store.owned('.skill-tree/history/worker-handoffs/'+rid.lower()+'.json')
+    if worker.is_symlink():
+        raise WorkflowError('Partial finish requires ordinary worker handoff evidence')
+    if worker.is_file():
+        ledger = json.loads(worker.read_bytes())
+        assignments = ledger.get('slots')
+        if ledger.get('schema') != 1 or ledger.get('run_id') != rid or not isinstance(assignments, dict):
+            raise WorkflowError('Partial finish requires exact original worker handoff evidence')
+        worker_state = {**state, 'active_run': run}
+        for slot in assignments.values():
+            if not isinstance(slot, list):
+                raise WorkflowError('Partial finish requires exact original worker assignments')
+            if slot and not retired_worker_scope(store, worker_state, slot[-1], checkout['head']):
+                blockers.append({'kind': 'original-worker', 'task_id': slot[-1]['task_id']})
+    for key, claim in sorted(registry['resources'].items()):
+        if claim['run_id'] == rid:
+            blockers.append({'kind': 'original-resource', 'resource': key})
+    if run.get('director_question_hold') or any(run.get('delivery', {}).get(name) for name in
+            ('reviewed_merge_attempt','current_target_attempts','reviewed_source')):
+        blockers.append({'kind': 'original-controller-handoff'})
+    changes = partial_finish_source_changes(path)
+    observation = {'run_id': rid, 'queue_id': registry['queue_id'], 'queue_sha256': digest(text.encode()),
+        'checkpoint_sha256': digest(dump(run).encode()),
+        'snapshot': run['snapshot'], 'required_ids': run['required_ids'], 'accepted': accepted,
+        'accepted_tip': tip, 'remaining_ids': remaining, 'claims': claims, 'blockers': blockers,
+        'source': {**checkout, 'registration': registration.name, 'location_sha256': digest(str(path).encode())},
+        'changes': changes, 'evidence_sha256': partial_finish_evidence_fingerprints(store, run),
+        'progress_sha256': digest(dump(progress).encode()), 'progress_ids': sorted(progress),
+        'requires_preservation': bool(progress or changes['paths'] or run.get('partial_work') or checkout['head'] != tip),
+        'delivery_status': run.get('delivery', {}).get('status')}
+    return observation, progress
+
+
+def partial_retire_locator(store, journal):
+    owner = journal['local_delivery']
+    rid = owner['run_id']
+    locator = workspaces.runtime(store.root)
+    receipts = [json.loads(write['content']) for write in journal['writes']
+                if write['path'] == partial_finish_receipt_path(rid)]
+    if (len(receipts) != 1 or not locator or locator['queue_id'] != receipts[0].get('queue_id')
+            or receipts[0].get('request_sha256') != owner['request_sha256']):
+        raise WorkflowError('Partial finish journal differs from the exact original worktree handoff')
+    source = receipts[0]['preview']['source']
+    if rid in locator.get('unverified_worktrees', []) or rid in locator.get('pending_worktrees', {}):
+        raise WorkflowError('The original partial finish binding is no longer verified')
+    retired = locator.setdefault('archived_worktrees', {})
+    if rid in retired:
+        binding = retired[rid]
+        if rid in locator['worktrees'] or binding.get('request_sha256') != owner['request_sha256']:
+            raise WorkflowError('The archived worktree binding differs from the original partial finish')
+        path = Path(binding['path'])
+    else:
+        location = locator['worktrees'].get(rid)
+        if not location:
+            raise WorkflowError('Recover the exact original worktree binding before partial finish')
+        path = Path(location)
+    if (digest(str(path).encode()) != source['location_sha256']
+            or workspaces.linked_registration(store.root, path).name != source['registration']
+            or workspaces.checked_out_branch(path) != {key:source[key] for key in ('checkout','ref','head')}):
+        raise WorkflowError('The original worktree changed before partial finish could be recorded')
+    receipt = receipts[0]
+    if receipt['checkpoint']['workspace'].get('cleanup_owner'):
+        workspaces.directed_owner(store.root, path, receipt['checkpoint'], receipt['queue_id'])
+    if (partial_finish_source_changes(path) != receipt['preview']['changes']
+            or partial_finish_evidence_fingerprints(store, receipt['checkpoint']) != receipt['preview']['evidence_sha256']):
+        raise WorkflowError('The original source or execution evidence changed during partial finish recovery')
+    directory = '.skill-tree/history/run-events/'+rid.lower()+'/'
+    if any(file_hash(store.owned(directory+row['event']['id'].lower()+'.json')) != row['event']['sha256']
+           for row in receipt['preview']['accepted']):
+        raise WorkflowError('An accepted event changed during partial finish recovery')
+    if rid not in retired:
+        retired[rid] = {'path': str(path), 'request_sha256': owner['request_sha256']}
+        del locator['worktrees'][rid]
+        workspaces.atomic(workspaces.runtime_file(store.root), locator)
+
+
+def partial_finish(store, command, payload):
+    workspaces.local_git_environment()
+    if not valid_id(store.run_id,'WR') or store.source_root != store.root:
+        raise WorkflowError('Partial finish requires the exact --run-id and canonical repository')
+    neutral = Store(store.root, neutral=True)
+    neutral.run_id = store.run_id
+    allowed = {'expected_preview_sha256', 'owner_instruction', 'preserve_unaccepted'}
+    if command == 'partial-finish-preview':
+        if payload:
+            raise WorkflowError('Partial finish preview accepts only the exact run ID')
+        text = neutral.text()
+        state = neutral.load(text)
+        original = partial_finished(neutral, state.get('run_registry'))
+        if original:
+            return original
+        preview, _ = partial_finish_observation(neutral, text, state)
+        return {'status': 'blocked' if preview['blockers'] else 'preview',
+                'preview_sha256': digest(dump(preview).encode()), 'preview': preview}
+    if (set(payload)-allowed or not isinstance(payload.get('expected_preview_sha256'), str)
+            or not isinstance(payload.get('owner_instruction'), str) or not payload['owner_instruction'].strip()
+            or type(payload.get('preserve_unaccepted', False)) is not bool):
+        raise WorkflowError('Partial finish requires the exact preview and explicit owner instruction')
+    request = digest(dump(payload).encode())
+    owner = {'action': 'partial-finish', 'run_id': store.run_id, 'request_sha256': request}
+    with neutral.lock(local_delivery=owner):
+        text = neutral.text()
+        state = neutral.load(text)
+        registry = state.get('run_registry') or {}
+        original = partial_finished(neutral, registry)
+        if original:
+            if original['request_sha256'] != request:
+                raise WorkflowError('Retry the original partial finish instruction and preview')
+            return original
+
+        preview, progress = partial_finish_observation(neutral, text, state)
+        preview_digest = digest(dump(preview).encode())
+        if preview_digest != payload['expected_preview_sha256']:
+            raise WorkflowError('Partial finish preview changed; inspect current state before confirming')
+        if preview['blockers']:
+            raise WorkflowError('Reconcile the original attempts and resource leases before partial finish')
+        if preview['requires_preservation'] and not payload.get('preserve_unaccepted'):
+            raise WorkflowError('Partial finish requires explicit preservation of unaccepted work in the original worktree')
+
+        rid = neutral.run_id
+        checkpoint = registry['runs'].pop(rid)
+        receipt = {'schema': 1, 'status': 'partially-completed', 'run_id': rid, 'id': rid,
+                   'queue_id': registry['queue_id'], 'finished_at': now(), 'request_sha256': request,
+                   'owner_instruction': payload['owner_instruction'], 'preview_sha256': preview_digest,
+                   'preview': preview, 'checkpoint': checkpoint, 'archived_progress': progress}
+        body = dump(receipt)
+        registry.setdefault('archived_runs', {})[rid] = {
+            'checkpoint': checkpoint, 'receipt_sha256': digest(body.encode()), 'status': 'partially-completed'}
+        for tid in progress:
+            del state['task_progress'][tid]
+        neutral.selected_run_id = rid
+        neutral.save(text, state, {partial_finish_receipt_path(rid): body})
+        return receipt
+
+
+def partial_delivery_save(store, state, relative, record, extras=None):
+    archived = state['run_registry']['archived_runs'][record['run_id']]
+    records = archived.setdefault('delivery_records', {})
+    path = store.owned(relative)
+    writes = dict(extras or {})
+    if relative in records and path.is_file() and file_hash(path) == records[relative]:
+        previous = json.loads(path.read_bytes())
+        prior_request = previous.get('request_sha256')
+        if (previous['status'] == 'blocked' and prior_request and prior_request != record.get('request_sha256')):
+            archived_path = relative.removesuffix('.json') + '-blocked-' + prior_request + '.json'
+            writes[archived_path] = dump(previous)
+            records[archived_path] = digest(writes[archived_path].encode())
+    body = dump(record)
+    records[relative] = digest(body.encode())
+    store.save(store.text(), state, {**writes, relative:body}, update_navigation=False)
+
+
+def partial_delivery_check_attempt(store, closed, view):
+    _, _, contracts = partial_accepted_delivery_scope(store, closed)
+    if not contracts:
+        raise WorkflowError('No accepted runnable validation contract is available for the partial candidate')
+    prep = view['preparation']
+    return {'candidate':{'commit':prep['source_head'], 'tree':prep['source_tree']}, 'contracts':contracts}
+
+
+def partial_delivery_checks(store, payload, closed, target, target_identity, relative):
+    if not isinstance(payload.get('owner_instruction'), str) or not payload['owner_instruction'].strip():
+        raise WorkflowError('Partial delivery checks require the exact owner instruction')
+    owner = {'run_id':closed['run_id'],'action':'partial-delivery-checks','request_sha256':digest(dump(payload).encode())}
+    check_relative = relative.removesuffix('.json')+'-checks.json'
+    with workspaces.publication_lock(store.root,'local',target_identity['ref'].removeprefix('refs/heads/')):
+        with store.lock(local_delivery=owner):
+            state = store.load()
+            current_target, current = partial_delivery_target(store,payload)
+            if current_target != target or current != target_identity or partial_finished(store,state['run_registry']) != closed:
+                raise WorkflowError('The original partial delivery changed before checks')
+            previous = partial_delivery_record(store,relative,closed,current['ref'])
+            if previous and previous['status'] in {'prepared','merged','already-integrated'}:
+                raise WorkflowError('Reconcile the existing prepared or completed delivery before running replacement checks')
+            view, candidate = partial_delivery_observation(store,closed,payload,target,current)
+            if digest(dump(view).encode()) != payload.get('expected_preview_sha256') or view['status'] != 'review-required':
+                raise WorkflowError('Partial delivery checks require the exact review candidate preview')
+            proof = _hook_source_store(store,candidate)
+            attempt = partial_delivery_check_attempt(proof,closed,view)
+            base = {'schema':1,'id':closed['run_id'],'run_id':closed['run_id'],'preview':view}
+            try:
+                inputs = current_target_check_inputs(proof,attempt)
+            except WorkflowError as error:
+                result = {**base,'status':'blocked','reason':str(error)}
+                partial_delivery_save(store,state,check_relative,result)
+                return result
+        checks, writes = run_reviewed_candidate_checks(closed, 'partial', candidate, inputs)
+        with store.lock(local_delivery=owner):
+            state = store.load()
+            current_target, current = partial_delivery_target(store,payload)
+            observed, actual = partial_delivery_observation(store,closed,payload,current_target,current)
+            if (partial_finished(store,state['run_registry']) != closed or observed != view
+                    or actual != candidate or current_target_check_inputs(proof,attempt) != inputs):
+                raise WorkflowError('The partial candidate, target or check inputs changed during execution')
+            result = {**base,'status':'checked' if all(check['qualified'] for check in checks.values()) else 'blocked',
+                      'checks':checks}
+            partial_delivery_save(store,state,check_relative,result,writes)
+            return result
+
+
+def partial_delivery_target(store, payload):
+    branch = workspaces.branch(store.root, payload.get('target_branch'))
+    name = payload.get('target_worktree', str(store.root))
+    if not isinstance(name, str) or not name:
+        raise WorkflowError('Select the exact target worktree path')
+    path = Path(name)
+    if path != path.resolve() or workspaces.common_dir(path) != workspaces.common_dir(store.root):
+        raise WorkflowError('Select the exact target checkout in the original Git repository')
+    if path != store.root:
+        workspaces.linked_registration(store.root, path)
+    identity = workspaces.checked_out_branch(path)
+    if identity['ref'] != 'refs/heads/'+branch:
+        raise WorkflowError('The selected checkout does not have the exact authorized target branch')
+    return path, identity
+
+
+def partial_accepted_delivery_scope(store, closed):
+    tip = closed['preview']['accepted_tip']
+    if tip is None:
+        raise WorkflowError('The accepted commits do not form an exact contiguous range for delivery')
+    base = closed['checkpoint']['workspace']['base_commit']
+    commits = {entry['commit'] for entry in closed['preview']['accepted']}
+    history = set(workspaces.local_git_text(store.root,'rev-list',base+'..'+tip).splitlines())
+    if history != commits:
+        raise WorkflowError('The partial delivery range includes unaccepted or missing commits')
+    contracts = {}
+    outcomes = {row['id']:row for row in store.outcomes()}
+    for entry in closed['preview']['accepted']:
+        row = outcomes.get(entry['outcome_id'], {})
+        if (row.get('run_id') != closed['run_id'] or row.get('task_id') != entry['task_id']
+                or row.get('disposition') != 'completed'
+                or (row.get('task_git_commit') or {}).get('commit') != entry['commit']):
+            raise WorkflowError('The original accepted outcome changed before partial delivery')
+        relative = '.skill-tree/history/run-events/'+closed['run_id'].lower()+'/'+entry['event']['id'].lower()+'.json'
+        event_path = store.owned(relative)
+        if (event_path.is_symlink() or file_hash(event_path) != entry['event']['sha256']
+                or [value for value in json.loads(event_path.read_bytes()).get('outcomes', [])
+                    if value.get('id') == row['id']] != [row]):
+            raise WorkflowError('The original applied task evidence changed before partial delivery')
+        for check in row.get('validation_plan', []):
+            contracts[entry['task_id']+'/'+check['id']] = check
+    return base, tip, contracts
+
+
+def partial_review_candidate(store, payload, base, tip, target, target_identity):
+    name = payload.get('candidate_worktree')
+    if not isinstance(name, str) or not name:
+        raise WorkflowError('Select a clean exact candidate worktree for the accepted partial range')
+    candidate = Path(name)
+    if candidate != candidate.resolve() or candidate == target:
+        raise WorkflowError('The partial review requires a separate exact candidate worktree')
+    workspaces.linked_registration(store.root, candidate)
+    source = workspaces.checked_out_branch(candidate)
+    if workspaces.local_worktree_dirt(candidate, allow_staged=True):
+        raise WorkflowError('Uncommitted changes cannot enter the reviewed partial candidate')
+    head = source['head']
+    target_head = target_identity['head']
+    def ancestor(a, b):
+        return workspaces.local_git(candidate,'merge-base','--is-ancestor',a,b,accepted=(0,1)).returncode == 0
+    if not ancestor(base, target_head):
+        raise WorkflowError('The selected target does not contain the accepted range base')
+    if not ancestor(tip, head) or not ancestor(target_head, head):
+        raise WorkflowError('The reviewed candidate must contain the accepted tip and exact live target; prepare current-target integration')
+    if ancestor(target_head, tip):
+        foundation = tip
+    else:
+        # Only the ordinary, conflict-free Git integration can establish the
+        # foundation before any independently reviewed fix commits.
+        tree, conflicts = workspaces.current_target_merge_tree(candidate, target_head, tip)
+        if conflicts:
+            raise WorkflowError('The accepted range conflicts with the exact target: '+', '.join(conflicts))
+        first_parent = workspaces.local_git_text(candidate,'rev-list','--first-parent','--reverse',
+                                                 target_head+'..'+head).splitlines()
+        if not first_parent:
+            raise WorkflowError('The reviewed candidate lacks the exact current-target integration commit')
+        foundation = first_parent[0]
+        parents = workspaces.local_git_text(candidate,'show','-s','--format=%P',foundation).split()
+        if parents != [target_head,tip] or workspaces.local_git_text(candidate,'rev-parse',foundation+'^{tree}') != tree:
+            raise WorkflowError('The candidate foundation differs from the exact ordinary current-target merge tree')
+    fixes = workspaces.local_git_text(candidate,'rev-list','--reverse',foundation+'..'+head).splitlines()
+    paths = workspaces.local_incoming(candidate, base, tip)
+    previous = foundation
+    for fix in fixes:
+        parents = workspaces.local_git_text(candidate,'show','-s','--format=%P',fix).split()
+        if parents != [previous] or workspaces.local_incoming(candidate,previous,fix)-paths:
+            raise WorkflowError('Partial review fixes must stay in the accepted diff and introduce no unrelated history')
+        previous = fix
+    tree = workspaces.local_git_text(candidate,'rev-parse',head+'^{tree}')
+    identity = {'head':head,'base_oid':target_head,'source_digest':digest(tree.encode())}
+    checkpoint = {'source_ref':source['ref'],'source_head':head,'source_tree':tree,
+                  'target_ref':target_identity['ref'],'target_head':target_head,
+                  'incoming':sorted(workspaces.local_incoming(target,target_head,head)),
+                  'allow_unrelated_staged':True}
+    return candidate, identity, checkpoint
+
+
+def partial_delivery_observation(store, closed, payload, target, target_identity):
+    view = {'run_id':closed['run_id'], 'close_sha256':digest(dump(closed).encode()),
+            'target':target_identity,'target_location_sha256':digest(str(target).encode())}
+    try:
+        base, tip, contracts = partial_accepted_delivery_scope(store, closed)
+    except WorkflowError as error:
+        return {**view,'status':'blocked','reason':str(error)}, None
+    view.update(accepted_base=base,accepted_tip=tip)
+    contains = workspaces.local_git(target,'merge-base','--is-ancestor',tip,target_identity['head'],
+                                     accepted=(0,1)).returncode == 0
+    if contains:
+        return {**view,'status':'already-integrated'}, None
+    try:
+        candidate, identity, preparation = partial_review_candidate(store,payload,base,tip,target,target_identity)
+    except (WorkflowError, workspaces.RunError) as error:
+        return {**view,'status':'blocked','reason':str(error)}, None
+    scope = {'kind':'controller','run_id':closed['run_id'],
+             'task_ids':[row['task_id'] for row in closed['preview']['accepted']],
+             'partial_close_sha256':view['close_sha256'],'target_ref':target_identity['ref']}
+    return {**view,'status':'review-required','identity':identity,'review_scope':scope,
+            'required_checks':sorted(contracts),'preparation':preparation,
+            'candidate_location_sha256':digest(str(candidate).encode())}, candidate
+
+
+def partial_delivery_record(store, relative, closed, target_ref):
+    path = store.owned(relative)
+    if path.is_symlink():
+        raise WorkflowError('Partial delivery requires an ordinary owned record')
+    archived = (store.load().get('run_registry') or {}).get('archived_runs', {}).get(closed['run_id'], {})
+    expected = archived.get('delivery_records', {}).get(relative)
+    if not path.is_file():
+        if expected is not None:
+            raise WorkflowError('The canonical partial delivery record is missing; recover the original receipt')
+        return None
+    if expected is None or expected != file_hash(path):
+        raise WorkflowError('Partial delivery record differs from the canonical recorded result')
+    result = json.loads(path.read_bytes())
+    preview = result.get('preview', {})
+    if (result.get('schema') != 1 or result.get('run_id') != closed['run_id']
+            or preview.get('close_sha256') != digest(dump(closed).encode())
+            or preview.get('target', {}).get('ref') != target_ref):
+        raise WorkflowError('Partial delivery record differs from the original closure or target')
+    return result
+
+
+def partial_delivery(store, command, payload):
+    workspaces.local_git_environment()
+    if not valid_id(store.run_id,'WR') or store.source_root != store.root:
+        raise WorkflowError('Partial delivery requires the exact --run-id and canonical repository')
+    neutral = Store(store.root, neutral=True)
+    neutral.run_id = store.run_id
+    fields = {'target_branch', 'target_worktree', 'candidate_worktree'}
+    fields |= {'expected_preview_sha256', 'owner_instruction', 'review_id'} if command in {'partial-delivery','partial-delivery-checks'} else set()
+    if set(payload)-fields:
+        raise WorkflowError('Partial delivery requires the exact target and review scope')
+    state = neutral.load()
+    closed = partial_finished(neutral, state.get('run_registry'))
+    if not closed:
+        raise WorkflowError('Partial delivery requires an original partial-finish receipt')
+    target, target_identity = partial_delivery_target(neutral,payload)
+    relative = _delivery_receipt_path(closed, '-partial-delivery-' + digest(target_identity['ref'].encode())[:16])
+    if command == 'partial-delivery-preview':
+        record = partial_delivery_record(neutral, relative, closed, target_identity['ref'])
+        if record and record['status'] in {'prepared','merged','already-integrated'}:
+            return {'status':record['status'], 'attempt':record, 'target':target_identity}
+
+        view, _ = partial_delivery_observation(neutral,closed,payload,target,target_identity)
+        return {**view,'preview_sha256':digest(dump(view).encode())}
+    if command == 'partial-delivery-checks':
+        return partial_delivery_checks(neutral,payload,closed,target,target_identity,relative)
+
+    if (not isinstance(payload.get('owner_instruction'),str) or not payload['owner_instruction'].strip()
+            or not isinstance(payload.get('expected_preview_sha256'),str)):
+        raise WorkflowError('Partial delivery requires explicit owner authority and the exact preview')
+    request = digest(dump(payload).encode())
+    ref = target_identity['ref']
+    owner = {'run_id':closed['run_id'],'action':'partial-delivery','request_sha256':request}
+    with workspaces.publication_lock(store.root,'local',ref.removeprefix('refs/heads/')), neutral.lock(local_delivery=owner):
+        state = neutral.load()
+        if partial_finished(neutral,state['run_registry']) != closed:
+            raise WorkflowError('The original partial-finish receipt changed before delivery')
+        target, target_identity = partial_delivery_target(neutral,payload)
+        original = partial_delivery_record(neutral, relative, closed, ref)
+        if original and original['status'] in {'merged','already-integrated'}:
+            if original['request_sha256'] != request:
+                raise WorkflowError('Preserve the original completed partial delivery and its exact request')
+            if original['preview']['target']['checkout'] != target_identity['checkout']:
+                raise WorkflowError('The partial delivery target checkout changed')
+            expected_tip = (original.get('merge') or {}).get('commit', original['preview']['accepted_tip'])
+            if workspaces.local_git(target, 'merge-base', '--is-ancestor', expected_tip,
+                                    target_identity['head'], accepted=(0, 1)).returncode:
+                raise WorkflowError('The recorded partial delivery is no longer contained by the exact target')
+            return original
+        if original and original['status'] == 'prepared':
+            if original['request_sha256'] != request:
+                raise WorkflowError('Retry or reconcile the exact prepared partial merge before selecting a new delivery')
+            preparation = original['preview']['preparation']
+            if target_identity['checkout'] != original['preview']['target']['checkout']:
+                raise WorkflowError('The prepared partial delivery target checkout changed')
+            if target_identity['head'] != preparation['target_head']:
+                if workspaces.local_git(target,'merge-base','--is-ancestor',preparation['target_head'],
+                                        target_identity['head'],accepted=(0,1)).returncode:
+                    if workspaces.local_git(target,'merge-base','--is-ancestor',preparation['source_head'],
+                                            target_identity['head'],accepted=(0,1)).returncode == 0:
+                        raise WorkflowError('The target contains the source without the exact prepared merge proof')
+                    original.update(status='blocked',reason='The current target lacks both the prepared base and reviewed result; review the current target.')
+                    partial_delivery_save(neutral,state,relative,original)
+                    return original
+                history = workspaces.local_git_text(target,'rev-list','--first-parent','--reverse',
+                                                    preparation['target_head']+'..'+target_identity['head']).splitlines()
+                if not history:
+                    raise WorkflowError('The prepared partial merge result cannot be identified')
+                try:
+                    merged = workspaces.local_merge_receipt(target,preparation,history[0])
+                except workspaces.RunError:
+                    if workspaces.local_git(target,'merge-base','--is-ancestor',preparation['source_head'],
+                                            target_identity['head'],accepted=(0,1)).returncode == 0:
+                        raise WorkflowError('The target contains the source without the exact prepared merge proof')
+                    original.update(status='blocked',reason='The target advanced without the prepared partial result; review the current target.')
+                    partial_delivery_save(neutral,state,relative,original)
+                    return original
+                if history[0] == target_identity['head']:
+                    workspaces.reconcile_reviewed_merge_index(target,preparation,merged)
+                original.update(status='merged', merge=merged)
+                partial_delivery_save(neutral,state,relative,original)
+                return original
+
+        view,candidate = partial_delivery_observation(neutral,closed,payload,target,target_identity)
+        if digest(dump(view).encode()) != payload['expected_preview_sha256']:
+            if original and original['status'] == 'prepared':
+                original.update(status='blocked',reason='The candidate changed before the prepared merge reached Git.')
+                partial_delivery_save(neutral,state,relative,original)
+                return original
+            raise WorkflowError('Partial delivery preview changed; inspect the current target and candidate')
+        result = {'schema':1,'run_id':closed['run_id'],'id':closed['run_id'],'request_sha256':request,
+                  'owner_instruction':payload['owner_instruction'],'preview':view,'status':view['status']}
+        if view['status'] in {'already-integrated','blocked'}:
+            partial_delivery_save(neutral,state,relative,result)
+            return result
+        if not valid_id(payload.get('review_id'),'DO'):
+            result.update(status='blocked',reason='The accepted partial candidate requires a current clean review ID')
+            partial_delivery_save(neutral,state,relative,result)
+            return result
+        neutral.source_root = candidate
+        _delivery_install_barrier(target)
+        _delivery_install_barrier(candidate)
+        try:
+            frame = verified_implementation_review(neutral,payload['review_id'],view['identity'],view['review_scope'])
+            if set(frame['plan']['required_checks']) != set(view['required_checks']):
+                raise WorkflowError('The partial review must cover every exact required check in the delivery preview')
+            checked_path = relative.removesuffix('.json')+'-checks.json'
+            checked = partial_delivery_record(neutral,checked_path,closed,ref)
+            if not checked or checked['preview'] != view or checked['status'] != 'checked':
+                raise WorkflowError('Run the qualified partial-delivery checks on the exact reviewed candidate')
+            check_attempt = partial_delivery_check_attempt(neutral,closed,view)
+            inputs = current_target_check_inputs(neutral,check_attempt)
+            evidence = current_target_checked_evidence(neutral,checked,inputs)
+            references = {row['id']:(row['status'],row['reference']) for row in frame['checks']['results']}
+            if references != {cid:('passed',check['review_reference']) for cid,check in evidence.items()}:
+                raise WorkflowError('The partial review must cite the actual current execution receipts')
+        except WorkflowError as error:
+            if original and original['status'] == 'prepared':
+                raise
+            result.update(status='blocked',reason=str(error))
+            partial_delivery_save(neutral,state,relative,result)
+            return result
+        preparation = view['preparation']
+        if original and original['status'] == 'prepared' and original.get('review_hash') != frame['orchestration_hash']:
+            raise WorkflowError('The exact prepared partial review changed')
+        result.update(status='prepared',review_id=payload['review_id'],review_hash=frame['orchestration_hash'])
+        partial_delivery_save(neutral,state,relative,result)
+        try:
+            workspaces.run_local_merge(target,candidate,preparation)
+        except workspaces.RunError as error:
+            # An uncertain update retains the original preparation. For a
+            # proven unchanged target, make the failure available for replan.
+            _, observed_target = partial_delivery_target(neutral,payload)
+            if observed_target != target_identity:
+                raise
+            result.update(status='blocked',reason=str(error))
+            partial_delivery_save(neutral,state,relative,result)
+            return result
+        _, updated_target = partial_delivery_target(neutral,payload)
+        merged = workspaces.local_merge_receipt(target,preparation,updated_target['head'])
+        workspaces.reconcile_reviewed_merge_index(target,preparation,merged)
+        result.update(status='merged',merge=merged)
+        partial_delivery_save(neutral,state,relative,result)
+        return result
 
 
 def finish(store,payload=None):
@@ -3444,21 +4200,57 @@ def evidence_pointer(store,reference,required=False):
     if 'sha256' not in ref:ref['sha256']=actual
     return ref
 
+def attach_partial_history_checkout(store, registry, locator, rid):
+    archived = Store(store.root, neutral=True)
+    archived.run_id = rid
+    receipt = partial_finished(archived, registry)
+    if not receipt:
+        return False
+    source = receipt['preview']['source']
+    binding = (locator or {}).get('archived_worktrees', {}).get(rid)
+    if binding and binding.get('request_sha256') == receipt['request_sha256']:
+        candidates = [Path(binding['path'])]
+    else:
+        # Older locator recovery can drop advisory archive paths. The sealed
+        # checkout and native registration still prove the original location.
+        candidates = workspaces.registered_worktrees(store.root)
+    for path in candidates:
+        if not path.is_dir() or digest(str(path).encode()) != source['location_sha256']:
+            continue
+        try:
+            if (workspaces.linked_registration(store.root, path).name != source['registration']
+                    or workspaces.checked_out_branch(path) != {key:source[key] for key in ('checkout','ref','head')}):
+                continue
+            if receipt['checkpoint']['workspace'].get('cleanup_owner'):
+                workspaces.directed_owner(store.root, path, receipt['checkpoint'], receipt['queue_id'])
+        except workspaces.RunError:
+            continue
+        store.source_root = path
+        return True
+    return False
+
+
 def history(store,task_id=None,component=None):
     result=[]
-    registry = json.loads(store.state.read_text()).get('run_registry', {}).get('runs', {}) if store.state.is_file() else {}
+    state = json.loads(store.state.read_text()) if store.state.is_file() else {}
+    records = state.get('run_registry', {})
+    registry = historical_runs(records)
     for outcome in store.outcomes():
         if task_id and outcome['task_id']!=task_id:continue
         if component and normalized(component) not in normalized(outcome['title']+' '+outcome['outcome']+' '+' '.join(outcome.get('source_fingerprints',{}))):continue
         view=deepcopy(outcome)
         proof_store=store
         committed = None
+        archived_evidence = False
         if outcome.get('run_id'):
             proof_store=deepcopy(store);locator=workspaces.runtime(store.root)
             location=locator['worktrees'].get(outcome['run_id']) if locator else None
             proof_store.source_root=Path(location) if location else store.root/'.skill-tree/unavailable-run-evidence'
             cleanup = registry.get(outcome['run_id'], {}).get('delivery', {}).get('worktree_cleanup', {})
-            if cleanup.get('status') == 'removed' or not proof_store.source_root.exists():
+            if outcome['run_id'] in records.get('archived_runs', {}):
+                committed = (outcome.get('task_git_commit') or {}).get('commit')
+                archived_evidence = attach_partial_history_checkout(proof_store, records, locator, outcome['run_id'])
+            elif cleanup.get('status') == 'removed' or not proof_store.source_root.exists():
                 committed = cleanup.get('attempt', {}).get('scope', {}).get('source_head')
 
         def history_fingerprint(relative):
@@ -3469,7 +4261,10 @@ def history(store,task_id=None,component=None):
         def history_evidence(reference):
             if not committed:
                 return evidence_pointer(proof_store, reference)
-            available = bool(reference.get('sha256')) and history_fingerprint(reference['path']) == reference['sha256']
+            fingerprint = history_fingerprint(reference['path'])
+            available = bool(reference.get('sha256')) and fingerprint == reference['sha256']
+            if not available and archived_evidence and reference.get('sha256'):
+                return evidence_pointer(proof_store, reference)
             return {**reference, 'available':available, **({'git_commit':committed} if available else {})}
 
         for check in view.get('acceptance',[]):check['evidence']=[history_evidence(e) for e in check.get('evidence',[])]
@@ -3516,7 +4311,15 @@ def manifest(store):
 def prune(store,apply=False):
     config=manifest(store)['retention'];pinned=set(config.get('pins',[]));protected=set(pinned)
     if store.state.exists():
-        state=store.load();runs=list(state.get('run_registry',{}).get('runs',{}).values()) or [state['active_run']]
+        state=store.load();registry=state.get('run_registry',{})
+        runs=list(historical_runs(registry).values()) or [state['active_run']]
+        for archived in registry.get('archived_runs', {}).values():
+            for relative, expected in archived.get('delivery_records', {}).items():
+                protected.add(relative)
+                record = store.owned(relative)
+                if file_hash(record) == expected:
+                    protected.update(check['artifact']['path']
+                                     for check in json.loads(record.read_bytes()).get('checks', {}).values())
         for run in runs:
             if run:protected.update(run.get('history_refs',[]));protected.add(run['id'])
     if store.future.exists():
@@ -3555,7 +4358,7 @@ def section_body(body,name):
 def acceptance_criteria(task):
     return [line[2:].strip() for line in section_body(task['body'],'Acceptance').splitlines() if line.startswith('- ')]
 
-def check_specs(task):
+def check_specs(task, *, boundary_issues=None):
     text=section_body(task['body'],'Validation');match=re.search(r'```json\n(.*?)\n```',text,re.S)
     if not match:raise WorkflowError('Validation requires a structured JSON checks object')
     try:plan=json.loads(match[1])
@@ -3578,7 +4381,11 @@ def check_specs(task):
         if not isinstance(check.get('parameters'),dict) or not isinstance(check.get('assertion'),str) or not check['assertion'].strip():raise WorkflowError('Check requires parameters and a concrete assertion')
         if 'fresh_review' in check and type(check['fresh_review']) is not bool:raise WorkflowError('Check fresh_review requires an explicit Boolean')
         if check.get('timing') not in {'immediate','group-end','before-dependent-work'}:raise WorkflowError('Check requires immediate or explicit boundary timing')
-        if check['timing']!='immediate' and task.get('boundary_validation','not-required')=='not-required':raise WorkflowError('Boundary check requires task boundary classification')
+        if check['timing'] != 'immediate' and task.get('boundary_validation','not-required') == 'not-required':
+            if boundary_issues is None:
+                raise WorkflowError('Boundary check requires task boundary classification')
+            boundary_issues.append({'check_id':check['id'],'field':'boundary_validation',
+                                    'timing':check['timing'],'supported':['group-end','before-dependent-work']})
     if covered!=set(criteria):raise WorkflowError('Every acceptance criterion requires a mapped check')
     return checks
 
@@ -3614,12 +4421,13 @@ def initial_profile_handoff(store, run):
             'argv': [sys.executable, '-B', str(Path(__file__).resolve()), 'prepare-worktree-profile', path, '--run-id', run['id']]}
 
 
-def initial_profile_installer(store, request, mode):
+def owned_profile_installer(store, request, mode, *, compatible=False):
     """Use canonical installer code for both install and read-only receipt checks."""
     path = binding_path(store.root, workspaces.PROFILE_FILE)
     raw = path.read_bytes()
     if digest(raw) != request['source_profile_sha256']:
-        raise WorkflowError('Restore the original canonical profile generation before worktree setup')
+        raise WorkflowError('Restore the original canonical profile generation before '
+                            + ('compatible refresh' if compatible else 'worktree setup'))
     owned = json.loads(raw)['bundle_digests']
     module_relative = '.skill-tree/installation/source/lib/installation.js'
     if module_relative not in owned or any(
@@ -3631,7 +4439,9 @@ def initial_profile_installer(store, request, mode):
 const manager = require(process.argv[1]);
 try {
   const request = JSON.parse(fs.readFileSync(0, 'utf8'));
-  const result = manager.initialWorktreeProfile(process.argv[2], request, process.argv[3]);
+  const apply = process.argv[4] === 'compatible' ? manager.maintainCompatibleWorktreeProfile : manager.initialWorktreeProfile;
+  if (typeof apply !== 'function') throw Error('The canonical installation lacks the selected worktree profile operation');
+  const result = apply(process.argv[2], request, process.argv[3]);
   process.stdout.write(JSON.stringify(result));
 } catch (error) {
   process.stderr.write(error.message);
@@ -3642,14 +4452,21 @@ try {
     for name in ('NODE_OPTIONS', 'NODE_PATH'):
         environment.pop(name, None)
     try:
-        process = subprocess.run(['node', '-e', program, str(module), str(store.root), mode],
+        process = subprocess.run(['node', '-e', program, str(module), str(store.root), mode,
+                                  'compatible' if compatible else 'initial'],
                                  input=dump(request), capture_output=True, text=True, timeout=40,
                                  env=environment)
     except (OSError, subprocess.TimeoutExpired) as error:
-        raise WorkflowError('Initial profile setup did not finish. Inspect the retained installation journal before retrying the same run') from error
+        operation='Compatible profile refresh' if compatible else 'Initial profile setup'
+        raise WorkflowError(operation+' did not finish. Inspect the retained installation journal before retrying the same run') from error
     if process.returncode:
-        raise WorkflowError(process.stderr.strip() or 'The verified canonical installer could not complete the worktree profile handoff')
+        raise WorkflowError(process.stderr.strip() or ('The verified installer could not reconcile the compatible refresh'
+                            if compatible else 'The verified canonical installer could not complete the worktree profile handoff'))
     return json.loads(process.stdout)
+
+
+def initial_profile_installer(store, request, mode):
+    return owned_profile_installer(store,request,mode)
 
 
 def recorded_initial_admission(store, state, caller, expected=None):
@@ -3706,6 +4523,8 @@ def resume_admission(store, *, expected_initial=None):
         if run and run.get('initial_profile',{}).get('status')=='admitted':
             return recorded_initial_admission(store,state,caller,expected_initial)
         raise WorkflowError('The original initial worktree profile handoff is no longer pending')
+    if (state['active_run'] or {}).get('compatible_profile_refresh'):
+        raise WorkflowError('Resume the original compatible worktree admission with the original operation')
     selected = (state['active_run'] or {}).get('id')
     admitted=admit_profile(store)
     with store.lock():
@@ -3714,14 +4533,159 @@ def resume_admission(store, *, expected_initial=None):
             raise WorkflowError('Select the exact original active run before admission')
         if workspaces.initial_profile_pending(run):
             raise WorkflowError('Complete the verified initial worktree profile before ordinary admission')
+        if run.get('compatible_profile_refresh'):
+            raise WorkflowError('Resume the original compatible worktree admission with the original operation')
         target=execution_run(run);target['admission']=admitted
         if target is run and run.pop('profile_refresh_required',False) and run['stop_reason']=='Installation profile changed; re-admit before continuation':run['stop_reason']=None
         store.save(text,state);return admitted
 
+def compatible_admission_context(store,state,caller):
+    run=state.get('active_run')
+    if (not run or store.run_id!=run['id'] or workspaces.initial_profile_pending(run) or run.get('maintenance')
+            or run['phase']=='completed' or run.get('workspace_state')!='ready'):
+        raise WorkflowError('Compatible refresh requires the exact already admitted run and worktree')
+    if not run.get('stop_reason') and run['phase'] not in {
+            'blocked','validate','awaiting-validation','refresh-profile','validation-blocked'}:
+        raise WorkflowError('Reach the original run stopped checkpoint before compatible refresh')
+    workspaces.ensure_workspace(store,run)
+    if caller!=store.source_root or caller==store.root:
+        raise WorkflowError('Select the original linked worktree for compatible refresh')
+    registry=state['run_registry']
+    registration=workspaces.linked_registration(store.root,caller)
+    owner=run['workspace'].get('cleanup_owner')
+    if not owner:
+        raise WorkflowError('Compatible refresh requires the original registered worktree owner')
+    workspaces.directed_owner(store.root,caller,run,registry['queue_id'])
+    progress={tid:entry for tid,entry in state['task_progress'].items() if entry.get('run_id')==run['id']}
+    if any(pending_check_attempt(slot) for entry in progress.values() for slot in entry['checks'].values()):
+        raise WorkflowError('Reconcile the original check attempt before compatible refresh')
+    if any(entry.get('task_git_attempt') for entry in progress.values()):
+        raise WorkflowError('Reconcile the original scoped commit before compatible refresh')
+    if any(claim['run_id']==run['id'] for claim in registry['resources'].values()):
+        raise WorkflowError('Reconcile the original runtime resource before compatible refresh')
+    hook_pending_admission(store,scope={'task_ids':run['admitted_task_ids']})
+    if any(attempt['chain_id'] in run.get('hook_chains',[]) for attempt in hook_helper().pending_scan(store)):
+        raise WorkflowError('Reconcile the original run hook before compatible refresh')
+    head=workspaces.checked_out_branch(caller)['head']
+    worker_path=store.owned('.skill-tree/history/worker-handoffs/'+run['id'].lower()+'.json')
+    worker_sha=file_hash(worker_path)
+    slots=worker_handoff(store,{'action':'status'})['slots']
+    if worker_sha!=file_hash(worker_path):
+        raise WorkflowError('The original worker handoff changed during compatible refresh inspection')
+    for slot in slots.values():
+        if not isinstance(slot,list) or (slot and (
+                not isinstance(slot[-1],dict) or not valid_id(slot[-1].get('task_id'),'T')
+                or not retired_worker_scope(store,state,slot[-1],head))):
+            raise WorkflowError('Reconcile the original worker handoff before compatible refresh')
+    if run.get('director_question_hold') or any(run.get('delivery',{}).get(name) for name in
+            ('reviewed_merge_attempt','current_target_attempts','reviewed_source')):
+        raise WorkflowError('Reconcile the original controller handoff before compatible refresh')
+    checkpoint={
+        'run':{key:value for key,value in run.items() if key!='compatible_profile_refresh'},
+        'claims':sorted(tid for tid,owner_id in registry['claims'].items() if owner_id==run['id']),
+        'progress':progress,
+    }
+    return {
+        'run_id':run['id'],'queue_id':registry['queue_id'],'worktree_path_sha256':digest(str(caller).encode()),
+        'registration':registration.name,'owner':owner,'head':head,'worker_sha256':worker_sha,
+        'checkpoint_sha256':digest(dump(checkpoint).encode()),
+        'locator_sha256':file_hash(workspaces.runtime_file(store.root)),
+        'source_profile_sha256':file_hash(binding_path(store.root,workspaces.PROFILE_FILE)),
+    }
+
+
+def compatible_baseline(store,state,context,expected_package_sha):
+    run=state['active_run']
+    entry=state['task_progress'].get(run['current_task_id'],{})
+    roots=[context['head'],entry.get('task_git_baseline',{}).get('head'),run['workspace']['base_commit']]
+    environment={**workspaces.local_git_environment(),'GIT_NO_LAZY_FETCH':'1','GIT_ALLOW_PROTOCOL':''}
+    for revision in dict.fromkeys(value for value in roots if value):
+        if not re.fullmatch('[a-f0-9]{40}|[a-f0-9]{64}',revision):
+            raise WorkflowError('Compatible refresh requires an exact Git metadata baseline')
+        committed=subprocess.run(
+            workspaces.local_git_args(store.source_root,'show',revision+':package.json'),
+            env=environment,capture_output=True,timeout=5)
+        if not committed.returncode and digest(committed.stdout)==expected_package_sha:
+            return revision
+    raise WorkflowError('Compatible refresh cannot verify the original admitted package metadata')
+
+
+def compatible_profile_admission(store):
+    caller=store.source_root
+    path=binding_path(caller,workspaces.PROFILE_FILE)
+    with store.lock():
+        state=store.load()
+        run=state.get('active_run') or {}
+        retained=run.get('compatible_profile_refresh')
+        last=(run.get('compatible_profile_readmissions') or [None])[-1]
+        if (not retained and last and file_hash(path)==last['plan']['after']['profile_sha256']
+                and file_hash(caller/'package.json')==last['plan']['package_input']['after']):
+            workspaces.ensure_workspace(store,run)
+            original=last['context']
+            if (store.run_id!=run['id'] or original['run_id']!=run['id'] or caller!=store.source_root
+                    or digest(str(caller).encode())!=original['worktree_path_sha256']
+                    or workspaces.linked_registration(store.root,caller).name!=original['registration']
+                    or run['workspace'].get('cleanup_owner')!=original['owner']):
+                raise WorkflowError('Select the original linked worktree for compatible refresh')
+            workspaces.directed_owner(store.root,caller,run,original['queue_id'])
+            if (run.get('profile_refresh_required') or admit_profile(store)!=run['admission']
+                    or run['admission']!=last['admission']):
+                raise WorkflowError('The acknowledged compatible worktree admission changed')
+            return {'status':'admitted','operation_id':last['operation_id'],'admission':last['admission'],'replayed':True}
+        context=compatible_admission_context(store,state,caller)
+        if retained and retained['context']!=context:
+            raise WorkflowError('The original compatible worktree checkpoint changed')
+        state_sha=file_hash(store.state)
+    if retained is None:
+        prior=path.read_bytes()
+        old=json.loads(prior)
+        if (old.get('identity')!=run['admission']['identity'] or old.get('project_root')!=str(caller)
+                or not old.get('inputs',{}).get('package.json')):
+            raise WorkflowError('Compatible refresh requires the original owned worktree profile and package metadata')
+        retained={
+            'operation_id':identity('OP'),'context':context,'profile_sha256':digest(prior),
+            'before_revision':compatible_baseline(store,state,context,old['inputs']['package.json']),
+        }
+        request={**context,'worktree':str(caller),'state_sha256':state_sha,**retained}
+        retained['plan']=owned_profile_installer(store,request,'preview',compatible=True)
+        with store.lock():
+            text=store.text()
+            state=store.load(text)
+            run=state['active_run']
+            if (compatible_admission_context(store,state,caller)!=context or run.get('compatible_profile_refresh')
+                    or file_hash(path)!=retained['profile_sha256']):
+                raise WorkflowError('The original run or profile changed before compatible refresh was prepared')
+            run['compatible_profile_refresh']=retained
+            store.save(text,state,update_navigation=False)
+            state_sha=file_hash(store.state)
+    request={**context,'worktree':str(caller),'state_sha256':state_sha,**retained}
+    result=owned_profile_installer(store,request,'activate',compatible=True)
+    if (result.get('operation_id')!=retained['operation_id']
+            or result.get('profile')!=retained['plan']['after']):
+        raise WorkflowError('The original compatible worktree installation result changed')
+    with store.lock():
+        text=store.text()
+        state=store.load(text)
+        run=state['active_run']
+        if compatible_admission_context(store,state,caller)!=context or run.get('compatible_profile_refresh')!=retained:
+            raise WorkflowError('The original run checkpoint changed before compatible admission')
+        observed=owned_profile_installer(store,{**request,'state_sha256':file_hash(store.state)},'verify',compatible=True)
+        if observed!=retained['plan']['after'] or file_hash(path)!=observed['profile_sha256']:
+            raise WorkflowError('The installed compatible worktree profile changed')
+        admitted={**{key:observed[key] for key in ('identity','environment_id')},'flavor':run['admission']['flavor']}
+        run['admission']=admitted
+        run.pop('compatible_profile_refresh')
+        if run.pop('profile_refresh_required',False) and run['stop_reason']=='Installation profile changed; re-admit before continuation':
+            run['stop_reason']=None
+        run.setdefault('compatible_profile_readmissions',[]).append({**retained,'admission':admitted})
+        store.save(text,state,update_navigation=False)
+    return {'status':'admitted','operation_id':retained['operation_id'],'admission':admitted,'replayed':False}
+
+
 def completed_dependency_order(store, outcomes, roots):
     if not roots:
         return []
-    runs = (store.load().get('run_registry') or {}).get('runs',{})
+    runs = historical_runs(store.load().get('run_registry') or {})
     order = []
     visiting = set()
     done = set()
@@ -3898,27 +4862,143 @@ def group_fingerprint(store,task,state):
     return digest(dump(definitions).encode())
 
 PRODUCT_LANES={'browser','server','unity-editmode','unity-playmode','visual','player','device','native'}
+COUNTED_LANES = {'unit','integration','browser','unity-editmode','unity-playmode'}
+COUNT_FIELDS = ('expected','discovered','passed','failed','skipped')
+EXECUTION_FIELDS = ('project_root','authorization','profile_id','deadline_utc','cleanup_seconds',
+                    'tool_identity','session_identity','fixture_identity','build_identity','identity_evidence')
+BOUND_EXECUTION_FIELDS = ('queue_root','binding_id','source_identity')
+BINDING_TOOL_FIELDS = ('cli_version','pipeline_version')
+UNITY_EXECUTION_FIELDS = ('editor_version','save_service_isolation')
+LAUNCH_FIELDS = ('assertion','cheaper_evidence_insufficient','authorization','deadline_utc','cleanup_seconds',
+                 'project_root','execution_profile')
+CHECK_CLASSIFICATIONS = ('executed-control','prerequisite-wait','transport-uncertainty','host-policy-rejection')
+CHECK_RESULTS = ('pass','fail','red','unavailable')
+CHECK_RESULT_FIELDS = ('task_id','check_id','attempt_id','classification','result',
+                       'actual_lane','environment_identity','cleanup')
+
+
+def validation_preflight(store,payload):
+    """Read the selected check requirements without preparing a check attempt."""
+    if (not isinstance(payload,dict)
+            or set(payload) - {'task_id','check_id','expected_source_hash'}
+            or not valid_id(payload.get('task_id'),'T')
+            or not isinstance(payload.get('check_id'),str)
+            or not re.fullmatch(r'[a-z][a-z0-9-]*',payload['check_id'])):
+        raise WorkflowError('Validation preflight requires an exact prioritized task and check ID')
+    source = store.owned(FUTURE_QUEUE)
+    if not source.is_file():
+        store.text()
+    inspected = source.read_bytes()
+    text = inspected.decode('utf-8').replace('\r\n','\n').replace('\r','\n')
+    source_hash = digest(inspected)
+    if 'expected_source_hash' in payload and payload['expected_source_hash'] != source_hash:
+        raise WorkflowError('Source changed since inspection; reread selected task')
+    task_id,check_id = payload['task_id'],payload['check_id']
+    boundary = []
+    tasks = parse(text,boundary_preflight=(task_id,boundary))
+    task = next((row for row in tasks if row['id']==task_id and row['queue']=='Prioritized Next Changes'),None)
+    if task is None:
+        raise WorkflowError('Validation preflight requires an exact prioritized task ID')
+    checks = check_specs(task,boundary_issues=[])
+    check = next((row for row in checks if row['id']==check_id),None)
+    if check is None:
+        raise WorkflowError('Validation preflight requires an exact check ID from the selected task')
+    baseline = clarification_baselines([task])
+    response = {'task_id':task_id,'check_id':check_id,'source_hash':source_hash,
+                'content_fingerprint':baseline[task_id]['content_hash'],
+                'semantic_fingerprint':clarification_fingerprints(baseline)[task_id],
+                'task_status':task['status'],'check':deepcopy(check),'missing_boundary_classification':boundary,
+                'status':'boundary-metadata-required' if boundary else 'requirements'}
+    state_path = store.owned(FUTURE_STATE)
+    checkpoint = state_path.read_bytes() if state_path.is_file() else None
+    state = workspaces.project(store,json.loads(checkpoint)) if checkpoint is not None else {}
+    run = state.get('active_run')
+    if store.run_id and (not run or run['id'] != store.run_id):
+        raise WorkflowError('The selected preflight run is unavailable')
+    if run:
+        if task_id not in scope_ids(tasks,execution_run(run)):
+            raise WorkflowError('Task is outside the admitted controller scope')
+        response['run_id'] = run['id']
+    try:
+        recipe,environment = recipe_for(store,check)
+        lane = recipe['lane']
+        if lane in {'unit','unity-editmode'} and check['timing'] != 'immediate':
+            raise WorkflowError('Focused behavioral checks remain immediate')
+    except WorkflowError as error:
+        if not boundary:
+            raise
+        response['recipe_prerequisite'] = str(error)
+    else:
+        runtime = lane in PRODUCT_LANES
+        execution_fields = list(EXECUTION_FIELDS) if runtime else []
+        binding = recipe.get('execution_context')
+        if runtime and binding:
+            execution_fields.extend(BOUND_EXECUTION_FIELDS)
+        if lane.startswith('unity-'):
+            execution_fields.extend(UNITY_EXECUTION_FIELDS)
+        counted = lane in COUNTED_LANES
+        response.update(recipe_id=check['recipe_id'],lane=lane,recipe_environment=environment)
+        response['execution'] = {
+            'required':runtime,'fields':execution_fields,
+            'tool_identity_fields':list(BINDING_TOOL_FIELDS) if runtime and binding else [],
+            'project_root':binding['execution_root'] if binding else str(store.source_root),
+            'requires_aware_deadline_and_positive_cleanup_reserve':runtime,
+            'identity_evidence_requires_repository_relative_paths':runtime,
+        }
+        response['launch'] = {'required':False,'fields_if_present':list(LAUNCH_FIELDS)}
+        results = [value for value in CHECK_RESULTS if counted or value != 'red']
+        response['receipt'] = {
+            'fields':list(CHECK_RESULT_FIELDS),'classification_values':list(CHECK_CLASSIFICATIONS),
+            'result_values':results,
+            'results_requiring_evidence_and_executed_control':['pass','red'] if counted else ['pass'],
+            'evidence_field':'evidence',
+            'evidence_reference':{'repository_relative_path_string':True,'object_required':['path'],
+                                  'object_optional':['sha256']},
+            'cleanup_requires_nonempty_text':True,
+            'executed_pass_shape':'counts' if counted else 'assertions',
+            'count_fields':list(COUNT_FIELDS) if counted else [],
+            'counts_must_be_nonnegative_integers':counted,
+            'minimum_expected_discovery':1 if counted else None,
+            'minimum_discovery_uses_expected_count':counted,
+            'discovered_must_equal_passed_failed_and_skipped':counted,
+            'pass_zero_count_fields':['failed','skipped'] if counted else [],
+            'assertion':None if counted else check['assertion'],
+            'assertions_all_passed':not counted,
+            'failure_signature_required_for_executed_fail':True,
+            'behavioral_red_allowed':counted,
+            'behavioral_red_requires_failed_and_no_skips':counted,
+            'behavioral_red_failure_category':'expected-behavior' if counted else None,
+        }
+        if recipe_for(store,check) != (recipe,environment):
+            raise WorkflowError('The selected validation recipe changed during preflight')
+    if source.read_bytes() != inspected:
+        raise WorkflowError('Source changed since inspection; reread selected task')
+    if (state_path.read_bytes() if state_path.is_file() else None) != checkpoint:
+        raise WorkflowError('The selected run changed during preflight')
+    return response
+
 
 def execution_session(store,recipe,environment,entry,provided=None,require_current=False):
     sessions=entry.setdefault('execution_sessions',{})
     session=provided or sessions.get(environment)
     if recipe['lane'] not in PRODUCT_LANES:return None
     if store.state.exists() and store.load().get('run_registry'):workspaces.environment(store,{'runtime':True})
-    fields=['project_root','authorization','profile_id','deadline_utc','cleanup_seconds','tool_identity','session_identity','fixture_identity','build_identity','identity_evidence']
-    if not isinstance(session,dict) or any(not session.get(key) for key in fields):raise WorkflowError('Product checks require an owned execution session with authorization, identity evidence, deadline and cleanup reserve')
+    if not isinstance(session,dict) or any(not session.get(key) for key in EXECUTION_FIELDS):raise WorkflowError('Product checks require an owned execution session with authorization, identity evidence, deadline and cleanup reserve')
     binding=binding_context(store,recipe)
     expected_root=Path(binding['execution_root']) if binding else store.source_root
     if Path(session['project_root']).resolve()!=expected_root:raise WorkflowError('Execution session checkout differs from the covered root')
     if binding:
-        if session.get('queue_root')!=str(store.root) or session.get('binding_id')!=binding['id'] or session.get('source_identity')!=binding['execution_digest']:raise WorkflowError('Execution session lacks the reviewed queue, binding or source identity')
+        expected=(str(store.root),binding['id'],binding['execution_digest'])
+        if tuple(session.get(key) for key in BOUND_EXECUTION_FIELDS)!=expected:raise WorkflowError('Execution session lacks the reviewed queue, binding or source identity')
         tools=session.get('tool_identity')
-        if not isinstance(tools,dict) or any(tools.get(key)!=binding['pins'][key] for key in ['cli_version','pipeline_version']):raise WorkflowError('Execution session toolchain differs from the binding pins')
+        if not isinstance(tools,dict) or any(tools.get(key)!=binding['pins'][key] for key in BINDING_TOOL_FIELDS):raise WorkflowError('Execution session toolchain differs from the binding pins')
     if type(session['cleanup_seconds']) not in {int,float} or session['cleanup_seconds']<=0:raise WorkflowError('Execution cleanup reserve must be positive')
     try:deadline=datetime.fromisoformat(session['deadline_utc'].replace('Z','+00:00'))
     except (ValueError,TypeError) as exc:raise WorkflowError('Execution deadline requires an aware timestamp') from exc
     if deadline.tzinfo is None or require_current and (deadline-datetime.now(timezone.utc)).total_seconds()<=session['cleanup_seconds']:raise WorkflowError('Execution deadline lacks a cleanup reserve')
     if recipe['lane'].startswith('unity-'):
-        if session.get('editor_version')!=recipe.get('editor_version') or not session.get('save_service_isolation'):raise WorkflowError('Unity session requires the pinned Editor and verified save/service isolation')
+        version,isolation = UNITY_EXECUTION_FIELDS
+        if session.get(version)!=recipe.get(version) or not session.get(isolation):raise WorkflowError('Unity session requires the pinned Editor and verified save/service isolation')
     if not isinstance(session['identity_evidence'],list):raise WorkflowError('Execution identity requires repository-relative evidence')
     for ref in session['identity_evidence']:evidence_pointer(store,ref,required=True)
     sessions[environment]=deepcopy(session)
@@ -3953,7 +5033,7 @@ def completed_task_body(store, record):
         return None
 
     registry = store.load().get('run_registry', {})
-    run = registry.get('runs', {}).get(run_id, {})
+    run = historical_runs(registry).get(run_id, {})
     if run.get('completion_refs', {}).get(task_id) != outcome_id:
         return None
 
@@ -4026,6 +5106,10 @@ def completed_contract_sha256(record):
                     {'path':ref.get('path'),'sha256':ref.get('sha256')} if isinstance(ref,dict) else ref
                     for ref in receipt.get('evidence',[])
                 ]
+                if 'runner_result' in receipt:
+                    # Other lanes can carry task-wide execution paths that are remapped on restore.
+                    bound[kind]['runner_acknowledgement']={key:receipt.get(key) for key in
+                        ('runner_result','payload_hash','recorded_at')}
         checks.append(bound)
     identity['check_results'] = checks
     return digest(dump(identity).encode())
@@ -4033,7 +5117,7 @@ def completed_contract_sha256(record):
 
 def verify_completed_contract(store,record,runs=None):
     if runs is None:
-        runs = (store.load().get('run_registry') or {}).get('runs',{})
+        runs = historical_runs(store.load().get('run_registry') or {})
     task_id = record['task_id']
     owner_id = record.get('run_id')
     owners = [run_id for run_id,run in runs.items() if task_id in run.get('completion_refs',{})]
@@ -4380,12 +5464,54 @@ def check_reconciliation_target(store,state,payload,run_id):
                   environment_identity=attempt['environment_identity'])
     return task,slot,attempt,origin
 
-def check_runner_group(value):
+def local_process_group_identity(pid, pgid):
+    """Read the live same-user leader's native process birth identity."""
+    def require_identity(condition, message):
+        if not condition:
+            raise WorkflowError(message)
+
+    if sys.platform == 'darwin':
+        import ctypes
+
+        class ProcBsdInfo(ctypes.Structure):
+            # macOS proc_info.h, PROC_PIDTBSDINFO. Retain the microsecond birth identity.
+            _fields_ = [('identity', ctypes.c_uint32 * 12), ('comm', ctypes.c_char * 16),
+                        ('name', ctypes.c_char * 32), ('group', ctypes.c_uint32 * 6),
+                        ('started_seconds', ctypes.c_uint64), ('started_microseconds', ctypes.c_uint64)]
+
+        info = ProcBsdInfo()
+        read_info = ctypes.CDLL('/usr/lib/libproc.dylib').proc_pidinfo
+        read_info.argtypes = (ctypes.c_int, ctypes.c_int, ctypes.c_uint64, ctypes.c_void_p, ctypes.c_int)
+        read_info.restype = ctypes.c_int
+        size = ctypes.sizeof(info)
+        observed = read_info(pid, 3, ctypes.c_uint64(0), ctypes.byref(info), size)
+        uid = info.identity[5]
+        require_identity(observed == size and info.identity[3] == pid and info.group[1] == pgid
+                   and uid == os.getuid() and info.started_seconds,
+                   'The exact same-user local process group leader is unavailable')
+        birth = {'clock': 'darwin-proc-bsdinfo', 'seconds': info.started_seconds, 'microseconds': info.started_microseconds}
+    elif sys.platform.startswith('linux'):
+        directory = Path('/proc') / str(pid)
+        stat = directory / 'stat'
+        before = stat.read_text().rpartition(') ')[2].split()
+        uid = directory.stat().st_uid
+        after = stat.read_text().rpartition(') ')[2].split()
+        require_identity(len(before) > 19 and len(after) > 19 and before[19] == after[19]
+                   and before[2] == after[2] == str(pgid) and uid == os.getuid(),
+                   'The exact same-user local process group leader is unavailable')
+        birth = {'clock': 'linux-proc-stat', 'boot_id': Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
+                 'ticks': int(after[19])}
+    else:
+        raise WorkflowError('Exact local process identity is unavailable on this host')
+    return {'pid': pid, 'pgid': pgid, 'uid': uid, 'birth': birth}
+
+
+def check_runner_group(value, *, allow_current=False):
     if type(value) is not int or not 1<value<=2**31-1:
         raise WorkflowError('Supply the original positive dedicated process group')
     if not all(hasattr(os,name) for name in ('getpgid','getpgrp','killpg','O_NOFOLLOW','O_DIRECTORY','O_NONBLOCK')):
         raise WorkflowError('Local POSIX process-group inspection is unavailable')
-    if value==os.getpgrp():
+    if not allow_current and value==os.getpgrp():
         raise WorkflowError('The workflow helper group cannot own the original runner')
     return value
 
@@ -4397,7 +5523,7 @@ def check_runner_timestamp(value):
         raise WorkflowError('Runner observation requires a timezone')
     return parsed
 
-def read_check_cleanup_artifact(root,relative):
+def read_check_artifact(root,relative,limit=65536):
     path=binding_path(root,relative)
     dir_flags=os.O_RDONLY|os.O_NOFOLLOW|os.O_DIRECTORY
     directory=os.open(root,dir_flags)
@@ -4409,8 +5535,8 @@ def read_check_cleanup_artifact(root,relative):
         fd=os.open(path.name,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK,dir_fd=directory)
         with os.fdopen(fd,'rb') as stream:
             if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
-                raise WorkflowError('Runner cleanup evidence requires an ordinary file')
-            return stream.read(65537)
+                raise WorkflowError('Runner evidence requires an ordinary file')
+            return stream.read(limit+1)
     finally:
         os.close(directory)
 
@@ -4418,7 +5544,7 @@ def check_cleanup_evidence(store,reference,origin,binding):
     if not isinstance(reference,dict) or set(reference)!={'path','sha256'} or not isinstance(reference['sha256'],str) or not re.fullmatch('[a-f0-9]{64}',reference['sha256']):
         raise WorkflowError('Supply the exact cleanup artifact path and SHA-256')
     try:
-        raw=read_check_cleanup_artifact(store.source_root,reference['path'])
+        raw=read_check_artifact(store.source_root,reference['path'])
         if len(raw)>65536 or digest(raw)!=reference['sha256']:
             raise WorkflowError('The original runner cleanup artifact changed')
         proof=json.loads(raw)
@@ -4434,10 +5560,151 @@ def check_cleanup_evidence(store,reference,origin,binding):
         raise WorkflowError('Cleanup observation must follow the original live runner binding')
     return {**reference,'observation':proof}
 
+def retained_local_check_result(store, slot, attempt_id):
+    relative='.skill-tree/history/check-runner-results/'+attempt_id.lower()+'.json'
+    expected=slot.get('runner_results',{}).get(attempt_id)
+    try:
+        raw=read_check_artifact(store.root,relative)
+        if len(raw)>65536:
+            raise WorkflowError('The original runner result exceeds the receipt size limit')
+        record=json.loads(raw)
+    except FileNotFoundError:
+        if expected is not None:
+            raise WorkflowError('The original runner result artifact is missing')
+        return relative,None,None
+    except (OSError,UnicodeError,json.JSONDecodeError,NotImplementedError) as error:
+        raise WorkflowError('The original runner result is unreadable') from error
+    sha=digest(raw)
+    if expected!=sha:
+        raise WorkflowError('The original runner result artifact changed')
+    if not isinstance(record,dict) or record.get('schema')!=1 or record.get('kind')!='local-check-runner-result':
+        raise WorkflowError('The original runner result has an invalid receipt')
+    return relative,sha,record
+
+def require_departed_check_runner(group):
+    try:os.killpg(group,0)
+    except ProcessLookupError:pass
+    except OSError as error:raise WorkflowError('The bound original runner group cleanup is uncertain') from error
+    else:raise WorkflowError('The bound original runner group remains live')
+
+def local_check_result_available(store,slot,attempt_id):
+    try:
+        _,_,retained=retained_local_check_result(store,slot,attempt_id)
+        return retained is not None and all(evidence_pointer(store,item,required=True)['available']
+                                            for item in retained['observation']['evidence'])
+    except WorkflowError:
+        return False
+
+
+def check_runner_observation(record):
+    fields=('result','classification','actual_lane','counts','assertions','failure_category','cleanup','timing',
+            'failure_signature','diagnostic_key','evidence')
+    return {key:record[key] for key in fields if key in record}
+
+
+def verify_recovered_check_replay(store,state,receipt,payload):
+    tid,cid,attempt=map(receipt.__getitem__,('task_id','check_id','attempt_id'))
+    entry=state['task_progress'].get(tid,{})
+    slot=entry.get('checks',{}).get(cid,{})
+    record=slot.get('receipts',{}).get(attempt) if entry.get('run_id')==receipt['run_id'] else None
+    historical=False
+    if record is None and not entry:
+        runs=historical_runs(state.get('run_registry',{}))
+        run_id=receipt['run_id']
+        if tid in runs.get(run_id,{}).get('completed_contract_sha256s',{}):
+            outcomes=[outcome for outcome in store.outcomes() if outcome['task_id']==tid
+                      and outcome.get('run_id')==run_id and outcome['disposition']=='completed']
+            if len(outcomes)==1:
+                outcome=outcomes[0]
+                verify_completed_contract(store,outcome,runs)
+                record=next((check['result'] for check in outcome.get('check_results',[])
+                             if check['check']['id']==cid and check['result']['attempt_id']==attempt),None)
+                historical=True
+    pointer=record.get('runner_result') if isinstance(record,dict) else None
+    if (not isinstance(pointer,dict) or record!=receipt.get('record') or pointer!=receipt.get('runner_result')
+            or pointer.get('sha256')!=payload['result_sha256']
+            or not (record.get('key')==receipt.get('expected_key')==payload['expected_key'])
+            or not (record.get('definition')==receipt.get('expected_definition')==payload['expected_definition'])
+            or record.get('environment_identity')!=receipt.get('environment_identity')
+            or record.get('recorded_at')!=receipt.get('recorded_at')):
+        raise WorkflowError('The recovered result archive differs from the canonical check receipt')
+    if historical:
+        original={'runner_results':{attempt:pointer['sha256']}}
+        relative,_,retained=retained_local_check_result(store,original,attempt)
+        if (relative!=pointer['path'] or record['payload_hash']!=digest(dump(retained['submission']).encode())
+                or check_runner_observation(record)!=retained['observation']):
+            raise WorkflowError('The completed acknowledgement differs from the original retained runner result')
+
+
+def reconcile_local_check_result(store,text,state,payload,origin,binding,attempt,slot,request_digest):
+    action=payload['action']
+    if attempt['recipe']['lane'] not in {'static','unit'} or not binding.get('process_identity'):
+        raise WorkflowError('Result recovery requires an owned local static or unit recipe')
+    group=check_runner_group(binding['process_group'],allow_current=action=='retain-result')
+    relative,sha,retained=retained_local_check_result(store,slot,attempt['attempt_id'])
+    if retained is not None and (retained.get('origin')!=origin or retained.get('runner_binding')!=binding):
+        raise WorkflowError('The result does not identify the original bound runner and attempt')
+    if action=='retain-result':
+        if (not hasattr(os,'getsid') or os.getpgrp()!=group or os.getsid(0)!=binding.get('session')):
+            raise WorkflowError('Only the original bound runner group may retain its result')
+        try:
+            if os.getpgid(group)!=group or os.getsid(group)!=binding['session']:
+                raise WorkflowError('The original runner leader no longer owns the process group')
+            if local_process_group_identity(group,group)!=binding['process_identity']:
+                raise WorkflowError('The original runner leader birth identity changed')
+        except OSError as error:
+            raise WorkflowError('The original local runner group cannot be verified live') from error
+        if retained is not None:
+            if retained.get('request_digest')!=request_digest:
+                raise WorkflowError('Conflicting replay of the original runner result')
+            return {'path':relative,'sha256':sha}
+        result=payload['result']
+        exit_code=payload['exit_code']
+        if (not isinstance(result,dict) or result.get('result') not in ('pass','red','fail')
+                or result.get('classification')!='executed-control' or type(exit_code) is not int
+                or not 0<=exit_code<=255 or (exit_code==0)!=(result['result']=='pass')
+                or not isinstance(result.get('evidence'),list) or not result['evidence']):
+            raise WorkflowError('Retain one executed runner result with matching exit status and actual evidence')
+        if any(isinstance(item,dict) and 'sha256' in item and
+               (not isinstance(item['sha256'],str) or not re.fullmatch('[a-f0-9]{64}',item['sha256']))
+               for item in result['evidence']):
+            raise WorkflowError('Runner evidence requires an exact SHA-256 when a digest is supplied')
+        ids={key:origin[key] for key in ('task_id','check_id','attempt_id')}
+        if ids.keys() & result.keys():
+            raise WorkflowError('Runner result identity comes from the bound check attempt')
+        submission={**result,**ids}
+        checked,_=record_check_result(store,deepcopy(state),submission,bound_runner=True)
+        if len(dump(checked).encode())>256*1024:
+            raise WorkflowError('The canonical runner result exceeds the receipt size limit')
+        retained={'schema':1,'kind':'local-check-runner-result','origin':origin,
+                  'runner_binding':binding,'submission':submission,'exit_code':exit_code,
+                  'observation':check_runner_observation(checked),'request_digest':request_digest,'retained_at':now()}
+        encoded=dump(retained)
+        if len(encoded.encode())>65536:
+            raise WorkflowError('The original runner result exceeds the receipt size limit')
+        sha=digest(encoded.encode())
+        slot.setdefault('runner_results',{})[attempt['attempt_id']]=sha
+        store.expect_unchanged(relative,None)
+        store.save(text,state,{relative:encoded},update_navigation=False)
+        return {'path':relative,'sha256':sha}
+    if retained is None or payload['result_sha256']!=sha:
+        raise WorkflowError('Select the exact retained runner result digest')
+    require_departed_check_runner(group)
+    record,_=record_check_result(store,state,retained['submission'],bound_runner=True)
+    if check_runner_observation(record)!=retained['observation']:
+        raise WorkflowError('Original runner result evidence changed after retention')
+    require_departed_check_runner(group)
+    store.expect_unchanged(relative,sha)
+    record['runner_result']={'path':relative,'sha256':sha}
+    return {**origin,'status':'recovered-result','runner_result':record['runner_result'],
+            'record':record,'request_digest':request_digest,'recorded_at':record['recorded_at']}
+
 def reconcile_check(store,payload):
     fields={'task_id','check_id','attempt_id','action'}
     action=payload.get('action') if isinstance(payload,dict) else None
     actions={'inspect':set(),'bind-runner':{'expected_key','expected_definition','process_group'},
+             'retain-result':{'expected_key','expected_definition','result','exit_code'},
+             'recover-result':{'expected_key','expected_definition','result_sha256'},
              'cancel':{'expected_key','expected_definition','observed','cleanup'}}
     if (not isinstance(action,str) or action not in actions or set(payload)!=fields|actions[action] or
             not valid_id(payload['task_id'],'T') or not valid_id(payload['attempt_id'],'C') or
@@ -4448,23 +5715,40 @@ def reconcile_check(store,payload):
         if run:workspaces.ensure_workspace(store,run)
         task,slot,attempt,origin=check_reconciliation_target(store,state,payload,run['id'] if run else None)
         observed,stale=check_drift(store,state,task,payload['check_id'],attempt)
-        return {**origin,'observed':observed,'stale':stale,
+        result={**origin,'observed':observed,'stale':stale,
                 'runner_binding':slot.get('runner_bindings',{}).get(attempt['attempt_id'])}
+        if attempt['attempt_id'] in slot.get('runner_results',{}):
+            try:
+                relative,sha,_=retained_local_check_result(store,slot,attempt['attempt_id'])
+                result['runner_result']={'path':relative,'sha256':sha}
+            except WorkflowError as error:
+                result['runner_result_error']=str(error)
+        return result
     with store.lock():
         text=store.text();state=store.load(text);run=state['active_run'];run_id=run['id'] if run else None
         if run:workspaces.ensure_workspace(store,run)
         reference='.skill-tree/history/check-reconciliations/'+payload['attempt_id'].lower()+'.json'
         archive=binding_path(store.root,reference)
         request_digest=digest(dump(payload).encode())
-        if action=='cancel' and archive.exists():
-            if not archive.is_file():raise WorkflowError('Original cancellation archive is invalid')
-            try:receipt=json.loads(archive.read_text())
+        terminal={'cancel':'cancelled-no-result','recover-result':'recovered-result'}
+        if action in terminal and archive.exists():
+            if not archive.is_file():raise WorkflowError('Original check reconciliation archive is invalid')
+            try:
+                if action=='recover-result':
+                    raw=read_check_artifact(store.root,reference,1024*1024)
+                    if len(raw)>1024*1024:
+                        raise WorkflowError('The recovered result archive exceeds the receipt size limit')
+                    receipt=json.loads(raw)
+                else:
+                    receipt=json.loads(archive.read_text())
             except (OSError,UnicodeError,json.JSONDecodeError) as error:
-                raise WorkflowError('Original cancellation archive is unreadable') from error
-            if (not isinstance(receipt,dict) or receipt.get('status')!='cancelled-no-result' or receipt.get('run_id')!=run_id or
+                raise WorkflowError('Original check reconciliation archive is unreadable') from error
+            if (not isinstance(receipt,dict) or receipt.get('status')!=terminal[action] or receipt.get('run_id')!=run_id or
                     any(receipt.get(key)!=payload[key] for key in ('task_id','check_id','attempt_id')) or
                     receipt.get('request_digest')!=request_digest):
                 raise WorkflowError('Conflicting replay of the original check reconciliation')
+            if action=='recover-result':
+                verify_recovered_check_replay(store,state,receipt,payload)
             return receipt
         task,slot,attempt,origin=check_reconciliation_target(store,state,payload,run_id)
         if any(payload[key]!=origin[key] for key in ('expected_key','expected_definition')):
@@ -4494,25 +5778,37 @@ def reconcile_check(store,payload):
                 os.killpg(group,0)
             except OSError as error:raise WorkflowError('The original local runner group cannot be verified live') from error
             binding={**origin,'host':host,'process_group':group,'bound_at':now()}
+            if hasattr(os,'getsid') and (sys.platform=='darwin' or sys.platform.startswith('linux')):
+                try:
+                    binding['session']=os.getsid(group)
+                    binding['process_identity']=local_process_group_identity(group,group)
+                except OSError as error:raise WorkflowError('The original runner session cannot be verified live') from error
             slot.setdefault('runner_bindings',{})[attempt['attempt_id']]=binding
             store.save(text,state,update_navigation=False)
             return binding
         if (not group_binding or any(group_binding.get(key)!=value for key,value in origin.items()) or
                 group_binding.get('host')!=socket.gethostname()):
             raise WorkflowError('The original attempt lacks a verified live runner binding on this host')
+        if action in {'retain-result','recover-result'}:
+            receipt=reconcile_local_check_result(store,text,state,payload,origin,group_binding,attempt,slot,request_digest)
+            if action=='recover-result':
+                store.expect_unchanged(reference,None)
+                store.save(text,state,{reference:dump(receipt)})
+            return receipt
         observed,stale=check_drift(store,state,task,payload['check_id'],attempt)
-        if not stale or observed!=payload['observed']:
-            raise WorkflowError('Reconciliation requires the exact current observation of source or check drift')
+        native_local=group_binding.get('process_identity') and recipe['lane'] in {'static','unit'}
+        if observed!=payload['observed'] or not (stale or native_local):
+            raise WorkflowError('Reconciliation requires the exact observation of drift or an unavailable local result')
         group=check_runner_group(group_binding['process_group'])
         cleanup=check_cleanup_evidence(store,payload['cleanup'],origin,group_binding)
-        if check_drift(store,state,task,payload['check_id'],attempt)!=(observed,True):
+        if check_drift(store,state,task,payload['check_id'],attempt)!=(observed,stale):
             raise WorkflowError('Source or check drift changed during cleanup verification')
-        try:os.killpg(group,0)
-        except ProcessLookupError:pass
-        except OSError as error:raise WorkflowError('The bound original runner group cleanup is uncertain') from error
-        else:raise WorkflowError('The bound original runner group remains live')
+        require_departed_check_runner(group)
+        if not stale and local_check_result_available(store,slot,attempt['attempt_id']):
+            raise WorkflowError('Recover the available original result through reconcile-check')
         receipt={**origin,'status':'cancelled-no-result','original_attempt':deepcopy(attempt),
                  'runner_binding':deepcopy(group_binding),'observed':observed,'cleanup':cleanup,
+                 'cancellation_reason':'source-or-check-drift' if stale else 'local-result-unavailable',
                  'request_digest':request_digest,'recorded_at':now()}
         slot.setdefault('receipts',{})[attempt['attempt_id']]=receipt
         store.expect_unchanged(reference,None)
@@ -4536,8 +5832,7 @@ def prepare_check(store,payload):
         snapshot=check_snapshot(store,task,check,state)
         launch=payload.get('launch')
         if launch:
-            required=['assertion','cheaper_evidence_insufficient','authorization','deadline_utc','cleanup_seconds','project_root','execution_profile']
-            if not isinstance(launch,dict) or any(not launch.get(key) for key in required):raise WorkflowError('Launch requires concrete assertion, rationale, authorization, exact checkout, deadline and cleanup profile')
+            if not isinstance(launch,dict) or any(not launch.get(key) for key in LAUNCH_FIELDS):raise WorkflowError('Launch requires concrete assertion, rationale, authorization, exact checkout, deadline and cleanup profile')
             if type(launch['cleanup_seconds']) not in {int,float} or launch['cleanup_seconds']<=0:raise WorkflowError('Launch cleanup reserve must be positive')
             if launch['cheaper_evidence_insufficient'].strip().casefold() in {'run everything to be safe','to be safe','routine checklist'}:raise WorkflowError('Launch requires an assertion-specific rationale')
             expected_root=Path(recipe['execution_context']['execution_root']) if recipe.get('execution_binding') else store.source_root
@@ -4551,59 +5846,72 @@ def prepare_check(store,payload):
 
 def record_check(store,payload):
     with store.lock():
-        text=store.text();state=store.load(text);task,check=get_check(store,state,payload);entry=state['task_progress'].get(task['id'],{});slot=entry.get('checks',{}).get(check['id'],{});attempt=slot.get('attempt')
-        delivered=slot.get('receipts',{}).get(payload.get('attempt_id'))
-        if delivered:
-            if delivered.get('status')=='cancelled-no-result':raise WorkflowError('The original check attempt was cancelled without a result')
-            if delivered.get('payload_hash')!=digest(dump(payload).encode()):raise WorkflowError('Conflicting replay of the original check receipt')
-            return deepcopy(delivered)
-        if not attempt or attempt['attempt_id']!=payload.get('attempt_id'):raise WorkflowError('Recover the original prepared check attempt; never invent a receipt')
-        current=check_snapshot(store,task,check,state)
-        if current['key']!=attempt['key'] or current['definition']!=attempt['definition']:raise WorkflowError('Prepared check is stale; source/test/check-set changed')
-        classification=payload.get('classification')
-        if classification not in {'executed-control','prerequisite-wait','transport-uncertainty','host-policy-rejection'}:raise WorkflowError('Check requires an operation classification')
-        result=payload.get('result')
-        if result not in {'pass','fail','red','unavailable'}:raise WorkflowError('Unsupported check result')
-        if result in {'pass','red'} and classification!='executed-control':raise WorkflowError('Only an executed control can establish evidence')
-        if payload.get('actual_lane')!=attempt['recipe']['lane'] or payload.get('environment_identity')!=attempt['environment_identity']:raise WorkflowError('Runner lane/environment does not match the prepared check')
-        if not isinstance(payload.get('cleanup'),str) or not payload['cleanup'].strip():raise WorkflowError('Record actual operation cleanup')
-        refs=payload.get('evidence',[])
-        if result in {'pass','red'} and not refs:raise WorkflowError('Executed evidence requires result artifacts')
-        evidence=[evidence_pointer(store,ref,required=True) for ref in refs]
-        lane=attempt['recipe']['lane']
-        if result in {'pass','red'}:
-            if lane in {'unit','integration','browser','unity-editmode','unity-playmode'}:
-                counts=payload.get('counts',{})
-                if any(type(counts.get(key)) is not int or counts[key]<0 for key in ['expected','discovered','passed','failed','skipped']):raise WorkflowError('Test runner requires actual nonnegative counts')
-                if counts['expected']<1 or counts['discovered']<counts['expected'] or counts['passed']+counts['failed']+counts['skipped']!=counts['discovered']:raise WorkflowError('Expected nonzero test discovery is missing')
-                if result=='pass' and (counts['failed'] or counts['skipped']):raise WorkflowError('Failed or skipped required tests cannot pass')
-                if result=='red' and (not counts['failed'] or counts['skipped'] or payload.get('failure_category')!='expected-behavior'):raise WorkflowError('Red requires the intended runnable behavioral failure')
-            else:
-                assertions=payload.get('assertions',[])
-                if not assertions or not any(a.get('assertion')==check['assertion'] for a in assertions) or any(a.get('result')!='pass' for a in assertions):raise WorkflowError('Static/visual checks require actual matching assertions')
-                if result=='red':raise WorkflowError('Static/visual observations cannot establish behavioral Red')
-        timings=payload.get('timing',{})
-        if not isinstance(timings,dict) or any(key not in {'active_controller_seconds','tool_wall_seconds','prerequisite_wait_seconds'} or type(value) not in {int,float} or value<0 for key,value in timings.items()):raise WorkflowError('Operation timings require separate nonnegative controller, tool and prerequisite observations')
-        record={key:deepcopy(payload[key]) for key in ['result','classification','actual_lane','counts','assertions','failure_category','cleanup','timing'] if key in payload}
-        record.update({key:attempt[key] for key in ['key','definition','sources','environment_identity','attempt_id']});record.update({'evidence':evidence,'recorded_at':now(),'execution_sessions':deepcopy(entry.get('execution_sessions',{}))})
-        if result=='red':slot['red']=record
-        slot['result']=record
-        record['payload_hash']=digest(dump(payload).encode());slot.setdefault('receipts',{})[attempt['attempt_id']]=record
-        if result=='fail' and classification=='executed-control':
-            signature=payload.get('failure_signature')
-            if not isinstance(signature,str) or not signature.strip():raise WorkflowError('Executed failure requires a stable failure signature')
-            observed=digest(dump({'failure':signature,'sources':attempt['sources'],'check':check['id'],'new_evidence':payload.get('new_evidence')}).encode())
-            prior=entry.get('unchanged_failure',{});count=prior.get('count',0)+1 if prior.get('signature')==observed else 1
-            entry['unchanged_failure']={'signature':observed,'count':count}
-            record['failure_signature']=signature;record['diagnostic_key']=observed
-            if count>=2:
-                entry['resume_stage']=entry['stage'];entry['stage']='blocked';entry['stop_reason']='Two unchanged executed failures'
-                if state['active_run']:execution_run(state['active_run']).update({'phase':'blocked','stop_task_id':task['id'],'stop_reason':entry['stop_reason'],'next_action':'Resolve the recorded failure before explicit resumption'})
-        elif result in {'pass','red'}:entry.pop('unchanged_failure',None)
-        if classification=='host-policy-rejection':
-            entry['resume_stage']=entry['stage'];entry['stage']='blocked';entry['stop_reason']='Host policy rejected the operation: '+payload.get('reason','missing execution scope')
-            if state['active_run']:execution_run(state['active_run']).update({'phase':'blocked','stop_task_id':task['id'],'stop_reason':entry['stop_reason'],'next_action':payload.get('next_action','Report the rejection and missing scope')})
-        store.save(text,state);return record
+        text=store.text()
+        state=store.load(text)
+        record,changed=record_check_result(store,state,payload)
+        if changed:
+            store.save(text,state)
+        return record
+
+
+def record_check_result(store,state,payload, *, bound_runner=False):
+    task,check=get_check(store,state,payload);entry=state['task_progress'].get(task['id'],{});slot=entry.get('checks',{}).get(check['id'],{});attempt=slot.get('attempt')
+    delivered=slot.get('receipts',{}).get(payload.get('attempt_id'))
+    if delivered:
+        if delivered.get('status')=='cancelled-no-result':raise WorkflowError('The original check attempt was cancelled without a result')
+        if delivered.get('payload_hash')!=digest(dump(payload).encode()):raise WorkflowError('Conflicting replay of the original check receipt')
+        return deepcopy(delivered),False
+    if not attempt or attempt['attempt_id']!=payload.get('attempt_id'):raise WorkflowError('Recover the original prepared check attempt; never invent a receipt')
+    binding=slot.get('runner_bindings',{}).get(attempt['attempt_id'],{})
+    if (binding.get('process_identity') and attempt['recipe']['lane'] in {'static','unit'}
+            and not attempt['recipe'].get('execution_binding') and not bound_runner):
+        raise WorkflowError('Recover the exact bound runner result through reconcile-check')
+    current=check_snapshot(store,task,check,state)
+    if current['key']!=attempt['key'] or current['definition']!=attempt['definition']:raise WorkflowError('Prepared check is stale; source/test/check-set changed')
+    classification=payload.get('classification')
+    if classification not in CHECK_CLASSIFICATIONS:raise WorkflowError('Check requires an operation classification')
+    result=payload.get('result')
+    if result not in CHECK_RESULTS:raise WorkflowError('Unsupported check result')
+    if result in {'pass','red'} and classification!='executed-control':raise WorkflowError('Only an executed control can establish evidence')
+    if payload.get('actual_lane')!=attempt['recipe']['lane'] or payload.get('environment_identity')!=attempt['environment_identity']:raise WorkflowError('Runner lane/environment does not match the prepared check')
+    if not isinstance(payload.get('cleanup'),str) or not payload['cleanup'].strip():raise WorkflowError('Record actual operation cleanup')
+    refs=payload.get('evidence',[])
+    if result in {'pass','red'} and not refs:raise WorkflowError('Executed evidence requires result artifacts')
+    evidence=[evidence_pointer(store,ref,required=True) for ref in refs]
+    lane=attempt['recipe']['lane']
+    if result in {'pass','red'}:
+        if lane in COUNTED_LANES:
+            counts=payload.get('counts',{})
+            if any(type(counts.get(key)) is not int or counts[key]<0 for key in COUNT_FIELDS):raise WorkflowError('Test runner requires actual nonnegative counts')
+            if counts['expected']<1 or counts['discovered']<counts['expected'] or counts['passed']+counts['failed']+counts['skipped']!=counts['discovered']:raise WorkflowError('Expected nonzero test discovery is missing')
+            if result=='pass' and (counts['failed'] or counts['skipped']):raise WorkflowError('Failed or skipped required tests cannot pass')
+            if result=='red' and (not counts['failed'] or counts['skipped'] or payload.get('failure_category')!='expected-behavior'):raise WorkflowError('Red requires the intended runnable behavioral failure')
+        else:
+            assertions=payload.get('assertions',[])
+            if not assertions or not any(a.get('assertion')==check['assertion'] for a in assertions) or any(a.get('result')!='pass' for a in assertions):raise WorkflowError('Static/visual checks require actual matching assertions')
+            if result=='red':raise WorkflowError('Static/visual observations cannot establish behavioral Red')
+    timings=payload.get('timing',{})
+    if not isinstance(timings,dict) or any(key not in {'active_controller_seconds','tool_wall_seconds','prerequisite_wait_seconds'} or type(value) not in {int,float} or value<0 for key,value in timings.items()):raise WorkflowError('Operation timings require separate nonnegative controller, tool and prerequisite observations')
+    record={key:deepcopy(payload[key]) for key in ['result','classification','actual_lane','counts','assertions','failure_category','cleanup','timing'] if key in payload}
+    record.update({key:attempt[key] for key in ['key','definition','sources','environment_identity','attempt_id']});record.update({'evidence':evidence,'recorded_at':now(),'execution_sessions':deepcopy(entry.get('execution_sessions',{}))})
+    if result=='red':slot['red']=record
+    slot['result']=record
+    record['payload_hash']=digest(dump(payload).encode());slot.setdefault('receipts',{})[attempt['attempt_id']]=record
+    if result=='fail' and classification=='executed-control':
+        signature=payload.get('failure_signature')
+        if not isinstance(signature,str) or not signature.strip():raise WorkflowError('Executed failure requires a stable failure signature')
+        observed=digest(dump({'failure':signature,'sources':attempt['sources'],'check':check['id'],'new_evidence':payload.get('new_evidence')}).encode())
+        prior=entry.get('unchanged_failure',{});count=prior.get('count',0)+1 if prior.get('signature')==observed else 1
+        entry['unchanged_failure']={'signature':observed,'count':count}
+        record['failure_signature']=signature;record['diagnostic_key']=observed
+        if count>=2:
+            entry['resume_stage']=entry['stage'];entry['stage']='blocked';entry['stop_reason']='Two unchanged executed failures'
+            if state['active_run']:execution_run(state['active_run']).update({'phase':'blocked','stop_task_id':task['id'],'stop_reason':entry['stop_reason'],'next_action':'Resolve the recorded failure before explicit resumption'})
+    elif result in {'pass','red'}:entry.pop('unchanged_failure',None)
+    if classification=='host-policy-rejection':
+        entry['resume_stage']=entry['stage'];entry['stage']='blocked';entry['stop_reason']='Host policy rejected the operation: '+payload.get('reason','missing execution scope')
+        if state['active_run']:execution_run(state['active_run']).update({'phase':'blocked','stop_task_id':task['id'],'stop_reason':entry['stop_reason'],'next_action':payload.get('next_action','Report the rejection and missing scope')})
+    return record,True
 
 def validate_task_checks(store,tid,state=None,check_id=None):
     state=state or store.load();task=validation_task(store,tid);entry=state['task_progress'].get(tid)
@@ -4866,7 +6174,7 @@ def timeline_interval(started_at,finished_at):
 
 def run_timing_timeline(store,run_ids):
     state=_hook_source_store(store,store.source_root).load()
-    registry=state.get('run_registry',{});runs=dict(registry.get('runs',{}))
+    registry=state.get('run_registry',{});runs=historical_runs(registry)
     if state['active_run']:runs[state['active_run']['id']]=state['active_run']
     applied=set(registry.get('applied_events',[]));outcomes=store.outcomes()
     result=[]
@@ -4947,6 +6255,8 @@ def replay_events(store,payload):
                     existing=json.loads(extras[rel]) if rel in extras else read_intake_receipt(store,batch)
                     if existing!=validate_intake_receipt(value,batch):raise WorkflowError('Event intake receipt conflict: '+batch)
                 continue
+            if event.get('partial_finish_sha256') or event.get('run_id') in registry.get('archived_runs', {}):
+                raise WorkflowError('Partial finish events require the original canonical closeout and cannot reopen a run')
             locator=workspaces.runtime(store.root);run_path=locator['worktrees'].get(event['run_id']) if locator else None
             if not run_path:raise WorkflowError('Event replay requires an explicitly recovered run worktree locator')
             event=workspaces.restore_envelope(event,run_path,store.root,payload.get('local_paths',{}))
@@ -5736,8 +7046,14 @@ def orchestration_execution_snapshot(store):
     paths={'common/scripts/'+name:scripts/name for name in ['workflow-state.py','decision-governance.py','decision-orchestration.py','run-workspaces.py','validate-document-rules.py']}
     paths.update({'common/references/'+name:references/name for name in ['decision-governance.md','validation-policy.md']})
     paths['owned-profile']=store.source_root/'.skill-tree/installation/profile.json'
+    body = globals().get('OWNED_WORKFLOW_SOURCE_PATH')
+    if body is not None:
+        paths['common/scripts/workflow-state.py'] = body
     if any(path.is_symlink() for path in paths.values()):raise WorkflowError('Execution snapshot cannot adopt symlinked core inputs')
-    return {key:file_hash(path) for key,path in paths.items()}
+    current = {key:file_hash(path) for key,path in paths.items()}
+    if body is not None and current['common/scripts/workflow-state.py'] != OWNED_WORKFLOW_SOURCE_SHA256:
+        raise WorkflowError('The verified shared workflow implementation changed during execution')
+    return current
 
 def orchestration_action(store,command,payload):
     helper=owned_module('skill_tree_decision_orchestration',Path(__file__).with_name('decision-orchestration.py'))
@@ -5907,7 +7223,17 @@ def decision_context_guard(store,context,allow_stale=False):
         state=Store(store.root,allow_unselected=True,route_queue=False,neutral=True).load()
         runs=dict(state.get('run_registry',{}).get('runs',{}))
         if state.get('active_run'):runs[state['active_run']['id']]=state['active_run']
-        run=runs.get(context.get('run_id'))
+        rid=context.get('run_id')
+        run=runs.get(rid)
+        if not run and rid in state.get('run_registry', {}).get('archived_runs', {}):
+            archived_store = Store(store.root, neutral=True)
+            archived_store.run_id = rid
+            closed = partial_finished(archived_store,state['run_registry'])
+            accepted = [row['task_id'] for row in closed['preview']['accepted']]
+            if (context.get('task_ids') != accepted or not context.get('target_ref', '').startswith('refs/heads/')
+                    or context.get('partial_close_sha256') != digest(dump(closed).encode())):
+                raise WorkflowError('Partial controller review requires the exact accepted scope and closeout receipt')
+            return
         if not run:raise WorkflowError('Controller decision identity is not a recorded run')
         if set(context.get('task_ids',[]))-set(run.get('admitted_task_ids',run.get('snapshot',[]))+run.get('required_ids',[])):raise WorkflowError('Decision scope exceeds the recorded controller scope')
     if context.get('session_id'):
@@ -6623,7 +7949,7 @@ def record_worker(store, state, payload, assignment, request):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|CURRENT_TARGET_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','prepare-worktree-profile','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','worker-handoff','environment','validation-impact','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=sorted(CLARIFICATION_COMMANDS|DECISION_COMMANDS|ORCHESTRATION_COMMANDS|HOOK_COMMANDS|FORCE_PROCESS_READS|CURRENT_TARGET_COMMANDS|set(LOCAL_DELIVERY_COMMANDS)|{'partial-delivery-preview','partial-delivery','partial-delivery-checks','partial-finish-preview','partial-finish','refresh','manifest','index','read','select','pending','group-selection','recent-batches','director-dispatch-read','director-dispatch','task-grouping-preview','task-grouping-apply','intake','process','start','next','advance','checkpoint','complete','completion-prose-preview','controller-review','merge-reviewed','cleanup-worktree','finish','audit','prune','history','cycle','capture-foundation','begin','implemented','prepare-check','record-check','reconcile-check','reuse-check','admit','prepare-worktree-profile','resume-task','accept-revalidation','focus-maintenance','workspace-setup','recover-locator','recover-workspace','resource','worker-handoff','environment','validation-impact','validation-preflight','runs','export-run','replay-events'}));parser.add_argument('root',type=Path);parser.add_argument('--id');parser.add_argument('--names',nargs='*');parser.add_argument('--input',type=Path);parser.add_argument('--mode',choices=['next','all'],default='next');parser.add_argument('--component');parser.add_argument('--apply',action='store_true');parser.add_argument('--expected-source-hash');parser.add_argument('--run-id')
     parser.add_argument('--standalone',action='store_true',help='Use the canonical queue and selected checkout without attaching to a registered controller.')
     parser.add_argument('--preview',type=Path,help='Retained Force Process Preview JSON')
     parser.add_argument('--receipt',type=Path,help='Original Process Pending receipt JSON')
@@ -6639,6 +7965,12 @@ def main(argv=None):
                 raise WorkflowError('Force Process evidence inspection uses the selected proposal without mutation or controller flags')
             store = Store(args.root, allow_unselected=True, neutral=True)
             print(dump(force_process_evidence(store, cmd, args.input, args.preview, args.receipt, args.expected_preview_sha256)), end='')
+            return 0
+        if cmd=='completion-prose-preview':
+            if args.apply or args.id or args.names is not None or args.expected_source_hash or args.direct_project:
+                raise WorkflowError('Completion prose preview accepts only a read-only draft payload')
+            payload=json.loads(args.input.read_text()) if args.input else {}
+            print(dump(completion_prose_preview(payload)),end='')
             return 0
         if args.standalone and (cmd not in {'intake','process','start','begin','implemented','prepare-check',
                 'record-check','reconcile-check','resume-task','complete'} or args.run_id):
@@ -6727,7 +8059,12 @@ def main(argv=None):
         elif cmd=='record-check':result=record_check(store,payload)
         elif cmd=='reconcile-check':result=reconcile_check(store,payload)
         elif cmd=='reuse-check':result=reuse_check(store,payload)
-        elif cmd=='admit':result=resume_admission(store)
+        elif cmd=='admit':
+            if 'compatible_refresh' in payload:
+                if set(payload)!={'compatible_refresh'} or payload['compatible_refresh'] is not True:
+                    raise WorkflowError('Compatible admission accepts the exact compatible refresh selection')
+                result=compatible_profile_admission(store)
+            else:result=resume_admission(store)
         elif cmd=='prepare-worktree-profile':result=prepare_worktree_profile(store)
         elif cmd=='focus-maintenance':result=focus_maintenance(store,payload)
         elif cmd=='resume-task':result=resume_task(store,payload)
@@ -6744,6 +8081,11 @@ def main(argv=None):
         elif cmd=='runs':result=store.load().get('run_registry',{})
         elif cmd=='start':result=start(store,args.mode,args.id,payload.get('limits'),payload)
         elif cmd=='next':result=next_task(store)
+        elif cmd=='validation-preflight':
+            if not isinstance(payload,dict) or args.names is not None or args.apply or (args.id and payload.get('task_id') and args.id != payload['task_id']):
+                raise WorkflowError('Validation preflight accepts one exact task and check')
+            if args.id:payload['task_id']=args.id
+            result=validation_preflight(store,payload)
         elif cmd=='validation-impact':
             if args.id or args.names is not None or args.apply:
                 raise WorkflowError('Validation impact accepts a read-only proposed path payload')
@@ -6754,6 +8096,8 @@ def main(argv=None):
         elif cmd=='controller-review':result=controller_review_identity(store)
         elif cmd=='merge-reviewed':result=merge_reviewed_controller(store,payload)
         elif cmd=='cleanup-worktree':result=cleanup_controller_worktree(store,payload)
+        elif cmd in {'partial-delivery-preview','partial-delivery','partial-delivery-checks'}:result=partial_delivery(store,cmd,payload)
+        elif cmd in {'partial-finish-preview','partial-finish'}:result=partial_finish(store,cmd,payload)
         elif cmd=='finish':result=finish(store,payload)
         elif cmd=='audit':result=audit(store,payload)
         elif cmd=='history':result=history(store,args.id,args.component)

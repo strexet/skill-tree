@@ -132,12 +132,25 @@ class LocalDeliveryTests(unittest.TestCase):
         self.implementation = wf.finish(self.selected) if finish else None
         return self.implementation
 
-    def start_reviewed_controller(self, mode, *, merges=False, remote=False, deps=False):
+    def start_reviewed_controller(self, mode, *, merges=False, remote=False, deps=False, partial_recipe=False):
         launch=self.base/'launch'
         self.git(self.root,'worktree','add',launch,'release/example')
         (launch/'local-tip.txt').write_text('local-only start branch commit\n')
         self.git(launch,'add','local-tip.txt')
         self.git(launch,'commit','-m','Unpushed launch tip')
+        if partial_recipe:
+            config = launch/'.skill-tree/config/repository.json'
+            data = json.loads(config.read_text())
+            data['recipes'] = {'static-inspection':{'lane':'unit','argv':['python3','test_partial.py'],
+                                                    'input_paths':['test_partial.py']}}
+            config.write_text(json.dumps(data))
+            (launch/'test_partial.py').write_text(
+                'import unittest\nfrom pathlib import Path\nclass TestCandidate(unittest.TestCase):\n'
+                '    def test_expected_source(self):\n'
+                '        self.assertIn("value = 1", Path("source.py").read_text())\n'
+                'unittest.main()\n')
+            self.git(launch,'add','.skill-tree/config/repository.json','test_partial.py')
+            self.git(launch,'commit','-m','Declare a runnable check for partial delivery')
         self.start_head=self.git(launch,'rev-parse','HEAD')
         self.launch=launch
         self.remote_before=self.git(self.remote,'show-ref')
@@ -1473,6 +1486,121 @@ class LocalDeliveryTests(unittest.TestCase):
         self.assertEqual(self.registry_run(self.retained['id']), state)
         self.assertEqual((self.location(self.retained) / 'source.py').read_text(), 'value = 9\n')
         self.assert_pending()
+
+
+    def partially_accepted_delivery_fixture(self):
+        self.start_reviewed_controller('all', deps=True, partial_recipe=True)
+        wf.advance(self.selected)
+        accepted = self.accept_scoped_source(self.dependency, commit_evidence=True)
+        wf.advance(self.selected)
+        wf.checkpoint(self.selected, {'phase':'stopped','stop_reason':'Owner paused after the first accepted task.'})
+        fresh = lambda: wf.Store(self.root,self.run['id'])
+        preview = wf.partial_finish(fresh(),'partial-finish-preview',{})
+        closed = wf.partial_finish(fresh(),'partial-finish', {
+            'expected_preview_sha256':preview['preview_sha256'],
+            'owner_instruction':'Close the exact paused fixture.'})
+        return fresh, accepted['task_git_commit']['commit'], closed
+
+    def test_partial_delivery_observes_already_integrated_without_second_merge(self):
+        fresh, tip, closed = self.partially_accepted_delivery_fixture()
+        self.git(self.launch,'merge','--ff-only',tip)
+        target_head = self.git(self.launch,'rev-parse','HEAD')
+        config = {'target_branch':'release/example','target_worktree':str(self.launch)}
+        observation = wf.partial_delivery(fresh(),'partial-delivery-preview',config)
+        self.assertEqual((observation['status'],observation['accepted_tip']),('already-integrated',tip))
+        request = {**config,'expected_preview_sha256':observation['preview_sha256'],
+                   'owner_instruction':'Record the exact already-integrated target.'}
+        result = wf.partial_delivery(fresh(),'partial-delivery',request)
+        self.assertEqual(result['status'],'already-integrated')
+        self.assertNotIn('review_id',result)
+        self.assertEqual(wf.partial_delivery(fresh(),'partial-delivery',request),result)
+        with self.assertRaisesRegex(wf.WorkflowError,'original completed partial delivery'):
+            wf.partial_delivery(fresh(),'partial-delivery',{**request,'owner_instruction':'A later request.'})
+        self.assertEqual(wf.partial_delivery(fresh(),'partial-delivery-preview',config)['attempt'], result)
+        self.assertEqual(self.git(self.launch,'rev-parse','HEAD'),target_head)
+        self.assertEqual(wf.partial_finish(fresh(),'partial-finish-preview',{}),closed)
+
+    def test_partial_delivery_reviews_current_target_and_recovers_lost_merge_acknowledgement(self):
+        fresh, tip, closed = self.partially_accepted_delivery_fixture()
+        (self.launch/'target-only.txt').write_text('Retain the independent target change.\n')
+        self.git(self.launch,'add','target-only.txt')
+        self.git(self.launch,'commit','-m','Advance the target with disjoint content')
+        target_head = self.git(self.launch,'rev-parse','HEAD')
+        worktree = self.base/'partial-candidate'
+        self.git(self.root,'worktree','add','-b','partial-candidate',worktree,tip)
+        config = {'target_branch':'release/example','target_worktree':str(self.launch),'candidate_worktree':str(worktree)}
+        behind = self.base/'partial-behind-base'
+        self.git(self.root,'worktree','add','-b','partial-behind-base',behind,self.start_head+'~2')
+        behind_request = {**config,'target_branch':'partial-behind-base','target_worktree':str(behind)}
+        self.assertIn('does not contain the accepted range base',
+                      wf.partial_delivery(fresh(),'partial-delivery-preview',behind_request)['reason'])
+        blocked = wf.partial_delivery(fresh(),'partial-delivery-preview',config)
+        self.assertEqual(blocked['status'],'blocked')
+        self.assertIn('exact live target',blocked['reason'])
+        self.git(worktree,'reset','--hard',target_head)
+        self.git(worktree,'merge','--no-ff','--no-edit',tip)
+        (worktree/'source.py').write_text((worktree/'source.py').read_text()+'# Independently reviewed fix\n')
+        self.git(worktree,'add','source.py')
+        self.git(worktree,'commit','-m','Fix the scoped review finding')
+        reviewed_head = self.git(worktree,'rev-parse','HEAD')
+        preview = wf.partial_delivery(fresh(),'partial-delivery-preview',config)
+        self.assertEqual(preview['status'],'review-required')
+        no_authority = {**config,'expected_preview_sha256':preview['preview_sha256']}
+        with self.assertRaisesRegex(wf.WorkflowError,'explicit owner authority'):
+            wf.partial_delivery(fresh(),'partial-delivery',no_authority)
+        request = {**no_authority,'owner_instruction':'Review and merge only accepted work.',
+                   'review_id':wf.identity('DO')}
+        real_merge = ws.run_local_merge
+        def lose_response(*args, **kwargs):
+            real_merge(*args, **kwargs)
+            raise OSError('Injected loss after partial merge ref update')
+        checked = wf.partial_delivery(fresh(),'partial-delivery-checks',{
+            **no_authority,'owner_instruction':'Execute the accepted candidate checks.'})
+        self.assertEqual(checked['status'],'checked')
+        frame = {'orchestration_hash':'a'*64,
+                 'plan':{'required_checks':preview['required_checks']},
+                 'checks':{'results':[{'id':cid,'status':'passed','reference':check['review_reference']}
+                                     for cid,check in checked['checks'].items()]}}
+        forged = {**frame,'checks':{'results':[{'id':cid,'status':'passed','reference':'Unverified check text'}
+                                              for cid in preview['required_checks']]}}
+        with patch.object(wf,'verified_implementation_review',return_value=forged):
+            self.assertEqual(wf.partial_delivery(fresh(),'partial-delivery',request)['status'],'blocked')
+        self.assertEqual(self.git(self.launch,'rev-parse','HEAD'),target_head)
+        with patch.object(wf,'verified_implementation_review',return_value=frame), \
+                patch.object(ws,'run_local_merge',side_effect=OSError('Injected loss before Git')):
+            with self.assertRaisesRegex(OSError,'Injected loss before Git'):
+                wf.partial_delivery(fresh(),'partial-delivery',request)
+        with self.assertRaisesRegex(wf.WorkflowError,'before running replacement checks'):
+            wf.partial_delivery(fresh(),'partial-delivery-checks',{
+                **no_authority,'owner_instruction':'Retry check with a different request.'})
+        with patch.object(wf,'verified_implementation_review',return_value=frame) as review, \
+                patch.object(ws,'run_local_merge',side_effect=lose_response):
+            with self.assertRaisesRegex(OSError,'Injected loss'):
+                wf.partial_delivery(fresh(),'partial-delivery',request)
+        self.assertEqual(review.call_args.args[2:],(preview['identity'],preview['review_scope']))
+        self.assertEqual(wf.partial_delivery(fresh(),'partial-delivery-preview',config)['status'],'prepared')
+        receipt, = (self.root/'.skill-tree/history/runs').glob('run-*-partial-delivery-????????????????.json')
+        original = receipt.read_bytes()
+        receipt.unlink()
+        with self.assertRaisesRegex(wf.WorkflowError,'canonical partial delivery record is missing'):
+            wf.partial_delivery(fresh(),'partial-delivery-preview',config)
+        receipt.write_bytes(original)
+        edited = json.loads(original)
+        edited['preview']['preparation']['source_tree'] = 'Falsified merge tree'
+        receipt.write_text(wf.dump(edited))
+        with self.assertRaisesRegex(wf.WorkflowError,'canonical recorded result'):
+            wf.partial_delivery(fresh(),'partial-delivery',request)
+        receipt.write_bytes(original)
+        (self.launch/'further.txt').write_text('Retain the later independent target commit.\n')
+        self.git(self.launch,'add','further.txt')
+        self.git(self.launch,'commit','-m','Advance after the lost acknowledgement')
+        result = wf.partial_delivery(fresh(),'partial-delivery',request)
+        self.assertEqual(result['status'],'merged')
+        self.assertEqual(result['merge']['parents'],[target_head,reviewed_head])
+        self.assertEqual((self.launch/'target-only.txt').read_text(),'Retain the independent target change.\n')
+        self.assertIn('Independently reviewed fix',(self.launch/'source.py').read_text())
+        self.assertTrue((self.launch/'further.txt').is_file())
+        self.assertEqual(wf.partial_finish(fresh(),'partial-finish-preview',{}),closed)
 
 
 del fixture

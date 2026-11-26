@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.9.0 (2026-11-26)
+
+### Added
+
+- Implement All can finish an accepted subset, retain the remaining tasks in Ready, and optionally deliver the reviewed result to the target branch.
+- Compact Pending and Ready previews show the exact queue, order and dependency edges. Validation and completion previews expose lane requirements and flag invalid draft prose before a commit.
+- Director can recommend a project route from a free-form request and preview an owner-approved profile refresh for a selected checkout.
+- A local validation runner can retain a result for reconciliation after interruption. Recovery verifies the original process identity, result and evidence.
+
+### Changed
+
+- Shared workflow resources reduce duplication in owned installations. Maintenance can use compact source checkouts with verified source identity.
+- Director Full Cycle processes the primary part of a partitioned intake and retains deferred work in Pending.
+
+### Fixed
+
+- Setup and recovery receipts identify interrupted operations. Stopped linked runs can re-admit after verified compatible profile drift.
+- PR review reports the exact workflow-file merge denial when the reviewed base moves.
+- Missing Director receipts preserve the partitioned intake boundary, and portable run restoration preserves the identity of recovered check receipts.
+
 ## 0.8.0 (2026-11-26)
 
 ### Added

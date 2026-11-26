@@ -26,6 +26,7 @@ Options:
   --copy                        Copy skill folders
   --symlink                     Unsupported for project specialization
   --with-init                   Add marker-fenced instruction bridge
+  --shared-runtime              Use the project-owned workflow runtime with --project
   --dry-run                     Print plan without writes or network
   --list                        List providers and skills
   --list-plugins                Inspect installed plugins without setup or dispatch
@@ -65,6 +66,7 @@ function parseArgs(argv) {
     copy: false,
     symlink: false,
     withInit: false,
+    sharedRuntime: undefined,
     dryRun: false,
     list: false,
     listPlugins: false,
@@ -104,6 +106,7 @@ function parseArgs(argv) {
     else if (token === "--copy") args.copy = true;
     else if (token === "--symlink") args.symlink = true;
     else if (token === "--with-init") args.withInit = true;
+    else if (token === "--shared-runtime") args.sharedRuntime = true;
     else if (token === "--dry-run") args.dryRun = true;
     else if (token === "--list") args.list = true;
     else if (token === "--list-plugins") {
@@ -498,6 +501,9 @@ async function main(argv = process.argv.slice(2), {promptFactory} = {}) {
   try {
     const args = parseArgs(argv);
     if (args.help) { console.log(usage()); return 0; }
+    if (args.sharedRuntime && (!args.project || args.uninstall || args.verify || args.list || args.listPlugins)) {
+      throw Error("Use --shared-runtime with an explicit --project installation or its dry-run preview.");
+    }
     if (args.listPlugins) {
       if (!args.target) throw Error("Select the inspected project explicitly with --target <repository>");
       const target = fs.realpathSync(path.resolve(args.target));
@@ -580,9 +586,12 @@ async function main(argv = process.argv.slice(2), {promptFactory} = {}) {
           result = manager.uninstall(target, selected, {dryRun: args.dryRun, withInit: args.withInit, recoverPluginPending: false});
         } else {
           result = manager.install(target, source, flavor, selected, {dryRun: args.dryRun, provider: provider.id,
+            sharedRuntime: args.sharedRuntime,
             bridges: args.withInit && provider.bridgePath ? [provider.bridgePath] : [], recoverPluginPending: false});
         }
         rows.push({provider: provider.id, ok: true, action: result.action, flavor, changed: result.delta,
+          operation_id: result.operation_id,
+          workflow_runtime: result.profile.workflow_runtime,
           profile_identity: result.profile.identity, environment_identity: result.profile.environment_id,
           input_fingerprints: result.profile.inputs,
           packages: Object.entries(result.profile.destinations).map(([destination, record]) => ({
@@ -591,7 +600,7 @@ async function main(argv = process.argv.slice(2), {promptFactory} = {}) {
           policy: "Immediate focused feedback; scoped additional boundary checks; no implicit product execution.",
           facts: result.profile.facts, gaps: result.profile.gaps});
       } catch (error) {
-        rows.push({provider: provider.id, ok: false, error: error.message});
+        rows.push({provider: provider.id, ok: false, error: error.message, operation_id: error.operation_id});
       }
     }
 
@@ -610,7 +619,7 @@ async function main(argv = process.argv.slice(2), {promptFactory} = {}) {
         stage = pendingPluginRecovery(manager, target) ? setupFailure({}, manager, target) :
           {status: "blocked", reason: "Every selected core provider and destination must verify before plugin setup."};
       } else if (args.dryRun) {
-        const planned = manager.plan(target, source, flavor, [...selections]);
+        const planned = manager.plan(target, source, flavor, [...selections], {sharedRuntime:args.sharedRuntime});
         stage = dryPluginStage(target, source, args, planned.profile, selections);
       } else {
         verifiedCore(manager, target, source, flavor, selections);

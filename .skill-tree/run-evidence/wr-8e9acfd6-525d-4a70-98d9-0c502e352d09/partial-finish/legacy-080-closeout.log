@@ -1,0 +1,2 @@
+Installed 0.8.0 checkpoint and locator recovery were fenced through retirement interruption.
+Installed 0.8.0 preserved the closed state, could not replay a retired run, and new history found the sealed checkout.

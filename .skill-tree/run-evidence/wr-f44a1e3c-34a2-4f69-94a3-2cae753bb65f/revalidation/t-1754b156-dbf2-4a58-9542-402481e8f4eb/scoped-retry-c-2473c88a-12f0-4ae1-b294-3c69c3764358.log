@@ -1,0 +1,30 @@
+Shard 1 (7 cases, exit 0)
+DispatchTests.test_parent_retains_exact_intent_before_effect_without_writing_child
+DispatchTests.test_wrong_owner_and_new_stale_digest_never_write
+DispatchTests.test_receipt_probe_parks_when_child_writer_appears_during_read
+DispatchTests.test_processing_replay_precedes_missing_pending_and_hooks
+DispatchTests.test_full_cycle_partition_is_frozen_in_the_canonical_intake_receipt
+DispatchTests.test_interruption_after_git_before_marker_does_not_claim_existing_work
+DispatchTests.test_already_ready_legacy_reservations_keep_their_original_ownership_checks
+  .......
+  ----------------------------------------------------------------------
+  Ran 7 tests in 36.978s
+
+  OK
+
+Shard 2 (6 cases, exit 0)
+DispatchTests.test_explicit_receiver_never_interprets_absent_protocol_as_ordinary_intake
+DispatchTests.test_direct_api_rejects_noncanonical_root_even_with_copied_queue
+DispatchTests.test_intake_journal_crash_recovers_original_receipt_and_scope
+DispatchTests.test_legacy_batch_without_dispatch_receipt_remains_unclaimed
+DispatchTests.test_start_reconciles_original_reserved_and_built_workspace
+DispatchTests.test_ready_directed_checkout_recreation_keeps_original_owner_and_refuses_conflicts
+  ......
+  ----------------------------------------------------------------------
+  Ran 6 tests in 39.072s
+
+  OK
+
+Ran 13 tests in 39.411s
+
+OK

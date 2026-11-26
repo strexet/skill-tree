@@ -1,0 +1,72 @@
+Shard 1 (2 cases, exit 0)
+DirectorTopologyTests.test_compact_source_preserves_full_project_checkout_and_pr_preflight
+DirectorTopologyTests.test_managed_implement_all_resumes_after_verified_incorporation
+  {"compact_git_objects_bytes": 269590, "compact_worktree_bytes": 264345, "full_git_objects_bytes": 791708, "full_worktree_bytes": 527332}
+  ..
+  ----------------------------------------------------------------------
+  Ran 2 tests in 177.269s
+
+  OK
+
+Shard 2 (2 cases, exit 0)
+DirectorTopologyTests.test_maintenance_distinguishes_client_outages_from_remote_rejections
+DirectorTopologyTests.test_supervised_pickup_timeout_recovers_unbound_supervisor_and_worker
+  ..
+  ----------------------------------------------------------------------
+  Ran 2 tests in 123.609s
+
+  OK
+
+Shard 3 (2 cases, exit 0)
+DirectorTopologyTests.test_moved_director_setup_stops_before_child_effects_and_reuses_identity
+DirectorTopologyTests.test_supervised_heartbeat_progress_and_submission_survive_contention
+  ..
+  ----------------------------------------------------------------------
+  Ran 2 tests in 198.812s
+
+  OK
+
+Shard 4 (2 cases, exit 0)
+DirectorTopologyTests.test_owned_shared_root_and_external_rebind_keep_exact_writers
+DirectorTopologyTests.test_supervised_nested_stall_preserves_sibling_and_fences_replacement
+  ..
+  ----------------------------------------------------------------------
+  Ran 2 tests in 203.186s
+
+  OK
+
+Shard 5 (1 cases, exit 0)
+DirectorTopologyTests.test_prepared_registration_and_intake_verify_the_original_canonical_route
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 200.107s
+
+  OK
+
+Shard 6 (1 cases, exit 0)
+DirectorTopologyTests.test_directed_batch_preserves_canonical_metadata_edges_and_receipts
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 63.168s
+
+  OK
+
+Shard 7 (1 cases, exit 0)
+DirectorTopologyTests.test_cross_area_manual_wait_preserves_same_external_run_and_allows_shared_sibling
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 64.825s
+
+  OK
+
+Shard 8 (1 cases, exit 0)
+DirectorTopologyTests.test_managed_implement_all_keeps_full_snapshot_and_dispatches_compatible_work
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 81.428s
+
+  OK
+
+Ran 12 tests in 203.606s
+
+OK

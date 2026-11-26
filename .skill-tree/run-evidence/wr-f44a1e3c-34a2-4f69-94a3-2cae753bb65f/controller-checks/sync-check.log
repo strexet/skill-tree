@@ -1,0 +1,5 @@
+
+> skill-tree-skills@0.7.2 sync:check
+> python3 .skill-tree/scripts/sync-skill-references.py --check
+
+skill references current

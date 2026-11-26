@@ -1,7 +1,10 @@
 import importlib.util
+from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
+import select
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -31,10 +34,272 @@ class ValidationProgressTests(unittest.TestCase):
         attempt=wf.prepare_check(self.store,{'task_id':tid,'check_id':check_id})
         return wf.record_check(self.store,{'task_id':tid,'check_id':check_id,'attempt_id':attempt['attempt_id'],'result':'pass','actual_lane':'static','environment_identity':attempt['environment_identity'],'classification':'executed-control','assertions':[{'assertion':'The value remains observable.','result':'pass'}],'evidence':['report.json'],'cleanup':'No product process was launched.'})
 
+    def start_result_runner(self, tid, *, retain_result=True, expected_value=1):
+        attempt=wf.prepare_check(self.store,{'task_id':tid,'check_id':'behavior'})
+        identity={'task_id':tid,'check_id':'behavior','attempt_id':attempt['attempt_id']}
+        observation=wf.reconcile_check(self.store,{**identity,'action':'inspect'})
+        expected={key:observation[key] for key in ('expected_key','expected_definition')}
+        result={'classification':'executed-control','result':'pass','actual_lane':'static',
+                'environment_identity':attempt['environment_identity'],
+                'assertions':[{'assertion':'The value remains observable.','result':'pass'}],
+                'cleanup':'The dedicated worker finished the scoped static assertion.',
+                'evidence':['runner-'+attempt['attempt_id']+'.json']}
+        retain={**identity,**expected,'action':'retain-result','result':result,'exit_code':0}
+        payload=self.store.source_root/'runner-request.json'
+        payload.write_text(json.dumps(retain))
+        program = """
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+directive=sys.stdin.readline().strip()
+if directive=='exit':
+    raise SystemExit(0)
+assert directive=='run'
+request=Path(sys.argv[2])
+payload=json.loads(request.read_text())
+observed=subprocess.run([sys.executable,'-B','-c',
+    "import runpy, sys; value=runpy.run_path('source.py')['value']; print(value); assert value==int(sys.argv[1])",
+    sys.argv[3]],capture_output=True,text=True,check=True)
+Path(payload['result']['evidence'][0]).write_text(json.dumps({'stdout':observed.stdout,'exit':observed.returncode}))
+command=[sys.executable,'-B',sys.argv[1],'reconcile-check','.']
+if sys.argv[4]:
+    command.extend(['--run-id',sys.argv[4]])
+command.append('--input')
+falsey=Path('invalid-result-evidence.json')
+falsey.write_text(json.dumps({**payload,'result':{**payload['result'],
+    'evidence':[{'path':payload['result']['evidence'][0],'sha256':''}]}}))
+rejected=subprocess.run([*command,str(falsey)],capture_output=True,text=True)
+assert rejected.returncode and 'exact SHA-256' in rejected.stdout,rejected.stdout+rejected.stderr
+stale_birth='''
+import runpy
+import sys
+
+entry=runpy.run_path(sys.argv[1])
+module=entry['reconcile_check'].__globals__
+native=module['local_process_group_identity']
+module['local_process_group_identity']=lambda pid,pgid: {**native(pid,pgid),'birth':{'clock':'fixture-reuse'}}
+raise SystemExit(entry['main'](sys.argv[2:]))
+'''
+rejected=subprocess.run([sys.executable,'-B','-c',stale_birth,*command[2:],str(request)],capture_output=True,text=True)
+assert rejected.returncode and 'birth identity changed' in rejected.stdout,rejected.stdout+rejected.stderr
+subprocess.run([*command,str(request)],check=True,stdout=subprocess.DEVNULL)
+print('retained',flush=True)
+sys.stdin.readline()
+"""
+        process=subprocess.Popen([sys.executable,'-B','-c',program,str(CORE/'common/scripts/workflow-state.py'),str(payload),
+                                 str(expected_value),self.store.run_id or ''],cwd=self.store.source_root,
+                                 start_new_session=True,stdin=subprocess.PIPE,stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE,text=True)
+        def cleanup():
+            if process.poll() is None:
+                process.terminate()
+            process.communicate(timeout=10)
+        self.addCleanup(cleanup)
+        binding=wf.reconcile_check(self.store,{**identity,**expected,'action':'bind-runner','process_group':process.pid})
+        self.assertEqual(binding['process_group'],process.pid)
+        with self.assertRaisesRegex(wf.WorkflowError,'Only the original bound runner'):
+            wf.reconcile_check(self.store,retain)
+        with self.assertRaisesRegex(wf.WorkflowError,'exact bound runner result'):
+            wf.record_check(self.store,{**identity,**result})
+        if not retain_result:
+            return process,identity,result,None,None
+        process.stdin.write('run\n')
+        process.stdin.flush()
+        self.assertTrue(select.select([process.stdout],[],[],15)[0],'The dedicated fixture did not retain its result')
+        announced=process.stdout.readline()
+        if announced!='retained\n':
+            self.fail('The bound runner stopped before retention. '+process.stderr.read())
+        inspected=wf.reconcile_check(self.store,{**identity,'action':'inspect'})
+        self.assertEqual(inspected['runner_binding'],binding)
+        pointer=inspected['runner_result']
+        recovery={**identity,**expected,'action':'recover-result','result_sha256':pointer['sha256']}
+        return process, identity, result, recovery, pointer
+
+    def runner_cancellation(self,identity,inspected):
+        binding=inspected['runner_binding']
+        cleanup=self.root/'runner-cleanup.json'
+        cleanup.write_text(json.dumps({**identity,'run_id':None,'schema':1,'kind':'local-process-group-cleanup',
+            'expected_key':inspected['expected_key'],'expected_definition':inspected['expected_definition'],
+            'environment_identity':inspected['environment_identity'],'host':binding['host'],
+            'process_group':binding['process_group'],'observed_at':wf.now(),'observed_live_processes':0}))
+        return {**identity,'action':'cancel','expected_key':inspected['expected_key'],
+                'expected_definition':inspected['expected_definition'],'observed':inspected['observed'],
+                'cleanup':{'path':cleanup.name,'sha256':wf.file_hash(cleanup)}}
+
+    def test_completed_local_runner_result_recovers_after_coordinator_interruption(self):
+        (self.root/'independent.py').write_text('independent = True\n')
+        tid=self.task(independent_source='independent.py')
+        self.progress(tid)
+        process,identity,result,recovery,pointer=self.start_result_runner(tid)
+        with self.assertRaisesRegex(wf.WorkflowError,'remains live'):
+            wf.reconcile_check(self.store,recovery)
+        with self.assertRaisesRegex(wf.WorkflowError,'reconcile-check'):
+            wf.record_check(self.store,{**identity,**result})
+        independent=self.passed(tid,'independent')
+        self.assertEqual(independent['result'],'pass')
+        self.assertIsNone(process.poll())
+        process.stdin.write('exit\n')
+        process.stdin.flush()
+        self.assertEqual(process.wait(timeout=10),0)
+        before=self.store.state.read_bytes()
+        with patch.object(wf.os,'killpg',side_effect=PermissionError('fixture unknown group')):
+            with self.assertRaisesRegex(wf.WorkflowError,'cleanup is uncertain'):
+                wf.reconcile_check(self.store,recovery)
+        with self.assertRaisesRegex(wf.WorkflowError,'exact retained runner result digest'):
+            wf.reconcile_check(self.store,{**recovery,'result_sha256':'0'*64})
+        retained=self.root/pointer['path']
+        retained_bytes=retained.read_bytes()
+        retained.write_bytes(retained_bytes+b' ')
+        with self.assertRaisesRegex(wf.WorkflowError,'runner result artifact changed'):
+            wf.reconcile_check(self.store,{**recovery,'result_sha256':wf.file_hash(retained)})
+        retained.write_bytes(retained_bytes)
+        report=self.root/result['evidence'][0]
+        report_bytes=report.read_bytes()
+        report.write_bytes(report_bytes+b' ')
+        with self.assertRaisesRegex(wf.WorkflowError,'evidence changed'):
+            wf.reconcile_check(self.store,recovery)
+        report.write_bytes(report_bytes)
+        self.assertEqual(self.store.state.read_bytes(),before)
+        receipt=wf.reconcile_check(self.store,recovery)
+        self.assertEqual(receipt['status'],'recovered-result')
+        self.assertEqual(receipt['runner_result'],pointer)
+        self.assertEqual(receipt['record']['attempt_id'],identity['attempt_id'])
+        self.assertEqual(receipt['record']['result'],'pass')
+        archive=self.store.base/'history/check-reconciliations'/f"{identity['attempt_id'].lower()}.json"
+        canonical=self.store.state.read_bytes()
+        archive_bytes=archive.read_bytes()
+        changed_archive={**receipt,'record':{**receipt['record'],'cleanup':'Replaced evidence summary.'}}
+        archive.write_text(json.dumps(changed_archive))
+        with self.assertRaisesRegex(wf.WorkflowError,'differs from the canonical check receipt'):
+            wf.reconcile_check(self.store,recovery)
+        conflicting={**recovery,'result_sha256':'0'*64}
+        archive.write_text(json.dumps({**receipt,'request_digest':wf.digest(wf.dump(conflicting).encode())}))
+        with self.assertRaisesRegex(wf.WorkflowError,'differs from the canonical check receipt'):
+            wf.reconcile_check(self.store,conflicting)
+        archive.write_bytes(archive_bytes)
+        self.store.state.write_bytes(before)
+        with self.assertRaisesRegex(wf.WorkflowError,'differs from the canonical check receipt'):
+            wf.reconcile_check(self.store,recovery)
+        self.store.state.write_bytes(canonical)
+        self.assertEqual(wf.reconcile_check(self.store,recovery),receipt)
+        self.assertEqual(wf.record_check(self.store,{**identity,**result}),receipt['record'])
+        with self.assertRaisesRegex(wf.WorkflowError,'Conflicting replay'):
+            wf.reconcile_check(self.store,{**recovery,'expected_key':'0'*64})
+        checks={row['check']['id']:row['result'] for row in wf.validate_task_checks(self.store,tid)}
+        self.assertEqual(checks,{'behavior':receipt['record'],'independent':independent})
+
+    def test_stale_local_runner_result_cannot_replace_the_next_attempt(self):
+        tid=self.task()
+        self.progress(tid)
+        previous=self.passed(tid)
+        process,identity,result,recovery,_=self.start_result_runner(tid)
+        (self.root/'source.py').write_text('value = 2\n')
+        inspected=wf.reconcile_check(self.store,{**identity,'action':'inspect'})
+        with self.assertRaisesRegex(wf.WorkflowError,'remains live'):
+            wf.reconcile_check(self.store,self.runner_cancellation(identity,inspected))
+        self.assertIsNone(process.poll())
+        process.stdin.write('exit\n')
+        process.stdin.flush()
+        self.assertEqual(process.wait(timeout=10),0)
+        with self.assertRaisesRegex(wf.WorkflowError,'Prepared check is stale'):
+            wf.reconcile_check(self.store,recovery)
+        closed=wf.reconcile_check(self.store,self.runner_cancellation(identity,inspected))
+        self.assertEqual(closed['status'],'cancelled-no-result')
+        slot=self.store.load()['task_progress'][tid]['checks']['behavior']
+        self.assertEqual(slot['result'],previous)
+        newer=self.passed(tid)
+        with self.assertRaisesRegex(wf.WorkflowError,'Conflicting replay'):
+            wf.reconcile_check(self.store,recovery)
+        with self.assertRaisesRegex(wf.WorkflowError,'cancelled without a result'):
+            wf.record_check(self.store,{**identity,**result})
+        self.assertEqual(wf.validate_task_checks(self.store,tid)[0]['result'],newer)
+
+    def test_departed_bound_runner_without_result_allows_current_check_retry(self):
+        (self.root/'independent.py').write_text('independent = True\n')
+        tid=self.task(independent_source='independent.py')
+        self.progress(tid)
+        process,identity,result,_,_=self.start_result_runner(tid,retain_result=False)
+        independent=self.passed(tid,'independent')
+        inspected=wf.reconcile_check(self.store,{**identity,'action':'inspect'})
+        self.assertFalse(inspected['stale'])
+        self.assertNotIn('runner_result',inspected)
+        with self.assertRaisesRegex(wf.WorkflowError,'remains live'):
+            wf.reconcile_check(self.store,self.runner_cancellation(identity,inspected))
+        process.stdin.write('exit\n')
+        process.stdin.flush()
+        self.assertEqual(process.wait(timeout=10),0)
+        cancel=self.runner_cancellation(identity,inspected)
+        closed=wf.reconcile_check(self.store,cancel)
+        self.assertEqual(closed['cancellation_reason'],'local-result-unavailable')
+        newer=self.passed(tid)
+        with self.assertRaisesRegex(wf.WorkflowError,'cancelled without a result'):
+            wf.record_check(self.store,{**identity,**result})
+        self.assertEqual(wf.reconcile_check(self.store,cancel),closed)
+        checks={row['check']['id']:row['result'] for row in wf.validate_task_checks(self.store,tid)}
+        self.assertEqual(checks,{'behavior':newer,'independent':independent})
+
+    def test_recovered_result_replay_uses_registered_completed_contract(self):
+        tid=self.task()
+        git_identity,_=self.review_candidate(tid,controller=True,record_result=False)
+        with self.store.lock():
+            text=self.store.text()
+            state=self.store.load(text)
+            state['task_progress'][tid]['execution_sessions']={
+                'separate-product-lane':{'project_root':str(self.store.source_root)},
+            }
+            self.store.save(text,state)
+        process,identity,result,recovery,_=self.start_result_runner(tid,expected_value=2)
+        process.stdin.write('exit\n')
+        process.stdin.flush()
+        self.assertEqual(process.wait(timeout=10),0)
+        receipt=wf.reconcile_check(self.store,recovery)
+        neutral=wf.Store(self.store.source_root,allow_unselected=True,neutral=True)
+        frame=self.review_frame({'kind':'task','task_ids':[tid]},git_identity)
+        request={**identity,'id':'behavior'}
+        frame=self.review_change(frame,'checks',store=neutral,identity=git_identity,reused_checks=[request])
+        frame=self.review_change(frame,'review',identity=git_identity,review_id='fixture-runner-review',findings=[],
+                                 reference='Independent fixture review.')
+        outcome=wf.complete(self.store,{'task_id':tid,'review_id':frame['id'],'outcome':'The scoped value remains observable.',
+            'acceptance':[{'criterion':'Preserve the value.','result':'pass','evidence':result['evidence']}],
+            'source_fingerprints':wf.fingerprints(self.store,['source.py'])})
+        self.assertNotIn(tid,self.store.load()['task_progress'])
+        self.assertEqual(wf.reconcile_check(self.store,recovery),receipt)
+        portable=wf.workspaces.portable_envelope(outcome,self.store.source_root,self.store.root)
+        relocated_root=self.root/'relocated-fixture'
+        relocated=wf.workspaces.restore_envelope(portable,relocated_root,self.root)
+        recovered=relocated['check_results'][0]['result']
+        self.assertEqual(recovered['execution_sessions']['separate-product-lane']['project_root'],str(relocated_root))
+        self.assertEqual(wf.completed_contract_sha256(outcome),wf.completed_contract_sha256(relocated))
+        wf.verify_completed_contract(self.store,relocated)
+        ledger=self.store.owned(wf.OUTCOME_LEDGER)
+        ledger_bytes=ledger.read_bytes()
+        archive=self.store.base/'history/check-reconciliations'/f"{identity['attempt_id'].lower()}.json"
+        archive_bytes=archive.read_bytes()
+        changed=json.loads(json.dumps(outcome))
+        checked=changed['check_results'][0]['result']
+        checked['runner_result']['sha256']='0'*64
+        conflicting={**recovery,'result_sha256':'0'*64}
+        ledger.write_text(json.dumps(changed)+'\n')
+        archive.write_text(wf.dump({**receipt,'runner_result':checked['runner_result'],'record':checked,
+                                     'request_digest':wf.digest(wf.dump(conflicting).encode())}))
+        with self.assertRaisesRegex(wf.WorkflowError,'registered completion proof'):
+            wf.reconcile_check(self.store,conflicting)
+        changed=json.loads(json.dumps(outcome))
+        checked=changed['check_results'][0]['result']
+        checked['cleanup']='Substituted local operation cleanup.'
+        ledger.write_text(json.dumps(changed)+'\n')
+        archive.write_text(wf.dump({**receipt,'record':checked}))
+        with self.assertRaisesRegex(wf.WorkflowError,'differs from the original retained runner result'):
+            wf.reconcile_check(self.store,recovery)
+        ledger.write_bytes(ledger_bytes)
+        archive.write_bytes(archive_bytes)
+        self.assertEqual(wf.reconcile_check(self.store,recovery),receipt)
     def git(self,*args,cwd=None):
         return subprocess.check_output(['git',*args],cwd=cwd or self.root,text=True,stderr=subprocess.STDOUT).strip()
 
-    def review_candidate(self,tid,controller=False):
+    def review_candidate(self,tid,controller=False,*,record_result=True):
         self.git('init','-q','-b','develop')
         self.git('config','user.name','Fixture editor')
         self.git('config','user.email','fixture@example.invalid')
@@ -52,7 +317,7 @@ class ValidationProgressTests(unittest.TestCase):
             wf.begin_task(self.store,{'task_id':tid,'implementation_operation':'implement-next'})
         (self.store.source_root/'source.py').write_text('value = 2\n')
         marked=wf.mark_implemented(self.store,{'task_id':tid,'changed_files':['source.py']})
-        return marked['git_review_identity'],self.passed(tid)
+        return marked['git_review_identity'],self.passed(tid) if record_result else None
 
     def review_change(self,frame,command,store=None,**payload):
         return wf.orchestration_action(store or self.store,'orchestration-'+command,{
@@ -87,6 +352,246 @@ class ValidationProgressTests(unittest.TestCase):
         frame=self.review_change(frame,'accept-decision')
         frame=self.review_change(frame,'accept-plan',decision_receipt=frame['acceptance'])
         return self.review_change(frame,'implement',identity=identity,reference='Current Git fixture candidate.')
+
+    def test_compatible_worktree_refresh_preserves_the_selected_checkpoint(self):
+        self.git('init','-q','-b','develop')
+        self.git('config','user.name','Fixture editor')
+        self.git('config','user.email','fixture@example.invalid')
+        self.git('config','commit.gpgSign','false')
+        self.git('remote','add','origin',str(self.root.parent/'unused-fixture-origin.git'))
+        package={'name':'worktree-profile-fixture','description':'Original metadata'}
+        (self.root/'package.json').write_text(json.dumps(package)+'\n')
+        (self.root/'.gitignore').write_text('/.agents/\n/.skill-tree/installation/\n')
+        self.git('add','.')
+        self.git('commit','-qm','Record original owned profile inputs')
+        subprocess.run(['node', str(CORE/'bin/install.js'),'--target',str(self.root),'--only','codex',
+                        '--flavor','general','--skills','skill-tree-work-through-next'],
+                       check=True,capture_output=True,text=True,timeout=30)
+        wf.workspaces.setup(self.store,{})
+        selected_id=self.task('Selected compatible checkpoint')
+        other_id=self.task('Independent stopped checkpoint')
+
+        def start(task):
+            run=wf.start(wf.Store(self.root,allow_unselected=True,neutral=True),'next',task,workspace={
+                'base_branch':'develop','local_base':True,'local_base_authorization':'Use the exact local fixture base.',
+            })
+            source=Path(run['profile_handoff']['worktree'])
+            store=wf.Store(source,run['id'])
+            wf.prepare_worktree_profile(store)
+            return run,store
+
+        other,other_store=start(other_id)
+        wf.checkpoint(other_store,{'phase':'blocked','stop_reason':'Retain the independent fixture stop'})
+        original,selected=start(selected_id)
+        self.store=selected
+        wf.begin_task(selected,{'task_id':selected_id})
+        self.passed(selected_id)
+        attempt=wf.prepare_check(selected,{'task_id':selected_id,'check_id':'behavior'})
+        wf.checkpoint(selected,{'phase':'blocked','stop_reason':'Wait for separate product approval'})
+        with self.assertRaisesRegex(wf.WorkflowError,'original check attempt'):
+            wf.compatible_profile_admission(selected)
+        wf.record_check(selected,{'task_id':selected_id,'check_id':'behavior','attempt_id':attempt['attempt_id'],
+            'result':'pass','actual_lane':'static','environment_identity':attempt['environment_identity'],
+            'classification':'executed-control','assertions':[{'assertion':'The value remains observable.','result':'pass'}],
+            'evidence':['report.json'],'cleanup':'No product process was launched.'})
+        resource=wf.workspaces.resource(selected,{'resource':'fixture-editor'})
+        with self.assertRaisesRegex(wf.WorkflowError,'original runtime resource'):
+            wf.compatible_profile_admission(selected)
+        wf.workspaces.resource(selected,{'resource':'fixture-editor','release':True,'token':resource['token']})
+        worker=selected.base/'history/worker-handoffs'/f"{original['id'].lower()}.json"
+        worker.parent.mkdir(parents=True,exist_ok=True)
+        worker.write_text(json.dumps({'schema':1,'run_id':original['id'],'slots':{
+            '1':[{'task_id':selected_id,'worker_id':'fixture-worker'}]}}))
+        with self.assertRaisesRegex(wf.WorkflowError,'original worker handoff'):
+            wf.compatible_profile_admission(selected)
+        worker.unlink()
+        canonical_state=selected.state.read_bytes()
+        source=selected.source_root
+        profile=source/'.skill-tree/installation/profile.json'
+        former=profile.read_bytes()
+        original_package=(source/'package.json').read_bytes()
+        (source/'package.json').write_text(json.dumps({**package,'dependencies':{'fixture-module':'2.0.0'}})+'\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'material or unexplained'):
+            wf.compatible_profile_admission(selected)
+        self.assertEqual((selected.state.read_bytes(),profile.read_bytes()),(canonical_state,former))
+        (source/'package.json').write_text(json.dumps({**package,'description':'Compatible description'})+'\n')
+        browser=source/'config/browser-policy.json'
+        browser.parent.mkdir()
+        browser.write_text('{}\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'material or unknown'):
+            wf.compatible_profile_admission(selected)
+        self.assertEqual((selected.state.read_bytes(),profile.read_bytes()),(canonical_state,former))
+        browser.unlink()
+        with self.assertRaisesRegex(wf.WorkflowError,'original linked worktree'):
+            wf.compatible_profile_admission(wf.Store(self.root,original['id']))
+        self.assertNotEqual((source/'package.json').read_bytes(),original_package)
+        activation=wf.owned_profile_installer
+        claim={}
+
+        def changed_checkpoint(store,request,mode,**options):
+            if mode=='activate' and not claim:
+                claim.update(wf.workspaces.resource(selected,{'resource':'fixture-before-activation'}))
+            return activation(store,request,mode,**options)
+
+        with patch.object(wf,'owned_profile_installer',changed_checkpoint):
+            with self.assertRaisesRegex(wf.WorkflowError,'original compatible readmission checkpoint'):
+                wf.compatible_profile_admission(selected)
+        self.assertEqual(profile.read_bytes(),former)
+        wf.workspaces.resource(selected,{'resource':'fixture-before-activation','release':True,'token':claim['token']})
+        installed=wf.compatible_profile_admission(selected)
+        self.assertEqual(installed['status'],'admitted')
+        self.assertNotEqual(profile.read_bytes(),former)
+        state=json.loads(selected.state.read_text())
+        previous=json.loads(canonical_state)
+        current=state['run_registry']['runs'][original['id']]
+        self.assertEqual(current['current_task_id'],selected_id)
+        self.assertEqual(current['stop_reason'],'Wait for separate product approval')
+        self.assertEqual(current['phase'],'blocked')
+        self.assertEqual(state['task_progress'],previous['task_progress'])
+        self.assertEqual(state['run_registry']['claims'],previous['run_registry']['claims'])
+        self.assertEqual(state['run_registry']['runs'][other['id']],previous['run_registry']['runs'][other['id']])
+        self.assertEqual(current['admission'],installed['admission'])
+        self.assertNotIn(str(source),json.dumps(current['compatible_profile_readmissions']))
+        self.assertEqual(wf.compatible_profile_admission(selected),{**installed,'replayed':True})
+
+    def test_lane_preflight_matches_browser_and_server_receipts(self):
+        configuration = self.store.base/'config/repository.json'
+        configuration.write_text(json.dumps({'schema':1,'role':'source','recipes':{
+            'fixture-'+lane:{'lane':lane,'input_paths':[]}
+            for lane in ('browser','server')
+        }}))
+        for lane in ('browser','server'):
+            with self.subTest(lane=lane):
+                counted = lane == 'browser'
+                tid = self.task('Review '+lane,recipe='fixture-'+lane)
+                request = {'task_id':tid,'check_id':'behavior',
+                           'expected_source_hash':wf.file_hash(self.store.future)}
+                payload = self.root/'validation-preflight.json'
+                payload.write_text(json.dumps(request))
+                before = self.store.state.read_bytes()
+                command = ['python3','-B',str(CORE/'common/scripts/workflow-state.py'),
+                           'validation-preflight',str(self.root),'--input',str(payload)]
+                outcome = subprocess.run(command,text=True,capture_output=True)
+                self.assertEqual(outcome.returncode,0,
+                                 'Selected lane evidence contract unavailable: '+outcome.stdout+outcome.stderr)
+                preview = json.loads(outcome.stdout)
+                self.assertEqual(preview['lane'],lane)
+                self.assertEqual(preview['source_hash'],request['expected_source_hash'])
+                self.assertEqual(preview['content_fingerprint'],wf.clarification_baselines(
+                    [wf.resolve(wf.parse(self.store.text()),[tid])[0]])[tid]['content_hash'])
+                self.assertEqual(preview['execution']['fields'],
+                    ['project_root','authorization','profile_id','deadline_utc','cleanup_seconds',
+                     'tool_identity','session_identity','fixture_identity','build_identity','identity_evidence'])
+                self.assertEqual(preview['receipt']['executed_pass_shape'],'counts' if counted else 'assertions')
+                self.assertEqual(preview['receipt']['behavioral_red_allowed'],counted)
+                self.assertEqual('red' in preview['receipt']['result_values'],counted)
+                self.assertEqual(preview['receipt']['results_requiring_evidence_and_executed_control'],
+                                 ['pass','red'] if counted else ['pass'])
+                self.assertEqual(preview['receipt']['evidence_reference']['object_optional'],['sha256'])
+                self.assertEqual(self.store.state.read_bytes(),before)
+                self.assertFalse((self.store.base/'.writer-lock').exists())
+
+                self.progress(tid)
+                execution = dict.fromkeys(preview['execution']['fields'],'fixture')
+                execution.update(project_root=str(self.root),cleanup_seconds=5,identity_evidence=['report.json'],
+                                 deadline_utc=(datetime.now(timezone.utc)+timedelta(seconds=60)).isoformat())
+                with self.assertRaisesRegex(wf.WorkflowError,'owned execution session'):
+                    wf.prepare_check(self.store,request)
+                attempt = wf.prepare_check(self.store,{**request,'execution':execution})
+                receipt = {'task_id':tid,'check_id':'behavior','attempt_id':attempt['attempt_id'],
+                           'actual_lane':lane,'environment_identity':attempt['environment_identity'],
+                           'classification':'executed-control','result':'pass','evidence':['report.json'],
+                           'cleanup':'The fixture starts no product processes.'}
+                invalid = ({'counts':dict.fromkeys(preview['receipt']['count_fields'],0)} if counted
+                           else {'assertions':[{'assertion':'Different assertion.','result':'pass'}]})
+                with self.assertRaisesRegex(wf.WorkflowError,'Expected nonzero test discovery' if counted
+                                            else 'matching assertions'):
+                    wf.record_check(self.store,{**receipt,**invalid})
+                valid = ({'counts':{'expected':1,'discovered':1,'passed':1,'failed':0,'skipped':0}} if counted
+                         else {'assertions':[{'assertion':preview['receipt']['assertion'],'result':'pass'}]})
+                with self.assertRaisesRegex(wf.WorkflowError,'Runner lane/environment'):
+                    wf.record_check(self.store,{**receipt,**valid,'environment_identity':'unrelated'})
+                if counted:
+                    skipped = {'expected':1,'discovered':1,'passed':0,'failed':0,'skipped':1}
+                    with self.assertRaisesRegex(wf.WorkflowError,'Failed or skipped required tests'):
+                        wf.record_check(self.store,{**receipt,'counts':skipped})
+                else:
+                    with self.assertRaisesRegex(wf.WorkflowError,'cannot establish behavioral Red'):
+                        wf.record_check(self.store,{**receipt,**valid,'result':'red'})
+                self.assertEqual(wf.record_check(self.store,{**receipt,**valid})['result'],'pass')
+
+    def test_preflight_resolves_only_the_exact_run_and_task(self):
+        admitted = self.task('Admitted')
+        other = self.task('Outside the snapshot')
+        self.git('init','-q','-b','develop')
+        self.git('config','user.name','Fixture editor')
+        self.git('config','user.email','fixture@example.invalid')
+        self.git('config','commit.gpgSign','false')
+        self.git('add','.')
+        self.git('commit','-qm','Fixture baseline')
+        wf.workspaces.setup(self.store,{})
+        scope = wf.Store(self.root,allow_unselected=True,neutral=True)
+        run = wf.start(scope,'next',admitted,workspace={'implementation_operation':'work-through-next'})
+        store = wf.Store(self.root,run['id'])
+        request = {'task_id':admitted,'check_id':'behavior'}
+        before = self.store.state.read_bytes()
+        preview = wf.validation_preflight(store,request)
+        self.assertEqual(preview['run_id'],run['id'])
+        self.assertNotEqual(preview['execution']['project_root'],str(self.root))
+        self.assertEqual(wf.validation_preflight(wf.Store(self.root),request),preview)
+        with self.assertRaisesRegex(wf.WorkflowError,'outside the admitted controller scope'):
+            wf.validation_preflight(wf.Store(self.root),{**request,'task_id':other})
+        with self.assertRaisesRegex(wf.WorkflowError,'exact check ID'):
+            wf.validation_preflight(store,{**request,'check_id':'missing'})
+        with self.assertRaisesRegex(wf.workspaces.RunError,'Unknown run ID'):
+            wf.validation_preflight(wf.Store(self.root,wf.identity('WR')),request)
+        self.assertEqual(self.store.state.read_bytes(),before)
+        scope = wf.Store(self.root,allow_unselected=True,neutral=True)
+        wf.start(scope,'next',other,workspace={'implementation_operation':'work-through-next'})
+        with self.assertRaisesRegex(wf.workspaces.RunError,'Multiple runs exist'):
+            wf.validation_preflight(wf.Store(self.root),request)
+        self.assertEqual(wf.validation_preflight(store,request),preview)
+
+    def test_boundary_preflight_names_required_metadata_and_retains_strict_writers(self):
+        group = wf.identity('VG')
+        configuration = self.store.base/'config/repository.json'
+        configuration.write_text(json.dumps({'schema':1,'role':'source','recipes':{
+            'fixture-browser':{'lane':'browser','input_paths':[]},
+        }}))
+        tid = self.task('Boundary candidate',group,timing='group-end',recipe='fixture-browser')
+        request = {'task_id':tid,'check_id':'behavior'}
+        good = wf.validation_preflight(self.store,request)
+        state = self.store.state.read_bytes()
+        original = self.store.future.read_bytes()
+        windows = original.replace(b'\n',b'\r\n')
+        self.store.future.write_bytes(windows)
+        crlf = wf.validation_preflight(self.store,{**request,'expected_source_hash':wf.file_hash(self.store.future)})
+        self.assertNotEqual(crlf['source_hash'],good['source_hash'])
+        self.assertEqual(crlf['semantic_fingerprint'],good['semantic_fingerprint'])
+        self.assertEqual(self.store.future.read_bytes(),windows)
+        source = original.replace(b'boundary_validation: group-end\n',b'',1)
+        self.assertNotEqual(source,original)
+        self.store.future.write_bytes(source)
+        with self.assertRaisesRegex(wf.WorkflowError,'Source changed'):
+            wf.validation_preflight(self.store,{**request,'expected_source_hash':good['source_hash']})
+        observed = wf.validation_preflight(self.store,request)
+        self.assertEqual(observed['status'],'boundary-metadata-required')
+        self.assertEqual(observed['lane'],'browser')
+        self.assertEqual(observed['receipt']['executed_pass_shape'],'counts')
+        self.assertNotEqual(observed['content_fingerprint'],good['content_fingerprint'])
+        self.assertNotEqual(observed['semantic_fingerprint'],good['semantic_fingerprint'])
+        self.assertEqual(observed['missing_boundary_classification'],[{
+            'check_id':'behavior','field':'boundary_validation','timing':'group-end',
+            'supported':['group-end','before-dependent-work'],
+        }])
+        with self.assertRaisesRegex(wf.WorkflowError,'Boundary check requires task boundary'):
+            wf.prepare_check(self.store,request)
+        self.assertEqual(self.store.future.read_bytes(),source)
+        self.assertEqual(self.store.state.read_bytes(),state)
+        bad_check = source.replace(b'"timing": "group-end"',b'"timing": "unsupported"',1)
+        self.store.future.write_bytes(bad_check)
+        with self.assertRaisesRegex(wf.WorkflowError,'explicit boundary timing'):
+            wf.validation_preflight(self.store,request)
 
     def test_review_incorporates_actual_check_only_and_revalidates_artifacts_before_review(self):
         tid=self.task();identity,receipt=self.review_candidate(tid)

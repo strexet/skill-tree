@@ -1,0 +1,82 @@
+Shard 1 (13 cases, exit 0)
+ReviewCycleTests.test_defaults_and_explicit_branch_parameters_are_independent_of_base
+ReviewCycleTests.test_direct_branch_operands_can_use_inline_code
+ReviewCycleTests.test_explicit_conflicts_require_clarification
+ReviewCycleTests.test_actionable_findings_need_fix_verification_and_a_real_new_review
+ReviewCycleTests.test_paginated_provider_arrays_are_flattened_without_dropping_pages
+ReviewCycleTests.test_absent_ci_is_honestly_reported
+ReviewCycleTests.test_provider_identity_changes_never_reuse_an_unrelated_pr
+ReviewCycleTests.test_snapshot_reads_all_provider_discussion_pages_and_required_checks
+ReviewCycleTests.test_legacy_rounds_with_an_ambiguous_retarget_leave_base_drift_unknown
+ReviewCycleTests.test_provider_creation_rechecks_after_a_lost_response
+LocalTargetSyncTests.test_observation_continues_profile_maintenance_with_exact_grant
+LocalTargetSyncTests.test_checked_out_target_preserves_disjoint_staged_and_unstaged_edits
+LocalTargetSyncTests.test_divergence_keeps_local_commit_and_closed_pr_does_not_sync
+  .............
+  ----------------------------------------------------------------------
+  Ran 13 tests in 55.987s
+
+  OK
+
+Shard 2 (13 cases, exit 0)
+ReviewCycleTests.test_owner_merge_forms
+ReviewCycleTests.test_retarget_cannot_reuse_old_merge_authority
+ReviewCycleTests.test_ready_requires_a_real_provider_pr_identity
+ReviewCycleTests.test_new_round_cannot_erase_an_unfixed_finding
+ReviewCycleTests.test_partial_diff_or_missing_context_never_counts_as_review
+ReviewCycleTests.test_unresolved_actionable_or_required_discussions_block
+ReviewCycleTests.test_operation_receipts_preserve_lost_response_recovery_and_conflict_detection
+ReviewCycleTests.test_provider_merge_uses_expected_head_without_admin_bypass
+ReviewCycleTests.test_workflow_diff_refuses_nonexact_objects_and_multiple_merge_bases
+LocalTargetSyncTests.test_existing_publication_resumes_from_exact_isolated_checkout
+LocalTargetSyncTests.test_fresh_external_integration_creates_exact_target_and_retries_idempotently
+LocalTargetSyncTests.test_unoccupied_behind_target_updates_and_ahead_target_preserves_local_commits
+ProviderCleanupTests.test_cleanup_follows_exact_provider_merge_to_the_live_target
+  .............
+  ----------------------------------------------------------------------
+  Ran 13 tests in 106.474s
+
+  OK
+
+Shard 3 (13 cases, exit 0)
+ReviewCycleTests.test_full_cycle_forwards_the_original_owner_instruction_to_the_pr_gate
+ReviewCycleTests.test_merge_gate_requires_direct_owner_authorization_origin
+ReviewCycleTests.test_composed_pr_helper_does_not_treat_full_cycle_bindings_as_review_bindings
+ReviewCycleTests.test_omitted_findings_require_current_verification_after_head_or_base_change
+ReviewCycleTests.test_head_base_target_and_new_discussions_invalidate_ready_evidence
+ReviewCycleTests.test_merge_requires_external_approval_policy_and_mergeability
+ReviewCycleTests.test_provider_reuses_existing_pr_instead_of_creating_duplicate
+ReviewCycleTests.test_merge_adapter_retains_scoped_http_refusal
+ReviewCycleTests.test_malformed_historical_review_base_reports_unknown
+LocalTargetSyncTests.test_verified_profile_maintenance_reconciles_without_reactivation
+LocalTargetSyncTests.test_synchronized_target_reports_stale_discovery_input_without_refresh
+LocalTargetSyncTests.test_concurrent_checkout_of_unoccupied_target_stops_without_touching_index
+ProviderCleanupTests.test_cleanup_follows_provider_delivery_after_reviewed_local_handoff
+  .............
+  ----------------------------------------------------------------------
+  Ran 13 tests in 123.262s
+
+  OK
+
+Shard 4 (12 cases, exit 0)
+ReviewCycleTests.test_literal_examples_and_non_owner_booleans_never_authorize_merge
+ReviewCycleTests.test_negatives_quotes_and_third_party_comments_do_not_authorize_merge
+ReviewCycleTests.test_current_clean_review_stops_at_pr_ready_without_merge
+ReviewCycleTests.test_merged_pr_with_new_source_head_does_not_get_reused
+ReviewCycleTests.test_failed_pending_missing_or_unknown_ci_policy_blocks_readiness
+ReviewCycleTests.test_merged_status_requires_provider_commit_and_repeated_observation_is_idempotent
+ReviewCycleTests.test_provider_comment_marker_recovers_a_lost_response_without_duplicate
+ReviewCycleTests.test_workflow_denial_preview_survives_observed_base_drift_without_writes
+ReviewCycleTests.test_provider_access_loss_is_a_failure_without_a_fake_result
+LocalTargetSyncTests.test_profile_maintenance_preserves_delivery_when_activation_is_blocked
+LocalTargetSyncTests.test_profile_input_rejects_named_pipe
+LocalTargetSyncTests.test_collision_remains_pending_and_same_publication_can_retry
+  ............
+  ----------------------------------------------------------------------
+  Ran 12 tests in 47.924s
+
+  OK
+
+Ran 51 tests in 123.540s
+
+OK

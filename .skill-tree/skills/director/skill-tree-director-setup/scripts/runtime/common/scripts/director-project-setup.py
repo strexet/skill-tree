@@ -243,18 +243,37 @@ def run(raw_root, command, request):
         return {'director':str(root), 'workspace':str(workspace), 'providers':hosts, 'projects':products,
                 'choices':['intake','status','audit','setup'] if products else ['existing','new','later']}
     if command == 'project-init':
-        with B.lock(root):
+        if request is not None:
+            D._object(request, set(), {'operation_id'})
+            if 'operation_id' in request:
+                D._require(D.WF.valid_id(request['operation_id'], 'OP'), 'Select the exact setup operation ID')
+        operations = D.WF.owned_module('director_setup_operations', Path(__file__).with_name('setup-operation-receipts.py'))
+        paths = {'profile_sha256':(root, '.skill-tree/installation/profile.json'),
+                 'preparation_sha256':(root, '.skill-tree/artifacts/director/project-preparation/coordinator.json'),
+                 'registration_sha256':(root, None)}
+        scope = {'workspace':str(root), 'providers':hosts, 'source':pkg['source_digests']}
+        requested_id = request.get('operation_id') if request else None
+        with B.lock(root), operations.observe_director_setup(D, root, 'director-init', scope, paths,
+                                                            requested_id) as (operation_id, replayed):
             D._require(descriptor(root) == (settings, pkg), 'Director workspace descriptor changed during setup')
             D._require(require_coordinator(root, pkg, allow_uninitialized=True) == owner,
                        'Director coordinator ownership changed before setup')
-            if 'owner' not in owner or has_interrupted_coordinator_preparation(root, B, owner):
+            if replayed:
+                require_prepared_coordinator(root, settings, B, owner)
+                B.protect_coordinator_storage(root, apply=False)
+            elif 'owner' not in owner or has_interrupted_coordinator_preparation(root, B, owner):
                 ensure_project(root, root, 'existing', 'director', 'coordinator', hosts, pkg, B)
             else:
                 B.protect_coordinator_storage(root)
             D._inspect_owner(root)
-            protect_storage(workspace, home=root.relative_to(workspace))
-        return {'status':'ready', 'director':str(root), 'providers':hosts}
+            protect_storage(workspace, home=root.relative_to(workspace), apply=not replayed)
+        return {'status':'ready', 'director':str(root), 'providers':hosts, 'operation_id':operation_id}
     D._require(isinstance(request, dict), 'Supply a project choice using --input')
+    requested_id = None
+    if command == 'project-setup' and 'operation_id' in request:
+        requested_id = request['operation_id']
+        D._require(D.WF.valid_id(requested_id, 'OP'), 'Select the exact setup operation ID')
+        request = {key:value for key,value in request.items() if key != 'operation_id'}
     name, path, flavor = locations(root, request)
     record = f'.skill-tree/artifacts/director/projects/{name}.json'
     previous, _ = D._read(root, record)
@@ -270,15 +289,43 @@ def run(raw_root, command, request):
         verify_choice(previous)
     if command == 'project-preview':
         return {**plan, 'status':'preview'}
-    with B.lock(root):
+    operations = D.WF.owned_module('director_setup_operations', Path(__file__).with_name('setup-operation-receipts.py'))
+    paths = {'profile_sha256':(path, '.skill-tree/installation/profile.json'),
+             'preparation_sha256':(root, prep), 'registration_sha256':(root, record)}
+    scope = {'plan':plan, 'source':pkg['source_digests']}
+    child = registration_area(name, flavor, path, ['status','preview','audit','review','intake','process','launch'])
+    def declaration(source):
+        canonical_source = registration_area('skill-tree-source', 'source-maintenance', source['checkout'],
+                                            ['status','preview','audit','review','intake','process','launch'])
+        return {'director_id':'workspace-director', 'areas':[child, canonical_source]}
+
+    with B.lock(root), operations.observe_director_setup(D, root, 'director-setup', scope, paths,
+                                                        requested_id) as (operation_id, replayed):
         D._require(descriptor(root) == (settings, pkg), 'Director workspace descriptor changed during setup')
         D._require(require_coordinator(root, pkg) == owner, 'Director coordinator ownership changed before setup')
         require_prepared_coordinator(root, settings, B, owner)
-        B.protect_coordinator_storage(root)
         previous, _ = D._read(root, record)
         if previous:
             verify_choice(previous)
         maintenance = D.WF.owned_module('director_maintenance', Path(__file__).with_name('director-maintenance.py'))
+        if replayed:
+            D._require(previous and D._inspect_owner(path)[0] == previous.get('queue_id')
+                       and D._inspect_profile(path)['flavor'] == flavor, 'Registered project identity changed')
+            observed = maintenance.inspect(root, name)
+            D._require(all(observed.get(key) == previous['maintenance'].get(key) for key in
+                           ('checkout', 'project_checkout', 'branch', 'queue_id')),
+                       'Maintenance project identity changed')
+            registry, bindings, _ = D.DirectorRegistry(root)._load()
+            for requested in declaration(observed)['areas']:
+                area, local_owner = D._area(requested)
+                D._require(registry and registry['areas'].get(area['id']) == area and bindings
+                           and bindings['queues'].get(area['queue_id']) == local_owner,
+                           'Registered Director area or local binding changed')
+            B.protect_coordinator_storage(root, apply=False)
+            if path == workspace:
+                protect_storage(path, home=root.relative_to(path), apply=False)
+            return {**previous,'operation_id':operation_id,'replayed':True}
+        B.protect_coordinator_storage(root)
         source = maintenance.prepare(root, name)
         if not previous:
             ensure_project(root, path, request['kind'], flavor, name, hosts, pkg, B)
@@ -294,14 +341,11 @@ def run(raw_root, command, request):
                 B.installation(path, installed, source_bundle, baseline, apply=True)
         if path == workspace:
             protect_storage(path, home=root.relative_to(path))
-        child = registration_area(name, flavor, path, ['status','preview','audit','review','intake','process','launch'])
-        canonical_source = registration_area('skill-tree-source', 'source-maintenance', source['checkout'],
-                                            ['status','preview','audit','review','intake','process','launch'])
         registry = D.DirectorRegistry(root)
-        declaration = {'director_id':'workspace-director', 'areas':[child, canonical_source]}
-        preview = registry.preview(declaration)
-        result = registry.apply({**declaration, 'expected_preview_sha256':preview['preview_sha256']})
+        registration = declaration(source)
+        preview = registry.preview(registration)
+        result = registry.apply({**registration, 'expected_preview_sha256':preview['preview_sha256']})
         area = result['registry']['areas'][name]
         verified = {**plan,'status':'registered','queue_id':area['queue_id'],'repo_id':area['repo_id'],'maintenance':source}
         D.WS.atomic(D._safe_path(root, record), verified)
-        return verified
+        return {**verified,'operation_id':operation_id}

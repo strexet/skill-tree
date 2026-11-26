@@ -1,0 +1,119 @@
+Thirteen passing cases retained from the same exact source and recipe execution.
+The earlier writer-lock result remains recorded at .skill-tree/run-evidence/wr-f44a1e3c-34a2-4f69-94a3-2cae753bb65f/revalidation/t-1754b156-dbf2-4a58-9542-402481e8f4eb/deferred-boundary-c-bf4c6b87-f571-453f-872a-9b9bcd9c9d4c.log.
+The heartbeat contention case was executed again on the same source and environment.
+
+DirectorTopologyTests.test_compact_source_preserves_full_project_checkout_and_pr_preflight
+  {"compact_git_objects_bytes": 269585, "compact_worktree_bytes": 264345, "full_git_objects_bytes": 791703, "full_worktree_bytes": 527332}
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 24.638s
+
+  OK
+
+
+DirectorTopologyTests.test_maintenance_distinguishes_client_outages_from_remote_rejections
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 4.436s
+
+  OK
+
+
+DirectorTopologyTests.test_moved_director_setup_stops_before_child_effects_and_reuses_identity
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 67.454s
+
+  OK
+
+
+DirectorTopologyTests.test_owned_shared_root_and_external_rebind_keep_exact_writers
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 20.478s
+
+  OK
+
+
+DirectorTopologyTests.test_directed_full_cycle_delivers_primary_and_retains_deferred_intake
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 128.214s
+
+  OK
+
+
+DirectorTopologyTests.test_director_profile_refresh_requires_current_owner_approval_and_reconciles
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 96.340s
+
+  OK
+
+
+DirectorTopologyTests.test_prepared_registration_and_intake_verify_the_original_canonical_route
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 166.801s
+
+  OK
+
+
+DirectorTopologyTests.test_directed_batch_preserves_canonical_metadata_edges_and_receipts
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 79.669s
+
+  OK
+
+
+DirectorTopologyTests.test_cross_area_manual_wait_preserves_same_external_run_and_allows_shared_sibling
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 61.338s
+
+  OK
+
+
+DirectorTopologyTests.test_managed_implement_all_keeps_full_snapshot_and_dispatches_compatible_work
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 70.518s
+
+  OK
+
+
+DirectorTopologyTests.test_managed_implement_all_resumes_after_verified_incorporation
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 136.947s
+
+  OK
+
+
+DirectorTopologyTests.test_supervised_pickup_timeout_recovers_unbound_supervisor_and_worker
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 93.293s
+
+  OK
+
+
+DirectorTopologyTests.test_supervised_heartbeat_progress_and_submission_survive_contention
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 105.825s
+
+  OK
+
+DirectorTopologyTests.test_supervised_nested_stall_preserves_sibling_and_fences_replacement
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 159.330s
+
+  OK
+
+
+Ran 14 tests in 1215.281s combined case time
+
+OK

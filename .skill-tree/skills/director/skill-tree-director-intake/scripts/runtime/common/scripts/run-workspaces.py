@@ -166,6 +166,14 @@ def validate_registry(registry):
         raise RunError('Unsupported run registry; explicit recovery required')
     if any(not isinstance(registry.get(k), dict) for k in ['runs', 'claims', 'resources']):
         raise RunError('Corrupt run registry collections')
+    archived = registry.get('archived_runs', {})
+    if not isinstance(archived, dict) or set(archived) & set(registry['runs']):
+        raise RunError('Historical partial finishes must remain outside the live run registry')
+    for rid, entry in archived.items():
+        if (not isinstance(entry, dict) or entry.get('status') != 'partially-completed'
+                or not isinstance(entry.get('checkpoint'), dict) or entry['checkpoint'].get('id') != rid
+                or not re.fullmatch(r'[a-f0-9]{64}', entry.get('receipt_sha256', ''))):
+            raise RunError('Invalid historical partial finish reference')
     for rid, run in registry['runs'].items():
         validate_hook_references(run)
         if run.get('id') != rid:
@@ -193,6 +201,8 @@ def project(store, state):
         if len(choices) > 1 and not store.allow_unselected:
             raise RunError('Multiple runs exist; select --run-id explicitly')
         rid = choices[0] if len(choices) == 1 else None
+    if rid in registry.get('archived_runs', {}):
+        raise RunError('The selected run is partially closed; inspect the historical result')
     if rid and rid not in registry['runs']:
         raise RunError('Unknown run ID')
     store.selected_run_id = rid
@@ -846,6 +856,9 @@ def recover_locator(store, payload, *, bootstrap_state_sha256=None):
                     or rid in previous.get('unverified_worktrees',[])):
                 unverified.append(rid)
         data = {'schema':1,'queue_id':registry['queue_id'],'canonical_root':str(store.root),'worktrees':restored}
+        if previous.get('archived_worktrees'):
+            data['archived_worktrees'] = {rid: entry for rid, entry in previous['archived_worktrees'].items()
+                                         if rid in registry.get('archived_runs', {})}
         if unverified:
             data['unverified_worktrees'] = sorted(unverified)
         if pending:

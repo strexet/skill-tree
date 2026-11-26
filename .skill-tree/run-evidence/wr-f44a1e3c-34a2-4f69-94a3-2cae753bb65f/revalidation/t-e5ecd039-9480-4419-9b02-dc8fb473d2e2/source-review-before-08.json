@@ -1,0 +1,12 @@
+{
+  "task_id": "T-e5ecd039-9480-4419-9b02-dc8fb473d2e2",
+  "sources": {
+    ".skill-tree/common/references/pr-review-cycle.md": "f696c00bef9253435cb6ee2f9710b4f7f7b0140da3dfc5756aed2968ec863b42",
+    ".skill-tree/skill-tree.json": "ad36d7a0f24f72e506ef629acf69f9225e732bc9463c4d01b2314aa899640a06"
+  },
+  "checks_sha256": "7d872dfcff1e89f5011e00bcd1cca3e6d8b6ee1fe20150d8cb89b52c478f2e2b",
+  "reviewer": "/root/director_resolver",
+  "result": "clean",
+  "original_head": "da31139b20847c1786cf8dc1f5aca0386ce847c9",
+  "reference": "Independent review verified the current PR contract and exact checkout and commit qualification. Local synchronization still records completion before the read-only stale profile prerequisite. Explicit and prose Director routes preserve the typed diagnosis. All 232 current source manifest digests matched actual files. Scoped diff check passed."
+}

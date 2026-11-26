@@ -1,0 +1,20 @@
+TAP version 13
+# Subtest: installed Setup registers existing, default and custom projects with selected hosts and preserves existing Git
+ok 1 - installed Setup registers existing, default and custom projects with selected hosts and preserves existing Git
+  ---
+  duration_ms: 501036.734792
+  ...
+# Subtest: dedicated coordinator protects machine-local paths and preserves portable Git inputs
+ok 2 - dedicated coordinator protects machine-local paths and preserves portable Git inputs
+  ---
+  duration_ms: 28483.7815
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 529649.4025

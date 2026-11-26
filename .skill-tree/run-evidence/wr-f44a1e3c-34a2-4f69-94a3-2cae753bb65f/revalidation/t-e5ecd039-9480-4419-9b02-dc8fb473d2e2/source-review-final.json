@@ -1,0 +1,15 @@
+{
+  "task_id": "T-e5ecd039-9480-4419-9b02-dc8fb473d2e2",
+  "sources": {
+    ".skill-tree/common/references/pr-review-cycle.md": "f696c00bef9253435cb6ee2f9710b4f7f7b0140da3dfc5756aed2968ec863b42",
+    ".skill-tree/skill-tree.json": "bc6ca6d03ad6f51a72f5adf43294f3c084e5be187214777517313a51ab61ec9d"
+  },
+  "checks_sha256": "23901184c7aa4e8d48874762148f07b438fd2d0291cf48a91d1931494a9c5a18",
+  "reviewer": "/root/director_resolver",
+  "status": "accepted",
+  "observations": [
+    "Independently verified exact current source hashes and manifest pins for the retained PR contract, PR helper, installer and Director route.",
+    "Tasks 10 through 12 preserve the original PR callables, installer, route and declared PR and integrity test inputs. The optional digest for new runner receipts preserves historical completed-contract identities.",
+    "Exact previously rerun PR and integrity controls remain current under the declared check inputs."
+  ]
+}

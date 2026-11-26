@@ -12,6 +12,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+from types import SimpleNamespace
 import uuid
 
 def owned_module(name,path):
@@ -396,7 +397,9 @@ def reviewed(record,snapshot,payload,*,store=None):
     ledger.update(observed)
     findings.extend(observed.values())
     unresolved=unresolved_findings(record,snapshot,enabled=enabled)
-    record['review']={'key':review_key(snapshot),'head':snapshot['head'],'base_oid':snapshot['base_oid'],'findings':findings,'unresolved':len(unresolved),'independent_approval':False,'evidence':payload.get('evidence',[])}
+    record['review']={'key':review_key(snapshot),'head':snapshot['head'],'base_oid':snapshot['base_oid'],
+                      'target_branch':snapshot['target_branch'],'findings':findings,'unresolved':len(unresolved),
+                      'independent_approval':False,'evidence':payload.get('evidence',[])}
     if notes:
         record['review']['development_policy_notes'] = notes
     record['rounds']=record.get('rounds',[])+[deepcopy(record['review'])]
@@ -819,6 +822,114 @@ def merge_gate(record,snapshot,*,store=None):
     if snapshot.get('mergeable')!='MERGEABLE':raise ReviewError('Merge conflict or unknown mergeability')
     return record
 
+
+def reviewed_bases(record, head, target):
+    """Read retained reviews of this source head and target in newest-first order."""
+    legacy_target_known = all(row.get('target_branch') == target for row in record.get('authorization_history', []))
+    bases = []
+    for review in reversed(record.get('rounds', []) + ([record['review']] if record.get('review') else [])):
+        if review.get('head') != head:
+            continue
+        round_target = review.get('target_branch')
+        sha, key = review.get('base_oid'), review.get('key')
+        if ((round_target == target or (round_target is None and legacy_target_known))
+                and isinstance(sha,str) and len(sha) == len(head) and re.fullmatch(r'[a-f0-9]+',sha)
+                and isinstance(key,str) and re.fullmatch(r'[a-f0-9]{64}',key)):
+            bases.append(sha)
+    return bases
+
+
+def workflow_diff(root, base, head):
+    environment = {**ws.local_git_environment(), 'GIT_NO_LAZY_FETCH':'1', 'GIT_ALLOW_PROTOCOL':''}
+    unavailable = {'status':'unavailable','paths':[]}
+
+    def git(*args, input_data=None):
+        return subprocess.run(ws.local_git_args(root,*args), env=environment, input=input_data,
+                              capture_output=True, timeout=15)
+
+    try:
+        objects = git('cat-file','--batch-check=%(objectname) %(objecttype)',
+                      input_data=(base+'\n'+head+'\n').encode('ascii'))
+        if objects.returncode or objects.stdout.splitlines() != [(sha+' commit').encode('ascii') for sha in (base,head)]:
+            return unavailable
+        bases = git('merge-base','--all',base,head)
+        if bases.returncode or len(bases.stdout.splitlines()) != 1:
+            return unavailable
+        common = bases.stdout.strip().decode('ascii')
+        if len(common) != len(head) or not re.fullmatch(r'[a-f0-9]+',common):
+            return unavailable
+        result = git('diff','--name-only','--no-renames','--no-ext-diff','--no-textconv','-z',
+                     common,head,'--','.github/workflows')
+        if result.returncode:
+            return unavailable
+        paths = sorted(name.decode('utf-8') for name in result.stdout.split(b'\0')
+                       if name.startswith(b'.github/workflows/'))
+    except (OSError, UnicodeError, subprocess.TimeoutExpired):
+        return unavailable
+    return {'status':'observed','paths':paths}
+
+
+def scoped_refusal(status, message):
+    return (type(status) is int and 400 <= status < 500 and status != 408
+            and isinstance(message,str) and 0 < len(message) <= 2048 and bool(message.strip())
+            and all(32 <= ord(char) < 127 or ord(char) >= 160 for char in message)
+            and not re.search(r'\b(?:gh[pousr]_\w{10,}|github_pat_\w{10,}|Bearer\s+[\w./=-]{8,})'
+                              r'|https?://[^/\s]+@', message, re.I))
+
+
+def merge_denial_preview(root, record, payload):
+    allowed = {'snapshot','provider_refusal','expected_publication_sha256'}
+    if set(payload) - allowed or not isinstance(payload.get('snapshot'), dict):
+        raise ReviewError('Merge denial preview requires the exact publication and provider snapshot')
+    snapshot = payload['snapshot']
+    expected_pr, pr = record.get('pr'), snapshot.get('pr')
+    if (not isinstance(expected_pr, dict) or not isinstance(pr, dict) or snapshot.get('state') != 'OPEN'
+            or type(expected_pr.get('id')) not in (int,str) or not expected_pr['id']
+            or type(expected_pr.get('number')) is not int or expected_pr['number'] < 1
+            or not isinstance(expected_pr.get('url'),str) or not expected_pr['url']
+            or any(type(expected_pr[key]) is not type(pr.get(key)) or expected_pr[key] != pr[key]
+                   for key in ('id','number','url'))):
+        raise ReviewError('Merge denial preview requires the original open provider PR')
+    for key in ('head','base_oid'):
+        if not isinstance(snapshot.get(key), str) or re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', snapshot[key]) is None:
+            raise ReviewError('Merge denial preview requires exact provider head and base objects')
+    reconcile(record, snapshot)
+    head, base, target = (snapshot[key] for key in ('head','base_oid','target_branch'))
+    historical_bases = reviewed_bases(record, head, target)
+    previous = historical_bases[0] if historical_bases else None
+    drift = 'unknown' if previous is None else 'unchanged' if previous == base else 'moved'
+    refusal = payload.get('provider_refusal')
+    if refusal is not None:
+        required = {'provider','repository','number','head','http_status','message','target_branch','attempted_base_oid'}
+        repository = record['identity'].get('base_repository')
+        if repository is None:
+            match = re.fullmatch(r'https://[^/]+/([\w.-]+/[\w.-]+)/pull/([1-9][0-9]*)', expected_pr.get('url') or '')
+            if match and int(match[2]) == expected_pr['number']:
+                repository = match[1].lower()
+        accepted_bases = [base,*historical_bases]
+        if record['identity']['head'] == head:
+            accepted_bases.append(record['identity']['base_oid'])
+        attempted_base = refusal.get('attempted_base_oid') if isinstance(refusal,dict) else None
+        if (not isinstance(refusal, dict) or set(refusal) != required or refusal['provider'] != 'github'
+                or not repository or refusal['repository'] != repository or type(refusal['number']) is not int
+                or refusal['number'] != pr['number']
+                or refusal['head'] != head or refusal['target_branch'] != target
+                or not isinstance(attempted_base,str) or len(attempted_base) != len(head)
+                or re.fullmatch(r'[a-f0-9]+',attempted_base) is None or attempted_base not in accepted_bases
+                or not scoped_refusal(refusal['http_status'],refusal['message'])):
+            raise ReviewError('Provider refusal requires the actual bounded HTTP response and the original merge attempt scope')
+    files = workflow_diff(root, base, head)
+    prerequisite = None
+    if drift == 'moved' and files['paths']:
+        prerequisite = {'kind':'review-refresh-required','target_branch':target,'head':head,'base_oid':base,
+                        'actions':['inspect-current-provider-snapshot','review-current-head-and-base',
+                                   'rerun-required-checks','apply-existing-merge-gate']}
+    return {'pr':deepcopy(expected_pr),'authorization':deepcopy(record['authorization']),'head':head,
+            'target_branch':target,'base_oid':base,'reviewed_base_oid':previous,'base_drift':drift,
+            'workflow_diff':files,'provider_refusal':deepcopy(refusal),'credential_permissions':'unknown',
+            'prerequisite':prerequisite}
+
+
 class GitHub:
     """Authorized gh fallback; connectors can supply the same normalized snapshots."""
     def __init__(self, root, repository, head_repository=None):
@@ -838,7 +949,14 @@ class GitHub:
     def gh(self,*args):
         if '--paginate' in args and '--slurp' not in args:args=(*args,'--slurp')
         result=subprocess.run(['gh',*map(str,args)],cwd=self.root,capture_output=True,text=True,timeout=45)
-        if result.returncode:raise ReviewError('GitHub access or operation failed; preserve the publication checkpoint')
+        if result.returncode:
+            error = ReviewError('GitHub access or operation failed; preserve the publication checkpoint')
+            if (len(args) >= 4 and args[:3] == ('api','--method','PUT')
+                    and re.fullmatch(r'repos/[^/]+/[^/]+/pulls/\d+/merge', args[3])):
+                response = re.fullmatch(r'gh: (.{1,2048}) \(HTTP (4[0-9]{2})\)', result.stderr.strip())
+                if response and scoped_refusal(int(response[2]), response[1]):
+                    error.http_refusal = {'http_status':int(response[2]),'message':response[1]}
+            raise error
         data=json.loads(result.stdout) if result.stdout.strip() else None
         if '--slurp' in args and data and isinstance(data[0],list):return [item for page in data for item in page]
         return data
@@ -928,7 +1046,14 @@ class GitHub:
         return {**context,'head':raw['headRefOid'],'base_oid':raw['baseRefOid'],'candidate_objects_required':True,'changed_files':[f['filename'] for f in files],'pr':{'id':raw['id'],'number':raw['number'],'url':raw['url']},'state':raw['state'],'merge_commit':(raw.get('mergeCommit') or {}).get('oid'),'mergeable':raw['mergeable'],'reviews':reviews,'comments':comments+inline,'threads':threads,'checks':checks,'checks_known':policy.get('checks_known') is True,'required_checks_missing':sorted(required-{c['name'] for c in checks}),'approvals_known':policy.get('approvals_known') is True,'approvals_required':policy.get('approvals_required',True),'approved':raw.get('reviewDecision')=='APPROVED','same_repository':raw.get('isCrossRepository') is False}
     def merge(self,number,head,method):
         if method not in {'merge','squash','rebase'}:raise ReviewError('Repository-approved merge method required')
-        return self.gh('api','--method','PUT','repos/'+self.repository+'/pulls/'+str(number)+'/merge','-f','sha='+head,'-f','merge_method='+method)
+        try:
+            return self.gh('api','--method','PUT','repos/'+self.repository+'/pulls/'+str(number)+'/merge',
+                           '-f','sha='+head,'-f','merge_method='+method)
+        except ReviewError as error:
+            if hasattr(error,'http_refusal'):
+                error.provider_refusal = {'provider':'github','repository':self.repository,'number':number,
+                                          'head':head,**error.http_refusal}
+            raise
 
 def new_record(snapshot,params):
     if not params['authorization'].get('pr'):raise ReviewError('Publication requires the direct owner invocation')
@@ -970,16 +1095,22 @@ def _profile_path(root, relative):
     return full
 
 
-def _profile_input(root, relative):
-    full = _profile_path(root, relative)
+def _regular_input(full, label, limit=None):
     try:
-        descriptor = os.open(full, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+        descriptor = os.open(full, os.O_RDONLY | getattr(os,'O_NOFOLLOW',0) | getattr(os,'O_NONBLOCK',0))
     except FileNotFoundError:
         return None
     with os.fdopen(descriptor, 'rb') as source:
         if not stat.S_ISREG(os.fstat(source.fileno()).st_mode):
-            raise ValueError('Owned profile inputs require regular files')
-        return source.read()
+            raise ValueError(label+' require regular files')
+        content = source.read() if limit is None else source.read(limit+1)
+        if limit is not None and len(content) > limit:
+            raise ValueError(label+' exceed the read limit')
+        return content
+
+
+def _profile_input(root, relative):
+    return _regular_input(_profile_path(root,relative),'Owned profile inputs')
 
 
 def _profile_discovery_paths(root, rules):
@@ -1417,11 +1548,12 @@ def publication_complete(record):
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command',choices=['parameters','preflight','init','observe','review','ready','merge-gate','operation','block','hook-attach','inspection','review-reconcile','plugin-findings','profile-maintenance'])
+    parser.add_argument('command',choices=['parameters','preflight','init','observe','review','ready','merge-gate','merge-denial-preview','operation','block','hook-attach','inspection','review-reconcile','plugin-findings','profile-maintenance'])
     parser.add_argument('root',type=Path);parser.add_argument('--input',type=Path,required=True);parser.add_argument('--publication-id')
     args=parser.parse_args(argv)
     try:
         payload=json.loads(args.input.read_text());root=args.root.resolve()
+        if not isinstance(payload,dict):raise ReviewError('Publication requests require an object')
         explicit_source = 'source_checkout' in payload
         if explicit_source and (not args.publication_id
                 or args.command in {'parameters','profile-maintenance','init','operation','review-reconcile'}):
@@ -1431,6 +1563,21 @@ def main(argv=None):
         if args.command=='parameters':result=parameters(payload.get('current_branch',ws.git(root,'symbolic-ref','--short','HEAD')),payload)
         elif args.command=='preflight':
             result=existing_source_preflight(root,payload,args.publication_id) if explicit_source else preflight(root,payload)
+        elif args.command=='merge-denial-preview':
+            carrier = _review_path(SimpleNamespace(root=ws.canonical(root)),args.publication_id)
+            raw = _regular_input(carrier,'Publication receipts',16*1024*1024)
+            if raw is None:
+                raise ReviewError('Merge denial preview requires the exact retained publication')
+            observed_hash = hashlib.sha256(raw).hexdigest()
+            if payload.get('expected_publication_sha256',observed_hash) != observed_hash:
+                raise ReviewError('The selected publication changed before merge denial preview')
+            record = json.loads(raw)
+            if not isinstance(record,dict) or record.get('publication_id') != args.publication_id:
+                raise ReviewError('Merge denial preview requires the exact retained publication')
+            result = merge_denial_preview(root,record,payload)
+            if _regular_input(carrier,'Publication receipts',16*1024*1024) != raw:
+                raise ReviewError('The selected publication changed during merge denial preview')
+            result.update(publication_id=args.publication_id,publication_sha256=observed_hash)
         elif args.command=='profile-maintenance':
             key = args.publication_id
             if not key or not re.fullmatch(r'[a-f0-9]{32}', key):

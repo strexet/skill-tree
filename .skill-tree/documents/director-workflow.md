@@ -16,6 +16,26 @@ The dedicated service lives under `.skill-tree/.director`. Use the [shared works
 
 An ordinary workspace audit requests a separate documentation audit from each available authorized subproject. The workspace audit report includes verified results and coverage gaps for the registered scope.
 
+### Preview a route from a request
+
+Send `request_text` and the exact registered `project_id` to the installed Setup entry's `project-route` command. For example, use `{"project_id":"site","request_text":"Implement the account settings page"}`. The request text accepts up to 4,000 characters.
+
+The preview recognizes explicit wording for fresh implementation, implementation of one existing prioritized task, Pending intake, and PR review. Existing work requires the exact T-ID in the receiving queue. Mixed and uncertain requests return choices for the owner to resolve. Missing projects, ineligible packages and unavailable queue work return the relevant prerequisite.
+
+The result gives matched intents, a candidate operation when available, a bounded confidence label, and any unresolved choices or prerequisites. The preview grants no effect. Select the exact operation and scope through the regular route before continuing.
+
+### Review a registered project profile refresh
+
+Use the `profile-refresh` project route or the installed Setup command `profile-refresh-preview` with the exact `project_id`. The read-only preview reports the verified checkout, current installation generation, changed input paths, anticipated generation and affected runs. A stopped checkpoint still requires ordinary re-admission after refresh.
+
+Use `profile-refresh-apply` with the same project, an exact caller-held `operation_id`, the `expected_preview_sha256` and actual owner `approval`. Supply the owner evidence `kind` and `reference` with `effect: "refresh-project-profile"`. The approval covers one refresh on the reviewed project. Registered area permissions remain in force. A project with an unresolved original runtime or worker handoff requires reconciliation before activation. The original operation receipt binds recovery to the same checkout, installation, inputs and run state. A mismatched preview or identity requires a new review.
+
+### Review primary delivery and deferred intake
+
+For a combined request, preview `operation: "skill-tree-full-cycle"` with the exact `project_id` and a `full_cycle` object. Supply the caller-held `intake_batch_id`, original ordered `items` and `full_cycle_partition`. Each partition has the original order and names explicit item keys. For intake items named `proxy` and `deployment-check`, the partition can contain `{"primary":["proxy"],"deferred":["deployment-check"]}`.
+
+Freeze the returned child selection before dispatch. The approved process proposal names only primary keys. After intake, the verified original receipt resolves both partitions to exact Pending IDs. The process request uses only the exact primary Pending IDs in the original order. Resume the ordinary Full Cycle from the exact prioritized IDs in the verified primary processing receipt. A later operation requires separate authority to process deferred work.
+
 ## Register areas
 
 For first-time setup, review the coordinator, project placements, package sources and prerequisites through the [guided setup preview](../common/references/director-workflow.md#preview-first-time-setup). Once approved, [prepare the workspace](../common/references/director-workflow.md#prepare-the-approved-workspace) with `setup-bootstrap`. Use the [prepared-area registration and status flow](../common/references/director-workflow.md#register-the-prepared-areas) for the exact prepared set. The explicit area registration commands below remain available.
