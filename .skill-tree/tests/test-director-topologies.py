@@ -793,6 +793,169 @@ class DirectorTopologyTests(unittest.TestCase):
         self.assertEqual(snapshot(root/QUEUE,root/STATE,root/PROFILE),delivered_state)
         self.assertEqual(self.core(root,'read',None,'--id',pending_later)['status'],'Pending')
 
+    def test_director_profile_refresh_requires_current_owner_approval_and_reconciles(self):
+        root=self.external
+        area=self.declaration['areas'][-1]
+        area['scope']='.'
+        area['allowed_effects'].append('preview')
+        self.register()
+        task=self.child_task(root)
+        start=self.core(root,'start',{
+            'base_branch':'develop','local_base':True,
+            'local_base_authorization':'Select the disposable fixture branch.',
+        },'--id',task['task_id'])
+        run_id=start['id']
+        checkout=Path(start['profile_handoff']['worktree'])
+        self.core(root,'prepare-worktree-profile',None,'--run-id',run_id,target=checkout)
+        self.core(root,'checkpoint',{'phase':'blocked','stop_reason':'Wait for fixture acceptance'},
+                  '--run-id',run_id,target=checkout)
+        paths=[root/QUEUE,root/STATE,root/PROFILE,checkout/PROFILE,self.parent/REGISTRY,self.parent/BINDINGS]
+        prior=snapshot(*paths)
+        original_branch=self.git(root,'rev-parse','HEAD')
+        changed=write(root,'config/browser-policy.json','{}\n')
+        selector={'project_id':'game'}
+        preview=self.director('profile-refresh-preview',selector,family='setup')
+        self.assertEqual(preview['status'],'preview')
+        self.assertEqual(preview['checkout'],str(root))
+        self.assertEqual(preview['changed_inputs'],['config/browser-policy.json'])
+        self.assertEqual([run['run_id'] for run in preview['affected_runs']],[run_id])
+        runtime=self.parent/AGENTS/'skill-tree-director-setup/scripts/runtime/common/scripts'
+        director=SimpleNamespace(**runpy.run_path(str(runtime/'director-state.py')))
+        routing=runpy.run_path(str(runtime/'director-project-routing.py'))
+        project={'id':'game','checkout':str(root),'queue_id':self.external_queue,'state':'available',
+                 'allowed_effects':area['allowed_effects']}
+        routed=routing['preview'](director,self.parent,self.parent,{'providers':['codex']},read_json(self.parent/PROFILE),
+            [project],{**selector,'operation':'profile-refresh'})
+        self.assertEqual(routed['command'],'profile-refresh-preview')
+        self.assertEqual(routed['preview_sha256'],preview['preview_sha256'])
+        self.assertEqual(snapshot(*paths),prior)
+        request={**selector,'operation_id':identity('OP'),'expected_preview_sha256':preview['preview_sha256']}
+        self.director('profile-refresh-apply',request,family='setup',error='Unexpected Director input')
+        self.assertEqual(snapshot(*paths),prior)
+        request['approval']={'kind':'owner-message','reference':'Apply the reviewed exact fixture profile refresh.',
+                             'effect':'refresh-project-profile'}
+        self.assertNotIn('install',area['allowed_effects'])
+        self.director('profile-refresh-apply',{**request,'approval':{**request['approval'],'effect':'install'}},
+                      family='setup',error='must explicitly authorize')
+        token=self.core(root,'resource',{'resource':'original-editor'},'--run-id',run_id,target=checkout)
+        held=self.director('profile-refresh-preview',selector,family='setup')
+        self.assertEqual(held['status'],'prerequisite')
+        self.assertIn('original project runtime resource',held['reason'])
+        self.core(root,'resource',{'resource':'original-editor','release':True,'token':token['token']},
+                  '--run-id',run_id,target=checkout)
+        pending_core=write(root,'.skill-tree/.transaction.json','{}\n')
+        try:
+            held=self.director('profile-refresh-preview',selector,family='setup')
+            self.assertEqual(held['limitations'],['original-core-transaction-needs-reconciliation'])
+        finally:
+            pending_core.unlink()
+        changed.write_text('{}\n\n')
+        self.director('profile-refresh-apply',request,family='setup',error='changed since the approved preview')
+        changed.write_text('{}\n')
+        self.core(root,'checkpoint',{'phase':'blocked','stop_reason':'A changed fixture checkpoint'},
+                  '--run-id',run_id,target=checkout)
+        self.director('profile-refresh-apply',request,family='setup',error='changed since the approved preview')
+        (root/STATE).write_bytes(prior[1])
+        moved=self.base/'other-fixture-path'
+        root.rename(moved)
+        try:
+            self.director('profile-refresh-apply',request,family='setup',error='unavailable|No such file')
+        finally:
+            moved.rename(root)
+        self.assertEqual(snapshot(*paths),prior)
+        fault = '''
+import runpy
+import sys
+edge = sys.argv[1]
+entry = runpy.run_path(sys.argv[2])
+registry = entry['DirectorRegistry']
+original = registry._refresh_installer
+subprocess = entry['subprocess']
+run = subprocess.run
+
+def tear(argv, **options):
+    if argv[:2] == ['node', '-e'] and argv[-1] == 'apply':
+        prefix = """
+const journalFs = require('node:fs');
+const publish = journalFs.writeFileSync;
+journalFs.writeFileSync = (destination, ...options) => {
+  if (typeof destination === 'string' && destination.endsWith('/.skill-tree/installation/.journal.json')) {
+    throw Error('Injected interruption after sealing the activation');
+  }
+  publish(destination, ...options);
+};
+""" if edge == 'seal' else """
+const recoveryFs = require('node:fs');
+const rename = recoveryFs.renameSync;
+recoveryFs.renameSync = (from, to) => {
+  rename(from, to);
+  if (typeof from === 'string' && from.endsWith('/.skill-tree/documents/future.json') &&
+      to.includes('/.skill-tree/installation/.backups/')) {
+    throw Error('Injected interruption after the queue state backup');
+  }
+};
+"""
+        argv = [*argv[:2], prefix+argv[2], *argv[3:]]
+    return run(argv, **options)
+
+def interrupt(self, checkout, mode, plan, operation_id=None):
+    if mode == 'apply' and edge == 'parent':
+        raise ValueError('Injected interruption before the child installer')
+    effect = original(self, checkout, mode, plan, operation_id)
+    if mode == 'apply' and edge == 'ack':
+        raise ValueError('Injected loss after project profile activation')
+    return effect
+
+if edge in {'seal', 'backup'}:
+    subprocess.run = tear
+registry._refresh_installer = interrupt
+raise SystemExit(entry['main'](sys.argv[3:]))
+'''
+        entry=self.parent/AGENTS/'skill-tree-director-setup/scripts/runtime/common/scripts/director-state.py'
+        other={**request,'operation_id':identity('OP')}
+        other_payload=write(self.base,'refresh-before-child.json',json.dumps(other))
+        self.command(sys.executable,'-B','-c',fault,'parent',entry,'profile-refresh-apply',self.parent,
+                     '--input',other_payload,error='Injected interruption before the child installer')
+        self.assertEqual(snapshot(*paths),prior)
+        sealed={**request,'operation_id':identity('OP')}
+        sealed_payload=write(self.base,'refresh-with-unpublished-seal.json',json.dumps(sealed))
+        installer_receipts=root/'.skill-tree/artifacts/setup-operations'
+        sealed_receipt=installer_receipts/f"{sealed['operation_id']}.json"
+        self.command(sys.executable,'-B','-c',fault,'seal',entry,'profile-refresh-apply',self.parent,
+                     '--input',sealed_payload,error='Injected interruption after sealing the activation')
+        unconsumed=read_json(sealed_receipt)['activation_journal_sha256']
+        self.assertIsNotNone(unconsumed)
+        self.assertFalse((root/'.skill-tree/installation/.journal.json').exists())
+        self.assertEqual(snapshot(*paths),prior)
+        payload=write(self.base,'refresh-with-lost-answer.json',json.dumps(request))
+        self.command(sys.executable,'-B','-c',fault,'backup',entry,'profile-refresh-apply',self.parent,'--input',payload,
+                     error='Injected interruption after the queue state backup')
+        self.assertFalse((root/STATE).exists())
+        self.assertTrue((root/'.skill-tree/installation/.journal.json').is_file())
+        self.command(sys.executable,'-B','-c',fault,'ack',entry,'profile-refresh-apply',self.parent,'--input',payload,
+                     error='Injected loss after project profile activation')
+        installer_receipt=installer_receipts/f"{request['operation_id']}.json"
+        installed=installer_receipt.read_bytes()
+        self.assertNotEqual(read_json(installer_receipt)['activation_journal_sha256'],unconsumed)
+        self.assertNotEqual((root/PROFILE).read_bytes(),prior[2])
+        affected=read_json(root/STATE)['run_registry']['runs'][run_id]
+        self.assertTrue(affected['profile_refresh_required'])
+        self.assertEqual(affected['stop_reason'],'Wait for fixture acceptance')
+        self.assertEqual((checkout/PROFILE).read_bytes(),prior[3])
+        self.assertEqual(self.git(root,'rev-parse','HEAD'),original_branch)
+        refreshed=self.director('profile-refresh-apply',request,family='setup')
+        self.assertEqual((refreshed['status'],refreshed['operation_id']),('refreshed',request['operation_id']))
+        self.assertEqual(installer_receipt.read_bytes(),installed)
+        self.assertTrue(self.director('profile-refresh-apply',request,family='setup')['replayed'])
+        self.assertEqual(installer_receipt.read_bytes(),installed)
+        self.director('profile-refresh-apply',other,family='setup',error='reviewed project run identities changed')
+        self.assertFalse((installer_receipts/f"{other['operation_id']}.json").exists())
+        sealed_before=sealed_receipt.read_bytes()
+        self.director('profile-refresh-apply',sealed,family='setup',error='reviewed project run identities changed')
+        self.assertEqual(sealed_receipt.read_bytes(),sealed_before)
+        self.assertEqual(self.director('profile-refresh-preview',selector,family='setup')['status'],'current')
+        self.command('node',root/MANAGER,'--verify')
+
     def freeze(self, game_task, *, assignments=None):
         intent = {'objective_id': identity('OB'), 'expected_current_sha256': None, 'intent': {
             'owner_ref': 'fixture-owner', 'title': 'Check linked areas', 'description': 'Retain the external checkpoint.',

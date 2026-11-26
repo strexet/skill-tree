@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "93f7d27e20e45d0b4f2411f0992e54ebe50cf03f26daf2944bb363be1a0b4680",
+  "identity": "b99ba69543c8ce17fb4adf79bcc7e66b0d548f3afc2aefa370d2e16d56519d6e",
   "operation": "skill-tree-director-audit",
   "operations": {
     "skill-tree-3d": {
@@ -3330,7 +3330,7 @@
     "scripts/runtime/common/scripts/director-questions.py": "f10e8d3fb1830bb5a3289148aa94067574e257676a77fc349eafa9a2f8696b34",
     "scripts/runtime/common/scripts/director-run.py": "1c4472f81223eb8d4c05e4a2a324eed84ebce60f70454ed621b5673430ead518",
     "scripts/runtime/common/scripts/director-source-repair.py": "d9f53a58cd06cd837d7758d118a029cc5db15a36c5574d02bb91bf873b208d35",
-    "scripts/runtime/common/scripts/director-state.py": "44a5ea4e0eddc626c5565bc8669598836b3aa4bb85892b1cd6993b56c61aa5d5",
+    "scripts/runtime/common/scripts/director-state.py": "21a5978981c83f0177081a86e27d05372e5d841d940140f684d1e4e514e249b6",
     "scripts/runtime/common/scripts/director-workspace-audit.py": "0e44fa17efe543e98f2f729e721488d9449b1cd65964c313572e4156d05f7ba2",
     "scripts/runtime/common/scripts/narrative-state.py": "ad6618d06fc1b2cac79694a64ff5733bdd03a330e0714851e04e185d108c1388",
     "scripts/runtime/common/scripts/parallel-preview.py": "5425da8665a31cfc681853cf5e5579d2a75295a08ee74399da717f803cf441bc",
@@ -3348,7 +3348,7 @@
     "scripts/runtime/lib/composer.js": "4f463c0b8a77a681de693a9016a91937f75616f3c2253ce747ba9f76914174b3",
     "scripts/runtime/lib/development-policies.js": "9d3036e0dd2b2aaf070f3ec92f9e1d6d6830fe35cd8ebb1a78135c3ad792a2fd",
     "scripts/runtime/lib/execution-bindings.js": "4087f0855eac260dc7ec4008be24015b3645ac7f53e11b3f7f7eccab5434a852",
-    "scripts/runtime/lib/installation.js": "f4cd6eab4970623e76f6eecac32dea50a031448fb2f6190e2909eaaab4fbabb9",
+    "scripts/runtime/lib/installation.js": "cf4b84466995104716ad1d0f7c6edae45fc9a10bd90efa83abb70bc7c29e8ec3",
     "scripts/runtime/lib/plugin-bindings.js": "6ae1378bd1fac584bb0145c815087a053eb716cb8d976f7e3ede8d4958966cba",
     "scripts/runtime/lib/plugin-composition.js": "9abfccf26e21c35355a97159178fb9bbbe40183cde2becc170621e4c428ab03b",
     "scripts/runtime/lib/plugin-parameters.js": "8567e45a1fa6dd764579ac5b2abf23f88154a985907c001c3670d8b11f826915",

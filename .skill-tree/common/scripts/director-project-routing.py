@@ -345,6 +345,14 @@ def preview(D, root, workspace, settings, profile, products, request):
         D._object(request['full_cycle'], {'intake_batch_id', 'items', 'full_cycle_partition'})
     op = CORE_TASK_ROUTES.get(operation, operation)
     summary = {'route':mode, 'operation':operation}
+    if operation == 'profile-refresh':
+        D._require(mode == 'director' and D._token(chosen) and 'task_ids' not in request,
+                   'A managed profile refresh requires one exact registered project')
+        project = project_for(D, workspace, products, chosen)
+        result = D.DirectorRegistry(root).profile_refresh_preview({'project_id':chosen})
+        return {**summary, **result, 'project':project, 'execution':'director',
+                'entry':package_entry(D, root, settings, profile, 'skill-tree-director-setup'),
+                'command':'profile-refresh-preview'}
     if op in TASK_ROUTES:
         project = project_for(D, workspace, products, chosen, mode)
         summary.update(project=project, execution='director-assignment' if mode == 'director' else 'direct-project')
@@ -419,7 +427,10 @@ def preview(D, root, workspace, settings, profile, products, request):
     checkout = Path(project.get('workspace_checkout', project['checkout']))
     prerequisite = D._profile_refresh_prerequisite(checkout)
     if prerequisite:
-        return {**summary, 'execution': execution, 'status': 'prerequisite', 'child_skill': None,
-                'limitations': [prerequisite['code']], 'profile_prerequisite': prerequisite}
+        result = {**summary, 'execution': execution, 'status': 'prerequisite', 'child_skill': None,
+                  'limitations': [prerequisite['code']], 'profile_prerequisite': prerequisite}
+        if mode == 'director' and project.get('id') and 'preview' in project['allowed_effects']:
+            result['profile_refresh_route'] = {'operation':'profile-refresh','project_id':project['id']}
+        return result
     return {**summary, 'execution': execution, 'status': 'prerequisite', 'child_skill': None,
             'limitations': ['project-skill-unavailable']}

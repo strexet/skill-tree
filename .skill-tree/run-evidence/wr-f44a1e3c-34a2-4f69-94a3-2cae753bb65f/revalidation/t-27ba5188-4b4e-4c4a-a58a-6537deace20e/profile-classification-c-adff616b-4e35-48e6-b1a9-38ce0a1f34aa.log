@@ -1,0 +1,161 @@
+TAP version 13
+# {"flavor":"general","providers":["claude-code","codex"],"standalone":{"skills":46,"package_files":1792,"package_bytes":62202144,"workflow_files":46,"workflow_bytes":24846992,"bundle_bytes":3160501,"receipt_bytes":370020},"owned":{"skills":46,"package_files":1792,"package_bytes":37542418,"workflow_files":46,"workflow_bytes":187266,"bundle_bytes":3160501,"receipt_bytes":370054}}
+# Subtest: opt-in workflow runtime measures both owned layouts and preserves standalone, verification and rollback
+ok 1 - opt-in workflow runtime measures both owned layouts and preserves standalone, verification and rollback
+  ---
+  duration_ms: 46719.745458
+  ...
+# Subtest: static inspection appears in the owned profile and explicit declarations take precedence
+ok 2 - static inspection appears in the owned profile and explicit declarations take precedence
+  ---
+  duration_ms: 3231.46575
+  ...
+# Subtest: owned PR review CommonJS scripts load below ESM across provider layouts
+ok 3 - owned PR review CommonJS scripts load below ESM across provider layouts
+  ---
+  duration_ms: 46200.153833
+  ...
+# Subtest: the owned CommonJS marker follows upgrade, verification, rollback and uninstall
+ok 4 - the owned CommonJS marker follows upgrade, verification, rollback and uninstall
+  ---
+  duration_ms: 4603.799083
+  ...
+# Subtest: external sources without membership exports still list, install and verify
+ok 5 - external sources without membership exports still list, install and verify
+  ---
+  duration_ms: 2247.253667
+  ...
+# Subtest: static inspection stays resolvable on an owned legacy profile and appears after source update
+ok 6 - static inspection stays resolvable on an owned legacy profile and appears after source update
+  ---
+  duration_ms: 3080.145792
+  ...
+# Subtest: invalid manager combinations reject before writes while explicit rollback remains available
+ok 7 - invalid manager combinations reject before writes while explicit rollback remains available
+  ---
+  duration_ms: 8635.316833
+  ...
+# Subtest: installed release version matches the bundled source and forged receipt versions fail verification
+ok 8 - installed release version matches the bundled source and forged receipt versions fail verification
+  ---
+  duration_ms: 3212.053334
+  ...
+# Subtest: force never adopts an unowned package
+ok 9 - force never adopts an unowned package
+  ---
+  duration_ms: 296.048583
+  ...
+# Subtest: verify rejects a false-positive entrypoint and locally modified packages survive force/uninstall
+ok 10 - verify rejects a false-positive entrypoint and locally modified packages survive force/uninstall
+  ---
+  duration_ms: 3316.888125
+  ...
+# Subtest: maintenance refresh works without source access and detects newly added tools
+ok 11 - maintenance refresh works without source access and detects newly added tools
+  ---
+  duration_ms: 7023.987917
+  ...
+# Subtest: fresh noninteractive installs preview Director and raw profile installation requires a flavor
+ok 12 - fresh noninteractive installs preview Director and raw profile installation requires a flavor
+  ---
+  duration_ms: 376.285291
+  ...
+# Subtest: owned no-op is verified; dry-run reports conflicts without writes
+ok 13 - owned no-op is verified; dry-run reports conflicts without writes
+  ---
+  duration_ms: 7033.025792
+  ...
+# Subtest: interrupted replacement rolls forward from the journal and preserves unrelated content
+ok 14 - interrupted replacement rolls forward from the journal and preserves unrelated content
+  ---
+  duration_ms: 8414.839042
+  ...
+# Subtest: flavor switch updates all owned packages; stopped pending validation survives refresh and rollback
+ok 15 - flavor switch updates all owned packages; stopped pending validation survives refresh and rollback
+  ---
+  duration_ms: 8699.129333
+  ...
+# Subtest: missing foundation is deferred without a queue and captured exactly once after setup
+ok 16 - missing foundation is deferred without a queue and captured exactly once after setup
+  ---
+  duration_ms: 4019.07
+  ...
+# Subtest: an active executing controller blocks replacement and malformed maintenance ownership is preserved
+ok 17 - an active executing controller blocks replacement and malformed maintenance ownership is preserved
+  ---
+  duration_ms: 4211.809916
+  ...
+# Subtest: untracked maintenance source is a conflict and cannot be adopted by refresh
+ok 18 - untracked maintenance source is a conflict and cannot be adopted by refresh
+  ---
+  duration_ms: 4059.893917
+  ...
+# Subtest: refresh refuses incompatible workflow state without replacing packages or receipts
+ok 19 - refresh refuses incompatible workflow state without replacing packages or receipts
+  ---
+  duration_ms: 3350.856458
+  ...
+# Subtest: refresh refuses an unresolved standalone execution attempt and the workflow writer lock
+ok 20 - refresh refuses an unresolved standalone execution attempt and the workflow writer lock
+  ---
+  duration_ms: 3081.317666
+  ...
+# Subtest: standalone profile refresh stops a waiting controller and preserves progress across rollback
+ok 21 - standalone profile refresh stops a waiting controller and preserves progress across rollback
+  ---
+  duration_ms: 7380.026667
+  ...
+# Subtest: a concurrent edit during staging is preserved and activation refuses the changed destination
+ok 22 - a concurrent edit during staging is preserved and activation refuses the changed destination
+  ---
+  duration_ms: 6489.603666
+  ...
+# Subtest: delivery profile classifies descriptive metadata and preserves material inputs for explicit recovery
+ok 23 - delivery profile classifies descriptive metadata and preserves material inputs for explicit recovery
+  ---
+  duration_ms: 7417.206916
+  ...
+# Subtest: a real controller re-admits after local refresh without resetting task progress
+ok 24 - a real controller re-admits after local refresh without resetting task progress
+  ---
+  duration_ms: 10331.608542
+  ...
+# Subtest: shared provider destinations retain every recorded owner during scoped uninstall
+ok 25 - shared provider destinations retain every recorded owner during scoped uninstall
+  ---
+  duration_ms: 9793.492417
+  ...
+# Subtest: verification rejects a forged flavor and rehashed unrelated package content
+ok 26 - verification rejects a forged flavor and rehashed unrelated package content
+  ---
+  duration_ms: 3592.159083
+  ...
+# Subtest: shared bridges survive uninstall until the final recorded provider releases the package
+ok 27 - shared bridges survive uninstall until the final recorded provider releases the package
+  ---
+  duration_ms: 11041.497583
+  ...
+# Subtest: input drift during staging preserves the previous owned generation
+ok 28 - input drift during staging preserves the previous owned generation
+  ---
+  duration_ms: 5651.297792
+  ...
+# Subtest: post-activation input drift rolls back the owned generation without reverting project inputs
+ok 29 - post-activation input drift rolls back the owned generation without reverting project inputs
+  ---
+  duration_ms: 5954.6
+  ...
+# Subtest: local refresh catches a Web runner major change and omits unsupported fixture instructions
+ok 30 - local refresh catches a Web runner major change and omits unsupported fixture instructions
+  ---
+  duration_ms: 6005.900917
+  ...
+1..30
+# tests 30
+# suites 0
+# pass 30
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 245688.70375

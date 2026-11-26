@@ -24,6 +24,12 @@ The preview recognizes explicit wording for fresh implementation, implementation
 
 The result gives matched intents, a candidate operation when available, a bounded confidence label, and any unresolved choices or prerequisites. The preview grants no effect. Select the exact operation and scope through the regular route before continuing.
 
+### Review a registered project profile refresh
+
+Use the `profile-refresh` project route or the installed Setup command `profile-refresh-preview` with the exact `project_id`. The read-only preview reports the verified checkout, current installation generation, changed input paths, anticipated generation and affected runs. A stopped checkpoint still requires ordinary re-admission after refresh.
+
+Use `profile-refresh-apply` with the same project, an exact caller-held `operation_id`, the `expected_preview_sha256` and actual owner `approval`. Supply the owner evidence `kind` and `reference` with `effect: "refresh-project-profile"`. The approval covers one refresh on the reviewed project. Registered area permissions remain in force. A project with an unresolved original runtime or worker handoff requires reconciliation before activation. The original operation receipt binds recovery to the same checkout, installation, inputs and run state. A mismatched preview or identity requires a new review.
+
 ### Review primary delivery and deferred intake
 
 For a combined request, preview `operation: "skill-tree-full-cycle"` with the exact `project_id` and a `full_cycle` object. Supply the caller-held `intake_batch_id`, original ordered `items` and `full_cycle_partition`. Each partition has the original order and names explicit item keys. For intake items named `proxy` and `deployment-check`, the partition can contain `{"primary":["proxy"],"deferred":["deployment-check"]}`.

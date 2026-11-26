@@ -320,7 +320,7 @@ function recover(root,channel='core',observed){
  fs.unlinkSync(c.safe(root,paths.journal));
  // Backups retain one completed generation for explicit reviewed rollback.
 }
-function transaction(root,changes,expected={},beforeActivate=null,channel='core',sealJournal){
+function transaction(root,changes,expected={},beforeActivate=null,channel='core',sealJournal,guardedOperation){
  const {stage,backups,journal}=transactionPaths(channel);
  const plugin=channel==='plugins',tree=rel=>treeHash(root,rel,plugin);
  const staging=c.safe(root,stage),journalPath=c.safe(root,journal);
@@ -344,7 +344,8 @@ function transaction(root,changes,expected={},beforeActivate=null,channel='core'
   if(!entries.length)return;
   if(plugin)verifyPluginBackups(root);
   const metadata=plugin?{}:{project_root:fs.realpathSync(root)};
-  const journalBytes=c.json({schema:1,channel,entries,...metadata});
+  const journalBytes=c.json({schema:1,channel,entries,...metadata,
+   ...(guardedOperation?{guarded_operation:guardedOperation}:{})});
   if(sealJournal){sealJournal(journalBytes);sealed=c.hash(journalBytes);}
   if(fs.existsSync(c.safe(root,backups)))fs.rmSync(c.safe(root,backups),{recursive:true});
   fs.writeFileSync(journalPath,journalBytes);
@@ -393,12 +394,16 @@ function writeSetupReceipt(root,relative,record,exclusive){
   else fs.renameSync(temporary,c.safe(root,relative));
  }finally{fs.rmSync(temporary,{force:true});}
 }
+function setupRequestDigest(kind,scope,layout){
+ const request={kind,scope};
+ return c.hash(c.json(kind==='install'?{...request,workflow_layout:layout}:request));
+}
 function beginSetupOperation(root,setup){
  const id=setup.id??'OP-'+randomUUID();
  if(!setupOperationId.test(id))throw Error('Select an exact setup operation ID');
  const relative=SETUP_OPERATIONS+'/'+id+'.json';
- const scope={kind:setup.kind,scope:setup.scope()};
- const requestFor=layout=>c.hash(c.json(setup.kind==='install'?{...scope,workflow_layout:layout}:scope));
+ const scope=setup.scope();
+ const requestFor=layout=>setupRequestDigest(setup.kind,scope,layout);
  const current=setupObservation(root);
  const retained=setupProofBytes(root,relative,4096);
  if(retained==='unavailable')throw Error('The selected setup operation receipt cannot be read');
@@ -435,7 +440,7 @@ function beginSetupOperation(root,setup){
  }
  if(!previous&&setup.requireOriginalRecovery&&
     (current.core_journal_sha256!==null||current.plugins_journal_sha256!==null))
-  throw Error('Recover the original owned installation operation before compatible refresh');
+  throw Error('Recover the original owned installation operation before guarded refresh');
  const timestamp=new Date().toISOString();
  layout=previous?.workflow_layout??layout;
  const record={schema:1,operation_id:id,kind:setup.kind,request_sha256:requestFor(layout),
@@ -679,15 +684,67 @@ function regenerateAgents(root,source,dryRun=false){
   return {action:'regenerated',changed:[AGENTS_PATH],bridge_sha256:hash};
  },{recoverPending:false,recoverPluginPending:false});
 }
+function installScope(source,flavor,selections,options){
+ return {source:c.sourceInputs(source),flavor,selections,bridges:options.bridges??[],
+  shared_workflow:options.sharedRuntime??'preserve-installed-layout',
+  development_policy:options.developmentPolicy??null,recover_pending:options.recoverPending!==false,
+  recover_plugins:options.recoverPluginPending!==false,
+  ...(options.guardedActivationProof?{guarded_activation_proof:options.guardedActivationProof}:{})};
+}
+
+function guardedInstallOperation(root,source,flavor,selections,options){
+ const id=options.operationId;
+ if(!setupOperationId.test(id)||!options.guardedActivationProof)
+  throw Error('Select the exact guarded installation operation');
+ const raw=setupProofBytes(root,SETUP_OPERATIONS+'/'+id+'.json',4096);
+ if(raw===null)return {receipt:null,journal:null,activated:false};
+ if(!Buffer.isBuffer(raw))throw Error('The original guarded installation receipt is unreadable');
+ const receipt=JSON.parse(raw);
+ if(receipt.schema!==1||receipt.operation_id!==id||receipt.kind!=='install'||
+    !['pending','failed','completed'].includes(receipt.status)||
+    receipt.request_sha256!==setupRequestDigest('install',installScope(source,flavor,selections,options),receipt.workflow_layout??null))
+  throw Error('The installation receipt belongs to another guarded refresh');
+ const current=setupObservation(root);
+ const sealed=receipt.activation_journal_sha256;
+ const verifyJournal=relative=>{
+  const rawJournal=setupProofBytes(root,relative);
+  if(!Buffer.isBuffer(rawJournal)||c.hash(rawJournal)!==sealed)
+   throw Error('The original guarded installation journal changed');
+  const journal=JSON.parse(rawJournal);
+  if(journal.schema!==1||journal.channel!=='core'||journal.project_root!==root||!Array.isArray(journal.entries)||
+     journal.guarded_operation?.id!==id||journal.guarded_operation?.request_sha256!==receipt.request_sha256)
+   throw Error('The original guarded installation journal is invalid');
+  return journal;
+ };
+ if(current.plugins_journal_sha256!==null)throw Error('Recover the original plugin installation separately');
+ if(sealed&&current.core_journal_sha256===sealed&&receipt.status!=='completed'){
+  return {receipt,journal:verifyJournal(transactionPaths().journal),activated:false};
+ }
+ const activated=Boolean(sealed&&current.core_journal_sha256===null&&current.core_last_sha256===sealed&&
+  receipt.before?.core_last_sha256!==sealed);
+ if(activated)verifyJournal(transactionPaths().last);
+ if(receipt.status==='completed'&&(!activated||c.json(current)!==c.json(receipt.observed)))
+  throw Error('The original guarded installation no longer matches its acknowledgement');
+ return {receipt,journal:null,activated};
+}
+
+function guardedMissingDestination(root,operation,relative,before,after){
+ if(!operation.journal)return false;
+ const matches=operation.journal.entries.filter(entry=>entry.dest===relative);
+ if(matches.length!==1)return false;
+ const entry=matches[0];
+ const {backups,stage}=transactionPaths();
+ if(path.posix.dirname(entry.backup??'')!==backups||path.posix.dirname(entry.staged??'')!==stage)return false;
+ const oldBytes=setupProofBytes(root,entry.backup), nextBytes=setupProofBytes(root,entry.staged);
+ return Buffer.isBuffer(oldBytes)&&Buffer.isBuffer(nextBytes)&&c.hash(oldBytes)===before&&
+  c.hash(nextBytes)===after&&treeHash(root,entry.backup)===entry.old&&treeHash(root,entry.staged)===entry.next;
+}
+
 function install(root,source,flavor,selections,options={}){
  if(options.dryRun){const result=plan(root,source,flavor,selections,options);return {profile:result.profile,delta:result.delta,action:'dry-run'};}
  const setup={
   kind:'install',id:options.operationId,sharedWorkflow:options.sharedRuntime,
-  scope:()=>({source:c.sourceInputs(source),flavor,selections,bridges:options.bridges??[],
-   shared_workflow:options.sharedRuntime??'preserve-installed-layout',
-   development_policy:options.developmentPolicy??null,recover_pending:options.recoverPending!==false,
-   recover_plugins:options.recoverPluginPending!==false,
-   ...(options.guardedActivationProof?{guarded_activation_proof:options.guardedActivationProof}:{})}),
+  scope:()=>installScope(source,flavor,selections,options),
   requireOriginalRecovery:Boolean(options.guardedActivationProof),
   replay:sharedRuntime=>{
    if(options.verifyActivationReplay)return options.verifyActivationReplay();
@@ -707,7 +764,8 @@ function install(root,source,flavor,selections,options={}){
    const current=c.resolveProfile(source,root,flavor,planned);
    if(current.environment_id!==result.profile.environment_id)throw Error('Project inputs changed during profile staging; refresh from current inputs');
    options.guardPlan?.(result);
-  },'core',session?(journalBytes)=>sealSetupActivation(root,session,journalBytes):undefined);
+  },'core',session?(journalBytes)=>sealSetupActivation(root,session,journalBytes):undefined,
+    session&&options.guardedActivationProof?{id:session.id,request_sha256:session.record.request_sha256}:undefined);
   try{verify(root,source);}catch(error){
    if(result.delta.length){try{restoreGeneration(root);}catch(recovery){throw Error('Profile verification failed; preserved generation backups require conflict review: '+error.message+'; '+recovery.message);}}
    throw error;
@@ -1004,21 +1062,6 @@ function maintainCompatibleWorktreeProfile(root,request,mode){
  const sourceSha=()=>c.hash(c.json(c.sourceInputs(source)));
  const actual=result=>({profile_sha256:c.hash(setupProofBytes(worktree,PROFILE)),
   identity:result.identity,environment_id:result.environment_id});
- const guardContext=()=>{
-  const verified=context();
-  if(c.json(verified.input)!==c.json(input))throw Error('The compatible worktree input changed');
-  if(sourceSha()!==request.plan.source_sha256||
-     c.resolveProfile(source,worktree,request.plan.install.flavor).environment_id!==request.plan.after.environment_id)
-   throw Error('The prepared worktree discovery inputs or owned source changed');
- };
- const verifyAfter=()=>{
-  guardContext();
-  const profile=verify(worktree,source);
-  if(c.json(actual(profile))!==c.json(request.plan.after)||profile.inputs['package.json']!==input.after)
-   throw Error('The installed worktree profile differs from the anticipated generation');
-  return {profile,delta:[],action:'verified compatible worktree profile'};
- };
- if(mode==='verify')return actual(verifyAfter().profile);
  if(mode==='preview'){
   const previous=receipt(worktree,true);
   const selections=Object.entries(previous.destinations).map(([rel,row])=>({rel,provider:row.provider,name:row.name}));
@@ -1030,6 +1073,32 @@ function maintainCompatibleWorktreeProfile(root,request,mode){
  }
  const {before,after:next,input:inputName,changed_fields:fields,install:scope}=request.plan;
  const proof={before,after:next,input:inputName,changed_fields:fields};
+ const options={bridges:scope.bridges,recoverPluginPending:false,operationId:request.operation_id,
+  guardedActivationProof:request.plan};
+ const guardContext=()=>{
+  const verified=context();
+  if(c.json(verified.input)!==c.json(input))throw Error('The compatible worktree input changed');
+  if(sourceSha()!==request.plan.source_sha256||
+     c.resolveProfile(source,worktree,request.plan.install.flavor).environment_id!==request.plan.after.environment_id)
+   throw Error('The prepared worktree discovery inputs or owned source changed');
+  if(setupProofBytes(root,'.skill-tree/.transaction.json')!==null)
+   throw Error('Reconcile the original Core workflow transaction before worktree refresh');
+  const operation=guardedInstallOperation(worktree,source,scope.flavor,scope.selections,options);
+  const current=setupObservation(worktree).profile_sha256;
+  if(current!==before.profile_sha256&&
+     !(current===next.profile_sha256&&(operation.activated||operation.journal))&&
+     !(current===null&&guardedMissingDestination(worktree,operation,PROFILE,before.profile_sha256,next.profile_sha256)))
+   throw Error('The original compatible worktree installation generation changed');
+  return operation;
+ };
+ const verifyAfter=()=>{
+  if(!guardContext().activated)throw Error('The original compatible worktree refresh has no acknowledged activation');
+  const profile=verify(worktree,source);
+  if(c.json(actual(profile))!==c.json(request.plan.after)||profile.inputs['package.json']!==input.after)
+   throw Error('The installed worktree profile differs from the anticipated generation');
+  return {profile,delta:[],action:'verified compatible worktree profile'};
+ };
+ if(mode==='verify')return actual(verifyAfter().profile);
  const guard=result=>{
   guardContext();
   if(c.hash(setupProofBytes(worktree,PROFILE))===request.plan.after.profile_sha256){
@@ -1040,8 +1109,7 @@ function maintainCompatibleWorktreeProfile(root,request,mode){
   if(c.json(compatibleProfilePlan(worktree,request.profile_sha256,input,result))!==c.json(proof))
    throw Error('The prepared compatible worktree profile changed');
  };
- const installed=install(worktree,source,scope.flavor,scope.selections,{bridges:scope.bridges,recoverPluginPending:false,
-  operationId:request.operation_id,guardedActivationProof:request.plan,
+ const installed=install(worktree,source,scope.flavor,scope.selections,{...options,
   verifyActivationReplay:verifyAfter,beforeActivationRecovery:guardContext,guardPlan:guard});
  return {profile:actual(installed.profile),operation_id:installed.operation_id};
 }
@@ -1167,4 +1235,4 @@ function localMain(root,source,args){
   const result=refresh(root,source,args.includes('--dry-run'));console.log(c.json({action:result.action,changed:result.delta,facts:result.profile.facts,gaps:result.profile.gaps,operation_id:result.operation_id}));return 0;
  }catch(error){console.error(error.message);if(error.operation_id)console.error('Setup operation '+error.operation_id);return 2;}
 }
-module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,readHookRecords,pendingHookOperation,stoppedWorkflow,plan,install,initialWorktreeProfile,verify,verifyTaskGroupingProfile,uninstall,refresh,maintainDeliveredProfile,maintainCompatibleWorktreeProfile,rollback,rebind,localMain,updateDevelopmentPolicy};
+module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,readHookRecords,pendingHookOperation,stoppedWorkflow,plan,install,guardedInstallOperation,guardedMissingDestination,initialWorktreeProfile,verify,verifyTaskGroupingProfile,uninstall,refresh,maintainDeliveredProfile,maintainCompatibleWorktreeProfile,rollback,rebind,localMain,updateDevelopmentPolicy};

@@ -1,0 +1,16 @@
+{
+  "task_id": "T-c5f30026-1a03-4b0c-ab0c-921bf2fd5c38",
+  "sources": {
+    ".skill-tree/common/references/director-workflow.md": "d573306865ad5cb84189f9ca410cfbbfb9f9cf0a63682b42917a3976af17b952",
+    ".skill-tree/common/scripts/workflow-state.py": "c167078b28047b6805203282c56b53ba6badf907759bb171794fb837acf17ba8",
+    ".skill-tree/skill-tree.json": "111dc3149b031b13b348cb097a235a1b568c3e7ccf887f38d662ce2939e2b3b7"
+  },
+  "checks_sha256": "15824b29a038d13cc0b91d1dac6c20d508d40fbf6f070b9b7770f3afe5909f8c",
+  "reviewer": "/root/director_resolver",
+  "status": "accepted",
+  "observations": [
+    "Independently verified the three exact source hashes and current manifest pins for the Core and Director dispatch, run, state and routing.",
+    "The installed Setup copies of both changed runtime sources match authored bytes. The explicit profile refresh route preserves the existing external task route and its original dispatch, admission and replay scope.",
+    "Current canonical P-ID inputs, dependency edges, frozen metadata, exact acknowledgement and replay remain covered by the fourteen passing topology controls."
+  ]
+}
