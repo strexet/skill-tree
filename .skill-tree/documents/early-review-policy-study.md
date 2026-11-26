@@ -1,0 +1,62 @@
+# Early Review Policy Study
+
+The proposed policy classifies the timing of independent review. A shadow pilot can evaluate the classifications while the current review and acceptance gates govern every execution.
+
+## Current gates
+
+| Entry point | Task boundary | Integrated boundary |
+| --- | --- | --- |
+| Implement All | The controller freezes the initial scope. The leaf accepts a current plan, executes immediate and dependency-bound checks and supplies independent review for the sealed scoped commit. Downstream admission checks completed prerequisite evidence and current integration. | The controller validates all required completed contracts and independently reviews the complete committed candidate against the exact local launch before local merge. |
+| Work Through Next | The controller admits one root and required dependencies. The same sealed task review and current prerequisite gates apply. | The controller reviews the combined committed result for the exact root and closure. Reviewed delivery defaults to review-ready. Local merge requires the recorded authorization. |
+| Full Cycle | A native wave verifies each independent worker and checked incorporation. The coordinator retains the leaf check and review obligations. The legacy combined route documents leaf review and validation and does not require the same scoped Git commit for every leaf. | One combined PR review and fix cycle verifies the current head and required checks. Provider merge verifies the exact target and existing owner authorization. |
+| Standalone Implement Next | The scoped Git entry point requires a current accepted task review before the scoped commit and completion. | The ordinary result is the accepted task commit. Any requested PR delivery has a separate review and authorization boundary. |
+| Partial Implement All delivery | Partial closeout preserves accepted outcomes and retains unfinished work. | Optional delivery independently reviews an exact clean partial candidate against the target with current evidence. Unaccepted work cannot enter the delivery scope. |
+
+The installed general, Web and Unity workflows share the inspected Core review implementation. Flavor and project profiles select different validation lanes. Browser, Editor and device requirements keep the relevant execution-session and owner gates. Shared code does not establish that every installed profile exposes the same check or runtime capability. [Governance](../common/references/decision-governance.md) · [Run workspaces](../common/references/run-workspaces.md) · [Full Cycle](../common/references/full-cycle.md) · [Core controller](../common/scripts/workflow-state.py)
+
+Plan acceptance establishes the bounded intended work. Check execution establishes an observed assertion. A current independent review examines the sealed result and can reuse evidence only when the check contract, inputs, execution environment and artifacts still match. Findings attach to a candidate. A substantive fix needs current evidence and re-review. Plan actors and check receipts cannot supply the review verdict. [Validation policy](../common/references/validation-policy.md) · [Phase implementation](../common/scripts/decision-orchestration.py)
+
+## Proposed decision rule
+
+Classify each task before implementation using the active entry point and expected affected behavior. Reassess against the actual diff before dependent execution, acceptance or an affected external operation. An affirmative trigger requires independent early review on the exact changed scope.
+
+| Trigger | Evidence for early review |
+| --- | --- |
+| Authority | Changed access, eligible actors, owner consent scope or lifetime, stop resolution, acceptance, validation trust, or authority to deliver. |
+| Shared state or effect | Possible write to another task, run, checkout, branch, PR, shared resource or external system. Include uncertain writes, retries, interruption, partial effects and discarded artifacts. |
+| Downstream consumption | A consumer before final review relies on a changed interface, instruction, decision, receipt or output. Include Markdown read as workflow guidance and a read result that selects an eventual write target. |
+| Failure visibility or recovery | A material failure can appear successful, go unobserved, suppress a required stop, lose evidence or changes, or require expensive or uncertain repair. |
+
+Deferral has affirmative evidence only when the task has a bounded candidate and identified consumers, no trigger applies, the plausible failure has a matching focused check or verifiable static assertion, and all subsequent actions through final review can safely wait for independent review. Record the task and candidate identity, affected behavior and consumers, relevant triggers and rationale, adverse case and evidence reference, and the next allowed action. Diff size, extension and task label supply insufficient evidence for deferral. Successful happy-path testing cannot answer an unresolved failure or authority question.
+
+The executor proposes timing and records evidence. The coordinator verifies candidate scope and affected consumers. For material ambiguity, an independent reviewer checks the disputed claim. Unresolved risk, disagreement, incomplete evidence or an unavailable required reviewer keeps early review pending. Auto uses the existing resolver, critic and arbiter roles within the owner grant. Manual decisions stay with the owner. An owner decision cannot silently bypass required runtime or delivery evidence. Related risky diffs may share an early review only when the reviewer can bind every exact candidate and obligation before any consumer relies on the changes.
+
+Reassess after a source, consumer, dependency order, ref, profile, evidence or potential effect changes. Reopen the classification and affected checks on the current candidate. Pause an already started consumer at the earliest safe boundary, preserve working state and evidence, identify the observed effects, and restore the relevant review and check gates before resuming. Preserve current fixes and re-review rules. Partial closeout may archive unfinished work. Partial delivery includes only exact accepted and currently reviewed scope.
+
+## Worked cases
+
+| Case | Current review placement | Final-only exposure | Proposed placement |
+| --- | --- | --- | --- |
+| Consent from one Pending task attaches to a different task or survives a changed request | Leaf and final | A wrong grant can open a dependent action before review | Early on authority and exact provenance. Cover unauthorized and changed requests. |
+| Git branch changes between check and patch application at the same SHA | Leaf and final | The operation can write to a different branch despite a matching commit | Early on worktree, branch and process identity. |
+| A failed worker keeps a slot or releases a resource while the process remains alive | Leaf and final | Later workers can hang or acquire a resource prematurely | Early on process observation, interrupted recovery and shared leases. |
+| Approved Playwright changes clear a separate Web stop | Leaf and final | A stopped run can resume across an unrelated boundary | Early on consent scope and retained stop handling. |
+| Stale or superseded evidence qualifies normal acceptance | Leaf and final | A later task can consume an obsolete passing result | Early on acceptance evidence, exact attempt and drift rules. |
+| An existing PR read only displays independently rechecked metadata | Leaf and final in the observed flow | Recheck of destination still governs the write | Deferral is eligible with bounded read scope and positive proof of the later destination check. |
+| An existing PR read selects the destination for an automatic provider write | Leaf and final | A wrong destination can cross into delivery | Early on the effect of the selected data, including a pagination or drift case. |
+| Combined wave recovery lacks the exact checked HEAD guard | Final review found the concrete defect | A mismatch can survive separate reviews of individual edits | Early for the wave recovery behavior and keep final combined review. |
+| Routine editorial document or an isolated behavior change with a matching regression | Leaf and final for scoped tasks | Waiting is safe with known consumers, no earlier governed action and credible failures covered by current evidence | Deferral is eligible with known readers, proportionate static or focused evidence and no earlier effect. Workflow instructions can trigger early review. |
+| A deferred task widens scope, changes a ref or acquires a dependent consumer | Requalification under current gates | Previous assumptions become stale before delivery | Reclassify immediately and require early review for the affected scope. |
+| A running downstream worker already read an earlier check receipt and prepared a write when a new revision invalidates the receipt | Current dependency and review gates require evidence for the changed input | Old output can drive a real write before final review | Pause the worker before the write or reconcile any observed write. Preserve the original receipt, prepared operation and observed effects. Invalidate the stale result and require current checks and independent re-review before the worker resumes. |
+| A single task has no separate final review step | Task review is the current independent final boundary | No later review exists to cover a deferral | Use the single current independent review after checks. Review earlier if a trigger precedes the ordinary task review. |
+| Partial finish requested before review closes | Only verified accepted work can enter reviewed delivery | Unaccepted work can be shipped if provisional status leaks across the boundary | Retain the unfinished task and require exact independent review for the accepted partial candidate. |
+
+The project history for run `WR-8c97c22a-1e66-4ca3-b6e7-5bbc31fe9544` and final review `DO-074cde8f-fe42-592f-8a5b-066ade498929` records 159 tests across five checks and the reviewed merge into develop. Commit `0087a3f5` records the exact HEAD correction. The run did not observe a final-only counterfactual. The two focused wave controls took 36.298 seconds. The initial accepted topology suite took 905.209 seconds and covered more cases. The 55-test PR handoff receipt later became stale after the mapped Full Cycle instructions changed. The run does not show which repeated checks a different review policy would have avoided. The false failure on trailing metrics and shared-input receipt invalidation are check-cost observations and should remain separate from review-cost estimates. [Topology evidence](../run-evidence/wr-8c97c22a-1e66-4ca3-b6e7-5bbc31fe9544/resumed-final-2-behavior.log)
+
+## Pilot and adoption boundary
+
+The status quo retains every task review and the integrated review. A final-only mode would defer risk across dependency and side-effect boundaries. The proposed selective mode keeps early review for the four triggers and applies the same independent integrated review to the full candidate. Compare all three classifications against the same historical inputs or an eligible shadow cohort. Record observed checks and reviews separately from estimates. A shadow classification grants no permission to change task completion, dependency admission, partial delivery or merge.
+
+A future runtime change would need a durable provisional state with exact task, candidate, evidence and dependency bindings. Provisional work may support reversible implementation only inside a scope explicitly allowed by the adopted policy. Accepted completion, downstream eligibility and delivery must measure current independent review and required evidence. A failing, ambiguous or stale proof keeps the transition pending. Tests would need to prove that partial delivery, restart recovery and standalone paths cannot treat a provisional result as accepted.
+
+Questions for adoption include the minimum useful decision evidence, reviewer availability and escalation, which low-risk scopes benefit from batching, and how to handle a late risk reclassification or final finding. Decide whether documented guidance is sufficient after the pilot, or whether controller changes warrant dedicated approval and compatibility tests. Preserve an explicit stop for high-impact misclassification or released unreviewed material work, and preserve exact current checkpoints across any rollout.

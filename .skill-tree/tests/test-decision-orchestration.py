@@ -6,6 +6,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 CORE=Path(__file__).resolve().parents[1]
@@ -60,6 +61,38 @@ class OrchestrationTests(unittest.TestCase):
 
     def test_api_is_runnable(self):
         for name in ['start','read','next_action','mutate','timing_timeline']:self.assertTrue(callable(getattr(flow,name)))
+
+    def test_core_handoff_requires_the_exact_task_and_accepted_check_ids(self):
+        task_id = wf.identity('T')
+        run_id = wf.identity('WR')
+        context = {'kind':'task','id':'task-scope:'+task_id,'task_ids':[task_id],
+                   'semantic_fingerprint':sha('one admitted task'),
+                   'content_fingerprint':sha('one body')}
+        run = {'current_task_id':task_id,'delivery':{'authorization':{'pr':True}}}
+        store = SimpleNamespace(run_id=run_id,source_root='canonical')
+        def project():
+            store.source_root = 'linked'
+            return {'active_run':run}
+        store.load = project
+        brief = {'task_id':task_id,'run_id':run_id,'semantic_fingerprint':context['semantic_fingerprint'],
+                 'content_fingerprint':context['content_fingerprint'],'checks':[{'check_id':'unit'}]}
+        frame = {'context':context,'phase':'implement','execution_snapshot':{'checkout':'linked'},
+                 'plan':{'required_checks':['unit']}}
+        helper = SimpleNamespace(read=lambda *_:frame, next_action=lambda *_:{'phase':'implement','action':'phase'},
+                                 OrchestrationError=ValueError)
+        request = {'orchestration_id':wf.identity('DO')}
+        with (patch.object(wf,'owned_module',return_value=helper),
+              patch.object(wf,'orchestration_execution_snapshot',side_effect=lambda current:{'checkout':current.source_root}),
+              patch.object(wf,'decision_context_guard'),
+              patch.object(wf,'next_task',return_value={'worker_brief':brief}) as handoff):
+            self.assertEqual(wf.orchestration_action(store,'orchestration-next',request)['worker_brief'],brief)
+            frame['plan']['required_checks']=['foreign']
+            blocked = wf.orchestration_action(store,'orchestration-next',request)
+            self.assertEqual(blocked['action'],'prerequisite')
+            self.assertNotIn('worker_brief',blocked)
+            run['current_task_id']=wf.identity('T')
+            self.assertNotIn('worker_brief',wf.orchestration_action(store,'orchestration-next',request))
+            self.assertEqual(handoff.call_count,2)
 
     def test_timing_distinguishes_review_and_pending_actor_wait_from_host_work(self):
         instants=[f'2026-11-25T12:00:{second:02d}+00:00' for second in range(20)]

@@ -16,6 +16,20 @@ Establish intended behavior, relevant baseline and boundary/failure cases. Execu
 
 Focused behavioral checks remain immediate. Grouping delays only compatible additional integration, rendering or platform qualification. Dependencies retain verified completion semantics through the single `depends_on` graph. Check grouping feasibility before execution; validate upstream work early when a verified dependency requires the result.
 
+## Full Cycle worker briefs
+
+Give the executor the current `worker_brief` from the implementation handoff. The brief binds the selected run, task fingerprints, checkout and admitted profile. The coordinator prepares the exact attempt before the worker executes an entry marked `focused-command`. Compare the prepared argument vector and checkout with the brief. Return the check evidence to the coordinator for recording. A `pending-attempt` entry directs the coordinator to reconcile the original attempt before any new execution. The brief supplies no execution-session, resource or acceptance receipt.
+
+The coordinator owns checks deferred by timing, checks without an executable command and product lanes with execution-session and resource requirements. Keep required immediate and dependency-bound checks at the existing validation boundaries. Resolve a reported prerequisite before executing the affected check.
+
+A project recipe in `.skill-tree/validation-recipes.json` can declare `"delivery_validation": {"path": "final-suite.json", "check_id": "full-suite"}`. The tagged recipe uses the same literal `argv` as the named check in the declared PR suite. The owned profile fingerprints the suite file. Keep delivery-only recipes outside leaf Acceptance mappings. The leaf preflight reports the required phase and the leaf writer refuses preparation. Pass the linked path as the publication's final suite declaration and prepare the named suite through `final-validation` on the current reviewed PR candidate.
+
+## Shared policy evidence
+
+Implementation and current review handoffs include the shared invariants relevant to the selected task or check. Inspect both allowed and forbidden cases for each named transition against the stated rule. Relevant check keys bind the invariant, case mappings and source or owner evidence. A changed policy definition requires current evidence even when the check IDs stay the same.
+
+Task revisions preserve required invariant identities and mappings. A change to the rule requires current policy evidence and ordinary clarification before implementation continues. Editorial changes preserve the policy contract. Completion retains the rule, transition mappings and evidence with the accepted check results after removing the task from the queue.
+
 ## Launch and evidence
 
 Select the smallest sufficient lane from the unverified assertion. Documentation and metadata use static/temporary-fixture checks. Pure logic uses focused unit checks. Rendering, input, accessibility, lifecycle, native and device assertions require the matching lane. A launch records exact task/check IDs, assertion, cheaper-evidence insufficiency, source/test/environment identity, authorization, hard deadline and cleanup reserve. Reuse compatible owned processes when scope permits; process availability never proves current acceptance.
@@ -34,7 +48,13 @@ A pending attempt blocks acceptance even when an earlier result passes or the cu
 
 An owned static or unit runner can retain the finished result before leaving the original native process group. After coordinator interruption, `reconcile-check` can recover the result using the exact receipt digest, the current check and evidence, and verified absence of the original group. Verified cleanup can close a native local attempt with an unavailable result so the current check can retry.
 
+Use installed `run-check` for one current local static or unit check with a resolved argument vector and an explicit bounded execution request. Revalidation uses the same exact runner path and the existing `accept-revalidation` gate. Check results with missing test discovery, changed inputs or uncertain cleanup require the recorded prerequisite or reconciliation.
+
+For unittest, native and reviewed current-target execution require a successful process exit and one nonempty count with the adjacent bare OK verdict. Ordinary output and metrics surrounding the completion block remain in the retained report. A missing, conflicting, skipped or ambiguous summary cannot establish a pass. A recognized unsuccessful unittest report cannot qualify through an unrelated TAP summary. Retain the original check and execution evidence for reconciliation.
+
 ## Final run evidence
+
+A declared local delivery suite belongs to the PR final validation phase. Leaf task completion requires all mapped immediate and dependency-bound checks. Run focused regressions during review fixes. Bind final suite results to the reviewed candidate and preserve required provider checks at readiness and merge.
 
 Review can reuse an executed check receipt when the current check contract, relevant source and test inputs, recipe, execution environment and evidence remain verified for the exact review candidate. Reviewers retain independent responsibility for the candidate and current findings. An unavailable artifact, changed input, outstanding execution or a fresh-check requirement retains the corresponding validation obligation. After reuse becomes invalid, execute the required check and use a current review frame for the new evidence.
 

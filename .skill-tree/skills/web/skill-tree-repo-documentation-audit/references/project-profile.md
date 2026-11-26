@@ -40,7 +40,7 @@ Flavor: web. Static compatibility only; execution remains unqualified.
       "lane": "static"
     }
   },
-  "source_version": "0.9.0",
+  "source_version": "0.10.0",
   "worktree_environment": {
     "exclusive_resources": [],
     "isolated_directories": [],

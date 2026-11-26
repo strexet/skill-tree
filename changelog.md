@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.10.0 (2026-11-27)
+
+### Added
+
+- Full Cycle can run independent tasks in isolated worktrees and incorporate checked worker results through the coordinator.
+- The owned `run-check` command executes and reconciles supported focused static and unit checks, including completed-contract revalidation.
+- A guarded handoff prepares verification inputs for continued work on an existing PR.
+- The proposed early-review decision matrix documents risk triggers and deferral evidence for a future pilot under the current review gates.
+
+### Changed
+
+- Task workers receive exact focused check commands. Declared full suites run on the reviewed final PR candidate, with focused regressions during fixes.
+- Shared policy invariants bind task contracts, acceptance checks and review evidence.
+
+### Fixed
+
+- A stopped Web run can re-admit an approved Playwright change while preserving independent stops.
+- Unittest evidence accepts a coherent passing completion followed by metrics and rejects conflicting, skipped or incomplete reports.
+- Wave recovery binds the captured Git head and retains exact worktree and resource ownership.
+
 ## 0.9.0 (2026-11-26)
 
 ### Added

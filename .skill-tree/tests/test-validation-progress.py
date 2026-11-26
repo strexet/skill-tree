@@ -13,6 +13,342 @@ CORE=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('wf_progress',CORE/'common/scripts/workflow-state.py');wf=importlib.util.module_from_spec(spec);spec.loader.exec_module(wf)
 
 class ValidationProgressTests(unittest.TestCase):
+    def local_runner_fixture(self, lane='static', *, program=None):
+        config=self.store.base/'config/repository.json'
+        config.write_text(json.dumps({'schema':1,'role':'source','recipes':{
+            'fixture-runner':{'lane':lane,'argv':['python3','verify-runner.py'],'input_paths':['verify-runner.py']},
+        }}))
+        (self.root/'verify-runner.py').write_text(program or (
+            "from pathlib import Path\n"
+            "with Path('runner-invocations').open('a') as stream: stream.write('run\\n')\n"
+            "assert 'value = ' in Path('source.py').read_text()\n"
+        ))
+        return 'fixture-runner'
+
+    def local_runner_request(self,tid,**extra):
+        return {'task_id':tid,'check_id':'behavior','action':'run',
+                'authorization':'Execute the selected disposable local check.',
+                'deadline_utc':(datetime.now(timezone.utc)+timedelta(seconds=25)).isoformat(),
+                'cleanup_seconds':3,**extra}
+
+    def test_installed_runner_reconciles_after_coordinator_ack_loss_without_relaunch(self):
+        tid=self.task(recipe=self.local_runner_fixture())
+        self.review_candidate(tid,controller=True,record_result=False)
+        request=self.local_runner_request(tid)
+        inspect={key:request[key] for key in ('task_id','check_id')}
+        state=self.store.state.read_bytes()
+        self.assertEqual(wf.run_check(self.store,{**inspect,'action':'inspect'})['status'],'due')
+        self.assertEqual(self.store.state.read_bytes(),state)
+        original=wf.reconcile_check
+        def interrupt_after_retention(store,payload):
+            if payload['action']=='recover-result':
+                raise wf.WorkflowError('Lost coordinator acknowledgement')
+            return original(store,payload)
+        with patch.object(wf,'reconcile_check',side_effect=interrupt_after_retention):
+            with self.assertRaisesRegex(wf.WorkflowError,'Lost coordinator acknowledgement'):
+                wf.run_check(self.store,request)
+        observation=wf.run_check(self.store,{**inspect,'action':'inspect'})
+        self.assertEqual(observation['status'],'reconciliation-required')
+        original_attempt=observation['attempt_id']
+        self.assertIn('runner_result',observation['observation'])
+        result=wf.run_check(self.store,{**inspect,'action':'reconcile','attempt_id':original_attempt})
+        self.assertEqual(result['record']['attempt_id'],original_attempt)
+        self.assertEqual(result['record']['result'],'pass')
+        self.assertEqual(wf.run_check(self.store,request)['record'],result['record'])
+        self.assertEqual((self.store.source_root/'runner-invocations').read_text(),'run\n')
+
+    def test_native_runner_reconciles_retained_result_after_launch_only_drift(self):
+        import os
+        import shlex
+
+        recipe=self.local_runner_fixture()
+        binary=self.root/'fixture-runner-executable'
+        binary.write_text('#!/bin/sh\nexec '+shlex.quote(sys.executable)+' "$@"\n')
+        binary.chmod(0o700)
+        config=self.store.base/'config/repository.json'
+        metadata=json.loads(config.read_text())
+        metadata['recipes'][recipe]['argv'][0]=str(binary)
+        config.write_text(json.dumps(metadata))
+        tid=self.task(recipe=recipe)
+        self.review_candidate(tid,controller=True,record_result=False)
+        selection={'task_id':tid,'check_id':'behavior'}
+        original=wf.reconcile_check
+
+        def lose_coordinator_ack(store,payload):
+            if payload['action']=='recover-result':
+                raise wf.WorkflowError('Lost coordinator acknowledgement')
+            return original(store,payload)
+
+        with patch.object(wf,'reconcile_check',side_effect=lose_coordinator_ack):
+            with self.assertRaisesRegex(wf.WorkflowError,'Lost coordinator acknowledgement'):
+                wf.run_check(self.store,self.local_runner_request(tid))
+        inspect={**selection,'action':'inspect'}
+        initial=wf.run_check(self.store,inspect)['observation']
+        retained=initial['runner_result']
+        state=self.store.state.read_bytes()
+        self.assertFalse(initial['stale'])
+
+        with patch.dict(os.environ,{'PATH':os.environ.get('PATH',os.defpath)+os.pathsep+str(self.root/'unused-bin')}):
+            drift=wf.run_check(self.store,inspect)['observation']
+            self.assertTrue(drift['stale'])
+            self.assertEqual(drift['observed']['key'],initial['expected_key'])
+            self.assertEqual(drift['runner_result'],retained)
+            self.assertNotEqual(drift['observed']['local_launch']['runner_environment_sha256'],
+                                initial['observed']['local_launch']['runner_environment_sha256'])
+            self.assertEqual(self.store.state.read_bytes(),state)
+
+        binary.write_text(binary.read_text()+'# replacement bytes\n')
+        drift=wf.run_check(self.store,inspect)['observation']
+        self.assertTrue(drift['stale'])
+        self.assertEqual(drift['observed']['key'],initial['expected_key'])
+        self.assertEqual(drift['observed']['local_launch']['executable_sha256'],wf.file_hash(binary))
+        self.assertEqual(drift['runner_result'],retained)
+        reconciled=wf.run_check(self.store,{**selection,'action':'reconcile','attempt_id':initial['attempt_id']})
+        self.assertEqual(reconciled['status'],'cancelled-no-result')
+        self.assertEqual(reconciled['receipt']['observed'],drift['observed'])
+        self.assertEqual(reconciled['receipt']['cancellation_reason'],'source-or-check-drift')
+        self.assertEqual(wf.file_hash(self.store.root/retained['path']),retained['sha256'])
+        slot=self.store.load()['task_progress'][tid]['checks']['behavior']
+        self.assertNotIn('result',slot)
+        self.assertEqual((self.store.source_root/'runner-invocations').read_text(),'run\n')
+
+    def test_native_runner_denies_unrelated_and_runtime_launches(self):
+        tid=self.task('Browser path',recipe=self.local_runner_fixture('browser'))
+        outside=self.task('Unrelated local task')
+        self.review_candidate(tid,controller=True,record_result=False)
+        before=self.store.state.read_bytes()
+        with self.assertRaisesRegex(wf.WorkflowError,'outside'):
+            wf.run_check(self.store,self.local_runner_request(outside))
+        result=wf.run_check(self.store,self.local_runner_request(tid))
+        self.assertEqual(result['status'],'explicit-execution-required')
+        self.assertIn('session_identity',result['requirements']['execution']['fields'])
+        self.assertEqual(self.store.state.read_bytes(),before)
+        self.assertFalse((self.store.source_root/'runner-invocations').exists())
+
+    def test_native_runner_refuses_inspected_input_drift_before_binding(self):
+        tid=self.task(recipe=self.local_runner_fixture())
+        self.review_candidate(tid,controller=True,record_result=False)
+        scope={'task_id':tid,'check_id':'behavior'}
+        inspect=wf.run_check(self.store,{**scope,'action':'inspect'})
+        self.assertEqual(inspect['status'],'due')
+        (self.store.source_root/'source.py').write_text('value = 3\n')
+        before=self.store.state.read_bytes()
+        with self.assertRaisesRegex(wf.WorkflowError,'inputs changed before launch'):
+            wf.run_check(self.store,self.local_runner_request(tid,expected_launch_sha256=inspect['launch_sha256']))
+        self.assertEqual(self.store.state.read_bytes(),before)
+        self.assertFalse((self.store.source_root/'runner-invocations').exists())
+
+    def test_native_runner_cancels_only_after_its_timed_out_group_departs(self):
+        import time
+
+        recipe=self.local_runner_fixture(program=(
+            "from pathlib import Path\n"
+            "import time\n"
+            "Path('runner-invocations').write_text('started\\n')\n"
+            "time.sleep(30)\n"
+        ))
+        tid=self.task(recipe=recipe)
+        self.review_candidate(tid,controller=True,record_result=False)
+        request=self.local_runner_request(tid,cleanup_seconds=2,
+            deadline_utc=(datetime.now(timezone.utc)+timedelta(seconds=8)).isoformat())
+        result=wf.run_check(self.store,request)
+        self.assertEqual(result['status'],'reconciliation-required')
+        self.assertEqual((self.store.source_root/'runner-invocations').read_text(),'started\n')
+        request={'task_id':tid,'check_id':'behavior','action':'reconcile','attempt_id':result['attempt_id']}
+        expires=time.monotonic()+4
+        while True:
+            cancelled=wf.run_check(self.store,request)
+            if cancelled['status']!='reconciliation-required' or time.monotonic()>=expires:break
+            time.sleep(0.05)
+        self.assertEqual(cancelled['status'],'cancelled-no-result',cancelled)
+        self.assertEqual(cancelled['receipt']['cancellation_reason'],'local-result-unavailable')
+        replay=wf.run_check(self.store,request)
+        self.assertTrue(replay['replayed'])
+        self.assertEqual(replay['receipt'],cancelled['receipt'])
+
+    def test_native_runner_retries_only_the_explicit_unsuccessful_receipt(self):
+        recipe=self.local_runner_fixture(program=(
+            "from pathlib import Path\n"
+            "path=Path('runner-invocations')\n"
+            "prior=path.exists()\n"
+            "with path.open('a') as stream: stream.write('run\\n')\n"
+            "raise SystemExit(0 if prior else 1)\n"
+        ))
+        tid=self.task(recipe=recipe)
+        self.review_candidate(tid,controller=True,record_result=False)
+        request=self.local_runner_request(tid)
+        first=wf.run_check(self.store,request)['record']
+        self.assertEqual(first['result'],'fail')
+        self.assertEqual(wf.run_check(self.store,request)['record'],first)
+        result=wf.run_check(self.store,{**request,'retry_attempt_id':first['attempt_id']})
+        self.assertEqual(result['record']['result'],'pass')
+        self.assertNotEqual(result['record']['attempt_id'],first['attempt_id'])
+        replay=wf.run_check(self.store,{'task_id':tid,'check_id':'behavior','action':'reconcile',
+                                       'attempt_id':first['attempt_id']})
+        self.assertEqual(replay['record'],first)
+        self.assertTrue(replay['historical'])
+        import os
+        with patch.dict(os.environ,{'PATH':os.environ.get('PATH',os.defpath)+os.pathsep+str(self.root/'unused-bin')}):
+            inspected=wf.run_check(self.store,{'task_id':tid,'check_id':'behavior','action':'inspect'})
+            self.assertEqual(inspected['status'],'due')
+            archived=wf.run_check(self.store,{'task_id':tid,'check_id':'behavior','action':'reconcile',
+                                             'attempt_id':result['record']['attempt_id']})
+            self.assertEqual(archived['record'],result['record'])
+            self.assertTrue(archived['historical'])
+        self.assertEqual((self.store.source_root/'runner-invocations').read_text(),'run\nrun\n')
+
+    def test_local_runner_tool_drift_blocks_current_task_and_review_gates(self):
+        import shlex
+
+        recipe=self.local_runner_fixture()
+        binary=self.root/'fixture-current-check-executable'
+        binary.write_text('#!/bin/sh\nexec '+shlex.quote(sys.executable)+' "$@"\n')
+        binary.chmod(0o700)
+        config=self.store.base/'config/repository.json'
+        metadata=json.loads(config.read_text())
+        metadata['recipes'][recipe]['argv'][0]=str(binary)
+        config.write_text(json.dumps(metadata))
+        tid=self.task(recipe=recipe)
+        identity,_=self.review_candidate(tid,controller=True,record_result=False)
+        record=wf.run_check(self.store,self.local_runner_request(tid))['record']
+        scope={'kind':'task','task_ids':[tid]}
+        self.assertEqual(wf.validate_task_checks(self.store,tid)[0]['result'],record)
+        self.assertEqual(wf.review_check_evidence(self.store,identity,scope)[0]['status'],'reusable')
+
+        state=self.store.state.read_bytes()
+        old_binary=binary.read_bytes()
+        binary.write_bytes(old_binary+b'# changed execution input\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'Local check runner.*changed'):
+            wf.validate_task_checks(self.store,tid)
+        review=wf.review_check_evidence(self.store,identity,scope)[0]
+        self.assertEqual(review['status'],'rerun-required')
+        self.assertRegex(review['reason'],'Local check runner.*changed')
+        replay=wf.run_check(self.store,{'task_id':tid,'check_id':'behavior','action':'reconcile',
+                                       'attempt_id':record['attempt_id']})
+        self.assertTrue(replay['historical'])
+        self.assertEqual(replay['record'],record)
+        self.assertEqual(self.store.state.read_bytes(),state)
+
+        binary.write_bytes(old_binary)
+        self.assertEqual(wf.validate_task_checks(self.store,tid)[0]['result'],record)
+        self.assertEqual(wf.review_check_evidence(self.store,identity,scope)[0]['status'],'reusable')
+
+    def test_local_runner_receipt_is_portable_for_a_byte_identical_checkout_executable(self):
+        import shlex
+
+        recipe=self.local_runner_fixture()
+        local_tool=self.root/'tools/check'
+        local_tool.parent.mkdir()
+        local_tool.write_text('#!/bin/sh\nexec '+shlex.quote(sys.executable)+' verify-runner.py\n')
+        local_tool.chmod(0o700)
+        config=self.store.base/'config/repository.json'
+        metadata=json.loads(config.read_text())
+        metadata['recipes'][recipe]['argv']=['./tools/check']
+        config.write_text(json.dumps(metadata))
+        tid=self.task(recipe=recipe)
+        self.review_candidate(tid,controller=True,record_result=False)
+        record=wf.run_check(self.store,self.local_runner_request(tid))['record']
+        task=wf.validation_task(self.store,tid)
+        check=wf.check_specs(task)[0]
+        state=self.store.load()
+
+        independent=self.store.source_root.parent/'independent-runner-fixture'
+        self.git('worktree','add','-qb','independent-runner-fixture',str(independent),'HEAD')
+        other=wf.Store(independent)
+        self.assertEqual(other.root,self.store.root)
+        self.assertNotEqual(wf.workspaces.checked_out_branch(other.source_root)['checkout'],
+                            wf.workspaces.checked_out_branch(self.store.source_root)['checkout'])
+        (other.source_root/'source.py').write_bytes((self.store.source_root/'source.py').read_bytes())
+        for evidence in record['evidence']:
+            path=other.source_root/evidence['path']
+            path.parent.mkdir(parents=True,exist_ok=True)
+            path.write_bytes((self.store.source_root/evidence['path']).read_bytes())
+
+        old=wf.local_check_runner_inputs(self.store,['./tools/check'],self.store.source_root/wf.workspaces.PROFILE_FILE)
+        new=wf.local_check_runner_inputs(other,['./tools/check'],other.source_root/wf.workspaces.PROFILE_FILE)
+        self.assertEqual(old['executable_sha256'],new['executable_sha256'])
+        self.assertEqual(old['runner_environment_sha256'],new['runner_environment_sha256'])
+        self.assertNotEqual(wf.local_check_launch_observation(old)['argv_sha256'],
+                            wf.local_check_launch_observation(new)['argv_sha256'])
+        self.assertEqual(wf.retained_revalidation_check(other,state,task,check,{'result':record},historical=True),record)
+        new_tool=other.source_root/'tools/check'
+        new_tool.write_bytes(new_tool.read_bytes()+b'# changed executable\n')
+        self.assertIsNone(wf.retained_revalidation_check(other,state,task,check,{'result':record},historical=True))
+
+    def test_local_runner_recognizes_only_successful_nonempty_vitest_counts(self):
+        report={'success':True,'numTotalTests':3,'numPassedTests':3,'numFailedTests':0,
+                'numPendingTests':0,'numTodoTests':0}
+        self.assertEqual(wf.local_check_count('unit',json.dumps(report)),3)
+        self.assertEqual(wf.local_check_count('unit',json.dumps({**report,'numTodoTests':1})),0)
+        self.assertEqual(wf.local_check_count('unit',json.dumps({**report,'numPassedTests':True})),0)
+        self.assertEqual(wf.local_check_count('unit',json.dumps({**report,'numTotalTests':0,'numPassedTests':0})),0)
+
+    def test_native_runner_records_actual_unittest_discovery(self):
+        recipe=self.local_runner_fixture('unit',program=(
+            'import unittest\n'
+            'class ExactFixture(unittest.TestCase):\n'
+            '    def test_original(self): self.assertTrue(True)\n'
+            '    def test_second(self): self.assertEqual(2, 2)\n'
+            'unittest.main()\n'
+        ))
+        tid=self.task(recipe=recipe)
+        self.review_candidate(tid,controller=True,record_result=False)
+        result=wf.run_check(self.store,self.local_runner_request(tid))
+        self.assertEqual(result['status'],'recorded')
+        self.assertEqual(result['record']['counts'],{'expected':1,'discovered':2,'passed':2,'failed':0,'skipped':0})
+
+    def test_native_runner_retains_historical_consumer_revalidation_receipt(self):
+        producer=self.task('Previously completed source producer',recipe=self.local_runner_fixture())
+        consumer=self.task('Blocked consumer requires current producer',deps=[producer])
+        git_identity,_=self.review_candidate(producer,controller=True,record_result=False)
+        original_run=self.store.run_id
+        initial=wf.run_check(self.store,self.local_runner_request(producer))['record']
+        neutral=wf.Store(self.store.source_root,allow_unselected=True,neutral=True)
+        frame=self.review_frame({'kind':'task','task_ids':[producer]},git_identity)
+        frame=self.review_change(frame,'checks',store=neutral,identity=git_identity,reused_checks=[
+            {'task_id':producer,'id':'behavior','check_id':'behavior','attempt_id':initial['attempt_id']}])
+        frame=self.review_change(frame,'review',identity=git_identity,review_id='owned-runner-fixture-review',
+                                 findings=[],reference='Independent fixture review.')
+        original=wf.complete(self.store,{'task_id':producer,'review_id':frame['id'],
+            'outcome':'The scoped source producer remains observable.',
+            'acceptance':[{'criterion':'Preserve the value.','result':'pass','evidence':initial['evidence']}],
+            'source_fingerprints':wf.fingerprints(self.store,['source.py'])})
+        archived=wf.run_check(self.store,{'task_id':producer,'check_id':'behavior','action':'reconcile',
+                                         'attempt_id':initial['attempt_id']})
+        self.assertTrue(archived['historical'])
+        self.assertEqual(archived['record'],initial)
+        owner=wf.Store(self.root,allow_unselected=True,neutral=True)
+        run=wf.start(owner,'next',consumer,workspace={'implementation_operation':'work-through-next'})
+        source=Path(wf.workspaces.runtime(self.root)['worktrees'][run['id']])
+        self.store=wf.Store(source,run['id'])
+        handoff=wf.advance(self.store)
+        self.assertEqual(handoff['task_id'],producer)
+        self.assertTrue(handoff['completed_contract'])
+        result=wf.run_check(self.store,self.local_runner_request(producer))
+        self.assertEqual(result['blocked_consumer_ids'],[consumer])
+        self.assertEqual(result['status'],'recorded')
+        self.assertNotEqual(result['record']['attempt_id'],initial['attempt_id'])
+        import os
+        with patch.dict(os.environ,{'PATH':os.environ.get('PATH',os.defpath)+os.pathsep+str(self.root/'runner-env-change')}):
+            before=self.store.state.read_bytes()
+            with self.assertRaisesRegex(wf.WorkflowError,'Local check runner.*changed'):
+                wf.accept_revalidation(self.store,{'task_id':producer})
+            selected=wf.next_task(self.store)
+            self.assertEqual(selected['task_id'],producer)
+            self.assertEqual([row['id'] for row in selected['checks']],['behavior'])
+            self.assertEqual(self.store.state.read_bytes(),before)
+        wf.accept_revalidation(self.store,{'task_id':producer})
+        self.assertNotIn(producer,self.store.load()['task_progress'])
+        self.assertEqual(wf.next_task(self.store)['task_id'],consumer)
+        replay=wf.run_check(self.store,{'task_id':producer,'check_id':'behavior','action':'reconcile',
+                                       'attempt_id':result['record']['attempt_id']})
+        self.assertTrue(replay['replayed'])
+        self.assertEqual(replay['record'],result['record'])
+        self.assertEqual((source/'runner-invocations').read_text(),'run\n')
+        durable=next(item for item in self.store.outcomes() if item['id']==original['id'])
+        self.assertEqual(durable['run_id'],original_run)
+        self.assertEqual(durable,original)
+
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup);self.root=Path(self.tmp.name);self.store=wf.Store(self.root);self.store.future.parent.mkdir(parents=True)
         self.store.future.write_text('# Future Work\n\n## Pending Task Format\n\n## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n')
@@ -453,6 +789,175 @@ sys.stdin.readline()
         self.assertEqual(current['admission'],installed['admission'])
         self.assertNotIn(str(source),json.dumps(current['compatible_profile_readmissions']))
         self.assertEqual(wf.compatible_profile_admission(selected),{**installed,'replayed':True})
+
+    def test_full_cycle_brief_projects_exact_checks_and_preserves_attempts(self):
+        cfg = self.store.base/'config/repository.json'
+        cfg.write_text(json.dumps({'schema':1,'role':'source','recipes':{
+            'point-unit':{'lane':'unit','argv':['runner','{project_root}','{selection}'],'input_paths':[]},
+            'scoped-browser':{'lane':'browser','argv':['browser','{project_root}'],'input_paths':[]},
+            'full-suite':{'lane':'unit','argv':['run-all'],'input_paths':[],
+                          'delivery_validation':{'path':'suite.json','check_id':'full'}},
+        }}))
+        (self.store.base/'worktree-profile.json').write_text(json.dumps(
+            {'schema':1,'exclusive_resources':['browser:test']}))
+        tid = self.task('Worker scope', group=wf.identity('VG'))
+        text = self.store.text()
+        original = wf.check_specs(wf.resolve(wf.parse(text),[tid])[0])
+        common = original[0]
+        checks = [
+            {**common,'id':'focused','recipe_id':'point-unit','parameters':{'selection':'one.spec'}},
+            {**common,'id':'manual'},
+            {**common,'id':'boundary','recipe_id':'scoped-browser','timing':'before-dependent-work'},
+            {**common,'id':'final','recipe_id':'full-suite'},
+            {**common,'id':'unavailable','recipe_id':'missing'},
+        ]
+        text = text.replace(json.dumps({'checks':original}),json.dumps({'checks':checks}))
+        with self.store.lock():
+            self.store.save(text,self.store.load())
+        wf.start(self.store,'next',tid)
+        state = self.store.load()
+        state['active_run']['delivery'] = {'authorization':{'pr':True}}
+        with self.store.lock():
+            self.store.save(text,state)
+        raw = self.store.state.read_bytes()
+        result = wf.next_task(self.store)
+        self.assertEqual(self.store.state.read_bytes(),raw)
+        brief = result['worker_brief']
+        self.assertEqual(brief['task_id'],tid)
+        self.assertEqual(brief['run_id'],state['active_run']['id'])
+        self.assertEqual(brief['checkout'],str(self.root.resolve()))
+        self.assertEqual(brief['runtime_resource_claims'],
+                         [{'resource':'browser:test','status':'unclaimed','holder_run_id':None}])
+        rows = {row['check_id']:row for row in brief['checks']}
+        self.assertEqual(rows['focused']['execution_owner'],'worker')
+        self.assertEqual(rows['focused']['argv'],['runner',str(self.root.resolve()),'one.spec'])
+        self.assertEqual(rows['focused']['evidence_owner'],'coordinator')
+        self.assertEqual(rows['focused']['receipt']['executed_pass_shape'],'counts')
+        self.assertEqual(rows['manual']['status'],'coordinator-check')
+        self.assertEqual(rows['boundary']['timing'],'before-dependent-work')
+        self.assertTrue(rows['boundary']['execution']['required'])
+        self.assertIn('session_identity',rows['boundary']['execution']['fields'])
+        self.assertEqual(rows['final']['status'],'delivery-validation-only')
+        self.assertNotIn('argv',rows['final'])
+        self.assertEqual(rows['unavailable']['status'],'prerequisite')
+        self.assertEqual(wf.advance(self.store)['worker_brief'],brief)
+        self.assertEqual(wf.begin_task(self.store,{'task_id':tid})['worker_brief'],brief)
+        self.assertEqual(wf.validation_preflight(self.store,{'task_id':tid,'check_id':'focused'})['receipt'],
+                         rows['focused']['receipt'])
+        self.assertEqual(wf.validation_preflight(self.store,{'task_id':tid,'check_id':'final'})['status'],
+                         'delivery-validation-only')
+        with self.assertRaisesRegex(wf.WorkflowError,'Source changed'):
+            wf.validation_preflight(self.store,{'task_id':tid,'check_id':'focused','expected_source_hash':'stale'})
+        with self.assertRaisesRegex(wf.DeliveryOnlyRecipe,'requires the declared PR final validation phase'):
+            wf.prepare_check(self.store,{'task_id':tid,'check_id':'final'})
+        self.assertFalse(self.store.load()['task_progress'][tid]['checks'])
+        attempt = wf.prepare_check(self.store,{'task_id':tid,'check_id':'focused'})
+        self.assertEqual(attempt['recipe']['argv'],rows['focused']['argv'])
+        resumed = wf.next_task(self.store)['worker_brief']['checks'][0]
+        self.assertEqual(resumed['status'],'pending-attempt')
+        self.assertEqual(resumed['attempt_id'],attempt['attempt_id'])
+        self.assertNotIn('argv',resumed)
+
+    def test_worker_brief_keeps_profile_recipe_drift_visible(self):
+        tid = self.task('Delivery scope',recipe='full-suite')
+        wf.start(self.store,'next',tid)
+        state = self.store.load()
+        path = self.root/'suite.json'
+        path.write_text('before')
+        profile_path = self.store.base/'installation/profile.json'
+        profile_path.parent.mkdir()
+        profile_path.write_text(json.dumps({
+            'recipes':{'full-suite':{'lane':'unit','argv':['run-all'],'input_paths':['suite.json'],
+                                     'delivery_validation':{'path':'suite.json','check_id':'full'}}},
+            'inputs':{'suite.json':wf.file_hash(path)},
+        }))
+        selected = wf.resolve(wf.parse(self.store.text()),[tid])[0]
+        prepared = wf.focused_worker_brief(self.store,state,selected,wf.check_specs(selected))
+        self.assertEqual(prepared['checks'][0]['status'],'delivery-validation-only')
+        path.write_text('after')
+        stale = wf.focused_worker_brief(self.store,state,selected,wf.check_specs(selected))
+        self.assertEqual(stale['checks'][0]['status'],'prerequisite')
+        self.assertIn('Profile refresh-required',stale['checks'][0]['prerequisite'])
+        self.assertNotIn('argv',stale['checks'][0])
+
+    def test_worker_brief_refuses_a_profile_changed_while_resolving_rows(self):
+        tid = self.task('One pinned profile',recipe='focused',independent_source='report.json')
+        wf.start(self.store,'next',tid)
+        state = self.store.load()
+        path = self.store.base/'installation/profile.json'
+        path.parent.mkdir()
+        profile = {'recipes':{'focused':{'lane':'unit','argv':['old-command'],'input_paths':[]}}}
+        path.write_text(json.dumps(profile))
+        selected = wf.resolve(wf.parse(self.store.text()),[tid])[0]
+        native_recipe = wf.recipe_for
+        def change_profile(*args, **kwargs):
+            resolved = native_recipe(*args, **kwargs)
+            profile['recipes']['focused']['argv'] = ['new-command']
+            path.write_text(json.dumps(profile))
+            return resolved
+        with patch.object(wf,'recipe_for',side_effect=change_profile):
+            with self.assertRaisesRegex(wf.WorkflowError,'Worker handoff inputs changed'):
+                wf.focused_worker_brief(self.store,state,selected,wf.check_specs(selected))
+
+    def test_independent_builtin_check_ignores_unrelated_declaration_drift(self):
+        tid = self.task('Independent inspection')
+        wf.start(self.store,'next',tid)
+        installed = self.store.base/'installation/profile.json'
+        installed.parent.mkdir()
+        installed.write_text(json.dumps({'identity':'repository-local','recipes':{}}))
+        self.store.base.joinpath('validation-recipes.json').write_text('temporarily invalid')
+        self.progress(tid)
+        result = wf.validation_preflight(self.store,{'task_id':tid,'check_id':'behavior'})
+        self.assertEqual(result['lane'],'static')
+        self.assertEqual(self.passed(tid)['result'],'pass')
+
+    def test_changed_playwright_receipt_reopens_only_completed_browser_check(self):
+        primary = self.root / 'playwright.config.ts'
+        primary.write_text('export default { timeout: 1000 };\n')
+        (self.root / 'independent.py').write_text('value = 1\n')
+        task_id = self.task('Browser proof with independent check',recipe='fixture-browser',
+                            independent_source='independent.py')
+        current = self.store.future.read_text()
+        self.store.future.write_text(current.replace(
+            '"id": "independent", "recipe_id": "fixture-browser"',
+            '"id": "independent", "recipe_id": "static-inspection"'))
+        wf.start(self.store,'next',task_id)
+        path = self.store.base / 'installation/profile.json'
+        path.parent.mkdir()
+        profile = {'identity':'repository-local','flavor':'web','inputs':{'playwright.config.ts':wf.file_hash(primary)},
+                   'recipes':{'fixture-browser':{'lane':'browser','input_paths':[]}}}
+        path.write_text(json.dumps(profile))
+        self.progress(task_id)
+        execution = dict.fromkeys(wf.EXECUTION_FIELDS,'fixture')
+        execution.update(project_root=str(self.root),cleanup_seconds=5,identity_evidence=['report.json'],
+                         deadline_utc=(datetime.now(timezone.utc)+timedelta(seconds=60)).isoformat())
+        prepared = wf.prepare_check(self.store,{'task_id':task_id,'check_id':'behavior','execution':execution})
+        wf.record_check(self.store,{'task_id':task_id,'check_id':'behavior','attempt_id':prepared['attempt_id'],
+             'classification':'executed-control','result':'pass','actual_lane':'browser',
+             'environment_identity':prepared['environment_identity'],
+             'counts':{'expected':1,'discovered':1,'passed':1,'failed':0,'skipped':0},
+             'cleanup':'The simulated Browser runner exited.','evidence':['report.json']})
+        control=self.passed(task_id,'independent')
+        completed=wf.complete(self.store,{'task_id':task_id,'outcome':'The Browser and static checks passed.',
+                    'acceptance':[{'criterion':'Preserve the value.','result':'pass','evidence':['report.json']}],
+                    'source_fingerprints':wf.fingerprints(self.store,['source.py','independent.py'])})
+        original=wf.validation_task(self.store,task_id)
+        kept,due=wf.completed_revalidation_checks(self.store,self.store.load(),original,completed)
+        self.assertFalse(due)
+        self.assertEqual(set(kept),{'behavior','independent'})
+        primary.write_text('export default { timeout: 2000 };\n')
+        profile['inputs']['playwright.config.ts']=wf.file_hash(primary)
+        path.write_text(json.dumps(profile))
+        kept,due=wf.completed_revalidation_checks(self.store,self.store.load(),original,completed)
+        self.assertEqual(kept['independent']['result']['attempt_id'],control['attempt_id'])
+        self.assertEqual([row['id'] for row in due],['behavior'])
+        state=self.store.load()
+        execution['session_identity']='fresh-browser-fixture'
+        state['task_progress'][task_id]={'execution_sessions':{}}
+        _,environment=wf.recipe_for(self.store,due[0])
+        state['task_progress'][task_id]['execution_sessions'][environment]=execution
+        fresh=wf.check_snapshot(self.store,original,due[0],state)
+        self.assertNotEqual(fresh['environment_identity'],prepared['environment_identity'])
 
     def test_lane_preflight_matches_browser_and_server_receipts(self):
         configuration = self.store.base/'config/repository.json'

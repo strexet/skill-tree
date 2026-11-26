@@ -8,6 +8,28 @@ When the owner expressly authorizes compatible profile maintenance for the selec
 
 The helper records the anticipated generation before activation and verifies the exact installed identity before finalizing the separate `profile_maintenance` receipt. Reinvoke the same command and publication ID to reconcile a retained attempt. A matching installed generation confirms the result without another activation. A moved target, unknown before state, changed execution input, unfinished workflow or interrupted installer stays retryable with the specific prerequisite. Provider integration and local synchronization remain recorded in the delivery receipt.
 
+## Focused review and final validation
+
+During review and fixes, run the smallest regression that addresses each finding. Use the full local suite for final qualification after the code review converges. Preserve the required provider checks, discussions, approvals and merge authorization throughout the cycle.
+
+Opt in on the initial `init` request with `"final_validation": {"path": "path/to/final-suite.json"}`. The selected file must be a regular file committed on the source candidate. The publication pins the exact file bytes, check IDs and argument vectors. The same declaration remains bound across candidate changes and retries. Existing publications without a declaration use the ordinary readiness flow.
+
+Example committed definition
+
+```json
+{
+  "checks": [
+    {"id": "unit-suite", "argv": ["npm", "test"]},
+    {"id": "browser-suite", "argv": ["npm", "run", "test:e2e"]}
+  ]
+}
+```
+
+- A complete code review with resolved findings opens final validation for the exact PR head, base and changed files. Run `final-validation` on the original publication with the current `snapshot` and `"final_validation": {"action": "prepare", "attempt_id": "final-1"}`. The returned declaration contains the commands. The selected checkout must expose the exact committed source.
+- Run each declared command from the verified checkout under the applicable local validation requirements. Write one JSON receipt per check under the returned `evidence_root`, using `<attempt_id>/<check_id>.json`. Keep the evidence directory ignored by Git. Each receipt contains the prepared `candidate`, `attempt_id`, `check_id` and exact `argv`, plus the observed integer `exit_code` and `output` string. Record the same attempt with `"action": "record"` and a `results` array in definition order. Each entry contains `id`, the observed integer `exit_code`, and `evidence` with the checkout-relative `path` and raw-file `sha256`. The helper prepares and verifies metadata. The executor owns actual command execution, time limits and cleanup.
+- Retry the same attempt ID to reconcile a lost response. A failed suite keeps readiness open. Fix the failure and verify the affected code with current review evidence when the candidate changes, then prepare a new attempt. An unchanged candidate can reuse a current passing attempt while every evidence file still matches.
+- After provider-only updates, refresh the provider snapshot and record an `inspection` covering current discussions and checks. The same code candidate keeps the local qualification evidence. `ready` and `merge-gate` verify the local pass and continue to apply the current provider checks and approval policy.
+
 ## Invocation and authorization
 
 The operation completes the selected source branch through PR creation, review, fixes and repeated review. `source_branch` defaults to the current branch of the selected repository/run/worktree. `target_branch` defaults to `develop`; the PR base and merge destination always use the same target. `merge` defaults to `false`. Controller `base_branch` supplies the initial implementation ancestry and remains independent of both publication parameters. A missing target requires an owner decision; another branch never replaces the target silently.
@@ -30,6 +52,16 @@ Resume an existing open PR from an exact linked checkout with `scripts/pr-review
 Review findings, checks and authorization stay in the original publication. The response includes the selected checkout for the current call. A configured review also requires the original verified operation package, profile and execution generation. Resolve generation drift through the original owned review route before continuing. Use the ordinary current-provider transition to incorporate a newly observed head, base or integration result.
 
 For a project source repair in a contributor fork, set `remote` to the base remote (normally `upstream`), `head_remote` to the contributor's configured push remote, and `base_repository` to `strexet/skill-tree` in preflight. Select the project source branch and the intended upstream target. Preflight resolves both remotes, returns the exact repository pair and inspects the merge-base diff. Push the selected branch to the verified head remote under the original publication authorization. Use `GitHub.from_preflight(root, preflight)` for the fallback provider. The provider finds or resumes the selected fork branch against the upstream base, including when a different owner uses the same branch name. Keep the returned repository identities in publication snapshots.
+
+### Prepare the handoff for an existing open PR
+
+Run `scripts/pr-review-state.py prepare-handoff <canonical-root> --publication-id <id> --input <request.json>` after the existing-publication preflight. Pass the exact absolute `source_checkout`, expected `head` and `base_oid` from preflight. Pass `expected_publication_sha256` to reuse a specific inspected receipt. The helper selects the provider PR from the retained publication and uses the verified GitHub hostname and repository.
+
+Pass `provider_policy` from the current inspection of the target repository rules. Supply `host`, `repository`, `target_branch`, a `reference` to the rule inspection, the full `required_check_names` list and the observed Boolean `approvals_required`. Use an empty check list only when the inspected rules establish that there are no required checks. Incomplete repository policy or unavailable provider capabilities hold the handoff.
+
+The response includes `next` with the exact `observe` request and receipt hash. Use the returned snapshot to inspect the complete diff, current discussions and checks. `observe` checks the receipt again under the existing publication lock. Current `inspection`, `review`, `ready` and `merge-gate` continue with the evidence and authority required by each command.
+
+The handoff returns the original key and request digest for an unconfirmed operation. Inspect provider evidence for the actual effect and reconcile through `operation` with the original request. Confirm each push, comment or merge attempt using evidence of that specific effect. After reconciliation, prepare the same publication again. Continue a closed or merged PR through the existing delivery reconciliation.
 
 ## Create, review and fix
 

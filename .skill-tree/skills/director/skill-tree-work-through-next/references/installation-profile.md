@@ -81,6 +81,12 @@ Registered worktree installations use the canonical installation/writer barrier 
 
 Compatible worktree admission covers `package.json` description and keywords changes against an exact retained Git baseline and the original owned input digest. The anticipated generation must preserve other discovered inputs, installation ownership, runtime layout, bindings, policy and resolved recipes. The guard verifies the original registered checkout and stopped run before activation or recovery. Unknown inputs, material changes and pending attempts require the existing explicit recovery path.
 
+## Approved Playwright discovery refresh
+
+A stopped installed Web run can preview an exact change to the tracked `playwright.config.ts` discovery file through `admit`. Preview compares the original admitted Git bytes with the current regular worktree file, profile and other discovery inputs. Executable Playwright configuration requires exact owner authorization for the inspected preview digest.
+
+Apply uses the original owned installer and operation journal. The selected worktree, Git checkout, index identity, checkpoint and approval remain bound through activation and replay. A separate discovery change or unresolved attempt holds the original checkpoint. Browser validation uses the verified Playwright discovery fingerprint even for declared Browser recipes that omit the path.
+
 ## Merged target activation
 
 Local delivery verifies the installed generation against the source inputs in the exact canonical merge tree. Installed bundle verification alone establishes internal ownership and consistency. Target activation additionally checks the expected flavor and provider destinations, including newly admitted core operations.

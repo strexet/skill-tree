@@ -1,0 +1,51 @@
+{
+  "source_fingerprints": {
+    ".skill-tree/documents/early-review-policy-study.md": "02484cd40cdd1463cb5a415f1bbcff0cee7536c62e9e40c559e472856fe900b8",
+    ".skill-tree/common/scripts/workflow-state.py": "92e370f896dcfc165d10f57c8a2adbf35b0780a5d6dee559d0e229b6ff5c3341",
+    ".skill-tree/common/references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
+    ".skill-tree/common/references/validation-policy.md": "8ab3ed2b2f73595d4ebbff29af451cefb5f0b804ea1499be9dc385effff5f5f3",
+    ".skill-tree/common/references/run-workspaces.md": "170251170232d01dee1cadbe9cb59f554d49c4e4cbcd490a6bc5d5a62f698292"
+  },
+  "validated_links": [
+    "../common/references/decision-governance.md",
+    "../common/references/run-workspaces.md",
+    "../common/references/full-cycle.md",
+    "../common/scripts/workflow-state.py",
+    "../common/references/validation-policy.md",
+    "../common/scripts/decision-orchestration.py",
+    "../run-evidence/wr-8c97c22a-1e66-4ca3-b6e7-5bbc31fe9544/resumed-final-2-behavior.log"
+  ],
+  "sections": [
+    "Current gates",
+    "Proposed decision rule",
+    "Worked cases",
+    "Pilot and adoption boundary"
+  ],
+  "mandatory_trigger_rows": [
+    "Authority",
+    "Shared state or effect",
+    "Downstream consumption",
+    "Failure visibility or recovery"
+  ],
+  "gate_anchors": [
+    "verified_implementation_review",
+    "complete_task_commit",
+    "require_current_completed_sources",
+    "controller_review_identity",
+    "freeze_reviewed_controller",
+    "partial_review_candidate"
+  ],
+  "matching_generated_core": [
+    ".skill-tree/skills/general/skill-tree-implement-all/scripts/workflow-state.py",
+    ".skill-tree/skills/general/skill-tree-work-through-next/scripts/workflow-state.py",
+    ".skill-tree/skills/general/skill-tree-full-cycle/scripts/workflow-state.py",
+    ".skill-tree/skills/web/skill-tree-implement-all/scripts/workflow-state.py",
+    ".skill-tree/skills/web/skill-tree-work-through-next/scripts/workflow-state.py",
+    ".skill-tree/skills/web/skill-tree-full-cycle/scripts/workflow-state.py",
+    ".skill-tree/skills/unity/skill-tree-implement-all/scripts/workflow-state.py",
+    ".skill-tree/skills/unity/skill-tree-work-through-next/scripts/workflow-state.py",
+    ".skill-tree/skills/unity/skill-tree-full-cycle/scripts/workflow-state.py"
+  ],
+  "document_lint": "clean",
+  "observation": "The proposal specifies the current gates and worked examples. The inspected task delta changes the study and derived navigation only."
+}

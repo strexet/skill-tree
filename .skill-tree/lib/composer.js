@@ -57,6 +57,27 @@ function operationNames(source,flavor) {
  if(new Set(names).size!==names.length||names.some(name=>typeof name!=='string'||!Object.hasOwn(operations,name)))throw Error('Invalid operation membership: '+flavor);
  return names.sort();
 }
+function deliveryRecipeInput(root,id,recipe) {
+ const link=recipe.delivery_validation,pattern=/^[a-z][a-z0-9-]{0,63}$/;
+ if(!link||typeof link!=='object'||Array.isArray(link)||Object.keys(link).length!==2||
+    !Object.hasOwn(link,'path')||!Object.hasOwn(link,'check_id')||
+    typeof link.path!=='string'||!link.path||/[\\\0]/.test(link.path)||
+    link.path.split('/').some(part=>['','.','..','.git'].includes(part))||
+    typeof link.check_id!=='string'||!pattern.test(link.check_id)||recipe.execution_binding||
+    recipe.argv.some(arg=>/\{[a-z][a-z0-9_]*\}|\0/.test(arg)))
+  throw Error('Delivery-only recipe requires a final suite path, exact check ID and literal argv: '+id);
+ const file=safe(root,link.path),entry=fs.existsSync(file)?fs.lstatSync(file):null;
+ if(!entry?.isFile()||entry.size>65536)throw Error('Delivery-only recipe requires a bounded regular final suite file: '+id);
+ const raw=fs.readFileSync(file),suite=JSON.parse(raw.toString('utf8'));
+ if(!suite||Object.keys(suite).length!==1||!Array.isArray(suite.checks)||!suite.checks.length||
+    suite.checks.some(check=>!check||Object.keys(check).length!==2||typeof check.id!=='string'||!pattern.test(check.id)||
+      !Array.isArray(check.argv)||!check.argv[0]||check.argv.some(arg=>typeof arg!=='string'||arg.includes('\0')))||
+    new Set(suite.checks.map(check=>check.id)).size!==suite.checks.length)
+  throw Error('Delivery-only recipe requires a valid final suite definition: '+id);
+ const selected=suite.checks.find(check=>check.id===link.check_id);
+ if(!selected||json(selected.argv)!==json(recipe.argv))throw Error('Delivery-only recipe differs from the declared final check: '+id);
+ return {path:link.path,digest:hash(raw)};
+}
 function resolveProfile(source,root,flavor,options={}) {
  root=fs.realpathSync(root);
  const registry=requiredJson(source,'config/flavors.json'),rules=requiredJson(source,'config/capabilities.json');
@@ -119,10 +140,16 @@ function resolveProfile(source,root,flavor,options={}) {
   if(!/^[a-z][a-z0-9-]*$/.test(id)||!Array.isArray(recipe.argv)||!recipe.argv.length||recipe.argv.some(v=>typeof v!=='string')||!rules.lanes.includes(recipe.lane))throw Error('Invalid or unsupported static recipe lane: '+id);
   if(recipes[id])throw Error('Recipe collision: '+id);
   if(recipe.execution_binding&&(!execution_bindings[recipe.execution_binding]||!['unity-editmode','unity-playmode'].includes(recipe.lane)||recipe.editor_version!==execution_bindings[recipe.execution_binding].pins.editor_version))throw Error('Recipe requires a matching reviewed Unity execution binding: '+id);
-  recipes[id]={...recipe,input_paths:[declarationPath,...(recipe.input_paths||[])],qualification:'owner-declared static recipe; runner unqualified'};
+  const input_paths=[declarationPath,...(recipe.input_paths||[])];
   for(const rel of recipe.input_paths||[]){inputs[rel]=inputDigest(root,rel);}
+  if(Object.hasOwn(recipe,'delivery_validation')){
+   const delivery=deliveryRecipeInput(root,id,recipe);
+   if(!input_paths.includes(delivery.path))input_paths.push(delivery.path);
+   inputs[delivery.path]=delivery.digest;
+  }
+  recipes[id]={...recipe,input_paths,qualification:'owner-declared static recipe; runner unqualified'};
  }
- if(Object.values(recipes).some(r=>['unit','integration','browser','unity-editmode'].includes(r.lane)))gaps.splice(0,gaps.length,...gaps.filter(g=>g.key!=='test-foundation'));}
+ if(Object.values(recipes).some(r=>!Object.hasOwn(r,'delivery_validation')&&['unit','integration','browser','unity-editmode'].includes(r.lane)))gaps.splice(0,gaps.length,...gaps.filter(g=>g.key!=='test-foundation'));}
  }
  const staticInspection=rules.built_in_recipes?.['static-inspection'];
  if(staticInspection&&!Object.hasOwn(recipes,'static-inspection'))recipes['static-inspection']=staticInspection;

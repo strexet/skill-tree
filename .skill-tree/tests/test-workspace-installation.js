@@ -2,6 +2,52 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const core=path.resolve(__dirname,'..'),cli=path.join(core,'bin/install.js');
 function run(command,args,options={}){const r=spawnSync(command,args,{encoding:'utf8',timeout:30000,...options});assert.equal(r.status,0,r.stdout+r.stderr);return r.stdout;}
 function write(root,rel,value){const p=path.join(root,rel);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,typeof value==='string'?value:JSON.stringify(value));}
+test('installed run-check executes one owned recipe and replays the exact original receipt', t => {
+ const base=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-owned-check-'));
+ t.after(()=>fs.rmSync(base,{recursive:true,force:true}));
+ const root=path.join(base,'queue'),wt=path.join(base,'run');
+ fs.mkdirSync(root);
+ const git=(...args)=>run('git',['-C',root,...args]);
+ git('init','-b','develop');git('config','user.name','Fixture');git('config','user.email','fixture@example.invalid');
+ write(root,'package.json',{scripts:{test:'node --test'}});
+ write(root,'owned-test.cjs',"const test=require('node:test');\nconst fs=require('node:fs');\ntest('exact selected fixture',()=>fs.appendFileSync('invocations.log','run\\n'));\n");
+ write(root,'.skill-tree/validation-recipes.json',{schema:1,recipes:{'owned-fixture':{
+  lane:'unit',argv:['node','--test','owned-test.cjs'],input_paths:['owned-test.cjs']
+ }}});
+ write(root,'.skill-tree/documents/future.md','# Future Work\n\n## Pending Task Format\n\n## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n');
+ git('add','.');git('commit','-m','Exact installed runner fixture');
+ const operation='skill-tree-work-through-next';
+ run(process.execPath,[cli,'--target',root,'--flavor','general','--only','codex','--skills',operation]);
+ const standalone=path.join(base,'standalone');
+ fs.cpSync(path.join(root,'.agents/skills',operation),standalone,{recursive:true});
+ const helper=path.join(standalone,'scripts/workflow-state.py');let serial=0;
+ function command(action,checkout,payload,flags=[]){
+  const input=path.join(base,`request-${serial++}.json`);write(base,path.basename(input),payload);
+  return JSON.parse(run('python3',['-B',helper,action,checkout,'--input',input,...flags],{cwd:base}));
+ }
+ const pending=command('intake',root,{title:'Owned runner fixture',description:'Validate a scoped fixture.',expected_behavior:'Record one actual check.'});
+ const criterion='Record one actual check.';
+ const check={id:'behavior',recipe_id:'owned-fixture',criteria:[criterion],sources:['owned-test.cjs'],
+  parameters:{},assertion:criterion,timing:'immediate'};
+ const body='Goal:\n- '+criterion+'\n\nTouch:\n- owned-test.cjs\n\nValidation:\n```json\n'+
+  JSON.stringify({checks:[check]})+'\n```\n\nAcceptance:\n- '+criterion+'\n';
+ const task=command('process',root,{selectors:[pending.id],dispositions:{[pending.id]:{status:'promoted',reason:'The fixture supplies the owned recipe.'}},
+  tasks:[{title:'Owned runner fixture',body,parent_pending_ids:[pending.id]}]}).created_ids[0];
+ command('workspace-setup',root,{});
+ const started=command('start',root,{worktree:wt,implementation_operation:'work-through-next'},['--standalone','--id',task]);
+ const [program,...handoffArgs]=started.profile_handoff.argv;
+ assert.equal(JSON.parse(run(program,handoffArgs)).status,'admitted');
+ const selected=['--run-id',started.id];command('begin',wt,{task_id:task},selected);
+ const id={task_id:task,check_id:'behavior'};
+ const due=command('run-check',wt,{...id,action:'inspect'},selected);assert.equal(due.status,'due');
+ const request={...id,action:'run',authorization:'Run one disposable installed check.',deadline_utc:new Date(Date.now()+20000).toISOString(),cleanup_seconds:3};
+ const result=command('run-check',wt,request,selected);assert.equal(result.status,'recorded',JSON.stringify(result));
+ assert.deepEqual(result.record.counts,{expected:1,discovered:1,passed:1,failed:0,skipped:0});
+ const replay=command('run-check',wt,{...id,action:'reconcile',attempt_id:result.record.attempt_id},selected);
+ assert.equal(replay.replayed,true);assert.deepEqual(replay.record,result.record);
+ assert.equal(fs.readFileSync(path.join(wt,'invocations.log'),'utf8'),'run\n');
+});
+
 for(const flavor of ['general','web','unity'])test(`installed ${flavor} Implement All freezes only the requested group through its standalone CLI`,t=>{
  const base=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-group-installed-'));t.after(()=>fs.rmSync(base,{recursive:true,force:true}));
  const root=path.join(base,'queue'),remote=path.join(base,'remote.git');fs.mkdirSync(root);
@@ -216,4 +262,285 @@ test('installed implementation operations select scoped commits and local contro
  const sealed=command(0,'implemented',{task_id:leaf,changed_files:['source.py']},['--standalone']);
  assert.equal(sealed.git_review_identity.head,launch);
  assert.equal(git('rev-parse','HEAD'),launch);
+});
+
+test('installed Full Cycle hands off focused commands and admits the linked suite only in PR final validation',t=>{
+ const base=fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-worker-brief-')));
+ t.after(()=>fs.rmSync(base,{recursive:true,force:true}));
+ const root=path.join(base,'product'),remote=path.join(base,'remote.git');
+ fs.mkdirSync(root);
+ const git=(checkout,...args)=>run('git',['-C',checkout,...args]);
+ git(root,'init','-b','develop');
+ git(root,'config','user.name','Fixture');
+ git(root,'config','user.email','fixture@example.invalid');
+ write(root,'.gitignore','.agents/\n.skill-tree/*\n!.skill-tree/validation-recipes.json\n');
+ write(root,'source.py','value = 1\n');
+ write(root,'package.json',{name:'focused-worker-fixture'});
+ const link={path:'final-suite.json',check_id:'all'};
+ const suite={checks:[{id:'all',argv:['python3','-V']}]};
+ const recipes={schema:1,recipes:{
+  'focused':{lane:'unit',argv:['python3','{file}']},
+  'all-checks':{lane:'unit',argv:suite.checks[0].argv,delivery_validation:link},
+ }};
+ write(root,link.path,suite);
+ write(root,'.skill-tree/validation-recipes.json',recipes);
+ git(root,'add','.');
+ git(root,'commit','-m','Commit the fixture validation declarations');
+ run('git',['init','--bare',remote]);
+ git(root,'remote','add','origin',remote);
+ git(root,'push','origin','develop');
+
+ const install=[cli,'--target',root,'--only','codex','--flavor','general','--skills','skill-tree-full-cycle','skill-tree-pr-review-cycle'];
+ write(root,link.path,{checks:[{id:'all',argv:['python3','-VV']}]});
+ const mismatch=spawnSync(process.execPath,[...install,'--dry-run'],{encoding:'utf8',timeout:30000});
+ assert.notEqual(mismatch.status,0);
+ assert.match(mismatch.stdout+mismatch.stderr,/differs from the declared final check/);
+ write(root,link.path,suite);
+ run(process.execPath,install);
+ const profile=JSON.parse(fs.readFileSync(path.join(root,'.skill-tree/installation/profile.json')));
+ assert.match(profile.inputs[link.path],/^[a-f0-9]{64}$/);
+ assert.ok(profile.recipes['all-checks'].input_paths.includes(link.path));
+
+ const future='.skill-tree/documents/future.md';
+ const checkpoint='.skill-tree/documents/future.json';
+ write(root,future,'# Future Work\n\n## Pending Task Format\n\n## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n');
+ const helper=path.join(root,'.agents/skills/skill-tree-full-cycle/scripts/workflow-state.py');
+ const prHelper=path.join(root,'.agents/skills/skill-tree-pr-review-cycle/scripts/pr-review-state.py');
+ let step=0;
+ function command(script,action,target,request,extra=[]){
+  const args=['-B',script,action,target,...extra];
+  if(request!==undefined){
+   const input=path.join(base,`request-${step++}.json`);
+   write(base,path.basename(input),request);
+   args.push('--input',input);
+  }
+  return JSON.parse(run('python3',args));
+ }
+ function wf(action,target=root,request,extra=[]){return command(helper,action,target,request,extra);}
+ const title='Scoped worker fixture',goal='Preserve the observable fixture.';
+ const pending=wf('intake',root,{title,description:'Verify the managed handoff.',expected_behavior:goal});
+ const check={id:'point',recipe_id:'focused',criteria:[goal],sources:['source.py'],
+              parameters:{file:'source.py'},assertion:goal,timing:'immediate'};
+ const body='Goal:\n- '+goal+'\n\nTouch:\n- source.py\n\nValidation:\n```json\n'
+  +JSON.stringify({checks:[check,{...check,id:'early-suite',recipe_id:'all-checks',parameters:{}}]})
+  +'\n```\n\nAcceptance:\n- '+goal+'\n';
+ const task=wf('process',root,{selectors:[pending.id],
+  dispositions:{[pending.id]:{status:'promoted',reason:'The fixture covers the exact handoff.'}},
+  tasks:[{title,body,parent_pending_ids:[pending.id]}]}).created_ids[0];
+ wf('workspace-setup',root,{});
+ const worktree=path.join(base,'worktree');
+ const started=wf('start',root,{worktree,delivery_authorization:{pr:true,target_branch:'develop'}},
+                  ['--standalone','--mode','next','--id',task]);
+ run(started.profile_handoff.argv[0],started.profile_handoff.argv.slice(1));
+ const scope=['--run-id',started.id];
+ const before=fs.readFileSync(path.join(root,checkpoint));
+ const handoff=wf('next',worktree,undefined,scope).worker_brief;
+ assert.deepEqual(fs.readFileSync(path.join(root,checkpoint)),before);
+ assert.equal(handoff.task_id,task);
+ assert.equal(handoff.checkout,worktree);
+ assert.deepEqual(handoff.checks[0].argv,['python3','source.py']);
+ assert.deepEqual(handoff.checks[1].delivery_validation,link);
+ assert.equal(handoff.checks[1].status,'delivery-validation-only');
+ assert.equal(handoff.checks[1].argv,undefined);
+ assert.deepEqual(wf('advance',worktree,undefined,scope).worker_brief,handoff);
+ const checkpointPath=path.join(root,checkpoint);
+ const legacy=JSON.parse(fs.readFileSync(checkpointPath));
+ delete legacy.run_registry.runs[started.id].initial_profile;
+ fs.writeFileSync(checkpointPath,JSON.stringify(legacy));
+ const oldHandoff=wf('next',worktree,undefined,scope);
+ assert.equal(oldHandoff.task_id,task);
+ assert.equal(oldHandoff.phase,'implement');
+ assert.deepEqual(oldHandoff.worker_brief.checks,[]);
+ assert.match(oldHandoff.worker_brief.prerequisite,/re-admit the selected worktree profile before requesting worker commands/);
+ wf('admit',root,{},scope);
+ assert.deepEqual(wf('next',worktree,undefined,scope).worker_brief,handoff);
+ wf('begin',worktree,{task_id:task},scope);
+ const checkpointed=fs.readFileSync(path.join(root,checkpoint));
+ const reject=path.join(base,'rejected-check.json');
+ write(base,path.basename(reject),{task_id:task,check_id:'early-suite'});
+ const denied=spawnSync('python3',[helper,'prepare-check',worktree,...scope,'--input',reject],{encoding:'utf8',timeout:30000});
+ assert.equal(denied.status,2,denied.stdout+denied.stderr);
+ assert.match(denied.stdout,/requires the declared PR final validation phase/);
+ assert.deepEqual(fs.readFileSync(path.join(root,checkpoint)),checkpointed);
+
+ const linkedProfile=path.join(worktree,'.skill-tree/installation/profile.json');
+ const ownerManager=path.join(worktree,'.skill-tree/installation/manager.js');
+ const ownedBytes=fs.readFileSync(linkedProfile),managerBytes=fs.readFileSync(ownerManager);
+ const invalid=JSON.parse(ownedBytes);
+ delete invalid.recipes['all-checks'].delivery_validation;
+ delete invalid.format;
+ fs.writeFileSync(linkedProfile,JSON.stringify(invalid));
+ const sentinel=path.join(base,'unexpected-manager-execution');
+ fs.writeFileSync(ownerManager,'require("node:fs").writeFileSync('+JSON.stringify(sentinel)+',"invoked");');
+ for(const args of [
+  [helper,'next',worktree,...scope],
+  [helper,'prepare-check',worktree,...scope,'--input',reject],
+ ]){
+  const forged=spawnSync('python3',args,{encoding:'utf8',timeout:30000});
+  assert.equal(forged.status,2,forged.stdout+forged.stderr);
+  assert.match(forged.stdout,/differs from the admitted recipe profile/);
+ }
+ assert.deepEqual(fs.readFileSync(path.join(root,checkpoint)),checkpointed);
+ assert.equal(fs.existsSync(sentinel),false);
+ fs.writeFileSync(ownerManager,managerBytes);
+ fs.writeFileSync(linkedProfile,ownedBytes);
+ const allowed=wf('prepare-check',worktree,{task_id:task,check_id:'point'},scope);
+ assert.deepEqual(allowed.recipe.argv,handoff.checks[0].argv);
+
+ const publication=path.join(base,'publication-source');
+ run('git',['clone','--branch','develop',remote,publication]);
+ git(publication,'config','user.name','Fixture');
+ git(publication,'config','user.email','fixture@example.invalid');
+ git(publication,'switch','-c','review-source');
+ write(publication,'source.py','value = 2\n');
+ git(publication,'add','source.py');
+ git(publication,'commit','-m','Review the fixture candidate');
+ const authority={instruction:'Review and then merge into develop',instruction_origin:'owner',target_branch:'develop'};
+ const preflight=command(prHelper,'preflight',publication,authority);
+ const snapshot={...preflight,state:'OPEN',pr:{id:'fixture-pr',number:1,url:'https://example.invalid/fixture/pull/1'},
+                 threads:[],reviews:[],comments:[],checks:[]};
+ command(prHelper,'init',publication,{...authority,snapshot,final_validation:{path:link.path}});
+ command(prHelper,'review',publication,{snapshot,review:{
+  head:snapshot.head,base_oid:snapshot.base_oid,target_branch:'develop',files:snapshot.changed_files,
+  context_inspected:true,discussions_inspected:true,checks_inspected:true,findings:[],
+ }});
+ const ready=command(prHelper,'final-validation',publication,{snapshot,final_validation:{action:'prepare',attempt_id:'final'}});
+ assert.deepEqual(ready.final_validation.checks,suite.checks);
+ assert.equal(ready.final_validation.attempts.final.status,'prepared');
+});
+
+test('owned Web profile refresh binds exact Playwright drift to the same stopped run',t=>{
+ const base=fs.mkdtempSync(path.join(os.tmpdir(),'skill-tree-playwright-readmit-'));
+ t.after(()=>fs.rmSync(base,{recursive:true,force:true}));
+ const root=path.join(base,'queue'),remote=path.join(base,'remote.git'),working=path.join(base,'working');
+ fs.mkdirSync(root);
+ const git=(...args)=>run('git',['-C',root,...args]);
+ git('init','-b','develop');git('config','user.name','Fixture');git('config','user.email','fixture@example.invalid');
+ const pkg={name:'playwright-readmit-fixture',scripts:{test:'node --test'}};
+ const initial='export default { use: { baseURL: "http://127.0.0.1:4000" } };\n';
+ const changed='export default { use: { baseURL: "http://127.0.0.1:4001" } };\n';
+ write(root,'package.json',pkg);
+ write(root,'playwright.config.ts',initial);
+ write(root,'source.txt','The recorded static behavior.\n');
+ write(root,'partial.txt','Original implementation input.\n');
+ write(root,'.skill-tree/validation-recipes.json',{schema:1,recipes:{
+  'fixture-browser':{lane:'browser',argv:['node','browser-fixture.js'],input_paths:[]}
+ }});
+ const future='.skill-tree/documents/future.md',state='.skill-tree/documents/future.json';
+ write(root,future,'# Future Work\n\n## Pending Task Format\n\n## Pending Queue\n\n## Prioritized Next Changes\n\n## Backlog\n');
+ git('add','.');git('commit','-m','Record tracked Playwright discovery inputs');
+ run('git',['init','--bare',remote]);git('remote','add','origin',remote);git('push','origin','develop');
+ const skill='skill-tree-work-through-next';
+ run(process.execPath,[cli,'--target',root,'--only','codex','--flavor','web','--skills',skill]);
+ const helper=path.join(root,'.agents/skills',skill,'scripts/workflow-state.py');
+ function invoke(operation,target,payload,options=[],fail){
+  const request=path.join(base,'request.json');
+  const args=[helper,operation,target,...options];
+  if(payload){fs.writeFileSync(request,JSON.stringify(payload));args.push('--input',request);}
+  const result=spawnSync('python3',args,{encoding:'utf8',timeout:55000});
+  if(fail){assert.equal(result.status,2,result.stdout+result.stderr);assert.match(result.stdout+result.stderr,fail);return;}
+  assert.equal(result.status,0,result.stdout+result.stderr);
+  return JSON.parse(result.stdout);
+ }
+ const pending=invoke('intake',root,{title:'Preserve selected Web progress',description:'Guard owned browser discovery.',
+  expected_behavior:'Resume the same Web run after exact configured approval.'});
+ const staticCriterion='The static input retains the observed behavior.',browserCriterion='Exercise the configured fixture.';
+ const checks=[
+  {id:'static',recipe_id:'static-inspection',assertion:staticCriterion,criteria:[staticCriterion],
+   sources:['source.txt'],parameters:{},timing:'immediate'},
+  {id:'browser',recipe_id:'fixture-browser',assertion:browserCriterion,criteria:[browserCriterion],
+   sources:['source.txt'],parameters:{},timing:'immediate'}
+ ];
+ const body='Goal:\n- Preserve selected Web progress.\n\nTouch:\n- partial.txt\n\nValidation:\n```json\n'+
+  JSON.stringify({checks})+'\n```\n\nAcceptance:\n- '+staticCriterion+'\n- '+browserCriterion+'\n';
+ const processed=invoke('process',root,{selectors:[pending.id],
+  dispositions:{[pending.id]:{status:'promoted',reason:'The controlled Web fixture supplies the required bounds.'}},
+  tasks:[{title:'Preserve selected Web progress',body,parent_pending_ids:[pending.id]}]});
+ const task_id=processed.created_ids[0];
+ invoke('workspace-setup',root,{});
+ const runReceipt=invoke('start',root,{worktree:working},['--id',task_id]);
+ const selected=['--run-id',runReceipt.id];
+ invoke('prepare-worktree-profile',working,null,selected);
+ invoke('begin',working,{task_id},selected);
+ const inspectBrowser=()=>invoke('validation-preflight',working,{task_id,check_id:'browser'},selected);
+ const oldBrowser=inspectBrowser();
+ write(working,'partial.txt','Unfinished selected task changes.\n');
+ write(working,'static.log','The exact source assertion passed.\n');
+ const attempt=invoke('prepare-check',working,{task_id,check_id:'static'},selected);
+ invoke('checkpoint',working,{phase:'refresh-profile',stop_reason:'Installation profile changed; re-admit before continuation'},selected);
+ write(working,'playwright.config.ts',changed);
+ const previewRequest={playwright_refresh:{action:'preview'}};
+ invoke('admit',working,previewRequest,selected,/original check attempt/);
+ invoke('record-check',working,{task_id,check_id:'static',attempt_id:attempt.attempt_id,result:'pass',
+  classification:'executed-control',actual_lane:'static',environment_identity:attempt.environment_identity,
+  cleanup:'The fixture started no runtime process.',assertions:[{assertion:staticCriterion,result:'pass'}],
+  evidence:['static.log']},selected);
+ const statePath=path.join(root,state),queuePath=path.join(root,future);
+ const beforeState=fs.readFileSync(statePath),beforeQueue=fs.readFileSync(queuePath);
+ const beforeProfile=fs.readFileSync(path.join(working,'.skill-tree/installation/profile.json'));
+ const preview=invoke('admit',working,previewRequest,selected);
+ assert.equal(preview.status,'approval-required');
+ assert.equal(preview.task_id,task_id);
+ assert.deepEqual(preview.affected_checks.map(row=>row.check_id),['browser']);
+ assert.notEqual(preview.plan.playwright_input.before,preview.plan.playwright_input.after);
+ assert.deepEqual(fs.readFileSync(statePath),beforeState);
+ assert.deepEqual(fs.readFileSync(queuePath),beforeQueue);
+ assert.deepEqual(fs.readFileSync(path.join(working,'.skill-tree/installation/profile.json')),beforeProfile);
+ const approval={action:'apply',expected_preview_sha256:preview.preview_sha256,
+  owner_instruction:'Fixture owner approves the exact Playwright discovery input for the original stopped run.'};
+ invoke('admit',working,{playwright_refresh:{...approval,expected_preview_sha256:'0'.repeat(64)}},selected,/preview changed/);
+ write(working,'package.json',{...pkg,description:'A separate discovered input changed.'});
+ invoke('admit',working,{playwright_refresh:approval},selected,/material or unknown changes/);
+ write(working,'package.json',pkg);
+ assert.deepEqual(fs.readFileSync(statePath),beforeState);
+ const requestFile=path.join(base,'approved-playwright.json');
+ fs.writeFileSync(requestFile,JSON.stringify({playwright_refresh:approval}));
+ const interrupt=`
+import runpy, sys
+entry=runpy.run_path(sys.argv[1])
+scope=entry['main'].__globals__
+original=scope['owned_profile_installer']
+def lose_ack(store, request, mode, **kwargs):
+    result=original(store, request, mode, **kwargs)
+    if mode=='activate' and request.get('kind')=='playwright-discovery':
+        raise scope['WorkflowError']('Injected loss after the exact Playwright activation')
+    return result
+scope['owned_profile_installer']=lose_ack
+raise SystemExit(entry['main'](sys.argv[2:]))
+`;
+ const lost=spawnSync('python3',['-B','-c',interrupt,helper,'admit',working,...selected,'--input',requestFile],
+  {encoding:'utf8',timeout:55000});
+ assert.equal(lost.status,2,lost.stdout+lost.stderr);
+ assert.match(lost.stdout+lost.stderr,/Injected loss after the exact Playwright activation/);
+ const retained=JSON.parse(fs.readFileSync(statePath)).run_registry.runs[runReceipt.id].compatible_profile_refresh;
+ assert.equal(retained.kind,'playwright-discovery');
+ invoke('admit',working,{compatible_refresh:true},selected,/original exact Playwright approval/);
+ const result=invoke('admit',working,{playwright_refresh:approval},selected);
+ assert.equal(result.operation_id,retained.operation_id);
+ assert.equal(result.run_id,runReceipt.id);
+ assert.equal(result.task_id,task_id);
+ assert.deepEqual(invoke('admit',working,{playwright_refresh:approval},selected),{...result,replayed:true});
+ assert.equal(fs.readFileSync(path.join(working,'partial.txt'),'utf8'),'Unfinished selected task changes.\n');
+ assert.deepEqual(fs.readFileSync(queuePath),beforeQueue);
+ const afterState=JSON.parse(fs.readFileSync(statePath)),originalState=JSON.parse(beforeState);
+ assert.deepEqual(afterState.run_registry.claims,originalState.run_registry.claims);
+ assert.deepEqual(afterState.task_progress,originalState.task_progress);
+ assert.equal(afterState.run_registry.runs[runReceipt.id].phase,'implement');
+ const currentBrowser=inspectBrowser();
+ assert.notEqual(currentBrowser.recipe_environment,oldBrowser.recipe_environment);
+ assert.equal(currentBrowser.execution.required,true);
+ run('git',['-C',working,'add','playwright.config.ts']);
+ run('git',['-C',working,'commit','-m','Record the approved fixture configuration']);
+ const separateStop='A separate owner decision is still pending';
+ invoke('checkpoint',working,{phase:'refresh-profile',stop_reason:separateStop,
+  next_action:'Resolve the separate requirement'},selected);
+ write(working,'playwright.config.ts',initial);
+ const later=invoke('admit',working,previewRequest,selected);
+ const retainedStop=invoke('admit',working,{playwright_refresh:{...approval,
+  expected_preview_sha256:later.preview_sha256}},selected);
+ assert.equal(retainedStop.stop_reason,separateStop);
+ const stopped=JSON.parse(fs.readFileSync(statePath)).run_registry.runs[runReceipt.id];
+ assert.equal(stopped.phase,'refresh-profile');
+ assert.equal(stopped.stop_reason,separateStop);
+ assert.equal(stopped.next_action,'Resolve the separate requirement');
 });

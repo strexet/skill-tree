@@ -970,13 +970,12 @@ function requireUnaffectedProfileRuns(root){
   throw Error('Unfinished canonical work requires the explicit profile recovery path');
 }
 
-function compatibleProfilePlan(root, profileSha, input, result){
+function compatibleProfilePlan(root, profileSha, input, result, inputName='package.json'){
  const {old,profile:after}=result;
  const oldSha=c.hash(fs.readFileSync(c.safe(root,PROFILE)));
- if(oldSha!==profileSha||old.inputs['package.json']!==input.before||
-    after.inputs['package.json']!==input.after)
-  throw Error('The owned profile inputs differ from the exact original and synchronized Git bytes');
- const inputs={...after.inputs,'package.json':input.before};
+ if(oldSha!==profileSha||old.inputs[inputName]!==input.before||after.inputs[inputName]!==input.after)
+  throw Error('The owned profile inputs differ from the exact original and current Git bytes');
+ const inputs={...after.inputs,[inputName]:input.before};
  if(c.json(inputs)!==c.json(old.inputs))
   throw Error('Discovered profile inputs include material or unknown changes');
  const comparison=profile=>{
@@ -991,7 +990,7 @@ function compatibleProfilePlan(root, profileSha, input, result){
   throw Error('Resolved profile facts, policy, source, bindings, or recipes changed');
  const identity=(profile,profile_sha256)=>({profile_sha256,identity:profile.identity,environment_id:profile.environment_id});
  return {before:identity(old,oldSha),after:identity(after,c.hash(result.changes[PROFILE])),
-  input:'package.json',changed_fields:input.fields};
+  input:inputName,changed_fields:input.fields};
 }
 
 function deliveryProfilePlan(root,request,result){
@@ -1029,34 +1028,56 @@ function verifyCompatibleWorktree(root,request){
     c.json(run.workspace.cleanup_owner)!==c.json(request.owner)||
     c.json(c.readJson(registration,'skill-tree-owner.json'))!==c.json(request.owner))
   throw Error('The admitted worktree Git registration or original owner changed');
+ const playwright=request.kind==='playwright-discovery';
+ const inputName=playwright?'playwright.config.ts':'package.json';
+ if(playwright){
+  const queue=setupProofBytes(root,'.skill-tree/documents/future.md');
+  const progress=state.task_progress?.[run.current_task_id];
+  if(run.phase!=='refresh-profile'||run.admission?.flavor!=='web'||progress?.run_id!==run.id||
+     !['implementing','awaiting-validation'].includes(progress.stage)||
+     (request.queue_sha256!==undefined&&(!Buffer.isBuffer(queue)||c.hash(queue)!==request.queue_sha256))||
+     (request.task_id!==undefined&&request.task_id!==run.current_task_id))
+   throw Error('Select the exact stopped Web task and queue for Playwright discovery refresh');
+ }
  const baseline=state.task_progress?.[run.current_task_id]?.task_git_baseline?.head;
  if(![request.head,baseline,run.workspace.base_commit].includes(request.before_revision))
-  throw Error('Select an exact retained package metadata baseline');
+  throw Error('Select an exact retained discovery input baseline');
  git(worktree,'merge-base','--is-ancestor',request.before_revision,request.head);
- const beforeEntry=query(worktree,'ls-tree',request.before_revision,'--','package.json');
- const currentIndex=query(worktree,'ls-files','--stage','--','package.json');
- const before=/^(100(?:644|755)) blob ([0-9a-f]{40}|[0-9a-f]{64})\tpackage\.json$/.exec(beforeEntry);
- const index=/^(100(?:644|755)) ([0-9a-f]{40}|[0-9a-f]{64}) 0\tpackage\.json$/.exec(currentIndex);
- const after=setupProofBytes(worktree,'package.json');
- if(!before||!index||before[1]!==index[1]||!Buffer.isBuffer(after)||
-    Boolean(fs.lstatSync(c.safe(worktree,'package.json')).mode&0o100)!==(before[1]==='100755'))
-  throw Error('Compatibility requires exact regular package metadata with the original Git mode');
- const input=comparePackageMetadata(git(worktree,'cat-file','blob',before[2]),after);
- return {worktree,input};
+ const [beforeEntry,beforePath]=query(worktree,'ls-tree',request.before_revision,'--',inputName).split('\t');
+ const [indexEntry,indexPath]=query(worktree,'ls-files','--stage','--',inputName).split('\t');
+ const before=/^(100(?:644|755)) blob ([0-9a-f]{40}|[0-9a-f]{64})$/.exec(beforeEntry);
+ const index=/^(100(?:644|755)) ([0-9a-f]{40}|[0-9a-f]{64}) 0$/.exec(indexEntry);
+ const after=setupProofBytes(worktree,inputName);
+ if(!before||!index||beforePath!==inputName||indexPath!==inputName||before[1]!==index[1]||!Buffer.isBuffer(after)||
+    Boolean(fs.lstatSync(c.safe(worktree,inputName)).mode&0o100)!==(before[1]==='100755'))
+  throw Error('Compatibility requires exact regular discovery input with the original Git mode');
+ const original=git(worktree,'cat-file','blob',before[2]);
+ const input=playwright?{before:c.hash(original),after:c.hash(after),mode:before[1],index_oid:index[2],
+  fields:[inputName]}:comparePackageMetadata(original,after);
+ if(playwright&&input.before===input.after)
+  throw Error('An approved Playwright discovery refresh requires changed input bytes');
+ return {worktree,input,inputName};
 }
 
 function maintainCompatibleWorktreeProfile(root,request,mode){
  if(!['preview','activate','verify'].includes(mode))
   throw Error('Select the compatible worktree profile action');
  const context=()=>verifyCompatibleWorktree(root,request);
- const {worktree,input}=context();
+ const {worktree,input,inputName}=context();
+ const playwright=inputName==='playwright.config.ts';
+ const inputProof=playwright?'playwright_input':'package_input';
  if(mode!=='preview'){
   const state=c.readJson(root,WORKFLOW);
   const original=state.run_registry?.runs?.[request.run_id]?.compatible_profile_refresh;
   if(!original||original.operation_id!==request.operation_id||original.profile_sha256!==request.profile_sha256||
-     original.before_revision!==request.before_revision||c.json(original.plan)!==c.json(request.plan)||
-     c.json(input)!==c.json(request.plan.package_input))
-   throw Error('The original compatible profile plan or package input changed');
+     original.before_revision!==request.before_revision||request.plan.input!==inputName||c.json(original.plan)!==c.json(request.plan)||
+     c.json(input)!==c.json(request.plan[inputProof])||
+     (playwright&&(original.kind!==request.kind||original.queue_sha256!==request.queue_sha256||
+        original.task_id!==request.task_id||!original.approval?.owner_instruction||
+        !/^[a-f0-9]{64}$/.test(original.approval.expected_preview_sha256)||
+        c.json(original.approval)!==c.json(request.approval))))
+   throw Error(playwright?'The original Playwright profile plan, discovery input or owner approval changed':
+     'The original compatible profile plan or package input changed');
  }
  const source=c.safe(worktree,INSTALL+'/source');
  const sourceSha=()=>c.hash(c.json(c.sourceInputs(source)));
@@ -1067,11 +1088,11 @@ function maintainCompatibleWorktreeProfile(root,request,mode){
   const selections=Object.entries(previous.destinations).map(([rel,row])=>({rel,provider:row.provider,name:row.name}));
   const options={bridges:Object.keys(previous.bridges||{}),recoverPluginPending:false};
   const proposed=plan(worktree,source,previous.flavor,selections,options);
-  const proof=compatibleProfilePlan(worktree,request.profile_sha256,input,proposed);
-  return {...proof,package_input:input,source_sha256:sourceSha(),
+  const proof=compatibleProfilePlan(worktree,request.profile_sha256,input,proposed,inputName);
+  return {...proof,[inputProof]:input,source_sha256:sourceSha(),
    install:{flavor:previous.flavor,selections,bridges:options.bridges}};
  }
- const {before,after:next,input:inputName,changed_fields:fields,install:scope}=request.plan;
+ const {before,after:next,changed_fields:fields,install:scope}=request.plan;
  const proof={before,after:next,input:inputName,changed_fields:fields};
  const options={bridges:scope.bridges,recoverPluginPending:false,operationId:request.operation_id,
   guardedActivationProof:request.plan};
@@ -1094,7 +1115,7 @@ function maintainCompatibleWorktreeProfile(root,request,mode){
  const verifyAfter=()=>{
   if(!guardContext().activated)throw Error('The original compatible worktree refresh has no acknowledged activation');
   const profile=verify(worktree,source);
-  if(c.json(actual(profile))!==c.json(request.plan.after)||profile.inputs['package.json']!==input.after)
+  if(c.json(actual(profile))!==c.json(request.plan.after)||profile.inputs[inputName]!==input.after)
    throw Error('The installed worktree profile differs from the anticipated generation');
   return {profile,delta:[],action:'verified compatible worktree profile'};
  };
@@ -1106,7 +1127,7 @@ function maintainCompatibleWorktreeProfile(root,request,mode){
    if(result.delta.length)throw Error('The verified compatible generation has unowned pending changes');
    return;
   }
-  if(c.json(compatibleProfilePlan(worktree,request.profile_sha256,input,result))!==c.json(proof))
+  if(c.json(compatibleProfilePlan(worktree,request.profile_sha256,input,result,inputName))!==c.json(proof))
    throw Error('The prepared compatible worktree profile changed');
  };
  const installed=install(worktree,source,scope.flavor,scope.selections,{...options,
