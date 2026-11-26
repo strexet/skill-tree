@@ -137,6 +137,63 @@ class DirectorTopologyTests(unittest.TestCase):
     def git(self, root, *args):
         return self.command('git', '-C', root, '-c', 'commit.gpgsign=false', '-c', f'core.hooksPath={os.devnull}', *args)
 
+    def test_installed_full_cycle_routes_one_registered_wave(self):
+        project=self.base/'wave-project'
+        self.git_project(project,('left','right'))
+        remote=self.base/(project.name+'-unused.git')
+        remote.mkdir()
+        self.git(remote,'init','--bare')
+        self.git(project,'push','origin','develop')
+        operation='skill-tree-full-cycle'
+        self.install(project,'general',operation)
+        entry=project/AGENTS/operation/'scripts/workflow-state.py'
+
+        def cli(command,payload=None,*options):
+            return self.invoke(entry,project,command,payload,options,None)
+
+        cli('workspace-setup')
+        tasks=[]
+        for prefix in ('left','right'):
+            source=prefix+'/source.txt'
+            title='Preserve the '+prefix+' source'
+            pending=cli('intake',{'title':title,'description':title+'.','expected_behavior':'Preserve the fixture input.'})
+            criterion='Verify the selected source.'
+            check={'id':'source','recipe_id':'static-inspection','criteria':[criterion],'sources':[source],
+                   'parameters':{},'assertion':criterion,'timing':'immediate'}
+            body='Goal:\n- '+title+'.\n\nTouch:\n- '+source+'\n\nValidation:\n```json\n'+json.dumps(
+                {'checks':[check]})+'\n```\n\nAcceptance:\n- '+criterion+'\n'
+            processed=cli('process',{'selectors':[pending['id']],
+                'dispositions':{pending['id']:{'status':'promoted','reason':'The fixture verifies this source scope.'}},
+                'tasks':[{'title':title,'body':body,'parent_pending_ids':[pending['id']]}]})
+            tasks.append(processed['created_ids'][0])
+        original=cli('index')
+        run=cli('start',{'full_cycle_wave':{'slots':2},'snapshot_ids':tasks,
+                   'expected_source_hash':original['source_hash'],
+                   'delivery_authorization':{'pr':True,'merge':False,'target_branch':'develop',
+                                             'owner_instruction':'Use one Full Cycle publication for the fixture wave.'}},
+                '--standalone','--mode','all')
+        checkout=Path(run['profile_handoff']['worktree'])
+        selected=['--run-id',run['id']]
+        self.invoke(entry,checkout,'prepare-worktree-profile',None,selected,None)
+        view=self.invoke(entry,checkout,'worker-handoff',{'action':'wave-preview'},selected,None)
+        self.assertEqual({row['id'] for row in view['selected']},set(tasks))
+        common=self.git(project,'rev-parse','--path-format=absolute','--git-common-dir').strip()
+        for slot in view['selected']:
+            path=Path(slot['worktree'])
+            self.assertTrue(path.resolve().is_relative_to(Path(common).resolve()),(path,common))
+            path.parent.mkdir(parents=True,exist_ok=True)
+            self.git(checkout,'worktree','add','--detach',path,view['head'])
+            assigned=self.invoke(entry,checkout,'worker-handoff',{'action':'assign','task_id':slot['id'],
+                'slot':slot['slot'],'generation':slot['generation'],'worker_id':'fixture-slot-'+str(slot['slot']),
+                'base':view['head'],'worktree':str(path),'paths':slot['paths'],'shared_inputs':slot['shared_inputs']},
+                selected,None)
+            self.assertEqual(assigned['task_id'],slot['id'])
+        final=self.invoke(entry,checkout,'worker-handoff',{'action':'wave-preview'},selected,None)
+        self.assertFalse(final['selected'])
+        self.assertEqual({item['task_id'] for item in final['held']},set(tasks))
+        self.assertEqual(set(cli('runs')['runs']),{run['id']})
+        self.assertEqual(self.git(remote,'for-each-ref','--format=%(refname)').strip(), 'refs/heads/develop')
+
     def test_compact_source_preserves_full_project_checkout_and_pr_preflight(self):
         core = SOURCE/'common/scripts'
         maintenance_spec = importlib.util.spec_from_file_location('compact_maintenance_fixture',core/'director-maintenance.py')

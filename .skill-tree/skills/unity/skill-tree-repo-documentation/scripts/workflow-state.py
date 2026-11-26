@@ -580,6 +580,9 @@ class Store:
 
 def validate_run(run):
     required={'id','mode','snapshot','root_task_id','current_task_id','phase','required_ids','deferred_ids','pending_ids','processing_results','completed_ids','limits','next_action','stop_reason','admission','admitted_task_ids','admitted_groups'}
+    if 'full_cycle_wave' in run and (run['full_cycle_wave']!={'slots':2} or run.get('mode')!='all'
+            or len(run.get('snapshot',[]))<2 or run.get('delivery',{}).get('authorization',{}).get('pr') is not True):
+        raise WorkflowError('Invalid retained Full Cycle wave')
     if not isinstance(run,dict) or not required.issubset(run) or not valid_id(run.get('id'),'WR') or run.get('mode') not in {'next','all'}:
         raise WorkflowError('Corrupt active checkpoint')
     if not isinstance(run['admission'],dict) or not isinstance(run['admitted_groups'],dict):raise WorkflowError('Corrupt profile admission/group scope')
@@ -1369,6 +1372,16 @@ def start(store,mode,selector=None,limits=None,workspace=None,*,reviewed_directe
     if {'topic', 'intake_batch_ids', 'group'} & options.keys():
         raise WorkflowError('Resolve group filters before start and pass the exact snapshot IDs and source hash')
     operation=options.get('implementation_operation')
+    wave=options.get('full_cycle_wave')
+    if 'full_cycle_wave' in options:
+        authorization=options.get('delivery_authorization',{})
+        if (wave!={'slots':2} or mode!='all' or selector or operation or not store.neutral or store.run_id
+                or not isinstance(options.get('snapshot_ids'),list) or len(options['snapshot_ids'])<2
+                or not options.get('expected_source_hash') or not isinstance(authorization,dict)
+                or authorization.get('pr') is not True or authorization.get('target_branch')!='develop'
+                or not isinstance(authorization.get('owner_instruction',authorization.get('instruction')),str)
+                or not authorization.get('owner_instruction',authorization.get('instruction')).strip()):
+            raise WorkflowError('Full Cycle waves require two slots, exact roots, a verified queue and the original Full Cycle PR grant')
     review_policy=None
     directed_local = (reviewed_directed and dispatch and mode == 'next' and operation == 'work-through-next'
                       and options.get('local_base') is True and 'delivery_authorization' not in options)
@@ -1420,6 +1433,9 @@ def start(store,mode,selector=None,limits=None,workspace=None,*,reviewed_directe
             raise WorkflowError('Git controllers require workspace-setup before start')
         tasks,chosen,snapshot=_start_selection(store,mode,selector,options,text)
         run={'id':identity('WR'),'mode':mode,'snapshot':snapshot,'root_task_id':chosen['id'],'current_task_id':chosen['id'],'phase':'implement','required_ids':[chosen['id']],'deferred_ids':[],'pending_ids':[],'processing_results':[],'completed_ids':[],'limits':limits or {},'partial_work':[],'stop_reason':None,'next_action':'Implement selected task','started_at':now()}
+        if wave:
+            if not registry:raise WorkflowError('A Full Cycle wave requires a registered project')
+            run['full_cycle_wave']=deepcopy(wave)
         for tid in dependency_scope(tasks,run):clarification_admission(store,tid)
         run['admission']=admission
         completed = {item['task_id']:item for item in store.outcomes() if item['disposition']=='completed'}
@@ -1943,6 +1959,12 @@ def complete(store,payload):
         invariants=policy_invariants(task)
         if invariants:record[POLICY_INVARIANTS]=invariants
         if disposition=='completed':
+            run=state['active_run']
+            if run and run.get('full_cycle_wave'):
+                progress=state['task_progress'].get(task['id'],{})
+                incorporation=require_wave_candidate(store,task,progress.get('task_git_baseline'),
+                                                      progress.get('task_git_candidate'))
+                if incorporation:record['wave_incorporation']=incorporation
             check_inputs=set(payload['source_fingerprints'])
             if state['task_progress'].get(task['id'],{}).get('task_git_baseline'):
                 for item in validation_records:
@@ -5418,7 +5440,8 @@ def completed_contract_sha256(record):
                         ('runner_result','payload_hash','recorded_at')}
         checks.append(bound)
     identity['check_results'] = checks
-    if POLICY_INVARIANTS in record:identity[POLICY_INVARIANTS]=record[POLICY_INVARIANTS]
+    for key in (POLICY_INVARIANTS,'wave_incorporation'):
+        if key in record:identity[key]=record[key]
     return digest(dump(identity).encode())
 
 
@@ -5682,7 +5705,7 @@ def begin_task(store,payload):
         if operation is not None and operation!='implement-next':
             raise WorkflowError('Select the exact standalone task implementation operation')
         run=state['active_run']
-        scoped_commit=bool(run and run.get('implementation_operation')) or (not run and operation=='implement-next')
+        scoped_commit=bool(run and (run.get('implementation_operation') or run.get('full_cycle_wave'))) or (not run and operation=='implement-next')
         previous=state['task_progress'].get(task['id'])
         checks=check_specs(task)
         invariants=policy_invariants(task)
@@ -5721,6 +5744,8 @@ def mark_implemented(store,payload):
             if entry.get('task_git_attempt'):
                 raise WorkflowError('Recover the original prepared task commit before changing the candidate')
             candidate=workspaces.task_commit_candidate(store.source_root,baseline,paths)
+            if (state.get('active_run') or {}).get('full_cycle_wave'):
+                require_wave_candidate(store,task,baseline,candidate)
             entry['task_git_candidate']=candidate
             result['git_review_identity']=workspaces.task_review_identity(baseline,candidate,task['body'])
         entry['stage']='awaiting-validation';entry['definition']=task_signature(task);entry['partial_work']=paths
@@ -8145,17 +8170,232 @@ def guard_shared_project(store):
             'Use --direct-project only for an explicitly requested direct Core operation.')
 
 
+def wave_worker_path(store, slot, generation):
+    return workspaces.common_dir(store.source_root) / 'skill-tree-wave-workers' / store.run_id.lower() / f'{slot}-{generation}'
+
+
+def wave_retried(assignment):
+    return bool(assignment.get('superseded') or assignment.get('cleanup',{}).get('retry'))
+
+
+def full_cycle_wave_preview(store, state, ledger):
+    run = state['active_run']
+    if not run or not run.get('full_cycle_wave') or run.get('stop_reason') or run['phase']=='completed':
+        raise WorkflowError('Select an open Full Cycle run with an explicitly admitted wave')
+    preview = owned_module('full_cycle_wave_preview', Path(__file__).with_name('parallel-preview.py'))
+    tasks = parse(store.text())
+    head = workspaces.worker_head(store.source_root)
+    active = [rows[-1] for rows in ledger['slots'].values() if rows
+              and not wave_retried(rows[-1])
+              and not retired_worker_scope(store,state,rows[-1],head)]
+    completed = {row['task_id']:row for row in store.outcomes() if row['disposition']=='completed'}
+    registry = state['run_registry']
+    claims = {key:value for key,value in registry['claims'].items() if value != run['id']}
+    resources = preview.named_resources(store.source_root)
+    outputs = preview.generated_outputs(store.source_root)
+    selected, held = [], []
+    rows = {task['id']:task for task in tasks if task['queue']=='Prioritized Next Changes'}
+    for task_id in run['snapshot']:
+        task = rows.get(task_id)
+        if not task or task_id in completed:
+            continue
+        candidate = preview.describe(store,task,outputs,resources)
+        if task['status']!='Ready':
+            candidate['reasons'].append({'kind':'task-hold'})
+        if any(row['task_id']==task_id for row in active):
+            candidate['reasons'].append({'kind':'worker-active'})
+        if task_id in claims or state['task_progress'].get(task_id,{}).get('stage')=='blocked':
+            candidate['reasons'].append({'kind':'task-claimed-or-stopped'})
+        if any(key in registry.get('resources',{}) for key in candidate['exclusive_resources']):
+            candidate['reasons'].append({'kind':'exclusive-resource-held'})
+        candidate['reasons'].extend(preview.dependency_holds(store,candidate,completed,state['task_progress'],claims))
+        if not candidate['reasons'] and required_completed_gap(store,state,completed,task['depends_on']):
+            candidate['reasons'].append({'kind':'dependency-revalidation-required'})
+        for other in active:
+            if other['task_id']!=task_id:
+                candidate['reasons'].extend(preview.conflicts(candidate,other['wave_scope']))
+        for other in selected:
+            candidate['reasons'].extend(preview.conflicts(candidate,other))
+        if not candidate['reasons'] and len(active)+len(selected)<run['full_cycle_wave']['slots']:
+            candidate['paths']=sorted(set(preview.writes(candidate)))
+            candidate['shared_inputs']=sorted({path for path in candidate['check_inputs']+candidate['prerequisite_inputs']
+                if not any(preview.overlap(path,owned) for owned in candidate['paths'])})
+            selected.append(candidate)
+        else:
+            if not candidate['reasons']:
+                candidate['reasons'].append({'kind':'worker-limit'})
+            held.append({'task_id':task_id,'reasons':candidate['reasons']})
+    openings=[]
+    for slot in range(1,run['full_cycle_wave']['slots']+1):
+        if not any(row['slot']==slot for row in active):
+            generation = 1+len(ledger['slots'].get(str(slot),[]))
+            openings.append({'slot':slot,'generation':generation,'worktree':str(wave_worker_path(store,slot,generation))})
+    for slot,row in zip(openings,selected):
+        row.update(slot)
+    return {'run_id':run['id'],'head':head,'selected':selected,'held':held}
+
+
+def wave_related_code(store,state,ledger,head):
+    paths={path for rows in ledger['slots'].values() for row in rows
+           if row.get('incorporation',{}).get('state')=='applied'
+           and retired_worker_scope(store,state,row,head)
+           for path in row['result']['candidate']['paths']}
+    return {path:digest(workspaces.local_git(store.source_root,'cat-file','blob',blob).stdout)
+            for path,(_,blob) in workspaces.wave_blobs(store.source_root,head,sorted(paths)[:12]).items()}
+
+
+def incorporate_wave_worker(store,state,ledger,current,payload,relative,request):
+    run=state['active_run']
+    if not run.get('full_cycle_wave') or not current.get('result') or wave_retried(current):
+        raise WorkflowError('Incorporation requires a recorded worker result from the current Full Cycle wave')
+    original=current.get('incorporation')
+    if original and original['request_sha256']!=request:
+        raise WorkflowError('Recover the original worker incorporation request')
+    if original and original['state']=='applied':
+        return original
+    if payload['result_sha256']!=digest(dump(current['result']).encode()):
+        raise WorkflowError('Worker result changed before incorporation')
+    task=resolve(parse(store.text()),[current['task_id']],'Prioritized Next Changes')[0]
+    if run['current_task_id']!=task['id'] or digest(task['body'].strip().encode())!=current['definition']:
+        raise WorkflowError('Advance and begin the exact current task before wave incorporation')
+    entry=state['task_progress'].get(task['id'],{})
+    baseline=entry.get('task_git_baseline',{})
+    head=workspaces.worker_head(store.source_root)
+    if (entry.get('stage')!='implementing' or not baseline or baseline['head']!=head
+            or payload['expected_head']!=head):
+        raise WorkflowError('Wave incorporation requires the exact current task baseline')
+    if any(row.get('incorporation',{}).get('state')=='applied'
+           and row['task_id']!=task['id'] and not retired_worker_scope(store,state,row,head)
+           for rows in ledger['slots'].values() for row in rows[-1:]):
+        raise WorkflowError('Finish the current incorporated task before applying another result')
+    result=current['result']
+    if current.get('resources') and not current.get('cleanup'):
+        raise WorkflowError('Confirm worker cleanup and release exclusive resources before incorporation')
+    worker,checkout=workspaces.worker_checkout(store.source_root,str(wave_worker_path(store,current['slot'],current['generation'])))
+    if checkout!=current['checkout']:
+        raise WorkflowError('The original wave worker checkout identity changed')
+    check_ids={check['id'] for check in check_specs(task)}
+    if {row['id'] for row in result['checks']}!=check_ids or any(row['result']!='pass' for row in result['checks']):
+        raise WorkflowError('Wave result requires passing evidence for every declared task check')
+    if fingerprints(store,current['shared_inputs'])!=current['shared_inputs']:
+        raise WorkflowError('Wave incorporation inputs changed before acceptance')
+    identity={'head':result['candidate']['head'],'base_oid':result['base'],
+              'source_digest':digest((result['candidate']['tree']+'\n'+task['body']).encode())}
+    verified_implementation_review(store,payload['review_id'],identity,{'kind':'task','task_ids':[task['id']]})
+    expected=workspaces.worker_candidate(worker,result['base'],result['candidate']['head'],
+                                        current['paths'],[check['path'] for check in result['checks']])
+    if expected!=result['candidate']:
+        raise WorkflowError('Checked worker candidate identity changed')
+    artifacts={}
+    for row in result['checks']:
+        path=binding_path(worker,row['path'])
+        data=path.read_bytes()
+        if digest(data)!=row['sha256']:
+            raise WorkflowError('Recorded worker check evidence changed before incorporation')
+        relative_artifact='.skill-tree/run-evidence/'+run['id'].lower()+f'/wave-{current["slot"]}-{current["generation"]}-{row["id"]}'
+        target=binding_path(store.source_root,relative_artifact)
+        if target.exists() and file_hash(target)!=row['sha256']:
+            raise WorkflowError('Wave evidence would replace an unrelated artifact')
+        artifacts[relative_artifact]=data
+    if not original:
+        workspaces.preflight_wave_candidate(store.source_root,baseline,result['base'],expected)
+        original={'request_sha256':request,'state':'prepared','incorporation_base':head,
+                  'worker_head':identity['head'],'worker_tree':expected['tree'],'review_id':payload['review_id'],
+                  'task_id':task['id'],'artifacts':{path:digest(data) for path,data in artifacts.items()}}
+        current['incorporation']=original
+        store.commit({relative:dump(ledger)})
+    workspaces.apply_wave_candidate(store.source_root,baseline,result['base'],expected)
+    for path,data in artifacts.items():
+        target=binding_path(store.source_root,path)
+        if not target.exists():
+            target.parent.mkdir(parents=True,exist_ok=True)
+            fd,temporary=tempfile.mkstemp(prefix='.wave-evidence-',dir=target.parent)
+            try:
+                with os.fdopen(fd,'wb') as stream:
+                    stream.write(data)
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                os.link(temporary,target)
+            finally:
+                Path(temporary).unlink(missing_ok=True)
+        if file_hash(target)!=digest(data):
+            raise WorkflowError('Worker artifact changed during incorporation')
+    original['state']='applied'
+    store.commit({relative:dump(ledger)})
+    return original
+
+
+def require_wave_candidate(store,task,baseline,candidate):
+    wave=worker_handoff(store,{'action':'status'})
+    active=[rows[-1] for rows in wave['slots'].values() if rows and rows[-1]['task_id']==task['id']
+            and not wave_retried(rows[-1])]
+    if not active:
+        return None
+    assignment, = active
+    incorporation=assignment.get('incorporation')
+    if not incorporation or incorporation['state']!='applied' or not baseline or not candidate:
+        raise WorkflowError('Incorporate the exact wave worker before sealing the coordinator task')
+    result=assignment['result']['candidate']
+    paths=result['paths']
+    root=store.source_root
+    if (baseline['head']!=incorporation['incorporation_base'] or not set(paths).issubset(candidate['paths'])
+            or workspaces.wave_blobs(root,candidate['tree'],paths)!=workspaces.wave_blobs(root,result['tree'],paths)):
+        raise WorkflowError('Coordinator candidate does not retain the exact reviewed wave changes')
+    for path,expected in incorporation['artifacts'].items():
+        entry=workspaces.wave_blobs(root,candidate['tree'],[path]).get(path)
+        if (path not in candidate['paths'] or not entry
+                or digest(workspaces.local_git(root,'cat-file','blob',entry[1]).stdout)!=expected):
+            raise WorkflowError('Coordinator candidate does not retain the exact wave check evidence')
+    return incorporation
+
+
+def close_wave_worker(state,assignment,payload,request):
+    evidence=payload['cleanup_evidence']
+    result=assignment.get('result')
+    expected=digest(dump(result).encode()) if result else None
+    if ('wave_scope' not in assignment or not isinstance(evidence,dict)
+            or set(evidence)!={'kind','event','worker_id','slot','generation','result_sha256'}
+            or evidence['kind'] not in {'host-worker-terminated','host-worker-unused'}
+            or not isinstance(evidence['event'],str) or not evidence['event'].strip()
+            or any(evidence[key]!=assignment[key] for key in ('worker_id','slot','generation'))
+            or evidence['result_sha256']!=expected or payload['result_sha256']!=expected
+            or type(payload['retry']) is not bool):
+        raise WorkflowError('Worker cleanup requires an exact host termination observation for the original generation and result')
+    if evidence['kind']=='host-worker-unused' and (result or assignment.get('native_worker') or not payload['retry']):
+        raise WorkflowError('A started or recorded worker cannot be declared unused')
+    if assignment.get('resources'):
+        binding=assignment.get('native_worker')
+        if binding:
+            require_departed_check_runner(binding['process']['pgid'])
+        elif result or not payload['retry'] or evidence['kind']!='host-worker-unused':
+            raise WorkflowError('Reconcile the registered native resource worker before releasing its claims')
+    if (payload['retry'] and assignment.get('incorporation')) or (
+            not payload['retry'] and (not result or any(row['result']!='pass' for row in result['checks']))):
+        raise WorkflowError('A failed worker requires cleanup and retry before incorporation')
+    wave={key:assignment[key] for key in ('slot','generation','task_id')}
+    for key,token in assignment.get('resources',{}).items():
+        workspaces.change_resource(state['run_registry'],state['active_run'],
+                                  {'resource':key,'release':True,'token':token},wave=wave)
+    return {'request_sha256':request,'cleanup_evidence':deepcopy(evidence),'retry':payload['retry'],
+            'released_resources':sorted(assignment.get('resources',{}))}
+
+
 def worker_handoff(store, payload):
     if not valid_id(store.run_id, 'WR') or not isinstance(payload, dict):
         raise WorkflowError('Worker handoff requires an exact controller run ID')
     action = payload.get('action')
     fields = {
         'status': {'action'},
+        'wave-preview': {'action'},
+        'incorporate': {'action','slot','generation','worker_id','result_sha256','expected_head','review_id'},
+        'close-worker': {'action','slot','generation','worker_id','result_sha256','cleanup_evidence','retry'},
+        'bind-worker': {'action','slot','generation','worker_id','process_group'},
+        'supersede-worker': {'action','slot','generation','worker_id','cleanup_sha256'},
         'assign': {'action', 'slot', 'generation', 'worker_id', 'task_id', 'base', 'worktree', 'paths', 'shared_inputs'},
         'record': {'action', 'slot', 'generation', 'worker_id', 'head', 'checks'},
     }
     if not isinstance(action, str) or set(payload) != fields.get(action):
-        raise WorkflowError('Worker handoff requires an exact status, assign or record payload')
+        raise WorkflowError('Worker handoff requires an exact status, preview, assign, record or incorporate payload')
     caller = store.source_root
     relative = '.skill-tree/history/worker-handoffs/' + store.run_id.lower() + '.json'
     path = store.owned(relative)
@@ -8174,6 +8414,10 @@ def worker_handoff(store, payload):
     if action == 'status':
         store.load()
         return load_receipts()
+    if action == 'wave-preview':
+        state=store.load()
+        assert_admission(store,state)
+        return full_cycle_wave_preview(store,state,load_receipts())
 
     slot, generation, actor = (payload[key] for key in ('slot', 'generation', 'worker_id'))
     if (type(slot) is not int or slot not in {1, 2} or type(generation) is not int or generation < 1
@@ -8192,6 +8436,95 @@ def worker_handoff(store, payload):
         ledger = load_receipts()
         assignments = ledger['slots'].setdefault(str(slot), [])
         current = assignments[-1] if assignments else None
+        if action=='incorporate':
+            observed=next((row.get('incorporation') for row in assignments
+                           if row['generation']==generation and row['worker_id']==actor),None)
+            if observed and observed['state']=='applied' and observed['request_sha256']==request:
+                return observed
+            if not current or current['generation']!=generation or current['worker_id']!=actor:
+                raise WorkflowError('Wave incorporation requires the current generation and worker')
+            if (run['phase']=='completed' or run.get('stop_reason')) and not current.get('incorporation',{}).get('state')=='applied':
+                raise WorkflowError('Wave incorporation requires an open admitted controller')
+            return incorporate_wave_worker(store,state,ledger,current,payload,relative,request)
+        if action in {'bind-worker','supersede-worker'}:
+            if not current or current['generation']!=generation or current['worker_id']!=actor or 'wave_scope' not in current:
+                raise WorkflowError('Select the original active wave worker generation')
+            field='native_worker' if action=='bind-worker' else 'superseded'
+            if field in current:
+                observed=current[field]
+                if observed['request_sha256']!=request:
+                    raise WorkflowError('Wave retry differs from the original request')
+                return observed
+            if action=='bind-worker':
+                if run.get('stop_reason') or run['phase']=='completed' or current.get('cleanup') or current.get('result'):
+                    raise WorkflowError('Bind the dedicated native worker before executing the assigned work')
+                group=check_runner_group(payload['process_group'])
+                process=local_process_group_identity(group,group)
+                if any(row.get('native_worker',{}).get('process')==process
+                       for rows in ledger['slots'].values() for row in rows):
+                    raise WorkflowError('A native process cannot serve two worker generations')
+                extra={'process':process}
+            else:
+                cleanup=current.get('cleanup')
+                if not cleanup or cleanup['retry'] or payload['cleanup_sha256']!=digest(dump(cleanup).encode()):
+                    raise WorkflowError('Supersede requires the exact successful original worker cleanup')
+                attempt=current.get('incorporation')
+                candidate=current['result']['candidate']
+                paths=candidate['paths']
+                root=store.source_root
+                head=workspaces.worker_head(root)
+                before=workspaces.wave_blobs(root,current['base'],paths)
+                committed=workspaces.wave_blobs(root,head,paths)
+                if attempt:
+                    after=workspaces.wave_blobs(root,candidate['head'],paths)
+                    currently_clean=workspaces.wave_worktree_blobs(root,paths)==committed
+                    applied_paths=any(before.get(path)!=after.get(path) and committed.get(path)==after.get(path)
+                                      for path in paths)
+                    artifacts_present=any(binding_path(root,path).exists() for path in attempt['artifacts'])
+                    if (attempt['state']!='prepared' or not currently_clean or applied_paths or artifacts_present
+                            or workspaces.local_git_paths(root,'diff','--cached','--name-only','-z',head,'--',*paths)):
+                        raise WorkflowError('Reconcile the prepared incorporation because worker changes may already be present')
+                if fingerprints(store,current['shared_inputs'])==current['shared_inputs'] and committed==before:
+                    raise WorkflowError('Current checked wave inputs permit original incorporation')
+                extra={'cleanup_sha256':payload['cleanup_sha256'],'observed_head':head}
+                if attempt:extra['unapplied_incorporation_sha256']=digest(dump(attempt).encode())
+                progress=state['task_progress'].get(current['task_id'],{})
+                baseline=progress.get('task_git_baseline')
+                if baseline and baseline['head']!=head:
+                    if (progress.get('stage')!='implementing' or any(progress.get(key) for key in
+                            ('checks','partial_work','execution_sessions','task_git_candidate','task_git_attempt'))
+                            or workspaces.local_git(root,'merge-base','--is-ancestor',
+                                                    baseline['head'],head,accepted=(0,1,128)).returncode):
+                        raise WorkflowError('Reconcile original leaf work before replacing its wave baseline')
+                    updated=workspaces.task_commit_baseline(root)
+                    if any(updated[key]!=baseline[key] for key in ('ref','checkout')):
+                        raise WorkflowError('Select the original coordinator branch and checkout')
+                    if (workspaces.wave_worktree_blobs(root,paths)!=committed
+                            or workspaces.local_git_paths(root,'diff','--cached','--name-only','-z',head,'--',*paths)):
+                        raise WorkflowError('Reconcile changes on the original worker paths before replacing the baseline')
+                    extra['previous_task_baseline']=baseline
+                    progress['task_git_baseline']=updated
+            result={'request_sha256':request,**extra}
+            current[field]=result
+            if 'previous_task_baseline' in extra:
+                store.save(store.text(),state,{relative:dump(ledger)},update_navigation=False)
+            else:
+                store.commit({relative:dump(ledger)})
+            return result
+        if action=='close-worker':
+            assignment=next((row for row in assignments if row['generation']==generation and row['worker_id']==actor),None)
+            if assignment is None:
+                raise WorkflowError('Worker cleanup requires the exact admitted generation')
+            if cleanup:=assignment.get('cleanup'):
+                if cleanup['request_sha256']!=request:
+                    raise WorkflowError('Worker cleanup retry differs from the original')
+                return cleanup
+            if assignment is not current:
+                raise WorkflowError('Worker cleanup must reconcile the current generation')
+            result=close_wave_worker(state,assignment,payload,request)
+            assignment['cleanup']=result
+            store.save(store.text(),state,{relative:dump(ledger)},update_navigation=False)
+            return result
         if current and current['generation'] == generation:
             existing = current if action == 'assign' else current.get('result')
             if existing and existing['request_sha256'] == request:
@@ -8204,11 +8537,14 @@ def worker_handoff(store, payload):
             result = assign_worker(store, state, payload, ledger, current, request)
             assignments.append(result)
         else:
-            if not current or current['generation'] != generation or current['worker_id'] != actor:
+            if not current or current['generation'] != generation or current['worker_id'] != actor or current.get('cleanup'):
                 raise WorkflowError('Worker result does not match the current assignment generation and identity')
             result = record_worker(store, state, payload, current, request)
             current['result'] = result
-        store.commit({relative: dump(ledger)})
+        if action=='assign' and result.get('resources'):
+            store.save(store.text(),state,{relative:dump(ledger)},update_navigation=False)
+        else:
+            store.commit({relative:dump(ledger)})
         return result
 
 
@@ -8245,7 +8581,17 @@ def assign_worker(store, state, payload, ledger, current, request):
     inputs = workspaces.worker_paths(payload['shared_inputs'])
     touch = [line[2:].strip().strip('`') for line in section_body(task['body'], 'Touch').splitlines()
              if line.startswith('- ')]
-    if not paths or any(not any(path == scope or path.startswith(scope + '/') for scope in touch) for path in paths):
+    wave_scope=None
+    if state['active_run'].get('full_cycle_wave'):
+        preview=full_cycle_wave_preview(store,state,ledger)
+        wave_scope=next((row for row in preview['selected'] if row['id']==task['id']),None)
+        if (not wave_scope or payload['slot']!=wave_scope['slot'] or payload['generation']!=wave_scope['generation']
+                or payload['worktree']!=wave_scope['worktree'] or paths!=wave_scope['paths']
+                or inputs!=wave_scope['shared_inputs']):
+            raise WorkflowError('Worker assignment differs from the exact current eligible wave and isolated checkout')
+        wave_scope={key:wave_scope[key] for key in (
+            'id','touch','generated_consumers','check_inputs','prerequisite_inputs','exclusive_resources')}
+    elif not paths or any(not any(path == scope or path.startswith(scope + '/') for scope in touch) for path in paths):
         raise WorkflowError('Worker assignment exceeds the task Touch scope')
     if any(workspaces.local_overlap(path, shared) for path in paths for shared in inputs):
         raise WorkflowError('Worker writes overlap shared validation inputs')
@@ -8258,7 +8604,7 @@ def assign_worker(store, state, payload, ledger, current, request):
         if slot == str(payload['slot']) or not attempts:
             continue
         other = attempts[-1]
-        if retired_worker_scope(store, state, other, base):
+        if wave_retried(other) or retired_worker_scope(store, state, other, base):
             continue
         if other['worker_id'] == payload['worker_id'] or other['checkout'] == checkout:
             raise WorkflowError('Worker slots require distinct actors and checkouts')
@@ -8269,19 +8615,32 @@ def assign_worker(store, state, payload, ledger, current, request):
     worker = Store(root, route_queue=False)
     if None in shared.values() or fingerprints(worker, inputs) != shared:
         raise WorkflowError('Worker shared validation inputs differ from the coordinator')
-    return {'request_sha256': request, 'recorded_at': now(), 'slot': payload['slot'],
+    common={'request_sha256': request, 'recorded_at': now(), 'slot': payload['slot'],
             'generation': payload['generation'], 'worker_id': payload['worker_id'], 'task_id': task['id'],
-            'definition': digest(task['body'].strip().encode()), 'base': base, 'worktree': str(root), 'checkout': checkout,
+            'definition': digest(task['body'].strip().encode()), 'base': base, 'checkout': checkout,
             'paths': paths, 'shared_inputs': shared}
+    if wave_scope:
+        wave={key:common[key] for key in ('slot','generation','task_id')}
+        resources={key:workspaces.change_resource(state['run_registry'],state['active_run'],
+            {'resource':key,'purpose':'Full Cycle wave task '+task['id']},wave=wave)['token']
+            for key in wave_scope['exclusive_resources']}
+        common.update(wave_scope=wave_scope,related_code=wave_related_code(store,state,ledger,base),resources=resources)
+    else:
+        common['worktree']=str(root)
+    return common
 
 
 def record_worker(store, state, payload, assignment, request):
+    if assignment.get('resources') and not assignment.get('native_worker'):
+        raise WorkflowError('Bind the exact dedicated native resource worker before recording a result')
     tasks = parse(store.text())
     task = resolve(tasks, [assignment['task_id']], 'Prioritized Next Changes')[0]
     assert_scope(store, state, tasks, task['id'])
     if task['status'] != 'Ready' or digest(task['body'].strip().encode()) != assignment['definition']:
         raise WorkflowError('Worker assignment task contract changed')
-    root, checkout = workspaces.worker_checkout(store.source_root, assignment['worktree'])
+    path=(wave_worker_path(store,assignment['slot'],assignment['generation']) if 'wave_scope' in assignment
+          else assignment['worktree'])
+    root, checkout = workspaces.worker_checkout(store.source_root,str(path))
     if checkout != assignment['checkout']:
         raise WorkflowError('Worker checkout identity changed')
     worker = Store(root, route_queue=False)
@@ -8304,6 +8663,8 @@ def record_worker(store, state, payload, assignment, request):
         if artifact.resolve() != artifact or not artifact.is_file() or file_hash(artifact) != outcome['sha256']:
             raise WorkflowError('Worker check artifact is missing, aliased or changed')
         evidence.append(deepcopy(outcome))
+    if 'wave_scope' in assignment and (len(evidence)!=len(known) or {row['id'] for row in evidence}!=known):
+        raise WorkflowError('Wave check evidence requires one result per declared check')
     candidate = workspaces.worker_candidate(root, assignment['base'], payload['head'],
                                             assignment['paths'], [check['path'] for check in evidence])
     return {'request_sha256': request, 'recorded_at': now(), 'slot': assignment['slot'],
