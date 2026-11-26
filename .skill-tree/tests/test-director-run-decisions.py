@@ -296,9 +296,9 @@ class RunDecisionTests(unittest.TestCase):
         item = {'title': 'Exact processed task', 'body': body}
         assignment = {**self.plan['assignments'][0], 'write_paths': ['source.txt']}
         expected = DIRECTOR._digest(item)
-        self.run._scope_processed_task({**item, 'parent_pending_ids': [WF.identity('P')]}, assignment, expected)
+        self.run._scope_processed_task({**item, 'parent_pending_ids': [WF.identity('P')]}, assignment, expected=expected)
         with self.assertRaisesRegex(ValueError, 'owner-approved body'):
-            self.run._scope_processed_task({**item, 'parent_pending_ids': [WF.identity('P')], 'body': body + 'Unreviewed.\n'}, assignment, expected)
+            self.run._scope_processed_task({**item, 'parent_pending_ids': [WF.identity('P')], 'body': body + 'Unreviewed.\n'}, assignment, expected=expected)
         self.start_child()
         question = self.ask()['question']
         _, state, _ = self.run._load(self.parent_id)
