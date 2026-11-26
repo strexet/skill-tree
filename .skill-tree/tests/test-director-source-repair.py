@@ -156,11 +156,9 @@ require(lib).install(root, source, 'director', names.map(name=>({name, rel: '.ag
             'assignment_id': 'snapshot-check', 'operation': 'start', 'request': {**work,
                 'expected_source_hash': WF.file_hash(self.product_store.future)}})['result']
         store = WF.Store(self.product, run_id=launched['id'])
-        WF.checkpoint(store, {'phase': 'refresh-profile', 'stop_reason': 'Prepare the owned fixture installation.'})
         worktree = Path(work['worktree'])
-        self.install_old(worktree)
-        WF.resume_admission(store)
-        WF.checkpoint(store, {'phase': 'implement', 'stop_reason': None})
+        admitted = WF.prepare_worktree_profile(store)
+        self.assertEqual((admitted['status'],admitted['run_id']), ('admitted',launched['id']))
         WF.begin_task(store, {'task_id': task['id']})
         attempt = WF.prepare_check(store, {'task_id': task['id'], 'check_id': self.check_id})
         relative = self.original_result(worktree, attempt)

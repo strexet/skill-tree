@@ -4,7 +4,7 @@
     "check": "inspect-design-rule",
     "check_key": "868293309ca3683ea13dadcdda24fd8bc67ac5878274ec81d79582e960c153f8",
     "evidence_sha256": "b74ba7c916312c94b14c1fe130369a63516245a914faf65c0abc86464bd8cc6c",
-    "outcome_sha256": "9ed699bca86fceb508979c71566ab6c93feade05f7fcc1a3e37f3ef5cd417e7b",
+    "outcome_sha256": "e17a730b9886bdc61de92716364ef8044b6123578e9e326d5ec7101c8cf13721",
     "source": "game/observed-rule.json"
   },
   "controls": {
@@ -58,10 +58,10 @@
   "omissions": [
     "Live GDD adoption and private source input remain outside the fixture."
   ],
-  "prior_acceptance_sha256": "191f46470d0d3c7a31380505d27420362aa97551b465f7680afe8446ebf47e4f",
+  "prior_acceptance_sha256": "597522cda38cf7165b547fb32ce8585fe8bebeaed30a7776eba284ff4fdd6316",
   "producer": {
     "area": "fixture-design",
-    "queue": "Q-99a64fcf-0043-464c-81a4-239af0852dfd",
+    "queue": "Q-b553c2ad-2458-4a82-b152-e690174a8efe",
     "record": "lantern-release",
     "revision": "r001",
     "sha256": "09195c4ce430a8f3ffae915d38d4cb47103def46afd652f8057e0ecd144bc51f"
@@ -70,7 +70,7 @@
   "scope": "disposable-source-fixture",
   "source_digests": {
     "common/scripts/director-evidence.py": "10aa47af295a75cbd83e596e7181c38868e28e16fa27e77be5bbbad67ea4cd5e",
-    "common/scripts/director-plan-adapters.py": "f64a26f9908621d63fc9dccf1a0b1c4d529081a0e995f4c8068454ec9418b9fa",
+    "common/scripts/director-plan-adapters.py": "1f78af0ae2187105d44ccc2487176548268357fa4a5916c496cb093899c4741d",
     "domains/director/capabilities.json": "8fcc314f88b5b818220d13a54e86550319712f752a0fd4fcaf9ebab4921051fb",
     "tests/fixtures/director/gdd-evidence/accepted-rule.json": "09195c4ce430a8f3ffae915d38d4cb47103def46afd652f8057e0ecd144bc51f",
     "tests/test-director-gdd-evidence-fixture.py": "2161ed4bc9aa0a1bde7dd2ae561b10e58e7b81ee30a5ebcbcc58c901dad4b79c"
@@ -91,5 +91,5 @@
       "status": "unsupported"
     }
   },
-  "unaffected_acceptance_sha256": "2ea617156cc27df44ad7f9eb247adf605b3204029046e0c5a1e2e537bdd2842f"
+  "unaffected_acceptance_sha256": "3cde6b31bcd50668c094c0a05f04c83fc5d4c4aa4f9101fb74be0d0945cf3785"
 }
