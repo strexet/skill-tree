@@ -1,0 +1,79 @@
+Shard 1 (19 cases, exit 0)
+RunWorkspaceTests.test_new_web_worktree_reaches_owned_profile_admission
+RunWorkspaceTests.test_rejected_and_interrupted_profile_setup_keep_the_exact_run
+RunWorkspaceTests.test_web_default_worktree_and_runtime_use_a_sibling_checkout
+RunWorkspaceTests.test_pending_web_reservations_reject_case_aliases
+RunWorkspaceTests.test_explicit_web_reservation_restores_a_lost_local_locator
+RunWorkspaceTests.test_worker_checkout_refuses_another_registered_controller
+RunWorkspaceTests.test_two_runs_different_bases_and_explicit_selection
+RunWorkspaceTests.test_implement_all_has_one_workspace_for_the_snapshot
+RunWorkspaceTests.test_group_preview_from_linked_checkout_uses_canonical_queue_and_frozen_scope
+RunWorkspaceTests.test_dirty_old_workspace_never_contaminates_a_new_run
+RunWorkspaceTests.test_queue_copy_edits_never_become_authority
+RunWorkspaceTests.test_exclusive_resource_release_requires_owner_token
+RunWorkspaceTests.test_publication_lock_serializes_worktrees_and_recovers_without_deletion
+RunWorkspaceTests.test_semantic_event_export_has_no_absolute_workspace_locator
+RunWorkspaceTests.test_export_preserves_pending_check_attempts_owned_by_the_selected_run
+RunWorkspaceTests.test_finish_preserves_implementation_acceptance_and_local_handoff
+RunWorkspaceTests.test_portable_execution_path_references_require_explicit_recovery
+RunWorkspaceTests.test_unrelated_queue_updates_survive_run_mutation
+RunWorkspaceTests.test_partial_finish_holds_scoped_lease_and_binds_unaccepted_changes
+  ...................
+  ----------------------------------------------------------------------
+  Ran 19 tests in 89.802s
+  
+  OK
+
+Shard 2 (18 cases, exit 0)
+RunWorkspaceTests.test_initial_profile_admits_another_parked_worktree_while_a_run_executes
+RunWorkspaceTests.test_legacy_installer_update_is_required_before_reservation
+RunWorkspaceTests.test_default_web_worktree_rejects_an_alias_into_git_storage
+RunWorkspaceTests.test_default_web_reservation_recovers_before_locator_write
+RunWorkspaceTests.test_default_web_reservation_recovers_after_locator_write
+RunWorkspaceTests.test_default_workspace_uses_remote_develop_and_stable_run_branch
+RunWorkspaceTests.test_standalone_capture_and_processing_preserve_an_existing_controller
+RunWorkspaceTests.test_selected_snapshot_claims_only_selected_roots_and_dependencies
+RunWorkspaceTests.test_stale_group_preview_never_reserves_a_run
+RunWorkspaceTests.test_resume_preserves_dirty_work_budget_stop_and_failure_counters
+RunWorkspaceTests.test_linked_refresh_rejects_canonical_loss_and_source_drift
+RunWorkspaceTests.test_secret_prerequisites_do_not_copy_or_read_secret_values
+RunWorkspaceTests.test_old_checkpoint_requires_explicit_adoption_and_preserves_record
+RunWorkspaceTests.test_reserved_workspace_recovery_keeps_run_id_and_original_claims
+RunWorkspaceTests.test_event_task_conflict_rolls_back_all_queue_changes
+RunWorkspaceTests.test_promised_merge_stays_open_after_implementation_acceptance
+RunWorkspaceTests.test_unfinished_git_operation_stops_resume
+RunWorkspaceTests.test_partial_finish_keeps_twenty_outcomes_and_releases_only_selected_claims
+  ..................
+  ----------------------------------------------------------------------
+  Ran 18 tests in 97.293s
+  
+  OK
+
+Shard 3 (18 cases, exit 0)
+RunWorkspaceTests.test_initial_profile_keeps_the_install_barrier_for_overlapping_general_worktrees
+RunWorkspaceTests.test_initial_profile_handoff_survives_git_reservation_recovery
+RunWorkspaceTests.test_explicit_web_worktree_in_git_requires_an_outside_runtime_path
+RunWorkspaceTests.test_explicit_web_reservation_recovers_before_locator_write
+RunWorkspaceTests.test_two_worker_handoffs_preserve_scope_evidence_and_controller_state
+RunWorkspaceTests.test_registered_schema_is_rejected_by_single_run_only_helpers
+RunWorkspaceTests.test_overlapping_claims_and_dependency_claims_are_atomic
+RunWorkspaceTests.test_invalid_selected_group_never_reserves_claims_or_workspace
+RunWorkspaceTests.test_missing_default_base_stops_without_a_reserved_run
+RunWorkspaceTests.test_missing_worktree_and_wrong_branch_require_explicit_recovery
+RunWorkspaceTests.test_task_claim_blocks_standalone_mutation_from_another_run
+RunWorkspaceTests.test_mutable_shared_directory_is_rejected
+RunWorkspaceTests.test_interrupted_provision_preserves_reservation_and_claims
+RunWorkspaceTests.test_export_replay_is_idempotent_on_the_canonical_owner
+RunWorkspaceTests.test_git_preflight_uses_the_current_remote_target_and_preserves_dirty_source
+RunWorkspaceTests.test_completed_dependency_from_another_run_requires_source_integration
+RunWorkspaceTests.test_changed_remote_identity_stops_resume
+RunWorkspaceTests.test_partial_finish_retries_original_fenced_transaction_after_locator_retirement
+  ..................
+  ----------------------------------------------------------------------
+  Ran 18 tests in 90.296s
+  
+  OK
+
+Ran 55 tests in 97.435s
+
+OK

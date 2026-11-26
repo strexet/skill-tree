@@ -66,6 +66,14 @@ Run `partial-finish` with the same run ID and a JSON input containing `expected_
 
 Partial completion retires the live Git locator under the exact owner-bound transaction journal and archives the original checkpoint and progress. The original accepted outcomes, Git branch and worktree remain available. The terminal receipt frees the remaining task claims without changing queue entries. Ordinary resume, new resource acquisition and portable replay cannot reactivate archived runs. A pending profile refresh is preserved in the archived checkpoint and does not require executing the stopped scope.
 
+### Optional reviewed local delivery
+
+Use `partial-delivery-preview` with the archived run ID and an exact `target_branch`. The optional `target_worktree` selects the linked checkout for the authorized target. If the current target already contains the accepted range, the preview reports verified ancestry. Explicit delivery recording requires `owner_instruction` and `expected_preview_sha256`; the already-integrated route writes an observation without a new Git merge.
+
+For new delivery, supply an exact clean `candidate_worktree`. The candidate must contain the sealed accepted tip and current target. A divergent target requires the ordinary conflict-free integration tree with exact target and accepted parents. Review fixes remain scoped to the accepted diff. Execute `partial-delivery-checks` with the same target, candidate, owner instruction and preview SHA. The command runs the original supported local recipes and stores candidate-bound check references. Missing executables, unsupported runtime lanes, failed checks and target drift remain delivery blockers.
+
+Review the complete final candidate with the returned `identity`, `review_scope` and `required_checks`. Cite the exact execution references in the current clean review. Apply `partial-delivery` with the same preview and the current `review_id`. The protected local merge reconciles exact lost acknowledgements and preserves unrelated target content. A delivery block leaves the historical partial result and the released task scope intact.
+
 ## Post-merge worktree cleanup
 
 Verified local and controller-linked provider delivery evaluate cleanup after saving the merge result. New controller provisioning records a creation token in the linked Git administrative directory and the run checkpoint. Cleanup requires the matching token, run locator, source branch and head, and current target reachability. Existing or recovered worktrees without qualifying creation evidence are retained.

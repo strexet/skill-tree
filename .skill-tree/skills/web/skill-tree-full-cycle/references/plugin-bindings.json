@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "aaa65f856f6ed5a79b62e62a5bdc981a13fc1af54881f79b72e036eb82b98789",
+  "identity": "a40080856929a0176e1c5a30de8be209ee77f51d06b50f3941c81328d36fca50",
   "operation": "skill-tree-full-cycle",
   "operations": {
     "skill-tree-3d": {
@@ -3304,7 +3304,7 @@
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/pr-review-cycle.md": "5bc55fbf5f4883e215fa229bc7531979ee522a40ddcfeb22d476eb6f7d7cd60f",
     "references/project-profile.md": "75da46ecf2c034d0211e2b1dcfcb3d70dfd1550cabd8138974fefde74eb8758e",
-    "references/run-workspaces.md": "9146b566171504e9731b5c63ea3ce293dc9c74fb9133a034abd491f561d3f0b0",
+    "references/run-workspaces.md": "298f972fd4802b3bf95af3120a00904b999d23beb70ef7366ff3684945ee4cfd",
     "references/validation-policy.md": "e17660b35a658f5fb595b6c151987dae993b264d21576d21160f79f9b195f20e",
     "references/web-development.md": "67bb456b2322e102e84e198ba89468159f59d05d7bed2c996d4eb97db38b1d90",
     "references/workflow-metadata.md": "e706a20d247277722bed1c8cecbffd6f1ba5dfa6e1e1a88622bab5bdb4ac48a1",
@@ -3328,7 +3328,7 @@
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
     "scripts/validate-future-document.py": "54647bb7dc7b7ec670d29a2f395b3bee53b90ff37bc646ce5d3aa98d562518d5",
-    "scripts/workflow-state.py": "f831aa3d9328f3061a5b4600bcc15986585fe5683c3c3b8fc54aa2ce09217528"
+    "scripts/workflow-state.py": "a57a5aa793a71bb19413f0d7f5b2985c7bf03fc5ed9a57245d0c7afb53b59bac"
   },
   "packages": {},
   "parameter_defaults": {},
