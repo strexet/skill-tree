@@ -3035,8 +3035,19 @@ def current_target_checked_evidence(store,attempt,inputs):
 
 def current_target_check_counts(lane,report):
     if lane=='static':return None
-    python=re.findall(r'(?m)^Ran (\d+) tests? in .*$',report)
-    if len(python)==1 and re.search(r'(?m)^OK\s*$',report):return int(python[0])
+    summaries=list(re.finditer(r'(?m)^Ran ([0-9]+) tests? in ([^\r\n]*)\r?$',report))
+    verdicts=list(re.finditer(
+        r'(?m)^(?:OK|FAILED)( \((?:failures|errors|skipped|expected failures|unexpected successes)=[^\r\n]*\))?[ \t]*\r?$',
+        report))
+    if summaries or any(verdict[1] for verdict in verdicts):
+        if len(summaries)!=1 or len(verdicts)!=1:return 0
+        summary,verdict=summaries[0],verdicts[0]
+        if (not re.fullmatch(r'[0-9]+(?:\.[0-9]+)?s',summary[2])
+                or verdict.group().rstrip()!='OK' or verdict.start()<=summary.end()
+                or report[summary.end():verdict.start()].strip()):
+            return 0
+        try:return int(summary[1])
+        except ValueError:return 0
     tap={name:int(value) for name,value in re.findall(r'(?m)^# (tests|pass|fail|skipped|todo) (\d+)\s*$',report)}
     if (set(tap)=={'tests','pass','fail','skipped','todo'} and tap['tests']==tap['pass']
             and all(tap[name]==0 for name in ('fail','skipped','todo'))):return tap['tests']

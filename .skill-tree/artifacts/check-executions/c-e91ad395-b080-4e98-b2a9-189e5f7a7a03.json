@@ -1,0 +1,19 @@
+{
+  "executable_sha256": "ff2d7180d4aa2dcc03193194c1999509239e00101ade54fcdd736d9fc25bd0c6",
+  "exit_code": 0,
+  "kind": "local-check-execution",
+  "observed_tests": 5,
+  "origin": {
+    "attempt_id": "C-e91ad395-b080-4e98-b2a9-189e5f7a7a03",
+    "check_id": "unittest-verdict-control",
+    "environment_identity": "45a5dc7ba367d6515e696e81299e94d109c6dbf6d8978440f723cacda85e858a",
+    "expected_definition": "295d85fb758d02411df40a02792697b2d47e4c0bf3f98fec42da6139078b2fb9",
+    "expected_key": "3c17999247f249b559a3a938408446f2766ff0bb6389116b70d24516c11317c1",
+    "run_id": "WR-798ad1ac-9554-4604-83a7-0ceb7333aeeb",
+    "task_id": "T-ed1eb535-6d82-409b-994f-fc38db77651f"
+  },
+  "output": ".....\n----------------------------------------------------------------------\nRan 5 tests in 6.915s\n\nOK\n",
+  "schema": 1,
+  "tool_wall_seconds": 7.048631125129759,
+  "truncated": false
+}
