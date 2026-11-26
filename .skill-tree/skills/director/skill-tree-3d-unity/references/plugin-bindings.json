@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "9609292190792a2483b2d545647ea20ebb6562b087e64c267f895d6c75623fb9",
+  "identity": "29c50b0bb572f894557765aac93cb8f2599b49e08a3d58590170eb371489a6bd",
   "operation": "skill-tree-3d-unity",
   "operations": {
     "skill-tree-3d": {
@@ -3305,7 +3305,7 @@
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/project-profile.md": "232c01c9ce6554545653d3c4b0b515e3c180f9361bb85c6206d372209cac5bba",
     "references/run-workspaces.md": "298f972fd4802b3bf95af3120a00904b999d23beb70ef7366ff3684945ee4cfd",
-    "references/validation-policy.md": "12a1b55e31e4b5840f26859dfbf9984b849cca4ff6eaa2aab13fa315f50fe727",
+    "references/validation-policy.md": "0de713d8cc37e18b590c1b6215fbef75614b4aed01eaed24948f92662e258663",
     "references/workflow-metadata.md": "645f69a3d44c75671ede4958e9659a94c18365e29bff2f10575cc07b4ff9f078",
     "scripts/3d-review/evidence.py": "5ac272ec3fc1b80efb6ad033b51247c2281271ed4689b9ac1df493f855f988d9",
     "scripts/3d-review/review.py": "1038e615a9671a368387dc37462d44fee96207ca3d80f3f73807ea77102114e8",

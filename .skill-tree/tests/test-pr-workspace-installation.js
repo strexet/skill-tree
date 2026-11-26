@@ -15,6 +15,7 @@ for(const flavor of ['general','web','unity'])test(`installed ${flavor} PR/contr
  for(const name of names){
   const isolated=path.join(root,'isolated',name);fs.cpSync(path.join(root,'.agents/skills',name),isolated,{recursive:true});
   const request=path.join(root,'request.json');fs.writeFileSync(request,JSON.stringify({current_branch:'Feature/Case',instruction:'with merge',target_branch:'release/example'}));
+  assert.match(run('python3',[path.join(isolated,'scripts/pr-review-state.py'),'--help'],{cwd:os.tmpdir()}),/final-validation/);
   const helper=path.join(isolated,'scripts/pr-review-state.py');const result=JSON.parse(run('python3',[helper,'parameters',root,'--input',request],{cwd:os.tmpdir()}));
   assert.equal(result.source_branch,'Feature/Case');assert.equal(result.target_branch,'release/example');assert.equal(result.merge,true);
   assert.ok(fs.existsSync(path.join(isolated,'scripts/run-workspaces.py')));assert.match(fs.readFileSync(path.join(isolated,'references/project-profile.md'),'utf8'),new RegExp('Flavor: '+flavor));

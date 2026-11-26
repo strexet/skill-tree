@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "37cfda1cf436be4323a2fe0dce18ff8a7051618697d1e087d93808898b801187",
+  "identity": "bc2b821732ef2cddbb484db6e0b06deeda4a03e1c008b44c4e0cb9bee574f52e",
   "operation": "skill-tree-repo-documentation",
   "operations": {
     "skill-tree-3d": {
@@ -3302,7 +3302,7 @@
     "references/project-profile.md": "82492b7e3c8a8ec8df6bb3581b727e081ddac6f5adeb1a25bb2d945571b9441c",
     "references/repository-discovery-checklist.md": "a112230c076fea515c437e3e7407c575ee6690d772eaa28e68f80c720c7a621c",
     "references/run-workspaces.md": "298f972fd4802b3bf95af3120a00904b999d23beb70ef7366ff3684945ee4cfd",
-    "references/validation-policy.md": "12a1b55e31e4b5840f26859dfbf9984b849cca4ff6eaa2aab13fa315f50fe727",
+    "references/validation-policy.md": "0de713d8cc37e18b590c1b6215fbef75614b4aed01eaed24948f92662e258663",
     "references/workflow-metadata.md": "645f69a3d44c75671ede4958e9659a94c18365e29bff2f10575cc07b4ff9f078",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "dd1b6fb5dfb56b93ad531abf87f4f713b5934156133007bb4014b56ec9f285e5",
