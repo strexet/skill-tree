@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "c10478a0549f8f9c15df20698fecea4d85b3c9ad93edbe7557a46cdb529d51bd",
+  "identity": "bc28d1772633455bcd243c0b77a9d9089c954ad26ba67930458ac556c19abdff",
   "operation": "skill-tree-plugins",
   "operations": {
     "skill-tree-3d": {
@@ -3292,7 +3292,7 @@
     "SKILL.md": "c4d59e9f2bd17b1ceee33b9d1c3f565cbab8a84a09bd4d8526ec1b13e64594a8",
     "agents/openai.yaml": "bbc33054f516d6e98ba3e1570cfc14e932da45499f3c50e2e2f3ba89bec83c1b",
     "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
-    "references/installation-profile.md": "f256a1a05df9541680bea05170f517d24e8d50fb41dd4ce63be5cb24a665c85e",
+    "references/installation-profile.md": "f8411ee15ea283b2d828ab862cbbe3f3807d7c72e458c8a122a9f84ebbe36a0a",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/project-profile.md": "af84614ccf2aea888e0f3a0fa09264eb282e05c934c79a431d53407e61290fd6",
     "references/ugui-testing.md": "873c236f793ff3c9ece8f0d0346c5c48513e8220406fce216751571c58b79073",
@@ -3317,7 +3317,7 @@
     "scripts/run-workspaces.py": "a706fedaca99a6231d753201cff28f5d5601292b048ceb0929dc8ae469eb302b",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "13b8932a763ece81905ad4dbd7cd73fe99f4f0d8370ca13c2da183239e262541"
+    "scripts/workflow-state.py": "c167078b28047b6805203282c56b53ba6badf907759bb171794fb837acf17ba8"
   },
   "packages": {},
   "parameter_defaults": {},

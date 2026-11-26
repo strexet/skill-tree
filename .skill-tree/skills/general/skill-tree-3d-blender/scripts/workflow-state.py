@@ -4373,12 +4373,13 @@ def initial_profile_handoff(store, run):
             'argv': [sys.executable, '-B', str(Path(__file__).resolve()), 'prepare-worktree-profile', path, '--run-id', run['id']]}
 
 
-def initial_profile_installer(store, request, mode):
+def owned_profile_installer(store, request, mode, *, compatible=False):
     """Use canonical installer code for both install and read-only receipt checks."""
     path = binding_path(store.root, workspaces.PROFILE_FILE)
     raw = path.read_bytes()
     if digest(raw) != request['source_profile_sha256']:
-        raise WorkflowError('Restore the original canonical profile generation before worktree setup')
+        raise WorkflowError('Restore the original canonical profile generation before '
+                            + ('compatible refresh' if compatible else 'worktree setup'))
     owned = json.loads(raw)['bundle_digests']
     module_relative = '.skill-tree/installation/source/lib/installation.js'
     if module_relative not in owned or any(
@@ -4390,7 +4391,9 @@ def initial_profile_installer(store, request, mode):
 const manager = require(process.argv[1]);
 try {
   const request = JSON.parse(fs.readFileSync(0, 'utf8'));
-  const result = manager.initialWorktreeProfile(process.argv[2], request, process.argv[3]);
+  const apply = process.argv[4] === 'compatible' ? manager.maintainCompatibleWorktreeProfile : manager.initialWorktreeProfile;
+  if (typeof apply !== 'function') throw Error('The canonical installation lacks the selected worktree profile operation');
+  const result = apply(process.argv[2], request, process.argv[3]);
   process.stdout.write(JSON.stringify(result));
 } catch (error) {
   process.stderr.write(error.message);
@@ -4401,14 +4404,21 @@ try {
     for name in ('NODE_OPTIONS', 'NODE_PATH'):
         environment.pop(name, None)
     try:
-        process = subprocess.run(['node', '-e', program, str(module), str(store.root), mode],
+        process = subprocess.run(['node', '-e', program, str(module), str(store.root), mode,
+                                  'compatible' if compatible else 'initial'],
                                  input=dump(request), capture_output=True, text=True, timeout=40,
                                  env=environment)
     except (OSError, subprocess.TimeoutExpired) as error:
-        raise WorkflowError('Initial profile setup did not finish. Inspect the retained installation journal before retrying the same run') from error
+        operation='Compatible profile refresh' if compatible else 'Initial profile setup'
+        raise WorkflowError(operation+' did not finish. Inspect the retained installation journal before retrying the same run') from error
     if process.returncode:
-        raise WorkflowError(process.stderr.strip() or 'The verified canonical installer could not complete the worktree profile handoff')
+        raise WorkflowError(process.stderr.strip() or ('The verified installer could not reconcile the compatible refresh'
+                            if compatible else 'The verified canonical installer could not complete the worktree profile handoff'))
     return json.loads(process.stdout)
+
+
+def initial_profile_installer(store, request, mode):
+    return owned_profile_installer(store,request,mode)
 
 
 def recorded_initial_admission(store, state, caller, expected=None):
@@ -4465,6 +4475,8 @@ def resume_admission(store, *, expected_initial=None):
         if run and run.get('initial_profile',{}).get('status')=='admitted':
             return recorded_initial_admission(store,state,caller,expected_initial)
         raise WorkflowError('The original initial worktree profile handoff is no longer pending')
+    if (state['active_run'] or {}).get('compatible_profile_refresh'):
+        raise WorkflowError('Resume the original compatible worktree admission with the original operation')
     selected = (state['active_run'] or {}).get('id')
     admitted=admit_profile(store)
     with store.lock():
@@ -4473,9 +4485,154 @@ def resume_admission(store, *, expected_initial=None):
             raise WorkflowError('Select the exact original active run before admission')
         if workspaces.initial_profile_pending(run):
             raise WorkflowError('Complete the verified initial worktree profile before ordinary admission')
+        if run.get('compatible_profile_refresh'):
+            raise WorkflowError('Resume the original compatible worktree admission with the original operation')
         target=execution_run(run);target['admission']=admitted
         if target is run and run.pop('profile_refresh_required',False) and run['stop_reason']=='Installation profile changed; re-admit before continuation':run['stop_reason']=None
         store.save(text,state);return admitted
+
+def compatible_admission_context(store,state,caller):
+    run=state.get('active_run')
+    if (not run or store.run_id!=run['id'] or workspaces.initial_profile_pending(run) or run.get('maintenance')
+            or run['phase']=='completed' or run.get('workspace_state')!='ready'):
+        raise WorkflowError('Compatible refresh requires the exact already admitted run and worktree')
+    if not run.get('stop_reason') and run['phase'] not in {
+            'blocked','validate','awaiting-validation','refresh-profile','validation-blocked'}:
+        raise WorkflowError('Reach the original run stopped checkpoint before compatible refresh')
+    workspaces.ensure_workspace(store,run)
+    if caller!=store.source_root or caller==store.root:
+        raise WorkflowError('Select the original linked worktree for compatible refresh')
+    registry=state['run_registry']
+    registration=workspaces.linked_registration(store.root,caller)
+    owner=run['workspace'].get('cleanup_owner')
+    if not owner:
+        raise WorkflowError('Compatible refresh requires the original registered worktree owner')
+    workspaces.directed_owner(store.root,caller,run,registry['queue_id'])
+    progress={tid:entry for tid,entry in state['task_progress'].items() if entry.get('run_id')==run['id']}
+    if any(pending_check_attempt(slot) for entry in progress.values() for slot in entry['checks'].values()):
+        raise WorkflowError('Reconcile the original check attempt before compatible refresh')
+    if any(entry.get('task_git_attempt') for entry in progress.values()):
+        raise WorkflowError('Reconcile the original scoped commit before compatible refresh')
+    if any(claim['run_id']==run['id'] for claim in registry['resources'].values()):
+        raise WorkflowError('Reconcile the original runtime resource before compatible refresh')
+    hook_pending_admission(store,scope={'task_ids':run['admitted_task_ids']})
+    if any(attempt['chain_id'] in run.get('hook_chains',[]) for attempt in hook_helper().pending_scan(store)):
+        raise WorkflowError('Reconcile the original run hook before compatible refresh')
+    head=workspaces.checked_out_branch(caller)['head']
+    worker_path=store.owned('.skill-tree/history/worker-handoffs/'+run['id'].lower()+'.json')
+    worker_sha=file_hash(worker_path)
+    slots=worker_handoff(store,{'action':'status'})['slots']
+    if worker_sha!=file_hash(worker_path):
+        raise WorkflowError('The original worker handoff changed during compatible refresh inspection')
+    for slot in slots.values():
+        if not isinstance(slot,list) or (slot and (
+                not isinstance(slot[-1],dict) or not valid_id(slot[-1].get('task_id'),'T')
+                or not retired_worker_scope(store,state,slot[-1],head))):
+            raise WorkflowError('Reconcile the original worker handoff before compatible refresh')
+    if run.get('director_question_hold') or any(run.get('delivery',{}).get(name) for name in
+            ('reviewed_merge_attempt','current_target_attempts','reviewed_source')):
+        raise WorkflowError('Reconcile the original controller handoff before compatible refresh')
+    checkpoint={
+        'run':{key:value for key,value in run.items() if key!='compatible_profile_refresh'},
+        'claims':sorted(tid for tid,owner_id in registry['claims'].items() if owner_id==run['id']),
+        'progress':progress,
+    }
+    return {
+        'run_id':run['id'],'queue_id':registry['queue_id'],'worktree_path_sha256':digest(str(caller).encode()),
+        'registration':registration.name,'owner':owner,'head':head,'worker_sha256':worker_sha,
+        'checkpoint_sha256':digest(dump(checkpoint).encode()),
+        'locator_sha256':file_hash(workspaces.runtime_file(store.root)),
+        'source_profile_sha256':file_hash(binding_path(store.root,workspaces.PROFILE_FILE)),
+    }
+
+
+def compatible_baseline(store,state,context,expected_package_sha):
+    run=state['active_run']
+    entry=state['task_progress'].get(run['current_task_id'],{})
+    roots=[context['head'],entry.get('task_git_baseline',{}).get('head'),run['workspace']['base_commit']]
+    environment={**workspaces.local_git_environment(),'GIT_NO_LAZY_FETCH':'1','GIT_ALLOW_PROTOCOL':''}
+    for revision in dict.fromkeys(value for value in roots if value):
+        if not re.fullmatch('[a-f0-9]{40}|[a-f0-9]{64}',revision):
+            raise WorkflowError('Compatible refresh requires an exact Git metadata baseline')
+        committed=subprocess.run(
+            workspaces.local_git_args(store.source_root,'show',revision+':package.json'),
+            env=environment,capture_output=True,timeout=5)
+        if not committed.returncode and digest(committed.stdout)==expected_package_sha:
+            return revision
+    raise WorkflowError('Compatible refresh cannot verify the original admitted package metadata')
+
+
+def compatible_profile_admission(store):
+    caller=store.source_root
+    path=binding_path(caller,workspaces.PROFILE_FILE)
+    with store.lock():
+        state=store.load()
+        run=state.get('active_run') or {}
+        retained=run.get('compatible_profile_refresh')
+        last=(run.get('compatible_profile_readmissions') or [None])[-1]
+        if (not retained and last and file_hash(path)==last['plan']['after']['profile_sha256']
+                and file_hash(caller/'package.json')==last['plan']['package_input']['after']):
+            workspaces.ensure_workspace(store,run)
+            original=last['context']
+            if (store.run_id!=run['id'] or original['run_id']!=run['id'] or caller!=store.source_root
+                    or digest(str(caller).encode())!=original['worktree_path_sha256']
+                    or workspaces.linked_registration(store.root,caller).name!=original['registration']
+                    or run['workspace'].get('cleanup_owner')!=original['owner']):
+                raise WorkflowError('Select the original linked worktree for compatible refresh')
+            workspaces.directed_owner(store.root,caller,run,original['queue_id'])
+            if (run.get('profile_refresh_required') or admit_profile(store)!=run['admission']
+                    or run['admission']!=last['admission']):
+                raise WorkflowError('The acknowledged compatible worktree admission changed')
+            return {'status':'admitted','operation_id':last['operation_id'],'admission':last['admission'],'replayed':True}
+        context=compatible_admission_context(store,state,caller)
+        if retained and retained['context']!=context:
+            raise WorkflowError('The original compatible worktree checkpoint changed')
+        state_sha=file_hash(store.state)
+    if retained is None:
+        prior=path.read_bytes()
+        old=json.loads(prior)
+        if (old.get('identity')!=run['admission']['identity'] or old.get('project_root')!=str(caller)
+                or not old.get('inputs',{}).get('package.json')):
+            raise WorkflowError('Compatible refresh requires the original owned worktree profile and package metadata')
+        retained={
+            'operation_id':identity('OP'),'context':context,'profile_sha256':digest(prior),
+            'before_revision':compatible_baseline(store,state,context,old['inputs']['package.json']),
+        }
+        request={**context,'worktree':str(caller),'state_sha256':state_sha,**retained}
+        retained['plan']=owned_profile_installer(store,request,'preview',compatible=True)
+        with store.lock():
+            text=store.text()
+            state=store.load(text)
+            run=state['active_run']
+            if (compatible_admission_context(store,state,caller)!=context or run.get('compatible_profile_refresh')
+                    or file_hash(path)!=retained['profile_sha256']):
+                raise WorkflowError('The original run or profile changed before compatible refresh was prepared')
+            run['compatible_profile_refresh']=retained
+            store.save(text,state,update_navigation=False)
+            state_sha=file_hash(store.state)
+    request={**context,'worktree':str(caller),'state_sha256':state_sha,**retained}
+    result=owned_profile_installer(store,request,'activate',compatible=True)
+    if (result.get('operation_id')!=retained['operation_id']
+            or result.get('profile')!=retained['plan']['after']):
+        raise WorkflowError('The original compatible worktree installation result changed')
+    with store.lock():
+        text=store.text()
+        state=store.load(text)
+        run=state['active_run']
+        if compatible_admission_context(store,state,caller)!=context or run.get('compatible_profile_refresh')!=retained:
+            raise WorkflowError('The original run checkpoint changed before compatible admission')
+        observed=owned_profile_installer(store,{**request,'state_sha256':file_hash(store.state)},'verify',compatible=True)
+        if observed!=retained['plan']['after'] or file_hash(path)!=observed['profile_sha256']:
+            raise WorkflowError('The installed compatible worktree profile changed')
+        admitted={**{key:observed[key] for key in ('identity','environment_id')},'flavor':run['admission']['flavor']}
+        run['admission']=admitted
+        run.pop('compatible_profile_refresh')
+        if run.pop('profile_refresh_required',False) and run['stop_reason']=='Installation profile changed; re-admit before continuation':
+            run['stop_reason']=None
+        run.setdefault('compatible_profile_readmissions',[]).append({**retained,'admission':admitted})
+        store.save(text,state,update_navigation=False)
+    return {'status':'admitted','operation_id':retained['operation_id'],'admission':admitted,'replayed':False}
+
 
 def completed_dependency_order(store, outcomes, roots):
     if not roots:
@@ -7619,7 +7776,12 @@ def main(argv=None):
         elif cmd=='record-check':result=record_check(store,payload)
         elif cmd=='reconcile-check':result=reconcile_check(store,payload)
         elif cmd=='reuse-check':result=reuse_check(store,payload)
-        elif cmd=='admit':result=resume_admission(store)
+        elif cmd=='admit':
+            if 'compatible_refresh' in payload:
+                if set(payload)!={'compatible_refresh'} or payload['compatible_refresh'] is not True:
+                    raise WorkflowError('Compatible admission accepts the exact compatible refresh selection')
+                result=compatible_profile_admission(store)
+            else:result=resume_admission(store)
         elif cmd=='prepare-worktree-profile':result=prepare_worktree_profile(store)
         elif cmd=='focus-maintenance':result=focus_maintenance(store,payload)
         elif cmd=='resume-task':result=resume_task(store,payload)

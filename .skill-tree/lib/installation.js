@@ -433,6 +433,9 @@ function beginSetupOperation(root,setup){
     throw Error('Setup operation journal changed since the original attempt');
   }
  }
+ if(!previous&&setup.requireOriginalRecovery&&
+    (current.core_journal_sha256!==null||current.plugins_journal_sha256!==null))
+  throw Error('Recover the original owned installation operation before compatible refresh');
  const timestamp=new Date().toISOString();
  layout=previous?.workflow_layout??layout;
  const record={schema:1,operation_id:id,kind:setup.kind,request_sha256:requestFor(layout),
@@ -466,12 +469,13 @@ function finishSetupOperation(root,session,status,stage){
  writeSetupReceipt(root,session.relative,{...session.record,status,stage,
   observed_at:new Date().toISOString(),observed:setupObservation(root)},false);
 }
-function locked(root,action,{recoverPending=true,recoverPluginPending=true,onPending,setup}={}){
+function locked(root,action,{recoverPending=true,recoverPluginPending=true,onPending,setup,beforeRecovery}={}){
  const owner=queueRoot(root),barrier=owner!==root?path.join(owner,INSTALL+'/.install-lock'):null;let barrierFd;
  if(barrier){fs.mkdirSync(path.dirname(barrier),{recursive:true});try{barrierFd=fs.openSync(barrier,'wx',0o600);fs.writeFileSync(barrierFd,c.json({pid:process.pid,host:require('node:os').hostname()}));}catch{throw Error('Canonical installation lock exists');}}
  const dir=c.safe(root,INSTALL);fs.mkdirSync(dir,{recursive:true});const lock=c.safe(root,INSTALL+'/.install-lock');let fd;
  try{fd=fs.openSync(lock,'wx',0o600);}catch{if(barrier){fs.closeSync(barrierFd);fs.unlinkSync(barrier);}throw Error('Installation lock exists; inspect PID/host before explicit removal');}
  try{fs.writeFileSync(fd,c.json({pid:process.pid,host:require('node:os').hostname()}));if(fs.existsSync(c.safe(owner,'.skill-tree/.writer-lock')))throw Error('Workflow writer lock exists; reach a cleanup/handoff boundary before installation');
+  beforeRecovery?.();
   const session=setup?beginSetupOperation(root,setup):null;
   if(session?.replayed)return {...setup.replay(session.layout),operation_id:session.id,replayed:true};
   let stage='recover',value;
@@ -682,8 +686,11 @@ function install(root,source,flavor,selections,options={}){
   scope:()=>({source:c.sourceInputs(source),flavor,selections,bridges:options.bridges??[],
    shared_workflow:options.sharedRuntime??'preserve-installed-layout',
    development_policy:options.developmentPolicy??null,recover_pending:options.recoverPending!==false,
-   recover_plugins:options.recoverPluginPending!==false}),
+   recover_plugins:options.recoverPluginPending!==false,
+   ...(options.guardedActivationProof?{guarded_activation_proof:options.guardedActivationProof}:{})}),
+  requireOriginalRecovery:Boolean(options.guardedActivationProof),
   replay:sharedRuntime=>{
+   if(options.verifyActivationReplay)return options.verifyActivationReplay();
    if(options.guardPlan||options.updateDevelopmentPolicy)throw Error('Guarded installation replay requires a fresh operation');
    const candidate=plan(root,source,flavor,selections,{...options,sharedRuntime});
    if(candidate.delta.length)throw Error('The previously verified setup generation changed');
@@ -707,6 +714,7 @@ function install(root,source,flavor,selections,options={}){
   }
   return {profile:result.profile,delta:result.delta,action:result.delta.length?'installed':'verified no-op current'};
  },{recoverPending:options.recoverPending,recoverPluginPending:options.recoverPluginPending,
+    beforeRecovery:options.beforeActivationRecovery,
     setup:Object.hasOwn(options,INITIAL_WORKTREE_PROFILE)?undefined:setup});
 }
 function uninstall(root,selections,options={}){
@@ -880,6 +888,10 @@ function packageMetadataAtDelivery(root, request){
   if(!stat.isFile()||Boolean(stat.mode&0o100)!==(current[1]==='100755')||!fs.readFileSync(fd).equals(synchronized))
    throw Error('Compatibility requires the exact committed package.json bytes and mode');
  }finally{fs.closeSync(fd);}
+ return comparePackageMetadata(original,synchronized);
+}
+
+function comparePackageMetadata(original,synchronized){
  const decode=value=>JSON.parse(value.toString('utf8').replace(/^\uFEFF/,''));
  const oldPackage=decode(original),newPackage=decode(synchronized);
  if(!oldPackage||typeof oldPackage!=='object'||Array.isArray(oldPackage)||
@@ -900,11 +912,10 @@ function requireUnaffectedProfileRuns(root){
   throw Error('Unfinished canonical work requires the explicit profile recovery path');
 }
 
-function deliveryProfilePlan(root, request, result){
- const input=packageMetadataAtDelivery(root,request);
+function compatibleProfilePlan(root, profileSha, input, result){
  const {old,profile:after}=result;
  const oldSha=c.hash(fs.readFileSync(c.safe(root,PROFILE)));
- if(oldSha!==request.profile_sha256||old.inputs['package.json']!==input.before||
+ if(oldSha!==profileSha||old.inputs['package.json']!==input.before||
     after.inputs['package.json']!==input.after)
   throw Error('The owned profile inputs differ from the exact original and synchronized Git bytes');
  const inputs={...after.inputs,'package.json':input.before};
@@ -923,6 +934,116 @@ function deliveryProfilePlan(root, request, result){
  const identity=(profile,profile_sha256)=>({profile_sha256,identity:profile.identity,environment_id:profile.environment_id});
  return {before:identity(old,oldSha),after:identity(after,c.hash(result.changes[PROFILE])),
   input:'package.json',changed_fields:input.fields};
+}
+
+function deliveryProfilePlan(root,request,result){
+ return compatibleProfilePlan(root,request.profile_sha256,packageMetadataAtDelivery(root,request),result);
+}
+
+function verifyCompatibleWorktree(root,request){
+ const {execFileSync}=require('node:child_process');
+ const git=(directory,...args)=>execFileSync('git',
+  ['--no-replace-objects','--no-optional-locks','--literal-pathspecs','-C',directory,'-c','core.fsmonitor=false',...args],
+  {encoding:'buffer',stdio:['ignore','pipe','ignore'],timeout:5000,
+   env:{...process.env,GIT_NO_LAZY_FETCH:'1',GIT_ALLOW_PROTOCOL:''}});
+ const query=(directory,...args)=>git(directory,...args).toString().trim();
+ const worktree=fs.realpathSync(request.worktree);
+ const checkpoint=setupProofBytes(root,WORKFLOW);
+ if(!Buffer.isBuffer(checkpoint)||c.hash(checkpoint)!==request.state_sha256||c.hash(worktree)!==request.worktree_path_sha256||
+    worktree!==request.worktree||worktree===root||queueRoot(worktree)!==root)
+  throw Error('The original compatible readmission checkpoint or worktree changed');
+ const state=JSON.parse(checkpoint);
+ const registry=state.run_registry;
+ const run=registry?.runs?.[request.run_id];
+ const worker=setupProofBytes(root,'.skill-tree/history/worker-handoffs/'+request.run_id.toLowerCase()+'.json');
+ if((Buffer.isBuffer(worker)?c.hash(worker):worker)!==request.worker_sha256)
+  throw Error('The original worktree worker handoff changed before compatible activation');
+ const common=path.resolve(root,query(root,'rev-parse','--git-common-dir'));
+ const locator=setupProofBytes(common,'skill-tree-runtime.json');
+ const local=Buffer.isBuffer(locator)?JSON.parse(locator):null;
+ const registration=query(worktree,'rev-parse','--absolute-git-dir');
+ if(registry?.queue_id!==request.queue_id||run?.workspace_state!=='ready'||
+    !Buffer.isBuffer(locator)||c.hash(locator)!==request.locator_sha256||local.queue_id!==request.queue_id||
+    local.worktrees?.[run.id]!==worktree||registration!==path.join(common,'worktrees',request.registration)||
+    query(worktree,'rev-parse','--show-toplevel')!==worktree||
+    query(worktree,'symbolic-ref','--short','HEAD')!==run.workspace.branch||
+    query(worktree,'rev-parse','--verify','HEAD')!==request.head||
+    c.json(run.workspace.cleanup_owner)!==c.json(request.owner)||
+    c.json(c.readJson(registration,'skill-tree-owner.json'))!==c.json(request.owner))
+  throw Error('The admitted worktree Git registration or original owner changed');
+ const baseline=state.task_progress?.[run.current_task_id]?.task_git_baseline?.head;
+ if(![request.head,baseline,run.workspace.base_commit].includes(request.before_revision))
+  throw Error('Select an exact retained package metadata baseline');
+ git(worktree,'merge-base','--is-ancestor',request.before_revision,request.head);
+ const beforeEntry=query(worktree,'ls-tree',request.before_revision,'--','package.json');
+ const currentIndex=query(worktree,'ls-files','--stage','--','package.json');
+ const before=/^(100(?:644|755)) blob ([0-9a-f]{40}|[0-9a-f]{64})\tpackage\.json$/.exec(beforeEntry);
+ const index=/^(100(?:644|755)) ([0-9a-f]{40}|[0-9a-f]{64}) 0\tpackage\.json$/.exec(currentIndex);
+ const after=setupProofBytes(worktree,'package.json');
+ if(!before||!index||before[1]!==index[1]||!Buffer.isBuffer(after)||
+    Boolean(fs.lstatSync(c.safe(worktree,'package.json')).mode&0o100)!==(before[1]==='100755'))
+  throw Error('Compatibility requires exact regular package metadata with the original Git mode');
+ const input=comparePackageMetadata(git(worktree,'cat-file','blob',before[2]),after);
+ return {worktree,input};
+}
+
+function maintainCompatibleWorktreeProfile(root,request,mode){
+ if(!['preview','activate','verify'].includes(mode))
+  throw Error('Select the compatible worktree profile action');
+ const context=()=>verifyCompatibleWorktree(root,request);
+ const {worktree,input}=context();
+ if(mode!=='preview'){
+  const state=c.readJson(root,WORKFLOW);
+  const original=state.run_registry?.runs?.[request.run_id]?.compatible_profile_refresh;
+  if(!original||original.operation_id!==request.operation_id||original.profile_sha256!==request.profile_sha256||
+     original.before_revision!==request.before_revision||c.json(original.plan)!==c.json(request.plan)||
+     c.json(input)!==c.json(request.plan.package_input))
+   throw Error('The original compatible profile plan or package input changed');
+ }
+ const source=c.safe(worktree,INSTALL+'/source');
+ const sourceSha=()=>c.hash(c.json(c.sourceInputs(source)));
+ const actual=result=>({profile_sha256:c.hash(setupProofBytes(worktree,PROFILE)),
+  identity:result.identity,environment_id:result.environment_id});
+ const guardContext=()=>{
+  const verified=context();
+  if(c.json(verified.input)!==c.json(input))throw Error('The compatible worktree input changed');
+  if(sourceSha()!==request.plan.source_sha256||
+     c.resolveProfile(source,worktree,request.plan.install.flavor).environment_id!==request.plan.after.environment_id)
+   throw Error('The prepared worktree discovery inputs or owned source changed');
+ };
+ const verifyAfter=()=>{
+  guardContext();
+  const profile=verify(worktree,source);
+  if(c.json(actual(profile))!==c.json(request.plan.after)||profile.inputs['package.json']!==input.after)
+   throw Error('The installed worktree profile differs from the anticipated generation');
+  return {profile,delta:[],action:'verified compatible worktree profile'};
+ };
+ if(mode==='verify')return actual(verifyAfter().profile);
+ if(mode==='preview'){
+  const previous=receipt(worktree,true);
+  const selections=Object.entries(previous.destinations).map(([rel,row])=>({rel,provider:row.provider,name:row.name}));
+  const options={bridges:Object.keys(previous.bridges||{}),recoverPluginPending:false};
+  const proposed=plan(worktree,source,previous.flavor,selections,options);
+  const proof=compatibleProfilePlan(worktree,request.profile_sha256,input,proposed);
+  return {...proof,package_input:input,source_sha256:sourceSha(),
+   install:{flavor:previous.flavor,selections,bridges:options.bridges}};
+ }
+ const {before,after:next,input:inputName,changed_fields:fields,install:scope}=request.plan;
+ const proof={before,after:next,input:inputName,changed_fields:fields};
+ const guard=result=>{
+  guardContext();
+  if(c.hash(setupProofBytes(worktree,PROFILE))===request.plan.after.profile_sha256){
+   verifyAfter();
+   if(result.delta.length)throw Error('The verified compatible generation has unowned pending changes');
+   return;
+  }
+  if(c.json(compatibleProfilePlan(worktree,request.profile_sha256,input,result))!==c.json(proof))
+   throw Error('The prepared compatible worktree profile changed');
+ };
+ const installed=install(worktree,source,scope.flavor,scope.selections,{bridges:scope.bridges,recoverPluginPending:false,
+  operationId:request.operation_id,guardedActivationProof:request.plan,
+  verifyActivationReplay:verifyAfter,beforeActivationRecovery:guardContext,guardPlan:guard});
+ return {profile:actual(installed.profile),operation_id:installed.operation_id};
 }
 
 function maintainDeliveredProfile(root,request){
@@ -1046,4 +1167,4 @@ function localMain(root,source,args){
   const result=refresh(root,source,args.includes('--dry-run'));console.log(c.json({action:result.action,changed:result.delta,facts:result.profile.facts,gaps:result.profile.gaps,operation_id:result.operation_id}));return 0;
  }catch(error){console.error(error.message);if(error.operation_id)console.error('Setup operation '+error.operation_id);return 2;}
 }
-module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,readHookRecords,pendingHookOperation,stoppedWorkflow,plan,install,initialWorktreeProfile,verify,verifyTaskGroupingProfile,uninstall,refresh,maintainDeliveredProfile,rollback,rebind,localMain,updateDevelopmentPolicy};
+module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,readHookRecords,pendingHookOperation,stoppedWorkflow,plan,install,initialWorktreeProfile,verify,verifyTaskGroupingProfile,uninstall,refresh,maintainDeliveredProfile,maintainCompatibleWorktreeProfile,rollback,rebind,localMain,updateDevelopmentPolicy};

@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "04d14db988e9522b45e4267e841678e7e12660d5e4c1fc4f1e9c44d234a36230",
+  "identity": "32bcdb85613d6c6499a07992cd9be60c0915a0cabdbfb3c558b299c7fca82e72",
   "operation": "skill-tree-3d-unity",
   "operations": {
     "skill-tree-3d": {
@@ -3299,7 +3299,7 @@
     "references/decision-governance.md": "9c8e67477e2fb76a78b5e87df8d59f458688d45f889886f986e9513c45c30c92",
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/future-workflow.md": "ea2d77afaf0dbe92d8c3bacf983e8f26fe2233d84826ba8b539f92216b8d3d6c",
-    "references/installation-profile.md": "f256a1a05df9541680bea05170f517d24e8d50fb41dd4ce63be5cb24a665c85e",
+    "references/installation-profile.md": "f8411ee15ea283b2d828ab862cbbe3f3807d7c72e458c8a122a9f84ebbe36a0a",
     "references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
     "references/pending-task-intake.md": "c23e7fc58a44b58ab8e0b09ee0b15bd56fbdfd4fc275833c26fd4c8c2d0e4619",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
@@ -3307,7 +3307,7 @@
     "references/run-workspaces.md": "298f972fd4802b3bf95af3120a00904b999d23beb70ef7366ff3684945ee4cfd",
     "references/validation-policy.md": "a3413c285687d49f22aac9eb124cb7a64252200984b60b16de1d675d6cfe2472",
     "references/web-development.md": "67bb456b2322e102e84e198ba89468159f59d05d7bed2c996d4eb97db38b1d90",
-    "references/workflow-metadata.md": "ecfc1114e415e3bff2d8c13aab94eb1d3d7f7e57ea19b7cd49f029067183cba2",
+    "references/workflow-metadata.md": "367c94e3997a8c6a4a7f7ebf9dffce31fdb225b29ce20b72f44ccbcfab1e42c2",
     "scripts/3d-review/evidence.py": "5ac272ec3fc1b80efb6ad033b51247c2281271ed4689b9ac1df493f855f988d9",
     "scripts/3d-review/review.py": "1038e615a9671a368387dc37462d44fee96207ca3d80f3f73807ea77102114e8",
     "scripts/3d-review/visual.py": "03495e7240539b83ad853f6bf1d971b7352ef4c7ba5994df0206f989cdc6d3c7",
@@ -3331,7 +3331,7 @@
     "scripts/run-workspaces.py": "a706fedaca99a6231d753201cff28f5d5601292b048ceb0929dc8ae469eb302b",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "13b8932a763ece81905ad4dbd7cd73fe99f4f0d8370ca13c2da183239e262541"
+    "scripts/workflow-state.py": "c167078b28047b6805203282c56b53ba6badf907759bb171794fb837acf17ba8"
   },
   "packages": {},
   "parameter_defaults": {},

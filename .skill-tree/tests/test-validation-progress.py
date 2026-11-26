@@ -89,6 +89,107 @@ class ValidationProgressTests(unittest.TestCase):
         frame=self.review_change(frame,'accept-plan',decision_receipt=frame['acceptance'])
         return self.review_change(frame,'implement',identity=identity,reference='Current Git fixture candidate.')
 
+    def test_compatible_worktree_refresh_preserves_the_selected_checkpoint(self):
+        self.git('init','-q','-b','develop')
+        self.git('config','user.name','Fixture editor')
+        self.git('config','user.email','fixture@example.invalid')
+        self.git('config','commit.gpgSign','false')
+        self.git('remote','add','origin',str(self.root.parent/'unused-fixture-origin.git'))
+        package={'name':'worktree-profile-fixture','description':'Original metadata'}
+        (self.root/'package.json').write_text(json.dumps(package)+'\n')
+        (self.root/'.gitignore').write_text('/.agents/\n/.skill-tree/installation/\n')
+        self.git('add','.')
+        self.git('commit','-qm','Record original owned profile inputs')
+        subprocess.run(['node', str(CORE/'bin/install.js'),'--target',str(self.root),'--only','codex',
+                        '--flavor','general','--skills','skill-tree-work-through-next'],
+                       check=True,capture_output=True,text=True,timeout=30)
+        wf.workspaces.setup(self.store,{})
+        selected_id=self.task('Selected compatible checkpoint')
+        other_id=self.task('Independent stopped checkpoint')
+
+        def start(task):
+            run=wf.start(wf.Store(self.root,allow_unselected=True,neutral=True),'next',task,workspace={
+                'base_branch':'develop','local_base':True,'local_base_authorization':'Use the exact local fixture base.',
+            })
+            source=Path(run['profile_handoff']['worktree'])
+            store=wf.Store(source,run['id'])
+            wf.prepare_worktree_profile(store)
+            return run,store
+
+        other,other_store=start(other_id)
+        wf.checkpoint(other_store,{'phase':'blocked','stop_reason':'Retain the independent fixture stop'})
+        original,selected=start(selected_id)
+        self.store=selected
+        wf.begin_task(selected,{'task_id':selected_id})
+        self.passed(selected_id)
+        attempt=wf.prepare_check(selected,{'task_id':selected_id,'check_id':'behavior'})
+        wf.checkpoint(selected,{'phase':'blocked','stop_reason':'Wait for separate product approval'})
+        with self.assertRaisesRegex(wf.WorkflowError,'original check attempt'):
+            wf.compatible_profile_admission(selected)
+        wf.record_check(selected,{'task_id':selected_id,'check_id':'behavior','attempt_id':attempt['attempt_id'],
+            'result':'pass','actual_lane':'static','environment_identity':attempt['environment_identity'],
+            'classification':'executed-control','assertions':[{'assertion':'The value remains observable.','result':'pass'}],
+            'evidence':['report.json'],'cleanup':'No product process was launched.'})
+        resource=wf.workspaces.resource(selected,{'resource':'fixture-editor'})
+        with self.assertRaisesRegex(wf.WorkflowError,'original runtime resource'):
+            wf.compatible_profile_admission(selected)
+        wf.workspaces.resource(selected,{'resource':'fixture-editor','release':True,'token':resource['token']})
+        worker=selected.base/'history/worker-handoffs'/f"{original['id'].lower()}.json"
+        worker.parent.mkdir(parents=True,exist_ok=True)
+        worker.write_text(json.dumps({'schema':1,'run_id':original['id'],'slots':{
+            '1':[{'task_id':selected_id,'worker_id':'fixture-worker'}]}}))
+        with self.assertRaisesRegex(wf.WorkflowError,'original worker handoff'):
+            wf.compatible_profile_admission(selected)
+        worker.unlink()
+        canonical_state=selected.state.read_bytes()
+        source=selected.source_root
+        profile=source/'.skill-tree/installation/profile.json'
+        former=profile.read_bytes()
+        original_package=(source/'package.json').read_bytes()
+        (source/'package.json').write_text(json.dumps({**package,'dependencies':{'fixture-module':'2.0.0'}})+'\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'material or unexplained'):
+            wf.compatible_profile_admission(selected)
+        self.assertEqual((selected.state.read_bytes(),profile.read_bytes()),(canonical_state,former))
+        (source/'package.json').write_text(json.dumps({**package,'description':'Compatible description'})+'\n')
+        browser=source/'config/browser-policy.json'
+        browser.parent.mkdir()
+        browser.write_text('{}\n')
+        with self.assertRaisesRegex(wf.WorkflowError,'material or unknown'):
+            wf.compatible_profile_admission(selected)
+        self.assertEqual((selected.state.read_bytes(),profile.read_bytes()),(canonical_state,former))
+        browser.unlink()
+        with self.assertRaisesRegex(wf.WorkflowError,'original linked worktree'):
+            wf.compatible_profile_admission(wf.Store(self.root,original['id']))
+        self.assertNotEqual((source/'package.json').read_bytes(),original_package)
+        activation=wf.owned_profile_installer
+        claim={}
+
+        def changed_checkpoint(store,request,mode,**options):
+            if mode=='activate' and not claim:
+                claim.update(wf.workspaces.resource(selected,{'resource':'fixture-before-activation'}))
+            return activation(store,request,mode,**options)
+
+        with patch.object(wf,'owned_profile_installer',changed_checkpoint):
+            with self.assertRaisesRegex(wf.WorkflowError,'original compatible readmission checkpoint'):
+                wf.compatible_profile_admission(selected)
+        self.assertEqual(profile.read_bytes(),former)
+        wf.workspaces.resource(selected,{'resource':'fixture-before-activation','release':True,'token':claim['token']})
+        installed=wf.compatible_profile_admission(selected)
+        self.assertEqual(installed['status'],'admitted')
+        self.assertNotEqual(profile.read_bytes(),former)
+        state=json.loads(selected.state.read_text())
+        previous=json.loads(canonical_state)
+        current=state['run_registry']['runs'][original['id']]
+        self.assertEqual(current['current_task_id'],selected_id)
+        self.assertEqual(current['stop_reason'],'Wait for separate product approval')
+        self.assertEqual(current['phase'],'blocked')
+        self.assertEqual(state['task_progress'],previous['task_progress'])
+        self.assertEqual(state['run_registry']['claims'],previous['run_registry']['claims'])
+        self.assertEqual(state['run_registry']['runs'][other['id']],previous['run_registry']['runs'][other['id']])
+        self.assertEqual(current['admission'],installed['admission'])
+        self.assertNotIn(str(source),json.dumps(current['compatible_profile_readmissions']))
+        self.assertEqual(wf.compatible_profile_admission(selected),{**installed,'replayed':True})
+
     def test_lane_preflight_matches_browser_and_server_receipts(self):
         configuration = self.store.base/'config/repository.json'
         configuration.write_text(json.dumps({'schema':1,'role':'source','recipes':{

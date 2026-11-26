@@ -79,6 +79,7 @@ The example pins describe data syntax, not a qualified toolchain combination. Th
 
 Registered worktree installations use the canonical installation/writer barrier and inspect every retained active run before activation. A worktree profile belongs to the exact execution root; profile refresh requires a stopped handoff and explicit re-admission. The portable worktree environment declaration records required file names, isolated mutable directories and exclusive resource keys without secret contents.
 
+Compatible worktree admission covers `package.json` description and keywords changes against an exact retained Git baseline and the original owned input digest. The anticipated generation must preserve other discovered inputs, installation ownership, runtime layout, bindings, policy and resolved recipes. The guard verifies the original registered checkout and stopped run before activation or recovery. Unknown inputs, material changes and pending attempts require the existing explicit recovery path.
 
 ## Merged target activation
 

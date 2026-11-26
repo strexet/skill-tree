@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "cda26db15a81a4751c3dbd3e58d636745eb6e2048d84b6302ff11b6d65813cef",
+  "identity": "330393da0b5809ddf7b9b1d6ae9cfd68f06edb2f2dcd67c8e24bc6647e81a86f",
   "operation": "skill-tree-game-design",
   "operations": {
     "skill-tree-3d": {
@@ -3297,7 +3297,7 @@
     "references/game-design-gdd.md": "b33102a28f1ca07b6e210b555e79de35b05c26031442046e7a4ce4f83ab2ece2",
     "references/game-design-playtest.md": "f305aba94b011959e204cdc52a398ac9d16a7ec07e35ac5313ae2697667efe80",
     "references/game-design-records.md": "ee0c46efe3f88d4e4d68859c0e5e94dc26a453f36575dcfc5830f96f863990c3",
-    "references/installation-profile.md": "f256a1a05df9541680bea05170f517d24e8d50fb41dd4ce63be5cb24a665c85e",
+    "references/installation-profile.md": "f8411ee15ea283b2d828ab862cbbe3f3807d7c72e458c8a122a9f84ebbe36a0a",
     "references/narrative-human-playtest.md": "f6894df614f45fbdc059147ab2100d9abed8cbb9dcd37ddbc5d02f0fd4b31238",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/project-profile.md": "75da46ecf2c034d0211e2b1dcfcb3d70dfd1550cabd8138974fefde74eb8758e",
@@ -3319,7 +3319,7 @@
     "scripts/run-workspaces.py": "a706fedaca99a6231d753201cff28f5d5601292b048ceb0929dc8ae469eb302b",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "13b8932a763ece81905ad4dbd7cd73fe99f4f0d8370ca13c2da183239e262541"
+    "scripts/workflow-state.py": "c167078b28047b6805203282c56b53ba6badf907759bb171794fb837acf17ba8"
   },
   "packages": {},
   "parameter_defaults": {},
