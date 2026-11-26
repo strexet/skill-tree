@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "00a1c29068761f1e839a00d6296600fa4433ba29f3cd4ef79e9db3e2b917cb86",
+  "identity": "2294c7beeeb30f7eb908e2b40faad2f6873fdc9ca99fc032dfc22115d94faea0",
   "operation": "skill-tree-narative",
   "operations": {
     "skill-tree-3d": {
@@ -3365,8 +3365,8 @@
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
     "references/project-profile.md": "82492b7e3c8a8ec8df6bb3581b727e081ddac6f5adeb1a25bb2d945571b9441c",
     "references/run-workspaces.md": "298f972fd4802b3bf95af3120a00904b999d23beb70ef7366ff3684945ee4cfd",
-    "references/validation-policy.md": "0de713d8cc37e18b590c1b6215fbef75614b4aed01eaed24948f92662e258663",
-    "references/workflow-metadata.md": "645f69a3d44c75671ede4958e9659a94c18365e29bff2f10575cc07b4ff9f078",
+    "references/validation-policy.md": "fb4f195d4a88a6614dbb4c3de8e241771a4bd673e2c7f6686877b948b18aa03d",
+    "references/workflow-metadata.md": "b32cf6768c2a46270cb0480b908f6847fa1c721577f18c482b9a1808396982be",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "dd1b6fb5dfb56b93ad531abf87f4f713b5934156133007bb4014b56ec9f285e5",
     "scripts/director-dispatch.py": "41438736aeed0da210bd7f65971193f25c84a68c2536be66f52b7f7cf3a040cf",
@@ -3385,7 +3385,7 @@
     "scripts/run-workspaces.py": "a706fedaca99a6231d753201cff28f5d5601292b048ceb0929dc8ae469eb302b",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "f2982fb012c5bb9648b6011273fd05943769120eafbbb472baa0be0d9b99cce4"
+    "scripts/workflow-state.py": "3bad78ae6fa39d6ad4eac48d7dc8c7721c9a2314440f1783ff22ffbd61dfad45"
   },
   "packages": {},
   "parameter_defaults": {},

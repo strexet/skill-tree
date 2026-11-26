@@ -1540,6 +1540,8 @@ def next_task(store):
     result = {'phase':'validate' if stage=='awaiting-validation' else 'implement','root_task_id':root,
               'task_id':task['id'],'title':task['title'],'priority':task['priority'],'body':task['body'],'checks':check_specs(task)}
     if result['phase'] == 'implement':
+        if state['active_run'].get('delivery', {}).get('authorization', {}).get('pr') is True:
+            result['worker_brief'] = focused_worker_brief(store, state, task, result['checks'])
         paths = []
         for line in section_body(task['body'],'Touch').splitlines():
             if not line.startswith('- '):
@@ -4526,6 +4528,8 @@ def resume_admission(store, *, expected_initial=None):
     if (state['active_run'] or {}).get('compatible_profile_refresh'):
         raise WorkflowError('Resume the original compatible worktree admission with the original operation')
     selected = (state['active_run'] or {}).get('id')
+    profile_path=store.source_root/workspaces.PROFILE_FILE
+    profile_hash=file_hash(profile_path)
     admitted=admit_profile(store)
     with store.lock():
         text=store.text();state=store.load(text);run=state['active_run']
@@ -4536,6 +4540,10 @@ def resume_admission(store, *, expected_initial=None):
         if run.get('compatible_profile_refresh'):
             raise WorkflowError('Resume the original compatible worktree admission with the original operation')
         target=execution_run(run);target['admission']=admitted
+        if target is run and run.get('delivery', {}).get('authorization', {}).get('pr') is True:
+            if store.source_root/workspaces.PROFILE_FILE!=profile_path or file_hash(profile_path)!=profile_hash:
+                raise WorkflowError('The selected recipe checkout or profile changed during admission')
+            target['recipe_profile_sha256']=profile_hash
         if target is run and run.pop('profile_refresh_required',False) and run['stop_reason']=='Installation profile changed; re-admit before continuation':run['stop_reason']=None
         store.save(text,state);return admitted
 
@@ -4674,6 +4682,8 @@ def compatible_profile_admission(store):
             raise WorkflowError('The installed compatible worktree profile changed')
         admitted={**{key:observed[key] for key in ('identity','environment_id')},'flavor':run['admission']['flavor']}
         run['admission']=admitted
+        if run.get('delivery', {}).get('authorization', {}).get('pr') is True:
+            run['recipe_profile_sha256']=observed['profile_sha256']
         run.pop('compatible_profile_refresh')
         if run.pop('profile_refresh_required',False) and run['stop_reason']=='Installation profile changed; re-admit before continuation':
             run['stop_reason']=None
@@ -4819,9 +4829,38 @@ def binding_context(store,recipe,allow_blocked=False):
     if binding['blockers'] and not allow_blocked:raise WorkflowError('Validation-blocked: '+str(len(binding['blockers']))+' unqualified isolated source differences; review '+binding['review_path'])
     return {'id':binding_id,**({'queue_support_digest':binding['queue_support_digest']} if 'queue_support_digest' in binding else {}),**{key:binding[key] for key in ['queue_root','execution_root','workspace_root','queue_digest','execution_digest','workspace_digest','pins','review_digest','blockers']}}
 
-def recipe_for(store,check):
+class DeliveryOnlyRecipe(WorkflowError):
+    def __init__(self, recipe_id, declaration):
+        super().__init__('Delivery-only recipe ' + recipe_id + ' requires the declared PR final validation phase')
+        self.declaration = declaration
+
+
+class WorkerProfileAdmissionRequired(WorkflowError):
+    pass
+
+
+def verified_recipe_profile(store, state, *, require_pin=False):
+    path = store.source_root/'.skill-tree/installation/profile.json'
+    raw = path.read_bytes() if path.is_file() else None
+    profile_hash = digest(raw) if raw is not None else None
+    run = state.get('active_run') or {}
+    if not run.get('maintenance') and run.get('delivery', {}).get('authorization', {}).get('pr') is True:
+        admitted = run.get('initial_profile', {}).get('profile_sha256')
+        retained = (run.get('compatible_profile_readmissions') or [None])[-1]
+        pin = run.get('recipe_profile_sha256') or admitted
+        if not run.get('recipe_profile_sha256') and retained and retained.get('admission') == run.get('admission'):
+            pin = retained['plan']['after']['profile_sha256']
+        if require_pin and pin is None and (raw is not None or run.get('admission', {}).get('identity') not in {None,'repository-local'}):
+            raise WorkerProfileAdmissionRequired('Verify and re-admit the selected worktree profile before requesting worker commands')
+        if pin is not None and (path.is_symlink() or profile_hash != pin):
+            raise WorkflowError('The selected worktree profile differs from the admitted recipe profile')
+    return json.loads(raw) if raw is not None else {}, path, profile_hash
+
+
+def recipe_for(store,check,*,profile=None):
     profile_path=store.source_root/'.skill-tree/installation/profile.json'
-    profile=json.loads(profile_path.read_text()) if profile_path.exists() else {}
+    if profile is None:
+        profile=json.loads(profile_path.read_text()) if profile_path.exists() else {}
     local_path=store.source_root/'.skill-tree/config/repository.json'
     local=json.loads(local_path.read_text()) if local_path.exists() else {}
     recipes=profile.get('recipes',local.get('recipes',{}))
@@ -4831,6 +4870,21 @@ def recipe_for(store,check):
     inputs={}
     for rel in recipe.get('input_paths',[]):inputs.update(fingerprints(store,[rel]))
     if profile and any(profile.get('inputs',{}).get(rel)!=value for rel,value in inputs.items()):raise WorkflowError('Profile refresh-required: node .skill-tree/installation/manager.js --refresh-profile')
+    if 'delivery_validation' in recipe:
+        raise DeliveryOnlyRecipe(check['recipe_id'], recipe['delivery_validation'])
+    target_declaration = '.skill-tree/validation-recipes.json'
+    source_declaration = '.skill-tree/config/repository.json'
+    if profile:
+        declarations = []
+        if target_declaration in inputs:
+            declared_path = binding_path(store.source_root,target_declaration)
+            declarations.append(json.loads(declared_path.read_text(encoding='utf-8-sig')))
+        if source_declaration in inputs and local.get('role')=='source':
+            declarations.append(local)
+        for declaration in declarations:
+            authored = declaration.get('recipes', {}).get(check['recipe_id'], {})
+            if 'delivery_validation' in authored:
+                raise DeliveryOnlyRecipe(check['recipe_id'], authored['delivery_validation'])
     recipe=deepcopy(recipe);recipe.pop('execution_context',None)
     binding=binding_context(store,recipe)
     parameters={**check['parameters'],'project_root':str(store.source_root),'queue_root':str(store.root)}
@@ -4877,6 +4931,125 @@ CHECK_RESULT_FIELDS = ('task_id','check_id','attempt_id','classification','resul
                        'actual_lane','environment_identity','cleanup')
 
 
+def validation_requirements(store, check, recipe, environment):
+    lane = recipe['lane']
+    if lane in {'unit','unity-editmode'} and check['timing'] != 'immediate':
+        raise WorkflowError('Focused behavioral checks remain immediate')
+    response = {}
+    runtime = lane in PRODUCT_LANES
+    execution_fields = list(EXECUTION_FIELDS) if runtime else []
+    binding = recipe.get('execution_context')
+    if runtime and binding:
+        execution_fields.extend(BOUND_EXECUTION_FIELDS)
+    if lane.startswith('unity-'):
+        execution_fields.extend(UNITY_EXECUTION_FIELDS)
+    counted = lane in COUNTED_LANES
+    response.update(recipe_id=check['recipe_id'],lane=lane,recipe_environment=environment)
+    response['execution'] = {
+        'required':runtime,'fields':execution_fields,
+        'tool_identity_fields':list(BINDING_TOOL_FIELDS) if runtime and binding else [],
+        'project_root':binding['execution_root'] if binding else str(store.source_root),
+        'requires_aware_deadline_and_positive_cleanup_reserve':runtime,
+        'identity_evidence_requires_repository_relative_paths':runtime,
+    }
+    response['launch'] = {'required':False,'fields_if_present':list(LAUNCH_FIELDS)}
+    results = [value for value in CHECK_RESULTS if counted or value != 'red']
+    response['receipt'] = {
+        'fields':list(CHECK_RESULT_FIELDS),'classification_values':list(CHECK_CLASSIFICATIONS),
+        'result_values':results,
+        'results_requiring_evidence_and_executed_control':['pass','red'] if counted else ['pass'],
+        'evidence_field':'evidence',
+        'evidence_reference':{'repository_relative_path_string':True,'object_required':['path'],
+                              'object_optional':['sha256']},
+        'cleanup_requires_nonempty_text':True,
+        'executed_pass_shape':'counts' if counted else 'assertions',
+        'count_fields':list(COUNT_FIELDS) if counted else [],
+        'counts_must_be_nonnegative_integers':counted,
+        'minimum_expected_discovery':1 if counted else None,
+        'minimum_discovery_uses_expected_count':counted,
+        'discovered_must_equal_passed_failed_and_skipped':counted,
+        'pass_zero_count_fields':['failed','skipped'] if counted else [],
+        'assertion':None if counted else check['assertion'],
+        'assertions_all_passed':not counted,
+        'failure_signature_required_for_executed_fail':True,
+        'behavioral_red_allowed':counted,
+        'behavioral_red_requires_failed_and_no_skips':counted,
+        'behavioral_red_failure_category':'expected-behavior' if counted else None,
+    }
+    return response
+
+
+def focused_worker_brief(store, state, task, checks):
+    """Project the exact implementation handoff without preparing or launching checks."""
+    run = state['active_run']
+    queue_hash, checkpoint_hash = file_hash(store.future), file_hash(store.state)
+    current = store.load()
+    progress = state['task_progress'].get(task['id'], {})
+    scope = {key:value for key,value in run.items() if key!='admitted_groups'}
+    observed_scope = {key:value for key,value in (current['active_run'] or {}).items()
+                      if key!='admitted_groups'}
+    if (current['source_hash'] != state['source_hash'] or observed_scope != scope
+            or current['task_progress'].get(task['id'], {}) != progress):
+        raise WorkflowError('The exact worker task or checkpoint changed during handoff')
+    baseline = clarification_baselines([task])
+    brief = {
+        'run_id': run['id'], 'task_id': task['id'], 'checkout': str(store.source_root),
+        'profile_identity': run.get('admission', {}).get('identity'),
+        'semantic_fingerprint': clarification_fingerprints(baseline)[task['id']],
+        'content_fingerprint': baseline[task['id']]['content_hash'],
+        'checks': [],
+    }
+    try:
+        profile, profile_path, profile_hash = verified_recipe_profile(store,state,require_pin=True)
+    except WorkerProfileAdmissionRequired as error:
+        return {**brief,'prerequisite':str(error)}
+    runtime = False
+    resolved = []
+    for check in checks:
+        row = {'check_id': check['id'], 'recipe_id': check['recipe_id'], 'timing': check['timing'],
+               'criteria': check['criteria'], 'sources': check['sources'], 'assertion': check['assertion'],
+               'execution_owner': 'coordinator', 'evidence_owner': 'coordinator'}
+        attempt = pending_check_attempt(progress.get('checks', {}).get(check['id'], {}))
+        if attempt:
+            row.update(status='pending-attempt', attempt_id=attempt['attempt_id'])
+            brief['checks'].append(row)
+            continue
+        try:
+            recipe, environment = recipe_for(store, check, profile=profile)
+            requirements = validation_requirements(store, check, recipe, environment)
+        except DeliveryOnlyRecipe as error:
+            row.update(status='delivery-validation-only', prerequisite=str(error),
+                       delivery_validation=error.declaration)
+        except (WorkflowError, workspaces.RunError) as error:
+            row.update(status='prerequisite', prerequisite=str(error))
+        else:
+            row.update(requirements)
+            needs_runtime = requirements['execution']['required']
+            runtime |= needs_runtime
+            resolved.append((check, recipe, environment))
+            if check['timing'] == 'immediate' and not needs_runtime and recipe.get('argv'):
+                row.update(status='focused-command', execution_owner='worker', argv=recipe['argv'])
+            else:
+                row['status'] = 'coordinator-check'
+        brief['checks'].append(row)
+    if runtime:
+        try:
+            environment = workspaces.environment(store)
+            brief['runtime_resource_claims'] = environment.get('runtime_resource_claims', [])
+            web = environment.get('web_runtime_path')
+            if web and web.get('prerequisite'):
+                brief['runtime_prerequisite'] = web['prerequisite']
+        except workspaces.RunError as error:
+            brief['runtime_prerequisite'] = str(error)
+    for check, recipe, environment in resolved:
+        if recipe_for(store, check, profile=profile) != (recipe, environment):
+            raise WorkflowError('A validation recipe changed during worker handoff')
+    if (file_hash(store.future) != queue_hash or file_hash(store.state) != checkpoint_hash
+            or file_hash(profile_path) != profile_hash):
+        raise WorkflowError('Worker handoff inputs changed; request a current brief')
+    return brief
+
+
 def validation_preflight(store,payload):
     """Read the selected check requirements without preparing a check attempt."""
     if (not isinstance(payload,dict)
@@ -4919,62 +5092,26 @@ def validation_preflight(store,payload):
         if task_id not in scope_ids(tasks,execution_run(run)):
             raise WorkflowError('Task is outside the admitted controller scope')
         response['run_id'] = run['id']
+    profile, profile_path, profile_hash = verified_recipe_profile(store,state)
     try:
-        recipe,environment = recipe_for(store,check)
-        lane = recipe['lane']
-        if lane in {'unit','unity-editmode'} and check['timing'] != 'immediate':
-            raise WorkflowError('Focused behavioral checks remain immediate')
+        recipe,environment = recipe_for(store,check,profile=profile)
+        response.update(validation_requirements(store, check, recipe, environment))
+    except DeliveryOnlyRecipe as error:
+        response.update(status='delivery-validation-only', recipe_prerequisite=str(error),
+                        delivery_validation=error.declaration)
     except WorkflowError as error:
         if not boundary:
             raise
         response['recipe_prerequisite'] = str(error)
     else:
-        runtime = lane in PRODUCT_LANES
-        execution_fields = list(EXECUTION_FIELDS) if runtime else []
-        binding = recipe.get('execution_context')
-        if runtime and binding:
-            execution_fields.extend(BOUND_EXECUTION_FIELDS)
-        if lane.startswith('unity-'):
-            execution_fields.extend(UNITY_EXECUTION_FIELDS)
-        counted = lane in COUNTED_LANES
-        response.update(recipe_id=check['recipe_id'],lane=lane,recipe_environment=environment)
-        response['execution'] = {
-            'required':runtime,'fields':execution_fields,
-            'tool_identity_fields':list(BINDING_TOOL_FIELDS) if runtime and binding else [],
-            'project_root':binding['execution_root'] if binding else str(store.source_root),
-            'requires_aware_deadline_and_positive_cleanup_reserve':runtime,
-            'identity_evidence_requires_repository_relative_paths':runtime,
-        }
-        response['launch'] = {'required':False,'fields_if_present':list(LAUNCH_FIELDS)}
-        results = [value for value in CHECK_RESULTS if counted or value != 'red']
-        response['receipt'] = {
-            'fields':list(CHECK_RESULT_FIELDS),'classification_values':list(CHECK_CLASSIFICATIONS),
-            'result_values':results,
-            'results_requiring_evidence_and_executed_control':['pass','red'] if counted else ['pass'],
-            'evidence_field':'evidence',
-            'evidence_reference':{'repository_relative_path_string':True,'object_required':['path'],
-                                  'object_optional':['sha256']},
-            'cleanup_requires_nonempty_text':True,
-            'executed_pass_shape':'counts' if counted else 'assertions',
-            'count_fields':list(COUNT_FIELDS) if counted else [],
-            'counts_must_be_nonnegative_integers':counted,
-            'minimum_expected_discovery':1 if counted else None,
-            'minimum_discovery_uses_expected_count':counted,
-            'discovered_must_equal_passed_failed_and_skipped':counted,
-            'pass_zero_count_fields':['failed','skipped'] if counted else [],
-            'assertion':None if counted else check['assertion'],
-            'assertions_all_passed':not counted,
-            'failure_signature_required_for_executed_fail':True,
-            'behavioral_red_allowed':counted,
-            'behavioral_red_requires_failed_and_no_skips':counted,
-            'behavioral_red_failure_category':'expected-behavior' if counted else None,
-        }
-        if recipe_for(store,check) != (recipe,environment):
+        if recipe_for(store,check,profile=profile) != (recipe,environment):
             raise WorkflowError('The selected validation recipe changed during preflight')
     if source.read_bytes() != inspected:
         raise WorkflowError('Source changed since inspection; reread selected task')
     if (state_path.read_bytes() if state_path.is_file() else None) != checkpoint:
         raise WorkflowError('The selected run changed during preflight')
+    if file_hash(profile_path) != profile_hash:
+        raise WorkflowError('The owned recipe profile changed during preflight')
     return response
 
 
@@ -5004,10 +5141,10 @@ def execution_session(store,recipe,environment,entry,provided=None,require_curre
     sessions[environment]=deepcopy(session)
     return session
 
-def check_snapshot(store,task,check,state,*,historical_sessions=None):
+def check_snapshot(store,task,check,state,*,historical_sessions=None,profile=None):
     sources=fingerprints(store,check['sources'])
     if any(value is None for value in sources.values()):raise WorkflowError('Required check source/test input is unavailable')
-    recipe,environment=recipe_for(store,check)
+    recipe,environment=recipe_for(store,check,profile=profile)
     if recipe['lane'] in {'unit','unity-editmode'} and check['timing']!='immediate':raise WorkflowError('Focused behavioral checks remain immediate')
     if historical_sessions is not None:
         session = None
@@ -5373,6 +5510,11 @@ def begin_task(store,payload):
         run=state['active_run']
         scoped_commit=bool(run and run.get('implementation_operation')) or (not run and operation=='implement-next')
         previous=state['task_progress'].get(task['id'])
+        checks=check_specs(task)
+        brief=None
+        if ((not previous or previous['stage']=='implementing') and run
+                and run.get('delivery', {}).get('authorization', {}).get('pr') is True):
+            brief=focused_worker_brief(store,state,task,checks)
         entry=state['task_progress'].setdefault(task['id'],{'stage':'implementing','checks':{},'admission':admission,'partial_work':[]})
         if entry['stage']=='blocked':raise WorkflowError('Task progress is blocked; explicitly resolve the recorded stop')
         entry['admission']=admission
@@ -5383,7 +5525,9 @@ def begin_task(store,payload):
             elif 'task_git_baseline' not in previous:
                 raise WorkflowError('Resume the existing task under its original completion policy')
         if state['active_run']:entry['run_id']=state['active_run']['id']
-        result={'task_id':task['id'],'phase':'validate' if entry['stage']=='awaiting-validation' else 'implement','checks':check_specs(task)}
+        result={'task_id':task['id'],'phase':'validate' if entry['stage']=='awaiting-validation' else 'implement','checks':checks}
+        if brief is not None:
+            result['worker_brief'] = brief
         store.save(text,state);return result
 
 def mark_implemented(store,payload):
@@ -5828,8 +5972,12 @@ def prepare_check(store,payload):
         if pending_check_attempt(slot):raise WorkflowError('Recover and close the original pending check attempt before preparing another control')
         if state['active_run']:
             target=execution_run(state['active_run']);enforce_limits(target);target['admitted_groups']=admitted_groups(parse(text),target)
-        recipe,environment=recipe_for(store,check);execution_session(store,recipe,environment,entry,payload.get('execution'),require_current=True)
-        snapshot=check_snapshot(store,task,check,state)
+        profile, profile_path, profile_hash = verified_recipe_profile(store,state)
+        recipe,environment=recipe_for(store,check,profile=profile)
+        execution_session(store,recipe,environment,entry,payload.get('execution'),require_current=True)
+        snapshot=check_snapshot(store,task,check,state,profile=profile)
+        if file_hash(profile_path) != profile_hash or recipe_for(store,check,profile=profile) != (recipe,environment):
+            raise WorkflowError('The owned recipe profile changed during check preparation')
         launch=payload.get('launch')
         if launch:
             if not isinstance(launch,dict) or any(not launch.get(key) for key in LAUNCH_FIELDS):raise WorkflowError('Launch requires concrete assertion, rationale, authorization, exact checkout, deadline and cleanup profile')
@@ -7073,6 +7221,11 @@ def orchestration_action(store,command,payload):
             return result
         if command=='orchestration-read':return helper.read(store,payload.get('orchestration_id'))
         frame=None if command=='orchestration-start' else helper.read(store,payload.get('orchestration_id'))
+        selected_run = None
+        if (command=='orchestration-next' and store.run_id and frame['phase']=='implement'
+                and frame['context'].get('kind')=='task'
+                and frame['context'].get('run_id',store.run_id)==store.run_id):
+            selected_run = store.load()['active_run']
         current_snapshot=orchestration_execution_snapshot(store)
         if frame is None or command=='orchestration-resume':
             if 'execution_snapshot' in payload and payload['execution_snapshot']!=current_snapshot:raise WorkflowError('Orchestration execution snapshot differs from the actual current bundle/profile')
@@ -7108,7 +7261,29 @@ def orchestration_action(store,command,payload):
                 if mode!=clarification_decision_mode(parent) or authority!=parent.get('decision_authority') or mode=='auto' and executor!=parent.get('decision_executor'):raise WorkflowError('Orchestration mode, authority or executor differs from the current clarification')
                 if command=='orchestration-switch-mode' and payload.get('mode')!=mode:raise WorkflowError('Change the parent clarification mode through the guarded session')
         if command=='orchestration-next':
-            scope_guard();return helper.next_action(store,payload['orchestration_id'])
+            scope_guard()
+            result = helper.next_action(store,payload['orchestration_id'])
+            members = context.get('task_ids', [])
+            if (store.run_id and context.get('run_id',store.run_id)==store.run_id
+                    and context.get('kind')=='task' and len(members)==1
+                    and result['phase']=='implement' and result['action'] in {'phase','accepted'}):
+                task_id = members[0]
+                run = selected_run
+                if (run and run.get('current_task_id')==task_id
+                        and run.get('delivery', {}).get('authorization', {}).get('pr') is True):
+                    handoff = next_task(store)
+                    brief = handoff.get('worker_brief')
+                    if (brief and brief['task_id']==task_id
+                            and brief['semantic_fingerprint']==context['semantic_fingerprint']
+                            and brief['content_fingerprint']==context['content_fingerprint']
+                            and {row['check_id'] for row in brief['checks']}==set(frame['plan']['required_checks'])):
+                        if orchestration_execution_snapshot(store)!=current_snapshot:
+                            raise WorkflowError('The selected worktree snapshot changed during worker handoff')
+                        result['worker_brief'] = brief
+                    else:
+                        reason = (brief or {}).get('prerequisite') or 'Align the accepted plan with the current admitted task checks before worker execution'
+                        result.update(action='prerequisite', prerequisites=[reason])
+            return result
         if command=='orchestration-check-evidence':
             if set(payload)!={'orchestration_id'}:raise WorkflowError('Check evidence requires one exact orchestration ID')
             scope_guard();return orchestration_check_evidence(store,frame)
@@ -8004,7 +8179,8 @@ def main(argv=None):
             if args.id:payload['chain_id']=args.id
             result=hook_action(store,cmd,payload)
         elif cmd in ORCHESTRATION_COMMANDS:
-            store=Store(args.root,allow_unselected=True,neutral=True)
+            run_id=args.run_id if cmd=='orchestration-next' else None
+            store=Store(args.root,run_id,allow_unselected=True,neutral=run_id is None)
             if args.id:payload['orchestration_id']=args.id
             result=orchestration_action(store,cmd,payload)
         elif cmd in DECISION_COMMANDS:
