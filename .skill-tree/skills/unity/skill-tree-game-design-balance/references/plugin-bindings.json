@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "3f142b06db413d6014d092ec2ebee36ff39766fd1656d3f1e0fca5dcdf6d3483",
+  "identity": "a2ed171a16d3274516ff3a96d36e5b2d146bfbf3d232fb8e0805b8a7566e2a5d",
   "operation": "skill-tree-game-design-balance",
   "operations": {
     "skill-tree-3d": {
@@ -3323,7 +3323,7 @@
     "scripts/run-workspaces.py": "a706fedaca99a6231d753201cff28f5d5601292b048ceb0929dc8ae469eb302b",
     "scripts/task-grouping-migration.py": "e130fc563d731f0fee0d71438e31a2e1c90b9921b89710a60d4dfa9f2bf0bd5b",
     "scripts/validate-document-rules.py": "1f19fe0450a1bc8210953660950f45169e729d46196bcd75464ee32faa46f8a7",
-    "scripts/workflow-state.py": "a57a5aa793a71bb19413f0d7f5b2985c7bf03fc5ed9a57245d0c7afb53b59bac"
+    "scripts/workflow-state.py": "66d30a26c5749df8576781146b395806320d05d35674463f157a84b2f48acb9a"
   },
   "packages": {},
   "parameter_defaults": {},

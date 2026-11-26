@@ -3354,7 +3354,8 @@ def partial_finish_observation(store, text, state):
         blockers.append({'kind': 'original-controller-handoff'})
     changes = partial_finish_source_changes(path)
     observation = {'run_id': rid, 'queue_id': registry['queue_id'], 'queue_sha256': digest(text.encode()),
-        'checkpoint_sha256': digest(dump(run).encode()), 'accepted': accepted,
+        'checkpoint_sha256': digest(dump(run).encode()),
+        'snapshot': run['snapshot'], 'required_ids': run['required_ids'], 'accepted': accepted,
         'accepted_tip': tip, 'remaining_ids': remaining, 'claims': claims, 'blockers': blockers,
         'source': {**checkout, 'registration': registration.name, 'location_sha256': digest(str(path).encode())},
         'changes': changes, 'evidence_sha256': partial_finish_evidence_fingerprints(store, run),

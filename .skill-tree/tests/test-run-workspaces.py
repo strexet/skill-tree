@@ -826,6 +826,9 @@ class RunWorkspaceTests(unittest.TestCase):
         old_head = self.call(source, 'rev-parse', 'HEAD')
         preview = wf.partial_finish(wf.Store(self.root, selected.run_id), 'partial-finish-preview', {})
         self.assertEqual(preview['preview']['remaining_ids'], remaining)
+        original = json.loads(selected.state.read_bytes())['run_registry']['runs'][selected.run_id]
+        self.assertEqual(preview['preview']['snapshot'], original['snapshot'])
+        self.assertEqual(preview['preview']['required_ids'], original['required_ids'])
         self.assertEqual(len(preview['preview']['accepted']), 20)
         self.assertFalse(preview['preview']['requires_preservation'])
         request = {'expected_preview_sha256':preview['preview_sha256'],
