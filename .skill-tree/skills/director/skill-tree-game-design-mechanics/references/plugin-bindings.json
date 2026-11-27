@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "380826c9de88a3da12f5c0d507f8148d530c1fd4fc53c511eb836a69a98dee53",
+  "identity": "3b2013e557dd59719f02065ce3fb49817f83ccdf0e0be91b5a75dddf44cf281c",
   "operation": "skill-tree-game-design-mechanics",
   "operations": {
     "skill-tree-3d": {
@@ -3300,7 +3300,7 @@
     "references/game-design-records.md": "ee0c46efe3f88d4e4d68859c0e5e94dc26a453f36575dcfc5830f96f863990c3",
     "references/installation-profile.md": "5a8ab3d1a37d094b679543ec3c32090a5102ef7fd5399ab1925cbfd4eb7bd235",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
-    "references/project-profile.md": "db4a92430ce1c34d879a6adec625ac5036faa992245c9c52e14208dc8a30b4c8",
+    "references/project-profile.md": "d8f16571c4806b10003d71c65f4bc9b9aac0fa34d7d51abddf980daf80fe6dee",
     "references/validation-policy.md": "8ab3ed2b2f73595d4ebbff29af451cefb5f0b804ea1499be9dc385effff5f5f3",
     "scripts/decision-governance.py": "18e8c33d3c2b150e13ee76492402cc6cd0ae8e17aa6ca63063f3bb8e92385286",
     "scripts/decision-orchestration.py": "dd1b6fb5dfb56b93ad531abf87f4f713b5934156133007bb4014b56ec9f285e5",

@@ -204,6 +204,13 @@ def preflight(root,payload):
 def identity(snapshot):
     return {**repository_scope(snapshot),**{key:snapshot[key] for key in ['repo_id','remote','source_branch','target_branch','head','base_oid']},'remote_id':snapshot.get('remote_id')}
 
+
+def same_publication_source(saved, snapshot):
+    keys = ('repo_id', 'remote', 'remote_id', 'source_branch',
+            'base_repository', 'head_repository', 'head_remote')
+    return all(saved.get(key) == snapshot.get(key) for key in keys)
+
+
 def review_key(snapshot):
     return digest({key:snapshot.get(key) for key in ['head','base_oid','target_branch','changed_files','candidate_objects_required','threads','reviews','comments','checks','checks_known','required_checks_missing','approvals_known','approvals_required','approved']})
 
@@ -227,8 +234,9 @@ def decision_acceptance(store,record,snapshot,reference,expected):
 
 def reconcile(record,snapshot,*,retarget=None):
     record=deepcopy(record)
-    for key in ['repo_id','remote','remote_id','source_branch','base_repository','head_repository','head_remote']:
-        if record['identity'].get(key)!=snapshot.get(key):raise ReviewError('Publication repository/source identity conflict')
+    if not same_publication_source(record['identity'], snapshot):
+        raise ReviewError('Publication repository/source identity conflict')
+    guard_merged_publication(record, snapshot)
     previous_target=record['identity']['target_branch']
     target_changed=previous_target!=snapshot['target_branch']
     if target_changed:
@@ -243,6 +251,11 @@ def reconcile(record,snapshot,*,retarget=None):
     if record.get('pr') and pr and (record['pr']['id']!=pr['id']
             or ('final_validation' in record and record['pr'] != pr)):
         raise ReviewError('Existing PR identity conflict')
+    if record['identity']['head'] != snapshot['head']:
+        if bool(pr) != bool(record.get('pr')):
+            raise ReviewError('A changed source head requires the exact current PR association')
+        if not pr and not record.get('pr') and record.get('operations'):
+            raise ReviewError('Reconcile the retained provider operations before changing an unpublished head')
     if pr:record['pr']=pr
     current_identity=identity(snapshot)
     changed=record['identity']!=current_identity or record.get('snapshot_key')!=review_key(snapshot)
@@ -447,6 +460,150 @@ def _review_path(store,publication_id):
     path=store.root/'.skill-tree/history/publications'/('pub-'+publication_id+'.json')
     if any(part.is_symlink() for part in [path,*path.parents]):raise ReviewError('Publication metadata cannot use symlinks')
     return path
+
+
+def guard_merged_publication(record, snapshot):
+    if record.get('merge_commit') and record['status'] != 'merged':
+        raise ReviewError('Mixed publication receipt requires explicit recovery from verified evidence')
+    if record['status'] != 'merged':
+        return
+    saved = record['identity']
+    if (snapshot.get('state') != 'MERGED' or snapshot.get('head') != saved['head']
+            or snapshot.get('target_branch') != saved['target_branch']
+            or snapshot.get('pr') != record.get('pr')):
+        raise ReviewError('A merged publication requires the exact original merged PR and source head')
+
+
+def select_publication(store, snapshot, command, payload):
+    scope = {**repository_scope(snapshot),
+             **{key: snapshot[key] for key in ('repo_id', 'remote', 'source_branch', 'target_branch')}}
+    key = digest(scope)[:32]
+    requested = (snapshot.get('pr') or {}).get('id')
+    matches = []
+    merged_heads = set()
+    active = None
+    while (carrier := _review_path(store, key)).exists():
+        record = json.loads(carrier.read_text())
+        saved = record['identity']
+        if (record.get('publication_id') != key or not same_publication_source(saved, snapshot)
+                or saved['target_branch'] != snapshot['target_branch']):
+            raise ReviewError('Publication series identity conflict; select the exact publication ID')
+        if requested and requested == (record.get('pr') or {}).get('id'):
+            matches.append(key)
+        if record['status'] != 'merged':
+            if record.get('merge_commit'):
+                raise ReviewError('Mixed publication receipt requires explicit recovery from verified evidence')
+            active = key
+            break
+        if not record.get('pr') or not re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', record.get('merge_commit') or ''):
+            raise ReviewError('The previous publication needs exact verified merge evidence')
+        merged_heads.add(saved['head'])
+        key = digest({'successor_of': key})[:32]
+    if len(matches) > 1:
+        raise ReviewError('Multiple matching publications require explicit selection')
+    if matches:
+        return matches[0]
+    if snapshot.get('head') in merged_heads:
+        raise ReviewError('A previously published head requires the exact merged PR identity')
+    if active:
+        return active
+    if merged_heads:
+        if command != 'init' or snapshot.get('state') in {'MERGED', 'CLOSED'}:
+            raise ReviewError('Initialize a new publication or select the exact retained publication ID')
+        instruction = payload.get('instruction')
+        if (payload.get('instruction_origin', 'owner') != 'owner' or not isinstance(instruction, str)
+                or not instruction.strip()):
+            raise ReviewError('A new cycle on the same branch pair requires a current owner instruction')
+    return key
+
+
+def matching_publication_run(registry, canonical, caller, record, relative, *, attach=False):
+    runs = list(registry.get('runs', {}).values())
+    matches = [run for run in runs if run.get('delivery', {}).get('publication') == relative]
+    if not matches and attach:
+        saved = record['identity']
+        locator = ws.runtime(canonical) or {}
+        for run in runs:
+            workspace = run.get('workspace', {})
+            delivery = run.get('delivery', {})
+            grant = delivery.get('authorization', {})
+            remote_grant = (grant.get('pr')
+                            and grant.get('target_branch', workspace.get('base_branch')) == saved['target_branch'])
+            reviewed_handoff = (run.get('reviewed_local_delivery')
+                                and delivery.get('status') == 'review-ready'
+                                and delivery.get('reviewed_source', {}).get('identity', {}).get('head') == saved['head']
+                                and record.get('authorization', {}).get('pr'))
+            if (delivery.get('publication') != 'not-requested' or delivery.get('implementation') != 'completed'
+                    or workspace.get('branch') != saved['source_branch'] or workspace.get('repo_id') != saved['repo_id']
+                    or workspace.get('remote') not in (None, saved['remote'])
+                    or workspace.get('remote_id') not in (None, saved.get('remote_id'))
+                    or not (remote_grant or reviewed_handoff)):
+                continue
+            location = locator.get('worktrees', {}).get(run['id'])
+            if not location:
+                continue
+            checkout = Path(location).resolve()
+            if (not checkout.is_dir() or caller not in (canonical, checkout)
+                    or ws.common_dir(checkout) != ws.common_dir(canonical)
+                    or ws.git(checkout, 'symbolic-ref', '--quiet', '--short', 'HEAD') != saved['source_branch']
+                    or ws.git(checkout, 'rev-parse', 'HEAD') != saved['head']):
+                continue
+            matches.append(run)
+    if len(matches) > 1:
+        raise ReviewError('Publication run identity is ambiguous')
+    return matches[0] if matches else None
+
+
+def publication_recovery_preview(root, publication_id, payload):
+    carrier = _review_path(SimpleNamespace(root=ws.canonical(root)), publication_id)
+    raw = _regular_input(carrier, 'Publication receipts', 16*1024*1024)
+    if raw is None or hashlib.sha256(raw).hexdigest() != payload.get('expected_publication_sha256'):
+        raise ReviewError('Recovery preview requires the exact current publication receipt hash')
+    archive = payload.get('archived_receipt')
+    creation = payload.get('creation_receipt')
+    if not isinstance(archive, str) or not isinstance(creation, dict):
+        raise ReviewError('Recovery preview requires the archived merged receipt and newer PR creation receipt')
+    current, archived = json.loads(raw), json.loads(archive)
+    if not isinstance(current, dict) or not isinstance(archived, dict):
+        raise ReviewError('The current and archived publication receipts must be JSON objects')
+    original_pr = archived.get('pr') or {}
+    merge_commit = archived.get('merge_commit') or ''
+    if (archived.get('publication_id') != publication_id or current.get('publication_id') != publication_id
+            or archived.get('status') != 'merged' or current.get('status') == 'merged'
+            or not original_pr.get('id') or original_pr != current.get('pr')
+            or not re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', merge_commit)
+            or merge_commit != current.get('merge_commit')):
+        raise ReviewError('The archived merged PR and retained integration evidence do not match')
+    old_identity, new_identity = archived['identity'], current['identity']
+    if (not same_publication_source(old_identity, new_identity)
+            or old_identity['target_branch'] != new_identity['target_branch']
+            or old_identity['head'] == new_identity['head']):
+        raise ReviewError('The receipts do not identify successive candidates for the same publication scope')
+    old_operations = archived.get('operations', {})
+    current_operations = current.get('operations', {})
+    key, request, result = creation.get('key'), creation.get('request'), creation.get('result')
+    if (not isinstance(key, str) or key in old_operations or not isinstance(request, dict)
+            or not isinstance(result, dict) or not isinstance(creation.get('snapshot'), dict)
+            or identity(creation['snapshot']) != new_identity
+            or request.get('action') != 'create-pr' or request.get('head') != new_identity['head']
+            or request.get('base') != new_identity['target_branch']
+            or type(result.get('number')) is not int or result['number'] <= 0
+            or result['number'] == original_pr.get('number') or not result.get('url')
+            or current_operations.get(key) != {'state': 'confirmed', 'request_digest': digest(request), 'result': result}
+            or any(current_operations.get(name) != value for name, value in old_operations.items())):
+        raise ReviewError('The retained operation evidence does not match the distinct newer PR creation')
+    if _regular_input(carrier, 'Publication receipts', 16*1024*1024) != raw:
+        raise ReviewError('The publication changed during recovery preview')
+    return {
+        'status': 'recovery-preview',
+        'publication_id': publication_id,
+        'current_sha256': hashlib.sha256(raw).hexdigest(),
+        'archived_sha256': hashlib.sha256(archive.encode()).hexdigest(),
+        'original_pr': original_pr,
+        'merge_commit': merge_commit,
+        'newer_pr': result,
+        'newer_operation_key': key,
+    }
 
 
 def inspected(record,snapshot,payload):
@@ -1962,7 +2119,7 @@ def publication_complete(record):
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command',choices=['parameters','preflight','prepare-handoff','init','observe','review','ready','merge-gate','merge-denial-preview','operation','block','hook-attach','inspection','review-reconcile','plugin-findings','profile-maintenance','final-validation'])
+    parser.add_argument('command',choices=['parameters','preflight','prepare-handoff','init','observe','review','ready','merge-gate','merge-denial-preview','publication-recovery-preview','operation','block','hook-attach','inspection','review-reconcile','plugin-findings','profile-maintenance','final-validation'])
     parser.add_argument('root',type=Path);parser.add_argument('--input',type=Path,required=True);parser.add_argument('--publication-id')
     args=parser.parse_args(argv)
     if args.command in {'final-validation', 'prepare-handoff'}:
@@ -1986,6 +2143,8 @@ def dispatch(args):
             result=existing_source_preflight(root,payload,args.publication_id) if explicit_source else preflight(root,payload)
         elif args.command=='prepare-handoff':
             result=prepare_handoff(root,payload,args.publication_id)
+        elif args.command=='publication-recovery-preview':
+            result=publication_recovery_preview(root,args.publication_id,payload)
         elif args.command=='merge-denial-preview':
             carrier = _review_path(SimpleNamespace(root=ws.canonical(root)),args.publication_id)
             raw = _regular_input(carrier,'Publication receipts',16*1024*1024)
@@ -2011,14 +2170,14 @@ def dispatch(args):
         else:
             # Metadata-only commands never send provider requests. The agent supplies inspected snapshots.
             canonical=ws.canonical(root);snapshot=payload.get('snapshot',{})
-            key=args.publication_id or digest({**repository_scope(snapshot), **{k:snapshot[k] for k in ['repo_id','remote','source_branch','target_branch']}})[:32]
-            if not re.fullmatch(r'[a-f0-9]{32}',key):raise ReviewError('Invalid publication ID')
+            if args.publication_id and not re.fullmatch(r'[a-f0-9]{32}',args.publication_id):raise ReviewError('Invalid publication ID')
             wf=owned_module('pr_workflow',Path(__file__).with_name('workflow-state.py'))
             store = (wf.Store(canonical,allow_unselected=True,neutral=True) if explicit_source
                      else wf.Store(root,allow_unselected=True))
             cleanup_run_id = None
             source_checkout = None
-            with ws.publication_lock(root,snapshot.get('remote','origin'),snapshot.get('target_branch',key)):
+            with ws.publication_lock(root,snapshot.get('remote','origin'),snapshot.get('target_branch') or args.publication_id or ''):
+                key = args.publication_id or select_publication(store, snapshot, args.command, payload)
                 carrier=_review_path(store,key)
                 carrier_hash=hashlib.sha256(carrier.read_bytes()).hexdigest() if carrier.exists() else None
                 if args.command == 'observe' and explicit_source and 'expected_publication_sha256' in payload:
@@ -2045,6 +2204,8 @@ def dispatch(args):
                     if inspected_carrier:
                         wf.prepare_hook_admission(store,chain_ids=inspected_carrier.get('hook_chains',[]))
                 with store.lock():
+                    if not args.publication_id and select_publication(store, snapshot, args.command, payload) != key:
+                        raise ReviewError('Publication selection changed before the writer')
                     relative='.skill-tree/history/publications/pub-'+key+'.json';path=canonical/relative
                     record=json.loads(path.read_text()) if path.exists() else None
                     if (hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None)!=carrier_hash:raise ReviewError('The inspected publication carrier changed before the writer')
@@ -2068,7 +2229,8 @@ def dispatch(args):
                         if not record and snapshot.get('state') in {'MERGED', 'CLOSED'}:
                             result = reconcile(result, snapshot)
                         if prepared_review and 'review_requirements' not in result:result['review_requirements']=_frozen_review_requirements(store,prepared_review)
-                        if record and not retarget and params['merge_explicit']:
+                        if (record and not retarget and params['merge_explicit'] and result['status'] != 'merged'
+                                and params['authorization'] != result['authorization']):
                             result.setdefault('authorization_history',[]).append(deepcopy(result['authorization']))
                             result['authorization']=params['authorization']
                     else:
@@ -2084,8 +2246,24 @@ def dispatch(args):
                         elif args.command=='merge-gate':result=merge_gate(record,snapshot,store=store)
                         elif args.command=='block':
                             if not payload.get('reason'):raise ReviewError('Publication block requires the actual prerequisite or failure')
+                            if record['status'] == 'merged' or record.get('merge_commit'):
+                                raise ReviewError('A publication block cannot replace recorded integration')
+                            if (not snapshot or identity(snapshot) != record['identity']
+                                    or snapshot.get('pr') and snapshot['pr'] != record.get('pr')):
+                                raise ReviewError('Publication block requires the current publication snapshot')
                             result=deepcopy(record);result['status']='blocked';result['blocked_reason']=payload['reason']
-                        else:result=operation(record,payload['key'],payload['request'],payload.get('result'))
+                        else:
+                            requested = snapshot.get('pr')
+                            if (snapshot and record['status'] == 'merged' and publication_complete(record)
+                                    and payload['key'] not in record['operations']):
+                                raise ReviewError('A completed publication only accepts replay of original operations')
+                            if snapshot and (not same_publication_source(record['identity'], snapshot)
+                                    or record['identity']['target_branch'] != snapshot.get('target_branch')
+                                    or record.get('pr') and requested and record['pr']['id'] != requested['id']
+                                    or (record['status'] == 'merged' or not record.get('pr'))
+                                    and record['identity']['head'] != snapshot.get('head')):
+                                raise ReviewError('Operation snapshot differs from the selected publication')
+                            result=operation(record,payload['key'],payload['request'],payload.get('result'))
                 observed_integration = (args.command in {'init', 'observe', 'review', 'inspection', 'ready', 'merge-gate'}
                                         and snapshot.get('state') == 'MERGED' and result['status'] == 'merged')
                 if observed_integration:
@@ -2101,6 +2279,8 @@ def dispatch(args):
                                            retained.get('authorization', {}).get('target_head')
                                            == result['local_target_sync']['local_head'])))
                 with store.lock():
+                    if not args.publication_id and select_publication(store, snapshot, args.command, payload) != key:
+                        raise ReviewError('Publication selection changed before recording the result')
                     current_hash = hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None
                     if current_hash != carrier_hash:
                         raise ReviewError('The inspected publication carrier changed before recording the result')
@@ -2112,15 +2292,13 @@ def dispatch(args):
                     if prepared_review:wf._hook_watch_guard(prepared_review['watch'],prepared_review['package_root'])
                     state=store.load() if store.state.exists() else None
                     registry=(state or {}).get('run_registry') or {}
-                    matches=[r for r in registry.get('runs',{}).values()
-                             if r.get('workspace',{}).get('branch')==result['identity']['source_branch']
-                             and (not explicit_source or r.get('delivery',{}).get('publication')==relative)]
-                    if len(matches)>1:raise ReviewError('Publication run identity is ambiguous')
+                    run = matching_publication_run(registry, canonical, root, result, relative,
+                                                   attach=args.command == 'init' and not explicit_source)
                     carrier_write={relative:json.dumps(result,sort_keys=True,indent=2)+'\n'}
-                    if not explicit_source or not matches:
+                    if not run:
                         store.commit(carrier_write)
-                    if matches:
-                        run=matches[0];run.setdefault('delivery',{})['publication']=relative
+                    else:
+                        run.setdefault('delivery',{})['publication']=relative
                         delivery = run['delivery']
                         delivery['status'] = result['status']
                         delivery['authorization'] = result['authorization']
@@ -2135,10 +2313,7 @@ def dispatch(args):
                         if result['status'] != 'merged' or 'local_target_sync' in result:
                             delivery['order_completed'] = publication_complete(result)
                         run['delivery']['pr']=result.get('pr');run['delivery']['merge_commit']=result.get('merge_commit')
-                        if explicit_source:
-                            store.save(store.text(),state,extras=carrier_write,update_navigation=False)
-                        else:
-                            store.save(store.text(),state)
+                        store.save(store.text(),state,extras=carrier_write,update_navigation=not explicit_source)
                         if observed_integration:
                             if result['order_completed']:
                                 if automatic_profile:

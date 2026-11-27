@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.10.1 (2026-11-27)
+
+### Fixed
+
+- Successive pull requests from long-lived branches use separate publication records and operation receipts. Exact PR retries preserve the original cycle, and a new cycle preserves earlier merged records.
+- A read-only recovery preview checks mixed publication receipts against the archived merge and the newer pull request creation evidence.
+
+### Documentation
+
+- The review-timing pilot records a five-task replay, check costs and safety stops. The report supports retaining the current review gates.
+
 ## 0.10.0 (2026-11-27)
 
 ### Added

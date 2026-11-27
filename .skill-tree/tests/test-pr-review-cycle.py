@@ -406,6 +406,164 @@ class ReviewCycleTests(unittest.TestCase):
             result=provider.ensure('feature/example','develop','Title','Body')
         self.assertEqual(result['number'],3);self.assertEqual(len(writes),1)
 
+class SuccessivePublicationTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name).resolve()
+        subprocess.run(['git', 'init', '-q', str(self.root)], check=True, capture_output=True)
+        self.request = self.root / 'publication-input.json'
+        self.first = {
+            'repo_id': 'fixture', 'remote': 'origin', 'remote_id': 'original-remote',
+            'source_branch': 'develop', 'target_branch': 'main', 'head': 'a'*40,
+            'base_oid': 'b'*40, 'changed_files': ['source.py'], 'state': 'OPEN',
+            'pr': {'id': 'PR_first', 'number': 9, 'url': 'https://example.invalid/pr/9'},
+        }
+        self.second = {**self.first, 'head': 'c'*40, 'base_oid': 'd'*40,
+                       'state': None, 'pr': None}
+        self.grant = {'target_branch': 'main', 'instruction_origin': 'owner',
+                      'instruction': 'Review and merge develop into main', 'merge': True}
+
+    def invoke(self, command, snapshot, publication_id=None, **payload):
+        self.request.write_text(json.dumps({'snapshot': snapshot, **payload}))
+        args = [command, str(self.root), '--input', str(self.request)]
+        if publication_id:
+            args += ['--publication-id', publication_id]
+        output = io.StringIO()
+        with redirect_stdout(output):
+            code = pr.main(args)
+        return code, json.loads(output.getvalue())
+
+    def carrier(self, publication_id):
+        return self.root / '.skill-tree/history/publications' / f'pub-{publication_id}.json'
+
+    def merge_first(self):
+        code, first = self.invoke('init', self.first, **self.grant)
+        self.assertEqual(code, 0, first)
+        self.assertEqual(self.invoke('operation', self.first, key='create-pr-1',
+                                     request={'head': self.first['head']})[0], 0)
+        with patch.object(pr, 'synchronize_local_target', return_value={'status': 'synchronized'}):
+            code, merged = self.invoke('observe', {**self.first, 'state': 'MERGED',
+                                                   'merge_commit': 'd'*40})
+        self.assertEqual(code, 0, merged)
+        self.assertTrue(merged['order_completed'])
+        return merged['publication_id']
+
+    def test_successive_cycle_reuses_neither_the_merged_record_nor_its_operation_keys(self):
+        original = self.merge_first()
+        prior_bytes = self.carrier(original).read_bytes()
+        code, new = self.invoke('init', self.second, **self.grant)
+        self.assertEqual(code, 0, new)
+        new_id = new['publication_id']
+        self.assertNotEqual(original, new_id)
+        self.assertIsNone(new['pr'])
+        self.assertEqual(new['operations'], {})
+        self.assertEqual(self.invoke('init', self.second, **self.grant)[1]['publication_id'], new_id)
+        code, operation = self.invoke('operation', self.second, new_id, key='create-pr-1',
+                                      request={'head': self.second['head']})
+        self.assertEqual(code, 0, operation)
+        opened = {**self.second, 'state': 'OPEN',
+                  'pr': {'id': 'PR_second', 'number': 15, 'url': 'https://example.invalid/pr/15'}}
+        code, bound = self.invoke('observe', opened)
+        self.assertEqual(code, 0, bound)
+        self.assertEqual((bound['publication_id'], bound['pr']), (new_id, opened['pr']))
+        code, moved = self.invoke('observe', {**opened, 'head': 'e'*40}, new_id)
+        self.assertEqual(code, 0, moved)
+        self.assertEqual(moved['identity']['head'], 'e'*40)
+        self.assertEqual(self.carrier(original).read_bytes(), prior_bytes)
+
+    def test_stale_and_unauthorized_init_leave_the_merged_record_unchanged(self):
+        original = self.merge_first()
+        prior_bytes = self.carrier(original).read_bytes()
+        for snapshot, publication_id, grant in (
+            (self.second, None, {'target_branch': 'main'}),
+            ({**self.second, 'head': self.first['head']}, None, self.grant),
+            (self.second, original, self.grant),
+        ):
+            with self.subTest(snapshot=snapshot, publication_id=publication_id, grant=grant):
+                code, result = self.invoke('init', snapshot, publication_id, **grant)
+                self.assertNotEqual(code, 0, result)
+                self.assertEqual(self.carrier(original).read_bytes(), prior_bytes)
+
+    def test_another_carriers_controller_delivery_is_not_rebound(self):
+        source = self.root / 'registered-source'
+        source.mkdir()
+        old_carrier = '.skill-tree/history/publications/pub-' + '1'*32 + '.json'
+        new_carrier = '.skill-tree/history/publications/pub-' + '2'*32 + '.json'
+        workspace = {'branch': 'develop', 'repo_id': 'fixture', 'remote': 'origin',
+                     'remote_id': 'original-remote', 'base_branch': 'main'}
+        old = {'id': 'old', 'workspace': workspace, 'delivery': {
+            'publication': old_carrier, 'implementation': 'completed', 'status': 'merged'}}
+        new = {'id': 'new', 'workspace': workspace, 'delivery': {
+            'publication': 'not-requested', 'implementation': 'completed',
+            'authorization': {'pr': True, 'target_branch': 'main'}}}
+        registry = {'runs': {'old': old, 'new': new}}
+        record = {'identity': pr.identity(self.second)}
+        before = deepcopy(old)
+        with (patch.object(pr.ws, 'runtime', return_value={'worktrees': {'new': str(source)}}),
+              patch.object(pr.ws, 'common_dir', return_value=self.root / '.git'),
+              patch.object(pr.ws, 'git', side_effect=['develop', self.second['head']])):
+            self.assertIs(pr.matching_publication_run(registry, self.root, source, record,
+                                                      new_carrier, attach=True), new)
+        self.assertEqual(old, before)
+        self.assertIs(pr.matching_publication_run(registry, self.root, source, record, old_carrier), old)
+        self.assertIsNone(pr.matching_publication_run(registry, self.root, source, record, new_carrier))
+
+    def test_reject_block_and_new_operations_on_a_completed_publication(self):
+        key = self.merge_first()
+        carrier = self.carrier(key)
+        before = carrier.read_bytes()
+        for snapshot in (self.first, self.second):
+            self.assertNotEqual(self.invoke('block', snapshot, key, reason='Unrelated hold')[0], 0)
+        self.assertNotEqual(self.invoke('operation', self.first, key, key='new-operation', request={})[0], 0)
+        self.assertEqual(self.invoke('operation', self.first, key, key='create-pr-1',
+                                     request={'head': self.first['head']})[0], 0)
+        self.assertEqual(carrier.read_bytes(), before)
+
+    def test_pre_pr_head_drift_preserves_the_prepared_provider_attempt(self):
+        self.merge_first()
+        code, initialized = self.invoke('init', self.second, **self.grant)
+        self.assertEqual(code, 0, initialized)
+        key = initialized['publication_id']
+        self.assertEqual(self.invoke('operation', self.second, key, key='create-pr-1',
+                                     request={'head': self.second['head']})[0], 0)
+        carrier = self.carrier(key)
+        before = carrier.read_bytes()
+        moved = {**self.second, 'head': 'e'*40}
+        self.assertNotEqual(self.invoke('init', moved, key, **self.grant)[0], 0)
+        self.assertNotEqual(self.invoke('operation', moved, key, key='create-pr-2',
+                                        request={'head': moved['head']})[0], 0)
+        self.assertEqual(carrier.read_bytes(), before)
+
+    def test_mixed_receipt_recovery_preview_verifies_both_cycles_without_writing(self):
+        key = self.merge_first()
+        carrier = self.carrier(key)
+        archive = carrier.read_text()
+        mixed = json.loads(archive)
+        mixed.update(identity=pr.identity(self.second), status='pr-review-in-progress', order_completed=False)
+        creation = {'key': 'create-pr-2', 'request': {
+            'action': 'create-pr', 'head': self.second['head'], 'base': 'main'},
+            'result': {'number': 15, 'url': 'https://example.invalid/pr/15'},
+            'snapshot': self.second}
+        mixed = pr.operation(mixed, creation['key'], creation['request'], creation['result'])
+        carrier.write_text(json.dumps(mixed))
+        raw = carrier.read_bytes()
+        request = {'expected_publication_sha256': hashlib.sha256(raw).hexdigest(),
+                   'archived_receipt': archive, 'creation_receipt': creation}
+        code, result = self.invoke('publication-recovery-preview', {}, key, **request)
+        self.assertEqual(code, 0, result)
+        self.assertEqual(result['original_pr']['number'], 9)
+        self.assertEqual(result['newer_pr']['number'], 15)
+        self.assertEqual(result['archived_sha256'], hashlib.sha256(archive.encode()).hexdigest())
+        for drift in ({'expected_publication_sha256': '0'*64},
+                      {'archived_receipt': '[]'},
+                      {'creation_receipt': {**creation, 'result': {**creation['result'], 'number': 16}}},
+                      {'archived_receipt': json.dumps({**json.loads(archive), 'merge_commit': '0'*40})}):
+            self.assertNotEqual(self.invoke('publication-recovery-preview', {}, key, **(request | drift))[0], 0)
+        self.assertNotEqual(self.invoke('init', self.second, key, **self.grant)[0], 0)
+        self.assertEqual(carrier.read_bytes(), raw)
+
+
 class LocalTargetSyncTests(unittest.TestCase):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()

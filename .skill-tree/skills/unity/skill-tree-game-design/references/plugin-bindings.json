@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "18f0e1daa34c8385737d9eea284968db127f3173e5ebbfa74b34e9b96e951488",
+  "identity": "1353e49fc245f053b133a014583bc98a73e4cd4d4b1e2d6f1c9b36fbf5a26f94",
   "operation": "skill-tree-game-design",
   "operations": {
     "skill-tree-3d": {
@@ -3300,7 +3300,7 @@
     "references/installation-profile.md": "5a8ab3d1a37d094b679543ec3c32090a5102ef7fd5399ab1925cbfd4eb7bd235",
     "references/narrative-human-playtest.md": "f6894df614f45fbdc059147ab2100d9abed8cbb9dcd37ddbc5d02f0fd4b31238",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
-    "references/project-profile.md": "8a7024ec889570f1a7617bb06896a24b6161242534f941d94a09ff5b39c80078",
+    "references/project-profile.md": "c3555431b56f8456123b46dfa7634095e0c16b738ee00faa8819cf01ab85ed2f",
     "references/ugui-testing.md": "873c236f793ff3c9ece8f0d0346c5c48513e8220406fce216751571c58b79073",
     "references/unity-development.md": "49110c691d4493cd21e8c3ceb682053e3f975016be9879cd10836d9f4feaf371",
     "references/unity-safety.md": "c4a96cdb4bc35a98fcab8ba6bf9c983252cd73d1cefaa439669cedcbed357df0",

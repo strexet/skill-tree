@@ -3188,7 +3188,7 @@
   "configuration_digest": "87750cec61522974d35e71eed46f1b2c790b521a438d2f90c3d7ca1f76ac796d",
   "definitions": [],
   "format": "skill-tree-plugin-bindings",
-  "identity": "5256e0ec71560592a5f7bf598566a68281cd749c25d910dedc1fd3073dd64ece",
+  "identity": "ab824965e6f8a716bcbd2367cb89a68c8ac40e6977cfd81e7bef4c3b4fca49bb",
   "operation": "skill-tree-create-documents-snapshot",
   "operations": {
     "skill-tree-3d": {
@@ -3295,7 +3295,7 @@
     "references/document-rules.md": "6a8500da7426257490a1c7f1234f4f4f4cb705e02e5271b947fb961b38872b69",
     "references/installation-profile.md": "5a8ab3d1a37d094b679543ec3c32090a5102ef7fd5399ab1925cbfd4eb7bd235",
     "references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
-    "references/project-profile.md": "06965da1f029a27cdb25ac1fa04c2340fc72404f01863c93152855f1f63b3594",
+    "references/project-profile.md": "d0a05d40c902cbeeae820fe1906134e2f5adbe5ede31147063fa60a57b718afc",
     "references/snapshot-rules.md": "18142120546fcd532e496fbd14aefbe449fa63da40cbcca577db249b91dcd30e",
     "references/validation-policy.md": "8ab3ed2b2f73595d4ebbff29af451cefb5f0b804ea1499be9dc385effff5f5f3",
     "references/web-development.md": "67bb456b2322e102e84e198ba89468159f59d05d7bed2c996d4eb97db38b1d90",
